@@ -829,6 +829,9 @@ function onActivityCheck(tm)
       elseif tm >= actTime2013_04_09 and tm < actTime2013_04_09+5*86400 then
           setRechargeActive(true, 16)
           setNeedRechargeRank(true)
+      elseif tm >= actTime2013_04_14 and tm < actTime2013_04_14+7*86400 then
+          setRechargeActive(true, 16)
+          setNeedRechargeRank(true)
       else
           setRechargeActive(false, 16)
           setNeedRechargeRank(false)
@@ -1332,6 +1335,8 @@ function initActTime(y, m, d)
   --空间黄钻、大厅蓝钻礼包
   local  SerStartTm244 = { ['year'] = 2013, ['month'] = 3, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  local  SerStartTm2013_04_14 = { ['year'] = 2013, ['month'] = 4, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   --300-399越南版用了
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -1758,6 +1763,7 @@ function initActTime(y, m, d)
   actTime2013_04_12= os.time(SerStartTm2013_04_01)+86400*11;
   actTime2013_04_27= os.time(SerStartTm2013_04_01)+86400*26;
   actTime2013_04_09= os.time(SerStartTm2013_04_01)+86400*8;
+  actTime2013_04_14= os.time(SerStartTm2013_04_14)
 
   onActivityCheck(os.time() + 30);
 
