@@ -10863,6 +10863,9 @@ namespace GObject
         case 16:
             getConsumeAward();
             break;
+        case 17:
+            getDiamondInfo(opt);
+            break;
         }
     }
 
@@ -11194,7 +11197,20 @@ namespace GObject
             Stream st(REP::GETAWARD);
             st << static_cast<UInt8>(12) << idx << Stream::eos;
             send(st);
+
+            getDiamondInfo(opt);
         }
+    }
+    void Player::getDiamondInfo(UInt8 opt)
+    {
+        static UInt32 s_varId[] = {196, 197, 245};
+        if (opt == 0 || opt > 3)
+            return;
+        UInt32 id = s_varId[opt-1];
+        UInt8 num = GetVar(id);
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(17) << opt << num << Stream::eos;
+        send(st);
     }
     void Player::getConsumeAward()
     {
@@ -16103,13 +16119,15 @@ void EventTlzAuto::notify(bool isBeginAuto)
         }
         if (type & 0x10)
         {
+            UInt32 f = 0;
+            UInt32 t = 0;
             for (UInt8 i = 0; i < 14; ++i)
             {
-                Int32 f = fFgt->getElixirAttrByOffset(i);
-                Int32 t = tFgt->getElixirAttrByOffset(i);
-                money += abs(int(f-t))*1;
-                money4 += abs(int(f-t))*1;
+                f += fFgt->getElixirAttrByOffset(i);
+                t += tFgt->getElixirAttrByOffset(i);
             }
+            money += abs(int(f-t))*1;
+            money4 += abs(int(f-t))*1;
         }
         //34是测试区
         if(getGold() < money && cfg.serverNum != 34)
@@ -18910,7 +18928,7 @@ void Player::buyRP7Treasure(UInt8 idx)
     UInt8 res = 0;
     UInt32 opTime = TimeUtil::MkTime(cfg.openYear, cfg.openMonth, cfg.openDay);
     if((TimeUtil::SharpDay(0) >= opTime + 7 * 86400 && cfg.rpServer) ||
-       (TimeUtil::Now()<GVAR.GetVar(GVAR_TREASURE_BEGIN) || TimeUtil::Now()>GVAR.GetVar(GVAR_TREASURE_END))
+       ((TimeUtil::Now()<GVAR.GetVar(GVAR_TREASURE_BEGIN) || TimeUtil::Now()>GVAR.GetVar(GVAR_TREASURE_END)) && !cfg.rpServer)
       )
         res = 4;
     UInt8 v = GetVar(VAR_RP7_TREASURE); 

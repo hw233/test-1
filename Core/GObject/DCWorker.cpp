@@ -324,5 +324,17 @@ namespace GObject
         #undef JSON_ERR_CUSTOM3
         #undef JSON_ERR_CUSTOM4
     }
+    bool DCWorker::CheckRPOpenid(char* openid)
+    {
+        if (!cfg.rpServer)
+            return true;
+        if (!m_inited || NULL == openid)
+            return false;
+        char value[32] = {0};
+        char key[64] = {0};
+        size_t len = snprintf(key, sizeof(key), "uid_asss_rp_%s", openid); 
+        m_MCached.get(key, len, value, sizeof(value));
+        return value[0] == '1';
+    }
 }
 

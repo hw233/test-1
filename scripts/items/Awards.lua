@@ -441,7 +441,7 @@ function RunBlueDiamondAward(player, opt)
     };
     local item = {
         [1] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
-        [2] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
+        [2] = {{515,3},{9338,4},{134,4},{1325,4},{507,2},{509,2},{47,3},{5006,1}},
         [3] = {{515,3},{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{5026,1}},
         [4] = {{507,2},{509,2},{503,10},{1325,4},{47,3},{134,4},{515,10},{'ipad',1}},
     };
@@ -468,10 +468,10 @@ function RunBlueDiamondAward(player, opt)
         end
     end
     local extraAward_9191 = {
-        [2] = {{9191,1}},
-        [5] = {{50,2}, {9371,5}, {548,10}},
-        [8] = {{509,5}, {507,5}, {500,5}},
-        [12]= {{9076,5},{503,5},{515,5}},
+        [2] = {9191,1,1},
+        [5] = {50,2,1, 9371,5,1, 548,10,1},
+        [8] = {509,5,1, 507,5,1, 500,5,1},
+        [12]= {9076,5,1, 503,5,1, 515,5,1},
     };
 
     local VAR_BLUE_AWARD_COUNT = 196;
@@ -491,9 +491,9 @@ function RunBlueDiamondAward(player, opt)
         count = player:GetVar(VAR_YELLOW_AWARD_COUNT);
         local extarAward = extraAward_9191[count];
         if extarAward then
-            for i=1,#extarAward do
-                package:Add(extarAward[i][1], extarAward[i][2], true, 0, 31);
-            end
+            local title = string.format(msg_130)
+            local ctx = string.format(msg_131, count)
+            player:GetMailBox():newItemPackageMail(title, ctx, extarAward);
         end
     elseif opt == 3 then
         player:AddVar(VAR_QQVIP_AWARD_COUNT, 1);
