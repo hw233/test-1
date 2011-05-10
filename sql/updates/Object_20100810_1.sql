@@ -1,0 +1,5 @@
+ALTER TABLE `clan_player`  ADD COLUMN `advReg` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `optime`;
+ALTER TABLE `special_fighter`  DROP PRIMARY KEY,  ADD INDEX `id` (`id`),  ADD UNIQUE INDEX `id_playerId` (`id`, `playerId`);
+ALTER TABLE `player`  ADD COLUMN `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `wallow`;
+ALTER TABLE `player`  CHANGE COLUMN `slaught` `slaught` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `country`,  CHANGE COLUMN `archievement` `archievement` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `slaught`,  CHANGE COLUMN `donation` `donation` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `archievement`;
+ALTER TABLE `special_fighter`  ADD COLUMN `summoned` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `ring`;

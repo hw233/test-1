@@ -1,0 +1,2 @@
+DELETE FROM `fighter_train` WHERE `ownerId`=2147483647;
+ALTER TABLE `fighter_train` MODIFY `ownerId` BIGINT(20) UNSIGNED NOT NULL;

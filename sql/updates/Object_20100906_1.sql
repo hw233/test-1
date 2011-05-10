@@ -1,0 +1,17 @@
+DELETE FROM `mail` WHERE `flag` = 0x11;
+DROP TABLE `tavern`;
+UPDATE `special_fighter` SET `id` = 44 WHERE `id` = 1;
+UPDATE `special_fighter` SET `id` = 135 WHERE `id` = 10;
+UPDATE `special_fighter` SET `id` = 10 WHERE `id` = 2;
+UPDATE `special_fighter` SET `id` = 136 WHERE `id` = 80;
+UPDATE `special_fighter` SET `id` = 80 WHERE `id` = 3;
+UPDATE `special_fighter` SET `id` = 131 WHERE `id` = 4;
+UPDATE `special_fighter` SET `id` = 132 WHERE `id` = 5;
+UPDATE `special_fighter` SET `id` = 133 WHERE `id` = 6;
+ALTER TABLE `special_fighter`  CHANGE COLUMN `pending` `potential` FLOAT(5,2) UNSIGNED NOT NULL DEFAULT '1.00' AFTER `playerId`,  DROP COLUMN `loyalty`;
+REPLACE INTO `special_fighter` SELECT `sex` + `class`, `player`.`id`, 1.0f, `level`, `experience`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `amulet`, `ring`, CURRENT_TIMESTAMP() from `player`, `fighter` where `player`.`mainFighter` = `fighter`.`id`;
+DROP TABLE `fighter`;
+ALTER TABLE `special_fighter`  RENAME TO `fighter`;
+UPDATE `player`, `fighter` SET `player`.`mainFighter` = `fighter`.`id`, `player`.`formation` = 0, `player`.`lineup` = CONCAT(`fighter`.`id`, '|12') WHERE `fighter`.`playerId` = `player`.`id`;
+UPDATE `fighter` `fgt`, `tdyx_info_v2`.`special_fighter_template` `tp` SET `fgt`.`potential` = `tp`.`potential` WHERE `fgt`.`id` = `tp`.`id`;
+ALTER TABLE `player`  ADD COLUMN `tavernId` VARCHAR(255) NOT NULL DEFAULT '' AFTER `nextReward`;

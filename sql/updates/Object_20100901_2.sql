@@ -1,0 +1,1 @@
+ALTER TABLE `day_task_instance`  ADD COLUMN `consumeGold` smallint(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `currDay`;

@@ -1,0 +1,17 @@
+--Ö÷³ÌÐò¼ÓÔØ
+require("global")
+require("Task/Task_All")
+require("Explore/Explore_All")
+require("Collect/Collect_All")
+require("Monster/Monster_All")
+require("Convey/Convey")
+require("UseItem/ItemTask")
+require("UseItem/ItemNormal")
+require("UseItem/TaskItemUse")
+require("UseItem/Function")
+require("DayTask/DayTask")
+require("DayTask/DayCopyTask");
+require("DayTask/GreatFighterDayTask")
+require("MapObject/NpcDefaultAction")
+require("Other/OperationTaskAction")
+require("Special/Activity")

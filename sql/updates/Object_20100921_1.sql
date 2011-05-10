@@ -1,0 +1,1 @@
+ALTER TABLE `player`  CHANGE COLUMN `totalRecharge` `totalRecharge` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `lineup`,  CHANGE COLUMN `nextReward` `nextReward` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `totalRecharge`,  ADD COLUMN `nextExtraReward` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `nextReward`;

@@ -1,0 +1,1226 @@
+#ifndef _GOBJECTDBEXECHELPER_H_
+#define _GOBJECTDBEXECHELPER_H_
+
+#include "DB/DBExecHelper.h"
+#include "ItemData.h"
+#include "TaskData.h"
+#include "DB/DBExecHelper.h"
+#include "Map.h"
+#include "Server/WorldServer.h"
+#include "Player.h"
+
+namespace GData
+{
+
+struct DBNpcGroup
+{
+	UInt32 id;
+	std::string fighterId;
+	UInt8 formationId;
+	UInt32 experience;
+	std::string lootId;
+};
+
+struct DBDungeon
+{
+	UInt32 id;
+	std::string name;
+	UInt16 location;
+	UInt8 type;
+	UInt8 lvlReq;
+};
+
+struct DBDungeonLevel
+{
+	UInt32 id;
+	UInt8 level;
+	UInt32 monsterSet;
+	std::string lootSet;
+};
+
+struct DBDungeonMonster
+{
+	UInt32 id;
+	UInt8 formated;
+	std::string monsters;
+	UInt32 experience;
+};
+
+struct DBClanAssistant
+{
+	UInt32 id;
+	UInt8 formated;
+	std::string assistants;
+};
+
+}
+
+namespace GObject
+{
+
+struct DBMapSpot
+{
+	UInt16	id;
+	std::string	name;
+	UInt8	type;
+	UInt8	countryBattle;
+	UInt32	x;
+	UInt32	y;
+};
+
+struct DBBoss
+{
+	UInt32 id;
+	UInt16 location;
+	UInt32 spawnTime;
+	UInt32 fleeTime;
+	UInt8 appearLevel;
+};
+
+struct DBMailPackageData
+{
+	UInt32		id;
+	UInt32		itemId;
+	UInt32		itemCount;
+};
+
+struct DBMailData
+{
+	UInt32		id;
+	UInt64		playerId;
+	std::string	sender;
+	UInt32		recvTime;
+	UInt8		flag;
+	std::string	title;
+	std::string	content;
+	UInt32		additionalId;
+};
+
+struct DBPlayerData
+{
+	UInt64 id;
+	PlayerData pdata;
+	UInt8 bossLevel;
+	std::string icCount;
+	std::string lineup;
+	std::string nextreward;
+	std::string tavernId;
+	std::string bookStore;
+};
+
+struct DBPrepaid
+{
+	UInt64 id;
+	UInt32 gold;
+};
+
+struct DBPlayerBuffData
+{
+	UInt64 id;
+	UInt8 buffId;
+	UInt32 data;
+};
+
+struct DBFighterBuffData
+{
+	UInt64 playerId;
+	UInt32 fighterId;
+	UInt8 buffId;
+	UInt32 data;
+};
+
+struct DBFighter
+{
+	UInt32 id;
+	std::string name;
+	UInt8 cls;
+	UInt8 lvl;
+	UInt8 sex;
+	float potential;
+	UInt16 skill;
+	UInt32 npc_weapon;
+	UInt32 favor;
+	UInt32 friendliness;
+	Int16 strength;
+	Int16 physique;
+	Int16 agility;
+	Int16 intelligence;
+	Int16 attack;
+	Int16 defend;
+	Int32 hp;
+	UInt16 action;
+	float hitrate;
+	float evade;
+	float critical;
+	float pierce;
+	float counter;
+	std::string extraPos;
+};
+
+struct DBFightersFriendliness
+{
+	UInt64 playerId;
+	UInt32 fighterId;
+	UInt16 friendliness;
+	UInt16 submitFavorCount;
+	UInt32 submitFavorDay;
+};
+
+struct DBSecondPWD
+{
+	UInt64 playerId;
+	std::string secondPWD;
+	std::string questionForPWD;
+	std::string answerForPWD;
+};
+
+struct DBBossHP
+{
+	UInt32 id;
+	UInt8 level;
+	UInt8 pos;
+	UInt32 hp;
+};
+
+struct DBBossDamage
+{
+	UInt32 id;
+	UInt64 playerId;
+	UInt32 damage;
+	UInt32 exp;
+};
+
+struct DBFighterObj
+{
+	UInt32 id;
+	UInt64 playerId;
+	float potential;
+	UInt8 level;
+	UInt64 experience;
+	UInt32 hp;
+	UInt32 weapon;
+	UInt32 armor1;
+	UInt32 armor2;
+	UInt32 armor3;
+	UInt32 armor4;
+	UInt32 armor5;
+	UInt32 ring;
+	UInt32 amulet;
+	UInt16 skill;
+};
+
+struct DBEquipment
+{
+	UInt32 id;
+	UInt32 itemId;
+	UInt8 enchant;
+	UInt8 attrType1;
+	Int16 attrValue1;
+	UInt8 attrType2;
+	Int16 attrValue2;
+	UInt8 attrType3;
+	Int16 attrValue3;
+	UInt8 sockets;
+	UInt32 socket1;
+	UInt32 socket2;
+	UInt32 socket3;
+	UInt32 socket4;
+	UInt32 socket5;
+	UInt32 socket6;
+	UInt8 bindType;
+};
+
+struct DBFriend
+{
+	UInt64 id;
+	UInt8 type;
+	UInt64 friendId;
+};
+
+struct DBClan
+{
+	UInt32 id;
+	std::string name;
+	UInt8  rank;
+	UInt32 foundTime;
+	UInt64 founder;
+	UInt64 leader;
+	std::string contact;
+	std::string announce;
+	std::string purpose;
+	UInt32 proffer;
+	UInt32 grabAchieve;
+	UInt8 battleTime;
+	UInt8 nextBattleTime;
+	UInt32 allyClan;
+	UInt32 enemyClan1;
+	UInt32 enemyClan2;
+	UInt32 battleThisDay;
+	UInt8  battleStatus;
+	UInt8  southEdurance;
+	UInt8  northEdurance;
+	UInt8  hallEdurance;
+	UInt8  hasBattle;
+};
+
+struct DBClanRepo
+{
+	UInt32 id;
+	UInt32 itemId;
+	UInt32 itemNum;
+};
+
+struct DBClanPlayer
+{
+	UInt32 id;
+	UInt64 playerId;
+	UInt32 joinTime;
+	UInt32 proffer;
+	UInt8  enterCount;
+	UInt16 achieveCount;
+	UInt32 thisDay;
+	UInt16 petFriendness[4];
+	UInt16 favorCount[4];
+	UInt32 lastFavorTime[4];
+};
+
+struct DBClanSkill
+{
+	UInt32 clanId;
+	UInt8  skillId;
+	UInt8  level;
+	UInt16  extra;
+};
+
+struct DBClanPendingPlayer
+{
+	UInt32 id;
+	UInt64 playerId;
+	UInt8 cls;
+	UInt32 opTime;
+};
+
+struct DBClanDonateRecord
+{
+	UInt32 clanId;
+	std::string doanteName;
+	UInt8 skillId;
+	UInt16 donateCount;
+	UInt32 donateTime;
+};
+
+struct DBClanBattleResult
+{
+	UInt32 id;
+	UInt32 battleTime;
+	UInt8 result;
+};
+
+struct DBClanBattler
+{
+	UInt32 id;
+	UInt64 battler;
+	UInt8  battlerLev;
+	UInt32 battlerClanId;
+	UInt32 battleClanTime;
+	UInt16 battleHold;
+	UInt8  battleStatus;
+	UInt16 reliveNum;
+	UInt16 wins;
+	UInt16 serialWins;
+	UInt16 maxSerialWins;
+	UInt8  southEdurance;
+	UInt8  northEdurance;
+	UInt32 grabAchieve;
+	UInt8  hasEnter;
+	UInt8 hasAttack;
+};
+
+struct DBCBClanReward
+{
+	UInt32 id;
+	UInt32 itemNum;
+};
+
+struct DBCBPlayerReward
+{
+	UInt64 id;
+	UInt32 itemNum;
+};
+
+struct DBClanPendingReward
+{
+	UInt32 id;
+	UInt32 timeAlloc;
+	UInt64 playerId;
+	UInt32 itemId;
+	UInt32 itemNum;
+};
+
+struct DBClanRewardRecord
+{
+	UInt32 id;
+	UInt8 type;
+	UInt32 timeAlloc;
+	std::string playerName;
+	std::string items;
+};
+
+struct DBTaskData
+{
+	UInt64 m_ownerId;
+	UInt32 m_TaskId;
+	UInt32 m_AcceptTime;
+	std::string m_TaskStep;
+	UInt32 m_TimeBegin;
+	UInt32 m_TimeEnd;
+	UInt8  m_Completed;
+	UInt8  m_Submit;
+};
+
+struct DBTaskCompleteData
+{
+	UInt64 m_ownerId;
+	UInt32 m_TaskId;
+    UInt32 m_TimeEnd;
+};
+
+struct DBDayTaskData
+{
+	UInt32 m_LoopTaskId;
+	UInt64 m_ownerId;
+	UInt16 m_Count;
+	UInt16 m_MaxCount;
+	UInt16 m_MaxFlushQualityCount;
+	UInt32 m_PreTaskId;
+	UInt32 m_PreFlushTime;
+	UInt8  m_PreTaskQuality;
+	UInt32 m_AutoCompletedTaksId;
+	UInt32 m_AutoCompletedTaskAcceptTime;
+	UInt32 m_CurrDay;
+	UInt16 m_FlushCount;
+};
+
+typedef ItemData DBItemData;
+
+struct DBDungeonPlayer
+{
+	UInt32 id;
+	UInt64 playerId;
+	UInt8 difficulty;
+	UInt8 level;
+	UInt8 count;
+	UInt16 totalCount;
+	std::string firstPass;
+	UInt32 counterEnd;
+};
+
+
+struct DBDungeonAuto
+{
+	UInt64 playerId;
+	UInt32 dungeonId;
+	UInt32 totalExp;
+	UInt8 won;
+};
+
+struct DBTradeData
+{
+	UInt32 tradeId;
+	UInt64 ownerId;
+	UInt8  tradeSide;
+	UInt8  tradeStatus;
+	UInt64 tradeTo;
+	std::string tradeTitle;
+	UInt32 tradeTime;
+	UInt32 coin;
+	UInt32 gold;
+	std::string items;
+};
+
+struct DBSaleData
+{
+	UInt32 saleId;
+	UInt64 ownerId;
+	UInt8  status;
+	UInt32 saleTime;
+	UInt8  priceType;
+	UInt32 price;
+	UInt32 itemId;
+	UInt16 itemNum;
+};
+
+struct DBAutoBattle
+{
+	UInt64 playerId;
+	UInt32 npcId;
+	UInt16 count;
+	UInt16 interval;
+};
+
+struct DBExchangeTicket
+{
+	UInt64 playerId;
+	UInt32 count;
+};
+
+struct DBAthleticsData
+{
+	UInt8  row;
+	UInt32 rank;
+	UInt64 ranker;
+	UInt32 maxRank;
+	UInt8  challengeNum;
+	UInt32 challengeTime;
+	UInt8  boxcolor;
+	UInt8  boxtype;
+	UInt32 boxcount;
+	UInt32 boxFlushTime;
+	UInt8  winStreak;
+};
+
+struct DBAthleticsRecordData
+{
+	UInt32 id;
+	UInt64 atker;
+	UInt64 defer;
+	UInt32 repid;
+	UInt32 time;
+	UInt8  winSide;
+	UInt8  awardType;
+	UInt32 awardAtkerCount;
+};
+
+struct DBSpecialAward
+{
+	UInt8 rank;
+	UInt8 type;
+	UInt64 playerid;
+};
+
+struct DBLuckyDraw
+{
+	UInt64 playerid;
+	UInt32 cost;
+};
+
+struct DBFighterTrain
+{
+	UInt32 fighterId;
+	UInt64 ownerId;
+	UInt8  priceType;
+	UInt32 price;
+	UInt32 trainTime;
+	UInt32 trainRemain;
+	UInt32 checkTime;
+	UInt32 accExp;
+};
+
+
+struct DBClanAssistant
+{
+	UInt32 id;
+	UInt8 formated;
+	std::string assistants;
+};
+
+struct DBVersion
+{
+	std::string version;
+};
+
+struct DBArenaBet
+{
+	UInt64 id;
+	UInt8 round;
+	UInt8 group;
+	UInt8 pos;
+	UInt8 tael;
+};
+
+}
+
+namespace DB {
+
+SPECIALBEGIN(GObject::MapData)
+SPECIALDEF(5)
+	(
+	UInt8, m_ID,
+	std::string, m_Name,
+	UInt8, m_Level,
+	UInt8, m_Acquirable,
+	UInt8, m_Country
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMapSpot)
+SPECIALDEF(6)
+	(
+	UInt16, id,
+	std::string, name,
+	UInt8, type,
+	UInt8, countryBattle,
+	UInt32, x,
+	UInt32, y
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBBoss)
+SPECIALDEF(5)
+	(
+	UInt32, id,
+	UInt16, location,
+	UInt32, spawnTime,
+	UInt32, fleeTime,
+	UInt8, appearLevel
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::MOData)
+SPECIALDEF(5)
+	(
+	UInt32,		m_ID,
+	std::string,m_Name,
+	UInt16,		m_Spot,
+	UInt8,		m_Type,
+	UInt32,		m_ActionType
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBPlayerData)
+SPECIALDEF(30)
+	(
+	UInt64, id,
+	std::string, pdata.name,
+	UInt32, pdata.gold,
+	UInt32, pdata.coupon,
+	UInt32, pdata.tael,
+	UInt32, pdata.coin,
+	UInt32, pdata.status,
+	UInt8, pdata.country,
+	UInt8, pdata.title,
+	UInt32, pdata.achievement,
+	UInt16, pdata.location,
+	UInt8, pdata.inCity,
+	UInt32, pdata.lastOnline,
+	UInt64, pdata.newGuild,
+	UInt16, pdata.packSize,
+	std::string, icCount,
+	UInt8, pdata.formation,
+	std::string, lineup,
+	UInt8, bossLevel,
+	UInt32, pdata.totalRecharge,
+	std::string, nextreward,
+	UInt32, pdata.nextExtraReward,
+	UInt32, pdata.lastExp,
+	UInt64, pdata.lastResource,
+	std::string, tavernId,
+	std::string, bookStore,
+	UInt8, pdata.gmLevel,
+	UInt8, pdata.wallow,
+	UInt32, pdata.created,
+	UInt32, pdata.lockExpireTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBPrepaid)
+SPECIALDEF(2)
+	(
+	UInt64, id,
+	UInt32, gold
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBPlayerBuffData)
+SPECIALDEF(3)
+	(
+	UInt64, id,
+	UInt8, buffId,
+	UInt32, data
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFighterBuffData)
+SPECIALDEF(4)
+	(
+	UInt64, playerId,
+	UInt32, fighterId,
+	UInt8, buffId,
+	UInt32, data
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMailPackageData)
+SPECIALDEF(3)
+(
+	UInt32,		id,
+	UInt32,		itemId,
+	UInt32,		itemCount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMailData)
+SPECIALDEF(8)
+(
+	UInt32,		id,
+	UInt64,		playerId,
+	std::string,sender,
+	UInt32,		recvTime,
+	UInt8,		flag,
+	std::string,title,
+	std::string,content,
+	UInt32,		additionalId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFighter)
+SPECIALDEF(24)
+(
+	UInt32, id,
+	std::string, name,
+	UInt8, cls,
+	UInt8, lvl,
+	UInt8, sex,
+	float, potential,
+	UInt16, skill,
+	UInt32, npc_weapon,
+	UInt32, favor,
+	UInt32, friendliness,
+	Int16, strength,
+	Int16, physique,
+	Int16, agility,
+	Int16, intelligence,
+	Int16, attack,
+	Int16, defend,
+	Int32, hp,
+	UInt16, action,
+	float, hitrate,
+	float, evade,
+	float, critical,
+	float, pierce,
+	float, counter,
+	std::string, extraPos
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFightersFriendliness)
+SPECIALDEF(5)
+	(
+	UInt64, playerId,
+	UInt32, fighterId,
+	UInt16, friendliness,
+	UInt16, submitFavorCount,
+	UInt32, submitFavorDay
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSecondPWD)
+SPECIALDEF(4)
+(
+ UInt64, playerId,
+ std::string, secondPWD,
+ std::string, questionForPWD,
+ std::string, answerForPWD
+ )
+ SPECIALEND()
+
+SPECIALBEGIN(GObject::DBBossHP)
+SPECIALDEF(4)
+	(
+	UInt32, id,
+	UInt8, level,
+	UInt8, pos,
+	UInt32, hp
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBBossDamage)
+SPECIALDEF(4)
+	(
+	UInt32, id,
+	UInt64, playerId,
+	UInt32, damage,
+	UInt32, exp
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFighterObj)
+SPECIALDEF(15)
+	(
+	UInt32, id,
+	UInt64, playerId,
+	float, potential,
+	UInt8, level,
+	UInt64, experience,
+	UInt32, hp,
+	UInt32, weapon,
+	UInt32, armor1,
+	UInt32, armor2,
+	UInt32, armor3,
+	UInt32, armor4,
+	UInt32, armor5,
+	UInt32, ring,
+	UInt32, amulet,
+	UInt16, skill
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBNpcGroup)
+SPECIALDEF(5)
+(
+	UInt32, id,
+	std::string, fighterId,
+	UInt8, formationId,
+	UInt32, experience,
+	std::string, lootId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBDungeon)
+SPECIALDEF(5)
+	(
+	UInt32, id,
+	std::string, name,
+	UInt16, location,
+	UInt8, type,
+	UInt8, lvlReq
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBDungeonLevel)
+SPECIALDEF(4)
+	(
+	UInt32, id,
+	UInt8, level,
+	UInt32, monsterSet,
+	std::string, lootSet
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBDungeonMonster)
+SPECIALDEF(4)
+	(
+	UInt32, id,
+	UInt8, formated,
+	std::string, monsters,
+	UInt32, experience
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFriend)
+SPECIALDEF(3)
+(
+	UInt64, id,
+	UInt8, type,
+	UInt64, friendId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClan)
+SPECIALDEF(22)
+(
+	UInt32, id,
+	std::string, name,
+	UInt8, rank,
+	UInt32, foundTime,
+	UInt64, founder,
+	UInt64, leader,
+	std::string, contact,
+	std::string, announce,
+	std::string, purpose,
+	UInt32, proffer,
+	UInt32, grabAchieve,
+	UInt8, battleTime,
+	UInt8, nextBattleTime,
+	UInt32, allyClan,
+	UInt32, enemyClan1,
+	UInt32, enemyClan2,
+	UInt32, battleThisDay,
+	UInt8,  battleStatus,
+	UInt8,  southEdurance,
+	UInt8,  northEdurance,
+	UInt8,  hallEdurance,
+	UInt8,  hasBattle
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBClanRepo)
+SPECIALDEF(3)
+(
+	UInt32, id,
+	UInt32, itemId,
+	UInt32, itemNum
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBClanDonateRecord)
+SPECIALDEF(5)
+(
+	UInt32, clanId,
+	std::string, doanteName,
+	UInt8, skillId,
+	UInt16, donateCount,
+	UInt32, donateTime
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBClanPlayer)
+SPECIALDEF(19)
+(
+	UInt32, id,
+	UInt64, playerId,
+	UInt32, joinTime,
+	UInt32, proffer,
+	UInt8,  enterCount,
+	UInt16, achieveCount,
+	UInt32, thisDay,
+	UInt16, petFriendness[0],
+	UInt16, petFriendness[1],
+	UInt16, petFriendness[2],
+	UInt16, petFriendness[3],
+	UInt16, favorCount[0],
+	UInt16, favorCount[1],
+	UInt16, favorCount[2],
+	UInt16, favorCount[3],
+	UInt32, lastFavorTime[0],
+	UInt32, lastFavorTime[1],
+	UInt32, lastFavorTime[2],
+	UInt32, lastFavorTime[3]
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanPendingPlayer)
+SPECIALDEF(4)
+(
+	UInt32, id,
+	UInt64, playerId,
+	UInt8, cls,
+	UInt32, opTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBCBClanReward)
+SPECIALDEF(2)
+(
+	UInt32, id,
+	UInt32, itemNum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBCBPlayerReward)
+SPECIALDEF(2)
+(
+	UInt64, id,
+	UInt32, itemNum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanPendingReward)
+SPECIALDEF(5)
+(
+	UInt32, id,
+	UInt32, timeAlloc,
+	UInt64, playerId,
+	UInt32, itemId,
+	UInt32, itemNum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanRewardRecord)
+SPECIALDEF(5)
+(
+	UInt32, id,
+	UInt8, type,
+	UInt32, timeAlloc,
+	std::string, playerName,
+	std::string, items
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanBattleResult)
+SPECIALDEF(3)
+(
+	UInt32, id,
+	UInt32, battleTime,
+	UInt8, result
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBTaskData)
+SPECIALDEF(8)
+(
+	UInt64,	m_ownerId,
+	UInt32,	m_TaskId,
+	UInt32,	m_AcceptTime,
+	std::string,m_TaskStep,
+	UInt32,	m_TimeBegin,
+	UInt32,	m_TimeEnd,
+	UInt8,	m_Completed,
+	UInt8,	m_Submit
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTaskCompleteData)
+SPECIALDEF(3)
+(
+	UInt64,	m_ownerId,
+	UInt32,	m_TaskId,
+	UInt32, m_TimeEnd
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBDayTaskData)
+SPECIALDEF(12)
+(
+	UInt32, m_LoopTaskId,
+	UInt64,	m_ownerId,
+	UInt16, m_Count,
+	UInt16, m_MaxCount,
+	UInt16, m_MaxFlushQualityCount,
+	UInt32, m_PreTaskId,
+	UInt32, m_PreFlushTime,
+	UInt8 , m_PreTaskQuality,
+	UInt32, m_AutoCompletedTaksId,
+	UInt32, m_AutoCompletedTaskAcceptTime,
+	UInt32, m_CurrDay,
+	UInt16, m_FlushCount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBItemData)
+SPECIALDEF(4)
+(
+	UInt32,	id,
+	UInt64,	ownerId,
+	UInt16,	itemNum,
+	UInt8,  bindType
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBEquipment)
+SPECIALDEF(17)
+(
+	UInt32, id,
+	UInt32, itemId,
+	UInt8, enchant,
+	UInt8, attrType1,
+	Int16, attrValue1,
+	UInt8, attrType2,
+	Int16, attrValue2,
+	UInt8, attrType3,
+	Int16, attrValue3,
+	UInt8, sockets,
+	UInt32, socket1,
+	UInt32, socket2,
+	UInt32, socket3,
+	UInt32, socket4,
+	UInt32, socket5,
+	UInt32, socket6,
+	UInt8, bindType
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBDungeonPlayer)
+SPECIALDEF(8)
+(
+	UInt32, id,
+	UInt64, playerId,
+	UInt8, difficulty,
+	UInt8, level,
+	UInt8, count,
+	UInt16, totalCount,
+	std::string, firstPass,
+	UInt32, counterEnd
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBDungeonAuto)
+SPECIALDEF(4)
+(
+ UInt64, playerId,
+ UInt32, dungeonId,
+ UInt32, totalExp,
+ UInt8, won
+ )
+ SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBTradeData)
+SPECIALDEF(10)
+(
+	UInt32, tradeId,
+	UInt64, ownerId,
+	UInt8,  tradeSide,
+	UInt8,  tradeStatus,
+	UInt64, tradeTo,
+	std::string, tradeTitle,
+	UInt32, tradeTime,
+	UInt32, coin,
+	UInt32, gold,
+	std::string, items
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSaleData)
+SPECIALDEF(8)
+(
+	UInt32, saleId,
+	UInt64, ownerId,
+	UInt8,  status,
+	UInt32, saleTime,
+	UInt8,  priceType,
+	UInt32, price,
+	UInt32, itemId,
+	UInt16, itemNum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAutoBattle)
+SPECIALDEF(4)
+(
+	UInt64, playerId,
+	UInt32, npcId,
+	UInt16, count,
+	UInt16, interval
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBExchangeTicket)
+SPECIALDEF(2)
+(
+	UInt64, playerId,
+	UInt32, count
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAthleticsData)
+SPECIALDEF(11)
+(
+	UInt8,  row,
+	UInt32, rank,
+	UInt64, ranker,
+	UInt32, maxRank,
+	UInt8,  challengeNum,
+	UInt32, challengeTime,
+	UInt8,  boxcolor,
+	UInt8,  boxtype,
+	UInt32, boxcount,
+	UInt32, boxFlushTime,
+	UInt8,  winStreak
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAthleticsRecordData)
+SPECIALDEF(8)
+(
+	UInt32, id,
+	UInt64, atker,
+	UInt64, defer,
+	UInt32, repid,
+	UInt32, time,
+	UInt8,	winSide,
+	UInt8,  awardType,
+	UInt32, awardAtkerCount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSpecialAward)
+SPECIALDEF(3)
+(
+	UInt8, rank,
+	UInt8, type,
+	UInt64, playerid
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLuckyDraw)
+SPECIALDEF(2)
+(
+ UInt64, playerid,
+ UInt32, cost
+ )
+ SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFighterTrain)
+SPECIALDEF(8)
+(
+	UInt32, fighterId,
+	UInt64, ownerId,
+	UInt8,  priceType,
+	UInt32, price,
+	UInt32, trainTime,
+	UInt32, trainRemain,
+	UInt32, checkTime,
+	UInt32, accExp
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBClanSkill)
+SPECIALDEF(4)
+(
+	UInt32, clanId,
+	UInt8,  skillId,
+	UInt8,  level,
+	UInt16, extra
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanBattler)
+SPECIALDEF(16)
+(
+	UInt32, id,
+	UInt64, battler,
+	UInt8,  battlerLev,
+	UInt32, battlerClanId,
+	UInt32, battleClanTime,
+	UInt16, battleHold,
+	UInt8,  battleStatus,
+	UInt16, reliveNum,
+	UInt16, wins,
+	UInt16, serialWins,
+	UInt16, maxSerialWins,
+	UInt8,  southEdurance,
+	UInt8,  northEdurance,
+	UInt32, grabAchieve,
+	UInt8,  hasEnter,
+	UInt8,  hasAttack
+)
+SPECIALEND()
+
+
+SPECIALBEGIN(GObject::DBClanAssistant)
+SPECIALDEF(3)
+(
+	UInt32, id,
+	UInt8, formated,
+	std::string, assistants
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBArenaBet)
+SPECIALDEF(5)
+(
+	UInt64, id,
+	UInt8, round,
+	UInt8, group,
+	UInt8, pos,
+	UInt8, tael
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBVersion)
+SPECIALDEF(1)
+(
+	std::string, version
+)
+SPECIALEND()
+
+}
+
+#endif // _GOBJECTDBEXECHELPER_H_

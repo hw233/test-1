@@ -1,0 +1,7 @@
+addWeapon(1, "Sword", 35, 0, weapon.Sword)
+addWeapon(2, "Hammer", 25, 0, weapon.Hammer)
+addWeapon(3, "Spear", 25, 0, weapon.Spear)
+addWeapon(4, "Whip", 25, 0, weapon.Whip)
+addWeapon(5, "Bow", 30, 0, weapon.Bow)
+addWeapon(6, "Throwing", 30, 0, weapon.Throwing)
+addWeapon(7, "Fan", 35, 0, weapon.Fan)

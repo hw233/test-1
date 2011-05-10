@@ -1,0 +1,2 @@
+CREATE TABLE `mail_package` (  `id` INT(10) UNSIGNED NOT NULL,  `itemId` INT(10) UNSIGNED NOT NULL,  `itemCount` INT(10) UNSIGNED NOT NULL,  INDEX `id` (`id`),  UNIQUE INDEX `id_itemId` (`id`, `itemId`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;
+CREATE TABLE `dungeon_auto` (  `playerId` BIGINT(20) UNSIGNED NOT NULL,  `dungeonId` INT(10) UNSIGNED NOT NULL,  `totalExp` INT(10) UNSIGNED NOT NULL,  `won` TINYINT(1) UNSIGNED NOT NULL,  PRIMARY KEY (`playerId`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;

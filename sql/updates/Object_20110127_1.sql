@@ -1,0 +1,1 @@
+UPDATE `clan` AS `update_clan` SET `leader` = `update_clan`.`founder` WHERE	`leader` = 0;

@@ -1,0 +1,1 @@
+CREATE TABLE `locked_player` (  `player_id` BIGINT(20) UNSIGNED NOT NULL,  `lockExpireTime` INT(10) UNSIGNED NOT NULL,  PRIMARY KEY (`player_id`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;

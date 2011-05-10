@@ -1,0 +1,125 @@
+SET FOREIGN_KEY_CHECKS=0;
+-- ----------------------------
+-- Table structure for temp_box_award
+-- ----------------------------
+CREATE TABLE `temp_box_award` (
+  `id` int(11) NOT NULL,
+  `value` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records 
+-- ----------------------------
+INSERT INTO `temp_box_award` VALUES ('1000', '4000');
+INSERT INTO `temp_box_award` VALUES ('1011', '4500');
+INSERT INTO `temp_box_award` VALUES ('1021', '5000');
+INSERT INTO `temp_box_award` VALUES ('1031', '5500');
+INSERT INTO `temp_box_award` VALUES ('1041', '6000');
+INSERT INTO `temp_box_award` VALUES ('1051', '6500');
+INSERT INTO `temp_box_award` VALUES ('1002', '10000');
+INSERT INTO `temp_box_award` VALUES ('1012', '11000');
+INSERT INTO `temp_box_award` VALUES ('1022', '12000');
+INSERT INTO `temp_box_award` VALUES ('1032', '13000');
+INSERT INTO `temp_box_award` VALUES ('1042', '14000');
+INSERT INTO `temp_box_award` VALUES ('1052', '15000');
+INSERT INTO `temp_box_award` VALUES ('1003', '22000');
+INSERT INTO `temp_box_award` VALUES ('1013', '24000');
+INSERT INTO `temp_box_award` VALUES ('1023', '26000');
+INSERT INTO `temp_box_award` VALUES ('1033', '28000');
+INSERT INTO `temp_box_award` VALUES ('1043', '30000');
+INSERT INTO `temp_box_award` VALUES ('1053', '32000');
+INSERT INTO `temp_box_award` VALUES ('2001', '10');
+INSERT INTO `temp_box_award` VALUES ('2011', '15');
+INSERT INTO `temp_box_award` VALUES ('2021', '20');
+INSERT INTO `temp_box_award` VALUES ('2031', '25');
+INSERT INTO `temp_box_award` VALUES ('2041', '30');
+INSERT INTO `temp_box_award` VALUES ('2051', '35');
+INSERT INTO `temp_box_award` VALUES ('2002', '25');
+INSERT INTO `temp_box_award` VALUES ('2012', '30');
+INSERT INTO `temp_box_award` VALUES ('2022', '40');
+INSERT INTO `temp_box_award` VALUES ('2032', '50');
+INSERT INTO `temp_box_award` VALUES ('2042', '60');
+INSERT INTO `temp_box_award` VALUES ('2052', '70');
+INSERT INTO `temp_box_award` VALUES ('2003', '50');
+INSERT INTO `temp_box_award` VALUES ('2013', '60');
+INSERT INTO `temp_box_award` VALUES ('2023', '80');
+INSERT INTO `temp_box_award` VALUES ('2033', '100');
+INSERT INTO `temp_box_award` VALUES ('2043', '120');
+INSERT INTO `temp_box_award` VALUES ('2053', '140');
+INSERT INTO `temp_box_award` VALUES ('3001', '2');
+INSERT INTO `temp_box_award` VALUES ('3011', '5');
+INSERT INTO `temp_box_award` VALUES ('3021', '7');
+INSERT INTO `temp_box_award` VALUES ('3031', '10');
+INSERT INTO `temp_box_award` VALUES ('3041', '12');
+INSERT INTO `temp_box_award` VALUES ('3051', '15');
+INSERT INTO `temp_box_award` VALUES ('3002', '5');
+INSERT INTO `temp_box_award` VALUES ('3012', '10');
+INSERT INTO `temp_box_award` VALUES ('3022', '15');
+INSERT INTO `temp_box_award` VALUES ('3032', '20');
+INSERT INTO `temp_box_award` VALUES ('3042', '25');
+INSERT INTO `temp_box_award` VALUES ('3052', '30');
+INSERT INTO `temp_box_award` VALUES ('3003', '10');
+INSERT INTO `temp_box_award` VALUES ('3013', '20');
+INSERT INTO `temp_box_award` VALUES ('3023', '30');
+INSERT INTO `temp_box_award` VALUES ('3033', '40');
+INSERT INTO `temp_box_award` VALUES ('3043', '50');
+INSERT INTO `temp_box_award` VALUES ('3053', '60');
+INSERT INTO `temp_box_award` VALUES ('1101', '7000');
+INSERT INTO `temp_box_award` VALUES ('1111', '7500');
+INSERT INTO `temp_box_award` VALUES ('1121', '8000');
+INSERT INTO `temp_box_award` VALUES ('1131', '8500');
+INSERT INTO `temp_box_award` VALUES ('1141', '9000');
+INSERT INTO `temp_box_award` VALUES ('1151', '11000');
+INSERT INTO `temp_box_award` VALUES ('1102', '16000');
+INSERT INTO `temp_box_award` VALUES ('1112', '17000');
+INSERT INTO `temp_box_award` VALUES ('1122', '18000');
+INSERT INTO `temp_box_award` VALUES ('1132', '19000');
+INSERT INTO `temp_box_award` VALUES ('1142', '20000');
+INSERT INTO `temp_box_award` VALUES ('1152', '25000');
+INSERT INTO `temp_box_award` VALUES ('1103', '35000');
+INSERT INTO `temp_box_award` VALUES ('1113', '37000');
+INSERT INTO `temp_box_award` VALUES ('1123', '39000');
+INSERT INTO `temp_box_award` VALUES ('1133', '41000');
+INSERT INTO `temp_box_award` VALUES ('1143', '43000');
+INSERT INTO `temp_box_award` VALUES ('1153', '53000');
+INSERT INTO `temp_box_award` VALUES ('2101', '40');
+INSERT INTO `temp_box_award` VALUES ('2111', '45');
+INSERT INTO `temp_box_award` VALUES ('2121', '50');
+INSERT INTO `temp_box_award` VALUES ('2131', '60');
+INSERT INTO `temp_box_award` VALUES ('2141', '80');
+INSERT INTO `temp_box_award` VALUES ('2151', '100');
+INSERT INTO `temp_box_award` VALUES ('2102', '80');
+INSERT INTO `temp_box_award` VALUES ('2112', '90');
+INSERT INTO `temp_box_award` VALUES ('2122', '100');
+INSERT INTO `temp_box_award` VALUES ('2132', '120');
+INSERT INTO `temp_box_award` VALUES ('2142', '160');
+INSERT INTO `temp_box_award` VALUES ('2152', '200');
+INSERT INTO `temp_box_award` VALUES ('2103', '160');
+INSERT INTO `temp_box_award` VALUES ('2113', '180');
+INSERT INTO `temp_box_award` VALUES ('2123', '200');
+INSERT INTO `temp_box_award` VALUES ('2133', '240');
+INSERT INTO `temp_box_award` VALUES ('2143', '320');
+INSERT INTO `temp_box_award` VALUES ('2153', '400');
+INSERT INTO `temp_box_award` VALUES ('3101', '17');
+INSERT INTO `temp_box_award` VALUES ('3111', '20');
+INSERT INTO `temp_box_award` VALUES ('3121', '22');
+INSERT INTO `temp_box_award` VALUES ('3131', '25');
+INSERT INTO `temp_box_award` VALUES ('3141', '27');
+INSERT INTO `temp_box_award` VALUES ('3151', '30');
+INSERT INTO `temp_box_award` VALUES ('3102', '35');
+INSERT INTO `temp_box_award` VALUES ('3112', '40');
+INSERT INTO `temp_box_award` VALUES ('3122', '45');
+INSERT INTO `temp_box_award` VALUES ('3132', '50');
+INSERT INTO `temp_box_award` VALUES ('3142', '55');
+INSERT INTO `temp_box_award` VALUES ('3152', '60');
+INSERT INTO `temp_box_award` VALUES ('3103', '70');
+INSERT INTO `temp_box_award` VALUES ('3113', '80');
+INSERT INTO `temp_box_award` VALUES ('3123', '90');
+INSERT INTO `temp_box_award` VALUES ('3133', '100');
+INSERT INTO `temp_box_award` VALUES ('3143', '110');
+INSERT INTO `temp_box_award` VALUES ('3153', '120');
+
+ALTER TABLE `athletics_rank` ADD COLUMN `boxColor` tinyint(1)  NOT  NULL default '0' AFTER `challengeTime`, ADD COLUMN `boxType` tinyint(1) NOT NULL default  '0'  AFTER `boxColor`, ADD COLUMN `boxCount` int(10) NOT NULL default  '0'  AFTER `boxType`;
+UPDATE `athletics_rank`, `temp_box_award`  SET  `boxColor` = (`boxId` % 10 -1), `boxType` =  IF ((FLOOR(`boxId` / 1000) = 1), 0, (FLOOR(`boxId` / 1000))), `boxCount` = `temp_box_award`.`value`  WHERE  `temp_box_award`.`id` = `athletics_rank`.`boxId`;
+ALTER TABLE `athletics_rank` DROP COLUMN `boxId`;
+DROP TABLE `temp_box_award`;

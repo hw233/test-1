@@ -1,0 +1,1 @@
+ALTER TABLE `player`  CHANGE COLUMN `icCount` `icCount` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `mainFighter`;

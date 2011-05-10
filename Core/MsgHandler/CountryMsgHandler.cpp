@@ -1,0 +1,184 @@
+#include "Config.h"
+#include "CountryMsgHandler.h"
+#include "CountryOuterMsgHandler.h"
+#include "CountryInnerMsgHandler.h"
+
+MSG_HANDLER_DECLARE(CountryMsgHandler)
+
+MSG_REG(GameMsgHdr, OnNullReq);
+MSG_REG(GameMsgHdr, OnPlayerInfoReq);
+MSG_REG_2(GameMsgHdr, 0x15, OnPlayerInfoChangeReq);
+MSG_REG_2(GameMsgHdr, 0x1A, OnBookStoreListReq);
+MSG_REG(GameMsgHdr, OnPurchaseBookReq);
+MSG_REG(GameMsgHdr, OnStatusChangeReq);
+MSG_REG_2(GameMsgHdr, 0x1E, OnSetFormationReq);
+MSG_REG(GameMsgHdr, OnFighterEquipReq);
+MSG_REG(GameMsgHdr, OnRecruitFighterReq);
+MSG_REG_2(GameMsgHdr, 0x23, OnFighterInfoReq);
+MSG_REG(GameMsgHdr, OnGreatFighterTaskValReq);
+MSG_REG_2(GameMsgHdr, 0x25, OnGreatFighterActionReq);
+MSG_REG_2(GameMsgHdr, 0x26, OnRecruitListReq);
+MSG_REG(GameMsgHdr, OnFighterDismissReq);
+MSG_REG(GameMsgHdr, OnFighterRegenReq);
+MSG_REG(GameMsgHdr, OnFighterTrainReq);
+MSG_REG(GameMsgHdr, OnFighterTrain2Req);
+MSG_REG(GameMsgHdr, OnFighterTrainListReq);
+MSG_REG_2(GameMsgHdr, 0x2E, OnFighterTrainOpReq);
+MSG_REG(GameMsgHdr, OnExtendPackageReq);
+MSG_REG(GameMsgHdr, OnTakeOnlineRewardReq);
+MSG_REG(GameMsgHdr, OnEnchantReq);
+MSG_REG(GameMsgHdr, OnOpenSocketReq);
+MSG_REG(GameMsgHdr, OnMergeGemReq);
+MSG_REG(GameMsgHdr, OnAttachGemReq);
+MSG_REG(GameMsgHdr, OnDetachGemReq);
+MSG_REG(GameMsgHdr, OnSplitReq);
+MSG_REG(GameMsgHdr, OnExchangeReq);
+MSG_REG(GameMsgHdr, OnForgeReq);
+MSG_REG_2(GameMsgHdr, 0x49, OnBatchSplitReq);
+MSG_REG(GameMsgHdr, OnExchangeSetReq);
+MSG_REG_2(GameMsgHdr, 0x4B, OnBatchMergeReq);
+MSG_REG(GameMsgHdr, OnActivateAttrReq);
+MSG_REG(GameMsgHdr, OutCitySwitchReq);
+MSG_REG(GameMsgHdr, InCitySwitchReq);
+MSG_REG(GameMsgHdr, OnTransportReq);
+MSG_REG(GameMsgHdr, OnDungeonOpReq);
+MSG_REG(GameMsgHdr, OnDungeonInfoReq);
+MSG_REG(GameMsgHdr, OnDungeonBattleReq);
+MSG_REG(GameMsgHdr, OnDungeonAutoReq);
+MSG_REG(GameMsgHdr, OnDungeonCompleteAutoReq);
+MSG_REG(GameMsgHdr, OnDailyReq);
+MSG_REG(GameMsgHdr, OnNpcTriggerReq);
+MSG_REG(GameMsgHdr, OnPlayerGetTaskReq);
+MSG_REG(GameMsgHdr, OnCanAcceptTaskReq);
+MSG_REG(GameMsgHdr, OnTaskActionReq);
+MSG_REG(GameMsgHdr, OnTaskNpcActionReq);
+MSG_REG(GameMsgHdr, CountryBattleJoinReq);
+MSG_REG(GameMsgHdr, OnChallengePlayerReq);
+MSG_REG(GameMsgHdr, OnLanchChallengeReq);
+MSG_REG(GameMsgHdr, OnRequestChallengeReq);
+MSG_REG(GameMsgHdr, OnAttackNpcReq);
+MSG_REG(GameMsgHdr, OnAutoBattleReq);
+MSG_REG(GameMsgHdr, OnCancelAutoBattleReq);
+MSG_REG(GameMsgHdr, OnInstantAutoBattleReq);
+MSG_REG(GameMsgHdr, OnBattleEndReq);
+MSG_REG(GameMsgHdr, OnConveyBattleReq);
+MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
+MSG_REG(GameMsgHdr, OnLuckyDrawReq);
+
+MSG_REG(GameMsgHdr, OnFlushTaskColorReq);
+MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
+MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
+MSG_REG(GameMsgHdr, OnQueryDayTaskCompletedCountReq);
+MSG_REG(GameMsgHdr, OnQueryPackageItemReq);
+MSG_REG_2(GameMsgHdr, 0x31, OnDestroyItemReq);
+MSG_REG_2(GameMsgHdr, 0x32, OnSellItemReq);
+MSG_REG(GameMsgHdr, OnUseItemReq);
+
+MSG_REG(GameMsgHdr, OnStoreBuyReq);
+
+MSG_REG(GameMsgHdr, OnChatReq);
+MSG_REG(GameMsgHdr, OnPrivChatReq);
+MSG_REG(GameMsgHdr, OnChatItemReq);
+
+MSG_REG(GameMsgHdr, OnSubmitBugInfo);
+
+MSG_REG(GameMsgHdr, OnTradeListReq);
+MSG_REG(GameMsgHdr, OnTradeDataReq);
+MSG_REG(GameMsgHdr, OnTradeLaunchReq);
+MSG_REG(GameMsgHdr, OnTradeReplyReq);
+MSG_REG(GameMsgHdr, OnTradeOperate);
+
+MSG_REG(GameMsgHdr, OnSaleSellReq);
+
+MSG_REG(GameMsgHdr, OnMailListReq);
+MSG_REG(GameMsgHdr, OnMailReq);
+MSG_REG(GameMsgHdr, OnMailClickReq);
+MSG_REG_2(GameMsgHdr, 0xA2, OnMailDelReq);
+MSG_REG_2(GameMsgHdr, 0xA0, OnMailList2Req);
+MSG_REG(GameMsgHdr, OnMailSendReq);
+
+MSG_REG(GameMsgHdr, OnFriendListReq);
+MSG_REG(GameMsgHdr, OnFriendOpReq);
+MSG_REG(GameMsgHdr, OnFriendActReq);
+
+MSG_REG(GameMsgHdr, OnGreatFighterMetReq);
+MSG_REG(GameMsgHdr, OnGreatFighterInfoReq);
+
+MSG_REG(GameMsgHdr, OnAthleticsDataReq);
+
+MSG_REG(GameMsgHdr, OnBlockBossReq);
+MSG_REG(GameMsgHdr, OnAttackBlockBossReq);
+
+MSG_REG(GameMsgHdr, OnPwdQuestionReq);
+MSG_REG_2(GameMsgHdr, 0xCA, OnOpPwdReq);
+MSG_REG(GameMsgHdr, OnLockPwdReq);
+
+MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
+
+MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);
+MSG_REG_2(GameMsgHdr, 0x1ED, OnRunScriptReq);
+MSG_REG_2(GameMsgHdr, 0x1EF, OnRunScriptBattleReq);
+MSG_REG_2(GameMsgHdr, 0x1F0, PlayerEnter);
+MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
+
+MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
+MSG_REG_2(GameMsgHdr, 0x201, PlayerLogin);
+MSG_REG_2(GameMsgHdr, 0x202, PlayerReconnect);
+MSG_REG_2(GameMsgHdr, 0x203, PlayerExpAdd);
+
+MSG_REG_2(GameMsgHdr, 0x212, OnAthleticsReq);
+MSG_REG_2(GameMsgHdr, 0x213, OnAthleticsDeferNotify);
+MSG_REG_2(GameMsgHdr, 0x214, OnAthleticsDropNotify);
+MSG_REG_2(GameMsgHdr, 0x215, OnAthleticsBeReq);
+MSG_REG_2(GameMsgHdr, 0x216, OnAthleticsEnterResp);
+
+MSG_REG_2(GameMsgHdr, 0x217, OnAthleticsAwardReq);
+MSG_REG_2(GameMsgHdr, 0x218, OnGetBoxAddSource);
+MSG_REG_2(GameMsgHdr, 0x219, OnOnAthleticsEnterNotify);
+MSG_REG_2(GameMsgHdr, 0x220, OnAthleticsResNotify);
+
+MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
+MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
+
+MSG_REG_2(GameMsgHdr, 0x269, OnDailyCheck);
+
+MSG_REG_2(GameMsgHdr, 0x270, OnGetClanBattleRewardReq);
+MSG_REG_2(GameMsgHdr, 0x271, OnClanTakeRewardReq);
+MSG_REG_2(GameMsgHdr, 0x272, OnClanBattleAttendReq);
+MSG_REG_2(GameMsgHdr, 0x274, OnExpGainByInstantCompleteReq);
+
+MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
+
+MSG_REG_2(GameMsgHdr, 0x280, OnCancelDungeonAutoNotifyReq);
+MSG_REG_2(GameMsgHdr, 0x281, OnCompleteDungeonAutoNotifyReq);
+MSG_REG_2(GameMsgHdr, 0x289, OnTimerEventCompletedNotify);
+MSG_REG_2(GameMsgHdr, 0x28C, OnSearchAutoBattleResult);
+MSG_REG_2(GameMsgHdr, 0x28D, OnSearchAutoDungeonResult);
+
+MSG_REG_2(GameMsgHdr, 0x291, OnLaunchTradeNotify);
+MSG_REG_2(GameMsgHdr, 0x292, OnOperateTradeNotify);
+MSG_REG_2(GameMsgHdr, 0x293, OnConfirmTradeNotify);
+MSG_REG_2(GameMsgHdr, 0x294, OnTradeDataNotify);
+MSG_REG_2(GameMsgHdr, 0x295, OnDelTradeNotify);
+
+MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
+
+MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
+
+MSG_REG_2(GameMsgHdr, 0x300, OnSalePriceCheckNotify);
+MSG_REG_2(GameMsgHdr, 0x301, OnSaleAddItemNotify);
+MSG_REG_2(GameMsgHdr, 0x302, OnSaleSellReqNotify);
+MSG_REG_2(GameMsgHdr, 0x303, OnSaleSellRespNotify);
+MSG_REG_2(GameMsgHdr, 0x304, OnSaleItemCancel);	//È¡Ïû & ³¬Ê±
+MSG_REG_2(GameMsgHdr, 0x305, OnSaleItemSearchReq);
+
+
+MSG_REG_2(GameMsgHdr, 0x306, OnGmHandler);
+
+MSG_REG_2(GameMsgHdr, 0x307, OnDelFgtTrainNotify);
+
+MSG_REG_2(GameMsgHdr, 0x308, OnClanSkillDonateCheckReq);
+MSG_REG_2(GameMsgHdr, 0x309, OnClanSkillDonateBackReq);
+
+
+MSG_HANDLER_END()

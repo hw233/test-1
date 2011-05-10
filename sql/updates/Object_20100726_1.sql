@@ -1,0 +1,1 @@
+CREATE TABLE `clan_reward_record` (  `id` INT(10) UNSIGNED NOT NULL,  `type` TINYINT(3) UNSIGNED NOT NULL, `timeAlloc` INT(10) UNSIGNED NOT NULL,  `playerName` VARCHAR(255) NOT NULL,  `items` VARCHAR(4095) NOT NULL DEFAULT '',  INDEX `id` (`id`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;

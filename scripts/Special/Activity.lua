@@ -1,0 +1,620 @@
+function checkExpire(player)
+  local tm = os.time()
+  local nextReward = player:getNextExtraReward()
+  if tm >= nextReward then
+    player:removeStatus(0xFFF8FF00)
+    local thisDay = GetSharpDay(tm)
+    nextReward = GetSharpDay(tm) + 86400
+    player:setNextExtraReward(nextReward)
+  end
+end
+
+function checkExpire2(player, stage)
+  checkExpire(player)
+end
+
+function sendRewardMail(player, title, content, itemid, count)
+  player:GetMailBox():newItemMail(0x21, title, content, itemid, count)
+end
+
+function sendItemPackageMail(player, title, content, table_item)
+  player:GetMailBox():newItemPackageMail(title, content, table_item);
+end
+
+local MailPackage_Table = {
+	[1] = {[8922] = 1},
+	[2] = {[8922] = 2},
+	[3] = {[8922] = 3},
+	[4] = {[8922] = 4, [8923] = 1},
+	[5] = {[8922] = 5, [8923] = 2, [8924] = 1},
+	[6] = {[8922] = 6, [8923] = 3, [8924] = 2, [8927] = 1},
+	[11] = {[8934] = 1},
+	[12] = {[8934] = 2},
+	[13] = {[8934] = 3},
+	[14] = {[8934] = 4, [8924] = 1},
+	[15] = {[8934] = 5, [8924] = 2, [8923] = 1},
+	[16] = {[8934] = 6, [8924] = 3, [8923] = 2, [8927] = 1},
+	[1001] = {[8934] = 2},
+	[1003] = {[8934] = 10, [8940] = 5},
+	[1004] = {[8934] = 6},
+	[10002] = {[8923] = 2},
+	[10003] = {[8922] = 2},
+}
+function onGetMailItems(pkgId)--client read mail 
+	local ItemTable = {};
+	if pkgId == 10000 then
+		table.insert(ItemTable, 0xA000);--itemId:Coin = 0x8000, Tael = 0x9000, Coupon = 0xA000, Gold = 0xB000, Achievement = 0xC000
+		table.insert(ItemTable, 888);--itemCount
+		return ItemTable;
+	elseif pkgId == 10001 then
+		table.insert(ItemTable, 0xA000);
+		table.insert(ItemTable, 88)
+		return ItemTable;
+	end
+	local pkgFunc = MailPackage_Table[pkgId]
+	if pkgFunc ~= nil then    
+		for k, v in pairs(pkgFunc) do
+			table.insert(ItemTable, k);
+			table.insert(ItemTable, v);
+		end
+	end
+	if pkgId == 1001 then
+		table.insert(ItemTable, 0xA000);   
+		table.insert(ItemTable, 100);    	
+	elseif pkgId == 1002 then
+		table.insert(ItemTable, 0xA000);
+		table.insert(ItemTable, 88);        
+	elseif pkgId == 1003 then
+		table.insert(ItemTable, 0xA000);
+		table.insert(ItemTable, 1000);        
+	elseif pkgId == 1004 then
+		table.insert(ItemTable, 0xA000); 
+		table.insert(ItemTable, 300);    	
+	end
+	return ItemTable;
+end
+
+function onTakeMailPackage(player, pkgId)
+  if pkgId == 10000 then
+    player:getCoupon(888)
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 888 礼券!")
+    return true
+  elseif pkgId == 10001 then
+    player:getCoupon(88)
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 88 礼券!")
+    return true
+  end
+  local pkgFunc = MailPackage_Table[pkgId]
+  if pkgFunc ~= nil then
+    local package = player:GetPackage()
+    local reqGrids = 0
+    for k, v in pairs(pkgFunc) do
+      reqGrids = reqGrids + package:GetItemUsedGrids(k, v, 1)
+    end
+    if reqGrids > package:GetRestPackageSize() then
+      return false
+    end
+    for k, v in pairs(pkgFunc) do
+      package:AddItem(k, v, 1)
+    end
+  end
+  if pkgId == 10002 then
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 [4:8923] x2!")
+  elseif pkgId == 10003 then
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 [4:8922] x2!")
+  elseif pkgId == 1001 then
+    player:getCoupon(100)
+  elseif pkgId == 1002 then
+    player:getCoupon(88)
+  elseif pkgId == 1003 then
+    player:getCoupon(1000)
+  elseif pkgId == 1004 then
+    player:getCoupon(300)
+  end
+  return true
+end
+
+function onLogin(player)
+	local stage = getActivityStage();
+	checkExpire2(player, stage);
+end
+
+function onLevelup(player, olev, nlev)
+end
+
+function onDungeonWin(player, id, diffficulty, level)
+	if (id == 1 and level == 15) or (id == 2 and level == 22) or (id == 3 and level == 44) or (id == 4 and level == 20) or (id == 5 and level == 20)then
+		local stage = getActivityStage()
+		if stage == 1 then
+			checkExpire(player)
+			if player:hasStatus(0x100) then
+				return
+			end
+			player:addStatus(0x100)
+			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在副本通关后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+		end
+	end
+end
+
+function onClanBattleAttend(player)
+	local stage = getActivityStage()
+  	if stage == 1 then
+		checkExpire(player)
+		if player:hasStatus(0x400) then
+			return
+		end
+		player:addStatus(0x400)
+		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在宗族战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+	end
+end
+
+function onCountryBattleAttend(player)
+	local stage = getActivityStage();
+	if stage == 1 then	
+		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在国战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2);
+	end
+end
+
+function onCountryBattleWinStreak(player, count)
+end
+
+function onAttakerAward(attacker, defender, award)
+	local isMale1 = attacker:IsMale();
+	local isMale2 = defender:IsMale();
+	if (isMale1 and not isMale2) or (not isMale1 and isMale2) then
+		SendMsg(attacker, 0x35, "恭喜您通过情人节乱世佳人活动获得50%额外奖励");
+		return (award * 3 / 2);		
+	else
+		return award;
+	end	
+end
+
+function getActivateAttrResult(lastActivateCount, quality)
+  if lastActivateCount > 3 then
+    return true;
+  end
+  local rand = math.random(100);
+  return rand < 40;
+end
+
+function onAthleticWin(player)
+	local stage = getActivityStage()
+	if stage == 1 then	
+		checkExpire(player)
+		local cnt = player:getStatusBit(20, 3);
+		if(cnt >= 5) then
+			return;
+		end	
+		cnt = cnt + 1;
+		player:setStatusBit(20, 3, cnt);
+		if cnt == 5 then
+			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你今日竞技场胜利5次，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+		end
+	end
+end
+
+function onDayTaskComplete(player, count)
+	local stage = getActivityStage()
+	if stage == 1 then
+		checkExpire(player)
+		local cnt = player:getStatusBit(24, 2)
+		if cnt >= 2 then
+			return
+		end
+		local cnt2 = player:getStatusBit(26, 4)
+		cnt2 = cnt2 + count
+		if cnt2 >= 10 then
+			cnt2 = cnt2 - 10
+			cnt = cnt + 1
+			player:setStatusBit(24, 2, cnt)
+			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，您今日成功完成 10 次日常循环任务，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+		end
+		player:setStatusBit(26, 4, cnt2)
+	end
+end
+
+function onExchange(player)
+end
+
+function onMergeGem(player, lev, num)
+	local stage = getActivityStage();
+	local playerLev = player:GetLev();
+	local orangeFavor = {5820, 5821, 5822, 5823, 5824};
+	local dietyFavor = {5825, 5826, 5827, 5828};
+	if stage >= 1 and stage <= 3 then
+		if lev == 6 then
+			sendRewardMail(player, '合成6级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..num..'个三级洗炼符，赶紧领取吧！', 8916, 1 * num);
+		elseif lev == 7 then
+			local table_items = {8916, 1 * num, 1};			
+			if playerLev >= 85 then
+				for i = 1, num do 
+					table.insert(table_items, dietyFavor[math.random(1, 4)]);
+					table.insert(table_items, 1);
+					table.insert(table_items, 0);
+				end
+			else
+				for i = 1, num do 
+					table.insert(table_items, orangeFavor[math.random(1, 5)]);
+					table.insert(table_items, 1);
+					table.insert(table_items, 0);
+				end
+			end
+			sendItemPackageMail(player, '合成7级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..num..'个喜好品、'..num..'个三级洗炼符，赶紧领取吧！', table_items);
+		elseif lev == 8 then
+			local table_items = {9000, 1 * num, 1};
+			if playerLev >= 85 then
+				for i = 1, num do 
+					table.insert(table_items, dietyFavor[math.random(1, 4)]);
+					table.insert(table_items, 2);
+					table.insert(table_items, 0);
+				end
+			else
+				for i = 1, num do 
+					table.insert(table_items, orangeFavor[math.random(1, 5)]);
+					table.insert(table_items, 2);
+					table.insert(table_items, 0);
+				end
+			end
+			sendItemPackageMail(player, '合成8级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(2 * num)..'个喜好品、'..num..'个潜力保护符，赶紧领取吧！', table_items);
+		elseif lev == 9 then
+			local table_items = {9000, 2 * num, 1};
+			if playerLev >= 85 then
+				for i = 1, num do 
+					table.insert(table_items, dietyFavor[math.random(1, 4)]);
+					table.insert(table_items, 3);
+					table.insert(table_items, 0);
+				end
+			else
+				for i = 1, num do 
+					table.insert(table_items, orangeFavor[math.random(1, 5)]);
+					table.insert(table_items, 3);
+					table.insert(table_items, 0);
+				end
+			end
+			sendItemPackageMail(player, '合成9级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(3 * num)..'个喜好品、'..(2 * num)..'个潜力保护符，赶紧领取吧！', table_items);
+		elseif lev == 10 then
+			local table_items = {9000, 3 * num, 1};
+			if playerLev >= 85 then
+				for i = 1, num do 
+					table.insert(table_items, dietyFavor[math.random(1, 4)]);
+					table.insert(table_items, 4);
+					table.insert(table_items, 0);
+				end
+			else
+				for i = 1, num do 
+					table.insert(table_items, orangeFavor[math.random(1, 5)]);
+					table.insert(table_items, 4);
+					table.insert(table_items, 0);
+				end
+			end
+			sendItemPackageMail(player, '合成10级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(4 * num)..'个喜好品、'..(3 * num)..'个潜力保护符，赶紧领取吧！', table_items);
+		end
+	end
+end
+
+function onOnlineAward(player, itemId, count)
+	local stage = getActivityStage();
+	local rand = math.random(1, 100);
+	local package = player:GetPackage();
+	if rand < 16 then
+			if package:Add(itemId, count * 2, true, false, 12) == nil then
+				return false
+			end
+		SendMsg(player, 0x35, "恭喜您非常幸运地获得了春节期间在线双倍奖励！");
+		else
+			if package:Add(itemId, count, true, false, 12) == nil then
+				return false
+			end
+	end
+	return true
+end
+
+function onEnchant(player, level)
+  local stage = getActivityStage();
+  if stage == 2 then
+	if level == 7 then
+		sendRewardMail(player, '装备强化7级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你一个银票，赶紧领取吧！', 8996, 1);		
+	elseif level == 8 then
+		sendRewardMail(player, '装备强化8级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你一个潜力保护符，赶紧领取吧！', 9000, 1);		
+	elseif level == 9 then
+		sendRewardMail(player, '装备强化9级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你一个潜力保护符，赶紧领取吧！', 9000, 1);		
+	elseif level == 10 then
+		local favor = {5820, 5821, 5822, 5823, 5824};
+		local rand_favor = math.random(1, #favor);
+		local table_items = {favor[rand_favor], 10, 0};
+		sendItemPackageMail(player, '装备强化10级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你10个橙色喜好品，赶紧领取吧！', table_items);
+	end
+  end
+end
+
+function onAttackBoss(player)
+	local stage = getActivityStage()
+	if stage == 1 then
+		checkExpire(player)
+		local cnt = player:getStatusBit(30, 2)
+		if cnt >= 3 then
+			return
+		end
+		cnt = cnt + 1
+		player:setStatusBit(30, 2, cnt)
+		if cnt == 3 then
+			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你今日攻击Boss 3次，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+		end
+	end
+end
+
+function onPurchase(player, id, count)
+  return true
+end
+
+function onTopup(player, oldGold, newGold)
+  local stage = getActivityStage();
+  if stage == 2 then
+	if player:hasStatus(0x200) then
+		return;
+	end
+	player:addStatus(0x200)
+	sendRewardMail(player, '充值有礼', '您在活动期间充值获得“天地英雄银币嘉奖礼包”一个，内含银票2张。请在背包中留出足够空间后点击接收。天地英雄感谢您一路支持和关爱。', 8996, 2)
+  end
+  if stage == 5 then
+	local rand = math.random(1, 16);
+	local gold = newGold - oldGold;
+	player:sendTopupMail('恭喜您获得了春节字符奖券', "恭喜，您在活动期间充值了"..gold.."元宝，获得了一张相应的春节字符奖券，奖券号码为："..rand.."。\n如果您的奖券号码和2月6日公布的幸运字符一致，您将额外获得"..gold.."元宝的奖励。\n详见官网公告。", gold, rand);
+  end
+end
+
+function onTavernFlush(color)
+end
+
+function onLuckyDrawItemRoll(t)
+  local stage = getActivityStage();
+  if stage > 0 and stage < 4 then
+	if t == 1 then
+		if math.random(1,250) < 4 then
+			return 9208
+		end
+	elseif t == 2 or t == 3 or t == 4 or t == 7 then
+		if math.random(1,40) == 1 then
+			return 9208
+		end
+	end	
+  end
+  return 0
+end
+
+extra_dungeon_loot_item = {9032, 9032, 9032, 9033, 9033, 9033, 9034, 9034, 9034, 9035}
+dname = {'焚骨窟', '天人福邸', '困仙阵', '无间炼狱', '海底幻境'}
+function onDungeonLootItemRoll(player, id, d, l, b)
+	local stage = getActivityStage();
+	if stage ~= 3 then
+		return 0;
+	end
+	if id == 1 and d == 0 then
+		return 0;
+	end
+
+	local highr = 50;
+	if (id == 1 and level == 15) or (id == 2 and level == 22) or (id == 3 and level == 44) or (id == 4 and level == 20) or (id == 5 and level == 20)then
+		if d == 1 then
+			highr = 5;
+		else
+			highr = 10;
+		end
+	elseif not b then
+		if d == 1 then
+			highr = 25;
+		else
+			highr = 50;
+		end
+	else
+		if d == 1 then
+			highr = 10;
+		else 
+			highr = 20;
+		end
+	end	
+	if math.random(1, highr) == 1 then
+		local pic = {9218, 9219, 9220, 9221, 9222};
+		local rand = math.random(1, #pic);
+		local table_items = {pic[rand], 1, 0};
+		sendItemPackageMail(player, '清明节拼接清明上河图', '你在副本'..dname[id]..l..'层边打怪边看风景，无意中看到地上一张纸片，捡起一看，哇！清明上河图碎片！赶紧集齐一套去活动侍女处兑换奖励吧！', table_items);
+	end
+  return 0;
+end
+
+function exchangeRoll(player, itemId)
+  local roll = math.random(1,1000) - 1;
+  if roll < 10 then
+    local c
+    if roll == 0 then
+      c = 888;
+    else
+      c = 100;
+    end
+    player:getCoupon(c);
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用 [4:"..itemId.."] 兑换获得礼券" .. c);
+    return;
+  end
+  local itemId = 8996;
+  local itemCount = 1;
+  if roll < 160 then
+    itemId = 8923;
+  elseif roll < 310 then
+    itemId = 5002 + (math.random(1,4) - 1) * 10;
+    itemCount = 3;
+  elseif roll < 460 then
+    itemId = 8919;
+  elseif roll < 510 then
+    itemId = 8999;
+    itemCount = 3;
+  elseif roll < 610 then
+    itemId = 8927;
+  elseif roll < 710 then
+   itemId = 8934;
+  elseif roll < 910 then
+   itemId = 8941;
+   itemCount = 3;
+  end
+  player:GetPackage():AddItem(itemId, itemCount, true);
+  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用 [4:"..itemId.."] 兑换获得[4:" .. itemId .. "]x" .. itemCount);
+end
+
+function exchangeExtraReward(player, id)
+	if id == 8 then
+		local package = player:GetPackage()
+		if package:IsFull() then
+		player:sendMsgCode(2, 2016, 0)
+			return;
+		end
+		if not package:DelItem(9224, 10, true) then
+			player:sendMsgCode(2, 2112, 0)
+			return;
+		end
+		package:AddItem(9225, 1, true);
+	elseif id == 9 then
+		checkExpire(player)
+		local cnt = player:getStatusBit(12, 2)
+		if cnt >= 2 then
+			player:sendMsgCode(2, 2113, 0)
+			return;
+		end
+		local package = player:GetPackage()
+		if package:IsFull() then
+			player:sendMsgCode(2, 2016, 0)
+			return;
+		end
+		if not package:ExistItem(9218) or not package:ExistItem(9219) or not package:ExistItem(9220) or not package:ExistItem(9221) or not package:ExistItem(9222) then
+			player:sendMsgCode(2, 2113, 0)
+			return
+		end
+		cnt = cnt + 1
+		player:setStatusBit(12, 2, cnt)
+		package:DelItem(9218, 1, false);
+		package:DelItem(9219, 1, false);
+		package:DelItem(9220, 1, false);
+		package:DelItem(9221, 1, false);
+		package:DelItem(9222, 1, false);
+		package:AddItem(9223, 1, true);  
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 凑齐了清明上河图,兑换获得了[4:9223]");
+	else 
+		return;  
+	end
+  if id == 1 then
+    local package = player:GetPackage()
+    if package:IsFull() then
+      player:sendMsgCode(2, 2016, 0)
+      return
+    end
+    if not package:DelItem(9001, 10, true) then
+      player:sendMsgCode(2, 2100, 0)
+      return
+    end
+    exchangeRoll(player, 9001)
+  elseif id == 2 then
+    local package = player:GetPackage()
+    if package:IsFull() then
+      player:sendMsgCode(2, 2016, 0)
+      return
+    end
+    if not package:DelItem(9004, 5, true) then
+      player:sendMsgCode(2, 2101, 0)
+      return
+    end
+    exchangeRoll(player, 9004)
+  elseif id == 3 then
+    checkExpire(player)
+    local package = player:GetPackage()
+    if package:IsFull() then
+      player:sendMsgCode(2, 2016, 0)
+      return
+    end
+    if not package:DelItem(9038, 10, true) then
+      player:sendMsgCode(2, 2104, 0)
+      return
+    end
+    package:AddItem(9039, 1, true);
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用生肖兔兑换获得[4:9039]");
+  elseif id == 4 then
+    checkExpire(player)
+    local cnt = player:getStatusBit(12, 2)
+    if cnt >= 2 then
+      player:sendMsgCode(2, 2102, 0)
+      return
+    end
+    local package = player:GetPackage()
+    if package:IsFull() then
+      player:sendMsgCode(2, 2016, 0)
+      return
+    end
+    if package:GetItemNum(9032, false) < 3 or package:GetItemNum(9033, false) < 3 or package:GetItemNum(9034, false) < 3 then
+      player:sendMsgCode(2, 2102, 0)
+      return
+    end
+    cnt = cnt + 1
+    player:setStatusBit(12, 2, cnt)
+    package:DelItem(9032, 3, false);
+    package:DelItem(9033, 3, false);
+    package:DelItem(9034, 3, false);
+    package:AddItem(9036, 1, true);
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用福星画像+禄星画像+寿星画像兑换获得[4:9036]");
+  elseif id == 5 then
+    checkExpire(player)
+    local cnt = player:getStatusBit(14, 2)
+    if cnt >= 2 then
+      player:sendMsgCode(2, 2103, 0)
+      return
+    end
+    local package = player:GetPackage()
+    if package:IsFull() then
+      player:sendMsgCode(2, 2016, 0)
+      return
+    end
+    if package:GetItemNum(9032, false) < 3 or package:GetItemNum(9033, false) < 3 or package:GetItemNum(9034, false) < 3 or package:GetItemNum(9035, false) < 2 then
+      player:sendMsgCode(2, 2103, 0)
+      return
+    end
+    cnt = cnt + 1
+    player:setStatusBit(14, 2, cnt)
+    package:DelItem(9032, 3, false);
+    package:DelItem(9033, 3, false);
+    package:DelItem(9034, 3, false);
+    package:DelItem(9035, 2, false);
+    package:AddItem(9037, 1, true);
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用福星画像+禄星画像+寿星画像+三星高照兑换获得[4:9037]");
+  elseif id == 6 then
+    checkExpire(player)
+    local cnt = player:getStatusBit(24, 2)
+	if cnt >= 2 then
+		player:sendMsgCode(2, 2111, 0)
+		return;
+     end	
+	local package = player:GetPackage();
+	if package:GetItemNum(9205, false) < 3 or package:GetItemNum(9206, false) < 3 or package:GetItemNum(9207, false) < 3 then
+      player:sendMsgCode(2, 2111, 0)
+      return;
+    end
+	cnt = cnt + 1;
+	player:setStatusBit(24, 2, cnt);
+	package:DelItem(9205, 3, false);
+	package:DelItem(9206, 3, false);
+	package:DelItem(9207, 3, false);
+	package:AddItem(9209, 1, true);	
+  elseif id == 7 then
+	local package = player:GetPackage()
+	if package:GetItemNum(9208, false) < 3 then
+		player:sendMsgCode(2, 2110, 0);
+		return;
+	end
+	local exchangeCount = player:getTicketCount();
+	exchangeCount = exchangeCount + 1;
+	player:setTicketCount(exchangeCount, true);
+	local table_count = {5, 10, 50, 100, 200, 500, 1000};
+	for i, v in ipairs(table_count) do
+		if exchangeCount == v then
+			Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]惊为天人，义无反顾的兑换了"..exchangeCount.."个[4:9210]，获得了大量奇珍异宝，称霸天下指日可待！");
+		end
+	end
+	package:DelItem(9208, 3, false);
+	package:AddItem(9210, 1, true);	
+  end
+end

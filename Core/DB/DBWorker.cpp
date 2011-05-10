@@ -1,0 +1,175 @@
+#include "Config.h"
+#include "DBWorker.h"
+#include "DB/DBConnectionMgr.h"
+#include "Log/Log.h"
+#include "Common/TimeUtil.h"
+#include "GObject/Player.h"
+#include "Server/Cfg.h"
+#include <errmsg.h>
+#include <cstdarg>
+
+namespace DB
+{
+
+DBWorker::DBWorker(UInt8 type) : WorkerRunner<>((type == 1 && cfg.serverLogId == 0) ? 0 : 500), m_Type(type)
+{
+}
+
+DBWorker::~DBWorker()
+{
+}
+
+void DBWorker::CalcUserLost(DBWorker * worker)
+{
+	UInt32 tstart = TimeUtil::SharpDay(-1);
+	UInt32 tend = tstart + 86400;
+	{
+		Mutex::ScopedLock lk(GObject::newPlayers.getMutex());
+		std::unordered_map<UInt64, GObject::Player *>& newplayers = GObject::newPlayers.getMap();
+		std::unordered_map<UInt64, GObject::Player *>::iterator it = newplayers.begin();
+		while(it != newplayers.end())
+		{
+			GObject::Player * pl = it->second;
+			UInt32 created = PLAYER_DATA(pl, created);
+			if(created < tend)
+			{
+				if(created >= tstart)
+					worker->PushUpdateData("update register_states set level=%u where server_id=%u and player_id=%"I64_FMT"u", pl->GetLev(), cfg.serverLogId, pl->getId());
+				newplayers.erase(it ++);
+			}
+			else
+				++ it;
+		}
+	}
+	worker->PushUpdateData("call update_register(%u,%u)", cfg.serverLogId, tend);
+}
+
+bool DBWorker::Init()
+{
+	switch(m_Type)
+	{
+	case 0:
+		m_DBExecutor.reset(gObjectDBConnectionMgr->GetExecutor());
+		break;
+	case 1:
+		{
+			m_DBExecutor.reset(gLogDBConnectionMgr->GetExecutor());
+			UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
+			if(sday < now) sday += 86400;
+			AddTimer(86400 * 1000, CalcUserLost, this, (sday - now) * 1000);
+		}
+		break;
+	}
+
+	return true;
+}
+
+void DBWorker::UnInit()
+{
+	OnTimer();
+	m_DBExecutor.reset();
+}
+
+void DBWorker::OnTimer()
+{
+	std::vector<const char *> l;
+	{
+		FastMutex::ScopedLock lk(m_Mutex);
+		if(m_UpdateItems.empty())
+			return;
+		l = m_UpdateItems;
+		m_UpdateItems.clear();
+	}
+	while(m_DBExecutor.get() == NULL || !m_DBExecutor->isConnected())
+	{
+		Thread::sleep(500);
+		if(m_Type == 0)
+			m_DBExecutor.reset(gObjectDBConnectionMgr->GetExecutor());
+		else
+			m_DBExecutor.reset(gLogDBConnectionMgr->GetExecutor());
+	}
+	std::vector<const char *>::iterator it;
+	for(it = l.begin(); it != l.end(); ++ it)
+	{
+		bool r = DoDBQuery(*it);
+		TRACE_LOG("[%s] -> %d", *it, r ? 1 : 0);
+		delete[] *it;
+	}
+}
+
+void DBWorker::OnPause()
+{
+	m_DBExecutor->setMgr(NULL);
+	m_DBExecutor.reset();
+	if(m_Type == 0)
+		DB::gObjectDBConnectionMgr->Init( cfg.dbObjectHost.c_str(), cfg.dbObjectUser.c_str(), cfg.dbObjectPassword.c_str(), cfg.dbObjectSource.c_str(), 4, 32, cfg.dbObjectPort );
+	else
+		DB::gLogDBConnectionMgr->Init( cfg.dbLogHost.c_str(), cfg.dbLogUser.c_str(), cfg.dbLogPassword.c_str(), cfg.dbLogSource.c_str(), 4, 32, cfg.dbLogPort );
+	Resume();
+}
+
+void DBWorker::PushUpdateData(const char * fmt, ...)
+{
+	if(m_Type == 1 && cfg.serverLogId == 0)
+		return;
+	/* Guess we need no more than 256 bytes. */
+	int size = 256;
+
+	char *p = new(std::nothrow) char[size];
+	if (p == NULL)
+		return;
+
+	while (1) {
+		va_list ap;
+		/* Try to print in the allocated space. */
+		va_start(ap, fmt);
+		int n = vsnprintf(p, size, fmt, ap);
+		va_end(ap);
+		/* If that worked, return the string. */
+		if (n > -1 && n < size)
+			break;
+		/* Else try again with more space. */
+		if (n > -1)    /* glibc 2.1 */
+			size = n+1; /* precisely what is needed */
+		else           /* glibc 2.0 */
+			size *= 2;  /* twice the old size */
+		delete[] p;
+		if ((p = new(std::nothrow) char[size]) == NULL) {
+			return;
+		}
+	}
+
+	FastMutex::ScopedLock lk(m_Mutex);
+	m_UpdateItems.push_back(p);
+	if(m_Type == 0)
+		DB().GetLog()->OutInfo("Push [%s]\n", p);
+}
+
+bool DBWorker::DoDBQuery(const char* query)
+{
+	if (query == NULL)
+		return false;
+	DBResult r;
+	while((r = m_DBExecutor->Execute(query)) == DB_ConnLost)
+	{
+		TRACE_LOG("Lost connection to Database, retrying...");
+		Thread::sleep(500);
+	}
+	return r == DB_OK;
+}
+
+std::string DBWorker::GetLogName()
+{
+	switch(m_Type)
+	{
+	case 0:
+		return "log/DB/";
+		break;
+	case 1:
+		return "log/DBLog/";
+		break;
+	}
+	return "";
+}
+
+}

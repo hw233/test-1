@@ -1,0 +1,1 @@
+ALTER TABLE `boss_damage`  ADD COLUMN `exp` INT(10) UNSIGNED NOT NULL AFTER `damage`;

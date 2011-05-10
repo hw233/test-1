@@ -1,0 +1,4694 @@
+Gem_Level_1 = { 5001, 5011, 5021, 5031, 5041, 5071, 5081, 5091, 5101, 5111, 5121 };
+Gem_Level_2 = { 5002, 5012, 5022, 5032, 5042, 5072, 5082, 5092, 5102, 5112, 5122 };
+Gem_Level_3 = { 5003, 5013, 5023, 5033, 5043, 5073, 5083, 5093, 5103, 5113, 5123 };
+
+Green_Equip_Level_20 = {101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114 };
+Green_Equip_Level_30 = {161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174};
+Green_Equip_Level_40 = {221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234};
+Green_Equip_Level_50 = {421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434};
+Green_Equip_Level_60 = {621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634};
+Green_Equip_Level_70 = {821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 832, 833, 834};
+Green_Equip_Level_80 = {1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034};
+
+Blue_Equip_Level_20 = {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134};
+Blue_Equip_Level_30 = {181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194};
+Blue_Equip_Level_40 = {241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254};
+Blue_Equip_Level_50 = {441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454};
+Blue_Equip_Level_60 = {641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 654};
+Blue_Equip_Level_70 = {841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854};
+Blue_Equip_Level_80 = {1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1054};
+
+Purple_Equip_Level_40 = {261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274,
+ 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 
+301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 
+321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334};
+Purple_Equip_Level_50 = {461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474,
+481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 
+501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 
+521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534};
+Purple_Equip_Level_60 = {661, 662, 663, 664, 665, 666, 667, 668, 669, 670, 671, 672, 673, 674, 
+681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 
+701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 
+721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 732, 733, 734};
+Purple_Equip_Level_70 = {861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 
+881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 
+901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 
+921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934};
+Purple_Equip_Level_80 = {1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 
+1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 
+1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113, 1114, 
+1121, 1122, 1123, 1124, 1125, 1126, 1127, 1128, 1129, 1130, 1131, 1132, 1133, 1134};
+Purple_Equip_Level_90 = {1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674};
+Purple_Equip_Level_100 = {1761, 1762, 1763, 1764, 1765, 1766, 1767, 1768, 1769, 1770, 1771, 1772, 1773, 1774};
+
+Orange_Equip_Level_50 = {1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554}
+Orange_Equip_Level_70 = {1561, 1562, 1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594}
+Orange_Equip_Level_80 = {1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634}
+Orange_Equip_Level_90 = {1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714}
+Orange_Equip_Level_100 = {1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1729, 1730, 1731, 1732, 1733, 1734, 1741, 1742, 1743, 1744, 1745, 1746, 1747, 1748, 1749, 1750, 1751, 1752, 1753, 1754}
+
+Purple_Favor = {5813,5814,5815,5816,5817,5818,5819}
+Orange_Favor = {5820,5821,5822,5823,5824}
+Diety_Favor = {5825, 5826, 5827, 5828}
+
+function BroadCastEquip1(playercountry, playername, boxname, equipname1)
+	Broadcast(0x17, "[p:"..playercountry..":"..playername.."]幸运地从[e:5:"..boxname.."]中开出了[e:5:"..equipname1.."]");
+end
+function BroadCastEquip2(playercountry, playername, boxname, equipname1, equipname2)
+	Broadcast(0x17, "[p:"..playercountry..":"..playername.."]幸运地从[e:5:"..boxname.."]中开出了[e:5:"..equipname1.."],[e:5:"..equipname2.."]");
+end
+
+function ItemNormal_AddBuff(obj, idx, num, count, max_num)
+  local now = os.time()
+  local num2 = obj:getBuffData(idx);
+  if num2 > now then
+    num2 = num2 - now
+    if num2 >= max_num then
+      return false
+    end
+  else
+    num2 = 0
+  end
+  num2 = num2 + num * count
+  if num2 >= max_num then
+    num2 = max_num
+  end
+  obj:setBuffData(idx, num2 + now, true)
+  return true
+end
+
+function ItemNormal_00008900(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+	local hp = fgt:getCurrentHP();
+	if hp == 0 then
+		return false;
+	end
+	hp = num * 300;
+	fgt:regenHP(hp);
+	package:DelItemSendMsg(8900, player);
+	return true;
+end
+
+
+function ItemNormal_00008901(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+	local hp = fgt:getCurrentHP();
+	if hp == 0 then
+		return false;
+	end
+	hp = num * 600;
+	fgt:regenHP(hp);
+	package:DelItemSendMsg(8901, player);
+	return true;
+end
+
+function ItemNormal_00008902(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+	local hp = fgt:getCurrentHP();
+	if hp == 0 then
+		return false;
+	end
+	hp = num * 1200;
+	fgt:regenHP(hp);
+	package:DelItemSendMsg(8902, player);
+	return true;
+end
+
+function ItemNormal_00008903(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+	local hp = fgt:getCurrentHP();
+	if hp == 0 then
+		return false;
+	end
+	hp = num * 2000;
+	fgt:regenHP(hp);
+	package:DelItemSendMsg(8903, player);
+	return true;	
+end
+
+function ItemNormal_00008904(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+  if player:regenHP(num*300) then
+	package:DelItemSendMsg(8904, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008905(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+  if player:regenHP(num*800) then
+	package:DelItemSendMsg(8905, player);
+	return true;
+  else
+    return false;
+  end
+end
+
+function ItemNormal_00008906(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+  if player:regenHP(num*1500) then
+	package:DelItemSendMsg(8906, player);
+	return true;
+  else
+    return false;
+  end
+end
+
+function ItemNormal_00008907(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false
+  end
+  if player:regenHP(num*3000) then
+    package:DelItemSendMsg(8907, player);
+	return true;
+  else
+    return false;
+  end
+end
+
+function ItemNormal_00008908(iid, num, bind, param)
+  local player = GetPlayer();
+  local fgt = player:findFighter(param)
+  local package = player:GetPackage();
+	if fgt == nil then
+		return false
+	end
+  fgt:setBuffData(2, 0, true)
+  fgt:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(fgt, 1, 1800, num, 18000) then
+	package:DelItemSendMsg(8908, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008909(iid, num, bind, param)
+  local player = GetPlayer();
+  local fgt = player:findFighter(param)
+  local package = player:GetPackage();
+	if fgt == nil then
+		return false
+	end
+  fgt:setBuffData(1, 0, true)
+  fgt:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(fgt, 2, 1800, num, 18000) then
+	package:DelItemSendMsg(8909, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008910(iid, num, bind, param)
+    local player = GetPlayer();
+	local fgt = player:findFighter(param)
+  local package = player:GetPackage();
+	if fgt == nil then
+		return false
+	end
+  fgt:setBuffData(1, 0, true)
+  fgt:setBuffData(2, 0, true)
+  if ItemNormal_AddBuff(fgt, 3, 1800, num, 18000) then
+ 	package:DelItemSendMsg(8910, player);
+	return true;
+  else
+	return false;
+  end
+
+end
+
+function ItemNormal_00008911(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(2, 0, true)
+  player:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(player, 1, 1800, num, 18000) then
+ 	package:DelItemSendMsg(8911, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008912(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(1, 0, true)
+  player:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(player, 2, 1800, num, 18000) then
+  	package:DelItemSendMsg(8912, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008913(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(1, 0, true)
+  player:setBuffData(2, 0, true)
+  if ItemNormal_AddBuff(player, 3, 1800, num, 18000) then
+   	package:DelItemSendMsg(8913, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008930(iid, num, bind, param)
+  local player = GetPlayer()
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false;
+  end
+  local num2 = player:getBuffData(0)
+  local package = player:GetPackage();
+  if num2 >= 10000000 then
+    return false
+  end
+  num2 = num2 + 1000000 * num
+  if num2 > 10000000 then
+    num2 = 10000000
+  end
+  player:setBuffData(0, num2, true);
+  player:autoRegenAll();
+  package:DelItemSendMsg(8930, player);
+  return true
+end
+
+function ItemNormal_00008931(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  package:DelItemSendMsg(8931, player);
+  player:moveToHome()
+  return true
+end
+
+function ItemNormal_00008932(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	local num2 = player:getBuffData(0x04, os.time());
+	if num2 ~= 0 then
+		num2 = num2 - os.time();
+	end
+	num2 = num2 + 1800 * num;
+	if num2 > 18000 then
+		num2 = 18000;
+	end
+	package:DelItemSendMsg(8932, player);
+	player:setBuffData(0x04, os.time() + num2, true);
+	return true;
+end
+
+function ItemNormal_00008933(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(6, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
+  if ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
+  	package:DelItemSendMsg(8933, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008934(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(5, 0, true)
+  player:setBuffData(10, 0, true)
+  player:setBuffData(11, 0, true)
+  if ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
+  	package:DelItemSendMsg(8934, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008935(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+  local package = player:GetPackage();
+	if fgt == nil then
+		return false;
+	end
+  local oldexp = fgt:getExp();
+	fgt:addExp(5000*num);
+  if fgt:getExp() > oldexp then
+  	package:DelItemSendMsg(8935, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008936(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+	if fgt == nil then
+		return false;
+	end
+  local oldexp = fgt:getExp();
+	fgt:addExp(30000*num);
+  if fgt:getExp() > oldexp then
+  	package:DelItemSendMsg(8936, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008937(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+	if fgt == nil then
+		return false;
+	end
+  local oldexp = fgt:getExp();
+	fgt:addExp(60000*num);
+  if fgt:getExp() > oldexp then
+  	package:DelItemSendMsg(8937, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00008938(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+	package:DelItemSendMsg(8938, player);
+	player:getCoin(num * 10000);
+	return true;
+end
+
+function ItemNormal_00008939(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+	package:DelItemSendMsg(8939, player);
+	player:getCoin(num * 50000);
+	return true;
+end
+
+function ItemNormal_00008940(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+	package:DelItemSendMsg(8940, player);
+	player:getCoin(num * 100000);
+	return true;
+end
+
+function ItemNormal_00008942(iid, num, bind, param)  
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	local reqGrids = 3;
+	reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(8900, 5, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(8933, 2, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(8943, 1, 1);
+
+	if reqGrids <= 	package:GetRestPackageSize() then
+    	package:DelItemSendMsg(8942, player);
+		package:AddEquip(10, 1);
+		package:AddEquip(11, 1);
+		package:AddEquip(13, 1);
+		package:AddItem(8921, 2, 1, 0, 2);
+		package:AddItem(8900, 5, 1, 0, 2);
+		package:AddItem(8933, 2, 1, 0, 2);
+		package:AddItem(8930, 1, 1, 0, 2);
+		package:AddItem(8943, 1, 1, 0, 2);
+		player:getCoupon(30);
+		return true;
+	end
+	player:sendMsgCode(2, 2014, 0);
+	return false;
+end
+
+function ItemNormal_00008943(iid, num, bind, param)
+	local player = GetPlayer();
+	if player:GetLev() >= 10 then
+       local package = player:GetPackage();
+	   local reqGrids = 15;
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8901, 5, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
+       reqGrids = reqGrids + package:GetItemUsedGrids(5001, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5011, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5021, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5031, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8917, 5, 1);
+	   if reqGrids <= 	package:GetRestPackageSize() then
+           package:DelItemSendMsg(8943, player);
+		   package:AddEquip(61, 1);
+		   package:AddEquip(62, 1);
+		   package:AddEquip(63, 1);
+		   package:AddEquip(64, 1);
+		   package:AddEquip(65, 1);
+		   package:AddEquip(66, 1);
+		   package:AddEquip(67, 1);
+		   package:AddEquip(68, 1);
+		   package:AddEquip(69, 1);
+		   package:AddEquip(70, 1);
+		   package:AddEquip(71, 1);
+		   package:AddEquip(72, 1);
+		   package:AddEquip(73, 1);
+		   package:AddEquip(74, 1);
+		   package:AddItem(8921, 2, 1, 0, 2);
+		   package:AddItem(8901, 5, 1, 0, 2);
+		   package:AddItem(8922, 2, 1, 0, 2);
+		   package:AddItem(5001, 1, 1, 0, 2);
+	   	   package:AddItem(5011, 1, 1, 0, 2);
+		   package:AddItem(5021, 1, 1, 0, 2);
+		   package:AddItem(5031, 1, 1, 0, 2);
+		   package:AddItem(8917, 5, 1, 0, 2);
+		   package:AddItem(8944, 1, 1, 0, 2);
+	  	   player:getCoupon(30);
+		   return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+
+function ItemNormal_00008944(iid, num, bind, param)
+	local player = GetPlayer();
+	if player:GetLev() >= 20 then
+	   local package = player:GetPackage();
+  	   local reqGrids = 15;
+ 	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5002, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5012, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5022, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(5032, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8917, 5, 1);
+	   if reqGrids <= 	package:GetRestPackageSize() then
+		   package:DelItemSendMsg(8944, player);
+		   package:AddEquip(121, 1);
+		   package:AddEquip(122, 1);
+		   package:AddEquip(123, 1);
+		   package:AddEquip(124, 1);
+		   package:AddEquip(125, 1);
+		   package:AddEquip(126, 1);
+		   package:AddEquip(127, 1);
+		   package:AddEquip(128, 1);
+		   package:AddEquip(129, 1);
+		   package:AddEquip(130, 1);
+		   package:AddEquip(131, 1);
+		   package:AddEquip(132, 1);
+		   package:AddEquip(133, 1);
+		   package:AddEquip(134, 1);	
+		   package:AddItem(8922, 2, 1, 0, 2);
+		   package:AddItem(8930, 1, 1, 0, 2);
+		   package:AddItem(5002, 1, 1, 0, 2);
+		   package:AddItem(5012, 1, 1, 0, 2);
+		   package:AddItem(5022, 1, 1, 0, 2);
+		   package:AddItem(5032, 1, 1, 0, 2);
+		   package:AddItem(8917, 5, 1, 0, 2);
+		   package:AddItem(8945, 1, 1, 0, 2);
+		   player:getCoupon(40);
+		   return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+function ItemNormal_00008945(iid, num, bind, param)
+	local player = GetPlayer();
+	if player:GetLev() >= 30 then
+	   local package = player:GetPackage();
+	   local reqGrids = 15;
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8935, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8914, 1, 1);
+	   if reqGrids <= 	package:GetRestPackageSize() then
+	       package:DelItemSendMsg(8945, player);
+	  	   package:AddEquip(181, 1);
+		   package:AddEquip(182, 1);
+		   package:AddEquip(183, 1);
+		   package:AddEquip(184, 1);
+		   package:AddEquip(185, 1);
+		   package:AddEquip(186, 1);
+		   package:AddEquip(187, 1);
+		   package:AddEquip(188, 1);
+		   package:AddEquip(189, 1);
+		   package:AddEquip(190, 1);
+		   package:AddEquip(191, 1);
+		   package:AddEquip(192, 1);
+		   package:AddEquip(193, 1);
+		   package:AddEquip(194, 1);	
+		   package:AddItem(8935, 1, 1, 0, 2);
+		   package:AddItem(8922, 2, 1, 0, 2);
+		   package:AddItem(8930, 2, 1, 0, 2);
+		   package:AddItem(8920, 1, 1, 0, 2);
+		   package:AddItem(8914, 1, 1, 0, 2);	
+		   package:AddItem(8946, 1, 1, 0, 2);
+		   player:getCoupon(40);
+		   return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+
+function ItemNormal_00008946(iid, num, bind, param)
+	local player = GetPlayer();
+	if player:GetLev() >= 40 then
+	   local package = player:GetPackage();
+	   local reqGrids = 15;
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 3, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8927, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8925, 1, 1);	
+	   if reqGrids <= 	package:GetRestPackageSize() then
+	   	   package:DelItemSendMsg(8946, player);
+           package:AddEquip(241, 1);
+		   package:AddEquip(242, 1);
+		   package:AddEquip(243, 1);
+		   package:AddEquip(244, 1);
+		   package:AddEquip(245, 1);
+		   package:AddEquip(246, 1);
+		   package:AddEquip(247, 1);
+		   package:AddEquip(248, 1);
+		   package:AddEquip(249, 1);
+		   package:AddEquip(250, 1);
+		   package:AddEquip(251, 1);
+		   package:AddEquip(252, 1);
+		   package:AddEquip(253, 1);
+		   package:AddEquip(254, 1);	
+		   package:AddItem(8936, 1, 1, 0, 2);
+		   package:AddItem(8923, 2, 1, 0, 2);
+		   package:AddItem(8930, 3, 1, 0, 2);
+		   package:AddItem(8915, 1, 1, 0, 2);
+		   package:AddItem(8927, 1, 1, 0, 2);
+		   package:AddItem(8925, 1, 1, 0, 2);
+           package:AddItem(8947, 1, 1, 0, 2);	
+           player:getCoupon(50);		
+		   return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+
+function ItemNormal_00008947(iid, num, bind, param)
+	local player = GetPlayer();
+	if player:GetLev() >= 50 then 
+	   local package = player:GetPackage();
+	   local reqGrids = 14;
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8937, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 5, 1);	
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8916, 1, 1);	
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8927, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(8926, 1, 1);
+	   if reqGrids <= 	package:GetRestPackageSize() then
+	       package:DelItemSendMsg(8947, player);
+	 	   package:AddEquip(441, 1);
+		   package:AddEquip(442, 1);
+		   package:AddEquip(443, 1);
+		   package:AddEquip(444, 1);
+		   package:AddEquip(445, 1);
+		   package:AddEquip(446, 1);
+		   package:AddEquip(447, 1);
+		   package:AddEquip(448, 1);
+		   package:AddEquip(449, 1);
+		   package:AddEquip(450, 1);
+		   package:AddEquip(451, 1);
+		   package:AddEquip(452, 1);
+		   package:AddEquip(453, 1);
+		   package:AddEquip(454, 1);
+		   package:AddItem(8937, 1, 1, 0, 2);
+		   package:AddItem(8923, 2, 1, 0, 2);
+		   package:AddItem(8930, 5, 1, 0, 2);	
+		   package:AddItem(8916, 1, 1, 0, 2);
+		   package:AddItem(8927, 2, 1, 0, 2);
+		   package:AddItem(8926, 1, 1, 0, 2);	
+		   player:getCoupon(50);
+		   return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+
+function ItemNormal_00008949(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	local randGem = Gem_Level_1[math.random(1, table.getn(Gem_Level_1))];
+	local reqGrids = package:GetItemUsedGrids(randGem, 1, 1) + package:GetItemUsedGrids(8935, 1, 1);
+	if reqGrids <= 	package:GetRestPackageSize() then
+	    package:DelItemSendMsg(8949, player);
+		package:AddItem(randGem, 1, 1);
+		package:AddItem(8935, 1, 1);
+		return true;
+	end
+	player:sendMsgCode(2, 2014, 0);
+	return false;
+end
+
+function ItemNormal_00008950(iid, num, bind, param)
+    local player = GetPlayer();
+	local package = player:GetPackage();
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem1 = Gem_Level_1[math.random(1, gemSize)];
+	local randGem2 = Gem_Level_1[math.random(1, gemSize)];
+	local randEquip = 0;
+	local randEquipPos = math.random(1, 28);
+	if randEquipPos <= 14 then
+		randEquip = Green_Equip_Level_20[randEquipPos];
+	else
+		randEquip = Green_Equip_Level_30[randEquipPos-14];
+	end
+	local reqGrids = package:GetItemUsedGrids(randGem1, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(randGem2, 1, 1);
+    reqGrids = reqGrids + 1;
+    reqGrids = reqGrids + package:GetItemUsedGrids(8935, 3, 1);
+	if reqGrids <= 	package:GetRestPackageSize() then
+		package:DelItemSendMsg(8950, player);
+	    package:AddEquip(randEquip, 1);
+		package:AddItem(randGem1, 1, 1, 0, 2);
+		package:AddItem(randGem2, 1, 1, 0, 2);
+		package:AddItem(8935, 3, 1, 0, 2);
+		return true;
+	end
+	player:sendMsgCode(2, 2014, 0);
+	return false;
+end
+
+function ItemNormal_00008951(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem1 = Gem_Level_1[math.random(1, gemSize)];
+	local randGem2 = Gem_Level_1[math.random(1, gemSize)];
+	local randGem3 = Gem_Level_1[math.random(1, gemSize)];
+	local randEquip1 = 0;
+	local randEquip2 = 0;
+	local randEquipPos1 = math.random(1, 28);
+	local randEquipPos2 = math.random(1, 28);
+	if randEquipPos1 <= 14 then 
+              randEquip1 = Green_Equip_Level_20[randEquipPos1] 
+        else 
+              randEquip1 = Green_Equip_Level_20[randEquipPos1-14] 
+        end
+	if randEquipPos2 <= 14 then 
+              randEquip2 = Green_Equip_Level_30[randEquipPos2] 
+        else 
+              randEquip2 = Green_Equip_Level_30[randEquipPos2-14] 
+        end
+	local reqGrids = package:GetItemUsedGrids(randGem1, 1, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(randGem2, 1, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(randGem3, 1, 1);
+	reqGrids = reqGrids + 2;
+    reqGrids = reqGrids + package:GetItemUsedGrids(8935, 4, 1);
+	if reqGrids <= 	package:GetRestPackageSize() then
+		package:DelItemSendMsg(8951, player);
+     	package:AddEquip(randEquip1, 1);
+		package:AddEquip(randEquip2, 1);
+		package:AddItem(randGem1, 1, 1, 0, 2);
+		package:AddItem(randGem2, 1, 1, 0, 2);
+		package:AddItem(randGem3, 1, 1, 0, 2);
+		package:AddItem(8935, 4, 1, 0, 2);
+		return true;
+	end
+	player:sendMsgCode(2, 2014, 0);
+	return false;
+end
+
+
+function ItemNormal_00008952(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem1 = Gem_Level_1[math.random(1, gemSize)];
+	local randGem2 = Gem_Level_1[math.random(1, gemSize)];
+    local randGem3 = Gem_Level_1[math.random(1, gemSize)];
+    local randGem4 = Gem_Level_1[math.random(1, gemSize)];
+	local randEquip = 0;
+	local randEquipPos = math.random(1, 28);
+	if randEquipPos <= 14 then
+		randEquip = Blue_Equip_Level_20[randEquipPos];
+	else
+		randEquip = Blue_Equip_Level_30[randEquipPos-14];
+	end
+	local reqGrids = package:GetItemUsedGrids(randGem1, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(randGem2, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(randGem3, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(randGem4, 1, 1);
+    reqGrids = reqGrids + 1;
+    reqGrids = reqGrids + package:GetItemUsedGrids(8935, 5, 1);
+	if reqGrids <= 	package:GetRestPackageSize() then
+		package:DelItemSendMsg(8952, player);
+    	package:AddEquip(randEquip, 1);
+		package:AddItem(randGem1, 1, 1, 0, 2);
+		package:AddItem(randGem2, 1, 1, 0, 2);
+        package:AddItem(randGem3, 1, 1, 0, 2);
+        package:AddItem(randGem4, 1, 1, 0, 2);
+		package:AddItem(8935, 5, 1, 0, 2);
+		return true;
+	end
+	player:sendMsgCode(2, 2014, 0);
+	return false;
+end
+
+
+
+function ItemNormal_00008953(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Green_Equip_Level_40[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_40[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	
+	if  r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8953, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8935, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8953, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8935, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+
+function ItemNormal_00008954(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Green_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	
+	if  r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8954, player);
+			package:AddEquip(randEquip1 ,1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8935, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8954, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8935, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008955(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Green_Equip_Level_60[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_60[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+
+	if  r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8955, player);
+			package:AddEquip(randEquip1,1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8935, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8955, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8935, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008956(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Green_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8956, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 1, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8956, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 1, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008957(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	local randEquipPos1= math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Green_Equip_Level_80[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_80[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8957, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8957, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008958(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Blue_Equip_Level_40[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_40[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8958, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8958, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008959(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Blue_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8959, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8959, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008960(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Blue_Equip_Level_60[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_60[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8960, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8960, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008961(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Blue_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8961, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8961, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008962(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	local randEquipPos1 = math.random(1, 14);
+	local randEquipPos2 = math.random(1, 14);
+	local randEquip1 = Blue_Equip_Level_80[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_80[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8962, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8962, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008963(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_40)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_40[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_40[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8963, player);
+			package:AddEquip(randEquip1, 1, 0, 2);-- for backstatge 2: equip from box
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8963, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008964(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;  
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8964, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8964, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008965(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_60)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_60[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_60[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8965, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8965, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008966(iid, num, bind, param)
+    local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+
+	local equipSize = table.getn(Purple_Equip_Level_70)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 6, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8966, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 6, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 6, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8966, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 6, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008967(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_80)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_80[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_80[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8967, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 7, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8967, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 7, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end	
+end
+
+
+function ItemNormal_00008968(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+  local reqGrids = 3 + package:GetItemUsedGrids(8937, 2, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+ 
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+  local randEquip = Orange_Equip_Level_50[math.random(1, #Orange_Equip_Level_50)];
+  package:DelItemSendMsg(8968, player);
+  package:AddEquip(randEquip, 1, 0, 2);			
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 2, 1, 0, 2);
+  BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
+
+  return true;
+end
+
+
+function ItemNormal_00008969(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+  local reqGrids = 2 + package:GetItemUsedGrids(8937, 3, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+	 
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+  local randEquip = Orange_Equip_Level_50[math.random(1, #Orange_Equip_Level_50)];
+  package:DelItemSendMsg(8969, player);
+  package:AddEquip(randEquip, 1, 0, 2);			
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 3, 1, 0, 2);
+  BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
+
+  return true;
+end
+
+
+function ItemNormal_00008970(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+  local reqGrids = 2 + package:GetItemUsedGrids(8937, 4, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+		  
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+  local randEquip = Orange_Equip_Level_50[math.random(1, #Orange_Equip_Level_50)];
+  package:DelItemSendMsg(8970, player);
+  package:AddEquip(randEquip, 1, 0, 2);			
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 4, 1, 0, 2);
+  BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
+
+  return true;
+end
+
+
+function ItemNormal_00008971(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+  local reqGrids = 2 + package:GetItemUsedGrids(8937, 5, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+ 
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+  local randEquip = Orange_Equip_Level_70[math.random(1, #Orange_Equip_Level_70)];
+  package:DelItemSendMsg(8971, player);
+  package:AddEquip(randEquip, 1, 0, 2);			
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 5, 1, 0, 2);
+  BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
+
+  return true;
+end
+
+
+function ItemNormal_00008972(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+	
+  local reqGrids = 2 + package:GetItemUsedGrids(8937, 6, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+ 
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+
+  package:DelItemSendMsg(8972, player);  
+  if math.random(1, 100) < 51 then
+	local randEquip = Orange_Equip_Level_80[math.random(1, #Orange_Equip_Level_80)];
+	package:AddEquip(randEquip, 1, 0, 2);	
+	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
+  else
+	local randFavor = Orange_Favor[math.random(1, #Orange_Favor)];
+	package:AddItem(randFavor, 2, 1, 0, 2);
+	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randFavor));
+  end
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 6, 1, 0, 2);
+ 
+  return true;
+end
+
+
+function ItemNormal_00008973(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Green_Equip_Level_40)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Green_Equip_Level_40[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_40[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8938, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8973, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8938, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8938, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8973, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8938, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008974(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Green_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Green_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8938, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8974, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8938, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8938, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8974, player);
+			package:AddEquip(randEquip1, 1);		
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8938, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008975(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Green_Equip_Level_60)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Green_Equip_Level_60[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_60[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8938, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8975, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8938, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1
+        reqGrids = reqGrids + package:GetItemUsedGrids(8938, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8975, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8938, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008976(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Green_Equip_Level_70)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Green_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 1, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8976, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 1, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;  
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 1, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8976, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 1, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008977(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_1);
+	local randGem = Gem_Level_1[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Green_Equip_Level_80)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Green_Equip_Level_80[randEquipPos1];
+	local randEquip2 = Green_Equip_Level_80[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8977, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8977, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008978(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Blue_Equip_Level_40)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Blue_Equip_Level_40[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_40[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8978, player);
+			package:AddEquip(randEquip1,1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8978, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008979(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Blue_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Blue_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8979, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8979, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 2, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008980(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Blue_Equip_Level_60)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Blue_Equip_Level_60[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_60[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8980, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8980, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008981(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Blue_Equip_Level_70)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Blue_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8981, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8981, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008982(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Blue_Equip_Level_80)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Blue_Equip_Level_80[randEquipPos1];
+	local randEquip2 = Blue_Equip_Level_80[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;  
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8982, player);
+			package:AddEquip(randEquip1, 1);
+			package:AddEquip(randEquip2, 1);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8982, player);
+			package:AddEquip(randEquip1, 1);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008983(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_40)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_40[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_40[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;  
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8983, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8983, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 3, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008984(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8984, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8984, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 4, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008985(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_60)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_60[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_60[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;  
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8985, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8985, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 5, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008986(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_70)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 6, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8986, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 6, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 6, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8986, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 6, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008987(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_80)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_80[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_80[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 7, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8987, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 7, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8939, 7, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8987, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8939, 7, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008988(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_3);
+	local randGem = Gem_Level_3[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Orange_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Orange_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Orange_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 2, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8988, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 2, 1, 0, 2);
+			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 2, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8988, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 2, 1, 0, 2);
+			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008989(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_3);
+	local randGem = Gem_Level_3[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	
+	local equipSize = table.getn(Orange_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Orange_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Orange_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+  		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 3, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8989, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 3, 1, 0, 2);
+			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 3, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8989, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 3, 1, 0, 2);
+			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008990(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_3);
+	local randGem = Gem_Level_3[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	
+	local equipSize = table.getn(Orange_Equip_Level_50)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Orange_Equip_Level_50[randEquipPos1];
+	local randEquip2 = Orange_Equip_Level_50[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 4, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8990, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 4, 1, 0, 2);
+			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 4, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8990, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 4, 1, 0, 2);
+			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+function ItemNormal_00008991(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_3);
+	local randGem = Gem_Level_3[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	
+	local equipSize = table.getn(Orange_Equip_Level_70)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Orange_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Orange_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 5, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8991, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 5, 1, 0, 2);
+			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 5, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8991, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 5, 1, 0, 2);
+			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	
+end
+
+
+function ItemNormal_00008992(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_3);
+	local randGem = Gem_Level_3[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+    local randEquip = 0;
+	
+	local equipSize = table.getn(Orange_Equip_Level_70)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Orange_Equip_Level_70[randEquipPos1];
+	local randEquip2 = Orange_Equip_Level_70[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2; 
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 6, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8992, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 6, 1, 0, 2);
+			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8940, 6, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8992, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8940, 6, 1, 0, 2);
+			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end	
+end
+
+
+function ItemNormal_00008993(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();
+		
+		local Equip_Index1 = math.random(1, 28);-- orange equip level 50、70 size 28
+		local Equip_Index2 = math.random(1, 28);
+		local randEquip1 = 0;
+		local randEquip2 = 0;
+		
+		if level < 70 then
+			randEquip1 = Orange_Equip_Level_50[Equip_Index1];
+			randEquip2 = Orange_Equip_Level_50[Equip_Index2];
+		else
+			randEquip1 = Orange_Equip_Level_70[Equip_Index1];
+			randEquip2 = Orange_Equip_Level_70[Equip_Index2];
+		end
+		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+		local R_Equip = math.random(1, 100);
+		
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		if R_Equip <= 10 then
+			reqGrids = reqGrids + 2;	
+		else
+			reqGrids = reqGrids + 1;	
+		end
+		
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(8993, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1, 0, 2);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1, 0, 2);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1, 0, 2);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1, 0, 2);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1, 0, 2);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1, 0, 2);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1, 0, 2);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1, 0, 2);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1, 0, 2);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1, 0, 2);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1, 0, 2);	
+			end
+			if R_Equip <= 10 then
+				package:AddEquip(randEquip1, 1, 0, 2);	
+				package:AddEquip(randEquip2, 1, 0, 2);
+				BroadCastEquip2(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			else
+				package:AddEquip(randEquip1, 1, 0, 2);
+				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1));
+			end
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+	
+end
+
+
+
+function ItemNormal_00008994(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then 
+		local package = player:GetPackage();
+		local reqGrids = 0;
+
+		local Equip_Index = math.random(1, 28);-- orange equip level 50、70 size 28
+		local randEquip = 0;
+		if level < 70 then
+			randEquip = Orange_Equip_Level_50[Equip_Index];
+		else
+			randEquip = Orange_Equip_Level_70[Equip_Index];
+		end
+		
+		local R_Equip = math.random(1, 100);
+		local r1_8910 = math.random(1, 100);
+		local r1_8913 = math.random(1, 100);
+		local r1_8930 = math.random(1, 100);
+		local r1_8915 = math.random(1, 100);
+		local r2_8910 = math.random(1, 100);
+		local r2_8913 = math.random(1, 100);
+		local r2_8930 = math.random(1, 100);
+		local r2_8915 = math.random(1, 100);
+		
+		if R_Equip <= 20 then
+			reqGrids = reqGrids + 1;
+	   	   
+			if r1_8910 <=25 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8910, 1, 1);
+		    elseif r1_8913 <=50 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8913, 1, 1);
+     	    elseif r1_8930 <=75 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+		    elseif r1_8915 <=100 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
+			end
+		    if r2_8910 <=25 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8910, 1, 1);
+		    elseif r2_8913 <=50 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8913, 1, 1);
+		    elseif r2_8930 <=75 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+		    elseif r2_8915 <=100 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
+            end	
+		
+			if reqGrids <= package:GetRestPackageSize() then
+				package:DelItemSendMsg(8994, player);
+				package:AddEquip(randEquip, 1, 0, 2);
+				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族战个人宝箱", GetItemName(randEquip));
+				if r1_8910 <=25 then
+                    package:AddItem(8910, 1, 1, 0, 2);
+		        elseif r1_8913 <=50 then
+                    package:AddItem(8913, 1, 1, 0, 2);
+     	        elseif r1_8930 <=75 then
+                    package:AddItem(8930, 1, 1, 0, 2);
+		        elseif r1_8915 <=100 then
+                    package:AddItem(8915, 1, 1, 0, 2);
+                end	
+		        if r2_8910 <=25 then
+                    package:AddItem(8910, 1, 1, 0, 2);
+				elseif r2_8913 <=50 then
+					package:AddItem(8913, 1, 1, 0, 2);
+				elseif r2_8930 <=75 then
+					package:AddItem(8930, 1, 1, 0, 2);
+				elseif r2_8915 <=100 then
+					package:AddItem(8915, 1, 1, 0, 2);
+				end	
+				return true;				
+			else
+				player:sendMsgCode(2, 2014, 0);
+				return false;
+			end
+		else
+			if reqGrids <= package:GetRestPackageSize() then				
+				package:DelItemSendMsg(8994, player);
+				if r1_8910 <=25 then
+                    package:AddItem(8910, 1, 1, 0, 2);
+		        elseif r1_8913 <=50 then
+                    package:AddItem(8913, 1, 1, 0, 2);
+     	        elseif r1_8930 <=75 then
+                    package:AddItem(8930, 1, 1, 0, 2);
+		        elseif r1_8915 <=100 then
+                    package:AddItem(8915, 1, 1, 0, 2);
+                end	
+		        if r2_8910 <=25 then
+                    package:AddItem(8910, 1, 1, 0, 2);
+				elseif r2_8913 <=50 then
+					package:AddItem(8913, 1, 1, 0, 2);
+				elseif r2_8930 <=75 then
+					package:AddItem(8930, 1, 1, 0, 2);
+				elseif r2_8915 <=100 then
+					package:AddItem(8915, 1, 1, 0, 2);
+				end	
+				return true;			
+			else	
+				player:sendMsgCode(2, 2014, 0);			
+				return false;
+			end	
+		end
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+
+
+
+function ItemNormal_00008995(iid, num, bind, param)
+  local player = GetPlayer()
+    local package = player:GetPackage();
+  if player:isMainFighter(param) then
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+  local oldexp = fgt:getExp();
+	fgt:addExp(50000*num);
+  if fgt:getExp() > oldexp then
+  	package:DelItemSendMsg(8995, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+
+
+function ItemNormal_00008996(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  package:DelItemSendMsg(8996, player);
+  player:getTael(100*num)  
+  return true;
+end
+
+
+function ItemNormal_00008997(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	if package:GetRestPackageSize() > 0 then				
+		package:DelItemSendMsg(8997, player);
+		package:AddItem(8934, 3, 1, 0, 2);
+		player:getGold(100);
+	else
+		player:sendMsgCode(2, 2014, 0);			
+		return false;
+	end
+	return true;
+end
+
+function ItemNormal_00008998(iid, num, bind, param)
+--高级经验加速符8934 x2，中级群体增强符8912 x2，中级水晶8922x2，初级水晶8921x2，初级打孔符8917x2，潜力提升符8999x2
+  local player = GetPlayer();
+  local package = player:GetPackage();
+  local reqGrids = 0;
+  reqGrids = reqGrids + package:GetItemUsedGrids(8934, 2, 1);
+  reqGrids = reqGrids + package:GetItemUsedGrids(8912, 2, 1);
+--  reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
+-- reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
+--  reqGrids = reqGrids + package:GetItemUsedGrids(8917, 2, 1);
+--  reqGrids = reqGrids + package:GetItemUsedGrids(8999, 2, 1);
+  if reqGrids <= package:GetRestPackageSize() then
+    package:DelItemSendMsg(8998, player);
+    package:AddItem(8934, 2, 1, 0, 2);
+    package:AddItem(8912, 2, 1, 0, 2);
+--    package:AddItem(8922, 2, 1, 0, 2);
+--    package:AddItem(8921, 2, 1, 0, 2);
+--    package:AddItem(8917, 2, 1, 0, 2);
+--    package:AddItem(8999, 2, 1, 0, 2);
+    return true;
+  end
+  player:sendMsgCode(2, 2014, 0);
+  return false;
+end
+
+function ItemNormal_00009002(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 0;
+    reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(8922, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(5003, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(5013, 1, 1);
+    if reqGrids <= package:GetRestPackageSize() then
+ 		package:DelItemSendMsg(9002, player);
+        package:AddItem(8934, 1, 1, 0, 2);
+        package:AddItem(8922, 1, 1, 0, 2);
+        package:AddItem(5003, 1, 1, 0, 2);
+        package:AddItem(5013, 1, 1, 0, 2);
+        return true;
+    end
+    player:sendMsgCode(2, 2014, 0);
+    return false;
+end
+
+function ItemNormal_00009003(iid, num, bind, param)
+  local player = GetPlayer()
+  if player:hasFlag(9) then
+    player:sendMsgCode(2, 2051, 0)
+    return false;
+  end
+  local num2 = player:getBuffData(0)
+  if num2 >= 100000 then
+    return false
+  end
+  num2 = num2 + 10000 * num
+  if num2 > 100000 then
+    num2 = 100000
+  end
+  player:setBuffData(0, num2, true)
+  player:autoRegenAll()
+  local package = player:GetPackage();
+  package:DelItemSendMsg(9003, player);
+  return true
+end
+
+function openGemBox(id, boxid)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 0;
+    reqGrids = reqGrids + package:GetItemUsedGrids(8917, 2, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(8918, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(id, 3, 1);
+    if reqGrids <= package:GetRestPackageSize() then
+		package:DelItemSendMsg(boxid, player);
+		package:AddItem(8917, 2, 1, 0, 2);
+        package:AddItem(8921, 2, 1, 0, 2);
+        package:AddItem(8918, 1, 1, 0, 2);
+        package:AddItem(id, 3, 1, 0, 2);
+        return true;
+    end
+    player:sendMsgCode(2, 2014, 0);
+    return false;
+end
+
+function ItemNormal_00009005(iid, num, bind, param)
+  return openGemBox(5003, 9005)
+end
+
+function ItemNormal_00009006(iid, num, bind, param)
+  return openGemBox(5033, 9006)
+end
+
+function ItemNormal_00009007(iid, num, bind, param)
+  return openGemBox(5013, 9007)
+end
+
+function ItemNormal_00009008(iid, num, bind, param)
+  return openGemBox(5023, 9008)
+end
+
+function ItemNormal_00009009(iid, num, bind, param)
+  return openGemBox(5043, 9009)
+end
+
+function ItemNormal_00009010(iid, num, bind, param)
+  return openGemBox(5123, 9010)
+end
+
+function ItemNormal_00009011(iid, num, bind, param)
+  return openGemBox(5073, 9011)
+end
+
+function ItemNormal_00009012(iid, num, bind, param)
+  return openGemBox(5093, 9012)
+end
+
+function ItemNormal_00009013(iid, num, bind, param)
+  return openGemBox(5103, 9013)
+end
+
+function ItemNormal_00009014(iid, num, bind, param)
+  return openGemBox(5113, 9014)
+end
+
+function ItemNormal_00009015(iid, num, bind, param)
+  return openGemBox(5083, 9015)
+end
+
+function ItemNormal_00009016(iid, num, bind, param)
+  local player = GetPlayer()
+    local package = player:GetPackage();
+  if player:isMainFighter(param) then
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+  local oldexp = fgt:getExp();
+	fgt:addExp(2000000*num);
+  if fgt:getExp() > oldexp then
+  	package:DelItemSendMsg(9016, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00009017(iid, num, bind, param)
+  local player = GetPlayer()
+    local package = player:GetPackage();
+  if player:isMainFighter(param) then
+    return false
+  end
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+  local oldexp = fgt:getExp();
+	fgt:addExp(80000000*num);
+  if fgt:getExp() > oldexp then
+  	package:DelItemSendMsg(9017, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00009031(iid, num, bind, param)
+	if(num ~= 4) then
+		return false;
+	end
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	package:DelItemSendMsg(9031, player);
+	equip = math.random(1, table.getn(Orange_Equip_Level_90));
+	package:AddEquip(Orange_Equip_Level_90[equip], bind, 0, 5);--for backstatge 5 for equip from merge
+
+	return true;
+end
+
+
+function ItemNormal_00009027(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 0;
+	local itemId = 0;
+    reqGrids = package:GetItemUsedGrids(8938, 2, 1);
+	local chance = math.random(1, 100);
+	if chance <= 15 then
+		local var1 = {5801,5802,5803,5804};
+		itemId = var1[math.random(1, #var1)];
+	elseif chance <= 40 then
+		local var2 = {5001,5011,5021,5031,5041,5071,5081,5091,5101,5111,5121};
+		itemId = var2[math.random(1, #var2)];
+	else
+		local var3 = {5805,5806,5807,5808,5809,5810,5811,5812};
+		itemId = var3[math.random(1, #var3)];
+	end
+	reqGrids =  reqGrids + package:GetItemUsedGrids(itemId, 1, 1);
+	if reqGrids > package:GetRestPackageSize() then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+        package:DelItemSendMsg(9027, player);
+	package:AddItem(8938, 2, 1, 0, 2);
+	package:AddItem(itemId, 1, 1, 0, 2);
+        return true;
+end
+
+function ItemNormal_00009028(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 0;
+	local itemId = 0;
+    reqGrids = package:GetItemUsedGrids(8939, 1, 1);
+	local chance = math.random(1, 100);
+	if chance <= 25 then
+		local var1 = {5002,5012,5022,5032,5042,5072,5082,5092,5102,5112,5122};
+		itemId = var1[math.random(1, #var1)];
+	else
+		local var2 = {5805,5806,5807,5808,5809,5810,5811,5812};
+		itemId = var2[math.random(1, #var2)];
+	end
+	reqGrids =  reqGrids + package:GetItemUsedGrids(itemId, 1, 1);
+	if reqGrids > package:GetRestPackageSize() then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+        package:DelItemSendMsg(9028, player);
+	package:AddItem(8939, 1, 1, 0, 2);
+	package:AddItem(itemId, 1, 1, 0, 2);
+        return true;
+end
+
+
+function ItemNormal_00009029(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 0;
+	local itemId = 0;
+    reqGrids = package:GetItemUsedGrids(8939, 2, 1);
+	local chance = math.random(1, 100);
+	if chance <= 25 then
+		local var1 = {5002,5012,5022,5032,5042,5072,5082,5092,5102,5112,5122};
+		itemId = var1[math.random(1, #var1)];
+	else
+		local var2 = {5813,5814,5815,5816,5817,5818,5819};
+		itemId = var2[math.random(1, #var2)];
+	end
+	reqGrids =  reqGrids + package:GetItemUsedGrids(itemId, 1, 1);
+	if reqGrids > package:GetRestPackageSize() then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+        package:DelItemSendMsg(9029, player);
+	package:AddItem(8939, 2, 1, 0, 2);
+	package:AddItem(itemId, 1, 1, 0, 2);
+        return true;
+end
+
+function ItemNormal_00009030(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+  local reqGrids = 0;
+	local itemId = 0;
+  reqGrids = 1 + package:GetItemUsedGrids(8940, 2, 1);
+	if reqGrids > package:GetRestPackageSize() then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	local chance = math.random(1, 100);
+	if chance <= 2 then
+		itemId = Orange_Favor[math.random(1, #Orange_Favor)];
+	elseif  chance <= 47 then
+		itemId = Purple_Favor[math.random(1, #Purple_Favor)];
+	else
+		itemId = Gem_Level_3[math.random(1, #Gem_Level_3)];
+	end
+  package:DelItemSendMsg(9030, player);
+	package:AddItem(8940, 2, 1, 0, 2);
+	package:AddItem(itemId, 1, 1, 0, 2);
+  return true;
+end
+
+function ItemNormal_00009036(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+  local roll = math.random(1,100);
+  if roll <= 5 then
+    package:DelItemSendMsg(9036, player);
+    player:getCoupon(10);
+    return;
+  end
+  local itemId
+  local itemCount = 1
+  if roll <= 6 then
+    itemId = 5005
+  elseif roll <= 15 then
+    itemId = 8934
+  elseif roll <= 25 then
+    itemId = 8999
+  elseif roll <= 36 then
+    itemId = 8916
+  elseif roll <= 48 then
+    itemId = 8913
+  elseif roll <= 61 then
+    itemId = 8941
+    itemCount = 10
+  elseif roll <= 74 then
+    itemId = 8922
+  elseif roll <= 87 then
+    itemId = 8930
+  else
+    itemId = 8932
+  end
+
+  package:DelItemSendMsg(9036, player);
+  player:GetPackage():AddItem(itemId, itemCount, true);
+  return true;
+end
+
+function ItemNormal_00009037(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+  local roll = math.random(1,100);
+  local itemId
+  local itemCount = 1
+  local notify = false
+  if roll <= 3 then
+    itemId = 9000
+    notify = true
+  elseif roll <= 14 then
+    itemId = Gem_Level_1[math.random(1, #Gem_Level_1)] + 6;
+    notify = true
+  elseif roll <= 80 then
+    itemId = Gem_Level_1[math.random(1, #Gem_Level_1)] + 5;
+    notify = true
+  elseif roll <= 87 then
+    itemId = 8927
+    itemCount = 5
+  elseif roll <= 93 then
+    itemId = Orange_Favor[math.random(1, #Orange_Favor)]
+    itemCount = 10
+  else
+    itemId = 8916
+    itemCount = 30
+  end
+
+  package:DelItemSendMsg(9037, player);
+  player:GetPackage():AddItem(itemId, itemCount, true);
+  if notify then
+    local prn
+    if player:IsMale() then
+      prn = '他'
+    else
+      prn = '她'
+    end
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 轻轻地打开了 [4:9037] ，一道金光扑面而来，"..prn.."获得了 [4:"..itemId.."]");
+  end
+  return true;
+end
+
+function ItemNormal_00009039(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+  local roll = math.random(1,1000) - 1;
+  if roll < 10 then
+    local c
+    if roll == 0 then
+      c = 888;
+    else
+      c = 100;
+    end
+    package:DelItemSendMsg(9039, player);
+    player:getCoupon(c);
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 打开 [4:9039] 获得礼券" .. c);
+    return true;
+  end
+  local itemId = 8996;
+  local itemCount = 1;
+  if roll < 160 then
+    itemId = 8922;
+  elseif roll < 310 then
+    itemId = Gem_Level_2[math.random(1, #Gem_Level_2)];
+    itemCount = 3;
+  elseif roll < 460 then
+    itemId = 8927;
+  elseif roll < 510 then
+    itemId = 8924;
+  elseif roll < 610 then
+    itemId = 8921;
+  elseif roll < 710 then
+    itemId = 8934;
+  elseif roll < 910 then
+    itemId = 8941;
+    itemCount = 3;
+  end
+  package:DelItemSendMsg(9039, player);
+  player:GetPackage():AddItem(itemId, itemCount, true);
+  return true;
+end
+
+function ItemNormal_00009040(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  package:DelItemSendMsg(9040, player);
+  player:getTael(25*num)  
+  return true;
+end
+
+
+function ItemNormal_00009041(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();
+		
+		local Equip_Index1 = math.random(1, 28);-- orange equip level 50、70 size 28
+		local Equip_Index2 = math.random(1, 28);
+		local randEquip1 = 0;
+		local randEquip2 = 0;
+		
+		if level < 70 then
+			randEquip1 = Orange_Equip_Level_50[Equip_Index1];
+			randEquip2 = Orange_Equip_Level_50[Equip_Index2];
+		else
+			randEquip1 = Orange_Equip_Level_70[Equip_Index1];
+			randEquip2 = Orange_Equip_Level_70[Equip_Index2];
+		end
+		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+		local R_Equip = math.random(1, 100);
+		
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		if R_Equip <= 10 then
+			reqGrids = reqGrids + 2;	
+		else
+			reqGrids = reqGrids + 1;	
+		end
+		
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9041, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1);	
+			end
+			if R_Equip <= 10 then
+				package:AddEquip(randEquip1, 1);	
+				package:AddEquip(randEquip2, 1);
+				BroadCastEquip2(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+			else
+				package:AddEquip(randEquip1, 1);
+				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1));
+			end
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+function ItemNormal_00009201(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();
+		
+		local Equip_Index = math.random(1, #Orange_Equip_Level_50);
+		local randEquip = Orange_Equip_Level_50[Equip_Index];
+		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+		local R_Equip = math.random(1, 100);
+		
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		if R_Equip <= 75 then
+			reqGrids = reqGrids + 1;	
+		end
+		reqGrids = reqGrids + 1;
+		
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9201, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1);	
+			end
+			if R_Equip <= 75 then
+				package:AddEquip(randEquip, 1);
+				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip));
+			end
+				package:AddItem(Purple_Favor[math.random(1, #Purple_Favor)], 2, true);	
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+function ItemNormal_00009202(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();
+		
+		local Equip_Index = math.random(1, #Orange_Equip_Level_70);
+		local randEquip = Orange_Equip_Level_70[Equip_Index];
+		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+		local R_Equip = math.random(1, 100);
+		
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		if R_Equip <= 75 then
+			reqGrids = reqGrids + 1;	
+		end
+		reqGrids = reqGrids + 1;	
+		
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9202, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1);	
+			end
+			if R_Equip <= 75 then
+				package:AddEquip(randEquip, 1);
+				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip));
+			end
+			package:AddItem(Purple_Favor[math.random(1, #Purple_Favor)], 2, true);	
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+function ItemNormal_00009203(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();
+		
+		local Equip_Index = math.random(1, #Orange_Equip_Level_80);
+		local randEquip = Orange_Equip_Level_80[Equip_Index];
+		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+		local R_Equip = math.random(1, 100);
+		
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		if R_Equip <= 75 then
+			reqGrids = reqGrids + 1;	
+		end
+		reqGrids = reqGrids + 1;	
+		
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9203, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1);	
+			end
+			if R_Equip <= 75 then
+				package:AddEquip(randEquip, 1);
+				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip));
+			end
+			package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 2, true);	
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+function ItemNormal_00009204(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+	
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		reqGrids = reqGrids + package:GetItemUsedGrids(9031, 1, 1);	--100% 乾坤碎片
+		reqGrids = reqGrids + 1;	
+				
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9204, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1);	
+			end
+			package:AddItem(9031, 1, 1);	
+			BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(9031));
+			package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 2, true);	
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+function ItemNormal_00009216(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+	
+  local reqGrids = 2 + package:GetItemUsedGrids(8937, 6, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+ 
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+
+  package:DelItemSendMsg(9216, player);  
+  if math.random(1, 100) < 51 then
+	package:AddItem(9214, 1, 1, 0, 2);	
+	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(9214));
+  else
+	local randFavor = Diety_Favor[math.random(1, #Diety_Favor)];
+	package:AddItem(randFavor, 2, 1, 0, 2);
+	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randFavor));
+  end
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 6, 1, 0, 2);
+ 
+  return true;
+end
+
+function ItemNormal_00009217(iid, num, bind, param)
+	local player = GetPlayer();
+	local level = player:GetLev();
+	if level >= 40 then  
+		local package = player:GetPackage();		
+		local reqGrids = 0;
+		
+		local R_8916 = math.random(1, 100);
+		local R_8934 = math.random(1, 100);
+		local R_8923 = math.random(1, 100);
+		local R_8920 = math.random(1, 100);
+		local R_8929 = math.random(1, 100);
+		local R_8903 = math.random(1, 100);
+		local R_8902 = math.random(1, 100);
+		local R_8941 = math.random(1, 100);
+		local R_8940 = math.random(1, 100);
+		local R_8930 = math.random(1, 100);
+		local R_8919 = math.random(1, 100);
+		
+		
+		if R_8916 <= 30 then		
+			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
+		end
+		if R_8934 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		end
+		if R_8923 <= 30 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
+		end
+		if R_8920 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);	
+		end
+		if R_8929 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8929, 1, 1);	
+		end
+		if R_8903 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8903, 1, 1);	
+		end	
+		if R_8902 <= 70 then		
+			reqGrids = reqGrids + package:GetItemUsedGrids(8902, 2, 1);
+		end
+		if R_8941 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8941, 5, 1);	
+		end
+		if R_8940 <= 70 then			
+			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
+		end
+		if R_8930 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		end
+		if R_8919 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
+		end
+		reqGrids = reqGrids + package:GetItemUsedGrids(9214, 1, 1);	--100%女娲碎片
+		reqGrids = reqGrids + 1;
+		
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9217, player);
+			if R_8916 <= 30 then		
+				package:AddItem(8916, 1, 1);
+			end
+			if R_8934 <= 30 then	
+				package:AddItem(8934, 1, 1);
+			end
+			if R_8923 <= 30 then			
+				package:AddItem(8923, 2, 1);
+			end
+			if R_8920 <= 30 then	
+				package:AddItem(8920, 1, 1);	
+			end
+			if R_8929 <= 30 then	
+				package:AddItem(8929, 1, 1);	
+			end
+			if R_8903 <= 30 then	
+				package:AddItem(8903, 1, 1);	
+			end	
+			if R_8902 <= 70 then		
+				package:AddItem(8902, 2, 1);
+			end
+			if R_8941 <= 70 then	
+				package:AddItem(8941, 5, 1);	
+			end
+			if R_8940 <= 70 then			
+				package:AddItem(8940, 1, 1);	
+			end
+			if R_8930 <= 70 then	
+				package:AddItem(8930, 1, 1);	
+			end
+			if R_8919 <= 70 then	
+				package:AddItem(8919, 1, 1);	
+			end
+			package:AddItem(9214, 1, 1);	
+			BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(9214));
+			package:AddItem(Diety_Favor[math.random(1, #Diety_Favor)], 2, true);	
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;	
+	end
+	player:sendMsgCode(2, 2015, 0);
+	return false;
+end
+
+function ItemNormal_00009209(iid, num, bind, param)
+	local rand = math.random(100);
+	local itemId = 0;
+	local count = 0;
+	local player = GetPlayer();
+	if rand < 13 then
+		itemId = 8941;
+		count = 10;
+	elseif rand < 25 then
+		itemId = 8999;
+		count = 1;
+	elseif rand < 26 then
+		itemId = 5005;
+		count = 1;
+	elseif rand < 39 then
+		itemId = 8932;
+		count = 1;
+	elseif rand < 48 then
+		itemId = 8934;
+		count = 1;
+	elseif rand < 61 then
+		itemId = 8916;
+		count = 1;
+	elseif rand < 62 then
+		player:getCoupon(100);
+		return true;
+	elseif rand < 76 then
+		itemId = 8930
+		count = 1;
+	elseif rand < 88 then
+		itemId = 8912;
+		count = 1;
+	else
+		itemId = 8996;
+		count = 1;
+	end	
+	local package = player:GetPackage();
+	if package:GetItemUsedGrids(itemId, count, 1) > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else
+		package:DelItemSendMsg(9209, player);	
+		package:AddItem(itemId, count, 1);
+		return true;
+	end
+end
+
+function ItemNormal_00009210(iid, num, bind, param)
+	local rand = math.random(100);
+	local itemId = 0;
+	local count = 0;
+	local player = GetPlayer();
+	if rand < 2 then
+		itemId = 9000;
+		count = 1;
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了合家团圆礼包，一道金光扑面而来，获得了[4:9000]");
+	elseif rand < 13 then
+		local Gem_Level_7 = { 5007, 5017, 5027, 5037, 5047, 5077, 5087, 5097, 5107, 5117, 5127 };
+		local rand_gem = math.random(1, #Gem_Level_7);
+		itemId = Gem_Level_7[rand_gem];
+		count = 1;
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了合家团圆礼包，一道金光扑面而来，获得了[4:"..itemId.."]");
+	elseif rand < 46 then
+		local Gem_Level_6 = { 5006, 5016, 5026, 5036, 5046, 5076, 5086, 5096, 5106, 5116, 5126 };
+		local rand_gem = math.random(1, #Gem_Level_6);
+		itemId = Gem_Level_6[rand_gem];
+		count = 1;
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了合家团圆礼包，一道金光扑面而来，获得了[4:"..itemId.."]");
+	elseif rand < 52 then
+		itemId = 8913;
+		count = 20;
+	elseif rand < 58 then
+		local favor = {5820, 5821, 5822, 5823, 5824};
+		local rand_favor = math.random(1, #favor);
+		itemId = favor[rand_favor];
+		count = 10;
+	elseif rand < 65 then
+		itemId = 8919;
+		count = 10;
+	elseif rand < 72 then
+		itemId = 8927;
+		count = 5;
+	elseif rand < 79 then
+		itemId = 8999;
+		count = 20;
+	elseif rand < 86 then
+		itemId = 8924;
+		count = 10;
+	elseif rand < 93 then
+		itemId = 8916;
+		count = 20;
+	else
+		itemId = 8996;
+		count = 20;
+	end
+	local package = player:GetPackage();
+	if package:GetItemUsedGrids(itemId, count, 1) > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else
+		package:DelItemSendMsg(9210, player);
+		package:AddItem(itemId, count, 1);
+		return true;
+	end
+end
+
+function ItemNormal_00009211(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(5, 0, true)
+  player:setBuffData(6, 0, true)
+  local stage = getActivityStage();  
+  if stage == 9 or stage == 10 then
+	player:setBuffData(11, 0, true)
+	if ItemNormal_AddBuff(player, 10, 3600, num, 36000) then
+		package:DelItemSendMsg(9211, player);
+		return true;
+	end
+  else
+	player:setBuffData(10, 0, true)
+	if ItemNormal_AddBuff(player, 11, 3600, num, 36000) then
+		package:DelItemSendMsg(9211, player);
+		return true;
+	end
+  end
+	return false;
+end
+
+function ItemNormal_00009212(iid, num, bind, param)
+ 	local player = GetPlayer();
+	local package = player:GetPackage();
+	
+	local gemSize = table.getn(Gem_Level_2);
+	local randGem = Gem_Level_2[math.random(1, gemSize)];
+	
+	local randAmount = 0;      
+	
+	local equipSize = table.getn(Purple_Equip_Level_90)
+	local randEquipPos1 = math.random(1, equipSize);
+	local randEquipPos2 = math.random(1, equipSize);
+	local randEquip1 = Purple_Equip_Level_90[randEquipPos1];
+	local randEquip2 = Purple_Equip_Level_90[randEquipPos2];
+		  
+    local r = math.random(1, 100) / 100;
+	if r <= 0.15 then
+		randAmount = 2;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);		
+        reqGrids = reqGrids + 2;
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9212, player);
+			package:AddEquip(randEquip1, 1, 0, 2);
+			package:AddEquip(randEquip2, 1, 0, 2);
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 7, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	else 	 
+		randAmount = 1;
+		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
+        reqGrids = reqGrids + 1;
+        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);
+		if reqGrids <= 	package:GetRestPackageSize() then
+			package:DelItemSendMsg(9212, player);
+			package:AddEquip(randEquip1, 1, 0, 2);			
+			package:AddItem(randGem, 1, 1, 0, 2);
+			package:AddItem(8936, 7, 1, 0, 2);
+			return true;
+		end
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end	
+end
+
+function ItemNormal_00009213(iid, num, bind, param)
+  local player = GetPlayer();
+  local package = player:GetPackage();
+	
+  local reqGrids = 2 + package:GetItemUsedGrids(8937, 6, 1)
+  if reqGrids > package:GetRestPackageSize() then
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+  end
+ 
+  local randGem = Gem_Level_3[math.random(1, #Gem_Level_3)];
+
+  package:DelItemSendMsg(9213, player);  
+  if math.random(1, 100) < 51 then
+	package:AddItem(9031, 1, 1, 0, 2);	
+	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(9031));
+  else
+	local randFavor = Orange_Favor[math.random(1, #Orange_Favor)];
+	package:AddItem(randFavor, 2, 1, 0, 2);
+	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randFavor));
+  end
+  package:AddItem(randGem, 1, 1, 0, 2);
+  package:AddItem(8937, 6, 1, 0, 2);
+ 
+  return true;
+end
+
+function ItemNormal_00007xxx(iid, num, bind, param)
+ 	local player = GetPlayer()
+	local fgt = player:findFighter(param)
+  if fgt == nil then
+    return false
+  end
+  local skillId = (math.floor((iid - 7000) / 20) + 1) * 100 + ((iid - 7000) % 20)
+  if not fgt:learnSkill(skillId) then
+    return false
+  end
+  player:GetPackage():DelItemSendMsg(iid, player)
+  return true
+end
+
+function ItemNormal_SkillLvUp(iid, num, bind, param)
+ 	local player = GetPlayer()
+	local fgt = player:findFighter(param)
+  if fgt == nil then
+    return false
+  end
+  local skillLevel = iid - 9017
+  if not fgt:skillLevelUp(skillLevel) then
+    return false
+  end
+  player:GetPackage():DelItemSendMsg(iid, player)
+  return true
+end
+
+local SkillPageRange = {
+  9042, 9044, 9047, 9051, 9056, 9062, 9069, 9077, 9087
+}
+function ItemNormal_SkillPage(iid, num, bind, param)
+ 	local player = GetPlayer()
+  local package = player:GetPackage()
+  local n = 2
+  for i = 2, 9 do
+    if iid < SkillPageRange[i] then
+      n = i
+      break
+    end
+  end
+  if package:GetRestPackageSize() < package:GetItemUsedGrids(9017 + n, num, true) then
+    player:sendMsgCode(2, 2014, 0)
+    return false
+  end
+  for i = SkillPageRange[n - 1], SkillPageRange[n] - 1 do
+    if package:GetItemNum(i, false) < num then
+      player:sendMsgCode(2, 2156, i)
+      return false
+    end
+  end
+  for i = SkillPageRange[n - 1], SkillPageRange[n] - 1 do
+    player:GetPackage():DelItemSendMsg(i, player)
+    if i ~= iid then
+      package:DelItem(i, num, false)
+    end
+  end
+  package:AddItem(9017 + n, num, true)
+  return true;
+end
+
+function ItemNormal_00009214(iid, num, bind, param)
+	if(num ~= 4) then
+		return false;
+	end
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	package:DelItemSendMsg(9214, player);
+	equip = math.random(1, table.getn(Orange_Equip_Level_100));
+	package:AddEquip(Orange_Equip_Level_100[equip], bind, 0, 5);--for backstatge 5 for equip from merge
+
+	return true;
+end
+function ItemNormal_00009223(iid, num, bind, param)
+ 	local player = GetPlayer()
+	local package = player:GetPackage()	
+	if package:GetRestPackageSize() < 2 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end		
+	local itemId = 8924;
+	local count = 1;
+	local rand = math.random(1, 100);
+	if rand == 1 then
+		package:DelItemSendMsg(9223, player);
+		player:getCoupon(188);
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9223]，一道金光扑面而来，获得了礼券188");
+		return true;  
+	elseif rand == 2 then
+		itemId = 5055;
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9223]，一道金光扑面而来，获得了[4:5055]");
+	elseif rand <= 14 then
+		itemId = 8999;
+	elseif rand <= 27 then
+		itemId = 8941;
+		count = 10;
+	elseif rand <= 40 then
+		itemId = 8932;
+	elseif rand <= 51 then
+		itemId = 8934;
+	elseif rand <= 64 then
+		itemId = 8916;
+	elseif rand <= 77 then
+		itemId = 8930;
+	elseif rand <= 90 then
+		itemId = 8913;		
+	end
+	package:DelItemSendMsg(9223, player);
+	package:AddItem(itemId, count, 1, 0, 2);
+	package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 1, 1, 0, 2);
+	return true;
+end
+function ItemNormal_00009225(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+	if package:GetRestPackageSize() < 2 then		
+		player:sendMsgCode(2, 2014, 0);
+		return false;
+	end
+	local roll = math.random(1,1000) - 1;
+	if roll < 20 then
+		local c
+		if roll < 5 then
+			c = 888;
+		else
+			c = 100;
+		end
+		package:DelItemSendMsg(9225, player);
+		player:getCoupon(c);
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9225]，一道金光扑面而来，获得了礼券".. c);
+		return true;
+	end
+	local itemId = 8996;
+	local itemCount = 1;
+	if roll < 120 then
+		itemId = 8924;
+		itemCount = 2;
+	elseif roll < 270 then
+		itemId = 8923;
+		itemCount = 5;
+	elseif roll < 380 then
+		itemId = 8922;
+		itemCount = 10;
+	elseif roll < 480 then
+		itemId = Gem_Level_2[math.random(1, #Gem_Level_2)];
+		itemCount = 3;
+	elseif roll < 600 then
+		itemId = 8927;
+	elseif roll < 750 then
+		itemId = 8934;
+	elseif roll < 900 then	
+		itemId = 8941;
+		itemCount = 10;
+	end
+	package:DelItemSendMsg(9225, player);
+	package:AddItem(itemId, itemCount, true, 0, 2);
+	package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 1, 1, 0, 2);
+	return true;
+end
+
+local ItemNormal_Table = {
+  [7001] = ItemNormal_00007xxx,
+  [7002] = ItemNormal_00007xxx,
+  [7003] = ItemNormal_00007xxx,
+  [7004] = ItemNormal_00007xxx,
+  [7005] = ItemNormal_00007xxx,
+  [7006] = ItemNormal_00007xxx,
+  [7007] = ItemNormal_00007xxx,
+  [7008] = ItemNormal_00007xxx,
+  [7009] = ItemNormal_00007xxx,
+  [7010] = ItemNormal_00007xxx,
+  [7021] = ItemNormal_00007xxx,
+  [7022] = ItemNormal_00007xxx,
+  [7023] = ItemNormal_00007xxx,
+  [7024] = ItemNormal_00007xxx,
+  [7025] = ItemNormal_00007xxx,
+  [7026] = ItemNormal_00007xxx,
+  [7027] = ItemNormal_00007xxx,
+  [7028] = ItemNormal_00007xxx,
+  [7029] = ItemNormal_00007xxx,
+  [7030] = ItemNormal_00007xxx,
+  [7041] = ItemNormal_00007xxx,
+  [7042] = ItemNormal_00007xxx,
+  [7043] = ItemNormal_00007xxx,
+  [7044] = ItemNormal_00007xxx,
+  [7045] = ItemNormal_00007xxx,
+  [7046] = ItemNormal_00007xxx,
+  [7047] = ItemNormal_00007xxx,
+  [7048] = ItemNormal_00007xxx,
+  [7049] = ItemNormal_00007xxx,
+  [7050] = ItemNormal_00007xxx,
+
+  [8900] = ItemNormal_00008900,
+	[8901] = ItemNormal_00008901,
+	[8902] = ItemNormal_00008902,
+	[8903] = ItemNormal_00008903,
+	[8904] = ItemNormal_00008904,
+	[8905] = ItemNormal_00008905,
+	[8906] = ItemNormal_00008906,
+	[8907] = ItemNormal_00008907,
+	[8908] = ItemNormal_00008908,
+	[8909] = ItemNormal_00008909,
+	[8910] = ItemNormal_00008910,
+	[8911] = ItemNormal_00008911,
+	[8912] = ItemNormal_00008912,
+	[8913] = ItemNormal_00008913,
+	[8930] = ItemNormal_00008930,
+	[8931] = ItemNormal_00008931,
+	[8932] = ItemNormal_00008932,
+	[8933] = ItemNormal_00008933,
+	[8934] = ItemNormal_00008934,
+	[8935] = ItemNormal_00008935,
+	[8936] = ItemNormal_00008936,
+	[8937] = ItemNormal_00008937,
+	
+	[8938] = ItemNormal_00008938,
+	[8939] = ItemNormal_00008939,
+	[8940] = ItemNormal_00008940,
+	[8942] = ItemNormal_00008942,
+	[8943] = ItemNormal_00008943,
+	[8944] = ItemNormal_00008944,
+	[8945] = ItemNormal_00008945,
+	[8946] = ItemNormal_00008946,
+	[8947] = ItemNormal_00008947,
+	[8949] = ItemNormal_00008949,
+	[8950] = ItemNormal_00008950,
+	[8951] = ItemNormal_00008951,
+	[8952] = ItemNormal_00008952,
+	[8953] = ItemNormal_00008953,
+	[8954] = ItemNormal_00008954,
+	[8955] = ItemNormal_00008955,
+	[8956] = ItemNormal_00008956,
+	[8957] = ItemNormal_00008957,
+	[8958] = ItemNormal_00008958,
+	[8959] = ItemNormal_00008959,
+	[8960] = ItemNormal_00008960,
+	[8961] = ItemNormal_00008961,
+	[8962] = ItemNormal_00008962,
+	[8963] = ItemNormal_00008963,
+	[8964] = ItemNormal_00008964,
+	[8965] = ItemNormal_00008965,
+	[8966] = ItemNormal_00008966,
+	[8967] = ItemNormal_00008967,
+	[8968] = ItemNormal_00008968,
+	[8969] = ItemNormal_00008969,
+	[8970] = ItemNormal_00008970,
+	[8971] = ItemNormal_00008971,
+	[8972] = ItemNormal_00008972,
+	[8973] = ItemNormal_00008973,
+	[8974] = ItemNormal_00008974,
+	[8975] = ItemNormal_00008975,
+	[8976] = ItemNormal_00008976,
+	[8977] = ItemNormal_00008977,
+	[8978] = ItemNormal_00008978,
+	[8979] = ItemNormal_00008979,
+	[8980] = ItemNormal_00008980,
+	[8981] = ItemNormal_00008981,
+	[8982] = ItemNormal_00008982,
+	[8983] = ItemNormal_00008983,
+	[8984] = ItemNormal_00008984,
+	[8985] = ItemNormal_00008985,
+	[8986] = ItemNormal_00008986,
+	[8987] = ItemNormal_00008987,
+	[8988] = ItemNormal_00008988,
+	[8989] = ItemNormal_00008989,
+	[8990] = ItemNormal_00008990,
+	[8991] = ItemNormal_00008991,
+	[8992] = ItemNormal_00008992,
+	[8993] = ItemNormal_00008993,
+	[8994] = ItemNormal_00008994,
+	[8995] = ItemNormal_00008995,
+	[8996] = ItemNormal_00008996,
+	[8997] = ItemNormal_00008997,
+	[8998] = ItemNormal_00008998,
+	[9002] = ItemNormal_00009002,
+	[9003] = ItemNormal_00009003,
+	[9005] = ItemNormal_00009005,
+	[9006] = ItemNormal_00009006,
+	[9007] = ItemNormal_00009007,
+	[9008] = ItemNormal_00009008,
+	[9009] = ItemNormal_00009009,
+	[9010] = ItemNormal_00009010,
+	[9011] = ItemNormal_00009011,
+	[9012] = ItemNormal_00009012,
+	[9013] = ItemNormal_00009013,
+	[9014] = ItemNormal_00009014,
+	[9015] = ItemNormal_00009015,
+	[9016] = ItemNormal_00009016,
+	[9017] = ItemNormal_00009017,
+	[9031] = ItemNormal_00009031,
+	[9027] = ItemNormal_00009027,
+	[9028] = ItemNormal_00009028,
+	[9029] = ItemNormal_00009029,
+	[9030] = ItemNormal_00009030,
+	[9036] = ItemNormal_00009036,
+	[9037] = ItemNormal_00009037,
+	[9039] = ItemNormal_00009039,
+	[9040] = ItemNormal_00009040,
+	[9041] = ItemNormal_00009041,
+
+  [9018] = ItemNormal_SkillLvUp,
+  [9019] = ItemNormal_SkillLvUp,
+  [9020] = ItemNormal_SkillLvUp,
+  [9021] = ItemNormal_SkillLvUp,
+  [9022] = ItemNormal_SkillLvUp,
+  [9023] = ItemNormal_SkillLvUp,
+  [9024] = ItemNormal_SkillLvUp,
+  [9025] = ItemNormal_SkillLvUp,
+  [9026] = ItemNormal_SkillLvUp,
+
+  [9042] = ItemNormal_SkillPage,
+  [9043] = ItemNormal_SkillPage,
+  [9044] = ItemNormal_SkillPage,
+  [9045] = ItemNormal_SkillPage,
+  [9046] = ItemNormal_SkillPage,
+  [9047] = ItemNormal_SkillPage,
+  [9048] = ItemNormal_SkillPage,
+  [9049] = ItemNormal_SkillPage,
+  [9050] = ItemNormal_SkillPage,
+  [9051] = ItemNormal_SkillPage,
+  [9052] = ItemNormal_SkillPage,
+  [9053] = ItemNormal_SkillPage,
+  [9054] = ItemNormal_SkillPage,
+  [9055] = ItemNormal_SkillPage,
+  [9056] = ItemNormal_SkillPage,
+  [9057] = ItemNormal_SkillPage,
+  [9058] = ItemNormal_SkillPage,
+  [9059] = ItemNormal_SkillPage,
+  [9060] = ItemNormal_SkillPage,
+  [9061] = ItemNormal_SkillPage,
+  [9062] = ItemNormal_SkillPage,
+  [9063] = ItemNormal_SkillPage,
+  [9064] = ItemNormal_SkillPage,
+  [9065] = ItemNormal_SkillPage,
+  [9066] = ItemNormal_SkillPage,
+  [9067] = ItemNormal_SkillPage,
+  [9068] = ItemNormal_SkillPage,
+  [9069] = ItemNormal_SkillPage,
+  [9070] = ItemNormal_SkillPage,
+  [9071] = ItemNormal_SkillPage,
+  [9072] = ItemNormal_SkillPage,
+  [9073] = ItemNormal_SkillPage,
+  [9074] = ItemNormal_SkillPage,
+  [9075] = ItemNormal_SkillPage,
+  [9076] = ItemNormal_SkillPage,
+  [9077] = ItemNormal_SkillPage,
+  [9078] = ItemNormal_SkillPage,
+  [9079] = ItemNormal_SkillPage,
+  [9080] = ItemNormal_SkillPage,
+  [9081] = ItemNormal_SkillPage,
+  [9082] = ItemNormal_SkillPage,
+  [9083] = ItemNormal_SkillPage,
+  [9084] = ItemNormal_SkillPage,
+  [9085] = ItemNormal_SkillPage,
+  [9086] = ItemNormal_SkillPage,
+
+  [9201] = ItemNormal_00009201,
+	[9202] = ItemNormal_00009202,
+	[9203] = ItemNormal_00009203,
+	[9204] = ItemNormal_00009204,
+	[9209] = ItemNormal_00009209,
+	[9210] = ItemNormal_00009210,
+	[9211] = ItemNormal_00009211,
+	[9212] = ItemNormal_00009212,
+	[9213] = ItemNormal_00009213,
+	[9214] = ItemNormal_00009214,
+	[9216] = ItemNormal_00009216,
+	[9217] = ItemNormal_00009217,
+	[9223] = ItemNormal_00009223,
+	[9225] = ItemNormal_00009225
+	};
+
+function RunItemNormalUse(itemId, num, bind, param)
+	local trigger = ItemNormal_Table[itemId];
+	if trigger == nil then
+		return false;
+	end
+	return trigger(itemId, num, bind, param);	
+end

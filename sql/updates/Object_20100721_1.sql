@@ -1,0 +1,5 @@
+ALTER TABLE `clan`  DROP COLUMN `rewardNum`;
+CREATE TABLE `clanbattle_clan_reward` (  `id` INT(10) UNSIGNED NOT NULL,  `itemNum` INT(10) UNSIGNED NOT NULL,  PRIMARY KEY (`id`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;
+CREATE TABLE `clanbattle_player_reward` (  `id` BIGINT(20) UNSIGNED NOT NULL,  `itemNum` INT(10) UNSIGNED NOT NULL,  PRIMARY KEY (`id`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;
+CREATE TABLE `clan_pending_reward` (  `id` INT(10) UNSIGNED NOT NULL,  `timeAlloc` INT(10) UNSIGNED NOT NULL,  `playerId` BIGINT(20) UNSIGNED NOT NULL,  `itemId` INT(10) UNSIGNED NOT NULL,  `itemNum` INT(10) UNSIGNED NOT NULL,  INDEX `id` (`id`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;
+CREATE TABLE `clan_repo` (  `id` INT(10) UNSIGNED NOT NULL,  `itemId` INT(10) UNSIGNED NOT NULL,  `itemNum` INT(10) UNSIGNED NOT NULL,  UNIQUE INDEX `id_itemId` (`id`, `itemId`),  INDEX `id` (`id`) ) COLLATE='utf8_general_ci' ENGINE=InnoDB ROW_FORMAT=DEFAULT;

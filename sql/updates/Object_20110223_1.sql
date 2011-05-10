@@ -1,0 +1,1 @@
+ALTER TABLE `clan_battler` ADD COLUMN `hasAttack` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `hasEnter`;

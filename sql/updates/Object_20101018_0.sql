@@ -1,0 +1,1 @@
+UPDATE `player` SET `icCount` = 24 - `icCount`;

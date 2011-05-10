@@ -1,0 +1,860 @@
+#include "Config.h"
+#include "GameActionLua.h"
+#include "Server/WorldServer.h"
+#include "GObject/Player.h"
+#include "GObject/Fighter.h"
+#include "GObject/Mail.h"
+#include "GObject/TaskMgr.h"
+#include "GObject/Package.h"
+#include "GObject/MOAction.h"
+
+#include "GObject/Country.h"
+#include "Log/Log.h"
+
+#include "MsgHandler/CountryMsgStruct.h"
+#include "Network/TcpServerWrapper.h"
+#include "Server/OidGenerator.h"
+
+using namespace GObject;
+
+namespace Script
+{
+	GameActionLua::GameActionLua(UInt8 tid, const char * path) : _player1(NULL), _player2(NULL), _tid(tid)
+	{
+		doFile(path);
+	}
+
+	GameActionLua::~GameActionLua()
+	{
+		
+	}
+
+	void GameActionLua::init()
+	{
+		RegisterActionInterface();
+	}
+
+	void GameActionLua::postInit()
+	{
+		lua_tinker::call<void>(_L, "initSeed", IDGenerator::gSeedOidGenerator.ID());
+		TRACE_LOG("Script loaded...");
+	}
+
+	void SysBroadcast(UInt8 type, const char * msg)
+	{
+		Stream st(0xF7);
+		st << type << msg << Stream::eos;
+		NETWORK()->Broadcast(st);
+	}
+
+	void SysSendMsg(GObject::Player * player, UInt8 type, const char * msg)
+	{
+		Stream st(0xF7);
+		st << type << msg << Stream::eos;
+		player->send(st);
+	}
+
+	void GameActionLua::RegisterActionInterface()
+	{
+		#define CLASS_DEF(klass,member)	 \
+			lua_tinker::class_def<klass>(_L, #member, &klass::member)
+		#define CLASS_ADD(klass)	\
+			lua_tinker::class_add<klass>(_L, #klass);
+		#define CLASS_STATIC_DEF(klass,member)	\
+			lua_tinker::class_def<klass>(_L, #klass "_" #member, &klass::member)
+
+		lua_tinker::class_add<GameActionLua>(_L, "GameActionLua");
+		lua_tinker::set(_L, "_GameActionLua", this);
+
+		//static function register or free function
+		lua_tinker::def(_L, "GetTaskReqStep", &TaskMgr::GetTaskReqStep);
+		lua_tinker::def(_L, "IsEquipId",	IsEquipId);
+		lua_tinker::def(_L, "IsEquipTypeId",IsEquipTypeId);
+		lua_tinker::def(_L, "IsEquip",		IsEquip);
+		lua_tinker::def(_L, "Broadcast",	SysBroadcast);
+		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
+		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
+		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
+		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
+
+		CLASS_DEF(GameActionLua, Print);
+		CLASS_DEF(GameActionLua, GetPlayer1);
+		CLASS_DEF(GameActionLua, GetPlayer2);
+		CLASS_DEF(GameActionLua, GetNpcRelationTask);
+		CLASS_DEF(GameActionLua, GetTaskData);
+		CLASS_DEF(GameActionLua, SetPlayerData);
+		CLASS_DEF(GameActionLua, GetPlayerData);
+		CLASS_DEF(GameActionLua, RunConveyAction);
+		CLASS_DEF(GameActionLua, GetPlayerName);
+		CLASS_DEF(GameActionLua, GetPlayerStateName);
+		CLASS_DEF(GameActionLua, RunTask);
+		CLASS_DEF(GameActionLua, RunDayTaskAccept);
+		CLASS_DEF(GameActionLua, RunAutoBattleAction);
+		CLASS_DEF(GameActionLua, GetDayTaskCompletedCount);
+		CLASS_DEF(GameActionLua, GetDayTaskFlushColor);
+		CLASS_DEF(GameActionLua, GetGreatFighterFavor);
+		CLASS_DEF(GameActionLua, GetGreatFighterReqFriendliness);
+		CLASS_DEF(GameActionLua, GetItemName);
+		CLASS_DEF(GameActionLua, GetGreatFighterName);
+		CLASS_DEF(GameActionLua, RunItemTaskAction);
+		CLASS_DEF(GameActionLua, GetGreatFighterLev);
+		CLASS_DEF(GameActionLua, GetGreatFighterCorlor);
+        CLASS_DEF(GameActionLua, GetSharpDay);
+
+		CLASS_ADD(Player);
+		CLASS_DEF(Player, getPName);
+		CLASS_DEF(Player, IsMale);
+		CLASS_DEF(Player, GetLev);
+		CLASS_DEF(Player, GetExp);
+		CLASS_DEF(Player, AddExp);
+		CLASS_DEF(Player, getGold);
+		CLASS_DEF(Player, useGold);
+		CLASS_DEF(Player, getCoupon);
+		CLASS_DEF(Player, useCoupon);
+		CLASS_DEF(Player, getTael);
+		CLASS_DEF(Player, useTael);
+		CLASS_DEF(Player, getCoin);
+		CLASS_DEF(Player, useCoin);
+		CLASS_DEF(Player, addStatus);
+		CLASS_DEF(Player, removeStatus);
+		CLASS_DEF(Player, hasStatus);
+		CLASS_DEF(Player, hasStatusAny);
+		CLASS_DEF(Player, addStatusBit);
+		CLASS_DEF(Player, setStatusBit);
+		CLASS_DEF(Player, removeStatusBit);
+		CLASS_DEF(Player, getStatusBit);
+		CLASS_DEF(Player, hasStatusBit);
+		CLASS_DEF(Player, setTitle);
+		CLASS_DEF(Player, getTitle);
+		CLASS_DEF(Player, getAchievement);
+		CLASS_DEF(Player, useAchievement);
+		CLASS_DEF(Player, getLocation);
+		CLASS_DEF(Player, setLocation);
+		CLASS_DEF(Player, IsInTeam);
+		CLASS_DEF(Player, getLocation);
+		CLASS_DEF(Player, getCountry);
+		CLASS_DEF(Player, GetClass);
+		CLASS_DEF(Player, GetTaskMgr);
+		CLASS_DEF(Player, GetPackage);
+		CLASS_DEF(Player, GetMailBox);
+		CLASS_DEF(Player, GetFreePackageSize);
+		CLASS_DEF(Player, addFightCurrentHp);
+		CLASS_DEF(Player, addFightCurrentHpAll);
+		CLASS_DEF(Player, getGreatFighterFriendliness);
+		CLASS_DEF(Player, getGreatFighterFavorSubmitCount);
+		CLASS_DEF(Player, getGreatFighterFavor);
+		CLASS_DEF(Player, getFighterCount);
+		CLASS_DEF(Player, regenHP);
+		CLASS_DEF(Player, findFighter);
+		CLASS_DEF(Player, getBuffData);
+		CLASS_DEF(Player, setBuffData);
+		CLASS_DEF(Player, moveTo);
+		CLASS_DEF(Player, moveToHome);
+		CLASS_DEF(Player, moveToNeutralHome);
+		CLASS_DEF(Player, autoRegenAll);
+		CLASS_DEF(Player, sendMsgCode);
+		CLASS_DEF(Player, isMainFighter);
+		CLASS_DEF(Player, getGoldOrCoupon);
+		CLASS_DEF(Player, useGoldOrCoupon);
+		CLASS_DEF(Player, hasFlag);
+		CLASS_DEF(Player, takeFighter);
+		CLASS_DEF(Player, isFighterFull);
+		CLASS_DEF(Player, getNextExtraReward);
+		CLASS_DEF(Player, setNextExtraReward);
+		CLASS_DEF(Player, isDungeonPassed);
+		CLASS_DEF(Player, getVipLevel);
+		CLASS_DEF(Player, getLastOnline);
+		CLASS_DEF(Player, sendTopupMail);
+		CLASS_DEF(Player, setTicketCount);
+		CLASS_DEF(Player, getTicketCount);
+		CLASS_DEF(Player, getClan);
+		CLASS_DEF(Player, getCreated);
+		CLASS_DEF(Player, getBlockBossLevel);
+		
+		CLASS_ADD(Fighter);
+		CLASS_DEF(Fighter, regenHP);
+		CLASS_DEF(Fighter, getCurrentHP);
+		CLASS_DEF(Fighter, getMaxHP);
+		CLASS_DEF(Fighter, addExp);
+		CLASS_DEF(Fighter, getExp);
+		CLASS_DEF(Fighter, getBuffData);
+		CLASS_DEF(Fighter, setBuffData);
+		CLASS_DEF(Fighter, getClass);
+		CLASS_DEF(Fighter, getSkill);
+		CLASS_DEF(Fighter, setSkill);
+		CLASS_DEF(Fighter, setSkillLevel);
+		CLASS_DEF(Fighter, learnSkill);
+		CLASS_DEF(Fighter, skillLevelUp);
+
+		//任务
+		CLASS_ADD(TaskMgr);
+		CLASS_DEF(TaskMgr, AddTask);
+		CLASS_DEF(TaskMgr, TaskCanAccept);
+		CLASS_DEF(TaskMgr, GetDayTaskCompletedCnt);
+		CLASS_DEF(TaskMgr, GetDayTaskCurrTaskId);
+		CLASS_DEF(TaskMgr, CanDayTaskSubmit);
+		CLASS_DEF(TaskMgr, DayTaskSubmit);
+		CLASS_DEF(TaskMgr, AutoTaskAbandon);
+		CLASS_DEF(TaskMgr, GetTaskAcceptNpc);
+		CLASS_DEF(TaskMgr, GetTaskSubmitNpc);
+		CLASS_DEF(TaskMgr, GetTaskStep);
+		CLASS_DEF(TaskMgr, HasAcceptedTask);
+		CLASS_DEF(TaskMgr, HasCompletedTask);
+		CLASS_DEF(TaskMgr, HasSubmitedTask);
+		CLASS_DEF(TaskMgr, DelAcceptedTask);
+		CLASS_DEF(TaskMgr, AddTaskStep);
+		CLASS_DEF(TaskMgr, AddTaskStep2);
+		CLASS_DEF(TaskMgr, AddDummyTaskStep);
+		CLASS_DEF(TaskMgr, AddDummyTaskStep2);
+		CLASS_DEF(TaskMgr, AcceptTask);
+		CLASS_DEF(TaskMgr, SubmitTask);	
+		CLASS_DEF(TaskMgr, AbandonTask);
+		CLASS_DEF(TaskMgr, ResetTaskStep);
+		CLASS_DEF(TaskMgr, CheckPreTaskStep);
+		CLASS_DEF(TaskMgr, GetTaskSubType);
+		CLASS_DEF(TaskMgr, IsTaskCompleted);
+		CLASS_DEF(TaskMgr, DayTaskAward);
+		CLASS_DEF(TaskMgr, AddTaskStep4);
+        CLASS_DEF(TaskMgr, GetTaskBeginTime);
+        CLASS_DEF(TaskMgr, GetTaskEndTime);
+		CLASS_DEF(TaskMgr, DelSubmitedTask);
+		CLASS_DEF(TaskMgr, AddCanAcceptTask2);
+		CLASS_DEF(TaskMgr, DayTaskSubmit2);
+		CLASS_DEF(TaskMgr, TaskExist);
+		CLASS_DEF(TaskMgr, DelCanAcceptTask2);
+		CLASS_DEF(TaskMgr, SendCanAcceptTaskInfor);
+
+
+		//背包
+		CLASS_ADD(Package);
+		CLASS_DEF(Package, Add);
+		CLASS_DEF(Package, AddItem);
+		CLASS_DEF(Package, AddEquip);
+		CLASS_DEF(Package, SetItem);
+		CLASS_DEF(Package, DelItemAll);
+		CLASS_DEF(Package, DelItem);
+		CLASS_DEF(Package, DelItemAny);
+		CLASS_DEF(Package, DelEquip);
+		CLASS_DEF(Package, SellItem);
+		CLASS_DEF(Package, SellEquip);
+		CLASS_DEF(Package, UseItem);
+		CLASS_DEF(Package, UseTaskItem);
+		CLASS_DEF(Package, GetItem);
+		CLASS_DEF(Package, GetEquip);
+		CLASS_DEF(Package, GetItemUsedGrids);
+		CLASS_DEF(Package, ExistItem);
+		CLASS_DEF(Package, GetItemNum);
+		CLASS_DEF(Package, GetMaxPackageSize);
+		CLASS_DEF(Package, GetUsedPackageSize);
+		CLASS_DEF(Package, GetRestPackageSize);
+		CLASS_DEF(Package, IsFull);
+		CLASS_DEF(Package, DelItemSendMsg);
+		
+		//物品
+		CLASS_ADD(ItemBase);
+		CLASS_DEF(ItemBase, Count);
+
+		CLASS_ADD(MailBox);
+		CLASS_DEF(MailBox, newItemMail);
+		CLASS_DEF(MailBox, newItemPackageMail);
+	}
+
+	const char* GameActionLua::GetItemName(UInt32 itemId)
+	{
+		const GData::ItemBaseType * data = GData::GDataManager::GetItemTypeData(itemId);
+		return data == NULL ? "" : data->getName().c_str();
+	}
+
+	const char* GameActionLua::GetGreatFighterName(UInt32 fgtId)
+	{
+		GObject::Fighter& fighter = GObject::getGreatFighter(fgtId);
+		return fighter.getId() == 0 ? "" : fighter.getName().c_str();
+	}
+
+	Table GameActionLua::GetTaskData(Player* player, UInt32 id)
+	{
+		Table task(_L);
+		task.set("m_TaskId", 0);
+
+		if (player == NULL) return task;
+		const TaskData data = player->GetTaskMgr()->GetTaskData(id);
+
+		task.set("m_TaskId", data.m_TaskId);
+		task.set("m_OwnerId", data.m_OwnerId);
+		task.set("m_AcceptTime", data.m_AcceptTime);
+		task.set("m_Step", data.m_Step);
+		task.set("m_TimeBegin", data.m_TimeBegin);
+		task.set("m_TimeEnd", data.m_TimeEnd);
+		task.set("m_Completed", data.m_Completed);
+		task.set("m_Submit", data.m_Submit);
+
+		return task;
+	}
+
+	UInt32 GameActionLua::GetRandLoopTask(Player * player, UInt32 dayTaskId)
+	{
+		return Run<UInt32>(player, "GetRandLoopTask", dayTaskId);	
+	}
+
+	UInt8 GameActionLua::GetRandLoopTaskQuality()
+	{
+		return Run<UInt8>(NULL, "GetRandLoopTaskQuality");	
+	}
+
+	UInt16 GameActionLua::GetLoopTaskMaxCount(UInt32 dayTaskId)
+	{
+		return Run<UInt16>(NULL, "GetLoopTaskMaxCount", dayTaskId);	
+	}
+
+	UInt16 GameActionLua::GetLoopTaskMaxQualityCount(UInt32 dayTaskId)
+	{
+		return Run<UInt16>(NULL, "GetLoopTaskMaxQualityCount", dayTaskId);	
+	}
+
+	Table GameActionLua::GetLoopTaskTasks(Player * player, UInt32 dayTaskId)
+	{
+		return Run<Table>(player, "GetLoopTaskTasks", dayTaskId);		
+	}
+
+	UInt32 GameActionLua::GetLoopTaskIdByNpc(Player * player, UInt32 npcId)
+	{
+		return Run<UInt32>(player, "GetLoopTaskIdByNpc", npcId);
+	}
+
+	UInt32 GameActionLua::GetLoopTaskFlushGold(UInt32 dayTaskId)
+	{
+		return Run<UInt32>(NULL, "GetLoopTaskFlushGold", dayTaskId);
+	}
+
+	UInt8 GameActionLua::GetRandLoopTaskManualQuality(UInt8 color, bool useGold, UInt32 count)
+	{
+		return Run<UInt8>(NULL, "GetRandLoopTaskManualQuality", color, useGold, count);
+	}
+
+	Table GameActionLua::FlushLoopTask(UInt8 preColor, UInt8 color, UInt32 count, UInt32 preCount)
+	{
+		return Run<Table>(NULL, "FlushLoopTask", preColor, color, count, preCount);
+	}
+
+	UInt32 GameActionLua::GetAutoCompletedTask(Player * player, UInt32 dayTaskId)
+	{
+		return Run<UInt32>(player, "GetAutoCompletedTask", dayTaskId);
+	}
+
+	UInt32 GameActionLua::GetAutoCompletedConsume()
+	{
+		return Run<UInt32>(NULL, "GetAutoCompletedConsume");
+	}
+
+	bool GameActionLua::DayTaskAward(Player * player, UInt32 dayTaskId, UInt16 count, UInt8 color)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "DayTaskAward_%08d", dayTaskId);
+		return Run<bool>(player, buffer, count, color);
+	}
+
+	bool GameActionLua::IsFlushQualityDayTask(UInt32 dayTaskId)
+	{
+		return Run<bool>(NULL, "IsFlushQualityDayTask", dayTaskId);
+	}
+
+	bool GameActionLua::IsAutoCompletedTask(UInt32 taskId)
+	{
+		return Run<bool>(NULL, "IsAutoTask", taskId);
+	}
+
+	Table GameActionLua::GetDayTaskCompletedCount(Player * player, UInt32 dayTaskId)
+	{
+		Table task(_L);
+
+		UInt16 count = 0;
+		UInt8 token = player->GetTaskMgr()->GetDayTaskCompletedCount(dayTaskId, count) ? 1 : 0;
+		task.set("dayTask", token);
+		task.set("count", count);
+
+		return task;
+	}
+
+	Table GameActionLua::GetDayTaskFlushColor(Player * player, UInt32 dayTaskId)
+	{
+		Table task(_L);
+
+		UInt8 color = 0;
+		UInt8 token = player->GetTaskMgr()->GetDayTaskFlushColor(dayTaskId, color) ? 1 : 0;
+		task.set("dayTask", token);
+		task.set("color", color);
+
+		return task;
+	}
+
+	Table GameActionLua::RunNpcDefaultAction(Player * player, UInt32 npcId)
+	{
+		return Run<Table>(player, "RunNpcDefaultAction", npcId);
+	}
+
+	bool GameActionLua::RunTakeFighterAction(Player * player)
+	{
+		return Run<bool>(player, "RunTakeFighterAction");
+	}
+
+	void GameActionLua::RunItemTaskAction(Player* player, UInt32 taskId, UInt32 dummyNpcId)
+	{
+		MOAction::ItemTaskAction(player, taskId, dummyNpcId);
+	}
+
+	UInt8 GameActionLua::GetGreatFighterLev(UInt32 fgtId)
+	{
+		Fighter& fgt = getGreatFighter(fgtId);
+		return fgt.getId() == 0 ? 0xFF : fgt.getLevel();
+	}
+
+	UInt8 GameActionLua::GetGreatFighterCorlor(UInt32 fgtId)
+	{
+		Fighter& fgt = getGreatFighter(fgtId);
+		return fgt.getColor();
+	}
+
+	UInt32 GameActionLua::GetSharpDay(UInt32 now) 
+	{
+		return TimeUtil::SharpDay(0, now);
+	}
+
+	bool GameActionLua::RunOperationTaskAction0(Player * player, UInt8 op)
+	{
+		return Run<bool>(player, "RunOperationTaskAction0", op);
+	}
+
+	bool GameActionLua::RunOperationTaskAction1(Player * player, UInt8 op, UInt32 param1)
+	{
+		return Run<bool>(player, "RunOperationTaskAction1", op, param1);
+	}
+
+	bool GameActionLua::RunOperationTaskAction2(Player * player, UInt8 op, UInt32 param1, UInt32 param2)
+	{
+		return Run<bool>(player, "RunOperationTaskAction2", op, param1, param2);
+	}
+
+	bool GameActionLua::RunOperationTaskAction3(Player * player, UInt8 op, UInt32 param1, UInt32 param2, UInt32 param3)
+	{
+		return Run<bool>(player, "RunOperationTaskAction3", op, param1, param2, param3);
+	}
+
+
+	bool GameActionLua::SetPlayerData(Player* player, UInt8 field, UInt32 value)
+	{
+		switch (field)
+		{
+		case 1:	//gold
+			PLAYER_DATA(player, gold) = value;
+			break;
+		case 2: //coupon
+			PLAYER_DATA(player, coupon) = value;
+			break;
+		case 3:	//tael
+			PLAYER_DATA(player, tael) = value;
+			break;
+		case 4: //coin
+			PLAYER_DATA(player, coin) = value;
+			break;
+		case 5: //status
+			PLAYER_DATA(player, status) = value;
+			break;
+		case 6: //country
+			PLAYER_DATA(player, country) = value;
+			break;
+		case 7: //location
+			PLAYER_DATA(player, location) = value;
+			break;
+		case 8: //inCity
+			PLAYER_DATA(player, inCity) = value;
+			break;
+		case 9:	//achievement
+			PLAYER_DATA(player, achievement) = value;
+			break;
+		default:
+			return false;
+		}
+
+		return true;
+	}
+
+	UInt32 GameActionLua::GetPlayerData(Player* player, UInt8 field)
+	{
+		switch (field)
+		{
+		case 1:	//gold
+			return PLAYER_DATA(player, gold);
+		case 2: //coupon
+			return PLAYER_DATA(player, coupon);
+		case 3:	//tael
+			return PLAYER_DATA(player, tael);
+		case 4: //coin
+			return PLAYER_DATA(player, coin);
+		case 5: //status
+			return PLAYER_DATA(player, status);
+		case 6: //country
+			return PLAYER_DATA(player, country);
+		case 7: //location
+			return PLAYER_DATA(player, location);
+		case 8: //inCity
+			return PLAYER_DATA(player, inCity);
+		case 9: //achievement
+			return PLAYER_DATA(player, achievement);
+		default:
+			return 0;
+		}
+	}
+
+	bool GameActionLua::CheckTaskAcceptCondition(Player* player, UInt32 taskId)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "Task_Can_Accept_%08d", taskId);
+		return Run<bool>(player, buffer);
+	}
+
+	Table GameActionLua::RunTask(Player* player, UInt32 taskId, UInt32 npcId)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "Task_%08d", taskId);
+		return Run<Table>(player, buffer, npcId);
+	}
+
+	Table GameActionLua::RunTaskStep(Player* player, UInt32 taskId, UInt8 step)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "Task_%08d_step", taskId);
+		return Run<Table>(player, buffer, step);
+	}
+
+	Table GameActionLua::RunGreatFighterAction(Player * player, UInt32 fightId)
+	{
+		return Run<Table>(player, "RunGreatFighterAction", fightId);
+	}
+
+	Table GameActionLua::RunGreatCollectActionStep(Player * player, UInt32 fightId)
+	{
+		return Run<Table>(player, "RunGreatCollectActionStep", fightId);
+	}
+
+	Table GameActionLua::RunGreatCtrlActionStep(Player * player, UInt32 fightId)
+	{
+		return Run<Table>(player, "RunGreatCtrlActionStep", fightId);
+	}
+
+	Table GameActionLua::RunDayCopyTask(Player * player, UInt32 npcId)
+	{
+		return Run<Table>(player, "RunDayCopyTask", npcId);
+	}
+
+	Table GameActionLua::RunDayCopyTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
+	{
+		return Run<Table>(player, "RunDayCopyTaskStep", npcId, actionId);
+	}
+
+	bool GameActionLua::RunGreatTaskAction(Player * player, UInt32 fgtId)
+	{
+		return Run<bool>(player, "RunGreatTaskAction", fgtId);
+	}
+
+	UInt32 GameActionLua::GetGreatFighterFavor(UInt32 fightId)
+	{
+		Fighter& fighter = getGreatFighter(fightId);
+		return fighter.favor;
+	}
+
+	UInt32 GameActionLua::GetGreatFighterReqFriendliness(UInt32 fightId)
+	{
+		Fighter& fighter = getGreatFighter(fightId);
+		return fighter.reqFriendliness;
+	}
+
+	Table GameActionLua::RunDayTask(Player* player, UInt32 npcId)
+	{
+		return Run<Table>(player, "RunDayTask", npcId);
+	}
+
+	Table GameActionLua::RunDayTaskAccept(Player* player, UInt32 taskId, UInt32 npcId)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "DayTask_%08d", taskId);
+		return Run<Table>(player, buffer, npcId);
+	}
+
+
+	bool GameActionLua::MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum)
+	{
+		return Run<bool>(player, "RunMonsterKilled", monsterId, monsterNum);
+	}
+
+	bool GameActionLua::AcceptTask(Player* player, UInt32 taskId)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "Task_%08d_accept", taskId);
+		return Run<bool>(player, buffer, taskId);
+	}
+
+	bool GameActionLua::SubmitTask(Player* player, UInt32 taskId, UInt32 itemId, UInt16 itemNum)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "Task_%08d_submit", taskId);
+		return Run<bool>(player, buffer, itemId, itemNum);
+	}
+
+	bool GameActionLua::AbandonTask(Player* player, UInt32 taskId)
+	{
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "Task_%08d_abandon", taskId);
+		return Run<bool>(player, buffer);
+	}
+
+	bool GameActionLua::RunConveyAction(Player* player, UInt32 taskId)
+	{
+		assert(player != NULL);
+		Table conveyPath = Run<Table>(player, "RunConvey", taskId);
+		int size = conveyPath.size();
+		if (size < 3) return false;
+
+		UInt32 npcId = conveyPath.fetch<UInt32>(1);
+
+		Stream st(0x88);
+		st << npcId << taskId << static_cast<UInt16>(size-1);
+		for (int i = 1; i <= (size-1)/2; i++)
+		{
+			st << conveyPath.fetch<UInt16>(2*i);
+			st << static_cast<UInt8>(conveyPath.fetch<UInt16>(2*i+1) != 0);
+		}
+		st << Stream::eos;
+		TaskMgr* taskMgr = player->GetTaskMgr();
+		taskMgr->SetConvey();			//置护送状态
+		taskMgr->SetConveyTask(taskId);
+		taskMgr->SetConveyNpc(npcId);
+		player->send(&st[0], st.size());
+
+		return true;
+	}
+
+	//采集类NPC走的接口
+	Table GameActionLua::RunCollectTask(Player* player, UInt32 npcId)
+	{
+		return Run<Table>(player, "RunCollectTask", npcId);
+	}
+
+	bool GameActionLua::RunCollectTaskItem(Player* player, UInt32 npcId)
+	{
+		return Run<bool>(player, "RunCollectTaskItem", npcId);
+	}
+
+	bool GameActionLua::RunExploreTask(Player* player, UInt32 npcId)
+	{
+		return Run<bool>(player, "RunExplore", npcId);
+	}
+
+	bool GameActionLua::RunAutoBattleAction(Player* player, UInt32 npcId, UInt32 turns)
+	{
+		return player->attackNpc(npcId, turns, true);
+	}
+
+	UInt32 GameActionLua::GetConveyMonster(Player* player, UInt32 taskId, UInt16 spot)
+	{
+		return Run<UInt32>(player, "GetConveyMonster", taskId, spot);
+	}
+
+	//更新护送任务的进度
+	bool GameActionLua::UpdateConveyStep(Player* player, UInt32 taskId, UInt16 spot, bool succ)
+	{
+		TaskMgr* taskMgr = player->GetTaskMgr();
+		bool ret =  Run<bool>(player, "UpdateConveyStep", taskId, spot, succ);
+		if (!ret || taskMgr->HasCompletedTask(taskId))
+		{
+			taskMgr->SetConvey(false);
+		}
+		return ret;
+	}
+
+	bool GameActionLua::IsItemTaskItem(UInt32 itemId)
+	{
+		return Run<bool>(NULL, "IsItemTaskItem", itemId);
+	}
+
+	bool GameActionLua::IsTaskItemItem(UInt32 itemId)
+	{
+		return Run<bool>(NULL, "IsTaskItemItem", itemId);
+	}
+
+	bool GameActionLua::RunTaskItemUse(Player* player, UInt32 itemId)
+	{
+		assert(player != NULL);
+		return Run<bool>(player, "RunTaskItemUse", itemId);
+	}
+
+	bool GameActionLua::RunItemTaskUse(Player* player, UInt32 itemId)
+	{
+		assert(player != NULL);
+		return Run<bool>(player, "RunItemTaskUse", itemId);
+	}
+
+	bool GameActionLua::RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind)
+	{
+		assert(player != NULL);
+		return Run<bool>(player, "RunItemNormalUse", itemId, num, bind, param);
+	}
+
+	Table GameActionLua::GetNpcRelationTask(UInt32 npcId)
+	{
+		Table task(_L);
+		const std::set<UInt32>& data = GData::GDataManager::GetTaskNpcRelationData(npcId);
+		std::set<UInt32>::const_iterator cit = data.begin();
+		for (; cit != data.end(); ++cit)
+		{
+			task.put(*cit);
+		}
+		return task;
+	}
+
+	const char* GameActionLua::GetPlayerName(Player* player)
+	{
+		if (player == NULL) return "";
+		const std::string& name = player->getName();
+		return name.c_str();
+	}
+
+	const char* GameActionLua::GetPlayerStateName(Player* player)
+	{
+		if (player == NULL) return "";
+		if (player->getCountry() == 0)
+		{
+			return "天族";
+		}
+		else{
+			return "魔族";
+		}
+	}
+
+	void GameActionLua::DoLuaTest(Player * player, const std::string& buffer)
+	{
+		Player* savePlayer1 = _player1;
+		_player1 = player;
+
+		lua_tinker::dostring(_L, buffer.c_str());
+
+		_player1 = savePlayer1;
+	}
+
+	void GameActionLua::RunAutoRegen( Player* player, Fighter* fighter )
+	{
+		Run<bool>(player, "DoAutoRegen", fighter);
+	}
+
+	void GameActionLua::onLogin( Player* player )
+	{
+		Call<void>("onLogin", player);
+	}
+
+	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 difficulty, UInt8 level )
+	{
+		Call<void>("onDungeonWin", player, id, difficulty, level);
+	}
+
+	void GameActionLua::onClanBattleAttend( Player* player )
+	{
+		Call<void>("onClanBattleAttend", player);
+	}
+
+	void GameActionLua::onCountryBattleAttend( Player* player )
+	{
+		Call<void>("onCountryBattleAttend", player);
+	}
+
+	void GameActionLua::onCountryBattleWinStreak( Player* player, UInt32 count )
+	{
+		Call<void>("onCountryBattleWinStreak", player, count);
+	}
+
+	void GameActionLua::onAthleticWin( Player* player )
+	{
+		Call<void>("onAthleticWin", player);
+	}
+
+	void GameActionLua::onDayTaskComplete( Player* player, UInt32 count )
+	{
+		Call<void>("onDayTaskComplete", player, count);
+	}
+
+	void GameActionLua::onExchange( Player* player )
+	{
+		Call<void>("onExchange", player);
+	}
+
+	bool GameActionLua::onPurchase( Player* player, UInt32 id, UInt8 count )
+	{
+		return Call<bool>("onPurchase", player, id, count);
+	}
+
+	void GameActionLua::onAttackBoss( Player* player )
+	{
+		Call<void>("onAttackBoss", player);
+	}
+
+	void GameActionLua::exchangeExtraReward( Player* player, UInt32 id )
+	{
+		Call<void>("exchangeExtraReward", player, id);
+	}
+
+	void GameActionLua::onLevelup( Player* player, UInt8 olev, UInt8 nlev )
+	{
+		Call<void>("onLevelup", player, olev, nlev);
+	}
+
+	void GameActionLua::onEnchant( Player* player, UInt8 level )
+	{
+		Call<void>("onEnchant", player, level);
+	}
+
+	bool GameActionLua::onOnlineAward(Player* player, UInt32 itemId, UInt8 count)
+	{
+		return Call<bool>("onOnlineAward", player, itemId, count);
+	}
+
+	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)
+	{
+		return Call<bool>("getActivateAttrResult", lastActivateCount, quality);
+	}
+
+	UInt32 GameActionLua::onAttakerAddexp(Player* attacker, Player *defender, UInt32 award)
+	{
+		return Call<UInt32>("onAttakerAward", attacker, defender, award);
+	}
+
+	void GameActionLua::onTopup(Player* player, UInt32 ogold, UInt32 ngold)
+	{
+		Call<void>("onTopup", player, ogold, ngold);
+	}
+
+	UInt32 GameActionLua::onTavernFlush( UInt8 color )
+	{
+		return Call<UInt32>("onTavernFlush", color);
+	}
+
+	bool GameActionLua::onTakeMailPackage( Player* player, UInt32 pkgId )
+	{
+		return Call<bool>("onTakeMailPackage", player, pkgId);
+	}
+	lua_tinker::table GameActionLua::onGetMailItems(UInt32 pkgId)
+	{
+		return Call<lua_tinker::table>("onGetMailItems", pkgId);	
+	}
+
+	UInt32 GameActionLua::onLuckyDrawItemRoll( UInt8 type )
+	{
+		return Call<UInt32>("onLuckyDrawItemRoll", type);
+	}
+
+	UInt32 GameActionLua::onDungeonLootItemRoll( Player * player, UInt8 id, UInt8 difficulty, UInt8 level, bool isBoss )
+	{
+		return Call<UInt32>("onDungeonLootItemRoll", player, id, difficulty, level, isBoss);
+	}
+	void GameActionLua::onMergeGem(Player * player, UInt8 lev, UInt8 num)
+	{
+		Call<void>("onMergeGem", player, lev, num);
+	}
+}

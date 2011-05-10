@@ -1,0 +1,496 @@
+#ifndef _WORLDINNERMSGHANDLER_H_
+#define _WORLDINNERMSGHANDLER_H_
+
+#include "Common/Serialize.h"
+#include "MsgTypes.h"
+#include "MsgFunc.h"
+#include "CountryMsgStruct.h"
+#include "Server/WorldServer.h"
+#include "GObject/Fighter.h"
+#include "GObject/Player.h"
+#include "GObject/TaskMgr.h"
+#include "GObject/EventBase.h"
+#include "GObject/ClanBattle.h"
+#include "GObject/Mail.h"
+#include "GObject/TradeCheck.h"
+#include "GObject/SaleMgr.h"
+#include "GObject/Athletics.h"
+#include "GObject/AthleticsRank.h"
+#include "GObject/Dungeon.h"
+#include "GObject/BlockBossMgr.h"
+#include "Server/SysMsg.h"
+#include "Script/WorldScript.h"
+#include "Script/BattleFormula.h"
+#include "GObject/SpecialAward.h"
+
+void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
+{
+	GObject::EventBase* event = *reinterpret_cast<GObject::EventBase * const*>(data);
+	GObject::eventWrapper.AddTimerEvent(event);
+}
+
+
+void OnPopTimerEvent( GameMsgHdr& hdr, const void * data )
+{
+	struct EventMsgData
+	{
+		UInt32 id;
+		size_t data;
+	};
+	const EventMsgData* emd = reinterpret_cast<const EventMsgData *>(data);
+	GObject::eventWrapper.DelTimerEvent(hdr.player, emd->id, emd->data);
+}
+
+void OnSearchEvents( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct EventQuery
+	{
+		bool autoBattle;
+		bool autoDungeon;
+	};
+	const EventQuery * eq = reinterpret_cast<const EventQuery *>(data);
+	if(eq->autoBattle)
+	{
+		GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(player, EVENT_AUTOBATTLE, 0);
+		if(it != GObject::eventWrapper.end())
+		{
+			GObject::EventBase * event = it->second;
+			event->duplicate();
+			if(event == NULL) return;
+
+			GameMsgHdr hdr1(0x28C, player->getThreadId(), player, sizeof(GObject::EventBase *));
+			GLOBAL().PushMsg(hdr1, &event);
+		}
+	}
+	if(eq->autoDungeon)
+	{
+		GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(player, EVENT_DUNGEONAUTO, 0);
+		if(it != GObject::eventWrapper.end())
+		{
+			GObject::EventDungeonAuto * event = static_cast<GObject::EventDungeonAuto *>(it->second);
+			GameMsgHdr hdr1(0x28D, player->getThreadId(), player, sizeof(GObject::Dungeon));
+			GObject::Dungeon * dg = event->GetDungeon();
+			GLOBAL().PushMsg(hdr1, &dg);
+		}
+	}
+	Stream st(0xEC);
+	st << static_cast<UInt8>(0) << static_cast<UInt8>(GObject::arena.active() ? 1 : 0) << Stream::eos;
+	player->send(st);
+}
+
+void OnAthleticsOver( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct AthleticsResult
+	{
+		UInt32 id;
+		UInt8 side;
+		GObject::Player * defer;
+		bool result;
+	};
+	AthleticsResult * ar = reinterpret_cast<AthleticsResult *>(const_cast<void *>(data));
+	GObject::gAthleticsRank.notifyAthletcisOver(ar->side == 0 ? player : ar->defer, ar->side == 0 ? ar->defer : player, ar->id, ar->result);
+}
+
+void OnAthleticsEnter( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	UInt8 lev = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+	GObject::gAthleticsRank.enterAthleticsReq(player, lev);
+}
+
+void OnAthleticsAndClanNotify( GameMsgHdr& hdr, const void * )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::gAthleticsRank.notifyAthletcisBoxFlushTime(player);
+	Stream st(0x5F);
+	st << static_cast<UInt8>(3) << GObject::gAthleticsRank.getChallengeNum(player);
+	GObject::Clan * clan = player->getClan();
+	if(clan == NULL)
+		st << static_cast<UInt8>(0);
+	else
+		st << clan->getClanBattle()->getEnterBattleClanCount(player);
+	st << Stream::eos;
+	player->send(st);
+}
+
+void OnClanChatReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	if(player->getClan() != NULL)
+		player->getClan()->broadcast(data, hdr.msgHdr.bodyLen);
+}
+
+void OnClanTakeRewardResultReq(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(player->getClan() == NULL)
+		return;
+	struct ClanTakeRewardResultStruct
+	{
+		bool result;
+		UInt32 allocTime;
+		GObject::AllocItem item;
+	};
+	const ClanTakeRewardResultStruct * ctrss = reinterpret_cast<const ClanTakeRewardResultStruct *>(data);
+	player->getClan()->takeRewardResult(player, ctrss->result, ctrss->allocTime, ctrss->item);
+}
+
+void OnClanMailInviteClick(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	struct ClanMailClickInviteReq
+	{
+		UInt32 id;
+		GObject::Player * inviter;
+		UInt8 action;
+	};
+	const ClanMailClickInviteReq * cmcir = reinterpret_cast<const ClanMailClickInviteReq *>(data);
+	if (player->getClan() != NULL)
+		return;
+	GObject::Player * inviter = cmcir->inviter;
+	if (inviter == NULL || inviter->getClan() == NULL || inviter->getCountry() != player->getCountry())
+		return;
+	if (cmcir->action == 0)
+	{
+		inviter->getClan()->apply(player);
+	}
+	else
+	{
+		inviter->getClan()->declineInvite(player);	
+	}
+	Stream st(0xA2);
+	st << static_cast<UInt8>(1) << cmcir->id << Stream::eos;
+	player->send(st);
+	player->GetMailBox()->delMail(cmcir->id, false);
+}
+
+void OnClanMailClick(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+	struct ClanMailClickReq
+	{
+		UInt32 id;
+		GObject::Player * applier;
+		UInt8 action;
+	};
+	const ClanMailClickReq * cmcr = reinterpret_cast<const ClanMailClickReq *>(data);
+	do
+	{
+		GObject::Clan * clan = player->getClan();
+		if(clan == NULL)
+		{
+			player->sendMsgCode(2, 2043);
+			break;
+		}
+		if (clan->getClanBattle()->isInBattling())
+		{
+			player->sendMsgCode(2, 2210);
+			return;
+		}
+		GObject::Player * p = cmcr->applier;
+		if(cmcr->action == 0)
+		{
+			if (p == NULL)
+				break;
+			GObject::Clan * applierClan = p->getClan();
+			if (applierClan != NULL)
+			{
+				if (applierClan != clan)
+					player->sendMsgCode(2, 2042);
+				break;
+			}
+			if(!player->getClan()->accept(player, p->getId()))
+				return;
+			Stream st(0x94);
+			st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << p->getId() << Stream::eos;
+			player->send(st);
+		}
+		else
+		{
+			player->getClan()->decline(p->getId());
+			Stream st(0x94);
+			st << static_cast<UInt8>(3) << static_cast<UInt8>(1) << p->getId() << Stream::eos;
+			player->send(st);
+		}
+	}
+	while(0);
+	Stream st(0xA2);
+	st << static_cast<UInt8>(1) << cmcr->id << Stream::eos;
+	player->send(st);
+	player->GetMailBox()->delMail(cmcr->id, false);
+}
+
+
+void OnClanSkillDonateCheckResp( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct DonateItems
+	{
+		UInt8  skillId;
+		UInt16 flag;
+		UInt32 count;
+		UInt8 ret;
+	};
+	UInt8 r = 2;
+	const DonateItems * items = reinterpret_cast<const DonateItems *>(data);
+	if (items->ret == 0)
+	{
+		GObject::Clan * clan = player->getClan();
+		if (clan != NULL && clan->donate(player, items->skillId, items->flag, items->count))
+			r = 1;
+	}
+	Stream st(0x78);
+	st << static_cast<UInt8>(2) << r << Stream::eos;
+	player->send(st);
+}
+void OnDonateClanbyGM( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct DonateItem
+	{
+		UInt8  skillId;
+		UInt16 type;
+		UInt32 count;
+	};
+	GObject::Clan * clan = player->getClan();
+	const DonateItem * items = reinterpret_cast<const DonateItem *>(data);
+		if(clan == NULL)
+			return;
+	clan->GMDonate(player, items->skillId, items->type, items->count);
+}
+void OnAddClanBoxGM( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct AddClanBox
+	{
+		GObject::Clan *cl;
+		UInt8 count;
+	};
+	const AddClanBox * clb = reinterpret_cast<const AddClanBox *>(data);
+	if(clb->cl == NULL || clb->count == 0)
+		return;
+	clb->cl->addRepoNum(9041, clb->count);
+}
+void OnClanAllyMailResp( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct ClanAllyClickReq
+	{
+		UInt32 clanId;
+		bool   agree;
+		GObject::Player * reciever;
+	};
+	const ClanAllyClickReq * cacr = reinterpret_cast<const ClanAllyClickReq *>(data);
+	GObject::Clan * clan = player->getClan();
+	GObject::Clan * allyClan = cacr->reciever->getClan();
+	if (clan == NULL || allyClan == NULL)
+		return;
+	if (cacr->agree)
+	{
+		if (clan->getClanBattle()->isInBattling() || allyClan->getClanBattle()->isInBattling())
+		{
+			cacr->reciever->sendMsgCode(0, 2210);
+			return;
+		}
+		if (clan->hasEnemyClan(allyClan))
+		{
+			cacr->reciever->sendMsgCode(0, 2234);
+			return;
+		}
+		if (allyClan->hasEnemyClan(clan))
+		{
+			cacr->reciever->sendMsgCode(0, 2230);
+			return;
+		}
+		if (clan->addAllyClan(player, cacr->reciever, allyClan))
+		{
+			SYSMSG(title, 350);
+			SYSMSGV(content, 352, allyClan->getName().c_str(), cacr->reciever->getName().c_str());
+			player->GetMailBox()->newMail(player, 0x25, title, content);
+		}
+	}
+	else
+	{
+		SYSMSG(title, 350);
+		SYSMSGV(content, 353, allyClan->getName().c_str(), cacr->reciever->getName().c_str());
+		player->GetMailBox()->newMail(player, 0x25, title, content);
+	}
+}
+
+void OnClanBattlerOffTimeCheck( GameMsgHdr& hdr, const void * )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::ClanBattle * battleClan = player->getClanBattle();
+	if (battleClan == NULL)
+		return;
+	battleClan->leaveClanCity(player);
+}
+
+void OnAddTradeCheckNotify( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct TradeCheckData
+	{
+		UInt32 id;
+		UInt32 time;
+	};
+	const TradeCheckData * trade = reinterpret_cast<const TradeCheckData *>(data);
+	GObject::gTradeCheck.addTradeCheck(trade->id, trade->time, player);
+}
+
+void OnDelTradeCheckNotify( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct TradeCheckData
+	{
+		UInt32 id;
+		UInt32 time;
+	};
+	const TradeCheckData * trade = reinterpret_cast<const TradeCheckData *>(data);
+	GObject::gTradeCheck.delTradeCheck(trade->id, trade->time);
+}
+
+void OnSearchSaleNotify( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::SaleSearchResp * saleSearchResp = reinterpret_cast<GObject::SaleSearchResp *>(const_cast<void *>(data));
+	GObject::gSaleMgr.searchPlayerSaleResp(saleSearchResp->founder, player, saleSearchResp->start, saleSearchResp->count, saleSearchResp->ids, 18);
+}
+
+void OnPutSaleNotify( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::SalePut * sale = reinterpret_cast<GObject::SalePut *>(const_cast<void *>(data));
+	GObject::gSaleMgr.sellSale(player, sale, 9);
+}
+
+void OnBuySaleCheckOKNotify( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	const UInt32 id = *reinterpret_cast<const UInt32 *>(data);
+	const UInt32 pos = *reinterpret_cast<const UInt32 *>((const UInt8 *)data + 4);
+	GObject::gSaleMgr.addSaleItem(player, id, pos);
+}
+
+void OnDoInstantAutoBattleReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(player, EVENT_AUTOBATTLE, 0);
+	if(it == GObject::eventWrapper.end())
+		return;
+	GObject::EventAutoBattle * event = static_cast<GObject::EventAutoBattle*>(it->second);
+	if(event->instantComplete())
+	{
+		GObject::eventWrapper.DelTimerEvent(it);
+	}
+}
+
+void OnDoCancelAutoBattleReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_AUTOBATTLE, 0);
+	if(ev == NULL)
+		return;
+	ev->release();
+	GameMsgHdr hdr2(0x279, player->getThreadId(), player, 0);
+	GLOBAL().PushMsg(hdr2, NULL);
+}
+
+void OnTrainAccelerateReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct TrainAccData
+	{
+		UInt32 fgtId;
+		UInt32 accCount;
+	};
+	const TrainAccData * tad = reinterpret_cast<const TrainAccData *>(data);
+	GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(player, EVENT_FIGHTERAUTOTRAINING, tad->fgtId);
+	if(it == GObject::eventWrapper.end())
+		return;
+	GObject::EventFighterTrain * event = static_cast<GObject::EventFighterTrain*>(it->second);
+	if(event->Accelerate(tad->accCount))
+	{
+		GObject::eventWrapper.DelTimerEvent(it);
+	}
+}
+
+void OnCancelDungeonAutoReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_DUNGEONAUTO, 0);
+	if(ev == NULL)
+		return;
+	GameMsgHdr hdr2(0x280, player->getThreadId(), player, sizeof(GObject::EventBase *));
+	GLOBAL().PushMsg(hdr2, &ev);
+}
+
+void OnCompleteDungeonAutoReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::EventBase * ev = GObject::eventWrapper.RemoveTimerEvent(player, EVENT_DUNGEONAUTO, 0);
+	if(ev == NULL)
+		return;
+	GameMsgHdr hdr2(0x281, player->getThreadId(), player, sizeof(GObject::EventBase *));
+	GLOBAL().PushMsg(hdr2, &ev);
+}
+
+void OnReloadLuaReq( GameMsgHdr& hdr, const void * data )
+{
+	UInt16 flag = *static_cast<const UInt16 *>(data);
+	if(flag & 0x10)
+		WORLD().getWorldScript()->reload();
+	if(flag & 0x01)
+		WORLD().getBattleFormula()->reload();
+	if(flag & 0xF0F)
+	{
+		GameMsgHdr hdr1(0x1EE, WORKER_THREAD_COUNTRY_1, NULL, sizeof(UInt16));
+		GLOBAL().PushMsg(hdr1, &flag);
+		GameMsgHdr hdr2(0x1EE, WORKER_THREAD_COUNTRY_2, NULL, sizeof(UInt16));
+		GLOBAL().PushMsg(hdr2, &flag);
+		GameMsgHdr hdr3(0x1EE, WORKER_THREAD_NEUTRAL, NULL, sizeof(UInt16));
+		GLOBAL().PushMsg(hdr3, &flag);
+	}
+}
+
+void OnSpecialAward( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	UInt8 type = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+	GObject::gSpecialAward.AddSpecialAwardList(type, player);
+}
+
+void OnUpdateBlockBossRank(  GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	const UInt8 *buff = reinterpret_cast<const UInt8 *>(data);
+	UInt8 playerLevel = *buff;
+	UInt16 bossLevel = *reinterpret_cast<const UInt8 *>(buff + 1);
+	UInt16 couponCount = *reinterpret_cast<const UInt8 *>(buff + 2);
+	UInt16 itemId = *reinterpret_cast<const UInt16 *>(buff + 4);
+	UInt8 itemCount = *reinterpret_cast<const UInt8 *>(buff + 6);
+	GObject::gBlockbossmgr.resetPlayerRank(player, bossLevel, playerLevel, couponCount, itemId, itemCount);
+}
+
+void OnBloackBossDataReq(  GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	UInt16 bossLevel = *reinterpret_cast<const UInt8 *>(data);
+	GObject::gBlockbossmgr.reqBlockBossData(player, bossLevel);
+}
+
+void OnRunscriptReq( GameMsgHdr&, const void * data )
+{
+	const char * script = reinterpret_cast<const char *>(data);
+	WORLD().getWorldScript()->runScript(script);
+}
+
+void OnRunscriptBattleReq( GameMsgHdr&, const void * data )
+{
+	const char * script = reinterpret_cast<const char *>(data);
+	Script::BattleFormula::getCurrent()->runScript(script);
+}
+
+#endif // _WORLDINNERMSGHANDLER_H_

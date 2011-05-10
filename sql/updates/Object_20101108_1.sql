@@ -1,0 +1,1 @@
+ALTER TABLE `athletics_record` DROP COLUMN `awardDeferCount`;

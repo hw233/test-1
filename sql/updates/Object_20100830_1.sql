@@ -1,0 +1,2 @@
+ALTER TABLE `sale`  ENGINE=InnoDB;
+ALTER TABLE `trade`  ENGINE=InnoDB;

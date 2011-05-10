@@ -1,0 +1,2 @@
+DROP PROCEDURE IF EXISTS `new_player`;
+CREATE PROCEDURE `new_player`(IN `id` INT(20) UNSIGNED, IN `name` VARCHAR(255), IN `country` INT(1) UNSIGNED, IN `location` INT(5) UNSIGNED, IN `fighterId` INT(10) UNSIGNED)  LANGUAGE SQL  NOT DETERMINISTIC  CONTAINS SQL  SQL SECURITY DEFINER  COMMENT '' BEGIN     INSERT INTO `player` (`id`, `name`, `country`, `location`, `mainFighter`, `lineup1`, `lineup2`, `lineup3`) VALUES (id, name, country, location, fighterId, CONCAT(fighterId, ',12'), CONCAT(fighterId, ',12'), CONCAT(fighterId, ',12')); END;

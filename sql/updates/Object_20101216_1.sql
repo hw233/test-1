@@ -1,0 +1,3 @@
+ALTER TABLE `clan` CHANGE COLUMN `battleStartTime` `battleThisDay` INT(10) UNSIGNED NOT NULL DEFAULT '0', CHANGE COLUMN `battleStatus` `battleStatus` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `clan_battler` ADD COLUMN `maxSerialWins` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `serialWins`,  DROP COLUMN `flag`;
+ALTER TABLE `clan_player` ADD COLUMN `enterClanBattleTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `enterCount`;
