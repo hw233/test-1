@@ -455,6 +455,8 @@ void CountryBattle::rotate( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UInt
 
 bool CountryBattle::playerEnter( Player * player )
 {
+    if (player && player->getCountry() >= COUNTRY_NEUTRAL)
+        return false;
 	if(!globalCountryBattle.isRunning())
 		return false;
 	UInt8 plvl = player->GetLev();
@@ -503,6 +505,8 @@ bool CountryBattle::playerEnter( Player * player )
 
 void CountryBattle::playerLeave( Player * player )
 {
+    if (player && player->getCountry() >= COUNTRY_NEUTRAL)
+        return;
 	if(!globalCountryBattle.isRunning())
 		return;
 	UInt8 lvl, side;
@@ -561,6 +565,8 @@ void CountryBattle::doLeave( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UIn
 int CountryBattle::findPlayer( Player * player, UInt8& lvl, UInt8& side )
 {
 	side = PLAYER_DATA(player, country);
+    if (side >= COUNTRY_NEUTRAL) // XXX: no useful?
+        return -1;
 	int lvlend = getJoinLevel(player->GetLev());
 	for(lvl = 0; lvl <= lvlend; ++ lvl)
 	{
