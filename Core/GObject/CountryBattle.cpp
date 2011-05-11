@@ -744,6 +744,8 @@ void CountryBattle::getReward(UInt32 curtime)
 
 void CountryBattle::sendInfo( Player * pl)
 {
+    if (pl && pl->getCountry() >= COUNTRY_NEUTRAL)
+        return;
 	Stream st(0x63);
 	st << static_cast<UInt8>(0);
 	UInt32 curtime = TimeUtil::Now();

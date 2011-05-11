@@ -5,6 +5,7 @@
 #include "Common/TimeUtil.h"
 #include "GObjectManager.h"
 #include "ClanDynamicMsg.h"
+#include "Server/ServerTypes.h"
 
 class SysMsgItem;
 namespace GObject
@@ -303,10 +304,10 @@ private:
 };
 
 typedef GGlobalObjectManagerT<Clan, UInt32> GlobalClans;
-extern GlobalClans globalClans, globalClansByCountry[2];
+extern GlobalClans globalClans, globalClansByCountry[COUNTRY_MAX];
 typedef GGlobalObjectManagerIStringT<Clan> GlobalNamedClans;
-extern GlobalNamedClans globalGlobalNamedClans, globalNamedClans[2];
-extern GlobalNamedClans globalOwnedClans[2];
+extern GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
+extern GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
 class ClanCache
 {
@@ -319,7 +320,7 @@ private:
 	void searchInternal(UInt8, std::vector<std::string>&, std::set<Clan *>&);
 	void makeKeywordList(const std::string&, std::vector<std::string>&);
 private:
-	std::map<std::string, std::set<Clan *> > _keyLists[2];
+	std::map<std::string, std::set<Clan *> > _keyLists[COUNTRY_MAX];
 };
 
 extern ClanCache clanCache;

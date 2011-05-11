@@ -96,7 +96,7 @@ private:
 	UInt16 _score[2];
 	Player * _topKiller;
 	UInt8 _topStreak;
-	std::map<Player *, CBPlayerData> _battleDuration[2];
+	std::map<Player *, CBPlayerData> _battleDuration[COUNTRY_NEUTRAL];
 	CBStatusDataList _cbsdlist;
 	Stream _lastReport;
 };

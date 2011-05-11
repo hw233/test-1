@@ -20,9 +20,9 @@
 namespace GObject
 {
 
-GlobalClans globalClans, globalClansByCountry[2];
-GlobalNamedClans globalGlobalNamedClans, globalNamedClans[2];
-GlobalNamedClans globalOwnedClans[2];
+GlobalClans globalClans, globalClansByCountry[COUNTRY_MAX];
+GlobalNamedClans globalGlobalNamedClans, globalNamedClans[COUNTRY_MAX];
+GlobalNamedClans globalOwnedClans[COUNTRY_MAX];
 
 UInt8 ClanAuthority[5][7] = 
 {
