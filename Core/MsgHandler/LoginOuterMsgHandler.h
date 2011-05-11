@@ -50,9 +50,8 @@ struct NewUserStruct
 {
 	std::string _name;
 	UInt8 _class;
-	UInt8 _country;
 
-	MESSAGE_DEF3(0x11, std::string, _name, UInt8, _class, UInt8, _country);
+	MESSAGE_DEF2(0x11, std::string, _name, UInt8, _class);
 };
 
 
@@ -353,8 +352,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		UInt16 loc = 0x0001;
 #endif
 
+        UInt8 country = COUNTRY_NEUTRAL; // XXX: 低级玩家暂时规为中立
+
 		PLAYER_DATA(pl, name) = newname;
-		PLAYER_DATA(pl, country) = COUNTRY_NEUTRAL; // XXX: 低级玩家暂时规为中立
+		PLAYER_DATA(pl, country) = country;
 		PLAYER_DATA(pl, wallow) = noWallow ? 0 : 1;
 		PLAYER_DATA(pl, created) = TimeUtil::Now();
 
@@ -381,7 +382,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			lup.fighter = fgt;
 			lup.updateId();
 
-			DB().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u)", pl->getId(), nu._name.c_str(), PLAYER_DATA(pl, country), loc, fgtId, PLAYER_DATA(pl, wallow));
+			DB().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u)", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow));
 
 			DBLOG().PushUpdateData("insert into register_states(server_id,player_id,player_name, reg_time) values(%u,%"I64_FMT"u, '%s', %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), TimeUtil::Now());
 
@@ -393,7 +394,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			pl->SetSessionID(hdr.sessionID);
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
-			UInt8 country = GObject::mapCollection.getCountryFromSpot(loc);
 
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));

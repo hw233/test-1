@@ -496,7 +496,14 @@ CREATE TABLE `map_spot` (
 
 LOCK TABLES `map_spot` WRITE;
 /*!40000 ALTER TABLE `map_spot` DISABLE KEYS */;
-INSERT INTO `map_spot` VALUES (1,'',2,0,0,0),(2,'乌鸦嘴渡口',0,0,0,0),(3,'去成都郊外',0,0,0,0),(257,'白云庵',0,0,0,0),(258,'去白堰村',0,0,0,0);
+INSERT INTO `map_spot` VALUES
+(1,'',2,0,0,0),
+(2,'乌鸦嘴渡口',0,0,0,0),
+(3,'去成都郊外',0,0,0,0),
+(4,'国战',0,1,0,0),
+(257,'白云庵',0,0,0,0),
+(258,'去白堰村',0,0,0,0)
+;
 /*!40000 ALTER TABLE `map_spot` ENABLE KEYS */;
 UNLOCK TABLES;
 
