@@ -439,7 +439,13 @@ CREATE TABLE `map` (
 
 LOCK TABLES `map` WRITE;
 /*!40000 ALTER TABLE `map` DISABLE KEYS */;
-INSERT INTO `map` VALUES (0,'白堰村',0,0,2),(1,'成都郊外',0,0,2);
+INSERT INTO `map` VALUES (0,'白堰村',0,0,2);
+INSERT INTO `map` VALUES (1,'成都郊外',0,0,2);
+INSERT INTO `map` VALUES (2,'成都',0,0,2);
+INSERT INTO `map` VALUES (3,'慈云寺',0,0,2);
+INSERT INTO `map` VALUES (4,'魏家场',30,0,2);
+INSERT INTO `map` VALUES (5,'桂花山',0,0,2);
+
 /*!40000 ALTER TABLE `map` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -467,7 +473,16 @@ CREATE TABLE `map_object` (
 
 LOCK TABLES `map_object` WRITE;
 /*!40000 ALTER TABLE `map_object` DISABLE KEYS */;
-INSERT INTO `map_object` VALUES (8,'李宁',1,4,4096),(9,'白云大师',1,4,4096);
+INSERT INTO `map_object` VALUES (8,'李宁',1,4,4096);
+INSERT INTO `map_object` VALUES (9,'元元大师',258,4,4096);
+INSERT INTO `map_object` VALUES (10,'周淳',4,4,4096);
+INSERT INTO `map_object` VALUES (11,'马湘',5,4,4096);
+INSERT INTO `map_object` VALUES (12,'赵燕儿',6,4,4096);
+INSERT INTO `map_object` VALUES (13,'醉道人',7,4,4096);
+INSERT INTO `map_object` VALUES (14,'知味楼掌柜',8,4,4096);
+INSERT INTO `map_object` VALUES (15,'髯仙李元化',258,4,4096);
+INSERT INTO `map_object` VALUES (16,'施林',259,4,4096);
+INSERT INTO `map_object` VALUES (17,'李宁（2）',6,4,4096);
 /*!40000 ALTER TABLE `map_object` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -498,11 +513,27 @@ LOCK TABLES `map_spot` WRITE;
 /*!40000 ALTER TABLE `map_spot` DISABLE KEYS */;
 INSERT INTO `map_spot` VALUES
 (1,'',2,0,0,0),
-(2,'乌鸦嘴渡口',0,0,0,0),
-(3,'去成都郊外',0,0,0,0),
-(4,'国战',0,1,0,0),
-(257,'白云庵',0,0,0,0),
-(258,'去白堰村',0,0,0,0)
+(2,'乌鸦嘴渡口',9,0,0,0),
+(3,'去成都郊外',8,0,0,0),
+(4,'湘江',9,0,0,0),
+(5,'周淳蒙馆',9,0,0,0),
+(6,'文昌阁',9,0,0,0),
+(7,'舍身崖',9,0,0,0),
+(8,'峨眉山脚',9,0,0,0),
+(9,'知味楼',9,0,0,0),
+(10,'贼兵营地',9,0,0,0),
+(11,'去峨眉山',8,0,0,0),
+
+(257,'去白堰村',8,0,0,0),
+(258,'白云庵',9,0,0,0),
+(269,'农家茅屋',9,0,0,0),
+(260,'云灵山',9,0,0,0),
+(261,'魏青茅舍',9,0,0,0),
+(262,'绿竹林',9,0,0,0),
+(263,'碧均庵',9,0,0,0),
+(264,'辟邪村',9,0,0,0),
+(265,'乱葬岗',9,0,0,0),
+(272,'去成都',8,0,0,0)
 ;
 /*!40000 ALTER TABLE `map_spot` ENABLE KEYS */;
 UNLOCK TABLES;

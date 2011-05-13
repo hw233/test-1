@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.1.53, for pc-linux-gnu (x86_64)
 --
--- Host: localhost    Database: qyz
+-- Host: localhost    Database: asss
 -- ------------------------------------------------------
 -- Server version	5.1.53-log
 
@@ -15,8 +15,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-create database qyz;
-use qyz;
+create database asss;
+use asss;
 
 --
 -- Table structure for table `SpecialAward`
@@ -859,7 +859,7 @@ CREATE TABLE `user_id_name_mapping` (
 -- Dump completed
 -- MySQL dump 10.13  Distrib 5.1.53, for pc-linux-gnu (x86_64)
 --
--- Host: localhost    Database: qyz
+-- Host: localhost    Database: asss
 -- ------------------------------------------------------
 -- Server version	5.1.53-log
 
@@ -936,7 +936,7 @@ UNLOCK TABLES;
 -- Dump completed
 -- MySQL dump 10.13  Distrib 5.1.53, for pc-linux-gnu (x86_64)
 --
--- Host: localhost    Database: qyz
+-- Host: localhost    Database: asss
 -- ------------------------------------------------------
 -- Server version	5.1.53-log
 
