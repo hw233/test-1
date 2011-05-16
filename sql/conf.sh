@@ -1,6 +1,6 @@
 #!/bin/bash
 
 H=localhost
-U=bsc
-P=123456
+U=kingxin
+P=kingxin
 
