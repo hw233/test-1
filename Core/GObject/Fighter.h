@@ -60,9 +60,9 @@ public:
 	inline UInt64 getExp() {return _exp;}
 	inline float getPotential() {return _potential;}
 	inline UInt16 getCurrentHP() {return _hp;}
-	inline UInt16 getSkill() { return _skill; }
-	inline UInt8 getSkillLevel() { return _skillLevel; }
-	inline UInt16 getSkillAndLevel() { return static_cast<UInt16>(_skill * 100 + _skillLevel); }
+	inline UInt16 getSkill(size_t sidx = 0) { return sidx < _skill.size() ? _skill[sidx] : 0; }
+	inline UInt8 getSkillLevel(size_t sidx = 0) { return sidx < _skillLevel.size() ? _skillLevel[sidx] : 0; }
+	inline UInt16 getSkillAndLevel(size_t sidx = 0) { return sidx < _skill.size() ? static_cast<UInt16>(_skill[sidx] * 100 + _skillLevel[sidx]) : 0; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
 	inline ItemEquip * getAmulet() { return _amulet; }
@@ -172,8 +172,8 @@ protected:
 	UInt8 _color;
 	UInt16 _hp;
 
-	UInt16 _skill;
-	UInt8 _skillLevel;
+    std::vector<UInt16> _skill;
+    std::vector<UInt8> _skillLevel;
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];

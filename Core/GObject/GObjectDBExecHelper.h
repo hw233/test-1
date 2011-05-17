@@ -129,32 +129,41 @@ struct DBFighterBuffData
 	UInt32 data;
 };
 
+// 将基础属性
 struct DBFighter
 {
-	UInt32 id;
-	std::string name;
-	UInt8 cls;
-	UInt8 lvl;
-	UInt8 sex;
-	float potential;
-	UInt16 skill;
-	UInt32 npc_weapon;
-	UInt32 favor;
-	UInt32 friendliness;
-	Int16 strength;
-	Int16 physique;
-	Int16 agility;
-	Int16 intelligence;
-	Int16 attack;
-	Int16 defend;
-	Int32 hp;
-	UInt16 action;
-	float hitrate;
-	float evade;
-	float critical;
-	float pierce;
-	float counter;
-	std::string extraPos;
+    UInt32 id;                  // 将编号
+    std::string name;           // 名字
+    UInt8 cls;                  // 职业/0-儒男 1-儒女 2-释男 3-释女 4-道男 5-道女 6-童子(创建角色时没有此选项，但游戏中会出现)
+    UInt8 lvl;                  // 等级*
+    UInt8 sex;                  // 性别
+    float potential;            // 资质*
+    float capacity;             // 潜力*
+    std::string skill;          // 技能/初始技能*, 一些比较牛的将可能会有多个初始技能
+    UInt32 npc_weapon;          // 初始装备
+    Int16 strength;             // 力量
+    Int16 physique;             // 耐力/体魄
+    Int16 agility;              // 敏捷
+    Int16 intelligence;         // 智力
+    Int16 will;                 // 意志
+    Int16 soul;                 // 元神力
+    Int16 aura;                 // 灵气/士气
+    Int16 attack;               // 物理攻击
+    Int16 img_attack;           // 法术攻击
+    Int16 defend;               // 物理防御
+    Int16 img_defend;           // 法术防御
+    Int32 hp;                   // 最大血槽*
+    UInt16 action;              // 身法/行动值
+    UInt32 peerless;            // 无双技能
+    float hitrate;              // 命中
+    float evade;                // 闪躲
+    float critical;             // 暴击
+    float critical_dmg;         // 暴击伤害
+    float tough;                // 坚韧
+    float pierce;               // 击破/护甲穿透
+    float counter;              // 反击
+    float img_res;              // 法术抵抗
+    std::string extraPos;
 };
 
 struct DBFightersFriendliness
@@ -190,23 +199,32 @@ struct DBBossDamage
 	UInt32 exp;
 };
 
+// 将可变属性
 struct DBFighterObj
 {
-	UInt32 id;
-	UInt64 playerId;
-	float potential;
-	UInt8 level;
-	UInt64 experience;
-	UInt32 hp;
-	UInt32 weapon;
-	UInt32 armor1;
-	UInt32 armor2;
-	UInt32 armor3;
-	UInt32 armor4;
-	UInt32 armor5;
-	UInt32 ring;
-	UInt32 amulet;
-	UInt16 skill;
+	UInt32 id;              // 将编号
+	UInt64 playerId;        // 玩家ID
+	float potential;        // 资质
+    float capacity;         // 潜力
+	UInt8 level;            // 等级
+	UInt64 experience;      // 经验槽
+    UInt64 practiceExp;     // 修炼经验槽
+	UInt32 hp;              // 血槽
+	UInt32 weapon;          // 武器
+	UInt32 armor1;          // 
+	UInt32 armor2;          //
+	UInt32 armor3;          //
+	UInt32 armor4;          //
+	UInt32 armor5;          //
+	UInt32 ring;            // 戒指
+	UInt32 amulet;          // 项链
+    UInt32 trump[3];        // 法宝
+    UInt32 peerless;        // 无双技能
+    UInt8 bloodbit[15];     // 血位,打通次数
+    UInt16 skill[3];        // 装备的技能
+    UInt16 citta[6];        // 装备的心法
+    std::string skills;     // 学会的技能, ID1,ID2,...
+    std::string cittas;     // 学会的心法, ID1,ID2,...
 };
 
 struct DBEquipment
@@ -674,7 +692,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter)
-SPECIALDEF(24)
+SPECIALDEF(32)
 (
 	UInt32, id,
 	std::string, name,
@@ -682,23 +700,31 @@ SPECIALDEF(24)
 	UInt8, lvl,
 	UInt8, sex,
 	float, potential,
-	UInt16, skill,
+	float, capacity,
+	std::string, skill,
 	UInt32, npc_weapon,
-	UInt32, favor,
-	UInt32, friendliness,
 	Int16, strength,
 	Int16, physique,
 	Int16, agility,
 	Int16, intelligence,
+	Int16, will,
+	Int16, soul,
+	Int16, aura,
 	Int16, attack,
+	Int16, img_attack,
 	Int16, defend,
+	Int16, img_defend,
 	Int32, hp,
 	UInt16, action,
+	UInt32, peerless,
 	float, hitrate,
 	float, evade,
 	float, critical,
+	float, critical_dmg,
+	float, tough,
 	float, pierce,
 	float, counter,
+	float, img_res,
 	std::string, extraPos
 )
 SPECIALEND()
@@ -745,13 +771,15 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(15)
+SPECIALDEF(43)
 	(
 	UInt32, id,
 	UInt64, playerId,
 	float, potential,
+	float, capacity,
 	UInt8, level,
 	UInt64, experience,
+	UInt64, practiceExp,
 	UInt32, hp,
 	UInt32, weapon,
 	UInt32, armor1,
@@ -761,7 +789,33 @@ SPECIALDEF(15)
 	UInt32, armor5,
 	UInt32, ring,
 	UInt32, amulet,
-	UInt16, skill
+	UInt32, trump[0],
+	UInt32, trump[1],
+	UInt32, trump[2],
+    UInt32, peerless,
+    UInt8, bloodbit[0],
+    UInt8, bloodbit[1],
+    UInt8, bloodbit[2],
+    UInt8, bloodbit[3],
+    UInt8, bloodbit[4],
+    UInt8, bloodbit[5],
+    UInt8, bloodbit[6],
+    UInt8, bloodbit[7],
+    UInt8, bloodbit[8],
+    UInt8, bloodbit[9],
+    UInt8, bloodbit[10],
+    UInt8, bloodbit[11],
+    UInt8, bloodbit[12],
+    UInt8, bloodbit[13],
+    UInt8, bloodbit[14],
+    UInt16, skill[0],
+    UInt16, skill[1],
+    UInt16, skill[2],
+    UInt16, citta[0],
+    UInt16, citta[1],
+    UInt16, citta[2],
+    std::string, skills,
+    std::string, cittas
 	)
 SPECIALEND()
 

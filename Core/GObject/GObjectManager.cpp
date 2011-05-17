@@ -226,7 +226,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `skill`, `npc_weapon`, `favor`, `friendliness`, `strength`, `physique`, `agility`, `intelligence`, `attack`, `defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `tough`, `pierce`, `counter`, `img_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
@@ -243,10 +243,9 @@ namespace GObject
 			fgt->setMale(dbfgt.sex == 0);
 			ItemWeapon * nwp = GData::GDataManager::GetNpcWeapon(dbfgt.npc_weapon);
 			fgt->setWeapon(nwp, false);
-			fgt->setSkillAndLevel(dbfgt.skill);
+            // TODO: 
+			// fgt->setSkillAndLevel(dbfgt.skill);
 			fgt->setPotential(dbfgt.potential, false);
-			fgt->favor = dbfgt.favor;
-			fgt->reqFriendliness = dbfgt.friendliness;
 			fgt->strength = dbfgt.strength;
 			fgt->physique = dbfgt.physique;
 			fgt->agility = dbfgt.agility;
@@ -777,7 +776,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `level`, `experience`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `skill` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `trump`, `trump1`, `trump2`, `peerless`, `bloodbit`, `bloodbit1`, `bloodbit2`, `bloodbit3`, `bloodbit4`, `bloodbit5`, `bloodbit6`, `bloodbit7`, `bloodbit8`, `bloodbit9`, `bloodbit10`, `bloodbit11`, `bloodbit12`, `bloodbit13`, `bloodbit14`, `skill`, `skill1`, `skill2`, `citta`, `citta1`, `citta2`, `citta3`, `citta4`, `citta5`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -811,10 +810,13 @@ namespace GObject
 			fgt2->setArmor(4, fetchArmor(specfgtobj.armor5), false);
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
+            // TODO:
+#if 0
 			if(specfgtobj.skill != 0)
 			{
 				fgt2->setSkillAndLevel(specfgtobj.skill);
 			}
+#endif
 		}
 		lc.finalize();
 
