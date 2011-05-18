@@ -980,18 +980,18 @@ namespace GObject
 
 	void Player::makeFighterInfo( Stream& st, Fighter * fgt, bool withequip )
 	{
-		st << static_cast<UInt16>(fgt->getId()) << fgt->getUpSkills();
-        for (size_t i; i < fgt->getUpSkills(); ++i)
-        {
-            st << fgt->getUpSkillAndLevel(i);
-        }
-        // TODO: all skills and cittas
-        st << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
-		st << fgt->getCurrentHP();
+		st << static_cast<UInt16>(fgt->getId()) << fgt->getPotential()
+            << fgt->getCapacity() << fgt->getLevel() << fgt->getExp();
+		st << fgt->getPeerlessAndLevel() << fgt->getPExp() << fgt->getCurrentHP();
 		if(withequip)
 		{
 			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1) << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getRingId() << fgt->getAmuletId();
+            fgt->getAllTrumps(st);
+            fgt->getAllBloodBits(st);
+            fgt->getAllSkillAndLevel(st);
+            fgt->getAllCittaAndLevel(st);
+
 			UInt8 c = 0;
 			UInt8 buffid[PLAYER_BUFF_COUNT];
 			UInt32 buffleft[PLAYER_BUFF_COUNT];

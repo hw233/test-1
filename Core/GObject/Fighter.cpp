@@ -39,7 +39,7 @@ bool existGreatFighter(UInt32 id)
 
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _isMale(true), _class(0), _level(1), _exp(0), _potential(1.0f),_capacity(1.0f),
-	_color(2), _hp(0), _peerless(0), _skillup(0), _cittaup(0), _weapon(NULL), _ring(NULL), _amulet(NULL), _trumpup(0),
+	_color(2), _hp(0), _peerless(0), _skillup(0), _cittaup(0), _weapon(NULL), _ring(NULL), _amulet(NULL),
 	_attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
 	favor(0), reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0),
 	attack(0), defend(0), maxhp(0), action(0), hitrate(0), evade(0), critical(0), pierce(0), counter(0)
@@ -866,6 +866,78 @@ void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true
 	}
 }
 #endif
+
+void Fighter::getAllUpSkillAndLevel(Stream& st)
+{
+    st << _skillup;
+    for (int i = 0; i < _skillup; ++i)
+    {
+        st << _skill[i];
+    }
+}
+
+void Fighter::getAllSkillsAndLevel(Stream& st)
+{
+    int skills = getSkills();
+    st << skills;
+    for (int i = 0; i < skills; ++i)
+    {
+        st << _skills[i];
+    }
+}
+
+void Fighter::getAllSkillAndLevel(Stream& st)
+{
+    getAllUpSkillAndLevel(st);
+    getAllSkillsAndLevel(st);
+}
+
+
+void Fighter::getAllUpCittaAndLevel(Stream& st)
+{
+    st << _cittaup;
+    for (int i = 0; i < _cittaup; ++i)
+    {
+        st << _citta[i];
+    }
+}
+
+void Fighter::getAllCittasAndLevel(Stream& st)
+{
+    int cittas = getCittas();
+    st << cittas;
+    for (int i = 0; i < cittas; ++i)
+    {
+        st << _cittas[i];
+    }
+}
+
+void Fighter::getAllCittaAndLevel(Stream& st)
+{
+    getAllUpCittaAndLevel(st);
+    getAllCittasAndLevel(st);
+}
+
+UInt32 Fighter::getTrumpId(int idx)
+{
+    return (idx >= 0 && idx < TRUMP_UPMAX && _trump[idx]) ? _trump[idx]->getId() : 0;
+}
+
+void Fighter::getAllTrumps(Stream& st)
+{
+    for (int i = 0; i < TRUMP_UPMAX; ++i)
+    {
+        st << getTrumpId(i);
+    }
+}
+
+void Fighter::getAllBloodBits(Stream& st)
+{
+    for (int i = 0; i < BLOODBIT_MAX; ++i)
+    {
+        st << _bloodbit[i];
+    }
+}
 
 Fighter * GlobalFighters::getRandomOut()
 {

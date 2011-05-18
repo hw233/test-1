@@ -52,6 +52,29 @@ public:
 	void setPotential(float p, bool = true);
 	void setCurrentHP(UInt16 hp, bool = true);
 
+	const std::string& getName();
+	const std::string& getBattleName();
+	inline UInt8 getClass() {return _class;}
+	inline UInt8 getClassAndSex() {return _isMale ? (_class - 1) : _class;}
+	inline bool isMale() {return _isMale;}
+	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
+	inline UInt8 getLevel() {return _level;}
+	inline UInt64 getExp() {return _exp;}
+	inline UInt64 getPExp() {return _pexp;}
+	inline float getPotential() {return _potential;}
+	inline float getCapacity() {return _capacity;}
+	inline UInt16 getCurrentHP() {return _hp;}
+
+    inline UInt16 getPeerless() { return _peerless / SKILL_LEVEL_MAX; }
+    inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
+    inline UInt16 getPeerlessAndLevel() { return _peerless; }
+
+    bool setBloodBit(UInt8 idx, UInt8 v);
+    bool incBloodBit(UInt8 idx);
+
+    inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _bloodbit[idx] : static_cast<UInt8>(-1); }
+    void getAllBloodBits(Stream& st);
+
     // TODO:
 #if 0
 	void setSkillLevel(UInt8 level, bool = true);
@@ -80,57 +103,45 @@ public:
     // 通过索引卸下技能
     void offSkillByIdx(UInt8 idx);
 
-    bool setBloodBit(UInt8 idx, UInt8 v);
-    bool incBloodBit(UInt8 idx);
-
-    UInt8 hasCitta(UInt16 citta);
-    UInt8 isCittaUp(UInt16 citta);
-
-	const std::string& getName();
-	const std::string& getBattleName();
-	inline UInt8 getClass() {return _class;}
-	inline UInt8 getClassAndSex() {return _isMale ? (_class - 1) : _class;}
-	inline bool isMale() {return _isMale;}
-	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
-	inline UInt8 getLevel() {return _level;}
-	inline UInt64 getExp() {return _exp;}
-	inline UInt64 getPExp() {return _pexp;}
-	inline float getPotential() {return _potential;}
-	inline float getCapacity() {return _capacity;}
-	inline UInt16 getCurrentHP() {return _hp;}
-    inline UInt16 getPeerless() { return _peerless / SKILL_LEVEL_MAX; }
-    inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
-    inline UInt16 getPeerlessAndLevel() { return _peerless; }
-
-    inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _bloodbit[idx] : static_cast<UInt8>(-1); }
-
     inline UInt8 getUpSkills() { return _skillup; }
     inline UInt8 getUpMaxSkills() { return SKILL_UPMAX; }
 	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
 	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
-    inline UInt8 getSkills() { return _skills.size(); }
-    inline void getAllUpSkillAndLevel(Stream& st)
-    {
-        st << getUpSkills();
-        for (int i = 0; i < _skillup; ++i)
-        {
-            st << _skill[i];
-        }
-    }
 
-    inline UInt8 getUpCitta() { return _cittaup; }
+    inline UInt8 getSkills() { return _skills.size(); }
+
+    // 取得所有装备的技能和等级
+    void getAllUpSkillAndLevel(Stream& st);
+    // 取得所有学习的技能和等级
+    void getAllSkillsAndLevel(Stream& st);
+    // 取得装备了的和学习了的技能和等级
+    void getAllSkillAndLevel(Stream& st);
+
+    UInt8 hasCitta(UInt16 citta);
+    UInt8 isCittaUp(UInt16 citta);
+    inline UInt8 getUpCittas() { return _cittaup; }
     inline UInt8 getUpMaxCittas() { return CITTA_UPMAX; }
 	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] / CITTA_LEVEL_MAX : 0; }
 	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] % CITTA_LEVEL_MAX : 0; }
 	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] : 0; }
     inline UInt8 getCittas() { return _cittas.size(); }
+    // 取得所有装备的心法和等级
+    void getAllUpCittaAndLevel(Stream& st);
+    // 取得所有学习的心法和等级
+    void getAllCittasAndLevel(Stream& st);
+    // 取得装备了的和学习了的心法和等级
+    void getAllCittaAndLevel(Stream& st);
 
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
 	inline ItemEquip * getAmulet() { return _amulet; }
 	inline ItemEquip * getRing() { return _ring; }
+
 	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < TRUMP_UPMAX) ? _trump[idx] : 0; }
+    UInt32 getTrumpId(int idx);
+    void getAllTrumps(Stream& st);
+
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -254,7 +265,6 @@ protected:
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
 	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
-    UInt8 _trumpup;                     // 装备法宝个数
 
 	bool _attrDirty;
 	UInt32 _maxHP;

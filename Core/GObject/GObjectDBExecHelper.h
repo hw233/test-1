@@ -211,11 +211,11 @@ struct DBFighterObj
     UInt64 practiceExp;     // 修炼经验槽
 	UInt32 hp;              // 血槽
 	UInt32 weapon;          // 武器
-	UInt32 armor1;          // 
-	UInt32 armor2;          //
-	UInt32 armor3;          //
-	UInt32 armor4;          //
-	UInt32 armor5;          //
+	UInt32 armor1;          // 头盔
+	UInt32 armor2;          // 护甲
+	UInt32 armor3;          // 护肩
+	UInt32 armor4;          // 腰带
+	UInt32 armor5;          // 靴子
 	UInt32 ring;            // 戒指
 	UInt32 amulet;          // 项链
     UInt32 trump[3];        // 法宝
