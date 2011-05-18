@@ -180,9 +180,9 @@ namespace Script
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);
 		CLASS_DEF(Fighter, getClass);
-		CLASS_DEF(Fighter, getSkill);
-		CLASS_DEF(Fighter, setSkill);
-		CLASS_DEF(Fighter, setSkillLevel);
+		// TODO: CLASS_DEF(Fighter, getSkill);
+		// CLASS_DEF(Fighter, setSkill);
+		// CLASS_DEF(Fighter, setSkillLevel);
 		CLASS_DEF(Fighter, learnSkill);
 		CLASS_DEF(Fighter, skillLevelUp);
 

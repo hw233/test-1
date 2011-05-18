@@ -38,13 +38,19 @@ bool existGreatFighter(UInt32 id)
 }
 
 Fighter::Fighter(UInt32 id, Player * owner):
-	_id(id), _owner(owner), _isMale(true), _class(0), _level(1), _exp(0), _potential(1.0f),
-	_color(2), _hp(0), _skill(0), _skillLevel(0), _weapon(NULL), _ring(NULL), _amulet(NULL),
+	_id(id), _owner(owner), _isMale(true), _class(0), _level(1), _exp(0), _potential(1.0f),_capacity(1.0f),
+	_color(2), _hp(0), _peerless(0), _skillup(0), _cittaup(0), _weapon(NULL), _ring(NULL), _amulet(NULL), _trumpup(0),
 	_attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
 	favor(0), reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0),
 	attack(0), defend(0), maxhp(0), action(0), hitrate(0), evade(0), critical(0), pierce(0), counter(0)
 {
+    memset(_bloodbit, 0, sizeof(_bloodbit));
+    memset(_skill, 0, sizeof(_skill));
+    _skills.resize(32); // 默认为32个
+    memset(_citta, 0, sizeof(_citta));
+    _cittas.resize(32); // 默认为32个
 	memset(_armor, 0, 5 * sizeof(ItemEquip *));
+	memset(_trump, 0, sizeof(_trump));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
 }
 
@@ -758,6 +764,7 @@ Fighter * Fighter::cloneWithEquip(Player * player)
 	return fgt;
 }
 
+#if 0
 void Fighter::setSkill( UInt16 skill, bool writedb /*= true*/ )
 {
 	if(_skill == skill)
@@ -779,9 +786,12 @@ void Fighter::setSkillLevel( UInt8 level, bool writedb /*= true*/ )
 		sendModification(0x11, _skill * 100 + _skillLevel);
 	}
 }
+#endif
 
 bool Fighter::learnSkill(UInt16 skill)
 {
+    // TODO:
+#if 0
 	if(skill == _skill)
 	{
 		if(_owner != NULL) _owner->sendMsgCode(0, 2151);
@@ -814,11 +824,14 @@ bool Fighter::learnSkill(UInt16 skill)
 		SYSMSG_SENDV(162, _owner, _skill, _skillLevel);
 		SYSMSG_SENDV(1062, _owner, _color, getName().c_str(), _skill, _skillLevel);
 	}
+#endif
 	return true;
 }
 
-bool Fighter::skillLevelUp( UInt8 lv )
+bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 {
+    // TODO: 
+#if 0
 	if(_skillLevel + 1 != lv)
 	{
 		if(_owner != NULL) _owner->sendMsgCode(0, 2155);
@@ -830,9 +843,11 @@ bool Fighter::skillLevelUp( UInt8 lv )
 		SYSMSG_SENDV(162, _owner, _skill, _skillLevel);
 		SYSMSG_SENDV(1062, _owner, _color, getName().c_str(), _skill, _skillLevel);
 	}
+#endif
 	return true;
 }
 
+#if 0
 void Fighter::setSkillAndLevel( UInt16 data )
 {
 	_skill = data / 100;
@@ -850,6 +865,7 @@ void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true
 		sendModification(0x11, _skill * 100 + _skillLevel);
 	}
 }
+#endif
 
 Fighter * GlobalFighters::getRandomOut()
 {

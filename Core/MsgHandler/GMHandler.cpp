@@ -1324,7 +1324,8 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 
 static void setFighterSkillLevel(const std::pair<UInt32, GObject::Fighter *>& p, UInt8 skillLevel)
 {
-	p.second->setSkillLevel(skillLevel);
+    // TODO:
+	// p.second->setSkillLevel(skillLevel);
 }
 
 void GMHandler::OnSetSkill( GObject::Player * player, std::vector<std::string>& args )
@@ -1334,14 +1335,15 @@ void GMHandler::OnSetSkill( GObject::Player * player, std::vector<std::string>& 
 	if(args.size() > 2)
 	{
 		UInt32 fighterId = atoi(args[0].c_str());
-		UInt32 skillId = atoi(args[1].c_str());
+		UInt32 skillId = atoi(args[1].c_str());(void)skillId;
 		UInt32 skillLevel = atoi(args[2].c_str());
 		GObject::Fighter * fgt = player->findFighter(fighterId);
 		if(fgt == NULL)
 			return;
 		if(skillLevel == 0 || skillLevel > 40)
 			return;
-		fgt->setSkillAndLevel(skillId, skillLevel - 1);
+        // TODO: 
+		// fgt->setSkillAndLevel(skillId, skillLevel - 1);
 	}
 	else if(args.size() > 1)
 	{
@@ -1352,7 +1354,8 @@ void GMHandler::OnSetSkill( GObject::Player * player, std::vector<std::string>& 
 			return;
 		if(skillLevel == 0 || skillLevel > 40)
 			return;
-		fgt->setSkillLevel(skillLevel - 1);
+        // TODO:
+		// fgt->setSkillLevel(skillLevel - 1);
 	}
 	else
 	{

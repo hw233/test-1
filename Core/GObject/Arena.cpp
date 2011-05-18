@@ -138,7 +138,9 @@ void Arena::appendLineup( Stream& st, Player * player )
 			++ c;
 			st << pdata.pos << static_cast<UInt16>(pdata.fid);
 			Fighter * fgt = pdata.fighter;
-			st << fgt->getLevel() << static_cast<UInt8>(fgt->getPotential() * 100 + 0.5f) << fgt->getSkillAndLevel();
+            // XXX: 
+			st << fgt->getLevel() << static_cast<UInt8>(fgt->getPotential() * 100 + 0.5f);
+            fgt->getAllUpSkillAndLevel(st);
 			appendEquipInfo(st, fgt->getWeapon());
 			appendEquipInfo(st, fgt->getArmor(0));
 			appendEquipInfo(st, fgt->getArmor(1));

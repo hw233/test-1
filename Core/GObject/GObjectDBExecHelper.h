@@ -134,7 +134,7 @@ struct DBFighter
 {
     UInt32 id;                  // 将编号
     std::string name;           // 名字
-    UInt8 cls;                  // 职业/0-儒男 1-儒女 2-释男 3-释女 4-道男 5-道女 6-童子(创建角色时没有此选项，但游戏中会出现)
+    UInt8 cls;                  // 职业/0-儒男 1-儒女 2-释男 3-释女 4-道男 5-道女 6-童男 7-童女(创建角色时没有此选项，但游戏中会出现)
     UInt8 lvl;                  // 等级*
     UInt8 sex;                  // 性别
     float potential;            // 资质*
@@ -154,7 +154,7 @@ struct DBFighter
     Int16 img_defend;           // 法术防御
     Int32 hp;                   // 最大血槽*
     UInt16 action;              // 身法/行动值
-    UInt32 peerless;            // 无双技能
+    UInt16 peerless;            // 无双技能
     float hitrate;              // 命中
     float evade;                // 闪躲
     float critical;             // 暴击
@@ -219,7 +219,7 @@ struct DBFighterObj
 	UInt32 ring;            // 戒指
 	UInt32 amulet;          // 项链
     UInt32 trump[3];        // 法宝
-    UInt32 peerless;        // 无双技能
+    UInt16 peerless;        // 无双技能
     UInt8 bloodbit[15];     // 血位,打通次数
     UInt16 skill[3];        // 装备的技能
     UInt16 citta[6];        // 装备的心法
@@ -716,7 +716,7 @@ SPECIALDEF(32)
 	Int16, img_defend,
 	Int32, hp,
 	UInt16, action,
-	UInt32, peerless,
+	UInt16, peerless,
 	float, hitrate,
 	float, evade,
 	float, critical,
@@ -792,7 +792,7 @@ SPECIALDEF(43)
 	UInt32, trump[0],
 	UInt32, trump[1],
 	UInt32, trump[2],
-    UInt32, peerless,
+    UInt16, peerless,
     UInt8, bloodbit[0],
     UInt8, bloodbit[1],
     UInt8, bloodbit[2],

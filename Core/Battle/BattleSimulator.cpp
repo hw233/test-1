@@ -125,8 +125,13 @@ void BattleSimulator::start()
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
 					_packet << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
-					_packet << static_cast<UInt16>(bf->getHitrate() * 100.0f) << static_cast<UInt16>(bf->getEvade() * 100.0f) << static_cast<UInt16>(bf->getCritical() * 100.0f)
-						 << static_cast<UInt16>(bf->getPierce() * 100.0f) << static_cast<UInt16>(bf->getCounter() * 100.0f) << bf->getFighter()->getSkillAndLevel();
+                    // TODO: up skills
+					_packet << static_cast<UInt16>(bf->getHitrate() * 100.0f) << static_cast<UInt16>(bf->getEvade() * 100.0f) << static_cast<UInt16>(bf->getCritical() * 100.0f) << static_cast<UInt16>(bf->getPierce() * 100.0f) << static_cast<UInt16>(bf->getCounter() * 100.0f) << bf->getFighter()->getUpSkills();
+                    for (size_t i = 0; i < bf->getFighter()->getUpSkills(); ++i)
+                    {
+                        _packet << bf->getFighter()->getUpSkillAndLevel(i);
+                    }
+                    
 					if(ismain)
 					{
 						bf->postInit();
@@ -269,6 +274,8 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 			}
 		}
 	}
+    // TODO: 
+#if 0
 	UInt32 sid = bf->getFighter()->getSkill();
 	switch(sid)
 	{
@@ -289,6 +296,7 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 			return 0.0f;
         }
 	}
+#endif
 	return 0.0f;
 }
 
@@ -569,6 +577,8 @@ UInt32 BattleSimulator::doAttack( int pos )
 		{
 			if(dmg > 0 && target_object->isChar())
 			{
+                // TODO: 
+#if 0
 				BattleFighter * target_fighter = static_cast<BattleFighter *>(target_object);
 				UInt16 myskillid = bf->getFighter()->getSkill();
 				if(target_fighter->getHP() > 0)
@@ -747,6 +757,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 						}
 					}
 				}
+#endif
 			}
 			UInt8 confuseLevel = bf->getConfuseLevel();
 			if(confuseLevel > 0)
@@ -820,6 +831,7 @@ struct _PosAndHP
 // try to post-use skill after attack
 UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * target_object )
 {
+#if 0
 	UInt16 skillId = bf->getFighter()->getSkill();
 	switch(skillId)
 	{
@@ -1092,6 +1104,7 @@ UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * tar
 	default:
 		return 0;
 	}
+#endif
 	return 0;
 }
 
@@ -1341,6 +1354,7 @@ void BattleSimulator::onDead(BattleObject * bo)
 
 void BattleSimulator::onDamage( BattleObject * bo, StatusChange * scList, size_t& scCount, bool active )
 {
+#if 0
 	if(bo->isChar() && bo->getHP() > 0)
 	{
 		BattleFighter * bf = static_cast<BattleFighter *>(bo);
@@ -1363,6 +1377,7 @@ void BattleSimulator::onDamage( BattleObject * bo, StatusChange * scList, size_t
 			setStatusChange(bf->getSide(), 0, 25, 106, 1, (sd.value1 + bf->getStrength() * sd.value2) * (bf->getMaxHP() - bf->getHP()) / bf->getMaxHP(), scList, scCount, active);
 		}
 	}
+#endif
 }
 
 BattleFighter * BattleSimulator::getRandomFighter( UInt8 side, UInt8 * excepts, size_t exceptCount )

@@ -21,6 +21,13 @@ namespace GObject
 #define FIGHTER_BUFF_ATTR2		0x02
 #define FIGHTER_BUFF_ATTR3		0x03
 
+#define SKILL_LEVEL_MAX 100
+#define SKILL_UPMAX 3
+#define CITTA_LEVEL_MAX 100
+#define CITTA_UPMAX 3
+#define TRUMP_UPMAX 3
+#define BLOODBIT_MAX 15
+
 class Player;
 class Fighter
 {
@@ -40,15 +47,44 @@ public:
 	inline void setMale(bool m) {_isMale = m;}
 	inline void setLevel(UInt8 l) {_level = l;}
 	inline void setExp(UInt64 e) {_exp = e;}
+    inline void setPExp(UInt64 e) { _pexp = e; }
 	void setLevelAndExp(UInt8 l, UInt64 e);
 	void setPotential(float p, bool = true);
 	void setCurrentHP(UInt16 hp, bool = true);
-	void setSkill(UInt16 skill, bool = true);
+
+    // TODO:
+#if 0
 	void setSkillLevel(UInt8 level, bool = true);
 	void setSkillAndLevel(UInt16 data);
 	void setSkillAndLevel(UInt16 skill, UInt8 level, bool = true);
+#endif
+
+    // 学习技能
 	bool learnSkill(UInt16 skill);
-	bool skillLevelUp(UInt8 lv);
+    // 装备技能
+    void upSkill(UInt16 skill, bool = true);
+    // 卸下技能
+    void offSkill(UInt16 skill);
+    // 交换两个技能顺序
+    void swapSkill(UInt8 idx1, UInt8 idx2, bool = true);
+    // 通过索引装备技能
+    void upSkillByIdx(UInt16 skill, bool = true);
+    // 升级技能
+	bool skillLevelUp(UInt16 skill, UInt8 lv);
+    // 通过索引升级技能
+	bool skillLevelUpByIdx(UInt8 , UInt8 lv);
+    // 是否学会此技能
+    UInt8 hasSkill(UInt16 skill);
+    // 是否装备此技能
+    UInt8 isKillUp(UInt16 skill);
+    // 通过索引卸下技能
+    void offSkillByIdx(UInt8 idx);
+
+    bool setBloodBit(UInt8 idx, UInt8 v);
+    bool incBloodBit(UInt8 idx);
+
+    UInt8 hasCitta(UInt16 citta);
+    UInt8 isCittaUp(UInt16 citta);
 
 	const std::string& getName();
 	const std::string& getBattleName();
@@ -58,15 +94,43 @@ public:
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
+	inline UInt64 getPExp() {return _pexp;}
 	inline float getPotential() {return _potential;}
+	inline float getCapacity() {return _capacity;}
 	inline UInt16 getCurrentHP() {return _hp;}
-	inline UInt16 getSkill(size_t sidx = 0) { return sidx < _skill.size() ? _skill[sidx] : 0; }
-	inline UInt8 getSkillLevel(size_t sidx = 0) { return sidx < _skillLevel.size() ? _skillLevel[sidx] : 0; }
-	inline UInt16 getSkillAndLevel(size_t sidx = 0) { return sidx < _skill.size() ? static_cast<UInt16>(_skill[sidx] * 100 + _skillLevel[sidx]) : 0; }
+    inline UInt16 getPeerless() { return _peerless / SKILL_LEVEL_MAX; }
+    inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
+    inline UInt16 getPeerlessAndLevel() { return _peerless; }
+
+    inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _bloodbit[idx] : static_cast<UInt8>(-1); }
+
+    inline UInt8 getUpSkills() { return _skillup; }
+    inline UInt8 getUpMaxSkills() { return SKILL_UPMAX; }
+	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
+	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
+	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
+    inline UInt8 getSkills() { return _skills.size(); }
+    inline void getAllUpSkillAndLevel(Stream& st)
+    {
+        st << getUpSkills();
+        for (int i = 0; i < _skillup; ++i)
+        {
+            st << _skill[i];
+        }
+    }
+
+    inline UInt8 getUpCitta() { return _cittaup; }
+    inline UInt8 getUpMaxCittas() { return CITTA_UPMAX; }
+	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] / CITTA_LEVEL_MAX : 0; }
+	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] % CITTA_LEVEL_MAX : 0; }
+	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] : 0; }
+    inline UInt8 getCittas() { return _cittas.size(); }
+
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
 	inline ItemEquip * getAmulet() { return _amulet; }
 	inline ItemEquip * getRing() { return _ring; }
+	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < TRUMP_UPMAX) ? _trump[idx] : 0; }
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -167,18 +231,30 @@ protected:
 	bool _isMale;		// 是否男性
 	UInt8 _class;
 	UInt8 _level;
-	UInt64 _exp;
-	float _potential;
+	UInt64 _exp;        // 经验
+    UInt64 _pexp;       // 修炼经验
+	float _potential;   // 资质
+	float _capacity;    // 潜力
 	UInt8 _color;
 	UInt16 _hp;
 
-    std::vector<UInt16> _skill;
-    std::vector<UInt8> _skillLevel;
+    UInt16 _peerless;       // 无双技能
+    UInt8 _bloodbit[BLOODBIT_MAX];    // 血道
+
+    UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
+    UInt8 _skillup;                 // 装备的技能个数
+    std::vector<UInt16> _skills;    // 学会的技能
+
+    UInt16 _citta[CITTA_UPMAX];  // 装备的心法
+    UInt8 _cittaup;              // 装备的心法个数
+    std::vector<UInt16> _cittas; // 学会的心法
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
+	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
+    UInt8 _trumpup;                     // 装备法宝个数
 
 	bool _attrDirty;
 	UInt32 _maxHP;

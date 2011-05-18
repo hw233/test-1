@@ -159,41 +159,41 @@ namespace GObject
 		{ memset(tavernId, 0, sizeof(tavernId)); memset(bookStore, 0, sizeof(bookStore)); }
 
 
-		std::string name;
-		UInt32 gold;	// 元宝
-		UInt32 coupon;	// 礼券
-		UInt32 tael;	// 银两
-		UInt32 coin;	// 铜钱
-		UInt32 status;
-		UInt8 country;
-		UInt8 title;
-		UInt32 achievement;
-		UInt16 location;
-		UInt8 inCity;
-		UInt32 lastOnline;
-		UInt64 newGuild;
-		UInt16 packSize;
-		UInt8 gmLevel;
-		UInt8 icCount;
-		UInt32 nextIcReset;
-		UInt8 formation;
-		Lineup lineup[5];
-		UInt32 totalRecharge;
-		UInt32 lastExp;
-		UInt64 lastResource;
-		UInt8 rewardStep;
-		UInt16 nextRewardItem;
-		UInt8 nextRewardCount;
-		UInt32 nextRewardTime;
-		UInt32 nextExtraReward;
-		UInt16 tavernId[6];
-		UInt8 tavernBlueCount;
-		UInt8 tavernPurpleCount;
-		UInt16 bookStore[6];
-		UInt32 created;
-		UInt32 lockExpireTime;
-		UInt8 wallow;
-		UInt32 battlecdtm;
+		std::string name;           // 名字
+		UInt32 gold;	            // 元宝
+		UInt32 coupon;	            // 礼券
+		UInt32 tael;	            // 银两
+		UInt32 coin;	            // 铜钱
+		UInt32 status;              // 状态:0x01 - pk打开 0x02 - 切磋开 0x04 - 小秘书关 0x80 - 禁止探险
+		UInt8 country;              // 国家
+		UInt8 title;                // 头衔
+		UInt32 achievement;         // 战功
+		UInt16 location;            // 位置
+		UInt8 inCity;               // 城市
+		UInt32 lastOnline;          // 上次上线时间
+		UInt64 newGuild;            // 新手引导任务
+		UInt16 packSize;            // 玩家背包容量
+		UInt8 gmLevel;              //
+		UInt8 icCount;              // 
+		UInt32 nextIcReset;         // 
+		UInt8 formation;            // 
+		Lineup lineup[5];           // 
+		UInt32 totalRecharge;       // 
+		UInt32 lastExp;             // 
+		UInt64 lastResource;        // 
+		UInt8 rewardStep;           // 
+		UInt16 nextRewardItem;      // 
+		UInt8 nextRewardCount;      // 
+		UInt32 nextRewardTime;      // 
+		UInt32 nextExtraReward;     // 
+		UInt16 tavernId[6];         // 
+		UInt8 tavernBlueCount;      // 
+		UInt8 tavernPurpleCount;    // 
+		UInt16 bookStore[6];        // 
+		UInt32 created;             // 
+		UInt32 lockExpireTime;      // 
+		UInt8 wallow;               // 
+		UInt32 battlecdtm;          // 
 	};
 
 	class Player:

@@ -744,7 +744,13 @@ namespace GObject
 		if(!_isOnline)
 			return;
 		Stream st(0x28);
-		st << static_cast<UInt16>(fgt->getId()) << fgt->getSkillAndLevel() << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
+		st << static_cast<UInt16>(fgt->getId()) << fgt->getUpSkills();
+        for (size_t i = 0; i < fgt->getUpSkills(); ++i)
+        {
+            st << fgt->getUpSkillAndLevel(i);
+        }
+        // TODO: all skills and cittas
+        st << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
 		st << Stream::eos;
 		send(st);
 		SYSMSG_SENDV(110, this, fgt->getColor(), fgt->getName().c_str());
@@ -974,7 +980,13 @@ namespace GObject
 
 	void Player::makeFighterInfo( Stream& st, Fighter * fgt, bool withequip )
 	{
-		st << static_cast<UInt16>(fgt->getId()) << fgt->getSkillAndLevel() << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
+		st << static_cast<UInt16>(fgt->getId()) << fgt->getUpSkills();
+        for (size_t i; i < fgt->getUpSkills(); ++i)
+        {
+            st << fgt->getUpSkillAndLevel(i);
+        }
+        // TODO: all skills and cittas
+        st << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
 		st << fgt->getCurrentHP();
 		if(withequip)
 		{
