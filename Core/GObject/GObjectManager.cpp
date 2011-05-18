@@ -776,7 +776,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `trump`, `trump1`, `trump2`, `peerless`, `bloodbit`, `bloodbit1`, `bloodbit2`, `bloodbit3`, `bloodbit4`, `bloodbit5`, `bloodbit6`, `bloodbit7`, `bloodbit8`, `bloodbit9`, `bloodbit10`, `bloodbit11`, `bloodbit12`, `bloodbit13`, `bloodbit14`, `skill`, `skill1`, `skill2`, `citta`, `citta1`, `citta2`, `citta3`, `citta4`, `citta5`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `trump`, `bloodbit`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -799,9 +799,13 @@ namespace GObject
 				continue;
 			pl->addFighter(fgt2, false);
 			fgt2->setPotential(specfgtobj.potential, false);
+            fgt2->setCapacity(specfgtobj.capacity, false);
 			fgt2->setLevel(specfgtobj.level);
 			fgt2->setExp(specfgtobj.experience);
+			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
+            fgt2->setPeerless(specfgtobj.peerless, false);
+            fgt2->setBloodBits(specfgtobj.bloodbit, false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
 			fgt2->setArmor(1, fetchArmor(specfgtobj.armor2), false);
@@ -810,6 +814,11 @@ namespace GObject
 			fgt2->setArmor(4, fetchArmor(specfgtobj.armor5), false);
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
+            fgt2->setTrump(specfgtobj.trump, false);
+            fgt2->setUpSkills(specfgtobj.skill, false);
+            fgt2->setSkills(specfgtobj.skills, false);
+            fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setCittas(specfgtobj.cittas, false);
             // TODO:
 #if 0
 			if(specfgtobj.skill != 0)

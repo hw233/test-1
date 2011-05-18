@@ -218,11 +218,11 @@ struct DBFighterObj
 	UInt32 armor5;          // 靴子
 	UInt32 ring;            // 戒指
 	UInt32 amulet;          // 项链
-    UInt32 trump[3];        // 法宝
     UInt16 peerless;        // 无双技能
-    UInt8 bloodbit[15];     // 血位,打通次数
-    UInt16 skill[3];        // 装备的技能
-    UInt16 citta[6];        // 装备的心法
+    std::string trump;      // 法宝
+    std::string bloodbit;   // 血位,打通次数
+    std::string skill;      // 装备的技能
+    std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
     std::string cittas;     // 学会的心法, ID1,ID2,...
 };
@@ -771,7 +771,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(43)
+SPECIALDEF(23)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -789,31 +789,11 @@ SPECIALDEF(43)
 	UInt32, armor5,
 	UInt32, ring,
 	UInt32, amulet,
-	UInt32, trump[0],
-	UInt32, trump[1],
-	UInt32, trump[2],
     UInt16, peerless,
-    UInt8, bloodbit[0],
-    UInt8, bloodbit[1],
-    UInt8, bloodbit[2],
-    UInt8, bloodbit[3],
-    UInt8, bloodbit[4],
-    UInt8, bloodbit[5],
-    UInt8, bloodbit[6],
-    UInt8, bloodbit[7],
-    UInt8, bloodbit[8],
-    UInt8, bloodbit[9],
-    UInt8, bloodbit[10],
-    UInt8, bloodbit[11],
-    UInt8, bloodbit[12],
-    UInt8, bloodbit[13],
-    UInt8, bloodbit[14],
-    UInt16, skill[0],
-    UInt16, skill[1],
-    UInt16, skill[2],
-    UInt16, citta[0],
-    UInt16, citta[1],
-    UInt16, citta[2],
+    std::string, trump,
+    std::string, bloodbit,
+    std::string, skill,
+    std::string, citta,
     std::string, skills,
     std::string, cittas
 	)

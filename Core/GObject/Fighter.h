@@ -24,7 +24,7 @@ namespace GObject
 #define SKILL_LEVEL_MAX 100
 #define SKILL_UPMAX 3
 #define CITTA_LEVEL_MAX 100
-#define CITTA_UPMAX 3
+#define CITTA_UPMAX 6
 #define TRUMP_UPMAX 3
 #define BLOODBIT_MAX 15
 
@@ -62,9 +62,12 @@ public:
 	inline UInt64 getExp() {return _exp;}
 	inline UInt64 getPExp() {return _pexp;}
 	inline float getPotential() {return _potential;}
-	inline float getCapacity() {return _capacity;}
 	inline UInt16 getCurrentHP() {return _hp;}
 
+    void setCapacity(float c, bool = true);
+	inline float getCapacity() {return _capacity;}
+
+    void setPeerless(UInt16 peerless, bool = true);
     inline UInt16 getPeerless() { return _peerless / SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessAndLevel() { return _peerless; }
@@ -74,6 +77,7 @@ public:
 
     inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _bloodbit[idx] : static_cast<UInt8>(-1); }
     void getAllBloodBits(Stream& st);
+    void setBloodBits(std::string& bloodbit, bool = true);
 
     // TODO:
 #if 0
@@ -117,6 +121,11 @@ public:
     void getAllSkillsAndLevel(Stream& st);
     // 取得装备了的和学习了的技能和等级
     void getAllSkillAndLevel(Stream& st);
+
+    void setUpSkills(std::string& skill, bool = true);
+    void setSkills(std::string& skills, bool = true);
+    void setUpCittas(std::string& citta, bool = true);
+    void setCittas(std::string& cittas, bool = true);
 
     UInt8 hasCitta(UInt16 citta);
     UInt8 isCittaUp(UInt16 citta);
@@ -169,6 +178,7 @@ public:
 	ItemArmor * setArmor(int idx, ItemArmor * a, bool = true);
 	ItemEquip * setAmulet(ItemEquip * a, bool = true);
 	ItemEquip * setRing(ItemEquip * r, bool = true);
+	ItemEquip * setTrump(std::string& trumps, bool = true);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }

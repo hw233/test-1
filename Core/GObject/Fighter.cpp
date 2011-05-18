@@ -11,6 +11,7 @@
 #include "Common/Stream.h"
 #include "Common/URandom.h"
 #include "Common/TimeUtil.h"
+#include "Common/StringTokenizer.h"
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 
@@ -395,6 +396,11 @@ ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 	return rr;
 }
 
+ItemEquip * Fighter::setTrump( std::string& trumps, bool writedb )
+{
+    return 0;
+}
+
 void Fighter::setCurrentHP( UInt16 hp, bool writedb )
 {
 	if(_hp == hp)
@@ -465,6 +471,14 @@ void Fighter::setPotential( float p, bool writedb )
 			sendModification(4, static_cast<UInt32>(p * 100 + 0.5f));
 		}
 	}
+}
+
+void Fighter::setCapacity( float c, bool writedb )
+{
+    _capacity = c;
+    // TODO:
+    if (writedb) {
+    }
 }
 
 inline void addAttr1Extra( GData::Attr1Extra& ae, const GData::Attr1Extra * ext )
@@ -867,7 +881,7 @@ void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true
 }
 #endif
 
-void Fighter::getAllUpSkillAndLevel(Stream& st)
+void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
     st << _skillup;
     for (int i = 0; i < _skillup; ++i)
@@ -876,7 +890,7 @@ void Fighter::getAllUpSkillAndLevel(Stream& st)
     }
 }
 
-void Fighter::getAllSkillsAndLevel(Stream& st)
+void Fighter::getAllSkillsAndLevel( Stream& st )
 {
     int skills = getSkills();
     st << skills;
@@ -886,14 +900,14 @@ void Fighter::getAllSkillsAndLevel(Stream& st)
     }
 }
 
-void Fighter::getAllSkillAndLevel(Stream& st)
+void Fighter::getAllSkillAndLevel( Stream& st )
 {
     getAllUpSkillAndLevel(st);
     getAllSkillsAndLevel(st);
 }
 
 
-void Fighter::getAllUpCittaAndLevel(Stream& st)
+void Fighter::getAllUpCittaAndLevel( Stream& st )
 {
     st << _cittaup;
     for (int i = 0; i < _cittaup; ++i)
@@ -902,7 +916,7 @@ void Fighter::getAllUpCittaAndLevel(Stream& st)
     }
 }
 
-void Fighter::getAllCittasAndLevel(Stream& st)
+void Fighter::getAllCittasAndLevel( Stream& st )
 {
     int cittas = getCittas();
     st << cittas;
@@ -912,18 +926,18 @@ void Fighter::getAllCittasAndLevel(Stream& st)
     }
 }
 
-void Fighter::getAllCittaAndLevel(Stream& st)
+void Fighter::getAllCittaAndLevel( Stream& st )
 {
     getAllUpCittaAndLevel(st);
     getAllCittasAndLevel(st);
 }
 
-UInt32 Fighter::getTrumpId(int idx)
+UInt32 Fighter::getTrumpId( int idx )
 {
     return (idx >= 0 && idx < TRUMP_UPMAX && _trump[idx]) ? _trump[idx]->getId() : 0;
 }
 
-void Fighter::getAllTrumps(Stream& st)
+void Fighter::getAllTrumps( Stream& st )
 {
     for (int i = 0; i < TRUMP_UPMAX; ++i)
     {
@@ -931,11 +945,106 @@ void Fighter::getAllTrumps(Stream& st)
     }
 }
 
-void Fighter::getAllBloodBits(Stream& st)
+void Fighter::getAllBloodBits( Stream& st )
 {
     for (int i = 0; i < BLOODBIT_MAX; ++i)
     {
         st << _bloodbit[i];
+    }
+}
+
+void Fighter::setPeerless( UInt16 peerless, bool writedb )
+{
+    _peerless = peerless;
+    // TODO:
+    if (writedb)
+    {
+    }
+}
+
+void Fighter::setBloodBits( std::string& bloodbit, bool writedb )
+{
+    size_t nbits = bloodbit.length();
+    if (!nbits)
+        return;
+
+    const char* pbits = bloodbit.c_str();
+    for (size_t i = 0; i < nbits && i < BLOODBIT_MAX; ++i)
+    {
+        _bloodbit[i] = pbits[i] - 0x30;
+    }
+
+    // TODO:
+    if (writedb)
+    {
+    }
+}
+
+void Fighter::setUpSkills( std::string& skill, bool writedb )
+{
+    size_t nsize = skill.length();
+    if (!nsize)
+        return;
+    StringTokenizer tk(skill, "|");
+    for (size_t i = 0; i < tk.count(); ++i)
+    {
+        _skill[i] = ::atoi(tk[i].c_str());
+    }
+
+    // TODO:
+    if (writedb)
+    {
+    }
+}
+
+void Fighter::setSkills( std::string& skills, bool writedb )
+{
+    size_t nsize = skills.length();
+    if (!nsize)
+        return;
+    StringTokenizer tk(skills, "|");
+    for (size_t i = 0; i < tk.count(); ++i)
+    {
+        _skills[i] = ::atoi(tk[i].c_str());
+    }
+
+    // TODO:
+    if (writedb)
+    {
+    }
+}
+
+void Fighter::setUpCittas( std::string& citta, bool writedb )
+{
+    size_t nsize = citta.length();
+    if (!nsize)
+        return;
+    StringTokenizer tk(citta, "|");
+    for (size_t i = 0; i < tk.count(); ++i)
+    {
+        _citta[i] = ::atoi(tk[i].c_str());
+    }
+
+    // TODO:
+    if (writedb)
+    {
+    }
+}
+
+void Fighter::setCittas( std::string& cittas, bool writedb )
+{
+    size_t nsize = cittas.length();
+    if (!nsize)
+        return;
+    StringTokenizer tk(cittas, "|");
+    for (size_t i = 0; i < tk.count(); ++i)
+    {
+        _cittas[i] = ::atoi(tk[i].c_str());
+    }
+
+    // TODO:
+    if (writedb)
+    {
     }
 }
 
