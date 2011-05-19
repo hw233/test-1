@@ -735,7 +735,10 @@ namespace GObject
 		if(writedb)
 		{
 			UInt32 p = static_cast<UInt32>(fgt->getPotential() * 100);
-			DB().PushUpdateData("REPLACE INTO `fighter` (`id`, `playerId`, `potential`, `level`, `experience`) VALUES(%u, %"I64_FMT"u, %u.%02u, %u, %u)", id, getId(), p / 100, p % 100, fgt->getLevel(), fgt->getExp());
+			UInt32 c = static_cast<UInt32>(fgt->getCapacity() * 100);
+			DB().PushUpdateData("REPLACE INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
+                    VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
+                    id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 		}
 	}
 

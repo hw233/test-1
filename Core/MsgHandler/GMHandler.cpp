@@ -987,6 +987,11 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
 void addSuperClass( GObject::Player * player, UInt32 id )
 {
 	GObject::Fighter * fgt = player->takeFighter(id);
+    if (!fgt)
+    {
+        WARN_LOG("get fighter by id");
+        return;
+    }
 	UInt64 exp = GData::expTable.getLevelMin(100);
 	fgt->addExp(exp);
 	makeSuper(fgt);

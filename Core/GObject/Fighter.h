@@ -72,8 +72,9 @@ public:
     inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessAndLevel() { return _peerless; }
 
-    bool setBloodBit(UInt8 idx, UInt8 v);
-    bool incBloodBit(UInt8 idx);
+    inline UInt8 getBloodCntMax() { return 3; }
+    bool setBloodBit(int idx, UInt8 v, bool = true);
+    bool incBloodBit(int idx, bool = true);
 
     inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _bloodbit[idx] : static_cast<UInt8>(-1); }
     void getAllBloodBits(Stream& st);
@@ -148,7 +149,9 @@ public:
 	inline ItemEquip * getRing() { return _ring; }
 
 	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < TRUMP_UPMAX) ? _trump[idx] : 0; }
+    inline int getMaxTrumps () { return TRUMP_UPMAX; }
     UInt32 getTrumpId(int idx);
+    int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
 
 	UInt32 getMaxHP();
@@ -178,7 +181,9 @@ public:
 	ItemArmor * setArmor(int idx, ItemArmor * a, bool = true);
 	ItemEquip * setAmulet(ItemEquip * a, bool = true);
 	ItemEquip * setRing(ItemEquip * r, bool = true);
-	ItemEquip * setTrump(std::string& trumps, bool = true);
+	ItemEquip ** setTrump(std::string& trumps, bool = true);
+    ItemEquip* setTrump( UInt32 trump, int idx, bool = true);
+    ItemEquip* setTrump( ItemEquip* trump, int idx, bool = true);
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
@@ -242,6 +247,24 @@ protected:
 			rebuildBattlePoint();
 		}
 	}
+
+    template <typename T>
+    bool value2string(T* values, int size, std::string& str)
+    {
+        if (!values || size)
+            return false;
+
+        char buf[256] = {0};
+        char* pbuf = buf;
+        char* pend = &buf[sizeof(buf)-1];
+        for (int i = 0; i < size; ++i)
+        {
+            pbuf += snprintf(pbuf, pend - pbuf, "%u", values[i]);
+            if (i < size - 1)
+                pbuf += snprintf(pbuf, pend - pbuf, "|");
+        }
+        return true;
+    }
 
 protected:
 	UInt32 _id;

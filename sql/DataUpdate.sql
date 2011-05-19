@@ -174,6 +174,7 @@ INSERT INTO `map_spot` VALUES (5137,'灵翠峰',9,0,0,0);
 INSERT INTO `map_spot` VALUES (5138,'万佛顶',9,0,0,0);
 INSERT INTO `map_spot` VALUES (5139,'去都天烈火阵',8,0,0,0);
 INSERT INTO `map_spot` VALUES (5140,'去青城山',8,0,0,0);
+INSERT INTO `map_spot` VALUES (5141,'国战',8,1,0,0);
 UNLOCK TABLES;
 
 LOCK TABLES `special_fighter_template` WRITE;

@@ -238,6 +238,34 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
 			DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
 		return;
+    case 5:
+		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
+			DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+        return;
+    case 0x29:
+        {
+        }
+        break;
+    case 0x30: // trump
+        {
+            UInt32 trumps[TRUMP_UPMAX] = {0};
+            if (getAllTrumpId(trumps)) {
+                std::string str;
+                if (value2string(trumps, TRUMP_UPMAX, str)) {
+                    DB().PushUpdateData("UPDATE `fighter` SET `trump` = %s WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                }
+            }
+        }
+        break;
+#if 0
+    case 0x31:
+        {
+			DB().PushUpdateData("UPDATE `fighter` SET `skill` = %s WHERE `id` = %u AND `playerId` = %"I64_FMT"u",
+                    value2string(_skill, SKILL_UPMAX).c_str(), _id, _owner->getId());
+        }
+        break;
+#endif
+
 	case 0x11: field = "skill"; break;
 	case 0x21: field = "weapon"; break;
 	case 0x22: field = "armor1"; break;
@@ -396,9 +424,70 @@ ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 	return rr;
 }
 
-ItemEquip * Fighter::setTrump( std::string& trumps, bool writedb )
+ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
 {
-    return 0;
+    if (!trumps.length())
+        return 0;
+
+    StringTokenizer tk(trumps, "|");
+    for (size_t i = 0; i < tk.count() && i < TRUMP_UPMAX; ++i)
+    {
+        setTrump(::atoi(tk[i].c_str()), i, writedb);
+    }
+
+    return &_trump[0];
+}
+
+ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
+{
+    ItemEquip* t = 0;
+    t = GObjectManager::fetchEquipment(trump);
+    return setTrump(t, idx, writedb);
+}
+
+ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
+{
+    ItemEquip* t = 0;
+    if (idx >= 0 && idx < TRUMP_UPMAX)
+    {
+        if
+            (
+                (!_trump[idx] && trump) ||
+                (
+                    _trump[idx] &&
+                    (
+                        (trump && _trump[idx]->getId() != trump->getId()) ||
+                        !trump
+                    )
+                )
+            )
+        {
+            t = _trump[idx];
+            _trump[idx] = trump;
+            if (writedb)
+            {
+                _attrDirty = true;
+                _bPDirty = true;
+                sendModification(0x30, _trump[idx], writedb);
+            }
+        }
+    }
+    return t;
+}
+
+int Fighter::getAllTrumpId( UInt32* trumps, int size )
+{
+    if (!trumps || !size)
+        return 0;
+
+    for (int i = 0; i < TRUMP_UPMAX; ++i)
+    {
+        if (_trump[i])
+            trumps[i] = _trump[i]->getId();
+        else
+            trumps[i] = 0;
+    }
+    return TRUMP_UPMAX;
 }
 
 void Fighter::setCurrentHP( UInt16 hp, bool writedb )
@@ -476,8 +565,10 @@ void Fighter::setPotential( float p, bool writedb )
 void Fighter::setCapacity( float c, bool writedb )
 {
     _capacity = c;
-    // TODO:
-    if (writedb) {
+    if (writedb && _owner) {
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModification(5, static_cast<UInt32>(c * 100 + 0.5f));
     }
 }
 
@@ -964,20 +1055,44 @@ void Fighter::setPeerless( UInt16 peerless, bool writedb )
 
 void Fighter::setBloodBits( std::string& bloodbit, bool writedb )
 {
-    size_t nbits = bloodbit.length();
-    if (!nbits)
+    if (!bloodbit.length())
         return;
 
-    const char* pbits = bloodbit.c_str();
-    for (size_t i = 0; i < nbits && i < BLOODBIT_MAX; ++i)
+    StringTokenizer tk(bloodbit, "|");
+    for (size_t i = 0; i < tk.count() && i < BLOODBIT_MAX; ++i)
     {
-        _bloodbit[i] = pbits[i] - 0x30;
+        setBloodBit(::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
     }
 
-    // TODO:
-    if (writedb)
+}
+
+bool Fighter::setBloodBit( int idx, UInt8 v, bool writedb )
+{
+    if (idx >= 0  && idx < BLOODBIT_MAX && v <= getBloodCntMax())
     {
+        _bloodbit[idx] = v;
+        if (writedb)
+        {
+            _attrDirty = true;
+            _bPDirty = true;
+            // TODO:
+            //sendModification(0x29, _bloodbit[idx], writedb);
+        }
+        return true;
     }
+    return false;
+}
+
+bool Fighter::incBloodBit( int idx, bool writedb )
+{
+    if (idx >= 0 && idx < BLOODBIT_MAX)
+    {
+        if (_bloodbit[idx] < getBloodCntMax())
+        {
+            return setBloodBit(idx, _bloodbit[idx]+1, writedb);
+        }
+    }
+    return false;
 }
 
 void Fighter::setUpSkills( std::string& skill, bool writedb )
