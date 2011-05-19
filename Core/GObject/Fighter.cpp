@@ -40,7 +40,7 @@ bool existGreatFighter(UInt32 id)
 
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _isMale(true), _class(0), _level(1), _exp(0), _potential(1.0f),_capacity(1.0f),
-	_color(2), _hp(0), _peerless(0), _skillup(0), _cittaup(0), _weapon(NULL), _ring(NULL), _amulet(NULL),
+	_color(2), _hp(0), _peerless(0), _weapon(NULL), _ring(NULL), _amulet(NULL),
 	_attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
 	favor(0), reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0),
 	attack(0), defend(0), maxhp(0), action(0), hitrate(0), evade(0), critical(0), pierce(0), counter(0)
@@ -228,6 +228,17 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 			DB().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - 0x40);
 		return;
 	}
+    if (t >= 0x50 && t < 0x50 + TRUMP_UPMAX)
+    {
+        UInt32 trumps[TRUMP_UPMAX] = {0};
+        if (getAllTrumpId(trumps)) {
+            std::string str;
+            if (value2string(trumps, TRUMP_UPMAX, str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `trump` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
+        }
+    }
+
 	switch(t)
 	{
 	case 1: field = "hp"; break;
@@ -242,29 +253,23 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
 			DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
         return;
+
     case 0x29:
         {
-        }
-        break;
-    case 0x30: // trump
-        {
-            UInt32 trumps[TRUMP_UPMAX] = {0};
-            if (getAllTrumpId(trumps)) {
-                std::string str;
-                if (value2string(trumps, TRUMP_UPMAX, str)) {
-                    DB().PushUpdateData("UPDATE `fighter` SET `trump` = %s WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
-                }
+            std::string str;
+            if (value2string(_bloodbit, BLOODBIT_MAX, str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `bloodbit` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
-#if 0
-    case 0x31:
+    case 0x30:
         {
-			DB().PushUpdateData("UPDATE `fighter` SET `skill` = %s WHERE `id` = %u AND `playerId` = %"I64_FMT"u",
-                    value2string(_skill, SKILL_UPMAX).c_str(), _id, _owner->getId());
+            std::string str;
+            if (value2string(_skill, getUpSkillsNum(), str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
         }
         break;
-#endif
 
 	case 0x11: field = "skill"; break;
 	case 0x21: field = "weapon"; break;
@@ -287,6 +292,50 @@ void Fighter::sendModification( UInt8 t, UInt64 v )
 {
 	sendModification(1, &t, &v);
 }
+
+void Fighter::sendModificationBloodBit( UInt8 t, int idx, bool writedb )
+{
+	if(_owner == NULL)
+		return;
+	Stream st(0x21);
+	st << getId() << static_cast<UInt8>(1) << t;
+    st << static_cast<UInt8>(idx) << _bloodbit[idx];
+    if (writedb)
+    {
+        updateToDB(t, 0);
+    }
+	st << Stream::eos;
+	_owner->send(st);
+}
+
+void Fighter::sendModificationUpSkill( UInt8 t, UInt16 skill, int idx, bool writedb)
+{
+	if(_owner == NULL)
+		return;
+	Stream st(0x21);
+	st << getId() << static_cast<UInt8>(1) << t;
+    st << static_cast<UInt8>(idx) << skill;
+    if (writedb)
+    {
+        updateToDB(t, 0);
+    }
+	st << Stream::eos;
+	_owner->send(st);
+}
+
+#if 0
+void Fighter::sendModificationSkills()
+{
+}
+
+void Fighter::sendModificationUpCitta()
+{
+}
+
+void Fighter::sendModificationCittas()
+{
+}
+#endif
 
 void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 {
@@ -468,7 +517,7 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
             {
                 _attrDirty = true;
                 _bPDirty = true;
-                sendModification(0x30, _trump[idx], writedb);
+                sendModification(0x50+idx, _trump[idx], writedb);
             }
         }
     }
@@ -974,20 +1023,23 @@ void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
-    st << _skillup;
-    for (int i = 0; i < _skillup; ++i)
+    int skills = getUpSkillsNum();
+    st << skills;
+    for (int i = 0; i < skills; ++i)
     {
-        st << _skill[i];
+        if (_skill[i])
+            st << _skill[i];
     }
 }
 
 void Fighter::getAllSkillsAndLevel( Stream& st )
 {
-    int skills = getSkills();
+    int skills = getSkillsNum();
     st << skills;
     for (int i = 0; i < skills; ++i)
     {
-        st << _skills[i];
+        if (_skills[i])
+            st << _skills[i];
     }
 }
 
@@ -1000,10 +1052,12 @@ void Fighter::getAllSkillAndLevel( Stream& st )
 
 void Fighter::getAllUpCittaAndLevel( Stream& st )
 {
-    st << _cittaup;
-    for (int i = 0; i < _cittaup; ++i)
+    UInt8 cittas = getUpCittasNum();
+    st << cittas;
+    for (int i = 0; i < cittas; ++i)
     {
-        st << _citta[i];
+        if (_citta[i])
+            st << _citta[i];
     }
 }
 
@@ -1013,7 +1067,8 @@ void Fighter::getAllCittasAndLevel( Stream& st )
     st << cittas;
     for (int i = 0; i < cittas; ++i)
     {
-        st << _cittas[i];
+        if (_cittas[i])
+            st << _cittas[i];
     }
 }
 
@@ -1030,6 +1085,8 @@ UInt32 Fighter::getTrumpId( int idx )
 
 void Fighter::getAllTrumps( Stream& st )
 {
+    // XXX: append to armor
+    // st << TRUMP_UPMAX;
     for (int i = 0; i < TRUMP_UPMAX; ++i)
     {
         st << getTrumpId(i);
@@ -1075,8 +1132,7 @@ bool Fighter::setBloodBit( int idx, UInt8 v, bool writedb )
         {
             _attrDirty = true;
             _bPDirty = true;
-            // TODO:
-            //sendModification(0x29, _bloodbit[idx], writedb);
+            sendModificationBloodBit(0x29, idx, writedb);
         }
         return true;
     }
@@ -1097,19 +1153,79 @@ bool Fighter::incBloodBit( int idx, bool writedb )
 
 void Fighter::setUpSkills( std::string& skill, bool writedb )
 {
-    size_t nsize = skill.length();
-    if (!nsize)
+    if (!skill.length())
         return;
-    StringTokenizer tk(skill, "|");
-    for (size_t i = 0; i < tk.count(); ++i)
-    {
-        _skill[i] = ::atoi(tk[i].c_str());
-    }
 
-    // TODO:
-    if (writedb)
+    StringTokenizer tk(skill, "|");
+    for (size_t i = 0; i < tk.count() && i < SKILL_UPMAX; ++i)
     {
+        upSkill(::atoi(tk[i].c_str()), writedb);
     }
+}
+
+UInt8 Fighter::hasSkill( UInt16 skill )
+{
+    for (size_t i = 0; i < _skills.size(); ++i)
+    {
+        if (_skills[i] == skill)
+            return static_cast<UInt8>(i);
+    }
+    return static_cast<UInt8>(-1);
+}
+
+UInt8 Fighter::isSkillUp(UInt16 skill)
+{
+    for (int i = 0; i < SKILL_UPMAX; ++i)
+    {
+        if (skill == _skill[i])
+            return static_cast<UInt8>(i);
+    }
+    return static_cast<UInt8>(-1);
+}
+
+int Fighter::getUpSkillsNum()
+{
+    int c = 0;
+    for (int i = 0; i < SKILL_UPMAX; ++i)
+    {
+        if (_skill[i])
+            ++c;
+    }
+    return c;
+}
+
+bool Fighter::upSkill( UInt16 skill, bool writedb )
+{
+    int idx = getUpSkillsNum();
+    if (idx < SKILL_UPMAX && static_cast<UInt8>(-1) == isSkillUp(skill) &&
+            static_cast<UInt8>(-1) != hasSkill(skill))
+    {
+        _skill[idx] = skill;
+
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModificationUpSkill(0x30, skill, idx, writedb);
+        return true;
+    }
+    return false;
+}
+
+bool Fighter::offSkill( UInt16 skill, bool writedb )
+{
+    UInt8 idx = isSkillUp(skill);
+    if (static_cast<UInt8>(-1) != idx)
+    {
+        _skill[idx] = 0;
+        for (int i = idx; i < SKILL_UPMAX - 1; ++i)
+        {
+            _skill[i] = _skill[i+1];
+        }
+
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModificationUpSkill(0x30, 0, idx, writedb);
+    }
+    return false;
 }
 
 void Fighter::setSkills( std::string& skills, bool writedb )
@@ -1120,7 +1236,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     StringTokenizer tk(skills, "|");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        _skills[i] = ::atoi(tk[i].c_str());
+        _skills.push_back(::atoi(tk[i].c_str()));
     }
 
     // TODO:
@@ -1131,9 +1247,9 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
 void Fighter::setUpCittas( std::string& citta, bool writedb )
 {
-    size_t nsize = citta.length();
-    if (!nsize)
+    if (!citta.length())
         return;
+
     StringTokenizer tk(citta, "|");
     for (size_t i = 0; i < tk.count(); ++i)
     {
@@ -1148,19 +1264,30 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
 
 void Fighter::setCittas( std::string& cittas, bool writedb )
 {
-    size_t nsize = cittas.length();
-    if (!nsize)
+    if (!cittas.length())
         return;
+
     StringTokenizer tk(cittas, "|");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        _cittas[i] = ::atoi(tk[i].c_str());
+        _cittas.push_back(::atoi(tk[i].c_str()));
     }
 
     // TODO:
     if (writedb)
     {
     }
+}
+
+UInt8 Fighter::getUpCittasNum()
+{
+    UInt8 c = 0;
+    for (int i = 0; i < CITTA_UPMAX; ++i)
+    {
+        if (_citta[i])
+            ++c;
+    }
+    return c;
 }
 
 Fighter * GlobalFighters::getRandomOut()

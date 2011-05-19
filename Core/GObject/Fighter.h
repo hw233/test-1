@@ -90,31 +90,26 @@ public:
     // 学习技能
 	bool learnSkill(UInt16 skill);
     // 装备技能
-    void upSkill(UInt16 skill, bool = true);
+    bool upSkill(UInt16 skill, bool = true);
     // 卸下技能
-    void offSkill(UInt16 skill);
-    // 交换两个技能顺序
-    void swapSkill(UInt8 idx1, UInt8 idx2, bool = true);
-    // 通过索引装备技能
-    void upSkillByIdx(UInt16 skill, bool = true);
+    bool offSkill(UInt16 skill, bool = true);
     // 升级技能
 	bool skillLevelUp(UInt16 skill, UInt8 lv);
-    // 通过索引升级技能
-	bool skillLevelUpByIdx(UInt8 , UInt8 lv);
     // 是否学会此技能
     UInt8 hasSkill(UInt16 skill);
     // 是否装备此技能
-    UInt8 isKillUp(UInt16 skill);
+    UInt8 isSkillUp(UInt16 skill);
     // 通过索引卸下技能
-    void offSkillByIdx(UInt8 idx);
+    bool offSkillByIdx(UInt8 idx);
+    // 取得装备的技能个数
+    int getUpSkillsNum();
 
-    inline UInt8 getUpSkills() { return _skillup; }
     inline UInt8 getUpMaxSkills() { return SKILL_UPMAX; }
 	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
 	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
 
-    inline UInt8 getSkills() { return _skills.size(); }
+    inline UInt8 getSkillsNum() { return _skills.size(); }
 
     // 取得所有装备的技能和等级
     void getAllUpSkillAndLevel(Stream& st);
@@ -130,7 +125,7 @@ public:
 
     UInt8 hasCitta(UInt16 citta);
     UInt8 isCittaUp(UInt16 citta);
-    inline UInt8 getUpCittas() { return _cittaup; }
+    inline UInt8 getUpCittasNum();
     inline UInt8 getUpMaxCittas() { return CITTA_UPMAX; }
 	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] / CITTA_LEVEL_MAX : 0; }
 	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] % CITTA_LEVEL_MAX : 0; }
@@ -162,6 +157,11 @@ public:
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
+    void sendModificationBloodBit(UInt8 t, int idx, bool = true);
+    void sendModificationUpSkill(UInt8 t, UInt16 skill, int idx, bool = true);
+    void sendModificationUpCitta(UInt8 t, int idx, bool = true);
+    void sendModificationUpSkills(UInt8 t, int idx, bool = true);
+    void sendModificationUpCittas(UInt8 t, int idx, bool = true);
 	void updateToDB(UInt8 t, UInt64 v);
 
 	UInt32 getBuffData(UInt8 idx, UInt32 now = TimeUtil::Now());
@@ -263,6 +263,9 @@ protected:
             if (i < size - 1)
                 pbuf += snprintf(pbuf, pend - pbuf, "|");
         }
+
+        if (pbuf != buf)
+            str = buf;
         return true;
     }
 
@@ -286,11 +289,9 @@ protected:
     UInt8 _bloodbit[BLOODBIT_MAX];    // 血道
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
-    UInt8 _skillup;                 // 装备的技能个数
     std::vector<UInt16> _skills;    // 学会的技能
 
     UInt16 _citta[CITTA_UPMAX];  // 装备的心法
-    UInt8 _cittaup;              // 装备的心法个数
     std::vector<UInt16> _cittas; // 学会的心法
 
 	ItemWeapon * _weapon;

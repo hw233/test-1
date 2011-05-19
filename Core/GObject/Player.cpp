@@ -747,11 +747,8 @@ namespace GObject
 		if(!_isOnline)
 			return;
 		Stream st(0x28);
-		st << static_cast<UInt16>(fgt->getId()) << fgt->getUpSkills();
-        for (size_t i = 0; i < fgt->getUpSkills(); ++i)
-        {
-            st << fgt->getUpSkillAndLevel(i);
-        }
+		st << static_cast<UInt16>(fgt->getId());
+        fgt->getAllUpSkillAndLevel(st);
         // TODO: all skills and cittas
         st << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
 		st << Stream::eos;

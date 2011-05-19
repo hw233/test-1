@@ -126,11 +126,8 @@ void BattleSimulator::start()
 
 					_packet << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
                     // TODO: up skills
-					_packet << static_cast<UInt16>(bf->getHitrate() * 100.0f) << static_cast<UInt16>(bf->getEvade() * 100.0f) << static_cast<UInt16>(bf->getCritical() * 100.0f) << static_cast<UInt16>(bf->getPierce() * 100.0f) << static_cast<UInt16>(bf->getCounter() * 100.0f) << bf->getFighter()->getUpSkills();
-                    for (size_t i = 0; i < bf->getFighter()->getUpSkills(); ++i)
-                    {
-                        _packet << bf->getFighter()->getUpSkillAndLevel(i);
-                    }
+					_packet << static_cast<UInt16>(bf->getHitrate() * 100.0f) << static_cast<UInt16>(bf->getEvade() * 100.0f) << static_cast<UInt16>(bf->getCritical() * 100.0f) << static_cast<UInt16>(bf->getPierce() * 100.0f) << static_cast<UInt16>(bf->getCounter() * 100.0f);
+                    bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     
 					if(ismain)
 					{

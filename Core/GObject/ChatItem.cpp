@@ -41,11 +41,8 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 	cid.st.init(0xF3);
     // XXX: 
 	cid.st << static_cast<UInt8>(0x02) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
-		<< player->getName() << fgt->getId() << fgt->getName() << fgt->getLevel() << fgt->getPotential() << fgt->getUpSkills();
-    for (size_t i = 0; i < fgt->getUpSkills(); ++i)
-    {
-        cid.st << fgt->getUpSkill(i);
-    }
+		<< player->getName() << fgt->getId() << fgt->getName() << fgt->getLevel() << fgt->getPotential();
+    fgt->getAllUpSkillAndLevel(cid.st);
 
 	Script::BattleFormula * bformula = Script::BattleFormula::getCurrent();
 	UInt16 str = static_cast<UInt16>(bformula->calcStrength(fgt));
