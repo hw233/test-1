@@ -80,31 +80,24 @@ public:
     void getAllBloodBits(Stream& st);
     void setBloodBits(std::string& bloodbit, bool = true);
 
-    // TODO:
-#if 0
-	void setSkillLevel(UInt8 level, bool = true);
-	void setSkillAndLevel(UInt16 data);
-	void setSkillAndLevel(UInt16 skill, UInt8 level, bool = true);
-#endif
-
     // 学习技能
 	bool learnSkill(UInt16 skill);
     // 装备技能
-    bool upSkill(UInt16 skill, bool = true);
+    bool upSkill(UInt16 skill, int idx, bool = true);
     // 卸下技能
     bool offSkill(UInt16 skill, bool = true);
     // 升级技能
 	bool skillLevelUp(UInt16 skill, UInt8 lv);
     // 是否学会此技能
-    UInt8 hasSkill(UInt16 skill);
+    int hasSkill(UInt16 skill);
     // 是否装备此技能
-    UInt8 isSkillUp(UInt16 skill);
+    int isSkillUp(UInt16 skill);
     // 通过索引卸下技能
     bool offSkillByIdx(UInt8 idx);
     // 取得装备的技能个数
     int getUpSkillsNum();
 
-    inline UInt8 getUpMaxSkills() { return SKILL_UPMAX; }
+    inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
 	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
 	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }

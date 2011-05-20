@@ -1103,10 +1103,14 @@ void Fighter::getAllBloodBits( Stream& st )
 
 void Fighter::setPeerless( UInt16 peerless, bool writedb )
 {
+    if (_peerless == peerless)
+        return;
     _peerless = peerless;
-    // TODO:
     if (writedb)
     {
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModification(0x11, peerless);
     }
 }
 
@@ -1157,25 +1161,25 @@ void Fighter::setUpSkills( std::string& skill, bool writedb )
         return;
 
     StringTokenizer tk(skill, "|");
-    for (size_t i = 0; i < tk.count() && i < SKILL_UPMAX; ++i)
+    for (size_t i = 0; i < tk.count() && i < getUpSkillsMax(); ++i)
     {
         upSkill(::atoi(tk[i].c_str()), writedb);
     }
 }
 
-UInt8 Fighter::hasSkill( UInt16 skill )
+int Fighter::hasSkill( UInt16 skill )
 {
     for (size_t i = 0; i < _skills.size(); ++i)
     {
         if (_skills[i] == skill)
-            return static_cast<UInt8>(i);
+            return static_cast<int>(i);
     }
-    return static_cast<UInt8>(-1);
+    return -1;
 }
 
-UInt8 Fighter::isSkillUp(UInt16 skill)
+int Fighter::isSkillUp(UInt16 skill)
 {
-    for (int i = 0; i < SKILL_UPMAX; ++i)
+    for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (skill == _skill[i])
             return static_cast<UInt8>(i);
@@ -1186,7 +1190,7 @@ UInt8 Fighter::isSkillUp(UInt16 skill)
 int Fighter::getUpSkillsNum()
 {
     int c = 0;
-    for (int i = 0; i < SKILL_UPMAX; ++i)
+    for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (_skill[i])
             ++c;
@@ -1194,38 +1198,76 @@ int Fighter::getUpSkillsNum()
     return c;
 }
 
-bool Fighter::upSkill( UInt16 skill, bool writedb )
+bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
 {
-    int idx = getUpSkillsNum();
-    if (idx < SKILL_UPMAX && static_cast<UInt8>(-1) == isSkillUp(skill) &&
-            static_cast<UInt8>(-1) != hasSkill(skill))
-    {
-        _skill[idx] = skill;
+    if (!(idx >= 0 && idx < getUpSkillsMax())) // dst
+        return false;
 
+    bool ret = false;
+    int src = isSkillUp(skill);
+    if (src < 0)
+    {
+        int i = getUpSkillsNum();
+        if (i < getUpSkillsMax())
+        {
+            for (int j = getUpSkillsMax() - 1; j >= idx+1; ++j)
+            {
+                _skill[j] = _skill[j-1];;
+                _skill[j-1] = 0;
+            }
+            _skill[i] = skill;
+            idx = i;
+            ret = true;
+        }
+        else
+        {
+            _skill[idx] = skill;
+            ret = true;
+        }
+    }
+    else
+    {
+        if (src != idx)
+        {
+            if (_skill[idx])
+            { // swap
+                sendModificationUpSkill(0x30, _skill[idx], src, false);
+
+                _skill[src] ^= _skill[idx];
+                _skill[idx] ^= _skill[src];
+                _skill[src] ^= _skill[idx];
+                ret = true;
+            }
+        }
+    }
+
+    if (ret)
+    {
         _attrDirty = true;
         _bPDirty = true;
         sendModificationUpSkill(0x30, skill, idx, writedb);
-        return true;
     }
-    return false;
+
+    return ret;
 }
 
 bool Fighter::offSkill( UInt16 skill, bool writedb )
 {
-    UInt8 idx = isSkillUp(skill);
-    if (static_cast<UInt8>(-1) != idx)
-    {
-        _skill[idx] = 0;
-        for (int i = idx; i < SKILL_UPMAX - 1; ++i)
-        {
-            _skill[i] = _skill[i+1];
-        }
+    int idx = isSkillUp(skill);
+    if (idx < 0)
+        return false;
 
-        _attrDirty = true;
-        _bPDirty = true;
-        sendModificationUpSkill(0x30, 0, idx, writedb);
+    _skill[idx] = 0;
+    for (int i = idx; i < getUpSkillsMax() - 1; ++i)
+    {
+        _skill[i] = _skill[i+1];
+        _skill[i+1] = 0;
     }
-    return false;
+
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModificationUpSkill(0x30, 0, idx, writedb);
+    return true;
 }
 
 void Fighter::setSkills( std::string& skills, bool writedb )
