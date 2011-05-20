@@ -155,19 +155,23 @@ struct DetachGemReq
 	MESSAGE_DEF4(0x44, UInt16, _fighterId, UInt32, _itemid, UInt8, _pos, UInt8, _protect);
 };
 
+#if 0
 struct SplitReq
 {
 	UInt32 _itemid;
 	UInt8 _protect;
 	MESSAGE_DEF2(0x45, UInt32, _itemid, UInt8, _protect);
 };
+#endif
 
+#if 0
 struct ExchangeReq
 {
 	typedef Array<UInt32, 5> ExchangeItemType;
 	UInt32 _itemid[5];
 	MESSAGE_DEF1(0x46, ExchangeItemType, _itemid);
 };
+#endif
 
 struct ForgeReq
 {
@@ -186,6 +190,7 @@ struct ForgeAnswerReq
 	MESSAGE_DEF3(0x48, UInt16, _fighterId, UInt32, _itemid, UInt8, _answer);
 };
 
+#if 0
 struct ExchangeSetReq
 {
 	typedef Array<UInt32, 3> ExchangeSetItemType;
@@ -193,7 +198,9 @@ struct ExchangeSetReq
 	UInt8 _flag;
 	MESSAGE_DEF2(0x4A, ExchangeSetItemType, _itemid, UInt8, _flag);
 };
+#endif
 
+#if 0
 struct ActivateAttrReq
 {
 	UInt16 _fighterId;
@@ -201,6 +208,7 @@ struct ActivateAttrReq
 	UInt32 _itemId2;
 	MESSAGE_DEF3(0x4C, UInt16, _fighterId, UInt32, _itemId, UInt32, _itemId2);
 };
+#endif
 
 struct OutCitySwitchStruct
 {
@@ -1339,6 +1347,7 @@ void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
 	player->send(st);
 }
 
+#if 0
 void OnSplitReq( GameMsgHdr& hdr, SplitReq& sr )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1347,12 +1356,14 @@ void OnSplitReq( GameMsgHdr& hdr, SplitReq& sr )
 	Stream st(0x45);
 	UInt32 enchangId = 0;
 	UInt8 count = 0;
-	UInt8 r = player->GetPackage()->Split(sr._itemid, enchangId, count, sr._protect > 0);
+	UInt8 r = player->GetPackage()->Split(sr._itemid, enchangId, count /*sr._protect > 0*/);
 	st << r << static_cast<UInt16>(enchangId) << count << Stream::eos;
 	player->send(st);
     GameAction()->RunOperationTaskAction1(player, 1, 1);
 }
+#endif
 
+#if 0
 void OnExchangeReq( GameMsgHdr& hdr, ExchangeReq& er )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1365,6 +1376,7 @@ void OnExchangeReq( GameMsgHdr& hdr, ExchangeReq& er )
 	player->send(st);
 	//GameAction()->onExchange(player);
 }
+#endif
 
 void OnForgeReq( GameMsgHdr& hdr, ForgeReq& fr )
 {
@@ -1378,6 +1390,7 @@ void OnForgeReq( GameMsgHdr& hdr, ForgeReq& fr )
 	player->send(st);
 }
 
+#if 0
 void OnExchangeSetReq( GameMsgHdr& hdr, ExchangeSetReq& esr )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1389,6 +1402,7 @@ void OnExchangeSetReq( GameMsgHdr& hdr, ExchangeSetReq& esr )
 	st << r << rid << Stream::eos;
 	player->send(st);
 }
+#endif
 
 void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 {
@@ -1408,7 +1422,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 		br >> itemId;
 		UInt32 outId;
 		UInt8 outCount;
-		if(pkg->Split(itemId, outId, outCount, false, true) < 2)
+		if(pkg->Split(itemId, outId, outCount, /*false,*/ true) < 2)
 		{
 			switch(outId)
 			{
@@ -1473,6 +1487,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, const void * data )
 	player->send(st);
 }
 
+#if 0
 void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1482,6 +1497,7 @@ void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 	st << player->GetPackage()->ActivateAttr(aar._fighterId, aar._itemId, aar._itemId2) << aar._fighterId << aar._itemId << Stream::eos;
 	player->send(st);
 }
+#endif
 
 void OutCitySwitchReq( GameMsgHdr& hdr, OutCitySwitchStruct& lms )
 {
