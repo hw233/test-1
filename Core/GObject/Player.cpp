@@ -981,11 +981,12 @@ namespace GObject
 	void Player::makeFighterInfo( Stream& st, Fighter * fgt, bool withequip )
 	{
 		st << static_cast<UInt16>(fgt->getId()) << fgt->getPotential()
-            << fgt->getCapacity() << fgt->getLevel() << fgt->getExp();
-		st << fgt->getPeerlessAndLevel() << fgt->getPExp() << fgt->getCurrentHP();
+            << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getPExp();
+		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP();
 		if(withequip)
 		{
-			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1) << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
+			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)
+                << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getRingId() << fgt->getAmuletId();
             fgt->getAllTrumps(st);
             fgt->getAllBloodBits(st);

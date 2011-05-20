@@ -148,6 +148,7 @@ struct DBFighter
     Int16 will;                 // 意志
     Int16 soul;                 // 元神力
     Int16 aura;                 // 灵气/士气
+    Int16 tough;                // 坚韧
     Int16 attack;               // 物理攻击
     Int16 img_attack;           // 法术攻击
     Int16 defend;               // 物理防御
@@ -159,7 +160,6 @@ struct DBFighter
     float evade;                // 闪躲
     float critical;             // 暴击
     float critical_dmg;         // 暴击伤害
-    float tough;                // 坚韧
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击
     float img_res;              // 法术抵抗
@@ -710,6 +710,7 @@ SPECIALDEF(32)
 	Int16, will,
 	Int16, soul,
 	Int16, aura,
+	Int16, tough,
 	Int16, attack,
 	Int16, img_attack,
 	Int16, defend,
@@ -721,7 +722,6 @@ SPECIALDEF(32)
 	float, evade,
 	float, critical,
 	float, critical_dmg,
-	float, tough,
 	float, pierce,
 	float, counter,
 	float, img_res,

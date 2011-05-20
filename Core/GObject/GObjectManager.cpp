@@ -226,7 +226,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `tough`, `pierce`, `counter`, `img_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `img_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;

@@ -28,6 +28,12 @@ namespace GObject
 #define TRUMP_UPMAX 3
 #define BLOODBIT_MAX 15
 
+#define SKILL_LEVEL(x)  ((x)%SKILL_LEVEL_MAX)
+#define SKILL_ID(x) ((x)/SKILL_LEVEL_MAX)
+
+#define CITTA_LEVEL(x) ((x)%CITTA_LEVEL_MAX)
+#define CITTA_ID(x) ((x)/CITTA_LEVEL_MAX)
+
 class Player;
 class Fighter
 {
@@ -44,7 +50,7 @@ public:
 
 	inline void setName(const std::string& s) {_name = s;}
 	inline void setClass(UInt8 c) {_class = c;}
-	inline void setMale(bool m) {_isMale = m;}
+    inline void setSex(UInt8 s) {_sex = s;}
 	inline void setLevel(UInt8 l) {_level = l;}
 	inline void setExp(UInt64 e) {_exp = e;}
     inline void setPExp(UInt64 e) { _pexp = e; }
@@ -55,8 +61,10 @@ public:
 	const std::string& getName();
 	const std::string& getBattleName();
 	inline UInt8 getClass() {return _class;}
-	inline UInt8 getClassAndSex() {return _isMale ? (_class - 1) : _class;}
-	inline bool isMale() {return _isMale;}
+	inline UInt8 getClassAndSex() {return _class<<4|_sex;}
+	inline bool isMale() {return _sex == 0;}
+	inline bool isBoy() {return _sex == 2;}
+    inline UInt8 getSex() {return _sex;}
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
@@ -96,6 +104,8 @@ public:
     bool offSkillByIdx(UInt8 idx);
     // 取得装备的技能个数
     int getUpSkillsNum();
+    
+    bool addNewSkill(UInt16 skill, bool = true);
 
     inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
 	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
@@ -113,17 +123,28 @@ public:
 
     void setUpSkills(std::string& skill, bool = true);
     void setSkills(std::string& skills, bool = true);
+
     void setUpCittas(std::string& citta, bool = true);
     void setCittas(std::string& cittas, bool = true);
 
-    UInt8 hasCitta(UInt16 citta);
-    UInt8 isCittaUp(UInt16 citta);
+    // 装备心法
+    bool upCitta(UInt16 citta, int idx, bool = true);
+    // 卸下心法
+    bool offCitta(UInt16 citta, bool = true);
+    // 增加一个心法
+    bool addNewCitta(UInt16 citta, bool = true);
+    // 删除一个心法
+    bool delCitta(UInt16 citta, bool = true);
+
+    int hasCitta(UInt16 citta);
+    int isCittaUp(UInt16 citta);
+
     inline UInt8 getUpCittasNum();
-    inline UInt8 getUpMaxCittas() { return CITTA_UPMAX; }
-	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] / CITTA_LEVEL_MAX : 0; }
-	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] % CITTA_LEVEL_MAX : 0; }
+    inline UInt8 getUpCittasMax() { return CITTA_UPMAX; }
+	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_ID(_citta[idx]) : 0; }
+	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_LEVEL(_citta[idx]) : 0; }
 	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] : 0; }
-    inline UInt8 getCittas() { return _cittas.size(); }
+    inline UInt8 getCittasNum() { return _cittas.size(); }
     // 取得所有装备的心法和等级
     void getAllUpCittaAndLevel(Stream& st);
     // 取得所有学习的心法和等级
@@ -146,15 +167,18 @@ public:
 
 	UInt32 regenHP(UInt32);
 	bool addExp(UInt64);
+
 	void sendModification(UInt8 t, UInt64 v);
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
     void sendModificationBloodBit(UInt8 t, int idx, bool = true);
+
     void sendModificationUpSkill(UInt8 t, UInt16 skill, int idx, bool = true);
-    void sendModificationUpCitta(UInt8 t, int idx, bool = true);
-    void sendModificationUpSkills(UInt8 t, int idx, bool = true);
-    void sendModificationUpCittas(UInt8 t, int idx, bool = true);
+    void sendModificationUpCitta(UInt8 t, UInt16 citta, int idx, bool = true);
+    void sendModificationSkills(UInt8 t, UInt16 skill, int idx, bool = true);
+    void sendModificationCittas(UInt8 t, UInt16 citta, int idx, bool = true);
+
 	void updateToDB(UInt8 t, UInt64 v);
 
 	UInt32 getBuffData(UInt8 idx, UInt32 now = TimeUtil::Now());
@@ -268,7 +292,7 @@ protected:
 	Player * _owner;
 
 	std::string _name;
-	bool _isMale;		// 是否男性
+    UInt8 _sex;         // 性别
 	UInt8 _class;
 	UInt8 _level;
 	UInt64 _exp;        // 经验
@@ -309,6 +333,10 @@ public:
 	Int32 physique;
 	Int32 agility;
 	Int32 intelligence;
+    Int32 will;
+    Int32 soul;
+    Int32 aura;
+    Int32 tough;
 	Int32 attack;
 	Int32 defend;
 	Int32 maxhp;
