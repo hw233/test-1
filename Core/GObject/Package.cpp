@@ -721,8 +721,6 @@ namespace GObject
 					if(item->getClass() != Item_Weapon)
 						return false;
 					GObject::ItemWeapon * wp = static_cast<GObject::ItemWeapon *>(item);
-					if(!wp->getWeaponDef().isClassWeapon(fgt->getClass()))
-						return false;
 					old = fgt->setWeapon(wp);
 				}
 				break;

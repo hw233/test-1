@@ -121,7 +121,7 @@ void BattleSimulator::start()
 					else
 						_packet << bf->getFighter()->getClassAndSex();
 					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << bf->getPortrait() << static_cast<UInt8>(bf->getFlag() & 0x03);
-					_packet << static_cast<UInt8>((bf->getFighter()->getColor() << 4) | (bf->getFighter()->getWeapon() ? static_cast<UInt8>(bf->getFighter()->getWeapon()->getWeaponDef().getId() & 0x0F) : static_cast<UInt8>(0)))
+					_packet << static_cast<UInt8>((bf->getFighter()->getColor() << 4) | (bf->getFighter()->getWeapon() ? /*TODO: no weapon_def static_cast<UInt8>(bf->getFighter()->getWeapon()->getWeaponDef().getId() & 0x0F)*/ 0 : static_cast<UInt8>(0)))
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
 					_packet << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
@@ -498,7 +498,8 @@ UInt32 BattleSimulator::doAttack( int pos )
 		GObject::ItemWeapon * weapon = bf->getFighter()->getWeapon();
 		if(weapon != NULL)
 		{
-			area = &weapon->getWeaponDef().getArea();
+            // TODO: no weapon_def
+			// area = &weapon->getWeaponDef().getArea();
 		}
 		else
 		{
@@ -784,7 +785,8 @@ UInt32 BattleSimulator::doAttack( int pos )
 				GData::Area * area2 = NULL;
 				if(tmp_bf->getFighter()->getWeapon() != NULL)
 				{
-					area2 = &tmp_bf->getFighter()->getWeapon()->getWeaponDef().getArea();
+                    // TODO: no weapon_def
+					// area2 = &tmp_bf->getFighter()->getWeapon()->getWeaponDef().getArea();
 				}
 				else
 				{

@@ -100,7 +100,7 @@ namespace GObject
 			: ItemEquip(id, itemArmorType, itemEquipData) 
 		{ }
 		inline UInt16 getAttack() { return static_cast<const GData::ItemWeaponType&>(_itemBaseType).value; } 
-		inline const GData::WeaponDef& getWeaponDef() { return static_cast<const GData::ItemWeaponType&>(_itemBaseType).wdef; }
+		inline UInt16 getAttack1() { return static_cast<const GData::ItemWeaponType&>(_itemBaseType).value1; } 
 	};
 
 	class ItemArmor : public ItemEquip
@@ -110,6 +110,7 @@ namespace GObject
 		    : ItemEquip(id, itemEquipType, itemEquipData) 
 		{ }
 		inline UInt16 getDefend() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).value; } 
+		inline UInt16 getDefend1() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).value1; } 
 	};
 }
 

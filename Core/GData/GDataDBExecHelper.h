@@ -26,19 +26,20 @@ struct DBWeaponDef
 
 struct DBItemType
 {
-	UInt32		typeId;
-	std::string	name;
-	UInt8		subClass;
-	UInt32		coin;
-	UInt16		reqLev;
-	UInt8		quality;
-	UInt16		maxQuantity;
-	UInt8		bindType;
-	UInt8		canDestroy;
-	UInt16		value;
-	UInt16		data;
-	UInt32		attr1Extra;
-	UInt32		attr2Extra;
+	UInt32		typeId;         // 物品编号
+	std::string	name;           // 名字
+	UInt8		subClass;       // 物品类型 - 
+	UInt32		coin;           // 品质颜色
+	UInt16		reqLev;         // 物品(可装备)等级
+	UInt8		quality;        // 品质
+	UInt16		maxQuantity;    // 
+	UInt8		bindType;       // 是否绑定
+	UInt8		canDestroy;     // 可否摧毁
+	UInt16		value;          // 属性值(物攻, 物防, 可使用道具:作用类型)
+	UInt16		value1;         // 属性值(法攻, 法防)
+	UInt16		data;           // 武器: 武器定义; 可使用道具: 作用数值 - DBWeaponDef
+	UInt32		attr1Extra;     // 一级属性附加
+	UInt32		attr2Extra;     // 二级属性附加
 };
 
 struct DBEquipSetType
@@ -55,20 +56,28 @@ struct DBAttr1Extra
 	std::string physique;
 	std::string agility;
 	std::string intelligence;
+    std::string will;
+    std::string soul;
+    std::string aura;
 };
 
 struct DBAttr2Extra
 {
 	UInt32 id;
 	std::string attack;
+	std::string img_attack;
 	std::string defend;
+	std::string img_defend;
 	std::string hp;
 	float action;
 	float hitrate;
 	float evade;
 	float critical;
+	float critical_dmg;
+	float tough;
 	float pierce;
 	float counter;
+	float img_res;
 };
 
 struct DBFormation
@@ -139,7 +148,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(13)
+SPECIALDEF(14)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -151,6 +160,7 @@ SPECIALDEF(13)
 	UInt8,		bindType,
 	UInt8,		canDestroy,
 	UInt16,		value,
+	UInt16,		value1,
 	UInt16,		data,
 	UInt32,		attr1Extra,
 	UInt32,		attr2Extra
@@ -170,29 +180,36 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBAttr1Extra)
-SPECIALDEF(5)
+SPECIALDEF(8)
 	(
 	UInt32, id,
 	std::string, strength,
 	std::string, physique,
 	std::string, agility,
-	std::string, intelligence
+	std::string, intelligence,
+    std::string, will,
+    std::string, soul,
+    std::string, aura
 	)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBAttr2Extra)
-SPECIALDEF(10)
+SPECIALDEF(14)
 	(
 	UInt32, id,
 	std::string, attack,
+	std::string, img_attack,
 	std::string, defend,
+	std::string, img_defend,
 	std::string, hp,
 	float, action,
 	float, hitrate,
 	float, evade,
 	float, critical,
+	float, critical_dmg,
 	float, pierce,
-	float, counter
+	float, counter,
+	float, img_res 
 	)
 SPECIALEND()
 

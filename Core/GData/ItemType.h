@@ -19,6 +19,7 @@ enum ItemClass
 	Item_Amulet,		//项链  项链
 	Item_Ring,			//戒指  戒指
 	Item_Favor,			//喜好品
+    Item_Trump,         //法宝
 	Item_Other,			//其他
 };
 inline bool IsEquipId(UInt32 id)
@@ -110,8 +111,9 @@ namespace GData
 	struct ItemEquipType : public ItemBaseType
 	{
 		UInt16		value;
+		UInt16		value1;
 		const Attr1Extra*	attr1Extra;
-		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt16 val = 0, UInt32 attr1Id = 0) : ItemBaseType(id, name), value(val)
+		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt16 val = 0, UInt16 val1 = 0, UInt32 attr1Id = 0) : ItemBaseType(id, name), value(val), value1(val1)
 		{
 			const Attr1ExtraItem * item1 = attr1ExtraManager[attr1Id];
 			if(item1 != NULL)
@@ -124,8 +126,7 @@ namespace GData
 
 	struct ItemWeaponType : public ItemEquipType
 	{
-		const WeaponDef& wdef;
-		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt16 val = 0, UInt32 attr1Id = 0, UInt8 wtype = 0 ) : ItemEquipType(id, name, val, attr1Id), wdef(*weaponDefManager[wtype]) {}
+		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt16 val = 0, UInt16 val1 = 0, UInt32 attr1Id = 0) : ItemEquipType(id, name, val, val1, attr1Id) {}
 	};
 
 	struct ItemEquipSetType:

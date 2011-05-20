@@ -174,7 +174,8 @@ bool BattleFighter::calcCounter(bool ranged)
 bool BattleFighter::canBeCounter()
 {
 	GObject::ItemWeapon * wp = _fighter->getWeapon();
-	return wp == NULL || wp->getWeaponDef().canCounter();
+	// TODO: no weapon_def return wp == NULL || wp->getWeaponDef().canCounter();
+	return wp == NULL;
 }
 
 bool BattleFighter::calcPierce()

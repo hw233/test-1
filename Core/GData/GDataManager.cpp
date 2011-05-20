@@ -216,7 +216,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttr1Extra a1e;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence` FROM `attr1_extra`", a1e) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura` FROM `attr1_extra`", a1e) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -225,23 +225,30 @@ namespace GData
 			SetValOrPercent(a1extra->_extra.physique, a1extra->_extra.physiqueP, a1e.physique);
 			SetValOrPercent(a1extra->_extra.agility, a1extra->_extra.agilityP, a1e.agility);
 			SetValOrPercent(a1extra->_extra.intelligence, a1extra->_extra.intelligenceP, a1e.intelligence);
+			SetValOrPercent(a1extra->_extra.will, a1extra->_extra.willP, a1e.will);
+			SetValOrPercent(a1extra->_extra.soul, a1extra->_extra.soulP, a1e.soul);
+			SetValOrPercent(a1extra->_extra.aura, a1extra->_extra.auraP, a1e.aura);
 			attr1ExtraManager.add(a1extra);
 		}
 		GData::DBAttr2Extra a2e;
-		if(execu->Prepare("SELECT `id`, `attack`, `defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter` FROM `attr2_extra`", a2e) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `img_res` FROM `attr2_extra`", a2e) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
 			Attr2ExtraItem * a2extra = new Attr2ExtraItem(a2e.id);
 			SetValOrPercent(a2extra->_extra.attack, a2extra->_extra.attackP, a2e.attack);
+			SetValOrPercent(a2extra->_extra.img_attack, a2extra->_extra.img_attackP, a2e.img_attack);
 			SetValOrPercent(a2extra->_extra.defend, a2extra->_extra.defendP, a2e.defend);
+			SetValOrPercent(a2extra->_extra.img_defend, a2extra->_extra.img_defendP, a2e.img_defend);
 			SetValOrPercent(a2extra->_extra.hp, a2extra->_extra.hpP, a2e.hp);
 			a2extra->_extra.action = a2e.action;
 			a2extra->_extra.hitrate = a2e.hitrate;
 			a2extra->_extra.evade = a2e.evade;
 			a2extra->_extra.critical = a2e.critical;
+			a2extra->_extra.critical_dmg = a2e.critical_dmg;
 			a2extra->_extra.pierce = a2e.pierce;
 			a2extra->_extra.counter = a2e.counter;
+			a2extra->_extra.img_res = a2e.img_res;
 			attr2ExtraManager.add(a2extra);
 		}
 		return true;
@@ -261,7 +268,7 @@ namespace GData
 			{
 			case Item_Weapon:
 				{
-					wt = new ItemWeaponType(idt.typeId, idt.name, idt.value, idt.attr1Extra, static_cast<UInt8>(idt.data));
+					wt = new ItemWeaponType(idt.typeId, idt.name, idt.value, idt.attr1Extra);
 					if(idt.typeId > 25000)
 					{
 						GObject::ItemEquipData ied;
