@@ -240,7 +240,7 @@ namespace GObject
 			fgt->setClass(dbfgt.cls);
 			fgt->setLevel(dbfgt.lvl);
 			fgt->setExp(GData::expTable.getLevelMin(fgt->getLevel()));
-			fgt->setMale(dbfgt.sex == 0);
+            fgt->setSex(dbfgt.sex);
 			ItemWeapon * nwp = GData::GDataManager::GetNpcWeapon(dbfgt.npc_weapon);
 			fgt->setWeapon(nwp, false);
             // TODO: 

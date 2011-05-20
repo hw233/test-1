@@ -228,6 +228,7 @@ namespace GData
 			SetValOrPercent(a1extra->_extra.will, a1extra->_extra.willP, a1e.will);
 			SetValOrPercent(a1extra->_extra.soul, a1extra->_extra.soulP, a1e.soul);
 			SetValOrPercent(a1extra->_extra.aura, a1extra->_extra.auraP, a1e.aura);
+			SetValOrPercent(a1extra->_extra.tough, a1extra->_extra.toughP, a1e.tough);
 			attr1ExtraManager.add(a1extra);
 		}
 		GData::DBAttr2Extra a2e;
@@ -259,7 +260,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `canDestroy`, `value`, `data`, `attr1Id`, `attr2Id` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `value`, `data`, `attr1Id`, `attr2Id` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -306,7 +307,6 @@ namespace GData
 			wt->quality = idt.quality;
 			wt->maxQuantity = idt.maxQuantity;
 			wt->bindType = idt.bindType;
-			wt->canDestroy = idt.canDestroy;
 			itemBaseTypeManager.add(wt);
 			itemBaseTypeNameManager.add(wt->getName(), wt);
 		}

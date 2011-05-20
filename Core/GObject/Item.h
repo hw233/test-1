@@ -28,7 +28,6 @@ namespace GObject
 
 		inline UInt16		getMaxQuantity() const	{ return _itemBaseType.maxQuantity; }
 		inline UInt8		getBindType() const	{ return _itemBaseType.bindType; }
-		inline bool			canDestroy() const	{ return _itemBaseType.canDestroy != 0; }
 
 		bool GetBindStatus() const { return m_BindStatus; }
 		inline bool  SetBindStatus(bool bindType)

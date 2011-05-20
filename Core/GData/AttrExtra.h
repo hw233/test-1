@@ -10,9 +10,9 @@ struct Attr1Extra
 {
 	Attr1Extra():
 		strength(0), physique(0), agility(0), intelligence(0),
-        will(0), soul(0), aura(0),
+        will(0), soul(0), aura(0), tough(0),
 		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
-        willP(0), soulP(0), auraP(0)
+        willP(0), soulP(0), auraP(0), toughP(0)
 	{ }
 	Attr1Extra& operator +=(const Attr1Extra& other)
 	{
@@ -23,6 +23,7 @@ struct Attr1Extra
 		will += other.will;
 		soul += other.soul;
 		aura += other.aura;
+		tough += other.tough;
 		strengthP += other.strengthP;
 		physiqueP += other.physiqueP;
 		agilityP += other.agilityP;
@@ -30,6 +31,7 @@ struct Attr1Extra
 		willP += other.willP;
 		soulP += other.soulP;
 		auraP += other.auraP;
+		toughP += other.toughP;
 		return *this;
 	}
 	inline void reset()
@@ -44,6 +46,7 @@ struct Attr1Extra
 	UInt16 will;
 	UInt16 soul;
 	UInt16 aura;
+	UInt16 tough;
 	float strengthP;
 	float physiqueP;
 	float agilityP;
@@ -51,6 +54,7 @@ struct Attr1Extra
 	float willP;
 	float soulP;
 	float auraP;
+	float toughP;
 };
 
 struct Attr2Extra

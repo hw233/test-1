@@ -71,7 +71,6 @@ namespace GData
 		UInt8		quality;
 		UInt16		maxQuantity;
 		UInt8		bindType;
-		UInt8		canDestroy;
 
 		ItemBaseType(UInt32 id = 0, const std::string& name = "") : ObjectBaseT<>(id, name)	{}
 		virtual ~ItemBaseType() { }	//RTTI

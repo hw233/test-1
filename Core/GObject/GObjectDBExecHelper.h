@@ -134,9 +134,9 @@ struct DBFighter
 {
     UInt32 id;                  // 将编号
     std::string name;           // 名字
-    UInt8 cls;                  // 职业/0-儒男 1-儒女 2-释男 3-释女 4-道男 5-道女 6-童男 7-童女(创建角色时没有此选项，但游戏中会出现)
+    UInt8 cls;                  // 职业:1-儒 2-释 3-道
     UInt8 lvl;                  // 等级*
-    UInt8 sex;                  // 性别
+    UInt8 sex;                  // 性别:0-男 1-女 2-童
     float potential;            // 资质*
     float capacity;             // 潜力*
     std::string skill;          // 技能/初始技能*, 一些比较牛的将可能会有多个初始技能

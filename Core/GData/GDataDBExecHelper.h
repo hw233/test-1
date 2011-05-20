@@ -34,10 +34,9 @@ struct DBItemType
 	UInt8		quality;        // 品质
 	UInt16		maxQuantity;    // 
 	UInt8		bindType;       // 是否绑定
-	UInt8		canDestroy;     // 可否摧毁
 	UInt16		value;          // 属性值(物攻, 物防, 可使用道具:作用类型)
 	UInt16		value1;         // 属性值(法攻, 法防)
-	UInt16		data;           // 武器: 武器定义; 可使用道具: 作用数值 - DBWeaponDef
+	UInt16		data;           // 可使用道具: 作用数值
 	UInt32		attr1Extra;     // 一级属性附加
 	UInt32		attr2Extra;     // 二级属性附加
 };
@@ -59,6 +58,7 @@ struct DBAttr1Extra
     std::string will;
     std::string soul;
     std::string aura;
+    std::string tough;
 };
 
 struct DBAttr2Extra
@@ -74,7 +74,6 @@ struct DBAttr2Extra
 	float evade;
 	float critical;
 	float critical_dmg;
-	float tough;
 	float pierce;
 	float counter;
 	float img_res;
@@ -148,7 +147,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(14)
+SPECIALDEF(13)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -158,7 +157,6 @@ SPECIALDEF(14)
 	UInt8,		quality,
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
-	UInt8,		canDestroy,
 	UInt16,		value,
 	UInt16,		value1,
 	UInt16,		data,
@@ -180,7 +178,7 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBAttr1Extra)
-SPECIALDEF(8)
+SPECIALDEF(9)
 	(
 	UInt32, id,
 	std::string, strength,
@@ -189,7 +187,8 @@ SPECIALDEF(8)
 	std::string, intelligence,
     std::string, will,
     std::string, soul,
-    std::string, aura
+    std::string, aura,
+    std::string, tough
 	)
 SPECIALEND()
 

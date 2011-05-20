@@ -418,6 +418,8 @@ namespace GObject
 	{
 		assert(!IsEquipId(id));
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+        if (!itemType)
+            return 0;
 		ItemBase * item = new(std::nothrow) ItemBase(id, *itemType);
 		if (item == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
