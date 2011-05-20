@@ -1440,7 +1440,7 @@ namespace GObject
 		return 0;
 	}
 
-	UInt8 Package::Split( UInt32 itemId, UInt32& enchantId, UInt8& count, bool protect, bool silence )
+	UInt8 Package::Split( UInt32 itemId, UInt32& enchantId, UInt8& count, /*bool protect,*/ bool silence )
 	{
 		count = 0;
 		if (!IsEquipId(itemId)) return 2;
@@ -1458,13 +1458,16 @@ namespace GObject
 		ConsumeInfo ci(SplitEquipment,0,0);
 		m_Owner->useCoin(amount, &ci, !silence);
 		bool isBound = item->GetBindStatus();
+#if 0
 		if(protect && !DelItemAny(ITEM_SPLIT_PROTECT, 1, &isBound))
 			protect = false;
 		if(protect)
 			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SPLIT_PROTECT, 1, TimeUtil::Now());
-		UInt32 chance_low = split_chance[q][lv][0];
+#endif	
+        UInt32 chance_low = split_chance[q][lv][0];
 		UInt32 chance_high = split_chance[q][lv][1];
 		UInt8 got = 0;
+#if 0
 		if(protect)
 		{
 			if(uRand(chance_low + chance_high) < chance_low)
@@ -1473,6 +1476,7 @@ namespace GObject
 				got = 2;
 		}
 		else
+#endif
 		{
 			UInt32 r = uRand(100);
 			if(r < chance_low)
