@@ -1,13 +1,14 @@
 ---系数表
-str_factor  = {2.50,      2.50,      1.50,      1.50,      2.50,       2.50 }
-agi_factor  = {1.50,      1.50,      4.00,      4.00,      2.50,       2.50 }
-int_factor  = {1.00,      1.00,      1.00,      1.00,      1.30,       1.30 }
-phy_factor  = {4.00,      4.00,      2.50,      2.50,      2.70,       2.70 }
+-- TODO: 
+str_factor  = {2.50,      1.50,      2.50 }
+agi_factor  = {1.50,      4.00,      2.50 }
+int_factor  = {1.00,      1.00,      1.30 }
+phy_factor  = {4.00,      2.50,      2.70 }
 
-str_m_factor  = {2.75,      2.75,      2.00,      2.00,      3.00,       3.00 }
-agi_m_factor  = {1.50,      1.50,      4.25,      4.25,      2.70,       2.70 }
-int_m_factor  = {1.00,      1.00,      1.00,      1.00,      1.30,       1.30 }
-phy_m_factor  = {4.50,      4.50,      2.50,      2.50,      3.00,       3.00 }
+str_m_factor  = {2.75,      2.00,      3.00 }
+agi_m_factor  = {1.50,      4.25,      2.70 }
+int_m_factor  = {1.00,      1.00,      1.30 }
+phy_m_factor  = {4.50,      2.50,      3.00 }
 
 str_atk_factor = 1.0
 str_cnt_factor = 0.02
@@ -33,7 +34,7 @@ function calcStrength( fgt )
   local str = fgt:getBaseStrength()
   local pot = fgt:getPotential()
   local lvl = fgt:getLevel()
-  if fgt:getId() < 7 then
+  if fgt:getId() < 10 then
     return (str + pot * str_m_factor[cls] * lvl) * (1 + fgt:getExtraStrengthPercent()) + fgt:getExtraStrength()
   end
   return (str + pot * str_factor[cls] * lvl) * (1 + fgt:getExtraStrengthPercent()) + fgt:getExtraStrength()
