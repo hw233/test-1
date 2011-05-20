@@ -813,6 +813,8 @@ namespace GObject
 
 	bool TaskMgr::InitTaskStep(TaskData* task, UInt16 size)
 	{
+        if (!size)
+            return false;
 		task->m_Step.resize(size);
 		task->m_StepStr.resize(size*5-1);
 		memset(&task->m_StepStr[0], '0', size*5-1);
