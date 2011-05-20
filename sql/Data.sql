@@ -61,6 +61,7 @@ CREATE TABLE `attr1_extra` (
   `will` varchar(10) NOT NULL DEFAULT '0',
   `soul` varchar(10) NOT NULL DEFAULT '0',
   `aura` varchar(10) NOT NULL DEFAULT '0',
+  `tough` varchar(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -84,7 +85,6 @@ CREATE TABLE `attr2_extra` (
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
   `critical` float(10,4) NOT NULL DEFAULT '0.0000',
   `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
-  `tough` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
   `img_res` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -330,7 +330,6 @@ CREATE TABLE `item_template` (
   `quality` tinyint(3) NOT NULL COMMENT '品质',
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
   `bindType` tinyint(1) NOT NULL COMMENT '绑定类型',
-  `canDestroy` tinyint(1) NOT NULL COMMENT '可以摧毁',
   `value` smallint(6) NOT NULL COMMENT '属性值(物攻, 物防, 可使用道具:作用类型)',
   `value1` smallint(6) NOT NULL COMMENT '属性值(法攻, 法防)',
   `data` smallint(6) NOT NULL COMMENT '武器: 武器定义; 可使用道具: 作用数值',

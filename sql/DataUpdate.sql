@@ -239,7 +239,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `item_template` WRITE;
 INSERT INTO `item_template` VALUES
-(1,'粗制飞刀',4,20,1000,1,1,0,1,36,3,5,92,0);
+(1,'粗制飞刀',4,20,1000,1,1,0,36,3,5,92,0);
 UNLOCK TABLES;
 
 
