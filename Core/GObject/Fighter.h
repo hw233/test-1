@@ -172,12 +172,17 @@ public:
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
+
     void sendModificationBloodBit(UInt8 t, int idx, bool = true);
 
+#if 1
+    void sendModification(UInt8 t, UInt16 skill, int idx, bool = true);
+#else
     void sendModificationUpSkill(UInt8 t, UInt16 skill, int idx, bool = true);
     void sendModificationUpCitta(UInt8 t, UInt16 citta, int idx, bool = true);
     void sendModificationSkills(UInt8 t, UInt16 skill, int idx, bool = true);
     void sendModificationCittas(UInt8 t, UInt16 citta, int idx, bool = true);
+#endif
 
 	void updateToDB(UInt8 t, UInt64 v);
 

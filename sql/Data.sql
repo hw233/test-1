@@ -330,8 +330,6 @@ CREATE TABLE `item_template` (
   `quality` tinyint(3) NOT NULL COMMENT '品质',
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
   `bindType` tinyint(1) NOT NULL COMMENT '绑定类型',
-  `value` smallint(6) NOT NULL COMMENT '属性值(物攻, 物防, 可使用道具:作用类型)',
-  `value1` smallint(6) NOT NULL COMMENT '属性值(法攻, 法防)',
   `data` smallint(6) NOT NULL COMMENT '武器: 武器定义; 可使用道具: 作用数值',
   `attr1Id` int(10) NOT NULL COMMENT '一级属性附加',
   `attr2Id` int(10) NOT NULL COMMENT '二级属性附加',

@@ -272,18 +272,29 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         break;
     case 0x61:
         { // skills
+            std::string str;
+            if (value2string(&_skills[0], _skills.size(), str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
         }
         break;
     case 0x62:
         { // citta
+            std::string str;
+            if (value2string(_citta, getUpCittasNum(), str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `citta` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
         }
         break;
     case 0x63:
         { // cittas 
+            std::string str;
+            if (value2string(&_cittas[0], _cittas.size(), str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            }
         }
         break;
 
-	case 0x11: field = "skill"; break;
 	case 0x21: field = "weapon"; break;
 	case 0x22: field = "armor1"; break;
 	case 0x23: field = "armor2"; break;
@@ -320,6 +331,22 @@ void Fighter::sendModificationBloodBit( UInt8 t, int idx, bool writedb )
 	_owner->send(st);
 }
 
+#if 1
+void Fighter::sendModification( UInt8 t, UInt16 value, int idx, bool writedb)
+{
+	if(_owner == NULL)
+		return;
+	Stream st(0x21);
+	st << getId() << static_cast<UInt8>(1) << t;
+    st << static_cast<UInt8>(idx) << value;
+    if (writedb)
+    {
+        updateToDB(t, 0);
+    }
+	st << Stream::eos;
+	_owner->send(st);
+}
+#else
 void Fighter::sendModificationUpSkill( UInt8 t, UInt16 skill, int idx, bool writedb)
 {
 	if(_owner == NULL)
@@ -379,6 +406,7 @@ void Fighter::sendModificationCittas( UInt8 t, UInt16 citta, int idx, bool write
 	st << Stream::eos;
 	_owner->send(st);
 }
+#endif
 
 void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 {
@@ -554,14 +582,16 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                 )
             )
         {
+            _attrDirty = true;
+            _bPDirty = true;
+
             t = _trump[idx];
             _trump[idx] = trump;
-            if (writedb)
-            {
-                _attrDirty = true;
-                _bPDirty = true;
-                sendModification(0x50+idx, _trump[idx], writedb);
-            }
+
+            if (trump)
+                trump->DoEquipBind(true);
+
+            sendModification(0x50+idx, _trump[idx], writedb);
         }
     }
     return t;
@@ -1270,7 +1300,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
         {
             if (_skill[idx])
             { // swap
-                sendModificationUpSkill(0x60, _skill[idx], src, false);
+                sendModification(0x60, _skill[idx], src, false);
 
                 _skill[src] ^= _skill[idx];
                 _skill[idx] ^= _skill[src];
@@ -1292,7 +1322,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
     {
         _attrDirty = true;
         _bPDirty = true;
-        sendModificationUpSkill(0x60, skill, idx, writedb);
+        sendModification(0x60, skill, idx, writedb);
     }
 
     return ret;
@@ -1314,7 +1344,7 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModificationUpSkill(0x60, 0, idx, writedb);
+    sendModification(0x60, 0, idx, writedb);
     return true;
 }
 
@@ -1351,7 +1381,7 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
         _skills.push_back(skill);
     }
 
-    sendModificationSkills(0x61, skill, idx, writedb);
+    sendModification(0x61, skill, idx, writedb);
     return true;
 }
 
@@ -1410,7 +1440,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         {
             if (_citta[idx])
             { // swap
-                sendModificationUpCitta(0x62, _citta[idx], src, false);
+                sendModification(0x62, _citta[idx], src, false);
 
                 _citta[src] ^= _citta[idx];
                 _citta[idx] ^= _citta[src];
@@ -1432,7 +1462,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     {
         _attrDirty = true;
         _bPDirty = true;
-        sendModificationUpCitta(0x62, citta, idx, writedb);
+        sendModification(0x62, citta, idx, writedb);
     }
 
     return ret;
@@ -1481,7 +1511,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         _cittas.push_back(citta);
     }
 
-    sendModificationCittas(0x63, citta, idx, writedb);
+    sendModification(0x63, citta, idx, writedb);
     return true;
 }
 

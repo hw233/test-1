@@ -84,7 +84,38 @@ namespace GObject
 		inline ItemEquipData& getItemEquipData() { return _itemEquipData; }
 
 		inline const GData::Attr1Extra * getAttr1Extra() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).attr1Extra; }
+		inline const GData::Attr2Extra * getAttr2Extra() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).attr2Extra; }
+
 		inline ItemEquipAttr2& getEquipAttr2() { return _itemEquipData.extraAttr2; }
+
+		inline UInt16 getAttack()
+        {
+            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
+            if (attr2Extra)
+                return attr2Extra->attack;
+            return 0;
+        } 
+		inline UInt16 getImgAttack()
+        {
+            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
+            if (attr2Extra)
+                return attr2Extra->img_attack;
+            return 0;
+        }
+		inline UInt16 getDefend()
+        {
+            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
+            if (attr2Extra)
+                return attr2Extra->defend;
+            return 0;
+        }
+		inline UInt16 getImgDefend()
+        {
+            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
+            if (attr2Extra)
+                return attr2Extra->img_defend;
+            return 0;
+        }
 
 		void DoEquipBind(bool = false);
 
@@ -98,8 +129,6 @@ namespace GObject
 		ItemWeapon(UInt32 id, const GData::ItemWeaponType& itemArmorType, ItemEquipData& itemEquipData)
 			: ItemEquip(id, itemArmorType, itemEquipData) 
 		{ }
-		inline UInt16 getAttack() { return static_cast<const GData::ItemWeaponType&>(_itemBaseType).value; } 
-		inline UInt16 getAttack1() { return static_cast<const GData::ItemWeaponType&>(_itemBaseType).value1; } 
 	};
 
 	class ItemArmor : public ItemEquip
@@ -108,8 +137,6 @@ namespace GObject
 		ItemArmor(UInt32 id, const GData::ItemEquipType& itemEquipType, ItemEquipData& itemEquipData)
 		    : ItemEquip(id, itemEquipType, itemEquipData) 
 		{ }
-		inline UInt16 getDefend() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).value; } 
-		inline UInt16 getDefend1() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).value1; } 
 	};
 }
 

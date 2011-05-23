@@ -109,23 +109,27 @@ namespace GData
 	//×°±¸
 	struct ItemEquipType : public ItemBaseType
 	{
-		UInt16		value;
-		UInt16		value1;
 		const Attr1Extra*	attr1Extra;
-		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt16 val = 0, UInt16 val1 = 0, UInt32 attr1Id = 0) : ItemBaseType(id, name), value(val), value1(val1)
+		const Attr2Extra*	attr2Extra;
+		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attr1Id = 0, UInt32 attr2Id = 0) : ItemBaseType(id, name)
 		{
 			const Attr1ExtraItem * item1 = attr1ExtraManager[attr1Id];
 			if(item1 != NULL)
 				attr1Extra = *item1;
 			else
 				attr1Extra = NULL;
+			const Attr2ExtraItem * item2 = attr2ExtraManager[attr2Id];
+			if(item2 != NULL)
+				attr2Extra = *item2;
+			else
+				attr2Extra = NULL;
 		}
 		virtual ~ItemEquipType() { }
 	};
 
 	struct ItemWeaponType : public ItemEquipType
 	{
-		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt16 val = 0, UInt16 val1 = 0, UInt32 attr1Id = 0) : ItemEquipType(id, name, val, val1, attr1Id) {}
+		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt32 attr1Id = 0, UInt32 attr2Id = 0) : ItemEquipType(id, name, attr1Id, attr2Id) {}
 	};
 
 	struct ItemEquipSetType:

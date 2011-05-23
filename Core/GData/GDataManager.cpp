@@ -260,7 +260,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `value`, `data`, `attr1Id`, `attr2Id` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `data`, `attr1Id`, `attr2Id` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -269,7 +269,7 @@ namespace GData
 			{
 			case Item_Weapon:
 				{
-					wt = new ItemWeaponType(idt.typeId, idt.name, idt.value, idt.attr1Extra);
+					wt = new ItemWeaponType(idt.typeId, idt.name, idt.attr1Extra, idt.attr2Extra);
 					if(idt.typeId > 25000)
 					{
 						GObject::ItemEquipData ied;
@@ -285,7 +285,7 @@ namespace GData
 			case Item_Ring:
 			case Item_Amulet:
 				{
-					wt = new ItemEquipType(idt.typeId, idt.name, idt.value, idt.attr1Extra);
+					wt = new ItemEquipType(idt.typeId, idt.name, idt.attr1Extra, idt.attr2Extra);
 				}
 				break;
 			case Item_Gem:

@@ -29,13 +29,11 @@ struct DBItemType
 	UInt32		typeId;         // 物品编号
 	std::string	name;           // 名字
 	UInt8		subClass;       // 物品类型 - 
-	UInt32		coin;           // 品质颜色
+	UInt32		coin;           // 价格(铜)
 	UInt16		reqLev;         // 物品(可装备)等级
 	UInt8		quality;        // 品质
-	UInt16		maxQuantity;    // 
+	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
-	UInt16		value;          // 属性值(物攻, 物防, 可使用道具:作用类型)
-	UInt16		value1;         // 属性值(法攻, 法防)
 	UInt16		data;           // 可使用道具: 作用数值
 	UInt32		attr1Extra;     // 一级属性附加
 	UInt32		attr2Extra;     // 二级属性附加
@@ -147,7 +145,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(13)
+SPECIALDEF(11)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -157,8 +155,6 @@ SPECIALDEF(13)
 	UInt8,		quality,
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
-	UInt16,		value,
-	UInt16,		value1,
 	UInt16,		data,
 	UInt32,		attr1Extra,
 	UInt32,		attr2Extra
