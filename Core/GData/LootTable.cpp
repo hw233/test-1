@@ -25,10 +25,13 @@ const LootItem * LootTable::operator[]( UInt32 id )
 
 void LootItem::roll( GObject::Player * player ) const
 {
+    // XXX: We have no Item_Favor // TODO:
+#if 0
 	LootResult lr = roll();
 	if(lr.id == 0)
 		return;
 	player->GetPackage()->Add(lr.id, lr.count, GetItemSubClass(lr.id) == Item_Favor, false, FromNpc);
+#endif
 }
 
 LootResult LootItem::roll(URandom * ur) const

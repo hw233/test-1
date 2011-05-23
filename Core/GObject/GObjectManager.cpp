@@ -243,8 +243,7 @@ namespace GObject
             fgt->setSex(dbfgt.sex);
 			ItemWeapon * nwp = GData::GDataManager::GetNpcWeapon(dbfgt.npc_weapon);
 			fgt->setWeapon(nwp, false);
-            // TODO: 
-			// fgt->setSkillAndLevel(dbfgt.skill);
+            fgt->setSkills(dbfgt.skill);
 			fgt->setPotential(dbfgt.potential, false);
 			fgt->strength = dbfgt.strength;
 			fgt->physique = dbfgt.physique;

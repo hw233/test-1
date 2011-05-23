@@ -4,37 +4,66 @@
 #include "AttrExtra.h"
 #include "WeaponDef.h"
 
+#define LNORMAL_ID      0
+#define RNORMAL_ID      499
+#define LENHANCE_ID     500
+#define RENHANCE_ID     799
+#define LTASK_ID        800
+#define RTASK_ID        999
+#define LFORMULA_ID     1000
+#define RFORMULA_ID     1199
+#define LCITTA_ID       1200
+#define RCITTA_ID       1499
+#define LARM_ID         1500
+#define RARM_ID         4990
+#define LGEM_ID         5000
+#define RGEM_ID         5200
+#define LOTHER_ID       5201
+#define ROTHER_ID       65535
+
 enum ItemClass
 {
+    // 0~19  装备       1500~4990   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11坐骑
+    // 20~29 普通       0~499
+    // 30~39 阵法       1000~1199
+    // 40~49 心法       1200~1499
+    // 50~59 强化       500~799
+    // 60~79 宝石       5001~5200  60力量，61敏捷，62智力，63体魄，64生命，65攻击，66防御，67命中，68反击，69闪避，70暴击，71破击，72闪电
+    // 80~89 任务       800~999
 	Item_None = 0,
-	Item_Normal,		//普通物品
-	Item_Gem,			//宝石
-	Item_Task,			//任务
-	Item_Weapon = 4,	//武器  武器
-	Item_Armor1,		//防具1 头盔
-	Item_Armor2,		//防具2 胸甲
-	Item_Armor3,		//防具3 肩甲
-	Item_Armor4,		//防具4 腰带
-	Item_Armor5,		//防具5 腿甲
-	Item_Amulet,		//项链  项链
-	Item_Ring,			//戒指  戒指
-	Item_Favor,			//喜好品
-    Item_Trump,         //法宝
-	Item_Other,			//其他
+	Item_Weapon = 1,	//武器  武器 1
+	Item_Armor1,		//防具1 头盔 2
+	Item_Armor2,		//防具2 胸甲 3
+	Item_Armor3,		//防具3 肩甲 4
+	Item_Armor4,		//防具4 腰带 5
+	Item_Armor5,		//防具5 腿甲 6
+	Item_Amulet,		//项链 7
+	Item_Ring,			//戒指 8
+	Item_Reserved,		//法宝 9
+	Item_Trump,			//法宝 10
+	Item_Mounts,		//坐骑 11
+	Item_Normal,		//普通物品 20~29
+	Item_Formula,		//阵法 30~39
+	Item_Citta,			//决法 40~49
+	Item_Enhance,		//强化 50~59
+	Item_Gem,			//宝石 60~79
+	Item_Task,			//任务 80~89
+	Item_Other,			//其他 90~
 };
+
 inline bool IsEquipId(UInt32 id)
 {
-	return id > 25000;
+	return id >= LARM_ID && id <= RARM_ID;
 }
 
 inline bool IsEquipTypeId(UInt32 id)
 {
-	return id >= 1 && id <= 5000;
+	return id >= LARM_ID && id <= RARM_ID;
 }
 
 inline bool IsGemId(UInt32 id)
 {
-	return id > 5000 && id <= 5800;
+	return id > LGEM_ID && id <= RGEM_ID;
 }
 
 inline bool IsEquip(UInt8 subClass)
@@ -44,18 +73,18 @@ inline bool IsEquip(UInt8 subClass)
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
-	if(id <= 5000)
-		return Item_Other;
-	if(id <= 5800)
+    if (id >= LNORMAL_ID && id <= RNORMAL_ID)
+        return Item_Normal;
+    if (id >= LENHANCE_ID && id <= RENHANCE_ID)
+        return Item_Enhance;
+    if (id >= LTASK_ID && id <= RTASK_ID)
+        return Item_Task;
+    if (id >= LFORMULA_ID && id <= RFORMULA_ID)
+        return Item_Citta;
+    //if (id >= LARM_ID && id <= RARM_ID)
+    //    return Item_Weapon; // XXX: 
+    if (id >= LGEM_ID && id <= RGEM_ID)
 		return Item_Gem;
-	if(id <= 7000)
-		return Item_Favor;
-	if(id <= 10000)
-		return Item_Normal;
-	if(id <= 15000)
-		return Item_Other;
-	if(id <= 25000)
-		return Item_Task;
 	return Item_Other;
 }
 
@@ -91,9 +120,9 @@ namespace GData
 		const AttrExtra* attrExtra;	//附加属性
 		ItemGemType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
 		{
-			const AttrExtraItem * item1 = attrExtraManager[attrId];
-			if(item1 != NULL)
-				attrExtra = *item1;
+			const AttrExtraItem * attr = attrExtraManager[attrId];
+			if(attr != NULL)
+				attrExtra = *attr;
 			else
 				attrExtra = NULL;
 		}
@@ -106,9 +135,9 @@ namespace GData
 		const AttrExtra*	attrExtra;
 		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
 		{
-			const AttrExtraItem * item1 = attrExtraManager[attrId];
-			if(item1 != NULL)
-				attrExtra = *item1;
+			const AttrExtraItem * attr = attrExtraManager[attrId];
+			if(attr != NULL)
+				attrExtra = *attr;
 			else
 				attrExtra = NULL;
 		}
@@ -136,7 +165,7 @@ namespace GData
 	extern ItemEquipSetTypeManager itemEquipSetTypeManager;
 
 #define ITEM_BIND_CHECK(bindType, bind)	\
-	if(!bind && bindType == 2) bind = true;
+	if(!bind && bindType == 1) bind = true;
 
 }
 

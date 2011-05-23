@@ -262,11 +262,11 @@ namespace GData
 			case Item_Weapon:
 				{
 					wt = new ItemWeaponType(idt.typeId, idt.name, idt.attrExtra);
-					if(idt.typeId > 25000)
-					{
-						GObject::ItemEquipData ied;
-						npcWeapons.add(new GObject::ItemWeapon(idt.typeId, *static_cast<const GData::ItemWeaponType *>(wt), ied));
-					}
+                    if (IsEquipId(idt.typeId))
+                    {
+                        GObject::ItemEquipData ied;
+                        npcWeapons.add(new GObject::ItemWeapon(idt.typeId, *static_cast<const GData::ItemWeaponType *>(wt), ied));
+                    }
 				}
 				break;
 			case Item_Armor1:
@@ -276,6 +276,8 @@ namespace GData
 			case Item_Armor5:
 			case Item_Ring:
 			case Item_Amulet:
+			case Item_Trump:
+			// case Item_Mounts: // XXX:
 				{
 					wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
 				}
@@ -284,7 +286,7 @@ namespace GData
 				{
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
-					gemTypes[wt->getId() - 5000] = igt;
+					gemTypes[wt->getId() - LGEM_ID] = igt;
 				}
 				break;
 			default:
@@ -727,7 +729,7 @@ namespace GData
 
 	GObject::ItemWeapon* GDataManager::GetNpcWeapon( UInt32 wpId )
 	{
-		return const_cast<GObject::ItemWeapon *>(npcWeapons[wpId + 25000]);
+		return const_cast<GObject::ItemWeapon *>(npcWeapons[wpId]);
 	}
 
 	const std::vector<UInt32>& GDataManager::GetSaleItemSortRule(UInt8 type)

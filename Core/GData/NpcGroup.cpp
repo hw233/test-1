@@ -72,6 +72,8 @@ void NpcGroup::getLoots( GObject::Player * player )
 
 void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il )
 {
+    // XXX: We have no Item_Favor // TODO:
+#if 0
 	std::vector<const LootItem *>::iterator it;
 	for(it = _loots.begin(); it != _loots.end(); ++ it)
 	{
@@ -81,6 +83,7 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il )
 		player->GetPackage()->Add(lr.id, lr.count, GetItemSubClass(lr.id) == Item_Favor, true, FromNpc);
 		il.push_back(lr);
 	}
+#endif
 }
 
 void NpcGroup::calcBattlePoints( Script::BattleFormula * bformula )
