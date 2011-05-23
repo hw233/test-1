@@ -84,9 +84,9 @@ public:
     bool setBloodBit(int idx, UInt8 v, bool = true);
     bool incBloodBit(int idx, bool = true);
 
-    inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _bloodbit[idx] : static_cast<UInt8>(-1); }
+    inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
     void getAllBloodBits(Stream& st);
-    void setBloodBits(std::string& bloodbit, bool = true);
+    void setBloodBits(std::string& acupoints, bool = true);
 
     // 学习技能
 	bool learnSkill(UInt16 skill);
@@ -307,7 +307,7 @@ protected:
 	UInt16 _hp;
 
     UInt16 _peerless;       // 无双技能
-    UInt8 _bloodbit[BLOODBIT_MAX];    // 血道
+    UInt8 _acupoints[BLOODBIT_MAX];    // 血道
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
     std::vector<UInt16> _skills;    // 学会的技能

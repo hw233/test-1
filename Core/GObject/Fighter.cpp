@@ -45,7 +45,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	favor(0), reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0),
 	attack(0), defend(0), maxhp(0), action(0), hitrate(0), evade(0), critical(0), pierce(0), counter(0)
 {
-    memset(_bloodbit, 0, sizeof(_bloodbit));
+    memset(_acupoints, 0, sizeof(_acupoints));
     memset(_skill, 0, sizeof(_skill));
     //_skills.resize(32); // 默认为32个
     memset(_citta, 0, sizeof(_citta));
@@ -257,8 +257,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
     case 0x29:
         {
             std::string str;
-            if (value2string(_bloodbit, BLOODBIT_MAX, str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `bloodbit` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            if (value2string(_acupoints, BLOODBIT_MAX, str)) {
+                DB().PushUpdateData("UPDATE `fighter` SET `acupoints` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
@@ -322,7 +322,7 @@ void Fighter::sendModificationBloodBit( UInt8 t, int idx, bool writedb )
 		return;
 	Stream st(0x21);
 	st << getId() << static_cast<UInt8>(1) << t;
-    st << static_cast<UInt8>(idx) << _bloodbit[idx];
+    st << static_cast<UInt8>(idx) << _acupoints[idx];
     if (writedb)
     {
         updateToDB(t, 0);
@@ -1162,7 +1162,7 @@ void Fighter::getAllBloodBits( Stream& st )
 {
     for (int i = 0; i < BLOODBIT_MAX; ++i)
     {
-        st << _bloodbit[i];
+        st << _acupoints[i];
     }
 }
 
@@ -1175,12 +1175,12 @@ void Fighter::setPeerless( UInt16 peerless, bool writedb )
     }
 }
 
-void Fighter::setBloodBits( std::string& bloodbit, bool writedb )
+void Fighter::setBloodBits( std::string& acupoints, bool writedb )
 {
-    if (!bloodbit.length())
+    if (!acupoints.length())
         return;
 
-    StringTokenizer tk(bloodbit, "|");
+    StringTokenizer tk(acupoints, "|");
     for (size_t i = 0; i < tk.count() && i < BLOODBIT_MAX; ++i)
     {
         setBloodBit(::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
@@ -1192,7 +1192,7 @@ bool Fighter::setBloodBit( int idx, UInt8 v, bool writedb )
 {
     if (idx >= 0  && idx < BLOODBIT_MAX && v <= getBloodCntMax())
     {
-        _bloodbit[idx] = v;
+        _acupoints[idx] = v;
         if (writedb)
         {
             _attrDirty = true;
@@ -1208,9 +1208,9 @@ bool Fighter::incBloodBit( int idx, bool writedb )
 {
     if (idx >= 0 && idx < BLOODBIT_MAX)
     {
-        if (_bloodbit[idx] < getBloodCntMax())
+        if (_acupoints[idx] < getBloodCntMax())
         {
-            return setBloodBit(idx, _bloodbit[idx]+1, writedb);
+            return setBloodBit(idx, _acupoints[idx]+1, writedb);
         }
     }
     return false;

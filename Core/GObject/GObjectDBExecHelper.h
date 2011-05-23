@@ -220,7 +220,7 @@ struct DBFighterObj
 	UInt32 amulet;          // 项链
     UInt16 peerless;        // 无双技能
     std::string trump;      // 法宝
-    std::string bloodbit;   // 血位,打通次数
+    std::string acupoints;  // 穴道,打通次数
     std::string skill;      // 装备的技能
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
@@ -791,7 +791,7 @@ SPECIALDEF(23)
 	UInt32, amulet,
     UInt16, peerless,
     std::string, trump,
-    std::string, bloodbit,
+    std::string, acupoints,
     std::string, skill,
     std::string, citta,
     std::string, skills,
