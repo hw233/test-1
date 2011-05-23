@@ -694,21 +694,14 @@ void Fighter::setCapacity( float c, bool writedb )
     }
 }
 
-inline void addAttr1Extra( GData::Attr1Extra& ae, const GData::Attr1Extra * ext )
+inline void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
 {
 	if(ext == NULL)
 		return;
 	ae += *ext;
 }
 
-inline void addAttr2Extra( GData::Attr2Extra& ae, const GData::Attr2Extra * ext )
-{
-	if(ext == NULL)
-		return;
-	ae += *ext;
-}
-
-inline void addEquipAttr2( GData::Attr2Extra& ae, UInt8 type, UInt16 value )
+inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 {
 	switch(type)
 	{
@@ -736,7 +729,7 @@ inline void addEquipAttr2( GData::Attr2Extra& ae, UInt8 type, UInt16 value )
 	}
 }
 
-inline void addEquipAttr2( GData::Attr2Extra& ae, const ItemEquipAttr2& ext )
+inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext )
 {
 	if(ext.type1 != 0)
 	{
@@ -775,24 +768,23 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 
 void Fighter::addAttr( ItemEquip * equip )
 {
-	addAttr1Extra(_attr1ExtraEquip, equip->getAttr1Extra());
-	addEquipAttr2(_attr2ExtraEquip, equip->getEquipAttr2());
+	addAttrExtra(_attrExtraEquip, equip->getAttrExtra());
+	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2());
 	ItemEquipData& ied = equip->getItemEquipData();
 	for(UInt8 i = 0; i < ied.sockets; ++ i)
 	{
 		if(ied.gems[i] != 0)
 		{
 			GData::ItemGemType * igt = GData::gemTypes[ied.gems[i] - 5000];
-			addAttr1Extra(_attr1ExtraEquip, igt->attr1Extra);
-			addAttr2Extra(_attr2ExtraEquip, igt->attr2Extra);
+			addAttrExtra(_attrExtraEquip, igt->attrExtra);
 		}
 	}
 }
 
 void Fighter::rebuildEquipAttr()
 {
-	_attr1ExtraEquip.reset();
-	_attr2ExtraEquip.reset();
+	_attrExtraEquip.reset();
+	_attrExtraEquip.reset();
 
 	UInt32 setId[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	UInt32 setNum[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -842,14 +834,14 @@ void Fighter::rebuildEquipAttr()
 		if(iest == NULL)
 			continue;
 		UInt32 idx = setNum[i] / 2 - 1;
-		_attr1ExtraEquip += *iest->attr1Extra[idx];
-		_attr2ExtraEquip += *iest->attr2Extra[idx];
+		_attrExtraEquip += *iest->attrExtra[idx];
+		_attrExtraEquip += *iest->attrExtra[idx];
 	}
-	_attr2ExtraEquip.attack += getWeaponAttack();
+	_attrExtraEquip.attack += getWeaponAttack();
 	UInt16 armorDefend, armorHP;
 	getArmorDefendAndHP(armorDefend, armorHP);
-	_attr2ExtraEquip.defend += armorDefend;
-	_attr2ExtraEquip.hp += armorHP;
+	_attrExtraEquip.defend += armorDefend;
+	_attrExtraEquip.hp += armorHP;
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }

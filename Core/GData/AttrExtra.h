@@ -6,15 +6,19 @@
 namespace GData
 {
 
-struct Attr1Extra
+struct AttrExtra
 {
-	Attr1Extra():
+	AttrExtra():
 		strength(0), physique(0), agility(0), intelligence(0),
         will(0), soul(0), aura(0), tough(0),
 		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
-        willP(0), soulP(0), auraP(0), toughP(0)
+        willP(0), soulP(0), auraP(0), toughP(0),
+		attack(0), attackP(0), img_attack(0), img_attackP(0),
+        defend(0), defendP(0), img_defend(0), img_defendP(0),
+		hp(0), hpP(0), action(0), hitrate(0), evade(0),
+        critical(0), critical_dmg(0), pierce(0), counter(0), img_res(0)
 	{ }
-	Attr1Extra& operator +=(const Attr1Extra& other)
+	AttrExtra& operator +=(const AttrExtra& other)
 	{
 		strength += other.strength;
 		physique += other.physique;
@@ -32,41 +36,6 @@ struct Attr1Extra
 		soulP += other.soulP;
 		auraP += other.auraP;
 		toughP += other.toughP;
-		return *this;
-	}
-	inline void reset()
-	{
-        bzero(this, sizeof(*this));
-	}
-
-	UInt16 strength;
-	UInt16 physique;
-	UInt16 agility;
-	UInt16 intelligence;
-	UInt16 will;
-	UInt16 soul;
-	UInt16 aura;
-	UInt16 tough;
-	float strengthP;
-	float physiqueP;
-	float agilityP;
-	float intelligenceP;
-	float willP;
-	float soulP;
-	float auraP;
-	float toughP;
-};
-
-struct Attr2Extra
-{
-	Attr2Extra():
-		attack(0), attackP(0), img_attack(0), img_attackP(0),
-        defend(0), defendP(0), img_defend(0), img_defendP(0),
-		hp(0), hpP(0), action(0), hitrate(0), evade(0),
-        critical(0), critical_dmg(0), pierce(0), counter(0), img_res(0)
-	{}
-	Attr2Extra& operator +=(const Attr2Extra& other)
-	{
 		attack += other.attack;
 		attackP += other.attackP;
 		defend += other.defend;
@@ -91,6 +60,23 @@ struct Attr2Extra
 	{
         bzero(this, sizeof(*this));
 	}
+
+	UInt16 strength;
+	UInt16 physique;
+	UInt16 agility;
+	UInt16 intelligence;
+	UInt16 will;
+	UInt16 soul;
+	UInt16 aura;
+	UInt16 tough;
+	float strengthP;
+	float physiqueP;
+	float agilityP;
+	float intelligenceP;
+	float willP;
+	float soulP;
+	float auraP;
+	float toughP;
 	UInt16 attack;
 	float attackP;
 	UInt16 img_attack;
@@ -111,29 +97,18 @@ struct Attr2Extra
 	float img_res;
 };
 
-struct Attr1ExtraItem:
+struct AttrExtraItem:
 	public ObjectBaseNT<>
 {
-	Attr1ExtraItem(UInt32 idx): ObjectBaseNT<>(idx) { }
-	Attr1Extra _extra;
-	inline Attr1Extra* operator ->() { return &_extra; }
-	inline operator const Attr1Extra*() const { return &_extra; }
+	AttrExtraItem(UInt32 idx): ObjectBaseNT<>(idx) { }
+	AttrExtra _extra;
+	inline AttrExtra* operator ->() { return &_extra; }
+	inline operator const AttrExtra*() const { return &_extra; }
 };
 
-struct Attr2ExtraItem:
-	public ObjectBaseNT<>
-{
-	Attr2ExtraItem(UInt32 idx): ObjectBaseNT<>(idx) { }
-	Attr2Extra _extra;
-	inline Attr2Extra* operator ->() { return &_extra; }
-	inline operator const Attr2Extra*() const { return &_extra; }
-};
+typedef ObjectListT<AttrExtraItem> AttrExtraManager;
 
-typedef ObjectListT<Attr1ExtraItem> Attr1ExtraManager;
-typedef ObjectListT<Attr2ExtraItem> Attr2ExtraManager;
-
-#define attr1ExtraManager Attr1ExtraManager::Instance()
-#define attr2ExtraManager Attr2ExtraManager::Instance()
+#define attrExtraManager AttrExtraManager::Instance()
 
 }
 

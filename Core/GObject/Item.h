@@ -83,37 +83,36 @@ namespace GObject
 	public:
 		inline ItemEquipData& getItemEquipData() { return _itemEquipData; }
 
-		inline const GData::Attr1Extra * getAttr1Extra() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).attr1Extra; }
-		inline const GData::Attr2Extra * getAttr2Extra() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).attr2Extra; }
+		inline const GData::AttrExtra * getAttrExtra() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).attrExtra; }
 
 		inline ItemEquipAttr2& getEquipAttr2() { return _itemEquipData.extraAttr2; }
 
 		inline UInt16 getAttack()
         {
-            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
-            if (attr2Extra)
-                return attr2Extra->attack;
+            const GData::AttrExtra* attrExtra = getAttrExtra();
+            if (attrExtra)
+                return attrExtra->attack;
             return 0;
         } 
 		inline UInt16 getImgAttack()
         {
-            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
-            if (attr2Extra)
-                return attr2Extra->img_attack;
+            const GData::AttrExtra* attrExtra = getAttrExtra();
+            if (attrExtra)
+                return attrExtra->img_attack;
             return 0;
         }
 		inline UInt16 getDefend()
         {
-            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
-            if (attr2Extra)
-                return attr2Extra->defend;
+            const GData::AttrExtra* attrExtra = getAttrExtra();
+            if (attrExtra)
+                return attrExtra->defend;
             return 0;
         }
 		inline UInt16 getImgDefend()
         {
-            const GData::Attr2Extra* attr2Extra = getAttr2Extra();
-            if (attr2Extra)
-                return attr2Extra->img_defend;
+            const GData::AttrExtra* attrExtra = getAttrExtra();
+            if (attrExtra)
+                return attrExtra->img_defend;
             return 0;
         }
 

@@ -35,8 +35,7 @@ struct DBItemType
 	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
 	UInt16		data;           // 可使用道具: 作用数值
-	UInt32		attr1Extra;     // 一级属性附加
-	UInt32		attr2Extra;     // 二级属性附加
+	UInt32		attrExtra;      // 属性附加
 };
 
 struct DBEquipSetType
@@ -46,7 +45,7 @@ struct DBEquipSetType
 	UInt16 attrId[4];
 };
 
-struct DBAttr1Extra
+struct DBAttrExtra
 {
 	UInt32 id;
 	std::string strength;
@@ -57,11 +56,6 @@ struct DBAttr1Extra
     std::string soul;
     std::string aura;
     std::string tough;
-};
-
-struct DBAttr2Extra
-{
-	UInt32 id;
 	std::string attack;
 	std::string img_attack;
 	std::string defend;
@@ -145,7 +139,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(11)
+SPECIALDEF(10)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -156,8 +150,7 @@ SPECIALDEF(11)
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
 	UInt16,		data,
-	UInt32,		attr1Extra,
-	UInt32,		attr2Extra
+	UInt32,		attrExtra
 	)
 SPECIALEND()
 
@@ -173,8 +166,8 @@ SPECIALDEF(6)
 	)
 SPECIALEND()
 
-SPECIALBEGIN(GData::DBAttr1Extra)
-SPECIALDEF(9)
+SPECIALBEGIN(GData::DBAttrExtra)
+SPECIALDEF(22)
 	(
 	UInt32, id,
 	std::string, strength,
@@ -184,14 +177,7 @@ SPECIALDEF(9)
     std::string, will,
     std::string, soul,
     std::string, aura,
-    std::string, tough
-	)
-SPECIALEND()
-
-SPECIALBEGIN(GData::DBAttr2Extra)
-SPECIALDEF(14)
-	(
-	UInt32, id,
+    std::string, tough,
 	std::string, attack,
 	std::string, img_attack,
 	std::string, defend,
@@ -204,7 +190,7 @@ SPECIALDEF(14)
 	float, critical_dmg,
 	float, pierce,
 	float, counter,
-	float, img_res 
+	float, img_res
 	)
 SPECIALEND()
 

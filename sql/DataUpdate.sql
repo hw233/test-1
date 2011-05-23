@@ -229,15 +229,10 @@ INSERT INTO `weapon_def` VALUES
 (150,'全屏鞭',0,10,1);
 UNLOCK TABLES;
 
-LOCK TABLES `attr1_extra` WRITE;
-UNLOCK TABLES;
-
-LOCK TABLES `attr2_extra` WRITE;
+LOCK TABLES `attr_extra` WRITE;
 UNLOCK TABLES;
 
 LOCK TABLES `item_template` WRITE;
-INSERT INTO `item_template` VALUES
-(1,'粗制飞刀',4,20,1000,1,1,0,36,3,5,92,0);
 UNLOCK TABLES;
 
 

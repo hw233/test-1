@@ -88,20 +88,14 @@ namespace GData
 	//宝石
 	struct ItemGemType : public ItemBaseType
 	{
-		const Attr1Extra* attr1Extra;	//附加一级属性
-		const Attr2Extra* attr2Extra;	//附加二级属性
-		ItemGemType(UInt32 id = 0, const std::string& name = "", UInt32 attr1Id = 0, UInt32 attr2Id = 0) : ItemBaseType(id, name)
+		const AttrExtra* attrExtra;	//附加属性
+		ItemGemType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
 		{
-			const Attr1ExtraItem * item1 = attr1ExtraManager[attr1Id];
+			const AttrExtraItem * item1 = attrExtraManager[attrId];
 			if(item1 != NULL)
-				attr1Extra = *item1;
+				attrExtra = *item1;
 			else
-				attr1Extra = NULL;
-			const Attr2ExtraItem * item2 = attr2ExtraManager[attr2Id];
-			if(item2 != NULL)
-				attr2Extra = *item2;
-			else
-				attr2Extra = NULL;
+				attrExtra = NULL;
 		}
 		virtual ~ItemGemType() { }
 	};
@@ -109,34 +103,27 @@ namespace GData
 	//装备
 	struct ItemEquipType : public ItemBaseType
 	{
-		const Attr1Extra*	attr1Extra;
-		const Attr2Extra*	attr2Extra;
-		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attr1Id = 0, UInt32 attr2Id = 0) : ItemBaseType(id, name)
+		const AttrExtra*	attrExtra;
+		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
 		{
-			const Attr1ExtraItem * item1 = attr1ExtraManager[attr1Id];
+			const AttrExtraItem * item1 = attrExtraManager[attrId];
 			if(item1 != NULL)
-				attr1Extra = *item1;
+				attrExtra = *item1;
 			else
-				attr1Extra = NULL;
-			const Attr2ExtraItem * item2 = attr2ExtraManager[attr2Id];
-			if(item2 != NULL)
-				attr2Extra = *item2;
-			else
-				attr2Extra = NULL;
+				attrExtra = NULL;
 		}
 		virtual ~ItemEquipType() { }
 	};
 
 	struct ItemWeaponType : public ItemEquipType
 	{
-		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt32 attr1Id = 0, UInt32 attr2Id = 0) : ItemEquipType(id, name, attr1Id, attr2Id) {}
+		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemEquipType(id, name, attrId) {}
 	};
 
 	struct ItemEquipSetType:
 		public ObjectBaseT<>
 	{
-		const Attr1Extra* attr1Extra[4];
-		const Attr2Extra* attr2Extra[4];
+		const AttrExtra* attrExtra[4];
 
 		ItemEquipSetType(UInt32 id = 0, const std::string& name = "") : ObjectBaseT<>(id, name)	{}
 	};

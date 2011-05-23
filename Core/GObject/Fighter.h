@@ -211,28 +211,27 @@ public:
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
 
 public:
-	inline const GData::Attr1Extra * getAttr1ExtraEquip() { checkDirty(); return &_attr1ExtraEquip; }
-	inline const GData::Attr2Extra * getAttr2ExtraEquip() { checkDirty(); return &_attr2ExtraEquip; }
-	inline UInt16 getExtraStrength() { checkDirty(); return _attr1ExtraEquip.strength; }
-	inline UInt16 getExtraPhysique() { checkDirty(); return _attr1ExtraEquip.physique; }
-	inline UInt16 getExtraAgility() { checkDirty(); return _attr1ExtraEquip.agility; }
-	inline UInt16 getExtraIntelligence() { checkDirty(); return _attr1ExtraEquip.intelligence; }
-	inline float getExtraStrengthP() { checkDirty(); return _attr1ExtraEquip.strengthP; }
-	inline float getExtraPhysiqueP() { checkDirty(); return _attr1ExtraEquip.physiqueP; }
-	inline float getExtraAgilityP() { checkDirty(); return _attr1ExtraEquip.agilityP; }
-	inline float getExtraIntelligenceP() { checkDirty(); return _attr1ExtraEquip.intelligenceP; }
-	inline UInt16 getExtraAttack() { checkDirty(); return _attr2ExtraEquip.attack; }
-	inline float getExtraAttackP() { checkDirty(); return _attr2ExtraEquip.attackP; }
-	inline UInt16 getExtraDefend() { checkDirty(); return _attr2ExtraEquip.defend; }
-	inline float getExtraDefendP() { checkDirty(); return _attr2ExtraEquip.defendP; }
-	inline UInt16 getExtraHP() { checkDirty(); return _attr2ExtraEquip.hp; }
-	inline float getExtraHPP() { checkDirty(); return _attr2ExtraEquip.hpP; }
-	inline float getExtraAction() { checkDirty(); return _attr2ExtraEquip.action; }
-	inline float getExtraHitrate() { checkDirty(); return _attr2ExtraEquip.hitrate; }
-	inline float getExtraEvade() { checkDirty(); return _attr2ExtraEquip.evade; }
-	inline float getExtraCritical() { checkDirty(); return _attr2ExtraEquip.critical; }
-	inline float getExtraPierce() { checkDirty(); return _attr2ExtraEquip.pierce; }
-	inline float getExtraCounter() { checkDirty(); return _attr2ExtraEquip.counter; }
+	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
+	inline UInt16 getExtraStrength() { checkDirty(); return _attrExtraEquip.strength; }
+	inline UInt16 getExtraPhysique() { checkDirty(); return _attrExtraEquip.physique; }
+	inline UInt16 getExtraAgility() { checkDirty(); return _attrExtraEquip.agility; }
+	inline UInt16 getExtraIntelligence() { checkDirty(); return _attrExtraEquip.intelligence; }
+	inline float getExtraStrengthP() { checkDirty(); return _attrExtraEquip.strengthP; }
+	inline float getExtraPhysiqueP() { checkDirty(); return _attrExtraEquip.physiqueP; }
+	inline float getExtraAgilityP() { checkDirty(); return _attrExtraEquip.agilityP; }
+	inline float getExtraIntelligenceP() { checkDirty(); return _attrExtraEquip.intelligenceP; }
+	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
+	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
+	inline UInt16 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
+	inline float getExtraDefendP() { checkDirty(); return _attrExtraEquip.defendP; }
+	inline UInt16 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
+	inline float getExtraHPP() { checkDirty(); return _attrExtraEquip.hpP; }
+	inline float getExtraAction() { checkDirty(); return _attrExtraEquip.action; }
+	inline float getExtraHitrate() { checkDirty(); return _attrExtraEquip.hitrate; }
+	inline float getExtraEvade() { checkDirty(); return _attrExtraEquip.evade; }
+	inline float getExtraCritical() { checkDirty(); return _attrExtraEquip.critical; }
+	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
+	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
 	inline float getBattlePoint() { checkBPDirty(); return _battlePoint; }
 
 	inline Int16 getBaseStrength() { if(_id > 6) return strength; const Int16 add[6][6] = {{0}, {0}, {0}, {15, 15, 15, 15, 40, 40}, {35, 35, 35, 35, 90, 90}, {55, 55, 55, 55, 140, 140}}; return strength + add[_color][_class]; }
@@ -326,8 +325,7 @@ protected:
 	UInt32 _maxHP;
 	bool _bPDirty;
 	float _battlePoint;
-	GData::Attr1Extra _attr1ExtraEquip;
-	GData::Attr2Extra _attr2ExtraEquip;
+	GData::AttrExtra _attrExtraEquip;
 
 	UInt32 _buffData[FIGHTER_BUFF_COUNT];
 

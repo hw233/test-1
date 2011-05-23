@@ -23,7 +23,7 @@ namespace GData
 	class NpcGroup;
 	struct LootItem;
 	struct DungeonLevel;
-	struct Attr1Extra;
+	struct AttrExtra;
 	struct Attr2Extra;
 }
 

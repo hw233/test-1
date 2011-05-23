@@ -215,42 +215,34 @@ namespace GData
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
-		GData::DBAttr1Extra a1e;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura` FROM `attr1_extra`", a1e) != DB::DB_OK)
+		GData::DBAttrExtra ae;
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `img_res` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-			Attr1ExtraItem * a1extra = new Attr1ExtraItem(a1e.id);
-			SetValOrPercent(a1extra->_extra.strength, a1extra->_extra.strengthP, a1e.strength);
-			SetValOrPercent(a1extra->_extra.physique, a1extra->_extra.physiqueP, a1e.physique);
-			SetValOrPercent(a1extra->_extra.agility, a1extra->_extra.agilityP, a1e.agility);
-			SetValOrPercent(a1extra->_extra.intelligence, a1extra->_extra.intelligenceP, a1e.intelligence);
-			SetValOrPercent(a1extra->_extra.will, a1extra->_extra.willP, a1e.will);
-			SetValOrPercent(a1extra->_extra.soul, a1extra->_extra.soulP, a1e.soul);
-			SetValOrPercent(a1extra->_extra.aura, a1extra->_extra.auraP, a1e.aura);
-			SetValOrPercent(a1extra->_extra.tough, a1extra->_extra.toughP, a1e.tough);
-			attr1ExtraManager.add(a1extra);
-		}
-		GData::DBAttr2Extra a2e;
-		if(execu->Prepare("SELECT `id`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `img_res` FROM `attr2_extra`", a2e) != DB::DB_OK)
-			return false;
-		while(execu->Next() == DB::DB_OK)
-		{
-			Attr2ExtraItem * a2extra = new Attr2ExtraItem(a2e.id);
-			SetValOrPercent(a2extra->_extra.attack, a2extra->_extra.attackP, a2e.attack);
-			SetValOrPercent(a2extra->_extra.img_attack, a2extra->_extra.img_attackP, a2e.img_attack);
-			SetValOrPercent(a2extra->_extra.defend, a2extra->_extra.defendP, a2e.defend);
-			SetValOrPercent(a2extra->_extra.img_defend, a2extra->_extra.img_defendP, a2e.img_defend);
-			SetValOrPercent(a2extra->_extra.hp, a2extra->_extra.hpP, a2e.hp);
-			a2extra->_extra.action = a2e.action;
-			a2extra->_extra.hitrate = a2e.hitrate;
-			a2extra->_extra.evade = a2e.evade;
-			a2extra->_extra.critical = a2e.critical;
-			a2extra->_extra.critical_dmg = a2e.critical_dmg;
-			a2extra->_extra.pierce = a2e.pierce;
-			a2extra->_extra.counter = a2e.counter;
-			a2extra->_extra.img_res = a2e.img_res;
-			attr2ExtraManager.add(a2extra);
+			AttrExtraItem * aextra = new AttrExtraItem(ae.id);
+			SetValOrPercent(aextra->_extra.strength, aextra->_extra.strengthP, ae.strength);
+			SetValOrPercent(aextra->_extra.physique, aextra->_extra.physiqueP, ae.physique);
+			SetValOrPercent(aextra->_extra.agility, aextra->_extra.agilityP, ae.agility);
+			SetValOrPercent(aextra->_extra.intelligence, aextra->_extra.intelligenceP, ae.intelligence);
+			SetValOrPercent(aextra->_extra.will, aextra->_extra.willP, ae.will);
+			SetValOrPercent(aextra->_extra.soul, aextra->_extra.soulP, ae.soul);
+			SetValOrPercent(aextra->_extra.aura, aextra->_extra.auraP, ae.aura);
+			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
+			SetValOrPercent(aextra->_extra.attack, aextra->_extra.attackP, ae.attack);
+			SetValOrPercent(aextra->_extra.img_attack, aextra->_extra.img_attackP, ae.img_attack);
+			SetValOrPercent(aextra->_extra.defend, aextra->_extra.defendP, ae.defend);
+			SetValOrPercent(aextra->_extra.img_defend, aextra->_extra.img_defendP, ae.img_defend);
+			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
+			aextra->_extra.action = ae.action;
+			aextra->_extra.hitrate = ae.hitrate;
+			aextra->_extra.evade = ae.evade;
+			aextra->_extra.critical = ae.critical;
+			aextra->_extra.critical_dmg = ae.critical_dmg;
+			aextra->_extra.pierce = ae.pierce;
+			aextra->_extra.counter = ae.counter;
+			aextra->_extra.img_res = ae.img_res;
+			attrExtraManager.add(aextra);
 		}
 		return true;
 	}
@@ -260,7 +252,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `data`, `attr1Id`, `attr2Id` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `data`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -269,7 +261,7 @@ namespace GData
 			{
 			case Item_Weapon:
 				{
-					wt = new ItemWeaponType(idt.typeId, idt.name, idt.attr1Extra, idt.attr2Extra);
+					wt = new ItemWeaponType(idt.typeId, idt.name, idt.attrExtra);
 					if(idt.typeId > 25000)
 					{
 						GObject::ItemEquipData ied;
@@ -285,12 +277,12 @@ namespace GData
 			case Item_Ring:
 			case Item_Amulet:
 				{
-					wt = new ItemEquipType(idt.typeId, idt.name, idt.attr1Extra, idt.attr2Extra);
+					wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
 				}
 				break;
 			case Item_Gem:
 				{
-					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attr1Extra, idt.attr2Extra);
+					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
 					gemTypes[wt->getId() - 5000] = igt;
 				}
@@ -318,8 +310,7 @@ namespace GData
 			ItemEquipSetType * iest = new ItemEquipSetType(est.id / 20, est.name);
 			for(int j = 0; j < 4; ++ j)
 			{
-				iest->attr1Extra[j] = *attr1ExtraManager[est.attrId[j]];
-				iest->attr2Extra[j] = *attr2ExtraManager[est.attrId[j]];
+				iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
 			}
 			itemEquipSetTypeManager.add(iest);
 		}
@@ -605,22 +596,12 @@ namespace GData
 				effect.rescue_ratio = atoi(tk3[4].c_str());
 				if(effect.link_ratio > 100)
 					effect.link_ratio = 100;
-				UInt32 attr1id = atoi(tk3[5].c_str());
-				UInt32 attr2id;
-				if(tk3.count() == 6)
-					attr2id = attr1id;
+				UInt32 attrid = atoi(tk3[5].c_str());
+				const AttrExtraItem * ae = attrExtraManager[attrid];
+				if(ae == NULL)
+					effect.attrExtra = NULL;
 				else
-					attr2id = atoi(tk3[6].c_str());
-				const Attr1ExtraItem * a1e = attr1ExtraManager[attr1id];
-				if(a1e == NULL)
-					effect.attr1Extra = NULL;
-				else
-					effect.attr1Extra = *a1e;
-				const Attr2ExtraItem * a2e = attr2ExtraManager[attr2id];
-				if(a2e == NULL)
-					effect.attr2Extra = NULL;
-				else
-					effect.attr2Extra = *a2e;
+					effect.attrExtra = *ae;
 				form->addGrid(effect);
 			}
 			formationManager.add(form);

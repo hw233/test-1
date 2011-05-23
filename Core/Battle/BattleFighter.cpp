@@ -74,29 +74,22 @@ void BattleFighter::setAttrExtra(UInt8 klass, UInt8 career, UInt8 level)
 	
 	UInt8 i = 1;
 	lua_tinker::table factors = _formula->getFactor(klass, career, level);
-	_attr1bylevel.strength = static_cast<UInt16>(factors.get<float>(i++));
-	_attr1bylevel.physique = static_cast<UInt16>(factors.get<float>(i ++));
-	_attr1bylevel.intelligence = static_cast<UInt16>(factors.get<float>(i ++));
-	_attr1bylevel.agility = static_cast<UInt16>(factors.get<float>(i ++));
-	_attr2bylevel.hitrate = factors.get<float>(i ++);
-	_attr2bylevel.evade = factors.get<float>(i ++);
-	_attr2bylevel.critical = factors.get<float>(i ++);
-	_attr2bylevel.pierce = factors.get<float>(i ++);
-	_attr2bylevel.counter = factors.get<float>(i ++);
-	_attr2bylevel.action = factors.get<float>(i ++);
-	_attr2bylevel.hp = factors.get<UInt16>(i ++);
-	_attr2bylevel.attack = factors.get<UInt16>(i ++);
-	_attr2bylevel.defend = factors.get<UInt16>(i ++);
+	_attrbylevel.strength = static_cast<UInt16>(factors.get<float>(i++));
+	_attrbylevel.physique = static_cast<UInt16>(factors.get<float>(i ++));
+	_attrbylevel.intelligence = static_cast<UInt16>(factors.get<float>(i ++));
+	_attrbylevel.agility = static_cast<UInt16>(factors.get<float>(i ++));
+	_attrbylevel.hitrate = factors.get<float>(i ++);
+	_attrbylevel.evade = factors.get<float>(i ++);
+	_attrbylevel.critical = factors.get<float>(i ++);
+	_attrbylevel.pierce = factors.get<float>(i ++);
+	_attrbylevel.counter = factors.get<float>(i ++);
+	_attrbylevel.action = factors.get<float>(i ++);
+	_attrbylevel.hp = factors.get<UInt16>(i ++);
+	_attrbylevel.attack = factors.get<UInt16>(i ++);
+	_attrbylevel.defend = factors.get<UInt16>(i ++);
 }
 
-inline void addAttr1Extra( GData::Attr1Extra& ae, const GData::Attr1Extra * ext )
-{
-	if(ext == NULL)
-		return;
-	ae += *ext;
-}
-
-inline void addAttr2Extra( GData::Attr2Extra& ae, const GData::Attr2Extra * ext )
+inline void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
 {
 	if(ext == NULL)
 		return;
@@ -105,30 +98,26 @@ inline void addAttr2Extra( GData::Attr2Extra& ae, const GData::Attr2Extra * ext 
 
 void BattleFighter::updateBuffExtras()
 {
-	_attr1Extra.reset();
-	_attr2Extra.reset();
+	_attrExtra.reset();
 	if(_formEffect != NULL)
 	{
-		addAttr1Extra(_attr1Extra, _formEffect->attr1Extra);
-		addAttr2Extra(_attr2Extra, _formEffect->attr2Extra);
+		addAttrExtra(_attrExtra, _formEffect->attrExtra);
 	}
-	addAttr1Extra(_attr1Extra, _fighter->getAttr1ExtraEquip());
-	addAttr2Extra(_attr2Extra, _fighter->getAttr2ExtraEquip());
+	addAttrExtra(_attrExtra, _fighter->getAttrExtraEquip());
 	UInt32 ext = (_flag & 0x03) + ((_flag >> 2) & 0x03);
 	if(_flag & Enh3)
 		ext += 2;
 	if(_flag & BlockBoss)
 	{
-		addAttr1Extra(_attr1Extra, &_attr1bylevel);
-		addAttr2Extra(_attr2Extra, &_attr2bylevel);
+		addAttrExtra(_attrExtra, &_attrbylevel);
 	}
 	if(ext > 0)
 	{
 		float extAttr = 0.05f * ext;
-		_attr1Extra.strengthP += extAttr;
-		_attr1Extra.physiqueP += extAttr;
-		_attr1Extra.agilityP += extAttr;
-		_attr1Extra.intelligenceP += extAttr;
+		_attrExtra.strengthP += extAttr;
+		_attrExtra.physiqueP += extAttr;
+		_attrExtra.agilityP += extAttr;
+		_attrExtra.intelligenceP += extAttr;
 	}
 }
 

@@ -64,7 +64,7 @@ namespace GObject
 
 	static void getRandomAttr2(UInt8 lv, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
 	{
-		static UInt8 attr2Chances[11][3][8] =
+		static UInt8 attrChances[11][3][8] =
 		{
 			{{15, 50, 35}},
 			{{15, 50, 35}},
@@ -79,7 +79,7 @@ namespace GObject
 			{{0}, {15, 50, 35}, {15, 44, 20, 10, 5, 3, 2, 1}},
 		};
 
-		static UInt16 attr2Info[11][7][3][8] =
+		static UInt16 attrInfo[11][7][3][8] =
 		{
 			{{{10, 15, 20}},
 			{{40, 50, 60}},
@@ -218,16 +218,16 @@ namespace GObject
 				v[i] = 0;
 				for(UInt8 j = 0; j < 8; ++ j)
 				{
-					if(dice < attr2Chances[lv][q][j])
+					if(dice < attrChances[lv][q][j])
 					{
 						t[i] = types[nidx];
-						v[i] = attr2Info[lv][t[i] - 1][q][j];
+						v[i] = attrInfo[lv][t[i] - 1][q][j];
 						if(nidx + 1 < tcount)
 							types[nidx] = types[tcount - 1];
 						-- tcount;
 						break;
 					}
-					dice -= attr2Chances[lv][q][j];
+					dice -= attrChances[lv][q][j];
 				}
 			}
 			while(oldt != 0 && t[i] == oldt && v[i] == oldv);

@@ -46,13 +46,13 @@ INSERT INTO `area` VALUES (1,1,'0,0','1.05'),(2,1,'0,0;1,0;2,0;3,0;4,0;-1,0;-2,0
 UNLOCK TABLES;
 
 --
--- Table structure for table `attr1_extra`
+-- Table structure for table `attr_extra`
 --
 
-DROP TABLE IF EXISTS `attr1_extra`;
+DROP TABLE IF EXISTS `attr_extra`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `attr1_extra` (
+CREATE TABLE `attr_extra` (
   `id` int(10) NOT NULL,
   `strength` varchar(10) NOT NULL DEFAULT '0',
   `physique` varchar(10) NOT NULL DEFAULT '0',
@@ -62,19 +62,6 @@ CREATE TABLE `attr1_extra` (
   `soul` varchar(10) NOT NULL DEFAULT '0',
   `aura` varchar(10) NOT NULL DEFAULT '0',
   `tough` varchar(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `attr2_extra`
---
-
-DROP TABLE IF EXISTS `attr2_extra`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `attr2_extra` (
-  `id` int(10) NOT NULL,
   `attack` varchar(64) NOT NULL DEFAULT '0',
   `img_attack` varchar(64) NOT NULL DEFAULT '0',
   `defend` varchar(64) NOT NULL DEFAULT '0',
@@ -88,7 +75,7 @@ CREATE TABLE `attr2_extra` (
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
   `img_res` float(10,4) NOT NULL DEFAULT '0.0000',
-  PRIMARY KEY (`id`)
+PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -331,8 +318,7 @@ CREATE TABLE `item_template` (
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
   `bindType` tinyint(1) NOT NULL COMMENT '绑定类型',
   `data` smallint(6) NOT NULL COMMENT '武器: 武器定义; 可使用道具: 作用数值',
-  `attr1Id` int(10) NOT NULL COMMENT '一级属性附加',
-  `attr2Id` int(10) NOT NULL COMMENT '二级属性附加',
+  `attrId` int(10) NOT NULL COMMENT '附加属性',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

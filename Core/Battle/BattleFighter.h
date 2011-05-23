@@ -35,26 +35,26 @@ public:
 	inline UInt8 getColor() { return _fighter->getColor(); }
 	inline float getPotential() { return _fighter->getPotential(); }
 
-	inline UInt16 getExtraStrength() { return _attr1Extra.strength; }
-	inline UInt16 getExtraPhysique() { return _attr1Extra.physique; }
-	inline UInt16 getExtraAgility() { return _attr1Extra.agility; }
-	inline UInt16 getExtraIntelligence() { return _attr1Extra.intelligence; }
-	inline float getExtraStrengthP() { return _attr1Extra.strengthP; }
-	inline float getExtraPhysiqueP() { return _attr1Extra.physiqueP; }
-	inline float getExtraAgilityP() { return _attr1Extra.agilityP; }
-	inline float getExtraIntelligenceP() { return _attr1Extra.intelligenceP; }
-	inline UInt16 getExtraAttack() { return _attr2Extra.attack; }
-	inline float getExtraAttackP() { return _attr2Extra.attackP; }
-	inline UInt16 getExtraDefend() { return _attr2Extra.defend; }
-	inline float getExtraDefendP() { return _attr2Extra.defendP; }
-	inline UInt16 getExtraHP() { return _attr2Extra.hp; }
-	inline float getExtraHPP() { return _attr2Extra.hpP; }
-	inline float getExtraAction() { return _attr2Extra.action; }
-	inline float getExtraHitrate() { return _attr2Extra.hitrate; }
-	inline float getExtraEvade() { return _attr2Extra.evade; }
-	inline float getExtraCritical() { return _attr2Extra.critical; }
-	inline float getExtraPierce() { return _attr2Extra.pierce; }
-	inline float getExtraCounter() { return _attr2Extra.counter; }
+	inline UInt16 getExtraStrength() { return _attrExtra.strength; }
+	inline UInt16 getExtraPhysique() { return _attrExtra.physique; }
+	inline UInt16 getExtraAgility() { return _attrExtra.agility; }
+	inline UInt16 getExtraIntelligence() { return _attrExtra.intelligence; }
+	inline float getExtraStrengthP() { return _attrExtra.strengthP; }
+	inline float getExtraPhysiqueP() { return _attrExtra.physiqueP; }
+	inline float getExtraAgilityP() { return _attrExtra.agilityP; }
+	inline float getExtraIntelligenceP() { return _attrExtra.intelligenceP; }
+	inline UInt16 getExtraAttack() { return _attrExtra.attack; }
+	inline float getExtraAttackP() { return _attrExtra.attackP; }
+	inline UInt16 getExtraDefend() { return _attrExtra.defend; }
+	inline float getExtraDefendP() { return _attrExtra.defendP; }
+	inline UInt16 getExtraHP() { return _attrExtra.hp; }
+	inline float getExtraHPP() { return _attrExtra.hpP; }
+	inline float getExtraAction() { return _attrExtra.action; }
+	inline float getExtraHitrate() { return _attrExtra.hitrate; }
+	inline float getExtraEvade() { return _attrExtra.evade; }
+	inline float getExtraCritical() { return _attrExtra.critical; }
+	inline float getExtraPierce() { return _attrExtra.pierce; }
+	inline float getExtraCounter() { return _attrExtra.counter; }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
@@ -122,8 +122,7 @@ public:
 
 	inline void addAction(UInt32 p);
 
-	inline GData::Attr1Extra * getTotalAttr1Extra() { return &_attr1Extra; }
-	inline GData::Attr2Extra * getTotalAttr2Extra() { return &_attr2Extra; }
+	inline GData::AttrExtra * getTotalAttrExtra() { return &_attrExtra; }
 
 	UInt16 getPortrait();
 	inline UInt32 getFlag() { return _flag; }
@@ -159,12 +158,9 @@ private:
 	   b4:愈战愈勇
 	   28-31bit: holy level */
 	UInt32 _flag;
-	GData::Attr1Extra _attr1ExtraEquip; // 装备附加一级属性和
-	GData::Attr2Extra _attr2ExtraEquip; // 装备附加二级属性和
-	GData::Attr1Extra _attr1Extra; // 全部附加一级属性和
-	GData::Attr2Extra _attr2Extra; // 全部附加二级属性和
-	GData::Attr1Extra _attr1bylevel;
-	GData::Attr2Extra _attr2bylevel;
+	GData::AttrExtra _attrExtraEquip; // 装备附加一级属性和
+	GData::AttrExtra _attrExtra; // 全部附加一级属性和
+	GData::AttrExtra _attrbylevel;
 
 public:
 	enum StatusFlag

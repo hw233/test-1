@@ -18,10 +18,9 @@ public:
 		UInt8 link_ratio;
 		UInt8 rescue;
 		UInt8 rescue_ratio;
-		const Attr1Extra * attr1Extra;
-		const Attr2Extra * attr2Extra;
+		const AttrExtra * attrExtra;
 		GridEffect(): pos(0), link(0), link_ratio(0), rescue(0), rescue_ratio(0),
-			attr1Extra(NULL), attr2Extra(NULL) { }
+			attrExtra(NULL) { }
 	};
 public:
 	Formation(UInt8, std::string, UInt8, UInt16, int, UInt8 *);
