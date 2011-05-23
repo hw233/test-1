@@ -26,7 +26,7 @@ namespace GObject
 #define CITTA_LEVEL_MAX 100
 #define CITTA_UPMAX 6
 #define TRUMP_UPMAX 3
-#define BLOODBIT_MAX 15
+#define ACUPOINTS_MAX 15
 
 #define SKILL_LEVEL(x)  ((x)%SKILL_LEVEL_MAX)
 #define SKILL_ID(x) ((x)/SKILL_LEVEL_MAX)
@@ -80,13 +80,13 @@ public:
     inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessAndLevel() { return _peerless; }
 
-    inline UInt8 getBloodCntMax() { return 3; }
-    bool setBloodBit(int idx, UInt8 v, bool = true);
-    bool incBloodBit(int idx, bool = true);
+    inline UInt8 getAcupointsCntMax() { return 3; }
+    bool setAcupointsBit(int idx, UInt8 v, bool = true);
+    bool incAcupointsBit(int idx, bool = true);
 
-    inline UInt8 getBloodBit(int idx) { return (idx >= 0 && idx < BLOODBIT_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
-    void getAllBloodBits(Stream& st);
-    void setBloodBits(std::string& acupoints, bool = true);
+    inline UInt8 getAcupointsBit(int idx) { return (idx >= 0 && idx < ACUPOINTS_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
+    void getAllAcupointsBits(Stream& st);
+    void setAcupointsBits(std::string& acupoints, bool = true);
 
     // 学习技能
 	bool learnSkill(UInt16 skill);
@@ -173,7 +173,7 @@ public:
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
 
-    void sendModificationBloodBit(UInt8 t, int idx, bool = true);
+    void sendModificationAcupointsBit(UInt8 t, int idx, bool = true);
 
 #if 1
     void sendModification(UInt8 t, UInt16 skill, int idx, bool = true);
@@ -307,7 +307,7 @@ protected:
 	UInt16 _hp;
 
     UInt16 _peerless;       // 无双技能
-    UInt8 _acupoints[BLOODBIT_MAX];    // 血道
+    UInt8 _acupoints[ACUPOINTS_MAX];    // 血道
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
     std::vector<UInt16> _skills;    // 学会的技能

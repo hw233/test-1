@@ -989,7 +989,7 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getRingId() << fgt->getAmuletId();
             fgt->getAllTrumps(st);
-            fgt->getAllBloodBits(st);
+            fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
             fgt->getAllCittaAndLevel(st);
 

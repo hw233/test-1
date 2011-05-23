@@ -521,7 +521,7 @@ CREATE TABLE `fighter` (
   `amulet` int(10) unsigned NOT NULL DEFAULT '0',
   `peerless` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
-  `bloodbit` varchar(255) NOT NULL,
+  `acupoints` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
   `citta` varchar(255) NOT NULL,
   `skills` varchar(255) NOT NULL,
