@@ -31,6 +31,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getLevel", &GObject::Fighter::getLevel);
 	class_def<GObject::Fighter>("getColor", &GObject::Fighter::getColor);
 	class_def<GObject::Fighter>("getPotential", &GObject::Fighter::getPotential);
+	class_def<GObject::Fighter>("getCapacity", &GObject::Fighter::getCapacity);
 	class_def<GObject::Fighter>("getExtraStrength", &GObject::Fighter::getExtraStrength);
 	class_def<GObject::Fighter>("getExtraPhysique", &GObject::Fighter::getExtraPhysique);
 	class_def<GObject::Fighter>("getExtraAgility", &GObject::Fighter::getExtraAgility);

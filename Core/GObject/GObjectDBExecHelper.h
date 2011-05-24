@@ -137,8 +137,8 @@ struct DBFighter
     UInt8 cls;                  // 职业:1-儒 2-释 3-道
     UInt8 lvl;                  // 等级*
     UInt8 sex;                  // 性别:0-男 1-女 2-童
-    float potential;            // 资质*
-    float capacity;             // 潜力*
+    float potential;            // 潜力*
+    float capacity;             // 资质*
     std::string skill;          // 技能/初始技能*, 一些比较牛的将可能会有多个初始技能
     UInt32 npc_weapon;          // 初始装备
     Int16 strength;             // 力量
@@ -204,8 +204,8 @@ struct DBFighterObj
 {
 	UInt32 id;              // 将编号
 	UInt64 playerId;        // 玩家ID
-	float potential;        // 资质
-    float capacity;         // 潜力
+	float potential;        // 潜力
+    float capacity;         // 资质
 	UInt8 level;            // 等级
 	UInt64 experience;      // 经验槽
     UInt64 practiceExp;     // 修炼经验槽
@@ -606,7 +606,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(30)
+SPECIALDEF(31)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -623,6 +623,7 @@ SPECIALDEF(30)
 	UInt32, pdata.lastOnline,
 	UInt64, pdata.newGuild,
 	UInt16, pdata.packSize,
+	UInt8, pdata.mounts,
 	std::string, icCount,
 	UInt8, pdata.formation,
 	std::string, lineup,

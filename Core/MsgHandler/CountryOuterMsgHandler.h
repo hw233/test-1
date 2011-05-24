@@ -363,7 +363,7 @@ struct CanAcceptTaskReq
 
 struct CanAcceptTaskToken
 {
-	//UInt8  m_Token;		//0：表示删�?1: 表示添加
+	//UInt8  m_Token;		//0：表示删???1: 表示添加
 	UInt32 m_TaskId;    //更新的任务ID
 };
 S11N_TRAITS_1(CanAcceptTaskToken, UInt32, m_TaskId);
@@ -371,9 +371,9 @@ S11N_TRAITS_1(CanAcceptTaskToken, UInt32, m_TaskId);
 struct TaskActionReq
 {
 	UInt32	m_TaskId;	//
-	UInt8	m_Action;	//0：接�?1：提�?2：放�?
+	UInt8	m_Action;	//0：接???1：提???2：放???
 	UInt32  m_ItemId;	//奖励物品ID
-	UInt16  m_ItemNum;	//奖励物品的数�?
+	UInt16  m_ItemNum;	//奖励物品的数???
 
 	TaskActionReq() : m_TaskId(0), m_Action(0), m_ItemId(0), m_ItemNum(0) {};
 
@@ -708,7 +708,7 @@ void OnConveyBattleReq( GameMsgHdr& hdr, ConveyBattleReq& req )
 	if (req.m_TaskId != pl->GetTaskMgr()->GetConveyTask())
 		return ;
 
-	//检查此护送任务是否已�?
+	//检查此护送任务是否已???
 	if (!taskMgr->HasAcceptedTask(req.m_TaskId))
 		return ;
 
@@ -791,6 +791,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
 	pl->sendWallow();
 	pl->sendEvents();
+    pl->GetPackage()->SendPackageItemInfor();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -801,6 +802,13 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 	br >> field;
 	switch (field)
 	{
+    case 0x09:
+        {
+            UInt32 mounts;
+            br >> mounts;
+            player->setMounts(static_cast<UInt8>(mounts));
+        }
+        break;
 	case 0x10:
 		{
 			UInt32 step;
@@ -1732,11 +1740,11 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 	switch (req.m_Action)
 	{
 	case 0:
-		//接受, 走脚�?
+		//接受, 走脚???
 		succ = GameAction()->AcceptTask(player, req.m_TaskId);
 		break;
 	case 1:
-		//提交, 直接走脚�?
+		//提交, 直接走脚???
 		succ = GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
 		break;
 	case 2:

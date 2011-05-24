@@ -727,6 +727,7 @@ CREATE TABLE `player` (
   `inCity` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `lastOnline` int(10) unsigned NOT NULL DEFAULT '0',
   `packSize` smallint(4) unsigned NOT NULL DEFAULT '100',
+  `mounts` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mainFighter` int(10) unsigned NOT NULL DEFAULT '0',
   `icCount` varchar(32) NOT NULL DEFAULT '',
   `formation` tinyint(3) unsigned NOT NULL DEFAULT '0',
