@@ -151,7 +151,7 @@ namespace GObject
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), status(0), country(0),
 			title(0), achievement(0), location(0), inCity(false), lastOnline(0),
-			newGuild(0), packSize(INIT_PACK_SIZE), gmLevel(0), icCount(0), nextIcReset(0),
+			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0),
@@ -173,6 +173,7 @@ namespace GObject
 		UInt32 lastOnline;          // 上次上线时间
 		UInt64 newGuild;            // 新手引导任务
 		UInt16 packSize;            // 玩家背包容量
+		UInt8 mounts;               // 坐骑
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // 
 		UInt32 nextIcReset;         // 
@@ -434,6 +435,8 @@ namespace GObject
 		UInt8 getIcCount();
 
 		inline UInt16 getPacksize() { return _playerData.packSize; }
+        inline UInt8 getMounts() { return _playerData.mounts; }
+        bool setMounts(UInt8 mounts);
 
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;

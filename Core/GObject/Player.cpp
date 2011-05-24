@@ -932,7 +932,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -989,7 +989,7 @@ namespace GObject
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getRingId() << fgt->getAmuletId();
             fgt->getAllTrumps(st);
-            fgt->getAllBloodBits(st);
+            fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
             fgt->getAllCittaAndLevel(st);
 
@@ -1219,6 +1219,16 @@ namespace GObject
 		send(st);
 		return true;
 	}
+
+    bool Player::setMounts(UInt8 mounts)
+    {
+        if (mounts != getMounts())
+        {
+            sendModification(9, mounts, false);
+            return true;
+        }
+        return false;
+    }
 
 	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen )
 	{
@@ -1855,6 +1865,7 @@ namespace GObject
 		case 6: field = "title"; break;
 		case 7: field = "totalRecharge"; break;
 		case 8: field = "archievement"; break;
+		case 9: field = "mounts"; break;
 		case 0x20: field = "packSize"; break;
 		}
 		if(field != NULL)
