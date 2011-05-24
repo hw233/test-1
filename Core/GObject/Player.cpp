@@ -3483,24 +3483,31 @@ namespace GObject
 		UInt32 rate = 0;
 		if(p < 0.90f)
 			rate = 100;
-		else if(p < 0.955f)
+		else if(p < 0.95f)
+			rate = 90;
+		else if(p < 1.05f)
 			rate = 80;
-		else if(p < 1.005f)
+		else if(p < 1.15f)
 			rate = 70;
-		else if(p < 1.055f)
+		else if(p < 1.25f)
 			rate = 60;
-		else if(p < 1.105f)
+		else if(p < 1.35f)
 			rate = 50;
-		else if(p < 1.195f)
+		else if(p < 1.45f)
 			rate = 40;
-		else if(p < 1.225f)
+		else if(p < 1.55f)
 			rate = 30;
-		else if(p < 1.255f)
+		else if(p < 1.65f)
 			rate = 20;
-		else if(p < 1.325f)
+		else if(p < 1.75f)
 			rate = 10;
-		else if(p < 1.785f)
+		else if(p < 1.85f)
 			rate = 5;
+		else if(p < 1.95f)
+			rate = 2;
+		else if(p < 2.05f)
+			rate = 10;
+
 		if(rate == 0)
 			return 1;
 		if(!m_Package->DelItemAny(ITEM_TRAIN, 1))
