@@ -311,7 +311,7 @@ MapPlayer::iterator Map::find(UInt8 country, UInt8 status, Player *player)
 UInt32 Map::getCityPlayerNum()
 {
 	UInt32 count = 0;
-	for(UInt32 i = 0; i < 2; i ++)
+	for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
 	{
 		for(UInt32 j = 0; j < 2; j ++)
 		{
@@ -357,7 +357,7 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 {
 	if(pl == NULL)
 	{
-		for(UInt32 i = 0; i < 2; i ++)
+		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
@@ -372,7 +372,7 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 	}
 	else
 	{
-		for(UInt32 i = 0; i < 2; i ++)
+		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
