@@ -255,11 +255,11 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 		Stream st(0x54);
 		
 		st << static_cast<UInt8>(0);
-		for(UInt32 i = 0; i < 2 && c <= MAX_NUM; i ++)
+		for(UInt32 i = 0; i < COUNTRY_MAX && c <= MAX_NUM; i ++)
 		{
 			for(UInt32 j = 0; j < 2 && c <= MAX_NUM; j ++)
 			{
-				if(pl->getCountry() == 1)
+				if(pl->getCountry() == 1 || pl->getCountry() == 2)
 				{
 					const MapPlayer& playerList = _playerList[i][j];
 					for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
