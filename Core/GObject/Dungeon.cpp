@@ -237,6 +237,9 @@ bool Dungeon::doAttack( Player * player, UInt8 difficulty, UInt8 level)
 	if(dm == NULL)
 		return false;
 
+    if(!dm->fighter)
+        return false;
+
 	Battle::BattleSimulator bsim(player->getLocation(), player, dm->fighter->getName(), dm->fighter->getLevel(), false);
 	player->PutFighters(bsim, 0);
 	bsim.setPortrait(1, dm->fighter->favor);

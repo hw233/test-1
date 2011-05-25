@@ -709,7 +709,7 @@ namespace GObject
 		ItemEquip * old = NULL;
 		if(id != 0)
 		{
-			if (!IsEquipId(id) || part < 1 || part > 8) return false;
+			if (!IsEquipId(id)) return false;
 			item_elem_iter iter = m_Items.find(ItemKey(id));
 			if(iter == m_Items.end())
 				return false;
@@ -718,7 +718,7 @@ namespace GObject
 				return false;
 			switch(part)
 			{
-			case 1:
+			case 0x21:
 				{
 					if(item->getClass() != Item_Weapon)
 						return false;
@@ -726,41 +726,50 @@ namespace GObject
 					old = fgt->setWeapon(wp);
 				}
 				break;
-			case 2:
+			case 0x22:
 				if(item->getClass() != Item_Armor1)
 					return false;
 				old = fgt->setArmor(0, static_cast<GObject::ItemArmor *>(item));
 				break;
-			case 3:
+			case 0x23:
 				if(item->getClass() != Item_Armor2)
 					return false;
 				old = fgt->setArmor(1, static_cast<GObject::ItemArmor *>(item));
 				break;
-			case 4:
+			case 0x24:
 				if(item->getClass() != Item_Armor3)
 					return false;
 				old = fgt->setArmor(2, static_cast<GObject::ItemArmor *>(item));
 				break;
-			case 5:
+			case 0x25:
 				if(item->getClass() != Item_Armor4)
 					return false;
 				old = fgt->setArmor(3, static_cast<GObject::ItemArmor *>(item));
 				break;
-			case 6:
+			case 0x26:
 				if(item->getClass() != Item_Armor5)
 					return false;
 				old = fgt->setArmor(4, static_cast<GObject::ItemArmor *>(item));
 				break;
-			case 7:
+			case 0x27:
 				if(item->getClass() != Item_Amulet)
 					return false;
 				old = fgt->setAmulet(static_cast<GObject::ItemEquip *>(item));
 				break;
-			case 8:
+			case 0x28:
 				if(item->getClass() != Item_Ring)
 					return false;
 				old = fgt->setRing(static_cast<GObject::ItemEquip *>(item));
 				break;
+            case 0x50:
+            case 0x51:
+            case 0x52:
+                if(item->getClass() != Item_Trump)
+                    return false;
+                old = fgt->setTrump(static_cast<GObject::ItemEquip *>(item), part-0x50);
+                break;
+            default:
+                return false;
 			}
 
 			newOne = static_cast<GObject::ItemEquip *>(item);
