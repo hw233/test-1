@@ -254,6 +254,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
 			DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
         return;
+	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+        break;
 
     case 0x29:
         {
@@ -305,7 +307,6 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 0x27: field = "amulet"; break;
 	case 0x28: field = "ring"; break;
 	case 0x30: field = "peerless"; break;
-	}
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
