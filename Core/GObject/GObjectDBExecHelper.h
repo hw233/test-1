@@ -150,9 +150,9 @@ struct DBFighter
     Int16 aura;                 // 灵气/士气
     Int16 tough;                // 坚韧
     Int16 attack;               // 物理攻击
-    Int16 img_attack;           // 法术攻击
+    Int16 mag_attack;           // 法术攻击
     Int16 defend;               // 物理防御
-    Int16 img_defend;           // 法术防御
+    Int16 mag_defend;           // 法术防御
     Int32 hp;                   // 最大血槽*
     UInt16 action;              // 身法/行动值
     UInt16 peerless;            // 无双技能
@@ -162,7 +162,7 @@ struct DBFighter
     float critical_dmg;         // 暴击伤害
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击
-    float img_res;              // 法术抵抗
+    float mag_res;              // 法术抵抗
     std::string extraPos;
 };
 
@@ -713,9 +713,9 @@ SPECIALDEF(32)
 	Int16, aura,
 	Int16, tough,
 	Int16, attack,
-	Int16, img_attack,
+	Int16, mag_attack,
 	Int16, defend,
-	Int16, img_defend,
+	Int16, mag_defend,
 	Int32, hp,
 	UInt16, action,
 	UInt16, peerless,
@@ -725,7 +725,7 @@ SPECIALDEF(32)
 	float, critical_dmg,
 	float, pierce,
 	float, counter,
-	float, img_res,
+	float, mag_res,
 	std::string, extraPos
 )
 SPECIALEND()

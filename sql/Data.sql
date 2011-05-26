@@ -63,9 +63,9 @@ CREATE TABLE `attr_extra` (
   `aura` varchar(10) NOT NULL DEFAULT '0',
   `tough` varchar(10) NOT NULL DEFAULT '0',
   `attack` varchar(64) NOT NULL DEFAULT '0',
-  `img_attack` varchar(64) NOT NULL DEFAULT '0',
+  `mag_attack` varchar(64) NOT NULL DEFAULT '0',
   `defend` varchar(64) NOT NULL DEFAULT '0',
-  `img_defend` varchar(64) NOT NULL DEFAULT '0',
+  `mag_defend` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -74,7 +74,7 @@ CREATE TABLE `attr_extra` (
   `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
-  `img_res` float(10,4) NOT NULL DEFAULT '0.0000',
+  `mag_res` float(10,4) NOT NULL DEFAULT '0.0000',
 PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -422,34 +422,51 @@ CREATE TABLE `npc_group` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `skill`
+-- Table structure for table `skills`
 --
 
-DROP TABLE IF EXISTS `skill`;
+DROP TABLE IF EXISTS `skills`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `skill` (
-  `id` int(10) NOT NULL,
+CREATE TABLE `skills` (
+  `id` smallint(5) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `areaType` tinyint(3) NOT NULL,
-  `areaId` int(10) NOT NULL,
-  `attr2Id` int(10) NOT NULL,
-  `damage` int(10) NOT NULL,
-  `duration` mediumint(5) NOT NULL,
+  `target` tinyint(3) NOT NULL DEFAULT '0',
+  `cond` smallint(5) NOT NULL DEFAULT '0',
+  `prob` float(10,4) NOT NULL DEFAULT '0.0000',
+  `area` tinyint(3) NOT NULL DEFAULT '0',
+  `factor` varchar(255) NOT NULL DEFAULT '',
+  `last` smallint(5) NOT NULL DEFAULT '0',
+  `cd` smallint(5) NOT NULL DEFAULT '0',
+  `effectid` smallint(5) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `skill_effect`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `skill_effect` (
+  `id` smallint(5) NOT NULL,
+  `state` tinyint(3) NOT NULL DEFAULT '0',
+  `stateprob` float(10,4) NOT NULL DEFAULT '0.0000',
+  `immune` tinyint(3) NOT NULL DEFAULT '0',
+  `damage` varchar(255) NOT NULL DEFAULT '',
+  `magdam` varchar(255) NOT NULL DEFAULT '',
+  `hp` varchar(255) NOT NULL DEFAULT '',
+  `aura` varchar(255) NOT NULL DEFAULT '',
+  `hitCount` tinyint(3) NOT NULL DEFAULT '0',
+  `def` varchar(255) NOT NULL DEFAULT '',
+  `magdef` varchar(255) NOT NULL DEFAULT '',
+  `evade` float(10,4) NOT NULL DEFAULT '0.0000',
+  `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
+  `adddam` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `skill`
---
--- ORDER BY:  `id`
-
-LOCK TABLES `skill` WRITE;
-/*!40000 ALTER TABLE `skill` DISABLE KEYS */;
-/*!40000 ALTER TABLE `skill` ENABLE KEYS */;
-UNLOCK TABLES;
-
+-- Table structure for table `special_fighter_intro`
 --
 -- Table structure for table `special_fighter_intro`
 --
@@ -502,9 +519,9 @@ CREATE TABLE `special_fighter_template` (
   `aura` int(5) NOT NULL DEFAULT '10',
   `tough` int(5) NOT NULL DEFAULT '10',
   `attack` int(5) NOT NULL DEFAULT '10',
-  `img_attack` int(5) NOT NULL DEFAULT '10',
+  `mag_attack` int(5) NOT NULL DEFAULT '10',
   `defend` int(5) NOT NULL DEFAULT '10',
-  `img_defend` int(5) NOT NULL DEFAULT '10',
+  `mag_defend` int(5) NOT NULL DEFAULT '10',
   `hp` int(10) NOT NULL DEFAULT '20',
   `action` int(5) NOT NULL DEFAULT '6000',
   `peerless` int(10) NOT NULL DEFAULT '20',
@@ -514,7 +531,7 @@ CREATE TABLE `special_fighter_template` (
   `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
-  `img_res` float(10,4) NOT NULL DEFAULT '0.0000',
+  `mag_res` float(10,4) NOT NULL DEFAULT '0.0000',
   `extraPos` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

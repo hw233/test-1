@@ -98,7 +98,7 @@ namespace GObject
         {
             const GData::AttrExtra* attrExtra = getAttrExtra();
             if (attrExtra)
-                return attrExtra->img_attack;
+                return attrExtra->mag_attack;
             return 0;
         }
 		inline UInt16 getDefend()
@@ -112,7 +112,7 @@ namespace GObject
         {
             const GData::AttrExtra* attrExtra = getAttrExtra();
             if (attrExtra)
-                return attrExtra->img_defend;
+                return attrExtra->mag_defend;
             return 0;
         }
 

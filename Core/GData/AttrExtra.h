@@ -13,10 +13,10 @@ struct AttrExtra
         will(0), soul(0), aura(0), tough(0),
 		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
         willP(0), soulP(0), auraP(0), toughP(0),
-		attack(0), attackP(0), img_attack(0), img_attackP(0),
-        defend(0), defendP(0), img_defend(0), img_defendP(0),
+		attack(0), attackP(0), mag_attack(0), mag_attackP(0),
+        defend(0), defendP(0), mag_defend(0), mag_defendP(0),
 		hp(0), hpP(0), action(0), hitrate(0), evade(0),
-        critical(0), critical_dmg(0), pierce(0), counter(0), img_res(0)
+        critical(0), critical_dmg(0), pierce(0), counter(0), mag_res(0)
 	{ }
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
@@ -40,10 +40,10 @@ struct AttrExtra
 		attackP += other.attackP;
 		defend += other.defend;
 		defendP += other.defendP;
-        img_attack += other.img_attack;
-        img_attackP += other.img_attackP;
-        img_defend += other.img_defend;
-        img_defendP += other.img_defendP;
+        mag_attack += other.mag_attack;
+        mag_attackP += other.mag_attackP;
+        mag_defend += other.mag_defend;
+        mag_defendP += other.mag_defendP;
 		hp += other.hp;
 		hpP += other.hpP;
 		action += other.action;
@@ -53,7 +53,7 @@ struct AttrExtra
 		critical_dmg += other.critical_dmg;
 		pierce += other.pierce;
 		counter += other.counter;
-        img_res += other.img_res;
+        mag_res += other.mag_res;
 		return *this;
 	}
 	inline void reset()
@@ -79,12 +79,12 @@ struct AttrExtra
 	float toughP;
 	UInt16 attack;
 	float attackP;
-	UInt16 img_attack;
-	float img_attackP;
+	UInt16 mag_attack;
+	float mag_attackP;
 	UInt16 defend;
 	float defendP;
-	UInt16 img_defend;
-	float img_defendP;
+	UInt16 mag_defend;
+	float mag_defendP;
 	UInt16 hp;
 	float hpP;
 	float action;
@@ -94,7 +94,7 @@ struct AttrExtra
 	float critical_dmg;
 	float pierce;
 	float counter;
-	float img_res;
+	float mag_res;
 };
 
 struct AttrExtraItem:
