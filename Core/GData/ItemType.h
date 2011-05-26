@@ -39,7 +39,7 @@ enum ItemClass
 	Item_Armor5,		//防具5 腿甲 6
 	Item_Amulet,		//项链 7
 	Item_Ring,			//戒指 8
-	Item_Reserved,		//法宝 9
+	Item_Reserved,		//保留 9
 	Item_Trump,			//法宝 10
 	Item_Mounts,		//坐骑 11
 	Item_Normal,		//普通物品 20~29

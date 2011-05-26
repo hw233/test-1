@@ -1,0 +1,47 @@
+
+#!/bin/bash
+
+F=loot.txt
+if [ "$1" != "" ]
+then
+    F=$1
+fi
+
+function loot()
+{
+    f=$1
+    d=loot
+    sed -i /isPack/d $f
+    sed -i s/\"//g $f
+    export lines=`wc -l $f | awk '{print $1}'`
+    echo "Generating file $d, total lines $l"
+    awk '
+        BEGIN {
+            print "INSERT INTO `loot` VALUES";
+        } {
+            printf("(%d,\x27%s\x27,%d)",$1,$2,$3);
+            if (NR <= ENVIRON["lines"]-1)
+                printf(",");
+            else if (NR >= ENVIRON["lines"])
+                printf(";");
+            printf("\n");
+        }
+        END {
+        }
+    ' $f > $d
+    sed -i s/\\r//g $d
+    if [ $? -eq 0 ]
+    then
+        echo "OK"
+    else
+        echo "ERROR"
+    fi
+}
+
+if [ -f $F  ]
+then
+    loot $F
+else
+    echo "File $F is not exists"
+fi
+

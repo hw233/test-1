@@ -226,7 +226,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `img_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
@@ -245,19 +245,29 @@ namespace GObject
 			fgt->setWeapon(nwp, false);
             fgt->setSkills(dbfgt.skill);
 			fgt->setPotential(dbfgt.potential, false);
+            fgt->setCapacity(dbfgt.capacity, false);
 			fgt->strength = dbfgt.strength;
 			fgt->physique = dbfgt.physique;
 			fgt->agility = dbfgt.agility;
 			fgt->intelligence = dbfgt.intelligence;
+			fgt->will = dbfgt.will;
+			fgt->soul = dbfgt.soul;
+			fgt->aura = dbfgt.aura;
+			fgt->tough = dbfgt.tough;
 			fgt->attack = dbfgt.attack;
+			fgt->mag_attack = dbfgt.mag_attack;
 			fgt->defend = dbfgt.defend;
+			fgt->mag_defend = dbfgt.mag_defend;
 			fgt->maxhp = dbfgt.hp;
 			fgt->action = dbfgt.action;
+			fgt->peerless = dbfgt.peerless;
 			fgt->hitrate = dbfgt.hitrate;
 			fgt->evade = dbfgt.evade;
 			fgt->critical = dbfgt.critical;
+			fgt->critical_dmg = dbfgt.critical_dmg;
 			fgt->pierce = dbfgt.pierce;
 			fgt->counter = dbfgt.counter;
+			fgt->mag_res = dbfgt.mag_res;
 
 			StringTokenizer tokenizer(dbfgt.extraPos, "|");
 			for(size_t j = 0; j < tokenizer.count(); ++ j)

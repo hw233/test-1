@@ -39,11 +39,12 @@ bool existGreatFighter(UInt32 id)
 }
 
 Fighter::Fighter(UInt32 id, Player * owner):
-	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _potential(1.0f),_capacity(1.0f),
-	_color(2), _hp(0), _peerless(0), _weapon(NULL), _ring(NULL), _amulet(NULL),
-	_attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
-	favor(0), reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0),
-	attack(0), defend(0), maxhp(0), action(0), hitrate(0), evade(0), critical(0), pierce(0), counter(0)
+	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _potential(1.0f),
+    _capacity(1.0f), _color(2), _hp(0), _weapon(NULL), _ring(NULL), _amulet(NULL), 
+    _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f), favor(0),
+    reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0), will(0),
+    soul(0), aura(0), tough(0), attack(0), defend(0), maxhp(0), action(0), peerless(0), 
+    hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0), counter(0), mag_res(0)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
     memset(_skill, 0, sizeof(_skill));
@@ -253,6 +254,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
 			DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
         return;
+	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+        break;
 
     case 0x29:
         {
@@ -303,7 +306,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 0x26: field = "armor5"; break;
 	case 0x27: field = "amulet"; break;
 	case 0x28: field = "ring"; break;
-	}
+	case 0x30: field = "peerless"; break;
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
@@ -1166,13 +1169,14 @@ void Fighter::getAllAcupointsBits( Stream& st )
     }
 }
 
-void Fighter::setPeerless( UInt16 peerless, bool writedb )
+void Fighter::setPeerless( UInt16 pl, bool writedb )
 {
-    _peerless = peerless;
-    // TODO:
-    if (writedb)
-    {
-    }
+    if (peerless == pl)
+        return;
+    peerless = pl;
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x30, peerless);
 }
 
 void Fighter::setAcupointsBits( std::string& acupoints, bool writedb )
@@ -1193,12 +1197,9 @@ bool Fighter::setAcupointsBit( int idx, UInt8 v, bool writedb )
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
         _acupoints[idx] = v;
-        if (writedb)
-        {
-            _attrDirty = true;
-            _bPDirty = true;
-            sendModificationAcupointsBit(0x29, idx, writedb);
-        }
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModificationAcupointsBit(0x29, idx, writedb);
         return true;
     }
     return false;

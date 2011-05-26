@@ -57,9 +57,9 @@ struct DBAttrExtra
     std::string aura;
     std::string tough;
 	std::string attack;
-	std::string img_attack;
+	std::string mag_attack;
 	std::string defend;
-	std::string img_defend;
+	std::string mag_defend;
 	std::string hp;
 	float action;
 	float hitrate;
@@ -68,7 +68,7 @@ struct DBAttrExtra
 	float critical_dmg;
 	float pierce;
 	float counter;
-	float img_res;
+	float mag_res;
 };
 
 struct DBFormation
@@ -79,6 +79,38 @@ struct DBFormation
 	std::string grids;
 	UInt8 leastNum;
 	UInt16 skillId;
+};
+
+struct DBSkill
+{
+    UInt16 id;
+    std::string name;
+    UInt8 target;       // 作用对象: 0-友方,1-敌方
+    UInt16 cond;        // 触发条件: 0-主动,1-攻击前被动触发,2-攻击后被动触发,3-被攻击后触发 N-灵气值(>=)
+    float prob;         // 触发概率
+    UInt8 area;         // 伤害范围: 0-单体,1-横排,2-竖列,3-全体
+    std::string factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 对第一个位置是100%,对第二个位置是30%,对第五个位置没有伤害
+    UInt16 last;        // 持续时间: -1-一直有效,0-非持续,N-持续次数
+    UInt16 cd;          // 冷却回合
+    UInt16 effectId;    // 效果索引
+};
+
+struct DBSkillEffect
+{
+    UInt16 id;
+    UInt8 state;        // 状态: 0-无状态 1中毒，2混乱，4晕眩，8无法使用技能, 有等级之分
+    float stateprob;    // 状态触发概率
+    UInt8 immune;       // 对状态技能的免疫,只能免疫比自己技能低的技能
+    std::string damage; // 物理伤害 num/num%
+    std::string magdam; // 法术伤害 num/num%
+    std::string hp;     // HP改变
+    std::string aura;   // 作用士气 +/-num
+    UInt8 hitCount;     // 连击次数
+    std::string def;    // 物理防御 num/num%
+    std::string magdef; // 法术防御 num/num%
+    float evade;        // 增加闪避
+    float pierce;       // 增加破击
+    float adddam;       // 人物属性的伤害加成
 };
 
 struct DBClanSkillType
@@ -179,9 +211,9 @@ SPECIALDEF(22)
     std::string, aura,
     std::string, tough,
 	std::string, attack,
-	std::string, img_attack,
+	std::string, mag_attack,
 	std::string, defend,
-	std::string, img_defend,
+	std::string, mag_defend,
 	std::string, hp,
 	float, action,
 	float, hitrate,
@@ -190,7 +222,7 @@ SPECIALDEF(22)
 	float, critical_dmg,
 	float, pierce,
 	float, counter,
-	float, img_res
+	float, mag_res
 	)
 SPECIALEND()
 
@@ -245,7 +277,42 @@ SPECIALDEF(6)
 	)
 SPECIALEND()
 
-}
+SPECIALBEGIN(GData::DBSkill)
+SPECIALDEF(10)
+    (
+        UInt16, id,
+        std::string, name,
+        UInt8, target,
+        UInt16, cond,
+        float, prob,
+        UInt8, area,
+        std::string, factor,
+        UInt16, last,
+        UInt16, cd,
+        UInt16, effectId
+    )
+SPECIALEND()
 
+SPECIALBEGIN(GData::DBSkillEffect)
+SPECIALDEF(14)
+    (
+        UInt16, id,
+        UInt8, state,
+        float, stateprob,
+        UInt8, immune,
+        std::string, damage,
+        std::string, magdam,
+        std::string, hp,
+        std::string, aura,
+        UInt8, hitCount,
+        std::string, def,
+        std::string, magdef,
+        float, evade,
+        float, pierce,
+        float, adddam
+    )
+SPECIALEND()
+
+}
 
 #endif // _GDATADBEXECHELPER_H_

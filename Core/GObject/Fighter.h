@@ -75,10 +75,10 @@ public:
     void setCapacity(float c, bool = true);
 	inline float getCapacity() {return _capacity;}
 
-    void setPeerless(UInt16 peerless, bool = true);
-    inline UInt16 getPeerless() { return _peerless / SKILL_LEVEL_MAX; }
-    inline UInt16 getPeerlessLevel() { return _peerless % SKILL_LEVEL_MAX; }
-    inline UInt16 getPeerlessAndLevel() { return _peerless; }
+    void setPeerless(UInt16 pl, bool = true);
+    inline UInt16 getPeerless() { return peerless / SKILL_LEVEL_MAX; }
+    inline UInt16 getPeerlessLevel() { return peerless % SKILL_LEVEL_MAX; }
+    inline UInt16 getPeerlessAndLevel() { return peerless; }
 
     inline UInt8 getAcupointsCntMax() { return 3; }
     bool setAcupointsBit(int idx, UInt8 v, bool = true);
@@ -306,7 +306,6 @@ protected:
 	UInt8 _color;
 	UInt16 _hp;
 
-    UInt16 _peerless;       // 无双技能
     UInt8 _acupoints[ACUPOINTS_MAX];    // 血道
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
@@ -341,14 +340,19 @@ public:
     Int32 aura;
     Int32 tough;
 	Int32 attack;
+	Int32 mag_attack;
 	Int32 defend;
+	Int32 mag_defend;
 	Int32 maxhp;
 	UInt32 action;
+    UInt16 peerless;       // 无双技能
 	float hitrate;
 	float evade;
 	float critical;
+	float critical_dmg;
 	float pierce;
 	float counter;
+	float mag_res;
 
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;

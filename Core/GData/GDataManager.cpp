@@ -12,6 +12,7 @@
 #include "DB/DBExecutor.h"
 #include "Server/ServerTypes.h"
 #include "Server/Cfg.h"
+#include "SkillTable.h"
 #include "Common/StringTokenizer.h"
 
 #include "Script/lua_tinker.h"
@@ -86,6 +87,16 @@ namespace GData
 			fprintf(stderr, "Load fighter train daata Error !\n");
 			return false;
 		}
+        if (!LoadSkillEffect())
+        {
+			fprintf(stderr, "Load skill effect Error !\n");
+			return false;
+        }
+        if (!LoadSkills())
+        {
+			fprintf(stderr, "Load skills template Error !\n");
+			return false;
+        }
 		if (!LoadClanSkillTable())
 		{
 			fprintf(stderr, "Load clan skill template Error !\n");
@@ -216,7 +227,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttrExtra ae;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `img_attack`, `defend`, `img_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `img_res` FROM `attr_extra`", ae) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -230,9 +241,9 @@ namespace GData
 			SetValOrPercent(aextra->_extra.aura, aextra->_extra.auraP, ae.aura);
 			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
 			SetValOrPercent(aextra->_extra.attack, aextra->_extra.attackP, ae.attack);
-			SetValOrPercent(aextra->_extra.img_attack, aextra->_extra.img_attackP, ae.img_attack);
+			SetValOrPercent(aextra->_extra.mag_attack, aextra->_extra.mag_attackP, ae.mag_attack);
 			SetValOrPercent(aextra->_extra.defend, aextra->_extra.defendP, ae.defend);
-			SetValOrPercent(aextra->_extra.img_defend, aextra->_extra.img_defendP, ae.img_defend);
+			SetValOrPercent(aextra->_extra.mag_defend, aextra->_extra.mag_defendP, ae.mag_defend);
 			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
 			aextra->_extra.action = ae.action;
 			aextra->_extra.hitrate = ae.hitrate;
@@ -241,7 +252,7 @@ namespace GData
 			aextra->_extra.critical_dmg = ae.critical_dmg;
 			aextra->_extra.pierce = ae.pierce;
 			aextra->_extra.counter = ae.counter;
-			aextra->_extra.img_res = ae.img_res;
+			aextra->_extra.mag_res = ae.mag_res;
 			attrExtraManager.add(aextra);
 		}
 		return true;
@@ -534,6 +545,66 @@ namespace GData
 		}
 		return true;
 	}
+
+    bool GDataManager::LoadSkillEffect()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBSkillEffect effs;
+		if(execu->Prepare("SELECT `id`, `state`, `stateprob`, `immune`, `damage`, `magdam`, `hp`, `aura`, `hitCount`, `def`, `magdef`, `evade`, `pierce`, `adddam` FROM `skill_effect`", effs) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            SkillEffect* ef = new SkillEffect(effs.id);
+            if (!ef)
+                return false;
+            ef->state = effs.state;
+            ef->stateprob = effs.stateprob;
+            ef->immune = effs.immune;
+            SetValOrPercent(ef->damage, ef->damageP, effs.damage);
+            SetValOrPercent(ef->magdam, ef->magdamP, effs.magdam);
+            SetValOrPercent(ef->hp, ef->hpP, effs.hp);
+            SetValOrPercent(ef->aura, ef->auraP, effs.aura);
+            ef->hitCount = effs.hitCount;
+            SetValOrPercent(ef->def, ef->defP, effs.def);
+            SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
+            ef->evade = effs.evade;
+            ef->pierce = effs.pierce;
+            ef->adddam = effs.adddam;
+            skillEffectManager.add(ef);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadSkills()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBSkill skills;
+		if(execu->Prepare("SELECT `id`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectId` FROM `skills`", skills) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            Skill* skill = new Skill(skills.id, skills.name);
+            if (!skill)
+                return false;
+            skill->target = skills.target;
+            skill->cond = skills.cond;
+            skill->prob = skills.prob;
+            skill->area = skills.area;
+            StringTokenizer tk(skills.factor, ",");
+            if (tk.count())
+            {
+                for (size_t i = 0; i < tk.count(); ++i)
+                    skill->factor.push_back(::atof(tk[i].c_str()));
+            }
+            skill->last = skills.last;
+            skill->cd = skills.cd;
+            skill->effect = skillEffectManager[skills.effectId];
+            skillManager.add(skill);
+        }
+        return true;
+    }
 
 	bool GDataManager::LoadClanSkillTable()
 	{
