@@ -36,14 +36,14 @@ private:
 	{
 		BattleFighter * bfgt;
 		UInt32 action;
-		UInt32 poisonAction;
+		//UInt32 poisonAction;
 		UInt32 poisonDamage;
 
 		inline FighterStatus() {}
 		inline FighterStatus(BattleFighter * f, UInt32 pa = 0, UInt32 pd = 0)
 		{
 			bfgt = f;
-			poisonAction = pa;
+			//poisonAction = pa;
 			poisonDamage = pd;
 			if(pa)
 				action = pa;
@@ -66,9 +66,9 @@ private:
 
 		inline void resetAction()
 		{
-			if(poisonAction)
-				action = poisonAction;
-			else
+		//	if(poisonAction)
+		//		action = poisonAction;
+		//	else
 				action = bfgt->getAction();
 		}
 	};
@@ -119,7 +119,8 @@ private:
 	UInt8 _position;
 	bool _report;
 	UInt32 _fake_turns;
-	std::vector<FighterStatus> _fgtlist;
+	std::vector<FighterStatus> _fgtlist[2];
+    Int8 _cur_fgtlist_idx;
 	Stream _packet;
 	Script::BattleFormula * _formula;
 	UInt16 _portrait[2];

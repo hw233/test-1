@@ -36,6 +36,7 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
 	_other_level = level2;
 	_portrait[0] = 0;
 	_portrait[1] = 0;
+    _cur_fgtlist_idx = 0;
 }
 
 BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObject::Player * player2, bool rpt, UInt32 fr): BattleField(), _id(rpt ? IDGenerator::gBattleOidGenerator.ID() : 0), _winner(0), _turns(0), _report(rpt), _fake_turns(fr), _formula(Script::BattleFormula::getCurrent())
@@ -48,12 +49,16 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
 	_other_level = player2->GetLev();
 	_portrait[0] = 0;
 	_portrait[1] = 0;
+    _cur_fgtlist_idx = 0;
 }
 
+// #############################
+// change the battle queue but not pass client check
 void BattleSimulator::start()
 {
 	_packet.clear();
-	_fgtlist.clear();
+	_fgtlist[0].clear();
+	_fgtlist[1].clear();
 
 	// [[ Make packet header data
 	_packet.init(0x6C);
@@ -69,6 +74,8 @@ void BattleSimulator::start()
 
 	_packet << static_cast<UInt16>(0);
 
+    // for the insertFighterStatus can only insert to next fgtlist, so to make sure to insert fighter status to _figtlist[0] and set the _cur_fgtlist to 1
+    _cur_fgtlist_idx = 1;
 	UInt8 cnt[2] = {0, 0};
 	bool loaded[2] = {false, false};
 	bool checkEnh = _player[1] == NULL;
@@ -145,7 +152,10 @@ void BattleSimulator::start()
 			}
 		}
 	}
-	if(_fgtlist.empty())
+
+    // after insert fighter status to _fgtlist[0] set the _cur_fgtlist_idx to 0
+    _cur_fgtlist_idx = 0;
+	if(_fgtlist[_cur_fgtlist_idx].empty())
 	{
 		_packet.clear();
 		return;
@@ -180,41 +190,53 @@ void BattleSimulator::start()
 
 void BattleSimulator::insertFighterStatus( FighterStatus& fs )
 {
-	int cnt = static_cast<int>(_fgtlist.size());
-	for(int i = cnt - 1; i >= 0; -- i)
+    Int8 next_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
+    std::vector<FighterStatus>& next_fgtlist = _fgtlist[next_fgtlist_idx];
+	int cnt = static_cast<int>(next_fgtlist.size());
+	for(int i = 0; i < cnt; ++ i)
 	{
-		if(_fgtlist[i].action < fs.action)
+		if(next_fgtlist[i].action < fs.action)
 		{
-			_fgtlist.insert(_fgtlist.begin() + i + 1, fs);
+			next_fgtlist.insert(next_fgtlist.begin() + i, fs);
 			return;
 		}
 	}
-	_fgtlist.insert(_fgtlist.begin(), fs);
+	next_fgtlist.insert(next_fgtlist.begin(), fs);
 }
 
 void BattleSimulator::removeFighterStatus( FighterStatus& fs )
 {
-	size_t c = _fgtlist.size();
-	size_t i = 0;
-	while(i < c)
-	{
-		if(_fgtlist[i] == fs)
-		{
-			_fgtlist.erase(_fgtlist.begin() + i);
-			-- c;
-		}
-		else
-			++ i;
-	}
+    for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
+    {
+        std::vector<FighterStatus>& cur_fgtlist = _fgtlist[fgtlist_idx];
+        size_t c = cur_fgtlist.size();
+        size_t i = 0;
+        while(i < c)
+        {
+            if(cur_fgtlist[i] == fs)
+            {
+                cur_fgtlist.erase(cur_fgtlist.begin() + i);
+                -- c;
+            }
+            else
+                ++ i;
+        }
+    }
 }
 
 // Find first attacker and update action points
 int BattleSimulator::findFirstAttacker()
 {
 	// Randomly select an attacker in that some fighters have the same action points
-	size_t c = 1, cnt = _fgtlist.size();
-	UInt32 act = _fgtlist[0].action;
-	while(c < cnt && _fgtlist[c].action == act)
+    if(_fgtlist[_cur_fgtlist_idx].size() == 0)
+    {
+        _cur_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
+    }
+
+    std::vector<FighterStatus>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
+	size_t c = 1, cnt = cur_fgtlist.size();
+    UInt32 act = cur_fgtlist[0].action;
+	while(c < cnt && cur_fgtlist[c].action == act)
 		++ c;
 	if(c == 1)
 		return 0;
@@ -414,12 +436,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, float atk, bool cs, bool 
 UInt32 BattleSimulator::doAttack( int pos )
 {
 	UInt32 rcnt = 0;
-	FighterStatus fs = _fgtlist[pos];
+    std::vector<FighterStatus>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
+	FighterStatus fs = cur_fgtlist[pos];
 	BattleFighter * bf = fs.bfgt;
 
-	_fgtlist.erase(_fgtlist.begin() + pos);
+	cur_fgtlist.erase(cur_fgtlist.begin() + pos);
 
 	// update all action points
+#if 0
 	UInt32 minact = fs.action;
 	for(size_t i = 0; i < _fgtlist.size(); ++ i)
 	{
@@ -427,9 +451,10 @@ UInt32 BattleSimulator::doAttack( int pos )
 			continue;
 		_fgtlist[i].addAction(minact);
 	}
+#endif
 
-	// insert the fighter back to queue by order
-	if(fs.poisonAction)
+	// insert the fighter to next queue by order
+	// if(fs.poisonAction)
 	{
 		UInt32 bPoisonLevel = bf->getPoisonLevel();
 		if(bPoisonLevel > 0)
@@ -455,7 +480,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 					bf->setPoisonLevel(0);
 				else
 				{
-					fs.resetAction();
+					//fs.resetAction();
 					insertFighterStatus(fs);
 				}
 				// killed
@@ -467,13 +492,12 @@ UInt32 BattleSimulator::doAttack( int pos )
 				return 1;
 			}
 		}
-		return 0;
-	}
-	else
-	{
-		fs.resetAction();
-		insertFighterStatus(fs);
-	}
+        else
+        {
+            //fs.resetAction();
+            insertFighterStatus(fs);
+        }
+    }
 
 	UInt32 stun = bf->getStunRound();
 	if(stun > 0)
@@ -1109,12 +1133,16 @@ UInt32 BattleSimulator::tryDelayUseSkill( BattleFighter * bf, BattleObject * tar
 
 int BattleSimulator::testWinner()
 {
-	size_t c = _fgtlist.size();
 	int alive[2] = { 0, 0 };
-	for(size_t i = 0; i < c; ++ i)
-	{
-		alive[_fgtlist[i].bfgt->getSide()] ++;
-	}
+	for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
+    {
+        std::vector<FighterStatus>& fgtlist = _fgtlist[fgtlist_idx];
+        size_t c = fgtlist.size();
+        for(size_t i = 0; i < c; ++ i)
+        {
+            alive[fgtlist[i].bfgt->getSide()] ++;
+        }
+    }
 	if(alive[0] == 0)
 		return 2;
 	else if(alive[1] == 0)
