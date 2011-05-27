@@ -1,14 +1,13 @@
 ---系数表
 -- TODO: 
-str_factor  = {2.50,      1.50,      2.50 }
-agi_factor  = {1.50,      4.00,      2.50 }
-int_factor  = {1.00,      1.00,      1.30 }
-phy_factor  = {4.00,      2.50,      2.70 }
 
-str_m_factor  = {2.75,      2.00,      3.00 }
-agi_m_factor  = {1.50,      4.25,      2.70 }
-int_m_factor  = {1.00,      1.00,      1.30 }
-phy_m_factor  = {4.50,      2.50,      3.00 }
+-- 属性成长不分主副将
+--           儒     释      道
+str_factor = {0,    0,      3}  -- 力量
+phy_factor = {1.5,  1.8,    2}  -- 耐力
+agi_factor = {0,    0.8,    1}  -- 敏捷
+int_factor = {3.5,  2.5,    0}  -- 智力
+wil_factor = {1,    1,      0}  -- 意志
 
 str_atk_factor = 1.0
 str_cnt_factor = 0.02
@@ -34,10 +33,7 @@ function calcStrength( fgt )
   local str = fgt:getBaseStrength()
   local pot = fgt:getPotential()
   local lvl = fgt:getLevel()
-  if fgt:getId() < 10 then
-    return (str + pot * str_m_factor[cls] * lvl) * (1 + fgt:getExtraStrengthPercent()) + fgt:getExtraStrength()
-  end
-  return (str + pot * str_factor[cls] * lvl) * (1 + fgt:getExtraStrengthPercent()) + fgt:getExtraStrength()
+  return str + str_factor[cls] * pot;
 end
 
 function calcPhysique( fgt )
