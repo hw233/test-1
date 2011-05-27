@@ -30,9 +30,11 @@ namespace GObject
 
 #define SKILL_LEVEL(x)  ((x)%SKILL_LEVEL_MAX)
 #define SKILL_ID(x) ((x)/SKILL_LEVEL_MAX)
+#define SKILLANDLEVEL(s,l) ((s)*SKILL_LEVEL_MAX | (l))
 
 #define CITTA_LEVEL(x) ((x)%CITTA_LEVEL_MAX)
 #define CITTA_ID(x) ((x)/CITTA_LEVEL_MAX)
+#define CITTAANDLEVEL(c,l) ((c)*CITTA_LEVEL_MAX | (l))
 
 class Player;
 class Fighter
@@ -88,15 +90,18 @@ public:
     void getAllAcupointsBits(Stream& st);
     void setAcupointsBits(std::string& acupoints, bool = true);
 
+    // XXX: 由心法和法宝带出技能，且技能不需要升级
+#if 0
     // 学习技能
 	bool learnSkill(UInt16 skill);
+#endif
     // 装备技能
     bool upSkill(UInt16 skill, int idx, bool = true);
     // 卸下技能
     bool offSkill(UInt16 skill, bool = true);
     // 升级技能
 	bool skillLevelUp(UInt16 skill, UInt8 lv);
-    // 是否学会此技能
+    // 技能是否可装备
     int hasSkill(UInt16 skill);
     // 是否装备此技能
     int isSkillUp(UInt16 skill);
@@ -216,35 +221,133 @@ public:
 	inline UInt16 getExtraPhysique() { checkDirty(); return _attrExtraEquip.physique; }
 	inline UInt16 getExtraAgility() { checkDirty(); return _attrExtraEquip.agility; }
 	inline UInt16 getExtraIntelligence() { checkDirty(); return _attrExtraEquip.intelligence; }
+	inline UInt16 getExtraWill() { checkDirty(); return _attrExtraEquip.will; }
+	inline UInt16 getExtraSoul() { checkDirty(); return _attrExtraEquip.soul; }
+	inline UInt16 getExtraAura() { checkDirty(); return _attrExtraEquip.aura; }
+	inline UInt16 getExtraTough() { checkDirty(); return _attrExtraEquip.tough; }
 	inline float getExtraStrengthP() { checkDirty(); return _attrExtraEquip.strengthP; }
 	inline float getExtraPhysiqueP() { checkDirty(); return _attrExtraEquip.physiqueP; }
 	inline float getExtraAgilityP() { checkDirty(); return _attrExtraEquip.agilityP; }
 	inline float getExtraIntelligenceP() { checkDirty(); return _attrExtraEquip.intelligenceP; }
+	inline float getExtraWillP() { checkDirty(); return _attrExtraEquip.willP; }
+	inline float getExtraSoulP() { checkDirty(); return _attrExtraEquip.soulP; }
+	inline float getExtraAuraP() { checkDirty(); return _attrExtraEquip.auraP; }
+	inline float getExtraToughP() { checkDirty(); return _attrExtraEquip.toughP; }
 	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
+	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.mag_attack; }
+	inline float getExtraMagAttackP() { checkDirty(); return _attrExtraEquip.mag_attackP; }
 	inline UInt16 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
 	inline float getExtraDefendP() { checkDirty(); return _attrExtraEquip.defendP; }
+	inline UInt16 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.mag_defend; }
+	inline float getExtraMagDefendP() { checkDirty(); return _attrExtraEquip.mag_defendP; }
 	inline UInt16 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
 	inline float getExtraHPP() { checkDirty(); return _attrExtraEquip.hpP; }
 	inline float getExtraAction() { checkDirty(); return _attrExtraEquip.action; }
 	inline float getExtraHitrate() { checkDirty(); return _attrExtraEquip.hitrate; }
 	inline float getExtraEvade() { checkDirty(); return _attrExtraEquip.evade; }
 	inline float getExtraCritical() { checkDirty(); return _attrExtraEquip.critical; }
+	inline float getExtraCriticalDmg() { checkDirty(); return _attrExtraEquip.critical_dmg; }
 	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
 	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
+	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.mag_res; }
 	inline float getBattlePoint() { checkBPDirty(); return _battlePoint; }
 
-	inline Int16 getBaseStrength() { if(_id > 6) return strength; const Int16 add[6][6] = {{0}, {0}, {0}, {15, 15, 15, 15, 40, 40}, {35, 35, 35, 35, 90, 90}, {55, 55, 55, 55, 140, 140}}; return strength + add[_color][_class]; }
-	inline Int16 getBasePhysique() { if(_id > 6) return physique; const Int16 add[6][6] = {{0}, {0}, {0}, {40, 40, 15, 15, 15, 15}, {90, 90, 30, 30, 35, 35}, {140, 140, 45, 45, 55, 55}}; return physique + add[_color][_class]; }
-	inline Int16 getBaseAgility() { if(_id > 6) return agility; const Int16 add[6][6] = {{0}, {0}, {0}, {15, 15, 40, 40, 15, 15}, {30, 30, 90, 90, 30, 30}, {45, 45, 140, 140, 45, 45}}; return agility + add[_color][_class]; }
-	inline Int16 getBaseIntelligence() { if(_id > 6) return intelligence; const Int16 add[6][6] = {{0}, {0}, {0}, {10, 10, 10, 10, 10, 10}, {25, 25, 25, 25, 25, 25}, {40, 40, 40, 40, 40, 40}}; return intelligence + add[_color][_class]; }
+	inline Int16 getBaseStrength()
+    {
+        return strength;
+        // XXX: 暂时不启用
+        if (_id > 9)
+            return strength;
+        static const Int16 add[9][9] = {
+            {0}, {0}, {0},
+            {15, 15, 15, 15, 40, 40},
+            {35, 35, 35, 35, 90, 90},
+            {55, 55, 55, 55, 140, 140}
+        };
+        return strength + add[_color][_class];
+    }
+
+	inline Int16 getBasePhysique()
+    {
+        return physique;
+        if (_id > 9)
+            return physique;
+        static const Int16 add[9][9] = {{0}, {0}, {0}, {40, 40, 15, 15, 15, 15}, {90, 90, 30, 30, 35, 35}, {140, 140, 45, 45, 55, 55}};
+        return physique + add[_color][_class];
+    }
+
+	inline Int16 getBaseAgility()
+    {
+        return agility;
+        if (_id > 9)
+            return agility;
+        static const Int16 add[9][9] = {{0}, {0}, {0}, {15, 15, 40, 40, 15, 15}, {30, 30, 90, 90, 30, 30}, {45, 45, 140, 140, 45, 45}};
+        return agility + add[_color][_class];
+    }
+
+	inline Int16 getBaseIntelligence()
+    {
+        return intelligence;
+        if (_id > 9)
+            return intelligence;
+        static const Int16 add[9][9] = {{0}, {0}, {0}, {10, 10, 10, 10, 10, 10}, {25, 25, 25, 25, 25, 25}, {40, 40, 40, 40, 40, 40}};
+        return intelligence + add[_color][_class];
+    }
+
+	inline Int16 getBaseWill() { return will; }
+	inline Int16 getBaseSoul() { return soul; }
+	inline Int16 getBaseAura() { return aura; }
+	inline Int16 getBaseTough() { return tough; }
+
 	inline Int16 getBaseAttack() { return attack; }
+	inline Int16 getBaseMagAttack() { return mag_attack; }
 	inline Int16 getBaseDefend() { return defend; }
+	inline Int16 getBaseMagDefend() { return mag_defend; }
 	inline float getBaseHitrate() { return hitrate; }
-	inline float getBaseEvade() { if(_id > 6) return evade; const float add[6][6] = {{0}, {0}, {0}, {0, 0, 2, 2, 0, 0}, {0, 0, 4, 4, 0, 0}, {0, 0, 4, 4, 0, 0}}; return evade + add[_color][_class]; }
-	inline float getBaseCritical() { if(_id > 6) return critical; const float add[6][6] = {{0}, {0}, {0}, {4, 4, 0, 0, 0, 0}, {8, 8, 0, 0, 0, 0}, {8, 8, 8, 8, 0, 0}}; return critical + add[_color][_class]; }
-	inline float getBasePierce() { if(_id > 6) return pierce; const float add[6][6] = {{0}, {0}, {0}, {0, 0, 0, 0, 3, 3}, {0, 0, 0, 0, 6, 6}, {0, 0, 0, 0, 10, 10}}; return pierce + add[_color][_class]; }
-	inline float getBaseCounter() { if(_id > 6) return counter; const float add[6][6] = {{0}, {0}, {0}, {0}, {0}, {4, 4, 0, 0, 0, 0}}; return counter + add[_color][_class];  }
+
+	inline float getBaseEvade()
+    {
+        return evade;
+        if(_id > 9)
+            return evade;
+        static const float add[9][9] = {{0}, {0}, {0}, {0, 0, 2, 2, 0, 0}, {0, 0, 4, 4, 0, 0}, {0, 0, 4, 4, 0, 0}};
+        return evade + add[_color][_class];
+    }
+
+	inline float getBaseCritical()
+    {
+        return critical;
+        if(_id > 9)
+            return critical;
+        const float add[9][9] = {{0}, {0}, {0}, {4, 4, 0, 0, 0, 0}, {8, 8, 0, 0, 0, 0}, {8, 8, 8, 8, 0, 0}};
+        return critical + add[_color][_class];
+    }
+
+    inline float getBaseCriticalDmg()
+    {
+        return critical_dmg;
+    }
+
+	inline float getBasePierce()
+    {
+        return pierce;
+        if (_id > 9)
+            return pierce;
+        static const float add[9][9] = {{0}, {0}, {0}, {0, 0, 0, 0, 3, 3}, {0, 0, 0, 0, 6, 6}, {0, 0, 0, 0, 10, 10}};
+        return pierce + add[_color][_class];
+    }
+
+	inline float getBaseCounter()
+    {
+        return counter;
+        if (_id > 9)
+            return counter;
+        static const float add[9][9] = {{0}, {0}, {0}, {0}, {0}, {4, 4, 0, 0, 0, 0}};
+        return counter + add[_color][_class];
+    }
+
+    inline float getBaseMagRes() { return mag_res; }
 	inline Int32 getBaseHP() { return maxhp; }
 	inline UInt32 getBaseAction() { return action; }
 
@@ -306,13 +409,13 @@ protected:
 	UInt8 _color;
 	UInt16 _hp;
 
-    UInt8 _acupoints[ACUPOINTS_MAX];    // 血道
+    UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
-    std::vector<UInt16> _skills;    // 学会的技能
+    std::vector<UInt16> _skills;    // 可装备的技能
 
     UInt16 _citta[CITTA_UPMAX];  // 装备的心法
-    std::vector<UInt16> _cittas; // 学会的心法
+    std::vector<UInt16> _cittas; // 可装备的心法
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];

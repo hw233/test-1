@@ -307,6 +307,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 0x27: field = "amulet"; break;
 	case 0x28: field = "ring"; break;
 	case 0x30: field = "peerless"; break;
+    }
+
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
@@ -1010,10 +1012,9 @@ void Fighter::setSkillLevel( UInt8 level, bool writedb /*= true*/ )
 }
 #endif
 
+#if 0
 bool Fighter::learnSkill(UInt16 skill)
 {
-    // TODO:
-#if 0
 	if(skill == _skill)
 	{
 		if(_owner != NULL) _owner->sendMsgCode(0, 2151);
@@ -1046,27 +1047,36 @@ bool Fighter::learnSkill(UInt16 skill)
 		SYSMSG_SENDV(162, _owner, _skill, _skillLevel);
 		SYSMSG_SENDV(1062, _owner, _color, getName().c_str(), _skill, _skillLevel);
 	}
-#endif
 	return true;
 }
+#endif
 
 bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 {
-    // TODO: 
-#if 0
-	if(_skillLevel + 1 != lv)
-	{
+    int idx = hasSkill(skill);
+    if (idx < 0)
+        return false;
+    if (SKILL_LEVEL(_skills[idx])+1 != lv)
+    {
 		if(_owner != NULL) _owner->sendMsgCode(0, 2155);
 		return false;
-	}
-	setSkillLevel(lv);
-	if(_owner != NULL && _owner->isOnline())
-	{
-		SYSMSG_SENDV(162, _owner, _skill, _skillLevel);
-		SYSMSG_SENDV(1062, _owner, _color, getName().c_str(), _skill, _skillLevel);
-	}
-#endif
-	return true;
+    }
+
+    idx = isSkillUp(skill);
+    if (idx > 0)
+        upSkill(SKILLANDLEVEL(skill, lv), idx);
+
+    if (addNewSkill(SKILLANDLEVEL(skill, lv)))
+    {
+        if(_owner != NULL && _owner->isOnline())
+        {
+            SYSMSG_SENDV(162, _owner, skill, lv);
+            SYSMSG_SENDV(1062, _owner, _color, getName().c_str(), skill, lv);
+        }
+        return true;
+    }
+
+    return false;
 }
 
 #if 0

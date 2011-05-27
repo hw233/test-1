@@ -39,37 +39,62 @@ public:
 	inline UInt16 getExtraPhysique() { return _attrExtra.physique; }
 	inline UInt16 getExtraAgility() { return _attrExtra.agility; }
 	inline UInt16 getExtraIntelligence() { return _attrExtra.intelligence; }
+	inline UInt16 getExtraWill() { return _attrExtra.will; }
+	inline UInt16 getExtraSoul() { return _attrExtra.soul; }
+	inline UInt16 getExtraAura() { return _attrExtra.aura; }
+	inline UInt16 getExtraTough() { return _attrExtra.tough; }
 	inline float getExtraStrengthP() { return _attrExtra.strengthP; }
 	inline float getExtraPhysiqueP() { return _attrExtra.physiqueP; }
 	inline float getExtraAgilityP() { return _attrExtra.agilityP; }
 	inline float getExtraIntelligenceP() { return _attrExtra.intelligenceP; }
+	inline float getExtraWillP() { return _attrExtra.willP; }
+	inline float getExtraSoulP() { return _attrExtra.soulP; }
+	inline float getExtraAuraP() { return _attrExtra.auraP; }
+	inline float getExtraToughP() { return _attrExtra.toughP; }
 	inline UInt16 getExtraAttack() { return _attrExtra.attack; }
 	inline float getExtraAttackP() { return _attrExtra.attackP; }
+	inline UInt16 getExtraMagAttack() { return _attrExtra.mag_attack; }
+	inline float getExtraMagAttackP() { return _attrExtra.mag_attackP; }
 	inline UInt16 getExtraDefend() { return _attrExtra.defend; }
 	inline float getExtraDefendP() { return _attrExtra.defendP; }
+	inline UInt16 getExtraMagDefend() { return _attrExtra.mag_defend; }
+	inline float getExtraMagDefendP() { return _attrExtra.mag_defendP; }
 	inline UInt16 getExtraHP() { return _attrExtra.hp; }
 	inline float getExtraHPP() { return _attrExtra.hpP; }
 	inline float getExtraAction() { return _attrExtra.action; }
 	inline float getExtraHitrate() { return _attrExtra.hitrate; }
 	inline float getExtraEvade() { return _attrExtra.evade; }
 	inline float getExtraCritical() { return _attrExtra.critical; }
+	inline float getExtraCriticalDmg() { return _attrExtra.critical_dmg; }
 	inline float getExtraPierce() { return _attrExtra.pierce; }
 	inline float getExtraCounter() { return _attrExtra.counter; }
+	inline float getExtraMagRes() { return _attrExtra.mag_res; }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
 	inline bool isNpc() { return _fighter->isNpc(); }
+	inline bool isBoy() { return _fighter->isBoy(); }
+	inline bool isMale() { return _fighter->isMale(); }
+	inline UInt8 getSex() { return _fighter->getSex(); }
 	inline Int16 getBaseStrength() { return _fighter->getBaseStrength(); }
 	inline Int16 getBasePhysique() { return _fighter->getBasePhysique(); }
 	inline Int16 getBaseAgility() { return _fighter->getBaseAgility(); }
 	inline Int16 getBaseIntelligence() { return _fighter->getBaseIntelligence(); }
+	inline Int16 getBaseWill() { return _fighter->getBaseWill(); }
+	inline Int16 getBaseSoul() { return _fighter->getBaseSoul(); }
+	inline Int16 getBaseAura() { return _fighter->getBaseAura(); }
+	inline Int16 getBaseTough() { return _fighter->getBaseTough(); }
 	inline Int16 getBaseAttack() {return _fighter->getBaseAttack();}
+	inline Int16 getBaseMagAttack() {return _fighter->getBaseMagAttack();}
 	inline Int16 getBaseDefend() {return _fighter->getBaseDefend();}
+	inline Int16 getBaseMagDefend() {return _fighter->getBaseMagDefend();}
 	inline float getBaseHitrate() {return _fighter->getBaseHitrate();}
 	inline float getBaseEvade() {return _fighter->getBaseEvade();}
 	inline float getBaseCritical() {return _fighter->getBaseCritical();}
+	inline float getBaseCriticalDmg() {return _fighter->getBaseCriticalDmg();}
 	inline float getBasePierce() {return _fighter->getBasePierce();}
 	inline float getBaseCounter() {return _fighter->getBaseCounter();}
+	inline float getBaseMagRes() {return _fighter->getBaseMagRes();}
 	inline Int32 getBaseHP() {return _fighter->getBaseHP();}
 	inline UInt32 getBaseAction() {return _fighter->getBaseAction();}
 
@@ -77,33 +102,49 @@ public:
 	inline float getAgility() { return _agility; }
 	inline float getPhysique() { return _physique; }
 	inline float getIntelligence() { return _intelligence; }
+	inline float getWill() { return _will; }
+	inline float getSoul() { return _soul; }
+	inline float getAura() { return _aura; }
+	inline float getTough() { return _tough; }
 	inline float getAttack() {return _attack + _attackAdd;}
+	inline float getMagAttack() {return _mag_attack + _magAttackAdd;}
 	inline float getDefend() {return _defend + _defendAdd;}
+	inline float getMagDefend() {return _mag_defend + _magDefendAdd;}
 	inline float getHitrate() {return _hitrate + _hitrateAdd;}
 	inline float getEvade() {return _evade + _evadeAdd;}
 	inline float getCritical() {return _critical + _criticalAdd;}
+	inline float getCriticalDmg() {return _critical_dmg + _criticalDmgAdd;}
 	inline float getPierce() {return _pierce + _pierceAdd;}
 	inline float getCounter() {return _counter + _counterAdd;}
+	inline float getMagRes() {return _mag_res+ _magResAdd;}
 	inline UInt32 getMaxHP() {return _maxhp + _maxhpAdd;}
 	inline UInt32 getAction() {return _maxAction;}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
 
 	inline float getAttackAdd() {return _attackAdd;}
+    inline float getMagAttackAdd() {return _magAttackAdd;}
 	inline float getDefendAdd() {return _defendAdd;}
+	inline float getMagDefendAdd() {return _magDefendAdd;}
 	inline float getHitrateAdd() {return _hitrateAdd;}
 	inline float getEvadeAdd() {return _evadeAdd;}
 	inline float getCriticalAdd() {return _criticalAdd;}
+	inline float getCriticalDmgAdd() {return _criticalDmgAdd;}
 	inline float getPierceAdd() {return _pierceAdd;}
 	inline float getCounterAdd() {return _counterAdd;}
+	inline float getMagResAdd() {return _magResAdd;}
 	inline UInt32 getMaxHPAdd() {return _maxhpAdd;}
 	inline UInt32 getActionAdd() {return _maxActionAdd;}
 	inline void setAttackAdd(float v) {_attackAdd = v;}
+	inline void setMagAttackAdd(float v) {_magAttackAdd = v;}
 	inline void setDefendAdd(float v) {_defendAdd = v;}
+	inline void setMagDefendAdd(float v) {_magDefendAdd = v;}
 	inline void setHitrateAdd(float v) {_hitrateAdd = v;}
 	inline void setEvadeAdd(float v) {_evadeAdd = v;}
 	inline void setCriticalAdd(float v) {_criticalAdd = v;}
+	inline void setCriticalDmgAdd(float v) {_criticalDmgAdd = v;}
 	inline void setPierceAdd(float v) {_pierceAdd = v;}
 	inline void setCounterAdd(float v) {_counterAdd = v;}
+	inline void setMagResAdd(float v) {_magResAdd = v;}
 	inline void setMaxHPAdd(UInt32 v) {_maxhpAdd = v;}
 	inline void setActionAdd(UInt32 v) {_maxActionAdd = v;}
 
@@ -146,10 +187,12 @@ private:
 
 private:
 	GObject::Fighter * _fighter;
-	float _strength, _agility, _physique, _intelligence;
-	float _attack, _defend, _hitrate, _evade, _critical, _pierce, _counter;
+	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _tough;
+	float _attack, _mag_attack, _defend, _mag_defend, _hitrate, _evade;
+    float _critical, _critical_dmg, _pierce, _counter, _mag_res;
 	UInt32 _maxhp, _maxAction;
-	float _attackAdd, _defendAdd, _hitrateAdd, _evadeAdd, _criticalAdd, _pierceAdd, _counterAdd;
+	float _attackAdd, _magAttackAdd, _defendAdd, _magDefendAdd, _hitrateAdd, _evadeAdd;
+    float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd;
 	UInt32 _maxhpAdd, _maxActionAdd;
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
