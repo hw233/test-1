@@ -183,7 +183,7 @@ namespace Script
 		// TODO: CLASS_DEF(Fighter, getSkill);
 		// CLASS_DEF(Fighter, setSkill);
 		// CLASS_DEF(Fighter, setSkillLevel);
-		CLASS_DEF(Fighter, learnSkill);
+		// CLASS_DEF(Fighter, learnSkill);
 		CLASS_DEF(Fighter, skillLevelUp);
 
 		//хннЯ

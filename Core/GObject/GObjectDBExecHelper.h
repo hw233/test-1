@@ -158,7 +158,7 @@ struct DBFighter
     UInt16 peerless;            // 无双技能
     float hitrate;              // 命中
     float evade;                // 闪躲
-    float critical;             // 暴击
+    float critical;             // 暴击(等级): 暴击率=暴击等级/（暴击等级+200+目标等级*20）+修正
     float critical_dmg;         // 暴击伤害
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击

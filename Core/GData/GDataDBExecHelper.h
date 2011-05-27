@@ -98,19 +98,19 @@ struct DBSkill
 struct DBSkillEffect
 {
     UInt16 id;
-    UInt8 state;        // 状态: 0-无状态 1中毒，2混乱，4晕眩，8无法使用技能, 有等级之分
+    UInt8 state;        // 状态: 0-无状态 1中毒，2混乱，4晕眩(无法攻击)，8无法使用技能, 有等级之分
     float stateprob;    // 状态触发概率
     UInt8 immune;       // 对状态技能的免疫,只能免疫比自己技能低的技能
-    std::string damage; // 物理伤害 num/num%
-    std::string magdam; // 法术伤害 num/num%
+    std::string damage; // 物理伤害 [+-]num/num%
+    std::string magdam; // 法术伤害 [+-]num/num%
     std::string hp;     // HP改变
-    std::string aura;   // 作用士气 +/-num
+    std::string aura;   // 作用士气 [+/-]num
     UInt8 hitCount;     // 连击次数
-    std::string def;    // 物理防御 num/num%
-    std::string magdef; // 法术防御 num/num%
+    std::string def;    // 物理防御 [+/-]num/num%
+    std::string magdef; // 法术防御 [+-]num/num%
     float evade;        // 增加闪避
     float pierce;       // 增加破击
-    float adddam;       // 人物属性的伤害加成
+    float adddam;       // 人物属性的伤害加成(人物属性的adddame倍)
 };
 
 struct DBClanSkillType

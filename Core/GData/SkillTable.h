@@ -10,11 +10,13 @@ namespace GData
 
 struct SkillEffect : public ObjectBaseNT<UInt16>
 {
-    SkillEffect(UInt16 id) : ObjectBaseNT<UInt16>(id),
-    state(0), stateprob(0), immune(0), damage(0), damageP(0), 
-    magdam(0), magdamP(0), hp(0), hpP(0), aura(0), auraP(0),
-    hitCount(0), def(0), defP(0), magdef(0), magdefP(0), evade(0),
-    pierce(0), adddam(0) {}
+    SkillEffect(UInt16 id)
+        : ObjectBaseNT<UInt16>(id), state(0), stateprob(0), immune(0), 
+        damage(0), damageP(0), magdam(0), magdamP(0), hp(0), hpP(0),
+        aura(0), auraP(0), hitCount(0), def(0), defP(0), magdef(0),
+        magdefP(0), evade(0), pierce(0), adddam(0) {}
+    ~SkillEffect() {}
+
     UInt8 state;
     float stateprob;
     UInt8 immune;
@@ -38,8 +40,11 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
 
 struct Skill : public ObjectBaseT<UInt16>
 {
-    Skill(UInt16 id, std::string& name) : ObjectBaseT<UInt16>(id, name),
-    target(0), cond(0), prob(0), area(0), last(0), cd(0), effect(0) {}
+    Skill(UInt16 id, std::string& name)
+        : ObjectBaseT<UInt16>(id, name), target(0), cond(0),
+        prob(0), area(0), last(0), cd(0), effect(0) {}
+    ~Skill() { if (effect) delete effect; }
+
     UInt8 target;
     UInt16 cond;
     float prob;
