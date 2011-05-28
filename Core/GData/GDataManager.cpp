@@ -585,7 +585,7 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-            Skill* skill = new Skill(skills.id, skills.name);
+            SkillBase* skill = new SkillBase(skills.id, skills.name);
             if (!skill)
                 return false;
             skill->target = skills.target;

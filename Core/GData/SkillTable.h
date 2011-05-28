@@ -38,12 +38,12 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float adddam;
 };
 
-struct Skill : public ObjectBaseT<UInt16>
+struct SkillBase : public ObjectBaseT<UInt16>
 {
-    Skill(UInt16 id, std::string& name)
+    SkillBase(UInt16 id, std::string& name)
         : ObjectBaseT<UInt16>(id, name), target(0), cond(0),
         prob(0), area(0), last(0), cd(0), effect(0) {}
-    ~Skill() { if (effect) delete effect; }
+    ~SkillBase() { if (effect) delete effect; }
 
     UInt8 target;
     UInt16 cond;
@@ -55,7 +55,7 @@ struct Skill : public ObjectBaseT<UInt16>
     const SkillEffect* effect;
 };
 
-typedef ObjectMapT<Skill, UInt16> SkillManager;
+typedef ObjectMapT<SkillBase, UInt16> SkillManager;
 #define skillManager SkillManager::Instance()
 
 typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;

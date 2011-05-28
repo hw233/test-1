@@ -86,7 +86,7 @@ struct DBSkill
     UInt16 id;
     std::string name;
     UInt8 target;       // 作用对象: 0-友方,1-敌方
-    UInt16 cond;        // 触发条件: 0-主动,1-攻击前被动触发,2-攻击后被动触发,3-被攻击后触发 N-灵气值(>=)
+    UInt16 cond;        // 触发条件: 0-主动,1-攻击前被动触发(回血技能,无概率),2-攻击后被动触发(有概率),3-被攻击后触发(有概率) N-灵气值(>=)
     float prob;         // 触发概率
     UInt8 area;         // 伤害范围: 0-单体,1-横排,2-竖列,3-全体
     std::string factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 对第一个位置是100%,对第二个位置是30%,对第五个位置没有伤害
@@ -108,9 +108,9 @@ struct DBSkillEffect
     UInt8 hitCount;     // 连击次数
     std::string def;    // 物理防御 [+/-]num/num%
     std::string magdef; // 法术防御 [+-]num/num%
-    float evade;        // 增加闪避
-    float pierce;       // 增加破击
-    float adddam;       // 人物属性的伤害加成(人物属性的adddame倍)
+    float evade;        // 闪避
+    float pierce;       // 破击
+    float adddam;       // 人物属性的伤害加成(人物属性的adddam倍)
 };
 
 struct DBClanSkillType
@@ -123,6 +123,40 @@ struct DBClanSkillType
 	UInt32 effect2;
 };
 
+struct DBCitta
+{
+    UInt16 id;          // id及阶数(等级)
+    std::string name;   // 名称
+    UInt16 needsoul;    // 元神需求
+    UInt32 effectId;    // 效果索引
+};
+
+struct DBCittaEffect
+{
+	UInt32 id;
+	std::string strength;       // 力量 [+/-]num/num%
+	std::string physique;       // 耐力 [+/-]num/num%
+	std::string agility;        // 敏捷 [+/-]num/num%
+	std::string intelligence;   // 智力 [+/-]num/num%
+    std::string will;           // 意志 [+/-]num/num%
+    std::string soul;           // 元神 [+/-]num/num%
+    std::string aura;           // 灵气 [+/-]num/num%
+	std::string attack;         // 物攻 [+/-]num/num%
+	std::string mag_attack;     // 法攻 [+/-]num/num%
+	std::string defend;         // 物防 [+/-]num/num%
+	std::string mag_defend;     // 法防 [+/-]num/num%
+	std::string hp;             // HP [+/-]num/num%
+    std::string skill;          // 带出技能(包括技能和无双技能)
+	float action;
+	float hitrate;
+	float evade;
+	float critical;
+	float critical_dmg;
+	float pierce;
+	float counter;
+	float mag_res;
+    float practice;             // 修炼速度加成
+};
 
 struct DBExp
 {
@@ -310,6 +344,45 @@ SPECIALDEF(14)
         float, evade,
         float, pierce,
         float, adddam
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCitta)
+SPECIALDEF(4)
+    (
+        UInt16, id,
+        std::string, name,
+        UInt16, needsoul,
+        UInt32, effectId
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBCittaEffect)
+SPECIALDEF(23)
+    (
+        UInt32, id,
+        std::string, strength,
+        std::string, physique,
+        std::string, agility,
+        std::string, intelligence,
+        std::string, will,
+        std::string, soul,
+        std::string, aura,
+        std::string, attack,
+        std::string, mag_attack,
+        std::string, defend,
+        std::string, mag_defend,
+        std::string, hp,
+        std::string, skill,
+        float, action,
+        float, hitrate,
+        float, evade,
+        float, critical,
+        float, critical_dmg,
+        float, pierce,
+        float, counter,
+        float, mag_res,
+        float, practice
     )
 SPECIALEND()
 
