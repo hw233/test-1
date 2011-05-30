@@ -108,7 +108,7 @@ public:
     // 通过索引卸下技能
     bool offSkillByIdx(UInt8 idx);
     // 取得装备的技能个数
-    int getUpSkillsNum();
+    UInt8 getUpSkillsNum();
     // 增加一个新技能,包括技能升级
     bool addNewSkill(UInt16 skill, bool = true);
     // 取得装备技能的最大数

@@ -17,6 +17,12 @@ namespace GObject
 	class ItemEquip;
 }
 
+namespace GData
+{
+    class SkillBase;
+    class SkillItem;
+}
+
 namespace Battle
 {
 
@@ -183,6 +189,11 @@ public:
 	inline void setConfuseLevel(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
 
+    GData::SkillBase* getActiveSkill();
+    GData::SkillBase* getPeerlessSkill();
+    GData::SkillBase* getPassiveSkillPrvAtk();
+    GData::SkillBase* getPassiveSkillAftAtk();
+    GData::SkillBase* getPassiveSkillBeAtk();
 
 private:
 	void updateBuffExtras();
@@ -208,12 +219,11 @@ private:
 	GData::AttrExtra _attrbylevel;
 
 
-    SKillItem* peerlessSkill;
-    std::vector<SkillItem*> activeSkill;
-    std::vector<SkillItem*> passiveSkillPrvAtk;
-    std::vector<SkillItem*> passiveSkillAftAtk;
-    std::vector<SkillItem*> passiveSkillBeAtk;
-    UInt16 aura;
+    GData::SkillItem _peerlessSkill;
+    std::vector<GData::SkillItem> _activeSkill;
+    std::vector<GData::SkillItem> _passiveSkillPrvAtk;
+    std::vector<GData::SkillItem> _passiveSkillAftAtk;
+    std::vector<GData::SkillItem> _passiveSkillBeAtk;
 
 public:
 	enum StatusFlag
