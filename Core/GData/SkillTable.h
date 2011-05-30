@@ -55,9 +55,9 @@ struct SkillBase : public ObjectBaseT<UInt16>
     const SkillEffect* effect;
 };
 
-class SkillItem
+struct SkillItem
 {
-    SKillBase* base;
+    SkillBase* base;
     UInt16 cd;
 };
 

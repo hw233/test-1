@@ -260,4 +260,61 @@ void BattleFighter::postInit()
 	}
 }
 
+GData::SkillBase* BattleFighter::getPeerlessSkill()
+{
+    if(_aura>=_peerlessSkill.base->cond)
+    {
+        return _peerlessSkill.base;
+    }
+
+    return NULL;
+}
+
+GData::SkillBase* BattleFighter::getActiveSkill()
+{
+    size_t cnt = _activeSkill.size();
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(_activeSkill[idx].cd == 0)
+        {
+            _activeSkill[idx].cd = _activeSkill[idx].base->cd;
+            return _activeSkill[idx].base;
+        }
+        else
+        {
+            _activeSkill[idx].cd--;
+        }
+    }
+
+    return NULL;
+}
+
+GData::SkillBase* BattleFighter::getPassiveSkillPrvAtk()
+{
+    //XXX:
+    size_t cnt = _passiveSkillPrvAtk.size();
+    UInt16 random = uRand(cnt*100);
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillPrvAtk[idx].cd == 0)
+            ;
+    }
+
+    return NULL;
+}
+
+GData::SkillBase* BattleFighter::getPassiveSkillAftAtk()
+{
+    size_t cnt = _passiveSkillAftAtk.size();
+    UInt16 random = uRand(cnt*100*100);
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+    }
+
+    return NULL;
+}
+
+
 }

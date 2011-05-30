@@ -193,7 +193,7 @@ void BattleSimulator::insertFighterStatus( FighterStatus& fs )
     Int8 next_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
     std::vector<FighterStatus>& next_fgtlist = _fgtlist[next_fgtlist_idx];
 	int cnt = static_cast<int>(next_fgtlist.size());
-	for(int i = 0; i < cnt; ++ i)
+	for(int i = 0; i < cnt ; ++ i)
 	{
 		if(next_fgtlist[i].action < fs.action)
 		{
@@ -201,7 +201,7 @@ void BattleSimulator::insertFighterStatus( FighterStatus& fs )
 			return;
 		}
 	}
-	next_fgtlist.insert(next_fgtlist.begin(), fs);
+	next_fgtlist.insert(next_fgtlist.end(), fs);
 }
 
 void BattleSimulator::removeFighterStatus( FighterStatus& fs )
@@ -478,11 +478,11 @@ UInt32 BattleSimulator::doAttack( int pos )
 				bf->setPoisonRound(round);
 				if(round == 0)
 					bf->setPoisonLevel(0);
-				else
-				{
-					//fs.resetAction();
-					insertFighterStatus(fs);
-				}
+				//else
+				//{
+				//	fs.resetAction();
+				//	insertFighterStatus(fs);
+				//}
 				// killed
 				if(bf->getHP() == 0)
 					onDead(bf);

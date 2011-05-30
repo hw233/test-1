@@ -1106,7 +1106,7 @@ void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
-    int skills = getUpSkillsNum();
+    Int8 skills = getUpSkillsNum();
     st << skills;
     for (int i = 0; i < skills; ++i)
     {
@@ -1263,9 +1263,9 @@ int Fighter::isSkillUp(UInt16 skill)
     return -1;
 }
 
-int Fighter::getUpSkillsNum()
+UInt8 Fighter::getUpSkillsNum()
 {
-    int c = 0;
+    UInt8 c = 0;
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (_skill[i])
