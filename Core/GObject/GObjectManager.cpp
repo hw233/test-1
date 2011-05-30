@@ -226,7 +226,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
@@ -253,6 +253,7 @@ namespace GObject
 			fgt->will = dbfgt.will;
 			fgt->soul = dbfgt.soul;
 			fgt->aura = dbfgt.aura;
+			fgt->auraMax = dbfgt.auraMax;
 			fgt->tough = dbfgt.tough;
 			fgt->attack = dbfgt.attack;
 			fgt->mag_attack = dbfgt.mag_attack;

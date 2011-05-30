@@ -1477,7 +1477,17 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                     if (s->cond == 0)
                         addNewSkill(s->getId());
                     else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
-                        upPassiveSkill(s->getId(), s->cond);
+                    {
+                        if (s->cond != 1)
+                        {
+                            if (s->prob >= 10000.0f) // TODO: 100%?
+                                upPassiveSkill(s->getId(), s->cond, true, writedb);
+                            else
+                                upPassiveSkill(s->getId(), s->cond, false, writedb);
+                        }
+                        else
+                            upPassiveSkill(s->getId(), s->cond);
+                    }
                 }
             }
         }
@@ -1490,57 +1500,88 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     return ret;
 }
 
-bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool writedb)
+bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 {
     bool ret = false;
     if (type == 1)
     {
-        for (size_t i = 0; i < _passkl.size(); ++i)
+        for (size_t i = 0; i < _passkl[0].size(); ++i)
         {
-            if (SKILL_ID(_passkl[i]) == SKILL_ID(skill))
+            if (SKILL_ID(_passkl[0][i]) == SKILL_ID(skill))
             {
-                if (skill != _passkl[i])
+                if (skill != _passkl[0][i])
                 { // upgrade
                     ret = true;
-                    _passkl[i] = skill;
+                    _passkl[0][i] = skill;
                     sendModification(0x31, skill, static_cast<int>(i), writedb);
+                    break;
                 }
             }
-            else
-            { // up
-                ret = true;
-                _passkl.push_back(skill);
-                sendModification(0x31, skill, static_cast<int>(i), writedb);
-            }
+        }
+
+        if (!ret)
+        { // up
+            ret = true;
+            _passkl[0].push_back(skill);
+            sendModification(0x31, skill, static_cast<int>(_passkl[0].size()), writedb);
         }
     }
     else
     {
-        for (size_t i = 0; i < 2; ++i)
+        size_t lastsize = 0;
+        for (size_t i = 0; i < type; ++i)
         {
-            size_t lastsize = 0;
-            if (i > 0)
-                lastsize = _rpasskl[i-1].size();
-            for (size_t j = 0; j < _rpasskl[i].size(); ++j)
+            lastsize += _passkl[i-1].size(); 
+        }
+
+        if (p100)
+        { // 100%
+            for (size_t j = 0; j < _passkl[type-1].size(); ++j)
             {
-                if (SKILL_ID(_rpasskl[i][j]) == SKILL_ID(skill))
+                if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
                 {
-                    if (skill != _rpasskl[i][j])
+                    if (skill != _passkl[type-1][j])
                     { // upgrade
                         ret = true;
-                        _rpasskl[i][j] = skill;
+                        _passkl[type-1][j] = skill;
                         sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+                        break;
                     }
                 }
-                else
-                { // up
-                    ret = true;
-                    _rpasskl[i].push_back(skill);
-                    sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+            }
+
+            if(!ret)
+            {  // up
+                ret = true;
+                _passkl[type-1].push_back(skill);
+                sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[type-1].size()), writedb);
+            }
+        }
+        else
+        {
+            for (size_t j = 0; j < _rpasskl[type-1].size(); ++j)
+            {
+                if (SKILL_ID(_rpasskl[type-1][j]) == SKILL_ID(skill))
+                {
+                    if (skill != _rpasskl[type-1][j])
+                    { // upgrade
+                        ret = true;
+                        _rpasskl[type-1][j] = skill;
+                        sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+                        break;
+                    }
                 }
+            }
+
+            if (!ret)
+            { // up
+                ret = true;
+                _rpasskl[type-1].push_back(skill);
+                sendModification(0x32, skill, static_cast<int>(lastsize + _rpasskl[type-1].size()), writedb);
             }
         }
     }
+
     return ret;
 }
 

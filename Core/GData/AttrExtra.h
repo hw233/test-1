@@ -10,7 +10,7 @@ struct AttrExtra
 {
 	AttrExtra():
 		strength(0), physique(0), agility(0), intelligence(0),
-        will(0), soul(0), aura(0), tough(0),
+        will(0), soul(0), aura(0), auraMax(0), tough(0),
 		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
         willP(0), soulP(0), auraP(0), toughP(0),
 		attack(0), attackP(0), mag_attack(0), mag_attackP(0),
@@ -27,6 +27,7 @@ struct AttrExtra
 		will += other.will;
 		soul += other.soul;
 		aura += other.aura;
+		aura += other.auraMax;
 		tough += other.tough;
 		strengthP += other.strengthP;
 		physiqueP += other.physiqueP;
@@ -35,6 +36,7 @@ struct AttrExtra
 		willP += other.willP;
 		soulP += other.soulP;
 		auraP += other.auraP;
+		auraMaxP += other.auraMaxP;
 		toughP += other.toughP;
 		attack += other.attack;
 		attackP += other.attackP;
@@ -68,6 +70,7 @@ struct AttrExtra
 	UInt16 will;
 	UInt16 soul;
 	UInt16 aura;
+	UInt16 auraMax;
 	UInt16 tough;
 	float strengthP;
 	float physiqueP;
@@ -76,6 +79,7 @@ struct AttrExtra
 	float willP;
 	float soulP;
 	float auraP;
+	float auraMaxP;
 	float toughP;
 	UInt16 attack;
 	float attackP;

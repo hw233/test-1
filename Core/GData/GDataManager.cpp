@@ -227,7 +227,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttrExtra ae;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res` FROM `attr_extra`", ae) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -239,6 +239,7 @@ namespace GData
 			SetValOrPercent(aextra->_extra.will, aextra->_extra.willP, ae.will);
 			SetValOrPercent(aextra->_extra.soul, aextra->_extra.soulP, ae.soul);
 			SetValOrPercent(aextra->_extra.aura, aextra->_extra.auraP, ae.aura);
+			SetValOrPercent(aextra->_extra.auraMax, aextra->_extra.auraMaxP, ae.auraMax);
 			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
 			SetValOrPercent(aextra->_extra.attack, aextra->_extra.attackP, ae.attack);
 			SetValOrPercent(aextra->_extra.mag_attack, aextra->_extra.mag_attackP, ae.mag_attack);

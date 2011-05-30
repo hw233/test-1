@@ -55,6 +55,7 @@ struct DBAttrExtra
     std::string will;
     std::string soul;
     std::string aura;
+    std::string auraMax;
     std::string tough;
 	std::string attack;
 	std::string mag_attack;
@@ -127,7 +128,7 @@ struct DBCitta
 {
     UInt16 id;          // id及阶数(等级)
     std::string name;   // 名称
-    UInt16 needsoul;    // 元神需求
+    UInt16 needsoul;    // 元神需求(负重)
     UInt32 effectId;    // 效果索引
 };
 
@@ -141,6 +142,7 @@ struct DBCittaEffect
     std::string will;           // 意志 [+/-]num/num%
     std::string soul;           // 元神 [+/-]num/num%
     std::string aura;           // 灵气 [+/-]num/num%
+    std::string auraMax;        // 最大灵气 [+/-]num/num%
 	std::string attack;         // 物攻 [+/-]num/num%
 	std::string mag_attack;     // 法攻 [+/-]num/num%
 	std::string defend;         // 物防 [+/-]num/num%
@@ -233,7 +235,7 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBAttrExtra)
-SPECIALDEF(22)
+SPECIALDEF(23)
 	(
 	UInt32, id,
 	std::string, strength,
@@ -243,6 +245,7 @@ SPECIALDEF(22)
     std::string, will,
     std::string, soul,
     std::string, aura,
+    std::string, auraMax,
     std::string, tough,
 	std::string, attack,
 	std::string, mag_attack,
@@ -358,7 +361,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCittaEffect)
-SPECIALDEF(23)
+SPECIALDEF(24)
     (
         UInt32, id,
         std::string, strength,
@@ -368,6 +371,7 @@ SPECIALDEF(23)
         std::string, will,
         std::string, soul,
         std::string, aura,
+        std::string, auraMax,
         std::string, attack,
         std::string, mag_attack,
         std::string, defend,

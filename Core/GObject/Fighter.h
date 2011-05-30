@@ -132,11 +132,15 @@ public:
     // 初始化可装备的技能
     void setSkills(std::string& skills, bool = true);
     // 更新被动技能表
-    bool upPassiveSkill(UInt16 skill, UInt16 type, bool = true);
+    bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
     // 更新被动技能
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = true);
-    // 取得所有100%被动触发技能
-    inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _passkl; }
+    // 取得狙击前被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[0]; }
+    // 取得攻击后被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[1]; }
+    // 取得被攻击后被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[2]; }
     // 取得攻击后被动触发技能
     inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[0]; }
     // 取得被攻击后被动触发技能
@@ -247,6 +251,7 @@ public:
 	inline UInt16 getExtraWill() { checkDirty(); return _attrExtraEquip.will; }
 	inline UInt16 getExtraSoul() { checkDirty(); return _attrExtraEquip.soul; }
 	inline UInt16 getExtraAura() { checkDirty(); return _attrExtraEquip.aura; }
+	inline UInt16 getExtraAuraMax() { checkDirty(); return _attrExtraEquip.auraMax; }
 	inline UInt16 getExtraTough() { checkDirty(); return _attrExtraEquip.tough; }
 	inline float getExtraStrengthP() { checkDirty(); return _attrExtraEquip.strengthP; }
 	inline float getExtraPhysiqueP() { checkDirty(); return _attrExtraEquip.physiqueP; }
@@ -255,6 +260,7 @@ public:
 	inline float getExtraWillP() { checkDirty(); return _attrExtraEquip.willP; }
 	inline float getExtraSoulP() { checkDirty(); return _attrExtraEquip.soulP; }
 	inline float getExtraAuraP() { checkDirty(); return _attrExtraEquip.auraP; }
+	inline float getExtraAuraMaxP() { checkDirty(); return _attrExtraEquip.auraMaxP; }
 	inline float getExtraToughP() { checkDirty(); return _attrExtraEquip.toughP; }
 	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
@@ -321,6 +327,7 @@ public:
 	inline Int16 getBaseWill() { return will; }
 	inline Int16 getBaseSoul() { return soul; }
 	inline Int16 getBaseAura() { return aura; }
+	inline Int16 getBaseAuraMax() { return auraMax; }
 	inline Int16 getBaseTough() { return tough; }
 
 	inline Int16 getBaseAttack() { return attack; }
@@ -441,11 +448,12 @@ protected:
     std::vector<UInt16> _cittas; // 可装备的心法
 
     /**
-     * AFTATK       0       攻击后被动触发
-     * AFTATKED     1       被攻击后触发
+     * PREATK       0       攻击前被动触发
+     * AFTATK       1       攻击后被动触发
+     * AFTATKED     2       被攻击后触发
      */
     std::vector<UInt16> _rpasskl[2];    // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _passkl;        // 100%被动触发的技能
+    std::vector<UInt16> _passkl[3];     //  100%触发技能
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
@@ -471,6 +479,7 @@ public:
     Int32 will;
     Int32 soul;
     Int32 aura;
+    Int32 auraMax;
     Int32 tough;
 	Int32 attack;
 	Int32 mag_attack;

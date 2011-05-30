@@ -148,6 +148,7 @@ struct DBFighter
     Int16 will;                 // 意志
     Int16 soul;                 // 元神力
     Int16 aura;                 // 灵气/士气
+    Int16 auraMax;              // 最大灵气/士气
     Int16 tough;                // 坚韧
     Int16 attack;               // 物理攻击
     Int16 mag_attack;           // 法术攻击
@@ -693,7 +694,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter)
-SPECIALDEF(32)
+SPECIALDEF(33)
 (
 	UInt32, id,
 	std::string, name,
@@ -711,6 +712,7 @@ SPECIALDEF(32)
 	Int16, will,
 	Int16, soul,
 	Int16, aura,
+	Int16, auraMax,
 	Int16, tough,
 	Int16, attack,
 	Int16, mag_attack,
