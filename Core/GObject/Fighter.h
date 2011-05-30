@@ -109,29 +109,45 @@ public:
     bool offSkillByIdx(UInt8 idx);
     // 取得装备的技能个数
     int getUpSkillsNum();
-    
+    // 增加一个新技能,包括技能升级
     bool addNewSkill(UInt16 skill, bool = true);
-
+    // 取得装备技能的最大数
     inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
+    // 取得技能装备位置idx处的技能ID
 	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
+    // 取得技能装备位置idx处的技能等级
 	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
+    // 取得技能装备位置idx处的技能ID和等级
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
-
+    // 取得可装备的技能数
     inline UInt8 getSkillsNum() { return _skills.size(); }
-
     // 取得所有装备的技能和等级
     void getAllUpSkillAndLevel(Stream& st);
     // 取得所有学习的技能和等级
     void getAllSkillsAndLevel(Stream& st);
     // 取得装备了的和学习了的技能和等级
     void getAllSkillAndLevel(Stream& st);
-
+    // 初始化装备的技能
     void setUpSkills(std::string& skill, bool = true);
+    // 初始化可装备的技能
     void setSkills(std::string& skills, bool = true);
+    // 更新被动技能表
+    bool upPassiveSkill(UInt16 skill, UInt16 type, bool = true);
+    // 更新被动技能
+    bool offPassiveSkill(UInt16 skill, UInt16 type, bool = true);
+    // 取得所有100%被动触发技能
+    inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _passkl; }
+    // 取得攻击后被动触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[0]; }
+    // 取得被攻击后被动触发技能
+    inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[1]; }
+    // 取得心法带出技能的ID表
+    std::vector<UInt16>& skillFromCitta(UInt16 citta);
 
+    // 初始化装备的心法
     void setUpCittas(std::string& citta, bool = true);
+    // 初始化可装备的心法
     void setCittas(std::string& cittas, bool = true);
-
     // 装备心法
     bool upCitta(UInt16 citta, int idx, bool = true);
     // 卸下心法
@@ -140,15 +156,22 @@ public:
     bool addNewCitta(UInt16 citta, bool = true);
     // 删除一个心法
     bool delCitta(UInt16 citta, bool = true);
-
+    // 是否学会了此心法
     int hasCitta(UInt16 citta);
+    // 是否装备了此心法
     int isCittaUp(UInt16 citta);
 
+    // 取得装备的心法数
     inline UInt8 getUpCittasNum();
+    // 取得最大装备心法数
     inline UInt8 getUpCittasMax() { return CITTA_UPMAX; }
+    // 取得装备位置idx处所装备的心法的ID
 	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_ID(_citta[idx]) : 0; }
+    // 取得装备位置idx处所装备的心法等级
 	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_LEVEL(_citta[idx]) : 0; }
+    // 取得装备位置idx处所装备的心法的ID和等级
 	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] : 0; }
+    // 取得可装备的心法数
     inline UInt8 getCittasNum() { return _cittas.size(); }
     // 取得所有装备的心法和等级
     void getAllUpCittaAndLevel(Stream& st);
@@ -416,6 +439,13 @@ protected:
 
     UInt16 _citta[CITTA_UPMAX];  // 装备的心法
     std::vector<UInt16> _cittas; // 可装备的心法
+
+    /**
+     * AFTATK       0       攻击后被动触发
+     * AFTATKED     1       被攻击后触发
+     */
+    std::vector<UInt16> _rpasskl[2];    // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
+    std::vector<UInt16> _passkl;        // 100%被动触发的技能
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];

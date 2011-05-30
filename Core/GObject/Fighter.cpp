@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Package.h"
 #include "GData/ExpTable.h"
+#include "GData/SkillTable.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -263,6 +264,10 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             if (value2string(_acupoints, ACUPOINTS_MAX, str)) {
                 DB().PushUpdateData("UPDATE `fighter` SET `acupoints` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
+        }
+        break;
+    case 0x31:
+        { // passive skill
         }
         break;
     case 0x60:
@@ -1127,7 +1132,6 @@ void Fighter::getAllSkillAndLevel( Stream& st )
     getAllSkillsAndLevel(st);
 }
 
-
 void Fighter::getAllUpCittaAndLevel( Stream& st )
 {
     UInt8 cittas = getUpCittasNum();
@@ -1463,12 +1467,88 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
     if (ret)
     {
+        std::vector<UInt16>& skills = skillFromCitta(citta);
+        if (skills.size())
+        {
+            for (size_t i = 0; i < skills.size(); ++i)
+            {
+                const GData::SkillBase* s = GData::skillManager[skills[i]];
+                if (s) {
+                    if (s->cond == 0)
+                        addNewSkill(s->getId());
+                    else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
+                        upPassiveSkill(s->getId(), s->cond);
+                }
+            }
+        }
+
         _attrDirty = true;
         _bPDirty = true;
         sendModification(0x62, citta, idx, writedb);
     }
 
     return ret;
+}
+
+bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool writedb)
+{
+    bool ret = false;
+    if (type == 1)
+    {
+        for (size_t i = 0; i < _passkl.size(); ++i)
+        {
+            if (SKILL_ID(_passkl[i]) == SKILL_ID(skill))
+            {
+                if (skill != _passkl[i])
+                { // upgrade
+                    ret = true;
+                    _passkl[i] = skill;
+                    sendModification(0x31, skill, static_cast<int>(i), writedb);
+                }
+            }
+            else
+            { // up
+                ret = true;
+                _passkl.push_back(skill);
+                sendModification(0x31, skill, static_cast<int>(i), writedb);
+            }
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < 2; ++i)
+        {
+            size_t lastsize = 0;
+            if (i > 0)
+                lastsize = _rpasskl[i-1].size();
+            for (size_t j = 0; j < _rpasskl[i].size(); ++j)
+            {
+                if (SKILL_ID(_rpasskl[i][j]) == SKILL_ID(skill))
+                {
+                    if (skill != _rpasskl[i][j])
+                    { // upgrade
+                        ret = true;
+                        _rpasskl[i][j] = skill;
+                        sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+                    }
+                }
+                else
+                { // up
+                    ret = true;
+                    _rpasskl[i].push_back(skill);
+                    sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+std::vector<UInt16>& Fighter::skillFromCitta(UInt16 citta)
+{
+    // TODO:
+    static std::vector<UInt16> null;
+    return null;
 }
 
 void Fighter::setCittas( std::string& cittas, bool writedb )
