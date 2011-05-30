@@ -5,6 +5,7 @@
 #include "GData/Formation.h"
 #include "GData/AttrExtra.h"
 #include "BattleObject.h"
+#include "GData/SkillTable.h"
 
 namespace Script
 {
@@ -182,6 +183,7 @@ public:
 	inline void setConfuseLevel(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
 
+
 private:
 	void updateBuffExtras();
 
@@ -204,6 +206,14 @@ private:
 	GData::AttrExtra _attrExtraEquip; // 装备附加一级属性和
 	GData::AttrExtra _attrExtra; // 全部附加一级属性和
 	GData::AttrExtra _attrbylevel;
+
+
+    SKillItem* peerlessSkill;
+    std::vector<SkillItem*> activeSkill;
+    std::vector<SkillItem*> passiveSkillPrvAtk;
+    std::vector<SkillItem*> passiveSkillAftAtk;
+    std::vector<SkillItem*> passiveSkillBeAtk;
+    UInt16 aura;
 
 public:
 	enum StatusFlag

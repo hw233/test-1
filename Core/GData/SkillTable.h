@@ -55,6 +55,13 @@ struct Skill : public ObjectBaseT<UInt16>
     const SkillEffect* effect;
 };
 
+class SkillItem
+{
+    SKillBase* base;
+    UInt16 cd;
+};
+
+
 typedef ObjectMapT<Skill, UInt16> SkillManager;
 #define skillManager SkillManager::Instance()
 
