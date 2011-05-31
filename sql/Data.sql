@@ -464,6 +464,45 @@ CREATE TABLE `skill_effect` (
   `adddam` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cittas`;
+CREATE TABLE `cittas` (
+  `id` smallint(5) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `needsoul` smallint(5) NOT NULL DEFAULT '0',
+  `effectid` smallint(5) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cittas`;
+CREATE TABLE `cittas` (
+  `id` smallint(5) NOT NULL,
+  `strength` varchar(10) NOT NULL DEFAULT '0',
+  `physique` varchar(10) NOT NULL DEFAULT '0',
+  `agility` varchar(10) NOT NULL DEFAULT '0',
+  `intelligence` varchar(10) NOT NULL DEFAULT '0',
+  `will` varchar(10) NOT NULL DEFAULT '0',
+  `soul` varchar(10) NOT NULL DEFAULT '0',
+  `aura` varchar(10) NOT NULL DEFAULT '0',
+  `auraMax` varchar(10) NOT NULL DEFAULT '0',
+  `attack` varchar(64) NOT NULL DEFAULT '0',
+  `mag_attack` varchar(64) NOT NULL DEFAULT '0',
+  `defend` varchar(64) NOT NULL DEFAULT '0',
+  `mag_defend` varchar(64) NOT NULL DEFAULT '0',
+  `hp` varchar(64) NOT NULL DEFAULT '0',
+  `skill` varchar(255) NOT NULL DEFAULT '0',
+  `action` float(10,4) NOT NULL DEFAULT '0.0000',
+  `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
+  `evade` float(10,4) NOT NULL DEFAULT '0.0000',
+  `critical` float(10,4) NOT NULL DEFAULT '0.0000',
+  `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
+  `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
+  `counter` float(10,4) NOT NULL DEFAULT '0.0000',
+  `mag_res` float(10,4) NOT NULL DEFAULT '0.0000',
+  `practice` float(10,4) NOT NULL DEFAULT '0.0000',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

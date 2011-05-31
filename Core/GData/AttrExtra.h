@@ -12,7 +12,7 @@ struct AttrExtra
 		strength(0), physique(0), agility(0), intelligence(0),
         will(0), soul(0), aura(0), auraMax(0), tough(0),
 		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
-        willP(0), soulP(0), auraP(0), toughP(0),
+        willP(0), soulP(0), auraP(0), auraMaxP(0), toughP(0),
 		attack(0), attackP(0), mag_attack(0), mag_attackP(0),
         defend(0), defendP(0), mag_defend(0), mag_defendP(0),
 		hp(0), hpP(0), action(0), hitrate(0), evade(0),
@@ -27,7 +27,7 @@ struct AttrExtra
 		will += other.will;
 		soul += other.soul;
 		aura += other.aura;
-		aura += other.auraMax;
+		auraMax += other.auraMax;
 		tough += other.tough;
 		strengthP += other.strengthP;
 		physiqueP += other.physiqueP;

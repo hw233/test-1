@@ -93,7 +93,7 @@ struct DBSkill
     std::string factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 对第一个位置是100%,对第二个位置是30%,对第五个位置没有伤害
     UInt16 last;        // 持续时间: -1-一直有效,0-非持续,N-持续次数
     UInt16 cd;          // 冷却回合
-    UInt16 effectId;    // 效果索引
+    UInt16 effectid;    // 效果索引
 };
 
 struct DBSkillEffect
@@ -129,12 +129,12 @@ struct DBCitta
     UInt16 id;          // id及阶数(等级)
     std::string name;   // 名称
     UInt16 needsoul;    // 元神需求(负重)
-    UInt32 effectId;    // 效果索引
+    UInt16 effectid;    // 效果索引
 };
 
 struct DBCittaEffect
 {
-	UInt32 id;
+	UInt16 id;
 	std::string strength;       // 力量 [+/-]num/num%
 	std::string physique;       // 耐力 [+/-]num/num%
 	std::string agility;        // 敏捷 [+/-]num/num%
@@ -326,7 +326,7 @@ SPECIALDEF(10)
         std::string, factor,
         UInt16, last,
         UInt16, cd,
-        UInt16, effectId
+        UInt16, effectid
     )
 SPECIALEND()
 
@@ -356,14 +356,14 @@ SPECIALDEF(4)
         UInt16, id,
         std::string, name,
         UInt16, needsoul,
-        UInt32, effectId
+        UInt16, effectid
     )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCittaEffect)
 SPECIALDEF(24)
     (
-        UInt32, id,
+        UInt16, id,
         std::string, strength,
         std::string, physique,
         std::string, agility,

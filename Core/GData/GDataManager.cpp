@@ -13,6 +13,7 @@
 #include "Server/ServerTypes.h"
 #include "Server/Cfg.h"
 #include "SkillTable.h"
+#include "CittaTable.h"
 #include "Common/StringTokenizer.h"
 
 #include "Script/lua_tinker.h"
@@ -95,6 +96,16 @@ namespace GData
         if (!LoadSkills())
         {
 			fprintf(stderr, "Load skills template Error !\n");
+			return false;
+        }
+        if (!LoadCittaEffect())
+        {
+			fprintf(stderr, "Load citta effect Error !\n");
+			return false;
+        }
+        if (!LoadCittas())
+        {
+			fprintf(stderr, "Load cittas template Error !\n");
 			return false;
         }
 		if (!LoadClanSkillTable())
@@ -582,7 +593,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkill skills;
-		if(execu->Prepare("SELECT `id`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectId` FROM `skills`", skills) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -601,8 +612,75 @@ namespace GData
             }
             skill->last = skills.last;
             skill->cd = skills.cd;
-            skill->effect = skillEffectManager[skills.effectId];
+            skill->effect = skillEffectManager[skills.effectid];
             skillManager.add(skill);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadCittaEffect()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCittaEffect cf;
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `skill`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `practice` FROM `citta_effect`", cf) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            CittaEffect* cft = new CittaEffect(cf.id);
+            SetValOrPercent(cft->strength, cft->strengthP, cf.strength);
+            SetValOrPercent(cft->physique, cft->physiqueP, cf.physique);
+            SetValOrPercent(cft->agility, cft->agilityP, cf.agility);
+            SetValOrPercent(cft->intelligence, cft->intelligenceP, cf.intelligence);
+            SetValOrPercent(cft->will, cft->willP, cf.will);
+            SetValOrPercent(cft->soul, cft->soulP, cf.soul);
+            SetValOrPercent(cft->aura, cft->auraP, cf.aura);
+            SetValOrPercent(cft->auraMax, cft->auraMaxP, cf.auraMax);
+            // SetValOrPercent(cft->tough, cft->toughP, cf.tough);
+            SetValOrPercent(cft->attack, cft->attackP, cf.attack);
+            SetValOrPercent(cft->mag_attack, cft->mag_attackP, cf.mag_attack);
+            SetValOrPercent(cft->defend, cft->defendP, cf.defend);
+            SetValOrPercent(cft->mag_defend, cft->mag_defendP, cf.mag_defend);
+            SetValOrPercent(cft->hp, cft->hpP, cf.hp);
+            cft->action = cf.action;
+            cft->hitrate = cf.hitrate;
+            cft->evade = cf.evade;
+            cft->critical = cf.critical;
+            cft->critical_dmg = cf.critical_dmg;
+            cft->pierce = cf.pierce;
+            cft->counter = cf.counter;
+            cft->mag_res = cf.mag_res;
+            cft->practice = cf.practice;
+
+            StringTokenizer tk(cf.skill, ",");
+            if (tk.count())
+            {
+                for (size_t i=0; i<tk.count(); ++i)
+                {
+                    const SkillBase* skill = skillManager[::atoi(tk[i].c_str())];
+                    if (skill)
+                        cft->skill.push_back(skill);
+                }
+            }
+
+            cittaEffectManager.add(cft);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadCittas()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCitta ct;
+		if(execu->Prepare("SELECT `id`, `name`, `needsoul`, `effectid` FROM `cittas`", ct) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            CittaBase* citta = new CittaBase(ct.id, ct.name);
+            citta->needsoul = ct.needsoul;
+            citta->effect = cittaEffectManager[ct.effectid];
+            cittaManager.add(citta);
         }
         return true;
     }

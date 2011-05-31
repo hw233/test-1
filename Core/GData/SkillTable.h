@@ -1,6 +1,6 @@
 
-#ifndef SKILL_H_
-#define SKILL_H_
+#ifndef SKILLTABLE_H_
+#define SKILLTABLE_H_
 
 #include "Config.h"
 #include "ObjectManager.h"
@@ -70,7 +70,7 @@ typedef ObjectMapT<SkillEffect, UInt16> SkillEffectManager;
 
 } // namespace GData
 
-#endif // SKILL_H_
+#endif // CITTA_H 
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 
