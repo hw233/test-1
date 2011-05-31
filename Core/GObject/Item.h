@@ -5,6 +5,8 @@
 #include "ItemData.h"
 #include "GObjectManager.h"
 
+struct SkillBase;
+
 namespace GObject
 {
 	class ItemBase :
@@ -136,6 +138,15 @@ namespace GObject
 		ItemArmor(UInt32 id, const GData::ItemEquipType& itemEquipType, ItemEquipData& itemEquipData)
 		    : ItemEquip(id, itemEquipType, itemEquipData) 
 		{ }
+	};
+
+	class ItemTrump : public ItemEquip
+	{
+	public:
+		ItemTrump(UInt32 id, const GData::ItemTrumpType& itemTrumpType, ItemEquipData& itemEquipData)
+			: ItemEquip(id, itemTrumpType, itemEquipData) 
+		{ }
+        ~ItemTrump() { }
 	};
 }
 

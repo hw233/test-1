@@ -62,6 +62,7 @@ struct DBAttrExtra
 	std::string defend;
 	std::string mag_defend;
 	std::string hp;
+	std::string skills;
 	float action;
 	float hitrate;
 	float evade;
@@ -235,7 +236,7 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBAttrExtra)
-SPECIALDEF(23)
+SPECIALDEF(24)
 	(
 	UInt32, id,
 	std::string, strength,
@@ -252,6 +253,7 @@ SPECIALDEF(23)
 	std::string, defend,
 	std::string, mag_defend,
 	std::string, hp,
+	std::string, skills,
 	float, action,
 	float, hitrate,
 	float, evade,

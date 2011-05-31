@@ -238,7 +238,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttrExtra ae;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res` FROM `attr_extra`", ae) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `skills` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -265,6 +265,18 @@ namespace GData
 			aextra->_extra.pierce = ae.pierce;
 			aextra->_extra.counter = ae.counter;
 			aextra->_extra.mag_res = ae.mag_res;
+
+            StringTokenizer tk(ae.skills, ",");
+            if (tk.count())
+            {
+                for (size_t i=0; i<tk.count(); ++i)
+                {
+                    const SkillBase* skill = skillManager[::atoi(tk[i].c_str())];
+                    if (skill)
+                        (*aextra)->skills.push_back(skill);
+                }
+            }
+
 			attrExtraManager.add(aextra);
 		}
 		return true;

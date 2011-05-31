@@ -149,6 +149,11 @@ namespace GData
 		ItemWeaponType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemEquipType(id, name, attrId) {}
 	};
 
+	struct ItemTrumpType : public ItemEquipType
+	{
+		ItemTrumpType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemEquipType(id, name, attrId) {}
+	};
+
 	struct ItemEquipSetType:
 		public ObjectBaseT<>
 	{

@@ -6,6 +6,8 @@
 namespace GData
 {
 
+struct SkillBase;
+
 struct AttrExtra
 {
 	AttrExtra():
@@ -60,7 +62,42 @@ struct AttrExtra
 	}
 	inline void reset()
 	{
-        bzero(this, sizeof(*this));
+        strength = 0;
+        physique = 0;
+        agility = 0;
+        intelligence = 0;
+        will = 0;
+        soul = 0;
+        aura = 0;
+        auraMax = 0;
+        tough = 0;
+        strengthP = 0;
+        physiqueP = 0;
+        agilityP = 0;
+        intelligenceP = 0;
+        willP = 0;
+        soulP = 0;
+        auraP = 0;
+        auraMaxP = 0;
+        toughP = 0;
+        attack = 0;
+        attackP = 0;
+        mag_attack = 0;
+        mag_attackP = 0;
+        defend = 0;
+        defendP = 0;
+        mag_defend = 0;
+        mag_defendP = 0;
+        hp = 0;
+        hpP = 0;
+        action = 0;
+        hitrate = 0;
+        evade = 0;
+        critical = 0;
+        critical_dmg = 0;
+        pierce = 0;
+        counter = 0;
+        mag_res = 0;
 	}
 
 	UInt16 strength;
@@ -99,6 +136,7 @@ struct AttrExtra
 	float pierce;
 	float counter;
 	float mag_res;
+    std::vector<const SkillBase*> skills;
 };
 
 struct AttrExtraItem:
