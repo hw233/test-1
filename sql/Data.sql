@@ -68,6 +68,7 @@ CREATE TABLE `attr_extra` (
   `defend` varchar(64) NOT NULL DEFAULT '0',
   `mag_defend` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
+  `skills` varchar(255) NOT NULL DEFAULT '',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',

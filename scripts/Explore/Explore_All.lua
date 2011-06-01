@@ -1,4 +1,4 @@
-require("global")
+require("scripts/global")
 
 
 

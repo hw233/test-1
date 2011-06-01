@@ -1,0 +1,157 @@
+--ÈÎÎñµÄ½ÓÊÜÌõ¼ş
+function Task_Accept_00000005()
+	local player = GetPlayer();
+	local task =  player:GetTaskMgr();
+	if task:HasAcceptedTask(5) or task:HasCompletedTask(5) or task:HasSubmitedTask(5) then
+		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(4) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(4) then
+			return false;
+		end
+	end
+	return true;
+end
+
+
+
+
+-----¿É½ÓÈÎÎñÌõ¼ş
+function Task_Can_Accept_00000005()
+	local player = GetPlayer();
+	local task =  player:GetTaskMgr();
+	if task:HasAcceptedTask(5) or task:HasCompletedTask(5) or task:HasSubmitedTask(5) then
+		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(4) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(4) then
+			return false;
+		end
+	end
+	return true;
+end
+
+
+--ÈÎÎñÍê³ÉÌõ¼ş
+function Task_Submit_00000005()
+	if GetPlayer():GetTaskMgr():HasCompletedTask(5) then
+		return true;
+	end
+	return false;
+end
+
+
+---------------------------------------
+------NPC½»»¥µÄÈÎÎñ½Å±¾
+---------------------------------------
+function Task_00000005(npcId)
+	local player = GetPlayer();
+	local task = player:GetTaskMgr();
+	local action = ActionTable:Instance();
+
+	if task:GetTaskAcceptNpc(5) == npcId and Task_Accept_00000005 () then
+		action.m_ActionType = 0x0001;
+		action.m_ActionID = 5
+		action.m_ActionToken = 1;
+		action.m_ActionStep = 01;
+		action.m_ActionMsg = "è´­ä¹°ä¹¦ç±";
+	elseif task:GetTaskSubmitNpc(5) == npcId then
+		if Task_Submit_00000005() then
+			action.m_ActionType = 0x0001;
+			action.m_ActionID = 5
+			action.m_ActionToken = 2;
+			action.m_ActionStep = 10;
+			action.m_ActionMsg = "è´­ä¹°ä¹¦ç±";
+		elseif task:HasAcceptedTask(5) then
+			action.m_ActionType = 0x0001;
+			action.m_ActionID = 5
+			action.m_ActionToken = 0;
+			action.m_ActionStep = 0;
+			action.m_ActionMsg = "è´­ä¹°ä¹¦ç±";
+		end
+	end
+	return action;
+end
+
+-------------------------------------------------
+--------ÈÎÎñ½»»¥²½Öè
+-------------------------------------------------
+function Task_00000005_step_01()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
+	action.m_ActionStep = 0;
+	action.m_NpcMsg = "è¿™äº›é“¶ä¸¤æˆ‘ä¸èƒ½æ”¶ï¼Œä¸è¿‡æ•™ä¹¦åŠå­¦ä¹Ÿç¡®å®éœ€è¦é’±è´¢â€¦â€¦å—¯ï¼Œå›å­çˆ±è´¢å–ä¹‹æœ‰é“ï¼Œæˆ‘è¿™è¾¹æœ‰ä¸å°‘æ”¶é›†æ¥çš„å¤ç±ï¼Œä¸å¦¨å°±èµ ä¸å°‘ä¾ å§ï¼Œè¿™äº›é“¶ä¸¤æƒå½“ä½œå°‘ä¾ çš„ä¹¦èµ„å¯å¥½ï¼Ÿ";
+	action.m_ActionMsg = "å°å£°å˜€å’•ï¼ˆè¿™äº›ç ´ä¹¦èƒ½å€¼å‡ ä¸ªé’±ï¼‰ã€‚";
+	return action;
+end
+
+function Task_00000005_step_10()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
+	action.m_ActionStep = 0;
+	action.m_NpcMsg = "è¿™äº›å¤ç±å¯æ˜¯æˆ‘èŠ±äº†æ•°åå¹´çš„æ—¶é—´æ‰æœé›†åˆ°çš„ï¼Œå°‘ä¾ ä½ å¯è¦å¥½ç”Ÿä¿æŠ¤æ‰å¥½ã€‚";
+	action.m_ActionMsg = "";
+	return action;
+end
+
+local Task_00000005_step_table = {
+		[1] = Task_00000005_step_01,
+		[10] = Task_00000005_step_10,
+		};
+
+function Task_00000005_step(step)
+	if Task_00000005_step_table[step] ~= nil then
+		return Task_00000005_step_table[step]();
+	end
+	return ActionTable:Instance();
+end
+
+--½ÓÊÜÈÎÎñ
+function Task_00000005_accept()
+	local player = GetPlayer();
+	local task = player:GetTaskMgr();
+	if not Task_Accept_00000005() then
+		return false;
+	end
+	if not task:AcceptTask(5) then
+		return false;
+	end
+	return true;
+end
+
+
+
+--Ìá½»ÈÎÎñ
+function Task_00000005_submit(itemId, itemNum)
+	local player = GetPlayer();
+
+	local package = player:GetPackage();
+
+	if not player:GetTaskMgr():SubmitTask(5) then
+		return false;
+	end
+
+
+	player:AddExp(1000);
+	return true;
+end
+
+--·ÅÆúÈÎÎñ
+function Task_00000005_abandon()
+	local package = GetPlayer():GetPackage();
+	return GetPlayer():GetTaskMgr():AbandonTask(5);
+end

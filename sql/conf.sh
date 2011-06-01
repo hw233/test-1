@@ -1,6 +1,6 @@
 #!/bin/bash
 
 H=localhost
-U=asss
-P=asss
+U=bsc
+P=123456
 
