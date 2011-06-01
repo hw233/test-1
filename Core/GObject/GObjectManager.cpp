@@ -207,7 +207,10 @@ namespace GObject
 			if(mos.m_ID <= GREAT_FIGHTER_MAX)
 				globalFighters.setSpot(mos.m_ID, mos.m_Spot);
 			Map * map = Map::FromSpot(mos.m_Spot);
-			mos.m_Hide = false;
+            if (mos.m_ID == 4114) // XXX: ÌìÃÉìøÊ¦
+                mos.m_Hide = true;
+            else
+                mos.m_Hide = false;
 			if(map == NULL)
 			{
 				//ERROR_LOG...
