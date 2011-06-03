@@ -62,7 +62,6 @@ struct SkillItem
     UInt16 cd;
 };
 
-
 typedef ObjectMapT<SkillBase, UInt16> SkillManager;
 #define skillManager SkillManager::Instance()
 
