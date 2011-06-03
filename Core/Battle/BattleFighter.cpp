@@ -25,6 +25,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 void BattleFighter::setFighter( GObject::Fighter * f )
 {
 	_fighter = f;
+    _peerlessSkill.base = skillManager[f->getPeerlessSkill()];
+    _peerlessSkill.cd = 0;
 }
 
 void BattleFighter::updateAllAttr()
@@ -260,25 +262,22 @@ void BattleFighter::postInit()
 	}
 }
 
-GData::SkillBase* BattleFighter::getPeerlessSkill()
-{
-    if(_aura>=_peerlessSkill.base->cond)
-    {
-        return _peerlessSkill.base;
-    }
-
-    return NULL;
-}
-
 GData::SkillBase* BattleFighter::getActiveSkill()
 {
+    GData::SkillBase* resSkill = NULL;
+    if(_aura>=_peerlessSkill.base->cond)
+    {
+        _aura = 0;
+        resSkill = _peerlessSkill.base;
+    }
+
     size_t cnt = _activeSkill.size();
     for(size_t idx = 0; idx < cnt; idx++)
     {
-        if(_activeSkill[idx].cd == 0)
+        if( !resSkill && _activeSkill[idx].cd == 0)
         {
             _activeSkill[idx].cd = _activeSkill[idx].base->cd;
-            return _activeSkill[idx].base;
+            resSkill = _activeSkill[idx].base;
         }
         else
         {
@@ -286,19 +285,61 @@ GData::SkillBase* BattleFighter::getActiveSkill()
         }
     }
 
+    return resSkill;
+}
+
+GData::SkillBase* BattleFighter::getPassiveSkillPrvAtk100(size_t& idx)
+{
+    size_t cnt = _passiveSkillPrvAtk100.size();
+    for(; idx < cnt; idx++)
+    {
+        if(_passiveSkillPrvAtk100[idx].cd == 0)
+        {
+            _passiveSkillPrvAtk100[idx].cd = _passiveSkillPrvAtk100[idx].base->cd;
+            return _passiveSkillPrvAtk100[idx++].base;
+        }
+        else
+        {
+            _passiveSkillPrvAtk100[idx].cd--;
+        }
+    }
+
     return NULL;
 }
 
-GData::SkillBase* BattleFighter::getPassiveSkillPrvAtk()
+GData::SkillBase* BattleFighter::getPassiveSkillAftAtk100(size_t& idx)
 {
-    //XXX:
-    size_t cnt = _passiveSkillPrvAtk.size();
-    UInt16 random = uRand(cnt*100);
-
-    for(size_t idx = 0; idx < cnt; idx++)
+    size_t cnt = _passiveSkillAftAtk100.size();
+    for(; idx < cnt; idx++)
     {
-        if(_passiveSkillPrvAtk[idx].cd == 0)
-            ;
+        if(_passiveSkillAftAtk100[idx].cd == 0)
+        {
+            _passiveSkillAftAtk100[idx].cd = _passiveSkillAftAtk100[idx].base->cd;
+            return _passiveSkillAftAtk100[idx++].base;
+        }
+        else
+        {
+            _passiveSkillAftAtk100[idx].cd--;
+        }
+   }
+
+    return NULL;
+}
+
+GData::SkillBase* BattleFighter::getPassiveSkillBeAtk100(size_t& idx)
+{
+    size_t cnt = _passiveSkillBeAtk100.size();
+    for(; idx < cnt; idx++)
+    {
+        if(_passiveSkillBeAtk100[idx].cd == 0)
+        {
+            _passiveSkillBeAtk100[idx].cd = _passiveSkillBeAtk100[idx].base->cd;
+            return _passiveSkillBeAtk100[idx++].base;
+        }
+        else
+        {
+            _passiveSkillBeAtk100[idx].cd--;
+        }
     }
 
     return NULL;
@@ -307,14 +348,45 @@ GData::SkillBase* BattleFighter::getPassiveSkillPrvAtk()
 GData::SkillBase* BattleFighter::getPassiveSkillAftAtk()
 {
     size_t cnt = _passiveSkillAftAtk.size();
-    UInt16 random = uRand(cnt*100*100);
+    UInt32 rnd = URandom(cnt*100*100);
+    GData::SkillBase* resSkillBase = NULL;
 
     for(size_t idx = 0; idx < cnt; idx++)
     {
+        if(_passiveSkillAftAtk[idx].cd != 0)
+        {
+            _passiveSkillAftAtk[idx].cd--;
+        }
+        else if(rnd < _passiveSkillAftAtk[idx].rateExtent)
+        {
+            _passiveSkillAftAtk[idx].cd = _passiveSkillAftAtk[idx].base->cd;
+            resSkillBase = _passiveSkillAftAtk[idx].base;
+        }
     }
-
-    return NULL;
+ 
+    return resSkillBase;
 }
 
+GData::SkillBase* BattleFighter::getPassiveSkillBeAtk()
+{
+    size_t cnt = _passiveSkillBeAtk.size();
+    UInt32 rnd = URandom(cnt*100*100);
+    GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillBeAtk[idx].cd != 0)
+        {
+           _passiveSkillBeAtk[idx].cd--;
+        }
+        else if(rnd < _passiveSkillBeAtk[idx].rateExtent)
+        {
+            _passiveSkillBeAtk[idx].cd = _passiveSkillBeAtk[idx].base->cd;
+            resSkillBase = _passiveSkillBeAtk[idx].base;
+        }
+    }
+ 
+    return resSkillBase;
+}
 
 }

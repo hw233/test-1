@@ -190,8 +190,9 @@ public:
 	void setAttrExtra(UInt8, UInt8, UInt8);
 
     GData::SkillBase* getActiveSkill();
-    GData::SkillBase* getPeerlessSkill();
-    GData::SkillBase* getPassiveSkillPrvAtk();
+    GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
+    GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx);
+    GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx);
     GData::SkillBase* getPassiveSkillAftAtk();
     GData::SkillBase* getPassiveSkillBeAtk();
 
@@ -221,7 +222,9 @@ private:
 
     GData::SkillItem _peerlessSkill;
     std::vector<GData::SkillItem> _activeSkill;
-    std::vector<GData::SkillItem> _passiveSkillPrvAtk;
+    std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
+    std::vector<GData::SkillItem> _passiveSkillAftAtk100;
+    std::vector<GData::SkillItem> _PassiveSkillBeAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
     std::vector<GData::SkillItem> _passiveSkillBeAtk;
 

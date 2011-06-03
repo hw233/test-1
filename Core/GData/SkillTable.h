@@ -58,6 +58,7 @@ struct SkillBase : public ObjectBaseT<UInt16>
 struct SkillItem
 {
     SkillBase* base;
+    float rateExtent;
     UInt16 cd;
 };
 
