@@ -189,12 +189,12 @@ public:
 	inline void setConfuseLevel(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
 
-    GData::SkillBase* getActiveSkill();
-    GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
-    GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx);
-    GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx);
-    GData::SkillBase* getPassiveSkillAftAtk();
-    GData::SkillBase* getPassiveSkillBeAtk();
+    const GData::SkillBase* getActiveSkill();
+    const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillAftAtk();
+    const GData::SkillBase* getPassiveSkillBeAtk();
 
 private:
 	void updateBuffExtras();
@@ -224,7 +224,7 @@ private:
     std::vector<GData::SkillItem> _activeSkill;
     std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk100;
-    std::vector<GData::SkillItem> _PassiveSkillBeAtk100;
+    std::vector<GData::SkillItem> _passiveSkillBeAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
     std::vector<GData::SkillItem> _passiveSkillBeAtk;
 
