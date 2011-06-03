@@ -7,6 +7,7 @@
 #include "Package.h"
 #include "GData/ExpTable.h"
 #include "GData/SkillTable.h"
+#include "GData/CittaTable.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -267,8 +268,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         }
         break;
     case 0x31:
-        { // passive skill
-        }
+        break;
+    case 0x32:
         break;
     case 0x60:
         { // skill
@@ -326,7 +327,7 @@ void Fighter::sendModification( UInt8 t, UInt64 v )
 	sendModification(1, &t, &v);
 }
 
-void Fighter::sendModificationAcupointsBit( UInt8 t, int idx, bool writedb )
+void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
 {
 	if(_owner == NULL)
 		return;
@@ -559,7 +560,7 @@ ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
     if (!trumps.length())
         return 0;
 
-    StringTokenizer tk(trumps, "|");
+    StringTokenizer tk(trumps, ",");
     for (size_t i = 0; i < tk.count() && i < TRUMP_UPMAX; ++i)
     {
         setTrump(::atoi(tk[i].c_str()), i, writedb);
@@ -1160,6 +1161,79 @@ void Fighter::getAllCittaAndLevel( Stream& st )
     getAllCittasAndLevel(st);
 }
 
+void Fighter::offPeerless( bool writedb )
+{
+    setPeerless(0, writedb);
+}
+
+int Fighter::hasPeerless( UInt16 pl )
+{
+    for (size_t i = 0; i < _peerless.size(); ++i)
+    {
+        if (_peerless[i] == pl || SKILL_ID(_peerless[i]) == SKILL_ID(pl))
+            return static_cast<int>(i);
+    }
+    return -1;
+}
+
+bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
+{
+    int idx = hasPeerless(pl);
+    if (idx > 0)
+    {
+        if (pl != _peerless[idx])
+        { // upgrade
+            _peerless[idx] = pl;
+            int i = isPeerlessUp(pl);
+            if (i >= 0)
+                upPeerless(pl, writedb);
+        }
+        else
+            return false;
+    }
+    else
+    {
+        idx = static_cast<int>(_peerless.size());
+        _peerless.push_back(pl);
+    }
+
+    sendModification(0x31, pl, idx, writedb);
+    return true;
+}
+
+bool Fighter::delPeerless( UInt16 pl, bool writedb )
+{
+    for (size_t i = 0; i < _peerless.size(); ++i)
+    {
+        if (_peerless[i] == pl)
+        {
+            std::vector<UInt16>::iterator it = _peerless.begin();
+            std::advance(it, i);
+            _peerless.erase(it);
+
+            if (isPeerlessUp(pl))
+                setPeerless(0, writedb);
+            sendModification(0x31, pl, i, writedb);
+            return true;
+        }
+    }
+    return false;
+}
+
+void Fighter::getAllPeerless( Stream& st )
+{
+    UInt8 pls = _peerless.size();
+    st << pls;
+    for (int i = 0; i < pls; ++i)
+    {
+        if (_peerless[i])
+            st << _peerless[i];
+    }
+#if 0
+    std::for_each(_peerless.begin(), _peerless.end(), [&st](UInt16& pl){ st << pl; });
+#endif
+}
+
 UInt32 Fighter::getTrumpId( int idx )
 {
     return (idx >= 0 && idx < TRUMP_UPMAX && _trump[idx]) ? _trump[idx]->getId() : 0;
@@ -1193,27 +1267,27 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     sendModification(0x30, peerless);
 }
 
-void Fighter::setAcupointsBits( std::string& acupoints, bool writedb )
+void Fighter::setAcupoints( std::string& acupoints, bool writedb )
 {
     if (!acupoints.length())
         return;
 
-    StringTokenizer tk(acupoints, "|");
+    StringTokenizer tk(acupoints, ",");
     for (size_t i = 0; i < tk.count() && i < ACUPOINTS_MAX; ++i)
     {
-        setAcupointsBit(::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
+        setAcupoints(::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
     }
 
 }
 
-bool Fighter::setAcupointsBit( int idx, UInt8 v, bool writedb )
+bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
 {
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
         _acupoints[idx] = v;
         _attrDirty = true;
         _bPDirty = true;
-        sendModificationAcupointsBit(0x29, idx, writedb);
+        sendModificationAcupoints(0x29, idx, writedb);
         return true;
     }
     return false;
@@ -1225,7 +1299,7 @@ bool Fighter::incAcupointsBit( int idx, bool writedb )
     {
         if (_acupoints[idx] < getAcupointsCntMax())
         {
-            return setAcupointsBit(idx, _acupoints[idx]+1, writedb);
+            return setAcupoints(idx, _acupoints[idx]+1, writedb);
         }
     }
     return false;
@@ -1236,7 +1310,7 @@ void Fighter::setUpSkills( std::string& skill, bool writedb )
     if (!skill.length())
         return;
 
-    StringTokenizer tk(skill, "|");
+    StringTokenizer tk(skill, ",");
     for (size_t i = 0; i < tk.count() && i < getUpSkillsMax(); ++i)
     {
         upSkill(::atoi(tk[i].c_str()), i, writedb);
@@ -1355,15 +1429,32 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     return true;
 }
 
+bool Fighter::delSkill( UInt16 skill, bool writedb )
+{
+    int idx = hasSkill(skill);
+    if (idx < 0)
+        return false;
+
+    offSkill(skill);
+    std::vector<UInt16>::iterator it = _skills.begin();
+    std::advance(it, idx);
+    _skills.erase(it);
+
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x61, 0, idx, writedb);
+    return true;
+}
+
 void Fighter::setSkills( std::string& skills, bool writedb )
 {
     if (!skills.length())
         return;
 
-    StringTokenizer tk(skills, "|");
+    StringTokenizer tk(skills, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        addNewSkill(::atoi(tk[i].c_str()));
+        addNewSkill(::atoi(tk[i].c_str()), writedb);
     }
 }
 
@@ -1397,7 +1488,7 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     if (!citta.length())
         return;
 
-    StringTokenizer tk(citta, "|");
+    StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
         upCitta(::atoi(tk[i].c_str()), i, writedb);
@@ -1467,26 +1558,30 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
     if (ret)
     {
-        std::vector<UInt16>& skills = skillFromCitta(citta);
+        const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
         if (skills.size())
         {
             for (size_t i = 0; i < skills.size(); ++i)
             {
-                const GData::SkillBase* s = GData::skillManager[skills[i]];
+                const GData::SkillBase* s = skills[i];
                 if (s) {
                     if (s->cond == 0)
-                        addNewSkill(s->getId());
+                        addNewSkill(s->getId(), writedb);
                     else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
                     {
                         if (s->cond != 1)
                         {
-                            if (s->prob >= 10000.0f) // TODO: 100%?
+                            if (s->prob >= 100.0f)
                                 upPassiveSkill(s->getId(), s->cond, true, writedb);
                             else
                                 upPassiveSkill(s->getId(), s->cond, false, writedb);
                         }
                         else
                             upPassiveSkill(s->getId(), s->cond);
+                    }
+                    else
+                    { // peerless
+                        addNewPeerless(s->getId(), writedb);
                     }
                 }
             }
@@ -1513,7 +1608,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
                 { // upgrade
                     ret = true;
                     _passkl[0][i] = skill;
-                    sendModification(0x31, skill, static_cast<int>(i), writedb);
+                    sendModification(0x32, skill, static_cast<int>(i), writedb);
                     break;
                 }
             }
@@ -1523,7 +1618,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         { // up
             ret = true;
             _passkl[0].push_back(skill);
-            sendModification(0x31, skill, static_cast<int>(_passkl[0].size()), writedb);
+            sendModification(0x32, skill, static_cast<int>(_passkl[0].size()), writedb);
         }
     }
     else
@@ -1585,10 +1680,15 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
-std::vector<UInt16>& Fighter::skillFromCitta(UInt16 citta)
+const std::vector<const GData::SkillBase*>& Fighter::skillFromCitta(UInt16 citta)
 {
-    // TODO:
-    static std::vector<UInt16> null;
+    static std::vector<const GData::SkillBase*> null;
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (cb)
+    {
+        if (cb->effect)
+            return cb->effect->skill;
+    }
     return null;
 }
 
@@ -1597,7 +1697,7 @@ void Fighter::setCittas( std::string& cittas, bool writedb )
     if (!cittas.length())
         return;
 
-    StringTokenizer tk(cittas, "|");
+    StringTokenizer tk(cittas, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
         addNewCitta(::atoi(tk[i].c_str()), writedb);
@@ -1635,7 +1735,51 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         _cittas.push_back(citta);
     }
 
+    _attrDirty = true;
+    _bPDirty = true;
     sendModification(0x63, citta, idx, writedb);
+    return true;
+}
+
+bool Fighter::offCitta( UInt16 citta, bool writedb )
+{
+    int idx = isCittaUp(citta);
+    if (idx < 0)
+        return false;
+    _citta[idx] = 0;
+    for (int i = idx; i < getUpCittasMax() - 1; ++i)
+    {
+        _citta[i] = _citta[i+1];
+        _citta[i+1] = 0;
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x63, 0, idx, writedb);
+    return true;
+}
+
+bool Fighter::delCitta( UInt16 citta, bool writedb )
+{
+    int idx = hasCitta(citta);
+    if (idx < 0)
+        return false;
+
+    const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
+    if (skills.size())
+    {
+        for (size_t i = 0; i < skills.size(); ++i)
+            delSkill(skills[i]?skills[i]->getId():0, writedb);
+    }
+    offCitta(citta, writedb);
+
+    std::vector<UInt16>::iterator it = _cittas.begin();
+    std::advance(it, idx);
+    _cittas.erase(it);
+
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x63, 0, idx, writedb);
     return true;
 }
 

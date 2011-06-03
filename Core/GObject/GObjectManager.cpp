@@ -818,7 +818,7 @@ namespace GObject
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
             fgt2->setPeerless(specfgtobj.peerless, false);
-            fgt2->setAcupointsBits(specfgtobj.acupoints, false);
+            fgt2->setAcupoints(specfgtobj.acupoints, false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
 			fgt2->setArmor(1, fetchArmor(specfgtobj.armor2), false);

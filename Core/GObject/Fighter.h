@@ -36,6 +36,8 @@ namespace GObject
 #define CITTA_ID(x) ((x)/CITTA_LEVEL_MAX)
 #define CITTAANDLEVEL(c,l) ((c)*CITTA_LEVEL_MAX | (l))
 
+#define PEERLESS_UPMAX 1
+
 class Player;
 class Fighter
 {
@@ -77,18 +79,30 @@ public:
     void setCapacity(float c, bool = true);
 	inline float getCapacity() {return _capacity;}
 
+    // 装备无双技能
     void setPeerless(UInt16 pl, bool = true);
+    inline void upPeerless(UInt16 pl, bool writedb = true) { setPeerless(pl, writedb); }
+    // 卸下无双技能
+    void offPeerless(bool = true);
+    // 增加一个可装备的无双技能
+    bool addNewPeerless(UInt16 pl, bool = true); 
+    // 删除一个可装备的无双技能
+    bool delPeerless(UInt16 pl, bool = true);
     inline UInt16 getPeerless() { return peerless / SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessLevel() { return peerless % SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessAndLevel() { return peerless; }
+    // 是否装备了pl这个无双技能
+    inline int isPeerlessUp(UInt16 pl) { return SKILL_ID(peerless) == SKILL_ID(pl); }
+    // 是否有pl这个可装备的无双技能
+    int hasPeerless(UInt16 pl);
 
     inline UInt8 getAcupointsCntMax() { return 3; }
-    bool setAcupointsBit(int idx, UInt8 v, bool = true);
+    bool setAcupoints(int idx, UInt8 v, bool = true);
     bool incAcupointsBit(int idx, bool = true);
 
     inline UInt8 getAcupointsBit(int idx) { return (idx >= 0 && idx < ACUPOINTS_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }
     void getAllAcupointsBits(Stream& st);
-    void setAcupointsBits(std::string& acupoints, bool = true);
+    void setAcupoints(std::string& acupoints, bool = true);
 
     // XXX: 由心法和法宝带出技能，且技能不需要升级
 #if 0
@@ -111,6 +125,8 @@ public:
     UInt16 getUpSkillsNum();
     // 增加一个新技能,包括技能升级
     bool addNewSkill(UInt16 skill, bool = true);
+    // 删除一个可装备的技能
+    bool delSkill(UInt16 skill, bool = true);
     // 取得装备技能的最大数
     inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
     // 取得技能装备位置idx处的技能ID
@@ -146,7 +162,7 @@ public:
     // 取得被攻击后被动触发技能
     inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[1]; }
     // 取得心法带出技能的ID表
-    std::vector<UInt16>& skillFromCitta(UInt16 citta);
+    const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
     // 初始化装备的心法
     void setUpCittas(std::string& citta, bool = true);
@@ -184,6 +200,11 @@ public:
     // 取得装备了的和学习了的心法和等级
     void getAllCittaAndLevel(Stream& st);
 
+    // 取得可装备的无双技能
+    void getAllPeerless(Stream& st);
+    // 取得可装备的无双技能的个数
+    inline UInt8 getPeerlessNum() { return _peerless.size(); }
+
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
 	inline ItemEquip * getAmulet() { return _amulet; }
@@ -205,7 +226,7 @@ public:
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
 
-    void sendModificationAcupointsBit(UInt8 t, int idx, bool = true);
+    void sendModificationAcupoints(UInt8 t, int idx, bool = true);
 
 #if 1
     void sendModification(UInt8 t, UInt16 skill, int idx, bool = true);
@@ -415,7 +436,7 @@ protected:
         {
             pbuf += snprintf(pbuf, pend - pbuf, "%u", values[i]);
             if (i < size - 1)
-                pbuf += snprintf(pbuf, pend - pbuf, "|");
+                pbuf += snprintf(pbuf, pend - pbuf, ",");
         }
 
         if (pbuf != buf)
@@ -446,6 +467,8 @@ protected:
 
     UInt16 _citta[CITTA_UPMAX];  // 装备的心法
     std::vector<UInt16> _cittas; // 可装备的心法
+
+    std::vector<UInt16> _peerless; // 可装备的无双技能
 
     /**
      * PREATK       0       攻击前被动触发
@@ -487,7 +510,7 @@ public:
 	Int32 mag_defend;
 	Int32 maxhp;
 	UInt32 action;
-    UInt16 peerless;       // 无双技能
+    UInt16 peerless;       // 装备的无双技能
 	float hitrate;
 	float evade;
 	float critical;
