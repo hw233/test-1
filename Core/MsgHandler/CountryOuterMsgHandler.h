@@ -1077,7 +1077,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
         {
             idx = (fer._equipId >> 16) & 0xFFFF;
             UInt8 v = fer._equipId & 0xFFFF;
-            fgt->setAcupointsBit(idx, v);
+            fgt->setAcupoints(idx, v);
         }
         break;
     case 0x30:

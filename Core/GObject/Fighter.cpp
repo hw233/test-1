@@ -593,15 +593,20 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                 )
             )
         {
-            _attrDirty = true;
-            _bPDirty = true;
-
             t = _trump[idx];
             _trump[idx] = trump;
 
             if (trump)
                 trump->DoEquipBind(true);
 
+            const GData::AttrExtra* attr = trump->getAttrExtra();
+            if (attr)
+            {
+                addSkillsFromCT(attr->skills, writedb);
+            }
+
+            _attrDirty = true;
+            _bPDirty = true;
             sendModification(0x50+idx, _trump[idx], writedb);
         }
     }
@@ -1558,34 +1563,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
     if (ret)
     {
-        const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
-        if (skills.size())
-        {
-            for (size_t i = 0; i < skills.size(); ++i)
-            {
-                const GData::SkillBase* s = skills[i];
-                if (s) {
-                    if (s->cond == 0)
-                        addNewSkill(s->getId(), writedb);
-                    else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
-                    {
-                        if (s->cond != 1)
-                        {
-                            if (s->prob >= 100.0f)
-                                upPassiveSkill(s->getId(), s->cond, true, writedb);
-                            else
-                                upPassiveSkill(s->getId(), s->cond, false, writedb);
-                        }
-                        else
-                            upPassiveSkill(s->getId(), s->cond);
-                    }
-                    else
-                    { // peerless
-                        addNewPeerless(s->getId(), writedb);
-                    }
-                }
-            }
-        }
+        addSkillsFromCT(skillFromCitta(citta), writedb);
 
         _attrDirty = true;
         _bPDirty = true;
@@ -1593,6 +1571,37 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     }
 
     return ret;
+}
+
+void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)
+{
+    if (skills.size())
+    {
+        for (size_t i = 0; i < skills.size(); ++i)
+        {
+            const GData::SkillBase* s = skills[i];
+            if (s) {
+                if (s->cond == 0)
+                    addNewSkill(s->getId(), writedb);
+                else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
+                {
+                    if (s->cond != 1)
+                    {
+                        if (s->prob >= 100.0f)
+                            upPassiveSkill(s->getId(), s->cond, true, writedb);
+                        else
+                            upPassiveSkill(s->getId(), s->cond, false, writedb);
+                    }
+                    else
+                        upPassiveSkill(s->getId(), s->cond);
+                }
+                else
+                { // peerless
+                    addNewPeerless(s->getId(), writedb);
+                }
+            }
+        }
+    }
 }
 
 bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
