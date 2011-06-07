@@ -179,6 +179,26 @@ float BattleFormula::calcIntelligence( GObject::Fighter * fgt )
 	return call<float>("calcIntelligence", fgt);
 }
 
+float BattleFormula::calcWill( GObject::Fighter * fgt )
+{
+	return call<float>("calcWill", fgt);
+}
+
+float BattleFormula::calcSoul( GObject::Fighter * fgt )
+{
+	return call<float>("calcSoul", fgt);
+}
+
+float BattleFormula::calcAura( GObject::Fighter * fgt )
+{
+	return call<float>("calcAura", fgt);
+}
+
+float BattleFormula::calcTough( GObject::Fighter * fgt )
+{
+	return call<float>("calcTough", fgt);
+}
+
 float BattleFormula::calcPhysique( GObject::Fighter * fgt )
 {
 	return call<float>("calcPhysique", fgt);
@@ -189,9 +209,19 @@ float BattleFormula::calcAttack( GObject::Fighter * fgt )
 	return call<float>("calcAttack", fgt);
 }
 
+float BattleFormula::calcMagAttack( GObject::Fighter * fgt )
+{
+	return call<float>("calcMagAttack", fgt);
+}
+
 float BattleFormula::calcDefend( GObject::Fighter * fgt )
 {
 	return call<float>("calcDefend", fgt);
+}
+
+float BattleFormula::calcMagDefend( GObject::Fighter * fgt )
+{
+	return call<float>("calcMagDefend", fgt);
 }
 
 float BattleFormula::calcHitrate( GObject::Fighter * fgt )
@@ -209,6 +239,11 @@ float BattleFormula::calcCritical( GObject::Fighter * fgt )
 	return call<float>("calcCritical", fgt);
 }
 
+float BattleFormula::calcCriticalDmg( GObject::Fighter * fgt )
+{
+	return call<float>("calcCriticalDmg", fgt);
+}
+
 float BattleFormula::calcPierce( GObject::Fighter * fgt )
 {
 	return call<float>("calcPierce", fgt);
@@ -217,6 +252,11 @@ float BattleFormula::calcPierce( GObject::Fighter * fgt )
 float BattleFormula::calcCounter( GObject::Fighter * fgt )
 {
 	return call<float>("calcCounter", fgt);
+}
+
+float BattleFormula::calcMagRes( GObject::Fighter * fgt )
+{
+	return call<float>("calcMagRes", fgt);
 }
 
 UInt32 BattleFormula::calcHP( GObject::Fighter * fgt )
@@ -249,6 +289,26 @@ float BattleFormula::calcIntelligence(Battle::BattleFighter * fgt)
 	return call<float>("calcIntelligence", fgt);
 }
 
+float BattleFormula::calcWill( Battle::BattleFighter* fgt )
+{
+	return call<float>("calcWill", fgt);
+}
+
+float BattleFormula::calcSoul( Battle::BattleFighter * fgt )
+{
+	return call<float>("calcSoul", fgt);
+}
+
+float BattleFormula::calcAura( Battle::BattleFighter * fgt )
+{
+	return call<float>("calcAura", fgt);
+}
+
+float BattleFormula::calcTough( Battle::BattleFighter * fgt )
+{
+	return call<float>("calcTough", fgt);
+}
+
 float BattleFormula::calcPhysique(Battle::BattleFighter * fgt)
 {
 	return call<float>("calcPhysique", fgt);
@@ -259,9 +319,19 @@ float BattleFormula::calcAttack(Battle::BattleFighter * fgt)
 	return call<float>("calcAttack", fgt);
 }
 
+float BattleFormula::calcMagAttack(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcMagAttack", fgt);
+}
+
 float BattleFormula::calcDefend(Battle::BattleFighter * fgt)
 {
 	return call<float>("calcDefend", fgt);
+}
+
+float BattleFormula::calcMagDefend(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcMagDefend", fgt);
 }
 
 float BattleFormula::calcHitrate(Battle::BattleFighter * fgt)
@@ -278,6 +348,12 @@ float BattleFormula::calcCritical(Battle::BattleFighter * fgt)
 {
 	return call<float>("calcCritical", fgt);
 }
+
+float BattleFormula::calcCriticalDmg(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcCriticalDmg", fgt);
+}
+
 lua_tinker::table BattleFormula::getFactor(UInt8 klass, UInt8 career, UInt8 level)
 {
 	return call<lua_tinker::table>("getFactor", klass, career, level);
@@ -290,6 +366,11 @@ float BattleFormula::calcPierce(Battle::BattleFighter * fgt)
 float BattleFormula::calcCounter(Battle::BattleFighter * fgt)
 {
 	return call<float>("calcCounter", fgt);
+}
+
+float BattleFormula::calcMagRes(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcMagRes", fgt);
 }
 
 UInt32 BattleFormula::calcHP(Battle::BattleFighter * fgt)

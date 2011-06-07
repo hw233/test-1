@@ -599,10 +599,30 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
             if (trump)
                 trump->DoEquipBind(true);
 
-            const GData::AttrExtra* attr = trump->getAttrExtra();
-            if (attr)
-            {
-                addSkillsFromCT(attr->skills, writedb);
+            if (trump)
+            { // up
+                const GData::AttrExtra* attr = trump->getAttrExtra();
+                if (attr)
+                {
+                    addSkillsFromCT(attr->skills, writedb);
+                }
+            }
+            else
+            { // off
+                if (t)
+                {
+                    const GData::AttrExtra* attr = t->getAttrExtra();
+                    if (attr)
+                    {
+                        const GData::SkillBase* s = 0;
+                        for (size_t i = 0; i < attr->skills.size(); ++i)
+                        {
+                            s = attr->skills[i];
+                            if (s)
+                                delSkill(s->getId(), writedb);
+                        }
+                    }
+                }
             }
 
             _attrDirty = true;
@@ -1434,7 +1454,7 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     return true;
 }
 
-bool Fighter::delSkill( UInt16 skill, bool writedb )
+bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync )
 {
     int idx = hasSkill(skill);
     if (idx < 0)
@@ -1447,7 +1467,8 @@ bool Fighter::delSkill( UInt16 skill, bool writedb )
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x61, 0, idx, writedb);
+    if (sync)
+        sendModification(0x61, 0, idx, writedb);
     return true;
 }
 
@@ -1555,6 +1576,8 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         { // upgrade
             if (_citta[idx] != citta)
             {
+                // XXX: do not send message to client
+                delCitta(_citta[idx], writedb, false); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
             }
@@ -1768,7 +1791,7 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
     return true;
 }
 
-bool Fighter::delCitta( UInt16 citta, bool writedb )
+bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
 {
     int idx = hasCitta(citta);
     if (idx < 0)
@@ -1778,7 +1801,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     if (skills.size())
     {
         for (size_t i = 0; i < skills.size(); ++i)
-            delSkill(skills[i]?skills[i]->getId():0, writedb);
+            delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
     }
     offCitta(citta, writedb);
 

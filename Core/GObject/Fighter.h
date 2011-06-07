@@ -126,7 +126,7 @@ public:
     // 增加一个新技能,包括技能升级
     bool addNewSkill(UInt16 skill, bool = true);
     // 删除一个可装备的技能
-    bool delSkill(UInt16 skill, bool = true);
+    bool delSkill(UInt16 skill, bool = true, bool = true);
     // 取得装备技能的最大数
     inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
     // 取得技能装备位置idx处的技能ID
@@ -175,7 +175,7 @@ public:
     // 增加一个心法
     bool addNewCitta(UInt16 citta, bool = true);
     // 删除一个心法
-    bool delCitta(UInt16 citta, bool = true);
+    bool delCitta(UInt16 citta, bool = true, bool = true);
     // 是否学会了此心法
     int hasCitta(UInt16 citta);
     // 是否装备了此心法
