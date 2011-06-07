@@ -1020,30 +1020,6 @@ Fighter * Fighter::cloneWithEquip(Player * player)
 }
 
 #if 0
-void Fighter::setSkill( UInt16 skill, bool writedb /*= true*/ )
-{
-	if(_skill == skill)
-		return;
-	_skill = skill;
-	if(writedb)
-	{
-		sendModification(0x11, _skill * 100 + _skillLevel);
-	}
-}
-
-void Fighter::setSkillLevel( UInt8 level, bool writedb /*= true*/ )
-{
-	if(_skillLevel == level)
-		return;
-	_skillLevel = level;
-	if(writedb)
-	{
-		sendModification(0x11, _skill * 100 + _skillLevel);
-	}
-}
-#endif
-
-#if 0
 bool Fighter::learnSkill(UInt16 skill)
 {
 	if(skill == _skill)
@@ -1109,26 +1085,6 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
     return false;
 }
-
-#if 0
-void Fighter::setSkillAndLevel( UInt16 data )
-{
-	_skill = data / 100;
-	_skillLevel = data % 100;
-}
-
-void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true*/ )
-{
-	if(_skill == skill && _skillLevel == level)
-		return;
-	_skill = skill;
-	_skillLevel = level;
-	if(writedb)
-	{
-		sendModification(0x11, _skill * 100 + _skillLevel);
-	}
-}
-#endif
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
