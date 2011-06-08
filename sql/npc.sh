@@ -33,10 +33,18 @@ function npc()
     sed -i s/\\r//g $d
     if [ $? -eq 0 ]
     then
+        iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
     fi
+}
+
+function iconv2utf8()
+{
+    iconv -f cp936 -t utf8 $1 -o $1.tmp
+    rm $1
+    mv $1.tmp $1
 }
 
 if [ -f $F  ]
