@@ -12,6 +12,8 @@ function loot()
     f=$1
     d=loot
     sed -i /isPack/d $f
+    sed -i /ID/d $f
+    sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"

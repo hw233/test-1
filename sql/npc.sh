@@ -13,6 +13,7 @@ function npc()
     f=$1
     d=npc
     sed -i /id/d $f
+    sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
