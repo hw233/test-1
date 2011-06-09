@@ -20,33 +20,33 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
     counter(0), magres(0), practice(0) {}
     ~CittaEffect() { skill.clear(); }
 
-    UInt16 strength;
+    Int16 strength;
     float strengthP;
-    UInt16 physique;
+    Int16 physique;
     float physiqueP;
-    UInt16 agility;
+    Int16 agility;
     float agilityP;
-    UInt16 intelligence;
+    Int16 intelligence;
     float intelligenceP;
-    UInt16 will;
+    Int16 will;
     float willP;
-    UInt16 soul;
+    Int16 soul;
     float soulP;
-    UInt16 aura;
+    Int16 aura;
     float auraP;
-    UInt16 auraMax;
+    Int16 auraMax;
     float auraMaxP;
     // UInt16 tough;
     // UInt16 toughP;
-    UInt16 attack;
+    Int16 attack;
     float attackP;
-    UInt16 mag_attack;
+    Int16 mag_attack;
     float mag_attackP;
-    UInt16 defend;
+    Int16 defend;
     float defendP;
-    UInt16 mag_defend;
+    Int16 mag_defend;
     float mag_defendP;
-    UInt16 hp;
+    Int16 hp;
     float hpP;
     float action;
     float hitrate;

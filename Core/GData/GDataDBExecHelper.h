@@ -106,18 +106,18 @@ struct DBSkillEffect
     UInt16 id;
     UInt8 state;        // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 有等级之分
     UInt8 immune;       // 对状态技能的免疫,只能免疫比自己技能低的技能
-    std::string damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)
+    std::string damage; // 物理伤害 [+/-]num/num% (目前物理伤害和法术伤害互斥)
     float adddam;       // 物理伤害附加(具体值)
-    std::string magdam; // 法术伤害 num/num%
+    std::string magdam; // 法术伤害 [+/-]num/num%
     float addmag;       // 法术伤害附加(具体值)
-    std::string hp;     // HP改变 num/num%
+    std::string hp;     // HP改变 [+/-]num/num%
     float addhp;        // HP改变附加(具体值)
     float absorb;       // 伤害吸血系数
-    std::string aura;   // 作用士气 num/num%
-    std::string atk;    // 物理攻击 num/num%
-    std::string def;    // 物理防御 num/num%
-    std::string magatk; // 法术攻击 num/num%
-    std::string magdef; // 法术防御 num/num%
+    std::string aura;   // 作用士气 [+/-]num/num%
+    std::string atk;    // 物理攻击 [+/-]num/num%
+    std::string def;    // 物理防御 [+/-]num/num%
+    std::string magatk; // 法术攻击 [+/-]num/num%
+    std::string magdef; // 法术防御 [+/-]num/num%
     float tough;        // 坚韧
     float action;       // 身法
     float evade;        // 闪避
@@ -171,6 +171,20 @@ struct DBCittaEffect
 	float counter;
 	float magres;
     float practice;             // 修炼速度加成
+};
+
+// 穴道及修为
+struct DBAcuPra
+{
+    UInt8 id;       // 穴道
+    UInt8 lvl;      // 层级(1-3)
+    UInt8 needlvl;  // 所需等级
+    UInt32 pra;     // 所需修为
+    UInt32 soulmax; // 元神力上限
+    UInt32 pramax;  // 修为上限
+    UInt8 citslot;  // 心法装备加1
+    UInt8 aura;     // 出场灵气加成
+    UInt8 auraInc;  // 灵气增长加成
 };
 
 struct DBExp
@@ -369,6 +383,21 @@ SPECIALDEF(22)
         float, critical,
         float, counter,
         float, magres
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBAcuPra)
+SPECIALDEF(9)
+    (
+        UInt8, id,
+        UInt8, lvl,
+        UInt8, needlvl,
+        UInt32, pra,
+        UInt32, soulmax,
+        UInt32, pramax,
+        UInt8, citslot,
+        UInt8, aura,
+        UInt8, auraInc
     )
 SPECIALEND()
 

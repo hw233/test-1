@@ -520,6 +520,7 @@ CREATE TABLE `fighter` (
   `ring` int(10) unsigned NOT NULL DEFAULT '0',
   `amulet` int(10) unsigned NOT NULL DEFAULT '0',
   `peerless` mediumint(5) unsigned NOT NULL DEFAULT '0',
+  `cittaslot` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
   `acupoints` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
@@ -571,10 +572,12 @@ CREATE TABLE `fighter_train` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-DROP TABLE IF EXISTS `player_practice`;
-CREATE TABLE `player_practice` (
-  PRIMARY KEY (`fgtId`,`ownerId`)
-);
+/*
+-- DROP TABLE IF EXISTS `fighter_practice`;
+-- CREATE TABLE `fighter_practice` (
+--   PRIMARY KEY (`fgtId`,`ownerId`)
+-- );
+*/
 
 --
 -- Table structure for table `friend`

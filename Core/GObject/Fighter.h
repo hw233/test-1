@@ -58,6 +58,7 @@ public:
 	inline void setLevel(UInt8 l) {_level = l;}
 	inline void setExp(UInt64 e) {_exp = e;}
     inline void setPExp(UInt64 e) { _pexp = e; }
+    inline void setPExpMax(UInt64 e) { _pexpMax = e; }
 	void setLevelAndExp(UInt8 l, UInt64 e);
 	void setPotential(float p, bool = true);
 	void setCurrentHP(UInt16 hp, bool = true);
@@ -73,6 +74,7 @@ public:
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
 	inline UInt64 getPExp() {return _pexp;}
+	inline UInt64 getPExpMax() {return _pexpMax;}
 	inline float getPotential() {return _potential;}
 	inline UInt16 getCurrentHP() {return _hp;}
 
@@ -184,7 +186,9 @@ public:
     // 取得装备的心法数
     inline UInt8 getUpCittasNum();
     // 取得最大装备心法数
-    inline UInt8 getUpCittasMax() { return CITTA_UPMAX; }
+    inline UInt8 getUpCittasMax() { return _cittaslot <= CITTA_UPMAX ? _cittaslot : CITTA_UPMAX; }
+    // 设置可装备心法槽
+    inline void setCittaSlot(UInt8 slots) { _cittaslot = slots; }
     // 取得装备位置idx处所装备的心法的ID
 	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_ID(_citta[idx]) : 0; }
     // 取得装备位置idx处所装备的心法等级
@@ -457,6 +461,7 @@ protected:
 	UInt8 _level;
 	UInt64 _exp;        // 经验
     UInt64 _pexp;       // 修炼经验
+    UInt64 _pexpMax;    // 修炼最大经验
 	float _potential;   // 资质
 	float _capacity;    // 潜力
 	UInt8 _color;
@@ -467,24 +472,25 @@ protected:
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
     std::vector<UInt16> _skills;    // 可装备的技能
 
-    UInt16 _citta[CITTA_UPMAX];  // 装备的心法
-    std::vector<UInt16> _cittas; // 可装备的心法
+    UInt8 _cittaslot;               // 可装备心法最大数
+    UInt16 _citta[CITTA_UPMAX];     // 装备的心法
+    std::vector<UInt16> _cittas;    // 可装备的心法
 
-    std::vector<UInt16> _peerless; // 可装备的无双技能
+    std::vector<UInt16> _peerless;  // 可装备的无双技能
 
     /**
      * PREATK       0       攻击前被动触发
      * AFTATK       1       攻击后被动触发
      * AFTATKED     2       被攻击后触发
      */
-    std::vector<UInt16> _rpasskl[2];    // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _passkl[3];     //  100%触发技能
+    std::vector<UInt16> _rpasskl[2];// 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
+    std::vector<UInt16> _passkl[3]; //  100%触发技能
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
-	ItemEquip * _trump[TRUMP_UPMAX];    // 法宝
+	ItemEquip * _trump[TRUMP_UPMAX];// 法宝
 
 	bool _attrDirty;
 	UInt32 _maxHP;

@@ -220,6 +220,7 @@ struct DBFighterObj
 	UInt32 ring;            // 戒指
 	UInt32 amulet;          // 项链
     UInt16 peerless;        // 无双技能
+    UInt8 cittaslot;        // 可装备心法数
     std::string trump;      // 法宝
     std::string acupoints;  // 穴道,打通次数
     std::string skill;      // 装备的技能
@@ -774,7 +775,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(23)
+SPECIALDEF(24)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -793,6 +794,7 @@ SPECIALDEF(23)
 	UInt32, ring,
 	UInt32, amulet,
     UInt16, peerless,
+    UInt8, cittaslot,
     std::string, trump,
     std::string, acupoints,
     std::string, skill,

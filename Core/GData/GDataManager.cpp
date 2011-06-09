@@ -14,6 +14,7 @@
 #include "Server/Cfg.h"
 #include "SkillTable.h"
 #include "CittaTable.h"
+#include "AcuPraTable.h"
 #include "Common/StringTokenizer.h"
 
 #include "Script/lua_tinker.h"
@@ -41,6 +42,11 @@ namespace GData
 		if (!LoadExpData())
 		{
 			fprintf(stderr, "Load ExpData Error !\n");
+			return false;
+		}
+		if (!LoadAcuPraData())
+		{
+			fprintf(stderr, "Load AcuPra Error !\n");
 			return false;
 		}
 		if (!LoadAreaData())
@@ -130,6 +136,30 @@ namespace GData
 		}
 		return true;
 	}
+
+	bool GDataManager::LoadAcuPraData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBAcuPra ap;
+		if(execu->Prepare("SELECT `id`, `lvl`, `needlvl`, `pra`, `soulmax`, `pramax`, `citslot`, `aura`, `auraInc` FROM `acupra`", ap) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            GData::AcuPra* pap = new GData::AcuPra(ap.id << 8 | ap.lvl);
+            if (!pap)
+                return false;
+            pap->needlvl = ap.needlvl;
+            pap->pra = ap.pra;
+            pap->soulmax = ap.soulmax;
+            pap->pramax = ap.pramax;
+            pap->citslot = ap.citslot;
+            pap->aura = ap.aura;
+            pap->auraInc = ap.auraInc;
+            GData::acupraManager.add(pap);
+		}
+        return true;
+    }
 
 	bool GDataManager::LoadAreaData()
 	{

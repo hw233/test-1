@@ -8,6 +8,7 @@
 #include "GData/ExpTable.h"
 #include "GData/SkillTable.h"
 #include "GData/CittaTable.h"
+#include "GData/AcuPraTable.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Common/Stream.h"
@@ -41,8 +42,8 @@ bool existGreatFighter(UInt32 id)
 }
 
 Fighter::Fighter(UInt32 id, Player * owner):
-	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _potential(1.0f),
-    _capacity(1.0f), _color(2), _hp(0), _weapon(NULL), _ring(NULL), _amulet(NULL), 
+	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _pexpMax(0), _potential(1.0f),
+    _capacity(1.0f), _color(2), _hp(0), _cittaslot(0), _weapon(NULL), _ring(NULL), _amulet(NULL), 
     _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f), favor(0),
     reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0), will(0),
     soul(0), aura(0), tough(0), attack(0), defend(0), maxhp(0), action(0), peerless(0), 
@@ -1265,6 +1266,24 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
 {
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
+        const GData::AcuPra* pap = GData::acupraManager[idx<<8|v];
+        if (!pap)
+            return false;
+        if (pap->needlvl > getLevel())
+            return false;
+        if (pap->pra > getPExp())
+            return false;
+
+        soul += pap->soulmax;
+        _pexpMax += pap->pramax;
+        _cittaslot += pap->citslot;
+        if (pap->citslot)
+        {
+            DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
+        }
+        aura += pap->aura;
+        // pap->auraInc
+
         _acupoints[idx] = v;
         _attrDirty = true;
         _bPDirty = true;
