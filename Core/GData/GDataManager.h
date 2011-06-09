@@ -18,6 +18,7 @@ namespace GData
 
 	public:
 		static bool LoadExpData();
+        static bool LoadAcuPraData();
 		static bool LoadAreaData();
 		static bool LoadWeaponDefData();
 		static bool LoadItemTypeData();

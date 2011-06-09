@@ -354,6 +354,21 @@ CREATE TABLE `lvl_exp` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `acupra`;
+CREATE TABLE `acupra` (
+  `id` tinyint(3) unsigned NOT NULL,
+  `lvl` tinyint(3) unsigned NOT NULL,
+  `needlvl` tinyint(3) unsigned NOT NULL,
+  `pra` int(10) unsigned NOT NULL,
+  `soulmax` int(10) unsigned NOT NULL,
+  `pramax` int(10) unsigned NOT NULL,
+  `citslot` tinyint(3) unsigned NOT NULL,
+  `aura` tinyint(3) unsigned NOT NULL,
+  `auraInc` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`id`, `lvl`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+
 --
 -- Table structure for table `map`
 --
@@ -432,7 +447,7 @@ DROP TABLE IF EXISTS `skills`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `skills` (
   `id` smallint(5) NOT NULL,
-  `name` varchar(255) NOT '',
+  `name` varchar(255) NOT NULL DEFAULT '',
   `target` tinyint(3) NOT NULL DEFAULT '0',
   `cond` smallint(5) NOT NULL DEFAULT '0',
   `prob` float(10,4) NOT NULL DEFAULT '0.0000',

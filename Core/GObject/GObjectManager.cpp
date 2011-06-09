@@ -789,7 +789,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `cittaslot`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -827,18 +827,12 @@ namespace GObject
 			fgt2->setArmor(4, fetchArmor(specfgtobj.armor5), false);
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
+            fgt2->setCittaSlot(specfgtobj.cittaslot);
             fgt2->setTrump(specfgtobj.trump, false);
             fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setSkills(specfgtobj.skills, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
             fgt2->setCittas(specfgtobj.cittas, false);
-            // TODO:
-#if 0
-			if(specfgtobj.skill != 0)
-			{
-				fgt2->setSkillAndLevel(specfgtobj.skill);
-			}
-#endif
 		}
 		lc.finalize();
 
