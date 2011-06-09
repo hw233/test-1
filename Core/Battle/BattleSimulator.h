@@ -101,7 +101,7 @@ private:
 	UInt32 doAttack(int);
 	void insertFighterStatus(FighterStatus& fs);
 	void removeFighterStatus(FighterStatus& fs);
-	UInt32 attackOnce(BattleFighter * bf, float atk, bool cs, bool pr, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL);
+	UInt32 attackOnce(BattleFighter * bf, bool& cs, bool& pr, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL);
 	float testRescue(BattleFighter *& bf, int counter_deny, AttackPoint * counter_deny_list);
 	float testLink(BattleFighter *& bf, UInt16& skillId);
 	void onDead(BattleObject * bo);
@@ -113,6 +113,9 @@ private:
 	void setStatusChange(UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, StatusChange * scList, size_t& scCount, bool active);
 	void onDamage(BattleObject * bo, StatusChange * scList, size_t& scCount, bool active);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
+    UInt32 doNormalAttack(BattleFighter* bf, int otherside, int target_pos);
+    UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* therapy_bf = NULL);
+    BattleFighter* getTherapyTarget(BattleFighter* bf);
 
 private:
 	int _id, _winner, _turns;
