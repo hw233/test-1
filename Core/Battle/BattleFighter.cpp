@@ -130,7 +130,7 @@ void BattleFighter::updateAllAttr()
     _tough = _formula->calcTough(this);
     _mag_attack = _formula->calcMagAttack(this);
     _mag_defend = _formula->calcMagDefend(this);
-    _mag_res = _formula->calcMagRes(this);
+    _magres = _formula->calcMagRes(this);
 
 	if((_flag & BlockBoss) == 0 && oldhp > 0 && _hp > 0 && oldhp < _maxhp)
 	{
