@@ -233,12 +233,27 @@ namespace GData
 		}
 	}
 
+	void SetValOrPercent(Int16& val, float& perc, const std::string& str)
+	{
+		if(str[str.length() - 1] == '%')
+		{
+			std::string astr(str.begin(), str.end() - 1);
+			perc = static_cast<float>(atof(astr.c_str())) / 100;
+			val = 0;
+		}
+		else
+		{
+			val = atoi(str.c_str());
+			perc = 0;
+		}
+	}
+
 	bool GDataManager::LoadAttrExtraData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttrExtra ae;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `skills` FROM `attr_extra`", ae) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `skills` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -264,7 +279,7 @@ namespace GData
 			aextra->_extra.critical_dmg = ae.critical_dmg;
 			aextra->_extra.pierce = ae.pierce;
 			aextra->_extra.counter = ae.counter;
-			aextra->_extra.mag_res = ae.mag_res;
+			aextra->_extra.magres = ae.magres;
 
             StringTokenizer tk(ae.skills, ",");
             if (tk.count())
@@ -575,7 +590,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkillEffect effs;
-		if(execu->Prepare("SELECT `id`, `state`, `stateprob`, `immune`, `damage`, `magdam`, `hp`, `aura`, `hitCount`, `def`, `magdef`, `evade`, `pierce`, `adddam` FROM `skill_effect`", effs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `state`, `stateprob`, `immune`, `damage`, `adddam`, `magdam`, `addmag`, `hp`, `addhp`, `absorb`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `evade`, `critical`, `pierce`, `counter`, `magres` FROM `skill_effect`", effs) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -583,18 +598,26 @@ namespace GData
             if (!ef)
                 return false;
             ef->state = effs.state;
-            ef->stateprob = effs.stateprob;
             ef->immune = effs.immune;
             SetValOrPercent(ef->damage, ef->damageP, effs.damage);
-            SetValOrPercent(ef->magdam, ef->magdamP, effs.magdam);
-            SetValOrPercent(ef->hp, ef->hpP, effs.hp);
-            SetValOrPercent(ef->aura, ef->auraP, effs.aura);
-            ef->hitCount = effs.hitCount;
-            SetValOrPercent(ef->def, ef->defP, effs.def);
-            SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
-            ef->evade = effs.evade;
-            ef->pierce = effs.pierce;
             ef->adddam = effs.adddam;
+            SetValOrPercent(ef->magdam, ef->magdamP, effs.magdam);
+            ef->addmag = effs.addmag;
+            SetValOrPercent(ef->hp, ef->hpP, effs.hp);
+            ef->addhp = effs.addhp;
+            ef->absorb = effs.absorb;
+            SetValOrPercent(ef->aura, ef->auraP, effs.aura);
+            SetValOrPercent(ef->atk, ef->atkP, effs.atk);
+            SetValOrPercent(ef->def, ef->defP, effs.def);
+            SetValOrPercent(ef->magatk, ef->magatkP, effs.magatk);
+            SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
+            ef->tough = effs.tough;
+            ef->action = effs.action;
+            ef->evade = effs.evade;
+            ef->critical = effs.critical;
+            ef->pierce = effs.pierce;
+            ef->counter = effs.counter;
+            ef->magres = effs.magres;
             skillEffectManager.add(ef);
         }
         return true;
@@ -605,7 +628,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkill skills;
-		if(execu->Prepare("SELECT `id`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `target`, `cond`, `prob`, `area`, `factor`, `last`, `cd`, `effectid` FROM `skills`", skills) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -635,7 +658,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCittaEffect cf;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `skill`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `mag_res`, `practice` FROM `citta_effect`", cf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `skill`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `practice` FROM `citta_effect`", cf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -661,7 +684,7 @@ namespace GData
             cft->critical_dmg = cf.critical_dmg;
             cft->pierce = cf.pierce;
             cft->counter = cf.counter;
-            cft->mag_res = cf.mag_res;
+            cft->magres = cf.magres;
             cft->practice = cf.practice;
 
             StringTokenizer tk(cf.skill, ",");

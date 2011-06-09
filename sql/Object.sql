@@ -571,6 +571,11 @@ CREATE TABLE `fighter_train` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `player_practice`;
+CREATE TABLE `player_practice` (
+  PRIMARY KEY (`fgtId`,`ownerId`)
+);
+
 --
 -- Table structure for table `friend`
 --

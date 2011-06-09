@@ -18,7 +18,7 @@ struct AttrExtra
 		attack(0), attackP(0), mag_attack(0), mag_attackP(0),
         defend(0), defendP(0), mag_defend(0), mag_defendP(0),
 		hp(0), hpP(0), action(0), hitrate(0), evade(0),
-        critical(0), critical_dmg(0), pierce(0), counter(0), mag_res(0)
+        critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
 	{ }
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
@@ -57,7 +57,7 @@ struct AttrExtra
 		critical_dmg += other.critical_dmg;
 		pierce += other.pierce;
 		counter += other.counter;
-        mag_res += other.mag_res;
+        magres += other.magres;
 		return *this;
 	}
 	inline void reset()
@@ -97,7 +97,7 @@ struct AttrExtra
         critical_dmg = 0;
         pierce = 0;
         counter = 0;
-        mag_res = 0;
+        magres = 0;
 	}
 
 	UInt16 strength;
@@ -135,7 +135,7 @@ struct AttrExtra
 	float critical_dmg;
 	float pierce;
 	float counter;
-	float mag_res;
+	float magres;
     std::vector<const SkillBase*> skills;
 };
 

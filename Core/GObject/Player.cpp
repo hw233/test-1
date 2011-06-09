@@ -225,6 +225,29 @@ namespace GObject
 		}
 	}
 
+	bool EventFighterPractice::Equal(UInt32 id, size_t fgtId) const
+	{
+		return 	id == GetID() && _fighter->getId() == fgtId;
+	}
+
+	bool EventFighterPractice::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		_end -= times * 60;
+		return count == 0;
+    }
+
+	void EventFighterPractice::Process(UInt32 times)
+    {
+        return;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -987,7 +1010,7 @@ namespace GObject
 		{
 			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
-				<< fgt->getRingId() << fgt->getAmuletId();
+				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
@@ -2412,6 +2435,12 @@ namespace GObject
 		}
 		st << Stream::eos;
 	}
+
+    bool Player::addPracticeFighter(UInt32 id, UInt8 priceType, UInt32 times)
+    {
+        // TODO
+        return false;
+    }
 
 	UInt32 Player::addStatus( UInt32 s )
 	{

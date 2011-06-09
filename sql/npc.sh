@@ -13,6 +13,7 @@ function npc()
     f=$1
     d=npc
     sed -i /id/d $f
+    sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
@@ -33,10 +34,18 @@ function npc()
     sed -i s/\\r//g $d
     if [ $? -eq 0 ]
     then
+        iconv2utf8 $d
         echo "OK"
     else
         echo "ERROR"
     fi
+}
+
+function iconv2utf8()
+{
+    iconv -f cp936 -t utf8 $1 -o $1.tmp
+    rm $1
+    mv $1.tmp $1
 }
 
 if [ -f $F  ]

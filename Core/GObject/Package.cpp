@@ -477,6 +477,7 @@ namespace GObject
 		case Item_Armor5:
 		case Item_Ring:
 		case Item_Amulet:
+        case Item_Mounts:
 			{
 				ItemEquip * equip;
 				ItemEquipData edata;
@@ -781,30 +782,38 @@ namespace GObject
 		{
 			switch(part)
 			{
-			case 1:
+			case 0x21:
 				old = fgt->setWeapon(NULL);
 				break;
-			case 2:
+			case 0x22:
 				old = fgt->setArmor(0, NULL);
 				break;
-			case 3:
+			case 0x23:
 				old = fgt->setArmor(1, NULL);
 				break;
-			case 4:
+			case 0x24:
 				old = fgt->setArmor(2, NULL);
 				break;
-			case 5:
+			case 0x25:
 				old = fgt->setArmor(3, NULL);
 				break;
-			case 6:
+			case 0x26:
 				old = fgt->setArmor(4, NULL);
 				break;
-			case 7:
+			case 0x27:
 				old = fgt->setAmulet(NULL);
 				break;
-			case 8:
+			case 0x28:
 				old = fgt->setRing(NULL);
 				break;
+            case 0x50:
+            case 0x51:
+            case 0x52:
+                old = fgt->setTrump(static_cast<GObject::ItemEquip *>(NULL), part-0x50);
+                break;
+            default:
+                return false;
+                break;
 			}
 		}
 		if(old != NULL)

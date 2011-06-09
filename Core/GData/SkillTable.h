@@ -11,36 +11,47 @@ namespace GData
 struct SkillEffect : public ObjectBaseNT<UInt16>
 {
     SkillEffect(UInt16 id)
-        : ObjectBaseNT<UInt16>(id), state(0), stateprob(0), immune(0), 
-        damage(0), damageP(0), magdam(0), magdamP(0), hp(0), hpP(0),
-        aura(0), auraP(0), hitCount(0), def(0), defP(0), magdef(0),
-        magdefP(0), evade(0), pierce(0), adddam(0) {}
+        : ObjectBaseNT<UInt16>(id), state(0), immune(0), 
+        damage(0), damageP(0), adddam(0), magdam(0), magdamP(0), addmag(0),
+        hp(0), hpP(0), addhp(0), absorb(0), aura(0), auraP(0), atk(0), atkP(0),
+        def(0), defP(0), magatk(0), magatkP(0), magdef(0), magdefP(0), 
+        tough(0), action(0), evade(0), critical(0), pierce(0), counter(0), magres(0) {}
     ~SkillEffect() {}
 
     UInt8 state;
-    float stateprob;
     UInt8 immune;
-    UInt16 damage;
+    Int16 damage;
     float damageP;
-    UInt16 magdam;
-    float magdamP;
-    UInt16 hp;
-    float hpP;
-    UInt16 aura;
-    float auraP;
-    UInt8 hitCount;
-    UInt16 def;
-    float defP;
-    UInt16 magdef;
-    float magdefP;
-    float evade;
-    float pierce;
     float adddam;
+    Int16 magdam;
+    float magdamP;
+    float addmag;
+    Int16 hp;
+    float hpP;
+    float addhp;
+    float absorb;
+    Int16 aura;
+    float auraP;
+    Int16 atk;
+    float atkP;
+    Int16 def;
+    float defP;
+    Int16 magatk;
+    float magatkP;
+    Int16 magdef;
+    float magdefP;
+    float tough;
+    float action;
+    float evade;
+    float critical;
+    float pierce;
+    float counter;
+    float magres;
 };
 
 struct SkillBase : public ObjectBaseT<UInt16>
 {
-    SkillBase(UInt16 id, std::string& name)
+    SkillBase(UInt16 id, const std::string& name)
         : ObjectBaseT<UInt16>(id, name), target(0), cond(0),
         prob(0), area(0), last(0), cd(0), effect(0) {}
     ~SkillBase() { if (effect) delete effect; }
@@ -50,7 +61,7 @@ struct SkillBase : public ObjectBaseT<UInt16>
     float prob;
     UInt8 area;
     std::vector<float> factor;
-    UInt16 last;
+    Int16 last;
     UInt16 cd;
     const SkillEffect* effect;
 };

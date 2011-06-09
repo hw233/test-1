@@ -1,27 +1,27 @@
 
 #!/bin/bash
 
-F=loot.txt
+F=skilleffect.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function loot()
+function skilleffect()
 {
+# 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=loot
-    sed -i /isPack/d $f
+    d=skilleffect
+    sed -i /id/d $f
     sed -i /ID/d $f
-    sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `loot` VALUES";
+            print "INSERT INTO `skill_effect` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d)",$1,$2,$3);
+            printf("(%d,%d,%d,\x27%s\x27,%f,\x27%s\x27,%f,\x27%s\x27,%f,%f,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,%f,%f,%f,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -50,7 +50,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    loot $F
+    skilleffect $F
 else
     echo "File $F is not exists"
 fi

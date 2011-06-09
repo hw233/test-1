@@ -1,27 +1,28 @@
 
 #!/bin/bash
 
-F=loot.txt
+F=skills.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function loot()
+function skills()
 {
+# 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=loot
-    sed -i /isPack/d $f
+    d=skills
     sed -i /ID/d $f
+    sed -i /id/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `loot` VALUES";
+            print "INSERT INTO `skills` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d)",$1,$2,$3);
+            printf("(%d,\x27%s\x27,%d,%f,%d,%d,\x27%s\x27,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -50,7 +51,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    loot $F
+    skills $F
 else
     echo "File $F is not exists"
 fi

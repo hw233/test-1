@@ -46,7 +46,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f), favor(0),
     reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0), will(0),
     soul(0), aura(0), tough(0), attack(0), defend(0), maxhp(0), action(0), peerless(0), 
-    hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0), counter(0), mag_res(0)
+    hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
     memset(_skill, 0, sizeof(_skill));
@@ -599,10 +599,30 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
             if (trump)
                 trump->DoEquipBind(true);
 
-            const GData::AttrExtra* attr = trump->getAttrExtra();
-            if (attr)
-            {
-                addSkillsFromCT(attr->skills, writedb);
+            if (trump)
+            { // up
+                const GData::AttrExtra* attr = trump->getAttrExtra();
+                if (attr)
+                {
+                    addSkillsFromCT(attr->skills, writedb);
+                }
+            }
+            else
+            { // off
+                if (t)
+                {
+                    const GData::AttrExtra* attr = t->getAttrExtra();
+                    if (attr)
+                    {
+                        const GData::SkillBase* s = 0;
+                        for (size_t i = 0; i < attr->skills.size(); ++i)
+                        {
+                            s = attr->skills[i];
+                            if (s)
+                                delSkill(s->getId(), writedb);
+                        }
+                    }
+                }
             }
 
             _attrDirty = true;
@@ -1000,30 +1020,6 @@ Fighter * Fighter::cloneWithEquip(Player * player)
 }
 
 #if 0
-void Fighter::setSkill( UInt16 skill, bool writedb /*= true*/ )
-{
-	if(_skill == skill)
-		return;
-	_skill = skill;
-	if(writedb)
-	{
-		sendModification(0x11, _skill * 100 + _skillLevel);
-	}
-}
-
-void Fighter::setSkillLevel( UInt8 level, bool writedb /*= true*/ )
-{
-	if(_skillLevel == level)
-		return;
-	_skillLevel = level;
-	if(writedb)
-	{
-		sendModification(0x11, _skill * 100 + _skillLevel);
-	}
-}
-#endif
-
-#if 0
 bool Fighter::learnSkill(UInt16 skill)
 {
 	if(skill == _skill)
@@ -1089,26 +1085,6 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
     return false;
 }
-
-#if 0
-void Fighter::setSkillAndLevel( UInt16 data )
-{
-	_skill = data / 100;
-	_skillLevel = data % 100;
-}
-
-void Fighter::setSkillAndLevel( UInt16 skill, UInt8 level, bool writedb /*= true*/ )
-{
-	if(_skill == skill && _skillLevel == level)
-		return;
-	_skill = skill;
-	_skillLevel = level;
-	if(writedb)
-	{
-		sendModification(0x11, _skill * 100 + _skillLevel);
-	}
-}
-#endif
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
@@ -1434,7 +1410,7 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     return true;
 }
 
-bool Fighter::delSkill( UInt16 skill, bool writedb )
+bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync )
 {
     int idx = hasSkill(skill);
     if (idx < 0)
@@ -1447,7 +1423,8 @@ bool Fighter::delSkill( UInt16 skill, bool writedb )
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x61, 0, idx, writedb);
+    if (sync)
+        sendModification(0x61, 0, idx, writedb);
     return true;
 }
 
@@ -1555,6 +1532,8 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         { // upgrade
             if (_citta[idx] != citta)
             {
+                // XXX: do not send message to client
+                delCitta(_citta[idx], writedb, false); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
             }
@@ -1586,12 +1565,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                 else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
                 {
                     if (s->cond != 1)
-                    {
-                        if (s->prob >= 100.0f)
-                            upPassiveSkill(s->getId(), s->cond, true, writedb);
-                        else
-                            upPassiveSkill(s->getId(), s->cond, false, writedb);
-                    }
+                        upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
                     else
                         upPassiveSkill(s->getId(), s->cond);
                 }
@@ -1768,7 +1742,7 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
     return true;
 }
 
-bool Fighter::delCitta( UInt16 citta, bool writedb )
+bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
 {
     int idx = hasCitta(citta);
     if (idx < 0)
@@ -1778,7 +1752,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     if (skills.size())
     {
         for (size_t i = 0; i < skills.size(); ++i)
-            delSkill(skills[i]?skills[i]->getId():0, writedb);
+            delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
     }
     offCitta(citta, writedb);
 

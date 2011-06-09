@@ -17,7 +17,7 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
     soul(0), soulP(0), aura(0), auraP(0), auraMax(0), auraMaxP(0), attack(0), attackP(0),
     defend(0), defendP(0), mag_defend(0), mag_defendP(0), hp(0), hpP(0), 
     action(0), hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0),
-    counter(0), mag_res(0), practice(0) {}
+    counter(0), magres(0), practice(0) {}
     ~CittaEffect() { skill.clear(); }
 
     UInt16 strength;
@@ -55,7 +55,7 @@ struct CittaEffect : public ObjectBaseNT<UInt16>
     float critical_dmg;
     float pierce;
     float counter;
-    float mag_res;
+    float magres;
     float practice;                 // 修炼速度加成
     std::vector<const SkillBase*> skill;  // 带出技能
 };

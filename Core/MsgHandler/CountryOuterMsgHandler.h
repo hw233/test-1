@@ -1062,11 +1062,11 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-#if 0
-		static UInt8 p[8] = {0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28};
-		ItemEquip * e[8] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1), fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(), fgt->getRing()};
-		fgt->sendModification(8, p, e, false);
-#endif
+		static UInt8 p[11] = {0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
+		ItemEquip * e[11] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+            fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
+            fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
+		fgt->sendModification(11, p, e, false);
 		return;
 	}
 
