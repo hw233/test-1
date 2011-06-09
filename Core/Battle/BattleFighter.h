@@ -75,7 +75,7 @@ public:
 	inline float getExtraCriticalDmg() { return _attrExtra.critical_dmg; }
 	inline float getExtraPierce() { return _attrExtra.pierce; }
 	inline float getExtraCounter() { return _attrExtra.counter; }
-	inline float getExtraMagRes() { return _attrExtra.mag_res; }
+	inline float getExtraMagRes() { return _attrExtra.magres; }
 
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
@@ -123,7 +123,7 @@ public:
 	inline float getCriticalDmg() {return _critical_dmg + _criticalDmgAdd;}
 	inline float getPierce() {return _pierce + _pierceAdd;}
 	inline float getCounter() {return _counter + _counterAdd;}
-	inline float getMagRes() {return _mag_res+ _magResAdd;}
+	inline float getMagRes() {return _magres+ _magResAdd;}
 	inline UInt32 getMaxHP() {return _maxhp + _maxhpAdd;}
 	inline UInt32 getAction() {return _maxAction;}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
@@ -203,7 +203,7 @@ private:
 	GObject::Fighter * _fighter;
 	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _tough;
 	float _attack, _mag_attack, _defend, _mag_defend, _hitrate, _evade;
-    float _critical, _critical_dmg, _pierce, _counter, _mag_res;
+    float _critical, _critical_dmg, _pierce, _counter, _magres;
 	UInt32 _maxhp, _maxAction;
 	float _attackAdd, _magAttackAdd, _defendAdd, _magDefendAdd, _hitrateAdd, _evadeAdd;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd;

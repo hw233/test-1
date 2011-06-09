@@ -302,7 +302,7 @@ public:
 	inline float getExtraCriticalDmg() { checkDirty(); return _attrExtraEquip.critical_dmg; }
 	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
 	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
-	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.mag_res; }
+	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
 	inline float getBattlePoint() { checkBPDirty(); return _battlePoint; }
 
 	inline Int16 getBaseStrength()
@@ -400,7 +400,7 @@ public:
         return counter + add[_color][_class];
     }
 
-    inline float getBaseMagRes() { return mag_res; }
+    inline float getBaseMagRes() { return magres; }
 	inline Int32 getBaseHP() { return maxhp; }
 	inline UInt32 getBaseAction() { return action; }
 
@@ -519,7 +519,7 @@ public:
 	float critical_dmg;
 	float pierce;
 	float counter;
-	float mag_res;
+	float magres;
 
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;

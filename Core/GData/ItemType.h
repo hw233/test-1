@@ -53,7 +53,8 @@ enum ItemClass
 
 inline bool IsEquipId(UInt32 id)
 {
-	return id >= LARM_ID && id <= RARM_ID;
+    return id > 25000; // XXX:
+	// return id >= LARM_ID && id <= RARM_ID;
 }
 
 inline bool IsEquipTypeId(UInt32 id)
@@ -68,11 +69,12 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Ring);
+	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Trump);
 }
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
+#if 1
     if (id >= LNORMAL_ID && id <= RNORMAL_ID)
         return Item_Normal;
     if (id >= LENHANCE_ID && id <= RENHANCE_ID)
@@ -86,6 +88,21 @@ inline ItemClass GetItemSubClass(UInt32 id)
     if (id >= LGEM_ID && id <= RGEM_ID)
 		return Item_Gem;
 	return Item_Other;
+#else
+    if(id <= 5000)
+        return Item_Other;
+    if(id <= 5800)
+        return Item_Gem;
+    //if(id <= 7000)
+    //    return Item_Favor;
+    if(id <= 10000)
+        return Item_Normal;
+    if(id <= 15000)
+        return Item_Other;
+    if(id <= 25000)
+        return Item_Task;
+    return Item_Other;
+#endif
 }
 
 namespace GData

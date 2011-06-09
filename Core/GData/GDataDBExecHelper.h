@@ -70,7 +70,7 @@ struct DBAttrExtra
 	float critical_dmg;
 	float pierce;
 	float counter;
-	float mag_res;
+	float magres;
 };
 
 struct DBFormation
@@ -87,16 +87,16 @@ struct DBSkill
 {
     UInt16 id;
     std::string name;
-    UInt8 target;       // 作用对象: 0-友方,1-敌方
     UInt16 cond;        // 触发条件: 0-主动
                         //           1-攻击前被动触发(回血技能,无概率)
                         //           2-攻击后被动触发(有概率)
                         //           3-被攻击后触发(有概率)
                         //           4-无双技能,当灵气>=100释放
-    float prob;         // 触发概率
-    UInt8 area;         // 伤害范围: 0-单体,1-横排,2-竖列,3-全体
+    float prob;         // 主动状态触发概率 或 被动触发概率
+    UInt8 target;       // 作用对象: 0-友方,1-敌方,2-自己(对友方和自己加,对敌方减)
+    UInt8 area;         // 伤害范围: 0-单体,1-全体,2-横排,3-竖列,4-十字,5-品字 (4,5可选支持)
     std::string factor; // 伤害倍率: 如, 横排伤害 1,0.3,0.5,1,0 距离攻击目标为0的伤害系数是1,距离为2的伤害系数为0.5
-    UInt16 last;        // 持续时间: -1-一直有效,0-非持续,N-持续次数
+    Int16 last;         // 持续时间: -1-一直有效,0-非持续,N-持续次数
     UInt16 cd;          // 冷却回合
     UInt16 effectid;    // 效果索引
 };
@@ -104,19 +104,27 @@ struct DBSkill
 struct DBSkillEffect
 {
     UInt16 id;
-    UInt8 state;        // 状态: 0-无状态 1中毒，2混乱，4晕眩(无法攻击)，8无法使用技能, 有等级之分
-    float stateprob;    // 状态触发概率
+    UInt8 state;        // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 有等级之分
     UInt8 immune;       // 对状态技能的免疫,只能免疫比自己技能低的技能
-    std::string damage; // 物理伤害 [+-]num/num%
-    std::string magdam; // 法术伤害 [+-]num/num%
-    std::string hp;     // HP改变
-    std::string aura;   // 作用士气 [+/-]num
-    UInt8 hitCount;     // 连击次数
-    std::string def;    // 物理防御 [+/-]num/num%
-    std::string magdef; // 法术防御 [+-]num/num%
+    std::string damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)
+    float adddam;       // 物理伤害附加(具体值)
+    std::string magdam; // 法术伤害 num/num%
+    float addmag;       // 法术伤害附加(具体值)
+    std::string hp;     // HP改变 num/num%
+    float addhp;        // HP改变附加(具体值)
+    float absorb;       // 伤害吸血系数
+    std::string aura;   // 作用士气 num/num%
+    std::string atk;    // 物理攻击 num/num%
+    std::string def;    // 物理防御 num/num%
+    std::string magatk; // 法术攻击 num/num%
+    std::string magdef; // 法术防御 num/num%
+    float tough;        // 坚韧
+    float action;       // 身法
     float evade;        // 闪避
-    float pierce;       // 破击
-    float adddam;       // 人物属性的伤害加成(人物属性的adddam倍)
+    float critical;     // 暴击
+    float pierce;       // 击破/护甲穿透
+    float counter;      // 反击
+    float magres;       // 法术抵抗
 };
 
 struct DBClanSkillType
@@ -161,7 +169,7 @@ struct DBCittaEffect
 	float critical_dmg;
 	float pierce;
 	float counter;
-	float mag_res;
+	float magres;
     float practice;             // 修炼速度加成
 };
 
@@ -265,7 +273,7 @@ SPECIALDEF(24)
 	float, critical_dmg,
 	float, pierce,
 	float, counter,
-	float, mag_res
+	float, magres
 	)
 SPECIALEND()
 
@@ -330,29 +338,37 @@ SPECIALDEF(10)
         float, prob,
         UInt8, area,
         std::string, factor,
-        UInt16, last,
+        Int16, last,
         UInt16, cd,
         UInt16, effectid
     )
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(14)
+SPECIALDEF(22)
     (
         UInt16, id,
         UInt8, state,
-        float, stateprob,
         UInt8, immune,
         std::string, damage,
+        float, adddam,
         std::string, magdam,
-        std::string, hp,
+        float, addmag,
+        float, absorb,
         std::string, aura,
-        UInt8, hitCount,
+        std::string, atk,
         std::string, def,
+        std::string, magatk,
         std::string, magdef,
+        std::string, hp,
+        float, addhp,
+        float, tough,
+        float, action,
         float, evade,
         float, pierce,
-        float, adddam
+        float, critical,
+        float, counter,
+        float, magres
     )
 SPECIALEND()
 
@@ -391,7 +407,7 @@ SPECIALDEF(24)
         float, critical_dmg,
         float, pierce,
         float, counter,
-        float, mag_res,
+        float, magres,
         float, practice
     )
 SPECIALEND()

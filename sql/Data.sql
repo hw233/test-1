@@ -76,7 +76,7 @@ CREATE TABLE `attr_extra` (
   `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
-  `mag_res` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magres` float(10,4) NOT NULL DEFAULT '0.0000',
 PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -451,18 +451,26 @@ DROP TABLE IF EXISTS `skill_effect`;
 CREATE TABLE `skill_effect` (
   `id` smallint(5) NOT NULL,
   `state` tinyint(3) NOT NULL DEFAULT '0',
-  `stateprob` float(10,4) NOT NULL DEFAULT '0.0000',
   `immune` tinyint(3) NOT NULL DEFAULT '0',
   `damage` varchar(255) NOT NULL DEFAULT '',
-  `magdam` varchar(255) NOT NULL DEFAULT '',
-  `hp` varchar(255) NOT NULL DEFAULT '',
-  `aura` varchar(255) NOT NULL DEFAULT '',
-  `hitCount` tinyint(3) NOT NULL DEFAULT '0',
-  `def` varchar(255) NOT NULL DEFAULT '',
-  `magdef` varchar(255) NOT NULL DEFAULT '',
-  `evade` float(10,4) NOT NULL DEFAULT '0.0000',
-  `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `adddam` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magdam` varchar(255) NOT NULL DEFAULT '',
+  `addmag` float(10,4) NOT NULL DEFAULT '0.0000',
+  `hp` varchar(255) NOT NULL DEFAULT '',
+  `addhp` float(10,4) NOT NULL DEFAULT '0.0000',
+  `absorb` float(10,4) NOT NULL DEFAULT '0.0000',
+  `aura` varchar(255) NOT NULL DEFAULT '',
+  `atk` varchar(255) NOT NULL DEFAULT '',
+  `def` varchar(255) NOT NULL DEFAULT '',
+  `magatk` varchar(255) NOT NULL DEFAULT '',
+  `magdef` varchar(255) NOT NULL DEFAULT '',
+  `tough` float(10,4) NOT NULL DEFAULT '0.0000',
+  `action` float(10,4) NOT NULL DEFAULT '0.0000',
+  `evade` float(10,4) NOT NULL DEFAULT '0.0000',
+  `critical` float(10,4) NOT NULL DEFAULT '0.0000',
+  `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
+  `counter` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magres` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -499,7 +507,7 @@ CREATE TABLE `citta_effect` (
   `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
-  `mag_res` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magres` float(10,4) NOT NULL DEFAULT '0.0000',
   `practice` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -526,7 +534,7 @@ CREATE TABLE `special_fighter_template` (
   `agility` int(5) NOT NULL DEFAULT '10',
   `intelligence` int(5) NOT NULL DEFAULT '10',
   `will` int(5) NOT NULL DEFAULT '10',
-  `soul` int(5) NOT NULL DEFAULT '10',
+  `soul` int(5) NOT NULL DEFAULT '30',
   `aura` int(5) NOT NULL DEFAULT '10',
   `auraMax` int(5) NOT NULL DEFAULT '10',
   `tough` int(5) NOT NULL DEFAULT '10',
@@ -543,7 +551,7 @@ CREATE TABLE `special_fighter_template` (
   `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
-  `mag_res` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magres` float(10,4) NOT NULL DEFAULT '0.0000',
   `extraPos` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

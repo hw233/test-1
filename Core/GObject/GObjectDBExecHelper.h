@@ -163,7 +163,7 @@ struct DBFighter
     float critical_dmg;         // 暴击伤害
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击
-    float mag_res;              // 法术抵抗
+    float magres;              // 法术抵抗
     std::string extraPos;
 };
 
@@ -727,7 +727,7 @@ SPECIALDEF(33)
 	float, critical_dmg,
 	float, pierce,
 	float, counter,
-	float, mag_res,
+	float, magres,
 	std::string, extraPos
 )
 SPECIALEND()

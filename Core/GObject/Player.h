@@ -108,6 +108,24 @@ namespace GObject
 		UInt32 _end;
 	};
 
+    class EventFighterPractice : public EventBase
+    {
+    public:
+		EventFighterPractice(Player * player, UInt32 interval, UInt32 count, Fighter * fighter, UInt32 final)
+			: EventBase(player, interval, count), _fighter(fighter), _end(final)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_FIGHTERPRACTICING; }
+        virtual bool Equal(UInt32 id, size_t fgtId) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+        inline UInt32 GetEnd() { return _end; }
+
+	private:
+		Fighter * _fighter;
+        UInt32 _end;
+    };
+
 
 	struct Lineup
 	{
@@ -407,6 +425,16 @@ namespace GObject
 		bool cancelTrainFighter(UInt32);
 		void makeTrainFighterInfo(Stream&);
 		TrainFighterData* getTrainFighterData(UInt32);
+
+        // TODO:
+		void addPracticeFighterFromDB(UInt32, UInt8, UInt32, UInt32, UInt32, UInt32);
+		bool delPracticeFighter(UInt32, bool = false);
+		bool hasPracticeFighter(UInt32);
+		bool addPracticeFighter(UInt32, UInt8, UInt32);
+		bool accPracticeFighter(UInt32, UInt32);
+		bool cancelPracticeFighter(UInt32);
+		void makePracticeFighterInfo(Stream&);
+		//PracticeFighterData* getPracticeFighterData(UInt32);
 
 		UInt32 addStatus(UInt32 s);
 		UInt32 removeStatus(UInt32 s);
