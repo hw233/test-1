@@ -22,10 +22,12 @@ namespace GObject
 #define FIGHTER_BUFF_ATTR3		0x03
 
 #define SKILL_LEVEL_MAX 100
-#define SKILL_UPMAX 3
+#define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
 #define CITTA_UPMAX 6
+#define CITTA_INIT 2 // 心法早初只能装2个,由穴道控制装备个数
 #define TRUMP_UPMAX 3
+#define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
 
 #define SKILL_LEVEL(x)  ((x)%SKILL_LEVEL_MAX)
@@ -187,8 +189,6 @@ public:
     inline UInt8 getUpCittasNum();
     // 取得最大装备心法数
     inline UInt8 getUpCittasMax() { return _cittaslot <= CITTA_UPMAX ? _cittaslot : CITTA_UPMAX; }
-    // 设置可装备心法槽
-    inline void setCittaSlot(UInt8 slots) { _cittaslot = slots; }
     // 取得装备位置idx处所装备的心法的ID
 	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_ID(_citta[idx]) : 0; }
     // 取得装备位置idx处所装备的心法等级
@@ -216,8 +216,8 @@ public:
 	inline ItemEquip * getAmulet() { return _amulet; }
 	inline ItemEquip * getRing() { return _ring; }
 
-	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < TRUMP_UPMAX) ? _trump[idx] : 0; }
-    inline int getMaxTrumps () { return TRUMP_UPMAX; }
+	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < getMaxTrumps()) ? _trump[idx] : 0; }
+    inline int getMaxTrumps () { return _trumpslot <= TRUMP_UPMAX ? _trumpslot : TRUMP_UPMAX; }
     UInt32 getTrumpId(int idx);
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
@@ -352,7 +352,6 @@ public:
     }
 
 	inline Int16 getBaseWill() { return will; }
-	inline Int16 getBaseSoul() { return soul; }
 	inline Int16 getBaseAura() { return aura; }
 	inline Int16 getBaseAuraMax() { return auraMax; }
 	inline Int16 getBaseTough() { return tough; }
@@ -362,6 +361,10 @@ public:
 	inline Int16 getBaseDefend() { return defend; }
 	inline Int16 getBaseMagDefend() { return mag_defend; }
 	inline float getBaseHitrate() { return hitrate; }
+
+	inline Int16 getBaseSoul() { return baseSoul; }
+    inline Int16 getSoul() { return soul; }
+    inline Int16 getMaxSoul() { return soulMax; }
 
 	inline float getBaseEvade()
     {
@@ -407,6 +410,12 @@ public:
     inline float getBaseMagRes() { return magres; }
 	inline Int32 getBaseHP() { return maxhp; }
 	inline UInt32 getBaseAction() { return action; }
+
+    Int32 getAcuPraAdd() { return _praadd; }
+    Int32 getPracticeInc();
+    // TODO:
+    UInt16 getPracticePlace() { return 1; }
+    bool isGoldPractice() { return false; }
 
 protected:
 	void addAttr( ItemEquip * );
@@ -472,6 +481,7 @@ protected:
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
     std::vector<UInt16> _skills;    // 可装备的技能
 
+    UInt8 _trumpslot;               // 可装备法宝最大数
     UInt8 _cittaslot;               // 可装备心法最大数
     UInt16 _citta[CITTA_UPMAX];     // 装备的心法
     std::vector<UInt16> _cittas;    // 可装备的心法
@@ -500,6 +510,9 @@ protected:
 
 	UInt32 _buffData[FIGHTER_BUFF_COUNT];
 
+    Int32 _praadd;  // 穴道对修为增长的加成
+    Int32 _auraadd; // 灵气增长加成
+
 public:
 	UInt32 favor;
 	UInt32 reqFriendliness;
@@ -508,9 +521,11 @@ public:
 	Int32 agility;
 	Int32 intelligence;
     Int32 will;
-    Int32 soul;
-    Int32 aura;
-    Int32 auraMax;
+    Int32 soulMax;  // 最大元神力,穴道会增加元神力上限
+    Int32 soul;     // 已使用元神力,装备心法会消耗元神力
+    Int32 baseSoul; // 初始元神力
+    Int32 aura;     // 当前灵气
+    Int32 auraMax;  // 最大灵气
     Int32 tough;
 	Int32 attack;
 	Int32 mag_attack;

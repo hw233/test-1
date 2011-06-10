@@ -91,6 +91,8 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getBasePierce", &GObject::Fighter::getBasePierce);
 	class_def<GObject::Fighter>("getBaseCounter", &GObject::Fighter::getBaseCounter);
 	class_def<GObject::Fighter>("getBaseMagRes", &GObject::Fighter::getBaseMagRes);
+	class_def<GObject::Fighter>("getPracticePlace", &GObject::Fighter::getPracticePlace);
+	class_def<GObject::Fighter>("isGoldPractice", &GObject::Fighter::isGoldPractice);
 
 	class_add<Battle::BattleFighter>("BattleFighter");
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
@@ -391,6 +393,11 @@ UInt32 BattleFormula::calcDamage( float atk, float def )
 float BattleFormula::calcAutoBattle( float mybp, float theirbp )
 {
 	return call<float>("calcAutoBattle", mybp, theirbp);
+}
+
+float BattleFormula::calcPracticeInc( GObject::Fighter * fgt )
+{
+	return call<float>("calcPracticeInc", fgt);
 }
 
 BattleFormula * BattleFormula::getCurrent()

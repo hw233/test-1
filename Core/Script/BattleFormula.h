@@ -84,6 +84,7 @@ public:
 	UInt32 calcAction(Battle::BattleFighter *);
 
 	UInt32 calcDamage(float, float);
+    float calcPracticeInc(GObject::Fighter *);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);
 
 	void reloadSkillData();

@@ -620,7 +620,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkillEffect effs;
-		if(execu->Prepare("SELECT `id`, `state`, `stateprob`, `immune`, `damage`, `adddam`, `magdam`, `addmag`, `hp`, `addhp`, `absorb`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `evade`, `critical`, `pierce`, `counter`, `magres` FROM `skill_effect`", effs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `state`, `immune`, `damage`, `adddam`, `magdam`, `addmag`, `hp`, `addhp`, `absorb`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `evade`, `critical`, `pierce`, `counter`, `magres` FROM `skill_effect`", effs) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -635,7 +635,7 @@ namespace GData
             ef->addmag = effs.addmag;
             SetValOrPercent(ef->hp, ef->hpP, effs.hp);
             ef->addhp = effs.addhp;
-            ef->absorb = effs.absorb;
+            SetValOrPercent(ef->absorb, ef->absorbP, effs.absorb);
             SetValOrPercent(ef->aura, ef->auraP, effs.aura);
             SetValOrPercent(ef->atk, ef->atkP, effs.atk);
             SetValOrPercent(ef->def, ef->defP, effs.def);

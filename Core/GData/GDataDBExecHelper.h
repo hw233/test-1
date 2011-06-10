@@ -112,7 +112,7 @@ struct DBSkillEffect
     float addmag;       // 法术伤害附加(具体值)
     std::string hp;     // HP改变 [+/-]num/num%
     float addhp;        // HP改变附加(具体值)
-    float absorb;       // 伤害吸血系数
+    std::string absorb; // 伤害吸血系数 [+/-]num/num%
     std::string aura;   // 作用士气 [+/-]num/num%
     std::string atk;    // 物理攻击 [+/-]num/num%
     std::string def;    // 物理防御 [+/-]num/num%
@@ -139,7 +139,7 @@ struct DBClanSkillType
 
 struct DBCitta
 {
-    UInt16 id;          // id及阶数(等级)
+    UInt16 id;          // id及阶数(等级) id=id/100 lvl=id%100
     std::string name;   // 名称
     UInt16 needsoul;    // 元神需求(负重)
     UInt16 effectid;    // 效果索引
@@ -368,7 +368,7 @@ SPECIALDEF(22)
         float, adddam,
         std::string, magdam,
         float, addmag,
-        float, absorb,
+        std::string, absorb,
         std::string, aura,
         std::string, atk,
         std::string, def,

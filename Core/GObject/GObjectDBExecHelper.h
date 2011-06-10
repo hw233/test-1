@@ -167,6 +167,15 @@ struct DBFighter
     std::string extraPos;
 };
 
+struct DBPracticePlace
+{
+    UInt8 id;       // 修为挂机点ID
+    UInt32 ownerid; // 主人ID
+    UInt16 maxslot; // 最大修炼位
+    UInt32 protid;  // 护法弟子ID
+    UInt8 open;     // 是否开放
+};
+
 struct DBFightersFriendliness
 {
 	UInt64 playerId;
@@ -220,7 +229,6 @@ struct DBFighterObj
 	UInt32 ring;            // 戒指
 	UInt32 amulet;          // 项链
     UInt16 peerless;        // 无双技能
-    UInt8 cittaslot;        // 可装备心法数
     std::string trump;      // 法宝
     std::string acupoints;  // 穴道,打通次数
     std::string skill;      // 装备的技能
@@ -733,6 +741,17 @@ SPECIALDEF(33)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBPracticePlace)
+SPECIALDEF(5)
+	(
+        UInt8, id,
+        UInt32, ownerid,
+        UInt16, maxslot,
+        UInt32, protid,
+        UInt8, open
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBFightersFriendliness)
 SPECIALDEF(5)
 	(
@@ -775,7 +794,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(24)
+SPECIALDEF(23)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -794,7 +813,6 @@ SPECIALDEF(24)
 	UInt32, ring,
 	UInt32, amulet,
     UInt16, peerless,
-    UInt8, cittaslot,
     std::string, trump,
     std::string, acupoints,
     std::string, skill,

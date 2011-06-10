@@ -473,7 +473,7 @@ CREATE TABLE `skill_effect` (
   `addmag` float(10,4) NOT NULL DEFAULT '0.0000',
   `hp` varchar(255) NOT NULL DEFAULT '',
   `addhp` float(10,4) NOT NULL DEFAULT '0.0000',
-  `absorb` float(10,4) NOT NULL DEFAULT '0.0000',
+  `absorb` varchar(255) NOT NULL DEFAULT '',
   `aura` varchar(255) NOT NULL DEFAULT '',
   `atk` varchar(255) NOT NULL DEFAULT '',
   `def` varchar(255) NOT NULL DEFAULT '',
