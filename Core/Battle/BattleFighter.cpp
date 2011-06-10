@@ -225,6 +225,14 @@ float BattleFighter::calcAttack( bool& isCritical )
 	return atk;
 }
 
+float BattleFighter::calcTherapy(GData::SkillBase* skill)
+{
+    if(!skill)
+        return 0;
+
+    return (_mag_attack + _magAttackAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp;
+}
+
 bool BattleFighter::calcHit( BattleFighter * defender )
 {
 	if(defender->getStunRound() > 0)

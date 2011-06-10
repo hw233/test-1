@@ -545,14 +545,84 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 {
     UInt8 skill_target = skill->target;
     UInt8 target_side = skill_target ? bf->getSide() : 1 - bf->getSide();
+    UInt8 atk_type = 2;
 
-    if(therapy_bf && (skill->effect->hp > 0 || skill->effect->hpP > 0.001))
+    if(skill->effect->hp || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
     {
-        ;
+        UInt32 rhp = bf->calcTherapy(skill);
+        DefStatus defList[25];
+        size_t defCount = 0;
+        if(1 == skill->area)
+        {
+            for(UInt8 pos = 0; pos < 25; ++ pos)
+            {
+                BattleObject* bo = _objs[target_side][pos];
+                if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                    continue;
+
+                if(bo->getLostHP() == 0)
+                    continue;
+
+                UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
+                if(hpr == 0)
+                    continue;
+
+                defList[defCount].pos = pos + 25;
+                defList[defCount].damType = 3;
+                defList[defCount].damage = hpr;
+                defList[defCount].leftHP = bo->getHP();
+                ++ defCount;
+            }
+        }
+        else if(NULL != therapy_bf)
+        {
+            UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
+            if(hpr != 0)
+            {
+                defList[defCount].pos = therapy_bf->getPos() + 25;
+                defList[defCount].demType = 3;
+                defList[defCount].damage = hpr;
+                defList[defCount].leftHP = bo->getHP();
+                ++ defCount;
+            }
+        }
+        else
+        {
+            atk_type = 1;
+            UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
+            if(hpr != 0)
+            {
+                defList[defCount].pos = bf->getPos() + 25;
+                defList[defCount].damtype = 3;
+                defList[defCount].damage = hpr;
+                defList[defCount].leftHP = bo->getHP();
+                ++ defCount;
+            }
+        }
+
+        appendToPacket( bf->getSide(), bf->getPos(), bf->getPos() + 25, atk_type, skill->getId(), false, false, defList, defCount, NULL, 0);
+
+        return 1;
+    }
+
+    if(1 == skill->area)
+    {
     }
     else
     {
-        ;
+    }
+
+    if(0 == skill_target)
+    {
+    }
+    else if(2 == skill_target)
+    {
+    }
+    else if()
+    {
+    }
+    else
+    {
     }
 
     return 0;
@@ -689,55 +759,59 @@ UInt32 BattleSimulator::doAttack( int pos )
 
         rcnt += doNormalAttack(bf, otherside, target_pos);
     }
-    else
+    else if(forget > 0)
     {
-	    target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
 
         if(target_pos < 0)
             return 0;
 
         int otherside = 1 - bf->getSide();
 
-        if(forget > 0)
+       rcnt += doNormalAttack(bf, otherside, target_pos);
+    }
+    else
+    {
+        const GData::SkillBase* skill = NULL;
+        // do preve attack passive skill that must act
+        size_t skillIdx = 0;
+        while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx)))
         {
-            rcnt += doNormalAttack(bf, otherside, target_pos);
+            rcnt += doSkillAttack(bf, skill);
+        }
+
+        // do active skill
+        BattleFighter* therapy_bf = getTherapyTarget(bf);
+        skill = bf->getActiveSkill(therapy_bf!= NULL);
+        if(NULL != skill)
+        {
+            rcnt += doSkillAttack(bf, skill, therapy_bf);
         }
         else
         {
-            const GData::SkillBase* skill = NULL;
-            // do preve attack passive skill that must act
-            size_t skillIdx = 0;
-            while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx)))
-            {
-                rcnt += doSkillAttack(bf, skill);
-            }
+            target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
 
-            // do active skill
-            BattleFighter* therapy_bf = getTherapyTarget(bf);
-            skill = bf->getActiveSkill(therapy_bf!= NULL);
-            if(NULL != skill)
-            {
-                rcnt += doSkillAttack(bf, skill, therapy_bf);
-            }
-            else
-            {
-                rcnt += doNormalAttack(bf, otherside, target_pos);
-            }
+            if(target_pos < 0)
+                return 0;
 
-            // do after attack passive skill that must act
-            skillIdx = 0;
-            while(NULL != (skill = bf->getPassiveSkillAftAtk100(skillIdx)))
-            {
-                rcnt += doSkillAttack(bf, skill);
-            }
-            // do after attack passive skill that probaly act
-            skill = bf->getPassiveSkillAftAtk();
-            if(NULL != skill)
-            {
-                rcnt += doSkillAttack(bf, skill);
-            }
+            int otherside = 1 - bf->getSide();
 
+           rcnt += doNormalAttack(bf, otherside, target_pos);
         }
+
+        // do after attack passive skill that must act
+        skillIdx = 0;
+        while(NULL != (skill = bf->getPassiveSkillAftAtk100(skillIdx)))
+        {
+            rcnt += doSkillAttack(bf, skill);
+        }
+        // do after attack passive skill that probaly act
+        skill = bf->getPassiveSkillAftAtk();
+        if(NULL != skill)
+        {
+            rcnt += doSkillAttack(bf, skill);
+        }
+
     }
 
 #if 0

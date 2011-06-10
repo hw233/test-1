@@ -167,6 +167,7 @@ public:
 	bool calcCounter(bool ranged = false);
 	bool canBeCounter();
 	bool calcPierce();
+    float calcTherapy(GData::SkillBase* skill);
 
 	inline void addAction(UInt32 p);
 
