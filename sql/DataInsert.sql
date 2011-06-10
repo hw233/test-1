@@ -98,7 +98,7 @@ LOCK TABLES `skills` WRITE;
 source skills
 UNLOCK TABLES;
 
--- LOCK TABLES `skill_effect` WRITE;
--- source skilleffect
--- UNLOCK TABLES;
+LOCK TABLES `skill_effect` WRITE;
+source skilleffect
+UNLOCK TABLES;
 
