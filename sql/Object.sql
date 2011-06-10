@@ -520,7 +520,6 @@ CREATE TABLE `fighter` (
   `ring` int(10) unsigned NOT NULL DEFAULT '0',
   `amulet` int(10) unsigned NOT NULL DEFAULT '0',
   `peerless` mediumint(5) unsigned NOT NULL DEFAULT '0',
-  `cittaslot` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
   `acupoints` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,

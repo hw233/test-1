@@ -94,9 +94,9 @@ LOCK TABLES `loot` WRITE;
 source loot
 UNLOCK TABLES;
 
-LOCK TABLES `skills` WRITE;
-source skills
-UNLOCK TABLES;
+-- LOCK TABLES `skills` WRITE;
+-- source skills
+-- UNLOCK TABLES;
 
 LOCK TABLES `skill_effect` WRITE;
 source skilleffect

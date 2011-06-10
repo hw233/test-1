@@ -43,10 +43,11 @@ bool existGreatFighter(UInt32 id)
 
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _pexpMax(0), _potential(1.0f),
-    _capacity(1.0f), _color(2), _hp(0), _cittaslot(0), _weapon(NULL), _ring(NULL), _amulet(NULL), 
-    _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f), favor(0),
-    reqFriendliness(0), strength(0), physique(0), agility(0), intelligence(0), will(0),
-    soul(0), aura(0), tough(0), attack(0), defend(0), maxhp(0), action(0), peerless(0), 
+    _capacity(1.0f), _color(2), _hp(0), _trumpslot(TRUMP_INIT), _cittaslot(CITTA_INIT), _weapon(NULL),
+    _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
+    _praadd(0), _auraadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
+    agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
+    attack(0), defend(0), maxhp(0), action(0), peerless(0), 
     hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
@@ -232,12 +233,12 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 			DB().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - 0x40);
 		return;
 	}
-    if (t >= 0x50 && t < 0x50 + TRUMP_UPMAX)
+    if (t >= 0x50 && t < 0x50 + getMaxTrumps())
     {
         UInt32 trumps[TRUMP_UPMAX] = {0};
         if (getAllTrumpId(trumps)) {
             std::string str;
-            if (value2string(trumps, TRUMP_UPMAX, str)) {
+            if (value2string(trumps, getMaxTrumps(), str)) {
                 DB().PushUpdateData("UPDATE `fighter` SET `trump` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
@@ -562,7 +563,7 @@ ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
         return 0;
 
     StringTokenizer tk(trumps, ",");
-    for (size_t i = 0; i < tk.count() && i < TRUMP_UPMAX; ++i)
+    for (size_t i = 0; i < tk.count() && static_cast<int>(i) < getMaxTrumps(); ++i)
     {
         setTrump(::atoi(tk[i].c_str()), i, writedb);
     }
@@ -580,7 +581,7 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (idx >= 0 && idx < TRUMP_UPMAX)
+    if (idx >= 0 && idx < getMaxTrumps())
     {
         if
             (
@@ -639,14 +640,14 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
     if (!trumps || !size)
         return 0;
 
-    for (int i = 0; i < TRUMP_UPMAX; ++i)
+    for (int i = 0; i < getMaxTrumps(); ++i)
     {
         if (_trump[i])
             trumps[i] = _trump[i]->getId();
         else
             trumps[i] = 0;
     }
-    return TRUMP_UPMAX;
+    return getMaxTrumps();
 }
 
 void Fighter::setCurrentHP( UInt16 hp, bool writedb )
@@ -903,6 +904,7 @@ Fighter * Fighter::clone(Player * player)
 	fgt->_attrDirty = true;
 	fgt->_bPDirty = true;
 	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
+    memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
 	return fgt;
 }
 
@@ -1218,14 +1220,14 @@ void Fighter::getAllPeerless( Stream& st )
 
 UInt32 Fighter::getTrumpId( int idx )
 {
-    return (idx >= 0 && idx < TRUMP_UPMAX && _trump[idx]) ? _trump[idx]->getId() : 0;
+    return (idx >= 0 && idx < getMaxTrumps() && _trump[idx]) ? _trump[idx]->getId() : 0;
 }
 
 void Fighter::getAllTrumps( Stream& st )
 {
     // XXX: append to armor
-    // st << TRUMP_UPMAX;
-    for (int i = 0; i < TRUMP_UPMAX; ++i)
+    // st << getMaxTrumps();
+    for (int i = 0; i < getMaxTrumps() ; ++i)
     {
         st << getTrumpId(i);
     }
@@ -1274,7 +1276,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         if (pap->pra > getPExp())
             return false;
 
-        soul += pap->soulmax;
+        soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
         if (pap->citslot)
@@ -1282,7 +1284,8 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
             DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         }
         aura += pap->aura;
-        // pap->auraInc
+        _auraadd += pap->auraInc;
+        ++_praadd; // 每一层级+1
 
         _acupoints[idx] = v;
         _attrDirty = true;
@@ -1794,6 +1797,12 @@ UInt8 Fighter::getUpCittasNum()
             ++c;
     }
     return c;
+}
+
+Int32 Fighter::getPracticeInc()
+{
+    // XXX: float => Int32
+    return Script::BattleFormula::getCurrent()->calcPracticeInc(this);
 }
 
 Fighter * GlobalFighters::getRandomOut()

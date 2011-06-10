@@ -44,6 +44,7 @@
 #include "Common/LoadingCounter.h"
 #include "Common/StringTokenizer.h"
 #include "Common/DirectoryIterator.h"
+#include "GObject/PracticePlace.h"
 
 #include <fcntl.h>
 
@@ -92,6 +93,7 @@ namespace GObject
 		LoadSpecialAward();
 		LoadLuckyDraw();
 		LoadArena();
+        LoadPracticePlace();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -254,7 +256,8 @@ namespace GObject
 			fgt->agility = dbfgt.agility;
 			fgt->intelligence = dbfgt.intelligence;
 			fgt->will = dbfgt.will;
-			fgt->soul = dbfgt.soul;
+			fgt->soulMax = dbfgt.soul;
+			fgt->baseSoul = dbfgt.soul;
 			fgt->aura = dbfgt.aura;
 			fgt->auraMax = dbfgt.auraMax;
 			fgt->tough = dbfgt.tough;
@@ -789,7 +792,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `cittaslot`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -827,7 +830,6 @@ namespace GObject
 			fgt2->setArmor(4, fetchArmor(specfgtobj.armor5), false);
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
-            fgt2->setCittaSlot(specfgtobj.cittaslot);
             fgt2->setTrump(specfgtobj.trump, false);
             fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setSkills(specfgtobj.skills, false);
@@ -2205,6 +2207,29 @@ namespace GObject
 
 		return true;	
 	}
+
+    bool GObjectManager::LoadPracticePlace()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Practice Place");
+		DBPracticePlace pp;
+		if(execu->Prepare("SELECT `id`, `ownerid`, `maxslot`, `protid`, `open` FROM `practiceplace` ORDER BY `id`", pp)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+            GObject::PPlace place;
+            place.id = pp.id;
+            place.ownerid = pp.id;
+            place.maxslot = pp.maxslot;
+            place.protid = pp.protid;
+            place.open = pp.open;
+            practicePlace.addPlace(place);
+        }
+		lc.finalize();
+        return true;
+    }
 
 	bool GObjectManager::unloadEquipments()
 	{
