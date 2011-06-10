@@ -342,7 +342,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 		{
             pr = bf->calcPierce();
             float atk = bf->calcAttack(cs);
-
+#if 0
 			float rescueRate = 0.0f;
 			bool rescue = counter_deny >= 0 && (rescueRate = testRescue(area_target, counter_deny, counter_deny_list)) > 0.0f;
 
@@ -352,7 +352,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 				pos = area_target->getPos();
 				atk *= rescueRate;
 			}
-
+#endif
 			if(area_target->hasFlag(BattleFighter::IsMirror))
 			{
 				dmg = area_target->getHP();
@@ -383,8 +383,16 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 		}
 		defList[defCount].pos = pos;
 		++ defCount;
+
+        // target fighter will do not counter while fighter is the same side
+        bool can_counter = true;
+        if(bf->getSide() == area_target->getSide())
+        {
+            can_counter = false;
+        }
+
 		// if this fighter can counter
-		if(counter_deny >= 0 && _winner == 0 && !_isBody[side][pos] && area_target_obj->getHP() > 0 && bf->getHP() > 0)
+		if(can_counter && counter_deny >= 0 && _winner == 0 && !_isBody[side][pos] && area_target_obj->getHP() > 0 && bf->getHP() > 0)
 		{
 			BattleFighter * target_fighter = static_cast<BattleFighter *>(area_target_obj);
 			// test counter by rolling dice
@@ -656,10 +664,15 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
 
     int target_pos; 
-    if(confuse > 0 && _rnd(2) == bf->getSide())
+    if(confuse > 0)
     {
-        UInt8 myPos = bf->getPos();
-        BattleFighter* rnd_bf = getRandomFighter(bf->getSide(), &myPos, 1);
+        BattleFighter* rnd_bf = NULL; 
+        if(_rnd(2) == bf->getSide())
+        {
+            UInt8 myPos = bf->getPos();
+            rnd_bf = getRandomFighter(bf->getSide(), &myPos, 1);
+        }
+
         if(NULL == rnd_bf)
         {
 	        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
@@ -675,11 +688,6 @@ UInt32 BattleSimulator::doAttack( int pos )
         int otherside = 1 - bf->getSide();
 
         rcnt += doNormalAttack(bf, otherside, target_pos);
-        // if attack same side fighter, then do only normal attack with no any other action
-        if(rnd_bf != NULL)
-        {
-            return rcnt;
-        }
     }
     else
     {
