@@ -269,9 +269,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             }
         }
         break;
-    case 0x31:
+    case 0x31: // peerless
         break;
-    case 0x32:
+    case 0x32: // 100%
+        break;
+    case 0x33: // n%
         break;
     case 0x60:
         { // skill
@@ -621,7 +623,14 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                         {
                             s = attr->skills[i];
                             if (s)
-                                delSkill(s->getId(), writedb);
+                            {
+                                if (s->cond == GData::SKILL_PEERLESS) {}
+                                    // impossible
+                                else if (s->cond == GData::SKILL_ACTIVE)
+                                    delSkill(s->getId(), writedb);
+                                else
+                                    offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
+                            }
                         }
                     }
                 }
@@ -1100,6 +1109,63 @@ void Fighter::getAllUpSkillAndLevel( Stream& st )
     }
 }
 
+UInt16 Fighter::getPSkillsNum()
+{
+    return getP100SkillsNum() + getPnSkillsNum();
+}
+
+UInt16 Fighter::getP100SkillsNum()
+{
+    UInt16 size = 0;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    {
+        size += _passkl[i-1].size(); 
+    }
+    return size;
+}
+
+UInt16 Fighter::getPnSkillsNum()
+{
+    UInt16 size = 0;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    {
+        size += _rpasskl[i-1].size(); 
+    }
+    return size;
+}
+
+void Fighter::getAllPSkillAndLevel(Stream& st)
+{
+    getAllP100SkillAndLevel(st);
+    getAllPnSkillAndLevel(st);
+}
+
+void Fighter::getAllP100SkillAndLevel(Stream& st)
+{
+    UInt16 size = getP100SkillsNum();
+    st << size;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    {
+        for (size_t j = 0; j < _passkl[i-1].size(); ++j)
+        {
+            st << _passkl[i-1][j];
+        }
+    }
+}
+
+void Fighter::getAllPnSkillAndLevel(Stream& st)
+{
+    UInt16 size = getPnSkillsNum();
+    st << size;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    {
+        for (size_t j = 0; j < _rpasskl[i-1].size(); ++j)
+        {
+            st << _rpasskl[i-1][j];
+        }
+    }
+}
+
 void Fighter::getAllSkillsAndLevel( Stream& st )
 {
     UInt8 skills = getSkillsNum();
@@ -1115,6 +1181,9 @@ void Fighter::getAllSkillAndLevel( Stream& st )
 {
     getAllUpSkillAndLevel(st);
     getAllSkillsAndLevel(st);
+    // TODO: order
+    getAllP100SkillAndLevel(st);
+    getAllPnSkillAndLevel(st);
 }
 
 void Fighter::getAllUpCittaAndLevel( Stream& st )
@@ -1582,38 +1651,80 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
         {
             const GData::SkillBase* s = skills[i];
             if (s) {
-                if (s->cond == 0)
+                if (s->cond == GData::SKILL_ACTIVE)
                     addNewSkill(s->getId(), writedb);
-                else if (s->cond == 1 || s->cond == 2 || s->cond == 3)
+                else if (s->cond == GData::SKILL_PREATK ||
+                        s->cond == GData::SKILL_AFTATK ||
+                        s->cond == GData::SKILL_BEATKED ||
+                        s->cond == GData::SKILL_AFTEVD ||
+                        s->cond == GData::SKILL_AFTRES ||
+                        s->cond == GData::SKILL_DEAD ||
+                        s->cond == GData::SKILL_ENTER ||
+                        s->cond == GData::SKILL_DEAD)
                 {
-                    if (s->cond != 1)
-                        upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
-                    else
-                        upPassiveSkill(s->getId(), s->cond);
+                    upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
                 }
-                else
+                else if (s->cond == GData::SKILL_PEERLESS)
                 { // peerless
                     addNewPeerless(s->getId(), writedb);
+                }
+                else
+                {
+                    // error
                 }
             }
         }
     }
 }
 
+// XXX: 发送时先发送100％触发技能,后发送概率触发技能
 bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 {
     bool ret = false;
-    if (type == 1)
+    size_t lastsize = 0;
+
+    for (size_t i = 0; i < type; ++i)
     {
-        for (size_t i = 0; i < _passkl[0].size(); ++i)
+        if (p100)
+            lastsize += _passkl[i-1].size(); 
+        else
+            lastsize += _rpasskl[i-1].size(); 
+    }
+
+    if (p100)
+    { // 100%
+        for (size_t j = 0; j < _passkl[type-1].size(); ++j)
         {
-            if (SKILL_ID(_passkl[0][i]) == SKILL_ID(skill))
+            if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
             {
-                if (skill != _passkl[0][i])
+                if (skill != _passkl[type-1][j])
                 { // upgrade
                     ret = true;
-                    _passkl[0][i] = skill;
-                    sendModification(0x32, skill, static_cast<int>(i), writedb);
+                    _passkl[type-1][j] = skill;
+                    sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+                    break;
+                }
+            }
+        }
+
+        if(!ret)
+        {  // up
+            ret = true;
+            _passkl[type-1].push_back(skill);
+            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[type-1].size()), writedb);
+        }
+    }
+    else
+    {
+        for (size_t j = 0; j < _rpasskl[type-1].size(); ++j)
+        {
+            if (SKILL_ID(_rpasskl[type-1][j]) == SKILL_ID(skill))
+            {
+                if (skill != _rpasskl[type-1][j])
+                { // upgrade
+                    ret = true;
+                    _rpasskl[type-1][j] = skill;
+                    sendModification(0x33, skill, static_cast<int>(lastsize + j), writedb);
                     break;
                 }
             }
@@ -1622,67 +1733,69 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         if (!ret)
         { // up
             ret = true;
-            _passkl[0].push_back(skill);
-            sendModification(0x32, skill, static_cast<int>(_passkl[0].size()), writedb);
-        }
-    }
-    else
-    {
-        size_t lastsize = 0;
-        for (size_t i = 0; i < type; ++i)
-        {
-            lastsize += _passkl[i-1].size(); 
-        }
-
-        if (p100)
-        { // 100%
-            for (size_t j = 0; j < _passkl[type-1].size(); ++j)
-            {
-                if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
-                {
-                    if (skill != _passkl[type-1][j])
-                    { // upgrade
-                        ret = true;
-                        _passkl[type-1][j] = skill;
-                        sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
-                        break;
-                    }
-                }
-            }
-
-            if(!ret)
-            {  // up
-                ret = true;
-                _passkl[type-1].push_back(skill);
-                sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[type-1].size()), writedb);
-            }
-        }
-        else
-        {
-            for (size_t j = 0; j < _rpasskl[type-1].size(); ++j)
-            {
-                if (SKILL_ID(_rpasskl[type-1][j]) == SKILL_ID(skill))
-                {
-                    if (skill != _rpasskl[type-1][j])
-                    { // upgrade
-                        ret = true;
-                        _rpasskl[type-1][j] = skill;
-                        sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
-                        break;
-                    }
-                }
-            }
-
-            if (!ret)
-            { // up
-                ret = true;
-                _rpasskl[type-1].push_back(skill);
-                sendModification(0x32, skill, static_cast<int>(lastsize + _rpasskl[type-1].size()), writedb);
-            }
+            _rpasskl[type-1].push_back(skill);
+            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[type-1].size()), writedb);
         }
     }
 
     return ret;
+}
+
+bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
+{
+    bool ret = false;
+    size_t lastsize = 0;
+
+    for (size_t i = 0; i < type; ++i)
+    {
+        if (p100)
+            lastsize += _passkl[i-1].size(); 
+        else
+            lastsize += _rpasskl[i-1].size(); 
+    }
+
+    if (p100)
+    { // 100%
+        for (size_t j = 0; j < _passkl[type-1].size(); ++j)
+        {
+            if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
+            { // off
+                std::vector<UInt16>::iterator i = _passkl[type-1].begin();
+                std::advance(i, j);
+                _passkl[type-1].erase(i);
+                ret = true;
+            }
+        }
+    }
+    else
+    {
+        for (size_t j = 0; j < _passkl[type-1].size(); ++j)
+        {
+            if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
+            { // off
+                std::vector<UInt16>::iterator i = _rpasskl[type-1].begin();
+                std::advance(i, j);
+                _passkl[type-1].erase(i);
+                ret = true;
+            }
+        }
+    }
+
+    if (ret)
+    { // off
+        if (p100)
+        {
+            _passkl[type-1].push_back(skill);
+            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[type-1].size()), writedb);
+        }
+        else
+        {
+            _rpasskl[type-1].push_back(skill);
+            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[type-1].size()), writedb);
+        }
+    }
+
+    return true;
 }
 
 const std::vector<const GData::SkillBase*>& Fighter::skillFromCitta(UInt16 citta)
@@ -1751,6 +1864,7 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
     int idx = isCittaUp(citta);
     if (idx < 0)
         return false;
+
     _citta[idx] = 0;
     for (int i = idx; i < getUpCittasMax() - 1; ++i)
     {
@@ -1774,7 +1888,15 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
     if (skills.size())
     {
         for (size_t i = 0; i < skills.size(); ++i)
-            delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
+        {
+            if (skills[i]->cond == GData::SKILL_PEERLESS) {}
+                // impossible
+            else if (skills[i]->cond == GData::SKILL_ACTIVE)
+                delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
+            else
+                offPassiveSkill(skills[i]?skills[i]->getId():0, skills[i]->cond, skills[i]->prob>=100.0f, writedb);
+        }
+
     }
     offCitta(citta, writedb);
 
@@ -1791,7 +1913,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
 UInt8 Fighter::getUpCittasNum()
 {
     UInt8 c = 0;
-    for (int i = 0; i < CITTA_UPMAX; ++i)
+    for (int i = 0; i < getUpCittasMax(); ++i)
     {
         if (_citta[i])
             ++c;
