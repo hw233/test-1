@@ -168,6 +168,7 @@ public:
 	bool canBeCounter();
 	bool calcPierce();
     float calcTherapy(GData::SkillBase* skill);
+    float calcMagAttack(bool& isCritical);
 
 	inline void addAction(UInt32 p);
 

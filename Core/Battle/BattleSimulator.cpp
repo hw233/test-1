@@ -398,9 +398,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 			// test counter by rolling dice
 			if(target_fighter->getStunRound() == 0 && target_fighter->calcCounter(!bf->canBeCounter()))
 			{
-				defList[0].damType |= 0x80;
 				if(target_fighter->calcHit(bf))
 				{
+                    defList[0].damType |= 0x80;
 					bool cs = false;
 					float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
@@ -427,6 +427,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 					else if(_winner == 0)
 						onDamage(bf, scList, scCount, false);
 				}
+#if 0
 				else
 				{
 //					printf("  [Counter] %u:%u attacks %u:%u, but missed!\n", side, pos, 1-side, from_pos);
@@ -434,6 +435,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 					defList[0].counterDmg = 0;
 					defList[0].counterLeft = bf->getHP();
 				}
+#endif
 			}
 		}
 	}
@@ -545,8 +547,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 {
     UInt8 skill_target = skill->target;
     UInt8 target_side = skill_target ? bf->getSide() : 1 - bf->getSide();
-    UInt8 atk_type = 2;
 
+    // therapy skill
     if(skill->effect->hp || skill->effect->addhp > 0 || skill->effect->hpP > 0.001)
     {
         UInt32 rhp = bf->calcTherapy(skill);
@@ -588,7 +590,6 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
         else
         {
-            atk_type = 1;
             UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
             if(hpr != 0)
             {
@@ -600,9 +601,26 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             }
         }
 
-        appendToPacket( bf->getSide(), bf->getPos(), bf->getPos() + 25, atk_type, skill->getId(), false, false, defList, defCount, NULL, 0);
+        appendToPacket( bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
 
         return 1;
+    }
+
+    if(skill->effect->damage || skill->effect->damageP || skill->effect->adddam)
+    {
+        UInt8 target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+
+        if(target_pos < 0)
+            return 0;
+
+        bool cs = false;
+        bool pr = bf->calcPierce();
+        float magatk = bf->calcMagAttack(cs);
+    }
+
+    // state
+    if(skill->effect->state)
+    {
     }
 
     if(1 == skill->area)

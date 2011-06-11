@@ -225,6 +225,19 @@ float BattleFighter::calcAttack( bool& isCritical )
 	return atk;
 }
 
+float BattleFighter::calcMagAttack(bool& isCritical)
+{
+    isCritical = uRand(10000) < _critical * 100;
+    float magatk = _mag_attack + _magAttackAdd;
+
+    if(isCritical)
+    {
+        magatk = magatk * 3 / 2;
+    }
+
+    return magatk;
+}
+
 float BattleFighter::calcTherapy(GData::SkillBase* skill)
 {
     if(!skill)
