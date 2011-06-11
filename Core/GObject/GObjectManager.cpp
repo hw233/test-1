@@ -2214,18 +2214,20 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Place");
 		DBPracticePlace pp;
-		if(execu->Prepare("SELECT `id`, `ownerid`, `maxslot`, `protid`, `open` FROM `practiceplace` ORDER BY `id`", pp)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `protmoney`, `slotmoney`, `open` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
+        UInt8 i = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
             GObject::PPlace place;
-            place.id = pp.id;
-            place.ownerid = pp.id;
-            place.maxslot = pp.maxslot;
+            place.ownerid = pp.ownerid;
             place.protid = pp.protid;
+            place.maxslot = pp.maxslot;
+            place.protmoney = pp.protmoney;
+            place.slotmoney = pp.slotmoney;
             place.open = pp.open;
-            practicePlace.addPlace(place);
+            practicePlace.addPlace(place, i++);
         }
 		lc.finalize();
         return true;

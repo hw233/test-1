@@ -571,6 +571,18 @@ CREATE TABLE `fighter_train` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `practice_place`;
+CREATE TABLE `practice_place` (
+  `id` tinyint(3) NOT NULL,
+  `ownerid` bigint(20) unsigned NOT NULL,
+  `protid` bigint(20) unsigned NOT NULL,
+  `maxslot` smallint(5) unsigned NOT NULL DEFAULT '30',
+  `protmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
+  `slotmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
+  `open` tinyint(2) unsigned NOT NULL DEFAULT '1',
+   PRIMARY KEY (`id`)
+);
+
 /*
 -- DROP TABLE IF EXISTS `fighter_practice`;
 -- CREATE TABLE `fighter_practice` (

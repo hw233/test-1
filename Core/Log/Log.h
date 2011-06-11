@@ -38,6 +38,7 @@ enum PurchaseType
 	TrainFighter,
 	ClanBattleRecov,
 	PurchaseBook,
+    Practice,
 };
 
 enum MoneyType

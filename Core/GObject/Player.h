@@ -739,9 +739,15 @@ namespace GObject
 		static UInt32 _tavernInterval, _tavernRate;
 		static UInt32 _bookStoreInterval, _bookStoreRate;
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)
+
+        bool _ispra;
 	public:
 		void setTicketCount(UInt32 cnt, bool writedb = true);
 		inline UInt32 getTicketCount(){return _exchangeTicketCount;}
+
+        inline bool isPracticing() { return _ispra; }
+        inline void setPracticing(bool pra = true) { _ispra = pra; }
+
 	protected:
 		inline void setBlockBossByLevel();
 	public:

@@ -28,6 +28,6 @@ function calcPracticeInc( fgt )
         goldfactor = 0
     end
     -- 穴道加成 + (资质 - 5) * 0.16 + 钱加成 + 山头加成
-    return fgt:getAcuPraAdd() + (prabase * (1 + (fgt:getPotential() - 5) * potfactor + goldfactor + placeadd))
+    return fgt:getAcuPraAdd() + (prabase * (1 + (fgt:getPotential() - 5) * potfactor + goldfactor + placeadd)) + 0.5
 end
 

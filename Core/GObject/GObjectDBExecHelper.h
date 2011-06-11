@@ -169,11 +169,13 @@ struct DBFighter
 
 struct DBPracticePlace
 {
-    UInt8 id;       // 修为挂机点ID
-    UInt32 ownerid; // 主人ID
-    UInt16 maxslot; // 最大修炼位
-    UInt32 protid;  // 护法弟子ID
-    UInt8 open;     // 是否开放
+    UInt8 id;           // 修为挂机点ID
+    UInt64 ownerid;     // 主人ID
+    UInt64 protid;      // 护法弟子ID - 某个玩家ID
+    UInt16 protmoney;   // 8小时保护费用
+    UInt16 slotmoney;   // 8小时收费
+    UInt16 maxslot;     // 最大修炼位
+    UInt8 open;         // 是否开放
 };
 
 struct DBFightersFriendliness
@@ -742,12 +744,14 @@ SPECIALDEF(33)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(5)
+SPECIALDEF(7)
 	(
         UInt8, id,
-        UInt32, ownerid,
+        UInt64, ownerid,
+        UInt64, protid,
         UInt16, maxslot,
-        UInt32, protid,
+        UInt16, protmoney,
+        UInt16, slotmoney,
         UInt8, open
     )
 SPECIALEND()

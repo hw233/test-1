@@ -2,8 +2,9 @@
 #define _GLOCALOBJECTMANAGER_H_
 
 #include "GObjectBase.h"
-
 #include "Common/Mutex.h"
+#include <list>
+#include <vector>
 
 namespace GObject
 {
