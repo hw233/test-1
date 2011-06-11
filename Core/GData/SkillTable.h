@@ -7,6 +7,20 @@
 
 namespace GData
 {
+enum
+{
+    /*0*/ SKILL_ACTIVE = 0,
+    /*1*/ SKILL_PREATK,
+    /*2*/ SKILL_AFTATK,
+    /*3*/ SKILL_BEATKED,
+    /*4*/ SKILL_AFTEVD,
+    /*5*/ SKILL_AFTRES,
+    /*6*/ SKILL_ENTER,
+    /*7*/ SKILL_DEAD,
+    SKILL_PASSIVES = SKILL_DEAD,
+    /*7*/ SKILL_PEERLESS,
+    SKILL_CONDMAX
+};
 
 struct SkillEffect : public ObjectBaseNT<UInt16>
 {

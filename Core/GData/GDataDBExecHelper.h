@@ -87,11 +87,15 @@ struct DBSkill
 {
     UInt16 id;
     std::string name;
-    UInt16 cond;        // 触发条件: 0-主动
-                        //           1-攻击前被动触发(回血技能,无概率)
-                        //           2-攻击后被动触发(有概率)
-                        //           3-被攻击后触发(有概率)
-                        //           4-无双技能,当灵气>=100释放
+    UInt16 cond;        // 触发条件: SKILL_ACTIVE   -主动
+                        //           SKILL_PREATK   -攻击前被动触发(回血技能,无概率)
+                        //           SKILL_AFTATK   -攻击后被动触发(有概率)
+                        //           SKILL_BEATKED  -被攻击后触发(有概率)
+                        //           SKILL_AFTEVD   -闪避后触发
+                        //           SKILL_AFTRES   -抵抗后触发
+                        //           SKILL_ENTER    -入场时触发
+                        //           SKILL_DEAD     -死亡后触发
+                        //           SKILL_PEERLESS -无双技能,当灵气>=100释放
     float prob;         // 主动状态触发概率 或 被动触发概率
     UInt8 target;       // 作用对象: 0-友方,1-敌方,2-自己(对友方和自己加,对敌方减)
     UInt8 area;         // 伤害范围: 0-单体,1-全体,2-横排,3-竖列,4-十字,5-品字 (4,5可选支持)

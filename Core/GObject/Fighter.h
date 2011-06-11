@@ -10,6 +10,7 @@
 #include "GData/AttrExtra.h"
 #include "Common/TimeUtil.h"
 #include "Server/ServerTypes.h"
+#include "GData/SkillTable.h"
 
 namespace GObject
 {
@@ -127,6 +128,12 @@ public:
     bool offSkillByIdx(UInt8 idx);
     // 取得装备的技能个数
     UInt16 getUpSkillsNum();
+    // 取得所有被动技能的个数
+    UInt16 getPSkillsNum();
+    // 取得100%被动技能的个数
+    UInt16 getP100SkillsNum();
+    // 取得概率被动技能的个数
+    UInt16 getPnSkillsNum();
     // 增加一个新技能,包括技能升级
     bool addNewSkill(UInt16 skill, bool = true);
     // 删除一个可装备的技能
@@ -143,6 +150,12 @@ public:
     inline UInt8 getSkillsNum() { return _skills.size(); }
     // 取得所有装备的技能和等级
     void getAllUpSkillAndLevel(Stream& st);
+    // 取得所有被动技能
+    void getAllPSkillAndLevel(Stream& st);
+    // 取得所有100%被动技能
+    void getAllP100SkillAndLevel(Stream& st);
+    // 取得所有概率被动技能
+    void getAllPnSkillAndLevel(Stream& st);
     // 取得所有学习的技能和等级
     void getAllSkillsAndLevel(Stream& st);
     // 取得装备了的和学习了的技能和等级
@@ -154,17 +167,38 @@ public:
     // 更新被动技能表
     bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
     // 更新被动技能
-    bool offPassiveSkill(UInt16 skill, UInt16 type, bool = true);
-    // 取得狙击前被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[0]; }
+    bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
+
+    // 取得攻击前被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-1]; }
     // 取得攻击后被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[GData::SKILL_AFTATK-1]; }
     // 取得被攻击后被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[2]; }
-    // 取得攻击后被动触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[0]; }
-    // 取得被攻击后被动触发技能
-    inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[1]; }
+    inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[GData::SKILL_BEATKED-1]; }
+    // 取得闪避后被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftEvd100() { return _passkl[GData::SKILL_AFTEVD-1]; }
+    // 取得法术抵抗后被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftRes100() { return _passkl[GData::SKILL_AFTRES-1]; }
+    // 取得入场时概率100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillEnter100() { return _passkl[GData::SKILL_ENTER-1]; }
+    // 取得死亡后概率100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-1]; }
+
+    // 取得攻击前被动概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-1]; }
+    // 取得攻击后被动概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[GData::SKILL_AFTATK-1]; }
+    // 取得被攻击后被动概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[GData::SKILL_BEATKED-1]; }
+    // 取得闪避后被动概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftEvd() { return _rpasskl[GData::SKILL_AFTEVD-1]; }
+    // 取得法术抵抗后被动概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftRes() { return _rpasskl[GData::SKILL_AFTRES-1]; }
+    // 取得入场时概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillEnter() { return _rpasskl[GData::SKILL_ENTER-1]; }
+    // 取得死亡后概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-1]; }
+
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
@@ -190,11 +224,11 @@ public:
     // 取得最大装备心法数
     inline UInt8 getUpCittasMax() { return _cittaslot <= CITTA_UPMAX ? _cittaslot : CITTA_UPMAX; }
     // 取得装备位置idx处所装备的心法的ID
-	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_ID(_citta[idx]) : 0; }
+	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax() ) ? CITTA_ID(_citta[idx]) : 0; }
     // 取得装备位置idx处所装备的心法等级
-	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? CITTA_LEVEL(_citta[idx]) : 0; }
+	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax() ) ? CITTA_LEVEL(_citta[idx]) : 0; }
     // 取得装备位置idx处所装备的心法的ID和等级
-	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < CITTA_UPMAX) ? _citta[idx] : 0; }
+	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax()) ? _citta[idx] : 0; }
     // 取得可装备的心法数
     inline UInt8 getCittasNum() { return _cittas.size(); }
     // 取得所有装备的心法和等级
@@ -493,8 +527,8 @@ protected:
      * AFTATK       1       攻击后被动触发
      * AFTATKED     2       被攻击后触发
      */
-    std::vector<UInt16> _rpasskl[2];// 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _passkl[3]; //  100%触发技能
+    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES];// 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
+    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES]; // 100%触发技能
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
