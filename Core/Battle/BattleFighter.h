@@ -167,6 +167,8 @@ public:
 	bool calcCounter(bool ranged = false);
 	bool canBeCounter();
 	bool calcPierce();
+    float calcTherapy(const GData::SkillBase* skill);
+    float calcMagAttack(bool& isCritical);
 
 	inline void addAction(UInt32 p);
 
@@ -177,31 +179,34 @@ public:
 	inline void addFlag(UInt32 f) { _flag |= f; }
 	inline void delFlag(UInt32 f) { _flag &= ~f; }
 	inline bool hasFlag(UInt32 f) { return (_flag & f) > 0;}
-	inline UInt32 getPoisonRound() { return (_flag & 0x1C00000) >> 22; }
-	inline UInt32 getStunRound() { return (_flag & 0xE000000) >> 25; }
-	inline void setPoisonRound(UInt32 r) { _flag = (_flag & 0xFE3FFFFF) + (r << 22); }
-	inline void setStunRound(UInt32 r) { _flag = (_flag & 0xF1FFFFFF) + (r << 25); }
+	inline UInt32 getPoisonRound() { return (_flag & PoisonRound) >> 22; }
+	inline UInt32 getStunRound() { return (_flag & Stun) >> 25; }
+	inline void setPoisonRound(UInt32 r) { _flag = (_flag & ~PoisonRound) + (r << 22); }
+	inline void setStunRound(UInt32 r) { _flag = (_flag & ~Stun) + (r << 25); }
 	inline UInt32 getThornLevel() { return (_flag & Thorn) >> 5; }
 	inline UInt32 getPoisonLevel() { return (_flag & Poison) >> 8; }
-	inline UInt32 getConfuseLevel() { return (_flag & Confuse) >> 11; }
+	inline UInt32 getConfuseRound() { return (_flag & Confuse) >> 11; }
 	inline void setThornLevel(UInt32 l) { _flag = (_flag & ~Thorn) + (l << 5); }
 	inline void setPoisonLevel(UInt32 l) { _flag = (_flag & ~Poison) + (l << 8); }
-	inline void setConfuseLevel(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
+	inline void setConfuseRound(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
+    inline UInt32 getForgetRound() { return (_flag & Forget) >> 28; }
+    inline void setForgetRound(UInt32 l) { _flag = (_flag & ~Forget) + (l << 28); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
 
-    const GData::SkillBase* getActiveSkill();
+    const GData::SkillBase* getActiveSkill(bool need_therapy = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
     const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx);
     const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx);
     const GData::SkillBase* getPassiveSkillAftAtk();
     const GData::SkillBase* getPassiveSkillBeAtk();
+    void releaseSkillCD(int cd);
 
 private:
 	void updateBuffExtras();
 
 private:
 	GObject::Fighter * _fighter;
-	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _tough;
+	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _tough, _max_aura;
 	float _attack, _mag_attack, _defend, _mag_defend, _hitrate, _evade;
     float _critical, _critical_dmg, _pierce, _counter, _magres;
 	UInt32 _maxhp, _maxAction;
@@ -241,6 +246,9 @@ public:
 		MaxHPRef = 0x8000,
 		IsMirror = 0x10000,
 		BlockBoss = 0x200000,
+        PoisonRound = 0x1C00000,
+        Stun = 0xE000000,
+        Forget = 0x70000000,
 	};
 };
 

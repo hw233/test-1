@@ -196,6 +196,11 @@ float BattleFormula::calcAura( GObject::Fighter * fgt )
 	return call<float>("calcAura", fgt);
 }
 
+float BattleFormula::calcMaxAura( GObject::Fighter * fgt )
+{
+    return call<float>("calcMaxAura", fgt);
+}
+
 float BattleFormula::calcTough( GObject::Fighter * fgt )
 {
 	return call<float>("calcTough", fgt);
@@ -304,6 +309,11 @@ float BattleFormula::calcSoul( Battle::BattleFighter * fgt )
 float BattleFormula::calcAura( Battle::BattleFighter * fgt )
 {
 	return call<float>("calcAura", fgt);
+}
+
+float BattleFormula::calcMaxAura( Battle::BattleFighter * fgt )
+{
+	return call<float>("calcMaxAura", fgt);
 }
 
 float BattleFormula::calcTough( Battle::BattleFighter * fgt )

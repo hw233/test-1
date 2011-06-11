@@ -91,6 +91,15 @@ int BattleField::getPossibleTarget( int side, int idx )
 	};
 	int targetidx = 4 - (idx % 5);
 	int tside = 1 - side;
+    for(int irow = 0; irow < 5; irow++)
+    {
+        int tidx = irow * 5 + targetidx;
+        if(_objs[tside][tidx] != NULL && _objs[tside][tidx]->getHP() > 0)
+        {
+            return tidx;
+        }
+    }
+
 	int * tbl = select_table[targetidx];
 	for(int i = 0; i < 5; ++ i)
 	{

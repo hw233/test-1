@@ -30,6 +30,22 @@ autobattle_tweak = 0.5
 autobattle_A = 2.5
 
 -- 辅助函数
+function calcAura( fgt )
+  if fgt == nil then
+    return 0
+  end
+  local aura = fgt:getBaseAura()
+  return aura * (1 + fgt:getExtraAuraPercent()) + fgt:getExtraArua()
+end
+
+function calcMaxAura( fgt )
+  if fgt == nil then
+    return 0
+  end
+  local maxAura = fgt:getBaseMaxAura()
+  return maxAura * (1 + fgt:getExtraMaxAuraPercent()) + fgt:getExtraMaxArua()
+end
+
 function calcStrength( fgt )
   if fgt == nil then
     return 0
