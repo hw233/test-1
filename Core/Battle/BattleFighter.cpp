@@ -238,7 +238,7 @@ float BattleFighter::calcMagAttack(bool& isCritical)
     return magatk;
 }
 
-float BattleFighter::calcTherapy(GData::SkillBase* skill)
+float BattleFighter::calcTherapy(const GData::SkillBase* skill)
 {
     if(!skill)
         return 0;

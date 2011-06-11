@@ -364,7 +364,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, Battl
 			}
 			area_target->makeDamage(dmg);
 
-			defList[defCount].damType = rescue ? 1 : 0;
+			defList[defCount].damType = 0;
 			defList[defCount].damage = dmg;
 			defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
@@ -558,14 +558,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         {
             for(UInt8 pos = 0; pos < 25; ++ pos)
             {
-                BattleObject* bo = _objs[target_side][pos];
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
                 if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                     continue;
 
                 if(bo->getLostHP() == 0)
                     continue;
 
-                UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
+                UInt32 hpr = bo->regenHP(rhp);
                 if(hpr == 0)
                     continue;
 
@@ -578,23 +578,25 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
         else if(NULL != therapy_bf)
         {
-            UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
+            UInt32 hpr = therapy_bf->regenHP(rhp);
             if(hpr != 0)
             {
                 defList[defCount].pos = therapy_bf->getPos() + 25;
-                defList[defCount].demType = 3;
+                defList[defCount].damType = 3;
                 defList[defCount].damage = hpr;
-                defList[defCount].leftHP = bo->getHP();
+                defList[defCount].leftHP = therapy_bf->getHP();
                 ++ defCount;
             }
         }
         else
         {
+            UInt8 pos= getPossibleTarget(bf->getSide(), bf->getPos());
+            BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
             UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
             if(hpr != 0)
             {
                 defList[defCount].pos = bf->getPos() + 25;
-                defList[defCount].damtype = 3;
+                defList[defCount].damType = 3;
                 defList[defCount].damage = hpr;
                 defList[defCount].leftHP = bo->getHP();
                 ++ defCount;
@@ -634,9 +636,6 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     {
     }
     else if(2 == skill_target)
-    {
-    }
-    else if()
     {
     }
     else
