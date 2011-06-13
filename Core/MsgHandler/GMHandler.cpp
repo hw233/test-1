@@ -93,6 +93,9 @@ GMHandler::GMHandler()
 	Reg(3, "nextarena", &GMHandler::OnNextArena);
 
 	Reg(1, "enterClan", &GMHandler::OnEnterClan);
+
+	Reg(3, "pay4pra", &GMHandler::OnPay4Pra);
+	Reg(3, "sitpra", &GMHandler::OnSitPra);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1744,5 +1747,31 @@ void GMHandler::OnNextArena( GObject::Player * player, std::vector<std::string>&
 void GMHandler::OnEnterClan( GObject::Player * player, std::vector<std::string>& )
 {
 	(GObject::clanManager.getRobBattleClan())->enterClanCity(player);
+}
+
+void GMHandler::OnPay4Pra( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (args.size() < 6)
+        return;
+    UInt8 place = atoi(args[0].c_str());
+    UInt16 slot = atoi(args[1].c_str());
+    UInt8 type = atoi(args[2].c_str());
+    UInt8 pricetype = atoi(args[3].c_str());
+    UInt8 time = atoi(args[4].c_str());
+    UInt8 prot = atoi(args[5].c_str());
+    player->payPractice(place, slot, type, pricetype, time, prot);
+}
+
+void GMHandler::OnSitPra( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 1)
+        return;
+
+    size_t cnt = 0;
+    UInt32 fighters[5] = {0};
+    for (size_t i = 0; i < args.size() && i < 5; ++i)
+        fighters[cnt++] = atoi(args[i].c_str());
+
+    player->addPracticeFighter(fighters, cnt);
 }
 
