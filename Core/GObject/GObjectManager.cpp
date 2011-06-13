@@ -2220,6 +2220,8 @@ namespace GObject
         UInt8 i = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if (!pp.id)
+                continue;
             GObject::PPlace place;
             place.ownerid = pp.ownerid;
             place.protid = pp.protid;
@@ -2230,6 +2232,54 @@ namespace GObject
             practicePlace.addPlace(place, i++);
         }
 		lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::LoadPracticeData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Practice Data");
+        Player* pl = 0;
+		DBPracticeData pd;
+		if(execu->Prepare("SELECT `id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters` FROM `practice_data`", pd)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+            GObject::PracticeData* ppd = new (std::nothrow) GObject::PracticeData(pd.id);
+            if (!ppd)
+                return false;
+            ppd->type = pd.type;
+            ppd->pricetype = pd.pricetype;
+            ppd->price = pd.price;
+            ppd->traintime = pd.traintime;
+            ppd->checktime = pd.checktime;
+            ppd->trainend = TimeUtil::Now() + 60 * pd.checktime;
+            ppd->prot = pd.prot;
+            ppd->cdend = pd.cdend;
+            ppd->winnerid = pd.winnerid;
+            StringTokenizer tk(pd.fighters, ",");
+            for (size_t i = 0; i < tk.count(); ++i)
+            {
+                ppd->fighters.push_back(::atoi(tk[i].c_str()));
+            }
+
+            pl = globalPlayers[pd.id];
+            if (!pl)
+                continue;
+
+            if (ppd->checktime)
+            {
+                pl->setPracticingPlaceSlot(pd.place << 16 | pd.slot);
+                practicePlace.addPractice(pl, ppd);
+            }
+            else
+            {
+                pl->setPracticingPlaceSlot(7 << 16 | pd.slot);
+                practicePlace.addPractice(pl, ppd);
+            }
+        }
         return true;
     }
 
