@@ -172,10 +172,26 @@ struct DBPracticePlace
     UInt8 id;           // 修为挂机点ID
     UInt64 ownerid;     // 主人ID
     UInt64 protid;      // 护法弟子ID - 某个玩家ID
+    UInt16 maxslot;     // 最大修炼位
     UInt16 protmoney;   // 8小时保护费用
     UInt16 slotmoney;   // 8小时收费
-    UInt16 maxslot;     // 最大修炼位
     UInt8 open;         // 是否开放
+};
+
+struct DBPracticeData
+{
+    UInt64 id;          // 用户ID
+    UInt8 place;        // 修炼地点
+    UInt16 slot;        // 修炼位置
+    UInt8 type;         // 修炼类型 0-8小时, 1-24小时
+    UInt8 pricetype;    // 付费方式 0-金币， 1-银币
+    UInt16 price;        // 所付的钱
+    UInt32 traintime;   // 修炼分钟数
+    UInt32 checktime;   // 修炼分钟数
+    UInt8 prot;         // 是否申请保护 0-没有任何保护, 1-护法弟子保护, 2-仙府禁法
+    UInt32 cdend;       // 下次可修炼时间
+    UInt64 winnerid;    // 挑战胜利者ID
+    std::string fighters;
 };
 
 struct DBFightersFriendliness
@@ -753,6 +769,24 @@ SPECIALDEF(7)
         UInt16, protmoney,
         UInt16, slotmoney,
         UInt8, open
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBPracticeData)
+SPECIALDEF(12)
+	(
+        UInt64, id,
+        UInt8, place,
+        UInt16, slot,
+        UInt8, type,
+        UInt8, pricetype,
+        UInt16, price,
+        UInt32, traintime,
+        UInt32, checktime,
+        UInt8, prot,
+        UInt32, cdend,
+        UInt64, winnerid,
+        std::string, fighters
     )
 SPECIALEND()
 

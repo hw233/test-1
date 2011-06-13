@@ -260,6 +260,7 @@ public:
 
 	UInt32 regenHP(UInt32);
 	bool addExp(UInt64);
+	bool addPExp(UInt64);
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
@@ -446,9 +447,9 @@ public:
 	inline UInt32 getBaseAction() { return action; }
 
     Int32 getAcuPraAdd() { return _praadd; }
-    Int32 getPracticeInc();
+    UInt64 getPracticeInc();
     // TODO:
-    UInt16 getPracticePlace() { return 1; }
+    UInt16 getPracticePlace();
     bool isGoldPractice() { return false; }
 
 protected:

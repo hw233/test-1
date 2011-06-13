@@ -28,6 +28,7 @@
 #include "Server/Cfg.h"
 #include "Common/Itoa.h"
 #include "ClanDynamicMsg.h"
+#include "PracticePlace.h"
 #include <mysql.h>
 
 #include <cmath>
@@ -225,12 +226,12 @@ namespace GObject
 		}
 	}
 
-	bool EventFighterPractice::Equal(UInt32 id, size_t fgtId) const
+	bool EventPlayerPractice::Equal(UInt32 id, size_t playerid) const
 	{
-		return 	id == GetID() && _fighter->getId() == fgtId;
+		return 	id == GetID() && playerid == m_Player->getId();
 	}
 
-	bool EventFighterPractice::Accelerate(UInt32 times)
+	bool EventPlayerPractice::Accelerate(UInt32 times)
     {
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(times > count)
@@ -243,8 +244,34 @@ namespace GObject
 		return count == 0;
     }
 
-	void EventFighterPractice::Process(UInt32 times)
+	void EventPlayerPractice::Process(UInt32 leftCount)
     {
+        PracticeData* data = practicePlace.getPracticeData(m_Player->getId());
+        if (!data) {
+			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
+			return;
+        }
+
+        data->lock.lock();
+        Fighter* fgt = 0;
+        for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
+        {
+            fgt = m_Player->findFighter(*i);
+            if (fgt)
+            {
+                fgt->addPExp(fgt->getPracticeInc() * 60); 
+            }
+        }
+        data->lock.unlock();
+
+		data->checktime = leftCount;
+		DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %"I64_FMT"u",
+                data->checktime, m_Player->getId());
+		if(leftCount == 0)
+		{
+			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
+			return;
+		}
         return;
     }
 
@@ -257,7 +284,7 @@ namespace GObject
 		_isOnline(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
-		_lastDungeon(0), _exchangeTicketCount(0), _ispra(false)
+		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -2436,12 +2463,6 @@ namespace GObject
 		st << Stream::eos;
 	}
 
-    bool Player::addPracticeFighter(UInt32 id, UInt8 priceType, UInt32 times)
-    {
-        // TODO
-        return false;
-    }
-
 	UInt32 Player::addStatus( UInt32 s )
 	{
 		if(s == 0 || (_playerData.status & s) == s)
@@ -4466,4 +4487,15 @@ namespace GObject
 			globalCountryBattle.delAutoCB(this);
 		}
 	}
+
+    void Player::payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot)
+    {
+        practicePlace.pay(this, place, slot, type, priceType, time, prot);
+    }
+
+    void Player::addPracticeFighter(UInt32* fighters, size_t size)
+    {
+        practicePlace.sitdown(this, fighters, size);
+    }
 }
+

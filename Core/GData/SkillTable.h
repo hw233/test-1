@@ -7,6 +7,7 @@
 
 namespace GData
 {
+
 enum
 {
     /*0*/ SKILL_ACTIVE = 0,

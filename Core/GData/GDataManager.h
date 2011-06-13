@@ -29,6 +29,7 @@ namespace GData
 		static bool LoadLootData();
 		static bool LoadQueRule();
 		static bool LoadFighterTrainData();
+		static bool LoadPracticeData();
 		static bool LoadSkillEffect();
 		static bool LoadSkills();
 		static bool LoadCittaEffect();
@@ -47,6 +48,9 @@ namespace GData
 		static const std::vector<UInt32>& GetTaelTrainList();
 		static const std::vector<UInt32>& GetGoldTrainList();
 		static const std::vector<UInt32>& GetLevelTrainExp();
+		static const std::vector<UInt32>& GetTaelPractice();
+		static const std::vector<UInt32>& GetGoldPractice();
+		static const std::vector<UInt32>& GetGoldOpenSlot();
 		
 
 	public:
@@ -59,6 +63,9 @@ namespace GData
 		static std::vector<UInt32>		 m_TaelTrainList;
 		static std::vector<UInt32>		 m_GoldTrainList;
 		static std::vector<UInt32>		 m_LevelTrainExp;
+		static std::vector<UInt32>		 m_TaelPractice;
+		static std::vector<UInt32>		 m_GoldPractice;
+		static std::vector<UInt32>		 m_GoldOpenSlot;
 	};
 
 	

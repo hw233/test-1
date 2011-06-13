@@ -195,6 +195,14 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
+bool Fighter::addPExp( UInt64 e )
+{
+    _pexp += e;
+    if (_pexp > _pexpMax)
+        _pexp = _pexpMax;
+    return true;
+}
+
 void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 {
 	if(_level != l)
@@ -912,6 +920,7 @@ Fighter * Fighter::clone(Player * player)
 	fgt->_amulet = NULL;
 	fgt->_attrDirty = true;
 	fgt->_bPDirty = true;
+    fgt->_pexpMax = 100000; // XXX: 100000
 	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
 	return fgt;
@@ -1921,10 +1930,15 @@ UInt8 Fighter::getUpCittasNum()
     return c;
 }
 
-Int32 Fighter::getPracticeInc()
+UInt64 Fighter::getPracticeInc()
 {
-    // XXX: float => Int32
-    return Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    UInt64 ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    return ret;
+}
+
+UInt16 Fighter::getPracticePlace()
+{
+    return _owner->getPracticePlace();
 }
 
 Fighter * GlobalFighters::getRandomOut()
