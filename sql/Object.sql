@@ -581,14 +581,24 @@ CREATE TABLE `practice_place` (
   `slotmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `open` tinyint(2) unsigned NOT NULL DEFAULT '1',
    PRIMARY KEY (`id`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*
--- DROP TABLE IF EXISTS `fighter_practice`;
--- CREATE TABLE `fighter_practice` (
---   PRIMARY KEY (`fgtId`,`ownerId`)
--- );
-*/
+DROP TABLE IF EXISTS `practice_data`;
+CREATE TABLE `practice_data` (
+  `id` bigint(20) unsigned NOT NULL,
+  `place` tinyint(3) NOT NULL,
+  `slot` smallint(5) unsigned NOT NULL DEFAULT '30',
+  `type` tinyint(3) NOT NULL,
+  `pricetype` tinyint(3) NOT NULL,
+  `price` smallint(5) NOT NULL,
+  `traintime` int(11) NOT NULL,
+  `checktime` int(11) NOT NULL,
+  `prot` tinyint(3) NOT NULL,
+  `cdend` int(11) NOT NULL,
+  `winnerid` bigint(20) unsigned NOT NULL,
+  `fighters` varchar(255) NOT NULL,
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `friend`

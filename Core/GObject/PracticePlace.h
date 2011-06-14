@@ -4,7 +4,9 @@
 
 #include "Common/Singleton.h"
 #include "Common/Mutex.h"
+#include "GData/ObjectManager.h"
 #include <map>
+#include <list>
 #include <vector>
 
 #define PPLACE_MAX 7
@@ -21,32 +23,27 @@ struct PPlace
     UInt16 maxslot;
     UInt16 protmoney;
     UInt16 slotmoney;
+    UInt8 openslot;
     UInt8 open;
 };
 
-struct PracticeData
+struct PracticeData : public GData::ObjectBaseNT<UInt64>
 {
-    UInt8 type;         // 修炼类型 1-8小时, 2-24小时
-    UInt32 price;       // 银币数量
+    PracticeData(UInt64 id) :GData::ObjectBaseNT<UInt64>(id) {}
+    ~PracticeData() { fighters.clear(); }
+
+    UInt8 type;         // 修炼类型 0-8小时, 1-24小时
+    UInt8 pricetype;    // 付费方式 0-金币， 1-银币
+    UInt16 price;       // 花了多少钱
     UInt32 traintime;   // 修炼分钟数
     UInt32 checktime;   // 修炼分钟数
     UInt32 trainend;    // 修炼结束时间
     UInt8 prot;         // 是否申请保护 0-没有任何保护, 1-护法弟子保护, 2-仙府禁法
-};
+    UInt32 cdend;       // 下次可修炼时间
+    UInt32 winnerid;    // 挑战胜利者ID
 
-struct PlayerPracticeData
-{
-    PlayerPracticeData(){}
-    ~PlayerPracticeData(){ fighters.clear(); }
-
-    PracticeData data;
-    std::vector<UInt32> fighters;
-};
-
-struct PlaceCD
-{
-    size_t idx;
-    UInt32 cdend;
+    Mutex lock;
+    std::list<UInt32> fighters;
 };
 
 struct PlaceData
@@ -55,14 +52,10 @@ struct PlaceData
     {
         bzero(&place, sizeof(place));
     }
-    ~PlaceData()
-    {
-        players.clear();
-    }
+    ~PlaceData() { }
 
     PPlace place;
-    std::map<Player*, PlaceCD> players;
-    std::vector<PlayerPracticeData>  playerdata;
+    std::vector<PracticeData*> data;
 };
 
 class PracticePlace : public Singleton<PracticePlace>
@@ -72,12 +65,12 @@ public:
     ~PracticePlace() { }
 
     // 付费
-    bool pay(Player* pl, UInt8 place, UInt16 slot, UInt8 type, UInt8 time, UInt8 prot);
+    bool pay(Player* pl, UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
 
     // 修炼
-    bool sitdown(Player* pl, UInt8 place, UInt16 slot, UInt32* fgtid, size_t size);
+    bool sitdown(Player* pl, UInt32* fgtid, size_t size);
     // 退出修炼
-    bool standup(Player* pl, UInt8 place, UInt16 slot, UInt32* fgtid, size_t size);
+    bool standup(Player* pl, UInt32* fgtid, size_t size);
 
     // 取得修炼点信息
     void getPlaceInfo(Player* pl, UInt8 place);
@@ -99,10 +92,18 @@ public:
 
     // 增加一个修炼点
     bool addPlace(PPlace& place, UInt8 idx);
+    // 增加一个人
+    bool addPractice(Player* pl, PracticeData* data);
+    // 取得修炼数据
+    PracticeData* getPracticeData(UInt64 playerid);
+    PracticeData* getPracticeData(Player* pl);
+
+    bool isSitdownYet(PracticeData* pd, UInt32 id);
 
 private:
     Mutex m_lock[PPLACE_MAX];
     PlaceData m_places[PPLACE_MAX];
+    std::map<UInt64, PracticeData*> m_pradata;
 };
 
 #define practicePlace PracticePlace::Instance()

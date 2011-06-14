@@ -216,6 +216,7 @@ void World::World_Athletics_Check( void * )
 bool World::Init()
 {
 	GObjectManager::delayLoad();
+	GObjectManager::LoadPracticeData();
 	
 	std::string path = cfg.scriptPath + "World/main.lua";
 	_worldScript = new Script::WorldScript(path.c_str());

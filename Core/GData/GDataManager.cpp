@@ -36,6 +36,9 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_TaelTrainList;
 	std::vector<UInt32>		GDataManager::m_GoldTrainList;
 	std::vector<UInt32>		GDataManager::m_LevelTrainExp;
+	std::vector<UInt32>		GDataManager::m_TaelPractice;
+	std::vector<UInt32>		GDataManager::m_GoldPractice;
+	std::vector<UInt32>		GDataManager::m_GoldOpenSlot;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -92,6 +95,11 @@ namespace GData
 		if (!LoadFighterTrainData())
 		{
 			fprintf(stderr, "Load fighter train daata Error !\n");
+			return false;
+		}
+		if (!LoadPracticeData())
+		{
+			fprintf(stderr, "Load practice daata Error !\n");
 			return false;
 		}
         if (!LoadSkillEffect())
@@ -332,7 +340,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `coin`, `reqLev`, `quality`, `maxQuantity`, `bindType`, `data`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `data`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -614,6 +622,47 @@ namespace GData
 		}
 		return true;
 	}
+
+	bool GDataManager::LoadPracticeData()
+	{
+		lua_State * L = lua_open();
+		luaopen_base(L);
+		luaopen_string(L);
+		luaopen_table(L);
+		{
+			std::string path = cfg.scriptPath + "Other/Practice.lua";
+			lua_tinker::dofile(L, path.c_str());
+
+            {
+                lua_tinker::table tael_pra = lua_tinker::call<lua_tinker::table>(L, "GetTaelPractice");
+                UInt32 size = tael_pra.size();
+                for (UInt32 i = 0; i < size; ++ i)
+                {
+                    m_TaelPractice.push_back(tael_pra.get<UInt32>(i+1));
+                }
+            }
+
+            {
+                lua_tinker::table gold_pra = lua_tinker::call<lua_tinker::table>(L, "GetGoldPractice");
+                UInt32 size = gold_pra.size();
+                for (UInt32 i = 0; i < size; ++ i)
+                {
+                    m_GoldPractice.push_back(gold_pra.get<UInt32>(i+1));
+                }
+            }
+
+            {
+                lua_tinker::table gold_openslot = lua_tinker::call<lua_tinker::table>(L, "GetGoldOpenSlot");
+                UInt32 size = gold_openslot.size();
+                for (UInt32 i = 0; i < size; ++ i)
+                {
+                    m_GoldOpenSlot.push_back(gold_openslot.get<UInt32>(i+1));
+                }
+            }
+
+        }
+        return true;
+    }
 
     bool GDataManager::LoadSkillEffect()
     {
@@ -968,4 +1017,18 @@ namespace GData
 		return m_LevelTrainExp;
 	}
 
+	const std::vector<UInt32>& GDataManager::GetTaelPractice()
+	{
+		return m_TaelPractice;
+	}
+
+	const std::vector<UInt32>& GDataManager::GetGoldPractice()
+	{
+		return m_GoldPractice;
+	}
+
+	const std::vector<UInt32>& GDataManager::GetGoldOpenSlot()
+	{
+		return m_GoldOpenSlot;
+	}
 }

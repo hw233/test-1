@@ -195,6 +195,14 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
+bool Fighter::addPExp( UInt64 e )
+{
+    _pexp += e;
+    if (_pexp > _pexpMax)
+        _pexp = _pexpMax;
+    return true;
+}
+
 void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 {
 	if(_level != l)
@@ -624,8 +632,8 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                             s = attr->skills[i];
                             if (s)
                             {
-                                if (s->cond == GData::SKILL_PEERLESS) {}
-                                    // impossible
+                                if (s->cond == GData::SKILL_PEERLESS)
+                                    delPeerless(s->getId(), writedb);
                                 else if (s->cond == GData::SKILL_ACTIVE)
                                     delSkill(s->getId(), writedb);
                                 else
@@ -912,6 +920,7 @@ Fighter * Fighter::clone(Player * player)
 	fgt->_amulet = NULL;
 	fgt->_attrDirty = true;
 	fgt->_bPDirty = true;
+    fgt->_pexpMax = 100000; // XXX: 100000
 	memset(fgt->_armor, 0, 5 * sizeof(ItemEquip *));
     memset(fgt->_trump, 0, TRUMP_UPMAX * sizeof(ItemEquip*));
 	return fgt;
@@ -1258,14 +1267,14 @@ bool Fighter::delPeerless( UInt16 pl, bool writedb )
 {
     for (size_t i = 0; i < _peerless.size(); ++i)
     {
-        if (_peerless[i] == pl)
+        if (SKILL_ID(_peerless[i]) == SKILL_ID(pl))
         {
             std::vector<UInt16>::iterator it = _peerless.begin();
             std::advance(it, i);
             _peerless.erase(it);
 
             if (isPeerlessUp(pl))
-                setPeerless(0, writedb);
+                offPeerless(writedb);
             sendModification(0x31, pl, i, writedb);
             return true;
         }
@@ -1651,7 +1660,9 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
         {
             const GData::SkillBase* s = skills[i];
             if (s) {
-                if (s->cond == GData::SKILL_ACTIVE)
+                if (s->cond == GData::SKILL_PEERLESS)
+                    addNewPeerless(s->getId(), writedb);
+                else if (s->cond == GData::SKILL_ACTIVE)
                     addNewSkill(s->getId(), writedb);
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
@@ -1663,10 +1674,6 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                         s->cond == GData::SKILL_DEAD)
                 {
                     upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), writedb);
-                }
-                else if (s->cond == GData::SKILL_PEERLESS)
-                { // peerless
-                    addNewPeerless(s->getId(), writedb);
                 }
                 else
                 {
@@ -1889,8 +1896,8 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
     {
         for (size_t i = 0; i < skills.size(); ++i)
         {
-            if (skills[i]->cond == GData::SKILL_PEERLESS) {}
-                // impossible
+            if (skills[i]->cond == GData::SKILL_PEERLESS)
+                delPeerless(skills[i]?skills[i]->getId():0, writedb);
             else if (skills[i]->cond == GData::SKILL_ACTIVE)
                 delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
             else
@@ -1921,10 +1928,15 @@ UInt8 Fighter::getUpCittasNum()
     return c;
 }
 
-Int32 Fighter::getPracticeInc()
+UInt64 Fighter::getPracticeInc()
 {
-    // XXX: float => Int32
-    return Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    UInt64 ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    return ret;
+}
+
+UInt16 Fighter::getPracticePlace()
+{
+    return _owner->getPracticePlace();
 }
 
 Fighter * GlobalFighters::getRandomOut()

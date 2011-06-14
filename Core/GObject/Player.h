@@ -69,6 +69,7 @@ namespace GObject
 	class ClanBattle;
 	class MailBox;
 	class Athletics;
+    struct PracticeData;
 
 	class EventAutoBattle : public EventBase
 	{
@@ -108,21 +109,20 @@ namespace GObject
 		UInt32 _end;
 	};
 
-    class EventFighterPractice : public EventBase
+    class EventPlayerPractice : public EventBase
     {
     public:
-		EventFighterPractice(Player * player, UInt32 interval, UInt32 count, Fighter * fighter, UInt32 final)
-			: EventBase(player, interval, count), _fighter(fighter), _end(final)
+		EventPlayerPractice(Player * player, UInt32 interval, UInt32 count, UInt32 final)
+			: EventBase(player, interval, count), _end(final)
 		{}
 
-        virtual UInt32 GetID() const { return EVENT_FIGHTERPRACTICING; }
-        virtual bool Equal(UInt32 id, size_t fgtId) const;
+        virtual UInt32 GetID() const { return EVENT_PLAYERPRACTICING; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
         void Process(UInt32);
 		bool Accelerate(UInt32);
         inline UInt32 GetEnd() { return _end; }
 
 	private:
-		Fighter * _fighter;
         UInt32 _end;
     };
 
@@ -425,16 +425,6 @@ namespace GObject
 		bool cancelTrainFighter(UInt32);
 		void makeTrainFighterInfo(Stream&);
 		TrainFighterData* getTrainFighterData(UInt32);
-
-        // TODO:
-		void addPracticeFighterFromDB(UInt32, UInt8, UInt32, UInt32, UInt32, UInt32);
-		bool delPracticeFighter(UInt32, bool = false);
-		bool hasPracticeFighter(UInt32);
-		bool addPracticeFighter(UInt32, UInt8, UInt32);
-		bool accPracticeFighter(UInt32, UInt32);
-		bool cancelPracticeFighter(UInt32);
-		void makePracticeFighterInfo(Stream&);
-		//PracticeFighterData* getPracticeFighterData(UInt32);
 
 		UInt32 addStatus(UInt32 s);
 		UInt32 removeStatus(UInt32 s);
@@ -740,13 +730,16 @@ namespace GObject
 		static UInt32 _bookStoreInterval, _bookStoreRate;
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)
 
-        bool _ispra;
+        UInt32 _praplace;
 	public:
 		void setTicketCount(UInt32 cnt, bool writedb = true);
 		inline UInt32 getTicketCount(){return _exchangeTicketCount;}
 
-        inline bool isPracticing() { return _ispra; }
-        inline void setPracticing(bool pra = true) { _ispra = pra; }
+        inline bool isPracticing() { return _praplace; }
+        inline void setPracticingPlaceSlot(UInt32 place) { _praplace = place; }
+        inline UInt32 getPracticePlaceSlot() { return _praplace; }
+        inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
+        inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
 
 	protected:
 		inline void setBlockBossByLevel();
@@ -766,6 +759,11 @@ namespace GObject
 		std::string& getQuestionForPWD(){ return _pwdInfo.questionForPWD; }
 		void makeSenconPWDInfo(Stream& st);
 		bool hasChecked();
+
+    public:
+        void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
+        void addPracticeFighter(UInt32* fighters, size_t size);
+
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

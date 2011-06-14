@@ -102,3 +102,9 @@ LOCK TABLES `skill_effect` WRITE;
 source skilleffect
 UNLOCK TABLES;
 
+use asss;
+LOCK TABLES `practice_place` WRITE;
+INSERT INTO `practice_place` VALUES
+(1,0,0,100,5,10,1);
+UNLOCK TABLES;
+

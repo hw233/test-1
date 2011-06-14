@@ -2,6 +2,7 @@
 potfactor = 0.16
 goldfactor = 0.2
 prabase = 5
+potentialbase = 5
 
 -- TODO: 山头据点
 addons = {
@@ -19,7 +20,11 @@ function calcPracticeInc( fgt )
         return 0
     end
 
-    placeadd = addons[fgt:getPracticePlace()];
+    place = fgt:getPracticePlace();
+    if not place or place > 7 then
+        return 0
+    end
+    placeadd = addons[place]
     if placeadd == nil then
         placeadd = 0
     end
@@ -27,7 +32,13 @@ function calcPracticeInc( fgt )
     if not fgt:isGoldPractice() then
         goldfactor = 0
     end
+
+    potential = fgt:getPotential()
+    if potential < 5 then
+        potential = 5
+    end
+
     -- 穴道加成 + (资质 - 5) * 0.16 + 钱加成 + 山头加成
-    return fgt:getAcuPraAdd() + (prabase * (1 + (fgt:getPotential() - 5) * potfactor + goldfactor + placeadd)) + 0.5
+    return fgt:getAcuPraAdd() + (prabase * (1 + (potential - 5) * potfactor + goldfactor + placeadd)) + 0.5
 end
 
