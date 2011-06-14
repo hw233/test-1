@@ -22,7 +22,7 @@ function itemtemplate()
         BEGIN {
             print "INSERT INTO `item_template` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10);
+            printf("(%d,\x27%s\x27,%d,%d,,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
