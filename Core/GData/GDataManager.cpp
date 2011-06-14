@@ -174,7 +174,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBAreaDef adef;
-		if(execu->Prepare("SELECT `id`, `side`, `area`, `rate` FROM `area`", adef) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `side`, `area` FROM `area`", adef) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -201,34 +201,6 @@ namespace GData
 						ad[z].y = atoi(s.c_str() + p + 1);
 					}
 					++ z;
-				}
-			}
-			{
-				const std::string area = adef.rate;
-				StringTokenizer tokenizer(area, ",");
-				if(tokenizer.count() < ad.size())
-					continue;
-				StringTokenizer::Iterator it;
-				int z = 0;
-				for(it = tokenizer.begin(); it != tokenizer.end(); ++ it)
-				{
-					if((*it).empty())
-						continue;
-					if((*it)[0] == '/')
-					{
-						ad[z].type = 1;
-						ad[z ++].factor = static_cast<float>(atof((*it).c_str() + 1));
-					}
-					else if((*it)[0] == '*')
-					{
-						ad[z].type = 2;
-						ad[z ++].factor = static_cast<float>(atof((*it).c_str() + 1));
-					}
-					else
-					{
-						ad[z].type = 0;
-						ad[z ++].factor = static_cast<float>(atof((*it).c_str()));
-					}
 				}
 			}
 			Area& ar = areaList[adef.id];

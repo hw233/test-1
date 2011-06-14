@@ -11,7 +11,6 @@ struct DBAreaDef
 	UInt32 id;
 	UInt8  side;
 	std::string area;
-	std::string rate;
 };
 
 //Weapon class definitions read from DB
@@ -219,12 +218,11 @@ struct DBStoreItem
 namespace DB {
 
 SPECIALBEGIN(GData::DBAreaDef)
-SPECIALDEF(4)
+SPECIALDEF(3)
 	(
 	UInt32,		id,
 	UInt8,		side,
-	std::string,area,
-	std::string,rate
+	std::string,area
 	)
 SPECIALEND()
 

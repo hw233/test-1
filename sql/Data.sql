@@ -29,21 +29,9 @@ CREATE TABLE `area` (
   `id` int(10) unsigned NOT NULL,
   `side` int(1) unsigned NOT NULL DEFAULT '1',
   `area` varchar(255) NOT NULL DEFAULT '0',
-  `rate` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `area`
---
--- ORDER BY:  `id`
-
-LOCK TABLES `area` WRITE;
-/*!40000 ALTER TABLE `area` DISABLE KEYS */;
-INSERT INTO `area` VALUES (1,1,'0,0','1.05'),(2,1,'0,0;1,0;2,0;3,0;4,0;-1,0;-2,0;-3,0;-4,0','0.8,*0.5,*0.5,*0.5,*0.5,/0.5,*0.5,*0.5,*0.5'),(3,1,'0,0;1,0;-1,0;0,1;0,-1','1,0.2,0.2,0.2,0.2'),(4,1,'0,0;0,1;0,2;0,3;0,4','0.8,*0.5,*0.5,*0.5,*0.5'),(5,1,'0,0;0,1','0.95,0.25'),(6,1,'0,0;-1,1;1,1','0.9,0.3,0.3'),(7,1,'0,0','1.05'),(10,1,'0,0;1,0;2,0;3,0;4,0;-1,0;-2,0;-3,0;-4,0;0,1;1,1;2,1;3,1;4,1;-1,1;-2,1;-3,1;-4,1;0,2;1,2;2,2;3,2;4,2;-1,2;-2,2;-3,2;-4,2;0,3;1,3;2,3;3,3;4,3;-1,3;-2,3;-3,3;-4,3;0,4;1,4;2,4;3,4;4,4;-1,4;-2,4;-3,4;-4,4','1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1');
-/*!40000 ALTER TABLE `area` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `attr_extra`
