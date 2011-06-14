@@ -29,8 +29,9 @@ struct DBItemType
 	UInt32		typeId;         // 物品编号
 	std::string	name;           // 名字
 	UInt8		subClass;       // 物品类型 - 
-	UInt32		coin;           // 价格(铜)
+    UInt8       career;         // 职业
 	UInt16		reqLev;         // 物品(可装备)等级
+	UInt32		coin;           // 价格(铜)
 	UInt8		quality;        // 品质
 	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
@@ -116,7 +117,8 @@ struct DBSkillEffect
     float addmag;       // 法术伤害附加(具体值)
     std::string hp;     // HP改变 [+/-]num/num%
     float addhp;        // HP改变附加(具体值)
-    std::string absorb; // 伤害吸血系数 [+/-]num/num%
+    std::string absorb; // 伤害吸血 [+/-]num/num%
+    std::string thorn;  // 反弹 [+/-]num/num%
     std::string aura;   // 作用士气 [+/-]num/num%
     std::string atk;    // 物理攻击 [+/-]num/num%
     std::string def;    // 物理防御 [+/-]num/num%
@@ -238,13 +240,14 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(10)
+SPECIALDEF(11)
 	(
 	UInt32,		typeId,
 	std::string,name,
 	UInt8,		subClass,
-	UInt32,		coin,
+    UInt8,      career,
 	UInt16,		reqLev,
+	UInt32,		coin,
 	UInt8,		quality,
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
@@ -363,7 +366,7 @@ SPECIALDEF(10)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(22)
+SPECIALDEF(23)
     (
         UInt16, id,
         UInt8, state,
@@ -373,6 +376,7 @@ SPECIALDEF(22)
         std::string, magdam,
         float, addmag,
         std::string, absorb,
+        std::string, thorn,
         std::string, aura,
         std::string, atk,
         std::string, def,

@@ -28,9 +28,10 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     SkillEffect(UInt16 id)
         : ObjectBaseNT<UInt16>(id), state(0), immune(0), 
         damage(0), damageP(0), adddam(0), magdam(0), magdamP(0), addmag(0),
-        hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), aura(0), auraP(0), atk(0), atkP(0),
-        def(0), defP(0), magatk(0), magatkP(0), magdef(0), magdefP(0), 
-        tough(0), action(0), evade(0), critical(0), pierce(0), counter(0), magres(0) {}
+        hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),
+        aura(0), auraP(0), atk(0), atkP(0), def(0), defP(0), magatk(0),
+        magatkP(0), magdef(0), magdefP(0), tough(0), action(0), evade(0),
+        critical(0), pierce(0), counter(0), magres(0) {}
     ~SkillEffect() {}
 
     UInt8 state;
@@ -46,6 +47,8 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float addhp;
     Int16 absorb;
     float absorbP;
+    Int16 thorn;
+    float thornP;
     Int16 aura;
     float auraP;
     Int16 atk;
