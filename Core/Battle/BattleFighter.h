@@ -141,19 +141,21 @@ public:
 	inline float getMagResAdd() {return _magResAdd;}
 	inline UInt32 getMaxHPAdd() {return _maxhpAdd;}
 	inline UInt32 getActionAdd() {return _maxActionAdd;}
-	inline void setAttackAdd(float v) {_attackAdd = v;}
-	inline void setMagAttackAdd(float v) {_magAttackAdd = v;}
-	inline void setDefendAdd(float v) {_defendAdd = v;}
-	inline void setMagDefendAdd(float v) {_magDefendAdd = v;}
-	inline void setHitrateAdd(float v) {_hitrateAdd = v;}
-	inline void setEvadeAdd(float v) {_evadeAdd = v;}
-	inline void setCriticalAdd(float v) {_criticalAdd = v;}
+	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
+	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAttackAdd = v; _magAtkAdd_last = last;}
+	inline void setDefendAdd(float v, UInt16 last = 0) {_defendAdd = v; _defAdd_last = last;}
+	inline void setMagDefendAdd(float v, UInt16 last = 0) {_magDefendAdd = v; _magDefAdd_last = last;}
+	inline void setHitrateAdd(float v, UInt16 last = 0) {_hitrateAdd = v; _hitrateAdd_last = last;}
+	inline void setEvadeAdd(float v, UInt16 last = 0) {_evadeAdd = v; _evadeAdd_last = last;}
+	inline void setCriticalAdd(float v, UInt16 last = 0) {_criticalAdd = v; _criticalAdd_last = last;}
 	inline void setCriticalDmgAdd(float v) {_criticalDmgAdd = v;}
-	inline void setPierceAdd(float v) {_pierceAdd = v;}
-	inline void setCounterAdd(float v) {_counterAdd = v;}
-	inline void setMagResAdd(float v) {_magResAdd = v;}
+	inline void setPierceAdd(float v, UInt16 last = 0) {_pierceAdd = v; _pierceAdd_last = last;}
+	inline void setCounterAdd(float v, UInt16 last = 0) {_counterAdd = v; _counterAdd_last = last;}
+	inline void setMagResAdd(float v, UInt16 last = 0) {_magResAdd = v; _magResAdd_last = last;}
 	inline void setMaxHPAdd(UInt32 v) {_maxhpAdd = v;}
-	inline void setActionAdd(UInt32 v) {_maxActionAdd = v;}
+	inline void setActionAdd(UInt32 v, UInt16 last = 0) {_maxActionAdd = v; _maxActionAdd_last = last;}
+    inline void AddAura(UInt32 v) {_aura += v;}
+    inline void setToughAdd(float v, UInt16 last) {_toughAdd = v; _toughAdd_last = last;}
 
 	inline UInt32 getLostHP() { UInt32 mhp = _maxhp + _maxhpAdd; if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -197,8 +199,18 @@ public:
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
     const GData::SkillBase* getPassiveSkillAftAtk100(size_t& idx);
     const GData::SkillBase* getPassiveSkillBeAtk100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillAftEvd100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillAftRes100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillEnter100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillDead100(size_t& idx);
+
+    const GData::SkillBase* getPassiveSkillPreAtk();
     const GData::SkillBase* getPassiveSkillAftAtk();
     const GData::SkillBase* getPassiveSkillBeAtk();
+    const GData::SkillBase* getPassiveSkillAftEvd();
+    const GData::SkillBase* getPassiveSkillAftRes();
+    const GData::SkillBase* getPassiveSkillEnter();
+    const GData::SkillBase* getPassiveSkillDead();
     void releaseSkillCD(int cd);
 
 private:
@@ -211,8 +223,11 @@ private:
     float _critical, _critical_dmg, _pierce, _counter, _magres;
 	UInt32 _maxhp, _maxAction;
 	float _attackAdd, _magAttackAdd, _defendAdd, _magDefendAdd, _hitrateAdd, _evadeAdd;
-    float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd;
+    float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	UInt32 _maxhpAdd, _maxActionAdd;
+    UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
+    UInt8 _criticalAdd_last, criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
+    UInt8 _maxhpAdd_last, _maxActionAdd_last;
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
 	/* Îä½«×´Ì¬ 0-1bit:ÔöÇ¿·û
@@ -230,8 +245,19 @@ private:
     std::vector<GData::SkillItem> _passiveSkillPrvAtk100;
     std::vector<GData::SkillItem> _passiveSkillAftAtk100;
     std::vector<GData::SkillItem> _passiveSkillBeAtk100;
+    std::vector<GData::SkillItem> _passiveSkillAftEvd100;
+    std::vector<GData::SkillItem> _passiveSkillAftRes100;
+    std::vector<GData::SkillItem> _passiveSkillEnter100;
+    std::vector<GData::SkillItem> _passiveSkillDead100;
+
+    std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
     std::vector<GData::SkillItem> _passiveSkillBeAtk;
+    std::vector<GData::SkillItem> _passiveSkillAftEvd;
+    std::vector<GData::SkillItem> _passiveSkillAftRes;
+    std::vector<GData::SkillItem> _passiveSkillEnter;
+    std::vector<GData::SkillItem> _passiveSkillDead;
+
 
 public:
 	enum StatusFlag

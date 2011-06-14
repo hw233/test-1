@@ -17,6 +17,9 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_maxhp(f->getMaxHP()), _maxAction(0),
 	_attackAdd(0), _defendAdd(0), _hitrateAdd(0), _evadeAdd(0), _criticalAdd(0), _pierceAdd(0), _counterAdd(0),
 	_maxhpAdd(0), _maxActionAdd(0),
+    _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
+    _criticalAdd_last(0), criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
+    _maxhpAdd_last(0), _maxActionAdd_last(0),
 	_formEffect(NULL), _formula(bf), _flag(0)
 {
 	setFighter(f);
@@ -40,8 +43,19 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     std::vector<UInt16>& passiveSkillPrvAtk100Id = _fighter->getPassiveSkillPreAtk100();
     std::vector<UInt16>& passiveSkillAftAtk100Id = _fighter->getPassiveSkillAftAtk100();
     std::vector<UInt16>& passiveSkillBeAtk100Id = _fighter->getPassiveSkillBeAtk100();
+    std::vector<UInt16>& passiveSkillAftEvd100Id = _fighter->getPassiveSkillAftEvd100();
+    std::vector<UInt16>& passiveSkillAftRes100Id = _fighter->getPassiveSkillAftRes100();
+    std::vector<UInt16>& passiveSkillEnter100Id = _fighter->getPassiveSkillEnter100();
+    std::vector<UInt16>& passiveSkillDead100Id = _fighter->getPassiveSkillDead100();
+
+    std::vector<UInt16>& passiveSkillPreAtkId = _fighter->getPassiveSkillPreAtk();
     std::vector<UInt16>& passiveSkillAftAtkId = _fighter->getPassiveSkillAftAtk();
     std::vector<UInt16>& passiveSkillBeAtkId = _fighter->getPassiveSkillBeAtk();
+    std::vector<UInt16>& passiveSkillAftEvdId = _fighter->getPassiveSkillAftEvd();
+    std::vector<UInt16>& passiveSkillAftResId = _fighter->getPassiveSkillAftRes();
+    std::vector<UInt16>& passiveSkillEnterId = _fighter->getPassiveSkillEnter();
+    std::vector<UInt16>& passiveSkillDeadId = _fighter->getPassiveSkillDead();
+
 
     size_t idx;
     size_t cnt = passiveSkillPrvAtk100Id.size();
@@ -64,7 +78,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillAftAtk100.insert(_passiveSkillAftAtk100.end(), skillItem);
-   }
+    }
 
     cnt = passiveSkillBeAtk100Id.size();
     _passiveSkillBeAtk100.clear();
@@ -75,11 +89,68 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillBeAtk100.insert(_passiveSkillBeAtk100.end(), skillItem);
-   }
+    }
+
+    cnt = passiveSkillAftEvd100Id.size();
+    _passiveSkillAftEvd100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillAftEvd100Id[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillAftEvd100.insert(_passiveSkillAftEvd100.end(), skillItem);
+    }
+
+    cnt = passiveSkillAftRes100Id.size();
+    _passiveSkillAftRes100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillAftRes100Id[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillAftRes100.insert(_passiveSkillAftRes100.end(), skillItem);
+    }
+
+    cnt = passiveSkillEnter100Id.size();
+    _passiveSkillEnter100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillEnter100Id[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillEnter100.insert(_passiveSkillEnter100.end(), skillItem);
+    }
+
+    cnt = passiveSkillDead100Id.size();
+    _passiveSkillDead100.clear();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillDead100Id[idx]];
+        skillItem.cd = 0;
+        skillItem.rateExtent = 0;
+        _passiveSkillDead100.insert(_passiveSkillDead100.end(), skillItem);
+    }
+
+    cnt = passiveSkillPreAtkId.size();
+    _passiveSkillPreAtk.clear();
+    float rateExtent = 0;
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillPreAtkId[idx]];
+        skillItem.cd = 0;
+        rateExtent += skillItem.base->prob;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillPreAtk.insert(_passiveSkillPreAtk.end(), skillItem);
+    }
 
     cnt = passiveSkillAftAtkId.size();
     _passiveSkillAftAtk.clear();
-    float rateExtent = 0;
+    rateExtent = 0;
     for(idx = 0; idx < cnt; idx++)
     {
         GData::SkillItem skillItem;
@@ -101,6 +172,58 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob;
         skillItem.rateExtent = rateExtent;
         _passiveSkillBeAtk.insert(_passiveSkillBeAtk.end(), skillItem);
+    }
+
+    cnt = passiveSkillAftEvdId.size();
+    _passiveSkillAftEvd.clear();
+    rateExtent = 0;
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillAftEvdId[idx]];
+        skillItem.cd = 0;
+        rateExtent += skillItem.base->prob;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillAftEvd.insert(_passiveSkillAftEvd.end(), skillItem);
+    }
+
+    cnt = passiveSkillAftResId.size();
+    _passiveSkillAftRes.clear();
+    rateExtent = 0;
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillAftResId[idx]];
+        skillItem.cd = 0;
+        rateExtent += skillItem.base->prob;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillAftRes.insert(_passiveSkillAftRes.end(), skillItem);
+    }
+
+    cnt = passiveSkillEnterId.size();
+    _passiveSkillEnter.clear();
+    rateExtent = 0;
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillEnterId[idx]];
+        skillItem.cd = 0;
+        rateExtent += skillItem.base->prob;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillEnter.insert(_passiveSkillEnter.end(), skillItem);
+    }
+
+    cnt = passiveSkillDeadId.size();
+    _passiveSkillDead.clear();
+    rateExtent = 0;
+    for(idx = 0; idx < cnt; idx++)
+    {
+        GData::SkillItem skillItem;
+        skillItem.base = GData::skillManager[passiveSkillDeadId[idx]];
+        skillItem.cd = 0;
+        rateExtent += skillItem.base->prob;
+        skillItem.rateExtent = rateExtent;
+        _passiveSkillDead.insert(_passiveSkillDead.end(), skillItem);
     }
 }
 
@@ -457,6 +580,85 @@ const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk100(size_t& idx)
     return NULL;
 }
 
+const GData::SkillBase* BattleFighter::getPassiveSkillAftEvd100(size_t& idx)
+{
+    size_t cnt = _passiveSkillAftEvd100.size();
+    for(; idx < cnt; idx++)
+    {
+        if(_passiveSkillAftEvd100[idx].cd == 0)
+        {
+            _passiveSkillAftEvd100[idx].cd = _passiveSkillAftEvd100[idx].base->cd + 1;
+            return _passiveSkillAftEvd100[idx++].base;
+        }
+    }
+
+    return NULL;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillAftRes100(size_t& idx)
+{
+    size_t cnt = _passiveSkillAftRes100.size();
+    for(; idx < cnt; idx++)
+    {
+        if(_passiveSkillAftRes100[idx].cd == 0)
+        {
+            _passiveSkillAftRes100[idx].cd = _passiveSkillAftRes100[idx].base->cd + 1;
+            return _passiveSkillAftRes100[idx++].base;
+        }
+    }
+
+    return NULL;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillEnter100(size_t& idx)
+{
+    size_t cnt = _passiveSkillEnter100.size();
+    for(; idx < cnt; idx++)
+    {
+        if(_passiveSkillEnter100[idx].cd == 0)
+        {
+            _passiveSkillEnter100[idx].cd = _passiveSkillEnter100[idx].base->cd + 1;
+            return _passiveSkillEnter100[idx++].base;
+        }
+    }
+
+    return NULL;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillDead100(size_t& idx)
+{
+    size_t cnt = _passiveSkillDead100.size();
+    for(; idx < cnt; idx++)
+    {
+        if(_passiveSkillDead100[idx].cd == 0)
+        {
+            _passiveSkillDead100[idx].cd = _passiveSkillDead100[idx].base->cd + 1;
+            return _passiveSkillDead100[idx++].base;
+        }
+    }
+
+    return NULL;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillPreAtk()
+{
+    size_t cnt = _passiveSkillPreAtk.size();
+    URandom rand;
+    UInt32 rnd = rand(cnt*100*100);
+    const GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(rnd < _passiveSkillPreAtk[idx].rateExtent && _passiveSkillPreAtk[idx].cd == 0)
+        {
+            _passiveSkillPreAtk[idx].cd = _passiveSkillPreAtk[idx].base->cd + 1;
+            resSkillBase = _passiveSkillPreAtk[idx].base;
+        }
+    }
+ 
+    return resSkillBase;
+}
+
 const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk()
 {
     size_t cnt = _passiveSkillAftAtk.size();
@@ -489,6 +691,82 @@ const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk()
         {
             _passiveSkillBeAtk[idx].cd = _passiveSkillBeAtk[idx].base->cd + 1;
             resSkillBase = _passiveSkillBeAtk[idx].base;
+        }
+    }
+ 
+    return resSkillBase;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillAftEvd()
+{
+    size_t cnt = _passiveSkillAftEvd.size();
+    URandom rand;
+    UInt32 rnd = rand(cnt*100*100);
+    const GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(rnd < _passiveSkillAftEvd[idx].rateExtent && _passiveSkillAftEvd[idx].cd == 0)
+        {
+            _passiveSkillAftEvd[idx].cd = _passiveSkillAftEvd[idx].base->cd + 1;
+            resSkillBase = _passiveSkillAftEvd[idx].base;
+        }
+    }
+ 
+    return resSkillBase;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillAftRes()
+{
+    size_t cnt = _passiveSkillAftRes.size();
+    URandom rand;
+    UInt32 rnd = rand(cnt*100*100);
+    const GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(rnd < _passiveSkillAftRes[idx].rateExtent && _passiveSkillAftRes[idx].cd == 0)
+        {
+            _passiveSkillAftRes[idx].cd = _passiveSkillAftRes[idx].base->cd + 1;
+            resSkillBase = _passiveSkillAftRes[idx].base;
+        }
+    }
+ 
+    return resSkillBase;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillEnter()
+{
+    size_t cnt = _passiveSkillEnter.size();
+    URandom rand;
+    UInt32 rnd = rand(cnt*100*100);
+    const GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(rnd < _passiveSkillEnter[idx].rateExtent && _passiveSkillEnter[idx].cd == 0)
+        {
+            _passiveSkillEnter[idx].cd = _passiveSkillEnter[idx].base->cd + 1;
+            resSkillBase = _passiveSkillEnter[idx].base;
+        }
+    }
+ 
+    return resSkillBase;
+}
+
+const GData::SkillBase* BattleFighter::getPassiveSkillDead()
+{
+    size_t cnt = _passiveSkillDead.size();
+    URandom rand;
+    UInt32 rnd = rand(cnt*100*100);
+    const GData::SkillBase* resSkillBase = NULL;
+
+    for(size_t idx = 0; idx < cnt; idx++)
+    {
+        if(rnd < _passiveSkillDead[idx].rateExtent && _passiveSkillDead[idx].cd == 0)
+        {
+            _passiveSkillDead[idx].cd = _passiveSkillDead[idx].base->cd + 1;
+            resSkillBase = _passiveSkillDead[idx].base;
         }
     }
  
@@ -534,6 +812,51 @@ void BattleFighter::releaseSkillCD(int cd)
         }
     }
 
+    cnt = _passiveSkillAftEvd100.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillAftEvd100[idx].cd > 0)
+        {
+            _passiveSkillAftEvd100[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillAftRes100.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillAftRes100[idx].cd > 0)
+        {
+            _passiveSkillAftRes100[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillEnter100.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillEnter100[idx].cd > 0)
+        {
+            _passiveSkillEnter100[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillDead100.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillDead100[idx].cd > 0)
+        {
+            _passiveSkillDead100[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillPreAtk.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillPreAtk[idx].cd > 0)
+        {
+            _passiveSkillPreAtk[idx].cd -= cd;
+        }
+    }
+
     cnt = _passiveSkillAftAtk.size();
     for(idx = 0; idx < cnt; idx++)
     {
@@ -549,6 +872,42 @@ void BattleFighter::releaseSkillCD(int cd)
         if(_passiveSkillBeAtk[idx].cd > 0)
         {
             _passiveSkillBeAtk[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillAftEvd.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillAftEvd[idx].cd > 0)
+        {
+            _passiveSkillAftEvd[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillAftRes.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillAftRes[idx].cd > 0)
+        {
+            _passiveSkillAftRes[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillEnter.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillEnter[idx].cd > 0)
+        {
+            _passiveSkillEnter[idx].cd -= cd;
+        }
+    }
+
+    cnt = _passiveSkillDead.size();
+    for(idx = 0; idx < cnt; idx++)
+    {
+        if(_passiveSkillDead[idx].cd > 0)
+        {
+            _passiveSkillDead[idx].cd -= cd;
         }
     }
 }
