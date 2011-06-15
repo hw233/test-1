@@ -464,6 +464,7 @@ CREATE TABLE `skill_effect` (
   `addhp` float(10,4) NOT NULL DEFAULT '0.0000',
   `absorb` varchar(255) NOT NULL DEFAULT '',
   `thorn` varchar(255) NOT NULL DEFAULT '',
+  `inj2hp` varchar(255) NOT NULL DEFAULT '',
   `aura` varchar(255) NOT NULL DEFAULT '',
   `atk` varchar(255) NOT NULL DEFAULT '',
   `def` varchar(255) NOT NULL DEFAULT '',

@@ -112,6 +112,7 @@ public:
 	inline float getWill() { return _will; }
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return _aura; }
+	inline float getAuraMax() { return _auraMax; }
 	inline float getTough() { return _tough; }
 	inline float getAttack() {return _attack + _attackAdd;}
 	inline float getMagAttack() {return _magatk + _magAttackAdd;}
@@ -206,7 +207,7 @@ private:
 
 private:
 	GObject::Fighter * _fighter;
-	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _tough;
+	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _auraMax, _tough;
 	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
     float _critical, _critical_dmg, _pierce, _counter, _magres;
 	UInt32 _maxhp, _maxAction;

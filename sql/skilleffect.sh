@@ -21,7 +21,7 @@ function skilleffect()
         BEGIN {
             print "INSERT INTO `skill_effect` VALUES";
         } {
-            printf("(%d,%d,%d,\x27%s\x27,%f,\x27%s\x27,%f,\x27%s\x27,%f,%f,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,%f,%f,%f,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23);
+            printf("(%d,%d,%d,\x27%s\x27,%f,\x27%s\x27,%f,\x27%s\x27,%f,%f,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,%f,%f,%f,%f,%f,%f,%f)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

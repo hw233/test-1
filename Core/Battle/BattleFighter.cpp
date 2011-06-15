@@ -124,12 +124,12 @@ void BattleFighter::updateAllAttr()
 	_maxhp = _formula->calcHP(this);
 
     _aura = _formula->calcAura(this);
-    _max_aura = _formula->calcMaxAura(this);
+    _auraMax = _formula->calcMaxAura(this);
     _will = _formula->calcWill(this);
     _soul = _formula->calcSoul(this);
     _tough = _formula->calcTough(this);
-    _mag_attack = _formula->calcMagAttack(this);
-    _mag_defend = _formula->calcMagDefend(this);
+    _magatk = _formula->calcMagAttack(this);
+    _magdef = _formula->calcMagDefend(this);
     _magres = _formula->calcMagRes(this);
 
 	if((_flag & BlockBoss) == 0 && oldhp > 0 && _hp > 0 && oldhp < _maxhp)
@@ -228,7 +228,7 @@ float BattleFighter::calcAttack( bool& isCritical )
 float BattleFighter::calcMagAttack(bool& isCritical)
 {
     isCritical = uRand(10000) < _critical * 100;
-    float magatk = _mag_attack + _magAttackAdd;
+    float magatk = _magatk + _magAttackAdd;
 
     if(isCritical)
     {
@@ -243,7 +243,7 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     if(!skill)
         return 0;
 
-    return (_mag_attack + _magAttackAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp;
+    return (_magatk + _magAttackAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp;
 }
 
 bool BattleFighter::calcHit( BattleFighter * defender )
