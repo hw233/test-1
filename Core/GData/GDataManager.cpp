@@ -709,7 +709,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCittaEffect cf;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `skill`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `practice` FROM `citta_effect`", cf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `skills`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres` FROM `citta_effect`", cf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -722,12 +722,12 @@ namespace GData
             SetValOrPercent(cft->soul, cft->soulP, cf.soul);
             SetValOrPercent(cft->aura, cft->auraP, cf.aura);
             SetValOrPercent(cft->auraMax, cft->auraMaxP, cf.auraMax);
-            // SetValOrPercent(cft->tough, cft->toughP, cf.tough);
             SetValOrPercent(cft->attack, cft->attackP, cf.attack);
             SetValOrPercent(cft->mag_attack, cft->mag_attackP, cf.mag_attack);
             SetValOrPercent(cft->defend, cft->defendP, cf.defend);
             SetValOrPercent(cft->mag_defend, cft->mag_defendP, cf.mag_defend);
             SetValOrPercent(cft->hp, cft->hpP, cf.hp);
+            cft->tough = cf.tough;
             cft->action = cf.action;
             cft->hitrate = cf.hitrate;
             cft->evade = cf.evade;
@@ -736,7 +736,6 @@ namespace GData
             cft->pierce = cf.pierce;
             cft->counter = cf.counter;
             cft->magres = cf.magres;
-            cft->practice = cf.practice;
 
             StringTokenizer tk(cf.skill, ",");
             if (tk.count())

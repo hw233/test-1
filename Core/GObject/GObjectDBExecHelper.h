@@ -163,7 +163,7 @@ struct DBFighter
     float critical_dmg;         // 暴击伤害
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击
-    float magres;              // 法术抵抗
+    float magres;               // 法术抵抗
     std::string extraPos;
 };
 
@@ -185,7 +185,7 @@ struct DBPracticeData
     UInt16 slot;        // 修炼位置
     UInt8 type;         // 修炼类型 0-8小时, 1-24小时
     UInt8 pricetype;    // 付费方式 0-金币， 1-银币
-    UInt16 price;        // 所付的钱
+    UInt16 price;       // 所付的钱
     UInt32 traintime;   // 修炼分钟数
     UInt32 checktime;   // 修炼分钟数
     UInt8 prot;         // 是否申请保护 0-没有任何保护, 1-护法弟子保护, 2-仙府禁法

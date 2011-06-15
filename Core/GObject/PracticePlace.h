@@ -42,13 +42,13 @@ struct PracticeData : public GData::ObjectBaseNT<UInt64>
     UInt32 cdend;       // 下次可修炼时间
     UInt32 winnerid;    // 挑战胜利者ID
 
-    Mutex lock;
+    //Mutex lock;
     std::list<UInt32> fighters;
 };
 
 struct PlaceData
 {
-    PlaceData()
+    PlaceData() : used(0)
     {
         bzero(&place, sizeof(place));
     }
@@ -56,8 +56,10 @@ struct PlaceData
 
     PPlace place;
     std::vector<PracticeData*> data;
+    size_t used;
 };
 
+// XXX: 修炼指令必须是世界线程执行
 class PracticePlace : public Singleton<PracticePlace>
 {
 public:
@@ -66,16 +68,20 @@ public:
 
     // 付费
     bool pay(Player* pl, UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
+    // 停止修炼
+    bool stop(Player* pl);
 
-    // 修炼
+    // 将修炼
     bool sitdown(Player* pl, UInt32* fgtid, size_t size);
-    // 退出修炼
+    // 将退出修炼
     bool standup(Player* pl, UInt32* fgtid, size_t size);
+    // 更新修炼将
+    void updateFighters(std::list<UInt32>& fgts, UInt64 id);
 
     // 取得修炼点信息
     void getPlaceInfo(Player* pl, UInt8 place);
     // 取得某一修为挂机点位置
-    void getList(Player* pl, UInt8 place, UInt16 pageno);
+    void getList(Player* pl, UInt8 place, UInt16 pageno, UInt16 pagenum);
 
     // 更换护法弟子
     bool replaceProtecter(Player* pl, UInt8 place, UInt64 protid);
@@ -83,12 +89,14 @@ public:
     bool setCharges(Player* pl, UInt8 place, UInt16 money);
     // 设置保护收费
     bool setProtCharges(Player* pl, UInt8 place, UInt16 money);
+    // 将所有修炼人放入无主之地
+    void moveAllToMax(UInt8 place);
 
     // 挑战
     bool doChallenge(Player* pl, UInt8 place, UInt16 idx);
 
     // 增加修练空间
-    bool addSlot(Player* pl, UInt8 place, UInt8 num);
+    bool addSlot(Player* pl, UInt8 place);
 
     // 增加一个修炼点
     bool addPlace(PPlace& place, UInt8 idx);

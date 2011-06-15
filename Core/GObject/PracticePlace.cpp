@@ -21,16 +21,16 @@ namespace GObject
         if (!pl || !time || !place || place > PPLACE_MAX || slot > m_places[place-1].place.maxslot)
             return false;
 
+        if (pl->isPracticing())
+        {
+            // TODO: msg
+            return false;
+        }
+
         if (place != PPLACE_MAX)
         {
             if (!m_places[place-1].data.size()) // XXX: no configuration
                 return false;
-
-            if (pl->isPracticing())
-            {
-                // TODO: msg
-                return false;
-            }
         }
 
         PracticeData* p = getPracticeData(pl);
@@ -39,10 +39,33 @@ namespace GObject
             return false;
         }
 
-        if (m_places[place-1].data[slot] && m_places[place-1].data[slot]->winnerid != pl->getId())
+        PracticeData*& pd = m_places[place-1].data[slot];
+        if (pd)
         {
-            return false;
+            if (pd->winnerid != pl->getId())
+            {
+                return false;
+            }
+
+            Player* def = globalPlayers[pd->getId()];
+            if (!def)
+            {
+                return false;
+            }
+
+            UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->price;
+            if (pd->pricetype == 0)
+                def->getGold(money);
+            else
+                def->getTael(money);
+
+            pd->winnerid = 0;
+            m_places[PPLACE_MAX-1].data.push_back(pd);
+            pd = 0;
+            --m_places[place-1].used;
+            ++m_places[PPLACE_MAX-1].used;
         }
+        ++m_places[place-1].used;
 
         UInt32 price = 0;
         ConsumeInfo ci(Practice,0,0);
@@ -101,6 +124,33 @@ namespace GObject
         return false;
     }
 
+    bool PracticePlace::stop(Player* pl)
+    {
+        if (!pl)
+            return false;
+
+        if (!pl->isPracticing())
+            return false;
+
+        UInt8 place = pl->getPracticePlace();
+        UInt16 slot = pl->getPracticeSlot();
+
+        if (slot >= m_places[place-1].data.size())
+            return false;
+        PracticeData*& pd = m_places[place-1].data[slot];
+        if (pd)
+        {
+            pd->winnerid = 0;
+            pd->fighters.clear();
+
+            --m_places[place-1].used;
+            pd = 0;
+        }
+        if (place != PPLACE_MAX)
+            pl->setPracticingPlaceSlot(PPLACE_MAX<<16);
+        return true;
+    }
+
     bool PracticePlace::sitdown(Player* pl, UInt32* fgtid, size_t size)
     {
         if (!pl || !fgtid || !size)
@@ -116,29 +166,19 @@ namespace GObject
         if (data->fighters.size() > 5)
             return false;
 
-        data->lock.lock();
+        //data->lock.lock();
         for (size_t i = 0; i < size && i < 5; ++i)
         {
             if (!isSitdownYet(data, fgtid[i]))
             {
                 if (pl->findFighter(fgtid[i]))
+                {
                     data->fighters.push_back(fgtid[i]);
+                    updateFighters(data->fighters, pl->getId());
+                }
             }
         }
-
-        size_t cnt = 0;
-        size_t nfgt = data->fighters.size();
-        std::ostringstream fighters;
-        for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
-        {
-            fighters << *i;
-            if (cnt++ < nfgt - 1)
-                fighters << ",";
-        }
-        data->lock.unlock();
-
-        DB().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %"I64_FMT"u",
-                fighters.str().c_str(), pl->getId());
+        //data->lock.unlock();
 
         // TODO: notify client
 
@@ -154,23 +194,54 @@ namespace GObject
         if (!data)
             return false;
 
-        data->lock.lock();
+        //data->lock.lock();
         for (size_t i = 0; i < size; ++i)
         {
-            data->fighters.remove(fgtid[i]);
-            // TODO: notify client
+            if (isSitdownYet(data, fgtid[i]))
+            {
+                data->fighters.remove(fgtid[i]);
+                updateFighters(data->fighters, pl->getId());
+            }
         }
-        data->lock.unlock();
+        //data->lock.unlock();
 
+        // TODO: notify client
         return true;
+    }
+
+    void PracticePlace::updateFighters(std::list<UInt32>& fgts, UInt64 id)
+    {
+        size_t cnt = 0;
+        size_t nfgt = fgts.size();
+        std::ostringstream fighters;
+        for (auto i = fgts.begin(), e = fgts.end(); i != e; ++i)
+        {
+            fighters << *i;
+            if (cnt++ < nfgt - 1)
+                fighters << ",";
+        }
+
+        DB().PushUpdateData("UPDATE `practice_data` SET `fighters` = '%s' WHERE `id` = %"I64_FMT"u",
+                fighters.str().c_str(), id);
     }
 
     void PracticePlace::getPlaceInfo(Player* pl, UInt8 place)
     {
     }
 
-    void PracticePlace::getList(Player* pl, UInt8 place, UInt16 pageno)
+    void PracticePlace::getList(Player* pl, UInt8 place, UInt16 pageno, UInt16 pagenum)
     {
+        if (!pl || !place || !pageno || !pagenum || place > PPLACE_MAX)
+            return;
+
+        PlaceData& pd = m_places[place-1];
+        auto i = pd.data.begin();
+        std::advance(i, pageno*pagenum);
+
+        for (auto e = pd.data.end(); i != e; ++i)
+        {
+            // TODO: send *i to client
+        }
     }
 
     bool PracticePlace::replaceProtecter(Player* pl, UInt8 place, UInt64 protid)
@@ -276,27 +347,43 @@ namespace GObject
 
         if (bsim.getWinner() == 1)
         {
-            {
-                ScopedLocker<Mutex> lock1(m_lock[PPLACE_MAX-1]);
-                ScopedLocker<Mutex> lock2(m_lock[place-1]);
-
-                PracticeData*& pd = m_places[place-1].data[idx];
-                UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->price;
-                if (pd->pricetype == 0)
-                    def->getGold(money);
-                else
-                    def->useTael(money);
-
-                m_places[PPLACE_MAX-1].data.push_back(pd);
-                pd = 0;
-            }
+            pd->winnerid = pl->getId();
         }
 
         return true;
     }
 
-    bool PracticePlace::addSlot(Player* pl, UInt8 place, UInt8 num)
+    bool PracticePlace::addSlot(Player* pl, UInt8 place)
     {
+        if (!pl || !place)
+            return false;
+        if (place > PPLACE_MAX)
+            return false;
+        PlaceData& pd = m_places[place-1];
+        if (pd.place.ownerid != pl->getId())
+            return false;
+
+        const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
+        if (!golds.size() || pd.place.openslot >= golds.size())
+            return false;
+        UInt32 price = golds[pd.place.openslot]; 
+        if (pl->getGold() < price)
+        {
+            pl->sendMsgCode(0, 2008);
+            return false;
+        }
+        ConsumeInfo ci(AddPracticeSlot,0,0);
+        pl->useGold(price, &ci);
+
+        if (pd.data.size() >= pd.place.maxslot ||
+                pd.data.size() + 1 > pd.place.maxslot)
+            return false;
+        ++pd.place.maxslot;
+        ++pd.place.openslot;
+        pd.data.resize(pd.place.maxslot);
+
+        // TODO: notify client
+
         return true;
     }
 
@@ -314,7 +401,6 @@ namespace GObject
     {
         if (!pl || !pd)
             return false;
-        ScopedLocker<Mutex> lock(m_lock[pl->getPracticePlace()-1]);
         PracticeData*& oldpd = m_pradata[pd->getId()];
         if (oldpd) delete oldpd;
         oldpd = pd;
@@ -339,7 +425,6 @@ namespace GObject
             return 0;
         if (!pl->isPracticing())
             return 0;
-        ScopedLocker<Mutex> lock(m_lock[pl->getPracticePlace()-1]);
         auto it = m_pradata.find(pl->getId());
         if (it != m_pradata.end())
             return it->second;
@@ -357,6 +442,25 @@ namespace GObject
                 return true;
         }
         return false;
+    }
+
+    void PracticePlace::moveAllToMax(UInt8 place)
+    {
+        if (!place || place > PPLACE_MAX)
+            return;
+
+        //ScopedLocker<Mutex> lock1(m_lock[place-1]);
+        //ScopedLocker<Mutex> lock2(m_lock[PPLACE_MAX-1]);
+
+        PlaceData& pd = m_places[PPLACE_MAX-1];
+        for (auto i = m_places[place-1].data.begin(), e = m_places[place-1].data.end(); i != e; ++i)
+        {
+            pd.data.push_back(*i);
+            *i = 0;
+
+            // TODO: notify client
+        }
+        return;
     }
 
 } // namespace GObject

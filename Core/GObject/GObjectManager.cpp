@@ -2276,7 +2276,7 @@ namespace GObject
             }
             else
             {
-                pl->setPracticingPlaceSlot(7 << 16 | pd.slot);
+                pl->setPracticingPlaceSlot(7 << 16);
                 practicePlace.addPractice(pl, ppd);
             }
         }

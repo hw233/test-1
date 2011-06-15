@@ -252,7 +252,7 @@ namespace GObject
 			return;
         }
 
-        data->lock.lock();
+        //data->lock.lock();
         Fighter* fgt = 0;
         for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
         {
@@ -262,16 +262,21 @@ namespace GObject
                 fgt->addPExp(fgt->getPracticeInc() * 60); 
             }
         }
-        data->lock.unlock();
+        //data->lock.unlock();
 
 		data->checktime = leftCount;
-		DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %"I64_FMT"u",
-                data->checktime, m_Player->getId());
 		if(leftCount == 0)
 		{
+            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+            practicePlace.stop(m_Player);
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
 			return;
 		}
+        else
+        {
+            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %"I64_FMT"u",
+                    data->checktime, m_Player->getId());
+        }
         return;
     }
 

@@ -42,6 +42,7 @@ DROP TABLE IF EXISTS `attr_extra`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `attr_extra` (
   `id` int(10) NOT NULL,
+  `skills` varchar(255) NOT NULL DEFAULT '',
   `strength` varchar(10) NOT NULL DEFAULT '0',
   `physique` varchar(10) NOT NULL DEFAULT '0',
   `agility` varchar(10) NOT NULL DEFAULT '0',
@@ -56,7 +57,6 @@ CREATE TABLE `attr_extra` (
   `defend` varchar(64) NOT NULL DEFAULT '0',
   `mag_defend` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
-  `skills` varchar(255) NOT NULL DEFAULT '',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -505,6 +505,7 @@ CREATE TABLE `citta_effect` (
   `mag_defend` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
   `skill` varchar(255) NOT NULL DEFAULT '0',
+  `tough` float(10,4) NOT NULL DEFAULT '0.0000',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -513,7 +514,6 @@ CREATE TABLE `citta_effect` (
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
   `magres` float(10,4) NOT NULL DEFAULT '0.0000',
-  `practice` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
