@@ -58,9 +58,9 @@ struct DBAttrExtra
     std::string auraMax;
     std::string tough;
 	std::string attack;
-	std::string mag_attack;
+	std::string magatk;
 	std::string defend;
-	std::string mag_defend;
+	std::string magdef;
 	std::string hp;
 	std::string skills;
 	float action;
@@ -164,9 +164,9 @@ struct DBCittaEffect
     std::string aura;           // 灵气 [+/-]num/num%
     std::string auraMax;        // 最大灵气 [+/-]num/num%
 	std::string attack;         // 物攻 [+/-]num/num%
-	std::string mag_attack;     // 法攻 [+/-]num/num%
+	std::string magatk;     // 法攻 [+/-]num/num%
 	std::string defend;         // 物防 [+/-]num/num%
-	std::string mag_defend;     // 法防 [+/-]num/num%
+	std::string magdef;     // 法防 [+/-]num/num%
 	std::string hp;             // HP [+/-]num/num%
     float tough;                // 坚韧
 	float action;               // 身法
@@ -281,9 +281,9 @@ SPECIALDEF(24)
     std::string, auraMax,
     std::string, tough,
 	std::string, attack,
-	std::string, mag_attack,
+	std::string, magatk,
 	std::string, defend,
-	std::string, mag_defend,
+	std::string, magdef,
 	std::string, hp,
 	std::string, skills,
 	float, action,
@@ -432,9 +432,9 @@ SPECIALDEF(24)
         std::string, aura,
         std::string, auraMax,
         std::string, attack,
-        std::string, mag_attack,
+        std::string, magatk,
         std::string, defend,
-        std::string, mag_defend,
+        std::string, magdef,
         std::string, hp,
         float, tough,
         float, action,

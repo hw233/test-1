@@ -100,7 +100,7 @@ namespace GObject
         {
             const GData::AttrExtra* attrExtra = getAttrExtra();
             if (attrExtra)
-                return attrExtra->mag_attack;
+                return attrExtra->magatk;
             return 0;
         }
 		inline UInt16 getDefend()
@@ -114,7 +114,7 @@ namespace GObject
         {
             const GData::AttrExtra* attrExtra = getAttrExtra();
             if (attrExtra)
-                return attrExtra->mag_defend;
+                return attrExtra->magdef;
             return 0;
         }
 

@@ -326,12 +326,12 @@ public:
 	inline float getExtraToughP() { checkDirty(); return _attrExtraEquip.toughP; }
 	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
-	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.mag_attack; }
-	inline float getExtraMagAttackP() { checkDirty(); return _attrExtraEquip.mag_attackP; }
+	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }
+	inline float getExtraMagAttackP() { checkDirty(); return _attrExtraEquip.magatkP; }
 	inline UInt16 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
 	inline float getExtraDefendP() { checkDirty(); return _attrExtraEquip.defendP; }
-	inline UInt16 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.mag_defend; }
-	inline float getExtraMagDefendP() { checkDirty(); return _attrExtraEquip.mag_defendP; }
+	inline UInt16 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.magdef; }
+	inline float getExtraMagDefendP() { checkDirty(); return _attrExtraEquip.magdefP; }
 	inline UInt16 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
 	inline float getExtraHPP() { checkDirty(); return _attrExtraEquip.hpP; }
 	inline float getExtraAction() { checkDirty(); return _attrExtraEquip.action; }
@@ -392,9 +392,9 @@ public:
 	inline Int16 getBaseTough() { return tough; }
 
 	inline Int16 getBaseAttack() { return attack; }
-	inline Int16 getBaseMagAttack() { return mag_attack; }
+	inline Int16 getBaseMagAttack() { return magatk; }
 	inline Int16 getBaseDefend() { return defend; }
-	inline Int16 getBaseMagDefend() { return mag_defend; }
+	inline Int16 getBaseMagDefend() { return magdef; }
 	inline float getBaseHitrate() { return hitrate; }
 
 	inline Int16 getBaseSoul() { return baseSoul; }
@@ -563,9 +563,9 @@ public:
     Int32 auraMax;  // 最大灵气
     Int32 tough;
 	Int32 attack;
-	Int32 mag_attack;
+	Int32 magatk;
 	Int32 defend;
-	Int32 mag_defend;
+	Int32 magdef;
 	Int32 maxhp;
 	UInt32 action;
     UInt16 peerless;       // 装备的无双技能

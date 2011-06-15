@@ -151,9 +151,9 @@ struct DBFighter
     Int16 auraMax;              // 最大灵气/士气
     Int16 tough;                // 坚韧
     Int16 attack;               // 物理攻击
-    Int16 mag_attack;           // 法术攻击
+    Int16 magatk;           // 法术攻击
     Int16 defend;               // 物理防御
-    Int16 mag_defend;           // 法术防御
+    Int16 magdef;           // 法术防御
     Int32 hp;                   // 最大血槽*
     UInt16 action;              // 身法/行动值
     UInt16 peerless;            // 无双技能
@@ -742,9 +742,9 @@ SPECIALDEF(33)
 	Int16, auraMax,
 	Int16, tough,
 	Int16, attack,
-	Int16, mag_attack,
+	Int16, magatk,
 	Int16, defend,
-	Int16, mag_defend,
+	Int16, magdef,
 	Int32, hp,
 	UInt16, action,
 	UInt16, peerless,
