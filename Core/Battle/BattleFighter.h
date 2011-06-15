@@ -182,18 +182,27 @@ public:
 	inline void delFlag(UInt32 f) { _flag &= ~f; }
 	inline bool hasFlag(UInt32 f) { return (_flag & f) > 0;}
 	inline UInt32 getPoisonRound() { return (_flag & PoisonRound) >> 22; }
-	inline UInt32 getStunRound() { return (_flag & Stun) >> 25; }
+	inline UInt32 getStunRound() { return (_flag & StunRound) >> 25; }
 	inline void setPoisonRound(UInt32 r) { _flag = (_flag & ~PoisonRound) + (r << 22); }
-	inline void setStunRound(UInt32 r) { _flag = (_flag & ~Stun) + (r << 25); }
-	inline UInt32 getThornLevel() { return (_flag & Thorn) >> 5; }
+	inline void setStunRound(UInt32 r) { _flag = (_flag & ~StunRound) + (r << 25); }
+	inline UInt32 getStunLevel() { return (_flag & Stun) >> 5; }
 	inline UInt32 getPoisonLevel() { return (_flag & Poison) >> 8; }
-	inline UInt32 getConfuseRound() { return (_flag & Confuse) >> 11; }
-	inline void setThornLevel(UInt32 l) { _flag = (_flag & ~Thorn) + (l << 5); }
+	inline UInt32 getConfuseLevel() { return (_flag & Confuse) >> 11; }
+	inline void setStunLevel(UInt32 l) { _flag = (_flag & ~Stun) + (l << 5); }
 	inline void setPoisonLevel(UInt32 l) { _flag = (_flag & ~Poison) + (l << 8); }
-	inline void setConfuseRound(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
-    inline UInt32 getForgetRound() { return (_flag & Forget) >> 28; }
-    inline void setForgetRound(UInt32 l) { _flag = (_flag & ~Forget) + (l << 28); }
+	inline void setConfuseLevel(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
+    inline UInt32 getConfuseRound() { return (_flag & ConfuseRound) >> 28; }
+    inline void setConfuseRound(UInt32 l) { _flag = (_flag & ~ConfuseRound) + (l << 28); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
+    inline void setImmuneLevel(UInt8 f) { _immuneLevel = f; }
+    inline void setImmuneRound(UInt8 f) { _immuneRound = f; }
+    inline UInt8 getImmuneLevel() { return _immuneLevel; }
+    inline UInt8 getImmuneRound() { return _immuneRound; }
+    inline void setForgetLevel(UInt8 f) { _forgetLevel = f; }
+    inline void setForgetRound(UInt8 f) { _forgetRound = f; }
+    inline UInt8 getForgetLevel() { return _forgetLevel; }
+    inline UInt8 getForgetRound() { return _forgetRound; }
+
 
     const GData::SkillBase* getActiveSkill(bool need_therapy = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
@@ -213,6 +222,9 @@ public:
     const GData::SkillBase* getPassiveSkillDead();
     void releaseSkillCD(int cd);
 
+    inline bool isReAlive() { return _reAlive; }
+    inline void setReAlive() { _reAlive = true; _hp = _maxhp; }
+
 private:
 	void updateBuffExtras();
 
@@ -230,6 +242,8 @@ private:
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
+    UInt8 _immuneLevel, _immuneRound;
+    UInt8 _forgetLevel, _forgetRound;
 	/* 武将状态 0-1bit:增强符
 	   2-3bit:群体增强符
 	   b4:愈战愈勇
@@ -258,6 +272,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillEnter;
     std::vector<GData::SkillItem> _passiveSkillDead;
 
+    bool _reAlive;
 
 public:
 	enum StatusFlag
@@ -265,7 +280,7 @@ public:
 		Enh1 = 0x03,
 		Enh2 = 0x0C,
 		Enh3 = 0x10,
-		Thorn = 0xE0,
+		Stun = 0xE0,
 		Poison = 0x700,
 		Confuse = 0x3800,
 		Mirrored = 0x4000,
@@ -273,8 +288,8 @@ public:
 		IsMirror = 0x10000,
 		BlockBoss = 0x200000,
         PoisonRound = 0x1C00000,
-        Stun = 0xE000000,
-        Forget = 0x70000000,
+        StunRound = 0xE000000,
+        ConfuseRound = 0x70000000,
 	};
 };
 

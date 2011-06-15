@@ -112,6 +112,23 @@ private:
         e_stMagRes,
     };
 
+    enum StateType
+    {
+        e_Poison = 6,
+        e_UnPoison = 7,
+        e_Stun = 9,
+        e_UnStun = 10,
+        e_Confuse = 11,
+        e_UnConfuse = 12,
+        e_Forget = 13,
+        e_UnForget = 14,
+        e_ImPoison = 15,
+        e_ImStun = 16,
+        e_ImConfuse = 17,
+        e_ImForget = 18,
+        e_Res = 19,
+    };
+
 private:
 	int findFirstAttacker();
 	UInt32 doAttack(int);
@@ -132,6 +149,8 @@ private:
     UInt32 doNormalAttack(BattleFighter* bf, int otherside, int target_pos);
     UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* therapy_bf = NULL);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
+    void doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, StatusChange* scList, size_t& scCount);
+    void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount);
 
 private:
 	int _id, _winner, _turns;
