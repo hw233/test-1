@@ -11,7 +11,7 @@ public:
 	{
 		Int8 x, y;
 		Int8 type;
-		float factor;
+        float factor;
 	};
 public:
 	Area(UInt8 s = 1): _side(s) {}

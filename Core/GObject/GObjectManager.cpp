@@ -231,7 +231,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
@@ -262,9 +262,9 @@ namespace GObject
 			fgt->auraMax = dbfgt.auraMax;
 			fgt->tough = dbfgt.tough;
 			fgt->attack = dbfgt.attack;
-			fgt->mag_attack = dbfgt.mag_attack;
+			fgt->magatk = dbfgt.magatk;
 			fgt->defend = dbfgt.defend;
-			fgt->mag_defend = dbfgt.mag_defend;
+			fgt->magdef = dbfgt.magdef;
 			fgt->maxhp = dbfgt.hp;
 			fgt->action = dbfgt.action;
 			fgt->peerless = dbfgt.peerless;
@@ -2276,7 +2276,7 @@ namespace GObject
             }
             else
             {
-                pl->setPracticingPlaceSlot(7 << 16 | pd.slot);
+                pl->setPracticingPlaceSlot(7 << 16);
                 practicePlace.addPractice(pl, ppd);
             }
         }

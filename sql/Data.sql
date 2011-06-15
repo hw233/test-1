@@ -29,21 +29,9 @@ CREATE TABLE `area` (
   `id` int(10) unsigned NOT NULL,
   `side` int(1) unsigned NOT NULL DEFAULT '1',
   `area` varchar(255) NOT NULL DEFAULT '0',
-  `rate` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `area`
---
--- ORDER BY:  `id`
-
-LOCK TABLES `area` WRITE;
-/*!40000 ALTER TABLE `area` DISABLE KEYS */;
-INSERT INTO `area` VALUES (1,1,'0,0','1.05'),(2,1,'0,0;1,0;2,0;3,0;4,0;-1,0;-2,0;-3,0;-4,0','0.8,*0.5,*0.5,*0.5,*0.5,/0.5,*0.5,*0.5,*0.5'),(3,1,'0,0;1,0;-1,0;0,1;0,-1','1,0.2,0.2,0.2,0.2'),(4,1,'0,0;0,1;0,2;0,3;0,4','0.8,*0.5,*0.5,*0.5,*0.5'),(5,1,'0,0;0,1','0.95,0.25'),(6,1,'0,0;-1,1;1,1','0.9,0.3,0.3'),(7,1,'0,0','1.05'),(10,1,'0,0;1,0;2,0;3,0;4,0;-1,0;-2,0;-3,0;-4,0;0,1;1,1;2,1;3,1;4,1;-1,1;-2,1;-3,1;-4,1;0,2;1,2;2,2;3,2;4,2;-1,2;-2,2;-3,2;-4,2;0,3;1,3;2,3;3,3;4,3;-1,3;-2,3;-3,3;-4,3;0,4;1,4;2,4;3,4;4,4;-1,4;-2,4;-3,4;-4,4','1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1');
-/*!40000 ALTER TABLE `area` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `attr_extra`
@@ -64,9 +52,9 @@ CREATE TABLE `attr_extra` (
   `auraMax` varchar(10) NOT NULL DEFAULT '0',
   `tough` varchar(10) NOT NULL DEFAULT '0',
   `attack` varchar(64) NOT NULL DEFAULT '0',
-  `mag_attack` varchar(64) NOT NULL DEFAULT '0',
+  `magatk` varchar(64) NOT NULL DEFAULT '0',
   `defend` varchar(64) NOT NULL DEFAULT '0',
-  `mag_defend` varchar(64) NOT NULL DEFAULT '0',
+  `magdef` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
   `skills` varchar(255) NOT NULL DEFAULT '',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -476,6 +464,7 @@ CREATE TABLE `skill_effect` (
   `addhp` float(10,4) NOT NULL DEFAULT '0.0000',
   `absorb` varchar(255) NOT NULL DEFAULT '',
   `thorn` varchar(255) NOT NULL DEFAULT '',
+  `inj2hp` varchar(255) NOT NULL DEFAULT '',
   `aura` varchar(255) NOT NULL DEFAULT '',
   `atk` varchar(255) NOT NULL DEFAULT '',
   `def` varchar(255) NOT NULL DEFAULT '',
@@ -503,6 +492,7 @@ CREATE TABLE `cittas` (
 DROP TABLE IF EXISTS `citta_effect`;
 CREATE TABLE `citta_effect` (
   `id` smallint(5) NOT NULL,
+  `skills` varchar(255) NOT NULL DEFAULT '0',
   `strength` varchar(10) NOT NULL DEFAULT '0',
   `physique` varchar(10) NOT NULL DEFAULT '0',
   `agility` varchar(10) NOT NULL DEFAULT '0',
@@ -512,11 +502,11 @@ CREATE TABLE `citta_effect` (
   `aura` varchar(10) NOT NULL DEFAULT '0',
   `auraMax` varchar(10) NOT NULL DEFAULT '0',
   `attack` varchar(64) NOT NULL DEFAULT '0',
-  `mag_attack` varchar(64) NOT NULL DEFAULT '0',
+  `magatk` varchar(64) NOT NULL DEFAULT '0',
   `defend` varchar(64) NOT NULL DEFAULT '0',
-  `mag_defend` varchar(64) NOT NULL DEFAULT '0',
+  `magdef` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
-  `skill` varchar(255) NOT NULL DEFAULT '0',
+  `tough` float(10,4) NOT NULL DEFAULT '0.0000',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -525,7 +515,6 @@ CREATE TABLE `citta_effect` (
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
   `magres` float(10,4) NOT NULL DEFAULT '0.0000',
-  `practice` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -556,9 +545,9 @@ CREATE TABLE `special_fighter_template` (
   `auraMax` int(5) NOT NULL DEFAULT '10',
   `tough` int(5) NOT NULL DEFAULT '10',
   `attack` int(5) NOT NULL DEFAULT '10',
-  `mag_attack` int(5) NOT NULL DEFAULT '10',
+  `magatk` int(5) NOT NULL DEFAULT '10',
   `defend` int(5) NOT NULL DEFAULT '10',
-  `mag_defend` int(5) NOT NULL DEFAULT '10',
+  `magdef` int(5) NOT NULL DEFAULT '10',
   `hp` int(10) NOT NULL DEFAULT '20',
   `action` int(5) NOT NULL DEFAULT '6000',
   `peerless` int(10) NOT NULL DEFAULT '20',

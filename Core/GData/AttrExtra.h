@@ -15,8 +15,8 @@ struct AttrExtra
         will(0), soul(0), aura(0), auraMax(0), tough(0),
 		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
         willP(0), soulP(0), auraP(0), auraMaxP(0), toughP(0),
-		attack(0), attackP(0), mag_attack(0), mag_attackP(0),
-        defend(0), defendP(0), mag_defend(0), mag_defendP(0),
+		attack(0), attackP(0), magatk(0), magatkP(0),
+        defend(0), defendP(0), magdef(0), magdefP(0),
 		hp(0), hpP(0), action(0), hitrate(0), evade(0),
         critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
 	{ }
@@ -44,10 +44,10 @@ struct AttrExtra
 		attackP += other.attackP;
 		defend += other.defend;
 		defendP += other.defendP;
-        mag_attack += other.mag_attack;
-        mag_attackP += other.mag_attackP;
-        mag_defend += other.mag_defend;
-        mag_defendP += other.mag_defendP;
+        magatk += other.magatk;
+        magatkP += other.magatkP;
+        magdef += other.magdef;
+        magdefP += other.magdefP;
 		hp += other.hp;
 		hpP += other.hpP;
 		action += other.action;
@@ -82,12 +82,12 @@ struct AttrExtra
         toughP = 0;
         attack = 0;
         attackP = 0;
-        mag_attack = 0;
-        mag_attackP = 0;
+        magatk = 0;
+        magatkP = 0;
         defend = 0;
         defendP = 0;
-        mag_defend = 0;
-        mag_defendP = 0;
+        magdef = 0;
+        magdefP = 0;
         hp = 0;
         hpP = 0;
         action = 0;
@@ -120,12 +120,12 @@ struct AttrExtra
 	float toughP;
 	UInt16 attack;
 	float attackP;
-	UInt16 mag_attack;
-	float mag_attackP;
+	UInt16 magatk;
+	float magatkP;
 	UInt16 defend;
 	float defendP;
-	UInt16 mag_defend;
-	float mag_defendP;
+	UInt16 magdef;
+	float magdefP;
 	UInt16 hp;
 	float hpP;
 	float action;

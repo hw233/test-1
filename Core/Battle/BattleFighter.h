@@ -60,12 +60,12 @@ public:
 	inline float getExtraToughP() { return _attrExtra.toughP; }
 	inline UInt16 getExtraAttack() { return _attrExtra.attack; }
 	inline float getExtraAttackP() { return _attrExtra.attackP; }
-	inline UInt16 getExtraMagAttack() { return _attrExtra.mag_attack; }
-	inline float getExtraMagAttackP() { return _attrExtra.mag_attackP; }
+	inline UInt16 getExtraMagAttack() { return _attrExtra.magatk; }
+	inline float getExtraMagAttackP() { return _attrExtra.magatkP; }
 	inline UInt16 getExtraDefend() { return _attrExtra.defend; }
 	inline float getExtraDefendP() { return _attrExtra.defendP; }
-	inline UInt16 getExtraMagDefend() { return _attrExtra.mag_defend; }
-	inline float getExtraMagDefendP() { return _attrExtra.mag_defendP; }
+	inline UInt16 getExtraMagDefend() { return _attrExtra.magdef; }
+	inline float getExtraMagDefendP() { return _attrExtra.magdefP; }
 	inline UInt16 getExtraHP() { return _attrExtra.hp; }
 	inline float getExtraHPP() { return _attrExtra.hpP; }
 	inline float getExtraAction() { return _attrExtra.action; }
@@ -112,11 +112,12 @@ public:
 	inline float getWill() { return _will; }
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return _aura; }
+	inline float getAuraMax() { return _auraMax; }
 	inline float getTough() { return _tough; }
 	inline float getAttack() {return _attack + _attackAdd;}
-	inline float getMagAttack() {return _mag_attack + _magAttackAdd;}
+	inline float getMagAttack() {return _magatk + _magAttackAdd;}
 	inline float getDefend() {return _defend + _defendAdd;}
-	inline float getMagDefend() {return _mag_defend + _magDefendAdd;}
+	inline float getMagDefend() {return _magdef + _magDefendAdd;}
 	inline float getHitrate() {return _hitrate + _hitrateAdd;}
 	inline float getEvade() {return _evade + _evadeAdd;}
 	inline float getCritical() {return _critical + _criticalAdd;}
@@ -230,8 +231,8 @@ private:
 
 private:
 	GObject::Fighter * _fighter;
-	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _tough, _max_aura;
-	float _attack, _mag_attack, _defend, _mag_defend, _hitrate, _evade;
+	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _auraMax, _tough;
+	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
     float _critical, _critical_dmg, _pierce, _counter, _magres;
 	UInt32 _maxhp, _maxAction;
 	float _attackAdd, _magAttackAdd, _defendAdd, _magDefendAdd, _hitrateAdd, _evadeAdd;

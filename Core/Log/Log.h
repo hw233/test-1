@@ -39,6 +39,7 @@ enum PurchaseType
 	ClanBattleRecov,
 	PurchaseBook,
     Practice,
+    AddPracticeSlot,
 };
 
 enum MoneyType
