@@ -51,9 +51,9 @@ enum ItemClass
 	Item_Other,			//其他 90~
 };
 
-inline bool IsEquipId(UInt32 id)
+inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
 {
-    return id > 25000; // XXX:
+    return id > 25000; // XXX: 只有武器需要流水号
 	// return id >= LARM_ID && id <= RARM_ID;
 }
 

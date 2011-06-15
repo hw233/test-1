@@ -174,7 +174,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBAreaDef adef;
-		if(execu->Prepare("SELECT `id`, `side`, `area`, `rate` FROM `area`", adef) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `side`, `area` FROM `area`", adef) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -201,34 +201,6 @@ namespace GData
 						ad[z].y = atoi(s.c_str() + p + 1);
 					}
 					++ z;
-				}
-			}
-			{
-				const std::string area = adef.rate;
-				StringTokenizer tokenizer(area, ",");
-				if(tokenizer.count() < ad.size())
-					continue;
-				StringTokenizer::Iterator it;
-				int z = 0;
-				for(it = tokenizer.begin(); it != tokenizer.end(); ++ it)
-				{
-					if((*it).empty())
-						continue;
-					if((*it)[0] == '/')
-					{
-						ad[z].type = 1;
-						ad[z ++].factor = static_cast<float>(atof((*it).c_str() + 1));
-					}
-					else if((*it)[0] == '*')
-					{
-						ad[z].type = 2;
-						ad[z ++].factor = static_cast<float>(atof((*it).c_str() + 1));
-					}
-					else
-					{
-						ad[z].type = 0;
-						ad[z ++].factor = static_cast<float>(atof((*it).c_str()));
-					}
 				}
 			}
 			Area& ar = areaList[adef.id];
@@ -291,7 +263,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttrExtra ae;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `skills` FROM `attr_extra`", ae) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `skills` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -306,9 +278,9 @@ namespace GData
 			SetValOrPercent(aextra->_extra.auraMax, aextra->_extra.auraMaxP, ae.auraMax);
 			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
 			SetValOrPercent(aextra->_extra.attack, aextra->_extra.attackP, ae.attack);
-			SetValOrPercent(aextra->_extra.mag_attack, aextra->_extra.mag_attackP, ae.mag_attack);
+			SetValOrPercent(aextra->_extra.magatk, aextra->_extra.magatkP, ae.magatk);
 			SetValOrPercent(aextra->_extra.defend, aextra->_extra.defendP, ae.defend);
-			SetValOrPercent(aextra->_extra.mag_defend, aextra->_extra.mag_defendP, ae.mag_defend);
+			SetValOrPercent(aextra->_extra.magdef, aextra->_extra.magdefP, ae.magdef);
 			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
 			aextra->_extra.action = ae.action;
 			aextra->_extra.hitrate = ae.hitrate;
@@ -737,7 +709,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCittaEffect cf;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `mag_attack`, `defend`, `mag_defend`, `hp`, `skill`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `practice` FROM `citta_effect`", cf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `skills`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres` FROM `citta_effect`", cf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -750,12 +722,12 @@ namespace GData
             SetValOrPercent(cft->soul, cft->soulP, cf.soul);
             SetValOrPercent(cft->aura, cft->auraP, cf.aura);
             SetValOrPercent(cft->auraMax, cft->auraMaxP, cf.auraMax);
-            // SetValOrPercent(cft->tough, cft->toughP, cf.tough);
             SetValOrPercent(cft->attack, cft->attackP, cf.attack);
-            SetValOrPercent(cft->mag_attack, cft->mag_attackP, cf.mag_attack);
+            SetValOrPercent(cft->magatk, cft->magatkP, cf.magatk);
             SetValOrPercent(cft->defend, cft->defendP, cf.defend);
-            SetValOrPercent(cft->mag_defend, cft->mag_defendP, cf.mag_defend);
+            SetValOrPercent(cft->magdef, cft->magdefP, cf.magdef);
             SetValOrPercent(cft->hp, cft->hpP, cf.hp);
+            cft->tough = cf.tough;
             cft->action = cf.action;
             cft->hitrate = cf.hitrate;
             cft->evade = cf.evade;
@@ -764,7 +736,6 @@ namespace GData
             cft->pierce = cf.pierce;
             cft->counter = cf.counter;
             cft->magres = cf.magres;
-            cft->practice = cf.practice;
 
             StringTokenizer tk(cf.skill, ",");
             if (tk.count())

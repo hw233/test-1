@@ -841,6 +841,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 		{
             // TODO: no weapon_def
 			// area = &weapon->getWeaponDef().getArea();
+            area = &GData::Area::getDefault();
 		}
 		else
 		{

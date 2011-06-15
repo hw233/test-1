@@ -1,18 +1,17 @@
 
 #!/bin/bash
 
-F=itemtemplate.txt
+F=map.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function itemtemplate()
+function map()
 {
 # 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=itemtemplate
-    sed -i /id/d $f
+    d=map
     sed -i /ID/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
@@ -20,9 +19,9 @@ function itemtemplate()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `item_template` VALUES";
+            print "INSERT INTO `map` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11);
+            printf("(%d,\x27%s\x27,%d,%d,%d)",$1,$2,$3,$4,$5);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -51,7 +50,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    itemtemplate $F
+    map $F
 else
     echo "File $F is not exists"
 fi

@@ -11,7 +11,6 @@ struct DBAreaDef
 	UInt32 id;
 	UInt8  side;
 	std::string area;
-	std::string rate;
 };
 
 //Weapon class definitions read from DB
@@ -59,9 +58,9 @@ struct DBAttrExtra
     std::string auraMax;
     std::string tough;
 	std::string attack;
-	std::string mag_attack;
+	std::string magatk;
 	std::string defend;
-	std::string mag_defend;
+	std::string magdef;
 	std::string hp;
 	std::string skills;
 	float action;
@@ -145,8 +144,9 @@ struct DBClanSkillType
 
 struct DBCitta
 {
-    UInt16 id;          // id及阶数(等级) id=id/100 lvl=id%100
+    UInt16 id;          // 类型(阶)及等级 id=id/100 lvl=id%100
     std::string name;   // 名称
+    UInt32 pexp;        // 修为消耗
     UInt16 needsoul;    // 元神需求(负重)
     UInt16 effectid;    // 效果索引
 };
@@ -154,6 +154,7 @@ struct DBCitta
 struct DBCittaEffect
 {
 	UInt16 id;
+    std::string skill;          // 带出技能(包括技能和无双技能)
 	std::string strength;       // 力量 [+/-]num/num%
 	std::string physique;       // 耐力 [+/-]num/num%
 	std::string agility;        // 敏捷 [+/-]num/num%
@@ -163,20 +164,19 @@ struct DBCittaEffect
     std::string aura;           // 灵气 [+/-]num/num%
     std::string auraMax;        // 最大灵气 [+/-]num/num%
 	std::string attack;         // 物攻 [+/-]num/num%
-	std::string mag_attack;     // 法攻 [+/-]num/num%
+	std::string magatk;     // 法攻 [+/-]num/num%
 	std::string defend;         // 物防 [+/-]num/num%
-	std::string mag_defend;     // 法防 [+/-]num/num%
+	std::string magdef;     // 法防 [+/-]num/num%
 	std::string hp;             // HP [+/-]num/num%
-    std::string skill;          // 带出技能(包括技能和无双技能)
-	float action;
-	float hitrate;
-	float evade;
-	float critical;
-	float critical_dmg;
-	float pierce;
-	float counter;
-	float magres;
-    float practice;             // 修炼速度加成
+    float tough;                // 坚韧
+	float action;               // 身法
+	float hitrate;              // 命中
+	float evade;                // 闪避
+	float critical;             // 暴击
+	float critical_dmg;         // 暴击伤害
+	float pierce;               // 击破/护甲穿透
+	float counter;              // 反击
+	float magres;               // 法术抵抗
 };
 
 // 穴道及修为
@@ -219,12 +219,11 @@ struct DBStoreItem
 namespace DB {
 
 SPECIALBEGIN(GData::DBAreaDef)
-SPECIALDEF(4)
+SPECIALDEF(3)
 	(
 	UInt32,		id,
 	UInt8,		side,
-	std::string,area,
-	std::string,rate
+	std::string,area
 	)
 SPECIALEND()
 
@@ -282,9 +281,9 @@ SPECIALDEF(24)
     std::string, auraMax,
     std::string, tough,
 	std::string, attack,
-	std::string, mag_attack,
+	std::string, magatk,
 	std::string, defend,
-	std::string, mag_defend,
+	std::string, magdef,
 	std::string, hp,
 	std::string, skills,
 	float, action,
@@ -423,6 +422,7 @@ SPECIALBEGIN(GData::DBCittaEffect)
 SPECIALDEF(24)
     (
         UInt16, id,
+        std::string, skill,
         std::string, strength,
         std::string, physique,
         std::string, agility,
@@ -432,11 +432,11 @@ SPECIALDEF(24)
         std::string, aura,
         std::string, auraMax,
         std::string, attack,
-        std::string, mag_attack,
+        std::string, magatk,
         std::string, defend,
-        std::string, mag_defend,
+        std::string, magdef,
         std::string, hp,
-        std::string, skill,
+        float, tough,
         float, action,
         float, hitrate,
         float, evade,
@@ -444,8 +444,7 @@ SPECIALDEF(24)
         float, critical_dmg,
         float, pierce,
         float, counter,
-        float, magres,
-        float, practice
+        float, magres
     )
 SPECIALEND()
 
