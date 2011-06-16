@@ -126,6 +126,7 @@ struct DBSkillEffect
     std::string magdef; // 法术防御 [+/-]num/num%
     float tough;        // 坚韧
     float action;       // 身法
+    float hitrate;      // 命中
     float evade;        // 闪避
     float critical;     // 暴击
     float pierce;       // 击破/护甲穿透
@@ -366,7 +367,7 @@ SPECIALDEF(10)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(24)
+SPECIALDEF(25)
     (
         UInt16, id,
         UInt8, state,
@@ -387,6 +388,7 @@ SPECIALDEF(24)
         float, addhp,
         float, tough,
         float, action,
+        float, hitrate,
         float, evade,
         float, pierce,
         float, critical,
