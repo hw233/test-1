@@ -1748,6 +1748,26 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
     return ret;
 }
 
+bool Fighter::upPassiveSkill(UInt16* skill, UInt8 size, bool writedb)
+{
+    if (!skill || !size)
+        return false;
+
+    const GData::SkillBase* s  = 0;
+    std::vector<const GData::SkillBase*> skills;
+    for (size_t i = 0; i < size; ++i)
+    {
+        s = GData::skillManager[skill[i]];
+        if (s && s->cond)
+        {
+            skills.push_back(s);
+        }
+    }
+    if (skills.size())
+        addSkillsFromCT(skills, writedb);
+    return true;
+}
+
 bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 {
     bool ret = false;

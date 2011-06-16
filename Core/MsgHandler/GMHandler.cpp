@@ -71,8 +71,9 @@ GMHandler::GMHandler()
 	Reg(3, "attack", &GMHandler::OnAttack);
 	Reg(3, "challenge", &GMHandler::OnChallenge);
 	Reg(3, "setwd", &GMHandler::OnsetWeekDay);
-	Reg(3, "skill", &GMHandler::OnSetSkill);
-	Reg(3, "setskill", &GMHandler::OnSetSkill);
+	Reg(3, "skill", &GMHandler::OnUpSkill);
+	Reg(3, "setskill", &GMHandler::OnUpSkill);
+	Reg(3, "passkill", &GMHandler::OnUpPasSkill);
 	Reg(3, "level", &GMHandler::OnSetLevel);
 	Reg(3, "setlevel", &GMHandler::OnSetLevel);
 	Reg(3, "forge", &GMHandler::OnForge);
@@ -1402,13 +1403,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 	player->send(st);
 }
 
-static void setFighterSkillLevel(const std::pair<UInt32, GObject::Fighter *>& p, UInt8 skillLevel)
-{
-    // TODO:
-	// p.second->setSkillLevel(skillLevel);
-}
-
-void GMHandler::OnSetSkill( GObject::Player * player, std::vector<std::string>& args )
+void GMHandler::OnUpSkill( GObject::Player * player, std::vector<std::string>& args )
 {
 	if(args.empty())
 		return;
@@ -1422,28 +1417,30 @@ void GMHandler::OnSetSkill( GObject::Player * player, std::vector<std::string>& 
 			return;
 		if(skillLevel == 0 || skillLevel > 40)
 			return;
-        // TODO: 
-		// fgt->setSkillAndLevel(skillId, skillLevel - 1);
+
+        UInt16 num = fgt->getUpSkillsNum();
+        fgt->upSkill(SKILLANDLEVEL(skillId, skillLevel), num);
 	}
-	else if(args.size() > 1)
+}
+
+void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() > 2)
 	{
 		UInt32 fighterId = atoi(args[0].c_str());
-		UInt32 skillLevel = atoi(args[1].c_str());
+		UInt16 skillId = atoi(args[1].c_str());(void)skillId;
+		UInt16 skillLevel = atoi(args[2].c_str());
 		GObject::Fighter * fgt = player->findFighter(fighterId);
 		if(fgt == NULL)
 			return;
 		if(skillLevel == 0 || skillLevel > 40)
 			return;
-        // TODO:
-		// fgt->setSkillLevel(skillLevel - 1);
-	}
-	else
-	{
-		UInt32 skillLevel = atoi(args[0].c_str());
-		if(skillLevel == 0 || skillLevel > 40)
-			return;
-		using namespace std::placeholders;
-		player->foreachFighter(std::bind(setFighterSkillLevel, _1, skillLevel - 1));
+
+        UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
+        UInt16 skills[1] = {skill};
+        fgt->upPassiveSkill(skills, 1);
 	}
 }
 
