@@ -1438,10 +1438,15 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
     int src = isSkillUp(skill);
     if (src < 0)
     {
+        UInt8  max = getUpSkillsMax();
         UInt16 i = getUpSkillsNum();
-        if (i < getUpSkillsMax())
+        if (!i)
+        {
+            _skill[0] = skill;
+        }
+        else if (i < max && _skill[idx])
         { // insert
-            for (int j = getUpSkillsMax() - 1; j >= idx+1; ++j)
+            for (int j = max - 1; j >= idx+1; --j)
             {
                 _skill[j] = _skill[j-1];;
                 _skill[j-1] = 0;
@@ -1460,7 +1465,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
     {
         if (src != idx)
         {
-            if (_skill[idx])
+            //if (_skill[idx])
             { // swap
                 sendModification(0x60, _skill[idx], src, false);
 
@@ -1498,7 +1503,8 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
 
     // XXX: ? if (SKILL_ID(_skill[idx]) == SKILL_ID(skill))
     _skill[idx] = 0;
-    for (int i = idx; i < getUpSkillsMax() - 1; ++i)
+    UInt8 max = getUpSkillsMax();
+    for (int i = idx; i < max - 1; ++i)
     {
         _skill[i] = _skill[i+1];
         _skill[i+1] = 0;
@@ -1656,9 +1662,10 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
 {
     if (skills.size())
     {
+        const GData::SkillBase* s = 0;
         for (size_t i = 0; i < skills.size(); ++i)
         {
-            const GData::SkillBase* s = skills[i];
+            s = skills[i];
             if (s) {
                 if (s->cond == GData::SKILL_PEERLESS)
                     addNewPeerless(s->getId(), writedb);
@@ -1713,8 +1720,8 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
                     ret = true;
                     _passkl[idx][j] = skill;
                     sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
-                    break;
                 }
+                break;
             }
         }
 

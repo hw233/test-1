@@ -472,6 +472,7 @@ CREATE TABLE `skill_effect` (
   `magdef` varchar(255) NOT NULL DEFAULT '',
   `tough` float(10,4) NOT NULL DEFAULT '0.0000',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
+  `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
   `critical` float(10,4) NOT NULL DEFAULT '0.0000',
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
