@@ -31,9 +31,9 @@ namespace GObject
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
 
-#define SKILL_LEVEL(x)  ((x)%SKILL_LEVEL_MAX)
-#define SKILL_ID(x) ((x)/SKILL_LEVEL_MAX)
-#define SKILLANDLEVEL(s,l) ((s)*SKILL_LEVEL_MAX | (l))
+#define SKILL_LEVEL(x)  (((UInt16)(x))%SKILL_LEVEL_MAX)
+#define SKILL_ID(x) (((UInt16)(x))/SKILL_LEVEL_MAX)
+#define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX | ((UInt16)(l)))
 
 #define CITTA_LEVEL(x) ((x)%CITTA_LEVEL_MAX)
 #define CITTA_ID(x) ((x)/CITTA_LEVEL_MAX)
@@ -166,6 +166,8 @@ public:
     void setSkills(std::string& skills, bool = true);
     // 更新被动技能表
     bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
+    // 装备被动技能
+    bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
     // 更新被动技能
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
 
@@ -528,8 +530,9 @@ protected:
      * AFTATK       1       攻击后被动触发
      * AFTATKED     2       被攻击后触发
      */
-    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES];// 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES]; // 100%触发技能
+    // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
+    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
+    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];

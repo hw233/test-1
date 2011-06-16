@@ -11,16 +11,16 @@ namespace GData
 enum
 {
     /*0*/ SKILL_ACTIVE = 0,
-    /*1*/ SKILL_PREATK,
-    /*2*/ SKILL_AFTATK,
-    /*3*/ SKILL_BEATKED,
-    /*4*/ SKILL_AFTEVD,
-    /*5*/ SKILL_AFTRES,
-    /*6*/ SKILL_ENTER,
-    /*7*/ SKILL_DEAD,
-    SKILL_PASSIVES = SKILL_DEAD,
-    /*7*/ SKILL_PEERLESS,
-    SKILL_CONDMAX
+    /*1*/ SKILL_PEERLESS,
+    SKILL_PASSSTART,
+    /*2*/ SKILL_PREATK = SKILL_PASSSTART,
+    /*3*/ SKILL_AFTATK,
+    /*4*/ SKILL_BEATKED,
+    /*5*/ SKILL_AFTEVD,
+    /*6*/ SKILL_AFTRES,
+    /*7*/ SKILL_ENTER,
+    /*8*/ SKILL_DEAD,
+    SKILL_PASSIVES
 };
 
 struct SkillEffect : public ObjectBaseNT<UInt16>
@@ -28,9 +28,9 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     SkillEffect(UInt16 id)
         : ObjectBaseNT<UInt16>(id), state(0), immune(0), 
         damage(0), damageP(0), adddam(0), magdam(0), magdamP(0), addmag(0),
-        hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),
+        hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),inj2hp(0), inj2hpP(0),
         aura(0), auraP(0), atk(0), atkP(0), def(0), defP(0), magatk(0),
-        magatkP(0), magdef(0), magdefP(0), tough(0), action(0), evade(0),
+        magatkP(0), magdef(0), magdefP(0), tough(0), action(0), hitrate(0), evade(0),
         critical(0), pierce(0), counter(0), magres(0) {}
     ~SkillEffect() {}
 
@@ -49,6 +49,8 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float absorbP;
     Int16 thorn;
     float thornP;
+    Int16 inj2hp;
+    float inj2hpP;
     Int16 aura;
     float auraP;
     Int16 atk;
@@ -61,6 +63,7 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float magdefP;
     float tough;
     float action;
+    float hitrate;
     float evade;
     float critical;
     float pierce;
