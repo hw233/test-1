@@ -64,6 +64,9 @@ private:
 	void OnUpSkill(GObject::Player *, std::vector<std::string>&);
 	void OnSetLevel(GObject::Player *, std::vector<std::string>&);
     void OnUpPasSkill(GObject::Player * player, std::vector<std::string>& args);
+    void OnOffPasSkill(GObject::Player * player, std::vector<std::string>& args);
+    void OnUpPeerless(GObject::Player * player, std::vector<std::string>& args);
+    void OnOffPeerless(GObject::Player * player, std::vector<std::string>& args);
 	void OnAttack(GObject::Player *, std::vector<std::string>&);
 	void OnSetBosslevel(GObject::Player * player, std::vector<std::string>& args);
 	void OnClanBox(GObject::Player * player, std::vector<std::string>&);

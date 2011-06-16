@@ -73,7 +73,10 @@ GMHandler::GMHandler()
 	Reg(3, "setwd", &GMHandler::OnsetWeekDay);
 	Reg(3, "skill", &GMHandler::OnUpSkill);
 	Reg(3, "setskill", &GMHandler::OnUpSkill);
-	Reg(3, "passkill", &GMHandler::OnUpPasSkill);
+	Reg(3, "uppasskill", &GMHandler::OnUpPasSkill);
+	Reg(3, "offpasskill", &GMHandler::OnOffPasSkill);
+	Reg(3, "uppeerless", &GMHandler::OnUpPeerless);
+	Reg(3, "offpeerless", &GMHandler::OnOffPeerless);
 	Reg(3, "level", &GMHandler::OnSetLevel);
 	Reg(3, "setlevel", &GMHandler::OnSetLevel);
 	Reg(3, "forge", &GMHandler::OnForge);
@@ -1442,6 +1445,56 @@ void GMHandler::OnUpPasSkill( GObject::Player * player, std::vector<std::string>
         UInt16 skills[1] = {skill};
         fgt->upPassiveSkill(skills, 1);
 	}
+}
+
+void GMHandler::OnOffPasSkill( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() >= 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt16 skillId = atoi(args[1].c_str());(void)skillId;
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        UInt16 skill = SKILLANDLEVEL(skillId, 0);
+        fgt->offSkill(skill);
+    }
+}
+
+void GMHandler::OnUpPeerless( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() > 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt16 skillId = atoi(args[1].c_str());(void)skillId;
+		UInt16 skillLevel = atoi(args[2].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        UInt16 skill = SKILLANDLEVEL(skillId, skillLevel);
+        fgt->setPeerless(skill);
+    }
+}
+
+void GMHandler::OnOffPeerless( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() >= 1)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->offPeerless(0);
+    }
 }
 
 void GMHandler::OnSetLevel( GObject::Player * player, std::vector<std::string>& args )
