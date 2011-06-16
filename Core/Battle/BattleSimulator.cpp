@@ -394,7 +394,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             {
 				onDamage(area_target, scList, scCount, true);
 
-                if(skill->effect->state > 0)
+                if(NULL != skill && skill->effect->state > 0)
                 {
                     float rate = skill->prob * 100;
                     if(rate < _rnd(10000))
@@ -456,7 +456,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 		}
 
         UInt32 rhp = 0;
-        if((skill->effect->absorb || skill->effect->absorbP))
+        if(NULL != skill && (skill->effect->absorb || skill->effect->absorbP))
         {
             rhp = dmg * skill->effect->absorbP + skill->effect->absorb;
         }
@@ -545,7 +545,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, bool& rState)
 {
-    if(skill->effect->state == 0)
+    if(NULL == skill || skill->effect->state == 0)
     {
         return;
     }
@@ -739,6 +739,9 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
 
 UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* therapy_bf)
 {
+    if(NULL == skill)
+        return 0;
+
     UInt8 skill_target = skill->target;
     UInt8 target_side = skill_target ? bf->getSide() : 1 - bf->getSide();
     UInt32 dmg = 0;
@@ -803,7 +806,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         return 0;
     }
 
-    if(skill->effect->damage || skill->effect->damageP || skill->effect->adddam)
+    if(skill->effect->damage || skill->effect->damageP || skill->effect->adddam
+            || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag)
     {
         UInt8 target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
 
@@ -881,6 +885,9 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
 void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, StatusChange* scList, size_t& scCount)
 {
+    if(NULL == skill)
+        return;
+
     BattleFighter* bo = NULL;
     int cnt = 0;
     UInt8 target_side = skill->target ? bf->getSide() : 1 - bf->getSide();
@@ -1159,8 +1166,8 @@ UInt32 BattleSimulator::doAttack( int pos )
         if(target_pos < 0)
             return 0;
 
-       dmg += doNormalAttack(bf, otherside, target_pos);
-       rcnt++;
+        dmg += doNormalAttack(bf, otherside, target_pos);
+        rcnt++;
     }
     else
     {

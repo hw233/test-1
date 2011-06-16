@@ -31,7 +31,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 	_fighter = f;
 
     _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];
-    UInt8 skillNum = _fighter->getSkillsNum();
+    UInt8 skillNum = _fighter->getUpSkillsNum();
     _activeSkill.clear();
     for(UInt8 skillIdx = 0; skillIdx < skillNum; skillIdx++)
     {
@@ -496,12 +496,15 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
     const GData::SkillItem* resSkillItem = NULL;
     bool has_peerless = false;
     bool has_therapy = false;
-    UInt16 peerless_cond = _peerlessSkill.base->cond == 4 ? 100 : _peerlessSkill.base->cond;
-    if(_aura >= peerless_cond)
+    if(NULL != _peerlessSkill.base)
     {
-        // peerless skill first
-        has_peerless = true;
-        resSkillItem = &_peerlessSkill;
+        UInt16 peerless_cond = _peerlessSkill.base->cond == 4 ? 100 : _peerlessSkill.base->cond;
+        if(_aura >= peerless_cond)
+        {
+            // peerless skill first
+            has_peerless = true;
+            resSkillItem = &_peerlessSkill;
+        }
     }
 
     size_t cnt = _activeSkill.size();
@@ -531,9 +534,12 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
                 _activeSkill[idx].cd = resSkillItem->base->cd + 1;
             }
         }
-   }
+    }
 
-    return resSkillItem->base;
+    if(resSkillItem)
+        return resSkillItem->base;
+
+    return NULL;
 }
 
 const GData::SkillBase* BattleFighter::getPassiveSkillPrvAtk100(size_t& idx)
@@ -644,6 +650,9 @@ const GData::SkillBase* BattleFighter::getPassiveSkillDead100(size_t& idx)
 const GData::SkillBase* BattleFighter::getPassiveSkillPreAtk()
 {
     size_t cnt = _passiveSkillPreAtk.size();
+    if(cnt < 1)
+        return NULL;
+
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
@@ -663,6 +672,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkillPreAtk()
 const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk()
 {
     size_t cnt = _passiveSkillAftAtk.size();
+    if(cnt < 1)
+        return NULL;
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
@@ -682,6 +693,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftAtk()
 const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk()
 {
     size_t cnt = _passiveSkillBeAtk.size();
+    if(cnt < 1)
+        return NULL;
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
@@ -701,6 +714,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkillBeAtk()
 const GData::SkillBase* BattleFighter::getPassiveSkillAftEvd()
 {
     size_t cnt = _passiveSkillAftEvd.size();
+    if(cnt < 1)
+        return NULL;
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
@@ -720,6 +735,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftEvd()
 const GData::SkillBase* BattleFighter::getPassiveSkillAftRes()
 {
     size_t cnt = _passiveSkillAftRes.size();
+    if(cnt < 1)
+        return NULL;
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
@@ -739,6 +756,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkillAftRes()
 const GData::SkillBase* BattleFighter::getPassiveSkillEnter()
 {
     size_t cnt = _passiveSkillEnter.size();
+    if(cnt < 1)
+        return NULL;
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
@@ -758,6 +777,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkillEnter()
 const GData::SkillBase* BattleFighter::getPassiveSkillDead()
 {
     size_t cnt = _passiveSkillDead.size();
+    if(cnt < 1)
+        return NULL;
     URandom rand;
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
