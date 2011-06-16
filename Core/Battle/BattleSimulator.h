@@ -127,6 +127,7 @@ private:
         e_ImConfuse = 17,
         e_ImForget = 18,
         e_Res = 19,
+        e_ResR = 20,
     };
 
 private:
@@ -150,7 +151,7 @@ private:
     UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* therapy_bf = NULL);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
     void doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, StatusChange* scList, size_t& scCount);
-    void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount);
+    void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, bool& rState);
 
 private:
 	int _id, _winner, _turns;

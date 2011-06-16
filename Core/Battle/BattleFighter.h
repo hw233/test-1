@@ -234,7 +234,7 @@ private:
 	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _auraMax, _tough;
 	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
     float _critical, _critical_dmg, _pierce, _counter, _magres;
-	UInt32 _maxhp, _maxAction;
+	UInt32 _maxhp, _maxAction, _actionAdd2;
 	float _attackAdd, _magAttackAdd, _defendAdd, _magDefendAdd, _hitrateAdd, _evadeAdd;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	UInt32 _maxhpAdd, _maxActionAdd;
