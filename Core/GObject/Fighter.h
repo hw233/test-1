@@ -530,8 +530,9 @@ protected:
      * AFTATK       1       攻击后被动触发
      * AFTATKED     2       被攻击后触发
      */
-    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES];// 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
-    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES]; // 100%触发技能
+    // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
+    std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
+    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];

@@ -1126,9 +1126,9 @@ UInt16 Fighter::getPSkillsNum()
 UInt16 Fighter::getP100SkillsNum()
 {
     UInt16 size = 0;
-    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        size += _passkl[i-1].size(); 
+        size += _passkl[i].size(); 
     }
     return size;
 }
@@ -1136,9 +1136,9 @@ UInt16 Fighter::getP100SkillsNum()
 UInt16 Fighter::getPnSkillsNum()
 {
     UInt16 size = 0;
-    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        size += _rpasskl[i-1].size(); 
+        size += _rpasskl[i].size(); 
     }
     return size;
 }
@@ -1153,11 +1153,11 @@ void Fighter::getAllP100SkillAndLevel(Stream& st)
 {
     UInt16 size = getP100SkillsNum();
     st << size;
-    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        for (size_t j = 0; j < _passkl[i-1].size(); ++j)
+        for (size_t j = 0; j < _passkl[i].size(); ++j)
         {
-            st << _passkl[i-1][j];
+            st << _passkl[i][j];
         }
     }
 }
@@ -1166,11 +1166,11 @@ void Fighter::getAllPnSkillAndLevel(Stream& st)
 {
     UInt16 size = getPnSkillsNum();
     st << size;
-    for (size_t i = 0; i < GData::SKILL_PASSIVES; ++i)
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
-        for (size_t j = 0; j < _rpasskl[i-1].size(); ++j)
+        for (size_t j = 0; j < _rpasskl[i].size(); ++j)
         {
-            st << _rpasskl[i-1][j];
+            st << _rpasskl[i][j];
         }
     }
 }
@@ -1687,27 +1687,31 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
 // XXX: 发送时先发送100％触发技能,后发送概率触发技能
 bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 {
+    if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
+        return false;
+
     bool ret = false;
     size_t lastsize = 0;
 
-    for (size_t i = 0; i < type; ++i)
+    for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
     {
         if (p100)
-            lastsize += _passkl[i-1].size(); 
+            lastsize += _passkl[i].size(); 
         else
-            lastsize += _rpasskl[i-1].size(); 
+            lastsize += _rpasskl[i].size(); 
     }
 
+    UInt16 idx = type - GData::SKILL_PASSSTART;
     if (p100)
     { // 100%
-        for (size_t j = 0; j < _passkl[type-1].size(); ++j)
+        for (size_t j = 0; j < _passkl[idx].size(); ++j)
         {
-            if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
+            if (SKILL_ID(_passkl[idx][j]) == SKILL_ID(skill))
             {
-                if (skill != _passkl[type-1][j])
+                if (skill != _passkl[idx][j])
                 { // upgrade
                     ret = true;
-                    _passkl[type-1][j] = skill;
+                    _passkl[idx][j] = skill;
                     sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
                     break;
                 }
@@ -1717,20 +1721,20 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         if(!ret)
         {  // up
             ret = true;
-            _passkl[type-1].push_back(skill);
-            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[type-1].size()), writedb);
+            _passkl[idx].push_back(skill);
+            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[idx].size()), writedb);
         }
     }
     else
     {
-        for (size_t j = 0; j < _rpasskl[type-1].size(); ++j)
+        for (size_t j = 0; j < _rpasskl[idx].size(); ++j)
         {
-            if (SKILL_ID(_rpasskl[type-1][j]) == SKILL_ID(skill))
+            if (SKILL_ID(_rpasskl[idx][j]) == SKILL_ID(skill))
             {
-                if (skill != _rpasskl[type-1][j])
+                if (skill != _rpasskl[idx][j])
                 { // upgrade
                     ret = true;
-                    _rpasskl[type-1][j] = skill;
+                    _rpasskl[idx][j] = skill;
                     sendModification(0x33, skill, static_cast<int>(lastsize + j), writedb);
                     break;
                 }
@@ -1740,8 +1744,8 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         if (!ret)
         { // up
             ret = true;
-            _rpasskl[type-1].push_back(skill);
-            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[type-1].size()), writedb);
+            _rpasskl[idx].push_back(skill);
+            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[idx].size()), writedb);
         }
     }
 
@@ -1770,39 +1774,43 @@ bool Fighter::upPassiveSkill(UInt16* skill, UInt8 size, bool writedb)
 
 bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 {
+    if (type < GData::SKILL_PASSSTART || type >= GData::SKILL_PASSIVES)
+        return false;
+
     bool ret = false;
     size_t lastsize = 0;
 
-    for (size_t i = 0; i < type; ++i)
+    for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
     {
         if (p100)
-            lastsize += _passkl[i-1].size(); 
+            lastsize += _passkl[i].size(); 
         else
-            lastsize += _rpasskl[i-1].size(); 
+            lastsize += _rpasskl[i].size(); 
     }
 
+    UInt16 idx = type - GData::SKILL_PASSSTART;
     if (p100)
     { // 100%
-        for (size_t j = 0; j < _passkl[type-1].size(); ++j)
+        for (size_t j = 0; j < _passkl[idx].size(); ++j)
         {
-            if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
+            if (SKILL_ID(_passkl[idx][j]) == SKILL_ID(skill))
             { // off
-                std::vector<UInt16>::iterator i = _passkl[type-1].begin();
+                std::vector<UInt16>::iterator i = _passkl[idx].begin();
                 std::advance(i, j);
-                _passkl[type-1].erase(i);
+                _passkl[idx].erase(i);
                 ret = true;
             }
         }
     }
     else
     {
-        for (size_t j = 0; j < _passkl[type-1].size(); ++j)
+        for (size_t j = 0; j < _passkl[idx].size(); ++j)
         {
-            if (SKILL_ID(_passkl[type-1][j]) == SKILL_ID(skill))
+            if (SKILL_ID(_passkl[idx][j]) == SKILL_ID(skill))
             { // off
-                std::vector<UInt16>::iterator i = _rpasskl[type-1].begin();
+                std::vector<UInt16>::iterator i = _rpasskl[idx].begin();
                 std::advance(i, j);
-                _passkl[type-1].erase(i);
+                _passkl[idx].erase(i);
                 ret = true;
             }
         }
@@ -1812,13 +1820,13 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
     { // off
         if (p100)
         {
-            _passkl[type-1].push_back(skill);
-            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[type-1].size()), writedb);
+            _passkl[idx].push_back(skill);
+            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[idx].size()), writedb);
         }
         else
         {
-            _rpasskl[type-1].push_back(skill);
-            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[type-1].size()), writedb);
+            _rpasskl[idx].push_back(skill);
+            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[idx].size()), writedb);
         }
     }
 
