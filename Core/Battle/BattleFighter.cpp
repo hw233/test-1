@@ -19,9 +19,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_maxhpAdd(0), _maxActionAdd(0),
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
     _criticalAdd_last(0), criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
-    _maxhpAdd_last(0), _maxActionAdd_last(0),
-    _forgetLevel(0), _forgetRound(0),
-	_formEffect(NULL), _formula(bf), _flag(0)
+    _maxhpAdd_last(0), _maxActionAdd_last(0), _formEffect(NULL), _formula(bf),
+    _immuneLevel(0), _immuneRound(0),_forgetLevel(0), _forgetRound(0), _flag(0)
 {
 	setFighter(f);
 }

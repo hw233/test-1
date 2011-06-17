@@ -437,9 +437,9 @@ DROP TABLE IF EXISTS `skills`;
 CREATE TABLE `skills` (
   `id` smallint(5) NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
-  `target` tinyint(3) NOT NULL DEFAULT '0',
   `cond` smallint(5) NOT NULL DEFAULT '0',
   `prob` float(10,4) NOT NULL DEFAULT '0.0000',
+  `target` tinyint(3) NOT NULL DEFAULT '0',
   `area` tinyint(3) NOT NULL DEFAULT '0',
   `factor` varchar(255) NOT NULL DEFAULT '',
   `last` smallint(5) NOT NULL DEFAULT '0',
