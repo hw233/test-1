@@ -1107,7 +1107,7 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
-    Int16 skills = getUpSkillsNum();
+    Int8 skills = getUpSkillsNum();
     st << skills;
     for (int i = 0; i < skills; ++i)
     {
@@ -1304,8 +1304,8 @@ UInt32 Fighter::getTrumpId( int idx )
 void Fighter::getAllTrumps( Stream& st )
 {
     // XXX: append to armor
-    // st << getMaxTrumps();
-    for (int i = 0; i < getMaxTrumps() ; ++i)
+    // st << static_const<UInt8>(TRUMP_UPMAX);
+    for (int i = 0; i < TRUMP_UPMAX; ++i)
     {
         st << getTrumpId(i);
     }
