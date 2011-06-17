@@ -1053,6 +1053,7 @@ namespace GObject
             fgt->getAllTrumps(st);
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
+            fgt->getAllPeerlessAndLevel(st);
             fgt->getAllCittaAndLevel(st);
 
 			UInt8 c = 0;

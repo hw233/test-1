@@ -279,10 +279,6 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         break;
     case 0x31: // peerless
         break;
-    case 0x32: // 100%
-        break;
-    case 0x33: // n%
-        break;
     case 0x60:
         { // skill
             std::string str;
@@ -314,6 +310,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
                 DB().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
+        break;
+    case 0x64: // passive
         break;
 
 	case 0x21: field = "weapon"; break;
@@ -1145,13 +1143,7 @@ UInt16 Fighter::getPnSkillsNum()
 
 void Fighter::getAllPSkillAndLevel(Stream& st)
 {
-    getAllP100SkillAndLevel(st);
-    getAllPnSkillAndLevel(st);
-}
-
-void Fighter::getAllP100SkillAndLevel(Stream& st)
-{
-    UInt16 size = getP100SkillsNum();
+    UInt8 size = getPSkillsNum();
     st << size;
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
@@ -1160,12 +1152,6 @@ void Fighter::getAllP100SkillAndLevel(Stream& st)
             st << _passkl[i][j];
         }
     }
-}
-
-void Fighter::getAllPnSkillAndLevel(Stream& st)
-{
-    UInt16 size = getPnSkillsNum();
-    st << size;
     for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
     {
         for (size_t j = 0; j < _rpasskl[i].size(); ++j)
@@ -1182,17 +1168,17 @@ void Fighter::getAllSkillsAndLevel( Stream& st )
     for (int i = 0; i < skills; ++i)
     {
         if (_skills[i])
+        {
             st << _skills[i];
+        }
     }
 }
 
 void Fighter::getAllSkillAndLevel( Stream& st )
 {
     getAllUpSkillAndLevel(st);
+    getAllPSkillAndLevel(st);
     getAllSkillsAndLevel(st);
-    // TODO: order
-    getAllP100SkillAndLevel(st);
-    getAllPnSkillAndLevel(st);
 }
 
 void Fighter::getAllUpCittaAndLevel( Stream& st )
@@ -1208,12 +1194,15 @@ void Fighter::getAllUpCittaAndLevel( Stream& st )
 
 void Fighter::getAllCittasAndLevel( Stream& st )
 {
-    int cittas = getCittasNum();
+    // XXX: 只发送没有装备的
+    UInt8 cittas = getUpCittasNum();
     st << cittas;
     for (int i = 0; i < cittas; ++i)
     {
         if (_cittas[i])
+        {
             st << _cittas[i];
+        }
     }
 }
 
@@ -1221,6 +1210,17 @@ void Fighter::getAllCittaAndLevel( Stream& st )
 {
     getAllUpCittaAndLevel(st);
     getAllCittasAndLevel(st);
+}
+
+void Fighter::getAllPeerlessAndLevel( Stream& st )
+{
+    UInt8 peerlesses = getPeerlessNum();
+    st << peerlesses;
+    for (int i = 0; i < peerlesses; ++i)
+    {
+        if (_peerless[i])
+            st << _peerless[i];
+    }
 }
 
 void Fighter::offPeerless( bool writedb )
@@ -1337,11 +1337,12 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
     StringTokenizer tk(acupoints, ",");
     for (size_t i = 0; i < tk.count() && i < ACUPOINTS_MAX; ++i)
     {
-        setAcupoints(::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
+        setAcupoints(i, ::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
     }
 
 }
 
+// XXX: 穴道 id (0-14) lvl [1-3]
 bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
 {
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
@@ -1719,7 +1720,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
                 { // upgrade
                     ret = true;
                     _passkl[idx][j] = skill;
-                    sendModification(0x32, skill, static_cast<int>(lastsize + j), writedb);
+                    sendModification(0x64, skill, static_cast<int>(lastsize + j), writedb);
                 }
                 break;
             }
@@ -1729,7 +1730,7 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
         {  // up
             ret = true;
             _passkl[idx].push_back(skill);
-            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[idx].size()), writedb);
+            sendModification(0x64, skill, static_cast<int>(lastsize + _passkl[idx].size()), writedb);
         }
     }
     else
@@ -1828,12 +1829,12 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
         if (p100)
         {
             _passkl[idx].push_back(skill);
-            sendModification(0x32, skill, static_cast<int>(lastsize + _passkl[idx].size()), writedb);
+            sendModification(0x64, skill, static_cast<int>(lastsize + _passkl[idx].size()), writedb);
         }
         else
         {
             _rpasskl[idx].push_back(skill);
-            sendModification(0x33, skill, static_cast<int>(lastsize + _rpasskl[idx].size()), writedb);
+            sendModification(0x64, skill, static_cast<int>(lastsize + _rpasskl[idx].size()), writedb);
         }
     }
 
