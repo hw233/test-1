@@ -277,6 +277,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillDead;
 
     bool _reAlive;
+    UInt8 _activeSkillIdx;
 
 public:
 	enum StatusFlag

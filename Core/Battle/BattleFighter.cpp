@@ -32,6 +32,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
     _peerlessSkill.base = GData::skillManager[_fighter->getPeerlessAndLevel()];
     UInt8 skillNum = _fighter->getUpSkillsNum();
     _activeSkill.clear();
+    _activeSkillIdx = 0;
     for(UInt8 skillIdx = 0; skillIdx < skillNum; skillIdx++)
     {
         GData::SkillItem skillItem;
@@ -492,8 +493,7 @@ void BattleFighter::postInit()
 
 const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
 {
-    const GData::SkillItem* resSkillItem = NULL;
-    bool has_peerless = false;
+    GData::SkillItem* resSkillItem = NULL;
     bool has_therapy = false;
     if(NULL != _peerlessSkill.base)
     {
@@ -501,18 +501,18 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
         if(_aura >= peerless_cond)
         {
             // peerless skill first
-            has_peerless = true;
-            resSkillItem = &_peerlessSkill;
+            return _peerlessSkill.base;
         }
     }
 
     size_t cnt = _activeSkill.size();
-    for(size_t idx = 0; idx < cnt; idx++)
+    for(size_t i = 0; i < cnt; i++)
     {
+        size_t idx = (_activeSkillIdx + i) % cnt;
         if(_activeSkill[idx].cd == 0)
         {
             // therapy skill second while need therapy
-            if(need_therapy && !has_therapy && !has_peerless)
+            if(need_therapy && !has_therapy)
             {
                 if(_activeSkill[idx].base->effect->hp && _activeSkill[idx].base->effect->hpP > 0.001)
                 {
@@ -520,15 +520,18 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
                     has_therapy = true;
                     if(resSkillItem)
                     {
-                        _activeSkill[idx].cd = 0;
+                        resSkillItem->cd = 0;
                     }
                     resSkillItem = &(_activeSkill[idx]);
                     _activeSkill[idx].cd = resSkillItem->base->cd + 1;
                 }
             }
-
-            if(!resSkillItem)
+            else if(!resSkillItem)
             {
+                if(!need_therapy && _activeSkill[idx].base->effect->hp && _activeSkill[idx].base->effect->hpP > 0.001)
+                {
+                    continue;
+                }
                 resSkillItem = &(_activeSkill[idx]);
                 _activeSkill[idx].cd = resSkillItem->base->cd + 1;
             }

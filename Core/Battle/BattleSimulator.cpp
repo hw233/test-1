@@ -128,7 +128,7 @@ void BattleSimulator::start()
 					else
 						_packet << bf->getFighter()->getClassAndSex();
 					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << bf->getPortrait() << static_cast<UInt8>(bf->getFlag() & 0x03);
-					_packet << static_cast<UInt8>((bf->getFighter()->getColor() << 4) | (bf->getFighter()->getWeapon() ? /*TODO: no weapon_def static_cast<UInt8>(bf->getFighter()->getWeapon()->getWeaponDef().getId() & 0x0F)*/ 0 : static_cast<UInt8>(0)))
+					_packet << static_cast<UInt8>(bf->getFighter()->getColor())
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
 					_packet << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
@@ -184,6 +184,7 @@ void BattleSimulator::start()
 	if(act_count == 0)
 		_winner = 1;
 
+    _report = true;
 	if(_report)
 		battleReport.addReport(_id, _packet);
 }
@@ -746,7 +747,7 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
 
 void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt)
 {
-    target_side = skill->target ? bf->getSide() : 1 - bf->getSide();
+    target_side = skill->target != 1 ? bf->getSide() : 1 - bf->getSide();
 
     if(1 == skill->area)
     {
