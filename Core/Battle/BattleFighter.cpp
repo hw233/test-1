@@ -248,7 +248,7 @@ void BattleFighter::updateAllAttr()
 	_maxhp = _formula->calcHP(this);
 
     _aura = _formula->calcAura(this);
-    _auraMax = _formula->calcMaxAura(this);
+    _auraMax = _formula->calcAuraMax(this);
     _will = _formula->calcWill(this);
     _soul = _formula->calcSoul(this);
     _tough = _formula->calcTough(this);

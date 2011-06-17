@@ -787,6 +787,13 @@ namespace GObject
 			_fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
 		else
 			_fighters[fgt->getId()] = fgt;
+
+        //TODO:
+        fgt->upSkill(101, 0, true);
+        fgt->upPeerless(201);
+        UInt16 passiveSkill[] = {501, 601, 701, 801, 901, 1001, 1101, 1201};
+        fgt->upPassiveSkill(passiveSkill, sizeof(passiveSkill));
+
 		if(writedb)
 		{
 			UInt32 p = static_cast<UInt32>(fgt->getPotential() * 100);

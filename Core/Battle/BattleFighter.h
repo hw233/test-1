@@ -49,6 +49,7 @@ public:
 	inline UInt16 getExtraWill() { return _attrExtra.will; }
 	inline UInt16 getExtraSoul() { return _attrExtra.soul; }
 	inline UInt16 getExtraAura() { return _attrExtra.aura; }
+	inline UInt16 getExtraAuraMax() { return _attrExtra.auraMax; }
 	inline UInt16 getExtraTough() { return _attrExtra.tough; }
 	inline float getExtraStrengthP() { return _attrExtra.strengthP; }
 	inline float getExtraPhysiqueP() { return _attrExtra.physiqueP; }
@@ -57,6 +58,7 @@ public:
 	inline float getExtraWillP() { return _attrExtra.willP; }
 	inline float getExtraSoulP() { return _attrExtra.soulP; }
 	inline float getExtraAuraP() { return _attrExtra.auraP; }
+	inline float getExtraAuraMaxP() { return _attrExtra.auraMaxP; }
 	inline float getExtraToughP() { return _attrExtra.toughP; }
 	inline UInt16 getExtraAttack() { return _attrExtra.attack; }
 	inline float getExtraAttackP() { return _attrExtra.attackP; }
@@ -90,6 +92,7 @@ public:
 	inline Int16 getBaseWill() { return _fighter->getBaseWill(); }
 	inline Int16 getBaseSoul() { return _fighter->getBaseSoul(); }
 	inline Int16 getBaseAura() { return _fighter->getBaseAura(); }
+	inline Int16 getBaseAuraMax() { return _fighter->getBaseAuraMax(); }
 	inline Int16 getBaseTough() { return _fighter->getBaseTough(); }
 	inline Int16 getBaseAttack() {return _fighter->getBaseAttack();}
 	inline Int16 getBaseMagAttack() {return _fighter->getBaseMagAttack();}

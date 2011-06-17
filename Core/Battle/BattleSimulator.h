@@ -148,10 +148,11 @@ private:
 	void onDamage(BattleObject * bo, StatusChange * scList, size_t& scCount, bool active);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
     UInt32 doNormalAttack(BattleFighter* bf, int otherside, int target_pos);
-    UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* therapy_bf = NULL);
+    UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
-    void doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, StatusChange* scList, size_t& scCount);
+    void doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount);
     void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, bool& rState);
+    void getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt);
 
 private:
 	int _id, _winner, _turns;

@@ -41,7 +41,7 @@ public:
 	float calcWill(GObject::Fighter *);
 	float calcSoul(GObject::Fighter *);
 	float calcAura(GObject::Fighter *);
-	float calcMaxAura(GObject::Fighter *);
+	float calcAuraMax(GObject::Fighter *);
 	float calcTough(GObject::Fighter *);
 	float calcPhysique(GObject::Fighter *);
 	float calcAttack(GObject::Fighter *);
@@ -62,7 +62,7 @@ public:
 	float calcWill(Battle::BattleFighter *);
 	float calcSoul(Battle::BattleFighter *);
 	float calcAura(Battle::BattleFighter *);
-	float calcMaxAura(Battle::BattleFighter *);
+	float calcAuraMax(Battle::BattleFighter *);
 	float calcTough(Battle::BattleFighter *);
 	float calcPhysique(Battle::BattleFighter *);
 	float calcAttack(Battle::BattleFighter *);

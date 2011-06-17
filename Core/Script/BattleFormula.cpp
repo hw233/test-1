@@ -39,6 +39,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraWill", &GObject::Fighter::getExtraWill);
 	class_def<GObject::Fighter>("getExtraSoul", &GObject::Fighter::getExtraSoul);
 	class_def<GObject::Fighter>("getExtraAura", &GObject::Fighter::getExtraAura);
+	class_def<GObject::Fighter>("getExtraAuraMax", &GObject::Fighter::getExtraAuraMax);
 	class_def<GObject::Fighter>("getExtraTough", &GObject::Fighter::getExtraTough);
 	class_def<GObject::Fighter>("getExtraStrengthPercent", &GObject::Fighter::getExtraStrengthP);
 	class_def<GObject::Fighter>("getExtraPhysiquePercent", &GObject::Fighter::getExtraPhysiqueP);
@@ -47,6 +48,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraWillPercent", &GObject::Fighter::getExtraWillP);
 	class_def<GObject::Fighter>("getExtraSoulPercent", &GObject::Fighter::getExtraSoulP);
 	class_def<GObject::Fighter>("getExtraAuraPercent", &GObject::Fighter::getExtraAuraP);
+	class_def<GObject::Fighter>("getExtraAuraMaxPercent", &GObject::Fighter::getExtraAuraMaxP);
 	class_def<GObject::Fighter>("getExtraToughPercent", &GObject::Fighter::getExtraToughP);
 	class_def<GObject::Fighter>("getExtraAttack", &GObject::Fighter::getExtraAttack);
 	class_def<GObject::Fighter>("getExtraAttackPercent", &GObject::Fighter::getExtraAttackP);
@@ -77,6 +79,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getBaseWill", &GObject::Fighter::getBaseWill);
 	class_def<GObject::Fighter>("getBaseSoul", &GObject::Fighter::getBaseSoul);
 	class_def<GObject::Fighter>("getBaseAura", &GObject::Fighter::getBaseAura);
+	class_def<GObject::Fighter>("getBaseAuraMax", &GObject::Fighter::getBaseAuraMax);
 	class_def<GObject::Fighter>("getBaseTough", &GObject::Fighter::getBaseTough);
 	class_def<GObject::Fighter>("getBaseAttack", &GObject::Fighter::getBaseAttack);
 	class_def<GObject::Fighter>("getBaseMagAttack", &GObject::Fighter::getBaseMagAttack);
@@ -108,6 +111,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraWill", &Battle::BattleFighter::getExtraWill);
 	class_def<Battle::BattleFighter>("getExtraSoul", &Battle::BattleFighter::getExtraSoul);
 	class_def<Battle::BattleFighter>("getExtraAura", &Battle::BattleFighter::getExtraAura);
+	class_def<Battle::BattleFighter>("getExtraAuraMax", &Battle::BattleFighter::getExtraAuraMax);
 	class_def<Battle::BattleFighter>("getExtraTough", &Battle::BattleFighter::getExtraTough);
 	class_def<Battle::BattleFighter>("getExtraStrengthPercent", &Battle::BattleFighter::getExtraStrengthP);
 	class_def<Battle::BattleFighter>("getExtraPhysiquePercent", &Battle::BattleFighter::getExtraPhysiqueP);
@@ -116,6 +120,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraWillPercent", &Battle::BattleFighter::getExtraWillP);
 	class_def<Battle::BattleFighter>("getExtraSoulPercent", &Battle::BattleFighter::getExtraSoulP);
 	class_def<Battle::BattleFighter>("getExtraAuraPercent", &Battle::BattleFighter::getExtraAuraP);
+	class_def<Battle::BattleFighter>("getExtraAuraMaxPercent", &Battle::BattleFighter::getExtraAuraMaxP);
 	class_def<Battle::BattleFighter>("getExtraToughPercent", &Battle::BattleFighter::getExtraToughP);
 	class_def<Battle::BattleFighter>("getExtraAttack", &Battle::BattleFighter::getExtraAttack);
 	class_def<Battle::BattleFighter>("getExtraAttackPercent", &Battle::BattleFighter::getExtraAttackP);
@@ -146,6 +151,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getBaseWill", &Battle::BattleFighter::getBaseWill);
 	class_def<Battle::BattleFighter>("getBaseSoul", &Battle::BattleFighter::getBaseSoul);
 	class_def<Battle::BattleFighter>("getBaseAura", &Battle::BattleFighter::getBaseAura);
+	class_def<Battle::BattleFighter>("getBaseAuraMax", &Battle::BattleFighter::getBaseAuraMax);
 	class_def<Battle::BattleFighter>("getBaseTough", &Battle::BattleFighter::getBaseTough);
 	class_def<Battle::BattleFighter>("getBaseAttack", &Battle::BattleFighter::getBaseAttack);
 	class_def<Battle::BattleFighter>("getBaseMagAttack", &Battle::BattleFighter::getBaseMagAttack);
@@ -197,9 +203,9 @@ float BattleFormula::calcAura( GObject::Fighter * fgt )
 	return call<float>("calcAura", fgt);
 }
 
-float BattleFormula::calcMaxAura( GObject::Fighter * fgt )
+float BattleFormula::calcAuraMax( GObject::Fighter * fgt )
 {
-    return call<float>("calcMaxAura", fgt);
+    return call<float>("calcAuraMax", fgt);
 }
 
 float BattleFormula::calcTough( GObject::Fighter * fgt )
@@ -312,9 +318,9 @@ float BattleFormula::calcAura( Battle::BattleFighter * fgt )
 	return call<float>("calcAura", fgt);
 }
 
-float BattleFormula::calcMaxAura( Battle::BattleFighter * fgt )
+float BattleFormula::calcAuraMax( Battle::BattleFighter * fgt )
 {
-	return call<float>("calcMaxAura", fgt);
+	return call<float>("calcAuraMax", fgt);
 }
 
 float BattleFormula::calcTough( Battle::BattleFighter * fgt )

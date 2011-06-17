@@ -35,15 +35,15 @@ function calcAura( fgt )
     return 0
   end
   local aura = fgt:getBaseAura()
-  return aura * (1 + fgt:getExtraAuraPercent()) + fgt:getExtraArua()
+  return aura * (1 + fgt:getExtraAuraPercent()) + fgt:getExtraAura()
 end
 
-function calcMaxAura( fgt )
+function calcAuraMax( fgt )
   if fgt == nil then
     return 0
   end
-  local maxAura = fgt:getBaseMaxAura()
-  return maxAura * (1 + fgt:getExtraMaxAuraPercent()) + fgt:getExtraMaxArua()
+  local maxAura = fgt:getBaseAuraMax()
+  return maxAura * (1 + fgt:getExtraAuraMaxPercent()) + fgt:getExtraAuraMax()
 end
 
 function calcStrength( fgt )
@@ -162,7 +162,7 @@ function calcMagAttack( fgt )
   end
   local cls = fgt:getClass()
   local lvl = fgt:getLevel()
-  return ((magatk + Int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
+  return ((magatk + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
 end
 
 function calcDefend( fgt )
