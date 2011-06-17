@@ -1046,8 +1046,8 @@ namespace GObject
             fgt->getAllTrumps(st);
             fgt->getAllAcupointsBits(st);
             fgt->getAllSkillAndLevel(st);
-            fgt->getAllCittaAndLevel(st);
             fgt->getAllPeerlessAndLevel(st);
+            fgt->getAllCittaAndLevel(st);
 
 			UInt8 c = 0;
 			UInt8 buffid[PLAYER_BUFF_COUNT];
