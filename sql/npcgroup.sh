@@ -12,7 +12,7 @@ function npcgroup()
 # 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
     d=npcgroup
-    sed -i /fighterId/d $f
+    sed -i /ID/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`

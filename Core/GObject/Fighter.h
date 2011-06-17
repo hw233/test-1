@@ -152,10 +152,6 @@ public:
     void getAllUpSkillAndLevel(Stream& st);
     // 取得所有被动技能
     void getAllPSkillAndLevel(Stream& st);
-    // 取得所有100%被动技能
-    void getAllP100SkillAndLevel(Stream& st);
-    // 取得所有概率被动技能
-    void getAllPnSkillAndLevel(Stream& st);
     // 取得所有学习的技能和等级
     void getAllSkillsAndLevel(Stream& st);
     // 取得装备了的和学习了的技能和等级
@@ -239,6 +235,8 @@ public:
     void getAllCittasAndLevel(Stream& st);
     // 取得装备了的和学习了的心法和等级
     void getAllCittaAndLevel(Stream& st);
+    // 取得所有学会的无双技能
+    void getAllPeerlessAndLevel(Stream& st);
 
     // 取得可装备的无双技能
     void getAllPeerless(Stream& st);
@@ -516,7 +514,7 @@ protected:
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
 
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
-    std::vector<UInt16> _skills;    // 可装备的技能
+    std::vector<UInt16> _skills;    // 可装备的技能 TODO: 如果所有技能都将是由心法带出,则数据表里不需要存这个字段
 
     UInt8 _trumpslot;               // 可装备法宝最大数
     UInt8 _cittaslot;               // 可装备心法最大数
