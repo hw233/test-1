@@ -26,7 +26,7 @@ namespace GObject
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
 #define CITTA_UPMAX 6
-#define CITTA_INIT 2 // 心法早初只能装2个,由穴道控制装备个数
+#define CITTA_INIT 2 // 心法最初只能装2个,由穴道控制装备个数
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
@@ -172,34 +172,34 @@ public:
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
 
     // 取得攻击前被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-1]; }
+    inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[GData::SKILL_AFTATK-1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
     // 取得被攻击后被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[GData::SKILL_BEATKED-1]; }
+    inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[GData::SKILL_BEATKED-GData::SKILL_PASSSTART]; }
     // 取得闪避后被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftEvd100() { return _passkl[GData::SKILL_AFTEVD-1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftEvd100() { return _passkl[GData::SKILL_AFTEVD-GData::SKILL_PASSSTART]; }
     // 取得法术抵抗后被动100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftRes100() { return _passkl[GData::SKILL_AFTRES-1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftRes100() { return _passkl[GData::SKILL_AFTRES-GData::SKILL_PASSSTART]; }
     // 取得入场时概率100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillEnter100() { return _passkl[GData::SKILL_ENTER-1]; }
+    inline std::vector<UInt16>& getPassiveSkillEnter100() { return _passkl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
     // 取得死亡后概率100%触发技能
-    inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-1]; }
+    inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
 
     // 取得攻击前被动概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-1]; }
+    inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[GData::SKILL_AFTATK-1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
     // 取得被攻击后被动概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[GData::SKILL_BEATKED-1]; }
+    inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[GData::SKILL_BEATKED-GData::SKILL_PASSSTART]; }
     // 取得闪避后被动概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftEvd() { return _rpasskl[GData::SKILL_AFTEVD-1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftEvd() { return _rpasskl[GData::SKILL_AFTEVD-GData::SKILL_PASSSTART]; }
     // 取得法术抵抗后被动概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillAftRes() { return _rpasskl[GData::SKILL_AFTRES-1]; }
+    inline std::vector<UInt16>& getPassiveSkillAftRes() { return _rpasskl[GData::SKILL_AFTRES-GData::SKILL_PASSSTART]; }
     // 取得入场时概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillEnter() { return _rpasskl[GData::SKILL_ENTER-1]; }
+    inline std::vector<UInt16>& getPassiveSkillEnter() { return _rpasskl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
     // 取得死亡后概率触发技能
-    inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-1]; }
+    inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
 
     // 取得心法带出技能的ID表
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
@@ -525,11 +525,6 @@ protected:
 
     std::vector<UInt16> _peerless;  // 可装备的无双技能
 
-    /**
-     * PREATK       0       攻击前被动触发
-     * AFTATK       1       攻击后被动触发
-     * AFTATKED     2       被攻击后触发
-     */
     // 被动触发技能, 分摊概率触发, XXX: 注意装备和删除心法或法宝时需更新
     std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
