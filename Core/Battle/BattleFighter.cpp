@@ -13,9 +13,10 @@ namespace Battle
 BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, UInt8 side, UInt8 pos):
 	BattleObject(BattleObject::Char, side, pos),
 	_strength(0), _agility(0), _physique(0), _intelligence(0),
-	_attack(0), _defend(0), _hitrate(0), _evade(0), _critical(0), _pierce(0), _counter(0),
+	_attack(0), _magatk(0), _defend(0), _magdef(0), _hitrate(0), _evade(0), _critical(0), _critical_dmg(0), _pierce(0), _counter(0), _magres(0),
 	_maxhp(f->getMaxHP()), _maxAction(0),
-	_attackAdd(0), _defendAdd(0), _hitrateAdd(0), _evadeAdd(0), _criticalAdd(0), _pierceAdd(0), _counterAdd(0),
+	_attackAdd(0), _magAttackAdd(0), _defendAdd(0), _magDefendAdd(0), _hitrateAdd(0), _evadeAdd(0), _criticalAdd(0), _criticalDmgAdd(0),
+    _pierceAdd(0), _counterAdd(0), _magResAdd(0),
 	_maxhpAdd(0), _maxActionAdd(0),
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
     _criticalAdd_last(0), criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),

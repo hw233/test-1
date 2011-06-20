@@ -1107,7 +1107,7 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
-    Int16 skills = getUpSkillsNum();
+    Int8 skills = getUpSkillsNum();
     st << skills;
     for (int i = 0; i < skills; ++i)
     {

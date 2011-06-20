@@ -1348,6 +1348,8 @@ namespace GObject
 		checkLastBattled();
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+        //TODO::bufLeft=0
+        buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);
