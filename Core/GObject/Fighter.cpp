@@ -1700,13 +1700,10 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 
     bool ret = false;
     size_t lastsize = 0;
-
-    for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
+    if (!p100)
     {
-        if (p100)
-            lastsize += _passkl[i].size(); 
-        else
-            lastsize += _rpasskl[i].size(); 
+        for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
+            lastsize += _passkl[i].size();
     }
 
     UInt16 idx = type - GData::SKILL_PASSSTART;
@@ -1788,12 +1785,10 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
     bool ret = false;
     size_t lastsize = 0;
 
-    for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
+    if (!p100)
     {
-        if (p100)
+        for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
             lastsize += _passkl[i].size(); 
-        else
-            lastsize += _rpasskl[i].size(); 
     }
 
     UInt16 idx = type - GData::SKILL_PASSSTART;
