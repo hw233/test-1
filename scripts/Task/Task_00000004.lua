@@ -1,6 +1,9 @@
 --����Ľ�������
 function Task_Accept_00000004()
 	local player = GetPlayer();
+	if player:GetLev() < 4 then
+		return false;
+	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(4) or task:HasCompletedTask(4) or task:HasSubmitedTask(4) then
 		return false;
@@ -26,6 +29,9 @@ end
 function Task_Can_Accept_00000004()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
+	if player:GetLev() < 4 then
+		return false;
+	end
 	if task:HasAcceptedTask(4) or task:HasCompletedTask(4) or task:HasSubmitedTask(4) then
 		return false;
 	end
@@ -66,20 +72,20 @@ function Task_00000004(npcId)
 		action.m_ActionID = 4
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "告诉马湘";
+		action.m_ActionMsg = "文昌阁";
 	elseif task:GetTaskSubmitNpc(4) == npcId then
 		if Task_Submit_00000004() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 4
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "告诉马湘";
+			action.m_ActionMsg = "文昌阁";
 		elseif task:HasAcceptedTask(4) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 4
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "告诉马湘";
+			action.m_ActionMsg = "文昌阁";
 		end
 	end
 	return action;
@@ -147,6 +153,7 @@ function Task_00000004_submit(itemId, itemNum)
 	end
 
 
+	player:AddExp(1111);
 	return true;
 end
 

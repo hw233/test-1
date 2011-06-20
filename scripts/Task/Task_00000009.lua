@@ -1,6 +1,9 @@
 --����Ľ�������
 function Task_Accept_00000009()
 	local player = GetPlayer();
+	if player:GetLev() < 9 then
+		return false;
+	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(9) or task:HasCompletedTask(9) or task:HasSubmitedTask(9) then
 		return false;
@@ -26,6 +29,9 @@ end
 function Task_Can_Accept_00000009()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
+	if player:GetLev() < 9 then
+		return false;
+	end
 	if task:HasAcceptedTask(9) or task:HasCompletedTask(9) or task:HasSubmitedTask(9) then
 		return false;
 	end
@@ -66,20 +72,20 @@ function Task_00000009(npcId)
 		action.m_ActionID = 9
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "去找赵燕儿";
+		action.m_ActionMsg = "事发突然";
 	elseif task:GetTaskSubmitNpc(9) == npcId then
 		if Task_Submit_00000009() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 9
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "去找赵燕儿";
+			action.m_ActionMsg = "事发突然";
 		elseif task:HasAcceptedTask(9) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 9
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "去找赵燕儿";
+			action.m_ActionMsg = "事发突然";
 		end
 	end
 	return action;
@@ -93,7 +99,7 @@ function Task_00000009_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老朽我和英琼在舍身崖才稍息了片刻，看到赵燕儿跑来，十分焦急，似乎找他师傅有急事，少侠不妨去问问他，到底是何事如此惊慌？";
+	action.m_NpcMsg = "我和父亲在舍身崖才稍息了片刻，就看到赵燕儿跑来，十分焦急，似乎找他师傅有急事，少侠不妨去问问他，到底是何事如此惊慌？";
 	action.m_ActionMsg = "嗯，我去问问。";
 	return action;
 end
@@ -147,6 +153,7 @@ function Task_00000009_submit(itemId, itemNum)
 	end
 
 
+	player:AddExp(1111);
 	return true;
 end
 

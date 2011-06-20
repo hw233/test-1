@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000003()
 	local player = GetPlayer();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 3 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000003()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 3 then
 		return false;
 	end
 	if task:HasAcceptedTask(3) or task:HasCompletedTask(3) or task:HasSubmitedTask(3) then
@@ -72,20 +72,20 @@ function Task_00000003(npcId)
 		action.m_ActionID = 3
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "找周淳";
+		action.m_ActionMsg = "周淳蒙馆";
 	elseif task:GetTaskSubmitNpc(3) == npcId then
 		if Task_Submit_00000003() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 3
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "找周淳";
+			action.m_ActionMsg = "周淳蒙馆";
 		elseif task:HasAcceptedTask(3) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 3
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "找周淳";
+			action.m_ActionMsg = "周淳蒙馆";
 		end
 	end
 	return action;
