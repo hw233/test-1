@@ -2685,6 +2685,7 @@ namespace GObject
 
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
+        return 0;
 		switch(color)
 		{
 		case 0:
