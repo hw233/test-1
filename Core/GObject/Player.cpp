@@ -810,9 +810,7 @@ namespace GObject
 			return;
 		Stream st(0x28);
 		st << static_cast<UInt16>(fgt->getId());
-        fgt->getAllUpSkillAndLevel(st);
-        // TODO: all skills and cittas
-        st << fgt->getPotential() << fgt->getLevel() << fgt->getExp();
+        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp();
 		st << Stream::eos;
 		send(st);
 		SYSMSG_SENDV(110, this, fgt->getColor(), fgt->getName().c_str());
@@ -2689,6 +2687,7 @@ namespace GObject
 
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
+        return 0;
 		switch(color)
 		{
 		case 0:

@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000002()
 	local player = GetPlayer();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 2 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000002()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 2 then
 		return false;
 	end
 	if task:HasAcceptedTask(2) or task:HasCompletedTask(2) or task:HasSubmitedTask(2) then
@@ -72,20 +72,20 @@ function Task_00000002(npcId)
 		action.m_ActionID = 2
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "杀死贼首李刚";
+		action.m_ActionMsg = "贼首李刚";
 	elseif task:GetTaskSubmitNpc(2) == npcId then
 		if Task_Submit_00000002() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 2
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "杀死贼首李刚";
+			action.m_ActionMsg = "贼首李刚";
 		elseif task:HasAcceptedTask(2) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 2
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "杀死贼首李刚";
+			action.m_ActionMsg = "贼首李刚";
 		end
 	end
 	return action;

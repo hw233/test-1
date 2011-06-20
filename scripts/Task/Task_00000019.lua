@@ -1,6 +1,9 @@
 --任务的接受条件
 function Task_Accept_00000019()
 	local player = GetPlayer();
+	if player:GetLev() < 1 then
+		return false;
+	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(19) or task:HasCompletedTask(19) or task:HasSubmitedTask(19) then
 		return false;
@@ -26,6 +29,9 @@ end
 function Task_Can_Accept_00000019()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
+	if player:GetLev() < 1 then
+		return false;
+	end
 	if task:HasAcceptedTask(19) or task:HasCompletedTask(19) or task:HasSubmitedTask(19) then
 		return false;
 	end
@@ -130,9 +136,6 @@ function Task_00000019_accept()
 	if not task:AcceptTask(19) then
 		return false;
 	end
-	RunAutoBattleAction(player,4096,0);
-	task:AddTaskStep(19);
-
 	return true;
 end
 
@@ -149,6 +152,7 @@ function Task_00000019_submit(itemId, itemNum)
 	end
 
 
+	player:AddExp(1111);
 	return true;
 end
 

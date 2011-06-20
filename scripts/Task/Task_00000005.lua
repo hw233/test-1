@@ -1,6 +1,9 @@
 --����Ľ�������
 function Task_Accept_00000005()
 	local player = GetPlayer();
+	if player:GetLev() < 5 then
+		return false;
+	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(5) or task:HasCompletedTask(5) or task:HasSubmitedTask(5) then
 		return false;
@@ -26,6 +29,9 @@ end
 function Task_Can_Accept_00000005()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
+	if player:GetLev() < 5 then
+		return false;
+	end
 	if task:HasAcceptedTask(5) or task:HasCompletedTask(5) or task:HasSubmitedTask(5) then
 		return false;
 	end
@@ -66,20 +72,20 @@ function Task_00000005(npcId)
 		action.m_ActionID = 5
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "购买书籍";
+		action.m_ActionMsg = "购买古籍";
 	elseif task:GetTaskSubmitNpc(5) == npcId then
 		if Task_Submit_00000005() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 5
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "购买书籍";
+			action.m_ActionMsg = "购买古籍";
 		elseif task:HasAcceptedTask(5) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 5
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "购买书籍";
+			action.m_ActionMsg = "购买古籍";
 		end
 	end
 	return action;
@@ -93,7 +99,7 @@ function Task_00000005_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些银两我不能收，不过教书办学也确实需要钱财……嗯，君子爱财取之有道，我这边有不少收集来的古籍，不妨就赠与少侠吧，这些银两权当作少侠的书资可好？";
+	action.m_NpcMsg = "这些银两我不能收，不过教书办学也确实需要钱财……嗯，君子爱财取之有道，我这边有不少收集来的古籍，都是我的老仆保管。少侠不妨去挑选几本古籍吧，这些银两权当作<name>你的书资可好？";
 	action.m_ActionMsg = "小声嘀咕（这些破书能值几个钱）。";
 	return action;
 end

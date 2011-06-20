@@ -1304,8 +1304,8 @@ UInt32 Fighter::getTrumpId( int idx )
 void Fighter::getAllTrumps( Stream& st )
 {
     // XXX: append to armor
-    // st << getMaxTrumps();
-    for (int i = 0; i < getMaxTrumps() ; ++i)
+    // st << static_const<UInt8>(TRUMP_UPMAX);
+    for (int i = 0; i < TRUMP_UPMAX; ++i)
     {
         st << getTrumpId(i);
     }

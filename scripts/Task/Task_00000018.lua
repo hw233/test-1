@@ -1,6 +1,9 @@
 --任务的接受条件
 function Task_Accept_00000018()
 	local player = GetPlayer();
+	if player:GetLev() < 1 then
+		return false;
+	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(18) or task:HasCompletedTask(18) or task:HasSubmitedTask(18) then
 		return false;
@@ -26,6 +29,9 @@ end
 function Task_Can_Accept_00000018()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
+	if player:GetLev() < 1 then
+		return false;
+	end
 	if task:HasAcceptedTask(18) or task:HasCompletedTask(18) or task:HasSubmitedTask(18) then
 		return false;
 	end
@@ -147,6 +153,7 @@ function Task_00000018_submit(itemId, itemNum)
 	end
 
 
+	player:AddExp(1111);
 	return true;
 end
 
