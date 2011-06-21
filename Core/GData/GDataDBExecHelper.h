@@ -146,7 +146,8 @@ struct DBClanSkillType
 
 struct DBCitta
 {
-    UInt16 id;          // 类型(阶)及等级 id=id/100 lvl=id%100
+    UInt16 id;          // ID及等级 id=id/100 lvl=id%100
+    UInt16 type;        // 阶
     std::string name;   // 名称
     UInt32 pexp;        // 修为消耗
     UInt16 needsoul;    // 元神需求(负重)
@@ -166,9 +167,9 @@ struct DBCittaEffect
     std::string aura;           // 灵气 [+/-]num/num%
     std::string auraMax;        // 最大灵气 [+/-]num/num%
 	std::string attack;         // 物攻 [+/-]num/num%
-	std::string magatk;     // 法攻 [+/-]num/num%
+	std::string magatk;         // 法攻 [+/-]num/num%
 	std::string defend;         // 物防 [+/-]num/num%
-	std::string magdef;     // 法防 [+/-]num/num%
+	std::string magdef;         // 法防 [+/-]num/num%
 	std::string hp;             // HP [+/-]num/num%
     float tough;                // 坚韧
 	float action;               // 身法
@@ -413,9 +414,10 @@ SPECIALDEF(9)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCitta)
-SPECIALDEF(4)
+SPECIALDEF(5)
     (
         UInt16, id,
+        UInt16, type,
         std::string, name,
         UInt16, needsoul,
         UInt16, effectid

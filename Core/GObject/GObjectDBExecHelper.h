@@ -151,9 +151,9 @@ struct DBFighter
     Int16 auraMax;              // 最大灵气/士气
     Int16 tough;                // 坚韧
     Int16 attack;               // 物理攻击
-    Int16 magatk;           // 法术攻击
+    Int16 magatk;               // 法术攻击
     Int16 defend;               // 物理防御
-    Int16 magdef;           // 法术防御
+    Int16 magdef;               // 法术防御
     Int32 hp;                   // 最大血槽*
     UInt16 action;              // 身法/行动值
     UInt16 peerless;            // 无双技能
@@ -235,6 +235,7 @@ struct DBFighterObj
 	float potential;        // 潜力
     float capacity;         // 资质
 	UInt8 level;            // 等级
+    UInt8 relvl;            // 转身后等级
 	UInt64 experience;      // 经验槽
     UInt64 practiceExp;     // 修炼经验槽
 	UInt32 hp;              // 血槽
@@ -832,13 +833,14 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(23)
+SPECIALDEF(24)
 	(
 	UInt32, id,
 	UInt64, playerId,
 	float, potential,
 	float, capacity,
 	UInt8, level,
+    UInt8, relvl,
 	UInt64, experience,
 	UInt64, practiceExp,
 	UInt32, hp,

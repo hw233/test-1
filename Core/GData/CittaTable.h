@@ -66,6 +66,7 @@ struct CittaBase : public ObjectBaseT<UInt16>
 
     ~CittaBase() { if (effect) delete effect; }
 
+    UInt16 type;
     UInt16 needsoul;
     const CittaEffect* effect;
 };

@@ -195,11 +195,23 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
-bool Fighter::addPExp( UInt64 e )
+bool Fighter::addPExp( Int64 e, bool writedb )
 {
-    _pexp += e;
-    if (_pexp > _pexpMax)
-        _pexp = _pexpMax;
+    if (e < 0)
+    {
+        if (_pexp <= (UInt64)-e)
+            _pexp = 0;
+        else
+            _pexp += e;
+    }
+    else
+    {
+        _pexp += e;
+        if (_pexp > _pexpMax)
+            _pexp = _pexpMax;
+    }
+
+    sendModification(6, e, writedb);
     return true;
 }
 
@@ -1354,6 +1366,8 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
             return false;
         if (pap->pra > getPExp())
             return false;
+
+        addPExp(-pap->pra, writedb);
 
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;

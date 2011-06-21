@@ -484,6 +484,7 @@ CREATE TABLE `skill_effect` (
 DROP TABLE IF EXISTS `cittas`;
 CREATE TABLE `cittas` (
   `id` smallint(5) NOT NULL,
+  `type` smallint(5) NOT NULL,
   `name` varchar(255) NOT NULL,
   `needsoul` smallint(5) NOT NULL DEFAULT '0',
   `effectid` smallint(5) NOT NULL DEFAULT '0',

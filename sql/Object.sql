@@ -508,6 +508,7 @@ CREATE TABLE `fighter` (
   `potential` float(5,2) unsigned NOT NULL DEFAULT '1.00',
   `capacity` float(5,2) unsigned NOT NULL DEFAULT '1.00',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `relvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `experience` bigint(20) unsigned NOT NULL DEFAULT '0',
   `practiceExp` bigint(20) unsigned NOT NULL DEFAULT '0',
   `hp` mediumint(5) unsigned NOT NULL DEFAULT '0',
