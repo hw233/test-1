@@ -242,7 +242,7 @@ private:
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	UInt32 _maxhpAdd, _maxActionAdd;
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
-    UInt8 _criticalAdd_last, criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
+    UInt8 _criticalAdd_last, _criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;

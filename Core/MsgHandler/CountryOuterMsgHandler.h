@@ -118,8 +118,8 @@ struct EnchantReq
 	UInt16 _fighterId;
 	UInt32 _itemid;
 	UInt8 _type;
-	UInt8 _protect;
-	MESSAGE_DEF4(0x40, UInt16, _fighterId, UInt32, _itemid, UInt8, _type, UInt8, _protect);
+	// UInt8 _protect;
+	MESSAGE_DEF3(0x40, UInt16, _fighterId, UInt32, _itemid, UInt8, _type/*, UInt8, _protect*/);
 };
 
 struct OpenSocketReq
@@ -177,9 +177,9 @@ struct ForgeReq
 {
 	UInt16 _fighterId;
 	UInt32 _itemid;
-	UInt8 _type;
+	//i UInt8 _type;
 	UInt8 _protect;
-	MESSAGE_DEF4(0x47, UInt16, _fighterId, UInt32, _itemid, UInt8, _type, UInt8, _protect);
+	MESSAGE_DEF3(0x47, UInt16, _fighterId, UInt32, _itemid, /*UInt8, _type,*/ UInt8, _protect);
 };
 
 struct ForgeAnswerReq
@@ -1346,7 +1346,7 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 	if(!player->hasChecked())
 		return;
 	Stream st(0x40);
-	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._protect > 0) << er._fighterId << er._itemid << Stream::eos;
+	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type/*, er._protect > 0*/) << er._fighterId << er._itemid << Stream::eos;
 	player->send(st);
     GameAction()->RunOperationTaskAction1(player, 1, 2);
 }
@@ -1427,7 +1427,7 @@ void OnForgeReq( GameMsgHdr& hdr, ForgeReq& fr )
 	if(!player->hasChecked())
 		return;
 	UInt8 types[3]; Int16 values[3];
-	UInt8 r = player->GetPackage()->Forge(fr._fighterId, fr._itemid, fr._type, types, values, fr._protect);
+	UInt8 r = player->GetPackage()->Forge(fr._fighterId, fr._itemid, /*fr._type,*/ types, values, fr._protect);
 	Stream st(0x47);
 	st << r << fr._fighterId << fr._itemid << Stream::eos;
 	player->send(st);
@@ -1458,7 +1458,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 	br >> flag >> count;
 
 	Package * pkg = player->GetPackage();
-	UInt16 rcount[4] = {0, 0, 0, 0};
+	UInt16 rcount[2] = {0, 0};
 	for(UInt16 i = 0; i < count; ++ i)
 	{
 		UInt32 itemId;
@@ -1475,12 +1475,6 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 			case ITEM_ENCHANT_L2:
 				rcount[1] += outCount;
 				break;
-			case ITEM_ENCHANT_L3:
-				rcount[2] += outCount;
-				break;
-			case ITEM_ENCHANT_L4:
-				rcount[3] += outCount;
-				break;
 			default:
 				break;
 			}
@@ -1489,7 +1483,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 			break;
 	}
 	Stream st(0x49);
-	st << flag << rcount[0] << rcount[1] << rcount[2] << rcount[3] << Stream::eos;
+	st << flag << rcount[0] << rcount[1] << Stream::eos;
 	player->send(st);
 }
 

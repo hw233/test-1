@@ -52,6 +52,19 @@ namespace GObject
 {
 	std::map<UInt32, ItemEquip *> GObjectManager::equips;
 
+    UInt32 GObjectManager::_enchant_cost;
+    UInt32 GObjectManager::_merge_cost;
+    UInt32 GObjectManager::_detach_cost;
+    UInt32 GObjectManager::_split_cost;
+    UInt32 GObjectManager::_forge_cost;
+    UInt32 GObjectManager::_split_chance[4][2];
+    UInt32 GObjectManager::_merge_chance[9];
+    UInt32 GObjectManager::_enchant_chance[12];
+    UInt8  GObjectManager::_enchant_max[11];
+    UInt8  GObjectManager::_attrChances[11][3][8];
+    UInt16 GObjectManager::_attrInfo[11][8][3][8];
+    UInt32 GObjectManager::_socket_chance[6];
+
 	bool GObjectManager::InitIDGen()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -81,6 +94,7 @@ namespace GObject
 	{
 		loadMapData();
 		loadEquipments();
+        loadEquipForge();
 		loadFighters();
 		loadClanAssist();
 		loadClanRobMonster();
@@ -563,6 +577,8 @@ namespace GObject
 					GData::clanRobMonster._clanTotemGuarderBoss = found->second;
 			}
 		}
+
+        lua_close(L);
 
 		return true;
 	}
@@ -2053,55 +2069,148 @@ namespace GObject
 
 		return true;
 	}
-	
-	
-	bool GObjectManager::loadEquipments()
-	{
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
 
-		LoadingCounter lc("Loading equipments:");
-		DBEquipment dbe;
-		if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
-			return false;
-
-		lc.reset(2000);
-		while(execu->Next() == DB::DB_OK)
+    bool GObjectManager::loadEquipForge()
+    {
+		lua_State* L = lua_open();
+		luaopen_base(L);
+		luaopen_string(L);
+		luaopen_table(L);
 		{
-			lc.advance();
-			const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dbe.itemId];
-			if(itype == NULL)
-				continue;
-			switch(itype->subClass)
+			std::string path = cfg.scriptPath + "items/EquipForge.lua";
+			lua_tinker::dofile(L, path.c_str());
+
+            _enchant_cost = lua_tinker::call<UInt32>(L, "getEnchantCost");
+            _merge_cost = lua_tinker::call<UInt32>(L, "getMergeCost");
+            _detach_cost = lua_tinker::call<UInt32>(L, "getDetachCost");
+            _split_cost = lua_tinker::call<UInt32>(L, "getSplitCost");
+            _forge_cost = lua_tinker::call<UInt32>(L, "getForgeCost");
+
+            UInt8 q = 0;
+			for(; q < 4; q ++)
 			{
-			case Item_Weapon:
-			case Item_Armor1:
-			case Item_Armor2:
-			case Item_Armor3:
-			case Item_Armor4:
-			case Item_Armor5:
-			case Item_Ring:
-			case Item_Amulet:
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getSplitChance", q + 1);
+				UInt32 size = std::min(2, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
 				{
-					ItemEquipData ied;
-					ied.enchant = dbe.enchant;
-					ied.sockets = dbe.sockets;
-					ied.gems[0] = dbe.socket1;
-					ied.gems[1] = dbe.socket2;
-					ied.gems[2] = dbe.socket3;
-					ied.gems[3] = dbe.socket4;
-					ied.gems[4] = dbe.socket5;
-					ied.gems[5] = dbe.socket6;
-					ied.enchant = dbe.enchant;
-					ItemEquip * equip;
-					switch(itype->subClass)
-					{
-					case Item_Weapon:
-						equip = new ItemWeapon(dbe.id, *static_cast<const GData::ItemWeaponType *>(itype), ied);
-						break;
-					case Item_Armor1:
-					case Item_Armor2:
-					case Item_Armor3:
+					_split_chance[q][j] =  table_temp.get<UInt32>(j + 1);
+				}
+			}
+
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getMergeChance");
+				UInt32 size = std::min(9, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_merge_chance[j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance");
+				UInt32 size = std::min(12, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_enchant_chance[j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantMax");
+				UInt32 size = std::min(11, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_enchant_max[j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+            UInt8 lvl = 0;
+            for(; lvl < 11; lvl ++)
+            {
+                for(UInt8 q = 0; q < 3; q ++)
+                {
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrChance", lvl + 1, q + 1);
+                    UInt32 size = std::min(8, table_temp.size());
+                    for(UInt32 j = 0; j < size; j ++)
+                    {
+                        _attrChances[lvl][q][j] =  table_temp.get<UInt8>(j + 1);
+                    }
+                }
+
+                for(UInt8 t = 0; t < 8; t ++)
+                {
+                    for(UInt8 q = 0; q < 3; q ++)
+                    {
+                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrInfo", lvl + 1, t + 1, q + 1);
+                        UInt32 size = std::min(8, table_temp.size());
+                        for(UInt32 j = 0; j < size; j ++)
+                        {
+                            _attrInfo[lvl][t][q][j] =  table_temp.get<UInt16>(j + 1);
+                        }
+                    }
+                }
+            }
+
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getSocketChance");
+				UInt32 size = std::min(6, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_socket_chance[j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+        }
+        lua_close(L);
+        return true;
+    }
+        
+        bool GObjectManager::loadEquipments()
+        {
+            std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+            if (execu.get() == NULL || !execu->isConnected()) return false;
+
+            LoadingCounter lc("Loading equipments:");
+            DBEquipment dbe;
+            if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
+                return false;
+
+            lc.reset(2000);
+            while(execu->Next() == DB::DB_OK)
+            {
+                lc.advance();
+                const GData::ItemBaseType * itype = GData::itemBaseTypeManager[dbe.itemId];
+                if(itype == NULL)
+                    continue;
+                switch(itype->subClass)
+                {
+                case Item_Weapon:
+                case Item_Armor1:
+                case Item_Armor2:
+                case Item_Armor3:
+                case Item_Armor4:
+                case Item_Armor5:
+                case Item_Ring:
+                case Item_Amulet:
+                    {
+                        ItemEquipData ied;
+                        ied.enchant = dbe.enchant;
+                        ied.sockets = dbe.sockets;
+                        ied.gems[0] = dbe.socket1;
+                        ied.gems[1] = dbe.socket2;
+                        ied.gems[2] = dbe.socket3;
+                        ied.gems[3] = dbe.socket4;
+                        ied.gems[4] = dbe.socket5;
+                        ied.gems[5] = dbe.socket6;
+                        ied.enchant = dbe.enchant;
+                        ItemEquip * equip;
+                        switch(itype->subClass)
+                        {
+                        case Item_Weapon:
+                            equip = new ItemWeapon(dbe.id, *static_cast<const GData::ItemWeaponType *>(itype), ied);
+                            break;
+                        case Item_Armor1:
+                        case Item_Armor2:
+                        case Item_Armor3:
 					case Item_Armor4:
 					case Item_Armor5:
 						equip = new ItemArmor(dbe.id, *static_cast<const GData::ItemEquipType *>(itype), ied);

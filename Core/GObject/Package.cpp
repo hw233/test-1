@@ -15,9 +15,7 @@
 #include "Server/OidGenerator.h"
 #include "Server/Cfg.h"
 
-#define ITEM_FORGE_L1 8914
-#define ITEM_FORGE_L2 8915
-#define ITEM_FORGE_L3 8916
+#define ITEM_FORGE_L1 500      //洗炼符
 #define ITEM_SOCKET_L1 8917
 #define ITEM_SOCKET_L2 8918
 #define ITEM_SOCKET_L3 8919
@@ -26,7 +24,7 @@
 #define ITEM_DETACH_PROTECT 8926
 #define ITEM_ENCHANT_PROTECT 8927
 #define ITEM_DETACH_RUNE 8928
-#define ITEM_FORGE_PROTECT 8929
+#define ITEM_FORGE_PROTECT 501  // 洗炼保护符
 #define ITEM_ACTIVATE_ATTR 9215
 
 namespace GObject
@@ -64,6 +62,7 @@ namespace GObject
 
 	static void getRandomAttr2(UInt8 lv, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
 	{
+#if 0
 		static UInt8 attrChances[11][3][8] =
 		{
 			{{15, 50, 35}},
@@ -169,7 +168,7 @@ namespace GObject
 			{{60, 90, 120}, {120, 150, 180}, {180, 190, 200, 210, 230, 250, 260, 280}},
 			{{40, 50, 60}, {60, 70, 80}, {80, 90, 100, 110, 120, 130, 140, 150}}},
 		};
-
+#endif
 		if(c == 0)
 		{
 			if(q > 2)
@@ -180,9 +179,9 @@ namespace GObject
 				c = 1;
 		}
 
-		UInt8 types[7] = {1, 2, 3, 4, 5, 6, 7};
+		UInt8 types[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 		bool retain[3] = {false, false, false};
-		int tcount = 7;
+		int tcount = 8;
 		for(int i = 0; i < c; ++ i)
 		{
 			retain[i] = (mask & (1 << i)) > 0;
@@ -218,16 +217,16 @@ namespace GObject
 				v[i] = 0;
 				for(UInt8 j = 0; j < 8; ++ j)
 				{
-					if(dice < attrChances[lv][q][j])
+					if(dice < GObjectManager::getAttrChance(lv, q, j)  /*attrChances[lv][q][j]*/)
 					{
 						t[i] = types[nidx];
-						v[i] = attrInfo[lv][t[i] - 1][q][j];
+						v[i] = GObjectManager::getAttrInfo(lv, t[i] - 1, q, j);         //attrInfo[lv][t[i] - 1][q][j];
 						if(nidx + 1 < tcount)
 							types[nidx] = types[tcount - 1];
 						-- tcount;
 						break;
 					}
-					dice -= attrChances[lv][q][j];
+					dice -= GObjectManager::getAttrChance(lv, q, j);   //attrChances[lv][q][j];
 				}
 			}
 			while(oldt != 0 && t[i] == oldt && v[i] == oldv);
@@ -1066,7 +1065,7 @@ namespace GObject
 		m_Owner->send(st);
 	}
 
-	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, bool protect )
+	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type/*, bool protect*/ )
 	{
 		if (type > 3) return 2;
 		Fighter * fgt = NULL;
@@ -1078,35 +1077,17 @@ namespace GObject
         if(ied.enchant >= ENCHANT_LEVEL_MAX)
             return 2;
 		
-		UInt32 viplvl = this->m_Owner->getVipLevel();
-		const UInt8 enchant_max[] = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12};
-        if(ied.enchant >= enchant_max[viplvl])
-            return 2;
+		// UInt32 viplvl = this->m_Owner->getVipLevel();
+		// const UInt8 enchant_max[] = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12};
+        // if(ied.enchant >= enchant_max[viplvl])
+        //     return 2;
 
-		UInt32 amount = enchant_cost[ied.enchant];
+		UInt32 amount = GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
 		if(m_Owner->getCoin() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 2;
 		}
-		else if(ied.enchant >= 8)
-		{
-			if(type < 3)
-				return 2;
-		}
-		else if(ied.enchant >= 6)
-		{
-			if(type < 2)
-				return 2;
-		}
-		else if(ied.enchant >= 4)
-		{
-			if(type < 1)
-				return 2;
-		}
-		protect &= ied.enchant >= 4;
-		if(protect && !ExistItem(ITEM_ENCHANT_PROTECT))
-			return 3;
 		bool isBound = equip->GetBindStatus();
 		if(!DelItemAny(ITEM_ENCHANT_L1 + type, 1, &isBound))
 		{
@@ -1115,10 +1096,8 @@ namespace GObject
 		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_ENCHANT_L1 + type, 1, TimeUtil::Now());
 		ConsumeInfo ci(EnchantEquipment,0,0);
 		m_Owner->useCoin(amount,&ci);
-		if(protect)
-			DelItemAny(ITEM_ENCHANT_PROTECT, 1);
-		static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
-		if(uRand(100) < enchant_chance[ied.enchant])
+		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
+		if(uRand(1000) < GObjectManager::getEnchantChance(ied.enchant)/*enchant_chance[ied.enchant]*/)
 		{
 			++ ied.enchant;
 			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
@@ -1154,9 +1133,9 @@ namespace GObject
 			}
 			return 0;
 		}
-		if(!protect && ied.enchant >= 4)
+		if(type == 0 && ied.enchant >= 4)
 		{
-			ied.enchant = 1;
+			ied.enchant --;
 			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
 			if(fgt != NULL)
@@ -1167,8 +1146,6 @@ namespace GObject
 			else
 				SendSingleEquipData(equip);
 		}
-		if(protect)
-			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_ENCHANT_PROTECT, 1, TimeUtil::Now());
 
 		return 1;
 	}
@@ -1202,13 +1179,12 @@ namespace GObject
 				return 2;
 			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L1, 1, TimeUtil::Now());
 		}
-		UInt32 chance[6] = {0, 0, 15, 15, 45, 45};
 		//if(World::_wday == 6)
 		//{
 		//	if(chance[ied.sockets] > 25)
 		//		chance[ied.sockets] -= 25;
 		//}
-		if(uRand(100) < chance[ied.sockets])
+		if(uRand(100) < GObjectManager::getSocketChance(ied.sockets) /*chance[ied.sockets]*/)
 			return 1;
 		++ied.sockets;
 		DB().PushUpdateData("UPDATE `equipment` SET `sockets` = %u WHERE `id` = %u", ied.sockets, equip->getId());
@@ -1226,31 +1202,9 @@ namespace GObject
 		if (GetItemSubClass(gemId) != Item_Gem) return 2;
 		UInt32 lvl = (gemId - 1) % 10;
 		if(lvl >= 9) return 2;
-		UInt32 viplvl = this->m_Owner->getVipLevel();
-
-		if(viplvl == 7)
-		{
-			if(lvl>=8)
-				return 2;
-		}
-		else if(viplvl == 6)
-		{
-			if(lvl>=7)
-					return 2;
-		}
-		else if(viplvl == 5)
-		{
-            if(lvl>=6)
-                return 2;
-		}
-		else if(viplvl < 5)
-		{
-			if(lvl>=5)
-				return 2;
-		}
 
 		UInt8 unbindCount = 3 - bindCount;
-		UInt32 amount = merge_cost[lvl];
+		UInt32 amount = GObjectManager::getMergeCost(); // merge_cost[lvl];
 		if(m_Owner->getCoin() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
@@ -1283,7 +1237,7 @@ namespace GObject
 		{
 			protect = false;
 		}
-		if(uRand(100) < merge_chance[lvl])
+		if(uRand(100) < GObjectManager::getMergeChance(lvl) /*merge_chance[lvl]*/)
 		{
 			if(bindCount > 0)
 				DelItem(gemId, bindCount, true);
@@ -1325,28 +1279,10 @@ namespace GObject
 				return 1;
 			break;
 		case Item_Armor3:
-			{
-				UInt32 viplvl = m_Owner->getVipLevel();
-				if(viplvl > 9)
-				{
-					if((gemId > 5050 && gemId <= 5070) || (gemId > 5090 && gemId <= 5100) || gemId > 5120)
-						return 1;
-					break;
-				}
-			}
 			if((gemId > 5050 && gemId <= 5070) || gemId > 5090)
 				return 1;
 			break;
 		case Item_Armor4:
-			{
-				UInt32 viplvl = m_Owner->getVipLevel();
-				if(viplvl > 8)
-				{
-					if((gemId > 5050 && gemId <= 5070) || (gemId > 5100 && gemId <= 5120))
-						return 1;
-					break;
-				}
-			}
 			if((gemId > 5050 && gemId <= 5070) || gemId > 5090)
 				return 1;
 			break;
@@ -1468,8 +1404,7 @@ namespace GObject
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
 		UInt8 q = item->getQuality() - 2;
-		UInt8 lv = (item->getReqLev() + 5) / 10;
-		UInt32 amount = split_cost[q][lv];
+		UInt32 amount = GObjectManager::getSplitCost();   // split_cost[q][lv];
 		if(m_Owner->getCoin() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
@@ -1478,14 +1413,8 @@ namespace GObject
 		ConsumeInfo ci(SplitEquipment,0,0);
 		m_Owner->useCoin(amount, &ci, !silence);
 		bool isBound = item->GetBindStatus();
-#if 0
-		if(protect && !DelItemAny(ITEM_SPLIT_PROTECT, 1, &isBound))
-			protect = false;
-		if(protect)
-			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SPLIT_PROTECT, 1, TimeUtil::Now());
-#endif	
-        UInt32 chance_low = split_chance[q][lv][0];
-		UInt32 chance_high = split_chance[q][lv][1];
+        UInt32 chance_low = GObjectManager::getSplitChance(q, 0);  // split_chance[q][lv][0];
+		UInt32 chance_high = GObjectManager::getSplitChance(q, 1);  // split_chance[q][lv][1];
 		UInt8 got = 0;
 #if 0
 		if(protect)
@@ -1510,15 +1439,10 @@ namespace GObject
 		}
 		if(got)
 		{
-			enchantId = ITEM_ENCHANT_L1 + q + got - 2;
-			UInt32 count_low = split_count[lv][0];
-			UInt32 count_high = split_count[lv][1];
+			enchantId = ITEM_ENCHANT_L1 + got - 1;
 			isBound |= item->GetBindStatus();
 			DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
-			if(count_high > count_low)
-				count = count_low + uRand(count_high - count_low + 1);
-			else
-				count = count_low;
+		    count = 1;
 			AddItem(enchantId, count, isBound, silence, FromSplit);
 			return 0;
 		}
@@ -1975,9 +1899,9 @@ namespace GObject
 		return 1;
 	}
 
-	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, UInt8 t, UInt8 * types, Int16 * values, UInt8 protect )
+	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect )
 	{
-		if (t > 2) return 2;
+		// if (t > 2) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
@@ -1986,25 +1910,18 @@ namespace GObject
 		switch(equip->getQuality())
 		{
 		case 3:
-			if(!DelItemAny(ITEM_FORGE_L1 + t, 1, &isBound))
-				return 2;
-			break;
 		case 4:
-			if(t < 1 || !DelItemAny(ITEM_FORGE_L1 + t, 1, &isBound))
-				return 2;
-			break;
 		case 5:
-			if(t < 2 || !DelItemAny(ITEM_FORGE_L1 + t, 1, &isBound))
+			if(!DelItemAny(ITEM_FORGE_L1, 1, &isBound))
 				return 2;
 			break;
 		default:
 			return 2;
 		}
-		if(t == 2)
-			DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1 + t, 1, TimeUtil::Now());
+        DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
 		UInt8 lv = (equip->getReqLev() + 5) / 10;
 		UInt8 q = equip->getQuality() - 3;
-		UInt32 amount = forge_cost;
+		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
 		if(m_Owner->getCoin() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);

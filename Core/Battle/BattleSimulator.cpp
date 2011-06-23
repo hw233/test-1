@@ -434,6 +434,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     aa.target_side = bf->getSide();
                     aa.target_pos = bf->getPos();
                     atkAct->insert(atkAct->end(), aa);
+                    counter100 = true;
                 } 
                 target_skill = area_target->getPassiveSkillAftEvd();
                 if(NULL != target_skill)
@@ -444,6 +445,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     aa.target_side = bf->getSide();
                     aa.target_pos = bf->getPos();
                     atkAct->insert(atkAct->end(), aa);
+                    counter100 = true;
                 }
             }
 
@@ -912,6 +914,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         return 0;
     }
 
+    if(skill->cond == GData::SKILL_AFTEVD)
+    {
+        int self_side = bf->getSide() == target_side ? 25 : 0;
+        appendToPacket( bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, NULL, 0, NULL, 0);
+        return 0;
+    }
+
     if(skill->cond == GData::SKILL_AFTRES)
     {
         int self_side = bf->getSide() == target_side ? 25 : 0;
@@ -1188,13 +1197,13 @@ UInt32 BattleSimulator::doAttack( int pos )
 
         std::vector<AttackAct> atkAct;
         atkAct.clear();
-        dmg += doNormalAttack(bf, otherside, target_pos, &atkAct);
+        dmg += doNormalAttack(bf, otherside, target_pos, rnd_bf != NULL ? &atkAct : NULL);
         rcnt++;
 
         size_t actCnt = atkAct.size();
         for(size_t idx = 0; idx < actCnt; idx++)
         {
-            dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
         }
 
         atkAct.clear();
@@ -1214,7 +1223,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         size_t actCnt = atkAct.size();
         for(size_t idx = 0; idx < actCnt; idx++)
         {
-            dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
         }
         atkAct.clear();
     }
@@ -1238,7 +1247,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
-                dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
             }
             atkAct.clear();
         }
@@ -1258,7 +1267,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
-                dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
             }
             atkAct.clear();
         }
@@ -1289,7 +1298,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
-                dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
             }
             atkAct.clear();
         }
@@ -1308,7 +1317,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
-                dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
             }
             atkAct.clear();
         }
@@ -1391,7 +1400,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
-                    dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
                 }
                 atkAct.clear();
             }
@@ -1413,7 +1422,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
-                    dmg += doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL);
                 }
                 atkAct.clear();
             }

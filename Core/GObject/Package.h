@@ -7,10 +7,8 @@
 
 namespace GObject
 {
-#define ITEM_ENCHANT_L1 8921
-#define ITEM_ENCHANT_L2 8922
-#define ITEM_ENCHANT_L3 8923
-#define ITEM_ENCHANT_L4 8924
+#define ITEM_ENCHANT_L1 502   //太乙真金
+#define ITEM_ENCHANT_L2 503   //太乙精金
 
 	class Fighter;
 	class Player;
@@ -116,14 +114,14 @@ namespace GObject
 
 	public:
 		// 铁匠
-		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type, bool protect);
+		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type/*, bool protect*/);
 		UInt8 OpenSocket(UInt16 fighterId, UInt32 itemId);
 		UInt8 MergeGem(UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid);
 		UInt8 AttachGem(UInt16 fighterId, UInt32 itemId, UInt32 gemId, bool bind);
 		UInt8 DetachGem(UInt16 fighterId, UInt32 itemId, UInt8 pos, UInt8 protect);
 		UInt8 Split(UInt32 itemId, UInt32& enchantId, UInt8& count, /*bool protect,*/ bool silence = false);
 		UInt8 Exchange(UInt32 * itemId, UInt32& resultId);
-		UInt8 Forge(UInt16 fighterId, UInt32 itemId, UInt8 t, UInt8 * types, Int16 * values, UInt8 protect);
+		UInt8 Forge(UInt16 fighterId, UInt32 itemId, /*UInt8 t,8*/ UInt8 * types, Int16 * values, UInt8 protect);
 		UInt8 ExchangeSet(UInt32 * itemId, UInt8 type, UInt32& resultId);
 		UInt8 BatchMergeGem(std::map<UInt16, UInt32, _GemCompare >& gems, std::vector<UInt32>& gemsOut);
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);

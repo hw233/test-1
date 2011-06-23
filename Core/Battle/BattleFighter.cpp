@@ -19,7 +19,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _pierceAdd(0), _counterAdd(0), _magResAdd(0),
 	_maxhpAdd(0), _maxActionAdd(0),
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
-    _criticalAdd_last(0), criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
+    _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _formEffect(NULL), _formula(bf),
     _immuneLevel(0), _immuneRound(0),_forgetLevel(0), _forgetRound(0), _flag(0)
 {
@@ -935,6 +935,35 @@ void BattleFighter::releaseSkillCD(int cd)
             _passiveSkillDead[idx].cd -= cd;
         }
     }
+
+    if(_atkAdd_last)
+        (-- _atkAdd_last) ? 0 : (_attackAdd = 0);
+    if(_magAtkAdd_last)
+        (-- _magAtkAdd_last) ? 0 : (_magAtkAdd_last = 0);
+    if(_defAdd_last)
+        (-- _defAdd_last) ? 0 : (_defAdd_last = 0);
+    if(_magDefAdd_last)
+        (-- _magDefAdd_last) ? 0 : (_magDefAdd_last = 0);
+    if(_hitrateAdd_last)
+        (-- _hitrateAdd_last) ? 0 : (_hitrateAdd_last = 0);
+    if(_evadeAdd_last)
+        (-- _evadeAdd_last) ? 0 : (_evadeAdd_last = 0);
+    if(_criticalAdd_last)
+        (-- _criticalAdd_last) ? 0 : (_criticalAdd_last = 0);
+    if(_criticalDmgAdd_last)
+        (-- _criticalDmgAdd_last) ? 0 : (_criticalDmgAdd_last = 0);
+    if(_pierceAdd_last)
+        (-- _pierceAdd_last) ? 0 : (_pierceAdd_last = 0);
+    if(_counterAdd_last)
+        (-- _counterAdd_last) ? 0 : (_counterAdd_last = 0);
+    if(_magResAdd_last)
+        (-- _magResAdd_last) ? 0 : (_magResAdd_last = 0);
+    if(_toughAdd_last)
+        (-- _toughAdd_last) ? 0 : (_toughAdd_last = 0);
+    if(_maxhpAdd_last)
+        (-- _maxhpAdd_last) ? 0 : (_maxhpAdd_last = 0);
+    if(_maxActionAdd_last)
+        (-- _maxActionAdd_last) ? 0 : (_maxActionAdd_last = 0);
 }
 
 
