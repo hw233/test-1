@@ -1090,11 +1090,32 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             fgt->upSkill(skill, idx);
         }
         break;
+    case 0x61:
+        {
+            UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
+            idx = fer._equipId & 0xFFFF;
+            fgt->offSkill(skill);
+        }
+        break;
     case 0x62:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             fgt->upCitta(citta, idx);
+        }
+        break;
+    case 0x63:
+        {
+            UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
+            idx = fer._equipId & 0xFFFF;
+            fgt->offCitta(citta);
+        }
+        break;
+    case 0x64:
+        {
+            UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
+            idx = fer._equipId & 0xFFFF;
+            fgt->lvlUpCitta(citta, idx);
         }
         break;
     default:

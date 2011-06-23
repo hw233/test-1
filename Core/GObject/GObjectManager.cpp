@@ -1673,6 +1673,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) 
 			return false;
 
+        // 帮会信息
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
 		if (execu->Prepare("SELECT `id`, `name`, `rank`, `foundTime`, `founder`, `leader`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
@@ -1736,6 +1737,7 @@ namespace GObject
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
 		resetClanData(now);
 
+        // 帮会成员
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
 		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `enterCount`, `achieveCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
@@ -1804,6 +1806,7 @@ namespace GObject
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
 
+        //帮会技能
 		//load all clan skills
 		lc.prepare("Loading clan skills:");
 		DBClanSkill cs;
@@ -1823,6 +1826,7 @@ namespace GObject
 		}
 		lc.finalize();
 
+        //申请帮会请求
 		lc.prepare("Loading clan pending players:");
 		DBClanPendingPlayer cpp;
 		if(execu->Prepare("SELECT `id`, `playerId`, `class`, `opTime` FROM `clan_pending_player` ORDER BY `id`", cpp) != DB::DB_OK)
@@ -1849,7 +1853,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-
+        //帮会捐献
 		lc.prepare("Loading clan donate record:");
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
@@ -1875,6 +1879,7 @@ namespace GObject
 		clanManager.resumeRobClanBattleData();
 		//clanManager.updateAllocated();
 
+        // 帮会战报
 		lc.prepare("Loading clan battle result record:");
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
@@ -1903,7 +1908,7 @@ namespace GObject
 		lc.finalize();
 
 
-		//加载宗族战场玩家数据
+		//加载帮会战场玩家数据
 		lc.prepare("Loading clan battler:");
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
@@ -1991,6 +1996,7 @@ namespace GObject
 		}
 		lc.finalize();
 
+        //帮会奖励
 		lc.prepare("Loading clan pending rewards:");
 		DBClanPendingReward cpr;
 		if(execu->Prepare("SELECT `id`, `timeAlloc`, `playerId`, `itemId`, `itemNum` FROM `clan_pending_reward` ORDER BY `id`", cpr) != DB::DB_OK)

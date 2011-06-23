@@ -216,6 +216,8 @@ public:
     int hasCitta(UInt16 citta);
     // 是否装备了此心法
     int isCittaUp(UInt16 citta);
+    // 升级心法
+    bool lvlUpCitta(UInt16 citta, int idx, bool = true);
 
     // 取得装备的心法数
     inline UInt8 getUpCittasNum();
@@ -323,7 +325,6 @@ public:
 	inline float getExtraSoulP() { checkDirty(); return _attrExtraEquip.soulP; }
 	inline float getExtraAuraP() { checkDirty(); return _attrExtraEquip.auraP; }
 	inline float getExtraAuraMaxP() { checkDirty(); return _attrExtraEquip.auraMaxP; }
-	inline float getExtraToughP() { checkDirty(); return _attrExtraEquip.toughP; }
 	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
 	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }

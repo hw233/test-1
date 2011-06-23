@@ -1610,6 +1610,10 @@ int Fighter::isCittaUp( UInt16 citta )
 
 bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 {
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
         return false;
 
@@ -1671,6 +1675,19 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     }
 
     return ret;
+}
+
+bool Fighter::lvlUpCitta(UInt16 citta, int idx, bool writedb)
+{
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
+    cb = GData::cittaManager[CITTA_LEVEL(citta)+1];
+    if (!cb)
+        return false;
+
+    return addNewCitta(citta+1);
 }
 
 void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)

@@ -23,7 +23,6 @@ void BattleFormula::init()
 	set("Warlock1", 5);
 	set("Warlock2", 6);
 	class_add<BattleFormula>("BattleFormula");
-	class_def<BattleFormula>("reloadSkillData", &BattleFormula::reloadSkillData);
 	set("battle", this);
 	class_add<GObject::Fighter>("Fighter");
 	class_def<GObject::Fighter>("getId", &GObject::Fighter::getId);
@@ -49,7 +48,6 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraSoulPercent", &GObject::Fighter::getExtraSoulP);
 	class_def<GObject::Fighter>("getExtraAuraPercent", &GObject::Fighter::getExtraAuraP);
 	class_def<GObject::Fighter>("getExtraAuraMaxPercent", &GObject::Fighter::getExtraAuraMaxP);
-	class_def<GObject::Fighter>("getExtraToughPercent", &GObject::Fighter::getExtraToughP);
 	class_def<GObject::Fighter>("getExtraAttack", &GObject::Fighter::getExtraAttack);
 	class_def<GObject::Fighter>("getExtraAttackPercent", &GObject::Fighter::getExtraAttackP);
 	class_def<GObject::Fighter>("getExtraMagAttack", &GObject::Fighter::getExtraMagAttack);
@@ -121,7 +119,6 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraSoulPercent", &Battle::BattleFighter::getExtraSoulP);
 	class_def<Battle::BattleFighter>("getExtraAuraPercent", &Battle::BattleFighter::getExtraAuraP);
 	class_def<Battle::BattleFighter>("getExtraAuraMaxPercent", &Battle::BattleFighter::getExtraAuraMaxP);
-	class_def<Battle::BattleFighter>("getExtraToughPercent", &Battle::BattleFighter::getExtraToughP);
 	class_def<Battle::BattleFighter>("getExtraAttack", &Battle::BattleFighter::getExtraAttack);
 	class_def<Battle::BattleFighter>("getExtraAttackPercent", &Battle::BattleFighter::getExtraAttackP);
 	class_def<Battle::BattleFighter>("getExtraMagAttack", &Battle::BattleFighter::getExtraMagAttack);
@@ -417,6 +414,12 @@ float BattleFormula::calcPracticeInc( GObject::Fighter * fgt )
 	return call<float>("calcPracticeInc", fgt);
 }
 
+float BattleFormula::calcClanTechAddon(UInt16 id, UInt8 lvl)
+{
+    return call<float>("calcClanTechAddon", id, lvl);
+}
+
+
 BattleFormula * BattleFormula::getCurrent()
 {
 	WorkerRunner<>& worker = WorkerThread<WorkerRunner<> >::LocalWorker();
@@ -432,88 +435,5 @@ BattleFormula * BattleFormula::getCurrent()
 	return NULL;
 }
 
-void BattleFormula::reloadSkillData()
-{
-	Table t = get<Table>("skillData");
-	for(int i = 0; i < 3; ++ i)
-	{
-		for(int j = 0; j < 10; ++ j)
-		{
-			UInt32 skillId = (i + 1) * 100 + j + 1;
-			Table skillT = t.get<Table>(skillId);
-			int size = skillT.size();
-			if(size > 40)
-				size = 40;
-			for(int k = 0; k < size; ++ k)
-			{
-				Table skillS = skillT.get<Table>(k + 1);
-				SkillData& sd = _skillData[i][j][k];
-				sd.rate = skillS.get<UInt32>("rate");
-				switch(skillId)
-				{
-				case 101:
-				case 102:
-					sd.value1 = skillS.get<float>("damage");
-					break;
-				case 103:
-				case 104:
-				case 105:
-				case 109:
-				case 110:
-				case 206:
-				case 207:
-				case 210:
-					sd.value1 = skillS.get<float>("factor");
-					break;
-				case 107:
-				case 108:
-				case 301:
-				case 302:
-				case 310:
-					sd.value1 = skillS.get<float>("percent") / 100.0f;
-					break;
-				case 305:
-				case 306:
-				case 307:
-				case 309:
-					sd.value1 = skillS.get<float>("percent");
-					break;
-				case 106:
-					sd.value1 = skillS.get<float>("base");
-					sd.value2 = skillS.get<float>("factor");
-					break;
-				case 201:
-					sd.value1 = skillS.get<float>("percent_low");
-					sd.value2 = skillS.get<float>("percent_high");
-					sd.value3 = skillS.get<UInt32>("count");
-					break;
-				case 202:
-				case 203:
-				case 204:
-				case 209:
-					sd.value1 = skillS.get<float>("factor");
-					sd.value3 = skillS.get<UInt32>("round");
-					break;
-				case 303:
-					sd.value3 = skillS.get<UInt32>("regen");
-					sd.value4 = skillS.get<UInt32>("count");
-					sd.value1 = skillS.get<float>("factor");
-					break;
-				case 304:
-				case 308:
-					sd.value1 = skillS.get<float>("damage");
-					sd.value3 = skillS.get<UInt32>("count");
-					sd.value4 = skillS.get<UInt32>("stun");
-					break;
-				case 205:
-				case 208:
-					sd.value1 = skillS.get<float>("attack_percent") / 100;
-					sd.value2 = skillS.get<float>("defense");
-					break;
-				}
-			}
-		}
-	}
 }
 
-}

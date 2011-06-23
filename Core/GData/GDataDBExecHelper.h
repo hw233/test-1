@@ -34,7 +34,9 @@ struct DBItemType
 	UInt8		quality;        // 品质
 	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
+	UInt16		energy;         // 九仪鼎值
 	UInt16		data;           // 可使用道具: 作用数值
+    UInt16      enchant;        // 附魔类型
 	UInt32		attrExtra;      // 属性附加
 };
 
@@ -48,29 +50,29 @@ struct DBEquipSetType
 struct DBAttrExtra
 {
 	UInt32 id;
-	std::string strength;
-	std::string physique;
-	std::string agility;
-	std::string intelligence;
-    std::string will;
-    std::string soul;
-    std::string aura;
-    std::string auraMax;
-    std::string tough;
-	std::string attack;
-	std::string magatk;
-	std::string defend;
-	std::string magdef;
-	std::string hp;
-	std::string skills;
-	float action;
-	float hitrate;
-	float evade;
-	float critical;
-	float critical_dmg;
-	float pierce;
-	float counter;
-	float magres;
+	std::string strength;       // 力量 [+/-]num/num%
+	std::string physique;       // 耐力 [+/-]num/num%
+	std::string agility;        // 敏捷 [+/-]num/num%
+	std::string intelligence;   // 智力 [+/-]num/num%
+    std::string will;           // 意志 [+/-]num/num%
+    std::string soul;           // 元神 [+/-]num/num%
+    std::string aura;           // 作用士气 [+/-]num/num%
+    std::string auraMax;        // 最大灵气 [+/-]num/num%
+	std::string attack;         // 物攻 [+/-]num/num%
+	std::string magatk;         // 法术攻击 [+/-]num/num%
+	std::string defend;         // 物防 [+/-]num/num%
+	std::string magdef;         // 法术防御 [+/-]num/num%
+	std::string hp;             // HP [+/-]num/num%
+	std::string skills;         // 带出技能
+    float tough;                // 坚韧
+	float action;               // 身法
+	float hitrate;              // 命中
+	float evade;                // 闪避
+	float critical;             // 暴击
+	float critical_dmg;         // 暴击伤害
+	float pierce;               // 击破/护甲穿透
+	float counter;              // 反击
+	float magres;               // 法术抵抗
 };
 
 struct DBFormation
@@ -136,12 +138,12 @@ struct DBSkillEffect
 
 struct DBClanSkillType
 {
-	UInt16 id;
-	UInt8  level;
-	UInt32 needs;
-	UInt8  clanLev;
-	UInt32 effect1;
-	UInt32 effect2;
+	UInt16 id;          // 科技ID
+	UInt8  level;       // 科技等级
+	UInt32 needs;       // 所需捐献
+	UInt8  clanLev;     // 所需帮派等级
+	UInt32 effect1;     // 效果一
+	UInt32 effect2;     // 效果二
 };
 
 struct DBCitta
@@ -242,7 +244,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(11)
+SPECIALDEF(13)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -253,7 +255,9 @@ SPECIALDEF(11)
 	UInt8,		quality,
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
+	UInt16,		energy,
 	UInt16,		data,
+	UInt16,		enchant,
 	UInt32,		attrExtra
 	)
 SPECIALEND()
@@ -282,13 +286,13 @@ SPECIALDEF(24)
     std::string, soul,
     std::string, aura,
     std::string, auraMax,
-    std::string, tough,
 	std::string, attack,
 	std::string, magatk,
 	std::string, defend,
 	std::string, magdef,
 	std::string, hp,
 	std::string, skills,
+    float, tough,
 	float, action,
 	float, hitrate,
 	float, evade,

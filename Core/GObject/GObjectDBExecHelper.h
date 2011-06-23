@@ -331,6 +331,13 @@ struct DBClanPlayer
 	UInt32 lastFavorTime[4];
 };
 
+struct DBClanTech
+{
+	UInt32 clanId;
+    UInt8 techId;
+    UInt8 level;
+};
+
 struct DBClanSkill
 {
 	UInt32 clanId;

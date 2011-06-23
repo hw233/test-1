@@ -276,12 +276,12 @@ namespace GData
 			SetValOrPercent(aextra->_extra.soul, aextra->_extra.soulP, ae.soul);
 			SetValOrPercent(aextra->_extra.aura, aextra->_extra.auraP, ae.aura);
 			SetValOrPercent(aextra->_extra.auraMax, aextra->_extra.auraMaxP, ae.auraMax);
-			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
 			SetValOrPercent(aextra->_extra.attack, aextra->_extra.attackP, ae.attack);
 			SetValOrPercent(aextra->_extra.magatk, aextra->_extra.magatkP, ae.magatk);
 			SetValOrPercent(aextra->_extra.defend, aextra->_extra.defendP, ae.defend);
 			SetValOrPercent(aextra->_extra.magdef, aextra->_extra.magdefP, ae.magdef);
 			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
+			aextra->_extra.tough = ae.tough;
 			aextra->_extra.action = ae.action;
 			aextra->_extra.hitrate = ae.hitrate;
 			aextra->_extra.evade = ae.evade;
@@ -312,7 +312,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `data`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `data`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -361,6 +361,8 @@ namespace GData
 			wt->quality = idt.quality;
 			wt->maxQuantity = idt.maxQuantity;
 			wt->bindType = idt.bindType;
+			wt->energy = idt.energy;
+			wt->data = idt.data;
 			itemBaseTypeManager.add(wt);
 			itemBaseTypeNameManager.add(wt->getName(), wt);
 		}
