@@ -318,9 +318,9 @@ CREATE TABLE `item_template` (
   `quality` tinyint(3) NOT NULL COMMENT '品质',
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
   `bindType` tinyint(1) NOT NULL COMMENT '绑定类型',
-  `energy` tinyint(1) NOT NULL COMMENT '九仪鼎值',
+  `energy` smallint(6) NOT NULL COMMENT '九仪鼎值',
   `data` smallint(6) NOT NULL COMMENT '可使用道具: 作用数值',
-  `enchent` smallint(6) NOT NULL COMMENT '附魔类型',
+  `enchant` smallint(6) NOT NULL COMMENT '附魔类型',
   `attrId` int(10) NOT NULL COMMENT '附加属性',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
