@@ -127,6 +127,8 @@ public:
 	void fixLeaderId();
 	inline UInt64 getLeaderId() { return _leader; }
 	inline Player * getLeader() { return _members.empty() ?	NULL : (*(_members.begin()))->player; }
+    inline UInt64 getConstruction() { return _construction; }
+    void setConstruction(UInt64 cons, bool = true);
 	bool alterLeader();
 	UInt16 getDonateAchievement(Player *);
 	void setFounder(UInt64);
@@ -275,6 +277,7 @@ private:
 	UInt64 _founder;
 	std::string _founderName;
 	UInt64 _leader;
+	UInt64 _construction;
 	UInt32 _nextPurgeTime;
 	std::string _contact;
 	std::string _announce;

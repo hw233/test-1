@@ -4,6 +4,7 @@
 #include "WeaponDef.h"
 #include "Formation.h"
 #include "ExpTable.h"
+#include "ClanLvlTable.h"
 #include "LootTable.h"
 #include "ClanSkillTable.h"
 #include "GObject/Item.h"
@@ -141,6 +142,20 @@ namespace GData
 		while(execu->Next() == DB::DB_OK)
 		{
 			expTable.setTable(dbexp.lvl, dbexp.exp);
+		}
+		return true;
+	}
+
+	bool GDataManager::LoadClanLvlData()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBClanLvl dbexp;
+		if(execu->Prepare("SELECT `lvl`, `exp` FROM `clan_lvl`", dbexp) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+			clanLvlTable.setTable(dbexp.lvl, dbexp.exp);
 		}
 		return true;
 	}

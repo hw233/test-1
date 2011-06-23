@@ -121,6 +121,16 @@ INSERT INTO `clan_hold_monster` VALUES (4478,0,'4478,5'),(4479,0,'4479,5'),(4480
 /*!40000 ALTER TABLE `clan_hold_monster` ENABLE KEYS */;
 UNLOCK TABLES;
 
+DROP TABLE IF EXISTS `clan_lvl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `clan_lvl` (
+  `lvl` tinyint(3) unsigned NOT NULL,
+  `exp` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`lvl`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+/*!40101 SET character_set_client = @saved_cs_client */;
 --
 -- Table structure for table `clan_skill_template`
 --

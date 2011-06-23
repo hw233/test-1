@@ -28,6 +28,7 @@ enum
 #define COUNTRY_MAX (WORKER_THREAD_NEUTRAL+1)
 
 #define LEVEL_MAX (100)
+#define CLAN_LEVEL_MAX (10)
 #define NEWGUILDSTEP_MAX (34)
 
 #endif // _SERVERTYPES_H_

@@ -136,6 +136,12 @@ struct DBSkillEffect
     float magres;       // 法术抵抗
 };
 
+struct DBClanLvl
+{
+	UInt8 lvl;          // 帮派等级
+	UInt64 exp;         // 建设度值
+};
+
 struct DBClanSkillType
 {
 	UInt16 id;          // 科技ID
@@ -342,6 +348,13 @@ SPECIALDEF(3)
 	)
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBClanLvl)
+SPECIALDEF(2)
+	(
+	UInt8,			lvl,
+	UInt64,			exp
+	)
+SPECIALEND()
 
 SPECIALBEGIN(GData::DBClanSkillType)
 SPECIALDEF(6)

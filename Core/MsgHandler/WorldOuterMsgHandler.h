@@ -247,7 +247,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		player->send(st);
 		return;
 	}
-	if(player->getTael() < 50)
+	if(player->getTael() < 100) // XXX:
 	{
 		Stream st(0x92);
 		st << static_cast<UInt8>(3) << Stream::eos;
@@ -288,9 +288,9 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length());
 	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length());
 	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length());
-	DB().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `contact`, `purpose`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), contact2, purpose2);
+	DB().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), 0, contact2, purpose2);
 	ConsumeInfo ci(ClanCreate,0,0);
-	player->useTael(50,&ci);
+	player->useTael(100,&ci);
 	clan->initBuildClan();
 	SYSMSG_SEND(120, player);
 	SYSMSG_SENDV(1020, player, clan->getName().c_str());

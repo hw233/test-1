@@ -35,6 +35,7 @@ namespace GData
 		static bool LoadCittaEffect();
 		static bool LoadCittas();
 		static bool LoadClanSkillTable();
+        static bool LoadClanLvlData();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);
