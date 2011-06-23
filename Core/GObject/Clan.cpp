@@ -45,8 +45,9 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 }
 
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
-	GObjectBaseT<Clan>(id), _name(name), _rank(0), _foundTime(ft == 0 ? TimeUtil::Now() : ft), _founder(0), _leader(0),
-	_nextPurgeTime(0), _proffer(0), _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false)
+	GObjectBaseT<Clan>(id), _name(name), _rank(0), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
+    _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false)
 {
 	_skills = new ClanSkill(this);
 	memset(_favorId, 0, sizeof(_favorId));
@@ -1519,6 +1520,17 @@ void Clan::setLeaderId(UInt64 ld, bool writedb)
 	{
 		DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", ld, _id);
 	}
+}
+
+void Clan::setConstruction(UInt64 cons, bool writedb)
+{
+    if (cons == _construction)
+        return;
+    _construction = cons;
+    if (writedb)
+    {
+		DB().PushUpdateData("UPDATE `clan` SET `construction` = %"I64_FMT"u WHERE `id` = %u", cons, _id);
+    }
 }
 
 void Clan::fixLeaderId()

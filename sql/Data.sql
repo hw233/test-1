@@ -50,13 +50,13 @@ CREATE TABLE `attr_extra` (
   `soul` varchar(10) NOT NULL DEFAULT '0',
   `aura` varchar(10) NOT NULL DEFAULT '0',
   `auraMax` varchar(10) NOT NULL DEFAULT '0',
-  `tough` varchar(10) NOT NULL DEFAULT '0',
   `attack` varchar(64) NOT NULL DEFAULT '0',
   `magatk` varchar(64) NOT NULL DEFAULT '0',
   `defend` varchar(64) NOT NULL DEFAULT '0',
   `magdef` varchar(64) NOT NULL DEFAULT '0',
   `hp` varchar(64) NOT NULL DEFAULT '0',
   `skills` varchar(255) NOT NULL DEFAULT '',
+  `tough` float(10,4) NOT NULL DEFAULT '0.0000',
   `action` float(10,4) NOT NULL DEFAULT '0.0000',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
@@ -121,6 +121,16 @@ INSERT INTO `clan_hold_monster` VALUES (4478,0,'4478,5'),(4479,0,'4479,5'),(4480
 /*!40000 ALTER TABLE `clan_hold_monster` ENABLE KEYS */;
 UNLOCK TABLES;
 
+DROP TABLE IF EXISTS `clan_lvl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `clan_lvl` (
+  `lvl` tinyint(3) unsigned NOT NULL,
+  `exp` bigint(20) unsigned NOT NULL,
+  PRIMARY KEY (`lvl`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
+
+/*!40101 SET character_set_client = @saved_cs_client */;
 --
 -- Table structure for table `clan_skill_template`
 --
@@ -308,7 +318,9 @@ CREATE TABLE `item_template` (
   `quality` tinyint(3) NOT NULL COMMENT '品质',
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
   `bindType` tinyint(1) NOT NULL COMMENT '绑定类型',
-  `data` smallint(6) NOT NULL COMMENT '武器: 武器定义; 可使用道具: 作用数值',
+  `energy` tinyint(1) NOT NULL COMMENT '九仪鼎值',
+  `data` smallint(6) NOT NULL COMMENT '可使用道具: 作用数值',
+  `enchent` smallint(6) NOT NULL COMMENT '附魔类型',
   `attrId` int(10) NOT NULL COMMENT '附加属性',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -484,6 +496,7 @@ CREATE TABLE `skill_effect` (
 DROP TABLE IF EXISTS `cittas`;
 CREATE TABLE `cittas` (
   `id` smallint(5) NOT NULL,
+  `type` smallint(5) NOT NULL,
   `name` varchar(255) NOT NULL,
   `needsoul` smallint(5) NOT NULL DEFAULT '0',
   `effectid` smallint(5) NOT NULL DEFAULT '0',

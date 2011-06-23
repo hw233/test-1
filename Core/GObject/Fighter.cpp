@@ -195,11 +195,23 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
-bool Fighter::addPExp( UInt64 e )
+bool Fighter::addPExp( Int64 e, bool writedb )
 {
-    _pexp += e;
-    if (_pexp > _pexpMax)
-        _pexp = _pexpMax;
+    if (e < 0)
+    {
+        if (_pexp <= (UInt64)-e)
+            _pexp = 0;
+        else
+            _pexp += e;
+    }
+    else
+    {
+        _pexp += e;
+        if (_pexp > _pexpMax)
+            _pexp = _pexpMax;
+    }
+
+    sendModification(6, e, writedb);
     return true;
 }
 
@@ -1355,6 +1367,8 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         if (pap->pra > getPExp())
             return false;
 
+        addPExp(-pap->pra, writedb);
+
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
@@ -1596,6 +1610,10 @@ int Fighter::isCittaUp( UInt16 citta )
 
 bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 {
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
         return false;
 
@@ -1659,6 +1677,19 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     return ret;
 }
 
+bool Fighter::lvlUpCitta(UInt16 citta, int idx, bool writedb)
+{
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
+    cb = GData::cittaManager[CITTA_LEVEL(citta)+1];
+    if (!cb)
+        return false;
+
+    return addNewCitta(citta+1);
+}
+
 void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)
 {
     if (skills.size())
@@ -1700,13 +1731,10 @@ bool Fighter::upPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb)
 
     bool ret = false;
     size_t lastsize = 0;
-
-    for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
+    if (!p100)
     {
-        if (p100)
-            lastsize += _passkl[i].size(); 
-        else
-            lastsize += _rpasskl[i].size(); 
+        for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
+            lastsize += _passkl[i].size();
     }
 
     UInt16 idx = type - GData::SKILL_PASSSTART;
@@ -1788,12 +1816,10 @@ bool Fighter::offPassiveSkill(UInt16 skill, UInt16 type, bool p100, bool writedb
     bool ret = false;
     size_t lastsize = 0;
 
-    for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
+    if (!p100)
     {
-        if (p100)
+        for (UInt16 i = 0; i < type-GData::SKILL_PASSSTART; ++i)
             lastsize += _passkl[i].size(); 
-        else
-            lastsize += _rpasskl[i].size(); 
     }
 
     UInt16 idx = type - GData::SKILL_PASSSTART;

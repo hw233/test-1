@@ -79,12 +79,12 @@ void Leaderboard::doUpdate()
 	blist.clear();
 	execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `fighter`.`experience`, `clan`.`name` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
 		" LIMIT 0, 100", blist);
-	buildPacket(_levelStream, 2, _id, blist);
+	buildPacket(_levelStream, 0, _id, blist);
 	if(!blist.empty())
 		_maxLevel = blist[0].lvl;
 
@@ -103,17 +103,17 @@ void Leaderboard::doUpdate()
 		blist[i].clan = (*it)->ranker->getClanName();
 	}
 	blist.resize(i);
-	buildPacket(_moneyStream, 3, _id, blist);
+	buildPacket(_moneyStream, 1, _id, blist);
 
 	blist.clear();
 	execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `player`.`archievement`, `clan`.`name` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `player`.`archievement` DESC"
 		" LIMIT 0, 100", blist);
-	buildPacket(_achievementStream, 4, _id, blist, false);
+	buildPacket(_achievementStream, 2, _id, blist, false);
 
 	blist.clear();
 	execu->ExtractData("SELECT `clan`.`id`, `player`.`name`, `clan_skill`.`level`, `player`.`country`, COUNT(`clan_player`.`id`) AS `pcount`, `clan`.`name` FROM"
@@ -121,7 +121,7 @@ void Leaderboard::doUpdate()
 		"WHERE `clan_skill`.`clanId` = `clan`.`id` AND `clan_skill`.`skillId` = 1 AND `clan`.`id` = `clan_player`.`id`"
 		"AND `clan`.`leader` = `player`.`id` GROUP BY `clan_player`.`id`"
 		"ORDER BY `clan_skill`.`level` DESC, `clan`.`proffer` DESC, `pcount` DESC LIMIT 0, 100", blist);
-	buildPacket(_clanStream, 5, _id, blist);
+	buildPacket(_clanStream, 3, _id, blist);
 
 	std::vector<UInt64> ilist;
 	size_t cnt;
@@ -141,7 +141,7 @@ void Leaderboard::doUpdate()
 
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
@@ -156,7 +156,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" WHERE `player`.`country` = 0"
@@ -172,7 +172,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" WHERE `player`.`country` = 1"
@@ -188,7 +188,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `coin` DESC, `tael` DESC"
@@ -203,7 +203,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" WHERE `country` = 0"
@@ -219,7 +219,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" WHERE `country` = 1"
@@ -235,7 +235,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `archievement` DESC"
@@ -250,7 +250,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" WHERE `country` = 0"
@@ -266,7 +266,7 @@ void Leaderboard::doUpdate()
 	ilist.clear();
 	execu->ExtractData("SELECT `player`.`id` FROM"
 		" (`player` CROSS JOIN `fighter`"
-		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 7)"
+		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" WHERE `country` = 1"
@@ -328,16 +328,16 @@ bool Leaderboard::getPacket( UInt8 t, Stream*& st )
 {
 	switch(t)
 	{
-	case 2:
+	case 0:
 		st = &_levelStream;
 		break;
-	case 3:
+	case 1:
 		st = &_moneyStream;
 		break;
-	case 4:
+	case 2:
 		st = &_achievementStream;
 		break;
-	case 5:
+	case 3:
 		st = &_clanStream;
 		break;
 	default:

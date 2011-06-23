@@ -87,9 +87,8 @@ public:
 
 	UInt32 calcDamage(float, float);
     float calcPracticeInc(GObject::Fighter *);
+    float calcClanTechAddon(UInt16 id, UInt8 lvl);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);
-
-	void reloadSkillData();
 
 	inline SkillData& skillData(UInt16 c, UInt16 s, UInt8 level)
 	{

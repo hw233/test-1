@@ -59,7 +59,6 @@ public:
 	inline float getExtraSoulP() { return _attrExtra.soulP; }
 	inline float getExtraAuraP() { return _attrExtra.auraP; }
 	inline float getExtraAuraMaxP() { return _attrExtra.auraMaxP; }
-	inline float getExtraToughP() { return _attrExtra.toughP; }
 	inline UInt16 getExtraAttack() { return _attrExtra.attack; }
 	inline float getExtraAttackP() { return _attrExtra.attackP; }
 	inline UInt16 getExtraMagAttack() { return _attrExtra.magatk; }

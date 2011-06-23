@@ -35,9 +35,9 @@ namespace GObject
 #define SKILL_ID(x) (((UInt16)(x))/SKILL_LEVEL_MAX)
 #define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX | ((UInt16)(l)))
 
-#define CITTA_LEVEL(x) ((x)%CITTA_LEVEL_MAX)
-#define CITTA_ID(x) ((x)/CITTA_LEVEL_MAX)
-#define CITTAANDLEVEL(c,l) ((c)*CITTA_LEVEL_MAX | (l))
+#define CITTA_LEVEL(x) (((UInt16)(x))%CITTA_LEVEL_MAX)
+#define CITTA_ID(x) (((UInt16)(x))/CITTA_LEVEL_MAX)
+#define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX | ((UInt16)(l)))
 
 #define PEERLESS_UPMAX 1
 
@@ -216,6 +216,8 @@ public:
     int hasCitta(UInt16 citta);
     // 是否装备了此心法
     int isCittaUp(UInt16 citta);
+    // 升级心法
+    bool lvlUpCitta(UInt16 citta, int idx, bool = true);
 
     // 取得装备的心法数
     inline UInt8 getUpCittasNum();
@@ -260,7 +262,7 @@ public:
 
 	UInt32 regenHP(UInt32);
 	bool addExp(UInt64);
-	bool addPExp(UInt64);
+	bool addPExp(Int64, bool = true);
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
@@ -323,7 +325,6 @@ public:
 	inline float getExtraSoulP() { checkDirty(); return _attrExtraEquip.soulP; }
 	inline float getExtraAuraP() { checkDirty(); return _attrExtraEquip.auraP; }
 	inline float getExtraAuraMaxP() { checkDirty(); return _attrExtraEquip.auraMaxP; }
-	inline float getExtraToughP() { checkDirty(); return _attrExtraEquip.toughP; }
 	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
 	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }
