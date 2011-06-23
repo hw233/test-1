@@ -117,9 +117,9 @@ public:
 	inline float getAuraMax() { return _auraMax; }
 	inline float getTough() { return _tough; }
 	inline float getAttack() {return _attack + _attackAdd;}
-	inline float getMagAttack() {return _magatk + _magAttackAdd;}
-	inline float getDefend() {return _defend + _defendAdd;}
-	inline float getMagDefend() {return _magdef + _magDefendAdd;}
+	inline float getMagAttack() {return _magatk + _magAtkAdd;}
+	inline float getDefend() {return _defend + _defAdd;}
+	inline float getMagDefend() {return _magdef + _magDefAdd;}
 	inline float getHitrate() {return _hitrate + _hitrateAdd;}
 	inline float getEvade() {return _evade + _evadeAdd;}
 	inline float getCritical() {return _critical + _criticalAdd;}
@@ -132,9 +132,9 @@ public:
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
 
 	inline float getAttackAdd() {return _attackAdd;}
-    inline float getMagAttackAdd() {return _magAttackAdd;}
-	inline float getDefendAdd() {return _defendAdd;}
-	inline float getMagDefendAdd() {return _magDefendAdd;}
+    inline float getMagAttackAdd() {return _magAtkAdd;}
+	inline float getDefendAdd() {return _defAdd;}
+	inline float getMagDefendAdd() {return _magDefAdd;}
 	inline float getHitrateAdd() {return _hitrateAdd;}
 	inline float getEvadeAdd() {return _evadeAdd;}
 	inline float getCriticalAdd() {return _criticalAdd;}
@@ -145,9 +145,9 @@ public:
 	inline UInt32 getMaxHPAdd() {return _maxhpAdd;}
 	inline UInt32 getActionAdd() {return _maxActionAdd;}
 	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
-	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAttackAdd = v; _magAtkAdd_last = last;}
-	inline void setDefendAdd(float v, UInt16 last = 0) {_defendAdd = v; _defAdd_last = last;}
-	inline void setMagDefendAdd(float v, UInt16 last = 0) {_magDefendAdd = v; _magDefAdd_last = last;}
+	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}
+	inline void setDefendAdd(float v, UInt16 last = 0) {_defAdd = v; _defAdd_last = last;}
+	inline void setMagDefendAdd(float v, UInt16 last = 0) {_magDefAdd = v; _magDefAdd_last = last;}
 	inline void setHitrateAdd(float v, UInt16 last = 0) {_hitrateAdd = v; _hitrateAdd_last = last;}
 	inline void setEvadeAdd(float v, UInt16 last = 0) {_evadeAdd = v; _evadeAdd_last = last;}
 	inline void setCriticalAdd(float v, UInt16 last = 0) {_criticalAdd = v; _criticalAdd_last = last;}
@@ -225,8 +225,8 @@ public:
     const GData::SkillBase* getPassiveSkillDead();
     void releaseSkillCD(int cd);
 
-    inline bool isReAlive() { return _reAlive; }
-    inline void setReAlive() { _reAlive = true; _hp = _maxhp; }
+    inline bool isRevival() { return _revival; }
+    inline void setRevival() { _revival = true; _hp = _maxhp; }
 
 private:
 	void updateBuffExtras();
@@ -236,8 +236,8 @@ private:
 	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _auraMax, _tough;
 	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
     float _critical, _critical_dmg, _pierce, _counter, _magres;
-	UInt32 _maxhp, _maxAction, _actionAdd2;
-	float _attackAdd, _magAttackAdd, _defendAdd, _magDefendAdd, _hitrateAdd, _evadeAdd;
+	UInt32 _maxhp, _maxAction;
+	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	UInt32 _maxhpAdd, _maxActionAdd;
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
@@ -275,7 +275,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillEnter;
     std::vector<GData::SkillItem> _passiveSkillDead;
 
-    bool _reAlive;
+    bool _revival;
     UInt8 _activeSkillIdx;
 
 public:
