@@ -142,7 +142,7 @@ struct DBClanLvl
 	UInt64 exp;         // 建设度值
 };
 
-struct DBClanSkillType
+struct DBClanTechType
 {
 	UInt16 id;          // 科技ID
 	UInt8  level;       // 科技等级
@@ -356,7 +356,7 @@ SPECIALDEF(2)
 	)
 SPECIALEND()
 
-SPECIALBEGIN(GData::DBClanSkillType)
+SPECIALBEGIN(GData::DBClanTechType)
 SPECIALDEF(6)
 	(
 	UInt16, id,

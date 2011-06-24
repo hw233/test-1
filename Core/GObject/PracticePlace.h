@@ -18,8 +18,8 @@ class Player;
 
 struct PPlace
 {
-    UInt32 ownerid;
-    UInt32 protid;
+    UInt64 ownerid;
+    UInt64 protid;
     UInt16 maxslot;
     UInt16 protmoney;
     UInt16 slotmoney;
@@ -40,7 +40,7 @@ struct PracticeData : public GData::ObjectBaseNT<UInt64>
     UInt32 trainend;    // 修炼结束时间
     UInt8 prot;         // 是否申请保护 0-没有任何保护, 1-护法弟子保护, 2-仙府禁法
     UInt32 cdend;       // 下次可修炼时间
-    UInt32 winnerid;    // 挑战胜利者ID
+    UInt64 winnerid;    // 挑战胜利者ID
 
     //Mutex lock;
     std::list<UInt32> fighters;
@@ -105,6 +105,7 @@ public:
     // 取得修炼数据
     PracticeData* getPracticeData(UInt64 playerid);
     PracticeData* getPracticeData(Player* pl);
+    UInt64 getPlaceOwnerId(UInt8 place);
 
     bool isSitdownYet(PracticeData* pd, UInt32 id);
 

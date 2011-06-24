@@ -4,6 +4,7 @@
 #include "TaskMgr.h"
 #include "Server/WorldServer.h"
 #include "Player.h"
+#include "Clan.h"
 #include "Package.h"
 #include "GData/ExpTable.h"
 #include "GData/SkillTable.h"
@@ -1990,10 +1991,23 @@ UInt8 Fighter::getUpCittasNum()
     return c;
 }
 
-UInt64 Fighter::getPracticeInc()
+float Fighter::getPracticeInc()
 {
-    UInt64 ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
     return ret;
+}
+
+float Fighter::getClanTechAddon( int place )
+{
+    if (_owner)
+    {
+        GObject::Clan* clan = _owner->getClan();
+        if (clan)
+        {
+            return clan->getClanTechAddon();
+        }
+    }
+    return 0.0;
 }
 
 UInt16 Fighter::getPracticePlace()

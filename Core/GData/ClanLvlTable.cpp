@@ -20,8 +20,8 @@ bool ClanLvl::testLevelUp( UInt8& lvl, UInt64& exp )
 		r = true;
 		++ lvl;
 	}
-	if(lvl == LEVEL_MAX)
-		exp = _exp[LEVEL_MAX - 1];
+	if(lvl == CLAN_LEVEL_MAX)
+		exp = _exp[CLAN_LEVEL_MAX - 1];
 	return r;
 }
 
@@ -34,8 +34,8 @@ UInt64 ClanLvl::getLevelMin( UInt8 lvl )
 {
 	if(lvl < 2)
 		return 0;
-	if(lvl > LEVEL_MAX)
-		return _exp[LEVEL_MAX - 1];
+	if(lvl > CLAN_LEVEL_MAX)
+		return _exp[CLAN_LEVEL_MAX - 1];
 	return _exp[lvl - 1];
 }
 

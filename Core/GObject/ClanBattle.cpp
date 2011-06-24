@@ -1,7 +1,7 @@
 #include "Config.h"
 #include "ClanBattle.h"
 #include "Clan.h"
-#include "ClanSkill.h"
+#include "ClanTech.h"
 #include "ClanDynamicMsg.h"
 #include "Player.h"
 #include "TaskMgr.h"
@@ -9,7 +9,7 @@
 #include "Server/OidGenerator.h"
 #include "GData/NpcGroup.h"
 #include "GData/ClanAssistantData.h"
-#include "GData/ClanSkillTable.h"
+#include "GData/ClanTechTable.h"
 #include "Mail.h"
 #include "Battle/BattleSimulator.h"
 #include "MsgHandler/CountryMsgStruct.h"
@@ -299,21 +299,21 @@ void ClanBattle::configClanBattleData(bool writedb)
 		return;
 
 	UInt32 guarderId = 0;
-	ClanSkill * skills = clan->getClanSkill();
+	ClanTech* techs = clan->getClanTech();
 
 	//综合宗族技艺配置相关战斗数据
 	_holds[0].endurance = _holds[0].totalendurance = 30;
 	_holds[3].endurance = _holds[3].totalendurance = 0;
-	UInt8 edurance =  static_cast<UInt8>(skills->getNorthEdurance());
+	UInt8 edurance =  static_cast<UInt8>(techs->getNorthEdurance());
 	_holds[1].endurance = _holds[1].totalendurance = (edurance == 0 ? 30 : edurance);
-	edurance = static_cast<UInt8>(skills->getSouthEdurance());
+	edurance = static_cast<UInt8>(techs->getSouthEdurance());
 	_holds[2].endurance = _holds[2].totalendurance = (edurance == 0 ? 30 : edurance);
 	if (writedb)
 		DB().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u, `northEdurance` = %u, `hallEdurance` = %u WHERE `id` = %u", _holds[1].endurance, _holds[2].endurance, _holds[0].endurance, getOwnerClanId());
 
 	//配置宗祠守卫者
 	{
-		guarderId = skills->getHoldTotemGuarder();
+		guarderId = techs->getHoldTotemGuarder();
 		if (guarderId == 0) guarderId = 4562;
 		const GData::ClanAssistant * cat = GData::clanAssistants[guarderId];
 		if (cat == NULL)
@@ -328,7 +328,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 
 	//配置南北门守卫者，护卫者
 	{
-		guarderId = skills->getHoldCityGuarder();
+		guarderId = techs->getHoldCityGuarder();
 		if (guarderId == 0) guarderId = 4540;
 		//配置南门图腾 
 		{
@@ -360,7 +360,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 		//配置护卫者
 		UInt16 assistCnt;
 		UInt32 assistId;
-		if (!skills->getHoldAssist(assistCnt, assistId))
+		if (!techs->getHoldAssist(assistCnt, assistId))
 			return;
 		const GData::ClanAssistant * cat = GData::clanAssistants[assistId];
 		if (cat == NULL)
@@ -1868,7 +1868,7 @@ Clan * ClanCityBattle::getAllyClan()
 
 UInt16 ClanCityBattle::getBattleAchieve() 
 { 
-	return _clan->getClanSkill()->getBattleAchieve(); 
+	return _clan->getClanTech()->getBattleAchieve(); 
 }
 
 UInt8 ClanCityBattle::getLev() 
@@ -2523,14 +2523,14 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 	UInt32 clanId;
 	float gainScore = 0.0f;
 	Clan * clan = NULL;
-	ClanSkill * skills = _clan->getClanSkill();
+	ClanTech * techs = _clan->getClanTech();
 	ClanBattlePlayer * cbp = NULL;
 	ClanMember * cm = NULL;
 	UInt32 thisDay = TimeUtil::SharpDay();
 	typedef std::multimap<float, ClanBattlePlayer *, std::greater<float> > CBPTable;
 	std::map<UInt32, CBPTable> awardExpTable;
 	std::map<UInt32, float> awardExpSum;
-	UInt16 battleAchieve = skills->getBattleAchieve() / 3;
+	UInt16 battleAchieve = techs->getBattleAchieve() / 3;
 	_achieve = 0;
 	std::map<Player *, ClanBattlePlayer *>::iterator offset = _clanBattlePlayerLocs.begin();
 	for (; offset != _clanBattlePlayerLocs.end(); ++ offset)
@@ -2548,7 +2548,7 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 				cbp->grabAchieve = static_cast<UInt32>(cbp->grabAchieve * (4.0f / (clan->getLev() - _clan->getLev() - 6)));
 			if (cbp->grabAchieve <= 0) cbp->grabAchieve = 1;
 			_achieve += cbp->grabAchieve;
-			clan->getClanSkill()->addAchieve(cbp->grabAchieve);
+			clan->getClanTech()->addAchieve(cbp->grabAchieve);
 			Mutex::ScopedLock lk(clan->_mutex);
 			Clan::Members::iterator found = clan->find(cbp->player);
 			if (found != clan->end())
@@ -2578,7 +2578,7 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 			setAwardClanBattleVictor(cbp, false);
 		cbp->player->GetTaskMgr()->DoAcceptedTask(80113);
 	}
-	skills->delAchieve(_achieve);
+	techs->delAchieve(_achieve);
 	DEBUG_LOG("Clan [%u] lost achieve [%u]", _clan->getId(), _achieve);
 	for (std::map<UInt32, CBPTable>::iterator offset = awardExpTable.begin(); offset != awardExpTable.end(); ++ offset)
 	{
@@ -2617,7 +2617,7 @@ bool ClanCityBattle::incEnterClanCount(Player * player)
 UInt16 ClanCityBattle::getWillGainBattlerAward(Clan * c)
 {
 	if (c == NULL) return 0;
-	UInt16 battleAchieve = _clan->getClanSkill()->getBattleAchieve() / 3;
+	UInt16 battleAchieve = _clan->getClanTech()->getBattleAchieve() / 3;
 	if (c->getLev() > _clan->getLev() + 10)
 		return static_cast<UInt16>(4.0f / (c->getLev() - _clan->getLev() - 6) * battleAchieve);
 	return battleAchieve;

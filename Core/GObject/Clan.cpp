@@ -8,11 +8,12 @@
 #include "MapCollection.h"
 #include "ClanBattle.h"
 #include "ClanManager.h"
-#include "GData/ClanSkillTable.h"
+#include "GData/ClanTechTable.h"
+#include "GData/ClanLvlTable.h"
 #include "Player.h"
 #include "Package.h"
 #include "Mail.h"
-#include "ClanSkill.h"
+#include "ClanTech.h"
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
 #include <mysql.h>
@@ -49,7 +50,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
     _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false)
 {
-	_skills = new ClanSkill(this);
+	_techs = new ClanTech(this);
 	memset(_favorId, 0, sizeof(_favorId));
 	_clanDynamicMsg = new ClanDynamicMsg();
 	_clanBattle = new ClanCityBattle(this);
@@ -57,7 +58,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
 
 Clan::~Clan()
 {
-	delete _skills;
+	delete _techs;
 	delete _clanDynamicMsg;
 	delete _clanBattle;
 }
@@ -572,11 +573,11 @@ UInt8 Clan::buildRank( UInt16 pos )
 	return pos >= 9 ? 0 : Ranks[pos];
 }
 
-UInt16 Clan::getFavorItemId(UInt8 skillId)
+UInt16 Clan::getFavorItemId(UInt8 techId)
 {
 	const UInt16 FavoritemId[] = {5801, 5802, 5803, 5804, 5805, 5806, 5807, 5808, 580, 5809, 5810, 5811, 5812, 5813, 5814, 5815, 5816, 5817, 5818, 5819};
 	UInt32 now = TimeUtil::Now();
-	UInt32 index = getSkillIdIndex(skillId);
+	UInt32 index = getTechIdIndex(techId);
 	if(TimeUtil::SharpDay() != TimeUtil::SharpDay(0, _flushFavorTime))
 	{
 		UInt32 r_type1 = uRand(19);
@@ -607,7 +608,7 @@ bool Clan::existClanMember(UInt64 id)
 	return find(id) != _members.end();
 }
 
-bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
+bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 {
 	static UInt16 donateMaxFavor[] = { 40, 40, 40, 40, 40 }; 
 
@@ -615,7 +616,7 @@ bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count
 	Members::iterator found = find(player);
 	if (found == _members.end())
 		return false;
-	if (_skills->isSkillFull(skillId))
+	if (_techs->isTechFull(techId))
 	{
 		player->sendMsgCode(0, 2229);
 		return false;
@@ -636,7 +637,7 @@ bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count
 			player->sendMsgCode(0, 2218);
 			return false;
 		}
-		if (skillId != 1) return false;
+		if (techId != 1) return false;
 		realCount = count + mem->achieveCount;
 		if (realCount > 200 + 10 * player->GetLev())
 		{
@@ -646,7 +647,7 @@ bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count
 	}
 	else if(type == 2)
 	{
-		if(skillId < 2 || skillId > 9)
+		if(techId < 2 || techId > 9)
 			return false;
 		if (getLev() >= 5 && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
 		{
@@ -654,18 +655,18 @@ bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count
 			return false;
 		}
 
-		GData::SingleClanSkillTable & skillTable = GData::clanSkillTable[skillId];
-		UInt8 maxLev = skillTable.size() - 1;
-		UInt8 level = _skills->getLev(skillId);
-		count += static_cast<UInt32>(_skills->getExtra(skillId));
-		while (level < maxLev && count >= skillTable[level+1].needs)
+		GData::SingleClanTechTable & techTable = GData::clanTechTable[techId];
+		UInt8 maxLev = techTable.size() - 1;
+		UInt8 level = _techs->getLev(techId);
+		count += static_cast<UInt32>(_techs->getExtra(techId));
+		while (level < maxLev && count >= techTable[level+1].needs)
 		{
 			++ level;
-			count -= skillTable[level].needs;
+			count -= techTable[level].needs;
 		}
 		if(level >= maxLev && count > 0)
 			return false;
-		if(skillTable[level].clanLev > getLev())
+		if(techTable[level].clanLev > getLev())
 		{
 			player->sendMsgCode(0, 2222);
 			return false;
@@ -673,11 +674,11 @@ bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count
 	}
 	else
 	{
-		GData::SingleClanSkillTable & skillTable = GData::clanSkillTable[7];//pet skill id 7
-		UInt8 level = _skills->getLev(7);//pet skill id 7
-		if(mem->clanPet.size() >= skillTable[level].effect1 && mem->clanPet.find(skillId) == mem->clanPet.end())
+		GData::SingleClanTechTable & techTable = GData::clanTechTable[7];//pet tech id 7
+		UInt8 level = _techs->getLev(7);//pet tech id 7
+		if(mem->clanPet.size() >= techTable[level].effect1 && mem->clanPet.find(techId) == mem->clanPet.end())
 			return false;
-		ClanPlayerPet& playerPetInfo = mem->clanPet[skillId];
+		ClanPlayerPet& playerPetInfo = mem->clanPet[techId];
 		thisDay = TimeUtil::SharpDay(0, now);
 		lastFavorDay = TimeUtil::SharpDay(0, playerPetInfo.favorTime);
 		if(thisDay != lastFavorDay)
@@ -695,14 +696,14 @@ bool Clan::checkDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count
 }
 
 
-bool Clan::GMDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
+bool Clan::GMDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 {
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(player);
 	if (found == _members.end())
 		return false;
 	ClanMember * mem = (*found);
-	if (_skills->donate(player, skillId, type, count))
+	if (_techs->donate(player, techId, type, count))
 	{
 		if (type == 1)
 		{
@@ -728,7 +729,7 @@ bool Clan::GMDonate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 }
 
 
-bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
+bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 {
 	Mutex::ScopedLock lk(_mutex);
 	if (count == 0) 
@@ -749,7 +750,7 @@ bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 	AddItems items = {type, count};
 	if(World::_wday == 4 && type == 1)
 		count *= 2;
-	if (_skills->donate(player, skillId, type, count))
+	if (_techs->donate(player, techId, type, count))
 	{
 		if (type == 1)
 		{
@@ -772,7 +773,7 @@ bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 				broadcast(st);
 			}
 			setProffer(getProffer()+count);
-			addClanDonateRecord(player->getName(), skillId, count, now);
+			addClanDonateRecord(player->getName(), techId, count, now);
 			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u, `achieveCount` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, mem->achieveCount, player->getId());
 			player->GetTaskMgr()->DoAcceptedTask(62207);
 		}
@@ -786,13 +787,13 @@ bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 			Stream st;
 			SYSMSGVP(st, 430, mem->player->getName().c_str(), count);
 			broadcast(st);
-			addClanDonateRecord(player->getName(), skillId, count, now);
+			addClanDonateRecord(player->getName(), techId, count, now);
 			setProffer(getProffer()+count);
 			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());
 		}
 		else
 		{
-			//ClanPlayerPet& playerPetInfo = mem->clanPet[skillId];
+			//ClanPlayerPet& playerPetInfo = mem->clanPet[techId];
 			//thisDay = TimeUtil::SharpDay(0, now);
 			//lastFavorDay = TimeUtil::SharpDay(0, playerPetInfo.favorTime);
 			//if(thisDay != lastFavorDay)
@@ -804,14 +805,14 @@ bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 			//const std::string field3[4] = {"lastFavorTime1", "lastFavorTime2", "lastFavorTime3", "lastFavorTime4"};
 			//for(std::map<UInt8, ClanPlayerPet>::iterator it = mem->clanPet.begin(); it != mem->clanPet.end(); it ++)
 			//{
-			//	if(it->first == skillId)
+			//	if(it->first == techId)
 			//	{
 			//		it->second.petFriendness += 2;
 			//		if(it->second.petFriendness > 100)
 			//			it->second.petFriendness = 100;
 			//		it->second.favorCount = realCount;
 			//		it->second.favorTime = now;
-			//		UInt32 index = getSkillIdIndex(it->first);
+			//		UInt32 index = getTechIdIndex(it->first);
 			//		DB().PushUpdateData("UPDATE `clan_player` SET `%s` = %u, `%s` = %u, `%s` = %u WHERE `playerId` = %"I64_FMT"u;", field1[index].c_str(), it->second.petFriendness, field2[index].c_str(), it->second.favorCount, field3[index].c_str(), it->second.favorTime, player->getId());
 			//	}					
 			//	else
@@ -819,7 +820,7 @@ bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 			//		if(it->second.petFriendness >= 1)
 			//		{
 			//			it->second.petFriendness -= 1;
-			//			UInt32 index = getSkillIdIndex(it->first);
+			//			UInt32 index = getTechIdIndex(it->first);
 			//			DB().PushUpdateData("UPDATE `clan_player` SET `%s` = %u WHERE `playerId` = %"I64_FMT"u;", field1[index].c_str(), it->second.petFriendness, player->getId());
 			//		}
 			//	}
@@ -827,9 +828,9 @@ bool Clan::donate(Player * player, UInt8 skillId, UInt16 type, UInt32 count)
 		}
 
 		//Stream st(0x78);
-		//st << static_cast<UInt8>(4) << skillId << player->getName() << count << mem->donateTime << Stream::eos;
+		//st << static_cast<UInt8>(4) << techId << player->getName() << count << mem->donateTime << Stream::eos;
 		//player->send(st);
-		DEBUG_LOG("Player [%s] donate clanId = [%u] skillId = [%u] type = [%u] count = [%u]", player->getName().c_str(), _id, skillId, type, count);
+		DEBUG_LOG("Player [%s] donate clanId = [%u] techId = [%u] type = [%u] count = [%u]", player->getName().c_str(), _id, techId, type, count);
 
 		return true;
 	}
@@ -923,21 +924,21 @@ void Clan::appendListInfo( Stream& st )
 	}
 }
 
-void Clan::listSkills(Player * player)
+void Clan::listTechs(Player * player)
 {
 	Stream st(0x78);
-	st << static_cast<UInt8>(0) << _skills->getSize();
-	_skills->makeSkillInfo(st);
+	st << static_cast<UInt8>(0) << _techs->getSize();
+	_techs->makeTechInfo(st);
 	st << Stream::eos;
 	player->send(st);
 }
 
-void Clan::listSkillDonators(Player * player, UInt8 skillId)
+void Clan::listTechDonators(Player * player, UInt8 techId)
 {
 	Mutex::ScopedLock lk(_mutex);
-	MemberDonates& mds = _memberDonates[skillId];
+	MemberDonates& mds = _memberDonates[techId];
 	Stream st(0x78);
-	st << static_cast<UInt8>(1) << skillId << static_cast<UInt8>(mds.size());
+	st << static_cast<UInt8>(1) << techId << static_cast<UInt8>(mds.size());
 	for (MemberDonates::iterator offset = mds.begin(); offset != mds.end(); ++ offset)
 	{
 		st << (*offset).donateName << static_cast<UInt32>((*offset).donateCount) << (*offset).donateTime;
@@ -1075,7 +1076,7 @@ bool Clan::hasClanAuthority(Player * player, UInt8 authority)
 void Clan::initBuildClan()
 {
 	Mutex::ScopedLock lk(_mutex);
-	_skills->buildSkill();
+	_techs->buildTech();
 	_clanBattle->initClanBattle();
 }
 
@@ -1101,7 +1102,7 @@ void Clan::disband(Player * player)
 	DB().PushUpdateData("DELETE FROM `clan` WHERE `id` = %u", _id);
 	DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
 	DB().PushUpdateData("DELETE FROM `clan_player` WHERE `id` = %u", _id);
-	DB().PushUpdateData("DELETE FROM `clan_skill` WHERE `clanId` = %u", _id);
+	DB().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
 
 	//4): Maybe bug here
 	Members::iterator iter = _members.begin();
@@ -1117,20 +1118,20 @@ void Clan::disband(Player * player)
 		delete _pending[i];
 	}
 	_pending.clear();
-	//delete _skills;
-	//_skills = NULL;
+	//delete _techs;
+	//_techs = NULL;
 	_clanBattle->clearClanBattle();
 	_deleted = true;
 }
 
 float Clan::getAutoBattleSpeed()
 { 
-	return _skills->getAtuobattleSpeed() / 100.0f + 1.0f;
+	return _techs->getAtuobattleSpeed() / 100.0f + 1.0f;
 }
 
 UInt8 Clan::getAutoBattleEffect()
 {
-	return static_cast<UInt8>(_skills->getAtuobattleSpeed());
+	return static_cast<UInt8>(_techs->getAtuobattleSpeed());
 }
 
 void Clan::retEnterPlsyersCount(UInt16 *count)
@@ -1367,7 +1368,7 @@ void Clan::addClanDonateRecordFromDB(const std::string& dn, UInt8 si, UInt16 dc,
 {
 	MemberDonates& mds = _memberDonates[si];
 	if (mds.size() >= 30)
-		DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `skillId` = %u AND `donateTime` = %u", _id, si, dt);
+		DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, dt);
 	else
 		mds.insert(MemberDonate(dn, dc, dt));
 }
@@ -1378,14 +1379,14 @@ void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt3
 	if (mds.size() >= 30)
 	{
 		const MemberDonate& md = *(mds.begin());
-		DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `skillId` = %u AND `donateTime` = %u", _id, si, md.donateTime);
+		DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, md.donateTime);
 		mds.erase(mds.begin());
 	}
 	mds.insert(MemberDonate(dn, dc, dt));
 	Stream st(0x78);
 	st << static_cast<UInt8>(4) << si << dn << static_cast<UInt32>(dc) << dt << Stream::eos;
 	broadcast(st);
-	DB().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `skillId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
+	DB().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `techId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
 }
 
 void Clan::sendClanDynamicMsg(Player * player, UInt8 type, UInt16 start, UInt16 count)
@@ -1406,10 +1407,12 @@ void Clan::sendClanDynamicMsg(Player * player, UInt8 type, UInt16 start, UInt16 
 	player->send(st);
 }
 
+#if 0
 UInt8 Clan::getLev()
 {
-	return _skills->getClanLev();
+	return _techs->getClanLev();
 }
+#endif
 
 void Clan::setPurpose( const std::string& c, bool writedb )
 {
@@ -1527,9 +1530,19 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     if (cons == _construction)
         return;
     _construction = cons;
+
+    GData::clanLvlTable.testLevelUp(_level, _construction);
     if (writedb)
     {
-		DB().PushUpdateData("UPDATE `clan` SET `construction` = %"I64_FMT"u WHERE `id` = %u", cons, _id);
+		DB().PushUpdateData("UPDATE `clan` SET `level`, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, cons, _id);
+    }
+}
+
+void Clan::addConstruction(UInt64 cons, bool writedb)
+{
+    if (cons)
+    {
+        setConstruction(getConstruction() + cons, writedb);
     }
 }
 
@@ -2003,6 +2016,12 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 		}
 		while(sid > 0);
 	}
+}
+
+float Clan::getClanTechAddon()
+{
+    // TODO:
+    return 0.0;
 }
 
 ClanCache clanCache;

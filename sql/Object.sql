@@ -924,6 +924,7 @@ CREATE TABLE `clan` (
   `id` int(10) unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `rank` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `foundTime` int(10) unsigned NOT NULL DEFAULT '0',
   `founder` bigint(20) unsigned NOT NULL,
   `leader` bigint(20) unsigned NOT NULL DEFAULT '0',

@@ -1,5 +1,5 @@
-#ifndef CLANSKILL_INC
-#define CLANSKILL_INC
+#ifndef CLANTECH_INC
+#define CLANTECH_INC
 
 namespace GObject
 {
@@ -15,41 +15,41 @@ class Player;
     1 : 宗族等级 2: 宗族经验 3 : 喜好品(神兽)
 */
 
-struct ClanSkillData
+struct ClanTechData
 {
-	ClanSkillData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt16 e = 0) 
-		: skillId(s), type(t), level(l), extra(e)
+	ClanTechData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt16 e = 0) 
+		: techId(s), type(t), level(l), extra(e)
 	{
 	}
 
-	UInt8  skillId;
+	UInt8  techId;
 	UInt16 type;
 	UInt8  level;	//如果 = 0， 表示此技能尚未被激活
 	UInt16 extra;
 };
 
-class ClanSkill
+class ClanTech
 {
-	typedef std::map<UInt8, ClanSkillData> Skills;
+	typedef std::map<UInt8, ClanTechData> Techs;
 
 public:
-	ClanSkill(Clan * = NULL);
-	~ClanSkill();
+	ClanTech(Clan * = NULL);
+	~ClanTech();
 
 public:
-	void addSkillFromDB(UInt8, UInt8, UInt16);
-	void buildSkill();
+	void addTechFromDB(UInt8, UInt8, UInt16);
+	void buildTech();
 
 public:
 	bool donate(Player *, UInt8, UInt16, UInt16);
-	void makeSkillInfo(Stream&);
-	void makeSkillInfo(Stream&, ClanSkillData&);
-	UInt8 getSize() { return _skills.size(); }
-	void addSkill(UInt8, UInt16, UInt8, UInt16);
+	void makeTechInfo(Stream&);
+	void makeTechInfo(Stream&, ClanTechData&);
+	UInt8 getSize() { return _techs.size(); }
+	void addTech(UInt8, UInt16, UInt8, UInt16);
 	UInt8 getLev(UInt8);
 	Int32 getExtra(UInt8);
 	inline UInt8 getClanLev() { return getLev(1); }
-	bool isSkillFull(UInt8);
+	bool isTechFull(UInt8);
 
 	bool addAchieve(UInt16);
 	bool delAchieve(UInt16);
@@ -64,13 +64,13 @@ public:
 	UInt32 getHoldCityGuarder();
 
 private:
-	bool skillLevelUp(UInt8, UInt8&, UInt16&, UInt16);
-	bool skillLevelDown(UInt8, UInt8&, UInt16&, UInt16);
+	bool techLevelUp(UInt8, UInt8&, UInt16&, UInt16);
+	bool techLevelDown(UInt8, UInt8&, UInt16&, UInt16);
 
 private:
 	UInt8 _clanLev;
 	Clan * _clan;
-	Skills _skills;
+	Techs _techs;
 	Mutex _mutex;
 };
 

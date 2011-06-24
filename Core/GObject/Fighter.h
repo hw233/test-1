@@ -448,7 +448,8 @@ public:
 	inline UInt32 getBaseAction() { return action; }
 
     Int32 getAcuPraAdd() { return _praadd; }
-    UInt64 getPracticeInc();
+    float getClanTechAddon(int place);
+    float getPracticeInc();
     // TODO:
     UInt16 getPracticePlace();
     bool isGoldPractice() { return false; }
