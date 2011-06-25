@@ -230,7 +230,7 @@ public:
     // 取得装备位置idx处所装备的心法的ID和等级
 	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax()) ? _citta[idx] : 0; }
     // 取得可装备的心法数
-    inline UInt8 getCittasNum() { return _cittas.size(); }
+    UInt8 getCittasNum();
     // 取得所有装备的心法和等级
     void getAllUpCittaAndLevel(Stream& st);
     // 取得所有学习的心法和等级
@@ -486,9 +486,12 @@ protected:
         char* pend = &buf[sizeof(buf)-1];
         for (int i = 0; i < size; ++i)
         {
-            pbuf += snprintf(pbuf, pend - pbuf, "%u", values[i]);
-            if (i < size - 1)
-                pbuf += snprintf(pbuf, pend - pbuf, ",");
+            if (values[i])
+            {
+                pbuf += snprintf(pbuf, pend - pbuf, "%u", values[i]);
+                if (i < size - 1)
+                    pbuf += snprintf(pbuf, pend - pbuf, ",");
+            }
         }
 
         if (pbuf != buf)
@@ -544,7 +547,6 @@ protected:
 	UInt32 _buffData[FIGHTER_BUFF_COUNT];
 
     Int32 _praadd;  // 穴道对修为增长的加成
-    Int32 _auraadd; // 灵气增长加成
 
 public:
 	UInt32 favor;

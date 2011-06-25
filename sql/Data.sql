@@ -378,8 +378,6 @@ CREATE TABLE `acupra` (
   `soulmax` int(10) unsigned NOT NULL,
   `pramax` int(10) unsigned NOT NULL,
   `citslot` tinyint(3) unsigned NOT NULL,
-  `aura` tinyint(3) unsigned NOT NULL,
-  `auraInc` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`, `lvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
@@ -452,6 +450,40 @@ CREATE TABLE `npc_group` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `talent`;
+CREATE TABLE `talent` (
+  `id` smallint(5) NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `cls` tinyint(3) NOT NULL DEFAULT '0',
+  `quality` tinyint(3) NOT NULL DEFAULT '0',
+  `prob` float(5,2) unsigned NOT NULL DEFAULT '1.00',
+  `potential` float(5,2) unsigned NOT NULL DEFAULT '1.00',
+  `capacity` float(5,2) unsigned NOT NULL DEFAULT '1.00',
+  `strength` varchar(10) NOT NULL DEFAULT '0',
+  `physique` varchar(10) NOT NULL DEFAULT '0',
+  `agility` varchar(10) NOT NULL DEFAULT '0',
+  `intelligence` varchar(10) NOT NULL DEFAULT '0',
+  `will` varchar(10) NOT NULL DEFAULT '0',
+  `soul` varchar(10) NOT NULL DEFAULT '0',
+  `aura` varchar(10) NOT NULL DEFAULT '0',
+  `auraMax` varchar(10) NOT NULL DEFAULT '0',
+  `attack` varchar(64) NOT NULL DEFAULT '0',
+  `magatk` varchar(64) NOT NULL DEFAULT '0',
+  `defend` varchar(64) NOT NULL DEFAULT '0',
+  `magdef` varchar(64) NOT NULL DEFAULT '0',
+  `hp` varchar(64) NOT NULL DEFAULT '0',
+  `tough` float(10,4) NOT NULL DEFAULT '0.0000',
+  `action` float(10,4) NOT NULL DEFAULT '0.0000',
+  `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
+  `evade` float(10,4) NOT NULL DEFAULT '0.0000',
+  `critical` float(10,4) NOT NULL DEFAULT '0.0000',
+  `critical_dmg` float(10,4) NOT NULL DEFAULT '0.0000',
+  `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
+  `counter` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magres` float(10,4) NOT NULL DEFAULT '0.0000',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `skills`
