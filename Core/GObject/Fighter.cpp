@@ -1176,6 +1176,14 @@ void Fighter::getAllPSkillAndLevel(Stream& st)
     }
 }
 
+UInt8 Fighter::getSkillsNum()
+{
+    UInt8 c = 0;
+    for (size_t i = 0; i < _skills.size(); ++i)
+        if (_skills[i]) ++c;
+    return c;
+}
+
 void Fighter::getAllSkillsAndLevel( Stream& st )
 {
     UInt8 skills = getSkillsNum();
@@ -1568,6 +1576,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb )
 {
+    if (!skill) return false;
     int idx = hasSkill(skill);
     if (idx > 0)
     {

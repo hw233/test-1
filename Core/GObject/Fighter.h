@@ -147,7 +147,7 @@ public:
     // 取得技能装备位置idx处的技能ID和等级
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
     // 取得可装备的技能数
-    inline UInt8 getSkillsNum() { return _skills.size(); }
+    UInt8 getSkillsNum();
     // 取得所有装备的技能和等级
     void getAllUpSkillAndLevel(Stream& st);
     // 取得所有被动技能
