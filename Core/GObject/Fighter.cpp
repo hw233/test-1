@@ -1124,8 +1124,10 @@ void Fighter::getAllUpSkillAndLevel( Stream& st )
     st << skills;
     for (int i = 0; i < skills; ++i)
     {
-        if (_skill[i])
+        if (_skill[i]) {
+            st << static_cast<UInt8>(i);
             st << _skill[i];
+        }
     }
 }
 
@@ -1200,8 +1202,10 @@ void Fighter::getAllUpCittaAndLevel( Stream& st )
     st << cittas;
     for (int i = 0; i < cittas; ++i)
     {
-        if (_citta[i])
+        if (_citta[i]) {
+            st << static_cast<UInt8>(i);
             st << _citta[i];
+        }
     }
 }
 
