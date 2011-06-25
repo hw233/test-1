@@ -198,8 +198,10 @@ public:
     inline void setConfuseRound(UInt32 l) { _flag = (_flag & ~ConfuseRound) + (l << 28); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
     inline void setImmuneLevel(UInt8 f) { _immuneLevel = f; }
+    inline void setImmune(UInt8 f) { _immune |= f; }
     inline void setImmuneRound(UInt8 f) { _immuneRound = f; }
     inline UInt8 getImmuneLevel() { return _immuneLevel; }
+    inline UInt8 getImmune() { return _immune; }
     inline UInt8 getImmuneRound() { return _immuneRound; }
     inline void setForgetLevel(UInt8 f) { _forgetLevel = f; }
     inline void setForgetRound(UInt8 f) { _forgetRound = f; }
@@ -227,6 +229,12 @@ public:
 
     inline bool isRevival() { return _revival; }
     inline void setRevival() { _revival = true; _hp = _maxhp; }
+    inline void setDeAction( float deAct ) { _deAction = deAct; }
+    inline float getDeAction() { return _deAction; }
+    inline void setEvad100( bool evd100 ) { _evade100 = evd100; }
+    inline bool getEvad100() { return _evade100; }
+    inline void setDefend100( bool def100 ) { _defend100 = def100; }
+    inline bool getDefend100() { return _defend100; }
 
 private:
 	void updateBuffExtras();
@@ -245,7 +253,6 @@ private:
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
-    UInt8 _immuneLevel, _immuneRound;
     UInt8 _forgetLevel, _forgetRound;
 	/* 武将状态 0-1bit:增强符
 	   2-3bit:群体增强符
@@ -277,6 +284,12 @@ private:
 
     bool _revival;
     UInt8 _activeSkillIdx;
+    UInt8 _immuneLevel;
+    UInt8 _immune;
+    UInt8 _immuneRound;
+    float _deAction;
+    bool _evade100;
+    bool _defend100;
 
 public:
 	enum StatusFlag

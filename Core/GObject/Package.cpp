@@ -21,9 +21,9 @@
 #define ITEM_SOCKET_L3 8919
 #define ITEM_GEM_PROTECT 8920
 #define ITEM_SPLIT_PROTECT 8925
-#define ITEM_DETACH_PROTECT 8926
+#define ITEM_DETACH_PROTECT 504 // 精致拆卸石
 #define ITEM_ENCHANT_PROTECT 8927
-#define ITEM_DETACH_RUNE 8928
+#define ITEM_DETACH_RUNE 505    // 粗制拆卸石
 #define ITEM_FORGE_PROTECT 501  // 洗炼保护符
 #define ITEM_ACTIVATE_ATTR 9215
 
@@ -1358,18 +1358,22 @@ namespace GObject
 			return 2;
 		}
 		bool bind = false;
-		if(DelItem(ITEM_DETACH_RUNE, 1, true))
-			bind = true;
-		else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
-			return 2;
-		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_RUNE, 1, TimeUtil::Now());
-		bool isBound = bind;
-		if(protect > 0 && !DelItemAny(ITEM_DETACH_PROTECT, 1, &isBound))
-			protect = 0;
-		else
-			bind |= isBound;
-		if(protect > 0)			
-			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_PROTECT, 1, TimeUtil::Now());
+        if(!protect)
+        {
+            if(DelItem(ITEM_DETACH_RUNE, 1, true))
+                bind = true;
+            else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
+                return 2;
+            DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_RUNE, 1, TimeUtil::Now());
+        }
+        else
+        {
+            if(DelItem(ITEM_DETACH_PROTECT, 1, true))
+                bind = true;
+            else if(!DelItem(ITEM_DETACH_PROTECT, 1, false))
+                return 2;
+            DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_PROTECT, 1, TimeUtil::Now());
+        }
 		if(!AddItem(ied.gems[pos], 1, bind | equip->GetBindStatus(), false, FromDetachGem))
 			return 2;
         ConsumeInfo ci(DetachGems,0,0);

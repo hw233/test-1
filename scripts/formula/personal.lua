@@ -235,7 +235,11 @@ function calcPierce( fgt )
 end
 
 function calcDamage( atk, def )
-  return atk * def_factor / (def + def_factor)
+    if atk < def + 1 then
+        return 1;
+    end
+
+  return atk - def
 end
 
 function calcBattlePoint( fgt )

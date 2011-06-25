@@ -139,8 +139,11 @@ private:
 private:
 	int findFirstAttacker();
 	UInt32 doAttack(int);
-	void insertFighterStatus(FighterStatus& fs);
-	void removeFighterStatus(FighterStatus& fs);
+    UInt32 FightersEnter();
+    UInt32 doSkillAttackAftEnter(BattleFighter* bf);
+    void reQueueFighterStatus(BattleFighter* bf);
+	void insertFighterStatus(BattleFighter* bf);
+	void removeFighterStatus(BattleFighter* bf);
 	UInt32 attackOnce(BattleFighter * bf, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL);
 	float testRescue(BattleFighter *& bf, int counter_deny, AttackPoint * counter_deny_list);
 	float testLink(BattleFighter *& bf, UInt16& skillId);
@@ -165,7 +168,8 @@ private:
 	UInt8 _position;
 	bool _report;
 	UInt32 _fake_turns;
-	std::vector<FighterStatus> _fgtlist[2];
+	//std::vector<FighterStatus> _fgtlist[2];
+	std::vector<BattleFighter*> _fgtlist[2];
     Int8 _cur_fgtlist_idx;
 	Stream _packet;
 	Script::BattleFormula * _formula;

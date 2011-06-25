@@ -23,6 +23,11 @@ enum
     SKILL_PASSIVES
 };
 
+enum
+{
+    SKILL_EFFECT_FALG_VALUE = 30000
+};
+
 struct SkillEffect : public ObjectBaseNT<UInt16>
 {
     SkillEffect(UInt16 id)
