@@ -17,8 +17,6 @@ struct AcuPra : public ObjectBaseNT<UInt16>
     UInt32 soulmax;
     UInt32 pramax;
     UInt32 citslot;
-    UInt8 aura;
-    UInt8 auraInc;
 };
 
 typedef ObjectMapT<AcuPra, UInt16> AcuPraManager;

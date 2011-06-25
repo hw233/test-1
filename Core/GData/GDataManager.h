@@ -30,6 +30,7 @@ namespace GData
 		static bool LoadQueRule();
 		static bool LoadFighterTrainData();
 		static bool LoadPracticeData();
+		static bool LoadTalent();
 		static bool LoadSkillEffect();
 		static bool LoadSkills();
 		static bool LoadCittaEffect();

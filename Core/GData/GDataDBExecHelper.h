@@ -136,6 +136,39 @@ struct DBSkillEffect
     float magres;       // 法术抵抗
 };
 
+struct DBTalent
+{
+    UInt16 id;                  // 天赋ID
+    std::string name;           // 天赋名
+    UInt8 cls;                  // 职业
+    UInt8 quality;              // 天赋品质
+    float prob;                 // 洗概率(同一职业的概率之和为100)
+    float potential;            // 潜力*
+    float capacity;             // 资质*
+	std::string strength;       // 力量 [+/-]num/num%
+	std::string physique;       // 耐力 [+/-]num/num%
+	std::string agility;        // 敏捷 [+/-]num/num%
+	std::string intelligence;   // 智力 [+/-]num/num%
+    std::string will;           // 意志 [+/-]num/num%
+    std::string soul;           // 元神 [+/-]num/num%
+    std::string aura;           // 作用士气 [+/-]num/num%
+    std::string auraMax;        // 最大灵气 [+/-]num/num%
+	std::string attack;         // 物攻 [+/-]num/num%
+	std::string magatk;         // 法术攻击 [+/-]num/num%
+	std::string defend;         // 物防 [+/-]num/num%
+	std::string magdef;         // 法术防御 [+/-]num/num%
+	std::string hp;             // HP [+/-]num/num%
+    float tough;                // 坚韧
+	float action;               // 身法
+	float hitrate;              // 命中
+	float evade;                // 闪避
+	float critical;             // 暴击
+	float critical_dmg;         // 暴击伤害
+	float pierce;               // 击破/护甲穿透
+	float counter;              // 反击
+	float magres;               // 法术抵抗
+};
+
 struct DBClanLvl
 {
 	UInt8 lvl;          // 帮派等级
@@ -213,8 +246,6 @@ struct DBAcuPra
     UInt32 soulmax; // 元神力上限
     UInt32 pramax;  // 修为上限
     UInt8 citslot;  // 心法装备加1
-    UInt8 aura;     // 出场灵气加成
-    UInt8 auraInc;  // 灵气增长加成
 };
 
 struct DBExp
@@ -443,8 +474,43 @@ SPECIALDEF(25)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBTalent)
+SPECIALDEF(29)
+    (
+        UInt16, id,
+        std::string, name,
+        UInt8, cls,
+        UInt8, quality,
+        float, prob,
+        float, potential,
+        float, capacity,
+        std::string, strength,
+        std::string, physique,
+        std::string, agility,
+        std::string, intelligence,
+        std::string, will,
+        std::string, soul,
+        std::string, aura,
+        std::string, auraMax,
+        std::string, attack,
+        std::string, magatk,
+        std::string, defend,
+        std::string, magdef,
+        std::string, hp,
+        float, tough,
+        float, action,
+        float, hitrate,
+        float, evade,
+        float, critical,
+        float, critical_dmg,
+        float, pierce,
+        float, counter,
+        float, magres
+    )
+SPECIALEND()
+
 SPECIALBEGIN(GData::DBAcuPra)
-SPECIALDEF(9)
+SPECIALDEF(7)
     (
         UInt8, id,
         UInt8, lvl,
@@ -452,9 +518,7 @@ SPECIALDEF(9)
         UInt32, pra,
         UInt32, soulmax,
         UInt32, pramax,
-        UInt8, citslot,
-        UInt8, aura,
-        UInt8, auraInc
+        UInt8, citslot
     )
 SPECIALEND()
 

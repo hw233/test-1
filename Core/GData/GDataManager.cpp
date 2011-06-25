@@ -15,6 +15,7 @@
 #include "Server/ServerTypes.h"
 #include "Server/Cfg.h"
 #include "SkillTable.h"
+#include "TalentTable.h"
 #include "CittaTable.h"
 #include "AcuPraTable.h"
 #include "Common/StringTokenizer.h"
@@ -104,6 +105,11 @@ namespace GData
 			fprintf(stderr, "Load practice daata Error !\n");
 			return false;
 		}
+        if (!LoadTalent())
+        {
+			fprintf(stderr, "Load talent template Error !\n");
+			return false;
+        }
         if (!LoadSkillEffect())
         {
 			fprintf(stderr, "Load skill effect Error !\n");
@@ -176,7 +182,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBAcuPra ap;
-		if(execu->Prepare("SELECT `id`, `lvl`, `needlvl`, `pra`, `soulmax`, `pramax`, `citslot`, `aura`, `auraInc` FROM `acupra`", ap) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `lvl`, `needlvl`, `pra`, `soulmax`, `pramax`, `citslot` FROM `acupra`", ap) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -188,8 +194,6 @@ namespace GData
             pap->soulmax = ap.soulmax;
             pap->pramax = ap.pramax;
             pap->citslot = ap.citslot;
-            pap->aura = ap.aura;
-            pap->auraInc = ap.auraInc;
             GData::acupraManager.add(pap);
 		}
         return true;
@@ -663,6 +667,48 @@ namespace GData
         }
         return true;
     }
+
+    bool GDataManager::LoadTalent()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBTalent tal;
+		if(execu->Prepare("SELECT `id`, `name`, `cls`, `quality`, `prob`, `potential`, `capacity`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres` FROM `talent`", tal) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            Talent* ptal = new Talent(tal.id, tal.name);
+            ptal->cls = tal.cls;
+            ptal->quality = tal.quality;
+            ptal->prob = tal.prob;
+            ptal->potential = tal.potential;
+            ptal->capacity = tal.capacity;
+            SetValOrPercent(ptal->strength, ptal->strengthP, tal.strength);
+            SetValOrPercent(ptal->physique, ptal->physiqueP, tal.physique);
+            SetValOrPercent(ptal->agility, ptal->agilityP, tal.agility);
+            SetValOrPercent(ptal->intelligence, ptal->intelligenceP, tal.intelligence);
+            SetValOrPercent(ptal->will, ptal->willP, tal.will);
+            SetValOrPercent(ptal->soul, ptal->soulP, tal.soul);
+            SetValOrPercent(ptal->aura, ptal->auraP, tal.aura);
+            SetValOrPercent(ptal->auraMax, ptal->auraMaxP, tal.auraMax);
+            SetValOrPercent(ptal->attack, ptal->attackP, tal.attack);
+            SetValOrPercent(ptal->magatk, ptal->magatkP, tal.magatk);
+            SetValOrPercent(ptal->defend, ptal->defendP, tal.defend);
+            SetValOrPercent(ptal->magdef, ptal->magdefP, tal.magdef);
+            SetValOrPercent(ptal->hp, ptal->hpP, tal.hp);
+            ptal->tough = tal.tough;
+            ptal->action = tal.action;
+            ptal->evade = tal.evade;
+            ptal->critical = tal.critical;
+            ptal->critical_dmg = tal.critical_dmg;
+            ptal->pierce = tal.pierce;
+            ptal->counter = tal.counter;
+            ptal->magres = tal.magres;
+            talentManager.add(ptal);
+        }
+        return true;
+    }
+
 
     bool GDataManager::LoadSkillEffect()
     {

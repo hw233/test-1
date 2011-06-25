@@ -46,7 +46,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _trumpslot(TRUMP_INIT), _cittaslot(CITTA_INIT), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
-    _praadd(0), _auraadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
+    _praadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), 
     hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
@@ -1217,10 +1217,18 @@ void Fighter::getAllUpCittaAndLevel( Stream& st )
     }
 }
 
+UInt8 Fighter::getCittasNum()
+{
+    UInt8 c = 0;
+    for (size_t i = 0; i < _cittas.size(); ++i)
+        if (_citta[i]) ++c;
+    return c;
+}
+
 void Fighter::getAllCittasAndLevel( Stream& st )
 {
     // XXX: 只发送没有装备的
-    UInt8 cittas = getUpCittasNum();
+    UInt8 cittas = getCittasNum();
     st << cittas;
     for (int i = 0; i < cittas; ++i)
     {
@@ -1389,8 +1397,6 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         {
             DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         }
-        aura += pap->aura;
-        _auraadd += pap->auraInc;
         ++_praadd; // 每一层级+1
 
         _acupoints[idx] = v;
@@ -1917,6 +1923,7 @@ int Fighter::hasCitta( UInt16 citta )
 
 bool Fighter::addNewCitta( UInt16 citta, bool writedb )
 {
+    if (!citta) return false;
     int idx = hasCitta(citta);
     if (idx > 0)
     {
