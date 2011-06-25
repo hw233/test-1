@@ -6,6 +6,7 @@
 #include "ExpTable.h"
 #include "ClanLvlTable.h"
 #include "LootTable.h"
+#include "ClanTechTable.h"
 #include "ClanSkillTable.h"
 #include "GObject/Item.h"
 #include "DB/DBConnectionMgr.h"
@@ -123,6 +124,16 @@ namespace GData
 			fprintf(stderr, "Load cittas template Error !\n");
 			return false;
         }
+		if (!LoadClanLvlData())
+		{
+			fprintf(stderr, "Load clan level template Error !\n");
+			return false;
+		}
+		if (!LoadClanTechTable())
+		{
+			fprintf(stderr, "Load clan tech template Error !\n");
+			return false;
+		}
 		if (!LoadClanSkillTable())
 		{
 			fprintf(stderr, "Load clan skill template Error !\n");
@@ -790,13 +801,38 @@ namespace GData
         return true;
     }
 
+	bool GDataManager::LoadClanTechTable()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		UInt32 accNeeds = 0;
+		DBClanTechType cst;
+		if (execu->Prepare("SELECT `id`, `level`, `needs`, `clanLev`, `effect1`, `effect2` FROM `clan_tech_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+			if (cst.id >= clanTechTable.size())
+			{
+				accNeeds = 0;
+				clanTechTable.resize(cst.id+1);
+			}
+			SingleClanTechTable & single = clanTechTable[cst.id];
+			if (cst.level >= single.size())
+				single.resize(cst.level+1);
+			accNeeds += cst.needs;
+			single[cst.level] = ClanTechTableData(cst.id, cst.level, cst.needs, accNeeds, cst.clanLev, cst.effect1, cst.effect2);
+		}
+
+		return true;
+	}
+
 	bool GDataManager::LoadClanSkillTable()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		UInt32 accNeeds = 0;
 		DBClanSkillType cst;
-		if (execu->Prepare("SELECT `id`, `level`, `needs`, `clanLev`, `effect1`, `effect2` FROM `clan_skill_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `level`, `needs`, `hp`, `attack`, `defend`, `magatk`, `magdef` FROM `clan_skill_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
@@ -809,7 +845,7 @@ namespace GData
 			if (cst.level >= single.size())
 				single.resize(cst.level+1);
 			accNeeds += cst.needs;
-			single[cst.level] = ClanSkillTableData(cst.id, cst.level, cst.needs, accNeeds, cst.clanLev, cst.effect1, cst.effect2);
+			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, accNeeds, cst.hp, cst.attack, cst.defend, cst.magatk, cst.magdef);
 		}
 
 		return true;

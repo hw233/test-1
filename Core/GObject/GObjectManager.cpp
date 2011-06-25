@@ -26,7 +26,7 @@
 #include "Dungeon.h"
 #include "SpecialAward.h"
 #include "Prepaid.h"
-#include "ClanSkill.h"
+#include "ClanTech.h"
 #include "ClanBattle.h"
 #include "ClanManager.h"
 #include "LuckyDraw.h"
@@ -1692,7 +1692,7 @@ namespace GObject
         // 帮会信息
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -1823,10 +1823,9 @@ namespace GObject
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
 
-        //帮会技能
-		//load all clan skills
+        //帮派科技
 		lc.prepare("Loading clan skills:");
-		DBClanSkill cs;
+		DBClanTech cs;
 		if(execu->Prepare("SELECT `clanId`, `skillId`, `level`, `extra` FROM `clan_skill` ORDER BY `clanId`", cs) != DB::DB_OK)
 			return false;
 		lastId = 0xFFFFFFFF;
@@ -1839,11 +1838,11 @@ namespace GObject
 				clan = globalClans[cs.clanId];
 			if (clan == NULL)
 				continue;
-			clan->getClanSkill()->addSkillFromDB(cs.skillId, cs.level, cs.extra);
+			clan->getClanTech()->addTechFromDB(cs.skillId, cs.level, cs.extra);
 		}
 		lc.finalize();
 
-        //申请帮会请求
+        //申请帮派请求
 		lc.prepare("Loading clan pending players:");
 		DBClanPendingPlayer cpp;
 		if(execu->Prepare("SELECT `id`, `playerId`, `class`, `opTime` FROM `clan_pending_player` ORDER BY `id`", cpp) != DB::DB_OK)

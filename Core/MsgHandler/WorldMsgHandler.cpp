@@ -31,7 +31,7 @@ MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG(GameMsgHdr, OnAthleticsChallengeReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 
-MSG_REG_2(GameMsgHdr, 0x78, OnClanSkillOpReq);
+MSG_REG_2(GameMsgHdr, 0x78, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, 0x79, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, 0x7A, OnClanCityBattleListReq);
 MSG_REG(GameMsgHdr, OnArenaInfoReq);
@@ -49,7 +49,7 @@ MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 MSG_REG_2(GameMsgHdr, 0x171, OnClanTakeRewardResultReq);
 MSG_REG_2(GameMsgHdr, 0x173, OnClanMailInviteClick);
 MSG_REG_2(GameMsgHdr, 0x174, OnClanMailClick);
-MSG_REG_2(GameMsgHdr, 0x175, OnClanSkillDonateCheckResp);
+MSG_REG_2(GameMsgHdr, 0x175, OnClanTechDonateCheckResp);
 MSG_REG_2(GameMsgHdr, 0x176, OnClanAllyMailResp);
 MSG_REG_2(GameMsgHdr, 0x177, OnClanBattlerOffTimeCheck);
 MSG_REG_2(GameMsgHdr, 0x178, OnDoInstantAutoBattleReq);

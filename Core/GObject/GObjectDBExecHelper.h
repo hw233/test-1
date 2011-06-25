@@ -289,6 +289,7 @@ struct DBClan
 	UInt32 id;
 	std::string name;
 	UInt8  rank;
+	UInt8  level;
 	UInt32 foundTime;
 	UInt64 founder;
 	UInt64 leader;
@@ -333,13 +334,6 @@ struct DBClanPlayer
 };
 
 struct DBClanTech
-{
-	UInt32 clanId;
-    UInt8 techId;
-    UInt8 level;
-};
-
-struct DBClanSkill
 {
 	UInt32 clanId;
 	UInt8  skillId;
@@ -922,11 +916,12 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(23)
+SPECIALDEF(24)
 (
 	UInt32, id,
 	std::string, name,
 	UInt8, rank,
+	UInt8, level,
 	UInt32, foundTime,
 	UInt64, founder,
 	UInt64, leader,
@@ -1267,7 +1262,7 @@ SPECIALDEF(8)
 SPECIALEND()
 
 
-SPECIALBEGIN(GObject::DBClanSkill)
+SPECIALBEGIN(GObject::DBClanTech)
 SPECIALDEF(4)
 (
 	UInt32, clanId,

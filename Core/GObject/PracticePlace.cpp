@@ -407,7 +407,7 @@ namespace GObject
 
         if (pd->checktime)
         {
-            EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60, pd->checktime, pd->trainend);
+            EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);
         }
@@ -461,6 +461,13 @@ namespace GObject
             // TODO: notify client
         }
         return;
+    }
+
+
+    UInt64 PracticePlace::getPlaceOwnerId(UInt8 place)
+    {
+        PlaceData& pd = m_places[place-1];
+        return pd.place.ownerid;
     }
 
 } // namespace GObject

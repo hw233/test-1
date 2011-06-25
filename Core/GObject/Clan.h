@@ -12,7 +12,7 @@ namespace GObject
 {
 
 class Player;
-class ClanSkill;
+class ClanTech;
 class ClanBattle;
 
 struct AllocItem
@@ -106,7 +106,7 @@ public:
 	static void patchMergedName(UInt32 id, std::string& name);
 public:
 	UInt16 getFavorItemId(UInt8 skilId);
-	inline UInt32 getSkillIdIndex(UInt8 skillId){return skillId - 7;}// 青龙7、白虎8、朱雀9、玄武10 fix??????
+	inline UInt32 getTechIdIndex(UInt8 skillId){return skillId - 7;}// 青龙7、白虎8、朱雀9、玄武10 fix??????
 
 public:
 	UInt16 getPetFriendness(ClanMember *mem, UInt8 skillId){return mem->clanPet[skillId].petFriendness;}
@@ -129,6 +129,7 @@ public:
 	inline Player * getLeader() { return _members.empty() ?	NULL : (*(_members.begin()))->player; }
     inline UInt64 getConstruction() { return _construction; }
     void setConstruction(UInt64 cons, bool = true);
+    void addConstruction(UInt64 cons, bool = true);
 	bool alterLeader();
 	UInt16 getDonateAchievement(Player *);
 	void setFounder(UInt64);
@@ -174,6 +175,7 @@ public:
 	void initBuildClan();
 	void disband(Player *);
 	bool hasClanAuthority(Player *, UInt8);
+    float getClanTechAddon();
 
 
 public:
@@ -220,8 +222,8 @@ public:
 	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
 
 public:
-	UInt8 getLev();
-	ClanSkill * getClanSkill() { return _skills; }
+	inline UInt8 getLev() { return _level; }
+	ClanTech * getClanTech() { return _techs; }
 	ClanBattle * getClanBattle() { return _clanBattle; }
 	ClanDynamicMsg * getClanDynamicMsg() { return _clanDynamicMsg; }
 
@@ -238,8 +240,8 @@ public:
 	void searchMatch(Player *);
 	void appendListInfo(Stream&);
 
-	void listSkills(Player *);
-	void listSkillDonators(Player *, UInt8);
+	void listTechs(Player *);
+	void listTechDonators(Player *, UInt8);
 
 	void broadcastMemberInfo(ClanMember &, UInt8);
 	void broadcastMemberInfo(Player *);
@@ -273,6 +275,7 @@ private:
 	std::set<UInt32> _membersJoinTime;	//保证每个成员加入的时间不一样
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
+	UInt8 _level;
 	UInt32 _foundTime;
 	UInt64 _founder;
 	std::string _founderName;
@@ -296,7 +299,7 @@ private:
 
 	std::map<UInt32, UInt8> _repoNum;
 	std::multimap<UInt32, AllocRecord> _allocRecords;
-	ClanSkill * _skills;
+	ClanTech * _techs;
 	bool _deleted;
 	std::vector<std::string> _keywords;
 

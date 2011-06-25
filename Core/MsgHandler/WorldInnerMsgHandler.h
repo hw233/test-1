@@ -223,12 +223,12 @@ void OnClanMailClick(GameMsgHdr& hdr, const void * data)
 }
 
 
-void OnClanSkillDonateCheckResp( GameMsgHdr& hdr, const void * data )
+void OnClanTechDonateCheckResp( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	struct DonateItems
 	{
-		UInt8  skillId;
+		UInt8  techId;
 		UInt16 flag;
 		UInt32 count;
 		UInt8 ret;
@@ -238,7 +238,7 @@ void OnClanSkillDonateCheckResp( GameMsgHdr& hdr, const void * data )
 	if (items->ret == 0)
 	{
 		GObject::Clan * clan = player->getClan();
-		if (clan != NULL && clan->donate(player, items->skillId, items->flag, items->count))
+		if (clan != NULL && clan->donate(player, items->techId, items->flag, items->count))
 			r = 1;
 	}
 	Stream st(0x78);

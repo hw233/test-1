@@ -4,6 +4,7 @@
 #include "TaskMgr.h"
 #include "Server/WorldServer.h"
 #include "Player.h"
+#include "Clan.h"
 #include "Package.h"
 #include "GData/ExpTable.h"
 #include "GData/SkillTable.h"
@@ -1123,8 +1124,10 @@ void Fighter::getAllUpSkillAndLevel( Stream& st )
     st << skills;
     for (int i = 0; i < skills; ++i)
     {
-        if (_skill[i])
+        if (_skill[i]) {
+            st << static_cast<UInt8>(i);
             st << _skill[i];
+        }
     }
 }
 
@@ -1173,6 +1176,14 @@ void Fighter::getAllPSkillAndLevel(Stream& st)
     }
 }
 
+UInt8 Fighter::getSkillsNum()
+{
+    UInt8 c = 0;
+    for (size_t i = 0; i < _skills.size(); ++i)
+        if (_skills[i]) ++c;
+    return c;
+}
+
 void Fighter::getAllSkillsAndLevel( Stream& st )
 {
     UInt8 skills = getSkillsNum();
@@ -1199,8 +1210,10 @@ void Fighter::getAllUpCittaAndLevel( Stream& st )
     st << cittas;
     for (int i = 0; i < cittas; ++i)
     {
-        if (_citta[i])
+        if (_citta[i]) {
+            st << static_cast<UInt8>(i);
             st << _citta[i];
+        }
     }
 }
 
@@ -1563,6 +1576,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb )
 {
+    if (!skill) return false;
     int idx = hasSkill(skill);
     if (idx > 0)
     {
@@ -1990,10 +2004,23 @@ UInt8 Fighter::getUpCittasNum()
     return c;
 }
 
-UInt64 Fighter::getPracticeInc()
+float Fighter::getPracticeInc()
 {
-    UInt64 ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
+    float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
     return ret;
+}
+
+float Fighter::getClanTechAddon( int place )
+{
+    if (_owner)
+    {
+        GObject::Clan* clan = _owner->getClan();
+        if (clan)
+        {
+            return clan->getClanTechAddon();
+        }
+    }
+    return 0.0;
 }
 
 UInt16 Fighter::getPracticePlace()

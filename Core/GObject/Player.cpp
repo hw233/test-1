@@ -259,7 +259,7 @@ namespace GObject
             fgt = m_Player->findFighter(*i);
             if (fgt)
             {
-                fgt->addPExp(fgt->getPracticeInc() * 60); 
+                fgt->addPExp(fgt->getPracticeInc() * 60 * 10); 
             }
         }
         //data->lock.unlock();

@@ -33,12 +33,18 @@ function calcPracticeInc( fgt )
         goldfactor = 0
     end
 
+    if place ~= 7 then
+        clantechaddon = fgt:getClanTechAddon(place)
+    else
+        clantechaddon = 0
+    end
+
     potential = fgt:getPotential()
     if potential < 5 then
         potential = 5
     end
 
     -- 穴道加成 + (资质 - 5) * 0.16 + 钱加成 + 山头加成
-    return fgt:getAcuPraAdd() + (prabase * (1 + (potential - 5) * potfactor + goldfactor + placeadd)) + 0.5
+    return fgt:getAcuPraAdd() + (prabase * (1 + (potential - 5) * potfactor + goldfactor + placeadd + clantechaddon)) + 0.5
 end
 

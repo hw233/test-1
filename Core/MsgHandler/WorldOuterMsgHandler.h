@@ -527,7 +527,7 @@ void OnClanGetDynamicMsgReq(GameMsgHdr& hdr, ClanGetDynamicMsgReq& req)
 	player->getClan()->sendClanDynamicMsg(player, req._type, req._start, req._count);
 }
 
-void OnClanSkillOpReq(GameMsgHdr& hdr, const void * data)
+void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
@@ -539,13 +539,13 @@ void OnClanSkillOpReq(GameMsgHdr& hdr, const void * data)
 		switch (op)
 		{
 		case 0:
-			clan->listSkills(player);
+			clan->listTechs(player);
 			break;
 		case 1:
 			{
 				UInt8 skillId;
 				brd >> skillId;
-				clan->listSkillDonators(player, skillId);
+				clan->listTechDonators(player, skillId);
 			}
 			break;
 		case 2:
