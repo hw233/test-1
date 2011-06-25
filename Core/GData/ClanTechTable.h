@@ -1,5 +1,5 @@
-#ifndef CLANSKILLTABLE_INC
-#define CLANSKILLTABLE_INC
+#ifndef CLANTECHTABLE_INC
+#define CLANTECHTABLE_INC
 
 namespace GData
 {

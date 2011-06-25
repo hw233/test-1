@@ -152,6 +152,19 @@ struct DBClanTechType
 	UInt32 effect2;     // 效果二
 };
 
+struct DBClanSkillType
+{
+	UInt16 id;          // 技能ID
+    std::string name;   // 技能名
+	UInt8  level;       // 技能等级
+	UInt32 needs;       // 升级所需
+    UInt32 hp;          // HP
+    UInt32 attack;      // 物攻
+    UInt32 defend;      // 物防
+    UInt32 magatk;      // 法攻
+    UInt32 magdef;      // 法防
+};
+
 struct DBCitta
 {
     UInt16 id;          // ID及等级 id=id/100 lvl=id%100
@@ -365,6 +378,21 @@ SPECIALDEF(6)
 	UInt8, clanLev,
 	UInt32, effect1,
 	UInt32, effect2
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBClanSkillType)
+SPECIALDEF(9)
+	(
+	UInt16, id,
+    std::string, name,
+	UInt8,  level,
+	UInt32, needs,
+    UInt32, hp,
+    UInt32, attack,
+    UInt32, defend,
+    UInt32, magatk,
+    UInt32, magdef
 	)
 SPECIALEND()
 
