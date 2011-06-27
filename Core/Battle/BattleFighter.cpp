@@ -518,7 +518,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
     for(size_t i = 0; i < cnt; i++)
     {
         size_t idx = (_activeSkillIdx + i) % cnt;
-        if(_activeSkill[idx].cd == 0)
+        if(NULL != _activeSkill[idx].base && _activeSkill[idx].cd == 0)
         {
             // therapy skill second while need therapy
             if(need_therapy && !has_therapy)
