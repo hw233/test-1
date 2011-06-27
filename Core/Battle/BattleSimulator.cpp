@@ -408,13 +408,21 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             float magatk = 0;
             if(NULL != skill)
             {
-                atk = bf->calcAttack(cs) * skill->effect->damageP + skill->effect->adddam;
-                magatk = bf->calcMagAttack(cs) * skill->effect->magdamP + skill->effect->addmag;
+                float aura_factor = 1;
+                if(skill->cond == GData::SKILL_PEERLESS)
+                {
+                    aura_factor = bf->getAura() / 100;
+                    bf->setAura(0);
+                }
+
+                atk = aura_factor * (bf->calcAttack(cs) * skill->effect->damageP + skill->effect->adddam);
+                magatk = aura_factor * (bf->calcMagAttack(cs) * skill->effect->magdamP + skill->effect->addmag);
             }
             else
             {
                 atk = bf->calcAttack(cs);
             }
+
 #if 0
 			float rescueRate = 0.0f;
 			bool rescue = counter_deny >= 0 && (rescueRate = testRescue(area_target, counter_deny, counter_deny_list)) > 0.0f;
@@ -2576,6 +2584,7 @@ void BattleSimulator::onDead(BattleObject * bo, std::vector<AttackAct>* atkAct)
     if(fRevival)
     {
         (static_cast<BattleFighter*>(bo))->setRevival();
+        doSkillAttackAftEnter(static_cast<BattleFighter*>(bo));
     }
     else
     {

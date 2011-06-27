@@ -158,6 +158,7 @@ public:
 	inline void setMaxHPAdd(UInt32 v) {_maxhpAdd = v;}
 	inline void setActionAdd(UInt32 v, UInt16 last = 0) {_maxActionAdd = v; _maxActionAdd_last = last;}
     inline void AddAura(UInt32 v) {_aura += v;}
+    inline void setAura(UInt32 v) {_aura = v;}
     inline void setToughAdd(float v, UInt16 last) {_toughAdd = v; _toughAdd_last = last;}
 
 	inline UInt32 getLostHP() { UInt32 mhp = _maxhp + _maxhpAdd; if(mhp > _hp) return mhp - _hp; return 0; }
@@ -228,7 +229,39 @@ public:
     void releaseSkillCD(int cd);
 
     inline bool isRevival() { return _revival; }
-    inline void setRevival() { _revival = true; _hp = _maxhp; }
+    inline void setRevival()
+    {
+        _revival = true;
+        _hp = _maxhp;
+        _attackAdd = 0;
+        _magAtkAdd = 0;
+        _defAdd = 0;
+        _magDefAdd = 0;
+        _hitrateAdd = 0;
+        _evadeAdd = 0;
+        _criticalAdd = 0;
+        _criticalDmgAdd = 0;
+        _pierceAdd = 0;
+        _counterAdd = 0;
+        _magResAdd = 0;
+        _toughAdd = 0;
+        _maxhpAdd = 0;
+        _maxActionAdd = 0;
+        _atkAdd_last = 0;
+        _magAtkAdd_last = 0;
+        _defAdd_last = 0;
+        _magDefAdd_last = 0;
+        _hitrateAdd_last = 0;
+        _evadeAdd_last = 0;
+        _criticalAdd_last = 0;
+        _criticalDmgAdd_last = 0;
+        _pierceAdd_last = 0;
+        _counterAdd_last = 0;
+        _magResAdd_last = 0;
+        _toughAdd_last = 0;
+        _maxhpAdd_last = 0;
+        _maxActionAdd_last = 0;
+    }
     inline void setDeAction( float deAct ) { _deAction = deAct; }
     inline float getDeAction() { return _deAction; }
     inline void setEvad100( bool evd100 ) { _evade100 = evd100; }
