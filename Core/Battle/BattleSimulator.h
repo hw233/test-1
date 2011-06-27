@@ -83,6 +83,7 @@ private:
 	{
 		UInt8 pos;
 		UInt8 damType;
+		UInt8 damType2;
 		UInt16 damage;
 		UInt32 leftHP;
         UInt16 rhp;
