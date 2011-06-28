@@ -511,8 +511,8 @@ protected:
 	UInt64 _exp;        // 经验
     UInt64 _pexp;       // 修炼经验
     UInt64 _pexpMax;    // 修炼最大经验
-	float _potential;   // 资质
-	float _capacity;    // 潜力
+	float _potential;   // 潜力
+	float _capacity;    // 资质
 	UInt8 _color;
 	UInt16 _hp;
 
@@ -602,12 +602,15 @@ public:
 	void setSpot(UInt32 id, UInt16 spot);
 	UInt16 getSpot(UInt32 id);
 	inline void setMaxFgtId(UInt32 n) { _maxFgtId = n; }
+    static void setTavernFighterStartEnd( UInt32 start, UInt32 end );
 
 private:
 	FastMutex _mutex;
 	std::vector<FighterData> _fighters;
 	UInt32 _maxFgtId;
 	std::map<UInt32,UInt32> _summonSet[3];
+    static UInt32 _tavernFighterStart;
+    static UInt32 _tavernFighterEnd;
 };
 
 extern GlobalFighters globalFighters;

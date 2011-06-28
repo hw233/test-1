@@ -4,6 +4,7 @@
 #include "GData/Title.h"
 #include "GObject/Dungeon.h"
 #include "GObject/Player.h"
+#include "GObject/Fighter.h"
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
 #include "GObject/SpecialAward.h"
@@ -31,6 +32,10 @@ void WorldScript::init()
 	def("setDungeonExtraCount", GObject::Dungeon::setExtraCount);
 	def("setTavernInterval", GObject::Player::setTavernInterval);
 	def("setTavernRate", GObject::Player::setTavernRate);
+    def("setRecruitCost", GObject::Player::setRecruitCost);
+    def("setTavernBlueCount", GObject::Player::setTavernBlueCount);
+    def("setTavernPurpleCount", GObject::Player::setTavernPurpleCount);
+    def("setTavernFighterStartEnd", GObject::GlobalFighters::setTavernFighterStartEnd);
 	def("setActivityStage", GObject::World::setActivityStage);
 	def("setActAvailable", GObject::World::setActAvailable);
 	def("setActAvailable1", GObject::World::setActAvailable1);

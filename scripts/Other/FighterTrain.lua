@@ -135,6 +135,44 @@ local LevelTrainExp = {
 	{ 120,98000 },
 };
 
+-- 潜力{潜力(潜力/100为最终潜力值)，概率(概率/1000为最终概率值)}
+local PotentialChance = {
+    {90,  1000},
+    {95,  900},
+    {105, 800},
+    {115, 700},
+    {125, 600},
+    {135, 500},
+    {145, 400},
+    {155, 300},
+    {165, 200},
+    {175, 100},
+    {185, 50},
+    {195, 20},
+    {205, 10},
+}
+
+-- 资质{资质(资质/100为最终资质值)，概率(概率/1000为最终概率值)}
+local CapacityChance = {
+    {90,  1000},
+    {95,  900},
+    {105, 800},
+    {115, 700},
+    {125, 600},
+    {135, 500},
+    {145, 400},
+    {155, 300},
+    {165, 200},
+    {175, 100},
+    {185, 50},
+    {195, 20},
+    {205, 10},
+}
+
+local MinPotential = 70
+local MaxPotential = 200
+local MinCapacity = 500
+local MaxCapacity = 1000
 
 function GetTaelTrain()
 	return TaelTrain;
@@ -146,4 +184,28 @@ end
 
 function GetLevelTrainExp()
 	return LevelTrainExp;
+end
+
+function getPotentialChance()
+    return PotentialChance
+end
+
+function getCapacityChance()
+    return CapacityChance
+end
+
+function getMinPotential()
+    return MinPotential
+end
+
+function getMaxPotential()
+    return MaxPotential
+end
+
+function getMinCapacity()
+    return MinCapacity
+end
+
+function getMaxCapacity()
+    return MaxCapacity
 end

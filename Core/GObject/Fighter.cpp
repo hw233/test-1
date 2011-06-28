@@ -22,6 +22,8 @@
 namespace GObject
 {
 
+    UInt32 GlobalFighters::_tavernFighterStart = 0, GlobalFighters::_tavernFighterEnd = 0;
+
 GlobalFighters globalFighters;
 
 Fighter& getGreatFighter(UInt32 id)
@@ -2069,12 +2071,12 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 	switch(type)
 	{
 	case 0:
-		if(uRand(200 * 100 / rate) == 0)
+		if(uRand(rate) == 0)
 			color = 2;
 		break;
 	case 1:
 		{
-			UInt32 rnd = uRand(400 * 100 / rate);
+			UInt32 rnd = uRand(rate*2);
 			if(rnd == 0)
 				color = 3;
 			else if(rnd < 5)
@@ -2115,32 +2117,10 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 	if(size == 0)
 		return NULL;
 
-	if(color == 2)
-	{
-		std::map<UInt32, UInt32>::iterator it;
-		UInt32 bs = 0;
-		for(it = idset.begin(); it != idset.end(); ++ it)
-		{
-			bs += it->second;
-		}
-		UInt32 r = uRand(bs);
-		for(it = idset.begin(); it != idset.end(); ++ it)
-		{
-			if(r < it->second)
-			{
-				return _fighters[it->first].fighter;
-			}
-			r -= it->second;
-		}
-		return NULL;
-	}
-	else
-	{
-		std::map<UInt32, UInt32>::iterator it = idset.begin();
-		if(size > 1)
-			std::advance(it, uRand(size));
-		return _fighters[it->first].fighter;
-	}
+    std::map<UInt32, UInt32>::iterator it = idset.begin();
+    if(size > 1)
+        std::advance(it, uRand(size));
+    return _fighters[it->first].fighter;
 }
 
 void GlobalFighters::setSpot( UInt32 id, UInt16 spot )
@@ -2161,9 +2141,15 @@ UInt16 GlobalFighters::getSpot( UInt32 id )
 	return _fighters[id].spot;
 }
 
+void GlobalFighters::setTavernFighterStartEnd( UInt32 start, UInt32 end )
+{
+    _tavernFighterStart = start;
+    _tavernFighterEnd = end;
+}
+
 void GlobalFighters::buildSummonSet()
 {
-	for(UInt32 i = 7; i < 134; ++ i)
+	for(UInt32 i = _tavernFighterStart; i < _tavernFighterEnd; ++ i)
 	{
 		Fighter * fgt = _fighters[i].fighter;
 		if(fgt == NULL) continue;
@@ -2172,40 +2158,11 @@ void GlobalFighters::buildSummonSet()
 		{
 		case 1:
 		case 2:
+        case 3:
 			_summonSet[color - 1][i] = 0;
 			break;
 		}
 	}
-	_summonSet[2][8] = 3;
-	_summonSet[2][11] = 6;
-	_summonSet[2][13] = 4;
-	_summonSet[2][24] = 6;
-	_summonSet[2][25] = 3;
-	_summonSet[2][26] = 6;
-	_summonSet[2][28] = 3;
-	_summonSet[2][30] = 3;
-	_summonSet[2][35] = 2;
-	_summonSet[2][37] = 6;
-	_summonSet[2][44] = 6;
-	_summonSet[2][45] = 6;
-	_summonSet[2][48] = 2;
-	_summonSet[2][51] = 3;
-	_summonSet[2][55] = 6;
-	_summonSet[2][56] = 3;
-	_summonSet[2][63] = 6;
-	_summonSet[2][66] = 2;
-	_summonSet[2][77] = 2;
-	_summonSet[2][85] = 4;
-	_summonSet[2][87] = 4;
-	_summonSet[2][102] = 4;
-	_summonSet[2][106] = 6;
-	_summonSet[2][107] = 3;
-	_summonSet[2][117] = 4;
-	_summonSet[2][118] = 4;
-	_summonSet[2][122] = 4;
-	_summonSet[2][123] = 6;
-	_summonSet[2][131] = 6;
-	_summonSet[2][132] = 4;
 }
 
 void GlobalFighters::setAllDirty()

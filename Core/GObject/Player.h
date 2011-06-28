@@ -654,6 +654,10 @@ namespace GObject
 		static void setTavernInterval(UInt32);
 		static void setTavernRate(UInt32);
 
+        static void setRecruitCost(UInt32 recruit_cost);
+        static void setTavernBlueCount(UInt32 tavernBlueCount);
+        static void setTavernPurpleCount(UInt32 tavernPurpleCount);
+
 		inline Mutex& getMutex() { return _mutex; }
 
 	private:
@@ -726,6 +730,9 @@ namespace GObject
 		UInt16 _lastDungeon;
 		std::vector<GData::LootResult> _lastLoot;
 
+        static UInt32 _recruit_cost;
+        static UInt32 _tavernBlueCount;
+        static UInt32 _tavernPurpleCount;
 		static UInt32 _tavernInterval, _tavernRate;
 		static UInt32 _bookStoreInterval, _bookStoreRate;
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)

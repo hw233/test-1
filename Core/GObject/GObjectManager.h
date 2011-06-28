@@ -10,7 +10,15 @@ namespace GObject
 	class ItemEquip;
 	class ItemWeapon;
 	class ItemArmor;
-
+#ifndef CHANCECOND
+#define CHANCECOND(a) ((0xFFFF0000 & a) >> 16)
+#endif
+#ifndef CHANCEVALUE
+#define CHANCEVALUE(b) (0x0000FFFF & b)
+#endif
+#ifndef MAKECHANCE
+#define MAKECHANCE(a,b) (((0x0000FFFF & a) << 16) | (0x0000FFFF & b))
+#endif
 	class GObjectManager
 	{
 	public:
@@ -44,6 +52,7 @@ namespace GObject
 		static bool resetClanData(UInt32);
 
         static bool loadEquipForge();
+        static bool loadFightersPCChance();
 
         static UInt32 getEnchantCost() { return _enchant_cost; }
         static UInt32 getMergeCost() { return _merge_cost; }
@@ -57,8 +66,12 @@ namespace GObject
         static UInt8 getAttrChance( UInt8 lvl, UInt8 q, UInt8 idx ) { return _attrChances[lvl][q][idx]; }
         static UInt16 getAttrInfo( UInt8 lvl, UInt8 t, UInt8 q, UInt8 idx ) { return _attrInfo[lvl][t][q][idx]; }
         static UInt32 getSocketChance( UInt8 s ) { return _socket_chance[s]; }
+        static UInt32 getMinPotential() { return _min_potential; }
+        static UInt32 getMaxPotential() { return _max_potential; }
+        static UInt32 getMinCapacity() { return _min_capacity; }
+        static UInt32 getMaxCapacity() { return _max_capacity; }
         static std::vector<UInt32>& getPotentialChance() { return _potential_chance; }
-        static std::vector<UInt32>& getTalentChance() { return _talent_chance; }
+        static std::vector<UInt32>& getCapacityChance() { return _capacity_chance; }
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -73,8 +86,12 @@ namespace GObject
 		static UInt8  _attrChances[11][3][8];
 		static UInt16 _attrInfo[11][8][3][8];
         static UInt32 _socket_chance[6];
+        static UInt32 _min_potential;
+        static UInt32 _max_potential;
+        static UInt32 _min_capacity;
+        static UInt32 _max_capacity;
         static std::vector<UInt32> _potential_chance;
-        static std::vector<UInt32> _talent_chance;
+        static std::vector<UInt32> _capacity_chance;
 	};
 }
 
