@@ -337,7 +337,7 @@ void BattleFighter::updateBuffExtras()
 float BattleFighter::calcAttack( bool& isCritical )
 {
 	// 计算暴击率
-	isCritical = uRand(10000) < _critical * 100;
+	isCritical = uRand(10000) < (_critical + _criticalAdd) * 100;
 
 	float atk = _attack + _attackAdd;
 	/* TODO: random
@@ -347,7 +347,7 @@ float BattleFighter::calcAttack( bool& isCritical )
 	// 如果暴击
 	if(isCritical)
 	{
-		atk = atk * 3 / 2;
+		atk = atk * (_critical_dmg + _criticalDmgAdd);
 	}
 	return atk;
 }
@@ -370,7 +370,14 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     if(!skill)
         return 0;
 
-    return (_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp;
+    float aura_factor = 1;
+    if(skill->cond == GData::SKILL_PEERLESS)
+    {
+        aura_factor = _aura / 100;
+        _aura = 0;
+    }
+
+    return aura_factor * ((_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
 bool BattleFighter::calcHit( BattleFighter * defender )
@@ -511,7 +518,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
     for(size_t i = 0; i < cnt; i++)
     {
         size_t idx = (_activeSkillIdx + i) % cnt;
-        if(_activeSkill[idx].cd == 0)
+        if(NULL != _activeSkill[idx].base && _activeSkill[idx].cd == 0)
         {
             // therapy skill second while need therapy
             if(need_therapy && !has_therapy)

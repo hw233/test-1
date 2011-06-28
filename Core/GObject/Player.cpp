@@ -3544,7 +3544,7 @@ namespace GObject
 		}
 	}
 
-	UInt8 Player::trainFighter( UInt32 id, UInt8 protect )
+	UInt8 Player::trainFighter( UInt32 id, UInt8 type )
 	{
 #define ITEM_TRAIN 8999
 #define ITEM_TRAIN_PROTECT 9000

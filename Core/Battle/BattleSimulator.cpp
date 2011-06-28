@@ -7,6 +7,8 @@
 #include "BattleReport.h"
 #include "Server/OidGenerator.h"
 
+#include "Common/DirectoryIterator.h"
+#include "Server/Cfg.h"
 namespace Battle
 {
 
@@ -181,6 +183,21 @@ void BattleSimulator::start()
 	_packet.data<UInt32>(cnt_pos) = act_count;
 	_packet << Stream::eos;
 //	printf("Winner is: %d,  actions: %d\n", _winner, act_count);
+#ifdef _DEBUG
+	char path[1024], path2[1024];
+	sprintf(path, "%s0/0", cfg.reportPath.c_str());
+	sprintf(path2, "%s/%u.log", path, 0);
+	File rfile(path);
+	rfile.createDirectories();
+	FILE * f = fopen(path2, "a+");
+	if(f != NULL)
+    {
+        char szBuf[256] = {0};
+        sprintf(szBuf, "act_count=%d\r\n\r\n\r\n", act_count);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        fclose(f);
+    }
+#endif
 
 	_turns = act_count;
 
@@ -408,13 +425,21 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             float magatk = 0;
             if(NULL != skill)
             {
-                atk = bf->calcAttack(cs) * skill->effect->damageP + skill->effect->adddam;
-                magatk = bf->calcMagAttack(cs) * skill->effect->magdamP + skill->effect->addmag;
+                float aura_factor = 1;
+                if(skill->cond == GData::SKILL_PEERLESS)
+                {
+                    aura_factor = bf->getAura() / 100;
+                    bf->setAura(0);
+                }
+
+                atk = aura_factor * (bf->calcAttack(cs) * skill->effect->damageP + skill->effect->adddam);
+                magatk = aura_factor * (bf->calcMagAttack(cs) * skill->effect->magdamP + skill->effect->addmag);
             }
             else
             {
                 atk = bf->calcAttack(cs);
             }
+
 #if 0
 			float rescueRate = 0.0f;
 			bool rescue = counter_deny >= 0 && (rescueRate = testRescue(area_target, counter_deny, counter_deny_list)) > 0.0f;
@@ -558,7 +583,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			{
 				if(target_fighter->calcHit(bf))
 				{
-                    defList[0].damType |= 0x80;
+                    defList[0].damType2 |= 0x80;
 					bool cs = false;
 					float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
@@ -568,9 +593,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					bf->makeDamage(dmg2);
 
 					if(cs)
-						defList[0].damType |= 0x40;
+						defList[0].damType2 |= 0x40;
 					if(pr)
-						defList[0].damType |= 0x20;
+						defList[0].damType2 |= 0x20;
 					defList[0].counterDmg = dmg2;
 					defList[0].counterLeft = bf->getHP();
 
@@ -737,6 +762,7 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
 		StatusChange scList[50];
 		size_t scCount = 0;
 
+        memset(defList, 0, sizeof(defList));
 		// calculate damage
 		bool cs = false;
 		bool pr = false;
@@ -845,6 +871,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         UInt32 rhp = bf->calcTherapy(skill);
         DefStatus defList[25];
         size_t defCount = 0;
+        memset(defList, 0, sizeof(defList));
         if(1 == skill->area)
         {
             for(UInt8 pos = 0; pos < 25; ++ pos)
@@ -904,6 +931,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 		bool cs = false;
 		bool pr = false;
 
+        memset(defList, 0, sizeof(defList));
         if(0 == skill->area)
         {
             dmg = attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
@@ -964,6 +992,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         StatusChange scList[50];
         size_t scCount = 0;
 
+        memset(defList, 0, sizeof(defList));
         if(cnt == 1)
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
@@ -1050,6 +1079,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         DefStatus defList[25];
         size_t defCount = 0;
 	
+        memset(defList, 0, sizeof(defList));
         BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
 
         defList[defCount].damage = 0;
@@ -1260,6 +1290,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             StatusChange scList[50];
             size_t scCount = 0;
 
+            memset(defList, 0, sizeof(defList));
             UInt32 fdmg = bf->getMaxHP() * bPoisonLevel/100;
             -- round;
             defList[defCount].damType = (round > 0) ? e_Poison : e_UnPoison;
@@ -1315,6 +1346,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             DefStatus defList[25];
             size_t defCount = 0;
 
+            memset(defList, 0, sizeof(defList));
             defList[defCount].damType = e_UnConfuse;
             defList[defCount].damage = 0;
             defList[defCount].pos = bf->getPos() + 25;
@@ -1334,6 +1366,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             DefStatus defList[25];
             size_t defCount = 0;
 
+            memset(defList, 0, sizeof(defList));
             defList[defCount].damType = e_UnForget;
             defList[defCount].damage = 0;
             defList[defCount].pos = bf->getPos() + 25;
@@ -1353,6 +1386,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             DefStatus defList[25];
             size_t defCount = 0;
 
+            memset(defList, 0, sizeof(defList));
             defList[defCount].damType = e_UnStun;
             defList[defCount].damage = 0;
             defList[defCount].pos = bf->getPos() + 25;
@@ -1539,6 +1573,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             StatusChange scList[50];
             size_t scCount = 0;
 
+            memset(defList, 0, sizeof(defList));
             size_t idx = 0;
             const GData::SkillBase* passiveSkill = NULL;
             const GData::SkillBase* passiveSkillThorn = NULL;
@@ -2314,13 +2349,13 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 	// attacked players list
 	for(size_t i = 0; i < defCount; ++ i)
 	{
-		_packet << defList[i].pos << defList[i].damType << defList[i].damage << defList[i].leftHP;
+		_packet << defList[i].pos << defList[i].damType << defList[i].damType2 << defList[i].damage << defList[i].leftHP;
         if(defList[i].damType == 8)
         {
             _packet << defList[i].rhp << defList[i].rLeftHP;
         }
 
-		if((defList[i].damType & 0x07) == 5 || (defList[i].damType & 0x80) == 0x80)
+		if((defList[i].damType2 & 0x80) == 0x80)
 		{
 			_packet << defList[i].counterDmg << defList[i].counterLeft;
 		}
@@ -2331,6 +2366,73 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 	{
 		_packet << scList[i].pos << scList[i].statusId << scList[i].type << scList[i].data;
 	}
+
+#ifdef _DEBUG
+	char path[1024], path2[1024];
+	sprintf(path, "%s0/0", cfg.reportPath.c_str());
+	sprintf(path2, "%s/%u.log", path, 0);
+	File rfile(path);
+	rfile.createDirectories();
+	FILE * f = fopen(path2, "a+");
+	if(f == NULL)
+		return;
+
+    char szBuf[256] = {0};
+    sprintf(szBuf, "from_side=%d\r\n", from_side);
+	fwrite(szBuf, 1, strlen(szBuf), f);
+    sprintf(szBuf, "atk_type=%d\r\n", atk_type);
+	fwrite(szBuf, 1, strlen(szBuf), f);
+    sprintf(szBuf, "skillId=%d\r\n", add_id);
+	fwrite(szBuf, 1, strlen(szBuf), f);
+    sprintf(szBuf, "target_pos=%d\r\n", target_pos);
+	fwrite(szBuf, 1, strlen(szBuf), f);
+    sprintf(szBuf, "from_pos=%d\r\n", from_pos);
+	fwrite(szBuf, 1, strlen(szBuf), f);
+    sprintf(szBuf, "defCount=%d\r\n", defCount);
+	fwrite(szBuf, 1, strlen(szBuf), f);
+	for(size_t i = 0; i < defCount; ++ i)
+	{
+        sprintf(szBuf, "defList[%d].pos=%d\r\n", i, defList[i].pos);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        sprintf(szBuf, "defList[%d].damType=%d\r\n", i, defList[i].damType);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        sprintf(szBuf, "defList[%d].damage=%d\r\n", i, defList[i].damage);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        sprintf(szBuf, "defList[%d].leftHP=%d\r\n", i, defList[i].leftHP);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        if(defList[i].damType == 8)
+        {
+            sprintf(szBuf, "defList[%d].rhp=%d\r\n", i, defList[i].rhp);
+            fwrite(szBuf, 1, strlen(szBuf), f);
+            sprintf(szBuf, "defList[%d].rLeftHP=%d\r\n", i, defList[i].rLeftHP);
+            fwrite(szBuf, 1, strlen(szBuf), f);
+        }
+
+		if((defList[i].damType & 0x07) == 5 || (defList[i].damType & 0x80) == 0x80)
+		{
+            sprintf(szBuf, "defList[%d].counterDmg=%d\r\n", i, defList[i].counterDmg);
+            fwrite(szBuf, 1, strlen(szBuf), f);
+            sprintf(szBuf, "defList[%d].counterLeft=%d\r\n", i, defList[i].counterLeft);
+            fwrite(szBuf, 1, strlen(szBuf), f);
+		}
+	}
+	// status change
+    sprintf(szBuf, "scCount=%d\r\n", scCount);
+    fwrite(szBuf, 1, strlen(szBuf), f);
+	for(size_t i = 0; i < scCount; ++ i)
+	{
+        sprintf(szBuf, "scList[%d].pos=%d\r\n", i, scList[i].pos);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        sprintf(szBuf, "scList[%d].type=%d\r\n", i, scList[i].type);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+        sprintf(szBuf, "scList[%d].data=%d\r\n", i, scList[i].data);
+        fwrite(szBuf, 1, strlen(szBuf), f);
+	}
+
+    sprintf(szBuf, "------------------------------------\r\n");
+    fwrite(szBuf, 1, strlen(szBuf), f);
+	fclose(f);
+#endif
 }
 
 bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool useRegen, UInt32 sysRegen )
@@ -2576,6 +2678,7 @@ void BattleSimulator::onDead(BattleObject * bo, std::vector<AttackAct>* atkAct)
     if(fRevival)
     {
         (static_cast<BattleFighter*>(bo))->setRevival();
+        doSkillAttackAftEnter(static_cast<BattleFighter*>(bo));
     }
     else
     {

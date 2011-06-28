@@ -57,6 +57,8 @@ namespace GObject
         static UInt8 getAttrChance( UInt8 lvl, UInt8 q, UInt8 idx ) { return _attrChances[lvl][q][idx]; }
         static UInt16 getAttrInfo( UInt8 lvl, UInt8 t, UInt8 q, UInt8 idx ) { return _attrInfo[lvl][t][q][idx]; }
         static UInt32 getSocketChance( UInt8 s ) { return _socket_chance[s]; }
+        static std::vector<UInt32>& getPotentialChance() { return _potential_chance; }
+        static std::vector<UInt32>& getTalentChance() { return _talent_chance; }
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -71,6 +73,8 @@ namespace GObject
 		static UInt8  _attrChances[11][3][8];
 		static UInt16 _attrInfo[11][8][3][8];
         static UInt32 _socket_chance[6];
+        static std::vector<UInt32> _potential_chance;
+        static std::vector<UInt32> _talent_chance;
 	};
 }
 
