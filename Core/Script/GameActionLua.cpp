@@ -849,9 +849,9 @@ namespace Script
 		return Call<UInt32>("onLuckyDrawItemRoll", type);
 	}
 
-	UInt32 GameActionLua::onDungeonLootItemRoll( Player * player, UInt8 id, UInt8 difficulty, UInt8 level, bool isBoss )
+	UInt32 GameActionLua::onDungeonLootItemRoll( Player * player, UInt8 id, UInt8 level, bool isBoss )
 	{
-		return Call<UInt32>("onDungeonLootItemRoll", player, id, difficulty, level, isBoss);
+		return Call<UInt32>("onDungeonLootItemRoll", player, id, level, isBoss);
 	}
 	void GameActionLua::onMergeGem(Player * player, UInt8 lev, UInt8 num)
 	{

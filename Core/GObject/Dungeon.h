@@ -46,15 +46,13 @@ public:
 	};
 	struct DungeonPlayerInfo
 	{
-		DungeonPlayerInfo(): difficulty(0), level(0), count(0), totalCount(0), counterEnd(0)
-		{
-			memset(firstPass, 0, sizeof(firstPass));
-		}
+		DungeonPlayerInfo(): difficulty(0), level(0), count(0), totalCount(0), firstPass(0), counterEnd(0)
+		{}
 		UInt8 difficulty;
 		UInt8 level;
 		UInt8 count;
 		UInt16 totalCount;
-		UInt32 firstPass[DUNGEON_DIFFICULTY_MAX];
+		UInt32 firstPass;
 		UInt32 counterEnd;
 		std::list<DungeonItemInfo> lootToday;
 	};
@@ -66,12 +64,12 @@ public:
 public:
 	Dungeon(UInt8 id, const GData::DungeonData *);
 	~Dungeon();
-	void pushPlayer(Player *, UInt8, UInt8, UInt8, UInt16, UInt32 *, UInt32);
-	UInt8 playerEnter(Player *, UInt8);
+	void pushPlayer(Player *, UInt8, UInt8, UInt16, UInt32, UInt32);
+	UInt8 playerEnter(Player *);
 	UInt8 playerLeave(Player *);
 	UInt8 playerBreak(Player *);
 	UInt8 playerContinue(Player *);
-	void playerJump(Player *, UInt8, UInt8);
+	void playerJump(Player *, UInt8);
 	void startChallenge(Player *);
 	void sendAutoChallengeStart(Player *);
 	void processAutoChallenge(Player *, UInt8, UInt32 *);
@@ -82,8 +80,8 @@ public:
 	void sendDungeonInfo(Player *);
 	void sendMyLootInfo(Player *);
 	void buildInfo(Player *, Stream&);
-	UInt32 getFirstPass(Player *, UInt8);
-	bool doAttack(Player *, UInt8, UInt8);
+	UInt32 getFirstPass(Player *);
+	bool doAttack(Player *, UInt8);
 	static void setMaxCount(UInt32 cnt);
 	static void setPrice(UInt32 idx, UInt16 price);
 	static UInt16 * getPrice(size_t& size);
@@ -97,11 +95,11 @@ private:
 	bool advanceLevel(Player *, DungeonPlayerInfo&, bool = false, UInt32 * = NULL, UInt32 = 0);
 	void sendDungeonInfo(Player *, DungeonPlayerInfo&);
 	void sendDungeonLevelData(Player *, DungeonPlayerInfo&);
-	void enterLevel(Player *, UInt8, UInt8);
-	void leaveLevel(Player *, UInt8, UInt8);
+	void enterLevel(Player *, UInt8);
+	void leaveLevel(Player *, UInt8);
 	void updateToDB(Player *, DungeonPlayerInfo&);
 	void checkForTimeout(Player *, DungeonPlayerInfo&, bool);
-	void broadcast(Stream&, UInt8, Player * = NULL);
+	void broadcast(Stream&, Player * = NULL);
 	inline static UInt8 getEnterCount() { return _maxCount; }
 private:
 	inline UInt8 getGemLeve3Chance(UInt8 id, UInt8 bossIndex)
@@ -130,7 +128,7 @@ private:
 private:
 	const GData::DungeonData * _dungeon;
 	std::map<Player *, DungeonPlayerInfo> _players;
-	std::vector<DungeonLevel> _levels[DUNGEON_DIFFICULTY_MAX];
+	std::vector<DungeonLevel> _levels;
 	struct DungeonLootInfo
 	{
 		DungeonLootInfo(Player * player_, UInt16 id_, UInt8 count_): player(player_), id(id_), count(count_) {}
@@ -139,7 +137,7 @@ private:
 		UInt8 count;
 	};
 	std::list<DungeonLootInfo> _recentLoots;
-	std::vector<std::list<DungeonReportInfo> > _recentReports[DUNGEON_DIFFICULTY_MAX];
+	std::vector<std::list<DungeonReportInfo> > _recentReports;
 	static UInt8 _maxCount;
 	static UInt8 _extraCount[11];
 	static UInt16 _price[5];

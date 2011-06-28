@@ -1528,7 +1528,7 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-			GData::DungeonData * dd = const_cast<GData::DungeonData *>(GData::dungeons[dlvl.id / 10]);
+			GData::DungeonData * dd = const_cast<GData::DungeonData *>(GData::dungeons[dlvl.id]);
 			GData::DungeonLevel * dl = new GData::DungeonLevel;
 			dl->monsterSet = GData::dungeonMonsters[dlvl.monsterSet];
 			StringTokenizer tk(dlvl.lootSet, ",");
@@ -1536,10 +1536,10 @@ namespace GObject
 			{
 				dl->loots.push_back(GData::lootTable[atoi(tk[i].c_str())]);
 			}
-			std::vector<const GData::DungeonLevel *>& ddl = dd->monsters[(dlvl.id % 10) - 1];
-			if(ddl.size() <= static_cast<size_t>(dlvl.level - 1))
-				ddl.resize(dlvl.level);
-			ddl[dlvl.level - 1] = dl;
+            std::vector<const GData::DungeonLevel *>& ddl = dd->monsters;
+            if(ddl.size() <= static_cast<size_t>(dlvl.level - 1))
+                ddl.resize(dlvl.level);
+            ddl[dlvl.level - 1] = dl;
 		}
 		lc.finalize();
 		
@@ -1550,7 +1550,7 @@ namespace GObject
 		Player * pl = NULL;
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 		DBDungeonPlayer dp;
-		if(execu->Prepare("SELECT `id`, `playerId`, `difficulty`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1566,14 +1566,7 @@ namespace GObject
 			Dungeon * dg = dungeonManager[dp.id];
 			if(dg == NULL)
 				continue;
-			StringTokenizer tk(dp.firstPass, ",");
-			UInt32 fp[DUNGEON_DIFFICULTY_MAX] = {0, 0};
-			size_t tcnt = tk.count();
-			if(tcnt > DUNGEON_DIFFICULTY_MAX)
-				tcnt = DUNGEON_DIFFICULTY_MAX;
-			for(size_t j = 0; j < tcnt; ++ j)
-				fp[j] = atoi(tk[j].c_str());
-			dg->pushPlayer(pl, dp.difficulty, dp.level, dp.count, dp.totalCount, fp, dp.counterEnd);
+			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd);
 		}
 		lc.finalize();
 		return true;

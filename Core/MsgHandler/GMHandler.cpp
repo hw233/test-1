@@ -764,9 +764,8 @@ void GMHandler::OnSetDL( GObject::Player * player, std::vector<std::string>& arg
 	GObject::Dungeon * dg = GObject::dungeonManager[id];
 	if(dg == NULL)
 		return;
-	UInt32 difficulty = atoi(args[1].c_str());
-	UInt32 level = atoi(args[2].c_str()) - 1;
-	dg->playerJump(player, difficulty, level);
+	UInt32 level = atoi(args[1].c_str()) - 1;
+	dg->playerJump(player, level);
 }
 
 void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt8 type, UInt8 enchant = 10, UInt8 level = 10, bool flushAttr = true )
@@ -1334,7 +1333,6 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 	int win = 0;
 	if(npcId < 4096)
 	{
-		UInt8 difficulty = npcId / 1000;
 		UInt8 dungeonId = (npcId % 1000) / 100;
 		UInt8 dungeonLevel = (npcId % 100) - 1;
 		GObject::Dungeon * dg = GObject::dungeonManager[dungeonId];
@@ -1343,10 +1341,11 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 			return;
 		for(int i = 0; i < npcCount; ++ i)
 		{
-			if(dg->doAttack(player, difficulty, dungeonLevel))
+			if(dg->doAttack(player, dungeonLevel))
 				++ win;
 		}
-		SYSMSG_SENDV(610, player, dd->getName().c_str(), difficulty, dungeonLevel + 1, npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
+        // TODO:
+		SYSMSG_SENDV(610, player, dd->getName().c_str(), 0, dungeonLevel + 1, npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
 	}
 	else
 	{

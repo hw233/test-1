@@ -148,7 +148,7 @@ namespace Script
 		bool onTakeMailPackage(Player* player, UInt32 pkgId);
 		lua_tinker::table onGetMailItems(UInt32 pkgId);
 		UInt32 onLuckyDrawItemRoll(UInt8 type);
-		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 difficulty, UInt8 level, bool isBoss);
+		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 level, bool isBoss);
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
 

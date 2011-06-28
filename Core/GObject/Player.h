@@ -622,7 +622,7 @@ namespace GObject
 		UInt8 trainFighter(UInt32 id, UInt8 type);
 
 		inline UInt32 getVipLevel() { return _vipLevel; }
-		bool isDungeonPassed(UInt8 id, UInt8 difficulty);
+		bool isDungeonPassed(UInt8 id);
 
 		template<typename T>
 		inline void notifyFriendAct(UInt8 type, T arg)

@@ -3692,12 +3692,12 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `nextExtraReward` = %u WHERE `id` = %"I64_FMT"u", _playerData.nextExtraReward, _id);
 	}
 
-	bool Player::isDungeonPassed( UInt8 id, UInt8 difficulty )
+	bool Player::isDungeonPassed( UInt8 id )
 	{
 		Dungeon * dg = dungeonManager[id];
 		if(dg == NULL)
 			return false;
-		return dg->getFirstPass(this, difficulty) > 0;
+		return dg->getFirstPass(this) > 0;
 	}
 
 	void Player::sendFriendActList()
