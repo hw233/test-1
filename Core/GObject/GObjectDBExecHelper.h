@@ -456,11 +456,10 @@ struct DBDungeonPlayer
 {
 	UInt32 id;
 	UInt64 playerId;
-	UInt8 difficulty;
 	UInt8 level;
 	UInt8 count;
 	UInt16 totalCount;
-	std::string firstPass;
+	UInt32 firstPass;
 	UInt32 counterEnd;
 };
 
@@ -1127,15 +1126,14 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBDungeonPlayer)
-SPECIALDEF(8)
+SPECIALDEF(7)
 (
 	UInt32, id,
 	UInt64, playerId,
-	UInt8, difficulty,
 	UInt8, level,
 	UInt8, count,
 	UInt16, totalCount,
-	std::string, firstPass,
+	UInt32, firstPass,
 	UInt32, counterEnd
 )
 SPECIALEND()
