@@ -120,14 +120,21 @@ INSERT INTO `area` VALUES
 (5,1,'0,0;1,1;1,-1;-1,-1;-1;1');
 UNLOCK TABLES;
 
+<<<<<<< HEAD
 LOCK TABLES `fighter_prob` WRITE;
 source fighterprob
 UNLOCK TABLES;
 
+=======
+>>>>>>> master
 LOCK TABLES `dungeon_level` WRITE;
 source dungeonlevel
 UNLOCK TABLES;
 
+<<<<<<< HEAD
+=======
+-- ASSS
+>>>>>>> master
 use asss;
 LOCK TABLES `practice_place` WRITE;
 INSERT INTO `practice_place` VALUES
