@@ -268,6 +268,13 @@ struct DBStoreItem
 	UInt16 price;
 };
 
+struct DBFighterProb
+{
+    UInt32 id;
+    Int32 free;
+    Int32 gold;
+};
+
 }
 
 
@@ -560,6 +567,15 @@ SPECIALDEF(24)
         float, pierce,
         float, counter,
         float, magres
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBFighterProb)
+SPECIALDEF(3)
+    (
+        UInt32, id,
+        Int32, free,
+        Int32, gold
     )
 SPECIALEND()
 
