@@ -538,6 +538,7 @@ CREATE TABLE `cittas` (
   `id` smallint(5) NOT NULL,
   `type` smallint(5) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `pexp` int(10) unsigned NOT NULL DEFAULT '0',
   `needsoul` smallint(5) NOT NULL DEFAULT '0',
   `effectid` smallint(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)

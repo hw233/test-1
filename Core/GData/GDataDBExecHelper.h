@@ -530,11 +530,12 @@ SPECIALDEF(7)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBCitta)
-SPECIALDEF(5)
+SPECIALDEF(6)
     (
         UInt16, id,
         UInt16, type,
         std::string, name,
+        UInt32, pexp,
         UInt16, needsoul,
         UInt16, effectid
     )

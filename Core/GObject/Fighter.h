@@ -220,7 +220,7 @@ public:
     bool lvlUpCitta(UInt16 citta, int idx, bool = true);
 
     // 取得装备的心法数
-    inline UInt8 getUpCittasNum();
+    UInt8 getUpCittasNum();
     // 取得最大装备心法数
     inline UInt8 getUpCittasMax() { return _cittaslot <= CITTA_UPMAX ? _cittaslot : CITTA_UPMAX; }
     // 取得装备位置idx处所装备的心法的ID

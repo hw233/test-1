@@ -1645,7 +1645,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         int i = getUpCittasNum();
         if (i < getUpCittasMax())
         { // insert
-            for (int j = getUpCittasMax() - 1; j >= idx+1; ++j)
+            for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
             {
                 _citta[j] = _citta[j-1];;
                 _citta[j-1] = 0;
