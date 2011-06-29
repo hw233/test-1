@@ -18,6 +18,7 @@
 #include "TalentTable.h"
 #include "CittaTable.h"
 #include "AcuPraTable.h"
+#include "FighterProb.h"
 #include "Common/StringTokenizer.h"
 
 #include "Script/lua_tinker.h"
@@ -143,6 +144,11 @@ namespace GData
 		if (!LoadClanSkillTable())
 		{
 			fprintf(stderr, "Load clan skill template Error !\n");
+			return false;
+		}
+		if (!LoadFighterProb())
+		{
+			fprintf(stderr, "Load fighter prob template Error !\n");
 			return false;
 		}
 
@@ -896,6 +902,21 @@ namespace GData
 
 		return true;
 	}
+	bool GDataManager::LoadFighterProb()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBFighterProb dbfp;
+		if(execu->Prepare("SELECT `id`, `free`, `gold` FROM `fighter_prob`", dbfp) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            FighterProb& fp = fighterProb[dbfp.id];
+            fp.free = dbfp.free;
+            fp.gold = dbfp.gold;
+        }
+        return true;
+    }
 
 	bool GDataManager::LoadFormationData()
 	{

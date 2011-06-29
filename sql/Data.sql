@@ -617,6 +617,13 @@ CREATE TABLE `special_fighter_template` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `fighter_prob`;
+CREATE TABLE `fighter_prob` (
+  `id` int(10) unsigned NOT NULL,
+  `free` int(5) NOT NULL DEFAULT '0',
+  `gold` int(5) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 --
 -- Table structure for table `weapon_def`
 --
