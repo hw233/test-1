@@ -236,24 +236,21 @@ struct DungeonOpReq
 {
 	UInt8 op;
 	UInt8 type;
-	UInt8 difficulty;
-	MESSAGE_DEF3(0x58, UInt8, op, UInt8, type, UInt8, difficulty);
+	MESSAGE_DEF2(0x58, UInt8, op, UInt8, type);
 };
 
 struct DungeonInfoReq
 {
 	UInt8 op;
 	UInt8 type;
-	UInt8 difficulty;
-	MESSAGE_DEF3(0x59, UInt8, op, UInt8, type, UInt8, difficulty);
+	MESSAGE_DEF2(0x59, UInt8, op, UInt8, type);
 };
 
 struct DungeonBattleReq
 {
 	UInt8 type;
-	UInt8 difficulty;
 	UInt8 level;
-	MESSAGE_DEF3(0x5A, UInt8, type, UInt8, difficulty, UInt8, level);
+	MESSAGE_DEF2(0x5A, UInt8, type, UInt8, level);
 };
 
 struct DungeonAutoReq
@@ -1616,7 +1613,7 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 	switch(dor.op)
 	{
 	case 0:
-		result = dg->playerEnter(pl, dor.difficulty - 1);
+		result = dg->playerEnter(pl);
 		break;
 	case 1:
 		result = dg->playerLeave(pl);
@@ -1630,7 +1627,7 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 	default:
 		break;
 	}
-	st << result << dor.type << dor.difficulty << Stream::eos;
+	st << result << dor.type << Stream::eos;
 	pl->send(st);
 }
 

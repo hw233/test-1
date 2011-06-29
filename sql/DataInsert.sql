@@ -102,6 +102,14 @@ LOCK TABLES `skill_effect` WRITE;
 source skilleffect
 UNLOCK TABLES;
 
+LOCK TABLES `cittas` WRITE;
+source cittas 
+UNLOCK TABLES;
+
+LOCK TABLES `citta_effect` WRITE;
+source cittaeffect
+UNLOCK TABLES;
+
 LOCK TABLES `area` WRITE;
 INSERT INTO `area` VALUES
 (0,1,'0,0'),
@@ -116,9 +124,14 @@ LOCK TABLES `fighter_prob` WRITE;
 source fighterprob
 UNLOCK TABLES;
 
+LOCK TABLES `dungeon_level` WRITE;
+source dungeonlevel
+UNLOCK TABLES;
+
 use asss;
 LOCK TABLES `practice_place` WRITE;
 INSERT INTO `practice_place` VALUES
 (1,0,0,100,5,10,1);
 UNLOCK TABLES;
+
 

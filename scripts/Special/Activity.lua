@@ -384,34 +384,19 @@ end
 
 extra_dungeon_loot_item = {9032, 9032, 9032, 9033, 9033, 9033, 9034, 9034, 9034, 9035}
 dname = {'焚骨窟', '天人福邸', '困仙阵', '无间炼狱', '海底幻境'}
-function onDungeonLootItemRoll(player, id, d, l, b)
+function onDungeonLootItemRoll(player, id, l, b)
 	local stage = getActivityStage();
 	if stage ~= 3 then
-		return 0;
-	end
-	if id == 1 and d == 0 then
 		return 0;
 	end
 
 	local highr = 50;
 	if (id == 1 and level == 15) or (id == 2 and level == 22) or (id == 3 and level == 44) or (id == 4 and level == 20) or (id == 5 and level == 20)then
-		if d == 1 then
-			highr = 5;
-		else
-			highr = 10;
-		end
+        highr = 5;
 	elseif not b then
-		if d == 1 then
-			highr = 25;
-		else
-			highr = 50;
-		end
+        highr = 25;
 	else
-		if d == 1 then
-			highr = 10;
-		else 
-			highr = 20;
-		end
+        highr = 10;
 	end	
 	if math.random(1, highr) == 1 then
 		local pic = {9218, 9219, 9220, 9221, 9222};

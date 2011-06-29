@@ -35,6 +35,9 @@
 
 namespace GObject
 {
+    UInt32 Player::_recruit_cost = 20;
+    UInt32 Player::_tavernBlueCount = 24;
+    UInt32 Player::_tavernPurpleCount = 89;
 	UInt32 Player::_tavernInterval = 2 * 3600, Player::_tavernRate = 100;
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
 	const UInt8 MaxICCount[] = {8, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24};
@@ -2719,7 +2722,7 @@ namespace GObject
 	{
 		UInt32 curtime = TimeUtil::Now();
 		bool extraRefresh = false;
-		UInt16 usedGold = 0, maxGold = 20 * count;
+		UInt16 usedGold = 0, maxGold = _recruit_cost * count;
 
 		if(_nextTavernUpdate == 0)
 		{
@@ -2732,7 +2735,7 @@ namespace GObject
 		{
 			if(type == 1)
 			{
-				maxGold -= 20;
+				maxGold -= _recruit_cost;
 				extraRefresh = true;
 				updateNextTavernUpdate(curtime);
 			}
@@ -2758,8 +2761,8 @@ namespace GObject
 				i = 0;
 				if(!extraRefresh)
 				{
-					usedGold += 20;
-					if(_playerData.tavernBlueCount >= 24)
+					usedGold += _recruit_cost;
+					if(_playerData.tavernBlueCount >= _tavernBlueCount)
 					{
 						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 2, _tavernRate);
 						if(fgt != NULL)
@@ -2771,7 +2774,7 @@ namespace GObject
 							++ i;
 						}
 					}
-					if(_playerData.tavernPurpleCount >= 89)
+					if(_playerData.tavernPurpleCount >= _tavernPurpleCount)
 					{
 						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 3, _tavernRate);
 						if(fgt != NULL)
@@ -3546,90 +3549,93 @@ namespace GObject
 
 	UInt8 Player::trainFighter( UInt32 id, UInt8 type )
 	{
-#define ITEM_TRAIN 8999
-#define ITEM_TRAIN_PROTECT 9000
+#define ITEM_TRAIN_TYPE1 506         // 补髓丹(不带保护) 资质
+#define ITEM_TRAIN_TYPE2 507         // 补髓益元丹(带保护) 资质
+#define ITEM_TRAIN_TYPE3 508         // 凝神丹(不带保护) 潜力
+#define ITEM_TRAIN_TYPE4 509         // 凝神易经丹(带保护) 潜力
 		Fighter * fgt = findFighter(id);
 		if(fgt == NULL)
 			return 1;
-		float p = fgt->getPotential();
+
+        bool isPotential = false;
+        float p = 0; 
+		UInt32 rate = 0;
+        UInt32 itemId = ITEM_TRAIN_TYPE1 + type - 1;
+
+        if(type == 1 || type == 2)
+        {
+		    p = fgt->getCapacity();
+            std::vector<UInt32>& chance = GObjectManager::getCapacityChance();
+            size_t cnt = chance.size();
+            for(UInt32 idx = 0; idx < cnt; idx ++)
+            {
+                if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
+                {
+                    rate = static_cast<float>(CHANCEVALUE(chance[idx]))/1000;
+                    break;
+                }
+            }
+        }
+        else if(type == 3 || type == 4)
+        {
+            isPotential = true;
+		    p = fgt->getPotential();
+            std::vector<UInt32>& chance = GObjectManager::getPotentialChance();
+            size_t cnt = chance.size();
+            for(UInt32 idx = 0; idx < cnt; idx ++)
+            {
+                if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
+                {
+                    rate = static_cast<float>(CHANCEVALUE(chance[idx]))/1000;
+                    break;
+                }
+            }
+        }
+
 		Fighter * fgt_orig = globalFighters[id];
 		if(fgt_orig == NULL)
 			return 1;
-		UInt32 rate = 0;
-		if(p < 0.90f)
-			rate = 100;
-		else if(p < 0.95f)
-			rate = 90;
-		else if(p < 1.05f)
-			rate = 80;
-		else if(p < 1.15f)
-			rate = 70;
-		else if(p < 1.25f)
-			rate = 60;
-		else if(p < 1.35f)
-			rate = 50;
-		else if(p < 1.45f)
-			rate = 40;
-		else if(p < 1.55f)
-			rate = 30;
-		else if(p < 1.65f)
-			rate = 20;
-		else if(p < 1.75f)
-			rate = 10;
-		else if(p < 1.85f)
-			rate = 5;
-		else if(p < 1.95f)
-			rate = 2;
-		else if(p < 2.05f)
-			rate = 10;
 
 		if(rate == 0)
 			return 1;
-		if(!m_Package->DelItemAny(ITEM_TRAIN, 1))
+
+		if(!m_Package->DelItemAny(itemId, 1))
 			return 1;
-		if(protect > 0 && !m_Package->DelItemAny(ITEM_TRAIN_PROTECT, 1))
-			protect = 0;
 		
-		if(getVipLevel() >= 6 && rate + 5 <= 100)
-			rate = rate + 5;
 		if(uRand(100) < rate)
 		{
 			p += 0.01f;
 			p = floorf(p * 100.0f + 0.5f) / 100.0f;
-			if(p > 2.00f)
-				p = 2.00f;
-			fgt->setPotential(p);
+
+            if(isPotential)
+            {
+                if(p > GObjectManager::getMaxPotential()/100)
+                    p = GObjectManager::getMaxPotential()/100;
+                fgt->setPotential(p);
+            }
+            else
+            {
+                if(p > GObjectManager::getMaxCapacity()/100)
+                    p = GObjectManager::getMaxCapacity()/100;
+                fgt->setCapacity(p);
+            }
 		}
 		else
 		{
-			if(protect == 0)
+			if(type == 1 || type == 3)
 			{
-				UInt8 color = fgt->getColor();
-				float newp;
-				switch(color)
-				{
-				case 1:
-					newp = 0.70f;
-					break;
-				case 2:
-					newp = 0.90f;
-					break;
-				case 3:
-					newp = 1.20f;
-					break;
-				case 4:
-					newp = 1.40f;
-					break;
-				case 5:
-					newp = 1.60f;
-					break;
-				default:
-					newp = 0.60f;
-					break;
-				}
-				float decp = fgt->getPotential() - 0.01f;
-				newp = std::max(std::max(newp, decp), fgt_orig->getPotential());
-				fgt->setPotential(newp);
+                if(isPotential)
+                {
+                    float decp = fgt->getPotential() - 0.01f;
+                    float newp = std::max(std::max(decp, static_cast<float>(GObjectManager::getMinPotential())/100), fgt_orig->getPotential());
+                    fgt->setPotential(newp);
+                }
+                else
+                {
+                    float decp = fgt->getCapacity() - 0.01f;
+                    float newp = std::max(std::max(decp, static_cast<float>(GObjectManager::getMinCapacity())/100), fgt_orig->getCapacity());
+                    fgt->setCapacity(newp);
+                }
 			}
 			return 1;
 		}
@@ -3686,18 +3692,33 @@ namespace GObject
 		_tavernRate = rate;
 	}
 
+    void Player::setRecruitCost(UInt32 recruit_cost)
+    {
+        _recruit_cost = recruit_cost;
+    }
+
+    void Player::setTavernBlueCount(UInt32 tavernBlueCount)
+    {
+        _tavernBlueCount = tavernBlueCount;
+    }
+
+    void Player::setTavernPurpleCount(UInt32 tavernPurpleCount)
+    {
+        _tavernPurpleCount = tavernPurpleCount;
+    }
+
 	void Player::setNextExtraReward( UInt32 ner )
 	{
 		_playerData.nextExtraReward = ner;
 		DB().PushUpdateData("UPDATE `player` SET `nextExtraReward` = %u WHERE `id` = %"I64_FMT"u", _playerData.nextExtraReward, _id);
 	}
 
-	bool Player::isDungeonPassed( UInt8 id, UInt8 difficulty )
+	bool Player::isDungeonPassed( UInt8 id )
 	{
 		Dungeon * dg = dungeonManager[id];
 		if(dg == NULL)
 			return false;
-		return dg->getFirstPass(this, difficulty) > 0;
+		return dg->getFirstPass(this) > 0;
 	}
 
 	void Player::sendFriendActList()

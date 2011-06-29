@@ -441,11 +441,10 @@ DROP TABLE IF EXISTS `dungeon_player`;
 CREATE TABLE `dungeon_player` (
   `id` int(10) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
-  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `count` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `totalCount` int(10) unsigned NOT NULL DEFAULT '0',
-  `firstPass` varchar(64) NOT NULL DEFAULT '0,0',
+  `firstPass` int(10) unsigned NOT NULL DEFAULT '0',
   `counterEnd` int(10) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
   KEY `id` (`id`),

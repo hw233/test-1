@@ -64,6 +64,14 @@ namespace GObject
     UInt8  GObjectManager::_attrChances[11][3][8];
     UInt16 GObjectManager::_attrInfo[11][8][3][8];
     UInt32 GObjectManager::_socket_chance[6];
+    UInt32 GObjectManager::_min_potential;
+    UInt32 GObjectManager::_max_potential;
+    UInt32 GObjectManager::_min_capacity;
+    UInt32 GObjectManager::_max_capacity;
+    std::vector<UInt32> GObjectManager::_potential_chance;
+    std::vector<UInt32> GObjectManager::_capacity_chance;
+    UInt32 GObjectManager::_tavernFighterStart;
+    UInt32 GObjectManager::_tavernFighterEnd;
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -94,6 +102,7 @@ namespace GObject
 	{
 		loadMapData();
 		loadEquipments();
+        loadFightersPCChance();
         loadEquipForge();
 		loadFighters();
 		loadClanAssist();
@@ -378,6 +387,21 @@ namespace GObject
 			}
 		}
 		lc.finalize();
+
+        {
+            lua_State* L = lua_open();
+            luaopen_base(L);
+            luaopen_string(L);
+
+            std::string path = cfg.scriptPath + "Other/TavernFighters.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            _tavernFighterStart = lua_tinker::call<UInt32>(L, "getTavernFighterStart");
+            _tavernFighterEnd = lua_tinker::call<UInt32>(L, "getTavernFighterEnd");
+ 
+            lua_close(L);
+        }
+ 
 		globalFighters.setMaxFgtId(maxGF);
 		globalFighters.buildSummonSet();
 
@@ -1528,7 +1552,7 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-			GData::DungeonData * dd = const_cast<GData::DungeonData *>(GData::dungeons[dlvl.id / 10]);
+			GData::DungeonData * dd = const_cast<GData::DungeonData *>(GData::dungeons[dlvl.id]);
 			GData::DungeonLevel * dl = new GData::DungeonLevel;
 			dl->monsterSet = GData::dungeonMonsters[dlvl.monsterSet];
 			StringTokenizer tk(dlvl.lootSet, ",");
@@ -1536,10 +1560,10 @@ namespace GObject
 			{
 				dl->loots.push_back(GData::lootTable[atoi(tk[i].c_str())]);
 			}
-			std::vector<const GData::DungeonLevel *>& ddl = dd->monsters[(dlvl.id % 10) - 1];
-			if(ddl.size() <= static_cast<size_t>(dlvl.level - 1))
-				ddl.resize(dlvl.level);
-			ddl[dlvl.level - 1] = dl;
+            std::vector<const GData::DungeonLevel *>& ddl = dd->monsters;
+            if(ddl.size() <= static_cast<size_t>(dlvl.level - 1))
+                ddl.resize(dlvl.level);
+            ddl[dlvl.level - 1] = dl;
 		}
 		lc.finalize();
 		
@@ -1550,7 +1574,7 @@ namespace GObject
 		Player * pl = NULL;
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 		DBDungeonPlayer dp;
-		if(execu->Prepare("SELECT `id`, `playerId`, `difficulty`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1566,14 +1590,7 @@ namespace GObject
 			Dungeon * dg = dungeonManager[dp.id];
 			if(dg == NULL)
 				continue;
-			StringTokenizer tk(dp.firstPass, ",");
-			UInt32 fp[DUNGEON_DIFFICULTY_MAX] = {0, 0};
-			size_t tcnt = tk.count();
-			if(tcnt > DUNGEON_DIFFICULTY_MAX)
-				tcnt = DUNGEON_DIFFICULTY_MAX;
-			for(size_t j = 0; j < tcnt; ++ j)
-				fp[j] = atoi(tk[j].c_str());
-			dg->pushPlayer(pl, dp.difficulty, dp.level, dp.count, dp.totalCount, fp, dp.counterEnd);
+			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd);
 		}
 		lc.finalize();
 		return true;
@@ -2169,6 +2186,69 @@ namespace GObject
         lua_close(L);
         return true;
     }
+
+    bool GObjectManager::loadFightersPCChance()
+    {
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        luaopen_table(L);
+        {
+            std::string path = cfg.scriptPath + "Other/FighterTrain.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            _min_potential = lua_tinker::call<UInt32>(L, "getMinPotential");
+            _max_potential = lua_tinker::call<UInt32>(L, "getMaxPotential");
+            _min_capacity = lua_tinker::call<UInt32>(L, "getMinCapacity");
+            _max_capacity = lua_tinker::call<UInt32>(L, "getMaxCapacity");
+
+            lua_tinker::table potentialTable = lua_tinker::call<lua_tinker::table>(L, "getPotentialChance");
+            size_t potential_size = potentialTable.size();
+            for(UInt32 i = 0; i < potential_size; i ++)
+            {
+                lua_tinker::table tempTable = potentialTable.get<lua_tinker::table>(i + 1);
+                size_t tempSize = tempTable.size();
+                UInt32 chance = 0;
+                UInt32 a = 0;
+                UInt32 b = 0;
+                if(tempSize >= 2)
+                {
+                    a = tempTable.get<UInt32>(1);
+                    b = tempTable.get<UInt32>(2);
+                }
+                else if(tempSize == 1)
+                    a = tempTable.get<UInt32>(1);
+
+                chance = MAKECHANCE(a, b);
+                _potential_chance.push_back(chance);
+            }
+
+            lua_tinker::table capacityTable = lua_tinker::call<lua_tinker::table>(L, "getCapacityChance");
+            size_t capacity_size = capacityTable.size();
+            for(UInt32 j = 0; j < capacity_size; j ++)
+            {
+                lua_tinker::table tempTable = capacityTable.get<lua_tinker::table>(j + 1);
+                size_t tempSize = tempTable.size();
+                UInt32 chance = 0;
+                UInt32 a = 0;
+                UInt32 b = 0;
+                if(tempSize >= 2)
+                {
+                    a = tempTable.get<UInt32>(1);
+                    b = tempTable.get<UInt32>(2);
+                }
+                else if(tempSize == 1)
+                    a = tempTable.get<UInt32>(1);
+
+                chance = MAKECHANCE(a, b);
+                _capacity_chance.push_back(chance);
+            }
+
+        }
+        lua_close(L);
+
+        return true;
+    }
         
         bool GObjectManager::loadEquipments()
         {
@@ -2251,6 +2331,8 @@ namespace GObject
 
 		return true;
 	}
+
+
 	bool GObjectManager::LoadSpecialAward()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());

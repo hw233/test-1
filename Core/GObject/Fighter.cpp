@@ -18,6 +18,7 @@
 #include "Common/StringTokenizer.h"
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
+#include "GData/FighterProb.h"
 
 namespace GObject
 {
@@ -115,15 +116,15 @@ UInt8 Fighter::getColor2( float pot )
 {
 	if(pot < 0.299f)
 		return 5;
-	if(pot < 0.699f)
-		return 0;
 	if(pot < 0.899f)
-		return 1;
+		return 0;
 	if(pot < 1.199f)
+		return 1;
+	if(pot < 1.499f)
 		return 2;
-	if(pot < 1.399f)
+	if(pot < 1.899f)
 		return 3;
-	if(pot < 1.599f)
+	if(pot < 2.099f)
 		return 4;
 	return 5;
 }
@@ -1644,7 +1645,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         int i = getUpCittasNum();
         if (i < getUpCittasMax())
         { // insert
-            for (int j = getUpCittasMax() - 1; j >= idx+1; ++j)
+            for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
             {
                 _citta[j] = _citta[j-1];;
                 _citta[j-1] = 0;
@@ -2065,30 +2066,29 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 	if(_fighters.empty())
 		return NULL;
 
-	UInt8 color = 1;
+	Int8 color = 0;
+    UInt8 colors = 4;
+    UInt8 free_gold = 0;
 	switch(type)
 	{
-	case 0:
-		if(uRand(200 * 100 / rate) == 0)
-			color = 2;
-		break;
-	case 1:
-		{
-			UInt32 rnd = uRand(400 * 100 / rate);
-			if(rnd == 0)
-				color = 3;
-			else if(rnd < 5)
-				color = 2;
-			break;
-		}
+    case 0:
+    case 1:
+        free_gold = type;
+        break;
 	case 2:
 		color = 2;
+        colors = 1;
+        free_gold = 1;
 		break;
 	case 3:
 		color = 3;
+        colors = 1;
+        free_gold = 1;
 		break;
 	default:
-		color = 1;
+		color = 0;
+        colors = 4;
+        free_gold = 0;
 		break;
 	}
 
@@ -2098,49 +2098,69 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 	//	return _fighters[fgtId].fighter;
 	//}
 
-	std::map<UInt32, UInt32> idset;
-	while(idset.empty() && color > 0)
-	{
-		-- color;
+	std::map<UInt32, UInt32> idset[4];
+    UInt32 bs = 0;
+    for(Int8 i = 0; i < colors; i++)
+    {
+        Int8 tmpColor = color + i;
+        while(tmpColor > -1)
+        {
+            idset[tmpColor] = _summonSet[free_gold][tmpColor];
+            pl->exceptAvailableFighters(idset[tmpColor]);
+            for(std::set<UInt32>::iterator it = excepts.begin(); it != excepts.end(); ++ it)
+                idset[tmpColor].erase(*it);
+            for(std::set<UInt32>::iterator it = excepts2.begin(); idset[tmpColor].size() > 6 && it != excepts2.end(); ++ it)
+                idset[tmpColor].erase(*it);
 
-		idset = _summonSet[color];
-		pl->exceptAvailableFighters(idset);
-		for(std::set<UInt32>::iterator it = excepts.begin(); it != excepts.end(); ++ it)
-			idset.erase(*it);
-		for(std::set<UInt32>::iterator it = excepts2.begin(); idset.size() > 6 && it != excepts2.end(); ++ it)
-			idset.erase(*it);
-	}
+            if(colors == 1 && idset[tmpColor].empty())
+            {
+               tmpColor --;
+            }
+            else
+            {
+                break;
+            }
+        }
 
-	size_t size = idset.size();
-	if(size == 0)
-		return NULL;
+        if(tmpColor < 0)
+        {
+            break;
+        }
 
-	if(color == 2)
-	{
-		std::map<UInt32, UInt32>::iterator it;
-		UInt32 bs = 0;
-		for(it = idset.begin(); it != idset.end(); ++ it)
-		{
-			bs += it->second;
-		}
-		UInt32 r = uRand(bs);
-		for(it = idset.begin(); it != idset.end(); ++ it)
-		{
-			if(r < it->second)
-			{
-				return _fighters[it->first].fighter;
-			}
-			r -= it->second;
-		}
-		return NULL;
-	}
-	else
-	{
-		std::map<UInt32, UInt32>::iterator it = idset.begin();
-		if(size > 1)
-			std::advance(it, uRand(size));
-		return _fighters[it->first].fighter;
-	}
+        size_t size = idset[tmpColor].size();
+        if(size == 0)
+            continue;
+
+        std::map<UInt32, UInt32>::iterator it;
+        for(it = idset[tmpColor].begin(); it != idset[tmpColor].end(); it ++)
+        {
+            bs += it->second;
+        }
+    }
+
+    if(bs == 0)
+        return NULL;
+
+    UInt32 r = uRand(bs);
+    for(UInt8 j = color; j < color + colors; j++)
+    {
+        size_t size = idset[j].size();
+        if(size == 0)
+            continue;
+
+        std::map<UInt32, UInt32>::iterator it;
+        for(it = idset[j].begin(); it != idset[j].end(); it ++)
+        {
+            if(r < it->second)
+            {
+                return _fighters[it->first].fighter;
+            }
+            r -= it->second;
+        }
+    }
+
+
+    return NULL;
 }
 
 void GlobalFighters::setSpot( UInt32 id, UInt16 spot )
@@ -2163,49 +2183,23 @@ UInt16 GlobalFighters::getSpot( UInt32 id )
 
 void GlobalFighters::buildSummonSet()
 {
-	for(UInt32 i = 7; i < 134; ++ i)
-	{
-		Fighter * fgt = _fighters[i].fighter;
-		if(fgt == NULL) continue;
-		UInt8 color = fgt->getColor();
-		switch(color)
-		{
-		case 1:
-		case 2:
-			_summonSet[color - 1][i] = 0;
-			break;
-		}
-	}
-	_summonSet[2][8] = 3;
-	_summonSet[2][11] = 6;
-	_summonSet[2][13] = 4;
-	_summonSet[2][24] = 6;
-	_summonSet[2][25] = 3;
-	_summonSet[2][26] = 6;
-	_summonSet[2][28] = 3;
-	_summonSet[2][30] = 3;
-	_summonSet[2][35] = 2;
-	_summonSet[2][37] = 6;
-	_summonSet[2][44] = 6;
-	_summonSet[2][45] = 6;
-	_summonSet[2][48] = 2;
-	_summonSet[2][51] = 3;
-	_summonSet[2][55] = 6;
-	_summonSet[2][56] = 3;
-	_summonSet[2][63] = 6;
-	_summonSet[2][66] = 2;
-	_summonSet[2][77] = 2;
-	_summonSet[2][85] = 4;
-	_summonSet[2][87] = 4;
-	_summonSet[2][102] = 4;
-	_summonSet[2][106] = 6;
-	_summonSet[2][107] = 3;
-	_summonSet[2][117] = 4;
-	_summonSet[2][118] = 4;
-	_summonSet[2][122] = 4;
-	_summonSet[2][123] = 6;
-	_summonSet[2][131] = 6;
-	_summonSet[2][132] = 4;
+    for(std::map<UInt32, GData::FighterProb>::iterator it = GData::fighterProb.begin(); it != GData::fighterProb.end(); ++ it)
+    {
+        int i = it->first;
+        Fighter * fgt = _fighters[i].fighter;
+        if(fgt == NULL) continue;
+        UInt8 color = fgt->getColor();
+        switch(color)
+        {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            _summonSet[0][color - 1][i] = it->second.free;
+            _summonSet[1][color - 1][i] = it->second.gold;
+            break;
+        }
+    }
 }
 
 void GlobalFighters::setAllDirty()

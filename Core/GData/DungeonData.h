@@ -16,8 +16,6 @@ namespace GData
 struct LootItem;
 struct LootResult;
 
-#define DUNGEON_DIFFICULTY_MAX 2
-
 struct DungeonMonster: public ObjectBaseT<>
 {
 	DungeonMonster(UInt32 id): ObjectBaseT<>(id), formated(false), exp(0), fighter(NULL), minNum(0), maxNum(0) {}
@@ -45,7 +43,7 @@ struct DungeonData: public ObjectBaseT<>
 	UInt16 location;
 	UInt8 type;
 	UInt8 levelReq;
-	std::vector<const DungeonLevel *> monsters[DUNGEON_DIFFICULTY_MAX];
+	std::vector<const DungeonLevel *> monsters;
 };
 
 extern ObjectListT<DungeonMonster> dungeonMonsters;

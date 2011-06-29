@@ -220,7 +220,7 @@ public:
     bool lvlUpCitta(UInt16 citta, int idx, bool = true);
 
     // 取得装备的心法数
-    inline UInt8 getUpCittasNum();
+    UInt8 getUpCittasNum();
     // 取得最大装备心法数
     inline UInt8 getUpCittasMax() { return _cittaslot <= CITTA_UPMAX ? _cittaslot : CITTA_UPMAX; }
     // 取得装备位置idx处所装备的心法的ID
@@ -511,8 +511,8 @@ protected:
 	UInt64 _exp;        // 经验
     UInt64 _pexp;       // 修炼经验
     UInt64 _pexpMax;    // 修炼最大经验
-	float _potential;   // 资质
-	float _capacity;    // 潜力
+	float _potential;   // 潜力
+	float _capacity;    // 资质
 	UInt8 _color;
 	UInt16 _hp;
 
@@ -607,7 +607,7 @@ private:
 	FastMutex _mutex;
 	std::vector<FighterData> _fighters;
 	UInt32 _maxFgtId;
-	std::map<UInt32,UInt32> _summonSet[3];
+	std::map<UInt32,UInt32> _summonSet[2][4];
 };
 
 extern GlobalFighters globalFighters;

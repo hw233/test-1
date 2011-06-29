@@ -77,6 +77,8 @@ GMHandler::GMHandler()
 	Reg(3, "offpsskill", &GMHandler::OnOffPasSkill);
 	Reg(3, "uppeerless", &GMHandler::OnUpPeerless);
 	Reg(3, "offpeerless", &GMHandler::OnOffPeerless);
+	Reg(3, "upcitta", &GMHandler::OnUpCitta);
+	Reg(3, "offcitta", &GMHandler::OnOffCitta);
 	Reg(3, "level", &GMHandler::OnSetLevel);
 	Reg(3, "setlevel", &GMHandler::OnSetLevel);
 	Reg(3, "forge", &GMHandler::OnForge);
@@ -764,9 +766,8 @@ void GMHandler::OnSetDL( GObject::Player * player, std::vector<std::string>& arg
 	GObject::Dungeon * dg = GObject::dungeonManager[id];
 	if(dg == NULL)
 		return;
-	UInt32 difficulty = atoi(args[1].c_str());
-	UInt32 level = atoi(args[2].c_str()) - 1;
-	dg->playerJump(player, difficulty, level);
+	UInt32 level = atoi(args[1].c_str()) - 1;
+	dg->playerJump(player, level);
 }
 
 void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt8 type, UInt8 enchant = 10, UInt8 level = 10, bool flushAttr = true )
@@ -1334,7 +1335,6 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 	int win = 0;
 	if(npcId < 4096)
 	{
-		UInt8 difficulty = npcId / 1000;
 		UInt8 dungeonId = (npcId % 1000) / 100;
 		UInt8 dungeonLevel = (npcId % 100) - 1;
 		GObject::Dungeon * dg = GObject::dungeonManager[dungeonId];
@@ -1343,10 +1343,11 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 			return;
 		for(int i = 0; i < npcCount; ++ i)
 		{
-			if(dg->doAttack(player, difficulty, dungeonLevel))
+			if(dg->doAttack(player, dungeonLevel))
 				++ win;
 		}
-		SYSMSG_SENDV(610, player, dd->getName().c_str(), difficulty, dungeonLevel + 1, npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
+        // TODO:
+		SYSMSG_SENDV(610, player, dd->getName().c_str(), 0, dungeonLevel + 1, npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
 	}
 	else
 	{
@@ -1426,6 +1427,24 @@ void GMHandler::OnUpSkill( GObject::Player * player, std::vector<std::string>& a
 	}
 }
 
+void GMHandler::OnUpCitta( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() > 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 cittaId = atoi(args[1].c_str());(void)cittaId;
+		UInt32 cittaLevel = atoi(args[2].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        UInt16 num = fgt->getUpCittasNum();
+        fgt->upCitta(CITTAANDLEVEL(cittaId, cittaLevel), num);
+	}
+}
+
 void GMHandler::OnOffSkill( GObject::Player * player, std::vector<std::string>& args )
 {
 	if(args.empty())
@@ -1438,6 +1457,21 @@ void GMHandler::OnOffSkill( GObject::Player * player, std::vector<std::string>& 
 		if(fgt == NULL)
 			return;
         fgt->offSkill(SKILLANDLEVEL(skillId, 0));
+    }
+}
+
+void GMHandler::OnOffCitta( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() > 1)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 cittaId = atoi(args[1].c_str());(void)cittaId;
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+        fgt->offCitta(CITTAANDLEVEL(cittaId, 0));
     }
 }
 
