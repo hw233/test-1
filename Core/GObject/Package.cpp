@@ -16,9 +16,9 @@
 #include "Server/Cfg.h"
 
 #define ITEM_FORGE_L1 500      //洗炼符
-#define ITEM_SOCKET_L1 8917
-#define ITEM_SOCKET_L2 8918
-#define ITEM_SOCKET_L3 8919
+#define ITEM_SOCKET_L1 510
+#define ITEM_SOCKET_L2 511
+#define ITEM_SOCKET_L3 512
 #define ITEM_GEM_PROTECT 8920
 #define ITEM_SPLIT_PROTECT 8925
 #define ITEM_DETACH_PROTECT 504 // 精致拆卸石

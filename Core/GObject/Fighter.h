@@ -607,7 +607,7 @@ private:
 	FastMutex _mutex;
 	std::vector<FighterData> _fighters;
 	UInt32 _maxFgtId;
-	std::map<UInt32,UInt32> _summonSet[3];
+	std::map<UInt32,UInt32> _summonSet[2][4];
 };
 
 extern GlobalFighters globalFighters;
