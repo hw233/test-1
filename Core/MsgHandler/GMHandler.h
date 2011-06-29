@@ -63,6 +63,8 @@ private:
 	void OnChallenge(GObject::Player *, std::vector<std::string>&);
 	void OnUpSkill(GObject::Player *, std::vector<std::string>&);
 	void OnOffSkill(GObject::Player *, std::vector<std::string>&);
+	void OnUpCitta(GObject::Player *, std::vector<std::string>&);
+	void OnOffCitta(GObject::Player *, std::vector<std::string>&);
     void OnUpPasSkill(GObject::Player *, std::vector<std::string>&);
     void OnOffPasSkill(GObject::Player *, std::vector<std::string>&);
     void OnUpPeerless(GObject::Player *, std::vector<std::string>&);
