@@ -840,12 +840,13 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCitta ct;
-		if(execu->Prepare("SELECT `id`, `type`, `name`, `needsoul`, `effectid` FROM `cittas`", ct) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `type`, `name`, `pexp`, `needsoul`, `effectid` FROM `cittas`", ct) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
             CittaBase* citta = new CittaBase(ct.id, ct.name);
             citta->type = ct.type;
+            citta->pexp = ct.pexp;
             citta->needsoul = ct.needsoul;
             citta->effect = cittaEffectManager[ct.effectid];
             cittaManager.add(citta);

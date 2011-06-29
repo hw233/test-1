@@ -102,6 +102,14 @@ LOCK TABLES `skill_effect` WRITE;
 source skilleffect
 UNLOCK TABLES;
 
+LOCK TABLES `cittas` WRITE;
+source cittas 
+UNLOCK TABLES;
+
+LOCK TABLES `citta_effect` WRITE;
+source cittaeffect
+UNLOCK TABLES;
+
 LOCK TABLES `area` WRITE;
 INSERT INTO `area` VALUES
 (0,1,'0,0'),
