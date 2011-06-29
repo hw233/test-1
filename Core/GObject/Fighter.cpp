@@ -22,8 +22,6 @@
 namespace GObject
 {
 
-    UInt32 GlobalFighters::_tavernFighterStart = 0, GlobalFighters::_tavernFighterEnd = 0;
-
 GlobalFighters globalFighters;
 
 Fighter& getGreatFighter(UInt32 id)
@@ -2141,15 +2139,9 @@ UInt16 GlobalFighters::getSpot( UInt32 id )
 	return _fighters[id].spot;
 }
 
-void GlobalFighters::setTavernFighterStartEnd( UInt32 start, UInt32 end )
-{
-    _tavernFighterStart = start;
-    _tavernFighterEnd = end;
-}
-
 void GlobalFighters::buildSummonSet()
 {
-	for(UInt32 i = _tavernFighterStart; i < _tavernFighterEnd; ++ i)
+	for(UInt32 i = GObjectManager::getTavernFighterStart(); i < GObjectManager::getTavernFighterEnd(); ++ i)
 	{
 		Fighter * fgt = _fighters[i].fighter;
 		if(fgt == NULL) continue;

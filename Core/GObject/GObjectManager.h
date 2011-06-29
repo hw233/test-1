@@ -72,6 +72,8 @@ namespace GObject
         static UInt32 getMaxCapacity() { return _max_capacity; }
         static std::vector<UInt32>& getPotentialChance() { return _potential_chance; }
         static std::vector<UInt32>& getCapacityChance() { return _capacity_chance; }
+        static UInt32 getTavernFighterStart() { return _tavernFighterStart; }
+        static UInt32 getTavernFighterEnd() { return _tavernFighterEnd; }
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -92,6 +94,8 @@ namespace GObject
         static UInt32 _max_capacity;
         static std::vector<UInt32> _potential_chance;
         static std::vector<UInt32> _capacity_chance;
+        static UInt32 _tavernFighterStart;
+        static UInt32 _tavernFighterEnd;
 	};
 }
 
