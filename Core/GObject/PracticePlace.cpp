@@ -18,7 +18,7 @@ namespace GObject
     bool PracticePlace::pay(Player* pl, UInt8 place, UInt16 slot,
             UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot)
     {
-        if (!pl || !time || !place || place > PPLACE_MAX || slot > m_places[place-1].place.maxslot)
+        if (!pl || !time || !place || place > PPLACE_MAX || ((place != PPLACE_MAX) && slot > m_places[place-1].place.maxslot))
             return false;
 
         if (pl->isPracticing())
@@ -74,7 +74,7 @@ namespace GObject
             const std::vector<UInt32>& golds = GData::GDataManager::GetGoldPractice();
             if (!golds.size() || type >= golds.size())
                 return false;
-            price = time * golds[type]; 
+            price = time * golds[type];
             if (pl->getGold() < price)
             {
                 pl->sendMsgCode(0, 2008);
@@ -225,6 +225,45 @@ namespace GObject
                 fighters.str().c_str(), id);
     }
 
+    void PracticePlace::getAllPlaceInfo(Player* pl)
+    {
+        Stream st;
+        st.init(0xE0);
+        const std::vector<UInt32>& addons = GData::GDataManager::GetPlaceAddons();
+        st << static_cast<UInt8>(PPLACE_MAX);
+        for (int i = 0; i < PPLACE_MAX; ++i) {
+            st << static_cast<UInt8>(i);
+            if (i >= static_cast<int>(addons.size()))
+                st << static_cast<UInt16>(100);
+            else
+                st << static_cast<UInt16>(addons[i]);
+            UInt64 ownerid = getPlaceOwnerId(i+1);
+            if (ownerid) {
+                Player* owner = globalPlayers[ownerid];
+                if (owner)
+                    st << owner->getName();
+                else
+                    st << "";
+            } else {
+                st << "";
+            }
+
+            PPlace& data = m_places[i].place;
+            st << static_cast<UInt8>(data.maxslot);
+
+
+
+            if (data.protid) {
+                Player* prot = globalPlayers[data.protid];
+                if (prot)
+                    st << prot->getName();
+                else
+                    st << "";
+            } else
+                st << "";
+        }
+    }
+
     void PracticePlace::getPlaceInfo(Player* pl, UInt8 place)
     {
     }
@@ -237,6 +276,8 @@ namespace GObject
         PlaceData& pd = m_places[place-1];
         auto i = pd.data.begin();
         std::advance(i, pageno*pagenum);
+        if (i == pd.data.end())
+            return;
 
         for (auto e = pd.data.end(); i != e; ++i)
         {

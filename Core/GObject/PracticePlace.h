@@ -78,6 +78,8 @@ public:
     // 更新修炼将
     void updateFighters(std::list<UInt32>& fgts, UInt64 id);
 
+    // 取得所有修练点信息 
+    void getAllPlaceInfo(Player* pl);
     // 取得修炼点信息
     void getPlaceInfo(Player* pl, UInt8 place);
     // 取得某一修为挂机点位置

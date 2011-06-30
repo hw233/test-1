@@ -55,7 +55,7 @@ namespace GData
 		static const std::vector<UInt32>& GetTaelPractice();
 		static const std::vector<UInt32>& GetGoldPractice();
 		static const std::vector<UInt32>& GetGoldOpenSlot();
-		
+		static const std::vector<UInt32>& GetPlaceAddons();
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -70,6 +70,7 @@ namespace GData
 		static std::vector<UInt32>		 m_TaelPractice;
 		static std::vector<UInt32>		 m_GoldPractice;
 		static std::vector<UInt32>		 m_GoldOpenSlot;
+		static std::vector<UInt32>		 m_PlaceAddons;
 	};
 
 	

@@ -43,6 +43,7 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_TaelPractice;
 	std::vector<UInt32>		GDataManager::m_GoldPractice;
 	std::vector<UInt32>		GDataManager::m_GoldOpenSlot;
+	std::vector<UInt32>		GDataManager::m_PlaceAddons;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -640,8 +641,17 @@ namespace GData
 		luaopen_string(L);
 		luaopen_table(L);
 		{
-			std::string path = cfg.scriptPath + "Other/Practice.lua";
+			std::string path = cfg.scriptPath + "formula/practice.lua";
 			lua_tinker::dofile(L, path.c_str());
+
+            {
+                lua_tinker::table addons = lua_tinker::call<lua_tinker::table>(L, "GetPlaceAddons");
+                UInt32 size = addons.size();
+                for (UInt32 i = 0; i < size; ++ i)
+                {
+                    m_PlaceAddons.push_back(addons.get<float>(i+1)*100+100);
+                }
+            }
 
             {
                 lua_tinker::table tael_pra = lua_tinker::call<lua_tinker::table>(L, "GetTaelPractice");
@@ -1126,4 +1136,10 @@ namespace GData
 	{
 		return m_GoldOpenSlot;
 	}
+
+	const std::vector<UInt32>& GDataManager::GetPlaceAddons()
+	{
+		return m_PlaceAddons;
+	}
+
 }
