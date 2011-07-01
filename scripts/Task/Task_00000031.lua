@@ -1,7 +1,7 @@
 --任务的接受条件
 function Task_Accept_00000031()
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 25 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000031()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 25 then
 		return false;
 	end
 	if task:HasAcceptedTask(31) or task:HasCompletedTask(31) or task:HasSubmitedTask(31) then
@@ -73,12 +73,6 @@ function Task_00000031(npcId)
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
 		action.m_ActionMsg = "澶箼鐪熼噾";
-	elseif task:GetTaskAcceptNpc(31) == npcId and task:HasAcceptedTask(31) then
-		action.m_ActionType = 0x0001;
-		action.m_ActionID = 31
-		action.m_ActionToken = 3;
-		action.m_ActionStep = 11;
-		action.m_ActionMsg = "澶箼鐪熼噾";
 	elseif task:GetTaskSubmitNpc(31) == npcId then
 		if Task_Submit_00000031() then
 			action.m_ActionType = 0x0001;
@@ -120,14 +114,9 @@ function Task_00000031_step_10()
 	return action;
 end
 
-function Task_00000031_step_11()
-	RunConveyAction(GetPlayer(),31);
-end
-
 local Task_00000031_step_table = {
 		[1] = Task_00000031_step_01,
 		[10] = Task_00000031_step_10,
-		[11] = Task_00000031_step_11,
 		};
 
 function Task_00000031_step(step)
@@ -147,7 +136,7 @@ function Task_00000031_accept()
 	if not task:AcceptTask(31) then
 		return false;
 	end
-	RunConveyAction(player,31);
+	task:AddTaskStep(31);
 	return true;
 end
 
@@ -164,7 +153,7 @@ function Task_00000031_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(2222);
 	return true;
 end
 

@@ -2393,7 +2393,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Place");
 		DBPracticePlace pp;
-		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `protmoney`, `slotmoney`, `open` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
         UInt8 i = 0;
@@ -2408,6 +2408,8 @@ namespace GObject
             place.protmoney = pp.protmoney;
             place.slotmoney = pp.slotmoney;
             place.open = pp.open;
+            place.enemyCount = pp.enemyCount;
+            place.winCount = pp.winCount;
             practicePlace.addPlace(place, i++);
         }
 		lc.finalize();

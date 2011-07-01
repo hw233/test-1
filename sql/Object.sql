@@ -580,6 +580,8 @@ CREATE TABLE `practice_place` (
   `protmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `slotmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `open` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `enemyCount` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `winCount` smallint(5) unsigned NOT NULL DEFAULT '0',
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

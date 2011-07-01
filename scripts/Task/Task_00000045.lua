@@ -10,12 +10,12 @@ function Task_Accept_00000045()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(43) then
+		if not task:HasSubmitedTask(44) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(43) then
+		if not task:HasSubmitedTask(44) then
 			return false;
 		end
 	end
@@ -37,12 +37,12 @@ function Task_Can_Accept_00000045()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(43) then
+		if not task:HasSubmitedTask(44) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(43) then
+		if not task:HasSubmitedTask(44) then
 			return false;
 		end
 	end
@@ -109,8 +109,8 @@ function Task_00000045_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 3;
-	action.m_NpcMsg = "哎呀，少侠慢走，现在寺内死了几个恶僧，又走失了书生，方丈责怪下来，我也不好交代……不如这样，少侠你刺我一剑，这样的话我也好蒙混过关。";
-	action.m_ActionMsg = "这……很疼的，你要忍住痛哦……";
+	action.m_NpcMsg = "哎呀，少侠慢走，现在寺内死了几个恶僧，又走失了书生，方丈责怪下来，我也不好交代……不如这样，少侠你插我一剑，这样的话我也好蒙混过关。";
+	action.m_ActionMsg = "这……很疼的，你要忍住哦……";
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000045_step_03()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "啊……啊啊啊！我的妈呀，好痛！你……你怎么刺我这里！";
-	action.m_ActionMsg = "对不起，我手滑了……要不我在你说的地方再刺一剑？";
+	action.m_NpcMsg = "啊……啊啊啊！好痛！你……你怎么插我这里！";
+	action.m_ActionMsg = "对不起，我手滑了……要不我在你说的地方再插一下？";
 	return action;
 end
 
@@ -175,7 +175,7 @@ function Task_00000045_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(4444);
 	return true;
 end
 

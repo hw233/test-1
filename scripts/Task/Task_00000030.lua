@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000030()
 	local player = GetPlayer();
-	if player:GetLev() < 29 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -10,11 +10,6 @@ function Task_Accept_00000030()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(29) then
-			return false;
-		end
-	end
-	if state == 1 then
 		if not task:HasSubmitedTask(29) then
 			return false;
 		end
@@ -29,7 +24,7 @@ end
 function Task_Can_Accept_00000030()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 29 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	if task:HasAcceptedTask(30) or task:HasCompletedTask(30) or task:HasSubmitedTask(30) then
@@ -37,11 +32,6 @@ function Task_Can_Accept_00000030()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(29) then
-			return false;
-		end
-	end
-	if state == 1 then
 		if not task:HasSubmitedTask(29) then
 			return false;
 		end
@@ -109,7 +99,7 @@ function Task_00000030_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你小子运气不错嘛，玉清这件法宝虽然多年不用，不过也是一件降魔至宝呢。";
+	action.m_NpcMsg = "你小子运气不错嘛，白云那小姑娘竟然把她的随身至宝都送你了。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -153,7 +143,7 @@ function Task_00000030_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(2222);
 	return true;
 end
 

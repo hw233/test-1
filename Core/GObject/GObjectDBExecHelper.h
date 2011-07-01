@@ -176,6 +176,8 @@ struct DBPracticePlace
     UInt16 protmoney;   // 8小时保护费用
     UInt16 slotmoney;   // 8小时收费
     UInt8 open;         // 是否开放
+    UInt16 enemyCount;  // 来犯敌人总次数
+    UInt16 winCount;    // 赢的次数
 };
 
 struct DBPracticeData
@@ -762,7 +764,7 @@ SPECIALDEF(33)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(7)
+SPECIALDEF(9)
 	(
         UInt8, id,
         UInt64, ownerid,
@@ -770,7 +772,9 @@ SPECIALDEF(7)
         UInt16, maxslot,
         UInt16, protmoney,
         UInt16, slotmoney,
-        UInt8, open
+        UInt8, open,
+        UInt16, enemyCount,
+        UInt16, winCount
     )
 SPECIALEND()
 

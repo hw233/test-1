@@ -100,7 +100,7 @@ function Task_00000062_step_01()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
 	action.m_NpcMsg = "啊……啊！这位少侠快帮忙救我出来，我和主人见这妖道恶毒，与他争斗，却被他这个什么九天都篆阴魔妖法所困，昏昏欲睡，若破不了这个妖术，恐怕我们要遭了妖道的毒手！少侠救命。";
-	action.m_ActionMsg = "一只会说话的大猩猩，真是有趣。";
+	action.m_ActionMsg = "大猩猩，真是有趣。";
 	return action;
 end
 
@@ -163,7 +163,7 @@ function Task_00000062_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(5555);
 	return true;
 end
 

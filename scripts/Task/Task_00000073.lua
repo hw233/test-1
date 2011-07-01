@@ -4,7 +4,7 @@ function Task_Accept_00000073()
 		return false;
 	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 35 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -27,7 +27,7 @@ function Task_Can_Accept_00000073()
 	if GetPlayerData(6) ~= 1 then
 		return false;
 	end
-	if player:GetLev() < 30 then
+	if player:GetLev() < 35 then
 		return false;
 	end
 	if task:HasAcceptedTask(73) or task:HasCompletedTask(73) or task:HasSubmitedTask(73) then
@@ -99,7 +99,7 @@ function Task_00000073_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "";
+	action.m_NpcMsg = "顽石大师被妖人所伤，真是不幸。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -143,7 +143,7 @@ function Task_00000073_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(11111);
+	player:AddExp(1111);
 	return true;
 end
 

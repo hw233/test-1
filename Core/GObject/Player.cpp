@@ -2718,6 +2718,20 @@ namespace GObject
 		return getTavernPriceByColor(fgt->getColor());
 	}
 
+	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count)
+    {
+        // m_TaskMgr 
+        if (tasktype == 0) // 师门
+        {
+            if (type == 0) { // free
+            } else { // money
+            }
+        }
+        else // 衙门
+        {
+        }
+    }
+
 	void Player::listRecruit(UInt8 type, UInt8 color, UInt16 count)
 	{
 		UInt32 curtime = TimeUtil::Now();

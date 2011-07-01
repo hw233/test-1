@@ -1,23 +1,18 @@
 --����Ľ�������
 function Task_Accept_00000029()
+	if GetPlayerData(6) ~= 0 then
+		return false;
+	end
 	local player = GetPlayer();
-	if player:GetLev() < 28 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(29) or task:HasCompletedTask(29) or task:HasSubmitedTask(29) then
 		return false;
 	end
-	local state = GetPlayerData(6);
-	if state == 0 then
-		if not task:HasSubmitedTask(28) then
-			return false;
-		end
-	end
-	if state == 1 then
-		if not task:HasSubmitedTask(28) then
-			return false;
-		end
+	if not task:HasSubmitedTask(28) then
+		return false;
 	end
 	return true;
 end
@@ -29,22 +24,17 @@ end
 function Task_Can_Accept_00000029()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 28 then
+	if GetPlayerData(6) ~= 0 then
+		return false;
+	end
+	if player:GetLev() < 24 then
 		return false;
 	end
 	if task:HasAcceptedTask(29) or task:HasCompletedTask(29) or task:HasSubmitedTask(29) then
 		return false;
 	end
-	local state = GetPlayerData(6);
-	if state == 0 then
-		if not task:HasSubmitedTask(28) then
-			return false;
-		end
-	end
-	if state == 1 then
-		if not task:HasSubmitedTask(28) then
-			return false;
-		end
+	if not task:HasSubmitedTask(28) then
+		return false;
 	end
 	return true;
 end
@@ -119,7 +109,7 @@ function Task_00000029_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠你赶回来的正是及时，我这里有一件多年不用的法宝，就赠送给你作为答谢。";
+	action.m_NpcMsg = "少侠你赶回来的真是及时，玉清多谢少侠援手。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -163,7 +153,7 @@ function Task_00000029_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(3333);
 	return true;
 end
 

@@ -72,20 +72,20 @@ function Task_00000006(npcId)
 		action.m_ActionID = 6
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "意外之喜";
+		action.m_ActionMsg = "阵法图册";
 	elseif task:GetTaskSubmitNpc(6) == npcId then
 		if Task_Submit_00000006() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 6
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "意外之喜";
+			action.m_ActionMsg = "阵法图册";
 		elseif task:HasAcceptedTask(6) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 6
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "意外之喜";
+			action.m_ActionMsg = "阵法图册";
 		end
 	end
 	return action;
@@ -99,8 +99,8 @@ function Task_00000006_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "咦，这几本古籍在我这里真是明珠蒙尘了，方才少侠所得那古籍珍品倒是可以卖个好价钱。至于那本功法，我就不清楚了，周淳周大哥常在江湖行走，见多识广或许知道，你去问问他吧。";
-	action.m_ActionMsg = "好，我这就去找他。";
+	action.m_NpcMsg = "咦，这几本古籍在我这里真是明珠蒙尘了，这本阵法图册看起来玄奥无比，小生我是肉眼凡胎自然不了解你们剑侠之流……不过周大哥吩咐的事情我一定妥善安排，你回去告诉周大哥一声，让他放心就是。";
+	action.m_ActionMsg = "好，我这就去转告他。";
 	return action;
 end
 
@@ -109,7 +109,7 @@ function Task_00000006_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎呀，这可是传说中修仙之人练习的功法啊，少侠你真是有福缘，想不到马湘这个秀才竟然还收藏着这个。";
+	action.m_NpcMsg = "如此，我就放心了。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -153,7 +153,7 @@ function Task_00000006_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1000);
+	player:AddExp(2000);
 	return true;
 end
 

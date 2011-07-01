@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000028()
 	local player = GetPlayer();
-	if player:GetLev() < 27 then
+	if player:GetLev() < 22 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000028()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 27 then
+	if player:GetLev() < 22 then
 		return false;
 	end
 	if task:HasAcceptedTask(28) or task:HasCompletedTask(28) or task:HasSubmitedTask(28) then
@@ -109,7 +109,7 @@ function Task_00000028_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "";
+	action.m_NpcMsg = "我虽然隐居在此，不过也听说了少侠你的一些事迹。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -153,7 +153,7 @@ function Task_00000028_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(3333);
 	return true;
 end
 

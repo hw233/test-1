@@ -185,6 +185,7 @@ struct PracticeChallengeReq
 {
 	UInt8 _type;
     UInt8 _idx;
+    std::string _name;
 	MESSAGE_DEF(0xE2);
 };
 
@@ -1049,7 +1050,7 @@ void OnPracticeListReq( GameMsgHdr& hdr, PracticeListReq& req)
 void OnPracticeChallengeReq( GameMsgHdr& hdr, PracticeChallengeReq& req)
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::practicePlace.doChallenge(player, req._type+1, req._idx);
+	GObject::practicePlace.doChallenge(player, req._type+1, req._idx, req._name);
 }
 
 void OnPracticePayReq( GameMsgHdr& hdr, PracticePayReq& req)

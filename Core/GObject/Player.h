@@ -604,6 +604,7 @@ namespace GObject
 		inline void setNextTavernUpdate(UInt32 n) { _nextTavernUpdate = n; }
 		void writeTavernIds();
 		void listRecruit(UInt8 type, UInt8, UInt16);
+		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);

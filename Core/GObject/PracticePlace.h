@@ -16,15 +16,18 @@ namespace GObject
 
 class Player;
 
+// 山头信息
 struct PPlace
 {
     UInt64 ownerid;
     UInt64 protid;
     UInt16 maxslot;
     UInt16 protmoney;
-    UInt16 slotmoney;
+    UInt16 slotmoney; // 8小时所收费用
     UInt8 openslot;
     UInt8 open;
+    UInt16 enemyCount;
+    UInt16 winCount;
 };
 
 struct PracticeData : public GData::ObjectBaseNT<UInt64>
@@ -95,7 +98,7 @@ public:
     void moveAllToMax(UInt8 place);
 
     // 挑战
-    bool doChallenge(Player* pl, UInt8 place, UInt16 idx);
+    bool doChallenge(Player* pl, UInt8 place, UInt16 idx, const std::string& name);
 
     // 增加修练空间
     bool addSlot(Player* pl, UInt8 place);

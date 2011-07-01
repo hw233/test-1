@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000012()
 	local player = GetPlayer();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 11 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000012()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 11 then
 		return false;
 	end
 	if task:HasAcceptedTask(12) or task:HasCompletedTask(12) or task:HasSubmitedTask(12) then
@@ -99,7 +99,7 @@ function Task_00000012_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "这位客官来得真不巧啊，本店原本有上好的女儿红，开坛十里香，是远近奇怪，酒楼怎会没有酒卖呢？掌柜的可否在说笑。";
+	action.m_NpcMsg = "这位客官来得真不巧啊，本店原本有上好的女儿红，开坛十里香，是远近闻名，只是现在本店的女儿红酒是一滴都不剩了。";
 	action.m_ActionMsg = "奇怪，酒楼怎会没有酒卖呢？掌柜的可否在说笑。";
 	return action;
 end

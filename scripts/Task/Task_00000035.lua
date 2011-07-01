@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000035()
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000035()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	if task:HasAcceptedTask(35) or task:HasCompletedTask(35) or task:HasSubmitedTask(35) then
@@ -100,7 +100,7 @@ function Task_00000035_step_01()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
 	action.m_NpcMsg = "<name>你来得正好，小女正被那妖人侮辱，眼看名节不保，还请少侠速速施以援手。";
-	action.m_ActionMsg = "老丈放心，我这就去除掉这个恶贼。";
+	action.m_ActionMsg = "老丈放心，我这就去除掉这个";
 	return action;
 end
 
@@ -136,7 +136,6 @@ function Task_00000035_accept()
 	if not task:AcceptTask(35) then
 		return false;
 	end
-	task:AddTaskStep(35);
 	return true;
 end
 
@@ -153,7 +152,7 @@ function Task_00000035_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(3333);
 	return true;
 end
 
