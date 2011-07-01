@@ -106,6 +106,8 @@ struct DBPlayerData
 	std::string nextreward;
 	std::string tavernId;
 	std::string bookStore;
+	std::string shimen;
+	std::string yamen;
 };
 
 struct DBPrepaid
@@ -156,7 +158,7 @@ struct DBFighter
     Int16 magdef;               // 法术防御
     Int32 hp;                   // 最大血槽*
     UInt16 action;              // 身法/行动值
-    UInt16 peerless;            // 无双技能
+    UInt16 talent;              // 天赋
     float hitrate;              // 命中
     float evade;                // 闪躲
     float critical;             // 暴击(等级): 暴击率=暴击等级/（暴击等级+200+目标等级*20）+修正
@@ -250,6 +252,7 @@ struct DBFighterObj
 	UInt32 ring;            // 戒指
 	UInt32 amulet;          // 项链
     UInt16 peerless;        // 无双技能
+    UInt16 talent;          // 天赋
     std::string trump;      // 法宝
     std::string acupoints;  // 穴道,打通次数
     std::string skill;      // 装备的技能
@@ -638,7 +641,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(31)
+SPECIALDEF(33)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -667,6 +670,8 @@ SPECIALDEF(31)
 	UInt64, pdata.lastResource,
 	std::string, tavernId,
 	std::string, bookStore,
+	std::string, shimen,
+	std::string, yamen,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
 	UInt32, pdata.created,
@@ -751,7 +756,7 @@ SPECIALDEF(33)
 	Int16, magdef,
 	Int32, hp,
 	UInt16, action,
-	UInt16, peerless,
+	UInt16, talent,
 	float, hitrate,
 	float, evade,
 	float, critical,
@@ -838,7 +843,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(24)
+SPECIALDEF(25)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -858,6 +863,7 @@ SPECIALDEF(24)
 	UInt32, ring,
 	UInt32, amulet,
     UInt16, peerless,
+    UInt16, talent,
     std::string, trump,
     std::string, acupoints,
     std::string, skill,

@@ -173,8 +173,16 @@ namespace GObject
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0),
+            smFinishCount(0), smFreeCount(0), ymFinishCount(0), ymFreeCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0)
-		{ memset(tavernId, 0, sizeof(tavernId)); memset(bookStore, 0, sizeof(bookStore)); }
+		{
+            memset(tavernId, 0, sizeof(tavernId));
+            memset(shimen, 0, sizeof(shimen));
+            memset(smcolor, 0, sizeof(smcolor));
+            memset(yamen, 0, sizeof(yamen));
+            memset(ymcolor, 0, sizeof(ymcolor));
+            memset(bookStore, 0, sizeof(bookStore));
+        }
 
 
 		std::string name;           // 名字
@@ -208,6 +216,14 @@ namespace GObject
 		UInt16 tavernId[6];         // 
 		UInt8 tavernBlueCount;      // 
 		UInt8 tavernPurpleCount;    // 
+		UInt32 shimen[6];           // 师门任务
+		UInt8 smcolor[6];           // 师门任务颜色
+        UInt8 smFinishCount;        // 师门任务当日完成次数
+        UInt8 smFreeCount;          // 师门任务当日免费刷新次数
+		UInt32 yamen[6];            // 衙门任务
+		UInt8 ymcolor[6];           // 衙门任务颜色
+        UInt8 ymFinishCount;        // 衙门任务当日完成次数
+        UInt8 ymFreeCount;          // 衙门任务当日免费刷新次数
 		UInt16 bookStore[6];        // 
 		UInt32 created;             // 
 		UInt32 lockExpireTime;      // 
@@ -603,8 +619,10 @@ namespace GObject
 
 		inline void setNextTavernUpdate(UInt32 n) { _nextTavernUpdate = n; }
 		void writeTavernIds();
+		void writeShiMen();
+		void writeYaMen();
 		void listRecruit(UInt8 type, UInt8, UInt16);
-		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16);
+		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);

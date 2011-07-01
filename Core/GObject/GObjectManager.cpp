@@ -252,7 +252,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `peerless`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `talent`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
@@ -288,7 +288,7 @@ namespace GObject
 			fgt->magdef = dbfgt.magdef;
 			fgt->maxhp = dbfgt.hp;
 			fgt->action = dbfgt.action;
-			fgt->peerless = dbfgt.peerless;
+			fgt->talent = dbfgt.talent;
 			fgt->hitrate = dbfgt.hitrate;
 			fgt->evade = dbfgt.evade;
 			fgt->critical = dbfgt.critical;
@@ -614,7 +614,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `yamen`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -719,6 +719,62 @@ namespace GObject
 					pl->setNextTavernUpdate(0);
 			}
 
+            if (dbpd.shimen.length())
+            {
+				StringTokenizer tk(dbpd.shimen, "|");
+				size_t count = tk.count();
+				if(count > 0)
+				{
+					do {
+						size_t tcount = count;
+						if(tcount > 6)
+							tcount = 6;
+						for(size_t j = 0; j < tcount; ++ j)
+						{
+                            StringTokenizer tk1(tk[j].c_str(), ",");
+							PLAYER_DATA(pl, shimen)[j] = atoi(tk1[0].c_str());
+							PLAYER_DATA(pl, smcolor)[j] = atoi(tk1[1].c_str());
+						}
+						if(count > 6)
+						{
+							PLAYER_DATA(pl, smFreeCount) = atoi(tk[6].c_str());
+							if(count > 7)
+							{
+								PLAYER_DATA(pl, smFinishCount) = atoi(tk[7].c_str());
+							}
+						}
+					} while(0);
+				}
+			}
+
+            if (dbpd.yamen.length())
+            {
+				StringTokenizer tk(dbpd.yamen, "|");
+				size_t count = tk.count();
+				if(count > 0)
+				{
+					do {
+						size_t tcount = count;
+						if(tcount > 6)
+							tcount = 6;
+						for(size_t j = 0; j < tcount; ++ j)
+						{
+                            StringTokenizer tk1(tk[j].c_str(), ",");
+							PLAYER_DATA(pl, yamen)[j] = atoi(tk1[0].c_str());
+							PLAYER_DATA(pl, ymcolor)[j] = atoi(tk1[1].c_str());
+						}
+						if(count > 6)
+						{
+							PLAYER_DATA(pl, ymFreeCount) = atoi(tk[6].c_str());
+							if(count > 7)
+							{
+								PLAYER_DATA(pl, ymFinishCount) = atoi(tk[7].c_str());
+							}
+						}
+					} while(0);
+				}
+			}
+
 			{
 				StringTokenizer tk(dbpd.bookStore, "|");
 				size_t count = tk.count();
@@ -815,7 +871,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)

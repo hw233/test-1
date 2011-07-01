@@ -605,7 +605,7 @@ CREATE TABLE `special_fighter_template` (
   `magdef` int(5) NOT NULL DEFAULT '10',
   `hp` int(10) NOT NULL DEFAULT '20',
   `action` int(5) NOT NULL DEFAULT '6000',
-  `peerless` int(10) NOT NULL DEFAULT '20',
+  `talent` int(10) NOT NULL DEFAULT '0',
   `hitrate` float(10,4) NOT NULL DEFAULT '90.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
   `critical` float(10,4) NOT NULL DEFAULT '0.0000',

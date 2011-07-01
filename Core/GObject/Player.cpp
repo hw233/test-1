@@ -2688,6 +2688,16 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _nextTavernUpdate, _id);
 	}
 
+	void Player::writeShiMen()
+	{
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _id);
+	}
+
+	void Player::writeYaMen()
+	{
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.ymcolor[0], _playerData.shimen[1], _playerData.ymcolor[1], _playerData.shimen[2], _playerData.ymcolor[2], _playerData.shimen[3], _playerData.ymcolor[3], _playerData.shimen[4], _playerData.ymcolor[4], _playerData.shimen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
+	}
+
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
         return 0;
@@ -2718,21 +2728,125 @@ namespace GObject
 		return getTavernPriceByColor(fgt->getColor());
 	}
 
-	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count)
+	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
     {
-        // m_TaskMgr 
-        if (tasktype == 0) // 师门
-        {
-            if (type == 0) { // free
-            } else { // money
+        int ttype = 0;
+        if (tasktype >= 1)
+            ttype = 1;
+        else
+            ttype = 0;
+
+        int ftype = 0;
+        if (type == 1)
+            ftype = 0;
+        if (type == 2 || type == 3)
+            ftype = 1;
+        else
+            ftype = 0;
+
+        bool first = false;
+        if (!force) {
+            if (ttype == 0) {
+                if (!_playerData.shimen[0])
+                    first = true;
+                    //return flushTaskColor(0, 1, 0, 1, true);
+            }
+            if (ttype == 1) {
+                if (!_playerData.yamen[0])
+                    first = true;
+                    //return flushTaskColor(1, 1, 0, 1, true);
             }
         }
-        else // 衙门
-        {
+
+        UInt16 ncount = 0;
+        if (type | first) {
+            const std::vector<UInt8>& factor = GData::GDataManager::GetFlushTaskFactor(ttype, ftype);
+            UInt8 rfac[5] = {0};
+            rfac[0] = factor[0];
+            for (int i = 1; i < 5; ++i) {
+                rfac[i] = rfac[i-1] + factor[i];
+            }
+
+            bool percolor = false;
+            do {
+                ++ncount;
+                if ((!ftype && _playerData.smFreeCount < 5) || ftype) {
+                    URandom rnd(time(NULL));
+                    const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(ttype);
+                    std::set<UInt32> idxs;
+                    if (task.size() < 6) {
+                        for (size_t i = 0; i < task.size(); ++i)
+                            idxs.insert(i);
+                    } else {
+                        for (int i = 0; i < 6; ++i) {
+                            UInt32 j = rnd(task.size());
+                            while (idxs.find(j) != idxs.end())
+                                j = rnd(task.size());
+                            idxs.insert(j);
+                        }
+                    }
+
+                    int n = 0;
+                    for (std::set<UInt32>::iterator i = idxs.begin(), e = idxs.end(); i != e; ++i) {
+                        UInt32 rd = rnd(100);
+                        for (int j = 0; j < 5; ++j) {
+                            if (rd <= rfac[j]) {
+                                if (ttype == 0) {
+                                    _playerData.shimen[n] = task[*i];
+                                    _playerData.smcolor[n] = j+1;
+                                } else {
+                                    _playerData.yamen[n] = task[*i];
+                                    _playerData.yamen[n] = j+1;
+                                }
+                                if (j+1 == color)
+                                    percolor = true;
+                                ++n;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!ftype && !first) {
+                    if (ttype == 0)
+                        ++_playerData.smFreeCount;
+                    else
+                        ++_playerData.ymFinishCount;
+                }
+
+                if (!ttype)
+                    writeShiMen();
+                else
+                    writeYaMen();
+
+                if (percolor)
+                    break;
+                if (type == 2)
+                    break;
+                --count;
+            } while (count > 0);
         }
+
+        Stream st(0x8B);
+        st <<  ncount << _playerData.smFinishCount;
+        st << static_cast<UInt8>(5 - _playerData.smFreeCount);
+
+        if (ttype == 0) {
+            for (int i = 0; i < 6; ++i) {
+                st << _playerData.shimen[i];
+                st << _playerData.smcolor[i];
+            }
+        } else {
+            for (int i = 0; i < 6; ++i) {
+                st << _playerData.yamen[i];
+                st << _playerData.ymcolor[i];
+            }
+        }
+        st << Stream::eos;
+        send(st);
     }
 
-	void Player::listRecruit(UInt8 type, UInt8 color, UInt16 count)
+    void Player::listRecruit(UInt8 type, UInt8 color, UInt16 count)
 	{
 		UInt32 curtime = TimeUtil::Now();
 		bool extraRefresh = false;

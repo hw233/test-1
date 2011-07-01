@@ -368,9 +368,9 @@ S11N_TRAITS_1(CanAcceptTaskToken, UInt32, m_TaskId);
 struct TaskActionReq
 {
 	UInt32	m_TaskId;	//
-	UInt8	m_Action;	//0：接???1：提???2：放???
-	UInt32  m_ItemId;	//奖励物品ID
-	UInt16  m_ItemNum;	//奖励物品的数???
+	UInt8	m_Action;	// 0:任务接受,1:任务提交,2:任务放弃,3:付费提交
+	UInt32  m_ItemId;	// 奖励物品ID
+	UInt16  m_ItemNum;	// 奖励物品的数???
 
 	TaskActionReq() : m_TaskId(0), m_Action(0), m_ItemId(0), m_ItemNum(0) {};
 
@@ -615,16 +615,16 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
 	br >> type;
-	UInt8 color = 5;
+	UInt8 color = 0;
 	UInt16 count = 0;
 	switch(type)
 	{
-	case 1:
+	case 2:
 		if(!player->hasChecked())
 			return;
 		count = 1;
 		break;
-	case 2:
+	case 3:
 		if(!player->hasChecked())
 			return;
 		br >> color >> count;
@@ -1791,11 +1791,18 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 	case 1:
 		//提交, 直接走脚???
 		succ = GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
+        if (succ) {
+            TaskData* td = player->GetTaskMgr()->GetTask(req.m_TaskId);
+            if (td) {
+            }
+        }
 		break;
 	case 2:
 		//放弃
 		succ = GameAction()->AbandonTask(player, req.m_TaskId);
 		break;
+    case 3:
+        break;
 	default:
 		return ;
 	}

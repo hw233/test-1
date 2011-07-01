@@ -84,6 +84,7 @@ private:
 	void OnEnterClan(GObject::Player *, std::vector<std::string>&);
     void OnPay4Pra(GObject::Player * player, std::vector<std::string>&);
     void OnSitPra(GObject::Player * player, std::vector<std::string>&);
+    void OnFlushTask(GObject::Player * player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;
