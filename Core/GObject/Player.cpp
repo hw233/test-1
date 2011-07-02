@@ -726,7 +726,7 @@ namespace GObject
 				lup.fighter = it->second;
 				lup.updateId();
 				++ c;
-				if(i > 0 && lup.fid < 7)
+				if(i > 0 && lup.fid < 10)
 				{
 					std::swap(_playerData.lineup[0], _playerData.lineup[i]);
 				}
@@ -786,7 +786,7 @@ namespace GObject
 	void Player::addFighter( Fighter * fgt, bool writedb )
 	{
 		UInt32 id = fgt->getId();
-		if(id < 7)
+		if(id < 10)
 			_fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
 		else
 			_fighters[fgt->getId()] = fgt;
@@ -1591,7 +1591,7 @@ namespace GObject
 
 	Fighter * Player::takeFighter( UInt32 id, bool writedb )
 	{
-		if(id > GREAT_FIGHTER_MAX || (writedb && id < 7))
+		if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))
 			return NULL;
 		if(hasFighter(id))
 			return NULL;
