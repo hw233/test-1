@@ -70,8 +70,6 @@ namespace GObject
     UInt32 GObjectManager::_max_capacity;
     std::vector<UInt32> GObjectManager::_potential_chance;
     std::vector<UInt32> GObjectManager::_capacity_chance;
-    UInt32 GObjectManager::_tavernFighterStart;
-    UInt32 GObjectManager::_tavernFighterEnd;
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -387,21 +385,6 @@ namespace GObject
 			}
 		}
 		lc.finalize();
-
-        {
-            lua_State* L = lua_open();
-            luaopen_base(L);
-            luaopen_string(L);
-
-            std::string path = cfg.scriptPath + "Other/TavernFighters.lua";
-            lua_tinker::dofile(L, path.c_str());
-
-            _tavernFighterStart = lua_tinker::call<UInt32>(L, "getTavernFighterStart");
-            _tavernFighterEnd = lua_tinker::call<UInt32>(L, "getTavernFighterEnd");
- 
-            lua_close(L);
-        }
- 
 		globalFighters.setMaxFgtId(maxGF);
 		globalFighters.buildSummonSet();
 

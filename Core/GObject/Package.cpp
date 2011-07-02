@@ -15,11 +15,11 @@
 #include "Server/OidGenerator.h"
 #include "Server/Cfg.h"
 
-#define ITEM_FORGE_L1 500      //洗炼符
+#define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
 #define ITEM_SOCKET_L2 511
 #define ITEM_SOCKET_L3 512
-#define ITEM_GEM_PROTECT 8920
+#define ITEM_GEM_PROTECT 513    // 宝石保护符
 #define ITEM_SPLIT_PROTECT 8925
 #define ITEM_DETACH_PROTECT 504 // 精致拆卸石
 #define ITEM_ENCHANT_PROTECT 8927
@@ -1639,6 +1639,179 @@ namespace GObject
 		return 0;
 	}
 
+    UInt8 Package::BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& unbindGemsOut, UInt16& bindGemsOut)
+    {
+		UInt16 protectUnbindNum = GetItemNum(ITEM_GEM_PROTECT, false);
+		UInt16 protectBindNum = GetItemNum(ITEM_GEM_PROTECT, true);
+		if(protect && protectUnbindNum == 0 && protectBindNum == 0)
+			return 1;
+
+		UInt16 protectBindUsed = 0, protectUnbindUsed = 0;
+		UInt32 coinAmount = 0;
+		UInt32 myCoin = m_Owner->getCoin();
+
+		URandom& rnd = static_cast<BaseThread *>(Thread::current())->uRandom;
+		UInt8 result = 0;
+
+        if (GetItemSubClass(gemId) != Item_Gem)
+            return 3;
+        UInt32 lvl = (gemId - 1) % 10;
+
+        if(bindCount > 0 && GetItemNum(gemId, true) < bindCount)
+            return 3;
+        if(unbindCount > 0 && GetItemNum(gemId, false) < unbindCount)
+            return 3;
+
+        UInt32 bindUsed = 0, unbindUsed = 0;
+        unbindGemsOut = 0;
+        bindGemsOut = 0;
+
+        while(result == 0 && bindCount >= 3)
+        {
+            UInt32 amount = GObjectManager::getMergeCost();    // merge_cost[lvl];
+            coinAmount += amount;
+            if(coinAmount > myCoin)
+            {
+                coinAmount -= amount;
+                result = 2;
+                break;
+            }
+            if(protect)
+            {
+                if(protectBindUsed >= protectBindNum)
+                {
+                    if(protectUnbindUsed >= protectUnbindNum)
+                    {
+                        coinAmount -= amount;
+                        result = 1;
+                        break;
+                    }
+                    ++ protectUnbindUsed;
+                }
+                else
+                    ++ protectBindUsed;
+            }
+
+            if(rnd(100) < merge_chance[lvl])
+            {
+                bindUsed += 3;
+                bindCount -= 3;
+                ++ bindGemsOut;
+            }
+            else if(!protect)
+            {
+                bindCount -= 3;
+            }
+        }
+
+        while(result == 0 && unbindCount >= 3)
+        {
+            UInt32 amount = GObjectManager::getMergeCost();        // merge_cost[lvl];
+            coinAmount += amount;
+            if(coinAmount > myCoin)
+            {
+                coinAmount -= amount;
+                result = 2;
+                break;
+            }
+            if(protect)
+            {
+                if(protectUnbindUsed >= protectUnbindNum)
+                {
+                    if(protectBindUsed >= protectBindNum)
+                    {
+                        coinAmount -= amount;
+                        result = 1;
+                        break;
+                    }
+                    ++ protectBindUsed;
+                }
+                else
+                    ++ protectUnbindUsed;
+            }
+            if(rnd(100) < merge_chance[lvl])
+            {
+                unbindUsed += 3;
+                unbindCount -= 3;
+                ++ unbindGemsOut;
+            }
+            else if(!protect)
+            {
+                unbindCount -= 3;
+            }
+        }
+
+        while(bindCount + unbindCount >= 3 && result == 0)
+        {
+            UInt32 amount = GObjectManager::getMergeCost();      // merge_cost[lvl];
+            coinAmount += amount;
+            if(coinAmount > myCoin)
+            {
+                coinAmount -= amount;
+                result = 2;
+                break;
+            }
+            if(protect)
+            {
+                if(protectBindUsed >= protectBindNum)
+                {
+                    if(protectUnbindUsed >= protectUnbindNum)
+                    {
+                        coinAmount -= amount;
+                        result = 1;
+                        break;
+                    }
+                    ++ protectUnbindUsed;
+                }
+                else
+                    ++ protectBindUsed;
+            }
+            if(rnd(100) < merge_chance[lvl])
+            {
+                bindUsed += bindCount;
+                unbindUsed += 3 - bindCount;
+
+                unbindCount -= 3 - bindCount;
+                bindCount = 0;
+
+                ++ bindGemsOut;
+                break;
+            }
+            else if(!protect)
+            {
+                unbindCount -= 3 - bindCount;
+                bindCount = 0;
+            }
+        }
+
+        if(bindUsed > 0)
+            DelItem(gemId, bindUsed, true);
+        if(unbindUsed > 0)
+            DelItem(gemId, unbindUsed, false);
+        if(bindGemsOut > 0)
+        {
+            AddItem(gemId + 1, bindGemsOut, true);
+            if(World::_activityStage > 0)
+                GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
+        }
+        if(unbindGemsOut > 0)
+        {
+            AddItem(gemId + 1, unbindGemsOut, false);
+            if(World::_activityStage > 0)
+                GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
+        }
+
+		ConsumeInfo ci(MergeGems,0,0);
+		m_Owner->useCoin(coinAmount, &ci);
+		if(protectBindUsed > 0)
+			DelItem(ITEM_GEM_PROTECT, protectBindUsed, true);
+		if(protectUnbindUsed > 0)
+			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false);
+
+		return result;
+    }
+
+#if 0
 	UInt8 Package::BatchMergeGem( std::map<UInt16, UInt32, _GemCompare >& gems, std::vector<UInt32>& gemsOut )
 	{
 		if(gems.empty())
@@ -1651,25 +1824,6 @@ namespace GObject
 		UInt32 coinAmount = 0;
 		UInt32 myCoin = m_Owner->getCoin();
 
-		UInt32 lvlLimit = 9;
-		UInt32 viplvl = this->m_Owner->getVipLevel();
-
-		if(viplvl == 7)
-		{
-			lvlLimit = 8;
-		}
-		else if(viplvl == 6)
-		{
-			lvlLimit = 7;
-		}
-		else if(viplvl == 5)
-		{
-			lvlLimit = 6;
-		}
-		else if(viplvl < 5)
-		{
-			lvlLimit = 5;
-		}
 		URandom& rnd = static_cast<BaseThread *>(Thread::current())->uRandom;
 		UInt8 result = 0;
 		for(std::map<UInt16, UInt32, _GemCompare >::iterator it = gems.begin(); result == 0 && it != gems.end(); ++ it)
@@ -1677,7 +1831,6 @@ namespace GObject
 			UInt32 gemId = it->first;
 			if (GetItemSubClass(gemId) != Item_Gem) continue;
 			UInt32 lvl = (gemId - 1) % 10;
-			if(lvl >= lvlLimit) continue;
 
 			UInt32 bindCount = it->second >> 16;
 			if(bindCount > 0 && GetItemNum(gemId, true) < bindCount)
@@ -1691,7 +1844,7 @@ namespace GObject
 
 			while(result == 0 && bindCount >= 3)
 			{
-				UInt32 amount = merge_cost[lvl];
+				UInt32 amount = GObjectManager::getMergeCost();    // merge_cost[lvl];
 				coinAmount += amount;
 				if(coinAmount > myCoin)
 				{
@@ -1726,7 +1879,7 @@ namespace GObject
 
 			while(result == 0 && unbindCount >= 3)
 			{
-				UInt32 amount = merge_cost[lvl];
+				UInt32 amount = GObjectManager::getMergeCost();        // merge_cost[lvl];
 				coinAmount += amount;
 				if(coinAmount > myCoin)
 				{
@@ -1761,7 +1914,7 @@ namespace GObject
 
 			if(bindCount + unbindCount >= 3) while(result == 0)
 			{
-				UInt32 amount = merge_cost[lvl];
+				UInt32 amount = GObjectManager::getMergeCost();      // merge_cost[lvl];
 				coinAmount += amount;
 				if(coinAmount > myCoin)
 				{
@@ -1822,6 +1975,7 @@ namespace GObject
 
 		return result;
 	}
+#endif
 
 	UInt8 Package::ActivateAttr( UInt16 fighterId, UInt32 itemId, UInt32 itemId2 )
 	{
