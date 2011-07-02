@@ -791,11 +791,13 @@ namespace GObject
 		else
 			_fighters[fgt->getId()] = fgt;
 
+#if 0
         //TODO:
         fgt->upSkill(101, 0, true);
         fgt->upPeerless(201);
         UInt16 passiveSkill[] = {501, 601, 701, 801, 901, 1001, 1101, 1201};
         fgt->upPassiveSkill(passiveSkill, sizeof(passiveSkill));
+#endif
 
 		if(writedb)
 		{

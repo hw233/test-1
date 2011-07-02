@@ -1103,7 +1103,7 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
     }
 
     idx = isSkillUp(skill);
-    if (idx > 0)
+    if (idx >= 0)
         upSkill(SKILLANDLEVEL(skill, lv), idx);
 
     if (addNewSkill(SKILLANDLEVEL(skill, lv)))
@@ -1585,7 +1585,7 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
 {
     if (!skill) return false;
     int idx = hasSkill(skill);
-    if (idx > 0)
+    if (idx >= 0)
     {
         if (skill != _skills[idx])
         { // upgrade
@@ -1926,7 +1926,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
 {
     if (!citta) return false;
     int idx = hasCitta(citta);
-    if (idx > 0)
+    if (idx >= 0)
     {
         if (_cittas[idx] != citta)
         { // upgrade
