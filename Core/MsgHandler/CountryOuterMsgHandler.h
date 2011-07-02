@@ -1791,17 +1791,16 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 	case 1:
 		//提交, 直接走脚???
 		succ = GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
-        if (succ) {
-            TaskData* td = player->GetTaskMgr()->GetTask(req.m_TaskId);
-            if (td) {
-            }
-        }
+        if (succ)
+            player->addAwardByTaskColor(req.m_TaskId);
 		break;
 	case 2:
 		//放弃
 		succ = GameAction()->AbandonTask(player, req.m_TaskId);
 		break;
     case 3:
+        player->addAwardByTaskColor(req.m_TaskId);
+        succ = true;
         break;
 	default:
 		return ;

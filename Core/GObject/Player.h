@@ -621,6 +621,7 @@ namespace GObject
 		void writeTavernIds();
 		void writeShiMen();
 		void writeYaMen();
+        void addAwardByTaskColor(UInt32);
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
 		UInt16 calcNextTavernUpdate(UInt32);
