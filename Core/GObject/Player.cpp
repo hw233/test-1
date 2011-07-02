@@ -726,7 +726,7 @@ namespace GObject
 				lup.fighter = it->second;
 				lup.updateId();
 				++ c;
-				if(i > 0 && lup.fid < 7)
+				if(i > 0 && lup.fid < 10)
 				{
 					std::swap(_playerData.lineup[0], _playerData.lineup[i]);
 				}
@@ -786,7 +786,7 @@ namespace GObject
 	void Player::addFighter( Fighter * fgt, bool writedb )
 	{
 		UInt32 id = fgt->getId();
-		if(id < 7)
+		if(id < 10)
 			_fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
 		else
 			_fighters[fgt->getId()] = fgt;
@@ -1591,7 +1591,7 @@ namespace GObject
 
 	Fighter * Player::takeFighter( UInt32 id, bool writedb )
 	{
-		if(id > GREAT_FIGHTER_MAX || (writedb && id < 7))
+		if(id > GREAT_FIGHTER_MAX || (writedb && id < 10))
 			return NULL;
 		if(hasFighter(id))
 			return NULL;
@@ -2698,6 +2698,24 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.ymcolor[0], _playerData.shimen[1], _playerData.ymcolor[1], _playerData.shimen[2], _playerData.ymcolor[2], _playerData.shimen[3], _playerData.ymcolor[3], _playerData.shimen[4], _playerData.ymcolor[4], _playerData.shimen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
 	}
 
+    void Player::addAwardByTaskColor(UInt32 taskid)
+    {
+        for (int i = 0; i < 6; ++i) {
+            if (_playerData.shimen[i] == taskid) {
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]);
+                AddExp(award); // TODO:
+                _playerData.shimen[i] = 0;
+            }
+        }
+        for (int i = 0; i < 6; ++i) {
+            if (_playerData.yamen[i] == taskid) {
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.smcolor[i]);
+                getTael(award); // TODO:
+                _playerData.yamen[i] = 0;
+            }
+        }
+    }
+
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
         return 0;
@@ -2747,14 +2765,12 @@ namespace GObject
         bool first = false;
         if (!force) {
             if (ttype == 0) {
-                if (!_playerData.shimen[0])
+                if (!_playerData.smcolor[0])
                     first = true;
-                    //return flushTaskColor(0, 1, 0, 1, true);
             }
             if (ttype == 1) {
-                if (!_playerData.yamen[0])
+                if (!_playerData.ymcolor[0])
                     first = true;
-                    //return flushTaskColor(1, 1, 0, 1, true);
             }
         }
 
@@ -2805,19 +2821,14 @@ namespace GObject
                             }
                         }
                     }
-                }
 
-                if (!ftype && !first) {
-                    if (ttype == 0)
-                        ++_playerData.smFreeCount;
-                    else
-                        ++_playerData.ymFinishCount;
+                    if (!ftype && !first) {
+                        if (ttype == 0)
+                            ++_playerData.smFreeCount;
+                        else
+                            ++_playerData.ymFinishCount;
+                    }
                 }
-
-                if (!ttype)
-                    writeShiMen();
-                else
-                    writeYaMen();
 
                 if (percolor)
                     break;
@@ -2825,6 +2836,11 @@ namespace GObject
                     break;
                 --count;
             } while (count > 0);
+
+            if (!ttype)
+                writeShiMen();
+            else
+                writeYaMen();
         }
 
         Stream st(0x8B);

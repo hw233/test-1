@@ -61,6 +61,7 @@ namespace GData
 		static const std::vector<UInt32>& GetYaMenTask();
 		static const std::vector<UInt32>& GetShiYaMenTask(int type);
 		static const std::vector<UInt8>& GetFlushTaskFactor(int ttype, int ftype);
+        static UInt32 GetTaskAwardFactor(int ttype, int color);
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -79,6 +80,7 @@ namespace GData
         static std::vector<UInt32>		 m_ShiMenTask;
         static std::vector<UInt32>		 m_YaMenTask;
         static std::vector<UInt8>		 m_FlushTaskFactor[2][2];
+        static std::vector<UInt32>		 m_TaskAwardFactor[2];
 	};
 
 	

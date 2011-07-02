@@ -47,6 +47,7 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_ShiMenTask;
 	std::vector<UInt32>		GDataManager::m_YaMenTask;
     std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
+    std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -718,6 +719,15 @@ namespace GData
                         }
                     }
                 }
+
+                for (int i = 0; i < 2; ++i) {
+                    lua_tinker::table factor = lua_tinker::call<lua_tinker::table>(L, "GetTaskAwardFactor", i+1);
+                    UInt32 size = factor.size();
+                    for (UInt32 n = 0; n < size; ++n)
+                    {
+                        m_TaskAwardFactor[i].push_back(factor.get<UInt8>(n+1));
+                    }
+                }
             }
         }
         return true;
@@ -1200,5 +1210,10 @@ namespace GData
     const std::vector<UInt8>& GDataManager::GetFlushTaskFactor(int ttype, int ftype)
     {
         return m_FlushTaskFactor[ttype][ftype];
+    }
+
+    UInt32 GDataManager::GetTaskAwardFactor(int ttype, int color)
+    {
+        return m_TaskAwardFactor[ttype][color];
     }
 }

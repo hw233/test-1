@@ -77,6 +77,7 @@ GMHandler::GMHandler()
 	Reg(3, "offpsskill", &GMHandler::OnOffPasSkill);
 	Reg(3, "uppeerless", &GMHandler::OnUpPeerless);
 	Reg(3, "offpeerless", &GMHandler::OnOffPeerless);
+	Reg(3, "learncitta", &GMHandler::OnLearnCitta);
 	Reg(3, "upcitta", &GMHandler::OnUpCitta);
 	Reg(3, "offcitta", &GMHandler::OnOffCitta);
 	Reg(3, "level", &GMHandler::OnSetLevel);
@@ -1425,6 +1426,23 @@ void GMHandler::OnUpSkill( GObject::Player * player, std::vector<std::string>& a
 
         UInt16 num = fgt->getUpSkillsNum();
         fgt->upSkill(SKILLANDLEVEL(skillId, skillLevel), num);
+	}
+}
+
+void GMHandler::OnLearnCitta( GObject::Player * player, std::vector<std::string>& args )
+{
+	if(args.empty())
+		return;
+	if(args.size() > 2)
+	{
+		UInt32 fighterId = atoi(args[0].c_str());
+		UInt32 cittaId = atoi(args[1].c_str());(void)cittaId;
+		UInt32 cittaLevel = atoi(args[2].c_str());
+		GObject::Fighter * fgt = player->findFighter(fighterId);
+		if(fgt == NULL)
+			return;
+
+        fgt->addNewCitta(CITTAANDLEVEL(cittaId, cittaLevel));
 	}
 }
 
