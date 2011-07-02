@@ -377,9 +377,9 @@ S11N_TRAITS_1(CanAcceptTaskToken, UInt32, m_TaskId);
 struct TaskActionReq
 {
 	UInt32	m_TaskId;	//
-	UInt8	m_Action;	//0：接???1：提???2：放???
-	UInt32  m_ItemId;	//奖励物品ID
-	UInt16  m_ItemNum;	//奖励物品的数???
+	UInt8	m_Action;	// 0:任务接受,1:任务提交,2:任务放弃,3:付费提交
+	UInt32  m_ItemId;	// 奖励物品ID
+	UInt16  m_ItemNum;	// 奖励物品的数???
 
 	TaskActionReq() : m_TaskId(0), m_Action(0), m_ItemId(0), m_ItemNum(0) {};
 
@@ -617,32 +617,30 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 	SYSMSG_SEND(1015, pl);
 }
 
-struct FlushTaskColorReq
+void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 {
-	UInt32 m_DayTaskId;
-	UInt8  m_FlushToken;
-	UInt32 m_FlushGoldTotal;
-	UInt8  m_TaskColor;
+ 	MSG_QUERY_PLAYER(player);
 
-	MESSAGE_DEF4(0x8B, UInt32, m_DayTaskId, UInt8, m_FlushToken, UInt32, m_FlushGoldTotal, UInt8, m_TaskColor);
-};
-
-void OnFlushTaskColorReq( GameMsgHdr& hdr, FlushTaskColorReq& req )
-{
- 	MSG_QUERY_PLAYER(pl);
-	if(!pl->hasChecked())
-		return;
-
-	TaskMgr* taskMgr = pl->GetTaskMgr();
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+	br >> type;
 	UInt8 color = 0;
-	UInt32 nextFlushTime = 0;
-	if (req.m_FlushToken == 0)
-		taskMgr->FlushTaskColor(req.m_DayTaskId, color, nextFlushTime);
-	else
-		taskMgr->FlushTaskColor(req.m_DayTaskId, req.m_TaskColor, req.m_FlushGoldTotal, color, nextFlushTime);
-	Stream st(0x8B);
-	st << req.m_DayTaskId << color << nextFlushTime << Stream::eos;
-	pl->send(st);
+	UInt16 count = 0;
+	switch(type)
+	{
+	case 2:
+		if(!player->hasChecked())
+			return;
+		count = 1;
+		break;
+	case 3:
+		if(!player->hasChecked())
+			return;
+		br >> color >> count;
+		break;
+	}
+
+	player->flushTaskColor(0, type, color, count);
 }
 
 struct DayTaskAutoCompletedReq
@@ -1825,11 +1823,18 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 	case 1:
 		//提交, 直接走脚???
 		succ = GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
+        if (succ) {
+            TaskData* td = player->GetTaskMgr()->GetTask(req.m_TaskId);
+            if (td) {
+            }
+        }
 		break;
 	case 2:
 		//放弃
 		succ = GameAction()->AbandonTask(player, req.m_TaskId);
 		break;
+    case 3:
+        break;
 	default:
 		return ;
 	}

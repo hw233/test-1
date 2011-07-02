@@ -12,7 +12,7 @@ namespace GData
 	{
 		UInt32				m_TypeId;
 		std::string			m_Name;
-		UInt8				m_Class;		//1:主线 2：支线 3：日常（循环）
+		UInt8				m_Class;		//1:主线 2：支线 3：日常（循环） 4: 师门 5:衙门 6：帮派
 		UInt8				m_SubType;
 		UInt32				m_AcceptNpc;	//任务接受NPC；如果为0， 则表示此任务是通过物品触发的
 		UInt32				m_SubmitNpc;

@@ -18,6 +18,7 @@ MSG_REG_2(GameMsgHdr, 0x23, OnFighterInfoReq);
 MSG_REG(GameMsgHdr, OnGreatFighterTaskValReq);
 MSG_REG_2(GameMsgHdr, 0x25, OnGreatFighterActionReq);
 MSG_REG_2(GameMsgHdr, 0x26, OnRecruitListReq);
+MSG_REG_2(GameMsgHdr, 0x8B, OnFlushTaskColorReq);
 MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
@@ -66,7 +67,6 @@ MSG_REG(GameMsgHdr, OnConveyBattleReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 
-MSG_REG(GameMsgHdr, OnFlushTaskColorReq);
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
 MSG_REG(GameMsgHdr, OnQueryDayTaskCompletedCountReq);

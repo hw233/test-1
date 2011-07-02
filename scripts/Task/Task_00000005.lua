@@ -136,6 +136,7 @@ function Task_00000005_accept()
 	if not task:AcceptTask(5) then
 		return false;
 	end
+	task:AddTaskStep(5);
 	return true;
 end
 
@@ -152,7 +153,7 @@ function Task_00000005_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1000);
+	player:AddExp(2222);
 	return true;
 end
 

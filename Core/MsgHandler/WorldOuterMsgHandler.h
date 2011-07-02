@@ -25,6 +25,7 @@
 #include "GData/Store.h"
 #include "GObject/Mail.h"
 #include "GObject/ClanManager.h"
+#include "GObject/PracticePlace.h"
 
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
@@ -167,6 +168,48 @@ struct SaleBuyAndCancelReq
 	MESSAGE_DEF2(0xC7, UInt8, _token, UInt32, _id);
 };
 
+struct PracticePlaceReq
+{
+	MESSAGE_DEF(0xE0);
+};
+
+struct PracticeListReq
+{
+	UInt8 _type;
+    UInt8 _pageno;
+    UInt8 _pagenum;
+	MESSAGE_DEF(0xE1);
+};
+
+struct PracticeChallengeReq
+{
+	UInt8 _type;
+    UInt8 _idx;
+    std::string _name;
+	MESSAGE_DEF(0xE2);
+};
+
+struct PracticePayReq
+{
+    UInt8 _place;
+    UInt8 _slot;
+    UInt8 _type;
+    UInt8 _ptype;
+	MESSAGE_DEF(0xE3);
+};
+
+struct PracticeSitDownReq
+{
+    UInt8 _num;
+    UInt32 _fgts[0];
+	MESSAGE_DEF(0xE4);
+};
+
+struct PracticeStopReq
+{
+	MESSAGE_DEF(0xE5);
+};
+
 struct AthleticsListReq
 {
 	MESSAGE_DEF(0xD0);
@@ -288,7 +331,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length());
 	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length());
 	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length());
-	DB().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), 0, contact2, purpose2);
+	DB().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), 0, contact2, purpose2);
 	ConsumeInfo ci(ClanCreate,0,0);
 	player->useTael(100,&ci);
 	clan->initBuildClan();
@@ -992,12 +1035,47 @@ void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
 		GObject::gSaleMgr.cancelSale(player, req._id);
 }
 
+void OnPracticePlaceReq( GameMsgHdr& hdr, PracticePlaceReq&)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::practicePlace.getAllPlaceInfo(player);
+}
+
+void OnPracticeListReq( GameMsgHdr& hdr, PracticeListReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::practicePlace.getList(player, req._type+1, req._pageno, req._pagenum);
+}
+
+void OnPracticeChallengeReq( GameMsgHdr& hdr, PracticeChallengeReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::practicePlace.doChallenge(player, req._type+1, req._idx, req._name);
+}
+
+void OnPracticePayReq( GameMsgHdr& hdr, PracticePayReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::practicePlace.pay(player, req._place+1, req._slot, req._type, 1, req._type==0?1:3,req._ptype);
+}
+
+void OnPracticeSitDownReq( GameMsgHdr& hdr, PracticeSitDownReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::practicePlace.sitdown(player, req._fgts, req._num);
+}
+
+void OnPracticeStopReq( GameMsgHdr& hdr, PracticeStopReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::practicePlace.stop(player);
+}
+
 void OnAthleticsListReq( GameMsgHdr& hdr, AthleticsListReq&)
 {
 	MSG_QUERY_PLAYER(player);
 	GObject::gAthleticsRank.requestAthleticsList(player);
 }
-
 
 void OnAthleticsChallengeReq( GameMsgHdr& hdr, AthleticsChallengeReq& req )
 {

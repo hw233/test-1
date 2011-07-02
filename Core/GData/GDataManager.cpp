@@ -43,6 +43,10 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_TaelPractice;
 	std::vector<UInt32>		GDataManager::m_GoldPractice;
 	std::vector<UInt32>		GDataManager::m_GoldOpenSlot;
+	std::vector<UInt32>		GDataManager::m_PlaceAddons;
+	std::vector<UInt32>		GDataManager::m_ShiMenTask;
+	std::vector<UInt32>		GDataManager::m_YaMenTask;
+    std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -98,12 +102,17 @@ namespace GData
 		}
 		if (!LoadFighterTrainData())
 		{
-			fprintf(stderr, "Load fighter train daata Error !\n");
+			fprintf(stderr, "Load fighter train data Error !\n");
 			return false;
 		}
 		if (!LoadPracticeData())
 		{
-			fprintf(stderr, "Load practice daata Error !\n");
+			fprintf(stderr, "Load practice data Error !\n");
+			return false;
+		}
+		if (!LoadFlushTaskFactor())
+		{
+			fprintf(stderr, "Load flush task factor Error !\n");
 			return false;
 		}
         if (!LoadTalent())
@@ -503,6 +512,11 @@ namespace GData
 					}
 					task.m_ReqLev = elem.get<UInt16>(pos++);
 					m_TaskTypeList.insert(std::make_pair(task.m_TypeId, task));
+
+                    if (task.m_Class == 4)
+                        m_ShiMenTask.push_back(task.m_TypeId);
+                    if (task.m_Class == 5)
+                        m_YaMenTask.push_back(task.m_TypeId);
 				}
 			}
 			lua_close(L);
@@ -640,8 +654,17 @@ namespace GData
 		luaopen_string(L);
 		luaopen_table(L);
 		{
-			std::string path = cfg.scriptPath + "Other/Practice.lua";
+			std::string path = cfg.scriptPath + "formula/practice.lua";
 			lua_tinker::dofile(L, path.c_str());
+
+            {
+                lua_tinker::table addons = lua_tinker::call<lua_tinker::table>(L, "GetPlaceAddons");
+                UInt32 size = addons.size();
+                for (UInt32 i = 0; i < size; ++ i)
+                {
+                    m_PlaceAddons.push_back(addons.get<float>(i+1)*100+100);
+                }
+            }
 
             {
                 lua_tinker::table tael_pra = lua_tinker::call<lua_tinker::table>(L, "GetTaelPractice");
@@ -674,6 +697,31 @@ namespace GData
         return true;
     }
 
+	bool GDataManager::LoadFlushTaskFactor()
+	{
+		lua_State * L = lua_open();
+		luaopen_base(L);
+		luaopen_string(L);
+		luaopen_table(L);
+		{
+			std::string path = cfg.scriptPath + "formula/flushtask.lua";
+			lua_tinker::dofile(L, path.c_str());
+
+            {
+                for (int i = 0; i < 2; ++i) {
+                    for (int j = 0; j < 2; ++j) {
+                        lua_tinker::table factor = lua_tinker::call<lua_tinker::table>(L, "GetFlushTaskFactor", i+1, j+1);
+                        UInt32 size = factor.size();
+                        for (UInt32 n = 0; n < size; ++n)
+                        {
+                            m_FlushTaskFactor[i][j].push_back(factor.get<UInt8>(n+1));
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
     bool GDataManager::LoadTalent()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -1126,4 +1174,31 @@ namespace GData
 	{
 		return m_GoldOpenSlot;
 	}
+
+	const std::vector<UInt32>& GDataManager::GetPlaceAddons()
+	{
+		return m_PlaceAddons;
+	}
+
+	const std::vector<UInt32>& GDataManager::GetShiMenTask()
+	{
+		return m_ShiMenTask;
+	}
+
+	const std::vector<UInt32>& GDataManager::GetYaMenTask()
+	{
+		return m_YaMenTask;
+	}
+
+    const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int type)
+    {
+        if (type >= 1)
+            return m_YaMenTask;
+        return m_ShiMenTask;
+    }
+
+    const std::vector<UInt8>& GDataManager::GetFlushTaskFactor(int ttype, int ftype)
+    {
+        return m_FlushTaskFactor[ttype][ftype];
+    }
 }

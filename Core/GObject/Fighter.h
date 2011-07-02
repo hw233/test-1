@@ -568,7 +568,8 @@ public:
 	Int32 magdef;
 	Int32 maxhp;
 	UInt32 action;
-    UInt16 peerless;       // 装备的无双技能
+    UInt16 peerless;// 装备的无双技能
+    UInt16 talent;  // 天赋
 	float hitrate;
 	float evade;
 	float critical;

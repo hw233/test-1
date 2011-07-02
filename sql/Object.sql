@@ -520,6 +520,7 @@ CREATE TABLE `fighter` (
   `ring` int(10) unsigned NOT NULL DEFAULT '0',
   `amulet` int(10) unsigned NOT NULL DEFAULT '0',
   `peerless` mediumint(5) unsigned NOT NULL DEFAULT '0',
+  `talent` mediumint(5) unsigned NOT NULL DEFAULT '0',
   `trump` varchar(255) NOT NULL,
   `acupoints` varchar(255) NOT NULL,
   `skill` varchar(255) NOT NULL,
@@ -580,6 +581,8 @@ CREATE TABLE `practice_place` (
   `protmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `slotmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `open` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `enemyCount` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `winCount` smallint(5) unsigned NOT NULL DEFAULT '0',
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -769,6 +772,8 @@ CREATE TABLE `player` (
   `nextExtraReward` int(10) unsigned NOT NULL DEFAULT '0',
   `tavernId` varchar(255) NOT NULL DEFAULT '',
   `bookStore` varchar(255) NOT NULL DEFAULT '0',
+  `shimen` varchar(255) NOT NULL DEFAULT '',
+  `yamen` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',

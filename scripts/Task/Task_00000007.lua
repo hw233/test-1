@@ -99,8 +99,8 @@ function Task_00000007_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠果然仙缘深厚，这本书籍乃是仙道中人修炼的功法，少侠机缘巧合获得此物，想必也是天意如此，待我告诉你如何使用这功法，日后必能斩妖除魔，造福苍生。";
-	action.m_ActionMsg = "多谢周前辈。";
+	action.m_NpcMsg = "少侠果然仙缘深厚，这本书籍乃是仙道中人修炼的阵法，少侠机缘巧合获得此物，想必也是天意如此。我虽然不是剑侠之流，也曾听说高人一般都隐居在名山仙府，少侠不妨试一试。";
+	action.m_ActionMsg = "多谢周前辈指点。";
 	return action;
 end
 
@@ -136,6 +136,7 @@ function Task_00000007_accept()
 	if not task:AcceptTask(7) then
 		return false;
 	end
+	task:AddTaskStep(7);
 	return true;
 end
 
@@ -152,7 +153,7 @@ function Task_00000007_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(2222);
 	return true;
 end
 

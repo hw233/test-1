@@ -99,7 +99,7 @@ function Task_00000058_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "现在万事具备，只欠东风了，现在是最后一步，这里是小徒申若兰在餐霞大师处借来的紫烟锄，可以在毒石上刨出乌风草来。不过这块毒石散发的毒雾很是凶毒，所以采集时千万要小心。\n";
+	action.m_NpcMsg = "现在万事具备，只欠东风了，现在是最后一步，这里是小徒申若兰在餐霞大师处借来的紫烟锄，可以在毒石上刨出乌风草来。不过这块毒石散发的毒雾很是凶毒，所以采集时千万要小心。";
 	action.m_ActionMsg = "我会注意的，姥姥您放心吧。";
 	return action;
 end
@@ -152,7 +152,7 @@ function Task_00000058_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(5555);
 	return true;
 end
 

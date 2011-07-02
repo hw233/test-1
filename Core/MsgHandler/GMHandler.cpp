@@ -102,6 +102,7 @@ GMHandler::GMHandler()
 
 	Reg(3, "pay4pra", &GMHandler::OnPay4Pra);
 	Reg(3, "sitpra", &GMHandler::OnSitPra);
+	Reg(3, "flushtask", &GMHandler::OnFlushTask);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1873,4 +1874,26 @@ void GMHandler::OnSitPra( GObject::Player * player, std::vector<std::string>& ar
 
     player->addPracticeFighter(fighters, cnt);
 }
+
+void GMHandler::OnFlushTask( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 1)
+        return;
+
+    UInt8 ttype = atoi(args[0].c_str());
+    UInt8 ftype = 0;
+    UInt8 color = 0;
+    UInt8 count = 1;
+    if (args.size() > 1) {
+        ftype = atoi(args[1].c_str());
+        if (args.size() > 2) {
+            color = atoi(args[2].c_str());
+            if (args.size() > 3)
+                count = atoi(args[3].c_str());
+        }
+    }
+    player->flushTaskColor(ttype, ftype, color, count);
+}
+
+
 

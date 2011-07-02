@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000032()
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000032()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 24 then
 		return false;
 	end
 	if task:HasAcceptedTask(32) or task:HasCompletedTask(32) or task:HasSubmitedTask(32) then
@@ -100,7 +100,7 @@ function Task_00000032_step_01()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
 	action.m_NpcMsg = "这个穷酒鬼竟然还藏着这么个好玩意，来来来，让我教教你怎么把这块太乙真金熔炼到你的飞剑中去，这次就不收你钱了，全记在那个酒鬼头上。";
-	action.m_ActionMsg = "这怎么好意思呢";
+	action.m_ActionMsg = "这怎么好意思呢？";
 	return action;
 end
 
@@ -164,7 +164,7 @@ function Task_00000032_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(2222);
 	return true;
 end
 

@@ -87,7 +87,7 @@ function Task_00000054_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "金驼这个邪派妖人，我可不屑和他们同流合污。";
+	action.m_NpcMsg = "";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -130,7 +130,7 @@ function Task_00000054_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(11111);
+	player:AddExp(3333);
 	return true;
 end
 

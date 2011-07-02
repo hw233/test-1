@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000050()
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 29 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -29,7 +29,7 @@ end
 function Task_Can_Accept_00000050()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 29 then
 		return false;
 	end
 	if task:HasAcceptedTask(50) or task:HasCompletedTask(50) or task:HasSubmitedTask(50) then
@@ -109,7 +109,7 @@ function Task_00000050_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "魏家场一战，邪派妖人被打得是丢盔弃甲啊，哈哈";
+	action.m_NpcMsg = "魏家场一战，邪派妖人被打得是丢盔弃甲啊，哈哈。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -152,7 +152,7 @@ function Task_00000050_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(11111);
+	player:AddExp(5000);
 	return true;
 end
 

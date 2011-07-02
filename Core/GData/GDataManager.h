@@ -30,6 +30,7 @@ namespace GData
 		static bool LoadQueRule();
 		static bool LoadFighterTrainData();
 		static bool LoadPracticeData();
+		static bool LoadFlushTaskFactor();
 		static bool LoadTalent();
 		static bool LoadSkillEffect();
 		static bool LoadSkills();
@@ -55,7 +56,11 @@ namespace GData
 		static const std::vector<UInt32>& GetTaelPractice();
 		static const std::vector<UInt32>& GetGoldPractice();
 		static const std::vector<UInt32>& GetGoldOpenSlot();
-		
+		static const std::vector<UInt32>& GetPlaceAddons();
+		static const std::vector<UInt32>& GetShiMenTask();
+		static const std::vector<UInt32>& GetYaMenTask();
+		static const std::vector<UInt32>& GetShiYaMenTask(int type);
+		static const std::vector<UInt8>& GetFlushTaskFactor(int ttype, int ftype);
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -70,6 +75,10 @@ namespace GData
 		static std::vector<UInt32>		 m_TaelPractice;
 		static std::vector<UInt32>		 m_GoldPractice;
 		static std::vector<UInt32>		 m_GoldOpenSlot;
+		static std::vector<UInt32>		 m_PlaceAddons;
+        static std::vector<UInt32>		 m_ShiMenTask;
+        static std::vector<UInt32>		 m_YaMenTask;
+        static std::vector<UInt8>		 m_FlushTaskFactor[2][2];
 	};
 
 	
