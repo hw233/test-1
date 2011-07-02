@@ -2284,6 +2284,7 @@ namespace GObject
             }
 
         }
+        lua_close(L);
 
         return true;
     }

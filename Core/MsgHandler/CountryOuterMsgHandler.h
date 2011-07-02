@@ -182,6 +182,15 @@ struct ForgeReq
 	MESSAGE_DEF3(0x47, UInt16, _fighterId, UInt32, _itemid, /*UInt8, _type,*/ UInt8, _protect);
 };
 
+struct BatchMergeReq
+{
+    UInt16 _gemId;
+    UInt16 _unBindNum;
+    UInt16 _bindNum;
+    UInt8 _protect;
+    MESSAGE_DEF4(0x4B, UInt16, _gemId, UInt16, _unBindNum, UInt16, _bindNum, UInt8, _protect);
+};
+
 struct ForgeAnswerReq
 {
 	UInt16 _fighterId;
@@ -1503,6 +1512,28 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 	player->send(st);
 }
 
+void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+
+	if(player->GetPackage()->GetRestPackageSize() < (bmr._unBindNum > 0 ? 1 : 0) + (bmr._bindNum > 0 ? 1 : 0))
+	{
+		player->sendMsgCode(0, 2016);
+		return;
+	}
+
+    UInt16 gemUnbindOut;
+    UInt16 gemBindOut;
+	UInt8 result = player->GetPackage()->BatchMergeGem(bmr._gemId, bmr._unBindNum, bmr._bindNum, bmr._protect, gemUnbindOut, gemBindOut);
+	Stream st(0x4B);
+	st << result << bmr._gemId << gemUnbindOut << gemBindOut;
+	st << Stream::eos;
+	player->send(st);
+}
+
+#if 0
 void OnBatchMergeReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1539,6 +1570,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, const void * data )
 	st << Stream::eos;
 	player->send(st);
 }
+#endif
 
 #if 0
 void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )

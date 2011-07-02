@@ -97,7 +97,6 @@ function onActivityCheck(tm)
   setRecruitCost(20);
   setTavernBlueCount(24);
   setTavernPurpleCount(89);
-  setTavernFighterStartEnd(7, 134);
 
   for i, v in ipairs(SpringChecPoints) do
     if tm < SpringChecPoints[i] then
