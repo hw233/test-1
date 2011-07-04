@@ -1406,7 +1406,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         _cittaslot += pap->citslot;
         if (pap->citslot)
         {
-            DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
+            //DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         }
         ++_praadd; // 每一层级+1
 
