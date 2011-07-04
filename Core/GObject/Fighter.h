@@ -60,8 +60,8 @@ public:
     inline void setSex(UInt8 s) {_sex = s;}
 	inline void setLevel(UInt8 l) {_level = l;}
 	inline void setExp(UInt64 e) {_exp = e;}
-    inline void setPExp(UInt64 e) { _pexp = e; }
-    inline void setPExpMax(UInt64 e) { _pexpMax = e; }
+    inline void setPExp(UInt32 e) { _pexp = e; }
+    inline void setPExpMax(UInt32 e) { _pexpMax = e; }
 	void setLevelAndExp(UInt8 l, UInt64 e);
 	void setPotential(float p, bool = true);
 	void setCurrentHP(UInt16 hp, bool = true);
@@ -76,8 +76,8 @@ public:
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
-	inline UInt64 getPExp() {return _pexp;}
-	inline UInt64 getPExpMax() {return _pexpMax;}
+	inline UInt32 getPExp() {return _pexp;}
+	inline UInt32 getPExpMax() {return _pexpMax;}
 	inline float getPotential() {return _potential;}
 	inline UInt16 getCurrentHP() {return _hp;}
 
@@ -509,8 +509,8 @@ protected:
 	UInt8 _class;
 	UInt8 _level;
 	UInt64 _exp;        // 经验
-    UInt64 _pexp;       // 修炼经验
-    UInt64 _pexpMax;    // 修炼最大经验
+    UInt32 _pexp;       // 修炼经验
+    UInt32 _pexpMax;    // 修炼最大经验
 	float _potential;   // 潜力
 	float _capacity;    // 资质
 	UInt8 _color;

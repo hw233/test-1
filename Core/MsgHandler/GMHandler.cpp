@@ -106,6 +106,8 @@ GMHandler::GMHandler()
 	Reg(3, "sitpra", &GMHandler::OnSitPra);
 	Reg(3, "flushtask", &GMHandler::OnFlushTask);
 	Reg(3, "setcountry", &GMHandler::OnSetCountry);
+	Reg(3, "addpexp", &GMHandler::OnAddPExp);
+	Reg(3, "setpexp", &GMHandler::OnSetPExp);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1933,5 +1935,29 @@ void GMHandler::OnSetCountry( GObject::Player * player, std::vector<std::string>
         GameMsgHdr hdr(0x1F0, country, player, sizeof(CountryEnterStruct));
         GLOBAL().PushMsg( hdr, &ces );
     }
+}
+
+void GMHandler::OnAddPExp( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 2)
+        return;
+    UInt32 id = atoi(args[0].c_str());
+	GObject::Fighter * fgt = player->findFighter(id);
+    if (!fgt)
+        return;
+    UInt64 pexp = atoll(args[1].c_str());
+    fgt->addPExp(pexp);
+}
+
+void GMHandler::OnSetPExp( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 2)
+        return;
+    UInt32 id = atoi(args[0].c_str());
+	GObject::Fighter * fgt = player->findFighter(id);
+    if (!fgt)
+        return;
+    UInt64 pexp = atoll(args[0].c_str());
+    fgt->setPExp(pexp);
 }
 

@@ -201,7 +201,7 @@ bool Fighter::addPExp( Int64 e, bool writedb )
 {
     if (e < 0)
     {
-        if (_pexp <= (UInt64)-e)
+        if (_pexp <= (UInt32)-e)
             _pexp = 0;
         else
             _pexp += e;
@@ -1715,7 +1715,14 @@ bool Fighter::lvlUpCitta(UInt16 citta, int idx, bool writedb)
     if (!cb)
         return false;
 
-    return addNewCitta(citta+1);
+    if (getPExp() >= cb->pexp) {
+        int i = hasCitta(citta);
+        if (i < 0)
+            return false;
+        citta = _skills[i];
+        return addNewCitta(citta+1);
+    }
+    return false;
 }
 
 void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)
@@ -1935,6 +1942,9 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;
+    if (cb->needsoul > getMaxSoul() - getSoul())
+        return false;
+
     int idx = hasCitta(citta);
     if (idx >= 0)
     {
@@ -1953,6 +1963,9 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         idx = _cittas.size();
         _cittas.push_back(citta);
     }
+
+    addPExp(-cb->pexp);
+    soul += cb->needsoul;
 
     _attrDirty = true;
     _bPDirty = true;
