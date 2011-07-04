@@ -1222,7 +1222,7 @@ UInt8 Fighter::getCittasNum()
 {
     UInt8 c = 0;
     for (size_t i = 0; i < _cittas.size(); ++i)
-        if (_citta[i]) ++c;
+        if (_cittas[i]) ++c;
     return c;
 }
 
@@ -1447,8 +1447,11 @@ int Fighter::isSkillUp(UInt16 skill)
 {
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
-        if (skill == _skill[i] || SKILL_ID(skill) == SKILL_ID(_skill[i]))
+        if (skill == _skill[i] || SKILL_ID(skill) == SKILL_ID(_skill[i])) {
+            if (skill != _skill[i])
+                skill = _skill[i];
             return i;
+        }
     }
     return -1;
 }
@@ -1583,6 +1586,9 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb )
 {
+    const GData::SkillBase* s = GData::skillManager[skill];
+    if (!s)
+        return false;
     if (!skill) return false;
     int idx = hasSkill(skill);
     if (idx >= 0)
@@ -1623,16 +1629,23 @@ int Fighter::isCittaUp( UInt16 citta )
 {
     for (int i = 0; i < getUpCittasMax(); ++i)
     {
-        if (citta == _citta[i] || CITTA_ID(citta) == CITTA_ID(_citta[i]))
+        if (citta == _citta[i] || CITTA_ID(citta) == CITTA_ID(_citta[i])) {
+            if (citta != _citta[i])
+                citta = _citta[i];
             return i;
+        }
     }
     return -1;
 }
 
 bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 {
+    // XXX: need this???
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
+        return false;
+
+    if (hasCitta(citta) < 0)
         return false;
 
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
@@ -1642,23 +1655,17 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     int src = isCittaUp(citta);
     if (src < 0)
     {
-        int i = getUpCittasNum();
-        if (i < getUpCittasMax())
-        { // insert
+        if (idx < getUpCittasNum()) // XXX: no we all append
+        {
             for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
             {
                 _citta[j] = _citta[j-1];;
                 _citta[j-1] = 0;
             }
-            _citta[i] = citta;
-            idx = i;
-            ret = true;
         }
-        else
-        { // replace
-            _citta[idx] = citta;
-            ret = true;
-        }
+
+        _citta[idx] = citta;
+        ret = true;
     }
     else
     {
@@ -1679,7 +1686,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
             if (_citta[idx] != citta)
             {
                 // XXX: do not send message to client
-                delCitta(_citta[idx], writedb, false); // delete skills was taken out by old citta first
+                offCitta(_citta[idx], writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
             }
@@ -1925,15 +1932,18 @@ int Fighter::hasCitta( UInt16 citta )
 bool Fighter::addNewCitta( UInt16 citta, bool writedb )
 {
     if (!citta) return false;
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
     int idx = hasCitta(citta);
     if (idx >= 0)
     {
         if (_cittas[idx] != citta)
         { // upgrade
-            _cittas[idx] = citta;
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, writedb);
+                upCitta(citta, i, writedb);
+            _cittas[idx] = citta;
         }
         else
             return false;
@@ -1956,6 +1966,22 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
     if (idx < 0)
         return false;
 
+    if (citta != _citta[idx])
+        citta = _citta[idx];
+    const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
+    if (skills.size())
+    {
+        for (size_t i = 0; i < skills.size(); ++i)
+        {
+            if (skills[i]->cond == GData::SKILL_PEERLESS)
+                delPeerless(skills[i]?skills[i]->getId():0, writedb);
+            else if (skills[i]->cond == GData::SKILL_ACTIVE)
+                delSkill(skills[i]?skills[i]->getId():0, writedb, true);
+            else
+                offPassiveSkill(skills[i]?skills[i]->getId():0, skills[i]->cond, skills[i]->prob>=100.0f, writedb);
+        }
+    }
+
     _citta[idx] = 0;
     for (int i = idx; i < getUpCittasMax() - 1; ++i)
     {
@@ -1965,7 +1991,7 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x63, 0, idx, writedb);
+    sendModification(0x62, 0, idx, writedb);
     return true;
 }
 
@@ -1975,20 +2001,6 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
     if (idx < 0)
         return false;
 
-    const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
-    if (skills.size())
-    {
-        for (size_t i = 0; i < skills.size(); ++i)
-        {
-            if (skills[i]->cond == GData::SKILL_PEERLESS)
-                delPeerless(skills[i]?skills[i]->getId():0, writedb);
-            else if (skills[i]->cond == GData::SKILL_ACTIVE)
-                delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
-            else
-                offPassiveSkill(skills[i]?skills[i]->getId():0, skills[i]->cond, skills[i]->prob>=100.0f, writedb);
-        }
-
-    }
     offCitta(citta, writedb);
 
     std::vector<UInt16>::iterator it = _cittas.begin();

@@ -478,8 +478,8 @@ protected:
     template <typename T>
     bool value2string(T* values, int size, std::string& str)
     {
-        if (!values || size)
-            return false;
+        if (!values || !size)
+            return true; // XXX: will be set to ''
 
         char buf[256] = {0};
         char* pbuf = buf;
