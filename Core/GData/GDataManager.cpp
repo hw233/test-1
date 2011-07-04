@@ -44,8 +44,8 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_GoldPractice;
 	std::vector<UInt32>		GDataManager::m_GoldOpenSlot;
 	std::vector<UInt32>		GDataManager::m_PlaceAddons;
-	std::vector<UInt32>		GDataManager::m_ShiMenTask;
-	std::vector<UInt32>		GDataManager::m_YaMenTask;
+	std::vector<UInt32>		GDataManager::m_ShiMenTask[COUNTRY_MAX];
+	std::vector<UInt32>		GDataManager::m_YaMenTask[COUNTRY_MAX];
     std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
     std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
 
@@ -514,10 +514,11 @@ namespace GData
 					task.m_ReqLev = elem.get<UInt16>(pos++);
 					m_TaskTypeList.insert(std::make_pair(task.m_TypeId, task));
 
+					task.m_Country = elem.get<UInt32>(pos++);
                     if (task.m_Class == 4)
-                        m_ShiMenTask.push_back(task.m_TypeId);
+                        m_ShiMenTask[task.m_Country].push_back(task.m_TypeId);
                     if (task.m_Class == 5)
-                        m_YaMenTask.push_back(task.m_TypeId);
+                        m_YaMenTask[task.m_Country].push_back(task.m_TypeId);
 				}
 			}
 			lua_close(L);
@@ -1190,21 +1191,21 @@ namespace GData
 		return m_PlaceAddons;
 	}
 
-	const std::vector<UInt32>& GDataManager::GetShiMenTask()
+	const std::vector<UInt32>& GDataManager::GetShiMenTask(int country)
 	{
-		return m_ShiMenTask;
+		return m_ShiMenTask[country];
 	}
 
-	const std::vector<UInt32>& GDataManager::GetYaMenTask()
+	const std::vector<UInt32>& GDataManager::GetYaMenTask(int country)
 	{
-		return m_YaMenTask;
+		return m_YaMenTask[country];
 	}
 
-    const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int type)
+    const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int country, int type)
     {
         if (type >= 1)
-            return m_YaMenTask;
-        return m_ShiMenTask;
+            return m_YaMenTask[country];
+        return m_ShiMenTask[country];
     }
 
     const std::vector<UInt8>& GDataManager::GetFlushTaskFactor(int ttype, int ftype)

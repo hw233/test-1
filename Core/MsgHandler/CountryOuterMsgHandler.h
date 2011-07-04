@@ -625,7 +625,7 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 	UInt8 type = 0;
 	br >> type;
 	UInt8 color = 0;
-	UInt16 count = 0;
+	UInt16 count = 1;
 	switch(type)
 	{
 	case 2:

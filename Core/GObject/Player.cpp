@@ -2707,6 +2707,7 @@ namespace GObject
                 UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]);
                 AddExp(award); // TODO:
                 _playerData.shimen[i] = 0;
+                ++_playerData.smFinishCount;
             }
         }
         for (int i = 0; i < 6; ++i) {
@@ -2714,6 +2715,7 @@ namespace GObject
                 UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.smcolor[i]);
                 getTael(award); // TODO:
                 _playerData.yamen[i] = 0;
+                ++_playerData.ymFinishCount;
             }
         }
     }
@@ -2790,7 +2792,7 @@ namespace GObject
                 ++ncount;
                 if ((!ftype && _playerData.smFreeCount < 5) || ftype) {
                     URandom rnd(time(NULL));
-                    const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(ttype);
+                    const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     std::set<UInt32> idxs;
                     if (task.size() < 6) {
                         for (size_t i = 0; i < task.size(); ++i)
@@ -2847,7 +2849,7 @@ namespace GObject
 
         Stream st(0x8B);
         st <<  ncount << _playerData.smFinishCount;
-        st << static_cast<UInt8>(5 - _playerData.smFreeCount);
+        st << _playerData.smFreeCount;
 
         if (ttype == 0) {
             for (int i = 0; i < 6; ++i) {

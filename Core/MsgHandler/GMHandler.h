@@ -86,6 +86,7 @@ private:
     void OnPay4Pra(GObject::Player * player, std::vector<std::string>&);
     void OnSitPra(GObject::Player * player, std::vector<std::string>&);
     void OnFlushTask(GObject::Player * player, std::vector<std::string>&);
+    void OnSetCountry(GObject::Player * player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;
