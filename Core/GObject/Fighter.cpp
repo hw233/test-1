@@ -213,7 +213,7 @@ bool Fighter::addPExp( Int32 e, bool writedb )
             _pexp = _pexpMax;
     }
 
-    sendModification(6, e);
+    sendModification(6, _pexp);
     return true;
 }
 
