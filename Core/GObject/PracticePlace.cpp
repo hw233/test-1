@@ -21,8 +21,7 @@ namespace GObject
         if (!pl || !time || !place || place > PPLACE_MAX || ((place != PPLACE_MAX) && slot > m_places[place-1].place.maxslot))
             return false;
 
-        Stream st;
-        st.init(0xE3);
+        Stream st(0xE3);
 
         if (pl->isPracticing())
         {

@@ -128,6 +128,10 @@ LOCK TABLES `dungeon_level` WRITE;
 source dungeonlevel
 UNLOCK TABLES;
 
+LOCK TABLES `acupra` WRITE;
+source acupra
+UNLOCK TABLES;
+
 -- ASSS
 use asss;
 LOCK TABLES `practice_place` WRITE;
