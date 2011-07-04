@@ -89,6 +89,7 @@ private:
     void OnSetCountry(GObject::Player * player, std::vector<std::string>&);
     void OnAddPExp(GObject::Player * player, std::vector<std::string>&);
     void OnSetPExp(GObject::Player * player, std::vector<std::string>&);
+    void OnSetAcu(GObject::Player * player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

@@ -466,10 +466,6 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 		{
 			st << v[i];
 		}
-		else if(t[i] == 0x08 || t[i] == 0x09)
-        {
-            st << static_cast<UInt16>(v[i]);
-        }
 		else
 		{
 			st << static_cast<UInt32>(v[i]);

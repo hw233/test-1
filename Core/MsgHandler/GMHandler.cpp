@@ -108,6 +108,7 @@ GMHandler::GMHandler()
 	Reg(3, "setcountry", &GMHandler::OnSetCountry);
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "setpexp", &GMHandler::OnSetPExp);
+	Reg(3, "setacu", &GMHandler::OnSetAcu);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1959,5 +1960,18 @@ void GMHandler::OnSetPExp( GObject::Player * player, std::vector<std::string>& a
         return;
     UInt64 pexp = atoll(args[0].c_str());
     fgt->setPExp(pexp);
+}
+
+void GMHandler::OnSetAcu( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 2)
+        return;
+    UInt32 id = atoi(args[0].c_str());
+	GObject::Fighter * fgt = player->findFighter(id);
+    if (!fgt)
+        return;
+    UInt8 idx = atoi(args[0].c_str());
+    UInt8 lvl = atoi(args[1].c_str());
+    fgt->setAcupoints(idx, lvl);
 }
 
