@@ -262,7 +262,7 @@ public:
 
 	UInt32 regenHP(UInt32);
 	bool addExp(UInt64);
-	bool addPExp(Int64, bool = true);
+	bool addPExp(Int32, bool = true);
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);

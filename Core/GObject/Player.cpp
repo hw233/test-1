@@ -1046,7 +1046,8 @@ namespace GObject
 	void Player::makeFighterInfo( Stream& st, Fighter * fgt, bool withequip )
 	{
 		st << static_cast<UInt16>(fgt->getId()) << fgt->getPotential()
-            << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getPExp();
+            << fgt->getCapacity() << fgt->getLevel() << fgt->getExp()
+            << fgt->getPExp() << fgt->getPExpMax() << fgt->getSoul() << fgt->getMaxSoul();
 		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP();
 		if(withequip)
 		{

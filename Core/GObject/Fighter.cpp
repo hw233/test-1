@@ -197,7 +197,7 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
-bool Fighter::addPExp( Int64 e, bool writedb )
+bool Fighter::addPExp( Int32 e, bool writedb )
 {
     if (e < 0)
     {
@@ -213,7 +213,7 @@ bool Fighter::addPExp( Int64 e, bool writedb )
             _pexp = _pexpMax;
     }
 
-    sendModification(6, e, writedb);
+    sendModification(6, e);
     return true;
 }
 
@@ -282,6 +282,12 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         return;
 	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
         break;
+    case 7:
+            break;
+    case 8:
+            break;
+    case 9:
+            break;
 
     case 0x29:
         {
@@ -357,7 +363,7 @@ void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
 		return;
 	Stream st(0x21);
 	st << getId() << static_cast<UInt8>(1) << t;
-    st << static_cast<UInt8>(idx) << _acupoints[idx];
+    st << static_cast<UInt8>(idx) << _acupoints[idx] << getSoul() << getMaxSoul();
     if (writedb)
     {
         updateToDB(t, 0);
@@ -460,6 +466,10 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 		{
 			st << v[i];
 		}
+		else if(t[i] == 0x08 || t[i] == 0x09)
+        {
+            st << static_cast<UInt16>(v[i]);
+        }
 		else
 		{
 			st << static_cast<UInt32>(v[i]);
@@ -1392,7 +1402,11 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         addPExp(-pap->pra, writedb);
 
         soulMax += pap->soulmax;
+        if (pap->soulmax)
+            sendModification(9, soulMax);
         _pexpMax += pap->pramax;
+        if (pap->pramax)
+            sendModification(7, _pexpMax);
         _cittaslot += pap->citslot;
         if (pap->citslot)
         {
@@ -1964,8 +1978,10 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         _cittas.push_back(citta);
     }
 
-    addPExp(-cb->pexp);
+    addPExp(-cb->pexp, writedb);
     soul += cb->needsoul;
+    if (cb->needsoul)
+        sendModification(8, soul);
 
     _attrDirty = true;
     _bPDirty = true;
