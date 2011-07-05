@@ -262,12 +262,14 @@ namespace GObject
             fgt = m_Player->findFighter(*i);
             if (fgt)
             {
-                fgt->addPExp(fgt->getPracticeInc() * 60 * 10); 
+                fgt->addPExp(fgt->getPracticeInc() * 10); 
             }
         }
         //data->lock.unlock();
 
-		data->checktime = leftCount;
+		data->checktime = data->traintime-(data->traintime-leftCount)*10;
+        if (data->checktime < 0)
+            data->checktime = 0;
 		if(leftCount == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());

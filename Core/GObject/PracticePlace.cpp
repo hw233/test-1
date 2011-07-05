@@ -44,38 +44,40 @@ namespace GObject
             return false;
         }
 
-        PracticeData*& pd = m_places[place-1].data[slot];
-        if (pd)
-        {
-            if (pd->winnerid != pl->getId())
+        if (place != PPLACE_MAX) {
+            PracticeData*& pd = m_places[place-1].data[slot];
+            if (pd)
             {
-                st << static_cast<UInt8>(1) << Stream::eos;
-                return false;
+                if (pd->winnerid != pl->getId())
+                {
+                    st << static_cast<UInt8>(1) << Stream::eos;
+                    return false;
+                }
+
+                Player* def = globalPlayers[pd->getId()];
+                if (!def)
+                {
+                    st << static_cast<UInt8>(1) << Stream::eos;
+                    return false;
+                }
+
+                UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->price;
+                if (pd->pricetype == 0)
+                    def->getGold(money);
+                else
+                    def->getTael(money);
+
+                pd->winnerid = 0;
+                m_places[PPLACE_MAX-1].data.push_back(pd);
+                pd = 0;
+                --m_places[place-1].used;
+                ++m_places[PPLACE_MAX-1].used;
+
+                pd->checktime = 0;
+                // DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", def->getId());
+                DB().PushUpdateData("UPDATE `practice_data` SET checktime = 0 where `id`= %"I64_FMT"u", def->getId());
+                PopTimerEvent(def, EVENT_PLAYERPRACTICING, def->getId());
             }
-
-            Player* def = globalPlayers[pd->getId()];
-            if (!def)
-            {
-                st << static_cast<UInt8>(1) << Stream::eos;
-                return false;
-            }
-
-            UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->price;
-            if (pd->pricetype == 0)
-                def->getGold(money);
-            else
-                def->getTael(money);
-
-            pd->winnerid = 0;
-            m_places[PPLACE_MAX-1].data.push_back(pd);
-            pd = 0;
-            --m_places[place-1].used;
-            ++m_places[PPLACE_MAX-1].used;
-
-            pd->checktime = 0;
-            // DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", def->getId());
-            DB().PushUpdateData("UPDATE `practice_data` SET checktime = 0 where `id`= %"I64_FMT"u", def->getId());
-            PopTimerEvent(def, EVENT_PLAYERPRACTICING, def->getId());
         }
         ++m_places[place-1].used;
 
@@ -141,7 +143,9 @@ namespace GObject
         pp->prot = prot;
         pp->cdend = TimeUtil::Now() + pp->traintime * 60 + 60 * 60;
         pp->winnerid = 0;
-        m_places[place-1].data[slot] = pp;
+
+        if (place != PPLACE_MAX)
+            m_places[place-1].data[slot] = pp;
 
         DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, price, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 

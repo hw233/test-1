@@ -178,7 +178,7 @@ struct PracticeListReq
 	UInt8 _type;
     UInt8 _pageno;
     UInt8 _pagenum;
-	MESSAGE_DEF(0xE1);
+	MESSAGE_DEF3(0xE1, UInt8, _type, UInt8, _pageno, UInt8, _pagenum);
 };
 
 struct PracticeChallengeReq
@@ -186,7 +186,7 @@ struct PracticeChallengeReq
 	UInt8 _type;
     UInt8 _idx;
     std::string _name;
-	MESSAGE_DEF(0xE2);
+	MESSAGE_DEF3(0xE2, UInt8, _type, UInt8, _idx, std::string, _name);
 };
 
 struct PracticePayReq
@@ -195,14 +195,14 @@ struct PracticePayReq
     UInt8 _slot;
     UInt8 _type;
     UInt8 _ptype;
-	MESSAGE_DEF(0xE3);
+	MESSAGE_DEF4(0xE3, UInt8, _place, UInt8, _slot, UInt8, _type, UInt8, _ptype);
 };
 
 struct PracticeSitDownReq
 {
-    UInt8 _num;
-    UInt32 _fgts[0];
-	MESSAGE_DEF(0xE4);
+    UInt8 _type;
+    UInt32 _fgtid;
+	MESSAGE_DEF2(0xE4, UInt8, _type, UInt32, _fgtid);
 };
 
 struct PracticeStopReq
@@ -1062,7 +1062,8 @@ void OnPracticePayReq( GameMsgHdr& hdr, PracticePayReq& req)
 void OnPracticeSitDownReq( GameMsgHdr& hdr, PracticeSitDownReq& req)
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::practicePlace.sitdown(player, req._fgts, req._num);
+    UInt32 fgts[1] = {req._fgtid};
+	GObject::practicePlace.sitdown(player, fgts, 1);
 }
 
 void OnPracticeStopReq( GameMsgHdr& hdr, PracticeStopReq& req)
