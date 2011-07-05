@@ -910,10 +910,10 @@ namespace GObject
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
+            fgt2->setUpCittas(specfgtobj.citta, false);
 		}
 		lc.finalize();
 

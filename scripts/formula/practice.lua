@@ -1,8 +1,7 @@
 
-capfactor = 0.16
-goldfactor = 0.2
-prabase = 5
-potentialbase = 5
+capfactor = 0.16 -- 资质加成
+prabase = 5 -- 基础增长点数
+potentialbase = 5 -- 
 
 -- TODO: 山头据点
 local addons = {
@@ -29,10 +28,6 @@ function calcPracticeInc( fgt )
         placeadd = 0
     end
 
-    if not fgt:isGoldPractice() then
-        goldfactor = 0
-    end
-
     if place ~= 7 then
         clantechaddon = fgt:getClanTechAddon(place)
     else
@@ -44,8 +39,9 @@ function calcPracticeInc( fgt )
         capacity = 5
     end
 
-    -- 穴道加成 + (资质 - 5) * 0.16 + 钱加成 + 山头加成
-    return fgt:getAcuPraAdd() + (prabase * (1 + (capacity - 5) * capfactor + goldfactor + placeadd + clantechaddon)) + 0.5
+    -- TODO: BUF加成
+    -- 穴道加成 + BUF加成 + (资质 - 5) * 0.16 + 山头加成
+    return fgt:getAcuPraAdd() + (prabase * (1 + (capacity - 5) * capfactor + placeadd + clantechaddon)) + 0.5
 end
 
 function GetPlaceAddons()

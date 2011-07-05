@@ -1112,7 +1112,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
-            fgt->offCitta(citta);
+            fgt->offCitta(citta, true, true);
         }
         break;
     case 0x64:
@@ -1120,9 +1120,9 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             if (idx == 1)
-                fgt->lvlUpCitta(citta, idx);
+                fgt->lvlUpCitta(citta);
             else if (idx == 2)
-                fgt->delCitta(citta, idx);
+                fgt->delCitta(citta, true);
         }
         break;
     default:
