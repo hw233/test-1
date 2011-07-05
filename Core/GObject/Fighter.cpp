@@ -1667,10 +1667,14 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     {
         if (idx < getUpCittasNum()) // XXX: no we all append
         {
-            for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
-            {
-                _citta[j] = _citta[j-1];;
-                _citta[j-1] = 0;
+            if (getUpCittasNum() < getUpCittasMax()) {
+                for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
+                {
+                    _citta[j] = _citta[j-1];;
+                    _citta[j-1] = 0;
+                    if (_citta[j])
+                        sendModification(0x62, _citta[j], j, false);
+                }
             }
         }
 
@@ -2008,15 +2012,19 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
     }
 
     _citta[idx] = 0;
-    for (int i = idx; i < getUpCittasMax() - 1; ++i)
-    {
-        _citta[i] = _citta[i+1];
-        _citta[i+1] = 0;
-    }
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x62, 0, idx, writedb);
+
+    int i = idx;
+    for (; i < getUpCittasMax() - 1; ++i)
+    {
+        _citta[i] = _citta[i+1];
+        _citta[i+1] = 0;
+        if (_citta[i])
+            sendModification(0x62, _citta[i], i, writedb);
+    }
+    sendModification(0x62, 0, i, writedb);
     return true;
 }
 
