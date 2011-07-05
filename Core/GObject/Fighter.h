@@ -207,7 +207,7 @@ public:
     // 装备心法
     bool upCitta(UInt16 citta, int idx, bool = true);
     // 卸下心法
-    bool offCitta(UInt16 citta, bool = true);
+    bool offCitta(UInt16 citta, bool = false, bool = true);
     // 增加一个心法
     bool addNewCitta(UInt16 citta, bool = true);
     // 删除一个心法

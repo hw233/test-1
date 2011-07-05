@@ -1662,22 +1662,29 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
         return false;
 
+    bool swap = false;
     bool ret = false;
     int src = isCittaUp(citta);
     if (src < 0)
     {
+        if (cb->needsoul > getMaxSoul() - getSoul())
+            return false;
+
         if (idx < getUpCittasNum()) // XXX: no we all append
         {
             if (getUpCittasNum() < getUpCittasMax()) {
                 for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
                 {
-                    _citta[j] = _citta[j-1];;
+                    _citta[j] = _citta[j-1];
                     _citta[j-1] = 0;
                     if (_citta[j])
                         sendModification(0x62, _citta[j], j, false);
                 }
             }
         }
+
+        if (_citta[idx])
+            offCitta(_citta[idx], false, writedb);
 
         _citta[idx] = citta;
         ret = true;
@@ -1694,23 +1701,31 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                 _citta[idx] ^= _citta[src];
                 _citta[src] ^= _citta[idx];
                 ret = true;
+                swap = true;
             }
         }
         else
         { // upgrade
             if (_citta[idx] != citta)
             {
+                if (cb->needsoul > getMaxSoul() - getSoul())
+                    return false;
+
                 // XXX: do not send message to client
-                offCitta(_citta[idx], writedb); // delete skills was taken out by old citta first
+                offCitta(_citta[idx], false, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
             }
         }
     }
 
-    if (ret)
+    if (ret && !swap)
     {
         addSkillsFromCT(skillFromCitta(citta), writedb);
+
+        soul += cb->needsoul;
+        if (cb->needsoul)
+            sendModification(8, soul);
 
         _attrDirty = true;
         _bPDirty = true;
@@ -1726,7 +1741,7 @@ bool Fighter::lvlUpCitta(UInt16 citta, int idx, bool writedb)
     if (!cb)
         return false;
 
-    cb = GData::cittaManager[CITTA_LEVEL(citta)+1];
+    cb = GData::cittaManager[citta+1];
     if (!cb)
         return false;
 
@@ -1734,7 +1749,6 @@ bool Fighter::lvlUpCitta(UInt16 citta, int idx, bool writedb)
         int i = hasCitta(citta);
         if (i < 0)
             return false;
-        citta = _skills[i];
         return addNewCitta(citta+1);
     }
     return false;
@@ -1957,8 +1971,6 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;
-    if (cb->needsoul > getMaxSoul() - getSoul())
-        return false;
 
     int idx = hasCitta(citta);
     if (idx >= 0)
@@ -1980,9 +1992,6 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
     }
 
     addPExp(-cb->pexp, writedb);
-    soul += cb->needsoul;
-    if (cb->needsoul)
-        sendModification(8, soul);
 
     _attrDirty = true;
     _bPDirty = true;
@@ -1990,7 +1999,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
     return true;
 }
 
-bool Fighter::offCitta( UInt16 citta, bool writedb )
+bool Fighter::offCitta( UInt16 citta, bool flip, bool writedb )
 {
     int idx = isCittaUp(citta);
     if (idx < 0)
@@ -2014,16 +2023,27 @@ bool Fighter::offCitta( UInt16 citta, bool writedb )
 
     _citta[idx] = 0;
 
+    {
+        const GData::CittaBase* cb = GData::cittaManager[citta];
+        if (!cb)
+            return false;
+        soul -= cb->needsoul;
+        if (cb->needsoul)
+            sendModification(8, soul);
+    }
+
     _attrDirty = true;
     _bPDirty = true;
 
     int i = idx;
-    for (; i < getUpCittasMax() - 1; ++i)
-    {
-        _citta[i] = _citta[i+1];
-        _citta[i+1] = 0;
-        if (_citta[i])
-            sendModification(0x62, _citta[i], i, writedb);
+    if (flip) {
+        for (; i < getUpCittasMax() - 1; ++i)
+        {
+            _citta[i] = _citta[i+1];
+            _citta[i+1] = 0;
+            if (_citta[i])
+                sendModification(0x62, _citta[i], i, writedb);
+        }
     }
     sendModification(0x62, 0, i, writedb);
     return true;
@@ -2035,7 +2055,7 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
     if (idx < 0)
         return false;
 
-    offCitta(citta, writedb);
+    offCitta(citta, true, writedb);
 
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
