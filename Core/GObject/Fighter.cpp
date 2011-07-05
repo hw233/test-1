@@ -1491,6 +1491,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
         if (!i)
         {
             _skill[0] = skill;
+            ret = true;
         }
         else if (i < max && _skill[idx])
         { // insert
