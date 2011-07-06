@@ -1,17 +1,17 @@
 
 #!/bin/bash
 
-F=cittaeffect.txt
+F=attrextra.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function cittaeffect()
+function attrextra()
 {
 # 11,"302,2,3|303,1",0,40,"3,4"
     f=$1
-    d=cittaeffect
+    d=attrextra
     sed -i /id/d $f
     sed -i /ID/d $f
     sed -i s/\"//g $f
@@ -19,7 +19,7 @@ function cittaeffect()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `citta_effect` VALUES";
+            print "INSERT INTO `attr_extra` VALUES";
         } {
             printf("(%d,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24);
             if (NR <= ENVIRON["lines"]-1)
@@ -50,7 +50,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    cittaeffect $F
+    attrextra $F
 else
     echo "File $F is not exists"
 fi

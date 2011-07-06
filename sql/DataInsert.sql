@@ -72,6 +72,7 @@ INSERT INTO `weapon_def` VALUES
 UNLOCK TABLES;
 
 LOCK TABLES `attr_extra` WRITE;
+source attrextra
 UNLOCK TABLES;
 
 LOCK TABLES `item_template` WRITE;
@@ -128,11 +129,21 @@ LOCK TABLES `dungeon_level` WRITE;
 source dungeonlevel
 UNLOCK TABLES;
 
+LOCK TABLES `acupra` WRITE;
+source acupra
+UNLOCK TABLES;
+
 -- ASSS
 use asss;
 LOCK TABLES `practice_place` WRITE;
 INSERT INTO `practice_place` VALUES
-(1,0,0,100,5,10,1,0,0);
+(1,0,0,30,0,0,1,0,0),
+(2,0,0,30,0,0,1,0,0),
+(3,0,0,30,0,0,1,0,0),
+(4,0,0,30,0,0,1,0,0),
+(5,0,0,30,0,0,1,0,0),
+(6,0,0,30,0,0,1,0,0),
+(7,0,0,0,0,0,1,0,0);
 UNLOCK TABLES;
 
 

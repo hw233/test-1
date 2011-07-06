@@ -22,6 +22,7 @@ namespace GData
 		std::set<UInt32>	m_PreTask;	
 		UInt16				m_ReqLev;
 		UInt16				m_LoopTask;	
+        UInt8               m_Country;
 
 		TaskType(UInt32 id = 0) : m_TypeId(id) {};
 		bool operator<(const TaskType& other) const { return m_TypeId < other.m_TypeId; }

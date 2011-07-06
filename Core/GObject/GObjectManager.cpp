@@ -252,7 +252,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading fighter templates:");
 		DBFighter dbfgt;
-		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `talent`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `class`, `level`, `sex`, `potential`, `capacity`, `skill`, `npc_weapon`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `talent`, `hitrate`, `evade`, `critical`, `criticaldmg`, `pierce`, `counter`, `magres`, `extraPos` FROM `special_fighter_template`", dbfgt) != DB::DB_OK)
 			return false;
 
 		UInt32 maxGF = 0;
@@ -292,7 +292,7 @@ namespace GObject
 			fgt->hitrate = dbfgt.hitrate;
 			fgt->evade = dbfgt.evade;
 			fgt->critical = dbfgt.critical;
-			fgt->critical_dmg = dbfgt.critical_dmg;
+			fgt->criticaldmg = dbfgt.criticaldmg;
 			fgt->pierce = dbfgt.pierce;
 			fgt->counter = dbfgt.counter;
 			fgt->magres = dbfgt.magres;
@@ -910,10 +910,10 @@ namespace GObject
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
-            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setSkills(specfgtobj.skills, false);
-            fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
+            fgt2->setUpCittas(specfgtobj.citta, false);
 		}
 		lc.finalize();
 
@@ -1506,6 +1506,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		
+        // 通天塔怪配置
 		LoadingCounter lc("Loading dungeon monster templates:");
 		GData::DBDungeonMonster dmon;
 		if(execu->Prepare("SELECT `id`, `formated`, `monsters`, `experience` FROM `dungeon_monster`", dmon) != DB::DB_OK)
@@ -1566,6 +1567,7 @@ namespace GObject
 		}
 		lc.finalize();
 
+        // 通天塔配置
 		lc.prepare("Loading dungeon templates:");
 		GData::DBDungeon dd;
 		if(execu->Prepare("SELECT `id`, `name`, `location`, `type`, `lvlReq` FROM `dungeon`", dd) != DB::DB_OK)
@@ -1583,6 +1585,7 @@ namespace GObject
 		}
 		lc.finalize();
 
+        // 通天塔层配置
 		lc.prepare("Loading dungeon level templates:");
 		GData::DBDungeonLevel dlvl;
 		if(execu->Prepare("SELECT `id`, `level`, `monsterSet`, `lootSet` FROM `dungeon_level`", dlvl) != DB::DB_OK)
@@ -1608,12 +1611,13 @@ namespace GObject
 		
 		GData::dungeons.enumerate(dungeon_enum, NULL);
 
+        // 通天塔用户数据
 		lc.prepare("Loading dungeon player data:");
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 		DBDungeonPlayer dp;
-		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`, `justice` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1629,7 +1633,7 @@ namespace GObject
 			Dungeon * dg = dungeonManager[dp.id];
 			if(dg == NULL)
 				continue;
-			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd);
+			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd, dp.justice);
 		}
 		lc.finalize();
 		return true;

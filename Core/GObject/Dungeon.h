@@ -54,6 +54,7 @@ public:
 		UInt16 totalCount;
 		UInt32 firstPass;
 		UInt32 counterEnd;
+        UInt8 justice;
 		std::list<DungeonItemInfo> lootToday;
 	};
 	struct DungeonReportInfo
@@ -64,7 +65,7 @@ public:
 public:
 	Dungeon(UInt8 id, const GData::DungeonData *);
 	~Dungeon();
-	void pushPlayer(Player *, UInt8, UInt8, UInt16, UInt32, UInt32);
+	void pushPlayer(Player *, UInt8, UInt8, UInt16, UInt32, UInt32, UInt8);
 	UInt8 playerEnter(Player *);
 	UInt8 playerLeave(Player *);
 	UInt8 playerBreak(Player *);

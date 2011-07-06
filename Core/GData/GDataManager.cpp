@@ -44,8 +44,8 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_GoldPractice;
 	std::vector<UInt32>		GDataManager::m_GoldOpenSlot;
 	std::vector<UInt32>		GDataManager::m_PlaceAddons;
-	std::vector<UInt32>		GDataManager::m_ShiMenTask;
-	std::vector<UInt32>		GDataManager::m_YaMenTask;
+	std::vector<UInt32>		GDataManager::m_ShiMenTask[COUNTRY_MAX];
+	std::vector<UInt32>		GDataManager::m_YaMenTask[COUNTRY_MAX];
     std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
     std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
 
@@ -304,12 +304,27 @@ namespace GData
 		}
 	}
 
+	void SetValOrPercent(float& val, float& perc, const std::string& str)
+	{
+		if(str[str.length() - 1] == '%')
+		{
+			std::string astr(str.begin(), str.end() - 1);
+			perc = static_cast<float>(atof(astr.c_str())) / 100;
+			val = 0;
+		}
+		else
+		{
+			val = atof(str.c_str());
+			perc = 0;
+		}
+	}
+
 	bool GDataManager::LoadAttrExtraData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		GData::DBAttrExtra ae;
-		if(execu->Prepare("SELECT `id`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `tough`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres`, `skills` FROM `attr_extra`", ae) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `skill`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `criticaldmg`, `pierce`, `counter`, `magres` FROM `attr_extra`", ae) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -327,17 +342,17 @@ namespace GData
 			SetValOrPercent(aextra->_extra.defend, aextra->_extra.defendP, ae.defend);
 			SetValOrPercent(aextra->_extra.magdef, aextra->_extra.magdefP, ae.magdef);
 			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
-			aextra->_extra.tough = ae.tough;
-			aextra->_extra.action = ae.action;
-			aextra->_extra.hitrate = ae.hitrate;
-			aextra->_extra.evade = ae.evade;
-			aextra->_extra.critical = ae.critical;
-			aextra->_extra.critical_dmg = ae.critical_dmg;
-			aextra->_extra.pierce = ae.pierce;
-			aextra->_extra.counter = ae.counter;
-			aextra->_extra.magres = ae.magres;
+			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
+			SetValOrPercent(aextra->_extra.action, aextra->_extra.actionP, ae.action);
+			SetValOrPercent(aextra->_extra.hitrate, aextra->_extra.hitrateP, ae.hitrate);
+			SetValOrPercent(aextra->_extra.evade, aextra->_extra.evadeP, ae.evade);
+			SetValOrPercent(aextra->_extra.critical, aextra->_extra.criticalP, ae.critical);
+			SetValOrPercent(aextra->_extra.criticaldmg, aextra->_extra.criticaldmgP, ae.criticaldmg);
+			SetValOrPercent(aextra->_extra.pierce, aextra->_extra.pierceP, ae.pierce);
+			SetValOrPercent(aextra->_extra.counter, aextra->_extra.counterP, ae.counter);
+			SetValOrPercent(aextra->_extra.magres, aextra->_extra.magresP, ae.magres);
 
-            StringTokenizer tk(ae.skills, ",");
+            StringTokenizer tk(ae.skill, ",");
             if (tk.count())
             {
                 for (size_t i=0; i<tk.count(); ++i)
@@ -514,10 +529,11 @@ namespace GData
 					task.m_ReqLev = elem.get<UInt16>(pos++);
 					m_TaskTypeList.insert(std::make_pair(task.m_TypeId, task));
 
+					task.m_Country = elem.get<UInt32>(pos++);
                     if (task.m_Class == 4)
-                        m_ShiMenTask.push_back(task.m_TypeId);
+                        m_ShiMenTask[task.m_Country].push_back(task.m_TypeId);
                     if (task.m_Class == 5)
-                        m_YaMenTask.push_back(task.m_TypeId);
+                        m_YaMenTask[task.m_Country].push_back(task.m_TypeId);
 				}
 			}
 			lua_close(L);
@@ -737,7 +753,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBTalent tal;
-		if(execu->Prepare("SELECT `id`, `name`, `cls`, `quality`, `prob`, `potential`, `capacity`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres` FROM `talent`", tal) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `cls`, `quality`, `prob`, `potential`, `capacity`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `criticaldmg`, `pierce`, `counter`, `magres` FROM `talent`", tal) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -764,7 +780,7 @@ namespace GData
             ptal->action = tal.action;
             ptal->evade = tal.evade;
             ptal->critical = tal.critical;
-            ptal->critical_dmg = tal.critical_dmg;
+            ptal->criticaldmg = tal.criticaldmg;
             ptal->pierce = tal.pierce;
             ptal->counter = tal.counter;
             ptal->magres = tal.magres;
@@ -849,7 +865,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCittaEffect cf;
-		if(execu->Prepare("SELECT `id`, `skills`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `critical_dmg`, `pierce`, `counter`, `magres` FROM `citta_effect`", cf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `skills`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `aura`, `auraMax`, `attack`, `magatk`, `defend`, `magdef`, `hp`, `tough`, `action`, `hitrate`, `evade`, `critical`, `criticaldmg`, `pierce`, `counter`, `magres` FROM `citta_effect`", cf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -867,15 +883,15 @@ namespace GData
             SetValOrPercent(cft->defend, cft->defendP, cf.defend);
             SetValOrPercent(cft->magdef, cft->magdefP, cf.magdef);
             SetValOrPercent(cft->hp, cft->hpP, cf.hp);
-            cft->tough = cf.tough;
-            cft->action = cf.action;
-            cft->hitrate = cf.hitrate;
-            cft->evade = cf.evade;
-            cft->critical = cf.critical;
-            cft->critical_dmg = cf.critical_dmg;
-            cft->pierce = cf.pierce;
-            cft->counter = cf.counter;
-            cft->magres = cf.magres;
+			SetValOrPercent(cft->tough, cft->toughP, cf.tough);
+			SetValOrPercent(cft->action, cft->actionP, cf.action);
+			SetValOrPercent(cft->hitrate, cft->hitrateP, cf.hitrate);
+			SetValOrPercent(cft->evade, cft->evadeP, cf.evade);
+			SetValOrPercent(cft->critical, cft->criticalP, cf.critical);
+			SetValOrPercent(cft->criticaldmg, cft->criticaldmgP, cf.criticaldmg);
+			SetValOrPercent(cft->pierce, cft->pierceP, cf.pierce);
+			SetValOrPercent(cft->counter, cft->counterP, cf.counter);
+			SetValOrPercent(cft->magres, cft->magresP, cf.magres);
 
             StringTokenizer tk(cf.skill, ",");
             if (tk.count())
@@ -1187,21 +1203,21 @@ namespace GData
 		return m_PlaceAddons;
 	}
 
-	const std::vector<UInt32>& GDataManager::GetShiMenTask()
+	const std::vector<UInt32>& GDataManager::GetShiMenTask(int country)
 	{
-		return m_ShiMenTask;
+		return m_ShiMenTask[country];
 	}
 
-	const std::vector<UInt32>& GDataManager::GetYaMenTask()
+	const std::vector<UInt32>& GDataManager::GetYaMenTask(int country)
 	{
-		return m_YaMenTask;
+		return m_YaMenTask[country];
 	}
 
-    const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int type)
+    const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int country, int type)
     {
         if (type >= 1)
-            return m_YaMenTask;
-        return m_ShiMenTask;
+            return m_YaMenTask[country];
+        return m_ShiMenTask[country];
     }
 
     const std::vector<UInt8>& GDataManager::GetFlushTaskFactor(int ttype, int ftype)

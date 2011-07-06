@@ -50,7 +50,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
     _praadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), talent(0),
-    hitrate(0), evade(0), critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
+    hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0)
 {
     memset(_acupoints, 0, sizeof(_acupoints));
     memset(_skill, 0, sizeof(_skill));
@@ -197,11 +197,11 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
-bool Fighter::addPExp( Int64 e, bool writedb )
+bool Fighter::addPExp( Int32 e, bool writedb )
 {
     if (e < 0)
     {
-        if (_pexp <= (UInt64)-e)
+        if (_pexp <= (UInt32)-e)
             _pexp = 0;
         else
             _pexp += e;
@@ -213,7 +213,7 @@ bool Fighter::addPExp( Int64 e, bool writedb )
             _pexp = _pexpMax;
     }
 
-    sendModification(6, e, writedb);
+    sendModification(6, _pexp);
     return true;
 }
 
@@ -282,6 +282,12 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         return;
 	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
         break;
+    case 7:
+            break;
+    case 8:
+            break;
+    case 9:
+            break;
 
     case 0x29:
         {
@@ -296,7 +302,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
     case 0x60:
         { // skill
             std::string str;
-            if (value2string(_skill, getUpSkillsNum(), str)) {
+            if (value2string(_skill, getUpSkillsMax(), str)) {
                 DB().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
@@ -357,7 +363,7 @@ void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
 		return;
 	Stream st(0x21);
 	st << getId() << static_cast<UInt8>(1) << t;
-    st << static_cast<UInt8>(idx) << _acupoints[idx];
+    st << static_cast<UInt8>(idx) << _acupoints[idx] << getSoul() << getMaxSoul();
     if (writedb)
     {
         updateToDB(t, 0);
@@ -768,6 +774,13 @@ inline void addAttrExtra( GData::AttrExtra& ae, const GData::AttrExtra * ext )
 	ae += *ext;
 }
 
+inline void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
+{
+	if(ce == NULL)
+		return;
+	ae += *ce;
+}
+
 inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 {
 	switch(type)
@@ -794,6 +807,11 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 		ae.counter += static_cast<float>(value) / 100;
 		break;
 	}
+}
+
+// TODO:
+inline void addEquipAttr2( GData::AttrExtra& ae, const GData::CittaEffect* ce )
+{
 }
 
 inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext )
@@ -831,6 +849,12 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 			return;
 		}
 	}
+}
+
+void Fighter::addAttr( const GData::CittaEffect* ce )
+{
+	addAttrExtra(_attrExtraEquip, ce);
+	addEquipAttr2(_attrExtraEquip, ce);
 }
 
 void Fighter::addAttr( ItemEquip * equip )
@@ -909,6 +933,19 @@ void Fighter::rebuildEquipAttr()
 	getArmorDefendAndHP(armorDefend, armorHP);
 	_attrExtraEquip.defend += armorDefend;
 	_attrExtraEquip.hp += armorHP;
+
+    for (int i = 0; i < getUpCittasNum(); ++i)
+    {
+        if (_citta[i])
+        {
+            const GData::CittaBase* cb = GData::cittaManager[_citta[i]];
+            if (cb)
+            {
+                if (cb->effect)
+                    addAttr(cb->effect);
+            }
+        }
+    }
 
     // 帮派秘术对额外属性的加成
     Clan* clan = _owner == NULL ? NULL : _owner->getClan();
@@ -1134,7 +1171,7 @@ void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
     Int8 skills = getUpSkillsNum();
     st << skills;
-    for (int i = 0; i < skills; ++i)
+    for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (_skill[i]) {
             st << static_cast<UInt8>(i);
@@ -1233,7 +1270,7 @@ UInt8 Fighter::getCittasNum()
 {
     UInt8 c = 0;
     for (size_t i = 0; i < _cittas.size(); ++i)
-        if (_citta[i]) ++c;
+        if (_cittas[i]) ++c;
     return c;
 }
 
@@ -1403,11 +1440,15 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         addPExp(-pap->pra, writedb);
 
         soulMax += pap->soulmax;
+        if (pap->soulmax)
+            sendModification(9, soulMax);
         _pexpMax += pap->pramax;
+        if (pap->pramax)
+            sendModification(7, _pexpMax);
         _cittaslot += pap->citslot;
         if (pap->citslot)
         {
-            DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
+            //DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         }
         ++_praadd; // 每一层级+1
 
@@ -1458,8 +1499,11 @@ int Fighter::isSkillUp(UInt16 skill)
 {
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
-        if (skill == _skill[i] || SKILL_ID(skill) == SKILL_ID(_skill[i]))
+        if (skill == _skill[i] || SKILL_ID(skill) == SKILL_ID(_skill[i])) {
+            if (skill != _skill[i])
+                skill = _skill[i];
             return i;
+        }
     }
     return -1;
 }
@@ -1477,6 +1521,8 @@ UInt16 Fighter::getUpSkillsNum()
 
 bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
 {
+    if (!skill)
+        return false;
     if (!(idx >= 0 && idx < getUpSkillsMax())) // dst
         return false;
 
@@ -1489,6 +1535,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
         if (!i)
         {
             _skill[0] = skill;
+            ret = true;
         }
         else if (i < max && _skill[idx])
         { // insert
@@ -1496,15 +1543,18 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
             {
                 _skill[j] = _skill[j-1];;
                 _skill[j-1] = 0;
+                sendModification(0x60, _skill[j], j, false);
             }
-            _skill[i] = skill;
-            idx = i;
+
+            _skill[idx] = skill;
             ret = true;
         }
         else
         { // replace
             _skill[idx] = skill;
             ret = true;
+            // flip
+
         }
     }
     else
@@ -1547,14 +1597,20 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     if (idx < 0)
         return false;
 
-    // XXX: ? if (SKILL_ID(_skill[idx]) == SKILL_ID(skill))
-    _skill[idx] = 0;
+#if 0
     UInt8 max = getUpSkillsMax();
-    for (int i = idx; i < max - 1; ++i)
+    int i = idx;
+    for (; i <= max - 1; ++i)
     {
         _skill[i] = _skill[i+1];
         _skill[i+1] = 0;
+        sendModification(0x60, _skill[i], i, false);
     }
+    if (!i)
+        _skill[i] = 0;
+#else
+    _skill[idx] = 0;
+#endif
 
     _attrDirty = true;
     _bPDirty = true;
@@ -1562,21 +1618,23 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     return true;
 }
 
-bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync )
+bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
 {
     int idx = hasSkill(skill);
     if (idx < 0)
         return false;
 
-    offSkill(skill);
+    if (offskill)
+        offSkill(skill);
     std::vector<UInt16>::iterator it = _skills.begin();
     std::advance(it, idx);
+    *it = 0;
     _skills.erase(it);
 
     _attrDirty = true;
     _bPDirty = true;
     if (sync)
-        sendModification(0x61, 0, idx, writedb);
+        sendModification(0x61, skill, 2/*1add,2del,3mod*/, writedb);
     return true;
 }
 
@@ -1594,7 +1652,13 @@ void Fighter::setSkills( std::string& skills, bool writedb )
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb )
 {
+    if (!skill)
+        return false;
+    const GData::SkillBase* s = GData::skillManager[skill];
+    if (!s)
+        return false;
     if (!skill) return false;
+    int op = 0;
     int idx = hasSkill(skill);
     if (idx >= 0)
     {
@@ -1604,6 +1668,7 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
             int i = isSkillUp(skill);
             if (i >= 0)
                 upSkill(skill, i, writedb);
+            op = 3;
         }
         else
             return false;
@@ -1612,9 +1677,10 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
     {
         idx = static_cast<int>(_skills.size());
         _skills.push_back(skill);
+        op = 1;
     }
 
-    sendModification(0x61, skill, idx, writedb);
+    sendModification(0x61, skill, op, writedb);
     return true;
 }
 
@@ -1634,42 +1700,56 @@ int Fighter::isCittaUp( UInt16 citta )
 {
     for (int i = 0; i < getUpCittasMax(); ++i)
     {
-        if (citta == _citta[i] || CITTA_ID(citta) == CITTA_ID(_citta[i]))
+        if (citta == _citta[i] || CITTA_ID(citta) == CITTA_ID(_citta[i])) {
+            if (citta != _citta[i])
+                citta = _citta[i];
             return i;
+        }
     }
     return -1;
 }
 
 bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 {
+    if (!citta)
+        return false;
+    // XXX: need this???
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
+        return false;
+
+    if (hasCitta(citta) < 0)
         return false;
 
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
         return false;
 
+    bool swap = false;
     bool ret = false;
     int src = isCittaUp(citta);
     if (src < 0)
     {
-        int i = getUpCittasNum();
-        if (i < getUpCittasMax())
-        { // insert
-            for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
-            {
-                _citta[j] = _citta[j-1];;
-                _citta[j-1] = 0;
+        if (cb->needsoul > getMaxSoul() - getSoul())
+            return false;
+
+        if (idx < getUpCittasNum()) // XXX: no we all append
+        {
+            if (getUpCittasNum() < getUpCittasMax()) {
+                for (int j = getUpCittasMax() - 1; j >= idx+1; --j)
+                {
+                    _citta[j] = _citta[j-1];
+                    _citta[j-1] = 0;
+                    if (_citta[j])
+                        sendModification(0x62, _citta[j], j, false);
+                }
             }
-            _citta[i] = citta;
-            idx = i;
-            ret = true;
         }
-        else
-        { // replace
-            _citta[idx] = citta;
-            ret = true;
-        }
+
+        if (_citta[idx])
+            offCitta(_citta[idx], false, true, writedb);
+
+        _citta[idx] = citta;
+        ret = true;
     }
     else
     {
@@ -1683,43 +1763,56 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                 _citta[idx] ^= _citta[src];
                 _citta[src] ^= _citta[idx];
                 ret = true;
+                swap = true;
             }
         }
         else
         { // upgrade
             if (_citta[idx] != citta)
             {
+                if (cb->needsoul > getMaxSoul() - getSoul())
+                    return false;
+
                 // XXX: do not send message to client
-                delCitta(_citta[idx], writedb, false); // delete skills was taken out by old citta first
+                offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
             }
         }
     }
 
-    if (ret)
+    if (ret && !swap)
     {
         addSkillsFromCT(skillFromCitta(citta), writedb);
 
-        _attrDirty = true;
-        _bPDirty = true;
-        sendModification(0x62, citta, idx, writedb);
+        soul += cb->needsoul;
+        if (cb->needsoul)
+            sendModification(8, soul);
     }
 
+    _attrDirty = true;
+    _bPDirty = true;
+    sendModification(0x62, citta, idx, writedb);
     return ret;
 }
 
-bool Fighter::lvlUpCitta(UInt16 citta, int idx, bool writedb)
+bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
 {
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;
 
-    cb = GData::cittaManager[CITTA_LEVEL(citta)+1];
+    cb = GData::cittaManager[citta+1];
     if (!cb)
         return false;
 
-    return addNewCitta(citta+1);
+    if (getPExp() >= cb->pexp) {
+        int i = hasCitta(citta);
+        if (i < 0)
+            return false;
+        return addNewCitta(citta+1, writedb);
+    }
+    return false;
 }
 
 void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)
@@ -1935,16 +2028,23 @@ int Fighter::hasCitta( UInt16 citta )
 
 bool Fighter::addNewCitta( UInt16 citta, bool writedb )
 {
-    if (!citta) return false;
+    if (!citta)
+        return false;
+    const GData::CittaBase* cb = GData::cittaManager[citta];
+    if (!cb)
+        return false;
+
+    int op = 0;
     int idx = hasCitta(citta);
     if (idx >= 0)
     {
         if (_cittas[idx] != citta)
         { // upgrade
-            _cittas[idx] = citta;
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, writedb);
+                upCitta(citta, i, writedb);
+            _cittas[idx] = citta;
+            op = 3;
         }
         else
             return false;
@@ -1953,39 +2053,25 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
     {
         idx = _cittas.size();
         _cittas.push_back(citta);
+        op = 1;
     }
+
+    addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x63, citta, idx, writedb);
+    sendModification(0x63, citta, op/*1add,2del,3mod*/, writedb);
     return true;
 }
 
-bool Fighter::offCitta( UInt16 citta, bool writedb )
+bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 {
     int idx = isCittaUp(citta);
     if (idx < 0)
         return false;
 
-    _citta[idx] = 0;
-    for (int i = idx; i < getUpCittasMax() - 1; ++i)
-    {
-        _citta[i] = _citta[i+1];
-        _citta[i+1] = 0;
-    }
-
-    _attrDirty = true;
-    _bPDirty = true;
-    sendModification(0x63, 0, idx, writedb);
-    return true;
-}
-
-bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
-{
-    int idx = hasCitta(citta);
-    if (idx < 0)
-        return false;
-
+    if (citta != _citta[idx])
+        citta = _citta[idx];
     const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
     if (skills.size())
     {
@@ -1994,21 +2080,56 @@ bool Fighter::delCitta( UInt16 citta, bool writedb, bool sync )
             if (skills[i]->cond == GData::SKILL_PEERLESS)
                 delPeerless(skills[i]?skills[i]->getId():0, writedb);
             else if (skills[i]->cond == GData::SKILL_ACTIVE)
-                delSkill(skills[i]?skills[i]->getId():0, writedb, sync);
+                delSkill(skills[i]?skills[i]->getId():0, writedb, true, offskill);
             else
                 offPassiveSkill(skills[i]?skills[i]->getId():0, skills[i]->cond, skills[i]->prob>=100.0f, writedb);
         }
-
     }
-    offCitta(citta, writedb);
+
+    _citta[idx] = 0;
+
+    {
+        const GData::CittaBase* cb = GData::cittaManager[citta];
+        if (!cb)
+            return false;
+        soul -= cb->needsoul;
+        if (cb->needsoul)
+            sendModification(8, soul);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+
+    int i = idx;
+    if (flip) {
+        for (; i < getUpCittasMax() - 1; ++i)
+        {
+            _citta[i] = _citta[i+1];
+            _citta[i+1] = 0;
+            if (_citta[i])
+                sendModification(0x62, _citta[i], i, writedb);
+        }
+    }
+    sendModification(0x62, 0, i, writedb);
+    return true;
+}
+
+bool Fighter::delCitta( UInt16 citta, bool writedb )
+{
+    int idx = hasCitta(citta);
+    if (idx < 0)
+        return false;
+
+    offCitta(citta, true, true, writedb);
 
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
+    *it = 0;
     _cittas.erase(it);
 
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x63, 0, idx, writedb);
+    sendModification(0x63, citta, 2/*1add,2del,3mod*/, writedb);
     return true;
 }
 

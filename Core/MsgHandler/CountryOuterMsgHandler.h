@@ -625,7 +625,7 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 	UInt8 type = 0;
 	br >> type;
 	UInt8 color = 0;
-	UInt16 count = 0;
+	UInt16 count = 1;
 	switch(type)
 	{
 	case 2:
@@ -1112,14 +1112,17 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
-            fgt->offCitta(citta);
+            fgt->offCitta(citta, true, true);
         }
         break;
     case 0x64:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
-            fgt->lvlUpCitta(citta, idx);
+            if (idx == 1)
+                fgt->lvlUpCitta(citta);
+            else if (idx == 2)
+                fgt->delCitta(citta, true);
         }
         break;
     default:

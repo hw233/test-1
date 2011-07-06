@@ -16,7 +16,7 @@ struct Talent : public ObjectBaseT<UInt16>
         intelligence(0), intelligenceP(0), will(0), willP(0), soul(0), soulP(0), aura(0), auraP(0),
         auraMax(0), auraMaxP(0), attack(0), attackP(0), magatk(0), magatkP(0), defend(0), defendP(0), 
         magdef(0), magdefP(0), hp(0), hpP(0), tough(0), action(0), hitrate(0), evade(0), critical(0),
-        critical_dmg(0), pierce(0), counter(0), magres(0) {}
+        criticaldmg(0), pierce(0), counter(0), magres(0) {}
     ~Talent() {}
 
     UInt8 cls;
@@ -55,7 +55,7 @@ struct Talent : public ObjectBaseT<UInt16>
     float hitrate;
     float evade;
     float critical;
-    float critical_dmg;
+    float criticaldmg;
     float pierce;
     float counter;
     float magres;

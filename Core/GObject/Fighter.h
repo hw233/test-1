@@ -11,6 +11,7 @@
 #include "Common/TimeUtil.h"
 #include "Server/ServerTypes.h"
 #include "GData/SkillTable.h"
+#include "GData/CittaTable.h"
 
 namespace GObject
 {
@@ -60,8 +61,8 @@ public:
     inline void setSex(UInt8 s) {_sex = s;}
 	inline void setLevel(UInt8 l) {_level = l;}
 	inline void setExp(UInt64 e) {_exp = e;}
-    inline void setPExp(UInt64 e) { _pexp = e; }
-    inline void setPExpMax(UInt64 e) { _pexpMax = e; }
+    inline void setPExp(UInt32 e) { _pexp = e; }
+    inline void setPExpMax(UInt32 e) { _pexpMax = e; }
 	void setLevelAndExp(UInt8 l, UInt64 e);
 	void setPotential(float p, bool = true);
 	void setCurrentHP(UInt16 hp, bool = true);
@@ -76,8 +77,8 @@ public:
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
-	inline UInt64 getPExp() {return _pexp;}
-	inline UInt64 getPExpMax() {return _pexpMax;}
+	inline UInt32 getPExp() {return _pexp;}
+	inline UInt32 getPExpMax() {return _pexpMax;}
 	inline float getPotential() {return _potential;}
 	inline UInt16 getCurrentHP() {return _hp;}
 
@@ -137,7 +138,7 @@ public:
     // 增加一个新技能,包括技能升级
     bool addNewSkill(UInt16 skill, bool = true);
     // 删除一个可装备的技能
-    bool delSkill(UInt16 skill, bool = true, bool = true);
+    bool delSkill(UInt16 skill, bool = true, bool = true, bool = true);
     // 取得装备技能的最大数
     inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
     // 取得技能装备位置idx处的技能ID
@@ -207,17 +208,17 @@ public:
     // 装备心法
     bool upCitta(UInt16 citta, int idx, bool = true);
     // 卸下心法
-    bool offCitta(UInt16 citta, bool = true);
+    bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
     // 增加一个心法
     bool addNewCitta(UInt16 citta, bool = true);
     // 删除一个心法
-    bool delCitta(UInt16 citta, bool = true, bool = true);
+    bool delCitta(UInt16 citta, bool = true);
     // 是否学会了此心法
     int hasCitta(UInt16 citta);
     // 是否装备了此心法
     int isCittaUp(UInt16 citta);
     // 升级心法
-    bool lvlUpCitta(UInt16 citta, int idx, bool = true);
+    bool lvlUpCitta(UInt16 citta, bool = true);
 
     // 取得装备的心法数
     UInt8 getUpCittasNum();
@@ -262,7 +263,7 @@ public:
 
 	UInt32 regenHP(UInt32);
 	bool addExp(UInt64);
-	bool addPExp(Int64, bool = true);
+	bool addPExp(Int32, bool = true);
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
@@ -339,7 +340,7 @@ public:
 	inline float getExtraHitrate() { checkDirty(); return _attrExtraEquip.hitrate; }
 	inline float getExtraEvade() { checkDirty(); return _attrExtraEquip.evade; }
 	inline float getExtraCritical() { checkDirty(); return _attrExtraEquip.critical; }
-	inline float getExtraCriticalDmg() { checkDirty(); return _attrExtraEquip.critical_dmg; }
+	inline float getExtraCriticalDmg() { checkDirty(); return _attrExtraEquip.criticaldmg; }
 	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
 	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
 	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
@@ -422,7 +423,7 @@ public:
 
     inline float getBaseCriticalDmg()
     {
-        return critical_dmg;
+        return criticaldmg;
     }
 
 	inline float getBasePierce()
@@ -456,6 +457,7 @@ public:
 
 protected:
 	void addAttr( ItemEquip * );
+    void addAttr( const GData::CittaEffect* ce );
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	inline void checkDirty()
@@ -478,20 +480,17 @@ protected:
     template <typename T>
     bool value2string(T* values, int size, std::string& str)
     {
-        if (!values || size)
-            return false;
+        if (!values || !size)
+            return true; // XXX: will be set to ''
 
         char buf[256] = {0};
         char* pbuf = buf;
         char* pend = &buf[sizeof(buf)-1];
         for (int i = 0; i < size; ++i)
         {
-            if (values[i])
-            {
-                pbuf += snprintf(pbuf, pend - pbuf, "%u", values[i]);
-                if (i < size - 1)
-                    pbuf += snprintf(pbuf, pend - pbuf, ",");
-            }
+            pbuf += snprintf(pbuf, pend - pbuf, "%u", values[i]);
+            if (i < size - 1)
+                pbuf += snprintf(pbuf, pend - pbuf, ",");
         }
 
         if (pbuf != buf)
@@ -509,8 +508,8 @@ protected:
 	UInt8 _class;
 	UInt8 _level;
 	UInt64 _exp;        // 经验
-    UInt64 _pexp;       // 修炼经验
-    UInt64 _pexpMax;    // 修炼最大经验
+    UInt32 _pexp;       // 修炼经验
+    UInt32 _pexpMax;    // 修炼最大经验
 	float _potential;   // 潜力
 	float _capacity;    // 资质
 	UInt8 _color;
@@ -573,7 +572,7 @@ public:
 	float hitrate;
 	float evade;
 	float critical;
-	float critical_dmg;
+	float criticaldmg;
 	float pierce;
 	float counter;
 	float magres;

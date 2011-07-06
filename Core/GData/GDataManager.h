@@ -3,6 +3,7 @@
 
 #include "GData/ItemType.h"
 #include "GData/TaskType.h"
+#include "Server/ServerTypes.h"
 
 namespace GObject
 {
@@ -57,9 +58,9 @@ namespace GData
 		static const std::vector<UInt32>& GetGoldPractice();
 		static const std::vector<UInt32>& GetGoldOpenSlot();
 		static const std::vector<UInt32>& GetPlaceAddons();
-		static const std::vector<UInt32>& GetShiMenTask();
-		static const std::vector<UInt32>& GetYaMenTask();
-		static const std::vector<UInt32>& GetShiYaMenTask(int type);
+		static const std::vector<UInt32>& GetShiMenTask(int country);
+		static const std::vector<UInt32>& GetYaMenTask(int country);
+		static const std::vector<UInt32>& GetShiYaMenTask(int country, int type);
 		static const std::vector<UInt8>& GetFlushTaskFactor(int ttype, int ftype);
         static UInt32 GetTaskAwardFactor(int ttype, int color);
 
@@ -77,8 +78,8 @@ namespace GData
 		static std::vector<UInt32>		 m_GoldPractice;
 		static std::vector<UInt32>		 m_GoldOpenSlot;
 		static std::vector<UInt32>		 m_PlaceAddons;
-        static std::vector<UInt32>		 m_ShiMenTask;
-        static std::vector<UInt32>		 m_YaMenTask;
+        static std::vector<UInt32>		 m_ShiMenTask[COUNTRY_MAX];
+        static std::vector<UInt32>		 m_YaMenTask[COUNTRY_MAX];
         static std::vector<UInt8>		 m_FlushTaskFactor[2][2];
         static std::vector<UInt32>		 m_TaskAwardFactor[2];
 	};

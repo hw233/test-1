@@ -259,8 +259,11 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 		{
 			for(UInt32 j = 0; j < 2 && c <= MAX_NUM; j ++)
 			{
+                // TODO:
+#if 0
 				if(pl->getCountry() == 1 || pl->getCountry() == 2)
 				{
+#endif
 					const MapPlayer& playerList = _playerList[i][j];
 					for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
 					{
@@ -271,6 +274,8 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 							++ c;							
 						}
 					}
+                    // TODO:
+#if 0
 				}
 				else
 				{
@@ -285,6 +290,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 						}
 					}
 				}
+#endif
 			}
 		}
 		st.data<UInt8>(4) = c;
