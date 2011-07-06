@@ -113,6 +113,10 @@ bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt16& extra, UInt16 count)
 		r = true;
 		++ level;
 		extra -= techTable[level].needs;
+        if(id == CLAN_TECH_MEMBER_COUNT)
+        {
+            _clan->setMaxMemberCount(getMemberCount());
+        }
 	}
 	if (r)
 	{
@@ -289,6 +293,46 @@ bool ClanTech::delAchieve(UInt16 ach)
 	DB().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
 
 	return true;
+}
+
+UInt32 ClanTech::getPracticeSpeed()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_PRACTICE_SPEED);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_PRACTICE_SPEED][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getPracticeSpace()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_PRACTICE_SPACE);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_PRACTICE_SPACE][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getMemberCount()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_MEMBER_COUNT);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_MEMBER_COUNT][found->second.level].effect1;
+}
+
+UInt32 ClanTech::getSkillExtend()
+{
+	Mutex::ScopedLock lk(_mutex);
+    Techs::iterator found = _techs.find(CLAN_TECH_SKILL_EXTEND);
+    if(found == _techs.end())
+        return 0;
+
+	return GData::clanTechTable[CLAN_TECH_SKILL_EXTEND][found->second.level].effect1;
 }
 
 }

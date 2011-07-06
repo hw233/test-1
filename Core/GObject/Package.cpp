@@ -21,9 +21,9 @@
 #define ITEM_SOCKET_L3 512
 #define ITEM_GEM_PROTECT 513    // 宝石保护符
 #define ITEM_SPLIT_PROTECT 8925
-#define ITEM_DETACH_PROTECT 504 // 精致拆卸石
+#define ITEM_DETACH_PROTECT 505 // 精致拆卸石
 #define ITEM_ENCHANT_PROTECT 8927
-#define ITEM_DETACH_RUNE 505    // 粗制拆卸石
+#define ITEM_DETACH_RUNE 504    // 粗制拆卸石
 #define ITEM_FORGE_PROTECT 501  // 洗炼保护符
 #define ITEM_ACTIVATE_ATTR 9215
 
@@ -1267,37 +1267,43 @@ namespace GObject
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if(equip == NULL)
 			return 1;
-		switch(equip->getClass())
-		{
-		case Item_Weapon:
-			if((gemId > 5060 && gemId <= 5070) || gemId > 5090)
-				return 1;
-			break;
-		case Item_Armor1:
-		case Item_Armor2:
-			if((gemId > 5050 && gemId <= 5060) || gemId > 5090)
-				return 1;
-			break;
-		case Item_Armor3:
-			if((gemId > 5050 && gemId <= 5070) || gemId > 5090)
-				return 1;
-			break;
-		case Item_Armor4:
-			if((gemId > 5050 && gemId <= 5070) || gemId > 5090)
-				return 1;
-			break;
-		case Item_Armor5:
-			if((gemId > 5050 && gemId <= 5070) || (gemId > 5090 && gemId <= 5120))
-				return 1;
-			break;
-		case Item_Ring:
-		case Item_Amulet:
-			if((gemId > 5050 && gemId <= 5070) || gemId > 5120)
-				return 1;
-			break;
-		default:
-			return 1;
-		}
+
+        // 坚韧宝石可以镶嵌任何装备
+        if(gemId < 5131)
+        {
+            switch(equip->getClass())
+            {
+            case Item_Weapon:
+                if((gemId > 5060 && gemId <= 5070) || gemId > 5090)
+                    return 1;
+                break;
+            case Item_Armor1:
+            case Item_Armor2:
+                if((gemId > 5050 && gemId <= 5060) || gemId > 5090)
+                    return 1;
+                break;
+            case Item_Armor3:
+                if((gemId > 5050 && gemId <= 5070) || gemId > 5090)
+                    return 1;
+                break;
+            case Item_Armor4:
+                if((gemId > 5050 && gemId <= 5070) || gemId > 5090)
+                    return 1;
+                break;
+            case Item_Armor5:
+                if((gemId > 5050 && gemId <= 5070) || (gemId > 5090 && gemId <= 5120))
+                    return 1;
+                break;
+            case Item_Ring:
+            case Item_Amulet:
+                if((gemId > 5050 && gemId <= 5070) || gemId > 5120)
+                    return 1;
+                break;
+            default:
+                return 1;
+            }
+        }
+
 		ItemEquipData& ied = equip->getItemEquipData();
 		UInt8 fempty = 0xFF;
 		UInt32 gt = (gemId - 1) / 10;
@@ -1338,7 +1344,7 @@ namespace GObject
 	{
 		-- pos;
 		if (pos > 5) return 2;
-		UInt32 amount = detach_cost;
+		UInt32 amount = GObjectManager::getDetachCost();
 		if(m_Owner->getCoin() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);

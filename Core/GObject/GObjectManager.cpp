@@ -1880,9 +1880,28 @@ namespace GObject
 		globalClans.enumerate(cacheClan, 0);
 
         //帮派科技
-		lc.prepare("Loading clan skills:");
-		DBClanTech cs;
-		if(execu->Prepare("SELECT `clanId`, `skillId`, `level`, `extra` FROM `clan_skill` ORDER BY `clanId`", cs) != DB::DB_OK)
+		lc.prepare("Loading clan tech:");
+		DBClanTech ct;
+		if(execu->Prepare("SELECT `clanId`, `techId`, `level`, `extra` FROM `clan_tech` ORDER BY `clanId`", ct) != DB::DB_OK)
+			return false;
+		lastId = 0xFFFFFFFF;
+		clan = NULL;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if (ct.clanId != lastId)
+				clan = globalClans[ct.clanId];
+			if (clan == NULL)
+				continue;
+			clan->getClanTech()->addTechFromDB(ct.techId, ct.level, ct.extra);
+		}
+		lc.finalize();
+
+        // 帮派技能
+        lc.prepare("Loading clan skill:");
+        DBClanSkill cs;
+		if(execu->Prepare("SELECT `clanId`, `playerId`, `skillId`, `level`, FROM `clan_skill` ORDER BY `clanId`, `skillId`, `playerId`", cs) != DB::DB_OK)
 			return false;
 		lastId = 0xFFFFFFFF;
 		clan = NULL;
@@ -1894,7 +1913,10 @@ namespace GObject
 				clan = globalClans[cs.clanId];
 			if (clan == NULL)
 				continue;
-			clan->getClanTech()->addTechFromDB(cs.skillId, cs.level, cs.extra);
+			Player * pl = globalPlayers[cs.playerId];
+			if(pl == NULL)
+				continue;
+            clan->addSkillFromDB(pl, cs.skillId, cs.level);
 		}
 		lc.finalize();
 

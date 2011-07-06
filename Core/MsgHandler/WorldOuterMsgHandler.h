@@ -586,9 +586,9 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 			break;
 		case 1:
 			{
-				UInt8 skillId;
-				brd >> skillId;
-				clan->listTechDonators(player, skillId);
+				UInt8 techId;
+				brd >> techId;
+				clan->listTechDonators(player, techId);
 			}
 			break;
 		case 2:
@@ -616,6 +616,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 			}
 			break;
 		case 3:
+#if 0
 			{
 				UInt8 skillId;
 				brd	>> skillId;
@@ -626,7 +627,23 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 				st << static_cast<UInt8>(5) << skillId << favorId << Stream::eos;
 				player->send(st);
 			}
+#endif
+			clan->listSkills(player);
 			break;
+        case 4:
+			{
+				UInt8 skillId;
+				brd >> skillId;
+				clan->showSkill(player, skillId);
+			}
+            break;
+        case 5:
+            {
+                UInt8 skillId;
+                brd >> skillId;
+                clan->skillLevelUp(player, skillId);
+            }
+            break;
 		}	
 	}
 }

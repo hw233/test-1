@@ -15,6 +15,7 @@ class Player;
 class ClanTech;
 class ClanBattle;
 
+#define BASE_MEMBER_COUNT 15
 struct AllocItem
 {
 	UInt32 itemId;
@@ -36,6 +37,12 @@ struct ClanPlayerPet
 	ClanPlayerPet(UInt16 count = 0,UInt32 tm = 0, UInt16 friendness = 0):favorCount(count), favorTime(tm), petFriendness(friendness){}
 };
 
+struct ClanSkill
+{
+    UInt8 id;
+	UInt8 level;	//如果 = 0， 表示此技能尚未被激活
+};
+
 struct ClanMember
 {
 	ClanMember(Player * pl = NULL, UInt8 c = 0, UInt32 jt = 0) : player(pl), cls(c), joinTime(jt)
@@ -51,6 +58,7 @@ struct ClanMember
 	UInt32 proffer;
 	UInt8  enterCount;
 	UInt16 achieveCount;
+    std::map<UInt8, ClanSkill> clanSkill;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
 
@@ -119,7 +127,9 @@ public:
 	inline const std::string& getName() const { return _name; }
 	inline void setName(const std::string& name) { _name = name; }
 	inline UInt32 getCount() { return _members.size(); }
-	inline bool isFull() { return getCount() >= /*static_cast<UInt32>(_rank * 10 + 20)*/20; }
+    inline UInt32 getMaxMemberCount() { return _maxMemberCount; }
+    inline void setMaxMemberCount(UInt8 count) { _maxMemberCount = BASE_MEMBER_COUNT + count; }
+	inline bool isFull() { return getCount() >= _maxMemberCount; }
 	inline UInt32 getFoundTime() { return _foundTime; }
 	inline UInt64 getFounder() { return _founder; }
 	inline std::string getFounderName() { return _founderName; }
@@ -221,6 +231,21 @@ public:
 	void addClanDonateRecordFromDB(const std::string&, UInt8, UInt16, UInt32);
 	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
 
+// 帮派技能
+    void addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level);
+    void addSkill(Player* pl, UInt8 skillId);
+    UInt8 getSkillLevel(Player* pl, UInt8 skillId);
+    UInt8 skillLevelUp(Player* pl, UInt8 skillId);
+	void makeSkillInfo(Stream&, Player*);
+	void makeSkillInfo(Stream&, Player*, UInt8 skillId);
+    void listSkills(Player * player);
+    void showSkill(Player* player, UInt8 skillId);
+    UInt32 getSkillHPEffect(Player* pl);
+    UInt32 getSkillAtkEffect(Player* pl);
+    UInt32 getSkillDefendEffect(Player* pl);
+    UInt32 getSkillMagAtkEffect(Player* pl);
+    UInt32 getSkillMagDefentEffect(Player* pl);
+
 public:
 	inline UInt8 getLev() { return _level; }
 	ClanTech * getClanTech() { return _techs; }
@@ -272,6 +297,7 @@ private:
 	static UInt8 _maxEnterCount;//
 	std::string _name;
 	Members _members;
+    UInt8 _maxMemberCount;
 	std::set<UInt32> _membersJoinTime;	//保证每个成员加入的时间不一样
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
@@ -280,7 +306,7 @@ private:
 	UInt64 _founder;
 	std::string _founderName;
 	UInt64 _leader;
-	UInt64 _construction;
+	UInt64 _construction;            // 帮派建设度
 	UInt32 _nextPurgeTime;
 	std::string _contact;
 	std::string _announce;

@@ -15,6 +15,11 @@ class Player;
     1 : 宗族等级 2: 宗族经验 3 : 喜好品(神兽)
 */
 
+#define CLAN_TECH_PRACTICE_SPEED    1
+#define CLAN_TECH_PRACTICE_SPACE    2
+#define CLAN_TECH_MEMBER_COUNT      3
+#define CLAN_TECH_SKILL_EXTEND      4
+
 struct ClanTechData
 {
 	ClanTechData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt16 e = 0) 
@@ -62,6 +67,11 @@ public:
 	bool   getHoldAssist(UInt16&, UInt32&);
 	UInt32 getHoldTotemGuarder();
 	UInt32 getHoldCityGuarder();
+
+    UInt32 getPracticeSpeed();
+    UInt32 getPracticeSpace();
+    UInt32 getMemberCount();
+    UInt32 getSkillExtend();
 
 private:
 	bool techLevelUp(UInt8, UInt8&, UInt16&, UInt16);

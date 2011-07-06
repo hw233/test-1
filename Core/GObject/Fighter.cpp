@@ -910,6 +910,17 @@ void Fighter::rebuildEquipAttr()
 	_attrExtraEquip.defend += armorDefend;
 	_attrExtraEquip.hp += armorHP;
 
+    // 帮派秘术对额外属性的加成
+    Clan* clan = _owner == NULL ? NULL : _owner->getClan();
+    if(clan != NULL)
+    {
+        _attrExtraEquip.hp += clan->getSkillHPEffect(_owner);
+        _attrExtraEquip.attack += clan->getSkillAtkEffect(_owner);
+        _attrExtraEquip.defend += clan->getSkillDefendEffect(_owner);
+        _attrExtraEquip.magatk += clan->getSkillMagAtkEffect(_owner);
+        _attrExtraEquip.magdef += clan->getSkillMagDefentEffect(_owner);
+    }
+
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
 }
 

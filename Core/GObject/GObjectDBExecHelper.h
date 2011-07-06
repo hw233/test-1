@@ -341,9 +341,17 @@ struct DBClanPlayer
 struct DBClanTech
 {
 	UInt32 clanId;
-	UInt8  skillId;
+	UInt8  techId;
 	UInt8  level;
 	UInt16  extra;
+};
+
+struct DBClanSkill
+{
+    UInt32 clanId;
+    UInt64 playerId;
+    UInt8  skillId;
+    UInt8  level;
 };
 
 struct DBClanPendingPlayer
@@ -1274,9 +1282,19 @@ SPECIALBEGIN(GObject::DBClanTech)
 SPECIALDEF(4)
 (
 	UInt32, clanId,
-	UInt8,  skillId,
+	UInt8,  techId,
 	UInt8,  level,
 	UInt16, extra
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanSkill)
+SPECIALDEF(4)
+(
+	UInt32, clanId,
+    UInt64, playerId,
+	UInt8,  skillId,
+	UInt8,  level
 )
 SPECIALEND()
 

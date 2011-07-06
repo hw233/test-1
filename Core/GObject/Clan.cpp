@@ -10,6 +10,7 @@
 #include "ClanManager.h"
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
+#include "GData/ClanSkillTable.h"
 #include "Player.h"
 #include "Package.h"
 #include "Mail.h"
@@ -35,6 +36,13 @@ UInt8 ClanAuthority[5][7] =
 };
 
 
+// °ïÅÉÃØÊõ
+#define CLAN_SKILL_HP       0
+#define CLAN_SKILL_ATTACK   1
+#define CLAN_SKILL_DEFEND   2
+#define CLAN_SKILL_MAGATK   3
+#define CLAN_SKILL_MAGDEF   4
+
 static bool find_pending_member(ClanPendingMember * member, Player * p)
 {
 	return member->player == p;
@@ -51,6 +59,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
     _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false)
 {
 	_techs = new ClanTech(this);
+    _maxMemberCount = BASE_MEMBER_COUNT + _techs->getMemberCount();
 	memset(_favorId, 0, sizeof(_favorId));
 	_clanDynamicMsg = new ClanDynamicMsg();
 	_clanBattle = new ClanCityBattle(this);
@@ -1373,6 +1382,215 @@ void Clan::addClanDonateRecordFromDB(const std::string& dn, UInt8 si, UInt16 dc,
 		mds.insert(MemberDonate(dn, dc, dt));
 }
 
+void Clan::addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level)
+{
+	ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return;
+
+    ClanSkill& cs = cm->clanSkill[skillId];
+    cs.id = skillId;
+    cs.level = level;
+}
+
+void Clan::addSkill(Player* pl, UInt8 skillId)
+{
+	ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return;
+
+    ClanSkill& cs = cm->clanSkill[skillId];
+    cs.id = skillId;
+    cs.level = 0;
+}
+
+UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
+{
+	ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return 0;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
+    if(it == cm->clanSkill.end())
+        return 0;
+
+    ClanSkill& cs = it->second;
+    return cs.level;
+}
+
+UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
+{
+	Stream st(0x78);
+	st << static_cast<UInt8>(8) << skillId;
+
+    UInt8 res = 0;
+    do
+    {
+        ClanMember* cm = getClanMember(pl);
+        if(cm == NULL)
+        {
+            res = 3;
+            break;
+        }
+
+        std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
+        if(it == cm->clanSkill.end())
+        {
+            res = 3;
+            break;
+        }
+
+        ClanSkill& cs = it->second;
+        if(_techs->getSkillExtend() < cs.level)
+        {
+            res = 2;
+            break;
+        }
+
+        UInt8 level = cs.level + 1;
+        GData::SingleClanSkillTable & single = GData::clanSkillTable[cs.id];
+        if(level > single.size())
+        {
+            res = 2;
+            break;
+        }
+
+        if(cm->achieveCount < single[level].needs)
+        {
+            res = 1;
+            break;
+        }
+
+        cm->achieveCount -= single[level].needs;
+        cs.level++;
+    } while(false);
+
+    st << res;
+	st << Stream::eos;
+	pl->send(st);
+    return res;
+}
+
+void Clan::makeSkillInfo(Stream& st, Player* pl)
+{
+	ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+    {
+        st << static_cast<UInt8>(0);
+        return;
+    }
+
+    st << cm->clanSkill.size();
+	std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.begin();
+	for (; it != cm->clanSkill.end(); ++ it)
+		st << it->second.id << it->second.level << (GData::clanSkillTable[it->second.id][it->second.level].needs);
+
+    return;
+}
+
+void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
+{
+	ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
+    if(it == cm->clanSkill.end())
+        return;
+
+    ClanSkill& skill = it->second;
+	st << skill.id << skill.level << (GData::clanSkillTable[skill.id][skill.level].needs);
+    return;
+}
+
+void Clan::listSkills(Player * player)
+{
+	Stream st(0x78);
+	st << static_cast<UInt8>(6);
+	makeSkillInfo(st, player);
+	st << Stream::eos;
+	player->send(st);
+}
+
+void Clan::showSkill(Player* player, UInt8 skillId)
+{
+    Stream st(0x78);
+    st << static_cast<UInt8>(7);
+    makeSkillInfo(st, player, skillId);
+	st << Stream::eos;
+	player->send(st);
+}
+
+UInt32 Clan::getSkillHPEffect(Player* pl)
+{
+    ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return 0;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_HP);
+    if(it == cm->clanSkill.end())
+        return 0;
+
+    ClanSkill& skill = it->second;
+	return GData::clanSkillTable[skill.id][skill.level].hp;
+}
+
+UInt32 Clan::getSkillAtkEffect(Player* pl)
+{
+    ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return 0;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_ATTACK);
+    if(it == cm->clanSkill.end())
+        return 0;
+
+    ClanSkill& skill = it->second;
+	return GData::clanSkillTable[skill.id][skill.level].attack;
+}
+
+UInt32 Clan::getSkillDefendEffect(Player* pl)
+{
+    ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return 0;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_DEFEND);
+    if(it == cm->clanSkill.end())
+        return 0;
+
+    ClanSkill& skill = it->second;
+	return GData::clanSkillTable[skill.id][skill.level].defend;
+}
+
+UInt32 Clan::getSkillMagAtkEffect(Player* pl)
+{
+    ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return 0;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_MAGATK);
+    if(it == cm->clanSkill.end())
+        return 0;
+
+    ClanSkill& skill = it->second;
+	return GData::clanSkillTable[skill.id][skill.level].magatk;
+}
+
+UInt32 Clan::getSkillMagDefentEffect(Player* pl)
+{
+    ClanMember* cm = getClanMember(pl);
+    if(cm == NULL)
+        return 0;
+
+    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_MAGDEF);
+    if(it == cm->clanSkill.end())
+        return 0;
+
+    ClanSkill& skill = it->second;
+	return GData::clanSkillTable[skill.id][skill.level].magdef;
+}
+
 void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt32 dt)
 {
 	MemberDonates& mds = _memberDonates[si];
@@ -2021,7 +2239,11 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 float Clan::getClanTechAddon()
 {
     // TODO:
-    return 0.0;
+    float practiceAddon = 0.0;
+
+    practiceAddon = static_cast<float>(_techs->getPracticeSpeed())/100;
+
+    return practiceAddon;
 }
 
 ClanCache clanCache;
