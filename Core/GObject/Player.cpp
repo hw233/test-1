@@ -3722,7 +3722,7 @@ namespace GObject
             {
                 if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
                 {
-                    rate = static_cast<float>(CHANCEVALUE(chance[idx]))/1000;
+                    rate = CHANCEVALUE(chance[idx]);
                     break;
                 }
             }
@@ -3737,7 +3737,7 @@ namespace GObject
             {
                 if(p < static_cast<float>(CHANCECOND(chance[idx]))/100)
                 {
-                    rate = static_cast<float>(CHANCEVALUE(chance[idx]))/1000;
+                    rate = CHANCEVALUE(chance[idx]);
                     break;
                 }
             }
@@ -3753,7 +3753,7 @@ namespace GObject
 		if(!m_Package->DelItemAny(itemId, 1))
 			return 1;
 		
-		if(uRand(100) < rate)
+		if(uRand(1000) < rate)
 		{
 			p += 0.01f;
 			p = floorf(p * 100.0f + 0.5f) / 100.0f;

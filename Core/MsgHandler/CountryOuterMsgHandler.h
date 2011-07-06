@@ -1230,7 +1230,7 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 {
 	MSG_QUERY_PLAYER(player);
 	Stream st(0x2C);
-	st << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
+	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
 	player->send(st);
 }
 
