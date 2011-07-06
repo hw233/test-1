@@ -2,6 +2,7 @@
 #define _ATTREXTRA_H_
 
 #include "ObjectManager.h"
+#include "CittaTable.h"
 
 namespace GData
 {
@@ -10,16 +11,14 @@ struct SkillBase;
 
 struct AttrExtra
 {
-	AttrExtra():
-		strength(0), physique(0), agility(0), intelligence(0),
-        will(0), soul(0), aura(0), auraMax(0), tough(0),
-		strengthP(0), physiqueP(0), agilityP(0), intelligenceP(0),
-        willP(0), soulP(0), auraP(0), auraMaxP(0), 
-		attack(0), attackP(0), magatk(0), magatkP(0),
-        defend(0), defendP(0), magdef(0), magdefP(0),
-		hp(0), hpP(0), action(0), hitrate(0), evade(0),
-        critical(0), critical_dmg(0), pierce(0), counter(0), magres(0)
-	{ }
+	AttrExtra() : strength(0), physique(0), agility(0), intelligence(0), will(0), soul(0),
+    aura(0), auraMax(0), attack(0), magatk(0), defend(0), magdef(0),
+    hp(0), tough(0), action(0), hitrate(0), evade(0), critical(0),
+    criticaldmg(0), pierce(0), counter(0), magres(0), strengthP(0), physiqueP(0),
+    agilityP(0), intelligenceP(0), willP(0), soulP(0), auraP(0), auraMaxP(0),
+    attackP(0), magatkP(0), defendP(0), magdefP(0), hpP(0), toughP(0),
+    actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0)
+	{}
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
 		strength += other.strength;
@@ -30,7 +29,21 @@ struct AttrExtra
 		soul += other.soul;
 		aura += other.aura;
 		auraMax += other.auraMax;
+		attack += other.attack;
+        magatk += other.magatk;
+		defend += other.defend;
+        magdef += other.magdef;
+		hp += other.hp;
 		tough += other.tough;
+		action += other.action;
+		hitrate += other.hitrate;
+		evade += other.evade;
+		critical += other.critical;
+		criticaldmg += other.criticaldmg;
+		pierce += other.pierce;
+		counter += other.counter;
+        magres += other.magres;
+
 		strengthP += other.strengthP;
 		physiqueP += other.physiqueP;
 		agilityP += other.agilityP;
@@ -39,26 +52,81 @@ struct AttrExtra
 		soulP += other.soulP;
 		auraP += other.auraP;
 		auraMaxP += other.auraMaxP;
-		attack += other.attack;
 		attackP += other.attackP;
-		defend += other.defend;
-		defendP += other.defendP;
-        magatk += other.magatk;
         magatkP += other.magatkP;
-        magdef += other.magdef;
+		defendP += other.defendP;
         magdefP += other.magdefP;
-		hp += other.hp;
+
+#if 0
 		hpP += other.hpP;
+		toughP += other.toughP;
+		actionP += other.actionP;
+		hitrateP += other.hitrateP;
+		evadeP += other.evadeP;
+		criticalP += other.criticalP;
+		criticaldmgP += other.criticaldmgP;
+		pierceP += other.pierceP;
+		counterP += other.counterP;
+        magresP += other.magresP;
+#endif
+
+		return *this;
+	}
+
+	AttrExtra& operator +=(const CittaEffect& other)
+	{
+		strength += other.strength;
+		physique += other.physique;
+		agility += other.agility;
+		intelligence += other.intelligence;
+		will += other.will;
+		soul += other.soul;
+		aura += other.aura;
+		auraMax += other.auraMax;
+		attack += other.attack;
+        magatk += other.magatk;
+		defend += other.defend;
+        magdef += other.magdef;
+		hp += other.hp;
+		tough += other.tough;
 		action += other.action;
 		hitrate += other.hitrate;
 		evade += other.evade;
 		critical += other.critical;
-		critical_dmg += other.critical_dmg;
+		criticaldmg += other.criticaldmg;
 		pierce += other.pierce;
 		counter += other.counter;
         magres += other.magres;
+
+		strengthP += other.strengthP;
+		physiqueP += other.physiqueP;
+		agilityP += other.agilityP;
+		intelligenceP += other.intelligenceP;
+		willP += other.willP;
+		soulP += other.soulP;
+		auraP += other.auraP;
+		auraMaxP += other.auraMaxP;
+		attackP += other.attackP;
+        magatkP += other.magatkP;
+		defendP += other.defendP;
+        magdefP += other.magdefP;
+
+#if 0
+		hpP += other.hpP;
+		toughP += other.toughP;
+		actionP += other.actionP;
+		hitrateP += other.hitrateP;
+		evadeP += other.evadeP;
+		criticalP += other.criticalP;
+		criticaldmgP += other.criticaldmgP;
+		pierceP += other.pierceP;
+		counterP += other.counterP;
+        magresP += other.magresP;
+#endif
+
 		return *this;
 	}
+
 	inline void reset()
 	{
         strength = 0;
@@ -69,7 +137,21 @@ struct AttrExtra
         soul = 0;
         aura = 0;
         auraMax = 0;
+        attack = 0;
+        magatk = 0;
+        defend = 0;
+        magdef = 0;
+        hp = 0;
         tough = 0;
+        action = 0;
+        hitrate = 0;
+        evade = 0;
+        critical = 0;
+        criticaldmg = 0;
+        pierce = 0;
+        counter = 0;
+        magres = 0;
+
         strengthP = 0;
         physiqueP = 0;
         agilityP = 0;
@@ -78,35 +160,45 @@ struct AttrExtra
         soulP = 0;
         auraP = 0;
         auraMaxP = 0;
-        attack = 0;
         attackP = 0;
-        magatk = 0;
         magatkP = 0;
-        defend = 0;
         defendP = 0;
-        magdef = 0;
         magdefP = 0;
-        hp = 0;
         hpP = 0;
-        action = 0;
-        hitrate = 0;
-        evade = 0;
-        critical = 0;
-        critical_dmg = 0;
-        pierce = 0;
-        counter = 0;
-        magres = 0;
-	}
+        toughP = 0;
+        actionP = 0;
+        hitrateP = 0;
+        evadeP = 0;
+        criticalP = 0;
+        criticaldmgP = 0;
+        pierceP = 0;
+        counterP = 0;
+        magresP = 0;
+    }
 
-	UInt16 strength;
-	UInt16 physique;
-	UInt16 agility;
-	UInt16 intelligence;
-	UInt16 will;
-	UInt16 soul;
-	UInt16 aura;
-	UInt16 auraMax;
-	UInt16 tough;
+	float strength;
+	float physique;
+	float agility;
+	float intelligence;
+	float will;
+	float soul;
+	float aura;
+	float auraMax;
+	float attack;
+	float magatk;
+	float defend;
+	float magdef;
+	float hp;
+	float tough;
+	float action;
+	float hitrate;
+	float evade;
+	float critical;
+	float criticaldmg;
+	float pierce;
+	float counter;
+	float magres;
+
 	float strengthP;
 	float physiqueP;
 	float agilityP;
@@ -115,24 +207,21 @@ struct AttrExtra
 	float soulP;
 	float auraP;
 	float auraMaxP;
-	UInt16 attack;
 	float attackP;
-	UInt16 magatk;
 	float magatkP;
-	UInt16 defend;
 	float defendP;
-	UInt16 magdef;
 	float magdefP;
-	UInt16 hp;
 	float hpP;
-	float action;
-	float hitrate;
-	float evade;
-	float critical;
-	float critical_dmg;
-	float pierce;
-	float counter;
-	float magres;
+    float toughP;
+	float actionP;
+	float hitrateP;
+	float evadeP;
+	float criticalP;
+	float criticaldmgP;
+	float pierceP;
+	float counterP;
+	float magresP;
+
     std::vector<const SkillBase*> skills;
 };
 

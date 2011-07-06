@@ -79,7 +79,6 @@ namespace GObject
                 PopTimerEvent(def, EVENT_PLAYERPRACTICING, def->getId());
             }
         }
-        ++m_places[place-1].used;
 
         PPlace& data = m_places[place-1].place;
         UInt32 price = 0;
@@ -149,16 +148,10 @@ namespace GObject
 
         DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, price, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
-        // TODO: 
-#if 0
-		Stream st(0x2E);
-		UInt32 remain = event->GetEnd() - TimeUtil::Now();
-		st << id << data->priceType << remain << Stream::eos;
-		send(st);
-#endif
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp); // XXX: must be here after setPracticingPlaceSlot
 
+        ++m_places[place-1].used;
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << Stream::eos;
         return true;
     }
@@ -168,8 +161,7 @@ namespace GObject
         if (!pl)
             return false;
 
-        Stream st;
-        st.init(0xE5);
+        Stream st(0xE5);
 
         if (!pl->isPracticing()) {
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
@@ -216,8 +208,7 @@ namespace GObject
         if (!pl || !fgtid || !size)
             return false;
 
-        Stream st;
-        st.init(0xE4);
+        Stream st(0xE4);
 
         if (!pl->isPracticing())
         {
@@ -261,8 +252,7 @@ namespace GObject
         if (!pl || !fgtid || !size)
             return false;
 
-        Stream st;
-        st.init(0xE5);
+        Stream st(0xE5);
 
         PracticeData* data = getPracticeData(pl);
         if (!data)
@@ -304,8 +294,7 @@ namespace GObject
 
     void PracticePlace::getAllPlaceInfo(Player* pl)
     {
-        Stream st;
-        st.init(0xE0);
+        Stream st(0xE0);
         const std::vector<UInt32>& addons = GData::GDataManager::GetPlaceAddons();
         st << static_cast<UInt8>(PPLACE_MAX);
         for (int i = 0; i < PPLACE_MAX; ++i) {
@@ -377,8 +366,7 @@ namespace GObject
         if (i == pd.data.end())
             return;
 
-        Stream st;
-        st.init(0xE1);
+        Stream st(0xE1);
         PracticeData* ppd = NULL;
         int n = 0;
         for (auto e = pd.data.end(); i != e && n < pagenum; ++i)
@@ -478,8 +466,7 @@ namespace GObject
         if (idx > m_places[place-1].data.size())
             return false;
 
-        Stream st;
-        st.init(0xE2);
+        Stream st(0xE2);
         Player* def = 0;
         PracticeData* pd = m_places[place-1].data[idx];
         if (pd)

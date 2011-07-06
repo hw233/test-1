@@ -73,7 +73,7 @@ public:
 	inline float getExtraHitrate() { return _attrExtra.hitrate; }
 	inline float getExtraEvade() { return _attrExtra.evade; }
 	inline float getExtraCritical() { return _attrExtra.critical; }
-	inline float getExtraCriticalDmg() { return _attrExtra.critical_dmg; }
+	inline float getExtraCriticalDmg() { return _attrExtra.criticaldmg; }
 	inline float getExtraPierce() { return _attrExtra.pierce; }
 	inline float getExtraCounter() { return _attrExtra.counter; }
 	inline float getExtraMagRes() { return _attrExtra.magres; }
@@ -123,7 +123,7 @@ public:
 	inline float getHitrate() {return _hitrate + _hitrateAdd;}
 	inline float getEvade() {return _evade + _evadeAdd;}
 	inline float getCritical() {return _critical + _criticalAdd;}
-	inline float getCriticalDmg() {return _critical_dmg + _criticalDmgAdd;}
+	inline float getCriticalDmg() {return _criticaldmg + _criticalDmgAdd;}
 	inline float getPierce() {return _pierce + _pierceAdd;}
 	inline float getCounter() {return _counter + _counterAdd;}
 	inline float getMagRes() {return _magres+ _magResAdd;}
@@ -276,7 +276,7 @@ private:
 	GObject::Fighter * _fighter;
 	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _auraMax, _tough;
 	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
-    float _critical, _critical_dmg, _pierce, _counter, _magres;
+    float _critical, _criticaldmg, _pierce, _counter, _magres;
 	UInt32 _maxhp, _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;

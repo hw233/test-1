@@ -11,6 +11,7 @@
 #include "Common/TimeUtil.h"
 #include "Server/ServerTypes.h"
 #include "GData/SkillTable.h"
+#include "GData/CittaTable.h"
 
 namespace GObject
 {
@@ -339,7 +340,7 @@ public:
 	inline float getExtraHitrate() { checkDirty(); return _attrExtraEquip.hitrate; }
 	inline float getExtraEvade() { checkDirty(); return _attrExtraEquip.evade; }
 	inline float getExtraCritical() { checkDirty(); return _attrExtraEquip.critical; }
-	inline float getExtraCriticalDmg() { checkDirty(); return _attrExtraEquip.critical_dmg; }
+	inline float getExtraCriticalDmg() { checkDirty(); return _attrExtraEquip.criticaldmg; }
 	inline float getExtraPierce() { checkDirty(); return _attrExtraEquip.pierce; }
 	inline float getExtraCounter() { checkDirty(); return _attrExtraEquip.counter; }
 	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
@@ -422,7 +423,7 @@ public:
 
     inline float getBaseCriticalDmg()
     {
-        return critical_dmg;
+        return criticaldmg;
     }
 
 	inline float getBasePierce()
@@ -456,6 +457,7 @@ public:
 
 protected:
 	void addAttr( ItemEquip * );
+    void addAttr( const GData::CittaEffect* ce );
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	inline void checkDirty()
@@ -570,7 +572,7 @@ public:
 	float hitrate;
 	float evade;
 	float critical;
-	float critical_dmg;
+	float criticaldmg;
 	float pierce;
 	float counter;
 	float magres;

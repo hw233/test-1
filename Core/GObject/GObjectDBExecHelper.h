@@ -162,7 +162,7 @@ struct DBFighter
     float hitrate;              // 命中
     float evade;                // 闪躲
     float critical;             // 暴击(等级): 暴击率=暴击等级/（暴击等级+200+目标等级*20）+修正
-    float critical_dmg;         // 暴击伤害
+    float criticaldmg;         // 暴击伤害
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击
     float magres;               // 法术抵抗
@@ -466,6 +466,7 @@ struct DBDungeonPlayer
 	UInt16 totalCount;
 	UInt32 firstPass;
 	UInt32 counterEnd;
+    UInt8 justice;
 };
 
 
@@ -760,7 +761,7 @@ SPECIALDEF(33)
 	float, hitrate,
 	float, evade,
 	float, critical,
-	float, critical_dmg,
+	float, criticaldmg,
 	float, pierce,
 	float, counter,
 	float, magres,
@@ -1136,7 +1137,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBDungeonPlayer)
-SPECIALDEF(7)
+SPECIALDEF(8)
 (
 	UInt32, id,
 	UInt64, playerId,
@@ -1144,7 +1145,8 @@ SPECIALDEF(7)
 	UInt8, count,
 	UInt16, totalCount,
 	UInt32, firstPass,
-	UInt32, counterEnd
+	UInt32, counterEnd,
+	UInt8, justice
 )
 SPECIALEND()
 

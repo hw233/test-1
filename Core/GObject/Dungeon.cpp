@@ -684,7 +684,7 @@ void Dungeon::pushChallenge( Player * player, UInt32 exp, bool won )
 	PushTimerEvent(event);
 }
 
-void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 totalCount, UInt32 firstPass, UInt32 counterEnd )
+void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 totalCount, UInt32 firstPass, UInt32 counterEnd, UInt8 justice )
 {
 	DungeonPlayerInfo& dpi = _players[player];
 	dpi.level = level;
@@ -692,6 +692,7 @@ void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 tota
 	dpi.totalCount = totalCount;
     dpi.firstPass = firstPass;
 	dpi.counterEnd = counterEnd;
+	dpi.justice = justice;
 	if(level >= _levels.size())
 		return;
 	DungeonLevel& dl = _levels[level];

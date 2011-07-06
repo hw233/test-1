@@ -50,6 +50,7 @@ struct DBEquipSetType
 struct DBAttrExtra
 {
 	UInt32 id;
+	std::string skill;          // 带出技能
 	std::string strength;       // 力量 [+/-]num/num%
 	std::string physique;       // 耐力 [+/-]num/num%
 	std::string agility;        // 敏捷 [+/-]num/num%
@@ -63,16 +64,15 @@ struct DBAttrExtra
 	std::string defend;         // 物防 [+/-]num/num%
 	std::string magdef;         // 法术防御 [+/-]num/num%
 	std::string hp;             // HP [+/-]num/num%
-	std::string skills;         // 带出技能
-    float tough;                // 坚韧
-	float action;               // 身法
-	float hitrate;              // 命中
-	float evade;                // 闪避
-	float critical;             // 暴击
-	float critical_dmg;         // 暴击伤害
-	float pierce;               // 击破/护甲穿透
-	float counter;              // 反击
-	float magres;               // 法术抵抗
+    std::string tough;          // 坚韧 [+/-]num/num%
+	std::string action;         // 身法 [+/-]num/num%
+	std::string hitrate;        // 命中 [+/-]num/num%
+	std::string evade;          // 闪避 [+/-]num/num%
+	std::string critical;       // 暴击 [+/-]num/num%
+	std::string criticaldmg;    // 暴击伤害 [+/-]num/num%
+	std::string pierce;         // 击破/护甲穿透 [+/-]num/num%
+	std::string counter;        // 反击 [+/-]num/num%
+	std::string magres;         // 法术抵抗 [+/-]num/num%
 };
 
 struct DBFormation
@@ -163,7 +163,7 @@ struct DBTalent
 	float hitrate;              // 命中
 	float evade;                // 闪避
 	float critical;             // 暴击
-	float critical_dmg;         // 暴击伤害
+	float criticaldmg;         // 暴击伤害
 	float pierce;               // 击破/护甲穿透
 	float counter;              // 反击
 	float magres;               // 法术抵抗
@@ -225,15 +225,15 @@ struct DBCittaEffect
 	std::string defend;         // 物防 [+/-]num/num%
 	std::string magdef;         // 法防 [+/-]num/num%
 	std::string hp;             // HP [+/-]num/num%
-    float tough;                // 坚韧
-	float action;               // 身法
-	float hitrate;              // 命中
-	float evade;                // 闪避
-	float critical;             // 暴击
-	float critical_dmg;         // 暴击伤害
-	float pierce;               // 击破/护甲穿透
-	float counter;              // 反击
-	float magres;               // 法术抵抗
+    std::string tough;          // 坚韧 [+/-]num/num%
+	std::string action;         // 身法 [+/-]num/num%
+	std::string hitrate;        // 命中 [+/-]num/num%
+	std::string evade;          // 闪避 [+/-]num/num%
+	std::string critical;       // 暴击 [+/-]num/num%
+	std::string criticaldmg;    // 暴击伤害 [+/-]num/num%
+	std::string pierce;         // 击破/护甲穿透 [+/-]num/num%
+	std::string counter;        // 反击 [+/-]num/num%
+	std::string magres;         // 法术抵抗 [+/-]num/num%
 };
 
 // 穴道及修为
@@ -335,6 +335,7 @@ SPECIALBEGIN(GData::DBAttrExtra)
 SPECIALDEF(24)
 	(
 	UInt32, id,
+	std::string, skill,
 	std::string, strength,
 	std::string, physique,
 	std::string, agility,
@@ -348,16 +349,15 @@ SPECIALDEF(24)
 	std::string, defend,
 	std::string, magdef,
 	std::string, hp,
-	std::string, skills,
-    float, tough,
-	float, action,
-	float, hitrate,
-	float, evade,
-	float, critical,
-	float, critical_dmg,
-	float, pierce,
-	float, counter,
-	float, magres
+    std::string, tough,
+	std::string, action,
+	std::string, hitrate,
+	std::string, evade,
+	std::string, critical,
+	std::string, criticaldmg,
+	std::string, pierce,
+	std::string, counter,
+	std::string, magres
 	)
 SPECIALEND()
 
@@ -509,7 +509,7 @@ SPECIALDEF(29)
         float, hitrate,
         float, evade,
         float, critical,
-        float, critical_dmg,
+        float, criticaldmg,
         float, pierce,
         float, counter,
         float, magres
@@ -559,15 +559,15 @@ SPECIALDEF(24)
         std::string, defend,
         std::string, magdef,
         std::string, hp,
-        float, tough,
-        float, action,
-        float, hitrate,
-        float, evade,
-        float, critical,
-        float, critical_dmg,
-        float, pierce,
-        float, counter,
-        float, magres
+        std::string, tough,
+        std::string, action,
+        std::string, hitrate,
+        std::string, evade,
+        std::string, critical,
+        std::string, criticaldmg,
+        std::string, pierce,
+        std::string, counter,
+        std::string, magres
     )
 SPECIALEND()
 

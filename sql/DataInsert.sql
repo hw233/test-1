@@ -72,6 +72,7 @@ INSERT INTO `weapon_def` VALUES
 UNLOCK TABLES;
 
 LOCK TABLES `attr_extra` WRITE;
+source attrextra
 UNLOCK TABLES;
 
 LOCK TABLES `item_template` WRITE;
