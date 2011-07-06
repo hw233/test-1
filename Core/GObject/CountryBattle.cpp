@@ -21,12 +21,6 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
 {
 	if(nextReward == 0)
 		return 0;
-	static const UInt32 coinReward[2] = {1000, 2000};
-	if(curtime > nextReward)
-	{
-		curtime = nextReward;
-		player->getCoin(coinReward[lvl]);
-	}
 	UInt32 duration;
 	if(joinTime + 60 > curtime)
 	{
@@ -102,7 +96,7 @@ void CountryBattle::process(UInt32 curtime)
 		}
 		_rewardTime = curtime + 60;
 	}
-	for(UInt8 lvl = 0; lvl < 2; ++ lvl)
+	for(UInt8 lvl = 0; lvl < 3; ++ lvl)
 	{
 		while(1)
 		{
@@ -344,7 +338,7 @@ void CountryBattle::end(UInt32 curtime)
 
 	SYSMSG(title, 261);
 
-	for(UInt8 lvl = 0; lvl < 2; ++ lvl)
+	for(UInt8 lvl = 0; lvl < 3; ++ lvl)
 	{
 		for(UInt8 side = 0; side < 2; ++ side)
 		{
@@ -366,10 +360,10 @@ void CountryBattle::end(UInt32 curtime)
 			blist.clear();
 		}
 	}
-	UInt32 totalAchievement[2] = {0};
-	UInt32 maxAchievement[2] = {0};
-	UInt64 maxPlayer[2] = {0};
-	UInt16 enterSize[2] = {0};
+	UInt32 totalAchievement[3] = {0};
+	UInt32 maxAchievement[3] = {0};
+	UInt64 maxPlayer[3] = {0};
+	UInt16 enterSize[3] = {0};
 
 	std::map<CBPlayerData *, Player *, _rankCompare> _rank;
 	for(UInt8 side = 0; side < 2; ++ side)
@@ -383,11 +377,7 @@ void CountryBattle::end(UInt32 curtime)
 			SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
 			it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
 			/*for back stage*/
-			UInt8 lvl = 0;
-			if(it->first->GetLev() > COUNTRY_BATTLE_BARRIER)
-			{
-				lvl = 1;
-			}
+			UInt8 lvl = getJoinLevel(it->first->GetLev());
 			enterSize[lvl] ++;
 			totalAchievement[lvl] += it->second.totalAchievement;
 			if(maxAchievement[lvl] < it->second.totalAchievement)
@@ -398,7 +388,7 @@ void CountryBattle::end(UInt32 curtime)
 			_rank[&it->second] = it->first;
 		}
 	}
-	DBLOG().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `created_at`) values(%u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], TimeUtil::Now());
+	DBLOG().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
 
 	_lastReport.init(0x64);
 	_lastReport << _spot << _score[0] << _score[1] << _owner << static_cast<UInt16>(0);
@@ -688,7 +678,7 @@ void CountryBattle::broadcast( Stream& st )
 
 void CountryBattle::getReward(UInt32 curtime)
 {
-	for(UInt8 lvl = 0; lvl < 2; ++ lvl)
+	for(UInt8 lvl = 0; lvl < 3; ++ lvl)
 	{
 		for(UInt8 side = 0; side < 2; ++ side)
 		{

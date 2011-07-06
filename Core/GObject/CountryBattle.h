@@ -7,7 +7,8 @@
 namespace GObject
 {
 
-#define COUNTRY_BATTLE_BARRIER 70
+#define COUNTRY_BATTLE_BARRIER1 60
+#define COUNTRY_BATTLE_BARRIER2 80
 
 class Player;
 
@@ -68,7 +69,9 @@ public:
 	inline void setOwner(UInt8 o) { _owner = o; }
 	inline UInt8 getOwner() { return _owner; }
 	inline UInt16 getCount(UInt8 lvl, UInt8 side) { return static_cast<UInt16>(_players[lvl][side].size()); }
-	inline UInt16 getCount(UInt8 side) { return static_cast<UInt16>(_players[0][side].size() + _players[1][side].size()); }
+	inline UInt16 getCount(UInt8 side)
+    {
+        return static_cast<UInt16>(_players[0][side].size() + _players[1][side].size() + _players[2][side].size()); }
 	inline UInt16 getScore(UInt8 side) { return _score[side]; }
 	inline std::vector<CountryBattleData *>::iterator playerEnd(UInt8 lvl, UInt8 side) { return _players[lvl][side].end(); }
 	void padPlayerData(Stream&, UInt8);
@@ -84,10 +87,17 @@ private:
 	void padPlayerData(Stream&, CBStatusData&);
 	void broadcast(Stream&);
 
-	static inline UInt8 getJoinLevel(UInt8 level) { return level >= COUNTRY_BATTLE_BARRIER ? 1 : 0; }
+	static inline UInt8 getJoinLevel(UInt8 level)
+    {
+        if (level <= COUNTRY_BATTLE_BARRIER1)
+            return 0;
+        if (level <= COUNTRY_BATTLE_BARRIER2)
+            return 1;
+        return 2;
+    }
 
 private:
-	std::vector<CountryBattleData *> _players[2][2];
+	std::vector<CountryBattleData *> _players[3][2];
 	bool _firstBlooded;
 	UInt8 _owner;
 	Map * _map;

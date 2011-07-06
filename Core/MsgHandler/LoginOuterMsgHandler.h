@@ -170,6 +170,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	if(ul._userid == 0)
 		conn->closeConn();
 
+    // TODO: 可能是这个地方导致登陆后不久断线
 	UInt32 now = TimeUtil::Now();
 	UInt32 loginTime = *reinterpret_cast<UInt32*>(ul._hashval + 12);
 	if(cfg.GMCheck && (now + 300 < loginTime || now > loginTime + 600))
