@@ -795,7 +795,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
 	pl->sendWallow();
 	pl->sendEvents();
-    pl->GetPackage()->SendPackageItemInfor();
+    //pl->GetPackage()->SendPackageItemInfor();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
