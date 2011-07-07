@@ -781,52 +781,46 @@ inline void addAttrExtra( GData::AttrExtra& ae, const GData::CittaEffect* ce )
 	ae += *ce;
 }
 
-inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value )
+inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8 level )
 {
 	switch(type)
 	{
-	case 1:
-		ae.hp += value;
-		break;
-	case 2:
-		ae.action += static_cast<float>(value) / 10000;
-		break;
 	case 3:
-		ae.hitrate += static_cast<float>(value) / 100;
+		ae.hitrate += static_cast<float>(value) / (level * GObjectManager::getHitrateFactor());
 		break;
 	case 4:
-		ae.evade += static_cast<float>(value) / 100;
+		ae.evade += static_cast<float>(value) / (level * GObjectManager::getEvadeFactor());
 		break;
 	case 5:
-		ae.critical += static_cast<float>(value) / 100;
+		ae.critical += static_cast<float>(value) / (level * GObjectManager::getCriticalFactor());
 		break;
 	case 6:
-		ae.pierce += static_cast<float>(value) / 100;
+		ae.pierce += static_cast<float>(value) / (level * GObjectManager::getPierceFactor());
 		break;
 	case 7:
-		ae.counter += static_cast<float>(value) / 100;
+		ae.tough += static_cast<float>(value) / (level* GObjectManager::getToughFactor());
 		break;
 	}
 }
 
 // TODO:
-inline void addEquipAttr2( GData::AttrExtra& ae, const GData::CittaEffect* ce )
+inline void addEquipAttr2( GData::AttrExtra& ae, const GData::CittaEffect* ce, UInt8 level)
 {
 }
 
-inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext )
+inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext, UInt8 level )
 {
 	if(ext.type1 != 0)
 	{
-		addEquipAttr2(ae, ext.type1, ext.value1);
+		addEquipAttr2(ae, ext.type1, ext.value1, level);
 	}
 	if(ext.type2 != 0)
 	{
-		addEquipAttr2(ae, ext.type2, ext.value2);
+		addEquipAttr2(ae, ext.type2, ext.value2, level);
 	}
 	if(ext.type3 != 0)
 	{
-		addEquipAttr2(ae, ext.type3, ext.value3);
+		addEquipAttr2(ae, ext.type3, ext.value3, level);
 	}
 }
 
@@ -854,13 +848,13 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 void Fighter::addAttr( const GData::CittaEffect* ce )
 {
 	addAttrExtra(_attrExtraEquip, ce);
-	addEquipAttr2(_attrExtraEquip, ce);
+	addEquipAttr2(_attrExtraEquip, ce, _level);
 }
 
 void Fighter::addAttr( ItemEquip * equip )
 {
 	addAttrExtra(_attrExtraEquip, equip->getAttrExtra());
-	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2());
+	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2(), _level);
 	ItemEquipData& ied = equip->getItemEquipData();
 	for(UInt8 i = 0; i < ied.sockets; ++ i)
 	{

@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "ClanTech.h"
 #include "Clan.h"
+#include "GObject/PracticePlace.h"
 
 namespace GObject
 {
@@ -52,7 +53,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
 				SYSMSGVP(st, 426);
 				_clan->broadcast(st);
 			}
-			Stream st(0x78);
+			Stream st(0x99);
 			st << static_cast<UInt8>(3);
 			makeTechInfo(st, tech);
 			st << Stream::eos;
@@ -64,7 +65,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
 	case 2:
 		{
 			techLevelUp(tech.techId, tech.level, tech.extra, count);
-			Stream st(0x78);
+			Stream st(0x99);
 			st << static_cast<UInt8>(3);
 			makeTechInfo(st, tech);
 			st << Stream::eos;
@@ -113,9 +114,14 @@ bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt16& extra, UInt16 count)
 		r = true;
 		++ level;
 		extra -= techTable[level].needs;
-        if(id == CLAN_TECH_MEMBER_COUNT)
+        switch(id)
         {
+        case CLAN_TECH_MEMBER_COUNT:
             _clan->setMaxMemberCount(getMemberCount());
+            break;
+        case CLAN_TECH_PRACTICE_SLOT:
+            practicePlace.addSlotFromTech(_clan->getOwner());
+            break;
         }
 	}
 	if (r)
@@ -268,7 +274,7 @@ bool ClanTech::addAchieve(UInt16 ach)
 		return false;
 	ClanTechData& tech = found->second;
 	techLevelUp(tech.techId, tech.level, tech.extra, ach);
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(3);
 	makeTechInfo(st, tech);
 	st << Stream::eos;
@@ -285,7 +291,7 @@ bool ClanTech::delAchieve(UInt16 ach)
 		return false;
 	ClanTechData& tech = found->second;
 	techLevelDown(tech.techId, tech.level, tech.extra, ach);
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(3);
 	makeTechInfo(st, tech);
 	st << Stream::eos;
@@ -305,14 +311,14 @@ UInt32 ClanTech::getPracticeSpeed()
 	return GData::clanTechTable[CLAN_TECH_PRACTICE_SPEED][found->second.level].effect1;
 }
 
-UInt32 ClanTech::getPracticeSpace()
+UInt32 ClanTech::getPracticeSlot()
 {
 	Mutex::ScopedLock lk(_mutex);
-    Techs::iterator found = _techs.find(CLAN_TECH_PRACTICE_SPACE);
+    Techs::iterator found = _techs.find(CLAN_TECH_PRACTICE_SLOT);
     if(found == _techs.end())
         return 0;
 
-	return GData::clanTechTable[CLAN_TECH_PRACTICE_SPACE][found->second.level].effect1;
+	return GData::clanTechTable[CLAN_TECH_PRACTICE_SLOT][found->second.level].effect1;
 }
 
 UInt32 ClanTech::getMemberCount()

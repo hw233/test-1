@@ -175,6 +175,7 @@ public:
 	bool calcPierce();
     float calcTherapy(const GData::SkillBase* skill);
     float calcMagAttack(bool& isCritical);
+    float calcPoison(const GData::SkillBase* skill);
 
 	inline void addAction(UInt32 p);
 

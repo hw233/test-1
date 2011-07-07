@@ -410,6 +410,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 	if(area_target_obj->isChar())
 	{
         bool counter100 = false;
+        bool poison = false;
 		BattleFighter * area_target = static_cast<BattleFighter *>(area_target_obj);
 		UInt8 side = area_target->getSide();
 		UInt8 pos = area_target->getPos();
@@ -504,7 +505,15 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     float rate = skill->prob * 100;
                     if(rate < _rnd(10000))
                     {
-                        doSkillState(bf, skill, area_target, defList, defCount, atkAct);
+                        // poison
+                        if(skill->effect->state == 1)
+                        {
+                            poison = true;
+                        }
+                        else
+                        {
+                            doSkillState(bf, skill, area_target, defList, defCount, atkAct);
+                        }
                     }
                 }
 
@@ -565,6 +574,24 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         }
         defList[defCount].pos = pos;
         ++ defCount;
+
+        // 中毒
+        if(poison)
+        {
+            doSkillState(bf, skill, area_target, defList, defCount, atkAct);
+            defList[defCount].pos = pos;
+            defList++;
+
+            doSkillState(bf, skill, area_target, defList, defCount, atkAct);
+            defList[defCount].damage *= 1.5;
+            defList[defCount].pos = pos;
+            defList++;
+
+            doSkillState(bf, skill, area_target, defList, defCount, atkAct);
+            defList[defCount].damage *= 2;
+            defList[defCount].pos = pos;
+            defList++;
+        }
 
 
         // target fighter will do not counter while fighter is the same side
@@ -704,8 +731,9 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         if(target_bo->getPoisonRound() < 1)
         {
             defList[defCount].damType = e_Poison;
-            target_bo->setPoisonLevel(SKILL_LEVEL(skill->getId()));
-            target_bo->setPoisonRound(skill->last);
+            defList[defCount].damage = bf->calcPoison(skill);
+            //target_bo->setPoisonLevel(SKILL_LEVEL(skill->getId()));
+            //target_bo->setPoisonRound(skill->last);
         }
         break;
     case 2:
@@ -1279,6 +1307,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 #endif
 
 	// insert the fighter to next queue by order
+#if 0
     UInt32 bPoisonLevel = bf->getPoisonLevel();
     if(bPoisonLevel > 0)
     {
@@ -1331,6 +1360,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             atkAct.clear();
        }
     }
+#endif
     //fs.resetAction();
     insertFighterStatus(bf);
 

@@ -175,6 +175,7 @@ struct DBPracticePlace
     UInt64 ownerid;     // 主人ID
     UInt64 protid;      // 护法弟子ID - 某个玩家ID
     UInt16 maxslot;     // 最大修炼位
+    UInt16 openslot;    // 金币开启的修炼位
     UInt16 protmoney;   // 8小时保护费用
     UInt16 slotmoney;   // 8小时收费
     UInt8 open;         // 是否开放

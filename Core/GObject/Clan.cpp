@@ -18,6 +18,7 @@
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
 #include <mysql.h>
+#include "GObject/PracticePlace.h"
 
 namespace GObject
 {
@@ -37,11 +38,11 @@ UInt8 ClanAuthority[5][7] =
 
 
 // °ïÅÉÃØÊõ
-#define CLAN_SKILL_HP       0
-#define CLAN_SKILL_ATTACK   1
-#define CLAN_SKILL_DEFEND   2
-#define CLAN_SKILL_MAGATK   3
-#define CLAN_SKILL_MAGDEF   4
+#define CLAN_SKILL_HP       1
+#define CLAN_SKILL_ATTACK   2
+#define CLAN_SKILL_DEFEND   3
+#define CLAN_SKILL_MAGATK   4
+#define CLAN_SKILL_MAGDEF   5
 
 static bool find_pending_member(ClanPendingMember * member, Player * p)
 {
@@ -356,6 +357,7 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 	cmPlayer->cls = 4;
 	_members.insert(cmLeader);
 	_members.insert(cmPlayer);
+    practicePlace.replaceOwner(cmLeader->player, cmPlayer->player);
 	{
 		Stream st;
 		_clanDynamicMsg->addCDMsg(9, cmPlayer->player->getName(), 4, &st);
@@ -935,7 +937,7 @@ void Clan::appendListInfo( Stream& st )
 
 void Clan::listTechs(Player * player)
 {
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(0) << _techs->getSize();
 	_techs->makeTechInfo(st);
 	st << Stream::eos;
@@ -946,7 +948,7 @@ void Clan::listTechDonators(Player * player, UInt8 techId)
 {
 	Mutex::ScopedLock lk(_mutex);
 	MemberDonates& mds = _memberDonates[techId];
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(1) << techId << static_cast<UInt8>(mds.size());
 	for (MemberDonates::iterator offset = mds.begin(); offset != mds.end(); ++ offset)
 	{
@@ -1420,7 +1422,7 @@ UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
 
 UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 {
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(8) << skillId;
 
     UInt8 res = 0;
@@ -1505,7 +1507,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
 
 void Clan::listSkills(Player * player)
 {
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(6);
 	makeSkillInfo(st, player);
 	st << Stream::eos;
@@ -1514,7 +1516,7 @@ void Clan::listSkills(Player * player)
 
 void Clan::showSkill(Player* player, UInt8 skillId)
 {
-    Stream st(0x78);
+    Stream st(0x99);
     st << static_cast<UInt8>(7);
     makeSkillInfo(st, player, skillId);
 	st << Stream::eos;
@@ -1601,7 +1603,7 @@ void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt3
 		mds.erase(mds.begin());
 	}
 	mds.insert(MemberDonate(dn, dc, dt));
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(4) << si << dn << static_cast<UInt32>(dc) << dt << Stream::eos;
 	broadcast(st);
 	DB().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `techId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
@@ -2244,6 +2246,11 @@ float Clan::getClanTechAddon()
     practiceAddon = static_cast<float>(_techs->getPracticeSpeed())/100;
 
     return practiceAddon;
+}
+
+UInt8 Clan::getPracticeSlot()
+{
+    return _techs->getPracticeSlot();
 }
 
 ClanCache clanCache;

@@ -53,6 +53,7 @@ namespace GObject
 
         static bool loadEquipForge();
         static bool loadFightersPCChance();
+        static bool loadAttrFactor();
 
         static UInt32 getEnchantCost() { return _enchant_cost; }
         static UInt32 getMergeCost() { return _merge_cost; }
@@ -72,6 +73,11 @@ namespace GObject
         static UInt32 getMaxCapacity() { return _max_capacity; }
         static std::vector<UInt32>& getPotentialChance() { return _potential_chance; }
         static std::vector<UInt32>& getCapacityChance() { return _capacity_chance; }
+        static UInt8 getEvadeFactor() { return _evade_factor; }
+        static UInt8 getHitrateFactor() { return _hitrate_factor; }
+        static UInt8 getCriticalFactor() { return _critcal_factor; }
+        static UInt8 getPierceFactor() { return _pierce_factor; }
+        static UInt8 getToughFactor() { return _tough_factor; }
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -92,6 +98,11 @@ namespace GObject
         static UInt32 _max_capacity;
         static std::vector<UInt32> _potential_chance;
         static std::vector<UInt32> _capacity_chance;
+        static UInt8 _evade_factor;
+        static UInt8 _hitrate_factor;
+        static UInt8 _critcal_factor;
+        static UInt8 _pierce_factor;
+        static UInt8 _tough_factor;
 	};
 }
 

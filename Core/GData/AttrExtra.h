@@ -57,17 +57,17 @@ struct AttrExtra
 		defendP += other.defendP;
         magdefP += other.magdefP;
 
-#if 0
 		hpP += other.hpP;
-		toughP += other.toughP;
 		actionP += other.actionP;
+		criticaldmgP += other.criticaldmgP;
+		counterP += other.counterP;
+        magresP += other.magresP;
+#if 0
+		toughP += other.toughP;
 		hitrateP += other.hitrateP;
 		evadeP += other.evadeP;
 		criticalP += other.criticalP;
-		criticaldmgP += other.criticaldmgP;
 		pierceP += other.pierceP;
-		counterP += other.counterP;
-        magresP += other.magresP;
 #endif
 
 		return *this;
@@ -111,17 +111,17 @@ struct AttrExtra
 		defendP += other.defendP;
         magdefP += other.magdefP;
 
-#if 0
 		hpP += other.hpP;
-		toughP += other.toughP;
 		actionP += other.actionP;
+		criticaldmgP += other.criticaldmgP;
+		counterP += other.counterP;
+        magresP += other.magresP;
+#if 0
+		toughP += other.toughP;
 		hitrateP += other.hitrateP;
 		evadeP += other.evadeP;
 		criticalP += other.criticalP;
-		criticaldmgP += other.criticaldmgP;
 		pierceP += other.pierceP;
-		counterP += other.counterP;
-        magresP += other.magresP;
 #endif
 
 		return *this;

@@ -186,6 +186,7 @@ public:
 	void disband(Player *);
 	bool hasClanAuthority(Player *, UInt8);
     float getClanTechAddon();
+    UInt8 getPracticeSlot();
 
 
 public:

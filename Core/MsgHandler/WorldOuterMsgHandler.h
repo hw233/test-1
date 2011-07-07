@@ -623,7 +623,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 				if(skillId < 7 || skillId > 10)
 					return;
 				UInt16 favorId = clan->getFavorItemId(skillId);
-				Stream st(0x78);
+				Stream st(0x99);
 				st << static_cast<UInt8>(5) << skillId << favorId << Stream::eos;
 				player->send(st);
 			}
