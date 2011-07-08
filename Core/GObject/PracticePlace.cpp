@@ -82,6 +82,11 @@ namespace GObject
         }
 
         PPlace& data = m_places[place-1].place;
+        Player* owner = globalPlayers[data.ownerid];
+        Clan* clan = NULL;
+        if(NULL != owner)
+            clan = owner->getClan();
+
         UInt32 price = 0;
         ConsumeInfo ci(Practice,0,0);
         if (place == PPLACE_MAX || !data.slotmoney)
@@ -115,6 +120,8 @@ namespace GObject
                     return false;
                 }
                 pl->useTael(price, &ci);
+                if(!clan)
+                    clan->addClanFunds(price);
             }
         }
         else
@@ -127,6 +134,8 @@ namespace GObject
                 return false;
             }
             pl->useTael(price, &ci);
+            if(!clan)
+                clan->addClanFunds(price);
         }
 
         PracticeData* pp = new (std::nothrow) PracticeData(pl->getId());

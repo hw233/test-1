@@ -930,6 +930,7 @@ CREATE TABLE `clan` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `rank` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `funds` int(10) unsigned NOT NULL DEFAULT '0',
   `foundTime` int(10) unsigned NOT NULL DEFAULT '0',
   `founder` bigint(20) unsigned NOT NULL,
   `leader` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -966,7 +967,7 @@ CREATE TABLE `clan` (
 
 LOCK TABLES `clan` WRITE;
 /*!40000 ALTER TABLE `clan` DISABLE KEYS */;
-INSERT INTO `clan` VALUES (0,'英雄之城',40,0,0,0,0,0,'','','',0,0,39,39,0,0,0,0,0,0,0,0,1301587200,0,30,30,30,0);
+INSERT INTO `clan` VALUES (0,'英雄之城',40,0,0,0,0,0,0,'','','',0,0,39,39,0,0,0,0,0,0,0,0,1301587200,0,30,30,30,0);
 /*!40000 ALTER TABLE `clan` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

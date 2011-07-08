@@ -296,6 +296,7 @@ struct DBClan
 	std::string name;
 	UInt8  rank;
 	UInt8  level;
+    UInt32 funds;
 	UInt32 foundTime;
 	UInt64 founder;
 	UInt64 leader;
@@ -935,12 +936,13 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(24)
+SPECIALDEF(25)
 (
 	UInt32, id,
 	std::string, name,
 	UInt8, rank,
 	UInt8, level,
+	UInt32, funds,
 	UInt32, foundTime,
 	UInt64, founder,
 	UInt64, leader,

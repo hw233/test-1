@@ -262,7 +262,7 @@ namespace GObject
             std::string path = cfg.scriptPath + "formula/attribute.lua";
             lua_tinker::dofile(L, path.c_str());
 
-            _evade_factor = lua_tinker::call<UInt8>(L, "getEvadeFacotr");
+            _evade_factor = lua_tinker::call<UInt8>(L, "getEvadeFactor");
             _hitrate_factor = lua_tinker::call<UInt8>(L, "getHitrateFactor");
             _critcal_factor = lua_tinker::call<UInt8>(L, "getCriticalFactor");
             _pierce_factor = lua_tinker::call<UInt8>(L, "getPierceFactor");
@@ -1780,7 +1780,7 @@ namespace GObject
         // °ï»áÐÅÏ¢
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -1800,6 +1800,7 @@ namespace GObject
 				clan->addEnemyClanFromDB(cl.enemyClan1);
 				clan->addEnemyClanFromDB(cl.enemyClan2);
 				clan->patchMergedName();
+                clan->setClanFunds(cl.funds);
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
 				clan->setConstruction(cl.construction, false);

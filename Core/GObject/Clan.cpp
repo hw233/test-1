@@ -57,7 +57,7 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false)
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0)
 {
 	_techs = new ClanTech(this);
     _maxMemberCount = BASE_MEMBER_COUNT + _techs->getMemberCount();
@@ -2490,6 +2490,24 @@ void ClanCache::makeKeywordList( const std::string& n, std::vector<std::string>&
 			i += cur;
 		}
 	}
+}
+
+void Clan::addClanFunds(UInt32 funds)
+{
+    if(funds != 0)
+    {
+        _funds += funds;
+		DB().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
+    }
+}
+
+void Clan::useClanFunds(UInt32 funds)
+{
+    if(funds != 0)
+    {
+        _funds -= funds;
+		DB().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
+    }
 }
 
 }

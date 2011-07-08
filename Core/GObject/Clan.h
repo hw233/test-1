@@ -232,6 +232,12 @@ public:
 	void addClanDonateRecordFromDB(const std::string&, UInt8, UInt16, UInt32);
 	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
 
+    // 帮派资金
+    void setClanFunds(UInt32 funds) { _funds = funds; }
+    void addClanFunds(UInt32 funds);
+    void useClanFunds(UInt32 funds);
+    UInt32 getClanFunds() { return _funds; }
+
 // 帮派技能
     void addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level);
     void addSkill(Player* pl, UInt8 skillId);
@@ -332,6 +338,8 @@ private:
 
 	ClanDynamicMsg * _clanDynamicMsg;
 	ClanBattle * _clanBattle;
+
+    UInt32 _funds;          //帮派资金
 
 	Mutex _mutex;
 };
