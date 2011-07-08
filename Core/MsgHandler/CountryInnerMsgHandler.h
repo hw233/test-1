@@ -21,6 +21,7 @@
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
+#include "GObject/Tripod.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -89,6 +90,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
 	DBLOG().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %"I64_FMT"u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
+    tripod.getTripodData(player); // XXX: 完家登陆之后如果没有九疑鼎数据则新建
 }
 
 void PlayerReconnect( GameMsgHdr& hdr, const void * data )

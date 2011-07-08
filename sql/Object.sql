@@ -738,6 +738,16 @@ CREATE TABLE `pass_word` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `tripod`;
+CREATE TABLE `tripod` (
+  `id` bigint(20) unsigned NOT NULL,
+  `soul` int(10) unsigned NOT NULL DEFAULT '0',
+  `fire` tinyint(1) unsigned NOT NULL,
+  `quality` tinyint(1) unsigned NOT NULL,
+  `awdst` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Table structure for table `player`
 --

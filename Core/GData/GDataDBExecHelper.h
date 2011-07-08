@@ -31,7 +31,7 @@ struct DBItemType
     UInt8       career;         // 职业
 	UInt16		reqLev;         // 物品(可装备)等级
 	UInt32		coin;           // 价格(铜)
-	UInt8		quality;        // 品质
+	UInt8		quality;        // 品质 1-白 2-绿 3-蓝 4-紫 5-橙
 	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
 	UInt16		energy;         // 九仪鼎值

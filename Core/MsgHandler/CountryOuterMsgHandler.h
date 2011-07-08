@@ -34,6 +34,7 @@
 #include "Server/SysMsg.h"
 #include "Battle/BattleSimulator.h"
 #include "GMHandler.h"
+#include "GObject/Tripod.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -604,17 +605,40 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-		if (IsEquipId(itemId))
-		{
-			pl->GetPackage()->DelEquip(itemId, ToDesdroy);
-		}
-		else
-		{
-			pl->GetPackage()->DelItem(itemId, itemNum, bindType);
-		}
+        tripod.addItem(pl, itemId, itemNum, bindType);
 	}
 	SYSMSG_SEND(115, pl);
 	SYSMSG_SEND(1015, pl);
+}
+
+void OnTripodReq( GameMsgHdr& hdr, const void* data )
+{
+ 	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+    br >> type;
+    if (type == 0)
+    {
+        tripod.getTripodInfo(player);
+    }
+    else if (type == 1)
+    {
+        UInt8 num = 0;
+        UInt32 id1 = 0;
+        UInt32 id2 = 0;
+        br >> num;
+        if (num < 2)
+            return;
+        br >> id1;
+        br >> id2;
+
+        tripod.makeFire(player, id1, id2);
+    }
+    else if (type == 2)
+    {
+        tripod.getAward(player);
+    }
 }
 
 void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)

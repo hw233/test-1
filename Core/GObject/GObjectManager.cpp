@@ -45,6 +45,7 @@
 #include "Common/StringTokenizer.h"
 #include "Common/DirectoryIterator.h"
 #include "GObject/PracticePlace.h"
+#include "GObject/Tripod.h"
 
 #include <fcntl.h>
 
@@ -2499,7 +2500,28 @@ namespace GObject
         return true;
     }
 
-    bool GObjectManager::LoadPracticeData()
+    bool GObjectManager::LoadTripodData() // XXX: 需要延迟加载,在World::Init里加载
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Tripod Data");
+		DBTripod t;
+		if(execu->Prepare("SELECT `id`, `soul`, `fire`, `quality`, `awdst` FROM `tripod`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+            TripodData td;
+            td.soul = t.soul;
+            td.fire = t.fire;
+            td.quality = t.quality;
+            td.awdst = t.awdst;
+            tripod.addTripodData(t.id, td);
+        }
+        return true;
+    }
+
+    bool GObjectManager::LoadPracticeData() // XXX: 需要延迟加载,在World::Init里加载
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;

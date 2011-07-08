@@ -600,6 +600,15 @@ struct DBArenaBet
 	UInt8 tael;
 };
 
+struct DBTripod
+{
+    UInt64 id;
+	UInt32 soul;
+	UInt8 fire;
+	UInt8 quality;
+	UInt8 awdst;
+};
+
 }
 
 namespace DB {
@@ -1340,6 +1349,17 @@ SPECIALDEF(5)
 	UInt8, group,
 	UInt8, pos,
 	UInt8, tael
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTripod)
+SPECIALDEF(5)
+(
+    UInt64, id,
+    UInt32, soul,
+    UInt8, fire,
+    UInt8, quality,
+    UInt8, awdst
 )
 SPECIALEND()
 

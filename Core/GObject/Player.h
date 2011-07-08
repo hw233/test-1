@@ -126,6 +126,18 @@ namespace GObject
         UInt32 _end;
     };
 
+    class EventPlayerTripod : public EventBase
+    {
+    public:
+		EventPlayerTripod(Player * player, UInt32 interval, UInt32 count)
+			: EventBase(player, interval, count)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_PLAYERPRTRIPOD; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+    };
 
 	struct Lineup
 	{

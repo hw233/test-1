@@ -31,6 +31,7 @@ namespace GData
 		static bool LoadQueRule();
 		static bool LoadFighterTrainData();
 		static bool LoadPracticeData();
+		static bool LoadTripodAward();
 		static bool LoadFlushTaskFactor();
 		static bool LoadTalent();
 		static bool LoadSkillEffect();
@@ -63,6 +64,7 @@ namespace GData
 		static const std::vector<UInt32>& GetShiYaMenTask(int country, int type);
 		static const std::vector<UInt8>& GetFlushTaskFactor(int ttype, int ftype);
         static UInt32 GetTaskAwardFactor(int ttype, int color);
+        static UInt32 GetTripodAward(int fire, int quality);
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -82,6 +84,7 @@ namespace GData
         static std::vector<UInt32>		 m_YaMenTask[COUNTRY_MAX];
         static std::vector<UInt8>		 m_FlushTaskFactor[2][2];
         static std::vector<UInt32>		 m_TaskAwardFactor[2];
+        static std::vector<UInt32>		 m_TripodAward[7];
 	};
 
 	
