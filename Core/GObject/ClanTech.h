@@ -16,7 +16,7 @@ class Player;
 */
 
 #define CLAN_TECH_PRACTICE_SPEED    1
-#define CLAN_TECH_PRACTICE_SPACE    2
+#define CLAN_TECH_PRACTICE_SLOT     2
 #define CLAN_TECH_MEMBER_COUNT      3
 #define CLAN_TECH_SKILL_EXTEND      4
 
@@ -69,7 +69,7 @@ public:
 	UInt32 getHoldCityGuarder();
 
     UInt32 getPracticeSpeed();
-    UInt32 getPracticeSpace();
+    UInt32 getPracticeSlot();
     UInt32 getMemberCount();
     UInt32 getSkillExtend();
 

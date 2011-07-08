@@ -37,7 +37,7 @@ MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG(GameMsgHdr, OnAthleticsChallengeReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 
-MSG_REG_2(GameMsgHdr, 0x78, OnClanTechOpReq);
+MSG_REG_2(GameMsgHdr, 0x99, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, 0x79, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, 0x7A, OnClanCityBattleListReq);
 MSG_REG(GameMsgHdr, OnArenaInfoReq);

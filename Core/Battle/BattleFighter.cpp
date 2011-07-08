@@ -393,6 +393,14 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     return aura_factor * ((_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
+float BattleFighter::calcPoison(const GData::SkillBase* skill)
+{
+    if(!skill)
+        return 0;
+
+    return (_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp;
+}
+
 bool BattleFighter::calcHit( BattleFighter * defender )
 {
 	if(defender->getStunRound() > 0)

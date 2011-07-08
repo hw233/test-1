@@ -241,7 +241,7 @@ void OnClanTechDonateCheckResp( GameMsgHdr& hdr, const void * data )
 		if (clan != NULL && clan->donate(player, items->techId, items->flag, items->count))
 			r = 1;
 	}
-	Stream st(0x78);
+	Stream st(0x99);
 	st << static_cast<UInt8>(2) << r << Stream::eos;
 	player->send(st);
 }

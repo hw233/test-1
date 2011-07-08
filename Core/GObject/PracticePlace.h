@@ -24,7 +24,8 @@ struct PPlace
     UInt16 maxslot;
     UInt16 protmoney;
     UInt16 slotmoney; // 8小时所收费用
-    UInt8 openslot;
+    UInt8 openslot;   // 金币开启的洞府
+    UInt8 techslot;   // 科技开启的洞府
     UInt8 open;
     UInt16 enemyCount;
     UInt16 winCount;
@@ -100,8 +101,17 @@ public:
     // 挑战
     bool doChallenge(Player* pl, UInt8 place, UInt16 idx, const std::string& name);
 
-    // 增加修练空间
+    // 使用金币增加修练空间
     bool addSlot(Player* pl, UInt8 place);
+
+    // 通过帮派科技增加修炼空间
+    bool addSlotFromTech(Player* pl, UInt8 place = 0);
+
+    // 山头易主
+    bool replaceOwner(Player* oldpl, Player* newpl);
+
+    // 占领山头
+    bool ocupyPlace(Player* pl, UInt8 place);
 
     // 增加一个修炼点
     bool addPlace(PPlace& place, UInt8 idx);

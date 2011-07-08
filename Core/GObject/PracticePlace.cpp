@@ -1,6 +1,7 @@
 
 #include "Config.h"
 #include "Player.h"
+#include "Clan.h"
 #include "Log/Log.h"
 #include "PracticePlace.h"
 #include "Common/TimeUtil.h"
@@ -81,6 +82,11 @@ namespace GObject
         }
 
         PPlace& data = m_places[place-1].place;
+        Player* owner = globalPlayers[data.ownerid];
+        Clan* clan = NULL;
+        if(NULL != owner)
+            clan = owner->getClan();
+
         UInt32 price = 0;
         ConsumeInfo ci(Practice,0,0);
         if (place == PPLACE_MAX || !data.slotmoney)
@@ -114,6 +120,8 @@ namespace GObject
                     return false;
                 }
                 pl->useTael(price, &ci);
+                if(!clan)
+                    clan->addClanFunds(price);
             }
         }
         else
@@ -126,6 +134,8 @@ namespace GObject
                 return false;
             }
             pl->useTael(price, &ci);
+            if(!clan)
+                clan->addClanFunds(price);
         }
 
         PracticeData* pp = new (std::nothrow) PracticeData(pl->getId());
@@ -556,14 +566,56 @@ namespace GObject
         ConsumeInfo ci(AddPracticeSlot,0,0);
         pl->useGold(price, &ci);
 
-        if (pd.data.size() >= pd.place.maxslot ||
-                pd.data.size() + 1 > pd.place.maxslot)
-            return false;
         ++pd.place.maxslot;
         ++pd.place.openslot;
         pd.data.resize(pd.place.maxslot);
 
+        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = '%u', `openslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
+
         // TODO: notify client
+
+        return true;
+    }
+
+    bool PracticePlace::addSlotFromTech(Player* pl, UInt8 place)
+    {
+        UInt8 idx = 0;
+        if (!pl || place > PPLACE_MAX)
+            return false;
+
+        GObject::Clan* clan = pl->getClan();
+        if(clan == NULL)
+            return false;
+
+        if(0 != place)
+        {
+            idx = place - 1;
+        }
+        else
+        {
+            UInt64 ownerid = clan->getOwner()->getId();
+            for(; idx < PPLACE_MAX; idx ++)
+            {
+                if(ownerid == m_places[idx].place.ownerid)
+                    break;
+            }
+
+            if(idx == PPLACE_MAX)
+                return false;
+        }
+
+        PlaceData& pd = m_places[idx];
+        if (pd.place.ownerid != pl->getId())
+            return false;
+
+        UInt8 techslot = clan->getPracticeSlot();
+        UInt8 slotadd = techslot - pd.place.techslot;
+
+        pd.place.maxslot += slotadd;
+        pd.place.techslot += techslot;
+        pd.data.resize(pd.place.maxslot);
+
+        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = '%u', `techslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.techslot, pd.place.ownerid);
 
         return true;
     }
@@ -575,6 +627,12 @@ namespace GObject
         PlaceData& pd = m_places[idx];
         pd.place = place;
         pd.data.resize(place.maxslot);
+        Player* pl = globalPlayers[pd.place.ownerid];
+        if(!pl)
+        {
+            addSlotFromTech(pl, idx+1);
+        }
+
         return true;
     }
 
@@ -649,6 +707,45 @@ namespace GObject
     {
         PlaceData& pd = m_places[place-1];
         return pd.place.ownerid;
+    }
+
+    bool PracticePlace::replaceOwner(Player* oldpl, Player* newpl)
+    {
+        UInt8 idx = 0;
+        if (!oldpl || !newpl)
+            return false;
+
+        for(; idx < PPLACE_MAX; idx ++)
+        {
+            if(oldpl->getId() == m_places[idx].place.ownerid)
+                break;
+        }
+
+        if(idx == PPLACE_MAX)
+            return false;
+
+        PlaceData& pd = m_places[idx];
+
+        GObject::Clan* clan = newpl->getClan();
+        if(clan == NULL)
+            return false;
+
+        if(oldpl->getClan() != clan)
+        {
+            pd.place.openslot = 0;
+            UInt8 techslot = clan->getPracticeSlot();
+            UInt8 slotadd = techslot - pd.place.techslot;
+
+            pd.place.maxslot += slotadd;
+            pd.place.techslot += techslot;
+            pd.data.resize(pd.place.maxslot);
+       }
+
+        pd.place.ownerid = newpl->getId();
+
+        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = '%"I64_FMT"u, `maxslot` = '%u', `techslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.ownerid, pd.place.maxslot, pd.place.techslot, pd.place.ownerid);
+
+        return true;
     }
 
 } // namespace GObject

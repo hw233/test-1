@@ -72,6 +72,13 @@ namespace GObject
     std::vector<UInt32> GObjectManager::_potential_chance;
     std::vector<UInt32> GObjectManager::_capacity_chance;
 
+    UInt8 GObjectManager::_evade_factor;
+    UInt8 GObjectManager::_hitrate_factor;
+    UInt8 GObjectManager::_critcal_factor;
+    UInt8 GObjectManager::_pierce_factor;
+    UInt8 GObjectManager::_tough_factor;
+
+
 	bool GObjectManager::InitIDGen()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -100,6 +107,7 @@ namespace GObject
 	void GObjectManager::loadAllData()
 	{
 		loadMapData();
+        loadAttrFactor();
 		loadEquipments();
         loadFightersPCChance();
         loadEquipForge();
@@ -245,6 +253,26 @@ namespace GObject
 
 		return true;
 	}
+
+    bool GObjectManager::loadAttrFactor()
+    {
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        {
+            std::string path = cfg.scriptPath + "formula/attribute.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            _evade_factor = lua_tinker::call<UInt8>(L, "getEvadeFactor");
+            _hitrate_factor = lua_tinker::call<UInt8>(L, "getHitrateFactor");
+            _critcal_factor = lua_tinker::call<UInt8>(L, "getCriticalFactor");
+            _pierce_factor = lua_tinker::call<UInt8>(L, "getPierceFactor");
+            _tough_factor = lua_tinker::call<UInt8>(L, "getToughFactor");
+        }
+        lua_close(L);
+
+        return true;
+    }
 
 	bool GObjectManager::loadFighters()
 	{
@@ -1753,7 +1781,7 @@ namespace GObject
         // °ï»áÐÅÏ¢
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -1773,6 +1801,7 @@ namespace GObject
 				clan->addEnemyClanFromDB(cl.enemyClan1);
 				clan->addEnemyClanFromDB(cl.enemyClan2);
 				clan->patchMergedName();
+                clan->setClanFunds(cl.funds);
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
 				clan->setConstruction(cl.construction, false);
@@ -2477,7 +2506,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Place");
 		DBPracticePlace pp;
-		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
         UInt8 i = 0;
@@ -2489,6 +2518,7 @@ namespace GObject
             place.ownerid = pp.ownerid;
             place.protid = pp.protid;
             place.maxslot = pp.maxslot;
+            place.openslot = pp.openslot;
             place.protmoney = pp.protmoney;
             place.slotmoney = pp.slotmoney;
             place.open = pp.open;
