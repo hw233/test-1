@@ -162,7 +162,7 @@ struct DBFighter
     float hitrate;              // 命中
     float evade;                // 闪躲
     float critical;             // 暴击(等级): 暴击率=暴击等级/（暴击等级+200+目标等级*20）+修正
-    float criticaldmg;         // 暴击伤害
+    float criticaldmg;          // 暴击伤害
     float pierce;               // 击破/护甲穿透
     float counter;              // 反击
     float magres;               // 法术抵抗

@@ -314,6 +314,8 @@ namespace GObject
         data.soul += POINT_PERMIN;
         if (data.soul > MAX_TRIPOD_SOUL)
             data.soul = MAX_TRIPOD_SOUL;
+
+        DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
     }
 
 	void Lineup::updateId()
