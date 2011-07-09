@@ -44,6 +44,7 @@ namespace GObject
 		static bool LoadArena();
         static bool LoadPracticePlace();
         static bool LoadPracticeData();
+        static bool LoadTripodData();
 		static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
 		static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现

@@ -689,6 +689,8 @@ void AthleticsRank::TmExtraAward()
 		if(equipid == 0)
 			continue;//error; 
 		const GData::ItemBaseType *item1 = Package::GetItemBaseType(equipid);
+        if (!item1)
+            return;
 
 		MailPackage::MailItem mitem[5] = {{8913, 1}, {equipid, cnt}};
 		UInt32 count = 2;

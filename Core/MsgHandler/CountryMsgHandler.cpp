@@ -18,6 +18,7 @@ MSG_REG_2(GameMsgHdr, 0x23, OnFighterInfoReq);
 MSG_REG(GameMsgHdr, OnGreatFighterTaskValReq);
 MSG_REG_2(GameMsgHdr, 0x25, OnGreatFighterActionReq);
 MSG_REG_2(GameMsgHdr, 0x26, OnRecruitListReq);
+MSG_REG_2(GameMsgHdr, 0x39, OnTripodReq);
 MSG_REG_2(GameMsgHdr, 0x8B, OnFlushTaskColorReq);
 MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);

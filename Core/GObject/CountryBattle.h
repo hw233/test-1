@@ -34,7 +34,7 @@ struct CBStatusData
 	UInt8 score;
 	Player * playerOther;
 	UInt8 streakOther;
-	inline void setSideLevel(UInt8 side, UInt8 lvl) { lvlside = (side << 4) + lvl; }
+	inline void setSideLevel(UInt8 side, UInt8 lvl) { lvlside = (side << 6) + lvl; }
 };
 
 typedef std::vector<CBStatusData> CBStatusDataList;

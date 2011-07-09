@@ -48,6 +48,7 @@ namespace GData
 	std::vector<UInt32>		GDataManager::m_YaMenTask[COUNTRY_MAX];
     std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
     std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
+    std::vector<UInt32>		GDataManager::m_TripodAward[7];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -112,6 +113,11 @@ namespace GData
 			return false;
 		}
 		if (!LoadFlushTaskFactor())
+		{
+			fprintf(stderr, "Load flush task factor Error !\n");
+			return false;
+		}
+		if (!LoadTripodAward())
 		{
 			fprintf(stderr, "Load flush task factor Error !\n");
 			return false;
@@ -714,6 +720,30 @@ namespace GData
         return true;
     }
 
+	bool GDataManager::LoadTripodAward()
+	{
+		lua_State * L = lua_open();
+		luaopen_base(L);
+		luaopen_string(L);
+		luaopen_table(L);
+		{
+			std::string path = cfg.scriptPath + "items/TripodLoot.lua";
+			lua_tinker::dofile(L, path.c_str());
+
+            {
+                for (int i = 0; i < 7; ++i) {
+                    lua_tinker::table award = lua_tinker::call<lua_tinker::table>(L, "GetTripodAward", i+1);
+                    UInt32 size = award.size();
+                    for (UInt32 n = 0; n < size; ++n)
+                    {
+                        m_TripodAward[i].push_back(award.get<UInt8>(n+1));
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
 	bool GDataManager::LoadFlushTaskFactor()
 	{
 		lua_State * L = lua_open();
@@ -1228,5 +1258,10 @@ namespace GData
     UInt32 GDataManager::GetTaskAwardFactor(int ttype, int color)
     {
         return m_TaskAwardFactor[ttype][color];
+    }
+
+    UInt32 GDataManager::GetTripodAward(int first, int quality)
+    {
+        return m_TripodAward[first][quality];
     }
 }

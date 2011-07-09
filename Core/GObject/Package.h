@@ -144,7 +144,7 @@ namespace GObject
 		bool TryAddItem(ItemBase * item, UInt16 num);
 		bool TryDelItem(ItemBase * item, UInt16 num);
 
-	protected:
+	public:
 		inline ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
 			item_elem_iter iter = m_Items.find(ItemKey(id, bind));

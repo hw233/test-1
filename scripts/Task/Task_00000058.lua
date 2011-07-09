@@ -19,6 +19,11 @@ function Task_Accept_00000058()
 			return false;
 		end
 	end
+	if state == 2 then
+		if not task:HasSubmitedTask(57) then
+			return false;
+		end
+	end
 	return true;
 end
 
@@ -42,6 +47,11 @@ function Task_Can_Accept_00000058()
 		end
 	end
 	if state == 1 then
+		if not task:HasSubmitedTask(57) then
+			return false;
+		end
+	end
+	if state == 2 then
 		if not task:HasSubmitedTask(57) then
 			return false;
 		end

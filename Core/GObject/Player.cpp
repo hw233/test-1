@@ -29,6 +29,7 @@
 #include "Common/Itoa.h"
 #include "ClanDynamicMsg.h"
 #include "PracticePlace.h"
+#include "Tripod.h"
 #include <mysql.h>
 
 #include <cmath>
@@ -283,6 +284,38 @@ namespace GObject
                     data->checktime, m_Player->getId());
         }
         return;
+    }
+
+	bool EventPlayerTripod::Equal(UInt32 id, size_t playerid) const
+	{
+		return 	id == GetID() && playerid == m_Player->getId();
+	}
+
+	bool EventPlayerTripod::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
+	void EventPlayerTripod::Process(UInt32 leftCount)
+    {
+        TripodData& data = tripod.getTripodData(m_Player->getId());
+        if (data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
+            PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
+            return;
+        }
+
+        data.soul += POINT_PERMIN;
+        if (data.soul > MAX_TRIPOD_SOUL)
+            data.soul = MAX_TRIPOD_SOUL;
+
+        DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
     }
 
 	void Lineup::updateId()
