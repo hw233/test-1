@@ -1846,7 +1846,7 @@ namespace GObject
         // °ï»á³ÉÔ±
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `enterCount`, `achieveCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -1875,22 +1875,18 @@ namespace GObject
 			if (pl->getId() == clan->getLeaderId())
 			{
 				hasLeader = true;
-				cm->cls = 4;
 			}
-			else
-				cm->cls = Clan::buildRank(rank);
 			cm->joinTime = cp.joinTime;
-			cm->proffer = cp.proffer;
+            cm->proffer = cp.proffer;
+			cm->cls = cp.cls;
 			if (thisDay != cp.thisDay)
 			{
-				DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `achieveCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
+				DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
 				cm->enterCount = 0;
-				cm->achieveCount = 0;
 			}
 			else
 			{
 				cm->enterCount = cp.enterCount;
-				cm->achieveCount = cp.achieveCount;
 			}
 			for(UInt32 i = 0; i < 4; i ++)
 			{

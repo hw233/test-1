@@ -209,7 +209,7 @@ void OnClanMailClick(GameMsgHdr& hdr, const void * data)
 		}
 		else
 		{
-			player->getClan()->decline(p->getId());
+			player->getClan()->decline(player, p->getId());
 			Stream st(0x94);
 			st << static_cast<UInt8>(3) << static_cast<UInt8>(1) << p->getId() << Stream::eos;
 			player->send(st);

@@ -331,9 +331,9 @@ struct DBClanPlayer
 	UInt32 id;
 	UInt64 playerId;
 	UInt32 joinTime;
-	UInt32 proffer;
+    UInt32 proffer;
+	UInt8  cls;
 	UInt8  enterCount;
-	UInt16 achieveCount;
 	UInt32 thisDay;
 	UInt16 petFriendness[4];
 	UInt16 favorCount[4];
@@ -995,9 +995,9 @@ SPECIALDEF(19)
 	UInt32, id,
 	UInt64, playerId,
 	UInt32, joinTime,
-	UInt32, proffer,
+    UInt32, proffer,
+	UInt8,  cls,
 	UInt8,  enterCount,
-	UInt16, achieveCount,
 	UInt32, thisDay,
 	UInt16, petFriendness[0],
 	UInt16, petFriendness[1],

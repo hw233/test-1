@@ -376,6 +376,7 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
 	UInt8 op;
 	brd >> op;
 	UInt64 inviteeId = 0;
+    UInt8  cls = 0;
 	std::string inviteeName;
 	bool r = false;
 	GObject::Clan * clan = player->getClan();
@@ -397,7 +398,7 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
 			break;
 		case 3:
 			brd >> inviteeId;
-			r = clan->decline(inviteeId);
+			r = clan->decline(player, inviteeId);
 			break;
 		case 4:
 			r = clan->leave(player);
@@ -406,6 +407,10 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
 			brd >> inviteeId;
 			r = clan->handoverLeader(player, inviteeId);
 			break;
+        case 6:
+            brd >> inviteeId >> cls;
+            r = clan->setClanRank(player, inviteeId, cls);
+            break;
 		}
 	}
 	Stream st(0x94);
@@ -454,13 +459,13 @@ void OnClanQueryReq( GameMsgHdr& hdr, ClanQueryReq& cqr )
 	if(clan == NULL /*TODO: ¼ì²éÈËÊýÊÇ·ñ´ïµ½ÉÏÏÞ*/)
 	{
 		Stream st(0x96);
-		st << static_cast<UInt32>(0) << "" << Stream::eos;
+		st << static_cast<UInt32>(0) << "" << "" << Stream::eos;
 		player->send(st);
 		return;
 	}
 
 	Stream st(0x96);
-	st << clan->getId() << clan->getPurpose() << Stream::eos;
+	st << clan->getId() << clan->getContact() << clan->getPurpose() << Stream::eos;
 	player->send(st);
 }
 
