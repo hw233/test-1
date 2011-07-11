@@ -133,6 +133,14 @@ LOCK TABLES `acupra` WRITE;
 source acupra
 UNLOCK TABLES;
 
+LOCK TABLES `clan_skill_template` WRITE;
+source clanskill
+UNLOCK TABLES;
+
+LOCK TABLES `clan_tech_template` WRITE;
+source clantech
+UNLOCK TABLES;
+
 -- ASSS
 use asss;
 LOCK TABLES `practice_place` WRITE;
