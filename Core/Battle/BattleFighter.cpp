@@ -250,6 +250,7 @@ void BattleFighter::updateAllAttr()
 	_maxAction = _formula->calcAction(this);
 	UInt32 oldhp = _maxhp;
 	_maxhp = _formula->calcHP(this);
+    _criticaldmg = _formula->calcCriticalDmg(this);
 
     _aura = _formula->calcAura(this);
     _auraMax = _formula->calcAuraMax(this);
