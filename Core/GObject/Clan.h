@@ -47,17 +47,15 @@ struct ClanMember
 {
 	ClanMember(Player * pl = NULL, UInt8 c = 0, UInt32 jt = 0) : player(pl), cls(c), joinTime(jt)
 	{
-		proffer = 0;
 		enterCount = 0;
-		achieveCount = 0;
+		proffer = 0;
 	}
 	std::multimap<UInt32, AllocItem> allocItems;
 	Player * player;
 	UInt8  cls;
 	UInt32 joinTime;
-	UInt32 proffer;
+    UInt32 proffer;
 	UInt8  enterCount;
-	UInt16 achieveCount;
     std::map<UInt8, ClanSkill> clanSkill;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
@@ -97,6 +95,12 @@ class Clan:
 	{
 		bool operator()(const ClanMember * mem1, const ClanMember * mem2) const
 		{
+            if(mem1->cls == mem2->cls)
+				return mem1->joinTime < mem2->joinTime;
+            else
+                return mem1->cls > mem2->cls;
+
+#if 0
 			if (mem1->cls == 4)
 				return true;
 			else if (mem2->cls == 4)
@@ -104,6 +108,7 @@ class Clan:
 			else if(mem1->proffer == mem2->proffer)
 				return mem1->joinTime < mem2->joinTime;
 			return mem1->proffer > mem2->proffer;
+#endif
 		}
 	};
 	typedef std::multiset<ClanMember *, MemberLess> Members;
@@ -141,11 +146,11 @@ public:
     void setConstruction(UInt64 cons, bool = true);
     void addConstruction(UInt64 cons, bool = true);
 	bool alterLeader();
-	UInt16 getDonateAchievement(Player *);
+	UInt32 getDonateAchievement(Player *);
 	void setFounder(UInt64);
 	UInt8 getCountry();
 	bool accept(Player *, UInt64);
-	bool decline(UInt64);
+	bool decline(Player*, UInt64);
 	bool join(Player *, UInt8 = 0, UInt16 = 0, UInt32 = 0, UInt32 = 0, UInt32 = 0, UInt32 = 0);
 	bool join(ClanMember *);	//Only called by db
 	bool kick(Player *, UInt64);
@@ -187,6 +192,11 @@ public:
 	bool hasClanAuthority(Player *, UInt8);
     float getClanTechAddon();
     UInt8 getPracticeSlot();
+
+    // ∞Ô≈…÷∞Œª
+    bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);
+    UInt8 getClanRank(Player* pl);
+    UInt8 getClanRankCount(UInt8 cls);
 
 
 public:

@@ -87,6 +87,7 @@ enum ItemFrom
 	FromClanBattleAward,
 	FromNpcBuy,
 	FromSplit,
+    FromTripod,
 };
 
 enum ItemTo

@@ -31,7 +31,7 @@ UInt8 ClanAuthority[5][7] =
 {
 	{ 0, 1, 0, 0, 0, 0, 0 },
 	{ 0, 1, 0, 0, 0, 0, 0 },
-	{ 0, 1, 0, 0, 0, 0, 0 },
+	{ 1, 1, 0, 0, 0, 0, 0 },
 	{ 1, 1, 1, 0, 0, 0, 0 },
 	{ 1, 1, 1, 1, 1, 1, 1 }
 };
@@ -112,8 +112,14 @@ bool Clan::accept(Player * player, UInt64 pid )
 	return true;
 }
 
-bool Clan::decline( UInt64 pid )
+bool Clan::decline( Player* player, UInt64 pid )
 {
+    if (!hasClanAuthority(player, 0))
+	{
+		player->sendMsgCode(2, 2043);
+		return false;
+	}
+
 	using namespace std::placeholders;
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member_id, _1, pid));
 	if(it == _pending.end())
@@ -159,10 +165,10 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	broadcastMemberInfo(*cmem, 0);
 	std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 	_members.insert(cmem);
-	updateRank(NULL, oldLeaderName);
+	// updateRank(NULL, oldLeaderName);
 	player->setClan(this);
 	player->notifyFriendAct(5, _name.c_str());
-	DB().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->proffer);
+	DB().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
 	if(player->isOnline())
 	{
 		sendInfo(player);
@@ -260,7 +266,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 	if (battleClan != NULL)
 		battleClan->kickClanBattler(kicker);
 
-	updateRank();
+	// updateRank();
 	DB().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", pid);
 
 	SYSMSGV(title, 229, _name.c_str());
@@ -292,7 +298,14 @@ bool Clan::leave(Player * player)
 		return false;
 	}
     getAllocBack(*member);
-	std::string oldLeaderName = (*_members.begin())->player->getName();
+	// std::string oldLeaderName = (*_members.begin())->player->getName();
+    if( player == getOwner())
+    {
+        // XXX 帮主不能退出帮派
+		player->sendMsgCode(0, 2235);
+        return false;
+    }
+
 	_members.erase(found);
 	delete member;
 	player->setClan(NULL);
@@ -332,7 +345,7 @@ bool Clan::leave(Player * player)
 	else
 	{
 		DB().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", player->getId());
-		updateRank(NULL, oldLeaderName);
+		// updateRank(NULL, oldLeaderName);
 	}
 	
 	return true;
@@ -353,7 +366,7 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 	ClanMember * cmPlayer = *found;
 	_members.erase(cmLeaderIter);
 	_members.erase(found);
-	cmLeader->cls = 3;
+	cmLeader->cls = 0;
 	cmPlayer->cls = 4;
 	_members.insert(cmLeader);
 	_members.insert(cmPlayer);
@@ -369,8 +382,21 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 		broadcast(st);
 	}
 
+    {
+		Stream st(0x98);
+		st << static_cast<UInt8>(6) << cmLeader->player->getId() << cmLeader->cls;
+		st << Stream::eos;
+		broadcast(st);
+    }
+    {
+		Stream st(0x98);
+		st << static_cast<UInt8>(6) << cmPlayer->player->getId() << cmPlayer->cls;
+		st << Stream::eos;
+		broadcast(st);
+    }
+
 	DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", pid, _id);
-	updateRank(cmLeader, cmLeader->player->getName());
+	// updateRank(cmLeader, cmLeader->player->getName());
 
 	return true;
 }
@@ -649,12 +675,14 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			return false;
 		}
 		if (techId != 1) return false;
+#if 0
 		realCount = count + mem->achieveCount;
 		if (realCount > 200 + 10 * player->GetLev())
 		{
 			player->sendMsgCode(0, 2208);
 			return false;
 		}
+#endif
 	}
 	else if(type == 2)
 	{
@@ -719,10 +747,13 @@ bool Clan::GMDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		if (type == 1)
 		{
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
-			_members.erase(found);
 			mem->proffer += count;
-			_members.insert(mem);
-			updateRank(mem, oldLeaderName);
+            {
+                Stream st(0x98);
+                st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
+                player->send(st);
+            }
+			// updateRank(mem, oldLeaderName);
 			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());	
 		}
 		//else if (type == 2)
@@ -766,18 +797,23 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		if (type == 1)
 		{
 			thisDay = TimeUtil::SharpDay(0, now);
+#if 0
 			mem->achieveCount = items.count + mem->achieveCount;
 			{
 				Stream st(0x98);
 				st << static_cast<UInt8>(5) << mem->achieveCount << Stream::eos;
 				player->send(st);
 			}
+#endif
 			
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
-			_members.erase(found);
-			mem->proffer += count;
-			_members.insert(mem);
-			updateRank(mem, oldLeaderName);
+            mem->proffer += count;
+			{
+				Stream st(0x98);
+				st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
+				player->send(st);
+			}
+			// updateRank(mem, oldLeaderName);
 			{
 				Stream st;
 				SYSMSGVP(st, 429, mem->player->getName().c_str(), count);
@@ -785,16 +821,19 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			}
 			setProffer(getProffer()+count);
 			addClanDonateRecord(player->getName(), techId, count, now);
-			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u, `achieveCount` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, mem->achieveCount, player->getId());
+			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());
 			player->GetTaskMgr()->DoAcceptedTask(62207);
 		}
 		else if (type == 2)
 		{
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
-			_members.erase(found);
 			mem->proffer += count;
-			_members.insert(mem);
-			updateRank(mem, oldLeaderName);
+            {
+                Stream st(0x98);
+                st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
+                player->send(st);
+            }
+			// updateRank(mem, oldLeaderName);
 			Stream st;
 			SYSMSGVP(st, 430, mem->player->getName().c_str(), count);
 			broadcast(st);
@@ -1457,13 +1496,18 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             break;
         }
 
-        if(cm->achieveCount < single[level].needs)
+        if(cm->proffer < single[level].needs)
         {
             res = 1;
             break;
         }
 
-        cm->achieveCount -= single[level].needs;
+        cm->proffer -= single[level].needs;
+        {
+            Stream st(0x98);
+            st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
+            pl->send(st);
+        }
         cs.level++;
     } while(false);
 
@@ -1778,6 +1822,7 @@ void Clan::fixLeaderId()
 	cm->cls = 4;
 	_members.insert(cm);
 	setLeaderId(cm->player->getId());
+#if 0
 	Members::iterator it = _members.begin();
 	++ it;
 	const UInt8 Ranks[] = { 3, 3, 2, 2, 2, 1, 1, 1, 1, 0 };
@@ -1786,7 +1831,8 @@ void Clan::fixLeaderId()
 		ClanMember * mem = *it;
 		if (Ranks[offset] != mem->cls)
 			mem->cls = Ranks[offset];
-	}	
+	}
+#endif
 }
 
 bool Clan::alterLeader()
@@ -1807,7 +1853,7 @@ bool Clan::alterLeader()
 		return false;
 	}
 	_members.erase(_members.begin());
-	leader->cls = 3;
+	leader->cls = 0;
 	secondLeader->cls = 4;
 	_members.insert(leader);
 	_members.insert(secondLeader);
@@ -1817,17 +1863,17 @@ bool Clan::alterLeader()
 		broadcast(st);
 	}
 	DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", secondLeader->player->getId(), _id);
-	updateRank(leader, leader->player->getName());
+	// updateRank(leader, leader->player->getName());
 	return true;
 }
 
-UInt16 Clan::getDonateAchievement(Player * player)
+UInt32 Clan::getDonateAchievement(Player * player)
 {
 	Members::iterator offset = _members.begin();
 	for (; offset != _members.end(); ++ offset)
 	{
 		if ((*offset)->player == player)
-			return (*offset)->achieveCount;
+			return (*offset)->proffer;
 	}
 
 	return 0;
@@ -2508,6 +2554,83 @@ void Clan::useClanFunds(UInt32 funds)
         _funds -= funds;
 		DB().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
     }
+}
+
+bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
+{
+    Player* clan_pl = globalPlayers[inviteeId];
+    if(!clan_pl)
+        return false;
+
+    ClanMember * mem1 = getClanMember(pl);
+    ClanMember * mem2 = getClanMember(clan_pl);
+    if(!mem1 || !mem2)
+        return false;
+
+    if(mem1->cls == 0 || mem1->cls - 1 < mem2->cls)
+        return false;
+
+    switch(cls)
+    {
+    case 3:
+        if(getClanRankCount(cls) == 2)
+            return false;
+        break;
+    case 2:
+        if(getClanRankCount(cls) == 3)
+            return false;
+        break;
+    case 1:
+        if(getClanRankCount(cls) == 4)
+            return false;
+        break;
+    }
+
+    if(mem2->cls != cls)
+    {
+        mem2->cls = cls;
+        _members.erase(mem2);
+        _members.insert(mem2);
+
+		Stream st(0x98);
+		st << static_cast<UInt8>(6) << mem2->player->getId() << cls;
+		st << Stream::eos;
+		broadcast(st);
+    }
+
+    return true;
+}
+
+UInt8 Clan::getClanRank(Player* pl)
+{
+    ClanMember * mem = getClanMember(pl);
+    if(mem != NULL)
+    {
+        return mem->cls;
+    }
+
+    return 0;
+}
+
+UInt8 Clan::getClanRankCount(UInt8 cls)
+{
+    UInt8 clsCount = 0;
+	Members::iterator found = _members.begin();
+	for (; found != _members.end(); ++found)
+    {
+		if ((*found)->cls == cls)
+            break;
+    }
+
+	for (; found != _members.end(); ++found)
+	{
+		if ((*found)->cls == cls)
+            clsCount ++;
+        else
+            break;
+	}
+
+    return clsCount;
 }
 
 }

@@ -130,7 +130,7 @@ CREATE TABLE `clan_lvl` (
   PRIMARY KEY (`lvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
-DROP TABLE IF EXISTS `clan_tech_template`;
+DROP TABLE IF EXISTS `clan_skill_template`;
 CREATE TABLE `clan_skill_template` (
   `id` smallint(6) NOT NULL,
   `name` varchar(255) NOT NULL,

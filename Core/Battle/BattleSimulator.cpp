@@ -588,6 +588,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             defList++;
 
             doSkillState(bf, skill, area_target, defList, defCount, atkAct);
+            defList[defCount].damType = e_UnPoison;
             defList[defCount].damage *= 2;
             defList[defCount].pos = pos;
             defList++;

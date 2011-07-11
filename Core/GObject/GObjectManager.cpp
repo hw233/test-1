@@ -190,7 +190,7 @@ namespace GObject
 		execu->Execute2("UPDATE `clan` SET `grabAchieve` = 0 WHERE `battleThisDay` <> %u", thisDay);
 		execu->Execute2("UPDATE `clan` AS `update_clan` SET `battleStatus` = IF(%u < `battleThisDay` + `battleTime` * 1800, 0, IF(%u < `battleThisDay`+ `battleTime` * 1800 + 3600, 1, 2)) WHERE `battleThisDay` = %u AND `update_clan`.`id` = `id` AND (`battleStatus` = 0 OR `battleStatus` = 1)", now, now, thisDay);
 		execu->Execute2("UPDATE `clan` AS `update_clan` SET `battleThisDay` = %u, `battleTime` = `update_clan`.`nextBattleTime`, `battleStatus` = IF(%u < %u + `nextBattleTime` * 1800, 0, IF(%u < %u + `nextBattleTime` * 1800 + 3600, 1, 2)) WHERE `battleThisDay` <> %u AND `update_clan`.`id` = `id` AND `battleStatus` <> 256", thisDay, now, thisDay, now, thisDay, thisDay);
-		execu->Execute2("UPDATE `clan_player` AS `update_clan_player` SET `enterCount` = 0, `achieveCount` = 0 WHERE `playerId` = `update_clan_player`.`playerId` AND `thisDay` <> %u", thisDay);
+		execu->Execute2("UPDATE `clan_player` AS `update_clan_player` SET `enterCount` = 0 WHERE `playerId` = `update_clan_player`.`playerId` AND `thisDay` <> %u", thisDay);
 		
 		return true;
 	}
@@ -1847,7 +1847,7 @@ namespace GObject
         // 帮会成员
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `enterCount`, `achieveCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -1876,22 +1876,18 @@ namespace GObject
 			if (pl->getId() == clan->getLeaderId())
 			{
 				hasLeader = true;
-				cm->cls = 4;
 			}
-			else
-				cm->cls = Clan::buildRank(rank);
 			cm->joinTime = cp.joinTime;
-			cm->proffer = cp.proffer;
+            cm->proffer = cp.proffer;
+			cm->cls = cp.cls;
 			if (thisDay != cp.thisDay)
 			{
-				DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `achieveCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
+				DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
 				cm->enterCount = 0;
-				cm->achieveCount = 0;
 			}
 			else
 			{
 				cm->enterCount = cp.enterCount;
-				cm->achieveCount = cp.achieveCount;
 			}
 			for(UInt32 i = 0; i < 4; i ++)
 			{
@@ -1935,7 +1931,7 @@ namespace GObject
         // 帮派技能
         lc.prepare("Loading clan skill:");
         DBClanSkill cs;
-		if(execu->Prepare("SELECT `clanId`, `playerId`, `skillId`, `level`, FROM `clan_skill` ORDER BY `clanId`, `skillId`, `playerId`", cs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `clanId`, `playerId`, `skillId`, `level` FROM `clan_skill` ORDER BY `clanId`, `skillId`, `playerId`", cs) != DB::DB_OK)
 			return false;
 		lastId = 0xFFFFFFFF;
 		clan = NULL;
@@ -2548,6 +2544,7 @@ namespace GObject
             td.awdst = t.awdst;
             tripod.addTripodData(t.id, td);
         }
+		lc.finalize();
         return true;
     }
 
@@ -2588,14 +2585,15 @@ namespace GObject
             if (ppd->checktime)
             {
                 pl->setPracticingPlaceSlot(pd.place << 16 | pd.slot);
-                practicePlace.addPractice(pl, ppd);
+                practicePlace.addPractice(pl, ppd, pd.place);
             }
             else
             {
                 pl->setPracticingPlaceSlot(7 << 16);
-                practicePlace.addPractice(pl, ppd);
+                practicePlace.addPractice(pl, ppd, 7);
             }
         }
+		lc.finalize();
         return true;
     }
 
