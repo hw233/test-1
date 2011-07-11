@@ -308,6 +308,8 @@ namespace GObject
         TripodData& data = tripod.getTripodData(m_Player->getId());
         if (data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
             PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
+            data.awdst = 1;
+            DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %"I64_FMT"u", data.awdst, m_Player->getId());
             return;
         }
 

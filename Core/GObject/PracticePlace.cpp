@@ -89,6 +89,7 @@ namespace GObject
 
         UInt32 price = 0;
         ConsumeInfo ci(Practice,0,0);
+#if 0
         if (place == PPLACE_MAX || !data.slotmoney)
         {
             if (priceType == 0)
@@ -120,22 +121,26 @@ namespace GObject
                     return false;
                 }
                 pl->useTael(price, &ci);
-                if(!clan)
+                if(clan)
                     clan->addClanFunds(price);
             }
         }
         else
+#endif
+        if (place != PPLACE_MAX)
         {
             price = time * data.slotmoney;
-            if (pl->getTael() < price)
-            {
-                pl->sendMsgCode(0, 2007);
-                st << static_cast<UInt8>(1) << Stream::eos;
-                return false;
+            if (price) {
+                if (pl->getTael() < price)
+                {
+                    pl->sendMsgCode(0, 2007);
+                    st << static_cast<UInt8>(1) << Stream::eos;
+                    return false;
+                }
+                pl->useTael(price, &ci);
+                if(clan)
+                    clan->addClanFunds(price);
             }
-            pl->useTael(price, &ci);
-            if(!clan)
-                clan->addClanFunds(price);
         }
 
         PracticeData* pp = new (std::nothrow) PracticeData(pl->getId());
