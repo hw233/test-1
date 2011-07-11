@@ -1,8 +1,5 @@
 --任务的接受条件
 function Task_Accept_00000029()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
 	if player:GetLev() < 24 then
 		return false;
@@ -11,8 +8,21 @@ function Task_Accept_00000029()
 	if task:HasAcceptedTask(29) or task:HasCompletedTask(29) or task:HasSubmitedTask(29) then
 		return false;
 	end
-	if not task:HasSubmitedTask(28) then
-		return false;
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(28) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(28) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(28) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -24,17 +34,27 @@ end
 function Task_Can_Accept_00000029()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	if player:GetLev() < 24 then
 		return false;
 	end
 	if task:HasAcceptedTask(29) or task:HasCompletedTask(29) or task:HasSubmitedTask(29) then
 		return false;
 	end
-	if not task:HasSubmitedTask(28) then
-		return false;
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(28) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(28) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(28) then
+			return false;
+		end
 	end
 	return true;
 end

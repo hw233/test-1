@@ -258,6 +258,7 @@ namespace GObject
         //data->lock.unlock();
 
         st << static_cast<UInt8>(0) << Stream::eos;
+        //pl->send(st);
         return true;
     }
 

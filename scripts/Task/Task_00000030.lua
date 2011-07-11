@@ -14,6 +14,16 @@ function Task_Accept_00000030()
 			return false;
 		end
 	end
+	if state == 1 then
+		if not task:HasSubmitedTask(29) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(29) then
+			return false;
+		end
+	end
 	return true;
 end
 
@@ -32,6 +42,16 @@ function Task_Can_Accept_00000030()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
+		if not task:HasSubmitedTask(29) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(29) then
+			return false;
+		end
+	end
+	if state == 2 then
 		if not task:HasSubmitedTask(29) then
 			return false;
 		end

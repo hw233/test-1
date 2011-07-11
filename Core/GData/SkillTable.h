@@ -31,7 +31,7 @@ enum
 struct SkillEffect : public ObjectBaseNT<UInt16>
 {
     SkillEffect(UInt16 id)
-        : ObjectBaseNT<UInt16>(id), state(0), immune(0), 
+        : ObjectBaseNT<UInt16>(id), state(0), immune(0), disperse(0),
         damage(0), damageP(0), adddam(0), magdam(0), magdamP(0), addmag(0),
         hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),inj2hp(0), inj2hpP(0),
         aura(0), auraP(0), atk(0), atkP(0), def(0), defP(0), magatk(0),
@@ -41,6 +41,7 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
 
     UInt8 state;
     UInt8 immune;
+    UInt8 disperse;
     Int16 damage;
     float damageP;
     float adddam;
