@@ -1,6 +1,6 @@
 #!/bin/bash
 
 H=localhost
-U=kingxin
-P=kingxin
+U=asss
+P=asss
 
