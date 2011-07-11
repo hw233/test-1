@@ -627,9 +627,11 @@ void CountryBattle::padPlayerData( Stream& st, UInt8 lvl )
 	padPlayerData(st, curtime, 0, 1, !ishigh);
 	padPlayerData(st, curtime, 1, 1, ishigh);
 #endif
+    st << static_cast<UInt8>(3);
 	padPlayerData(st, curtime, 0, 0, true);
 	padPlayerData(st, curtime, 1, 0, true);
 	padPlayerData(st, curtime, 2, 0, true);
+    st << static_cast<UInt8>(3);
 	padPlayerData(st, curtime, 0, 1, true);
 	padPlayerData(st, curtime, 1, 1, true);
 	padPlayerData(st, curtime, 2, 1, true);
@@ -639,7 +641,7 @@ void CountryBattle::padPlayerData( Stream& st, UInt32 curtime, UInt8 lvl, UInt8 
 {
 	std::vector<CountryBattleData *>& blist = _players[lvl][side];
 	std::vector<CountryBattleData *>::iterator it;
-    st << static_cast<UInt8>(3) << lvl;
+    st << lvl;
 	UInt16 size = static_cast<UInt16>(blist.size());
 	if(fulllist)
 	{
