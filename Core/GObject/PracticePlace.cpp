@@ -164,9 +164,8 @@ namespace GObject
         DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, price, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
-        addPractice(pl, pp); // XXX: must be here after setPracticingPlaceSlot
+        addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
 
-        ++m_places[place-1].used;
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << Stream::eos;
         return true;
     }
@@ -641,7 +640,7 @@ namespace GObject
         return true;
     }
 
-    bool PracticePlace::addPractice(Player* pl, PracticeData* pd)
+    bool PracticePlace::addPractice(Player* pl, PracticeData* pd, UInt8 place)
     {
         if (!pl || !pd)
             return false;
@@ -654,6 +653,7 @@ namespace GObject
             EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);
+            ++m_places[place-1].used;
         }
         return true;
     }

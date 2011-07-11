@@ -116,7 +116,7 @@ public:
     // 增加一个修炼点
     bool addPlace(PPlace& place, UInt8 idx);
     // 增加一个人
-    bool addPractice(Player* pl, PracticeData* data);
+    bool addPractice(Player* pl, PracticeData* data, UInt8 place);
     // 取得修炼数据
     PracticeData* getPracticeData(UInt64 playerid);
     PracticeData* getPracticeData(Player* pl);
