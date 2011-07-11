@@ -2585,12 +2585,12 @@ namespace GObject
             if (ppd->checktime)
             {
                 pl->setPracticingPlaceSlot(pd.place << 16 | pd.slot);
-                practicePlace.addPractice(pl, ppd);
+                practicePlace.addPractice(pl, ppd, pd.place);
             }
             else
             {
                 pl->setPracticingPlaceSlot(7 << 16);
-                practicePlace.addPractice(pl, ppd);
+                practicePlace.addPractice(pl, ppd, 7);
             }
         }
 		lc.finalize();

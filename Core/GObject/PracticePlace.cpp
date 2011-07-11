@@ -89,6 +89,7 @@ namespace GObject
 
         UInt32 price = 0;
         ConsumeInfo ci(Practice,0,0);
+#if 0
         if (place == PPLACE_MAX || !data.slotmoney)
         {
             if (priceType == 0)
@@ -120,22 +121,26 @@ namespace GObject
                     return false;
                 }
                 pl->useTael(price, &ci);
-                if(!clan)
+                if(clan)
                     clan->addClanFunds(price);
             }
         }
         else
+#endif
+        if (place != PPLACE_MAX)
         {
             price = time * data.slotmoney;
-            if (pl->getTael() < price)
-            {
-                pl->sendMsgCode(0, 2007);
-                st << static_cast<UInt8>(1) << Stream::eos;
-                return false;
+            if (price) {
+                if (pl->getTael() < price)
+                {
+                    pl->sendMsgCode(0, 2007);
+                    st << static_cast<UInt8>(1) << Stream::eos;
+                    return false;
+                }
+                pl->useTael(price, &ci);
+                if(clan)
+                    clan->addClanFunds(price);
             }
-            pl->useTael(price, &ci);
-            if(!clan)
-                clan->addClanFunds(price);
         }
 
         PracticeData* pp = new (std::nothrow) PracticeData(pl->getId());
@@ -159,9 +164,8 @@ namespace GObject
         DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, price, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
-        addPractice(pl, pp); // XXX: must be here after setPracticingPlaceSlot
+        addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
 
-        ++m_places[place-1].used;
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << Stream::eos;
         return true;
     }
@@ -636,7 +640,7 @@ namespace GObject
         return true;
     }
 
-    bool PracticePlace::addPractice(Player* pl, PracticeData* pd)
+    bool PracticePlace::addPractice(Player* pl, PracticeData* pd, UInt8 place)
     {
         if (!pl || !pd)
             return false;
@@ -649,6 +653,7 @@ namespace GObject
             EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);
+            ++m_places[place-1].used;
         }
         return true;
     }

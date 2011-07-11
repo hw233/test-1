@@ -27,15 +27,8 @@ void Tripod::getTripodInfo(Player* pl)
     pl->send(st);
 }
 
-void Tripod::genAward(const TripodData& td, Stream& st)
+bool Tripod::genAward(const TripodData& td, UInt32& id, UInt8& num)
 {
-    if (td.awdst != 1)
-    {
-        st << static_cast<UInt8>(0);
-        st << static_cast<UInt32>(0);
-        return;
-    }
-
     UInt32 loot = GData::GDataManager::GetTripodAward(td.fire, td.quality);
     const GData::LootItem* li = GData::lootTable[loot];
     if (li)
@@ -43,11 +36,27 @@ void Tripod::genAward(const TripodData& td, Stream& st)
         GData::LootResult lr = li->roll();
         if (lr.id)
         {
-            st << static_cast<UInt8>(lr.count);
-            st << static_cast<UInt32>(lr.id);
-            return;
+            id = lr.id;
+            num = lr.count;
+            return true;
         }
     }
+    return false;
+}
+
+void Tripod::genAward(const TripodData& td, Stream& st)
+{
+    UInt32 id;
+    UInt8 num;
+
+    if (genAward(td, id, num)) {
+        st << num;
+        st << id;
+    } else {
+        st << static_cast<UInt8>(0);
+        st << static_cast<UInt32>(0);
+    }
+
     return;
 }
 
@@ -180,9 +189,16 @@ void Tripod::getAward(Player* pl)
     if (td.awdst != 1)
         return;
 
+    UInt32 id;
+    UInt8 num;
+
+    if (!genAward(td, id, num))
+        return;
+    pl->GetPackage()->AddItem(id, num, true, false, FromTripod);
 
     td.awdst = 0;
-    DB().PushUpdateData("DELETE FROM `tripod` SET `awdst` = 0 WHERE `id` = %"I64_FMT"u)", pl->getId());
+    td.soul = 0;
+    DB().PushUpdateData("DELETE FROM `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u)", pl->getId());
 }
 
 TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)
