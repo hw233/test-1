@@ -190,7 +190,7 @@ namespace GObject
 		execu->Execute2("UPDATE `clan` SET `grabAchieve` = 0 WHERE `battleThisDay` <> %u", thisDay);
 		execu->Execute2("UPDATE `clan` AS `update_clan` SET `battleStatus` = IF(%u < `battleThisDay` + `battleTime` * 1800, 0, IF(%u < `battleThisDay`+ `battleTime` * 1800 + 3600, 1, 2)) WHERE `battleThisDay` = %u AND `update_clan`.`id` = `id` AND (`battleStatus` = 0 OR `battleStatus` = 1)", now, now, thisDay);
 		execu->Execute2("UPDATE `clan` AS `update_clan` SET `battleThisDay` = %u, `battleTime` = `update_clan`.`nextBattleTime`, `battleStatus` = IF(%u < %u + `nextBattleTime` * 1800, 0, IF(%u < %u + `nextBattleTime` * 1800 + 3600, 1, 2)) WHERE `battleThisDay` <> %u AND `update_clan`.`id` = `id` AND `battleStatus` <> 256", thisDay, now, thisDay, now, thisDay, thisDay);
-		execu->Execute2("UPDATE `clan_player` AS `update_clan_player` SET `enterCount` = 0, `achieveCount` = 0 WHERE `playerId` = `update_clan_player`.`playerId` AND `thisDay` <> %u", thisDay);
+		execu->Execute2("UPDATE `clan_player` AS `update_clan_player` SET `enterCount` = 0 WHERE `playerId` = `update_clan_player`.`playerId` AND `thisDay` <> %u", thisDay);
 		
 		return true;
 	}
@@ -1931,7 +1931,7 @@ namespace GObject
         // °ïÅÉ¼¼ÄÜ
         lc.prepare("Loading clan skill:");
         DBClanSkill cs;
-		if(execu->Prepare("SELECT `clanId`, `playerId`, `skillId`, `level`, FROM `clan_skill` ORDER BY `clanId`, `skillId`, `playerId`", cs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `clanId`, `playerId`, `skillId`, `level` FROM `clan_skill` ORDER BY `clanId`, `skillId`, `playerId`", cs) != DB::DB_OK)
 			return false;
 		lastId = 0xFFFFFFFF;
 		clan = NULL;
@@ -2544,6 +2544,7 @@ namespace GObject
             td.awdst = t.awdst;
             tripod.addTripodData(t.id, td);
         }
+		lc.finalize();
         return true;
     }
 
@@ -2592,6 +2593,7 @@ namespace GObject
                 practicePlace.addPractice(pl, ppd);
             }
         }
+		lc.finalize();
         return true;
     }
 

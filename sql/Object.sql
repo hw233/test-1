@@ -335,6 +335,22 @@ CREATE TABLE `clan_reward_record` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `clan_tech`
+--
+
+DROP TABLE IF EXISTS `clan_tech`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `clan_tech` (
+  `clanId` int(10) unsigned NOT NULL,
+  `techId` smallint(5) unsigned NOT NULL,
+  `level` smallint(5) unsigned NOT NULL,
+  `extra` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`clanId`,`techId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `clan_skill`
 --
 
@@ -343,10 +359,10 @@ DROP TABLE IF EXISTS `clan_skill`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `clan_skill` (
   `clanId` int(10) unsigned NOT NULL,
+  `playerId` bigint(20) unsigned NOT NULL,
   `skillId` smallint(5) unsigned NOT NULL,
   `level` smallint(5) unsigned NOT NULL,
-  `extra` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`clanId`,`skillId`)
+  PRIMARY KEY (`playerId`, `skillId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -579,6 +595,7 @@ CREATE TABLE `practice_place` (
   `ownerid` bigint(20) unsigned NOT NULL,
   `protid` bigint(20) unsigned NOT NULL,
   `maxslot` smallint(5) unsigned NOT NULL DEFAULT '30',
+  `openslot` smallint(5) unsigned NOT NULL DEFAULT '0',
   `protmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `slotmoney` smallint(5) unsigned NOT NULL DEFAULT '10',
   `open` tinyint(2) unsigned NOT NULL DEFAULT '1',

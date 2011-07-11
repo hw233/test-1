@@ -789,12 +789,13 @@ SPECIALDEF(33)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(9)
+SPECIALDEF(10)
 	(
         UInt8, id,
         UInt64, ownerid,
         UInt64, protid,
         UInt16, maxslot,
+        UInt16, openslot,
         UInt16, protmoney,
         UInt16, slotmoney,
         UInt8, open,
