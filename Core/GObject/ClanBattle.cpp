@@ -1910,7 +1910,6 @@ void ClanCityBattle::configClanBattleCheck()
 	//for backstage enter clancity count
 	for (; offset != _clan->_members.end(); ++ offset)
 	{
-		(*offset)->achieveCount = 0;
 		(*offset)->enterCount = 0;
 	}
 }
@@ -2557,6 +2556,11 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 				std::string oldLeaderName = (_clan->_members.empty() ? "" : (*_clan->_members.begin())->player->getName());
 				clan->_members.erase(found);
 				cm->proffer += cbp->grabAchieve;
+                {
+                    Stream st(0x98);
+                    st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
+                    cbp->player->send(st);
+                }
 				clan->_members.insert(cm);
 				clan->getClanBattle()->incGrabAcheive(cbp->grabAchieve);
 				clan->updateRank(cm, oldLeaderName);

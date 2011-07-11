@@ -331,9 +331,9 @@ struct DBClanPlayer
 	UInt32 id;
 	UInt64 playerId;
 	UInt32 joinTime;
-	UInt32 proffer;
+    UInt32 proffer;
+	UInt8  cls;
 	UInt8  enterCount;
-	UInt16 achieveCount;
 	UInt32 thisDay;
 	UInt16 petFriendness[4];
 	UInt16 favorCount[4];
@@ -789,12 +789,13 @@ SPECIALDEF(33)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(9)
+SPECIALDEF(10)
 	(
         UInt8, id,
         UInt64, ownerid,
         UInt64, protid,
         UInt16, maxslot,
+        UInt16, openslot,
         UInt16, protmoney,
         UInt16, slotmoney,
         UInt8, open,
@@ -1004,9 +1005,9 @@ SPECIALDEF(19)
 	UInt32, id,
 	UInt64, playerId,
 	UInt32, joinTime,
-	UInt32, proffer,
+    UInt32, proffer,
+	UInt8,  cls,
 	UInt8,  enterCount,
-	UInt16, achieveCount,
 	UInt32, thisDay,
 	UInt16, petFriendness[0],
 	UInt16, petFriendness[1],
