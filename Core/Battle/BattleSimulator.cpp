@@ -771,21 +771,6 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
     if(target_object!= NULL)
 	{
 		// find all targets that are hit
-		GData::Area * area = NULL;
-		GObject::ItemWeapon * weapon = bf->getFighter()->getWeapon();
-		if(weapon != NULL)
-		{
-            // TODO: no weapon_def
-			// area = &weapon->getWeaponDef().getArea();
-		}
-		else
-		{
-			area = &GData::Area::getDefault();
-		}
-		int cnt = area->getCount();
-		if(cnt <= 0)
-			return 0;
-
 		DefStatus defList[25];
 		size_t defCount = 0;
 		StatusChange scList[50];
@@ -796,55 +781,9 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
 		bool cs = false;
 		bool pr = false;
 
-		float factor = (*area)[0].factor;
-
 		UInt32 dmg = 0;
-		if(cnt > 1)
-		{
-			AttackPoint ap[25];
-			int apcnt = 0;
-			int x_ = target_pos % 5;
-			int y_ = target_pos / 5;
-			for(int i = 1; i < cnt; ++ i)
-			{
-				GData::Area::Data& ad = (*area)[i];
-				int x = x_ + ad.x;
-				int y = y_ + ad.y;
-				if(x < 0 || x > 4 || y < 0 || y > 4)
-				{
-					continue;
-				}
-				ap[apcnt].pos = x + y * 5;
-				ap[apcnt].type = ad.type;
-				ap[apcnt ++].factor = ad.factor;
-			}
-			// attack the target on center
-			dmg += attackOnce(bf, cs, pr, NULL, target_object, factor, defList, defCount, scList, scCount, apcnt, ap, atkAct);
-			for(int i = 0; i < apcnt; ++ i)
-			{
-				switch(ap[i].type)
-				{
-				case 0:
-					factor = ap[i].factor;
-					dmg += attackOnce(bf, cs, pr, NULL, _objs[otherside][ap[i].pos], factor, defList, defCount, scList, scCount);
-					break;
-				case 1:
-					factor = (*area)[0].factor;
-				case 2:
-					{
-						float newfactor = factor * ap[i].factor;
-						if(dmg += attackOnce(bf, cs, pr, NULL,  _objs[otherside][ap[i].pos], newfactor, defList, defCount, scList, scCount))
-							factor = newfactor;
-					}
-					break;
-				}
-			}
-		}
-		else
-		{
-			// attack only one target
-			dmg += attackOnce(bf, cs, pr, NULL, target_object, factor, defList, defCount, scList, scCount, 0, NULL, atkAct);
-		}
+        // attack only one target
+        dmg += attackOnce(bf, cs, pr, NULL, target_object, 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
 
         int self_side = bf->getSide() == otherside ? 25 : 0;
         appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, static_cast<UInt8>(0), static_cast<UInt16>(0), cs, pr, defList, defCount, scList, scCount);
