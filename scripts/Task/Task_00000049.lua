@@ -109,7 +109,7 @@ function Task_00000049_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "<name>，其实醉道人前辈怕你出意外，一直跟着你去了慈云寺，方才寺内的恶僧躁动也是前辈故意做的，方便少侠你去救人。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，其实醉道人前辈怕你出意外，一直跟着你去了慈云寺，方才寺内的恶僧躁动也是前辈故意做的，方便少侠你去救人。";
 	action.m_ActionMsg = "原来如此，我说怎么救人这么顺利。";
 	return action;
 end

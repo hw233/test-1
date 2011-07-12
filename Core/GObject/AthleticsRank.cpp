@@ -709,6 +709,8 @@ void AthleticsRank::TmExtraAward()
 				FavorId = OrangeFavor[rand];
 			}
 			const GData::ItemBaseType *item2 = Package::GetItemBaseType(FavorId);
+            if (!item2)
+                return;
 			mitem[2].id = 8999; mitem[2].count = 4 - rank;
 			mitem[3].id = FavorId; mitem[3].count = 4 - rank;
 			count = 4;

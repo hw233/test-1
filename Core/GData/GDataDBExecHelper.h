@@ -93,6 +93,7 @@ struct DBSkill
                         //           SKILL_PEERLESS - 无双技能,当灵气>=100释放
                         //           SKILL_PREATK   - 攻击前被动触发(回血技能,无概率)
                         //           SKILL_AFTATK   - 攻击后被动触发(有概率)
+                        //           SKILL_AFTNATK  - 普通攻击后被动触发(有概率)
                         //           SKILL_BEATKED  - 被攻击后触发(有概率)
                         //           SKILL_AFTEVD   - 闪避后触发
                         //           SKILL_AFTRES   - 抵抗后触发

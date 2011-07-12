@@ -109,7 +109,7 @@ function Task_00000020_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "虽然金鳞蜈蚣已殁，不过<name>你也见识到无双技能的厉害之处了吧，我这里有法宝一件，是我昔年行走江湖时的降妖之宝，不如就送给少侠。";
+	action.m_NpcMsg = "虽然金鳞蜈蚣已殁，不过"..GetPlayerName(GetPlayer()).."你也见识到无双技能的厉害之处了吧，我这里有法宝一件，是我昔年行走江湖时的降妖之宝，不如就送给少侠。";
 	action.m_ActionMsg = "多谢大师以法宝相赠。";
 	return action;
 end
@@ -119,7 +119,7 @@ function Task_00000020_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>你虽然学道资历尚浅，可是天资不凡，相信领悟法宝的用法不是难事，要知道对于修道之人来说，最重要的就是天地灵气，只要在战斗中蓄满灵气自然可以释放法宝所附带的无双大招。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你虽然学道资历尚浅，可是天资不凡，相信领悟法宝的用法不是难事，要知道对于修道之人来说，最重要的就是天地灵气，只要在战斗中蓄满灵气自然可以释放法宝所附带的无双大招。";
 	action.m_ActionMsg = "多谢大师指点。";
 	return action;
 end

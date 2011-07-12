@@ -129,7 +129,7 @@ function Task_00000012_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这酒不错，<name>看你眼光清明，也是正道中人，这本修道功法我就传授于你，你们的忙我也一定帮……哈哈，好酒！";
+	action.m_NpcMsg = "这酒不错，"..GetPlayerName(GetPlayer()).."看你眼光清明，也是正道中人，这本修道功法我就传授于你，你们的忙我也一定帮……哈哈，好酒！";
 	action.m_ActionMsg = "";
 	return action;
 end

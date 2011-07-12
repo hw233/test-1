@@ -109,7 +109,7 @@ function Task_00000019_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "蛇妖确实比较厉害，不过我早已准备了应付之法，特地从黄山的餐霞大师那里借来金鳞蜈蚣，它可是蛇妖的克星。消灭这只蛇妖不在话下，<name>你这就和我们一起去吧。";
+	action.m_NpcMsg = "蛇妖确实比较厉害，不过我早已准备了应付之法，特地从黄山的餐霞大师那里借来金鳞蜈蚣，它可是蛇妖的克星。消灭这只蛇妖不在话下，"..GetPlayerName(GetPlayer()).."你这就和我们一起去吧。";
 	action.m_ActionMsg = "晚辈正好也想去见识一下蛇妖的厉害。";
 	return action;
 end

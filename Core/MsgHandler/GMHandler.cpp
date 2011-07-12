@@ -109,6 +109,7 @@ GMHandler::GMHandler()
 	Reg(3, "addpexp", &GMHandler::OnAddPExp);
 	Reg(3, "setpexp", &GMHandler::OnSetPExp);
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
+	Reg(3, "useitem", &GMHandler::OnUseItem);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1970,8 +1971,19 @@ void GMHandler::OnSetAcu( GObject::Player * player, std::vector<std::string>& ar
 	GObject::Fighter * fgt = player->findFighter(id);
     if (!fgt)
         return;
-    UInt8 idx = atoi(args[0].c_str());
-    UInt8 lvl = atoi(args[1].c_str());
+    UInt8 idx = atoi(args[1].c_str());
+    UInt8 lvl = atoi(args[2].c_str());
     fgt->setAcupoints(idx, lvl);
+}
+
+void GMHandler::OnUseItem( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 1)
+        return;
+    UInt32 itemid = atoi(args[0].c_str());
+    UInt8 num = 1;
+    if (args.size() == 2)
+        num = atoi(args[1].c_str());
+    player->GetPackage()->UseItem(itemid, num);
 }
 

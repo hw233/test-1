@@ -109,7 +109,7 @@ function Task_00000013_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "<name> , 你可知现在正值第三次峨眉斗剑，正邪都在为此做准备。各派人士四处寻觅根骨资质俱佳的弟子，你一人恐怕势单力薄，不如多结交一些同道中人。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).." , 你可知现在正值第三次峨眉斗剑，正邪都在为此做准备。各派人士四处寻觅根骨资质俱佳的弟子，你一人恐怕势单力薄，不如多结交一些同道中人。";
 	action.m_ActionMsg = "我初来乍到，人地不熟，去哪里找是好呢？";
 	return action;
 end
@@ -119,7 +119,7 @@ function Task_00000013_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "呵呵，远在天边，近在眼前呀，<name>你刚刚打过交道的知味楼掌柜识人丰富，他一定能帮你介绍几个同道人士。";
+	action.m_NpcMsg = "呵呵，远在天边，近在眼前呀，"..GetPlayerName(GetPlayer()).."你刚刚打过交道的知味楼掌柜识人丰富，他一定能帮你介绍几个同道人士。";
 	action.m_ActionMsg = "多谢前辈指教，我这就去看看。";
 	return action;
 end

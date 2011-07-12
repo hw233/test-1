@@ -109,7 +109,7 @@ function Task_00000002_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "我乃是齐鲁三英的李宁，昔年在湖北除掉一个为祸乡里的恶徒陆地飞腾李启明，这帮水贼的首领正是其父浪里飞腾李刚。我寡不敌从，且战且退已是身负重伤，这李刚凶狠异常，<name>你可千万要小心才是。";
+	action.m_NpcMsg = "我乃是齐鲁三英的李宁，昔年在湖北除掉一个为祸乡里的恶徒陆地飞腾李启明，这帮水贼的首领正是其父浪里飞腾李刚。我寡不敌从，且战且退已是身负重伤，这李刚凶狠异常，"..GetPlayerName(GetPlayer()).."你可千万要小心才是。";
 	action.m_ActionMsg = "我知道了。";
 	return action;
 end
@@ -119,7 +119,7 @@ function Task_00000002_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这是老夫昔年行走江湖的随身兵刃，虽是凡铁，在老夫手里也惩治过不少恶徒，我看<name>你空手而来，想必是武艺高强，不过还是请你收下此剑。";
+	action.m_NpcMsg = "这是老夫昔年行走江湖的随身兵刃，虽是凡铁，在老夫手里也惩治过不少恶徒，我看"..GetPlayerName(GetPlayer()).."你空手而来，想必是武艺高强，不过还是请你收下此剑。";
 	action.m_ActionMsg = "多谢老丈，我一定不会放过这个恶人。";
 	return action;
 end

@@ -83,7 +83,7 @@ function Task_00000100_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "自从中原遭遇兵劫，民不聊生，不但有恶人作乱，甚至有些在兵劫中惨遭横死的人执念深重，化为僵尸为恶，近日在成都郊外乱葬岗处有村民发现了一些可怕的僵尸，还希望<name>去将这些怪物消灭。";
+	action.m_NpcMsg = "自从中原遭遇兵劫，民不聊生，不但有恶人作乱，甚至有些在兵劫中惨遭横死的人执念深重，化为僵尸为恶，近日在成都郊外乱葬岗处有村民发现了一些可怕的僵尸，还希望"..GetPlayerName(GetPlayer()).."去将这些怪物消灭。";
 	action.m_ActionMsg = "几个僵尸不在话下，我去去就回。";
 	return action;
 end
@@ -93,7 +93,7 @@ function Task_00000100_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>你果然是身手不凡。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是身手不凡。";
 	action.m_ActionMsg = "";
 	return action;
 end

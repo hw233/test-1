@@ -119,7 +119,7 @@ function Task_00000026_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是感谢<name>你来告诉我这个喜讯。";
+	action.m_NpcMsg = "真是感谢"..GetPlayerName(GetPlayer()).."你来告诉我这个喜讯。";
 	action.m_ActionMsg = "";
 	return action;
 end

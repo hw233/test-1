@@ -119,7 +119,7 @@ function Task_00000036_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>你真是身手不凡啊，张亮这个恶徒官府早已通缉在案，只是这厮轻功高强，一直不见他踪迹，却不料被少侠你给抓住了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊，张亮这个恶徒官府早已通缉在案，只是这厮轻功高强，一直不见他踪迹，却不料被少侠你给抓住了。";
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -90,6 +90,7 @@ private:
     void OnAddPExp(GObject::Player * player, std::vector<std::string>&);
     void OnSetPExp(GObject::Player * player, std::vector<std::string>&);
     void OnSetAcu(GObject::Player * player, std::vector<std::string>&);
+    void OnUseItem(GObject::Player * player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

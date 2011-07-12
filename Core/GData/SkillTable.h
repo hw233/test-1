@@ -20,6 +20,7 @@ enum
     /*6*/ SKILL_AFTRES,
     /*7*/ SKILL_ENTER,
     /*8*/ SKILL_DEAD,
+    /*9*/ SKILL_AFTNATK,
     SKILL_PASSIVES
 };
 

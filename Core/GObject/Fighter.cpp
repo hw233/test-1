@@ -1824,6 +1824,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                     addNewSkill(s->getId(), writedb);
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
+                        s->cond == GData::SKILL_AFTNATK ||
                         s->cond == GData::SKILL_BEATKED ||
                         s->cond == GData::SKILL_AFTEVD ||
                         s->cond == GData::SKILL_AFTRES ||
