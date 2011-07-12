@@ -4718,5 +4718,14 @@ namespace GObject
     {
         practicePlace.sitdown(this, fighters, size);
     }
+
+    float Player::getPracticeBufFactor()
+    {
+        if(getBuffData(PLAYER_BUFF_PRACTICE, TimeUtil::Now()))
+        {
+            return 0.2;
+        }
+        return 0.0;
+    }
 }
 

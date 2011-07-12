@@ -453,6 +453,7 @@ public:
 	inline UInt32 getBaseAction() { return action; }
 
     Int32 getAcuPraAdd() { return _praadd; }
+    float getPracticeBufFactor();
     float getClanTechAddon(int place);
     float getPracticeInc();
     // TODO:

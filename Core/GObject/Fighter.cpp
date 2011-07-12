@@ -2145,6 +2145,11 @@ float Fighter::getPracticeInc()
     return ret;
 }
 
+float Fighter::getPracticeBufFactor()
+{
+    return _owner->getPracticeBufFactor();
+}
+
 float Fighter::getClanTechAddon( int place )
 {
     if (_owner)
