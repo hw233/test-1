@@ -894,9 +894,13 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
 	GObject::Player * player = fgt->getOwner();
 	if(player == NULL)
 		return;
-	const UInt32 itemIdStart[2][5] = {{1521, 1561, 1601, 1681, 1721}, {1541, 1581, 1621, 1701, 1741}};
+	const UInt32 itemIdStart[3][5] = {
+        {2088, 2112, 2136, 2160, 2184},
+        {2080, 2104, 2128, 2152, 2176},
+        {2072, 2096, 2120, 2144, 2168}
+    };
 	int idx = -1;
-	if(equipLvl == 50)
+	if(equipLvl == 60)
 		idx = 0;
 	else if(equipLvl == 70)
 		idx = 1;
@@ -918,153 +922,153 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
 	switch(fgt->getClass())
 	{
 	case 1:
-		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[1][idx] + 8, false, true));
+		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[0][idx], false, true));
         if(weapon)
         { 
             makeItemSuper(package, weapon, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(weapon->getId(), fgt, 1, o);
+            package->EquipTo(weapon->getId(), fgt, 0x21, o);
         }
-        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx], false, true));
+        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 1, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 2, o);
+            package->EquipTo(armor->getId(), fgt, 0x22, o);
         }
-        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 1, false, true));
+        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 3, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 3, o);
+            package->EquipTo(armor->getId(), fgt, 0x23, o);
         }
-        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 2, false, true));
+        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 2, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 4, o);
+            package->EquipTo(armor->getId(), fgt, 0x24, o);
         }
-        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 3, false, true));
+        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 4, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 5, o);
+            package->EquipTo(armor->getId(), fgt, 0x25, o);
         }
-        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 4, false, true));
+        armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 5, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 6, o);
+            package->EquipTo(armor->getId(), fgt, 0x26, o);
         }
-        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[1][idx] + 5, false, true));
+        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 6, false, true));
         if(equip)
         { 
             makeItemSuper(package, equip, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 7, o);
+            package->EquipTo(equip->getId(), fgt, 0x27, o);
         }
-        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[1][idx] + 6, false, true));
+        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 7, false, true));
         if(equip)
         { 
             makeItemSuper(package, equip, 0, enchant, gemlevel, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 8, o);
+            package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
 		break;
-	case 3:
-		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[0][idx] + 11, false, true));
+	case 2:
+		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[1][idx], false, true));
         if(weapon)
         { 
             makeItemSuper(package, weapon, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(weapon->getId(), fgt, 1, o);
+            package->EquipTo(weapon->getId(), fgt, 0x21, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx], false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 1, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 2, o);
+            package->EquipTo(armor->getId(), fgt, 0x22, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 1, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 3, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 3, o);
+            package->EquipTo(armor->getId(), fgt, 0x23, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 2, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 2, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 4, o);
+            package->EquipTo(armor->getId(), fgt, 0x24, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 3, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 4, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 5, o);
+            package->EquipTo(armor->getId(), fgt, 0x25, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 4, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[1][idx] + 5, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 6, o);
+            package->EquipTo(armor->getId(), fgt, 0x26, o);
         }
-		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 5, false, true));
+		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[1][idx] + 6, false, true));
         if(equip)
         { 
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 7, o);
+            package->EquipTo(equip->getId(), fgt, 0x27, o);
         }
-		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 6, false, true));
+		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[1][idx] + 7, false, true));
         if(equip)
         { 
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 8, o);
+            package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
 		break;
-	case 5:
-		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[0][idx] + 13, false, true));
+	case 3:
+		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[2][idx], false, true));
 	    if(weapon)
         { 
             makeItemSuper(package, weapon, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(weapon->getId(), fgt, 1, o);
+            package->EquipTo(weapon->getId(), fgt, 0x21, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx], false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 1, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 2, o);
+            package->EquipTo(armor->getId(), fgt, 0x22, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 1, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 3, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 3, o);
+            package->EquipTo(armor->getId(), fgt, 0x23, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 2, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 2, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 4, o);
+            package->EquipTo(armor->getId(), fgt, 0x24, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 3, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 4, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 5, o);
+            package->EquipTo(armor->getId(), fgt, 0x25, o);
         }
-		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[0][idx] + 4, false, true));
+		armor = static_cast<GObject::ItemArmor *>(package->AddEquip(itemIdStart[2][idx] + 5, false, true));
         if(armor)
         { 
             makeItemSuper(package, armor, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(armor->getId(), fgt, 6, o);
+            package->EquipTo(armor->getId(), fgt, 0x26, o);
         }
-		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 5, false, true));
+		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[2][idx] + 6, false, true));
         if(equip)
         { 
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 7, o);
+            package->EquipTo(equip->getId(), fgt, 0x27, o);
         }
-		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[0][idx] + 6, false, true));
+		equip = static_cast<GObject::ItemEquip *>(package->AddEquip(itemIdStart[2][idx] + 7, false, true));
         if(equip)
         { 
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
-            package->EquipTo(equip->getId(), fgt, 8, o);
+            package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
 		break;
 	default:
@@ -1129,10 +1133,13 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 		return;
 	player->AddExp(GData::expTable.getLevelMin(100));
 	makeSuper(player->getMainFighter());
-	addSuperClass(player, 313);
-	addSuperClass(player, 314);
+	addSuperClass(player, 10);
+	addSuperClass(player, 16);
+    addSuperClass(player, 13);
+    addSuperClass(player, 14);
 	switch(player->GetClass())
 	{
+#if 0
 	case 1:
 		addSuperClass(player, 316);
 		addSuperClass(player, 321);
@@ -1145,6 +1152,8 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 		addSuperClass(player, 311);
 		addSuperClass(player, 316);
 		break;
+#else
+#endif
 	default:
 		break;
 	}
