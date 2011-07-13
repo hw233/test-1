@@ -1737,7 +1737,8 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                         sendModification(0x62, _citta[j], j, false);
                 }
             }
-        }
+        } else
+            idx = getUpCittasNum();
 
         if (_citta[idx])
             offCitta(_citta[idx], false, true, writedb);
@@ -1784,9 +1785,13 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
             sendModification(8, soul);
     }
 
-    _attrDirty = true;
-    _bPDirty = true;
-    sendModification(0x62, citta, idx, writedb);
+    if (ret)
+    {
+        _attrDirty = true;
+        _bPDirty = true;
+        sendModification(0x62, citta, idx, writedb);
+    }
+
     return ret;
 }
 
@@ -2097,7 +2102,7 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 
     int i = idx;
     if (flip) {
-        for (; i < getUpCittasMax() - 1; ++i)
+        for (; i < getUpCittasNum(); ++i)
         {
             _citta[i] = _citta[i+1];
             _citta[i+1] = 0;
