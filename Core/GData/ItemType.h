@@ -44,8 +44,17 @@ enum ItemClass
 	Item_Mounts,		//坐骑 11
 	Item_Normal = 20,	//普通物品 20~29
 	Item_Formula = 30,	//阵法 30~39
+	Item_Formula1, Item_Formula2, Item_Formula3,
+	Item_Formula4, Item_Formula5, Item_Formula6,
+	Item_Formula7, Item_Formula8, Item_Formula9,
 	Item_Citta = 40,	//决法 40~49
+	Item_Citta1, Item_Citta2, Item_Citta3,
+	Item_Citta4, Item_Citta5, Item_Citta6,
+	Item_Citta7, Item_Citta8, Item_Citta9,
 	Item_Enhance = 50,	//强化 50~59
+	Item_Enhance1, Item_Enhance2, Item_Enhance3,
+	Item_Enhance4, Item_Enhance5, Item_Enhance6,
+	Item_Enhance7, Item_Enhance8, Item_Enhance9,
 	Item_Gem = 60,		//宝石 60~79
     Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4,
     Item_Gem5, Item_Gem6, Item_Gem8, Item_Gem9,
@@ -87,6 +96,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
     if (id >= LTASK_ID && id <= RTASK_ID)
         return Item_Task;
     if (id >= LFORMULA_ID && id <= RFORMULA_ID)
+        return Item_Formula;
+    if (id >= LCITTA_ID && id <= RCITTA_ID)
         return Item_Citta;
     //if (id >= LARM_ID && id <= RARM_ID)
     //    return Item_Weapon; // XXX: 
