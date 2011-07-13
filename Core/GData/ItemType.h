@@ -42,13 +42,18 @@ enum ItemClass
 	Item_Reserved,		//保留 9
 	Item_Trump,			//法宝 10
 	Item_Mounts,		//坐骑 11
-	Item_Normal,		//普通物品 20~29
-	Item_Formula,		//阵法 30~39
-	Item_Citta,			//决法 40~49
-	Item_Enhance,		//强化 50~59
-	Item_Gem,			//宝石 60~79
-	Item_Task,			//任务 80~89
-	Item_Other,			//其他 90~
+	Item_Normal = 20,	//普通物品 20~29
+	Item_Formula = 30,	//阵法 30~39
+	Item_Citta = 40,	//决法 40~49
+	Item_Enhance = 50,	//强化 50~59
+	Item_Gem = 60,		//宝石 60~79
+    Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4,
+    Item_Gem5, Item_Gem6, Item_Gem8, Item_Gem9,
+    Item_Gem10, Item_Gem11, Item_Gem12, Item_Gem13,
+    Item_Gem14, Item_Gem15, Item_Gem16, Item_Gem17,
+    Item_Gem18, Item_Gem19,
+	Item_Task = 80,		//任务 80~89
+	Item_Other = 90,	//其他 90~
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -112,7 +117,7 @@ namespace GData
 		public ObjectBaseT<>
 	{
 		ItemClass	subClass;
-		UInt32		coin;
+		UInt32		price;
 		UInt16		reqLev;
 		UInt8		quality;
 		UInt16		maxQuantity;

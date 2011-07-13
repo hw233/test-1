@@ -116,7 +116,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     if (td.soul >= MAX_TRIPOD_SOUL)
         PopTimerEvent(pl, EVENT_PLAYERPRTRIPOD, pl->getId());
 
-    DB().PushUpdateData("DELETE FROM `tripod` SET `quality` = %u WHERE `id` = %"I64_FMT"u)", td.quality, pl->getId());
+    DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u WHERE `id` = %"I64_FMT"u", td.quality, pl->getId());
 }
 
 
@@ -178,7 +178,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     st << td.fire;
     genAward(td, st);
     pl->send(st);
-    DB().PushUpdateData("DELETE FROM `tripod` SET `fire` = %u WHERE `id` = %"I64_FMT"u)", td.fire, pl->getId());
+    DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u WHERE `id` = %"I64_FMT"u", td.fire, pl->getId());
 }
 
 void Tripod::getAward(Player* pl)
@@ -198,7 +198,7 @@ void Tripod::getAward(Player* pl)
 
     td.awdst = 0;
     td.soul = 0;
-    DB().PushUpdateData("DELETE FROM `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u)", pl->getId());
+    DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
 }
 
 TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)

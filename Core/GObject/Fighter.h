@@ -172,6 +172,8 @@ public:
     inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动100%触发技能
     inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
+    // 取得普通攻击后被动100%触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftNAtk100() { return _passkl[GData::SKILL_AFTNATK-GData::SKILL_PASSSTART]; }
     // 取得被攻击后被动100%触发技能
     inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[GData::SKILL_BEATKED-GData::SKILL_PASSSTART]; }
     // 取得闪避后被动100%触发技能
@@ -187,6 +189,8 @@ public:
     inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动概率触发技能
     inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
+    // 取得普通攻击后被动概率触发技能
+    inline std::vector<UInt16>& getPassiveSkillAftNAtk() { return _rpasskl[GData::SKILL_AFTNATK-GData::SKILL_PASSSTART]; }
     // 取得被攻击后被动概率触发技能
     inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[GData::SKILL_BEATKED-GData::SKILL_PASSSTART]; }
     // 取得闪避后被动概率触发技能
@@ -449,6 +453,7 @@ public:
 	inline UInt32 getBaseAction() { return action; }
 
     Int32 getAcuPraAdd() { return _praadd; }
+    float getPracticeBufFactor();
     float getClanTechAddon(int place);
     float getPracticeInc();
     // TODO:

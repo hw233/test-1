@@ -119,7 +119,7 @@ function Task_00000017_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>真是太感谢你了，这蛇妖的毒雾好生厉害。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."真是太感谢你了，这蛇妖的毒雾好生厉害。";
 	action.m_ActionMsg = "";
 	return action;
 end

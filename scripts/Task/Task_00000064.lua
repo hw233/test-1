@@ -109,7 +109,7 @@ function Task_00000064_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才髯仙李元华来这里找你，原来顽石大师被追云叟前辈他们护送到了长沙谷王峰，可是因为伤势恶化疼痛难忍，顽石大师几次欲兵解被大家劝住，<name>髯仙前辈叫你迅速赶去谷王峰用乌风草救治顽石大师。";
+	action.m_NpcMsg = "方才髯仙李元华来这里找你，原来顽石大师被追云叟前辈他们护送到了长沙谷王峰，可是因为伤势恶化疼痛难忍，顽石大师几次欲兵解被大家劝住，"..GetPlayerName(GetPlayer()).."髯仙前辈叫你迅速赶去谷王峰用乌风草救治顽石大师。";
 	action.m_ActionMsg = "事不宜迟，那我这就告辞了，申姑娘多保重。";
 	return action;
 end

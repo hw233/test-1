@@ -167,6 +167,7 @@ namespace GObject
         addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
 
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << Stream::eos;
+        pl->send(st);
         return true;
     }
 
@@ -185,18 +186,13 @@ namespace GObject
         UInt8 place = pl->getPracticePlace();
         UInt16 slot = pl->getPracticeSlot();
 
-        if (slot >= m_places[place-1].data.size()) {
-            st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
-            return false;
-        }
-        PracticeData*& pd = m_places[place-1].data[slot];
+        PracticeData* pd = getPracticeData(pl);
         if (pd)
         {
             pd->winnerid = 0;
             pd->fighters.clear();
 
             --m_places[place-1].used;
-            pd = 0;
 
             //DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
             DB().PushUpdateData("UPDATE `practice_data` SET checktime = 0 where `id`= %"I64_FMT"u", pl->getId());
@@ -206,12 +202,12 @@ namespace GObject
             UInt16 money = ((float)(trained)/pd->traintime)*pd->price;
             UInt16 remain = pd->price - money;
             st << trained * 60 << money << remain << Stream::eos;
+            //delPracticeData(pl);
         } else
         {
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
         }
-        if (place != PPLACE_MAX)
-            pl->setPracticingPlaceSlot(PPLACE_MAX<<16);
+        pl->setPracticingPlaceSlot(0);
 
         pl->send(st);
         return true;
@@ -668,12 +664,25 @@ namespace GObject
     {
         if (!pl)
             return 0;
-        if (!pl->isPracticing())
-            return 0;
         auto it = m_pradata.find(pl->getId());
         if (it != m_pradata.end())
             return it->second;
         return 0;
+    }
+
+    bool PracticePlace::delPracticeData(Player* pl)
+    {
+        if (!pl)
+            return false;
+        if (!pl->isPracticing())
+            return false;
+        auto it = m_pradata.find(pl->getId());
+        if (it != m_pradata.end()) {
+            delete it->second;
+            m_pradata.erase(it);
+            return true;
+        }
+        return false;
     }
 
     bool PracticePlace::isSitdownYet(PracticeData* pd, UInt32 id)

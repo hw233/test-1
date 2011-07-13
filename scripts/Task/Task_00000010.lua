@@ -109,7 +109,7 @@ function Task_00000010_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "<name>大哥，你行侠仗义的事情我已经听李叔叔说了，不知你现在能不能帮忙寻找我师傅？";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."大哥，你行侠仗义的事情我已经听李叔叔说了，不知你现在能不能帮忙寻找我师傅？";
 	action.m_ActionMsg = "当然可以，但不知你为何如此焦急，究竟发生了？";
 	return action;
 end

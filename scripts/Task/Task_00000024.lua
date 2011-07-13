@@ -109,7 +109,7 @@ function Task_00000024_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "<name>不错，不错，我老人家就喜欢象你这样侠肝义胆的年青人，你看这边两个就和你完全不一样，没几分本事却在那里胡乱吹牛，说不得要好好教训他们一下。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."不错，不错，我老人家就喜欢象你这样侠肝义胆的年青人，你看这边两个就和你完全不一样，没几分本事却在那里胡乱吹牛，说不得要好好教训他们一下。";
 	action.m_ActionMsg = "老前辈，你过奖了。";
 	return action;
 end

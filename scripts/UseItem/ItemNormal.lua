@@ -313,7 +313,7 @@ function ItemNormal_00008913(iid, num, bind, param)
   end
 end
 
-function ItemNormal_00008930(iid, num, bind, param)
+function ItemNormal_00000009(iid, num, bind, param)
   local player = GetPlayer()
   if player:hasFlag(9) then
     player:sendMsgCode(2, 2051, 0)
@@ -330,7 +330,7 @@ function ItemNormal_00008930(iid, num, bind, param)
   end
   player:setBuffData(0, num2, true);
   player:autoRegenAll();
-  package:DelItemSendMsg(8930, player);
+  package:DelItemSendMsg(9, player);
   return true
 end
 
@@ -468,7 +468,7 @@ function ItemNormal_00008942(iid, num, bind, param)
 	reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
 	reqGrids = reqGrids + package:GetItemUsedGrids(8900, 5, 1);
 	reqGrids = reqGrids + package:GetItemUsedGrids(8933, 2, 1);
-	reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+	reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
 	reqGrids = reqGrids + package:GetItemUsedGrids(8943, 1, 1);
 
 	if reqGrids <= 	package:GetRestPackageSize() then
@@ -479,7 +479,7 @@ function ItemNormal_00008942(iid, num, bind, param)
 		package:AddItem(8921, 2, 1, 0, 2);
 		package:AddItem(8900, 5, 1, 0, 2);
 		package:AddItem(8933, 2, 1, 0, 2);
-		package:AddItem(8930, 1, 1, 0, 2);
+		package:AddItem(9, 1, 1, 0, 2);
 		package:AddItem(8943, 1, 1, 0, 2);
 		player:getCoupon(30);
 		return true;
@@ -543,7 +543,7 @@ function ItemNormal_00008944(iid, num, bind, param)
 	   local package = player:GetPackage();
   	   local reqGrids = 15;
  	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(5002, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(5012, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(5022, 1, 1);
@@ -566,7 +566,7 @@ function ItemNormal_00008944(iid, num, bind, param)
 		   package:AddEquip(133, 1);
 		   package:AddEquip(134, 1);	
 		   package:AddItem(8922, 2, 1, 0, 2);
-		   package:AddItem(8930, 1, 1, 0, 2);
+		   package:AddItem(9, 1, 1, 0, 2);
 		   package:AddItem(5002, 1, 1, 0, 2);
 		   package:AddItem(5012, 1, 1, 0, 2);
 		   package:AddItem(5022, 1, 1, 0, 2);
@@ -590,7 +590,7 @@ function ItemNormal_00008945(iid, num, bind, param)
 	   local reqGrids = 15;
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8935, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 2, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 2, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8914, 1, 1);
 	   if reqGrids <= 	package:GetRestPackageSize() then
@@ -611,7 +611,7 @@ function ItemNormal_00008945(iid, num, bind, param)
 		   package:AddEquip(194, 1);	
 		   package:AddItem(8935, 1, 1, 0, 2);
 		   package:AddItem(8922, 2, 1, 0, 2);
-		   package:AddItem(8930, 2, 1, 0, 2);
+		   package:AddItem(9, 2, 1, 0, 2);
 		   package:AddItem(8920, 1, 1, 0, 2);
 		   package:AddItem(8914, 1, 1, 0, 2);	
 		   package:AddItem(8946, 1, 1, 0, 2);
@@ -633,7 +633,7 @@ function ItemNormal_00008946(iid, num, bind, param)
 	   local reqGrids = 15;
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 3, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 3, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8927, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8925, 1, 1);	
@@ -655,7 +655,7 @@ function ItemNormal_00008946(iid, num, bind, param)
 		   package:AddEquip(254, 1);	
 		   package:AddItem(8936, 1, 1, 0, 2);
 		   package:AddItem(8923, 2, 1, 0, 2);
-		   package:AddItem(8930, 3, 1, 0, 2);
+		   package:AddItem(9, 3, 1, 0, 2);
 		   package:AddItem(8915, 1, 1, 0, 2);
 		   package:AddItem(8927, 1, 1, 0, 2);
 		   package:AddItem(8925, 1, 1, 0, 2);
@@ -678,7 +678,7 @@ function ItemNormal_00008947(iid, num, bind, param)
 	   local reqGrids = 14;
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8937, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8930, 5, 1);	
+	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 5, 1);	
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8916, 1, 1);	
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8927, 2, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8926, 1, 1);
@@ -700,7 +700,7 @@ function ItemNormal_00008947(iid, num, bind, param)
 		   package:AddEquip(454, 1);
 		   package:AddItem(8937, 1, 1, 0, 2);
 		   package:AddItem(8923, 2, 1, 0, 2);
-		   package:AddItem(8930, 5, 1, 0, 2);	
+		   package:AddItem(9, 5, 1, 0, 2);	
 		   package:AddItem(8916, 1, 1, 0, 2);
 		   package:AddItem(8927, 2, 1, 0, 2);
 		   package:AddItem(8926, 1, 1, 0, 2);	
@@ -2726,7 +2726,7 @@ function ItemNormal_00008993(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 		local R_Equip = math.random(1, 100);
 		
@@ -2758,8 +2758,8 @@ function ItemNormal_00008993(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -2799,8 +2799,8 @@ function ItemNormal_00008993(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1, 0, 2);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1, 0, 2);	
+			if R_0009 <= 70 then	
+				package:AddItem(9, 1, 1, 0, 2);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1, 0, 2);	
@@ -2844,11 +2844,11 @@ function ItemNormal_00008994(iid, num, bind, param)
 		local R_Equip = math.random(1, 100);
 		local r1_8910 = math.random(1, 100);
 		local r1_8913 = math.random(1, 100);
-		local r1_8930 = math.random(1, 100);
+		local r1_0009 = math.random(1, 100);
 		local r1_8915 = math.random(1, 100);
 		local r2_8910 = math.random(1, 100);
 		local r2_8913 = math.random(1, 100);
-		local r2_8930 = math.random(1, 100);
+		local r2_0009 = math.random(1, 100);
 		local r2_8915 = math.random(1, 100);
 		
 		if R_Equip <= 20 then
@@ -2858,8 +2858,8 @@ function ItemNormal_00008994(iid, num, bind, param)
                 reqGrids = reqGrids + package:GetItemUsedGrids(8910, 1, 1);
 		    elseif r1_8913 <=50 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(8913, 1, 1);
-     	    elseif r1_8930 <=75 then
-                reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+     	    elseif r1_0009 <=75 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
 		    elseif r1_8915 <=100 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
 			end
@@ -2867,8 +2867,8 @@ function ItemNormal_00008994(iid, num, bind, param)
                 reqGrids = reqGrids + package:GetItemUsedGrids(8910, 1, 1);
 		    elseif r2_8913 <=50 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(8913, 1, 1);
-		    elseif r2_8930 <=75 then
-                reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);
+		    elseif r2_0009 <=75 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
 		    elseif r2_8915 <=100 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
             end	
@@ -2881,8 +2881,8 @@ function ItemNormal_00008994(iid, num, bind, param)
                     package:AddItem(8910, 1, 1, 0, 2);
 		        elseif r1_8913 <=50 then
                     package:AddItem(8913, 1, 1, 0, 2);
-     	        elseif r1_8930 <=75 then
-                    package:AddItem(8930, 1, 1, 0, 2);
+     	        elseif r1_0009 <=75 then
+                    package:AddItem(9, 1, 1, 0, 2);
 		        elseif r1_8915 <=100 then
                     package:AddItem(8915, 1, 1, 0, 2);
                 end	
@@ -2890,8 +2890,8 @@ function ItemNormal_00008994(iid, num, bind, param)
                     package:AddItem(8910, 1, 1, 0, 2);
 				elseif r2_8913 <=50 then
 					package:AddItem(8913, 1, 1, 0, 2);
-				elseif r2_8930 <=75 then
-					package:AddItem(8930, 1, 1, 0, 2);
+				elseif r2_0009 <=75 then
+					package:AddItem(9, 1, 1, 0, 2);
 				elseif r2_8915 <=100 then
 					package:AddItem(8915, 1, 1, 0, 2);
 				end	
@@ -2907,8 +2907,8 @@ function ItemNormal_00008994(iid, num, bind, param)
                     package:AddItem(8910, 1, 1, 0, 2);
 		        elseif r1_8913 <=50 then
                     package:AddItem(8913, 1, 1, 0, 2);
-     	        elseif r1_8930 <=75 then
-                    package:AddItem(8930, 1, 1, 0, 2);
+     	        elseif r1_0009 <=75 then
+                    package:AddItem(9, 1, 1, 0, 2);
 		        elseif r1_8915 <=100 then
                     package:AddItem(8915, 1, 1, 0, 2);
                 end	
@@ -2916,8 +2916,8 @@ function ItemNormal_00008994(iid, num, bind, param)
                     package:AddItem(8910, 1, 1, 0, 2);
 				elseif r2_8913 <=50 then
 					package:AddItem(8913, 1, 1, 0, 2);
-				elseif r2_8930 <=75 then
-					package:AddItem(8930, 1, 1, 0, 2);
+				elseif r2_0009 <=75 then
+					package:AddItem(9, 1, 1, 0, 2);
 				elseif r2_8915 <=100 then
 					package:AddItem(8915, 1, 1, 0, 2);
 				end	
@@ -3302,7 +3302,7 @@ function ItemNormal_00009036(iid, num, bind, param)
   elseif roll <= 74 then
     itemId = 8922
   elseif roll <= 87 then
-    itemId = 8930
+    itemId = 9
   else
     itemId = 8932
   end
@@ -3440,7 +3440,7 @@ function ItemNormal_00009041(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 		local R_Equip = math.random(1, 100);
 		
@@ -3472,8 +3472,8 @@ function ItemNormal_00009041(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -3513,8 +3513,8 @@ function ItemNormal_00009041(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1);	
+			if R_0009 <= 70 then	
+				package:AddItem(9, 1, 1);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1);	
@@ -3557,7 +3557,7 @@ function ItemNormal_00009201(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 		local R_Equip = math.random(1, 100);
 		
@@ -3589,8 +3589,8 @@ function ItemNormal_00009201(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -3629,8 +3629,8 @@ function ItemNormal_00009201(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1);	
+			if R_0009 <= 70 then	
+				package:AddItem(4, 1, 1);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1);	
@@ -3669,7 +3669,7 @@ function ItemNormal_00009202(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 		local R_Equip = math.random(1, 100);
 		
@@ -3701,8 +3701,8 @@ function ItemNormal_00009202(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -3741,8 +3741,8 @@ function ItemNormal_00009202(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1);	
+			if R_0009 <= 70 then	
+				package:AddItem(9, 1, 1);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1);	
@@ -3781,7 +3781,7 @@ function ItemNormal_00009203(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 		local R_Equip = math.random(1, 100);
 		
@@ -3813,8 +3813,8 @@ function ItemNormal_00009203(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -3853,8 +3853,8 @@ function ItemNormal_00009203(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1);	
+			if R_0009 <= 70 then	
+				package:AddItem(9, 1, 1);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1);	
@@ -3889,7 +3889,7 @@ function ItemNormal_00009204(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 	
 		
@@ -3920,8 +3920,8 @@ function ItemNormal_00009204(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -3958,8 +3958,8 @@ function ItemNormal_00009204(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1);	
+			if R_0009 <= 70 then	
+				package:AddItem(9, 1, 1);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1);	
@@ -4019,7 +4019,7 @@ function ItemNormal_00009217(iid, num, bind, param)
 		local R_8902 = math.random(1, 100);
 		local R_8941 = math.random(1, 100);
 		local R_8940 = math.random(1, 100);
-		local R_8930 = math.random(1, 100);
+		local R_0009 = math.random(1, 100);
 		local R_8919 = math.random(1, 100);
 		
 		
@@ -4050,8 +4050,8 @@ function ItemNormal_00009217(iid, num, bind, param)
 		if R_8940 <= 70 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8940, 1, 1);	
 		end
-		if R_8930 <= 70 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8930, 1, 1);	
+		if R_0009 <= 70 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);	
 		end
 		if R_8919 <= 70 then	
 			reqGrids = reqGrids + package:GetItemUsedGrids(8919, 1, 1);	
@@ -4088,8 +4088,8 @@ function ItemNormal_00009217(iid, num, bind, param)
 			if R_8940 <= 70 then			
 				package:AddItem(8940, 1, 1);	
 			end
-			if R_8930 <= 70 then	
-				package:AddItem(8930, 1, 1);	
+			if R_0009 <= 70 then	
+				package:AddItem(9, 1, 1);	
 			end
 			if R_8919 <= 70 then	
 				package:AddItem(8919, 1, 1);	
@@ -4133,7 +4133,7 @@ function ItemNormal_00009209(iid, num, bind, param)
 		player:getCoupon(100);
 		return true;
 	elseif rand < 76 then
-		itemId = 8930
+		itemId = 9
 		count = 1;
 	elseif rand < 88 then
 		itemId = 8912;
@@ -4416,7 +4416,7 @@ function ItemNormal_00009223(iid, num, bind, param)
 	elseif rand <= 64 then
 		itemId = 8916;
 	elseif rand <= 77 then
-		itemId = 8930;
+		itemId = 9;
 	elseif rand <= 90 then
 		itemId = 8913;		
 	end
@@ -4519,7 +4519,7 @@ local ItemNormal_Table = {
 	[8911] = ItemNormal_00008911,
 	[8912] = ItemNormal_00008912,
 	[8913] = ItemNormal_00008913,
-	[8930] = ItemNormal_00008930,
+	[9] = ItemNormal_00000009,
 	[8931] = ItemNormal_00008931,
 	[8932] = ItemNormal_00008932,
 	[8933] = ItemNormal_00008933,

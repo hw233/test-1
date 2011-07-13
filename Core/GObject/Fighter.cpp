@@ -860,7 +860,7 @@ void Fighter::addAttr( ItemEquip * equip )
 	{
 		if(ied.gems[i] != 0)
 		{
-			GData::ItemGemType * igt = GData::gemTypes[ied.gems[i] - 5000];
+			GData::ItemGemType * igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
 			addAttrExtra(_attrExtraEquip, igt->attrExtra);
 		}
 	}
@@ -1824,6 +1824,7 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
                     addNewSkill(s->getId(), writedb);
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
+                        s->cond == GData::SKILL_AFTNATK ||
                         s->cond == GData::SKILL_BEATKED ||
                         s->cond == GData::SKILL_AFTEVD ||
                         s->cond == GData::SKILL_AFTRES ||
@@ -2142,6 +2143,11 @@ float Fighter::getPracticeInc()
 {
     float ret = Script::BattleFormula::getCurrent()->calcPracticeInc(this);
     return ret;
+}
+
+float Fighter::getPracticeBufFactor()
+{
+    return _owner->getPracticeBufFactor();
 }
 
 float Fighter::getClanTechAddon( int place )

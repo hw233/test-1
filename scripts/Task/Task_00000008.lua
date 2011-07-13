@@ -119,7 +119,7 @@ function Task_00000008_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>，我看你神采奕奕，莫非得了什么奇遇？";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，我看你神采奕奕，莫非得了什么奇遇？";
 	action.m_ActionMsg = "";
 	return action;
 end

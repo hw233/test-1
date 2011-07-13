@@ -109,7 +109,7 @@ function Task_00000016_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>你稍安毋躁，慈云寺妖人鉴于正道实力不敢轻举妄动，来，我先给你介绍醉道人的师兄，髯仙李元化，他和我正在准备除掉云灵山为祸的蛇妖。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你稍安毋躁，慈云寺妖人鉴于正道实力不敢轻举妄动，来，我先给你介绍醉道人的师兄，髯仙李元化，他和我正在准备除掉云灵山为祸的蛇妖。";
 	action.m_ActionMsg = "多谢大师。";
 	return action;
 end

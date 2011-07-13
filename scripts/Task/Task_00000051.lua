@@ -89,7 +89,7 @@ function Task_00000051_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺一战已经终了，正道中人都齐聚蜀山，<name>你也一起去吧。峨眉掌教乾坤正气妙一真人齐前辈正在峨眉派的玉清殿等着见见你这个正道的后起之秀呢。";
+	action.m_NpcMsg = "慈云寺一战已经终了，正道中人都齐聚蜀山，"..GetPlayerName(GetPlayer()).."你也一起去吧。峨眉掌教乾坤正气妙一真人齐前辈正在峨眉派的玉清殿等着见见你这个正道的后起之秀呢。";
 	action.m_ActionMsg = "嗯，我这就赶去。";
 	return action;
 end
@@ -99,7 +99,7 @@ function Task_00000051_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>正道中兴的重担就在你们这小一辈的肩上了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."正道中兴的重担就在你们这小一辈的肩上了。";
 	action.m_ActionMsg = "";
 	return action;
 end

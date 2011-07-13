@@ -129,7 +129,7 @@ function Task_00000070_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>正道中兴的重担就在你们的肩上了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."正道中兴的重担就在你们的肩上了。";
 	action.m_ActionMsg = "";
 	return action;
 end

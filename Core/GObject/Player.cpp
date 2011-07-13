@@ -1171,7 +1171,7 @@ namespace GObject
 		{
 			DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v.friendliness, v.submitFavorCount, v.submitFavorDay);
 			sendGreatFighterTaskVal(id, v.friendliness, v.submitFavorCount);
-			SYSMSG_SENDV(148, this, friendliness);
+			//SYSMSG_SENDV(148, this, friendliness);
 			SYSMSG_SENDV(1048, this, id, friendliness);
 		}
 	}
@@ -1234,7 +1234,7 @@ namespace GObject
 			v->friendliness = fgt->reqFriendliness;
 			_greatFighterFull.insert(id);
 		}
-		SYSMSG_SENDV(148, this, 30);
+		//SYSMSG_SENDV(148, this, 30);
 		SYSMSG_SENDV(1048, this, id, 30);
 		DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v->friendliness, v->submitFavorCount, v->submitFavorDay);
 		DBLOG().PushUpdateData("insert into `fighter_friendness`(`server_id`, `player_id`, `fighter_id`, `friendness`, `time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), id, v->friendliness, TimeUtil::Now());		
@@ -2175,6 +2175,7 @@ namespace GObject
 
 	UInt32 Player::getCoin( UInt32 c )
 	{
+        return 0; // XXX: no useful
 		if(c == 0)
 			return _playerData.coin;
 		if(_playerData.coin >= 99999999)
@@ -2228,6 +2229,7 @@ namespace GObject
 
 	UInt32 Player::useCoin( UInt32 c, ConsumeInfo * ci, bool notify )
 	{
+        return 0; // XXX: no useful
 		if(c == 0 || _playerData.coin == 0)
 			return _playerData.coin;
 		if(_playerData.coin < c)
@@ -4717,6 +4719,15 @@ namespace GObject
     void Player::addPracticeFighter(UInt32* fighters, size_t size)
     {
         practicePlace.sitdown(this, fighters, size);
+    }
+
+    float Player::getPracticeBufFactor()
+    {
+        if(getBuffData(PLAYER_BUFF_PRACTICE, TimeUtil::Now()))
+        {
+            return 0.2;
+        }
+        return 0.0;
     }
 }
 

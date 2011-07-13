@@ -83,7 +83,7 @@ function Task_00000105_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都前段时间治安真得很成问题，有几个大户人家的小姐都被那采花大盗糟蹋，还希望<name>去将这个淫贼捉拿归案。";
+	action.m_NpcMsg = "成都前段时间治安真得很成问题，有几个大户人家的小姐都被那采花大盗糟蹋，还希望"..GetPlayerName(GetPlayer()).."去将这个淫贼捉拿归案。";
 	action.m_ActionMsg = "为民除害是我辈本色，小可去去就回。";
 	return action;
 end
@@ -93,7 +93,7 @@ function Task_00000105_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
 	action.m_ActionMsg = "";
 	return action;
 end

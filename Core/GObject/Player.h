@@ -29,7 +29,7 @@ namespace GData
 
 namespace GObject
 {
-#define PLAYER_BUFF_COUNT			0x16
+#define PLAYER_BUFF_COUNT			0x17
 #define PLAYER_BUFF_DISPLAY_MAX		0x0C
 #define PLAYER_BUFF_AUTOHEAL		0x00
 #define PLAYER_BUFF_ATTR1			0x01
@@ -53,6 +53,7 @@ namespace GObject
 #define PLAYER_BUFF_REENTERCLAN		0x13
 #define PLAYER_BUFF_CLANRCENHANCE	0x14
 #define PLAYER_BUFF_PWDLOCK			0x15	//5´ÎÃÜÂë´íÎó Ëø¶¨10·ÖÖÓ
+#define PLAYER_BUFF_PRACTICE        0x16	//ÐÞÁ¶¼Ó³É20%
 
 
 	class Map;
@@ -779,6 +780,7 @@ namespace GObject
         inline UInt32 getPracticePlaceSlot() { return _praplace; }
         inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
+        float getPracticeBufFactor();
 
 	protected:
 		inline void setBlockBossByLevel();

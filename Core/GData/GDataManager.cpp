@@ -409,7 +409,25 @@ namespace GData
 					wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
 				}
 				break;
-			case Item_Gem:
+            case Item_Gem:
+            case Item_Gem1:
+            case Item_Gem2:
+            case Item_Gem3:
+            case Item_Gem4:
+            case Item_Gem5:
+            case Item_Gem6:
+            case Item_Gem8:
+            case Item_Gem9:
+            case Item_Gem10:
+            case Item_Gem11:
+            case Item_Gem12:
+            case Item_Gem13:
+            case Item_Gem14:
+            case Item_Gem15:
+            case Item_Gem16:
+            case Item_Gem17:
+            case Item_Gem18:
+            case Item_Gem19:
 				{
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
@@ -423,7 +441,7 @@ namespace GData
 				break;
 			}
 			wt->subClass = static_cast<ItemClass>(idt.subClass);
-			wt->coin = idt.coin;
+			wt->price = idt.coin;
 			wt->reqLev = idt.reqLev;
 			wt->quality = idt.quality;
 			wt->maxQuantity = idt.maxQuantity;

@@ -109,7 +109,7 @@ function Task_00000060_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才我去五色云雾外祭拜师傅，见那金驼三人的师傅飞龙师太飞剑毁了师父法体，又飞出剑光攻击师父已出窍的元婴。如今师父危在旦夕，我一人不是那贼婆的对手，<name>还请你帮忙一起救我师父，赶走飞龙师太。";
+	action.m_NpcMsg = "方才我去五色云雾外祭拜师傅，见那金驼三人的师傅飞龙师太飞剑毁了师父法体，又飞出剑光攻击师父已出窍的元婴。如今师父危在旦夕，我一人不是那贼婆的对手，"..GetPlayerName(GetPlayer()).."还请你帮忙一起救我师父，赶走飞龙师太。";
 	action.m_ActionMsg = "若兰师妹莫急，我这就去救令师。";
 	return action;
 end
@@ -119,7 +119,7 @@ function Task_00000060_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>多谢你出手赶走了飞龙师太，如今吾师飞升应已无忧。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."多谢你出手赶走了飞龙师太，如今吾师飞升应已无忧。";
 	action.m_ActionMsg = "";
 	return action;
 end

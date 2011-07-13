@@ -1085,7 +1085,15 @@ void OnPracticeSitDownReq( GameMsgHdr& hdr, PracticeSitDownReq& req)
 {
 	MSG_QUERY_PLAYER(player);
     UInt32 fgts[1] = {req._fgtid};
-	GObject::practicePlace.sitdown(player, fgts, 1);
+
+    switch (req._type) {
+        case 0:
+            GObject::practicePlace.sitdown(player, fgts, 1);
+        break;
+        case 1:
+            GObject::practicePlace.standup(player, fgts, 1);
+        break;
+    }
 }
 
 void OnPracticeStopReq( GameMsgHdr& hdr, PracticeStopReq& req)

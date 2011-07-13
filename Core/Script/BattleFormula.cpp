@@ -96,6 +96,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("isGoldPractice", &GObject::Fighter::isGoldPractice);
 	class_def<GObject::Fighter>("getClanTechAddon", &GObject::Fighter::getClanTechAddon);
 	class_def<GObject::Fighter>("getAcuPraAdd", &GObject::Fighter::getAcuPraAdd);
+	class_def<GObject::Fighter>("getPracticeBufFactor", &GObject::Fighter::getPracticeBufFactor);
 
 	class_add<Battle::BattleFighter>("BattleFighter");
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);

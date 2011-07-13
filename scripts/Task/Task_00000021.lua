@@ -109,7 +109,7 @@ function Task_00000021_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>刚刚我看见多臂熊毛太鬼鬼祟祟去了魏青家的茅舍，虽然不清楚他去做什么，不过这种妖人去肯定不是什么好事，少侠不如跟去看看。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."刚刚我看见多臂熊毛太鬼鬼祟祟去了魏青家的茅舍，虽然不清楚他去做什么，不过这种妖人去肯定不是什么好事，少侠不如跟去看看。";
 	action.m_ActionMsg = "我这就过去。";
 	return action;
 end

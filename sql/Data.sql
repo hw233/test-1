@@ -497,6 +497,7 @@ CREATE TABLE `skill_effect` (
   `id` smallint(5) NOT NULL,
   `state` tinyint(3) NOT NULL DEFAULT '0',
   `immune` tinyint(3) NOT NULL DEFAULT '0',
+  `disperse` tinyint(3) NOT NULL DEFAULT '0',
   `damage` varchar(255) NOT NULL DEFAULT '',
   `adddam` float(10,4) NOT NULL DEFAULT '0.0000',
   `magdam` varchar(255) NOT NULL DEFAULT '',

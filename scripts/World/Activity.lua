@@ -17,7 +17,7 @@ serverName = nil
 serverNum = 0
 
 oldServersMax = {
-["verycd"] = 32,
+["kingxin"] = 32,
 ["4399"] = 3,
 ["huanlang"] = 2,
 ["kuwan8"] = 16,
@@ -70,7 +70,7 @@ function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
     local freeEnter = false
-    if serverName == 'verycd' then
+    if serverName == 'kingxin' then
       local freeStartTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 });
       local freeEndTime = os.time({ ['year'] = 2011, ['month'] = 1, ['day'] = 26, ['hour'] = 23, ['min'] = 50, ['sec'] = 0 });
       setDungeonPrice(0, 0)

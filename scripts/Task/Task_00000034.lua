@@ -109,7 +109,7 @@ function Task_00000034_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>你来了呀，刚不巧那位道人已经离去，不过临走时留了一张纸条让我交付给少侠，听他说这附近的施家巷有个妖人作恶，要少侠你去除掉这个妖人。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你来了呀，刚不巧那位道人已经离去，不过临走时留了一张纸条让我交付给少侠，听他说这附近的施家巷有个妖人作恶，要少侠你去除掉这个妖人。";
 	action.m_ActionMsg = "知道了，我这就去。";
 	return action;
 end

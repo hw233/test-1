@@ -83,7 +83,7 @@ function Task_00000101_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "<name>我们峨眉开府在即，也是天下正道的领袖，作为峨眉弟子一定要时刻自省其身。玄真子师伯早在我入门前就跟随你师祖长眉真人，受训颇严，今日你就去师伯处聆听教诲吧。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."我们峨眉开府在即，也是天下正道的领袖，作为峨眉弟子一定要时刻自省其身。玄真子师伯早在我入门前就跟随你师祖长眉真人，受训颇严，今日你就去师伯处聆听教诲吧。";
 	action.m_ActionMsg = "谨遵掌教之令。";
 	return action;
 end

@@ -109,7 +109,7 @@ function Task_00000005_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些银两我不能收，不过教书办学也确实需要钱财……嗯，君子爱财取之有道，我这边有不少收集来的古籍，都是我的老仆保管。少侠不妨去挑选几本古籍吧，这些银两权当作<name>你的书资可好？";
+	action.m_NpcMsg = "这些银两我不能收，不过教书办学也确实需要钱财……嗯，君子爱财取之有道，我这边有不少收集来的古籍，都是我的老仆保管。少侠不妨去挑选几本古籍吧，这些银两权当作"..GetPlayerName(GetPlayer()).."你的书资可好？";
 	action.m_ActionMsg = "小声嘀咕（这些破书能值几个钱）。";
 	return action;
 end
