@@ -104,6 +104,7 @@ private:
         UInt8 target_side;
         UInt8 target_pos;
         const GData::SkillBase* skill;
+        UInt32 param;
     };
 
     enum StatusType
@@ -124,8 +125,14 @@ private:
 
     enum StateType
     {
+        e_damNormal = 0,
+        e_damEvade = 2,
+        e_damHpAdd = 3,
+        e_damRevival = 4,
+        e_damBack = 5,
         e_Poison = 6,
         e_UnPoison = 7,
+        e_damAbsorb = 8,
         e_Stun = 9,
         e_UnStun = 10,
         e_Confuse = 11,
@@ -133,9 +140,13 @@ private:
         e_Forget = 13,
         e_UnForget = 14,
         e_Immune = 15,
+        e_damInj = 16,
+        e_damOut = 17,
         e_Res = 19,
         e_ResR = 20,
+        e_Disperse = 21,
     };
+
 
 private:
 	int findFirstAttacker();
@@ -158,11 +169,15 @@ private:
 	void onDamage(BattleObject * bo, StatusChange * scList, size_t& scCount, bool active, std::vector<AttackAct>* atkAct = NULL);
 	BattleFighter * getRandomFighter(UInt8 side, UInt8 * excepts, size_t exceptCount);
     UInt32 doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL);
-    UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL);
+    UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
     void doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount);
     void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct = NULL);
     void getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt);
+
+    UInt32 doPoisonAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* area_target, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, std::vector<AttackAct>* atkAct);
+
+    void doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, std::vector<AttackAct>* atkAct, UInt32 dmg);
 
 private:
 	int _id, _winner, _turns;

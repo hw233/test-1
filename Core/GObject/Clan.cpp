@@ -168,7 +168,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	// updateRank(NULL, oldLeaderName);
 	player->setClan(this);
 	player->notifyFriendAct(5, _name.c_str());
-	DB().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
+	DB().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
 	if(player->isOnline())
 	{
 		sendInfo(player);
