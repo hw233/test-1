@@ -1502,6 +1502,15 @@ int Fighter::isSkillUp(UInt16 skill)
     return -1;
 }
 
+void Fighter::getUpSkillAndLevel(std::vector<UInt16>& skills)
+{
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+            skills.push_back(_skill[i]);
+    }
+}
+
 UInt16 Fighter::getUpSkillsNum()
 {
     UInt8 c = 0;
@@ -1529,6 +1538,7 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
         if (!i)
         {
             _skill[0] = skill;
+            idx = 0;
             ret = true;
         }
         else if (i < max && _skill[idx])
