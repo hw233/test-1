@@ -120,6 +120,7 @@ public:
     // 取得修炼数据
     PracticeData* getPracticeData(UInt64 playerid);
     PracticeData* getPracticeData(Player* pl);
+    bool delPracticeData(Player* pl);
     UInt64 getPlaceOwnerId(UInt8 place);
 
     bool isSitdownYet(PracticeData* pd, UInt32 id);

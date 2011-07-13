@@ -354,7 +354,7 @@ function onTopup(player, oldGold, newGold)
 		return;
 	end
 	player:addStatus(0x200)
-	sendRewardMail(player, '充值有礼', '您在活动期间充值获得“天地英雄银币嘉奖礼包”一个，内含银票2张。请在背包中留出足够空间后点击接收。天地英雄感谢您一路支持和关爱。', 8996, 2)
+	sendRewardMail(player, '充值有礼', '您在活动期间充值获得“蜀山传奇银币嘉奖礼包”一个，内含银票2张。请在背包中留出足够空间后点击接收。蜀山传奇感谢您一路支持和关爱。', 8996, 2)
   end
   if stage == 5 then
 	local rand = math.random(1, 16);
