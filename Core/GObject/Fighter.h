@@ -168,6 +168,8 @@ public:
     // 更新被动技能
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
 
+    // 取得所有主动技能
+    void getUpSkillAndLevel(std::vector<UInt16>& skills);
     // 取得攻击前被动100%触发技能
     inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
     // 取得攻击后被动100%触发技能
