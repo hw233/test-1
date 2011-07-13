@@ -117,7 +117,7 @@ namespace GData
 		public ObjectBaseT<>
 	{
 		ItemClass	subClass;
-		UInt32		coin;
+		UInt32		price;
 		UInt16		reqLev;
 		UInt8		quality;
 		UInt16		maxQuantity;

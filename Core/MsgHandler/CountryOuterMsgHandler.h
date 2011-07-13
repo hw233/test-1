@@ -560,7 +560,7 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 		return;
 
 	UInt16 offset = 2;
-	UInt32 coin = 0;
+	UInt32 price = 0;
 	for (UInt16 i = 0; i < itemCount; ++i)
 	{
 		UInt32 itemId = *reinterpret_cast<const UInt32*>(data+offset);
@@ -569,18 +569,18 @@ void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 		offset += 7;
 		if (IsEquipId(itemId))
 		{
-			coin += pl->GetPackage()->SellEquip(itemId);
+			price += pl->GetPackage()->SellEquip(itemId);
 		}
 		else
 		{
-			coin += pl->GetPackage()->SellItem(itemId, itemNum, bindType);
+			price += pl->GetPackage()->SellItem(itemId, itemNum, bindType);
 		}
 	}
-	if(coin > 0)
+	if(price > 0)
 	{
 		SYSMSG_SEND(116, pl);
 		SYSMSG_SEND(1016, pl);
-		pl->getCoin(coin);
+        pl->getTael(price);
 	}
 }
 

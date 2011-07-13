@@ -441,7 +441,7 @@ namespace GData
 				break;
 			}
 			wt->subClass = static_cast<ItemClass>(idt.subClass);
-			wt->coin = idt.coin;
+			wt->price = idt.coin;
 			wt->reqLev = idt.reqLev;
 			wt->quality = idt.quality;
 			wt->maxQuantity = idt.maxQuantity;

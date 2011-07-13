@@ -26,7 +26,7 @@ namespace GObject
 		inline const std::string& getName() const   { return _itemBaseType.getName();	 }
 		inline UInt8		getQuality() const { return _itemBaseType.quality; }
 		inline UInt16		getReqLev() const { return _itemBaseType.reqLev; }
-		inline UInt32		getPrice() const { return _itemBaseType.coin; }
+		inline UInt32		getPrice() const { return _itemBaseType.price; }
 
 		inline UInt16		getMaxQuantity() const	{ return _itemBaseType.maxQuantity; }
 		inline UInt8		getBindType() const	{ return _itemBaseType.bindType; }
