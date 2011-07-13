@@ -179,6 +179,7 @@ bool Fighter::addExp( UInt64 e )
 	if(r)
 	{
 		_bPDirty = true;
+		_attrDirty = true;
 		_hp = 0;
 		UInt8 t[3] = {1, 2, 3};
 		UInt64 v[3] = {0, _level, _exp};

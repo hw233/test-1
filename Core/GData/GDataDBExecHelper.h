@@ -111,31 +111,31 @@ struct DBSkill
 struct DBSkillEffect
 {
     UInt16 id;
-    UInt8 state;        // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反击 有等级之分
+    UInt8 state;        // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-额外伤害 有等级之分
     UInt8 immune;       // 对状态技能的免疫,只能免疫比自己技能低的技能
     UInt8 disperse;     // 驱散状态,只对友方使用,除自己外,是状态的值的和
-    std::string damage; // 物理伤害 [+/-]num/num% (目前物理伤害和法术伤害互斥)
+    std::string damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)
     float adddam;       // 物理伤害附加(具体值)
-    std::string magdam; // 法术伤害 [+/-]num/num%
+    std::string magdam; // 法术伤害 num/num%
     float addmag;       // 法术伤害附加(具体值)
     std::string hp;     // HP改变 [+/-]num/num%
-    float addhp;        // HP改变附加(具体值)
-    std::string absorb; // 伤害吸血 [+/-]num/num%
-    std::string thorn;  // 反弹 [+/-]num/num%
-    std::string inj2hp; // 受伤回扣 [+/-]num/num%
+    float addhp;        // HP改变附加(具体值)[+/-]
+    std::string absorb; // 伤害吸血 num/num%
+    std::string thorn;  // 反弹 num/num%
+    std::string inj2hp; // 受伤回扣 num/num%
     std::string aura;   // 作用士气 [+/-]num/num%
     std::string atk;    // 物理攻击 [+/-]num/num%
     std::string def;    // 物理防御 [+/-]num/num%
     std::string magatk; // 法术攻击 [+/-]num/num%
     std::string magdef; // 法术防御 [+/-]num/num%
-    float tough;        // 坚韧
-    float action;       // 身法
-    float hitrate;      // 命中
-    float evade;        // 闪避
-    float critical;     // 暴击
-    float pierce;       // 击破/护甲穿透
-    float counter;      // 反击
-    float magres;       // 法术抵抗
+    float tough;        // 坚韧[+/-]
+    float action;       // 身法[+/-]
+    float hitrate;      // 命中[+/-]
+    float evade;        // 闪避[+/-]
+    float critical;     // 暴击[+/-]
+    float pierce;       // 击破/护甲穿透[+/-]
+    float counter;      // 反击[+/-]
+    float magres;       // 法术抵抗[+/-]
 };
 
 struct DBTalent

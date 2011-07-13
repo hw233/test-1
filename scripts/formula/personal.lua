@@ -3,28 +3,40 @@
 
 -- 属性成长不分主副将
 --           儒     释      道
-str_factor = {0.5,  0.5,    3}  -- 力量
-phy_factor = {2,    2.5,    3}  -- 耐力
-agi_factor = {0.5,  1,      1}  -- 敏捷
-int_factor = {3.5,  2.5,  0.5}  -- 智力
-wil_factor = {1,    1,    0.5}  -- 意志
+str_factor = { 2,    3,      4}  -- 力量
+phy_factor = {10,   11,     12}  -- 耐力
+agi_factor = { 2,    2,      4}  -- 敏捷
+int_factor = { 5,    4,      2}  -- 智力
+wil_factor = { 2,    4,      2}  -- 意志
 
-str_atk_factor = 2.0            -- 力量影响的物理攻击系数
-int_atk_factor = 2.0            -- 智力影响的法术攻击系数
-agi_def_factor = 1.0            -- 敏捷影响的物理防御系数
-phy_hp_factor  = 15.0           -- 耐力影响的生命值系数
-wil_def_factor = 1.0            -- 意志影响的法术防御系数
+hp_factor     = {80,   88,     96}  -- 生命
+atk_factor    = { 8,   12,     16}  -- 物功
+def_factor    = { 4,    4,      4}  -- 物防
+magatk_factor = {20,   16,      8}  -- 法功
+magdef_factor = { 4,    8,      4}  -- 法防
+
+tough_factor       = { 0,  0,  0}  -- 坚韧
+action_factor      = { 1,  1,  1}  -- 身法
+hitrate_factor     = { 0,  0,  0}  -- 命中
+evade_factor       = { 0,  0,  0}  -- 闪避
+critical_factor    = { 0,  0,  0}  -- 暴击
+criticaldmg_factor = { 0,  0,  0}  -- 暴击伤害
+pierce_factor      = { 0,  0,  0}  -- 破击
+counter_factor     = { 0,  0,  0}  -- 反击
+magres_factor      = { 0,  0,  0}  -- 法术抵抗
+
+str_atk_factor = 4.0            -- 力量影响的物理攻击系数
+int_atk_factor = 4.0            -- 智力影响的法术攻击系数
+agi_def_factor = 2.0            -- 敏捷影响的物理防御系数
+phy_hp_factor  = 8.0            -- 耐力影响的生命值系数
+wil_def_factor = 2.0            -- 意志影响的法术防御系数
 
 str_cnt_factor = 0.02
 agi_act_factor = 1.0
 agi_evd_factor = 0.02
-phy_hp_factor  = 1.0
 phy_def_factor = 2
 int_hit_factor = 0.02
 
-atk_factor = 6
-hp_factor  = 15
-def_factor = 4000
 
 autobattle_tweak = 0.5
 autobattle_A = 2.5
@@ -56,7 +68,7 @@ function calcStrength( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel()
+  local lvl = fgt:getLevel() - 1
   return (str + pot * str_factor[cls] * lvl) * (1 + fgt:getExtraStrengthPercent()) + fgt:getExtraStrength()
 end
 
@@ -70,7 +82,7 @@ function calcPhysique( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel()
+  local lvl = fgt:getLevel() - 1
   return (phy + pot * phy_factor[cls] * lvl) * (1 + fgt:getExtraPhysiquePercent()) + fgt:getExtraPhysique()
 end
 
@@ -84,7 +96,7 @@ function calcAgility( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel()
+  local lvl = fgt:getLevel() - 1
   return (agi + pot * agi_factor[cls] * lvl) * (1 + fgt:getExtraAgilityPercent()) + fgt:getExtraAgility()
 end
 
@@ -98,7 +110,7 @@ function calcIntelligence( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel()
+  local lvl = fgt:getLevel() - 1
   return (int + pot * int_factor[cls] * lvl) * (1 + fgt:getExtraIntelligencePercent()) + fgt:getExtraIntelligence()
 end
 
@@ -112,7 +124,7 @@ function calcWill( fgt )
   end
   local cls = fgt:getClass()
   local pot = fgt:getPotential()
-  local lvl = fgt:getLevel()
+  local lvl = fgt:getLevel() - 1
   return (wil + pot * wil_factor[cls] * lvl) * (1 + fgt:getExtraWillPercent()) + fgt:getExtraWill()
 end
 
@@ -126,8 +138,8 @@ function calcHP( fgt )
       return hp * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel()
-  return (hp + hp_factor * lvl) * (1 + phy_hp_factor * calcPhysique(fgt) / 100) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
+  local lvl = fgt:getLevel() - 1
+  return (hp + hp_factor[cls] * lvl + phy_hp_factor * calcPhysique(fgt)) * (1 + fgt:getExtraHPPercent()) + fgt:getExtraHP()
 end
 
 function calcAction( fgt )
@@ -135,8 +147,9 @@ function calcAction( fgt )
     return 0
   end
   local cls = fgt:getClass()
+  local lvl = fgt:getLevel() - 1
   local act = fgt:getBaseAction()
-  return act + fgt:getExtraAction();
+  return act + action_factor[cls] * lvl + fgt:getExtraAction();
 end
 
 function calcAttack( fgt )
@@ -148,8 +161,8 @@ function calcAttack( fgt )
       return atk * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel()
-  return ((atk + str_atk_factor * calcStrength(fgt)) * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack())
+  local lvl = fgt:getLevel() - 1
+  return ((atk + atk_factor[cls] * lvl + str_atk_factor * calcStrength(fgt)) * (1 + fgt:getExtraAttackPercent()) + fgt:getExtraAttack())
 end
 
 function calcMagAttack( fgt )
@@ -161,8 +174,8 @@ function calcMagAttack( fgt )
       return magatk * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack()
   end
   local cls = fgt:getClass()
-  local lvl = fgt:getLevel()
-  return ((magatk + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
+  local lvl = fgt:getLevel() - 1
+  return ((magatk + magatk_factor[cls] * lvl + int_atk_factor * calcIntelligence(fgt)) * (1 + fgt:getExtraMagAttackPercent()) + fgt:getExtraMagAttack())
 end
 
 function calcDefend( fgt )
@@ -174,7 +187,8 @@ function calcDefend( fgt )
       return def * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend()
   end
   local cls = fgt:getClass()
-  return (def + agi_def_factor * calcAgility(fgt)) * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend()
+  local lvl = fgt:getLevel() - 1
+  return (def + def_factor[cls] * lvl + agi_def_factor * calcAgility(fgt)) * (1 + fgt:getExtraDefendPercent()) + fgt:getExtraDefend()
 end
 
 function calcMagDefend( fgt )
@@ -186,7 +200,8 @@ function calcMagDefend( fgt )
       return def * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
   end
   local cls = fgt:getClass()
-  return (def + wil_def_factor * calcWill(fgt)) * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
+  local lvl = fgt:getLevel() - 1
+  return (def + magdef_factor[cls] * lvl + wil_def_factor * calcWill(fgt)) * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
 end
 
 function calcHitrate( fgt )
@@ -242,12 +257,48 @@ function calcDamage( atk, def )
   return atk - def
 end
 
+function calcCriticalDmg( fgt )
+  if fgt == nil then
+    return 0
+  end
+  local cls = fgt:getClass()
+  local cri = fgt:getBaseCriticalDmg()
+  return cri + fgt:getExtraCriticalDmg()
+end
+
+function calcMagRes( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local cls = fgt:getClass()
+    local magres = fgt:getBaseMagRes()
+    return magres + fgt:getExtraMagRes()
+end
+
+function calcSoul( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local cls = fgt:getClass()
+    local soul = fgt:getBaseSoul()
+    return soul + fgt:getExtraSoul()
+end
+
+function calcTough( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local cls = fgt:getClass(0)
+    local tough = fgt:getBaseTough()
+    return tough + fgt:getExtraTough()
+end
+
 function calcBattlePoint( fgt )
   if fgt == nil then
     return 0
   end
   if fgt:isNpc() then
-    local lvl = fgt:getLevel()
+    local lvl = fgt:getLevel() - 1
     if lvl >= 70 then
       local cls = 1
       local atk = fgt:getBaseAttack()

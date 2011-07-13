@@ -250,6 +250,7 @@ void BattleFighter::updateAllAttr()
 	_maxAction = _formula->calcAction(this);
 	UInt32 oldhp = _maxhp;
 	_maxhp = _formula->calcHP(this);
+    _criticaldmg = _formula->calcCriticalDmg(this);
 
     _aura = _formula->calcAura(this);
     _auraMax = _formula->calcAuraMax(this);
@@ -401,11 +402,11 @@ float BattleFighter::calcPoison(const GData::SkillBase* skill)
     // µÀ
     if(getClass() == 3)
     {
-        return (_attack+ _attackAdd) * skill->effect->hpP;
+        return (_attack+ _attackAdd) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
     }
 
     // ÈåÊÍ
-    return (_magatk + _magAtkAdd) * skill->effect->hpP;
+    return (_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
 }
 
 bool BattleFighter::calcHit( BattleFighter * defender )

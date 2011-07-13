@@ -321,7 +321,7 @@ namespace GObject
 			fgt->hitrate = dbfgt.hitrate;
 			fgt->evade = dbfgt.evade;
 			fgt->critical = dbfgt.critical;
-			fgt->criticaldmg = dbfgt.criticaldmg;
+			fgt->criticaldmg = dbfgt.criticaldmg / 100;
 			fgt->pierce = dbfgt.pierce;
 			fgt->counter = dbfgt.counter;
 			fgt->magres = dbfgt.magres;
