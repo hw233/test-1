@@ -77,7 +77,7 @@ function ItemNormal_AddBuff(obj, idx, num, count, max_num)
   return true
 end
 
-function ItemNormal_00008900(iid, num, bind, param)
+function ItemNormal_00000001(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   if player:hasFlag(9) then
@@ -94,7 +94,7 @@ function ItemNormal_00008900(iid, num, bind, param)
 	end
 	hp = num * 300;
 	fgt:regenHP(hp);
-	package:DelItemSendMsg(8900, player);
+	package:DelItemSendMsg(1, player);
 	return true;
 end
 
@@ -222,7 +222,7 @@ function ItemNormal_00008907(iid, num, bind, param)
   end
 end
 
-function ItemNormal_00008908(iid, num, bind, param)
+function ItemNormal_00000002(iid, num, bind, param)
   local player = GetPlayer();
   local fgt = player:findFighter(param)
   local package = player:GetPackage();
@@ -232,14 +232,14 @@ function ItemNormal_00008908(iid, num, bind, param)
   fgt:setBuffData(2, 0, true)
   fgt:setBuffData(3, 0, true)
   if ItemNormal_AddBuff(fgt, 1, 1800, num, 18000) then
-	package:DelItemSendMsg(8908, player);
+	package:DelItemSendMsg(2, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008909(iid, num, bind, param)
+function ItemNormal_00000003(iid, num, bind, param)
   local player = GetPlayer();
   local fgt = player:findFighter(param)
   local package = player:GetPackage();
@@ -249,14 +249,14 @@ function ItemNormal_00008909(iid, num, bind, param)
   fgt:setBuffData(1, 0, true)
   fgt:setBuffData(3, 0, true)
   if ItemNormal_AddBuff(fgt, 2, 1800, num, 18000) then
-	package:DelItemSendMsg(8909, player);
+	package:DelItemSendMsg(3, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008910(iid, num, bind, param)
+function ItemNormal_00000004(iid, num, bind, param)
     local player = GetPlayer();
 	local fgt = player:findFighter(param)
   local package = player:GetPackage();
@@ -266,7 +266,7 @@ function ItemNormal_00008910(iid, num, bind, param)
   fgt:setBuffData(1, 0, true)
   fgt:setBuffData(2, 0, true)
   if ItemNormal_AddBuff(fgt, 3, 1800, num, 18000) then
- 	package:DelItemSendMsg(8910, player);
+ 	package:DelItemSendMsg(4, player);
 	return true;
   else
 	return false;
@@ -274,39 +274,39 @@ function ItemNormal_00008910(iid, num, bind, param)
 
 end
 
-function ItemNormal_00008911(iid, num, bind, param)
+function ItemNormal_00000005(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(2, 0, true)
   player:setBuffData(3, 0, true)
   if ItemNormal_AddBuff(player, 1, 1800, num, 18000) then
- 	package:DelItemSendMsg(8911, player);
+ 	package:DelItemSendMsg(5, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008912(iid, num, bind, param)
+function ItemNormal_00000006(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(1, 0, true)
   player:setBuffData(3, 0, true)
   if ItemNormal_AddBuff(player, 2, 1800, num, 18000) then
-  	package:DelItemSendMsg(8912, player);
+  	package:DelItemSendMsg(6, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008913(iid, num, bind, param)
+function ItemNormal_00000007(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(1, 0, true)
   player:setBuffData(2, 0, true)
   if ItemNormal_AddBuff(player, 3, 1800, num, 18000) then
-   	package:DelItemSendMsg(8913, player);
+   	package:DelItemSendMsg(7, player);
 	return true;
   else
 	return false;
@@ -342,7 +342,7 @@ function ItemNormal_00008931(iid, num, bind, param)
   return true
 end
 
-function ItemNormal_00008932(iid, num, bind, param)
+function ItemNormal_00000011(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	local num2 = player:getBuffData(0x04, os.time());
@@ -353,40 +353,64 @@ function ItemNormal_00008932(iid, num, bind, param)
 	if num2 > 18000 then
 		num2 = 18000;
 	end
-	package:DelItemSendMsg(8932, player);
+	package:DelItemSendMsg(11, player);
 	player:setBuffData(0x04, os.time() + num2, true);
 	return true;
 end
 
-function ItemNormal_00008933(iid, num, bind, param)
+function ItemNormal_00000055(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(6, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
   if ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
-  	package:DelItemSendMsg(8933, player);
+  	package:DelItemSendMsg(55, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008934(iid, num, bind, param)
+function ItemNormal_00000056(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(5, 0, true)
   player:setBuffData(10, 0, true)
   player:setBuffData(11, 0, true)
   if ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
-  	package:DelItemSendMsg(8934, player);
+  	package:DelItemSendMsg(56, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008935(iid, num, bind, param)
+function ItemNormal_00000057(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(23, 0, true)
+  if ItemNormal_AddBuff(player, 22, 3600, num, 356400) then
+  	package:DelItemSendMsg(57, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00000058(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(22, 0, true)
+  if ItemNormal_AddBuff(player, 23, 3600, num, 356400) then
+  	package:DelItemSendMsg(58, player);
+	return true;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00000012(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
   local package = player:GetPackage();
@@ -396,14 +420,14 @@ function ItemNormal_00008935(iid, num, bind, param)
   local oldexp = fgt:getExp();
 	fgt:addExp(5000*num);
   if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(8935, player);
+  	package:DelItemSendMsg(12, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008936(iid, num, bind, param)
+function ItemNormal_00000013(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
     local package = player:GetPackage();
@@ -413,14 +437,14 @@ function ItemNormal_00008936(iid, num, bind, param)
   local oldexp = fgt:getExp();
 	fgt:addExp(30000*num);
   if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(8936, player);
+  	package:DelItemSendMsg(13, player);
 	return true;
   else
 	return false;
   end
 end
 
-function ItemNormal_00008937(iid, num, bind, param)
+function ItemNormal_00000014(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
     local package = player:GetPackage();
@@ -430,7 +454,7 @@ function ItemNormal_00008937(iid, num, bind, param)
   local oldexp = fgt:getExp();
 	fgt:addExp(60000*num);
   if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(8937, player);
+  	package:DelItemSendMsg(14, player);
 	return true;
   else
 	return false;
@@ -461,26 +485,22 @@ function ItemNormal_00008940(iid, num, bind, param)
 	return true;
 end
 
-function ItemNormal_00008942(iid, num, bind, param)  
+function ItemNormal_00000017(iid, num, bind, param)  
 	local player = GetPlayer();
 	local package = player:GetPackage();
-	local reqGrids = 3;
-	reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
-	reqGrids = reqGrids + package:GetItemUsedGrids(8900, 5, 1);
-	reqGrids = reqGrids + package:GetItemUsedGrids(8933, 2, 1);
-	reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
-	reqGrids = reqGrids + package:GetItemUsedGrids(8943, 1, 1);
+	local reqGrids = 9;
 
 	if reqGrids <= 	package:GetRestPackageSize() then
-    	package:DelItemSendMsg(8942, player);
-		package:AddEquip(10, 1);
-		package:AddEquip(11, 1);
-		package:AddEquip(13, 1);
-		package:AddItem(8921, 2, 1, 0, 2);
-		package:AddItem(8900, 5, 1, 0, 2);
-		package:AddItem(8933, 2, 1, 0, 2);
-		package:AddItem(9, 1, 1, 0, 2);
-		package:AddItem(8943, 1, 1, 0, 2);
+    	package:DelItemSendMsg(17, player);
+		package:AddEquip(2000, 1);
+		package:AddEquip(2001, 1);
+		package:AddEquip(2002, 1);
+		package:AddEquip(2003, 1);
+		package:AddEquip(2004, 1);
+		package:AddEquip(2005, 1);
+		package:AddEquip(2006, 1);
+		package:AddEquip(2007, 1);
+		package:AddItem(18, 1, 1, 0, 2);
 		player:getCoupon(30);
 		return true;
 	end
@@ -488,44 +508,22 @@ function ItemNormal_00008942(iid, num, bind, param)
 	return false;
 end
 
-function ItemNormal_00008943(iid, num, bind, param)
+function ItemNormal_00000018(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 10 then
        local package = player:GetPackage();
-	   local reqGrids = 15;
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8901, 5, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
-       reqGrids = reqGrids + package:GetItemUsedGrids(5001, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5011, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5021, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5031, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8917, 5, 1);
+	   local reqGrids = 9;
 	   if reqGrids <= 	package:GetRestPackageSize() then
-           package:DelItemSendMsg(8943, player);
-		   package:AddEquip(61, 1);
-		   package:AddEquip(62, 1);
-		   package:AddEquip(63, 1);
-		   package:AddEquip(64, 1);
-		   package:AddEquip(65, 1);
-		   package:AddEquip(66, 1);
-		   package:AddEquip(67, 1);
-		   package:AddEquip(68, 1);
-		   package:AddEquip(69, 1);
-		   package:AddEquip(70, 1);
-		   package:AddEquip(71, 1);
-		   package:AddEquip(72, 1);
-		   package:AddEquip(73, 1);
-		   package:AddEquip(74, 1);
-		   package:AddItem(8921, 2, 1, 0, 2);
-		   package:AddItem(8901, 5, 1, 0, 2);
-		   package:AddItem(8922, 2, 1, 0, 2);
-		   package:AddItem(5001, 1, 1, 0, 2);
-	   	   package:AddItem(5011, 1, 1, 0, 2);
-		   package:AddItem(5021, 1, 1, 0, 2);
-		   package:AddItem(5031, 1, 1, 0, 2);
-		   package:AddItem(8917, 5, 1, 0, 2);
-		   package:AddItem(8944, 1, 1, 0, 2);
+           package:DelItemSendMsg(18, player);
+		   package:AddEquip(2192, 1);
+		   package:AddEquip(2193, 1);
+		   package:AddEquip(2194, 1);
+		   package:AddEquip(2195, 1);
+		   package:AddEquip(2196, 1);
+		   package:AddEquip(2197, 1);
+		   package:AddEquip(2198, 1);
+		   package:AddEquip(2199, 1);
+		   package:AddItem(19, 1, 1, 0, 2);
 	  	   player:getCoupon(30);
 		   return true;
 		end
@@ -537,42 +535,22 @@ function ItemNormal_00008943(iid, num, bind, param)
 end
 
 
-function ItemNormal_00008944(iid, num, bind, param)
+function ItemNormal_00000019(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 20 then
 	   local package = player:GetPackage();
-  	   local reqGrids = 15;
- 	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5002, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5012, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5022, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(5032, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8917, 5, 1);
+  	   local reqGrids = 9;
 	   if reqGrids <= 	package:GetRestPackageSize() then
-		   package:DelItemSendMsg(8944, player);
-		   package:AddEquip(121, 1);
-		   package:AddEquip(122, 1);
-		   package:AddEquip(123, 1);
-		   package:AddEquip(124, 1);
-		   package:AddEquip(125, 1);
-		   package:AddEquip(126, 1);
-		   package:AddEquip(127, 1);
-		   package:AddEquip(128, 1);
-		   package:AddEquip(129, 1);
-		   package:AddEquip(130, 1);
-		   package:AddEquip(131, 1);
-		   package:AddEquip(132, 1);
-		   package:AddEquip(133, 1);
-		   package:AddEquip(134, 1);	
-		   package:AddItem(8922, 2, 1, 0, 2);
-		   package:AddItem(9, 1, 1, 0, 2);
-		   package:AddItem(5002, 1, 1, 0, 2);
-		   package:AddItem(5012, 1, 1, 0, 2);
-		   package:AddItem(5022, 1, 1, 0, 2);
-		   package:AddItem(5032, 1, 1, 0, 2);
-		   package:AddItem(8917, 5, 1, 0, 2);
-		   package:AddItem(8945, 1, 1, 0, 2);
+		   package:DelItemSendMsg(19, player);
+		   package:AddEquip(2200, 1);
+		   package:AddEquip(2201, 1);
+		   package:AddEquip(2202, 1);
+		   package:AddEquip(2203, 1);
+		   package:AddEquip(2204, 1);
+		   package:AddEquip(2205, 1);
+		   package:AddEquip(2206, 1);
+		   package:AddEquip(2207, 1);
+		   package:AddItem(20, 1, 1, 0, 2);
 		   player:getCoupon(40);
 		   return true;
 		end
@@ -583,38 +561,49 @@ function ItemNormal_00008944(iid, num, bind, param)
 	return false;
 end
 
-function ItemNormal_00008945(iid, num, bind, param)
+function ItemNormal_00000020(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 30 then
 	   local package = player:GetPackage();
-	   local reqGrids = 15;
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8935, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8920, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8914, 1, 1);
+	   local reqGrids = 9;
 	   if reqGrids <= 	package:GetRestPackageSize() then
-	       package:DelItemSendMsg(8945, player);
-	  	   package:AddEquip(181, 1);
-		   package:AddEquip(182, 1);
-		   package:AddEquip(183, 1);
-		   package:AddEquip(184, 1);
-		   package:AddEquip(185, 1);
-		   package:AddEquip(186, 1);
-		   package:AddEquip(187, 1);
-		   package:AddEquip(188, 1);
-		   package:AddEquip(189, 1);
-		   package:AddEquip(190, 1);
-		   package:AddEquip(191, 1);
-		   package:AddEquip(192, 1);
-		   package:AddEquip(193, 1);
-		   package:AddEquip(194, 1);	
-		   package:AddItem(8935, 1, 1, 0, 2);
-		   package:AddItem(8922, 2, 1, 0, 2);
-		   package:AddItem(9, 2, 1, 0, 2);
-		   package:AddItem(8920, 1, 1, 0, 2);
-		   package:AddItem(8914, 1, 1, 0, 2);	
-		   package:AddItem(8946, 1, 1, 0, 2);
+	       package:DelItemSendMsg(20, player);
+           local fgt = player:getMainFighter();
+           if fgt == nil then
+               return false
+           end
+
+           local cls = fgt:getClass()
+           if cls == 1 then
+               package:AddEquip(2224, 1);
+               package:AddEquip(2225, 1);
+               package:AddEquip(2226, 1);
+               package:AddEquip(2227, 1);
+               package:AddEquip(2228, 1);
+               package:AddEquip(2229, 1);
+               package:AddEquip(2230, 1);
+               package:AddEquip(2231, 1);
+           elseif cls == 2 then
+               package:AddEquip(2216, 1);
+               package:AddEquip(2217, 1);
+               package:AddEquip(2218, 1);
+               package:AddEquip(2219, 1);
+               package:AddEquip(2220, 1);
+               package:AddEquip(2221, 1);
+               package:AddEquip(2222, 1);
+               package:AddEquip(2223, 1);
+           elseif cls == 3 then
+               package:AddEquip(2208, 1);
+               package:AddEquip(2209, 1);
+               package:AddEquip(2210, 1);
+               package:AddEquip(2211, 1);
+               package:AddEquip(2212, 1);
+               package:AddEquip(2213, 1);
+               package:AddEquip(2214, 1);
+               package:AddEquip(2215, 1);
+           end
+
+		   package:AddItem(21, 1, 1, 0, 2);
 		   player:getCoupon(40);
 		   return true;
 		end
@@ -626,57 +615,119 @@ function ItemNormal_00008945(iid, num, bind, param)
 end
 
 
-function ItemNormal_00008946(iid, num, bind, param)
+function ItemNormal_00000021(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 40 then
 	   local package = player:GetPackage();
-	   local reqGrids = 15;
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 3, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8927, 1, 1);
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8925, 1, 1);	
+	   local reqGrids = 8;
 	   if reqGrids <= 	package:GetRestPackageSize() then
-	   	   package:DelItemSendMsg(8946, player);
-           package:AddEquip(241, 1);
-		   package:AddEquip(242, 1);
-		   package:AddEquip(243, 1);
-		   package:AddEquip(244, 1);
-		   package:AddEquip(245, 1);
-		   package:AddEquip(246, 1);
-		   package:AddEquip(247, 1);
-		   package:AddEquip(248, 1);
-		   package:AddEquip(249, 1);
-		   package:AddEquip(250, 1);
-		   package:AddEquip(251, 1);
-		   package:AddEquip(252, 1);
-		   package:AddEquip(253, 1);
-		   package:AddEquip(254, 1);	
-		   package:AddItem(8936, 1, 1, 0, 2);
-		   package:AddItem(8923, 2, 1, 0, 2);
-		   package:AddItem(9, 3, 1, 0, 2);
-		   package:AddItem(8915, 1, 1, 0, 2);
-		   package:AddItem(8927, 1, 1, 0, 2);
-		   package:AddItem(8925, 1, 1, 0, 2);
-           package:AddItem(8947, 1, 1, 0, 2);	
-           player:getCoupon(50);		
+	       package:DelItemSendMsg(20, player);
+           local fgt = player:getMainFighter();
+           if fgt == nil then
+               return false
+           end
+
+           local cls = fgt:getClass()
+           if cls == 1 then
+               package:AddEquip(2248, 1);
+               package:AddEquip(2249, 1);
+               package:AddEquip(2250, 1);
+               package:AddEquip(2251, 1);
+               package:AddEquip(2252, 1);
+               package:AddEquip(2253, 1);
+               package:AddEquip(2254, 1);
+               package:AddEquip(2255, 1);
+           elseif cls == 2 then
+               package:AddEquip(2240, 1);
+               package:AddEquip(2241, 1);
+               package:AddEquip(2242, 1);
+               package:AddEquip(2243, 1);
+               package:AddEquip(2244, 1);
+               package:AddEquip(2245, 1);
+               package:AddEquip(2246, 1);
+               package:AddEquip(2247, 1);
+           elseif cls == 3 then
+               package:AddEquip(2232, 1);
+               package:AddEquip(2233, 1);
+               package:AddEquip(2234, 1);
+               package:AddEquip(2235, 1);
+               package:AddEquip(2236, 1);
+               package:AddEquip(2237, 1);
+               package:AddEquip(2238, 1);
+               package:AddEquip(2239, 1);
+           end
+		   player:getCoupon(40);
 		   return true;
 		end
-		player:sendMsgCode(2, 2014, 0);
-		return false;
 	end
 	player:sendMsgCode(2, 2015, 0);
 	return false;
 end
 
+function ItemNormal_00000029(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    fgt:addPExp(1000);
+    package:DelItemSendMsg(29, player);
+    return true;
+end
+
+function ItemNormal_00000030(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    fgt:addPExp(5000);
+    package:DelItemSendMsg(30, player);
+    return true;
+end
+
+function ItemNormal_00000031(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    fgt:addPExp(10000);
+    package:DelItemSendMsg(31, player);
+    return true;
+end
+
+function ItemNormal_00000043(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    local num = player:getBuffData(24)
+    if num then
+        return false;
+    end
+
+    fgt:addPExp(10000);
+    local now = os.time() + 8*60*60 -- UTC+8
+    now = now % (24*60*60)
+	if ItemNormal_AddBuff(player, 24, 24*60*60-now, num, 36000) then
+		package:DelItemSendMsg(31, player);
+		return true;
+	end
+    return true;
+end
 
 function ItemNormal_00008947(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 50 then 
 	   local package = player:GetPackage();
 	   local reqGrids = 14;
-	   reqGrids = reqGrids + package:GetItemUsedGrids(8937, 1, 1);
+	   reqGrids = reqGrids + package:GetItemUsedGrids(14, 1, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);
 	   reqGrids = reqGrids + package:GetItemUsedGrids(9, 5, 1);	
 	   reqGrids = reqGrids + package:GetItemUsedGrids(8916, 1, 1);	
@@ -698,7 +749,7 @@ function ItemNormal_00008947(iid, num, bind, param)
 		   package:AddEquip(452, 1);
 		   package:AddEquip(453, 1);
 		   package:AddEquip(454, 1);
-		   package:AddItem(8937, 1, 1, 0, 2);
+		   package:AddItem(14, 1, 1, 0, 2);
 		   package:AddItem(8923, 2, 1, 0, 2);
 		   package:AddItem(9, 5, 1, 0, 2);	
 		   package:AddItem(8916, 1, 1, 0, 2);
@@ -719,11 +770,11 @@ function ItemNormal_00008949(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	local randGem = Gem_Level_1[math.random(1, table.getn(Gem_Level_1))];
-	local reqGrids = package:GetItemUsedGrids(randGem, 1, 1) + package:GetItemUsedGrids(8935, 1, 1);
+	local reqGrids = package:GetItemUsedGrids(randGem, 1, 1) + package:GetItemUsedGrids(12, 1, 1);
 	if reqGrids <= 	package:GetRestPackageSize() then
 	    package:DelItemSendMsg(8949, player);
 		package:AddItem(randGem, 1, 1);
-		package:AddItem(8935, 1, 1);
+		package:AddItem(12, 1, 1);
 		return true;
 	end
 	player:sendMsgCode(2, 2014, 0);
@@ -746,13 +797,13 @@ function ItemNormal_00008950(iid, num, bind, param)
 	local reqGrids = package:GetItemUsedGrids(randGem1, 1, 1);
     reqGrids = reqGrids + package:GetItemUsedGrids(randGem2, 1, 1);
     reqGrids = reqGrids + 1;
-    reqGrids = reqGrids + package:GetItemUsedGrids(8935, 3, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(12, 3, 1);
 	if reqGrids <= 	package:GetRestPackageSize() then
 		package:DelItemSendMsg(8950, player);
 	    package:AddEquip(randEquip, 1);
 		package:AddItem(randGem1, 1, 1, 0, 2);
 		package:AddItem(randGem2, 1, 1, 0, 2);
-		package:AddItem(8935, 3, 1, 0, 2);
+		package:AddItem(12, 3, 1, 0, 2);
 		return true;
 	end
 	player:sendMsgCode(2, 2014, 0);
@@ -784,7 +835,7 @@ function ItemNormal_00008951(iid, num, bind, param)
 	reqGrids = reqGrids + package:GetItemUsedGrids(randGem2, 1, 1);
 	reqGrids = reqGrids + package:GetItemUsedGrids(randGem3, 1, 1);
 	reqGrids = reqGrids + 2;
-    reqGrids = reqGrids + package:GetItemUsedGrids(8935, 4, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(12, 4, 1);
 	if reqGrids <= 	package:GetRestPackageSize() then
 		package:DelItemSendMsg(8951, player);
      	package:AddEquip(randEquip1, 1);
@@ -792,7 +843,7 @@ function ItemNormal_00008951(iid, num, bind, param)
 		package:AddItem(randGem1, 1, 1, 0, 2);
 		package:AddItem(randGem2, 1, 1, 0, 2);
 		package:AddItem(randGem3, 1, 1, 0, 2);
-		package:AddItem(8935, 4, 1, 0, 2);
+		package:AddItem(12, 4, 1, 0, 2);
 		return true;
 	end
 	player:sendMsgCode(2, 2014, 0);
@@ -820,7 +871,7 @@ function ItemNormal_00008952(iid, num, bind, param)
     reqGrids = reqGrids + package:GetItemUsedGrids(randGem3, 1, 1);
     reqGrids = reqGrids + package:GetItemUsedGrids(randGem4, 1, 1);
     reqGrids = reqGrids + 1;
-    reqGrids = reqGrids + package:GetItemUsedGrids(8935, 5, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(12, 5, 1);
 	if reqGrids <= 	package:GetRestPackageSize() then
 		package:DelItemSendMsg(8952, player);
     	package:AddEquip(randEquip, 1);
@@ -828,7 +879,7 @@ function ItemNormal_00008952(iid, num, bind, param)
 		package:AddItem(randGem2, 1, 1, 0, 2);
         package:AddItem(randGem3, 1, 1, 0, 2);
         package:AddItem(randGem4, 1, 1, 0, 2);
-		package:AddItem(8935, 5, 1, 0, 2);
+		package:AddItem(12, 5, 1, 0, 2);
 		return true;
 	end
 	player:sendMsgCode(2, 2014, 0);
@@ -856,14 +907,14 @@ function ItemNormal_00008953(iid, num, bind, param)
 	if  r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 3, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(12, 3, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8953, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8935, 3, 1, 0, 2);
+			package:AddItem(12, 3, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -872,12 +923,12 @@ function ItemNormal_00008953(iid, num, bind, param)
 		randAmount = 1; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 3, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(12, 3, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8953, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8935, 3, 1, 0, 2);
+			package:AddItem(12, 3, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -907,14 +958,14 @@ function ItemNormal_00008954(iid, num, bind, param)
 	if  r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 4, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(12, 4, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8954, player);
 			package:AddEquip(randEquip1 ,1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8935, 4, 1, 0, 2);
+			package:AddItem(12, 4, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -923,12 +974,12 @@ function ItemNormal_00008954(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 4, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(12, 4, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8954, player);
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8935, 4, 1, 0, 2);
+			package:AddItem(12, 4, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -957,14 +1008,14 @@ function ItemNormal_00008955(iid, num, bind, param)
 	if  r <= 0.15 then
 		randAmount = 2; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 5, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(12, 5, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8955, player);
 			package:AddEquip(randEquip1,1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8935, 5, 1, 0, 2);
+			package:AddItem(12, 5, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -973,12 +1024,12 @@ function ItemNormal_00008955(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8935, 5, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(12, 5, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8955, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8935, 5, 1, 0, 2);
+			package:AddItem(12, 5, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1006,14 +1057,14 @@ function ItemNormal_00008956(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 1, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8956, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 1, 1, 0, 2);
+			package:AddItem(13, 1, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1022,12 +1073,12 @@ function ItemNormal_00008956(iid, num, bind, param)
 		randAmount = 1; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 1, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 1, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8956, player);
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 1, 1, 0, 2);
+			package:AddItem(13, 1, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1054,14 +1105,14 @@ function ItemNormal_00008957(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 2, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8957, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 2, 1, 0, 2);
+			package:AddItem(13, 2, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1070,12 +1121,12 @@ function ItemNormal_00008957(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 2, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8957, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 2, 1, 0, 2);
+			package:AddItem(13, 2, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1102,14 +1153,14 @@ function ItemNormal_00008958(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 2, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8958, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 2, 1, 0, 2);
+			package:AddItem(13, 2, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1118,12 +1169,12 @@ function ItemNormal_00008958(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 2, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8958, player);
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 2, 1, 0, 2);
+			package:AddItem(13, 2, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1150,14 +1201,14 @@ function ItemNormal_00008959(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 2, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8959, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 2, 1, 0, 2);
+			package:AddItem(13, 2, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1166,12 +1217,12 @@ function ItemNormal_00008959(iid, num, bind, param)
 		randAmount = 1; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 2, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 2, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8959, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 2, 1, 0, 2);
+			package:AddItem(13, 2, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1198,14 +1249,14 @@ function ItemNormal_00008960(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 3, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8960, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 3, 1, 0, 2);
+			package:AddItem(13, 3, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1214,12 +1265,12 @@ function ItemNormal_00008960(iid, num, bind, param)
 		randAmount = 1; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 3, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8960, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 3, 1, 0, 2);
+			package:AddItem(13, 3, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1246,14 +1297,14 @@ function ItemNormal_00008961(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 4, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8961, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 4, 1, 0, 2);
+			package:AddItem(13, 4, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1262,12 +1313,12 @@ function ItemNormal_00008961(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 4, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8961, player);
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 4, 1, 0, 2);
+			package:AddItem(13, 4, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1294,14 +1345,14 @@ function ItemNormal_00008962(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 5, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8962, player);
 			package:AddEquip(randEquip1, 1);
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 5, 1, 0, 2);
+			package:AddItem(13, 5, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1310,12 +1361,12 @@ function ItemNormal_00008962(iid, num, bind, param)
 		randAmount = 1; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 5, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8962, player);
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 5, 1, 0, 2);
+			package:AddItem(13, 5, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1344,14 +1395,14 @@ function ItemNormal_00008963(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 3, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8963, player);
 			package:AddEquip(randEquip1, 1, 0, 2);-- for backstatge 2: equip from box
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 3, 1, 0, 2);
+			package:AddItem(13, 3, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1360,12 +1411,12 @@ function ItemNormal_00008963(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 3, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 3, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8963, player);
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 3, 1, 0, 2);
+			package:AddItem(13, 3, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1394,14 +1445,14 @@ function ItemNormal_00008964(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;  
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 4, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8964, player);
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 4, 1, 0, 2);
+			package:AddItem(13, 4, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1410,12 +1461,12 @@ function ItemNormal_00008964(iid, num, bind, param)
 		randAmount = 1; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 4, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 4, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8964, player);
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 4, 1, 0, 2);
+			package:AddItem(13, 4, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1444,14 +1495,14 @@ function ItemNormal_00008965(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2; 
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 5, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8965, player);
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 5, 1, 0, 2);
+			package:AddItem(13, 5, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1460,12 +1511,12 @@ function ItemNormal_00008965(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 5, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 5, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8965, player);
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 5, 1, 0, 2);
+			package:AddItem(13, 5, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1494,14 +1545,14 @@ function ItemNormal_00008966(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 6, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 6, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8966, player);
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 6, 1, 0, 2);
+			package:AddItem(13, 6, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1510,12 +1561,12 @@ function ItemNormal_00008966(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 6, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 6, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8966, player);
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 6, 1, 0, 2);
+			package:AddItem(13, 6, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1544,14 +1595,14 @@ function ItemNormal_00008967(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 7, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8967, player);
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 7, 1, 0, 2);
+			package:AddItem(13, 7, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1560,12 +1611,12 @@ function ItemNormal_00008967(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 7, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(8967, player);
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 7, 1, 0, 2);
+			package:AddItem(13, 7, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -1578,7 +1629,7 @@ function ItemNormal_00008968(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	
-  local reqGrids = 3 + package:GetItemUsedGrids(8937, 2, 1)
+  local reqGrids = 3 + package:GetItemUsedGrids(14, 2, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -1589,7 +1640,7 @@ function ItemNormal_00008968(iid, num, bind, param)
   package:DelItemSendMsg(8968, player);
   package:AddEquip(randEquip, 1, 0, 2);			
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 2, 1, 0, 2);
+  package:AddItem(14, 2, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
   return true;
@@ -1600,7 +1651,7 @@ function ItemNormal_00008969(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	
-  local reqGrids = 2 + package:GetItemUsedGrids(8937, 3, 1)
+  local reqGrids = 2 + package:GetItemUsedGrids(14, 3, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -1611,7 +1662,7 @@ function ItemNormal_00008969(iid, num, bind, param)
   package:DelItemSendMsg(8969, player);
   package:AddEquip(randEquip, 1, 0, 2);			
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 3, 1, 0, 2);
+  package:AddItem(14, 3, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
   return true;
@@ -1622,7 +1673,7 @@ function ItemNormal_00008970(iid, num, bind, param)
  	local player = GetPlayer();
 	local package = player:GetPackage();
 	
-  local reqGrids = 2 + package:GetItemUsedGrids(8937, 4, 1)
+  local reqGrids = 2 + package:GetItemUsedGrids(14, 4, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -1633,7 +1684,7 @@ function ItemNormal_00008970(iid, num, bind, param)
   package:DelItemSendMsg(8970, player);
   package:AddEquip(randEquip, 1, 0, 2);			
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 4, 1, 0, 2);
+  package:AddItem(14, 4, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
   return true;
@@ -1644,7 +1695,7 @@ function ItemNormal_00008971(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	
-  local reqGrids = 2 + package:GetItemUsedGrids(8937, 5, 1)
+  local reqGrids = 2 + package:GetItemUsedGrids(14, 5, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -1655,7 +1706,7 @@ function ItemNormal_00008971(iid, num, bind, param)
   package:DelItemSendMsg(8971, player);
   package:AddEquip(randEquip, 1, 0, 2);			
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 5, 1, 0, 2);
+  package:AddItem(14, 5, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
   return true;
@@ -1666,7 +1717,7 @@ function ItemNormal_00008972(iid, num, bind, param)
   local player = GetPlayer();
   local package = player:GetPackage();
 	
-  local reqGrids = 2 + package:GetItemUsedGrids(8937, 6, 1)
+  local reqGrids = 2 + package:GetItemUsedGrids(14, 6, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -1685,7 +1736,7 @@ function ItemNormal_00008972(iid, num, bind, param)
 	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randFavor));
   end
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 6, 1, 0, 2);
+  package:AddItem(14, 6, 1, 0, 2);
  
   return true;
 end
@@ -2718,7 +2769,7 @@ function ItemNormal_00008993(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056= math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -2734,8 +2785,8 @@ function ItemNormal_00008993(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -2775,8 +2826,8 @@ function ItemNormal_00008993(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1, 0, 2);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1, 0, 2);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1, 0, 2);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1, 0, 2);
@@ -2842,31 +2893,31 @@ function ItemNormal_00008994(iid, num, bind, param)
 		end
 		
 		local R_Equip = math.random(1, 100);
-		local r1_8910 = math.random(1, 100);
-		local r1_8913 = math.random(1, 100);
+		local r1_0004 = math.random(1, 100);
+		local r10007 = math.random(1, 100);
 		local r1_0009 = math.random(1, 100);
 		local r1_8915 = math.random(1, 100);
-		local r2_8910 = math.random(1, 100);
-		local r2_8913 = math.random(1, 100);
+		local r2_0004 = math.random(1, 100);
+		local r20007 = math.random(1, 100);
 		local r2_0009 = math.random(1, 100);
 		local r2_8915 = math.random(1, 100);
 		
 		if R_Equip <= 20 then
 			reqGrids = reqGrids + 1;
 	   	   
-			if r1_8910 <=25 then
-                reqGrids = reqGrids + package:GetItemUsedGrids(8910, 1, 1);
-		    elseif r1_8913 <=50 then
-                reqGrids = reqGrids + package:GetItemUsedGrids(8913, 1, 1);
+			if r1_0004 <=25 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(4, 1, 1);
+		    elseif r10007 <=50 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(7, 1, 1);
      	    elseif r1_0009 <=75 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
 		    elseif r1_8915 <=100 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(8915, 1, 1);
 			end
-		    if r2_8910 <=25 then
-                reqGrids = reqGrids + package:GetItemUsedGrids(8910, 1, 1);
-		    elseif r2_8913 <=50 then
-                reqGrids = reqGrids + package:GetItemUsedGrids(8913, 1, 1);
+		    if r2_0004 <=25 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(4, 1, 1);
+		    elseif r20007 <=50 then
+                reqGrids = reqGrids + package:GetItemUsedGrids(7, 1, 1);
 		    elseif r2_0009 <=75 then
                 reqGrids = reqGrids + package:GetItemUsedGrids(9, 1, 1);
 		    elseif r2_8915 <=100 then
@@ -2877,19 +2928,19 @@ function ItemNormal_00008994(iid, num, bind, param)
 				package:DelItemSendMsg(8994, player);
 				package:AddEquip(randEquip, 1, 0, 2);
 				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族战个人宝箱", GetItemName(randEquip));
-				if r1_8910 <=25 then
-                    package:AddItem(8910, 1, 1, 0, 2);
-		        elseif r1_8913 <=50 then
-                    package:AddItem(8913, 1, 1, 0, 2);
+				if r1_0004 <=25 then
+                    package:AddItem(4, 1, 1, 0, 2);
+		        elseif r10007 <=50 then
+                    package:AddItem(7, 1, 1, 0, 2);
      	        elseif r1_0009 <=75 then
                     package:AddItem(9, 1, 1, 0, 2);
 		        elseif r1_8915 <=100 then
                     package:AddItem(8915, 1, 1, 0, 2);
                 end	
-		        if r2_8910 <=25 then
-                    package:AddItem(8910, 1, 1, 0, 2);
-				elseif r2_8913 <=50 then
-					package:AddItem(8913, 1, 1, 0, 2);
+		        if r2_0004 <=25 then
+                    package:AddItem(4, 1, 1, 0, 2);
+				elseif r20007 <=50 then
+					package:AddItem(7, 1, 1, 0, 2);
 				elseif r2_0009 <=75 then
 					package:AddItem(9, 1, 1, 0, 2);
 				elseif r2_8915 <=100 then
@@ -2903,19 +2954,19 @@ function ItemNormal_00008994(iid, num, bind, param)
 		else
 			if reqGrids <= package:GetRestPackageSize() then				
 				package:DelItemSendMsg(8994, player);
-				if r1_8910 <=25 then
-                    package:AddItem(8910, 1, 1, 0, 2);
-		        elseif r1_8913 <=50 then
-                    package:AddItem(8913, 1, 1, 0, 2);
+				if r1_0004 <=25 then
+                    package:AddItem(4, 1, 1, 0, 2);
+		        elseif r10007 <=50 then
+                    package:AddItem(7, 1, 1, 0, 2);
      	        elseif r1_0009 <=75 then
                     package:AddItem(9, 1, 1, 0, 2);
 		        elseif r1_8915 <=100 then
                     package:AddItem(8915, 1, 1, 0, 2);
                 end	
-		        if r2_8910 <=25 then
-                    package:AddItem(8910, 1, 1, 0, 2);
-				elseif r2_8913 <=50 then
-					package:AddItem(8913, 1, 1, 0, 2);
+		        if r2_0004 <=25 then
+                    package:AddItem(4, 1, 1, 0, 2);
+				elseif r20007 <=50 then
+					package:AddItem(7, 1, 1, 0, 2);
 				elseif r2_0009 <=75 then
 					package:AddItem(9, 1, 1, 0, 2);
 				elseif r2_8915 <=100 then
@@ -2957,10 +3008,10 @@ end
 
 
 
-function ItemNormal_00008996(iid, num, bind, param)
+function ItemNormal_00000015(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  package:DelItemSendMsg(8996, player);
+  package:DelItemSendMsg(15, player);
   player:getTael(100*num)  
   return true;
 end
@@ -2971,7 +3022,7 @@ function ItemNormal_00008997(iid, num, bind, param)
 	local package = player:GetPackage();
 	if package:GetRestPackageSize() > 0 then				
 		package:DelItemSendMsg(8997, player);
-		package:AddItem(8934, 3, 1, 0, 2);
+		package:AddItem(56, 3, 1, 0, 2);
 		player:getGold(100);
 	else
 		player:sendMsgCode(2, 2014, 0);			
@@ -2981,20 +3032,20 @@ function ItemNormal_00008997(iid, num, bind, param)
 end
 
 function ItemNormal_00008998(iid, num, bind, param)
---高级经验加速符8934 x2，中级群体增强符8912 x2，中级水晶8922x2，初级水晶8921x2，初级打孔符8917x2，潜力提升符8999x2
+--高级经验加速符56 x2，中级群体增强符6 x2，中级水晶8922x2，初级水晶8921x2，初级打孔符8917x2，潜力提升符8999x2
   local player = GetPlayer();
   local package = player:GetPackage();
   local reqGrids = 0;
-  reqGrids = reqGrids + package:GetItemUsedGrids(8934, 2, 1);
-  reqGrids = reqGrids + package:GetItemUsedGrids(8912, 2, 1);
+  reqGrids = reqGrids + package:GetItemUsedGrids(56, 2, 1);
+  reqGrids = reqGrids + package:GetItemUsedGrids(6, 2, 1);
 --  reqGrids = reqGrids + package:GetItemUsedGrids(8922, 2, 1);
 -- reqGrids = reqGrids + package:GetItemUsedGrids(8921, 2, 1);
 --  reqGrids = reqGrids + package:GetItemUsedGrids(8917, 2, 1);
 --  reqGrids = reqGrids + package:GetItemUsedGrids(8999, 2, 1);
   if reqGrids <= package:GetRestPackageSize() then
     package:DelItemSendMsg(8998, player);
-    package:AddItem(8934, 2, 1, 0, 2);
-    package:AddItem(8912, 2, 1, 0, 2);
+    package:AddItem(56, 2, 1, 0, 2);
+    package:AddItem(6, 2, 1, 0, 2);
 --    package:AddItem(8922, 2, 1, 0, 2);
 --    package:AddItem(8921, 2, 1, 0, 2);
 --    package:AddItem(8917, 2, 1, 0, 2);
@@ -3009,13 +3060,13 @@ function ItemNormal_00009002(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
     local reqGrids = 0;
-    reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);
+    reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);
     reqGrids = reqGrids + package:GetItemUsedGrids(8922, 1, 1);
     reqGrids = reqGrids + package:GetItemUsedGrids(5003, 1, 1);
     reqGrids = reqGrids + package:GetItemUsedGrids(5013, 1, 1);
     if reqGrids <= package:GetRestPackageSize() then
  		package:DelItemSendMsg(9002, player);
-        package:AddItem(8934, 1, 1, 0, 2);
+        package:AddItem(56, 1, 1, 0, 2);
         package:AddItem(8922, 1, 1, 0, 2);
         package:AddItem(5003, 1, 1, 0, 2);
         package:AddItem(5013, 1, 1, 0, 2);
@@ -3289,13 +3340,13 @@ function ItemNormal_00009036(iid, num, bind, param)
   if roll <= 6 then
     itemId = 5005
   elseif roll <= 15 then
-    itemId = 8934
+    itemId = 56
   elseif roll <= 25 then
     itemId = 8999
   elseif roll <= 36 then
     itemId = 8916
   elseif roll <= 48 then
-    itemId = 8913
+    itemId = 7
   elseif roll <= 61 then
     itemId = 8941
     itemCount = 10
@@ -3304,7 +3355,7 @@ function ItemNormal_00009036(iid, num, bind, param)
   elseif roll <= 87 then
     itemId = 9
   else
-    itemId = 8932
+    itemId = 11 
   end
 
   package:DelItemSendMsg(9036, player);
@@ -3377,7 +3428,7 @@ function ItemNormal_00009039(iid, num, bind, param)
     Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 打开 [4:9039] 获得礼券" .. c);
     return true;
   end
-  local itemId = 8996;
+  local itemId = 15;
   local itemCount = 1;
   if roll < 160 then
     itemId = 8922;
@@ -3391,7 +3442,7 @@ function ItemNormal_00009039(iid, num, bind, param)
   elseif roll < 610 then
     itemId = 8921;
   elseif roll < 710 then
-    itemId = 8934;
+    itemId = 56;
   elseif roll < 910 then
     itemId = 8941;
     itemCount = 3;
@@ -3432,7 +3483,7 @@ function ItemNormal_00009041(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056 = math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -3448,8 +3499,8 @@ function ItemNormal_00009041(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -3489,8 +3540,8 @@ function ItemNormal_00009041(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1);
@@ -3549,7 +3600,7 @@ function ItemNormal_00009201(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056 = math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -3565,8 +3616,8 @@ function ItemNormal_00009201(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -3605,8 +3656,8 @@ function ItemNormal_00009201(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1);
@@ -3661,7 +3712,7 @@ function ItemNormal_00009202(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056 = math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -3677,8 +3728,8 @@ function ItemNormal_00009202(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -3717,8 +3768,8 @@ function ItemNormal_00009202(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1);
@@ -3773,7 +3824,7 @@ function ItemNormal_00009203(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056 = math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -3789,8 +3840,8 @@ function ItemNormal_00009203(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -3829,8 +3880,8 @@ function ItemNormal_00009203(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1);
@@ -3881,7 +3932,7 @@ function ItemNormal_00009204(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056 = math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -3896,8 +3947,8 @@ function ItemNormal_00009204(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -3934,8 +3985,8 @@ function ItemNormal_00009204(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1);
@@ -3980,7 +4031,7 @@ function ItemNormal_00009216(iid, num, bind, param)
   local player = GetPlayer();
   local package = player:GetPackage();
 	
-  local reqGrids = 2 + package:GetItemUsedGrids(8937, 6, 1)
+  local reqGrids = 2 + package:GetItemUsedGrids(14, 6, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -3998,7 +4049,7 @@ function ItemNormal_00009216(iid, num, bind, param)
 	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randFavor));
   end
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 6, 1, 0, 2);
+  package:AddItem(14, 6, 1, 0, 2);
  
   return true;
 end
@@ -4011,7 +4062,7 @@ function ItemNormal_00009217(iid, num, bind, param)
 		local reqGrids = 0;
 		
 		local R_8916 = math.random(1, 100);
-		local R_8934 = math.random(1, 100);
+		local R_0056 = math.random(1, 100);
 		local R_8923 = math.random(1, 100);
 		local R_8920 = math.random(1, 100);
 		local R_8929 = math.random(1, 100);
@@ -4026,8 +4077,8 @@ function ItemNormal_00009217(iid, num, bind, param)
 		if R_8916 <= 30 then		
 			reqGrids = package:GetItemUsedGrids(8916, 1, 1);
 		end
-		if R_8934 <= 30 then	
-			reqGrids = reqGrids + package:GetItemUsedGrids(8934, 1, 1);	
+		if R_0056 <= 30 then	
+			reqGrids = reqGrids + package:GetItemUsedGrids(56, 1, 1);	
 		end
 		if R_8923 <= 30 then			
 			reqGrids = reqGrids + package:GetItemUsedGrids(8923, 2, 1);	
@@ -4064,8 +4115,8 @@ function ItemNormal_00009217(iid, num, bind, param)
 			if R_8916 <= 30 then		
 				package:AddItem(8916, 1, 1);
 			end
-			if R_8934 <= 30 then	
-				package:AddItem(8934, 1, 1);
+			if R_0056 <= 30 then	
+				package:AddItem(56, 1, 1);
 			end
 			if R_8923 <= 30 then			
 				package:AddItem(8923, 2, 1);
@@ -4121,10 +4172,10 @@ function ItemNormal_00009209(iid, num, bind, param)
 		itemId = 5005;
 		count = 1;
 	elseif rand < 39 then
-		itemId = 8932;
+		itemId = 11;
 		count = 1;
 	elseif rand < 48 then
-		itemId = 8934;
+		itemId = 56;
 		count = 1;
 	elseif rand < 61 then
 		itemId = 8916;
@@ -4136,10 +4187,10 @@ function ItemNormal_00009209(iid, num, bind, param)
 		itemId = 9
 		count = 1;
 	elseif rand < 88 then
-		itemId = 8912;
+		itemId = 6;
 		count = 1;
 	else
-		itemId = 8996;
+		itemId = 15;
 		count = 1;
 	end	
 	local package = player:GetPackage();
@@ -4175,7 +4226,7 @@ function ItemNormal_00009210(iid, num, bind, param)
 		count = 1;
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了合家团圆礼包，一道金光扑面而来，获得了[4:"..itemId.."]");
 	elseif rand < 52 then
-		itemId = 8913;
+		itemId = 7;
 		count = 20;
 	elseif rand < 58 then
 		local favor = {5820, 5821, 5822, 5823, 5824};
@@ -4198,7 +4249,7 @@ function ItemNormal_00009210(iid, num, bind, param)
 		itemId = 8916;
 		count = 20;
 	else
-		itemId = 8996;
+		itemId = 15;
 		count = 20;
 	end
 	local package = player:GetPackage();
@@ -4253,14 +4304,14 @@ function ItemNormal_00009212(iid, num, bind, param)
 	if r <= 0.15 then
 		randAmount = 2;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);		
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 7, 1);		
         reqGrids = reqGrids + 2;
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(9212, player);
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 7, 1, 0, 2);
+			package:AddItem(13, 7, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -4269,12 +4320,12 @@ function ItemNormal_00009212(iid, num, bind, param)
 		randAmount = 1;
 		local reqGrids = package:GetItemUsedGrids(randGem, 1, 1);        
         reqGrids = reqGrids + 1;
-        reqGrids = reqGrids + package:GetItemUsedGrids(8936, 7, 1);
+        reqGrids = reqGrids + package:GetItemUsedGrids(13, 7, 1);
 		if reqGrids <= 	package:GetRestPackageSize() then
 			package:DelItemSendMsg(9212, player);
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
-			package:AddItem(8936, 7, 1, 0, 2);
+			package:AddItem(13, 7, 1, 0, 2);
 			return true;
 		end
 		player:sendMsgCode(2, 2014, 0);
@@ -4286,7 +4337,7 @@ function ItemNormal_00009213(iid, num, bind, param)
   local player = GetPlayer();
   local package = player:GetPackage();
 	
-  local reqGrids = 2 + package:GetItemUsedGrids(8937, 6, 1)
+  local reqGrids = 2 + package:GetItemUsedGrids(14, 6, 1)
   if reqGrids > package:GetRestPackageSize() then
 		player:sendMsgCode(2, 2014, 0);
 		return false;
@@ -4304,7 +4355,7 @@ function ItemNormal_00009213(iid, num, bind, param)
 	BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randFavor));
   end
   package:AddItem(randGem, 1, 1, 0, 2);
-  package:AddItem(8937, 6, 1, 0, 2);
+  package:AddItem(14, 6, 1, 0, 2);
  
   return true;
 end
@@ -4410,15 +4461,15 @@ function ItemNormal_00009223(iid, num, bind, param)
 		itemId = 8941;
 		count = 10;
 	elseif rand <= 40 then
-		itemId = 8932;
+		itemId = 11;
 	elseif rand <= 51 then
-		itemId = 8934;
+		itemId = 56;
 	elseif rand <= 64 then
 		itemId = 8916;
 	elseif rand <= 77 then
 		itemId = 9;
 	elseif rand <= 90 then
-		itemId = 8913;		
+		itemId = 7;		
 	end
 	package:DelItemSendMsg(9223, player);
 	package:AddItem(itemId, count, 1, 0, 2);
@@ -4445,7 +4496,7 @@ function ItemNormal_00009225(iid, num, bind, param)
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9225]，一道金光扑面而来，获得了礼券".. c);
 		return true;
 	end
-	local itemId = 8996;
+	local itemId = 15;
 	local itemCount = 1;
 	if roll < 120 then
 		itemId = 8924;
@@ -4462,7 +4513,7 @@ function ItemNormal_00009225(iid, num, bind, param)
 	elseif roll < 600 then
 		itemId = 8927;
 	elseif roll < 750 then
-		itemId = 8934;
+		itemId = 56;
 	elseif roll < 900 then	
 		itemId = 8941;
 		itemCount = 10;
@@ -4505,7 +4556,7 @@ local ItemNormal_Table = {
   [7049] = ItemNormal_00007xxx,
   [7050] = ItemNormal_00007xxx,
 
-  [8900] = ItemNormal_00008900,
+  [1] = ItemNormal_00000001,
 	[8901] = ItemNormal_00008901,
 	[8902] = ItemNormal_00008902,
 	[8903] = ItemNormal_00008903,
@@ -4513,29 +4564,34 @@ local ItemNormal_Table = {
 	[8905] = ItemNormal_00008905,
 	[8906] = ItemNormal_00008906,
 	[8907] = ItemNormal_00008907,
-	[8908] = ItemNormal_00008908,
-	[8909] = ItemNormal_00008909,
-	[8910] = ItemNormal_00008910,
-	[8911] = ItemNormal_00008911,
-	[8912] = ItemNormal_00008912,
-	[8913] = ItemNormal_00008913,
+	[2] = ItemNormal_00000002,
+	[3] = ItemNormal_00000003,
+	[4] = ItemNormal_00000004,
+	[5] = ItemNormal_00000005,
+	[6] = ItemNormal_00000006,
+	[7] = ItemNormal_00000007,
 	[9] = ItemNormal_00000009,
 	[8931] = ItemNormal_00008931,
-	[8932] = ItemNormal_00008932,
-	[8933] = ItemNormal_00008933,
-	[8934] = ItemNormal_00008934,
-	[8935] = ItemNormal_00008935,
-	[8936] = ItemNormal_00008936,
-	[8937] = ItemNormal_00008937,
+	[11] = ItemNormal_00000011,
+	[55] = ItemNormal_00000055,
+	[56] = ItemNormal_00000056,
+	[57] = ItemNormal_00000057,
+	[58] = ItemNormal_00000058,
+	[12] = ItemNormal_00000012,
+	[13] = ItemNormal_00000013,
+	[14] = ItemNormal_00000014,
 	
 	[8938] = ItemNormal_00008938,
 	[8939] = ItemNormal_00008939,
 	[8940] = ItemNormal_00008940,
-	[8942] = ItemNormal_00008942,
-	[8943] = ItemNormal_00008943,
-	[8944] = ItemNormal_00008944,
-	[8945] = ItemNormal_00008945,
-	[8946] = ItemNormal_00008946,
+	[17] = ItemNormal_00000017,
+	[18] = ItemNormal_00000018,
+	[19] = ItemNormal_00000019,
+	[20] = ItemNormal_00000020,
+	[21] = ItemNormal_00000021,
+	[29] = ItemNormal_00000029,
+	[30] = ItemNormal_00000030,
+	[31] = ItemNormal_00000031,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,
@@ -4584,7 +4640,7 @@ local ItemNormal_Table = {
 	[8993] = ItemNormal_00008993,
 	[8994] = ItemNormal_00008994,
 	[8995] = ItemNormal_00008995,
-	[8996] = ItemNormal_00008996,
+	[15] = ItemNormal_00000015,
 	[8997] = ItemNormal_00008997,
 	[8998] = ItemNormal_00008998,
 	[9002] = ItemNormal_00009002,
@@ -4683,7 +4739,7 @@ local ItemNormal_Table = {
 	[9217] = ItemNormal_00009217,
 	[9223] = ItemNormal_00009223,
 	[9225] = ItemNormal_00009225
-	};
+};
 
 function RunItemNormalUse(itemId, num, bind, param)
 	local trigger = ItemNormal_Table[itemId];

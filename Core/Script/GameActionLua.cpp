@@ -177,6 +177,8 @@ namespace Script
 		CLASS_DEF(Fighter, getMaxHP);
 		CLASS_DEF(Fighter, addExp);
 		CLASS_DEF(Fighter, getExp);
+		CLASS_DEF(Fighter, addPExp);
+		CLASS_DEF(Fighter, getPExp);
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);
 		CLASS_DEF(Fighter, getClass);
