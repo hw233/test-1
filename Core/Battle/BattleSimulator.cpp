@@ -486,8 +486,17 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
 			// killed the target fighter
+
+            if(counter_deny >= 0)
+            {
+                setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
+                setStatusChange( area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
+            }
+
 			if(area_target->getHP() == 0)
+            {
 				onDead(area_target, atkAct);
+            }
 			else if(_winner == 0)
             {
 				onDamage(area_target, scList, scCount, true, atkAct);
@@ -500,12 +509,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                         // poison
                         poison = true;
                     }
-                }
-
-                if(counter_deny >= 0)
-                {
-                    setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
-                    setStatusChange( area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
                 }
             }
 		}
@@ -1173,6 +1176,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     DefStatus defList[250];
     size_t scCount = 0;
     StatusChange scList[250];
+    bool cs = false;
+    bool pr = false;
 
     memset(defList, 0, sizeof(defList));
     doSkillStatus(bf, skill, target_side, target_pos, cnt, scList, scCount);
@@ -1429,9 +1434,6 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->effect->damage || skill->effect->damageP || skill->effect->adddam
             || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag)
     {
-		bool cs = false;
-		bool pr = false;
-
         if(0 == skill->area)
         {
             dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
@@ -1458,7 +1460,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
 
     int self_side = bf->getSide() == target_side ? 25 : 0;
-    appendToPacket( bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, NULL, 0, scList, scCount);
+    appendToPacket( bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), cs, pr, defList, defCount, scList, scCount);
     return dmg;
 }
 
