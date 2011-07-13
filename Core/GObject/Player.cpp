@@ -4723,9 +4723,13 @@ namespace GObject
 
     float Player::getPracticeBufFactor()
     {
-        if(getBuffData(PLAYER_BUFF_PRACTICE, TimeUtil::Now()))
+        if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
             return 0.2;
+        }
+        if(getBuffData(PLAYER_BUFF_PRACTICE2, TimeUtil::Now()))
+        {
+            return 0.5;
         }
         return 0.0;
     }
