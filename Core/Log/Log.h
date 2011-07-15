@@ -88,6 +88,7 @@ enum ItemFrom
 	FromNpcBuy,
 	FromSplit,
     FromTripod,
+    FromFCMerge,
 };
 
 enum ItemTo

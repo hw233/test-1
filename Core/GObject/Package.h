@@ -85,6 +85,9 @@ namespace GObject
 		UInt16 Size() const  { return m_Size; }
 		ItemBase*  GetItem(UInt32 id, bool bind = false);
 		ItemEquip*  GetEquip(UInt32 id);
+        inline bool FormulaMerge(UInt32 id, bool bind) { return FCMerge(id, bind); }
+        bool CittaMerge(UInt32 id, bool bind) { return FCMerge(id, bind); }
+        bool FCMerge(UInt32 id, bool bind);
 
 		UInt16 GetItemNum(UInt32 id, bool bind = false);
 		UInt16 GetItemAnyNum(UInt32 id);

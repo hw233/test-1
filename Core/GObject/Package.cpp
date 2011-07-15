@@ -13,6 +13,7 @@
 #include "Server/SysMsg.h"
 #include "Script/GameActionLua.h"
 #include "Server/OidGenerator.h"
+#include "Common/StringTokenizer.h"
 #include "Server/Cfg.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
@@ -855,7 +856,24 @@ namespace GObject
 		if(!m_Owner->hasChecked())
 			return false;
 		bool ret = false;
-		if (num == 0 || IsEquipId(id) || GetItemSubClass(id) != Item_Normal)
+
+        if (GetItemSubClass(id) == Item_Formula)
+        {
+            ret = FormulaMerge(id, bind > 0);
+            if (ret)
+                m_Owner->sendMsgCode(0, 5001);
+            else
+                m_Owner->sendMsgCode(0, 5002);
+            return ret;
+        } else if (GetItemSubClass(id) == Item_Citta)
+        {
+            ret = CittaMerge(id, bind > 0);
+            if (ret)
+                m_Owner->sendMsgCode(0, 5001);
+            else
+                m_Owner->sendMsgCode(0, 5002);
+            return ret;
+        } else if (num == 0 || IsEquipId(id) || GetItemSubClass(id) != Item_Normal)
 			ret = false;
 		else
 		{
@@ -919,6 +937,79 @@ namespace GObject
 
 		return ret;
 	}
+
+    bool Package::FCMerge(UInt32 id, bool bind)
+    {
+        static struct {
+            UInt32 sid; // start id
+            UInt32 eid; // end id
+            const char* nums; // numbuers of every id
+            UInt32 tid; // target id
+        } config[] = {
+            {1014, 1019, "1,1,1,1,1,1",         1013},
+            {1022, 1030, "1,1,1,1,1,1,1,1,1",   1021},
+            {1033, 1039, "1,1,1,1,1,1,1",       1032},
+            {1042, 1051, "1,1,1,1,1,1,1,1,1,1", 1041},
+            {1054, 1058, "1,1,1,1,1",           1053},
+            {1061, 1064, "1,1,1,1",             1060},
+            {1067, 1073, "1,1,1,1,1,1,1",       1066},
+            {1076, 1083, "1,1,1,1,1,1,1",       1075},
+            {1086, 1095, "1,1,1,1,1,1,1,1,1,1", 1085},
+            {1098, 1106, "1,1,1,1,1,1,1,1,1",   1097},
+            {1109, 1115, "1,1,1,1,1,1,1",       1108},
+            {1118, 1124, "1,1,1,1,1,1,1",       1117},
+            {1304, 1312, "1,1,1,1,1,1,1,1,1",   1208},
+            {1313, 1321, "1,1,1,1,1,1,1,1,1",   1228},
+            {1322, 1330, "1,1,1,1,1,1,1,1,1",   1206},
+            {1331, 1339, "1,1,1,1,1,1,1,1,1",   1302},
+            {1340, 1348, "1,1,1,1,1,1,1,1,1",   1299},
+            {1349, 1357, "1,1,1,1,1,1,1,1,1",   1303},
+            {1358, 1366, "1,1,1,1,1,1,1,1,1",   1248},
+            {1367, 1375, "1,1,1,1,1,1,1,1,1",   1298},
+            {0, 0, NULL, 0},
+        };
+
+        int i = -1;
+        while (true)
+        {
+            if (!config[i].sid)
+                break;
+            if (id >= config[i].sid && id <= config[i].eid)
+                break;
+            ++i;
+        }
+
+        if (i < 0)
+            return false;
+
+        StringTokenizer tk(config[i].nums, ",");
+        if (!tk.count())
+            return false;
+
+        UInt8 j = 0;
+        for (; j < tk.count(); ++j)
+        {
+            UInt32 id = config[i].sid+j;
+            UInt16 num = atoi(tk[j].c_str());
+
+            UInt16 rnum = GetItemNum(id, bind);
+            if (rnum < num)
+                return false;
+        }
+
+        if (config[i].eid != j + config[i].sid) {
+            return false;
+        }
+
+        for (j = 0; j < tk.count(); ++j)
+        {
+            UInt32 id = config[i].sid+j;
+            UInt16 num = atoi(tk[j].c_str());
+            DelItem(id, num, bind);
+        }
+        AddItem(config[i].tid, 1, bind, false, FromFCMerge);
+        return true;
+    }
 
 	UInt16 Package::GetItemNum(UInt32 id, bool bind)
 	{
