@@ -50,6 +50,7 @@ namespace GData
     std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
     std::vector<UInt32>		GDataManager::m_TripodAward[7];
     std::vector<UInt32>		GDataManager::m_BookFactor[3];
+    std::vector<UInt32>		GDataManager::m_BookPrice;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -817,6 +818,7 @@ namespace GData
             {
                 UInt32 id;
                 UInt32 factor;
+                UInt32 price;
             };
 
             class Sort
@@ -840,19 +842,25 @@ namespace GData
                     idfact t;
                     t.id = idnf.get<UInt32>(1);
                     t.factor = idnf.get<UInt32>(2);
+                    t.price = idnf.get<UInt32>(3);
                     ids.push_back(t);
                 }
 
                 // totalfactor,factor1,id1,factor2,id2...factorN,idN
-                m_BookFactor[i].resize(2*sizeof(UInt32)*factor.size()+1);
+                m_BookFactor[i].resize(2*factor.size()+1);
+                m_BookPrice.resize(2*factor.size());
                 std::sort(ids.begin(), ids.end(), Sort());
 
                 UInt32 totalfactor = 0;
-                for (int m = 1, n = 0; m < ids.size(); m+=2, ++n)
+                for (UInt32 m = 1, n = 0, l = 0; m < ids.size(); m+=2, ++n, l+=2)
                 {
                     totalfactor += ids[n].factor;
                     m_BookFactor[i][m] = totalfactor;
                     m_BookFactor[i][m+1] = ids[n].id;
+
+                    // id1,price1,id2,price2,...idN,priceN
+                    m_BookPrice[l] = ids[n].id;
+                    m_BookPrice[l+1] = ids[n].price;
                 }
                 m_BookFactor[i][0] = totalfactor;
 
@@ -1343,6 +1351,11 @@ namespace GData
     const std::vector<UInt32>& GDataManager::GetFlushBookFactor(int type)
     {
         return m_BookFactor[type];
+    }
+
+    const std::vector<UInt32>& GDataManager::GetFlushBookPrice()
+    {
+        return m_BookPrice;
     }
 
     UInt32 GDataManager::GetTaskAwardFactor(int ttype, int color)

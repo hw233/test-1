@@ -4303,147 +4303,18 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `bookStore` = '%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.bookStore[0], _playerData.bookStore[1], _playerData.bookStore[2], _playerData.bookStore[3], _playerData.bookStore[4], _playerData.bookStore[5], _nextBookStoreUpdate, _id);
 	}
 
-	inline UInt32 getRandomBook(UInt8 type, UInt8& level)
+	inline UInt32 getBookPriceById(UInt32 id)
 	{
-		switch(type)
-		{
-		case 0:
-			{
-				UInt32 r = uRand(200);
-				if(r == 0)
-				{
-					level = 4;
-					return 9044 + uRand(3);
-				}
-				else if(r < 7)
-				{
-					level = 3;
-					return 9042 + uRand(2);
-				}
-				else
-				{
-					level = 2;
-					return 9018;
-				}
-			}
-			break;
-		case 1:
-			{
-				UInt32 r = uRand(10000);
-				if(r < 3)
-				{
-					level = 10;
-					return 9077 + uRand(10);
-				}
-				else if(r < 10)
-				{
-					level = 9;
-					return 9069 + uRand(8);
-				}
-				else if(r < 23)
-				{
-					level = 8;
-					return 9062 + uRand(7);
-				}
-				else if(r < 56)
-				{
-					level = 7;
-					return 9056 + uRand(6);
-				}
-				else if(r < 123)
-				{
-					level = 6;
-					return 9051 + uRand(5);
-				}
-				else if(r < 290)
-				{
-					level = 5;
-					return 9047 + uRand(4);
-				}
-				else if(r < 957)
-				{
-					level = 4;
-					return 9044 + uRand(3);
-				}
-				else if(r < 1957)
-				{
-					level = 3;
-					return 9042 + uRand(2);
-				}
-				else
-				{
-					level = 2;
-					return 9018;
-				}
-			}
-		}
-		level = 0;
-		return 0;
-	}
-
-	inline UInt32 getBookPriceById(UInt16 id)
-	{
-		switch(id)
-		{
-		case 9018:
-			return 50;
-		case 9042:
-		case 9043:
-			return 100;
-		case 9044:
-		case 9045:
-		case 9046:
-			return 200;
-		case 9047:
-		case 9048:
-		case 9049:
-		case 9050:
-			return 400;
-		case 9051:
-		case 9052:
-		case 9053:
-		case 9054:
-		case 9055:
-			return 800;
-		case 9056:
-		case 9057:
-		case 9058:
-		case 9059:
-		case 9060:
-		case 9061:
-			return 1200;
-		case 9062:
-		case 9063:
-		case 9064:
-		case 9065:
-		case 9066:
-		case 9067:
-		case 9068:
-			return 2000;
-		case 9069:
-		case 9070:
-		case 9071:
-		case 9072:
-		case 9073:
-		case 9074:
-		case 9075:
-		case 9076:
-			return 3000;
-		case 9077:
-		case 9078:
-		case 9079:
-		case 9080:
-		case 9081:
-		case 9082:
-		case 9083:
-		case 9084:
-		case 9085:
-		case 9086:
-			return 5000;
-		default:
-			return 5000;
-		}
-		return 5000;
+        UInt32 deftael = 5000;
+        const std::vector<UInt32>& bookprice = GData::GDataManager::GetFlushBookPrice();
+        if (!bookprice.size())
+            return deftael;
+        for (UInt32 i = 0; i < bookprice.size(); i+=2)
+        {
+            if (bookprice[i] == id)
+                return bookprice[i+1];
+        }
+        return deftael;
 	}
 
 	void Player::listBookStore(UInt8 type)
@@ -4484,8 +4355,8 @@ namespace GObject
 				for(; i < 6; ++ i)
 				{
                     UInt32 rnd = uRand(totalfactor);
-                    int j = 1;
-                    for (; j < (int)factor.size(); j += 2)
+                    UInt32 j = 1;
+                    for (; j < factor.size(); j += 2)
                     {
                         if (rnd <= factor[j])
                             break;
@@ -4543,19 +4414,18 @@ namespace GObject
 		UInt32 price = getBookPriceById(iid);
 		if(_playerData.tael < price)
 		{
-			sendMsgCode(0, 2007);
+			sendMsgCode(0, 1006);
 			return 0;
 		}
 		if(!m_Package->AddItem(iid, 1))
 		{
-			sendMsgCode(2, 2016);
+			sendMsgCode(2, 1010);
 			return 0;
 		}
 		_playerData.bookStore[idx] = 0;
 		writeBookStoreIds();
 		ConsumeInfo ci(PurchaseBook,0,0);
 		useTael(price,&ci);
-
 		return iid;
 	}
 

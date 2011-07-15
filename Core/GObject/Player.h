@@ -639,7 +639,6 @@ namespace GObject
         void addAwardByTaskColor(UInt32);
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
-		void flushBook(UInt8 type);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);
