@@ -4446,51 +4446,53 @@ namespace GObject
 		return 5000;
 	}
 
-	void Player::listBookStore(UInt8 type, UInt8 color, UInt16 count)
+	void Player::listBookStore(UInt8 type)
 	{
 		UInt32 curtime = TimeUtil::Now();
-		bool extraRefresh = false;
-		UInt16 usedGold = 0, maxGold = 20 * count;
+		UInt16 money = 0;
+        int count = 0;
 
-		if(_nextBookStoreUpdate == 0)
+		if(type > 0 && _playerData.tael < money)
 		{
-			maxGold = 0;
-			extraRefresh = true;
-			count = 1;
-			updateNextBookStoreUpdate(curtime);
-		}
-		else if(type > 0 && curtime >= _nextBookStoreUpdate)
-		{
-			if(type == 1)
-			{
-				maxGold -= 20;
-				extraRefresh = true;
-				updateNextBookStoreUpdate(curtime);
-			}
-		}
-
-		if(_playerData.gold < maxGold)
-		{
-			sendMsgCode(1, 2029);
+			sendMsgCode(1, 5003);
 			return;
 		}
 
-		UInt16 tcount = 0;
+		if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
+		{
+            count = 1;
+			updateNextBookStoreUpdate(curtime);
+		}
+		else if(type == 1)
+		{
+            count = 1;
+            money = 50;
+            // updateNextBookStoreUpdate(curtime);
+        }
+
 		Stream st(0x1A);
 		if(count > 0)
 		{
+            const std::vector<UInt32>& factor = GData::GDataManager::GetFlushBookFactor(type);
+            if (!factor.size())
+                return;
+            UInt32 totalfactor = factor[0];
+
 			do
 			{
 				int i = 0;
-				if(!extraRefresh)
-				{
-					usedGold += 20;
-				}
-				UInt8 hlevel = 0;
 				for(; i < 6; ++ i)
 				{
-					UInt8 blevel;
-					UInt16 iid = getRandomBook(extraRefresh ? 0 : 1, blevel);
+                    UInt32 rnd = uRand(totalfactor);
+                    int j = 1;
+                    for (; j < (int)factor.size(); j += 2)
+                    {
+                        if (rnd <= factor[j])
+                            break;
+                    }
+                    ++j;
+
+					UInt32 iid = factor[j];
 					if(iid == 0)
 					{
 						_playerData.bookStore[i] = 0;
@@ -4498,36 +4500,26 @@ namespace GObject
 					else
 					{
 						_playerData.bookStore[i] = iid;
-						if(hlevel < blevel)
-							hlevel = blevel;
 					}
 				}
-				if(extraRefresh)
-				{
-					extraRefresh = false;
-				}
-				else
-				{
-					++ tcount;
-				}
-				-- count;
-				if(color <= hlevel)
-					break;
+				--count;
 			}
 			while(count > 0);
+
 			st << calcNextBookStoreUpdate(curtime);
-			if(type == 2)
-				st << tcount;
-			else
-				st << static_cast<UInt16>(0);
 			writeBookStoreIds();
-			ConsumeInfo ci(FlushBookStore, 0, 0);
-			useGold(usedGold, &ci);
+
+            if (money)
+            {
+                ConsumeInfo ci(FlushBookStore, 0, 0);
+                useTael(money, &ci);
+            }
 		}
 		else
 		{
-			st << calcNextBookStoreUpdate(curtime) << static_cast<UInt16>(0);
+			st << calcNextBookStoreUpdate(curtime);
 		}
+
 		for(int i = 0; i < 6; ++ i)
 		{
 			st << _playerData.bookStore[i] << getBookPriceById(_playerData.bookStore[i]);

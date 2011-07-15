@@ -639,6 +639,7 @@ namespace GObject
         void addAwardByTaskColor(UInt32);
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
+		void flushBook(UInt8 type);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);
@@ -649,7 +650,7 @@ namespace GObject
 
 		inline void setNextBookStoreUpdate(UInt32 n) { _nextBookStoreUpdate = n; }
 		void writeBookStoreIds();
-		void listBookStore(UInt8 type, UInt8, UInt16);
+		void listBookStore(UInt8 type);
 		UInt16 calcNextBookStoreUpdate(UInt32);
 		UInt32 purchaseBook(UInt8);
 		void updateNextBookStoreUpdate(UInt32);

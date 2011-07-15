@@ -49,6 +49,7 @@ namespace GData
     std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
     std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
     std::vector<UInt32>		GDataManager::m_TripodAward[7];
+    std::vector<UInt32>		GDataManager::m_BookFactor[3];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -115,6 +116,11 @@ namespace GData
 		if (!LoadFlushTaskFactor())
 		{
 			fprintf(stderr, "Load flush task factor Error !\n");
+			return false;
+		}
+		if (!LoadFlushBookFactor())
+		{
+			fprintf(stderr, "Load flush book factor Error !\n");
 			return false;
 		}
 		if (!LoadTripodAward())
@@ -796,6 +802,66 @@ namespace GData
         }
         return true;
     }
+
+	bool GDataManager::LoadFlushBookFactor()
+	{
+		lua_State * L = lua_open();
+		luaopen_base(L);
+		luaopen_string(L);
+		luaopen_table(L);
+		{
+			std::string path = cfg.scriptPath + "formula/flushbook.lua";
+			lua_tinker::dofile(L, path.c_str());
+
+            struct idfact
+            {
+                UInt32 id;
+                UInt32 factor;
+            };
+
+            class Sort
+            {
+                public:
+                    bool operator()(idfact a, idfact b)
+                    {
+                        return a.factor < b.factor;
+                    }
+            };
+
+            std::vector<idfact> ids;
+            for (int i = 0; i < 3; ++i)
+            {
+                lua_tinker::table factor = lua_tinker::call<lua_tinker::table>(L, "GetFlushBookFactor", i+1);
+                if (!factor.size())
+                    return false;
+                for (int j = 0; j < factor.size(); ++j)
+                {
+                    lua_tinker::table idnf = factor.get<lua_tinker::table>(j+1);
+                    idfact t;
+                    t.id = idnf.get<UInt32>(1);
+                    t.factor = idnf.get<UInt32>(2);
+                    ids.push_back(t);
+                }
+
+                // totalfactor,factor1,id1,factor2,id2...factorN,idN
+                m_BookFactor[i].resize(2*sizeof(UInt32)*factor.size()+1);
+                std::sort(ids.begin(), ids.end(), Sort());
+
+                UInt32 totalfactor = 0;
+                for (int m = 1, n = 0; m < ids.size(); m+=2, ++n)
+                {
+                    totalfactor += ids[n].factor;
+                    m_BookFactor[i][m] = totalfactor;
+                    m_BookFactor[i][m+1] = ids[n].id;
+                }
+                m_BookFactor[i][0] = totalfactor;
+
+                ids.clear();
+            }
+        }
+        return true;
+    }
+
     bool GDataManager::LoadTalent()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -1272,6 +1338,11 @@ namespace GData
     const std::vector<UInt8>& GDataManager::GetFlushTaskFactor(int ttype, int ftype)
     {
         return m_FlushTaskFactor[ttype][ftype];
+    }
+
+    const std::vector<UInt32>& GDataManager::GetFlushBookFactor(int type)
+    {
+        return m_BookFactor[type];
     }
 
     UInt32 GDataManager::GetTaskAwardFactor(int ttype, int color)

@@ -855,18 +855,7 @@ void OnBookStoreListReq( GameMsgHdr& hdr, const void * data )
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
 	br >> type;
-	UInt8 color = 5;
-	UInt16 count = 0;
-	switch(type)
-	{
-	case 1:
-		count = 1;
-		break;
-	case 2:
-		br >> color >> count;
-		break;
-	}
-	player->listBookStore(type, color, count);
+	player->listBookStore(type);
 }
 
 void OnPurchaseBookReq( GameMsgHdr& hdr, PurchaseBookReq& pbr )
