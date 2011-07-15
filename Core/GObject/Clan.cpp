@@ -1432,7 +1432,7 @@ void Clan::addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level)
 void Clan::buildTechSkill(ClanMember* cm)
 {
     UInt8 skillNum = GData::clanSkillTable.size();
-    for(UInt8 i = 1; i <= skillNum; ++ i)
+    for(UInt8 i = 1; i < skillNum; ++ i)
         addSkill(cm, i);
 }
 

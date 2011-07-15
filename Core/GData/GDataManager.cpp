@@ -987,16 +987,16 @@ namespace GData
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
-			if (cst.id > clanTechTable.size())
+			if (cst.id >= clanTechTable.size())
 			{
 				accNeeds = 0;
-				clanTechTable.resize(cst.id);
+				clanTechTable.resize(cst.id + 1);
 			}
-			SingleClanTechTable & single = clanTechTable[cst.id - 1];
-			if (cst.level > single.size())
-				single.resize(cst.level);
+			SingleClanTechTable & single = clanTechTable[cst.id];
+			if (cst.level >= single.size())
+				single.resize(cst.level + 1);
 			accNeeds += cst.needs;
-			single[cst.level - 1] = ClanTechTableData(cst.id, cst.level, cst.needs, accNeeds, cst.clanLev, cst.effect1, cst.effect2);
+			single[cst.level] = ClanTechTableData(cst.id, cst.level, cst.needs, accNeeds, cst.clanLev, cst.effect1, cst.effect2);
 		}
 
 		return true;
@@ -1011,14 +1011,14 @@ namespace GData
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
-			if (cst.id > clanSkillTable.size())
+			if (cst.id >= clanSkillTable.size())
 			{
-				clanSkillTable.resize(cst.id);
+				clanSkillTable.resize(cst.id + 1);
 			}
-			SingleClanSkillTable & single = clanSkillTable[cst.id - 1];
-			if (cst.level > single.size())
-				single.resize(cst.level);
-			single[cst.level - 1] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.hp, cst.attack, cst.defend, cst.magatk, cst.magdef);
+			SingleClanSkillTable & single = clanSkillTable[cst.id];
+			if (cst.level >= single.size())
+				single.resize(cst.level + 1);
+			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.hp, cst.attack, cst.defend, cst.magatk, cst.magdef);
 		}
 
 		return true;

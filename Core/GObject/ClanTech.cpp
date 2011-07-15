@@ -33,7 +33,7 @@ void ClanTech::addTechFromDB(UInt8 techId, UInt8 level, UInt16 extra)
 void ClanTech::buildTech()
 {
     UInt8 techNum = GData::clanTechTable.size();
-	for (UInt8 i = 1; i <= techNum; ++ i)
+	for (UInt8 i = 1; i < techNum; ++ i)
 		addTech(i, 0, 0, 0);
 }
 
