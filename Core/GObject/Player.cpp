@@ -720,7 +720,7 @@ namespace GObject
 	bool Player::isFighterFull() const
 	{
 		size_t size = _fighters.size();
-		return (size > 9 || size >= static_cast<size_t>(1 + GetLev() / 10));
+		return (size > 9 || (GetLev() < 40 && size >= static_cast<size_t>(1 + GetLev() / 10)));
 	}
 
 	void Player::storeFighters()
@@ -3067,7 +3067,7 @@ namespace GObject
 			return 0;
 		}
 		UInt32 price = getTavernPrice(_playerData.tavernId[idx]);
-		if(_playerData.coin < price)
+		if(_playerData.tael < price)
 		{
 			sendMsgCode(0, 2009);
 			return 0;
@@ -3078,7 +3078,7 @@ namespace GObject
 		_playerData.tavernId[idx] = 0;
 		writeTavernIds();
 		ConsumeInfo ci(RecruitFighter,0,0);
-		useCoin(price,&ci);
+		useTael(price,&ci);
 
 		return fgt->getId();
 	}

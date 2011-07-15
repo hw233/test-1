@@ -300,6 +300,7 @@ struct DBClan
 	UInt32 foundTime;
 	UInt64 founder;
 	UInt64 leader;
+	UInt64 watchman;
     UInt64 construction;
 	std::string contact;
 	std::string announce;
@@ -946,7 +947,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(25)
+SPECIALDEF(26)
 (
 	UInt32, id,
 	std::string, name,
@@ -956,6 +957,7 @@ SPECIALDEF(25)
 	UInt32, foundTime,
 	UInt64, founder,
 	UInt64, leader,
+	UInt64, watchman,
     UInt64, construction,
 	std::string, contact,
 	std::string, announce,

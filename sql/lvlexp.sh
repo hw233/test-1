@@ -22,7 +22,7 @@ function lvlexp()
         BEGIN {
             print "INSERT INTO `lvl_exp` VALUES";
         } {
-            printf("(%d,%ld)",$1,$2);
+            printf("(%d,%s)",$1,$2);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

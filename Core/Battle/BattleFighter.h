@@ -115,7 +115,6 @@ public:
 	inline float getSoul() { return _soul; }
 	inline float getAura() { return _aura; }
 	inline float getAuraMax() { return _auraMax; }
-	inline float getTough() { return _tough; }
 	inline float getAttack() {return _attack + _attackAdd;}
 	inline float getMagAttack() {return _magatk + _magAtkAdd;}
 	inline float getDefend() {return _defend + _defAdd;}
@@ -126,7 +125,8 @@ public:
 	inline float getCriticalDmg() {return _criticaldmg + _criticalDmgAdd;}
 	inline float getPierce() {return _pierce + _pierceAdd;}
 	inline float getCounter() {return _counter + _counterAdd;}
-	inline float getMagRes() {return _magres+ _magResAdd;}
+	inline float getMagRes() {return _magres + _magResAdd;}
+	inline float getTough() {return _tough + _toughAdd;}
 	inline UInt32 getMaxHP() {return _maxhp + _maxhpAdd;}
 	inline UInt32 getAction() {return _maxAction;}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
@@ -144,6 +144,7 @@ public:
 	inline float getMagResAdd() {return _magResAdd;}
 	inline UInt32 getMaxHPAdd() {return _maxhpAdd;}
 	inline UInt32 getActionAdd() {return _maxActionAdd;}
+    inline float getToughAdd() { return _toughAdd;}
 	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
 	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}
 	inline void setDefendAdd(float v, UInt16 last = 0) {_defAdd = v; _defAdd_last = last;}
@@ -151,7 +152,7 @@ public:
 	inline void setHitrateAdd(float v, UInt16 last = 0) {_hitrateAdd = v; _hitrateAdd_last = last;}
 	inline void setEvadeAdd(float v, UInt16 last = 0) {_evadeAdd = v; _evadeAdd_last = last;}
 	inline void setCriticalAdd(float v, UInt16 last = 0) {_criticalAdd = v; _criticalAdd_last = last;}
-	inline void setCriticalDmgAdd(float v) {_criticalDmgAdd = v;}
+	inline void setCriticalDmgAdd(float v, UInt16 last = 0) {_criticalDmgAdd = v; _criticalDmgAdd_last = last;}
 	inline void setPierceAdd(float v, UInt16 last = 0) {_pierceAdd = v; _pierceAdd_last = last;}
 	inline void setCounterAdd(float v, UInt16 last = 0) {_counterAdd = v; _counterAdd_last = last;}
 	inline void setMagResAdd(float v, UInt16 last = 0) {_magResAdd = v; _magResAdd_last = last;}
@@ -160,6 +161,21 @@ public:
     inline void AddAura(UInt32 v) {_aura += v;}
     inline void setAura(UInt32 v) {_aura = v;}
     inline void setToughAdd(float v, UInt16 last) {_toughAdd = v; _toughAdd_last = last;}
+
+	inline UInt32 getAttackAddLast() {return _atkAdd_last;}
+    inline UInt32 getMagAttackAddLast() {return _magAtkAdd_last;}
+	inline UInt32 getDefendAddLast() {return _defAdd_last;}
+	inline UInt32 getMagDefendAddLast() {return _magDefAdd_last;}
+	inline UInt32 getHitrateAddLast() {return _hitrateAdd_last;}
+	inline UInt32 getEvadeAddLast() {return _evadeAdd_last;}
+	inline UInt32 getCriticalAddLast() {return _criticalAdd_last;}
+	inline UInt32 getCriticalDmgAddLast() {return _criticalDmgAdd_last;}
+	inline UInt32 getPierceAddLast() {return _pierceAdd_last;}
+	inline UInt32 getCounterAddLast() {return _counterAdd_last;}
+	inline UInt32 getMagResAddLast() {return _magResAdd_last;}
+	inline UInt32 getMaxHPAddLast() {return _maxhpAdd_last;}
+	inline UInt32 getActionAddLast() {return _maxActionAdd_last;}
+    inline UInt32 getToughAddLast() { return _toughAdd_last;}
 
 	inline UInt32 getLostHP() { UInt32 mhp = _maxhp + _maxhpAdd; if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -219,6 +235,7 @@ public:
     const GData::SkillBase* getPassiveSkillAftRes100(size_t& idx);
     const GData::SkillBase* getPassiveSkillEnter100(size_t& idx);
     const GData::SkillBase* getPassiveSkillDead100(size_t& idx);
+    const GData::SkillBase* getPassiveSkillAftNAtk100(size_t& idx);
 
     const GData::SkillBase* getPassiveSkillPreAtk();
     const GData::SkillBase* getPassiveSkillAftAtk();
@@ -227,7 +244,12 @@ public:
     const GData::SkillBase* getPassiveSkillAftRes();
     const GData::SkillBase* getPassiveSkillEnter();
     const GData::SkillBase* getPassiveSkillDead();
+    const GData::SkillBase* getPassiveSkillAftNAtk();
     void releaseSkillCD(int cd);
+    void releaseSkillCD(std::vector<GData::SkillItem>& skill, int cd);
+
+    const GData::SkillBase* getPassiveSkill(std::vector<GData::SkillItem>& passiveSkill);
+    const GData::SkillBase* getPassiveSkill100(std::vector<GData::SkillItem>& passiveSkill100, size_t& idx);
 
     inline bool isRevival() { return _revival; }
     inline void setRevival()
@@ -307,6 +329,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillAftRes100;
     std::vector<GData::SkillItem> _passiveSkillEnter100;
     std::vector<GData::SkillItem> _passiveSkillDead100;
+    std::vector<GData::SkillItem> _passiveSkillAftNAtk100;
 
     std::vector<GData::SkillItem> _passiveSkillPreAtk;
     std::vector<GData::SkillItem> _passiveSkillAftAtk;
@@ -315,6 +338,7 @@ private:
     std::vector<GData::SkillItem> _passiveSkillAftRes;
     std::vector<GData::SkillItem> _passiveSkillEnter;
     std::vector<GData::SkillItem> _passiveSkillDead;
+    std::vector<GData::SkillItem> _passiveSkillAftNAtk;
 
     bool _revival;
     UInt8 _activeSkillIdx;

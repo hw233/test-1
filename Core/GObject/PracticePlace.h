@@ -91,6 +91,7 @@ public:
 
     // 更换护法弟子
     bool replaceProtecter(Player* pl, UInt8 place, UInt64 protid);
+    bool replaceProtecter(Player* pl, UInt64 protid);
     // 设置挂机收费
     bool setCharges(Player* pl, UInt8 place, UInt16 money);
     // 设置保护收费

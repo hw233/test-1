@@ -411,6 +411,9 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
             brd >> inviteeId >> cls;
             r = clan->setClanRank(player, inviteeId, cls);
             break;
+        case 7:
+            brd >> inviteeId;
+            r = clan->setWatchmanId(inviteeId);
 		}
 	}
 	Stream st(0x94);

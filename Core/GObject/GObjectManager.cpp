@@ -1781,7 +1781,7 @@ namespace GObject
         // °ï»áÐÅÏ¢
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -1804,6 +1804,7 @@ namespace GObject
                 clan->setClanFunds(cl.funds);
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
+				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
 				clanBattle->setOwnerClanId(cl.id);
 				if (!clanManager.validClanBattleTime(cl.battleTime))

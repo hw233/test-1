@@ -9,11 +9,11 @@ agi_factor = { 2,    2,      4}  -- 敏捷
 int_factor = { 5,    4,      2}  -- 智力
 wil_factor = { 2,    4,      2}  -- 意志
 
-hp_factor     = {80,   88,     96}  -- 生命
-atk_factor    = { 8,   12,     16}  -- 物功
-def_factor    = { 4,    4,      4}  -- 物防
-magatk_factor = {20,   16,      8}  -- 法功
-magdef_factor = { 4,    8,      4}  -- 法防
+hp_factor     = { 0,   0,   0}  -- 生命
+atk_factor    = { 0,   0,   0}  -- 物功
+def_factor    = { 0,   0,   0}  -- 物防
+magatk_factor = { 0,   0,   0}  -- 法功
+magdef_factor = { 0,   0,   0}  -- 法防
 
 tough_factor       = { 0,  0,  0}  -- 坚韧
 action_factor      = { 1,  1,  1}  -- 身法
