@@ -32,9 +32,9 @@ void ClanTech::addTechFromDB(UInt8 techId, UInt8 level, UInt16 extra)
 
 void ClanTech::buildTech()
 {
-	addTech(1, 1, 1, 0);
-	for (UInt8 i = 2; i <= 9; ++ i)
-		addTech(i, 2, 0, 0);
+    UInt8 techNum = GData::clanTechTable.size();
+	for (UInt8 i = 1; i < techNum; ++ i)
+		addTech(i, 0, 0, 0);
 }
 
 bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)

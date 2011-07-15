@@ -1056,11 +1056,11 @@ namespace GData
 			if (cst.id >= clanTechTable.size())
 			{
 				accNeeds = 0;
-				clanTechTable.resize(cst.id+1);
+				clanTechTable.resize(cst.id + 1);
 			}
 			SingleClanTechTable & single = clanTechTable[cst.id];
 			if (cst.level >= single.size())
-				single.resize(cst.level+1);
+				single.resize(cst.level + 1);
 			accNeeds += cst.needs;
 			single[cst.level] = ClanTechTableData(cst.id, cst.level, cst.needs, accNeeds, cst.clanLev, cst.effect1, cst.effect2);
 		}
@@ -1079,11 +1079,11 @@ namespace GData
 		{
 			if (cst.id >= clanSkillTable.size())
 			{
-				clanSkillTable.resize(cst.id+1);
+				clanSkillTable.resize(cst.id + 1);
 			}
 			SingleClanSkillTable & single = clanSkillTable[cst.id];
 			if (cst.level >= single.size())
-				single.resize(cst.level+1);
+				single.resize(cst.level + 1);
 			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.hp, cst.attack, cst.defend, cst.magatk, cst.magdef);
 		}
 

@@ -57,7 +57,7 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
-    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0)
+    _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0)
 {
 	_techs = new ClanTech(this);
     _maxMemberCount = BASE_MEMBER_COUNT + _techs->getMemberCount();
@@ -161,6 +161,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 		cmem->proffer = 2000;
 	}
 	if (cmem == NULL) return false;
+    buildTechSkill(cmem);
 	_membersJoinTime.insert(joinTime);
 	broadcastMemberInfo(*cmem, 0);
 	std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
@@ -204,6 +205,7 @@ bool Clan::join(ClanMember * cm)
 	std::set<UInt32>::iterator found = _membersJoinTime.find(cm->joinTime);
 	while (found != _membersJoinTime.end())
 		found = _membersJoinTime.find(++cm->joinTime);
+    buildTechSkill(cm);
 	_members.insert(cm);
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
@@ -345,6 +347,7 @@ bool Clan::leave(Player * player)
 	else
 	{
 		DB().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", player->getId());
+		DB().PushUpdateData("DELETE FROM `clan_skill` WHERE `playerId` = %"I64_FMT"u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
 	
@@ -382,18 +385,8 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 		broadcast(st);
 	}
 
-    {
-		Stream st(0x98);
-		st << static_cast<UInt8>(6) << cmLeader->player->getId() << cmLeader->cls;
-		st << Stream::eos;
-		broadcast(st);
-    }
-    {
-		Stream st(0x98);
-		st << static_cast<UInt8>(6) << cmPlayer->player->getId() << cmPlayer->cls;
-		st << Stream::eos;
-		broadcast(st);
-    }
+    broadcastMemberInfo(*cmLeader, 1);
+    broadcastMemberInfo(*cmPlayer, 1);
 
 	DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", pid, _id);
 	// updateRank(cmLeader, cmLeader->player->getName());
@@ -940,8 +933,10 @@ void Clan::sendInfo( Player * player )
 	ClanMember * member = (*found);
 	Stream st(0x91);
 	Player * owner = getOwner();
+    Player* watchman = globalPlayers[_watchman];
+
 	st << static_cast<UInt8>(0) << _name << (owner == NULL ? "" : owner->getName())
-		<< getFounderName() << getLev() << _contact << _announce << _purpose
+		<< getFounderName() << (watchman == NULL ? "" : watchman->getName()) << getLev() << _contact << _announce << _purpose
 		<< static_cast<UInt8>(getCount()) << getDonateAchievement(player) << member->cls;
 	st << Stream::eos;
 	player->send(st);
@@ -1434,15 +1429,23 @@ void Clan::addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level)
     cs.level = level;
 }
 
-void Clan::addSkill(Player* pl, UInt8 skillId)
+void Clan::buildTechSkill(ClanMember* cm)
 {
-	ClanMember* cm = getClanMember(pl);
+    UInt8 skillNum = GData::clanSkillTable.size();
+    for(UInt8 i = 1; i < skillNum; ++ i)
+        addSkill(cm, i);
+}
+
+void Clan::addSkill(ClanMember* cm, UInt8 skillId)
+{
     if(cm == NULL)
         return;
 
     ClanSkill& cs = cm->clanSkill[skillId];
     cs.id = skillId;
     cs.level = 0;
+
+	DB().PushUpdateData("REPLACE INTO `clan_skill`(`clanId`, `playerId`, `skillId`, `level`) VALUES(%u, %u, %u, %d)", _id, cm->player->getId(), skillId, 0);
 }
 
 UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
@@ -1787,6 +1790,31 @@ void Clan::setLeaderId(UInt64 ld, bool writedb)
 	{
 		DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", ld, _id);
 	}
+}
+
+bool Clan::setWatchmanId(UInt64 watchman, bool writedb)
+{
+	if (watchman == _watchman)
+		return false;
+    Player* owner = getOwner();
+    if(NULL == owner)
+        return false;
+	Player * player = globalPlayers[watchman];
+    if(NULL == player)
+        return false;
+
+	_watchman = watchman;
+    practicePlace.replaceProtecter(owner, watchman);
+	if (writedb)
+	{
+		DB().PushUpdateData("UPDATE `clan` SET `watchman` = %"I64_FMT"u WHERE `id` = %u", watchman, _id);
+	}
+
+    Stream st(0x98);
+    st << static_cast<UInt8>(6) << watchman;
+    st << Stream::eos;
+    broadcast(st);
+    return true;
 }
 
 void Clan::setConstruction(UInt64 cons, bool writedb)
@@ -2592,10 +2620,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
         _members.erase(mem2);
         _members.insert(mem2);
 
-		Stream st(0x98);
-		st << static_cast<UInt8>(6) << mem2->player->getId() << cls;
-		st << Stream::eos;
-		broadcast(st);
+		broadcastMemberInfo(*mem2, 1);
     }
 
     return true;

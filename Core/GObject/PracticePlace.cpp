@@ -431,6 +431,22 @@ namespace GObject
         return true;
     }
 
+    bool PracticePlace::replaceProtecter(Player* pl, UInt64 protid)
+    {
+        if (!pl || !protid)
+            return false;
+
+        bool flag = false;
+        for(UInt8 idx = 0; idx < PPLACE_MAX; ++ idx)
+        {
+            flag = replaceProtecter(pl, idx, protid);
+            if(flag)
+                break;
+        }
+
+        return flag;
+    }
+
     bool PracticePlace::setCharges(Player* pl, UInt8 place, UInt16 money)
     {
         if (!pl || !place || !money)
@@ -754,7 +770,7 @@ namespace GObject
             pd.place.maxslot += slotadd;
             pd.place.techslot += techslot;
             pd.data.resize(pd.place.maxslot);
-       }
+        }
 
         pd.place.ownerid = newpl->getId();
 

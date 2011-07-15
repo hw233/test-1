@@ -1174,7 +1174,7 @@ namespace GObject
         //     return 2;
 
 		UInt32 amount = GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 2;
@@ -1186,7 +1186,7 @@ namespace GObject
 		}
 		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_ENCHANT_L1 + type, 1, TimeUtil::Now());
 		ConsumeInfo ci(EnchantEquipment,0,0);
-		m_Owner->useCoin(amount,&ci);
+		m_Owner->useTael(amount,&ci);
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
 		if(uRand(1000) < GObjectManager::getEnchantChance(ied.enchant)/*enchant_chance[ied.enchant]*/)
 		{
@@ -1296,7 +1296,7 @@ namespace GObject
 
 		UInt8 unbindCount = 3 - bindCount;
 		UInt32 amount = GObjectManager::getMergeCost(); // merge_cost[lvl];
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 2;
@@ -1322,7 +1322,7 @@ namespace GObject
 				return 2;
 		}
 		ConsumeInfo ci(MergeGems,0,0);
-		m_Owner->useCoin(amount,&ci);
+		m_Owner->useTael(amount,&ci);
 		bool isBound = bindCount > 0;
 		if(protect && !DelItemAny(ITEM_GEM_PROTECT, 1, &isBound))
 		{
@@ -1436,7 +1436,7 @@ namespace GObject
 		-- pos;
 		if (pos > 5) return 2;
 		UInt32 amount = GObjectManager::getDetachCost();
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 2;
@@ -1474,7 +1474,7 @@ namespace GObject
 		if(!AddItem(ied.gems[pos], 1, bind | equip->GetBindStatus(), false, FromDetachGem))
 			return 2;
         ConsumeInfo ci(DetachGems,0,0);
-		m_Owner->useCoin(amount,&ci);
+		m_Owner->useTael(amount,&ci);
 		if(protect == 0 && uRand(100) < 75)
 		{
 			if(fgt != NULL)
@@ -1506,13 +1506,13 @@ namespace GObject
 			return 2;
 		UInt8 q = item->getQuality() - 2;
 		UInt32 amount = GObjectManager::getSplitCost();   // split_cost[q][lv];
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 2;
 		}
 		ConsumeInfo ci(SplitEquipment,0,0);
-		m_Owner->useCoin(amount, &ci, !silence);
+		m_Owner->useTael(amount, &ci);
 		bool isBound = item->GetBindStatus();
         UInt32 chance_low = GObjectManager::getSplitChance(q, 0);  // split_chance[q][lv][0];
 		UInt32 chance_high = GObjectManager::getSplitChance(q, 1);  // split_chance[q][lv][1];
@@ -1632,13 +1632,13 @@ namespace GObject
 		}
 		UInt8 lv = (level + 5) / 10;
 		UInt32 amount = exchange_cost[quality - 1][lv];
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 1;
 		}
 		ConsumeInfo ci(ExchangeEquipment,0,0);
-		m_Owner->useCoin(amount,&ci);
+		m_Owner->useTael(amount,&ci);
 		for(int i = 0; i < 5; ++ i)
 		{
 			DelEquip2(static_cast<ItemEquip *>(item[i]), ToExchange);
@@ -1715,13 +1715,13 @@ namespace GObject
 		}
 		UInt8 lv = (level + 5) / 10;
 		UInt32 amount = exchange_set_cost;
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 1;
 		}
 		ConsumeInfo ci(ExchangeEquipment,0,0);
-		m_Owner->useCoin(amount,&ci);
+		m_Owner->useTael(amount,&ci);
 		for(int i = 0; i < 3; ++ i)
 		{
 			DelEquip2(static_cast<ItemEquip *>(item[i]), ToExchangeSet);
@@ -1745,7 +1745,7 @@ namespace GObject
 
 		UInt16 protectBindUsed = 0, protectUnbindUsed = 0;
 		UInt32 coinAmount = 0;
-		UInt32 myCoin = m_Owner->getCoin();
+		UInt32 myCoin = m_Owner->getTael();
 
 		URandom& rnd = static_cast<BaseThread *>(Thread::current())->uRandom;
 		UInt8 result = 0;
@@ -1899,7 +1899,7 @@ namespace GObject
         }
 
 		ConsumeInfo ci(MergeGems,0,0);
-		m_Owner->useCoin(coinAmount, &ci);
+		m_Owner->useTael(coinAmount, &ci);
 		if(protectBindUsed > 0)
 			DelItem(ITEM_GEM_PROTECT, protectBindUsed, true);
 		if(protectUnbindUsed > 0)
@@ -1919,7 +1919,7 @@ namespace GObject
 			return 1;
 		UInt16 protectBindUsed = 0, protectUnbindUsed = 0;
 		UInt32 coinAmount = 0;
-		UInt32 myCoin = m_Owner->getCoin();
+		UInt32 myCoin = m_Owner->getTael();
 
 		URandom& rnd = static_cast<BaseThread *>(Thread::current())->uRandom;
 		UInt8 result = 0;
@@ -2064,7 +2064,7 @@ namespace GObject
 		}
 
 		ConsumeInfo ci(MergeGems,0,0);
-		m_Owner->useCoin(coinAmount, &ci);
+		m_Owner->useTael(coinAmount, &ci);
 		if(protectBindUsed > 0)
 			DelItem(ITEM_GEM_PROTECT, protectBindUsed, true);
 		if(protectUnbindUsed > 0)
@@ -2094,7 +2094,7 @@ namespace GObject
 		if(equip->getQuality() != equip2->getQuality() || lv != (equip2->getReqLev() + 5) / 10) return 1;
 
 		q -= 3;
-		if(m_Owner->getCoin() < activate_cost[lv][q])
+		if(m_Owner->getTael() < activate_cost[lv][q])
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 1;
@@ -2106,7 +2106,7 @@ namespace GObject
 		isBound |= equip2->GetBindStatus();
 		DelEquip2(equip2, ToActivateAttr);
 
-		m_Owner->useCoin(activate_cost[lv][q]);
+		m_Owner->useTael(activate_cost[lv][q]);
 		if(lv != _lastActivateLv || q != _lastActivateQ)
 		{
 			_lastActivateLv = lv;
@@ -2177,7 +2177,7 @@ namespace GObject
 		UInt8 lv = (equip->getReqLev() + 5) / 10;
 		UInt8 q = equip->getQuality() - 3;
 		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
-		if(m_Owner->getCoin() < amount)
+		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 2009);
 			return 1;
@@ -2202,7 +2202,7 @@ namespace GObject
 		types[2] = ied.extraAttr2.type3;
 		values[2] = ied.extraAttr2.value3;
 		ConsumeInfo ci(ForgeEquipment,0,0);
-		m_Owner->useCoin(amount,&ci);
+		m_Owner->useTael(amount,&ci);
 		getRandomAttr2(lv, q, ied.extraAttr2.getCount(), protect, types, values);
 
 		ApplyAttr2(equip, types, values);

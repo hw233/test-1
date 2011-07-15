@@ -121,6 +121,8 @@ private:
         e_stPierce,
         e_stCounter,
         e_stMagRes,
+        e_stCriticalDmg,
+        e_stHitRate,
     };
 
     enum StateType
@@ -178,6 +180,8 @@ private:
     UInt32 doPoisonAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* area_target, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, std::vector<AttackAct>* atkAct);
 
     void doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, std::vector<AttackAct>* atkAct, UInt32 dmg);
+
+    void releaseCD(BattleFighter* bf);
 
 private:
 	int _id, _winner, _turns;

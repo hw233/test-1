@@ -139,6 +139,8 @@ public:
 	inline UInt64 getFounder() { return _founder; }
 	inline std::string getFounderName() { return _founderName; }
 	void setLeaderId(UInt64, bool = true);
+	bool setWatchmanId(UInt64, bool = true);
+	inline UInt64 getWatchmanId() { return _watchman; }
 	void fixLeaderId();
 	inline UInt64 getLeaderId() { return _leader; }
 	inline Player * getLeader() { return _members.empty() ?	NULL : (*(_members.begin()))->player; }
@@ -250,7 +252,7 @@ public:
 
 // 帮派技能
     void addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level);
-    void addSkill(Player* pl, UInt8 skillId);
+    void addSkill(ClanMember* cm, UInt8 skillId);
     UInt8 getSkillLevel(Player* pl, UInt8 skillId);
     UInt8 skillLevelUp(Player* pl, UInt8 skillId);
 	void makeSkillInfo(Stream&, Player*);
@@ -262,6 +264,8 @@ public:
     UInt32 getSkillDefendEffect(Player* pl);
     UInt32 getSkillMagAtkEffect(Player* pl);
     UInt32 getSkillMagDefentEffect(Player* pl);
+
+    void buildTechSkill(ClanMember* cm);
 
 public:
 	inline UInt8 getLev() { return _level; }
@@ -315,7 +319,7 @@ private:
 	std::string _name;
 	Members _members;
     UInt8 _maxMemberCount;
-	std::set<UInt32> _membersJoinTime;	//保证每个成员加入的时间不一样
+	std::set<UInt32> _membersJoinTime;	// 保证每个成员加入的时间不一样
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
@@ -349,7 +353,8 @@ private:
 	ClanDynamicMsg * _clanDynamicMsg;
 	ClanBattle * _clanBattle;
 
-    UInt32 _funds;          //帮派资金
+    UInt32 _funds;          // 帮派资金
+	UInt64 _watchman;       // 帮派修炼地护法
 
 	Mutex _mutex;
 };
