@@ -804,6 +804,22 @@ namespace GData
         return true;
     }
 
+    struct idfact
+    {
+        UInt32 id;
+        UInt32 factor;
+        UInt32 price;
+    };
+
+    class Sort
+    {
+        public:
+            bool operator()(idfact a, idfact b)
+            {
+                return a.factor < b.factor;
+            }
+    };
+
 	bool GDataManager::LoadFlushBookFactor()
 	{
 		lua_State * L = lua_open();
@@ -813,22 +829,6 @@ namespace GData
 		{
 			std::string path = cfg.scriptPath + "formula/flushbook.lua";
 			lua_tinker::dofile(L, path.c_str());
-
-            struct idfact
-            {
-                UInt32 id;
-                UInt32 factor;
-                UInt32 price;
-            };
-
-            class Sort
-            {
-                public:
-                    bool operator()(idfact a, idfact b)
-                    {
-                        return a.factor < b.factor;
-                    }
-            };
 
             std::vector<idfact> ids;
             for (int i = 0; i < 3; ++i)
