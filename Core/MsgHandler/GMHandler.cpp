@@ -73,13 +73,18 @@ GMHandler::GMHandler()
 	Reg(3, "challenge", &GMHandler::OnChallenge);
 	Reg(3, "setwd", &GMHandler::OnsetWeekDay);
 	Reg(3, "upskill", &GMHandler::OnUpSkill);
+	Reg(3, "us", &GMHandler::OnUpSkill);
 	Reg(3, "offskill", &GMHandler::OnOffSkill);
 	Reg(3, "uppsskill", &GMHandler::OnUpPasSkill);
+	Reg(3, "ups", &GMHandler::OnUpPasSkill);
 	Reg(3, "offpsskill", &GMHandler::OnOffPasSkill);
 	Reg(3, "uppeerless", &GMHandler::OnUpPeerless);
 	Reg(3, "offpeerless", &GMHandler::OnOffPeerless);
+	Reg(3, "op", &GMHandler::OnOffPeerless);
 	Reg(3, "learncitta", &GMHandler::OnLearnCitta);
+	Reg(3, "lc", &GMHandler::OnLearnCitta);
 	Reg(3, "upcitta", &GMHandler::OnUpCitta);
+	Reg(3, "uc", &GMHandler::OnUpCitta);
 	Reg(3, "offcitta", &GMHandler::OnOffCitta);
 	Reg(3, "level", &GMHandler::OnSetLevel);
 	Reg(3, "setlevel", &GMHandler::OnSetLevel);

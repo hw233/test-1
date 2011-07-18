@@ -2830,11 +2830,11 @@ namespace GObject
             bool percolor = false;
             do {
                 ++ncount;
-                if ((!ftype && _playerData.smFreeCount < 5) || ftype) {
+                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < 5) || (ttype == 1 && _playerData.ymFreeCount < 5))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     std::set<UInt32> idxs;
-                    if (task.size() < 6) {
+                    if (task.size() <= 6) {
                         for (size_t i = 0; i < task.size(); ++i)
                             idxs.insert(i);
                     } else {
@@ -2888,8 +2888,16 @@ namespace GObject
         }
 
         Stream st(0x8B);
-        st <<  ncount << _playerData.smFinishCount;
-        st << _playerData.smFreeCount;
+        if (ttype == 0) 
+        {
+            st <<  ncount << _playerData.smFinishCount;
+            st << _playerData.smFreeCount;
+        }
+        else
+        {
+            st <<  ncount << _playerData.ymFinishCount;
+            st << _playerData.ymFreeCount;
+        }
 
         if (ttype == 0) {
             for (int i = 0; i < 6; ++i) {

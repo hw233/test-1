@@ -187,6 +187,7 @@ namespace Script
 		// CLASS_DEF(Fighter, setSkillLevel);
 		// CLASS_DEF(Fighter, learnSkill);
 		CLASS_DEF(Fighter, skillLevelUp);
+		CLASS_DEF(Fighter, addNewCitta);
 
 		//хннЯ
 		CLASS_ADD(TaskMgr);

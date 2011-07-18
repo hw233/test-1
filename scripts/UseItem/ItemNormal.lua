@@ -51,6 +51,8 @@ Purple_Favor = {5813,5814,5815,5816,5817,5818,5819}
 Orange_Favor = {5820,5821,5822,5823,5824}
 Diety_Favor = {5825, 5826, 5827, 5828}
 
+CittaBookBase = 1200
+
 function BroadCastEquip1(playercountry, playername, boxname, equipname1)
 	Broadcast(0x17, "[p:"..playercountry..":"..playername.."]幸运地从[e:5:"..boxname.."]中开出了[e:5:"..equipname1.."]");
 end
@@ -4524,6 +4526,21 @@ function ItemNormal_00009225(iid, num, bind, param)
 	return true;
 end
 
+function ItemNormal_citta(iid, num, bind, param)
+	local player = GetPlayer();
+	local package = player:GetPackage();
+    local cittaid = iid - CittaBookBase + 1
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if not fgt:addNewCitta(cittaid*100+1) then
+        return false;
+    end
+	package:DelItemSendMsg(iid, player);
+    return true
+end
+
 local ItemNormal_Table = {
   [7001] = ItemNormal_00007xxx,
   [7002] = ItemNormal_00007xxx,
@@ -4738,7 +4755,112 @@ local ItemNormal_Table = {
 	[9216] = ItemNormal_00009216,
 	[9217] = ItemNormal_00009217,
 	[9223] = ItemNormal_00009223,
-	[9225] = ItemNormal_00009225
+	[9225] = ItemNormal_00009225,
+
+    [1200] = ItemNormal_citta,
+    [1201] = ItemNormal_citta,
+    [1202] = ItemNormal_citta,
+    [1203] = ItemNormal_citta,
+    [1204] = ItemNormal_citta,
+    [1205] = ItemNormal_citta,
+    [1206] = ItemNormal_citta,
+    [1207] = ItemNormal_citta,
+    [1208] = ItemNormal_citta,
+    [1209] = ItemNormal_citta,
+    [1210] = ItemNormal_citta,
+    [1211] = ItemNormal_citta,
+    [1212] = ItemNormal_citta,
+    [1213] = ItemNormal_citta,
+    [1214] = ItemNormal_citta,
+    [1215] = ItemNormal_citta,
+    [1216] = ItemNormal_citta,
+    [1217] = ItemNormal_citta,
+    [1218] = ItemNormal_citta,
+    [1219] = ItemNormal_citta,
+    [1220] = ItemNormal_citta,
+    [1221] = ItemNormal_citta,
+    [1222] = ItemNormal_citta,
+    [1223] = ItemNormal_citta,
+    [1224] = ItemNormal_citta,
+    [1225] = ItemNormal_citta,
+    [1226] = ItemNormal_citta,
+    [1227] = ItemNormal_citta,
+    [1228] = ItemNormal_citta,
+    [1229] = ItemNormal_citta,
+    [1230] = ItemNormal_citta,
+    [1231] = ItemNormal_citta,
+    [1232] = ItemNormal_citta,
+    [1233] = ItemNormal_citta,
+    [1234] = ItemNormal_citta,
+    [1235] = ItemNormal_citta,
+    [1236] = ItemNormal_citta,
+    [1237] = ItemNormal_citta,
+    [1238] = ItemNormal_citta,
+    [1239] = ItemNormal_citta,
+    [1240] = ItemNormal_citta,
+    [1241] = ItemNormal_citta,
+    [1242] = ItemNormal_citta,
+    [1243] = ItemNormal_citta,
+    [1244] = ItemNormal_citta,
+    [1245] = ItemNormal_citta,
+    [1246] = ItemNormal_citta,
+    [1247] = ItemNormal_citta,
+    [1248] = ItemNormal_citta,
+    [1249] = ItemNormal_citta,
+    [1250] = ItemNormal_citta,
+    [1251] = ItemNormal_citta,
+    [1252] = ItemNormal_citta,
+    [1253] = ItemNormal_citta,
+    [1254] = ItemNormal_citta,
+    [1255] = ItemNormal_citta,
+    [1256] = ItemNormal_citta,
+    [1257] = ItemNormal_citta,
+    [1258] = ItemNormal_citta,
+    [1259] = ItemNormal_citta,
+    [1260] = ItemNormal_citta,
+    [1261] = ItemNormal_citta,
+    [1262] = ItemNormal_citta,
+    [1263] = ItemNormal_citta,
+    [1264] = ItemNormal_citta,
+    [1265] = ItemNormal_citta,
+    [1266] = ItemNormal_citta,
+    [1267] = ItemNormal_citta,
+    [1268] = ItemNormal_citta,
+    [1269] = ItemNormal_citta,
+    [1270] = ItemNormal_citta,
+    [1271] = ItemNormal_citta,
+    [1272] = ItemNormal_citta,
+    [1273] = ItemNormal_citta,
+    [1274] = ItemNormal_citta,
+    [1275] = ItemNormal_citta,
+    [1276] = ItemNormal_citta,
+    [1277] = ItemNormal_citta,
+    [1278] = ItemNormal_citta,
+    [1279] = ItemNormal_citta,
+    [1280] = ItemNormal_citta,
+    [1281] = ItemNormal_citta,
+    [1282] = ItemNormal_citta,
+    [1283] = ItemNormal_citta,
+    [1284] = ItemNormal_citta,
+    [1285] = ItemNormal_citta,
+    [1286] = ItemNormal_citta,
+    [1287] = ItemNormal_citta,
+    [1288] = ItemNormal_citta,
+    [1289] = ItemNormal_citta,
+    [1290] = ItemNormal_citta,
+    [1291] = ItemNormal_citta,
+    [1292] = ItemNormal_citta,
+    [1293] = ItemNormal_citta,
+    [1294] = ItemNormal_citta,
+    [1295] = ItemNormal_citta,
+    [1296] = ItemNormal_citta,
+    [1297] = ItemNormal_citta,
+    [1298] = ItemNormal_citta,
+    [1299] = ItemNormal_citta,
+    [1300] = ItemNormal_citta,
+    [1301] = ItemNormal_citta,
+    [1302] = ItemNormal_citta,
+    [1303] = ItemNormal_citta
 };
 
 function RunItemNormalUse(itemId, num, bind, param)
