@@ -199,6 +199,7 @@ void Tripod::getAward(Player* pl)
     td.awdst = 0;
     td.soul = 0;
     DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
+    addTripodData(pl->getId(), td);
 }
 
 TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)
@@ -207,7 +208,8 @@ TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)
     if (!pl)
         return nulltd;
     TripodData& td = m_tds[id];
-    td = data;
+    if (&data != &td)
+        td = data;
     EventPlayerTripod* event = new (std::nothrow) EventPlayerTripod(pl, 60, MAX_TRIPOD_SOUL/POINT_PERMIN);
     if (!event) return nulltd;
     PushTimerEvent(event);
@@ -229,7 +231,7 @@ TripodData& Tripod::getTripodData(Player* pl)
         return nulltd;
     if (m_tds.find(pl->getId()) == m_tds.end())
         return newTripodData(pl);
-    return nulltd;
+    return m_tds[pl->getId()];
 }
 
 TripodData& Tripod::getTripodData(UInt64 id)

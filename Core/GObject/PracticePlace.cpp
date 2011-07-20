@@ -151,7 +151,7 @@ namespace GObject
         pp->type = type;
         pp->pricetype = priceType;
         pp->price = price;
-        pp->traintime = 60 * time;
+        pp->traintime = 60 * time * 8;
         pp->checktime = pp->traintime;
         pp->trainend = TimeUtil::Now() + pp->traintime;
         pp->prot = prot;

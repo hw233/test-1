@@ -1,16 +1,16 @@
 
 #!/bin/bash
 
-F=dungeonlevel.txt
+F=dungeon.txt
 if [ "$1" != "" ]
 then
     F=$1
 fi
 
-function dungeonlevel()
+function dungeon()
 {
     f=$1
-    d=dungeonlevel
+    d=dungeon
     sed -i /isPack/d $f
     sed -i /id/d $f
     sed -i /^$/d $f
@@ -19,9 +19,9 @@ function dungeonlevel()
     echo "Generating file $d, total lines $l"
     awk '
         BEGIN {
-            print "INSERT INTO `dungeon_level` VALUES";
+            print "INSERT INTO `dungeon` VALUES";
         } {
-            printf("(%d,%d,%d,\x27%s\x27)",$1,$2,$3,$4);
+            printf("(%d,\x27%s\x27,%d,%d,%d)",$1,$2,$3,$4,$5);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
@@ -50,7 +50,7 @@ function iconv2utf8()
 
 if [ -f $F  ]
 then
-    dungeonlevel $F
+    dungeon $F
 else
     echo "File $F is not exists"
 fi
