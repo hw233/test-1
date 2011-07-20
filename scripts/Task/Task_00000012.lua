@@ -129,7 +129,7 @@ function Task_00000012_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这酒不错，"..GetPlayerName(GetPlayer()).."看你眼光清明，也是正道中人，这本修道功法我就传授于你，你们的忙我也一定帮……哈哈，好酒！";
+	action.m_NpcMsg = "这酒不错，"..GetPlayerName(GetPlayer()).."看你眼光清明，也是正道中人，我这就教你我们剑仙之流的修炼方法……哈哈，好酒！ ";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -157,6 +157,15 @@ function Task_00000012_accept()
 	if not task:AcceptTask(12) then
 		return false;
 	end
+	local package = player:GetPackage();
+	local itemNum = package:GetItemNum(801,1);
+	if itemNum ~= 0 then
+		if itemNum > 1 then
+			itemNum = 1;
+			package:SetItem(801, itemNum, 1);
+		end
+		task:AddTaskStep2(12, 1, itemNum);
+	end
 	return true;
 end
 
@@ -167,11 +176,15 @@ function Task_00000012_submit(itemId, itemNum)
 	local player = GetPlayer();
 
 	local package = player:GetPackage();
+	if package:GetItemNum(801,1) < 1 then
+		return false;
+	end
 
 	if not player:GetTaskMgr():SubmitTask(12) then
 		return false;
 	end
 
+	package:DelItemAll(801,1);
 
 	player:AddExp(1000);
 	return true;
@@ -180,5 +193,7 @@ end
 --��������
 function Task_00000012_abandon()
 	local package = GetPlayer():GetPackage();
+	local itemNum = 0;
+	package:DelItemAll(801,1);
 	return GetPlayer():GetTaskMgr():AbandonTask(12);
 end

@@ -269,9 +269,9 @@ namespace GObject
         //data->lock.unlock();
 
 		data->checktime = data->traintime-(data->traintime-leftCount)*10;
-        if (data->checktime < 0)
+        if ((int)data->checktime < 0)
             data->checktime = 0;
-		if(leftCount == 0)
+		if(leftCount == 0 || data->checktime == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
             practicePlace.stop(m_Player);
@@ -2732,31 +2732,144 @@ namespace GObject
 
 	void Player::writeShiMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount, _id);
 	}
 
 	void Player::writeYaMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.ymcolor[0], _playerData.shimen[1], _playerData.ymcolor[1], _playerData.shimen[2], _playerData.ymcolor[2], _playerData.shimen[3], _playerData.ymcolor[3], _playerData.shimen[4], _playerData.ymcolor[4], _playerData.shimen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.ymcolor[0], _playerData.shimen[1], _playerData.ymcolor[1], _playerData.shimen[2], _playerData.ymcolor[2], _playerData.shimen[3], _playerData.ymcolor[3], _playerData.shimen[4], _playerData.ymcolor[4], _playerData.shimen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _id);
 	}
 
-    void Player::addAwardByTaskColor(UInt32 taskid)
+    void Player::delColorTask(UInt32 taskid)
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            if (_playerData.shimen[i] == taskid)
+            {
+                //_playerData.shimen[i] = 0;
+                _playerData.smcolor[i] |= 0xF0;
+                sendColorTask(0, 0);
+                return;
+            }
+        }
+        for (int i = 0; i < 6; ++i)
+        {
+            if (_playerData.yamen[i] == taskid)
+            {
+                //_playerData.yamen[i] = 0;
+                _playerData.ymcolor[i] |= 0xF0;
+                sendColorTask(1, 0);
+                return;
+            }
+        }
+
+        return;
+    }
+
+    bool Player::addAwardByTaskColor(UInt32 taskid)
     {
         for (int i = 0; i < 6; ++i) {
             if (_playerData.shimen[i] == taskid) {
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]);
-                AddExp(award); // TODO:
+                if (_playerData.smFinishCount >= 5)
+                    return false;
+                if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+                    return false;
+
                 _playerData.shimen[i] = 0;
+                _playerData.smcolor[i] = 0;
+
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]&0x0F);
+                AddExp(award); // TODO:
                 ++_playerData.smFinishCount;
+                sendColorTask(0, 0);
+                return true;
             }
         }
         for (int i = 0; i < 6; ++i) {
             if (_playerData.yamen[i] == taskid) {
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.smcolor[i]);
-                getTael(award); // TODO:
+                if (_playerData.ymFinishCount >= 5)
+                    return false;
+                if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+                    return false;
+
                 _playerData.yamen[i] = 0;
+                _playerData.ymcolor[i] = 0;
+
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.ymcolor[i]&0x0F);
+                getTael(award); // TODO:
                 ++_playerData.ymFinishCount;
+                sendColorTask(1, 0);
+                return true;
             }
+        }
+        return false;
+    }
+
+    bool Player::ColorTaskOutOf(UInt8 type)
+    {
+        if (type == 0)
+        {
+            return _playerData.smFinishCount >= 5;
+        }
+        else if (type == 1)
+        {
+            return _playerData.ymFinishCount >= 5;
+        }
+        return false;
+    }
+
+    bool Player::ColorTaskOutOfAccept(UInt8 type)
+    {
+        if (type == 4)
+        {
+            if (_playerData.smFinishCount >= 5)
+                return true;
+            if (_playerData.smAcceptCount >= 5)
+                return true;
+            if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+                return true;
+        }
+        else if (type == 5)
+        {
+            if (_playerData.ymFinishCount >= 5)
+                return true;
+            if (_playerData.ymAcceptCount >= 5)
+                return true;
+            if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+                return true;
+        }
+        return false;
+    }
+
+    void Player::ColorTaskAccept(UInt8 type, UInt32 taskid)
+    {
+        if (type == 4)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                if (_playerData.shimen[i] == taskid)
+                {
+                    //_playerData.shimen[i] = 0;
+                    _playerData.smcolor[i] |= 0xF0;
+                    ++_playerData.smAcceptCount;
+                    sendColorTask(0, 0);
+                    return;
+                }
+            }
+        }
+        if (type == 5)
+        {
+        for (int i = 0; i < 6; ++i)
+        {
+            if (_playerData.yamen[i] == taskid)
+            {
+                //_playerData.yamen[i] = 0;
+                _playerData.ymcolor[i] |= 0xF0;
+                ++_playerData.ymAcceptCount;
+                sendColorTask(1, 0);
+                return;
+            }
+        }
         }
     }
 
@@ -2834,6 +2947,8 @@ namespace GObject
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     std::set<UInt32> idxs;
+                    if (!task.size())
+                        break;
                     if (task.size() <= 6) {
                         for (size_t i = 0; i < task.size(); ++i)
                             idxs.insert(i);
@@ -2887,6 +3002,11 @@ namespace GObject
                 writeYaMen();
         }
 
+        sendColorTask(ttype, ncount);
+    }
+
+    void Player::sendColorTask(UInt8 ttype, UInt16 ncount)
+    {
         Stream st(0x8B);
         if (ttype == 0) 
         {
@@ -2901,13 +3021,29 @@ namespace GObject
 
         if (ttype == 0) {
             for (int i = 0; i < 6; ++i) {
-                st << _playerData.shimen[i];
-                st << _playerData.smcolor[i];
+                if (_playerData.smcolor[i] & 0xF0)
+                {
+                    st << static_cast<UInt32>(0);
+                    st << static_cast<UInt8>(0);
+                }
+                else
+                {
+                    st << _playerData.shimen[i];
+                    st << static_cast<UInt8>(_playerData.smcolor[i]&0x0F);
+                }
             }
         } else {
             for (int i = 0; i < 6; ++i) {
-                st << _playerData.yamen[i];
-                st << _playerData.ymcolor[i];
+                if (_playerData.ymcolor[i] & 0xF0)
+                {
+                    st << static_cast<UInt32>(0);
+                    st << static_cast<UInt8>(0);
+                }
+                else
+                {
+                    st << _playerData.yamen[i];
+                    st << static_cast<UInt8>(_playerData.ymcolor[i]&0x0F);
+                }
             }
         }
         st << Stream::eos;

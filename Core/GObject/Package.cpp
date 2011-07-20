@@ -891,6 +891,9 @@ namespace GObject
 			ret = false;
 		else
 		{
+            if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta)
+                num = 1;
+
 			if (bind != 0xFF)
 			{
 				ItemBase* item = GetItem(id, bind > 0);

@@ -1847,8 +1847,13 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 		succ = GameAction()->AbandonTask(player, req.m_TaskId);
 		break;
     case 3:
-        player->addAwardByTaskColor(req.m_TaskId);
-        succ = true;
+        // 师门，衙门任务立即完成
+        if (player->getGold() >= 1)
+        {
+            succ = player->addAwardByTaskColor(req.m_TaskId);
+            if (succ)
+                player->useGold(1);
+        }
         break;
 	default:
 		return ;

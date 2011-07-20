@@ -558,13 +558,14 @@ namespace GData
 						}
 					}
 					task.m_ReqLev = elem.get<UInt16>(pos++);
-					m_TaskTypeList.insert(std::make_pair(task.m_TypeId, task));
-
 					task.m_Country = elem.get<UInt32>(pos++);
+
                     if (task.m_Class == 4)
                         m_ShiMenTask[task.m_Country].push_back(task.m_TypeId);
-                    if (task.m_Class == 5)
+                    else if (task.m_Class == 5)
                         m_YaMenTask[task.m_Country].push_back(task.m_TypeId);
+
+                    m_TaskTypeList.insert(std::make_pair(task.m_TypeId, task));
 				}
 			}
 			lua_close(L);

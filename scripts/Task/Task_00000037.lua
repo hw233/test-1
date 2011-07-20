@@ -1,26 +1,23 @@
 --����Ľ�������
 function Task_Accept_00000037()
 	local player = GetPlayer();
-	if player:GetLev() < 27 then
-		return false;
-	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(37) or task:HasCompletedTask(37) or task:HasSubmitedTask(37) then
 		return false;
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(36) then
+		if not task:HasSubmitedTask(88) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(36) then
+		if not task:HasSubmitedTask(88) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(36) then
+		if not task:HasSubmitedTask(88) then
 			return false;
 		end
 	end
@@ -34,25 +31,22 @@ end
 function Task_Can_Accept_00000037()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 27 then
-		return false;
-	end
 	if task:HasAcceptedTask(37) or task:HasCompletedTask(37) or task:HasSubmitedTask(37) then
 		return false;
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(36) then
+		if not task:HasSubmitedTask(88) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(36) then
+		if not task:HasSubmitedTask(88) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(36) then
+		if not task:HasSubmitedTask(88) then
 			return false;
 		end
 	end
@@ -82,20 +76,20 @@ function Task_00000037(npcId)
 		action.m_ActionID = 37
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "僵尸作乱";
+		action.m_ActionMsg = "神手比丘";
 	elseif task:GetTaskSubmitNpc(37) == npcId then
 		if Task_Submit_00000037() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 37
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "僵尸作乱";
+			action.m_ActionMsg = "神手比丘";
 		elseif task:HasAcceptedTask(37) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 37
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "僵尸作乱";
+			action.m_ActionMsg = "神手比丘";
 		end
 	end
 	return action;
@@ -108,9 +102,19 @@ function Task_00000037_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
+	action.m_ActionStep = 2;
+	action.m_NpcMsg = "方才我以元神之法去青螺魔宫进行了探查，发现正道群英已经齐聚青螺山，准备进攻青螺魔宫，剿灭这处邪道的据点，"..GetPlayerName(GetPlayer()).."你也应该去助一臂之力。";
+	action.m_ActionMsg = "嗯，我知道了。";
+	return action;
+end
+
+function Task_00000037_step_02()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "自从中原遭遇兵劫，民不聊生，不但有恶人作乱，甚至有些在兵劫中惨遭横死的人执念深重，化为僵尸为恶，近日在成都郊外乱葬岗处有村民发现了一些可怕的僵尸，还希望"..GetPlayerName(GetPlayer()).."去将这些怪物消灭。";
-	action.m_ActionMsg = "几个僵尸不在话下，我去去就回。";
+	action.m_NpcMsg = "青螺魔宫是八魔的师傅神手比丘魏枫娘所建，这个妖妇非常狡猾，你去青螺魔宫一定不能放过他。";
+	action.m_ActionMsg = "你放心，我一定手刃此獠。";
 	return action;
 end
 
@@ -119,13 +123,14 @@ function Task_00000037_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是正道的后起之秀，未来前途不可限量啊。";
 	action.m_ActionMsg = "";
 	return action;
 end
 
 local Task_00000037_step_table = {
 		[1] = Task_00000037_step_01,
+		[2] = Task_00000037_step_02,
 		[10] = Task_00000037_step_10,
 		};
 
@@ -154,17 +159,16 @@ end
 --�ύ����
 function Task_00000037_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(37) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(37);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(37) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(3333);
+	return true;
 end
 
 --��������
