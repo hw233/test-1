@@ -1,0 +1,2 @@
+INSERT INTO `dungeon` VALUES
+(1,'魏家场',785,0,30);

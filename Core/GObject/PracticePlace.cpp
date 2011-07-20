@@ -191,7 +191,7 @@ namespace GObject
         pp->type = type;
         pp->pricetype = priceType;
         pp->price = price;
-        pp->traintime = 60 * time;
+        pp->traintime = 60 * time * 8;
         pp->checktime = pp->traintime;
         pp->trainend = TimeUtil::Now() + pp->traintime;
         pp->prot = prot;
@@ -806,7 +806,7 @@ namespace GObject
 
         if (pd->checktime)
         {
-            EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime, pd->trainend);
+            EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime/10, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);
             ++m_places[place-1].used;

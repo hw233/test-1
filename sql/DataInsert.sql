@@ -91,10 +91,6 @@ LOCK TABLES `fighter_prob` WRITE;
 source fighterprob
 UNLOCK TABLES;
 
-LOCK TABLES `dungeon_level` WRITE;
-source dungeonlevel
-UNLOCK TABLES;
-
 LOCK TABLES `acupra` WRITE;
 source acupra
 UNLOCK TABLES;
@@ -105,6 +101,19 @@ UNLOCK TABLES;
 
 LOCK TABLES `clan_tech_template` WRITE;
 source clantech
+UNLOCK TABLES;
+
+
+LOCK TABLES `dungeon` WRITE;
+source dungeon
+UNLOCK TABLES;
+
+LOCK TABLES `dungeon_level` WRITE;
+source dungeonlevel
+UNLOCK TABLES;
+
+LOCK TABLES `dungeon_monster` WRITE;
+source dungeonmonster
 UNLOCK TABLES;
 
 -- ASSS

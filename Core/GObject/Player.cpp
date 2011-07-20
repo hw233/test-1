@@ -268,7 +268,7 @@ namespace GObject
         }
         //data->lock.unlock();
 
-		data->checktime = data->traintime-(data->traintime-leftCount)*10;
+		data->checktime -= 10;
         if ((int)data->checktime < 0)
             data->checktime = 0;
 		if(leftCount == 0 || data->checktime == 0)
@@ -317,7 +317,8 @@ namespace GObject
         if (data.soul > MAX_TRIPOD_SOUL)
             data.soul = MAX_TRIPOD_SOUL;
 
-        DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
+        if (leftCount % 10 || !leftCount || data.soul == MAX_TRIPOD_SOUL)
+            DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
     }
 
 	void Lineup::updateId()

@@ -20,13 +20,16 @@ namespace GObject
 
 Boss::Boss( UInt32 id ) : _hppercent(0), _level(0), _ng(GData::npcGroups[id])
 {
-	std::vector<GData::NpcFData>& nflist = _ng->getList();
-	_hp.resize(nflist.size());
+    if (_ng) {
+        std::vector<GData::NpcFData>& nflist = _ng->getList();
+        _hp.resize(nflist.size());
+    }
 	_checkFBReward = false;
 }
 
 bool Boss::attackBy( Player * player )
 {
+    if (!_ng) return false;
 	Battle::BattleSimulator bsim(player->getLocation(), player, _ng->getName(), _ng->getLevel(), false);
 	player->PutFighters(bsim, 0);
 	std::vector<GData::NpcFData>& nflist = _ng->getList();
@@ -475,12 +478,17 @@ void Boss::setDamage( Player * player, UInt32 damage, UInt32 exp )
 
 UInt16 Boss::getId()
 {
-	return _ng->getId();
+    if (_ng)
+        return _ng->getId();
+    return 0;
 }
 
 const std::string& Boss::getName()
 {
-	return _ng->getName();
+    static std::string nullstr;
+    if (_ng)
+        return _ng->getName();
+    return nullstr;
 }
 
 UInt8 Boss::getHPPercent()
