@@ -728,15 +728,18 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
         area_target->makeDamage(dmg2);
         defList[defCount].damage = dmg2;
         defList[defCount].leftHP = area_target->getHP();
+        ++defCount;
+        dmg += dmg2;
 
         if(area_target->getHP() == 0)
+        {
             onDead(area_target, atkAct);
+            return dmg;
+        }
         else if(_winner == 0)
         {
             onDamage(area_target, scList, scCount, true);
         }
-        defList++;
-        dmg += dmg2;
 
         // 第二波毒
         doSkillState(bf, skill, area_target, defList, defCount, atkAct);
@@ -746,15 +749,18 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
             area_target->makeDamage(dmg2 * 1.5);
             defList[defCount].damage = dmg2 * 1.5;
             defList[defCount].leftHP = area_target->getHP();
+            ++defCount;
+            dmg += dmg2;
 
             if(area_target->getHP() == 0)
+            {
                 onDead(area_target, atkAct);
+                return dmg;
+            }
             else if(_winner == 0)
             {
                 onDamage(area_target, scList, scCount, true);
             }
-            defList++;
-            dmg += dmg2;
 
             // 第三波毒
             doSkillState(bf, skill, area_target, defList, defCount, atkAct);
@@ -765,6 +771,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
                 area_target->makeDamage(dmg2 * 2);
                 defList[defCount].damage = dmg2 * 2;
                 defList[defCount].leftHP = area_target->getHP();
+                ++defCount;
+                dmg += dmg2;
 
                 if(area_target->getHP() == 0)
                     onDead(area_target, atkAct);
@@ -772,25 +780,23 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
                 {
                     onDamage(area_target, scList, scCount, true);
                 }
-                defList++;
-                dmg += dmg2;
             } // 第三波毒
             else
             {
                 defList[defCount].leftHP = area_target->getHP();
-                defList++;
+                ++defCount;
             }
         } // 第二波毒
         else
         {
             defList[defCount].leftHP = area_target->getHP();
-            defList++;
+            ++defCount;
         }
     } // 第一波毒
     else
     {
         defList[defCount].leftHP = area_target->getHP();
-        defList++;
+        ++defCount;
     }
 
     return dmg;
@@ -979,9 +985,33 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         const GData::SkillBase* boSkill = GData::skillManager[skillParam];
         switch(boSkill->effect->state)
         {
+        case 1:
+            {
+                UInt32 dmg = abs(bo->calcPoison(boSkill));
+                bo->makeDamage(dmg);
+                defList[defCount].damage = dmg;
+                defList[defCount].leftHP = bo->getHP();
+                defList[defCount].pos = target_pos;
+                ++defCount;
+                if(bo->getHP() == 0)
+                    break;
+
+                bo->makeDamage(dmg*1.5);
+                defList[defCount].damage = dmg*1.5;
+                defList[defCount].leftHP = bo->getHP();
+                defList[defCount].pos = target_pos;
+                ++defCount;
+                if(bo->getHP() == 0)
+                    break;
+
+                bo->makeDamage(dmg*2);
+                defList[defCount].damage = dmg*2;
+            }
+            break;
         case 2:
             if(bo->getConfuseRound() < 1)
             {
+                defList[defCount].damage = 0;
                 defList[defCount].damType = e_Confuse;
                 bo->setConfuseLevel(SKILL_LEVEL(boSkill->getId()));
                 bo->setConfuseRound(boSkill->last);
@@ -990,6 +1020,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         case 4:
             if(bo->getStunRound() < 1)
             {
+                defList[defCount].damage = 0;
                 defList[defCount].damType = e_Stun;
                 bo->setStunLevel(SKILL_LEVEL(boSkill->getId()));
                 bo->setStunRound(boSkill->last);
@@ -998,6 +1029,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         case 8:
             if(bo->getForgetRound() < 1)
             {
+                defList[defCount].damage = 0;
                 defList[defCount].damType = e_Forget;
                 bo->setForgetLevel(SKILL_LEVEL(boSkill->getId()));
                 bo->setForgetRound(boSkill->last);
@@ -1005,12 +1037,11 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             break;
         }
 
-        defList[defCount].damage = 0;
         defList[defCount].pos = target_pos;
         defList[defCount].leftHP = bo->getHP();
-        defCount ++;
+        ++defCount;
 
-        appendToPacket( bf->getSide(), bf->getPos(), target_pos, 2, skill->getId(), false, false, NULL, 0, NULL, 0);
+        appendToPacket( bf->getSide(), bf->getPos(), target_pos, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
         return 0;
     }
 
