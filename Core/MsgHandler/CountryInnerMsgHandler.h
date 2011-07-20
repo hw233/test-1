@@ -712,17 +712,24 @@ void OnClanSkillDonateCheckReq( GameMsgHdr& hdr, const void * data )
 	ConsumeInfo ci(ClanDonate, 0, 0);
 	if (items->flag == 1)
 	{
-		if (items->count > player->getAchievement())
-			r = 1;
-		else
-			player->useAchievement(items->count, &ci);
-	}
-	else if (items->flag == 2)
-	{
+        // 个人资金
 		if (items->count > player->getTael())
 			r = 1;
 		else
 			player->useTael(items->count, &ci);
+	}
+	else if (items->flag == 2)
+	{
+        // 帮派资金
+        Clan* clan = player->getClan();
+        if(NULL == clan)
+            r = 1;
+        else if(clan->getOwner() != player)
+            r = 1;
+        else if (items->count > clan->getClanFunds())
+			r = 1;
+		else
+			clan->useClanFunds(items->count);
 	}
 	else
 	{

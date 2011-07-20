@@ -288,6 +288,15 @@ namespace GObject
 
 	UInt32 TaskMgr::AcceptTask(UInt32 taskId)
 	{
+        // XXX
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        if(taskType.m_Class == 6)
+        {
+            PlayerData& pldd = m_PlayerOwner->getPlayerData();
+            if(m_PlayerOwner->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount == 10)
+                return 0;
+        }
+
 		TaskData* task = AddTask(taskId);
 		if (task != NULL)
 		{
@@ -747,7 +756,9 @@ namespace GObject
 		UInt16 size = static_cast<UInt16>(taskIds.size());
 		if (size == 0) return;
 		for (UInt16 i = 0; i < size; ++i)
+        {
 			m_CanAcceptTaskList.insert(taskIds[i]);
+        }
 		SendCanAcceptTaskInfor();
 	}
 

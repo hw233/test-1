@@ -65,6 +65,7 @@ namespace GData
 		static const std::vector<UInt8>& GetFlushTaskFactor(int ttype, int ftype);
         static UInt32 GetTaskAwardFactor(int ttype, int color);
         static UInt32 GetTripodAward(int fire, int quality);
+        static const std::vector<UInt32>& GetClanTask();
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -85,6 +86,7 @@ namespace GData
         static std::vector<UInt8>		 m_FlushTaskFactor[2][2];
         static std::vector<UInt32>		 m_TaskAwardFactor[2];
         static std::vector<UInt32>		 m_TripodAward[7];
+        static std::vector<UInt32>       m_ClanTask;
 	};
 
 	

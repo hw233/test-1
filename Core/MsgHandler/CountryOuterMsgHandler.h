@@ -1851,7 +1851,10 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 		//提交, 直接走脚???
 		succ = GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
         if (succ)
+        {
             player->addAwardByTaskColor(req.m_TaskId);
+            player->finishClanTask(req.m_TaskId);
+        }
 		break;
 	case 2:
 		//放弃
@@ -1859,6 +1862,7 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 		break;
     case 3:
         player->addAwardByTaskColor(req.m_TaskId);
+        player->finishClanTask(req.m_TaskId);
         succ = true;
         break;
 	default:

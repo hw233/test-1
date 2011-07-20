@@ -2737,7 +2737,7 @@ namespace GObject
 
 	void Player::writeYaMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.ymcolor[0], _playerData.shimen[1], _playerData.ymcolor[1], _playerData.shimen[2], _playerData.ymcolor[2], _playerData.shimen[3], _playerData.ymcolor[3], _playerData.shimen[4], _playerData.ymcolor[4], _playerData.shimen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
 	}
 
     void Player::addAwardByTaskColor(UInt32 taskid)
@@ -2758,6 +2758,106 @@ namespace GObject
                 ++_playerData.ymFinishCount;
             }
         }
+    }
+
+    void Player::finishClanTask(UInt32 taskId)
+    {
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        if(taskType.m_Class != 6)
+        {
+            return;
+        }
+
+        if(getClan() == NULL)
+        {
+            delClanTask();
+            return;
+        }
+
+        if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount == 10)
+            return;
+
+        ++ _playerData.ctFinishCount;
+        if(10 != _playerData.ctFinishCount)
+        {
+            URandom rnd(time(NULL));
+            const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
+            _playerData.clanTaskId = rnd(task.size());
+            GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        }
+        else
+        {
+            _playerData.clanTaskId = 0;
+        }
+
+        writeClanTask();
+    }
+
+    void Player::delClanTask()
+    {
+        GetTaskMgr()->DelTask(_playerData.clanTaskId);
+        _playerData.clanTaskId = 0;
+        _playerData.ctFinishCount = 0;
+
+        writeClanTask();
+    }
+
+    void Player::buildClanTask()
+    {
+        if(getClan() == NULL)
+        {
+            return;
+        }
+
+        const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
+        if(task.size() == 0)
+            return;
+
+        if(_playerData.clanTaskId == 0)
+        {
+            URandom rnd(time(NULL));
+            _playerData.clanTaskId = rnd(task.size());
+        }
+        else
+        {
+            const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(_playerData.clanTaskId);
+            if(taskType.m_Class != 6)
+            {
+                URandom rnd(time(NULL));
+                _playerData.clanTaskId = rnd(task.size());
+            }
+        }
+
+        GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        _playerData.ctFinishCount = 0;
+        writeClanTask();
+
+    }
+
+
+	void Player::writeClanTask()
+	{
+        Stream st(0x98);
+        st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | 10);
+        st << Stream::eos;
+        send(st);
+
+		DB().PushUpdateData("UPDATE `player` SET `clantask` = '%u,%u' WHERE `id` = %"I64_FMT"u",  _playerData.clanTaskId, _playerData.ctFinishCount, _id);
+	}
+
+    UInt32 Player::getClanTaskId()
+    {
+        return _playerData.clanTaskId;
+    }
+
+    bool Player::isClanTask(UInt32 taskId)
+    {
+        return _playerData.clanTaskId == taskId;
+    }
+
+    bool Player::isClanTaskFull()
+    {
+        return 10 == _playerData.ctFinishCount;
     }
 
 	inline UInt32 getTavernPriceByColor(UInt8 color)

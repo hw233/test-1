@@ -194,6 +194,7 @@ public:
 	bool hasClanAuthority(Player *, UInt8);
     float getClanTechAddon();
     UInt8 getPracticeSlot();
+    void sendPracticePlaceInfo(Player* pl);
 
     // ∞Ô≈…÷∞Œª
     bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);

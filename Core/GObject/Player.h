@@ -189,6 +189,7 @@ namespace GObject
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0),
             smFinishCount(0), smFreeCount(0), ymFinishCount(0), ymFreeCount(0),
+            clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0)
 		{
             memset(tavernId, 0, sizeof(tavernId));
@@ -239,6 +240,8 @@ namespace GObject
 		UInt8 ymcolor[6];           // 衙门任务颜色
         UInt8 ymFinishCount;        // 衙门任务当日完成次数
         UInt8 ymFreeCount;          // 衙门任务当日免费刷新次数
+        UInt32 clanTaskId;          // 帮派任务
+        UInt8 ctFinishCount;        // 帮派任务当日完成个数
 		UInt16 bookStore[6];        // 
 		UInt32 created;             // 
 		UInt32 lockExpireTime;      // 
@@ -637,6 +640,14 @@ namespace GObject
 		void writeShiMen();
 		void writeYaMen();
         void addAwardByTaskColor(UInt32);
+        void finishClanTask(UInt32);
+        void delClanTask();
+        void buildClanTask();
+        void resetClanTask();
+        UInt32 getClanTaskId();
+        bool isClanTask(UInt32);
+        bool isClanTaskFull();
+        void writeClanTask();
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
 		UInt16 calcNextTavernUpdate(UInt32);

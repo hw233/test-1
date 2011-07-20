@@ -26,6 +26,7 @@
 #include "Script/WorldScript.h"
 #include "Script/BattleFormula.h"
 #include "SpecialAward.h"
+#include "PracticePlace.h"
 
 namespace GObject
 {
@@ -104,6 +105,9 @@ bool enum_midnight(void * ptr, void *)
 	{
 		DBLOG().PushUpdateData("insert into `gold_accounts`(`server_id`, `player_id`, `gold`, `time`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, pl->getId(), pl->getGold(), TimeUtil::SharpDay(1));
 	}
+
+    pl->buildClanTask();
+
 	return true;
 }
 
@@ -148,6 +152,10 @@ void World::calWeekDay()
 		for(size_t i = 0; i < sz; ++ i)
 			prices[i] /= 2;	
 	}
+    if(_wday == 1)
+    {
+        practicePlace.resetPracticePlaceIncoming();
+    }
 }
 
 void World::setWeekDay(UInt8 wday)

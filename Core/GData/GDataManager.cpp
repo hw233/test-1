@@ -49,6 +49,7 @@ namespace GData
     std::vector<UInt8>		GDataManager::m_FlushTaskFactor[2][2];
     std::vector<UInt32>		GDataManager::m_TaskAwardFactor[2];
     std::vector<UInt32>		GDataManager::m_TripodAward[7];
+    std::vector<UInt32>     GDataManager::m_ClanTask;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -558,6 +559,8 @@ namespace GData
                         m_ShiMenTask[task.m_Country].push_back(task.m_TypeId);
                     if (task.m_Class == 5)
                         m_YaMenTask[task.m_Country].push_back(task.m_TypeId);
+                    if (task.m_Class == 6)
+                        m_ClanTask.push_back(task.m_TypeId);
 				}
 			}
 			lua_close(L);
@@ -1267,6 +1270,11 @@ namespace GData
         if (type >= 1)
             return m_YaMenTask[country];
         return m_ShiMenTask[country];
+    }
+
+    const std::vector<UInt32>& GDataManager::GetClanTask()
+    {
+        return m_ClanTask;
     }
 
     const std::vector<UInt8>& GDataManager::GetFlushTaskFactor(int ttype, int ftype)
