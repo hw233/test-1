@@ -2808,44 +2808,44 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 	fwrite(szBuf, 1, strlen(szBuf), f);
     sprintf(szBuf, "from_pos=%d\r\n", from_pos);
 	fwrite(szBuf, 1, strlen(szBuf), f);
-    sprintf(szBuf, "defCount=%d\r\n", defCount);
+    sprintf(szBuf, "defCount=%lu\r\n", defCount);
 	fwrite(szBuf, 1, strlen(szBuf), f);
 	for(size_t i = 0; i < defCount; ++ i)
 	{
-        sprintf(szBuf, "defList[%d].pos=%d\r\n", i, defList[i].pos);
+        sprintf(szBuf, "defList[%lu].pos=%d\r\n", i, defList[i].pos);
         fwrite(szBuf, 1, strlen(szBuf), f);
-        sprintf(szBuf, "defList[%d].damType=%d\r\n", i, defList[i].damType);
+        sprintf(szBuf, "defList[%lu].damType=%d\r\n", i, defList[i].damType);
         fwrite(szBuf, 1, strlen(szBuf), f);
-        sprintf(szBuf, "defList[%d].damage=%d\r\n", i, defList[i].damage);
+        sprintf(szBuf, "defList[%lu].damage=%d\r\n", i, defList[i].damage);
         fwrite(szBuf, 1, strlen(szBuf), f);
-        sprintf(szBuf, "defList[%d].leftHP=%d\r\n", i, defList[i].leftHP);
+        sprintf(szBuf, "defList[%lu].leftHP=%d\r\n", i, defList[i].leftHP);
         fwrite(szBuf, 1, strlen(szBuf), f);
         if(defList[i].damType == e_damAbsorb)
         {
-            sprintf(szBuf, "defList[%d].rhp=%d\r\n", i, defList[i].rhp);
+            sprintf(szBuf, "defList[%lu].rhp=%d\r\n", i, defList[i].rhp);
             fwrite(szBuf, 1, strlen(szBuf), f);
-            sprintf(szBuf, "defList[%d].rLeftHP=%d\r\n", i, defList[i].rLeftHP);
+            sprintf(szBuf, "defList[%lu].rLeftHP=%d\r\n", i, defList[i].rLeftHP);
             fwrite(szBuf, 1, strlen(szBuf), f);
         }
 
 		if((defList[i].damType2 & 0x80) == 0x80)
 		{
-            sprintf(szBuf, "defList[%d].counterDmg=%d\r\n", i, defList[i].counterDmg);
+            sprintf(szBuf, "defList[%lu].counterDmg=%d\r\n", i, defList[i].counterDmg);
             fwrite(szBuf, 1, strlen(szBuf), f);
-            sprintf(szBuf, "defList[%d].counterLeft=%d\r\n", i, defList[i].counterLeft);
+            sprintf(szBuf, "defList[%lu].counterLeft=%d\r\n", i, defList[i].counterLeft);
             fwrite(szBuf, 1, strlen(szBuf), f);
 		}
 	}
 	// status change
-    sprintf(szBuf, "scCount=%d\r\n", scCount);
+    sprintf(szBuf, "scCount=%lu\r\n", scCount);
     fwrite(szBuf, 1, strlen(szBuf), f);
 	for(size_t i = 0; i < scCount; ++ i)
 	{
-        sprintf(szBuf, "scList[%d].pos=%d\r\n", i, scList[i].pos);
+        sprintf(szBuf, "scList[%lu].pos=%d\r\n", i, scList[i].pos);
         fwrite(szBuf, 1, strlen(szBuf), f);
-        sprintf(szBuf, "scList[%d].type=%d\r\n", i, scList[i].type);
+        sprintf(szBuf, "scList[%lu].type=%d\r\n", i, scList[i].type);
         fwrite(szBuf, 1, strlen(szBuf), f);
-        sprintf(szBuf, "scList[%d].data=%d\r\n", i, scList[i].data);
+        sprintf(szBuf, "scList[%lu].data=%d\r\n", i, scList[i].data);
         fwrite(szBuf, 1, strlen(szBuf), f);
 	}
 

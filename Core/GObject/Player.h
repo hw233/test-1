@@ -646,6 +646,7 @@ namespace GObject
         void sendColorTask(UInt8 ttype, UInt16 ncount);
         bool ColorTaskOutOfAccept(UInt8 type);
         void ColorTaskAccept(UInt8 type, UInt32 taskid);
+        void clearFinishCount();
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);

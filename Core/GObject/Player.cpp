@@ -2874,6 +2874,12 @@ namespace GObject
         }
     }
 
+    void Player::clearFinishCount()
+    {
+        _playerData.smFinishCount = 0;
+        _playerData.ymFinishCount = 0;
+    }
+
 	inline UInt32 getTavernPriceByColor(UInt8 color)
 	{
         return 0;
@@ -2934,6 +2940,13 @@ namespace GObject
 
         UInt16 ncount = 0;
         if (type | first) {
+            if (ftype) {
+                if (getGold() < 2) {
+                    sendMsgCode(1, 1007);
+                    return;
+                }
+            }
+
             const std::vector<UInt8>& factor = GData::GDataManager::GetFlushTaskFactor(ttype, ftype);
             UInt8 rfac[5] = {0};
             rfac[0] = factor[0];
