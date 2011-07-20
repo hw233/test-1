@@ -201,6 +201,7 @@ public:
     UInt8 getClanRank(Player* pl);
     UInt8 getClanRankCount(UInt8 cls);
 
+    void addMemberProffer(Player*pl, UInt32);
 
 public:
 	inline bool alive() { return !_deleted; }

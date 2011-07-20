@@ -57,6 +57,7 @@ namespace GObject
 #define PLAYER_BUFF_PRACTICE2       0x17	//修炼加成50%
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 
+#define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
 
 	class Map;
 	class Player;
@@ -653,6 +654,8 @@ namespace GObject
         bool isClanTask(UInt32);
         bool isClanTaskFull();
         void writeClanTask();
+        void AddClanBuilding(UInt32);
+        void AddClanContrib(UInt32);
 
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);

@@ -2887,15 +2887,15 @@ namespace GObject
             return false;
         }
 
-        if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount == 10)
+        if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
             return false;
 
         ++ _playerData.ctFinishCount;
-        if(10 != _playerData.ctFinishCount)
+        if(CLAN_TASK_MAXCOUNT > _playerData.ctFinishCount)
         {
             URandom rnd(time(NULL));
             const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
-            _playerData.clanTaskId = rnd(task.size());
+            _playerData.clanTaskId = task[rnd(task.size())];
             GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
         }
         else
@@ -2930,7 +2930,7 @@ namespace GObject
         if(_playerData.clanTaskId == 0)
         {
             URandom rnd(time(NULL));
-            _playerData.clanTaskId = rnd(task.size());
+            _playerData.clanTaskId = task[rnd(task.size())];
         }
         else
         {
@@ -2938,7 +2938,7 @@ namespace GObject
             if(taskType.m_Class != 6)
             {
                 URandom rnd(time(NULL));
-                _playerData.clanTaskId = rnd(task.size());
+                _playerData.clanTaskId = task[rnd(task.size())];
             }
         }
 
@@ -2952,7 +2952,7 @@ namespace GObject
 	void Player::writeClanTask()
 	{
         Stream st(0x98);
-        st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | 10);
+        st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
         st << Stream::eos;
         send(st);
 
@@ -2971,7 +2971,29 @@ namespace GObject
 
     bool Player::isClanTaskFull()
     {
-        return 10 == _playerData.ctFinishCount;
+        return CLAN_TASK_MAXCOUNT  - 1 < _playerData.ctFinishCount;
+    }
+
+    void Player::AddClanBuilding(UInt32 building)
+    {
+        Clan* clan = getClan();
+        if(clan == NULL)
+        {
+            return;
+        }
+
+        clan->addConstruction(building);
+   }
+
+    void Player::AddClanContrib(UInt32 contrib)
+    {
+        Clan* clan = getClan();
+        if(clan == NULL)
+        {
+            return;
+        }
+
+        clan->addMemberProffer(this, contrib);
     }
 
 	inline UInt32 getTavernPriceByColor(UInt8 color)

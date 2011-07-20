@@ -814,10 +814,9 @@ namespace GObject
 
             if (dbpd.clantask.length())
             {
-				StringTokenizer tk(dbpd.yamen, ",");
+				StringTokenizer tk(dbpd.clantask, ",");
                 PLAYER_DATA(pl, clanTaskId) = atoi(tk[0].c_str());
-                PLAYER_DATA(pl, ctFinishCount) = atoi(tk[2].c_str());
-                pl->buildClanTask();
+                PLAYER_DATA(pl, ctFinishCount) = atoi(tk[1].c_str());
             }
 
 			{

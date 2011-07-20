@@ -64,7 +64,7 @@ namespace GObject
 		{
             if(taskType.m_Class == 6)
             {
-                if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount == 10)
+                if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
                     continue;
             }
 
@@ -104,7 +104,7 @@ namespace GObject
         PlayerData& pldd = player->getPlayerData();
         if(taskType.m_Class == 6)
         {
-            if(player->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount == 10)
+            if(player->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
                 return;
         }
 

@@ -188,7 +188,8 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 		broadcast(st);
 	}
 	player->GetTaskMgr()->DoAcceptedTask(62206);
-    player->buildClanTask();
+    if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
+        player->buildClanTask();
 	return true;
 }
 
@@ -210,7 +211,8 @@ bool Clan::join(ClanMember * cm)
 	_members.insert(cm);
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
-    player->buildClanTask();
+    if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
+        player->buildClanTask();
 	return true;
 }
 
@@ -918,7 +920,7 @@ void Clan::sendInfo( Player * player )
     PlayerData& pd = player->getPlayerData();
 
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
-        <<  ((pd.ctFinishCount << 4) | 10) << getConstruction() << getClanFunds() << member->proffer << _name
+        <<  ((pd.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT) << getConstruction() << getClanFunds() << member->proffer << _name
         << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
         << _contact << _announce << _purpose;
 #if 0
@@ -1498,6 +1500,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             Stream st(0x98);
             st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
             pl->send(st);
+            DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
         }
         cs.level++;
     } while(false);
@@ -1819,7 +1822,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     GData::clanLvlTable.testLevelUp(_level, _construction);
     if (writedb)
     {
-		DB().PushUpdateData("UPDATE `clan` SET `level`, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, cons, _id);
+		DB().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, cons, _id);
     }
 }
 
@@ -2685,6 +2688,16 @@ UInt8 Clan::getClanRankCount(UInt8 cls)
 	}
 
     return clsCount;
+}
+
+void Clan::addMemberProffer(Player*pl, UInt32 proffer)
+{
+    ClanMember * mem = getClanMember(pl);
+    if(mem)
+    {
+        mem->proffer += proffer;
+        DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
+    }
 }
 
 }
