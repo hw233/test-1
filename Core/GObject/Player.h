@@ -188,7 +188,7 @@ namespace GObject
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0),
-            smFinishCount(0), smFreeCount(0), ymFinishCount(0), ymFreeCount(0),
+            smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0)
 		{
@@ -236,10 +236,12 @@ namespace GObject
 		UInt8 smcolor[6];           // 师门任务颜色
         UInt8 smFinishCount;        // 师门任务当日完成次数
         UInt8 smFreeCount;          // 师门任务当日免费刷新次数
+        UInt8 smAcceptCount;        // 师门任务当日接受次数
 		UInt32 yamen[6];            // 衙门任务
 		UInt8 ymcolor[6];           // 衙门任务颜色
         UInt8 ymFinishCount;        // 衙门任务当日完成次数
         UInt8 ymFreeCount;          // 衙门任务当日免费刷新次数
+        UInt8 ymAcceptCount;        // 衙门任务当日接受次数
         UInt32 clanTaskId;          // 帮派任务
         UInt8 ctFinishCount;        // 帮派任务当日完成个数
 		UInt16 bookStore[6];        // 
@@ -639,8 +641,11 @@ namespace GObject
 		void writeTavernIds();
 		void writeShiMen();
 		void writeYaMen();
-        void addAwardByTaskColor(UInt32);
-        void finishClanTask(UInt32);
+        bool addAwardByTaskColor(UInt32);
+        void delColorTask(UInt32);
+        bool ColorTaskOutOf(UInt8);
+
+        bool finishClanTask(UInt32);
         void delClanTask();
         void buildClanTask();
         void resetClanTask();
@@ -648,8 +653,12 @@ namespace GObject
         bool isClanTask(UInt32);
         bool isClanTaskFull();
         void writeClanTask();
+
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
+        void sendColorTask(UInt8 ttype, UInt16 ncount);
+        bool ColorTaskOutOfAccept(UInt8 type);
+        void ColorTaskAccept(UInt8 type, UInt32 taskid);
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);
 		void updateNextTavernUpdate(UInt32);
@@ -660,7 +669,7 @@ namespace GObject
 
 		inline void setNextBookStoreUpdate(UInt32 n) { _nextBookStoreUpdate = n; }
 		void writeBookStoreIds();
-		void listBookStore(UInt8 type, UInt8, UInt16);
+		void listBookStore(UInt8 type);
 		UInt16 calcNextBookStoreUpdate(UInt32);
 		UInt32 purchaseBook(UInt8);
 		void updateNextBookStoreUpdate(UInt32);

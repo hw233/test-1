@@ -389,7 +389,7 @@ void MailBox::readMail( UInt32 id )
 		if(_newMails > 0)
 		{
 			-- _newMails;
-			notifyNewMail();
+			// XXX: notifyNewMail();
 		}
 		DB().PushUpdateData("UPDATE `mail` SET `flag` = %u WHERE `mailId` = %u", mail->flag, id);
 	}
@@ -758,9 +758,10 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			if(_newMails > 0)
 			{
 				-- _newMails;
-				Stream st(0xA4);
-				st << _newMails << Stream::eos;
-				_owner->send(st);
+                // XXX: 
+				//Stream st(0xA4);
+				//st << _newMails << Stream::eos;
+				//_owner->send(st);
 			}
 		}
 		Stream st(0xA2);

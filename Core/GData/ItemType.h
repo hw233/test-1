@@ -47,7 +47,7 @@ enum ItemClass
 	Item_Formula1, Item_Formula2, Item_Formula3,
 	Item_Formula4, Item_Formula5, Item_Formula6,
 	Item_Formula7, Item_Formula8, Item_Formula9,
-	Item_Citta = 40,	//决法 40~49
+	Item_Citta = 40,	//心法 40~49
 	Item_Citta1, Item_Citta2, Item_Citta3,
 	Item_Citta4, Item_Citta5, Item_Citta6,
 	Item_Citta7, Item_Citta8, Item_Citta9,

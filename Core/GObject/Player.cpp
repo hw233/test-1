@@ -269,9 +269,9 @@ namespace GObject
         //data->lock.unlock();
 
 		data->checktime = data->traintime-(data->traintime-leftCount)*10;
-        if (data->checktime < 0)
+        if ((int)data->checktime < 0)
             data->checktime = 0;
-		if(leftCount == 0)
+		if(leftCount == 0 || data->checktime == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
             practicePlace.stop(m_Player);
@@ -2732,7 +2732,7 @@ namespace GObject
 
 	void Player::writeShiMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount, _id);
 	}
 
 	void Player::writeYaMen()
@@ -2740,42 +2740,155 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
 	}
 
-    void Player::addAwardByTaskColor(UInt32 taskid)
+    void Player::delColorTask(UInt32 taskid)
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            if (_playerData.shimen[i] == taskid)
+            {
+                //_playerData.shimen[i] = 0;
+                _playerData.smcolor[i] |= 0xF0;
+                sendColorTask(0, 0);
+                return;
+            }
+        }
+        for (int i = 0; i < 6; ++i)
+        {
+            if (_playerData.yamen[i] == taskid)
+            {
+                //_playerData.yamen[i] = 0;
+                _playerData.ymcolor[i] |= 0xF0;
+                sendColorTask(1, 0);
+                return;
+            }
+        }
+
+        return;
+    }
+
+    bool Player::addAwardByTaskColor(UInt32 taskid)
     {
         for (int i = 0; i < 6; ++i) {
             if (_playerData.shimen[i] == taskid) {
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]);
-                AddExp(award); // TODO:
+                if (_playerData.smFinishCount >= 5)
+                    return false;
+                if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+                    return false;
+
                 _playerData.shimen[i] = 0;
+                _playerData.smcolor[i] = 0;
+
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]&0x0F);
+                AddExp(award); // TODO:
                 ++_playerData.smFinishCount;
+                sendColorTask(0, 0);
+                return true;
             }
         }
         for (int i = 0; i < 6; ++i) {
             if (_playerData.yamen[i] == taskid) {
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.smcolor[i]);
-                getTael(award); // TODO:
+                if (_playerData.ymFinishCount >= 5)
+                    return false;
+                if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+                    return false;
+
                 _playerData.yamen[i] = 0;
+                _playerData.ymcolor[i] = 0;
+
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.ymcolor[i]&0x0F);
+                getTael(award); // TODO:
                 ++_playerData.ymFinishCount;
+                sendColorTask(1, 0);
+                return true;
             }
+        }
+        return false;
+    }
+
+    bool Player::ColorTaskOutOf(UInt8 type)
+    {
+        if (type == 0)
+        {
+            return _playerData.smFinishCount >= 5;
+        }
+        else if (type == 1)
+        {
+            return _playerData.ymFinishCount >= 5;
+        }
+        return false;
+    }
+
+    bool Player::ColorTaskOutOfAccept(UInt8 type)
+    {
+        if (type == 4)
+        {
+            if (_playerData.smFinishCount >= 5)
+                return true;
+            if (_playerData.smAcceptCount >= 5)
+                return true;
+            if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+                return true;
+        }
+        else if (type == 5)
+        {
+            if (_playerData.ymFinishCount >= 5)
+                return true;
+            if (_playerData.ymAcceptCount >= 5)
+                return true;
+            if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+                return true;
+        }
+        return false;
+    }
+
+    void Player::ColorTaskAccept(UInt8 type, UInt32 taskid)
+    {
+        if (type == 4)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                if (_playerData.shimen[i] == taskid)
+                {
+                    //_playerData.shimen[i] = 0;
+                    _playerData.smcolor[i] |= 0xF0;
+                    ++_playerData.smAcceptCount;
+                    sendColorTask(0, 0);
+                    return;
+                }
+            }
+        }
+        if (type == 5)
+        {
+        for (int i = 0; i < 6; ++i)
+        {
+            if (_playerData.yamen[i] == taskid)
+            {
+                //_playerData.yamen[i] = 0;
+                _playerData.ymcolor[i] |= 0xF0;
+                ++_playerData.ymAcceptCount;
+                sendColorTask(1, 0);
+                return;
+            }
+        }
         }
     }
 
-    void Player::finishClanTask(UInt32 taskId)
+    bool Player::finishClanTask(UInt32 taskId)
     {
 		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
         if(taskType.m_Class != 6)
         {
-            return;
+            return false;
         }
 
         if(getClan() == NULL)
         {
             delClanTask();
-            return;
+            return false;
         }
 
         if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount == 10)
-            return;
+            return false;
 
         ++ _playerData.ctFinishCount;
         if(10 != _playerData.ctFinishCount)
@@ -2791,6 +2904,7 @@ namespace GObject
         }
 
         writeClanTask();
+        return true;
     }
 
     void Player::delClanTask()
@@ -2930,11 +3044,13 @@ namespace GObject
             bool percolor = false;
             do {
                 ++ncount;
-                if ((!ftype && _playerData.smFreeCount < 5) || ftype) {
+                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < 5) || (ttype == 1 && _playerData.ymFreeCount < 5))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     std::set<UInt32> idxs;
-                    if (task.size() < 6) {
+                    if (!task.size())
+                        break;
+                    if (task.size() <= 6) {
                         for (size_t i = 0; i < task.size(); ++i)
                             idxs.insert(i);
                     } else {
@@ -2987,19 +3103,48 @@ namespace GObject
                 writeYaMen();
         }
 
+        sendColorTask(ttype, ncount);
+    }
+
+    void Player::sendColorTask(UInt8 ttype, UInt16 ncount)
+    {
         Stream st(0x8B);
-        st <<  ncount << _playerData.smFinishCount;
-        st << _playerData.smFreeCount;
+        if (ttype == 0) 
+        {
+            st <<  ncount << _playerData.smFinishCount;
+            st << _playerData.smFreeCount;
+        }
+        else
+        {
+            st <<  ncount << _playerData.ymFinishCount;
+            st << _playerData.ymFreeCount;
+        }
 
         if (ttype == 0) {
             for (int i = 0; i < 6; ++i) {
-                st << _playerData.shimen[i];
-                st << _playerData.smcolor[i];
+                if (_playerData.smcolor[i] & 0xF0)
+                {
+                    st << static_cast<UInt32>(0);
+                    st << static_cast<UInt8>(0);
+                }
+                else
+                {
+                    st << _playerData.shimen[i];
+                    st << static_cast<UInt8>(_playerData.smcolor[i]&0x0F);
+                }
             }
         } else {
             for (int i = 0; i < 6; ++i) {
-                st << _playerData.yamen[i];
-                st << _playerData.ymcolor[i];
+                if (_playerData.ymcolor[i] & 0xF0)
+                {
+                    st << static_cast<UInt32>(0);
+                    st << static_cast<UInt8>(0);
+                }
+                else
+                {
+                    st << _playerData.yamen[i];
+                    st << static_cast<UInt8>(_playerData.ymcolor[i]&0x0F);
+                }
             }
         }
         st << Stream::eos;
@@ -4403,194 +4548,67 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `bookStore` = '%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.bookStore[0], _playerData.bookStore[1], _playerData.bookStore[2], _playerData.bookStore[3], _playerData.bookStore[4], _playerData.bookStore[5], _nextBookStoreUpdate, _id);
 	}
 
-	inline UInt32 getRandomBook(UInt8 type, UInt8& level)
+	inline UInt32 getBookPriceById(UInt32 id)
 	{
-		switch(type)
-		{
-		case 0:
-			{
-				UInt32 r = uRand(200);
-				if(r == 0)
-				{
-					level = 4;
-					return 9044 + uRand(3);
-				}
-				else if(r < 7)
-				{
-					level = 3;
-					return 9042 + uRand(2);
-				}
-				else
-				{
-					level = 2;
-					return 9018;
-				}
-			}
-			break;
-		case 1:
-			{
-				UInt32 r = uRand(10000);
-				if(r < 3)
-				{
-					level = 10;
-					return 9077 + uRand(10);
-				}
-				else if(r < 10)
-				{
-					level = 9;
-					return 9069 + uRand(8);
-				}
-				else if(r < 23)
-				{
-					level = 8;
-					return 9062 + uRand(7);
-				}
-				else if(r < 56)
-				{
-					level = 7;
-					return 9056 + uRand(6);
-				}
-				else if(r < 123)
-				{
-					level = 6;
-					return 9051 + uRand(5);
-				}
-				else if(r < 290)
-				{
-					level = 5;
-					return 9047 + uRand(4);
-				}
-				else if(r < 957)
-				{
-					level = 4;
-					return 9044 + uRand(3);
-				}
-				else if(r < 1957)
-				{
-					level = 3;
-					return 9042 + uRand(2);
-				}
-				else
-				{
-					level = 2;
-					return 9018;
-				}
-			}
-		}
-		level = 0;
-		return 0;
+        UInt32 deftael = 5000;
+        const std::vector<UInt32>& bookprice = GData::GDataManager::GetFlushBookPrice();
+        if (!bookprice.size())
+            return deftael;
+        for (UInt32 i = 0; i < bookprice.size(); i+=2)
+        {
+            if (bookprice[i] == id)
+                return bookprice[i+1];
+        }
+        return deftael;
 	}
 
-	inline UInt32 getBookPriceById(UInt16 id)
-	{
-		switch(id)
-		{
-		case 9018:
-			return 50;
-		case 9042:
-		case 9043:
-			return 100;
-		case 9044:
-		case 9045:
-		case 9046:
-			return 200;
-		case 9047:
-		case 9048:
-		case 9049:
-		case 9050:
-			return 400;
-		case 9051:
-		case 9052:
-		case 9053:
-		case 9054:
-		case 9055:
-			return 800;
-		case 9056:
-		case 9057:
-		case 9058:
-		case 9059:
-		case 9060:
-		case 9061:
-			return 1200;
-		case 9062:
-		case 9063:
-		case 9064:
-		case 9065:
-		case 9066:
-		case 9067:
-		case 9068:
-			return 2000;
-		case 9069:
-		case 9070:
-		case 9071:
-		case 9072:
-		case 9073:
-		case 9074:
-		case 9075:
-		case 9076:
-			return 3000;
-		case 9077:
-		case 9078:
-		case 9079:
-		case 9080:
-		case 9081:
-		case 9082:
-		case 9083:
-		case 9084:
-		case 9085:
-		case 9086:
-			return 5000;
-		default:
-			return 5000;
-		}
-		return 5000;
-	}
-
-	void Player::listBookStore(UInt8 type, UInt8 color, UInt16 count)
+	void Player::listBookStore(UInt8 type)
 	{
 		UInt32 curtime = TimeUtil::Now();
-		bool extraRefresh = false;
-		UInt16 usedGold = 0, maxGold = 20 * count;
+		UInt16 money = 0;
+        int count = 0;
 
-		if(_nextBookStoreUpdate == 0)
+		if(type > 0 && _playerData.tael < money)
 		{
-			maxGold = 0;
-			extraRefresh = true;
-			count = 1;
-			updateNextBookStoreUpdate(curtime);
-		}
-		else if(type > 0 && curtime >= _nextBookStoreUpdate)
-		{
-			if(type == 1)
-			{
-				maxGold -= 20;
-				extraRefresh = true;
-				updateNextBookStoreUpdate(curtime);
-			}
-		}
-
-		if(_playerData.gold < maxGold)
-		{
-			sendMsgCode(1, 2029);
+			sendMsgCode(1, 5003);
 			return;
 		}
 
-		UInt16 tcount = 0;
+		if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
+		{
+            count = 1;
+			updateNextBookStoreUpdate(curtime);
+		}
+		else if(type == 1)
+		{
+            count = 1;
+            money = 50;
+            // updateNextBookStoreUpdate(curtime);
+        }
+
 		Stream st(0x1A);
 		if(count > 0)
 		{
+            const std::vector<UInt32>& factor = GData::GDataManager::GetFlushBookFactor(type);
+            if (!factor.size())
+                return;
+            UInt32 totalfactor = factor[0];
+
 			do
 			{
 				int i = 0;
-				if(!extraRefresh)
-				{
-					usedGold += 20;
-				}
-				UInt8 hlevel = 0;
 				for(; i < 6; ++ i)
 				{
-					UInt8 blevel;
-					UInt16 iid = getRandomBook(extraRefresh ? 0 : 1, blevel);
+                    UInt32 rnd = uRand(totalfactor);
+                    UInt32 j = 1;
+                    for (; j < factor.size(); j += 2)
+                    {
+                        if (rnd <= factor[j])
+                            break;
+                    }
+                    ++j;
+
+					UInt32 iid = factor[j];
 					if(iid == 0)
 					{
 						_playerData.bookStore[i] = 0;
@@ -4598,36 +4616,26 @@ namespace GObject
 					else
 					{
 						_playerData.bookStore[i] = iid;
-						if(hlevel < blevel)
-							hlevel = blevel;
 					}
 				}
-				if(extraRefresh)
-				{
-					extraRefresh = false;
-				}
-				else
-				{
-					++ tcount;
-				}
-				-- count;
-				if(color <= hlevel)
-					break;
+				--count;
 			}
 			while(count > 0);
+
 			st << calcNextBookStoreUpdate(curtime);
-			if(type == 2)
-				st << tcount;
-			else
-				st << static_cast<UInt16>(0);
 			writeBookStoreIds();
-			ConsumeInfo ci(FlushBookStore, 0, 0);
-			useGold(usedGold, &ci);
+
+            if (money)
+            {
+                ConsumeInfo ci(FlushBookStore, 0, 0);
+                useTael(money, &ci);
+            }
 		}
 		else
 		{
-			st << calcNextBookStoreUpdate(curtime) << static_cast<UInt16>(0);
+			st << calcNextBookStoreUpdate(curtime);
 		}
+
 		for(int i = 0; i < 6; ++ i)
 		{
 			st << _playerData.bookStore[i] << getBookPriceById(_playerData.bookStore[i]);
@@ -4651,19 +4659,18 @@ namespace GObject
 		UInt32 price = getBookPriceById(iid);
 		if(_playerData.tael < price)
 		{
-			sendMsgCode(0, 2007);
+			sendMsgCode(0, 1006);
 			return 0;
 		}
 		if(!m_Package->AddItem(iid, 1))
 		{
-			sendMsgCode(2, 2016);
+			sendMsgCode(2, 1010);
 			return 0;
 		}
 		_playerData.bookStore[idx] = 0;
 		writeBookStoreIds();
 		ConsumeInfo ci(PurchaseBook,0,0);
 		useTael(price,&ci);
-
 		return iid;
 	}
 

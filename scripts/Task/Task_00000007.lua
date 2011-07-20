@@ -82,20 +82,20 @@ function Task_00000007(npcId)
 		action.m_ActionID = 7
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "修炼功法";
+		action.m_ActionMsg = "剑侠心法";
 	elseif task:GetTaskSubmitNpc(7) == npcId then
 		if Task_Submit_00000007() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 7
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "修炼功法";
+			action.m_ActionMsg = "剑侠心法";
 		elseif task:HasAcceptedTask(7) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 7
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "修炼功法";
+			action.m_ActionMsg = "剑侠心法";
 		end
 	end
 	return action;
@@ -109,7 +109,7 @@ function Task_00000007_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠果然仙缘深厚，这本书籍乃是仙道中人修炼的阵法，少侠机缘巧合获得此物，想必也是天意如此。我虽然不是剑侠之流，也曾听说高人一般都隐居在名山仙府，少侠不妨试一试。";
+	action.m_NpcMsg = "少侠果然仙缘深厚，这本书籍乃是仙道中人修炼的功法，少侠机缘巧合获得此物，想必也是天意如此，待我告诉你如何使用这功法，日后必能斩妖除魔，造福苍生。";
 	action.m_ActionMsg = "多谢周前辈指点。";
 	return action;
 end

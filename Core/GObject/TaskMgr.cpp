@@ -351,6 +351,14 @@ namespace GObject
 		const TaskType& taskType= GDataManager::GetTaskTypeData(taskId);
 		if (taskType.m_TypeId == 0) return NULL;
 
+        // XXX: 师门，衙门任务限制
+        if (taskType.m_Class == 4 || taskType.m_Class == 5)
+        {
+            if (m_PlayerOwner->ColorTaskOutOfAccept(taskType.m_Class))
+                return NULL;
+            m_PlayerOwner->ColorTaskAccept(taskType.m_Class, taskId);
+        }
+
 		TaskData* task = new(std::nothrow) TaskData();
 		if(task == NULL) return NULL;
 		task->m_TaskId = taskId;
@@ -365,7 +373,7 @@ namespace GObject
 		task->m_Completed = 0;
 		task->m_Submit = 0;
 		InitTaskStep(task, taskType.m_ReqStep.size());
-		if (taskType.m_Class != 3)
+		if (taskType.m_Class != 3 && taskType.m_Class != 4 && taskType.m_Class != 5)
 		{
 			task->m_TimeBegin = task->m_AcceptTime;
 			task->m_TimeEnd = (taskType.m_ReqTime != 0) ? (task->m_TimeBegin + taskType.m_ReqTime) : (static_cast<UInt32>(-1));
@@ -408,7 +416,8 @@ namespace GObject
 
 	bool TaskMgr::TaskCanAccept(UInt32 taskId)
 	{
-		return GameAction()->CheckTaskAcceptCondition(m_PlayerOwner, taskId);
+		return GameAction()->CheckTaskAcceptCondition(m_PlayerOwner, taskId) &&
+            !isShiMenTask(taskId) && !isYaMenTask(taskId);
 	}
 
 	TaskData TaskMgr::GetTaskData(UInt32 taskId)
@@ -417,6 +426,32 @@ namespace GObject
 		static TaskData null;
 		return data != NULL ? *data : null;
 	}
+
+	bool TaskMgr::isShiMenTask(UInt32 taskid)
+    {
+        const std::vector<UInt32>& ids = GData::GDataManager::GetShiMenTask(m_PlayerOwner->getCountry());
+        UInt32* pid = (UInt32*)&ids[0];
+        size_t size = ids.size();
+        for (size_t i = 0; i < size; ++i)
+        {
+            if (*pid++ == taskid)
+                return true;
+        }
+        return false;
+    }
+
+	bool TaskMgr::isYaMenTask(UInt32 taskid)
+    {
+        const std::vector<UInt32>& ids = GData::GDataManager::GetYaMenTask(m_PlayerOwner->getCountry());
+        UInt32* pid = (UInt32*)&ids[0];
+        size_t size = ids.size();
+        for (size_t i = 0; i < size; ++i)
+        {
+            if (*pid++ == taskid)
+                return true;
+        }
+        return false;
+    }
 
 	void TaskMgr::CheckCanAcceptTaskByLev(UInt16 lev, bool notify)
 	{

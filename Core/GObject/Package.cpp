@@ -859,24 +859,41 @@ namespace GObject
 
         if (GetItemSubClass(id) == Item_Formula)
         {
-            ret = FormulaMerge(id, bind > 0);
-            if (ret)
-                m_Owner->sendMsgCode(0, 5001);
-            else
-                m_Owner->sendMsgCode(0, 5002);
-            return ret;
-        } else if (GetItemSubClass(id) == Item_Citta)
+            ItemBase* item = GetItem(id, bind > 0);
+            if (item && item->getClass() == Item_Formula5)
+            {
+                ret = FormulaMerge(id, bind > 0);
+                if (ret)
+                    m_Owner->sendMsgCode(0, 5001);
+                else
+                    m_Owner->sendMsgCode(0, 5002);
+                return ret;
+            }
+        }
+        else if (GetItemSubClass(id) == Item_Citta)
         {
-            ret = CittaMerge(id, bind > 0);
-            if (ret)
-                m_Owner->sendMsgCode(0, 5001);
-            else
-                m_Owner->sendMsgCode(0, 5002);
-            return ret;
-        } else if (num == 0 || IsEquipId(id) || GetItemSubClass(id) != Item_Normal)
+            ItemBase* item = GetItem(id, bind > 0);
+            if (item && item->getClass() == Item_Citta5)
+            {
+                ret = CittaMerge(id, bind > 0);
+                if (ret)
+                    m_Owner->sendMsgCode(0, 5001);
+                else
+                    m_Owner->sendMsgCode(0, 5002);
+                return ret;
+            }
+        }
+
+        if (num == 0 || IsEquipId(id) ||
+                (GetItemSubClass(id) != Item_Normal &&
+                 (GetItemSubClass(id) != Item_Formula && 
+                GetItemSubClass(id) != Item_Citta)))
 			ret = false;
 		else
 		{
+            if (GetItemSubClass(id) == Item_Formula || GetItemSubClass(id) == Item_Citta)
+                num = 1;
+
 			if (bind != 0xFF)
 			{
 				ItemBase* item = GetItem(id, bind > 0);
@@ -969,20 +986,23 @@ namespace GObject
             {0, 0, NULL, 0},
         };
 
+        int k = -1;
         int i = -1;
         while (true)
         {
             if (!config[i].sid)
                 break;
-            if (id >= config[i].sid && id <= config[i].eid)
+            if (id >= config[i].sid && id <= config[i].eid) {
+                k = i;
                 break;
+            }
             ++i;
         }
 
-        if (i < 0)
+        if (k < 0)
             return false;
 
-        StringTokenizer tk(config[i].nums, ",");
+        StringTokenizer tk(config[k].nums, ",");
         if (!tk.count())
             return false;
 

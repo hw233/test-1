@@ -33,6 +33,7 @@ namespace GData
 		static bool LoadPracticeData();
 		static bool LoadTripodAward();
 		static bool LoadFlushTaskFactor();
+		static bool LoadFlushBookFactor();
 		static bool LoadTalent();
 		static bool LoadSkillEffect();
 		static bool LoadSkills();
@@ -63,6 +64,8 @@ namespace GData
 		static const std::vector<UInt32>& GetYaMenTask(int country);
 		static const std::vector<UInt32>& GetShiYaMenTask(int country, int type);
 		static const std::vector<UInt8>& GetFlushTaskFactor(int ttype, int ftype);
+		static const std::vector<UInt32>& GetFlushBookFactor(int type/*0- 免费 1-银币 2-金币*/);
+		static const std::vector<UInt32>& GetFlushBookPrice();
         static UInt32 GetTaskAwardFactor(int ttype, int color);
         static UInt32 GetTripodAward(int fire, int quality);
         static const std::vector<UInt32>& GetClanTask();
@@ -87,6 +90,8 @@ namespace GData
         static std::vector<UInt32>		 m_TaskAwardFactor[2];
         static std::vector<UInt32>		 m_TripodAward[7];
         static std::vector<UInt32>       m_ClanTask;
+        static std::vector<UInt32>       m_BookFactor[3];
+        static std::vector<UInt32>       m_BookPrice;
 	};
 
 	

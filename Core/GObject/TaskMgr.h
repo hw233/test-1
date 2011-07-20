@@ -93,6 +93,8 @@ namespace GObject
 		TaskData* GetTask(UInt32 taskId);
 		TaskData  GetTaskData(UInt32 taskId);
 
+        bool isShiMenTask(UInt32 taskid);
+        bool isYaMenTask(UInt32 taskid);
 		void CheckCanAcceptTaskByTask(UInt32 taskId);
 		void CheckCanAcceptTaskByLev(UInt16 lev, bool = true);
 		bool TaskCanAccept(UInt32 taskId);

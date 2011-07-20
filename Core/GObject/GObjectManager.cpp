@@ -771,6 +771,10 @@ namespace GObject
 							{
 								PLAYER_DATA(pl, smFinishCount) = atoi(tk[7].c_str());
 							}
+                            if (count > 8)
+                            {
+								PLAYER_DATA(pl, smAcceptCount) = atoi(tk[8].c_str());
+                            }
 						}
 					} while(0);
 				}
@@ -798,6 +802,10 @@ namespace GObject
 							if(count > 7)
 							{
 								PLAYER_DATA(pl, ymFinishCount) = atoi(tk[7].c_str());
+							}
+							if(count > 8)
+							{
+								PLAYER_DATA(pl, ymAcceptCount) = atoi(tk[8].c_str());
 							}
 						}
 					} while(0);
