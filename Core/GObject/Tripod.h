@@ -8,7 +8,7 @@
 namespace GObject
 {
 
-#define MAX_TRIPOD_SOUL 100000
+#define MAX_TRIPOD_SOUL 10000
 #define POINT_PERMIN (60*10)
 
 struct TripodData

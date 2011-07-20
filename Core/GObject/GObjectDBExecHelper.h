@@ -108,6 +108,7 @@ struct DBPlayerData
 	std::string bookStore;
 	std::string shimen;
 	std::string yamen;
+    std::string clantask;
 };
 
 struct DBPrepaid
@@ -181,6 +182,8 @@ struct DBPracticePlace
     UInt8 open;         // 是否开放
     UInt16 enemyCount;  // 来犯敌人总次数
     UInt16 winCount;    // 赢的次数
+    UInt32 slotincoming; // 一周洞府总收入
+    UInt32 protincoming; // 一周保护费总收入
 };
 
 struct DBPracticeData
@@ -662,7 +665,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(33)
+SPECIALDEF(34)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -693,6 +696,7 @@ SPECIALDEF(33)
 	std::string, bookStore,
 	std::string, shimen,
 	std::string, yamen,
+    std::string, clantask,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
 	UInt32, pdata.created,
@@ -790,7 +794,7 @@ SPECIALDEF(33)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticePlace)
-SPECIALDEF(10)
+SPECIALDEF(12)
 	(
         UInt8, id,
         UInt64, ownerid,
@@ -801,7 +805,9 @@ SPECIALDEF(10)
         UInt16, slotmoney,
         UInt8, open,
         UInt16, enemyCount,
-        UInt16, winCount
+        UInt16, winCount,
+        UInt32, slotincoming,
+        UInt32, protincoming
     )
 SPECIALEND()
 

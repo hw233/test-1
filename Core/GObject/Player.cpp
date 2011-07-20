@@ -306,18 +306,18 @@ namespace GObject
 	void EventPlayerTripod::Process(UInt32 leftCount)
     {
         TripodData& data = tripod.getTripodData(m_Player->getId());
-        if (data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
+        data.soul += POINT_PERMIN;
+        if (data.soul > MAX_TRIPOD_SOUL)
+            data.soul = MAX_TRIPOD_SOUL;
+
+        if (!leftCount || data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
             PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
             data.awdst = 1;
             DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %"I64_FMT"u", data.awdst, m_Player->getId());
             return;
         }
 
-        data.soul += POINT_PERMIN;
-        if (data.soul > MAX_TRIPOD_SOUL)
-            data.soul = MAX_TRIPOD_SOUL;
-
-        if (leftCount % 10 || !leftCount || data.soul == MAX_TRIPOD_SOUL)
+        if (!(leftCount % 3))
             DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
     }
 
@@ -2738,7 +2738,7 @@ namespace GObject
 
 	void Player::writeYaMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.ymcolor[0], _playerData.shimen[1], _playerData.ymcolor[1], _playerData.shimen[2], _playerData.ymcolor[2], _playerData.shimen[3], _playerData.ymcolor[3], _playerData.shimen[4], _playerData.ymcolor[4], _playerData.shimen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
 	}
 
     void Player::delColorTask(UInt32 taskid)
@@ -2878,6 +2878,129 @@ namespace GObject
     {
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
+    }
+
+    bool Player::finishClanTask(UInt32 taskId)
+    {
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        if(taskType.m_Class != 6)
+        {
+            return false;
+        }
+
+        if(getClan() == NULL)
+        {
+            delClanTask();
+            return false;
+        }
+
+        if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+            return false;
+
+        ++ _playerData.ctFinishCount;
+        if(CLAN_TASK_MAXCOUNT > _playerData.ctFinishCount)
+        {
+            URandom rnd(time(NULL));
+            const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
+            _playerData.clanTaskId = task[rnd(task.size())];
+            GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        }
+        else
+        {
+            _playerData.clanTaskId = 0;
+        }
+
+        writeClanTask();
+        return true;
+    }
+
+    void Player::delClanTask()
+    {
+        GetTaskMgr()->DelTask(_playerData.clanTaskId);
+        _playerData.clanTaskId = 0;
+        _playerData.ctFinishCount = 0;
+
+        writeClanTask();
+    }
+
+    void Player::buildClanTask()
+    {
+        if(getClan() == NULL)
+        {
+            return;
+        }
+
+        const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
+        if(task.size() == 0)
+            return;
+
+        if(_playerData.clanTaskId == 0)
+        {
+            URandom rnd(time(NULL));
+            _playerData.clanTaskId = task[rnd(task.size())];
+        }
+        else
+        {
+            const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(_playerData.clanTaskId);
+            if(taskType.m_Class != 6)
+            {
+                URandom rnd(time(NULL));
+                _playerData.clanTaskId = task[rnd(task.size())];
+            }
+        }
+
+        GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        _playerData.ctFinishCount = 0;
+        writeClanTask();
+
+    }
+
+
+	void Player::writeClanTask()
+	{
+        Stream st(0x98);
+        st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
+        st << Stream::eos;
+        send(st);
+
+		DB().PushUpdateData("UPDATE `player` SET `clantask` = '%u,%u' WHERE `id` = %"I64_FMT"u",  _playerData.clanTaskId, _playerData.ctFinishCount, _id);
+	}
+
+    UInt32 Player::getClanTaskId()
+    {
+        return _playerData.clanTaskId;
+    }
+
+    bool Player::isClanTask(UInt32 taskId)
+    {
+        return _playerData.clanTaskId == taskId;
+    }
+
+    bool Player::isClanTaskFull()
+    {
+        return CLAN_TASK_MAXCOUNT  - 1 < _playerData.ctFinishCount;
+    }
+
+    void Player::AddClanBuilding(UInt32 building)
+    {
+        Clan* clan = getClan();
+        if(clan == NULL)
+        {
+            return;
+        }
+
+        clan->addConstruction(building);
+   }
+
+    void Player::AddClanContrib(UInt32 contrib)
+    {
+        Clan* clan = getClan();
+        if(clan == NULL)
+        {
+            return;
+        }
+
+        clan->addMemberProffer(this, contrib);
     }
 
 	inline UInt32 getTavernPriceByColor(UInt8 color)

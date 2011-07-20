@@ -194,12 +194,14 @@ public:
 	bool hasClanAuthority(Player *, UInt8);
     float getClanTechAddon();
     UInt8 getPracticeSlot();
+    void sendPracticePlaceInfo(Player* pl);
 
     // ∞Ô≈…÷∞Œª
     bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);
     UInt8 getClanRank(Player* pl);
     UInt8 getClanRankCount(UInt8 cls);
 
+    void addMemberProffer(Player*pl, UInt32);
 
 public:
 	inline bool alive() { return !_deleted; }

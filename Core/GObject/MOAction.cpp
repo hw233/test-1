@@ -57,8 +57,17 @@ namespace GObject
 		st << static_cast<UInt16>(0);
 		const std::set<UInt32>& relation = GData::GDataManager::GetTaskNpcRelationData(npcId);
 		std::set<UInt32>::const_iterator cit = relation.begin();
+        // XXX
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(*cit);
+        PlayerData& pldd = player->getPlayerData();
 		for (; cit != relation.end(); ++cit)
 		{
+            if(taskType.m_Class == 6)
+            {
+                if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+                    continue;
+            }
+
 			Table TaskMsgTable = GameAction()->RunTask(player, *cit, npcId);
 			UInt16 actionType = TaskMsgTable.get<UInt16>("m_ActionType");
 			if (actionType == 0)
@@ -90,6 +99,15 @@ namespace GObject
 
 	void MOAction::TaskActionStep(Player* player, UInt32 npcId, UInt32 taskId, UInt8 step)
 	{
+        // XXX
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        PlayerData& pldd = player->getPlayerData();
+        if(taskType.m_Class == 6)
+        {
+            if(player->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+                return;
+        }
+
 		Table TaskMsgTable = GameAction()->RunTaskStep(player, taskId, step);
 		UInt8 actionType = TaskMsgTable.get<UInt8>("m_ActionType");
 		if (actionType != 0)

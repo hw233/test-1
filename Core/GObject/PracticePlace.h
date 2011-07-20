@@ -29,6 +29,8 @@ struct PPlace
     UInt8 open;
     UInt16 enemyCount;
     UInt16 winCount;
+    UInt32 protincoming;
+    UInt32 slotincoming;
 };
 
 struct PracticeData : public GData::ObjectBaseNT<UInt64>
@@ -93,8 +95,10 @@ public:
     bool replaceProtecter(Player* pl, UInt8 place, UInt64 protid);
     bool replaceProtecter(Player* pl, UInt64 protid);
     // 设置挂机收费
+    bool setCharges(Player* pl, UInt16 money);
     bool setCharges(Player* pl, UInt8 place, UInt16 money);
     // 设置保护收费
+    bool setProtCharges(Player* pl, UInt16 money);
     bool setProtCharges(Player* pl, UInt8 place, UInt16 money);
     // 将所有修炼人放入无主之地
     void moveAllToMax(UInt8 place);
@@ -104,6 +108,7 @@ public:
 
     // 使用金币增加修练空间
     bool addSlot(Player* pl, UInt8 place);
+    bool addSlot(Player* pl);
 
     // 通过帮派科技增加修炼空间
     bool addSlotFromTech(Player* pl, UInt8 place = 0);
@@ -123,6 +128,11 @@ public:
     PracticeData* getPracticeData(Player* pl);
     bool delPracticeData(Player* pl);
     UInt64 getPlaceOwnerId(UInt8 place);
+
+    PlaceData* getPlaceData(Player* pl);
+    PlaceData* getPlaceData(UInt64 playerId);
+
+    void resetPracticePlaceIncoming();
 
     bool isSitdownYet(PracticeData* pd, UInt32 id);
 

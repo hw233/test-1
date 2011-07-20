@@ -94,10 +94,12 @@ struct ClanQuery2Req
 	MESSAGE_DEF1(0x97, UInt8, _type);
 };
 
+#if 0
 struct ClanPersonalRewardReq
 {
 	MESSAGE_DEF(0x9B);
 };
+#endif
 
 struct ClanRewardReq
 {
@@ -505,12 +507,53 @@ void OnClanBattleReportReq( GameMsgHdr& hdr, ClanBattleReportReq& req )
 	clanBattle->sendClanBattleReport(player, req._rptId);
 }
 
+#if 0
 void OnClanPersonalRewardReq( GameMsgHdr& hdr, ClanPersonalRewardReq& )
 {
 	MSG_QUERY_PLAYER(player);
 	if(player->getClan() == NULL)
 		return;
 	player->getClan()->sendPersonalRewardList(player);
+}
+#endif
+
+void OnClanPracticePlaceOpReq(GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+
+    GObject::Clan* clan = player->getClan();
+    if(NULL == clan)
+        return;
+
+    if(clan->getOwner() != player)
+        return;
+
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 op;
+    UInt16 money = 0;
+	brd >> op;
+
+    switch(op)
+    {
+    case 0:
+        clan->sendPracticePlaceInfo(player);
+        break;
+    case 1:
+        GObject::practicePlace.addSlot(player);
+        break;
+    case 2:
+        break;
+    case 3:
+        brd >> money;
+        GObject::practicePlace.setCharges(player, money);
+        break;
+    case 4:
+        brd >> money;
+        GObject::practicePlace.setProtCharges(player, money);
+        break;
+    }
 }
 
 void OnClanRewardReq(GameMsgHdr& hdr, ClanRewardReq&)

@@ -171,6 +171,11 @@ namespace Script
 		CLASS_DEF(Player, getCreated);
 		CLASS_DEF(Player, getBlockBossLevel);
 		CLASS_DEF(Player, ColorTaskOutOf);
+        CLASS_DEF(Player, getClanTaskId);
+        CLASS_DEF(Player, isClanTaskFull);
+        CLASS_DEF(Player, isClanTask);
+        CLASS_DEF(Player, AddClanBuilding);
+        CLASS_DEF(Player, AddClanContrib);
 		
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

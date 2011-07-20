@@ -288,6 +288,15 @@ namespace GObject
 
 	UInt32 TaskMgr::AcceptTask(UInt32 taskId)
 	{
+        // XXX
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        if(taskType.m_Class == 6)
+        {
+            PlayerData& pldd = m_PlayerOwner->getPlayerData();
+            if(m_PlayerOwner->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+                return 0;
+        }
+
 		TaskData* task = AddTask(taskId);
 		if (task != NULL)
 		{
@@ -323,8 +332,16 @@ namespace GObject
 		{
 			WARN_LOG("Find the same submit task ! taskId=%u ownerId=%"I64_FMT"u", taskId, m_PlayerOwner->getId());
 		}
-        m_TaskSubmitedList[taskId] = TimeUtil::Now();
-		DB().PushUpdateData("UPDATE `task_instance`  SET `submit` = 1,`timeEnd` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", m_TaskSubmitedList[taskId], it->second->m_TaskId, it->second->m_OwnerId);
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        if(taskType.m_Class == 4 || taskType.m_Class == 5 || taskType.m_Class == 6)
+        {
+            DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, m_PlayerOwner->getId());
+        }
+        else
+        {
+            m_TaskSubmitedList[taskId] = TimeUtil::Now();
+            DB().PushUpdateData("UPDATE `task_instance`  SET `submit` = 1,`timeEnd` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", m_TaskSubmitedList[taskId], it->second->m_TaskId, it->second->m_OwnerId);
+        }
 		SAFE_DELETE(it->second);
 		m_TaskCompletedList.erase(it);
 		CheckCanAcceptTaskByTask(taskId);
@@ -334,8 +351,7 @@ namespace GObject
 			SYSMSG_SENDV(1009, m_PlayerOwner, taskId);
 		}
 
-		return true;
-	}
+		return true; }
 
 	TaskData* TaskMgr::AddTask(UInt32 taskId)
 	{
@@ -782,7 +798,9 @@ namespace GObject
 		UInt16 size = static_cast<UInt16>(taskIds.size());
 		if (size == 0) return;
 		for (UInt16 i = 0; i < size; ++i)
+        {
 			m_CanAcceptTaskList.insert(taskIds[i]);
+        }
 		SendCanAcceptTaskInfor();
 	}
 

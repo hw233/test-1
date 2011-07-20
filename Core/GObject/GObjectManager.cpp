@@ -643,7 +643,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `yamen`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `yamen`, `clantask`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -811,6 +811,13 @@ namespace GObject
 					} while(0);
 				}
 			}
+
+            if (dbpd.clantask.length())
+            {
+				StringTokenizer tk(dbpd.clantask, ",");
+                PLAYER_DATA(pl, clanTaskId) = atoi(tk[0].c_str());
+                PLAYER_DATA(pl, ctFinishCount) = atoi(tk[1].c_str());
+            }
 
 			{
 				StringTokenizer tk(dbpd.bookStore, "|");
@@ -2511,7 +2518,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Practice Place");
 		DBPracticePlace pp;
-		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `ownerid`, `protid`, `maxslot`, `openslot`, `protmoney`, `slotmoney`, `open`, `enemyCount`, `winCount`, `slotincoming`, `protincoming` FROM `practice_place` ORDER BY `id`", pp)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
         UInt8 i = 0;
@@ -2529,6 +2536,8 @@ namespace GObject
             place.open = pp.open;
             place.enemyCount = pp.enemyCount;
             place.winCount = pp.winCount;
+            place.slotincoming = pp.slotincoming;
+            place.protincoming = pp.protincoming;
             practicePlace.addPlace(place, i++);
         }
 		lc.finalize();

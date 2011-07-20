@@ -601,6 +601,8 @@ CREATE TABLE `practice_place` (
   `open` tinyint(2) unsigned NOT NULL DEFAULT '1',
   `enemyCount` smallint(5) unsigned NOT NULL DEFAULT '0',
   `winCount` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `slotincoming` int(11) NOT NULL,
+  `protincoming` int(11) NOT NULL,
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -802,6 +804,7 @@ CREATE TABLE `player` (
   `bookStore` varchar(255) NOT NULL DEFAULT '0',
   `shimen` varchar(255) NOT NULL DEFAULT '',
   `yamen` varchar(255) NOT NULL DEFAULT '',
+  `clantask` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
