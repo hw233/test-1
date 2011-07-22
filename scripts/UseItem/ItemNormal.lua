@@ -697,7 +697,7 @@ function ItemNormal_00000031(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(10000);
+    fgt:addPExp(10000*num);
     package:DelItemSendMsg(31, player);
     return true;
 end

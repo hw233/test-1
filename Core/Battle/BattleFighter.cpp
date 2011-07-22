@@ -23,7 +23,10 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _formEffect(NULL), _formula(bf),
     _forgetLevel(0), _forgetRound(0), _flag(0), _immuneLevel(0), _immuneRound(0),
-    _deAction(0), _evade100(0), _defend100(0)
+    _evade100(0), _defend100(0),
+	_attackAdd2(0), _magAtkAdd2(0), _defAdd2(0), _magDefAdd2(0), _hitrateAdd2(0), _evadeAdd2(0),
+    _criticalAdd2(0), _criticalDmgAdd2(0), _pierceAdd2(0), _counterAdd2(0), _magResAdd2(0), _toughAdd2(0),
+	_maxhpAdd2(0), _maxActionAdd2(0)
 {
 	setFighter(f);
 }
@@ -379,13 +382,13 @@ void BattleFighter::updateBuffExtras()
     }
 }
 
-float BattleFighter::calcAttack( bool& isCritical )
+float BattleFighter::calcAttack( bool& isCritical, float tough)
 {
 	// 计算暴击率
-    float rate = _critical + _criticalAdd - _tough - _toughAdd;
-	isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
+    float rate = _critical - tough;
+    isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
 
-	float atk = _attack + _attackAdd;
+	float atk = _attack + _attackAdd + _attackAdd2;
 	/* TODO: random
 	int extra = (uRand(9)) - 4;
 	*/
@@ -393,19 +396,20 @@ float BattleFighter::calcAttack( bool& isCritical )
 	// 如果暴击
 	if(isCritical)
 	{
-		atk = atk * (_criticaldmg + _criticalDmgAdd);
+		atk = atk * (_criticaldmg + _criticalDmgAdd + _criticalDmgAdd2);
 	}
 	return atk;
 }
 
-float BattleFighter::calcMagAttack(bool& isCritical)
+float BattleFighter::calcMagAttack(bool& isCritical, float tough)
 {
-    isCritical = uRand(10000) < _critical * 100;
-    float magatk = _magatk + _magAtkAdd;
+    float rate = _critical - tough;
+    isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
+    float magatk = _magatk + _magAtkAdd + _magAtkAdd2;
 
     if(isCritical)
     {
-        magatk = magatk * 3 / 2;
+        magatk = magatk * (_criticaldmg + _criticalDmgAdd + _criticalDmgAdd2);
     }
 
     return magatk;
@@ -423,7 +427,7 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
         _aura = 0;
     }
 
-    return aura_factor * ((_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
+    return aura_factor * ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
 float BattleFighter::calcPoison(const GData::SkillBase* skill)
@@ -434,11 +438,11 @@ float BattleFighter::calcPoison(const GData::SkillBase* skill)
     // 道
     if(getClass() == 3)
     {
-        return (_attack+ _attackAdd) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
+        return (_attack+ _attackAdd + _attackAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
     }
 
     // 儒释
-    return (_magatk + _magAtkAdd) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
+    return (_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
 }
 
 bool BattleFighter::calcHit( BattleFighter * defender )
@@ -447,7 +451,7 @@ bool BattleFighter::calcHit( BattleFighter * defender )
 		return true;
 
 	// 计算命中值
-	float hitrate = _hitrate + _hitrateAdd - defender->getEvade();
+	float hitrate = _hitrate + _hitrateAdd + _hitrateAdd2 - defender->getEvade();
 
 	// 必中
 	if(hitrate >= 100)
@@ -459,7 +463,7 @@ bool BattleFighter::calcHit( BattleFighter * defender )
 
 bool BattleFighter::calcCounter(bool ranged)
 {
-	return uRand(ranged ? 20000 : 10000) < (_counter + _counterAdd) * 100;
+	return uRand(ranged ? 20000 : 10000) < (_counter + _counterAdd + _counterAdd2) * 100;
 }
 
 bool BattleFighter::canBeCounter()
@@ -471,7 +475,7 @@ bool BattleFighter::canBeCounter()
 
 bool BattleFighter::calcPierce()
 {
-	return uRand(10000) < (_pierce + _pierceAdd) * 100;
+	return uRand(10000) < (_pierce + _pierceAdd + _pierceAdd2) * 100;
 }
 
 void BattleFighter::initStats(bool checkEnh)
@@ -596,7 +600,8 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
                     _activeSkill[idx].cd = resSkillItem->base->cd + 1;
                 }
             }
-            else if(!resSkillItem)
+
+            if(!resSkillItem)
             {
                 if(!need_therapy && _activeSkill[idx].base->effect->hp && _activeSkill[idx].base->effect->hpP > 0.001)
                 {
@@ -604,6 +609,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
                 }
                 resSkillItem = &(_activeSkill[idx]);
                 _activeSkill[idx].cd = resSkillItem->base->cd + 1;
+                _activeSkillIdx  = idx + 1;
             }
         }
     }

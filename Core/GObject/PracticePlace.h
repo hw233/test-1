@@ -40,7 +40,8 @@ struct PracticeData : public GData::ObjectBaseNT<UInt64>
 
     UInt8 type;         // 修炼类型 0-8小时, 1-24小时
     UInt8 pricetype;    // 付费方式 0-金币， 1-银币
-    UInt16 price;       // 花了多少钱
+    UInt16 slotprice;   // 洞府花了多少钱
+    UInt16 protprice;   // 保护花了多少钱
     UInt32 traintime;   // 修炼分钟数
     UInt32 checktime;   // 修炼分钟数
     UInt32 trainend;    // 修炼结束时间

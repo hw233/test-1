@@ -2573,7 +2573,7 @@ namespace GObject
 		LoadingCounter lc("Loading Practice Data");
         Player* pl = 0;
 		DBPracticeData pd;
-		if(execu->Prepare("SELECT `id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters` FROM `practice_data`", pd)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters` FROM `practice_data`", pd)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -2583,7 +2583,8 @@ namespace GObject
                 return false;
             ppd->type = pd.type;
             ppd->pricetype = pd.pricetype;
-            ppd->price = pd.price;
+            ppd->slotprice = pd.slotprice;
+            ppd->protprice = pd.protprice;
             ppd->traintime = pd.traintime;
             ppd->checktime = pd.checktime;
             ppd->trainend = TimeUtil::Now() + 60 * pd.checktime;

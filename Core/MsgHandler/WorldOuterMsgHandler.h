@@ -285,7 +285,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	extern void trimName(std::string& str);
 	trimName(ccr._name);
 	std::string strNametmp(ccr._name);
-	if(player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL)
+	if(player->GetLev() < 30 || player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL)
 	{
 		Stream st(0x92);
 		st << static_cast<UInt8>(1) << Stream::eos;
