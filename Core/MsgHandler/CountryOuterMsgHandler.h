@@ -47,6 +47,12 @@ struct NullReq
 	MESSAGE_DEF1(0x00, UInt32, ticket);
 };
 
+struct SelectCountry
+{
+    UInt8 _country;
+	MESSAGE_DEF1(0x0D, UInt8, _country);
+};
+
 struct PlayerInfoReq
 {
 	MESSAGE_DEF(0x14);
@@ -754,6 +760,28 @@ void OnNullReq( GameMsgHdr& hdr, NullReq& nr )
 	Stream st(0x00);
 	st << nr.ticket << Stream::eos;
 	player->send(st);
+}
+
+void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req)
+{
+	MSG_QUERY_PLAYER(player);	
+    UInt8 country = req._country;
+    if (country > 2) 
+        return;
+    if (player->getCountry() != country)
+    {    
+        player->setCountry(country);
+        Stream st(0x0D);
+        st << country;
+        player->send(st);
+        PlayerData& pd = player->getPlayerData();
+
+        GObject::Country& cny = CURRENT_COUNTRY();
+        CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
+        cny.PlayerLeave(player);
+        GameMsgHdr hdr(0x1F0, country, player, sizeof(CountryEnterStruct));
+        GLOBAL().PushMsg( hdr, &ces );
+    }    
 }
 
 void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
