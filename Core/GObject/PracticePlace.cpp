@@ -440,7 +440,7 @@ namespace GObject
         int n = 0;
         for (auto e = pd.data.end(); i != e && n < pagenum; ++i)
         {
-            ppd = *e;
+            ppd = *i;
             Player* pl = globalPlayers[ppd->getId()];
             if (!pl)
                 continue;

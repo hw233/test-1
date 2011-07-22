@@ -60,7 +60,7 @@ namespace GObject
     UInt32 GObjectManager::_forge_cost;
     UInt32 GObjectManager::_split_chance[4][2];
     UInt32 GObjectManager::_merge_chance[9];
-    UInt32 GObjectManager::_enchant_chance[12];
+    UInt32 GObjectManager::_enchant_chance[5][12];
     UInt8  GObjectManager::_enchant_max[11];
     UInt8  GObjectManager::_attrChances[11][3][8];
     UInt16 GObjectManager::_attrInfo[11][8][3][8];
@@ -2236,12 +2236,13 @@ namespace GObject
 				}
             }
 
+			for(q = 0; q < 5; q ++)
             {
-				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance");
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance", q + 1);
 				UInt32 size = std::min(12, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
 				{
-					_enchant_chance[j] =  table_temp.get<UInt32>(j + 1);
+					_enchant_chance[q][j] =  table_temp.get<UInt32>(j + 1);
 				}
             }
 

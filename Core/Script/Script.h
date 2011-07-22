@@ -12,6 +12,7 @@ class Script
 {
 public:
 	Script();
+    virtual ~Script();
 	virtual void init() {}
 	virtual void postInit() {}
 	void runScript(const char *);
