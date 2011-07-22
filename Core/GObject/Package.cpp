@@ -335,6 +335,7 @@ namespace GObject
 
 	ItemBase* Package::AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind, UInt8 fromWhere)
 	{
+        if (!typeId || !num) return NULL;
 		if (IsEquipTypeId(typeId)) return NULL;
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
 		if(itemType == NULL) return NULL;

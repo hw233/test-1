@@ -310,9 +310,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         break;
     case 0x61:
         { // skills
-            std::string str;
-            if (value2string(&_skills[0], _skills.size(), str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            if (_skills.size()) {
+                std::string str;
+                if (value2string(&_skills[0], _skills.size(), str)) {
+                    DB().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                }
             }
         }
         break;
@@ -326,9 +328,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         break;
     case 0x63:
         { // cittas 
-            std::string str;
-            if (value2string(&_cittas[0], _cittas.size(), str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+            if (_cittas.size()) {
+                std::string str;
+                if (value2string(&_cittas[0], _cittas.size(), str)) {
+                    DB().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                }
             }
         }
         break;

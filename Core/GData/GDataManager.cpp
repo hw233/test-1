@@ -75,6 +75,16 @@ namespace GData
 			fprintf(stderr, "Load WeaponDefData Error !\n");
 			return false;
 		}
+        if (!LoadSkillEffect())
+        {
+			fprintf(stderr, "Load skill effect Error !\n");
+			return false;
+        }
+        if (!LoadSkills())
+        {
+			fprintf(stderr, "Load skills template Error !\n");
+			return false;
+        }
 		if (!LoadAttrExtraData())
 		{
 			fprintf(stderr, "Load AttrExtraData Error !\n");
@@ -133,16 +143,6 @@ namespace GData
         if (!LoadTalent())
         {
 			fprintf(stderr, "Load talent template Error !\n");
-			return false;
-        }
-        if (!LoadSkillEffect())
-        {
-			fprintf(stderr, "Load skill effect Error !\n");
-			return false;
-        }
-        if (!LoadSkills())
-        {
-			fprintf(stderr, "Load skills template Error !\n");
 			return false;
         }
         if (!LoadCittaEffect())
