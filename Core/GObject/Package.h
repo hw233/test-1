@@ -9,6 +9,8 @@ namespace GObject
 {
 #define ITEM_ENCHANT_L1 502   //太乙真金
 #define ITEM_ENCHANT_L2 503   //太乙精金
+#define TRUMP_ENCHANT_L1 514   //五行精英
+#define TRUMP_ENCHANT_L2 515  //五行精华
 
 	class Fighter;
 	class Player;

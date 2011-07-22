@@ -49,6 +49,12 @@ namespace GObject
             return false;
         }
 
+        PPlace& data = m_places[place-1].place;
+        Player* owner = globalPlayers[data.ownerid];
+        Clan* clan = NULL;
+        if(NULL != owner)
+            clan = owner->getClan();
+
         if (place != PPLACE_MAX) {
             PracticeData*& pd = m_places[place-1].data[slot];
             if (pd)
@@ -68,11 +74,14 @@ namespace GObject
                     return false;
                 }
 
-                UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->price;
-                if (pd->pricetype == 0)
-                    def->getGold(money);
-                else
-                    def->getTael(money);
+                UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->slotprice;
+                UInt16 money2 =  ((float)pd->checktime / pd->traintime) * pd->protprice;
+                def->getTael(money + money2);
+                data.slotincoming += pd->slotprice - money;
+                data.protincoming += pd->protprice - money2;
+                DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+                if(clan)
+                    clan->addClanFunds(pd->slotprice + pd->protprice - money - money2);
 
                 pd->winnerid = 0;
                 m_places[PPLACE_MAX-1].data.push_back(pd);
@@ -87,13 +96,8 @@ namespace GObject
             }
         }
 
-        PPlace& data = m_places[place-1].place;
-        Player* owner = globalPlayers[data.ownerid];
-        Clan* clan = NULL;
-        if(NULL != owner)
-            clan = owner->getClan();
-
-        UInt32 price = 0;
+        UInt32 slotprice = 0;
+        UInt32 protprice = 0;
         ConsumeInfo ci(Practice,0,0);
 #if 0
         if (place == PPLACE_MAX || !data.slotmoney)
@@ -135,19 +139,16 @@ namespace GObject
 #endif
         if (place != PPLACE_MAX)
         {
-            price = time * data.slotmoney;
-            if (price) {
-                if (pl->getTael() < price)
+            slotprice = time * data.slotmoney;
+            if (slotprice) {
+                if (pl->getTael() < slotprice)
                 {
                     pl->sendMsgCode(0, 2007);
                     st << static_cast<UInt8>(1) << Stream::eos;
                     pl->send(st);
                     return false;
                 }
-                data.slotincoming += price;
-                pl->useTael(price, &ci);
-                if(clan)
-                    clan->addClanFunds(price);
+                pl->useTael(slotprice, &ci);
             }
         }
 
@@ -164,19 +165,16 @@ namespace GObject
             break;
         case 2:
             {
-                price = time * data.protmoney;
-                if (price) {
-                    if (pl->getTael() < price)
+                protprice = time * data.protmoney;
+                if (protprice) {
+                    if (pl->getTael() < protprice)
                     {
                         pl->sendMsgCode(0, 2007);
                         st << static_cast<UInt8>(1) << Stream::eos;
                         pl->send(st);
                         return false;
                     }
-                    data.protincoming += price;
-                    pl->useTael(price, &ci);
-                    if(clan)
-                        clan->addClanFunds(price);
+                    pl->useTael(protprice, &ci);
                 }
             }
             break;
@@ -190,7 +188,8 @@ namespace GObject
         }
         pp->type = type;
         pp->pricetype = priceType;
-        pp->price = price;
+        pp->slotprice = slotprice;
+        pp->protprice = protprice;
         pp->traintime = 60 * time * 8;
         pp->checktime = pp->traintime;
         pp->trainend = TimeUtil::Now() + pp->traintime;
@@ -201,12 +200,10 @@ namespace GObject
         if (place != PPLACE_MAX)
             m_places[place-1].data[slot] = pp;
 
-        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `price`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, price, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
-
-        DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
 
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << Stream::eos;
         pl->send(st);
@@ -229,6 +226,12 @@ namespace GObject
         UInt8 place = pl->getPracticePlace();
         UInt16 slot = pl->getPracticeSlot();
 
+        PPlace& data = m_places[place-1].place;
+        Player* owner = globalPlayers[data.ownerid];
+        Clan* clan = NULL;
+        if(NULL != owner)
+            clan = owner->getClan();
+
         PracticeData* pd = getPracticeData(pl);
         if (pd)
         {
@@ -242,8 +245,16 @@ namespace GObject
             PopTimerEvent(pl, EVENT_PLAYERPRACTICING, pl->getId());
 
             UInt32 trained = pd->traintime - pd->checktime;
-            UInt16 money = ((float)(trained)/pd->traintime)*pd->price;
-            UInt16 remain = pd->price - money;
+            UInt16 money = ((float)(trained)/pd->traintime)*pd->slotprice;
+            UInt16 money2 = ((float)(trained)/pd->traintime)*pd->protprice;
+            UInt16 remain = pd->slotprice + pd->protprice - money - money2;
+            pl->getTael(remain);
+            data.slotincoming += money;
+            data.protincoming += money2;
+            DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+            if(clan)
+                clan->addClanFunds(money + money2);
+
             st << trained * 60 << money << remain << Stream::eos;
             //delPracticeData(pl);
         } else
@@ -429,7 +440,7 @@ namespace GObject
         int n = 0;
         for (auto e = pd.data.end(); i != e && n < pagenum; ++i)
         {
-            ppd = *e;
+            ppd = *i;
             Player* pl = globalPlayers[ppd->getId()];
             if (!pl)
                 continue;

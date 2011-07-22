@@ -12,6 +12,11 @@ Script::Script()
 	addPackagePath();
 }
 
+Script::~Script()
+{
+    lua_close(_L);
+}
+
 void Script::doFile(const char * fn)
 {
 	init();

@@ -1185,6 +1185,14 @@ namespace GObject
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if(equip == NULL || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet)
 			return 2;
+        UInt32 item_enchant_l = ITEM_ENCHANT_L1;
+        UInt8 quality = 0;
+        if(equip->getClass() == Item_Trump)
+        {
+            item_enchant_l = TRUMP_ENCHANT_L1;
+            quality = equip->getQuality() - 1;
+        }
+
 		ItemEquipData& ied = equip->getItemEquipData();
         if(ied.enchant >= ENCHANT_LEVEL_MAX)
             return 2;
@@ -1201,15 +1209,15 @@ namespace GObject
 			return 2;
 		}
 		bool isBound = equip->GetBindStatus();
-		if(!DelItemAny(ITEM_ENCHANT_L1 + type, 1, &isBound))
+		if(!DelItemAny(item_enchant_l + type, 1, &isBound))
 		{
 			return 2;
 		}
-		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_ENCHANT_L1 + type, 1, TimeUtil::Now());
+		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, 1, TimeUtil::Now());
 		ConsumeInfo ci(EnchantEquipment,0,0);
 		m_Owner->useTael(amount,&ci);
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
-		if(uRand(1000) < GObjectManager::getEnchantChance(ied.enchant)/*enchant_chance[ied.enchant]*/)
+		if(uRand(1000) < GObjectManager::getEnchantChance(quality, ied.enchant)/*enchant_chance[ied.enchant]*/)
 		{
 			++ ied.enchant;
 			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
