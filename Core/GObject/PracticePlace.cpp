@@ -200,7 +200,7 @@ namespace GObject
         if (place != PPLACE_MAX)
             m_places[place-1].data[slot] = pp;
 
-        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
@@ -436,36 +436,43 @@ namespace GObject
             return;
 
         Stream st(0xE1);
+        st << static_cast<UInt8>(pagenum);
+        st << static_cast<UInt8>(0);
         PracticeData* ppd = NULL;
         int n = 0;
-        for (auto e = pd.data.end(); i != e && n < pagenum; ++i)
+        int c = 0;
+        for (auto e = pd.data.end(); i != e && n < pagenum; ++i, ++n)
         {
             ppd = *i;
-            Player* pl = globalPlayers[ppd->getId()];
-            if (!pl)
-                continue;
+            if (ppd) {
+                Player* pl = globalPlayers[ppd->getId()];
+                if (!pl)
+                    continue;
 
-            st << static_cast<UInt8>(n);
-            st << pl->getName();
-            st << pl->getCountry();
+                st << static_cast<UInt8>(n);
+                st << pl->getName();
+                st << pl->getCountry();
 
-            Fighter* fgt = pl->getMainFighter();
-            if (fgt)
-            {
-                st << fgt->getClass();
-                st << fgt->getSex();
-                st << fgt->getLevel();
+                Fighter* fgt = pl->getMainFighter();
+                if (fgt)
+                {
+                    st << fgt->getClass();
+                    st << fgt->getSex();
+                    st << fgt->getLevel();
+                }
+                else
+                {
+                    st << static_cast<UInt8>(0);
+                    st << static_cast<UInt8>(0);
+                    st << static_cast<UInt8>(0);
+                }
+                st << ppd->prot;
+                st << ppd->checktime*60;
+                ++c;
             }
-            else
-            {
-                st << static_cast<UInt8>(0);
-                st << static_cast<UInt8>(0);
-                st << static_cast<UInt8>(0);
-            }
-            st << ppd->prot;
-            st << ppd->checktime*60;
         }
 
+        st.data<UInt8>(6) = c;
         st << Stream::eos;
         pl->send(st);
     }
