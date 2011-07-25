@@ -418,6 +418,30 @@ namespace GObject
 
         st << Stream::eos;
         pl->send(st);
+
+        Stream st1(0xE3);
+        PracticeData* p = getPracticeData(pl);
+        st << static_cast<UInt8>(0);
+        if (p)
+        {
+            st << p->checktime;
+            st << p->prot;
+            st << static_cast<UInt8>(pl->getPracticePlace());
+
+            UInt8 size = p->fighters.size();
+            st << size;
+
+            for (std::list<UInt32>::iterator i = p->fighters.begin(), e = p->fighters.end(); i != e; ++i)
+                st << *i;
+        }
+        else
+        {
+            st << static_cast<UInt32>(0);
+            st << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(0);
+        }
+        pl->send(st1);
     }
 
     void PracticePlace::getPlaceInfo(Player* pl, UInt8 place)
@@ -436,36 +460,43 @@ namespace GObject
             return;
 
         Stream st(0xE1);
+        st << static_cast<UInt8>(pagenum);
+        st << static_cast<UInt8>(0);
         PracticeData* ppd = NULL;
         int n = 0;
-        for (auto e = pd.data.end(); i != e && n < pagenum; ++i)
+        int c = 0;
+        for (auto e = pd.data.end(); i != e && n < pagenum; ++i, ++n)
         {
             ppd = *i;
-            Player* pl = globalPlayers[ppd->getId()];
-            if (!pl)
-                continue;
+            if (ppd) {
+                Player* pl = globalPlayers[ppd->getId()];
+                if (!pl)
+                    continue;
 
-            st << static_cast<UInt8>(n);
-            st << pl->getName();
-            st << pl->getCountry();
+                st << static_cast<UInt8>(n);
+                st << pl->getName();
+                st << pl->getCountry();
 
-            Fighter* fgt = pl->getMainFighter();
-            if (fgt)
-            {
-                st << fgt->getClass();
-                st << fgt->getSex();
-                st << fgt->getLevel();
+                Fighter* fgt = pl->getMainFighter();
+                if (fgt)
+                {
+                    st << fgt->getClass();
+                    st << fgt->getSex();
+                    st << fgt->getLevel();
+                }
+                else
+                {
+                    st << static_cast<UInt8>(0);
+                    st << static_cast<UInt8>(0);
+                    st << static_cast<UInt8>(0);
+                }
+                st << ppd->prot;
+                st << ppd->checktime*60;
+                ++c;
             }
-            else
-            {
-                st << static_cast<UInt8>(0);
-                st << static_cast<UInt8>(0);
-                st << static_cast<UInt8>(0);
-            }
-            st << ppd->prot;
-            st << ppd->checktime*60;
         }
 
+        st.data<UInt8>(6) = c;
         st << Stream::eos;
         pl->send(st);
     }

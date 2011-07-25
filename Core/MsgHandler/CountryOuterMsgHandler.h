@@ -762,7 +762,7 @@ void OnNullReq( GameMsgHdr& hdr, NullReq& nr )
 	player->send(st);
 }
 
-void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req)
+void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
 {
 	MSG_QUERY_PLAYER(player);	
     UInt8 country = req._country;
