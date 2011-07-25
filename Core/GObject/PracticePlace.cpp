@@ -418,6 +418,30 @@ namespace GObject
 
         st << Stream::eos;
         pl->send(st);
+
+        Stream st1(0xE3);
+        PracticeData* p = getPracticeData(pl);
+        st << static_cast<UInt8>(0);
+        if (p)
+        {
+            st << p->checktime;
+            st << p->prot;
+            st << static_cast<UInt8>(pl->getPracticePlace());
+
+            UInt8 size = p->fighters.size();
+            st << size;
+
+            for (std::list<UInt32>::iterator i = p->fighters.begin(), e = p->fighters.end(); i != e; ++i)
+                st << *i;
+        }
+        else
+        {
+            st << static_cast<UInt32>(0);
+            st << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(0);
+        }
+        pl->send(st1);
     }
 
     void PracticePlace::getPlaceInfo(Player* pl, UInt8 place)

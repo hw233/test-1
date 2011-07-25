@@ -119,7 +119,6 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u WHERE `id` = %"I64_FMT"u", td.quality, pl->getId());
 }
 
-
 static UInt8 fire_com[] = {24,20,18,17,12,10,9,6,5,3};
 static UInt8 fire_factor[][6] = 
 {
