@@ -200,7 +200,7 @@ namespace GObject
         if (place != PPLACE_MAX)
             m_places[place-1].data[slot] = pp;
 
-        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
@@ -643,6 +643,8 @@ namespace GObject
         }
 
         // TODO: package
+        ++m_places[place-1].place.enemyCount;
+        Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
 
         if (bsim.getWinner() == 1)
         {
@@ -651,21 +653,28 @@ namespace GObject
             st << static_cast<UInt8>(idx);
             pd->winnerid = pl->getId();
             ++m_places[place-1].place.winCount;
+
+            if (owner)
+            {
+                Stream st(0x9B);
+                st << static_cast<UInt8>(5) << m_places[place-1].place.winCount;
+                owner->send(st);
+            }
         } 
         else
+        {
             st << static_cast<UInt8>(1);
 
-        ++m_places[place-1].place.enemyCount;
+            if (owner)
+            {
+                Stream st(0x9B);
+                st << static_cast<UInt8>(6) << m_places[place-1].place.enemyCount - m_places[place-1].place.winCount;
+                owner->send(st);
+            }
+        }
+
         st << Stream::eos;
         pl->send(st);
-
-        Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
-        if (owner)
-        {
-            Stream st(0x9B);
-            st << static_cast<UInt8>(5) << m_places[place-1].place.enemyCount << m_places[place-1].place.winCount;
-            owner->send(st);
-        }
 
         return true;
     }
@@ -720,7 +729,7 @@ namespace GObject
         ++pd.place.openslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = '%u', `openslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
+        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u, `openslot` = %u WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
 
         // TODO: notify client
         Clan* clan = pl->getClan();
@@ -776,7 +785,7 @@ namespace GObject
         pd.place.techslot += techslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = '%u', `techslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.techslot, pd.place.ownerid);
+        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.ownerid);
 
         UInt32 openPrice = 0;
         const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
@@ -915,7 +924,8 @@ namespace GObject
         if(clan == NULL)
             return false;
 
-        if(oldpl->getClan() != clan)
+        GObject::Clan* oldclan = oldpl->getClan();
+        if(oldclan != clan)
         {
             pd.place.openslot = 0;
             UInt8 techslot = clan->getPracticeSlot();
@@ -928,21 +938,82 @@ namespace GObject
 
         pd.place.ownerid = newpl->getId();
 
-        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = '%"I64_FMT"u, `maxslot` = '%u', `techslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.ownerid, pd.place.maxslot, pd.place.techslot, pd.place.ownerid);
+        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, idx + 1);
+
+        clan->broadcastPracticePlaceInfo();
+        oldclan->broadcastPracticePlaceInfo();
+        return true;
+    }
+
+    bool PracticePlace::ocupyPlace(Player* pl, UInt8 place)
+    {
+        UInt8 idx = 0;
+        if (!pl)
+            return false;
+
+        for(; idx < PPLACE_MAX; idx ++)
+        {
+            if(pl->getId() == m_places[idx].place.ownerid)
+                break;
+        }
+
+        if(place - 1 == idx)
+            return false;
+
+        GObject::Clan* clan = pl->getClan();
+        if(clan == NULL)
+            return false;
+
+        if(clan->getOwner() != pl)
+            return false;
+
+        PlaceData& oldpd = m_places[idx];
+        if(idx != PPLACE_MAX)
+        {
+            oldpd.place.maxslot -= oldpd.place.openslot + oldpd.place.techslot;
+            oldpd.place.openslot = 0;
+            oldpd.place.techslot = 0;
+            oldpd.data.resize(oldpd.place.maxslot);
+
+            oldpd.place.ownerid = 0;
+            DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
+        }
+
+        if(place >= PPLACE_MAX)
+            return true;
+
+        PlaceData& pd = m_places[place - 1];
+        pd.place.openslot = 0;
+        UInt8 techslot = clan->getPracticeSlot();
+        UInt8 slotadd = techslot - pd.place.techslot;
+
+        pd.place.maxslot += slotadd;
+        pd.place.techslot += techslot;
+        pd.data.resize(pd.place.maxslot);
+
+        pd.place.ownerid = pl->getId();
+
+        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, place);
+
+        clan->broadcastPracticePlaceInfo();
 
         return true;
     }
 
-    PlaceData* PracticePlace::getPlaceData(Player* pl)
+    PlaceData* PracticePlace::getPlaceData(Player* pl, UInt8& place)
     {
         if (!pl)
             return NULL;
 
         size_t idx = 0;
+        place = PPLACE_MAX;
         for(; idx < PPLACE_MAX; idx ++)
         {
             if(pl->getId() == m_places[idx].place.ownerid)
+            {
+                place = idx;
                 break;
+            }
         }
 
         if(idx == PPLACE_MAX)
@@ -951,13 +1022,17 @@ namespace GObject
         return &(m_places[idx]);
     }
 
-    PlaceData* PracticePlace::getPlaceData(UInt64 playerId)
+    PlaceData* PracticePlace::getPlaceData(UInt64 playerId, UInt8& place)
     {
         size_t idx = 0;
+        place = PPLACE_MAX;
         for(; idx < PPLACE_MAX; idx ++)
         {
             if(playerId == m_places[idx].place.ownerid)
+            {
+                place = idx;
                 break;
+            }
         }
 
         if(idx == PPLACE_MAX)
