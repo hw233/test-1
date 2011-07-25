@@ -6,6 +6,7 @@
 MSG_HANDLER_DECLARE(CountryMsgHandler)
 
 MSG_REG(GameMsgHdr, OnNullReq);
+MSG_REG(GameMsgHdr, OnSelectCountry);
 MSG_REG(GameMsgHdr, OnPlayerInfoReq);
 MSG_REG_2(GameMsgHdr, 0x15, OnPlayerInfoChangeReq);
 MSG_REG_2(GameMsgHdr, 0x1A, OnBookStoreListReq);
