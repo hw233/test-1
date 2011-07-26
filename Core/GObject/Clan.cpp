@@ -920,8 +920,8 @@ void Clan::sendInfo( Player * player )
     PlayerData& pd = player->getPlayerData();
 
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
-        <<  ((pd.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT) << getConstruction() << getClanFunds() << member->proffer << _name
-        << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
+        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT) << static_cast<UInt32>(getConstruction()) << getClanFunds() << member->proffer
+        << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
         << _contact << _announce << _purpose;
 #if 0
 	st << static_cast<UInt8>(0) << _name << (owner == NULL ? "" : owner->getName())
@@ -2327,8 +2327,9 @@ void Clan::sendPracticePlaceInfo(Player* pl)
 {
     Player* owner = getOwner();
 
-    GObject::PlaceData* pd = practicePlace.getPlaceData(owner);
-    if(NULL)
+    UInt8 place = PPLACE_MAX;
+    GObject::PlaceData* pd = practicePlace.getPlaceData(owner, place);
+    if(pd == NULL)
         return;
 
     UInt32 price = 0;
@@ -2339,10 +2340,33 @@ void Clan::sendPracticePlaceInfo(Player* pl)
     Stream st(0x9B);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
         << pd->place.slotmoney << pd->place.protmoney << pd->place.slotincoming << pd->place.protincoming
-        << pd->place.enemyCount << pd->place.winCount;
+        << pd->place.enemyCount << pd->place.winCount << place;
 
     st << Stream::eos;
     pl->send(st);
+}
+
+void Clan::broadcastPracticePlaceInfo()
+{
+    Player* owner = getOwner();
+
+    UInt8 place = PPLACE_MAX;
+    GObject::PlaceData* pd = practicePlace.getPlaceData(owner, place);
+    if(pd == NULL)
+        return;
+
+    UInt32 price = 0;
+    const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
+    if (golds.size() && pd->place.openslot < golds.size())
+        price = golds[pd->place.openslot];
+
+    Stream st(0x9B);
+    st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
+        << pd->place.slotmoney << pd->place.protmoney << pd->place.slotincoming << pd->place.protincoming
+        << pd->place.enemyCount << pd->place.winCount << place;
+
+    st << Stream::eos;
+    broadcast(st);
 }
 
 ClanCache clanCache;
@@ -2696,6 +2720,11 @@ void Clan::addMemberProffer(Player*pl, UInt32 proffer)
     if(mem)
     {
         mem->proffer += proffer;
+        {
+            Stream st(0x98);
+            st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
+            pl->send(st);
+        }
         DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
     }
 }

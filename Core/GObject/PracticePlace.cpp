@@ -80,14 +80,31 @@ namespace GObject
                 data.slotincoming += pd->slotprice - money;
                 data.protincoming += pd->protprice - money2;
                 DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
-                if(clan)
-                    clan->addClanFunds(pd->slotprice + pd->protprice - money - money2);
 
                 pd->winnerid = 0;
                 m_places[PPLACE_MAX-1].data.push_back(pd);
                 pd = 0;
                 --m_places[place-1].used;
                 ++m_places[PPLACE_MAX-1].used;
+
+                if(clan)
+                {
+                    clan->addClanFunds(pd->slotprice + pd->protprice - money - money2);
+                    Stream st(0x9B);
+                    UInt8 cnt = 2;
+                    st << cnt;
+                    UInt8 offset = st.size();
+                    st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                    st << static_cast<UInt8>(3) << data.slotincoming;
+                    if(money2)
+                    {
+                        ++ cnt;
+                        st << static_cast<UInt8>(4) << data.protincoming;
+                    }
+                    st.data<UInt8>(offset) = cnt;
+                    st << Stream::eos;
+                    clan->broadcast(st);
+                }
 
                 pd->checktime = 0;
                 // DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", def->getId());
@@ -205,7 +222,7 @@ namespace GObject
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
 
-        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << Stream::eos;
+        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << place - 1 << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
         return true;
     }
@@ -237,11 +254,12 @@ namespace GObject
         {
             pd->winnerid = 0;
             pd->fighters.clear();
+            pd->cdend = TimeUtil::Now() + 10 * 60;
 
             --m_places[place-1].used;
 
             //DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
-            DB().PushUpdateData("UPDATE `practice_data` SET checktime = 0 where `id`= %"I64_FMT"u", pl->getId());
+            DB().PushUpdateData("UPDATE `practice_data` SET place = 0, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u", pd->cdend, pl->getId());
             PopTimerEvent(pl, EVENT_PLAYERPRACTICING, pl->getId());
 
             UInt32 trained = pd->traintime - pd->checktime;
@@ -252,8 +270,25 @@ namespace GObject
             data.slotincoming += money;
             data.protincoming += money2;
             DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+
             if(clan)
+            {
                 clan->addClanFunds(money + money2);
+                Stream st(0x9B);
+                UInt8 cnt = 2;
+                st << cnt;
+                UInt8 offset = st.size();
+                st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                st << static_cast<UInt8>(3) << data.slotincoming;
+                if(money2)
+                {
+                    ++ cnt;
+                    st << static_cast<UInt8>(4) << data.protincoming;
+                }
+                st.data<UInt8>(offset) = cnt;
+                st << Stream::eos;
+                clan->broadcast(st);
+            }
 
             st << trained * 60 << money << remain << Stream::eos;
             //delPracticeData(pl);
@@ -398,18 +433,25 @@ namespace GObject
                 Player* prot = globalPlayers[data.protid];
                 if (prot)
                 {
+                    UInt8 cls_sex = prot->GetClassAndSex();
                     st << prot->getName();
                     st << prot->GetLev();
+                    st << static_cast<UInt8>((cls_sex >> 4) & 0x0F);
+                    st << static_cast<UInt8>(cls_sex & 0x0F);
                 }
                 else
                 {
                     st << "";
+                    st << static_cast<UInt8>(0);
+                    st << static_cast<UInt8>(0);
                     st << static_cast<UInt8>(0);
                 }
             }
             else
             {
                 st << "";
+                st << static_cast<UInt8>(0);
+                st << static_cast<UInt8>(0);
                 st << static_cast<UInt8>(0);
             }
             st << data.enemyCount;
@@ -419,29 +461,27 @@ namespace GObject
         st << Stream::eos;
         pl->send(st);
 
-        Stream st1(0xE3);
+        if(!pl->isPracticing())
+            return;
+
         PracticeData* p = getPracticeData(pl);
-        st << static_cast<UInt8>(0);
         if (p)
         {
-            st << p->checktime;
-            st << p->prot;
-            st << static_cast<UInt8>(pl->getPracticePlace());
+            Stream st1(0xE3);
+            st1 << static_cast<UInt8>(0);
+            st1 << p->checktime * 60;
+            st1 << p->prot;
+            st1 << static_cast<UInt8>(pl->getPracticePlace()-1);
 
             UInt8 size = p->fighters.size();
-            st << size;
+            st1 << size;
 
             for (std::list<UInt32>::iterator i = p->fighters.begin(), e = p->fighters.end(); i != e; ++i)
-                st << *i;
+                st1 << *i;
+
+            st1 << Stream::eos;
+            pl->send(st1);
         }
-        else
-        {
-            st << static_cast<UInt32>(0);
-            st << static_cast<UInt8>(0);
-            st << static_cast<UInt8>(0);
-            st << static_cast<UInt8>(0);
-        }
-        pl->send(st1);
     }
 
     void PracticePlace::getPlaceInfo(Player* pl, UInt8 place)
@@ -460,7 +500,7 @@ namespace GObject
             return;
 
         Stream st(0xE1);
-        st << static_cast<UInt8>(pagenum);
+        st << static_cast<UInt8>(pageno);
         st << static_cast<UInt8>(0);
         PracticeData* ppd = NULL;
         int n = 0;
@@ -496,7 +536,7 @@ namespace GObject
             }
         }
 
-        st.data<UInt8>(6) = c;
+        st.data<UInt8>(5) = c;
         st << Stream::eos;
         pl->send(st);
     }
@@ -528,7 +568,7 @@ namespace GObject
         bool flag = false;
         for(UInt8 idx = 0; idx < PPLACE_MAX; ++ idx)
         {
-            flag = replaceProtecter(pl, idx, protid);
+            flag = replaceProtecter(pl, idx + 1, protid);
             if(flag)
                 break;
         }
@@ -544,7 +584,7 @@ namespace GObject
         bool flag = false;
         for(UInt8 idx = 0; idx < PPLACE_MAX; ++ idx)
         {
-            flag = setCharges(pl, idx, money);
+            flag = setCharges(pl, idx + 1, money);
             if(flag)
                 break;
         }
@@ -567,7 +607,8 @@ namespace GObject
 
         // TODO: notify client
         Stream st(0x9B);
-        st << static_cast<UInt8>(6) << data.slotmoney;
+        st << static_cast<UInt8>(1) << static_cast<UInt8>(7) << data.slotmoney;
+        st << Stream::eos;
         pl->send(st);
 
         return true;
@@ -581,7 +622,7 @@ namespace GObject
         bool flag = false;
         for(UInt8 idx = 0; idx < PPLACE_MAX; ++ idx)
         {
-            flag = setProtCharges(pl, idx, money);
+            flag = setProtCharges(pl, idx + 1, money);
             if(flag)
                 break;
         }
@@ -604,7 +645,8 @@ namespace GObject
 
         // TODO: notify client
         Stream st(0x9B);
-        st << static_cast<UInt8>(7) << data.protmoney;
+        st << static_cast<UInt8>(1) << static_cast<UInt8>(8) << data.protmoney;
+        st << Stream::eos;
         pl->send(st);
 
         return true;
@@ -622,11 +664,12 @@ namespace GObject
 
         Stream st(0xE2);
         Player* def = 0;
+        bool sumfalg = false;
         PracticeData* pd = m_places[place-1].data[idx];
         if (pd)
         {
             Player* opl = globalPlayers[pd->getId()];
-            if (opl || opl->getName() != name)
+            if (!opl || opl->getName() != name)
             {
                 st << static_cast<UInt8>(2);
                 st << Stream::eos;
@@ -640,7 +683,10 @@ namespace GObject
             else if (pd->prot == 1)
             {
                 if (m_places[place-1].place.protid)
+                {
                     def = globalPlayers[m_places[place-1].place.protid];
+                    sumfalg = true;
+                }
                 else
                     def = globalPlayers[pd->getId()];
             }
@@ -654,10 +700,12 @@ namespace GObject
         }
 
         if (!def) {
-            st << static_cast<UInt8>(2);
+            st << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(place-1);
+            st << static_cast<UInt8>(idx);
             st << Stream::eos;
             pl->send(st);
-            return false;
+            return true;
         }
 
         Battle::BattleSimulator bsim(pl->getLocation(), pl, def);
@@ -674,6 +722,8 @@ namespace GObject
         }
 
         // TODO: package
+        if(sumfalg)
+            ++m_places[place-1].place.enemyCount;
 
         if (bsim.getWinner() == 1)
         {
@@ -681,22 +731,39 @@ namespace GObject
             st << static_cast<UInt8>(place-1);
             st << static_cast<UInt8>(idx);
             pd->winnerid = pl->getId();
-            ++m_places[place-1].place.winCount;
+
+            if(sumfalg)
+            {
+                ++m_places[place-1].place.winCount;
+                Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
+                if (owner)
+                {
+                    Stream st(0x9B);
+                    st << static_cast<UInt8>(1) << static_cast<UInt8>(5) << m_places[place-1].place.winCount;
+                    st << Stream::eos;
+                    owner->send(st);
+                }
+            }
         } 
         else
+        {
             st << static_cast<UInt8>(1);
 
-        ++m_places[place-1].place.enemyCount;
+            if(sumfalg)
+            {
+                Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
+                if (owner)
+                {
+                    Stream st(0x9B);
+                    st << static_cast<UInt8>(1) << static_cast<UInt8>(6) << m_places[place-1].place.enemyCount - m_places[place-1].place.winCount;
+                    st << Stream::eos;
+                    owner->send(st);
+                }
+            }
+        }
+
         st << Stream::eos;
         pl->send(st);
-
-        Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
-        if (owner)
-        {
-            Stream st(0x9B);
-            st << static_cast<UInt8>(5) << m_places[place-1].place.enemyCount << m_places[place-1].place.winCount;
-            owner->send(st);
-        }
 
         return true;
     }
@@ -709,7 +776,7 @@ namespace GObject
         bool flag = false;
         for(UInt8 idx = 0; idx < PPLACE_MAX; ++ idx)
         {
-            addSlot(pl, idx);
+            addSlot(pl, idx + 1);
             if(flag)
                 break;
         }
@@ -751,7 +818,7 @@ namespace GObject
         ++pd.place.openslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = '%u', `openslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
+        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u, `openslot` = %u WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.openslot, pd.place.ownerid);
 
         // TODO: notify client
         Clan* clan = pl->getClan();
@@ -762,7 +829,8 @@ namespace GObject
                 openPrice = golds[pd.place.openslot];
             Stream st(0x9B);
             st << static_cast<UInt8>(1);
-            st << static_cast<UInt8>(pd.place.maxslot) << static_cast<UInt16>(openPrice);
+            st << static_cast<UInt8>(1) << static_cast<UInt8>(pd.place.maxslot) << static_cast<UInt16>(openPrice);
+            st << Stream::eos;
             clan->broadcast(st);
         }
 
@@ -807,7 +875,7 @@ namespace GObject
         pd.place.techslot += techslot;
         pd.data.resize(pd.place.maxslot);
 
-        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = '%u', `techslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.techslot, pd.place.ownerid);
+        DB().PushUpdateData("UPDATE `practice_place` SET `maxslot` = %u WHERE ownerid = %"I64_FMT"u", pd.place.maxslot, pd.place.ownerid);
 
         UInt32 openPrice = 0;
         const std::vector<UInt32>& golds = GData::GDataManager::GetGoldOpenSlot();
@@ -815,8 +883,9 @@ namespace GObject
             openPrice = golds[pd.place.openslot];
 
         Stream st(0x9B);
-        st << static_cast<UInt8>(1);
+        st << static_cast<UInt8>(1) << static_cast<UInt8>(1);
         st << static_cast<UInt8>(pd.place.maxslot) << static_cast<UInt16>(openPrice);
+        st << Stream::eos;
         clan->broadcast(st);
 
         return true;
@@ -852,6 +921,16 @@ namespace GObject
             if (event == NULL) return false;
             PushTimerEvent(event);
             ++m_places[place-1].used;
+
+            GObject::Clan* clan = pl->getClan();
+            if(clan)
+            {
+                Stream st(0x9B);
+                st << static_cast<UInt8>(1) << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                st << Stream::eos;
+                clan->broadcast(st);
+            }
+
         }
         return true;
     }
@@ -946,7 +1025,8 @@ namespace GObject
         if(clan == NULL)
             return false;
 
-        if(oldpl->getClan() != clan)
+        GObject::Clan* oldclan = oldpl->getClan();
+        if(oldclan != clan)
         {
             pd.place.openslot = 0;
             UInt8 techslot = clan->getPracticeSlot();
@@ -959,21 +1039,82 @@ namespace GObject
 
         pd.place.ownerid = newpl->getId();
 
-        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = '%"I64_FMT"u, `maxslot` = '%u', `techslot` = '%u' WHERE ownerid = %"I64_FMT"u", pd.place.ownerid, pd.place.maxslot, pd.place.techslot, pd.place.ownerid);
+        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, idx + 1);
+
+        clan->broadcastPracticePlaceInfo();
+        oldclan->broadcastPracticePlaceInfo();
+        return true;
+    }
+
+    bool PracticePlace::ocupyPlace(Player* pl, UInt8 place)
+    {
+        UInt8 idx = 0;
+        if (!pl)
+            return false;
+
+        for(; idx < PPLACE_MAX; idx ++)
+        {
+            if(pl->getId() == m_places[idx].place.ownerid)
+                break;
+        }
+
+        if(place - 1 == idx)
+            return false;
+
+        GObject::Clan* clan = pl->getClan();
+        if(clan == NULL)
+            return false;
+
+        if(clan->getOwner() != pl)
+            return false;
+
+        PlaceData& oldpd = m_places[idx];
+        if(idx != PPLACE_MAX)
+        {
+            oldpd.place.maxslot -= oldpd.place.openslot + oldpd.place.techslot;
+            oldpd.place.openslot = 0;
+            oldpd.place.techslot = 0;
+            oldpd.data.resize(oldpd.place.maxslot);
+
+            oldpd.place.ownerid = 0;
+            DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
+        }
+
+        if(place >= PPLACE_MAX)
+            return true;
+
+        PlaceData& pd = m_places[place - 1];
+        pd.place.openslot = 0;
+        UInt8 techslot = clan->getPracticeSlot();
+        UInt8 slotadd = techslot - pd.place.techslot;
+
+        pd.place.maxslot += slotadd;
+        pd.place.techslot += techslot;
+        pd.data.resize(pd.place.maxslot);
+
+        pd.place.ownerid = pl->getId();
+
+        DB().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, place);
+
+        clan->broadcastPracticePlaceInfo();
 
         return true;
     }
 
-    PlaceData* PracticePlace::getPlaceData(Player* pl)
+    PlaceData* PracticePlace::getPlaceData(Player* pl, UInt8& place)
     {
         if (!pl)
             return NULL;
 
         size_t idx = 0;
+        place = PPLACE_MAX;
         for(; idx < PPLACE_MAX; idx ++)
         {
             if(pl->getId() == m_places[idx].place.ownerid)
+            {
+                place = idx + 1;
                 break;
+            }
         }
 
         if(idx == PPLACE_MAX)
@@ -982,13 +1123,17 @@ namespace GObject
         return &(m_places[idx]);
     }
 
-    PlaceData* PracticePlace::getPlaceData(UInt64 playerId)
+    PlaceData* PracticePlace::getPlaceData(UInt64 playerId, UInt8& place)
     {
         size_t idx = 0;
+        place = PPLACE_MAX;
         for(; idx < PPLACE_MAX; idx ++)
         {
             if(playerId == m_places[idx].place.ownerid)
+            {
+                place = idx + 1;
                 break;
+            }
         }
 
         if(idx == PPLACE_MAX)

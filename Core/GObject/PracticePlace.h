@@ -130,8 +130,8 @@ public:
     bool delPracticeData(Player* pl);
     UInt64 getPlaceOwnerId(UInt8 place);
 
-    PlaceData* getPlaceData(Player* pl);
-    PlaceData* getPlaceData(UInt64 playerId);
+    PlaceData* getPlaceData(Player* pl, UInt8& place);
+    PlaceData* getPlaceData(UInt64 playerId, UInt8& place);
 
     void resetPracticePlaceIncoming();
 

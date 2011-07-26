@@ -22,7 +22,7 @@ local Split_chance = {
 
 --强化概率
 local Enchant_chance = {
-    {1000,  950,  900,  850,  500,  250,  100,   20,   10,    5,    2,    2},    -- 装备强化概率
+    {1000,  900,  600,  400,  200,  100,  50,   10,   2,    1,    1,    1},    -- 装备强化概率
     {1000, 1000, 1000,  900,  800,  700,  600,  500,    0,    0,    0,    0},    -- 绿色法宝强化概率
     {1000, 1000,  900,  800,  700,  600,  450,  300,    0,    0,    0,    0},    -- 蓝色法宝强化概率
     {1000,  900,  750,  600,  450,  300,  150,   50,    0,    0,    0,    0},    -- 紫色法宝强化概率
@@ -464,8 +464,8 @@ function getMergeChance()
     return Merge_chance
 end
 
-function getEnchantChance()
-    return Enchant_chance
+function getEnchantChance(q)
+    return Enchant_chance[q]
 end
 
 function getEnchantMax()

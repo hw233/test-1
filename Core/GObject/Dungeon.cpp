@@ -298,6 +298,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	if(dm == NULL)
 		return false;
 
+    player->setJusticeRoar(dpi.justice_roar);
 	Battle::BattleSimulator bsim(player->getLocation(), player, dm->fighter->getName(), dm->fighter->getLevel(), dm->formated);
 	player->PutFighters(bsim, 0);
 	bsim.setPortrait(1, dm->fighter->favor);
@@ -351,6 +352,8 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 		}
 	}
 	bsim.start();
+    player->setJusticeRoar(0);
+    dpi.justice_roar = 0;
 
 	Stream& packet = bsim.getPacket();
 	if(packet.size() <= 8)
@@ -434,8 +437,15 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 #endif
 	UInt8 level = dpi.level;
 	if(level >= _levels.size())
+    {
+        dpi.justice_roar = 0;
+        dpi.justice = 0;
 		return true;
+    }
 	leaveLevel(player, level);
+
+    if(dpi.justice < 100)
+        dpi.justice += 5;
 
     // TODO:
 #if 0
@@ -684,7 +694,7 @@ void Dungeon::pushChallenge( Player * player, UInt32 exp, bool won )
 	PushTimerEvent(event);
 }
 
-void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 totalCount, UInt32 firstPass, UInt32 counterEnd, UInt8 justice )
+void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 totalCount, UInt32 firstPass, UInt32 counterEnd, UInt8 justice, UInt8 justice_roar )
 {
 	DungeonPlayerInfo& dpi = _players[player];
 	dpi.level = level;
@@ -693,6 +703,7 @@ void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 tota
     dpi.firstPass = firstPass;
 	dpi.counterEnd = counterEnd;
 	dpi.justice = justice;
+    dpi.justice_roar = justice_roar;
 	if(level >= _levels.size())
 		return;
 	DungeonLevel& dl = _levels[level];
@@ -706,7 +717,7 @@ void Dungeon::sendDungeonInfo(Player * player)
 	{
 		Stream st(0x59);
 		UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << Stream::eos;
+		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
 		player->send(st);
 		return;
 	}
@@ -718,7 +729,7 @@ void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 {
 	Stream st(0x59);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.count << enterCount << dpi.totalCount << dpi.firstPass << Stream::eos;
+	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.count << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
 	player->send(st);
 }
 
@@ -741,7 +752,7 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 	if(dpi.level >= _levels.size())
 	{
 		Stream st(0x59);
-		st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(0xFF) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
+		st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(0xFF) << dpi.justice << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
 		player->send(st);
 		return;
 	}
@@ -749,7 +760,7 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 	if(dgl == NULL)
 		return;
 	Stream st(0x59);
-	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level + 1);
+	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.justice << static_cast<UInt8>(1);
 	const GData::DungeonMonster * dm = dgl->monsterSet;
 	if(dm->formated)
 	{
@@ -924,6 +935,37 @@ void Dungeon::pushEnterCountBS(UInt32 now)
 			count[it->second.count - 1] ++;
 	}
 	DBLOG().PushUpdateData("insert into `dungeon_count`(`server_id`, `dungeon_id`, `enter_players1`, `enter_players2`, `enter_players3`, `created_at`) values(%u, %u, %u, %u, %u, %u)", cfg.serverLogId, _id, count[0], count[1], count[2], now);
+}
+
+void Dungeon::doJusticeRoar(Player* pl)
+{
+	DungeonPlayerInfo& dpi = _players[pl];
+    UInt8 justiceflag = dpi.justice / 25;
+    switch(justiceflag)
+    {
+    case 1:
+        dpi.justice_roar = 25;
+        dpi.justice -= 25;
+        break;
+    case 2:
+        dpi.justice_roar = 50;
+        dpi.justice -= 50;
+        break;
+    case 3:
+        dpi.justice_roar = 75;
+        dpi.justice -= 75;
+        break;
+    case 4:
+        dpi.justice_roar = 100;
+        dpi.justice -= 100;
+        break;
+    default:
+        return;
+    }
+
+    Stream st(0x59);
+    st << static_cast<UInt8>(6) << _id << dpi.justice << Stream::eos;
+    pl->send(st);
 }
 
 }

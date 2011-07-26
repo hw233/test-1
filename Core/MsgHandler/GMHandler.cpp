@@ -25,6 +25,7 @@
 #include "Battle/BattleSimulator.h"
 #include "Common/StringTokenizer.h"
 #include "CountryMsgStruct.h"
+#include "GObject/PracticePlace.h"
 
 GMHandler gmHandler;
 
@@ -115,6 +116,7 @@ GMHandler::GMHandler()
 	Reg(3, "setpexp", &GMHandler::OnSetPExp);
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
 	Reg(3, "useitem", &GMHandler::OnUseItem);
+    Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2002,5 +2004,23 @@ void GMHandler::OnUseItem( GObject::Player * player, std::vector<std::string>& a
     if (args.size() >= 3)
         fgtid = atoi(args[2].c_str());
     player->GetPackage()->UseItem(itemid, num, fgtid);
+}
+
+void GMHandler::OnOcupyPlace(GObject::Player * player, std::vector<std::string>& args)
+{
+    if(!player || args.size() < 1)
+        return;
+
+	char * endptr;
+	UInt64 playerId = strtoull(args[0].c_str(), &endptr, 10);
+	if(playerId == 0)
+		return;
+	GObject::Player * pl = GObject::globalPlayers[playerId];
+	if(pl == NULL)
+		return;
+
+    UInt8 place = atoi(args[1].c_str());
+
+    practicePlace.ocupyPlace(pl, place);
 }
 

@@ -797,6 +797,9 @@ namespace GObject
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)
 
         UInt32 _praplace;
+
+        // 通天塔正义之吼
+        UInt8 _justice_roar;
 	public:
 		void setTicketCount(UInt32 cnt, bool writedb = true);
 		inline UInt32 getTicketCount(){return _exchangeTicketCount;}
@@ -807,6 +810,9 @@ namespace GObject
         inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
+
+        inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
+        inline UInt8 getJusticeRoar() { return _justice_roar; }
 
 	protected:
 		inline void setBlockBossByLevel();

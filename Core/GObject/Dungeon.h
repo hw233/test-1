@@ -55,6 +55,7 @@ public:
 		UInt32 firstPass;
 		UInt32 counterEnd;
         UInt8 justice;
+        UInt8 justice_roar;
 		std::list<DungeonItemInfo> lootToday;
 	};
 	struct DungeonReportInfo
@@ -65,7 +66,7 @@ public:
 public:
 	Dungeon(UInt8 id, const GData::DungeonData *);
 	~Dungeon();
-	void pushPlayer(Player *, UInt8, UInt8, UInt16, UInt32, UInt32, UInt8);
+	void pushPlayer(Player *, UInt8, UInt8, UInt16, UInt32, UInt32, UInt8, UInt8);
 	UInt8 playerEnter(Player *);
 	UInt8 playerLeave(Player *);
 	UInt8 playerBreak(Player *);
@@ -87,6 +88,8 @@ public:
 	static void setPrice(UInt32 idx, UInt16 price);
 	static UInt16 * getPrice(size_t& size);
 	static void setExtraCount(UInt32 idx, UInt8 count);
+
+    void doJusticeRoar(Player*);
 public:
 	void pushEnterCountBS(UInt32 now);
 

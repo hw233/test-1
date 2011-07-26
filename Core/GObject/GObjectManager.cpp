@@ -1661,7 +1661,7 @@ namespace GObject
 		Player * pl = NULL;
 		execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 		DBDungeonPlayer dp;
-		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`, `justice` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`, `justice`, `justice_roar` FROM `dungeon_player` ORDER BY `playerId`", dp) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1677,7 +1677,7 @@ namespace GObject
 			Dungeon * dg = dungeonManager[dp.id];
 			if(dg == NULL)
 				continue;
-			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd, dp.justice);
+			dg->pushPlayer(pl, dp.level, dp.count, dp.totalCount, dp.firstPass, dp.counterEnd, dp.justice, dp.justice_roar);
 		}
 		lc.finalize();
 		return true;
@@ -2609,8 +2609,8 @@ namespace GObject
             }
             else
             {
-                pl->setPracticingPlaceSlot(7 << 16);
-                practicePlace.addPractice(pl, ppd, 7);
+                pl->setPracticingPlaceSlot(0 << 16);
+                practicePlace.addPractice(pl, ppd, PPLACE_MAX);
             }
         }
 		lc.finalize();
