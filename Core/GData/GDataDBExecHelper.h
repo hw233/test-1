@@ -79,10 +79,16 @@ struct DBFormation
 {
 	UInt32 id;
 	std::string name;
-	std::string eyes;
-	std::string grids;
-	UInt8 leastNum;
-	UInt16 skillId;
+    UInt8 grid1;
+    UInt32 prop1;
+    UInt8 grid2;
+    UInt32 prop2;
+    UInt8 grid3;
+    UInt32 prop3;
+    UInt8 grid4;
+    UInt32 prop4;
+    UInt8 grid5;
+    UInt32 prop5;
 };
 
 struct DBSkill
@@ -364,14 +370,20 @@ SPECIALDEF(24)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBFormation)
-SPECIALDEF(6)
+SPECIALDEF(12)
 	(
 	UInt32, id,
 	std::string, name,
-	std::string, eyes,
-	std::string, grids,
-	UInt8, leastNum,
-	UInt16, skillId
+    UInt8, grid1,
+    UInt32, prop1,
+    UInt8, grid2,
+    UInt32, prop2,
+    UInt8, grid3,
+    UInt32, prop3,
+    UInt8, grid4,
+    UInt32, prop4,
+    UInt8, grid5,
+    UInt32, prop5
 	)
 SPECIALEND()
 

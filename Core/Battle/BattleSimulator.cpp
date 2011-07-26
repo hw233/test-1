@@ -316,6 +316,8 @@ int BattleSimulator::findFirstAttacker()
 	return _rnd(c);
 }
 
+// XXX: 取消救援
+#if 0
 float BattleSimulator::testRescue(BattleFighter *& bf, int counter_deny, AttackPoint * counter_deny_list)
 {
 	const GData::Formation::GridEffect * effect = bf->getFormationEffect();
@@ -346,7 +348,9 @@ float BattleSimulator::testRescue(BattleFighter *& bf, int counter_deny, AttackP
 	}
 	return 0.0f;
 }
+#endif
 
+#if 0
 float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 {
 	const GData::Formation::GridEffect * effect = bf->getFormationEffect();
@@ -391,6 +395,7 @@ float BattleSimulator::testLink( BattleFighter *& bf, UInt16& skillId )
 #endif
 	return 0.0f;
 }
+#endif
 
 UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * area_target_obj, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny, AttackPoint * counter_deny_list, std::vector<AttackAct>* atkAct)
 {

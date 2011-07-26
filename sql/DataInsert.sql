@@ -116,6 +116,10 @@ LOCK TABLES `dungeon_monster` WRITE;
 source dungeonmonster
 UNLOCK TABLES;
 
+LOCK TABLES `formation` WRITE;
+source formation
+UNLOCK TABLES;
+
 -- ASSS
 use asss;
 LOCK TABLES `practice_place` WRITE;

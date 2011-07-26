@@ -749,7 +749,7 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 	if(dgl == NULL)
 		return;
 	Stream st(0x59);
-	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level + 1) << static_cast<UInt8>(1);
+	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level + 1);
 	const GData::DungeonMonster * dm = dgl->monsterSet;
 	if(dm->formated)
 	{
@@ -805,7 +805,7 @@ void Dungeon::leaveLevel( Player * player, UInt8 level )
 
 void Dungeon::updateToDB( Player * player, DungeonPlayerInfo& dpi )
 {
-	DB().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.level, dpi.count, dpi.totalCount, dpi.firstPass, dpi.counterEnd);
+	DB().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.level, dpi.count, dpi.totalCount, dpi.firstPass, dpi.counterEnd);
 }
 
 void Dungeon::checkForTimeout( Player * player, DungeonPlayerInfo& dpi, bool writeDB )
