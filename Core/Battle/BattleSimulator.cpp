@@ -143,6 +143,9 @@ void BattleSimulator::start()
 					if(ismain)
 					{
 						bf->postInit();
+                        UInt8 justice_roar = _player[i]->getJusticeRoar();
+                        if(justice_roar)
+                            bf->AddAura(justice_roar);
 						// FighterStatus fs(bf);
 						// Insert into action queue
 						insertFighterStatus(bf);

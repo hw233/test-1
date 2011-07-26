@@ -2720,6 +2720,11 @@ void Clan::addMemberProffer(Player*pl, UInt32 proffer)
     if(mem)
     {
         mem->proffer += proffer;
+        {
+            Stream st(0x98);
+            st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
+            pl->send(st);
+        }
         DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
     }
 }

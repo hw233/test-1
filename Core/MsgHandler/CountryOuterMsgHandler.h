@@ -1724,6 +1724,9 @@ void OnDungeonInfoReq( GameMsgHdr& hdr, DungeonInfoReq& dir )
 		break;
 	case 2:
 		break;
+    case 3:
+        dg->doJusticeRoar(pl);
+        break;
 	default:
 		break;
 	}

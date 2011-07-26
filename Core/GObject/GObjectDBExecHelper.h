@@ -482,6 +482,7 @@ struct DBDungeonPlayer
 	UInt32 firstPass;
 	UInt32 counterEnd;
     UInt8 justice;
+    UInt8 justice_roar;
 };
 
 
@@ -1168,7 +1169,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBDungeonPlayer)
-SPECIALDEF(8)
+SPECIALDEF(9)
 (
 	UInt32, id,
 	UInt64, playerId,
@@ -1177,7 +1178,8 @@ SPECIALDEF(8)
 	UInt16, totalCount,
 	UInt32, firstPass,
 	UInt32, counterEnd,
-	UInt8, justice
+	UInt8, justice,
+    UInt8, justice_roar
 )
 SPECIALEND()
 
