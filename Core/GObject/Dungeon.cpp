@@ -816,7 +816,7 @@ void Dungeon::leaveLevel( Player * player, UInt8 level )
 
 void Dungeon::updateToDB( Player * player, DungeonPlayerInfo& dpi )
 {
-	DB().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.level, dpi.count, dpi.totalCount, dpi.firstPass, dpi.counterEnd);
+	DB().PushUpdateData("REPLACE INTO `dungeon_player`(`id`, `playerId`, `level`, `count`, `totalCount`, `firstPass`, `counterEnd`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", _id, player->getId(), dpi.level, dpi.count, dpi.totalCount, dpi.firstPass, dpi.counterEnd);
 }
 
 void Dungeon::checkForTimeout( Player * player, DungeonPlayerInfo& dpi, bool writeDB )

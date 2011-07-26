@@ -1122,47 +1122,44 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBFormation dbf;
-		if(execu->Prepare("SELECT `id`, `name`, `eyes`, `grids`, `leastNum`, `skillId` FROM `formation`", dbf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5` FROM `formation`", dbf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-			StringTokenizer tk1(dbf.eyes, ",");
-			std::vector<UInt8> eyes;
-			for(StringTokenizer::Iterator it = tk1.begin(); it != tk1.end(); ++ it)
-			{
-				eyes.push_back(atoi((*it).c_str()));
-			}
-			Formation * form = new Formation(dbf.id, dbf.name, dbf.leastNum, dbf.skillId, eyes.size(), (eyes.size() > 0 ? &eyes[0] : NULL));
-			StringTokenizer tk2(dbf.grids, "|");
-			for(StringTokenizer::Iterator it = tk2.begin(); it != tk2.end(); ++ it)
-			{
-				Formation::GridEffect effect;
-				StringTokenizer tk3(*it, ",");
-				if(tk3.count() < 6)
-					continue;
-				effect.pos = atoi(tk3[0].c_str());
-				if(effect.pos > 24)
-					continue;
-				effect.link = atoi(tk3[1].c_str());
-				if(effect.link > 24)
-					continue;
-				effect.link_ratio = atoi(tk3[2].c_str());
-				if(effect.link_ratio > 100)
-					effect.link_ratio = 100;
-				effect.rescue = atoi(tk3[3].c_str());
-				if(effect.rescue > 24)
-					continue;
-				effect.rescue_ratio = atoi(tk3[4].c_str());
-				if(effect.link_ratio > 100)
-					effect.link_ratio = 100;
-				UInt32 attrid = atoi(tk3[5].c_str());
-				const AttrExtraItem * ae = attrExtraManager[attrid];
-				if(ae == NULL)
-					effect.attrExtra = NULL;
-				else
-					effect.attrExtra = *ae;
-				form->addGrid(effect);
-			}
+			Formation * form = new Formation(dbf.id, dbf.name);
+            Formation::GridEffect effect;
+            const AttrExtraItem* ae = NULL;
+
+            ae = attrExtraManager[dbf.prop1];
+            effect.pos = dbf.grid1;
+            if (ae)
+                effect.attrExtra = *ae;
+            form->addGrid(effect);
+
+            ae = attrExtraManager[dbf.prop2];
+            effect.pos = dbf.grid2;
+            if (ae)
+                effect.attrExtra = *ae;
+            form->addGrid(effect);
+
+            ae = attrExtraManager[dbf.prop3];
+            effect.pos = dbf.grid3;
+            if (ae)
+                effect.attrExtra = *ae;
+            form->addGrid(effect);
+
+            ae = attrExtraManager[dbf.prop4];
+            effect.pos = dbf.grid4;
+            if (ae)
+                effect.attrExtra = *ae;
+            form->addGrid(effect);
+
+            ae = attrExtraManager[dbf.prop5];
+            effect.pos = dbf.grid5;
+            if (ae)
+                effect.attrExtra = *ae;
+            form->addGrid(effect);
+
 			formationManager.add(form);
 		}
 		return true;
