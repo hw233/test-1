@@ -77,7 +77,7 @@ struct DBAttrExtra
 
 struct DBFormation
 {
-	UInt32 id;
+	UInt8 id;
 	std::string name;
     UInt8 grid1;
     UInt32 prop1;
@@ -372,7 +372,7 @@ SPECIALEND()
 SPECIALBEGIN(GData::DBFormation)
 SPECIALDEF(12)
 	(
-	UInt32, id,
+	UInt8, id,
 	std::string, name,
     UInt8, grid1,
     UInt32, prop1,
