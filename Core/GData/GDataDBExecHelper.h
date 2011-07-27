@@ -283,6 +283,14 @@ struct DBFighterProb
     Int32 gold;
 };
 
+struct DBCopy
+{
+    UInt8 id;
+    UInt8 floor;
+    UInt8 spot;
+    UInt32 fighterId;
+};
+
 }
 
 
@@ -595,6 +603,15 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBCopy)
+SPECIALDEF(4)
+    (
+        UInt8, id,
+        UInt8, floor,
+        UInt8, spot, 
+        UInt32, fighterId
+    )
+SPECIALEND()
 }
 
 #endif // _GDATADBEXECHELPER_H_

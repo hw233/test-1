@@ -46,6 +46,7 @@
 #include "Common/DirectoryIterator.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/Tripod.h"
+#include "GObject/Copy.h"
 
 #include <fcntl.h>
 
@@ -271,6 +272,20 @@ namespace GObject
         }
         lua_close(L);
 
+        return true;
+    }
+
+    bool GObjectManager::loadCopy()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBCopyData dbcd;
+		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot` FROM `player_copy` ORDER BY playerId,id", dbcd) != DB::DB_OK)
+            return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot);
+        }
         return true;
     }
 

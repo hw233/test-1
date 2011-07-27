@@ -17,6 +17,7 @@
 #include "SkillTable.h"
 #include "TalentTable.h"
 #include "CittaTable.h"
+#include "CopyTable.h"
 #include "AcuPraTable.h"
 #include "FighterProb.h"
 #include "Common/StringTokenizer.h"
@@ -1113,6 +1114,23 @@ namespace GData
             FighterProb& fp = fighterProb[dbfp.id];
             fp.free = dbfp.free;
             fp.gold = dbfp.gold;
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadCopyData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBCopy dbc;
+		if(execu->Prepare("SELECT `id`, `floor`, `spot`, `fighterId` FROM `copy`", dbc) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            std::vector<UInt32>& cpv = copyManager[dbc.id<<8|dbc.floor];
+            if (cpv.size() < dbc.spot)
+                cpv.resize(dbc.spot, 0);
+            cpv[dbc.spot] = dbc.fighterId;
         }
         return true;
     }
