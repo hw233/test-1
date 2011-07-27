@@ -463,6 +463,7 @@ CREATE TABLE `dungeon_player` (
   `firstPass` int(10) unsigned NOT NULL DEFAULT '0',
   `counterEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `justice` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `justice_roar` tinyint(3) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `id_playerId` (`id`,`playerId`),
   KEY `id` (`id`),
   KEY `playerId` (`playerId`)
