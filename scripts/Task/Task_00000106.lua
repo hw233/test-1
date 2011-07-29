@@ -1,15 +1,25 @@
 --����Ľ�������
 function Task_Accept_00000106()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
-		return false;
-	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(106) or task:HasCompletedTask(106) or task:HasSubmitedTask(106) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(105) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(105) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(105) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -21,14 +31,24 @@ end
 function Task_Can_Accept_00000106()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
-	if player:GetLev() < 30 then
-		return false;
-	end
 	if task:HasAcceptedTask(106) or task:HasCompletedTask(106) or task:HasSubmitedTask(106) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(105) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(105) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(105) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -56,20 +76,20 @@ function Task_00000106(npcId)
 		action.m_ActionID = 106
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "106";
+		action.m_ActionMsg = "魔教妖孽";
 	elseif task:GetTaskSubmitNpc(106) == npcId then
 		if Task_Submit_00000106() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 106
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "106";
+			action.m_ActionMsg = "魔教妖孽";
 		elseif task:HasAcceptedTask(106) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 106
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "106";
+			action.m_ActionMsg = "魔教妖孽";
 		end
 	end
 	return action;
@@ -83,8 +103,8 @@ function Task_00000106_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你好";
-	action.m_ActionMsg = "我不好";
+	action.m_NpcMsg = "绿袍老祖魔功高强，乃是南方魔教的始祖之一，而这个魔头身怀玄牝珠，几乎是不死之身，所以我们特地在百蛮山布下长眉真人亲传的两仪微尘阵来杀灭此獠。"..GetPlayerName(GetPlayer()).."如今你来助我们是再好也不过，先去将绿袍布在恶鬼峡附近的魔教前哨消灭吧，此时我们还不宜出面。";
+	action.m_ActionMsg = "弟子遵命。";
 	return action;
 end
 
@@ -93,7 +113,7 @@ function Task_00000106_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你好";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."今日我们东海三仙齐聚百蛮山布两仪微尘阵也将是一段佳话啊。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -120,7 +140,6 @@ function Task_00000106_accept()
 	if not task:AcceptTask(106) then
 		return false;
 	end
-	task:AddTaskStep(106);
 	return true;
 end
 
@@ -129,17 +148,16 @@ end
 --�ύ����
 function Task_00000106_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(106) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(106);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(106) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(2222);
+	return true;
 end
 
 --��������

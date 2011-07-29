@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000002()
 	local player = GetPlayer();
-	if player:GetLev() < 2 then
+	if player:GetLev() < 1 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -34,7 +34,7 @@ end
 function Task_Can_Accept_00000002()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 2 then
+	if player:GetLev() < 1 then
 		return false;
 	end
 	if task:HasAcceptedTask(2) or task:HasCompletedTask(2) or task:HasSubmitedTask(2) then
@@ -109,7 +109,7 @@ function Task_00000002_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "我乃是齐鲁三英的李宁，昔年在湖北除掉一个为祸乡里的恶徒陆地飞腾李启明，这帮水贼的首领正是其父浪里飞腾李刚。我寡不敌从，且战且退已是身负重伤，这李刚凶狠异常，"..GetPlayerName(GetPlayer()).."你可千万要小心才是。";
+	action.m_NpcMsg = "我乃是齐鲁三英的李宁，昔年在湖北除掉一个为祸乡里的恶徒陆地飞腾李启明，这帮水贼的首领正是其父浪里飞腾李刚。我寡不敌众，且战且退已是身负重伤，这李刚凶狠异常，"..GetPlayerName(GetPlayer()).."你可千万要小心才是。";
 	action.m_ActionMsg = "我知道了。";
 	return action;
 end
@@ -154,9 +154,17 @@ function Task_00000002_accept()
 	if not Task_Accept_00000002() then
 		return false;
 	end
+	local package = player:GetPackage();
+	local reqGrids = 0;
+	reqGrids = reqGrids + package:GetItemUsedGrids(2000, 1, 1);
+	if reqGrids > player:GetFreePackageSize() then
+		player:sendMsgCode(2, 2012, 0);
+		return false;
+	end
 	if not task:AcceptTask(2) then
 		return false;
 	end
+	package:AddItem(2000, 1, 1);
 	return true;
 end
 
@@ -168,29 +176,18 @@ function Task_00000002_submit(itemId, itemNum)
 
 	local package = player:GetPackage();
 
-	local fixReqGrid = package:GetItemUsedGrids(2000,1,1);
-	if fixReqGrid > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2013, 0);
-		return false;
-	end
 	if not player:GetTaskMgr():SubmitTask(2) then
 		return false;
 	end
 
-	if IsEquipTypeId(2000) then
-		for k = 1, 1 do
-			package:AddEquip(2000, 1);
-		end
-	else 
-		package:AddItem(2000,1,1);
-	end
 
-	player:AddExp(1000);
+	player:AddExp(750);
 	return true;
 end
 
 --��������
 function Task_00000002_abandon()
 	local package = GetPlayer():GetPackage();
+	package:DelItem(2000, 1, 1);
 	return GetPlayer():GetTaskMgr():AbandonTask(2);
 end

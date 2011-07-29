@@ -1,15 +1,25 @@
 --����Ľ�������
 function Task_Accept_00000102()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
-		return false;
-	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(102) or task:HasCompletedTask(102) or task:HasSubmitedTask(102) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(101) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(101) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(101) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -21,14 +31,24 @@ end
 function Task_Can_Accept_00000102()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
-	if player:GetLev() < 30 then
-		return false;
-	end
 	if task:HasAcceptedTask(102) or task:HasCompletedTask(102) or task:HasSubmitedTask(102) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(101) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(101) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(101) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -56,20 +76,20 @@ function Task_00000102(npcId)
 		action.m_ActionID = 102
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "蛇妖之祸";
+		action.m_ActionMsg = "斩蛇";
 	elseif task:GetTaskSubmitNpc(102) == npcId then
 		if Task_Submit_00000102() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 102
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "蛇妖之祸";
+			action.m_ActionMsg = "斩蛇";
 		elseif task:HasAcceptedTask(102) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 102
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "蛇妖之祸";
+			action.m_ActionMsg = "斩蛇";
 		end
 	end
 	return action;
@@ -83,8 +103,8 @@ function Task_00000102_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都郊外的云灵山有一只蛇妖盘踞，经常祸害过往行人。这只蛇妖惯于喷涂剧毒，我手下的衙役捕快拿它毫无办法，还希望"..GetPlayerName(GetPlayer()).."去将这只妖物消灭。";
-	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
+	action.m_NpcMsg = "这金针圣母昔年作孽也颇多，虽然我和她有斗剑之约，但我却不会用青牛剑助她兵解。不过"..GetPlayerName(GetPlayer()).."你颇有侠名，跟我借剑却也不是不可。武当山的斩龙崖是昔年张三丰真人斩孽龙之所，只是孽龙虽除，仍有些蛇妖尚存。少侠你若去帮我除掉这些孽蛇妖，我就赠你青牛剑。";
+	action.m_ActionMsg = "半边大师真是多谢你了。";
 	return action;
 end
 
@@ -93,7 +113,7 @@ function Task_00000102_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。";
+	action.m_NpcMsg = "少侠剑术高强，除掉这些蛇妖果然是易如反掌。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -128,17 +148,16 @@ end
 --�ύ����
 function Task_00000102_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(102) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(102);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(102) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(2222);
+	return true;
 end
 
 --��������

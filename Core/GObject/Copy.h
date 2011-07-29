@@ -11,11 +11,13 @@ namespace GObject
 
 struct CopyData
 {
-    CopyData() : floor(0), spot(0) {}
+    CopyData() : floor(0), spot(0), freeCount(0), goldCount(0) {}
     void reset() { memset(this, 0x00, sizeof(*this)); }
 
     UInt8 floor;
     UInt8 spot;
+    UInt8 freeCount;
+    UInt8 goldCount;
 };
 
 class Player;
@@ -26,11 +28,11 @@ public:
 
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
-    void enter(Player* pl, UInt8 id);
+    void enter(Player* pl, UInt8 id, UInt8 type);
     void next(Player* pl, UInt8 id);
     void reset(Player* pl, UInt8 id);
 
-    void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot);
+    void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 free, UInt8 gold);
 
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;

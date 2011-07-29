@@ -1,15 +1,25 @@
 --����Ľ�������
 function Task_Accept_00000100()
-	if GetPlayerData(6) ~= 1 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
-		return false;
-	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(100) or task:HasCompletedTask(100) or task:HasSubmitedTask(100) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(99) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(99) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(99) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -21,14 +31,24 @@ end
 function Task_Can_Accept_00000100()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 1 then
-		return false;
-	end
-	if player:GetLev() < 30 then
-		return false;
-	end
 	if task:HasAcceptedTask(100) or task:HasCompletedTask(100) or task:HasSubmitedTask(100) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(99) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(99) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(99) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -56,20 +76,20 @@ function Task_00000100(npcId)
 		action.m_ActionID = 100
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "僵尸作乱";
+		action.m_ActionMsg = "玉露符";
 	elseif task:GetTaskSubmitNpc(100) == npcId then
 		if Task_Submit_00000100() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 100
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "僵尸作乱";
+			action.m_ActionMsg = "玉露符";
 		elseif task:HasAcceptedTask(100) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 100
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "僵尸作乱";
+			action.m_ActionMsg = "玉露符";
 		end
 	end
 	return action;
@@ -83,8 +103,8 @@ function Task_00000100_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "自从中原遭遇兵劫，民不聊生，不但有恶人作乱，甚至有些在兵劫中惨遭横死的人执念深重，化为僵尸为恶，近日在成都郊外乱葬岗处有村民发现了一些可怕的僵尸，还希望"..GetPlayerName(GetPlayer()).."去将这些怪物消灭。";
-	action.m_ActionMsg = "几个僵尸不在话下，我去去就回。";
+	action.m_NpcMsg = "我昔年与乙休为一件事情反目，将躯壳萎化，隐居在这白犀潭已有数年，不问世事已久。白云大师元敬与我是近邻，倒也有点往来，这玉露符乃是聚宫阙之下地根泉眼的灵气而化的灵符，却不是什么稀罕之物，你这就带去给大师吧。";
+	action.m_ActionMsg = "好的，韩前辈我这就去。";
 	return action;
 end
 
@@ -93,7 +113,7 @@ function Task_00000100_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是身手不凡。";
+	action.m_NpcMsg = "有了这玉露符，净化姑婆岭的瘴气要轻松许多了。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -120,6 +140,7 @@ function Task_00000100_accept()
 	if not task:AcceptTask(100) then
 		return false;
 	end
+	task:AddTaskStep(100);
 	return true;
 end
 
@@ -128,17 +149,16 @@ end
 --�ύ����
 function Task_00000100_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(100) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(100);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(100) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(2222);
+	return true;
 end
 
 --��������

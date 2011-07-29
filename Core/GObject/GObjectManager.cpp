@@ -240,9 +240,11 @@ namespace GObject
 			if(mos.m_ID <= GREAT_FIGHTER_MAX)
 				globalFighters.setSpot(mos.m_ID, mos.m_Spot);
 			Map * map = Map::FromSpot(mos.m_Spot);
+#if 0
             if (mos.m_ID == 4114) // XXX: ÌìÃÉìøÊ¦
                 mos.m_Hide = true;
             else
+#endif
                 mos.m_Hide = false;
 			if(map == NULL)
 			{
@@ -280,11 +282,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCopyData dbcd;
-		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot` FROM `player_copy` ORDER BY playerId,id", dbcd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot`, `freeCount`, `goldCount` FROM `player_copy` ORDER BY playerId,id", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot);
+            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot, dbcd.freeCount, dbcd.goldCount);
         }
         return true;
     }

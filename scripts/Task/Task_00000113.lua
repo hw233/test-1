@@ -1,10 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000113()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 60 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -21,10 +18,7 @@ end
 function Task_Can_Accept_00000113()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
-	if player:GetLev() < 30 then
+	if player:GetLev() < 60 then
 		return false;
 	end
 	if task:HasAcceptedTask(113) or task:HasCompletedTask(113) or task:HasSubmitedTask(113) then
@@ -56,20 +50,20 @@ function Task_00000113(npcId)
 		action.m_ActionID = 113
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "113";
+		action.m_ActionMsg = "莽苍山";
 	elseif task:GetTaskSubmitNpc(113) == npcId then
 		if Task_Submit_00000113() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 113
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "113";
+			action.m_ActionMsg = "莽苍山";
 		elseif task:HasAcceptedTask(113) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 113
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "113";
+			action.m_ActionMsg = "莽苍山";
 		end
 	end
 	return action;
@@ -83,8 +77,8 @@ function Task_00000113_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "齐漱溟让你去对话";
-	action.m_ActionMsg = "齐漱溟让你去对话";
+	action.m_NpcMsg = "如今绿袍伏诛，我即日就与东海老友会山炼制一宗法宝，"..GetPlayerName(GetPlayer()).."你不如去莽苍山一趟，李英琼的那只爱宠袁星前不久在莽苍山走失，不过我用紫薇卦术推测，目前袁星正在马熊洞中，不如你去将它寻会，";
+	action.m_ActionMsg = "好的，弟子这就去。";
 	return action;
 end
 
@@ -93,7 +87,7 @@ function Task_00000113_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "齐漱溟让你去对话";
+	action.m_NpcMsg = "怎么又是你！";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -129,17 +123,16 @@ end
 --�ύ����
 function Task_00000113_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(113) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(113);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(113) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(2222);
+	return true;
 end
 
 --��������

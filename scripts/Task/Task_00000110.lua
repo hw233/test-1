@@ -1,15 +1,25 @@
 --����Ľ�������
 function Task_Accept_00000110()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
-		return false;
-	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(110) or task:HasCompletedTask(110) or task:HasSubmitedTask(110) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(109) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(109) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(109) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -21,14 +31,24 @@ end
 function Task_Can_Accept_00000110()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
-	if player:GetLev() < 30 then
-		return false;
-	end
 	if task:HasAcceptedTask(110) or task:HasCompletedTask(110) or task:HasSubmitedTask(110) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(109) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(109) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(109) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -56,20 +76,20 @@ function Task_00000110(npcId)
 		action.m_ActionID = 110
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "110";
+		action.m_ActionMsg = "祭风台";
 	elseif task:GetTaskSubmitNpc(110) == npcId then
 		if Task_Submit_00000110() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 110
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "110";
+			action.m_ActionMsg = "祭风台";
 		elseif task:HasAcceptedTask(110) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 110
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "110";
+			action.m_ActionMsg = "祭风台";
 		end
 	end
 	return action;
@@ -83,8 +103,8 @@ function Task_00000110_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "齐漱溟让你去对话";
-	action.m_ActionMsg = "齐漱溟让你去对话";
+	action.m_NpcMsg = "为师和你的师叔师伯不方便出面，唯恐打草惊蛇惊动了绿袍妖孽。如今绿袍手下基本已经清剿干净，只剩下祭风台一带妖孽的亲传弟子了。他们能被绿袍收为亲传弟子，基本都是十恶不赦之辈，将他们一并消灭吧"..GetPlayerName(GetPlayer()).."。";
+	action.m_ActionMsg = "除魔卫道正是我辈本色。";
 	return action;
 end
 
@@ -93,7 +113,7 @@ function Task_00000110_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "齐漱溟让你去对话";
+	action.m_NpcMsg = "如今绿袍老祖的爪牙尽去，我们布置两仪微尘阵的进度可以加快不少。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -120,7 +140,6 @@ function Task_00000110_accept()
 	if not task:AcceptTask(110) then
 		return false;
 	end
-	task:AddTaskStep(110);
 	return true;
 end
 
@@ -129,17 +148,16 @@ end
 --�ύ����
 function Task_00000110_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(110) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(110);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(110) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(5555);
+	return true;
 end
 
 --��������

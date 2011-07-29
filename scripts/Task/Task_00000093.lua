@@ -124,7 +124,7 @@ function Task_00000093_step_03()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
 	action.m_NpcMsg = "你……你你……你个牙尖嘴滑的小辈……气煞我也！";
-	action.m_ActionMsg = "你个贪心不足的老怪物……";
+	action.m_ActionMsg = "可惜我最厉害的不是嘴，是我的飞剑啊！";
 	return action;
 end
 

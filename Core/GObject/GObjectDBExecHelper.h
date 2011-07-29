@@ -623,6 +623,8 @@ struct DBCopyData
     UInt8 id;
     UInt8 floor;
     UInt8 spot;
+    UInt8 freeCount;
+    UInt8 goldCount;
 };
 
 }
@@ -1388,12 +1390,14 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBCopyData)
-SPECIALDEF(4)
+SPECIALDEF(6)
 (
     UInt64, playerId,
     UInt8, id,
     UInt8, floor,
-    UInt8, spot
+    UInt8, spot,
+    UInt8, freeCount,
+    UInt8, goldCount
 )
 SPECIALEND()
 

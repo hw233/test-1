@@ -50,20 +50,20 @@ function Task_00000001(npcId)
 		action.m_ActionID = 1
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "天蒙禅师";
+		action.m_ActionMsg = "应劫之人";
 	elseif task:GetTaskSubmitNpc(1) == npcId then
 		if Task_Submit_00000001() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 1
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "天蒙禅师";
+			action.m_ActionMsg = "应劫之人";
 		elseif task:HasAcceptedTask(1) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 1
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "天蒙禅师";
+			action.m_ActionMsg = "应劫之人";
 		end
 	end
 	return action;
@@ -76,18 +76,8 @@ function Task_00000001_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
-	action.m_ActionStep = 2;
-	action.m_NpcMsg = "老衲早已在东汉得道，虽说大道无情，可是仍有一丝尘心未泯，这一日老衲静坐枯禅，心中忽有所得，推算出1700年后中华大地将遭遇兵劫，邪道会乘势而起……";
-	action.m_ActionMsg = "那我该怎么办？";
-	return action;
-end
-
-function Task_00000001_step_02()
-	local action = ActionTable:Instance();
-	action.m_ActionType = 0x0001;
-	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我以佛门无上神通推动元神之力，穿越千年来寻你，须知你是这正邪之战的应劫之人，而蜀中也正是正邪之战的关键之地。你现在速速去湘江边消灭那些追杀李宁父女的水贼，保护好他们父女。";
+	action.m_NpcMsg = "目前蜀中之地正是正邪之战的关键之地。我已推算出数个应劫之人，其中有一位就在不远的乌鸦嘴渡口，你现在速速去湘江边消灭那些追杀李宁父女的水贼，保护好他们父女。";
 	action.m_ActionMsg = "好，我这就去。";
 	return action;
 end
@@ -104,7 +94,6 @@ end
 
 local Task_00000001_step_table = {
 		[1] = Task_00000001_step_01,
-		[2] = Task_00000001_step_02,
 		[10] = Task_00000001_step_10,
 		};
 
@@ -141,7 +130,7 @@ function Task_00000001_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1000);
+	player:AddExp(460);
 	player:getTael(100);
 	return true;
 end
