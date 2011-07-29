@@ -12,6 +12,8 @@
 #include "Battle/BattleSimulator.h"
 #include <sstream>
 #include <mysql.h>
+#include "Server/SysMsg.h"
+#include "Mail.h"
 
 namespace GObject
 {
@@ -51,150 +53,166 @@ namespace GObject
 
         PPlace& data = m_places[place-1].place;
         Player* owner = globalPlayers[data.ownerid];
+
+        if(place != PPLACE_MAX && NULL == owner)
+        {
+            st << static_cast<UInt8>(1) << Stream::eos;
+            pl->send(st);
+            return false;
+        }
+
         Clan* clan = NULL;
         if(NULL != owner)
             clan = owner->getClan();
 
-        if (place != PPLACE_MAX) {
-            PracticeData*& pd = m_places[place-1].data[slot];
-            if (pd)
-            {
-                if (pd->winnerid != pl->getId())
-                {
-                    st << static_cast<UInt8>(1) << Stream::eos;
-                    pl->send(st);
-                    return false;
-                }
-
-                Player* def = globalPlayers[pd->getId()];
-                if (!def)
-                {
-                    st << static_cast<UInt8>(1) << Stream::eos;
-                    pl->send(st);
-                    return false;
-                }
-
-                UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->slotprice;
-                UInt16 money2 =  ((float)pd->checktime / pd->traintime) * pd->protprice;
-                def->getTael(money + money2);
-                data.slotincoming += pd->slotprice - money;
-                data.protincoming += pd->protprice - money2;
-                DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
-
-                pd->winnerid = 0;
-                m_places[PPLACE_MAX-1].data.push_back(pd);
-                pd = 0;
-                --m_places[place-1].used;
-                ++m_places[PPLACE_MAX-1].used;
-
-                if(clan)
-                {
-                    clan->addClanFunds(pd->slotprice + pd->protprice - money - money2);
-                    Stream st(0x9B);
-                    UInt8 cnt = 2;
-                    st << cnt;
-                    UInt8 offset = st.size();
-                    st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
-                    st << static_cast<UInt8>(3) << data.slotincoming;
-                    if(money2)
-                    {
-                        ++ cnt;
-                        st << static_cast<UInt8>(4) << data.protincoming;
-                    }
-                    st.data<UInt8>(offset) = cnt;
-                    st << Stream::eos;
-                    clan->broadcast(st);
-                }
-
-                pd->checktime = 0;
-                // DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", def->getId());
-                DB().PushUpdateData("UPDATE `practice_data` SET checktime = 0 where `id`= %"I64_FMT"u", def->getId());
-                PopTimerEvent(def, EVENT_PLAYERPRACTICING, def->getId());
-            }
-        }
+        bool clanflag = (clan == pl->getClan());
 
         UInt32 slotprice = 0;
         UInt32 protprice = 0;
         ConsumeInfo ci(Practice,0,0);
-#if 0
-        if (place == PPLACE_MAX || !data.slotmoney)
+        if(!clanflag)
         {
-            if (priceType == 0)
-            {
-                const std::vector<UInt32>& golds = GData::GDataManager::GetGoldPractice();
-                if (!golds.size() || type >= golds.size())
-                    return false;
-                price = time * golds[type];
-                if (pl->getGold() < price)
+            if (place != PPLACE_MAX) {
+                PracticeData*& pd = m_places[place-1].data[slot];
+                if (pd)
                 {
-                    pl->sendMsgCode(0, 2008);
-                    st << static_cast<UInt8>(1) << Stream::eos;
-                    return false;
+                    if (pd->winnerid != pl->getId())
+                    {
+                        st << static_cast<UInt8>(1) << Stream::eos;
+                        pl->send(st);
+                        return false;
+                    }
+
+                    Player* def = globalPlayers[pd->getId()];
+                    if (!def)
+                    {
+                        st << static_cast<UInt8>(1) << Stream::eos;
+                        pl->send(st);
+                        return false;
+                    }
+
+                    UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->slotprice;
+                    UInt16 money2 =  ((float)pd->checktime / pd->traintime) * pd->protprice;
+                    def->getTael(money + money2);
+                    data.slotincoming += pd->slotprice - money;
+                    data.protincoming += pd->protprice - money2;
+                    DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+
+                    pd->winnerid = 0;
+                    m_places[PPLACE_MAX-1].data.push_back(pd);
+                    def->setPracticingPlaceSlot(PPLACE_MAX << 16);
+                    --m_places[place-1].used;
+                    ++m_places[PPLACE_MAX-1].used;
+
+                    if(clan)
+                    {
+                        clan->addClanFunds(pd->slotprice + pd->protprice - money - money2);
+                        Stream st(0x9B);
+                        UInt8 cnt = 2;
+                        st << cnt;
+                        UInt8 offset = st.size();
+                        st << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
+                        st << static_cast<UInt8>(3) << data.slotincoming;
+                        if(money2)
+                        {
+                            ++ cnt;
+                            st << static_cast<UInt8>(4) << data.protincoming;
+                        }
+                        st.data<UInt8>(offset) = cnt;
+                        st << Stream::eos;
+                        clan->broadcast(st);
+                    }
+
+                    pd = 0;
+                    // DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", def->getId());
+                    DB().PushUpdateData("UPDATE `practice_data` SET place = %u where `id`= %"I64_FMT"u", PPLACE_MAX, def->getId());
+                    SYSMSG(title, 1000);
+                    SYSMSGV(content, 1001, pl->getName().c_str());
+                    def->GetMailBox()->newMail(NULL, 1, title, content);
+                    //PopTimerEvent(def, EVENT_PLAYERPRACTICING, def->getId());
                 }
-                pl->useGold(price, &ci);
+            }
+
+#if 0
+            if (place == PPLACE_MAX || !data.slotmoney)
+            {
+                if (priceType == 0)
+                {
+                    const std::vector<UInt32>& golds = GData::GDataManager::GetGoldPractice();
+                    if (!golds.size() || type >= golds.size())
+                        return false;
+                    price = time * golds[type];
+                    if (pl->getGold() < price)
+                    {
+                        pl->sendMsgCode(0, 2008);
+                        st << static_cast<UInt8>(1) << Stream::eos;
+                        return false;
+                    }
+                    pl->useGold(price, &ci);
+                }
+                else
+                {
+                    const std::vector<UInt32>& taels = GData::GDataManager::GetTaelPractice();
+                    if (!taels.size() || type >= taels.size()) {
+                        st << static_cast<UInt8>(1) << Stream::eos;
+                        return false;
+                    }
+                    price = time * taels[type];
+                    if (pl->getTael() < price)
+                    {
+                        st << static_cast<UInt8>(1) << Stream::eos;
+                        pl->sendMsgCode(0, 2007);
+                        return false;
+                    }
+                    pl->useTael(price, &ci);
+                    if(clan)
+                        clan->addClanFunds(price);
+                }
             }
             else
-            {
-                const std::vector<UInt32>& taels = GData::GDataManager::GetTaelPractice();
-                if (!taels.size() || type >= taels.size()) {
-                    st << static_cast<UInt8>(1) << Stream::eos;
-                    return false;
-                }
-                price = time * taels[type];
-                if (pl->getTael() < price)
-                {
-                    st << static_cast<UInt8>(1) << Stream::eos;
-                    pl->sendMsgCode(0, 2007);
-                    return false;
-                }
-                pl->useTael(price, &ci);
-                if(clan)
-                    clan->addClanFunds(price);
-            }
-        }
-        else
 #endif
-        if (place != PPLACE_MAX)
-        {
-            slotprice = time * data.slotmoney;
-            if (slotprice) {
-                if (pl->getTael() < slotprice)
-                {
-                    pl->sendMsgCode(0, 2007);
-                    st << static_cast<UInt8>(1) << Stream::eos;
-                    pl->send(st);
-                    return false;
-                }
-                pl->useTael(slotprice, &ci);
-            }
-        }
-
-        switch(prot)
-        {
-        case 1:
-            if(pl->GetPackage()->DelItemAny(ITEM_PRACTICE_PROT, 1) == false)
+            if (place != PPLACE_MAX)
             {
-                pl->sendMsgCode(0, 2064);
-                st << static_cast<UInt8>(1) << Stream::eos;
-                pl->send(st);
-                return false;
-            }
-            break;
-        case 2:
-            {
-                protprice = time * data.protmoney;
-                if (protprice) {
-                    if (pl->getTael() < protprice)
+                slotprice = time * data.slotmoney;
+                if (slotprice) {
+                    if (pl->getTael() < slotprice)
                     {
                         pl->sendMsgCode(0, 2007);
                         st << static_cast<UInt8>(1) << Stream::eos;
                         pl->send(st);
                         return false;
                     }
-                    pl->useTael(protprice, &ci);
+                    pl->useTael(slotprice, &ci);
                 }
             }
-            break;
+
+            switch(prot)
+            {
+            case 1:
+                if(pl->GetPackage()->DelItemAny(ITEM_PRACTICE_PROT, 1) == false)
+                {
+                    pl->sendMsgCode(0, 2064);
+                    st << static_cast<UInt8>(1) << Stream::eos;
+                    pl->send(st);
+                    return false;
+                }
+                break;
+            case 2:
+                {
+                    protprice = time * data.protmoney;
+                    if (protprice) {
+                        if (pl->getTael() < protprice)
+                        {
+                            pl->sendMsgCode(0, 2007);
+                            st << static_cast<UInt8>(1) << Stream::eos;
+                            pl->send(st);
+                            return false;
+                        }
+                        pl->useTael(protprice, &ci);
+                    }
+                }
+                break;
+            }
         }
 
         PracticeData* pp = new (std::nothrow) PracticeData(pl->getId());
@@ -203,6 +221,7 @@ namespace GObject
             pl->send(st);
             return false;
         }
+
         pp->type = type;
         pp->pricetype = priceType;
         pp->slotprice = slotprice;
@@ -214,13 +233,10 @@ namespace GObject
         pp->cdend = TimeUtil::Now() + pp->traintime * 60 + 60 * 60;
         pp->winnerid = 0;
 
-        if (place != PPLACE_MAX)
-            m_places[place-1].data[slot] = pp;
-
         DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
-        addPractice(pl, pp, place); // XXX: must be here after setPracticingPlaceSlot
+        addPractice(pl, pp, place, slot); // XXX: must be here after setPracticingPlaceSlot
 
         st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << place - 1 << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
@@ -256,11 +272,12 @@ namespace GObject
             pd->fighters.clear();
             pd->cdend = TimeUtil::Now() + 10 * 60;
 
-            --m_places[place-1].used;
-
             //DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
             DB().PushUpdateData("UPDATE `practice_data` SET place = 0, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u", pd->cdend, pl->getId());
             PopTimerEvent(pl, EVENT_PLAYERPRACTICING, pl->getId());
+
+            if(place == PPLACE_MAX || clan != pl->getClan())
+                --m_places[place-1].used;
 
             UInt32 trained = pd->traintime - pd->checktime;
             UInt16 money = ((float)(trained)/pd->traintime)*pd->slotprice;
@@ -297,6 +314,7 @@ namespace GObject
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
         }
         pl->setPracticingPlaceSlot(0);
+        m_places[place-1].data[slot] = 0;
 
         pl->send(st);
         return true;
@@ -494,6 +512,9 @@ namespace GObject
             return;
 
         PlaceData& pd = m_places[place-1];
+        if(pageno > pd.data.size()/pagenum)
+            return;
+
         auto i = pd.data.begin();
         std::advance(i, pageno*pagenum);
         if (i == pd.data.end())
@@ -662,6 +683,18 @@ namespace GObject
         if (idx > m_places[place-1].data.size())
             return false;
 
+        Player* owner = globalPlayers[m_places[place-1].place.ownerid];
+        if(NULL == owner)
+            return false;
+
+        PracticeData* p = getPracticeData(pl);
+        if (p && p->cdend > TimeUtil::Now())
+        {
+            pl->sendMsgCode(0, 3100);
+            return false;
+        }
+
+
         Stream st(0xE2);
         Player* def = 0;
         bool sumfalg = false;
@@ -708,7 +741,7 @@ namespace GObject
             return true;
         }
 
-        Battle::BattleSimulator bsim(pl->getLocation(), pl, def);
+        Battle::BattleSimulator bsim(pl->getLocation(), pl, def, false);
         pl->PutFighters(bsim, 0, true);
         def->PutFighters(bsim, 1, true);
         bsim.start();
@@ -721,11 +754,24 @@ namespace GObject
             return false;
         }
 
+        bool res = bsim.getWinner() == 1;
+        {
+            Stream st(0x61);
+            if(res)
+                st << static_cast<UInt16>(0x0101);
+            else
+                st << static_cast<UInt16>(0x0100);
+            st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+            st.append(&packet[8], packet.size() - 8);
+            st << Stream::eos;
+            pl->send(st);
+        }
+
         // TODO: package
         if(sumfalg)
             ++m_places[place-1].place.enemyCount;
 
-        if (bsim.getWinner() == 1)
+        if (res)
         {
             st << static_cast<UInt8>(0);
             st << static_cast<UInt8>(place-1);
@@ -907,7 +953,7 @@ namespace GObject
         return true;
     }
 
-    bool PracticePlace::addPractice(Player* pl, PracticeData* pd, UInt8 place)
+    bool PracticePlace::addPractice(Player* pl, PracticeData* pd, UInt8 place, UInt8 slot)
     {
         if (!pl || !pd)
             return false;
@@ -920,10 +966,24 @@ namespace GObject
             EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime/10, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);
-            ++m_places[place-1].used;
 
-            GObject::Clan* clan = pl->getClan();
-            if(clan)
+            Player* owner = globalPlayers[m_places[place-1].place.ownerid];
+            GObject::Clan* clan = NULL;
+            if(NULL != owner)
+            {
+                clan = owner->getClan();
+            }
+
+            if(place == PPLACE_MAX || clan != pl->getClan())
+            {
+                if(place == PPLACE_MAX)
+                    m_places[place-1].data.push_back(pd);
+                else
+                    m_places[place-1].data[slot] = pd;
+                ++m_places[place-1].used;
+            }
+
+            if(clan && clan != pl->getClan())
             {
                 Stream st(0x9B);
                 st << static_cast<UInt8>(1) << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);

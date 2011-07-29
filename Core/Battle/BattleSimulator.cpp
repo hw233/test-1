@@ -122,6 +122,9 @@ void BattleSimulator::start()
 							}
 						}
 						bf->initStats(checkEnh);
+                        UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
+                        if(justice_roar)
+                            bf->AddAura(justice_roar);
 					}
 					UInt32 maxhp = bf->getMaxHP();
 					_packet << static_cast<UInt8>(j + 1) << bf->getFighter()->getBattleName();
@@ -143,9 +146,6 @@ void BattleSimulator::start()
 					if(ismain)
 					{
 						bf->postInit();
-                        UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
-                        if(justice_roar)
-                            bf->AddAura(justice_roar);
 						// FighterStatus fs(bf);
 						// Insert into action queue
 						insertFighterStatus(bf);
@@ -207,8 +207,6 @@ void BattleSimulator::start()
 	if(act_count == 0)
 		_winner = 1;
 
-    //TODO::_report=true
-    _report = true;
 	if(_report)
 		battleReport.addReport(_id, _packet);
 }

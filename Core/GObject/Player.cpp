@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Package.h"
 #include "TaskMgr.h"
+#include "AttainMgr.h"
 #include "Trade.h"
 #include "Sale.h"
 #include "Country.h"
@@ -339,6 +340,7 @@ namespace GObject
 		m_Sale = new Sale(this);
 		m_MailBox = new MailBox(this);
 		m_Athletics = new Athletics(this);
+		m_AttainMgr = new AttainMgr(this);
 	}
 
 
@@ -3216,6 +3218,13 @@ namespace GObject
 			return;
 		}
 
+        while(color > 0)
+        {
+            if(globalFighters.getColorFighterNum(color) > 0)
+                break;
+            -- color;
+        }
+
 		UInt16 tcount = 0;
 		Stream st(0x26);
 		if(count > 0)
@@ -3300,12 +3309,12 @@ namespace GObject
 				-- count;
 				if(hasBlue)
 				{
-					if(color <= 3)
+					if(color <= 2)
 						break;
 				}
 				if(hasPurple)
 				{
-					if(color <= 4)
+					if(color <= 3)
 						break;
 				}
 			}

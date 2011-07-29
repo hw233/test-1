@@ -214,7 +214,7 @@ DROP TABLE IF EXISTS `clan_donate_record`;
 CREATE TABLE `clan_donate_record` (
   `clanId` int(10) unsigned NOT NULL,
   `donateName` varchar(255) NOT NULL DEFAULT '',
-  `skillId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `techId` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `donateCount` int(10) unsigned NOT NULL DEFAULT '0',
   `donateTime` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

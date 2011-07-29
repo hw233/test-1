@@ -341,4 +341,9 @@ UInt32 ClanTech::getSkillExtend()
 	return GData::clanTechTable[CLAN_TECH_SKILL_EXTEND][found->second.level].effect1;
 }
 
+UInt8 ClanTech::getClanLev()
+{
+    return _clan->getLev();
+}
+
 }

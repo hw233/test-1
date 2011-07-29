@@ -354,6 +354,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	bsim.start();
     player->setJusticeRoar(0);
     dpi.justice_roar = 0;
+    DB().PushUpdateData("UPDATE `dungeon_player` SET `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice_roar, _id, player->getId());
 
 	Stream& packet = bsim.getPacket();
 	if(packet.size() <= 8)
@@ -440,12 +441,16 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     {
         dpi.justice_roar = 0;
         dpi.justice = 0;
+        DB().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, player->getId());
 		return true;
     }
 	leaveLevel(player, level);
 
     if(dpi.justice < 100)
+    {
         dpi.justice += 5;
+        DB().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, _id, player->getId());
+    }
 
     // TODO:
 #if 0
@@ -534,6 +539,12 @@ void Dungeon::startChallenge( Player * player )
 	if(it == _players.end())
 		return;
 
+	if(player->hasFlag(Player::AutoDungeon))
+	{
+		player->sendMsgCode(0, 2035);
+		return;
+	}
+
 	UInt32 now = TimeUtil::Now();
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
@@ -583,12 +594,27 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			}
 			DBLOG().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(0x5B);
-			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
+			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(0) << Stream::eos;
+			player->send(st);
+		}
+		break;
+    case 1:
+        if(advanceLevel(player, it->second, true, totalExp))
+        {
+            player->delFlag(Player::AutoDungeon);
+            DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+            return;
+        }
+        if(player->GetPackage()->GetRestPackageSize() < 4)
+        {
+            player->delFlag(Player::AutoDungeon);
+            Stream st(0x5B);
+            st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 			return;
 		}
-		break;
+        break;
 	case 2:
 		{
 			player->delFlag(Player::AutoDungeon);
@@ -963,6 +989,7 @@ void Dungeon::doJusticeRoar(Player* pl)
         return;
     }
 
+    DB().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, pl->getId());
     Stream st(0x59);
     st << static_cast<UInt8>(6) << _id << dpi.justice << Stream::eos;
     pl->send(st);

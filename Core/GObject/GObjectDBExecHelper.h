@@ -373,7 +373,7 @@ struct DBClanDonateRecord
 {
 	UInt32 clanId;
 	std::string doanteName;
-	UInt8 skillId;
+	UInt8 techId;
 	UInt16 donateCount;
 	UInt32 donateTime;
 };
@@ -1003,7 +1003,7 @@ SPECIALDEF(5)
 (
 	UInt32, clanId,
 	std::string, doanteName,
-	UInt8, skillId,
+	UInt8, techId,
 	UInt16, donateCount,
 	UInt32, donateTime
 )

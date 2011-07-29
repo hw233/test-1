@@ -1806,7 +1806,7 @@ namespace GObject
 			lc.advance();
 			if (cl.id != 0)
 			{
-				clan = new Clan(cl.id, cl.name, cl.foundTime);
+				clan = new Clan(cl.id, cl.name, cl.foundTime, cl.level );
 				clanBattle = clan->getClanBattle();
 				clan->setContact(cl.contact, false);
 				clan->setAnnounce(cl.announce, false);
@@ -1998,7 +1998,7 @@ namespace GObject
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		DBClanDonateRecord ddr;
-		if (execu->Prepare("SELECT `clanId`, `donateName`, `skillId`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
+		if (execu->Prepare("SELECT `clanId`, `donateName`, `techId`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
 			return false;
 		lc.reset(200);
 		while (execu->Next() == DB::DB_OK)
@@ -2011,7 +2011,7 @@ namespace GObject
 				DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u", ddr.clanId);
 				continue;
 			}
-			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.skillId, ddr.donateCount, ddr.donateTime);
+			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.techId, ddr.donateCount, ddr.donateTime);
 		}
 		lc.finalize();
 
@@ -2605,12 +2605,12 @@ namespace GObject
             if (ppd->checktime)
             {
                 pl->setPracticingPlaceSlot(pd.place << 16 | pd.slot);
-                practicePlace.addPractice(pl, ppd, pd.place);
+                practicePlace.addPractice(pl, ppd, pd.place, pd.slot);
             }
             else
             {
                 pl->setPracticingPlaceSlot(0 << 16);
-                practicePlace.addPractice(pl, ppd, PPLACE_MAX);
+                practicePlace.addPractice(pl, ppd, PPLACE_MAX, pd.slot);
             }
         }
 		lc.finalize();

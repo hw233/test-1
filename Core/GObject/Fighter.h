@@ -609,12 +609,13 @@ public:
 	void setSpot(UInt32 id, UInt16 spot);
 	UInt16 getSpot(UInt32 id);
 	inline void setMaxFgtId(UInt32 n) { _maxFgtId = n; }
+    UInt32 getColorFighterNum( UInt8 color ) { return _summonSet[0][color].size(); }
 
 private:
 	FastMutex _mutex;
 	std::vector<FighterData> _fighters;
 	UInt32 _maxFgtId;
-	std::map<UInt32,UInt32> _summonSet[2][4];
+	std::map<UInt32,UInt32> _summonSet[2][5];
 };
 
 extern GlobalFighters globalFighters;

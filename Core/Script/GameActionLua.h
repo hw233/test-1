@@ -187,7 +187,11 @@ namespace Script
 
 	public:
 		Player* GetPlayer1() { return _player1; }
-		Player* GetPlayer2() { return _player2; } 
+		Player* GetPlayer2() { return _player2; }
+
+    // 成就达成
+    public:
+        void doAttainment(Player* pl, UInt16 attainId, UInt32 param);
 
 	private:
 		Player* _player1;	//脚本动作行为主体1
