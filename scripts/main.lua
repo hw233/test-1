@@ -1,6 +1,6 @@
 --Ö÷³ÌĞò¼ÓÔØ
 require("global")
-require("Attain")
+require("World/Attain")
 require("Task/Task_All")
 require("Explore/Explore_All")
 require("Collect/Collect_All")
