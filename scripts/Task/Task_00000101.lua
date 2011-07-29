@@ -1,10 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000101()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 52 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -21,10 +18,7 @@ end
 function Task_Can_Accept_00000101()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
-	if player:GetLev() < 30 then
+	if player:GetLev() < 52 then
 		return false;
 	end
 	if task:HasAcceptedTask(101) or task:HasCompletedTask(101) or task:HasSubmitedTask(101) then
@@ -56,20 +50,20 @@ function Task_00000101(npcId)
 		action.m_ActionID = 101
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "教诲";
+		action.m_ActionMsg = "武当借剑";
 	elseif task:GetTaskSubmitNpc(101) == npcId then
 		if Task_Submit_00000101() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 101
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "教诲";
+			action.m_ActionMsg = "武当借剑";
 		elseif task:HasAcceptedTask(101) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 101
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "教诲";
+			action.m_ActionMsg = "武当借剑";
 		end
 	end
 	return action;
@@ -83,8 +77,8 @@ function Task_00000101_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."我们峨眉开府在即，也是天下正道的领袖，作为峨眉弟子一定要时刻自省其身。玄真子师伯早在我入门前就跟随你师祖长眉真人，受训颇严，今日你就去师伯处聆听教诲吧。";
-	action.m_ActionMsg = "谨遵掌教之令。";
+	action.m_NpcMsg = "当年我炼制这九九八十一根玄女针，虽是犀利无比，可也有伤天和，如今劫难降至，只有兵解来免去大劫。可是这次兵解需要的飞剑只有武当半边大师的七口青牛剑才合适，不知道少侠可否帮我去武当山找半边借来这七口青牛剑？";
+	action.m_ActionMsg = "武当半边大师性格怪异，我尽力而为吧。";
 	return action;
 end
 
@@ -93,7 +87,7 @@ function Task_00000101_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我看你心存正气，将来必然会将我派发扬光大。";
+	action.m_NpcMsg = "贫尼已经知晓你的来意。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -129,17 +123,16 @@ end
 --�ύ����
 function Task_00000101_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(101) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(101);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(101) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(2222);
+	return true;
 end
 
 --��������

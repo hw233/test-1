@@ -1054,12 +1054,14 @@ INSERT INTO `database_version` VALUES ('Object_20110330_1');
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DROP TABLE IF EXISTS `player_copy`;
+CREATE TABLE `player_copy` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  `floor` tinyint(3) unsigned NOT NULL,
+  `spot` tinyint(3) unsigned NOT NULL,
+  `freeCount` tinyint(3) unsigned NOT NULL,
+  `goldCount` tinyint(3) unsigned NOT NULL,
+  UNIQUE KEY `player_id` (`playerId`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Dump completed

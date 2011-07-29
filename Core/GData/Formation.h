@@ -37,7 +37,7 @@ inline void Formation::addGrid(int c, GridEffect* ge)
 	}
 }
 
-typedef ObjectListT<Formation> FormationManager;
+typedef ObjectMapT<Formation> FormationManager;
 #define formationManager FormationManager::Instance()
 
 }

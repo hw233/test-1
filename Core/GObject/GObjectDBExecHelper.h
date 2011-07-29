@@ -617,6 +617,16 @@ struct DBTripod
 	UInt8 awdst;
 };
 
+struct DBCopyData
+{
+    UInt64 playerId;
+    UInt8 id;
+    UInt8 floor;
+    UInt8 spot;
+    UInt8 freeCount;
+    UInt8 goldCount;
+};
+
 }
 
 namespace DB {
@@ -1376,6 +1386,18 @@ SPECIALDEF(5)
     UInt8, fire,
     UInt8, quality,
     UInt8, awdst
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBCopyData)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt8, id,
+    UInt8, floor,
+    UInt8, spot,
+    UInt8, freeCount,
+    UInt8, goldCount
 )
 SPECIALEND()
 

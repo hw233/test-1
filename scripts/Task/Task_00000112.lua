@@ -1,15 +1,25 @@
 --����Ľ�������
 function Task_Accept_00000112()
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
-		return false;
-	end
 	local task =  player:GetTaskMgr();
 	if task:HasAcceptedTask(112) or task:HasCompletedTask(112) or task:HasSubmitedTask(112) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(111) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(111) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(111) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -21,14 +31,24 @@ end
 function Task_Can_Accept_00000112()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if GetPlayerData(6) ~= 0 then
-		return false;
-	end
-	if player:GetLev() < 30 then
-		return false;
-	end
 	if task:HasAcceptedTask(112) or task:HasCompletedTask(112) or task:HasSubmitedTask(112) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(111) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(111) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(111) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -56,20 +76,20 @@ function Task_00000112(npcId)
 		action.m_ActionID = 112
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "112";
+		action.m_ActionMsg = "再战绿袍";
 	elseif task:GetTaskSubmitNpc(112) == npcId then
 		if Task_Submit_00000112() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 112
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "112";
+			action.m_ActionMsg = "再战绿袍";
 		elseif task:HasAcceptedTask(112) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 112
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "112";
+			action.m_ActionMsg = "再战绿袍";
 		end
 	end
 	return action;
@@ -83,8 +103,8 @@ function Task_00000112_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "齐漱溟让你去对话";
-	action.m_ActionMsg = "齐漱溟让你去对话";
+	action.m_NpcMsg = "我们已经布下两仪微尘大阵将绿袍的巢穴阴风洞团团围住，别说他有玄牝珠，这回就算他插翅也难逃一死，"..GetPlayerName(GetPlayer()).."你就和我们一道去灭此妖孽，也让你见识一下两仪微尘阵的玄奥之处。";
+	action.m_ActionMsg = "是吗，那太好了。";
 	return action;
 end
 
@@ -93,7 +113,7 @@ function Task_00000112_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "齐漱溟让你去对话";
+	action.m_NpcMsg = "如今绿袍得诛，算是功行圆满了。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -120,7 +140,6 @@ function Task_00000112_accept()
 	if not task:AcceptTask(112) then
 		return false;
 	end
-	task:AddTaskStep(112);
 	return true;
 end
 
@@ -129,17 +148,16 @@ end
 --�ύ����
 function Task_00000112_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(112) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(112);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(112) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(98888);
+	return true;
 end
 
 --��������

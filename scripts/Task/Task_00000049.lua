@@ -1,7 +1,7 @@
 --任务的接受条件
 function Task_Accept_00000049()
 	local player = GetPlayer();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 29 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -10,17 +10,17 @@ function Task_Accept_00000049()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
@@ -34,7 +34,7 @@ end
 function Task_Can_Accept_00000049()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 30 then
+	if player:GetLev() < 29 then
 		return false;
 	end
 	if task:HasAcceptedTask(49) or task:HasCompletedTask(49) or task:HasSubmitedTask(49) then
@@ -42,17 +42,17 @@ function Task_Can_Accept_00000049()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
@@ -173,7 +173,7 @@ function Task_00000049_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(1111);
+	player:AddExp(6000);
 	return true;
 end
 

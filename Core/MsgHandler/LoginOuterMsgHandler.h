@@ -350,7 +350,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		// UInt16 loc = (nu._country == 1) ? 0x0005 : 0x1002;
         // 先将_country移动置放置大地图id的高字节的高四位,然后+1初始化玩家的据点id
 #else
-		UInt16 loc = 0x0001;
+		UInt16 loc = 0x0002;
 #endif
 
         UInt8 country = COUNTRY_NEUTRAL; // XXX: 低级玩家暂时规为中立

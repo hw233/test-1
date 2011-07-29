@@ -77,7 +77,7 @@ struct DBAttrExtra
 
 struct DBFormation
 {
-	UInt32 id;
+	UInt8 id;
 	std::string name;
     UInt8 grid1;
     UInt32 prop1;
@@ -283,6 +283,14 @@ struct DBFighterProb
     Int32 gold;
 };
 
+struct DBCopy
+{
+    UInt8 id;
+    UInt8 floor;
+    UInt8 spot;
+    UInt32 fighterId;
+};
+
 }
 
 
@@ -372,7 +380,7 @@ SPECIALEND()
 SPECIALBEGIN(GData::DBFormation)
 SPECIALDEF(12)
 	(
-	UInt32, id,
+	UInt8, id,
 	std::string, name,
     UInt8, grid1,
     UInt32, prop1,
@@ -595,6 +603,15 @@ SPECIALDEF(3)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBCopy)
+SPECIALDEF(4)
+    (
+        UInt8, id,
+        UInt8, floor,
+        UInt8, spot, 
+        UInt32, fighterId
+    )
+SPECIALEND()
 }
 
 #endif // _GDATADBEXECHELPER_H_

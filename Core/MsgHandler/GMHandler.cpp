@@ -1948,8 +1948,9 @@ void GMHandler::OnSetCountry( GObject::Player * player, std::vector<std::string>
         PlayerData& pd = player->getPlayerData();
 
         GObject::Country& cny = CURRENT_COUNTRY();
-        CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
         cny.PlayerLeave(player);
+
+        CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
         GameMsgHdr hdr(0x1F0, country, player, sizeof(CountryEnterStruct));
         GLOBAL().PushMsg( hdr, &ces );
     }
