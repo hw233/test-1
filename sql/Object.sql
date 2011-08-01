@@ -1062,6 +1062,7 @@ CREATE TABLE `player_copy` (
   `spot` tinyint(3) unsigned NOT NULL,
   `freeCount` tinyint(3) unsigned NOT NULL,
   `goldCount` tinyint(3) unsigned NOT NULL,
+  `updatetime` int(10) unsigned NOT NULL,
   UNIQUE KEY `player_id` (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -20,52 +20,60 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
 
     CopyData& cd = getCopyData(pl, id, true);
     Stream st(0x67);
+    st << static_cast<UInt8>(0);
     st << id;
     st << cd.floor;
     st << cd.spot;
-    UInt8 count = 1-cd.freeCount;
+    UInt8 count = 2-cd.goldCount;
     count <<= 4;
-    count |= 2-cd.goldCount;
+    count |= 1-cd.freeCount;
     st << count;
     st << Stream::eos;
     pl->send(st);
 }
 
-void PlayerCopy::enter(Player* pl, UInt8 id, UInt8 type)
+void PlayerCopy::enter(Player* pl, UInt8 id)
 {
-    if (!pl)
+    if (!pl || !id)
         return;
 
     Stream st(0x67);
-    CopyData& tcd = getCopyData(pl, id);
-    if (type == 0) {
-        if (tcd.freeCount > 1) {
-            st << id << static_cast<UInt8>(1) << Stream::eos;
-            pl->send(st);
-            return;
-        }
+    CopyData& tcd = getCopyData(pl, id, true);
+
+    UInt8 ret = 1;
+    if (!tcd.floor) {
+        tcd.floor = 1;
+        tcd.spot = 1;
+    }
+    if (!tcd.freeCount) {
         ++tcd.freeCount;
-    } else if (type == 1) {
-        if (tcd.goldCount > 2 || pl->getGold() < 20) {
-            st << id << static_cast<UInt8>(1) << Stream::eos;
+        ret = 0;
+    } else if (tcd.goldCount < 2) {
+        if (tcd.goldCount > 2 || pl->getGold() < (UInt32)20*(tcd.goldCount+1)) {
+            st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
+
+            if (pl->getGold() < (UInt32)20*(tcd.goldCount+1))
+                pl->sendMsgCode(0, 1007);
             return;
         }
         ++tcd.goldCount;
 
         ConsumeInfo ci(EnterCopy,0,0);
-        pl->useGold(20);
+        pl->useGold(20*tcd.goldCount); // 第1次20,第2次40
+        ret = 0;
     }
 
-    DB().PushUpdateData("UPDATE `player_copy` SET `freeCount` = %u, `goldCount` = %u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.freeCount, tcd.goldCount, pl->getId(), id);
+    if (!ret)
+        DB().PushUpdateData("UPDATE `player_copy` SET `freeCount` = %u, `goldCount` = %u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.freeCount, tcd.goldCount, pl->getId(), id);
 
-    st << id << static_cast<UInt8>(0) << Stream::eos;
+    st << static_cast<UInt8>(1) << id << ret << Stream::eos;
     pl->send(st);
 }
 
 void PlayerCopy::fight(Player* pl, UInt8 id)
 {
-    if (!pl)
+    if (!pl || !id)
         return;
 
     CopyData& tcd = getCopyData(pl, id);
@@ -75,28 +83,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
-        GData::NpcGroups::iterator it = GData::npcGroups.find(fgtid);
-        if(it == GData::npcGroups.end())
-            return;
-
-        GData::NpcGroup* ng = it->second;
-        if (!ng) {
-            return;
-        }
-
-        Battle::BattleSimulator bsim(pl->getLocation(), pl, ng->getName(), ng->getLevel(), false, 0);
-        pl->PutFighters(bsim, 0);
-        ng->putFighters(bsim);
-
-        bsim.start();
-        Stream& st = bsim.getPacket();
-        if(st.size() <= 8)
-            return;
-
-        // TODO: loot
-        pl->send(st);
-
-        if (bsim.getWinner() == 1) {
+        if (pl->attackCopyNpc(fgtid)) {
             bool nextfloor = false;
             if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
                 nextfloor = true;
@@ -104,19 +91,24 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
             if (nextfloor) {
                 ++tcd.floor;
                 tcd.spot = 1;
-            }
+            } else
+                ++tcd.spot;
 
             if (tcd.floor > GData::copyMaxManager[id]) {
                 Stream st(0x67);
+                st << static_cast<UInt8>(5);
                 st << id;
                 st << Stream::eos;
                 pl->send(st);
             } else {
                 Stream st(0x67);
+                st << static_cast<UInt8>(6);
                 st << id << tcd.floor << tcd.spot;
                 st << Stream::eos;
                 pl->send(st);
             }
+
+            DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, pl->getId(), id);
         }
     }
 }
@@ -130,18 +122,18 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
     CopyData& tcd = getCopyData(pl, id);
     if (!tcd.floor)
     {
-        st << id << static_cast<UInt8>(1) << Stream::eos;
+        st << static_cast<UInt8>(2) << id << static_cast<UInt8>(1) << Stream::eos;
         pl->send(st);
         return;
     }
 
     tcd.floor = 1;
     tcd.spot = 1;
-    ++tcd.freeCount;
-    DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
-            pl->getId(), tcd.floor, tcd.spot, id);
+    tcd.freeCount = 1;
+    DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u,`freeCount`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
+            tcd.floor, tcd.spot, tcd.freeCount, pl->getId(), id);
 
-    st << id << static_cast<UInt8>(0) << Stream::eos;
+    st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);
 }
 
@@ -167,10 +159,15 @@ CopyData& PlayerCopy::getCopyData(UInt64 playerId, UInt8 id, bool update)
     static CopyData nulldata;
     CopyData& cd = m_copys[playerId][id];
     if (!cd.floor) {
-        cd.floor = 1;
-        cd.spot = 1;
+        cd.updatetime = TimeUtil::Now();
         if (update)
-            DB().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`, `freeCount`, `goldCount`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", playerId, id, cd.floor, cd.spot, cd.freeCount, cd.goldCount);
+            DB().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`, `freeCount`, `goldCount`, `updatetime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", playerId, id, cd.floor, cd.spot, cd.freeCount, cd.goldCount, TimeUtil::Now());
+    } else {
+        if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(cd.updatetime)) {
+            cd.updatetime = TimeUtil::Now();
+            cd.freeCount = 0;
+            cd.goldCount = 0;
+        }
     }
     return cd;
 }

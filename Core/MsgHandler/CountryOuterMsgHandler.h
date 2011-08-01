@@ -652,7 +652,9 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
  	MSG_QUERY_PLAYER(player);
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 cyc = 0;
 	UInt8 type = 0;
+    br >> cyc;
 	br >> type;
 	UInt8 color = 0;
 	UInt16 count = 1;
@@ -670,7 +672,7 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 		break;
 	}
 
-	player->flushTaskColor(0, type, color, count);
+	player->flushTaskColor(cyc, type, color, count);
 }
 
 struct DayTaskAutoCompletedReq

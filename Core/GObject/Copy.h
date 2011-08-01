@@ -18,6 +18,7 @@ struct CopyData
     UInt8 spot;
     UInt8 freeCount;
     UInt8 goldCount;
+    UInt32 updatetime;
 };
 
 class Player;
@@ -28,7 +29,7 @@ public:
 
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
-    void enter(Player* pl, UInt8 id, UInt8 type);
+    void enter(Player* pl, UInt8 id);
     void fight(Player* pl, UInt8 id);
     void reset(Player* pl, UInt8 id);
 

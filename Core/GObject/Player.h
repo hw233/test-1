@@ -579,6 +579,7 @@ namespace GObject
 		//’Ω∂∑œ‡πÿ
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false);
+        bool attackCopyNpc(UInt32);
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
