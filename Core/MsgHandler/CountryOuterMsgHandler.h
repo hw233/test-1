@@ -1892,7 +1892,8 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
             succ = player->finishClanTask(req.m_TaskId);
             if (succ)
                 player->useGold(1);
-        }
+        } else
+            player->sendMsgCode(0, 1007);
         break;
 	default:
 		return ;
