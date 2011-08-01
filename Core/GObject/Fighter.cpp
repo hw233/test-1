@@ -2343,12 +2343,13 @@ void GlobalFighters::buildSummonSet()
         UInt8 color = fgt->getColor();
         switch(color)
         {
+        case 0:
         case 1:
         case 2:
         case 3:
         case 4:
-            _summonSet[0][color - 1][i] = it->second.free;
-            _summonSet[1][color - 1][i] = it->second.gold;
+            _summonSet[0][color][i] = it->second.free;
+            _summonSet[1][color][i] = it->second.gold;
             break;
         }
     }

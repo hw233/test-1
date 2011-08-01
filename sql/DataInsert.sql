@@ -103,6 +103,10 @@ LOCK TABLES `clan_tech_template` WRITE;
 source clantech
 UNLOCK TABLES;
 
+LOCK TABLES `clan_lvl` WRITE;
+source clanlvl
+UNLOCK TABLES;
+
 
 LOCK TABLES `dungeon` WRITE;
 source dungeon

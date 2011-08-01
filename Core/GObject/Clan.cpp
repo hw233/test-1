@@ -54,8 +54,8 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 	return member->player->getId() == id;
 }
 
-Clan::Clan( UInt32 id, const std::string& name, UInt32 ft ) :
-	GObjectBaseT<Clan>(id), _name(name), _rank(0), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
+Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
+	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
     _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0)
 {
@@ -800,7 +800,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			// updateRank(mem, oldLeaderName);
 			{
 				Stream st;
-				SYSMSGVP(st, 429, mem->player->getName().c_str(), count);
+				SYSMSGVP(st, 430, mem->player->getName().c_str(), count);
 				broadcast(st);
 			}
 			setProffer(getProffer()+count);
@@ -813,9 +813,6 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
             // °ïÅÉ×Ê½ð
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 			// updateRank(mem, oldLeaderName);
-			Stream st;
-			SYSMSGVP(st, 430, mem->player->getName().c_str(), count);
-			broadcast(st);
 		}
 		else
 		{
@@ -2339,8 +2336,8 @@ void Clan::sendPracticePlaceInfo(Player* pl)
 
     Stream st(0x9B);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
-        << pd->place.slotmoney << pd->place.protmoney << pd->place.slotincoming << pd->place.protincoming
-        << pd->place.enemyCount << pd->place.winCount << place;
+        << static_cast<UInt8>(pd->place.slotmoney) << static_cast<UInt8>(pd->place.protmoney) << pd->place.slotincoming << pd->place.protincoming
+        << pd->place.enemyCount - pd->place.winCount << pd->place.winCount << place;
 
     st << Stream::eos;
     pl->send(st);

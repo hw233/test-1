@@ -229,7 +229,7 @@ void OnClanTechDonateCheckResp( GameMsgHdr& hdr, const void * data )
 	struct DonateItems
 	{
 		UInt8  techId;
-		UInt16 flag;
+		UInt8 flag;
 		UInt32 count;
 		UInt8 ret;
 	};

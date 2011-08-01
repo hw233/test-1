@@ -53,7 +53,7 @@ public:
 	void addTech(UInt8, UInt16, UInt8, UInt16);
 	UInt8 getLev(UInt8);
 	Int32 getExtra(UInt8);
-	inline UInt8 getClanLev() { return getLev(1); }
+	inline UInt8 getClanLev();
 	bool isTechFull(UInt8);
 
 	bool addAchieve(UInt16);

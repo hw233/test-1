@@ -214,7 +214,7 @@ DROP TABLE IF EXISTS `clan_donate_record`;
 CREATE TABLE `clan_donate_record` (
   `clanId` int(10) unsigned NOT NULL,
   `donateName` varchar(255) NOT NULL DEFAULT '',
-  `skillId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `techId` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `donateCount` int(10) unsigned NOT NULL DEFAULT '0',
   `donateTime` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1064,4 +1064,20 @@ CREATE TABLE `player_copy` (
   `goldCount` tinyint(3) unsigned NOT NULL,
   UNIQUE KEY `player_id` (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `attainment`
+--
+
+DROP TABLE IF EXISTS `attainment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attainment` (
+  `ownerId` bigint(20) unsigned NOT NULL,
+  `attainId` int(10) unsigned NOT NULL,
+  `status` int(10) unsigned NOT NULL,
+  `updatetime` int(10) unsigned NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 

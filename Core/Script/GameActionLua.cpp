@@ -7,6 +7,7 @@
 #include "GObject/TaskMgr.h"
 #include "GObject/Package.h"
 #include "GObject/MOAction.h"
+#include "GObject/AttainMgr.h"
 
 #include "GObject/Country.h"
 #include "Log/Log.h"
@@ -176,6 +177,7 @@ namespace Script
         CLASS_DEF(Player, isClanTask);
         CLASS_DEF(Player, AddClanBuilding);
         CLASS_DEF(Player, AddClanContrib);
+		CLASS_DEF(Player, GetAttainMgr);
 		
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -233,6 +235,14 @@ namespace Script
 		CLASS_DEF(TaskMgr, DelCanAcceptTask2);
 		CLASS_DEF(TaskMgr, SendCanAcceptTaskInfor);
 
+        // 成就达成
+		CLASS_ADD(AttainMgr);
+        CLASS_DEF(AttainMgr, HasFinishAttainment);
+        CLASS_DEF(AttainMgr, HasAttained);
+        CLASS_DEF(AttainMgr, UpdateAttainment);
+        CLASS_DEF(AttainMgr, getAttainStatus);
+        CLASS_DEF(AttainMgr, MidnightCheckAttain);
+        CLASS_DEF(AttainMgr, CanAttain);
 
 		//背包
 		CLASS_ADD(Package);
@@ -812,6 +822,7 @@ namespace Script
 	void GameActionLua::onLevelup( Player* player, UInt8 olev, UInt8 nlev )
 	{
 		Call<void>("onLevelup", player, olev, nlev);
+        doAttainment(player, 1000, nlev);
 	}
 
 	void GameActionLua::onEnchant( Player* player, UInt8 level )
@@ -866,4 +877,8 @@ namespace Script
 	{
 		Call<void>("onMergeGem", player, lev, num);
 	}
+    void GameActionLua::doAttainment(Player* pl, UInt16 attainId, UInt32 param)
+    {
+        Call<void>("doAttainment", pl, attainId, param);
+    }
 }

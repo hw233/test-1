@@ -113,7 +113,7 @@ class Clan:
 	};
 	typedef std::multiset<ClanMember *, MemberLess> Members;
 public:
-	Clan( UInt32 id, const std::string& name, UInt32 ft = 0 );
+	Clan( UInt32 id, const std::string& name, UInt32 ft = 0, UInt8 lvl = 1 );
 	~Clan();
 	inline void patchMergedName() { patchMergedName(_id, _name); }
 	static void patchMergedName(UInt32 id, std::string& name);

@@ -74,6 +74,7 @@ namespace GObject
 	class MailBox;
 	class Athletics;
     struct PracticeData;
+    class AttainMgr;
 
 	class EventAutoBattle : public EventBase
 	{
@@ -613,6 +614,7 @@ namespace GObject
 		Package* GetPackage() { return m_Package; }
 		TaskMgr* GetTaskMgr() { return m_TaskMgr; }
 		MailBox* GetMailBox() { return m_MailBox; }
+		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
 
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
@@ -756,6 +758,8 @@ namespace GObject
 		Trade* m_Trade;
 		Sale* m_Sale;
 		Athletics* m_Athletics;
+
+		AttainMgr* m_AttainMgr;
 
 		MailBox* m_MailBox;
 

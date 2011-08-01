@@ -373,7 +373,7 @@ struct DBClanDonateRecord
 {
 	UInt32 clanId;
 	std::string doanteName;
-	UInt8 skillId;
+	UInt8 techId;
 	UInt16 donateCount;
 	UInt32 donateTime;
 };
@@ -625,6 +625,14 @@ struct DBCopyData
     UInt8 spot;
     UInt8 freeCount;
     UInt8 goldCount;
+};
+
+struct DBAttainData
+{
+    UInt64 ownerId;
+    UInt32 attainId;
+    UInt32 status;
+    UInt32 updatetime;
 };
 
 }
@@ -1013,7 +1021,7 @@ SPECIALDEF(5)
 (
 	UInt32, clanId,
 	std::string, doanteName,
-	UInt8, skillId,
+	UInt8, techId,
 	UInt16, donateCount,
 	UInt32, donateTime
 )
@@ -1398,6 +1406,16 @@ SPECIALDEF(6)
     UInt8, spot,
     UInt8, freeCount,
     UInt8, goldCount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAttainData)
+SPECIALDEF(4)
+(
+    UInt64, ownerId,
+    UInt32, attainId,
+    UInt32, status,
+    UInt32, updatetime
 )
 SPECIALEND()
 

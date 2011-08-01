@@ -17,6 +17,7 @@
 #include "Mail.h"
 #include "Package.h"
 #include "TaskMgr.h"
+#include "AttainMgr.h"
 #include "Trade.h"
 #include "SaleMgr.h"
 #include "AthleticsRank.h"
@@ -1380,6 +1381,33 @@ namespace GObject
 			player->setTicketCount(det.count, false);
 		}
 		lc.finalize();
+
+        // Load player attainment
+		lc.prepare("Loading player attainment:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBAttainData dadata;
+		if(execu->Prepare("SELECT `ownerId`, `attainId`, `status`, `updatetime` FROM `attainment` ORDER BY `ownerId`, `attainId`", dadata) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dadata.ownerId != last_id)
+			{
+				last_id = dadata.ownerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			AttainData* attain = new AttainData();
+			attain->ownerId = dadata.ownerId;
+			attain->attainId = dadata.attainId;
+			attain->status = dadata.status;
+			attain->updatetime = dadata.updatetime;
+			pl->GetAttainMgr()->LoadAttain(attain);
+		}
+		lc.finalize();
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
@@ -1823,7 +1851,7 @@ namespace GObject
 			lc.advance();
 			if (cl.id != 0)
 			{
-				clan = new Clan(cl.id, cl.name, cl.foundTime);
+				clan = new Clan(cl.id, cl.name, cl.foundTime, cl.level );
 				clanBattle = clan->getClanBattle();
 				clan->setContact(cl.contact, false);
 				clan->setAnnounce(cl.announce, false);
@@ -2015,7 +2043,7 @@ namespace GObject
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
 		DBClanDonateRecord ddr;
-		if (execu->Prepare("SELECT `clanId`, `donateName`, `skillId`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
+		if (execu->Prepare("SELECT `clanId`, `donateName`, `techId`, `donateCount`, `donateTime` FROM `clan_donate_record` ORDER BY `clanId`, `donateTime`", ddr) != DB::DB_OK)
 			return false;
 		lc.reset(200);
 		while (execu->Next() == DB::DB_OK)
@@ -2028,7 +2056,7 @@ namespace GObject
 				DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u", ddr.clanId);
 				continue;
 			}
-			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.skillId, ddr.donateCount, ddr.donateTime);
+			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.techId, ddr.donateCount, ddr.donateTime);
 		}
 		lc.finalize();
 
@@ -2622,12 +2650,12 @@ namespace GObject
             if (ppd->checktime)
             {
                 pl->setPracticingPlaceSlot(pd.place << 16 | pd.slot);
-                practicePlace.addPractice(pl, ppd, pd.place);
+                practicePlace.addPractice(pl, ppd, pd.place, pd.slot);
             }
             else
             {
                 pl->setPracticingPlaceSlot(0 << 16);
-                practicePlace.addPractice(pl, ppd, PPLACE_MAX);
+                practicePlace.addPractice(pl, ppd, PPLACE_MAX, pd.slot);
             }
         }
 		lc.finalize();
