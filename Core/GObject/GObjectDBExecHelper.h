@@ -627,6 +627,14 @@ struct DBCopyData
     UInt8 goldCount;
 };
 
+struct DBAttainData
+{
+    UInt64 ownerId;
+    UInt32 attainId;
+    UInt32 status;
+    UInt32 updatetime;
+};
+
 }
 
 namespace DB {
@@ -1398,6 +1406,16 @@ SPECIALDEF(6)
     UInt8, spot,
     UInt8, freeCount,
     UInt8, goldCount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAttainData)
+SPECIALDEF(4)
+(
+    UInt64, ownerId,
+    UInt32, attainId,
+    UInt32, status,
+    UInt32, updatetime
 )
 SPECIALEND()
 

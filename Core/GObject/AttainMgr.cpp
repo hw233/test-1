@@ -88,10 +88,12 @@ namespace GObject
             ad->status = status;
             ad->updatetime = TimeUtil::Now();
             m_AttainList[attainId] = ad;
+            DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%"I64_FMT"u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, ad->updatetime);
         }
         else
         {
             it->second->status = status;
+            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u WHERE `ownerId` = %u AND `attainId` = %u", it->second->status, it->second->ownerId, it->second->attainId);
         }
     }
 

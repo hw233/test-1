@@ -1065,3 +1065,19 @@ CREATE TABLE `player_copy` (
   UNIQUE KEY `player_id` (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Table structure for table `attainment`
+--
+
+DROP TABLE IF EXISTS `attainment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attainment` (
+  `ownerId` bigint(20) unsigned NOT NULL,
+  `attainId` int(10) unsigned NOT NULL,
+  `status` int(10) unsigned NOT NULL,
+  `updatetime` int(10) unsigned NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+

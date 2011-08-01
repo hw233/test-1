@@ -17,6 +17,7 @@
 #include "Mail.h"
 #include "Package.h"
 #include "TaskMgr.h"
+#include "AttainMgr.h"
 #include "Trade.h"
 #include "SaleMgr.h"
 #include "AthleticsRank.h"
@@ -1378,6 +1379,33 @@ namespace GObject
 			if(player == NULL)
 				continue;
 			player->setTicketCount(det.count, false);
+		}
+		lc.finalize();
+
+        // Load player attainment
+		lc.prepare("Loading player attainment:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBAttainData dadata;
+		if(execu->Prepare("SELECT `ownerId`, `attainId`, `status`, `updatetime` FROM `attainment` ORDER BY `ownerId`, `attainId`", dadata) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dadata.ownerId != last_id)
+			{
+				last_id = dadata.ownerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			AttainData* attain = new AttainData();
+			attain->ownerId = dadata.ownerId;
+			attain->attainId = dadata.attainId;
+			attain->status = dadata.status;
+			attain->updatetime = dadata.updatetime;
+			pl->GetAttainMgr()->LoadAttain(attain);
 		}
 		lc.finalize();
 		/////////////////////////////////
