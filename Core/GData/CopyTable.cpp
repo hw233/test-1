@@ -5,6 +5,7 @@ namespace GData
 {
 
 CopyManager copyManager;
+CopyMaxManager copyMaxManager;
 
 } 
 

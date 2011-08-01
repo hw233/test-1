@@ -583,7 +583,7 @@ CREATE TABLE `copy` (
   `floor` tinyint(3) unsigned NOT NULL,
   `spot` tinyint(3) unsigned NOT NULL,
   `fighterId` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`, `floor`)
+  PRIMARY KEY (`id`, `floor`, `spot`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Dump completed

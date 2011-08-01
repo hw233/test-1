@@ -29,10 +29,12 @@ public:
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
     void enter(Player* pl, UInt8 id, UInt8 type);
-    void next(Player* pl, UInt8 id);
+    void fight(Player* pl, UInt8 id);
     void reset(Player* pl, UInt8 id);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 free, UInt8 gold);
+    CopyData& getCopyData(Player* pl, UInt8 id, bool update = false);
+    CopyData& getCopyData(UInt64 playerId, UInt8 id, bool update = false);
 
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;
