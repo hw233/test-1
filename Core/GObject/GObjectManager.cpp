@@ -244,8 +244,19 @@ namespace GObject
 #if 0
             if (mos.m_ID == 4114) // XXX: ÃÏ√…Ï¯ ¶
                 mos.m_Hide = true;
-            else
+#else
+            if (mos.m_ID == 5006 ||
+                mos.m_ID == 5049 ||
+                mos.m_ID == 5092 ||
+                mos.m_ID == 5088 ||
+                mos.m_ID == 5091 ||
+                mos.m_ID == 5097 ||
+                mos.m_ID == 5172 ||
+                mos.m_ID == 5272
+                )
+                mos.m_Hide = true;
 #endif
+            else
                 mos.m_Hide = false;
 			if(map == NULL)
 			{
