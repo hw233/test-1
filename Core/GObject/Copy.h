@@ -33,9 +33,9 @@ public:
     void fight(Player* pl, UInt8 id);
     void reset(Player* pl, UInt8 id);
 
-    void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 free, UInt8 gold);
+    void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot);
     CopyData& getCopyData(Player* pl, UInt8 id, bool update = false);
-    CopyData& getCopyData(UInt64 playerId, UInt8 id, bool update = false);
+    CopyData& getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool update = false);
 
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;

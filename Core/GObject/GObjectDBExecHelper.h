@@ -623,8 +623,6 @@ struct DBCopyData
     UInt8 id;
     UInt8 floor;
     UInt8 spot;
-    UInt8 freeCount;
-    UInt8 goldCount;
 };
 
 struct DBAttainData
@@ -685,7 +683,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(34)
+SPECIALDEF(36)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -717,6 +715,8 @@ SPECIALDEF(34)
 	std::string, shimen,
 	std::string, yamen,
     std::string, clantask,
+	UInt8, pdata.copyFreeCnt,
+	UInt8, pdata.copyGoldCnt,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
 	UInt32, pdata.created,
@@ -1398,14 +1398,12 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBCopyData)
-SPECIALDEF(6)
+SPECIALDEF(4)
 (
     UInt64, playerId,
     UInt8, id,
     UInt8, floor,
-    UInt8, spot,
-    UInt8, freeCount,
-    UInt8, goldCount
+    UInt8, spot
 )
 SPECIALEND()
 
