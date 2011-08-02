@@ -3211,6 +3211,7 @@ namespace GObject
     void Player::sendColorTask(UInt8 ttype, UInt16 ncount)
     {
         Stream st(0x8B);
+        st << ttype;
         if (ttype == 0) 
         {
             st <<  ncount << _playerData.smFinishCount;

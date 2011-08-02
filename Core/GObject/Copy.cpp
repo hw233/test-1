@@ -26,7 +26,7 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << cd.spot;
     UInt8 count = 2-cd.goldCount;
     count <<= 4;
-    count |= 1-cd.freeCount;
+    count |= 3-cd.freeCount;
     st << count;
     st << Stream::eos;
     pl->send(st);
@@ -45,7 +45,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         tcd.floor = 1;
         tcd.spot = 1;
     }
-    if (!tcd.freeCount) {
+    if (tcd.freeCount < 3) {
         ++tcd.freeCount;
         ret = 0;
     } else if (tcd.goldCount < 2) {
@@ -77,7 +77,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
         return;
 
     CopyData& tcd = getCopyData(pl, id);
-    if (tcd.freeCount > 1 || tcd.goldCount > 2) {
+    if (tcd.freeCount > 3 || tcd.goldCount > 2) {
         return;
     }
 
