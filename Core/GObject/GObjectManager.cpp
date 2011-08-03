@@ -251,8 +251,19 @@ namespace GObject
 #if 0
             if (mos.m_ID == 4114) // XXX: ÃÏ√…Ï¯ ¶
                 mos.m_Hide = true;
-            else
+#else
+            if (mos.m_ID == 5006 ||
+                mos.m_ID == 5049 ||
+                mos.m_ID == 5092 ||
+                mos.m_ID == 5088 ||
+                mos.m_ID == 5091 ||
+                mos.m_ID == 5097 ||
+                mos.m_ID == 5172 ||
+                mos.m_ID == 5272
+                )
+                mos.m_Hide = true;
 #endif
+            else
                 mos.m_Hide = false;
 			if(map == NULL)
 			{
@@ -298,11 +309,11 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBCopyData dbcd;
-		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot`, `freeCount`, `goldCount` FROM `player_copy` ORDER BY playerId,id", dbcd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot` FROM `player_copy` ORDER BY playerId,id", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot, dbcd.freeCount, dbcd.goldCount);
+            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot);
         }
         return true;
     }
@@ -676,7 +687,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `yamen`, `clantask`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `yamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);

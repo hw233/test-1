@@ -1480,6 +1480,70 @@ namespace GObject
 		return res;
 	}
 
+	bool Player::attackCopyNpc( UInt32 npcId )
+	{
+		checkLastBattled();
+		UInt32 now = TimeUtil::Now();
+		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+        //TODO::bufLeft=0
+        buffLeft = 0;
+		if(buffLeft > now)
+		{
+			sendMsgCode(0, 2035, buffLeft - now);
+			return false;
+		}
+		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+		if(it == GData::npcGroups.end())
+			return false;
+
+		GData::NpcGroup * ng = it->second;
+
+		Battle::BattleSimulator bsim(_playerData.location, this, ng->getName(), ng->getLevel(), false);
+		PutFighters( bsim, 0 );
+		ng->putFighters( bsim );
+		bsim.start();
+		Stream& packet = bsim.getPacket();
+		if(packet.size() <= 8)
+			return false;
+
+		Stream st(0x61);
+		bool res = bsim.getWinner() == 1;
+		if(res)
+		{
+			st << static_cast<UInt16>(0x0101);
+			_lastNg = ng;
+			if(getBuffData(PLAYER_BUFF_TRAINP3, now))
+				pendExp(ng->getExp() * 17 / 10);
+			else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
+				pendExp(ng->getExp() * 3 / 2);
+			else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
+				pendExp(ng->getExp() * 3 / 2);
+			else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
+				pendExp(ng->getExp() * 13 / 10);
+			else
+				pendExp(ng->getExp());
+			ng->getLoots(this, _lastLoot);
+		}
+		else
+			st << static_cast<UInt16>(0x0100);
+		st << _playerData.lastExp << static_cast<UInt8>(0);
+		UInt8 sz = _lastLoot.size();
+		st << sz;
+		for(UInt8 i = 0; i < sz; ++ i)
+		{
+			st << _lastLoot[i].id << _lastLoot[i].count;
+		}
+		st.append(&packet[8], packet.size() - 8);
+		st << Stream::eos;
+		send(st);
+
+		if(!res)
+			checkDeath();
+
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
+		return res;
+	}
+
 	bool Player::autoBattle( UInt32 npcId )
 	{
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
@@ -2862,17 +2926,17 @@ namespace GObject
         }
         if (type == 5)
         {
-        for (int i = 0; i < 6; ++i)
-        {
-            if (_playerData.yamen[i] == taskid)
+            for (int i = 0; i < 6; ++i)
             {
-                //_playerData.yamen[i] = 0;
-                _playerData.ymcolor[i] |= 0xF0;
-                ++_playerData.ymAcceptCount;
-                sendColorTask(1, 0);
-                return;
+                if (_playerData.yamen[i] == taskid)
+                {
+                    //_playerData.yamen[i] = 0;
+                    _playerData.ymcolor[i] |= 0xF0;
+                    ++_playerData.ymAcceptCount;
+                    sendColorTask(1, 0);
+                    return;
+                }
             }
-        }
         }
     }
 
@@ -3147,6 +3211,7 @@ namespace GObject
     void Player::sendColorTask(UInt8 ttype, UInt16 ncount)
     {
         Stream st(0x8B);
+        st << ttype;
         if (ttype == 0) 
         {
             st <<  ncount << _playerData.smFinishCount;

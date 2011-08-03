@@ -653,7 +653,9 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
  	MSG_QUERY_PLAYER(player);
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 cyc = 0;
 	UInt8 type = 0;
+    br >> cyc;
 	br >> type;
 	UInt8 color = 0;
 	UInt16 count = 1;
@@ -671,7 +673,7 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 		break;
 	}
 
-	player->flushTaskColor(0, type, color, count);
+	player->flushTaskColor(cyc, type, color, count);
 }
 
 struct DayTaskAutoCompletedReq
@@ -1911,7 +1913,8 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
             succ = player->finishClanTask(req.m_TaskId);
             if (succ)
                 player->useGold(1);
-        }
+        } else
+            player->sendMsgCode(0, 1007);
         break;
 	default:
 		return ;

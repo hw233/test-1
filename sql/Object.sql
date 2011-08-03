@@ -807,6 +807,8 @@ CREATE TABLE `player` (
   `shimen` varchar(255) NOT NULL DEFAULT '',
   `yamen` varchar(255) NOT NULL DEFAULT '',
   `clantask` varchar(255) NOT NULL DEFAULT '',
+  `copyFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
+  `copyGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -1060,8 +1062,6 @@ CREATE TABLE `player_copy` (
   `id` tinyint(3) unsigned NOT NULL,
   `floor` tinyint(3) unsigned NOT NULL,
   `spot` tinyint(3) unsigned NOT NULL,
-  `freeCount` tinyint(3) unsigned NOT NULL,
-  `goldCount` tinyint(3) unsigned NOT NULL,
   UNIQUE KEY `player_id` (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

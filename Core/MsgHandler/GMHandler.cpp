@@ -26,6 +26,7 @@
 #include "Common/StringTokenizer.h"
 #include "CountryMsgStruct.h"
 #include "GObject/PracticePlace.h"
+#include "GObject/Copy.h"
 
 GMHandler gmHandler;
 
@@ -117,6 +118,7 @@ GMHandler::GMHandler()
 	Reg(3, "setacu", &GMHandler::OnSetAcu);
 	Reg(3, "useitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
+    Reg(3, "ec", &GMHandler::OnEnterCopy);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2023,5 +2025,14 @@ void GMHandler::OnOcupyPlace(GObject::Player * player, std::vector<std::string>&
     UInt8 place = atoi(args[1].c_str());
 
     practicePlace.ocupyPlace(pl, place);
+}
+
+void GMHandler::OnEnterCopy(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(!player || args.size() < 1)
+        return;
+
+    UInt8 id = atoi(args[0].c_str());
+    playerCopy.enter(player, id);
 }
 

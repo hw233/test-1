@@ -124,6 +124,10 @@ LOCK TABLES `formation` WRITE;
 source formation
 UNLOCK TABLES;
 
+LOCK TABLES `copy` WRITE;
+source copy
+UNLOCK TABLES;
+
 -- ASSS
 use asss;
 LOCK TABLES `practice_place` WRITE;

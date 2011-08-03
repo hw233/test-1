@@ -26,6 +26,7 @@
 #include "GObject/Mail.h"
 #include "GObject/ClanManager.h"
 #include "GObject/PracticePlace.h"
+#include "GObject/Copy.h"
 
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
@@ -233,6 +234,13 @@ struct ArenaEliminationReq
 {
 	UInt8 group;
 	MESSAGE_DEF1(0xEB, UInt8, group);
+};
+
+struct CopyReq
+{
+    UInt8 type;
+    UInt8 id;
+	MESSAGE_DEF2(0x67, UInt8, type, UInt8, id);
 };
 
 void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
@@ -1153,6 +1161,34 @@ void OnPracticeStopReq( GameMsgHdr& hdr, PracticeStopReq& req)
 {
 	MSG_QUERY_PLAYER(player);
 	GObject::practicePlace.stop(player);
+}
+
+void OnCopyReq( GameMsgHdr& hdr, CopyReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+    switch (req.type) {
+        case 0:
+            GObject::playerCopy.sendInfo(player, req.id);
+            break;
+
+        case 1:
+            GObject::playerCopy.enter(player, req.id);
+            break;
+
+        case 2:
+            GObject::playerCopy.reset(player, req.id);
+            break;
+
+        case 3:
+            break;
+
+        case 4:
+            GObject::playerCopy.fight(player, req.id);
+            break;
+
+        default:
+            break;
+    }
 }
 
 void OnAthleticsListReq( GameMsgHdr& hdr, AthleticsListReq&)

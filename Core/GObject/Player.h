@@ -192,7 +192,7 @@ namespace GObject
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0),
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
-			created(0), lockExpireTime(0), wallow(1), battlecdtm(0)
+			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), copyFreeCnt(0), copyGoldCnt(0)
 		{
             memset(tavernId, 0, sizeof(tavernId));
             memset(shimen, 0, sizeof(shimen));
@@ -251,6 +251,8 @@ namespace GObject
 		UInt32 lockExpireTime;      // 
 		UInt8 wallow;               // 
 		UInt32 battlecdtm;          // 
+        UInt8 copyFreeCnt;          // 副本免费次数
+        UInt8 copyGoldCnt;          // 副本收费次数
 	};
 
 	class Player:
@@ -579,6 +581,7 @@ namespace GObject
 		//战斗相关
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false);
+        bool attackCopyNpc(UInt32);
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
 		void pushAutoDungeon(UInt32, UInt32, UInt8);

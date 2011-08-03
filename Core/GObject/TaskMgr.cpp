@@ -423,8 +423,7 @@ namespace GObject
 
 	bool TaskMgr::TaskCanAccept(UInt32 taskId)
 	{
-		return GameAction()->CheckTaskAcceptCondition(m_PlayerOwner, taskId) &&
-            !isShiMenTask(taskId) && !isYaMenTask(taskId);
+		return GameAction()->CheckTaskAcceptCondition(m_PlayerOwner, taskId) && !isShiMenTask(taskId) && !isYaMenTask(taskId);
 	}
 
 	TaskData TaskMgr::GetTaskData(UInt32 taskId)
@@ -436,6 +435,7 @@ namespace GObject
 
 	bool TaskMgr::isShiMenTask(UInt32 taskid)
     {
+#if 0
         const std::vector<UInt32>& ids = GData::GDataManager::GetShiMenTask(m_PlayerOwner->getCountry());
         UInt32* pid = (UInt32*)&ids[0];
         size_t size = ids.size();
@@ -445,10 +445,17 @@ namespace GObject
                 return true;
         }
         return false;
+#else
+        const TaskType& taskType= GDataManager::GetTaskTypeData(taskid);
+        if (taskType.m_Class == 4)
+            return true;
+        return false;
+#endif
     }
 
 	bool TaskMgr::isYaMenTask(UInt32 taskid)
     {
+#if 0
         const std::vector<UInt32>& ids = GData::GDataManager::GetYaMenTask(m_PlayerOwner->getCountry());
         UInt32* pid = (UInt32*)&ids[0];
         size_t size = ids.size();
@@ -458,6 +465,12 @@ namespace GObject
                 return true;
         }
         return false;
+#else
+        const TaskType& taskType= GDataManager::GetTaskTypeData(taskid);
+        if (taskType.m_Class == 5)
+            return true;
+        return false;
+#endif
     }
 
 	void TaskMgr::CheckCanAcceptTaskByLev(UInt16 lev, bool notify)

@@ -40,6 +40,7 @@ enum PurchaseType
 	PurchaseBook,
     Practice,
     AddPracticeSlot,
+    EnterCopy,
 };
 
 enum MoneyType

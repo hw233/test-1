@@ -13,6 +13,9 @@ namespace GData
 typedef std::map<UInt16, std::vector<UInt32> > CopyManager;
 extern CopyManager copyManager;
 
+typedef std::map<UInt8, UInt8> CopyMaxManager;
+extern CopyMaxManager copyMaxManager;
+
 } // namespace GData
 
 #endif // COPYTABLE_H_

@@ -176,6 +176,12 @@ namespace GData
 			fprintf(stderr, "Load fighter prob template Error !\n");
 			return false;
 		}
+		if (!LoadCopyData())
+		{
+			fprintf(stderr, "Load copy data template Error !\n");
+			return false;
+		}
+
 
 		return true;
 	}	
@@ -1123,14 +1129,31 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBCopy dbc;
-		if(execu->Prepare("SELECT `id`, `floor`, `spot`, `fighterId` FROM `copy`", dbc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `floor`, `spot`, `fighterId` FROM `copy` ORDER BY `id`,`floor`,`spot`", dbc) != DB::DB_OK)
 			return false;
+
+        bool nextcopy = false;
+        bool first = true;
+        int id = 0;
+        int floor = 0;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if (!first && id != dbc.id)
+                nextcopy = true;
+
+            if (nextcopy) {
+                copyMaxManager[id] = floor;
+                nextcopy = false;
+            }
+
             std::vector<UInt32>& cpv = copyManager[dbc.id<<8|dbc.floor];
-            if (cpv.size() < dbc.spot)
-                cpv.resize(dbc.spot, 0);
+            if (cpv.size() <= dbc.spot)
+                cpv.resize(dbc.spot+1, 0);
             cpv[dbc.spot] = dbc.fighterId;
+
+            id = dbc.id;
+            floor = dbc.floor;
+            first = false;
         }
         return true;
     }
