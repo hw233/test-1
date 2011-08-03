@@ -192,6 +192,7 @@ namespace Script
     // 成就达成
     public:
         void doAttainment(Player* pl, UInt16 attainId, UInt32 param);
+        void finishAttainment(Player* pl, UInt16 attainId);
 
 	private:
 		Player* _player1;	//脚本动作行为主体1

@@ -4885,5 +4885,6 @@ namespace GObject
         }
         return 0.0;
     }
+
 }
 

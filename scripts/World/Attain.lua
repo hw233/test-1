@@ -5,14 +5,14 @@ local attained = -2         --0xfffffffe
 -- 等级
 function Level40( player )
     if player:GetAttainMgr():CanAttain(1000) then
-        player:GetAttainMgr():UpdateAttainment( player, 1000, attained)
+        player:GetAttainMgr():UpdateAttainment( 1000, attained)
     end
 end
 
 function Level50( player )
     Level40( player )
     if player:GetAttainMgr():CanAttain(1001) then
-        player:GetAttainMgr():UpdateAttainment( player, 1001, attained)
+        player:GetAttainMgr():UpdateAttainment( 1001, attained)
     end
 end
 
@@ -20,7 +20,7 @@ function Level60( player )
     Level40( player )
     Level50( player )
     if player:GetAttainMgr():CanAttain(1002) then
-        player:GetAttainMgr():UpdateAttainment( player, 1002, attained)
+        player:GetAttainMgr():UpdateAttainment( 1002, attained)
     end
 end
 
@@ -29,7 +29,7 @@ function Level70( player )
     Level50( player )
     Level60( player )
     if player:GetAttainMgr():CanAttain(1003) then
-        player:GetAttainMgr():UpdateAttainment( player, 1003, attained)
+        player:GetAttainMgr():UpdateAttainment( 1003, attained)
     end
 end
 
@@ -39,7 +39,7 @@ function Level80( player )
     Level60( player )
     Level70( player )
     if player:GetAttainMgr():CanAttain(1004) then
-        player:GetAttainMgr():UpdateAttainment( player, 1004, attained)
+        player:GetAttainMgr():UpdateAttainment( 1004, attained)
     end
 end
 
@@ -50,7 +50,7 @@ function Level90( player )
     Level70( player )
     Level80( player )
     if player:GetAttainMgr():CanAttain(1005) then
-        player:GetAttainMgr():UpdateAttainment( player, 1005, attained)
+        player:GetAttainMgr():UpdateAttainment( 1005, attained)
     end
 end
 
@@ -62,7 +62,7 @@ function Level100( player )
     Level80( player )
     Level90( player )
     if player:GetAttainMgr():CanAttain(1006) then
-        player:GetAttainMgr():UpdateAttainment( player, 1006, attained)
+        player:GetAttainMgr():UpdateAttainment( 1006, attained)
     end
 end
 
@@ -156,5 +156,13 @@ function doAttainment( player, attainId, param )
 		return false;
 	end
 	return trigger(player, param);	
+end
+
+function finishAttainment( player, attainId )
+    local trigger = attain_fin_table[attainId]
+    if trigger == nil then
+        return false
+    end
+    return trigger(player)
 end
 

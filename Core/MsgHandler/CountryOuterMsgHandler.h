@@ -23,6 +23,7 @@
 #include "GObject/Package.h"
 #include "GObject/Trade.h"
 #include "GObject/TaskMgr.h"
+#include "GObject/AttainMgr.h"
 #include "GObject/Athletics.h"
 #include "GObject/Dungeon.h"
 #include "GObject/ChatItem.h"
@@ -760,6 +761,26 @@ void OnNullReq( GameMsgHdr& hdr, NullReq& nr )
 	Stream st(0x00);
 	st << nr.ticket << Stream::eos;
 	player->send(st);
+}
+
+void OnAttainReq( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 op = 0;
+	br >> op;
+
+    switch( op )
+    {
+    case 0:
+        player->GetAttainMgr()->sendAttainment();
+        break;
+    case 1:
+        UInt16 attainId = 0;
+        br >> attainId;
+        GameAction()->finishAttainment(player, attainId);
+        break;
+    }
 }
 
 void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )

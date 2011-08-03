@@ -64,8 +64,8 @@ namespace GObject
     UInt32 GObjectManager::_merge_chance[9];
     UInt32 GObjectManager::_enchant_chance[5][12];
     UInt8  GObjectManager::_enchant_max[11];
-    UInt8  GObjectManager::_attrChances[11][3][8];
-    UInt16 GObjectManager::_attrInfo[11][8][3][8];
+    UInt8  GObjectManager::_attrChances[11][3][9];
+    UInt16 GObjectManager::_attrInfo[11][8][3][9];
     UInt32 GObjectManager::_socket_chance[6];
     UInt32 GObjectManager::_min_potential;
     UInt32 GObjectManager::_max_potential;
@@ -80,6 +80,13 @@ namespace GObject
     UInt8 GObjectManager::_pierce_factor;
     UInt8 GObjectManager::_tough_factor;
 
+    float GObjectManager::_hiterate_max;
+    float GObjectManager::_evade_max;
+    float GObjectManager::_critical_max;
+    float GObjectManager::_pierce_max;
+    float GObjectManager::_tough_max;
+    float GObjectManager::_counter_max;
+    float GObjectManager::_mres_max;
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -272,6 +279,14 @@ namespace GObject
             _critcal_factor = lua_tinker::call<UInt8>(L, "getCriticalFactor");
             _pierce_factor = lua_tinker::call<UInt8>(L, "getPierceFactor");
             _tough_factor = lua_tinker::call<UInt8>(L, "getToughFactor");
+
+            _hiterate_max = lua_tinker::call<float>(L, "getHitrateMax");
+            _evade_max = lua_tinker::call<float>(L, "getEvadeMax");
+            _critical_max = lua_tinker::call<float>(L, "getCriticalMax");
+            _pierce_max = lua_tinker::call<float>(L, "getPierceMax");
+            _tough_max = lua_tinker::call<float>(L, "getToughMax");
+            _counter_max = lua_tinker::call<float>(L, "getCounterMax");
+            _mres_max = lua_tinker::call<float>(L, "getMagResMax");
         }
         lua_close(L);
 
@@ -2306,7 +2321,7 @@ namespace GObject
                 for(UInt8 q = 0; q < 3; q ++)
                 {
                     lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrChance", lvl + 1, q + 1);
-                    UInt32 size = std::min(8, table_temp.size());
+                    UInt32 size = std::min(9, table_temp.size());
                     for(UInt32 j = 0; j < size; j ++)
                     {
                         _attrChances[lvl][q][j] =  table_temp.get<UInt8>(j + 1);
@@ -2318,7 +2333,7 @@ namespace GObject
                     for(UInt8 q = 0; q < 3; q ++)
                     {
                         lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrInfo", lvl + 1, t + 1, q + 1);
-                        UInt32 size = std::min(8, table_temp.size());
+                        UInt32 size = std::min(9, table_temp.size());
                         for(UInt32 j = 0; j < size; j ++)
                         {
                             _attrInfo[lvl][t][q][j] =  table_temp.get<UInt16>(j + 1);

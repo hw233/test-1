@@ -630,7 +630,7 @@ struct DBCopyData
 struct DBAttainData
 {
     UInt64 ownerId;
-    UInt32 attainId;
+    UInt16 attainId;
     UInt32 status;
     UInt32 updatetime;
 };
@@ -1413,7 +1413,7 @@ SPECIALBEGIN(GObject::DBAttainData)
 SPECIALDEF(4)
 (
     UInt64, ownerId,
-    UInt32, attainId,
+    UInt16, attainId,
     UInt32, status,
     UInt32, updatetime
 )

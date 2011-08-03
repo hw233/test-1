@@ -46,7 +46,7 @@ public:
 	};
 	struct DungeonPlayerInfo
 	{
-		DungeonPlayerInfo(): difficulty(0), level(0), count(0), totalCount(0), firstPass(0), counterEnd(0)
+		DungeonPlayerInfo(): difficulty(0), level(0), count(0), totalCount(0), firstPass(0), counterEnd(0), justice(0), justice_roar(0)
 		{}
 		UInt8 difficulty;
 		UInt8 level;

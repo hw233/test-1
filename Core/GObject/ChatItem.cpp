@@ -52,11 +52,11 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 	UInt16 atk = static_cast<UInt16>(bformula->calcAttack(fgt));
 	UInt16 def = static_cast<UInt16>(bformula->calcDefend(fgt));
 	UInt16 hp = static_cast<UInt16>(bformula->calcHP(fgt));
-	UInt16 hit = static_cast<UInt16>(bformula->calcHitrate(fgt) * 100.0f);
-	UInt16 evd = static_cast<UInt16>(bformula->calcEvade(fgt) * 100.0f);
-	UInt16 cri = static_cast<UInt16>(bformula->calcCritical(fgt) * 100.0f);
-	UInt16 prc = static_cast<UInt16>(bformula->calcPierce(fgt) * 100.0f);
-	UInt16 cnt = static_cast<UInt16>(bformula->calcCounter(fgt) * 100.0f);
+	UInt16 hit = static_cast<UInt16>(bformula->calcHitrate(fgt, NULL) * 100.0f);
+	UInt16 evd = static_cast<UInt16>(bformula->calcEvade(fgt, NULL) * 100.0f);
+	UInt16 cri = static_cast<UInt16>(bformula->calcCritical(fgt, NULL) * 100.0f);
+	UInt16 prc = static_cast<UInt16>(bformula->calcPierce(fgt, NULL) * 100.0f);
+	UInt16 cnt = static_cast<UInt16>(bformula->calcCounter(fgt, NULL) * 100.0f);
 	cid.st << str << agi << inte << phy << atk << def << hp << hit << evd << cri << prc << cnt << Stream::eos;
 	cid.lastAccess = TimeUtil::Now();
 

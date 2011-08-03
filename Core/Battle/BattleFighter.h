@@ -78,6 +78,14 @@ public:
 	inline float getExtraCounter() { return _attrExtra.counter; }
 	inline float getExtraMagRes() { return _attrExtra.magres; }
 
+    inline float getExtraHitrateLevel() { return _attrExtra.hitrlvl; }
+    inline float getExtraEvadeLevel() { return _attrExtra.evdlvl; }
+    inline float getExtraCriticalLevel() { return _attrExtra.crilvl; }
+    inline float getExtraPierceLevel() { return _attrExtra.pirlvl; }
+    inline float getExtraCounterLevel() { return _attrExtra.counterlvl; }
+    inline float getExtraToughLevel() { return _attrExtra.toughlvl; }
+    inline float getExtraMagResLevel() { return _attrExtra.mreslvl; }
+
 	inline GObject::Fighter * getFighter() {return _fighter;}
 
 	inline bool isNpc() { return _fighter->isNpc(); }
@@ -119,14 +127,14 @@ public:
 	inline float getMagAttack() {return _magatk + _magAtkAdd + _magAtkAdd2;}
 	inline float getDefend() {return _defend + _defAdd + _defAdd2;}
 	inline float getMagDefend() {return _magdef + _magDefAdd + _magDefAdd2;}
-	inline float getHitrate() {return _hitrate + _hitrateAdd + _magDefAdd2;}
-	inline float getEvade() {return _evade + _evadeAdd + _evadeAdd2;}
-	inline float getCritical() {return _critical + _criticalAdd + _criticalAdd2;}
+	float getHitrate(BattleFighter* defgt);
+	float getEvade(BattleFighter* defgt);
+	float getCritical(BattleFighter* defgt);
 	inline float getCriticalDmg() {return _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2;}
-	inline float getPierce() {return _pierce + _pierceAdd + _pierceAdd2;}
-	inline float getCounter() {return _counter + _counterAdd + _counterAdd2;}
-	inline float getMagRes() {return _magres + _magResAdd + _magResAdd2;}
-	inline float getTough() {return _tough + _toughAdd + _toughAdd2;}
+	float getPierce(BattleFighter* defgt);
+	float getCounter(BattleFighter* defgt);
+	float getMagRes(BattleFighter* defgt);
+	float getTough(BattleFighter* defgt);
 	inline UInt32 getMaxHP() {return _maxhp + _maxhpAdd + _maxhpAdd2;}
 	inline UInt32 getAction() {return _maxAction + _maxActionAdd + _maxActionAdd2;}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
@@ -184,13 +192,13 @@ public:
 	void updateAllAttr();
 	void initStats(bool);
 	void postInit();
-	float calcAttack(bool& isCritical, float tough);
+	float calcAttack(bool& isCritical, BattleFighter* defender);
 	bool calcHit(BattleFighter * defender);
-	bool calcCounter(bool ranged = false);
+	bool calcCounter(BattleFighter* attacker, bool ranged = false);
 	bool canBeCounter();
-	bool calcPierce();
+	bool calcPierce(BattleFighter* defender);
     float calcTherapy(const GData::SkillBase* skill);
-    float calcMagAttack(bool& isCritical, float tough);
+    float calcMagAttack(bool& isCritical, BattleFighter* defender);
     float calcPoison(const GData::SkillBase* skill);
 
 	inline void addAction(UInt32 p);

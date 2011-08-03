@@ -138,7 +138,7 @@ void BattleSimulator::start()
 
 					_packet << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
                     // TODO: up skills
-					_packet << static_cast<UInt16>(bf->getHitrate() * 100.0f) << static_cast<UInt16>(bf->getEvade() * 100.0f) << static_cast<UInt16>(bf->getCritical() * 100.0f) << static_cast<UInt16>(bf->getPierce() * 100.0f) << static_cast<UInt16>(bf->getCounter() * 100.0f);
+					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f);
                     _packet << bf->getFighter()->getPeerlessAndLevel();
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);
@@ -419,7 +419,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 		if(!enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
 		{
-            pr = bf->calcPierce();
+            pr = bf->calcPierce(area_target);
             float atk = 0;
             float magatk = 0;
             if(NULL != skill)
@@ -431,12 +431,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, 0, 0, scList, scCount, false);
                 }
 
-                atk = aura_factor * (bf->calcAttack(cs, area_target->getTough()) * skill->effect->damageP + skill->effect->adddam);
-                magatk = aura_factor * (bf->calcMagAttack(cs, area_target->getTough()) * skill->effect->magdamP + skill->effect->addmag);
+                atk = aura_factor * (bf->calcAttack(cs, area_target) * skill->effect->damageP + skill->effect->adddam);
+                magatk = aura_factor * (bf->calcMagAttack(cs, area_target) * skill->effect->magdamP + skill->effect->addmag);
             }
             else
             {
-                atk = bf->calcAttack(cs, area_target->getTough());
+                atk = bf->calcAttack(cs, area_target);
             }
 
 #if 0
@@ -461,14 +461,14 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
-                    magdmg = (pr ? static_cast<UInt32>(factor * magatk) : _formula->calcDamage(factor * magatk, magdef)) * (950 + _rnd(100)) / 1000;
+                    magdmg = (pr ? static_cast<UInt32>(factor * magatk) : _formula->calcDamage(factor * magatk, magdef, bf->getLevel())) * (950 + _rnd(100)) / 1000;
                     magdmg = magdmg > 0 ? magdmg : 1;
                 }
 
                 if(atk)
                 {
                     def = area_target->getDefend();
-                    dmg = (pr ? static_cast<UInt32>(factor * atk) : _formula->calcDamage(factor * atk, def)) * (950 + _rnd(100)) / 1000;
+                    dmg = (pr ? static_cast<UInt32>(factor * atk) : _formula->calcDamage(factor * atk, def, bf->getLevel())) * (950 + _rnd(100)) / 1000;
                     dmg = dmg > 0 ? dmg : 1;
                 }
 
@@ -589,7 +589,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 		{
 			BattleFighter * target_fighter = static_cast<BattleFighter *>(area_target_obj);
 			// test counter by rolling dice
-			if(counter100 || target_fighter->calcCounter(!bf->canBeCounter()))
+			if(counter100 || target_fighter->calcCounter(bf, !bf->canBeCounter()))
 			{
 				if(target_fighter->calcHit(bf))
 				{
@@ -597,8 +597,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					bool cs = false;
 					float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
-					bool pr = target_fighter->calcPierce();
-					UInt32 dmg2 = (pr ? static_cast<UInt32>(atk) : _formula->calcDamage(atk, def)) * (950 + _rnd(100)) / 1000;
+					bool pr = target_fighter->calcPierce(bf);
+					UInt32 dmg2 = (pr ? static_cast<UInt32>(atk) : _formula->calcDamage(atk, def, target_fighter->getLevel())) * (950 + _rnd(100)) / 1000;
 
 					bf->makeDamage(dmg2);
 
@@ -839,7 +839,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
 
     if(atkAct)
     {
-        float rate = target_bo->getMagRes() * 100;
+        float rate = target_bo->getMagRes(bf) * 100;
         if(rate > _rnd(10000))
         {
             defList[defCount].damType = e_Res;
@@ -3244,19 +3244,19 @@ void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 s
 					break;
 				case e_stEvade:
 					bfgt->setEvadeAdd2(value);
-					sc.data = static_cast<UInt16>(bfgt->getEvade());
+					sc.data = static_cast<UInt16>(bfgt->getEvade(NULL));
 					break;
 				case e_stCritical:
 					bfgt->setCriticalAdd2(value);
-					sc.data = static_cast<UInt16>(bfgt->getCritical());
+					sc.data = static_cast<UInt16>(bfgt->getCritical(NULL));
 					break;
 				case e_stPierce:
 					bfgt->setPierceAdd2(value);
-					sc.data = static_cast<UInt16>(bfgt->getPierce());
+					sc.data = static_cast<UInt16>(bfgt->getPierce(NULL));
 					break;
 				case e_stCounter:
 					bfgt->setCounterAdd2(value);
-					sc.data = static_cast<UInt16>(bfgt->getCounter());
+					sc.data = static_cast<UInt16>(bfgt->getCounter(NULL));
 					break;
                 case e_stAura:
                     bfgt->AddAura(value);
@@ -3264,7 +3264,7 @@ void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 s
                     break;
                 case e_stTough:
                     bfgt->setToughAdd2(value);
-                    sc.data = static_cast<UInt16>(bfgt->getTough());
+                    sc.data = static_cast<UInt16>(bfgt->getTough(NULL));
                     break;
                 case e_stMagAtk:
                     bfgt->setMagAttackAdd2(value);
@@ -3276,7 +3276,7 @@ void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 s
                     break;
                 case e_stMagRes:
                     bfgt->setMagResAdd2(value);
-                    sc.data = static_cast<UInt16>(bfgt->getMagRes());
+                    sc.data = static_cast<UInt16>(bfgt->getMagRes(NULL));
                     break;
                 case e_stAction:
                     bfgt->setActionAdd2(value);
@@ -3292,7 +3292,7 @@ void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 s
 #endif
                 case e_stHitRate:
                     bfgt->setHitrateAdd2(value);
-                    sc.data = static_cast<UInt16>(bfgt->getHitrate());
+                    sc.data = static_cast<UInt16>(bfgt->getHitrate(NULL));
                     break;
 				}
 				++ scCount;
@@ -3330,19 +3330,19 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
 					break;
 				case e_stEvade:
 					bfgt->setEvadeAdd(value, last);
-					sc.data = static_cast<UInt16>(bfgt->getEvade());
+					sc.data = static_cast<UInt16>(bfgt->getEvade(NULL));
 					break;
 				case e_stCritical:
 					bfgt->setCriticalAdd(value, last);
-					sc.data = static_cast<UInt16>(bfgt->getCritical());
+					sc.data = static_cast<UInt16>(bfgt->getCritical(NULL));
 					break;
 				case e_stPierce:
 					bfgt->setPierceAdd(value, last);
-					sc.data = static_cast<UInt16>(bfgt->getPierce());
+					sc.data = static_cast<UInt16>(bfgt->getPierce(NULL));
 					break;
 				case e_stCounter:
 					bfgt->setCounterAdd(value, last);
-					sc.data = static_cast<UInt16>(bfgt->getCounter());
+					sc.data = static_cast<UInt16>(bfgt->getCounter(NULL));
 					break;
                 case e_stAura:
                     bfgt->AddAura(value);
@@ -3350,7 +3350,7 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
                     break;
                 case e_stTough:
                     bfgt->setToughAdd(value, last);
-                    sc.data = static_cast<UInt16>(bfgt->getTough());
+                    sc.data = static_cast<UInt16>(bfgt->getTough(NULL));
                     break;
                 case e_stMagAtk:
                     bfgt->setMagAttackAdd(value, last);
@@ -3362,7 +3362,7 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
                     break;
                 case e_stMagRes:
                     bfgt->setMagResAdd(value, last);
-                    sc.data = static_cast<UInt16>(bfgt->getMagRes());
+                    sc.data = static_cast<UInt16>(bfgt->getMagRes(NULL));
                     break;
                 case e_stAction:
                     bfgt->setActionAdd(value, last);
@@ -3378,7 +3378,7 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
 #endif
                 case e_stHitRate:
                     bfgt->setHitrateAdd(value, last);
-                    sc.data = static_cast<UInt16>(bfgt->getHitrate());
+                    sc.data = static_cast<UInt16>(bfgt->getHitrate(NULL));
                     break;
 				}
 				++ scCount;

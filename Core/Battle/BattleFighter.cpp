@@ -7,6 +7,7 @@
 #include "Common/URandom.h"
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
+#include "GObject/GObjectManager.h"
 
 namespace Battle
 {
@@ -276,11 +277,11 @@ void BattleFighter::updateAllAttr()
 	_intelligence = _formula->calcIntelligence(this);
 	_attack = _formula->calcAttack(this);
 	_defend = _formula->calcDefend(this);
-	_hitrate = _formula->calcHitrate(this);
-	_evade = _formula->calcEvade(this);
-	_critical = _formula->calcCritical(this);
-	_pierce = _formula->calcPierce(this);
-	_counter = _formula->calcCounter(this);
+	_hitrate = _formula->calcHitrate(this, NULL);
+	_evade = _formula->calcEvade(this, NULL);
+	_critical = _formula->calcCritical(this, NULL);
+	_pierce = _formula->calcPierce(this, NULL);
+	_counter = _formula->calcCounter(this, NULL);
 	_maxAction = _formula->calcAction(this);
 	UInt32 oldhp = _maxhp;
 	_maxhp = _formula->calcHP(this);
@@ -290,10 +291,10 @@ void BattleFighter::updateAllAttr()
     _auraMax = _formula->calcAuraMax(this);
     _will = _formula->calcWill(this);
     _soul = _formula->calcSoul(this);
-    _tough = _formula->calcTough(this);
+    _tough = _formula->calcTough(this, NULL);
     _magatk = _formula->calcMagAttack(this);
     _magdef = _formula->calcMagDefend(this);
-    _magres = _formula->calcMagRes(this);
+    _magres = _formula->calcMagRes(this, NULL);
 
 	if((_flag & BlockBoss) == 0 && oldhp > 0 && _hp > 0 && oldhp < _maxhp)
 	{
@@ -382,13 +383,13 @@ void BattleFighter::updateBuffExtras()
     }
 }
 
-float BattleFighter::calcAttack( bool& isCritical, float tough)
+float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender)
 {
 	// 计算暴击率
-    float rate = _critical - tough;
+    float rate = getCritical(defender) - defender->getTough(this);
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
 
-	float atk = _attack + _attackAdd + _attackAdd2;
+	float atk = getAttack();
 	/* TODO: random
 	int extra = (uRand(9)) - 4;
 	*/
@@ -396,20 +397,20 @@ float BattleFighter::calcAttack( bool& isCritical, float tough)
 	// 如果暴击
 	if(isCritical)
 	{
-		atk = atk * (_criticaldmg + _criticalDmgAdd + _criticalDmgAdd2);
+		atk = atk * getCriticalDmg();
 	}
 	return atk;
 }
 
-float BattleFighter::calcMagAttack(bool& isCritical, float tough)
+float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender)
 {
-    float rate = _critical - tough;
+    float rate = getCritical(defender) - defender->getTough(this);
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
-    float magatk = _magatk + _magAtkAdd + _magAtkAdd2;
+    float magatk = getMagAttack();
 
     if(isCritical)
     {
-        magatk = magatk * (_criticaldmg + _criticalDmgAdd + _criticalDmgAdd2);
+        magatk = magatk * getCriticalDmg();
     }
 
     return magatk;
@@ -451,7 +452,7 @@ bool BattleFighter::calcHit( BattleFighter * defender )
 		return true;
 
 	// 计算命中值
-	float hitrate = _hitrate + _hitrateAdd + _hitrateAdd2 - defender->getEvade();
+	float hitrate = getHitrate(defender) - defender->getEvade(this);
 
 	// 必中
 	if(hitrate >= 100)
@@ -461,9 +462,9 @@ bool BattleFighter::calcHit( BattleFighter * defender )
 	return uRand(10000) < hitrate * 100;
 }
 
-bool BattleFighter::calcCounter(bool ranged)
+bool BattleFighter::calcCounter(BattleFighter* attacker, bool ranged)
 {
-	return uRand(ranged ? 20000 : 10000) < (_counter + _counterAdd + _counterAdd2) * 100;
+	return uRand(ranged ? 20000 : 10000) < getCounter(attacker) * 100;
 }
 
 bool BattleFighter::canBeCounter()
@@ -473,9 +474,9 @@ bool BattleFighter::canBeCounter()
 	return wp == NULL;
 }
 
-bool BattleFighter::calcPierce()
+bool BattleFighter::calcPierce(BattleFighter* defender)
 {
-	return uRand(10000) < (_pierce + _pierceAdd + _pierceAdd2) * 100;
+	return uRand(10000) < getPierce(defender) * 100;
 }
 
 void BattleFighter::initStats(bool checkEnh)
@@ -770,6 +771,104 @@ void BattleFighter::releaseSkillCD(int cd)
     releaseSkillCD(_passiveSkillEnter, cd);
     releaseSkillCD(_passiveSkillDead, cd);
     releaseSkillCD(_passiveSkillAftNAtk, cd);
+}
+
+float BattleFighter::getHitrate(BattleFighter* defgt)
+{
+    float hiterate = 0;
+    if(defgt == NULL)
+        hiterate = _hitrate + _hitrateAdd + _hitrateAdd2;
+    else
+        hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2;
+
+    if(hiterate > GObject::GObjectManager::getHiterateMax())
+        hiterate = GObject::GObjectManager::getHiterateMax();
+
+    return hiterate;
+}
+
+float BattleFighter::getEvade(BattleFighter* defgt)
+{
+    float evade = 0;
+    if(defgt == NULL)
+        evade = _evade + _evadeAdd + _evadeAdd2;
+    else
+        evade = _formula->calcEvade(this, defgt) + _evadeAdd + _evadeAdd2;
+
+    if(evade > GObject::GObjectManager::getEvadeMax())
+        evade = GObject::GObjectManager::getEvadeMax();
+
+    return evade;
+}
+
+float BattleFighter::getCritical(BattleFighter* defgt)
+{
+    float critical = 0;
+    if(defgt == NULL)
+        critical = _critical + _criticalAdd + _criticalAdd2;
+    else
+        critical = _formula->calcCritical(this, defgt) + _criticalAdd + _criticalAdd2;
+
+    if(critical > GObject::GObjectManager::getCriticalMax())
+        critical = GObject::GObjectManager::getCriticalMax();
+
+    return critical;
+}
+
+float BattleFighter::getPierce(BattleFighter* defgt)
+{
+    float pierce = 0;
+    if(defgt == NULL)
+        pierce = _pierce + _pierceAdd + _pierceAdd2;
+    else
+        pierce = _formula->calcPierce(this, defgt) + _pierceAdd + _pierceAdd2;
+
+    if(pierce > GObject::GObjectManager::getPierceMax())
+        pierce = GObject::GObjectManager::getPierceMax();
+
+    return pierce;
+}
+
+float BattleFighter::getCounter(BattleFighter* defgt)
+{
+    float counter = 0;
+    if(defgt == NULL)
+        counter = _counter + _counterAdd + _counterAdd2;
+    else
+        counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2;
+
+    if(counter > GObject::GObjectManager::getCounterMax())
+        counter = GObject::GObjectManager::getCounterMax();
+
+    return counter;
+}
+
+float BattleFighter::getMagRes(BattleFighter* defgt)
+{
+    float magres = 0;
+    if(defgt == NULL)
+        magres = _magres + _magResAdd + _magResAdd2;
+    else
+        magres = _formula->calcMagRes(this, defgt) + _magResAdd + _magResAdd2;
+
+    if(magres > GObject::GObjectManager::getMagResMax())
+        magres = GObject::GObjectManager::getMagResMax();
+
+    return magres;
+}
+
+float BattleFighter::getTough(BattleFighter* defgt)
+{
+    float tough = 0;
+    if(defgt == NULL)
+        tough = _tough + _toughAdd + _toughAdd2;
+    else
+        tough = _formula->calcTough(this, defgt) + _toughAdd + _toughAdd2;
+
+    if(tough > GObject::GObjectManager::getToughMax())
+        tough = GObject::GObjectManager::getToughMax();
+
+    return tough;
 }
 
 
