@@ -17,7 +17,8 @@ struct AttrExtra
     criticaldmg(0), pierce(0), counter(0), magres(0), strengthP(0), physiqueP(0),
     agilityP(0), intelligenceP(0), willP(0), soulP(0), auraP(0), auraMaxP(0),
     attackP(0), magatkP(0), defendP(0), magdefP(0), hpP(0), toughP(0),
-    actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0)
+    actionP(0), hitrateP(0), evadeP(0), criticalP(0), criticaldmgP(0), pierceP(0), counterP(0), magresP(0),
+    hitrlvl(0), evdlvl(0), crilvl(0), pirlvl(0), counterlvl(0), mreslvl(0), toughlvl(0)
 	{}
 	AttrExtra& operator +=(const AttrExtra& other)
 	{
@@ -69,6 +70,14 @@ struct AttrExtra
 		criticalP += other.criticalP;
 		pierceP += other.pierceP;
 #endif
+    
+        hitrlvl += other.hitrlvl;
+        evdlvl += other.evdlvl;
+        crilvl += other.crilvl;
+        pirlvl += other.pirlvl;
+        counterlvl += other.counterlvl;
+        mreslvl += other.mreslvl;
+        toughlvl += other.toughlvl;
 
 		return *this;
 	}
@@ -174,6 +183,14 @@ struct AttrExtra
         pierceP = 0;
         counterP = 0;
         magresP = 0;
+
+        hitrlvl = 0;
+        evdlvl = 0;
+        crilvl = 0;
+        pirlvl = 0;
+        counterlvl = 0;
+        mreslvl = 0;
+        toughlvl = 0;
     }
 
 	float strength;
@@ -221,6 +238,14 @@ struct AttrExtra
 	float pierceP;
 	float counterP;
 	float magresP;
+
+    float hitrlvl;
+    float evdlvl;
+    float crilvl;
+    float pirlvl;
+    float counterlvl;
+    float mreslvl;
+    float toughlvl;
 
     std::vector<const SkillBase*> skills;
 };

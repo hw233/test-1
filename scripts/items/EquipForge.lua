@@ -37,20 +37,20 @@ local Merge_chance = {100, 85, 85, 75, 75, 65, 65, 55, 55}
 
 
 --蓝色装备随机属性概率
-local Blue_attr_chance0 = {0, 0, 0, 0, 0, 0, 0, 0}
-local Blue_attr_chance1 = {15, 50, 35, 0, 0, 0, 0, 0}
-local Blue_attr_chance2 = {5,  60, 35, 0, 0, 0, 0, 0}
-local Blue_attr_chance3 = {25, 50, 25, 0, 0, 0, 0, 0}
-local Blue_attr_chance4 = {5, 65,30, 0, 0, 0, 0, 0}
+local Blue_attr_chance0 = {0, 0, 0, 0, 0, 0, 0, 0, 0}
+local Blue_attr_chance1 = {15, 50, 35, 0, 0, 0, 0, 0, 0}
+local Blue_attr_chance2 = {5,  60, 35, 0, 0, 0, 0, 0, 0}
+local Blue_attr_chance3 = {25, 50, 25, 0, 0, 0, 0, 0, 0}
+local Blue_attr_chance4 = {5, 65,30, 0, 0, 0, 0, 0, 0}
 
 --紫色装备随机属性概率
-local Purple_attr_chance0 = {0, 0, 0, 0, 0, 0, 0, 0}
-local Purple_attr_chance1 = {15, 50, 35, 0, 0, 0, 0, 0}
+local Purple_attr_chance0 = {0, 0, 0, 0, 0, 0, 0, 0, 0}
+local Purple_attr_chance1 = {15, 50, 35, 0, 0, 0, 0, 0, 0}
 
 --橙色装备随机属性概率
-local Orange_attr_chance0 = {0, 0, 0, 0, 0, 0, 0, 0}
-local Orange_attr_chance1 = {15, 44, 20, 10, 5, 3, 2, 1}
-local Orange_attr_chance2 = {15, 70, 10, 5, 0, 0, 0, 0}
+local Orange_attr_chance0 = {0, 0, 0, 0, 0, 0, 0, 0, 0}
+local Orange_attr_chance1 = {15, 44, 20, 10, 5, 3, 2, 1, 0}
+local Orange_attr_chance2 = {15, 70, 10, 5, 0, 0, 0, 0, 0}
 
 --0级装备随机属性概率
 local Attr_chance_lvl0  = {Blue_attr_chance1, Purple_attr_chance0, Orange_attr_chance0}
@@ -173,11 +173,11 @@ local AttrInfo_MagRes_lvl0 =   {Blue_MagRes_value1,   MagRes_value0,   MagRes_va
 
 local AttrInfo_lvl0 = {
     AttrInfo_HP_lvl0,
+    AttrInfo_Action_lvl0,
     AttrInfo_Hitrate_lvl0,
     AttrInfo_Evade_lvl0,
     AttrInfo_Critical_lvl0,
     AttrInfo_Pierce_lvl0,
-    AttrInfo_Action_lvl0,
     AttrInfo_Counter_lvl0,
     AttrInfo_MagRes_lvl0
 }
@@ -196,11 +196,11 @@ local AttrInfo_MagRes_lvl10 =   {Blue_MagRes_value1,   MagRes_value0,   MagRes_v
 
 local AttrInfo_lvl10 = {
     AttrInfo_HP_lvl10,
+    AttrInfo_Action_lvl10,
     AttrInfo_Hitrate_lvl10,
     AttrInfo_Evade_lvl10,
     AttrInfo_Critical_lvl10,
     AttrInfo_Pierce_lvl10,
-    AttrInfo_Action_lvl10,
     AttrInfo_Counter_lvl10,
     AttrInfo_MagRes_lvl10
 }
@@ -219,11 +219,11 @@ local AttrInfo_MagRes_lvl20 =   {Blue_MagRes_value1,   MagRes_value0,   MagRes_v
 
 local AttrInfo_lvl20 = {
     AttrInfo_HP_lvl20,
+    AttrInfo_Action_lvl20,
     AttrInfo_Hitrate_lvl20,
     AttrInfo_Evade_lvl20,
     AttrInfo_Critical_lvl20,
     AttrInfo_Pierce_lvl20,
-    AttrInfo_Action_lvl20,
     AttrInfo_Counter_lvl20,
     AttrInfo_MagRes_lvl20
 }
@@ -242,11 +242,11 @@ local AttrInfo_MagRes_lvl30 =   {Blue_MagRes_value1,   MagRes_value0,   MagRes_v
 
 local AttrInfo_lvl30 = {
     AttrInfo_HP_lvl30,
+    AttrInfo_Action_lvl30,
     AttrInfo_Hitrate_lvl30,
     AttrInfo_Evade_lvl30,
     AttrInfo_Critical_lvl30,
     AttrInfo_Pierce_lvl30,
-    AttrInfo_Action_lvl30,
     AttrInfo_Counter_lvl30,
     AttrInfo_MagRes_lvl30
 }
@@ -265,11 +265,11 @@ local AttrInfo_MagRes_lvl40 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   O
 
 local AttrInfo_lvl40 = {
     AttrInfo_HP_lvl40,
+    AttrInfo_Action_lvl40,
     AttrInfo_Hitrate_lvl40,
     AttrInfo_Evade_lvl40,
     AttrInfo_Critical_lvl40,
     AttrInfo_Pierce_lvl40,
-    AttrInfo_Action_lvl40,
     AttrInfo_Counter_lvl40,
     AttrInfo_MagRes_lvl40}
 
@@ -287,11 +287,11 @@ local AttrInfo_MagRes_lvl50 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   O
 
 local AttrInfo_lvl50 = {
     AttrInfo_HP_lvl50,
+    AttrInfo_Action_lvl50,
     AttrInfo_Hitrate_lvl50,
     AttrInfo_Evade_lvl50,
     AttrInfo_Critical_lvl50,
     AttrInfo_Pierce_lvl50,
-    AttrInfo_Action_lvl50,
     AttrInfo_Counter_lvl50,
     AttrInfo_MagRes_lvl50
 }
@@ -310,11 +310,11 @@ local AttrInfo_MagRes_lvl60 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   O
 
 local AttrInfo_lvl60 = {
     AttrInfo_HP_lvl60,
+    AttrInfo_Action_lvl60,
     AttrInfo_Hitrate_lvl60,
     AttrInfo_Evade_lvl60,
     AttrInfo_Critical_lvl60,
     AttrInfo_Pierce_lvl60,
-    AttrInfo_Action_lvl60,
     AttrInfo_Counter_lvl60,
     AttrInfo_MagRes_lvl60
 }
@@ -333,11 +333,11 @@ local AttrInfo_MagRes_lvl70 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   O
 
 local AttrInfo_lvl70 = {
     AttrInfo_HP_lvl70,
+    AttrInfo_Action_lvl70,
     AttrInfo_Hitrate_lvl70,
     AttrInfo_Evade_lvl70,
     AttrInfo_Critical_lvl70,
     AttrInfo_Pierce_lvl70,
-    AttrInfo_Action_lvl70,
     AttrInfo_Counter_lvl70,
     AttrInfo_MagRes_lvl70
 }
@@ -356,11 +356,11 @@ local AttrInfo_MagRes_lvl80 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   O
 
 local AttrInfo_lvl80 = {
     AttrInfo_HP_lvl80,
+    AttrInfo_Action_lvl80,
     AttrInfo_Hitrate_lvl80,
     AttrInfo_Evade_lvl80,
     AttrInfo_Critical_lvl80,
     AttrInfo_Pierce_lvl80,
-    AttrInfo_Action_lvl80,
     AttrInfo_Counter_lvl80,
     AttrInfo_MagRes_lvl80
 }
@@ -379,11 +379,11 @@ local AttrInfo_MagRes_lvl90 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   O
 
 local AttrInfo_lvl90 = {
     AttrInfo_HP_lvl90,
+    AttrInfo_Action_lvl90,
     AttrInfo_Hitrate_lvl90,
     AttrInfo_Evade_lvl90,
     AttrInfo_Critical_lvl90,
     AttrInfo_Pierce_lvl90,
-    AttrInfo_Action_lvl90,
     AttrInfo_Counter_lvl90,
     AttrInfo_MagRes_lvl90
 }
@@ -402,11 +402,11 @@ local AttrInfo_MagRes_lvl100 =   {Blue_MagRes_value1,   Purple_MagRes_value1,   
 
 local AttrInfo_lvl100 = {
     AttrInfo_HP_lvl100,
+    AttrInfo_Action_lvl100,
     AttrInfo_Hitrate_lvl100,
     AttrInfo_Evade_lvl100,
     AttrInfo_Critical_lvl100,
     AttrInfo_Pierce_lvl100,
-    AttrInfo_Action_lvl100,
     AttrInfo_Counter_lvl100,
     AttrInfo_MagRes_lvl100
 }

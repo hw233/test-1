@@ -881,4 +881,8 @@ namespace Script
     {
         Call<void>("doAttainment", pl, attainId, param);
     }
+    void GameActionLua::finishAttainment(Player* pl, UInt16 attainId)
+    {
+        call<void>("finishAttainment", pl, attainId);
+    }
 }

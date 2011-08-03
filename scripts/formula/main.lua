@@ -1,3 +1,4 @@
+require('formula/attribute')
 require('formula/personal')
 require('formula/blockboss')
 require('formula/practice')

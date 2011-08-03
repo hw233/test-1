@@ -479,12 +479,13 @@ namespace GObject
 		case Item_Ring:
 		case Item_Amulet:
         case Item_Mounts:
+        case Item_Trump:
 			{
 				ItemEquip * equip;
 				ItemEquipData edata;
 
 				UInt8 lv = (itype->reqLev + 5) / 10;
-				if(itype->quality > 2)
+				if(itype->quality > 2 && itype->subClass != Item_Trump)
 				{
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};

@@ -352,6 +352,14 @@ public:
 	inline float getExtraMagRes() { checkDirty(); return _attrExtraEquip.magres; }
 	inline float getBattlePoint() { checkBPDirty(); return _battlePoint; }
 
+    inline float getExtraHitrateLevel() { checkBPDirty(); return _attrExtraEquip.hitrlvl; }
+    inline float getExtraEvadeLevel() { checkBPDirty(); return _attrExtraEquip.evdlvl; }
+    inline float getExtraCriticalLevel() { checkBPDirty(); return _attrExtraEquip.crilvl; }
+    inline float getExtraPierceLevel() { checkBPDirty(); return _attrExtraEquip.pirlvl; }
+    inline float getExtraCounterLevel() { checkBPDirty(); return _attrExtraEquip.counterlvl; }
+    inline float getExtraToughLevel() { checkBPDirty(); return _attrExtraEquip.toughlvl; }
+    inline float getExtraMagResLevel() { checkBPDirty(); return _attrExtraEquip.mreslvl; }
+
 	inline Int16 getBaseStrength()
     {
         return strength;

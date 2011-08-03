@@ -79,6 +79,10 @@ namespace GObject
 
     void AttainMgr::UpdateAttainment(UInt16 attainId, UInt32 status)
     {
+        Stream st(0x0C);
+        st << static_cast<UInt8>(1);
+        st << attainId;
+
         attain_iterator it = m_AttainList.find(attainId);
         if(it == m_AttainList.end())
         {
@@ -89,12 +93,40 @@ namespace GObject
             ad->updatetime = TimeUtil::Now();
             m_AttainList[attainId] = ad;
             DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%"I64_FMT"u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, ad->updatetime);
+            if(ad->status == _ATTAINED_)
+            {
+                st << static_cast<UInt8>(1);
+            }
+            else if(ad->status == _ATTAINED_FINISHED_)
+            {
+                st << static_cast<UInt8>(2);
+            }
+            else
+            {
+                st << static_cast<UInt8>(0);
+            }
         }
         else
         {
             it->second->status = status;
             DB().PushUpdateData("UPDATE `attainment` SET `status` = %u WHERE `ownerId` = %u AND `attainId` = %u", it->second->status, it->second->ownerId, it->second->attainId);
+
+            if(it->second->status == _ATTAINED_)
+            {
+                st << static_cast<UInt8>(1);
+            }
+            else if(it->second->status == _ATTAINED_FINISHED_)
+            {
+                st << static_cast<UInt8>(2);
+            }
+            else
+            {
+                st << static_cast<UInt8>(0);
+            }
         }
+
+        st << Stream::eos;
+        m_PlayerOwner->send(st);
     }
 
     UInt32 AttainMgr::getAttainStatus(UInt16 attainId)
@@ -119,6 +151,33 @@ namespace GObject
             if(it->second->updatetime + 24*3600 < TimeUtil::Now())
                 it->second->status = 0;
         }
+    }
+
+    void AttainMgr::sendAttainment()
+    {
+        Stream st(0x0C);
+        UInt16 cnt = m_AttainList.size();
+        st << cnt;
+
+        for(attain_c_iterator it = m_AttainList.begin(); it != m_AttainList.end(); ++ it)
+        {
+            st << it->second->attainId;
+            if(it->second->status == _ATTAINED_)
+            {
+                st << static_cast<UInt8>(1);
+            }
+            else if(it->second->status == _ATTAINED_FINISHED_)
+            {
+                st << static_cast<UInt8>(2);
+            }
+            else
+            {
+                st << static_cast<UInt8>(0);
+            }
+        }
+
+        st << Stream::eos;
+        m_PlayerOwner->send(st);
     }
 
 }

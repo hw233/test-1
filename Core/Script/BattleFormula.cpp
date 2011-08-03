@@ -97,6 +97,13 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getClanTechAddon", &GObject::Fighter::getClanTechAddon);
 	class_def<GObject::Fighter>("getAcuPraAdd", &GObject::Fighter::getAcuPraAdd);
 	class_def<GObject::Fighter>("getPracticeBufFactor", &GObject::Fighter::getPracticeBufFactor);
+	class_def<GObject::Fighter>("getExtraHitrateLevel", &GObject::Fighter::getExtraHitrateLevel);
+	class_def<GObject::Fighter>("getExtraEvadeLevel", &GObject::Fighter::getExtraEvadeLevel);
+	class_def<GObject::Fighter>("getExtraCriticalLevel", &GObject::Fighter::getExtraCriticalLevel);
+	class_def<GObject::Fighter>("getExtraPierceLevel", &GObject::Fighter::getExtraPierceLevel);
+	class_def<GObject::Fighter>("getExtraCounterLevel", &GObject::Fighter::getExtraCounterLevel);
+	class_def<GObject::Fighter>("getExtraToughLevel", &GObject::Fighter::getExtraToughLevel);
+	class_def<GObject::Fighter>("getExtraMagResLevel", &GObject::Fighter::getExtraMagResLevel);
 
 	class_add<Battle::BattleFighter>("BattleFighter");
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
@@ -165,6 +172,13 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getBasePierce", &Battle::BattleFighter::getBasePierce);
 	class_def<Battle::BattleFighter>("getBaseCounter", &Battle::BattleFighter::getBaseCounter);
 	class_def<Battle::BattleFighter>("getBaseMagRes", &Battle::BattleFighter::getBaseMagRes);
+	class_def<Battle::BattleFighter>("getExtraHitrateLevel", &GObject::Fighter::getExtraHitrateLevel);
+	class_def<Battle::BattleFighter>("getExtraEvadeLevel", &GObject::Fighter::getExtraEvadeLevel);
+	class_def<Battle::BattleFighter>("getExtraCriticalLevel", &GObject::Fighter::getExtraCriticalLevel);
+	class_def<Battle::BattleFighter>("getExtraPierceLevel", &GObject::Fighter::getExtraPierceLevel);
+	class_def<Battle::BattleFighter>("getExtraCounterLevel", &GObject::Fighter::getExtraCounterLevel);
+	class_def<Battle::BattleFighter>("getExtraToughLevel", &GObject::Fighter::getExtraToughLevel);
+	class_def<Battle::BattleFighter>("getExtraMagResLevel", &GObject::Fighter::getExtraMagResLevel);
 }
 
 void BattleFormula::postInit()
@@ -207,9 +221,9 @@ float BattleFormula::calcAuraMax( GObject::Fighter * fgt )
     return call<float>("calcAuraMax", fgt);
 }
 
-float BattleFormula::calcTough( GObject::Fighter * fgt )
+float BattleFormula::calcTough( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcTough", fgt);
+	return call<float>("calcTough", fgt, defgt);
 }
 
 float BattleFormula::calcPhysique( GObject::Fighter * fgt )
@@ -237,19 +251,19 @@ float BattleFormula::calcMagDefend( GObject::Fighter * fgt )
 	return call<float>("calcMagDefend", fgt);
 }
 
-float BattleFormula::calcHitrate( GObject::Fighter * fgt )
+float BattleFormula::calcHitrate( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcHitrate", fgt);
+	return call<float>("calcHitrate", fgt, defgt);
 }
 
-float BattleFormula::calcEvade( GObject::Fighter * fgt )
+float BattleFormula::calcEvade( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcEvade", fgt);
+	return call<float>("calcEvade", fgt, defgt);
 }
 
-float BattleFormula::calcCritical( GObject::Fighter * fgt )
+float BattleFormula::calcCritical( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcCritical", fgt);
+	return call<float>("calcCritical", fgt, defgt);
 }
 
 float BattleFormula::calcCriticalDmg( GObject::Fighter * fgt )
@@ -257,19 +271,19 @@ float BattleFormula::calcCriticalDmg( GObject::Fighter * fgt )
 	return call<float>("calcCriticalDmg", fgt);
 }
 
-float BattleFormula::calcPierce( GObject::Fighter * fgt )
+float BattleFormula::calcPierce( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcPierce", fgt);
+	return call<float>("calcPierce", fgt, defgt);
 }
 
-float BattleFormula::calcCounter( GObject::Fighter * fgt )
+float BattleFormula::calcCounter( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcCounter", fgt);
+	return call<float>("calcCounter", fgt, defgt);
 }
 
-float BattleFormula::calcMagRes( GObject::Fighter * fgt )
+float BattleFormula::calcMagRes( GObject::Fighter * fgt, GObject::Fighter * defgt )
 {
-	return call<float>("calcMagRes", fgt);
+	return call<float>("calcMagRes", fgt, defgt);
 }
 
 UInt32 BattleFormula::calcHP( GObject::Fighter * fgt )
@@ -286,6 +300,42 @@ float BattleFormula::calcBattlePoint(GObject::Fighter * fgt)
 {
 	return call<float>("calcBattlePoint", fgt);
 }
+
+float BattleFormula::calcHitRateLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcHitRateLevel", fgt);
+}
+
+float BattleFormula::calcEvadeLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcEvadeLevel", fgt);
+}
+
+float BattleFormula::calcCriticalLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcCriticalLevel", fgt);
+}
+
+float BattleFormula::calcPierceLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcPierceLevel", fgt);
+}
+
+float BattleFormula::calcCounterLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcCounterLevel", fgt);
+}
+
+float BattleFormula::calcToughLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcToughLevel", fgt);
+}
+
+float BattleFormula::calcMagResLevel(GObject::Fighter * fgt)
+{
+	return call<float>("calcMagResLevel", fgt);
+}
+
 
 float BattleFormula::calcStrength(Battle::BattleFighter * fgt)
 {
@@ -322,9 +372,9 @@ float BattleFormula::calcAuraMax( Battle::BattleFighter * fgt )
 	return call<float>("calcAuraMax", fgt);
 }
 
-float BattleFormula::calcTough( Battle::BattleFighter * fgt )
+float BattleFormula::calcTough( Battle::BattleFighter * fgt, Battle::BattleFighter * defgt )
 {
-	return call<float>("calcTough", fgt);
+	return call<float>("calcTough", fgt, defgt);
 }
 
 float BattleFormula::calcPhysique(Battle::BattleFighter * fgt)
@@ -352,19 +402,19 @@ float BattleFormula::calcMagDefend(Battle::BattleFighter * fgt)
 	return call<float>("calcMagDefend", fgt);
 }
 
-float BattleFormula::calcHitrate(Battle::BattleFighter * fgt)
+float BattleFormula::calcHitrate(Battle::BattleFighter * fgt, Battle::BattleFighter * defgt)
 {
-	return call<float>("calcHitrate", fgt);
+	return call<float>("calcHitrate", fgt, defgt);
 }
 
-float BattleFormula::calcEvade(Battle::BattleFighter * fgt)
+float BattleFormula::calcEvade(Battle::BattleFighter * fgt, Battle::BattleFighter * defgt)
 {
-	return call<float>("calcEvade", fgt);
+	return call<float>("calcEvade", fgt, defgt);
 }
 
-float BattleFormula::calcCritical(Battle::BattleFighter * fgt)
+float BattleFormula::calcCritical(Battle::BattleFighter * fgt, Battle::BattleFighter * defgt)
 {
-	return call<float>("calcCritical", fgt);
+	return call<float>("calcCritical", fgt, defgt);
 }
 
 float BattleFormula::calcCriticalDmg(Battle::BattleFighter * fgt)
@@ -372,23 +422,59 @@ float BattleFormula::calcCriticalDmg(Battle::BattleFighter * fgt)
 	return call<float>("calcCriticalDmg", fgt);
 }
 
+float BattleFormula::calcHitRateLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcHitRateLevel", fgt);
+}
+
+float BattleFormula::calcEvadeLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcEvadeLevel", fgt);
+}
+
+float BattleFormula::calcCriticalLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcCriticalLevel", fgt);
+}
+
+float BattleFormula::calcPierceLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcPierceLevel", fgt);
+}
+
+float BattleFormula::calcCounterLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcCounterLevel", fgt);
+}
+
+float BattleFormula::calcToughLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcToughLevel", fgt);
+}
+
+float BattleFormula::calcMagResLevel(Battle::BattleFighter * fgt)
+{
+	return call<float>("calcMagResLevel", fgt);
+}
+
+
 lua_tinker::table BattleFormula::getFactor(UInt8 klass, UInt8 career, UInt8 level)
 {
 	return call<lua_tinker::table>("getFactor", klass, career, level);
 }
-float BattleFormula::calcPierce(Battle::BattleFighter * fgt)
+float BattleFormula::calcPierce(Battle::BattleFighter * fgt, Battle::BattleFighter * defgt)
 {
-	return call<float>("calcPierce", fgt);
+	return call<float>("calcPierce", fgt, defgt);
 }
 
-float BattleFormula::calcCounter(Battle::BattleFighter * fgt)
+float BattleFormula::calcCounter(Battle::BattleFighter * fgt, Battle::BattleFighter * defgt)
 {
-	return call<float>("calcCounter", fgt);
+	return call<float>("calcCounter", fgt, defgt);
 }
 
-float BattleFormula::calcMagRes(Battle::BattleFighter * fgt)
+float BattleFormula::calcMagRes(Battle::BattleFighter * fgt, Battle::BattleFighter * defgt)
 {
-	return call<float>("calcMagRes", fgt);
+	return call<float>("calcMagRes", fgt, defgt);
 }
 
 UInt32 BattleFormula::calcHP(Battle::BattleFighter * fgt)
@@ -401,9 +487,9 @@ UInt32 BattleFormula::calcAction(Battle::BattleFighter * fgt)
 	return call<UInt32>("calcAction", fgt);
 }
 
-UInt32 BattleFormula::calcDamage( float atk, float def )
+UInt32 BattleFormula::calcDamage( float atk, float def, float atklvl )
 {
-	return call<UInt32>("calcDamage", atk, def);
+	return call<UInt32>("calcDamage", atk, def, atklvl);
 }
 
 float BattleFormula::calcAutoBattle( float mybp, float theirbp )

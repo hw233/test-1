@@ -3,20 +3,20 @@
 
 -- 属性成长不分主副将
 --           儒     释      道
-str_factor = { 2,    3,      4}  -- 力量
-phy_factor = {10,   11,     12}  -- 耐力
-agi_factor = { 2,    2,      4}  -- 敏捷
-int_factor = { 5,    4,      2}  -- 智力
-wil_factor = { 2,    4,      2}  -- 意志
+str_factor = {10,   12,     14}  -- 力量
+phy_factor = {11,   12,     13}  -- 耐力
+agi_factor = {12,   10,     15}  -- 敏捷
+int_factor = {15,   14,     10}  -- 智力
+wil_factor = {10,   15,     10}  -- 意志
 
-hp_factor     = { 0,   0,   0}  -- 生命
-atk_factor    = { 0,   0,   0}  -- 物功
-def_factor    = { 0,   0,   0}  -- 物防
-magatk_factor = { 0,   0,   0}  -- 法功
-magdef_factor = { 0,   0,   0}  -- 法防
+hp_factor     = {50,  55,  60}  -- 生命
+atk_factor    = { 2,   2,   5}  -- 物功
+def_factor    = { 3,   2,   4}  -- 物防
+magatk_factor = { 8,   3,   0}  -- 法功
+magdef_factor = { 3,   5,   3}  -- 法防
 
 tough_factor       = { 0,  0,  0}  -- 坚韧
-action_factor      = { 1,  1,  1}  -- 身法
+action_factor      = {11, 12, 10}  -- 身法
 hitrate_factor     = { 0,  0,  0}  -- 命中
 evade_factor       = { 0,  0,  0}  -- 闪避
 critical_factor    = { 0,  0,  0}  -- 暴击
@@ -25,15 +25,21 @@ pierce_factor      = { 0,  0,  0}  -- 破击
 counter_factor     = { 0,  0,  0}  -- 反击
 magres_factor      = { 0,  0,  0}  -- 法术抵抗
 
-str_atk_factor = 4.0            -- 力量影响的物理攻击系数
-int_atk_factor = 4.0            -- 智力影响的法术攻击系数
+str_atk_factor = 2.0            -- 力量影响的物理攻击系数
+int_atk_factor = 2.0            -- 智力影响的法术攻击系数
 agi_def_factor = 2.0            -- 敏捷影响的物理防御系数
-phy_hp_factor  = 8.0            -- 耐力影响的生命值系数
+phy_hp_factor  = 10.0           -- 耐力影响的生命值系数
 wil_def_factor = 2.0            -- 意志影响的法术防御系数
+
+str_cri_factor = 1.0            -- 力量影响的暴击等级系数
+int_pri_factor = 1.0            -- 智力影响的破击等级系数
+agi_evd_factor = 1.0            -- 敏捷影响的闪避等级系数
+wil_mres_factor = 1.0           -- 意志影响的法术抵抗等级系数
+
 
 str_cnt_factor = 0.02
 agi_act_factor = 1.0
-agi_evd_factor = 0.02
+--agi_evd_factor = 0.02
 phy_def_factor = 2
 int_hit_factor = 0.02
 
@@ -42,6 +48,7 @@ autobattle_tweak = 0.5
 autobattle_A = 2.5
 
 -- 辅助函数
+-- 基础属性
 function calcAura( fgt )
   if fgt == nil then
     return 0
@@ -152,6 +159,66 @@ function calcAction( fgt )
   return act + action_factor[cls] * lvl + fgt:getExtraAction();
 end
 
+
+--暴击，破击，闪避，命中，反击，坚韧，法术抵抗等级
+function calcCriticalLevel( fgt )
+  if fgt == nil then
+    return 0
+  end
+  local cri = fgt:getExtraCriticalLevel()
+  return cri + str_cri_factor * calcStrength(fgt)
+end
+
+function calcPierceLevel( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local pir = fgt:getExtraPierceLevel()
+    return pir + int_pri_factor * calcIntelligence(fgt)
+end
+
+function calcEvadeLevel( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local evd = fgt:getExtraEvadeLevel()
+    return evd + agi_evd_factor * calcAgility(fgt)
+end
+
+function calcMagResLevel( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local mres = fgt:getExtraMagResLevel()
+    return mres + wil_mres_factor * calcWill(fgt)
+end
+
+function calcHitRateLevel( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local hrate = fgt:getExtraHitrateLevel()
+    return hrate
+end
+
+function calcToughLevel( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local tough = fgt:getExtraToughLevel()
+    return tough
+end
+
+function calcCounterLevel( fgt )
+    if fgt == nil then
+        return 0
+    end
+    local counter = fgt:getExtraCounterLevel()
+    return counter
+end
+
+
+--攻击，防御，概率
 function calcAttack( fgt )
   if fgt == nil then
     return 0
@@ -204,57 +271,82 @@ function calcMagDefend( fgt )
   return (def + magdef_factor[cls] * lvl + wil_def_factor * calcWill(fgt)) * (1 + fgt:getExtraMagDefendPercent()) + fgt:getExtraMagDefend()
 end
 
-function calcHitrate( fgt )
+function calcHitrate( fgt, defgt )
   if fgt == nil then
     return 0
+  end
+  local deflev = fgt:getLevel();
+  if defgt ~= nil then
+      deflev = defgt:getLevel();
   end
   local cls = fgt:getClass()
   local hitr = fgt:getBaseHitrate()
-  return hitr + fgt:getExtraHitrate()
+  local hitrlvl = calcHitRateLevel(fgt)
+  return hitr + fgt:getExtraHitrate() + hitrlvl/(hitrlvl + hitrlvl_factor*deflev + hitrlvl_addon_factor)
 end
 
-function calcEvade( fgt )
+function calcEvade( fgt, defgt )
   if fgt == nil then
     return 0
+  end
+  local deflev = fgt:getLevel();
+  if defgt ~= nil then
+      deflev = defgt:getLevel();
   end
   local cls = fgt:getClass()
   local evd = fgt:getBaseEvade()
-  return evd + fgt:getExtraEvade()
+  local evdlvl = calcEvadeLevel(fgt)
+  return evd + fgt:getExtraEvade() + evdlvl/(evdlvl + evdlvl_factor*deflev + evdlvl_addon_factor)
 end
 
-function calcCritical( fgt )
+function calcCritical( fgt, defgt )
   if fgt == nil then
     return 0
+  end
+  local deflev = fgt:getLevel();
+  if defgt ~= nil then
+      deflev = defgt:getLevel();
   end
   local cls = fgt:getClass()
   local cri = fgt:getBaseCritical()
-  return cri + fgt:getExtraCritical()
+  local crilvl = calcCriticalLevel(fgt)
+  return cri + fgt:getExtraCritical() + crilvl/(crilvl + crilvl_factor*deflev + crilvl_addon_factor)
 end
 
-function calcCounter( fgt )
+function calcCounter( fgt, defgt )
   if fgt == nil then
     return 0
+  end
+  local deflev = fgt:getLevel();
+  if defgt ~= nil then
+      deflev = defgt:getLevel();
   end
   local cls = fgt:getClass()
   local cnt = fgt:getBaseCounter()
-  return cnt + fgt:getExtraCounter()
+  local cntlvl = calcCounterLevel(fgt)
+  return cnt + fgt:getExtraCounter() + cntlvl/(cntlvl + counterlvl_factor*deflev + counterlvl_addon_factor)
 end
 
-function calcPierce( fgt )
+function calcPierce( fgt, defgt )
   if fgt == nil then
     return 0
   end
+  local deflev = fgt:getLevel();
+  if defgt ~= nil then
+      deflev = defgt:getLevel();
+  end
   local cls = fgt:getClass()
   local prc = fgt:getBasePierce()
-  return prc + fgt:getExtraPierce()
+  local prclvl = calcPierceLevel(fgt)
+  return prc + fgt:getExtraPierce() + prclvl/(prclvl + pirlvl_factor*deflev + pirlvl_addon_factor)
 end
 
-function calcDamage( atk, def )
-    if atk < def + 1 then
-        return 1;
+function calcDamage( atk, def, atklvl )
+    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor))
+    if dmgP < 0.25 then
+        dmgP = 0.25
     end
-
-  return atk - def
+    return atk * dmgP
 end
 
 function calcCriticalDmg( fgt )
@@ -266,13 +358,18 @@ function calcCriticalDmg( fgt )
   return cri + fgt:getExtraCriticalDmg()
 end
 
-function calcMagRes( fgt )
+function calcMagRes( fgt, defgt )
     if fgt == nil then
         return 0
     end
+    local deflev = fgt:getLevel();
+    if defgt ~= nil then
+        deflev = defgt:getLevel();
+    end
     local cls = fgt:getClass()
     local magres = fgt:getBaseMagRes()
-    return magres + fgt:getExtraMagRes()
+    local mreslvl = calcMagResLevel(fgt)
+    return magres + fgt:getExtraMagRes() + mreslvl/(mreslvl + mreslvl_factor*deflev + mreslvl_addon_factor)
 end
 
 function calcSoul( fgt )
@@ -284,13 +381,18 @@ function calcSoul( fgt )
     return soul + fgt:getExtraSoul()
 end
 
-function calcTough( fgt )
+function calcTough( fgt, defgt )
     if fgt == nil then
         return 0
     end
+    local deflev = fgt:getLevel();
+    if defgt ~= nil then
+        deflev = defgt:getLevel();
+    end
     local cls = fgt:getClass(0)
     local tough = fgt:getBaseTough()
-    return tough + fgt:getExtraTough()
+    local toughlvl = calcToughLevel(fgt)
+    return tough + fgt:getExtraTough() + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)
 end
 
 function calcBattlePoint( fgt )
@@ -312,7 +414,7 @@ function calcBattlePoint( fgt )
       return atk * (1 + 0.005 * crt) * hit / act
     end
   end
-  return calcAttack(fgt) * (1 + 0.005 * calcCritical(fgt)) * calcHitrate(fgt) / calcAction(fgt)
+  return calcAttack(fgt) * (1 + 0.005 * calcCritical(fgt, nil)) * calcHitrate(fgt, nil) / calcAction(fgt)
 end
 
 function calcAutoBattle( mybp, theirbp )
@@ -321,3 +423,4 @@ function calcAutoBattle( mybp, theirbp )
   end
   return 1 + autobattle_tweak - autobattle_tweak * mybp / theirbp
 end
+

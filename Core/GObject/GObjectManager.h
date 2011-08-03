@@ -81,6 +81,14 @@ namespace GObject
         static UInt8 getCriticalFactor() { return _critcal_factor; }
         static UInt8 getPierceFactor() { return _pierce_factor; }
         static UInt8 getToughFactor() { return _tough_factor; }
+
+        static float getHiterateMax() { return _hiterate_max; }
+        static float getEvadeMax() { return _evade_max; }
+        static float getCriticalMax() { return _critical_max; }
+        static float getPierceMax() { return _pierce_max; }
+        static float getToughMax() { return _tough_max; }
+        static float getCounterMax() { return _counter_max; }
+        static float getMagResMax() { return _mres_max; }
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -92,8 +100,8 @@ namespace GObject
         static UInt32 _merge_chance[9];
 		static UInt32 _enchant_chance[5][12];
 		static UInt8  _enchant_max[11];
-		static UInt8  _attrChances[11][3][8];
-		static UInt16 _attrInfo[11][8][3][8];
+		static UInt8  _attrChances[11][3][9];
+		static UInt16 _attrInfo[11][8][3][9];
         static UInt32 _socket_chance[6];
         static UInt32 _min_potential;
         static UInt32 _max_potential;
@@ -106,6 +114,13 @@ namespace GObject
         static UInt8 _critcal_factor;
         static UInt8 _pierce_factor;
         static UInt8 _tough_factor;
+        static float _hiterate_max;
+        static float _evade_max;
+        static float _critical_max;
+        static float _pierce_max;
+        static float _tough_max;
+        static float _counter_max;
+        static float _mres_max;
 	};
 }
 

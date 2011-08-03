@@ -41,6 +41,7 @@ namespace GObject
         void UpdateAttainment(UInt16 attainId, UInt32 status);
         UInt32 getAttainStatus(UInt16 attainId);
         void MidnightCheckAttain();
+        void sendAttainment();
 
     private:
         Player* m_PlayerOwner;

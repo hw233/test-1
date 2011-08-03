@@ -790,21 +790,32 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
 {
 	switch(type)
 	{
+    case 1:
+        break;
+        ae.hp += value;
+    case 2:
+        ae.action += value;
+        break;
 	case 3:
-		ae.hitrate += static_cast<float>(value) / (level * GObjectManager::getHitrateFactor());
+        ae.hitrlvl += value;
 		break;
 	case 4:
-		ae.evade += static_cast<float>(value) / (level * GObjectManager::getEvadeFactor());
+        ae.evdlvl += value;
 		break;
 	case 5:
-		ae.critical += static_cast<float>(value) / (level * GObjectManager::getCriticalFactor());
+        ae.crilvl += value;
 		break;
 	case 6:
-		ae.pierce += static_cast<float>(value) / (level * GObjectManager::getPierceFactor());
+        ae.pirlvl += value;
 		break;
-	case 7:
-		ae.tough += static_cast<float>(value) / (level* GObjectManager::getToughFactor());
+    case 7:
+        ae.counterlvl += value;
+        break;
+	case 8:
+        ae.toughlvl += value;
 		break;
+    case 9:
+        ae.mreslvl += value;
 	}
 }
 
