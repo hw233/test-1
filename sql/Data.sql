@@ -586,4 +586,13 @@ CREATE TABLE `copy` (
   PRIMARY KEY (`id`, `floor`, `spot`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `frontmap`;
+CREATE TABLE `frontmap` (
+  `id` tinyint(3) unsigned NOT NULL,
+  `spot` tinyint(3) unsigned NOT NULL,
+  `count` tinyint(3) unsigned NOT NULL,
+  `fighterId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`, `spot`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 -- Dump completed

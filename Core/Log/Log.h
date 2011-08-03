@@ -41,6 +41,7 @@ enum PurchaseType
     Practice,
     AddPracticeSlot,
     EnterCopy,
+    EnterFrontMap,
 };
 
 enum MoneyType

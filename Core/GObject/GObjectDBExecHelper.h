@@ -625,6 +625,14 @@ struct DBCopyData
     UInt8 spot;
 };
 
+struct DBFrontMapData
+{
+    UInt64 playerId;
+    UInt8 id;
+    UInt8 spot;
+    UInt8 count;
+    UInt8 status;
+};
 struct DBAttainData
 {
     UInt64 ownerId;
@@ -683,7 +691,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(36)
+SPECIALDEF(40)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -717,6 +725,10 @@ SPECIALDEF(36)
     std::string, clantask,
 	UInt8, pdata.copyFreeCnt,
 	UInt8, pdata.copyGoldCnt,
+	UInt32, pdata.copyUpdate,
+	UInt8, pdata.frontFreeCnt,
+	UInt8, pdata.frontGoldCnt,
+	UInt32, pdata.frontUpdate,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
 	UInt32, pdata.created,
@@ -1404,6 +1416,17 @@ SPECIALDEF(4)
     UInt8, id,
     UInt8, floor,
     UInt8, spot
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFrontMapData)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8, id,
+    UInt8, spot,
+    UInt8, count,
+    UInt8, status
 )
 SPECIALEND()
 

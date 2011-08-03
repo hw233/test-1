@@ -291,6 +291,14 @@ struct DBCopy
     UInt32 fighterId;
 };
 
+struct DBFrontMap
+{
+    UInt8 id;
+    UInt8 spot;
+    UInt8 count;
+    UInt32 fighterId;
+};
+
 }
 
 
@@ -612,6 +620,17 @@ SPECIALDEF(4)
         UInt32, fighterId
     )
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBFrontMap)
+SPECIALDEF(4)
+    (
+        UInt8, id,
+        UInt8, spot, 
+        UInt8, count, 
+        UInt32, fighterId
+    )
+SPECIALEND()
+
 }
 
 #endif // _GDATADBEXECHELPER_H_

@@ -48,6 +48,7 @@
 #include "GObject/PracticePlace.h"
 #include "GObject/Tripod.h"
 #include "GObject/Copy.h"
+#include "GObject/FrontMap.h"
 
 #include <fcntl.h>
 
@@ -110,6 +111,8 @@ namespace GObject
 	{
 		loadMapData();
         loadAttrFactor();
+        loadCopy();
+        loadFrontMap();
 		loadEquipments();
         loadFightersPCChance();
         loadEquipForge();
@@ -299,6 +302,20 @@ namespace GObject
 		while(execu->Next() == DB::DB_OK)
 		{
             playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot);
+        }
+        return true;
+    }
+
+    bool GObjectManager::loadFrontMap()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBFrontMapData dbcd;
+		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status` FROM `player_frontmap` ORDER BY playerId,id", dbcd) != DB::DB_OK)
+            return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            frontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status);
         }
         return true;
     }

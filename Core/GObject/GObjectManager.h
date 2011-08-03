@@ -29,6 +29,7 @@ namespace GObject
 		static bool loadMapData();
 		static bool loadFighters();
 		static bool loadCopy();
+        static bool loadFrontMap();
 		static bool loadClanAssist();
 		static bool loadClanRobMonster();
 		static bool loadAllPlayers();

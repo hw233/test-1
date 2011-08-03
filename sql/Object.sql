@@ -809,6 +809,10 @@ CREATE TABLE `player` (
   `clantask` varchar(255) NOT NULL DEFAULT '',
   `copyFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `copyGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
+  `copyupdate` int(10) unsigned NOT NULL DEFAULT '0',
+  `frontFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
+  `frontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
+  `frontUpdate` int(10) unsigned NOT NULL DEFAULT '0',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -1062,6 +1066,16 @@ CREATE TABLE `player_copy` (
   `id` tinyint(3) unsigned NOT NULL,
   `floor` tinyint(3) unsigned NOT NULL,
   `spot` tinyint(3) unsigned NOT NULL,
+  UNIQUE KEY `player_id` (`playerId`,`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `player_frontmap`;
+CREATE TABLE `player_frontmap` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  `spot` tinyint(3) unsigned NOT NULL,
+  `count` tinyint(3) unsigned NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL,
   UNIQUE KEY `player_id` (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

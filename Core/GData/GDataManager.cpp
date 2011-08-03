@@ -18,6 +18,7 @@
 #include "TalentTable.h"
 #include "CittaTable.h"
 #include "CopyTable.h"
+#include "FrontMapTable.h"
 #include "AcuPraTable.h"
 #include "FighterProb.h"
 #include "Common/StringTokenizer.h"
@@ -181,7 +182,11 @@ namespace GData
 			fprintf(stderr, "Load copy data template Error !\n");
 			return false;
 		}
-
+		if (!LoadFrontMapData())
+		{
+			fprintf(stderr, "Load copy data template Error !\n");
+			return false;
+		}
 
 		return true;
 	}	
@@ -1153,6 +1158,41 @@ namespace GData
 
             id = dbc.id;
             floor = dbc.floor;
+            first = false;
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadFrontMapData()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBFrontMap dbc;
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `front_map` ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+			return false;
+
+        bool nextfrontmap = false;
+        bool first = true;
+        int id = 0;
+        int spot = 0;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if (!first && id != dbc.id)
+                nextfrontmap = true;
+
+            if (nextfrontmap) {
+                frontMapMaxManager[id] = spot;
+                nextfrontmap = false;
+            }
+
+            std::vector<FrontMapFighter>& cpv = frontMapManager[dbc.id<<8|dbc.spot];
+            if (cpv.size() <= dbc.spot)
+                cpv.resize(dbc.spot+1);
+            cpv[dbc.spot].count = dbc.count;
+            cpv[dbc.spot].fighterId = dbc.fighterId;
+
+            id = dbc.id;
+            spot = dbc.spot;
             first = false;
         }
         return true;

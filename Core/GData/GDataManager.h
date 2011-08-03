@@ -44,6 +44,7 @@ namespace GData
 		static bool LoadClanSkillTable();
         static bool LoadFighterProb();
         static bool LoadCopyData();
+        static bool LoadFrontMapData();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);
