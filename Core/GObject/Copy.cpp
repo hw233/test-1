@@ -76,9 +76,12 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
         return;
 
     CopyData& tcd = getCopyData(pl, id);
-    if (PLAYER_DATA(pl, copyFreeCnt) > 3 || PLAYER_DATA(pl, copyGoldCnt) > 2) {
+    if (!tcd.floor) {
         return;
     }
+
+    if (PLAYER_DATA(pl, copyFreeCnt) > 3 && PLAYER_DATA(pl, copyGoldCnt) > 2)
+        return;
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
@@ -129,12 +132,9 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
         return;
     }
 
-    tcd.floor = 1;
-    tcd.spot = 1;
-    PLAYER_DATA(pl, copyFreeCnt) = 1;
-    DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), pl->getId());
-    DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
-            tcd.floor, tcd.spot, pl->getId(), id);
+    tcd.floor = 0;
+    tcd.spot = 0;
+    DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, pl->getId(), id);
 
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);
@@ -160,18 +160,20 @@ CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool up
     static CopyData nulldata;
     CopyData& cd = m_copys[playerId][id];
     if (!cd.floor) {
-        cd.updatetime = TimeUtil::Now();
-        if (update)
-            DB().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)", playerId, id, cd.floor, cd.spot, TimeUtil::Now());
+        PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
+        if (update) {
+            DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);
+            DB().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)", playerId, id, cd.floor, cd.spot);
+        }
     } else {
-        if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(cd.updatetime)) {
-            cd.updatetime = TimeUtil::Now();
-
+        if (pl && TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate))) {
             if (pl) {
+                PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
                 PLAYER_DATA(pl, copyFreeCnt) = 0;
                 PLAYER_DATA(pl, copyGoldCnt) = 0;
-                DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), playerId);
             }
+
+            DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);
         }
     }
     return cd;

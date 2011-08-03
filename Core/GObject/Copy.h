@@ -11,14 +11,11 @@ namespace GObject
 
 struct CopyData
 {
-    CopyData() : floor(0), spot(0), freeCount(0), goldCount(0) {}
+    CopyData() : floor(0), spot(0) {}
     void reset() { memset(this, 0x00, sizeof(*this)); }
 
     UInt8 floor;
     UInt8 spot;
-    UInt8 freeCount;
-    UInt8 goldCount;
-    UInt32 updatetime;
 };
 
 class Player;
@@ -26,7 +23,6 @@ class Player;
 class PlayerCopy : public Singleton<PlayerCopy>
 {
 public:
-
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
     void enter(Player* pl, UInt8 id);
