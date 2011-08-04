@@ -15,6 +15,14 @@ void FrontMap::sendAllInfo(Player* pl)
 
 void FrontMap::sendInfo(Player* pl, UInt8 id)
 {
+    Stream st(0x00);
+    UInt8 count = 3-PLAYER_DATA(pl, frontGoldCnt);
+    count <<= 4;
+    count |= 2-PLAYER_DATA(pl, frontFreeCnt);
+
+    st << static_cast<UInt8>(0);
+    st << count;
+    st << Stream::eos;
 }
 
 void FrontMap::enter(Player* pl, UInt8 id)

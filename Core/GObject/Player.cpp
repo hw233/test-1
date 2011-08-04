@@ -3126,7 +3126,7 @@ namespace GObject
         }
 
         UInt16 ncount = 0;
-        if (type | first) {
+        if (type || first) {
             if (ftype) {
                 if (getGold() < 2) {
                     sendMsgCode(1, 1007);
@@ -3147,9 +3147,9 @@ namespace GObject
                 if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < 5) || (ttype == 1 && _playerData.ymFreeCount < 5))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
-                    std::set<UInt32> idxs;
                     if (!task.size())
-                        break;
+                        return;
+                    std::set<UInt32> idxs;
                     if (task.size() <= 6) {
                         for (size_t i = 0; i < task.size(); ++i)
                             idxs.insert(i);
@@ -3172,7 +3172,7 @@ namespace GObject
                                     _playerData.smcolor[n] = j+1;
                                 } else {
                                     _playerData.yamen[n] = task[*i];
-                                    _playerData.yamen[n] = j+1;
+                                    _playerData.ymcolor[n] = j+1;
                                 }
                                 if (j+1 == color)
                                     percolor = true;
