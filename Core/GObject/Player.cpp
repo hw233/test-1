@@ -1482,16 +1482,14 @@ namespace GObject
 
 	bool Player::attackCopyNpc( UInt32 npcId )
 	{
-		checkLastBattled();
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        //TODO::bufLeft=0
-        buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);
 			return false;
 		}
+		checkLastBattled();
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;
