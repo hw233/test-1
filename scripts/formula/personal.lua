@@ -3,17 +3,17 @@
 
 -- 属性成长不分主副将
 --           儒     释      道
-str_factor = {10,   12,     14}  -- 力量
-phy_factor = {11,   12,     13}  -- 耐力
-agi_factor = {12,   10,     15}  -- 敏捷
-int_factor = {15,   14,     10}  -- 智力
-wil_factor = {10,   15,     10}  -- 意志
+str_factor = {5,   6,     7}  -- 力量
+phy_factor = {8,   9,     10}  -- 耐力
+agi_factor = {5,   4,     6}  -- 敏捷
+int_factor = {8,   7,     5}  -- 智力
+wil_factor = {5,   7,     5}  -- 意志
 
-hp_factor     = {50,  55,  60}  -- 生命
-atk_factor    = { 2,   2,   5}  -- 物功
-def_factor    = { 3,   2,   4}  -- 物防
-magatk_factor = { 8,   3,   0}  -- 法功
-magdef_factor = { 3,   5,   3}  -- 法防
+hp_factor     = { 0,   0,   0}  -- 生命
+atk_factor    = { 0,   0,   0}  -- 物功
+def_factor    = { 0,   0,   0}  -- 物防
+magatk_factor = { 0,   0,   0}  -- 法功
+magdef_factor = { 0,   0,   0}  -- 法防
 
 tough_factor       = { 0,  0,  0}  -- 坚韧
 action_factor      = {11, 12, 10}  -- 身法
@@ -25,16 +25,16 @@ pierce_factor      = { 0,  0,  0}  -- 破击
 counter_factor     = { 0,  0,  0}  -- 反击
 magres_factor      = { 0,  0,  0}  -- 法术抵抗
 
-str_atk_factor = 2.0            -- 力量影响的物理攻击系数
-int_atk_factor = 2.0            -- 智力影响的法术攻击系数
-agi_def_factor = 2.0            -- 敏捷影响的物理防御系数
-phy_hp_factor  = 10.0           -- 耐力影响的生命值系数
-wil_def_factor = 2.0            -- 意志影响的法术防御系数
+str_atk_factor = 1.0            -- 力量影响的物理攻击系数
+int_atk_factor = 1.0            -- 智力影响的法术攻击系数
+agi_def_factor = 1.0            -- 敏捷影响的物理防御系数
+phy_hp_factor  = 5.0            -- 耐力影响的生命值系数
+wil_def_factor = 1.0            -- 意志影响的法术防御系数
 
-str_cri_factor = 1.0            -- 力量影响的暴击等级系数
-int_pri_factor = 1.0            -- 智力影响的破击等级系数
-agi_evd_factor = 1.0            -- 敏捷影响的闪避等级系数
-wil_mres_factor = 1.0           -- 意志影响的法术抵抗等级系数
+str_cri_factor = 0.1            -- 力量影响的暴击等级系数
+wil_mres_factor = 0.1           -- 意志影响的法术抵抗等级系数
+agi_evd_factor = 0.1            -- 敏捷影响的闪避等级系数
+int_pri_factor = 0.1            -- 智力影响的破击等级系数
 
 
 str_cnt_factor = 0.02
