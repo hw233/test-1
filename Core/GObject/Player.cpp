@@ -1482,16 +1482,14 @@ namespace GObject
 
 	bool Player::attackCopyNpc( UInt32 npcId )
 	{
-		checkLastBattled();
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        //TODO::bufLeft=0
-        buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);
 			return false;
 		}
+		checkLastBattled();
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return false;
@@ -2842,8 +2840,8 @@ namespace GObject
                 if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
                     return false;
 
-                _playerData.shimen[i] = 0;
-                _playerData.smcolor[i] = 0;
+                //_playerData.shimen[i] = 0;
+                //_playerData.smcolor[i] = 0;
 
                 UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]&0x0F);
                 AddExp(award); // TODO:
@@ -2859,8 +2857,8 @@ namespace GObject
                 if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
                     return false;
 
-                _playerData.yamen[i] = 0;
-                _playerData.ymcolor[i] = 0;
+                //_playerData.yamen[i] = 0;
+                //_playerData.ymcolor[i] = 0;
 
                 UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.ymcolor[i]&0x0F);
                 getTael(award); // TODO:
@@ -4678,12 +4676,6 @@ namespace GObject
 		UInt16 money = 0;
         int count = 0;
 
-		if(type > 0 && _playerData.tael < money)
-		{
-			sendMsgCode(1, 5003);
-			return;
-		}
-
 		if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
 		{
             count = 1;
@@ -4695,6 +4687,12 @@ namespace GObject
             money = 50;
             // updateNextBookStoreUpdate(curtime);
         }
+
+		if(type > 0 && _playerData.tael < money)
+		{
+			sendMsgCode(1, 1006);
+			return;
+		}
 
 		Stream st(0x1A);
 		if(count > 0)
