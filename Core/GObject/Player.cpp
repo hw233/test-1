@@ -4676,12 +4676,6 @@ namespace GObject
 		UInt16 money = 0;
         int count = 0;
 
-		if(type > 0 && _playerData.tael < money)
-		{
-			sendMsgCode(1, 5003);
-			return;
-		}
-
 		if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
 		{
             count = 1;
@@ -4693,6 +4687,12 @@ namespace GObject
             money = 50;
             // updateNextBookStoreUpdate(curtime);
         }
+
+		if(type > 0 && _playerData.tael < money)
+		{
+			sendMsgCode(1, 1006);
+			return;
+		}
 
 		Stream st(0x1A);
 		if(count > 0)
