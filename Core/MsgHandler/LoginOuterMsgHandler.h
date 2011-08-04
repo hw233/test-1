@@ -18,6 +18,7 @@
 #include "GObject/Prepaid.h"
 #include "GObject/Player.h"
 #include "GObject/Fighter.h"
+#include "GObject/Package.h"
 #include "Battle/BattleReport.h"
 #include "MsgHandler/GMHandler.h"
 #include "Common/BinaryReader.h"
@@ -395,6 +396,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			pl->SetSessionID(hdr.sessionID);
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
+
+            pl->GetPackage()->AddItem(18, 1);
 
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
