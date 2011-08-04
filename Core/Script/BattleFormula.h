@@ -91,15 +91,15 @@ public:
 	float calcToughLevel(Battle::BattleFighter *);
 	float calcMagResLevel(Battle::BattleFighter *);
 
-	UInt32 calcHP(GObject::Fighter *);
-	UInt32 calcAction(GObject::Fighter *);
+	float calcHP(GObject::Fighter *);
+	float calcAction(GObject::Fighter *);
 	float calcBattlePoint(GObject::Fighter *);
 	float calcAutoBattle(float, float);
 
-	UInt32 calcHP(Battle::BattleFighter *);
-	UInt32 calcAction(Battle::BattleFighter *);
+	float calcHP(Battle::BattleFighter *);
+	float calcAction(Battle::BattleFighter *);
 
-	UInt32 calcDamage(float, float, float);
+	float calcDamage(float, float, float);
     float calcPracticeInc(GObject::Fighter *);
     float calcClanTechAddon(UInt16 id, UInt8 lvl);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);

@@ -286,12 +286,12 @@ float BattleFormula::calcMagRes( GObject::Fighter * fgt, GObject::Fighter * defg
 	return call<float>("calcMagRes", fgt, defgt);
 }
 
-UInt32 BattleFormula::calcHP( GObject::Fighter * fgt )
+float BattleFormula::calcHP( GObject::Fighter * fgt )
 {
 	return call<UInt32>("calcHP", fgt);
 }
 
-UInt32 BattleFormula::calcAction( GObject::Fighter * fgt )
+float BattleFormula::calcAction( GObject::Fighter * fgt )
 {
 	return call<UInt32>("calcAction", fgt);
 }
@@ -477,19 +477,19 @@ float BattleFormula::calcMagRes(Battle::BattleFighter * fgt, Battle::BattleFight
 	return call<float>("calcMagRes", fgt, defgt);
 }
 
-UInt32 BattleFormula::calcHP(Battle::BattleFighter * fgt)
+float BattleFormula::calcHP(Battle::BattleFighter * fgt)
 {
 	return call<UInt32>("calcHP", fgt);
 }
 
-UInt32 BattleFormula::calcAction(Battle::BattleFighter * fgt)
+float BattleFormula::calcAction(Battle::BattleFighter * fgt)
 {
 	return call<UInt32>("calcAction", fgt);
 }
 
-UInt32 BattleFormula::calcDamage( float atk, float def, float atklvl )
+float BattleFormula::calcDamage( float atk, float def, float atklvl )
 {
-	return call<UInt32>("calcDamage", atk, def, atklvl);
+	return call<float>("calcDamage", atk, def, atklvl);
 }
 
 float BattleFormula::calcAutoBattle( float mybp, float theirbp )
