@@ -3126,7 +3126,7 @@ namespace GObject
         }
 
         UInt16 ncount = 0;
-        if (type | first) {
+        if (type || first) {
             if (ftype) {
                 if (getGold() < 2) {
                     sendMsgCode(1, 1007);
@@ -3172,7 +3172,7 @@ namespace GObject
                                     _playerData.smcolor[n] = j+1;
                                 } else {
                                     _playerData.yamen[n] = task[*i];
-                                    _playerData.yamen[n] = j+1;
+                                    _playerData.ymcolor[n] = j+1;
                                 }
                                 if (j+1 == color)
                                     percolor = true;

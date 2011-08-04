@@ -8,6 +8,22 @@ function Task_Accept_00000001()
 	if task:HasAcceptedTask(1) or task:HasCompletedTask(1) or task:HasSubmitedTask(1) then
 		return false;
 	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(123) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(123) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(123) then
+			return false;
+		end
+	end
 	return true;
 end
 
@@ -23,6 +39,22 @@ function Task_Can_Accept_00000001()
 	end
 	if task:HasAcceptedTask(1) or task:HasCompletedTask(1) or task:HasSubmitedTask(1) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(123) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(123) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(123) then
+			return false;
+		end
 	end
 	return true;
 end
@@ -87,7 +119,7 @@ function Task_00000001_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "后面有恶人追逼正紧，这位小哥你为何拦住我们去路？";
+	action.m_NpcMsg = "多谢少侠你帮我们击退这些恶人，这柄剑是老夫昔年行走江湖的随身兵刃就赠与少侠吧。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -125,10 +157,22 @@ function Task_00000001_submit(itemId, itemNum)
 
 	local package = player:GetPackage();
 
+	local fixReqGrid = package:GetItemUsedGrids(2000,1,1);
+	if fixReqGrid > player:GetFreePackageSize() then
+		player:sendMsgCode(2, 2013, 0);
+		return false;
+	end
 	if not player:GetTaskMgr():SubmitTask(1) then
 		return false;
 	end
 
+	if IsEquipTypeId(2000) then
+		for k = 1, 1 do
+			package:AddEquip(2000, 1);
+		end
+	else 
+		package:AddItem(2000,1,1);
+	end
 
 	player:AddExp(460);
 	player:getTael(100);
