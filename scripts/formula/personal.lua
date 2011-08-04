@@ -407,7 +407,7 @@ function calcBattlePoint( fgt )
       local str = fgt:getBaseStrength() + str_factor[cls] * lvl
       local intr = fgt:getBaseIntelligence() + int_factor[cls] * lvl
       local agi = fgt:getBaseAgility() + agi_factor[cls] * lvl
-      local atk = ((fgt:getBaseAttack() + atk_factor * lvl) * (1 + str_atk_factor * str / 100)) * (40 + lvl) / 120
+      local atk = ((fgt:getBaseAttack() + atk_factor[cls] * lvl) * (1 + str_atk_factor * str / 100)) * (40 + lvl) / 120
       local crt = fgt:getBaseCritical()
       local hit = fgt:getBaseHitrate() + int_hit_factor * intr
       local act = fgt:getBaseAction() / (1 + agi_act_factor * agi / 100)
