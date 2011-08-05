@@ -875,7 +875,7 @@ namespace GObject
 		if(_fighters.empty())
 			return NULL;
 		Fighter * fgt = _fighters.begin()->second;
-		if(fgt->getId() > 6)
+		if(fgt->getId() > 9)
 			return NULL;
 		return fgt;
 	}

@@ -568,7 +568,7 @@ function ItemNormal_00000020(iid, num, bind, param)
 	if player:GetLev() >= 30 then
 	   local package = player:GetPackage();
 	   local reqGrids = 9;
-	   if reqGrids <= 	package:GetRestPackageSize() then
+	   if reqGrids <= package:GetRestPackageSize() then
 	       package:DelItemSendMsg(20, player);
            local fgt = player:getMainFighter();
            if fgt == nil then

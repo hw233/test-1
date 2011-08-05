@@ -145,6 +145,7 @@ namespace Script
 		CLASS_DEF(Player, getGreatFighterFavorSubmitCount);
 		CLASS_DEF(Player, getGreatFighterFavor);
 		CLASS_DEF(Player, getFighterCount);
+		CLASS_DEF(Player, getMainFighter);
 		CLASS_DEF(Player, regenHP);
 		CLASS_DEF(Player, findFighter);
 		CLASS_DEF(Player, getBuffData);
