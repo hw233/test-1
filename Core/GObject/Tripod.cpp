@@ -199,6 +199,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     st << static_cast<UInt8>(0);
     st << td.fire;
     genAward(td, st);
+    st << Stream::eos;
     pl->send(st);
     DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u WHERE `id` = %"I64_FMT"u", td.fire, pl->getId());
 
