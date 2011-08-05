@@ -196,7 +196,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     if (j < 6)
         td.fire = j+1;
 
-    st << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(1);
     st << td.fire;
     genAward(td, st);
     st << Stream::eos;
