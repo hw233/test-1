@@ -155,17 +155,10 @@ end
 function Task_00000001_submit(itemId, itemNum)
 	local player = GetPlayer();
 
-	--检查选择性物品
-	local select = false;
-	if itemId == 2000 and itemNum == 1 then
-		select = true;
-	end
-
-	if not select then return false; end
 	local package = player:GetPackage();
 
-	local selReqGrid = package:GetItemUsedGrids(itemId, itemNum, 1);
-	if selReqGrid > player:GetFreePackageSize() then
+	local fixReqGrid = package:GetItemUsedGrids(2000,1,1);
+	if fixReqGrid > player:GetFreePackageSize() then
 		player:sendMsgCode(2, 2013, 0);
 		return false;
 	end
@@ -173,12 +166,12 @@ function Task_00000001_submit(itemId, itemNum)
 		return false;
 	end
 
-	if IsEquipTypeId(itemId) then 
-		for j = 1, itemNum do
-			package:AddEquip(itemId, 1);
+	if IsEquipTypeId(2000) then
+		for k = 1, 1 do
+			package:AddEquip(2000, 1);
 		end
-	else
-		package:AddItem(itemId, itemNum, 1);
+	else 
+		package:AddItem(2000,1,1);
 	end
 
 	player:AddExp(460);
