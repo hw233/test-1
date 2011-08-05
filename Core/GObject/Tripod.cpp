@@ -7,6 +7,7 @@
 //#include "Common/Stream.h"
 #include "GData/GDataManager.h"
 #include "GData/LootTable.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -169,13 +170,17 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     ItemBase* ib1 = pl->GetPackage()->GetItem(id1, true);
     if (!ib1)
         ib1 = pl->GetPackage()->GetItem(id1);
-    if (!ib1)
+    if (!ib1) {
+        SYSMSG_SEND(2003, pl);
         return;
+    }
     ItemBase* ib2 = pl->GetPackage()->GetItem(id2, true);
     if (!ib2)
         ib2 = pl->GetPackage()->GetItem(id2);
-    if (!ib2)
+    if (!ib2) {
+        SYSMSG_SEND(2003, pl);
         return;
+    }
 
     UInt32 id = fire_id2bit[id1-fire_begin] | fire_id2bit[id2-fire_begin];
     int i = 0;
@@ -205,6 +210,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
 
     pl->GetPackage()->DelItem2(ib1, 1);
     pl->GetPackage()->DelItem2(ib2, 1);
+    SYSMSG_SEND(2002, pl);
 }
 
 void Tripod::getAward(Player* pl)
