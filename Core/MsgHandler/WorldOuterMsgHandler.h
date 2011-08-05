@@ -27,6 +27,7 @@
 #include "GObject/ClanManager.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
+#include "GObject/FrontMap.h"
 
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
@@ -1184,6 +1185,42 @@ void OnCopyReq( GameMsgHdr& hdr, CopyReq& req)
 
         case 4:
             GObject::playerCopy.fight(player, req.id);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+    UInt8 id = 0;
+    UInt8 spot = 0;
+	brd >> type;
+    brd >> id;
+
+    switch (type) {
+        case 0:
+            GObject::frontMap.sendInfo(player, id);
+            break;
+
+        case 1:
+            GObject::frontMap.enter(player, id);
+            break;
+
+        case 2:
+            GObject::frontMap.reset(player, id);
+            break;
+
+        case 3:
+            break;
+
+        case 4:
+            brd >> spot;
+            GObject::frontMap.fight(player, id, spot);
             break;
 
         default:

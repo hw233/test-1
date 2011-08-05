@@ -119,6 +119,9 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u WHERE `id` = %"I64_FMT"u", td.quality, pl->getId());
 }
 
+static UInt16 fire_begin = 47;
+static UInt16 fire_end = 51;
+static UInt8 fire_id2bit[] = {16/*47*/, 8/*48*/, 4/*49*/, 2/*50*/, 1/*51*/};
 static UInt8 fire_com[] = {24,20,18,17,12,10,9,6,5,3};
 static UInt8 fire_factor[][6] = 
 {
@@ -154,7 +157,27 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     TripodData& td = getTripodData(pl);
     Stream st(0x39);
 
-    UInt32 id = id1 | id2;
+    if (id1 < fire_begin)
+        id1 = fire_begin;
+    if (id2 < fire_begin)
+        id2 = fire_begin;
+    if (id1 > fire_end)
+        id1 = fire_end;
+    if (id2 > fire_end)
+        id2 = fire_end;
+
+    ItemBase* ib1 = pl->GetPackage()->GetItem(id1, true);
+    if (!ib1)
+        ib1 = pl->GetPackage()->GetItem(id1);
+    if (!ib1)
+        return;
+    ItemBase* ib2 = pl->GetPackage()->GetItem(id2, true);
+    if (!ib2)
+        ib2 = pl->GetPackage()->GetItem(id2);
+    if (!ib2)
+        return;
+
+    UInt32 id = fire_id2bit[id1-fire_begin] | fire_id2bit[id2-fire_begin];
     int i = 0;
     while (i < 10)
     {
@@ -178,6 +201,9 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     genAward(td, st);
     pl->send(st);
     DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u WHERE `id` = %"I64_FMT"u", td.fire, pl->getId());
+
+    pl->GetPackage()->DelItem2(ib1, 1);
+    pl->GetPackage()->DelItem2(ib2, 1);
 }
 
 void Tripod::getAward(Player* pl)

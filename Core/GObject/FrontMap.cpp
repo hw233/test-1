@@ -15,14 +15,31 @@ void FrontMap::sendAllInfo(Player* pl)
 
 void FrontMap::sendInfo(Player* pl, UInt8 id)
 {
-    Stream st(0x00);
+    Stream st(0x68);
     UInt8 count = 3-PLAYER_DATA(pl, frontGoldCnt);
     count <<= 4;
     count |= 2-PLAYER_DATA(pl, frontFreeCnt);
 
     st << static_cast<UInt8>(0);
+    st << id;
     st << count;
+    std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+    UInt8 n = tmp.size();
+    if (n < 1)
+        st << static_cast<UInt8>(0);
+    else
+        st << static_cast<UInt8>(n-1);
+    for (UInt8 i = 1; i < n; ++i) {
+        if (!GData::frontMapManager[id<<8|i][i].count)
+            continue;
+        st << i;
+        if (!tmp[i].count)
+            st << static_cast<UInt8>(0xff);
+        else
+            st << static_cast<UInt8>(GData::frontMapManager[id<<8|i][i].count - tmp[i].count);
+    }
     st << Stream::eos;
+    pl->send(st);
 }
 
 void FrontMap::enter(Player* pl, UInt8 id)
@@ -31,7 +48,6 @@ void FrontMap::enter(Player* pl, UInt8 id)
         return;
 
     UInt8 ret = 1;
-    std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (PLAYER_DATA(pl, frontFreeCnt) < 2) {
         ++PLAYER_DATA(pl, frontFreeCnt);
         ret = 0;
@@ -42,6 +58,21 @@ void FrontMap::enter(Player* pl, UInt8 id)
         ConsumeInfo ci(EnterFrontMap,0,0);
         pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
     }
+
+    if (!ret) {
+        DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), pl->getId());
+
+        UInt8 count = 3-PLAYER_DATA(pl, frontGoldCnt);
+        count <<= 4;
+        count |= 2-PLAYER_DATA(pl, frontFreeCnt);
+        Stream st(0x68);
+        st << static_cast<UInt8>(3) << count << Stream::eos;
+        pl->send(st);
+    }
+
+    Stream st(0x68);
+    st << static_cast<UInt8>(1) << id << ret << Stream::eos;
+    pl->send(st);
 }
 
 void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
@@ -52,6 +83,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     if (PLAYER_DATA(pl, frontFreeCnt) > 2 && PLAYER_DATA(pl, frontGoldCnt) > 3)
         return;
 
+    Stream st(0x68);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (spot > GData::frontMapMaxManager[id]) {
         // TODO: 
@@ -67,7 +99,8 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
     UInt8 count = tmp[spot].count;
     if (count >= GData::frontMapManager[id<<8|spot][spot].count) {
-        // TODO:
+        st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(0) << Stream::eos;
+        pl->send(st);
         return;
     }
 
@@ -81,11 +114,18 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
     ++tmp[spot].count;
     tmp[spot].status = 1;
-    if (ret)
+    if (ret) {
+        if (spot >= GData::frontMapMaxManager[id]) {
+            Stream st(0x68);
+            st << static_cast<UInt8>(4) << id << Stream::eos;
+            pl->send(st);
+        }
         DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u", tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
-    else
+    } else
         DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", spot, tmp[spot].count, tmp[spot].status, pl->getId(), id);
-    // TODO:
+
+    st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id<<8|spot][spot].count - tmp[spot].count) << Stream::eos;
+    pl->send(st);
     return;
 }
 
@@ -93,12 +133,19 @@ void FrontMap::reset(Player* pl, UInt8 id)
 {
     if (!pl || !id)
         return;
+    Stream st(0x68);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
-    if (tmp.size() < 1)
+    if (tmp.size() < 1) {
+        st << static_cast<UInt8>(2) << id << static_cast<UInt8>(1) << Stream::eos;
+        pl->send(st);
         return;
+    }
+
     tmp.clear();
     DB().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
-    // TODO:
+
+    st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
+    pl->send(st);
 }
 
 void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status)
