@@ -206,7 +206,7 @@ void FrontMap::reset(Player* pl, UInt8 id)
         return;
     }
 
-    tmp.clear();
+    tmp.resize(0);
     DB().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
 
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
