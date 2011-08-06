@@ -766,6 +766,7 @@ CREATE TABLE `tripod` (
   `fire` tinyint(1) unsigned NOT NULL,
   `quality` tinyint(1) unsigned NOT NULL,
   `awdst` tinyint(1) unsigned NOT NULL,
+  `regen` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

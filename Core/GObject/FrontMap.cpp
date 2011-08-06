@@ -4,7 +4,6 @@
 #include "GData/FrontMapTable.h"
 #include "GData/NpcGroup.h"
 #include "Battle/BattleSimulator.h"
-#include "Common/Stream.h"
 
 namespace GObject
 {
@@ -13,33 +12,58 @@ void FrontMap::sendAllInfo(Player* pl)
 {
 }
 
-void FrontMap::sendInfo(Player* pl, UInt8 id)
+void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot)
 {
     Stream st(0x68);
-    UInt8 count = 3-PLAYER_DATA(pl, frontGoldCnt);
-    count <<= 4;
-    count |= 2-PLAYER_DATA(pl, frontFreeCnt);
-
+    FastMutex::ScopedLock lk(_mutex);
+    UInt8 count = getCount(pl);
     st << static_cast<UInt8>(0);
     st << id;
     st << count;
-    std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
-    UInt8 n = tmp.size();
-    if (n < 1)
-        st << static_cast<UInt8>(0);
-    else
-        st << static_cast<UInt8>(n-1);
-    for (UInt8 i = 1; i < n; ++i) {
-        if (!GData::frontMapManager[id<<8|i][i].count)
-            continue;
-        st << i;
-        if (!tmp[i].count)
-            st << static_cast<UInt8>(0xff);
-        else
-            st << static_cast<UInt8>(GData::frontMapManager[id<<8|i][i].count - tmp[i].count);
+
+    if (needspot) {
+        sendFrontMap(st, pl, id);
     }
+
     st << Stream::eos;
     pl->send(st);
+}
+
+void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id)
+{
+    std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+
+    size_t off = st.size();
+    st << static_cast<UInt8>(0);
+
+    bool first = true;
+    UInt8 size = 0;
+    UInt8 max = GData::frontMapMaxManager[id];
+    for (UInt8 i = 1; i <= max; ++i) {
+        std::vector<GData::FrontMapFighter>& fmf = GData::frontMapManager[id];
+        if (i >= fmf.size())
+            continue;
+        if (!fmf[i].count)
+            continue;
+
+        st << i;
+        if (i < tmp.size()) {
+            if (!tmp[i].count)
+                st << static_cast<UInt8>(0xff);
+            else
+                st << static_cast<UInt8>(GData::frontMapManager[id][i].count - tmp[i].count);
+        } else {
+            if (first) {
+                first = false;
+                st << fmf[i].count;
+            } else
+                st << static_cast<UInt8>(0xff);
+        }
+        ++size;
+    }
+
+    if (size)
+        st.data<UInt8>(off) = size;
 }
 
 void FrontMap::enter(Player* pl, UInt8 id)
@@ -47,11 +71,20 @@ void FrontMap::enter(Player* pl, UInt8 id)
     if (!pl || !id)
         return;
 
+    FastMutex::ScopedLock lk(_mutex);
     UInt8 ret = 1;
-    if (PLAYER_DATA(pl, frontFreeCnt) < 2) {
+    if (PLAYER_DATA(pl, frontFreeCnt) < 1) {
         ++PLAYER_DATA(pl, frontFreeCnt);
         ret = 0;
-    } else if (PLAYER_DATA(pl, frontGoldCnt) < 3) {
+    } else if (PLAYER_DATA(pl, frontGoldCnt) < 2) {
+        if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
+            Stream st(0x68);
+            st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
+            pl->send(st);
+            pl->sendMsgCode(0, 1007);
+            return;
+        }  
+
         ++PLAYER_DATA(pl, frontGoldCnt);
         ret = 0;
 
@@ -60,11 +93,9 @@ void FrontMap::enter(Player* pl, UInt8 id)
     }
 
     if (!ret) {
-        DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), pl->getId());
+        DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
 
-        UInt8 count = 3-PLAYER_DATA(pl, frontGoldCnt);
-        count <<= 4;
-        count |= 2-PLAYER_DATA(pl, frontFreeCnt);
+        UInt8 count = getCount(pl);
         Stream st(0x68);
         st << static_cast<UInt8>(3) << count << Stream::eos;
         pl->send(st);
@@ -72,7 +103,25 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
     Stream st(0x68);
     st << static_cast<UInt8>(1) << id << ret << Stream::eos;
+    sendFrontMap(st, pl, id);
     pl->send(st);
+}
+
+UInt8 FrontMap::getCount(Player* pl)
+{
+    if (pl && TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate))) {
+        if (pl) {
+            PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
+            PLAYER_DATA(pl, frontFreeCnt) = 0;
+            PLAYER_DATA(pl, frontGoldCnt) = 0;
+            DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), pl->getId());
+        }
+    }
+
+    UInt8 count = 2-PLAYER_DATA(pl, frontGoldCnt);
+    count <<= 4;
+    count |= 1-PLAYER_DATA(pl, frontFreeCnt);
+    return count;
 }
 
 void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
@@ -80,7 +129,8 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     if (!pl || !id || !spot)
         return;
 
-    if (PLAYER_DATA(pl, frontFreeCnt) > 2 && PLAYER_DATA(pl, frontGoldCnt) > 3)
+    FastMutex::ScopedLock lk(_mutex);
+    if (PLAYER_DATA(pl, frontFreeCnt) > 1 && PLAYER_DATA(pl, frontGoldCnt) > 2)
         return;
 
     Stream st(0x68);
@@ -90,7 +140,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
     }
 
-    if (spot > tmp.size()) {
+    if (spot >= tmp.size()) {
         tmp.resize(spot+1);
         tmp[spot].count = 0;
         tmp[spot].status = 0;
@@ -98,34 +148,48 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     }
 
     UInt8 count = tmp[spot].count;
-    if (count >= GData::frontMapManager[id<<8|spot][spot].count) {
+    if (count >= GData::frontMapManager[id][spot].count) {
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
         return;
     }
 
     bool ret = false;
-    UInt32 fgtid = GData::frontMapManager[id<<8|spot][spot].fighterId;
-    if (!fgtid) {
+    UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
+    if (fgtid) {
         if (pl->attackCopyNpc(fgtid)) {
             ret = true;
         }
+
+        ++tmp[spot].count;
+        tmp[spot].status = 1;
+        if (ret) {
+            if (spot >= GData::frontMapMaxManager[id]) {
+                Stream st(0x68);
+                st << static_cast<UInt8>(4) << id << Stream::eos;
+                pl->send(st);
+            } else {
+                UInt8 nspot = spot+1;
+                while (!GData::frontMapManager[id][nspot].count && nspot <= GData::frontMapMaxManager[id])
+                    ++nspot;
+                Stream st(0x68);
+                st << static_cast<UInt8>(5) << id << nspot;
+                if (nspot < tmp.size()) {
+                    st << static_cast<UInt8>(GData::frontMapManager[id][nspot].count - tmp[nspot].count);
+                } else {
+                    st << GData::frontMapManager[id][nspot].count;
+                }
+                st << Stream::eos;
+                pl->send(st);
+            }
+
+            DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u", tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
+        } else
+            DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tmp[spot].count, pl->getId(), id);
+
+        st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
+        pl->send(st);
     }
-
-    ++tmp[spot].count;
-    tmp[spot].status = 1;
-    if (ret) {
-        if (spot >= GData::frontMapMaxManager[id]) {
-            Stream st(0x68);
-            st << static_cast<UInt8>(4) << id << Stream::eos;
-            pl->send(st);
-        }
-        DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u", tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
-    } else
-        DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", spot, tmp[spot].count, tmp[spot].status, pl->getId(), id);
-
-    st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id<<8|spot][spot].count - tmp[spot].count) << Stream::eos;
-    pl->send(st);
     return;
 }
 
@@ -133,6 +197,7 @@ void FrontMap::reset(Player* pl, UInt8 id)
 {
     if (!pl || !id)
         return;
+    FastMutex::ScopedLock lk(_mutex);
     Stream st(0x68);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (tmp.size() < 1) {
@@ -157,41 +222,6 @@ void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UIn
         tmp.resize(spot+1);
     tmp[spot].count = count;
     tmp[spot].status = status?1:0;
-}
-
-std::vector<FrontMapData>& FrontMap::getFrontMapData(Player* pl, UInt8 id, bool update)
-{
-    static std::vector<FrontMapData> nulldata;
-    if (!pl || !id)
-        return nulldata;
-    return getFrontMapData(pl, pl->getId(), id, update);
-
-}
-
-std::vector<FrontMapData>& FrontMap::getFrontMapData(Player* pl, UInt64 playerId, UInt8 id, bool update)
-{
-    static std::vector<FrontMapData> nulldata;
-#if 0
-    std::vector<FrontMapData>& cd = m_frts[playerId][id];
-    if (!cd.size()) {
-        PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
-        if (update) {
-            DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);
-            DB().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", playerId, id, cd.spot, cd.count, cd.status);
-        }   
-    } else {
-        if (pl && TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate))) {
-            if (pl) {
-                PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
-                PLAYER_DATA(pl, frontFreeCnt) = 0;
-                PLAYER_DATA(pl, frontGoldCnt) = 0;
-            }   
-
-            DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);
-        }   
-    }   
-#endif
-    return nulldata; 
 }
 
 } // namespace GObject

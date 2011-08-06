@@ -1198,13 +1198,14 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
     UInt8 id = 0;
-    UInt8 spot = 0;
+    UInt8 param = 0;
 	brd >> type;
     brd >> id;
 
     switch (type) {
         case 0:
-            GObject::frontMap.sendInfo(player, id);
+            brd >> param; // flag
+            GObject::frontMap.sendInfo(player, id, param?true:false);
             break;
 
         case 1:
@@ -1219,8 +1220,12 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
             break;
 
         case 4:
-            brd >> spot;
-            GObject::frontMap.fight(player, id, spot);
+            brd >> param; // spot
+            GObject::frontMap.fight(player, id, param);
+            break;
+
+        case 5:
+            //GObject::frontMap.sendFrontMap(player, id);
             break;
 
         default:

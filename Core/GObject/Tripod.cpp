@@ -18,39 +18,51 @@ void Tripod::getTripodInfo(Player* pl)
 {
     if (!pl)
         return;
+	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
     Stream st(0x39);
     st << static_cast<UInt8>(0);
     st << td.fire;
-    genAward(td, st);
+
+    UInt8 needgen = td.needgen;
+    genAward(pl, td, st);
+    if (needgen != td.needgen)
+        DB().PushUpdateData("UPDATE `tripod` SET `regen` = %u WHERE `id` = %"I64_FMT"u", td.needgen, pl->getId());
 
     st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << td.soul << Stream::eos;
     pl->send(st);
 }
 
-bool Tripod::genAward(const TripodData& td, UInt32& id, UInt8& num)
+bool Tripod::genAward(Player* pl, TripodData& td, UInt32& id, UInt8& num)
 {
-    UInt32 loot = GData::GDataManager::GetTripodAward(td.fire, td.quality);
-    const GData::LootItem* li = GData::lootTable[loot];
-    if (li)
-    {
-        GData::LootResult lr = li->roll();
-        if (lr.id)
+    if (td.needgen) {
+        UInt32 loot = GData::GDataManager::GetTripodAward(td.fire, td.quality);
+        const GData::LootItem* li = GData::lootTable[loot];
+        if (li)
         {
-            id = lr.id;
-            num = lr.count;
-            return true;
+            GData::LootResult lr = li->roll();
+            if (lr.id)
+            {
+                id = lr.id;
+                num = lr.count;
+                pl->setTripodAwdIdNum(id, num);
+                td.needgen = 0;
+                return true;
+            }
         }
+        return false;
+    } else {
+        pl->getTripodAwdIdNum(id, num);
     }
-    return false;
+    return true;
 }
 
-void Tripod::genAward(const TripodData& td, Stream& st)
+void Tripod::genAward(Player* pl, TripodData& td, Stream& st)
 {
     UInt32 id;
     UInt8 num;
 
-    if (genAward(td, id, num)) {
+    if (genAward(pl, td, id, num)) {
         st << num;
         st << id;
     } else {
@@ -81,6 +93,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     if (!pl || !itemid || !num)
         return;
 
+	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
     Package* pk = pl->GetPackage();
     if (!pk)
@@ -99,6 +112,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
             {
                 if (td.quality < i+2) {
                     td.quality = i+2;
+                    td.needgen = 1;
                     break;
                 }
             }
@@ -117,7 +131,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     if (td.soul >= MAX_TRIPOD_SOUL)
         PopTimerEvent(pl, EVENT_PLAYERPRTRIPOD, pl->getId());
 
-    DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u WHERE `id` = %"I64_FMT"u", td.quality, pl->getId());
+    DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.quality, td.needgen, pl->getId());
 }
 
 static UInt16 fire_begin = 47;
@@ -155,6 +169,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
 {
     if (!pl)
         return;
+	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
     Stream st(0x39);
 
@@ -201,12 +216,14 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     if (j < 6)
         td.fire = j+1;
 
+    td.needgen = 1;
+
     st << static_cast<UInt8>(1);
     st << td.fire;
-    genAward(td, st);
+    genAward(pl, td, st);
     st << Stream::eos;
     pl->send(st);
-    DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u WHERE `id` = %"I64_FMT"u", td.fire, pl->getId());
+    DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.fire, td.needgen, pl->getId());
 
     pl->GetPackage()->DelItem2(ib1, 1);
     pl->GetPackage()->DelItem2(ib2, 1);
@@ -217,6 +234,7 @@ void Tripod::getAward(Player* pl)
 {
     if (!pl)
         return;
+	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
     if (td.awdst != 1)
         return;
@@ -224,7 +242,7 @@ void Tripod::getAward(Player* pl)
     UInt32 id;
     UInt8 num;
 
-    if (!genAward(td, id, num))
+    if (!genAward(pl, td, id, num))
         return;
     pl->GetPackage()->AddItem(id, num, true, false, FromTripod);
 
@@ -253,7 +271,7 @@ TripodData& Tripod::newTripodData(Player* pl)
     if (!pl)
         return nulltd;
     TripodData td;
-    DB().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst);
+    DB().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`) VALUES(%"I64_FMT"u, %u, %u, %u, %u,%u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst, td.needgen);
     return addTripodData(pl->getId(), td);
 }
 

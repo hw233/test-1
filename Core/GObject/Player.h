@@ -850,6 +850,21 @@ namespace GObject
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
         void addPracticeFighter(UInt32* fighters, size_t size);
 
+    private:
+        UInt32 m_tripodAwdId;
+        UInt8 m_tripodAwdNum;
+    public:
+        void setTripodAwdIdNum(UInt32 id, UInt8 num)
+        {
+            m_tripodAwdId = id;
+            m_tripodAwdNum = num;
+        }
+        void getTripodAwdIdNum(UInt32& id, UInt8& num)
+        {
+            id = m_tripodAwdId;
+            num = m_tripodAwdNum;
+        }
+
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
