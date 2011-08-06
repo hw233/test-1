@@ -829,32 +829,6 @@ namespace GObject
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->addNewCitta(citta)) {
             if (fgt->upCitta(citta, 0, true)) {
-                const GData::SkillBase* s = 0;
-                const std::vector<const GData::SkillBase*>& skills = fgt->skillFromCitta(citta);
-                size_t size = skills.size();
-                if (size) {
-                    for (size_t i = 0; i < size; ++i) {
-                        s = skills[i];
-                        if (s) {
-                            if (s->cond == GData::SKILL_PEERLESS)
-                                fgt->upPeerless(s->getId(), true);
-                            else if (s->cond == GData::SKILL_ACTIVE)
-                                fgt->upSkill(s->getId(), true);
-                            else if (s->cond == GData::SKILL_PREATK ||
-                                    s->cond == GData::SKILL_AFTATK ||
-                                    s->cond == GData::SKILL_AFTNATK ||
-                                    s->cond == GData::SKILL_BEATKED ||
-                                    s->cond == GData::SKILL_AFTEVD ||
-                                    s->cond == GData::SKILL_AFTRES ||
-                                    s->cond == GData::SKILL_DEAD ||
-                                    s->cond == GData::SKILL_ENTER ||
-                                    s->cond == GData::SKILL_DEAD)
-                            {    
-                                fgt->upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), true);
-                            } 
-                        }
-                    }
-                }
             }
         }
     }
