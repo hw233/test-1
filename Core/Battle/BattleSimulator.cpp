@@ -110,6 +110,8 @@ void BattleSimulator::start()
 				{
 					BattleFighter * bf = static_cast<BattleFighter *>(bo);
 					bool ismain = !_isBody[i][j];
+                    UInt8 aura = 0;
+                    UInt8 maxAura = 0;
 					if(ismain)
 					{
 						if(flag > 0)
@@ -125,6 +127,9 @@ void BattleSimulator::start()
                         UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
                         if(justice_roar)
                             bf->AddAura(justice_roar);
+
+                        aura = bf->getAura();
+                        maxAura = bf->getAuraMax();
 					}
 					UInt32 maxhp = bf->getMaxHP();
 					_packet << static_cast<UInt8>(j + 1) << bf->getFighter()->getBattleName();
@@ -136,9 +141,9 @@ void BattleSimulator::start()
 					_packet << static_cast<UInt8>(bf->getFighter()->getColor())
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
-					_packet << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
+					_packet << aura << maxAura <<static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
                     // TODO: up skills
-					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f);
+					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f) << static_cast<UInt16>(bf->getTough(NULL) * 100.0f) << static_cast<UInt16>(bf->getMagRes(NULL) * 100.0f);
                     _packet << bf->getFighter()->getPeerlessAndLevel();
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);

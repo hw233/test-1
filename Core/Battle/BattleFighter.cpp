@@ -296,6 +296,9 @@ void BattleFighter::updateAllAttr()
     _magdef = _formula->calcMagDefend(this);
     _magres = _formula->calcMagRes(this, NULL);
 
+    if(_maxhp == 0)
+        _maxhp = 1;
+
 	if((_flag & BlockBoss) == 0 && oldhp > 0 && _hp > 0 && oldhp < _maxhp)
 	{
 		_hp = _hp + _maxhp - oldhp;
