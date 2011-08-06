@@ -823,6 +823,42 @@ namespace GObject
 		return (!_fighters.empty()) ? _fighters.begin()->second->getExp() : 0;
 	}
 
+    void Player::upInitCitta(Fighter* fgt)
+    {
+        static UInt16 cittas[] = {101, 401, 701};
+        UInt16 citta = cittas[fgt->getClass()-1];
+        if (fgt->addNewCitta(citta)) {
+            if (fgt->upCitta(citta, 0, true)) {
+                const GData::SkillBase* s = 0;
+                const std::vector<const GData::SkillBase*>& skills = fgt->skillFromCitta(citta);
+                size_t size = skills.size();
+                if (size) {
+                    for (size_t i = 0; i < size; ++i) {
+                        s = skills[i];
+                        if (s) {
+                            if (s->cond == GData::SKILL_PEERLESS)
+                                fgt->upPeerless(s->getId(), true);
+                            else if (s->cond == GData::SKILL_ACTIVE)
+                                fgt->upSkill(s->getId(), true);
+                            else if (s->cond == GData::SKILL_PREATK ||
+                                    s->cond == GData::SKILL_AFTATK ||
+                                    s->cond == GData::SKILL_AFTNATK ||
+                                    s->cond == GData::SKILL_BEATKED ||
+                                    s->cond == GData::SKILL_AFTEVD ||
+                                    s->cond == GData::SKILL_AFTRES ||
+                                    s->cond == GData::SKILL_DEAD ||
+                                    s->cond == GData::SKILL_ENTER ||
+                                    s->cond == GData::SKILL_DEAD)
+                            {    
+                                fgt->upPassiveSkill(s->getId(), s->cond, (s->prob >= 100.0f), true);
+                            } 
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 	void Player::addFighter( Fighter * fgt, bool writedb )
 	{
 		UInt32 id = fgt->getId();
@@ -831,13 +867,7 @@ namespace GObject
 		else
 			_fighters[fgt->getId()] = fgt;
 
-#if 0
-        //TODO:
-        fgt->upSkill(101, 0, true);
-        fgt->upPeerless(201);
-        UInt16 passiveSkill[] = {501, 601, 701, 801, 901, 1001, 1101, 1201};
-        fgt->upPassiveSkill(passiveSkill, sizeof(passiveSkill));
-#endif
+        upInitCitta(fgt);
 
 		if(writedb)
 		{

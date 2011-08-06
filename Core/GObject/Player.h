@@ -504,6 +504,7 @@ namespace GObject
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 7; }
+        void upInitCitta(Fighter* fgt);
 		void addFighter(Fighter * fgt, bool = true);
 		Fighter * takeFighter(UInt32, bool = true);
 		void notifyAddFighter(Fighter * fgt);
