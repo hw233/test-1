@@ -1160,6 +1160,7 @@ namespace GData
             floor = dbc.floor;
             first = false;
         }
+        copyMaxManager[id] = floor;
         return true;
     }
 
@@ -1168,7 +1169,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBFrontMap dbc;
-		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `front_map` ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `spot`, `count`, `fighterId` FROM `frontmap` ORDER BY `id`,`spot`", dbc) != DB::DB_OK)
 			return false;
 
         bool nextfrontmap = false;
@@ -1185,7 +1186,7 @@ namespace GData
                 nextfrontmap = false;
             }
 
-            std::vector<FrontMapFighter>& cpv = frontMapManager[dbc.id<<8|dbc.spot];
+            std::vector<FrontMapFighter>& cpv = frontMapManager[dbc.id];
             if (cpv.size() <= dbc.spot)
                 cpv.resize(dbc.spot+1);
             cpv[dbc.spot].count = dbc.count;
@@ -1195,6 +1196,7 @@ namespace GData
             spot = dbc.spot;
             first = false;
         }
+        frontMapMaxManager[id] = spot;
         return true;
     }
 

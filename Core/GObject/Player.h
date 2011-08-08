@@ -504,6 +504,7 @@ namespace GObject
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 7; }
+        void upInitCitta(Fighter* fgt);
 		void addFighter(Fighter * fgt, bool = true);
 		Fighter * takeFighter(UInt32, bool = true);
 		void notifyAddFighter(Fighter * fgt);
@@ -848,6 +849,21 @@ namespace GObject
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
         void addPracticeFighter(UInt32* fighters, size_t size);
+
+    private:
+        UInt32 m_tripodAwdId;
+        UInt8 m_tripodAwdNum;
+    public:
+        void setTripodAwdIdNum(UInt32 id, UInt8 num)
+        {
+            m_tripodAwdId = id;
+            m_tripodAwdNum = num;
+        }
+        void getTripodAwdIdNum(UInt32& id, UInt8& num)
+        {
+            id = m_tripodAwdId;
+            num = m_tripodAwdNum;
+        }
 
 	};
 

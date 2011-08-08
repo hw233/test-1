@@ -331,7 +331,7 @@ namespace GObject
 		_isOnline(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
-		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0)
+		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -823,6 +823,16 @@ namespace GObject
 		return (!_fighters.empty()) ? _fighters.begin()->second->getExp() : 0;
 	}
 
+    void Player::upInitCitta(Fighter* fgt)
+    {
+        static UInt16 cittas[] = {101, 401, 701};
+        UInt16 citta = cittas[fgt->getClass()-1];
+        if (fgt->addNewCitta(citta)) {
+            if (fgt->upCitta(citta, 0, true)) {
+            }
+        }
+    }
+
 	void Player::addFighter( Fighter * fgt, bool writedb )
 	{
 		UInt32 id = fgt->getId();
@@ -831,13 +841,7 @@ namespace GObject
 		else
 			_fighters[fgt->getId()] = fgt;
 
-#if 0
-        //TODO:
-        fgt->upSkill(101, 0, true);
-        fgt->upPeerless(201);
-        UInt16 passiveSkill[] = {501, 601, 701, 801, 901, 1001, 1101, 1201};
-        fgt->upPassiveSkill(passiveSkill, sizeof(passiveSkill));
-#endif
+        upInitCitta(fgt);
 
 		if(writedb)
 		{

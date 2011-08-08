@@ -15,9 +15,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-create database asss;
-use asss;
-
 --
 -- Table structure for table `SpecialAward`
 --
@@ -766,6 +763,7 @@ CREATE TABLE `tripod` (
   `fire` tinyint(1) unsigned NOT NULL,
   `quality` tinyint(1) unsigned NOT NULL,
   `awdst` tinyint(1) unsigned NOT NULL,
+  `regen` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

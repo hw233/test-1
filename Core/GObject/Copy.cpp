@@ -80,7 +80,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
         return;
     }
 
-    if (PLAYER_DATA(pl, copyFreeCnt) > 3 && PLAYER_DATA(pl, copyGoldCnt) > 2)
+    if (PLAYER_DATA(pl, copyFreeCnt) > 2 && PLAYER_DATA(pl, copyGoldCnt) > 3)
         return;
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
