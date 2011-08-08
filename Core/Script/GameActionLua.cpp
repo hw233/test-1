@@ -770,9 +770,9 @@ namespace Script
 		Call<void>("onLogin", player);
 	}
 
-	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 difficulty, UInt8 level )
+	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 level )
 	{
-		Call<void>("onDungeonWin", player, id, difficulty, level);
+		Call<void>("onDungeonWin", player, id, level);
 	}
 
 	void GameActionLua::onClanBattleAttend( Player* player )

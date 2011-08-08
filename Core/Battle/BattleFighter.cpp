@@ -526,9 +526,9 @@ UInt32 BattleFighter::regenHP( UInt32 u )
 
 UInt16 BattleFighter::getPortrait()
 {
-	if(_fighter->isNpc())
-		return _fighter->favor;
-	else
+//	if(_fighter->isNpc())
+//		return _fighter->favor;
+//	else
 		return _fighter->getId();
 }
 

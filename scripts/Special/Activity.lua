@@ -122,7 +122,7 @@ end
 function onLevelup(player, olev, nlev)
 end
 
-function onDungeonWin(player, id, diffficulty, level)
+function onDungeonWin(player, id, level)
 	if (id == 1 and level == 15) or (id == 2 and level == 22) or (id == 3 and level == 44) or (id == 4 and level == 20) or (id == 5 and level == 20)then
 		local stage = getActivityStage()
 		if stage == 1 then

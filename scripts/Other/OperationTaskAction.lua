@@ -263,3 +263,42 @@ function RunOperationTaskAction3(op, param1, param2, param3)
 end
 
 
+
+------------------------------------------------------
+------------------------------------------------------
+--一次副本任务
+function OperationTaskAction2_0001(param1, param2)
+	if param1 == 1 then
+		local player = GetPlayer();
+		local task = player:GetTaskMgr();
+		if task:HasAcceptedTask(60) then
+			task:AddTaskStep(60);
+		end			
+	end
+end
+
+--
+function OperationTaskAction2_0002(_id, level)
+	local player = GetPlayer();
+	local task = player:GetTaskMgr();
+	--print("OperationTaskAction2_0002 " .. _id .. " " .. difficulty .. " " .. level);
+	if _id == 1 and level == 5 then
+		if task:HasAcceptedTask(60) then
+			task:AddTaskStep(60);
+		end		
+	end
+end
+
+local OperationTaskAction2_Table = {
+	[1] = OperationTaskAction2_0001,
+	[2] = OperationTaskAction2_0002,
+};
+
+function RunOperationTaskAction2(op, param1, param2)
+	if OperationTaskAction2_Table[op] ~= nil then
+		return OperationTaskAction2_Table[op](param1, param2);
+	end
+	return false;
+end
+
+

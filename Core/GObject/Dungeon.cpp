@@ -361,10 +361,8 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 		return false;
 
     // TODO:
-#if 0
 	if (_id == 1)
-            GameAction()->RunOperationTaskAction2(player, 1, level+1);
-#endif
+            GameAction()->RunOperationTaskAction2(player, 1, 1, level+1);
 
 	Stream st(0x61);
 	bool res = bsim.getWinner() == 1;
@@ -453,9 +451,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     }
 
     // TODO:
-#if 0
-	GameAction()->RunOperationTaskAction3(player, 2, _id, level+1);
-#endif
+	GameAction()->RunOperationTaskAction2(player, 2, _id, level+1);
 
 	++ level;
 	UInt16 dpd = (static_cast<UInt16>(level) << 8) + _id;
