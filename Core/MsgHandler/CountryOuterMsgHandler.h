@@ -36,6 +36,8 @@
 #include "Battle/BattleSimulator.h"
 #include "GMHandler.h"
 #include "GObject/Tripod.h"
+#include "GObject/Copy.h"
+#include "GObject/FrontMap.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -335,6 +337,13 @@ struct RequestChallengeReq
 struct BattleEndReq
 {
 	MESSAGE_DEF(0x77);
+};
+
+struct CopyReq
+{
+    UInt8 type;
+    UInt8 id;
+    MESSAGE_DEF2(0x67, UInt8, type, UInt8, id); 
 };
 
 struct NpcTriggerReq
@@ -2224,6 +2233,112 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& )
 		return ;
 	player->checkLastBattled();
 	player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+}
+
+void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->isInCity())
+	{
+		player->sendMsgCode(0, 2036);
+		return;
+	}
+	player->cancelAutoBattle();
+	player->cancelAutoDungeon();
+	UInt16 loc = player->getLocation();
+	GObject::Map * map = Map::FromSpot(loc);
+	if(map == NULL)
+	{
+		player->sendMsgCode(0, 2036);
+		return;
+	}
+    // XXX: 在这里找不到npc
+#if 0
+	GObject::MapObject * mo = map->GetObject(req._npcId);
+	if(mo == NULL || mo->GetSpot() != loc)
+	{
+		player->sendMsgCode(0, 2036);
+		return;
+	}
+#endif
+    switch (req.type) {
+        case 0:
+            GObject::playerCopy.sendInfo(player, req.id);
+            break;
+
+        case 1:
+            GObject::playerCopy.enter(player, req.id);
+            break;
+
+        case 2:
+            GObject::playerCopy.reset(player, req.id);
+            break;
+
+        case 3:
+            break;
+
+        case 4:
+            GObject::playerCopy.fight(player, req.id);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->isInCity())
+	{
+		player->sendMsgCode(0, 2036);
+		return;
+	}
+	player->cancelAutoBattle();
+	player->cancelAutoDungeon();
+	UInt16 loc = player->getLocation();
+	GObject::Map * map = Map::FromSpot(loc);
+	if(map == NULL)
+	{
+		player->sendMsgCode(0, 2036);
+		return;
+	}
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0; 
+    UInt8 id = 0; 
+    UInt8 param = 0; 
+    brd >> type;
+    brd >> id;
+
+    switch (type) {
+        case 0:
+            brd >> param; // flag
+            GObject::frontMap.sendInfo(player, id, param?true:false);
+            break;
+
+        case 1:
+            GObject::frontMap.enter(player, id); 
+            break;
+
+        case 2:
+            GObject::frontMap.reset(player, id); 
+            break;
+
+        case 3:
+            break;
+
+        case 4:
+            brd >> param; // spot
+            GObject::frontMap.fight(player, id, param);
+            break;
+        case 5:
+            //GObject::frontMap.sendFrontMap(player, id);
+            break;
+
+        default:
+            break;
+    }
 }
 
 void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )

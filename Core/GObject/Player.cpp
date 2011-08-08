@@ -1393,16 +1393,16 @@ namespace GObject
 
 	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen )
 	{
-		checkLastBattled();
 		UInt32 now = TimeUtil::Now();
+        // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        //TODO::bufLeft=0
         buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);
 			return false;
 		}
+		checkLastBattled();
 		if(getThreadId() == WORKER_THREAD_NEUTRAL && turns == 0xFFFFFFFF)
 		{
 			if(bossManager.attack(this, npcId))
@@ -1487,7 +1487,9 @@ namespace GObject
 	bool Player::attackCopyNpc( UInt32 npcId )
 	{
 		UInt32 now = TimeUtil::Now();
+        // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+        buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);

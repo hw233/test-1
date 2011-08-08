@@ -34,11 +34,9 @@ MSG_REG(GameMsgHdr, OnPracticeChallengeReq);
 MSG_REG(GameMsgHdr, OnPracticePayReq);
 MSG_REG(GameMsgHdr, OnPracticeSitDownReq);
 MSG_REG(GameMsgHdr, OnPracticeStopReq);
-MSG_REG(GameMsgHdr, OnCopyReq);
 MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG(GameMsgHdr, OnAthleticsChallengeReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
-MSG_REG_2(GameMsgHdr, 0x68, OnFrontMapReq);
 
 MSG_REG_2(GameMsgHdr, 0x99, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, 0x79, OnClanCityBattleReq);

@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "Common/Singleton.h"
+#include "Common/Mutex.h"
 #include <map>
 
 namespace GObject
@@ -35,6 +36,7 @@ public:
 
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;
+	FastMutex _mutex;
 };
 
 #define playerCopy PlayerCopy::Instance()

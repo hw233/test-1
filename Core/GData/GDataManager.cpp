@@ -868,7 +868,7 @@ namespace GData
                 std::sort(ids.begin(), ids.end(), Sort());
 
                 UInt32 totalfactor = 0;
-                for (UInt32 m = 1, n = 0, l = 0; m < ids.size(); m+=2, ++n, l+=2)
+                for (UInt32 m = 1, n = 0, l = 0; n < ids.size(); m+=2, ++n, l+=2)
                 {
                     totalfactor += ids[n].factor;
                     m_BookFactor[i][m] = totalfactor;

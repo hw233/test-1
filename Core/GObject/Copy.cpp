@@ -9,6 +9,9 @@
 namespace GObject
 {
 
+static const UInt8 GOLDCNT = 3;
+static const UInt8 FREECNT = 2;
+
 void PlayerCopy::sendAllInfo(Player* pl)
 {
 }
@@ -18,16 +21,17 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     if (!pl || !id)
         return;
 
+	FastMutex::ScopedLock lk(_mutex);
     CopyData& cd = getCopyData(pl, id, true);
     Stream st(0x67);
     st << static_cast<UInt8>(0);
     st << id;
     st << cd.floor;
     st << cd.spot;
-    UInt8 count = 2-PLAYER_DATA(pl, copyGoldCnt);
+    UInt8 count = GOLDCNT-PLAYER_DATA(pl, copyGoldCnt);
     count <<= 4;
     
-    count |= 3-PLAYER_DATA(pl, copyFreeCnt);
+    count |= FREECNT-PLAYER_DATA(pl, copyFreeCnt);
     st << count;
     st << Stream::eos;
     pl->send(st);
@@ -38,6 +42,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
     if (!pl || !id)
         return;
 
+	FastMutex::ScopedLock lk(_mutex);
     Stream st(0x67);
     CopyData& tcd = getCopyData(pl, id, true);
 
@@ -46,10 +51,10 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         tcd.floor = 1;
         tcd.spot = 1;
     }
-    if (PLAYER_DATA(pl, copyFreeCnt) < 3) {
+    if (PLAYER_DATA(pl, copyFreeCnt) < FREECNT) {
         ++PLAYER_DATA(pl, copyFreeCnt);
         ret = 0;
-    } else if (PLAYER_DATA(pl, copyGoldCnt) < 2) {
+    } else if (PLAYER_DATA(pl, copyGoldCnt) < GOLDCNT) {
         if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
@@ -75,12 +80,13 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
     if (!pl || !id)
         return;
 
+	FastMutex::ScopedLock lk(_mutex);
     CopyData& tcd = getCopyData(pl, id);
     if (!tcd.floor) {
         return;
     }
 
-    if (PLAYER_DATA(pl, copyFreeCnt) > 2 && PLAYER_DATA(pl, copyGoldCnt) > 3)
+    if (PLAYER_DATA(pl, copyFreeCnt) > FREECNT && PLAYER_DATA(pl, copyGoldCnt) > GOLDCNT)
         return;
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
@@ -123,6 +129,7 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
     if (!pl)
         return;
 
+	FastMutex::ScopedLock lk(_mutex);
     Stream st(0x67);
     CopyData& tcd = getCopyData(pl, id);
     if (!tcd.floor)

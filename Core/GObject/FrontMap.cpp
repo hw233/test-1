@@ -8,6 +8,9 @@
 namespace GObject
 {
 
+static const UInt8 FREECNT = 1;
+static const UInt8 GOLDCNT = 2;
+
 void FrontMap::sendAllInfo(Player* pl)
 {
 }
@@ -73,10 +76,10 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
     FastMutex::ScopedLock lk(_mutex);
     UInt8 ret = 1;
-    if (PLAYER_DATA(pl, frontFreeCnt) < 1) {
+    if (PLAYER_DATA(pl, frontFreeCnt) < FREECNT) {
         ++PLAYER_DATA(pl, frontFreeCnt);
         ret = 0;
-    } else if (PLAYER_DATA(pl, frontGoldCnt) < 2) {
+    } else if (PLAYER_DATA(pl, frontGoldCnt) < GOLDCNT) {
         if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
             Stream st(0x68);
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
@@ -118,9 +121,9 @@ UInt8 FrontMap::getCount(Player* pl)
         }
     }
 
-    UInt8 count = 2-PLAYER_DATA(pl, frontGoldCnt);
+    UInt8 count = GOLDCNT-PLAYER_DATA(pl, frontGoldCnt);
     count <<= 4;
-    count |= 1-PLAYER_DATA(pl, frontFreeCnt);
+    count |= FREECNT-PLAYER_DATA(pl, frontFreeCnt);
     return count;
 }
 
@@ -130,7 +133,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
 
     FastMutex::ScopedLock lk(_mutex);
-    if (PLAYER_DATA(pl, frontFreeCnt) > 1 && PLAYER_DATA(pl, frontGoldCnt) > 2)
+    if (PLAYER_DATA(pl, frontFreeCnt) > FREECNT && PLAYER_DATA(pl, frontGoldCnt) > GOLDCNT)
         return;
 
     Stream st(0x68);
