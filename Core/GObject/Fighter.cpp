@@ -214,6 +214,13 @@ bool Fighter::addPExp( Int32 e, bool writedb )
             _pexp = _pexpMax;
     }
 
+	bool isMain = _owner->isMainFighter(_id);
+	if(isMain)
+	{
+		SYSMSG_SENDV(2004, _owner, e);
+	}
+	SYSMSG_SENDV(2005, _owner, _color, getName().c_str(), e);
+
     sendModification(6, _pexp);
     return true;
 }

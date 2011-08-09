@@ -2688,6 +2688,16 @@ namespace GObject
 		return ;
 	}
 
+    void Player::AddPExp(UInt32 pexp)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->addPExp(pexp);
+		}
+    }
+
 	void Player::AddExp(UInt64 exp, UInt8 mlvl)
 	{
 		if(exp == 0)

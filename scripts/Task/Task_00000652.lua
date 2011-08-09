@@ -24,15 +24,6 @@ function Task_Can_Accept_00000652()
 	if task:HasAcceptedTask(652) or task:HasCompletedTask(652) or task:HasSubmitedTask(652) then
 		return false;
 	end
-	if player:getClan() == nil then
-		return false
-	end
-	if player:getClanTaskId() ~= 652 then
-		return false
-	end
-	if player:isClanTaskFull() then
-		return false
-	end
 	return true;
 end
 
@@ -131,16 +122,17 @@ end
 --提交任务
 function Task_00000652_submit(itemId, itemNum)
 	local player = GetPlayer();
-
+	local task = player:GetTaskMgr();
 	local package = player:GetPackage();
 
-	if not player:GetTaskMgr():SubmitTask(652) then
-		return false;
+	if task:CanDayTaskSubmit(652) then
+		if DayTaskAward(0) then
+			task:DayTaskSubmit(652);
+			return true;
+		end
 	end
 
-
-	player:AddExp(2222);
-	return true;
+	return false;
 end
 
 --放弃任务
