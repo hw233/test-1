@@ -395,7 +395,7 @@ namespace GObject
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
 		void setTotalRecharge( UInt32 r );
-		void genOnlineRewardItems(UInt32);
+		void genOnlineRewardItems();
 		bool takeOnlineReward();
 		UInt32 getOnlineReward();
 		void writeOnlineRewardToDB();

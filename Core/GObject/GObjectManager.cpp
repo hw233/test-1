@@ -771,7 +771,7 @@ namespace GObject
 					UInt32 seed = ((rwd & 0x0F000000) >> 24) + static_cast<UInt32>(id);
 					pl->setPlayerData(dbpd.pdata);
 					pl->recalcVipLevel();
-					pl->genOnlineRewardItems(seed);
+					pl->genOnlineRewardItems();
 				}
 			}
 

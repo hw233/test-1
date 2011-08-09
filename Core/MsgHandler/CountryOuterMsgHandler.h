@@ -857,10 +857,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
-	if(level >= 5)
-	{
-		pl->sendOnlineReward();
-	}
+    pl->sendOnlineReward();
 	pl->sendDailyInfo();
 	{
 		Stream st;
