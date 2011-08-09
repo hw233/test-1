@@ -1,3 +1,0 @@
-ALTER TABLE `special_fighter`  ADD COLUMN `pending` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' AFTER `playerId`;
-ALTER TABLE `clan`  ADD COLUMN `rewardNum` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `purpose`;
-ALTER TABLE `special_fighter`  DROP INDEX `id`,  ADD PRIMARY KEY (`id`);

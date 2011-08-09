@@ -1,2 +1,0 @@
-ALTER TABLE `clan` ADD COLUMN `leader` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' AFTER `founder`;
-UPDATE `clan` AS `update_clan` SET `leader` = (SELECT `playerId` FROM `clan_player` WHERE `clan_player`.`id` = `update_clan`.`id` ORDER BY `proffer` DESC LIMIT 1);

@@ -1,1 +1,0 @@
-ALTER TABLE `player` MODIFY `nextReward` VARCHAR(32) NOT NULL DEFAULT '';

@@ -1,1 +1,0 @@
-ALTER TABLE `item`  CHANGE COLUMN `ownerId` `ownerId` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ÎïÆ·ËùÊô' AFTER `itemNum`;

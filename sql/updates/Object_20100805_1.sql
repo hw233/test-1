@@ -1,1 +1,0 @@
-ALTER TABLE `special_fighter`  ADD COLUMN `level` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `pending`,  ADD COLUMN `experience` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `level`;
