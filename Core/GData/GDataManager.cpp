@@ -1503,7 +1503,7 @@ namespace GData
         std::vector<std::vector<UInt16> >& vecs = m_OnlineAward[cls-1];
         if (i >= m_OnlineAward[cls-1].size())
             return null;
-        return vecs[i-1];
+        return vecs[i];
     }
 
     UInt16 GDataManager::GetOnlineAwardTime(UInt8 i)
