@@ -157,10 +157,36 @@ function Task_00000019_submit(itemId, itemNum)
 
 	local package = player:GetPackage();
 
+	local fixReqGrid = package:GetItemUsedGrids(1600,1,1) + package:GetItemUsedGrids(1601,1,1) + package:GetItemUsedGrids(1602,1,1);
+	if fixReqGrid > player:GetFreePackageSize() then
+		player:sendMsgCode(2, 2013, 0);
+		return false;
+	end
 	if not player:GetTaskMgr():SubmitTask(19) then
 		return false;
 	end
 
+	if IsEquipTypeId(1600) then
+		for k = 1, 1 do
+			package:AddEquip(1600, 1);
+		end
+	else 
+		package:AddItem(1600,1,1);
+	end
+	if IsEquipTypeId(1601) then
+		for k = 1, 1 do
+			package:AddEquip(1601, 1);
+		end
+	else 
+		package:AddItem(1601,1,1);
+	end
+	if IsEquipTypeId(1602) then
+		for k = 1, 1 do
+			package:AddEquip(1602, 1);
+		end
+	else 
+		package:AddItem(1602,1,1);
+	end
 
 	player:AddExp(4400);
 	return true;

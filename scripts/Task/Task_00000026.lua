@@ -143,9 +143,17 @@ function Task_00000026_accept()
 	if not Task_Accept_00000026() then
 		return false;
 	end
+	local package = player:GetPackage();
+	local reqGrids = 0;
+	reqGrids = reqGrids + package:GetItemUsedGrids(800, 1, 1);
+	if reqGrids > player:GetFreePackageSize() then
+		player:sendMsgCode(2, 2012, 0);
+		return false;
+	end
 	if not task:AcceptTask(26) then
 		return false;
 	end
+	package:AddItem(800, 1, 1);
 	task:AddTaskStep(26);
 	return true;
 end
@@ -170,5 +178,6 @@ end
 --·ÅÆúÈÎÎñ
 function Task_00000026_abandon()
 	local package = GetPlayer():GetPackage();
+	package:DelItem(800, 1, 1);
 	return GetPlayer():GetTaskMgr():AbandonTask(26);
 end
