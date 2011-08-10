@@ -825,7 +825,7 @@ namespace GObject
 
     void Player::upInitCitta(Fighter* fgt)
     {
-        static UInt16 cittas[] = {101, 1001, 1901};
+        static UInt16 cittas[] = {301, 401, 701};
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->addNewCitta(citta)) {
             if (fgt->upCitta(citta, 0, true)) {

@@ -108,9 +108,19 @@ function Task_00000018_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
+	action.m_ActionStep = 2;
+	action.m_NpcMsg = "多谢少侠送药之恩，那蛇妖修炼多年已经快成气候，它喷吐的毒雾厉害无比，所以啊剑术再高也怕菜刀，出门在外不随身带些救命的灵药说不定哪天就阴沟里翻船了，"..GetPlayerName(GetPlayer()).."你可要切记，买点自动回血符随身带着以备不时之需！ ";
+	action.m_ActionMsg = "施大哥我知道了。";
+	return action;
+end
+
+function Task_00000018_step_02()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠送药之恩，那蛇妖修炼多年已经快成气候，要尽早铲除，否则恐怕难以对付，我毒伤未愈，还请少侠去通知白云大师。";
-	action.m_ActionMsg = "好，我这就去";
+	action.m_NpcMsg = "嗯，服了"..GetPlayerName(GetPlayer()).."你带来的灵药，我现在感觉好多了。这蛇妖不除始终是个麻烦，你这就快去白云寺吧，找白云大师和我师父商量怎么除掉这个妖孽。";
+	action.m_ActionMsg = "好，我这就去！";
 	return action;
 end
 
@@ -126,6 +136,7 @@ end
 
 local Task_00000018_step_table = {
 		[1] = Task_00000018_step_01,
+		[2] = Task_00000018_step_02,
 		[10] = Task_00000018_step_10,
 		};
 

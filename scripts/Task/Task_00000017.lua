@@ -176,6 +176,7 @@ function Task_00000017_submit(itemId, itemNum)
 	package:DelItem(802,1,1);
 
 	player:AddExp(2000);
+	player:getCoupon(20);
 	return true;
 end
 
