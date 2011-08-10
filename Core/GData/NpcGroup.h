@@ -38,9 +38,9 @@ public:
 	void addFighter(UInt32 id, UInt8 pos);
 	inline void setExp(UInt32 e) { _exp = e; }
 	inline UInt32 getExp() { return _exp; }
-	inline void setFormation(UInt8 f) { _formation = f;}
+	inline void setFormation(UInt16 f) { _formation = f;}
 	const std::string& getName() const;
-	inline UInt8 getFormation() { return _formation; }
+	inline UInt16 getFormation() { return _formation; }
 	void putFighters(Battle::BattleSimulator&);
 	void monsterKilled(GObject::Player *, UInt32 = 1);
 	void setLoots(std::vector<const LootItem *>&);
@@ -55,7 +55,7 @@ private:
 	UInt32 _id;
 	std::vector<NpcFData> _npcList;
 	std::map<UInt32, UInt16> _npcCount;
-	UInt8 _formation;
+	UInt16 _formation;
 	UInt32 _exp;
 	std::vector<const LootItem *> _loots;
 	float _bp;

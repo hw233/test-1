@@ -20,7 +20,7 @@ function formation()
         BEGIN {
             print "INSERT INTO `formation` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12);
+            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\x27%s\x27)",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

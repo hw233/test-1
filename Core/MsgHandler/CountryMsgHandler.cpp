@@ -13,6 +13,7 @@ MSG_REG_2(GameMsgHdr, 0x15, OnPlayerInfoChangeReq);
 MSG_REG_2(GameMsgHdr, 0x1A, OnBookStoreListReq);
 MSG_REG(GameMsgHdr, OnPurchaseBookReq);
 MSG_REG(GameMsgHdr, OnStatusChangeReq);
+MSG_REG_2(GameMsgHdr, 0x1D, OnFormationReq);
 MSG_REG_2(GameMsgHdr, 0x1E, OnSetFormationReq);
 MSG_REG(GameMsgHdr, OnFighterEquipReq);
 MSG_REG(GameMsgHdr, OnRecruitFighterReq);

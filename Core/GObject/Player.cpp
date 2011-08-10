@@ -32,6 +32,7 @@
 #include "PracticePlace.h"
 #include "Tripod.h"
 #include <mysql.h>
+#include "GData/Formation.h"
 
 #include <cmath>
 
@@ -1001,12 +1002,28 @@ namespace GObject
 		}
 	}
 
-	void Player::setFormation( UInt8 f )
+	bool Player::setFormation( UInt16 f )
 	{
+        int cnt = _playerData.formations.size();
+        bool find = false;
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            if(_playerData.formations[idx] == f)
+            {
+                find = true;
+                break;
+            }
+        }
+
+        if(!find)
+            return false;
+
 		if(_playerData.formation == f)
-			return;
+			return true;
 		_playerData.formation = f;
 		DB().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
+
+        return true;
 	}
 
 	void Player::makePlayerInfo( Stream& st )
@@ -1052,7 +1069,7 @@ namespace GObject
 	void Player::makeFormationInfo( Stream& st )
 	{
 		st.init(0x1E);
-		st << static_cast<UInt8>(1) << _playerData.formation << static_cast<UInt8>(0);
+		st << _playerData.formation << static_cast<UInt8>(0);
 		UInt8 c = 0;
 		for(UInt8 i = 0; i < 5; ++ i)
 		{
@@ -3621,42 +3638,21 @@ namespace GObject
 				_playerData.lineup[fe].updateId();
 				++ c;
 			}
-			UInt8 newFormation = 0;
-			UInt8 newPos[5] = {0};
-			switch(c)
-			{
-			case 2:
-				newPos[0] = 11;
-				newPos[1] = 13;
-				break;
-			case 3:
-				newPos[0] = 6;
-				newPos[1] = 8;
-				newPos[2] = 12;
-				newFormation = 1;
-				break;
-			case 4:
-				newPos[0] = 6;
-				newPos[1] = 8;
-				newPos[2] = 16;
-				newPos[3] = 18;
-				newFormation = 11;
-				break;
-			case 5:
-				{
-					const UInt8 formlist[4] = {21, 31, 41, 51};
-					const UInt8 poslist[4][5] = {{6, 8, 12, 17, 22}, {6, 8, 12, 16, 18}, {7, 11, 13, 15, 19}, {6, 8, 10, 12, 14}};
-					int rnd = uRand(4);
-					newFormation = formlist[rnd];
-					for(int i = 0; i < 5; ++ i)
-						newPos[i] = poslist[rnd][i];
-				}
-				break;
-			}
+            UInt8 newPos[5] = {0};
+            if(0 == _playerData.formation)
+            {
+                setFormation(FORMATION_1); // 七绝阵
+            }
+
+            for( int i = 0; i < 5; ++ i)
+            {
+                newPos[i] = GData::formationManager[_playerData.formation]->operator[](i).pos;
+            }
+
 			int starti = 0;
 			int endi = c - 1;
 			Lineup& lu1 = _playerData.lineup[0];
-			bool mfSolid = lu1.fighter->getClass() == 1;
+			bool mfSolid = lu1.fighter->getClass() == 3;
 			if(mfSolid)
 				lu1.pos = newPos[starti ++];
 			for(int i = 1; i < 5; ++ i)
@@ -3664,14 +3660,13 @@ namespace GObject
 				Lineup& lu = _playerData.lineup[i];
 				if(!lu.available())
 					continue;
-				if(lu.fighter->getClass() == 1)
+				if(lu.fighter->getClass() == 3)
 					lu.pos = newPos[starti ++];
 				else
 					lu.pos = newPos[endi --];
 			}
 			if(!mfSolid)
 				lu1.pos = newPos[starti];
-			setFormation(newFormation);
 			updateBattleFighters();
 			Stream st;
 			makeFormationInfo(st);
@@ -3767,6 +3762,111 @@ namespace GObject
 			GLOBAL().PushMsg(hdr1, buffer);
 		}
 	}
+
+    void Player::sendFormationList()
+    {
+        Stream st(0x1D);
+        UInt8 cnt = _playerData.formations.size();
+        st << cnt;
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            st << _playerData.formations[idx];
+        }
+
+        st << Stream::eos;
+        send(st);
+    }
+
+    bool Player::formationLevUp(UInt16 formationId)
+    {
+        const GData::Formation* formation = GData::formationManager[formationId];
+        if(formation == NULL)
+            return false;
+
+        Stream st(0x1D);
+        int cnt = formation->getLevUpItemCount();
+        if(0 == cnt)
+        {
+            st << static_cast<UInt8>(0) << Stream::eos;
+            send(st);
+
+            SYSMSG_SENDV(2100, this, formation->getName().c_str());
+            return false;
+        }
+
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            UInt32 itemId = formation->LevUpItem(idx);
+            if(0 == m_Package->GetItemNum(itemId))
+            {
+                st << static_cast<UInt8>(0) << Stream::eos;
+                send(st);
+
+                SYSMSG_SENDV(2101, this, m_Package->GetItem(itemId)->getName().c_str());
+                return false;
+            }
+        }
+
+        UInt16 newFormationId = formationId + 1;
+        if(!addNewFormation(newFormationId, true))
+        {
+            st << static_cast<UInt8>(0) << Stream::eos;
+            send(st);
+
+            SYSMSG_SENDV(2100, this, formation->getName().c_str());
+            return false;
+        }
+
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            m_Package->DelItemAny(formation->LevUpItem(idx), 1);
+        }
+
+        std::vector<UInt16>& act_form = _playerData.formations;
+        cnt = act_form.size();
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            if( act_form[idx] == formationId )
+                act_form.erase(act_form.begin() + idx);
+        }
+
+        if(_playerData.formation == formationId)
+			setFormation(newFormationId);
+
+        st << static_cast<UInt8>(1) << Stream::eos;
+        send(st);
+        return true;
+    }
+
+    bool Player::addNewFormation(UInt16 newformationId, bool writedb)
+    {
+        const GData::Formation* newformation = GData::formationManager[newformationId];
+        if(NULL == newformation)
+            return false;
+
+        _playerData.formations.push_back(newformationId);
+
+        if(!writedb)
+            return true;
+
+        std::string formations = "";
+        int cnt = _playerData.formations.size();
+
+        formations += Itoa(_playerData.formations[0]);
+        for(int idx = 1; idx < cnt; ++ idx)
+        {
+            formations += ",";
+            formations += Itoa(_playerData.formations[idx]);
+        }
+
+		DB().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
+
+        Stream st(0x1D);
+        st << static_cast<UInt8>(2) << newformationId << Stream::eos;
+        send(st);
+
+        return true;
+    }
 
 	void Player::addTotalRecharge( UInt32 r )
 	{

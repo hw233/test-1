@@ -228,7 +228,7 @@ DROP TABLE IF EXISTS `formation`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `formation` (
-  `id` tinyint(3) unsigned NOT NULL,
+  `id` smallint(5) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
   `grid1` tinyint(3) NOT NULL,
   `prop1` int(10) NOT NULL,
@@ -240,6 +240,7 @@ CREATE TABLE `formation` (
   `prop4` int(10) NOT NULL,
   `grid5` tinyint(3) NOT NULL,
   `prop5` int(10) NOT NULL,
+  `levelup_item` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -369,7 +370,7 @@ DROP TABLE IF EXISTS `npc_group`;
 CREATE TABLE `npc_group` (
   `id` int(10) unsigned NOT NULL,
   `fighterId` varchar(255) NOT NULL DEFAULT '',
-  `formationId` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `formationId` smallint(5) unsigned NOT NULL DEFAULT '0',
   `experience` int(10) unsigned NOT NULL DEFAULT '0',
   `lootId` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)

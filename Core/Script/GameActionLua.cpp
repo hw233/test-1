@@ -179,6 +179,7 @@ namespace Script
         CLASS_DEF(Player, AddClanBuilding);
         CLASS_DEF(Player, AddClanContrib);
 		CLASS_DEF(Player, GetAttainMgr);
+		CLASS_DEF(Player, addNewFormation);
 		
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

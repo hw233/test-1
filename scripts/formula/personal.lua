@@ -153,9 +153,12 @@ function calcAction( fgt )
   if fgt == nil then
     return 0
   end
+  local act = fgt:getBaseAction()
+  if fgt:isNpc() then
+      return act + fgt:getExtraAction()
+  end
   local cls = fgt:getClass()
   local lvl = fgt:getLevel() - 1
-  local act = fgt:getBaseAction()
   return act + action_factor[cls] * lvl + fgt:getExtraAction();
 end
 

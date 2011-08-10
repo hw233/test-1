@@ -16,7 +16,7 @@ struct DBNpcGroup
 {
 	UInt32 id;
 	std::string fighterId;
-	UInt8 formationId;
+	UInt16 formationId;
 	UInt32 experience;
 	std::string lootId;
 };
@@ -109,6 +109,7 @@ struct DBPlayerData
 	std::string shimen;
 	std::string yamen;
     std::string clantask;
+    std::string formations;
 };
 
 struct DBPrepaid
@@ -691,7 +692,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(40)
+SPECIALDEF(41)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -710,7 +711,7 @@ SPECIALDEF(40)
 	UInt16, pdata.packSize,
 	UInt8, pdata.mounts,
 	std::string, icCount,
-	UInt8, pdata.formation,
+	UInt16, pdata.formation,
 	std::string, lineup,
 	UInt8, bossLevel,
 	UInt32, pdata.totalRecharge,
@@ -729,6 +730,7 @@ SPECIALDEF(40)
 	UInt8, pdata.frontFreeCnt,
 	UInt8, pdata.frontGoldCnt,
 	UInt32, pdata.frontUpdate,
+    std::string, formations,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
 	UInt32, pdata.created,
@@ -939,7 +941,7 @@ SPECIALDEF(5)
 (
 	UInt32, id,
 	std::string, fighterId,
-	UInt8, formationId,
+	UInt16, formationId,
 	UInt32, experience,
 	std::string, lootId
 )

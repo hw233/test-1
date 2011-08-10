@@ -1205,7 +1205,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBFormation dbf;
-		if(execu->Prepare("SELECT `id`, `name`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5` FROM `formation`", dbf) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `grid1`, `prop1`, `grid2`, `prop2`, `grid3`, `prop3`, `grid4`, `prop4`, `grid5`, `prop5`, `levelup_item` FROM `formation`", dbf) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -1242,6 +1242,16 @@ namespace GData
             if (ae)
                 effect.attrExtra = *ae;
             form->addGrid(effect);
+
+            if (dbf.levelup_item.length())
+            {
+				StringTokenizer tk(dbf.levelup_item, ",");
+				size_t count = tk.count();
+                for(size_t idx = 0; idx < count; ++ idx)
+                {
+                    form->addLevUpItem(static_cast<UInt32>(atoi(tk[idx].c_str())));
+                }
+            }
 
 			formationManager.add(form);
 		}

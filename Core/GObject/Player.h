@@ -222,7 +222,7 @@ namespace GObject
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // 
 		UInt32 nextIcReset;         // 
-		UInt8 formation;            // 
+		UInt16 formation;            // 
 		Lineup lineup[5];           // 
 		UInt32 totalRecharge;       // 
 		UInt32 lastExp;             // 
@@ -258,6 +258,7 @@ namespace GObject
         UInt8 frontFreeCnt;         // 阵图免费次数
         UInt8 frontGoldCnt;         // 阵图收费次数
         UInt32 frontUpdate;         // 阵图次数更新时间
+        std::vector<UInt16> formations; // 已学会阵法
 	};
 
 	class Player:
@@ -360,13 +361,17 @@ namespace GObject
 		void checkDeath();
 
 		void checkLevUp(UInt8, UInt8);
+        bool formationLevUp(UInt16);
+        bool addNewFormation(UInt16 newformationId, bool writedb = false);
+        void sendFormationList();
+
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
 	public:
 		inline bool isOnline() const { return _isOnline; }
 		inline void setOnline(bool o) { _isOnline = o; }
 
-		inline UInt8 getFormation() const { return _playerData.formation; }
+		inline UInt16 getFormation() const { return _playerData.formation; }
 		inline Lineup& getLineup(int idx) { return _playerData.lineup[idx]; }
 
 		inline void SetSessionID(int session) { _session = session; }
@@ -535,7 +540,7 @@ namespace GObject
 
 		void updateBattleFighters(bool = true);
 		void storeFighters();
-		void setFormation(UInt8);
+		bool setFormation(UInt16);
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
 		void makeFighterIdList(Stream&);

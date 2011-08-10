@@ -210,7 +210,7 @@ void Athletics::attack(Player * defer)
 	struct AthleticsBeData
 	{
 		Player * attacker;
-		UInt8 formation;
+		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};

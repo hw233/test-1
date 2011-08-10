@@ -968,21 +968,43 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 	GObject::Map::NotifyPlayerEnter(player);
 }
 
+void OnFormationReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+	UInt8 type = 0;
+	br >> type;
+
+    switch(type)
+    {
+    case 0:
+        player->sendFormationList();
+        break;
+    case 1:
+        {
+            UInt16 formationId = 0;
+            br >> formationId;
+            player->formationLevUp(formationId);
+        }
+        break;
+    }
+}
+
 void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 {
 	UInt32 blen = hdr.msgHdr.bodyLen;
 	if(blen < 2)
 		return;
 	const UInt8 * buf = reinterpret_cast<const UInt8 *>(buffer);
-	UInt8 f = buf[0];
-	UInt8 c = buf[1];
-	if(c > 5 || blen < 2 + (sizeof(UInt8) + sizeof(UInt32)) * c)
+	UInt16 f = *reinterpret_cast<const UInt32 *>(buf);
+	UInt8 c = buf[2];
+	if(c > 5 || blen < 3 + (sizeof(UInt8) + sizeof(UInt32)) * c)
 		return;
 	MSG_QUERY_PLAYER(player);
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
-		UInt32 pos = 2 + (sizeof(UInt8) + sizeof(UInt32)) * i;
+		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 		if (player->hasTrainFighter(fgtid))
 			continue;
@@ -1012,9 +1034,10 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 		pdata.pos = 0;
 	}
 
-	player->updateBattleFighters();
+    SYSMSG_SEND(2102, player);
 
-	player->setFormation(f);
+	player->updateBattleFighters();
+    player->setFormation(f);
 
 	Stream st;
 	player->makeFormationInfo(st);

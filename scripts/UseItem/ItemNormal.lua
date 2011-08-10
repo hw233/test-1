@@ -53,6 +53,8 @@ Diety_Favor = {5825, 5826, 5827, 5828}
 
 CittaBookBase = 1200
 
+FormationBookBase  = 1000
+
 function BroadCastEquip1(playercountry, playername, boxname, equipname1)
 	Broadcast(0x17, "[p:"..playercountry..":"..playername.."]幸运地从[e:5:"..boxname.."]中开出了[e:5:"..equipname1.."]");
 end
@@ -4541,6 +4543,17 @@ function ItemNormal_citta(iid, num, bind, param)
     return true
 end
 
+function ItemNormal_formation(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local formation = iid - FormationBookBase + 1;
+    if not player:addNewFormation(formation * 100 + 1) then
+        return false;
+    end
+    package::DelItemSendMsg(iid, player);
+    return true
+end
+
 local ItemNormal_Table = {
   [7001] = ItemNormal_00007xxx,
   [7002] = ItemNormal_00007xxx,
@@ -4860,7 +4873,20 @@ local ItemNormal_Table = {
     [1300] = ItemNormal_citta,
     [1301] = ItemNormal_citta,
     [1302] = ItemNormal_citta,
-    [1303] = ItemNormal_citta
+    [1303] = ItemNormal_citta,
+
+    [1000] = ItemNormal_formation,
+    [1001] = ItemNormal_formation,
+    [1002] = ItemNormal_formation,
+    [1003] = ItemNormal_formation,
+    [1004] = ItemNormal_formation,
+    [1005] = ItemNormal_formation,
+    [1006] = ItemNormal_formation,
+    [1007] = ItemNormal_formation,
+    [1008] = ItemNormal_formation,
+    [1009] = ItemNormal_formation,
+    [1010] = ItemNormal_formation,
+    [1011] = ItemNormal_formation
 };
 
 function RunItemNormalUse(itemId, num, bind, param)

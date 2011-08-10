@@ -24,6 +24,7 @@
 #include "Common/BinaryReader.h"
 #include "Common/SHA1Engine.h"
 #include "Common/StringTokenizer.h"
+#include "GData/Formation.h"
 
 struct UserDisconnectStruct
 {
@@ -359,7 +360,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		PLAYER_DATA(pl, name) = newname;
 		PLAYER_DATA(pl, country) = country;
 		PLAYER_DATA(pl, wallow) = noWallow ? 0 : 1;
+		PLAYER_DATA(pl, formation) = FORMATION_1;
 		PLAYER_DATA(pl, created) = TimeUtil::Now();
+        pl->addNewFormation(FORMATION_1);
+        pl->addNewFormation(FORMATION_2);
 
 		UInt32 fgtId = nu._class + 1;
 		PLAYER_DATA(pl, newGuild) = (0x3FFFFFFFull << NEWGUILDSTEP_MAX);
@@ -384,7 +388,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			lup.fighter = fgt;
 			lup.updateId();
 
-			DB().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u)", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow));
+			DB().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
 
 			DBLOG().PushUpdateData("insert into register_states(server_id,player_id,player_name, reg_time) values(%u,%"I64_FMT"u, '%s', %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), TimeUtil::Now());
 

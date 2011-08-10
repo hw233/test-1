@@ -1,8 +1,8 @@
 #!/bin/bash
 
 H=localhost
-U=bsc
-P=123456
+U=asss
+P=asss
 DBD=data
 DBO=asss
 

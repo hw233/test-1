@@ -4,8 +4,8 @@
 namespace GData
 {
 
-Formation::Formation( UInt8 id, std::string& n)
-	: ObjectBaseT<UInt8>(id, n)
+Formation::Formation( UInt16 id, std::string& n)
+	: ObjectBaseT<UInt16>(id, n)
 {
 }
 

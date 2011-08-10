@@ -797,25 +797,25 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
         ae.action += value;
         break;
 	case 3:
-        ae.hitrlvl += value;
+        ae.hitrlvl += value/10;
 		break;
 	case 4:
-        ae.evdlvl += value;
+        ae.evdlvl += value/10;
 		break;
 	case 5:
-        ae.crilvl += value;
+        ae.crilvl += value/10;
 		break;
 	case 6:
-        ae.pirlvl += value;
+        ae.pirlvl += value/10;
 		break;
     case 7:
-        ae.counterlvl += value;
+        ae.counterlvl += value/10;
         break;
 	case 8:
-        ae.toughlvl += value;
+        ae.toughlvl += value/10;
 		break;
     case 9:
-        ae.mreslvl += value;
+        ae.mreslvl += value/10;
 	}
 }
 
