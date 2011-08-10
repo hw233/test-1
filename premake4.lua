@@ -31,8 +31,8 @@ solution "HoHH"
         libdirs { "/opt/local/lib" }
 
     configuration "linux"
-    	includedirs { "/usr/include/mysql", "/usr/local/include/mysql", "/usr/local/include", "/usr/local/mysql", "/usr/local/mysql/include" }
-        libdirs { "/usr/local/lib/mysql", "/usr/local/lib64", "/usr/local/lib", "/usr/local/mysql/lib" }
+    	includedirs { "/usr/include/mysql", "/usr/local/include/mysql", "/usr/local/include", "/usr/local/mysql", "/usr/local/mysql/include", "/usr/local/mysql/include/mysql" }
+        libdirs { "/usr/local/lib/mysql", "/usr/local/lib64", "/usr/local/lib", "/usr/local/mysql/lib", "/usr/local/mysql/lib/mysql/" }
 
     configuration "vs*"
 
