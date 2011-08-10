@@ -1002,10 +1002,10 @@ namespace GObject
 		}
 	}
 
-	bool Player::setFormation( UInt16 f )
-	{
-        int cnt = _playerData.formations.size();
+    bool Player::checkFormation(UInt16 f)
+    {
         bool find = false;
+        int cnt = _playerData.formations.size();
         for( int idx = 0; idx < cnt; ++ idx )
         {
             if(_playerData.formations[idx] == f)
@@ -1018,6 +1018,15 @@ namespace GObject
         if(!find)
             return false;
 
+        return true;
+    }
+
+	bool Player::setFormation( UInt16 f )
+	{
+        if(!checkFormation(f))
+            return false;
+
+        int cnt = _playerData.formations.size();
 		if(_playerData.formation == f)
 			return true;
 		_playerData.formation = f;
@@ -3776,7 +3785,7 @@ namespace GObject
     {
         Stream st(0x1D);
         UInt8 cnt = _playerData.formations.size();
-        st << cnt;
+        st << static_cast<UInt8>(0) << cnt;
         for( int idx = 0; idx < cnt; ++ idx )
         {
             st << _playerData.formations[idx];
@@ -3793,6 +3802,7 @@ namespace GObject
             return false;
 
         Stream st(0x1D);
+        st << static_cast<UInt8>(1);
         int cnt = formation->getLevUpItemCount();
         if(0 == cnt)
         {
@@ -3810,14 +3820,16 @@ namespace GObject
             {
                 st << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
-
-                SYSMSG_SENDV(2101, this, m_Package->GetItem(itemId)->getName().c_str());
+                const GData::ItemBaseType* item = GData::itemBaseTypeManager[itemId];
+                if(item)
+                    SYSMSG_SENDV(2101, this, item->getName().c_str());
                 return false;
             }
         }
 
         UInt16 newFormationId = formationId + 1;
-        if(!addNewFormation(newFormationId, true))
+        const GData::Formation* newformation = GData::formationManager[newFormationId];
+        if(NULL == newformation)
         {
             st << static_cast<UInt8>(0) << Stream::eos;
             send(st);
@@ -3826,17 +3838,19 @@ namespace GObject
             return false;
         }
 
-        for( int idx = 0; idx < cnt; ++ idx )
-        {
-            m_Package->DelItemAny(formation->LevUpItem(idx), 1);
-        }
-
         std::vector<UInt16>& act_form = _playerData.formations;
         cnt = act_form.size();
         for( int idx = 0; idx < cnt; ++ idx )
         {
             if( act_form[idx] == formationId )
                 act_form.erase(act_form.begin() + idx);
+        }
+
+        addNewFormation(newFormationId, true);
+
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            m_Package->DelItemAny(formation->LevUpItem(idx), 1);
         }
 
         if(_playerData.formation == formationId)

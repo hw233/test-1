@@ -1002,11 +1002,14 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 	if(blen < 2)
 		return;
 	const UInt8 * buf = reinterpret_cast<const UInt8 *>(buffer);
-	UInt16 f = *reinterpret_cast<const UInt32 *>(buf);
+	UInt16 f = *reinterpret_cast<const UInt16 *>(buf);
 	UInt8 c = buf[2];
 	if(c > 5 || blen < 3 + (sizeof(UInt8) + sizeof(UInt32)) * c)
 		return;
 	MSG_QUERY_PLAYER(player);
+
+    if(!player->checkFormation(f))
+        return;
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{

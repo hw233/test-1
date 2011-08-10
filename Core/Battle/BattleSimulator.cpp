@@ -66,7 +66,7 @@ void BattleSimulator::start()
 	_packet.init(0x6C);
 	_packet << _id << _position;
 	for(int i = 0; i < 2; ++ i)
-		_packet << (_formation[i] ? _formation[i]->getId() : static_cast<UInt8>(0));
+		_packet << (_formation[i] ? _formation[i]->getId() : static_cast<UInt16>(0));
 	_packet << _player[0]->GetLev() << _other_level;
 	_packet << _portrait[0] << _portrait[1];
 

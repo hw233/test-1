@@ -364,6 +364,7 @@ namespace GObject
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
         void sendFormationList();
+        bool checkFormation(UInt16);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);

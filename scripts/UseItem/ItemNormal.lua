@@ -4546,11 +4546,11 @@ end
 function ItemNormal_formation(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local formation = iid - FormationBookBase + 1;
+    local formation = iid - FormationBookBase + 1
     if not player:addNewFormation(formation * 100 + 1) then
         return false;
     end
-    package::DelItemSendMsg(iid, player);
+    package:DelItemSendMsg(iid, player);
     return true
 end
 
