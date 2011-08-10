@@ -826,7 +826,7 @@ namespace GObject
 
     void Player::upInitCitta(Fighter* fgt)
     {
-        static UInt16 cittas[] = {101, 401, 701};
+        static UInt16 cittas[] = {301, 401, 701};
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->addNewCitta(citta)) {
             if (fgt->upCitta(citta, 0, true)) {
@@ -860,7 +860,7 @@ namespace GObject
 			return;
 		Stream st(0x28);
 		st << static_cast<UInt16>(fgt->getId());
-        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp();
+        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getDefaultSkillAndLevel() << fgt->getDefaultCittaAndLevel();
 		st << Stream::eos;
 		send(st);
 		SYSMSG_SENDV(110, this, fgt->getColor(), fgt->getName().c_str());
@@ -1109,7 +1109,7 @@ namespace GObject
 		st << static_cast<UInt16>(fgt->getId()) << fgt->getPotential()
             << fgt->getCapacity() << fgt->getLevel() << fgt->getExp()
             << fgt->getPExp() << fgt->getPExpMax() << fgt->getSoul() << fgt->getMaxSoul();
-		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP();
+		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP() << fgt->getUpCittasMax();
 		if(withequip)
 		{
 			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)
@@ -1410,16 +1410,16 @@ namespace GObject
 
 	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen )
 	{
-		checkLastBattled();
 		UInt32 now = TimeUtil::Now();
+        // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        //TODO::bufLeft=0
         buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);
 			return false;
 		}
+		checkLastBattled();
 		if(getThreadId() == WORKER_THREAD_NEUTRAL && turns == 0xFFFFFFFF)
 		{
 			if(bossManager.attack(this, npcId))
@@ -1504,7 +1504,9 @@ namespace GObject
 	bool Player::attackCopyNpc( UInt32 npcId )
 	{
 		UInt32 now = TimeUtil::Now();
+        // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+        buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 2035, buffLeft - now);
@@ -2703,6 +2705,16 @@ namespace GObject
 		return ;
 	}
 
+    void Player::AddPExp(UInt32 pexp)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->addPExp(pexp);
+		}
+    }
+
 	void Player::AddExp(UInt64 exp, UInt8 mlvl)
 	{
 		if(exp == 0)
@@ -3735,10 +3747,7 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-		if(nLev >= 5 && oLev < 5)
-		{
-			sendOnlineReward();
-		}
+        sendOnlineReward();
 		if ((nLev >= 30 && !m_Athletics->hasEnterAthletics()) || (oLev < 51 && nLev >= 51))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
@@ -3920,172 +3929,10 @@ namespace GObject
 		sendModification(7, _playerData.totalRecharge);
 	}
 
-	void Player::genOnlineRewardItems(UInt32 seed)
+	void Player::genOnlineRewardItems()
 	{
-		switch(_playerData.rewardStep)
-		{
-		case 0:
-			_playerData.nextRewardItem = 8902; _playerData.nextRewardCount = 1;
-			break;
-		case 1:
-			_playerData.nextRewardItem = 8933; _playerData.nextRewardCount = 1;
-			break;
-		case 2:
-			_playerData.nextRewardItem = 8911; _playerData.nextRewardCount = 1;
-			break;
-		case 3:
-			_playerData.nextRewardItem = 126; _playerData.nextRewardCount = 1;
-			break;
-		case 4:
-			_playerData.nextRewardItem = 186; _playerData.nextRewardCount = 1;
-			break;
-		case 5:
-			_playerData.nextRewardItem = 241; _playerData.nextRewardCount = 1;
-			break;
-		case 6:
-			_playerData.nextRewardItem = 242; _playerData.nextRewardCount = 1;
-			break;
-		case 7:
-			_playerData.nextRewardItem = 243; _playerData.nextRewardCount = 1;
-			break;
-		case 8:
-			_playerData.nextRewardItem = 244; _playerData.nextRewardCount = 1;
-			break;
-		case 9:
-			_playerData.nextRewardItem = 245; _playerData.nextRewardCount = 1;
-			break;
-		case 10:
-			_playerData.nextRewardItem = 246; _playerData.nextRewardCount = 1;
-			break;
-		case 11:
-			_playerData.nextRewardItem = 247; _playerData.nextRewardCount = 1;
-			break;
-		default:
-			{
-				URandom rnd(seed);
-				UInt32 rd = rnd(100);
-				if(getVipLevel() >= 3)
-				{
-					if(rd < 3)
-					{
-						UInt32 rd1 =  rnd(4);
-						if(rd1 == 0)
-						{_playerData.nextRewardItem = 5002; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 1)
-						{_playerData.nextRewardItem = 5012; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 2)
-						{_playerData.nextRewardItem = 5022; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 3)
-						{_playerData.nextRewardItem = 5032; _playerData.nextRewardCount = 1;}
-					}
-					else if(rd < 10)
-					{
-						UInt32 rd1 = rnd(4);
-						if(rd1 == 0)
-						{_playerData.nextRewardItem = 5003; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 1)
-						{_playerData.nextRewardItem = 5013; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 2)
-						{_playerData.nextRewardItem = 5023; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 3)
-						{_playerData.nextRewardItem = 5033; _playerData.nextRewardCount = 1;}
-					}
-					else if(rd < 17)
-					{_playerData.nextRewardItem = 8916; _playerData.nextRewardCount = 1;}
-					else if(rd < 20)
-					{_playerData.nextRewardItem = 8929; _playerData.nextRewardCount = 1;}
-					else if(rd < 30)
-					{_playerData.nextRewardItem = 8919; _playerData.nextRewardCount = 1;}
-					else if(rd < 40)
-					{_playerData.nextRewardItem = 8924; _playerData.nextRewardCount = 1;}
-					else if(rd < 50)
-					{_playerData.nextRewardItem = 8999; _playerData.nextRewardCount = 1;}
-					else if(rd < 60)
-					{_playerData.nextRewardItem = 8926; _playerData.nextRewardCount = 1;}
-					else if(rd < 70)
-					{_playerData.nextRewardItem = 8930; _playerData.nextRewardCount = 1;}
-					else if(rd < 80)
-					{_playerData.nextRewardItem = 8934; _playerData.nextRewardCount = 1;} 
-					else if(rd < 90)
-					{_playerData.nextRewardItem = 8940; _playerData.nextRewardCount = 4;}
-					else
-					{_playerData.nextRewardItem = 8996; _playerData.nextRewardCount = 1;}
-				}
-				else if(getVipLevel() == 2)
-				{
-					if(rd < 10)
-					{
-						UInt32 rd1 =  rnd(4);
-						if(rd1 == 0)
-						{_playerData.nextRewardItem = 5002; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 1)
-						{_playerData.nextRewardItem = 5012; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 2)
-						{_playerData.nextRewardItem = 5022; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 3)
-						{_playerData.nextRewardItem = 5032; _playerData.nextRewardCount = 1;}
-					}
-					else if(rd < 20)
-					{_playerData.nextRewardItem = 8999; _playerData.nextRewardCount = 1;}
-					else if(rd < 30)
-					{_playerData.nextRewardItem = 8908; _playerData.nextRewardCount = 1;}
-					else if(rd < 35)
-					{_playerData.nextRewardItem = 8911; _playerData.nextRewardCount = 1;}
-					else if(rd < 50)
-					{_playerData.nextRewardItem = 8940; _playerData.nextRewardCount = 2;}
-					else if(rd < 57)
-					{_playerData.nextRewardItem = 8916; _playerData.nextRewardCount = 1;}
-					else if(rd < 60)
-					{_playerData.nextRewardItem = 8915; _playerData.nextRewardCount = 1;}
-					else if(rd < 67)
-					{_playerData.nextRewardItem = 8934; _playerData.nextRewardCount = 1;}
-					else if(rd < 77)
-					{_playerData.nextRewardItem = 8918; _playerData.nextRewardCount = 1;}
-					else if(rd < 82)
-					{_playerData.nextRewardItem = 8919; _playerData.nextRewardCount = 1;}
-					else if(rd < 85)
-					{_playerData.nextRewardItem = 8929; _playerData.nextRewardCount = 1;}
-					else if(rd < 95)
-					{_playerData.nextRewardItem = 8923; _playerData.nextRewardCount = 1;}
-					else
-					{_playerData.nextRewardItem = 8924; _playerData.nextRewardCount = 1;}
-				}
-				else
-				{	
-					if(rd < 10)
-					{
-						UInt32 rd1 =  rnd(4);
-						if(rd1 == 0)
-						{_playerData.nextRewardItem = 5001; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 1)
-						{_playerData.nextRewardItem = 5011; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 2)
-						{_playerData.nextRewardItem = 5021; _playerData.nextRewardCount = 1;}
-						else if(rd1 == 3)
-						{_playerData.nextRewardItem = 5031; _playerData.nextRewardCount = 1;}
-					}
-					if(rd < 30)
-					{_playerData.nextRewardItem = 8903; _playerData.nextRewardCount = 2;}
-					else if(rd < 40)
-					{_playerData.nextRewardItem = 8908; _playerData.nextRewardCount = 1;}
-					else if(rd < 45)
-					{_playerData.nextRewardItem = 8911; _playerData.nextRewardCount = 1;}
-					else if(rd < 55)
-					{_playerData.nextRewardItem = 8915; _playerData.nextRewardCount = 1;}
-					else if(rd < 65)
-					{_playerData.nextRewardItem = 8922; _playerData.nextRewardCount = 1;}
-					else if(rd < 70)
-					{_playerData.nextRewardItem = 8923; _playerData.nextRewardCount = 1;}
-					else if(rd < 85)
-					{_playerData.nextRewardItem = 8940; _playerData.nextRewardCount = 2;}
-					else if(rd < 95)
-					{_playerData.nextRewardItem = 8933; _playerData.nextRewardCount = 1;}
-					else
-					{_playerData.nextRewardItem = 9003; _playerData.nextRewardCount = 1;}
-				}				
-			}
-			break;
-		}
+        UInt32 now = TimeUtil::Now();
+        _playerData.nextRewardTime = GData::GDataManager::GetOnlineAwardTime(_playerData.rewardStep) + now - _playerData.lastOnline;
 		writeOnlineRewardToDB();
 	}
 
@@ -4099,55 +3946,87 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		if(_playerData.lastOnline + _playerData.nextRewardTime > now + 60)
 			return false;
-		//if(World::_newYearStage == 5)
-		//{
-		//	if(!GameAction()->onOnlineAward(this, _playerData.nextRewardItem, _playerData.nextRewardCount))
-		//		return false;
-		//}
-		if(!m_Package->Add(_playerData.nextRewardItem, _playerData.nextRewardCount, true, false, FromOnlineAward))
-			return false;
-		if(_playerData.rewardStep > 11)
-			_playerData.rewardStep = 12;
+
+        const std::vector<UInt16>& ids = GData::GDataManager::GetOnlineAward(GetClass(),  _playerData.rewardStep);
+        UInt8 size = ids.size();
+        if (!size)
+            return false;
+
+        for (UInt8 i = 0; i < size; i += 2)
+        {
+            if(!m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward))
+                return false;
+        }
+
+        UInt8 count = GData::GDataManager::GetOnlineAwardCount();
+		if(_playerData.rewardStep >= count)
+			_playerData.rewardStep = count;
 		else
-			++ _playerData.rewardStep;
-		static const UInt32 additionalSec[13] = { 60, 3 * 60, 5 * 60, 7 * 60, 10 * 60, 15 * 60, 30 * 60, 45 * 60, 60 * 60, 60 * 60, 60 * 60, 60 * 60, 6 * 60 * 60 };
-		_playerData.nextRewardTime = additionalSec[_playerData.rewardStep] + now - _playerData.lastOnline;
-		genOnlineRewardItems(static_cast<UInt32>(_id) + now);
+			++_playerData.rewardStep;
+
+		genOnlineRewardItems();
 		return true;
 	}
 
 	UInt32 Player::getOnlineReward()
 	{
 		UInt32 now = TimeUtil::Now();
-		if(_playerData.nextRewardItem == 0)
+		if(_playerData.nextRewardTime == 0)
 		{
-			if(GetLev() < 50)
-			{
-				_playerData.nextRewardTime = 60 + now - _playerData.lastOnline;
-				_playerData.rewardStep = 0;
-			}
-			else
-			{
-				_playerData.nextRewardTime = 6 * 60 * 60 + now - _playerData.lastOnline;
-				_playerData.rewardStep = 12;
-			}
-			genOnlineRewardItems(static_cast<UInt32>(_id) + now);
+            _playerData.rewardStep = 0;
+			genOnlineRewardItems();
 		}
+        else 
+        {
+            if (_playerData.rewardStep >= GData::GDataManager::GetOnlineAwardCount())
+            {
+                _playerData.nextRewardTime = -1;
+                return -1;
+            }
+        }
 		UInt32 deadline = _playerData.nextRewardTime + _playerData.lastOnline;
 		if(deadline <= now)
 			return 0;
-		if(deadline - now > 6*60*60)
-		{
-			_playerData.nextRewardTime = 6*60*60 + now - _playerData.lastOnline;	
-			return 6*60*60;
-		}
 		return deadline - now;
 	}
 
 	void Player::sendOnlineReward()
 	{
 		Stream st(0x38);
-		st << static_cast<UInt16>(getOnlineReward()) << _playerData.nextRewardItem << _playerData.nextRewardCount << Stream::eos;
+        UInt32 left = getOnlineReward();
+        if (left == static_cast<UInt32>(-1))
+        {
+            st << static_cast<UInt16>(-1);
+            st << Stream::eos;
+            send(st);
+            return ;
+        }
+        else
+            st << static_cast<UInt16>(left);
+
+        size_t pos = st.size();
+        st << static_cast<UInt8>(0);
+
+        UInt8 n = 0;
+        const std::vector<UInt16>& ids = GData::GDataManager::GetOnlineAward(GetClass(),  _playerData.rewardStep);
+        UInt8 size = ids.size();
+        if (size)
+        {
+            for (; n < size; n+=2)
+            {
+                st << ids[n]; 
+                if (n+1 >= size)
+                {
+                    st << static_cast<UInt8>(1);
+                    break;
+                }
+                else
+                    st << static_cast<UInt8>(ids[n+1]);
+            }
+        }
+
+        st.data<UInt8>(pos) = (n+1)/2;
+        st << Stream::eos;
 		send(st);
 	}
 

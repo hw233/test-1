@@ -1,1 +1,0 @@
-UPDATE `trade` SET `items` = '' WHERE `tradeStatus` IN (0, 6, 7, 8, 9, 12, 13, 14);

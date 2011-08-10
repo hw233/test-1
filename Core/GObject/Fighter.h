@@ -147,6 +147,8 @@ public:
 	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
     // 取得技能装备位置idx处的技能ID和等级
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
+    // 取得默认技能
+    inline UInt16 getDefaultSkillAndLevel() { return _skills.size()?_skills[0]:0; }
     // 取得可装备的技能数
     UInt8 getSkillsNum();
     // 取得所有装备的技能和等级
@@ -208,7 +210,7 @@ public:
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
     // 初始化装备的心法
-    void setUpCittas(std::string& citta, bool = true);
+    void setUpCittas(std::string& citta, bool = false);
     // 初始化可装备的心法
     void setCittas(std::string& cittas, bool = true);
     // 装备心法
@@ -236,6 +238,8 @@ public:
 	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax() ) ? CITTA_LEVEL(_citta[idx]) : 0; }
     // 取得装备位置idx处所装备的心法的ID和等级
 	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax()) ? _citta[idx] : 0; }
+    // 取得默认心法
+	inline UInt16 getDefaultCittaAndLevel() { return getUpCittaAndLevel(0); }
     // 取得可装备的心法数
     UInt8 getCittasNum();
     // 取得所有装备的心法和等级

@@ -54,6 +54,8 @@ namespace GData
     std::vector<UInt32>     GDataManager::m_ClanTask;
     std::vector<UInt32>		GDataManager::m_BookFactor[3];
     std::vector<UInt32>		GDataManager::m_BookPrice;
+    std::vector<UInt16>     GDataManager::m_OnlineAwardTime;
+    std::vector<std::vector<UInt16> > GDataManager::m_OnlineAward[3];
 
 	bool GDataManager::LoadAllData()
 	{
@@ -184,7 +186,12 @@ namespace GData
 		}
 		if (!LoadFrontMapData())
 		{
-			fprintf(stderr, "Load copy data template Error !\n");
+			fprintf(stderr, "Load front map data template Error !\n");
+			return false;
+		}
+		if (!LoadOnlineAwardData())
+		{
+			fprintf(stderr, "Load online award template Error !\n");
 			return false;
 		}
 
@@ -868,7 +875,7 @@ namespace GData
                 std::sort(ids.begin(), ids.end(), Sort());
 
                 UInt32 totalfactor = 0;
-                for (UInt32 m = 1, n = 0, l = 0; m < ids.size(); m+=2, ++n, l+=2)
+                for (UInt32 m = 1, n = 0, l = 0; n < ids.size(); m+=2, ++n, l+=2)
                 {
                     totalfactor += ids[n].factor;
                     m_BookFactor[i][m] = totalfactor;
@@ -1200,6 +1207,39 @@ namespace GData
         return true;
     }
 
+    bool GDataManager::LoadOnlineAwardData()
+    {
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        luaopen_table(L);
+        {
+            std::string path = cfg.scriptPath + "items/onlineAward.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            for (int i = 1; i <= 3; ++i)
+            {
+                lua_tinker::table award = lua_tinker::call<lua_tinker::table>(L, "GetOnlineAward", i);
+                std::vector<std::vector<UInt16> >& vecs = m_OnlineAward[i-1];
+                UInt8 size = award.size();
+                vecs.resize(size);
+                for (int j = 1; j <= size; ++j) {
+                    lua_tinker::table items = award.get<lua_tinker::table>(j);
+                    for (int k = 1; k <= items.size(); ++k) {
+                        vecs[j-1].push_back(items.get<UInt16>(k));
+                    }
+                }
+            }
+
+            lua_tinker::table oltime = lua_tinker::call<lua_tinker::table>(L, "GetOnlineAwardTime");
+            for (int i = 1; i <= oltime.size(); ++i) {
+                m_OnlineAwardTime.push_back(oltime.get<UInt16>(i));
+            }
+        }
+        lua_close(L);
+        return true;
+    }
+
 	bool GDataManager::LoadFormationData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -1466,4 +1506,26 @@ namespace GData
     {
         return m_TripodAward[first][quality];
     }
+
+    const std::vector<UInt16>& GDataManager::GetOnlineAward(UInt8 cls, UInt8 i)
+    {
+        static std::vector<UInt16> null;
+        std::vector<std::vector<UInt16> >& vecs = m_OnlineAward[cls-1];
+        if (i >= m_OnlineAward[cls-1].size())
+            return null;
+        return vecs[i];
+    }
+
+    UInt16 GDataManager::GetOnlineAwardTime(UInt8 i)
+    {
+        if (i > m_OnlineAwardTime.size())
+            return 0;
+        return m_OnlineAwardTime[i-1];
+    }
+
+    UInt8 GDataManager::GetOnlineAwardCount()
+    {
+        return m_OnlineAwardTime.size();
+    }
+
 }

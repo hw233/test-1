@@ -109,7 +109,7 @@ function Task_00000025_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "修道之路永无止境，虽然人生来资质有高下之分，不过还是可以用后天的手段来提升，我这里有精炼的补髓益元丹给你，你服用了试试，看看效果如何。";
+	action.m_NpcMsg = "修道之路永无止境，虽然人生来潜力有高下之分，不过还是可以用后天的手段来提升，你现在服用刚刚送你的这枚凝神丹，看看效果如何。";
 	action.m_ActionMsg = "那就太感谢前辈了。";
 	return action;
 end

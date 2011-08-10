@@ -214,6 +214,24 @@ bool Fighter::addPExp( Int32 e, bool writedb )
             _pexp = _pexpMax;
     }
 
+	bool isMain = _owner->isMainFighter(_id);
+    if (e < 0)
+    {
+        if(isMain)
+        {
+            SYSMSG_SENDV(2006, _owner, -e);
+        }
+        SYSMSG_SENDV(2007, _owner, _color, getName().c_str(), -e);
+    }
+    else
+    {
+        if(isMain)
+        {
+            SYSMSG_SENDV(2004, _owner, e);
+        }
+        SYSMSG_SENDV(2005, _owner, _color, getName().c_str(), e);
+    }
+
     sendModification(6, _pexp);
     return true;
 }
@@ -1437,6 +1455,9 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
 // XXX: 穴道 id (0-14) lvl [1-3]
 bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
 {
+    UInt8 cittaslot = _cittaslot;
+    Int32 soulmax = soulMax;
+    UInt32 pexp = _pexpMax;
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
         const GData::AcuPra* pap = GData::acupraManager[idx<<8|v];
@@ -1450,11 +1471,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         addPExp(-pap->pra, writedb);
 
         soulMax += pap->soulmax;
-        if (pap->soulmax)
-            sendModification(9, soulMax);
         _pexpMax += pap->pramax;
-        if (pap->pramax)
-            sendModification(7, _pexpMax);
         _cittaslot += pap->citslot;
         if (pap->citslot)
         {
@@ -1466,6 +1483,13 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         _attrDirty = true;
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);
+
+        if (pexp != _pexpMax)
+            sendModification(7, _pexpMax);
+        if (soulmax != soulMax)
+            sendModification(9, soulMax);
+        if (cittaslot != _cittaslot)
+            sendModification(0x32, getUpCittasMax());
         return true;
     }
     return false;

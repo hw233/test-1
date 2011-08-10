@@ -1,1 +1,0 @@
-ALTER TABLE `friendliness`  CHANGE COLUMN `friendiness` `friendliness` SMALLINT(5) UNSIGNED NOT NULL AFTER `fighterId`;

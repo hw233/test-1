@@ -108,6 +108,7 @@ namespace Script
 		CLASS_DEF(Player, GetLev);
 		CLASS_DEF(Player, GetExp);
 		CLASS_DEF(Player, AddExp);
+		CLASS_DEF(Player, AddPExp);
 		CLASS_DEF(Player, getGold);
 		CLASS_DEF(Player, useGold);
 		CLASS_DEF(Player, getCoupon);

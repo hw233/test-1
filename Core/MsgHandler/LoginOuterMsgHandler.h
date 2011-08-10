@@ -174,6 +174,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
     // TODO: 可能是这个地方导致登陆后不久断线
 	UInt32 now = TimeUtil::Now();
+#if 0
 	UInt32 loginTime = *reinterpret_cast<UInt32*>(ul._hashval + 12);
 	if(cfg.GMCheck && (now + 300 < loginTime || now > loginTime + 600))
 	{
@@ -183,6 +184,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		conn->pendClose();
 		return;
 	}
+#endif
 
 	SHA1Engine sha1;
 	sha1.update(ul._hashval + 8, 4);

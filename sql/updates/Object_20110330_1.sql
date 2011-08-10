@@ -1,1 +1,0 @@
-UPDATE `player` SET `location` = `location` + 3072 WHERE `location` >= 25600 AND `location` < 25610;

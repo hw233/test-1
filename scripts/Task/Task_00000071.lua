@@ -11,7 +11,7 @@ function Task_Accept_00000071()
 	if task:HasAcceptedTask(71) or task:HasCompletedTask(71) or task:HasSubmitedTask(71) then
 		return false;
 	end
-	if not task:HasSubmitedTask(50) then
+	if not task:HasSubmitedTask(70) then
 		return false;
 	end
 	return true;
@@ -33,7 +33,7 @@ function Task_Can_Accept_00000071()
 	if task:HasAcceptedTask(71) or task:HasCompletedTask(71) or task:HasSubmitedTask(71) then
 		return false;
 	end
-	if not task:HasSubmitedTask(50) then
+	if not task:HasSubmitedTask(70) then
 		return false;
 	end
 	return true;

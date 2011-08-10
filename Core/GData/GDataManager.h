@@ -45,6 +45,7 @@ namespace GData
         static bool LoadFighterProb();
         static bool LoadCopyData();
         static bool LoadFrontMapData();
+        static bool LoadOnlineAwardData();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);
@@ -71,6 +72,9 @@ namespace GData
         static UInt32 GetTaskAwardFactor(int ttype, int color);
         static UInt32 GetTripodAward(int fire, int quality);
         static const std::vector<UInt32>& GetClanTask();
+        static const std::vector<UInt16>& GetOnlineAward(UInt8 cls, UInt8 i);
+        static UInt16 GetOnlineAwardTime(UInt8 i);
+        static UInt8 GetOnlineAwardCount();
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -94,6 +98,8 @@ namespace GData
         static std::vector<UInt32>       m_ClanTask;
         static std::vector<UInt32>       m_BookFactor[3];
         static std::vector<UInt32>       m_BookPrice;
+        static std::vector<UInt16>       m_OnlineAwardTime;
+        static std::vector<std::vector<UInt16> > m_OnlineAward[3];
 	};
 
 	

@@ -400,7 +400,7 @@ namespace GObject
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
 		void setTotalRecharge( UInt32 r );
-		void genOnlineRewardItems(UInt32);
+		void genOnlineRewardItems();
 		bool takeOnlineReward();
 		UInt32 getOnlineReward();
 		void writeOnlineRewardToDB();
@@ -433,6 +433,7 @@ namespace GObject
 		UInt8 GetLev() const;
 		UInt64 GetExp() const;
 		void AddExp(UInt64, UInt8 = 0);
+		void AddPExp(UInt32);
 		void pendExp(UInt32, bool = false);
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }

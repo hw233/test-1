@@ -70,6 +70,9 @@ MSG_REG(GameMsgHdr, OnBattleEndReq);
 MSG_REG(GameMsgHdr, OnConveyBattleReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
+MSG_REG(GameMsgHdr, OnCopyReq);
+
+MSG_REG_2(GameMsgHdr, 0x68, OnFrontMapReq);
 
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);

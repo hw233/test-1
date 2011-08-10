@@ -24,9 +24,6 @@ function Task_Can_Accept_00000606()
 	if task:HasAcceptedTask(606) or task:HasCompletedTask(606) or task:HasSubmitedTask(606) then
 		return false;
 	end
-	if player:ColorTaskOutOf(1) then
-		return false
-	end
 	return true;
 end
 
@@ -125,16 +122,17 @@ end
 --提交任务
 function Task_00000606_submit(itemId, itemNum)
 	local player = GetPlayer();
-
+	local task = player:GetTaskMgr();
 	local package = player:GetPackage();
 
-	if not player:GetTaskMgr():SubmitTask(606) then
-		return false;
+	if task:CanDayTaskSubmit(606) then
+		if DayTaskAward(0) then
+			task:DayTaskSubmit(606);
+			return true;
+		end
 	end
 
-
-	player:AddExp(2222);
-	return true;
+	return false;
 end
 
 --放弃任务
