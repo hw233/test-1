@@ -4669,77 +4669,87 @@ namespace GObject
 
 	void Player::listBookStore(UInt8 type)
 	{
-		UInt32 curtime = TimeUtil::Now();
-		UInt16 money = 0;
-        int count = 0;
+        Stream st(0x1A);
+        if (GetLev() < 10 && !type && GetTaskMgr()->HasCompletedTask(5) && !GetTaskMgr()->HasSubmitedTask(5)) {
+            st << static_cast<UInt16>(0);
+            _playerData.bookStore[0] = 1200;
+            _playerData.bookStore[1] = 1201;
+            _playerData.bookStore[2] = 1204;
+            _playerData.bookStore[3] = 1205;
+            _playerData.bookStore[4] = 1207;
+            _playerData.bookStore[5] = 1208;
+        } else {
+            UInt32 curtime = TimeUtil::Now();
+            UInt16 money = 0;
+            int count = 0;
 
-		if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
-		{
-            count = 1;
-			updateNextBookStoreUpdate(curtime);
-		}
-		else if(type == 1)
-		{
-            count = 1;
-            money = 50;
-            // updateNextBookStoreUpdate(curtime);
-        }
-
-		if(type > 0 && _playerData.tael < money)
-		{
-			sendMsgCode(1, 1006);
-			return;
-		}
-
-		Stream st(0x1A);
-		if(count > 0)
-		{
-            const std::vector<UInt32>& factor = GData::GDataManager::GetFlushBookFactor(type);
-            if (!factor.size())
-                return;
-            UInt32 totalfactor = factor[0];
-
-			do
-			{
-				int i = 0;
-				for(; i < 6; ++ i)
-				{
-                    UInt32 rnd = uRand(totalfactor);
-                    UInt32 j = 1;
-                    for (; j < factor.size(); j += 2)
-                    {
-                        if (rnd <= factor[j])
-                            break;
-                    }
-                    ++j;
-
-					UInt32 iid = factor[j];
-					if(iid == 0)
-					{
-						_playerData.bookStore[i] = 0;
-					}
-					else
-					{
-						_playerData.bookStore[i] = iid;
-					}
-				}
-				--count;
-			}
-			while(count > 0);
-
-			st << calcNextBookStoreUpdate(curtime);
-			writeBookStoreIds();
-
-            if (money)
+            if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
             {
-                ConsumeInfo ci(FlushBookStore, 0, 0);
-                useTael(money, &ci);
+                count = 1;
+                updateNextBookStoreUpdate(curtime);
             }
-		}
-		else
-		{
-			st << calcNextBookStoreUpdate(curtime);
-		}
+            else if(type == 1)
+            {
+                count = 1;
+                money = 50;
+                // updateNextBookStoreUpdate(curtime);
+            }
+
+            if(type > 0 && _playerData.tael < money)
+            {
+                sendMsgCode(1, 1006);
+                return;
+            }
+
+            if(count > 0)
+            {
+                const std::vector<UInt32>& factor = GData::GDataManager::GetFlushBookFactor(type);
+                if (!factor.size())
+                    return;
+                UInt32 totalfactor = factor[0];
+
+                do
+                {
+                    int i = 0;
+                    for(; i < 6; ++ i)
+                    {
+                        UInt32 rnd = uRand(totalfactor);
+                        UInt32 j = 1;
+                        for (; j < factor.size(); j += 2)
+                        {
+                            if (rnd <= factor[j])
+                                break;
+                        }
+                        ++j;
+
+                        UInt32 iid = factor[j];
+                        if(iid == 0)
+                        {
+                            _playerData.bookStore[i] = 0;
+                        }
+                        else
+                        {
+                            _playerData.bookStore[i] = iid;
+                        }
+                    }
+                    --count;
+                }
+                while(count > 0);
+
+                st << calcNextBookStoreUpdate(curtime);
+                writeBookStoreIds();
+
+                if (money)
+                {
+                    ConsumeInfo ci(FlushBookStore, 0, 0);
+                    useTael(money, &ci);
+                }
+            }
+            else
+            {
+                st << calcNextBookStoreUpdate(curtime);
+            }
+        }
 
 		for(int i = 0; i < 6; ++ i)
 		{
