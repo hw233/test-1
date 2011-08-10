@@ -1043,7 +1043,7 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 		pdata.pos = 0;
 	}
 
-    SYSMSG_SEND(2102, player);
+    SYSMSG_SENDV(2102, player);
 
 	player->updateBattleFighters();
     player->setFormation(f);

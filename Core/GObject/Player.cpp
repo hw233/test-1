@@ -1002,6 +1002,25 @@ namespace GObject
 		}
 	}
 
+    bool Player::checkFormation_ID(UInt16 f)
+    {
+        bool find = false;
+        int cnt = _playerData.formations.size();
+        for( int idx = 0; idx < cnt; ++ idx )
+        {
+            if(FORMATION_ID(_playerData.formations[idx]) == FORMATION_ID(f))
+            {
+                find = true;
+                break;
+            }
+        }
+
+        if(!find)
+            return false;
+
+        return true;
+    }
+
     bool Player::checkFormation(UInt16 f)
     {
         bool find = false;
@@ -1026,7 +1045,6 @@ namespace GObject
         if(!checkFormation(f))
             return false;
 
-        int cnt = _playerData.formations.size();
 		if(_playerData.formation == f)
 			return true;
 		_playerData.formation = f;
@@ -3867,6 +3885,12 @@ namespace GObject
         if(NULL == newformation)
             return false;
 
+        if(writedb && checkFormation_ID(newformationId))
+        {
+            SYSMSG_SENDV(2103, this);
+            return false;
+        }
+
         _playerData.formations.push_back(newformationId);
 
         if(!writedb)
@@ -3882,6 +3906,7 @@ namespace GObject
             formations += Itoa(_playerData.formations[idx]);
         }
 
+        SYSMSG_SENDV(2104, this, newformation->getName().c_str());
 		DB().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
 
         Stream st(0x1D);
