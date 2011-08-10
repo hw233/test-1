@@ -130,6 +130,8 @@ int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
         areaid = atoi(val->child->text);
 
     playerid = atoll(playerId);
+    //if (cfg.merged)
+    //    playerid |= (areaid << 48);
     GObject::Player* player = GObject::globalPlayers[playerid];
     if (!player)
     {
