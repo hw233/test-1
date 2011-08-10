@@ -825,7 +825,7 @@ namespace GObject
 
     void Player::upInitCitta(Fighter* fgt)
     {
-        static UInt16 cittas[] = {101, 401, 701};
+        static UInt16 cittas[] = {101, 1001, 1901};
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->addNewCitta(citta)) {
             if (fgt->upCitta(citta, 0, true)) {
@@ -859,7 +859,7 @@ namespace GObject
 			return;
 		Stream st(0x28);
 		st << static_cast<UInt16>(fgt->getId());
-        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp();
+        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getDefaultSkillAndLevel() << fgt->getDefaultCittaAndLevel();
 		st << Stream::eos;
 		send(st);
 		SYSMSG_SENDV(110, this, fgt->getColor(), fgt->getName().c_str());
@@ -1092,7 +1092,7 @@ namespace GObject
 		st << static_cast<UInt16>(fgt->getId()) << fgt->getPotential()
             << fgt->getCapacity() << fgt->getLevel() << fgt->getExp()
             << fgt->getPExp() << fgt->getPExpMax() << fgt->getSoul() << fgt->getMaxSoul();
-		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP();
+		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP() << fgt->getUpCittasMax();
 		if(withequip)
 		{
 			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)

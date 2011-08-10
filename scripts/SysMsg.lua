@@ -484,4 +484,6 @@ sysMsg:set(2003, 0, "火种制作失败，没有相关物品")
 
 sysMsg:set(2004, 0x35, "获得修为值%u")
 sysMsg:set(2005, 1, "[f:%u:%s]获得修为值%u")
+sysMsg:set(2006, 0x35, "消耗修为值%u")
+sysMsg:set(2007, 1, "[f:%u:%s]消耗修为值%u")
 

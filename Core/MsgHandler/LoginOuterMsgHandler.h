@@ -173,6 +173,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
     // TODO: 可能是这个地方导致登陆后不久断线
 	UInt32 now = TimeUtil::Now();
+#if 0
 	UInt32 loginTime = *reinterpret_cast<UInt32*>(ul._hashval + 12);
 	if(cfg.GMCheck && (now + 300 < loginTime || now > loginTime + 600))
 	{
@@ -182,9 +183,9 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		conn->pendClose();
 		return;
 	}
+#endif
 
 	SHA1Engine sha1;
-#if 0
 	sha1.update(ul._hashval + 8, 4);
 	sha1.update(cfg.cryptKey1.c_str(), cfg.cryptKey1.length());
 	sha1.update(ul._hashval, 4);
@@ -192,11 +193,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	sha1.update(ul._hashval + 12, 4);
 	sha1.update(cfg.cryptKey2.c_str(), cfg.cryptKey2.length());
 	sha1.update(ul._hashval + 4, 4);
-#else
-	sha1.update(cfg.cryptKey1.c_str(), cfg.cryptKey1.length());
-	sha1.update(ul._hashval, 16);
-	sha1.update(cfg.cryptKey2.c_str(), cfg.cryptKey2.length());
-#endif
 
 	std::vector<UInt8> buf = sha1.digest();
 	UInt8 res;
