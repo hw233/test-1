@@ -271,8 +271,8 @@ function OperationTaskAction2_0001(param1, param2)
 	if param1 == 1 then
 		local player = GetPlayer();
 		local task = player:GetTaskMgr();
-		if task:HasAcceptedTask(60) then
-			task:AddTaskStep(60);
+		if task:HasAcceptedTask(50) then
+			task:AddTaskStep(50);
 		end			
 	end
 end
@@ -283,8 +283,8 @@ function OperationTaskAction2_0002(_id, level)
 	local task = player:GetTaskMgr();
 	--print("OperationTaskAction2_0002 " .. _id .. " " .. difficulty .. " " .. level);
 	if _id == 1 and level == 5 then
-		if task:HasAcceptedTask(60) then
-			task:AddTaskStep(60);
+		if task:HasAcceptedTask(50) then
+			task:AddTaskStep(50);
 		end		
 	end
 end

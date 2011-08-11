@@ -166,7 +166,7 @@ public:
 	inline void setMagResAdd(float v, UInt16 last = 0) {_magResAdd = v; _magResAdd_last = last;}
 	inline void setMaxHPAdd(UInt32 v) {_maxhpAdd = v;}
 	inline void setActionAdd(UInt32 v, UInt16 last = 0) {_maxActionAdd = v; _maxActionAdd_last = last;}
-    inline void AddAura(UInt32 v) {_aura += v; if(_aura > _auraMax) _aura = _auraMax;}
+    inline void AddAura(Int32 v) {_aura += v; if(_aura > _auraMax) _aura = _auraMax;}
     inline void setAura(UInt32 v) {_aura = v > _auraMax ? _auraMax : v;}
     inline void setToughAdd(float v, UInt16 last) {_toughAdd = v; _toughAdd_last = last;}
 
