@@ -114,7 +114,8 @@ struct FighterTrainReq
 
 struct TakeOnlineRewardReq
 {
-	MESSAGE_DEF(0x38);
+    UInt8 _flag;
+	MESSAGE_DEF1(0x38, UInt8, _flag);
 };
 
 struct LuckyDrawInfoReq
@@ -869,7 +870,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
-    pl->sendOnlineReward();
 	pl->sendDailyInfo();
 	{
 		Stream st;
@@ -888,9 +888,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
     {
         pl->sendNewGuild();
-    }
-    {
-        pl->sendOnlineReward();
     }
 	pl->sendWallow();
 	pl->sendEvents();
@@ -1354,11 +1351,13 @@ void OnLuckyDrawInfoReq( GameMsgHdr& hdr, LuckyDrawInfoReq& )
 	GObject::luckyDraw.sendInfo(player);
 }
 
-void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& )
+void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->takeOnlineReward())
-		player->sendMsgCode(1, 2016);
+    if (!req._flag) {
+        if(!player->takeOnlineReward())
+            player->sendMsgCode(1, 2016);
+    }
 	player->sendOnlineReward();
 }
 
