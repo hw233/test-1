@@ -4,7 +4,7 @@
 namespace Login
 {
 
-LoginWorker::LoginWorker()
+LoginWorker::LoginWorker() : m_count(0), m_current(0)
 {
 
 }

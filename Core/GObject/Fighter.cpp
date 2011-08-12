@@ -1350,6 +1350,7 @@ int Fighter::hasPeerless( UInt16 pl )
 
 bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
 {
+    int op = 0;
     int idx = hasPeerless(pl);
     if (idx > 0)
     {
@@ -1359,6 +1360,7 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
             int i = isPeerlessUp(pl);
             if (i >= 0)
                 upPeerless(pl, writedb);
+            op = 3;
         }
         else
             return false;
@@ -1367,9 +1369,10 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
     {
         idx = static_cast<int>(_peerless.size());
         _peerless.push_back(pl);
+        op = 1;
     }
 
-    sendModification(0x31, pl, idx, writedb);
+    sendModification(0x31, pl, op/*1add,2del,3mod*/, writedb);
     return true;
 }
 
@@ -1385,7 +1388,7 @@ bool Fighter::delPeerless( UInt16 pl, bool writedb )
 
             if (isPeerlessUp(pl))
                 offPeerless(writedb);
-            sendModification(0x31, pl, i, writedb);
+            sendModification(0x31, pl, 2/*1add,2del,3mod*/, writedb);
             return true;
         }
     }
@@ -1433,6 +1436,11 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
 {
     if (peerless == pl)
         return;
+
+    int idx = hasPeerless(pl);
+    if (idx < 0)
+        return;
+
     peerless = pl;
     _attrDirty = true;
     _bPDirty = true;
@@ -2106,7 +2114,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         op = 1;
     }
 
-    addPExp(-cb->pexp, writedb);
+    // addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
     _bPDirty = true;

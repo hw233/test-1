@@ -122,6 +122,7 @@ namespace GObject
 	
 	void TaskMgr::ConvertOldGuildTask()
 	{
+#if 0
 		static const UInt64 initVal = (0x3FFFFFFFull << NEWGUILDSTEP_MAX);
 		static const UInt64 fullVal = 0xFFFFFFFFFFFFFFFFull;
 		static const UInt32 tasks[] = { 111111, 111112, 111113, 111114, 111115, 111116,111117,111118, 111119, 111120, 111121, 111122, 111123, 111124, 111125, 111126, 111127, 111128, 111129, 111130, 111131, 111132, 111133 };
@@ -142,6 +143,7 @@ namespace GObject
 		}
 		DB().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(m_PlayerOwner, newGuild), m_PlayerOwner->getId());
 		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` >= 111111 AND `taskId` <= 111133 AND `ownerId` = %"I64_FMT"u", m_PlayerOwner->getId());
+#endif
 	}
 
 
