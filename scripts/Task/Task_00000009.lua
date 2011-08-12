@@ -176,6 +176,7 @@ function Task_00000009_submit(itemId, itemNum)
 	end
 
 	player:AddExp(1100);
+	player:getTael(200);
 	return true;
 end
 

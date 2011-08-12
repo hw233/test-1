@@ -1336,6 +1336,7 @@ namespace GObject
 
 	bool Player::setNewGuildTaskStep(UInt32 step)
 	{
+#if 0
 		if (step <= 0 || step > NEWGUILDSTEP_MAX)
 			return false;
 		UInt64 stepVal = 1ull << (step - 1);
@@ -1372,8 +1373,20 @@ namespace GObject
 		Stream st(0x15);
 		st << static_cast<UInt8>(0x10) << step << Stream::eos;
 		send(st);
+#else
+        PLAYER_DATA(this, newGuild) = step;
+        DB().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", _playerData.newGuild, getId());
+#endif
 		return true;
 	}
+
+    void Player::sendNewGuild()
+    {
+        Stream st(0x13);
+        st << static_cast<UInt16>(_playerData.newGuild);
+        st << Stream::eos;
+        send(st);
+    }
 
     bool Player::setMounts(UInt8 mounts)
     {
@@ -2900,10 +2913,10 @@ namespace GObject
                 if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
                     return false;
 
-                //_playerData.shimen[i] = 0;
+                _playerData.shimen[i] = 0;
                 //_playerData.smcolor[i] = 0;
 
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.smcolor[i]&0x0F);
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, (_playerData.smcolor[i]&0x0F)-1);
                 AddExp(award); // TODO:
                 ++_playerData.smFinishCount;
                 sendColorTask(0, 0);
@@ -2917,10 +2930,10 @@ namespace GObject
                 if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
                     return false;
 
-                //_playerData.yamen[i] = 0;
+                _playerData.yamen[i] = 0;
                 //_playerData.ymcolor[i] = 0;
 
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(2, _playerData.ymcolor[i]&0x0F);
+                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, (_playerData.ymcolor[i]&0x0F)-1);
                 getTael(award); // TODO:
                 ++_playerData.ymFinishCount;
                 sendColorTask(1, 0);
@@ -3246,7 +3259,7 @@ namespace GObject
                         if (ttype == 0)
                             ++_playerData.smFreeCount;
                         else
-                            ++_playerData.ymFinishCount;
+                            ++_playerData.ymFreeCount;
                     }
                 }
 
@@ -3747,6 +3760,7 @@ namespace GObject
 
 	void Player::checkHPLoss()
 	{
+#if 0
 		if(!hasStatus(FirstHPLoss))
 		{
 			Stream st(0x13);
@@ -3754,10 +3768,12 @@ namespace GObject
 			send(st);
 			addStatus(FirstHPLoss);
 		}
+#endif
 	}
 
 	void Player::checkDeath()
 	{
+#if 0
 		if(!hasStatus(FirstDeath))
 		{
 			Stream st(0x13);
@@ -3765,6 +3781,7 @@ namespace GObject
 			send(st);
 			addStatus(FirstDeath);
 		}
+#endif
 	}
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)

@@ -516,7 +516,7 @@ function ItemNormal_00000018(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 10 then
        local package = player:GetPackage();
-	   local reqGrids = 9;
+	   local reqGrids = 10;
 	   if reqGrids <= 	package:GetRestPackageSize() then
            package:DelItemSendMsg(18, player);
 		   package:AddEquip(2192, 1);
@@ -527,6 +527,7 @@ function ItemNormal_00000018(iid, num, bind, param)
 		   package:AddEquip(2197, 1);
 		   package:AddEquip(2198, 1);
 		   package:AddEquip(2199, 1);
+		   package:AddItem(9, 1, 1, 0, 2);
 		   package:AddItem(19, 1, 1, 0, 2);
 	  	   player:getCoupon(30);
 		   return true;
@@ -543,7 +544,7 @@ function ItemNormal_00000019(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 20 then
 	   local package = player:GetPackage();
-  	   local reqGrids = 9;
+  	   local reqGrids = 11;
 	   if reqGrids <= 	package:GetRestPackageSize() then
 		   package:DelItemSendMsg(19, player);
 		   package:AddEquip(2200, 1);
@@ -554,6 +555,8 @@ function ItemNormal_00000019(iid, num, bind, param)
 		   package:AddEquip(2205, 1);
 		   package:AddEquip(2206, 1);
 		   package:AddEquip(2207, 1);
+		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(1211, 1, 1, 0, 2);
 		   package:AddItem(20, 1, 1, 0, 2);
 		   player:getCoupon(40);
 		   return true;
@@ -569,7 +572,7 @@ function ItemNormal_00000020(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 30 then
 	   local package = player:GetPackage();
-	   local reqGrids = 9;
+	   local reqGrids = 13;
 	   if reqGrids <= package:GetRestPackageSize() then
 	       package:DelItemSendMsg(20, player);
            local fgt = player:getMainFighter();
@@ -587,6 +590,8 @@ function ItemNormal_00000020(iid, num, bind, param)
                package:AddEquip(2229, 1);
                package:AddEquip(2230, 1);
                package:AddEquip(2231, 1);
+               package:AddEquip(1600, 1);
+               package:AddItem(1201, 1, 1, 0, 2);
            elseif cls == 2 then
                package:AddEquip(2216, 1);
                package:AddEquip(2217, 1);
@@ -596,6 +601,8 @@ function ItemNormal_00000020(iid, num, bind, param)
                package:AddEquip(2221, 1);
                package:AddEquip(2222, 1);
                package:AddEquip(2223, 1);
+               package:AddEquip(1601, 1);
+               package:AddItem(1205, 1, 1, 0, 2);
            elseif cls == 3 then
                package:AddEquip(2208, 1);
                package:AddEquip(2209, 1);
@@ -605,8 +612,13 @@ function ItemNormal_00000020(iid, num, bind, param)
                package:AddEquip(2213, 1);
                package:AddEquip(2214, 1);
                package:AddEquip(2215, 1);
+               package:AddEquip(1602, 1);
+               package:AddItem(1208, 1, 1, 0, 2);
            end
 
+		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(55, 1, 1, 0, 2);
+		   package:AddItem(57, 1, 1, 0, 2);
 		   package:AddItem(21, 1, 1, 0, 2);
 		   player:getCoupon(40);
 		   return true;
@@ -623,7 +635,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 	local player = GetPlayer();
 	if player:GetLev() >= 40 then
 	   local package = player:GetPackage();
-	   local reqGrids = 8;
+	   local reqGrids = 21;
 	   if reqGrids <= 	package:GetRestPackageSize() then
 	       package:DelItemSendMsg(20, player);
            local fgt = player:getMainFighter();
@@ -660,6 +672,19 @@ function ItemNormal_00000021(iid, num, bind, param)
                package:AddEquip(2238, 1);
                package:AddEquip(2239, 1);
            end
+		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(507, 1, 1, 0, 2);
+		   package:AddItem(509, 1, 1, 0, 2);
+		   package:AddItem(510, 1, 1, 0, 2);
+		   package:AddItem(500, 1, 1, 0, 2);
+		   package:AddItem(56, 1, 1, 0, 2);
+		   package:AddItem(58, 1, 1, 0, 2);
+		   package:AddItem(48, 1, 1, 0, 2);
+		   package:AddItem(51, 1, 1, 0, 2);
+		   package:AddItem(502, 1, 1, 0, 2);
+		   package:AddItem(504, 1, 1, 0, 2);
+		   package:AddItem(1212, 1, 1, 0, 2);
+		   package:AddItem(5031, 1, 1, 0, 2);
 		   player:getCoupon(40);
 		   return true;
 		end

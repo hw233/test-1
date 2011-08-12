@@ -177,6 +177,7 @@ function Task_00000017_submit(itemId, itemNum)
 
 	player:AddExp(2000);
 	player:getCoupon(20);
+	player:getTael(300);
 	return true;
 end
 

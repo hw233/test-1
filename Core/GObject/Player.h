@@ -569,6 +569,7 @@ namespace GObject
 		void   makeGreatFighterTaskValList(Stream& st, UInt16 start, UInt16 count);
 
 		bool setNewGuildTaskStep(UInt32);
+        void sendNewGuild();
 
 
 	private:

@@ -232,6 +232,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	}
 	if(res == 2 || res == 3)
 		conn->pendClose();
+
+    if (!res)
+    {
+        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %u, 当前在线人数: %u",
+                ul._userid, LOGIN().Count(), LOGIN().Current());
+    }
 }
 
 struct NewUserRepStruct
@@ -368,7 +374,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
         pl->addNewFormation(FORMATION_2);
 
 		UInt32 fgtId = nu._class + 1;
-		PLAYER_DATA(pl, newGuild) = (0x3FFFFFFFull << NEWGUILDSTEP_MAX);
+		// PLAYER_DATA(pl, newGuild) = (0x3FFFFFFFull << NEWGUILDSTEP_MAX);
+		PLAYER_DATA(pl, newGuild) = 0;
 
 		GObject::Fighter * fgt2 = GObject::globalFighters[fgtId];
 		GObject::Fighter * fgt = NULL;

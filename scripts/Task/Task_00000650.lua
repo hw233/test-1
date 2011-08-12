@@ -21,7 +21,7 @@ function Task_Can_Accept_00000650()
 	if player:GetLev() < 30 then
 		return false;
 	end
-	if task:HasAcceptedTask(650) or task:HasCompletedTask(650) or task:HasSubmitedTask(650) then
+	if task:HasAcceptedTask(650) or task:HasCompletedTask(650) or task:HasSubmitedTask(650) or not player:isClanTask(650) then
 		return false;
 	end
 	return true;
@@ -122,17 +122,18 @@ end
 --提交任务
 function Task_00000650_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(650) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(650);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(650) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(1000);
+	player:AddClanBuilding(100);
+	player:AddClanContrib(100);
+	return true;
 end
 
 --放弃任务

@@ -56,6 +56,12 @@ struct SelectCountry
 	MESSAGE_DEF1(0x0D, UInt8, _country);
 };
 
+struct NewGuildReq
+{
+    UInt16 _step;
+	MESSAGE_DEF1(0x13, UInt16, _step);
+};
+
 struct PlayerInfoReq
 {
 	MESSAGE_DEF(0x14);
@@ -816,6 +822,12 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
     }    
 }
 
+void OnNewGuildReq( GameMsgHdr& hdr, NewGuildReq& req)
+{
+    MSG_QUERY_CONN_PLAYER(conn, pl);
+    pl->setNewGuildTaskStep(req._step);
+}
+
 void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 {
 	MSG_QUERY_CONN_PLAYER(conn, pl);
@@ -874,6 +886,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		World::makeActivityInfo(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        pl->sendNewGuild();
+    }
 	pl->sendWallow();
 	pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();

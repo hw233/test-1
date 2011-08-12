@@ -122,17 +122,17 @@ end
 --提交任务
 function Task_00000604_submit(itemId, itemNum)
 	local player = GetPlayer();
-	local task = player:GetTaskMgr();
+
 	local package = player:GetPackage();
 
-	if task:CanDayTaskSubmit(604) then
-		if DayTaskAward(0) then
-			task:DayTaskSubmit(604);
-			return true;
-		end
+	if not player:GetTaskMgr():SubmitTask(604) then
+		return false;
 	end
 
-	return false;
+
+	player:AddExp(2000);
+	player:getTael(1000);
+	return true;
 end
 
 --放弃任务

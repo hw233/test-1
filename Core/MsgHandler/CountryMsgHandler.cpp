@@ -9,6 +9,7 @@ MSG_REG(GameMsgHdr, OnNullReq);
 MSG_REG_2(GameMsgHdr, 0x0C, OnAttainReq);
 MSG_REG(GameMsgHdr, OnSelectCountry);
 MSG_REG(GameMsgHdr, OnPlayerInfoReq);
+MSG_REG(GameMsgHdr, OnNewGuildReq);
 MSG_REG_2(GameMsgHdr, 0x15, OnPlayerInfoChangeReq);
 MSG_REG_2(GameMsgHdr, 0x1A, OnBookStoreListReq);
 MSG_REG(GameMsgHdr, OnPurchaseBookReq);
