@@ -2913,7 +2913,7 @@ namespace GObject
                 if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
                     return false;
 
-                //_playerData.shimen[i] = 0;
+                _playerData.shimen[i] = 0;
                 //_playerData.smcolor[i] = 0;
 
                 UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, (_playerData.smcolor[i]&0x0F)-1);
@@ -2930,7 +2930,7 @@ namespace GObject
                 if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
                     return false;
 
-                //_playerData.yamen[i] = 0;
+                _playerData.yamen[i] = 0;
                 //_playerData.ymcolor[i] = 0;
 
                 UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, (_playerData.ymcolor[i]&0x0F)-1);
@@ -3259,7 +3259,7 @@ namespace GObject
                         if (ttype == 0)
                             ++_playerData.smFreeCount;
                         else
-                            ++_playerData.ymFinishCount;
+                            ++_playerData.ymFreeCount;
                     }
                 }
 
