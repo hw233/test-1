@@ -206,10 +206,12 @@ end
 
 function GetStateName(cny)
 	if cny == 0 then
-		return "天族";
-	else
-		return "魔族";
-	end
+		return "峨眉";
+    end
+    if cny == 1 then
+		return "昆仑";
+    end
+    return "中立";
 end
 
 --[[
