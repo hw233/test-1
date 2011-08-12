@@ -165,13 +165,18 @@ function Task_00000026_submit(itemId, itemNum)
 	local player = GetPlayer();
 
 	local package = player:GetPackage();
+	if package:GetItemNum(800,1) < 1 then
+		return false;
+	end
 
 	if not player:GetTaskMgr():SubmitTask(26) then
 		return false;
 	end
 
+	package:DelItem(800,1,1);
 
 	player:AddExp(6000);
+	player:getTael(500);
 	return true;
 end
 
@@ -179,5 +184,6 @@ end
 function Task_00000026_abandon()
 	local package = GetPlayer():GetPackage();
 	package:DelItem(800, 1, 1);
+	local itemNum = 0;
 	return GetPlayer():GetTaskMgr():AbandonTask(26);
 end
