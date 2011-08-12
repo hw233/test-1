@@ -889,6 +889,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendNewGuild();
     }
+    {
+        pl->sendOnlineReward();
+    }
 	pl->sendWallow();
 	pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
