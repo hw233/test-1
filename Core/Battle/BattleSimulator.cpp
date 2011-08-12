@@ -422,6 +422,13 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         if(enterEvade)
             area_target->setEvad100(false);
 
+        float aura_factor = 1;
+        if(skill && skill->cond == GData::SKILL_PEERLESS)
+        {
+            aura_factor = bf->getAura() / 100;
+            setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
+        }
+
 		if(!enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
 		{
             pr = bf->calcPierce(area_target);
@@ -429,15 +436,10 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             float magatk = 0;
             if(NULL != skill)
             {
-                float aura_factor = 1;
-                if(skill->cond == GData::SKILL_PEERLESS)
-                {
-                    aura_factor = bf->getAura() / 100;
-                    setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, 0, 0, scList, scCount, false);
-                }
-
-                atk = aura_factor * (bf->calcAttack(cs, area_target) * skill->effect->damageP + skill->effect->adddam);
-                magatk = aura_factor * (bf->calcMagAttack(cs, area_target) * skill->effect->magdamP + skill->effect->addmag);
+                atk = bf->calcAttack(cs, area_target);
+                magatk = bf->calcMagAttack(cs, area_target);
+                atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs ? bf->getCriticalDmg() : 1));
+                magatk = aura_factor * (magatk * skill->effect->magdamP + skill->effect->addmag * (cs ? bf->getCriticalDmg() : 1));
             }
             else
             {
@@ -498,7 +500,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 //			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
 			// killed the target fighter
 
-            if(counter_deny >= 0)
+            if(counter_deny >= 0 && (!skill || skill->cond != GData::SKILL_PEERLESS))
             {
                 setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
                 setStatusChange( area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
@@ -3038,6 +3040,11 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 	fwrite(szBuf, 1, strlen(szBuf), f);
     sprintf(szBuf, "atk_type=%d\r\n", atk_type);
 	fwrite(szBuf, 1, strlen(szBuf), f);
+    if(cs)
+        sprintf(szBuf, "critical\r\n");
+    if(pr)
+        sprintf(szBuf, "pierce\r\n");
+
     sprintf(szBuf, "skillId=%d\r\n", add_id);
 	fwrite(szBuf, 1, strlen(szBuf), f);
     sprintf(szBuf, "target_pos=%d\r\n", target_pos);
