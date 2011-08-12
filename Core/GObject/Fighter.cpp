@@ -1670,6 +1670,29 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     return true;
 }
 
+bool Fighter::updateSkill( UInt16 skill, UInt16 nskill, bool sync, bool writedb )
+{
+    int idx = hasSkill(skill);
+    if (idx < 0)
+        return false;
+
+    std::vector<UInt16>::iterator it = _skills.begin();
+    std::advance(it, idx);
+    *it = nskill;
+
+    idx = isSkillUp(skill);
+    if (idx >= 0) {
+        _skill[idx] = nskill;
+        sendModification(0x60, nskill, idx, writedb);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if (sync)
+        sendModification(0x61, skill, 3/*1add,2del,3mod*/, writedb);
+    return true;
+}
+
 bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
 {
     int idx = hasSkill(skill);
@@ -1678,6 +1701,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
 
     if (offskill)
         offSkill(skill);
+
     std::vector<UInt16>::iterator it = _skills.begin();
     std::advance(it, idx);
     *it = 0;
@@ -1730,6 +1754,12 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
         idx = static_cast<int>(_skills.size());
         _skills.push_back(skill);
         op = 1;
+    }
+
+    idx = isSkillUp(skill); // XXX: hack
+    if (idx >= 0) {
+        _skill[idx] = skill;
+        sendModification(0x60, skill, idx, writedb);
     }
 
     sendModification(0x61, skill, op, writedb);
@@ -2130,6 +2160,7 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 
     if (citta != _citta[idx])
         citta = _citta[idx];
+
     const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
     if (skills.size())
     {

@@ -119,6 +119,8 @@ public:
     bool upSkill(UInt16 skill, int idx, bool = true);
     // 卸下技能
     bool offSkill(UInt16 skill, bool = true);
+    // 更新技能
+    bool updateSkill(UInt16 skill, UInt16 nskill, bool sync = true, bool = true);
     // 升级技能
 	bool skillLevelUp(UInt16 skill, UInt8 lv);
     // 技能是否可装备

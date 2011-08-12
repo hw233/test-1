@@ -784,7 +784,7 @@ namespace GData
                     UInt32 size = award.size();
                     for (UInt32 n = 0; n < size; ++n)
                     {
-                        m_TripodAward[i].push_back(award.get<UInt8>(n+1));
+                        m_TripodAward[i].push_back(award.get<UInt32>(n+1));
                     }
                 }
             }
