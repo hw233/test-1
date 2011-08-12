@@ -318,6 +318,9 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         break;
     case 0x31: // peerless
         break;
+    case 0x32: // cittaslot
+        // DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
+        break;
     case 0x60:
         { // skill
             std::string str;
@@ -1492,11 +1495,11 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);
 
-        if (pexp != _pexpMax)
+    //    if (pexp != _pexpMax)
             sendModification(7, _pexpMax);
-        if (soulmax != soulMax)
+    //    if (soulmax != soulMax)
             sendModification(9, soulMax);
-        if (cittaslot != _cittaslot)
+    //    if (cittaslot != _cittaslot)
             sendModification(0x32, getUpCittasMax());
         return true;
     }
