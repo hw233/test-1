@@ -120,9 +120,9 @@ UInt8 Fighter::getColor2( float pot )
 		return 0;
 	if(pot < 1.199f)
 		return 1;
-	if(pot < 1.499f)
+	if(pot < 1.399f)
 		return 2;
-	if(pot < 1.899f)
+	if(pot < 1.799f)
 		return 3;
 	if(pot < 2.099f)
 		return 4;
@@ -2106,7 +2106,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         op = 1;
     }
 
-    addPExp(-cb->pexp, writedb);
+    //addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
     _bPDirty = true;

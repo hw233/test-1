@@ -2359,8 +2359,8 @@ void Clan::broadcastPracticePlaceInfo()
 
     Stream st(0x9B);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
-        << pd->place.slotmoney << pd->place.protmoney << pd->place.slotincoming << pd->place.protincoming
-        << pd->place.enemyCount << pd->place.winCount << place;
+        << static_cast<UInt8>(pd->place.slotmoney) << static_cast<UInt8>(pd->place.protmoney) << pd->place.slotincoming << pd->place.protincoming
+        << pd->place.winCount << pd->place.enemyCount - pd->place.winCount << place;
 
     st << Stream::eos;
     broadcast(st);
@@ -2398,7 +2398,7 @@ void ClanCache::push( Clan * clan, bool add )
 	}
 }
 
-void ClanCache::search( Player * player, std::string name )
+void ClanCache::search( Player * player, std::string name, UInt8 flag )
 {
 	if(name.empty())
 		return;
@@ -2410,18 +2410,29 @@ void ClanCache::search( Player * player, std::string name )
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0);
 	else
 	{
-		UInt8 cny = player->getCountry();
-		std::set<Clan *> clans;
-		searchInternal(cny, slist, clans);
-		UInt16 c = clans.size();
+		std::set<Clan *> clans[2];
+        if(flag == 0)
+            searchInternal(0, slist, clans[0]);
+        else if(flag == 1)
+            searchInternal(1, slist, clans[1]);
+        else
+        {
+            searchInternal(0, slist, clans[0]);
+            searchInternal(1, slist, clans[1]);
+        }
+
+		UInt16 c = clans[0].size() + clans[1].size();
 		UInt16 idx = 0;
 		if(c > 20)
 			c = 20;
 		st << c << idx << static_cast<UInt8>(c);
 		std::set<Clan *>::iterator iter;
-		for(iter = clans.begin(); iter != clans.end() && c > 0; ++ iter, -- c)
+		for(int i = 0; i < 2; ++ i)
 		{
-			(*iter)->appendListInfo(st);
+			for (iter = clans[i].begin(); iter != clans[i].end() && c > 0; ++ iter, -- c)
+			{
+                (*iter)->appendListInfo(st);
+            }
 		}
 	}
 	st << Stream::eos;
@@ -2439,8 +2450,9 @@ void ClanCache::search2(Player * player, std::string name)
 	if(!slist.empty())
 	{
 		std::set<Clan *> clans[2];
-		searchInternal(0, slist, clans[0]);
-		searchInternal(1, slist, clans[1]);
+        searchInternal(0, slist, clans[0]);
+        searchInternal(1, slist, clans[1]);
+
 		UInt16 size = clans[0].size() + clans[1].size();
 		if (size == 0)
 			player->sendMsgCode(0, 2220);

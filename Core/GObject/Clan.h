@@ -372,7 +372,7 @@ class ClanCache
 {
 public:
 	void push(Clan *, bool = true);
-	void search(Player *, std::string);
+	void search(Player *, std::string, UInt8 flag);
 	void search2(Player *, std::string);
 	void listAll(Player *, UInt16, UInt8);
 private:

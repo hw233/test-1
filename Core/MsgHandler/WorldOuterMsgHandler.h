@@ -37,8 +37,9 @@ struct ClanListReq
 	UInt8 _type;
 	UInt16 _startidx;
 	UInt8 _count;
+    UInt8 _flag;      // 0-¶ëáÒ 1-À¥ÂØ 2-È«²¿
 	std::string _name;
-	MESSAGE_DEF4(0x90, UInt8, _type, UInt16, _startidx, UInt8, _count, std::string, _name);
+	MESSAGE_DEF5(0x90, UInt8, _type, UInt16, _startidx, UInt8, _count, UInt8, _flag, std::string, _name);
 };
 
 struct ClanInfoReq
@@ -255,7 +256,7 @@ void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
 	}
 	if(clan == NULL)
 	{
-		GObject::clanCache.search(player, clr._name);
+		GObject::clanCache.search(player, clr._name, clr._flag);
 		return;
 	}
 	clan->searchMatch(player);
@@ -292,7 +293,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		player->send(st);
 		return;
     }
-	if(player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL)
+	if(player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL || player->getCountry() > 1)
 	{
 		Stream st(0x92);
 		st << static_cast<UInt8>(1) << Stream::eos;

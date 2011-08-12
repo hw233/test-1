@@ -584,15 +584,20 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
     }
 
     size_t cnt = _activeSkill.size();
-    for(size_t i = 0; i < cnt; i++)
+    if(cnt == 0)
+        return NULL;
+
+    size_t idx = _activeSkillIdx % cnt;
+    for(size_t i = idx; i < cnt; i++)
     {
-        size_t idx = (_activeSkillIdx + i) % cnt;
+        size_t idx = i % cnt;
         if(NULL != _activeSkill[idx].base && _activeSkill[idx].cd == 0)
         {
+            bool isTherapy = (_activeSkill[idx].base->effect->hp > 0 || _activeSkill[idx].base->effect->hpP > 0.001) && _activeSkill[idx].base->target == 0;
             // therapy skill second while need therapy
             if(need_therapy && !has_therapy)
             {
-                if(_activeSkill[idx].base->effect->hp && _activeSkill[idx].base->effect->hpP > 0.001)
+                if(isTherapy)
                 {
                     need_therapy = false;
                     has_therapy = true;
@@ -607,7 +612,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
 
             if(!resSkillItem)
             {
-                if(!need_therapy && _activeSkill[idx].base->effect->hp && _activeSkill[idx].base->effect->hpP > 0.001)
+                if(!need_therapy && isTherapy)
                 {
                     continue;
                 }

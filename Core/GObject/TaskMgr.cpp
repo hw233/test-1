@@ -423,7 +423,7 @@ namespace GObject
 
 	bool TaskMgr::TaskCanAccept(UInt32 taskId)
 	{
-		return GameAction()->CheckTaskAcceptCondition(m_PlayerOwner, taskId) && !isShiMenTask(taskId) && !isYaMenTask(taskId);
+        return GameAction()->CheckTaskAcceptCondition(m_PlayerOwner, taskId) && !isShiMenTask(taskId) && !isYaMenTask(taskId);
 	}
 
 	TaskData TaskMgr::GetTaskData(UInt32 taskId)
