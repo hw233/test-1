@@ -63,6 +63,10 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 	player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
+
+    LOGIN().Logout();
+    LOGIN().GetLog()->OutInfo("用户[%s][%"I64_FMT"u]退出游戏, 当前在线人数: %u\n",
+            player->getName().c_str(), player->getId(), LOGIN().Current());
 }
 
 struct UserLogonRepStruct
@@ -173,8 +177,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		conn->closeConn();
 
     // TODO: 可能是这个地方导致登陆后不久断线
-	UInt32 now = TimeUtil::Now();
 #if 0
+	UInt32 now = TimeUtil::Now();
 	UInt32 loginTime = *reinterpret_cast<UInt32*>(ul._hashval + 12);
 	if(cfg.GMCheck && (now + 300 < loginTime || now > loginTime + 600))
 	{
@@ -235,8 +239,9 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
     if (!res)
     {
-        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %u, 当前在线人数: %u",
-                ul._userid, LOGIN().Count(), LOGIN().Current());
+        UInt32 count = LOGIN().Count();
+        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %u, 当前在线人数: %u\n",
+                ul._userid, count, LOGIN().Current());
     }
 }
 
@@ -409,8 +414,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			pl->SetSessionID(hdr.sessionID);
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
-
-            pl->GetPackage()->AddItem(18, 1);
 
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
