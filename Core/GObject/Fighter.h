@@ -103,7 +103,7 @@ public:
     int hasPeerless(UInt16 pl);
 
     inline UInt8 getAcupointsCntMax() { return 3; }
-    bool setAcupoints(int idx, UInt8 v, bool = true);
+    bool setAcupoints(int idx, UInt8 v, bool = true, bool = false);
     bool incAcupointsBit(int idx, bool = true);
 
     inline UInt8 getAcupointsBit(int idx) { return (idx >= 0 && idx < ACUPOINTS_MAX) ? _acupoints[idx] : static_cast<UInt8>(-1); }

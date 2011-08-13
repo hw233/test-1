@@ -1458,13 +1458,13 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
     StringTokenizer tk(acupoints, ",");
     for (size_t i = 0; i < tk.count() && i < ACUPOINTS_MAX; ++i)
     {
-        setAcupoints(i, ::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
+        setAcupoints(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
     }
 
 }
 
 // XXX: 穴道 id (0-14) lvl [1-3]
-bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
+bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 {
     UInt8 cittaslot = _cittaslot;
     Int32 soulmax = soulMax;
@@ -1476,10 +1476,12 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
             return false;
         if (pap->needlvl > getLevel())
             return false;
-        if (pap->pra > getPExp())
-            return false;
 
-        addPExp(-pap->pra, writedb);
+        if (!init) {
+            if (pap->pra > getPExp())
+                return false;
+            addPExp(-pap->pra, writedb);
+        }
 
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
@@ -2147,7 +2149,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         op = 1;
     }
 
-    // addPExp(-cb->pexp, writedb);
+    addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
     _bPDirty = true;
