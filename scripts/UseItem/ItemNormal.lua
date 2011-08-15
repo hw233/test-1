@@ -2890,10 +2890,10 @@ function ItemNormal_00008993(iid, num, bind, param)
 			if R_Equip <= 10 then
 				package:AddEquip(randEquip1, 1, 0, 2);	
 				package:AddEquip(randEquip2, 1, 0, 2);
-				BroadCastEquip2(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+				BroadCastEquip2(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
 			else
 				package:AddEquip(randEquip1, 1, 0, 2);
-				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1));
+				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip1));
 			end
 			return true;
 		end
@@ -2958,7 +2958,7 @@ function ItemNormal_00008994(iid, num, bind, param)
 			if reqGrids <= package:GetRestPackageSize() then
 				package:DelItemSendMsg(8994, player);
 				package:AddEquip(randEquip, 1, 0, 2);
-				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族战个人宝箱", GetItemName(randEquip));
+				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派战个人宝箱", GetItemName(randEquip));
 				if r1_0004 <=25 then
                     package:AddItem(4, 1, 1, 0, 2);
 		        elseif r10007 <=50 then
@@ -3604,10 +3604,10 @@ function ItemNormal_00009041(iid, num, bind, param)
 			if R_Equip <= 10 then
 				package:AddEquip(randEquip1, 1);	
 				package:AddEquip(randEquip2, 1);
-				BroadCastEquip2(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
+				BroadCastEquip2(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
 			else
 				package:AddEquip(randEquip1, 1);
-				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip1));
+				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip1));
 			end
 			return true;
 		end
@@ -3719,7 +3719,7 @@ function ItemNormal_00009201(iid, num, bind, param)
 			end
 			if R_Equip <= 75 then
 				package:AddEquip(randEquip, 1);
-				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip));
+				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip));
 			end
 				package:AddItem(Purple_Favor[math.random(1, #Purple_Favor)], 2, true);	
 			return true;
@@ -3831,7 +3831,7 @@ function ItemNormal_00009202(iid, num, bind, param)
 			end
 			if R_Equip <= 75 then
 				package:AddEquip(randEquip, 1);
-				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip));
+				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip));
 			end
 			package:AddItem(Purple_Favor[math.random(1, #Purple_Favor)], 2, true);	
 			return true;
@@ -3943,7 +3943,7 @@ function ItemNormal_00009203(iid, num, bind, param)
 			end
 			if R_Equip <= 75 then
 				package:AddEquip(randEquip, 1);
-				BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(randEquip));
+				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip));
 			end
 			package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 2, true);	
 			return true;
@@ -4047,7 +4047,7 @@ function ItemNormal_00009204(iid, num, bind, param)
 				package:AddItem(8919, 1, 1);	
 			end
 			package:AddItem(9031, 1, 1);	
-			BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(9031));
+			BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(9031));
 			package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 2, true);	
 			return true;
 		end
@@ -4177,7 +4177,7 @@ function ItemNormal_00009217(iid, num, bind, param)
 				package:AddItem(8919, 1, 1);	
 			end
 			package:AddItem(9214, 1, 1);	
-			BroadCastEquip1(player:getCountry(), player:getPName(), "宗族宝箱", GetItemName(9214));
+			BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(9214));
 			package:AddItem(Diety_Favor[math.random(1, #Diety_Favor)], 2, true);	
 			return true;
 		end

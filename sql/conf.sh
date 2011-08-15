@@ -1,8 +1,8 @@
 #!/bin/bash
 
 H=localhost
-U=asss
-P=asss
-DBD=data
-DBO=asss
+U=kingxin
+P=kingxin
+DBD=data_8888
+DBO=asss_8888
 

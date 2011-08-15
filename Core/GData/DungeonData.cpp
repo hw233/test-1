@@ -30,6 +30,8 @@ void DungeonLevel::getLoot( GObject::Player * player, UInt32 specialItem, UInt8 
 	}
 	for(it = loots.begin(); it != loots.end(); ++ it)
 	{
+        if (!(*it))
+            continue;
 		LootResult lr = (*it)->roll();
 		const ItemBaseType * ibt = itemBaseTypeManager[lr.id];
 		if(replace)

@@ -864,7 +864,7 @@ inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext, UInt
 
 inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 {
-    if (id < 200)
+    if (id < 2000)
         return;
 
 	id -= 2000;

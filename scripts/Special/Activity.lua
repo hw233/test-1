@@ -144,14 +144,14 @@ function onClanBattleAttend(player)
 			return
 		end
 		player:addStatus(0x400)
-		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在宗族战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在帮派战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
 	end
 end
 
 function onCountryBattleAttend(player)
 	local stage = getActivityStage();
 	if stage == 1 then	
-		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在国战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2);
+		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在阵营战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2);
 	end
 end
 
@@ -188,7 +188,7 @@ function onAthleticWin(player)
 		cnt = cnt + 1;
 		player:setStatusBit(20, 3, cnt);
 		if cnt == 5 then
-			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你今日竞技场胜利5次，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
+			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你今日斗剑场胜利5次，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
 		end
 	end
 end
