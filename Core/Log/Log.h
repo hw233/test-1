@@ -67,6 +67,7 @@ enum MailItemType
 	DismissFighter,
 	BackStage,
 	Activity,
+	DismissCitta,
 
 };
 enum ItemFrom
@@ -91,6 +92,7 @@ enum ItemFrom
 	FromSplit,
     FromTripod,
     FromFCMerge,
+    FromPExp,
 };
 
 enum ItemTo

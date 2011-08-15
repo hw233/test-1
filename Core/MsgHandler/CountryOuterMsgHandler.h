@@ -114,7 +114,8 @@ struct FighterTrainReq
 
 struct TakeOnlineRewardReq
 {
-	MESSAGE_DEF(0x38);
+    UInt8 _flag;
+	MESSAGE_DEF1(0x38, UInt8, _flag);
 };
 
 struct LuckyDrawInfoReq
@@ -869,7 +870,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
-    pl->sendOnlineReward();
 	pl->sendDailyInfo();
 	{
 		Stream st;
@@ -1302,14 +1302,14 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 	if(exp >= 25000)
 	{
 		exp += 25000;
-		UInt16 rCount1 = static_cast<UInt16>(exp / 80000000);
-		exp = exp % 80000000;
-		UInt16 rCount2 = static_cast<UInt16>(exp / 2000000);
-		exp = exp % 2000000;
-		UInt16 rCount3 = static_cast<UInt16>(exp / 50000);
+		UInt16 rCount1 = static_cast<UInt16>(exp / 50000000);
+		exp = exp % 50000000;
+		UInt16 rCount2 = static_cast<UInt16>(exp / 500000);
+		exp = exp % 500000;
+		UInt16 rCount3 = static_cast<UInt16>(exp / 5000);
 		SYSMSG(title, 236);
 		SYSMSGV(content, 237, fgt->getLevel(), fgt->getColor(), fgt->getName().c_str());
-		MailPackage::MailItem mitem[3] = {{9017, rCount1}, {9016, rCount2}, {8995, rCount3}};
+		MailPackage::MailItem mitem[3] = {{14, rCount1}, {13, rCount2}, {12, rCount3}};
 		MailItemsInfo itemsInfo(mitem, DismissFighter, 3);
 		GObject::Mail * pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 		if(pmail != NULL)
@@ -1351,11 +1351,13 @@ void OnLuckyDrawInfoReq( GameMsgHdr& hdr, LuckyDrawInfoReq& )
 	GObject::luckyDraw.sendInfo(player);
 }
 
-void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& )
+void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->takeOnlineReward())
-		player->sendMsgCode(1, 2016);
+    if (!req._flag) {
+        if(!player->takeOnlineReward())
+            player->sendMsgCode(1, 2016);
+    }
 	player->sendOnlineReward();
 }
 

@@ -484,7 +484,9 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-			ItemEquipSetType * iest = new ItemEquipSetType(est.id / 20, est.name);
+            if (est.id < 2000)
+                continue;
+			ItemEquipSetType * iest = new ItemEquipSetType((est.id-2000)/8, est.name);
 			for(int j = 0; j < 4; ++ j)
 			{
 				iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
@@ -785,7 +787,7 @@ namespace GData
                     UInt32 size = award.size();
                     for (UInt32 n = 0; n < size; ++n)
                     {
-                        m_TripodAward[i].push_back(award.get<UInt8>(n+1));
+                        m_TripodAward[i].push_back(award.get<UInt32>(n+1));
                     }
                 }
             }
@@ -1521,7 +1523,7 @@ namespace GData
     {
         if (i > m_OnlineAwardTime.size())
             return 0;
-        return m_OnlineAwardTime[i-1];
+        return m_OnlineAwardTime[i];
     }
 
     UInt8 GDataManager::GetOnlineAwardCount()

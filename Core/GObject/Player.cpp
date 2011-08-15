@@ -502,13 +502,6 @@ namespace GObject
 
 		UInt32 curtime = TimeUtil::Now();
 		DBLOG().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		UInt32 deadline = _playerData.nextRewardTime + _playerData.lastOnline;
-		if(deadline <= curtime)
-			deadline = 0;
-		else
-			deadline -= curtime;
-
-		_playerData.nextRewardTime = deadline;
 		_playerData.lastOnline = curtime;
 		writeOnlineRewardToDB();
 
@@ -530,13 +523,6 @@ namespace GObject
 		}
 		
 		DBLOG().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		UInt32 deadline = _playerData.nextRewardTime + _playerData.lastOnline;
-		if(deadline <= curtime)
-			deadline = 0;
-		else
-			deadline -= curtime;
-
-		_playerData.nextRewardTime = deadline;
 		DB().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
 		_isOnline = false;
 
@@ -3852,7 +3838,6 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-        sendOnlineReward();
 		if ((nLev >= 30 && !m_Athletics->hasEnterAthletics()) || (oLev < 51 && nLev >= 51))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
@@ -4049,7 +4034,7 @@ namespace GObject
 	void Player::genOnlineRewardItems()
 	{
         UInt32 now = TimeUtil::Now();
-        _playerData.nextRewardTime = GData::GDataManager::GetOnlineAwardTime(_playerData.rewardStep) + now - _playerData.lastOnline;
+        _playerData.nextRewardTime = GData::GDataManager::GetOnlineAwardTime(_playerData.rewardStep) + now;
 		writeOnlineRewardToDB();
 	}
 
@@ -4061,7 +4046,8 @@ namespace GObject
 	bool Player::takeOnlineReward()
 	{
 		UInt32 now = TimeUtil::Now();
-		if(_playerData.lastOnline + _playerData.nextRewardTime > now + 60)
+		//if(_playerData.lastOnline + _playerData.nextRewardTime > now + 60)
+		if(now < _playerData.nextRewardTime)
 			return false;
 
         const std::vector<UInt16>& ids = GData::GDataManager::GetOnlineAward(GetClass(),  _playerData.rewardStep);
@@ -4072,14 +4058,21 @@ namespace GObject
         for (UInt8 i = 0; i < size; i += 2)
         {
             if(!m_Package->Add(ids[i], ((UInt8)(i+1)>=ids.size())?1:ids[i+1], true, false, FromOnlineAward))
-                return false;
+                // return false;
+                ; // XXX: ugly
         }
 
         UInt8 count = GData::GDataManager::GetOnlineAwardCount();
-		if(_playerData.rewardStep >= count)
+        ++_playerData.rewardStep;
+		if(_playerData.rewardStep >= count) {
 			_playerData.rewardStep = count;
-		else
-			++_playerData.rewardStep;
+
+            Stream st(0x38);
+            st << static_cast<UInt16>(-1) << static_cast<UInt8>(0);
+            st << Stream::eos;
+            send(st);
+            return true;
+        }
 
 		genOnlineRewardItems();
 		return true;
@@ -4101,10 +4094,9 @@ namespace GObject
                 return -1;
             }
         }
-		UInt32 deadline = _playerData.nextRewardTime + _playerData.lastOnline;
-		if(deadline <= now)
-			return 0;
-		return deadline - now;
+        if (_playerData.nextRewardTime <= now)
+            return 0;
+        return _playerData.nextRewardTime - now;
 	}
 
 	void Player::sendOnlineReward()
@@ -4113,7 +4105,7 @@ namespace GObject
         UInt32 left = getOnlineReward();
         if (left == static_cast<UInt32>(-1))
         {
-            st << static_cast<UInt16>(-1);
+            st << static_cast<UInt16>(-1) << static_cast<UInt8>(0);
             st << Stream::eos;
             send(st);
             return ;

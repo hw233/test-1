@@ -19,6 +19,7 @@
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
+#include "GObject/Mail.h"
 
 namespace GObject
 {
@@ -317,6 +318,9 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         }
         break;
     case 0x31: // peerless
+        break;
+    case 0x32: // cittaslot
+        // DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         break;
     case 0x60:
         { // skill
@@ -860,7 +864,11 @@ inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext, UInt
 
 inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 {
-	id /= 20;
+    if (id < 200)
+        return;
+
+	id -= 2000;
+    id /= 8;
 	if(id == 0)
 		return;
 	for(int i = 0; i < 8; ++ i)
@@ -1455,13 +1463,13 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
     StringTokenizer tk(acupoints, ",");
     for (size_t i = 0; i < tk.count() && i < ACUPOINTS_MAX; ++i)
     {
-        setAcupoints(i, ::atoi(tk[i].c_str()), writedb); // XXX: must be less then 255
+        setAcupoints(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
     }
 
 }
 
 // XXX: 穴道 id (0-14) lvl [1-3]
-bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
+bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 {
     UInt8 cittaslot = _cittaslot;
     Int32 soulmax = soulMax;
@@ -1473,10 +1481,12 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
             return false;
         if (pap->needlvl > getLevel())
             return false;
-        if (pap->pra > getPExp())
-            return false;
 
-        addPExp(-pap->pra, writedb);
+        if (!init) {
+            if (pap->pra > getPExp())
+                return false;
+            addPExp(-pap->pra, writedb);
+        }
 
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
@@ -1492,11 +1502,11 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb )
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);
 
-        if (pexp != _pexpMax)
+    //    if (pexp != _pexpMax)
             sendModification(7, _pexpMax);
-        if (soulmax != soulMax)
+    //    if (soulmax != soulMax)
             sendModification(9, soulMax);
-        if (cittaslot != _cittaslot)
+    //    if (cittaslot != _cittaslot)
             sendModification(0x32, getUpCittasMax());
         return true;
     }
@@ -1670,6 +1680,29 @@ bool Fighter::offSkill( UInt16 skill, bool writedb )
     return true;
 }
 
+bool Fighter::updateSkill( UInt16 skill, UInt16 nskill, bool sync, bool writedb )
+{
+    int idx = hasSkill(skill);
+    if (idx < 0)
+        return false;
+
+    std::vector<UInt16>::iterator it = _skills.begin();
+    std::advance(it, idx);
+    *it = nskill;
+
+    idx = isSkillUp(skill);
+    if (idx >= 0) {
+        _skill[idx] = nskill;
+        sendModification(0x60, nskill, idx, writedb);
+    }
+
+    _attrDirty = true;
+    _bPDirty = true;
+    if (sync)
+        sendModification(0x61, skill, 3/*1add,2del,3mod*/, writedb);
+    return true;
+}
+
 bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
 {
     int idx = hasSkill(skill);
@@ -1678,6 +1711,7 @@ bool Fighter::delSkill( UInt16 skill, bool writedb, bool sync, bool offskill )
 
     if (offskill)
         offSkill(skill);
+
     std::vector<UInt16>::iterator it = _skills.begin();
     std::advance(it, idx);
     *it = 0;
@@ -1730,6 +1764,12 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
         idx = static_cast<int>(_skills.size());
         _skills.push_back(skill);
         op = 1;
+    }
+
+    idx = isSkillUp(skill); // XXX: hack
+    if (idx >= 0) {
+        _skill[idx] = skill;
+        sendModification(0x60, skill, idx, writedb);
     }
 
     sendModification(0x61, skill, op, writedb);
@@ -2114,7 +2154,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         op = 1;
     }
 
-    // addPExp(-cb->pexp, writedb);
+    addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
     _bPDirty = true;
@@ -2130,6 +2170,7 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 
     if (citta != _citta[idx])
         citta = _citta[idx];
+
     const std::vector<const GData::SkillBase*>& skills = skillFromCitta(citta);
     if (skills.size())
     {
@@ -2184,6 +2225,41 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     std::advance(it, idx);
     *it = 0;
     _cittas.erase(it);
+
+    {
+        const GData::CittaBase* cb = GData::cittaManager[citta];
+        const GData::CittaBase* yacb = cb;
+        if (cb) {
+            UInt32 exp = cb->pexp;
+            UInt8 id = CITTA_ID(citta);
+            UInt8 lvl = CITTA_LEVEL(citta);
+            for (UInt8 i = 1; i <= lvl; ++i) {
+                cb = GData::cittaManager[CITTAANDLEVEL(id, lvl)];
+                if (cb)
+                    exp += cb->pexp;
+            }
+
+            // 29-100, 30-10000, 31-1000000
+            exp *= 0.6;
+            if (exp) {
+                UInt16 rCount1 = static_cast<UInt16>(exp / 1000000);
+                exp = exp % 1000000;
+                UInt16 rCount2 = static_cast<UInt16>(exp / 10000);
+                exp = exp % 10000;
+                UInt16 rCount3 = static_cast<UInt16>(exp / 100);
+
+                SYSMSG(title, 2105);
+                SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
+                MailPackage::MailItem mitem[3] = {{31, rCount1}, {30, rCount2}, {29, rCount3}};
+                MailItemsInfo itemsInfo(mitem, DismissCitta, 3);
+                GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail != NULL)
+                {    
+                    GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
+                }   
+            }
+        }
+    }
 
     _attrDirty = true;
     _bPDirty = true;
