@@ -19,6 +19,7 @@
 #include "Script/GameActionLua.h"
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
+#include "GObject/Mail.h"
 
 namespace GObject
 {
@@ -2220,6 +2221,41 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     std::advance(it, idx);
     *it = 0;
     _cittas.erase(it);
+
+    {
+        const GData::CittaBase* cb = GData::cittaManager[citta];
+        const GData::CittaBase* yacb = cb;
+        if (cb) {
+            UInt32 exp = cb->pexp;
+            UInt8 id = CITTA_ID(citta);
+            UInt8 lvl = CITTA_LEVEL(citta);
+            for (UInt8 i = 1; i <= lvl; ++i) {
+                cb = GData::cittaManager[CITTAANDLEVEL(id, lvl)];
+                if (cb)
+                    exp += cb->pexp;
+            }
+
+            // 29-100, 30-10000, 31-1000000
+            exp *= 0.6;
+            if (exp) {
+                UInt16 rCount1 = static_cast<UInt16>(exp / 1000000);
+                exp = exp % 1000000;
+                UInt16 rCount2 = static_cast<UInt16>(exp / 10000);
+                exp = exp % 10000;
+                UInt16 rCount3 = static_cast<UInt16>(exp / 100);
+
+                SYSMSG(title, 2105);
+                SYSMSGV(content, 2106, getLevel(), getColor(), getName().c_str(), yacb->type, yacb->getName().c_str(), lvl);
+                MailPackage::MailItem mitem[3] = {{31, rCount1}, {30, rCount2}, {29, rCount3}};
+                MailItemsInfo itemsInfo(mitem, DismissCitta, 3);
+                GObject::Mail * pmail = _owner->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail != NULL)
+                {    
+                    GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
+                }   
+            }
+        }
+    }
 
     _attrDirty = true;
     _bPDirty = true;

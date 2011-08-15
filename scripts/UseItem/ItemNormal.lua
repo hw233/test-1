@@ -702,7 +702,7 @@ function ItemNormal_00000029(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(1000);
+    fgt:addPExp(100*num);
     package:DelItemSendMsg(29, player);
     return true;
 end
@@ -714,7 +714,7 @@ function ItemNormal_00000030(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(5000);
+    fgt:addPExp(10000*num);
     package:DelItemSendMsg(30, player);
     return true;
 end
@@ -726,7 +726,7 @@ function ItemNormal_00000031(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(10000*num);
+    fgt:addPExp(1000000*num);
     package:DelItemSendMsg(31, player);
     return true;
 end
