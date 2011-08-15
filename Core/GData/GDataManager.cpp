@@ -475,6 +475,7 @@ namespace GData
 			wt->bindType = idt.bindType;
 			wt->energy = idt.energy;
 			wt->data = idt.data;
+            wt->career = idt.career;
 			itemBaseTypeManager.add(wt);
 			itemBaseTypeNameManager.add(wt->getName(), wt);
 		}

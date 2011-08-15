@@ -35,6 +35,7 @@ void WorldScript::init()
     def("setRecruitCost", GObject::Player::setRecruitCost);
     def("setTavernBlueCount", GObject::Player::setTavernBlueCount);
     def("setTavernPurpleCount", GObject::Player::setTavernPurpleCount);
+    def("setTavernOrangeCount", GObject::Player::setTavernOrangeCount);
 	def("setActivityStage", GObject::World::setActivityStage);
 	def("setActAvailable", GObject::World::setActAvailable);
 	def("setActAvailable1", GObject::World::setActAvailable1);

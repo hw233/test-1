@@ -60,10 +60,9 @@ namespace GObject
 		{10000, 20000, 50000},
 		{10000, 20000, 50000},
 		{10000, 20000, 50000}};
-
+#if 0
 	static void getRandomAttr2(UInt8 lv, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
 	{
-#if 0
 		static UInt8 attrChances[11][3][8] =
 		{
 			{{15, 50, 35}},
@@ -169,7 +168,6 @@ namespace GObject
 			{{60, 90, 120}, {120, 150, 180}, {180, 190, 200, 210, 230, 250, 260, 280}},
 			{{40, 50, 60}, {60, 70, 80}, {80, 90, 100, 110, 120, 130, 140, 150}}},
 		};
-#endif
 		if(c == 0)
 		{
 			if(q > 2)
@@ -180,7 +178,7 @@ namespace GObject
 				c = 1;
 		}
 
-		UInt8 types[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+		UInt8 types[8] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 		bool retain[3] = {false, false, false};
 		int tcount = 8;
 		for(int i = 0; i < c; ++ i)
@@ -233,7 +231,79 @@ namespace GObject
 			while(oldt != 0 && t[i] == oldt && v[i] == oldv);
 		}
 	}
+#endif
+	static void getRandomAttr2(UInt8 lv, UInt8 crr, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
+    {
+		if(c == 0)
+		{
+			if(q > 2)
+				c = 3;
+			else if(q == 2)
+				c = 2;
+			else
+				c = 1;
+		}
 
+		UInt8 types[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+		bool retain[3] = {false, false, false};
+		for(int i = 0; i < c; ++ i)
+		{
+			retain[i] = (mask & (1 << i)) > 0;
+			if(retain[i])
+			{
+				int oidx = t[i] - 1;
+				if(types[oidx])
+				{
+					types[oidx] = 0;
+				}
+			}
+		}
+		for(int i = 0; i < c; ++ i)
+		{
+			if(retain[i])
+				continue;
+			UInt8 oldt = t[i];
+			UInt16 oldv = v[i];
+			do
+			{
+				UInt32 tidx = uRand(10000);
+				t[i] = 0;
+				v[i] = 0;
+                int prev = -1;
+				for(UInt8 j = 0; j < 9; ++ j)
+				{
+					if(tidx < GObjectManager::getAttrTypeChance(q, j)  /*attrChances[lv][q][j]*/)
+					{
+                        if(types[j] == 0)
+                        {
+                            if(prev != -1)
+                                j = prev;
+                            else
+                                continue;
+                        }
+
+						t[i] = types[j];
+                        UInt32 aidx = uRand(10000);
+                        for(UInt8 k = 0; k < 8; ++ k)
+                        {
+                            if(aidx < GObjectManager::getAttrChance(q, k))
+                            {
+                                UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
+                                UInt32 factor = GObjectManager::getAttrDics(q, k) + uRand(dics);
+                                v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
+                                break;
+                            }
+                        }
+                        //attrInfo[lv][t[i] - 1][q][j];
+                        types[j] = 0;
+						break;
+					}
+                    prev = j;
+				}
+			}
+			while(oldt != 0 && t[i] == oldt && v[i] == oldv);
+		}
+    }
 
 	Package::Package(Player* player) : m_Owner(player), m_Size(0), _lastActivateLv(0), _lastActivateQ(0), _lastActivateCount(0)
 	{
@@ -485,12 +555,13 @@ namespace GObject
 				ItemEquipData edata;
 
 				UInt8 lv = (itype->reqLev + 5) / 10;
+                UInt8 crr = itype->career;
 				if(itype->quality > 2 && itype->subClass != Item_Trump)
 				{
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};
 					Int16 v[3] = {0, 0, 0};
-					getRandomAttr2(lv, q, 0, 0, t, v);
+					getRandomAttr2(lv, crr, q, 0, 0, t, v);
 					edata.extraAttr2.type1 = t[0];
 					edata.extraAttr2.value1 = v[0];
 					edata.extraAttr2.type2 = t[1];
@@ -2167,7 +2238,11 @@ namespace GObject
 			values[1] = ied.extraAttr2.value2;
 			types[2] = ied.extraAttr2.type3;
 			values[2] = ied.extraAttr2.value3;
-			getRandomAttr2(lv, q, c, protect, types, values);
+            UInt8 crr = 0;
+            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
+            if(itype)
+                crr = itype->career;
+			getRandomAttr2(lv, crr, q, c, protect, types, values);
 			if(!equip->GetBindStatus() && isBound)
 				equip->DoEquipBind();
 			ApplyAttr2(equip, types, values);
@@ -2233,7 +2308,11 @@ namespace GObject
 		values[2] = ied.extraAttr2.value3;
 		ConsumeInfo ci(ForgeEquipment,0,0);
 		m_Owner->useTael(amount,&ci);
-		getRandomAttr2(lv, q, ied.extraAttr2.getCount(), protect, types, values);
+        UInt8 crr = 0;
+		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
+		if(itype)
+            crr = itype->career;
+		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
 
 		ApplyAttr2(equip, types, values);
 		if(!equip->GetBindStatus() && isBound)

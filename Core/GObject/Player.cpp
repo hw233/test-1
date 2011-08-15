@@ -41,6 +41,7 @@ namespace GObject
     UInt32 Player::_recruit_cost = 20;
     UInt32 Player::_tavernBlueCount = 24;
     UInt32 Player::_tavernPurpleCount = 89;
+    UInt32 Player::_tavernOrangeCount = 200;
 	UInt32 Player::_tavernInterval = 2 * 3600, Player::_tavernRate = 100;
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
 	const UInt8 MaxICCount[] = {8, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24};
@@ -3354,9 +3355,20 @@ namespace GObject
 			return;
 		}
 
+        if(count == 1)
+            color = 1;
+        else if(color > 0)
+            -- color;
+
+        if(count > 0 && globalFighters.getColorFighterNum(extraRefresh ? 0 : 1, color) == getColorFighterNum(color))
+        {
+			sendMsgCode(0, 2006);
+            return;
+        }
+
         while(color > 0)
         {
-            if(globalFighters.getColorFighterNum(color) > 0)
+            if(globalFighters.getColorFighterNum(extraRefresh ? 0 : 1, color) > 0)
                 break;
             -- color;
         }
@@ -3367,11 +3379,11 @@ namespace GObject
 		{
 			do
 			{
-				bool hasBlue = false, hasPurple = false;
+				bool hasBlue = false, hasPurple = false, hasOrange = false;
 				std::set<UInt32> excepts, excepts2;
 				int i;
-				for(i = 0; i < 6; ++ i)
-					excepts2.insert(_playerData.tavernId[i]);
+				//for(i = 0; i < 6; ++ i)
+                    //excepts2.insert(_playerData.tavernId[i]);
 				i = 0;
 				if(!extraRefresh)
 				{
@@ -3400,7 +3412,21 @@ namespace GObject
 							++ i;
 						}
 					}
+					if(_playerData.tavernOrangeCount >= _tavernOrangeCount)
+					{
+						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 4, _tavernRate);
+						if(fgt != NULL)
+						{
+							_playerData.tavernId[i] = fgt->getId();
+							excepts.insert(fgt->getId());
+
+							hasOrange = true;
+							++ i;
+						}
+					}
 				}
+
+                bool hasGet = false;
 				for(; i < 6; ++ i)
 				{
 					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, _tavernRate);
@@ -3410,17 +3436,30 @@ namespace GObject
 					}
 					else
 					{
+						UInt8 tmpcolor = fgt->getColor();
+                        if(color <= tmpcolor)
+                        {
+                            if(hasGet)
+                            {
+                                -- i;
+                                continue;
+                            }
+                            else
+                                hasGet = true;
+                        }
+
 						_playerData.tavernId[i] = fgt->getId();
 						excepts.insert(fgt->getId());
-						UInt8 color = fgt->getColor();
-						switch(color)
+						switch(tmpcolor)
 						{
-						case 2:
+						case 1:
 							hasBlue = true;
 							break;
-						case 3:
+						case 2:
 							hasPurple = true;
 							break;
+                        case 3:
+                            hasOrange = true;
 						default:
 							break;
 						}
@@ -3441,18 +3480,27 @@ namespace GObject
 						_playerData.tavernPurpleCount = 0;
 					else
 						++ _playerData.tavernPurpleCount;
+                    if(hasOrange)
+                        _playerData.tavernOrangeCount = 0;
+                    else
+                        ++ _playerData.tavernOrangeCount;
 				}
 				-- count;
 				if(hasBlue)
 				{
-					if(color <= 2)
+					if(color <= 1)
 						break;
 				}
 				if(hasPurple)
 				{
-					if(color <= 3)
+					if(color <= 2)
 						break;
 				}
+                if(hasOrange)
+                {
+                    if(color <=3)
+                        break;
+                }
 			}
 			while(count > 0);
 			st << calcNextTavernUpdate(curtime);
@@ -3513,6 +3561,19 @@ namespace GObject
 	{
 		_nextTavernUpdate = (curtime + _tavernInterval) / _tavernInterval * _tavernInterval;
 	}
+
+    UInt32 Player::getColorFighterNum(UInt8 color)
+    {
+        UInt32 num = 0;
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            Fighter* fighter = it->second;
+            if(fighter->getColor() == color)
+                ++ num;
+        }
+
+        return num;
+    }
 
 	void Player::exceptAvailableFighters( std::map<UInt32, UInt32>& data )
 	{
@@ -4285,6 +4346,11 @@ namespace GObject
     void Player::setTavernPurpleCount(UInt32 tavernPurpleCount)
     {
         _tavernPurpleCount = tavernPurpleCount;
+    }
+
+    void Player::setTavernOrangeCount(UInt32 tavernOrangeCount)
+    {
+        _tavernOrangeCount = tavernOrangeCount;
     }
 
 	void Player::setNextExtraReward( UInt32 ner )

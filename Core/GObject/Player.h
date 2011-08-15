@@ -189,7 +189,7 @@ namespace GObject
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
-			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0),
+			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), copyFreeCnt(0), copyGoldCnt(0),
@@ -235,6 +235,7 @@ namespace GObject
 		UInt16 tavernId[6];         // 
 		UInt8 tavernBlueCount;      // 
 		UInt8 tavernPurpleCount;    // 
+		UInt8 tavernOrangeCount;    // 
 		UInt32 shimen[6];           // 师门任务
 		UInt8 smcolor[6];           // 师门任务颜色
         UInt8 smFinishCount;        // 师门任务当日完成次数
@@ -688,6 +689,7 @@ namespace GObject
 		void updateNextTavernUpdate(UInt32);
 
 		void exceptAvailableFighters(std::map<UInt32, UInt32>&);
+        UInt32 getColorFighterNum(UInt8 color);
 
 		void sendGreatFighterMet();
 
@@ -736,6 +738,7 @@ namespace GObject
         static void setRecruitCost(UInt32 recruit_cost);
         static void setTavernBlueCount(UInt32 tavernBlueCount);
         static void setTavernPurpleCount(UInt32 tavernPurpleCount);
+        static void setTavernOrangeCount(UInt32 tavernPurpleCount);
 
 		inline Mutex& getMutex() { return _mutex; }
 
@@ -814,6 +817,7 @@ namespace GObject
         static UInt32 _recruit_cost;
         static UInt32 _tavernBlueCount;
         static UInt32 _tavernPurpleCount;
+        static UInt32 _tavernOrangeCount;
 		static UInt32 _tavernInterval, _tavernRate;
 		static UInt32 _bookStoreInterval, _bookStoreRate;
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)

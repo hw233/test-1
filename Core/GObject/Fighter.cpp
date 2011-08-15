@@ -116,7 +116,7 @@ UInt8 Fighter::getColor2( float pot )
 {
 	if(pot < 0.299f)
 		return 5;
-	if(pot < 0.899f)
+	if(pot < 0.999f)
 		return 0;
 	if(pot < 1.199f)
 		return 1;
@@ -2271,12 +2271,9 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
         free_gold = type;
         break;
 	case 2:
-		color = 2;
-        colors = 1;
-        free_gold = 1;
-		break;
 	case 3:
-		color = 3;
+    case 4:
+		color = type - 1;
         colors = 1;
         free_gold = 1;
 		break;
@@ -2295,39 +2292,40 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 
 	std::map<UInt32, UInt32> idset[4];
     UInt32 bs = 0;
-    for(Int8 i = 0; i < colors; i++)
+    for(Int8 i = 0; i < colors; ++ i)
     {
         Int8 tmpColor = color + i;
-        while(tmpColor > -1)
-        {
+//        while(tmpColor > -1)
+//        {
             idset[tmpColor] = _summonSet[free_gold][tmpColor];
             pl->exceptAvailableFighters(idset[tmpColor]);
             for(std::set<UInt32>::iterator it = excepts.begin(); it != excepts.end(); ++ it)
                 idset[tmpColor].erase(*it);
             for(std::set<UInt32>::iterator it = excepts2.begin(); idset[tmpColor].size() > 6 && it != excepts2.end(); ++ it)
                 idset[tmpColor].erase(*it);
-
+/*
             if(colors == 1 && idset[tmpColor].empty())
             {
-               tmpColor --;
+               -- tmpColor;
             }
             else
             {
                 break;
             }
-        }
+*/
+//        }
 
-        if(tmpColor < 0)
-        {
-            break;
-        }
+//        if(tmpColor < 0)
+//        {
+//            break;
+//        }
 
         size_t size = idset[tmpColor].size();
         if(size == 0)
             continue;
 
         std::map<UInt32, UInt32>::iterator it;
-        for(it = idset[tmpColor].begin(); it != idset[tmpColor].end(); it ++)
+        for(it = idset[tmpColor].begin(); it != idset[tmpColor].end(); ++ it)
         {
             bs += it->second;
         }
@@ -2337,14 +2335,14 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
         return NULL;
 
     UInt32 r = uRand(bs);
-    for(UInt8 j = color; j < color + colors; j++)
+    for(Int8 j = colors-1; j > -1; -- j)
     {
-        size_t size = idset[j].size();
+        size_t size = idset[color+j].size();
         if(size == 0)
             continue;
 
         std::map<UInt32, UInt32>::iterator it;
-        for(it = idset[j].begin(); it != idset[j].end(); it ++)
+        for(it = idset[color+j].begin(); it != idset[color+j].end(); ++ it)
         {
             if(r < it->second)
             {
@@ -2380,10 +2378,11 @@ void GlobalFighters::buildSummonSet()
 {
     for(std::map<UInt32, GData::FighterProb>::iterator it = GData::fighterProb.begin(); it != GData::fighterProb.end(); ++ it)
     {
-        int i = it->first;
+        UInt32 i = it->first;
         Fighter * fgt = _fighters[i].fighter;
         if(fgt == NULL) continue;
         UInt8 color = fgt->getColor();
+        GData::FighterProb& prob = it->second;
         switch(color)
         {
         case 0:
@@ -2391,8 +2390,10 @@ void GlobalFighters::buildSummonSet()
         case 2:
         case 3:
         case 4:
-            _summonSet[0][color][i] = it->second.free;
-            _summonSet[1][color][i] = it->second.gold;
+            if(prob.free)
+                _summonSet[0][color][i] = prob.free;
+            if(prob.gold)
+                _summonSet[1][color][i] = prob.gold;
             break;
         }
     }
