@@ -1520,7 +1520,7 @@ namespace GData
     {
         if (i > m_OnlineAwardTime.size())
             return 0;
-        return m_OnlineAwardTime[i-1];
+        return m_OnlineAwardTime[i];
     }
 
     UInt8 GDataManager::GetOnlineAwardCount()

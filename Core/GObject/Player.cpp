@@ -3777,7 +3777,6 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-        sendOnlineReward();
 		if ((nLev >= 30 && !m_Athletics->hasEnterAthletics()) || (oLev < 51 && nLev >= 51))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
