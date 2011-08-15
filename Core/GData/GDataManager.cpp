@@ -483,7 +483,9 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-			ItemEquipSetType * iest = new ItemEquipSetType(est.id / 20, est.name);
+            if (est.id < 2000)
+                continue;
+			ItemEquipSetType * iest = new ItemEquipSetType((est.id-2000)/8, est.name);
 			for(int j = 0; j < 4; ++ j)
 			{
 				iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
