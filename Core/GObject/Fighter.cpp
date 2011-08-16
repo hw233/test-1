@@ -1476,13 +1476,17 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
     UInt32 pexp = _pexpMax;
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
+        if (_acupoints[idx] == v)
+            return false;
+
         const GData::AcuPra* pap = GData::acupraManager[idx<<8|v];
         if (!pap)
             return false;
-        if (pap->needlvl > getLevel())
-            return false;
 
         if (!init) {
+            if (pap->needlvl > getLevel())
+                return false;
+
             if (pap->pra > getPExp())
                 return false;
             addPExp(-pap->pra, writedb);
@@ -1784,7 +1788,7 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        upCitta(::atoi(tk[i].c_str()), i, writedb);
+        upCitta(::atoi(tk[i].c_str()), i, writedb, true);
     }
 }
 
@@ -1801,7 +1805,7 @@ int Fighter::isCittaUp( UInt16 citta )
     return -1;
 }
 
-bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
+bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
 {
     if (!citta)
         return false;
@@ -1821,7 +1825,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     int src = isCittaUp(citta);
     if (src < 0)
     {
-        if (cb->needsoul > getMaxSoul() - getSoul())
+        if (!init && (cb->needsoul > getMaxSoul() - getSoul()))
             return false;
 
         if (idx < getUpCittasNum()) // XXX: no we all append
@@ -1863,7 +1867,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         { // upgrade
             if (_citta[idx] != citta)
             {
-                if (cb->needsoul > getMaxSoul() - getSoul())
+                if (!init && (cb->needsoul > getMaxSoul() - getSoul()))
                     return false;
 
                 // XXX: do not send message to client
@@ -1878,9 +1882,12 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     {
         addSkillsFromCT(skillFromCitta(citta), writedb);
 
-        soul += cb->needsoul;
-        if (cb->needsoul)
-            sendModification(8, soul);
+        if (!init)
+        {
+            soul += cb->needsoul;
+            if (cb->needsoul)
+                sendModification(8, soul);
+        }
     }
 
     if (ret)
@@ -1903,11 +1910,12 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
     if (!cb)
         return false;
 
-    if (getPExp() >= cb->pexp) {
+    if (getPExp() >= cb->pexp)
+    {
         int i = hasCitta(citta);
         if (i < 0)
             return false;
-        return addNewCitta(citta+1, writedb);
+        return addNewCitta(citta+1, writedb, false);
     }
     return false;
 }
@@ -1920,7 +1928,8 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
         for (size_t i = 0; i < skills.size(); ++i)
         {
             s = skills[i];
-            if (s) {
+            if (s)
+            {
                 if (s->cond == GData::SKILL_PEERLESS)
                     addNewPeerless(s->getId(), writedb);
                 else if (s->cond == GData::SKILL_ACTIVE)
@@ -2110,7 +2119,7 @@ void Fighter::setCittas( std::string& cittas, bool writedb )
     StringTokenizer tk(cittas, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        addNewCitta(::atoi(tk[i].c_str()), writedb);
+        addNewCitta(::atoi(tk[i].c_str()), writedb, true);
     }
 }
 
@@ -2124,7 +2133,7 @@ int Fighter::hasCitta( UInt16 citta )
     return -1;
 }
 
-bool Fighter::addNewCitta( UInt16 citta, bool writedb )
+bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
 {
     if (!citta)
         return false;
@@ -2140,7 +2149,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         { // upgrade
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, i, writedb);
+                upCitta(citta, i, writedb, init);
             _cittas[idx] = citta;
             op = 3;
         }
@@ -2154,7 +2163,8 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb )
         op = 1;
     }
 
-    addPExp(-cb->pexp, writedb);
+    if (!init)
+        addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
     _bPDirty = true;
