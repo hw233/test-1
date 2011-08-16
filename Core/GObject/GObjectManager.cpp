@@ -65,8 +65,12 @@ namespace GObject
     UInt32 GObjectManager::_merge_chance[9];
     UInt32 GObjectManager::_enchant_chance[5][12];
     UInt8  GObjectManager::_enchant_max[11];
-    UInt8  GObjectManager::_attrChances[11][3][9];
-    UInt16 GObjectManager::_attrInfo[11][8][3][9];
+
+    UInt16 GObjectManager::_attrTypeChances[3][9];
+    UInt16 GObjectManager::_attrChances[3][9];
+    float  GObjectManager::_attrMax[3][4][12][9];
+    UInt16 GObjectManager::_attrDics[3][9];
+
     UInt32 GObjectManager::_socket_chance[6];
     UInt32 GObjectManager::_min_potential;
     UInt32 GObjectManager::_max_potential;
@@ -2353,28 +2357,45 @@ namespace GObject
 				}
             }
 
-            UInt8 lvl = 0;
-            for(; lvl < 11; lvl ++)
+            for(UInt8 q = 0; q < 3; q ++)
             {
-                for(UInt8 q = 0; q < 3; q ++)
                 {
-                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrChance", lvl + 1, q + 1);
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrTypeChance", q + 1);
                     UInt32 size = std::min(9, table_temp.size());
                     for(UInt32 j = 0; j < size; j ++)
                     {
-                        _attrChances[lvl][q][j] =  table_temp.get<UInt8>(j + 1);
+                        _attrTypeChances[q][j] =  table_temp.get<UInt16>(j + 1);
                     }
                 }
-
-                for(UInt8 t = 0; t < 8; t ++)
                 {
-                    for(UInt8 q = 0; q < 3; q ++)
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrChance", q + 1);
+                    UInt32 size = std::min(9, table_temp.size());
+                    for(UInt32 j = 0; j < size; j ++)
                     {
-                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrInfo", lvl + 1, t + 1, q + 1);
+                        _attrChances[q][j] =  table_temp.get<UInt16>(j + 1);
+                    }
+                }
+                {
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrDics", q + 1);
+                    UInt32 size = std::min(9, table_temp.size());
+                    for(UInt32 j = 0; j < size; j ++)
+                    {
+                        _attrDics[q][j] =  table_temp.get<UInt16>(j + 1);
+                    }
+                }
+            }
+
+            for(UInt8 q = 0; q < 3; ++q)
+            {
+                for(UInt8 crr = 0; crr < 4; ++crr)
+                {
+                    for(UInt8 lvl = 0; lvl < 12; ++lvl)
+                    {
+                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrMax", q + 1, crr + 1, lvl + 1);
                         UInt32 size = std::min(9, table_temp.size());
-                        for(UInt32 j = 0; j < size; j ++)
+                        for(UInt8 t = 0; t < size; ++t)
                         {
-                            _attrInfo[lvl][t][q][j] =  table_temp.get<UInt16>(j + 1);
+                            _attrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
                         }
                     }
                 }

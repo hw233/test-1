@@ -135,6 +135,7 @@ namespace GData
 		UInt8		bindType;
 		UInt16		energy;
         UInt16      data;
+        UInt8       career;
 
 		ItemBaseType(UInt32 id = 0, const std::string& name = "") : ObjectBaseT<>(id, name)	{}
 		virtual ~ItemBaseType() { }	//RTTI

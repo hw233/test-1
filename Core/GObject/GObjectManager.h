@@ -67,8 +67,6 @@ namespace GObject
         static UInt32 getMergeChance( UInt8 lvl ) { return _merge_chance[lvl]; }
         static UInt32 getEnchantChance( UInt8 q, UInt8 lvl ) { return _enchant_chance[q][lvl]; }
         static UInt8 getEnchantMax( UInt8 vip ) { return _enchant_max[vip]; }
-        static UInt8 getAttrChance( UInt8 lvl, UInt8 q, UInt8 idx ) { return _attrChances[lvl][q][idx]; }
-        static UInt16 getAttrInfo( UInt8 lvl, UInt8 t, UInt8 q, UInt8 idx ) { return _attrInfo[lvl][t][q][idx]; }
         static UInt32 getSocketChance( UInt8 s ) { return _socket_chance[s]; }
         static UInt32 getMinPotential() { return _min_potential; }
         static UInt32 getMaxPotential() { return _max_potential; }
@@ -89,6 +87,13 @@ namespace GObject
         static float getToughMax() { return _tough_max; }
         static float getCounterMax() { return _counter_max; }
         static float getMagResMax() { return _mres_max; }
+
+
+        static UInt16 getAttrTypeChance(UInt8 q, UInt8 idx) { return _attrTypeChances[q][idx]; }
+        static UInt16 getAttrChance( UInt8 q, UInt8 idx ) { return _attrChances[q][idx]; }
+        static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr ) { return _attrMax[q][crr][lvl][t]; }
+        static UInt16 getAttrDics(UInt8 q, UInt8 idx) { return _attrDics[q][idx]; }
+
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -100,8 +105,12 @@ namespace GObject
         static UInt32 _merge_chance[9];
 		static UInt32 _enchant_chance[5][12];
 		static UInt8  _enchant_max[11];
-		static UInt8  _attrChances[11][3][9];
-		static UInt16 _attrInfo[11][8][3][9];
+
+		static UInt16 _attrTypeChances[3][9];
+		static UInt16 _attrChances[3][9];
+		static float  _attrMax[3][4][12][9];
+        static UInt16 _attrDics[3][9];
+
         static UInt32 _socket_chance[6];
         static UInt32 _min_potential;
         static UInt32 _max_potential;
