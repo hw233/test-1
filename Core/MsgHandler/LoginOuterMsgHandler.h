@@ -322,7 +322,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	bool noWallow = (nu._country & 0x80) > 0;
 	nu._country &= 0x03;
 #else
-	bool noWallow = false;
+	bool noWallow = true;
 #endif
 
 	if(nu._name.empty() || nu._name.length() > 15 || (strncmp(nu._name.c_str(), "ERROR_", 6) == 0))

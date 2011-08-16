@@ -1168,6 +1168,7 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	if(player->getFighterCount() > 1 || player->GetPackage()->GetRestPackageSize() < 40)
 		return;
 	player->AddExp(GData::expTable.getLevelMin(100));
+    player->AddPExp(100000);
 	makeSuper(player->getMainFighter());
 	addSuperClass(player, 10);
 	addSuperClass(player, 16);

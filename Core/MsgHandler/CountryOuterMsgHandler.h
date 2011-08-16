@@ -1192,31 +1192,31 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
         {
             idx = (fer._equipId >> 16) & 0xFFFF;
             UInt8 v = fer._equipId & 0xFFFF;
-            fgt->setAcupoints(idx, v);
+            fgt->setAcupoints(idx, v, true, false);
         }
         break;
     case 0x30:
-        fgt->setPeerless(static_cast<UInt16>(fer._equipId));
+        fgt->setPeerless(static_cast<UInt16>(fer._equipId), true);
         break;
     case 0x60:
         {
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
-            fgt->upSkill(skill, idx);
+            fgt->upSkill(skill, idx, true);
         }
         break;
     case 0x61:
         {
             UInt16 skill = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
-            fgt->offSkill(skill);
+            fgt->offSkill(skill, true);
         }
         break;
     case 0x62:
         {
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
-            fgt->upCitta(citta, idx);
+            fgt->upCitta(citta, idx, true);
         }
         break;
     case 0x63:
@@ -1231,7 +1231,7 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
             UInt16 citta = (fer._equipId >> 16) & 0xFFFF;
             idx = fer._equipId & 0xFFFF;
             if (idx == 1)
-                fgt->lvlUpCitta(citta);
+                fgt->lvlUpCitta(citta, true);
             else if (idx == 2)
                 fgt->delCitta(citta, true);
         }

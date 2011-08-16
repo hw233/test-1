@@ -4563,7 +4563,7 @@ function ItemNormal_citta(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    if not fgt:addNewCitta(cittaid*100+1, true) then
+    if not fgt:addNewCitta(cittaid*100+1, true, false) then
         return false;
     end
 	package:DelItemSendMsg(iid, player);

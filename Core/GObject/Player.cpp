@@ -941,6 +941,10 @@ namespace GObject
 				sendMsgCode(0, 2034);
 			SYSMSG_SENDV(111, this, fgt->getColor(), fgt->getName().c_str());
 			SYSMSG_SENDV(1011, this, fgt->getColor(), fgt->getName().c_str());
+
+            UInt32 fgts[1] = {fgt->getId()};
+            GObject::practicePlace.standup(this, fgts, 1);
+
 			return fgt;
 		}
 		return NULL;
