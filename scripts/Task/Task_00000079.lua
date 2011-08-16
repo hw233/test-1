@@ -129,7 +129,7 @@ function Task_00000079_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "那姚开江要想个办法对付才好。";
+	action.m_NpcMsg = "那姚开江的妖法厉害，要想个办法对付才好。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -173,7 +173,7 @@ function Task_00000079_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(3333);
+	player:AddExp(20000);
 	return true;
 end
 

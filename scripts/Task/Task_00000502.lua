@@ -83,7 +83,7 @@ function Task_00000502_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都郊外的云灵山有一只蛇妖盘踞，经常祸害过往行人。这只蛇妖惯于喷涂剧毒，我手下的衙役捕快拿它毫无办法，还希望"..GetPlayerName(GetPlayer()).."去将这只妖物消灭。";
+	action.m_NpcMsg = "成都郊外的云灵山有一只蛇妖盘踞，经常祸害过往行人。这只蛇妖惯于喷涂剧毒，成都知府及其手下的衙役捕快拿它毫无办法，所以上我们峨眉求助，"..GetPlayerName(GetPlayer()).."你去将这只妖物消灭吧。\n";
 	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
 	return action;
 end
@@ -93,7 +93,7 @@ function Task_00000502_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。";
+	action.m_NpcMsg = "除了此蛇妖，也可以保成都附近百姓的安宁。";
 	action.m_ActionMsg = "";
 	return action;
 end

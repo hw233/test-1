@@ -11,4 +11,7 @@ function Monster_00005000(num)
 	if task:HasAcceptedTask(506) then
 		task:AddTaskStep2(506,1,num);
 	end
+	if task:HasAcceptedTask(556) then
+		task:AddTaskStep2(556,1,num);
+	end
 end

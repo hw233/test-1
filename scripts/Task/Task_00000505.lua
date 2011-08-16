@@ -83,8 +83,8 @@ function Task_00000505_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都前段时间治安真得很成问题，有几个大户人家的小姐都被那采花大盗糟蹋，还希望"..GetPlayerName(GetPlayer()).."去将这个淫贼捉拿归案。";
-	action.m_ActionMsg = "为民除害是我辈本色，小可去去就回。";
+	action.m_NpcMsg = "最近颇有些妖人在成都作乱，成都治安真得很成问题，听说有几个大户人家的小姐都被那采花大盗糟蹋，成都的官府对此束手无策，听说是剑侠一流在作案，"..GetPlayerName(GetPlayer()).."你去将这个淫贼捉拿归案。";
+	action.m_ActionMsg = "我绝不会放过这些采花贼！";
 	return action;
 end
 

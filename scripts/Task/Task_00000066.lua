@@ -163,6 +163,7 @@ function Task_00000066_submit(itemId, itemNum)
 	end
 
 
+	player:AddExp(13000);
 	return true;
 end
 

@@ -108,19 +108,9 @@ function Task_00000125_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
-	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，如今中华大地兵患才息，邪道之人纷乱又起，我等正道人士正应消灭妖邪，维护正义。听说成都府衙赵捕头遇到了几件棘手的案子，你去帮帮他吧。 ";
-	action.m_ActionMsg = "";
-	return action;
-end
-
-function Task_00000125_step_02()
-	local action = ActionTable:Instance();
-	action.m_ActionType = 0x0001;
-	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "好的，我这就去找捕头大哥。";
-	action.m_ActionMsg = "";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，如今中华大地兵患才息，邪道之人纷乱又起，我等正道人士正应消灭妖邪，维护正义。听说成都府衙赵捕头遇到了几件棘手的案子，你去帮帮他吧。 ";
+	action.m_ActionMsg = "好的，我这就去找捕头大哥。";
 	return action;
 end
 
@@ -136,7 +126,6 @@ end
 
 local Task_00000125_step_table = {
 		[1] = Task_00000125_step_01,
-		[2] = Task_00000125_step_02,
 		[10] = Task_00000125_step_10,
 		};
 

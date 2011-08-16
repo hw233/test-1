@@ -83,7 +83,7 @@ function Task_00000512_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在成都有位隐居多年的剑侠，叫沈浪，昔年为师曾和他一起出门历练，你去拜访一下他吧，";
+	action.m_NpcMsg = "在成都有位隐居多年的剑侠，叫沈浪，昔年为师曾和他一起出门历练，降魔除妖无数，只是汉室颠覆，又恪于修道之人的戒律，不能对凡人出手，所以他心灰意冷隐居成都，你去拜访一下他吧。";
 	action.m_ActionMsg = "弟子这就去。";
 	return action;
 end

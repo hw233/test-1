@@ -83,7 +83,7 @@ function Task_00000508_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都前段时间治安真得很成问题，有一些慈云寺出来的妖人在附近为恶，祸害百姓，实在是我们剑侠里的败类，"..GetPlayerName(GetPlayer()).."你速速去将这些恶人除掉。";
+	action.m_NpcMsg = "慈云寺最近聚集了不少邪派人士，有一些妖人在附近为恶，祸害百姓，实在是我们剑侠里的败类，"..GetPlayerName(GetPlayer()).."你速速去将这些恶人除掉。";
 	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
 	return action;
 end
