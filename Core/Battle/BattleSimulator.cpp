@@ -573,7 +573,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             defList[defCount].rhp= rhp;
             defList[defCount].rLeftHP = bf->getHP();
         }
-        defList[defCount].pos = pos;
+        defList[defCount].pos = pos + (bf->getSide() == side ? 25 : 0);
         ++ defCount;
 
         // 中毒
@@ -646,7 +646,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         float atk = bf->calcAttack(cs, 0);
 		dmg = static_cast<int>(factor * atk) * (950 + _rnd(100)) / 1000;
 		area_target_obj->makeDamage(dmg);
-		defList[defCount].pos = area_target_obj->getPos();
+		defList[defCount].pos = area_target_obj->getPos() + (bf->getSide() == area_target_obj->getSide() ? 25 : 0);
 		defList[defCount].damType = e_damNormal;
 		defList[defCount].damage = dmg;
 		defList[defCount].leftHP = area_target_obj->getHP();
