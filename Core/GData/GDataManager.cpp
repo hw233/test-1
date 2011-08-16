@@ -1476,7 +1476,7 @@ namespace GData
     const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int country, int type)
     {
         if (type >= 1)
-            return m_YaMenTask[country];
+            return m_YaMenTask[2];
         return m_ShiMenTask[country];
     }
 
