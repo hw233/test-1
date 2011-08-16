@@ -112,7 +112,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 	UInt8 row = 0xFF;
 	if(lev < 30)
 		return false;
-	else if(lev >= 30 && lev <= 50)
+	else if(lev > 29 && lev < 41)
 		row = 0;
 	else
 		row =1;

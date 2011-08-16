@@ -112,7 +112,7 @@ public:
 protected:
 	inline UInt8 getRankRow(UInt8 lev)
 	{
-		if (lev >= 51)
+		if (lev >= 41)
 			return 1;
 		if (lev >= 30)
 			return 0;

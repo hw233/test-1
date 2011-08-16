@@ -116,7 +116,7 @@ void Fighter::getArmorDefendAndHP(UInt16& def, UInt16& hp)
 UInt8 Fighter::getColor2( float pot )
 {
 	if(pot < 0.299f)
-		return 5;
+		return 10;
 	if(pot < 0.999f)
 		return 0;
 	if(pot < 1.199f)
@@ -127,7 +127,7 @@ UInt8 Fighter::getColor2( float pot )
 		return 3;
 	if(pot < 2.099f)
 		return 4;
-	return 5;
+	return 10;
 }
 
 UInt32 Fighter::getWeaponId()
