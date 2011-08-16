@@ -244,7 +244,11 @@ void Tripod::getAward(Player* pl)
 
     if (!genAward(pl, td, id, num))
         return;
-    pl->GetPackage()->AddItem(id, num, true, false, FromTripod);
+
+    if (IsEquipTypeId(id))
+        pl->GetPackage()->AddEquip(id, true, false, FromTripod);
+    else
+        pl->GetPackage()->AddItem(id, num, true, false, FromTripod);
 
     td.awdst = 0;
     td.soul = 0;
