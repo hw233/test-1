@@ -1785,7 +1785,7 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        upCitta(::atoi(tk[i].c_str()), i, writedb, true);
+        upCitta(::atoi(tk[i].c_str()), i, writedb);
     }
 }
 
@@ -1802,7 +1802,7 @@ int Fighter::isCittaUp( UInt16 citta )
     return -1;
 }
 
-bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
+bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 {
     if (!citta)
         return false;
@@ -1822,7 +1822,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
     int src = isCittaUp(citta);
     if (src < 0)
     {
-        if (!init && (cb->needsoul > getMaxSoul() - getSoul()))
+        if (cb->needsoul > getMaxSoul() - getSoul())
             return false;
 
         if (idx < getUpCittasNum()) // XXX: no we all append
@@ -1833,7 +1833,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
                     _citta[j] = _citta[j-1];
                     _citta[j-1] = 0;
                     if (_citta[j])
-                        sendModification(0x62, _citta[j], j, false);
+                        sendModification(0x62, _citta[j], j, writedb);
                 }
             }
         } else
@@ -1851,7 +1851,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
         {
             if (_citta[idx])
             { // swap
-                sendModification(0x62, _citta[idx], src, false);
+                sendModification(0x62, _citta[idx], src, writedb);
 
                 _citta[src] ^= _citta[idx];
                 _citta[idx] ^= _citta[src];
@@ -1864,7 +1864,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
         { // upgrade
             if (_citta[idx] != citta)
             {
-                if (!init && (cb->needsoul > getMaxSoul() - getSoul()))
+                if (cb->needsoul > getMaxSoul() - getSoul())
                     return false;
 
                 // XXX: do not send message to client
@@ -1879,7 +1879,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
     {
         addSkillsFromCT(skillFromCitta(citta), writedb);
 
-        if (!init)
         {
             soul += cb->needsoul;
             if (cb->needsoul)
@@ -2146,7 +2145,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
         { // upgrade
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, i, writedb, init);
+                upCitta(citta, i, writedb);
             _cittas[idx] = citta;
             op = 3;
         }

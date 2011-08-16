@@ -1011,7 +1011,6 @@ namespace GObject
 			Fighter * fgt2 = fgt->clone(pl);
 			if(fgt2 == NULL)
 				continue;
-			pl->addFighter(fgt2, false);
 			fgt2->setPotential(specfgtobj.potential, false);
             fgt2->setCapacity(specfgtobj.capacity, false);
 			fgt2->setLevel(specfgtobj.level);
@@ -1033,6 +1032,7 @@ namespace GObject
             fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
+			pl->addFighter(fgt2, false);
 		}
 		lc.finalize();
 

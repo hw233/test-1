@@ -216,7 +216,7 @@ public:
     // 初始化可装备的心法
     void setCittas(std::string& cittas, bool = true);
     // 装备心法
-    bool upCitta(UInt16 citta, int idx, bool = true, bool = false);
+    bool upCitta(UInt16 citta, int idx, bool = true);
     // 卸下心法
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
     // 增加一个心法

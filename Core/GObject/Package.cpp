@@ -1004,6 +1004,15 @@ namespace GObject
 		SYSMSG_SENDV(1004, player, itemid);		
 	}
 
+    UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
+    {
+		ItemBase * item = FindItem(itemid, bind);
+        if (item) {
+            return item->GetCareer();
+        }
+        return 0;
+    }
+
 	bool Package::UseTaskItem(UInt32 id, UInt8 bind)
 	{
 		bool ret = false;

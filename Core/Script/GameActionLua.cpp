@@ -271,6 +271,7 @@ namespace Script
 		CLASS_DEF(Package, GetRestPackageSize);
 		CLASS_DEF(Package, IsFull);
 		CLASS_DEF(Package, DelItemSendMsg);
+		CLASS_DEF(Package, GetItemCareer);
 		
 		//ŒÔ∆∑
 		CLASS_ADD(ItemBase);

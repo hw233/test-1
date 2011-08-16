@@ -4563,6 +4563,13 @@ function ItemNormal_citta(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
+    local cls = fgt:getClass()
+    local car = package:GetItemCareer(iid, bind)
+    if car ~= 0 then
+        if cls ~= car then
+            return false
+        end
+    end
     if not fgt:addNewCitta(cittaid*100+1, true, false) then
         return false;
     end
