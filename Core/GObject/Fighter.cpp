@@ -1483,7 +1483,8 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         if (!pap)
             return false;
 
-        if (!init) {
+        if (!init)
+        {
             if (pap->needlvl > getLevel())
                 return false;
 
@@ -1495,10 +1496,6 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
-        if (pap->citslot)
-        {
-            //DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
-        }
         ++_praadd; // 每一层级+1
 
         _acupoints[idx] = v;
