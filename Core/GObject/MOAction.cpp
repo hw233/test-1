@@ -69,11 +69,8 @@ namespace GObject
 
             if (taskType.m_Class == 4 || taskType.m_Class == 5)
             {
-                if (player->GetTaskMgr()->HasSubmitedTask(*cit) ||
-                        player->GetTaskMgr()->HasAcceptedTask(*cit)) {
-                    player->GetTaskMgr()->DelSubmitedTask(*cit);
+                if (!player->GetTaskMgr()->HasCompletedTask(*cit))
                     continue;
-                }
             }
 
 			Table TaskMsgTable = GameAction()->RunTask(player, *cit, npcId);

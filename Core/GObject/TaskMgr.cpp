@@ -364,7 +364,7 @@ namespace GObject
         // XXX: 师门，衙门任务限制
         if (taskType.m_Class == 4 || taskType.m_Class == 5)
         {
-            if (m_PlayerOwner->ColorTaskOutOfAccept(taskType.m_Class))
+            if (m_PlayerOwner->ColorTaskOutOfAccept(taskType.m_Class, true))
                 return NULL;
             m_PlayerOwner->ColorTaskAccept(taskType.m_Class, taskId);
         }

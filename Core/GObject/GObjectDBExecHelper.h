@@ -107,7 +107,9 @@ struct DBPlayerData
 	std::string tavernId;
 	std::string bookStore;
 	std::string shimen;
+	std::string fshimen;
 	std::string yamen;
+	std::string fyamen;
     std::string clantask;
     std::string formations;
 };
@@ -692,7 +694,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(41)
+SPECIALDEF(43)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -722,7 +724,9 @@ SPECIALDEF(41)
 	std::string, tavernId,
 	std::string, bookStore,
 	std::string, shimen,
+	std::string, fshimen,
 	std::string, yamen,
+	std::string, fyamen,
     std::string, clantask,
 	UInt8, pdata.copyFreeCnt,
 	UInt8, pdata.copyGoldCnt,

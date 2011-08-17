@@ -2861,110 +2861,87 @@ namespace GObject
 
 	void Player::writeShiMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], _id);
 	}
 
 	void Player::writeYaMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
 	}
 
-    void Player::delColorTask(UInt32 taskid)
+    bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
-        for (int i = 0; i < 6; ++i)
-        {
-            if (_playerData.shimen[i] == taskid)
-            {
-                //_playerData.shimen[i] = 0;
-                _playerData.smcolor[i] |= 0xF0;
-                sendColorTask(0, 0);
-                return;
+        if (!im) {
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(4, im))
+                    break;
+
+                if (_playerData.shimen[i] == taskid) {
+                    _playerData.shimen[i] = 0;
+                    _playerData.smcolor[i] = 0;
+
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.smcolor[i]-1);
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
+                    sendColorTask(0, 0);
+                    writeShiMen();
+                    return true;
+                }
             }
-        }
-        for (int i = 0; i < 6; ++i)
-        {
-            if (_playerData.yamen[i] == taskid)
-            {
-                //_playerData.yamen[i] = 0;
-                _playerData.ymcolor[i] |= 0xF0;
-                sendColorTask(1, 0);
-                return;
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(5, im))
+                    break;
+
+                if (_playerData.yamen[i] == taskid) {
+                    _playerData.yamen[i] = 0;
+                    _playerData.ymcolor[i] = 0;
+
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
+                    getTael(award); // TODO:
+                    ++_playerData.ymFinishCount;
+                    sendColorTask(1, 0);
+                    writeYaMen();
+                    return true;
+                }
             }
-        }
+        } else {
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(4, im))
+                    break;
 
-        return;
-    }
+                if (_playerData.fshimen[i] == taskid) {
+                    _playerData.fshimen[i] = 0;
+                    _playerData.fsmcolor[i] = 0;
 
-    bool Player::addAwardByTaskColor(UInt32 taskid)
-    {
-        for (int i = 0; i < 6; ++i) {
-            if (_playerData.shimen[i] == taskid) {
-                if (_playerData.smFinishCount >= 5) {
-                    SYSMSG_SENDV(2107, this, "师门");
-                    return false;
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.fsmcolor[i]-1);
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
+                    sendColorTask(0, 0);
+                    writeShiMen();
+                    return true;
                 }
-                if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5) {
-                    SYSMSG_SENDV(2107, this, "师门");
-                    return false;
-                }
-
-                _playerData.shimen[i] = 0;
-                //_playerData.smcolor[i] = 0;
-
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, (_playerData.smcolor[i]&0x0F)-1);
-                AddExp(award); // TODO:
-                ++_playerData.smFinishCount;
-                sendColorTask(0, 0);
-                return true;
             }
-        }
-        for (int i = 0; i < 6; ++i) {
-            if (_playerData.yamen[i] == taskid) {
-                if (_playerData.ymFinishCount >= 5) {
-                    SYSMSG_SENDV(2107, this, "衙门");
-                    return false;
-                }
-                if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5) {
-                    SYSMSG_SENDV(2107, this, "衙门");
-                    return false;
-                }
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(5, im))
+                    break;
 
-                _playerData.yamen[i] = 0;
-                //_playerData.ymcolor[i] = 0;
+                if (_playerData.fyamen[i] == taskid) {
+                    _playerData.fyamen[i] = 0;
+                    _playerData.fymcolor[i] = 0;
 
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, (_playerData.ymcolor[i]&0x0F)-1);
-                getTael(award); // TODO:
-                ++_playerData.ymFinishCount;
-                sendColorTask(1, 0);
-                return true;
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
+                    getTael(award); // TODO:
+                    ++_playerData.ymFinishCount;
+                    sendColorTask(1, 0);
+                    writeYaMen();
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    bool Player::ColorTaskOutOf(UInt8 type)
-    {
-        if (type == 0)
-        {
-            if (_playerData.smFinishCount >= 5)
-            {
-                SYSMSG_SENDV(2107, this, "师门");
-                return true;
-            }
-            return false;
-        }
-        else if (type == 1)
-        {
-            if (_playerData.ymFinishCount >= 5)
-            {
-                SYSMSG_SENDV(2107, this, "衙门");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool Player::ColorTaskOutOfAccept(UInt8 type)
+    bool Player::ColorTaskOutOfAccept(UInt8 type, bool im)
     {
         if (type == 4)
         {
@@ -2976,7 +2953,7 @@ namespace GObject
                 SYSMSG_SENDV(2107, this, "师门");
                 return true;
             }
-            if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5) {
+            if (im && (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)) {
                 SYSMSG_SENDV(2107, this, "师门");
                 return true;
             }
@@ -2991,7 +2968,7 @@ namespace GObject
                 SYSMSG_SENDV(2107, this, "衙门");
                 return true;
             }
-            if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5) {
+            if (im && (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)) {
                 SYSMSG_SENDV(2107, this, "衙门");
                 return true;
             }
@@ -3005,12 +2982,17 @@ namespace GObject
         {
             for (int i = 0; i < 6; ++i)
             {
-                if (_playerData.shimen[i] == taskid)
+                if (_playerData.fshimen[i] == taskid)
                 {
-                    //_playerData.shimen[i] = 0;
-                    _playerData.smcolor[i] |= 0xF0;
+                    _playerData.shimen[i] = taskid;
+                    _playerData.smcolor[i] = _playerData.fsmcolor[i];
+
+                    _playerData.fshimen[i] = 0;
+                    _playerData.fsmcolor[i] = 0;
+
                     ++_playerData.smAcceptCount;
                     sendColorTask(0, 0);
+                    writeShiMen();
                     return;
                 }
             }
@@ -3019,12 +3001,17 @@ namespace GObject
         {
             for (int i = 0; i < 6; ++i)
             {
-                if (_playerData.yamen[i] == taskid)
+                if (_playerData.fyamen[i] == taskid)
                 {
-                    //_playerData.yamen[i] = 0;
-                    _playerData.ymcolor[i] |= 0xF0;
+                    _playerData.yamen[i] = taskid;
+                    _playerData.ymcolor[i] = _playerData.fymcolor[i];
+
+                    _playerData.fyamen[i] = 0;
+                    _playerData.fymcolor[i] = 0;
+
                     ++_playerData.ymAcceptCount;
                     sendColorTask(1, 0);
+                    writeYaMen();
                     return;
                 }
             }
@@ -3035,6 +3022,8 @@ namespace GObject
     {
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
+        writeShiMen();
+        writeYaMen();
     }
 
     bool Player::finishClanTask(UInt32 taskId)
@@ -3209,11 +3198,11 @@ namespace GObject
         bool first = false;
         if (!force) {
             if (ttype == 0) {
-                if (!_playerData.smcolor[0])
+                if (!_playerData.smFreeCount)
                     first = true;
             }
             if (ttype == 1) {
-                if (!_playerData.ymcolor[0])
+                if (!_playerData.ymFinishCount)
                     first = true;
             }
         }
@@ -3261,11 +3250,11 @@ namespace GObject
                         for (int j = 0; j < 5; ++j) {
                             if (rd <= rfac[j]) {
                                 if (ttype == 0) {
-                                    _playerData.shimen[n] = task[*i];
-                                    _playerData.smcolor[n] = j+1;
+                                    _playerData.fshimen[n] = task[*i];
+                                    _playerData.fsmcolor[n] = j+1;
                                 } else {
-                                    _playerData.yamen[n] = task[*i];
-                                    _playerData.ymcolor[n] = j+1;
+                                    _playerData.fyamen[n] = task[*i];
+                                    _playerData.fymcolor[n] = j+1;
                                 }
                                 if (j+1 == color)
                                     percolor = true;
@@ -3316,28 +3305,28 @@ namespace GObject
 
         if (ttype == 0) {
             for (int i = 0; i < 6; ++i) {
-                if (_playerData.smcolor[i] & 0xF0)
+                if (!_playerData.fsmcolor[i])
                 {
                     st << static_cast<UInt32>(0);
                     st << static_cast<UInt8>(0);
                 }
                 else
                 {
-                    st << _playerData.shimen[i];
-                    st << static_cast<UInt8>(_playerData.smcolor[i]&0x0F);
+                    st << _playerData.fshimen[i];
+                    st << static_cast<UInt8>(_playerData.fsmcolor[i]);
                 }
             }
         } else {
             for (int i = 0; i < 6; ++i) {
-                if (_playerData.ymcolor[i] & 0xF0)
+                if (!_playerData.fymcolor[i])
                 {
                     st << static_cast<UInt32>(0);
                     st << static_cast<UInt8>(0);
                 }
                 else
                 {
-                    st << _playerData.yamen[i];
-                    st << static_cast<UInt8>(_playerData.ymcolor[i]&0x0F);
+                    st << _playerData.fyamen[i];
+                    st << static_cast<UInt8>(_playerData.fymcolor[i]);
                 }
             }
         }

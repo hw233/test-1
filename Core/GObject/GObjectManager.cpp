@@ -259,14 +259,14 @@ namespace GObject
             if (mos.m_ID == 4114) // XXX: ÌìÃÉìøÊ¦
                 mos.m_Hide = true;
 #else
-            if (mos.m_ID == 5006 ||
+            if (mos.m_ID == 5020 ||
+                mos.m_ID == 5021 ||
                 mos.m_ID == 5049 ||
+                mos.m_ID == 5273 ||
                 mos.m_ID == 5092 ||
                 mos.m_ID == 5088 ||
                 mos.m_ID == 5091 ||
-                mos.m_ID == 5097 ||
-                mos.m_ID == 5172 ||
-                mos.m_ID == 5272
+                mos.m_ID == 5097
                 )
                 mos.m_Hide = true;
 #endif
@@ -708,7 +708,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `yamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -845,6 +845,26 @@ namespace GObject
 				}
 			}
 
+            if (dbpd.fshimen.length())
+            {
+				StringTokenizer tk(dbpd.fshimen, "|");
+				size_t count = tk.count();
+				if(count > 0)
+				{
+					do {
+						size_t tcount = count;
+						if(tcount > 6)
+							tcount = 6;
+						for(size_t j = 0; j < tcount; ++ j)
+						{
+                            StringTokenizer tk1(tk[j].c_str(), ",");
+							PLAYER_DATA(pl, fshimen)[j] = atoi(tk1[0].c_str());
+							PLAYER_DATA(pl, fsmcolor)[j] = atoi(tk1[1].c_str());
+						}
+					} while(0);
+				}
+			}
+
             if (dbpd.yamen.length())
             {
 				StringTokenizer tk(dbpd.yamen, "|");
@@ -872,6 +892,26 @@ namespace GObject
 							{
 								PLAYER_DATA(pl, ymAcceptCount) = atoi(tk[8].c_str());
 							}
+						}
+					} while(0);
+				}
+			}
+
+            if (dbpd.fyamen.length())
+            {
+				StringTokenizer tk(dbpd.fyamen, "|");
+				size_t count = tk.count();
+				if(count > 0)
+				{
+					do {
+						size_t tcount = count;
+						if(tcount > 6)
+							tcount = 6;
+						for(size_t j = 0; j < tcount; ++ j)
+						{
+                            StringTokenizer tk1(tk[j].c_str(), ",");
+							PLAYER_DATA(pl, fyamen)[j] = atoi(tk1[0].c_str());
+							PLAYER_DATA(pl, fymcolor)[j] = atoi(tk1[1].c_str());
 						}
 					} while(0);
 				}

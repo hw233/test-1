@@ -1944,7 +1944,7 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 		succ = GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
         if (succ)
         {
-            player->addAwardByTaskColor(req.m_TaskId);
+            player->addAwardByTaskColor(req.m_TaskId, false);
             player->finishClanTask(req.m_TaskId);
         }
 		break;
@@ -1956,7 +1956,7 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
         // 师门，衙门任务立即完成
         if (player->getGold() >= 1)
         {
-            succ = player->addAwardByTaskColor(req.m_TaskId);
+            succ = player->addAwardByTaskColor(req.m_TaskId, true);
             if (succ)
                 player->useGold(1);
             succ = player->finishClanTask(req.m_TaskId);
