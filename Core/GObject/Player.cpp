@@ -2899,10 +2899,14 @@ namespace GObject
     {
         for (int i = 0; i < 6; ++i) {
             if (_playerData.shimen[i] == taskid) {
-                if (_playerData.smFinishCount >= 5)
+                if (_playerData.smFinishCount >= 5) {
+                    SYSMSG_SENDV(2107, this, "师门");
                     return false;
-                if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+                }
+                if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5) {
+                    SYSMSG_SENDV(2107, this, "师门");
                     return false;
+                }
 
                 _playerData.shimen[i] = 0;
                 //_playerData.smcolor[i] = 0;
@@ -2916,10 +2920,14 @@ namespace GObject
         }
         for (int i = 0; i < 6; ++i) {
             if (_playerData.yamen[i] == taskid) {
-                if (_playerData.ymFinishCount >= 5)
+                if (_playerData.ymFinishCount >= 5) {
+                    SYSMSG_SENDV(2107, this, "衙门");
                     return false;
-                if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+                }
+                if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5) {
+                    SYSMSG_SENDV(2107, this, "衙门");
                     return false;
+                }
 
                 _playerData.yamen[i] = 0;
                 //_playerData.ymcolor[i] = 0;
@@ -2938,11 +2946,20 @@ namespace GObject
     {
         if (type == 0)
         {
-            return _playerData.smFinishCount >= 5;
+            if (_playerData.smFinishCount >= 5)
+            {
+                SYSMSG_SENDV(2107, this, "师门");
+                return true;
+            }
+            return false;
         }
         else if (type == 1)
         {
-            return _playerData.ymFinishCount >= 5;
+            if (_playerData.ymFinishCount >= 5)
+            {
+                SYSMSG_SENDV(2107, this, "衙门");
+                return true;
+            }
         }
         return false;
     }
@@ -2951,21 +2968,33 @@ namespace GObject
     {
         if (type == 4)
         {
-            if (_playerData.smFinishCount >= 5)
+            if (_playerData.smFinishCount >= 5) {
+                SYSMSG_SENDV(2107, this, "师门");
                 return true;
-            if (_playerData.smAcceptCount >= 5)
+            }
+            if (_playerData.smAcceptCount >= 5) {
+                SYSMSG_SENDV(2107, this, "师门");
                 return true;
-            if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+            }
+            if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5) {
+                SYSMSG_SENDV(2107, this, "师门");
                 return true;
+            }
         }
         else if (type == 5)
         {
-            if (_playerData.ymFinishCount >= 5)
+            if (_playerData.ymFinishCount >= 5) {
+                SYSMSG_SENDV(2107, this, "衙门");
                 return true;
-            if (_playerData.ymAcceptCount >= 5)
+            }
+            if (_playerData.ymAcceptCount >= 5) {
+                SYSMSG_SENDV(2107, this, "衙门");
                 return true;
-            if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+            }
+            if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5) {
+                SYSMSG_SENDV(2107, this, "衙门");
                 return true;
+            }
         }
         return false;
     }

@@ -57,15 +57,23 @@ namespace GObject
 		st << static_cast<UInt16>(0);
 		const std::set<UInt32>& relation = GData::GDataManager::GetTaskNpcRelationData(npcId);
 		std::set<UInt32>::const_iterator cit = relation.begin();
-        // XXX
-		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(*cit);
         PlayerData& pldd = player->getPlayerData();
 		for (; cit != relation.end(); ++cit)
 		{
+            const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(*cit);
             if(taskType.m_Class == 6)
             {
                 if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
                     continue;
+            }
+
+            if (taskType.m_Class == 4 || taskType.m_Class == 5)
+            {
+                if (player->GetTaskMgr()->HasSubmitedTask(*cit) ||
+                        player->GetTaskMgr()->HasAcceptedTask(*cit)) {
+                    player->GetTaskMgr()->DelSubmitedTask(*cit);
+                    continue;
+                }
             }
 
 			Table TaskMsgTable = GameAction()->RunTask(player, *cit, npcId);
