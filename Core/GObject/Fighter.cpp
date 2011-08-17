@@ -93,7 +93,7 @@ const std::string& Fighter::getBattleName()
 UInt16 Fighter::getWeaponAttack()
 {
 	static UInt16 atk_enc[] = {0, 10, 20, 40, 60, 100, 200, 300, 450, 600, 800, 1050, 1500};
-	return _weapon ? (_weapon->getAttack() + atk_enc[_weapon->getItemEquipData().enchant]) : 0;
+	return _weapon ? (atk_enc[_weapon->getItemEquipData().enchant]) : 0;
 }
 
 void Fighter::getArmorDefendAndHP(UInt16& def, UInt16& hp)
@@ -107,7 +107,7 @@ void Fighter::getArmorDefendAndHP(UInt16& def, UInt16& hp)
 		if(_armor[i] != NULL)
 		{
 			UInt8 enc = _armor[i]->getItemEquipData().enchant;
-			def += _armor[i]->getDefend() + def_enc[enc];
+			def += def_enc[enc];
 			hp += hp_enc[enc];
 		}
 	}
