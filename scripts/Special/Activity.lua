@@ -359,7 +359,7 @@ function onTopup(player, oldGold, newGold)
   if stage == 5 then
 	local rand = math.random(1, 16);
 	local gold = newGold - oldGold;
-	player:sendTopupMail('恭喜您获得了春节字符奖券', "恭喜，您在活动期间充值了"..gold.."元宝，获得了一张相应的春节字符奖券，奖券号码为："..rand.."。\n如果您的奖券号码和2月6日公布的幸运字符一致，您将额外获得"..gold.."元宝的奖励。\n详见官网公告。", gold, rand);
+	player:sendTopupMail('恭喜您获得了春节字符奖券', "恭喜，您在活动期间充值了"..gold.."军令，获得了一张相应的春节字符奖券，奖券号码为："..rand.."。\n如果您的奖券号码和2月6日公布的幸运字符一致，您将额外获得"..gold.."军令的奖励。\n详见官网公告。", gold, rand);
   end
 end
 
