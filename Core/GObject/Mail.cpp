@@ -198,7 +198,8 @@ MailPackage * MailPackageManager::add( UInt32 id )
 
 Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, const std::string& content, UInt32 additional, bool writedb, MailItemsInfo * itemsInfo)
 {
-    return NULL; // XXX: 
+    if (type != 3)
+        return NULL; // TODO:
 	Mutex::ScopedLock lk(_owner->getMutex());
 
 	Mail * mail = newMail(IDGenerator::gMailOidGenerator.ID(), (sender == NULL ? "" : sender->getName()), TimeUtil::Now(), type, title, content, additional);
