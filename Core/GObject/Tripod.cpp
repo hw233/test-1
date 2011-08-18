@@ -36,7 +36,7 @@ void Tripod::getTripodInfo(Player* pl)
 bool Tripod::genAward(Player* pl, TripodData& td, UInt32& id, UInt8& num)
 {
     if (td.needgen) {
-        UInt32 loot = GData::GDataManager::GetTripodAward(td.fire, td.quality);
+        UInt32 loot = GData::GDataManager::GetTripodAward(td.fire, 5-td.quality); // 0-橙,1-紫,2-蓝,3-绿
         const GData::LootItem* li = GData::lootTable[loot];
         if (li)
         {
@@ -111,7 +111,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
             if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
             {
                 if (td.quality < i+2) {
-                    td.quality = i+2;
+                    td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
                     td.needgen = 1;
                     break;
                 }
@@ -250,6 +250,9 @@ void Tripod::getAward(Player* pl)
     else
         pl->GetPackage()->AddItem(id, num, true, false, FromTripod);
 
+    td.fire = 0;
+    td.quality = 2;
+    td.needgen = 1;
     td.awdst = 0;
     td.soul = 0;
     DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());

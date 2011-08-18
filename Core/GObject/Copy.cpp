@@ -89,6 +89,9 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
     if (PLAYER_DATA(pl, copyFreeCnt) > FREECNT && PLAYER_DATA(pl, copyGoldCnt) > GOLDCNT)
         return;
 
+    if (!GData::copyManager[id<<8|tcd.floor].size())
+        return;
+
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
         if (pl->attackCopyNpc(fgtid)) {
