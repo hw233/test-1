@@ -250,6 +250,7 @@ void ClanBattle::disbandClanBattle()
 
 void ClanBattle::startClanBattle(UInt32 battleThisDay, bool writedb)
 {
+    return; // TODO: °ïÅÉÕ½´ý¿ª·¢
 	_isInbattling = 1;
 	configClanBattleData(writedb);
 	_battleThisDay = battleThisDay;
