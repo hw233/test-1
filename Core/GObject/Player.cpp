@@ -33,6 +33,7 @@
 #include "Tripod.h"
 #include <mysql.h>
 #include "GData/Formation.h"
+#include "kingnet_analyzer.h"
 
 #include <cmath>
 

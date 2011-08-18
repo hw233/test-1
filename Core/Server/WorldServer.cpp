@@ -13,6 +13,7 @@
 #include "Cfg.h"
 #include "SysMsg.h"
 #include "Common/TimeUtil.h"
+#include "kingnet_analyzer.h"
 
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
@@ -70,6 +71,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName)
 	cfg.load(scriptStr);
 	globalSysMsg.load();
 	Battle::battleReport.init();
+    _analyzer.Init();
 
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();
