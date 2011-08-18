@@ -1,4 +1,6 @@
 
+SET NAMES UTF8;
+
 LOCK TABLES `practice_place` WRITE;
 INSERT INTO `practice_place` VALUES
 (1,0,0,30,0,0,0,1,0,0,0,0),

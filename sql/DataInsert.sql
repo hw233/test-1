@@ -1,4 +1,6 @@
 
+SET NAMES UTF8;
+
 source lvlexp
 
 LOCK TABLES `map` WRITE;
