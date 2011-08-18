@@ -20,6 +20,11 @@ void Tripod::getTripodInfo(Player* pl)
         return;
 	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
+    sendTripodInfo(pl, td);
+}
+
+void Tripod::sendTripodInfo(Player* pl, TripodData& td)
+{
     Stream st(0x39);
     st << static_cast<UInt8>(0);
     st << td.fire;
@@ -234,7 +239,8 @@ void Tripod::getAward(Player* pl)
 {
     if (!pl)
         return;
-	FastMutex::ScopedLock lk(_mutex);
+
+    FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
     if (td.awdst != 1)
         return;
@@ -257,6 +263,7 @@ void Tripod::getAward(Player* pl)
     td.soul = 0;
     DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
+    sendTripodInfo(pl, td);
 }
 
 TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)

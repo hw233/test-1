@@ -37,6 +37,7 @@ public:
     ~Tripod() { m_tds.clear(); }
 
     void getTripodInfo(Player* pl);
+    void sendTripodInfo(Player* pl, TripodData& td);
     void addItem(Player* pl, UInt32 itemid, int num, UInt8 bind);
     void makeFire(Player* pl, UInt32 id1, UInt32 id2);
     void getAward(Player* pl);
