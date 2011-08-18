@@ -1496,7 +1496,9 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
-        ++_praadd; // 每一层级+1
+
+        if (v < 3)
+            ++_praadd; // 第3层不加
 
         _acupoints[idx] = v;
         _attrDirty = true;
