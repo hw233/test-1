@@ -54,6 +54,7 @@ void ClanManager::resumeRobClanBattleScore()
 
 void ClanManager::process(UInt32 now, UInt32 today)
 {
+    return; // TODO: 帮派战暂时禁用
 	for (OnBattleClanT::iterator onBcIter = _onBattleClans.begin(); onBcIter != _onBattleClans.end();)
 	{
 		_clanBattle = onBcIter->second;
