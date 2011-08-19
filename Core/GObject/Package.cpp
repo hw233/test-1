@@ -2271,6 +2271,13 @@ namespace GObject
 	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect )
 	{
 		// if (t > 2) return 2;
+		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
+		if(m_Owner->getTael() < amount)
+		{
+			m_Owner->sendMsgCode(0, 2009);
+			return 1;
+		}
+
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
@@ -2290,12 +2297,6 @@ namespace GObject
         DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
 		UInt8 lv = (equip->getReqLev() + 5) / 10;
 		UInt8 q = equip->getQuality() - 3;
-		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
-		if(m_Owner->getTael() < amount)
-		{
-			m_Owner->sendMsgCode(0, 2009);
-			return 1;
-		}
 		if(protect)
 		{
 			UInt16 c = 0;

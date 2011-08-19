@@ -332,7 +332,7 @@ namespace GObject
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
 		_isOnline(false), _threadId(0xFF), _session(-1),
-		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0),
+		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0)
 	{
@@ -456,8 +456,11 @@ namespace GObject
 		if(cfg.enableWallow && _playerData.wallow)
 		{
 			UInt32 dur = curtime - _playerData.lastOnline;
-			if(dur >= 5 * 60 * 60)
+            _offlineTime = dur;
+			if(dur >= 5 * 60 * 60) {
 				_onlineDuration = 0;
+                _offlineTime = 0;
+            }
 		}
 
 		_playerData.lastOnline = curtime;
@@ -477,6 +480,18 @@ namespace GObject
 
 		checkLastBattled();
 		GameAction()->onLogin(this);
+
+        {
+            char id[32] = {0x00};
+            snprintf(id, sizeof(id), "%"I64_FMT"u", getId());
+            CUserLogger* logger = _analyzer.GetInstance(id);
+            if (logger)
+            {
+                logger->SetUserIP("192.168.9.2");
+                //logger->SetUserMsg("user|msg|is|here");
+                logger->LogMsg("11","22","33","44","55","66","login");
+            }
+        }
 	}
 
 	void Player::Reconnect()

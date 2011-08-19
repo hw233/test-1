@@ -808,6 +808,7 @@ namespace GObject
 		UInt32 _flag, _gflag;
 
 		UInt32 _onlineDuration; // for wallow use
+		UInt32 _offlineTime; // for wallow use
 		UInt32 _nextTavernUpdate;
 		UInt32 _nextBookStoreUpdate;
 
