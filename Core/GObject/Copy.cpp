@@ -5,6 +5,7 @@
 #include "GData/NpcGroup.h"
 #include "Battle/BattleSimulator.h"
 #include "Common/Stream.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -23,7 +24,7 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
 
 	FastMutex::ScopedLock lk(_mutex);
     CopyData& cd = getCopyData(pl, id, true);
-    Stream st(0x67);
+    Stream st(REP::COPY_INFO);
     st << static_cast<UInt8>(0);
     st << id;
     st << cd.floor;
@@ -43,7 +44,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         return;
 
 	FastMutex::ScopedLock lk(_mutex);
-    Stream st(0x67);
+    Stream st(REP::COPY_INFO);
     CopyData& tcd = getCopyData(pl, id, true);
 
     UInt8 ret = 1;
@@ -89,6 +90,9 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
     if (PLAYER_DATA(pl, copyFreeCnt) > FREECNT && PLAYER_DATA(pl, copyGoldCnt) > GOLDCNT)
         return;
 
+    if (!GData::copyManager[id<<8|tcd.floor].size())
+        return;
+
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
         if (pl->attackCopyNpc(fgtid)) {
@@ -103,7 +107,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
                 ++tcd.spot;
 
             if (tcd.floor > GData::copyMaxManager[id]) {
-                Stream st(0x67);
+                Stream st(REP::COPY_INFO);
                 st << static_cast<UInt8>(5);
                 st << id;
                 st << Stream::eos;
@@ -112,7 +116,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
                 tcd.floor = 0;
                 tcd.spot = 0;
             } else {
-                Stream st(0x67);
+                Stream st(REP::COPY_INFO);
                 st << static_cast<UInt8>(6);
                 st << id << tcd.floor << tcd.spot;
                 st << Stream::eos;
@@ -130,7 +134,7 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
         return;
 
 	FastMutex::ScopedLock lk(_mutex);
-    Stream st(0x67);
+    Stream st(REP::COPY_INFO);
     CopyData& tcd = getCopyData(pl, id);
     if (!tcd.floor)
     {

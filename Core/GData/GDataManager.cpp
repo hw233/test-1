@@ -1476,7 +1476,7 @@ namespace GData
     const std::vector<UInt32>& GDataManager::GetShiYaMenTask(int country, int type)
     {
         if (type >= 1)
-            return m_YaMenTask[country];
+            return m_YaMenTask[2];
         return m_ShiMenTask[country];
     }
 
@@ -1505,9 +1505,9 @@ namespace GData
         return m_TaskAwardFactor[ttype][color];
     }
 
-    UInt32 GDataManager::GetTripodAward(int first, int quality)
+    UInt32 GDataManager::GetTripodAward(int fire, int quality)
     {
-        return m_TripodAward[first][quality];
+        return m_TripodAward[fire][quality];
     }
 
     const std::vector<UInt16>& GDataManager::GetOnlineAward(UInt8 cls, UInt8 i)

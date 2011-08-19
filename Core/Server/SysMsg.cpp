@@ -2,6 +2,7 @@
 #include "SysMsg.h"
 #include "GObject/Player.h"
 #include "WorldServer.h"
+#include "MsgID.h"
 #include "Cfg.h"
 #include <cstdarg>
 
@@ -21,7 +22,7 @@ public:
 
 SysMsg globalSysMsg;
 
-SysMsgItem::SysMsgItem( UInt8 type, const std::string& msg ): _type(type), _msgBody(msg), _stream(0xF7)
+SysMsgItem::SysMsgItem( UInt8 type, const std::string& msg ): _type(type), _msgBody(msg), _stream(REP::SYSTEM_INFO)
 {
 	_stream << static_cast<UInt8>(type) << msg << Stream::eos;
 }
@@ -74,7 +75,7 @@ void SysMsgItem::sendva( GObject::Player * player, ... )
 		}
 	}
 
-	Stream st(0xF7);
+	Stream st(REP::SYSTEM_INFO);
 	st << _type << p << Stream::eos;
 	delete[] p;
 	if(player != NULL)
@@ -126,7 +127,7 @@ void SysMsgItem::getvap( Stream * st, ... )
 		}
 	}
 
-	st->init(0xF7);
+	st->init(REP::SYSTEM_INFO);
 	(*st) << _type << p << Stream::eos;
 	delete[] p;
 }

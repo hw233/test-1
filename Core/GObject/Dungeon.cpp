@@ -7,6 +7,7 @@
 #include "Script/GameActionLua.h"
 #include "Battle/BattleSimulator.h"
 #include "Server/Cfg.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -185,8 +186,8 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	if(!cloots.empty())
 	{
 		UInt16 sz = cloots.size();
-		Stream stp(0x59);
-		Stream stb(0x59);
+		Stream stp(REP::COPY_DATA_UPDATE);
+		Stream stb(REP::COPY_DATA_UPDATE);
 		stp << static_cast<UInt8>(4) << _id << sz;
 		stb << static_cast<UInt8>(3) << _id << sz;
 		for(std::map<UInt16, UInt8>::iterator iter = cloots.begin(); iter != cloots.end(); ++ iter)
@@ -364,7 +365,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	if (_id == 1)
             GameAction()->RunOperationTaskAction2(player, 1, 1, level+1);
 
-	Stream st(0x61);
+	Stream st(REP::ATTACK_NPC);
 	bool res = bsim.getWinner() == 1;
 	UInt32 turns_ = bsim.getTurns();
 	if(dm->formated && res)
@@ -420,7 +421,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	if(turns != NULL)
 		*turns = turns_;
 
-	st.init(0x5A);
+	st.init(REP::COPY_FIGHT_RESULT);
 	st << _id << static_cast<UInt8>(res ? 0 : 1) << Stream::eos;
 	player->send(st);
 
@@ -494,7 +495,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 			UInt16 gold_ = player->useGoldOrCoupon(gold, &ci);
 			if(online)
 			{
-				Stream st_(0x5C);
+				Stream st_(REP::COPY_END_FIGHT);
 				st_ << static_cast<UInt8>(0) << gold_ << static_cast<UInt16>(gold - gold_) << Stream::eos;
 				player->send(st_);
 			}
@@ -502,7 +503,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 
 		if(online)
 		{
-			Stream st(0x5B);
+			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << level;
 			if(r)
 				st << static_cast<UInt8>(4) << *totalExp;
@@ -562,7 +563,7 @@ void Dungeon::sendAutoChallengeStart( Player * player )
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
-	Stream st(0x5B);
+	Stream st(REP::COPY_AUTO_FIGHT);
 	st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(0) << Stream::eos;
 	player->send(st);
 }
@@ -589,7 +590,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 					player->useTael(taelReq[_id], &ci);
 			}
 			DBLOG().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
-			Stream st(0x5B);
+			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(0) << Stream::eos;
 			player->send(st);
 		}
@@ -604,7 +605,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
         if(player->GetPackage()->GetRestPackageSize() < 4)
         {
             player->delFlag(Player::AutoDungeon);
-            Stream st(0x5B);
+            Stream st(REP::COPY_AUTO_FIGHT);
             st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
@@ -614,7 +615,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 	case 2:
 		{
 			player->delFlag(Player::AutoDungeon);
-			Stream st(0x5B);
+			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
@@ -640,7 +641,7 @@ void Dungeon::cancelAutoChallengeNotify( Player * player, UInt32 exp )
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
-	Stream st(0x5B);
+	Stream st(REP::COPY_AUTO_FIGHT);
 	st << _id << it->second.level << static_cast<UInt8>(1) << exp << Stream::eos;
 	player->send(st);
 }
@@ -673,10 +674,10 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			player->delFlag(Player::AutoDungeon);
 			ConsumeInfo ci(DungeonAutoConsume, 0, 0);
 			UInt16 gold = player->useGoldOrCoupon(count, &ci);
-			Stream st_(0x5C);
+			Stream st_(REP::COPY_END_FIGHT);
 			st_ << static_cast<UInt8>(0) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
 			player->send(st_);
-			Stream st(0x5B);
+			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
@@ -685,7 +686,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 	}
 	ConsumeInfo ci(DungeonAutoConsume, 0, 0);
 	UInt16 gold = player->useGoldOrCoupon(count, &ci);
-	Stream st_(0x5C);
+	Stream st_(REP::COPY_END_FIGHT);
 	st_ << static_cast<UInt8>(1) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
 	player->send(st_);
 	processAutoChallenge(player, 3, &exp);
@@ -737,7 +738,7 @@ void Dungeon::sendDungeonInfo(Player * player)
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 	{
-		Stream st(0x59);
+		Stream st(REP::COPY_DATA_UPDATE);
 		UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
 		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << static_cast<UInt8>(0) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
 		player->send(st);
@@ -749,7 +750,7 @@ void Dungeon::sendDungeonInfo(Player * player)
 
 void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 {
-	Stream st(0x59);
+	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
 	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.count << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
 	player->send(st);
@@ -773,7 +774,7 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 {
 	if(dpi.level >= _levels.size())
 	{
-		Stream st(0x59);
+		Stream st(REP::COPY_DATA_UPDATE);
 		st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(0xFF) << dpi.justice << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
 		player->send(st);
 		return;
@@ -781,7 +782,7 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 	const GData::DungeonLevel * dgl = _dungeon->monsters[dpi.level];
 	if(dgl == NULL)
 		return;
-	Stream st(0x59);
+	Stream st(REP::COPY_DATA_UPDATE);
 	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.justice << static_cast<UInt8>(1);
 	const GData::DungeonMonster * dm = dgl->monsterSet;
 	if(dm->formated)
@@ -863,7 +864,7 @@ void Dungeon::sendMyLootInfo( Player * player )
 		return;
 	{
 		UInt16 sz = _recentLoots.size();
-		Stream st(0x59);
+		Stream st(REP::COPY_DATA_UPDATE);
 		st << static_cast<UInt8>(1) << _id << sz;
 		for(std::list<DungeonLootInfo>::iterator iter = _recentLoots.begin(); iter != _recentLoots.end(); ++ iter)
 		{
@@ -876,7 +877,7 @@ void Dungeon::sendMyLootInfo( Player * player )
 	{
 		std::list<DungeonItemInfo>& info = it->second.lootToday;
 		UInt16 sz = info.size();
-		Stream st(0x59);
+		Stream st(REP::COPY_DATA_UPDATE);
 		st << static_cast<UInt8>(2) << _id << sz;
 		for(std::list<DungeonItemInfo>::iterator iter = info.begin(); iter != info.end(); ++ iter)
 		{
@@ -986,7 +987,7 @@ void Dungeon::doJusticeRoar(Player* pl)
     }
 
     DB().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, pl->getId());
-    Stream st(0x59);
+    Stream st(REP::COPY_DATA_UPDATE);
     st << static_cast<UInt8>(6) << _id << dpi.justice << Stream::eos;
     pl->send(st);
 }

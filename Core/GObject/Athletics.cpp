@@ -8,6 +8,7 @@
 #include "Server/SysMsg.h"
 #include "Mail.h"
 #include "Package.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -113,7 +114,7 @@ void Athletics::notifyAthleticsData(UInt16 count)
 		count = static_cast<UInt16>(_athleticses.size());
 
 	std::deque<AthleticsData *>::reverse_iterator rit = _athleticses.rbegin();
-	Stream st(0xD1);
+	Stream st(REP::FIGHT_INFO);
 	st << count;
 	for (UInt16 i = 0; rit != _athleticses.rend() && i < count; ++rit, ++count)
 	{
@@ -128,7 +129,7 @@ void Athletics::notifyAthleticsData2(AthleticsData * data)
 {
     return;
 #if 0
-	Stream st(0xD1);
+	Stream st(REP::FIGHT_INFO);
 	st << static_cast<UInt16>(1);
 	st << data->side << data->win << data->awardType << data->awardCount << data->target->getName() << data->target->getCountry() << data->time << data->reptid;
 	st << Stream::eos;
@@ -215,7 +216,7 @@ void Athletics::attack(Player * defer)
         if (res)
            GameAction()->RunOperationTaskAction0(_owner, 4);
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		_owner->send(st);
 		
@@ -257,7 +258,7 @@ void Athletics::beAttack(Player * atker, UInt8 formation, UInt16 portrait, Lineu
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
 
-	Stream st(0x61);
+	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 	atker->send(st);
 

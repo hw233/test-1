@@ -2,6 +2,7 @@
 #define _COUNTRYMSGSTRUCT_H_
 
 #include "Common/Serialize.h"
+#include "MsgID.h"
 
 struct CountryEnterStruct
 {
@@ -24,7 +25,7 @@ struct NpcActionResp
 
 	NpcActionResp() : m_NpcId(0), m_ActionType(0), m_ActionToken(0), m_ActionID(0), m_ActionStep(0) {};
 
-	MESSAGE_DEF7(0x81, UInt32, m_NpcId, std::string, m_NpcMsg, UInt8, m_ActionType, UInt8, m_ActionToken, std::string, m_ActionMsg, UInt32, m_ActionID, UInt8, m_ActionStep);
+	MESSAGE_DEF7(REP::DIALOG_INTERACTION, UInt32, m_NpcId, std::string, m_NpcMsg, UInt8, m_ActionType, UInt8, m_ActionToken, std::string, m_ActionMsg, UInt32, m_ActionID, UInt8, m_ActionStep);
 };
 
 
@@ -35,7 +36,7 @@ struct TaskActionResp
 
 	TaskActionResp() : m_TaskId(0), m_Action(0) {};
 
-	MESSAGE_DEF2(0x85, UInt32, m_TaskId, UInt8, m_Action);
+	MESSAGE_DEF2(REP::PLAYER_ABANDON_TASK, UInt32, m_TaskId, UInt8, m_Action);
 };
 
 
@@ -57,7 +58,7 @@ struct NpcTriggerResp
 	std::vector<ActionTable>	m_ActionCont;
 	NpcTriggerResp() : m_NpcId(0) {};
 
-	MESSAGE_DEF3(0x80, UInt32, m_NpcId, UInt16, m_ActionType, std::vector<ActionTable>, m_ActionCont);
+	MESSAGE_DEF3(REP::DIALOG_START, UInt32, m_NpcId, UInt16, m_ActionType, std::vector<ActionTable>, m_ActionCont);
 };
 
 struct AcceptTaskResp
@@ -69,7 +70,7 @@ struct AcceptTaskResp
 	UInt32		m_TimeBegin;
 	UInt32		m_TimeEnd;
 
-	MESSAGE_DEF6(0x87, UInt32, m_Id, UInt8, m_Class, UInt32, m_TaskId, UInt32, m_AcceptTime, UInt32, m_TimeBegin, UInt32, m_TimeEnd);
+	MESSAGE_DEF6(REP::NEW_TASK, UInt32, m_Id, UInt8, m_Class, UInt32, m_TaskId, UInt32, m_AcceptTime, UInt32, m_TimeBegin, UInt32, m_TimeEnd);
 };
 
 struct TaskInfor
@@ -91,7 +92,7 @@ struct CurrTaskResp
 {	
 	std::vector<TaskInfor> m_TaskInforVec;
 
-	MESSAGE_DEF1(0x82, std::vector<TaskInfor>, m_TaskInforVec);
+	MESSAGE_DEF1(REP::GET_TASK_LIST, std::vector<TaskInfor>, m_TaskInforVec);
 };
 
 struct CollectNpcActinoResp
@@ -100,7 +101,7 @@ struct CollectNpcActinoResp
 
 	CollectNpcActinoResp() : m_NpcId(0) {};
 
-	MESSAGE_DEF1(0x89, UInt32, m_NpcId);
+	MESSAGE_DEF1(REP::COLLECTNPCACTION, UInt32, m_NpcId);
 };
 
 #endif // _COUNTRYMSGSTRUCT_H_

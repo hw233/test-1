@@ -27,6 +27,7 @@
 #include "Script/BattleFormula.h"
 #include "SpecialAward.h"
 #include "PracticePlace.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -131,7 +132,7 @@ bool enum_clan_midnight(void * ptr, void * data)
 }
 void World::makeActivityInfo(Stream &st)
 {
-	st.init(0x5F);
+	st.init(REP::DAILY_DATA);
 	st << static_cast<UInt8>(5) << _wday << static_cast<UInt8>(_activityStage) << Stream::eos;
 }
 void World::calWeekDay()
@@ -173,7 +174,7 @@ void World::setWeekDay(UInt8 wday)
 		for(size_t i = 0; i < sz; ++ i)
 			prices[i] /= 2;	
 	}
-	Stream st(0x5F);
+	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);
 }
@@ -207,7 +208,7 @@ void World::World_Midnight_Check( World * world )
 	challengeCheck.clear();
 	
 	calWeekDay();
-	Stream st(0x5F);
+	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);
 }

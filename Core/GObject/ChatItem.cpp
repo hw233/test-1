@@ -3,6 +3,7 @@
 #include "Item.h"
 #include "Country.h"
 #include "Player.h"
+#include "MsgID.h"
 #include "Fighter.h"
 #include "Package.h"
 #include "Script/BattleFormula.h"
@@ -22,7 +23,7 @@ void ChatItem::addItem( Player * player, UInt32 id )
 		return;
 
 	ChatItemData& cid = _itemData[id];
-	cid.st.init(0xF3);
+	cid.st.init(REP::FLAUNT_GOOD);
 	cid.st << static_cast<UInt8>(0x01) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
 		<< player->getName();
 	player->GetPackage()->AppendEquipData(cid.st, equip, false);
@@ -38,7 +39,7 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 
 	FIndex fi = {player->getId(), id};
 	ChatItemData& cid = _fighterData[fi];
-	cid.st.init(0xF3);
+	cid.st.init(REP::FLAUNT_GOOD);
     // XXX: 
 	cid.st << static_cast<UInt8>(0x02) << static_cast<UInt8>(player->IsMale() ? 0 : 1) << player->getCountry()
 		<< player->getName() << fgt->getId() << fgt->getName() << fgt->getLevel() << fgt->getPotential();

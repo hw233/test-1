@@ -196,8 +196,12 @@ namespace GObject
             copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
 		{
             memset(tavernId, 0, sizeof(tavernId));
+            memset(fshimen, 0, sizeof(fshimen));
+            memset(fsmcolor, 0, sizeof(fsmcolor));
             memset(shimen, 0, sizeof(shimen));
             memset(smcolor, 0, sizeof(smcolor));
+            memset(fyamen, 0, sizeof(fyamen));
+            memset(fymcolor, 0, sizeof(fymcolor));
             memset(yamen, 0, sizeof(yamen));
             memset(ymcolor, 0, sizeof(ymcolor));
             memset(bookStore, 0, sizeof(bookStore));
@@ -236,11 +240,15 @@ namespace GObject
 		UInt8 tavernBlueCount;      // 
 		UInt8 tavernPurpleCount;    // 
 		UInt8 tavernOrangeCount;    // 
+        UInt32 fshimen[6];          // 刷出的师门任务
+		UInt8 fsmcolor[6];          // 刷出的师门任务的颜色
 		UInt32 shimen[6];           // 师门任务
 		UInt8 smcolor[6];           // 师门任务颜色
         UInt8 smFinishCount;        // 师门任务当日完成次数
         UInt8 smFreeCount;          // 师门任务当日免费刷新次数
         UInt8 smAcceptCount;        // 师门任务当日接受次数
+        UInt32 fyamen[6];           // 刷出的衙门任务
+		UInt8 fymcolor[6];          // 刷出的衙门任务的颜色
 		UInt32 yamen[6];            // 衙门任务
 		UInt8 ymcolor[6];           // 衙门任务颜色
         UInt8 ymFinishCount;        // 衙门任务当日完成次数
@@ -547,7 +555,6 @@ namespace GObject
 		bool setFormation(UInt16);
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
-		void makeFighterIdList(Stream&);
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
@@ -566,15 +573,12 @@ namespace GObject
 		bool   submitGreatFighterFavor(UInt32 id);
 		UInt16 getGreatFighterFavorSubmitCount(UInt32 id);
 		UInt32 getGreatFighterFavor(UInt32 id);
-		void   sendGreatFighterTaskVal(UInt32 id);
-		void   makeGreatFighterTaskValList(Stream& st, UInt16 start, UInt16 count);
 
 		bool setNewGuildTaskStep(UInt32);
         void sendNewGuild();
 
 
 	private:
-		void  sendGreatFighterTaskVal(UInt32 id, UInt16 friendliness, UInt16 favorSubmitCount);
 		void  greatFighterFavorSubmitCheck(GreatFighterTaskVal *, UInt32, UInt32 = TimeUtil::SharpDay(0));
 
 	public:
@@ -663,9 +667,8 @@ namespace GObject
 		void writeTavernIds();
 		void writeShiMen();
 		void writeYaMen();
-        bool addAwardByTaskColor(UInt32);
+        bool addAwardByTaskColor(UInt32, bool = false);
         void delColorTask(UInt32);
-        bool ColorTaskOutOf(UInt8);
 
         bool finishClanTask(UInt32);
         void delClanTask();
@@ -681,7 +684,7 @@ namespace GObject
 		void listRecruit(UInt8 type, UInt8, UInt16);
 		void flushTaskColor(UInt8 tasktype, UInt8 type, UInt8, UInt16, bool = false);
         void sendColorTask(UInt8 ttype, UInt16 ncount);
-        bool ColorTaskOutOfAccept(UInt8 type);
+        bool ColorTaskOutOfAccept(UInt8 type, bool = false);
         void ColorTaskAccept(UInt8 type, UInt32 taskid);
         void clearFinishCount();
 		UInt16 calcNextTavernUpdate(UInt32);
@@ -690,8 +693,6 @@ namespace GObject
 
 		void exceptAvailableFighters(std::map<UInt32, UInt32>&);
         UInt32 getColorFighterNum(UInt8 color);
-
-		void sendGreatFighterMet();
 
 		inline void setNextBookStoreUpdate(UInt32 n) { _nextBookStoreUpdate = n; }
 		void writeBookStoreIds();
@@ -708,6 +709,7 @@ namespace GObject
 		template<typename T>
 		inline void notifyFriendAct(UInt8 type, T arg)
 		{
+#if 0
 			Mutex::ScopedLock lk(_mutex);
 			if(_friends[0].empty())
 				return;
@@ -721,6 +723,7 @@ namespace GObject
 				Player * player = *it;
 				player->pushFriendAct(fas);
 			}
+#endif
 		}
 
 		void sendFriendActList();
@@ -801,6 +804,7 @@ namespace GObject
 		UInt32 _flag, _gflag;
 
 		UInt32 _onlineDuration; // for wallow use
+		UInt32 _offlineTime; // for wallow use
 		UInt32 _nextTavernUpdate;
 		UInt32 _nextBookStoreUpdate;
 

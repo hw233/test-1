@@ -129,7 +129,7 @@ function Task_00000080_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "";
+	action.m_NpcMsg = "山人姚开江的妖术一破，余者就不足为虑了。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -173,7 +173,7 @@ function Task_00000080_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(2222);
+	player:AddExp(15000);
 	return true;
 end
 

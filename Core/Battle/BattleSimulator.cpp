@@ -9,6 +9,8 @@
 
 #include "Common/DirectoryIterator.h"
 #include "Server/Cfg.h"
+#include "MsgID.h"
+
 namespace Battle
 {
 
@@ -63,7 +65,7 @@ void BattleSimulator::start()
 	_fgtlist[1].clear();
 
 	// [[ Make packet header data
-	_packet.init(0x6C);
+	_packet.init(REP::FIGHT_START);
 	_packet << _id << _position;
 	for(int i = 0; i < 2; ++ i)
 		_packet << (_formation[i] ? _formation[i]->getId() : static_cast<UInt16>(0));
@@ -1541,7 +1543,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
     }
 
-    if(skill && skill->cond == GData::SKILL_PEERLESS)
+    if (skill && skill->cond == GData::SKILL_PEERLESS)
     {
         setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
     }

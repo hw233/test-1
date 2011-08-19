@@ -83,7 +83,7 @@ function Task_00000513_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "白云大师乃是我道中人，剑术通神，你应该去拜访一下她。";
+	action.m_NpcMsg = "白云大师元敬乃是我师长眉真人的亲传弟子，她一般隐居在巫山峡白竹涧正修庵，偶尔会来成都云灵山一游，学道很早，同辈中年岁与玄真子、嵩山二老不相上下，剑术高强，你可以多多向她请教剑术上的疑问。";
 	action.m_ActionMsg = "弟子这就去。";
 	return action;
 end
@@ -93,7 +93,7 @@ function Task_00000513_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢小友的好意。";
+	action.m_NpcMsg = "多谢小友的好意，也多谢掌教的挂念，希望小友多行侠仗义，扬我正道之气。";
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -83,8 +83,8 @@ function Task_00000504_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "之前听说慈云寺来了不少恶人，今日见百姓来告状才发觉竟是真事，有一个叫毛太的家伙时常来郊外骚扰良家妇女，还希望"..GetPlayerName(GetPlayer()).."去将这个毛太除掉。";
-	action.m_ActionMsg = "为民除害是我辈本色，小可去去就回。";
+	action.m_NpcMsg = "我之前听说慈云寺来了不少恶人，今日下山巡游见不少百姓去成都府衙来告状才发觉竟是真事，有一个叫毛太的家伙时常来郊外骚扰良家妇女，"..GetPlayerName(GetPlayer()).."你速速去将这个毛太除掉。";
+	action.m_ActionMsg = "为民除害是我辈本色，我去去就回。";
 	return action;
 end
 

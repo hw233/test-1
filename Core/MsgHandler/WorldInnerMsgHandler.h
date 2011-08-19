@@ -3,6 +3,7 @@
 
 #include "Common/Serialize.h"
 #include "MsgTypes.h"
+#include "MsgID.h"
 #include "MsgFunc.h"
 #include "CountryMsgStruct.h"
 #include "Server/WorldServer.h"
@@ -104,7 +105,7 @@ void OnAthleticsAndClanNotify( GameMsgHdr& hdr, const void * )
 {
 	MSG_QUERY_PLAYER(player);
 	GObject::gAthleticsRank.notifyAthletcisBoxFlushTime(player);
-	Stream st(0x5F);
+	Stream st(REP::DAILY_DATA);
 	st << static_cast<UInt8>(3) << GObject::gAthleticsRank.getChallengeNum(player);
 	GObject::Clan * clan = player->getClan();
 	if(clan == NULL)
@@ -160,7 +161,7 @@ void OnClanMailInviteClick(GameMsgHdr& hdr, const void * data)
 	{
 		inviter->getClan()->declineInvite(player);	
 	}
-	Stream st(0xA2);
+	Stream st(REQ::MAIL_DELETE);
 	st << static_cast<UInt8>(1) << cmcir->id << Stream::eos;
 	player->send(st);
 	player->GetMailBox()->delMail(cmcir->id, false);
@@ -203,20 +204,20 @@ void OnClanMailClick(GameMsgHdr& hdr, const void * data)
 			}
 			if(!player->getClan()->accept(player, p->getId()))
 				return;
-			Stream st(0x94);
+			Stream st(REP::CLAN_MEMBER_OPERATE);
 			st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << p->getId() << Stream::eos;
 			player->send(st);
 		}
 		else
 		{
 			player->getClan()->decline(player, p->getId());
-			Stream st(0x94);
+			Stream st(REP::CLAN_MEMBER_OPERATE);
 			st << static_cast<UInt8>(3) << static_cast<UInt8>(1) << p->getId() << Stream::eos;
 			player->send(st);
 		}
 	}
 	while(0);
-	Stream st(0xA2);
+	Stream st(REP::MAIL_DELETE);
 	st << static_cast<UInt8>(1) << cmcr->id << Stream::eos;
 	player->send(st);
 	player->GetMailBox()->delMail(cmcr->id, false);
@@ -241,7 +242,7 @@ void OnClanTechDonateCheckResp( GameMsgHdr& hdr, const void * data )
 		if (clan != NULL && clan->donate(player, items->techId, items->flag, items->count))
 			r = 1;
 	}
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(2) << r << Stream::eos;
 	player->send(st);
 }

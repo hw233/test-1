@@ -97,6 +97,7 @@ namespace GObject
 		bool ExistItem(UInt32 id);	//equip & item
 	public:
 		void DelItemSendMsg(UInt32 itemid, Player *player);//use for scripte send send msg to client
+        UInt8 GetItemCareer(UInt32 itemid, UInt8 bind);
 
 	public:
 		static ItemBase* BuildItem(UInt32 id, UInt32 num, bool bind = false);

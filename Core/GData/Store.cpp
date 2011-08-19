@@ -3,6 +3,7 @@
 #include "GObject/Country.h"
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
+#include "MsgID.h"
 
 namespace GData
 {
@@ -39,7 +40,7 @@ void Store::makePacket()
 	for(int i = 0; i < 7; ++ i)
 	{
 		std::vector<UInt32>& items = _items[i];
-		_storePacket[i].init(0xB0);
+		_storePacket[i].init(REP::STORE_LIST);
 		_storePacket[i] << static_cast<UInt8>(i + 1) << static_cast<UInt8>(items.size());
 		for(std::vector<UInt32>::iterator it = items.begin(); it != items.end(); ++ it)
 		{

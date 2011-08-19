@@ -11,6 +11,7 @@
 
 #include "GObject/Country.h"
 #include "Log/Log.h"
+#include "MsgID.h"
 
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Network/TcpServerWrapper.h"
@@ -44,14 +45,14 @@ namespace Script
 
 	void SysBroadcast(UInt8 type, const char * msg)
 	{
-		Stream st(0xF7);
+		Stream st(REP::SYSTEM_INFO);
 		st << type << msg << Stream::eos;
 		NETWORK()->Broadcast(st);
 	}
 
 	void SysSendMsg(GObject::Player * player, UInt8 type, const char * msg)
 	{
-		Stream st(0xF7);
+		Stream st(REP::SYSTEM_INFO);
 		st << type << msg << Stream::eos;
 		player->send(st);
 	}
@@ -184,7 +185,6 @@ namespace Script
 		CLASS_DEF(Player, getClan);
 		CLASS_DEF(Player, getCreated);
 		CLASS_DEF(Player, getBlockBossLevel);
-		CLASS_DEF(Player, ColorTaskOutOf);
         CLASS_DEF(Player, getClanTaskId);
         CLASS_DEF(Player, isClanTaskFull);
         CLASS_DEF(Player, isClanTask);
@@ -282,6 +282,7 @@ namespace Script
 		CLASS_DEF(Package, GetRestPackageSize);
 		CLASS_DEF(Package, IsFull);
 		CLASS_DEF(Package, DelItemSendMsg);
+		CLASS_DEF(Package, GetItemCareer);
 		
 		//ŒÔ∆∑
 		CLASS_ADD(ItemBase);
@@ -649,7 +650,7 @@ namespace Script
 
 		UInt32 npcId = conveyPath.fetch<UInt32>(1);
 
-		Stream st(0x88);
+		Stream st(REP::CONVEYBATTLE);
 		st << npcId << taskId << static_cast<UInt16>(size-1);
 		for (int i = 1; i <= (size-1)/2; i++)
 		{

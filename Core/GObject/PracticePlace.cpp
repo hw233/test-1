@@ -14,6 +14,7 @@
 #include <mysql.h>
 #include "Server/SysMsg.h"
 #include "Mail.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -25,7 +26,7 @@ namespace GObject
         if (!pl || !time || !place || place > PPLACE_MAX || ((place != PPLACE_MAX) && slot > m_places[place-1].place.maxslot))
             return false;
 
-        Stream st(0xE3);
+        Stream st(REP::PRACTICE_OCCUPY);
 
         if (pl->isPracticing())
         {
@@ -107,7 +108,7 @@ namespace GObject
                     if(clan)
                     {
                         clan->addClanFunds(pd->slotprice + pd->protprice - money - money2);
-                        Stream st(0x9B);
+                        Stream st(REP::CLAN_BUILD);
                         UInt8 cnt = 2;
                         st << cnt;
                         UInt8 offset = st.size();
@@ -248,7 +249,7 @@ namespace GObject
         if (!pl)
             return false;
 
-        Stream st(0xE5);
+        Stream st(REP::PRACTICE_STOP);
 
         if (!pl->isPracticing()) {
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
@@ -291,7 +292,7 @@ namespace GObject
             if(clan)
             {
                 clan->addClanFunds(money + money2);
-                Stream st(0x9B);
+                Stream st(REP::CLAN_BUILD);
                 UInt8 cnt = 2;
                 st << cnt;
                 UInt8 offset = st.size();
@@ -325,7 +326,7 @@ namespace GObject
         if (!pl || !fgtid || !size)
             return false;
 
-        Stream st(0xE4);
+        Stream st(REP::PRACTICE_START);
 
         if (!pl->isPracticing())
         {
@@ -373,7 +374,7 @@ namespace GObject
         if (!pl || !fgtid || !size)
             return false;
 
-        Stream st(0xE5);
+        Stream st(REP::PRACTICE_STOP);
 
         PracticeData* data = getPracticeData(pl);
         if (!data)
@@ -416,7 +417,7 @@ namespace GObject
 
     void PracticePlace::getAllPlaceInfo(Player* pl)
     {
-        Stream st(0xE0);
+        Stream st(REP::PRACTICE_PLACE_IFNO);
         const std::vector<UInt32>& addons = GData::GDataManager::GetPlaceAddons();
         st << static_cast<UInt8>(PPLACE_MAX);
         for (int i = 0; i < PPLACE_MAX; ++i) {
@@ -485,7 +486,7 @@ namespace GObject
         PracticeData* p = getPracticeData(pl);
         if (p)
         {
-            Stream st1(0xE3);
+            Stream st1(REP::PRACTICE_OCCUPY);
             st1 << static_cast<UInt8>(0);
             st1 << p->checktime * 60;
             st1 << p->prot;
@@ -520,7 +521,7 @@ namespace GObject
         if (i == pd.data.end())
             return;
 
-        Stream st(0xE1);
+        Stream st(REP::PRACTICE_PAGE);
         st << static_cast<UInt8>(pageno);
         st << static_cast<UInt8>(0);
         PracticeData* ppd = NULL;
@@ -627,7 +628,7 @@ namespace GObject
         DB().PushUpdateData("UPDATE `practice_place` SET `slotmoney` = %u WHERE `id` = %u", money, place);
 
         // TODO: notify client
-        Stream st(0x9B);
+        Stream st(REP::CLAN_BUILD);
         st << static_cast<UInt8>(1) << static_cast<UInt8>(7) << data.slotmoney;
         st << Stream::eos;
         pl->send(st);
@@ -665,7 +666,7 @@ namespace GObject
         DB().PushUpdateData("UPDATE `practice_place` SET `protmoney` = %u WHERE `id` = %u", money, place);
 
         // TODO: notify client
-        Stream st(0x9B);
+        Stream st(REP::CLAN_BUILD);
         st << static_cast<UInt8>(1) << static_cast<UInt8>(8) << data.protmoney;
         st << Stream::eos;
         pl->send(st);
@@ -695,7 +696,7 @@ namespace GObject
         }
 
 
-        Stream st(0xE2);
+        Stream st(REP::PRACTICE_ROB);
         Player* def = 0;
         bool sumfalg = false;
         PracticeData* pd = m_places[place-1].data[idx];
@@ -756,7 +757,7 @@ namespace GObject
 
         bool res = bsim.getWinner() == 1;
         {
-            Stream st(0x61);
+            Stream st(REP::ATTACK_NPC);
             if(res)
                 st << static_cast<UInt16>(0x0101);
             else
@@ -784,7 +785,7 @@ namespace GObject
                 Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
                 if (owner)
                 {
-                    Stream st(0x9B);
+                    Stream st(REP::CLAN_BUILD);
                     st << static_cast<UInt8>(1) << static_cast<UInt8>(5) << m_places[place-1].place.winCount;
                     st << Stream::eos;
                     owner->send(st);
@@ -800,7 +801,7 @@ namespace GObject
                 Player* owner = GObject::globalPlayers[m_places[place -1].place.ownerid];
                 if (owner)
                 {
-                    Stream st(0x9B);
+                    Stream st(REP::CLAN_BUILD);
                     st << static_cast<UInt8>(1) << static_cast<UInt8>(6) << m_places[place-1].place.enemyCount - m_places[place-1].place.winCount;
                     st << Stream::eos;
                     owner->send(st);
@@ -873,7 +874,7 @@ namespace GObject
             UInt32 openPrice = 0;
             if (golds.size() && pd.place.openslot < golds.size())
                 openPrice = golds[pd.place.openslot];
-            Stream st(0x9B);
+            Stream st(REP::CLAN_BUILD);
             st << static_cast<UInt8>(1);
             st << static_cast<UInt8>(1) << static_cast<UInt8>(pd.place.maxslot) << static_cast<UInt16>(openPrice);
             st << Stream::eos;
@@ -928,7 +929,7 @@ namespace GObject
         if (golds.size() && pd.place.openslot < golds.size())
             openPrice = golds[pd.place.openslot];
 
-        Stream st(0x9B);
+        Stream st(REP::CLAN_BUILD);
         st << static_cast<UInt8>(1) << static_cast<UInt8>(1);
         st << static_cast<UInt8>(pd.place.maxslot) << static_cast<UInt16>(openPrice);
         st << Stream::eos;
@@ -985,7 +986,7 @@ namespace GObject
 
             if(clan && clan != pl->getClan())
             {
-                Stream st(0x9B);
+                Stream st(REP::CLAN_BUILD);
                 st << static_cast<UInt8>(1) << static_cast<UInt8>(2) << static_cast<UInt8>(m_places[place - 1].used);
                 st << Stream::eos;
                 clan->broadcast(st);

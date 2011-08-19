@@ -7,6 +7,7 @@
 #include "ClanTech.h"
 #include "Clan.h"
 #include "GObject/PracticePlace.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -53,7 +54,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
 				SYSMSGVP(st, 426);
 				_clan->broadcast(st);
 			}
-			Stream st(0x99);
+			Stream st(REP::CLAN_SKILL);
 			st << static_cast<UInt8>(3);
 			makeTechInfo(st, tech);
 			st << Stream::eos;
@@ -65,7 +66,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
 	case 2:
 		{
 			techLevelUp(tech.techId, tech.level, tech.extra, count);
-			Stream st(0x99);
+			Stream st(REP::CLAN_SKILL);
 			st << static_cast<UInt8>(3);
 			makeTechInfo(st, tech);
 			st << Stream::eos;
@@ -274,7 +275,7 @@ bool ClanTech::addAchieve(UInt16 ach)
 		return false;
 	ClanTechData& tech = found->second;
 	techLevelUp(tech.techId, tech.level, tech.extra, ach);
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(3);
 	makeTechInfo(st, tech);
 	st << Stream::eos;
@@ -291,7 +292,7 @@ bool ClanTech::delAchieve(UInt16 ach)
 		return false;
 	ClanTechData& tech = found->second;
 	techLevelDown(tech.techId, tech.level, tech.extra, ach);
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(3);
 	makeTechInfo(st, tech);
 	st << Stream::eos;

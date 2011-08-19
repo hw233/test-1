@@ -9,6 +9,7 @@
 #include "GObject/Fighter.h"
 #include "GObject/TaskMgr.h"
 #include "Common/TimeUtil.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -52,19 +53,24 @@ namespace GObject
 	{
 		std::size_t size = 0;
 
-		Stream st(0x80);
+		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0);
 		st << static_cast<UInt16>(0);
 		const std::set<UInt32>& relation = GData::GDataManager::GetTaskNpcRelationData(npcId);
 		std::set<UInt32>::const_iterator cit = relation.begin();
-        // XXX
-		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(*cit);
         PlayerData& pldd = player->getPlayerData();
 		for (; cit != relation.end(); ++cit)
 		{
+            const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(*cit);
             if(taskType.m_Class == 6)
             {
                 if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+                    continue;
+            }
+
+            if (taskType.m_Class == 4 || taskType.m_Class == 5)
+            {
+                if (!player->GetTaskMgr()->HasCompletedTask(*cit))
                     continue;
             }
 
@@ -112,7 +118,7 @@ namespace GObject
 		UInt8 actionType = TaskMsgTable.get<UInt8>("m_ActionType");
 		if (actionType != 0)
 		{
-			Stream st(0x81);
+			Stream st(REP::DIALOG_INTERACTION);
 			st << npcId;
 			st << TaskMsgTable.get<const char*>("m_NpcMsg") << actionType << TaskMsgTable.get<UInt8>("m_ActionToken");
 			st << TaskMsgTable.get<const char*>("m_ActionMsg") << taskId << TaskMsgTable.get<UInt8>("m_ActionStep") << Stream::eos;
@@ -126,7 +132,7 @@ namespace GObject
 		UInt16 actionType = TaskMsgTable.get<UInt16>("m_ActionType");
 		if (actionType != 0)
 		{
-			Stream st(0x80);
+			Stream st(REP::DIALOG_START);
 			st << dummyNpcId << static_cast<UInt16>(0);
 			st << static_cast<UInt16>(1);
 			st << actionType << TaskMsgTable.get<UInt8>("m_ActionToken") << taskId << TaskMsgTable.get<UInt8>("m_ActionStep") << TaskMsgTable.get<const char*>("m_ActionMsg") << Stream::eos;
@@ -137,7 +143,7 @@ namespace GObject
 	void MOAction::CollectAction(Player* player, UInt32 npcId)
 	{
 		Table collect = GameAction()->RunCollectTask(player, npcId);
-		Stream st(0x80);
+		Stream st(REP::DIALOG_START);
 		UInt16 actionType = collect.get<UInt16>("m_ActionType");
 		st << npcId << static_cast<UInt16>(0);
 		st << static_cast<UInt16>(1);
@@ -150,7 +156,7 @@ namespace GObject
 		bool ret = GameAction()->RunCollectTaskItem(player, npcId);
 		if (ret)
 		{
-			Stream st(0x89);
+			Stream st(REP::COLLECTNPCACTION);
 			st << npcId << Stream::eos;
 			player->send(st);
 		}
@@ -166,7 +172,7 @@ namespace GObject
 		DayTaskData* data = taskMgr->GetDayTaskData(dayTaskId);
 		if (data == NULL)
 		{
-			Stream st(0x8A);
+			Stream st(REP::TASK_CYC_STATE);
 			st << npcId << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0);
 			st << static_cast<UInt16>(0) << static_cast<UInt8>(254) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << "";
 			st << Stream::eos;
@@ -185,7 +191,7 @@ namespace GObject
 			if (data->m_PreFlushTime != 0 && TimeUtil::SharpHour(0, data->m_PreFlushTime) == TimeUtil::SharpHour(0, now))
 				leftFlushTime = TimeUtil::SharpHour(1, now) - now;
 		}
-		Stream st(0x8A);
+		Stream st(REP::TASK_CYC_STATE);
 		st << npcId << dayTaskId;
 
 		if(viplvl >= 1)
@@ -216,7 +222,7 @@ namespace GObject
 		UInt16 size = msgTable.size();
 		if (size == 0) return ;
 
-		Stream st(0x80);
+		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0);
 		st << size;
 		for (UInt16 i = 1; i <= size; i++)
@@ -233,7 +239,7 @@ namespace GObject
 		player->checkGreatFighterFriendliness(npcId);
 
 		UInt16 size = 0;
-		Stream st(0x80);
+		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0);
 		st << static_cast<UInt16>(0);
 		Table msg = GameAction()->RunGreatFighterAction(player, npcId);
@@ -256,7 +262,7 @@ namespace GObject
 		UInt8 actionType = msg.get<UInt8>("m_ActionType");
 		if (actionType != 0)
 		{
-			Stream st(0x81);
+			Stream st(REP::DIALOG_INTERACTION);
 			st << static_cast<UInt32>(npcId);
 			st << msg.get<const char*>("m_NpcMsg") << actionType << msg.get<UInt8>("m_ActionToken");
 			st << msg.get<const char*>("m_ActionMsg") << msg.get<UInt32>("m_ActionID") << msg.get<UInt8>("m_ActionStep") << Stream::eos;
@@ -270,7 +276,7 @@ namespace GObject
 		UInt8 actionType = msg.get<UInt8>("m_ActionType");
 		if (actionType != 0)
 		{
-			Stream st(0x81);
+			Stream st(REP::DIALOG_INTERACTION);
 			st << static_cast<UInt32>(npcId);
 			st << msg.get<const char*>("m_NpcMsg") << actionType << msg.get<UInt8>("m_ActionToken");
 			st << msg.get<const char*>("m_ActionMsg") << msg.get<UInt32>("m_ActionID") << msg.get<UInt8>("m_ActionStep") << Stream::eos;
@@ -284,7 +290,7 @@ namespace GObject
 		Table msg = GameAction()->RunDayCopyTask(player, npcId);
 		UInt16 sz = static_cast<UInt16>(msg.size());
 		
-		Stream st(0x80);
+		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0) << sz;
 		for (UInt16 i = 1; i <= sz; ++i)
 		{
@@ -300,7 +306,7 @@ namespace GObject
 		Table msg = GameAction()->RunDayCopyTaskStep(player, npcId, actionId);
 		UInt16 sz = static_cast<UInt16>(msg.size());
 
-		Stream st(0x80);
+		Stream st(REP::DIALOG_START);
 		st << npcId << static_cast<UInt16>(0) << sz;
 		for (UInt16 i = 1; i <= sz; ++i)
 		{

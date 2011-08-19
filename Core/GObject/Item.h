@@ -31,6 +31,7 @@ namespace GObject
 		inline UInt16		getMaxQuantity() const	{ return _itemBaseType.maxQuantity; }
 		inline UInt8		getBindType() const	{ return _itemBaseType.bindType; }
         inline UInt16       getEnergy() const { return _itemBaseType.energy; }
+        inline UInt8        GetCareer() const { return _itemBaseType.career; }
 
 		bool GetBindStatus() const { return m_BindStatus; }
 		inline bool  SetBindStatus(bool bindType)

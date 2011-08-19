@@ -93,7 +93,7 @@ function Task_00000503_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = "这些不守清规戒律的僧人真是佛门之害。";
 	action.m_ActionMsg = "";
 	return action;
 end

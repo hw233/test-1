@@ -9,6 +9,7 @@
 #include "DB/DBExecHelper.h"
 #include "DB/DBConnectionMgr.h"
 #include "DB/DBExecutor.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -49,7 +50,7 @@ Leaderboard leaderboard;
 void buildPacket(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem>& list, bool merge = true)
 {
 	UInt8 c = static_cast<UInt8>(list.size());
-	st.init(0xE8);
+	st.init(REP::SORT_LIST);
 	st << t << id << c;
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -358,7 +359,7 @@ void _searchInside(Stream& st, T1 mapv, T2 v)
 
 void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 {
-	Stream st(0xE9);
+	Stream st(REP::SORT_PERSONAL);
 	if(id == _id)
 	{
 		st << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << Stream::eos;

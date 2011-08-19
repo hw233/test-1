@@ -10,6 +10,7 @@
 #include "Package.h"
 #include "Battle/BattleSimulator.h"
 #include "Common/TimeUtil.h"
+#include "MsgID.h"
 
 namespace GObject 
 {
@@ -54,6 +55,7 @@ void ClanManager::resumeRobClanBattleScore()
 
 void ClanManager::process(UInt32 now, UInt32 today)
 {
+    return; // TODO: 帮派战暂时禁用
 	for (OnBattleClanT::iterator onBcIter = _onBattleClans.begin(); onBcIter != _onBattleClans.end();)
 	{
 		_clanBattle = onBcIter->second;
@@ -122,7 +124,7 @@ void ClanManager::listClans(Player * player, UInt16 start, UInt8 count)
 		count = 0;
 	else
 		count = end - start;
-	Stream st(0x7A);
+	Stream st(REP::CLAN_OPEN);
 	st << sz << start << count;
 
 	{

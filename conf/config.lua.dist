@@ -10,3 +10,5 @@ cfg:setAdminAllowedIP("10.0.8.0/24");
 cfg:setWallow(true);
 cfg:setOpening([year], [month], [day]);
 cfg:setGMCheck(false);
+cfg:setLoginLimit(false);
+cfg:setLoginMax(3000);

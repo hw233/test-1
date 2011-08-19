@@ -175,7 +175,7 @@ function Task_00000083_submit(itemId, itemNum)
 
 	package:DelItemAll(808,1);
 
-	player:AddExp(10000);
+	player:AddExp(30000);
 	return true;
 end
 

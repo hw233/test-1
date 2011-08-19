@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Package.h"
 #include "TaskMgr.h"
@@ -33,6 +34,7 @@
 #include "Tripod.h"
 #include <mysql.h>
 #include "GData/Formation.h"
+#include "kingnet_analyzer.h"
 
 #include <cmath>
 
@@ -125,7 +127,7 @@ namespace GObject
 	{
 		if(m_Player == NULL || !m_Player->isOnline())
 			return;
-		Stream st(0x6D);
+		Stream st(REP::TASK_RESPONSE_HOOK);
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
 
 		UInt32 vipLevel = m_Player->getVipLevel();
@@ -331,7 +333,7 @@ namespace GObject
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
 		_isOnline(false), _threadId(0xFF), _session(-1),
-		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0),
+		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0)
 	{
@@ -455,8 +457,11 @@ namespace GObject
 		if(cfg.enableWallow && _playerData.wallow)
 		{
 			UInt32 dur = curtime - _playerData.lastOnline;
-			if(dur >= 5 * 60 * 60)
+            _offlineTime = dur;
+			if(dur >= 5 * 60 * 60) {
 				_onlineDuration = 0;
+                _offlineTime = 0;
+            }
 		}
 
 		_playerData.lastOnline = curtime;
@@ -476,6 +481,18 @@ namespace GObject
 
 		checkLastBattled();
 		GameAction()->onLogin(this);
+
+        {
+            char id[32] = {0x00};
+            snprintf(id, sizeof(id), "%"I64_FMT"u", getId());
+            CUserLogger* logger = _analyzer.GetInstance(id);
+            if (logger)
+            {
+                logger->SetUserIP("192.168.9.2");
+                //logger->SetUserMsg("user|msg|is|here");
+                logger->LogMsg("11","22","33","44","55","66","login");
+            }
+        }
 	}
 
 	void Player::Reconnect()
@@ -815,7 +832,7 @@ namespace GObject
     {
         static UInt16 cittas[] = {301, 401, 701};
         UInt16 citta = cittas[fgt->getClass()-1];
-        if (fgt->addNewCitta(citta)) {
+        if (fgt->addNewCitta(citta, false, true)) {
             if (fgt->upCitta(citta, 0, true)) {
             }
         }
@@ -845,7 +862,7 @@ namespace GObject
 	{
 		if(!_isOnline)
 			return;
-		Stream st(0x28);
+		Stream st(REP::FIGHTER_ACCEPT);
 		st << static_cast<UInt16>(fgt->getId());
         st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getDefaultSkillAndLevel() << fgt->getDefaultCittaAndLevel();
 		st << Stream::eos;
@@ -1071,7 +1088,7 @@ namespace GObject
 				}
 			}
 		}
-		st.init(0x14);
+		st.init(REP::USER_INFO);
 		UInt8 status = static_cast<UInt8>(_playerData.status);
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
@@ -1086,7 +1103,7 @@ namespace GObject
 
 	void Player::makeFormationInfo( Stream& st )
 	{
-		st.init(0x1E);
+		st.init(REP::RANK_SETTING);
 		st << _playerData.formation << static_cast<UInt8>(0);
 		UInt8 c = 0;
 		for(UInt8 i = 0; i < 5; ++ i)
@@ -1102,20 +1119,10 @@ namespace GObject
 		st << Stream::eos;
 	}
 
-	void Player::makeFighterIdList( Stream& st )
-	{
-		size_t c = _fighters.size();
-		st.init(0x18);
-		st << static_cast<UInt8>(c);
-		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-			st << it->second->getId();
-		st << Stream::eos;
-	}
-
 	void Player::makeFighterList( Stream& st )
 	{
 		size_t c = _fighters.size();
-		st.init(0x23);
+		st.init(REP::FIGHTER_INFO);
 		st << static_cast<UInt8>(c);
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
 			makeFighterInfo(st, it->second);
@@ -1212,7 +1219,6 @@ namespace GObject
 		if(writedb)
 		{
 			DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v.friendliness, v.submitFavorCount, v.submitFavorDay);
-			sendGreatFighterTaskVal(id, v.friendliness, v.submitFavorCount);
 			//SYSMSG_SENDV(148, this, friendliness);
 			SYSMSG_SENDV(1048, this, id, friendliness);
 		}
@@ -1224,21 +1230,6 @@ namespace GObject
 		if (cit == _greatFighterTaskVal.end())
 			return 0;
 		return cit->second.friendliness;
-	}
-
-	void Player::sendGreatFighterTaskVal(UInt32 id)
-	{
-		std::map<UInt32, GreatFighterTaskVal>::const_iterator cit = _greatFighterTaskVal.find(id);
-		if (cit == _greatFighterTaskVal.end())
-			return;
-		sendGreatFighterTaskVal(id, cit->second.friendliness, cit->second.submitFavorCount);
-	}
-
-	void Player::sendGreatFighterTaskVal( UInt32 id, UInt16 friendliness, UInt16 favorSubmitCount )
-	{
-		Stream st(0x25);
-		st << id << friendliness << favorSubmitCount << Stream::eos;
-		send(st);
 	}
 
 	void Player::greatFighterFavorSubmitCheck(GreatFighterTaskVal * task, UInt32 fightId, UInt32 thisDay)
@@ -1282,7 +1273,6 @@ namespace GObject
 		DBLOG().PushUpdateData("insert into `fighter_friendness`(`server_id`, `player_id`, `fighter_id`, `friendness`, `time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), id, v->friendliness, TimeUtil::Now());		
 		GameAction()->RunGreatTaskAction(this, id);
 
-		sendGreatFighterTaskVal(id, v->friendliness, v->submitFavorCount);
 		return true;
 	}
 
@@ -1300,29 +1290,6 @@ namespace GObject
 	{
 		GObject::Fighter& fighter = GObject::getGreatFighter(fightId);
 		return fighter.getId() == 0 ? 0 : fighter.favor;
-	}
-
-	void Player::makeGreatFighterTaskValList(Stream& st, UInt16 start, UInt16 count)
-	{
-		UInt16 sz = static_cast<UInt16>(_greatFighterTaskVal.size());
-		UInt16 end = start + count;
-		if (end > sz)
-			end = sz;
-		if (start < end)
-			count = end - start;
-		else
-			count = 0;
-		st.init(0x24);
-		st << start << count << sz;
-		std::map<UInt32, GreatFighterTaskVal>::iterator pos = _greatFighterTaskVal.begin();
-		std::advance(pos, start);
-		UInt32 thisDay = TimeUtil::SharpDay(0);
-		for (; pos != _greatFighterTaskVal.end() && start < end; ++pos, ++start)
-		{
-			greatFighterFavorSubmitCheck(&pos->second, pos->first, thisDay);
-			st << pos->first << pos->second.friendliness << pos->second.submitFavorCount;
-		}
-		st << Stream::eos;
 	}
 
 	bool Player::setNewGuildTaskStep(UInt32 step)
@@ -1361,7 +1328,7 @@ namespace GObject
 				break;
 			}
 		} 
-		Stream st(0x15);
+		Stream st(REP::USER_INFO_CHANGE);
 		st << static_cast<UInt8>(0x10) << step << Stream::eos;
 		send(st);
 #else
@@ -1373,7 +1340,7 @@ namespace GObject
 
     void Player::sendNewGuild()
     {
-        Stream st(0x13);
+        Stream st(REP::GUIDE_RESPONSE_STEP);
         st << static_cast<UInt16>(_playerData.newGuild);
         st << Stream::eos;
         send(st);
@@ -1399,7 +1366,7 @@ namespace GObject
 		bsim.start();
 		bool res = bsim.getWinner() == 1;
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		send(st);
 		st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
@@ -1485,7 +1452,7 @@ namespace GObject
 		if(packet.size() <= 8)
 			return false;
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 
 		bool res = bsim.getWinner() == 1;
 		if(res)
@@ -1558,7 +1525,7 @@ namespace GObject
 		if(packet.size() <= 8)
 			return false;
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		bool res = bsim.getWinner() == 1;
 		if(res)
 		{
@@ -1663,7 +1630,7 @@ namespace GObject
 
 	void Player::cancelAutoBattleNotify()
 	{
-		Stream st(0x6D);
+		Stream st(REP::TASK_RESPONSE_HOOK);
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (getMaxIcCount(_vipLevel) - getIcCount()) << Stream::eos;
 		send(st);
 		DB().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
@@ -1812,7 +1779,7 @@ namespace GObject
 
 		_playerData.packSize += EACH_EXTEND_NUM;
 		updateDB(32, _playerData.packSize);
-		Stream st(0x34);
+		Stream st(REP::PACK_EXTEND);
 		st << getPacksize() << Stream::eos;
 		send(st);
 		return true;
@@ -1866,7 +1833,7 @@ namespace GObject
 		if(notify)
 		{
 			notifyFriendAct(1, pl);
-			Stream st(0xA9);
+			Stream st(REP::FRIEND_ACTION);
 			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
@@ -1891,7 +1858,7 @@ namespace GObject
 		if(it == _friends[0].end())
 			return;
 		_friends[0].erase(it);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x02) << pl->getName() << Stream::eos;
 		send(st);
 		SYSMSG_SEND(134, this);
@@ -1937,7 +1904,7 @@ namespace GObject
 		}
 
 		notifyFriendAct(4, pl);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x03) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 1, %"I64_FMT"u)", getId(), pl->getId());
@@ -1963,7 +1930,7 @@ namespace GObject
 		if(it == _friends[1].end())
 			return false;
 		_friends[1].erase(it);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x04) << pl->getName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 1 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
@@ -1981,7 +1948,7 @@ namespace GObject
 		}
 
 		notifyFriendAct(3, pl);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
@@ -1991,7 +1958,7 @@ namespace GObject
 		if(_friends[2].size() >= 20)
 		{
 			std::set<Player *>::iterator it = _friends[2].begin();
-			Stream st(0xA9);
+			Stream st(REP::FRIEND_ACTION);
 			st << static_cast<UInt8>(0x06) << (*it)->getName() << Stream::eos;
 			send(st);
 			_friends[2].erase(it);
@@ -2014,7 +1981,7 @@ namespace GObject
 		if(it == _friends[2].end())
 			return false;
 		_friends[2].erase(it);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x06) << pl->getName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 2 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
@@ -2031,7 +1998,7 @@ namespace GObject
 			cnt = 0;
 		else
 			cnt = end - start;
-		Stream st(0xA8);
+		Stream st(REP::FRIEND_LIST);
 		st << static_cast<UInt8>(type) << start << cnt << sz;
 		std::set<Player *>::iterator it = _friends[type].begin();
 		std::advance(it, start);
@@ -2050,7 +2017,7 @@ namespace GObject
 	{
 		if(_isOnline)
 		{
-			Stream st(0x15);
+			Stream st(REP::USER_INFO_CHANGE);
 			if(t > 0x40)
 			{
 				UInt32 tm = TimeUtil::Now();
@@ -2482,7 +2449,7 @@ namespace GObject
 		delete data;
 		_trainFighters.erase(id);
 		DB().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
-		Stream st(0x2E);
+		Stream st(REP::TRAIN_FIGHTER_OP);
 		st << id << static_cast<UInt8>(2) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
 		if (notify)
@@ -2545,7 +2512,7 @@ namespace GObject
 		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 60, data->checktime, fgt, data->trainend);
 		if (event == NULL) return false;
 		PushTimerEvent(event);
-		Stream st(0x2E);
+		Stream st(REP::TRAIN_FIGHTER_OP);
 		UInt32 remain = event->GetEnd() - TimeUtil::Now();
 		st << id << data->priceType << remain << Stream::eos;
 		send(st);
@@ -2588,7 +2555,7 @@ namespace GObject
 			else
 			{
 				DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, id, _id);
-				Stream st(0x2E);
+				Stream st(REP::TRAIN_FIGHTER_OP);
 				UInt32 now = TimeUtil::Now();
 				st << id << data->priceType;
 				if(data->trainend > now)
@@ -2621,7 +2588,7 @@ namespace GObject
 
 	void Player::makeTrainFighterInfo(Stream& st)
 	{
-		st.init(0x2D);
+		st.init(REP::TRAIN_FIGHTER_LIST);
 		UInt8 cnt = 0;
 		st << cnt;
 		if(!_trainFighters.empty())
@@ -2861,111 +2828,117 @@ namespace GObject
 
 	void Player::writeShiMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], _id);
 	}
 
 	void Player::writeYaMen()
 	{
-		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _id);
+		DB().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
 	}
 
-    void Player::delColorTask(UInt32 taskid)
+    bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
-        for (int i = 0; i < 6; ++i)
-        {
-            if (_playerData.shimen[i] == taskid)
-            {
-                //_playerData.shimen[i] = 0;
-                _playerData.smcolor[i] |= 0xF0;
-                sendColorTask(0, 0);
-                return;
+        if (!im) {
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(4, im))
+                    break;
+
+                if (_playerData.shimen[i] == taskid) {
+                    _playerData.shimen[i] = 0;
+                    _playerData.smcolor[i] = 0;
+
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.smcolor[i]-1);
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
+                    sendColorTask(0, 0);
+                    writeShiMen();
+                    return true;
+                }
             }
-        }
-        for (int i = 0; i < 6; ++i)
-        {
-            if (_playerData.yamen[i] == taskid)
-            {
-                //_playerData.yamen[i] = 0;
-                _playerData.ymcolor[i] |= 0xF0;
-                sendColorTask(1, 0);
-                return;
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(5, im))
+                    break;
+
+                if (_playerData.yamen[i] == taskid) {
+                    _playerData.yamen[i] = 0;
+                    _playerData.ymcolor[i] = 0;
+
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
+                    getTael(award); // TODO:
+                    ++_playerData.ymFinishCount;
+                    sendColorTask(1, 0);
+                    writeYaMen();
+                    return true;
+                }
             }
-        }
+        } else {
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(4, im))
+                    break;
 
-        return;
-    }
+                if (_playerData.fshimen[i] == taskid) {
+                    _playerData.fshimen[i] = 0;
+                    _playerData.fsmcolor[i] = 0;
 
-    bool Player::addAwardByTaskColor(UInt32 taskid)
-    {
-        for (int i = 0; i < 6; ++i) {
-            if (_playerData.shimen[i] == taskid) {
-                if (_playerData.smFinishCount >= 5)
-                    return false;
-                if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
-                    return false;
-
-                _playerData.shimen[i] = 0;
-                //_playerData.smcolor[i] = 0;
-
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, (_playerData.smcolor[i]&0x0F)-1);
-                AddExp(award); // TODO:
-                ++_playerData.smFinishCount;
-                sendColorTask(0, 0);
-                return true;
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.fsmcolor[i]-1);
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
+                    sendColorTask(0, 0);
+                    writeShiMen();
+                    return true;
+                }
             }
-        }
-        for (int i = 0; i < 6; ++i) {
-            if (_playerData.yamen[i] == taskid) {
-                if (_playerData.ymFinishCount >= 5)
-                    return false;
-                if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
-                    return false;
+            for (int i = 0; i < 6; ++i) {
+                if (ColorTaskOutOfAccept(5, im))
+                    break;
 
-                _playerData.yamen[i] = 0;
-                //_playerData.ymcolor[i] = 0;
+                if (_playerData.fyamen[i] == taskid) {
+                    _playerData.fyamen[i] = 0;
+                    _playerData.fymcolor[i] = 0;
 
-                UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, (_playerData.ymcolor[i]&0x0F)-1);
-                getTael(award); // TODO:
-                ++_playerData.ymFinishCount;
-                sendColorTask(1, 0);
-                return true;
+                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
+                    getTael(award); // TODO:
+                    ++_playerData.ymFinishCount;
+                    sendColorTask(1, 0);
+                    writeYaMen();
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    bool Player::ColorTaskOutOf(UInt8 type)
-    {
-        if (type == 0)
-        {
-            return _playerData.smFinishCount >= 5;
-        }
-        else if (type == 1)
-        {
-            return _playerData.ymFinishCount >= 5;
-        }
-        return false;
-    }
-
-    bool Player::ColorTaskOutOfAccept(UInt8 type)
+    bool Player::ColorTaskOutOfAccept(UInt8 type, bool im)
     {
         if (type == 4)
         {
-            if (_playerData.smFinishCount >= 5)
+            if (_playerData.smFinishCount >= 5) {
+                SYSMSG_SENDV(2107, this, "师门");
                 return true;
-            if (_playerData.smAcceptCount >= 5)
+            }
+            if (_playerData.smAcceptCount >= 5) {
+                SYSMSG_SENDV(2107, this, "师门");
                 return true;
-            if (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)
+            }
+            if (im && (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)) {
+                SYSMSG_SENDV(2107, this, "师门");
                 return true;
+            }
         }
         else if (type == 5)
         {
-            if (_playerData.ymFinishCount >= 5)
+            if (_playerData.ymFinishCount >= 5) {
+                SYSMSG_SENDV(2107, this, "衙门");
                 return true;
-            if (_playerData.ymAcceptCount >= 5)
+            }
+            if (_playerData.ymAcceptCount >= 5) {
+                SYSMSG_SENDV(2107, this, "衙门");
                 return true;
-            if (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)
+            }
+            if (im && (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)) {
+                SYSMSG_SENDV(2107, this, "衙门");
                 return true;
+            }
         }
         return false;
     }
@@ -2976,12 +2949,17 @@ namespace GObject
         {
             for (int i = 0; i < 6; ++i)
             {
-                if (_playerData.shimen[i] == taskid)
+                if (_playerData.fshimen[i] == taskid)
                 {
-                    //_playerData.shimen[i] = 0;
-                    _playerData.smcolor[i] |= 0xF0;
+                    _playerData.shimen[i] = taskid;
+                    _playerData.smcolor[i] = _playerData.fsmcolor[i];
+
+                    _playerData.fshimen[i] = 0;
+                    _playerData.fsmcolor[i] = 0;
+
                     ++_playerData.smAcceptCount;
                     sendColorTask(0, 0);
+                    writeShiMen();
                     return;
                 }
             }
@@ -2990,12 +2968,17 @@ namespace GObject
         {
             for (int i = 0; i < 6; ++i)
             {
-                if (_playerData.yamen[i] == taskid)
+                if (_playerData.fyamen[i] == taskid)
                 {
-                    //_playerData.yamen[i] = 0;
-                    _playerData.ymcolor[i] |= 0xF0;
+                    _playerData.yamen[i] = taskid;
+                    _playerData.ymcolor[i] = _playerData.fymcolor[i];
+
+                    _playerData.fyamen[i] = 0;
+                    _playerData.fymcolor[i] = 0;
+
                     ++_playerData.ymAcceptCount;
                     sendColorTask(1, 0);
+                    writeYaMen();
                     return;
                 }
             }
@@ -3006,6 +2989,8 @@ namespace GObject
     {
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
+        writeShiMen();
+        writeYaMen();
     }
 
     bool Player::finishClanTask(UInt32 taskId)
@@ -3086,7 +3071,7 @@ namespace GObject
 
 	void Player::writeClanTask()
 	{
-        Stream st(0x98);
+        Stream st(REP::CLAN_INFO_UPDATE);
         st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
         st << Stream::eos;
         send(st);
@@ -3180,11 +3165,11 @@ namespace GObject
         bool first = false;
         if (!force) {
             if (ttype == 0) {
-                if (!_playerData.smcolor[0])
+                if (!_playerData.smFreeCount)
                     first = true;
             }
             if (ttype == 1) {
-                if (!_playerData.ymcolor[0])
+                if (!_playerData.ymFinishCount)
                     first = true;
             }
         }
@@ -3232,11 +3217,11 @@ namespace GObject
                         for (int j = 0; j < 5; ++j) {
                             if (rd <= rfac[j]) {
                                 if (ttype == 0) {
-                                    _playerData.shimen[n] = task[*i];
-                                    _playerData.smcolor[n] = j+1;
+                                    _playerData.fshimen[n] = task[*i];
+                                    _playerData.fsmcolor[n] = j+1;
                                 } else {
-                                    _playerData.yamen[n] = task[*i];
-                                    _playerData.ymcolor[n] = j+1;
+                                    _playerData.fyamen[n] = task[*i];
+                                    _playerData.fymcolor[n] = j+1;
                                 }
                                 if (j+1 == color)
                                     percolor = true;
@@ -3272,7 +3257,7 @@ namespace GObject
 
     void Player::sendColorTask(UInt8 ttype, UInt16 ncount)
     {
-        Stream st(0x8B);
+        Stream st(REP::TASK_CYC_FRESH);
         st << ttype;
         if (ttype == 0) 
         {
@@ -3287,28 +3272,28 @@ namespace GObject
 
         if (ttype == 0) {
             for (int i = 0; i < 6; ++i) {
-                if (_playerData.smcolor[i] & 0xF0)
+                if (!_playerData.fsmcolor[i])
                 {
                     st << static_cast<UInt32>(0);
                     st << static_cast<UInt8>(0);
                 }
                 else
                 {
-                    st << _playerData.shimen[i];
-                    st << static_cast<UInt8>(_playerData.smcolor[i]&0x0F);
+                    st << _playerData.fshimen[i];
+                    st << static_cast<UInt8>(_playerData.fsmcolor[i]);
                 }
             }
         } else {
             for (int i = 0; i < 6; ++i) {
-                if (_playerData.ymcolor[i] & 0xF0)
+                if (!_playerData.fymcolor[i])
                 {
                     st << static_cast<UInt32>(0);
                     st << static_cast<UInt8>(0);
                 }
                 else
                 {
-                    st << _playerData.yamen[i];
-                    st << static_cast<UInt8>(_playerData.ymcolor[i]&0x0F);
+                    st << _playerData.fyamen[i];
+                    st << static_cast<UInt8>(_playerData.fymcolor[i]);
                 }
             }
         }
@@ -3364,7 +3349,7 @@ namespace GObject
         }
 
 		UInt16 tcount = 0;
-		Stream st(0x26);
+		Stream st(REP::HOTEL_PUB_LIST);
 		if(count > 0)
 		{
 			do
@@ -3578,7 +3563,7 @@ namespace GObject
 	{
 		if(!_isOnline)
 			return;
-		Stream st(0x0F);
+		Stream st(REP::ALERT_MSG);
 		st << type << code << data << Stream::eos;
 		send(st);
 	}
@@ -3599,22 +3584,6 @@ namespace GObject
 	void Player::moveToNeutralHome()
 	{
 		moveTo(0x3004, true);
-	}
-
-	void Player::sendGreatFighterMet()
-	{
-		Stream st(0xB8);
-		UInt8 data[(GREAT_FIGHTER_MAX + 8) / 8] = {0};
-		st << static_cast<UInt8>(20);
-		std::map<UInt32, GreatFighterTaskVal>::iterator it;
-		for(it = _greatFighterTaskVal.begin(); it != _greatFighterTaskVal.end(); ++ it)
-		{
-			if (it->second.friendliness > 0)
-				data[it->first >> 3] |= 1 << (it->first & 0x07);
-		}
-		st.append(data, 20);
-		st << Stream::eos;
-		send(st);
 	}
 
 	void Player::autoRegenAll()
@@ -3693,7 +3662,7 @@ namespace GObject
 			stage = 0;
 			duration = 0;
 		}
-		st.init(0x12);
+		st.init(REP::WALLOW_VERIFY);
 		st << wallow << stage << duration << Stream::eos;
 	}
 
@@ -3814,7 +3783,7 @@ namespace GObject
 #if 0
 		if(!hasStatus(FirstHPLoss))
 		{
-			Stream st(0x13);
+			Stream st(REP::GUIDE_RESPONSE_STEP);
 			st << static_cast<UInt16>(1) << Stream::eos;
 			send(st);
 			addStatus(FirstHPLoss);
@@ -3827,7 +3796,7 @@ namespace GObject
 #if 0
 		if(!hasStatus(FirstDeath))
 		{
-			Stream st(0x13);
+			Stream st(REP::GUIDE_RESPONSE_STEP);
 			st << static_cast<UInt16>(2) << Stream::eos;
 			send(st);
 			addStatus(FirstDeath);
@@ -3868,7 +3837,7 @@ namespace GObject
 
     void Player::sendFormationList()
     {
-        Stream st(0x1D);
+        Stream st(REP::RANK_DATA);
         UInt8 cnt = _playerData.formations.size();
         st << static_cast<UInt8>(0) << cnt;
         for( int idx = 0; idx < cnt; ++ idx )
@@ -3886,7 +3855,7 @@ namespace GObject
         if(formation == NULL)
             return false;
 
-        Stream st(0x1D);
+        Stream st(REP::RANK_DATA);
         st << static_cast<UInt8>(1);
         int cnt = formation->getLevUpItemCount();
         if(0 == cnt)
@@ -3976,7 +3945,7 @@ namespace GObject
         SYSMSG_SENDV(2104, this, newformation->getName().c_str());
 		DB().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
 
-        Stream st(0x1D);
+        Stream st(REP::RANK_DATA);
         st << static_cast<UInt8>(2) << newformationId << Stream::eos;
         send(st);
 
@@ -4071,7 +4040,7 @@ namespace GObject
 		if(_playerData.rewardStep >= count) {
 			_playerData.rewardStep = count;
 
-            Stream st(0x38);
+            Stream st(REP::REWARD_DRAW);
             st << static_cast<UInt16>(-1) << static_cast<UInt8>(0);
             st << Stream::eos;
             send(st);
@@ -4105,7 +4074,7 @@ namespace GObject
 
 	void Player::sendOnlineReward()
 	{
-		Stream st(0x38);
+		Stream st(REP::REWARD_DRAW);
         UInt32 left = getOnlineReward();
         if (left == static_cast<UInt32>(-1))
         {
@@ -4157,7 +4126,7 @@ namespace GObject
 
 	void Player::sendDailyInfo()
 	{
-		Stream st(0x5F);
+		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(1);
 		bossManager.buildInfo(st);
 		st << static_cast<UInt8>(dungeonManager.size());
@@ -4363,10 +4332,11 @@ namespace GObject
 		return dg->getFirstPass(this) > 0;
 	}
 
+#if 0
 	void Player::sendFriendActList()
 	{
 		size_t sz = _friendActs.size();
-		Stream st(0xAB);
+		Stream st(REP::FRIEND_STATUS);
 		st << static_cast<UInt8>(sz);
 		for(size_t i = 0; i < sz; ++ i)
 		{
@@ -4375,6 +4345,7 @@ namespace GObject
 		st << Stream::eos;
 		send(st);
 	}
+#endif
 
 	void Player::appendFriendAct( Stream& st, FriendActStruct* fas )
 	{
@@ -4400,6 +4371,7 @@ namespace GObject
 		}
 	}
 
+#if 0
 	void Player::pushFriendAct( FriendActStruct * fas )
 	{
 		if(_friendActs.size() > 14)
@@ -4411,13 +4383,14 @@ namespace GObject
 		_friendActs.push_back(fas);
 		if(_isOnline)
 		{
-			Stream st(0xAB);
+			Stream st(REP::FRIEND_STATUS);
 			st << static_cast<UInt8>(0xFF);
 			appendFriendAct(st, fas);
 			st << Stream::eos;
 			send(st);
 		}
 	}
+#endif
 
 	bool Player::testCanAddFriend( Player * pl )
 	{
@@ -4646,7 +4619,7 @@ namespace GObject
 		Stream& packet = bsim.getPacket();
 		if(packet.size() <= 8)
 			return false;
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		bool isWin = bsim.getWinner() == 1;
 		UInt8 sz = 0;
 		GData::LootResult lt = {0, 0};
@@ -4773,7 +4746,7 @@ namespace GObject
 
 	void Player::listBookStore(UInt8 type)
 	{
-        Stream st(0x1A);
+        Stream st(REP::BOOK_SHOP_LIST);
         if (GetLev() < 10 && !type && GetTaskMgr()->HasCompletedTask(5) && !GetTaskMgr()->HasSubmitedTask(5)) {
             st << static_cast<UInt16>(0);
             _playerData.bookStore[0] = 1200;
@@ -4997,7 +4970,7 @@ namespace GObject
 
 	void Player::makeSenconPWDInfo(Stream& st)
 	{
-		st.init(0xCB);
+		st.init(REP::SECOND_PWD);
 		if(!_pwdInfo.secondPWD.empty())
 			st << static_cast<UInt8>(0) << _pwdInfo.questionForPWD;
 		else
@@ -5014,7 +4987,7 @@ namespace GObject
 				sendMsgCode(0, 2003);
 				return false;
 			}
-			Stream st(0xCC);
+			Stream st(REP::PWD_DAILOG);
 			st << Stream::eos;
 			send(st);
 			return false;

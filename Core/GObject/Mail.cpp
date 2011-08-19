@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Mail.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Fighter.h"
 #include "Trade.h"
@@ -198,7 +199,8 @@ MailPackage * MailPackageManager::add( UInt32 id )
 
 Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, const std::string& content, UInt32 additional, bool writedb, MailItemsInfo * itemsInfo)
 {
-    return NULL; // XXX: 
+    if (type != 3 && type != 0x13 && type != 0x80)
+        return NULL; // TODO:
 	Mutex::ScopedLock lk(_owner->getMutex());
 
 	Mail * mail = newMail(IDGenerator::gMailOidGenerator.ID(), (sender == NULL ? "" : sender->getName()), TimeUtil::Now(), type, title, content, additional);
@@ -207,7 +209,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 
 	if(_owner != NULL)
 	{
-		Stream st(0xA4);
+		Stream st(REP::MAIL_NEW);
 		st << _newMails << Stream::eos;
 		_owner->send(st);
 		SYSMSG_SEND(137, _owner);
@@ -394,7 +396,7 @@ void MailBox::readMail( UInt32 id )
 		}
 		DB().PushUpdateData("UPDATE `mail` SET `flag` = %u WHERE `mailId` = %u", mail->flag, id);
 	}
-	Stream st(0xA1);
+	Stream st(REP::MAIL_CONTENTS);
 	st << id << mail->content << mail->additional;
 	switch(mail->flag & 0x7F)
 	{
@@ -760,12 +762,12 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			{
 				-- _newMails;
                 // XXX: 
-				//Stream st(0xA4);
+				//Stream st(REP::MAIL_NEW);
 				//st << _newMails << Stream::eos;
 				//_owner->send(st);
 			}
 		}
-		Stream st(0xA2);
+		Stream st(REP::MAIL_DELETE);
 		st << static_cast<UInt8>(1) << mail->id << Stream::eos;
 		_owner->send(st);
 
@@ -782,7 +784,7 @@ void MailBox::listMail( UInt8 cnt, const UInt32 * idlist )
 
 	Mutex::ScopedLock lk(_owner->getMutex());
 
-	Stream st(0xA0);
+	Stream st(REP::MAIL_LIST);
 	st << cnt;
 	for(UInt8 i = 0; i < cnt; ++ i)
 	{
@@ -812,12 +814,12 @@ void MailBox::listMailID( UInt8 start, UInt8 count )
 	start_ *= count;
 	if(start_ >= _mailBox.size())
 	{
-		Stream st(0xA6);
+		Stream st(REP::MAIL_ID_LIST);
 		st << start << static_cast<UInt8>(0) << countMail() << Stream::eos;
 		_owner->send(st);
 		return;
 	}
-	Stream st(0xA6);
+	Stream st(REP::MAIL_ID_LIST);
 	st << start << static_cast<UInt8>(0) << countMail();
 	std::deque<Mail *>::iterator it = _mailBox.begin() + start_;
 	UInt8 cnt = 0;
@@ -837,7 +839,7 @@ void MailBox::listMailID( UInt8 start, UInt8 count )
 
 void MailBox::updateMail( Mail * mail )
 {
-	Stream st(0xA5);
+	Stream st(REP::MAIL_CHANGE);
 	st << mail->id << mail->sender << mail->recvTime << mail->flag << mail->title << mail->content << mail->additional << Stream::eos;
 	_owner->send(st);
 	char title2[128], content2[4096];
@@ -850,7 +852,7 @@ void MailBox::notifyNewMail()
 {
 	Mutex::ScopedLock lk(_owner->getMutex());
 
-	Stream st(0xA4);
+	Stream st(REP::MAIL_NEW);
 	st << _newMails << Stream::eos;
 	_owner->send(st);
 }

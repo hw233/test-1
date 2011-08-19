@@ -6,6 +6,7 @@
 #include "DB/DBConnectionMgr.h"
 #include "DB/DBExecHelper.h"
 #include "Common/StringTokenizer.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -92,7 +93,7 @@ void Announce::process( UInt32 curtime )
 		if(it->first > curtime)
 			return;
 		AnnItem& ai = it->second;
-		Stream st(0xF7);
+		Stream st(REP::SYSTEM_INFO);
 		st << static_cast<UInt8>(ai.type + 0x10) << ai.text << Stream::eos;
 		NETWORK()->Broadcast(st);
 		UInt32 cnt = (curtime - it->first) / ai.interval + 1;

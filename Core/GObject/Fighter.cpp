@@ -3,6 +3,7 @@
 #include "Country.h"
 #include "TaskMgr.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Clan.h"
 #include "Package.h"
@@ -94,7 +95,7 @@ UInt16 Fighter::getWeaponAttack()
 {
     //TODO
 	static UInt16 atk_enc[] = {0, 10, 20, 40, 60, 100, 200, 300, 450, 600, 800, 1050, 1500};
-	return _weapon ? atk_enc[_weapon->getItemEquipData().enchant] : 0;
+	return _weapon ? (atk_enc[_weapon->getItemEquipData().enchant]) : 0;
 }
 
 void Fighter::getArmorDefendAndHP(UInt16& def, UInt16& hp)
@@ -389,7 +390,7 @@ void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << _acupoints[idx] << getSoul() << getMaxSoul();
     if (writedb)
@@ -405,7 +406,7 @@ void Fighter::sendModification( UInt8 t, UInt16 value, int idx, bool writedb)
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << value;
     if (writedb)
@@ -420,7 +421,7 @@ void Fighter::sendModificationUpSkill( UInt8 t, UInt16 skill, int idx, bool writ
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << skill;
     if (writedb)
@@ -435,7 +436,7 @@ void Fighter::sendModificationSkills( UInt8 t, UInt16 skill, int idx, bool write
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << skill;
     if (writedb)
@@ -450,7 +451,7 @@ void Fighter::sendModificationUpCitta( UInt8 t, UInt16 citta, int idx, bool writ
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << citta;
     if (writedb)
@@ -465,7 +466,7 @@ void Fighter::sendModificationCittas( UInt8 t, UInt16 citta, int idx, bool write
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << citta;
     if (writedb)
@@ -481,7 +482,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << n;
 	for(UInt8 i = 0; i < n; ++ i)
 	{
@@ -513,7 +514,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << n;
 	for(UInt8 i = 0; i < n; ++ i)
 	{
@@ -1497,7 +1498,9 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
-        ++_praadd; // 每一层级+1
+
+        if (v < 3)
+            ++_praadd; // 第3层不加
 
         _acupoints[idx] = v;
         _attrDirty = true;
@@ -1786,7 +1789,7 @@ void Fighter::setUpCittas( std::string& citta, bool writedb )
     StringTokenizer tk(citta, ",");
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        upCitta(::atoi(tk[i].c_str()), i, writedb, true);
+        upCitta(::atoi(tk[i].c_str()), i, writedb);
     }
 }
 
@@ -1803,7 +1806,7 @@ int Fighter::isCittaUp( UInt16 citta )
     return -1;
 }
 
-bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
+bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 {
     if (!citta)
         return false;
@@ -1823,7 +1826,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
     int src = isCittaUp(citta);
     if (src < 0)
     {
-        if (!init && (cb->needsoul > getMaxSoul() - getSoul()))
+        if (cb->needsoul > getMaxSoul() - getSoul())
             return false;
 
         if (idx < getUpCittasNum()) // XXX: no we all append
@@ -1834,7 +1837,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
                     _citta[j] = _citta[j-1];
                     _citta[j-1] = 0;
                     if (_citta[j])
-                        sendModification(0x62, _citta[j], j, false);
+                        sendModification(0x62, _citta[j], j, writedb);
                 }
             }
         } else
@@ -1852,7 +1855,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
         {
             if (_citta[idx])
             { // swap
-                sendModification(0x62, _citta[idx], src, false);
+                sendModification(0x62, _citta[idx], src, writedb);
 
                 _citta[src] ^= _citta[idx];
                 _citta[idx] ^= _citta[src];
@@ -1865,7 +1868,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
         { // upgrade
             if (_citta[idx] != citta)
             {
-                if (!init && (cb->needsoul > getMaxSoul() - getSoul()))
+                if (cb->needsoul > getMaxSoul() - getSoul())
                     return false;
 
                 // XXX: do not send message to client
@@ -1880,7 +1883,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb, bool init )
     {
         addSkillsFromCT(skillFromCitta(citta), writedb);
 
-        if (!init)
         {
             soul += cb->needsoul;
             if (cb->needsoul)
@@ -2147,7 +2149,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
         { // upgrade
             int i = isCittaUp(citta);
             if (i >= 0)
-                upCitta(citta, i, writedb, init);
+                upCitta(citta, i, writedb);
             _cittas[idx] = citta;
             op = 3;
         }

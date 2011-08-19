@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Country.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Fighter.h"
 #include "Package.h"
@@ -992,7 +993,7 @@ namespace GObject
 			}
 		}
 
-		Stream st(0x33);
+		Stream st(REP::PACK_USE);
 		st << id << static_cast<UInt8>(1) << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
 		m_Owner->send(st);
 
@@ -1003,6 +1004,15 @@ namespace GObject
 		SYSMSG_SENDV(104, player, itemid);
 		SYSMSG_SENDV(1004, player, itemid);		
 	}
+
+    UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
+    {
+		ItemBase * item = FindItem(itemid, bind);
+        if (item) {
+            return item->GetCareer();
+        }
+        return 0;
+    }
 
 	bool Package::UseTaskItem(UInt32 id, UInt8 bind)
 	{
@@ -1021,7 +1031,7 @@ namespace GObject
 			ret = GameAction()->RunItemTaskUse(m_Owner, id);
 		}
 
-		Stream st(0x33);
+		Stream st(REP::PACK_USE);
 		st << id << token << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
 		m_Owner->send(st);
 
@@ -1180,7 +1190,7 @@ namespace GObject
 	void Package::SendPackageItemInfor()
 	{
 		ItemCont::iterator cit = m_Items.begin();
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(0);
 		UInt16 count = 0;
 		for (; cit != m_Items.end(); ++cit)
@@ -1226,7 +1236,7 @@ namespace GObject
 
 	void Package::SendSingleEquipData(ItemEquip * equip)
 	{
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(1);
 		AppendEquipData(st, equip);
 		st << Stream::eos;
@@ -1235,14 +1245,14 @@ namespace GObject
 
 	void Package::SendDelEquipData(ItemEquip * equip)
 	{
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(1) << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0) << static_cast<UInt16>(0) << Stream::eos;
 		m_Owner->send(st);
 	}
 
 	void Package::SendItemData(ItemBase * item)
 	{
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(1);
 		AppendItemData(st, item);
 		st << Stream::eos;
@@ -2262,6 +2272,13 @@ namespace GObject
 	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect )
 	{
 		// if (t > 2) return 2;
+		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
+		if(m_Owner->getTael() < amount)
+		{
+			m_Owner->sendMsgCode(0, 2009);
+			return 1;
+		}
+
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;

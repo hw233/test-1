@@ -78,7 +78,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	}
 	player->Login();
 
-	Stream st(0x10);
+	Stream st(REP::LOGIN);
 	st << static_cast<UInt32>(0) << player->getName() << Stream::eos;
 	TcpConnection conn = NETWORK()->GetConn(player->GetSessionID());
 	if(conn.get() == NULL)
@@ -97,7 +97,7 @@ void PlayerReconnect( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	player->Reconnect();
-	Stream st(0x01);
+	Stream st(REP::RECONNECT);
 	st << static_cast<UInt8>(0) << Stream::eos;
 	player->send(&st[0], st.size());
 }
