@@ -80,11 +80,18 @@ CREATE TABLE `athletics_rank` (
   `maxRank` smallint(4) NOT NULL DEFAULT '0',
   `challengeNum` tinyint(1) NOT NULL DEFAULT '0',
   `challengeTime` int(10) NOT NULL DEFAULT '0',
-  `boxColor` tinyint(1) NOT NULL DEFAULT '0',
-  `boxType` tinyint(1) NOT NULL DEFAULT '0',
-  `boxCount` int(10) NOT NULL DEFAULT '0',
-  `boxFlushTime` int(10) NOT NULL DEFAULT '0',
+  /*`boxColor` tinyint(1) NOT NULL DEFAULT '0',*/
+  /*`boxType` tinyint(1) NOT NULL DEFAULT '0',*/
+  /*`boxCount` int(10) NOT NULL DEFAULT '0',*/
+  /*`boxFlushTime` int(10) NOT NULL DEFAULT '0',*/
+  `prestige`  int(10) NOT NULL DEFAULT '0',
   `winStreak` tinyint(1) NOT NULL DEFAULT '0',
+  `bewinstreak` tinyint(1) NOT NULL DEFAULT '0',
+  `failstreak` tinyint(1) NOT NULL DEFAULT '0',
+  `befailstreak` tinyint(1) NOT NULL DEFAULT '0',
+  `oldrank` int(10) NOT NULL DEFAULT '0',
+  `first4rank` tinyint(10) NOT NULL DEFAULT '0',
+  `extrachallenge` tinyint(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -103,8 +110,8 @@ CREATE TABLE `athletics_record` (
   `repid` int(10) NOT NULL,
   `time` int(10) NOT NULL,
   `winSide` tinyint(1) NOT NULL DEFAULT '0',
-  `awardType` tinyint(1) NOT NULL DEFAULT '0',
-  `awardAtkerCount` int(10) NOT NULL DEFAULT '0',
+  /*`awardType` tinyint(1) NOT NULL DEFAULT '0',*/
+  /*`awardAtkerCount` int(10) NOT NULL DEFAULT '0',*/
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

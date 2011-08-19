@@ -1403,7 +1403,7 @@ namespace GObject
 		Player * atker, *defer;
 		atker = defer = NULL;
 		DBAthleticsRecordData drd;
-		if(execu->Prepare("SELECT `id`, `atker`, `defer`, `repid`, `time`, `winSide`, `awardType`, `awardAtkerCount` FROM `athletics_record` ORDER BY `time` desc", drd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `atker`, `defer`, `repid`, `time`, `winSide` FROM `athletics_record` ORDER BY `time` desc", drd) != DB::DB_OK)
 			return false;
 		lc.reset(2000);
 		bool ret1, ret2;
@@ -1414,8 +1414,8 @@ namespace GObject
 			defer = globalPlayers[drd.defer];
 			if (atker == NULL || defer == NULL)
 				continue;
-			ret1 = atker->GetAthletics()->addAthleticsDataFromDB(drd.id, 0, defer, drd.winSide, drd.awardType, drd.awardAtkerCount, drd.repid, drd.time);
-			ret2 = defer->GetAthletics()->addAthleticsDataFromDB(drd.id, 1, atker, drd.winSide, drd.awardType, drd.awardAtkerCount, drd.repid, drd.time);
+			ret1 = atker->GetAthletics()->addAthleticsDataFromDB(drd.id, 0, defer, drd.winSide, drd.repid, drd.time);
+			ret2 = defer->GetAthletics()->addAthleticsDataFromDB(drd.id, 1, atker, drd.winSide, drd.repid, drd.time);
 			if (!ret1 && !ret2)
 			{
 				DB().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", drd.id);
@@ -1479,7 +1479,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `boxColor`, `boxType`, `boxCount`, `boxFlushTime`, `winStreak` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1497,12 +1497,19 @@ namespace GObject
 			data->challengenum = dbd.challengeNum;
 			data->challengetime = dbd.challengeTime;
 			//data->boxid = dbd.boxId;
-			data->awardType = dbd.boxtype;
-			data->awardCount = dbd.boxcount;
-			data->boxcolor = dbd.boxcolor;
-			data->boxflushtime = dbd.boxFlushTime;
+			//data->awardType = dbd.boxtype;
+			//data->awardCount = dbd.boxcount;
+			//data->boxcolor = dbd.boxcolor;
+			//data->boxflushtime = dbd.boxFlushTime;
 			//AthleticsRank::buildBoxAward(data->boxid, data->awardType, data->awardCount, data->awardName);
-			data->winstreak = dbd.winStreak;
+            data->prestige = dbd.prestige;
+			data->winstreak = dbd.winstreak;
+            data->bewinstreak = dbd.bewinstreak;
+            data->failstreak = dbd.failstreak;
+            data->befailstreak = dbd.befailstreak;
+            data->oldrank = dbd.oldrank;
+            data->first4rank = dbd.first4rank;
+            data->extrachallenge = dbd.extrachallenge;
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
 		lc.finalize();

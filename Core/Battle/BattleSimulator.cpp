@@ -426,7 +426,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         if(skill && skill->cond == GData::SKILL_PEERLESS)
         {
             aura_factor = bf->getAura() / 100;
-            setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
         }
 
 		if(!enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
@@ -1542,6 +1541,10 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
     }
 
+    if(skill && skill->cond == GData::SKILL_PEERLESS)
+    {
+        setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
+    }
 
     int self_side = bf->getSide() == target_side ? 25 : 0;
     appendToPacket( bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), cs, pr, defList, defCount, scList, scCount);

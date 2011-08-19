@@ -243,7 +243,7 @@ void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
 	switch(clr._type)
 	{
 	case 0:
-		GObject::clanCache.listAll(player, clr._startidx, clr._count);
+		GObject::clanCache.listAll(player, clr._startidx, clr._count, clr._flag);
 		return;
 	case 1:
 		clan = GObject::globalNamedClans[player->getCountry()][player->fixName(clr._name)];
@@ -293,7 +293,14 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		player->send(st);
 		return;
     }
-	if(player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL || player->getCountry() > 1)
+    if(player->getCountry() > 1)
+    {
+		Stream st(0x92);
+		st << static_cast<UInt8>(5) << Stream::eos;
+		player->send(st);
+		return;
+    }
+	if(player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL)
 	{
 		Stream st(0x92);
 		st << static_cast<UInt8>(1) << Stream::eos;

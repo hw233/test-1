@@ -15,6 +15,7 @@
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Network/TcpServerWrapper.h"
 #include "Server/OidGenerator.h"
+#include "GObject/AthleticsRank.h"
 
 using namespace GObject;
 
@@ -101,6 +102,16 @@ namespace Script
 		CLASS_DEF(GameActionLua, GetGreatFighterLev);
 		CLASS_DEF(GameActionLua, GetGreatFighterCorlor);
         CLASS_DEF(GameActionLua, GetSharpDay);
+        CLASS_DEF(GameActionLua, AddAthleticsEvent);
+        CLASS_DEF(GameActionLua, getChallengeNum);
+        CLASS_DEF(GameActionLua, getAthleticsRank);
+        CLASS_DEF(GameActionLua, getAthleticsPrestige);
+        CLASS_DEF(GameActionLua, getAthleticsRankUpADay);
+        CLASS_DEF(GameActionLua, getAthleticsWinStreak);
+        CLASS_DEF(GameActionLua, getAthleticsBeWinStreak);
+        CLASS_DEF(GameActionLua, getAthleticsFailStreak);
+        CLASS_DEF(GameActionLua, getAthleticsBeFailStreak);
+        CLASS_DEF(GameActionLua, setAthleticsPrestige);
 
 		CLASS_ADD(Player);
 		CLASS_DEF(Player, getPName);
@@ -825,7 +836,7 @@ namespace Script
 	void GameActionLua::onLevelup( Player* player, UInt8 olev, UInt8 nlev )
 	{
 		Call<void>("onLevelup", player, olev, nlev);
-        doAttainment(player, 1000, nlev);
+        doAttainment(player, 10001, nlev);
 	}
 
 	void GameActionLua::onEnchant( Player* player, UInt8 level )
@@ -886,6 +897,83 @@ namespace Script
     }
     void GameActionLua::finishAttainment(Player* pl, UInt16 attainId)
     {
-        call<void>("finishAttainment", pl, attainId);
+        Call<void>("finishAttainment", pl, attainId);
     }
+
+    // ¾º¼¼³¡
+    void GameActionLua::RunAthleticsEvent(UInt8 row, Player* player1, Player* player2, bool win)
+    {
+        Call<void>("RunAthleticsEvent", row, player1, player2, win);
+    }
+
+    UInt32 GameActionLua::AddAthleticsEvent(UInt8 row, Player* player1, Player* player2, UInt8 cond, UInt8 itemCount, UInt32 itemId)
+    {
+        return GObject::gAthleticsRank.addAthleticsEventData(row, player1, player2, cond, itemCount, itemId);
+    }
+
+    UInt8 GameActionLua::getChallengeNum(Player* player)
+    {
+        return GObject::gAthleticsRank.getChallengeNum(player);
+    }
+
+    UInt32 GameActionLua::getAthleticsRank(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsRank(player);
+    }
+
+    UInt32 GameActionLua::getAthleticsPrestige(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsPrestige(player);
+    }
+
+    UInt32 GameActionLua::getAthleticsRankUpADay(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsRankUpADay(player);
+    }
+
+    UInt8 GameActionLua::getAthleticsWinStreak(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsWinStreak(player);
+    }
+
+    UInt8 GameActionLua::getAthleticsBeWinStreak(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsBeWinStreak(player);
+    }
+
+    UInt8 GameActionLua::getAthleticsFailStreak(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsFailStreak(player);
+    }
+
+    UInt8 GameActionLua::getAthleticsBeFailStreak(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsBeFailStreak(player);
+    }
+
+    UInt32 GameActionLua::setAthleticsPrestige(Player* player, UInt32 prestige)
+    {
+        return GObject::gAthleticsRank.setAthleticsPrestige(player, prestige);
+    }
+
+    UInt32 GameActionLua::getAthleticsFirst4Rank(Player* player, UInt32 first4rank)
+    {
+        return GObject::gAthleticsRank.getAthleticsFirst4Rank(player, first4rank);
+    }
+
+    UInt32 GameActionLua::setAthleticsFirst4Rank(Player* player, UInt32 first4rank)
+    {
+        return GObject::gAthleticsRank.setAthleticsFirst4Rank(player, first4rank);
+    }
+
+    UInt32 GameActionLua::getAthleticsExtraChallenge(Player* player)
+    {
+        return GObject::gAthleticsRank.getAthleticsExtraChallenge(player);
+    }
+
+    UInt32 GameActionLua::setAthleticsExtraChallenge(Player* player, UInt32 extrachallenge)
+    {
+        return GObject::gAthleticsRank.setAthleticsExtraChallenge(player, extrachallenge);
+    }
+
 }

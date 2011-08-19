@@ -152,6 +152,25 @@ namespace Script
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
 
+        // ¾º¼¼³¡
+        void RunAthleticsEvent(UInt8 row, Player* player1, Player* player2, bool win);
+        UInt32 AddAthleticsEvent(UInt8 row, Player* player1, Player* player2, UInt8 cond, UInt8 itemCount, UInt32 itemId);
+
+        UInt8 getChallengeNum(Player *);
+        UInt32 getAthleticsRank(Player*);
+        UInt32 getAthleticsPrestige(Player*);
+        UInt8 getAthleticsWinStreak(Player*);
+        UInt8 getAthleticsBeWinStreak(Player*);
+        UInt8 getAthleticsFailStreak(Player*);
+        UInt8 getAthleticsBeFailStreak(Player*);
+        UInt32 setAthleticsPrestige(Player*, UInt32 prestige);
+
+        UInt32 getAthleticsRankUpADay(Player*);
+        UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
+        UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
+
+        UInt32 getAthleticsExtraChallenge(Player* player);
+        UInt32 setAthleticsExtraChallenge(Player* player, UInt32 extrachallenge);
 
 	public:
 

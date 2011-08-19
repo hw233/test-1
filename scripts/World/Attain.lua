@@ -145,8 +145,8 @@ end
 
 
 local attain_table = {
-    [1000] = OnLevelUpAttain,        -- 1000 到 1006 为升级成就
-    [1007] = OnIncarnationAttain
+    [10001] = OnLevelUpAttain,        -- 1000 到 1006 为升级成就
+    [10008] = OnIncarnationAttain
 }
 
 

@@ -242,14 +242,14 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
 	if(awd->side == 0)
-		player->GetAthletics()->defendergainsource(awd->other, awd->athleticsid, awd->type, awd->count, awd->color);
+		player->GetAthletics()->defendergainsource(awd->other, awd->athleticsid, awd->type, awd->count);
 	else
 	{
 		if(awd->side > 1)
 			player->notifyFriendAct(8, awd->side - 1);
 		//if(World::_newYearStage == 9)
 		//	awd->count = GameAction()->onAttakerAddexp(player, awd->other, awd->count);
-		player->GetAthletics()->attackergainsource(awd->athleticsid, awd->type, awd->count, awd->color);
+		player->GetAthletics()->attackergainsource(awd->athleticsid, awd->type, awd->count);
 		if(World::_activityStage > 0 && awd->win)
 			GameAction()->onAthleticWin(player);
 	}

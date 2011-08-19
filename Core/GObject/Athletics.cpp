@@ -42,21 +42,21 @@ void Athletics::enterAthleticsNotify(UInt8 row)
 	{
 		SYSMSG(title, 318);
 		SYSMSGV(content, 320);
-		_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
+		//_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
 	}
 	else if (row == 1)
 	{
 		SYSMSG(title, 318);
 		SYSMSGV(content, 321);
-		_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
+		//_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
 	}
 }
 
-bool Athletics::addAthleticsDataFromDB(UInt32 id, UInt8 side, Player * target, UInt8 winSide, UInt8 awardType, UInt32 awardCount, UInt32 repid, UInt32 time)
+bool Athletics::addAthleticsDataFromDB(UInt32 id, UInt8 side, Player * target, UInt8 winSide, UInt32 repid, UInt32 time)
 {
 	if (_athleticses.size() >= 15)
 		return false;
-	AthleticsData * data = new AthleticsData(id, side, target, winSide, awardType, awardCount, repid, time);
+	AthleticsData * data = new AthleticsData(id, side, target, winSide, repid, time);
 	_athleticses.push_front(data);
 	return true;
 }
@@ -72,8 +72,8 @@ UInt32 Athletics::addAthleticsData(UInt8 side, Player * target, UInt8 win, UInt3
 	data->target = target;
 	data->reptid = repid;
 	data->time = now;
-	data->awardType = 0xFF;
-	data->awardCount = 0;
+	//data->awardType = 0xFF;
+	//data->awardCount = 0;
 	if (_athleticses.size() >= 15)
 	{
 		AthleticsData * del = _athleticses.front();
@@ -90,7 +90,7 @@ UInt32 Athletics::addAthleticsData(UInt8 side, Player * target, UInt8 win, UInt3
 
 void Athletics::addAthleticsDataFromTarget(UInt8 side, Player * target, UInt32 id, UInt8 win, UInt32 repid, UInt32 now)
 {
-	AthleticsData * data = new(std::nothrow) AthleticsData(id, side, target, win, 0xFF, 0, repid, now);
+	AthleticsData * data = new(std::nothrow) AthleticsData(id, side, target, win, repid, now);
 	if (data == NULL)
 		return ;
 	if (_athleticses.size() >= 15)
@@ -107,6 +107,8 @@ void Athletics::addAthleticsDataFromTarget(UInt8 side, Player * target, UInt32 i
 
 void Athletics::notifyAthleticsData(UInt16 count)
 {
+    return;
+#if 0
 	if (count > static_cast<UInt16>(_athleticses.size()))
 		count = static_cast<UInt16>(_athleticses.size());
 
@@ -119,15 +121,32 @@ void Athletics::notifyAthleticsData(UInt16 count)
 	}
 	st << Stream::eos;
 	_owner->send(st);
+#endif
 }
 
 void Athletics::notifyAthleticsData2(AthleticsData * data)
 {
+    return;
+#if 0
 	Stream st(0xD1);
 	st << static_cast<UInt16>(1);
 	st << data->side << data->win << data->awardType << data->awardCount << data->target->getName() << data->target->getCountry() << data->time << data->reptid;
 	st << Stream::eos;
 	_owner->send(st);
+#endif
+}
+
+void Athletics::appendAthleticsReport(Stream& st, UInt8 count)
+{
+	if (count > static_cast<UInt16>(_athleticses.size()))
+		count = static_cast<UInt16>(_athleticses.size());
+
+	std::deque<AthleticsData *>::reverse_iterator rit = _athleticses.rbegin();
+	st << count;
+	for (UInt16 i = 0; rit != _athleticses.rend() && i < count; ++rit, ++count)
+	{
+		st << (*rit)->target->getName() << (*rit)->target->getCountry() << static_cast<UInt8>((*rit)->win == (*rit)->side) << (*rit)->reptid;
+	}
 }
 
 void Athletics::notifyAthleticsData2(UInt32 id)
@@ -278,6 +297,8 @@ void Athletics::notifyAttackRes(Player *, bool win)
 
 void Athletics::updateAthleticsAwardData(UInt32 id, UInt8 type, UInt32 value)
 {
+    return;
+#if 0
 	std::deque<AthleticsData *>::reverse_iterator found = _athleticses.rbegin();
 	for (; found != _athleticses.rend(); ++ found)
 	{
@@ -290,10 +311,13 @@ void Athletics::updateAthleticsAwardData(UInt32 id, UInt8 type, UInt32 value)
 		(*found)->awardCount = value;
 		notifyAthleticsData2(*found);
 	}
+#endif
 }
 
-void Athletics::defendergainsource(Player * atker, UInt32 id, UInt8 type, UInt32 award, UInt8 color)
+void Athletics::defendergainsource(Player * atker, UInt32 id, UInt8 type, UInt32 award)
 {
+    return;
+#if 0
 	const static UInt32 Index1[]  = {315, 339, 316, 317, 356};
 	const static UInt32 Index2[]  = {340, 341, 342, 357};
 
@@ -308,24 +332,31 @@ void Athletics::defendergainsource(Player * atker, UInt32 id, UInt8 type, UInt32
 	_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
 	//AddUserSource(_owner, type, award);
 	updateAthleticsAwardData(id, type, award);
+#endif
 }
 
-void Athletics::attackergainsource(UInt32 id, UInt8 type, UInt32 award, UInt8 color)
+void Athletics::attackergainsource(UInt32 id, UInt8 type, UInt32 award)
 {
+    return;
+#if 0
 	if (type == 0xFF)
 		return notifyAthleticsData2(id);
 
 	AddUserSource(_owner, type, award, true);
 	updateAthleticsAwardData(id, type, award);
+#endif
 }
 
 void Athletics::GetBoxAddSourceNotify(UInt8 type, UInt32 count)
 {
+    return;
 	AddUserSource(_owner, type, count);
 }
 
 void Athletics::AddUserSource(Player *player, UInt8 type, UInt32 count, bool delay)
 {
+    return;
+
 	switch(type)
 	{
 		case 0:
@@ -366,6 +397,8 @@ void Athletics::AddUserSource(Player *player, UInt8 type, UInt32 count, bool del
 
 bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 {
+    return false;
+
 	if(EquipId == 0 || rank < 1 || rank > 10)
 		return false;//error
 

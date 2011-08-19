@@ -44,7 +44,7 @@ namespace GObject
         }
 
         PracticeData* p = getPracticeData(pl);
-        if (p && p->cdend > TimeUtil::Now())
+        if (place != PPLACE_MAX && p && p->cdend > TimeUtil::Now())
         {
             st << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);

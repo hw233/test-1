@@ -2504,11 +2504,20 @@ bool clanEnum(Clan * clan, EnumStruct * es)
 	return true;
 }
 
-void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt )
+void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt, UInt8 cny )
 {
-	UInt8 cny = player->getCountry();
+	//UInt8 cny = player->getCountry();
 	Stream st(0x90);
-	UInt16 sz = globalClansByCountry[cny].size();
+    UInt16 sz = 0;
+    if(cny > 1)
+    {
+        sz = globalClans.size();
+    }
+    else
+    {
+        sz = globalClansByCountry[cny].size();
+    }
+
 	if(idx >= sz)
 	{
 		idx = sz;
@@ -2523,7 +2532,10 @@ void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt )
 	st << sz << idx << cnt;
 
 	EnumStruct es = {st, 0, idx, static_cast<UInt16>(idx + cnt)};
-	globalClansByCountry[cny].enumerate(clanEnum, &es);
+    if(cny > 1)
+        globalClans.enumerate(clanEnum, &es);
+    else
+        globalClansByCountry[cny].enumerate(clanEnum, &es);
 	st << Stream::eos;
 	player->send(st);
 }

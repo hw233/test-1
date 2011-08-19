@@ -43,23 +43,58 @@ struct AthleticsRankData
 	UInt32	maxrank;
 	UInt8	challengenum;
 	UInt32	challengetime;
-	UInt32	boxflushtime;
-	UInt8   boxcolor;
-	UInt8	awardType;
-	UInt32	awardCount;
-	UInt8	winstreak;	
+	//UInt32	boxflushtime;
+	//UInt8   boxcolor;
+	//UInt8	awardType;
+	//UInt32	awardCount;
+    UInt32  prestige;
+	UInt8	winstreak;
+    UInt8   bewinstreak;
+    UInt8   failstreak;
+    UInt8   befailstreak;
+    UInt32  oldrank;
+    UInt32  first4rank;
+    UInt32  extrachallenge;
+    // 0x1 第一次成为竞技场第一
+    // 0x2 第一次杀入竞技场二强
+    // 0x4 第一次杀入竞技场三强
+    // 0x8 第一次杀入竞技场10强
+    // 0x10 第一次杀入竞技场100强
+    // 0x20 第一次杀入竞技场200强
+    // 0x40 第一次杀入竞技场300强
+    // 0x80 第一次竞技场挑战
+    // 0x100 一天内提升100个排名
+    // 0x200 一天内提升10个排名
+    // 0x400 一天内提升50个排名
 };
 
 struct AthleticsAward
 {
 	UInt32 athleticsid;
-	UInt8 color;
+	//UInt8 color;
 	UInt8 type;
 	UInt8 side;
 	bool win;
 	UInt32 count;
 	Player *other;
 };
+
+struct AthleticsEventData
+{
+	UInt32 id;
+    Player* player1;
+    Player* player2;
+    UInt8  cond;
+    UInt8  itemCount;
+    UInt32 itemId;
+	UInt32 time;
+
+	AthleticsEventData() { memset(this, 0x00, sizeof(*this));}
+	AthleticsEventData(UInt32 id_, Player* player1_, Player* player2_, UInt8 cond_, UInt8 itemCount_ = 0, UInt32 itemId_ = 0, UInt32 time_ = TimeUtil::Now())
+		: id(id_), player1(player1_), player2(player2_), cond(cond_), itemCount(itemCount_), itemId(itemId_), time(time_) {}
+};
+
+
 
 static const UInt16 TimeOutbyColor[] = {2 * 60 * 60, 4 * 60 * 60, 6 * 60 * 60, 6 * 60 * 60};//宝箱的时间 绿色:2小时 蓝色:4小时 紫色:6小时 橙色:6小时
 //static const UInt8 PLUND_RATE = 3;
@@ -88,6 +123,11 @@ public:
 	void notifyAthletcisOver(Player *, Player *, UInt32, bool);
 	void notifyAthletcisBoxFlushTime(Player *);
 
+    void broadcastAthleticsEvent(UInt8 count);
+    bool addAthleticsEventDataFromDB(UInt8 row, UInt32 id, Player* player1, Player* player2, UInt8 cond, UInt8 itemCount, UInt32 itemId, UInt32 time);
+    UInt32 addAthleticsEventData(UInt8 row, Player* player1, Player* player2,UInt8 cond, UInt8 itemCount, UInt32 itemId);
+    void requestAthleticsEvent(Player * player);
+
 protected:
 	void getRandomEquip(UInt8 level, UInt16 rank, UInt16& EquipId, UInt16& cnt);
 	void BuildNewBox(Rank &it_rank);
@@ -105,6 +145,21 @@ public:
 	void GetBoxSourceReq(Player *owner);
 
 	UInt8 getChallengeNum(Player *);
+    UInt32 getAthleticsRank(Player*);
+    UInt32 getAthleticsPrestige(Player*);
+    UInt8 getAthleticsWinStreak(Player*);
+    UInt8 getAthleticsBeWinStreak(Player*);
+    UInt8 getAthleticsFailStreak(Player*);
+    UInt8 getAthleticsBeFailStreak(Player*);
+
+    UInt32 getAthleticsRankUpADay(Player* player);
+
+    UInt32 getAthleticsExtraChallenge(Player* player);
+    UInt32 setAthleticsExtraChallenge(Player* player, UInt32 extrachallenge);
+
+    UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
+    UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
+    UInt32 setAthleticsPrestige(Player*, UInt32 prestige);
 
 public:
 	void TmExtraAward();
@@ -161,6 +216,8 @@ private:
 	RankList		_ranks[2];
 	AthleticsList	_athleticses[2];
 	UInt32			_maxRank[2];	//用于纪录最大位置序号
+
+	std::deque<AthleticsEventData *> _athleticsesEvent[2];
 };
 
 extern AthleticsRank gAthleticsRank;
