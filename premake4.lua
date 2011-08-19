@@ -51,7 +51,7 @@ solution "HoHH"
 
     configuration { "Release", "not vs*" }
         flags "Symbols"
-	buildoptions "-march=native"
+	-- buildoptions "-march=native" -- for suse
 
     configuration "Release"
         flags { "OptimizeSpeed", "FloatFast",  }
