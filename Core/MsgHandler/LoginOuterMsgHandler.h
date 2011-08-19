@@ -173,6 +173,14 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	if(conn.get() == NULL)
 		return;
 
+    if (cfg.enableLoginLimit && LOGIN().Current() >= cfg.loginLimit)
+    {
+		UserLogonRepStruct rep;
+		rep._result = 5;
+		NETWORK()->SendMsgToClient(conn.get(), rep);
+        return;
+    }
+
 	if(ul._userid == 0)
 		conn->closeConn();
 

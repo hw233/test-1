@@ -52,6 +52,9 @@ public:
 	std::string arenaHost;
 	UInt16      arenaPort;
 
+    bool enableLoginLimit;
+    UInt16 loginLimit;
+
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	inline void setScriptPath(const char * p) {scriptPath = p;}
@@ -75,6 +78,8 @@ public:
 	inline void setGMCheck(bool c) { GMCheck = c; }
 	inline void setArenaServer(const char * h, UInt16 p) { arenaHost = h; arenaPort = p; }
 	inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }
+	inline void setLoginLimit(bool limit) { enableLoginLimit = limit; }
+	inline void setLoginMax(UInt16 max) { loginLimit = max; }
 
 	bool isAdminIPAllowed(UInt32);
 
