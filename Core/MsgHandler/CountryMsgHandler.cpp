@@ -1,4 +1,5 @@
 #include "Config.h"
+#include "MsgID.h"
 #include "CountryMsgHandler.h"
 #include "CountryOuterMsgHandler.h"
 #include "CountryInnerMsgHandler.h"
@@ -6,30 +7,28 @@
 MSG_HANDLER_DECLARE(CountryMsgHandler)
 
 MSG_REG(GameMsgHdr, OnNullReq);
-MSG_REG_2(GameMsgHdr, 0x0C, OnAttainReq);
+MSG_REG_2(GameMsgHdr, REQ::ACHIEVEMENT, OnAttainReq);
 MSG_REG(GameMsgHdr, OnSelectCountry);
 MSG_REG(GameMsgHdr, OnPlayerInfoReq);
 MSG_REG(GameMsgHdr, OnNewGuildReq);
-MSG_REG_2(GameMsgHdr, 0x15, OnPlayerInfoChangeReq);
-MSG_REG_2(GameMsgHdr, 0x1A, OnBookStoreListReq);
+MSG_REG_2(GameMsgHdr, REQ::STATE, OnPlayerInfoChangeReq);
+MSG_REG_2(GameMsgHdr, REQ::BOOK_LIST, OnBookStoreListReq);
 MSG_REG(GameMsgHdr, OnPurchaseBookReq);
 MSG_REG(GameMsgHdr, OnStatusChangeReq);
-MSG_REG_2(GameMsgHdr, 0x1D, OnFormationReq);
-MSG_REG_2(GameMsgHdr, 0x1E, OnSetFormationReq);
+MSG_REG_2(GameMsgHdr, REQ::READ_BATTLE, OnFormationReq);
+MSG_REG_2(GameMsgHdr, REQ::BATTLE_CHECK, OnSetFormationReq);
 MSG_REG(GameMsgHdr, OnFighterEquipReq);
 MSG_REG(GameMsgHdr, OnRecruitFighterReq);
-MSG_REG_2(GameMsgHdr, 0x23, OnFighterInfoReq);
-MSG_REG(GameMsgHdr, OnGreatFighterTaskValReq);
-MSG_REG_2(GameMsgHdr, 0x25, OnGreatFighterActionReq);
-MSG_REG_2(GameMsgHdr, 0x26, OnRecruitListReq);
-MSG_REG_2(GameMsgHdr, 0x39, OnTripodReq);
-MSG_REG_2(GameMsgHdr, 0x8B, OnFlushTaskColorReq);
+MSG_REG_2(GameMsgHdr, REQ::HERO_INFO, OnFighterInfoReq);
+MSG_REG_2(GameMsgHdr, REQ::HOTEL_LIST, OnRecruitListReq);
+MSG_REG_2(GameMsgHdr, REQ::TRIPOD_INFO, OnTripodReq);
+MSG_REG_2(GameMsgHdr, REQ::TASK_CYC_REFRESH, OnFlushTaskColorReq);
 MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
 MSG_REG(GameMsgHdr, OnFighterTrain2Req);
 MSG_REG(GameMsgHdr, OnFighterTrainListReq);
-MSG_REG_2(GameMsgHdr, 0x2E, OnFighterTrainOpReq);
+MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);
 MSG_REG(GameMsgHdr, OnTakeOnlineRewardReq);
 MSG_REG(GameMsgHdr, OnEnchantReq);
@@ -40,10 +39,10 @@ MSG_REG(GameMsgHdr, OnDetachGemReq);
 //MSG_REG(GameMsgHdr, OnSplitReq);
 //MSG_REG(GameMsgHdr, OnExchangeReq);
 MSG_REG(GameMsgHdr, OnForgeReq);
-MSG_REG_2(GameMsgHdr, 0x49, OnBatchSplitReq);
+MSG_REG_2(GameMsgHdr, REQ::EQ_DECOMPOSE, OnBatchSplitReq);
 //MSG_REG(GameMsgHdr, OnExchangeSetReq);
 MSG_REG(GameMsgHdr, OnBatchMergeReq);
-//MSG_REG_2(GameMsgHdr, 0x4B, OnBatchMergeReq);
+//MSG_REG_2(GameMsgHdr, REQ::GEM_UPGRADE, OnBatchMergeReq);
 //MSG_REG(GameMsgHdr, OnActivateAttrReq);
 MSG_REG(GameMsgHdr, OutCitySwitchReq);
 MSG_REG(GameMsgHdr, InCitySwitchReq);
@@ -73,14 +72,14 @@ MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 
-MSG_REG_2(GameMsgHdr, 0x68, OnFrontMapReq);
+MSG_REG_2(GameMsgHdr, REQ::FORMATION_DATA, OnFrontMapReq);
 
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
 MSG_REG(GameMsgHdr, OnQueryDayTaskCompletedCountReq);
 MSG_REG(GameMsgHdr, OnQueryPackageItemReq);
-MSG_REG_2(GameMsgHdr, 0x31, OnDestroyItemReq);
-MSG_REG_2(GameMsgHdr, 0x32, OnSellItemReq);
+MSG_REG_2(GameMsgHdr, REQ::PACK_TRIPOD, OnDestroyItemReq);
+MSG_REG_2(GameMsgHdr, REQ::PACK_SELL, OnSellItemReq);
 MSG_REG(GameMsgHdr, OnUseItemReq);
 
 MSG_REG(GameMsgHdr, OnStoreBuyReq);
@@ -102,16 +101,13 @@ MSG_REG(GameMsgHdr, OnSaleSellReq);
 MSG_REG(GameMsgHdr, OnMailListReq);
 MSG_REG(GameMsgHdr, OnMailReq);
 MSG_REG(GameMsgHdr, OnMailClickReq);
-MSG_REG_2(GameMsgHdr, 0xA2, OnMailDelReq);
-MSG_REG_2(GameMsgHdr, 0xA0, OnMailList2Req);
+MSG_REG_2(GameMsgHdr, REQ::MAIL_DELETE, OnMailDelReq);
+MSG_REG_2(GameMsgHdr, REQ::MAIL_LIST, OnMailList2Req);
 MSG_REG(GameMsgHdr, OnMailSendReq);
 
 MSG_REG(GameMsgHdr, OnFriendListReq);
 MSG_REG(GameMsgHdr, OnFriendOpReq);
 MSG_REG(GameMsgHdr, OnFriendActReq);
-
-MSG_REG(GameMsgHdr, OnGreatFighterMetReq);
-MSG_REG(GameMsgHdr, OnGreatFighterInfoReq);
 
 MSG_REG(GameMsgHdr, OnAthleticsDataReq);
 
@@ -119,7 +115,7 @@ MSG_REG(GameMsgHdr, OnBlockBossReq);
 MSG_REG(GameMsgHdr, OnAttackBlockBossReq);
 
 MSG_REG(GameMsgHdr, OnPwdQuestionReq);
-MSG_REG_2(GameMsgHdr, 0xCA, OnOpPwdReq);
+MSG_REG_2(GameMsgHdr, REQ::OP_PWD, OnOpPwdReq);
 MSG_REG(GameMsgHdr, OnLockPwdReq);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);

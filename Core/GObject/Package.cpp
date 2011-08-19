@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Country.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Fighter.h"
 #include "Package.h"
@@ -992,7 +993,7 @@ namespace GObject
 			}
 		}
 
-		Stream st(0x33);
+		Stream st(REP::PACK_USE);
 		st << id << static_cast<UInt8>(1) << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
 		m_Owner->send(st);
 
@@ -1030,7 +1031,7 @@ namespace GObject
 			ret = GameAction()->RunItemTaskUse(m_Owner, id);
 		}
 
-		Stream st(0x33);
+		Stream st(REP::PACK_USE);
 		st << id << token << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
 		m_Owner->send(st);
 
@@ -1189,7 +1190,7 @@ namespace GObject
 	void Package::SendPackageItemInfor()
 	{
 		ItemCont::iterator cit = m_Items.begin();
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(0);
 		UInt16 count = 0;
 		for (; cit != m_Items.end(); ++cit)
@@ -1235,7 +1236,7 @@ namespace GObject
 
 	void Package::SendSingleEquipData(ItemEquip * equip)
 	{
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(1);
 		AppendEquipData(st, equip);
 		st << Stream::eos;
@@ -1244,14 +1245,14 @@ namespace GObject
 
 	void Package::SendDelEquipData(ItemEquip * equip)
 	{
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(1) << equip->getId() << static_cast<UInt8>(equip->GetBindStatus() ? 1 : 0) << static_cast<UInt16>(0) << Stream::eos;
 		m_Owner->send(st);
 	}
 
 	void Package::SendItemData(ItemBase * item)
 	{
-		Stream st(0x30);
+		Stream st(REP::PACK_INFO);
 		st << static_cast<UInt16>(1);
 		AppendItemData(st, item);
 		st << Stream::eos;

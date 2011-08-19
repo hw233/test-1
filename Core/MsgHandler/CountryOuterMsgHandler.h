@@ -2,6 +2,7 @@
 #define _COUNTRYOUTERMSGHANDLER_H_
 
 #include "MsgTypes.h"
+#include "MsgID.h"
 
 #include "GData/Store.h"
 #include "GData/ExpTable.h"
@@ -47,36 +48,36 @@
 struct NullReq
 {
 	UInt32 ticket;
-	MESSAGE_DEF1(0x00, UInt32, ticket);
+	MESSAGE_DEF1(REQ::KEEP_ALIVE, UInt32, ticket);
 };
 
 struct SelectCountry
 {
     UInt8 _country;
-	MESSAGE_DEF1(0x0D, UInt8, _country);
+	MESSAGE_DEF1(REQ::CAMPS_CHOICE, UInt8, _country);
 };
 
 struct NewGuildReq
 {
     UInt16 _step;
-	MESSAGE_DEF1(0x13, UInt16, _step);
+	MESSAGE_DEF1(REQ::NEW_HAND_STEP, UInt16, _step);
 };
 
 struct PlayerInfoReq
 {
-	MESSAGE_DEF(0x14);
+	MESSAGE_DEF(REQ::USER_INFO);
 };
 
 struct PurchaseBookReq
 {
 	UInt8 _pos;
-	MESSAGE_DEF1(0x1B, UInt8, _pos);
+	MESSAGE_DEF1(REQ::BOOK_BUY, UInt8, _pos);
 };
 
 struct StatusChangeReq
 {
 	UInt8 _id;
-	MESSAGE_DEF1(0x16, UInt8, _id);
+	MESSAGE_DEF1(REQ::STATE_CHANGE, UInt8, _id);
 };
 
 struct FighterEquipReq
@@ -84,50 +85,50 @@ struct FighterEquipReq
 	UInt32 _id;
 	UInt8 _part;
 	UInt32 _equipId;
-	MESSAGE_DEF3(0x21, UInt32, _id, UInt8, _part, UInt32, _equipId);
+	MESSAGE_DEF3(REQ::CHANGE_EQ, UInt32, _id, UInt8, _part, UInt32, _equipId);
 };
 
 struct RecruitFighterReq
 {
 	UInt8 _pos;
-	MESSAGE_DEF1(0x22, UInt8, _pos);
+	MESSAGE_DEF1(REQ::HIRE_HERO, UInt8, _pos);
 };
 
 struct FighterDismissReq
 {
 	UInt32	_fgtid;
-	MESSAGE_DEF1(0x27, UInt32, _fgtid);
+	MESSAGE_DEF1(REQ::FIRE_HERO, UInt32, _fgtid);
 };
 
 struct FighterRegenReq
 {
 	UInt32	_fgtid;
-	MESSAGE_DEF1(0x29, UInt32, _fgtid);
+	MESSAGE_DEF1(REQ::ADD_HP, UInt32, _fgtid);
 };
 
 struct FighterTrainReq
 {
 	UInt32 _fgtId;
 	UInt8 _type;
-	MESSAGE_DEF2(0x2C, UInt32, _fgtId, UInt8, _type);
+	MESSAGE_DEF2(REQ::POTENTIAL, UInt32, _fgtId, UInt8, _type);
 };
 
 struct TakeOnlineRewardReq
 {
     UInt8 _flag;
-	MESSAGE_DEF1(0x38, UInt8, _flag);
+	MESSAGE_DEF1(REQ::REWARD, UInt8, _flag);
 };
 
 struct LuckyDrawInfoReq
 {
-	MESSAGE_DEF(0x3D);
+	MESSAGE_DEF(REQ::LUCKYDRAW_INFO);
 };
 
 struct LuckyDrawReq
 {
 	UInt8 _type;
 	UInt8 _times;
-	MESSAGE_DEF2(0x3E, UInt8, _type, UInt8, _times);
+	MESSAGE_DEF2(REQ::LUCKYDRAW, UInt8, _type, UInt8, _times);
 };
 
 struct EnchantReq
@@ -136,14 +137,14 @@ struct EnchantReq
 	UInt32 _itemid;
 	UInt8 _type;
 	// UInt8 _protect;
-	MESSAGE_DEF3(0x40, UInt16, _fighterId, UInt32, _itemid, UInt8, _type/*, UInt8, _protect*/);
+	MESSAGE_DEF3(REQ::EQ_ENHANCE, UInt16, _fighterId, UInt32, _itemid, UInt8, _type/*, UInt8, _protect*/);
 };
 
 struct OpenSocketReq
 {
 	UInt16 _fighterId;
 	UInt32 _itemid;
-	MESSAGE_DEF2(0x41, UInt16, _fighterId, UInt32, _itemid);
+	MESSAGE_DEF2(REQ::EQ_PUNCH, UInt16, _fighterId, UInt32, _itemid);
 };
 
 struct MergeGemReq
@@ -151,7 +152,7 @@ struct MergeGemReq
 	UInt16 _itemid;
 	UInt8 _bindNum;
 	UInt8 _protect;
-	MESSAGE_DEF3(0x42, UInt16, _itemid, UInt8, _bindNum, UInt8, _protect);
+	MESSAGE_DEF3(REQ::MERGE_GEM, UInt16, _itemid, UInt8, _bindNum, UInt8, _protect);
 };
 
 struct AttachGemReq
@@ -160,7 +161,7 @@ struct AttachGemReq
 	UInt32 _itemid;
 	UInt16 _gemid;
 	UInt8 _bind;
-	MESSAGE_DEF4(0x43, UInt16, _fighterId, UInt32, _itemid, UInt16, _gemid, UInt8, _bind);
+	MESSAGE_DEF4(REQ::EQ_EMBED, UInt16, _fighterId, UInt32, _itemid, UInt16, _gemid, UInt8, _bind);
 };
 
 struct DetachGemReq
@@ -169,7 +170,7 @@ struct DetachGemReq
 	UInt32 _itemid;
 	UInt8 _pos;
 	UInt8 _protect;
-	MESSAGE_DEF4(0x44, UInt16, _fighterId, UInt32, _itemid, UInt8, _pos, UInt8, _protect);
+	MESSAGE_DEF4(REQ::EQ_UN_EMBED, UInt16, _fighterId, UInt32, _itemid, UInt8, _pos, UInt8, _protect);
 };
 
 #if 0
@@ -177,7 +178,7 @@ struct SplitReq
 {
 	UInt32 _itemid;
 	UInt8 _protect;
-	MESSAGE_DEF2(0x45, UInt32, _itemid, UInt8, _protect);
+	MESSAGE_DEF2(REQ::EQ_UN_SINGLE, UInt32, _itemid, UInt8, _protect);
 };
 #endif
 
@@ -186,7 +187,7 @@ struct ExchangeReq
 {
 	typedef Array<UInt32, 5> ExchangeItemType;
 	UInt32 _itemid[5];
-	MESSAGE_DEF1(0x46, ExchangeItemType, _itemid);
+	MESSAGE_DEF1(REQ::EQ_EXCHANGE, ExchangeItemType, _itemid);
 };
 #endif
 
@@ -196,7 +197,7 @@ struct ForgeReq
 	UInt32 _itemid;
 	//i UInt8 _type;
 	UInt8 _protect;
-	MESSAGE_DEF3(0x47, UInt16, _fighterId, UInt32, _itemid, /*UInt8, _type,*/ UInt8, _protect);
+	MESSAGE_DEF3(REQ::EQ_PURIFY, UInt16, _fighterId, UInt32, _itemid, /*UInt8, _type,*/ UInt8, _protect);
 };
 
 struct BatchMergeReq
@@ -205,15 +206,7 @@ struct BatchMergeReq
     UInt16 _unBindNum;
     UInt16 _bindNum;
     UInt8 _protect;
-    MESSAGE_DEF4(0x4B, UInt16, _gemId, UInt16, _unBindNum, UInt16, _bindNum, UInt8, _protect);
-};
-
-struct ForgeAnswerReq
-{
-	UInt16 _fighterId;
-	UInt32 _itemid;
-	UInt8 _answer;
-	MESSAGE_DEF3(0x48, UInt16, _fighterId, UInt32, _itemid, UInt8, _answer);
+    MESSAGE_DEF4(REQ::GEM_UPGRADE, UInt16, _gemId, UInt16, _unBindNum, UInt16, _bindNum, UInt8, _protect);
 };
 
 #if 0
@@ -222,7 +215,7 @@ struct ExchangeSetReq
 	typedef Array<UInt32, 3> ExchangeSetItemType;
 	UInt32 _itemid[3];
 	UInt8 _flag;
-	MESSAGE_DEF2(0x4A, ExchangeSetItemType, _itemid, UInt8, _flag);
+	MESSAGE_DEF2(REQ::EQ_EXCHANGE_POS, ExchangeSetItemType, _itemid, UInt8, _flag);
 };
 #endif
 
@@ -232,7 +225,7 @@ struct ActivateAttrReq
 	UInt16 _fighterId;
 	UInt32 _itemId;
 	UInt32 _itemId2;
-	MESSAGE_DEF3(0x4C, UInt16, _fighterId, UInt32, _itemId, UInt32, _itemId2);
+	MESSAGE_DEF3(REQ::EQ_ACTIVE, UInt16, _fighterId, UInt32, _itemId, UInt32, _itemId2);
 };
 #endif
 
@@ -240,14 +233,14 @@ struct OutCitySwitchStruct
 {
 	UInt8 _mapid;
 
-	MESSAGE_DEF1(0x50, UInt8, _mapid);
+	MESSAGE_DEF1(REQ::CITY_OUTSIDE_MOVE, UInt8, _mapid);
 };
 
 struct InCitySwitchStruct
 {
 	UInt16 _locid;
 
-	MESSAGE_DEF1(0x51, UInt16, _locid);
+	MESSAGE_DEF1(REQ::MAP_LOCATE, UInt16, _locid);
 };
 
 struct CityTransportReq
@@ -255,109 +248,109 @@ struct CityTransportReq
 	UInt16 _locid;
 	UInt8 flag;
 
-	MESSAGE_DEF2(0x52, UInt16, _locid, UInt8, flag);
+	MESSAGE_DEF2(REQ::MAP_TRANSPORT, UInt16, _locid, UInt8, flag);
 };
 
 struct DungeonOpReq
 {
 	UInt8 op;
 	UInt8 type;
-	MESSAGE_DEF2(0x58, UInt8, op, UInt8, type);
+	MESSAGE_DEF2(REQ::BABEL_JOIN, UInt8, op, UInt8, type);
 };
 
 struct DungeonInfoReq
 {
 	UInt8 op;
 	UInt8 type;
-	MESSAGE_DEF2(0x59, UInt8, op, UInt8, type);
+	MESSAGE_DEF2(REQ::BABEL_UPDATE, UInt8, op, UInt8, type);
 };
 
 struct DungeonBattleReq
 {
 	UInt8 type;
 	UInt8 level;
-	MESSAGE_DEF2(0x5A, UInt8, type, UInt8, level);
+	MESSAGE_DEF2(REQ::BABEL_START, UInt8, type, UInt8, level);
 };
 
 struct DungeonAutoReq
 {
 	UInt8 type;
-	MESSAGE_DEF1(0x5B, UInt8, type);
+	MESSAGE_DEF1(REQ::BABEL_AUTO_START, UInt8, type);
 };
 
 struct DungeonCompleteAutoReq
 {
-	MESSAGE_DEF(0x5C);
+	MESSAGE_DEF(REQ::BABEL_END);
 };
 
 struct DailyReq
 {
-	MESSAGE_DEF(0x5F);
+	MESSAGE_DEF(REQ::DAILY);
 };
 
 struct ChallengePlayerReq
 {
 	std::string _name;
-	MESSAGE_DEF1(0x60, std::string, _name);
+	MESSAGE_DEF1(REQ::CHANGE_NAME, std::string, _name);
 };
 
 struct AttackNpcReq
 {
 	UInt32 _npcId;
-	MESSAGE_DEF1(0x61, UInt32, _npcId);
+	MESSAGE_DEF1(REQ::ATTACK_NPC, UInt32, _npcId);
 };
 
 struct AutoBattleReq
 {
 	UInt32 _npcId;
-	MESSAGE_DEF1(0x6D, UInt32, _npcId);
+	MESSAGE_DEF1(REQ::TASK_HOOK, UInt32, _npcId);
 };
 
 struct CancelAutoBattleReq
 {
-	MESSAGE_DEF(0x6E);
+	MESSAGE_DEF(REQ::TASK_HOOK_STOP);
 };
 
 struct InstantAutoBattleReq
 {
-	MESSAGE_DEF(0x6F);
+	MESSAGE_DEF(REQ::TASK_HOOK_ADD);
 };
 
 struct CountryBattleJoinStruct
 {
 	UInt8 _action;
 
-	MESSAGE_DEF1(0x62, UInt8, _action);
+	MESSAGE_DEF1(REQ::CAMPS_WAR_JOIN, UInt8, _action);
 };
 struct LanchChallengeReq
 {
 	std::string target;
-	MESSAGE_DEF1(0x72, std::string, target);
+	MESSAGE_DEF1(REQ::LANCHCHALLENGE, std::string, target);
 };
 
 struct RequestChallengeReq
 {
 	UInt8 res;
 	std::string attacker;
-	MESSAGE_DEF2(0x73, UInt8, res, std::string, attacker);
+	MESSAGE_DEF2(REQ::REQUESTCHALLENGE, UInt8, res, std::string, attacker);
 };
 struct BattleEndReq
 {
-	MESSAGE_DEF(0x77);
+	MESSAGE_DEF(REQ::FIGHT_EXIT);
 };
 
 struct CopyReq
 {
     UInt8 type;
     UInt8 id;
-    MESSAGE_DEF2(0x67, UInt8, type, UInt8, id); 
+    MESSAGE_DEF2(REQ::COPY_DATA, UInt8, type, UInt8, id); 
 };
 
 struct NpcTriggerReq
 {
 	UInt32 m_NpcId;
 
-	MESSAGE_DEF1(0x80, UInt32, m_NpcId);
+	MESSAGE_DEF1(REQ::DIALOG_START, UInt32, m_NpcId);
 };
 
 struct TaskNpcActionReq
@@ -369,7 +362,7 @@ struct TaskNpcActionReq
 
 	TaskNpcActionReq() : m_NpcId(0), m_ActionType(0), m_ActionID(0), m_ActionStep(0) {};
 
-	MESSAGE_DEF4(0x81, UInt32, m_NpcId, UInt8, m_ActionType, UInt32, m_ActionID, UInt8, m_ActionStep);
+	MESSAGE_DEF4(REQ::NPC_INTERACT, UInt32, m_NpcId, UInt8, m_ActionType, UInt32, m_ActionID, UInt8, m_ActionStep);
 };
 
 struct CollectNpcActionReq
@@ -378,17 +371,17 @@ struct CollectNpcActionReq
 
 	CollectNpcActionReq() : m_NpcId(0) {};
 
-	MESSAGE_DEF1(0x89, UInt32, m_NpcId);
+	MESSAGE_DEF1(REQ::COLLECTNPCACTION, UInt32, m_NpcId);
 };
 
 struct PlayerGetTaskReq
 {
-	MESSAGE_DEF(0x82);
+	MESSAGE_DEF(REQ::CURR_TASK_LIST);
 };
 
 struct CanAcceptTaskReq
 {
-	MESSAGE_DEF(0x83);
+	MESSAGE_DEF(REQ::CURR_AVAILABLE_TASK);
 };
 
 struct CanAcceptTaskToken
@@ -407,7 +400,7 @@ struct TaskActionReq
 
 	TaskActionReq() : m_TaskId(0), m_Action(0), m_ItemId(0), m_ItemNum(0) {};
 
-	MESSAGE_DEF4(0x85, UInt32, m_TaskId, UInt8, m_Action, UInt32, m_ItemId, UInt16, m_ItemNum);
+	MESSAGE_DEF4(REQ::TASK_ACTION, UInt32, m_TaskId, UInt8, m_Action, UInt32, m_ItemId, UInt16, m_ItemNum);
 };
 
 struct StoreBuyReq
@@ -415,21 +408,21 @@ struct StoreBuyReq
 	UInt8 _type;
 	UInt16 _itemId;
 	UInt16 _count;
-	MESSAGE_DEF3(0xB1, UInt8, _type, UInt16, _itemId, UInt16, _count);
+	MESSAGE_DEF3(REQ::STORE_BUY, UInt8, _type, UInt16, _itemId, UInt16, _count);
 };
 
 struct ChatReq
 {
 	UInt8 _type;
 	std::string _text;
-	MESSAGE_DEF2(0xF0, UInt8, _type, std::string, _text);
+	MESSAGE_DEF2(REQ::CHAT, UInt8, _type, std::string, _text);
 };
 
 struct PrivChatReq
 {
 	UInt64 _id;
 	std::string _text;
-	MESSAGE_DEF2(0xF1, UInt64, _id, std::string, _text);
+	MESSAGE_DEF2(REQ::WHISPER, UInt64, _id, std::string, _text);
 };
 
 struct ChatItemReq
@@ -437,12 +430,12 @@ struct ChatItemReq
 	UInt8 _type;
 	UInt64 _playerId;
 	UInt32 _id;
-	MESSAGE_DEF3(0xF3, UInt8, _type, UInt64, _playerId, UInt32, _id);
+	MESSAGE_DEF3(REQ::FLAUNT, UInt8, _type, UInt64, _playerId, UInt32, _id);
 };
 
 struct QueryPackageItemReq
 {
-	MESSAGE_DEF(0x30);
+	MESSAGE_DEF(REQ::PACK_INFO);
 };
 
 void OnQueryPackageItemReq( GameMsgHdr& hdr, QueryPackageItemReq& req )
@@ -458,14 +451,14 @@ struct UseItemReq
 	UInt8  m_ItemBindType;
 	UInt16 m_ItemNum;
 	UInt32 m_Param;
-	MESSAGE_DEF4(0x33, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param);
+	MESSAGE_DEF4(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param);
 };
 
 struct BugInfoReq
 {
   std::string _title;
   std::string _content;
-  MESSAGE_DEF2(0xF8,std::string, _title,std::string,_content);
+  MESSAGE_DEF2(REQ::BUG,std::string, _title,std::string,_content);
 };
 
 void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
@@ -481,27 +474,27 @@ void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 
 struct ExtendPackageReq
 {
-	MESSAGE_DEF(0x34);
+	MESSAGE_DEF(REQ::PACK_EXTEND);
 };
 
 struct MailClickReq
 {
 	UInt32 _mailId;
 	UInt8 _action;
-	MESSAGE_DEF2(0xA5, UInt32, _mailId, UInt8, _action);
+	MESSAGE_DEF2(REQ::MAIL_CHANGE, UInt32, _mailId, UInt8, _action);
 };
 
 struct MailListReq
 {
 	UInt8	_start;
 	UInt8	_count;
-	MESSAGE_DEF2(0xA6, UInt8, _start, UInt8, _count);
+	MESSAGE_DEF2(REQ::MAIL_ID_LIST, UInt8, _start, UInt8, _count);
 };
 
 struct MailReq
 {
 	UInt32	_id;
-	MESSAGE_DEF1(0xA1, UInt32, _id);
+	MESSAGE_DEF1(REQ::MAIL_CONTENT, UInt32, _id);
 };
 
 struct MailSendReq
@@ -509,7 +502,7 @@ struct MailSendReq
 	std::string	_target;
 	std::string	_title;
 	std::string	_content;
-	MESSAGE_DEF3(0xA3, std::string, _target, std::string, _title, std::string, _content);
+	MESSAGE_DEF3(REQ::MAIL_SEND, std::string, _target, std::string, _title, std::string, _content);
 };
 
 struct FriendListReq
@@ -517,19 +510,19 @@ struct FriendListReq
 	UInt8 _type;
 	UInt8 _start;
 	UInt8 _count;
-	MESSAGE_DEF3(0xA8, UInt8, _type, UInt8, _start, UInt8, _count);
+	MESSAGE_DEF3(REQ::FRIEND_LIST, UInt8, _type, UInt8, _start, UInt8, _count);
 };
 
 struct FriendOpReq
 {
 	UInt8 _op;
 	std::string _name;
-	MESSAGE_DEF2(0xA9, UInt8, _op, std::string, _name);
+	MESSAGE_DEF2(REQ::FRIEND_ACTION, UInt8, _op, std::string, _name);
 };
 
 struct FriendActReq
 {
-	MESSAGE_DEF(0xAB);
+	MESSAGE_DEF(REQ::FRIEND_STATUS);
 };
 
 void OnExtendPackageReq( GameMsgHdr& hdr, ExtendPackageReq& )
@@ -540,25 +533,14 @@ void OnExtendPackageReq( GameMsgHdr& hdr, ExtendPackageReq& )
 	pl->ExtendPackageSize();
 }
 
-struct GreatFighterMetReq
-{
-	MESSAGE_DEF(0xB8);
-};
-
-struct GreatFighterInfoReq
-{
-	UInt32 _fgtId;
-	MESSAGE_DEF1(0xB9, UInt32, _fgtId);
-};
-
 struct AthleticsDataReq
 {
-	MESSAGE_DEF(0xD1);
+	MESSAGE_DEF(REQ::ARENA_FIGHT_INFO);
 };
 
 struct FighterTrainListReq
 {
-	MESSAGE_DEF(0x2D);
+	MESSAGE_DEF(REQ::TRAIN_FIGHTER_LIST);
 };
 
 struct FighterTrain2Req
@@ -695,7 +677,7 @@ void OnFlushTaskColorReq( GameMsgHdr& hdr, const void* data)
 struct DayTaskAutoCompletedReq
 {
 	UInt32 m_DayTaskId;
-	MESSAGE_DEF1(0x8C, UInt32, m_DayTaskId);
+	MESSAGE_DEF1(REQ::DAYTASKAUTOCOMPLETED, UInt32, m_DayTaskId);
 };
 
 void OnDayTaskAutoCompletedReq( GameMsgHdr& hdr, DayTaskAutoCompletedReq& req )
@@ -727,7 +709,7 @@ void OnQueryAutoCompletedTaskTimeReq( GameMsgHdr& hdr, QueryAutoCompletedTaskTim
 struct QueryDayTaskCompletedCountReq
 {
 	UInt32 m_DayTaskId;
-	MESSAGE_DEF1(0x8F, UInt32, m_DayTaskId);
+	MESSAGE_DEF1(REQ::QUERYDAYTASK, UInt32, m_DayTaskId);
 };
 
 void OnQueryDayTaskCompletedCountReq( GameMsgHdr& hdr, QueryDayTaskCompletedCountReq& req )
@@ -736,7 +718,7 @@ void OnQueryDayTaskCompletedCountReq( GameMsgHdr& hdr, QueryDayTaskCompletedCoun
 
 	DayTaskData* taskData = pl->GetTaskMgr()->GetDayTaskData(req.m_DayTaskId);
 	if (taskData == NULL) return ;
-	Stream st(0x8F);
+	Stream st(REP::QUERYDAYTASK);
 	st << req.m_DayTaskId << taskData->m_PreTaskQuality << static_cast<UInt16>(taskData->m_Count) << static_cast<UInt16>(taskData->m_MaxCount) << Stream::eos;
 	pl->send(st);
 }
@@ -744,7 +726,7 @@ void OnQueryDayTaskCompletedCountReq( GameMsgHdr& hdr, QueryDayTaskCompletedCoun
 struct ConveyBattleReq
 {
 	UInt32 m_TaskId;	//任务ID
-	MESSAGE_DEF1(0x88, UInt32, m_TaskId);
+	MESSAGE_DEF1(REQ::CONVEYBATTLE, UInt32, m_TaskId);
 };
 
 void OnConveyBattleReq( GameMsgHdr& hdr, ConveyBattleReq& req )
@@ -776,7 +758,7 @@ void OnConveyBattleReq( GameMsgHdr& hdr, ConveyBattleReq& req )
 void OnNullReq( GameMsgHdr& hdr, NullReq& nr )
 {
 	MSG_QUERY_PLAYER(player);
-	Stream st(0x00);
+	Stream st(REP::KEEP_ALIVE);
 	st << nr.ticket << Stream::eos;
 	player->send(st);
 }
@@ -810,7 +792,7 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
     if (player->getCountry() != country)
     {    
         player->setCountry(country);
-        Stream st(0x0D);
+        Stream st(REP::CAMP_SELECT);
         st << country << Stream::eos;
         player->send(st);
 
@@ -936,7 +918,7 @@ void OnPurchaseBookReq( GameMsgHdr& hdr, PurchaseBookReq& pbr )
 	if(pbr._pos >= 6)
 		return;
 	UInt32 id = player->purchaseBook(pbr._pos);
-	Stream st(0x1B);
+	Stream st(REP::BOOK_SHOP_BUY);
 	st << static_cast<UInt8>(id > 0 ? 1 : 0) << pbr._pos << Stream::eos;
 	player->send(st);
 }
@@ -1078,7 +1060,7 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 		return;
 	const UInt32 * idlist = reinterpret_cast<const UInt32 *>(buf + 1);
 	MSG_QUERY_PLAYER(player);
-	Stream st(0x23);
+	Stream st(REP::FIGHTER_INFO);
 	st << static_cast<UInt8>(0);
 	UInt8 cnt = 0;
 	for(UInt8 i = 0; i < c; ++ i)
@@ -1088,22 +1070,6 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 	}
 	st.data<UInt8>(4) = cnt;
 	st << Stream::eos;
-	player->send(st);
-}
-
-struct GreatFighterTaskReq
-{
-	UInt16 start;
-	UInt16 count;
-	MESSAGE_DEF2(0x24, UInt16, start, UInt16, count);
-};
-
-void OnGreatFighterTaskValReq( GameMsgHdr& hdr, GreatFighterTaskReq& req )
-{
-	MSG_QUERY_PLAYER(player);
-
-	Stream st;
-	player->makeGreatFighterTaskValList(st, req.start, req.count);
 	player->send(st);
 }
 
@@ -1166,7 +1132,7 @@ struct FighterLeaveStruct
 {
 	UInt8 _result;
 	UInt32 _fgtid;
-	MESSAGE_DEF2(0x27, UInt8, _result, UInt32, _fgtid);
+	MESSAGE_DEF2(REP::FIGHTER_DISMISS, UInt8, _result, UInt32, _fgtid);
 };
 
 void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
@@ -1275,7 +1241,7 @@ void OnRecruitFighterReq( GameMsgHdr& hdr, RecruitFighterReq& rfr )
 	if(rfr._pos >= 6)
 		return;
 	UInt32 id = player->hireRecruit(rfr._pos);
-	Stream st(0x22);
+	Stream st(REP::HOTEL_PUB_HIRE);
 	st << static_cast<UInt8>(id > 0 ? 0 : 1) << rfr._pos << Stream::eos;
 	player->send(st);
 	if (id != 0)
@@ -1291,7 +1257,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 	FighterLeaveStruct rep;
 	rep._fgtid = fdr._fgtid;
 	GObject::Fighter * fgt = player->removeFighter(fdr._fgtid);
-	Stream st(0x27);
+	Stream st(REP::FIGHTER_DISMISS);
 	if(fgt == NULL)
 	{
 		rep._result = 1;
@@ -1340,7 +1306,7 @@ void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
 void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 {
 	MSG_QUERY_PLAYER(player);
-	Stream st(0x2C);
+	Stream st(REP::POTENCIAL);
 	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
 	player->send(st);
 }
@@ -1433,7 +1399,7 @@ void OnLuckyDrawReq( GameMsgHdr& hdr, LuckyDrawReq& ldr )
 	{
 		GObject::luckyDraw.pushCost(player, cost);
 	}
-	Stream st(0x3E);
+	Stream st(REP::LUCKYDRAW);
 	Stream broadcastst;
 	st << ldr._type << ldr._times << static_cast<UInt8>(equips.size() + items.size());
 	std::vector<UInt16>::iterator it1;
@@ -1448,7 +1414,7 @@ void OnLuckyDrawReq( GameMsgHdr& hdr, LuckyDrawReq& ldr )
 			st << item->getId() << *it1;
 			if(quality >= 5)
 			{
-				Stream st(0x3F);
+				Stream st(REP::LUCKYDRAW_OTH);
 				st << static_cast<UInt8>(1) << player->getName() << player->getCountry() << ldr._type << *it1 << Stream::eos;
 				broadcastst.append(&st[0], st.size());
 			}
@@ -1468,7 +1434,7 @@ void OnLuckyDrawReq( GameMsgHdr& hdr, LuckyDrawReq& ldr )
 		{
 			if(item->getQuality() >= 5)
 			{
-				Stream st(0x3F);
+				Stream st(REP::LUCKYDRAW_OTH);
 				st << static_cast<UInt8>(1) << player->getName() << player->getCountry() << ldr._type << static_cast<UInt16>(it2->first) << it2->second << Stream::eos;
 				broadcastst.append(&st[0], st.size());
 			}
@@ -1486,7 +1452,7 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x40);
+	Stream st(REP::EQ_TO_STRONG);
 	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type/*, er._protect > 0*/) << er._fighterId << er._itemid << Stream::eos;
 	player->send(st);
     GameAction()->RunOperationTaskAction1(player, 1, 2);
@@ -1495,7 +1461,7 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 {
 	MSG_QUERY_PLAYER(player);
-	Stream st(0x41);
+	Stream st(REP::EQ_TO_PUNCH);
 	st << player->GetPackage()->OpenSocket(osr._fighterId, osr._itemid) << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
 }
@@ -1505,7 +1471,7 @@ void OnMergeGemReq( GameMsgHdr& hdr, MergeGemReq& mgr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x42);
+	Stream st(REP::MERGE_GEM);
 	UInt32 ogid = 0;
 	st << player->GetPackage()->MergeGem(mgr._itemid, mgr._bindNum, mgr._protect > 0, ogid) << static_cast<UInt16>(ogid) << Stream::eos;
 	player->send(st);
@@ -1516,7 +1482,7 @@ void OnAttachGemReq( GameMsgHdr& hdr, AttachGemReq& agr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x43);
+	Stream st(REP::EQ_EMBED);
 	st << player->GetPackage()->AttachGem(agr._fighterId, agr._itemid, agr._gemid, agr._bind > 0) << agr._fighterId << agr._itemid << Stream::eos;
 	player->send(st);
 }
@@ -1526,7 +1492,7 @@ void OnDetachGemReq( GameMsgHdr& hdr, DetachGemReq& dgr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x44);
+	Stream st(REP::EQ_UN_EMBED);
 	st << player->GetPackage()->DetachGem(dgr._fighterId, dgr._itemid, dgr._pos, dgr._protect) << dgr._fighterId << dgr._itemid << dgr._pos << Stream::eos;
 	player->send(st);
 }
@@ -1537,7 +1503,7 @@ void OnSplitReq( GameMsgHdr& hdr, SplitReq& sr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x45);
+	Stream st(REP::EQ_UN_SINGLE);
 	UInt32 enchangId = 0;
 	UInt8 count = 0;
 	UInt8 r = player->GetPackage()->Split(sr._itemid, enchangId, count /*sr._protect > 0*/);
@@ -1553,7 +1519,7 @@ void OnExchangeReq( GameMsgHdr& hdr, ExchangeReq& er )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x46);
+	Stream st(REP::EQ_EXCHANGE);
 	UInt32 rid = 0;
 	UInt8 r = player->GetPackage()->Exchange(er._itemid, rid);
 	st << r << rid << Stream::eos;
@@ -1569,7 +1535,7 @@ void OnForgeReq( GameMsgHdr& hdr, ForgeReq& fr )
 		return;
 	UInt8 types[3]; Int16 values[3];
 	UInt8 r = player->GetPackage()->Forge(fr._fighterId, fr._itemid, /*fr._type,*/ types, values, fr._protect);
-	Stream st(0x47);
+	Stream st(REP::EQ_PURIFY);
 	st << r << fr._fighterId << fr._itemid << Stream::eos;
 	player->send(st);
 }
@@ -1580,7 +1546,7 @@ void OnExchangeSetReq( GameMsgHdr& hdr, ExchangeSetReq& esr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x4A);
+	Stream st(REP::EQ_EXCHANGE_POS);
 	UInt32 rid = 0;
 	UInt8 r = player->GetPackage()->ExchangeSet(esr._itemid, esr._flag, rid);
 	st << r << rid << Stream::eos;
@@ -1623,7 +1589,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 		else
 			break;
 	}
-	Stream st(0x49);
+	Stream st(REP::EQ_BATCH_DECOMPOSE);
 	st << flag << rcount[0] << rcount[1] << Stream::eos;
 	player->send(st);
 }
@@ -1643,7 +1609,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
     UInt16 gemUnbindOut;
     UInt16 gemBindOut;
 	UInt8 result = player->GetPackage()->BatchMergeGem(bmr._gemId, bmr._unBindNum, bmr._bindNum, bmr._protect, gemUnbindOut, gemBindOut);
-	Stream st(0x4B);
+	Stream st(REP::GEM_BATCH_UPGRADE);
 	st << result << bmr._gemId << gemUnbindOut << gemBindOut;
 	st << Stream::eos;
 	player->send(st);
@@ -1677,7 +1643,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, const void * data )
 	}
 	std::vector<UInt32> gemsOut;
 	UInt8 result = player->GetPackage()->BatchMergeGem(gems, gemsOut);
-	Stream st(0x4B);
+	Stream st(REP::GEM_BATCH_UPGRADE);
 	st << result << static_cast<UInt16>(gemsOut.size());
 	for(std::vector<UInt32>::iterator it = gemsOut.begin(); it != gemsOut.end(); ++ it)
 	{
@@ -1694,7 +1660,7 @@ void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	Stream st(0x4C);
+	Stream st(REP::EQ_ACTIVE);
 	st << player->GetPackage()->ActivateAttr(aar._fighterId, aar._itemId, aar._itemId2) << aar._fighterId << aar._itemId << Stream::eos;
 	player->send(st);
 }
@@ -1753,7 +1719,7 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 	GObject::Dungeon * dg = GObject::dungeonManager[dor.type];
 	if(dg == NULL)
 		return;
-	Stream st(0x58);
+	Stream st(REP::COPY_JOIN);
 	st << dor.op;
 	UInt8 result = 0;
 	switch(dor.op)
@@ -1987,7 +1953,7 @@ void OnCanAcceptTaskReq(GameMsgHdr& hdr, CanAcceptTaskReq& req)
 struct CountryBattleJoinReply
 {
 	UInt8 result;
-	MESSAGE_DEF1(0x62, UInt8, result);
+	MESSAGE_DEF1(REP::COUNTRY_WAR_JOIN, UInt8, result);
 };
 
 void CountryBattleJoinReq( GameMsgHdr& hdr, CountryBattleJoinStruct& req )
@@ -2037,13 +2003,13 @@ void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
 	UInt8 tid = player->getThreadId();
 	if( target->getThreadId() != tid || !target->hasStatus(0x02) || !player->hasStatus(0x02) )
 	{
-		Stream st1(0x73);
+		Stream st1(REP::REQUESTCHALLENGE);
 		st1 << static_cast<UInt8>(1) << lcr.target << Stream::eos;
 		player->send(st1);
 		return;
 	}	
 	
-	Stream st(0x72);
+	Stream st(REP::LANCHCHALLENGE);
 	st << player->getCountry() << player->getName() << Stream::eos;
 	target->send(st);
 }
@@ -2054,7 +2020,7 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	GObject::Player *attacker = globalNamedPlayers[player->fixName(rcr.attacker)];
 	if(attacker == NULL)//error
 		return ;
-	Stream st(0x73);
+	Stream st(REP::REQUESTCHALLENGE);
 	if(rcr.res == 1)// refuse
 	{
 		st << static_cast<UInt8>(1) << player->getName() << Stream::eos;
@@ -2095,7 +2061,7 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	bool res = bsim.getWinner() == 1;
 	int turns = bsim.getTurns();
 
-	Stream st1(0x61);
+	Stream st1(REP::ATTACK_NPC);
 	st1 << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 	player->send(st1);
 	st1.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
@@ -2387,7 +2353,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	if(!player->hasChecked())
 		return;
 	UInt32 price = GData::store.getPrice(lr._type, lr._itemId);
-	Stream st(0xB1);
+	Stream st(REP::STORE_BUY);
 	if(price == 0 || price == 0xFFFFFFFF)
 	{
 		st << static_cast<UInt8>(3);
@@ -2523,7 +2489,7 @@ struct ChatRep
 	UInt8 office;
 	UInt8 guard;
 	std::string text;
-	MESSAGE_DEF7(0xF0, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text);
+	MESSAGE_DEF7(REP::CHAT, UInt8, type, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard, std::string, text);
 };
 
 static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
@@ -2546,7 +2512,7 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 	if(gmHandler.Handle(cr._text, player))
 		return;
 
-	Stream st(0xF0);
+	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
 	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
 		<< office << guard << cr._text << Stream::eos;
@@ -2628,7 +2594,7 @@ struct TradeListReq
 	UInt16 _num;
 
 	TradeListReq() : _index(0), _num(0) {}
-	MESSAGE_DEF2(0xC0, UInt16, _index, UInt16, _num);
+	MESSAGE_DEF2(REQ::TRADE_LIST, UInt16, _index, UInt16, _num);
 };
 
 struct TradeDataReq
@@ -2636,7 +2602,7 @@ struct TradeDataReq
 	UInt32 _tradeId;
 
 	TradeDataReq() : _tradeId(0) {}
-	MESSAGE_DEF1(0xC1, UInt32, _tradeId);
+	MESSAGE_DEF1(REQ::TRADE_DATA, UInt32, _tradeId);
 };
 
 S11N_TRAITS_2(TradeItemChange, UInt32, _itemId, UInt16, _itemNum);
@@ -2650,7 +2616,7 @@ struct TradeLaunchReq
 	std::vector<TradeItemChange> _items;
 
 	TradeLaunchReq() : _coin(0), _gold(0) {}
-	MESSAGE_DEF5(0xC2, std::string, _name, std::string, _title, UInt32, _coin, UInt32, _gold, std::vector<TradeItemChange>, _items);
+	MESSAGE_DEF5(REQ::TRADE_LAUNCH, std::string, _name, std::string, _title, UInt32, _coin, UInt32, _gold, std::vector<TradeItemChange>, _items);
 };
 
 struct TradeReplyReq
@@ -2661,7 +2627,7 @@ struct TradeReplyReq
 	std::vector<TradeItemChange> _items;
 
 	TradeReplyReq() : _id(0), _coin(0), _gold(0) {}
-	MESSAGE_DEF4(0xC3, UInt32, _id, UInt32, _coin, UInt32, _gold, std::vector<TradeItemChange>, _items);
+	MESSAGE_DEF4(REQ::TRADE_REPLY, UInt32, _id, UInt32, _coin, UInt32, _gold, std::vector<TradeItemChange>, _items);
 };
 
 struct TradeOperateReq
@@ -2670,14 +2636,14 @@ struct TradeOperateReq
 	UInt8  _op;
 
 	TradeOperateReq() : _id(0), _op(0) {}
-	MESSAGE_DEF2(0xC4, UInt32, _id, UInt8, _op);
+	MESSAGE_DEF2(REQ::TRADE_OPERATE, UInt32, _id, UInt8, _op);
 };
 
 S11N_TRAITS_4(GObject::SaleSellData, UInt32, id, UInt16, count, UInt32, price, UInt8, priceType);
 struct SaleSellReq
 {
 	std::vector<GObject::SaleSellData> _data;
-	MESSAGE_DEF1(0xC6, std::vector<GObject::SaleSellData>, _data);
+	MESSAGE_DEF1(REQ::SALE_SELL, std::vector<GObject::SaleSellData>, _data);
 };
 
 void OnTradeListReq(GameMsgHdr& hdr, TradeListReq& req)
@@ -2804,7 +2770,7 @@ struct MailSendRep
 {
 	UInt8 _res;
 
-	MESSAGE_DEF1(0xA3, UInt8, _res);
+	MESSAGE_DEF1(REP::MAIL_SEND, UInt8, _res);
 };
 
 void OnMailSendReq( GameMsgHdr& hdr, MailSendReq& msr )
@@ -2893,23 +2859,6 @@ void OnFriendActReq( GameMsgHdr& hdr, FriendActReq& )
 	player->sendFriendActList();
 }
 
-void OnGreatFighterMetReq( GameMsgHdr& hdr, GreatFighterMetReq& )
-{
-	MSG_QUERY_PLAYER(player);
-	player->sendGreatFighterMet();
-}
-
-void OnGreatFighterInfoReq( GameMsgHdr& hdr, GreatFighterInfoReq& gfir )
-{
-	if(gfir._fgtId > GREAT_FIGHTER_MAX)
-		return;
-	MSG_QUERY_PLAYER(player);
-	Stream st(0xB9);
-	st << gfir._fgtId << player->getGreatFighterFriendliness(gfir._fgtId);
-	st << "" << "" << Stream::eos;
-	player->send(st);
-}
-
 void OnAthleticsDataReq( GameMsgHdr& hdr, AthleticsDataReq& )
 {
 	MSG_QUERY_PLAYER(player);
@@ -2944,13 +2893,13 @@ void OnAttackBlockBossReq( GameMsgHdr& hdr, AttackBlockBossReq& )
 
 struct PwdQuestion
 {
-	MESSAGE_DEF(0xCB);
+	MESSAGE_DEF(REQ::PWD_QUESTION);
 };
 
 void OnPwdQuestionReq( GameMsgHdr& hdr, PwdQuestion& )
 {
 	MSG_QUERY_PLAYER(player);
-	Stream st(0xCB);
+	Stream st(REP::SECOND_PWD);
 	st << player->getQuestionForPWD() << Stream::eos;
 	player->send(st);
 }
@@ -2986,7 +2935,7 @@ void OnOpPwdReq( GameMsgHdr& hdr, const void * data)
 		brd >> pwd >> newPWD;
 		res = player->changeSecondPWD(pwd, newPWD);
 	}
-	Stream st(0xCA);
+	Stream st(REP::OP_PWD);
 	st << op << res << Stream::eos;
 	player->send(st);
 }
@@ -2995,7 +2944,7 @@ struct LockPwdReq
 {
 	UInt8 flag;
 	std::string pwd;
-	MESSAGE_DEF2(0xCE, UInt8, flag, std::string, pwd);
+	MESSAGE_DEF2(REQ::PWD_LOCK, UInt8, flag, std::string, pwd);
 };
 
 void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
@@ -3007,7 +2956,7 @@ void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
 	else
 		player->lockSecondPWD();
 
-	Stream st(0xCE);
+	Stream st(REP::PWD_LOCK);
 	st << lpd.flag << res << Stream::eos;
 	player->send(st);
 }

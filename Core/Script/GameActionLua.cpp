@@ -11,6 +11,7 @@
 
 #include "GObject/Country.h"
 #include "Log/Log.h"
+#include "MsgID.h"
 
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Network/TcpServerWrapper.h"
@@ -43,14 +44,14 @@ namespace Script
 
 	void SysBroadcast(UInt8 type, const char * msg)
 	{
-		Stream st(0xF7);
+		Stream st(REP::SYSTEM_INFO);
 		st << type << msg << Stream::eos;
 		NETWORK()->Broadcast(st);
 	}
 
 	void SysSendMsg(GObject::Player * player, UInt8 type, const char * msg)
 	{
-		Stream st(0xF7);
+		Stream st(REP::SYSTEM_INFO);
 		st << type << msg << Stream::eos;
 		player->send(st);
 	}
@@ -638,7 +639,7 @@ namespace Script
 
 		UInt32 npcId = conveyPath.fetch<UInt32>(1);
 
-		Stream st(0x88);
+		Stream st(REP::CONVEYBATTLE);
 		st << npcId << taskId << static_cast<UInt16>(size-1);
 		for (int i = 1; i <= (size-1)/2; i++)
 		{

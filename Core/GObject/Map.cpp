@@ -5,6 +5,7 @@
 #include "Network/TcpConduit.h"
 #include "CountryBattle.h"
 #include "Common/TimeUtil.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -186,7 +187,7 @@ Map * Map::FromID( UInt8 mapID )
 
 void Map::SendCityNPCs( Player * pl )
 {
-	Stream st(0x52);
+	Stream st(REP::MAP_TRANSPORT);
 	st << getId() << static_cast<UInt8>(0);
 	UInt8 c = 0;
 	MOMap::const_iterator it;
@@ -252,7 +253,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 	if(notify)
 	{
 		UInt8 c = 0;
-		Stream st(0x54);
+		Stream st(REP::MAP_SAMPLEUSER);
 		
 		st << static_cast<UInt8>(0);
 		for(UInt32 i = 0; i < COUNTRY_MAX && c <= MAX_NUM; i ++)
@@ -399,7 +400,7 @@ void Map::NotifyPlayerEnter( Player * pl )
 	GObject::Map * map = pl->GetMap();
 	if(map == NULL)
 		return;
-	Stream st(0x55);
+	Stream st(REP::MAP_POINT_JOIN);
 	st << static_cast<UInt8>(0) << pl->getName() << pl->GetClassAndSex() << pl->getCountry() << pl->GetLev() << static_cast<UInt8>(PLAYER_DATA(pl, status)) << Stream::eos;
 	map->Broadcast(st, pl);
 }
@@ -409,7 +410,7 @@ void Map::NotifyPlayerLeave( Player * pl )
 	GObject::Map * map = pl->GetMap();
 	if(map == NULL)
 		return;
-	Stream st(0x55);
+	Stream st(REP::MAP_POINT_JOIN);
 	st << static_cast<UInt8>(1) << pl->getName() << Stream::eos;
 	map->Broadcast(st, pl);
 }
@@ -422,7 +423,7 @@ void Map::Hide( UInt32 id, bool notify )
 		mo->GetMOData().m_Hide = true;
 		if(!notify)
 			return;
-		Stream st(0x53);
+		Stream st(REP::MAP_TRANSPORT_UPDATE);
 		st << static_cast<UInt8>(1) << id << mo->GetSpot() << mo->GetType() << mo->GetActionType() << Stream::eos;
 		Broadcast(&st[0], st.size());
 	}
@@ -433,7 +434,7 @@ void Map::SendHide( UInt32 id, Player * player)
 	MapObject * mo = GetObject(id);
 	if(mo != NULL)
 	{
-		Stream st(0x53);
+		Stream st(REP::MAP_TRANSPORT_UPDATE);
 		st << static_cast<UInt8>(1) << id << mo->GetSpot() << mo->GetType() << mo->GetActionType() << Stream::eos;
 		player->send((st));
 	}
@@ -447,7 +448,7 @@ void Map::Show( UInt32 id, bool notify )
 		mo->GetMOData().m_Hide = false;
 		if(!notify)
 			return;
-		Stream st(0x53);
+		Stream st(REP::MAP_TRANSPORT_UPDATE);
 		st << static_cast<UInt8>(2) << id << mo->GetSpot() << mo->GetType() << mo->GetActionType() << Stream::eos;
 		Broadcast(&st[0], st.size());
 	}

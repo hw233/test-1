@@ -17,8 +17,10 @@
 #include "ClanTech.h"
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
-#include <mysql.h>
 #include "GObject/PracticePlace.h"
+#include "MsgID.h"
+
+#include <mysql.h>
 
 namespace GObject
 {
@@ -132,7 +134,7 @@ bool Clan::decline( Player* player, UInt64 pid )
 	delete *it;
 	_pending.erase(it);
 	{
-		Stream st(0x98);
+		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(2) << pid;
 		st << Stream::eos;
 		broadcast(st);
@@ -241,14 +243,14 @@ bool Clan::kick(Player * player, UInt64 pid)
 	getAllocBack(*member);
 
 	{
-		Stream st(0x98);
+		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(2) << pid;
 		st << Stream::eos;
 		broadcast(st);
 	}
 
 	{
-		Stream st(0x94);
+		Stream st(REP::CLAN_MEMBER_OPERATE);
 		st << static_cast<UInt8>(1) << static_cast<UInt8>(1) << pid << Stream::eos;
 		player->send(st);
 	}
@@ -322,14 +324,14 @@ bool Clan::leave(Player * player)
 		battleClan->kickClanBattler(player);
 
 	{
-		Stream st(0x98);
+		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(2) << player->getId();
 		st << Stream::eos;
 		broadcast(st);
 	}
 
 	{
-		Stream st(0x94);
+		Stream st(REP::CLAN_MEMBER_OPERATE);
 		st << static_cast<UInt8>(4) << static_cast<UInt8>(1) << player->getId() << Stream::eos;
 		player->send(st);
 	}
@@ -732,7 +734,7 @@ bool Clan::GMDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 			mem->proffer += count;
             {
-                Stream st(0x98);
+                Stream st(REP::CLAN_INFO_UPDATE);
                 st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
                 player->send(st);
             }
@@ -784,7 +786,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 #if 0
 			mem->achieveCount = items.count + mem->achieveCount;
 			{
-				Stream st(0x98);
+				Stream st(REP::CLAN_INFO_UPDATE);
 				st << static_cast<UInt8>(5) << mem->achieveCount << Stream::eos;
 				player->send(st);
 			}
@@ -793,7 +795,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
             mem->proffer += count;
 			{
-				Stream st(0x98);
+				Stream st(REP::CLAN_INFO_UPDATE);
 				st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
 				player->send(st);
 			}
@@ -850,7 +852,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			//}
 		}
 
-		//Stream st(0x78);
+		//Stream st(REP::CLAN_TECH);
 		//st << static_cast<UInt8>(4) << techId << player->getName() << count << mem->donateTime << Stream::eos;
 		//player->send(st);
 		DEBUG_LOG("Player [%s] donate clanId = [%u] techId = [%u] type = [%u] count = [%u]", player->getName().c_str(), _id, techId, type, count);
@@ -866,7 +868,7 @@ void Clan::listMembers( Player * player )
 {
 	Mutex::ScopedLock lk(_mutex);
 	Stream st;
-	st.init(0x97);
+	st.init(REP::CLAN_MEMBER_LIST);
 	UInt8 c = _members.size();
 	st << static_cast<UInt8>(0) << c;
 	Members::iterator offset = _members.begin();
@@ -882,7 +884,7 @@ void Clan::listMembers( Player * player )
 void Clan::listPending( Player * player )
 {
 	purgePending();
-	Stream st(0x97);
+	Stream st(REP::CLAN_MEMBER_LIST);
 	UInt8 c = 0;
 	st << static_cast<UInt8>(1) << c;
 	size_t i = 0;
@@ -911,7 +913,7 @@ void Clan::sendInfo( Player * player )
 	if (found == _members.end())
 		return;
 	ClanMember * member = (*found);
-	Stream st(0x91);
+	Stream st(REP::CLAN_REQ_USER);
 	Player * owner = getOwner();
     Player* watchman = globalPlayers[_watchman];
     PlayerData& pd = player->getPlayerData();
@@ -931,7 +933,7 @@ void Clan::sendInfo( Player * player )
 
 void Clan::searchMatch( Player * player )
 {
-	Stream st(0x90);
+	Stream st(REP::CLAN_REQ_LIST);
 	UInt16 c = 1, idx = 0;
 	UInt8 cnt = 1;
 	st << c << idx << cnt;
@@ -958,7 +960,7 @@ void Clan::appendListInfo( Stream& st )
 
 void Clan::listTechs(Player * player)
 {
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(0) << _techs->getSize();
 	_techs->makeTechInfo(st);
 	st << Stream::eos;
@@ -969,7 +971,7 @@ void Clan::listTechDonators(Player * player, UInt8 techId)
 {
 	Mutex::ScopedLock lk(_mutex);
 	MemberDonates& mds = _memberDonates[techId];
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(1) << techId << static_cast<UInt8>(mds.size());
 	for (MemberDonates::iterator offset = mds.begin(); offset != mds.end(); ++ offset)
 	{
@@ -1019,7 +1021,7 @@ void Clan::broadcast( const void * data, size_t len)
 
 void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 {
-	Stream st(0x98);
+	Stream st(REP::CLAN_INFO_UPDATE);
 	st << t << cmem.player->getId();
 	if(t == 0)
 		st << cmem.cls << cmem.player->getName() << cmem.player->GetLev() << static_cast<UInt8>(cmem.player->isOnline() ? 1 : 0) << cmem.player->getLastOnline() << Stream::eos;
@@ -1030,7 +1032,7 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 
 void Clan::broadcastPendingMemberInfo( ClanPendingMember& cpmem )
 {
-	Stream st(0x98);
+	Stream st(REP::CLAN_INFO_UPDATE);
 	st << static_cast<UInt8>(0) << cpmem.player->getId() << static_cast<UInt8>(100) << cpmem.player->getName() << cpmem.player->GetLev() << static_cast<UInt8>(cpmem.player->isOnline() ? 1 : 0) << cpmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);
 }
@@ -1057,7 +1059,7 @@ void Clan::setContact( const std::string& c, bool announce )
 	_contact = c;
 	if(announce)
 	{
-		Stream st(0x98);
+		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(3) << c << Stream::eos;
 		broadcast(st);
 		char c2[1024];
@@ -1073,7 +1075,7 @@ void Clan::setAnnounce( const std::string& c, bool announce )
 	_announce = c;
 	if(announce)
 	{
-		Stream st(0x98);
+		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(4) << c << Stream::eos;
 		broadcast(st);
 		char c2[1024];
@@ -1089,7 +1091,7 @@ void Clan::setProffer( UInt32 r, bool announce )
 	_proffer = r;
 	if (announce)
 	{
-		Stream st(0x98);
+		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(5) << r << Stream::eos;
 		broadcast(st);
 		DB().PushUpdateData("UPDATE `clan` SET `proffer` = %u WHERE `id` = %u", r, _id);
@@ -1180,7 +1182,7 @@ void Clan::retEnterPlsyersCount(UInt16 *count)
 
 void Clan::notifyAllyClanInfo(Player * player)
 {
-	Stream st(0x79);
+	Stream st(REP::CLAN_BATTLE);
 	st << static_cast<UInt8>(7) << static_cast<UInt8>((_allyClan != NULL ? 1 : 0) + _enemyClan.size());
 	if (_allyClan != NULL)
 		st << static_cast<UInt8>(0) << _allyClan->getName() << _allyClan->getLev();
@@ -1195,7 +1197,7 @@ void Clan::notifyAllyClanInfo(Player * player)
 
 void Clan::notifyAllyClanInfo(Clan * clan, UInt8 type, UInt8 action, Player * player)
 {
-	Stream st(0x79);
+	Stream st(REP::CLAN_BATTLE);
 	st << static_cast<UInt8>(8) << action << type << clan->getName() << clan->getLev() << Stream::eos;
 	player != NULL ? player->send(st) : broadcast(st);
 }
@@ -1451,7 +1453,7 @@ UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
 
 UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 {
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(8) << skillId;
 
     UInt8 res = 0;
@@ -1494,7 +1496,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
         cm->proffer -= single[level].needs;
         {
-            Stream st(0x98);
+            Stream st(REP::CLAN_INFO_UPDATE);
             st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
             pl->send(st);
             DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
@@ -1542,7 +1544,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
 
 void Clan::listSkills(Player * player)
 {
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(6);
 	makeSkillInfo(st, player);
 	st << Stream::eos;
@@ -1551,7 +1553,7 @@ void Clan::listSkills(Player * player)
 
 void Clan::showSkill(Player* player, UInt8 skillId)
 {
-    Stream st(0x99);
+    Stream st(REP::CLAN_SKILL);
     st << static_cast<UInt8>(7);
     makeSkillInfo(st, player, skillId);
 	st << Stream::eos;
@@ -1638,7 +1640,7 @@ void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt3
 		mds.erase(mds.begin());
 	}
 	mds.insert(MemberDonate(dn, dc, dt));
-	Stream st(0x99);
+	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(4) << si << dn << static_cast<UInt32>(dc) << dt << Stream::eos;
 	broadcast(st);
 	DB().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `techId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
@@ -1655,7 +1657,7 @@ void Clan::sendClanDynamicMsg(Player * player, UInt8 type, UInt16 start, UInt16 
 		count = 0;
 	else
 		count = end - start;
-	Stream st(0x7C);
+	Stream st(REP::CLAN_INFO);
 	st << type << start << count << sz;
 	_clanDynamicMsg->makeCDMsgInfor(st, type, start, count);
 	st << Stream::eos;
@@ -1798,7 +1800,7 @@ bool Clan::setWatchmanId(UInt64 watchman, bool writedb)
 		DB().PushUpdateData("UPDATE `clan` SET `watchman` = %"I64_FMT"u WHERE `id` = %u", watchman, _id);
 	}
 
-    Stream st(0x98);
+    Stream st(REP::CLAN_INFO_UPDATE);
     st << static_cast<UInt8>(6) << plwatchman->getName();
     st << Stream::eos;
     broadcast(st);
@@ -1811,7 +1813,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
         return;
     _construction = cons;
 
-    Stream st(0x98);
+    Stream st(REP::CLAN_INFO_UPDATE);
     st << static_cast<UInt8>(7) << static_cast<UInt32>(_construction);
     st << Stream::eos;
     broadcast(st);
@@ -1925,7 +1927,7 @@ void Clan::sendRepoInfo( Player * player )
 {
 	Mutex::ScopedLock lk(_mutex);
 	purgeAlloc();
-	Stream st(0x9C);
+	Stream st(REP::CLANREWARD);
 	st << static_cast<UInt8>(_repoNum.size());
 	std::map<UInt32, UInt8>::iterator it;
 	for(it = _repoNum.begin(); it != _repoNum.end(); ++ it)
@@ -2090,7 +2092,7 @@ void Clan::sendPersonalRewardList( ClanMember& cmem )
 {
 	Mutex::ScopedLock lk(_mutex);
 	purgeAlloc(TimeUtil::Now(), cmem);
-	Stream st(0x9B);
+	Stream st(REP::CLAN_BUILD);
 	st << static_cast<UInt8>(cmem.allocItems.size());
 	std::multimap<UInt32, AllocItem>::iterator iter;
 	for(iter = cmem.allocItems.begin(); iter != cmem.allocItems.end(); ++ iter)
@@ -2156,7 +2158,7 @@ void Clan::takeReward( Player * player, UInt8 type, UInt32 allocTime, UInt16 ite
 			default:
 				return;
 			}
-			Stream st(0x9D);
+			Stream st(REP::GET_CLANREWARD);
 			st << type << itemId << allocTime << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u AND `itemId` = %u", _id, allocTime, player->getId(), itemId);
@@ -2183,7 +2185,7 @@ void Clan::takeRewardResult( Player * player, bool result, UInt32 timeAlloc, con
 		par.allocItems.push_back(aitem);
 		addAllocRecord(TimeUtil::Now(), par);
 
-		Stream st(0x9D);
+		Stream st(REP::GET_CLANREWARD);
 		st << static_cast<UInt8>(1) << static_cast<UInt16>(aitem.itemId) << timeAlloc << Stream::eos;
 		player->send(st);
 		DB().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u AND `itemId` = %u", _id, timeAlloc, player->getId(), aitem.itemId);
@@ -2202,7 +2204,7 @@ void Clan::sendAllocRecords( Player * player )
 	Mutex::ScopedLock lk(_mutex);
 	purgeAlloc();
 
-	Stream st(0x9F);
+	Stream st(REP::CLANALLOCRECORD);
 	st << static_cast<UInt8>(_allocRecords.size());
 	for(std::multimap<UInt32, AllocRecord>::iterator it = _allocRecords.begin(); it != _allocRecords.end(); ++ it)
 	{
@@ -2334,7 +2336,7 @@ void Clan::sendPracticePlaceInfo(Player* pl)
     if (golds.size() && pd->place.openslot < golds.size())
         price = golds[pd->place.openslot];
 
-    Stream st(0x9B);
+    Stream st(REP::CLAN_BUILD);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
         << static_cast<UInt8>(pd->place.slotmoney) << static_cast<UInt8>(pd->place.protmoney) << pd->place.slotincoming << pd->place.protincoming
         << pd->place.enemyCount - pd->place.winCount << pd->place.winCount << place;
@@ -2357,7 +2359,7 @@ void Clan::broadcastPracticePlaceInfo()
     if (golds.size() && pd->place.openslot < golds.size())
         price = golds[pd->place.openslot];
 
-    Stream st(0x9B);
+    Stream st(REP::CLAN_BUILD);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
         << static_cast<UInt8>(pd->place.slotmoney) << static_cast<UInt8>(pd->place.protmoney) << pd->place.slotincoming << pd->place.protincoming
         << pd->place.winCount << pd->place.enemyCount - pd->place.winCount << place;
@@ -2403,7 +2405,7 @@ void ClanCache::search( Player * player, std::string name, UInt8 flag )
 	if(name.empty())
 		return;
 
-	Stream st(0x90);
+	Stream st(REP::CLAN_REQ_LIST);
 	std::vector<std::string> slist;
 	makeKeywordList(name, slist);
 	if(slist.empty())
@@ -2446,7 +2448,7 @@ void ClanCache::search2(Player * player, std::string name)
 	
 	std::vector<std::string> slist;
 	makeKeywordList(name, slist);
-	Stream st(0x7A);
+	Stream st(REP::CLAN_OPEN);
 	if(!slist.empty())
 	{
 		std::set<Clan *> clans[2];
@@ -2507,7 +2509,7 @@ bool clanEnum(Clan * clan, EnumStruct * es)
 void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt )
 {
 	UInt8 cny = player->getCountry();
-	Stream st(0x90);
+	Stream st(REP::CLAN_REQ_LIST);
 	UInt16 sz = globalClansByCountry[cny].size();
 	if(idx >= sz)
 	{
@@ -2623,7 +2625,7 @@ void Clan::addClanFunds(UInt32 funds)
     {
         _funds += funds;
 
-        Stream st(0x98);
+        Stream st(REP::CLAN_INFO_UPDATE);
         st << static_cast<UInt8>(7) << _funds;
         st << Stream::eos;
         broadcast(st);
@@ -2638,7 +2640,7 @@ void Clan::useClanFunds(UInt32 funds)
     {
         _funds -= funds;
 
-        Stream st(0x98);
+        Stream st(REP::CLAN_INFO_UPDATE);
         st << static_cast<UInt8>(7) << _funds;
         st << Stream::eos;
         broadcast(st);
@@ -2730,7 +2732,7 @@ void Clan::addMemberProffer(Player*pl, UInt32 proffer)
     {
         mem->proffer += proffer;
         {
-            Stream st(0x98);
+            Stream st(REP::CLAN_INFO_UPDATE);
             st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
             pl->send(st);
         }

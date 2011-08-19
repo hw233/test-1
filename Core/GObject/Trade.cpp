@@ -2,6 +2,7 @@
 #include "Common/Itoa.h"
 #include "Player.h"
 #include "Package.h"
+#include "MsgID.h"
 #include "Trade.h"
 #include "Mail.h"
 #include "Server/SysMsg.h"
@@ -110,7 +111,7 @@ bool Trade::addTradeFromDB(TradeData* trade)
 
 void Trade::sendTradeList(UInt16 index, UInt16 num)
 {
-	Stream st(0xC0);
+	Stream st(REP::TRADE_LIST);
 	UInt16 sz = static_cast<UInt16>(_tradeDatas.size());
 	UInt16 end = index + num;
 	if (end > sz)
@@ -165,7 +166,7 @@ bool Trade::sendTradeData(UInt32 id, Player * receiver, UInt8 status)
 		status = trade->_tradeStatus;
 	if(status == TRADE_NONE || status >= TRADE_STATUS(TRADE_CONFIRMED))
 		return false;
-	Stream st(0xC1);
+	Stream st(REP::TRADE_DATA);
 	st << id << trade->_tradeSide << SSTATUS2CSTATUS[status] << trade->_coin << trade->_gold << static_cast<UInt16>(trade->_items.size());
 	Package * package = _owner->GetPackage();
 	for (UInt16 i = 0; i < trade->_items.size(); ++i)
@@ -626,14 +627,14 @@ bool Trade::recvCancelTrade(UInt32 id)
 
 void Trade::launchTradeNotify(UInt32 id, const std::string& tradeName, const std::string& title, UInt8 status, UInt32 time)
 {
-	Stream st(0xC2);
+	Stream st(REP::TRADE_LAUNCH);
 	st << id << tradeName << title << SSTATUS2CSTATUS[status] << time << Stream::eos;
 	_owner->send(st);
 }
 
 void Trade::operateTradeNotify(UInt32 id, UInt8 status)
 {
-	Stream st(0xC4);
+	Stream st(REP::TRADE_OPERATE);
 	st << id << SSTATUS2CSTATUS[status] << Stream::eos;
 	_owner->send(st);
 }

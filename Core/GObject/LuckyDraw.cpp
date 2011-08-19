@@ -10,6 +10,7 @@
 #include "Common/URandom.h"
 #include "Common/TimeUtil.h"
 #include "Common/Stream.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -125,7 +126,7 @@ void LuckyDraw::sendInfo( Player * player )
 {
 	FastMutex::ScopedLock lk(_mutex);
 
-	Stream st(0x3D);
+	Stream st(REP::LUCKYDRAW_INFO);
 	if(_topPayer != NULL)
 		st << _topPayer->getName() << _topPayer->getCountry();
 	else
@@ -142,7 +143,7 @@ void LuckyDraw::sendInfo( Player * player )
 	st << Stream::eos;
 	player->send(st);
 
-	st.init(0x3F);
+	st.init(REP::LUCKYDRAW_OTH);
 	st << static_cast<UInt8>(_luckyItems.size());
 	for(std::list<LuckyItem>::iterator it = _luckyItems.begin(); it != _luckyItems.end(); ++ it)
 	{

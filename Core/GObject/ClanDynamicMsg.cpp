@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Clan.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -103,7 +104,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, Stream * pst)
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << Stream::eos;
 		}
 		return true;
@@ -122,7 +123,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, UInt32 val, Stream * pst)
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val << Stream::eos;
 		}
 		return true;
@@ -142,7 +143,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, UInt32 val1, UInt32 val2, Stream * pst
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << Stream::eos;
 		}
 		return true;
@@ -161,7 +162,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val, Stream * pst)
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val << Stream::eos;
 		}
 		return true;
@@ -181,7 +182,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << Stream::eos;
 		}
 		return true;
@@ -202,7 +203,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << Stream::eos;
 		}
 		return true;
@@ -222,7 +223,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, UInt32 val2, 
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << Stream::eos;
 		}
 		return true;
@@ -243,7 +244,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, UInt32 val2, 
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << Stream::eos;
 		}
 		return true;
@@ -264,7 +265,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << Stream::eos;
 		}
 		return true;
@@ -286,7 +287,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << Stream::eos;
 		}
 		return true;
@@ -308,7 +309,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, UInt32 val2, 
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << Stream::eos;
 		}
 		return true;
@@ -331,7 +332,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << val5 << Stream::eos;
 		}
 		return true;	
@@ -353,7 +354,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << Stream::eos;
 		}
 		return true;
@@ -376,7 +377,7 @@ bool ClanDynamicMsg::addCDMsg(UInt8 type, const std::string& val1, const std::st
 		if (pst != NULL)
 		{
 			Stream& st = *pst;
-			st.init(0x7D);
+			st.init(REP::CLAN_DINFO_UPDATE);
 			st << type << static_cast<UInt32>(0) << val1 << val2 << val3 << val4 << val5 << Stream::eos;
 		}
 		return true;		

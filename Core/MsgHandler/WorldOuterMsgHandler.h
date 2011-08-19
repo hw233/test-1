@@ -3,6 +3,7 @@
 
 #include "MsgTypes.h"
 #include "MsgFunc.h"
+#include "MsgID.h"
 
 #include "Common/Serialize.h"
 
@@ -39,12 +40,12 @@ struct ClanListReq
 	UInt8 _count;
     UInt8 _flag;      // 0-���� 1-���� 2-ȫ��
 	std::string _name;
-	MESSAGE_DEF5(0x90, UInt8, _type, UInt16, _startidx, UInt8, _count, UInt8, _flag, std::string, _name);
+	MESSAGE_DEF5(REQ::CLAN_LIST, UInt8, _type, UInt16, _startidx, UInt8, _count, UInt8, _flag, std::string, _name);
 };
 
 struct ClanInfoReq
 {
-	MESSAGE_DEF(0x91);
+	MESSAGE_DEF(REQ::CLAN_SELF);
 };
 
 struct ClanCreateReq
@@ -52,27 +53,27 @@ struct ClanCreateReq
 	std::string _name;
 	std::string _contact;
 	std::string _purpose;
-	MESSAGE_DEF3(0x92, std::string, _name, std::string, _contact, std::string, _purpose);
+	MESSAGE_DEF3(REQ::CLAN_CREATE, std::string, _name, std::string, _contact, std::string, _purpose);
 };
 
 struct ClanApplyReq
 {
 	UInt32 _id;
-	MESSAGE_DEF1(0x93, UInt32, _id);
+	MESSAGE_DEF1(REQ::CLAN_APPLY, UInt32, _id);
 };
 
 struct ClanModifyReq
 {
 	UInt8 _op;
 	std::string _text;
-	MESSAGE_DEF2(0x95, UInt8, _op, std::string, _text);
+	MESSAGE_DEF2(REQ::CLAN_INFO_CHANGE, UInt8, _op, std::string, _text);
 };
 
 struct ClanBattleReportReq
 {
 	UInt32 _clanId;
 	UInt32 _rptId;
-	MESSAGE_DEF2(0x7D, UInt32, _clanId, UInt32, _rptId);
+	MESSAGE_DEF2(REQ::CLAN_BATTLE_INFO, UInt32, _clanId, UInt32, _rptId);
 };
 
 struct ClanGetDynamicMsgReq
@@ -80,31 +81,31 @@ struct ClanGetDynamicMsgReq
 	UInt8 _type;
 	UInt16 _start;
 	UInt16 _count;
-	MESSAGE_DEF3(0x7C, UInt8, _type, UInt16, _start, UInt16, _count);
+	MESSAGE_DEF3(REQ::CLAN_INFO, UInt8, _type, UInt16, _start, UInt16, _count);
 };
 
 struct ClanQueryReq
 {
 	UInt32 _id;
-	MESSAGE_DEF1(0x96, UInt32, _id);
+	MESSAGE_DEF1(REQ::CLAN_REQ_OTHER, UInt32, _id);
 };
 
 struct ClanQuery2Req
 {
 	UInt8 _type;
-	MESSAGE_DEF1(0x97, UInt8, _type);
+	MESSAGE_DEF1(REQ::CLAN_PLAYER_LIST, UInt8, _type);
 };
 
 #if 0
 struct ClanPersonalRewardReq
 {
-	MESSAGE_DEF(0x9B);
+	MESSAGE_DEF(REQ::CLAN_BUILD);
 };
 #endif
 
 struct ClanRewardReq
 {
-	MESSAGE_DEF(0x9C);
+	MESSAGE_DEF(REQ::CLANREWARD);
 };
 
 struct ClanPersonalRewardOpReq
@@ -112,43 +113,43 @@ struct ClanPersonalRewardOpReq
 	UInt8 _type;
 	UInt32 _allocTime;
 	UInt16 _itemId;
-	MESSAGE_DEF3(0x9D, UInt8, _type, UInt32, _allocTime, UInt16, _itemId);
+	MESSAGE_DEF3(REQ::GET_CLANREWARD, UInt8, _type, UInt32, _allocTime, UInt16, _itemId);
 };
 
 struct ClanAllocRecordReq
 {
-	MESSAGE_DEF(0x9F);
+	MESSAGE_DEF(REQ::CLANALLOCRECORD);
 };
 
 struct StoreListReq
 {
 	UInt8 _type;
-	MESSAGE_DEF1(0xB0, UInt8, _type);
+	MESSAGE_DEF1(REQ::STORE_LIST, UInt8, _type);
 };
 
 struct LeaderboardReq
 {
 	UInt8 _type;
 	UInt32 _id;
-	MESSAGE_DEF2(0xE8, UInt8, _type, UInt32, _id);
+	MESSAGE_DEF2(REQ::SORT_LIST, UInt8, _type, UInt32, _id);
 };
 
 struct OwnLeaderboardReq
 {
 	UInt32 _id;
-	MESSAGE_DEF1(0xE9, UInt32, _id);
+	MESSAGE_DEF1(REQ::SORT_PERSON, UInt32, _id);
 };
 
 struct PlayerIdReq
 {
 	std::string _name;
-	MESSAGE_DEF1(0xF2, std::string, _name);
+	MESSAGE_DEF1(REQ::CHECK_USER, std::string, _name);
 };
 
 struct BattleReportReq
 {
 	UInt32 _reportId;
-	MESSAGE_DEF1(0x6C, UInt32, _reportId);
+	MESSAGE_DEF1(REQ::FIGHT_REPORT, UInt32, _reportId);
 };
 
 struct SaleListReq
@@ -161,19 +162,19 @@ struct SaleListReq
 	UInt8  _sort;
 	UInt8  _color;
 	UInt8  _eqType;
-	MESSAGE_DEF8(0xC5, UInt16, _start, UInt16, _count, UInt8, _search, std::string, _name, UInt8, _req, UInt8, _sort, UInt8, _color, UInt8, _eqType);
+	MESSAGE_DEF8(REQ::SALE_LIST, UInt16, _start, UInt16, _count, UInt8, _search, std::string, _name, UInt8, _req, UInt8, _sort, UInt8, _color, UInt8, _eqType);
 };
 
 struct SaleBuyAndCancelReq
 {
 	UInt8  _token;
 	UInt32 _id;
-	MESSAGE_DEF2(0xC7, UInt8, _token, UInt32, _id);
+	MESSAGE_DEF2(REQ::SALE_OP, UInt8, _token, UInt32, _id);
 };
 
 struct PracticePlaceReq
 {
-	MESSAGE_DEF(0xE0);
+	MESSAGE_DEF(REQ::PLACE_INFO);
 };
 
 struct PracticeListReq
@@ -181,7 +182,7 @@ struct PracticeListReq
 	UInt8 _type;
     UInt8 _pageno;
     UInt8 _pagenum;
-	MESSAGE_DEF3(0xE1, UInt8, _type, UInt8, _pageno, UInt8, _pagenum);
+	MESSAGE_DEF3(REQ::PRACTICE_PAGE_CHANGE, UInt8, _type, UInt8, _pageno, UInt8, _pagenum);
 };
 
 struct PracticeChallengeReq
@@ -189,7 +190,7 @@ struct PracticeChallengeReq
 	UInt8 _type;
     UInt8 _idx;
     std::string _name;
-	MESSAGE_DEF3(0xE2, UInt8, _type, UInt8, _idx, std::string, _name);
+	MESSAGE_DEF3(REQ::PLACE_ROB, UInt8, _type, UInt8, _idx, std::string, _name);
 };
 
 struct PracticePayReq
@@ -198,24 +199,24 @@ struct PracticePayReq
     UInt8 _slot;
     UInt8 _type;
     UInt8 _ptype;
-	MESSAGE_DEF4(0xE3, UInt8, _place, UInt8, _slot, UInt8, _type, UInt8, _ptype);
+	MESSAGE_DEF4(REQ::PLACE_OCCUPY, UInt8, _place, UInt8, _slot, UInt8, _type, UInt8, _ptype);
 };
 
 struct PracticeSitDownReq
 {
     UInt8 _type;
     UInt32 _fgtid;
-	MESSAGE_DEF2(0xE4, UInt8, _type, UInt32, _fgtid);
+	MESSAGE_DEF2(REQ::PRACTICE_START, UInt8, _type, UInt32, _fgtid);
 };
 
 struct PracticeStopReq
 {
-	MESSAGE_DEF(0xE5);
+	MESSAGE_DEF(REQ::PRACTICE_STOP);
 };
 
 struct AthleticsListReq
 {
-	MESSAGE_DEF(0xD0);
+	MESSAGE_DEF(REQ::ARENA_INFO);
 };
 
 
@@ -227,13 +228,13 @@ struct AthleticsChallengeReq
 
 struct ArenaInfoReq
 {
-	MESSAGE_DEF(0xEA);
+	MESSAGE_DEF(REQ::SERVER_ARENA_INFO);
 };
 
 struct ArenaEliminationReq
 {
 	UInt8 group;
-	MESSAGE_DEF1(0xEB, UInt8, group);
+	MESSAGE_DEF1(REQ::SERVER_ARENA_ELIM, UInt8, group);
 };
 
 void OnClanListReq( GameMsgHdr& hdr, ClanListReq& clr )
@@ -268,7 +269,7 @@ void OnClanInfoReq( GameMsgHdr& hdr, ClanInfoReq& )
 	GObject::Clan * clan = player->getClan();
 	if(clan == NULL)
 	{
-		Stream st(0x91);
+		Stream st(REP::CLAN_REQ_USER);
 		st << static_cast<UInt8>(1);
 		st << Stream::eos;
 		player->send(st);
@@ -288,21 +289,21 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	std::string strNametmp(ccr._name);
     if(player->GetLev() < 30)
     {
-		Stream st(0x92);
+		Stream st(REP::CLAN_CREATE);
 		st << static_cast<UInt8>(4) << Stream::eos;
 		player->send(st);
 		return;
     }
 	if(player->getClan() != NULL || ccr._name.length() > 15 || GObject::globalGlobalNamedClans[player->fixName(ccr._name)] != NULL || player->getCountry() > 1)
 	{
-		Stream st(0x92);
+		Stream st(REP::CLAN_CREATE);
 		st << static_cast<UInt8>(1) << Stream::eos;
 		player->send(st);
 		return;
 	}
 	if(player->getTael() < 100) // XXX:
 	{
-		Stream st(0x92);
+		Stream st(REP::CLAN_CREATE);
 		st << static_cast<UInt8>(3) << Stream::eos;
 		player->send(st);
 		return;
@@ -317,7 +318,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	GObject::Clan * clan = new(std::nothrow) GObject::Clan(id, ccr._name);
 	if(clan == NULL)
 	{
-		Stream st(0x92);
+		Stream st(REP::CLAN_CREATE);
 		st << static_cast<UInt8>(4) << Stream::eos;
 		player->send(st);
 		return;
@@ -325,7 +326,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	clan->setContact(ccr._contact, false);
 	clan->setPurpose(ccr._purpose, false);
 	clan->setFounder(player->getId());
-	Stream st(0x92);
+	Stream st(REP::CLAN_CREATE);
 	st << static_cast<UInt8>(0) << Stream::eos;
 	player->send(st);
 	clan->join(player, 4);
@@ -359,7 +360,7 @@ void OnClanApplyReq( GameMsgHdr& hdr, ClanApplyReq& car )
 		(clan = GObject::globalClansByCountry[player->getCountry()][car._id]) == NULL
 		|| clan->isFull())
 	{
-		Stream st(0x93);
+		Stream st(REP::CLAN_JOIN_IN);
 		st << static_cast<UInt8>(1) << Stream::eos;
 		player->send(st);
 		return;
@@ -372,7 +373,7 @@ void OnClanApplyReq( GameMsgHdr& hdr, ClanApplyReq& car )
 		SYSMSG_SENDV(1019, player, clan->getName().c_str());
 	}
 
-	Stream st(0x93);
+	Stream st(REP::CLAN_JOIN_IN);
 	st << static_cast<UInt8>(r ? 0: 1) << Stream::eos;
 	player->send(st);
 }
@@ -426,7 +427,7 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
             r = clan->setWatchmanId(inviteeId);
 		}
 	}
-	Stream st(0x94);
+	Stream st(REP::CLAN_MEMBER_OPERATE);
 	if (op == 0)
 		st << op << static_cast<UInt8>(r ? 1 : 0) << inviteeName << Stream::eos;
 	else
@@ -441,7 +442,7 @@ void OnClanModifyReq( GameMsgHdr& hdr, ClanModifyReq& cmr )
 	if(!player->hasChecked())
 		return;
 	GObject::Clan * clan = player->getClan();
-	Stream st(0x95);
+	Stream st(REP::CLAN_INFO_CHANGE);
 	st << cmr._op;
 	UInt8 r = 0;
 	if(clan == NULL)
@@ -471,13 +472,13 @@ void OnClanQueryReq( GameMsgHdr& hdr, ClanQueryReq& cqr )
 	GObject::Clan * clan = GObject::globalClans[cqr._id];
 	if(clan == NULL /*TODO: ¼ì²éÈËÊýÊÇ·ñ´ïµ½ÉÏÏÞ*/)
 	{
-		Stream st(0x96);
+		Stream st(REP::CLAN_REQ_ITEM);
 		st << static_cast<UInt32>(0) << "" << "" << Stream::eos;
 		player->send(st);
 		return;
 	}
 
-	Stream st(0x96);
+	Stream st(REP::CLAN_REQ_ITEM);
 	st << clan->getId() << clan->getContact() << clan->getPurpose() << Stream::eos;
 	player->send(st);
 }
@@ -608,7 +609,7 @@ void OnAllocateClanBattleRewardReq(GameMsgHdr& hdr, const void * data)
 		items[itemId] = itemNum;
 	}
 	player->getClan()->allocateRepoAsReward(player2, items);
-	Stream st(0x9E);
+	Stream st(REP::ALLOCATECLANREWARD);
 	st << player2->getId() << static_cast<UInt8>(0) << Stream::eos;
 	player->send(st);
 }
@@ -682,7 +683,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 				if(skillId < 7 || skillId > 10)
 					return;
 				UInt16 favorId = clan->getFavorItemId(skillId);
-				Stream st(0x99);
+				Stream st(REP::CLAN_SKILL);
 				st << static_cast<UInt8>(5) << skillId << favorId << Stream::eos;
 				player->send(st);
 			}
@@ -729,7 +730,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 			UInt8 autobattleeffect = clan->getAutoBattleEffect();
 			if (blClanBattle == NULL)
 			{
-				Stream st(0x79);
+				Stream st(REP::CLAN_BATTLE);
 				st << static_cast<UInt8>(0) << static_cast<UInt8>((enterCount << 4) | (GObject::ClanCityBattle::getMaxEnterCount())) << autobattleeffect << battlingStatus << (battlingStatus > 1 ? battleNextTime : battleTime)  <<  static_cast<UInt8>(2) << Stream::eos;
 				player->send(st);
 			}
@@ -743,7 +744,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 				}
 				UInt16 loc = cbp->hold;
 				{
-					Stream st(0x79);
+					Stream st(REP::CLAN_BATTLE);
 					st << static_cast<UInt8>(0) << static_cast<UInt8>((enterCount << 4) | (GObject::ClanCityBattle::getMaxEnterCount())) <<  autobattleeffect << battlingStatus << (battlingStatus > 1 ? battleNextTime : battleTime) << static_cast<UInt8>(1) << blClanBattle->getClanBattleType() << blClanBattle->getOwnerClanName() << clanBattle->getClanRelation(blClanBattle->getOwnerClan()) << loc << static_cast<UInt8>(blClanBattle->isClanHoldDestroy(loc) ? 1 : 0) << Stream::eos;
 					player->send(st);
 				}
@@ -783,7 +784,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 				GObject::ClanBattle * clanBattle = GObject::clanManager.getBattleClan(player, clanName);
 				if (clanBattle == NULL)
 				{
-					Stream st(0x79);
+					Stream st(REP::CLAN_BATTLE);
 					st << static_cast<UInt8>(1) << static_cast<UInt8>(2) << static_cast<UInt8>(2) << static_cast<UInt8>(1) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << clanName << Stream::eos;
 					player->send(st);
 				}
@@ -898,7 +899,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 			}
 			if (!r)
 			{
-				Stream st(0x79);
+				Stream st(REP::CLAN_BATTLE);
 				st << static_cast<UInt8>(2) << flag << static_cast<UInt8>(1) << clanName << Stream::eos;
 				player->send(st);
 			}
@@ -913,7 +914,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 				return;
 			UInt16 buildID;
 			brd >> buildID;
-			Stream st(0x79);
+			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(3) << (blClanBattle->moveToHold(player, buildID) ? 0 : 1) << buildID << Stream::eos;
 			player->send(st);
 		}
@@ -932,7 +933,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 				blClanBattle->attackNpc(player, deferName);
 			else
 				blClanBattle->attackPlayer(player, player->fixName(deferName));
-			Stream st(0x79);
+			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(4) << Stream::eos;
 			player->send(st);
 		}
@@ -941,7 +942,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 		{
 			if (!clan->hasClanAuthority(player, 4))
 				return;
-			Stream st(0x79);
+			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(10) << clan->getClanBattle()->getNextBattleTime() << Stream::eos;
 			player->send(st);
 		}
@@ -956,7 +957,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 			brd >> openT;
 			if (clan->getClanBattle()->setNextBattleTime(player, openT))
 			{
-				Stream st(0x79);
+				Stream st(REP::CLAN_BATTLE);
 				st << static_cast<UInt8>(10) << openT << Stream::eos;
 				clan->broadcast(st);
 			}
@@ -970,7 +971,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 			GObject::ClanBattle * blClanBattle = player->getClanBattle();
 			if (blClanBattle != NULL && blClanBattle->leaveClanCity(player))
 				r = 1;
-			Stream st(0x79);
+			Stream st(REP::CLAN_BATTLE);
 			st << static_cast<UInt8>(16) << r << Stream::eos;
 			player->send(st);
 		}
@@ -1028,7 +1029,7 @@ struct PlayerIdRep
 	UInt8 sex;
 	UInt8 office;
 	UInt8 guard;
-	MESSAGE_DEF6(0xF2, UInt64, id, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard);
+	MESSAGE_DEF6(REP::FIND_USER, UInt64, id, std::string, name, UInt8, cny, UInt8, sex, UInt8, office, UInt8, guard);
 };
 
 void OnStoreListReq( GameMsgHdr& hdr, StoreListReq& lr )

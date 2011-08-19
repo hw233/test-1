@@ -6,6 +6,7 @@
 #include "Mail.h"
 #include "Server/Cfg.h"
 #include "Server/SysMsg.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -87,7 +88,7 @@ Arena::Arena():
 
 void Arena::enterArena( Player * player )
 {
-	Stream st(0x02, 0xEF);
+	Stream st(REP::ENTER_ARENA, 0xEF);
 	st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
 	appendLineup(st, player);
 	st << Stream::eos;
@@ -96,7 +97,7 @@ void Arena::enterArena( Player * player )
 
 void Arena::commitLineup( Player * player, int sid )
 {
-	Stream st(0x03, 0xEF);
+	Stream st(REP::LINEUP_CHANGE, 0xEF);
 	st << player->getId();
 	appendLineup(st, player);
 	st << Stream::eos;
@@ -518,7 +519,7 @@ void Arena::readFrom( BinaryReader& brd )
 
 void Arena::sendInfo( Player * player )
 {
-	Stream st(0xEA);
+	Stream st(REP::SERVER_ARENA_INFO);
 	std::map<Player *, ArenaPlayer>::iterator it = _players.find(player);
 	if(it == _players.end())
 	{
@@ -581,7 +582,7 @@ void Arena::sendElimination( Player * player, UInt8 group )
 		return;
 	if(_progress < 4)
 		return;
-	Stream st(0xEB);
+	Stream st(REP::SERVER_ARENA_ELIM);
 	st << group;
 	std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
 	const int aIndex[6] = {0, 16, 24, 28, 30, 31};

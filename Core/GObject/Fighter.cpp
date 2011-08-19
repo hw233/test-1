@@ -3,6 +3,7 @@
 #include "Country.h"
 #include "TaskMgr.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Clan.h"
 #include "Package.h"
@@ -388,7 +389,7 @@ void Fighter::sendModificationAcupoints( UInt8 t, int idx, bool writedb )
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << _acupoints[idx] << getSoul() << getMaxSoul();
     if (writedb)
@@ -404,7 +405,7 @@ void Fighter::sendModification( UInt8 t, UInt16 value, int idx, bool writedb)
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << value;
     if (writedb)
@@ -419,7 +420,7 @@ void Fighter::sendModificationUpSkill( UInt8 t, UInt16 skill, int idx, bool writ
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << skill;
     if (writedb)
@@ -434,7 +435,7 @@ void Fighter::sendModificationSkills( UInt8 t, UInt16 skill, int idx, bool write
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << skill;
     if (writedb)
@@ -449,7 +450,7 @@ void Fighter::sendModificationUpCitta( UInt8 t, UInt16 citta, int idx, bool writ
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << citta;
     if (writedb)
@@ -464,7 +465,7 @@ void Fighter::sendModificationCittas( UInt8 t, UInt16 citta, int idx, bool write
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     st << static_cast<UInt8>(idx) << citta;
     if (writedb)
@@ -480,7 +481,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << n;
 	for(UInt8 i = 0; i < n; ++ i)
 	{
@@ -512,7 +513,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 {
 	if(_owner == NULL)
 		return;
-	Stream st(0x21);
+	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << n;
 	for(UInt8 i = 0; i < n; ++ i)
 	{

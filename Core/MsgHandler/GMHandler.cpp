@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "GMHandler.h"
+#include "MsgID.h"
 #include "Server/WorldServer.h"
 #include "Server/OidGenerator.h"
 #include "Server/SysMsg.h"
@@ -1263,7 +1264,7 @@ void GMHandler::OnWallow( std::vector<std::string>& arglist )
 		NETWORK()->Enumerate<Network::GameClient>(enumWOn, n);
 	else
 	{
-		Stream st(0x12);
+		Stream st(REP::WALLOW_VERIFY);
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt32>(0) << Stream::eos;
 		NETWORK()->Enumerate<Network::GameClient>(enumWOff, &st);
 	}
@@ -1456,7 +1457,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
 
-	Stream st(0x61);
+	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 	player->send(st);
 }

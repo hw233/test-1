@@ -1,5 +1,6 @@
 #include "Config.h"
 #include "Server/WorldServer.h"
+#include "MsgID.h"
 #include "Player.h"
 #include "Package.h"
 #include "TaskMgr.h"
@@ -126,7 +127,7 @@ namespace GObject
 	{
 		if(m_Player == NULL || !m_Player->isOnline())
 			return;
-		Stream st(0x6D);
+		Stream st(REP::TASK_RESPONSE_HOOK);
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
 
 		UInt32 vipLevel = m_Player->getVipLevel();
@@ -861,7 +862,7 @@ namespace GObject
 	{
 		if(!_isOnline)
 			return;
-		Stream st(0x28);
+		Stream st(REP::FIGHTER_ACCEPT);
 		st << static_cast<UInt16>(fgt->getId());
         st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getDefaultSkillAndLevel() << fgt->getDefaultCittaAndLevel();
 		st << Stream::eos;
@@ -1087,7 +1088,7 @@ namespace GObject
 				}
 			}
 		}
-		st.init(0x14);
+		st.init(REP::USER_INFO);
 		UInt8 status = static_cast<UInt8>(_playerData.status);
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
@@ -1102,7 +1103,7 @@ namespace GObject
 
 	void Player::makeFormationInfo( Stream& st )
 	{
-		st.init(0x1E);
+		st.init(REP::RANK_SETTING);
 		st << _playerData.formation << static_cast<UInt8>(0);
 		UInt8 c = 0;
 		for(UInt8 i = 0; i < 5; ++ i)
@@ -1118,20 +1119,10 @@ namespace GObject
 		st << Stream::eos;
 	}
 
-	void Player::makeFighterIdList( Stream& st )
-	{
-		size_t c = _fighters.size();
-		st.init(0x18);
-		st << static_cast<UInt8>(c);
-		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
-			st << it->second->getId();
-		st << Stream::eos;
-	}
-
 	void Player::makeFighterList( Stream& st )
 	{
 		size_t c = _fighters.size();
-		st.init(0x23);
+		st.init(REP::FIGHTER_INFO);
 		st << static_cast<UInt8>(c);
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
 			makeFighterInfo(st, it->second);
@@ -1228,7 +1219,6 @@ namespace GObject
 		if(writedb)
 		{
 			DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v.friendliness, v.submitFavorCount, v.submitFavorDay);
-			sendGreatFighterTaskVal(id, v.friendliness, v.submitFavorCount);
 			//SYSMSG_SENDV(148, this, friendliness);
 			SYSMSG_SENDV(1048, this, id, friendliness);
 		}
@@ -1240,21 +1230,6 @@ namespace GObject
 		if (cit == _greatFighterTaskVal.end())
 			return 0;
 		return cit->second.friendliness;
-	}
-
-	void Player::sendGreatFighterTaskVal(UInt32 id)
-	{
-		std::map<UInt32, GreatFighterTaskVal>::const_iterator cit = _greatFighterTaskVal.find(id);
-		if (cit == _greatFighterTaskVal.end())
-			return;
-		sendGreatFighterTaskVal(id, cit->second.friendliness, cit->second.submitFavorCount);
-	}
-
-	void Player::sendGreatFighterTaskVal( UInt32 id, UInt16 friendliness, UInt16 favorSubmitCount )
-	{
-		Stream st(0x25);
-		st << id << friendliness << favorSubmitCount << Stream::eos;
-		send(st);
 	}
 
 	void Player::greatFighterFavorSubmitCheck(GreatFighterTaskVal * task, UInt32 fightId, UInt32 thisDay)
@@ -1298,7 +1273,6 @@ namespace GObject
 		DBLOG().PushUpdateData("insert into `fighter_friendness`(`server_id`, `player_id`, `fighter_id`, `friendness`, `time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), id, v->friendliness, TimeUtil::Now());		
 		GameAction()->RunGreatTaskAction(this, id);
 
-		sendGreatFighterTaskVal(id, v->friendliness, v->submitFavorCount);
 		return true;
 	}
 
@@ -1316,29 +1290,6 @@ namespace GObject
 	{
 		GObject::Fighter& fighter = GObject::getGreatFighter(fightId);
 		return fighter.getId() == 0 ? 0 : fighter.favor;
-	}
-
-	void Player::makeGreatFighterTaskValList(Stream& st, UInt16 start, UInt16 count)
-	{
-		UInt16 sz = static_cast<UInt16>(_greatFighterTaskVal.size());
-		UInt16 end = start + count;
-		if (end > sz)
-			end = sz;
-		if (start < end)
-			count = end - start;
-		else
-			count = 0;
-		st.init(0x24);
-		st << start << count << sz;
-		std::map<UInt32, GreatFighterTaskVal>::iterator pos = _greatFighterTaskVal.begin();
-		std::advance(pos, start);
-		UInt32 thisDay = TimeUtil::SharpDay(0);
-		for (; pos != _greatFighterTaskVal.end() && start < end; ++pos, ++start)
-		{
-			greatFighterFavorSubmitCheck(&pos->second, pos->first, thisDay);
-			st << pos->first << pos->second.friendliness << pos->second.submitFavorCount;
-		}
-		st << Stream::eos;
 	}
 
 	bool Player::setNewGuildTaskStep(UInt32 step)
@@ -1377,7 +1328,7 @@ namespace GObject
 				break;
 			}
 		} 
-		Stream st(0x15);
+		Stream st(REP::USER_INFO_CHANGE);
 		st << static_cast<UInt8>(0x10) << step << Stream::eos;
 		send(st);
 #else
@@ -1389,7 +1340,7 @@ namespace GObject
 
     void Player::sendNewGuild()
     {
-        Stream st(0x13);
+        Stream st(REP::GUIDE_RESPONSE_STEP);
         st << static_cast<UInt16>(_playerData.newGuild);
         st << Stream::eos;
         send(st);
@@ -1415,7 +1366,7 @@ namespace GObject
 		bsim.start();
 		bool res = bsim.getWinner() == 1;
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		send(st);
 		st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
@@ -1501,7 +1452,7 @@ namespace GObject
 		if(packet.size() <= 8)
 			return false;
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 
 		bool res = bsim.getWinner() == 1;
 		if(res)
@@ -1574,7 +1525,7 @@ namespace GObject
 		if(packet.size() <= 8)
 			return false;
 
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		bool res = bsim.getWinner() == 1;
 		if(res)
 		{
@@ -1679,7 +1630,7 @@ namespace GObject
 
 	void Player::cancelAutoBattleNotify()
 	{
-		Stream st(0x6D);
+		Stream st(REP::TASK_RESPONSE_HOOK);
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (getMaxIcCount(_vipLevel) - getIcCount()) << Stream::eos;
 		send(st);
 		DB().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
@@ -1828,7 +1779,7 @@ namespace GObject
 
 		_playerData.packSize += EACH_EXTEND_NUM;
 		updateDB(32, _playerData.packSize);
-		Stream st(0x34);
+		Stream st(REP::PACK_EXTEND);
 		st << getPacksize() << Stream::eos;
 		send(st);
 		return true;
@@ -1882,7 +1833,7 @@ namespace GObject
 		if(notify)
 		{
 			notifyFriendAct(1, pl);
-			Stream st(0xA9);
+			Stream st(REP::FRIEND_ACTION);
 			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
@@ -1907,7 +1858,7 @@ namespace GObject
 		if(it == _friends[0].end())
 			return;
 		_friends[0].erase(it);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x02) << pl->getName() << Stream::eos;
 		send(st);
 		SYSMSG_SEND(134, this);
@@ -1953,7 +1904,7 @@ namespace GObject
 		}
 
 		notifyFriendAct(4, pl);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x03) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 1, %"I64_FMT"u)", getId(), pl->getId());
@@ -1979,7 +1930,7 @@ namespace GObject
 		if(it == _friends[1].end())
 			return false;
 		_friends[1].erase(it);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x04) << pl->getName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 1 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
@@ -1997,7 +1948,7 @@ namespace GObject
 		}
 
 		notifyFriendAct(3, pl);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
@@ -2007,7 +1958,7 @@ namespace GObject
 		if(_friends[2].size() >= 20)
 		{
 			std::set<Player *>::iterator it = _friends[2].begin();
-			Stream st(0xA9);
+			Stream st(REP::FRIEND_ACTION);
 			st << static_cast<UInt8>(0x06) << (*it)->getName() << Stream::eos;
 			send(st);
 			_friends[2].erase(it);
@@ -2030,7 +1981,7 @@ namespace GObject
 		if(it == _friends[2].end())
 			return false;
 		_friends[2].erase(it);
-		Stream st(0xA9);
+		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x06) << pl->getName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 2 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
@@ -2047,7 +1998,7 @@ namespace GObject
 			cnt = 0;
 		else
 			cnt = end - start;
-		Stream st(0xA8);
+		Stream st(REP::FRIEND_LIST);
 		st << static_cast<UInt8>(type) << start << cnt << sz;
 		std::set<Player *>::iterator it = _friends[type].begin();
 		std::advance(it, start);
@@ -2066,7 +2017,7 @@ namespace GObject
 	{
 		if(_isOnline)
 		{
-			Stream st(0x15);
+			Stream st(REP::USER_INFO_CHANGE);
 			if(t > 0x40)
 			{
 				UInt32 tm = TimeUtil::Now();
@@ -2498,7 +2449,7 @@ namespace GObject
 		delete data;
 		_trainFighters.erase(id);
 		DB().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
-		Stream st(0x2E);
+		Stream st(REP::TRAIN_FIGHTER_OP);
 		st << id << static_cast<UInt8>(2) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
 		if (notify)
@@ -2561,7 +2512,7 @@ namespace GObject
 		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 60, data->checktime, fgt, data->trainend);
 		if (event == NULL) return false;
 		PushTimerEvent(event);
-		Stream st(0x2E);
+		Stream st(REP::TRAIN_FIGHTER_OP);
 		UInt32 remain = event->GetEnd() - TimeUtil::Now();
 		st << id << data->priceType << remain << Stream::eos;
 		send(st);
@@ -2604,7 +2555,7 @@ namespace GObject
 			else
 			{
 				DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, id, _id);
-				Stream st(0x2E);
+				Stream st(REP::TRAIN_FIGHTER_OP);
 				UInt32 now = TimeUtil::Now();
 				st << id << data->priceType;
 				if(data->trainend > now)
@@ -2637,7 +2588,7 @@ namespace GObject
 
 	void Player::makeTrainFighterInfo(Stream& st)
 	{
-		st.init(0x2D);
+		st.init(REP::TRAIN_FIGHTER_LIST);
 		UInt8 cnt = 0;
 		st << cnt;
 		if(!_trainFighters.empty())
@@ -3120,7 +3071,7 @@ namespace GObject
 
 	void Player::writeClanTask()
 	{
-        Stream st(0x98);
+        Stream st(REP::CLAN_INFO_UPDATE);
         st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
         st << Stream::eos;
         send(st);
@@ -3306,7 +3257,7 @@ namespace GObject
 
     void Player::sendColorTask(UInt8 ttype, UInt16 ncount)
     {
-        Stream st(0x8B);
+        Stream st(REP::TASK_CYC_FRESH);
         st << ttype;
         if (ttype == 0) 
         {
@@ -3398,7 +3349,7 @@ namespace GObject
         }
 
 		UInt16 tcount = 0;
-		Stream st(0x26);
+		Stream st(REP::HOTEL_PUB_LIST);
 		if(count > 0)
 		{
 			do
@@ -3635,22 +3586,6 @@ namespace GObject
 		moveTo(0x3004, true);
 	}
 
-	void Player::sendGreatFighterMet()
-	{
-		Stream st(0xB8);
-		UInt8 data[(GREAT_FIGHTER_MAX + 8) / 8] = {0};
-		st << static_cast<UInt8>(20);
-		std::map<UInt32, GreatFighterTaskVal>::iterator it;
-		for(it = _greatFighterTaskVal.begin(); it != _greatFighterTaskVal.end(); ++ it)
-		{
-			if (it->second.friendliness > 0)
-				data[it->first >> 3] |= 1 << (it->first & 0x07);
-		}
-		st.append(data, 20);
-		st << Stream::eos;
-		send(st);
-	}
-
 	void Player::autoRegenAll()
 	{
 		if(hasFlag(CountryBattle | ClanBattling))
@@ -3727,7 +3662,7 @@ namespace GObject
 			stage = 0;
 			duration = 0;
 		}
-		st.init(0x12);
+		st.init(REP::WALLOW_VERIFY);
 		st << wallow << stage << duration << Stream::eos;
 	}
 
@@ -3848,7 +3783,7 @@ namespace GObject
 #if 0
 		if(!hasStatus(FirstHPLoss))
 		{
-			Stream st(0x13);
+			Stream st(REP::GUIDE_RESPONSE_STEP);
 			st << static_cast<UInt16>(1) << Stream::eos;
 			send(st);
 			addStatus(FirstHPLoss);
@@ -3861,7 +3796,7 @@ namespace GObject
 #if 0
 		if(!hasStatus(FirstDeath))
 		{
-			Stream st(0x13);
+			Stream st(REP::GUIDE_RESPONSE_STEP);
 			st << static_cast<UInt16>(2) << Stream::eos;
 			send(st);
 			addStatus(FirstDeath);
@@ -3902,7 +3837,7 @@ namespace GObject
 
     void Player::sendFormationList()
     {
-        Stream st(0x1D);
+        Stream st(REP::RANK_DATA);
         UInt8 cnt = _playerData.formations.size();
         st << static_cast<UInt8>(0) << cnt;
         for( int idx = 0; idx < cnt; ++ idx )
@@ -3920,7 +3855,7 @@ namespace GObject
         if(formation == NULL)
             return false;
 
-        Stream st(0x1D);
+        Stream st(REP::RANK_DATA);
         st << static_cast<UInt8>(1);
         int cnt = formation->getLevUpItemCount();
         if(0 == cnt)
@@ -4010,7 +3945,7 @@ namespace GObject
         SYSMSG_SENDV(2104, this, newformation->getName().c_str());
 		DB().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
 
-        Stream st(0x1D);
+        Stream st(REP::RANK_DATA);
         st << static_cast<UInt8>(2) << newformationId << Stream::eos;
         send(st);
 
@@ -4105,7 +4040,7 @@ namespace GObject
 		if(_playerData.rewardStep >= count) {
 			_playerData.rewardStep = count;
 
-            Stream st(0x38);
+            Stream st(REP::REWARD_DRAW);
             st << static_cast<UInt16>(-1) << static_cast<UInt8>(0);
             st << Stream::eos;
             send(st);
@@ -4139,7 +4074,7 @@ namespace GObject
 
 	void Player::sendOnlineReward()
 	{
-		Stream st(0x38);
+		Stream st(REP::REWARD_DRAW);
         UInt32 left = getOnlineReward();
         if (left == static_cast<UInt32>(-1))
         {
@@ -4191,7 +4126,7 @@ namespace GObject
 
 	void Player::sendDailyInfo()
 	{
-		Stream st(0x5F);
+		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(1);
 		bossManager.buildInfo(st);
 		st << static_cast<UInt8>(dungeonManager.size());
@@ -4400,7 +4335,7 @@ namespace GObject
 	void Player::sendFriendActList()
 	{
 		size_t sz = _friendActs.size();
-		Stream st(0xAB);
+		Stream st(REP::FRIEND_STATUS);
 		st << static_cast<UInt8>(sz);
 		for(size_t i = 0; i < sz; ++ i)
 		{
@@ -4445,7 +4380,7 @@ namespace GObject
 		_friendActs.push_back(fas);
 		if(_isOnline)
 		{
-			Stream st(0xAB);
+			Stream st(REP::FRIEND_STATUS);
 			st << static_cast<UInt8>(0xFF);
 			appendFriendAct(st, fas);
 			st << Stream::eos;
@@ -4680,7 +4615,7 @@ namespace GObject
 		Stream& packet = bsim.getPacket();
 		if(packet.size() <= 8)
 			return false;
-		Stream st(0x61);
+		Stream st(REP::ATTACK_NPC);
 		bool isWin = bsim.getWinner() == 1;
 		UInt8 sz = 0;
 		GData::LootResult lt = {0, 0};
@@ -4807,7 +4742,7 @@ namespace GObject
 
 	void Player::listBookStore(UInt8 type)
 	{
-        Stream st(0x1A);
+        Stream st(REP::BOOK_SHOP_LIST);
         if (GetLev() < 10 && !type && GetTaskMgr()->HasCompletedTask(5) && !GetTaskMgr()->HasSubmitedTask(5)) {
             st << static_cast<UInt16>(0);
             _playerData.bookStore[0] = 1200;
@@ -5031,7 +4966,7 @@ namespace GObject
 
 	void Player::makeSenconPWDInfo(Stream& st)
 	{
-		st.init(0xCB);
+		st.init(REP::SECOND_PWD);
 		if(!_pwdInfo.secondPWD.empty())
 			st << static_cast<UInt8>(0) << _pwdInfo.questionForPWD;
 		else
@@ -5048,7 +4983,7 @@ namespace GObject
 				sendMsgCode(0, 2003);
 				return false;
 			}
-			Stream st(0xCC);
+			Stream st(REP::PWD_DAILOG);
 			st << Stream::eos;
 			send(st);
 			return false;

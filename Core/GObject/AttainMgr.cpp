@@ -1,4 +1,5 @@
 #include "Config.h"
+#include "MsgID.h"
 #include "Server/WorldServer.h"
 #include "Player.h"
 #include "AttainMgr.h"
@@ -79,7 +80,7 @@ namespace GObject
 
     void AttainMgr::UpdateAttainment(UInt16 attainId, UInt32 status)
     {
-        Stream st(0x0C);
+        Stream st(REP::ACHIEVEMENT);
         st << static_cast<UInt8>(1);
         st << attainId;
 
@@ -155,7 +156,7 @@ namespace GObject
 
     void AttainMgr::sendAttainment()
     {
-        Stream st(0x0C);
+        Stream st(REP::ACHIEVEMENT);
         UInt16 cnt = m_AttainList.size();
         st << cnt;
 

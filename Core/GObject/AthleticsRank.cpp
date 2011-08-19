@@ -17,6 +17,7 @@
 #include "SpecialAward.h"
 #include "Clan.h"
 #include "SpecialAward.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -344,7 +345,7 @@ void AthleticsRank::requestAthleticsList(Player * player)
 		else
 			std::advance(end, ranksize-1);
 	}
-	Stream st(0xD0);
+	Stream st(REP::ARENA_IFNO);
 	UInt32 now = TimeUtil::Now();
 	//UInt32 endTime = (*rank)->challengetime + ATHLETICS_BUFF_TIME;
 	//

@@ -3,6 +3,7 @@
 
 #include "MsgTypes.h"
 #include "MsgFunc.h"
+#include "MsgID.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -34,7 +35,7 @@ struct UserDisconnectStruct
 struct UserReconnectStruct
 {
 	UInt64 _userid;
-	MESSAGE_DEF1(0x01, UInt64, _userid);
+	MESSAGE_DEF1(REQ::RECONNECT, UInt64, _userid);
 };
 
 struct UserLoginStruct
@@ -45,7 +46,7 @@ struct UserLoginStruct
 	UInt8 _hashval[36];
 	std::string _server;
 
-	MESSAGE_DEF4(0x10, UInt64, _userid, UInt32, _lang, HashValType, _hashval, std::string, _server);
+	MESSAGE_DEF4(REQ::LOGIN, UInt64, _userid, UInt32, _lang, HashValType, _hashval, std::string, _server);
 };
 
 struct NewUserStruct
@@ -53,7 +54,7 @@ struct NewUserStruct
 	std::string _name;
 	UInt8 _class;
 
-	MESSAGE_DEF2(0x11, std::string, _name, UInt8, _class);
+	MESSAGE_DEF2(REQ::CREATE_ROLE, std::string, _name, UInt8, _class);
 };
 
 
@@ -74,7 +75,7 @@ struct UserLogonRepStruct
 	UInt32 _result;
 	std::string _name;
 
-	MESSAGE_DEF2(0x10, UInt32, _result, std::string, _name);
+	MESSAGE_DEF2(REP::LOGIN, UInt32, _result, std::string, _name);
 };
 
 inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject::Player *& player, bool kickOld = true)
@@ -150,7 +151,7 @@ void UserReconnectReq(LoginMsgHdr& hdr, UserReconnectStruct& ur)
 	GObject::Player * player = NULL;
 	if(doLogin(cl, ur._userid, hdr.sessionID, player, false) != 0)
 	{
-		Stream st(0x01);
+		Stream st(REP::RECONNECT);
 		st << static_cast<UInt8>(1) << Stream::eos;
 		cl->send(&st[0], st.size());
 		return;
@@ -258,7 +259,7 @@ struct NewUserRepStruct
 	UInt32 _result;
 	std::string _name;
 
-	MESSAGE_DEF2(0x11, UInt32, _result, std::string, _name);
+	MESSAGE_DEF2(REP::NEW_CHARACTER, UInt32, _result, std::string, _name);
 };
 
 static inline int char_type(UInt8 p)
@@ -488,7 +489,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
 
     Stream st;
-    st.init(0x00, 0x01);
+    st.init(REP::KEEP_ALIVE, 0x01);
     st<<ret<<Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
@@ -502,7 +503,7 @@ void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 	UInt8 type;
 	std::string msg;
 	brd >> type >> msg;
-	Stream st(0xF7);
+	Stream st(REP::SYSTEM_INFO);
 	st << type << msg << Stream::eos;
 	NETWORK()->Broadcast(st);
 }
@@ -511,7 +512,7 @@ void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 void OnKickUser(LoginMsgHdr& hdr,const void * data)
 {
     Stream st;
-    st.init(0x01,0x01);
+    st.init(REP::RECONNECT, 0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
     br>>playerId;
@@ -542,7 +543,7 @@ void OnKickUser(LoginMsgHdr& hdr,const void * data)
 void LockUser(LoginMsgHdr& hdr,const void * data)
 {
     Stream st;
-    st.init(0x02,0x01);
+    st.init(SPEP::LOCKUSER,0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
     UInt64 expireTime;
@@ -581,7 +582,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
 void UnlockUser(LoginMsgHdr& hdr,const void * data)
 {
     Stream st;
-    st.init(0x03,0x01);
+    st.init(SPEP::UNLOCKUSER,0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
     br>>playerId;
@@ -610,7 +611,7 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
-    st.init(0x04,0x01);
+    st.init(SPEP::GMHANDLERFROMBS,0x01);
     std::string playerNameList;
     std::string cmd;
     br>>playerNameList;
@@ -680,7 +681,7 @@ void MailFromBs(LoginMsgHdr &hdr,const void * data)
     brd>>content;
     GObject::Player *pl= GObject::globalNamedPlayers[playerName];
     Stream st;
-    st.init(0x05, 0x01);
+    st.init(SPEP::MAILFROMBS, 0x01);
     st<<playerName;
     if(pl==NULL)
     {
@@ -699,7 +700,7 @@ void BanChatFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
-    st.init(0x06,0x01);
+    st.init(SPEP::BANCHATFROMBS,0X01);
     std::string playerNameList;
     UInt32 time;
     br>>playerNameList;
@@ -746,7 +747,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
-	st.init(0x07,0x01);
+	st.init(SPEP::ADDITEMFROMBS,0x01);
 	std::string playerNameList;
 	std::string content;
 	std::string title;

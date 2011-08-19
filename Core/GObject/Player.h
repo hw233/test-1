@@ -555,7 +555,6 @@ namespace GObject
 		bool setFormation(UInt16);
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
-		void makeFighterIdList(Stream&);
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
@@ -574,15 +573,12 @@ namespace GObject
 		bool   submitGreatFighterFavor(UInt32 id);
 		UInt16 getGreatFighterFavorSubmitCount(UInt32 id);
 		UInt32 getGreatFighterFavor(UInt32 id);
-		void   sendGreatFighterTaskVal(UInt32 id);
-		void   makeGreatFighterTaskValList(Stream& st, UInt16 start, UInt16 count);
 
 		bool setNewGuildTaskStep(UInt32);
         void sendNewGuild();
 
 
 	private:
-		void  sendGreatFighterTaskVal(UInt32 id, UInt16 friendliness, UInt16 favorSubmitCount);
 		void  greatFighterFavorSubmitCheck(GreatFighterTaskVal *, UInt32, UInt32 = TimeUtil::SharpDay(0));
 
 	public:
@@ -697,8 +693,6 @@ namespace GObject
 
 		void exceptAvailableFighters(std::map<UInt32, UInt32>&);
         UInt32 getColorFighterNum(UInt8 color);
-
-		void sendGreatFighterMet();
 
 		inline void setNextBookStoreUpdate(UInt32 n) { _nextBookStoreUpdate = n; }
 		void writeBookStoreIds();

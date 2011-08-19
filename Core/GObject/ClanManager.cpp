@@ -10,6 +10,7 @@
 #include "Package.h"
 #include "Battle/BattleSimulator.h"
 #include "Common/TimeUtil.h"
+#include "MsgID.h"
 
 namespace GObject 
 {
@@ -123,7 +124,7 @@ void ClanManager::listClans(Player * player, UInt16 start, UInt8 count)
 		count = 0;
 	else
 		count = end - start;
-	Stream st(0x7A);
+	Stream st(REP::CLAN_OPEN);
 	st << sz << start << count;
 
 	{

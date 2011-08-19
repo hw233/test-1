@@ -21,6 +21,7 @@
 #include "Common/TimeUtil.h"
 #include "Server/SysMsg.h"
 #include "SpecialAward.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -492,7 +493,7 @@ namespace GObject
 
 	void TaskMgr::SendNewTaskInfor(const TaskData& task)
 	{
-		Stream st(0x87);
+		Stream st(REP::NEW_TASK);
 		st << static_cast<UInt32>(0) << task.m_Class << task.m_TaskId << task.m_AcceptTime << task.m_TimeBegin << task.m_TimeEnd << Stream::eos;
 		m_PlayerOwner->send(st);
 	}
@@ -681,13 +682,13 @@ namespace GObject
 			}
 			if (notify)
 			{
-				Stream st(0x86);
+				Stream st(REP::UPDATE_TASK_PROCESS);
 				st << td->m_TaskId << static_cast<UInt8>(0) << static_cast<UInt32>(td->m_Step[stepType-1]) << static_cast<UInt32>(stepType) << Stream::eos;
 				m_PlayerOwner->send(st);
 			}
 			if (completedToken && notify)
 			{
-				Stream st(0x86);
+				Stream st(REP::UPDATE_TASK_PROCESS);
 				st << td->m_TaskId << static_cast<UInt8>(1) << static_cast<UInt32>(1) << static_cast<UInt32>(0) << Stream::eos;
 				m_PlayerOwner->send(st);
 			}
@@ -702,7 +703,7 @@ namespace GObject
 
 	void TaskMgr::SendCurrTaskInfor()
 	{
-		Stream st(0x82);
+		Stream st(REP::GET_TASK_LIST);
 		UInt32 thisDay = TimeUtil::SharpDay(0);
 		st << static_cast<UInt16>(m_TaskAcceptedList.size()+m_TaskCompletedList.size());
 		TaskMgr::TaskList::iterator it;
@@ -762,7 +763,7 @@ namespace GObject
 	{
 		if (!m_PlayerOwner->isOnline())
 			return;
-		Stream st(0x83);
+		Stream st(REP::GET_USABLE_TASK);
 		st << static_cast<UInt16>(m_CanAcceptTaskList.size());
 		CanAcceptTaskList::const_iterator cit = m_CanAcceptTaskList.begin();
 		for (; cit != m_CanAcceptTaskList.end(); ++cit)
@@ -1247,7 +1248,7 @@ namespace GObject
 		m_TaskAcceptedList.erase(it);
 
 
-		Stream st(0x86);
+		Stream st(REP::UPDATE_TASK_PROCESS);
 		st << autoTask << static_cast<UInt8>(1) << static_cast<UInt32>(1) << static_cast<UInt32>(0) << Stream::eos;
 		m_PlayerOwner->send(st);
 
@@ -1336,7 +1337,7 @@ namespace GObject
 			{
 				if (m_PlayerOwner->isOnline() && notify)
 				{
-					Stream st(0x85);
+					Stream st(REP::PLAYER_ABANDON_TASK);
 					st << it->second->m_TaskId << static_cast<UInt8>(2) << Stream::eos;
 					m_PlayerOwner->send(st);
 				}
@@ -1353,7 +1354,7 @@ namespace GObject
 			{
 				if (m_PlayerOwner->isOnline() && notify)
 				{
-					Stream st(0x85);
+					Stream st(REP::PLAYER_ABANDON_TASK);
 					st << it->second->m_TaskId << static_cast<UInt8>(2) << Stream::eos;
 					m_PlayerOwner->send(st);
 				}

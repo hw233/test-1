@@ -8,6 +8,7 @@
 #include "GData/GDataManager.h"
 #include "MsgHandler/MsgTypes.h"
 #include "Common/Itoa.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -174,7 +175,7 @@ void SaleMgr::buySale(Player * player, UInt32 id)
 	SalePosType::iterator found = _salePos.find(id);
 	if (found == _salePos.end())
 	{
-		Stream st(0xC6);
+		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
 		player->send(st);
 		player->sendMsgCode(0, 2064);
@@ -257,7 +258,7 @@ void SaleMgr::cancelSale(Player * player, UInt32 id)
 	SalePosType::iterator found = _salePos.find(id);
 	if (found == _salePos.end())
 	{
-		Stream st(0xC6);
+		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << Stream::eos;
 		player->send(st);
 		return;
@@ -324,7 +325,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, UInt8
 				count = end - start;
 			UInt16 offset1, offset2;
 			UInt16 readCount = 0;
-			Stream st(0xC5);
+			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
 			if (shiftSingleSaleList(req, color, start, offset1, offset2))
 				readCount = appendSingleSaleList(player, st, req, sort, color, count, offset1, offset2);
@@ -346,7 +347,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, UInt8
 			UInt8 type;
 			UInt16 filter1Offset, filter0Offset;
 			UInt16 readCount = 0;
-			Stream st(0xC5);
+			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
 			if (shiftTotalSaleList(sort, color, start, type, filter1Offset, filter0Offset))
 				readCount = appendTotalSaleList(player, st, type, sort, color, count, filter1Offset, filter0Offset);
@@ -549,7 +550,7 @@ void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt1
 	const GData::ItemBaseType * itemBaseType = Package::GetItemBaseType(itemName);
 	if (itemBaseType == NULL)
 	{
-		Stream st(0xC5);
+		Stream st(REP::SALE_LIST);
 		st << static_cast<UInt16>(start) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
 		player->send(st);
 		player->sendMsgCode(1, 2063);
@@ -566,7 +567,7 @@ void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt1
 	else
 		count = end - start;
 	UInt16 realRead = 0;
-	Stream st(0xC5);
+	Stream st(REP::SALE_LIST);
 	st << static_cast<UInt16>(start) << static_cast<UInt16>(0) << static_cast<UInt16>(sales.size());
 	if (count != 0)
 	{
@@ -632,7 +633,7 @@ void SaleMgr::searchPlayerSale(Player * founder, Player * beFounder, UInt16 star
 {
 	if (beFounder == NULL)
 	{
-		Stream st(0xC5);
+		Stream st(REP::SALE_LIST);
 		st << static_cast<UInt16>(start) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
 		founder->send(st);
 		founder->sendMsgCode(1, 2062);
@@ -663,7 +664,7 @@ void SaleMgr::searchPlayerSaleResp(Player * founder, Player * beFounder, UInt16 
 	else
 		count = end - start;
 	UInt16 realRead = 0;
-	Stream st(0xC5);
+	Stream st(REP::SALE_LIST);
 	st << static_cast<UInt16>(start) << static_cast<UInt16>(0) << sz;
 	if (count != 0)
 	{

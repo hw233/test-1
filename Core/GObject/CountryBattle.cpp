@@ -11,6 +11,7 @@
 #include "Common/Serialize.h"
 #include "Common/TimeUtil.h"
 #include "SpecialAward.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -44,7 +45,7 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
 
 void CountryBattleData::sendAchieveUpdate( UInt16 achieve )
 {
-	Stream st(0x63);
+	Stream st(REP::COUNTRY_WAR_PROCESS);
 	st << static_cast<UInt8>(1) << achieve << Stream::eos;
 	player->send(st);
 }
@@ -251,7 +252,7 @@ void CountryBattle::process(UInt32 curtime)
 	if(!_cbsdlist.empty())
 	{
 		CBStatusDataList::iterator it;
-		Stream st(0x66);
+		Stream st(REP::COUNTRY_WAR_STRING);
 		st << _score[0] << _score[1] << static_cast<UInt16>(0);
 		UInt16 proc_count = 0;
 		for(it = _cbsdlist.begin(); it != _cbsdlist.end(); ++ it)
@@ -276,14 +277,14 @@ void CountryBattle::prepare(UInt32 rt)
 	_rewardTime = 0;
 	_battleDuration[0].clear();
 	_battleDuration[1].clear();
-	Stream st(0x63);
+	Stream st(REP::COUNTRY_WAR_PROCESS);
 	st << static_cast<UInt8>(2) << static_cast<UInt8>(0) << rt << Stream::eos;
 	broadcast(st);
 }
 
 void CountryBattle::start(UInt32 rt)
 {
-	Stream st(0x63);
+	Stream st(REP::COUNTRY_WAR_PROCESS);
 	st << static_cast<UInt8>(2) << static_cast<UInt8>(1) << rt << Stream::eos;
 	NETWORK()->Broadcast(st);
 }
@@ -390,7 +391,7 @@ void CountryBattle::end(UInt32 curtime)
 	}
 	DBLOG().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
 
-	_lastReport.init(0x64);
+	_lastReport.init(REP::COUNTRY_WAR_RESULT);
 	_lastReport << _spot << _score[0] << _score[1] << _owner << static_cast<UInt16>(0);
 	int i = 0;
 	for(std::map<CBPlayerData *, Player *, _rankCompare>::iterator it = _rank.begin(); it != _rank.end() && i < 5; ++ it, ++ i)
@@ -481,7 +482,7 @@ bool CountryBattle::playerEnter( Player * player )
 	cbsd.type = 0;
 	cbsd.setSideLevel(side, lvl);
 	cbsd.player = player;
-	Stream st(0x66);
+	Stream st(REP::COUNTRY_WAR_STRING);
 	st << _score[0] << _score[1] << static_cast<UInt16>(1);
 	padPlayerData(st, cbsd);
 	st << Stream::eos;
@@ -516,7 +517,7 @@ void CountryBattle::playerLeave( Player * player )
 	cbsd.type = 1;
 	cbsd.setSideLevel(side, lvl);
 	cbsd.player = player;
-	Stream st(0x66);
+	Stream st(REP::COUNTRY_WAR_STRING);
 	st << _score[0] << _score[1] << static_cast<UInt16>(1);
 	padPlayerData(st, cbsd);
 	st << Stream::eos;
@@ -734,7 +735,7 @@ void CountryBattle::getReward(UInt32 curtime)
 						cbsd[1].type = 0;
 						cbsd[1].setSideLevel(side, nlev);
 						cbsd[1].player = player;
-						Stream st(0x66);
+						Stream st(REP::COUNTRY_WAR_STRING);
 						st << _score[0] << _score[1] << static_cast<UInt16>(2);
 						padPlayerData(st, cbsd[0]);
 						padPlayerData(st, cbsd[1]);
@@ -753,7 +754,7 @@ void CountryBattle::sendInfo( Player * pl)
 {
     if (pl && pl->getCountry() >= COUNTRY_NEUTRAL)
         return;
-	Stream st(0x63);
+	Stream st(REP::COUNTRY_WAR_PROCESS);
 	st << static_cast<UInt8>(0);
 	UInt32 curtime = TimeUtil::Now();
 	if(curtime < globalCountryBattle.getStartTime())

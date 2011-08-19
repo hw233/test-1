@@ -2,6 +2,7 @@
 #include "WorldMsgHandler.h"
 #include "WorldOuterMsgHandler.h"
 #include "WorldInnerMsgHandler.h"
+#include "MsgID.h"
 
 MSG_HANDLER_DECLARE(WorldMsgHandler)
 
@@ -9,16 +10,16 @@ MSG_REG(GameMsgHdr, OnClanListReq);
 MSG_REG(GameMsgHdr, OnClanInfoReq);
 MSG_REG(GameMsgHdr, OnClanCreateReq);
 MSG_REG(GameMsgHdr, OnClanApplyReq);
-MSG_REG_2(GameMsgHdr, 0x94, OnClanOpReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_OPERATE, OnClanOpReq);
 MSG_REG(GameMsgHdr, OnClanModifyReq);
 MSG_REG(GameMsgHdr, OnClanQueryReq);
 MSG_REG(GameMsgHdr, OnClanQuery2Req);
 MSG_REG(GameMsgHdr, OnClanBattleReportReq);
 //MSG_REG(GameMsgHdr, OnClanPersonalRewardReq);
-MSG_REG_2(GameMsgHdr, 0x9B, OnClanPracticePlaceOpReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_BUILD, OnClanPracticePlaceOpReq);
 MSG_REG(GameMsgHdr, OnClanRewardReq);
 MSG_REG(GameMsgHdr, OnClanPersonalRewardOpReq);
-MSG_REG_2(GameMsgHdr, 0x9E, OnAllocateClanBattleRewardReq);
+MSG_REG_2(GameMsgHdr, REQ::ALLOCATECLANREWARD, OnAllocateClanBattleRewardReq);
 MSG_REG(GameMsgHdr, OnClanAllocRecordReq);
 MSG_REG(GameMsgHdr, OnClanGetDynamicMsgReq);
 MSG_REG(GameMsgHdr, OnPlayerIdReq);
@@ -38,9 +39,9 @@ MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG(GameMsgHdr, OnAthleticsChallengeReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 
-MSG_REG_2(GameMsgHdr, 0x99, OnClanTechOpReq);
-MSG_REG_2(GameMsgHdr, 0x79, OnClanCityBattleReq);
-MSG_REG_2(GameMsgHdr, 0x7A, OnClanCityBattleListReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
+MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);
 MSG_REG(GameMsgHdr, OnArenaInfoReq);
 MSG_REG(GameMsgHdr, OnArenaEliminationReq);
 MSG_REG_2(GameMsgHdr, 0xEC, OnArenaOpReq);

@@ -14,6 +14,7 @@
 #include "Script/GameActionLua.h"
 #include "Common/TimeUtil.h"
 #include "AthleticsRank.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -56,7 +57,7 @@ bool Boss::attackBy( Player * player )
 	if(packet.size() <= 8)
 		return false;
 	bool res = bsim.getWinner() == 1;
-	Stream st(0x61);
+	Stream st(REP::ATTACK_NPC);
 	if(res)
 		st << static_cast<UInt16>(0x0101);
 	else
@@ -86,7 +87,7 @@ bool Boss::attackBy( Player * player )
 				{
 					_hppercent = nPercent;
 					SYSMSG_BROADCASTV(405, player->getCountry(), player->getName().c_str(), _ng->getId(), (nPercent + 1) * 10);
-					Stream st(0x5F);
+					Stream st(REP::DAILY_DATA);
 					st << static_cast<UInt8>(2);
 					bossManager.buildCurrBossInfo(st, (nPercent + 1) * 10);
 					st << Stream::eos;
@@ -516,7 +517,7 @@ void Boss::appear()
 	}
 	_hppercent = (_hp[0] - 1) * 10 / nflist[0].fighter->getMaxHP();
 	bossManager.getNextBoss();
-	Stream st(0x5F);
+	Stream st(REP::DAILY_DATA);
 	st << static_cast<UInt8>(2);
 	bossManager.buildInfo(st);
 	st << Stream::eos;
@@ -649,7 +650,7 @@ void BossManager::process( UInt32 curtime )
 		if(bs.fleeTime <= curtime)
 		{
 			getNextBoss();
-			Stream st(0x5F);
+			Stream st(REP::DAILY_DATA);
 			st << static_cast<UInt8>(2);
 			buildInfo(st);
 			st << Stream::eos;
@@ -718,7 +719,7 @@ bool BossManager::attack( Player * player, UInt32 id )
 		_bossOff[it->first] = it->second;
 		_bossOn.erase(it);
 		getNextBoss();
-		Stream st(0x5F);
+		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(2);
 		buildInfo(st);
 		st << Stream::eos;
@@ -831,7 +832,7 @@ void BossManager::getNextBoss()
 
 void BossManager::sendInfo( Player * player )
 {
-	Stream st(0x5F);
+	Stream st(REP::DAILY_DATA);
 	st << static_cast<UInt8>(2);
 	buildInfo(st);
 	st << Stream::eos;

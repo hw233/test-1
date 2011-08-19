@@ -8,6 +8,7 @@
 #include "GData/GDataManager.h"
 #include "GData/LootTable.h"
 #include "Server/SysMsg.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -25,7 +26,7 @@ void Tripod::getTripodInfo(Player* pl)
 
 void Tripod::sendTripodInfo(Player* pl, TripodData& td)
 {
-    Stream st(0x39);
+    Stream st(REP::TRIPOD_INFO);
     st << static_cast<UInt8>(0);
     st << td.fire;
 
@@ -176,7 +177,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
         return;
 	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
-    Stream st(0x39);
+    Stream st(REP::TRIPOD_INFO);
 
     if (id1 < fire_begin)
         id1 = fire_begin;

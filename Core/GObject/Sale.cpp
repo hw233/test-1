@@ -5,6 +5,7 @@
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Mail.h"
+#include "MsgID.h"
 
 
 namespace GObject
@@ -146,7 +147,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 	else
 	{
 		_owner->sendMsgCode(0, 2061);
-		Stream st(0xC6);
+		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(1) << Stream::eos;
 		_owner->send(st);
 	}
@@ -170,7 +171,7 @@ void Sale::sellSaleReqNotify(SaleSellRespData * data, UInt8 count)
 	if (i != 0)
 	{
 		_owner->sendMsgCode(0, 2060);
-		Stream st(0xC6);
+		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
 		_owner->send(st);
 	}
@@ -226,7 +227,7 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 		MailPackage::MailItem mitem[1] = {{static_cast<UInt16>(saleItemBuy.item->getId()), static_cast<UInt32>(saleItemBuy.item->Count())}};
 		MailItemsInfo itemsInfo(mitem, SaleBuy, 1);
 		_owner->GetMailBox()->newMail(NULL, 0x06, title, content, saleItemBuy.id, true, &itemsInfo);
-		Stream st(0xC6);
+		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(1) << static_cast<UInt8>(0) << Stream::eos;
 		_owner->send(st);
 	}
@@ -266,7 +267,7 @@ void Sale::cancelSellResp(SaleItemCancel& saleItemCancel)
 		MailPackage::MailItem mitem[1] = {{static_cast<UInt16>(mailItem->item->GetItemType().getId()), static_cast<UInt32>(mailItem->item->Count())}};
 		MailItemsInfo itemsInfo(mitem, SaleCancel, 1);
 		_owner->GetMailBox()->newMail(_owner, 0x06, title, content, saleItemCancel.id, true, &itemsInfo);
-		Stream st(0xC6);
+		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(2) << static_cast<UInt8>(0) << Stream::eos;
 		_owner->send(st);
 	}
