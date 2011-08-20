@@ -44,7 +44,7 @@ MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);
 MSG_REG(GameMsgHdr, OnArenaInfoReq);
 MSG_REG(GameMsgHdr, OnArenaEliminationReq);
-MSG_REG_2(GameMsgHdr, 0xEC, OnArenaOpReq);
+MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 
 MSG_REG_2(ArenaMsgHdr, 0x101, OnArenaConnected);
 MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);

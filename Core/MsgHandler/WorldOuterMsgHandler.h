@@ -223,7 +223,7 @@ struct AthleticsListReq
 struct AthleticsChallengeReq
 {
 	std::string _name;
-	MESSAGE_DEF1(0xD2, std::string, _name);
+	MESSAGE_DEF1(REQ::ATHLETICS_CHALLENGE, std::string, _name);
 };
 
 struct ArenaInfoReq
@@ -1213,7 +1213,7 @@ void OnPlayerEntered( ArenaMsgHdr& hdr, const void * data )
 	if(player == NULL)
 		return;
 	GObject::arena.push(player, entered, rname);
-	Stream st(0xEC);
+	Stream st(REP::SERVER_ARENA_OP);
 	st << static_cast<UInt8>(1) << r << static_cast<UInt8>(entered + 1) << rname << Stream::eos;
 	player->send(st);
 }
@@ -1240,7 +1240,7 @@ void OnArenaPriliminary( ArenaMsgHdr& hdr, const void * data )
 	if(player == NULL)
 		return;
 	GObject::arena.pushPriliminary(player, won, color, name, btime, bid, rate);
-	Stream st(0xED);
+	Stream st(REP::ARENAPRILIMINARY);
 	st << static_cast<UInt8>(1) << won << color << name << btime << bid << Stream::eos;
 	player->send(st);
 }
@@ -1275,7 +1275,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 	{
 	case 0:
 		{
-			Stream st(0xEC);
+			Stream st(REP::SERVER_ARENA_OP);
 			st << type << static_cast<UInt8>(GObject::arena.active() ? 1 : 0) << Stream::eos;
 			player->send(st);
 		}
@@ -1290,7 +1290,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 			if(tael > 0)
 			{
 				UInt8 r = GObject::arena.bet(player, (pos >> 5) - 1, pos & 0x1F, tael);
-				Stream st(0xEC);
+				Stream st(REP::SERVER_ARENA_OP);
 				st << type << r << pos << tael << Stream::eos;
 				player->send(st);
 			}
@@ -1298,7 +1298,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 		break;
 	case 3:
 		{
-			Stream st(0xEC);
+			Stream st(REP::SERVER_ARENA_OP);
 			UInt32 pc[3];
 			GObject::arena.getPlayerCount(pc);
 			st << type << pc[0] << pc[1] << pc[2] << Stream::eos;
@@ -1310,7 +1310,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 			UInt8 group = 0;
 			UInt8 pos1 = 0, pos2 = 0;
 			brd >> group >> pos1 >> pos2;
-			Stream st(0xEC);
+			Stream st(REP::SERVER_ARENA_OP);
 			st << type << group << pos1 << pos2 << GObject::arena.getBetCount(group - 1, pos1) << GObject::arena.getBetCount(group - 1, pos2) << Stream::eos;
 			player->send(st);
 		}

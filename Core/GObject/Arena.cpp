@@ -335,7 +335,7 @@ void Arena::readFrom( BinaryReader& brd )
 		}
 		if(_loaded)
 		{
-			Stream st(0xED);
+			Stream st(REP::ARENAPRILIMINARY);
 			st << static_cast<UInt8>(2) << Stream::eos;
 			NETWORK()->Broadcast(st);
 			if(!_notified)

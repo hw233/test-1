@@ -2281,12 +2281,6 @@ namespace GObject
 
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
-		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
-		if(m_Owner->getTael() < amount)
-		{
-			m_Owner->sendMsgCode(0, 2009);
-			return 1;
-		}
 
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if (equip == NULL) return 2;

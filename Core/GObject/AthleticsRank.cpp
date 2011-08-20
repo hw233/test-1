@@ -427,9 +427,9 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 	if (row != getRankRow(atker->GetLev()))
 	{
 		atker->sendMsgCode(0, 2054);
-//		Stream st(0xD2);
-//		st << Stream::eos;
-//		atker->send(st);
+		Stream st(REP::ATHLETICS_CHALLENGE);
+		st << Stream::eos;
+		atker->send(st);
 		ERROR_LOG("Cannot find the athletics player[%"I64_FMT"u][%s][%d]", atker->getId(), atker->getName().c_str(), row);
 		enterAthleticsReq(atker, atker->GetLev());
 		return ;
@@ -449,9 +449,15 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 		if (atkerRankPos - deferRankPos > 14)
 		{
 			atker->sendMsgCode(0, 2054);
+<<<<<<< HEAD
 //			Stream st(0xD2);
 //			st << Stream::eos;
 //			atker->send(st);
+=======
+			Stream st(REP::ATHLETICS_CHALLENGE);
+			st << Stream::eos;
+			atker->send(st);
+>>>>>>> 17b0b1dc428d376a2d9b1aa7f3a4cb825ed3c0ea
 			return ;
 		}
 	}
@@ -542,7 +548,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 #if 0
 		if (data->winstreak >= 3)
 		{
-			Stream st(0xD3);
+			Stream st(REP::WINSTREAK);
 			st << atker->getName() << atker->getCountry() << defer->getName() << defer->getCountry() << data->winstreak << Stream::eos;
 			NETWORK()->Broadcast(st);
 
@@ -638,7 +644,7 @@ void AthleticsRank::notifyAthletcisBoxFlushTime(Player * player)
 	updateBoxTimeoutAward(playerRank->second, row, now);
 	UInt16 tmout = GetOutTimebyColor((*playerRank->second)->boxcolor);
 	UInt32 endTime = (*playerRank->second)->boxflushtime + static_cast<UInt32>(tmout);
-	Stream st(0xD4);
+	Stream st(REP::GETBOX);
 
 	st << static_cast<UInt8>(255) << (*playerRank->second)->awardType << (*playerRank->second)->awardCount <<static_cast<UInt16>(now >= endTime ? 0 : endTime - now) << Stream::eos;
 	player->send(st); 
@@ -709,7 +715,7 @@ void AthleticsRank::GetBoxSourceReq(Player *owner)
 
 	BuildNewBox(ownerRank->second);
 
-	Stream st(0xD4);
+	Stream st(REP::GETBOX);
 	st << data->boxcolor << data->awardType << data->awardCount << GetOutTimebyColor(data->boxcolor) << Stream::eos;
 	owner->send(st);
 	DB().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, boxFlushTime = %u WHERE `ranker` = %"I64_FMT"u", data->boxcolor, data->awardType, data->awardCount, data->boxflushtime, data->ranker->getId());

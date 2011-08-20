@@ -112,7 +112,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 				Network::GameClient * cl2 = static_cast<Network::GameClient *>(c.get());
 				player->SetSessionID(-1);
 				player->testBattlePunish();
-				static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, 0x0E};
+				static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, 0x0E}; // TODO: proto???
 				cl2->send(kick_pkt, 4);
 				cl2->SetPlayer(NULL);
 				cl2->pendClose();
@@ -658,7 +658,7 @@ void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 	UInt64 pid;
 	brd >> type >> pid;
 	GObject::Player * player = GObject::globalPlayers[pid];
-	Stream st(0xFD);
+	Stream st(SPEP::PLAYERIDAUTH);
 	st << type << pid;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
