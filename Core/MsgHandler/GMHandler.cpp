@@ -1908,7 +1908,7 @@ void GMHandler::OnEnterArena( GObject::Player * player, std::vector<std::string>
 
 void GMHandler::OnNextArena( GObject::Player * player, std::vector<std::string>& )
 {
-	Stream st(0x04, 0x01);
+	Stream st(REP::NEXT_ARENA, 0x01);
 	char p[128];
 	sprintf(p, "/next %u", WORLD().getWeekDay());
 	st << "" << p << Stream::eos;

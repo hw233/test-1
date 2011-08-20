@@ -5,6 +5,7 @@
 #include "Server/SysMsg.h"
 #include "GData/ItemType.h"
 #include "Package.h"
+#include "MsgID.h"
 
 namespace GObject
 {
@@ -73,7 +74,7 @@ void BlockBossMgr::reqBlockBossData(Player *pl, UInt16 bossLevel)
 	if(it != _playerRank.end())
 		rank = std::distance(_playerRank.begin(), it) + 1;
 		
-	Stream st(0xD5);
+	Stream st(REP::BLOCKBOSS);
 	UInt8 count = static_cast<UInt8>(_playerRank.size() > 3 ? 3 : _playerRank.size());
 	st << bossLevel << rank << count;
 	it = _playerRank.begin();

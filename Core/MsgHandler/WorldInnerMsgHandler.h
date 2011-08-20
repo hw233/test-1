@@ -75,7 +75,7 @@ void OnSearchEvents( GameMsgHdr& hdr, const void * data )
 			GLOBAL().PushMsg(hdr1, &dg);
 		}
 	}
-	Stream st(0xEC);
+	Stream st(REP::SERVER_ARENA_OP);
 	st << static_cast<UInt8>(0) << static_cast<UInt8>(GObject::arena.active() ? 1 : 0) << Stream::eos;
 	player->send(st);
 }

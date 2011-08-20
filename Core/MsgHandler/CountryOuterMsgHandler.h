@@ -699,7 +699,7 @@ void OnDayTaskAutoCompletedReq( GameMsgHdr& hdr, DayTaskAutoCompletedReq& req )
 struct QueryAutoCompletedTaskTimeReq
 {
 	UInt32 m_TaskId;
-	MESSAGE_DEF1(0x8D, UInt32, m_TaskId);
+	MESSAGE_DEF1(REQ::AUTO_COMPLETED_TASK, UInt32, m_TaskId);
 };
 
 void OnQueryAutoCompletedTaskTimeReq( GameMsgHdr& hdr, QueryAutoCompletedTaskTimeReq& req )
@@ -707,7 +707,7 @@ void OnQueryAutoCompletedTaskTimeReq( GameMsgHdr& hdr, QueryAutoCompletedTaskTim
 	MSG_QUERY_PLAYER(pl);
 
 	TaskMgr* taskMgr = pl->GetTaskMgr();
-	Stream st(0x8D);
+	Stream st(REP::AUTO_COMPLETED_TASK);
 	st << req.m_TaskId << taskMgr->GetAutoTaskLeftTime(req.m_TaskId) << Stream::eos;
 	pl->send(st);
 }
@@ -2897,7 +2897,7 @@ void OnBlockBossReq( GameMsgHdr& hdr, BlockBossReq& )
 
 struct AttackBlockBossReq
 {
-	MESSAGE_DEF(0xD6);
+	MESSAGE_DEF(REQ::ATTACK_BLOCKBOSS);
 };
 
 void OnAttackBlockBossReq( GameMsgHdr& hdr, AttackBlockBossReq& )

@@ -159,6 +159,8 @@ namespace REQ
     const UInt8 TASK_CYC_REFRESH    = 0x57;// 0x8B
     /**自动完成日常任务*/
     const UInt8 DAYTASKAUTOCOMPLETED= 0x8C;
+    /**???*/
+    const UInt8 AUTO_COMPLETED_TASK = 0x8D;
     /**循环任务进度请求*/
     const UInt8 QUERYDAYTASK        = 0x8F;
     /**请求帮派列表信息*/
@@ -235,6 +237,10 @@ namespace REQ
     const UInt8 ARENA_INFO          = 0xC5;// 0xD0
     /**斗剑场挑战*/
     const UInt8 ARENA_FIGHT_INFO    = 0xC6;// 0xD1
+    /**???*/
+    const UInt8 ATHLETICS_CHALLENGE = 0xF8;// 0xD2
+    /**???*/
+    const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/
     const UInt8 PLACE_INFO          = 0x30;// 0xE0
     /**修炼地翻页*/
@@ -255,6 +261,8 @@ namespace REQ
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
     /**请求对阵表*/
     const UInt8 SERVER_ARENA_ELIM   = 0xEB;
+    /**???*/
+    const UInt8 SERVER_ARENA_OP     = 0xEC;
     /**聊天*/
     const UInt8 CHAT                = 0x20;// 0xF0
     /**私聊*/
@@ -265,6 +273,9 @@ namespace REQ
     const UInt8 FLAUNT              = 0x23;// 0xF3
     /**BUG投诉*/
     const UInt8 BUG                 = 0x25;// 0xF8
+
+    // const UInt8 GETBOX              = 0xD4;
+    // const UInt8 BLOCKBOSS           = 0xD5;
 }
 
 namespace REP
@@ -273,6 +284,7 @@ namespace REP
     const UInt8 RECONNECT           = 0x01;
     const UInt8 ENTER_ARENA         = 0x02;
     const UInt8 LINEUP_CHANGE       = 0x03;
+    const UInt8 NEXT_ARENA          = 0x04;
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     const UInt8 CAMP_SELECT         = 0xF1;// 0x0D
     const UInt8 BE_DISCONNECT       = 0xF2;// 0x0E
@@ -286,6 +298,7 @@ namespace REP
     const UInt8 USER_INFO_CHANGE    = 0xE5;// 0x15
     const UInt8 STATE_CHANGE        = 0x16;
     const UInt8 BOOK_SHOP_LIST      = 0xEC;// 0x1A
+    const UInt8 ARENAPRILIMINARY    = 0xED;
     const UInt8 BOOK_SHOP_BUY       = 0xEE;// 0x1B
     const UInt8 RANK_DATA           = 0xEE;// 0x1D
     const UInt8 RANK_SETTING        = 0xEF;// 0x1E
@@ -296,7 +309,7 @@ namespace REP
     const UInt8 HOTEL_PUB_LIST      = 0xD3;// 0x26
     const UInt8 FIGHTER_DISMISS     = 0xD4;// 0x27
     const UInt8 FIGHTER_ACCEPT      = 0xD5;// 0x28
-    //const UInt8 PUB_LIST            = 0x2A;
+    const UInt8 PUB_LIST            = 0x2A;
     const UInt8 POTENCIAL           = 0xDF;// 0x2C
     const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
     const UInt8 TRAIN_FIGHTER_OP    = 0x2E;
@@ -368,6 +381,7 @@ namespace REP
 
     const UInt8 TASK_CYC_FRESH      = 0x57;// 0x8B
 
+    const UInt8 AUTO_COMPLETED_TASK = 0x8D;
     const UInt8 QUERYDAYTASK        = 0x8F;
 
     const UInt8 CLAN_REQ_LIST       = 0x60;// 0x90
@@ -431,11 +445,16 @@ namespace REP
     const UInt8 FLAUNT_GOOD         = 0x23;// 0xF3
     const UInt8 SYSTEM_INFO         = 0x24;// 0xF7
     const UInt8 BUG_INFO            = 0x25;// 0xF8
+    const UInt8 SERVER_ARENA_OP     = 0xEC;
+
+    const UInt8 ATHLETICS_CHALLENGE = 0xF5;// 0xD2
+    const UInt8 WINSTREAK           = 0xF6;// 0xD3
+    const UInt8 GETBOX              = 0xF7;// 0xD4
+    const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
 }
 
 namespace SPEQ
 {
-    //const UInt8 LOCKUSER            = 0x102;
     const UInt8 SOCK_ADDR           = 0x02;
     const UInt8 PLAYERIDAUTH        = 0xFD;
     const UInt8 WORLDANNOUNCE       = 0xFE;
@@ -458,6 +477,7 @@ namespace SPEP
     const UInt8 MAILFROMBS          = 0x05;
     const UInt8 BANCHATFROMBS       = 0x06;
     const UInt8 ADDITEMFROMBS       = 0x07;
+    const UInt8 PLAYERIDAUTH        = 0xFD;
 }
 
 #endif // _MSGID_H_
