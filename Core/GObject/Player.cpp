@@ -3563,7 +3563,7 @@ namespace GObject
 	{
 		if(!_isOnline)
 			return;
-		Stream st(0x0F);
+		Stream st(REP::ALERT_MSG);
 		st << type << code << data << Stream::eos;
 		send(st);
 	}
@@ -4332,6 +4332,7 @@ namespace GObject
 		return dg->getFirstPass(this) > 0;
 	}
 
+#if 0
 	void Player::sendFriendActList()
 	{
 		size_t sz = _friendActs.size();
@@ -4344,6 +4345,7 @@ namespace GObject
 		st << Stream::eos;
 		send(st);
 	}
+#endif
 
 	void Player::appendFriendAct( Stream& st, FriendActStruct* fas )
 	{
@@ -4369,6 +4371,7 @@ namespace GObject
 		}
 	}
 
+#if 0
 	void Player::pushFriendAct( FriendActStruct * fas )
 	{
 		if(_friendActs.size() > 14)
@@ -4387,6 +4390,7 @@ namespace GObject
 			send(st);
 		}
 	}
+#endif
 
 	bool Player::testCanAddFriend( Player * pl )
 	{

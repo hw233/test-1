@@ -147,6 +147,7 @@ struct OpenSocketReq
 	MESSAGE_DEF2(REQ::EQ_PUNCH, UInt16, _fighterId, UInt32, _itemid);
 };
 
+#if 0
 struct MergeGemReq
 {
 	UInt16 _itemid;
@@ -154,6 +155,7 @@ struct MergeGemReq
 	UInt8 _protect;
 	MESSAGE_DEF3(REQ::MERGE_GEM, UInt16, _itemid, UInt8, _bindNum, UInt8, _protect);
 };
+#endif
 
 struct AttachGemReq
 {
@@ -229,12 +231,14 @@ struct ActivateAttrReq
 };
 #endif
 
+#if 0
 struct OutCitySwitchStruct
 {
 	UInt8 _mapid;
 
 	MESSAGE_DEF1(REQ::CITY_OUTSIDE_MOVE, UInt8, _mapid);
 };
+#endif
 
 struct InCitySwitchStruct
 {
@@ -520,10 +524,12 @@ struct FriendOpReq
 	MESSAGE_DEF2(REQ::FRIEND_ACTION, UInt8, _op, std::string, _name);
 };
 
+#if 0
 struct FriendActReq
 {
 	MESSAGE_DEF(REQ::FRIEND_STATUS);
 };
+#endif
 
 void OnExtendPackageReq( GameMsgHdr& hdr, ExtendPackageReq& )
 {
@@ -853,11 +859,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
 	pl->sendDailyInfo();
+    // TODO: 暂时不发送
+#if 0
 	{
 		Stream st;
 		pl->makeSenconPWDInfo(st);
 		conn->send(&st[0], st.size());
 	}
+#endif
 	if (level >= 30)
 	{
 		GameMsgHdr hdr(0x19F, WORKER_THREAD_WORLD, pl, 0);
@@ -1466,6 +1475,7 @@ void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 	player->send(st);
 }
 
+#if 0
 void OnMergeGemReq( GameMsgHdr& hdr, MergeGemReq& mgr )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1476,6 +1486,7 @@ void OnMergeGemReq( GameMsgHdr& hdr, MergeGemReq& mgr )
 	st << player->GetPackage()->MergeGem(mgr._itemid, mgr._bindNum, mgr._protect > 0, ogid) << static_cast<UInt16>(ogid) << Stream::eos;
 	player->send(st);
 }
+#endif
 
 void OnAttachGemReq( GameMsgHdr& hdr, AttachGemReq& agr )
 {
@@ -1666,11 +1677,13 @@ void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 }
 #endif
 
+#if 0
 void OutCitySwitchReq( GameMsgHdr& hdr, OutCitySwitchStruct& lms )
 {
 	MSG_QUERY_PLAYER(pl);
 	pl->moveTo(static_cast<UInt16>(lms._mapid) << 8, false);
 }
+#endif
 
 void InCitySwitchReq( GameMsgHdr& hdr, InCitySwitchStruct& sms )
 {
@@ -2853,11 +2866,13 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 	}
 }
 
+#if 0
 void OnFriendActReq( GameMsgHdr& hdr, FriendActReq& )
 {
 	MSG_QUERY_PLAYER(player);
 	player->sendFriendActList();
 }
+#endif
 
 void OnAthleticsDataReq( GameMsgHdr& hdr, AthleticsDataReq& )
 {

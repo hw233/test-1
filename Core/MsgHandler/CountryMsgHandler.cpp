@@ -33,7 +33,7 @@ MSG_REG(GameMsgHdr, OnExtendPackageReq);
 MSG_REG(GameMsgHdr, OnTakeOnlineRewardReq);
 MSG_REG(GameMsgHdr, OnEnchantReq);
 MSG_REG(GameMsgHdr, OnOpenSocketReq);
-MSG_REG(GameMsgHdr, OnMergeGemReq);
+//MSG_REG(GameMsgHdr, OnMergeGemReq);
 MSG_REG(GameMsgHdr, OnAttachGemReq);
 MSG_REG(GameMsgHdr, OnDetachGemReq);
 //MSG_REG(GameMsgHdr, OnSplitReq);
@@ -44,7 +44,7 @@ MSG_REG_2(GameMsgHdr, REQ::EQ_DECOMPOSE, OnBatchSplitReq);
 MSG_REG(GameMsgHdr, OnBatchMergeReq);
 //MSG_REG_2(GameMsgHdr, REQ::GEM_UPGRADE, OnBatchMergeReq);
 //MSG_REG(GameMsgHdr, OnActivateAttrReq);
-MSG_REG(GameMsgHdr, OutCitySwitchReq);
+//MSG_REG(GameMsgHdr, OutCitySwitchReq);
 MSG_REG(GameMsgHdr, InCitySwitchReq);
 MSG_REG(GameMsgHdr, OnTransportReq);
 MSG_REG(GameMsgHdr, OnDungeonOpReq);
@@ -107,7 +107,7 @@ MSG_REG(GameMsgHdr, OnMailSendReq);
 
 MSG_REG(GameMsgHdr, OnFriendListReq);
 MSG_REG(GameMsgHdr, OnFriendOpReq);
-MSG_REG(GameMsgHdr, OnFriendActReq);
+//MSG_REG(GameMsgHdr, OnFriendActReq);
 
 MSG_REG(GameMsgHdr, OnAthleticsDataReq);
 

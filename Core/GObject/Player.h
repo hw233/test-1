@@ -709,6 +709,7 @@ namespace GObject
 		template<typename T>
 		inline void notifyFriendAct(UInt8 type, T arg)
 		{
+#if 0
 			Mutex::ScopedLock lk(_mutex);
 			if(_friends[0].empty())
 				return;
@@ -722,6 +723,7 @@ namespace GObject
 				Player * player = *it;
 				player->pushFriendAct(fas);
 			}
+#endif
 		}
 
 		void sendFriendActList();

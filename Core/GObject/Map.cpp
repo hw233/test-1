@@ -222,7 +222,8 @@ void Map::SendOnSpot( Player * pl)
 #pragma pack(pop)
 	SpotPacket packet;
 	packet.size = 2;
-	packet.op = 0x51FF;
+    packet.op = REP::CITY_INSIDE_MOVE<<8|0xFF;
+	//packet.op = 0x51FF;
 	packet.spotid = loc;
 	pl->send(&packet, 6);
 
@@ -239,7 +240,8 @@ void Map::SendOnMap( Player * pl )
 #pragma pack(pop)
 	MapPacket packet;
 	packet.size = 1;
-	packet.op = 0x50FF;
+    packet.op = REP::CITY_INSIDE_MOVE<<8|0xFF; // 0x50
+	//packet.op = 0x50FF;
 	packet.mapid = getId();
 	pl->send(&packet, 5);
 }
