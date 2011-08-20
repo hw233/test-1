@@ -27,6 +27,8 @@ bool ClanLvl::testLevelUp( UInt8& lvl, UInt64& exp )
 
 void ClanLvl::setTable( UInt8 lvl, UInt64 exp )
 {
+    if (lvl >= CLAN_LEVEL_MAX)
+        return;
 	_exp[lvl] = exp;
 }
 

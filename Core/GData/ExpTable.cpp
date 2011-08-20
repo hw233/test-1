@@ -27,6 +27,8 @@ bool ExpTable::testLevelUp( UInt8& lvl, UInt64& exp )
 
 void ExpTable::setTable( UInt8 lvl, UInt64 exp )
 {
+    if (lvl >= LEVEL_MAX)
+        return;
 	_exp[lvl] = exp;
 }
 
