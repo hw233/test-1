@@ -29,6 +29,7 @@ void Tripod::sendTripodInfo(Player* pl, TripodData& td)
     Stream st(REP::TRIPOD_INFO);
     st << static_cast<UInt8>(0);
     st << td.fire;
+    st << td.quality;
 
     UInt8 needgen = td.needgen;
     genAward(pl, td, st);
@@ -226,6 +227,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
 
     st << static_cast<UInt8>(1);
     st << td.fire;
+    st << td.quality;
     genAward(pl, td, st);
     st << Stream::eos;
     pl->send(st);
