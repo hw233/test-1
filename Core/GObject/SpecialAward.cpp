@@ -56,11 +56,11 @@ void SpecialAward::AthleticsAward()
 	Player *player = (*it)->ranker;
 	if(player == NULL)
 		return;
-	SYSMSG(title, 360);
-	SYSMSGV(content, 361, ServerAthleticsAward[size]);
+	//SYSMSG(title, 360);
+	//SYSMSGV(content, 361, ServerAthleticsAward[size]);
 	Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 	mailPackageManager.push(pmail->id, MailPackage::Gold, ServerAthleticsAward[size]);
-	SYSMSG_BROADCASTV(362, player->getCountry(), player->getName().c_str(), ServerAthleticsAward[size]);
+	//SYSMSG_BROADCASTV(362, player->getCountry(), player->getName().c_str(), ServerAthleticsAward[size]);
 	m_SpecialAward[2].push_back(player);
 	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %"I64_FMT"u, %u)", size, 2, player->getId(), TimeUtil::Now());
 
@@ -85,11 +85,11 @@ void SpecialAward::AddSpecialAwardList(UInt8 type, Player *player)
 	{
 		case 0:
 			Award = CunBattleAward[size];
-			SYSMSG_BROADCASTV(336, player->getCountry(), player->getName().c_str(), Award);
+			//SYSMSG_BROADCASTV(336, player->getCountry(), player->getName().c_str(), Award);
 			break;
 		case 1:
 			Award = EnchantEquipAward[size];
-			SYSMSG_BROADCASTV(337, player->getCountry(), player->getName().c_str(), size + 1);
+			//SYSMSG_BROADCASTV(337, player->getCountry(), player->getName().c_str(), size + 1);
 			break;
 	}
 
@@ -111,8 +111,8 @@ void SpecialAward::luckydrawAward(Player * player)
 	if(player == NULL)
 		return;
 	m_SpecialAward[3].push_back(player);
-	SYSMSG(title, 363);
-	SYSMSGV(content, 364, ServerLuckyDrawAward[size]);
+	//SYSMSG(title, 363);
+	//SYSMSGV(content, 364, ServerLuckyDrawAward[size]);
 	Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 	mailPackageManager.push(pmail->id, MailPackage::Coupon, ServerLuckyDrawAward[size]);
 	DB().PushUpdateData("INSERT INTO `SpecialAward` VALUES(%u, %u, %"I64_FMT"u, %u)", size, 3, player->getId(), TimeUtil::Now());

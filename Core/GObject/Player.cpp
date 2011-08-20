@@ -1220,7 +1220,7 @@ namespace GObject
 		{
 			DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v.friendliness, v.submitFavorCount, v.submitFavorDay);
 			//SYSMSG_SENDV(148, this, friendliness);
-			SYSMSG_SENDV(1048, this, id, friendliness);
+			//SYSMSG_SENDV(1048, this, id, friendliness);
 		}
 	}
 
@@ -1268,7 +1268,7 @@ namespace GObject
 			_greatFighterFull.insert(id);
 		}
 		//SYSMSG_SENDV(148, this, 30);
-		SYSMSG_SENDV(1048, this, id, 30);
+		//SYSMSG_SENDV(1048, this, id, 30);
 		DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v->friendliness, v->submitFavorCount, v->submitFavorDay);
 		DBLOG().PushUpdateData("insert into `fighter_friendness`(`server_id`, `player_id`, `fighter_id`, `friendness`, `time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), id, v->friendliness, TimeUtil::Now());		
 		GameAction()->RunGreatTaskAction(this, id);
@@ -1952,8 +1952,8 @@ namespace GObject
 		st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
-		SYSMSG_SEND(157, this);
-		SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
+		//SYSMSG_SEND(157, this);
+		//SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
 
 		if(_friends[2].size() >= 20)
 		{
@@ -2255,7 +2255,7 @@ namespace GObject
 			_playerData.tael -= c;
 		}
 		SYSMSG_SENDV(152, this, c);
-		SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
+		//SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
 		sendModification(3, _playerData.tael);
 	}
 
@@ -2266,7 +2266,7 @@ namespace GObject
 			return _playerData.coin;
 		if(_playerData.coin >= 99999999)
 		{
-			SYSMSG_SENDV(159, this);
+			//SYSMSG_SENDV(159, this);
 			return _playerData.coin;
 		}
 
@@ -2288,19 +2288,19 @@ namespace GObject
 			}
 			else
 			{
-				SYSMSG_SENDV(153, this, c);
-				SYSMSG_SENDV(1053, this, c);
+				//SYSMSG_SENDV(153, this, c);
+				//SYSMSG_SENDV(1053, this, c);
 			}
 		}
 		else
 		{
-			SYSMSG_SENDV(153, this, c);
-			SYSMSG_SENDV(1053, this, c);
+			//SYSMSG_SENDV(153, this, c);
+			//SYSMSG_SENDV(1053, this, c);
 		}
 
 		if(_playerData.coin >= 99999999)
 		{
-			SYSMSG_SENDV(159, this);
+			//SYSMSG_SENDV(159, this);
 		}
 
 		if(c > 0)
@@ -2331,8 +2331,8 @@ namespace GObject
 		}
 		if(notify)
 		{
-			SYSMSG_SENDV(154, this, c);
-			SYSMSG_SENDV(1054, this, c);
+			//SYSMSG_SENDV(154, this, c);
+			//SYSMSG_SENDV(1054, this, c);
 		}
 		sendModification(4, _playerData.coin);
 		return _playerData.coin;
@@ -2352,8 +2352,8 @@ namespace GObject
 		case 1:
 			{
 				sendModification(4, _playerData.coin);
-				SYSMSG_SENDV(154, this, c);
-				SYSMSG_SENDV(1054, this, c);
+				//SYSMSG_SENDV(154, this, c);
+				//SYSMSG_SENDV(1054, this, c);
 			}
 			break;
 		case 2:
@@ -2656,7 +2656,7 @@ namespace GObject
 		if(a == 0)
 			return _playerData.achievement;
 		_playerData.achievement += a;
-		SYSMSG_SENDV(105, this, a);
+		// SYSMSG_SENDV(105, this, a);
 		SYSMSG_SENDV(1005, this, a);
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
@@ -2677,7 +2677,7 @@ namespace GObject
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
 		}
-		SYSMSG_SENDV(106, this, a);
+		//SYSMSG_SENDV(106, this, a);
 		SYSMSG_SENDV(1006, this, a);
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
@@ -2697,8 +2697,8 @@ namespace GObject
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
 			}
 		}
-		SYSMSG_SENDV(106, this, a);
-		SYSMSG_SENDV(1061, this, attacker->getCountry(), attacker->getName().c_str(), a);
+		//SYSMSG_SENDV(106, this, a);
+		//SYSMSG_SENDV(1061, this, attacker->getCountry(), attacker->getName().c_str(), a);
 		sendModification(8, _playerData.achievement);
 		return ;
 	}

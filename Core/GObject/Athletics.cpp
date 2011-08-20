@@ -295,16 +295,16 @@ void Athletics::updateAthleticsAwardData(UInt32 id, UInt8 type, UInt32 value)
 
 void Athletics::defendergainsource(Player * atker, UInt32 id, UInt8 type, UInt32 award, UInt8 color)
 {
-	const static UInt32 Index1[]  = {315, 339, 316, 317, 356};
-	const static UInt32 Index2[]  = {340, 341, 342, 357};
+	//const static UInt32 Index1[]  = {315, 339, 316, 317, 356};
+	//const static UInt32 Index2[]  = {340, 341, 342, 357};
 
 	if (type == 0xFF)
 		return notifyAthleticsData2(id);
 
 
 	SYSMSG(title, 318);
-	SYSMSG(szType, Index1[type]);
-	SYSMSGV(boxname, Index2[color], szType);
+	//SYSMSG(szType, Index1[type]);
+	//SYSMSGV(boxname, Index2[color], szType);
 	SYSMSGV(content, 319, atker->getName().c_str(), atker->getName().c_str(), boxname, award, szType);
 	_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
 	//AddUserSource(_owner, type, award);

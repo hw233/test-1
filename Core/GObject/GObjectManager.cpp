@@ -2544,6 +2544,7 @@ namespace GObject
                 case Item_Armor5:
                 case Item_Ring:
                 case Item_Amulet:
+                case Item_Trump:
                     {
                         ItemEquipData ied;
                         ied.enchant = dbe.enchant;

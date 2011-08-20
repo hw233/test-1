@@ -2399,7 +2399,7 @@ namespace GObject
 	{
 		if(fighter->getCurrentHP() == 0)
 		{
-			SYSMSG_SENDV(190, m_Owner);
+			//SYSMSG_SENDV(190, m_Owner);
 			return;
 		}
 		GameAction()->RunAutoRegen(m_Owner, fighter);

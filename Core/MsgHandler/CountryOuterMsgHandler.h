@@ -956,8 +956,8 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 				player->sendMsgCode(0, 2001, player->getBuffData(PLAYER_BUFF_PKLOCK) - TimeUtil::Now());
 				return;
 			}
-			SYSMSG_SEND(146, player);
-			SYSMSG_SEND(1046, player);
+			//SYSMSG_SEND(146, player);
+			//SYSMSG_SEND(1046, player);
 			GObject::Map * map = GObject::Map::FromSpot(PLAYER_DATA(player, location));
 			if(map != NULL)
 				map->changebyStatus(player);
@@ -969,8 +969,8 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 		if(v == 1)
 		{
 			player->setBuffData(PLAYER_BUFF_PKLOCK, TimeUtil::Now() + 20 * 60);
-			SYSMSG_SEND(145, player);
-			SYSMSG_SEND(1045, player);
+			//SYSMSG_SEND(145, player);
+			//SYSMSG_SEND(1045, player);
 			GObject::Map * map = GObject::Map::FromSpot(PLAYER_DATA(player, location));
 			if(map != NULL)
 				map->changebyStatus(player);
@@ -2188,7 +2188,7 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 		SYSMSG_SENDV(1044, player, target->getCountry(), target->getName().c_str());
 		if(lev1 >= 60 && lev2 >= 60)
 		{
-			SYSMSG_BROADCASTV(370 + now % 2,  player->getCountry(), player->getName().c_str(), target->getCountry(), target->getName().c_str(), target->getCountry(), target->getName().c_str());
+			//SYSMSG_BROADCASTV(370 + now % 2,  player->getCountry(), player->getName().c_str(), target->getCountry(), target->getName().c_str(), target->getCountry(), target->getName().c_str());
 		}
 	}
 	player->setBuffData(PLAYER_BUFF_ATTACKING, now + turns * 2);

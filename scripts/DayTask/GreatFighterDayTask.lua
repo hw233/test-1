@@ -1,6 +1,7 @@
 require("global")
 
 function RunGreatFighterAction(fgtId)
+    return -- TODO:
 	local MsgTable = {};
 	
 	local player = GetPlayer();
@@ -37,7 +38,7 @@ function RunSepcialCollectAction1()
 	action.m_ActionID = 0;
 	action.m_ActionToken = 255;
 	action.m_ActionStep = 0;
-	action.m_ActionMsg =  "今天名将喜好品赠送额度已满";
+	action.m_ActionMsg =  "今天散仙喜好品赠送额度已满";
 	return action;	
 end
 
@@ -59,7 +60,7 @@ function RunSepcialCollectAction3()
 	action.m_ActionID = 0;
 	action.m_ActionToken = 255;
 	action.m_ActionStep = 0;
-	action.m_ActionMsg =  "赠送名将喜好品需要主将等级与名将等级在15级之内";
+	action.m_ActionMsg =  "赠送散仙喜好品需要主将等级与散仙等级在15级之内";
 	return action;	
 end
 
