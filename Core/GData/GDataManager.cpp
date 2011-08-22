@@ -817,6 +817,7 @@ namespace GData
                     }
                 }
 
+#if 0
                 for (int i = 0; i < 2; ++i) {
                     lua_tinker::table factor = lua_tinker::call<lua_tinker::table>(L, "GetTaskAwardFactor", i+1);
                     UInt32 size = factor.size();
@@ -825,6 +826,7 @@ namespace GData
                         m_TaskAwardFactor[i].push_back(factor.get<UInt8>(n+1));
                     }
                 }
+#endif
             }
         }
         return true;

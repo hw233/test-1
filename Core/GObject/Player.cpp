@@ -34,6 +34,7 @@
 #include "Tripod.h"
 #include <mysql.h>
 #include "GData/Formation.h"
+#include "Script/BattleFormula.h"
 #include "kingnet_analyzer.h"
 
 #include <cmath>
@@ -64,6 +65,7 @@ namespace GObject
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
+#if 0
 		float theirbp = _npcGroup->getBattlePoints();
 		float mybp = 0.0f;
 		for(int i = 0; i < 5; ++ i)
@@ -99,6 +101,9 @@ namespace GObject
 		else
 			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
 		return exp * clanEffect;
+#else
+        return 2.0f * _npcGroup->getExp();
+#endif
 	}
 
 	void EventAutoBattle::Process(UInt32)
@@ -2844,12 +2849,12 @@ namespace GObject
                     break;
 
                 if (_playerData.shimen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
                     _playerData.shimen[i] = 0;
                     _playerData.smcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.smcolor[i]-1);
-                    AddExp(award); // TODO:
-                    ++_playerData.smFinishCount;
                     sendColorTask(0, 0);
                     writeShiMen();
                     return true;
@@ -2860,12 +2865,12 @@ namespace GObject
                     break;
 
                 if (_playerData.yamen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.ymcolor[i], GetLev());
+                    getTael(award); // TODO:
+                    ++_playerData.ymFinishCount;
                     _playerData.yamen[i] = 0;
                     _playerData.ymcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
-                    getTael(award); // TODO:
-                    ++_playerData.ymFinishCount;
                     sendColorTask(1, 0);
                     writeYaMen();
                     return true;
@@ -2877,12 +2882,12 @@ namespace GObject
                     break;
 
                 if (_playerData.fshimen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
                     _playerData.fshimen[i] = 0;
                     _playerData.fsmcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.fsmcolor[i]-1);
-                    AddExp(award); // TODO:
-                    ++_playerData.smFinishCount;
                     sendColorTask(0, 0);
                     writeShiMen();
                     return true;
@@ -2896,7 +2901,7 @@ namespace GObject
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.fymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
                     sendColorTask(1, 0);
