@@ -222,7 +222,7 @@ void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UIn
     if (!playerId || !id || !spot)
         return;
     std::vector<FrontMapData>& tmp = m_frts[playerId][id];
-    if (tmp.size() < spot)
+    if (tmp.size() <= spot)
         tmp.resize(spot+1);
     tmp[spot].count = count;
     tmp[spot].status = status?1:0;
