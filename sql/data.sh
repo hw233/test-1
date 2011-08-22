@@ -9,4 +9,5 @@ mysql -h$H -u$U -p$P -P$PT $DBD -e "delete from acupra; source acupra;";
 mysql -h$H -u$U -p$P -P$PT $DBD -e "delete from dungeon_monster; source dungeonmonster;";
 mysql -h$H -u$U -p$P -P$PT $DBD -e "delete from lvl_exp; source lvlexp;";
 mysql -h$H -u$U -p$P -P$PT $DBD -e "delete from special_fighter_template; source npc;";
+mysql -h$H -u$U -p$P -P$PT $DBD -e "delete from frontmap; source frontmap;";
 
