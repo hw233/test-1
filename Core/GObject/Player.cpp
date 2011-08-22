@@ -837,8 +837,10 @@ namespace GObject
     {
         static UInt16 cittas[] = {301, 401, 701};
         UInt16 citta = cittas[fgt->getClass()-1];
-        if (fgt->addNewCitta(citta, false, true)) {
-            if (fgt->upCitta(citta, 0, true)) {
+        if (fgt->hasCitta(citta) < 0) {
+            if (fgt->addNewCitta(citta, false, true)) {
+                if (fgt->upCitta(citta, 0, true)) {
+                }
             }
         }
     }
