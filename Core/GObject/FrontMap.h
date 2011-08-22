@@ -15,7 +15,7 @@ namespace GObject
 struct FrontMapData
 {
     FrontMapData() : count(0), status(0) {}
-    void reset() { memset(this, 0x00, sizeof(*this)); }
+    void reset() { count = 0; status = 0; }
     UInt8 count;
     UInt8 status;
 };
