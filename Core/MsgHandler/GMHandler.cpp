@@ -1174,7 +1174,7 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	addSuperClass(player, 10);
 	addSuperClass(player, 16);
     addSuperClass(player, 13);
-    addSuperClass(player, 14);
+    addSuperClass(player, 15);
 	switch(player->GetClass())
 	{
 #if 0

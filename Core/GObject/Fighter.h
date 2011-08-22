@@ -267,9 +267,11 @@ public:
 
 	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < getMaxTrumps()) ? _trump[idx] : 0; }
     inline int getMaxTrumps () { return _trumpslot <= TRUMP_UPMAX ? _trumpslot : TRUMP_UPMAX; }
+    inline void setMaxTrump(UInt8 max) { max <= TRUMP_UPMAX ? _trumpslot = max : 0 ; }
     UInt32 getTrumpId(int idx);
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
+    void initTrumpSlot();
 
 	UInt32 getMaxHP();
 
@@ -318,6 +320,12 @@ public:
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
+    inline bool canSetTrump(UInt8 idx)
+    {
+        if (idx >= 0 && idx < getMaxTrumps())
+            return true;
+        return false;
+    }
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }

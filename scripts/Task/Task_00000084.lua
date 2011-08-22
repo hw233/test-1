@@ -119,7 +119,7 @@ function Task_00000084_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，在去魔宫的路上有一个清远寺，寺里的两个番僧虽然被妖人奴役，但是怀恨在心，他们修炼的天魔解体大法正是毒阵的克星，你这就去找他们商量下对策吧。";
+	action.m_NpcMsg = "嗯，在去魔宫的路上有一个清远寺，寺里的两个异域僧人虽然被妖人奴役，但是怀恨在心，他们修炼的天魔解体大法正是毒阵的克星，你这就去找他们商量下对策吧。";
 	action.m_ActionMsg = "好的。我这就赶去。";
 	return action;
 end
@@ -157,15 +157,7 @@ function Task_00000084_accept()
 	if not task:AcceptTask(84) then
 		return false;
 	end
-	local package = player:GetPackage();
-	local itemNum = package:GetItemNum(0,1);
-	if itemNum ~= 0 then
-		if itemNum > 0 then
-			itemNum = 0;
-			package:SetItem(0, itemNum, 1);
-		end
-		task:AddTaskStep2(84, 1, itemNum);
-	end
+	task:AddTaskStep(84);
 	return true;
 end
 

@@ -3146,6 +3146,14 @@ namespace GObject
 		return getTavernPriceByColor(fgt->getColor());
 	}
 
+    bool isFirst(UInt8* colors)
+    {
+        for (UInt8 i = 0; i < 6; ++i)
+            if (colors[i])
+                return false;
+        return true;
+    }
+
 	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
     {
         int ttype = 0;
@@ -3165,11 +3173,11 @@ namespace GObject
         bool first = false;
         if (!force) {
             if (ttype == 0) {
-                if (!_playerData.smFreeCount)
+                if (isFirst(_playerData.fsmcolor))
                     first = true;
             }
             if (ttype == 1) {
-                if (!_playerData.ymFinishCount)
+                if (isFirst(_playerData.fymcolor))
                     first = true;
             }
         }

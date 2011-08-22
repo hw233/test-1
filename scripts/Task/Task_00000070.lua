@@ -109,7 +109,7 @@ function Task_00000070_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "醉道人师叔已经观察你许久，觉得少侠你侠肝义胆，也是我们正道之人，所以已经象昆仑和峨眉的掌教真人推荐了少侠， 不知道少侠你愿意加入昆仑派还是峨眉派呢？";
+	action.m_NpcMsg = "醉道人师叔已经观察你许久，觉得少侠你侠肝义胆，也是我们正道之人，所以已经向昆仑和峨眉的掌教真人推荐了少侠， 不知道少侠你愿意加入昆仑派还是峨眉派呢？";
 	action.m_ActionMsg = "嗯，让我思考一下。";
 	return action;
 end

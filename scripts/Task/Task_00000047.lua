@@ -109,7 +109,7 @@ function Task_00000047_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才我发现寺内有很多恶僧鼓噪，估计是发现少侠你进入了慈云寺，现在大门恐怕已经被封锁，那边墙角有一颗大树，墙外是一个菜园，不如我们顺着大树翻出墙外，去种菜的张老实家避一避。";
+	action.m_NpcMsg = "方才我发现寺内有很多恶人鼓噪，估计是发现少侠你进入了慈云寺，现在大门恐怕已经被封锁，那边墙角有一颗大树，墙外是一个菜园，不如我们顺着大树翻出墙外，去种菜的张老实家避一避。";
 	action.m_ActionMsg = "这样也好，你要随时跟着我。";
 	return action;
 end

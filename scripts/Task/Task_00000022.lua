@@ -109,7 +109,7 @@ function Task_00000022_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠救命，这个和尚跟踪我到家里，见周围无人便想非礼于我，我看少侠一身正气，肯定是正道的剑仙，希望可以帮我刚走这个花和尚。";
+	action.m_NpcMsg = "少侠救命，这个恶人跟踪我到家里，见周围无人便想非礼于我，我看少侠一身正气，肯定是正道的剑仙，希望可以帮我赶走他。";
 	action.m_ActionMsg = "好的，看我帮你赶跑这个恶人。";
 	return action;
 end

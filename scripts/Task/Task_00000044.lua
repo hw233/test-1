@@ -119,7 +119,7 @@ function Task_00000044_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠进入厢房可以看到中堂挂着一副八仙过海图，在画的下面有一个磬锤，只要一敲，密室暗门就打开了。少侠千万注意不要惊动密室里看守的恶僧。";
+	action.m_NpcMsg = "少侠进入厢房可以看到中堂挂着一副八仙过海图，在画的下面有一个磬锤，只要一敲，密室暗门就打开了。少侠千万注意不要惊动密室里看守的妖人。";
 	action.m_ActionMsg = "好的，我这就去打开机关。";
 	return action;
 end

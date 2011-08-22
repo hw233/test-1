@@ -82,20 +82,20 @@ function Task_00000032(npcId)
 		action.m_ActionID = 32
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "强化武器";
+		action.m_ActionMsg = "强化装备";
 	elseif task:GetTaskSubmitNpc(32) == npcId then
 		if Task_Submit_00000032() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 32
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "强化武器";
+			action.m_ActionMsg = "强化装备";
 		elseif task:HasAcceptedTask(32) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 32
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "强化武器";
+			action.m_ActionMsg = "强化装备";
 		end
 	end
 	return action;
@@ -119,7 +119,7 @@ function Task_00000032_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "没事，没事……你看这么大块的太乙真金一次强化也用不了这许多，剩下的就权做手工费了，嘿嘿。";
+	action.m_NpcMsg = "没事，没事……你看这么大块的太乙真金一次强化也用不了这许多，剩下的就权且当做手工费了，嘿嘿。";
 	action.m_ActionMsg = "前辈真是打的好算盘……";
 	return action;
 end

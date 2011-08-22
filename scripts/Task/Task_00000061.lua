@@ -109,7 +109,7 @@ function Task_00000061_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "此去往南方不远，有个极阴洞，里面住着一个邪派妖道名叫鬼道人乔瘦腾，四处劫掠美貌的妇人回去练功。";
+	action.m_NpcMsg = "此去往南方不远，有个极阴洞，里面住着一个邪派妖道名叫鬼道人乔瘦腾，作恶多端，做下不少伤天害理的事情。";
 	action.m_ActionMsg = "这个妖道真是可恶！";
 	return action;
 end
@@ -120,7 +120,7 @@ function Task_00000061_step_02()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
 	action.m_NpcMsg = "听家师说他是阴阳叟的师弟，本领高强。以前小妹一人时，情知不是他的对手，只是在暗中留意。如今有"..GetPlayerName(GetPlayer()).."你的帮助，我想应该不难消灭这个妖人。";
-	action.m_ActionMsg = "那就一起去吧。";
+	action.m_ActionMsg = "我这就去铲除这个妖道。";
 	return action;
 end
 

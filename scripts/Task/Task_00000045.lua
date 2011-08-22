@@ -119,7 +119,7 @@ function Task_00000045_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 3;
-	action.m_NpcMsg = "哎呀，少侠慢走，现在寺内死了几个恶僧，又走失了书生，方丈责怪下来，我也不好交代……不如这样，少侠你插我一剑，这样的话我也好蒙混过关。";
+	action.m_NpcMsg = "哎呀，少侠慢走，现在寺内死了几个妖人，又走失了书生，方丈责怪下来，我也不好交代……不如这样，少侠你插我一剑，这样的话我也好蒙混过关。";
 	action.m_ActionMsg = "这……很疼的，你要忍住哦……";
 	return action;
 end

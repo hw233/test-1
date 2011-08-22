@@ -290,17 +290,28 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	switch(t)
 	{
 	case 1: field = "hp"; break;
-	case 2: field = "level"; break;
+	case 2:
+        {
+            field = "level";
+            initTrumpSlot();
+        }
+        break;
 	case 3: DB().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
 		return;
 	case 4:
-		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-			DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+        {
+            if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
+                DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+            initTrumpSlot();
 		return;
+        }
     case 5:
-		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-			DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+        {
+            if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
+                DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+            initTrumpSlot();
         return;
+        }
 	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
         break;
     case 7:
@@ -613,6 +624,21 @@ ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 	return rr;
 }
 
+void Fighter::initTrumpSlot()
+{
+    if (_level >= 60 && _potential >= 1.5 && _capacity >= 7)
+    {
+        _trumpslot = 3;
+        return;
+    }
+
+    if (_level >= 60 || (_potential >= 1.5 && _capacity >= 7))
+    {
+        _trumpslot = 2;
+        return;
+    }
+}
+
 ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
 {
     if (!trumps.length())
@@ -629,9 +655,13 @@ ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
 
 ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 {
-    ItemEquip* t = 0;
-    t = GObjectManager::fetchEquipment(trump);
-    return setTrump(t, idx, writedb);
+    if (idx >= 0 && idx < getMaxTrumps())
+    {
+        ItemEquip* t = 0;
+        t = GObjectManager::fetchEquipment(trump);
+        return setTrump(t, idx, writedb);
+    }
+    return 0;
 }
 
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )

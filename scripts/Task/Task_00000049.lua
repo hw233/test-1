@@ -82,20 +82,20 @@ function Task_00000049(npcId)
 		action.m_ActionID = 49
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "直捣黄龙";
+		action.m_ActionMsg = "再探慈云寺";
 	elseif task:GetTaskSubmitNpc(49) == npcId then
 		if Task_Submit_00000049() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 49
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "直捣黄龙";
+			action.m_ActionMsg = "再探慈云寺";
 		elseif task:HasAcceptedTask(49) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 49
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "直捣黄龙";
+			action.m_ActionMsg = "再探慈云寺";
 		end
 	end
 	return action;
@@ -109,7 +109,7 @@ function Task_00000049_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，其实醉道人前辈怕你出意外，一直跟着你去了慈云寺，方才寺内的恶僧躁动也是前辈故意做的，方便少侠你去救人。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，其实醉道人前辈怕你出意外，一直跟着你去了慈云寺，方才寺内的恶人躁动也是前辈故意做的，方便少侠你去救人。";
 	action.m_ActionMsg = "原来如此，我说怎么救人这么顺利。";
 	return action;
 end

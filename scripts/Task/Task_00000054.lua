@@ -87,7 +87,7 @@ function Task_00000054_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "";
+	action.m_NpcMsg = "这金驼的师傅叫飞龙师太，也想染指我们桂花山的乌风草。";
 	action.m_ActionMsg = "";
 	return action;
 end

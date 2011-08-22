@@ -88,7 +88,7 @@ function Task_00000082_step_02()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
 	action.m_NpcMsg = "我这里有书信一封，原本是要交给长沙白龙庵的素因大师，邀她同去青螺山的，现在只有麻烦你帮我送去了。";
-	action.m_ActionMsg = "没问题，就交给我把。";
+	action.m_ActionMsg = "没问题，就交给我吧。";
 	return action;
 end
 

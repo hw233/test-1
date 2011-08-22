@@ -119,7 +119,7 @@ function Task_00000021_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠救命，这个毛和尚欲非礼于我……";
+	action.m_NpcMsg = "少侠救命，这个恶人欲非礼于我……";
 	action.m_ActionMsg = "";
 	return action;
 end

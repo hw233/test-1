@@ -119,7 +119,7 @@ function Task_00000010_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠不知，村里来了一个形状吓人的和尚，唤做毛太，此人看起来似乎和我师傅有仇，看起来好象传说中的剑仙一流，师傅肯定不是对手，我要赶紧找到师傅，好有所准备。";
+	action.m_NpcMsg = "少侠不知，村里来了一个形状吓人的恶人，唤做毛太，此人看起来似乎和我师傅有仇，看起来好象传说中的剑仙一流，师傅肯定不是对手，我要赶紧找到师傅，好有所准备。";
 	action.m_ActionMsg = "好，我这就同你一起去找他。";
 	return action;
 end

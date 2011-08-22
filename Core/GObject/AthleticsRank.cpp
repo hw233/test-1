@@ -652,8 +652,8 @@ bool AthleticsRank::updateBoxTimeoutAward(Rank rank, UInt8 row, UInt32 now)
 			SYSMSG(title, 318);
 			//const UInt32 Index[]  = {315, 339, 316, 317, 356};
 			//SYSMSG(strType, Index[data->awardType]);
-			SYSMSGV(content, 333, data->awardCount, strType);
-			data->ranker->GetMailBox()->newMail(NULL, 0x01, title, content);
+			//SYSMSGV(content, 333, data->awardCount, strType);
+			//data->ranker->GetMailBox()->newMail(NULL, 0x01, title, content);
 		}
 
 		BuildNewBox(rank);
@@ -722,15 +722,15 @@ void AthleticsRank::TmExtraAward()
 			}
 			MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
 			//SYSMSGV(awardStr, mailIndex[rank-1], item2->getName().c_str(), item1->getName().c_str(), cnt);
-			SYSMSGV(content, 325, rank, awardStr);
-			pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			//SYSMSGV(content, 325, rank, awardStr);
+			//pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 		}
 		else
 		{
 			MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
 			//SYSMSGV(awardStr, mailIndex[rank-1], item1->getName().c_str());
-			SYSMSGV(content, 325, rank, awardStr);
-			pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			//SYSMSGV(content, 325, rank, awardStr);
+			//pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 		}
 
 		if(pmail != NULL)
