@@ -259,9 +259,8 @@ namespace GObject
             if (mos.m_ID == 4114) // XXX: ÃÏ√…Ï¯ ¶
                 mos.m_Hide = true;
 #else
-            if (mos.m_ID == 5020 ||
-                mos.m_ID == 5021 ||
-                mos.m_ID == 5049 ||
+           // if (mos.m_ID == 5020 ||
+            if (mos.m_ID == 5021 ||
                 mos.m_ID == 5273 ||
                 mos.m_ID == 5092 ||
                 mos.m_ID == 5088 ||
