@@ -59,7 +59,7 @@ public:
 	inline void setName(const std::string& s) {_name = s;}
 	inline void setClass(UInt8 c) {_class = c;}
     inline void setSex(UInt8 s) {_sex = s;}
-	inline void setLevel(UInt8 l) {_level = l;}
+	inline void setLevel(UInt8 l) { _level = l; initTrumpSlot(); }
 	inline void setExp(UInt64 e) {_exp = e;}
     inline void setPExp(UInt32 e) { _pexp = e; }
     inline void setPExpMax(UInt32 e) { _pexpMax = e; }

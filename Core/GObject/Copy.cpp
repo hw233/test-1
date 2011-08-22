@@ -153,7 +153,7 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
 
 void PlayerCopy::addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot)
 {
-    CopyData& cd = getCopyData(NULL, playerId, id);
+    CopyData& cd = m_copys[playerId][id];
     cd.floor = floor;
     cd.spot = spot;
 }

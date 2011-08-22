@@ -255,6 +255,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
 		}
+        initTrumpSlot();
 	}
 	else if(_exp != e)
 	{

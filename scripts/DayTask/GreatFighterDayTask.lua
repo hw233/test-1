@@ -1,7 +1,6 @@
 require("global")
 
 function RunGreatFighterAction(fgtId)
-    return -- TODO:
 	local MsgTable = {};
 	
 	local player = GetPlayer();
@@ -28,7 +27,8 @@ function RunGreatFighterAction(fgtId)
 	if player:getGreatFighterFriendliness(fgtId) >= GetGreatFighterReqFriendliness(fgtId) and playerLev + 10 >= fighterLev then
 		table.insert(MsgTable, RunGreatCtrlAction(fgtId));
 	end
-	return MsgTable;
+	-- return MsgTable; TODO:
+	return {};
 end
 
 function RunSepcialCollectAction1()
