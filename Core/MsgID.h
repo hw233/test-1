@@ -456,28 +456,28 @@ namespace REP
 namespace SPEQ
 {
     const UInt8 SOCK_ADDR           = 0x02;
-    const UInt8 PLAYERIDAUTH        = 0xFD;
-    const UInt8 WORLDANNOUNCE       = 0xFE;
-    const UInt16 USERRECHARGE       = 0x100;
-    const UInt16 KILLUSER           = 0x101;
-    const UInt16 LOCKUSER           = 0x102;
-    const UInt16 UNLOCKUSER         = 0x103;
-    const UInt16 GMHANDLERFROMBS    = 0x104;
-    const UInt16 MAILFROMBS         = 0x105;
-    const UInt16 BANCHATFROMBS      = 0x106;
-    const UInt16 ADDITEMFROMBS      = 0x107;
-    const UInt16 BATTLEREPORT       = 0x110;
+    const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
+    const UInt8 WORLDANNOUNCE       = 0xFD;// 0xFE
+    const UInt16 USERRECHARGE       = 0x105;// 0x100
+    const UInt16 KILLUSER           = 0x104;// 0x101
+    const UInt16 LOCKUSER           = 0x100;// 0x102
+    const UInt16 UNLOCKUSER         = 0x101;// 0x103
+    const UInt16 GMHANDLERFROMBS    = 0x102;// 0x104
+    const UInt16 MAILFROMBS         = 0x107;// 0x105
+    const UInt16 BANCHATFROMBS      = 0x103;// 0x106
+    const UInt16 ADDITEMFROMBS      = 0x108;// 0x107
+    const UInt16 BATTLEREPORT       = 0x106;// 0x110
 }
 
 namespace SPEP
 {
-    const UInt8 LOCKUSER            = 0x02;
-    const UInt8 UNLOCKUSER          = 0x03;
-    const UInt8 GMHANDLERFROMBS     = 0x04;
-    const UInt8 MAILFROMBS          = 0x05;
-    const UInt8 BANCHATFROMBS       = 0x06;
-    const UInt8 ADDITEMFROMBS       = 0x07;
-    const UInt8 PLAYERIDAUTH        = 0xFD;
+    const UInt8 LOCKUSER            = 0x00;
+    const UInt8 UNLOCKUSER          = 0x01;
+    const UInt8 GMHANDLERFROMBS     = 0x02;
+    const UInt8 MAILFROMBS          = 0x07;
+    const UInt8 BANCHATFROMBS       = 0x03;
+    const UInt8 ADDITEMFROMBS       = 0x08;
+    const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
 }
 
 #endif // _MSGID_H_

@@ -12,6 +12,7 @@
 #include "Common/TimeUtil.h"
 
 #include "Server/WorldServer.h"
+#include "kingnet_analyzer.h"
 
 namespace Battle
 {
@@ -883,6 +884,11 @@ namespace GObject
             num = m_tripodAwdNum;
         }
 
+    public:
+        void udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
+                const char* str5, const char* str6, const char* type);
+    private:
+        CUserLogger* m_ulog;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -35,7 +35,6 @@
 #include <mysql.h>
 #include "GData/Formation.h"
 #include "Script/BattleFormula.h"
-#include "kingnet_analyzer.h"
 
 #include <cmath>
 
@@ -341,7 +340,7 @@ namespace GObject
 		_isOnline(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
-		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0)
+		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -488,18 +487,31 @@ namespace GObject
 		checkLastBattled();
 		GameAction()->onLogin(this);
 
+        char buf[64] = {0};
+        snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+        m_ulog = _analyzer.GetInstance(buf);
+        if (m_ulog)
         {
-            char id[32] = {0x00};
-            snprintf(id, sizeof(id), "%"I64_FMT"u", getId());
-            CUserLogger* logger = _analyzer.GetInstance(id);
-            if (logger)
+            TcpConnection conn = NETWORK()->GetConn(_session);
+            if (conn)
             {
-                logger->SetUserIP("192.168.9.2");
-                //logger->SetUserMsg("user|msg|is|here");
-                logger->LogMsg("11","22","33","44","55","66","login");
+                Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
+                struct in_addr inaddr = inet_makeaddr(cl->GetClientIP(), 0);
+                m_ulog->SetUserIP(inet_ntoa(inaddr));
             }
         }
+        udpLog("", "", "", "", "", "", "", "login");
 	}
+
+    void Player::udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
+                const char* str5, const char* str6, const char* type)
+    {
+        if (m_ulog)
+        {
+            m_ulog->SetUserMsg(umsg);
+            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type);
+        }
+    }
 
 	void Player::Reconnect()
 	{
