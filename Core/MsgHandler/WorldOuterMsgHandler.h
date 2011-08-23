@@ -348,6 +348,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	clan->initBuildClan();
 	SYSMSG_SEND(120, player);
 	SYSMSG_SENDV(1020, player, clan->getName().c_str());
+    player->OperationTaskAction(0);
 }
 
 void OnClanApplyReq( GameMsgHdr& hdr, ClanApplyReq& car )

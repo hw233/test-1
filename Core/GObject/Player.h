@@ -577,6 +577,7 @@ namespace GObject
 		bool setNewGuildTaskStep(UInt32);
         void sendNewGuild();
 
+        bool OperationTaskAction(int type);
 
 	private:
 		void  greatFighterFavorSubmitCheck(GreatFighterTaskVal *, UInt32, UInt32 = TimeUtil::SharpDay(0));

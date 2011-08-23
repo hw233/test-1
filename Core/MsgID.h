@@ -298,8 +298,8 @@ namespace REP
     const UInt8 USER_INFO_CHANGE    = 0xE5;// 0x15
     const UInt8 STATE_CHANGE        = 0x16;
     const UInt8 BOOK_SHOP_LIST      = 0xEC;// 0x1A
-    const UInt8 ARENAPRILIMINARY    = 0xED;
-    const UInt8 BOOK_SHOP_BUY       = 0xEE;// 0x1B
+    const UInt8 ARENAPRILIMINARY    = 0xE9;// 0xED
+    const UInt8 BOOK_SHOP_BUY       = 0xED;// 0x1B
     const UInt8 RANK_DATA           = 0xEE;// 0x1D
     const UInt8 RANK_SETTING        = 0xEF;// 0x1E
 

@@ -10,7 +10,6 @@
 #include "GObject/GObjectManager.h"
 #include "GObject/Boss.h"
 #include "GObject/Clan.h"
-#include "GObject/Country.h"
 #include "Server/WorldServer.h"
 #include "Server/Cfg.h"
 #include "GObject/Player.h"

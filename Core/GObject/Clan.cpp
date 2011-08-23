@@ -189,7 +189,8 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 		_clanDynamicMsg->addCDMsg(0, player->getName(), &st);
 		broadcast(st);
 	}
-	player->GetTaskMgr()->DoAcceptedTask(62206);
+	//player->GetTaskMgr()->DoAcceptedTask(62206);
+    player->OperationTaskAction(0);
     if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
         player->buildClanTask();
 	return true;

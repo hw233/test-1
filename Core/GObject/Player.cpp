@@ -5048,5 +5048,17 @@ namespace GObject
         return 0.0;
     }
 
+    bool Player::OperationTaskAction(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return GameAction()->RunOperationTaskAction0(this, 6);
+                break;
+            default:
+                break;
+        }
+    }
+
 }
 
