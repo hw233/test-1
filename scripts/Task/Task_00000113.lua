@@ -87,7 +87,7 @@ function Task_00000113_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "怎么又是你！";
+	action.m_NpcMsg = "你小子还真是阴魂不散，走到哪都看得到你！";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -131,7 +131,7 @@ function Task_00000113_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(2222);
+	player:AddExp(20000);
 	return true;
 end
 

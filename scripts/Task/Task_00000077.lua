@@ -129,7 +129,7 @@ function Task_00000077_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠出手相救。";
+	action.m_NpcMsg = "我被那妖道困在这里多时，正束手无策，却没料到"..GetPlayerName(GetPlayer()).."你这么快就来救我。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -157,7 +157,6 @@ function Task_00000077_accept()
 	if not task:AcceptTask(77) then
 		return false;
 	end
-	task:AddTaskStep(77);
 	return true;
 end
 
@@ -174,7 +173,7 @@ function Task_00000077_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(14000);
+	player:AddExp(18000);
 	return true;
 end
 

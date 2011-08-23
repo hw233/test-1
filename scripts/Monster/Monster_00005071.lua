@@ -12,7 +12,7 @@ function Monster_00005071(num)
 			if itemNum > num then itemNum = num; end
 			local realItemNum = 0;
 			for i = 1, num do
-				if math.random(1, 100) <= 40 then
+				if math.random(1, 100) <= 30 then
 					realItemNum = realItemNum + 1;
 					if realItemNum >= itemNum then
 						break;

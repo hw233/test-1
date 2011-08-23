@@ -119,8 +119,8 @@ function Task_00000070_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我这就期待着少侠可以在将来的正邪之战中大方异彩了。";
-	action.m_ActionMsg = "邱大哥，你过奖了。";
+	action.m_NpcMsg = "这把剑是醉道人师叔送给"..GetPlayerName(GetPlayer()).."少侠的，听说是师叔当年在海外仙山找到的神兵，我这就期待着少侠可以用此剑在正邪之战中大方异彩了。";
+	action.m_ActionMsg = "多谢醉道人师叔也多谢邱大哥。";
 	return action;
 end
 
@@ -167,12 +167,35 @@ end
 function Task_00000070_submit(itemId, itemNum)
 	local player = GetPlayer();
 
+	--���ѡ������Ʒ
+	local select = false;
+	if itemId == 4999 and itemNum == 1 then
+		select = true;
+	elseif itemId == 4998 and itemNum == 1 then
+		select = true;
+	elseif itemId == 4997 and itemNum == 1 then
+		select = true;
+	end
+
+	if not select then return false; end
 	local package = player:GetPackage();
 
+	local selReqGrid = package:GetItemUsedGrids(itemId, itemNum, 1);
+	if selReqGrid > player:GetFreePackageSize() then
+		player:sendMsgCode(2, 2013, 0);
+		return false;
+	end
 	if not player:GetTaskMgr():SubmitTask(70) then
 		return false;
 	end
 
+	if IsEquipTypeId(itemId) then 
+		for j = 1, itemNum do
+			package:AddEquip(itemId, 1);
+		end
+	else
+		package:AddItem(itemId, itemNum, 1);
+	end
 
 	player:AddExp(10000);
 	return true;
