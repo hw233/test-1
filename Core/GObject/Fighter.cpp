@@ -47,7 +47,7 @@ bool existGreatFighter(UInt32 id)
 
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _pexpMax(0), _potential(1.0f),
-    _capacity(1.0f), _color(2), _hp(0), _trumpslot(TRUMP_INIT), _cittaslot(CITTA_INIT), _weapon(NULL),
+    _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
     _praadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
@@ -255,7 +255,6 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
 		}
-        initTrumpSlot();
 	}
 	else if(_exp != e)
 	{
@@ -291,28 +290,15 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	switch(t)
 	{
 	case 1: field = "hp"; break;
-	case 2:
-        {
-            field = "level";
-            initTrumpSlot();
-        }
-        break;
+	case 2: field = "level"; break;
 	case 3: DB().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
 		return;
 	case 4:
-        {
-            if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-                DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
-            initTrumpSlot();
-		return;
-        }
+        if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
+            DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
     case 5:
-        {
-            if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-                DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
-            initTrumpSlot();
-        return;
-        }
+        if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
+            DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
 	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
         break;
     case 7:
@@ -625,19 +611,22 @@ ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 	return rr;
 }
 
-void Fighter::initTrumpSlot()
+bool Fighter::canSetTrump(UInt8 idx)
 {
-    if (_level >= 60 && _potential >= 1.5 && _capacity >= 7)
+    if (idx == 0)
+        return true;
+
+    if (_level >= 60 && idx == 2)
     {
-        _trumpslot = 3;
-        return;
+        return true;
     }
 
-    if (_level >= 60 || (_potential >= 1.5 && _capacity >= 7))
+    if (_potential >= 1.5 && _capacity >= 7 && idx == 1)
     {
-        _trumpslot = 2;
-        return;
+        return true;
     }
+
+    return false;
 }
 
 ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
@@ -648,7 +637,10 @@ ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
     StringTokenizer tk(trumps, ",");
     for (size_t i = 0; i < tk.count() && static_cast<int>(i) < getMaxTrumps(); ++i)
     {
-        setTrump(::atoi(tk[i].c_str()), i, writedb);
+        UInt32 trump = ::atoi(tk[i].c_str());
+        if (trump) {
+            setTrump(trump, i, writedb);
+        }
     }
 
     return &_trump[0];
@@ -656,7 +648,7 @@ ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
 
 ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 {
-    if (idx >= 0 && idx < getMaxTrumps())
+    if (canSetTrump(idx))
     {
         ItemEquip* t = 0;
         t = GObjectManager::fetchEquipment(trump);
@@ -668,7 +660,7 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (idx >= 0 && idx < getMaxTrumps())
+    if (canSetTrump(idx))
     {
         if
             (

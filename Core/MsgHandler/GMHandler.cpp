@@ -949,8 +949,10 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
 		idx = 4;
 	else
 		return;
-	if(flushAttr)
+	if(flushAttr) {
 		fgt->setPotential(1.79f);
+        fgt->setCapacity(8);
+    }
 	GObject::Package * package = player->GetPackage();
 	GObject::ItemEquip * o = NULL;
 	GObject::ItemWeapon * weapon;

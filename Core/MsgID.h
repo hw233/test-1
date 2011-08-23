@@ -186,7 +186,7 @@ namespace REQ
     /**请求宗族奖励物品*/
     const UInt8 CLANREWARD          = 0x9C;
     /**领取宗族奖励*/
-    const UInt8 GET_CLANREWARD      = 0x9D;
+    const UInt8 GET_CLANREWARD      = 0xFB;// 0x9D
     /**分配宗族奖励物品*/
     const UInt8 ALLOCATECLANREWARD  = 0x9E;
     /**宗族分配记录请求*/
