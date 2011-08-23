@@ -32,14 +32,11 @@ end
 function OperationTaskAction0_0003()
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
-	local taskId;
-	if GetPlayerData(6) == 0 then
-		taskId = 40409;
-	else
-		taskId = 50409;
-	end	
+    local taskId = 14
 	if task:HasAcceptedTask(taskId) then
-		task:AddTaskStep(taskId);
+        if player:getFighterCount() >= 2 then
+            task:AddTaskStep(taskId);
+        end
 	end
 end
 
