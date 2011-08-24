@@ -1480,7 +1480,7 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     peerless = pl;
     _attrDirty = true;
     _bPDirty = true;
-    sendModification(0x30, peerless);
+    sendModification(0x30, peerless, writedb);
 }
 
 void Fighter::setAcupoints( std::string& acupoints, bool writedb )
