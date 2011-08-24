@@ -1064,7 +1064,6 @@ namespace GObject
 			fgt2->setExp(specfgtobj.experience);
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
-            fgt2->setPeerless(specfgtobj.peerless, false);
             fgt2->setAcupoints(specfgtobj.acupoints, false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
@@ -1075,6 +1074,7 @@ namespace GObject
 			fgt2->setRing(fetchEquipment(specfgtobj.ring), false);
 			fgt2->setAmulet(fetchEquipment(specfgtobj.amulet), false);
             fgt2->setTrump(specfgtobj.trump, false);
+            fgt2->setPeerless(specfgtobj.peerless, false); // XXX: must after setTrump
             fgt2->setSkills(specfgtobj.skills, false);
             fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
