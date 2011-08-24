@@ -159,7 +159,7 @@ function Task_00000001_submit(itemId, itemNum)
 
 	local fixReqGrid = package:GetItemUsedGrids(2000,1,1);
 	if fixReqGrid > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2013, 0);
+		player:sendMsgCode(2, 1013, 0);
 		return false;
 	end
 	if not player:GetTaskMgr():SubmitTask(1) then

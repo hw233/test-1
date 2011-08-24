@@ -1,7 +1,7 @@
 --任务的接受条件
 function Task_Accept_00000044()
 	local player = GetPlayer();
-	if player:GetLev() < 11 then
+	if player:GetLev() < 25 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -34,7 +34,7 @@ end
 function Task_Can_Accept_00000044()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 11 then
+	if player:GetLev() < 25 then
 		return false;
 	end
 	if task:HasAcceptedTask(44) or task:HasCompletedTask(44) or task:HasSubmitedTask(44) then

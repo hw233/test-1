@@ -48,10 +48,6 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
     CopyData& tcd = getCopyData(pl, id, true);
 
     UInt8 ret = 1;
-    if (!tcd.floor) {
-        tcd.floor = 1;
-        tcd.spot = 1;
-    }
     if (PLAYER_DATA(pl, copyFreeCnt) < FREECNT) {
         ++PLAYER_DATA(pl, copyFreeCnt);
         ret = 0;
@@ -71,6 +67,11 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
     if (!ret)
         DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
+
+    if (!tcd.floor) {
+        tcd.floor = 1;
+        tcd.spot = 1;
+    }
 
     st << static_cast<UInt8>(1) << id << ret << Stream::eos;
     pl->send(st);
@@ -145,7 +146,8 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
 
     tcd.floor = 0;
     tcd.spot = 0;
-    DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, pl->getId(), id);
+    //DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, pl->getId(), id);
+    DB().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.spot, pl->getId(), id);
 
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);

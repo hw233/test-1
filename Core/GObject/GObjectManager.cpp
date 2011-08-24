@@ -265,6 +265,8 @@ namespace GObject
                 mos.m_ID == 5092 ||
                 mos.m_ID == 5088 ||
                 mos.m_ID == 5091 ||
+                mos.m_ID == 5006 ||
+                mos.m_ID == 5272 ||
                 mos.m_ID == 5097
                 )
                 mos.m_Hide = true;

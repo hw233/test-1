@@ -1,7 +1,7 @@
 --任务的接受条件
 function Task_Accept_00000002()
 	local player = GetPlayer();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 2 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -34,7 +34,7 @@ end
 function Task_Can_Accept_00000002()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 1 then
+	if player:GetLev() < 2 then
 		return false;
 	end
 	if task:HasAcceptedTask(2) or task:HasCompletedTask(2) or task:HasSubmitedTask(2) then
@@ -147,7 +147,7 @@ function Task_00000002_accept()
 	local reqGrids = 0;
 	reqGrids = reqGrids + package:GetItemUsedGrids(2000, 1, 1);
 	if reqGrids > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2012, 0);
+		player:sendMsgCode(2, 1012, 0);
 		return false;
 	end
 	if not task:AcceptTask(2) then
@@ -167,7 +167,7 @@ function Task_00000002_submit(itemId, itemNum)
 
 	local fixReqGrid = package:GetItemUsedGrids(2001,1,1);
 	if fixReqGrid > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2013, 0);
+		player:sendMsgCode(2, 1013, 0);
 		return false;
 	end
 	if not player:GetTaskMgr():SubmitTask(2) then
