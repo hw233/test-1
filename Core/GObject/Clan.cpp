@@ -189,6 +189,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 		_clanDynamicMsg->addCDMsg(0, player->getName(), &st);
 		broadcast(st);
 	}
+
     int type = 0;
 	GameMsgHdr hdr(0x310, player->getThreadId(), player, sizeof(type));
 	GLOBAL().PushMsg(hdr, &type);
