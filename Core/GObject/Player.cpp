@@ -3015,7 +3015,12 @@ namespace GObject
         {
             URandom rnd(time(NULL));
             const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
-            _playerData.clanTaskId = task[rnd(task.size())];
+            UInt8 idx = rnd(task.size());
+            UInt32 taskid = task[idx];
+            if(_playerData.clanTaskId == taskid)
+                _playerData.clanTaskId = task[++idx % task.size()];
+            else
+                _playerData.clanTaskId = taskid;
             GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
         }
         else
@@ -3811,7 +3816,7 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-		if ((nLev >= 30 && !m_Athletics->hasEnterAthletics()) || (oLev < 51 && nLev >= 51))
+		if ((nLev >= 30 && !m_Athletics->hasEnterAthletics()) || (oLev < 41 && nLev >= 41))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
 			GLOBAL().PushMsg(hdr, &nLev);
@@ -5033,5 +5038,10 @@ namespace GObject
         return 0.0;
     }
 
+    void Player::setCountry(UInt8 cny)
+    {
+        _playerData.country = cny;
+		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, _id);
+    }
 }
 

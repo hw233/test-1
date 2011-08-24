@@ -216,15 +216,17 @@ struct PracticeStopReq
 
 struct AthleticsListReq
 {
-	MESSAGE_DEF(REQ::ARENA_INFO);
+    UInt16 _type;
+	MESSAGE_DEF1(REQ::ARENA_INFO, UInt16, _type);
 };
 
-
+#if 0
 struct AthleticsChallengeReq
 {
 	std::string _name;
 	MESSAGE_DEF1(REQ::ATHLETICS_CHALLENGE, std::string, _name);
 };
+#endif
 
 struct ArenaInfoReq
 {
@@ -1164,16 +1166,33 @@ void OnPracticeStopReq( GameMsgHdr& hdr, PracticeStopReq& req)
 	GObject::practicePlace.stop(player);
 }
 
-void OnAthleticsListReq( GameMsgHdr& hdr, AthleticsListReq&)
+void OnAthleticsListReq( GameMsgHdr& hdr, AthleticsListReq& req)
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::gAthleticsRank.requestAthleticsList(player);
+    GObject::gAthleticsRank.requestAthleticsList(player, req._type);
 }
 
-void OnAthleticsChallengeReq( GameMsgHdr& hdr, AthleticsChallengeReq& req )
+void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::gAthleticsRank.challenge(player, req._name);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    switch(type)
+    {
+    case 0:
+    case 1:
+        GObject::gAthleticsRank.challenge(player, type);
+        break;
+    case 2:
+        {
+            std::string name;
+            brd >> name;
+            GObject::gAthleticsRank.challenge(player, name);
+        }
+        break;
+    }
 }
 
 struct GetBoxReq

@@ -338,7 +338,7 @@ namespace GObject
 		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
         if(taskType.m_Class == 4 || taskType.m_Class == 5 || taskType.m_Class == 6)
         {
-            m_TaskSubmitedList[taskId] = TimeUtil::Now();
+            ResetTaskStep2(it->second);
             DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, m_PlayerOwner->getId());
         }
         else

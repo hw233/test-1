@@ -36,7 +36,7 @@ MSG_REG(GameMsgHdr, OnPracticePayReq);
 MSG_REG(GameMsgHdr, OnPracticeSitDownReq);
 MSG_REG(GameMsgHdr, OnPracticeStopReq);
 MSG_REG(GameMsgHdr, OnAthleticsListReq);
-MSG_REG(GameMsgHdr, OnAthleticsChallengeReq);
+MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_CHALLENGE, OnAthleticsChallengeReq);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);

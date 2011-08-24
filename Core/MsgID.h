@@ -236,9 +236,9 @@ namespace REQ
     /**斗剑场信息*/
     const UInt8 ARENA_INFO          = 0xC5;// 0xD0
     /**斗剑场挑战*/
-    const UInt8 ARENA_FIGHT_INFO    = 0xC6;// 0xD1
+    //const UInt8 ARENA_FIGHT_INFO    = 0xC6;// 0xD1
     /**???*/
-    const UInt8 ATHLETICS_CHALLENGE = 0xF8;// 0xD2
+    const UInt8 ATHLETICS_CHALLENGE = 0xC6;//0xF8;// 0xD2
     /**???*/
     const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/
@@ -426,7 +426,7 @@ namespace REP
     const UInt8 PWD_LOCK            = 0xCE;
 
     const UInt8 ARENA_IFNO          = 0xC5;// 0xD0
-    const UInt8 FIGHT_INFO          = 0xC6;// 0xD1
+    const UInt8 FIGHT_INFO_CHANGE   = 0xC6;// 0xD1
 
     const UInt8 PRACTICE_PLACE_IFNO = 0x30;// 0xE0
     const UInt8 PRACTICE_PAGE       = 0x31;// 0xE1

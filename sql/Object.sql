@@ -119,6 +119,29 @@ CREATE TABLE `athletics_record` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `athletics_event`
+--
+
+DROP TABLE IF EXISTS `athletics_event`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `athletics_event` (
+  `id` int(10) NOT NULL,
+  `row` tinyint(1) NOT NULL DEFAULT '0',
+  `player1` bigint(20) NOT NULL,
+  `player2` bigint(20) NOT NULL,
+  `cond` tinyint(3) NOT NULL DEFAULT '0',
+  `color` tinyint(3) NOT NULL DEFAULT '0',
+  `value` tinyint(5) unsigned NOT NULL,
+  `itemcount` tinyint(3) NOT NULL DEFAULT '0',
+  `itemid` int(10) NOT NULL,
+  `time` int(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
 -- Table structure for table `auto_battle`
 --
 
@@ -1011,13 +1034,6 @@ CREATE TABLE `clan` (
 -- Dumping data for table `clan`
 --
 -- WHERE:  id=0
-
-LOCK TABLES `clan` WRITE;
-/*!40000 ALTER TABLE `clan` DISABLE KEYS */;
-INSERT INTO `clan` VALUES (0,'英雄之城',40,0,0,0,0,0,0,0,'','','',0,0,39,39,0,0,0,0,0,0,0,0,1301587200,0,30,30,30,0);
-/*!40000 ALTER TABLE `clan` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

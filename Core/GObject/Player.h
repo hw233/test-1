@@ -392,7 +392,7 @@ namespace GObject
 		inline void setThreadId(UInt8 cny)	 { _threadId = cny; }
 
 		inline UInt8 getCountry() const		{ return _playerData.country; }
-		inline void setCountry(UInt8 cny)	{ _playerData.country = cny; }
+		void setCountry(UInt8 cny);
 
 		inline UInt16 getLocation()			{ return _playerData.location; }
 		inline void setLocation(UInt16 loc)	{ _playerData.location = loc; }

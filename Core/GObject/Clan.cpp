@@ -300,16 +300,16 @@ bool Clan::leave(Player * player)
 	if (found == _members.end())
 		return false;
 	ClanMember * member = (*found);
-	if (_members.size() == 1 && _clanBattle->isInBattling())
+	if (_clanBattle->isInBattling())
 	{
 		player->sendMsgCode(0, 2210);
 		return false;
 	}
     getAllocBack(*member);
 	// std::string oldLeaderName = (*_members.begin())->player->getName();
-    if( player == getOwner())
+    if( player == getOwner() && _members.size() != 1)
     {
-        // XXX 帮主不能退出帮派
+        // XXX 帮主不能退出帮派, 帮派只剩下帮主一人时，可解散帮派
 		player->sendMsgCode(0, 2235);
         return false;
     }
@@ -2638,7 +2638,7 @@ void Clan::addClanFunds(UInt32 funds)
         _funds += funds;
 
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(7) << _funds;
+        st << static_cast<UInt8>(8) << _funds;
         st << Stream::eos;
         broadcast(st);
 
@@ -2653,7 +2653,7 @@ void Clan::useClanFunds(UInt32 funds)
         _funds -= funds;
 
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(7) << _funds;
+        st << static_cast<UInt8>(8) << _funds;
         st << Stream::eos;
         broadcast(st);
 

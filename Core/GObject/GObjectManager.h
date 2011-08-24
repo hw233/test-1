@@ -34,6 +34,7 @@ namespace GObject
 		static bool loadClanRobMonster();
 		static bool loadAllPlayers();
 		static bool loadAllAthletics();
+		static bool loadAllAthleticsEvent();
 		static bool delayLoad();
 		static bool loadAllFriends();
 		static bool loadAllClans();

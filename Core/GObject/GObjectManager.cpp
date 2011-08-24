@@ -114,6 +114,8 @@ namespace GObject
 		IDGenerator::gAthleticsRecordOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `clan_battler`", maxId);
 		IDGenerator::gClanBatterRecordIDGenerator.Init(maxId);
+		execu->Extract("SELECT max(`id`) FROM `athletics_event`", maxId);
+		IDGenerator::gAthleticsEventOidGenerator.Init(maxId);
 
 		return true;
 	}
@@ -132,6 +134,7 @@ namespace GObject
 		loadClanRobMonster();
 		loadAllPlayers();
 		loadAllAthletics();
+		loadAllAthleticsEvent();
 		unloadEquipments();
 		loadAllFriends();
 		LoadDungeon();
@@ -1556,6 +1559,32 @@ namespace GObject
 
 		return true;
 	}
+
+	bool GObjectManager::loadAllAthleticsEvent()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading athletics_event:");
+		DBAthleticsEventData dbed;
+        if(execu->Prepare("SELECT `id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time` FROM `athletics_event` ORDER BY `time` desc", dbed) != DB::DB_OK)
+            return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl1 = globalPlayers[dbed.player1];
+			Player * pl2 = globalPlayers[dbed.player2];
+			if (pl1 == NULL && pl2 == NULL)
+				continue;
+            gAthleticsRank.addAthleticsEventDataFromDB(dbed.row, dbed.id, pl1, pl2, dbed.cond, dbed.color, dbed.value, dbed.itemCount, dbed.itemId, dbed.time);
+		}
+		lc.finalize();
+
+		return true;
+	}
+
+
 
 	bool GObjectManager::delayLoad()
 	{

@@ -539,10 +539,12 @@ void OnExtendPackageReq( GameMsgHdr& hdr, ExtendPackageReq& )
 	pl->ExtendPackageSize();
 }
 
+#if 0
 struct AthleticsDataReq
 {
 	MESSAGE_DEF(REQ::ARENA_FIGHT_INFO);
 };
+#endif
 
 struct FighterTrainListReq
 {
@@ -2874,11 +2876,13 @@ void OnFriendActReq( GameMsgHdr& hdr, FriendActReq& )
 }
 #endif
 
+#if 0
 void OnAthleticsDataReq( GameMsgHdr& hdr, AthleticsDataReq& )
 {
 	MSG_QUERY_PLAYER(player);
 	player->GetAthletics()->notifyAthleticsData(15);
 }
+#endif
 
 struct BlockBossReq
 {

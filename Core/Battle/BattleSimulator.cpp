@@ -22,11 +22,13 @@ static UInt8 getPosition(UInt16 loc)
 		return 7;
 	if(loc == 0x8FFF)
 		return 8;
-	loc >>= 12;
+	loc >>= 8;
+#if 0
 	if(loc > 6)
 		return 3;
 	if(loc > 5)
 		return 1;
+#endif
 	return static_cast<UInt8>(loc);
 }
 

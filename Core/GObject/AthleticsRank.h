@@ -48,13 +48,14 @@ struct AthleticsRankData
 	//UInt8	awardType;
 	//UInt32	awardCount;
     UInt32  prestige;
-	UInt8	winstreak;
-    UInt8   bewinstreak;
-    UInt8   failstreak;
-    UInt8   befailstreak;
+	UInt16	winstreak;
+    UInt16  bewinstreak;
+    UInt16  failstreak;
+    UInt16  befailstreak;
     UInt32  oldrank;
     UInt32  first4rank;
     UInt32  extrachallenge;
+    //UInt32  first4rank;
     // 0x1 第一次成为竞技场第一
     // 0x2 第一次杀入竞技场二强
     // 0x4 第一次杀入竞技场三强
@@ -63,9 +64,11 @@ struct AthleticsRankData
     // 0x20 第一次杀入竞技场200强
     // 0x40 第一次杀入竞技场300强
     // 0x80 第一次竞技场挑战
-    // 0x100 一天内提升100个排名
-    // 0x200 一天内提升10个排名
-    // 0x400 一天内提升50个排名
+    // 0x100 一天内提升200个排名
+    // 0x200 一天内提升100个排名
+    // 0x400 一天内提升10个排名
+    // 0x800 一天内提升50个排名
+    // 0x1000 失去10强排名
 };
 
 struct AthleticsAward
@@ -85,13 +88,15 @@ struct AthleticsEventData
     Player* player1;
     Player* player2;
     UInt8  cond;
+    UInt8  color;
+    UInt16 value;
     UInt8  itemCount;
     UInt32 itemId;
 	UInt32 time;
 
 	AthleticsEventData() { memset(this, 0x00, sizeof(*this));}
-	AthleticsEventData(UInt32 id_, Player* player1_, Player* player2_, UInt8 cond_, UInt8 itemCount_ = 0, UInt32 itemId_ = 0, UInt32 time_ = TimeUtil::Now())
-		: id(id_), player1(player1_), player2(player2_), cond(cond_), itemCount(itemCount_), itemId(itemId_), time(time_) {}
+	AthleticsEventData(UInt32 id_, Player* player1_, Player* player2_, UInt8 cond_, UInt8 color_, UInt16 value_, UInt8 itemCount_ = 0, UInt32 itemId_ = 0, UInt32 time_ = TimeUtil::Now())
+		: id(id_), player1(player1_), player2(player2_), cond(cond_), color(color_), value(value_), itemCount(itemCount_), itemId(itemId_), time(time_) {}
 };
 
 
@@ -118,15 +123,17 @@ public:
 	bool enterAthleticsReq(Player *, UInt8 row);
 
 public:
-	void requestAthleticsList(Player *);
+	void requestAthleticsList(Player *, UInt16 type);
 	void challenge(Player *, std::string&);
 	void notifyAthletcisOver(Player *, Player *, UInt32, bool);
 	void notifyAthletcisBoxFlushTime(Player *);
 
     void broadcastAthleticsEvent(UInt8 count);
-    bool addAthleticsEventDataFromDB(UInt8 row, UInt32 id, Player* player1, Player* player2, UInt8 cond, UInt8 itemCount, UInt32 itemId, UInt32 time);
-    UInt32 addAthleticsEventData(UInt8 row, Player* player1, Player* player2,UInt8 cond, UInt8 itemCount, UInt32 itemId);
-    void requestAthleticsEvent(Player * player);
+    bool addAthleticsEventDataFromDB(UInt8 row, UInt32 id, Player* player1, Player* player2, UInt8 cond, UInt8 color, UInt16 value, UInt8 itemCount, UInt32 itemId, UInt32 time);
+    UInt32 addAthleticsEventData(UInt8 row, Player* player1, Player* player2, UInt8 cond, UInt8 color, UInt16 value, UInt8 itemCount, UInt32 itemId);
+    void requestAthleticsEvent(Stream&, Player * player);
+
+	void challenge(Player *, UInt8 type);
 
 protected:
 	void getRandomEquip(UInt8 level, UInt16 rank, UInt16& EquipId, UInt16& cnt);
@@ -205,6 +212,8 @@ protected:
 	void getRankNeighbour(UInt8, Rank, Rank&, Rank&);
 
 	bool updateBoxTimeoutAward(Rank, UInt8, UInt32 = TimeUtil::Now());
+
+    void RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UInt8 win);
 
 public:	
 	AthleticsList *getAthleticsRank()

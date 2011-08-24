@@ -4,23 +4,23 @@ local attained = -2         --0xfffffffe
 
 -- 等级
 function Level40( player )
-    if player:GetAttainMgr():CanAttain(1000) then
-        player:GetAttainMgr():UpdateAttainment( 1000, attained)
+    if player:GetAttainMgr():CanAttain(10001) then
+        player:GetAttainMgr():UpdateAttainment( 10001, attained)
     end
 end
 
 function Level50( player )
     Level40( player )
-    if player:GetAttainMgr():CanAttain(1001) then
-        player:GetAttainMgr():UpdateAttainment( 1001, attained)
+    if player:GetAttainMgr():CanAttain(10002) then
+        player:GetAttainMgr():UpdateAttainment( 10002, attained)
     end
 end
 
 function Level60( player )
     Level40( player )
     Level50( player )
-    if player:GetAttainMgr():CanAttain(1002) then
-        player:GetAttainMgr():UpdateAttainment( 1002, attained)
+    if player:GetAttainMgr():CanAttain(10003) then
+        player:GetAttainMgr():UpdateAttainment( 10003, attained)
     end
 end
 
@@ -28,8 +28,8 @@ function Level70( player )
     Level40( player )
     Level50( player )
     Level60( player )
-    if player:GetAttainMgr():CanAttain(1003) then
-        player:GetAttainMgr():UpdateAttainment( 1003, attained)
+    if player:GetAttainMgr():CanAttain(10004) then
+        player:GetAttainMgr():UpdateAttainment( 10004, attained)
     end
 end
 
@@ -38,8 +38,8 @@ function Level80( player )
     Level50( player )
     Level60( player )
     Level70( player )
-    if player:GetAttainMgr():CanAttain(1004) then
-        player:GetAttainMgr():UpdateAttainment( 1004, attained)
+    if player:GetAttainMgr():CanAttain(10005) then
+        player:GetAttainMgr():UpdateAttainment( 10005, attained)
     end
 end
 
@@ -49,8 +49,8 @@ function Level90( player )
     Level60( player )
     Level70( player )
     Level80( player )
-    if player:GetAttainMgr():CanAttain(1005) then
-        player:GetAttainMgr():UpdateAttainment( 1005, attained)
+    if player:GetAttainMgr():CanAttain(10006) then
+        player:GetAttainMgr():UpdateAttainment( 10006, attained)
     end
 end
 
@@ -61,8 +61,8 @@ function Level100( player )
     Level70( player )
     Level80( player )
     Level90( player )
-    if player:GetAttainMgr():CanAttain(1006) then
-        player:GetAttainMgr():UpdateAttainment( 1006, attained)
+    if player:GetAttainMgr():CanAttain(10007) then
+        player:GetAttainMgr():UpdateAttainment( 10007, attained)
     end
 end
 

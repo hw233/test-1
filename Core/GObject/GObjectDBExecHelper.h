@@ -550,13 +550,27 @@ struct DBAthleticsData
 	//UInt32 boxcount;
 	//UInt32 boxFlushTime;
     UInt32  prestige;
-	UInt8	winstreak;
-    UInt8   bewinstreak;
-    UInt8   failstreak;
-    UInt8   befailstreak;
+	UInt16	winstreak;
+    UInt16   bewinstreak;
+    UInt16   failstreak;
+    UInt16   befailstreak;
     UInt32  oldrank;
     UInt32  first4rank;
     UInt32  extrachallenge;
+};
+
+struct DBAthleticsEventData
+{
+	UInt32 id;
+    UInt8  row;
+    UInt64 player1;
+    UInt64 player2;
+    UInt8  cond;
+    UInt8  color;
+    UInt16 value;
+    UInt8  itemCount;
+    UInt32 itemId;
+	UInt32 time;
 };
 
 struct DBAthleticsRecordData
@@ -1299,13 +1313,29 @@ SPECIALDEF(14)
 	//UInt32, boxcount,
 	//UInt32, boxFlushTime,
     UInt32, prestige,
-	UInt8,  winstreak,
-    UInt8,  bewinstreak,
-    UInt8,  failstreak,
-    UInt8,  befailstreak,
+	UInt16,  winstreak,
+    UInt16,  bewinstreak,
+    UInt16,  failstreak,
+    UInt16,  befailstreak,
     UInt32, oldrank,
     UInt32, first4rank,
     UInt32, extrachallenge
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAthleticsEventData)
+SPECIALDEF(10)
+(
+	UInt32, id,
+    UInt8,  row,
+    UInt64, player1,
+    UInt64, player2,
+    UInt8,  cond,
+    UInt8,  color,
+    UInt16, value,
+    UInt8,  itemCount,
+    UInt32, itemId,
+	UInt32, time
 )
 SPECIALEND()
 

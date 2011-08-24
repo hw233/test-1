@@ -146,7 +146,7 @@ void Athletics::appendAthleticsReport(Stream& st, UInt8 count)
 	st << count;
 	for (UInt16 i = 0; rit != _athleticses.rend() && i < count; ++rit, ++count)
 	{
-		st << (*rit)->target->getName() << (*rit)->target->getCountry() << static_cast<UInt8>((*rit)->win == (*rit)->side) << (*rit)->reptid;
+		st << (*rit)->target->getName() << (*rit)->target->getCountry() << static_cast<UInt8>((*rit)->win != (*rit)->side) << (*rit)->reptid;
 	}
 }
 
