@@ -5084,5 +5084,11 @@ namespace GObject
         return true;
     }
 
+    void Player::setCountry(UInt8 cny)
+    { 
+        _playerData.country = cny;
+		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, getId());
+    }
+
 }
 
