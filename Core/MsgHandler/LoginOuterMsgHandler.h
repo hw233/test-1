@@ -66,7 +66,7 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 	GLOBAL().PushMsg(imh, NULL);
 
     LOGIN().Logout();
-    LOGIN().GetLog()->OutInfo("用户[%s][%"I64_FMT"u]退出游戏, 当前在线人数: %u\n",
+    LOGIN().GetLog()->OutInfo("用户[%s][%"I64_FMT"u]退出游戏, 当前在线人数: %d\n",
             player->getName().c_str(), player->getId(), LOGIN().Current());
 }
 
@@ -238,7 +238,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         if (!res)
         {
             UInt32 count = LOGIN().Count();
-            LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %u, 当前在线人数: %u\n",
+            LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %d, 当前在线人数: %d\n",
                     ul._userid, count, LOGIN().Current());
         }
 	}
