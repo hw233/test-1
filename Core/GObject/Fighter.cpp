@@ -1384,7 +1384,7 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
 {
     int op = 0;
     int idx = hasPeerless(pl);
-    if (idx > 0)
+    if (idx >= 0)
     {
         if (pl != _peerless[idx])
         { // upgrade
@@ -1414,12 +1414,13 @@ bool Fighter::delPeerless( UInt16 pl, bool writedb )
     {
         if (SKILL_ID(_peerless[i]) == SKILL_ID(pl))
         {
+            if (isPeerlessUp(pl))
+                offPeerless(writedb);
+
             std::vector<UInt16>::iterator it = _peerless.begin();
             std::advance(it, i);
             _peerless.erase(it);
 
-            if (isPeerlessUp(pl))
-                offPeerless(writedb);
             sendModification(0x31, pl, 2/*1add,2del,3mod*/, writedb);
             return true;
         }
@@ -1469,9 +1470,12 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     if (peerless == pl)
         return;
 
-    int idx = hasPeerless(pl);
-    if (idx < 0)
-        return;
+    if (pl)
+    {
+        int idx = hasPeerless(pl);
+        if (idx < 0)
+            return;
+    }
 
     peerless = pl;
     _attrDirty = true;
