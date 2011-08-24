@@ -438,7 +438,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			}
 
             pl->GetPackage()->AddItem(18, 1, true);
-            {
+            { // TODO:
                 gold = 1000;
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(UInt32));
 				GLOBAL().PushMsg(hdr, &gold);
