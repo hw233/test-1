@@ -2511,7 +2511,7 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 	return pl != NULL && pl->getCountry() == country;
 }
 
-#define ITEM_SPEAKER 8941
+#define ITEM_SPEAKER 16
 
 void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 {
