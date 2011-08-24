@@ -2460,9 +2460,13 @@ void ClanCache::search2(Player * player, std::string name)
         searchInternal(1, slist, clans[1]);
 
 		UInt16 size = clans[0].size() + clans[1].size();
-		//if (size == 0)
-		//	player->sendMsgCode(0, 2220);
+#if 0
+		if (size == 0)
+			player->sendMsgCode(0, 2220);
 		else if (size > 20) 
+#else
+		if (size > 20) 
+#endif
 			size = 20;
 		st << static_cast<UInt16>(size) << static_cast<UInt16>(0) << static_cast<UInt8>(size);
 		std::set<Clan *>::iterator iter;
