@@ -697,7 +697,7 @@ bool BossManager::attack( Player * player, UInt32 id )
 	UInt32 now = TimeUtil::Now();
 	if(player->getBuffData(PLAYER_BUFF_BOSSWEAK, now) > 0)
 	{
-		player->sendMsgCode(2, 2033);
+		player->sendMsgCode(2, 1406);
 		return true;
 	}
 	if(it->second.boss->attackBy(player))

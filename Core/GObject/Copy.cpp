@@ -59,7 +59,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
-            pl->sendMsgCode(0, 1007);
+            pl->sendMsgCode(0, 1101);
             return;
         }
         ++PLAYER_DATA(pl, copyGoldCnt);

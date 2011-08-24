@@ -1291,7 +1291,7 @@ namespace GObject
 		UInt32 amount = GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 2;
 		}
 		bool isBound = equip->GetBindStatus();
@@ -1413,13 +1413,13 @@ namespace GObject
 		UInt32 amount = GObjectManager::getMergeCost(); // merge_cost[lvl];
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 2;
 		}
 
 		if(GetRestPackageSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 2016);
+			m_Owner->sendMsgCode(0, 1011);
 			return 2;
 		}
 
@@ -1553,7 +1553,7 @@ namespace GObject
 		UInt32 amount = GObjectManager::getDetachCost();
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 2;
 		}
 		Fighter * fgt = NULL;
@@ -1566,7 +1566,7 @@ namespace GObject
 			return 2;
 		if(GetRestPackageSize() < 1)
 		{
-			m_Owner->sendMsgCode(0, 2016);
+			m_Owner->sendMsgCode(0, 1011);
 			return 2;
 		}
 		bool bind = false;
@@ -1623,7 +1623,7 @@ namespace GObject
 		UInt32 amount = GObjectManager::getSplitCost();   // split_cost[q][lv];
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 2;
 		}
 		ConsumeInfo ci(SplitEquipment,0,0);
@@ -1749,7 +1749,7 @@ namespace GObject
 		UInt32 amount = exchange_cost[quality - 1][lv];
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 1;
 		}
 		ConsumeInfo ci(ExchangeEquipment,0,0);
@@ -1832,7 +1832,7 @@ namespace GObject
 		UInt32 amount = exchange_set_cost;
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 1;
 		}
 		ConsumeInfo ci(ExchangeEquipment,0,0);
@@ -2211,7 +2211,7 @@ namespace GObject
 		q -= 3;
 		if(m_Owner->getTael() < activate_cost[lv][q])
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 1;
 		}
 
@@ -2279,7 +2279,7 @@ namespace GObject
 		UInt32 amount = GObjectManager::getForgeCost();  // forge_cost;
 		if(m_Owner->getTael() < amount)
 		{
-			m_Owner->sendMsgCode(0, 2009);
+			m_Owner->sendMsgCode(0, 1100);
 			return 1;
 		}
 

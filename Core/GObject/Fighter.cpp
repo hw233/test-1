@@ -1165,7 +1165,7 @@ bool Fighter::learnSkill(UInt16 skill)
 {
 	if(skill == _skill)
 	{
-		if(_owner != NULL) _owner->sendMsgCode(0, 2151);
+		if(_owner != NULL) _owner->sendMsgCode(0, 1700);
 		return false;
 	}
 	const UInt8 colors[3][20] = {{1, 2, 3, 2, 3, 4, 3, 4}, {4, 1, 2, 3, 2, 3, 3, 4}, {2, 3, 4, 3, 1, 2, 3, 4}};

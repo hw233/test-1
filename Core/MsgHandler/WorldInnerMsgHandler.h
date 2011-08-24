@@ -182,12 +182,12 @@ void OnClanMailClick(GameMsgHdr& hdr, const void * data)
 		GObject::Clan * clan = player->getClan();
 		if(clan == NULL)
 		{
-			player->sendMsgCode(2, 2043);
+			player->sendMsgCode(2, 1313);
 			break;
 		}
 		if (clan->getClanBattle()->isInBattling())
 		{
-			player->sendMsgCode(2, 2210);
+			player->sendMsgCode(2, 1317);
 			return;
 		}
 		GObject::Player * p = cmcr->applier;
@@ -199,7 +199,7 @@ void OnClanMailClick(GameMsgHdr& hdr, const void * data)
 			if (applierClan != NULL)
 			{
 				if (applierClan != clan)
-					player->sendMsgCode(2, 2042);
+					player->sendMsgCode(2, 1312);
 				break;
 			}
 			if(!player->getClan()->accept(player, p->getId()))
@@ -292,17 +292,17 @@ void OnClanAllyMailResp( GameMsgHdr& hdr, const void * data )
 	{
 		if (clan->getClanBattle()->isInBattling() || allyClan->getClanBattle()->isInBattling())
 		{
-			cacr->reciever->sendMsgCode(0, 2210);
+			cacr->reciever->sendMsgCode(0, 1317);
 			return;
 		}
 		if (clan->hasEnemyClan(allyClan))
 		{
-			cacr->reciever->sendMsgCode(0, 2234);
+			//cacr->reciever->sendMsgCode(0, 2234);
 			return;
 		}
 		if (allyClan->hasEnemyClan(clan))
 		{
-			cacr->reciever->sendMsgCode(0, 2230);
+			//cacr->reciever->sendMsgCode(0, 2230);
 			return;
 		}
 		if (clan->addAllyClan(player, cacr->reciever, allyClan))

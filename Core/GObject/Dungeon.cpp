@@ -538,7 +538,7 @@ void Dungeon::startChallenge( Player * player )
 
 	if(player->hasFlag(Player::AutoDungeon))
 	{
-		player->sendMsgCode(0, 2035);
+		player->sendMsgCode(0, 1407);
 		return;
 	}
 
@@ -546,7 +546,7 @@ void Dungeon::startChallenge( Player * player )
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
 	{
-		player->sendMsgCode(0, 2035, buffLeft - now);
+		player->sendMsgCode(0, 1407, buffLeft - now);
 		return;
 	}
 
@@ -700,7 +700,7 @@ void Dungeon::autoChallenge( Player * player )
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
 	{
-		player->sendMsgCode(0, 2035, buffLeft - now);
+		player->sendMsgCode(0, 1407, buffLeft - now);
 		return;
 	}
 	player->checkLastBattled();

@@ -134,7 +134,7 @@ function DayTaskAward_Item_00001003(count, color)
 	local playerLev = player:GetLev();
 	
 	if not IsPackageEnough_00001003(count, color) then
-		player:sendMsgCode(2, 2013, 0);
+		player:sendMsgCode(2, 1013, 0);
 		return false
 	end
 	

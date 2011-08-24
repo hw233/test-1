@@ -384,7 +384,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 		return ;
 	if (row != getRankRow(atker->GetLev()))
 	{
-		atker->sendMsgCode(0, 2054);
+		atker->sendMsgCode(0, 1405);
 		Stream st(REP::ATHLETICS_CHALLENGE);
 		st << Stream::eos;
 		atker->send(st);
@@ -406,7 +406,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 			return;
 		if (atkerRankPos - deferRankPos > 14)
 		{
-			atker->sendMsgCode(0, 2054);
+			atker->sendMsgCode(0, 1405);
 			Stream st(REP::ATHLETICS_CHALLENGE);
 			st << Stream::eos;
 			atker->send(st);
@@ -417,7 +417,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 		return;
 	if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
 	{
-		atker->sendMsgCode(0, 2053);
+		atker->sendMsgCode(0, 1413);
 		return ;
 	}
 	if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)

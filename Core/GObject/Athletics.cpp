@@ -380,7 +380,7 @@ bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 
 	if (grid > _owner->GetPackage()->GetRestPackageSize())
 	{
-		_owner->sendMsgCode(0, 2016);
+		_owner->sendMsgCode(0, 1011);
 		return false;
 	}
 	_owner->GetPackage()->AddEquip(EquipId, true, false, FromAthletAward);

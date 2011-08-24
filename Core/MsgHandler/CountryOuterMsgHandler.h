@@ -1126,7 +1126,7 @@ void OnGreatFighterActionReq( GameMsgHdr& hdr, const void * data )
 			return;
 		if(player->isFighterFull())
 		{
-			player->sendMsgCode(0, 2006);
+			player->sendMsgCode(0, 1200);
 			return;
 		}
 		if (GameAction()->RunAutoBattleAction(player, fightId, -1))
@@ -1302,7 +1302,7 @@ void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
 	MSG_QUERY_PLAYER(player);
 	if(player->hasFlag(Player::CountryBattle | Player::ClanBattling))
 	{
-		player->sendMsgCode(2, 2051);
+		player->sendMsgCode(2, 1054);
 		return;
 	}
 	GObject::Fighter * fgt = player->findFighter(frr._fgtid);
@@ -1330,7 +1330,7 @@ void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
 	MSG_QUERY_PLAYER(player);
     if (!req._flag) {
         if(!player->takeOnlineReward())
-            player->sendMsgCode(1, 2016);
+            player->sendMsgCode(1, 1011);
     }
 	player->sendOnlineReward();
 }
@@ -1612,7 +1612,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
 
 	if(player->GetPackage()->GetRestPackageSize() < (bmr._unBindNum > 0 ? 1 : 0) + (bmr._bindNum > 0 ? 1 : 0))
 	{
-		player->sendMsgCode(0, 2016);
+		player->sendMsgCode(0, 1011);
 		return;
 	}
 
@@ -1636,7 +1636,7 @@ void OnBatchMergeReq( GameMsgHdr& hdr, const void * data )
 	br >> count;
 	if(player->GetPackage()->GetRestPackageSize() < count)
 	{
-		player->sendMsgCode(0, 2016);
+		player->sendMsgCode(0, 1011);
 		return;
 	}
 	std::map<UInt16, UInt32, GObject::_GemCompare > gems;
@@ -1712,7 +1712,7 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 		{
 			if(pl->getTael() < 10)
 			{
-				pl->sendMsgCode(0, 2070);
+				pl->sendMsgCode(0, 1103);
 				return;
 			}
 			ConsumeInfo ci(Transport,0,0);
@@ -1790,7 +1790,7 @@ void OnDungeonBattleReq( GameMsgHdr& hdr, DungeonBattleReq& dbr )
 
 	if(pl->GetPackage()->GetRestPackageSize() < 4)
 	{
-		pl->sendMsgCode(1, 2019);
+		pl->sendMsgCode(1, 1014);
 		return;
 	}
 	GObject::Dungeon * dg = GObject::dungeonManager[dbr.type];
@@ -1810,7 +1810,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 
 	if(pl->GetPackage()->GetRestPackageSize() < 4)
 	{
-		pl->sendMsgCode(1, 2019);
+		pl->sendMsgCode(1, 1014);
 		return;
 	}
 	if(dar.type == 0)
@@ -2004,12 +2004,12 @@ void OnLanchChallengeReq( GameMsgHdr& hdr, LanchChallengeReq& lcr)
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
 	{
-		player->sendMsgCode(0, 2035, buffLeft - now);
+		player->sendMsgCode(0, 1407, buffLeft - now);
 		return ;
 	}
 	if( target->getBuffData(PLAYER_BUFF_ATTACKING) > 0 )
 	{
-		player->sendMsgCode(0, 2037);
+		player->sendMsgCode(0, 1409);
 		return ;
 	}
 	UInt8 tid = player->getThreadId();
@@ -2049,12 +2049,12 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
 	{
-		player->sendMsgCode(0, 2035, buffLeft - now);
+		player->sendMsgCode(0, 1407, buffLeft - now);
 		return ;
 	}
 	if( attacker->getBuffData(PLAYER_BUFF_ATTACKING) > 0)
 	{
-		player->sendMsgCode(0, 2037);
+		player->sendMsgCode(0, 1409);
 		return ;
 	}
 
@@ -2101,23 +2101,23 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 	UInt32 now = TimeUtil::Now();
 	if(target->getBuffData(PLAYER_BUFF_PROTECT, now) > 0)
 	{
-		player->sendMsgCode(0, 2039);
+		player->sendMsgCode(0, 1411);
 		return ;
 	}
 	if(player->getBuffData(PLAYER_BUFF_PROTECT, now) > 0)
 	{
-		player->sendMsgCode(0, 2038);
+		player->sendMsgCode(0, 1410);
 		return ;
 	}
 	UInt32 buffLeft = player->getBuffData(PLAYER_BUFF_ATTACKING, now);
 	if(buffLeft > 0)
 	{
-		player->sendMsgCode(0, 2035, buffLeft - now);
+		player->sendMsgCode(0, 1407, buffLeft - now);
 		return ;
 	}
 	if(target->getBuffData(PLAYER_BUFF_ATTACKING, now) > 0)
 	{
-		player->sendMsgCode(0, 2037);
+		player->sendMsgCode(0, 1409);
 		return ;
 	}
 
@@ -2201,7 +2201,7 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->isInCity())
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 	player->cancelAutoBattle();
@@ -2210,13 +2210,13 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 	GObject::Map * map = Map::FromSpot(loc);
 	if(map == NULL)
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 	GObject::MapObject * mo = map->GetObject(anr._npcId);
 	if(mo == NULL || mo->GetSpot() != loc)
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 	player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
@@ -2258,7 +2258,7 @@ void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
 	MSG_QUERY_PLAYER(player);
 	if(!player->isInCity())
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 	player->cancelAutoBattle();
@@ -2267,7 +2267,7 @@ void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
 	GObject::Map * map = Map::FromSpot(loc);
 	if(map == NULL)
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
     // XXX: 在这里找不到npc
@@ -2275,7 +2275,7 @@ void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
 	GObject::MapObject * mo = map->GetObject(req._npcId);
 	if(mo == NULL || mo->GetSpot() != loc)
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 #endif
@@ -2309,7 +2309,7 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
 	MSG_QUERY_PLAYER(player);
 	if(!player->isInCity())
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 	player->cancelAutoBattle();
@@ -2318,7 +2318,7 @@ void OnFrontMapReq( GameMsgHdr& hdr, const void* data)
 	GObject::Map * map = Map::FromSpot(loc);
 	if(map == NULL)
 	{
-		player->sendMsgCode(0, 2036);
+		player->sendMsgCode(0, 1408);
 		return;
 	}
 
@@ -2798,12 +2798,12 @@ void OnMailSendReq( GameMsgHdr& hdr, MailSendReq& msr )
 	}
 	if(player->hasBlock(pl))
 	{
-		player->sendMsgCode(1, 2086);
+		player->sendMsgCode(1, 1500);
 		return;
 	}
 	if(pl->hasBlock(player))
 	{
-		player->sendMsgCode(1, 2087);
+		player->sendMsgCode(1, 1502);
 		return;
 	}
 	MailSendRep rep;
@@ -2832,7 +2832,7 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
 	if(pl == NULL || pl == player)
 	{
-		player->sendMsgCode(0, 1003);
+		player->sendMsgCode(0, 1150);
 		return;
 	}
 	switch(fr._op)

@@ -111,7 +111,7 @@ function DayTaskAward_Item_00001004(count, color)
 	
 	--ÅÐ¶Ï±³°ü¿Õ¼ä×ã¹»£¿
 	if not IsPackageEnough_00001004(count, color) then
-		player:sendMsgCode(2, 2013, 0);
+		player:sendMsgCode(2, 1013, 0);
 		return false
 	end
 	

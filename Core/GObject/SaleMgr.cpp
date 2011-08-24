@@ -178,7 +178,7 @@ void SaleMgr::buySale(Player * player, UInt32 id)
 		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(1) << static_cast<UInt8>(1) << Stream::eos;
 		player->send(st);
-		player->sendMsgCode(0, 2064);
+		player->sendMsgCode(0, 1055);
 		return;
 	}
 	if (found->second >= _sales.size())
@@ -553,7 +553,7 @@ void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt1
 		Stream st(REP::SALE_LIST);
 		st << static_cast<UInt16>(start) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
 		player->send(st);
-		player->sendMsgCode(1, 2063);
+		player->sendMsgCode(1, 1050);
 		return;
 	}
 	UInt8 pos = Index(itemBaseType->subClass, itemBaseType->getId());
@@ -625,7 +625,7 @@ void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt1
 	player->send(st);
 	if (realRead == 0)
 	{
-		player->sendMsgCode(1, 2063);
+		player->sendMsgCode(1, 1050);
 	}
 }
 
@@ -636,7 +636,7 @@ void SaleMgr::searchPlayerSale(Player * founder, Player * beFounder, UInt16 star
 		Stream st(REP::SALE_LIST);
 		st << static_cast<UInt16>(start) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
 		founder->send(st);
-		founder->sendMsgCode(1, 2062);
+		founder->sendMsgCode(1, 1050);
 		return;
 	}
 	SaleSearchReq saleSearchReq(start, count, founder);

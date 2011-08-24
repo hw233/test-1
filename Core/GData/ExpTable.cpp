@@ -36,7 +36,7 @@ UInt64 ExpTable::getLevelMin( UInt8 lvl )
 {
 	if(lvl < 2)
 		return 0;
-	if(lvl > LEVEL_MAX)
+	if(lvl >= LEVEL_MAX)
 		return _exp[LEVEL_MAX - 1];
 	return _exp[lvl - 1];
 }

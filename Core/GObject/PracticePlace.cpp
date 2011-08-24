@@ -145,7 +145,7 @@ namespace GObject
                     price = time * golds[type];
                     if (pl->getGold() < price)
                     {
-                        pl->sendMsgCode(0, 2008);
+                        pl->sendMsgCode(0, 1101);
                         st << static_cast<UInt8>(1) << Stream::eos;
                         return false;
                     }
@@ -162,7 +162,7 @@ namespace GObject
                     if (pl->getTael() < price)
                     {
                         st << static_cast<UInt8>(1) << Stream::eos;
-                        pl->sendMsgCode(0, 2007);
+                        pl->sendMsgCode(0, 1100);
                         return false;
                     }
                     pl->useTael(price, &ci);
@@ -178,7 +178,7 @@ namespace GObject
                 if (slotprice) {
                     if (pl->getTael() < slotprice)
                     {
-                        pl->sendMsgCode(0, 2007);
+                        pl->sendMsgCode(0, 1100);
                         st << static_cast<UInt8>(1) << Stream::eos;
                         pl->send(st);
                         return false;
@@ -192,7 +192,7 @@ namespace GObject
             case 1:
                 if(pl->GetPackage()->DelItemAny(ITEM_PRACTICE_PROT, 1) == false)
                 {
-                    pl->sendMsgCode(0, 2064);
+                    pl->sendMsgCode(0, 1055);
                     st << static_cast<UInt8>(1) << Stream::eos;
                     pl->send(st);
                     return false;
@@ -204,7 +204,7 @@ namespace GObject
                     if (protprice) {
                         if (pl->getTael() < protprice)
                         {
-                            pl->sendMsgCode(0, 2007);
+                            pl->sendMsgCode(0, 1100);
                             st << static_cast<UInt8>(1) << Stream::eos;
                             pl->send(st);
                             return false;
@@ -855,7 +855,7 @@ namespace GObject
         UInt32 price = golds[pd.place.openslot]; 
         if (pl->getGold() < price)
         {
-            pl->sendMsgCode(0, 2008);
+            pl->sendMsgCode(0, 1101);
             return false;
         }
         ConsumeInfo ci(AddPracticeSlot,0,0);

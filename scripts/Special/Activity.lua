@@ -448,11 +448,11 @@ function exchangeExtraReward(player, id)
 	if id == 8 then
 		local package = player:GetPackage()
 		if package:IsFull() then
-		player:sendMsgCode(2, 2016, 0)
+		player:sendMsgCode(2, 1011, 0)
 			return;
 		end
 		if not package:DelItem(9224, 10, true) then
-			player:sendMsgCode(2, 2112, 0)
+			--player:sendMsgCode(2, 2112, 0)
 			return;
 		end
 		package:AddItem(9225, 1, true);
@@ -460,16 +460,16 @@ function exchangeExtraReward(player, id)
 		checkExpire(player)
 		local cnt = player:getStatusBit(12, 2)
 		if cnt >= 2 then
-			player:sendMsgCode(2, 2113, 0)
+			--player:sendMsgCode(2, 2113, 0)
 			return;
 		end
 		local package = player:GetPackage()
 		if package:IsFull() then
-			player:sendMsgCode(2, 2016, 0)
+			player:sendMsgCode(2, 1011, 0)
 			return;
 		end
 		if not package:ExistItem(9218) or not package:ExistItem(9219) or not package:ExistItem(9220) or not package:ExistItem(9221) or not package:ExistItem(9222) then
-			player:sendMsgCode(2, 2113, 0)
+			--player:sendMsgCode(2, 2113, 0)
 			return
 		end
 		cnt = cnt + 1
@@ -487,22 +487,22 @@ function exchangeExtraReward(player, id)
   if id == 1 then
     local package = player:GetPackage()
     if package:IsFull() then
-      player:sendMsgCode(2, 2016, 0)
+      player:sendMsgCode(2, 1011, 0)
       return
     end
     if not package:DelItem(9001, 10, true) then
-      player:sendMsgCode(2, 2100, 0)
+      --player:sendMsgCode(2, 2100, 0)
       return
     end
     exchangeRoll(player, 9001)
   elseif id == 2 then
     local package = player:GetPackage()
     if package:IsFull() then
-      player:sendMsgCode(2, 2016, 0)
+      player:sendMsgCode(2, 1011, 0)
       return
     end
     if not package:DelItem(9004, 5, true) then
-      player:sendMsgCode(2, 2101, 0)
+      --player:sendMsgCode(2, 2101, 0)
       return
     end
     exchangeRoll(player, 9004)
@@ -510,11 +510,11 @@ function exchangeExtraReward(player, id)
     checkExpire(player)
     local package = player:GetPackage()
     if package:IsFull() then
-      player:sendMsgCode(2, 2016, 0)
+      player:sendMsgCode(2, 1011, 0)
       return
     end
     if not package:DelItem(9038, 10, true) then
-      player:sendMsgCode(2, 2104, 0)
+      --player:sendMsgCode(2, 2104, 0)
       return
     end
     package:AddItem(9039, 1, true);
@@ -523,12 +523,12 @@ function exchangeExtraReward(player, id)
     checkExpire(player)
     local cnt = player:getStatusBit(12, 2)
     if cnt >= 2 then
-      player:sendMsgCode(2, 2102, 0)
+      --player:sendMsgCode(2, 2102, 0)
       return
     end
     local package = player:GetPackage()
     if package:IsFull() then
-      player:sendMsgCode(2, 2016, 0)
+      player:sendMsgCode(2, 1011, 0)
       return
     end
     if package:GetItemNum(9032, false) < 3 or package:GetItemNum(9033, false) < 3 or package:GetItemNum(9034, false) < 3 then
@@ -546,16 +546,16 @@ function exchangeExtraReward(player, id)
     checkExpire(player)
     local cnt = player:getStatusBit(14, 2)
     if cnt >= 2 then
-      player:sendMsgCode(2, 2103, 0)
+      --player:sendMsgCode(2, 2103, 0)
       return
     end
     local package = player:GetPackage()
     if package:IsFull() then
-      player:sendMsgCode(2, 2016, 0)
+      player:sendMsgCode(2, 1011, 0)
       return
     end
     if package:GetItemNum(9032, false) < 3 or package:GetItemNum(9033, false) < 3 or package:GetItemNum(9034, false) < 3 or package:GetItemNum(9035, false) < 2 then
-      player:sendMsgCode(2, 2103, 0)
+      --player:sendMsgCode(2, 2103, 0)
       return
     end
     cnt = cnt + 1
@@ -570,12 +570,12 @@ function exchangeExtraReward(player, id)
     checkExpire(player)
     local cnt = player:getStatusBit(24, 2)
 	if cnt >= 2 then
-		player:sendMsgCode(2, 2111, 0)
+		--player:sendMsgCode(2, 2111, 0)
 		return;
      end	
 	local package = player:GetPackage();
 	if package:GetItemNum(9205, false) < 3 or package:GetItemNum(9206, false) < 3 or package:GetItemNum(9207, false) < 3 then
-      player:sendMsgCode(2, 2111, 0)
+      --player:sendMsgCode(2, 2111, 0)
       return;
     end
 	cnt = cnt + 1;
@@ -587,7 +587,7 @@ function exchangeExtraReward(player, id)
   elseif id == 7 then
 	local package = player:GetPackage()
 	if package:GetItemNum(9208, false) < 3 then
-		player:sendMsgCode(2, 2110, 0);
+		--player:sendMsgCode(2, 2110, 0);
 		return;
 	end
 	local exchangeCount = player:getTicketCount();

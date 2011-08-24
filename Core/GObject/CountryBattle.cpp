@@ -456,12 +456,12 @@ bool CountryBattle::playerEnter( Player * player )
 	UInt32 curtime = TimeUtil::Now();
 	if(player->getBuffData(PLAYER_BUFF_WEAK, curtime))
 	{
-		player->sendMsgCode(0, 2050);
+		player->sendMsgCode(0, 1401);
 		return false;
 	}
 	if(player->getBuffData(PLAYER_BUFF_ATTACKING, curtime))
 	{
-		player->sendMsgCode(0, 2052);
+		player->sendMsgCode(0, 1412);
 		return false;
 	}
 	UInt8 lvl, side;

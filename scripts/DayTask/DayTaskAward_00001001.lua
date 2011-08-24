@@ -72,7 +72,7 @@ function DayTaskAward_Item_00001001(count, color)
 	
 	--判断背包是否有足够的空间
 	if not IsPackageEnough_00001001(count, color) then
-		player:sendMsgCode(2, 2013, 0);
+		player:sendMsgCode(2, 1013, 0);
 		return false
 	end
 	

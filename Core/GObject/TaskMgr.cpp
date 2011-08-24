@@ -307,6 +307,13 @@ namespace GObject
 			SendNewTaskInfor(*task);
 			if(taskId == 10101 || taskId == 20101)
 				m_PlayerOwner->setNewGuildTaskStep(8);
+
+            { // 特殊任务，可以修改任务编辑器达到此目地
+                if (taskId == 14 && m_PlayerOwner->getFighterCount() >= 2)
+                    AddTaskStep(taskId);
+                if (taskId == 126 && m_PlayerOwner->getClan())
+                    AddTaskStep(taskId);
+            }
 			return task->m_TaskId;
 		}
 		return 0;

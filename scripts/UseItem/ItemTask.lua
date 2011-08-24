@@ -32,7 +32,7 @@ function RunItemTaskUse(itemId)
 	end
 	local player = GetPlayer();
 	if player:GetLev() < 31 then
-		player:sendMsgCode(1, 2015);
+		player:sendMsgCode(1, 1010);
 		return false;
 	end
 	return trigger();
