@@ -357,6 +357,10 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	clan->initBuildClan();
 	SYSMSG_SEND(120, player);
 	SYSMSG_SENDV(1020, player, clan->getName().c_str());
+
+    int type = 0;
+	GameMsgHdr hdr1(0x310, player->getThreadId(), player, sizeof(type));
+	GLOBAL().PushMsg(hdr1, &type);
 }
 
 void OnClanApplyReq( GameMsgHdr& hdr, ClanApplyReq& car )

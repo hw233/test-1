@@ -327,10 +327,10 @@ void Athletics::defendergainsource(Player * atker, UInt32 id, UInt8 type, UInt32
 
 
 	SYSMSG(title, 318);
-	SYSMSG(szType, Index1[type]);
-	SYSMSGV(boxname, Index2[color], szType);
-	SYSMSGV(content, 319, atker->getName().c_str(), atker->getName().c_str(), boxname, award, szType);
-	_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
+	//SYSMSG(szType, Index1[type]);
+	//SYSMSGV(boxname, Index2[color], szType);
+	//SYSMSGV(content, 319, atker->getName().c_str(), atker->getName().c_str(), boxname, award, szType);
+	//_owner->GetMailBox()->newMail(NULL, 0x01, title, content);
 	//AddUserSource(_owner, type, award);
 	updateAthleticsAwardData(id, type, award);
 #endif

@@ -34,7 +34,7 @@
 #include "Tripod.h"
 #include <mysql.h>
 #include "GData/Formation.h"
-#include "kingnet_analyzer.h"
+#include "Script/BattleFormula.h"
 
 #include <cmath>
 
@@ -64,6 +64,7 @@ namespace GObject
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
+#if 0
 		float theirbp = _npcGroup->getBattlePoints();
 		float mybp = 0.0f;
 		for(int i = 0; i < 5; ++ i)
@@ -99,6 +100,9 @@ namespace GObject
 		else
 			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
 		return exp * clanEffect;
+#else
+        return 2.0f * _npcGroup->getExp();
+#endif
 	}
 
 	void EventAutoBattle::Process(UInt32)
@@ -318,6 +322,7 @@ namespace GObject
         if (!leftCount || data.soul >= MAX_TRIPOD_SOUL - POINT_PERMIN/2) {
             PopTimerEvent(m_Player, EVENT_PLAYERPRTRIPOD, m_Player->getId());
             data.awdst = 1;
+            data.soul = MAX_TRIPOD_SOUL;
             DB().PushUpdateData("UPDATE `tripod` SET `awdst` = %u WHERE `id` = %"I64_FMT"u", data.awdst, m_Player->getId());
             return;
         }
@@ -335,7 +340,7 @@ namespace GObject
 		_isOnline(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
-		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0)
+		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -482,18 +487,31 @@ namespace GObject
 		checkLastBattled();
 		GameAction()->onLogin(this);
 
+        char buf[64] = {0};
+        snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
+        m_ulog = _analyzer.GetInstance(buf);
+        if (m_ulog)
         {
-            char id[32] = {0x00};
-            snprintf(id, sizeof(id), "%"I64_FMT"u", getId());
-            CUserLogger* logger = _analyzer.GetInstance(id);
-            if (logger)
+            TcpConnection conn = NETWORK()->GetConn(_session);
+            if (conn)
             {
-                logger->SetUserIP("192.168.9.2");
-                //logger->SetUserMsg("user|msg|is|here");
-                logger->LogMsg("11","22","33","44","55","66","login");
+                Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
+                struct in_addr inaddr = inet_makeaddr(cl->GetClientIP(), 0);
+                m_ulog->SetUserIP(inet_ntoa(inaddr));
             }
         }
+        udpLog("", "", "", "", "", "", "", "login");
 	}
+
+    void Player::udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
+                const char* str5, const char* str6, const char* type)
+    {
+        if (m_ulog)
+        {
+            m_ulog->SetUserMsg(umsg);
+            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type);
+        }
+    }
 
 	void Player::Reconnect()
 	{
@@ -832,8 +850,10 @@ namespace GObject
     {
         static UInt16 cittas[] = {301, 401, 701};
         UInt16 citta = cittas[fgt->getClass()-1];
-        if (fgt->addNewCitta(citta, false, true)) {
-            if (fgt->upCitta(citta, 0, true)) {
+        if (fgt->hasCitta(citta) < 0) {
+            if (fgt->addNewCitta(citta, false, true)) {
+                if (fgt->upCitta(citta, 0, true)) {
+                }
             }
         }
     }
@@ -1220,7 +1240,7 @@ namespace GObject
 		{
 			DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v.friendliness, v.submitFavorCount, v.submitFavorDay);
 			//SYSMSG_SENDV(148, this, friendliness);
-			SYSMSG_SENDV(1048, this, id, friendliness);
+			//SYSMSG_SENDV(1048, this, id, friendliness);
 		}
 	}
 
@@ -1268,7 +1288,7 @@ namespace GObject
 			_greatFighterFull.insert(id);
 		}
 		//SYSMSG_SENDV(148, this, 30);
-		SYSMSG_SENDV(1048, this, id, 30);
+		//SYSMSG_SENDV(1048, this, id, 30);
 		DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v->friendliness, v->submitFavorCount, v->submitFavorDay);
 		DBLOG().PushUpdateData("insert into `fighter_friendness`(`server_id`, `player_id`, `fighter_id`, `friendness`, `time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), id, v->friendliness, TimeUtil::Now());		
 		GameAction()->RunGreatTaskAction(this, id);
@@ -1952,8 +1972,8 @@ namespace GObject
 		st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
 		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
-		SYSMSG_SEND(157, this);
-		SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
+		//SYSMSG_SEND(157, this);
+		//SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
 
 		if(_friends[2].size() >= 20)
 		{
@@ -2255,7 +2275,7 @@ namespace GObject
 			_playerData.tael -= c;
 		}
 		SYSMSG_SENDV(152, this, c);
-		SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
+		//SYSMSG_SENDV(1060, this, attacker->getCountry(), attacker->getName().c_str(), c);
 		sendModification(3, _playerData.tael);
 	}
 
@@ -2266,7 +2286,7 @@ namespace GObject
 			return _playerData.coin;
 		if(_playerData.coin >= 99999999)
 		{
-			SYSMSG_SENDV(159, this);
+			//SYSMSG_SENDV(159, this);
 			return _playerData.coin;
 		}
 
@@ -2288,19 +2308,19 @@ namespace GObject
 			}
 			else
 			{
-				SYSMSG_SENDV(153, this, c);
-				SYSMSG_SENDV(1053, this, c);
+				//SYSMSG_SENDV(153, this, c);
+				//SYSMSG_SENDV(1053, this, c);
 			}
 		}
 		else
 		{
-			SYSMSG_SENDV(153, this, c);
-			SYSMSG_SENDV(1053, this, c);
+			//SYSMSG_SENDV(153, this, c);
+			//SYSMSG_SENDV(1053, this, c);
 		}
 
 		if(_playerData.coin >= 99999999)
 		{
-			SYSMSG_SENDV(159, this);
+			//SYSMSG_SENDV(159, this);
 		}
 
 		if(c > 0)
@@ -2331,8 +2351,8 @@ namespace GObject
 		}
 		if(notify)
 		{
-			SYSMSG_SENDV(154, this, c);
-			SYSMSG_SENDV(1054, this, c);
+			//SYSMSG_SENDV(154, this, c);
+			//SYSMSG_SENDV(1054, this, c);
 		}
 		sendModification(4, _playerData.coin);
 		return _playerData.coin;
@@ -2352,8 +2372,8 @@ namespace GObject
 		case 1:
 			{
 				sendModification(4, _playerData.coin);
-				SYSMSG_SENDV(154, this, c);
-				SYSMSG_SENDV(1054, this, c);
+				//SYSMSG_SENDV(154, this, c);
+				//SYSMSG_SENDV(1054, this, c);
 			}
 			break;
 		case 2:
@@ -2656,7 +2676,7 @@ namespace GObject
 		if(a == 0)
 			return _playerData.achievement;
 		_playerData.achievement += a;
-		SYSMSG_SENDV(105, this, a);
+		// SYSMSG_SENDV(105, this, a);
 		SYSMSG_SENDV(1005, this, a);
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
@@ -2677,7 +2697,7 @@ namespace GObject
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
 		}
-		SYSMSG_SENDV(106, this, a);
+		//SYSMSG_SENDV(106, this, a);
 		SYSMSG_SENDV(1006, this, a);
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
@@ -2697,8 +2717,8 @@ namespace GObject
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
 			}
 		}
-		SYSMSG_SENDV(106, this, a);
-		SYSMSG_SENDV(1061, this, attacker->getCountry(), attacker->getName().c_str(), a);
+		//SYSMSG_SENDV(106, this, a);
+		//SYSMSG_SENDV(1061, this, attacker->getCountry(), attacker->getName().c_str(), a);
 		sendModification(8, _playerData.achievement);
 		return ;
 	}
@@ -2844,12 +2864,12 @@ namespace GObject
                     break;
 
                 if (_playerData.shimen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
                     _playerData.shimen[i] = 0;
                     _playerData.smcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.smcolor[i]-1);
-                    AddExp(award); // TODO:
-                    ++_playerData.smFinishCount;
                     sendColorTask(0, 0);
                     writeShiMen();
                     return true;
@@ -2860,12 +2880,12 @@ namespace GObject
                     break;
 
                 if (_playerData.yamen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.ymcolor[i], GetLev());
+                    getTael(award); // TODO:
+                    ++_playerData.ymFinishCount;
                     _playerData.yamen[i] = 0;
                     _playerData.ymcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
-                    getTael(award); // TODO:
-                    ++_playerData.ymFinishCount;
                     sendColorTask(1, 0);
                     writeYaMen();
                     return true;
@@ -2877,12 +2897,12 @@ namespace GObject
                     break;
 
                 if (_playerData.fshimen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
+                    AddExp(award); // TODO:
+                    ++_playerData.smFinishCount;
                     _playerData.fshimen[i] = 0;
                     _playerData.fsmcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(0, _playerData.fsmcolor[i]-1);
-                    AddExp(award); // TODO:
-                    ++_playerData.smFinishCount;
                     sendColorTask(0, 0);
                     writeShiMen();
                     return true;
@@ -2896,7 +2916,7 @@ namespace GObject
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
 
-                    UInt32 award = GData::GDataManager::GetTaskAwardFactor(1, _playerData.ymcolor[i]-1);
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.fymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
                     sendColorTask(1, 0);
@@ -3151,6 +3171,14 @@ namespace GObject
 		return getTavernPriceByColor(fgt->getColor());
 	}
 
+    bool isFirst(UInt8* colors)
+    {
+        for (UInt8 i = 0; i < 6; ++i)
+            if (colors[i])
+                return false;
+        return true;
+    }
+
 	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
     {
         int ttype = 0;
@@ -3170,11 +3198,11 @@ namespace GObject
         bool first = false;
         if (!force) {
             if (ttype == 0) {
-                if (!_playerData.smFreeCount)
+                if (isFirst(_playerData.fsmcolor))
                     first = true;
             }
             if (ttype == 1) {
-                if (!_playerData.ymFinishCount)
+                if (isFirst(_playerData.fymcolor))
                     first = true;
             }
         }
@@ -5043,5 +5071,19 @@ namespace GObject
         _playerData.country = cny;
 		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, _id);
     }
+
+    bool Player::OperationTaskAction(int type)
+    {
+        switch (type)
+        {
+            case 0:
+                return GameAction()->RunOperationTaskAction0(this, 6);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
 }
 

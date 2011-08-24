@@ -155,10 +155,21 @@ end
 function Task_00000019_submit(itemId, itemNum)
 	local player = GetPlayer();
 
+	--检查选择性物品
+	local select = false;
+	if itemId == 1600 and itemNum == 1 then
+		select = true;
+	elseif itemId == 1601 and itemNum == 1 then
+		select = true;
+	elseif itemId == 1602 and itemNum == 1 then
+		select = true;
+	end
+
+	if not select then return false; end
 	local package = player:GetPackage();
 
-	local fixReqGrid = package:GetItemUsedGrids(1600,1,1) + package:GetItemUsedGrids(1601,1,1) + package:GetItemUsedGrids(1602,1,1);
-	if fixReqGrid > player:GetFreePackageSize() then
+	local selReqGrid = package:GetItemUsedGrids(itemId, itemNum, 1);
+	if selReqGrid > player:GetFreePackageSize() then
 		player:sendMsgCode(2, 2013, 0);
 		return false;
 	end
@@ -166,26 +177,12 @@ function Task_00000019_submit(itemId, itemNum)
 		return false;
 	end
 
-	if IsEquipTypeId(1600) then
-		for k = 1, 1 do
-			package:AddEquip(1600, 1);
+	if IsEquipTypeId(itemId) then 
+		for j = 1, itemNum do
+			package:AddEquip(itemId, 1);
 		end
-	else 
-		package:AddItem(1600,1,1);
-	end
-	if IsEquipTypeId(1601) then
-		for k = 1, 1 do
-			package:AddEquip(1601, 1);
-		end
-	else 
-		package:AddItem(1601,1,1);
-	end
-	if IsEquipTypeId(1602) then
-		for k = 1, 1 do
-			package:AddEquip(1602, 1);
-		end
-	else 
-		package:AddItem(1602,1,1);
+	else
+		package:AddItem(itemId, itemNum, 1);
 	end
 
 	player:AddExp(4400);

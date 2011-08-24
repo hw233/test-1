@@ -86,7 +86,7 @@ bool Boss::attackBy( Player * player )
 				if(nPercent < 9 && nPercent != _hppercent)
 				{
 					_hppercent = nPercent;
-					SYSMSG_BROADCASTV(405, player->getCountry(), player->getName().c_str(), _ng->getId(), (nPercent + 1) * 10);
+					//SYSMSG_BROADCASTV(405, player->getCountry(), player->getName().c_str(), _ng->getId(), (nPercent + 1) * 10);
 					Stream st(REP::DAILY_DATA);
 					st << static_cast<UInt8>(2);
 					bossManager.buildCurrBossInfo(st, (nPercent + 1) * 10);
@@ -631,13 +631,13 @@ void BossManager::process( UInt32 curtime )
 			Map * map = Map::FromSpot(it->second.location);
 			if(map != NULL)
 				map->Show(it->second.boss->getId());
-			SYSMSG_BROADCASTV(400, it->second.boss->getId(), it->second.location);
+			//SYSMSG_BROADCASTV(400, it->second.boss->getId(), it->second.location);
 			_bossOn[it->first] = it->second;
 			_bossOff.erase(it ++);
 		}
 		else if(bs.prepareTime <= curtime)
 		{
-			SYSMSG_BROADCASTV(404, it->second.location, it->second.boss->getId());
+			//SYSMSG_BROADCASTV(404, it->second.location, it->second.boss->getId());
 			bs.prepareTime += 60;
 		}
 		else
@@ -656,7 +656,7 @@ void BossManager::process( UInt32 curtime )
 			st << Stream::eos;
 			NETWORK()->Broadcast(st);
 
-			SYSMSG_BROADCASTV(402, it->second.boss->getId());
+			//SYSMSG_BROADCASTV(402, it->second.boss->getId());
 			it->second.boss->pushAttackerCountBS(false, it->second.spawnTime);
 			it->second.boss->onReward();
 			it->second.boss->reset();
@@ -674,7 +674,7 @@ void BossManager::process( UInt32 curtime )
 		{
 			if(broadcast)
 			{
-				SYSMSG_BROADCASTV(403, it->second.boss->getId(), it->second.location);
+				//SYSMSG_BROADCASTV(403, it->second.boss->getId(), it->second.location);
 			}
 			++ it;
 		}
@@ -708,7 +708,7 @@ bool BossManager::attack( Player * player, UInt32 id )
 		it->second.boss->onReward();
 		if(now - it->second.spawnTime < 15 * 60)
 			it->second.boss->setLevel(it->second.boss->getLevel() + 1);
-		SYSMSG_BROADCASTV(401, it->second.boss->getId(), player->getCountry(), player->getName().c_str(), it->second.boss->getId());
+		//SYSMSG_BROADCASTV(401, it->second.boss->getId(), player->getCountry(), player->getName().c_str(), it->second.boss->getId());
 		it->second.boss->reset();
 		it->second.spawnTime += 86400;
 		it->second.fleeTime += 86400;

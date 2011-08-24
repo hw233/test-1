@@ -146,15 +146,7 @@ function Task_00000085_accept()
 	if not task:AcceptTask(85) then
 		return false;
 	end
-	local package = player:GetPackage();
-	local itemNum = package:GetItemNum(0,1);
-	if itemNum ~= 0 then
-		if itemNum > 0 then
-			itemNum = 0;
-			package:SetItem(0, itemNum, 1);
-		end
-		task:AddTaskStep2(85, 1, itemNum);
-	end
+	task:AddTaskStep(85);
 	return true;
 end
 

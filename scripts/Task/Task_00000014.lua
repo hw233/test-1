@@ -146,7 +146,6 @@ function Task_00000014_accept()
 	if not task:AcceptTask(14) then
 		return false;
 	end
-	task:AddTaskStep(14);
 	return true;
 end
 

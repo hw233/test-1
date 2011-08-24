@@ -184,6 +184,7 @@ MSG_REG_2(GameMsgHdr, 0x307, OnDelFgtTrainNotify);
 
 MSG_REG_2(GameMsgHdr, 0x308, OnClanSkillDonateCheckReq);
 MSG_REG_2(GameMsgHdr, 0x309, OnClanSkillDonateBackReq);
+MSG_REG_2(GameMsgHdr, 0x310, OnOperationTaskAction);
 
 
 MSG_HANDLER_END()

@@ -698,6 +698,16 @@ void OnClanSkillDonateBackReq( GameMsgHdr& hdr, const void * data )
 
 }
 
+void OnOperationTaskAction( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    int type = *(int*)(data);
+    if (player)
+    {
+        player->OperationTaskAction(type);
+    }
+}
+
 void OnClanSkillDonateCheckReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

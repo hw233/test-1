@@ -153,7 +153,7 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
 
 void PlayerCopy::addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot)
 {
-    CopyData& cd = getCopyData(NULL, playerId, id);
+    CopyData& cd = m_copys[playerId][id];
     cd.floor = floor;
     cd.spot = spot;
 }
@@ -182,6 +182,9 @@ CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool up
                 PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
                 PLAYER_DATA(pl, copyFreeCnt) = 0;
                 PLAYER_DATA(pl, copyGoldCnt) = 0;
+                //cd.floor = 0;
+                //cd.spot = 0;
+                //DB().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)", playerId, id, cd.floor, cd.spot);
             }
 
             DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), playerId);

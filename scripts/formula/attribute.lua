@@ -1,19 +1,19 @@
-evdlvl_factor = 160
+evdlvl_factor = 10
 evdlvl_addon_factor = 800
-hitrlvl_factor = 160
+hitrlvl_factor = 10
 hitrlvl_addon_factor = 800
-crilvl_factor = 160
+crilvl_factor = 10
 crilvl_addon_factor = 800
-pirlvl_factor = 140
-pirlvl_addon_factor = 700
-toughlvl_factor = 200
+pirlvl_factor = 10
+pirlvl_addon_factor = 800
+toughlvl_factor = 10
 toughlvl_addon_factor = 800
-mreslvl_factor = 160
+mreslvl_factor = 10
 mreslvl_addon_factor = 800
-counterlvl_factor = 150
-counterlvl_addon_factor = 750
+counterlvl_factor = 10
+counterlvl_addon_factor = 800
 
-deflvl_factor = 250
+deflvl_factor = 200
 deflvl_addon_factor = 1000
 
 hitrate_max = 150

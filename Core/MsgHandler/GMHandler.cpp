@@ -432,6 +432,12 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 				UInt32 val = atoi(args[1].c_str());
 				if(val == 0)
 					return;
+
+                if (args.size() > 2) {
+                    Player* player2 = globalPlayers[atoi(args[2].c_str())];
+                    if (player2)
+                        player = player2;
+                }
 				player->getTael(val);
 			}
 			break;
@@ -440,6 +446,12 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 				UInt32 val = atoi(args[1].c_str());
 				if(val == 0)
 					return;
+
+                if (args.size() > 2) {
+                    Player* player2 = globalPlayers[atoi(args[2].c_str())];
+                    if (player2)
+                        player = player2;
+                }
 				player->getGold(val);
 			}
 			break;
@@ -448,6 +460,12 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 				UInt32 val = atoi(args[1].c_str());
 				if(val == 0)
 					return;
+
+                if (args.size() > 2) {
+                    Player* player2 = globalPlayers[atoi(args[2].c_str())];
+                    if (player2)
+                        player = player2;
+                }
 				player->getCoupon(val);
 			}
 			break;
@@ -456,6 +474,12 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 				UInt32 val = atoi(args[1].c_str());
 				if(val == 0)
 					return;
+
+                if (args.size() > 2) {
+                    Player* player2 = globalPlayers[atoi(args[2].c_str())];
+                    if (player2)
+                        player = player2;
+                }
 				player->getAchievement(val);
 			}
 		}
@@ -949,8 +973,10 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
 		idx = 4;
 	else
 		return;
-	if(flushAttr)
+	if(flushAttr) {
 		fgt->setPotential(1.79f);
+        fgt->setCapacity(8);
+    }
 	GObject::Package * package = player->GetPackage();
 	GObject::ItemEquip * o = NULL;
 	GObject::ItemWeapon * weapon;
@@ -1174,7 +1200,7 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	addSuperClass(player, 10);
 	addSuperClass(player, 16);
     addSuperClass(player, 13);
-    addSuperClass(player, 14);
+    addSuperClass(player, 15);
 	switch(player->GetClass())
 	{
 #if 0

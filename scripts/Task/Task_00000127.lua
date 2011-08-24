@@ -108,9 +108,19 @@ function Task_00000127_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
-	action.m_ActionStep = 0;
+	action.m_ActionStep = 2;
 	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，我整日处理公文，繁忙异常后来叫师爷先将公文备案，让我批阅起来一目了然。这些日来我见少侠你奔波忙碌，是在过意不去，特地为你整理了一份日常活动案表，你可以仔细研究一番，我想一定可以为你节省不少时间和精力。";
 	action.m_ActionMsg = "是吗，那多谢知府大人了。";
+	return action;
+end
+
+function Task_00000127_step_02()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
+	action.m_ActionStep = 0;
+	action.m_NpcMsg = "嗯，每天的活动都可以在日常里方便的查询，副本、阵图等等关卡也可以通过日常里的传送按钮方便快捷的到达。酒馆、书商的刷新时间也可以在日常里查看并且随时传送到地点。";
+	action.m_ActionMsg = "好的，没事我会经常查看日常的。";
 	return action;
 end
 
@@ -126,6 +136,7 @@ end
 
 local Task_00000127_step_table = {
 		[1] = Task_00000127_step_01,
+		[2] = Task_00000127_step_02,
 		[10] = Task_00000127_step_10,
 		};
 
@@ -163,7 +174,7 @@ function Task_00000127_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(2000);
+	player:AddExp(5000);
 	return true;
 end
 

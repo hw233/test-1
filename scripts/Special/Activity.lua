@@ -239,7 +239,7 @@ function onMergeGem(player, lev, num)
 					table.insert(table_items, 0);
 				end
 			end
-			sendItemPackageMail(player, '合成7级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..num..'个喜好品、'..num..'个三级洗炼符，赶紧领取吧！', table_items);
+			-- sendItemPackageMail(player, '合成7级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..num..'个喜好品、'..num..'个三级洗炼符，赶紧领取吧！', table_items);
 		elseif lev == 8 then
 			local table_items = {9000, 1 * num, 1};
 			if playerLev >= 85 then
@@ -255,7 +255,7 @@ function onMergeGem(player, lev, num)
 					table.insert(table_items, 0);
 				end
 			end
-			sendItemPackageMail(player, '合成8级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(2 * num)..'个喜好品、'..num..'个潜力保护符，赶紧领取吧！', table_items);
+			-- sendItemPackageMail(player, '合成8级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(2 * num)..'个喜好品、'..num..'个潜力保护符，赶紧领取吧！', table_items);
 		elseif lev == 9 then
 			local table_items = {9000, 2 * num, 1};
 			if playerLev >= 85 then
@@ -271,7 +271,7 @@ function onMergeGem(player, lev, num)
 					table.insert(table_items, 0);
 				end
 			end
-			sendItemPackageMail(player, '合成9级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(3 * num)..'个喜好品、'..(2 * num)..'个潜力保护符，赶紧领取吧！', table_items);
+			-- sendItemPackageMail(player, '合成9级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(3 * num)..'个喜好品、'..(2 * num)..'个潜力保护符，赶紧领取吧！', table_items);
 		elseif lev == 10 then
 			local table_items = {9000, 3 * num, 1};
 			if playerLev >= 85 then
@@ -287,7 +287,7 @@ function onMergeGem(player, lev, num)
 					table.insert(table_items, 0);
 				end
 			end
-			sendItemPackageMail(player, '合成10级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(4 * num)..'个喜好品、'..(3 * num)..'个潜力保护符，赶紧领取吧！', table_items);
+			-- sendItemPackageMail(player, '合成10级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(4 * num)..'个喜好品、'..(3 * num)..'个潜力保护符，赶紧领取吧！', table_items);
 		end
 	end
 end
@@ -322,7 +322,7 @@ function onEnchant(player, level)
 		local favor = {5820, 5821, 5822, 5823, 5824};
 		local rand_favor = math.random(1, #favor);
 		local table_items = {favor[rand_favor], 10, 0};
-		sendItemPackageMail(player, '装备强化10级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你10个橙色喜好品，赶紧领取吧！', table_items);
+		-- sendItemPackageMail(player, '装备强化10级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你10个橙色喜好品，赶紧领取吧！', table_items);
 	end
   end
 end

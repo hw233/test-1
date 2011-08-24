@@ -59,7 +59,7 @@ public:
 	inline void setName(const std::string& s) {_name = s;}
 	inline void setClass(UInt8 c) {_class = c;}
     inline void setSex(UInt8 s) {_sex = s;}
-	inline void setLevel(UInt8 l) {_level = l;}
+	inline void setLevel(UInt8 l) { _level = l; }
 	inline void setExp(UInt64 e) {_exp = e;}
     inline void setPExp(UInt32 e) { _pexp = e; }
     inline void setPExpMax(UInt32 e) { _pexpMax = e; }
@@ -266,7 +266,7 @@ public:
 	inline ItemEquip * getRing() { return _ring; }
 
 	inline ItemEquip * getTrump(int idx) { return (idx >= 0 && idx < getMaxTrumps()) ? _trump[idx] : 0; }
-    inline int getMaxTrumps () { return _trumpslot <= TRUMP_UPMAX ? _trumpslot : TRUMP_UPMAX; }
+    inline UInt8 getMaxTrumps () { return TRUMP_UPMAX; }
     UInt32 getTrumpId(int idx);
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
@@ -318,6 +318,7 @@ public:
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
+    bool canSetTrump(UInt8 idx);
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
@@ -541,7 +542,6 @@ protected:
     UInt16 _skill[SKILL_UPMAX];     // 装备的技能 _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
     std::vector<UInt16> _skills;    // 可装备的技能 TODO: 如果所有技能都将是由心法带出,则数据表里不需要存这个字段
 
-    UInt8 _trumpslot;               // 可装备法宝最大数
     UInt8 _cittaslot;               // 可装备心法最大数
     UInt16 _citta[CITTA_UPMAX];     // 装备的心法
     std::vector<UInt16> _cittas;    // 可装备的心法

@@ -129,7 +129,7 @@ function Task_00000074_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "想不到鱼神洞里如此险恶。";
+	action.m_NpcMsg = "想不到鱼神洞里如此险恶，我刚来就被这些恶人困在此处。";
 	action.m_ActionMsg = "";
 	return action;
 end
@@ -157,7 +157,6 @@ function Task_00000074_accept()
 	if not task:AcceptTask(74) then
 		return false;
 	end
-	task:AddTaskStep(74);
 	return true;
 end
 
@@ -174,7 +173,7 @@ function Task_00000074_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(12222);
+	player:AddExp(17000);
 	return true;
 end
 

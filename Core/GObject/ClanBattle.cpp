@@ -4188,7 +4188,7 @@ void ClanRobBattle::notifyBattleOverMailNotify(UInt8 succ)
 					}
 					else
 					{
-						SYSMSG2(msg2, 500);
+						//SYSMSG2(msg2, 500);
 					}
 					SYSMSGV(content2, 479, msg1, msg2);
 					SYSMSGV2(msg1, 501, clans[0]->getName().c_str(), clans[1]->getName().c_str(), clans[2]->getName().c_str());
@@ -4231,7 +4231,7 @@ void ClanRobBattle::notifyBattleOverMailNotify(UInt8 succ)
 					}
 					else
 					{
-						SYSMSG2(msg2, 500);
+						//SYSMSG2(msg2, 500);
 					}
 					SYSMSGV(content2, 479, msg1, msg2);
 					SYSMSGV2(msg1, 502, clans[0]->getName().c_str(), clans[1]->getName().c_str());
@@ -4273,7 +4273,7 @@ void ClanRobBattle::notifyBattleOverMailNotify(UInt8 succ)
 					}
 					else
 					{
-						SYSMSG2(msg2, 500);
+						//SYSMSG2(msg2, 500);
 					}
 					SYSMSGV(content2, 479, msg1, msg2);
 					SYSMSGV2(msg1, 503, clans[0]->getName().c_str());

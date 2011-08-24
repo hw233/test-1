@@ -109,7 +109,7 @@ function Task_00000079_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "那陈圩请来的妖人姚开江用妖术控制部分村民要打通鱼神洞旧道，这些被妖法控制的人变得力大无穷，全没人性，戴家的场得村民肯定不是他们的对手。";
+	action.m_NpcMsg = "那陈圩请来的妖人姚开江用妖术控制部分村民要打通鱼神洞旧道，这些被妖法控制的人变得力大无穷，全没人性，戴家场的村民肯定不是他们的对手。";
 	action.m_ActionMsg = "这种妖术听起来似乎很厉害。";
 	return action;
 end

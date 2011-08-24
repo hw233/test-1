@@ -60,6 +60,11 @@ bool Tripod::genAward(Player* pl, TripodData& td, UInt32& id, UInt8& num)
         return false;
     } else {
         pl->getTripodAwdIdNum(id, num);
+        if (id > 30000)
+        {
+            id = 0;
+            num = 0;
+        }
     }
     return true;
 }

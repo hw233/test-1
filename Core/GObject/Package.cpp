@@ -788,6 +788,7 @@ namespace GObject
 			item_elem_iter iter = m_Items.find(ItemKey(id));
 			if(iter == m_Items.end())
 				return false;
+            bool succ = false;
 			ItemBase * item = iter->second;
 			if(fgt->getLevel() < item->getReqLev())
 				return false;
@@ -847,10 +848,13 @@ namespace GObject
                 return false;
 			}
 
-			newOne = static_cast<GObject::ItemEquip *>(item);
-			SendDelEquipData(static_cast<ItemEquip *>(item));
-			m_Items.erase(iter);
-			-- m_Size;
+            if (item->getClass() != Item_Trump || (item->getClass() == Item_Trump && fgt->canSetTrump(part-0x50)))
+            {
+                newOne = static_cast<GObject::ItemEquip *>(item);
+                SendDelEquipData(static_cast<ItemEquip *>(item));
+                m_Items.erase(iter);
+                -- m_Size;
+            }
 		}
 		else
 		{
@@ -2400,7 +2404,7 @@ namespace GObject
 	{
 		if(fighter->getCurrentHP() == 0)
 		{
-			SYSMSG_SENDV(190, m_Owner);
+			//SYSMSG_SENDV(190, m_Owner);
 			return;
 		}
 		GameAction()->RunAutoRegen(m_Owner, fighter);

@@ -103,6 +103,7 @@ public:
     float calcPracticeInc(GObject::Fighter *);
     float calcClanTechAddon(UInt16 id, UInt8 lvl);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);
+    UInt32 calcTaskAward(UInt8, UInt8, UInt8);
 
 	inline SkillData& skillData(UInt16 c, UInt16 s, UInt8 level)
 	{

@@ -835,7 +835,9 @@ CREATE TABLE `player` (
   `tavernId` varchar(255) NOT NULL DEFAULT '',
   `bookStore` varchar(255) NOT NULL DEFAULT '0',
   `shimen` varchar(255) NOT NULL DEFAULT '',
+  `fshimen` varchar(255) NOT NULL DEFAULT '',
   `yamen` varchar(255) NOT NULL DEFAULT '',
+  `fyamen` varchar(255) NOT NULL DEFAULT '',
   `clantask` varchar(255) NOT NULL DEFAULT '',
   `copyFreeCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `copyGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
@@ -1090,7 +1092,9 @@ CREATE TABLE `player_copy` (
   `id` tinyint(3) unsigned NOT NULL,
   `floor` tinyint(3) unsigned NOT NULL,
   `spot` tinyint(3) unsigned NOT NULL,
-  UNIQUE KEY `player_id` (`playerId`,`id`)
+  UNIQUE KEY `player_id` (`playerId`,`id`),
+  KEY `playerId` (`playerId`),
+  KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `player_frontmap`;
@@ -1100,7 +1104,10 @@ CREATE TABLE `player_frontmap` (
   `spot` tinyint(3) unsigned NOT NULL,
   `count` tinyint(3) unsigned NOT NULL,
   `status` tinyint(3) unsigned NOT NULL,
-  UNIQUE KEY `player_id` (`playerId`,`id`)
+  UNIQUE KEY `player_id_spot` (`playerId`,`id`, `spot`),
+  KEY `playerIdId` (`playerId`, `id`),
+  KEY `playerId` (`playerId`),
+  KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

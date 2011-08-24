@@ -93,7 +93,7 @@ function Task_00000551_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "";
+	action.m_NpcMsg = "我看你心存正气，将来必然会将我派发扬光大。";
 	action.m_ActionMsg = "";
 	return action;
 end

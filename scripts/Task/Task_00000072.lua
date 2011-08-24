@@ -143,17 +143,9 @@ function Task_00000072_accept()
 	if not Task_Accept_00000072() then
 		return false;
 	end
-	local package = player:GetPackage();
-	local reqGrids = 0;
-	reqGrids = reqGrids + package:GetItemUsedGrids(810, 1, 1);
-	if reqGrids > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2012, 0);
-		return false;
-	end
 	if not task:AcceptTask(72) then
 		return false;
 	end
-	package:AddItem(810, 1, 1);
 	task:AddTaskStep(72);
 	return true;
 end
@@ -165,15 +157,11 @@ function Task_00000072_submit(itemId, itemNum)
 	local player = GetPlayer();
 
 	local package = player:GetPackage();
-	if package:GetItemNum(810,1) < 1 then
-		return false;
-	end
 
 	if not player:GetTaskMgr():SubmitTask(72) then
 		return false;
 	end
 
-	package:DelItem(810,1,1);
 
 	player:AddExp(12000);
 	return true;
@@ -182,7 +170,5 @@ end
 --·ÅÆúÈÎÎñ
 function Task_00000072_abandon()
 	local package = GetPlayer():GetPackage();
-	package:DelItem(810, 1, 1);
-	local itemNum = 0;
 	return GetPlayer():GetTaskMgr():AbandonTask(72);
 end

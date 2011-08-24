@@ -507,6 +507,10 @@ float BattleFormula::calcClanTechAddon(UInt16 id, UInt8 lvl)
     return call<float>("calcClanTechAddon", id, lvl);
 }
 
+UInt32 BattleFormula::calcTaskAward( UInt8 type, UInt8 color, UInt8 lvl )
+{
+	return call<UInt32>("GetTaskAwardFactor", type, color, lvl);
+}
 
 BattleFormula * BattleFormula::getCurrent()
 {

@@ -119,7 +119,7 @@ function Task_00000088_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老身一人在此参枯禅已久，些许风吹草动都逃不过我的耳朵，我发现有个妖僧在一边偷窥，想来是觊觎这个雪魂珠，这种天材地宝可不能落进妖人手里。老身行动不便就麻烦小友你出手将他除去了。";
+	action.m_NpcMsg = "老身一人在此参枯禅已久，些许风吹草动都逃不过我的耳朵，我发现有个贼人在一边偷窥，想来是觊觎这个雪魂珠，这种天材地宝可不能落进妖人手里。老身行动不便就麻烦小友你出手将他除去了。";
 	action.m_ActionMsg = "除魔卫道是我等义不容辞的责任。";
 	return action;
 end
@@ -129,7 +129,7 @@ function Task_00000088_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个妖僧竟然是西方野魔雅各达，亏得小友将他赶跑。";
+	action.m_NpcMsg = "这个贼人竟然是西方野魔雅各达，亏得小友将他赶跑。";
 	action.m_ActionMsg = "";
 	return action;
 end

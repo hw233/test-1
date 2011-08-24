@@ -21,11 +21,11 @@ void BlockBossMgr::resetPlayerRank(Player *pl, UInt16 bossLevel, UInt8 playerLev
 		{
 			if(itemId != 0)
 			{
-				SYSMSG_BROADCASTV(376, pl->getCountry(), pl->getName().c_str(), bossLevel - 21, couponCount, itemCount, itemId);
+				//SYSMSG_BROADCASTV(376, pl->getCountry(), pl->getName().c_str(), bossLevel - 21, couponCount, itemCount, itemId);
 			}
 			else
 			{
-				SYSMSG_BROADCASTV(375, pl->getCountry(), pl->getName().c_str(), bossLevel - 21);
+				//SYSMSG_BROADCASTV(375, pl->getCountry(), pl->getName().c_str(), bossLevel - 21);
 			}
 		}
 		Rank::iterator it = find(pl);

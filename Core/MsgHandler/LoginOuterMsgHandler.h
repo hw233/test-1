@@ -112,7 +112,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 				Network::GameClient * cl2 = static_cast<Network::GameClient *>(c.get());
 				player->SetSessionID(-1);
 				player->testBattlePunish();
-				static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, 0x0E}; // TODO: proto???
+				static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
 				cl2->send(kick_pkt, 4);
 				cl2->SetPlayer(NULL);
 				cl2->pendClose();
@@ -234,6 +234,13 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
 		}
+
+        if (!res)
+        {
+            UInt32 count = LOGIN().Count();
+            LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %u, 当前在线人数: %u\n",
+                    ul._userid, count, LOGIN().Current());
+        }
 	}
 	else
 		res = 2;
@@ -245,13 +252,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	}
 	if(res == 2 || res == 3)
 		conn->pendClose();
-
-    if (!res)
-    {
-        UInt32 count = LOGIN().Count();
-        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %u, 当前在线人数: %u\n",
-                ul._userid, count, LOGIN().Current());
-    }
 }
 
 struct NewUserRepStruct
@@ -327,9 +327,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 	trimName(nu._name);
 
-#if 0
-	bool noWallow = (nu._country & 0x80) > 0;
-	nu._country &= 0x03;
+#if 1
+	bool noWallow = (nu._class & 0x80) > 0;
+	nu._class &= ~0x80;
 #else
 	bool noWallow = false;
 #endif
@@ -453,7 +453,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     UInt64 player_Id;
     UInt32 gold;
-    //std::string md5Key="veryCD";
+    //std::string md5Key="kingxin";
     //std::string md5value="";
     brd>>player_Id;
     brd>>gold;

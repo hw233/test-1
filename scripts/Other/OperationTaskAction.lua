@@ -32,14 +32,11 @@ end
 function OperationTaskAction0_0003()
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
-	local taskId;
-	if GetPlayerData(6) == 0 then
-		taskId = 40409;
-	else
-		taskId = 50409;
-	end	
+    local taskId = 14
 	if task:HasAcceptedTask(taskId) then
-		task:AddTaskStep(taskId);
+        if player:getFighterCount() >= 2 then
+            task:AddTaskStep(taskId);
+        end
 	end
 end
 
@@ -52,7 +49,7 @@ function OperationTaskAction0_0004()
 	end	
 end
 
---送喜好品
+--
 function OperationTaskAction0_0005()
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
@@ -61,12 +58,15 @@ function OperationTaskAction0_0005()
 	end		
 end
 
---加入宗族
+--加入帮派
 function OperationTaskAction0_0006()
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
-	if task:HasAcceptedTask(62206) then
-		task:AddTaskStep(62206);
+    local taskId = 126
+	if task:HasAcceptedTask(taskId) then
+        if player:getClan() ~= nil then
+            task:AddTaskStep(taskId);
+        end
 	end
 end
 
@@ -300,5 +300,4 @@ function RunOperationTaskAction2(op, param1, param2)
 	end
 	return false;
 end
-
 

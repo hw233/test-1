@@ -12,7 +12,7 @@ function frontmap()
     f=$1
     d=frontmap
     sed -i /isPack/d $f
-    sed -i /ID/d $f
+    sed -i /id/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
