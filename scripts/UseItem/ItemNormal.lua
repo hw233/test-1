@@ -535,7 +535,7 @@ function ItemNormal_00000018(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -564,7 +564,7 @@ function ItemNormal_00000019(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -626,7 +626,7 @@ function ItemNormal_00000020(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -691,7 +691,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -792,7 +792,7 @@ function ItemNormal_00008947(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -1662,7 +1662,7 @@ function ItemNormal_00008968(iid, num, bind, param)
 	
   local reqGrids = 3 + package:GetItemUsedGrids(14, 2, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
  
@@ -1684,7 +1684,7 @@ function ItemNormal_00008969(iid, num, bind, param)
 	
   local reqGrids = 2 + package:GetItemUsedGrids(14, 3, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
 	 
@@ -1706,7 +1706,7 @@ function ItemNormal_00008970(iid, num, bind, param)
 	
   local reqGrids = 2 + package:GetItemUsedGrids(14, 4, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
 		  
@@ -1728,7 +1728,7 @@ function ItemNormal_00008971(iid, num, bind, param)
 	
   local reqGrids = 2 + package:GetItemUsedGrids(14, 5, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
  
@@ -1750,7 +1750,7 @@ function ItemNormal_00008972(iid, num, bind, param)
 	
   local reqGrids = 2 + package:GetItemUsedGrids(14, 6, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
  
@@ -2901,7 +2901,7 @@ function ItemNormal_00008993(iid, num, bind, param)
 		return false;
 	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 	
 end
@@ -2979,7 +2979,7 @@ function ItemNormal_00008994(iid, num, bind, param)
 				end	
 				return true;				
 			else
-				player:sendMsgCode(2, 1053, 0);
+				player:sendMsgCode(2, 1011, 0);
 				return false;
 			end
 		else
@@ -3005,12 +3005,12 @@ function ItemNormal_00008994(iid, num, bind, param)
 				end	
 				return true;			
 			else	
-				player:sendMsgCode(2, 1053, 0);			
+				player:sendMsgCode(2, 1011, 0);			
 				return false;
 			end	
 		end
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -3056,7 +3056,7 @@ function ItemNormal_00008997(iid, num, bind, param)
 		package:AddItem(56, 3, 1, 0, 2);
 		player:getGold(100);
 	else
-		player:sendMsgCode(2, 1053, 0);			
+		player:sendMsgCode(2, 1011, 0);			
 		return false;
 	end
 	return true;
@@ -3083,7 +3083,7 @@ function ItemNormal_00008998(iid, num, bind, param)
 --    package:AddItem(8999, 2, 1, 0, 2);
     return true;
   end
-  player:sendMsgCode(2, 1053, 0);
+  player:sendMsgCode(2, 1011, 0);
   return false;
 end
 
@@ -3103,7 +3103,7 @@ function ItemNormal_00009002(iid, num, bind, param)
         package:AddItem(5013, 1, 1, 0, 2);
         return true;
     end
-    player:sendMsgCode(2, 1053, 0);
+    player:sendMsgCode(2, 1011, 0);
     return false;
 end
 
@@ -3144,7 +3144,7 @@ function openGemBox(id, boxid)
         package:AddItem(id, 3, 1, 0, 2);
         return true;
     end
-    player:sendMsgCode(2, 1053, 0);
+    player:sendMsgCode(2, 1011, 0);
     return false;
 end
 
@@ -3239,7 +3239,7 @@ function ItemNormal_00009031(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 	if package:GetRestPackageSize() < 1 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 	package:DelItemSendMsg(9031, player);
@@ -3269,7 +3269,7 @@ function ItemNormal_00009027(iid, num, bind, param)
 	end
 	reqGrids =  reqGrids + package:GetItemUsedGrids(itemId, 1, 1);
 	if reqGrids > package:GetRestPackageSize() then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
         package:DelItemSendMsg(9027, player);
@@ -3294,7 +3294,7 @@ function ItemNormal_00009028(iid, num, bind, param)
 	end
 	reqGrids =  reqGrids + package:GetItemUsedGrids(itemId, 1, 1);
 	if reqGrids > package:GetRestPackageSize() then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
         package:DelItemSendMsg(9028, player);
@@ -3320,7 +3320,7 @@ function ItemNormal_00009029(iid, num, bind, param)
 	end
 	reqGrids =  reqGrids + package:GetItemUsedGrids(itemId, 1, 1);
 	if reqGrids > package:GetRestPackageSize() then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
         package:DelItemSendMsg(9029, player);
@@ -3336,7 +3336,7 @@ function ItemNormal_00009030(iid, num, bind, param)
 	local itemId = 0;
   reqGrids = 1 + package:GetItemUsedGrids(8940, 2, 1);
 	if reqGrids > package:GetRestPackageSize() then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 	local chance = math.random(1, 100);
@@ -3357,7 +3357,7 @@ function ItemNormal_00009036(iid, num, bind, param)
   local player = GetPlayer();
   local package = player:GetPackage();
 	if package:GetRestPackageSize() < 1 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
   local roll = math.random(1,100);
@@ -3398,7 +3398,7 @@ function ItemNormal_00009037(iid, num, bind, param)
   local player = GetPlayer();
   local package = player:GetPackage();
 	if package:GetRestPackageSize() < 1 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
   local roll = math.random(1,100);
@@ -3443,7 +3443,7 @@ function ItemNormal_00009039(iid, num, bind, param)
   local player = GetPlayer();
   local package = player:GetPackage();
 	if package:GetRestPackageSize() < 1 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
   local roll = math.random(1,1000) - 1;
@@ -3615,7 +3615,7 @@ function ItemNormal_00009041(iid, num, bind, param)
 		return false;
 	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -3728,7 +3728,7 @@ function ItemNormal_00009201(iid, num, bind, param)
 		return false;
 	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 function ItemNormal_00009202(iid, num, bind, param)
@@ -3840,7 +3840,7 @@ function ItemNormal_00009202(iid, num, bind, param)
 		return false;
 	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 function ItemNormal_00009203(iid, num, bind, param)
@@ -3952,7 +3952,7 @@ function ItemNormal_00009203(iid, num, bind, param)
 		return false;
 	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 function ItemNormal_00009204(iid, num, bind, param)
@@ -4054,7 +4054,7 @@ function ItemNormal_00009204(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -4064,7 +4064,7 @@ function ItemNormal_00009216(iid, num, bind, param)
 	
   local reqGrids = 2 + package:GetItemUsedGrids(14, 6, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
  
@@ -4184,7 +4184,7 @@ function ItemNormal_00009217(iid, num, bind, param)
 		player:sendMsgCode(2, 1053, 0);
 		return false;	
 	end
-	player:sendMsgCode(2, 1053, 0);
+	player:sendMsgCode(2, 1010, 0);
 	return false;
 end
 
@@ -4226,7 +4226,7 @@ function ItemNormal_00009209(iid, num, bind, param)
 	end	
 	local package = player:GetPackage();
 	if package:GetItemUsedGrids(itemId, count, 1) > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	else
 		package:DelItemSendMsg(9209, player);	
@@ -4285,7 +4285,7 @@ function ItemNormal_00009210(iid, num, bind, param)
 	end
 	local package = player:GetPackage();
 	if package:GetItemUsedGrids(itemId, count, 1) > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	else
 		package:DelItemSendMsg(9210, player);
@@ -4370,7 +4370,7 @@ function ItemNormal_00009213(iid, num, bind, param)
 	
   local reqGrids = 2 + package:GetItemUsedGrids(14, 6, 1)
   if reqGrids > package:GetRestPackageSize() then
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
   end
  
@@ -4433,7 +4433,7 @@ function ItemNormal_SkillPage(iid, num, bind, param)
     end
   end
   if package:GetRestPackageSize() < package:GetItemUsedGrids(9017 + n, num, true) then
-    player:sendMsgCode(2, 1053, 0)
+    player:sendMsgCode(2, 1011, 0)
     return false
   end
   for i = SkillPageRange[n - 1], SkillPageRange[n] - 1 do
@@ -4459,7 +4459,7 @@ function ItemNormal_00009214(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 	if package:GetRestPackageSize() < 1 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 	package:DelItemSendMsg(9214, player);
@@ -4472,7 +4472,7 @@ function ItemNormal_00009223(iid, num, bind, param)
  	local player = GetPlayer()
 	local package = player:GetPackage()	
 	if package:GetRestPackageSize() < 2 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end		
 	local itemId = 8924;
@@ -4511,7 +4511,7 @@ function ItemNormal_00009225(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	if package:GetRestPackageSize() < 2 then		
-		player:sendMsgCode(2, 1053, 0);
+		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 	local roll = math.random(1,1000) - 1;

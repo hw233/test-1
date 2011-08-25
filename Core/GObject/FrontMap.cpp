@@ -165,9 +165,10 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
             ret = true;
         }
 
-        ++tmp[spot].count;
-        tmp[spot].status = 1;
         if (ret) {
+            ++tmp[spot].count;
+            tmp[spot].status = 1;
+
             if (spot >= GData::frontMapMaxManager[id]) {
                 Stream st(REP::FORMATTON_INFO);
                 st << static_cast<UInt8>(4) << id << Stream::eos;
