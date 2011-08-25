@@ -58,7 +58,16 @@ int main(int argc, char* argv[])
 	{
 		serverName = argv[1];
 	}
-	if (!SERVER().Init(scriptStr, serverName))
+
+    int num = 0;
+    char* s = strstr(argv[0], ".");
+    if (s)
+    {
+        s += 1;
+        num = atoi(s);
+    }
+
+	if (!SERVER().Init(scriptStr, serverName, num))
 	{
 		fprintf(stdout, "Server Initialize fail !\n");
 		exit(-1);

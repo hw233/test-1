@@ -29,7 +29,7 @@ protected:
 	friend class Singleton<WorldServer>;
 
 public:
-	bool Init(const char * = NULL, const char * = NULL);
+	bool Init(const char * = NULL, const char * = NULL, int num = 0);
 	void Shutdown();
 	void UnInit();
 	void SetActive(bool active);

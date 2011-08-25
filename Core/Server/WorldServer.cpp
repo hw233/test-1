@@ -53,7 +53,7 @@ bool WorldServer::ParseCommandInfor(Int32 argc, char * argv[])
 	return true;
 }
 
-bool WorldServer::Init(const char * scriptStr, const char * serverName)
+bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 {
 	if(serverName != NULL)
 	{
@@ -72,6 +72,12 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName)
 	globalSysMsg.load();
 	Battle::battleReport.init();
     _analyzer.Init();
+
+    if (!num)
+    {
+        srand(time(NULL));
+        cfg.serverNum = cfg.tcpPort+rand()%1000;
+    }
 
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();

@@ -912,8 +912,7 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 		return false;
 	default:
 		{
-            // TODO: 暂时屏蔽
-			// SYSMSG_BROADCAST(240);
+			SYSMSG_BROADCAST(240);
 			prepare2(curtime);
 			_prepareTime = 4;
 		}

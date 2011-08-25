@@ -502,9 +502,9 @@ namespace GObject
         }
 
         {
-            // TODO: out id 的唯一性
             char buf[1024] = {0};
-            snprintf(buf, sizeof(buf), "%u_%"I64_FMT"u|%u_%"I64_FMT"u|||||%u|", cfg.tcpPort, getId(), GetSessionID(), getId(), GetLev());
+            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%u_%u_%"I64_FMT"u|||||%u||||||||||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
             udpLog(buf, "", "", "", "", "", "", "login");
         }
 	}
