@@ -31,8 +31,10 @@ void SysMsgItem::send( GObject::Player * player )
 {
 	if(player != NULL)
 	{
+#if 0
 		if(player->GetLev() < 6)
 			return;
+#endif
 		player->send(_stream);
 	}
 	else

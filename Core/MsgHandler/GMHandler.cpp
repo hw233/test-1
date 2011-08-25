@@ -120,6 +120,7 @@ GMHandler::GMHandler()
 	Reg(3, "useitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
     Reg(3, "ec", &GMHandler::OnEnterCopy);
+    Reg(3, "wa", &GMHandler::OnWorldAnnounce);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2065,5 +2066,15 @@ void GMHandler::OnEnterCopy(GObject::Player *player, std::vector<std::string>& a
 
     UInt8 id = atoi(args[0].c_str());
     playerCopy.enter(player, id);
+}
+
+void GMHandler::OnWorldAnnounce(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 1)
+        return;
+
+	Stream st(REP::SYSTEM_INFO);
+	st << static_cast<UInt8>(0x16) << args[0] << Stream::eos;
+	NETWORK()->Broadcast(st);
 }
 
