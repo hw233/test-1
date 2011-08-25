@@ -126,6 +126,13 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
+
+    {
+        UInt32 count = LOGIN().Count();
+        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %d, 当前在线人数: %d\n",
+                player->getId(), count, LOGIN().Current());
+    }
+
 	return res;
 }
 
@@ -234,13 +241,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
 		}
-
-        if (!res)
-        {
-            UInt32 count = LOGIN().Count();
-            LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %d, 当前在线人数: %d\n",
-                    ul._userid, count, LOGIN().Current());
-        }
 	}
 	else
 		res = 2;
@@ -442,6 +442,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
                 gold = 1000;
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(UInt32));
 				GLOBAL().PushMsg(hdr, &gold);
+            }
+
+            {
+                UInt32 count = LOGIN().Count();
+                LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %d, 当前在线人数: %d\n",
+                        pl->getId(), count, LOGIN().Current());
             }
 		}
 	}
