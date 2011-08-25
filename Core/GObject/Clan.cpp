@@ -879,6 +879,8 @@ void Clan::listMembers( Player * player )
 	for (; offset != _members.end(); ++ offset)
 	{
 		ClanMember * mem = *offset;
+        if (!mem->player)
+            continue;
 		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->proffer << mem->player->getLastOnline();
 	}
 	st << Stream::eos;
