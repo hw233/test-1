@@ -2175,6 +2175,9 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
     {
         if (_cittas[idx] != citta)
         { // upgrade
+            if (_cittas[idx] >= citta) // XXX: 不可能降级
+                return false;
+
             int i = isCittaUp(citta);
             if (i >= 0)
                 upCitta(citta, i, writedb);
