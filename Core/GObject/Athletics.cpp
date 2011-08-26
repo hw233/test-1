@@ -207,7 +207,7 @@ void Athletics::attack(Player * defer)
 		UInt32 reptid, time;
 		time = TimeUtil::Now();
 
-		Battle::BattleSimulator bsim(0x7FFF, _owner, defer);
+		Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, _owner, defer);
 		_owner->PutFighters( bsim, 0, true );
 		defer->PutFighters( bsim, 1, true );
 		bsim.start();
@@ -243,7 +243,7 @@ void Athletics::attack(Player * defer)
 
 void Athletics::beAttack(Player * atker, UInt8 formation, UInt16 portrait, Lineup * lineup)
 {
-	Battle::BattleSimulator bsim(0x7FFF, atker, _owner);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
 	for(int i = 0; i < 5; ++ i)

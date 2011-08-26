@@ -59,6 +59,8 @@ namespace GObject
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 
 #define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
+#define SHIMEN_TASK_MAXCOUNT        5       // 师门每日最大任务数
+#define YAMEN_TASK_MAXCOUNT         5       // 师门每日最大任务数
 
 	class Map;
 	class Player;
@@ -193,8 +195,8 @@ namespace GObject
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
-			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), copyFreeCnt(0), copyGoldCnt(0),
-            copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
+			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
 		{
             memset(tavernId, 0, sizeof(tavernId));
             memset(fshimen, 0, sizeof(fshimen));
@@ -225,7 +227,7 @@ namespace GObject
 		UInt16 packSize;            // 玩家背包容量
 		UInt8 mounts;               // 坐骑
 		UInt8 gmLevel;              //
-		UInt8 icCount;              // 
+		UInt8 icCount;              // 挂机加速次数
 		UInt32 nextIcReset;         // 
 		UInt16 formation;            // 
 		Lineup lineup[5];           // 
@@ -240,7 +242,7 @@ namespace GObject
 		UInt16 tavernId[6];         // 
 		UInt8 tavernBlueCount;      // 
 		UInt8 tavernPurpleCount;    // 
-		UInt8 tavernOrangeCount;    // 
+		UInt16 tavernOrangeCount;    // 
         UInt32 fshimen[6];          // 刷出的师门任务
 		UInt8 fsmcolor[6];          // 刷出的师门任务的颜色
 		UInt32 shimen[6];           // 师门任务
@@ -262,6 +264,8 @@ namespace GObject
 		UInt32 lockExpireTime;      // 
 		UInt8 wallow;               // 
 		UInt32 battlecdtm;          // 
+        UInt8 dungeonCnt;           // 通天塔当前次数
+        UInt32 dungeonEnd;          // 通天塔当天结束时间
         UInt8 copyFreeCnt;          // 副本免费次数
         UInt8 copyGoldCnt;          // 副本收费次数
         UInt32 copyUpdate;          // 副本次数更新时间

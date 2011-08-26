@@ -93,6 +93,10 @@ namespace GObject
     float GObjectManager::_counter_max;
     float GObjectManager::_mres_max;
 
+    UInt16 GObjectManager::_color_chance[2][4];
+
+    std::map<UInt16, UInt16> GObjectManager::_battle_scene;
+
 	bool GObjectManager::InitIDGen()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -281,6 +285,34 @@ namespace GObject
 			}
 			map->AddObject(mos);
 		}
+
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        {
+            std::string path = cfg.scriptPath + "Other/BattleScene.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            lua_tinker::table bs_table = lua_tinker::call<lua_tinker::table>(L, "getBattleScene");
+            size_t bs_size = bs_table.size();
+            for(UInt32 i = 0; i < bs_size; i ++)
+            {
+                lua_tinker::table tempTable = bs_table.get<lua_tinker::table>(i + 1);
+                size_t tempSize = tempTable.size();
+                UInt16 first = 0;
+                UInt16 second = 0;
+                if(tempSize > 1)
+                {
+                    first = tempTable.get<UInt16>(1);
+                    second = tempTable.get<UInt16>(2);
+                }
+                else if(tempSize == 1)
+                    first = tempTable.get<UInt16>(1);
+
+                _battle_scene[first] = second;
+            }
+        }
+        lua_close(L);
 
 		return true;
 	}
@@ -718,7 +750,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -2552,6 +2584,18 @@ namespace GObject
 
                 chance = MAKECHANCE(a, b);
                 _capacity_chance.push_back(chance);
+            }
+
+            lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance");
+            size_t ct_size = 2 < ct.size() ? 2 : ct.size();
+            for(UInt8 i = 0; i < ct_size; ++ i)
+            {
+                lua_tinker::table tempTable = ct.get<lua_tinker::table>(i + 1);
+                size_t tempSize = 4 < tempTable.size() ? 4 : tempTable.size();
+                for(UInt8 j = 0; j < tempSize; ++ j)
+                {
+                    _color_chance[i][j] = tempTable.get<UInt32>(j+1);
+                }
             }
 
         }

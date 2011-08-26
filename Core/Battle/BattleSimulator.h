@@ -14,6 +14,24 @@ class BattleFormula;
 namespace Battle
 {
 
+    enum BattleScene
+    {
+        // 副本
+        BS_COPY1 = 0xFF01,
+        BS_COPY2 = 0xFF02,
+        BS_COPY3 = 0xFF03,
+        BS_COPY4 = 0xFF04,
+        BS_COPY5 = 0xFF05,
+        BS_COPY6 = 0xFF06,
+
+        // 阵图
+        BS_FRONTMAP1 = 0xFE01,
+
+        // 斗剑场
+        BS_ATHLETICS1 = 0xFD01
+    };
+
+
 class BattleSimulator:
 	public BattleField
 {

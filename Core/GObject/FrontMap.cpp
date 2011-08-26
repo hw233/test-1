@@ -9,8 +9,6 @@
 namespace GObject
 {
 
-static const UInt8 FREECNT = 1;
-static const UInt8 GOLDCNT = 2;
 
 void FrontMap::sendAllInfo(Player* pl)
 {
@@ -31,6 +29,26 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot)
 
     st << Stream::eos;
     pl->send(st);
+}
+
+UInt8 FrontMap::getFrontMapSize(Player* pl)
+{
+    if(!pl)
+        return 0;
+
+    return m_frts[pl->getId()].size();
+}
+
+void FrontMap::buildInfo(Player* pl, Stream& st)
+{
+    if(!pl)
+        return;
+
+    std::map<UInt8, std::vector<FrontMapData>>& pl_frts = m_frts[pl->getId()];
+    for(std::map<UInt8, std::vector<FrontMapData>>::iterator it = pl_frts.begin(); it != pl_frts.end(); ++ it )
+    {
+        st << static_cast<UInt8>(it->first);
+    }
 }
 
 void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id)

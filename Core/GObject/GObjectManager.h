@@ -95,6 +95,17 @@ namespace GObject
         static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr ) { return _attrMax[q][crr][lvl][t]; }
         static UInt16 getAttrDics(UInt8 q, UInt8 idx) { return _attrDics[q][idx]; }
 
+        static UInt16 getColorFighterChance( UInt8 f_g, UInt8 color ) { return _color_chance[f_g][color]; }
+
+        static UInt16 getBattleScene(UInt16 location)
+        {
+            std::map<UInt16, UInt16>::iterator it = _battle_scene.find(location);
+            if(it != _battle_scene.end())
+                return it->second;
+            else
+                return 0;
+        }
+
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -131,6 +142,12 @@ namespace GObject
         static float _tough_max;
         static float _counter_max;
         static float _mres_max;
+
+        // 酒馆武将品质概率
+        static UInt16 _color_chance[2][4];
+
+        //战斗背景
+        static std::map<UInt16, UInt16> _battle_scene;
 	};
 }
 

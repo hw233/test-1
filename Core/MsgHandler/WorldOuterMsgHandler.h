@@ -298,7 +298,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
     }
     if(player->getCountry() > 1)
     {
-		Stream st(0x92);
+		Stream st(REP::CLAN_CREATE);
 		st << static_cast<UInt8>(5) << Stream::eos;
 		player->send(st);
 		return;

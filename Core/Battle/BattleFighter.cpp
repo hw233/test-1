@@ -389,7 +389,7 @@ void BattleFighter::updateBuffExtras()
 float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender)
 {
 	// 计算暴击率
-    float rate = getCritical(defender) - defender->getTough(this);
+    float rate = getCritical(defender);
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
 
 	float atk = getAttack();
@@ -400,20 +400,20 @@ float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender)
 	// 如果暴击
 	if(isCritical)
 	{
-		atk = atk * getCriticalDmg();
+		atk = atk * getCriticalDmg() - defender->getTough(this);
 	}
 	return atk;
 }
 
 float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender)
 {
-    float rate = getCritical(defender) - defender->getTough(this);
+    float rate = getCritical(defender);
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
     float magatk = getMagAttack();
 
     if(isCritical)
     {
-        magatk = magatk * getCriticalDmg();
+        magatk = magatk * getCriticalDmg() - defender->getTough(this);
     }
 
     return magatk;

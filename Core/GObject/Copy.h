@@ -7,6 +7,8 @@
 #include "Common/Mutex.h"
 #include <map>
 
+class Stream;
+
 namespace GObject
 {
 
@@ -24,11 +26,18 @@ class Player;
 class PlayerCopy : public Singleton<PlayerCopy>
 {
 public:
+    static const UInt8 GOLDCNT = 3;
+    static const UInt8 FREECNT = 2;
+
+public:
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
     void enter(Player* pl, UInt8 id);
     void fight(Player* pl, UInt8 id);
     void reset(Player* pl, UInt8 id);
+
+    UInt8 getCopySize(Player* pl);
+    void buildInfo(Player* pl, Stream& st);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot);
     CopyData& getCopyData(Player* pl, UInt8 id, bool update = false);

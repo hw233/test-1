@@ -25,6 +25,10 @@ class Player;
 class FrontMap : public Singleton<FrontMap>
 {
 public:
+    static const UInt8 FREECNT = 1;
+    static const UInt8 GOLDCNT = 2;
+
+public:
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id, bool = false);
     UInt8 getCount(Player* pl);
@@ -32,6 +36,9 @@ public:
     void enter(Player* pl, UInt8 id);
     void fight(Player* pl, UInt8 id, UInt8 spot);
     void reset(Player* pl, UInt8 id);
+
+    UInt8 getFrontMapSize(Player* pl);
+    void buildInfo(Player* pl, Stream& st);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status);
 private:

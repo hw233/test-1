@@ -86,13 +86,13 @@ CREATE TABLE `athletics_rank` (
   /*`boxType` tinyint(1) NOT NULL DEFAULT '0',*/
   /*`boxCount` int(10) NOT NULL DEFAULT '0',*/
   /*`boxFlushTime` int(10) NOT NULL DEFAULT '0',*/
-  `prestige`  int(10) NOT NULL DEFAULT '0',
-  `winStreak` tinyint(1) NOT NULL DEFAULT '0',
-  `bewinstreak` tinyint(1) NOT NULL DEFAULT '0',
-  `failstreak` tinyint(1) NOT NULL DEFAULT '0',
-  `befailstreak` tinyint(1) NOT NULL DEFAULT '0',
+  `prestige`  int(10) unsigned NOT NULL DEFAULT '0',
+  `winStreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `bewinstreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `failstreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `befailstreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `oldrank` int(10) NOT NULL DEFAULT '0',
-  `first4rank` tinyint(10) NOT NULL DEFAULT '0',
+  `first4rank` tinyint(10) unsigned NOT NULL DEFAULT '0',
   `extrachallenge` tinyint(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -132,7 +132,7 @@ CREATE TABLE `athletics_event` (
   `player2` bigint(20) NOT NULL,
   `cond` tinyint(3) NOT NULL DEFAULT '0',
   `color` tinyint(3) NOT NULL DEFAULT '0',
-  `value` tinyint(5) unsigned NOT NULL,
+  `value` smallint(5) unsigned NOT NULL,
   `itemcount` tinyint(3) NOT NULL DEFAULT '0',
   `itemid` int(10) NOT NULL,
   `time` int(10) NOT NULL,
@@ -848,6 +848,8 @@ CREATE TABLE `player` (
   `formations` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `dungeonCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `dungeonEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `newGuild` bigint(20) unsigned NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

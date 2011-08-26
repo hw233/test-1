@@ -35,6 +35,8 @@
 #include <mysql.h>
 #include "GData/Formation.h"
 #include "Script/BattleFormula.h"
+#include "Copy.h"
+#include "FrontMap.h"
 
 #include <cmath>
 
@@ -1380,7 +1382,7 @@ namespace GObject
 	{
 		checkLastBattled();
 		other->checkLastBattled();
-		Battle::BattleSimulator bsim(applyhp ? _playerData.location : 0x8FFF, this, other);
+		Battle::BattleSimulator bsim(applyhp ? _playerData.location : Battle::BS_ATHLETICS1, this, other);
 		PutFighters( bsim, 0 );
 		other->PutFighters( bsim, 1 );
 		bsim.start();
@@ -3226,7 +3228,7 @@ namespace GObject
             bool percolor = false;
             do {
                 ++ncount;
-                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < 5) || (ttype == 1 && _playerData.ymFreeCount < 5))) || ftype) {
+                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < SHIMEN_TASK_MAXCOUNT) || (ttype == 1 && _playerData.ymFreeCount < YAMEN_TASK_MAXCOUNT))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     if (!task.size())
@@ -3445,6 +3447,10 @@ namespace GObject
 					else
 					{
 						UInt8 tmpcolor = fgt->getColor();
+                        if(tmpcolor == 3 && _playerData.tavernOrangeCount < 1000 )
+                        {
+                        }
+
                         if(color <= tmpcolor)
                         {
                             if(hasGet)
@@ -4161,15 +4167,39 @@ namespace GObject
 	{
 		Stream st(REP::DAILY_DATA);
 		st << static_cast<UInt8>(1);
-		bossManager.buildInfo(st);
-		st << static_cast<UInt8>(dungeonManager.size());
-		Dungeon_Enum de = {this, st};
-		dungeonManager.enumerate(enum_dm, &de);
+        UInt32 curtime = TimeUtil::Now();
+		UInt32 vipLevel = getVipLevel();
+        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(SHIMEN_TASK_MAXCOUNT - _playerData.smFreeCount) << static_cast<UInt8>(YAMEN_TASK_MAXCOUNT - _playerData.ymFreeCount) << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
+        st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
+		//bossManager.buildInfo(st);
+        UInt8 cnt = playerCopy.getCopySize(this);
+        st << cnt << static_cast<UInt8>(_playerData.copyFreeCnt + _playerData.copyGoldCnt) << static_cast<UInt8>(GObject::PlayerCopy::FREECNT) << static_cast<UInt8>(GObject::PlayerCopy::GOLDCNT);
+        if(cnt)
+        {
+            playerCopy.buildInfo(this, st);
+        }
+
+        cnt = dungeonManager.size();
+        st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount() << GObject::Dungeon::getExtraCount(vipLevel);
+        if(cnt)
+        {
+            Dungeon_Enum de = {this, st};
+            dungeonManager.enumerate(enum_dm, &de);
+        }
+
+        cnt = frontMap.getFrontMapSize(this);
+        st << cnt << static_cast<UInt8>(_playerData.frontFreeCnt + _playerData.frontGoldCnt) << static_cast<UInt8>(GObject::FrontMap::FREECNT) << static_cast<UInt8>(GObject::FrontMap::GOLDCNT);
+        if(cnt)
+        {
+            frontMap.buildInfo(this, st);
+        }
+#if 0
 		size_t sz;
 		UInt16 * prices = Dungeon::getPrice(sz);
 		st << static_cast<UInt8>(sz);
 		for(size_t i = 0; i < sz; ++ i)
 			st << prices[i];
+#endif
 		st << Stream::eos;
 		send((st));
 	}
@@ -4239,7 +4269,7 @@ namespace GObject
 			return 1;
 
 		if(!m_Package->DelItemAny(itemId, 1))
-			return 1;
+			return 2;
 		
 		if(uRand(1000) < rate)
 		{
@@ -4627,7 +4657,7 @@ namespace GObject
 			return false;
 		}
 
-		Battle::BattleSimulator bsim(0x7FFF, this, _ng->getName(), static_cast<UInt8>(_bossLevel));
+		Battle::BattleSimulator bsim(_playerData.location, this, _ng->getName(), static_cast<UInt8>(_bossLevel));
 
 		PutFighters(bsim, 0);
 		std::vector<GData::NpcFData>& nflist = _ng->getList();

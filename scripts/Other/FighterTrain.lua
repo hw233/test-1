@@ -174,6 +174,16 @@ local MaxPotential = 200
 local MinCapacity = 500
 local MaxCapacity = 1000
 
+local Color_Fighter_Chance = {
+    {8500, 9950, 10000, 0},
+    {7000, 9799, 9999, 10000}
+}
+
+function getColorFighterChance()
+    return Color_Fighter_Chance
+end
+
+
 function GetTaelTrain()
 	return TaelTrain;
 end

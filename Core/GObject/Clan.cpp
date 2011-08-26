@@ -95,7 +95,7 @@ bool Clan::accept(Player * player, UInt64 pid )
 	if (accepter->getClan() != NULL)
 	{
 		player->sendMsgCode(0, 2042);
-		return true;
+		return false;
 	}
 	if (!isFull() && join(accepter))
 	{
@@ -953,12 +953,12 @@ void Clan::appendListInfo( Stream& st )
 	if(owner == NULL)
 	{
 		st << _id << _name << ""
-			<< static_cast<UInt8>(0) << getLev() << static_cast<UInt8>(getCount());
+			<< static_cast<UInt8>(0) << getLev() << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount());
 	}
 	else
 	{
 		st << _id << _name << owner->getName()
-			<< owner->getCountry() << getLev() << static_cast<UInt8>(getCount());
+			<< owner->getCountry() << getLev() << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount());
 	}
 }
 

@@ -715,7 +715,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(43)
+SPECIALDEF(45)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -758,6 +758,8 @@ SPECIALDEF(43)
     std::string, formations,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
+    UInt8,  pdata.dungeonCnt,
+    UInt32, pdata.dungeonEnd,
 	UInt32, pdata.created,
 	UInt32, pdata.lockExpireTime
     )
