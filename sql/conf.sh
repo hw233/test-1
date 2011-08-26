@@ -7,3 +7,22 @@ PT=3306
 DBD=data_8888
 DBO=asss_8888
 
+OPTIONS="Yes/No/Exit"
+IFS=/
+
+function selectAction()
+{
+echo -e "Update !!!!!!!!!!>>>>>> $1 <<<<<<!!!!!!!!!!"
+select selected in $OPTIONS;do
+    case $selected in
+        Yes)
+        return 1
+        break
+        ;;
+        *)
+        return 0;
+        break;;
+    esac
+done
+}
+
