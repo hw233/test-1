@@ -436,12 +436,14 @@ bool Clan::invite(Player * inviter, std::string invitee)
 
 ClanMember * Clan::getClanMember(Player * player)
 {
+	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(player);
 	return found == _members.end() ? NULL : *found;
 }
 
 Clan::Members::iterator Clan::find( Player * player )
 {
+	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = _members.begin();
 	for (; found != _members.end(); ++found)
 	{
@@ -453,6 +455,7 @@ Clan::Members::iterator Clan::find( Player * player )
 
 Clan::Members::iterator Clan::find( UInt64 pid )
 {
+	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = _members.begin();
 	for (; found != _members.end(); ++found)
 	{
@@ -464,6 +467,7 @@ Clan::Members::iterator Clan::find( UInt64 pid )
 
 Clan::Members::iterator Clan::end()
 {
+	Mutex::ScopedLock lk(_mutex);
 	return _members.end();
 }
 
@@ -1122,6 +1126,7 @@ void Clan::initBuildClan()
 
 void Clan::disband(Player * player)
 {
+	Mutex::ScopedLock lk(_mutex);
 	//1):Çå³ýÍ¬ÃË×Ú×å
 	if (_allyClan != NULL)
 		_allyClan->delAllyClan(this);
@@ -1176,6 +1181,7 @@ UInt8 Clan::getAutoBattleEffect()
 
 void Clan::retEnterPlsyersCount(UInt16 *count)
 {
+	Mutex::ScopedLock lk(_mutex);
 	Members::iterator offset = _members.begin();
 	for (; offset != _members.end(); ++ offset)
 	{
@@ -1518,6 +1524,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
 
 void Clan::makeSkillInfo(Stream& st, Player* pl)
 {
+	Mutex::ScopedLock lk(_mutex);
 	ClanMember* cm = getClanMember(pl);
     if(cm == NULL)
     {
@@ -1535,6 +1542,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl)
 
 void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
 {
+	Mutex::ScopedLock lk(_mutex);
 	ClanMember* cm = getClanMember(pl);
     if(cm == NULL)
         return;
@@ -1761,6 +1769,7 @@ void Clan::addRepoNum(UInt32 itemId, UInt8 itemNum)
 
 void Clan::sendRepoMail(UInt8 row, UInt8 num)
 {
+	Mutex::ScopedLock lk(_mutex);
 	SYSMSG(title, 440);
 	SYSMSG(order, row == 1 ? 452 : (row == 2 ? 453 : 454));
 	SYSMSGV(content, 455, order, num);
@@ -1841,6 +1850,7 @@ void Clan::addConstruction(UInt64 cons, bool writedb)
 
 void Clan::fixLeaderId()
 {
+	Mutex::ScopedLock lk(_mutex);
 	if (_members.empty())
 		return;
 	Members::iterator iter = _members.begin();
@@ -1898,6 +1908,7 @@ bool Clan::alterLeader()
 
 UInt32 Clan::getDonateAchievement(Player * player)
 {
+	Mutex::ScopedLock lk(_mutex);
 	Members::iterator offset = _members.begin();
 	for (; offset != _members.end(); ++ offset)
 	{
@@ -1926,6 +1937,7 @@ UInt8 Clan::getFromRepo(UInt32 itemId, UInt8 itemNum)
 
 UInt8 Clan::getCountry()
 {
+	Mutex::ScopedLock lk(_mutex);
 	return (_members.size() > 0) ? (*_members.begin())->player->getCountry() : 0; 
 }
 
@@ -2024,6 +2036,7 @@ void Clan::allocateRepoAsReward( Player * player, std::map<UInt32, UInt8>& items
 
 void Clan::purgeAlloc()
 {
+	Mutex::ScopedLock lk(_mutex);
 	UInt32 now = TimeUtil::Now();
 	if(now < _nextPurgeTime)
 		return;
@@ -2673,6 +2686,7 @@ void Clan::useClanFunds(UInt32 funds)
 
 bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 {
+	Mutex::ScopedLock lk(_mutex);
     Player* clan_pl = globalPlayers[inviteeId];
     if(!clan_pl)
         return false;
@@ -2728,6 +2742,7 @@ UInt8 Clan::getClanRank(Player* pl)
 
 UInt8 Clan::getClanRankCount(UInt8 cls)
 {
+	Mutex::ScopedLock lk(_mutex);
     UInt8 clsCount = 0;
 	Members::iterator found = _members.begin();
 	for (; found != _members.end(); ++found)
@@ -2749,6 +2764,7 @@ UInt8 Clan::getClanRankCount(UInt8 cls)
 
 void Clan::addMemberProffer(Player*pl, UInt32 proffer)
 {
+	Mutex::ScopedLock lk(_mutex);
     ClanMember * mem = getClanMember(pl);
     if(mem)
     {

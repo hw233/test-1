@@ -3405,12 +3405,17 @@ namespace GObject
 				//for(i = 0; i < 6; ++ i)
                     //excepts2.insert(_playerData.tavernId[i]);
 				i = 0;
+                int rateidx = _playerData.tavernOrangeCount / 10;
+                if(rateidx < 0)
+                    rateidx = 0;
+
 				if(!extraRefresh)
 				{
 					usedGold += _recruit_cost;
+#if 0
 					if(_playerData.tavernBlueCount >= _tavernBlueCount)
 					{
-						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 2, _tavernRate);
+						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 2, rateidx);
 						if(fgt != NULL)
 						{
 							_playerData.tavernId[i] = fgt->getId();
@@ -3422,7 +3427,7 @@ namespace GObject
 					}
 					if(_playerData.tavernPurpleCount >= _tavernPurpleCount)
 					{
-						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 3, _tavernRate);
+						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 3, rateidx);
 						if(fgt != NULL)
 						{
 							_playerData.tavernId[i] = fgt->getId();
@@ -3434,7 +3439,7 @@ namespace GObject
 					}
 					if(_playerData.tavernOrangeCount >= _tavernOrangeCount)
 					{
-						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 4, _tavernRate);
+						Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, 4, rateidx);
 						if(fgt != NULL)
 						{
 							_playerData.tavernId[i] = fgt->getId();
@@ -3444,12 +3449,13 @@ namespace GObject
 							++ i;
 						}
 					}
+#endif
 				}
 
                 bool hasGet = false;
 				for(; i < 6; ++ i)
 				{
-					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, _tavernRate);
+					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, rateidx);
 					if(fgt == NULL)
 					{
 						_playerData.tavernId[i] = 0;
@@ -3577,6 +3583,8 @@ namespace GObject
 		writeTavernIds();
 		ConsumeInfo ci(RecruitFighter,0,0);
 		useTael(price,&ci);
+
+        _playerData.tavernOrangeCount  = 0;
 
 		return fgt->getId();
 	}

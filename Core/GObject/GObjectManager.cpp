@@ -93,7 +93,8 @@ namespace GObject
     float GObjectManager::_counter_max;
     float GObjectManager::_mres_max;
 
-    UInt16 GObjectManager::_color_chance[2][4];
+    std::vector<std::vector<UInt32>> GObjectManager::_color_chance_gold;
+    UInt32 GObjectManager::_color_chance_free[4];
 
     std::map<UInt16, UInt16> GObjectManager::_battle_scene;
 
@@ -2588,15 +2589,30 @@ namespace GObject
                 _capacity_chance.push_back(chance);
             }
 
-            lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance");
-            size_t ct_size = 2 < ct.size() ? 2 : ct.size();
-            for(UInt8 i = 0; i < ct_size; ++ i)
             {
-                lua_tinker::table tempTable = ct.get<lua_tinker::table>(i + 1);
-                size_t tempSize = 4 < tempTable.size() ? 4 : tempTable.size();
-                for(UInt8 j = 0; j < tempSize; ++ j)
+                // 酒馆免费刷新武将概率
+                lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance_Free");
+                size_t ct_size = 4 < ct.size() ? 4 : ct.size();
+                for(UInt8 j = 0; j < ct_size; ++ j)
                 {
-                    _color_chance[i][j] = tempTable.get<UInt32>(j+1);
+                    _color_chance_free[j] = ct.get<UInt32>(j+1);
+                }
+            }
+
+            {
+                // 酒馆金币刷新武将概率
+                lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance_Gold");
+                size_t ct_size =  ct.size();
+                _color_chance_gold.resize(ct_size);
+                for(UInt8 i = 0; i < ct_size; ++ i)
+                {
+                    lua_tinker::table tempTable = ct.get<lua_tinker::table>(i + 1);
+                    size_t tempSize = 4 < tempTable.size() ? 4 : tempTable.size();
+                    _color_chance_gold[i].resize(tempSize);
+                    for(UInt8 j = 0; j < tempSize; ++ j)
+                    {
+                        _color_chance_gold[i][j] = tempTable.get<UInt32>(j+1);
+                    }
                 }
             }
 
