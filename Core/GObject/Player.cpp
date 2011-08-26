@@ -1485,16 +1485,20 @@ namespace GObject
 		{
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
-			if(getBuffData(PLAYER_BUFF_TRAINP3, now))
-				pendExp(ng->getExp() * 17 / 10);
-			else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
-				pendExp(ng->getExp() * 3 / 2);
-			else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
-				pendExp(ng->getExp() * 3 / 2);
-			else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
-				pendExp(ng->getExp() * 13 / 10);
-			else
-				pendExp(ng->getExp());
+
+            if (!(ng->getLevel() > GetLev() && ng->getLevel() - GetLev() >= 10))
+            {
+                if(getBuffData(PLAYER_BUFF_TRAINP3, now))
+                    pendExp(ng->getExp() * 17 / 10);
+                else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
+                    pendExp(ng->getExp() * 3 / 2);
+                else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
+                    pendExp(ng->getExp() * 3 / 2);
+                else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
+                    pendExp(ng->getExp() * 13 / 10);
+                else
+                    pendExp(ng->getExp());
+            }
 			ng->getLoots(this, _lastLoot);
 		}
 		else
