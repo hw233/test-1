@@ -682,7 +682,7 @@ void OnClanSkillDonateBackReq( GameMsgHdr& hdr, const void * data )
 	const BackItems * items = reinterpret_cast<const BackItems *>(data);
 	if (items->flag == 1)
 	{
-		player->getAchievement(items->count);
+		//player->getAchievement(items->count);
 	}
 	else if (items->flag == 2)
 	{

@@ -2135,13 +2135,14 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 	}
 	TRACE_LOG("%s(%"I64_FMT"u) challenge %s(%"I64_FMT"u)", player->getName().c_str(), player->getId(), target->getName().c_str(), target->getId());
 	int turns;
-	UInt32 tael = 0;
-	UInt32 Achievement = 0;
+	//UInt32 tael = 0;
+	//UInt32 Achievement = 0;
 
 	if(player->challenge(target, NULL, &turns))
 	{
 		if(lev <= 5 && !GObject::challengeCheck.hasPair(player, target))
 		{
+#if 0
 			GObject::challengeCheck.pushPair(player, target);
 			if(target->getTael() > 519)
 			{
@@ -2154,6 +2155,7 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 			ConsumeInfo ci2(ResourceLost, 0, 0);
 			target->useAchievement2(Achievement, player, &ci2);
 			player->getAchievement(Achievement);
+#endif
 		}
 
 		target->moveToHome();
@@ -2169,6 +2171,7 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 	{	
 		if(lev <= 5 && !GObject::challengeCheck.hasPair(target, player))
 		{
+#if 0
 			GObject::challengeCheck.pushPair(target, player);
 			if(player->getTael() > 519)
 			{
@@ -2181,6 +2184,7 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 			ConsumeInfo ci2(ResourceLost, 0, 0);
 			player->useAchievement2(Achievement, target, &ci2);
 			target->getAchievement(Achievement);
+#endif
 		}
 
 		player->moveToHome();
