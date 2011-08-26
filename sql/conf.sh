@@ -1,11 +1,11 @@
 #!/bin/bash
 
 H=localhost
-U=asss
-P=asss
+U=kingxin
+P=kingxin
 PT=3306
-DBD=data
-DBO=asss
+DBD=data_8888
+DBO=asss_8888
 
 OPTIONS="Yes/No/Exit"
 IFS=/

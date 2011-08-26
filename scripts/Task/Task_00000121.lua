@@ -1,11 +1,11 @@
 --����Ľ�������
-function Task_Accept_00000120()
+function Task_Accept_00000121()
 	local player = GetPlayer();
 	if player:GetLev() < 32 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
-	if task:HasAcceptedTask(120) or task:HasCompletedTask(120) or task:HasSubmitedTask(120) then
+	if task:HasAcceptedTask(121) or task:HasCompletedTask(121) or task:HasSubmitedTask(121) then
 		return false;
 	end
 	local state = GetPlayerData(6);
@@ -31,13 +31,13 @@ end
 
 
 -----�ɽ���������
-function Task_Can_Accept_00000120()
+function Task_Can_Accept_00000121()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
 	if player:GetLev() < 32 then
 		return false;
 	end
-	if task:HasAcceptedTask(120) or task:HasCompletedTask(120) or task:HasSubmitedTask(120) then
+	if task:HasAcceptedTask(121) or task:HasCompletedTask(121) or task:HasSubmitedTask(121) then
 		return false;
 	end
 	local state = GetPlayerData(6);
@@ -61,8 +61,8 @@ end
 
 
 --�����������
-function Task_Submit_00000120()
-	if GetPlayer():GetTaskMgr():HasCompletedTask(120) then
+function Task_Submit_00000121()
+	if GetPlayer():GetTaskMgr():HasCompletedTask(121) then
 		return true;
 	end
 	return false;
@@ -72,30 +72,30 @@ end
 ---------------------------------------
 ------NPC����������ű�
 ---------------------------------------
-function Task_00000120(npcId)
+function Task_00000121(npcId)
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
 	local action = ActionTable:Instance();
 
-	if task:GetTaskAcceptNpc(120) == npcId and Task_Accept_00000120 () then
+	if task:GetTaskAcceptNpc(121) == npcId and Task_Accept_00000121 () then
 		action.m_ActionType = 0x0001;
-		action.m_ActionID = 120
+		action.m_ActionID = 121
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "女贼杨花";
-	elseif task:GetTaskSubmitNpc(120) == npcId then
-		if Task_Submit_00000120() then
+		action.m_ActionMsg = "方丈智通";
+	elseif task:GetTaskSubmitNpc(121) == npcId then
+		if Task_Submit_00000121() then
 			action.m_ActionType = 0x0001;
-			action.m_ActionID = 120
+			action.m_ActionID = 121
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "女贼杨花";
-		elseif task:HasAcceptedTask(120) then
+			action.m_ActionMsg = "方丈智通";
+		elseif task:HasAcceptedTask(121) then
 			action.m_ActionType = 0x0001;
-			action.m_ActionID = 120
+			action.m_ActionID = 121
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "女贼杨花";
+			action.m_ActionMsg = "方丈智通";
 		end
 	end
 	return action;
@@ -104,57 +104,57 @@ end
 -------------------------------------------------
 --------���񽻻�����
 -------------------------------------------------
-function Task_00000120_step_01()
+function Task_00000121_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，其实醉道人前辈怕你出意外，一直跟着你去了慈云寺，方才寺内的恶人躁动也是前辈故意做的，方便少侠你去救人。";
-	action.m_ActionMsg = "原来如此，我说怎么救人这么顺利。";
+	action.m_NpcMsg = "慈云寺的方丈叫做智通，乃是当年五台派太乙混元祖师的弟子，一手飞剑使得出神入化。自从混元祖师在第二次峨眉斗剑中陨落，他手下的弟子各奔东西，而智通跑到成都建了这慈云寺，聚集了不少妖人，暗中图谋反攻正道。";
+	action.m_ActionMsg = "原来还有这么一段故事啊。";
 	return action;
 end
 
-function Task_00000120_step_02()
+function Task_00000121_step_02()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "如今慈云寺大批的妖人已经被前辈引走了，临走时前辈让我转告你，慈云寺藏污纳垢，密室内有不少邪恶之徒，其中有个叫杨花的女贼作恶多端让少侠你去将她铲除。";
-	action.m_ActionMsg = "我这就去再探慈云寺。";
+	action.m_NpcMsg = "嗯，魏家场一役，智通的师兄金身罗汉法元战败，其他妖人死的死伤的伤，现在智通一人独木难支，已经不成气候，"..GetPlayerName(GetPlayer()).."这智通就交给你对付了。";
+	action.m_ActionMsg = "好，我这就去慈云寺铲除首恶。";
 	return action;
 end
 
-function Task_00000120_step_10()
+function Task_00000121_step_10()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺里的这些妖人真是可恶！";
+	action.m_NpcMsg = "慈云寺的首恶已除，其他助拳妖人在魏家场也溃不成军，"..GetPlayerName(GetPlayer()).."你居功居首位啊！";
 	action.m_ActionMsg = "";
 	return action;
 end
 
-local Task_00000120_step_table = {
-		[1] = Task_00000120_step_01,
-		[2] = Task_00000120_step_02,
-		[10] = Task_00000120_step_10,
+local Task_00000121_step_table = {
+		[1] = Task_00000121_step_01,
+		[2] = Task_00000121_step_02,
+		[10] = Task_00000121_step_10,
 		};
 
-function Task_00000120_step(step)
-	if Task_00000120_step_table[step] ~= nil then
-		return Task_00000120_step_table[step]();
+function Task_00000121_step(step)
+	if Task_00000121_step_table[step] ~= nil then
+		return Task_00000121_step_table[step]();
 	end
 	return ActionTable:Instance();
 end
 
 --��������
-function Task_00000120_accept()
+function Task_00000121_accept()
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
-	if not Task_Accept_00000120() then
+	if not Task_Accept_00000121() then
 		return false;
 	end
-	if not task:AcceptTask(120) then
+	if not task:AcceptTask(121) then
 		return false;
 	end
 	return true;
@@ -163,22 +163,22 @@ end
 
 
 --�ύ����
-function Task_00000120_submit(itemId, itemNum)
+function Task_00000121_submit(itemId, itemNum)
 	local player = GetPlayer();
 
 	local package = player:GetPackage();
 
-	if not player:GetTaskMgr():SubmitTask(120) then
+	if not player:GetTaskMgr():SubmitTask(121) then
 		return false;
 	end
 
 
-	player:AddExp(20000);
+	player:AddExp(30000);
 	return true;
 end
 
 --��������
-function Task_00000120_abandon()
+function Task_00000121_abandon()
 	local package = GetPlayer():GetPackage();
-	return GetPlayer():GetTaskMgr():AbandonTask(120);
+	return GetPlayer():GetTaskMgr():AbandonTask(121);
 end

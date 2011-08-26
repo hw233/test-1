@@ -46,6 +46,7 @@ namespace GData
         static bool LoadCopyData();
         static bool LoadFrontMapData();
         static bool LoadOnlineAwardData();
+        static bool LoadMoney();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);

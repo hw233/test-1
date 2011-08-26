@@ -34,6 +34,18 @@ GMHandler gmHandler;
 GMHandler::GMHandler()
 {
 
+	Reg(1, "pinfo", &GMHandler::OnPlayerInfo);
+	Reg(1, "cinfo", &GMHandler::OnCharInfo);
+	Reg(1, "enterarena", &GMHandler::OnEnterArena);
+	Reg(1, "enterClan", &GMHandler::OnEnterClan);
+
+	Reg(2, "holy", &GMHandler::OnHoly);
+	Reg(2, "setspeed", &GMHandler::OnSetSpeed);
+	Reg(2, "spd", &GMHandler::OnSetSpeed);
+	Reg(2, "move", &GMHandler::OnMove);
+	Reg(2, "regen", &GMHandler::OnRegen);
+    Reg(2, "wa", &GMHandler::OnWorldAnnounce);
+
 	Reg(3, "donate", &GMHandler::OnClanDonate);
 	Reg(3, "banchat", &GMHandler::OnBanChat);
 	Reg(3, "addexp", &GMHandler::OnAddExp);
@@ -99,19 +111,7 @@ GMHandler::GMHandler()
 	Reg(3, "resetic", &GMHandler::OnResetIc);
 	Reg(3, "autocb", &GMHandler::OnAutoCB);
 
-	Reg(2, "holy", &GMHandler::OnHoly);
-	Reg(2, "setspeed", &GMHandler::OnSetSpeed);
-	Reg(2, "spd", &GMHandler::OnSetSpeed);
-	Reg(2, "move", &GMHandler::OnMove);
-	Reg(2, "regen", &GMHandler::OnRegen);
-
-	Reg(1, "pinfo", &GMHandler::OnPlayerInfo);
-	Reg(1, "cinfo", &GMHandler::OnCharInfo);
-	Reg(1, "enterarena", &GMHandler::OnEnterArena);
 	Reg(3, "nextarena", &GMHandler::OnNextArena);
-
-	Reg(1, "enterClan", &GMHandler::OnEnterClan);
-
 	Reg(3, "pay4pra", &GMHandler::OnPay4Pra);
 	Reg(3, "sitpra", &GMHandler::OnSitPra);
 	Reg(3, "flushtask", &GMHandler::OnFlushTask);
@@ -120,8 +120,8 @@ GMHandler::GMHandler()
 	Reg(3, "useitem", &GMHandler::OnUseItem);
     Reg(3, "ocupyplace", &GMHandler::OnOcupyPlace);
     Reg(3, "ec", &GMHandler::OnEnterCopy);
-    Reg(2, "wa", &GMHandler::OnWorldAnnounce);
     Reg(3, "gmc", &GMHandler::OnGmCheck);
+    Reg(3, "m2a", &GMHandler::OnMoney2All);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2087,5 +2087,40 @@ void GMHandler::OnGmCheck(GObject::Player *player, std::vector<std::string>& arg
     cfg.GMCheck = true;
     if (args.size() > 1)
         cfg.GMCheck = atoi(args[0].c_str());
+}
+
+inline bool give_money(Player * p, UInt32* money)
+{
+    UInt32* moneys = (UInt32*)money;
+
+    if (p)
+    {
+        if (moneys[0])
+            p->getGold(moneys[0]);
+        if (moneys[1])
+            p->getTael(moneys[1]);
+        if (moneys[2])
+            p->getCoupon(moneys[2]);
+    }
+    return true;
+}
+
+void GMHandler::OnMoney2All(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+    UInt32 gold = 1000;
+    UInt32 tael = 0;
+    UInt32 ticket = 0;
+
+    if (args.size() >= 1)
+        gold = atoi(args[0].c_str());
+    if (args.size() >= 2)
+        tael = atoi(args[1].c_str());
+    if (args.size() >= 3)
+        ticket = atoi(args[2].c_str());
+
+    UInt32 moneys[] = {gold, tael, ticket};
+    globalPlayers.enumerate(give_money, (UInt32*)moneys);
 }
 

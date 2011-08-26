@@ -21,6 +21,7 @@
 #include "FrontMapTable.h"
 #include "AcuPraTable.h"
 #include "FighterProb.h"
+#include "Money.h"
 #include "Common/StringTokenizer.h"
 
 #include "Script/lua_tinker.h"
@@ -194,6 +195,12 @@ namespace GData
 			fprintf(stderr, "Load online award template Error !\n");
 			return false;
 		}
+		if (!LoadMoney())
+		{
+			fprintf(stderr, "Load money Error !\n");
+			return false;
+		}
+
 
 		return true;
 	}	
@@ -1372,6 +1379,33 @@ namespace GData
 
 		return true;
 	}
+
+	bool GDataManager::LoadMoney()
+	{
+			lua_State* L = lua_open();
+			luaopen_base(L);
+			luaopen_string(L);
+			luaopen_table(L);
+			{
+				std::string path = cfg.scriptPath + "formula/money.lua";
+                lua_tinker::dofile(L, path.c_str());
+
+                lua_tinker::table money = lua_tinker::call<lua_tinker::table>(L, "GetMoney");
+                size_t size = money.size();
+                moneyNeed.resize(GData::MONEY_MAX);
+                for (int i = 1; i < GData::MONEY_MAX && i <= (int)size; ++i)
+                {
+                    lua_tinker::table needmoney = money.get<lua_tinker::table>(i);
+                    Money m;
+                    m.gold = needmoney.get<int>(1);
+                    m.tael = needmoney.get<int>(2);
+                    m.ticket = needmoney.get<int>(3);
+                    moneyNeed[i] = m;
+                }
+            }
+            lua_close(L);
+            return true;
+    }
 
 	const TaskType& GDataManager::GetTaskTypeData(UInt32 typeId)
 	{

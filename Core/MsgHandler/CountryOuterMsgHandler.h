@@ -14,6 +14,7 @@
 #include "Server/Cfg.h"
 #include "GObject/Player.h"
 #include "GObject/Fighter.h"
+#include "GData/Money.h"
 #include "GObject/CountryBattle.h"
 #include "GObject/Mail.h"
 #include "GObject/Map.h"
@@ -38,6 +39,7 @@
 #include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
+#include "GData/Money.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -1702,23 +1704,24 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 	{
 		if(viplvl < 3)
 		{
-			if(pl->getTael() < 1)
-					return;
-			ConsumeInfo ci(Transport,0,0);
-			pl->useTael(1,&ci);
+            // XXX: vip不收钱
+			//if(pl->getTael() < 1)
+			//		return;
+			//ConsumeInfo ci(Transport,0,0);
+			//pl->useTael(1,&ci);
 		}
 	}
 	else
 	{
 		if(viplvl == 0)
 		{
-			if(pl->getTael() < 10)
+			if(pl->getTael() < GData::moneyNeed[GData::JUMP_MAP].tael)
 			{
 				pl->sendMsgCode(0, 1103);
 				return;
 			}
 			ConsumeInfo ci(Transport,0,0);
-			pl->useTael(10,&ci);
+			pl->useTael(GData::moneyNeed[GData::JUMP_MAP].tael,&ci);
 		}
 	}
 
@@ -1913,6 +1916,7 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
  	MSG_QUERY_PLAYER(player);
 
 	bool succ = false;
+    bool succ1 = false;
 	switch (req.m_Action)
 	{
 	case 0:
@@ -1934,21 +1938,13 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 		break;
     case 3:
         // 师门，衙门任务立即完成
-        if (player->getGold() >= 1)
-        {
-            succ = player->addAwardByTaskColor(req.m_TaskId, true);
-            if (succ)
-                player->useGold(1);
-            succ = player->finishClanTask(req.m_TaskId);
-            if (succ)
-                player->useGold(1);
-        } else
-            player->sendMsgCode(0, 1007);
+        succ = player->addAwardByTaskColor(req.m_TaskId, true);
+        succ1 = player->finishClanTask(req.m_TaskId);
         break;
 	default:
 		return ;
 	}
-	if (succ)
+	if (succ || succ1)
 	{
 		TaskActionResp resp;
 		resp.m_TaskId = req.m_TaskId;

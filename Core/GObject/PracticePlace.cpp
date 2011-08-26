@@ -274,7 +274,7 @@ namespace GObject
             pd->cdend = TimeUtil::Now() + 10 * 60;
 
             //DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
-            DB().PushUpdateData("UPDATE `practice_data` SET place = 0, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u", pd->cdend, pl->getId());
+            DB().PushUpdateData("UPDATE `practice_data` SET place = 7, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u", pd->cdend, pl->getId());
             PopTimerEvent(pl, EVENT_PLAYERPRACTICING, pl->getId());
 
             if(place == PPLACE_MAX || clan != pl->getClan())
@@ -288,6 +288,8 @@ namespace GObject
             data.slotincoming += money;
             data.protincoming += money2;
             DB().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+
+            pd->checktime = 0; // XXX:
 
             if(clan)
             {
@@ -964,6 +966,12 @@ namespace GObject
 
         if (pd->checktime)
         {
+            if (!place)
+            {
+                DB().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
+                return false;
+            }
+
             EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime/10, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);

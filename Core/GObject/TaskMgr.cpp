@@ -1217,6 +1217,7 @@ namespace GObject
 
 	bool TaskMgr::DelTask(UInt32 taskId)
 	{
+        bool ret = false;
 		task_iterator it;
 		GET_TASK_DATA_ITER(m_TaskAcceptedList, taskId, it);
 		if (it != m_TaskAcceptedList.end())
@@ -1224,7 +1225,7 @@ namespace GObject
 			DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 			SAFE_DELETE(it->second);
 			m_TaskAcceptedList.erase(it);
-			return true;
+            ret = true;
 		}
 		else
 		{
@@ -1234,10 +1235,15 @@ namespace GObject
 				DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 				SAFE_DELETE(it->second);
 				m_TaskCompletedList.erase(it);
-				return true;
+                ret = true;
 			}
 		}
-		return false;
+
+		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
+        if (taskType.m_Class == 4 || taskType.m_Class == 5)
+            m_PlayerOwner->ColorTaskAbandon(taskType.m_Class, taskId);
+
+		return ret;
 	}
 
 	bool TaskMgr::SetAutoTaskCompleted(UInt32 autoTask)

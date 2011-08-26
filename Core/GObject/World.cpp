@@ -108,7 +108,7 @@ bool enum_midnight(void * ptr, void *)
 	}
 
     pl->buildClanTask();
-
+    pl->clearFinishCount();
 	return true;
 }
 

@@ -6,6 +6,8 @@
 #include "Battle/BattleSimulator.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
+#include "GData/Money.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -63,6 +65,15 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
 	FastMutex::ScopedLock lk(_mutex);
     Stream st(REP::COPY_INFO);
+
+    if (!id)
+        id = 1;
+    static UInt8 lvls[] = {30, 45, 60, 70, 80, 90};
+    if (pl->GetLev() < lvls[id-1]) {
+        SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
+        return;
+    }
+
     CopyData& tcd = getCopyData(pl, id, true);
 
     UInt8 ret = 1;
@@ -70,7 +81,8 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         ++PLAYER_DATA(pl, copyFreeCnt);
         ret = 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < GOLDCNT) {
-        if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
+        //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
+        if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
             pl->sendMsgCode(0, 1101);
