@@ -547,7 +547,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 	gSpecialAward.newServerActivity(atker, data->challengenum);
 	data->challengetime = TimeUtil::Now();
 
-	UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? 10 : ATHLETICS_BUFF_TIME);
+	UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
 //	if(Viplvl >= 2)
 //		challengeBuff=data->challengetime+ 5 * 60;
 //	else if(Viplvl == 1)
