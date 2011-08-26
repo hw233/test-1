@@ -92,6 +92,8 @@ private:
     void OnUseItem(GObject::Player * player, std::vector<std::string>&);
 	void OnOcupyPlace(GObject::Player *, std::vector<std::string>&);
 	void OnEnterCopy(GObject::Player *, std::vector<std::string>&);
+    void OnWorldAnnounce(GObject::Player *, std::vector<std::string>&);
+    void OnGmCheck(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

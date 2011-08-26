@@ -117,11 +117,10 @@ void Leaderboard::doUpdate()
 	buildPacket(_achievementStream, 2, _id, blist, false);
 
 	blist.clear();
-	execu->ExtractData("SELECT `clan`.`id`, `player`.`name`, `clan_skill`.`level`, `player`.`country`, COUNT(`clan_player`.`id`) AS `pcount`, `clan`.`name` FROM"
-		"`clan`, `clan_skill`, `clan_player`, `player`"
-		"WHERE `clan_skill`.`clanId` = `clan`.`id` AND `clan_skill`.`skillId` = 1 AND `clan`.`id` = `clan_player`.`id`"
-		"AND `clan`.`leader` = `player`.`id` GROUP BY `clan_player`.`id`"
-		"ORDER BY `clan_skill`.`level` DESC, `clan`.`proffer` DESC, `pcount` DESC LIMIT 0, 100", blist);
+	execu->ExtractData("SELECT `clan`.`id`, `player`.`name`, `clan`.`level`, `player`.`country`, COUNT(`clan_player`.`id`) AS `pcount`, `clan`.`name` FROM "
+		"`clan`, `clan_player`, `player` "
+		"WHERE `clan`.`id` = `clan_player`.`id` AND `clan`.`leader` = `player`.`id` "
+		"GROUP BY `clan_player`.`id` ORDER BY `clan`.`proffer` DESC, `pcount` DESC LIMIT 0, 100", blist);
 	buildPacket(_clanStream, 3, _id, blist);
 
 	std::vector<UInt64> ilist;

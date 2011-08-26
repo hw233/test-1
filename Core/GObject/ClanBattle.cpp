@@ -1268,7 +1268,7 @@ void ClanBattle::recoveBattlePlayer(Player * player, UInt8 recoveT)
 		UInt16 needGold = reliveNum >= 12 ? 100 : RecoveConsumeGold[reliveNum];
 		if (player->getGold() < needGold)
 		{
-			player->sendMsgCode(0, 2008);
+			player->sendMsgCode(0, 1101);
 			return;
 		}
 		ConsumeInfo ci(ClanBattleRecov,0,0);
@@ -1555,19 +1555,19 @@ bool ClanCityBattle::enterTotem(Player * player)
 	}
 	if (player->GetLev() < 40)
 	{
-		player->sendMsgCode(0, 2219);
+		//player->sendMsgCode(0, 2219);
 		return false;
 	}
 	if (player->getBuffData(PLAYER_BUFF_REENTERCLAN) != 0)
 	{
-		player->sendMsgCode(0, 2224);
+		//player->sendMsgCode(0, 2224);
 		return false;
 	}
 	UInt32 now = TimeUtil::Now();
 	UInt32 thisDay = TimeUtil::SharpDay(0, now);
 	if (TimeUtil::SharpDay(0, _clan->getFoundTime()) == thisDay)
 	{
-		player->sendMsgCode(0, 2214);
+		// player->sendMsgCode(0, 2214);
 		return false;
 	}
 	Mutex::ScopedLock lk(_clan->_mutex);
@@ -1576,7 +1576,7 @@ bool ClanCityBattle::enterTotem(Player * player)
 		return false;
 	if (TimeUtil::SharpDay(0, (*found)->joinTime) == thisDay)
 	{
-		player->sendMsgCode(0, 2226);
+		//player->sendMsgCode(0, 2226);
 		return false;
 	}
 
@@ -1643,20 +1643,22 @@ bool ClanCityBattle::enterClanCity(Player * player)
 	UInt32 thisDay = TimeUtil::SharpDay(0, now);
 	if (TimeUtil::SharpDay(0, _clan->getFoundTime()) == thisDay)
 	{
-		player->sendMsgCode(0, 2214);
+		//player->sendMsgCode(0, 2214);
 		return false;
 	}
 	if (!isInBattling())
 	{
+#if 0
 		if (_isInbattling == 0)
 			player->sendMsgCode(0, 2213);
 		else
 			player->sendMsgCode(0, 2217);
+#endif
 		return false;
 	}
 	if (player->GetLev() < 40)
 	{
-		player->sendMsgCode(0, 2219);
+		//player->sendMsgCode(0, 2219);
 		return false;
 	}
 	Clan * playerClan = player->getClan();
@@ -1674,7 +1676,7 @@ bool ClanCityBattle::enterClanCity(Player * player)
 	}
 	if (TimeUtil::SharpDay(0, (*playerFound)->joinTime) == thisDay)
 	{
-		player->sendMsgCode(0, 2226);
+		//player->sendMsgCode(0, 2226);
 		return false;
 	}
 	ClanMember * clanMember = *playerFound;
@@ -1682,7 +1684,7 @@ bool ClanCityBattle::enterClanCity(Player * player)
 		return false;
 	if (player->getBuffData(PLAYER_BUFF_REENTERCLAN) != 0)
 	{
-		player->sendMsgCode(0, 2224);
+		//player->sendMsgCode(0, 2224);
 		return false;
 	}
 	UInt8 side = getClanRelation(playerClan);
@@ -1694,7 +1696,7 @@ bool ClanCityBattle::enterClanCity(Player * player)
 		clanBattlePlayerEx = found->second;
 		if ((clanMember->enterCount & 0x0F) >= getMaxEnterCount() && clanBattlePlayerEx->hasAttack == 0)
 		{
-			player->sendMsgCode(0, 2209);
+			// player->sendMsgCode(0, 2209);
 			return false;
 		}
 		if (clanBattlePlayerEx->status != 1)
@@ -1707,7 +1709,7 @@ bool ClanCityBattle::enterClanCity(Player * player)
 	{
 		if ((clanMember->enterCount & 0x0F) >= getMaxEnterCount())
 		{
-			player->sendMsgCode(0, 2209);
+			// player->sendMsgCode(0, 2209);
 			return false;
 		}
 		clanBattlePlayerEx = new(std::nothrow) ClanBattlePlayer(player, side == 2 ? _holds[3].hold : _holds[0].hold, 1, side);
@@ -1976,7 +1978,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 {
 	if(atker->getBuffData(PLAYER_BUFF_ATTACKING))
 	{
-		atker->sendMsgCode(0, 2035);
+		atker->sendMsgCode(0, 1407);
 		return false;
 	}
 	if (atker->getClan() == NULL || atker->getClanBattle() == NULL)
@@ -2023,7 +2025,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 	UInt32 now = TimeUtil::Now();
 	if (cbAtker->status != 1)
 	{
-		atker->sendMsgCode(0, 2204);
+		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
@@ -2031,7 +2033,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 	if (cbDefer->status != 1)
 	{
 		//在复活，不能攻击
-		atker->sendMsgCode(0, 2204);
+		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
@@ -2203,7 +2205,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 {
 	if(atker->getBuffData(PLAYER_BUFF_ATTACKING))
 	{
-		atker->sendMsgCode(0, 2035);
+		atker->sendMsgCode(0, 1407);
 		return false;
 	}
 	ClanBattlePlayer * cbAtker = NULL;
@@ -2232,7 +2234,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 	}
 	if (cbAtker->status != 1)
 	{
-		atker->sendMsgCode(0, 2204);
+		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
@@ -2936,7 +2938,7 @@ bool ClanRobBattle::enterTotem(Player * player)
 	}
 	if (player->getBuffData(PLAYER_BUFF_REENTERCLAN) != 0)
 	{
-		player->sendMsgCode(0, 2224);
+		//player->sendMsgCode(0, 2224);
 		return false;
 	}
 	Mutex::ScopedLock lk(_clan->_mutex);
@@ -2945,7 +2947,7 @@ bool ClanRobBattle::enterTotem(Player * player)
 		return false;
 	if (TimeUtil::SharpDay(0, clanMember->joinTime) == TimeUtil::SharpDay())
 	{
-		player->sendMsgCode(0, 2226);
+		//player->sendMsgCode(0, 2226);
 		return false;
 	}
 
@@ -3018,17 +3020,19 @@ bool ClanRobBattle::enterClanCity(Player * player)
 		return false;
 	if (!isInBattling())
 	{
+#if 0
 		if (_isInbattling == 0)
 			player->sendMsgCode(0, 2213);
 		else
 			player->sendMsgCode(0, 2217);
+#endif
 		return false;
 	}
 	if (player->getClanBattle() != NULL)
 		return false;
 	if (player->GetLev() < 40)
 	{
-		player->sendMsgCode(0, 2219);
+		//player->sendMsgCode(0, 2219);
 		return false;
 	}
 	Mutex::ScopedLock lk(playerClan->_mutex);
@@ -3042,12 +3046,12 @@ bool ClanRobBattle::enterClanCity(Player * player)
 	UInt32 thisDay = TimeUtil::SharpDay(0, now);
 	if (TimeUtil::SharpDay(0, clanMember->joinTime) == thisDay)
 	{
-		player->sendMsgCode(0, 2226);
+		//player->sendMsgCode(0, 2226);
 		return false;
 	}
 	if (player->getBuffData(PLAYER_BUFF_REENTERCLAN) != 0)
 	{
-		player->sendMsgCode(0, 2224);
+		//player->sendMsgCode(0, 2224);
 		return false;
 	}
 	UInt8 side = (_status == 0 ? 2 : getClanRelation(playerClan));
@@ -3114,7 +3118,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 {
 	if(atker->getBuffData(PLAYER_BUFF_ATTACKING))
 	{
-		atker->sendMsgCode(0, 2035);
+		atker->sendMsgCode(0, 1407);
 		return false;
 	}
 	if (atker->getClan() == NULL || atker->getClanBattle() == NULL)
@@ -3161,7 +3165,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 	UInt32 now = TimeUtil::Now();
 	if (cbAtker->status != 1)
 	{
-		atker->sendMsgCode(0, 2204);
+		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
@@ -3169,7 +3173,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 	if (cbDefer->status != 1)
 	{
 		//在复活，不能攻击
-		atker->sendMsgCode(0, 2204);
+		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
@@ -3416,7 +3420,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 {
 	if(atker->getBuffData(PLAYER_BUFF_ATTACKING))
 	{
-		atker->sendMsgCode(0, 2035);
+		atker->sendMsgCode(0, 1407);
 		return false;
 	}
 	ClanBattlePlayer * cbAtker = NULL;
@@ -3440,7 +3444,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 	}
 	if (cbAtker->status != 1)
 	{
-		atker->sendMsgCode(0, 2204);
+		atker->sendMsgCode(0, 1315);
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}

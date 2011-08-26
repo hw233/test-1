@@ -8,13 +8,13 @@ function Monster_00005008(num)
 	if task:HasAcceptedTask(500) then
 		task:AddTaskStep2(500,1,num);
 	end
-	if task:HasAcceptedTask(29) then
-		task:AddTaskStep2(29,1,num);
-	end
 	if task:HasAcceptedTask(550) then
 		task:AddTaskStep2(550,1,num);
 	end
 	if task:HasAcceptedTask(600) then
 		task:AddTaskStep2(600,1,num);
+	end
+	if task:HasAcceptedTask(29) then
+		task:AddTaskStep2(29,1,num);
 	end
 end

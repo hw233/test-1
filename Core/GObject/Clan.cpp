@@ -79,12 +79,12 @@ bool Clan::accept(Player * player, UInt64 pid )
 {
 	if (_clanBattle->isInBattling())
 	{
-		player->sendMsgCode(2, 2210);
+		player->sendMsgCode(2, 1317);
 		return false;
 	}
 	if (!hasClanAuthority(player, 0))
 	{
-		player->sendMsgCode(2, 2043);
+		player->sendMsgCode(2, 1313);
 		return false;
 	}
 	using namespace std::placeholders;
@@ -94,8 +94,8 @@ bool Clan::accept(Player * player, UInt64 pid )
 	Player * accepter = (*it)->player;
 	if (accepter->getClan() != NULL)
 	{
-		player->sendMsgCode(0, 2042);
-		return false;
+		player->sendMsgCode(0, 1312);
+		return true;
 	}
 	if (!isFull() && join(accepter))
 	{
@@ -118,7 +118,7 @@ bool Clan::decline( Player* player, UInt64 pid )
 {
     if (!hasClanAuthority(player, 0))
 	{
-		player->sendMsgCode(2, 2043);
+		player->sendMsgCode(2, 1313);
 		return false;
 	}
 
@@ -226,7 +226,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 {
 	if (_clanBattle->isInBattling())
 	{
-		player->sendMsgCode(0, 2210);
+		player->sendMsgCode(0, 1317);
 		return false;
 	}
 	Mutex::ScopedLock lk(_mutex);
@@ -306,7 +306,7 @@ bool Clan::leave(Player * player)
 	ClanMember * member = (*found);
 	if (_clanBattle->isInBattling())
 	{
-		player->sendMsgCode(0, 2210);
+		player->sendMsgCode(0, 1317);
 		return false;
 	}
     getAllocBack(*member);
@@ -314,7 +314,7 @@ bool Clan::leave(Player * player)
     if( player == getOwner() && _members.size() != 1)
     {
         // XXX 帮主不能退出帮派, 帮派只剩下帮主一人时，可解散帮派
-		player->sendMsgCode(0, 2235);
+		player->sendMsgCode(0, 1318);
         return false;
     }
 
@@ -418,7 +418,7 @@ bool Clan::invite(Player * inviter, std::string invitee)
 		return false;
 	if (inviteePlayer->GetLev() < 20)
 	{
-		inviter->sendMsgCode(0, 2225);
+		//inviter->sendMsgCode(0, 2225);
 		return false;
 	}
 	if (inviteePlayer->getClan() != NULL)
@@ -661,7 +661,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		return false;
 	if (_techs->isTechFull(techId))
 	{
-		player->sendMsgCode(0, 2229);
+		//player->sendMsgCode(0, 2229);
 		return false;
 	}
 	ClanMember * mem = (*found);
@@ -679,7 +679,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			return false;
 		if (getLev() >= 5 && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
 		{
-			player->sendMsgCode(0, 2218);
+			//player->sendMsgCode(0, 2218);
 			return false;
 		}
 
@@ -696,7 +696,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			return false;
 		if(techTable[level].clanLev > getLev())
 		{
-			player->sendMsgCode(0, 2222);
+			//player->sendMsgCode(0, 2222);
 			return false;
 		}
 	}
@@ -715,7 +715,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			realCount = count + playerPetInfo.favorCount;
 		if(realCount > donateMaxFavor[mem->cls])
 		{
-			player->sendMsgCode(0, 2208);
+			player->sendMsgCode(0, 1316);
 			return false;
 		}
 	}
@@ -879,6 +879,8 @@ void Clan::listMembers( Player * player )
 	for (; offset != _members.end(); ++ offset)
 	{
 		ClanMember * mem = *offset;
+        if (!mem || !mem->player)
+            continue;
 		st << mem->player->getId() << mem->player->getName() << mem->cls << mem->player->GetLev() << static_cast<UInt8>(mem->player->isOnline() ? 1 : 0) << mem->proffer << mem->player->getLastOnline();
 	}
 	st << Stream::eos;
@@ -1214,12 +1216,12 @@ bool Clan::addAllyClan(Player * player, Player * allyPlayer, Clan * allyClan)
 		return false;
 	if (hasAllyClan())
 	{
-		allyPlayer->sendMsgCode(0, 2228);
+		//allyPlayer->sendMsgCode(0, 2228);
 		return false;
 	}
 	if (allyClan->hasAllyClan())
 	{
-		allyPlayer->sendMsgCode(0, 2227);
+		//allyPlayer->sendMsgCode(0, 2227);
 		return false;
 	}
 	if (!hasClanAuthority(player, 5))
@@ -2460,9 +2462,13 @@ void ClanCache::search2(Player * player, std::string name)
         searchInternal(1, slist, clans[1]);
 
 		UInt16 size = clans[0].size() + clans[1].size();
+#if 0
 		if (size == 0)
 			player->sendMsgCode(0, 2220);
 		else if (size > 20) 
+#else
+		if (size > 20) 
+#endif
 			size = 20;
 		st << static_cast<UInt16>(size) << static_cast<UInt16>(0) << static_cast<UInt8>(size);
 		std::set<Clan *>::iterator iter;

@@ -488,8 +488,8 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 
 void AthleticsRank::challenge(Player * atker, std::string& name)
 {
-	//UInt32 Viplvl = atker->getVipLevel();
-	//const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 18, 20, 20, 20, 20, 20};
+	UInt32 Viplvl = atker->getVipLevel();
+	const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 18, 20, 20, 20, 20, 20};
 
 	Player * defer = globalNamedPlayers[atker->fixName(name)];
 	if (defer == NULL || atker == defer)
@@ -499,7 +499,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 		return ;
 	if (row != getRankRow(atker->GetLev()))
 	{
-		atker->sendMsgCode(0, 2054);
+		atker->sendMsgCode(0, 1405);
 		Stream st(REP::ATHLETICS_CHALLENGE);
 		st << Stream::eos;
 		atker->send(st);
@@ -521,10 +521,10 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 			return;
 		if (atkerRankPos - deferRankPos > 14)
 		{
-			atker->sendMsgCode(0, 2054);
 			//Stream st(REP::ATHLETICS_CHALLENGE);
 			//st << Stream::eos;
 			//atker->send(st);
+			atker->sendMsgCode(0, 1405);
 			return ;
 		}
 	}
@@ -532,15 +532,15 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 		return;
 	if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
 	{
-		atker->sendMsgCode(0, 2053);
+		atker->sendMsgCode(0, 1413);
 		return ;
 	}
 	if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)
 		return ;
 	AthleticsRankData * data = *(atkerRank->second);
 	data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
-//	if (data->challengenum >= Maxchallengenum[Viplvl])
-//		return ;
+	if (data->challengenum >= Maxchallengenum[Viplvl])
+		return ;
 	atker->addGlobalFlag(Player::Challenging);
 	defer->addGlobalFlag(Player::BeChallenging);
 	data->challengenum ++;

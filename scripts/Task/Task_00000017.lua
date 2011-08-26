@@ -147,7 +147,7 @@ function Task_00000017_accept()
 	local reqGrids = 0;
 	reqGrids = reqGrids + package:GetItemUsedGrids(802, 1, 1);
 	if reqGrids > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2012, 0);
+		player:sendMsgCode(2, 1012, 0);
 		return false;
 	end
 	if not task:AcceptTask(17) then

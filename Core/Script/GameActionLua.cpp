@@ -746,10 +746,14 @@ namespace Script
 		if (player == NULL) return "";
 		if (player->getCountry() == 0)
 		{
-			return "天族";
+			return "峨眉";
 		}
+		if (player->getCountry() == 1)
+		{
+			return "昆仑";
+        }
 		else{
-			return "魔族";
+			return "中立";
 		}
 	}
 

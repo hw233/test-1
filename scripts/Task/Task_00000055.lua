@@ -82,20 +82,20 @@ function Task_00000055(npcId)
 		action.m_ActionID = 55
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "金花姥姥";
+		action.m_ActionMsg = "红花姥姥";
 	elseif task:GetTaskSubmitNpc(55) == npcId then
 		if Task_Submit_00000055() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 55
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "金花姥姥";
+			action.m_ActionMsg = "红花姥姥";
 		elseif task:HasAcceptedTask(55) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 55
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "金花姥姥";
+			action.m_ActionMsg = "红花姥姥";
 		end
 	end
 	return action;
@@ -110,7 +110,7 @@ function Task_00000055_step_01()
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
 	action.m_NpcMsg = "你看福仙潭四周围绕的五色云雾就是家师设下的禁制，天材地宝唯有有缘者得之。不过潭底有只神鳄很是厉害，要怎么取药我也不清楚，还是去问家师吧。";
-	action.m_ActionMsg = "好，我这就去见金花姥姥";
+	action.m_ActionMsg = "好，我这就去见红花姥姥";
 	return action;
 end
 
@@ -163,7 +163,7 @@ function Task_00000055_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(7000);
+	player:AddExp(15000);
 	return true;
 end
 

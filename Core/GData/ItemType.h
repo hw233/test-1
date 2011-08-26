@@ -15,7 +15,7 @@
 #define LCITTA_ID       1200
 #define RCITTA_ID       1499
 #define LARM_ID         1500
-#define RARM_ID         4990
+#define RARM_ID         4999
 #define LGEM_ID         5000
 #define RGEM_ID         5200
 #define LOTHER_ID       5201

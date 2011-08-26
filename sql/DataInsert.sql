@@ -128,3 +128,7 @@ LOCK TABLES `copy` WRITE;
 source copy
 UNLOCK TABLES;
 
+LOCK TABLES `frontmap` WRITE;
+source frontmap
+UNLOCK TABLES;
+

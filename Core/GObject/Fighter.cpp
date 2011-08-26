@@ -297,11 +297,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 4:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
             DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
-        break;
+        return;
     case 5:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
             DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
-        break;
+        return;
 	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
         break;
     case 7:
@@ -1176,7 +1176,7 @@ bool Fighter::learnSkill(UInt16 skill)
 {
 	if(skill == _skill)
 	{
-		if(_owner != NULL) _owner->sendMsgCode(0, 2151);
+		if(_owner != NULL) _owner->sendMsgCode(0, 1700);
 		return false;
 	}
 	const UInt8 colors[3][20] = {{1, 2, 3, 2, 3, 4, 3, 4}, {4, 1, 2, 3, 2, 3, 3, 4}, {2, 3, 4, 3, 1, 2, 3, 4}};
@@ -1395,7 +1395,7 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
 {
     int op = 0;
     int idx = hasPeerless(pl);
-    if (idx > 0)
+    if (idx >= 0)
     {
         if (pl != _peerless[idx])
         { // upgrade
@@ -1425,12 +1425,13 @@ bool Fighter::delPeerless( UInt16 pl, bool writedb )
     {
         if (SKILL_ID(_peerless[i]) == SKILL_ID(pl))
         {
+            if (isPeerlessUp(pl))
+                offPeerless(writedb);
+
             std::vector<UInt16>::iterator it = _peerless.begin();
             std::advance(it, i);
             _peerless.erase(it);
 
-            if (isPeerlessUp(pl))
-                offPeerless(writedb);
             sendModification(0x31, pl, 2/*1add,2del,3mod*/, writedb);
             return true;
         }
@@ -1480,9 +1481,12 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     if (peerless == pl)
         return;
 
-    int idx = hasPeerless(pl);
-    if (idx < 0)
-        return;
+    if (pl)
+    {
+        int idx = hasPeerless(pl);
+        if (idx < 0)
+            return;
+    }
 
     peerless = pl;
     _attrDirty = true;
@@ -2180,6 +2184,9 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
     {
         if (_cittas[idx] != citta)
         { // upgrade
+            if (_cittas[idx] >= citta) // XXX: 不可能降级
+                return false;
+
             int i = isCittaUp(citta);
             if (i >= 0)
                 upCitta(citta, i, writedb);

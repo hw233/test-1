@@ -196,17 +196,17 @@ bool Trade::launchTrade(std::string& name, const std::string& title, UInt32 coin
 	Player * tradePlayer = globalNamedPlayers[_owner->fixName(name)];
 	if (tradePlayer == NULL)
 	{
-		_owner->sendMsgCode(1, 1003);
+		_owner->sendMsgCode(1, 1150);
 		return false;
 	}
 	if(_owner->hasBlock(tradePlayer))
 	{
-		_owner->sendMsgCode(1, 2086);
+		_owner->sendMsgCode(1, 1500);
 		return false;
 	}
 	if(tradePlayer->hasBlock(_owner))
 	{
-		_owner->sendMsgCode(1, 2087);
+		_owner->sendMsgCode(1, 1502);
 		return false;
 	}
 	if (_owner->getCoin() < coin || _owner->getGold() < gold)
@@ -684,7 +684,7 @@ bool Trade::addTradeMailItems(UInt32 id)
 		UInt16 itemNum = getTradeItemsNum(trade->_items);
 		if (appendTradeItems(trade->_items))
 		{
-			_owner->sendMsgCode(2, 2018, itemNum);
+			_owner->sendMsgCode(2, 1053, itemNum);
 			trade->_items.clear();
 			trade->_strItems.clear();
 			if (trade->_tradeStatus == static_cast<UInt8>(TRADE_SUCCPACKFULL))
@@ -802,7 +802,7 @@ bool Trade::appendTradeItems(ItemBase** items, UInt16 itemNum)
 	}
 	if (grids > package->GetRestPackageSize())
 	{
-		_owner->sendMsgCode(2, 2017);
+		_owner->sendMsgCode(2, 1015);
 		return false;
 	}
 	for (UInt16 i = 0; i < itemNum; ++i)

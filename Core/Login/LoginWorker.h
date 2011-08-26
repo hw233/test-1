@@ -4,6 +4,7 @@
 #include "Server/WorkerRunner.h"
 #include "DB/DBExecutor.h"
 #include "MsgHandler/LoginMsgHandler.h"
+#include "Common/AtomicCounter.h"
 
 namespace Login
 {
@@ -21,7 +22,7 @@ public:
         return ++m_count;
     }
 
-    UInt32 Current() const
+    int Current() const
     {
         return m_current;
     }
@@ -40,8 +41,8 @@ protected:
 	std::string GetLogName();
 
 protected:
-    UInt32 m_count;
-    UInt32 m_current;
+    AtomicCounter m_count;
+    AtomicCounter m_current;
 };
 
 }

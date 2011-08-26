@@ -573,7 +573,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				{
 					if(_owner->GetPackage()->GetRestPackageSize() < 3)
 					{
-						_owner->sendMsgCode(0, 2016);
+						_owner->sendMsgCode(0, 1011);
 						return;
 					}
 					const UInt32 vipRollTable[10][3] = {{3001, 3002, 0}, {3003, 3004, 3005}, {3006, 3007, 3008},
@@ -594,7 +594,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				}
 				else if(pkgId > 0 && !GameAction()->onTakeMailPackage(_owner, pkgId))
 				{
-					_owner->sendMsgCode(0, 2016);
+					_owner->sendMsgCode(0, 1011);
 					return;
 				}
 			}
@@ -613,7 +613,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				}
 				else
 				{
-					_owner->sendMsgCode(0, 2016);
+					_owner->sendMsgCode(0, 1011);
 					return;
 				}
 			}
@@ -621,7 +621,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			{
 				if(count > 0 && _owner->GetPackage()->AddItem(mail->additional & 0xFFFF, count, true, false, FromMail) == NULL)
 				{
-					_owner->sendMsgCode(0, 2016);
+					_owner->sendMsgCode(0, 1011);
 					return;
 				}
 			}

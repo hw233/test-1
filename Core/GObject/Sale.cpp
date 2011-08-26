@@ -146,7 +146,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 	}
 	else
 	{
-		_owner->sendMsgCode(0, 2061);
+		_owner->sendMsgCode(0, 1601);
 		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(1) << Stream::eos;
 		_owner->send(st);
@@ -170,7 +170,7 @@ void Sale::sellSaleReqNotify(SaleSellRespData * data, UInt8 count)
 
 	if (i != 0)
 	{
-		_owner->sendMsgCode(0, 2060);
+		_owner->sendMsgCode(0, 1600);
 		Stream st(REP::SALE_SELL);
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
 		_owner->send(st);
@@ -237,7 +237,7 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 			_owner->holdCoin(saleItemBuy.price, 2);
 		else
 			_owner->holdGold(saleItemBuy.price, 2);
-		_owner->sendMsgCode(0, 2064);
+		_owner->sendMsgCode(0, 1055);
 	}
 }
 
@@ -321,7 +321,7 @@ bool Sale::addSaleMailItems(UInt32 id)
 	UInt16 usedGrids = IsEquipId(item->getId()) ? 1 :  package->GetItemUsedGrids(item->getId(), item->Count());
 	if (usedGrids > package->GetRestPackageSize())
 	{
-		_owner->sendMsgCode(2, 2017);
+		_owner->sendMsgCode(2, 1015);
 		return false;
 	}
 	if (IsEquipId(item->getId()))

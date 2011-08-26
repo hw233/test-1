@@ -182,7 +182,7 @@ function Task_00000070_submit(itemId, itemNum)
 
 	local selReqGrid = package:GetItemUsedGrids(itemId, itemNum, 1);
 	if selReqGrid > player:GetFreePackageSize() then
-		player:sendMsgCode(2, 2013, 0);
+		player:sendMsgCode(2, 1013, 0);
 		return false;
 	end
 	if not player:GetTaskMgr():SubmitTask(70) then

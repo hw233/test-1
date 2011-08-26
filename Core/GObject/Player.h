@@ -890,7 +890,7 @@ namespace GObject
 
     public:
         void udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
-                const char* str5, const char* str6, const char* type);
+                const char* str5, const char* str6, const char* type, UInt32 count = 1);
     private:
         CUserLogger* m_ulog;
 	};

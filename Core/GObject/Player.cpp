@@ -502,16 +502,22 @@ namespace GObject
                 m_ulog->SetUserIP(inet_ntoa(inaddr));
             }
         }
-        udpLog("", "", "", "", "", "", "", "login");
+
+        {
+            char buf[1024] = {0};
+            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%u_%u_%"I64_FMT"u|||||%u||||||||||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
+            udpLog(buf, "", "", "", "", "", "", "login");
+        }
 	}
 
     void Player::udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
-                const char* str5, const char* str6, const char* type)
+                const char* str5, const char* str6, const char* type, UInt32 count)
     {
         if (m_ulog)
         {
             m_ulog->SetUserMsg(umsg);
-            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type);
+            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count);
         }
     }
 
@@ -977,7 +983,7 @@ namespace GObject
 			_fighters.erase(it);
 			DB().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 			if(r)
-				sendMsgCode(0, 2034);
+				sendMsgCode(0, 1201);
 			SYSMSG_SENDV(111, this, fgt->getColor(), fgt->getName().c_str());
 			SYSMSG_SENDV(1011, this, fgt->getColor(), fgt->getName().c_str());
 
@@ -1436,7 +1442,7 @@ namespace GObject
         buffLeft = 0;
 		if(buffLeft > now)
 		{
-			sendMsgCode(0, 2035, buffLeft - now);
+			sendMsgCode(0, 1407, buffLeft - now);
 			return false;
 		}
 		checkLastBattled();
@@ -1481,16 +1487,20 @@ namespace GObject
 		{
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
-			if(getBuffData(PLAYER_BUFF_TRAINP3, now))
-				pendExp(ng->getExp() * 17 / 10);
-			else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
-				pendExp(ng->getExp() * 3 / 2);
-			else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
-				pendExp(ng->getExp() * 3 / 2);
-			else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
-				pendExp(ng->getExp() * 13 / 10);
-			else
-				pendExp(ng->getExp());
+
+            if (!(ng->getLevel() > GetLev() && ng->getLevel() - GetLev() >= 10))
+            {
+                if(getBuffData(PLAYER_BUFF_TRAINP3, now))
+                    pendExp(ng->getExp() * 17 / 10);
+                else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
+                    pendExp(ng->getExp() * 3 / 2);
+                else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
+                    pendExp(ng->getExp() * 3 / 2);
+                else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
+                    pendExp(ng->getExp() * 13 / 10);
+                else
+                    pendExp(ng->getExp());
+            }
 			ng->getLoots(this, _lastLoot);
 		}
 		else
@@ -1529,7 +1539,7 @@ namespace GObject
         buffLeft = 0;
 		if(buffLeft > now)
 		{
-			sendMsgCode(0, 2035, buffLeft - now);
+			sendMsgCode(0, 1407, buffLeft - now);
 			return false;
 		}
 		checkLastBattled();
@@ -1593,7 +1603,7 @@ namespace GObject
 		GData::NpcGroup * ng = it->second;
 		if(GetLev() < ng->getLevel())
 		{
-			sendMsgCode(0, 2005);
+			sendMsgCode(0, 1151);
 			return false;
 		}
 		const UInt32 eachBattle = 60;
@@ -1915,7 +1925,7 @@ namespace GObject
 		Mutex::ScopedLock lk(_mutex);
 		if(_friends[1].size() >= 20)
 		{
-			sendMsgCode(2, 2085);
+			sendMsgCode(2, 1505);
 			return false;
 		}
 		if(pl == NULL || _hasBlock(pl))
@@ -2474,8 +2484,8 @@ namespace GObject
 		Stream st(REP::TRAIN_FIGHTER_OP);
 		st << id << static_cast<UInt8>(2) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
-		if (notify)
-			sendMsgCode(0, 2088, id);
+		//if (notify)
+		//	sendMsgCode(0, 2088, id);
 
 		return true;
 	}
@@ -2504,7 +2514,7 @@ namespace GObject
 			price = time * golds[fgt->getLevel()]; 
 			if (getGold() < price)
 			{
-				sendMsgCode(0, 2008);
+				sendMsgCode(0, 1101);
 				return false;
 			}
 			useGold(price, &ci);
@@ -2515,7 +2525,7 @@ namespace GObject
 			price = time * taels[fgt->getLevel()];
 			if (getTael() < price)
 			{
-				sendMsgCode(0, 2007);
+				sendMsgCode(0, 1100);
 				return false;
 			}
 			useTael(price, &ci);
@@ -3213,7 +3223,7 @@ namespace GObject
         if (type || first) {
             if (ftype) {
                 if (getGold() < 2) {
-                    sendMsgCode(1, 1007);
+                    sendMsgCode(1, 1101);
                     return;
                 }
             }
@@ -3361,7 +3371,7 @@ namespace GObject
 
 		if(_playerData.gold < maxGold)
 		{
-			sendMsgCode(1, 2029);
+			sendMsgCode(1, 1101);
 			return;
 		}
 
@@ -3372,7 +3382,7 @@ namespace GObject
 
         if(count > 0 && globalFighters.getColorFighterNum(extraRefresh ? 0 : 1, color) == getColorFighterNum(color))
         {
-			sendMsgCode(0, 2006);
+			sendMsgCode(0, 1200);
             return;
         }
 
@@ -3551,13 +3561,13 @@ namespace GObject
 			return 0;
 		if(isFighterFull())
 		{
-			sendMsgCode(0, 2006);
+			sendMsgCode(0, 1200);
 			return 0;
 		}
 		UInt32 price = getTavernPrice(_playerData.tavernId[idx]);
 		if(_playerData.tael < price)
 		{
-			sendMsgCode(0, 2009);
+			sendMsgCode(0, 1100);
 			return 0;
 		}
 		Fighter * fgt = takeFighter(_playerData.tavernId[idx], true);
@@ -4461,7 +4471,7 @@ namespace GObject
 		Mutex::ScopedLock lk2(pl->getMutex());
 		if(isFriendFull())
 		{
-			sendMsgCode(2, 2083);
+			sendMsgCode(2, 1503);
 			return false;
 		}
 		if(_hasFriend(pl))
@@ -4470,29 +4480,33 @@ namespace GObject
 		}
 		if(_hasBlock(pl))
 		{
-			sendMsgCode(2, 2080);
+			sendMsgCode(2, 1500);
 			return false;
 		}
+#if 0
 		if(_hasFoe(pl))
 		{
-			sendMsgCode(2, 2081);
+			sendMsgCode(2, 1500);
 			return false;
 		}
+#endif
 		if(pl->isFriendFull())
 		{
-			sendMsgCode(2, 2084);
+			sendMsgCode(2, 1504);
 			return false;
 		}
 		if(pl->_hasBlock(this))
 		{
-			sendMsgCode(2, 2082);
+			sendMsgCode(2, 1502);
 			return false;
 		}
+#if 0
 		if(pl->_hasFoe(this))
 		{
-			sendMsgCode(2, 2082);
+			sendMsgCode(2, 1500);
 			return false;
 		}
+#endif
 		return true;
 	}
 
@@ -4646,14 +4660,14 @@ namespace GObject
 			return false;
 		if(_bossLevel % 4 == 0 && GetFreePackageSize() < 1)
 		{
-			sendMsgCode(0, 2016);
+			sendMsgCode(0, 1011);
 			return false;
 		}
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(buffLeft > now)
 		{
-			sendMsgCode(0, 2035, buffLeft - now);
+			sendMsgCode(0, 1407, buffLeft - now);
 			return false;
 		}
 
@@ -4837,7 +4851,7 @@ namespace GObject
 
             if(type > 0 && _playerData.tael < money)
             {
-                sendMsgCode(1, 1006);
+                sendMsgCode(1, 1100);
                 return;
             }
 
@@ -4914,12 +4928,12 @@ namespace GObject
 		UInt32 price = getBookPriceById(iid);
 		if(_playerData.tael < price)
 		{
-			sendMsgCode(0, 1006);
+			sendMsgCode(0, 1100);
 			return 0;
 		}
 		if(!m_Package->AddItem(iid, 1))
 		{
-			sendMsgCode(2, 1010);
+			sendMsgCode(2, 1011);
 			return 0;
 		}
 		_playerData.bookStore[idx] = 0;
@@ -5096,12 +5110,6 @@ namespace GObject
         return 0.0;
     }
 
-    void Player::setCountry(UInt8 cny)
-    {
-        _playerData.country = cny;
-		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, _id);
-    }
-
     bool Player::OperationTaskAction(int type)
     {
         switch (type)
@@ -5113,6 +5121,12 @@ namespace GObject
                 break;
         }
         return true;
+    }
+
+    void Player::setCountry(UInt8 cny)
+    { 
+        _playerData.country = cny;
+		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, getId());
     }
 
 }

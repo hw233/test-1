@@ -670,7 +670,7 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 					return;
 				if (clan->getClanBattle()->isInBattling())
 				{
-					player->sendMsgCode(0, 2210);
+					player->sendMsgCode(0, 1317);
 					return;
 				}
 				struct DonateItems
@@ -817,7 +817,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 			GObject::Clan * allyClan = GObject::globalGlobalNamedClans[player->fixName(clanName)];
 			if (allyClan == NULL)
 			{
-				player->sendMsgCode(0, 2220);
+				//player->sendMsgCode(0, 2220);
 				return;
 			}
 			if (clan == allyClan)
@@ -826,7 +826,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 				return;
 			if (allyClan->getClanBattle()->isInBattling() || clan->getClanBattle()->isInBattling())
 			{
-				player->sendMsgCode(0, 2210);
+				player->sendMsgCode(0, 1317);
 				r = false;
 			}
 			if (!clan->hasClanAuthority(player, 5))
@@ -841,17 +841,17 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 						if (clan->hasAllyClan())
 						{
 							r = false;
-							player->sendMsgCode(0, 2211);
+							//player->sendMsgCode(0, 2211);
 						}
 						if (clan->hasEnemyClan(allyClan))
 						{
 							r = false;
-							player->sendMsgCode(0, 2230);
+							//player->sendMsgCode(0, 2230);
 						}
 						if (r && allyClan->hasAllyClan())
 						{
 							r = false;
-							player->sendMsgCode(0, 2212);
+							//player->sendMsgCode(0, 2212);
 						}
 						if (r)
 						{
@@ -887,12 +887,12 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 						if (clan->hasEnemyClan(allyClan))
 						{
 							r = false;
-							player->sendMsgCode(0, 2232);
+							//player->sendMsgCode(0, 2232);
 						}
 						if (clan->hasAllyClan(allyClan))
 						{
 							r = false;
-							player->sendMsgCode(0, 2231);
+							//player->sendMsgCode(0, 2231);
 						}
 						if (r)
 							clan->addEnemyClan(player, allyClan);
