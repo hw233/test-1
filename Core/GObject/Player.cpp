@@ -1491,7 +1491,7 @@ namespace GObject
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
 
-            if (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10)
+            if (ng->getLevel() < GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     pendExp(ng->getExp() * 17 / 10);
