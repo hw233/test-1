@@ -2,9 +2,15 @@
 #export LD_LIBRARY_PATH=/opt/app/mysql/lib/mysql/:/opt/app/libevent/lib
 #echo "1" > /proc/sys/kernel/core_uses_pid
 #ulimit -n 16384 -c unlimited
+ulimit -S -c unlimited
+ID=00001
+PORT=8000
 while true
 do
 #  valgrind --tool=memcheck --leak-check=full bin/Debug/Server.ASSS 2>`date +memcheck_%y%m%d_%H%M%S`
-  bin/Debug/Server.ASSS
-  sleep 1
+    xxx=`netstat -tnlp |grep ":$PORT"|awk '{print $7}'|awk -F"/" '{print $1}'`
+    if [ "$xxx" != "" ]; then sleep 3; continue; fi;
+    if [ -f bin/Release/Server.ASSS ]; then mv -f bin/Release/Server.ASSS bin/Release/Server.$ID; fi
+    bin/Release/Server.$ID
+    sleep 3
 done

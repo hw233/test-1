@@ -127,11 +127,15 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
+#if 0
     {
         UInt32 count = LOGIN().Count();
         LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 登陆流水号: %d, 当前在线人数: %d\n",
                 player->getId(), count, LOGIN().Current());
     }
+#else
+        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 返回码: %d\n", res);
+#endif
 
 	return res;
 }

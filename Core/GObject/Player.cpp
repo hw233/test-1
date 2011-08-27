@@ -982,7 +982,7 @@ namespace GObject
 			Fighter * fgt = it->second;
 			ItemEquip * equip;
 			for(UInt8 z = 1; z < 9; ++ z)
-				m_Package->EquipTo(0, fgt, z, equip, true);
+				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
 			_fighters.erase(it);
 			DB().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 			if(r)
@@ -1491,7 +1491,7 @@ namespace GObject
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
 
-            if (ng->getLevel() < GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
+            if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     pendExp(ng->getExp() * 17 / 10);

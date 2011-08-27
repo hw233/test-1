@@ -90,7 +90,14 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
 	DBLOG().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %"I64_FMT"u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
+
     tripod.getTripodData(player); // XXX: 完家登陆之后如果没有九疑鼎数据则新建
+
+    {
+        UInt32 count = LOGIN().Count();
+        LOGIN().GetLog()->OutInfo("来自[%s]用户[%"I64_FMT"u]登陆[%05u]成功, 登陆流水号: %d, 当前在线人数: %d\n",
+                inet_ntoa(ip), player->getId(), cfg.serverNum, count, LOGIN().Current());
+    }
 }
 
 void PlayerReconnect( GameMsgHdr& hdr, const void * data )
