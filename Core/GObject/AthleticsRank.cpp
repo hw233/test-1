@@ -113,6 +113,11 @@ void AthleticsRank::updateBatchRanker(UInt8 row, Rank rank1, Rank rank2)
 void AthleticsRank::addAthleticsFromDB(UInt8 row, AthleticsRankData * data)
 {
 	_maxRank[row] = std::max(_maxRank[row], data->rank);
+    if(data->oldrank == 0)
+    {
+        data->oldrank = data->rank;
+    }
+
 	_ranks[row][data->ranker] = _athleticses[row].insert(_athleticses[row].end(), data);
 }
 
@@ -157,7 +162,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
         data->bewinstreak = 0;
         data->failstreak = 0;
         data->befailstreak = 0;
-        data->oldrank = 0;
+        data->oldrank = data->rank;
         data->first4rank = 0;
         data->extrachallenge = 0;
 		Rank rank = _athleticses[row].insert(_athleticses[row].end(), data);
@@ -1529,7 +1534,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.7);
             setAthleticsFirst4Rank(atker, 0x200);
         }
-        else if( getAthleticsRankUpADay(atker) > 49 && 0 == getAthleticsFirst4Rank(atker, 0x400) )     //一天内提升50个排名
+        else if( getAthleticsRankUpADay(atker) > 49 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x400) )     //一天内提升50个排名
         {
             cond = 15;
             color = 3;
@@ -1539,7 +1544,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.9);
             setAthleticsFirst4Rank(atker, 0x400);
         }
-        else if( getAthleticsRankUpADay(atker) > 19 && 0 == getAthleticsFirst4Rank(atker, 0x800) )    //一天内提升20个排名
+        else if( getAthleticsRankUpADay(atker) > 19 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x800) )    //一天内提升20个排名
         {
             cond = 15;
             color = 2;
