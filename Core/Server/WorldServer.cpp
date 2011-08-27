@@ -78,6 +78,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
         srand(time(NULL));
         cfg.serverNum = cfg.tcpPort+rand()%1000;
     }
+    else
+        cfg.serverNum = num;
 
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();

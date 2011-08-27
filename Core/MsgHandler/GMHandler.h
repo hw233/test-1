@@ -95,6 +95,7 @@ private:
     void OnWorldAnnounce(GObject::Player *, std::vector<std::string>&);
     void OnGmCheck(GObject::Player *player, std::vector<std::string>&);
     void OnMoney2All(GObject::Player *player, std::vector<std::string>&);
+    void OnKick(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;
