@@ -129,7 +129,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
-        if (pl->attackCopyNpc(fgtid)) {
+        if (pl->attackCopyNpc(fgtid, 1, id)) {
             bool nextfloor = false;
             if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
                 nextfloor = true;
