@@ -29,7 +29,11 @@ static UInt8 getPosition(UInt16 loc)
 	if(loc > 5)
 		return 1;
 #endif
-    UInt16 pos = GObject::GObjectManager::getBattleScene(loc >> 8);
+    UInt16 tmp = loc;
+    if(loc < static_cast<UInt16>(0xF000))
+        tmp = loc >> 8;
+
+    UInt16 pos = GObject::GObjectManager::getBattleScene(tmp);
 	return static_cast<UInt8>(pos);
 }
 

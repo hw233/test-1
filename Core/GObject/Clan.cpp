@@ -481,6 +481,8 @@ bool Clan::apply( Player * player, UInt32 optime, bool writedb )
 	if(player->getClan() != NULL)
 		return false;
 
+    Mutex::ScopedLock lk(_mutex);
+
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if(it != _pending.end() && (*it)->cls == 16)
 		return false;
@@ -503,7 +505,6 @@ bool Clan::apply( Player * player, UInt32 optime, bool writedb )
 	{
 		DB().PushUpdateData("INSERT INTO `clan_pending_player` (`id`, `playerId`, `class`, `optime`) VALUES (%u, %"I64_FMT"u, 16, %u)", _id, player->getId(), cpm->opTime);
 
-		Mutex::ScopedLock lk(_mutex);
 		if(_members.size() > 0)
 		{
 			ClanMember * leader = (*_members.begin());
@@ -893,6 +894,7 @@ void Clan::listMembers( Player * player )
 
 void Clan::listPending( Player * player )
 {
+	Mutex::ScopedLock lk(_mutex);
 	purgePending();
 	Stream st(REP::CLAN_MEMBER_LIST);
 	UInt8 c = 0;

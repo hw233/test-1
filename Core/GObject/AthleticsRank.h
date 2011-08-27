@@ -69,6 +69,7 @@ struct AthleticsRankData
     // 0x400 一天内提升10个排名
     // 0x800 一天内提升50个排名
     // 0x1000 失去10强排名
+    // 0x2000 夺得10强排名
 };
 
 struct AthleticsAward
@@ -172,6 +173,7 @@ public:
 	void TmExtraAward();
 
 protected:
+
 	inline UInt8 getRankRow(UInt8 lev)
 	{
 		if (lev > 45)
@@ -180,6 +182,8 @@ protected:
 			return 0;
 		return 0xFF;
 	}
+
+
 	inline UInt16 getRankPos(UInt8 row, Rank rank)
 	{
 		return std::distance(_athleticses[row].begin(), rank) + 1;	//FIXME

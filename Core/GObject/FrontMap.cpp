@@ -181,7 +181,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
-        if (pl->attackCopyNpc(fgtid)) {
+        if (pl->attackCopyNpc(fgtid, 0, id)) {
             ret = true;
         }
 
