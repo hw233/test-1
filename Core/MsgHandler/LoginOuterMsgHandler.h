@@ -134,7 +134,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
                 player->getId(), count, LOGIN().Current());
     }
 #else
-        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 返回码: %d\n", res);
+        LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 返回码: %u\n", player->getId(), res);
 #endif
 
 	return res;
