@@ -138,6 +138,11 @@ UInt8 Dungeon::playerContinue( Player * player )
 	if(it == _players.end())
 		return 1;
 
+    UInt32 viplvl = player->getVipLevel();
+    UInt8 extraCount = _extraCount[viplvl];
+    if(PLAYER_DATA(player, dungeonCnt) >= _maxCount + extraCount)
+        return 2;
+
 	enterLevel(player, it->second.level);
 	sendDungeonLevelData(player, it->second);
 	return 0;
