@@ -123,6 +123,8 @@ GMHandler::GMHandler()
     Reg(3, "gmc", &GMHandler::OnGmCheck);
     Reg(3, "m2a", &GMHandler::OnMoney2All);
     Reg(3, "kick", &GMHandler::OnKick);
+    Reg(3, "count", &GMHandler::OnCount);
+    Reg(3, "wc", &GMHandler::OnCount);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -785,6 +787,8 @@ void GMHandler::OnPlayerInfo( GObject::Player * player, std::vector<std::string>
 	SYSMSG_SENDV(602, player, PLAYER_DATA(pl, gold), PLAYER_DATA(pl, coupon));
 	SYSMSG_SENDV(603, player, PLAYER_DATA(pl, tael), PLAYER_DATA(pl, coin));
 	SYSMSG_SENDV(612, player, pl->isOnline()?"YES":"NO");
+	SYSMSG_SENDV(613, player, PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt));
+	SYSMSG_SENDV(614, player, PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl, frontGoldCnt));
 }
 
 void GMHandler::OnCharInfo( GObject::Player * player, std::vector<std::string>& args )
@@ -2132,30 +2136,30 @@ void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
         return;
 
     UInt64 playerId = atol(args[0].c_str());
-
-    Stream st;
-    st.init(REP::RECONNECT, 0x01);
-    st<<playerId;
 	GObject::Player * pl= GObject::globalPlayers[playerId];
-    if(pl==NULL)
+    if (pl) 
     {
-        st<<static_cast<UInt32>(1);
-    }
-    else
-    {
-        if(pl->isOnline())
+        TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
+        if (conn)
         {
-            st<<static_cast<UInt32>(0);
-            TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
-            if(conn.get() == NULL)
-                return;
             Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
-            cl->closeConn();
+            if (cl)
+            {
+                pl->SetSessionID(-1);
+                pl->testBattlePunish();
+                static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
+                cl->send(kick_pkt, 4);
+                cl->SetPlayer(NULL);
+                cl->pendClose();
+            }
         }
-        else
-            st<<static_cast<UInt32>(2);
     }
-    st<<Stream::eos;
-    NETWORK()->SendMsgToClient(pl->GetSessionID(),st);
+}
+
+void GMHandler::OnCount(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+	SYSMSG_SENDV(620, player, SERVER().GetTcpService()->getOnlineNum());
 }
 

@@ -113,6 +113,12 @@ void PlayerLogout( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	player->Logout();
+	player->SetSessionID(-1);
+    {
+        LOGIN().Logout();
+        LOGIN().GetLog()->OutInfo("用户[%s][%"I64_FMT"u]正常退出游戏, 当前在线人数: %d\n",
+                player->getName().c_str(), player->getId(), LOGIN().Current());
+    }
 }
 
 void PlayerExpAdd( GameMsgHdr& hdr, const void * data )
