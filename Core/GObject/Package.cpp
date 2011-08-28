@@ -2285,6 +2285,7 @@ namespace GObject
 
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
+
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if (equip == NULL) return 2;
 		bool isBound = equip->GetBindStatus();

@@ -1469,7 +1469,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 			int win = 0;
 			for(int i = 0; i < count; ++ i)
 			{
-				Battle::BattleSimulator bsim(0x8FFF, pl1, pl2);
+				Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, pl1, pl2);
 				pl1->PutFighters( bsim, 0, true );
 				pl2->PutFighters( bsim, 1, true );
 				bsim.start();
@@ -1479,7 +1479,7 @@ void GMHandler::OnChallenge( GObject::Player * player, std::vector<std::string>&
 			return;
 		}
 	}
-	Battle::BattleSimulator bsim(0x8FFF, pl1, pl2);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, pl1, pl2);
 	pl1->PutFighters( bsim, 0, true );
 	pl2->PutFighters( bsim, 1, true );
 	bsim.start();

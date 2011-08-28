@@ -304,17 +304,17 @@ bool Clan::leave(Player * player)
 	if (found == _members.end())
 		return false;
 	ClanMember * member = (*found);
-	if (_members.size() == 1 && _clanBattle->isInBattling())
+	if (_clanBattle->isInBattling())
 	{
 		player->sendMsgCode(0, 1317);
 		return false;
 	}
     getAllocBack(*member);
 	// std::string oldLeaderName = (*_members.begin())->player->getName();
-    if( player == getOwner())
+    if( player == getOwner() && _members.size() != 1)
     {
-        // XXX 帮主不能退出帮派
-		//player->sendMsgCode(0, 2235);
+        // XXX 帮主不能退出帮派, 帮派只剩下帮主一人时，可解散帮派
+		player->sendMsgCode(0, 1318);
         return false;
     }
 
@@ -955,12 +955,12 @@ void Clan::appendListInfo( Stream& st )
 	if(owner == NULL)
 	{
 		st << _id << _name << ""
-			<< static_cast<UInt8>(0) << getLev() << static_cast<UInt8>(getCount());
+			<< static_cast<UInt8>(0) << getLev() << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount());
 	}
 	else
 	{
 		st << _id << _name << owner->getName()
-			<< owner->getCountry() << getLev() << static_cast<UInt8>(getCount());
+			<< owner->getCountry() << getLev() << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount());
 	}
 }
 
@@ -2516,11 +2516,20 @@ bool clanEnum(Clan * clan, EnumStruct * es)
 	return true;
 }
 
-void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt )
+void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt, UInt8 cny )
 {
-	UInt8 cny = player->getCountry();
+	//UInt8 cny = player->getCountry();
 	Stream st(REP::CLAN_REQ_LIST);
-	UInt16 sz = globalClansByCountry[cny].size();
+    UInt16 sz = 0;
+    if(cny > 1)
+    {
+        sz = globalClans.size();
+    }
+    else
+    {
+        sz = globalClansByCountry[cny].size();
+    }
+
 	if(idx >= sz)
 	{
 		idx = sz;
@@ -2535,7 +2544,10 @@ void ClanCache::listAll( Player * player, UInt16 idx, UInt8 cnt )
 	st << sz << idx << cnt;
 
 	EnumStruct es = {st, 0, idx, static_cast<UInt16>(idx + cnt)};
-	globalClansByCountry[cny].enumerate(clanEnum, &es);
+    if(cny > 1)
+        globalClans.enumerate(clanEnum, &es);
+    else
+        globalClansByCountry[cny].enumerate(clanEnum, &es);
 	st << Stream::eos;
 	player->send(st);
 }
@@ -2636,7 +2648,7 @@ void Clan::addClanFunds(UInt32 funds)
         _funds += funds;
 
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(7) << _funds;
+        st << static_cast<UInt8>(8) << _funds;
         st << Stream::eos;
         broadcast(st);
 
@@ -2651,7 +2663,7 @@ void Clan::useClanFunds(UInt32 funds)
         _funds -= funds;
 
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(7) << _funds;
+        st << static_cast<UInt8>(8) << _funds;
         st << Stream::eos;
         broadcast(st);
 

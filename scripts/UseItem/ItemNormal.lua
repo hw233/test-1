@@ -4588,6 +4588,153 @@ function ItemNormal_formation(iid, num, bind, param)
     return true
 end
 
+function ItemNormal_athletics_22(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local roll = math.random(1, 100);
+    local itemId = 0;
+
+    package:DelItemSendMsg(22, player);
+    if roll < 21 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了礼券10");
+        player:getCoupon(10);
+    elseif roll < 41 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了[4:55]");
+		itemId = 55;
+    elseif roll < 61 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了银币500");
+        player:getTael(500);
+    elseif roll < 81 then
+        local gemSize = table.getn(Gem_Level_1);
+        itemId = Gem_Level_1[math.random(1, gemSize)];
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了[4:"..itemId.."]");
+    else
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了礼券20");
+        player:getCoupon(20);
+    end
+
+    if itemId ~= 0 then
+        package:AddItem(itemId, 1, true, 0, 2);
+    end
+
+    return true;
+end
+
+function ItemNormal_athletics_23(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local roll = math.random(1, 100);
+    local itemId = 0;
+
+    package:DelItemSendMsg(23, player);
+    if roll < 21 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了礼券30");
+        player:getCoupon(30);
+    elseif roll < 41 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了[4:511]");
+		itemId = 511;
+    elseif roll < 61 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了银币2000");
+        player:getTael(2000);
+    elseif roll < 81 then
+        local gemSize = table.getn(Gem_Level_2);
+        itemId = Gem_Level_2[math.random(1, gemSize)];
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了[4:"..itemId.."]");
+    else
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了礼券50");
+        player:getCoupon(50);
+    end
+
+    if itemId ~= 0 then
+        package:AddItem(itemId, 1, true, 0, 2);
+    end
+
+    return true;
+end
+
+function ItemNormal_athletics_24(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local roll = math.random(1, 100);
+    local itemId = 0;
+
+    package:DelItemSendMsg(24, player);
+    if roll < 21 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60");
+        player:getCoupon(60);
+    elseif roll < 41 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币10000");
+        player:getTael(10000);
+    elseif roll < 61 then
+		itemId = 506;
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:506]");
+    elseif roll < 81 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:508]");
+		itemId = 508;
+    else
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券90");
+        player:getCoupon(90);
+    end
+
+    if itemId ~= 0 then
+        package:AddItem(itemId, 1, true, 0, 2);
+    end
+
+    return true;
+end
+
+function ItemNormal_athletics_25(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 1 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local roll = math.random(1, 100);
+    local itemId = 0;
+
+    package:DelItemSendMsg(25, player);
+    if roll < 21 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100");
+        player:getCoupon(100);
+    elseif roll < 41 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币20000");
+        player:getTael(20000);
+    elseif roll < 61 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:507]");
+		itemId = 507;
+    elseif roll < 81 then
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:509]");
+		itemId = 509;
+    else
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200");
+        player:getCoupon(200);
+    end
+
+    if itemId ~= 0 then
+        package:AddItem(itemId, 1, true, 0, 2);
+    end
+
+    return true;
+end
+
+
 local ItemNormal_Table = {
   [7001] = ItemNormal_00007xxx,
   [7002] = ItemNormal_00007xxx,
@@ -4920,7 +5067,13 @@ local ItemNormal_Table = {
     [1008] = ItemNormal_formation,
     [1009] = ItemNormal_formation,
     [1010] = ItemNormal_formation,
-    [1011] = ItemNormal_formation
+    [1011] = ItemNormal_formation,
+
+    --竞技场宝箱
+    [22] = ItemNormal_athletics_22,
+    [23] = ItemNormal_athletics_23,
+    [24] = ItemNormal_athletics_24,
+    [25] = ItemNormal_athletics_25
 };
 
 function RunItemNormalUse(itemId, num, bind, param)

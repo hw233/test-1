@@ -16,18 +16,21 @@ namespace Battle
 
 static UInt8 getPosition(UInt16 loc)
 {
+#if 0
 	if(loc == 0x6FFF)
 		return 6;
 	if(loc == 0x7FFF)
 		return 7;
 	if(loc == 0x8FFF)
 		return 8;
-	loc >>= 12;
+	loc >>= 8;
 	if(loc > 6)
 		return 3;
 	if(loc > 5)
 		return 1;
-	return static_cast<UInt8>(loc);
+#endif
+    UInt16 pos = GObject::GObjectManager::getBattleScene(loc >> 8);
+	return static_cast<UInt8>(pos);
 }
 
 BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, const std::string& name2, UInt8 level2, bool rpt, UInt32 fr): BattleField(), _id(rpt ? IDGenerator::gBattleOidGenerator.ID() : 0), _winner(0), _turns(0), _report(rpt), _fake_turns(fr), _formula(Script::BattleFormula::getCurrent())

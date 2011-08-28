@@ -93,6 +93,7 @@ const std::string& Fighter::getBattleName()
 
 UInt16 Fighter::getWeaponAttack()
 {
+    //TODO
 	static UInt16 atk_enc[] = {0, 10, 20, 40, 60, 100, 200, 300, 450, 600, 800, 1050, 1500};
 	return _weapon ? (atk_enc[_weapon->getItemEquipData().enchant]) : 0;
 }
@@ -1073,6 +1074,14 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
 		pos = 7;
 		return _ring;
 	}
+    for(int idx = 0; idx < TRUMP_UPMAX; ++ idx)
+    {
+        if(_trump[idx] != NULL && _trump[idx]->getId() == id)  // 法宝
+        {
+            pos = idx + 1;
+            return _trump[idx];
+        }
+    }
 	return NULL;
 }
 
@@ -2385,6 +2394,22 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 	{
     case 0:
     case 1:
+        {
+            int a = uRand(10);
+            int b = uRand(10);
+            int c = uRand(10);
+            int d = uRand(10);
+            UInt16 roll = a + b*10 + c*100+ d*1000;
+            for(int i = 0; i < 4; ++ i)
+            {
+                if(roll < GObject::GObjectManager::getColorFighterChance(type, i))
+                {
+                    color = i;
+                    colors = 1;
+                    break;
+                }
+            }
+        }
         free_gold = type;
         break;
 	case 2:
@@ -2401,6 +2426,8 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 		break;
 	}
 
+    if(color == 3 && colors != 1)
+        printf("color = %d, colors=%d\n", color, colors);
 	//UInt32 fgtId = GameAction()->onTavernFlush(color);
 	//if(fgtId > 0 && !pl->hasFighter(fgtId) && excepts.find(fgtId) == excepts.end())
 	//{
@@ -2463,6 +2490,8 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
         {
             if(r < it->second)
             {
+                int a = it->first;
+                Fighter* fighter = _fighters[it->first].fighter;
                 return _fighters[it->first].fighter;
             }
             r -= it->second;

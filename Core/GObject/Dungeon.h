@@ -89,6 +89,9 @@ public:
 	static UInt16 * getPrice(size_t& size);
 	static void setExtraCount(UInt32 idx, UInt8 count);
 
+    static UInt8 getMaxCount() { return _maxCount; };
+	static UInt8 getExtraCount(UInt32 viplvl) { return _extraCount[viplvl]; }
+
     void doJusticeRoar(Player*);
 public:
 	void pushEnterCountBS(UInt32 now);

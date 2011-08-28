@@ -1920,7 +1920,7 @@ void ClanCityBattle::configClanBattleCheck()
 
 bool ClanCityBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer * cbDefer)
 {
-	Battle::BattleSimulator bsim(0x7FFF, cbAtker->player, cbDefer->player);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, cbAtker->player, cbDefer->player);
 	cbAtker->player->PutFighters( bsim, 0 );
 	cbDefer->player->PutFighters( bsim, 1 );
 	bsim.start();
@@ -2051,7 +2051,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 		atker->send(_attackClanBattlerStream);
 		return false;
 	}
-	Battle::BattleSimulator bsim(0x7FFF, atker, cbDefer->player);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, cbDefer->player);
 	atker->PutFighters( bsim, 0 );
 	cbDefer->player->PutFighters( bsim, 1 );
 	bsim.start();
@@ -3196,7 +3196,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 		return false;
 	}
 	UInt32 oldHp = 0, newHp = 0;
-	Battle::BattleSimulator bsim(0x7FFF, atker, cbDefer->player);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, cbDefer->player);
 	atker->PutFighters( bsim, 0 );
 	cbDefer->player->PutFighters( bsim, 1 );
 	bsim.start();
@@ -3362,7 +3362,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 
 bool ClanRobBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer * cbDefer)
 {
-	Battle::BattleSimulator bsim(0x7FFF, cbAtker->player, cbDefer->player);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, cbAtker->player, cbDefer->player);
 	cbAtker->player->PutFighters( bsim, 0 );
 	cbDefer->player->PutFighters( bsim, 1 );
 	bsim.start();
@@ -3607,7 +3607,7 @@ bool ClanRobBattle::attackMonster(Player * atker, std::string& name, UInt32& tur
 		return false;
 	UInt32 oldHp = 0, newHp = 0;
 	ClanRobHoldMonster * chm = static_cast<ClanRobHoldMonster *>(monster);
-	Battle::BattleSimulator bsim(0x7FFF, atker, chm->name, chm->level, false);
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, chm->name, chm->level, false);
 	atker->PutFighters(bsim, 0);
 	std::vector<GData::NpcFData>& nflist = chm->assist->getList();
 	size_t size = nflist.size();

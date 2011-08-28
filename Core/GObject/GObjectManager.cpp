@@ -93,6 +93,10 @@ namespace GObject
     float GObjectManager::_counter_max;
     float GObjectManager::_mres_max;
 
+    UInt16 GObjectManager::_color_chance[2][4];
+
+    std::map<UInt16, UInt16> GObjectManager::_battle_scene;
+
 	bool GObjectManager::InitIDGen()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -114,6 +118,8 @@ namespace GObject
 		IDGenerator::gAthleticsRecordOidGenerator.Init(maxId);
 		execu->Extract("SELECT max(`id`) FROM `clan_battler`", maxId);
 		IDGenerator::gClanBatterRecordIDGenerator.Init(maxId);
+		execu->Extract("SELECT max(`id`) FROM `athletics_event`", maxId);
+		IDGenerator::gAthleticsEventOidGenerator.Init(maxId);
 
 		return true;
 	}
@@ -132,6 +138,7 @@ namespace GObject
 		loadClanRobMonster();
 		loadAllPlayers();
 		loadAllAthletics();
+		loadAllAthleticsEvent();
 		unloadEquipments();
 		loadAllFriends();
 		LoadDungeon();
@@ -280,6 +287,34 @@ namespace GObject
 			}
 			map->AddObject(mos);
 		}
+
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        {
+            std::string path = cfg.scriptPath + "Other/BattleScene.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            lua_tinker::table bs_table = lua_tinker::call<lua_tinker::table>(L, "getBattleScene");
+            size_t bs_size = bs_table.size();
+            for(UInt32 i = 0; i < bs_size; i ++)
+            {
+                lua_tinker::table tempTable = bs_table.get<lua_tinker::table>(i + 1);
+                size_t tempSize = tempTable.size();
+                UInt16 first = 0;
+                UInt16 second = 0;
+                if(tempSize > 1)
+                {
+                    first = tempTable.get<UInt16>(1);
+                    second = tempTable.get<UInt16>(2);
+                }
+                else if(tempSize == 1)
+                    first = tempTable.get<UInt16>(1);
+
+                _battle_scene[first] = second;
+            }
+        }
+        lua_close(L);
 
 		return true;
 	}
@@ -717,7 +752,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1452,7 +1487,7 @@ namespace GObject
 		Player * atker, *defer;
 		atker = defer = NULL;
 		DBAthleticsRecordData drd;
-		if(execu->Prepare("SELECT `id`, `atker`, `defer`, `repid`, `time`, `winSide`, `awardType`, `awardAtkerCount` FROM `athletics_record` ORDER BY `time` desc", drd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `atker`, `defer`, `repid`, `time`, `winSide` FROM `athletics_record` ORDER BY `time` desc", drd) != DB::DB_OK)
 			return false;
 		lc.reset(2000);
 		bool ret1, ret2;
@@ -1463,8 +1498,8 @@ namespace GObject
 			defer = globalPlayers[drd.defer];
 			if (atker == NULL || defer == NULL)
 				continue;
-			ret1 = atker->GetAthletics()->addAthleticsDataFromDB(drd.id, 0, defer, drd.winSide, drd.awardType, drd.awardAtkerCount, drd.repid, drd.time);
-			ret2 = defer->GetAthletics()->addAthleticsDataFromDB(drd.id, 1, atker, drd.winSide, drd.awardType, drd.awardAtkerCount, drd.repid, drd.time);
+			ret1 = atker->GetAthletics()->addAthleticsDataFromDB(drd.id, 0, defer, drd.winSide, drd.repid, drd.time);
+			ret2 = defer->GetAthletics()->addAthleticsDataFromDB(drd.id, 1, atker, drd.winSide, drd.repid, drd.time);
 			if (!ret1 && !ret2)
 			{
 				DB().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", drd.id);
@@ -1528,7 +1563,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `boxColor`, `boxType`, `boxCount`, `boxFlushTime`, `winStreak` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1546,18 +1581,51 @@ namespace GObject
 			data->challengenum = dbd.challengeNum;
 			data->challengetime = dbd.challengeTime;
 			//data->boxid = dbd.boxId;
-			data->awardType = dbd.boxtype;
-			data->awardCount = dbd.boxcount;
-			data->boxcolor = dbd.boxcolor;
-			data->boxflushtime = dbd.boxFlushTime;
+			//data->awardType = dbd.boxtype;
+			//data->awardCount = dbd.boxcount;
+			//data->boxcolor = dbd.boxcolor;
+			//data->boxflushtime = dbd.boxFlushTime;
 			//AthleticsRank::buildBoxAward(data->boxid, data->awardType, data->awardCount, data->awardName);
-			data->winstreak = dbd.winStreak;
+            data->prestige = dbd.prestige;
+			data->winstreak = dbd.winstreak;
+            data->bewinstreak = dbd.bewinstreak;
+            data->failstreak = dbd.failstreak;
+            data->befailstreak = dbd.befailstreak;
+            data->oldrank = dbd.oldrank;
+            data->first4rank = dbd.first4rank;
+            data->extrachallenge = dbd.extrachallenge;
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
 		lc.finalize();
 
 		return true;
 	}
+
+	bool GObjectManager::loadAllAthleticsEvent()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		LoadingCounter lc("Loading athletics_event:");
+		DBAthleticsEventData dbed;
+        if(execu->Prepare("SELECT `id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time` FROM `athletics_event` ORDER BY `time` desc", dbed) != DB::DB_OK)
+            return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl1 = globalPlayers[dbed.player1];
+			Player * pl2 = globalPlayers[dbed.player2];
+			if (pl1 == NULL && pl2 == NULL)
+				continue;
+            gAthleticsRank.addAthleticsEventDataFromDB(dbed.row, dbed.id, pl1, pl2, dbed.cond, dbed.color, dbed.value, dbed.itemCount, dbed.itemId, dbed.time);
+		}
+		lc.finalize();
+
+		return true;
+	}
+
+
 
 	bool GObjectManager::delayLoad()
 	{
@@ -2518,6 +2586,18 @@ namespace GObject
 
                 chance = MAKECHANCE(a, b);
                 _capacity_chance.push_back(chance);
+            }
+
+            lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance");
+            size_t ct_size = 2 < ct.size() ? 2 : ct.size();
+            for(UInt8 i = 0; i < ct_size; ++ i)
+            {
+                lua_tinker::table tempTable = ct.get<lua_tinker::table>(i + 1);
+                size_t tempSize = 4 < tempTable.size() ? 4 : tempTable.size();
+                for(UInt8 j = 0; j < tempSize; ++ j)
+                {
+                    _color_chance[i][j] = tempTable.get<UInt32>(j+1);
+                }
             }
 
         }

@@ -374,7 +374,7 @@ public:
 	void push(Clan *, bool = true);
 	void search(Player *, std::string, UInt8 flag);
 	void search2(Player *, std::string);
-	void listAll(Player *, UInt16, UInt8);
+	void listAll(Player *, UInt16, UInt8, UInt8);
 private:
 	void searchInternal(UInt8, std::vector<std::string>&, std::set<Clan *>&);
 	void makeKeywordList(const std::string&, std::vector<std::string>&);

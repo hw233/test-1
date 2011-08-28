@@ -545,11 +545,32 @@ struct DBAthleticsData
 	UInt32 maxRank;
 	UInt8  challengeNum;
 	UInt32 challengeTime;
-	UInt8  boxcolor;
-	UInt8  boxtype;
-	UInt32 boxcount;
-	UInt32 boxFlushTime;
-	UInt8  winStreak;
+	//UInt8  boxcolor;
+	//UInt8  boxtype;
+	//UInt32 boxcount;
+	//UInt32 boxFlushTime;
+    UInt32  prestige;
+	UInt16	winstreak;
+    UInt16   bewinstreak;
+    UInt16   failstreak;
+    UInt16   befailstreak;
+    UInt32  oldrank;
+    UInt32  first4rank;
+    UInt32  extrachallenge;
+};
+
+struct DBAthleticsEventData
+{
+	UInt32 id;
+    UInt8  row;
+    UInt64 player1;
+    UInt64 player2;
+    UInt8  cond;
+    UInt8  color;
+    UInt16 value;
+    UInt8  itemCount;
+    UInt32 itemId;
+	UInt32 time;
 };
 
 struct DBAthleticsRecordData
@@ -560,8 +581,8 @@ struct DBAthleticsRecordData
 	UInt32 repid;
 	UInt32 time;
 	UInt8  winSide;
-	UInt8  awardType;
-	UInt32 awardAtkerCount;
+	//UInt8  awardType;
+	//UInt32 awardAtkerCount;
 };
 
 struct DBSpecialAward
@@ -694,7 +715,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(43)
+SPECIALDEF(45)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -737,6 +758,8 @@ SPECIALDEF(43)
     std::string, formations,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
+    UInt8,  pdata.dungeonCnt,
+    UInt32, pdata.dungeonEnd,
 	UInt32, pdata.created,
 	UInt32, pdata.lockExpireTime
     )
@@ -1279,7 +1302,7 @@ SPECIALDEF(2)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAthleticsData)
-SPECIALDEF(11)
+SPECIALDEF(14)
 (
 	UInt8,  row,
 	UInt32, rank,
@@ -1287,25 +1310,48 @@ SPECIALDEF(11)
 	UInt32, maxRank,
 	UInt8,  challengeNum,
 	UInt32, challengeTime,
-	UInt8,  boxcolor,
-	UInt8,  boxtype,
-	UInt32, boxcount,
-	UInt32, boxFlushTime,
-	UInt8,  winStreak
+	//UInt8,  boxcolor,
+	//UInt8,  boxtype,
+	//UInt32, boxcount,
+	//UInt32, boxFlushTime,
+    UInt32, prestige,
+	UInt16,  winstreak,
+    UInt16,  bewinstreak,
+    UInt16,  failstreak,
+    UInt16,  befailstreak,
+    UInt32, oldrank,
+    UInt32, first4rank,
+    UInt32, extrachallenge
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAthleticsEventData)
+SPECIALDEF(10)
+(
+	UInt32, id,
+    UInt8,  row,
+    UInt64, player1,
+    UInt64, player2,
+    UInt8,  cond,
+    UInt8,  color,
+    UInt16, value,
+    UInt8,  itemCount,
+    UInt32, itemId,
+	UInt32, time
 )
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAthleticsRecordData)
-SPECIALDEF(8)
+SPECIALDEF(6)
 (
 	UInt32, id,
 	UInt64, atker,
 	UInt64, defer,
 	UInt32, repid,
 	UInt32, time,
-	UInt8,	winSide,
-	UInt8,  awardType,
-	UInt32, awardAtkerCount
+	UInt8,	winSide
+	//UInt8,  awardType,
+	//UInt32, awardAtkerCount
 )
 SPECIALEND()
 

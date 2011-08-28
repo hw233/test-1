@@ -11,8 +11,6 @@
 namespace GObject
 {
 
-static const UInt8 GOLDCNT = 3;
-static const UInt8 FREECNT = 2;
 
 void PlayerCopy::sendAllInfo(Player* pl)
 {
@@ -37,6 +35,26 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << count;
     st << Stream::eos;
     pl->send(st);
+}
+
+UInt8 PlayerCopy::getCopySize(Player* pl)
+{
+    if(!pl)
+        return 0;
+
+    return static_cast<UInt8>(m_copys[pl->getId()].size());
+}
+
+void PlayerCopy::buildInfo(Player* pl, Stream& st)
+{
+    if(!pl)
+        return;
+
+    std::map<UInt8, CopyData>& pl_copy = m_copys[pl->getId()];
+    for(std::map<UInt8, CopyData>::iterator it = pl_copy.begin(); it != pl_copy.end(); ++ it )
+    {
+        st << static_cast<UInt8>(it->first);
+    }
 }
 
 void PlayerCopy::enter(Player* pl, UInt8 id)

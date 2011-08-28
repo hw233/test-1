@@ -73,6 +73,8 @@ UInt8 Dungeon::playerEnter( Player * player )
 		dpi = &_players[player];
 		dpi->counterEnd = TimeUtil::SharpDay(1);
 		++ dpi->count;
+		PLAYER_DATA(player, dungeonEnd) = TimeUtil::SharpDay(1);
+        ++ PLAYER_DATA(player, dungeonCnt);
 		sendDungeonInfo(player, *dpi);
 	}
 	else
@@ -84,13 +86,13 @@ UInt8 Dungeon::playerEnter( Player * player )
 		leaveLevel(player, it->second.level);
 		if(it->second.level > 0)
 		{
-			if(cfg.GMCheck && dpi->count >= _maxCount + extraCount)// fix gold less?
+			if(cfg.GMCheck && PLAYER_DATA(player, dungeonCnt) >= _maxCount + extraCount)// fix gold less?
 			{
 			    return 2;
 			}
-			if(dpi->count >= _maxCount)
+			if(PLAYER_DATA(player, dungeonCnt) >= _maxCount)
 			{
-				UInt32 price = _price[dpi->count];
+				UInt32 price = _price[PLAYER_DATA(player, dungeonCnt)];
 				if(price > 0)
 				{
 					if(!player->hasChecked())
@@ -102,7 +104,8 @@ UInt8 Dungeon::playerEnter( Player * player )
 				}
 			}
 
-			++ dpi->count;
+            ++ dpi->count;
+			++ PLAYER_DATA(player, dungeonCnt);
 			sendDungeonInfo(player, *dpi);
 		}
 	}
@@ -170,10 +173,10 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	{
         // TODO: lua function
 		GameAction()->onDungeonLootItemRoll(player, _dungeon->getId(), dpi.level + 1, dm->formated);
-		dgl->getLoot(player, itemId, static_cast<UInt8>(dpi.count < 2 ? 40 : 0));
+		dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA(player, dungeonCnt) < 2 ? 40 : 0));
 	}
 	else
-		dgl->getLoot(player, itemId, static_cast<UInt8>(dpi.count < 2 ? 40 : 0));
+		dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA(player, dungeonCnt) < 2 ? 40 : 0));
 	std::map<UInt16, UInt8> cloots;
 	for(std::vector<GData::LootResult>::iterator iter = player->_lastLoot.begin(); iter < player->_lastLoot.end(); ++ iter)
 	{
@@ -319,7 +322,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	}
 	else
 	{
-		UInt32 seed = TimeUtil::SharpDay(0) + static_cast<UInt32>(player->getId()) + static_cast<UInt32>(player->getId() >> 32) + (static_cast<UInt32>(_id) << 24) + (static_cast<UInt32>(level) << 8) + (static_cast<UInt32>(dpi.count) << 24);
+		UInt32 seed = TimeUtil::SharpDay(0) + static_cast<UInt32>(player->getId()) + static_cast<UInt32>(player->getId() >> 32) + (static_cast<UInt32>(_id) << 24) + (static_cast<UInt32>(level) << 8) + (static_cast<UInt32>(PLAYER_DATA(player, dungeonCnt)) << 24);
 		URandom rnd(seed);
 		UInt8 count;
 		if(dm->minNum < dm->maxNum)
@@ -760,13 +763,14 @@ void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 {
 	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.count << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
+	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level + 1) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
 	player->send(st);
 }
 
 void Dungeon::buildInfo( Player * player, Stream& st )
 {
 	st << _id;
+#if 0
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
 	if(it == _players.end())
@@ -776,6 +780,7 @@ void Dungeon::buildInfo( Player * player, Stream& st )
 		checkForTimeout(player, it->second, true);
 		st << it->second.count << enterCount;
 	}
+#endif
 }
 
 void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
@@ -853,10 +858,12 @@ void Dungeon::updateToDB( Player * player, DungeonPlayerInfo& dpi )
 void Dungeon::checkForTimeout( Player * player, DungeonPlayerInfo& dpi, bool writeDB )
 {
 	UInt32 now = TimeUtil::Now();
-	if(now >= dpi.counterEnd)
+	if(now >= PLAYER_DATA(player, dungeonEnd))
 	{
-		dpi.counterEnd = TimeUtil::SharpDay(1);
-		dpi.count = 0;
+        dpi.counterEnd = TimeUtil::SharpDay(1);
+        dpi.count = 0;
+		PLAYER_DATA(player, dungeonEnd) = dpi.counterEnd;
+		PLAYER_DATA(player, dungeonCnt) = 0;
 		dpi.lootToday.clear();
 		if(writeDB)
 		{

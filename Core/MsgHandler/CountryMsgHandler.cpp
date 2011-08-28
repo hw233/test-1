@@ -109,7 +109,7 @@ MSG_REG(GameMsgHdr, OnFriendListReq);
 MSG_REG(GameMsgHdr, OnFriendOpReq);
 //MSG_REG(GameMsgHdr, OnFriendActReq);
 
-MSG_REG(GameMsgHdr, OnAthleticsDataReq);
+//MSG_REG(GameMsgHdr, OnAthleticsDataReq);
 
 MSG_REG(GameMsgHdr, OnBlockBossReq);
 MSG_REG(GameMsgHdr, OnAttackBlockBossReq);

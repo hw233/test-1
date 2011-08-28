@@ -830,7 +830,7 @@ namespace Script
 	void GameActionLua::onLevelup( Player* player, UInt8 olev, UInt8 nlev )
 	{
 		Call<void>("onLevelup", player, olev, nlev);
-        doAttainment(player, 1000, nlev);
+        doAttainment(player, 10001, nlev);
 	}
 
 	void GameActionLua::onEnchant( Player* player, UInt8 level )
@@ -891,6 +891,7 @@ namespace Script
     }
     void GameActionLua::finishAttainment(Player* pl, UInt16 attainId)
     {
-        call<void>("finishAttainment", pl, attainId);
+        Call<void>("finishAttainment", pl, attainId);
     }
+
 }

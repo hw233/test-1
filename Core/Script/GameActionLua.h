@@ -152,7 +152,6 @@ namespace Script
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
 
-
 	public:
 
 		template <typename R>
