@@ -47,6 +47,100 @@ Orange_Equip_Level_80 = {1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1
 Orange_Equip_Level_90 = {1681, 1682, 1683, 1684, 1685, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1701, 1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1713, 1714}
 Orange_Equip_Level_100 = {1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1729, 1730, 1731, 1732, 1733, 1734, 1741, 1742, 1743, 1744, 1745, 1746, 1747, 1748, 1749, 1750, 1751, 1752, 1753, 1754}
 
+
+
+Athletics_Green_Equip_Level_30 = {
+    2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047}
+Athletics_Blue_Equip_Level_30 = {
+    2208, 2209, 2210, 2211, 2212, 2213, 2214, 2215, 2216, 2217, 2218, 2219, 2220, 2221, 2222, 2223, 2224, 2225, 2226, 2227, 2228, 2229, 2230, 2231}
+
+Athletics_Purple_Equip_Level_40 = {
+    2376, 2377, 2378, 2379, 2380, 2381, 2382, 2383, 2384, 2385, 2386, 2387, 2388, 2389, 2390, 2391, 2392, 2393, 2394, 2395, 2396, 2397, 2398, 2399}
+Athletics_Green_Equip_Level_40 = {
+    2048, 2049, 2050, 2051, 2052, 2053, 2054, 2055, 2056, 2057, 2058, 2059, 2060, 2061, 2062, 2063, 2064, 2065, 2066, 2067, 2068, 2069, 2070, 2071}
+Athletics_Blue_Equip_Level_40 = {
+    2232, 2233, 2234, 2235, 2236, 2237, 2238, 2239, 2240, 2241, 2242, 2243, 2244, 2245, 2246, 2247, 2248, 2249, 2250, 2251, 2252, 2253, 2254, 2255}
+
+Athletics_Purple_Equip_Level_50 = {
+    2400, 2401, 2402, 2403, 2404, 2405, 2406, 2407, 2408, 2409, 2410, 2411, 2412, 2413, 2414, 2415, 2416, 2417, 2418, 2419, 2420, 2421, 2422, 2423}
+Athletics_Green_Equip_Level_50 = {
+    2072, 2073, 2074, 2075, 2076, 2077, 2078, 2079, 2080, 2081, 2082, 2083, 2084, 2085, 2086, 2087, 2088, 2089, 2090, 2091, 2092, 2093, 2094, 2095}
+Athletics_Blue_Equip_Level_50 = {
+    2256, 2257, 2258, 2259, 2260, 2261, 2262, 2263, 2264, 2265, 2266, 2267, 2268, 2269, 2270, 2271, 2272, 2273, 2274, 2275, 2276, 2277, 2278, 2279}
+Athletics_Orange_Equip_Level_50 = {
+    2544, 2545, 2546, 2547, 2548, 2549, 2550, 2551, 2552, 2553, 2554, 2555, 2556, 2557, 2558, 2559, 2560, 2561, 2562, 2563, 2564, 2565, 2566, 2567}
+
+Athletics_Purple_Equip_Level_60 = {
+    2424, 2425, 2426, 2427, 2428, 2429, 2430, 2431, 2432, 2433, 2434, 2435, 2436, 2437, 2438, 2439, 2440, 2441, 2442, 2443, 2444, 2445, 2446, 2447}
+Athletics_Green_Equip_Level_60 = {
+    2096, 2097, 2098, 2099, 2100, 2101, 2102, 2103, 2104, 2105, 2106, 2107, 2108, 2109, 2110, 2111, 2112, 2113, 2114, 2115, 2116, 2117, 2118, 2119}
+Athletics_Blue_Equip_Level_60 = {
+    2280, 2281, 2282, 2283, 2284, 2285, 2286, 2287, 2288, 2289, 2290, 2291, 2292, 2293, 2294, 2295, 2296, 2297, 2298, 2299, 2300, 2301, 2302, 2303}
+Athletics_Orange_Equip_Level_60 = {
+    2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591}
+
+Athletics_Purple_Equip_Level_70 = {
+    2448, 2449, 2450, 2451, 2452, 2453, 2454, 2455, 2456, 2457, 2458, 2459, 2460, 2461, 2462, 2463, 2464, 2465, 2466, 2467, 2468, 2469, 2470, 2471}
+Athletics_Green_Equip_Level_70 = {
+    2120, 2121, 2122, 2123, 2124, 2125, 2126, 2127, 2128, 2129, 2130, 2131, 2132, 2133, 2134, 2135, 2136, 2137, 2138, 2139, 2140, 2141, 2142, 2143}
+Athletics_Blue_Equip_Level_70 = {
+    2304, 2305, 2306, 2307, 2308, 2309, 2310, 2311, 2312, 2313, 2314, 2315, 2316, 2317, 2318, 2319, 2320, 2321, 2322, 2323, 2324, 2325, 2326, 2327}
+
+Athletics_Purple_Equip_Level_80 = {
+    2472, 2473, 2474, 2475, 2476, 2477, 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485, 2486, 2487, 2488, 2489, 2490, 2491, 2492, 2493, 2494, 2495}
+Athletics_Green_Equip_Level_80 = {
+    2144, 2145, 2146, 2147, 2148, 2149, 2150, 2151, 2152, 2153, 2154, 2155, 2156, 2157, 2158, 2159, 2160, 2161, 2162, 2163, 2164, 2165, 2166, 2167}
+Athletics_Blue_Equip_Level_80 = {
+    2328, 2329, 2330, 2331, 2332, 2333, 2334, 2335, 2336, 2337, 2338, 2339, 2340, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351}
+
+Athletics_Purple_Equip_Level_90 = {
+    2496, 2497, 2498, 2499, 2500, 2501, 2502, 2503, 2504, 2505, 2506, 2507, 2508, 2509, 2510, 2511, 2512, 2513, 2514, 2515, 2516, 2517, 2518, 2519}
+Athletics_Green_Equip_Level_90 = {
+    2168, 2169, 2170, 2171, 2172, 2173, 2174, 2175, 2176, 2177, 2178, 2179, 2180, 2181, 2182, 2183, 2184, 2185, 2186, 2187, 2188, 2189, 2190, 2191}
+Athletics_Blue_Equip_Level_90 = {
+    2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 2361, 2362, 2363, 2364, 2365, 2366, 2367, 2368, 2369, 2370, 2371, 2372, 2373, 2374, 2375}
+
+
+Athletics_Purple_Equip_Level_100 = {
+    2520, 2521, 2522, 2523, 2524, 2525, 2526, 2527, 2528, 2529, 2530, 2531, 2532, 2533, 2534, 2535, 2536, 2537, 2538, 2539, 2540, 2541, 2542, 2543}
+
+
+local Athletics_Green_Equip = {
+    [30] = Athletics_Green_Equip_Level_30,
+    [40] = Athletics_Green_Equip_Level_40,
+    [50] = Athletics_Green_Equip_Level_50,
+    [60] = Athletics_Green_Equip_Level_60,
+    [70] = Athletics_Green_Equip_Level_70,
+    [80] = Athletics_Green_Equip_Level_80,
+    [90] = Athletics_Green_Equip_Level_90
+}
+
+Athletics_Blue_Equip = {
+    [30] = Athletics_Blue_Equip_Level_30,
+    [40] = Athletics_Blue_Equip_Level_40,
+    [50] = Athletics_Blue_Equip_Level_50,
+    [60] = Athletics_Blue_Equip_Level_60,
+    [70] = Athletics_Blue_Equip_Level_70,
+    [80] = Athletics_Blue_Equip_Level_80,
+    [90] = Athletics_Blue_Equip_Level_90
+}
+
+Athletics_Purple_Equip = {
+    [40] = Athletics_Purple_Equip_Level_40,
+    [50] = Athletics_Purple_Equip_Level_50,
+    [60] = Athletics_Purple_Equip_Level_60,
+    [70] = Athletics_Purple_Equip_Level_70,
+    [80] = Athletics_Purple_Equip_Level_80,
+    [90] = Athletics_Purple_Equip_Level_90,
+    [100] = Athletics_Purple_Equip_Level_100
+}
+
+Athletics_Orange_Equip = {
+    [50] = Athletics_Orange_Equip_Level_50,
+    [60] = Athletics_Orange_Equip_Level_60
+}
+
+
 Purple_Favor = {5813,5814,5815,5816,5817,5818,5819}
 Orange_Favor = {5820,5821,5822,5823,5824}
 Diety_Favor = {5825, 5826, 5827, 5828}
@@ -4599,22 +4693,32 @@ function ItemNormal_athletics_22(iid, num, bind, param)
     local roll = math.random(1, 100);
     local itemId = 0;
 
+    local level = player:GetLev();
+    level = math.floor((math.floor((level+5) / 10)) * 10)
+    local tmpEquipTable = Athletics_Green_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 90 then
+            tmpEquipTable = Athletics_Green_Equip[90]
+        end
+    end
+
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        package:AddEquip(tmpEquipTable[math.random(1, tmpSize)], 1);
+    end
+
     package:DelItemSendMsg(22, player);
     if roll < 21 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了礼券10");
         player:getCoupon(10);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了[4:55]");
 		itemId = 55;
     elseif roll < 61 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了银币500");
         player:getTael(500);
     elseif roll < 81 then
         local gemSize = table.getn(Gem_Level_1);
         itemId = Gem_Level_1[math.random(1, gemSize)];
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了[4:"..itemId.."]");
     else
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:22]，一道金光扑面而来，获得了礼券20");
         player:getCoupon(20);
     end
 
@@ -4636,22 +4740,33 @@ function ItemNormal_athletics_23(iid, num, bind, param)
     local roll = math.random(1, 100);
     local itemId = 0;
 
+    local level = player:GetLev();
+    level = math.floor((math.floor((level+5) / 10)) * 10)
+    local tmpEquipTable = Athletics_Blue_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 90 then
+            tmpEquipTable = Athletics_Blue_Equip[90]
+        end
+    end
+
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        package:AddEquip(tmpEquipTable[math.random(1, tmpSize)], 1);
+    end
+
+
     package:DelItemSendMsg(23, player);
     if roll < 21 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了礼券30");
         player:getCoupon(30);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了[4:511]");
 		itemId = 511;
     elseif roll < 61 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了银币2000");
         player:getTael(2000);
     elseif roll < 81 then
         local gemSize = table.getn(Gem_Level_2);
         itemId = Gem_Level_2[math.random(1, gemSize)];
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了[4:"..itemId.."]");
     else
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:23]，一道金光扑面而来，获得了礼券50");
         player:getCoupon(50);
     end
 
@@ -4673,22 +4788,45 @@ function ItemNormal_athletics_24(iid, num, bind, param)
     local roll = math.random(1, 100);
     local itemId = 0;
 
+    local level = player:GetLev();
+    level = math.floor((math.floor((level+5) / 10)) * 10)
+    local tmpEquipTable = Athletics_Purple_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 100 then
+            tmpEquipTable = Athletics_Purple_Equip[100]
+        else
+            tmpEquipTable = Athletics_Purple_Equip[40]
+        end
+    end
+
+    local equipId = 0;
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        equipId = tmpEquipTable[math.random(1, tmpSize)];
+    end
+
+
     package:DelItemSendMsg(24, player);
     if roll < 21 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60 和[4:"..equipId.."]");
         player:getCoupon(60);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币10000");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币10000 和[4:"..equipId.."]");
         player:getTael(10000);
     elseif roll < 61 then
 		itemId = 506;
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:506]");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:506] 和[4:"..equipId.."]");
     elseif roll < 81 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:508]");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:508] 和[4:"..equipId.."]");
 		itemId = 508;
     else
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券90");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券90 和[4:"..equipId.."]");
         player:getCoupon(90);
+    end
+
+    if equipId ~= 0 then
+		package:AddEquip(equipId, 1);
     end
 
     if itemId ~= 0 then
@@ -4709,22 +4847,44 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     local roll = math.random(1, 100);
     local itemId = 0;
 
+    local level = player:GetLev();
+    level = math.floor((math.floor((level+5) / 10)) * 10)
+    local tmpEquipTable = Athletics_Orange_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 60 then
+            tmpEquipTable = Athletics_Orange_Equip[60]
+        else
+            tmpEquipTable = Athletics_Orange_Equip[50]
+        end
+    end
+
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        equipId = tmpEquipTable[math.random(1, tmpSize)];
+    end
+
+
     package:DelItemSendMsg(25, player);
     if roll < 21 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100 和[4:"..equipId.."]");
         player:getCoupon(100);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币20000");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币20000 和[4:"..equipId.."]");
         player:getTael(20000);
     elseif roll < 61 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:507]");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:507] 和[4:"..equipId.."]");
 		itemId = 507;
     elseif roll < 81 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:509]");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:509] 和[4:"..equipId.."]");
 		itemId = 509;
     else
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200");
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200 和[4:"..equipId.."]");
         player:getCoupon(200);
+    end
+
+    if equipId ~= 0 then
+		package:AddEquip(equipId, 1);
     end
 
     if itemId ~= 0 then

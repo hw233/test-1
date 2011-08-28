@@ -1475,6 +1475,7 @@ namespace GObject
 			return 1;
 
         // 坚韧宝石可以镶嵌任何装备
+#if 0
         if(gemId < 5131)
         {
             switch(equip->getClass())
@@ -1509,6 +1510,7 @@ namespace GObject
                 return 1;
             }
         }
+#endif
 
 		ItemEquipData& ied = equip->getItemEquipData();
 		UInt8 fempty = 0xFF;

@@ -306,6 +306,7 @@ sysMsg:set(604, 1, "%u - [f:%u:%s]  等级: %u  潜力: %g")
 sysMsg:set(610, 1, "测试攻击 %s(%u) 第%u层，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(611, 1, "测试攻击 %s，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(611, 1, "测试 %s 攻击 %s，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
+sysMsg:set(612, 1, "是否在线: %s")
 
 sysMsg:set(400, 0x17, "")
 sysMsg:set(401, 0x17, "")

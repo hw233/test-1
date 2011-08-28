@@ -982,7 +982,7 @@ namespace GObject
 			Fighter * fgt = it->second;
 			ItemEquip * equip;
 			for(UInt8 z = 1; z < 9; ++ z)
-				m_Package->EquipTo(0, fgt, z, equip, true);
+				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
 			_fighters.erase(it);
 			DB().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 			if(r)
@@ -1491,7 +1491,7 @@ namespace GObject
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
 
-            if (ng->getLevel() < GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
+            if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     pendExp(ng->getExp() * 17 / 10);
@@ -1534,7 +1534,7 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::attackCopyNpc( UInt32 npcId )
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId )
 	{
 		UInt32 now = TimeUtil::Now();
         // TODO:
@@ -1551,8 +1551,13 @@ namespace GObject
 			return false;
 
 		GData::NpcGroup * ng = it->second;
+        UInt16 bs = 0;
+        if(type == 0)
+            bs = Battle::BS_FRONTMAP1;
+        else if(type == 1)
+            bs = copyId - 1 + Battle::BS_COPY1;
 
-		Battle::BattleSimulator bsim(_playerData.location, this, ng->getName(), ng->getLevel(), false);
+		Battle::BattleSimulator bsim(bs, this, ng->getName(), ng->getLevel(), false);
 		PutFighters( bsim, 0 );
 		ng->putFighters( bsim );
 		bsim.start();
@@ -3939,7 +3944,7 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-		if ((nLev >= 30 && !m_Athletics->hasEnterAthletics()) || (oLev < 41 && nLev >= 41))
+		if ((nLev > 29 && !m_Athletics->hasEnterAthletics()) || (oLev < 46 && nLev > 45))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
 			GLOBAL().PushMsg(hdr, &nLev);

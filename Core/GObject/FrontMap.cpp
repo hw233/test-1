@@ -181,7 +181,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
-        if (pl->attackCopyNpc(fgtid)) {
+        if (pl->attackCopyNpc(fgtid, 0, id)) {
             ret = true;
         }
 
@@ -209,8 +209,8 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
             }
 
             DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u", tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
-        } else
-            DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tmp[spot].count, pl->getId(), id);
+        }// else
+         //   DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tmp[spot].count, pl->getId(), id);
 
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
         pl->send(st);

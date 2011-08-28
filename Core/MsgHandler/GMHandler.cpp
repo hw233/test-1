@@ -122,6 +122,7 @@ GMHandler::GMHandler()
     Reg(3, "ec", &GMHandler::OnEnterCopy);
     Reg(3, "gmc", &GMHandler::OnGmCheck);
     Reg(3, "m2a", &GMHandler::OnMoney2All);
+    Reg(3, "kick", &GMHandler::OnKick);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -783,6 +784,7 @@ void GMHandler::OnPlayerInfo( GObject::Player * player, std::vector<std::string>
 	SYSMSG_SENDV(601, player, map->GetName().c_str(), ((sd != NULL) ? (sd->m_Name.c_str()) : ""));
 	SYSMSG_SENDV(602, player, PLAYER_DATA(pl, gold), PLAYER_DATA(pl, coupon));
 	SYSMSG_SENDV(603, player, PLAYER_DATA(pl, tael), PLAYER_DATA(pl, coin));
+	SYSMSG_SENDV(612, player, pl->isOnline()?"YES":"NO");
 }
 
 void GMHandler::OnCharInfo( GObject::Player * player, std::vector<std::string>& args )
@@ -2122,5 +2124,38 @@ void GMHandler::OnMoney2All(GObject::Player *player, std::vector<std::string>& a
 
     UInt32 moneys[] = {gold, tael, ticket};
     globalPlayers.enumerate(give_money, (UInt32*)moneys);
+}
+
+void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 1)
+        return;
+
+    UInt64 playerId = atol(args[0].c_str());
+
+    Stream st;
+    st.init(REP::RECONNECT, 0x01);
+    st<<playerId;
+	GObject::Player * pl= GObject::globalPlayers[playerId];
+    if(pl==NULL)
+    {
+        st<<static_cast<UInt32>(1);
+    }
+    else
+    {
+        if(pl->isOnline())
+        {
+            st<<static_cast<UInt32>(0);
+            TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
+            if(conn.get() == NULL)
+                return;
+            Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
+            cl->closeConn();
+        }
+        else
+            st<<static_cast<UInt32>(2);
+    }
+    st<<Stream::eos;
+    NETWORK()->SendMsgToClient(pl->GetSessionID(),st);
 }
 
