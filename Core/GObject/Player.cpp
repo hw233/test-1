@@ -2875,10 +2875,10 @@ namespace GObject
     {
         if (!im) {
             for (int i = 0; i < 6; ++i) {
-                if (ColorTaskOutOfAccept(4, im))
-                    break;
-
                 if (_playerData.shimen[i] == taskid) {
+                    //if (ColorTaskOutOfAccept(4, im))
+                    //    break;
+
                     if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
                         sendMsgCode(0, 1007);
                         return false;
@@ -2896,10 +2896,10 @@ namespace GObject
                 }
             }
             for (int i = 0; i < 6; ++i) {
-                if (ColorTaskOutOfAccept(5, im))
-                    break;
-
                 if (_playerData.yamen[i] == taskid) {
+                    //if (ColorTaskOutOfAccept(5, im))
+                    //    break;
+
                     if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
                         sendMsgCode(0, 1007);
                         return false;
@@ -2918,13 +2918,14 @@ namespace GObject
             }
         } else {
             for (int i = 0; i < 6; ++i) {
-                if (ColorTaskOutOfAccept(4, im))
-                    break;
-
                 if (_playerData.fshimen[i] == taskid) {
+                    if (ColorTaskOutOfAccept(4, im))
+                        break;
+
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
                     AddExp(award); // TODO:
                     ++_playerData.smFinishCount;
+                    ++_playerData.smAcceptCount;
                     _playerData.fshimen[i] = 0;
                     _playerData.fsmcolor[i] = 0;
 
@@ -2934,16 +2935,17 @@ namespace GObject
                 }
             }
             for (int i = 0; i < 6; ++i) {
-                if (ColorTaskOutOfAccept(5, im))
-                    break;
-
                 if (_playerData.fyamen[i] == taskid) {
+                    if (ColorTaskOutOfAccept(5, im))
+                        break;
+
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.fymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
+                    ++_playerData.smAcceptCount;
                     sendColorTask(1, 0);
                     writeYaMen();
                     return true;
@@ -2957,33 +2959,33 @@ namespace GObject
     {
         if (type == 4)
         {
-            if (_playerData.smFinishCount >= 5) {
-                SYSMSG_SENDV(2107, this, "师门");
-                return true;
-            }
+            //if (_playerData.smFinishCount >= 5) {
+            //    SYSMSG_SENDV(2107, this, "师门");
+            //    return true;
+            //}
             if (_playerData.smAcceptCount >= 5) {
                 SYSMSG_SENDV(2107, this, "师门");
                 return true;
             }
-            if (im && (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)) {
-                SYSMSG_SENDV(2108, this, "师门");
-                return true;
-            }
+            //if (im && (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)) {
+            //    SYSMSG_SENDV(2108, this, "师门");
+            //    return true;
+            //}
         }
         else if (type == 5)
         {
-            if (_playerData.ymFinishCount >= 5) {
-                SYSMSG_SENDV(2107, this, "衙门");
-                return true;
-            }
+            //if (_playerData.ymFinishCount >= 5) {
+            //    SYSMSG_SENDV(2107, this, "衙门");
+            //    return true;
+            //}
             if (_playerData.ymAcceptCount >= 5) {
                 SYSMSG_SENDV(2107, this, "衙门");
                 return true;
             }
-            if (im && (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)) {
-                SYSMSG_SENDV(2107, this, "衙门");
-                return true;
-            }
+            //if (im && (_playerData.ymFinishCount + _playerData.ymAcceptCount >= 5)) {
+            //    SYSMSG_SENDV(2107, this, "衙门");
+            //    return true;
+            //}
         }
         return false;
     }
@@ -3032,8 +3034,8 @@ namespace GObject
 
     void Player::clearFinishCount()
     {
-        _playerData.smAcceptCount = 5 - _playerData.smAcceptCount;
-        _playerData.ymAcceptCount = 5 - _playerData.ymAcceptCount;
+        _playerData.smAcceptCount = _playerData.smAcceptCount - _playerData.smFinishCount;
+        _playerData.ymAcceptCount = _playerData.ymAcceptCount - _playerData.ymFinishCount;
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
         writeShiMen();
