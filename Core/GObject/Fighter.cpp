@@ -992,9 +992,11 @@ void Fighter::rebuildEquipAttr()
 		_attrExtraEquip += *iest->attrExtra[idx];
 	}
 	_attrExtraEquip.attack += getWeaponAttack();
+	_attrExtraEquip.magatk += getWeaponAttack();
 	UInt16 armorDefend, armorHP;
 	getArmorDefendAndHP(armorDefend, armorHP);
 	_attrExtraEquip.defend += armorDefend;
+	_attrExtraEquip.magdef += armorDefend;
 	_attrExtraEquip.hp += armorHP;
 
     for (int i = 0; i < getUpCittasNum(); ++i)
