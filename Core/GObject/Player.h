@@ -525,7 +525,7 @@ namespace GObject
 
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
-		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 7; }
+		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
         void upInitCitta(Fighter* fgt);
 		void addFighter(Fighter * fgt, bool = true);
 		Fighter * takeFighter(UInt32, bool = true);
@@ -692,6 +692,7 @@ namespace GObject
         void sendColorTask(UInt8 ttype, UInt16 ncount);
         bool ColorTaskOutOfAccept(UInt8 type, bool = false);
         void ColorTaskAccept(UInt8 type, UInt32 taskid);
+        void ColorTaskAbandon(UInt8 type, UInt32 taskid);
         void clearFinishCount();
 		UInt16 calcNextTavernUpdate(UInt32);
 		UInt32 hireRecruit(UInt8);

@@ -2945,7 +2945,7 @@ namespace GObject
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.fymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
-                    ++_playerData.smAcceptCount;
+                    ++_playerData.ymAcceptCount;
                     sendColorTask(1, 0);
                     writeYaMen();
                     return true;
@@ -3027,6 +3027,40 @@ namespace GObject
                     sendColorTask(1, 0);
                     writeYaMen();
                     return;
+                }
+            }
+        }
+    }
+
+    void Player::ColorTaskAbandon(UInt8 type, UInt32 taskid)
+    {
+        if (type == 4)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                if (_playerData.shimen[i] == taskid)
+                {
+                    if (_playerData.smAcceptCount)
+                    {
+                        --_playerData.smAcceptCount;
+                        sendColorTask(0, 0);
+                        writeShiMen();
+                    }
+                }
+            }
+        }
+        if (type == 5)
+        {
+            for (int i = 0; i < 6; ++i)
+            {
+                if (_playerData.yamen[i] == taskid)
+                {
+                    if (_playerData.ymAcceptCount)
+                    {
+                        --_playerData.ymAcceptCount;
+                        sendColorTask(1, 0);
+                        writeYaMen();
+                    }
                 }
             }
         }
@@ -3213,6 +3247,16 @@ namespace GObject
         return true;
     }
 
+    inline bool hasCTAccept(UInt32 tasks[6], UInt32 task)
+    {
+        for (int i = 0; i < 6; ++i)
+        {
+            if (tasks[i] == task)
+                return true;
+        }
+        return false;
+    }
+
 	void Player::flushTaskColor(UInt8 tasktype, UInt8 type, UInt8 color, UInt16 count, bool force)
     {
         int ttype = 0;
@@ -3272,8 +3316,13 @@ namespace GObject
                     } else {
                         for (int i = 0; i < 6; ++i) {
                             UInt32 j = rnd(task.size());
-                            while (idxs.find(j) != idxs.end())
-                                j = rnd(task.size());
+                            if (ttype == 0) {
+                                while (idxs.find(j) != idxs.end() && !hasCTAccept(_playerData.shimen, task[j]))
+                                    j = rnd(task.size());
+                            } else {
+                                while (idxs.find(j) != idxs.end() && !hasCTAccept(_playerData.yamen, task[j]))
+                                    j = rnd(task.size());
+                            }
                             idxs.insert(j);
                         }
                     }
