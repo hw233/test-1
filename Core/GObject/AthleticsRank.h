@@ -113,7 +113,7 @@ class AthleticsRank
 	typedef AthleticsList::iterator Rank;
 	typedef std::map<Player *, Rank> RankList;
 
-	static const UInt32 ATHLETICS_BUFF_TIME = 10 * 60;
+	static const UInt32 ATHLETICS_BUFF_TIME = 15 * 60;
 public:
 	AthleticsRank();
 	~AthleticsRank();
@@ -174,9 +174,9 @@ public:
 protected:
 	inline UInt8 getRankRow(UInt8 lev)
 	{
-		if (lev >= 41)
+		if (lev > 45)
 			return 1;
-		if (lev >= 30)
+		if (lev > 29)
 			return 0;
 		return 0xFF;
 	}
