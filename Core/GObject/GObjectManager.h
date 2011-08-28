@@ -95,7 +95,18 @@ namespace GObject
         static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr ) { return _attrMax[q][crr][lvl][t]; }
         static UInt16 getAttrDics(UInt8 q, UInt8 idx) { return _attrDics[q][idx]; }
 
-        static UInt16 getColorFighterChance( UInt8 f_g, UInt8 color ) { return _color_chance[f_g][color]; }
+        static UInt32 getColorFighterChance(UInt16 idx, UInt8 f_g, UInt8 color )
+        {
+            if(!f_g)
+                return _color_chance_free[color];
+            else
+            {
+                if( idx > _color_chance_gold.size() - 1 )
+                    idx = _color_chance_gold.size() - 1;
+
+                return _color_chance_gold[idx][color];
+            }
+        }
 
         static UInt16 getBattleScene(UInt16 location)
         {
@@ -144,7 +155,8 @@ namespace GObject
         static float _mres_max;
 
         // 酒馆武将品质概率
-        static UInt16 _color_chance[2][4];
+        static std::vector<std::vector<UInt32>> _color_chance_gold;
+        static UInt32 _color_chance_free[4];
 
         //战斗背景
         static std::map<UInt16, UInt16> _battle_scene;

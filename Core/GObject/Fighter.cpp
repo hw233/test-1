@@ -2395,14 +2395,10 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
     case 0:
     case 1:
         {
-            int a = uRand(10);
-            int b = uRand(10);
-            int c = uRand(10);
-            int d = uRand(10);
-            UInt16 roll = a + b*10 + c*100+ d*1000;
+            UInt32 roll = uRand(100000);
             for(int i = 0; i < 4; ++ i)
             {
-                if(roll < GObject::GObjectManager::getColorFighterChance(type, i))
+                if(roll < GObject::GObjectManager::getColorFighterChance(rate, type, i))
                 {
                     color = i;
                     colors = 1;
