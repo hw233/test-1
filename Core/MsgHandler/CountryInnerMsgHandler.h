@@ -549,7 +549,6 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
 {
 	MSG_QUERY_PLAYER(player);
 
-    player->clearFinishCount();
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
 }

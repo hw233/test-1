@@ -5,6 +5,7 @@
 #include "GData/NpcGroup.h"
 #include "Battle/BattleSimulator.h"
 #include "MsgID.h"
+#include "GData/Money.h"
 
 namespace GObject
 {
@@ -81,7 +82,8 @@ void FrontMap::enter(Player* pl, UInt8 id)
         ++PLAYER_DATA(pl, frontFreeCnt);
         ret = 0;
     } else if (PLAYER_DATA(pl, frontGoldCnt) < GOLDCNT) {
-        if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
+        //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
+        if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
             Stream st(REP::FORMATTON_INFO);
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);

@@ -6,6 +6,7 @@
 #include "Battle/BattleSimulator.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
+#include "GData/Money.h"
 
 namespace GObject
 {
@@ -52,7 +53,8 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         ++PLAYER_DATA(pl, copyFreeCnt);
         ret = 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < GOLDCNT) {
-        if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
+        //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
+        if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
             pl->sendMsgCode(0, 1101);

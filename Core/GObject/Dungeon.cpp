@@ -8,6 +8,7 @@
 #include "Battle/BattleSimulator.h"
 #include "Server/Cfg.h"
 #include "MsgID.h"
+#include "GData/Money.h"
 
 namespace GObject
 {
@@ -580,7 +581,14 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			UInt32 viplevel = player->getVipLevel();
 			if(viplevel < 6)
 			{
-				const UInt32 taelReq[] = {0, 100, 150, 200, 250, 250};
+				const UInt32 taelReq[] = {
+                    GData::moneyNeed[GData::COPY_AUTO1].tael,
+                    GData::moneyNeed[GData::COPY_AUTO2].tael,
+                    GData::moneyNeed[GData::COPY_AUTO3].tael,
+                    GData::moneyNeed[GData::COPY_AUTO4].tael,
+                    GData::moneyNeed[GData::COPY_AUTO5].tael,
+                };
+
 				if(player->getTael() < taelReq[_id])
 					break;
 				ConsumeInfo ci(DungeonAutoConsume, 0, 0);

@@ -30,6 +30,7 @@
 
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
+#include "GData/Money.h"
 
 #include <mysql.h>
 
@@ -301,7 +302,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		player->send(st);
 		return;
 	}
-	if(player->getTael() < 100) // XXX:
+	if(player->getTael() < GData::moneyNeed[GData::CLAN_CREATE].tael) // XXX:
 	{
 		Stream st(REP::CLAN_CREATE);
 		st << static_cast<UInt8>(3) << Stream::eos;
@@ -1052,7 +1053,7 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
 	}
 	else
 	{
-		UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, 0xE8, lr._type, 0x00, 0x00, 0x00, 0x00};
+		UInt8 failed_packet[9] = {0x05, 0x00, 0xFF, REP::SORT_LIST, lr._type, 0x00, 0x00, 0x00, 0x00};
 		player->send(failed_packet, 9);
 	}
 }

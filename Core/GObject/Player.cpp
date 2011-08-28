@@ -12,6 +12,7 @@
 #include "MapCollection.h"
 #include "Country.h"
 #include "Dungeon.h"
+#include "GData/Money.h"
 #include "Fighter.h"
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Map.h"
@@ -34,6 +35,7 @@
 #include "Tripod.h"
 #include <mysql.h>
 #include "GData/Formation.h"
+#include "GData/Money.h"
 #include "Script/BattleFormula.h"
 
 #include <cmath>
@@ -350,6 +352,7 @@ namespace GObject
 		m_MailBox = new MailBox(this);
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
+        _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
 	}
 
 
@@ -1486,7 +1489,7 @@ namespace GObject
 			st << static_cast<UInt16>(0x0101);
 			_lastNg = ng;
 
-            if (!(ng->getLevel() > GetLev() && ng->getLevel() - GetLev() >= 10))
+            if (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10)
             {
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
                     pendExp(ng->getExp() * 17 / 10);
@@ -1498,8 +1501,8 @@ namespace GObject
                     pendExp(ng->getExp() * 13 / 10);
                 else
                     pendExp(ng->getExp());
+                ng->getLoots(this, _lastLoot);
             }
-			ng->getLoots(this, _lastLoot);
 		}
 		else
 			st << static_cast<UInt16>(0x0100);
@@ -1680,7 +1683,7 @@ namespace GObject
 			return;
 
         ConsumeInfo ci(InstantAutoBattle,0,0);
-		useGoldOrCoupon(10,&ci);
+		useGoldOrCoupon(GData::moneyNeed[GData::INSTANTAUTOBATTLE].gold,&ci);
         incIcCount();
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
@@ -2874,6 +2877,11 @@ namespace GObject
                     break;
 
                 if (_playerData.shimen[i] == taskid) {
+                    if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
+                        sendMsgCode(0, 1007);
+                        return false;
+                    }
+
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
                     AddExp(award); // TODO:
                     ++_playerData.smFinishCount;
@@ -2890,6 +2898,11 @@ namespace GObject
                     break;
 
                 if (_playerData.yamen[i] == taskid) {
+                    if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
+                        sendMsgCode(0, 1007);
+                        return false;
+                    }
+
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.ymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
@@ -2951,7 +2964,7 @@ namespace GObject
                 return true;
             }
             if (im && (_playerData.smFinishCount + _playerData.smAcceptCount >= 5)) {
-                SYSMSG_SENDV(2107, this, "师门");
+                SYSMSG_SENDV(2108, this, "师门");
                 return true;
             }
         }
@@ -3017,10 +3030,17 @@ namespace GObject
 
     void Player::clearFinishCount()
     {
+        _playerData.smAcceptCount = 5 - _playerData.smAcceptCount;
+        _playerData.ymAcceptCount = 5 - _playerData.ymAcceptCount;
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
         writeShiMen();
         writeYaMen();
+        if (isOnline())
+        {
+            sendColorTask(0, 0);
+            sendColorTask(1, 0);
+        }
     }
 
     bool Player::finishClanTask(UInt32 taskId)
