@@ -5149,6 +5149,10 @@ namespace GObject
     { 
         _playerData.country = cny;
 		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, getId());
+
+		Stream st(REP::USER_INFO_CHANGE);
+		st << static_cast<UInt8>(0x11) << cny << Stream::eos;
+		send(st);
     }
 
 }

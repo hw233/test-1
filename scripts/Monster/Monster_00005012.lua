@@ -8,10 +8,10 @@ function Monster_00005012(num)
 	if task:HasAcceptedTask(560) then
 		task:AddTaskStep2(560,1,num);
 	end
-	if task:HasAcceptedTask(610) then
-		task:AddTaskStep2(610,1,num);
-	end
 	if task:HasAcceptedTask(46) then
 		task:AddTaskStep2(46,1,num);
+	end
+	if task:HasAcceptedTask(610) then
+		task:AddTaskStep2(610,1,num);
 	end
 end
