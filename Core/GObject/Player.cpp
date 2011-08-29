@@ -4274,7 +4274,7 @@ namespace GObject
 		st << static_cast<UInt8>(1);
         UInt32 curtime = TimeUtil::Now();
 		UInt32 vipLevel = getVipLevel();
-        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(SHIMEN_TASK_MAXCOUNT - _playerData.smFreeCount) << static_cast<UInt8>(YAMEN_TASK_MAXCOUNT - _playerData.ymFreeCount) << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
+        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(SHIMEN_TASK_MAXCOUNT - _playerData.smFinishCount) << static_cast<UInt8>(YAMEN_TASK_MAXCOUNT - _playerData.ymFinishCount) << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
         UInt8 cnt = playerCopy.getCopySize(this);
