@@ -1441,7 +1441,7 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
         // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        buffLeft = 0;
+        //buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
@@ -1538,7 +1538,7 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
         // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        buffLeft = 0;
+        //buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);

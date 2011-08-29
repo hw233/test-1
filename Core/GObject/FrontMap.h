@@ -30,7 +30,8 @@ public:
 
 public:
     void sendAllInfo(Player* pl);
-    void sendInfo(Player* pl, UInt8 id, bool = false);
+    void sendInfo(Player* pl, UInt8 id, bool = false, bool = false);
+    void sendInfo2(Player* pl, UInt8 id, bool = false);
     UInt8 getCount(Player* pl);
 
     void enter(Player* pl, UInt8 id);
@@ -42,7 +43,7 @@ public:
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status);
 private:
-    void sendFrontMap(Stream& st, Player* pl, UInt8 id);
+    void sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force = false);
 
 private:
     std::map<UInt64, std::map<UInt8, std::vector<FrontMapData> > > m_frts;

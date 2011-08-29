@@ -1506,7 +1506,14 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
     {
         setAcupoints(i, ::atoi(tk[i].c_str()), writedb, true); // XXX: must be less then 255
     }
-
+    
+    for (UInt8 i = 0; i < ACUPOINTS_MAX; ++i)
+    {
+        if (_acupoints[i] && _acupoints[i] < 3)
+            _praadd += _acupoints[i];
+        else if (_acupoints[i] == 3)
+            _praadd += 2;
+    }
 }
 
 // XXX: 穴道 id (0-14) lvl [1-3]
