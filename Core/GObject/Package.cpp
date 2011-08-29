@@ -942,9 +942,9 @@ namespace GObject
             {
                 ret = FormulaMerge(id, bind > 0);
                 if (ret)
-                    m_Owner->sendMsgCode(0, 5001);
+                    m_Owner->sendMsgCode(0, 1800);
                 else
-                    m_Owner->sendMsgCode(0, 5002);
+                    m_Owner->sendMsgCode(0, 1802);
                 return ret;
             }
         }
@@ -955,9 +955,9 @@ namespace GObject
             {
                 ret = CittaMerge(id, bind > 0);
                 if (ret)
-                    m_Owner->sendMsgCode(0, 5001);
+                    m_Owner->sendMsgCode(0, 1800);
                 else
-                    m_Owner->sendMsgCode(0, 5002);
+                    m_Owner->sendMsgCode(0, 1802);
                 return ret;
             }
         }
@@ -1104,7 +1104,7 @@ namespace GObject
                 return false;
         }
 
-        if (config[i].eid != j + config[i].sid) {
+        if (config[i].eid != (j-1) + config[i].sid) {
             return false;
         }
 

@@ -15,18 +15,33 @@ void FrontMap::sendAllInfo(Player* pl)
 {
 }
 
-void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot)
+void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
 {
-    Stream st(REP::FORMATTON_INFO);
     FastMutex::ScopedLock lk(_mutex);
+    Stream st(REP::FORMATTON_INFO);
     UInt8 count = getCount(pl);
     st << static_cast<UInt8>(0);
     st << id;
     st << count;
 
     if (needspot) {
-        sendFrontMap(st, pl, id);
+        sendFrontMap(st, pl, id, force);
     }
+
+    st << Stream::eos;
+    pl->send(st);
+}
+
+void FrontMap::sendInfo2(Player* pl, UInt8 id, bool succ)
+{
+    Stream st(REP::FORMATTON_INFO);
+    st << id;
+    st << static_cast<UInt8>(1);
+
+    if (succ) {
+        sendFrontMap(st, pl, id, true);
+    } else 
+        st << static_cast<UInt8>(0);
 
     st << Stream::eos;
     pl->send(st);
@@ -52,9 +67,12 @@ void FrontMap::buildInfo(Player* pl, Stream& st)
     }
 }
 
-void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id)
+void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
 {
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+
+    if (!force && !tmp.size())
+        return;
 
     size_t off = st.size();
     st << static_cast<UInt8>(0);
@@ -96,39 +114,42 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
     FastMutex::ScopedLock lk(_mutex);
     UInt8 ret = 1;
-    if (PLAYER_DATA(pl, frontFreeCnt) < FREECNT) {
-        ++PLAYER_DATA(pl, frontFreeCnt);
-        ret = 0;
-    } else if (PLAYER_DATA(pl, frontGoldCnt) < GOLDCNT) {
-        //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
-        if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
-            Stream st(REP::FORMATTON_INFO);
-            st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
-            pl->send(st);
-            pl->sendMsgCode(0, 1101);
-            return;
-        }  
+    std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+    if (!tmp.size()) {
+        if (PLAYER_DATA(pl, frontFreeCnt) < FREECNT) {
+            ++PLAYER_DATA(pl, frontFreeCnt);
+            ret = 0;
+        } else if (PLAYER_DATA(pl, frontGoldCnt) < GOLDCNT) {
+            //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
+            if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
+                Stream st(REP::FORMATTON_INFO);
+                st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
+                pl->send(st);
+                pl->sendMsgCode(0, 1101);
+                return;
+            }  
 
-        ++PLAYER_DATA(pl, frontGoldCnt);
-        ret = 0;
+            ++PLAYER_DATA(pl, frontGoldCnt);
+            ret = 0;
 
-        ConsumeInfo ci(EnterFrontMap,0,0);
-        pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
-    }
+            ConsumeInfo ci(EnterFrontMap,0,0);
+            pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
+        }
+    } else
+        ret = 0;
 
     if (!ret) {
+        sendInfo2(pl, id, true);
+
+        PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
 
         UInt8 count = getCount(pl);
         Stream st(REP::FORMATTON_INFO);
         st << static_cast<UInt8>(3) << count << Stream::eos;
         pl->send(st);
-    }
-
-    Stream st(REP::FORMATTON_INFO);
-    st << static_cast<UInt8>(1) << id << ret << Stream::eos;
-    sendFrontMap(st, pl, id);
-    pl->send(st);
+    } else
+        sendInfo2(pl, id, false);
 }
 
 UInt8 FrontMap::getCount(Player* pl)
@@ -185,6 +206,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
             ret = true;
         }
 
+        bool over = false;
         if (ret) {
             ++tmp[spot].count;
             tmp[spot].status = 1;
@@ -193,6 +215,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
                 Stream st(REP::FORMATTON_INFO);
                 st << static_cast<UInt8>(4) << id << Stream::eos;
                 pl->send(st);
+                over = true;
             } else {
                 UInt8 nspot = spot+1;
                 while (!GData::frontMapManager[id][nspot].count && nspot <= GData::frontMapMaxManager[id])
@@ -214,6 +237,11 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
         pl->send(st);
+
+        if (over) {
+            tmp.resize(0);
+            DB().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+        }
     }
     return;
 }

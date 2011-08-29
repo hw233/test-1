@@ -1441,7 +1441,7 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
         // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        buffLeft = 0;
+        //buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
@@ -1538,7 +1538,7 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
         // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        buffLeft = 0;
+        //buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
@@ -5230,7 +5230,7 @@ namespace GObject
 		DB().PushUpdateData("UPDATE `player` SET `country` = %u WHERE `id` = %"I64_FMT"u", cny, getId());
 
 		Stream st(REP::USER_INFO_CHANGE);
-		st << static_cast<UInt8>(0x11) << cny << Stream::eos;
+		st << static_cast<UInt8>(0x11) << static_cast<UInt32>(cny) << Stream::eos;
 		send(st);
     }
 
