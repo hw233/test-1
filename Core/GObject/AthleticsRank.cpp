@@ -1253,7 +1253,6 @@ UInt32 AthleticsRank::getAthleticsExtraChallenge(Player* player)
 	if (found == _ranks[row].end())
 		return 0;
 
-    int a = (*found->second)->extrachallenge;
     return (*found->second)->extrachallenge;
 }
 

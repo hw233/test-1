@@ -2488,7 +2488,6 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
         {
             if(r < it->second)
             {
-                int a = it->first;
                 Fighter* fighter = _fighters[it->first].fighter;
                 return _fighters[it->first].fighter;
             }
