@@ -4934,7 +4934,7 @@ namespace GObject
             else if(type == 1)
             {
                 count = 1;
-                money = 50;
+                money = GData::moneyNeed[GData::BOOK_LIST].tael;
                 // updateNextBookStoreUpdate(curtime);
             }
 
