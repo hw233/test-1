@@ -2923,7 +2923,7 @@ namespace GObject
                         break;
 
                     if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
-                        sendMsgCode(0, 1007);
+                        sendMsgCode(0, 1101);
                         return false;
                     }
 
@@ -2948,7 +2948,7 @@ namespace GObject
                         break;
 
                     if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
-                        sendMsgCode(0, 1007);
+                        sendMsgCode(0, 1101);
                         return false;
                     }
                     
