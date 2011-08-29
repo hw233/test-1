@@ -2905,7 +2905,7 @@ namespace GObject
                     //if (ColorTaskOutOfAccept(5, im))
                     //    break;
 
-                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.ymcolor[i], GetLev());
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.ymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
                     _playerData.yamen[i] = 0;
@@ -2955,13 +2955,13 @@ namespace GObject
                     ConsumeInfo ci(YamenTask, 0, 0);
                     useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
-                    _playerData.fyamen[i] = 0;
-                    _playerData.fymcolor[i] = 0;
-
-                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.fymcolor[i], GetLev());
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.fymcolor[i], GetLev());
                     getTael(award); // TODO:
                     ++_playerData.ymFinishCount;
                     ++_playerData.ymAcceptCount;
+                    _playerData.fyamen[i] = 0;
+                    _playerData.fymcolor[i] = 0;
+
                     sendColorTask(1, 0);
                     writeYaMen();
                     return true;
