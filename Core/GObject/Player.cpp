@@ -2803,6 +2803,12 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
+        if (new_cny == 0xFF)
+        {
+            SYSMSG_SENDV(621, this, new_cny);
+            return;
+        }
+
 		if(new_cny != cny.GetThreadID())
 		{
 			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);

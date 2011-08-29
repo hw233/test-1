@@ -97,6 +97,7 @@ private:
     void OnMoney2All(GObject::Player *player, std::vector<std::string>&);
     void OnKick(GObject::Player *player, std::vector<std::string>&);
     void OnCount(GObject::Player *player, std::vector<std::string>&);
+    void OnThreadId(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

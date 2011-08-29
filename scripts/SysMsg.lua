@@ -311,6 +311,8 @@ sysMsg:set(612, 1, "是否在线: %s")
 sysMsg:set(613, 1, "免费副本次数: %u, 收费副本次数: %u")
 sysMsg:set(614, 1, "免费阵图次数: %u, 收费阵图次数: %u")
 sysMsg:set(620, 1, "当前在线人数: %u");
+sysMsg:set(621, 1, "目标据点[0x%x]不可达");
+sysMsg:set(622, 1, "所在线程: 0x%x");
 
 sysMsg:set(400, 0x17, "")
 sysMsg:set(401, 0x17, "")
