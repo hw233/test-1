@@ -42,6 +42,8 @@ enum PurchaseType
     AddPracticeSlot,
     EnterCopy,
     EnterFrontMap,
+    ShimenTask,
+    YamenTask,
 };
 
 enum MoneyType

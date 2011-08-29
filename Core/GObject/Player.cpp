@@ -2889,11 +2889,6 @@ namespace GObject
                     //if (ColorTaskOutOfAccept(4, im))
                     //    break;
 
-                    if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
-                        sendMsgCode(0, 1007);
-                        return false;
-                    }
-
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
                     AddExp(award); // TODO:
                     ++_playerData.smFinishCount;
@@ -2909,11 +2904,6 @@ namespace GObject
                 if (_playerData.yamen[i] == taskid) {
                     //if (ColorTaskOutOfAccept(5, im))
                     //    break;
-
-                    if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
-                        sendMsgCode(0, 1007);
-                        return false;
-                    }
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.ymcolor[i], GetLev());
                     getTael(award); // TODO:
@@ -2932,6 +2922,14 @@ namespace GObject
                     if (ColorTaskOutOfAccept(4, im))
                         break;
 
+                    if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
+                        sendMsgCode(0, 1007);
+                        return false;
+                    }
+
+                    ConsumeInfo ci(ShimenTask, 0, 0);
+                    useGold(GData::moneyNeed[GData::SHIMEN_IM].gold, &ci);
+
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
                     AddExp(award); // TODO:
                     ++_playerData.smFinishCount;
@@ -2948,6 +2946,14 @@ namespace GObject
                 if (_playerData.fyamen[i] == taskid) {
                     if (ColorTaskOutOfAccept(5, im))
                         break;
+
+                    if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
+                        sendMsgCode(0, 1007);
+                        return false;
+                    }
+                    
+                    ConsumeInfo ci(YamenTask, 0, 0);
+                    useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
