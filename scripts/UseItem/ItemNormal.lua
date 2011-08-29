@@ -4694,7 +4694,7 @@ function ItemNormal_athletics_22(iid, num, bind, param)
     local itemId = 0;
 
     local level = player:GetLev();
-    level = math.floor((math.floor((level+5) / 10)) * 10)
+    level = math.floor((math.floor((level) / 10)) * 10)
     local tmpEquipTable = Athletics_Green_Equip[level]
 
     if tmpEquipTable == nil then
@@ -4741,7 +4741,7 @@ function ItemNormal_athletics_23(iid, num, bind, param)
     local itemId = 0;
 
     local level = player:GetLev();
-    level = math.floor((math.floor((level+5) / 10)) * 10)
+    level = math.floor((math.floor((level) / 10)) * 10)
     local tmpEquipTable = Athletics_Blue_Equip[level]
 
     if tmpEquipTable == nil then
@@ -4789,7 +4789,7 @@ function ItemNormal_athletics_24(iid, num, bind, param)
     local itemId = 0;
 
     local level = player:GetLev();
-    level = math.floor((math.floor((level+5) / 10)) * 10)
+    level = math.floor((math.floor((level) / 10)) * 10)
     local tmpEquipTable = Athletics_Purple_Equip[level]
 
     if tmpEquipTable == nil then
@@ -4848,7 +4848,7 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     local itemId = 0;
 
     local level = player:GetLev();
-    level = math.floor((math.floor((level+5) / 10)) * 10)
+    level = math.floor((math.floor((level) / 10)) * 10)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
