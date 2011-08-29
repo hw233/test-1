@@ -35,8 +35,8 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 			delete player;
 			return;
 		} 
-		player->GetPackage()->AddItemFromDB(8942, 1, true);
-		DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
+		//player->GetPackage()->AddItemFromDB(8942, 1, true);
+		//DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
 	}
 	UInt16 newLoc = ces->newLoc;
 	if(ces->inCity && (newLoc & 0xFF) == 0)
@@ -76,6 +76,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	{
 		player->selfKick();
 	}
+
 	player->Login();
 
 	Stream st(REP::LOGIN);

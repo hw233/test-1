@@ -64,7 +64,7 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 	//player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
-    LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]断开连接，发送指令0x200\n", player->getId());
+    //LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]断开连接，发送指令0x200\n", player->getId());
 }
 
 struct UserLogonRepStruct
@@ -124,7 +124,10 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
 
-    LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]%s登陆成功, 返回码: %u\n", player->getId(), reconnect?"重":"", res);
+#if 0
+    LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]%s登陆成功, SESSIONID: %u(%u), 返回码: %u\n",
+            player->getId(), reconnect?"重":"", hsid, sid, res);
+#endif
 	return res;
 }
 
@@ -173,6 +176,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	if(conn.get() == NULL)
 		return;
 
+#if 0
     if (cfg.enableLoginLimit && LOGIN().Current() >= cfg.loginLimit)
     {
 		UserLogonRepStruct rep;
@@ -180,6 +184,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		NETWORK()->SendMsgToClient(conn.get(), rep);
         return;
     }
+#endif
 
 	if(ul._userid == 0)
 		conn->closeConn();
@@ -432,7 +437,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->GetPackage()->AddItem(18, 1, true);
             pl->getGold(1000);
 
-            LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 新建号，返回码：%u\n", pl->getId(), res);
+            // LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 新建号，返回码：%u\n", pl->getId(), res);
 		}
 	}
 

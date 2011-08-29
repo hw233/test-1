@@ -786,6 +786,7 @@ void GMHandler::OnPlayerInfo( GObject::Player * player, std::vector<std::string>
 	SYSMSG_SENDV(601, player, map->GetName().c_str(), ((sd != NULL) ? (sd->m_Name.c_str()) : ""));
 	SYSMSG_SENDV(602, player, PLAYER_DATA(pl, gold), PLAYER_DATA(pl, coupon));
 	SYSMSG_SENDV(603, player, PLAYER_DATA(pl, tael), PLAYER_DATA(pl, coin));
+	SYSMSG_SENDV(609, player, PLAYER_DATA(pl, country));
 	SYSMSG_SENDV(612, player, pl->isOnline()?"YES":"NO");
 	SYSMSG_SENDV(613, player, PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt));
 	SYSMSG_SENDV(614, player, PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl, frontGoldCnt));
@@ -2147,6 +2148,7 @@ void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
             {
                 pl->SetSessionID(-1);
                 pl->testBattlePunish();
+                pl->setOnline(false);
                 static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
                 cl->send(kick_pkt, 4);
                 cl->SetPlayer(NULL);

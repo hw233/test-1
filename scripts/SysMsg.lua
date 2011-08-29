@@ -303,6 +303,7 @@ sysMsg:set(601, 1, "所在地点: %s %s")
 sysMsg:set(602, 1, "仙石: %u  礼券: %u")
 sysMsg:set(603, 1, "银币: %u")
 sysMsg:set(604, 1, "%u - [f:%u:%s]  等级: %u  潜力: %g")
+sysMsg:set(609, 1, "国家: %u");
 sysMsg:set(610, 1, "测试攻击 %s(%u) 第%u层，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(611, 1, "测试攻击 %s，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(611, 1, "测试 %s 攻击 %s，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
