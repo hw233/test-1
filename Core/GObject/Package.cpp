@@ -1351,7 +1351,10 @@ namespace GObject
 			if(fgt != NULL)
 			{
 				fgt->setDirty();
-				fgt->sendModification(0x21 + pos, equip, false);
+                if(equip->getClass() == Item_Trump)
+                    fgt->sendModification(0x50 + pos, equip, false);
+                else
+                    fgt->sendModification(0x21 + pos, equip, false);
 			}
 			else
 				SendSingleEquipData(equip);
