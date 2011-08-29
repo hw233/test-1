@@ -53,7 +53,7 @@ Dungeon::~Dungeon()
 
 void Dungeon::playerJump( Player * player, UInt8 level )
 {
-	if(level >= _levels.size())
+	if(level > _levels.size())
 		return;
 	DungeonPlayerInfo& dpi = _players[player];
 	dpi.level = level;
@@ -110,7 +110,9 @@ UInt8 Dungeon::playerEnter( Player * player )
 		}
 	}
 
-	dpi->level = 0;
+    if( 0 == dpi->level)
+        dpi->level = 1;
+
 	sendDungeonLevelData(player, *dpi);
 	enterLevel(player, 0);
 	updateToDB(player, *dpi);
@@ -137,11 +139,6 @@ UInt8 Dungeon::playerContinue( Player * player )
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return 1;
-
-    UInt32 viplvl = player->getVipLevel();
-    UInt8 extraCount = _extraCount[viplvl];
-    if(it->second.level == 0 && PLAYER_DATA(player, dungeonCnt) >= _maxCount + extraCount)
-        return 2;
 
     enterLevel(player, it->second.level);
     sendDungeonLevelData(player, it->second);
@@ -177,7 +174,7 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	if(World::_activityStage > 0)
 	{
         // TODO: lua function
-		GameAction()->onDungeonLootItemRoll(player, _dungeon->getId(), dpi.level + 1, dm->formated);
+		GameAction()->onDungeonLootItemRoll(player, _dungeon->getId(), dpi.level, dm->formated);
 		dgl->getLoot(player, itemId, static_cast<UInt8>(PLAYER_DATA(player, dungeonCnt) < 2 ? 40 : 0));
 	}
 	else
@@ -227,9 +224,9 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 
 bool Dungeon::doAttack( Player * player, UInt8 level)
 {
-	if(level >= _levels.size())
+	if(level > _levels.size())
 		return false;
-	const GData::DungeonLevel * dgl = _dungeon->monsters[level];
+	const GData::DungeonLevel * dgl = _dungeon->monsters[level - 1];
 	if(dgl == NULL)
 		return false;
 	const GData::DungeonMonster * dm = dgl->monsterSet;
@@ -299,9 +296,9 @@ bool Dungeon::doAttack( Player * player, UInt8 level)
 bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report, UInt32 * turns )
 {
 	UInt8 level = dpi.level;
-	if(level >= _levels.size())
+	if(level > _levels.size())
 		return false;
-	const GData::DungeonLevel * dgl = _dungeon->monsters[level];
+	const GData::DungeonLevel * dgl = _dungeon->monsters[level - 1];
 	if(dgl == NULL)
 		return false;
 	const GData::DungeonMonster * dm = dgl->monsterSet;
@@ -379,7 +376,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	UInt32 turns_ = bsim.getTurns();
 	if(dm->formated && res)
 	{
-		std::list<DungeonReportInfo>& dril = _recentReports[level];
+		std::list<DungeonReportInfo>& dril = _recentReports[level - 1];
 		bool found = false;
 		DungeonReportInfo dri;
 		dri.player = player;
@@ -445,7 +442,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		GameAction()->onDungeonWin(player, _id, dpi.level + 1);
 #endif
 	UInt8 level = dpi.level;
-	if(level >= _levels.size())
+	if(level > _levels.size())
     {
         dpi.justice_roar = 0;
         dpi.justice = 0;
@@ -474,7 +471,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 			*totalExp += exp;
 	}
 	bool r;
-	if(level < _levels.size())
+	if(level <= _levels.size())
 	{
 		dpi.level = level;
 		enterLevel(player, level);
@@ -573,7 +570,7 @@ void Dungeon::sendAutoChallengeStart( Player * player )
 	if(it == _players.end())
 		return;
 	Stream st(REP::COPY_AUTO_FIGHT);
-	st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(0) << Stream::eos;
+	st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(0) << Stream::eos;
 	player->send(st);
 }
 
@@ -607,7 +604,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			}
 			DBLOG().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(REP::COPY_AUTO_FIGHT);
-			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(0) << Stream::eos;
+			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(0) << Stream::eos;
 			player->send(st);
 		}
 		break;
@@ -622,7 +619,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
         {
             player->delFlag(Player::AutoDungeon);
             Stream st(REP::COPY_AUTO_FIGHT);
-            st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
+            st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 			return;
@@ -632,7 +629,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 		{
 			player->delFlag(Player::AutoDungeon);
 			Stream st(REP::COPY_AUTO_FIGHT);
-			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
+			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 			return;
@@ -694,7 +691,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			st_ << static_cast<UInt8>(0) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
 			player->send(st_);
 			Stream st(REP::COPY_AUTO_FIGHT);
-			st << _id << static_cast<UInt8>(it->second.level + 1) << static_cast<UInt8>(2) << exp << Stream::eos;
+			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 			return;
@@ -743,9 +740,9 @@ void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 tota
 	dpi.counterEnd = counterEnd;
 	dpi.justice = justice;
     dpi.justice_roar = justice_roar;
-	if(level >= _levels.size())
+	if(level > _levels.size() || level == 0)
 		return;
-	DungeonLevel& dl = _levels[level];
+	DungeonLevel& dl = _levels[level - 1];
 	dl.singles.insert(player);
 }
 
@@ -768,7 +765,7 @@ void Dungeon::sendDungeonInfo(Player * player, DungeonPlayerInfo& dpi)
 {
 	Stream st(REP::COPY_DATA_UPDATE);
 	UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level + 1) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
+	st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(dpi.level) << PLAYER_DATA(player, dungeonCnt) << enterCount << dpi.totalCount << dpi.firstPass << dpi.justice << Stream::eos;
 	player->send(st);
 }
 
@@ -790,7 +787,7 @@ void Dungeon::buildInfo( Player * player, Stream& st )
 
 void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 {
-	if(dpi.level >= _levels.size())
+	if(dpi.level > _levels.size())
 	{
 		Stream st(REP::COPY_DATA_UPDATE);
 		st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(0xFF) << dpi.justice << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
@@ -801,7 +798,7 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 	if(dgl == NULL)
 		return;
 	Stream st(REP::COPY_DATA_UPDATE);
-	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level + 1) << dpi.justice << static_cast<UInt8>(1);
+	st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(dpi.level) << dpi.justice << static_cast<UInt8>(1);
 	const GData::DungeonMonster * dm = dgl->monsterSet;
 	if(dm->formated)
 	{
@@ -836,9 +833,9 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 
 void Dungeon::enterLevel( Player * player, UInt8 level )
 {
-	if(level >= _levels.size())
+	if(level > _levels.size() || 0 == level)
 		return;
-	DungeonLevel& dl = _levels[level];
+	DungeonLevel& dl = _levels[level - 1];
 	if(dl.singles.find(player) != dl.singles.end())
 		return;
 	dl.singles.insert(player);
@@ -846,9 +843,9 @@ void Dungeon::enterLevel( Player * player, UInt8 level )
 
 void Dungeon::leaveLevel( Player * player, UInt8 level )
 {
-	if(level >= _levels.size())
+	if(level > _levels.size() || 0 == level)
 		return;
-	DungeonLevel& dl = _levels[level];
+	DungeonLevel& dl = _levels[level - 1];
 	std::set<Player *>::iterator it = dl.singles.find(player);
 	if(it == dl.singles.end())
 		return;

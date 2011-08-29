@@ -4,9 +4,9 @@ alter table `athletics_rank` drop column `boxCount`;
 alter table `athletics_rank` drop column `boxFlushTime`;
 
 alter table `athletics_rank` add column `prestige` int(10) unsigned NOT NULL DEFAULT '0' after `challengeTime`;
-alter table `athletics_rank` add column `bewinstreak` tinyint(3) unsigned NOT NULL DEFAULT '0' after `winStreak`;
-alter table `athletics_rank` add column `failstreak` tinyint(3) unsigned NOT NULL DEFAULT '0' after `bewinstreak`;
-alter table `athletics_rank` add column `befailstreak` tinyint(3) unsigned NOT NULL DEFAULT '0' after `failstreak`;
+alter table `athletics_rank` add column `bewinstreak` smallint(3) unsigned NOT NULL DEFAULT '0' after `winStreak`;
+alter table `athletics_rank` add column `failstreak` smallint(3) unsigned NOT NULL DEFAULT '0' after `bewinstreak`;
+alter table `athletics_rank` add column `befailstreak` smallint(3) unsigned NOT NULL DEFAULT '0' after `failstreak`;
 alter table `athletics_rank` add column `oldrank` int(10) unsigned NOT NULL DEFAULT '0' after `befailstreak`;
 alter table `athletics_rank` add column `first4rank` int(10) unsigned NOT NULL DEFAULT '0' after `oldrank`;
 alter table `athletics_rank` add column `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0' after `first4rank`;

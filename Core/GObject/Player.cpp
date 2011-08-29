@@ -4273,6 +4273,12 @@ namespace GObject
             playerCopy.buildInfo(this, st);
         }
 
+        UInt32 now = TimeUtil::Now();
+        if(now >= _playerData.dungeonEnd)
+        {
+            _playerData.dungeonCnt = 0;
+        }
+
         cnt = dungeonManager.size();
         st << cnt << _playerData.dungeonCnt << GObject::Dungeon::getMaxCount() << GObject::Dungeon::getExtraCount(vipLevel);
         if(cnt)

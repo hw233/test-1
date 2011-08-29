@@ -1080,7 +1080,7 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
     {
         if(_trump[idx] != NULL && _trump[idx]->getId() == id)  // 法宝
         {
-            pos = idx + 1;
+            pos = idx;
             return _trump[idx];
         }
     }
