@@ -2803,7 +2803,7 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
-        if (new_cny == 0xFF)
+        if (new_cny > WORKER_THREAD_LOGIN)
         {
             SYSMSG_SENDV(621, this, new_cny);
             return;
