@@ -87,13 +87,13 @@ CREATE TABLE `athletics_rank` (
   /*`boxCount` int(10) NOT NULL DEFAULT '0',*/
   /*`boxFlushTime` int(10) NOT NULL DEFAULT '0',*/
   `prestige`  int(10) unsigned NOT NULL DEFAULT '0',
-  `winStreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `bewinstreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `failstreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `befailstreak` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `winStreak` smallint(3) unsigned NOT NULL DEFAULT '0',
+  `bewinstreak` smallint(3) unsigned NOT NULL DEFAULT '0',
+  `failstreak` smallint(3) unsigned NOT NULL DEFAULT '0',
+  `befailstreak` smallint(3) unsigned NOT NULL DEFAULT '0',
   `oldrank` int(10) NOT NULL DEFAULT '0',
-  `first4rank` tinyint(10) unsigned NOT NULL DEFAULT '0',
-  `extrachallenge` tinyint(10) NOT NULL DEFAULT '0',
+  `first4rank` int(10) unsigned NOT NULL DEFAULT '0',
+  `extrachallenge` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

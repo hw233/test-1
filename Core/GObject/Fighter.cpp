@@ -1080,7 +1080,7 @@ ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
     {
         if(_trump[idx] != NULL && _trump[idx]->getId() == id)  // 法宝
         {
-            pos = idx + 1;
+            pos = idx;
             return _trump[idx];
         }
     }
@@ -2495,7 +2495,6 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
         {
             if(r < it->second)
             {
-                int a = it->first;
                 Fighter* fighter = _fighters[it->first].fighter;
                 return _fighters[it->first].fighter;
             }
