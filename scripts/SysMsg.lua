@@ -303,10 +303,16 @@ sysMsg:set(601, 1, "所在地点: %s %s")
 sysMsg:set(602, 1, "仙石: %u  礼券: %u")
 sysMsg:set(603, 1, "银币: %u")
 sysMsg:set(604, 1, "%u - [f:%u:%s]  等级: %u  潜力: %g")
+sysMsg:set(609, 1, "国家: %u");
 sysMsg:set(610, 1, "测试攻击 %s(%u) 第%u层，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(611, 1, "测试攻击 %s，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(611, 1, "测试 %s 攻击 %s，一共战斗 %u 场，胜利 %u 场，胜率 %g%%")
 sysMsg:set(612, 1, "是否在线: %s")
+sysMsg:set(613, 1, "免费副本次数: %u, 收费副本次数: %u")
+sysMsg:set(614, 1, "免费阵图次数: %u, 收费阵图次数: %u")
+sysMsg:set(620, 1, "当前在线人数: %u");
+sysMsg:set(621, 1, "目标据点[0x%x]不可达");
+sysMsg:set(622, 1, "所在线程: 0x%x");
 
 sysMsg:set(400, 0x17, "")
 sysMsg:set(401, 0x17, "")

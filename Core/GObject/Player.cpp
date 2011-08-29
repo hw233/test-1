@@ -570,7 +570,6 @@ namespace GObject
 		
 		DBLOG().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
 		DB().PushUpdateData("UPDATE `player` SET `lastOnline` = %u, `nextReward` = '%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", curtime, _playerData.rewardStep, _playerData.nextRewardItem, _playerData.nextRewardCount, _playerData.nextRewardTime, _id);
-		_isOnline = false;
 
 		if(!nobroadcast)
 		{
@@ -2804,6 +2803,12 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
+        if (new_cny > WORKER_THREAD_LOGIN)
+        {
+            SYSMSG_SENDV(621, this, new_cny);
+            return;
+        }
+
 		if(new_cny != cny.GetThreadID())
 		{
 			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);
@@ -2884,11 +2889,6 @@ namespace GObject
                     //if (ColorTaskOutOfAccept(4, im))
                     //    break;
 
-                    if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
-                        sendMsgCode(0, 1007);
-                        return false;
-                    }
-
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
                     AddExp(award); // TODO:
                     ++_playerData.smFinishCount;
@@ -2904,11 +2904,6 @@ namespace GObject
                 if (_playerData.yamen[i] == taskid) {
                     //if (ColorTaskOutOfAccept(5, im))
                     //    break;
-
-                    if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
-                        sendMsgCode(0, 1007);
-                        return false;
-                    }
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(1, _playerData.ymcolor[i], GetLev());
                     getTael(award); // TODO:
@@ -2927,6 +2922,14 @@ namespace GObject
                     if (ColorTaskOutOfAccept(4, im))
                         break;
 
+                    if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
+                        sendMsgCode(0, 1101);
+                        return false;
+                    }
+
+                    ConsumeInfo ci(ShimenTask, 0, 0);
+                    useGold(GData::moneyNeed[GData::SHIMEN_IM].gold, &ci);
+
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
                     AddExp(award); // TODO:
                     ++_playerData.smFinishCount;
@@ -2943,6 +2946,14 @@ namespace GObject
                 if (_playerData.fyamen[i] == taskid) {
                     if (ColorTaskOutOfAccept(5, im))
                         break;
+
+                    if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
+                        sendMsgCode(0, 1101);
+                        return false;
+                    }
+                    
+                    ConsumeInfo ci(YamenTask, 0, 0);
+                    useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
@@ -4935,7 +4946,7 @@ namespace GObject
             else if(type == 1)
             {
                 count = 1;
-                money = 50;
+                money = GData::moneyNeed[GData::BOOK_LIST].tael;
                 // updateNextBookStoreUpdate(curtime);
             }
 

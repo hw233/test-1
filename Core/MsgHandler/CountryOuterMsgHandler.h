@@ -2773,7 +2773,7 @@ void OnMailDelReq( GameMsgHdr& hdr, const void * buffer )
 	}
 	std::vector<UInt8> rep;
 	rep.resize(4 + blen);
-	*reinterpret_cast<UInt32 *>(&rep[0]) = 0xA2FF0000 | blen;
+	*reinterpret_cast<UInt32 *>(&rep[0]) = (REP::MAIL_DELETE << 6) | 0xFF0000 | blen;
 	memcpy(&rep[4], buffer, blen);
 	player->send(&rep[0], rep.size());
 	if(c > 0)

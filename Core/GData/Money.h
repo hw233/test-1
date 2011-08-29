@@ -58,6 +58,8 @@ enum
     RECRUIT,
 // 地图跳转
     JUMP_MAP,
+// 书商刷新
+    BOOK_LIST,
 
     MONEY_MAX,
 };

@@ -123,6 +123,9 @@ GMHandler::GMHandler()
     Reg(3, "gmc", &GMHandler::OnGmCheck);
     Reg(3, "m2a", &GMHandler::OnMoney2All);
     Reg(3, "kick", &GMHandler::OnKick);
+    Reg(3, "count", &GMHandler::OnCount);
+    Reg(3, "wc", &GMHandler::OnCount);
+    Reg(3, "tid", &GMHandler::OnThreadId);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -784,7 +787,11 @@ void GMHandler::OnPlayerInfo( GObject::Player * player, std::vector<std::string>
 	SYSMSG_SENDV(601, player, map->GetName().c_str(), ((sd != NULL) ? (sd->m_Name.c_str()) : ""));
 	SYSMSG_SENDV(602, player, PLAYER_DATA(pl, gold), PLAYER_DATA(pl, coupon));
 	SYSMSG_SENDV(603, player, PLAYER_DATA(pl, tael), PLAYER_DATA(pl, coin));
+	SYSMSG_SENDV(609, player, PLAYER_DATA(pl, country));
 	SYSMSG_SENDV(612, player, pl->isOnline()?"YES":"NO");
+	SYSMSG_SENDV(613, player, PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt));
+	SYSMSG_SENDV(614, player, PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl, frontGoldCnt));
+	SYSMSG_SENDV(622, player, pl->getThreadId());
 }
 
 void GMHandler::OnCharInfo( GObject::Player * player, std::vector<std::string>& args )
@@ -2132,30 +2139,54 @@ void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
         return;
 
     UInt64 playerId = atol(args[0].c_str());
-
-    Stream st;
-    st.init(REP::RECONNECT, 0x01);
-    st<<playerId;
 	GObject::Player * pl= GObject::globalPlayers[playerId];
-    if(pl==NULL)
+    if (pl) 
     {
-        st<<static_cast<UInt32>(1);
-    }
-    else
-    {
-        if(pl->isOnline())
+        TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
+        if (conn)
         {
-            st<<static_cast<UInt32>(0);
-            TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
-            if(conn.get() == NULL)
-                return;
             Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
-            cl->closeConn();
+            if (cl)
+            {
+                pl->SetSessionID(-1);
+                pl->testBattlePunish();
+                pl->setOnline(false);
+                static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
+                cl->send(kick_pkt, 4);
+                cl->SetPlayer(NULL);
+                cl->pendClose();
+            }
         }
-        else
-            st<<static_cast<UInt32>(2);
     }
-    st<<Stream::eos;
-    NETWORK()->SendMsgToClient(pl->GetSessionID(),st);
+}
+
+void GMHandler::OnCount(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+	SYSMSG_SENDV(620, player, SERVER().GetTcpService()->getOnlineNum());
+}
+
+void GMHandler::OnThreadId(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+
+    if (args.size() >= 2)
+    {
+        UInt64 playerId = atol(args[0].c_str());
+        GObject::Player * pl= GObject::globalPlayers[playerId];
+
+        UInt8 threadId = atoi(args[1].c_str());
+        if (threadId == 0xFF)
+            threadId = 2;
+        CURRENT_COUNTRY().PlayerLeave(pl);
+        pl->setThreadId(threadId);
+
+        PlayerData& pd = pl->getPlayerData();
+        CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
+        GameMsgHdr hdr(0x1F0, threadId, player, sizeof(CountryEnterStruct));
+        GLOBAL().PushMsg(hdr, &ces);
+    }
 }
 
