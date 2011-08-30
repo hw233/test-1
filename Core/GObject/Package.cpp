@@ -1895,7 +1895,7 @@ namespace GObject
 		return 0;
 	}
 
-    UInt8 Package::BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& unbindGemsOut, UInt16& bindGemsOut)
+    UInt8 Package::BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut)
     {
 		UInt16 protectUnbindNum = GetItemNum(ITEM_GEM_PROTECT, false);
 		UInt16 protectBindNum = GetItemNum(ITEM_GEM_PROTECT, true);
@@ -1921,6 +1921,7 @@ namespace GObject
         UInt32 bindUsed = 0, unbindUsed = 0;
         unbindGemsOut = 0;
         bindGemsOut = 0;
+        gemIdOut = gemId + 1;
 
         while(result == 0 && bindCount >= 3)
         {
@@ -2046,13 +2047,13 @@ namespace GObject
             DelItem(gemId, unbindUsed, false);
         if(bindGemsOut > 0)
         {
-            AddItem(gemId + 1, bindGemsOut, true);
+            AddItem(gemIdOut, bindGemsOut, true);
             if(World::_activityStage > 0)
                 GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
         }
         if(unbindGemsOut > 0)
         {
-            AddItem(gemId + 1, unbindGemsOut, false);
+            AddItem(gemIdOut, unbindGemsOut, false);
             if(World::_activityStage > 0)
                 GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
         }

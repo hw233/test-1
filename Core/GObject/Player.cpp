@@ -3509,6 +3509,7 @@ namespace GObject
 		Stream st(REP::HOTEL_PUB_LIST);
 		if(count > 0)
 		{
+            UInt8 hasGet = 0;
 			do
 			{
 				bool hasBlue = false, hasPurple = false, hasOrange = false;
@@ -3564,7 +3565,6 @@ namespace GObject
 #endif
 				}
 
-                bool hasGet = false;
 				for(; i < 6; ++ i)
 				{
 					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, rateidx);
@@ -3575,19 +3575,17 @@ namespace GObject
 					else
 					{
 						UInt8 tmpcolor = fgt->getColor();
-                        if(tmpcolor == 3 && _playerData.tavernOrangeCount < 1000 )
+                        if(tmpcolor)
                         {
-                        }
-
-                        if(color <= tmpcolor)
-                        {
-                            if(hasGet)
+                            if( (1 << tmpcolor) & hasGet ) 
                             {
                                 -- i;
                                 continue;
                             }
                             else
-                                hasGet = true;
+                            {
+                                hasGet |= (1 << tmpcolor);
+                            }
                         }
 
 						_playerData.tavernId[i] = fgt->getId();
@@ -4370,6 +4368,8 @@ namespace GObject
         if(type == 1 || type == 2)
         {
 		    p = fgt->getCapacity();
+            if(p > GObjectManager::getMaxPotential()/100 - 0.001)
+                return 1;
             std::vector<UInt32>& chance = GObjectManager::getCapacityChance();
             size_t cnt = chance.size();
             for(UInt32 idx = 0; idx < cnt; idx ++)
@@ -4385,6 +4385,8 @@ namespace GObject
         {
             isPotential = true;
 		    p = fgt->getPotential();
+            if(p > GObjectManager::getMaxCapacity()/100 - 0.001)
+                return 1;
             std::vector<UInt32>& chance = GObjectManager::getPotentialChance();
             size_t cnt = chance.size();
             for(UInt32 idx = 0; idx < cnt; idx ++)

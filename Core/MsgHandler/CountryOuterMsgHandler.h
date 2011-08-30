@@ -1620,11 +1620,12 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
 		return;
 	}
 
-    UInt16 gemUnbindOut;
-    UInt16 gemBindOut;
-	UInt8 result = player->GetPackage()->BatchMergeGem(bmr._gemId, bmr._unBindNum, bmr._bindNum, bmr._protect, gemUnbindOut, gemBindOut);
+    UInt16 gemIdOut = 0;
+    UInt16 gemUnbindOut = 0;
+    UInt16 gemBindOut = 0;
+	UInt8 result = player->GetPackage()->BatchMergeGem(bmr._gemId, bmr._unBindNum, bmr._bindNum, bmr._protect, gemIdOut, gemUnbindOut, gemBindOut);
 	Stream st(REP::GEM_BATCH_UPGRADE);
-	st << result << bmr._gemId << gemUnbindOut << gemBindOut;
+	st << result << gemIdOut << gemUnbindOut << gemBindOut;
 	st << Stream::eos;
 	player->send(st);
 }
