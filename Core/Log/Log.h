@@ -43,7 +43,9 @@ enum PurchaseType
     EnterCopy,
     EnterFrontMap,
     ShimenTask,
+    ShimenTaskFresh,
     YamenTask,
+    YamenTaskFresh,
 };
 
 enum MoneyType
