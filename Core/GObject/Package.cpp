@@ -848,7 +848,7 @@ namespace GObject
                 return false;
 			}
 
-            if (item->getClass() != Item_Trump || (item->getClass() == Item_Trump && fgt->canSetTrump(part-0x50)))
+            if (item->getClass() != Item_Trump || (item->getClass() == Item_Trump && fgt->canSetTrump(part-0x50, item->getId())))
             {
                 newOne = static_cast<GObject::ItemEquip *>(item);
                 SendDelEquipData(static_cast<ItemEquip *>(item));
