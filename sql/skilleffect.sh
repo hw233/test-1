@@ -14,6 +14,7 @@ function skilleffect()
     d=skilleffect
     sed -i /id/d $f
     sed -i /ID/d $f
+    sed -i /REF/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
     echo "Generating file $d, total lines $l"

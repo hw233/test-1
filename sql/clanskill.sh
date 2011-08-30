@@ -12,6 +12,7 @@ function clanskill()
     f=$1
     d=clanskill
     sed -i /ID/d $f
+    sed -i /REF/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`

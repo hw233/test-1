@@ -13,6 +13,7 @@ function mapspot()
     f=$1
     d=mapspot
     sed -i /ID/d $f
+    sed -i /REF/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
