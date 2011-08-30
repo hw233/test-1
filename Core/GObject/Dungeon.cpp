@@ -53,7 +53,7 @@ Dungeon::~Dungeon()
 
 void Dungeon::playerJump( Player * player, UInt8 level )
 {
-	if(level > _levels.size())
+	if(level >= _levels.size())
 		return;
 	DungeonPlayerInfo& dpi = _players[player];
 	dpi.level = level;
@@ -73,6 +73,7 @@ UInt8 Dungeon::playerEnter( Player * player )
 		dpi = &_players[player];
 		dpi->counterEnd = TimeUtil::SharpDay(1);
 		++ dpi->count;
+        dpi->level = 1;
 		PLAYER_DATA(player, dungeonEnd) = TimeUtil::SharpDay(1);
         ++ PLAYER_DATA(player, dungeonCnt);
 		sendDungeonInfo(player, *dpi);
@@ -114,7 +115,7 @@ UInt8 Dungeon::playerEnter( Player * player )
         dpi->level = 1;
 
 	sendDungeonLevelData(player, *dpi);
-	enterLevel(player, 0);
+	enterLevel(player, dpi->level);
 	updateToDB(player, *dpi);
 	return 0;
 }
@@ -224,9 +225,9 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 
 bool Dungeon::doAttack( Player * player, UInt8 level)
 {
-	if(level > _levels.size())
+	if(level >= _levels.size())
 		return false;
-	const GData::DungeonLevel * dgl = _dungeon->monsters[level - 1];
+	const GData::DungeonLevel * dgl = _dungeon->monsters[level];
 	if(dgl == NULL)
 		return false;
 	const GData::DungeonMonster * dm = dgl->monsterSet;
@@ -296,9 +297,9 @@ bool Dungeon::doAttack( Player * player, UInt8 level)
 bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report, UInt32 * turns )
 {
 	UInt8 level = dpi.level;
-	if(level > _levels.size())
+	if(level >= _levels.size())
 		return false;
-	const GData::DungeonLevel * dgl = _dungeon->monsters[level - 1];
+	const GData::DungeonLevel * dgl = _dungeon->monsters[level];
 	if(dgl == NULL)
 		return false;
 	const GData::DungeonMonster * dm = dgl->monsterSet;
@@ -369,14 +370,14 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 
     // TODO:
 	if (_id == 1)
-            GameAction()->RunOperationTaskAction2(player, 1, 1, level+1);
+            GameAction()->RunOperationTaskAction2(player, 1, 1, level);
 
 	Stream st(REP::ATTACK_NPC);
 	bool res = bsim.getWinner() == 1;
 	UInt32 turns_ = bsim.getTurns();
 	if(dm->formated && res)
 	{
-		std::list<DungeonReportInfo>& dril = _recentReports[level - 1];
+		std::list<DungeonReportInfo>& dril = _recentReports[level];
 		bool found = false;
 		DungeonReportInfo dri;
 		dri.player = player;
@@ -442,7 +443,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		GameAction()->onDungeonWin(player, _id, dpi.level + 1);
 #endif
 	UInt8 level = dpi.level;
-	if(level > _levels.size())
+	if(level >= _levels.size())
     {
         dpi.justice_roar = 0;
         dpi.justice = 0;
@@ -458,7 +459,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     }
 
     // TODO:
-	GameAction()->RunOperationTaskAction2(player, 2, _id, level+1);
+	GameAction()->RunOperationTaskAction2(player, 2, _id, level);
 
 	++ level;
 	UInt16 dpd = (static_cast<UInt16>(level) << 8) + _id;
@@ -471,7 +472,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 			*totalExp += exp;
 	}
 	bool r;
-	if(level <= _levels.size())
+	if(level < _levels.size())
 	{
 		dpi.level = level;
 		enterLevel(player, level);
@@ -480,7 +481,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 	}
 	else
 	{
-		dpi.level = 0xFE;
+		dpi.level = 0xFF;
 		++ dpi.totalCount;
 		if(dpi.firstPass == 0)
 		{
@@ -510,7 +511,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		if(online)
 		{
 			Stream st(REP::COPY_AUTO_FIGHT);
-			st << _id << level;
+			st << _id << static_cast<UInt8>(level - 1);
 			if(r)
 				st << static_cast<UInt8>(4) << *totalExp;
 			else
@@ -742,7 +743,7 @@ void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 tota
     dpi.justice_roar = justice_roar;
 	if(level > _levels.size() || level == 0)
 		return;
-	DungeonLevel& dl = _levels[level - 1];
+	DungeonLevel& dl = _levels[level];
 	dl.singles.insert(player);
 }
 
@@ -787,7 +788,7 @@ void Dungeon::buildInfo( Player * player, Stream& st )
 
 void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 {
-	if(dpi.level > _levels.size())
+	if(dpi.level >= _levels.size())
 	{
 		Stream st(REP::COPY_DATA_UPDATE);
 		st << static_cast<UInt8>(5) << _id << static_cast<UInt8>(0xFF) << dpi.justice << static_cast<UInt8>(0) << static_cast<UInt8>(0) << Stream::eos;
@@ -833,9 +834,9 @@ void Dungeon::sendDungeonLevelData( Player * player, DungeonPlayerInfo& dpi )
 
 void Dungeon::enterLevel( Player * player, UInt8 level )
 {
-	if(level > _levels.size() || 0 == level)
+	if(level >= _levels.size())
 		return;
-	DungeonLevel& dl = _levels[level - 1];
+	DungeonLevel& dl = _levels[level];
 	if(dl.singles.find(player) != dl.singles.end())
 		return;
 	dl.singles.insert(player);
@@ -843,9 +844,9 @@ void Dungeon::enterLevel( Player * player, UInt8 level )
 
 void Dungeon::leaveLevel( Player * player, UInt8 level )
 {
-	if(level > _levels.size() || 0 == level)
+	if(level >= _levels.size())
 		return;
-	DungeonLevel& dl = _levels[level - 1];
+	DungeonLevel& dl = _levels[level];
 	std::set<Player *>::iterator it = dl.singles.find(player);
 	if(it == dl.singles.end())
 		return;
