@@ -1943,7 +1943,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         {
             soul += cb->needsoul;
             if (cb->needsoul)
-                sendModification(8, soul);
+                sendModification(0x8, soul);
         }
     }
 
@@ -2263,7 +2263,7 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
             return false;
         soul -= cb->needsoul;
         if (cb->needsoul)
-            sendModification(8, soul);
+            sendModification(0x8, soul);
     }
 
     _attrDirty = true;
