@@ -130,8 +130,7 @@ function Task_00000615_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(2000);
-	player:getTael(1000);
+	player:AddExp(3000);
 	return true;
 end
 
