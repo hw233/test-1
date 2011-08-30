@@ -1867,9 +1867,9 @@ namespace GObject
 				dl->loots.push_back(GData::lootTable[atoi(tk[i].c_str())]);
 			}
             std::vector<const GData::DungeonLevel *>& ddl = dd->monsters;
-            if(ddl.size() <= static_cast<size_t>(dlvl.level - 1))
-                ddl.resize(dlvl.level);
-            ddl[dlvl.level - 1] = dl;
+            if(ddl.size() <= static_cast<size_t>(dlvl.level))
+                ddl.resize(dlvl.level + 1);
+            ddl[dlvl.level] = dl;
 		}
 		lc.finalize();
 		
