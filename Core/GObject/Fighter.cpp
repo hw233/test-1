@@ -616,10 +616,19 @@ ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 
 bool Fighter::hasTrumpType(UInt32 trumpid)
 {
+    if (!_owner)
+        return false;
+
+    ItemEquip* ie = _owner->GetPackage()->GetEquip(trumpid);
+    if (!ie)
+        return false;
+
     for (UInt8 i = 0; i < TRUMP_UPMAX; ++i)
     {
         if (_trump[i])
         {
+            if (_trump[i]->GetItemType().getId() == ie->GetItemType().getId())
+                return true;
         }
     }
     return false;

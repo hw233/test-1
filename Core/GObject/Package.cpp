@@ -843,19 +843,19 @@ namespace GObject
             case 0x52:
                 if(item->getClass() != Item_Trump)
                     return false;
-                old = fgt->setTrump(static_cast<GObject::ItemEquip *>(item), part-0x50);
+                if (fgt->canSetTrump(part-0x50, item->getId()))
+                    old = fgt->setTrump(static_cast<GObject::ItemEquip *>(item), part-0x50);
+                else
+                    return false;
                 break;
             default:
                 return false;
 			}
 
-            if (item->getClass() != Item_Trump || (item->getClass() == Item_Trump && fgt->canSetTrump(part-0x50, item->getId())))
-            {
-                newOne = static_cast<GObject::ItemEquip *>(item);
-                SendDelEquipData(static_cast<ItemEquip *>(item));
-                m_Items.erase(iter);
-                -- m_Size;
-            }
+            newOne = static_cast<GObject::ItemEquip *>(item);
+            SendDelEquipData(static_cast<ItemEquip *>(item));
+            m_Items.erase(iter);
+            -- m_Size;
 		}
 		else
 		{

@@ -15,6 +15,17 @@ void FrontMap::sendAllInfo(Player* pl)
 {
 }
 
+UInt8 FrontMap::getGoldCount(UInt8 vipl)
+{
+    if (vipl == 2)
+        return 1;
+    if (vipl == 3)
+        return 2;
+    if (vipl >= 4)
+        return 3;
+    return 2; // TODO:
+}
+
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
 {
     FastMutex::ScopedLock lk(_mutex);
@@ -133,7 +144,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             tmp.resize(1);
             DB().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
             ret = 0;
-        } else if (PLAYER_DATA(pl, frontGoldCnt) < GOLDCNT) {
+        } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
             //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
             if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
                 Stream st(REP::FORMATTON_INFO);
@@ -150,6 +161,8 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
             ConsumeInfo ci(EnterFrontMap,0,0);
             pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
+        } else {
+            return;
         }
     } else
         ret = 0;
@@ -179,7 +192,7 @@ UInt8 FrontMap::getCount(Player* pl)
         }
     }
 
-    UInt8 count = GOLDCNT-PLAYER_DATA(pl, frontGoldCnt);
+    UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, frontGoldCnt);
     count <<= 4;
     count |= FREECNT-PLAYER_DATA(pl, frontFreeCnt);
     return count;
@@ -191,7 +204,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
 
     FastMutex::ScopedLock lk(_mutex);
-    if (PLAYER_DATA(pl, frontFreeCnt) > FREECNT && PLAYER_DATA(pl, frontGoldCnt) > GOLDCNT)
+    if (PLAYER_DATA(pl, frontFreeCnt) > FREECNT && PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))
         return;
 
     Stream st(REP::FORMATTON_INFO);

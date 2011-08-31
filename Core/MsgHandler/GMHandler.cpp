@@ -549,7 +549,7 @@ void GMHandler::OnSetVip( GObject::Player * player, std::vector<std::string>& ar
 	UInt32 level = atoi(args[0].c_str());
 	if(level > 10)
 		return;
-	const static UInt32 gold[] = {0, 200, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 300000};
+	const static UInt32 gold[] = {88,888,1888,5888,18888,58888,88888,188888,288888,588888};
 	player->setTotalRecharge(gold[level]);
 }
 

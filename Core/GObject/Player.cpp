@@ -393,25 +393,25 @@ namespace GObject
 #define VIP_OPEN_MAX 10
 		UInt32 totalRecharge = _playerData.totalRecharge;
 		UInt32 vipl;
-		if(totalRecharge < 199)
+		if(totalRecharge < 88)
 			vipl = 0;
-		else if(totalRecharge < 999)
+		else if(totalRecharge < 888)
 			vipl = 1;
-		else if(totalRecharge < 1999)
+		else if(totalRecharge < 1888)
 			vipl = 2;
-		else if(totalRecharge < 4999)
+		else if(totalRecharge < 5888)
 			vipl = 3;
-		else if(totalRecharge < 9999)
+		else if(totalRecharge < 18888)
 			vipl = 4;
-		else if (totalRecharge < 19999)
+		else if (totalRecharge < 58888)
 			vipl = 5;
-		else if(totalRecharge < 49999)
+		else if(totalRecharge < 88888)
 			vipl = 6;
-		else if(totalRecharge < 99999)
+		else if(totalRecharge < 188888)
 			vipl = 7;
-		else if(totalRecharge < 199999)
+		else if(totalRecharge < 288888)
 			vipl = 8;
-		else if(totalRecharge < 299999)
+		else if(totalRecharge < 588888)
 			vipl = 9;
 		else
 			vipl = 10;
@@ -2883,6 +2883,15 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
+        // TODO:
+#if 0
+        if (im) {
+            if (getVipLevel() < 3) {
+                sendMsgCode(0, 1003);
+                return false;
+            }
+        }
+#endif
         if (!im) {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.shimen[i] == taskid) {
@@ -3090,6 +3099,8 @@ namespace GObject
         _playerData.ymAcceptCount = _playerData.ymAcceptCount - _playerData.ymFinishCount;
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
+        _playerData.smFreeCount = 0;
+        _playerData.ymFreeCount = 0;
         writeShiMen();
         writeYaMen();
         if (isOnline())
@@ -3363,9 +3374,17 @@ namespace GObject
                                 if (ttype == 0) {
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
+                                    if (getVipLevel() >= 3) {
+                                        static UInt8 viptaskcolor[11] = {0,0,0,3,3,3,4,4,4,4,4};
+                                        _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
+                                    }
                                 } else {
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
+                                    if (getVipLevel() >= 2) {
+                                        static UInt8 viptaskcolor[11] = {0,0,3,3,3,4,4,4,4,4,4};
+                                        _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
+                                    }
                                 }
                                 if (j+1 == color)
                                     percolor = true;
