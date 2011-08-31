@@ -17,6 +17,17 @@ void PlayerCopy::sendAllInfo(Player* pl)
 {
 }
 
+UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
+{
+    if (vipl == 2)
+        return 1;
+    if (vipl == 3)
+        return 2;
+    if (vipl >= 4)
+        return 3;
+    return 3; // TODO:
+}
+
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)
 {
     if (!pl || !id)
@@ -29,7 +40,7 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << id;
     st << cd.floor;
     st << cd.spot;
-    UInt8 count = GOLDCNT-PLAYER_DATA(pl, copyGoldCnt);
+    UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, copyGoldCnt);
     count <<= 4;
     
     count |= FREECNT-PLAYER_DATA(pl, copyFreeCnt);
@@ -80,7 +91,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
     if (PLAYER_DATA(pl, copyFreeCnt) < FREECNT) {
         ++PLAYER_DATA(pl, copyFreeCnt);
         ret = 0;
-    } else if (PLAYER_DATA(pl, copyGoldCnt) < GOLDCNT) {
+    } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
         //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, copyGoldCnt)+1)) {
         if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
             st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
@@ -93,6 +104,9 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         ConsumeInfo ci(EnterCopy,0,0);
         pl->useGold(20*PLAYER_DATA(pl, copyGoldCnt)); // 第1次20,第2次40
         ret = 0;
+    } else {
+        SYSMSG_SENDV(2000, pl);
+        return;
     }
 
     if (!tcd.floor) {
@@ -121,7 +135,7 @@ void PlayerCopy::fight(Player* pl, UInt8 id)
         return;
     }
 
-    if (PLAYER_DATA(pl, copyFreeCnt) > FREECNT && PLAYER_DATA(pl, copyGoldCnt) > GOLDCNT)
+    if (PLAYER_DATA(pl, copyFreeCnt) > FREECNT && PLAYER_DATA(pl, copyGoldCnt) > getGoldCount(pl->getVipLevel()))
         return;
 
     if (!GData::copyManager[id<<8|tcd.floor].size())

@@ -28,6 +28,8 @@ public:
     static const UInt8 FREECNT = 1;
     static const UInt8 GOLDCNT = 2;
 
+    static UInt8 getGoldCount(UInt8 vipl);
+
 public:
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id, bool = false, bool = false);
