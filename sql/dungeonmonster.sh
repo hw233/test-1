@@ -12,7 +12,8 @@ function dungeonmonster()
     f=$1
     d=dungeonmonster
     sed -i /isPack/d $f
-    sed -i /ID/d $f
+    sed -i /monsters/d $f
+    sed -i /REF/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`

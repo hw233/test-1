@@ -318,7 +318,8 @@ public:
 	ItemEquip * findEquip(UInt32 id, UInt8& pos);
 	void removeEquip(UInt8 pos, ItemEquip * equip, UInt8 toWhere = 0);
 	inline void setDirty(bool d = true) { _attrDirty = d; _bPDirty = d; }
-    bool canSetTrump(UInt8 idx);
+    bool hasTrumpType(UInt32 trumpid);
+    bool canSetTrump(UInt8 idx, UInt32 trumpid);
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }

@@ -1,7 +1,7 @@
 --任务的接受条件
 function Task_Accept_00000094()
 	local player = GetPlayer();
-	if player:GetLev() < 48 then
+	if player:GetLev() < 47 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -18,7 +18,7 @@ end
 function Task_Can_Accept_00000094()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 48 then
+	if player:GetLev() < 47 then
 		return false;
 	end
 	if task:HasAcceptedTask(94) or task:HasCompletedTask(94) or task:HasSubmitedTask(94) then
@@ -126,11 +126,11 @@ function Task_00000094_accept()
 		return false;
 	end
 	local package = player:GetPackage();
-	local itemNum = package:GetItemNum(811,1);
+	local itemNum = package:GetItemNum(809,1);
 	if itemNum ~= 0 then
 		if itemNum > 2 then
 			itemNum = 2;
-			package:SetItem(811, itemNum, 1);
+			package:SetItem(809, itemNum, 1);
 		end
 		task:AddTaskStep2(94, 1, itemNum);
 	end
@@ -144,7 +144,7 @@ function Task_00000094_submit(itemId, itemNum)
 	local player = GetPlayer();
 
 	local package = player:GetPackage();
-	if package:GetItemNum(811,1) < 2 then
+	if package:GetItemNum(809,1) < 2 then
 		return false;
 	end
 
@@ -152,7 +152,7 @@ function Task_00000094_submit(itemId, itemNum)
 		return false;
 	end
 
-	package:DelItemAll(811,1);
+	package:DelItemAll(809,1);
 
 	player:AddExp(40000);
 	return true;
@@ -162,6 +162,6 @@ end
 function Task_00000094_abandon()
 	local package = GetPlayer():GetPackage();
 	local itemNum = 0;
-	package:DelItemAll(811,1);
+	package:DelItemAll(809,1);
 	return GetPlayer():GetTaskMgr():AbandonTask(94);
 end

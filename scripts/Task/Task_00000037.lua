@@ -1,7 +1,7 @@
 --����Ľ�������
 function Task_Accept_00000037()
 	local player = GetPlayer();
-	if player:GetLev() < 35 then
+	if player:GetLev() < 45 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -34,7 +34,7 @@ end
 function Task_Can_Accept_00000037()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 35 then
+	if player:GetLev() < 45 then
 		return false;
 	end
 	if task:HasAcceptedTask(37) or task:HasCompletedTask(37) or task:HasSubmitedTask(37) then
@@ -82,20 +82,20 @@ function Task_00000037(npcId)
 		action.m_ActionID = 37
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "神手比丘";
+		action.m_ActionMsg = "青螺八魔";
 	elseif task:GetTaskSubmitNpc(37) == npcId then
 		if Task_Submit_00000037() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 37
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "神手比丘";
+			action.m_ActionMsg = "青螺八魔";
 		elseif task:HasAcceptedTask(37) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 37
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "神手比丘";
+			action.m_ActionMsg = "青螺八魔";
 		end
 	end
 	return action;
@@ -119,7 +119,7 @@ function Task_00000037_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "青螺魔宫是八魔的师傅神手比丘魏枫娘所建，这个妖妇非常狡猾，你去青螺魔宫一定不能放过他。";
+	action.m_NpcMsg = "青螺魔宫是八魔的师傅神手比丘魏枫娘所建，这个妖妇非常狡猾，他的弟子七魔许人龙昔日与我有点恩怨，正好趁此机会报昔年之仇。";
 	action.m_ActionMsg = "你放心，我一定手刃此獠。";
 	return action;
 end
@@ -173,7 +173,7 @@ function Task_00000037_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(3333);
+	player:AddExp(30000);
 	return true;
 end
 

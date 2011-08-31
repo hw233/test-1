@@ -13,6 +13,7 @@ function clantech()
     f=$1
     d=clantech
     sed -i /ID/d $f
+    sed -i /REF/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`

@@ -16,6 +16,7 @@
 #include "Server/OidGenerator.h"
 #include "Common/StringTokenizer.h"
 #include "Server/Cfg.h"
+#include "GData/SkillTable.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -848,7 +849,7 @@ namespace GObject
                 return false;
 			}
 
-            if (item->getClass() != Item_Trump || (item->getClass() == Item_Trump && fgt->canSetTrump(part-0x50)))
+            if (item->getClass() != Item_Trump || (item->getClass() == Item_Trump && fgt->canSetTrump(part-0x50, item->getId())))
             {
                 newOne = static_cast<GObject::ItemEquip *>(item);
                 SendDelEquipData(static_cast<ItemEquip *>(item));
@@ -1318,7 +1319,23 @@ namespace GObject
 				fgt->setDirty();
 
                 if(equip->getClass() == Item_Trump)
+                {
+                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                    if (attr && attr->skills.size())
+                    {
+                        size_t size = attr->skills.size();
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            if (attr->skills[i])
+                            {
+                                UInt16 skillid = attr->skills[i]->getId();
+                                attr->skills[i] = GData::skillManager[skillid+1];
+                            }
+                        }
+                        fgt->addSkillsFromCT(attr->skills, true);
+                    }
                     fgt->sendModification(0x50 + pos, equip, false);
+                }
                 else
                     fgt->sendModification(0x21 + pos, equip, false);
 			}
@@ -1352,7 +1369,25 @@ namespace GObject
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
+                {
+                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                    if (attr && attr->skills.size())
+                    {
+                        size_t size = attr->skills.size();
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            if (attr->skills[i])
+                            {
+                                UInt16 skillid = attr->skills[i]->getId();
+                                if (!(skillid % 100))
+                                    skillid += 1;
+                                attr->skills[i] = GData::skillManager[skillid-1];
+                            }
+                        }
+                        fgt->addSkillsFromCT(attr->skills, true);
+                    }
                     fgt->sendModification(0x50 + pos, equip, false);
+                }
                 else
                     fgt->sendModification(0x21 + pos, equip, false);
 			}

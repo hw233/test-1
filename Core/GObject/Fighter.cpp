@@ -614,19 +614,30 @@ ItemEquip * Fighter::setRing( ItemEquip * r, bool writedb )
 	return rr;
 }
 
-bool Fighter::canSetTrump(UInt8 idx)
+bool Fighter::hasTrumpType(UInt32 trumpid)
+{
+    for (UInt8 i = 0; i < TRUMP_UPMAX; ++i)
+    {
+        if (_trump[i])
+        {
+        }
+    }
+    return false;
+}
+
+bool Fighter::canSetTrump(UInt8 idx, UInt32 trumpid)
 {
     if (idx == 0)
         return true;
 
     if (_level >= 60 && idx == 2)
     {
-        return true;
+        return !hasTrumpType(trumpid);
     }
 
     if (_potential >= 1.5 && _capacity >= 7 && idx == 1)
     {
-        return true;
+        return !hasTrumpType(trumpid);
     }
 
     return false;
@@ -651,7 +662,7 @@ ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
 
 ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 {
-    if (canSetTrump(idx))
+    if (canSetTrump(idx, trump))
     {
         ItemEquip* t = 0;
         t = GObjectManager::fetchEquipment(trump);
@@ -663,7 +674,7 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
-    if (canSetTrump(idx))
+    if (!trump || canSetTrump(idx, trump->getId()))
     {
         if
             (
@@ -1932,7 +1943,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         {
             soul += cb->needsoul;
             if (cb->needsoul)
-                sendModification(8, soul);
+                sendModification(0x8, soul);
         }
     }
 
@@ -1962,6 +1973,11 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
         if (i < 0)
             return false;
         return addNewCitta(citta+1, writedb, false);
+    }
+    else
+    {
+		if(_owner != NULL) ;
+            SYSMSG_SENDV(2008, _owner);
     }
     return false;
 }
@@ -2212,7 +2228,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
         op = 1;
     }
 
-    if (!init)
+    if (!init && cb->pexp)
         addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
@@ -2252,7 +2268,7 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
             return false;
         soul -= cb->needsoul;
         if (cb->needsoul)
-            sendModification(8, soul);
+            sendModification(0x8, soul);
     }
 
     _attrDirty = true;

@@ -13,6 +13,7 @@ function mapobject()
     f=$1
     d=mapobject
     sed -i /footHoldId/d $f
+    sed -i /REF/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
