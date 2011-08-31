@@ -1974,6 +1974,11 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
             return false;
         return addNewCitta(citta+1, writedb, false);
     }
+    else
+    {
+		if(_owner != NULL) ;
+            SYSMSG_SENDV(2008, _owner);
+    }
     return false;
 }
 
@@ -2223,7 +2228,7 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
         op = 1;
     }
 
-    if (!init)
+    if (!init && cb->pexp)
         addPExp(-cb->pexp, writedb);
 
     _attrDirty = true;
