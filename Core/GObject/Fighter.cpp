@@ -675,6 +675,24 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
     {
         ItemEquip* t = 0;
         t = GObjectManager::fetchEquipment(trump);
+        if (t)
+        {
+            GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(t->getAttrExtra());
+            if (attr->skills.size())
+            {
+                size_t size = attr->skills.size();
+                for (size_t i = 0; i < size; ++i)
+                {
+                    if (attr->skills[i])
+                    {
+                        UInt16 skillid = attr->skills[i]->getId();
+                        UInt16 nskillid = SKILLANDLEVEL(SKILL_ID(skillid), t->getItemEquipData().enchant+1);
+                        if (nskillid != skillid)
+                            attr->skills[i] = GData::skillManager[skillid];
+                    }
+                }
+            }
+        }
         return setTrump(t, idx, writedb);
     }
     return 0;
