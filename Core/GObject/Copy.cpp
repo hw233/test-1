@@ -19,6 +19,7 @@ void PlayerCopy::sendAllInfo(Player* pl)
 
 UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 {
+    return 3;
     if (vipl == 2)
         return 1;
     if (vipl == 3)
