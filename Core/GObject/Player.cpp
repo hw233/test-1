@@ -4368,7 +4368,7 @@ namespace GObject
         if(type == 1 || type == 2)
         {
 		    p = fgt->getCapacity();
-            if(p > GObjectManager::getMaxPotential()/100 - 0.001)
+            if(p > GObjectManager::getMaxCapacity()/100 - 0.001)
                 return 1;
             std::vector<UInt32>& chance = GObjectManager::getCapacityChance();
             size_t cnt = chance.size();
@@ -4385,7 +4385,7 @@ namespace GObject
         {
             isPotential = true;
 		    p = fgt->getPotential();
-            if(p > GObjectManager::getMaxCapacity()/100 - 0.001)
+            if(p > GObjectManager::getMaxPotential()/100 - 0.001)
                 return 1;
             std::vector<UInt32>& chance = GObjectManager::getPotentialChance();
             size_t cnt = chance.size();

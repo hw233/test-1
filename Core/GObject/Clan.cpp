@@ -95,9 +95,8 @@ bool Clan::accept(Player * player, UInt64 pid )
 	if (accepter->getClan() != NULL)
 	{
 		player->sendMsgCode(0, 1312);
-		return true;
 	}
-	if (!isFull() && join(accepter))
+    else if (!isFull() && join(accepter))
 	{
 		SYSMSG(title, 225);
 		SYSMSGV(content, 226, _name.c_str());
@@ -108,8 +107,8 @@ bool Clan::accept(Player * player, UInt64 pid )
 			SYSMSG_SENDV(1021, accepter, _name.c_str());
 		}
 	}
-	delete *it;
 	_pending.erase(it);
+	delete *it;
 	DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, accepter->getId());
 	return true;
 }
@@ -131,8 +130,8 @@ bool Clan::decline( Player* player, UInt64 pid )
 	SYSMSGV(content, 228, _name.c_str());
 	(*it)->player->GetMailBox()->newMail(NULL, 1, title, content);
 
-	delete *it;
 	_pending.erase(it);
+	delete *it;
 	{
 		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(2) << pid;
@@ -524,8 +523,8 @@ bool Clan::declineInvite(Player * player)
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if(it != _pending.end() && (*it)->cls == 15)
 	{
-		delete *it;
 		_pending.erase(it);
+		delete *it;
 		DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, player->getId());
 		return true;
 	}
@@ -2719,8 +2718,8 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 
     if(mem2->cls != cls)
     {
-        mem2->cls = cls;
         _members.erase(mem2);
+        mem2->cls = cls;
         _members.insert(mem2);
 
 		broadcastMemberInfo(*mem2, 1);
