@@ -111,8 +111,7 @@ UInt8 Dungeon::playerEnter( Player * player )
 		}
 	}
 
-    if( 0 == dpi->level)
-        dpi->level = 1;
+    dpi->level = 1;
 
 	sendDungeonLevelData(player, *dpi);
 	enterLevel(player, dpi->level);
