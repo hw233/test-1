@@ -3305,8 +3305,18 @@ namespace GObject
 
         UInt16 ncount = 0;
         if (type || first) {
+            UInt32 money = 0;
+            UInt16 usedGold = 0, maxGold = 0;
             if (ftype) {
-                if (getGold() < 2) {
+                if (ttype == 0) {
+                    money = GData::moneyNeed[GData::SHIMEN_FRESH].gold;
+                } else {
+                    money = GData::moneyNeed[GData::YAMEN_FRESH].gold;
+                }
+                maxGold = money * count;
+
+                if(_playerData.gold < maxGold)
+                {
                     sendMsgCode(1, 1101);
                     return;
                 }
@@ -3373,12 +3383,25 @@ namespace GObject
                     }
                 }
 
+                if (ftype)
+                    usedGold += money;
+
                 if (percolor)
                     break;
                 if (type == 2)
                     break;
                 --count;
             } while (count > 0);
+
+            if (ftype) {
+                if (ttype == 0) {
+                    ConsumeInfo ci(ShimenTaskFresh, 0, 0);
+                    useGold(usedGold, &ci);
+                } else {
+                    ConsumeInfo ci(YamenTaskFresh, 0, 0);
+                    useGold(usedGold, &ci);
+                }
+            }
 
             if (!ttype)
                 writeShiMen();
@@ -3626,8 +3649,8 @@ namespace GObject
 			else
 				st << static_cast<UInt16>(0);
 			writeTavernIds();
-			ConsumeInfo ci(FlushFighter, 0, 0);
-			useGold(usedGold, &ci);
+            ConsumeInfo ci(FlushFighter, 0, 0);
+            useGold(usedGold, &ci);
 		}
 		else
 		{
