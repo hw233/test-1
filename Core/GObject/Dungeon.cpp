@@ -754,7 +754,7 @@ void Dungeon::sendDungeonInfo(Player * player)
 	{
 		Stream st(REP::COPY_DATA_UPDATE);
 		UInt8 enterCount = (_extraCount[player->getVipLevel()] << 4) | getEnterCount();
-		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << static_cast<UInt8>(0) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
+		st << static_cast<UInt8>(0) << _id << static_cast<UInt8>(0) << PLAYER_DATA(player, dungeonCnt) << enterCount << static_cast<UInt16>(0) << static_cast<UInt32>(0) << static_cast<UInt8>(0) << Stream::eos;
 		player->send(st);
 		return;
 	}

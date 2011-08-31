@@ -143,6 +143,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 			DB().PushUpdateData("DELETE FROM `athletics_rank` WHERE `ranker` = %"I64_FMT"u", data->ranker->getId());
 			_ranks[1][player] = _athleticses[1].insert(_athleticses[1].end(), data);;
 			data->rank = ++_maxRank[1];
+            data->oldrank = data->rank;
 			data->maxrank = _athleticses[1].size();
             DB().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->prestige, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
 		}
