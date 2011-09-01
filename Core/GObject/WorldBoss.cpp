@@ -10,7 +10,8 @@
 namespace GObject
 {
     static UInt32 worldboss[] = {5162, 5162, 5103, 5168, 5127, 5197, 5164};
-    static UInt32 worldboss1[] = {5000, 5001, 5000, 5001, 5000, 5001, 5001};
+    static UInt32 worldboss1[] = {5162, 5162, 5103, 5168, 5127, 5197, 5164};
+    //static UInt32 worldboss1[] = {5000, 5001, 5000, 5001, 5000, 5001, 5001};
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
@@ -132,16 +133,7 @@ namespace GObject
         {
             if (i->second.npcId == npcid)
             {
-                UInt16 count = 0;
-                if (cfg.GMCheck)
-                {
-                    count = 9;
-                }
-                else
-                {
-                    count = 2;
-                }
-
+                UInt16 count = 9;
                 if (i->second.count >= count)
                 {
                     if (pl->getVipLevel() >= 2)
