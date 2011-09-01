@@ -76,7 +76,6 @@ namespace GObject
 
         if (!level)
             return;
-
         reset();
 
         std::vector<UInt16> spots;
