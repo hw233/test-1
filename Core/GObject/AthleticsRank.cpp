@@ -691,8 +691,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
         deferdata->ranker->send(st);
     }
 
-	AthleticsAward atkerAthleticsAward = { id, type, static_cast<UInt8>(1 + newRank), win, atkerAward, deferdata->ranker };
-	AthleticsAward deferAthleticsAward = { id, type, 0, !win, atkerAward, atker };
+	AthleticsAward atkerAthleticsAward = { id, type, static_cast<UInt8>(1 + newRank), win, atkerAward, deferdata->ranker, 0, 0 };
+	AthleticsAward deferAthleticsAward = { id, type, 0, !win, atkerAward, atker, 0, 0 };
 
 	GameMsgHdr hdr1(0x217, atker->getThreadId(), atker, sizeof(AthleticsAward));
 	GLOBAL().PushMsg(hdr1, &atkerAthleticsAward);
@@ -1555,8 +1555,11 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
 
         if( cond != 0 )
         {
-            Package* package = atker->GetPackage();
-            package->AddItem(itemId, itemCount, 1);
+            AthleticsAward deferAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
+
+            GameMsgHdr hdr2(0x217, atker->getThreadId(), atker, sizeof(AthleticsAward));
+            GLOBAL().PushMsg(hdr2, &deferAthleticsAward);
+
             addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
             cond = 0;
         }
@@ -1632,8 +1635,11 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
 
         if( cond != 0 )
         {
-            Package* package = defer->GetPackage();
-            package->AddItem(itemId, itemCount, 1);
+            AthleticsAward deferAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
+
+            GameMsgHdr hdr2(0x217, defer->getThreadId(), defer, sizeof(AthleticsAward));
+            GLOBAL().PushMsg(hdr2, &deferAthleticsAward);
+
             addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
             cond = 0;
         }
