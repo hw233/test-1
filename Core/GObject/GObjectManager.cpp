@@ -2681,29 +2681,9 @@ namespace GObject
 						equip = new ItemArmor(dbe.id, *static_cast<const GData::ItemEquipType *>(itype), ied);
                         break;
                     case Item_Trump:
-                        equip = new ItemTrump(dbe.id, *static_cast<const GData::ItemTrumpType *>(itype), ied);
-#if 1
+                        equip = new ItemTrump(dbe.id, *static_cast<const GData::ItemTrumpType*>(itype), ied);
                         if (equip)
-                        {
-                            GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                            if (attr->skills.size())
-                            {    
-                                size_t size = attr->skills.size();
-                                for (size_t i = 0; i < size; ++i) 
-                                {    
-                                    if (attr->skills[i])
-                                    {    
-                                        UInt16 skillid = attr->skills[i]->getId();
-                                        UInt16 id = SKILL_ID(skillid);
-                                        UInt16 lvl = equip->getItemEquipData().enchant+1;
-                                        UInt16 nskillid = SKILLANDLEVEL(id, lvl);
-                                        if (nskillid != skillid)
-                                            attr->skills[i] = GData::skillManager[nskillid];
-                                    }                  
-                                }                      
-                            }                          
-                        }
-#endif
+                            ((ItemTrump*)equip)->fixSkills();
                         break;
                     default:
                         equip = new ItemEquip(dbe.id, *static_cast<const GData::ItemEquipType *>(itype), ied);

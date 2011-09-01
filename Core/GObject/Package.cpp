@@ -246,6 +246,9 @@ namespace GObject
 				c = 1;
 		}
 
+        if(lv < 0)
+            return;
+
 		UInt8 types[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 		bool retain[3] = {false, false, false};
 		for(int i = 0; i < c; ++ i)
@@ -556,7 +559,7 @@ namespace GObject
 				ItemEquip * equip;
 				ItemEquipData edata;
 
-				UInt8 lv = (itype->reqLev + 5) / 10;
+				UInt8 lv = (itype->reqLev + 5) / 10 - 1;
                 UInt8 crr = itype->career;
 				if(itype->quality > 2 && itype->subClass != Item_Trump)
 				{
@@ -591,6 +594,11 @@ namespace GObject
 				case Item_Armor5:
 					equip = new ItemArmor(id, *static_cast<const GData::ItemEquipType *>(itype), edata);
 					break;
+                case Item_Trump:
+					equip = new ItemTrump(id, *static_cast<const GData::ItemTrumpType*>(itype), edata);
+                    if (equip)
+                        ((ItemTrump*)equip)->fixSkills();
+                    break;
 				default:
 					equip = new ItemEquip(id, *static_cast<const GData::ItemEquipType *>(itype), edata);
 					break;
@@ -2250,7 +2258,7 @@ namespace GObject
 		ItemEquip * equip2 = GetEquip(itemId2);
 		if(equip2 == NULL) return 1;
 
-		UInt8 lv = (equip->getReqLev() + 5) / 10;
+		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
 		if(equip->getQuality() != equip2->getQuality() || lv != (equip2->getReqLev() + 5) / 10) return 1;
 
 		q -= 3;
@@ -2346,7 +2354,7 @@ namespace GObject
 			return 2;
 		}
         DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
-		UInt8 lv = (equip->getReqLev() + 5) / 10;
+		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
 		UInt8 q = equip->getQuality() - 3;
 		if(protect)
 		{

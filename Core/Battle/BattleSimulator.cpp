@@ -1070,6 +1070,10 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->cond == GData::SKILL_BEATKED)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+
+        if(NULL == bo)
+            return 0;
+
         if(bf->getHP() > 0 && bo->getHP() > 0)
         {
             DefStatus defList[25];
@@ -1412,7 +1416,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 for(int i = 0; i < apcnt; ++ i)
                 {
                     BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
-                    if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
                     UInt32 dmg = abs(bf->calcPoison(skill)) * ap[i].factor;
@@ -1474,7 +1478,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 for(int i = 0; i < apcnt; ++ i)
                 {
                     BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][ap[i].pos]);
-                    if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                    if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
                     defList[defCount].damage = 0;

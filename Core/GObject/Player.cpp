@@ -4322,7 +4322,7 @@ namespace GObject
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
         UInt8 cnt = playerCopy.getCopySize(this);
-        st << cnt << static_cast<UInt8>(_playerData.copyFreeCnt + _playerData.copyGoldCnt) << static_cast<UInt8>(GObject::PlayerCopy::FREECNT) << static_cast<UInt8>(GObject::PlayerCopy::GOLDCNT);
+        st << cnt << static_cast<UInt8>(_playerData.copyFreeCnt + _playerData.copyGoldCnt) << static_cast<UInt8>(GObject::PlayerCopy::FREECNT) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel));
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -4343,7 +4343,7 @@ namespace GObject
         }
 
         cnt = frontMap.getFrontMapSize(this);
-        st << cnt << static_cast<UInt8>(_playerData.frontFreeCnt + _playerData.frontGoldCnt) << static_cast<UInt8>(GObject::FrontMap::FREECNT) << static_cast<UInt8>(GObject::FrontMap::GOLDCNT);
+        st << cnt << static_cast<UInt8>(_playerData.frontFreeCnt + _playerData.frontGoldCnt) << static_cast<UInt8>(GObject::FrontMap::FREECNT) << static_cast<UInt8>(GObject::FrontMap::getGoldCount(vipLevel));
         if(cnt)
         {
             frontMap.buildInfo(this, st);

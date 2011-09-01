@@ -4762,7 +4762,7 @@ function ItemNormal_athletics_23(iid, num, bind, param)
     elseif roll < 41 then
 		itemId = 511;
     elseif roll < 61 then
-        player:getTael(2000);
+        player:getTael(1500);
     elseif roll < 81 then
         local gemSize = table.getn(Gem_Level_2);
         itemId = Gem_Level_2[math.random(1, gemSize)];
@@ -4812,8 +4812,8 @@ function ItemNormal_athletics_24(iid, num, bind, param)
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60 和[4:"..equipId.."]");
         player:getCoupon(60);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币10000 和[4:"..equipId.."]");
-        player:getTael(10000);
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币4000 和[4:"..equipId.."]");
+        player:getTael(4000);
     elseif roll < 61 then
 		itemId = 506;
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:506] 和[4:"..equipId.."]");
@@ -4870,8 +4870,8 @@ function ItemNormal_athletics_25(iid, num, bind, param)
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100 和[4:"..equipId.."]");
         player:getCoupon(100);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币20000 和[4:"..equipId.."]");
-        player:getTael(20000);
+		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币10000 和[4:"..equipId.."]");
+        player:getTael(10000);
     elseif roll < 61 then
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:507] 和[4:"..equipId.."]");
 		itemId = 507;
