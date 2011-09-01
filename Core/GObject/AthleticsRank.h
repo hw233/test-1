@@ -81,6 +81,8 @@ struct AthleticsAward
 	bool win;
 	UInt32 count;
 	Player *other;
+    UInt32 itemId;
+    UInt8  itemCount;
 };
 
 struct AthleticsEventData
