@@ -170,8 +170,16 @@ namespace GObject
                         Fighter* fgt = globalFighters[npcid];
                         if (fgt)
                         {
-                            SYSMSG_BROADCASTV(552, pl->getName().c_str(), map->GetName().c_str(),
-                                    map->GetSpot(pl->getLocation())->m_Name.c_str(), fgt->getName().c_str());
+                            if (i->second.count >= count)
+                            {
+                                SYSMSG_BROADCASTV(553, map->GetName().c_str(), map->GetSpot(pl->getLocation())->m_Name.c_str(),
+                                        fgt->getName().c_str(), pl->getName().c_str());
+                            }
+                            else
+                            {
+                                SYSMSG_BROADCASTV(552, pl->getName().c_str(), map->GetName().c_str(),
+                                        map->GetSpot(pl->getLocation())->m_Name.c_str(), fgt->getName().c_str());
+                            }
                         }
                     }
                 }

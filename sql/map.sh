@@ -22,7 +22,7 @@ function map()
         BEGIN {
             print "INSERT INTO `map` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d)",$1,$2,$3,$4,$5);
+            printf("(%d,\x27%s\x27,%d,%d,%d)",(int($1/10)*16+($1%10)),$2,$3,$4,$5);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

@@ -445,6 +445,7 @@ sysMsg:set(549, 0x16, "世界BOSS已经神秘地出现在[ %s-%s ]，大家快�
 sysMsg:set(550, 0x35, "世界BOSS攻击次数已满，VIP可额外攻击一次");
 sysMsg:set(551, 0x35, "世界BOSS攻击次数已满");
 sysMsg:set(552, 0x16, "玩家[%s]在[%s-%s]打败世界BOSS[%s]");
+sysMsg:set(553, 0x16, "[%s-%s]的世界BOSS[%s]无法承受[%s]最后重重一击，倒了！！！");
 
 sysMsg:set(700, 0x16, "")
 sysMsg:set(701, 0x15, "")
