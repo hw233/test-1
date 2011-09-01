@@ -38,7 +38,7 @@ UInt16 Dungeon::_price[5] = {0, 50, 100};
 size_t Dungeon::_priceCount = 0;
 
 GGlobalObjectManagerT<Dungeon, UInt8> dungeonManager;
-UInt8 Dungeon::_extraCount[11] = {0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2};
+UInt8 Dungeon::_extraCount[11] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
 
 Dungeon::Dungeon( UInt8 id, const GData::DungeonData * dd ): GObjectBaseT<Dungeon, UInt8>(id), _dungeon(dd)
 {

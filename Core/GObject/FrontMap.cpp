@@ -17,6 +17,7 @@ void FrontMap::sendAllInfo(Player* pl)
 
 UInt8 FrontMap::getGoldCount(UInt8 vipl)
 {
+    return 2;
     if (vipl == 2)
         return 1;
     if (vipl == 3)

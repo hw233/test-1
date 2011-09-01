@@ -34,11 +34,11 @@ namespace GObject
 
 #define SKILL_LEVEL(x)  (((UInt16)(x))%SKILL_LEVEL_MAX)
 #define SKILL_ID(x) (((UInt16)(x))/SKILL_LEVEL_MAX)
-#define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX | ((UInt16)(l)))
+#define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX + ((UInt16)(l)))
 
 #define CITTA_LEVEL(x) (((UInt16)(x))%CITTA_LEVEL_MAX)
 #define CITTA_ID(x) (((UInt16)(x))/CITTA_LEVEL_MAX)
-#define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX | ((UInt16)(l)))
+#define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX + ((UInt16)(l)))
 
 #define PEERLESS_UPMAX 1
 

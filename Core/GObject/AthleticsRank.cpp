@@ -547,10 +547,10 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 	data->challengetime = TimeUtil::Now();
 
 	UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
-//	if(Viplvl >= 2)
-//		challengeBuff=data->challengetime+ 5 * 60;
-//	else if(Viplvl == 1)
-//		challengeBuff=data->challengetime+ 7 * 60;
+	if(Viplvl >= 1 && Viplvl <= 3)
+		challengeBuff=data->challengetime + 10 * 60;
+    else if (Viplvl > 3)
+		challengeBuff=data->challengetime + 5 * 60;
 
 	atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
 	DB().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
