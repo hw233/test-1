@@ -4,6 +4,7 @@
 #include "GData/ItemType.h"
 #include "ItemData.h"
 #include "GObjectManager.h"
+#include "GData/SkillTable.h"
 
 struct SkillBase;
 
@@ -147,8 +148,29 @@ namespace GObject
 	public:
 		ItemTrump(UInt32 id, const GData::ItemTrumpType& itemTrumpType, ItemEquipData& itemEquipData)
 			: ItemEquip(id, itemTrumpType, itemEquipData) 
-		{ }
+        { }
         ~ItemTrump() { }
+
+        void fixSkills()
+        {
+            GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(getAttrExtra());
+            if (attr->skills.size())
+            {
+                size_t size = attr->skills.size();
+                for (size_t i = 0; i < size; ++i)
+                {
+                    if (attr->skills[i])
+                    {
+                        UInt16 skillid = attr->skills[i]->getId();
+                        UInt16 id = SKILL_ID(skillid);
+                        UInt16 lvl = this->getItemEquipData().enchant+1;
+                        UInt16 nskillid = SKILLANDLEVEL(id, lvl);
+                        if (nskillid != skillid)
+                            attr->skills[i] = GData::skillManager[nskillid];
+                    }
+                }
+            }   
+        }
 	};
 }
 

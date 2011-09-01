@@ -23,7 +23,6 @@ namespace GObject
 #define FIGHTER_BUFF_ATTR2		0x02
 #define FIGHTER_BUFF_ATTR3		0x03
 
-#define SKILL_LEVEL_MAX 100
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
 #define CITTA_UPMAX 6
@@ -31,14 +30,6 @@ namespace GObject
 #define TRUMP_UPMAX 3
 #define TRUMP_INIT 1 // 法宝最初只能装1个,由VIP等级控制装备个数
 #define ACUPOINTS_MAX 15
-
-#define SKILL_LEVEL(x)  (((UInt16)(x))%SKILL_LEVEL_MAX)
-#define SKILL_ID(x) (((UInt16)(x))/SKILL_LEVEL_MAX)
-#define SKILLANDLEVEL(s,l) (((UInt16)(s))*SKILL_LEVEL_MAX + ((UInt16)(l)))
-
-#define CITTA_LEVEL(x) (((UInt16)(x))%CITTA_LEVEL_MAX)
-#define CITTA_ID(x) (((UInt16)(x))/CITTA_LEVEL_MAX)
-#define CITTAANDLEVEL(c,l) (((UInt16)(c))*CITTA_LEVEL_MAX + ((UInt16)(l)))
 
 #define PEERLESS_UPMAX 1
 

@@ -594,6 +594,11 @@ namespace GObject
 				case Item_Armor5:
 					equip = new ItemArmor(id, *static_cast<const GData::ItemEquipType *>(itype), edata);
 					break;
+                case Item_Trump:
+					equip = new ItemTrump(id, *static_cast<const GData::ItemTrumpType*>(itype), edata);
+                    if (equip)
+                        ((ItemTrump*)equip)->fixSkills();
+                    break;
 				default:
 					equip = new ItemEquip(id, *static_cast<const GData::ItemEquipType *>(itype), edata);
 					break;
