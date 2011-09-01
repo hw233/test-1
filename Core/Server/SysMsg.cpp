@@ -46,9 +46,6 @@ void SysMsgItem::sendva( GObject::Player * player, ... )
 #if 0
 	if(player != NULL && player->GetLev() < 6)
 		return;
-#else
-    if (!player)
-        return;
 #endif
 	/* Guess we need no more than 256 bytes. */
 	int size = 256;

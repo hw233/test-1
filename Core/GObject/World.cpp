@@ -260,7 +260,7 @@ bool World::Init()
 	UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
 	AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 	
-    if (cfg.GMCheck)
+    if (cfg.GMCheck || true)
     {
         AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
         UInt32 worldBossChk = TimeUtil::SharpDay(0, now) + 13 * 3600;
@@ -276,6 +276,8 @@ bool World::Init()
         worldBossChk = TimeUtil::SharpDay(0, now) + 18 * 3600;
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
         worldBossChk = TimeUtil::SharpDay(0, now) + 19 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 20 * 3600;
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
     }
     else

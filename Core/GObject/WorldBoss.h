@@ -30,7 +30,7 @@ public:
     void attack(Player* pl, UInt16 loc, UInt32 npcid);
     void reset();
     const WBoss& get(UInt16 loc) { return m_boss[loc]; }
-    void add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count);
+    void add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool = false);
     void setLevel(UInt8 lvl) { m_max = lvl; }
 private:
     std::map<UInt16, WBoss> m_boss;

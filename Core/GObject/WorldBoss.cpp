@@ -9,14 +9,22 @@
 
 namespace GObject
 {
-    static UInt32 worldboss[] = {0, 5162, 5103, 5168, 5127, 5197, 5164};
+    static UInt32 worldboss[] = {5162, 5162, 5103, 5168, 5127, 5197, 5164};
+    static UInt32 worldboss1[] = {5000, 5001, 5000, 5001, 5000, 5001, 5001};
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
         for (UInt8 i = 0; i < 6; ++i)
         {
-            if (worldboss[i] == npcid)
-                return true;
+            if (cfg.GMCheck)
+            {
+                if (worldboss[i] == npcid)
+                    return true;
+            } else
+            {
+                if (worldboss1[i] == npcid)
+                    return true;
+            }
         }
         return false;
     }
@@ -25,6 +33,12 @@ namespace GObject
     {
         time_t now2 = static_cast<time_t>(now);
         struct tm * t = localtime(&now2);
+
+        if (t->tm_hour >= 20)
+        {
+            reset();
+            return;
+        }
 
         UInt8 level = 0;
         if (t->tm_hour >= 19 && m_max >= 100)
@@ -56,8 +70,8 @@ namespace GObject
             level = 1;
         }
 
-        if (!cfg.GMCheck)
-            level = uRand(7)+1;
+        //if (!cfg.GMCheck)
+        //    level = uRand(7)+1;
 
         if (!level)
             return;
@@ -73,52 +87,28 @@ namespace GObject
         if (!spot)
             return;
 
-        UInt32 npcid = worldboss[level-1];
+        UInt32 npcid = 0;
+        if (cfg.GMCheck)
+        {
+            npcid = worldboss[level-1];
+        }
+        else
+        {
+            npcid = worldboss1[level-1];
+        }
         Fighter* fgt = globalFighters[npcid];
         if (fgt)
         {
             GData::NpcGroup* ng = GData::npcGroups[npcid];
             if (ng)
             {
-                spot = 13318; // TODO:
-                Map * map = Map::FromSpot(spot);
-                if (map)
-                {
-                    MOData mo;
-                    mo.m_ID = npcid;
-                    mo.m_Hide = false;
-                    mo.m_Spot = spot;
-                    mo.m_Type = 6;
-                    mo.m_ActionType = 0;
-                    map->AddObject(mo);
-                    map->Show(npcid);
-
-                    if (cfg.GMCheck)
-                    {
-                        SYSMSG_BROADCAST(548);
-                    }
-                    else
-                    {
-                        SpotData* sd = Map::Spot(spot);
-                        if (sd)
-                        {
-                            SYSMSG_BROADCAST(548);
-                            SYSMSG_BROADCASTV(549, sd->m_Name.c_str());
-                        }
-                    }
-
-                    DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcid, level, spot, 0);
-                    add(spot, npcid, level, 0);
-                }
+                add(spot, npcid, level, 0, true);
             }
         }
     }
 
     void WorldBoss::prepare(UInt32 now)
     {
-        if (!cfg.GMCheck)
-            SYSMSG_BROADCAST(547);
-
         time_t now2 = static_cast<time_t>(now);
         struct tm * t = localtime(&now2);
         if ((t->tm_hour >= 12 && t->tm_min >= 45 && t->tm_hour < 13) ||
@@ -126,9 +116,11 @@ namespace GObject
             (t->tm_hour >= 14 && t->tm_min >= 45 && t->tm_hour < 15) ||
             (t->tm_hour >= 15 && t->tm_min >= 45 && t->tm_hour < 16) ||
             (t->tm_hour >= 16 && t->tm_min >= 45 && t->tm_hour < 17) ||
-            (t->tm_hour >= 17 && t->tm_min >= 45 && t->tm_hour < 18))
+            (t->tm_hour >= 17 && t->tm_min >= 45 && t->tm_hour < 18) ||
+            (t->tm_hour >= 18 && t->tm_min >= 45 && t->tm_hour < 19))
         {
-            SYSMSG_BROADCAST(547);
+            if (60 - t->tm_min - 1 >= 4)
+                SYSMSG_BROADCASTV(547, 60 - t->tm_min);
             return;
         }
     }
@@ -163,6 +155,11 @@ namespace GObject
                         {
                             pl->setBuffData(PLAYER_BUFF_WBOSSID, npcid, true);
                         }
+                        else
+                        {
+                            SYSMSG_SEND(551, pl);
+                            return;
+                        }
                     }
                     else
                     {
@@ -175,6 +172,17 @@ namespace GObject
                 {
                     ++i->second.count;
                     DB().PushUpdateData("UPDATE `worldboss` SET `count` = %u WHERE `npcId` = %u", i->second.count, npcid);
+
+                    Map* map = pl->GetMap();
+                    if (map)
+                    {
+                        Fighter* fgt = globalFighters[npcid];
+                        if (fgt)
+                        {
+                            SYSMSG_BROADCASTV(552, pl->getName().c_str(), map->GetName().c_str(),
+                                    map->GetSpot(pl->getLocation())->m_Name.c_str(), fgt->getName().c_str());
+                        }
+                    }
                 }
             }
         }
@@ -196,13 +204,45 @@ namespace GObject
         DB().PushUpdateData("DELETE FROM `worldboss`");
     }
 
-    void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count)
+    void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool show)
     {
-        WBoss wb;
-        wb.npcId = npcId;
-        wb.level = level;
-        wb.count = count;
-        m_boss[loc] = wb;
+        Map * map = Map::FromSpot(loc);
+        if (map)
+        {
+            MOData mo;
+            mo.m_ID = npcId;
+            mo.m_Hide = false;
+            mo.m_Spot = loc;
+            mo.m_Type = 6;
+            mo.m_ActionType = 0;
+            map->AddObject(mo);
+
+            if (show) 
+            {
+                map->Show(npcId);
+                if (cfg.GMCheck)
+                {
+                    SYSMSG_BROADCAST(548);
+                }
+                else
+                {
+                    SpotData* sd = Map::Spot(loc);
+                    if (sd)
+                    {
+                        SYSMSG_BROADCAST(548);
+                        SYSMSG_BROADCASTV(549, map->GetName().c_str(), sd->m_Name.c_str());
+                    }
+                }
+                DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, 0);
+            }
+
+            WBoss wb;
+            wb.npcId = npcId;
+            wb.level = level;
+            wb.count = count;
+            m_boss[loc] = wb;
+
+        }
     }
 
     WorldBoss worldBoss;

@@ -149,6 +149,7 @@ namespace GObject
 		LoadLuckyDraw();
 		LoadArena();
         LoadPracticePlace();
+        LoadWorldBoss();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
