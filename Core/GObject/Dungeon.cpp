@@ -105,10 +105,11 @@ UInt8 Dungeon::playerEnter( Player * player )
 				}
 			}
 
-            ++ dpi->count;
-			++ PLAYER_DATA(player, dungeonCnt);
-			sendDungeonInfo(player, *dpi);
 		}
+
+        ++ dpi->count;
+        ++ PLAYER_DATA(player, dungeonCnt);
+        sendDungeonInfo(player, *dpi);
 	}
 
     dpi->level = 1;
@@ -740,7 +741,7 @@ void Dungeon::pushPlayer( Player * player, UInt8 level, UInt8 count, UInt16 tota
 	dpi.counterEnd = counterEnd;
 	dpi.justice = justice;
     dpi.justice_roar = justice_roar;
-	if(level > _levels.size() || level == 0)
+	if(level >= _levels.size())
 		return;
 	DungeonLevel& dl = _levels[level];
 	dl.singles.insert(player);

@@ -140,6 +140,9 @@ namespace GObject
 		void SetTaskStep(TaskData* task, const std::string& stepStr);
 		UInt16 GetTaskStep2(const TaskData* task, UInt16 stepType);
 
+    public:
+        bool CompleteClanTaskDirect(UInt32 taskId);
+
 	public:
 		bool IsInConvey() const				{ return m_IsConvey;	}
 		void SetConvey(bool token = true)	{ m_IsConvey = token;	}

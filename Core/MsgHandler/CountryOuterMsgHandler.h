@@ -1940,7 +1940,14 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
     case 3:
         // 师门，衙门任务立即完成
         succ = player->addAwardByTaskColor(req.m_TaskId, true);
-        succ1 = player->finishClanTask(req.m_TaskId);
+
+		succ1 = player->GetTaskMgr()->CompleteClanTaskDirect(req.m_TaskId);
+        if (succ1)
+        {
+            GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
+            succ1 = player->finishClanTask(req.m_TaskId);
+        }
+
         break;
 	default:
 		return ;
