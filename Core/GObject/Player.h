@@ -57,6 +57,8 @@ namespace GObject
 #define PLAYER_BUFF_PRACTICE1       0x16	//修炼加成20%
 #define PLAYER_BUFF_PRACTICE2       0x17	//修炼加成50%
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
+#define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
+#define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
 
 #define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
 #define SHIMEN_TASK_MAXCOUNT        5       // 师门每日最大任务数

@@ -1075,6 +1075,7 @@ namespace GObject
 		lc.prepare("Loading fighters:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
+        UInt8 lvl_max = 0;
 		DBFighterObj specfgtobj;
 		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
@@ -1119,8 +1120,11 @@ namespace GObject
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
 			pl->addFighter(fgt2, false);
+            if (specfgtobj.level > lvl_max)
+                lvl_max = specfgtobj.level;
 		}
 		lc.finalize();
+        worldBoss.setLevel(lvl_max);
 
 		lc.prepare("Loading fighter buffs:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;

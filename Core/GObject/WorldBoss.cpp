@@ -9,7 +9,7 @@
 
 namespace GObject
 {
-    static UInt32 worldboss[] = {5162, 5103, 5168, 5127, 5197, 5164};
+    static UInt32 worldboss[] = {0, 5162, 5103, 5168, 5127, 5197, 5164};
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
@@ -27,33 +27,37 @@ namespace GObject
         struct tm * t = localtime(&now2);
 
         UInt8 level = 0;
-        if (t->tm_hour >= 18)
+        if (t->tm_hour >= 19 && m_max >= 100)
+        {
+            level = 7;
+        }
+        else if (t->tm_hour >= 18 && m_max >= 90)
         {
             level = 6;
         }
-        else if (t->tm_hour >= 17)
+        else if (t->tm_hour >= 17 && m_max >= 80)
         {
             level = 5;
         }
-        else if (t->tm_hour >= 16)
+        else if (t->tm_hour >= 16 && m_max >= 70)
         {
             level = 4;
         }
-        else if (t->tm_hour >= 15)
+        else if (t->tm_hour >= 15 && m_max >= 60)
         {
             level = 3;
         }
-        else if (t->tm_hour >= 14)
+        else if (t->tm_hour >= 14 && m_max >= 50)
         {
             level = 2;
         }
-        else if (t->tm_hour >= 13)
+        else if (t->tm_hour >= 13 && m_max >= 40)
         {
             level = 1;
         }
 
         if (!cfg.GMCheck)
-            level = uRand(6)+1;
+            level = uRand(7)+1;
 
         if (!level)
             return;
@@ -76,6 +80,7 @@ namespace GObject
             GData::NpcGroup* ng = GData::npcGroups[npcid];
             if (ng)
             {
+                spot = 13318; // TODO:
                 Map * map = Map::FromSpot(spot);
                 if (map)
                 {
@@ -86,6 +91,7 @@ namespace GObject
                     mo.m_Type = 6;
                     mo.m_ActionType = 0;
                     map->AddObject(mo);
+                    map->Show(npcid);
 
                     if (cfg.GMCheck)
                     {
@@ -102,6 +108,7 @@ namespace GObject
                     }
 
                     DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcid, level, spot, 0);
+                    add(spot, npcid, level, 0);
                 }
             }
         }
@@ -133,10 +140,35 @@ namespace GObject
         {
             if (i->second.npcId == npcid)
             {
-                if (i->second.count >= 9)
+                UInt16 count = 0;
+                if (cfg.GMCheck)
                 {
-                    SYSMSG_SEND(550, pl);
-                    return;
+                    count = 9;
+                }
+                else
+                {
+                    count = 2;
+                }
+
+                if (i->second.count >= count)
+                {
+                    if (pl->getVipLevel() >= 2)
+                    {
+                        if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
+                        {
+                            pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
+                            pl->setBuffData(PLAYER_BUFF_WBOSSID, npcid, true);
+                        }
+                        else if (pl->getBuffData(PLAYER_BUFF_WBOSSID) != npcid)
+                        {
+                            pl->setBuffData(PLAYER_BUFF_WBOSSID, npcid, true);
+                        }
+                    }
+                    else
+                    {
+                        SYSMSG_SEND(550, pl);
+                        return;
+                    }
                 }
 
                 if (pl->attackNpc(npcid))
@@ -155,6 +187,7 @@ namespace GObject
             Map * map = Map::FromSpot(i->first);
             if (map)
             {
+                map->Hide(i->second.npcId);
                 map->DelObject(i->second.npcId);
             }
         }

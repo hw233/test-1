@@ -2225,7 +2225,7 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 	}
 
     if (WorldBoss::isWorldBoss(anr._npcId))
-        worldBoss.attack(player, anr._npcId, loc);
+        worldBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
 }

@@ -275,17 +275,20 @@ bool World::Init()
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
         worldBossChk = TimeUtil::SharpDay(0, now) + 18 * 3600;
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 19 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
     }
     else
     {
         AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL), 30000);
         UInt32 worldBossChk = TimeUtil::SharpDay(0, now) + 9 * 60 * 60 + 20 * 60;
-        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 60000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 30000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 10*60*1000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 20*60*1000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 30*60*1000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 40*60*1000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 50*60*1000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 60*60*1000);
     }
 
 	return true;
