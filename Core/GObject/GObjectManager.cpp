@@ -49,6 +49,7 @@
 #include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
+#include "GObject/WorldBoss.h"
 
 #include <fcntl.h>
 
@@ -2849,6 +2850,23 @@ namespace GObject
             td.quality = t.quality;
             td.awdst = t.awdst;
             tripod.addTripodData(t.id, td);
+        }
+		lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::LoadWorldBoss() // XXX: 需要延迟加载,在World::Init里加载
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldBoss Data");
+		DBWorldBoss t;
+		if(execu->Prepare("SELECT `npcId`, `level`, `location`, `count` FROM `worldboss`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+            worldBoss.add(t.loc, t.npcId, t.level, t.count);
         }
 		lc.finalize();
         return true;

@@ -7,6 +7,7 @@
 #include "Server/WorldServer.h"
 #include "Player.h"
 
+#include <vector>
 
 namespace Network
 {
@@ -95,6 +96,7 @@ public:
 	static SpotData * Spot(UInt16 spotID);
 	static void NotifyPlayerEnter( Player * );
 	static void NotifyPlayerLeave( Player * );
+    static void GetAllSpot(std::vector<UInt16>&);
 
 	void SendCityNPCs( Player * );
 	void SendOnMap( Player * );
@@ -117,6 +119,7 @@ public:
 	void Broadcast( const void *, int, Player * = NULL );
 
 	SpotData* GetSpot(UInt16);
+	void MapAllSpot(std::vector<UInt16>&);
 
 private:
 	std::string m_Name;

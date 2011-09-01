@@ -27,6 +27,7 @@
 #include "Script/BattleFormula.h"
 #include "SpecialAward.h"
 #include "PracticePlace.h"
+#include "WorldBoss.h"
 #include "MsgID.h"
 
 namespace GObject
@@ -224,6 +225,16 @@ void World::World_Athletics_Check( void * )
 	gAthleticsRank.TmExtraAward();
 }
 
+void World::World_Boss_Refresh(void*)
+{
+    worldBoss.refresh(TimeUtil::Now());
+}
+
+void World::World_Boss_Prepare(void*)
+{
+    worldBoss.prepare(TimeUtil::Now());
+}
+
 bool World::Init()
 {
 	GObjectManager::delayLoad();
@@ -249,6 +260,33 @@ bool World::Init()
 	UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
 	AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 	
+    if (cfg.GMCheck)
+    {
+        AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
+        UInt32 worldBossChk = TimeUtil::SharpDay(0, now) + 13 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 14 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 15 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 16 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 17 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+        worldBossChk = TimeUtil::SharpDay(0, now) + 18 * 3600;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
+    }
+    else
+    {
+        AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL), 30000);
+        UInt32 worldBossChk = TimeUtil::SharpDay(0, now) + 9 * 60 * 60 + 20 * 60;
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 60000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 10*60*1000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 20*60*1000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 30*60*1000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 40*60*1000);
+        AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 50*60*1000);
+    }
 
 	return true;
 }

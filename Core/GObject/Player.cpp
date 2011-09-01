@@ -3065,6 +3065,7 @@ namespace GObject
             {
                 if (_playerData.shimen[i] == taskid)
                 {
+                    _playerData.shimen[i] = 0;
                     if (_playerData.smAcceptCount)
                     {
                         --_playerData.smAcceptCount;
@@ -3081,6 +3082,7 @@ namespace GObject
             {
                 if (_playerData.yamen[i] == taskid)
                 {
+                    _playerData.yamen[i] = 0;
                     if (_playerData.ymAcceptCount)
                     {
                         --_playerData.ymAcceptCount;

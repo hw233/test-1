@@ -108,6 +108,24 @@ SpotData* Map::GetSpot(UInt16 spot)
 	return &it->second;
 }
 
+void Map::GetAllSpot(std::vector<UInt16>& spots)
+{
+    for (MapList::iterator it = mapList.begin(), end = mapList.end(); it != end; ++it)
+    {
+        if (*it)
+            (*it)->MapAllSpot(spots);
+    }
+}
+
+void Map::MapAllSpot(std::vector<UInt16>& spots)
+{
+    for (std::map<UInt16, SpotData>::iterator i = m_Spots.begin(), e = m_Spots.end(); i != e; ++i)
+    {
+        if (i->second.m_Type == 9)
+            spots.push_back(i->second.m_ID);
+    }
+}
+
 void Map::AddSpot( UInt16 id, const std::string& name, UInt8 type, UInt8 countryBattle, UInt32 x, UInt32 y )
 {
 	Map * map = FromSpot(id);

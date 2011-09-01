@@ -80,6 +80,8 @@ private:
 	static void World_Midnight_Check( World * );
 	static void World_Online_Log( void * );
 	static void World_Athletics_Check( void * );
+    static void World_Boss_Refresh(void*);
+    static void World_Boss_Prepare(void*);
 
 private:
 	void testUpdate();

@@ -40,6 +40,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GData/Money.h"
+#include "GObject/WorldBoss.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -2222,7 +2223,11 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 		player->sendMsgCode(0, 1408);
 		return;
 	}
-	player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
+
+    if (WorldBoss::isWorldBoss(anr._npcId))
+        worldBoss.attack(player, anr._npcId, loc);
+    else
+        player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
 }
 
 void OnAutoBattleReq( GameMsgHdr& hdr, AutoBattleReq& abr )

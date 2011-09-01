@@ -664,6 +664,13 @@ struct DBAttainData
     UInt32 status;
     UInt32 updatetime;
 };
+struct DBWorldBoss
+{
+    UInt32 npcId;
+    UInt8 level;
+    UInt16 loc;
+    UInt8 count;
+};
 
 }
 
@@ -1489,6 +1496,16 @@ SPECIALDEF(4)
     UInt16, attainId,
     UInt32, status,
     UInt32, updatetime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBWorldBoss)
+SPECIALDEF(4)
+(
+    UInt32, npcId,
+    UInt8, level,
+    UInt16, loc,
+    UInt8, count
 )
 SPECIALEND()
 
