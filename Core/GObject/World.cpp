@@ -278,7 +278,7 @@ bool World::Init()
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
         worldBossChk = TimeUtil::SharpDay(0, now) + 20 * 3600;
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), (worldBossChk >= now ? worldBossChk - now : 86400 + athChkPoint - now) * 1000);
-        //AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
+        AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
     }
     else
     {
@@ -290,7 +290,7 @@ bool World::Init()
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 40*60*1000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 50*60*1000);
         AddTimer(86400 * 1000, World_Boss_Refresh, static_cast<void*>(NULL), 60*60*1000);
-        //AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), 60 * 1000);
+        AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), 10*1000);
     }
 
 	return true;

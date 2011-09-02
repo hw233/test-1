@@ -184,7 +184,7 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 {
     return;
 #if 0
-	//row type0:Òø±Ò 1;ÀñÈ¯ color0:ÂÌÉ«1:À¶É«2:×ÏÉ« rank_sep
+	//row type0:é“¶å¸ 1;ç¤¼åˆ¸ color0:ç»¿è‰²1:è“è‰²2:ç´«è‰² rank_sep
 	const UInt16 boxcount[2][2][4][6] =
 	{
 		{
@@ -216,7 +216,7 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 	UInt32 now = TimeUtil::Now();
 	UInt32 time_stay = now - preBoxTime;
 	
-	UInt32 coupon_rate = 10;	//10:ÀñÈ¯±¦Ïä 50:¾­Ñé±¦Ïä 15: Í­±Ò±¦Ïä 15:Òø±Ò±¦Ïä 10:Õ½¹¦
+	UInt32 coupon_rate = 10;	//10:ç¤¼åˆ¸å®ç®± 50:ç»éªŒå®ç®± 15: é“œå¸å®ç®± 15:é“¶å¸å®ç®± 10:æˆ˜åŠŸ
 	UInt32 exp_rate = 60;
 	UInt32 coin_rate = 75;
 	UInt32 tael_rate = 90;
@@ -237,16 +237,16 @@ void AthleticsRank::BuildNewBox(Rank &it_rank)// UInt8 row, UInt16 rank, UInt8 l
 
 	UInt32 gre_rate = 15;
 	UInt32 blu_rate = 85;
-	UInt32 pur_rate = 95;// 15:ÂÌÉ« 70:À¶É« 10:×ÏÉ« 5:³ÈÉ«
+	UInt32 pur_rate = 95;// 15:ç»¿è‰² 70:è“è‰² 10:ç´«è‰² 5:æ©™è‰²
 	if(row == 1)
 	{
-		if(rank == 1)// 0:ÂÌÉ« 0:À¶É« 75:×ÏÉ« 25:³ÈÉ«
+		if(rank == 1)// 0:ç»¿è‰² 0:è“è‰² 75:ç´«è‰² 25:æ©™è‰²
 		{
 			gre_rate = 0;
 			blu_rate = 0;			
 			pur_rate = 75;
 		}
-		else if(rank < 11)// 0:ÂÌÉ« 65:À¶É« 25:×ÏÉ« 10:³ÈÉ«
+		else if(rank < 11)// 0:ç»¿è‰² 65:è“è‰² 25:ç´«è‰² 10:æ©™è‰²
 		{
 			gre_rate = 0;
 			blu_rate = 65;	
@@ -454,7 +454,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 		return;
 
     UInt32 extrachallenge = (*atkerRank->second)->extrachallenge;
-    if(0 == extrachallenge)
+    if(0 == extrachallenge || extrachallenge & 0x80000000)
         return;
 
     Rank tmp = _athleticses[row].begin();
@@ -476,13 +476,13 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
             }
             else
             {
+                setAthleticsExtraChallenge(atker, 0x80000000 | extrachallenge);
                 std::string name = defer->getName();
                 challenge(atker, name, type);
             }
         }
         break;
     }
-
 }
 
 void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
@@ -590,7 +590,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 	//std::string boxName = deferdata->awardName;
 	UInt32 atkerAward = 0;
 	UInt8 newRank = 0;
-    UInt16 flag = 0x09;    // Õ½±¨ºÍ»ù±¾ĞÅÏ¢
+    UInt16 flag = 0x09;    // æˆ˜æŠ¥å’ŒåŸºæœ¬ä¿¡æ¯
 
 	if (!win)
 	{
@@ -780,7 +780,7 @@ void AthleticsRank::GetBoxSourceReq(Player *owner)
 	*reinterpret_cast<UInt8 *>(buffer) = data->awardType;
 	*reinterpret_cast<UInt32 *>(buffer+1) = awardCount;
 
-	// ·¢ÏûÏ¢µ½Íæ¼ÒÏß³Ì£¬»ñÈ¡×ÊÔ´¡£
+	// å‘æ¶ˆæ¯åˆ°ç©å®¶çº¿ç¨‹ï¼Œè·å–èµ„æºã€‚
 	GameMsgHdr hdr(0x218, owner->getThreadId(), owner, sizeof(buffer));
 	GLOBAL().PushMsg(hdr, buffer);
 
@@ -844,12 +844,13 @@ void AthleticsRank::TmExtraAward()
 
 	for (UInt16 rank = 1; start != end; ++start, ++rank)
     {
-        UInt32 itemId = 0;
+        UInt16 itemId = 0;
         UInt8  itemCount = 1;
 		Player *ranker = (*start)->ranker;
         if(rank == 1)
         {
             itemId = 2;
+            SYSMSG_BROADCASTV(330, ranker->getCountry(), ranker->getName().c_str(), itemId);
         }
         else if(rank == 2)
         {
@@ -864,14 +865,24 @@ void AthleticsRank::TmExtraAward()
             itemId = 5;
         }
 
-        if(itemId)
+        const GData::ItemBaseType *item1 = Package::GetItemBaseType(itemId);
+        if(item1)
         {
-            AthleticsAward rankerAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
+            Mail *pmail = NULL;
+            MailPackage::MailItem mitem[5] = {{itemId, itemCount}};
+            UInt32 count = 1;
+			MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
 
-            GameMsgHdr hdr2(0x217, ranker->getThreadId(), ranker, sizeof(AthleticsAward));
-            GLOBAL().PushMsg(hdr2, &rankerAthleticsAward);
+            SYSMSG(title, 318);
+			SYSMSGV(awardStr, 326, item1->getName().c_str());
+			SYSMSGV(content, 325, rank, awardStr);
+			pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
 
-            SYSMSG_BROADCASTV(330, ranker->getCountry(), ranker->getName().c_str(), rank, itemId);
+            if(pmail != NULL)
+            {
+                mailPackageManager.push(pmail->id, mitem, count, false);
+            }
+
         }
     }
 
@@ -929,7 +940,7 @@ void AthleticsRank::TmExtraAward()
 				mitem[4].id = 9000; mitem[4].count = 1;
 				count = 5;
 			}
-			MailItemsInfo itemsInfo(mitem, AthliticisTimeAward, count);
+			MailItemsInfo itemsInfo(mitem, AathliticisTimeAward, count);
 			//SYSMSGV(awardStr, mailIndex[rank-1], item2->getName().c_str(), item1->getName().c_str(), cnt);
 			//SYSMSGV(content, 325, rank, awardStr);
 			//pmail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
@@ -1334,7 +1345,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
     if(defRank != _athleticses[row].end())
         defer = (*(defRank))->ranker;
 
-    if(0 == getAthleticsFirst4Rank(atker, 0x80))  //µÚÒ»´Î¾º¼¼³¡ÌôÕ½
+    if(0 == getAthleticsFirst4Rank(atker, 0x80))  //ç¬¬ä¸€æ¬¡ç«æŠ€åœºæŒ‘æˆ˜
     {
         Package* package = atker->GetPackage();
         package->AddItem(22, 1, 1);
@@ -1349,7 +1360,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
     UInt32 itemId = 0;
     UInt8 itemCount = 0;
 
-    if(win == 2 && row == 1 && getAthleticsExtraChallenge(atker) != 0) //·ÅÆúÌØÊâÌôÕ½
+    if(win == 2 && row == 1 && getAthleticsExtraChallenge(atker) != 0) //æ”¾å¼ƒç‰¹æ®ŠæŒ‘æˆ˜
     {
          setAthleticsExtraChallenge(atker, 0);
     }
@@ -1371,7 +1382,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         player1 = atker;
         player2 = defer;
 
-        if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x100) && 0 != getAthleticsExtraChallenge(atker) ) //ÌØÊâÌôÕ½Ê¤Àû Ò»ÌìÁ¬Éı200¸öÅÅÃû
+        if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x100) && 0 != getAthleticsExtraChallenge(atker) ) //ç‰¹æ®ŠæŒ‘æˆ˜èƒœåˆ© ä¸€å¤©è¿å‡200ä¸ªæ’å
         {
             cond = 16;
             color = 5;
@@ -1380,7 +1391,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 3;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && 0 != getAthleticsExtraChallenge(atker) )   //ÌØÊâÌôÕ½Ê¤Àû Ò»ÌìÁ¬Éı100¸öÅÅÃû
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && 0 != getAthleticsExtraChallenge(atker) )   //ç‰¹æ®ŠæŒ‘æˆ˜èƒœåˆ© ä¸€å¤©è¿å‡100ä¸ªæ’å
         {
             cond = 16;
             color = 4;
@@ -1389,7 +1400,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x400) && 0 != getAthleticsExtraChallenge(atker) )    //ÌØÊâÌôÕ½Ê¤Àû Ò»ÌìÁ¬Éı50¸öÅÅÃû
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x400) && 0 != getAthleticsExtraChallenge(atker) )    //ç‰¹æ®ŠæŒ‘æˆ˜èƒœåˆ© ä¸€å¤©è¿å‡50ä¸ªæ’å
         {
             cond = 16;
             color = 3;
@@ -1398,7 +1409,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && 0 != getAthleticsExtraChallenge(atker) )    //ÌØÊâÌôÕ½Ê¤Àû Ò»ÌìÁ¬Éı20¸öÅÅÃû
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && 0 != getAthleticsExtraChallenge(atker) )    //ç‰¹æ®ŠæŒ‘æˆ˜èƒœåˆ© ä¸€å¤©è¿å‡20ä¸ªæ’å
         {
             cond = 16;
             color = 2;
@@ -1409,7 +1420,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( 1 == getRankPos(row, atkRank) && row == 1 )
         {
-            if( 0 == getAthleticsFirst4Rank(atker, 0x1) )   //µÚÒ»´Î³ÉÎª¾º¼¼³¡µÚÒ»
+            if( 0 == getAthleticsFirst4Rank(atker, 0x1) )   //ç¬¬ä¸€æ¬¡æˆä¸ºç«æŠ€åœºç¬¬ä¸€
             {
                 cond = 1;
                 itemId = 25;
@@ -1423,7 +1434,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( 2 == getRankPos(row, atkRank) && row == 1 )
         {
-            if( 0 == getAthleticsFirst4Rank(atker, 0x2) )     //µÚÒ»´ÎÉ±Èë¾º¼¼³¡¶şÇ¿
+            if( 0 == getAthleticsFirst4Rank(atker, 0x2) )     //ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœºäºŒå¼º
             {
                 cond = 3;
                 itemId = 25;
@@ -1437,7 +1448,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( 3 == getRankPos(row, atkRank) && row == 1 )
         {
-            if( 0 == getAthleticsFirst4Rank(atker, 0x4) )    //µÚÒ»´ÎÉ±Èë¾º¼¼³¡ÈıÇ¿
+            if( 0 == getAthleticsFirst4Rank(atker, 0x4) )    //ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœºä¸‰å¼º
             {
                 cond = 5;
                 itemId = 25;
@@ -1451,7 +1462,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( 11 > getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x8) )
         {
-            //µÚÒ»´ÎÉ±Èë¾º¼¼³¡10Ç¿
+            //ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº10å¼º
             cond = 7;
             itemId = 25;
             itemCount = 1;
@@ -1459,13 +1470,13 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( 11 > getRankPos(row, atkRank) && row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x1000) )
         {
-            //ÖØ¶á¾º¼¼³¡10Ç¿
+            //é‡å¤ºç«æŠ€åœº10å¼º
             setAthleticsFirst4Rank(atker, 0x2000);
             cond = 8;
         }
         else if( (101 > getRankPos(row, atkRank)) && 10 < getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x10) )
         {
-            //µÚÒ»´ÎÉ±Èë¾º¼¼³¡100Ç¿
+            //ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº100å¼º
             cond = 9;
             itemId = 24;
             value = 100;
@@ -1474,7 +1485,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( (201 > getRankPos(row, atkRank)) && (100 < getRankPos(row, atkRank)) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x20) )
         {
-            //µÚÒ»´ÎÉ±Èë¾º¼¼³¡200Ç¿
+            //ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº200å¼º
             cond = 9;
             value = 200;
             itemId = 24;
@@ -1483,70 +1494,70 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
         else if( (301 > getRankPos(row, atkRank)) && (200 < getRankPos(row, atkRank)) && row == 1 && (0 == getAthleticsFirst4Rank(atker, 0x40)) )
         {
-            //µÚÒ»´ÎÉ±Èë¾º¼¼³¡300Ç¿
+            //ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº300å¼º
             cond = 9;
             value = 300;
             itemId = 23;
             itemCount = 1;
             setAthleticsFirst4Rank(atker, 0x40);
         }
-        else if( getAthleticsWinStreak(atker) == 5 )    //5Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) == 5 )    //5è¿èƒœ
         {
             cond = 12;
             value = getAthleticsWinStreak(atker);
             itemId = 22;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(atker) == 10 )    //10Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) == 10 )    //10è¿èƒœ
         {
             cond = 12;
             value = getAthleticsWinStreak(atker);
             itemId = 23;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(atker) == 20 )   //20Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) == 20 )   //20è¿èƒœ
         {
             cond = 12;
             value = getAthleticsWinStreak(atker);
             itemId = 24;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(atker) == 50 )   //50Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) == 50 )   //50è¿èƒœ
         {
             cond = 12;
             value = getAthleticsWinStreak(atker);
             itemId = 25;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(defer) > 19 )   //ÖÕ½áÁËXXXµÄ(20+)Á¬Ê¤
+        else if( getAthleticsWinStreak(defer) > 19 )   //ç»ˆç»“äº†XXXçš„(20+)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(defer);
             itemId = 24;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(defer) > 9 )    //ÖÕ½áÁËXXXµÄ(10~19)Á¬Ê¤
+        else if( getAthleticsWinStreak(defer) > 9 )    //ç»ˆç»“äº†XXXçš„(10~19)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(defer);
             itemId = 23;
             itemCount = 2;
         }
-        else if( getAthleticsWinStreak(defer) > 4 )    //ÖÕ½áÁËXXXµÄ(5~9)Á¬Ê¤
+        else if( getAthleticsWinStreak(defer) > 4 )    //ç»ˆç»“äº†XXXçš„(5~9)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(defer);
             itemId = 23;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(defer) > 3 )    //ÖÕ½áÁËXXXµÄ(3~4)Á¬Ê¤
+        else if( getAthleticsWinStreak(defer) > 3 )    //ç»ˆç»“äº†XXXçš„(3~4)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(defer);
             itemId = 22;
             itemCount = 1;
         }
-        else if( getAthleticsRankUpADay(atker) > 199 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x100) )   //Ò»ÌìÄÚÌáÉı200¸öÅÅÃû
+        else if( getAthleticsRankUpADay(atker) > 199 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x100) )   //ä¸€å¤©å†…æå‡200ä¸ªæ’å
         {
             cond = 15;
             color = 5;
@@ -1556,7 +1567,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.5);
             setAthleticsFirst4Rank(atker, 0x100);
         }
-        else if( getAthleticsRankUpADay(atker) > 99 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x200) )  //Ò»ÌìÄÚÌáÉı100¸öÅÅÃû
+        else if( getAthleticsRankUpADay(atker) > 99 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x200) )  //ä¸€å¤©å†…æå‡100ä¸ªæ’å
         {
             cond = 15;
             color = 4;
@@ -1566,7 +1577,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.7);
             setAthleticsFirst4Rank(atker, 0x200);
         }
-        else if( getAthleticsRankUpADay(atker) > 49 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x400) )     //Ò»ÌìÄÚÌáÉı50¸öÅÅÃû
+        else if( getAthleticsRankUpADay(atker) > 49 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x400) )     //ä¸€å¤©å†…æå‡50ä¸ªæ’å
         {
             cond = 15;
             color = 3;
@@ -1576,7 +1587,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.9);
             setAthleticsFirst4Rank(atker, 0x400);
         }
-        else if( getAthleticsRankUpADay(atker) > 19 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x800) )    //Ò»ÌìÄÚÌáÉı20¸öÅÅÃû
+        else if( getAthleticsRankUpADay(atker) > 19 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x800) )    //ä¸€å¤©å†…æå‡20ä¸ªæ’å
         {
             cond = 15;
             color = 2;
@@ -1587,7 +1598,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsFirst4Rank(atker, 0x800);
         }
 
-        if( cond == 0 && uRand(100) < 7 )    //ÒâÍâÖ®Ï²
+        if( cond == 0 && uRand(100) < 7 )    //æ„å¤–ä¹‹å–œ
         {
             cond = 17;
             itemId = 22;
@@ -1613,51 +1624,51 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         player1 = defer;
         player2 = atker;
 
-        if( row == 1 && getAthleticsExtraChallenge(atker) != 0 )    //ÌØÊâÌôÕ½Ê§°Ü
+        if( row == 1 && getAthleticsExtraChallenge(atker) != 0 )    //ç‰¹æ®ŠæŒ‘æˆ˜å¤±è´¥
             setAthleticsExtraChallenge(atker, 0);
-        else if( getAthleticsWinStreak(atker) > 19 )                //ÖÕ½áÁËXXXµÄ(20+)Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) > 19 )                //ç»ˆç»“äº†XXXçš„(20+)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(atker);
             itemId = 24;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(atker) > 9 )    //ÖÕ½áÁËXXXµÄ(10~19)Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) > 9 )    //ç»ˆç»“äº†XXXçš„(10~19)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(atker);
             itemId = 23;
             itemCount = 2;
         }
-        else if( getAthleticsWinStreak(atker) > 4 )    //ÖÕ½áÁËXXXµÄ(5~9)Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) > 4 )    //ç»ˆç»“äº†XXXçš„(5~9)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(atker);
             itemId = 23;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(atker) > 3 )    //ÖÕ½áÁËXXXµÄ(3~4)Á¬Ê¤
+        else if( getAthleticsWinStreak(atker) > 3 )    //ç»ˆç»“äº†XXXçš„(3~4)è¿èƒœ
         {
             cond = 11;
             value = getAthleticsWinStreak(atker);
             itemId = 22;
             itemCount = 1;
         }
-        else if( getAthleticsBeWinStreak(defer) == 10 )    // Á¬Ğø±»10ÈËÌôÕ½¶ø²»°Ü
+        else if( getAthleticsBeWinStreak(defer) == 10 )    // è¿ç»­è¢«10äººæŒ‘æˆ˜è€Œä¸è´¥
         {
             cond = 13;
             value = 10;
             itemId = 22;
             itemCount = 1;
         }
-        else if( getAthleticsBeWinStreak(defer) == 20 )    // Á¬Ğø±»20ÈËÌôÕ½¶ø²»°Ü
+        else if( getAthleticsBeWinStreak(defer) == 20 )    // è¿ç»­è¢«20äººæŒ‘æˆ˜è€Œä¸è´¥
         {
             cond = 13;
             value = 20;
             itemId = 23;
             itemCount = 1;
         }
-        else if( getAthleticsBeWinStreak(defer) == 100 )    // Á¬Ğø±»100ÈËÌôÕ½¶ø²»°Ü
+        else if( getAthleticsBeWinStreak(defer) == 100 )    // è¿ç»­è¢«100äººæŒ‘æˆ˜è€Œä¸è´¥
         {
             cond = 13;
             value = 100;
@@ -1665,7 +1676,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemId = 24;
             itemCount = 1;
         }
-        else if( getAthleticsFailStreak(atker) == 25 )    //°ÙÕÛ²»ÄÓ
+        else if( getAthleticsFailStreak(atker) == 25 )    //ç™¾æŠ˜ä¸æŒ 
         {
             player1 = atker;
             player2 = defer;
@@ -1694,8 +1705,9 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
         data->extrachallenge = 0;
         data->oldrank = data->rank;
         data->first4rank &= 0xFFFFF0FF;
-        data->challengetime = TimeUtil::Now();
     }
+
+    data->challengetime = TimeUtil::Now();
 }
 
 }

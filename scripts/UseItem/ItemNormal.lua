@@ -4682,6 +4682,150 @@ function ItemNormal_formation(iid, num, bind, param)
     return true
 end
 
+function ItemNormal_athletics_2(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 5 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local level = player:GetLev();
+    level = math.floor((math.floor((level) / 10)) * 10)
+    local tmpEquipTable = Athletics_Orange_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 90 then
+            tmpEquipTable = Athletics_Orange_Equip[90]
+        end
+    end
+
+    local equipId = 0;
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        equipId = tmpEquipTable[math.random(1, tmpSize)];
+        package:AddEquip(equipId, 1);
+    end
+
+    -- 补髓益元丹
+    package:AddItem(507, 2, true, 0, 2);
+    -- 凝神易经丹
+    package:AddItem(509, 2, true, 0, 2);
+    -- 五行精金
+    package:AddItem(515, 2, true, 0, 2);
+    -- 太乙精金
+    package:AddItem(503, 5, true, 0, 2);
+
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:2]，获得[4:507]x2、 [4:509]x2、 [4:515]x2、 [4:503]x5 [4:"..equipId.."]");
+
+    package:DelItemSendMsg(2, player);
+
+    return true;
+end
+
+function ItemNormal_athletics_3(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 5 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local level = player:GetLev();
+    level = math.floor((math.floor((level) / 10)) * 10)
+    local tmpEquipTable = Athletics_Purple_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 90 then
+            tmpEquipTable = Athletics_Purple_Equip[90]
+        end
+    end
+
+    local equipId = 0;
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        equipId = tmpEquipTable[math.random(1, tmpSize)];
+        package:AddEquip(equipId, 1);
+    end
+
+    -- 补髓益元丹
+    package:AddItem(507, 1, true, 0, 2);
+    -- 凝神易经丹
+    package:AddItem(509, 1, true, 0, 2);
+    -- 太乙精金
+    package:AddItem(503, 2, true, 0, 2);
+
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:3]，获得[4:507]、 [4:509]、 [4:503]x2 [4:"..equipId.."]");
+
+    package:DelItemSendMsg(3, player);
+
+    return true;
+end
+
+function ItemNormal_athletics_4(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 5 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    local level = player:GetLev();
+    level = math.floor((math.floor((level) / 10)) * 10)
+    local tmpEquipTable = Athletics_Purple_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 90 then
+            tmpEquipTable = Athletics_Purple_Equip[90]
+        end
+    end
+
+    local equipId = 0;
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        equipId = tmpEquipTable[math.random(1, tmpSize)];
+        package:AddEquip(equipId, 1);
+    end
+
+    -- 补髓益元丹
+    package:AddItem(507, 1, true, 0, 2);
+    -- 凝神丹
+    package:AddItem(508, 1, true, 0, 2);
+    -- 太乙精金
+    package:AddItem(503, 1, true, 0, 2);
+
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:4]，获得[4:507]、 [4:508]、 [4:503] [4:"..equipId.."]");
+
+    package:DelItemSendMsg(4, player);
+
+    return true;
+end
+
+
+
+function ItemNormal_athletics_5(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 5 then		
+		player:sendMsgCode(2, 1010, 0);
+		return false;
+	end
+
+    -- 凝神丹
+    package:AddItem(508, 1, true, 0, 2);
+    -- 太乙精金
+    package:AddItem(503, 1, true, 0, 2);
+
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:5]，获得[4:508]、 [4:503]");
+
+    package:DelItemSendMsg(5, player);
+
+    return true;
+end
+
+
+
+
 function ItemNormal_athletics_22(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -5232,6 +5376,11 @@ local ItemNormal_Table = {
     [1011] = ItemNormal_formation,
 
     --竞技场宝箱
+    [2] = ItemNormal_athletics_2,
+    [3] = ItemNormal_athletics_3,
+    [4] = ItemNormal_athletics_4,
+    [5] = ItemNormal_athletics_5,
+
     [22] = ItemNormal_athletics_22,
     [23] = ItemNormal_athletics_23,
     [24] = ItemNormal_athletics_24,
