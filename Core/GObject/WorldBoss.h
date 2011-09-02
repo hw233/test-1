@@ -33,6 +33,9 @@ public:
     void add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool = false);
     void setLevel(UInt8 lvl) { m_max = lvl; }
 private:
+    UInt8 getLevel(UInt32 now);
+
+private:
     std::map<UInt16, WBoss> m_boss;
     UInt8 m_max;
 };
