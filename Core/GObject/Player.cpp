@@ -2940,7 +2940,7 @@ namespace GObject
                     useGold(GData::moneyNeed[GData::SHIMEN_IM].gold, &ci);
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
-                    AddExp(award); // TODO:
+                    AddExp(award);
                     ++_playerData.smFinishCount;
                     ++_playerData.smAcceptCount;
                     _playerData.fshimen[i] = 0;
@@ -2965,7 +2965,8 @@ namespace GObject
                     useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.fymcolor[i], GetLev());
-                    getTael(award); // TODO:
+                    getTael(award);
+                    AddExp(3000);
                     ++_playerData.ymFinishCount;
                     ++_playerData.ymAcceptCount;
                     _playerData.fyamen[i] = 0;
