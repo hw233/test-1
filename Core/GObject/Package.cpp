@@ -801,6 +801,11 @@ namespace GObject
 			ItemBase * item = iter->second;
 			if(fgt->getLevel() < item->getReqLev())
 				return false;
+            if (item->GetCareer() && fgt->getClass() != item->GetCareer())
+            {
+                m_Owner->sendMsgCode(0, 1056);
+                return false;
+            }
 			switch(part)
 			{
 			case 0x21:

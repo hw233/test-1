@@ -2716,7 +2716,7 @@ namespace GObject
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
 		}
-		//SYSMSG_SENDV(106, this, a);
+		SYSMSG_SENDV(106, this, a);
 		SYSMSG_SENDV(1006, this, a);
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
@@ -4724,6 +4724,8 @@ namespace GObject
 			for(UInt32 i = 0; i < 3 && t[i] > 0; ++ i)
 			{
 				const GData::LootItem * li = GData::lootTable[t[i]];
+                if (!li)
+                    continue;
 				GData::LootResult r = li->roll(&ur);
 				mitem[mcount].id = r.id;
 				mitem[mcount ++].count = r.count;

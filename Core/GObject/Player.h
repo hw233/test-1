@@ -30,7 +30,6 @@ namespace GData
 
 namespace GObject
 {
-#define PLAYER_BUFF_COUNT			0x19
 #define PLAYER_BUFF_DISPLAY_MAX		0x0C
 #define PLAYER_BUFF_AUTOHEAL		0x00
 #define PLAYER_BUFF_ATTR1			0x01
@@ -59,6 +58,8 @@ namespace GObject
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 #define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
 #define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
+
+#define PLAYER_BUFF_COUNT			0x30
 
 #define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
 #define SHIMEN_TASK_MAXCOUNT        5       // 师门每日最大任务数
