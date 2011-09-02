@@ -1914,7 +1914,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     if (src < 0)
     {
         if (cb->needsoul > getMaxSoul() - getSoul())
+        {
+            _owner->sendMsgCode(0, 1057);
             return false;
+        }
 
         if (idx < getUpCittasNum()) // XXX: no we all append
         {

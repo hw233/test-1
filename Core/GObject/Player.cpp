@@ -2716,7 +2716,7 @@ namespace GObject
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
 		}
-		//SYSMSG_SENDV(106, this, a);
+		SYSMSG_SENDV(106, this, a);
 		SYSMSG_SENDV(1006, this, a);
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
@@ -2929,7 +2929,7 @@ namespace GObject
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fshimen[i] == taskid) {
                     if (ColorTaskOutOfAccept(4, im))
-                        break;
+                        return false;
 
                     if (getGold() < GData::moneyNeed[GData::SHIMEN_IM].gold) {
                         sendMsgCode(0, 1101);
@@ -2954,7 +2954,7 @@ namespace GObject
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fyamen[i] == taskid) {
                     if (ColorTaskOutOfAccept(5, im))
-                        break;
+                        return false;
 
                     if (getGold() < GData::moneyNeed[GData::YAMEN_IM].gold) {
                         sendMsgCode(0, 1101);
@@ -3023,8 +3023,8 @@ namespace GObject
             {
                 if (_playerData.fshimen[i] == taskid)
                 {
-                    _playerData.shimen[i] = taskid;
-                    _playerData.smcolor[i] = _playerData.fsmcolor[i];
+                    _playerData.shimen[_playerData.smAcceptCount] = taskid;
+                    _playerData.smcolor[_playerData.smAcceptCount] = _playerData.fsmcolor[i];
 
                     _playerData.fshimen[i] = 0;
                     _playerData.fsmcolor[i] = 0;
@@ -3042,8 +3042,8 @@ namespace GObject
             {
                 if (_playerData.fyamen[i] == taskid)
                 {
-                    _playerData.yamen[i] = taskid;
-                    _playerData.ymcolor[i] = _playerData.fymcolor[i];
+                    _playerData.yamen[_playerData.ymAcceptCount] = taskid;
+                    _playerData.ymcolor[_playerData.ymAcceptCount] = _playerData.fymcolor[i];
 
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
@@ -4724,6 +4724,8 @@ namespace GObject
 			for(UInt32 i = 0; i < 3 && t[i] > 0; ++ i)
 			{
 				const GData::LootItem * li = GData::lootTable[t[i]];
+                if (!li)
+                    continue;
 				GData::LootResult r = li->roll(&ur);
 				mitem[mcount].id = r.id;
 				mitem[mcount ++].count = r.count;

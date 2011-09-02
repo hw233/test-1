@@ -1404,7 +1404,7 @@ namespace GObject
 
     bool TaskMgr::CompleteClanTaskDirect(UInt32 taskId)
     {
-        if(!m_PlayerOwner->isClanTask(taskId) && m_PlayerOwner->isClanTaskFull())
+        if(!m_PlayerOwner->isClanTask(taskId) || m_PlayerOwner->isClanTaskFull())
             return false;
 
 		TaskData* task = AddTask(taskId);

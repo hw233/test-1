@@ -3137,7 +3137,7 @@ function ItemNormal_00000015(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   package:DelItemSendMsg(15, player);
-  player:getTael(100*num)  
+  player:getTael(1000*num)  
   return true;
 end
 

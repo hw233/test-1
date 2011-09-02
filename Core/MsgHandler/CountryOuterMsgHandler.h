@@ -1941,7 +1941,6 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
     case 3:
         // 师门，衙门任务立即完成
         succ = player->addAwardByTaskColor(req.m_TaskId, true);
-
 		succ1 = player->GetTaskMgr()->CompleteClanTaskDirect(req.m_TaskId);
         if (succ1)
         {
@@ -2412,7 +2411,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
 			}
 			break;
-		case 6:
+		case 5:
 			if(PLAYER_DATA(player, tael) < price)
 			{
 				st << static_cast<UInt8>(1);
@@ -2434,6 +2433,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
 			}
 			break;
+#if 0
 		case 5:
 			if(PLAYER_DATA(player, coin) < price)
 			{
@@ -2457,7 +2457,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				}
 			}
 			break;
-		case 7:
+#endif
+		case 6:
 			if(PLAYER_DATA(player, achievement) < price)
 			{
 				st << static_cast<UInt8>(1);
