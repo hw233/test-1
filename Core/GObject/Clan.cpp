@@ -107,9 +107,11 @@ bool Clan::accept(Player * player, UInt64 pid )
 			SYSMSG_SENDV(1021, accepter, _name.c_str());
 		}
 	}
-	_pending.erase(it);
-	delete *it;
 	DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, accepter->getId());
+
+	delete *it;
+	_pending.erase(it);
+
 	return true;
 }
 
@@ -130,8 +132,8 @@ bool Clan::decline( Player* player, UInt64 pid )
 	SYSMSGV(content, 228, _name.c_str());
 	(*it)->player->GetMailBox()->newMail(NULL, 1, title, content);
 
-	_pending.erase(it);
 	delete *it;
+	_pending.erase(it);
 	{
 		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(2) << pid;
@@ -523,9 +525,11 @@ bool Clan::declineInvite(Player * player)
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if(it != _pending.end() && (*it)->cls == 15)
 	{
-		_pending.erase(it);
-		delete *it;
 		DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, player->getId());
+
+		delete *it;
+		_pending.erase(it);
+
 		return true;
 	}
 	return false;
@@ -899,17 +903,20 @@ void Clan::listPending( Player * player )
 	UInt8 c = 0;
 	st << static_cast<UInt8>(1) << c;
 	size_t i = 0;
+    std::vector<ClanPendingMember *>::iterator it = _pending.begin();
 	while(i < _pending.size())
 	{
-		ClanPendingMember * cmem = _pending[i];
+		ClanPendingMember * cmem = *it;
 		if(cmem->player->getClan() != NULL)
 		{
 			DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND (`class` = 16 OR `class` = 15)", _id, cmem->player->getId());
-			_pending.erase(_pending.begin() + i);
+            delete cmem;
+			_pending.erase(it);
 			continue;
 		}
 		st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime;
 		++ c;
+        it = _pending.begin() + i;
 		++ i;
 	}
 	st.data<UInt8>(5) = c;
@@ -1053,13 +1060,15 @@ void Clan::purgePending()
 	UInt32 thatTime = TimeUtil::Now() - 10 * 3600 * 24;
 	size_t sz = _pending.size();
 	size_t i = 0;
-	while(i < sz && _pending[i]->opTime < thatTime)
+    std::vector<ClanPendingMember *>::iterator it = _pending.begin();
+	while(i < sz && (*it)->opTime < thatTime)
 	{
 		DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `class` = 16", _id, _pending[i]->player->getId());
+        delete *it;
 		++ i;
+        _pending.erase(it);
+        it = _pending.begin();
 	}
-	if(i > 0)
-		_pending.erase(_pending.begin(), _pending.begin() + i);
 }
 
 

@@ -471,13 +471,13 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
             {
                 setAthleticsExtraChallenge(atker, 0);
                 (*atkerRank->second)->oldrank = (*atkerRank->second)->rank;
-                (*atkerRank->second)->first4rank &= 0xFFFF0FFF;
+                (*atkerRank->second)->first4rank &= 0xFFFFF0FF;
                 DB().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*atkerRank->second)->oldrank, (*atkerRank->second)->first4rank, (*atkerRank->second)->ranker->getId());
             }
             else
             {
                 std::string name = defer->getName();
-                challenge(atker, name);
+                challenge(atker, name, type);
             }
         }
         break;
@@ -485,7 +485,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 
 }
 
-void AthleticsRank::challenge(Player * atker, std::string& name)
+void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 {
 	UInt32 Viplvl = atker->getVipLevel();
 	const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 18, 20, 20, 20, 20, 20};
@@ -518,7 +518,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 	{
 		if (atkerRankPos <= deferRankPos)
 			return;
-		if (atkerRankPos - deferRankPos > 14)
+		if (atkerRankPos - deferRankPos > 10 && !type)
 		{
 			//Stream st(REP::ATHLETICS_CHALLENGE);
 			//st << Stream::eos;
@@ -544,7 +544,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name)
 	defer->addGlobalFlag(Player::BeChallenging);
 	data->challengenum ++;
 	gSpecialAward.newServerActivity(atker, data->challengenum);
-	data->challengetime = TimeUtil::Now();
+    updateAthleticsRank(data);
 
 	UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
 	if(Viplvl >= 1 && Viplvl <= 3)
@@ -834,6 +834,47 @@ bool AthleticsRank::updateBoxTimeoutAward(Rank rank, UInt8 row, UInt32 now)
 
 void AthleticsRank::TmExtraAward()
 {
+	AthleticsList::iterator start = _athleticses[1].begin();
+	AthleticsList::iterator end = start;
+
+	if (_athleticses[1].size() >= 10)
+		std::advance(end, 10);
+	else
+		end = _athleticses[1].end();
+
+	for (UInt16 rank = 1; start != end; ++start, ++rank)
+    {
+        UInt32 itemId = 0;
+        UInt8  itemCount = 1;
+		Player *ranker = (*start)->ranker;
+        if(rank == 1)
+        {
+            itemId = 2;
+        }
+        else if(rank == 2)
+        {
+            itemId = 3;
+        }
+        else if(rank == 3)
+        {
+            itemId = 4;
+        }
+        else
+        {
+            itemId = 5;
+        }
+
+        if(itemId)
+        {
+            AthleticsAward rankerAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
+
+            GameMsgHdr hdr2(0x217, ranker->getThreadId(), ranker, sizeof(AthleticsAward));
+            GLOBAL().PushMsg(hdr2, &rankerAthleticsAward);
+
+            SYSMSG_BROADCASTV(330, ranker->getCountry(), ranker->getName().c_str(), rank, itemId);
+        }
+    }
+
     return;
 #if 0
 	gSpecialAward.AthleticsAward();
@@ -1045,7 +1086,7 @@ UInt32 AthleticsRank::getAthleticsRankUpADay(Player* player)
 	if (TimeUtil::SharpDay(0, (*found->second)->challengetime) != WORLD().ThisDay())
     {
         (*found->second)->oldrank = (*found->second)->rank;
-        (*found->second)->first4rank &= 0xFFFF0FFF;
+        (*found->second)->first4rank &= 0xFFFFF0FF;
 		DB().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->oldrank, (*found->second)->first4rank, (*found->second)->ranker->getId());
     }
 
@@ -1555,10 +1596,10 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
 
         if( cond != 0 )
         {
-            AthleticsAward deferAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
+            AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
 
             GameMsgHdr hdr2(0x217, atker->getThreadId(), atker, sizeof(AthleticsAward));
-            GLOBAL().PushMsg(hdr2, &deferAthleticsAward);
+            GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
 
             addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
             cond = 0;
@@ -1643,6 +1684,17 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
             cond = 0;
         }
+    }
+}
+
+void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
+{
+    if (TimeUtil::SharpDay(0, data->challengetime) != WORLD().ThisDay())
+    {
+        data->extrachallenge = 0;
+        data->oldrank = data->rank;
+        data->first4rank &= 0xFFFFF0FF;
+        data->challengetime = TimeUtil::Now();
     }
 }
 
