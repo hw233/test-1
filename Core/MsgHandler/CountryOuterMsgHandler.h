@@ -1941,7 +1941,6 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
     case 3:
         // 师门，衙门任务立即完成
         succ = player->addAwardByTaskColor(req.m_TaskId, true);
-
 		succ1 = player->GetTaskMgr()->CompleteClanTaskDirect(req.m_TaskId);
         if (succ1)
         {
