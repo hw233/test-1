@@ -159,7 +159,13 @@ UInt8 Dungeon::playerBreak( Player * player )
 void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 {
 	const GData::DungeonLevel * dgl = _dungeon->monsters[dpi.level];
+    if(!dgl)
+        return;
+
 	const GData::DungeonMonster * dm = dgl->monsterSet;
+    if(!dm)
+        return;
+
 	exp = dm->exp;
 	player->pendExp(exp);
 	UInt32 itemId = 0;

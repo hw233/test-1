@@ -127,7 +127,7 @@ public:
 
 public:
 	void requestAthleticsList(Player *, UInt16 type);
-	void challenge(Player *, std::string&);
+	void challenge(Player *, std::string&, UInt8 type = 0);
 	void notifyAthletcisOver(Player *, Player *, UInt32, bool);
 	void notifyAthletcisBoxFlushTime(Player *);
 
@@ -211,6 +211,7 @@ protected:
 		return (*rank) == _athleticses[row].back();
 	}
 
+    void updateAthleticsRank(AthleticsRankData* data);
 	void updateBatchRanker(UInt8, Rank, Rank);
 	UInt8 updateChallengeNum(UInt8, UInt32);
 	void getRankUpNeighbour(UInt8, Rank, Rank&);
