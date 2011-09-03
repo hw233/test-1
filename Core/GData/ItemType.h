@@ -169,7 +169,8 @@ namespace GData
 	struct ItemEquipType : public ItemBaseType
 	{
 		const AttrExtra*	attrExtra;
-		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
+        bool fix;
+		ItemEquipType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name), fix(false)
 		{
 			const AttrExtraItem * attr = attrExtraManager[attrId];
 			if(attr != NULL)
@@ -177,7 +178,16 @@ namespace GData
 			else
 				attrExtra = NULL;
 		}
-		virtual ~ItemEquipType() { }
+        void setAttr(const AttrExtra* attr, bool fix = false)
+        {
+            attrExtra = attr;
+            this->fix = fix;
+        }
+		virtual ~ItemEquipType()
+        {
+            if (fix && attrExtra)
+                delete attrExtra;
+        }
 	};
 
 	struct ItemWeaponType : public ItemEquipType

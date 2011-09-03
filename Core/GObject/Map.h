@@ -108,7 +108,7 @@ public:
 
 	void Hide(UInt32, bool = true);
 	void SendHide( UInt32 id, Player * player);
-	void Show(UInt32, bool = true);
+	void Show(UInt32, bool = true, UInt8 = 0);
 
 	inline void Broadcast( UInt16 loc, Stream& st, Player * pl = NULL )
 	{

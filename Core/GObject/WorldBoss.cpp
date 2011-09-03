@@ -9,9 +9,21 @@
 
 namespace GObject
 {
-    static UInt32 worldboss[] = {5162, 5162, 5103, 5168, 5127, 5197, 5164};
-    //static UInt32 worldboss1[] = {5162, 5162, 5103, 5168, 5127, 5197, 5164};
-    static UInt32 worldboss1[] = {5000, 5001, 5000, 5001, 5000, 5001, 5001};
+    static UInt32 worldboss[] = {
+        5466, 5467, 5468, 5469,
+        5162, 5473, 5474, 5475,
+        5103, 5470, 5471, 5472,
+    };
+
+    static UInt32 worldboss1[] = {
+        5272, 5004, 5005, 5006,
+        5008, 5010, 5011, 5012,
+        5009, 5013, 5274, 5275,
+        5276, 5277, 5033, 5278,
+        5279, 5280, 5281, 5032,
+        5282, 5283, 5284, 5285,
+        5037, 5410, 5016, 5411,
+    };
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
@@ -21,7 +33,8 @@ namespace GObject
             {
                 if (worldboss[i] == npcid)
                     return true;
-            } else
+            }
+            else
             {
                 if (worldboss1[i] == npcid)
                     return true;
@@ -30,67 +43,82 @@ namespace GObject
         return false;
     }
 
-    void WorldBoss::refresh(UInt32 now)
+    UInt8 WorldBoss::getLevel(UInt32 now)
     {
-        time_t now2 = static_cast<time_t>(now);
-        struct tm * t = localtime(&now2);
-
         reset();
 
-        UInt8 level = 0;
+        time_t now2 = static_cast<time_t>(now);
+        struct tm * t = localtime(&now2);
         switch (t->tm_hour)
         {
             case 19:
                 if (m_max >= 100)
                 {
-                    level = 7;
+                    return 7;
                 }
                 break;
             case 18:
                 if (m_max >= 90)
                 {
-                    level = 6;
+                    return 6;
                 }
                 break;
             case 17:
                 if (m_max >= 80)
                 {
-                    level = 5;
+                    return 5;
                 }
                 break;
             case 16:
                 if (m_max >= 70)
                 {
-                    level = 4;
+                    return 4;
                 }
                 break;
             case 15:
                 if (m_max >= 60)
                 {
-                    level = 3;
+                    return 3;
                 }
                 break;
             case 14:
                 if (m_max >= 50)
                 {
-                    level = 2;
+                    return 2;
                 }
                 break;
             case 13:
                 if (m_max >= 40)
                 {
-                    level = 1;
+                    return 1;
                 }
                 break;
             default:
                 break;
         }
+        return 0;
+    }
 
-        //if (!cfg.GMCheck)
-        //    level = uRand(7)+1;
-
+    void WorldBoss::refresh(UInt32 now)
+    {
+        UInt8 level = getLevel(now);
         if (!level)
             return;
+
+        UInt32 npcid = 0;
+        UInt8 idx = (level-1)*4;
+        if (cfg.GMCheck)
+        {
+            if (idx >= sizeof(worldboss)/sizeof(UInt32))
+                return;
+            npcid = worldboss[idx];
+        }
+        else
+        {
+            if (idx >= sizeof(worldboss1)/sizeof(UInt32))
+                return;
+            npcid = worldboss1[idx];
+        }
 
         std::vector<UInt16> spots;
         Map::GetAllSpot(spots);
@@ -101,15 +129,6 @@ namespace GObject
         if (!spot)
             return;
 
-        UInt32 npcid = 0;
-        if (cfg.GMCheck)
-        {
-            npcid = worldboss[level-1];
-        }
-        else
-        {
-            npcid = worldboss1[level-1];
-        }
         Fighter* fgt = globalFighters[npcid];
         if (fgt)
         {
@@ -125,16 +144,16 @@ namespace GObject
     {
         time_t now2 = static_cast<time_t>(now);
         struct tm * t = localtime(&now2);
-        if ((t->tm_hour >= 12 && t->tm_min >= 45 && t->tm_hour < 13) ||
-            (t->tm_hour >= 13 && t->tm_min >= 45 && t->tm_hour < 14) ||
-            (t->tm_hour >= 14 && t->tm_min >= 45 && t->tm_hour < 15) ||
-            (t->tm_hour >= 15 && t->tm_min >= 45 && t->tm_hour < 16) ||
-            (t->tm_hour >= 16 && t->tm_min >= 45 && t->tm_hour < 17) ||
-            (t->tm_hour >= 17 && t->tm_min >= 45 && t->tm_hour < 18) ||
-            (t->tm_hour >= 18 && t->tm_min >= 45 && t->tm_hour < 19))
+        if ((t->tm_hour >= 12 && t->tm_min >= 45 && t->tm_hour < 13 && m_max >= 40) ||
+            (t->tm_hour >= 13 && t->tm_min >= 45 && t->tm_hour < 14 && m_max >= 50) ||
+            (t->tm_hour >= 14 && t->tm_min >= 45 && t->tm_hour < 15 && m_max >= 60) ||
+            (t->tm_hour >= 15 && t->tm_min >= 45 && t->tm_hour < 16 && m_max >= 70) ||
+            (t->tm_hour >= 16 && t->tm_min >= 45 && t->tm_hour < 17 && m_max >= 80) ||
+            (t->tm_hour >= 17 && t->tm_min >= 45 && t->tm_hour < 18 && m_max >= 90) ||
+            (t->tm_hour >= 18 && t->tm_min >= 45 && t->tm_hour < 19 && m_max >= 100))
         {
             if (60 - t->tm_min >= 5)
-                SYSMSG_BROADCASTV(547, 60 - t->tm_min);
+                SYSMSG_BROADCASTV(547, ((60 - t->tm_min)/10)*10+5);
             return;
         }
     }
@@ -144,8 +163,8 @@ namespace GObject
         std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
         if (i != m_boss.end())
         {
-            if (i->second.npcId == npcid)
-            {
+            //if (i->second.npcId == npcid)
+            //{ // XXX:
                 bool vip = false;
                 UInt16 count = 9;
                 if (i->second.count >= count)
@@ -155,12 +174,12 @@ namespace GObject
                         if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
                         {
                             pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
-                            pl->setBuffData(PLAYER_BUFF_WBOSSID, npcid, true);
+                            pl->setBuffData(PLAYER_BUFF_WBOSSID, i->second.level, true);
                             vip = true;
                         }
-                        else if (pl->getBuffData(PLAYER_BUFF_WBOSSID) != npcid)
+                        else if (pl->getBuffData(PLAYER_BUFF_WBOSSID) != i->second.level)
                         {
-                            pl->setBuffData(PLAYER_BUFF_WBOSSID, npcid, true);
+                            pl->setBuffData(PLAYER_BUFF_WBOSSID, i->second.level, true);
                             vip = true;
                         }
                         else
@@ -183,6 +202,23 @@ namespace GObject
                         ++i->second.count;
                         DB().PushUpdateData("UPDATE `worldboss` SET `count` = %u WHERE `npcId` = %u", i->second.count, npcid);
 
+                        if (i->second.count < count)
+                        {
+                            UInt32 npcID = i->second.npcId;
+                            UInt8 idx = (i->second.level-1)*4 + i->second.count;
+                            if (cfg.GMCheck)
+                            {
+                                if (idx < sizeof(worldboss)/sizeof(UInt32))
+                                    npcID = worldboss[idx];
+                            }
+                            else
+                            {
+                                if (idx < sizeof(worldboss1)/sizeof(UInt32))
+                                    npcID = worldboss1[idx];
+                            }
+                            add(i->first, npcID, i->second.level, i->second.count, true);
+                        }
+
                         Map* map = pl->GetMap();
                         if (map)
                         {
@@ -197,7 +233,7 @@ namespace GObject
                         }
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -222,6 +258,13 @@ namespace GObject
         Map * map = Map::FromSpot(loc);
         if (map)
         {
+            std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
+            if (i != m_boss.end() && npcId != i->second.npcId)
+            {
+                map->Hide(i->second.npcId);
+                map->DelObject(i->second.npcId);
+            }
+
             MOData mo;
             mo.m_ID = npcId;
             mo.m_Hide = false;
@@ -230,9 +273,9 @@ namespace GObject
             mo.m_ActionType = 0;
             map->AddObject(mo);
 
-            if (show) 
+            if (show)
             {
-                map->Show(npcId);
+                map->Show(npcId, true, mo.m_Type);
                 Fighter* fgt = globalFighters[npcId];
                 if (!fgt)
                     return;
@@ -254,7 +297,6 @@ namespace GObject
             wb.level = level;
             wb.count = count;
             m_boss[loc] = wb;
-
         }
     }
 

@@ -14,25 +14,25 @@ namespace GObject
 		public GObjectBaseT<ItemBase>
 	{
 	public:
-		ItemBase(UInt32 id, const GData::ItemBaseType& itemType)
+		ItemBase(UInt32 id, const GData::ItemBaseType* itemType)
 			: GObjectBaseT<ItemBase>(id), _itemBaseType(itemType), m_BindStatus(false), m_TotalCount(0)
 		{
 		}
 		virtual ~ItemBase() {};
 	
 	public:
-		const GData::ItemBaseType& GetItemType() const { return _itemBaseType; }
+		const GData::ItemBaseType& GetItemType() const { return *_itemBaseType; }
 
-		inline ItemClass	getClass() const { return _itemBaseType.subClass; }
-		inline const std::string& getName() const   { return _itemBaseType.getName();	 }
-		inline UInt8		getQuality() const { return _itemBaseType.quality; }
-		inline UInt16		getReqLev() const { return _itemBaseType.reqLev; }
-		inline UInt32		getPrice() const { return _itemBaseType.price; }
+		inline ItemClass	getClass() const { return _itemBaseType->subClass; }
+		inline const std::string& getName() const   { return _itemBaseType->getName();	 }
+		inline UInt8		getQuality() const { return _itemBaseType->quality; }
+		inline UInt16		getReqLev() const { return _itemBaseType->reqLev; }
+		inline UInt32		getPrice() const { return _itemBaseType->price; }
 
-		inline UInt16		getMaxQuantity() const	{ return _itemBaseType.maxQuantity; }
-		inline UInt8		getBindType() const	{ return _itemBaseType.bindType; }
-        inline UInt16       getEnergy() const { return _itemBaseType.energy; }
-        inline UInt8        GetCareer() const { return _itemBaseType.career; }
+		inline UInt16		getMaxQuantity() const	{ return _itemBaseType->maxQuantity; }
+		inline UInt8		getBindType() const	{ return _itemBaseType->bindType; }
+        inline UInt16       getEnergy() const { return _itemBaseType->energy; }
+        inline UInt8        GetCareer() const { return _itemBaseType->career; }
 
 		bool GetBindStatus() const { return m_BindStatus; }
 		inline bool  SetBindStatus(bool bindType)
@@ -49,26 +49,26 @@ namespace GObject
 		inline bool DecItem(UInt16 num) { if(num > m_TotalCount) return false; m_TotalCount -= num; return true; }
 		inline UInt16 Size() const
 		{
-			if(_itemBaseType.subClass == Item_Task)
+			if(_itemBaseType->subClass == Item_Task)
 				return 0;
-			if(IsEquip(_itemBaseType.subClass))
+			if(IsEquip(_itemBaseType->subClass))
 				return 1;
-			return (m_TotalCount + _itemBaseType.maxQuantity - 1) / _itemBaseType.maxQuantity;
+			return (m_TotalCount + _itemBaseType->maxQuantity - 1) / _itemBaseType->maxQuantity;
 		}
 		inline UInt16 Size(UInt16 num) const
 		{
-			if(_itemBaseType.subClass == Item_Task)
+			if(_itemBaseType->subClass == Item_Task)
 				return 0;
-			if(IsEquip(_itemBaseType.subClass))
+			if(IsEquip(_itemBaseType->subClass))
 				return 1;
-			return (num + _itemBaseType.maxQuantity - 1) / _itemBaseType.maxQuantity;
+			return (num + _itemBaseType->maxQuantity - 1) / _itemBaseType->maxQuantity;
 		}
-		inline UInt16 Count() const		{ return IsEquip(_itemBaseType.subClass) ? 1 : m_TotalCount; }
-		inline UInt16 GetLeftNum() const { return m_TotalCount % _itemBaseType.maxQuantity; }
-		inline UInt16 GetOverlayNum() const { return _itemBaseType.maxQuantity; }
+		inline UInt16 Count() const		{ return IsEquip(_itemBaseType->subClass) ? 1 : m_TotalCount; }
+		inline UInt16 GetLeftNum() const { return m_TotalCount % _itemBaseType->maxQuantity; }
+		inline UInt16 GetOverlayNum() const { return _itemBaseType->maxQuantity; }
 
 	protected:
-		const GData::ItemBaseType& _itemBaseType;
+		const GData::ItemBaseType* _itemBaseType;
 
 		bool	m_BindStatus;
 		UInt16	m_TotalCount;
@@ -78,7 +78,7 @@ namespace GObject
 	class ItemEquip : public ItemBase
 	{
 	public:
-		ItemEquip(UInt32 id, const GData::ItemEquipType& itemEquipType, ItemEquipData& itemEquipData) 
+		ItemEquip(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData) 
 			: ItemBase(id, itemEquipType), _itemEquipData(itemEquipData)
 		{
 		}
@@ -88,7 +88,7 @@ namespace GObject
 	public:
 		inline ItemEquipData& getItemEquipData() { return _itemEquipData; }
 
-		inline const GData::AttrExtra * getAttrExtra() { return static_cast<const GData::ItemEquipType&>(_itemBaseType).attrExtra; }
+		inline const GData::AttrExtra * getAttrExtra() { return static_cast<const GData::ItemEquipType*>(_itemBaseType)->attrExtra; }
 
 		inline ItemEquipAttr2& getEquipAttr2() { return _itemEquipData.extraAttr2; }
 
@@ -130,7 +130,7 @@ namespace GObject
 	class ItemWeapon : public ItemEquip
 	{
 	public:
-		ItemWeapon(UInt32 id, const GData::ItemWeaponType& itemArmorType, ItemEquipData& itemEquipData)
+		ItemWeapon(UInt32 id, const GData::ItemBaseType* itemArmorType, ItemEquipData& itemEquipData)
 			: ItemEquip(id, itemArmorType, itemEquipData) 
 		{ }
 	};
@@ -138,7 +138,7 @@ namespace GObject
 	class ItemArmor : public ItemEquip
 	{
 	public:
-		ItemArmor(UInt32 id, const GData::ItemEquipType& itemEquipType, ItemEquipData& itemEquipData)
+		ItemArmor(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
 		    : ItemEquip(id, itemEquipType, itemEquipData) 
 		{ }
 	};
@@ -146,30 +146,65 @@ namespace GObject
 	class ItemTrump : public ItemEquip
 	{
 	public:
-		ItemTrump(UInt32 id, const GData::ItemTrumpType& itemTrumpType, ItemEquipData& itemEquipData)
-			: ItemEquip(id, itemTrumpType, itemEquipData) 
+		ItemTrump(UInt32 id, const GData::ItemBaseType* itemTrumpType, ItemEquipData& itemEquipData)
+			: ItemEquip(id, itemTrumpType, itemEquipData), fix(false)
         { }
-        ~ItemTrump() { }
+        virtual ~ItemTrump()
+        {
+            if (fix)
+                delete _itemBaseType;
+        }
+
+        bool fix;
 
         void fixSkills()
         {
-            GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(getAttrExtra());
-            if (attr->skills.size())
-            {
-                size_t size = attr->skills.size();
-                for (size_t i = 0; i < size; ++i)
+            const GData::ItemEquipType* ibt = static_cast<const GData::ItemEquipType*>(_itemBaseType);
+            if (ibt) {
+                GData::ItemEquipType* nibt = new GData::ItemEquipType(ibt->getId(), ibt->getName(), 0);
+                if (!nibt)
+                    return;
+                nibt->subClass = ibt->subClass;
+                nibt->price = ibt->price;
+                nibt->reqLev = ibt->reqLev;
+                nibt->quality = ibt->quality;
+                nibt->maxQuantity = ibt->maxQuantity;
+                nibt->bindType = ibt->bindType;
+                nibt->energy = ibt->energy;
+                nibt->data = ibt->data;
+                nibt->career = ibt->career;
+                const GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(getAttrExtra()); // from ibt
+                if (attr)
                 {
-                    if (attr->skills[i])
+                    GData::AttrExtra* tmp = new GData::AttrExtra;
+                    if (tmp && attr->skills.size())
                     {
-                        UInt16 skillid = attr->skills[i]->getId();
-                        UInt16 id = SKILL_ID(skillid);
-                        UInt16 lvl = this->getItemEquipData().enchant+1;
-                        UInt16 nskillid = SKILLANDLEVEL(id, lvl);
-                        if (nskillid != skillid)
-                            attr->skills[i] = GData::skillManager[nskillid];
+                        *tmp = *attr;
+                        tmp->skills.clear();
+
+                        size_t size = attr->skills.size();
+                        if (size)
+                            tmp->skills.resize(size);
+                        for (size_t i = 0; i < size; ++i)
+                        {
+                            if (attr->skills[i])
+                            {
+                                UInt16 skillid = attr->skills[i]->getId();
+                                UInt16 id = SKILL_ID(skillid);
+                                UInt16 lvl = this->getItemEquipData().enchant+1;
+                                UInt16 nskillid = SKILLANDLEVEL(id, lvl);
+                                tmp->skills[i] = GData::skillManager[nskillid];
+                            }
+                        }
+                        nibt->setAttr(tmp, true);
+                        _itemBaseType = nibt;
+                        fix = true;
+                        return;
                     }
+                    delete tmp;
                 }
-            }   
+                delete nibt;
+            }
         }
 	};
 }

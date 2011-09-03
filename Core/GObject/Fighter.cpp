@@ -676,26 +676,6 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
     {
         ItemEquip* t = 0;
         t = GObjectManager::fetchEquipment(trump);
-#if 0
-        if (t)
-        {
-            GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(t->getAttrExtra());
-            if (attr->skills.size())
-            {
-                size_t size = attr->skills.size();
-                for (size_t i = 0; i < size; ++i)
-                {
-                    if (attr->skills[i])
-                    {
-                        UInt16 skillid = attr->skills[i]->getId();
-                        UInt16 nskillid = SKILLANDLEVEL(SKILL_ID(skillid), t->getItemEquipData().enchant+1);
-                        if (nskillid != skillid)
-                            attr->skills[i] = GData::skillManager[nskillid];
-                    }
-                }
-            }
-        }
-#endif
         return setTrump(t, idx, writedb);
     }
     return 0;
@@ -1428,7 +1408,7 @@ int Fighter::hasPeerless( UInt16 pl )
 {
     for (size_t i = 0; i < _peerless.size(); ++i)
     {
-        if (_peerless[i] == pl || SKILL_ID(_peerless[i]) == SKILL_ID(pl))
+        if (SKILL_ID(_peerless[i]) == SKILL_ID(pl))
             return static_cast<int>(i);
     }
     return -1;
@@ -1560,9 +1540,6 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
 // XXX: 穴道 id (0-14) lvl [1-3]
 bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 {
-    UInt8 cittaslot = _cittaslot;
-    Int32 soulmax = soulMax;
-    UInt32 pexp = _pexpMax;
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
         if (_acupoints[idx] == v)
@@ -1593,13 +1570,9 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         _attrDirty = true;
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);
-
-    //    if (pexp != _pexpMax)
-            sendModification(7, _pexpMax);
-    //    if (soulmax != soulMax)
-            sendModification(9, soulMax);
-    //    if (cittaslot != _cittaslot)
-            sendModification(0x32, getUpCittasMax());
+        sendModification(7, _pexpMax);
+        sendModification(9, soulMax);
+        sendModification(0x32, getUpCittasMax());
         return true;
     }
     return false;
@@ -2544,7 +2517,6 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
         {
             if(r < it->second)
             {
-                Fighter* fighter = _fighters[it->first].fighter;
                 return _fighters[it->first].fighter;
             }
             r -= it->second;

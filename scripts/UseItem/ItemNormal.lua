@@ -487,8 +487,8 @@ end
 function ItemNormal_00000057(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(23, 0, true)
-  if ItemNormal_AddBuff(player, 22, 3600, num, 356400) then
+  player:setBuffData(4, 0, true)
+  if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(57, player);
 	return true;
   else
@@ -499,8 +499,8 @@ end
 function ItemNormal_00000058(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(22, 0, true)
-  if ItemNormal_AddBuff(player, 23, 3600, num, 356400) then
+  player:setBuffData(4, 0, true)
+  if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(58, player);
 	return true;
   else
@@ -533,7 +533,7 @@ function ItemNormal_00000013(iid, num, bind, param)
 		return false;
 	end
   local oldexp = fgt:getExp();
-	fgt:addExp(30000*num);
+  fgt:addExp(500000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(13, player);
 	return true;
@@ -550,7 +550,7 @@ function ItemNormal_00000014(iid, num, bind, param)
 		return false;
 	end
   local oldexp = fgt:getExp();
-	fgt:addExp(60000*num);
+	fgt:addExp(5000000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(14, player);
 	return true;

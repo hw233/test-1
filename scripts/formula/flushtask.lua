@@ -27,7 +27,7 @@ function GetTaskAwardFactor(ttype, color, lvl)
         if lvl < 30 then
             return taskawardfactor[1][color] * lvl + base
         end
-        return taskawardfactor[1][color] * (lvlfactor[math.floor(lvl/10)] * (lvl - 10) + base)
+        return taskawardfactor[1][color] * (lvlfactor[lvl/10] * (lvl - 10) + base)
     end
     return taskawardfactor[ttype][color]
 end

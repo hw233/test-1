@@ -2780,7 +2780,8 @@ namespace GObject
 		for(int i = 0; i < 5; ++ i)
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
-			if(fgt != NULL && fgt->getLevel() < mlvl)
+			//if(fgt != NULL && fgt->getLevel() < mlvl)
+			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
 	}
@@ -2940,7 +2941,7 @@ namespace GObject
                     useGold(GData::moneyNeed[GData::SHIMEN_IM].gold, &ci);
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
-                    AddExp(award); // TODO:
+                    AddExp(award);
                     ++_playerData.smFinishCount;
                     ++_playerData.smAcceptCount;
                     _playerData.fshimen[i] = 0;
@@ -2965,7 +2966,8 @@ namespace GObject
                     useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.fymcolor[i], GetLev());
-                    getTael(award); // TODO:
+                    getTael(award);
+                    AddExp(3000);
                     ++_playerData.ymFinishCount;
                     ++_playerData.ymAcceptCount;
                     _playerData.fyamen[i] = 0;
@@ -5250,6 +5252,7 @@ namespace GObject
 
     float Player::getPracticeBufFactor()
     {
+#if 0
         if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
             return 0.2;
@@ -5258,6 +5261,12 @@ namespace GObject
         {
             return 0.5;
         }
+#else
+        if(getBuffData(PLAYER_BUFF_PROTECT, TimeUtil::Now()))
+        {
+            return 0.5;
+        }
+#endif
         return 0.0;
     }
 

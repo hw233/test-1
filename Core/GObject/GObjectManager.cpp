@@ -2671,22 +2671,22 @@ namespace GObject
                         switch(itype->subClass)
                         {
                         case Item_Weapon:
-                            equip = new ItemWeapon(dbe.id, *static_cast<const GData::ItemWeaponType *>(itype), ied);
+                            equip = new ItemWeapon(dbe.id, itype, ied);
                             break;
                         case Item_Armor1:
                         case Item_Armor2:
                         case Item_Armor3:
 					case Item_Armor4:
 					case Item_Armor5:
-						equip = new ItemArmor(dbe.id, *static_cast<const GData::ItemEquipType *>(itype), ied);
+						equip = new ItemArmor(dbe.id, itype, ied);
                         break;
                     case Item_Trump:
-                        equip = new ItemTrump(dbe.id, *static_cast<const GData::ItemTrumpType*>(itype), ied);
-                        if (equip)
+                        equip = new ItemTrump(dbe.id, itype, ied);
+                        if (equip && ied.enchant)
                             ((ItemTrump*)equip)->fixSkills();
                         break;
                     default:
-                        equip = new ItemEquip(dbe.id, *static_cast<const GData::ItemEquipType *>(itype), ied);
+                        equip = new ItemEquip(dbe.id, itype, ied);
 						break;
 					}
 					ItemEquipAttr2& ea2 = equip->getEquipAttr2();
