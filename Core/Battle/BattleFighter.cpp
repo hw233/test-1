@@ -397,10 +397,14 @@ float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender)
 	int extra = (uRand(9)) - 4;
 	*/
 
+    float factor = getCriticalDmg() - defender->getTough(this);
+    if(factor < 1)
+        factor = 1;
+
 	// Èç¹û±©»÷
 	if(isCritical)
 	{
-		atk = atk * getCriticalDmg() - defender->getTough(this);
+		atk = atk * factor;
 	}
 	return atk;
 }
@@ -411,9 +415,13 @@ float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender)
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
     float magatk = getMagAttack();
 
+    float factor = getCriticalDmg() - defender->getTough(this);
+    if(factor < 1)
+        factor = 1;
+
     if(isCritical)
     {
-        magatk = magatk * getCriticalDmg() - defender->getTough(this);
+        magatk = magatk * factor;
     }
 
     return magatk;
