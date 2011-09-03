@@ -426,7 +426,7 @@ namespace GData
                     if (IsEquipId(idt.typeId))
                     {
                         GObject::ItemEquipData ied;
-                        npcWeapons.add(new GObject::ItemWeapon(idt.typeId, *static_cast<const GData::ItemWeaponType *>(wt), ied));
+                        npcWeapons.add(new GObject::ItemWeapon(idt.typeId, wt, ied));
                     }
 				}
 				break;

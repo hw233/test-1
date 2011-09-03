@@ -3,11 +3,11 @@
 
 -- 属性成长不分主副将
 --           儒     释      道
-str_factor = {5,   6,     7}  -- 力量
+str_factor = {4,   5,     7}  -- 力量
 phy_factor = {8,   9,     10}  -- 耐力
-agi_factor = {5,   4,     6}  -- 敏捷
-int_factor = {8,   7,     5}  -- 智力
-wil_factor = {5,   7,     5}  -- 意志
+agi_factor = {5,   4,     7}  -- 敏捷
+int_factor = {8,   7,     4}  -- 智力
+wil_factor = {5,   9,     5}  -- 意志
 
 hp_factor     = { 0,   0,   0}  -- 生命
 atk_factor    = { 0,   0,   0}  -- 物功

@@ -29,9 +29,14 @@ public:
     void prepare(UInt32 now);
     void attack(Player* pl, UInt16 loc, UInt32 npcid);
     void reset();
-    const WBoss& get(UInt16 loc) { return m_boss[loc]; }
     void add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool = false);
-    void setLevel(UInt8 lvl) { m_max = lvl; }
+
+    inline const WBoss& get(UInt16 loc) { return m_boss[loc]; }
+    inline void setLevel(UInt8 lvl)
+    {
+        if (lvl > m_max)
+            m_max = lvl;
+    }
 private:
     UInt8 getLevel(UInt32 now);
 

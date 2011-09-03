@@ -2780,7 +2780,8 @@ namespace GObject
 		for(int i = 0; i < 5; ++ i)
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
-			if(fgt != NULL && fgt->getLevel() < mlvl)
+			//if(fgt != NULL && fgt->getLevel() < mlvl)
+			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
 	}

@@ -361,7 +361,7 @@ namespace GObject
 		if (item == NULL)
 		{
 			//Add New Item
-			item = new(std::nothrow) ItemBase(typeId, *itemType);
+			item = new(std::nothrow) ItemBase(typeId, itemType);
 			if (item == NULL) return NULL;
 			item->SetBindStatus(bind);
 			bool ret = TryAddItem(item, num);
@@ -434,7 +434,7 @@ namespace GObject
 		else
 		{
 			//Add New Item
-			item = new(std::nothrow) ItemBase(typeId, *itemType);
+			item = new(std::nothrow) ItemBase(typeId, itemType);
 			if (item == NULL) return NULL;
 			item->SetBindStatus(bind);
 			bool ret = TryAddItem(item, num);
@@ -494,9 +494,8 @@ namespace GObject
 	{
 		assert(!IsEquipId(id));
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
-        if (!itemType)
-            return 0;
-		ItemBase * item = new(std::nothrow) ItemBase(id, *itemType);
+		if(itemType == NULL) return NULL;
+		ItemBase * item = new(std::nothrow) ItemBase(id, itemType);
 		if (item == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		item->SetBindStatus(bind);
@@ -511,7 +510,8 @@ namespace GObject
 	{
 		assert(!IsEquipId(id));
 		const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
-		ItemBase * item = new(std::nothrow) ItemBase(id, *itemType);
+		if(itemType == NULL) return NULL;
+		ItemBase * item = new(std::nothrow) ItemBase(id, itemType);
 		if (item == NULL) return NULL;
 		ITEM_BIND_CHECK(itemType->bindType,bind);
 		item->SetBindStatus(bind);
@@ -541,8 +541,7 @@ namespace GObject
 			return NULL;
 		//Add New Equip
 		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
-		if(itype == NULL)
-			return NULL;
+		if(itype == NULL) return NULL;
 		switch(itype->subClass)
 		{
 		case Item_Weapon:
@@ -585,22 +584,26 @@ namespace GObject
 				switch(itype->subClass)
 				{
 				case Item_Weapon:
-					equip = new(std::nothrow) ItemWeapon(id, *static_cast<const GData::ItemWeaponType *>(itype), edata);
+					equip = new(std::nothrow) ItemWeapon(id, itype, edata);
 					break;
 				case Item_Armor1:
 				case Item_Armor2:
 				case Item_Armor3:
 				case Item_Armor4:
 				case Item_Armor5:
-					equip = new ItemArmor(id, *static_cast<const GData::ItemEquipType *>(itype), edata);
+					equip = new ItemArmor(id, itype, edata);
 					break;
                 case Item_Trump:
-					equip = new ItemTrump(id, *static_cast<const GData::ItemTrumpType*>(itype), edata);
-                    if (equip)
-                        ((ItemTrump*)equip)->fixSkills();
+                    {
+                        equip = new ItemTrump(id, itype, edata);
+                        if (equip && equip->getItemEquipData().enchant)
+                        {
+                            ((ItemTrump*)equip)->fixSkills();
+                        }
+                    }
                     break;
 				default:
-					equip = new ItemEquip(id, *static_cast<const GData::ItemEquipType *>(itype), edata);
+					equip = new ItemEquip(id, itype, edata);
 					break;
 				}
 				if(equip == NULL)

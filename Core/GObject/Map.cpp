@@ -460,7 +460,7 @@ void Map::SendHide( UInt32 id, Player * player)
 	}
 }
 
-void Map::Show( UInt32 id, bool notify )
+void Map::Show( UInt32 id, bool notify, UInt8 type )
 {
 	MapObject * mo = GetObject(id);
 	if(mo != NULL)
@@ -469,7 +469,10 @@ void Map::Show( UInt32 id, bool notify )
 		if(!notify)
 			return;
 		Stream st(REP::MAP_TRANSPORT_UPDATE);
-		st << static_cast<UInt8>(2) << id << mo->GetSpot() << mo->GetType() << mo->GetActionType() << Stream::eos;
+        if (type)
+            st << static_cast<UInt8>(2) << id << mo->GetSpot() << mo->GetType() << mo->GetActionType() << Stream::eos;
+        else
+            st << static_cast<UInt8>(2) << id << mo->GetSpot() << type << mo->GetActionType() << Stream::eos;
 		Broadcast(&st[0], st.size());
 	}
 }
