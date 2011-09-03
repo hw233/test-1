@@ -38,6 +38,8 @@ public:
     void fight(Player* pl, UInt8 id);
     void reset(Player* pl, UInt8 id);
 
+    void getCount(Player* pl, UInt8* free, UInt8* gold, bool = false);
+
     UInt8 getCopySize(Player* pl);
     void buildInfo(Player* pl, Stream& st);
 
