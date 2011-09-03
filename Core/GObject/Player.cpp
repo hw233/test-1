@@ -1620,10 +1620,10 @@ namespace GObject
 			count = 60 * (LEVEL_MAX / 10);
 
 		UInt32 viplvl = getVipLevel();
-		if(viplvl >= 3)
-			count += 60 * 2;
-		else if(viplvl == 2)
-            count += 60;
+		if(viplvl >= 4 && viplvl <= 7)
+			count += 60 * 10;
+        else if (viplvl > 7 && viplvl <= 10)
+			count += 60 * 18;
 
 		UInt32 timeDur = count * eachBattle;
 
