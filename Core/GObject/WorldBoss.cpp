@@ -224,7 +224,7 @@ namespace GObject
                         {
                             if (i->second.count >= count)
                             {
-                                SYSMSG_BROADCASTV(553, loc, npcid, pl->getCountry(), pl->getName().c_str());
+                                SYSMSG_BROADCASTV(553, npcid);
                             }
                             else
                             {
@@ -282,7 +282,14 @@ namespace GObject
 
                 if (cfg.GMCheck)
                 {
-                    SYSMSG_BROADCASTV(548, fgt->getId());
+                    if (uRand(100) >= 50)
+                    {
+                        SYSMSG_BROADCASTV(548, fgt->getId());
+                    }
+                    else
+                    {
+                        SYSMSG_BROADCASTV(554, fgt->getId(), loc, fgt->getId());
+                    }
                 }
                 else
                 {
