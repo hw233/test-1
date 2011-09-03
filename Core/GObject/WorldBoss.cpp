@@ -109,13 +109,13 @@ namespace GObject
         UInt8 idx = (level-1)*4;
         if (cfg.GMCheck)
         {
-            if (idx >= sizeof(worldboss)/sizeof(int))
+            if (idx >= sizeof(worldboss)/sizeof(UInt32))
                 return;
             npcid = worldboss[idx];
         }
         else
         {
-            if (idx >= sizeof(worldboss1)/sizeof(int))
+            if (idx >= sizeof(worldboss1)/sizeof(UInt32))
                 return;
             npcid = worldboss1[idx];
         }
@@ -208,12 +208,12 @@ namespace GObject
                             UInt8 idx = (i->second.level-1)*4 + i->second.count;
                             if (cfg.GMCheck)
                             {
-                                if (idx < sizeof(worldboss)/sizeof(int))
+                                if (idx < sizeof(worldboss)/sizeof(UInt32))
                                     npcID = worldboss[idx];
                             }
                             else
                             {
-                                if (idx < sizeof(worldboss1)/sizeof(int))
+                                if (idx < sizeof(worldboss1)/sizeof(UInt32))
                                     npcID = worldboss1[idx];
                             }
                             add(i->first, npcID, i->second.level, i->second.count, true);
