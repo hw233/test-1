@@ -1444,7 +1444,6 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
 
 bool Fighter::delPeerless( UInt16 pl, bool writedb )
 {
-    UInt8 n = 0;
     for (size_t i = 0; i < _peerless.size(); ++i)
     {
         if (SKILL_ID(_peerless[i]) == SKILL_ID(pl))
@@ -1453,10 +1452,9 @@ bool Fighter::delPeerless( UInt16 pl, bool writedb )
                 offPeerless(writedb);
 
             std::vector<UInt16>::iterator it = _peerless.begin();
-            std::advance(it, i-n);
+            std::advance(it, i);
             _peerless.erase(it);
 
-            ++n;
             sendModification(0x31, pl, 2/*1add,2del,3mod*/, writedb);
             return true;
         }

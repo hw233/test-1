@@ -35,7 +35,7 @@ namespace GObject
 #define PLAYER_BUFF_ATTR1			0x01
 #define PLAYER_BUFF_ATTR2			0x02
 #define PLAYER_BUFF_ATTR3			0x03
-#define PLAYER_BUFF_PROTECT			0x04
+#define PLAYER_BUFF_PROTECT			0x04    //修炼加成
 #define PLAYER_BUFF_TRAINP1			0x05
 #define PLAYER_BUFF_TRAINP2			0x06
 #define PLAYER_BUFF_CLANMOVE		0x07	//宗族城战行走BUFF
@@ -51,10 +51,10 @@ namespace GObject
 #define PLAYER_BUFF_CLANBATTING		0x11	//处在宗族城战
 #define PLAYER_BUFF_CLANRECOVE		0x12	//
 #define PLAYER_BUFF_REENTERCLAN		0x13
-#define PLAYER_BUFF_CLANRCENHANCE	0x14
+#define PLAYER_BUFF_CLANRCENHANCE	0x14    
 #define PLAYER_BUFF_PWDLOCK			0x15	//5次密码错误 锁定10分钟
-#define PLAYER_BUFF_PRACTICE1       0x16	//修炼加成20%
-#define PLAYER_BUFF_PRACTICE2       0x17	//修炼加成50%
+#define PLAYER_BUFF_PRACTICE1       0x16	//修炼加成20% XXX: 暂时不用
+#define PLAYER_BUFF_PRACTICE2       0x17	//修炼加成50% XXX: 暂时不用
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 #define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
 #define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
