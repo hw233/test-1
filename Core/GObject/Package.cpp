@@ -1300,6 +1300,10 @@ namespace GObject
         if(ied.enchant >= ENCHANT_LEVEL_MAX)
             return 2;
 		
+        UInt32 enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
+        if(enchant == 0)
+            return 2;
+
 		// UInt32 viplvl = this->m_Owner->getVipLevel();
 		// const UInt8 enchant_max[] = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12};
         // if(ied.enchant >= enchant_max[viplvl])
@@ -1320,7 +1324,7 @@ namespace GObject
 		ConsumeInfo ci(EnchantEquipment,0,0);
 		m_Owner->useTael(amount,&ci);
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
-		if(uRand(1000) < GObjectManager::getEnchantChance(quality, ied.enchant)/*enchant_chance[ied.enchant]*/)
+		if(uRand(1000) < enchant/*enchant_chance[ied.enchant]*/)
 		{
 			++ ied.enchant;
 			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());

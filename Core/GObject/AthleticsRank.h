@@ -106,7 +106,7 @@ struct AthleticsEventData
 
 static const UInt16 TimeOutbyColor[] = {2 * 60 * 60, 4 * 60 * 60, 6 * 60 * 60, 6 * 60 * 60};//宝箱的时间 绿色:2小时 蓝色:4小时 紫色:6小时 橙色:6小时
 //static const UInt8 PLUND_RATE = 3;
-static const UInt32 EXTRAREWARDTM = 19 * 3600 + 30 * 60;
+static const UInt32 EXTRAREWARDTM = 19 * 3600;
 
 
 class Player;

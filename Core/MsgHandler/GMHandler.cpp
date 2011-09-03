@@ -1439,7 +1439,7 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 				++ win;
 		}
         // TODO:
-		SYSMSG_SENDV(610, player, dd->getName().c_str(), 0, dungeonLevel + 1, npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
+		//SYSMSG_SENDV(610, player, dd->getName().c_str(), 0, dungeonLevel + 1, npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
 	}
 	else
 	{
@@ -1451,7 +1451,7 @@ void GMHandler::OnAttack( GObject::Player * player, std::vector<std::string>& ar
 			if(player->attackNpc(npcId, 0xFFFFFFFF, true))
 				++ win;
 		}
-		SYSMSG_SENDV(611, player, ng->getName().c_str(), npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
+		//SYSMSG_SENDV(611, player, ng->getName().c_str(), npcCount, win, static_cast<float>(win * 10000 / npcCount) / 100);
 	}
 }
 

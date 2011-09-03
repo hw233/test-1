@@ -195,18 +195,35 @@ void BattleSimulator::start()
 		int pos = findFirstAttacker();
 
 		act_count += doAttack(pos);
+#ifdef _DEBUG
+        char path[1024], path2[1024];
+        sprintf(path, "%s0/0", cfg.reportPath.c_str());
+        sprintf(path2, "%s/%u.log", path, 0);
+        File rfile(path);
+        rfile.createDirectories();
+        FILE * f = fopen(path2, "a+");
+
+        if(f != NULL)
+        {
+            char szBuf[256] = {0};
+            sprintf(szBuf, "rcnt=%d\r\n", act_count);
+            fwrite(szBuf, 1, strlen(szBuf), f);
+            fclose(f);
+        }
+#endif
 	}
 	_packet << static_cast<UInt8>(_winner);
 	_packet.data<UInt32>(cnt_pos) = act_count;
 	_packet << Stream::eos;
 //	printf("Winner is: %d,  actions: %d\n", _winner, act_count);
 #ifdef _DEBUG
-	char path[1024], path2[1024];
-	sprintf(path, "%s0/0", cfg.reportPath.c_str());
-	sprintf(path2, "%s/%u.log", path, 0);
-	File rfile(path);
-	rfile.createDirectories();
-	FILE * f = fopen(path2, "a+");
+    char path[1024], path2[1024];
+    sprintf(path, "%s0/0", cfg.reportPath.c_str());
+    sprintf(path2, "%s/%u.log", path, 0);
+    File rfile(path);
+    rfile.createDirectories();
+    FILE * f = fopen(path2, "a+");
+
 	if(f != NULL)
     {
         char szBuf[256] = {0};
@@ -221,7 +238,7 @@ void BattleSimulator::start()
 	if(act_count == 0)
 		_winner = 1;
 
-	if(_report)
+	if(_report || !cfg.GMCheck)
 		battleReport.addReport(_id, _packet);
 }
 
@@ -546,7 +563,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     aa.skill = target_skill;
                     aa.target_side = bf->getSide();
                     aa.target_pos = bf->getPos();
-                    atkAct->insert(atkAct->end(), aa);
+                    atkAct->push_back(aa);
                     counter100 = true;
                 } 
                 target_skill = area_target->getPassiveSkillAftEvd();
@@ -557,7 +574,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                     aa.skill = target_skill;
                     aa.target_side = bf->getSide();
                     aa.target_pos = bf->getPos();
-                    atkAct->insert(atkAct->end(), aa);
+                    atkAct->push_back(aa);
                     counter100 = true;
                 }
             }
@@ -715,7 +732,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             aa.target_pos = bo->getPos();
             aa.param = dmg;
 
-            atkAct->insert(atkAct->end(), aa);
+            atkAct->push_back(aa);
         }
 
         if(passiveSkillThorn && bf->getSide() != bo->getSide())
@@ -727,7 +744,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             aa.target_pos = bf->getPos();
             aa.param = dmg;
 
-            atkAct->insert(atkAct->end(), aa);
+            atkAct->push_back(aa);
         }
     }
 }
@@ -873,7 +890,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 aa.target_pos = bf->getPos();
                 aa.param = skill->getId();
 
-                atkAct->insert(atkAct->end(), aa);
+                atkAct->push_back(aa);
                 defList[defCount].damType = e_ResR;
             }
 
@@ -961,10 +978,33 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
     }
     else if( 0 == skill->target )
     {
-        UInt8 myPos = bf->getPos();
-        BattleFighter* bo = getRandomFighter(bf->getSide(), &myPos, 1);
+        UInt8 excepts[25] = {0};
+        size_t exceptCnt = 1;
+        excepts[0] = bf->getPos();
+
+        if(skill->effect->aura > 0 || skill->effect->auraP > 0.001)
+        {
+            UInt8 side = bf->getSide();
+            for(int i = 0; i < 25; ++ i)
+            {
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[side][i]);
+                if(!bo)
+                    continue;
+
+                if(bo->getAura() > 99)
+                {
+                    excepts[exceptCnt] = i;
+                    ++ exceptCnt;
+                }
+            }
+        }
+
+        BattleFighter* bo = getRandomFighter(bf->getSide(), excepts, exceptCnt);
         if(NULL == bo)
-            cnt = 0;
+        {
+            target_pos = bf->getPos();
+            cnt = 1;
+        }
         else
         {
             target_pos = bo->getPos();
@@ -1971,7 +2011,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf)
         int target_side, target_pos, cnt;
         getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
         doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
-        rcnt++;
+        ++ rcnt;
     }
 
     if(NULL != (passiveSkill = bf->getPassiveSkillEnter()))
@@ -1979,7 +2019,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf)
         int target_side, target_pos, cnt;
         getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
         doSkillAttack(bf, passiveSkill, target_side, target_pos, 1, NULL);
-        rcnt++;
+        ++ rcnt;
     }
 
     return rcnt;
@@ -2070,7 +2110,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     if(stun > 0)
     {
-        return 0;
+        return rcnt;
     }
 
     int target_pos;
@@ -2096,7 +2136,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
 
         if(target_pos < 0)
-            return 0;
+            return rcnt;
 
         std::vector<AttackAct> atkAct;
         atkAct.clear();
@@ -2116,6 +2156,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             if(tmpbo && tmpbo->getHP() == 0)
             {
                 onDead(tmpbo, &atkAct);
+                actCnt = atkAct.size();
             }
             ++ rcnt;
         }
@@ -2129,7 +2170,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
 
         if(target_pos < 0)
-            return 0;
+            return rcnt;
 
         std::vector<AttackAct> atkAct;
         atkAct.clear();
@@ -2144,6 +2185,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             if(tmpbo && tmpbo->getHP() == 0)
             {
                 onDead(tmpbo, &atkAct);
+                actCnt = atkAct.size();
             }
             ++ rcnt;
         }
@@ -2176,6 +2218,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 if(tmpbo && tmpbo->getHP() == 0)
                 {
                     onDead(tmpbo, &atkAct);
+                    actCnt = atkAct.size();
                 }
                 ++ rcnt;
             }
@@ -2202,6 +2245,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 if(tmpbo && tmpbo->getHP() == 0)
                 {
                     onDead(tmpbo, &atkAct);
+                    actCnt = atkAct.size();
                 }
                 ++ rcnt;
             }
@@ -2213,7 +2257,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         skill = bf->getActiveSkill(therapy_bf!= NULL);
         if(NULL != skill)
         {
-            if(NULL != therapy_bf && (skill->effect->hpP > 0 || skill->effect->hp > 0 || skill->effect->addhp > 0))
+            if(NULL != therapy_bf && (skill->effect->hpP > 0 || skill->effect->hp > 0 || skill->effect->addhp > 0) && skill->target == 0)
             {
                 otherside = therapy_bf->getSide();
                 target_pos = therapy_bf->getPos();
@@ -2239,6 +2283,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 if(tmpbo && tmpbo->getHP() == 0)
                 {
                     onDead(tmpbo, &atkAct);
+                    actCnt = atkAct.size();
                 }
                 ++ rcnt;
             }
@@ -2249,7 +2294,7 @@ UInt32 BattleSimulator::doAttack( int pos )
             target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
 
             if(target_pos < 0)
-                return 0;
+                return rcnt;
 
             std::vector<AttackAct> atkAct;
             atkAct.clear();
@@ -2264,6 +2309,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 if(tmpbo && tmpbo->getHP() == 0)
                 {
                     onDead(tmpbo, &atkAct);
+                    actCnt = atkAct.size();
                 }
                 ++ rcnt;
             }
@@ -2289,6 +2335,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                         if(tmpbo && tmpbo->getHP() == 0)
                         {
                             onDead(tmpbo, &atkAct);
+                            actCnt = atkAct.size();
                         }
                         ++ rcnt;
                     }
@@ -2311,6 +2358,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                         if(tmpbo && tmpbo->getHP() == 0)
                         {
                             onDead(tmpbo, &atkAct);
+                            actCnt = atkAct.size();
                         }
                         ++ rcnt;
                     }
@@ -2340,6 +2388,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 if(tmpbo && tmpbo->getHP() == 0)
                 {
                     onDead(tmpbo, &atkAct);
+                    actCnt = atkAct.size();
                 }
                 ++ rcnt;
             }
@@ -2362,6 +2411,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 if(tmpbo && tmpbo->getHP() == 0)
                 {
                     onDead(tmpbo, &atkAct);
+                    actCnt = atkAct.size();
                 }
                 ++ rcnt;
             }
@@ -3432,7 +3482,7 @@ void BattleSimulator::onDead(BattleObject * bo, std::vector<AttackAct>* atkAct)
             aa.skill = passiveSkill;
             aa.target_side = bo->getSide();
             aa.target_pos = bo->getPos();
-            atkAct->insert(atkAct->end(), aa);
+            atkAct->push_back(aa);
 
             fRevival = true;
         }
@@ -3445,7 +3495,7 @@ void BattleSimulator::onDead(BattleObject * bo, std::vector<AttackAct>* atkAct)
             aa.skill = passiveSkill;
             aa.target_side = bo->getSide();
             aa.target_pos = bo->getPos();
-            atkAct->insert(atkAct->end(), aa);
+            atkAct->push_back(aa);
 
             fRevival = true;
         }
