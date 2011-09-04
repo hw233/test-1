@@ -159,6 +159,9 @@ namespace GObject
 
         void fixSkills()
         {
+            if (fix)
+                delete _itemBaseType;
+
             const GData::ItemEquipType* ibt = static_cast<const GData::ItemEquipType*>(_itemBaseType);
             if (ibt) {
                 GData::ItemEquipType* nibt = new GData::ItemEquipType(ibt->getId(), ibt->getName(), 0);
@@ -173,29 +176,16 @@ namespace GObject
                 nibt->energy = ibt->energy;
                 nibt->data = ibt->data;
                 nibt->career = ibt->career;
-                const GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(getAttrExtra()); // from ibt
+                const GData::AttrExtra* attr = ibt->attrExtra;
                 if (attr)
                 {
                     GData::AttrExtra* tmp = new GData::AttrExtra;
                     if (tmp && attr->skills.size())
                     {
                         *tmp = *attr;
-                        tmp->skills.clear();
-
                         size_t size = attr->skills.size();
                         if (size)
-                            tmp->skills.resize(size);
-                        for (size_t i = 0; i < size; ++i)
-                        {
-                            if (attr->skills[i])
-                            {
-                                UInt16 skillid = attr->skills[i]->getId();
-                                UInt16 id = SKILL_ID(skillid);
-                                UInt16 lvl = this->getItemEquipData().enchant+1;
-                                UInt16 nskillid = SKILLANDLEVEL(id, lvl);
-                                tmp->skills[i] = GData::skillManager[nskillid];
-                            }
-                        }
+                            enchant(this->getItemEquipData().enchant, tmp);
                         nibt->setAttr(tmp, true);
                         _itemBaseType = nibt;
                         fix = true;
@@ -204,6 +194,31 @@ namespace GObject
                     delete tmp;
                 }
                 delete nibt;
+            }
+        }
+
+        void enchant(UInt8 enchant, GData::AttrExtra* attr)
+        {
+            if (attr && attr->skills.size())
+            {
+                size_t size = attr->skills.size();
+                for (size_t i = 0; i < size; ++i)
+                {
+                    if (attr->skills[i])
+                    {
+                        UInt16 skillid = attr->skills[i]->getId();
+                        UInt16 id = SKILL_ID(skillid);
+                        UInt16 lvl = enchant+1;
+                        if (lvl > 9)
+                            lvl = 9;
+                        UInt16 nskillid = SKILLANDLEVEL(id, lvl);
+                        if (!(nskillid % 100))
+                            ++nskillid;
+                        if (nskillid != skillid)
+                            attr->skills[i] = GData::skillManager[nskillid];
+                    }
+                }
+                return;
             }
         }
 	};

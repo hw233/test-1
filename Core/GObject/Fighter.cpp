@@ -712,30 +712,17 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                     addSkillsFromCT(attr->skills, writedb);
                 }
             }
-            else
-            { // off
+            //else
+            //{ // off
                 if (t)
                 {
                     const GData::AttrExtra* attr = t->getAttrExtra();
                     if (attr)
                     {
-                        const GData::SkillBase* s = 0;
-                        for (size_t i = 0; i < attr->skills.size(); ++i)
-                        {
-                            s = attr->skills[i];
-                            if (s)
-                            {
-                                if (s->cond == GData::SKILL_PEERLESS)
-                                    delPeerless(s->getId(), writedb);
-                                else if (s->cond == GData::SKILL_ACTIVE)
-                                    delSkill(s->getId(), writedb);
-                                else
-                                    offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
-                            }
-                        }
+                        delSkillsFromCT(attr->skills, writedb);
                     }
                 }
-            }
+            //}
 
             _attrDirty = true;
             _bPDirty = true;
@@ -1986,6 +1973,41 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
             SYSMSG_SENDV(2008, _owner);
     }
     return false;
+}
+
+void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)
+{
+    if (skills.size())
+    {
+        const GData::SkillBase* s = 0;
+        for (size_t i = 0; i < skills.size(); ++i)
+        {
+            s = skills[i];
+            if (s)
+            {
+                if (s->cond == GData::SKILL_PEERLESS)
+                    delPeerless(s->getId(), writedb);
+                else if (s->cond == GData::SKILL_ACTIVE)
+                    delSkill(s->getId(), writedb);
+                else if (s->cond == GData::SKILL_PREATK ||
+                        s->cond == GData::SKILL_AFTATK ||
+                        s->cond == GData::SKILL_AFTNATK ||
+                        s->cond == GData::SKILL_BEATKED ||
+                        s->cond == GData::SKILL_AFTEVD ||
+                        s->cond == GData::SKILL_AFTRES ||
+                        s->cond == GData::SKILL_DEAD ||
+                        s->cond == GData::SKILL_ENTER ||
+                        s->cond == GData::SKILL_DEAD)
+                {
+                    offPassiveSkill(s->getId(), s->cond, s->prob>=100.0f, writedb);
+                }
+                else
+                {
+                    // error
+                }
+            }
+        }
+    }
 }
 
 void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)

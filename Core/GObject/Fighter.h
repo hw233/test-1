@@ -251,6 +251,7 @@ public:
     inline UInt8 getPeerlessNum() { return _peerless.size(); }
 
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
+    void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
