@@ -1795,10 +1795,24 @@ void Fighter::setSkills( std::string& skills, bool writedb )
         return;
 
     StringTokenizer tk(skills, ",");
+
+    {
+        //addNewSkill(::atoi(tk[i].c_str()), writedb);
+    }
+
+    const GData::SkillBase* s  = 0;
+    std::vector<const GData::SkillBase*> vt_skills;
     for (size_t i = 0; i < tk.count(); ++i)
     {
-        addNewSkill(::atoi(tk[i].c_str()), writedb);
+        s = GData::skillManager[::atoi(tk[i].c_str())];
+        if (s && s->cond)
+        {
+            vt_skills.push_back(s);
+        }
     }
+
+    if (vt_skills.size())
+        addSkillsFromCT(vt_skills, writedb);
 }
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb )
