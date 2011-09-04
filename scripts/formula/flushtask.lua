@@ -23,12 +23,17 @@ function GetFlushTaskFactor(ttype, ftype)
 end
 
 function GetTaskAwardFactor(ttype, color, lvl)
+    if color > 5 then
+        return 0
+    end
+    if color == 0 then
+        return 0
+    end
     if ttype == 0 then
         if lvl < 30 then
             return taskawardfactor[1][color] * lvl + base
         end
-        return taskawardfactor[1][color] * (lvlfactor[lvl/10] * (lvl - 10) + base)
+        return taskawardfactor[1][color] * (lvlfactor[math.floor(lvl/10)] * (lvl - 10) + base)
     end
     return taskawardfactor[ttype][color]
 end
-
