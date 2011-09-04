@@ -241,7 +241,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
                 *gold = PLAYER_DATA(pl, copyGoldCnt);
         }
     } else {
-        if (pl && TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate))) {
+        if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate))) {
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
             PLAYER_DATA(pl, copyGoldCnt) = 0;

@@ -29,7 +29,7 @@ namespace GObject
     {
         for (UInt8 i = 0; i < 6; ++i)
         {
-            if (cfg.GMCheck)
+            if (cfg.GMCheck || true)
             {
                 if (worldboss[i] == npcid)
                     return true;
