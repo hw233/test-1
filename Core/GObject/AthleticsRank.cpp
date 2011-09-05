@@ -529,13 +529,18 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	}
 	else if(deferRankPos - atkerRankPos > 4)
 		return;
-	if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
-	{
-		atker->sendMsgCode(0, 1413);
-		return ;
-	}
-	if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)
-		return ;
+
+    if(!type)
+    {
+        if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
+        {
+            atker->sendMsgCode(0, 1413);
+            return ;
+        }
+        if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)
+            return ;
+    }
+
 	AthleticsRankData * data = *(atkerRank->second);
 	data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
 	if (data->challengenum >= Maxchallengenum[Viplvl])
@@ -1705,6 +1710,7 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
         data->extrachallenge = 0;
         data->oldrank = data->rank;
         data->first4rank &= 0xFFFFF0FF;
+		DB().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u, `extrachallenge` = %u WHERE `ranker` = %"I64_FMT"u", data->oldrank, data->first4rank, data->extrachallenge, data->ranker->getId());
     }
 
     data->challengetime = TimeUtil::Now();
