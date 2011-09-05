@@ -860,7 +860,7 @@ namespace GObject
                 if(item->getClass() != Item_Trump)
                     return false;
                 if (fgt->canSetTrump(part-0x50, item->getId()))
-                    old = fgt->setTrump(static_cast<GObject::ItemEquip *>(item), part-0x50);
+                    old = fgt->setTrump(static_cast<GObject::ItemTrump*>(item), part-0x50);
                 else
                     return false;
                 break;
@@ -904,7 +904,7 @@ namespace GObject
             case 0x50:
             case 0x51:
             case 0x52:
-                old = fgt->setTrump(static_cast<GObject::ItemEquip *>(NULL), part-0x50);
+                old = fgt->setTrump(static_cast<GObject::ItemTrump*>(NULL), part-0x50);
                 break;
             default:
                 return false;
@@ -1340,18 +1340,12 @@ namespace GObject
 
                 if(equip->getClass() == Item_Trump)
                 {
-                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                    if (attr && attr->skills.size())
+                    if (ied.enchant == 1)
+                        ((ItemTrump*)equip)->fixSkills();
+                    else
                     {
-                        size_t size = attr->skills.size();
-                        for (size_t i = 0; i < size; ++i)
-                        {
-                            if (attr->skills[i])
-                            {
-                                UInt16 skillid = attr->skills[i]->getId();
-                                attr->skills[i] = GData::skillManager[skillid+1];
-                            }
-                        }
+                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                        ((ItemTrump*)equip)->enchant(ied.enchant, attr);
                         fgt->addSkillsFromCT(attr->skills, true);
                     }
                     fgt->sendModification(0x50 + pos, equip, false);
@@ -1391,21 +1385,8 @@ namespace GObject
                 if(equip->getClass() == Item_Trump)
                 {
                     GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                    if (attr && attr->skills.size())
-                    {
-                        size_t size = attr->skills.size();
-                        for (size_t i = 0; i < size; ++i)
-                        {
-                            if (attr->skills[i])
-                            {
-                                UInt16 skillid = attr->skills[i]->getId();
-                                if (!(skillid % 100))
-                                    skillid += 1;
-                                attr->skills[i] = GData::skillManager[skillid-1];
-                            }
-                        }
-                        fgt->addSkillsFromCT(attr->skills, true);
-                    }
+                    ((ItemTrump*)equip)->enchant(ied.enchant, attr);
+                    fgt->addSkillsFromCT(attr->skills, true);
                     fgt->sendModification(0x50 + pos, equip, false);
                 }
                 else
