@@ -487,7 +487,6 @@ end
 function ItemNormal_00000057(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(4, 0, true)
   if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(57, player);
 	return true;
@@ -499,7 +498,6 @@ end
 function ItemNormal_00000058(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(4, 0, true)
   if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(58, player);
 	return true;
