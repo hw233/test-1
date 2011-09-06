@@ -450,11 +450,11 @@ float BattleFighter::calcPoison(const GData::SkillBase* skill)
     // µÀ
     if(getClass() == 3)
     {
-        return (_attack+ _attackAdd + _attackAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
+        return ((_attack+ _attackAdd + _attackAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp) * (950 + uRand(100)) / 1000;
     }
 
     // ÈåÊÍ
-    return (_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp;
+    return ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp) *  (950 + uRand(100)) / 1000;
 }
 
 bool BattleFighter::calcHit( BattleFighter * defender )

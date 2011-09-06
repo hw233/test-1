@@ -542,7 +542,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(NULL != skill && skill->effect->state == 1)
                 {
                     float rate = skill->prob * 100;
-                    if(rate < _rnd(10000))
+                    if(rate > _rnd(10000))
                     {
                         // poison
                         poison = true;
@@ -1407,7 +1407,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             }
         }
     }
-    else if(skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001)
+    else if( (skill->effect->state != 1) && (skill->effect->hp < 0 || skill->effect->addhp < 0 || skill->effect->hpP < -0.001) )
     {
         if(bf->getSide() != target_side)
         {
@@ -1424,7 +1424,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     defList[defCount].pos = pos;
                     defList[defCount].damType = e_damNormal;
                     defList[defCount].damage = dmg;
+                    defList[defCount].leftHP = bo->getHP();
                     defCount ++;
+
+                    if(bo->getHP() == 0)
+                    {
+                        onDead(bo, atkAct);
+                    }
                 }
             }
             else if(0 == skill->area)
@@ -1437,7 +1443,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     defList[defCount].pos = target_pos;
                     defList[defCount].damType = e_damNormal;
                     defList[defCount].damage = dmg;
+                    defList[defCount].leftHP = bo->getHP();
                     defCount ++;
+
+                    if(bo->getHP() == 0)
+                    {
+                        onDead(bo, atkAct);
+                    }
                 }
             }
             else
@@ -1450,7 +1462,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     defList[defCount].pos = target_pos;
                     defList[defCount].damType = e_damNormal;
                     defList[defCount].damage = dmg;
+                    defList[defCount].leftHP = bo->getHP();
                     defCount ++;
+
+                    if(bo->getHP() == 0)
+                    {
+                        onDead(bo, atkAct);
+                    }
                 }
 
                 for(int i = 0; i < apcnt; ++ i)
@@ -1464,7 +1482,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     defList[defCount].pos = ap[i].pos;
                     defList[defCount].damType = e_damNormal;
                     defList[defCount].damage = dmg;
+                    defList[defCount].leftHP = bo->getHP();
                     defCount ++;
+
+                    if(bo->getHP() == 0)
+                    {
+                        onDead(bo, atkAct);
+                    }
                 }
             }
         }
@@ -1474,7 +1498,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->effect->state & 0x0e)
     {
         float rate = skill->prob * 100;
-	    if(bf->getSide() != target_side && rate < _rnd(10000))
+	    if(bf->getSide() != target_side && rate > _rnd(10000))
         {
             if(1 == skill->area)
             {
@@ -1535,7 +1559,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->effect->disperse > 0)
     {
         float rate = skill->prob * 100;
-	    if(bf->getSide() == target_side && rate < _rnd(10000))
+	    if(bf->getSide() == target_side && rate > _rnd(10000))
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo != NULL && bo->getHP() != 0 && bo->isChar())
@@ -1567,7 +1591,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
     }
 
-    if(skill->effect->damage || skill->effect->damageP || skill->effect->adddam
+    if(skill->effect->state == 1 || skill->effect->damage || skill->effect->damageP || skill->effect->adddam
             || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag)
     {
         if(0 == skill->area)
