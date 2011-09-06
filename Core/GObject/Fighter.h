@@ -83,14 +83,14 @@ public:
     // 卸下无双技能
     void offPeerless(bool = true);
     // 增加一个可装备的无双技能
-    bool addNewPeerless(UInt16 pl, bool = true); 
+    bool addNewPeerless(UInt16 pl, bool = true, bool = false); 
     // 删除一个可装备的无双技能
     bool delPeerless(UInt16 pl, bool = true);
     inline UInt16 getPeerless() { return peerless / SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessLevel() { return peerless % SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessAndLevel() { return peerless; }
     // 是否装备了pl这个无双技能
-    inline int isPeerlessUp(UInt16 pl) { return SKILL_ID(peerless) == SKILL_ID(pl); }
+    inline bool isPeerlessUp(UInt16 pl) { return SKILL_ID(peerless) == SKILL_ID(pl); }
     // 是否有pl这个可装备的无双技能
     int hasPeerless(UInt16 pl);
 
@@ -130,7 +130,7 @@ public:
     // 取得概率被动技能的个数
     UInt16 getPnSkillsNum();
     // 增加一个新技能,包括技能升级
-    bool addNewSkill(UInt16 skill, bool = true);
+    bool addNewSkill(UInt16 skill, bool = true, bool = false);
     // 删除一个可装备的技能
     bool delSkill(UInt16 skill, bool = true, bool = true, bool = true);
     // 取得装备技能的最大数
@@ -250,7 +250,7 @@ public:
     // 取得可装备的无双技能的个数
     inline UInt8 getPeerlessNum() { return _peerless.size(); }
 
-    void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
+    void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
 	inline ItemWeapon * getWeapon() { return _weapon; }

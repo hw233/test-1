@@ -833,15 +833,15 @@ function ItemNormal_00000043(iid, num, bind, param)
 		return false;
 	end
     local num = player:getBuffData(24)
-    if num then
+    if num > 0 then
         return false;
     end
 
-    fgt:addPExp(10000);
+    fgt:addPExp(50000);
     local now = os.time() + 8*60*60 -- UTC+8
     now = now % (24*60*60)
 	if ItemNormal_AddBuff(player, 24, 24*60*60-now, num, 36000) then
-		package:DelItemSendMsg(31, player);
+		package:DelItemSendMsg(43, player);
 		return true;
 	end
     return true;
@@ -5115,6 +5115,7 @@ local ItemNormal_Table = {
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
+	[43] = ItemNormal_00000043,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,

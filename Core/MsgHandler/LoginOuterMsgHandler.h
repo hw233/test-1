@@ -435,7 +435,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			}
 
             pl->GetPackage()->AddItem(18, 1, true);
-            pl->getGold(5000);
+            pl->getGold(20000);
 
             // LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 新建号，返回码：%u\n", pl->getId(), res);
 		}

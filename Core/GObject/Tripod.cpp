@@ -122,13 +122,16 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
         {
             if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
             {
-                if (td.quality < i+2) {
+                if (td.quality < i+2)
+                {
                     if (pl->getVipLevel() >= 3)
                     {
                         td.quality = i+3; // 2-绿,3-蓝,4-紫,5-橙
                     }
                     else
                         td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
+                    if (td.quality > 5)
+                        td.quality = 5;
                     td.needgen = 1;
                     break;
                 }

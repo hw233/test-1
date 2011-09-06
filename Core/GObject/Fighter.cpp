@@ -699,8 +699,16 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
             )
         {
             t = _trump[idx];
-            _trump[idx] = trump;
+            if (t)
+            {
+                const GData::AttrExtra* attr = t->getAttrExtra();
+                if (attr)
+                {
+                    delSkillsFromCT(attr->skills, writedb);
+                }
+            }
 
+            _trump[idx] = trump;
             if (trump)
                 trump->DoEquipBind(true);
 
@@ -712,17 +720,6 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                     addSkillsFromCT(attr->skills, writedb);
                 }
             }
-            //else
-            //{ // off
-                if (t)
-                {
-                    const GData::AttrExtra* attr = t->getAttrExtra();
-                    if (attr)
-                    {
-                        delSkillsFromCT(attr->skills, writedb);
-                    }
-                }
-            //}
 
             _attrDirty = true;
             _bPDirty = true;
@@ -823,8 +820,6 @@ void Fighter::setCapacity( float c, bool writedb )
 {
     _capacity = c;
     if (writedb && _owner) {
-        _attrDirty = true;
-        _bPDirty = true;
         sendModification(5, static_cast<UInt32>(c * 100 + 0.5f));
     }
 }
@@ -1401,7 +1396,7 @@ int Fighter::hasPeerless( UInt16 pl )
     return -1;
 }
 
-bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
+bool Fighter::addNewPeerless( UInt16 pl, bool writedb, bool up )
 {
     int op = 0;
     int idx = hasPeerless(pl);
@@ -1410,10 +1405,14 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
         if (pl != _peerless[idx])
         { // upgrade
             _peerless[idx] = pl;
-            int i = isPeerlessUp(pl);
-            if (i >= 0)
+            if (isPeerlessUp(pl) || up)
+            {
                 upPeerless(pl, writedb);
-            op = 3;
+                if (up)
+                    op = 1;
+                else
+                    op = 3;
+            }
         }
         else
             return false;
@@ -1422,6 +1421,8 @@ bool Fighter::addNewPeerless( UInt16 pl, bool writedb )
     {
         idx = static_cast<int>(_peerless.size());
         _peerless.push_back(pl);
+        if (up)
+            upPeerless(pl, writedb);
         op = 1;
     }
 
@@ -1499,8 +1500,6 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     }
 
     peerless = pl;
-    _attrDirty = true;
-    _bPDirty = true;
     sendModification(0x30, peerless);
 }
 
@@ -1697,8 +1696,6 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
 
     if (ret)
     {
-        _attrDirty = true;
-        _bPDirty = true;
         sendModification(0x60, skill, idx, writedb);
     }
 
@@ -1799,10 +1796,10 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     if (vt_skills.size())
-        addSkillsFromCT(vt_skills, writedb);
+        addSkillsFromCT(vt_skills, writedb, true);
 }
 
-bool Fighter::addNewSkill( UInt16 skill, bool writedb )
+bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up )
 {
     if (!skill)
         return false;
@@ -1818,9 +1815,14 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb )
         { // upgrade
             _skills[idx] = skill;
             int i = isSkillUp(skill);
-            if (i >= 0)
+            if (i >= 0 || up)
+            {
                 upSkill(skill, i, writedb);
-            op = 3;
+                if (up)
+                    op = 1;
+                else
+                    op = 3;
+            }
         }
         else
             return false;
@@ -2024,7 +2026,7 @@ void Fighter::delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
     }
 }
 
-void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb)
+void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool writedb, bool up)
 {
     if (skills.size())
     {
@@ -2035,9 +2037,9 @@ void Fighter::addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills
             if (s)
             {
                 if (s->cond == GData::SKILL_PEERLESS)
-                    addNewPeerless(s->getId(), writedb);
+                    addNewPeerless(s->getId(), writedb, up);
                 else if (s->cond == GData::SKILL_ACTIVE)
-                    addNewSkill(s->getId(), writedb);
+                    addNewSkill(s->getId(), writedb, up);
                 else if (s->cond == GData::SKILL_PREATK ||
                         s->cond == GData::SKILL_AFTATK ||
                         s->cond == GData::SKILL_AFTNATK ||
