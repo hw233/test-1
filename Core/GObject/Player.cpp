@@ -928,7 +928,8 @@ namespace GObject
 			return;
 		Stream st(REP::FIGHTER_ACCEPT);
 		st << static_cast<UInt16>(fgt->getId());
-        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getDefaultSkillAndLevel() << fgt->getDefaultCittaAndLevel();
+        st << fgt->getPotential() << fgt->getCapacity() << fgt->getLevel() << fgt->getExp() << fgt->getDefaultSkillAndLevel() << fgt->getDefaultCittaAndLevel()
+            << fgt->getSoul() << fgt->getMaxSoul();
 		st << Stream::eos;
 		send(st);
 		SYSMSG_SENDV(110, this, fgt->getColor(), fgt->getName().c_str());
