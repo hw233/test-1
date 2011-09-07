@@ -85,12 +85,13 @@ UInt8 Dungeon::playerEnter( Player * player )
 		dpi = &it->second;
 		checkForTimeout(player, *dpi, false);
 		leaveLevel(player, it->second.level);
-		if(it->second.level > 0)
+		//if(it->second.level > 0)
 		{
-			if(cfg.GMCheck && PLAYER_DATA(player, dungeonCnt) >= _maxCount + extraCount)// fix gold less?
-			{
-			    return 2;
-			}
+            if(cfg.GMCheck && PLAYER_DATA(player, dungeonCnt) >= _maxCount + extraCount)// fix gold less?
+            {
+                return 2;
+            }
+
 			if(PLAYER_DATA(player, dungeonCnt) >= _maxCount)
 			{
 				UInt32 price = _price[PLAYER_DATA(player, dungeonCnt)];
@@ -595,11 +596,11 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			{
 				const UInt32 taelReq[] = {
                     0,
-                    GData::moneyNeed[GData::COPY_AUTO1].tael,
-                    GData::moneyNeed[GData::COPY_AUTO2].tael,
-                    GData::moneyNeed[GData::COPY_AUTO3].tael,
-                    GData::moneyNeed[GData::COPY_AUTO4].tael,
-                    GData::moneyNeed[GData::COPY_AUTO5].tael,
+                    GData::moneyNeed[GData::DUNGEON_AUTO1].tael,
+                    GData::moneyNeed[GData::DUNGEON_AUTO2].tael,
+                    GData::moneyNeed[GData::DUNGEON_AUTO3].tael,
+                    GData::moneyNeed[GData::DUNGEON_AUTO4].tael,
+                    GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
                 };
 
 				if(player->getTael() < taelReq[_id])
@@ -676,7 +677,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 	UInt32 count = 0;
 	while(1)
 	{
-		++ count;
+		count += GData::moneyNeed[GData::DUNGEON_IM].gold;
 		if(won)
 		{
 			if(advanceLevel(player, it->second, true, &exp, count))
@@ -706,7 +707,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 		}
 	}
 	ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-	UInt16 gold = player->useGoldOrCoupon(count, &ci);
+	UInt16 gold = player->useGold(count, &ci);
 	Stream st_(REP::COPY_END_FIGHT);
 	st_ << static_cast<UInt8>(1) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
 	player->send(st_);
