@@ -142,6 +142,9 @@ UInt8 Dungeon::playerContinue( Player * player )
 	if(it == _players.end())
 		return 1;
 
+    if(it->second.level == 0)
+        return 1;
+
     enterLevel(player, it->second.level);
     sendDungeonLevelData(player, it->second);
 	return 0;
