@@ -160,7 +160,10 @@ namespace GObject
         void fixSkills()
         {
             if (fix)
+            {
                 delete _itemBaseType;
+                fix = false;
+            }
 
             const GData::ItemEquipType* ibt = static_cast<const GData::ItemEquipType*>(_itemBaseType);
             if (ibt) {

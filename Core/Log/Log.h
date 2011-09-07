@@ -46,6 +46,7 @@ enum PurchaseType
     ShimenTaskFresh,
     YamenTask,
     YamenTaskFresh,
+    AutoCopyComplete,
 };
 
 enum MoneyType

@@ -289,6 +289,13 @@ struct DungeonCompleteAutoReq
 	MESSAGE_DEF(REQ::BABEL_END);
 };
 
+struct AutoCopyReq
+{
+    UInt8 type;
+    UInt8 id;
+	MESSAGE_DEF2(REQ::AUTO_COPY, UInt8, type, UInt8, id);
+};
+
 struct DailyReq
 {
 	MESSAGE_DEF(REQ::DAILY);
@@ -883,6 +890,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
     {
         pl->sendNewGuild();
+    }
+    {
+        pl->sendAutoCopy();
     }
 	pl->sendWallow();
 	pl->sendEvents();
@@ -1836,6 +1846,37 @@ void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
 	MSG_QUERY_PLAYER(pl);
 	GameMsgHdr hdr2(0x181, WORKER_THREAD_WORLD, pl, 0);
 	GLOBAL().PushMsg(hdr2, NULL);
+}
+
+void OnAutoCopy( GameMsgHdr& hdr, AutoCopyReq& dar )
+{
+	MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
+
+	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	{
+		pl->sendMsgCode(1, 1014);
+		return;
+	}
+
+    switch (dar.type)
+    {
+        case 0:
+            pl->startAutoCopy(dar.id);
+            break;
+
+        case 1:
+            pl->cancelAutoCopy(dar.id);
+            break;
+
+        case 2:
+            pl->instantAutoCopy(dar.id);
+            break;
+
+        default:
+            break;
+    }
 }
 
 struct Dungeon_Enum

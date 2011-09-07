@@ -30,7 +30,6 @@ namespace GData
 
 namespace GObject
 {
-#define PLAYER_BUFF_DISPLAY_MAX		0x0C
 #define PLAYER_BUFF_AUTOHEAL		0x00
 #define PLAYER_BUFF_ATTR1			0x01
 #define PLAYER_BUFF_ATTR2			0x02
@@ -60,6 +59,7 @@ namespace GObject
 #define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
 #define PLAYER_BUFF_AUTOCOPY        0x21	//自动副本
 
+#define PLAYER_BUFF_DISPLAY_MAX		0x30
 #define PLAYER_BUFF_COUNT			0x30
 
 #define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
@@ -628,8 +628,11 @@ namespace GObject
 		//战斗相关
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, bool = false, std::vector<UInt32>* loot = NULL);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, bool = false, std::vector<UInt16>* loot = NULL);
         void autoCopyFailed(UInt8);
+        inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
+        inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
+        inline void setCopyFailed() { m_autoCopyFailed = true; }
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
@@ -645,6 +648,7 @@ namespace GObject
         void startAutoCopy(UInt8 id);
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
+        void sendAutoCopy();
 
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }
@@ -860,6 +864,7 @@ namespace GObject
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)
 
         UInt32 _praplace;
+        bool m_autoCopyFailed;
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
@@ -899,6 +904,13 @@ namespace GObject
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
         void addPracticeFighter(UInt32* fighters, size_t size);
+
+    private:
+        UInt16 m_autoCopyComplete;
+    public:
+        inline void addCopyCompleteGold(UInt16 gold) { m_autoCopyComplete += gold; }
+        inline UInt16 getCopyCompleteGold() { return m_autoCopyComplete; }
+        inline void resetCopyCompleteGold() { m_autoCopyComplete = 0; }
 
     private:
         UInt32 m_tripodAwdId;

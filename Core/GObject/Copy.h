@@ -35,7 +35,7 @@ public:
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
     void enter(Player* pl, UInt8 id);
-    UInt8 fight(Player* pl, UInt8 id, bool = false);
+    UInt8 fight(Player* pl, UInt8 id, bool = false, bool = false);
     void reset(Player* pl, UInt8 id);
 
     void getCount(Player* pl, UInt8* free, UInt8* gold, bool = false);
@@ -51,6 +51,7 @@ public:
     CopyData& getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool update = false);
     UInt8 getCopyFloors(UInt8 id);
     UInt8 checkCopy(Player* pl, UInt8 id);
+    void sendAutoCopy(Player* pl);
     
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;

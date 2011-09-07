@@ -52,6 +52,7 @@ MSG_REG(GameMsgHdr, OnDungeonInfoReq);
 MSG_REG(GameMsgHdr, OnDungeonBattleReq);
 MSG_REG(GameMsgHdr, OnDungeonAutoReq);
 MSG_REG(GameMsgHdr, OnDungeonCompleteAutoReq);
+MSG_REG(GameMsgHdr, OnAutoCopy);
 MSG_REG(GameMsgHdr, OnDailyReq);
 MSG_REG(GameMsgHdr, OnNpcTriggerReq);
 MSG_REG(GameMsgHdr, OnPlayerGetTaskReq);
@@ -151,6 +152,7 @@ MSG_REG_2(GameMsgHdr, 0x270, OnGetClanBattleRewardReq);
 MSG_REG_2(GameMsgHdr, 0x271, OnClanTakeRewardReq);
 MSG_REG_2(GameMsgHdr, 0x272, OnClanBattleAttendReq);
 MSG_REG_2(GameMsgHdr, 0x274, OnExpGainByInstantCompleteReq);
+MSG_REG_2(GameMsgHdr, 0x275, OnCompleteAutoCopy);
 
 MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 

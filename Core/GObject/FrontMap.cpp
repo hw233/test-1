@@ -184,13 +184,14 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
 UInt8 FrontMap::getCount(Player* pl)
 {
-    if (pl && TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate))) {
-        if (pl) {
-            PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
-            PLAYER_DATA(pl, frontFreeCnt) = 0;
-            PLAYER_DATA(pl, frontGoldCnt) = 0;
-            DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = 0, `copyGoldCnt` = 0, `copyUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), pl->getId());
-        }
+    if (!pl)
+        return 0;
+
+    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate))) {
+        PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
+        PLAYER_DATA(pl, frontFreeCnt) = 0;
+        PLAYER_DATA(pl, frontGoldCnt) = 0;
+        DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), pl->getId());
     }
 
     UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, frontGoldCnt);

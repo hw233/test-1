@@ -1342,7 +1342,11 @@ namespace GObject
                 if(equip->getClass() == Item_Trump)
                 {
                     if (ied.enchant == 1)
+                    {
                         ((ItemTrump*)equip)->fixSkills();
+                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                        fgt->addSkillsFromCT(attr->skills, true);
+                    }
                     else
                     {
                         GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
