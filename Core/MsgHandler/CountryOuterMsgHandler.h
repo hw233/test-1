@@ -2325,7 +2325,7 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& )
 		return ;
 
 	player->checkLastBattled();
-	player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+	//player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
 
     UInt32 lastEnd = player->getLastBattleEndTime();
     if (!lastEnd)
@@ -2878,7 +2878,9 @@ void OnMailDelReq( GameMsgHdr& hdr, const void * buffer )
 	//}
 	std::vector<UInt8> rep;
 	rep.resize(4 + blen);
-	*reinterpret_cast<UInt32 *>(&rep[0]) = (REP::MAIL_DELETE << 6) | 0xFF0000 | blen;
+    *(UInt16*)(&rep[0]) = blen;
+    rep[2] = 0xFF;
+    rep[3] = REP::MAIL_DELETE;
 	memcpy(&rep[4], buffer, blen);
 	player->send(&rep[0], rep.size());
 	if(c > 0)

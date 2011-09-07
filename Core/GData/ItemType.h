@@ -180,6 +180,8 @@ namespace GData
 		}
         void setAttr(const AttrExtra* attr, bool fix = false)
         {
+            if (this->fix)
+                delete attrExtra;
             attrExtra = attr;
             this->fix = fix;
         }

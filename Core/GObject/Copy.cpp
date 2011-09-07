@@ -123,11 +123,11 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id)
             pl->sendMsgCode(0, 1101);
             return 1;
         }
-        ++PLAYER_DATA(pl, copyGoldCnt);
-        DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
-
         ConsumeInfo ci(EnterCopy,0,0);
         pl->useGold(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
+
+        ++PLAYER_DATA(pl, copyGoldCnt);
+        DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);

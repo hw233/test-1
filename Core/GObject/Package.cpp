@@ -598,9 +598,7 @@ namespace GObject
                     {
                         equip = new ItemTrump(id, itype, edata);
                         if (equip && equip->getItemEquipData().enchant)
-                        {
                             ((ItemTrump*)equip)->fixSkills();
-                        }
                     }
                     break;
 				default:
@@ -1335,26 +1333,33 @@ namespace GObject
 			{
 				equip->DoEquipBind();
 			}
+
+            if(equip->getClass() == Item_Trump)
+            {
+                if (ied.enchant == 1)
+                {
+                    ((ItemTrump*)equip)->fixSkills();
+                    if (fgt)
+                    {
+                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                        fgt->addSkillsFromCT(attr->skills, true);
+                    }
+                }
+                else
+                {
+                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                    ((ItemTrump*)equip)->enchant(ied.enchant, attr);
+                    if (fgt)
+                        fgt->addSkillsFromCT(attr->skills, true);
+                }
+            }
+
 			if(fgt != NULL)
 			{
 				fgt->setDirty();
 
                 if(equip->getClass() == Item_Trump)
-                {
-                    if (ied.enchant == 1)
-                    {
-                        ((ItemTrump*)equip)->fixSkills();
-                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                        fgt->addSkillsFromCT(attr->skills, true);
-                    }
-                    else
-                    {
-                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                        ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                        fgt->addSkillsFromCT(attr->skills, true);
-                    }
                     fgt->sendModification(0x50 + pos, equip, false);
-                }
                 else
                     fgt->sendModification(0x21 + pos, equip, false);
 			}
@@ -1384,16 +1389,20 @@ namespace GObject
 			ied.enchant --;
 			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
+
+            if(equip->getClass() == Item_Trump)
+            {
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                ((ItemTrump*)equip)->enchant(ied.enchant, attr);
+                if (fgt)
+                    fgt->addSkillsFromCT(attr->skills, true);
+            }
+
 			if(fgt != NULL)
 			{
 				fgt->setDirty();
                 if(equip->getClass() == Item_Trump)
-                {
-                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                    ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                    fgt->addSkillsFromCT(attr->skills, true);
                     fgt->sendModification(0x50 + pos, equip, false);
-                }
                 else
                     fgt->sendModification(0x21 + pos, equip, false);
 			}
