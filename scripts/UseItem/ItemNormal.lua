@@ -770,7 +770,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 		   package:AddItem(510, 1, 1, 0, 2);
 		   package:AddItem(500, 1, 1, 0, 2);
 		   package:AddItem(56, 1, 1, 0, 2);
-		   package:AddItem(58, 1, 1, 0, 2);
+		   package:AddItem(57, 1, 1, 0, 2);
 		   package:AddItem(48, 1, 1, 0, 2);
 		   package:AddItem(51, 1, 1, 0, 2);
 		   package:AddItem(502, 1, 1, 0, 2);

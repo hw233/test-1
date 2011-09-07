@@ -2298,14 +2298,64 @@ void OnInstantAutoBattleReq( GameMsgHdr& hdr, InstantAutoBattleReq& )
 	player->instantAutoBattle();
 }
 
+void kick(Player* pl)
+{
+    TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
+    if (conn)
+    {    
+        Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
+        if (cl) 
+        {    
+            pl->SetSessionID(-1);
+            pl->testBattlePunish();
+            pl->setOnline(false);
+            static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::RECONNECT};
+            cl->send(kick_pkt, 4);
+            cl->SetPlayer(NULL);
+            cl->pendClose();
+        }    
+    }    
+}
+
 void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt32 now = TimeUtil::Now();
-	if(now < PLAYER_DATA(player, battlecdtm))
+	if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
+
 	player->checkLastBattled();
 	player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+
+    UInt32 lastEnd = player->getLastBattleEndTime();
+    if (!lastEnd)
+    {
+        player->setLastBattleEndTime(now);
+        return;
+    }
+
+    if (now < lastEnd)
+    {
+        kick(player);
+        return;
+    }
+    else if (now - lastEnd <= 1)
+    {
+        player->countBattleEnd();
+    }
+
+    if (now - lastEnd >= 2)
+    {
+        if (player->getCountBattleEnd() >= 3)
+        {
+            kick(player);
+        }
+        else
+        {
+            player->setLastBattleEndTime(now);
+            player->resetCountBattleEnd();
+        }
+    }
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )

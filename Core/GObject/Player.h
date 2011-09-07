@@ -208,7 +208,7 @@ namespace GObject
 		static const UInt16 INIT_PACK_SIZE = 100;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), status(0), country(0),
-			title(0), achievement(0), location(0), inCity(false), lastOnline(0),
+			title(0), achievement(0), qqvipl(0), qqvipyear(0), location(0), inCity(false), lastOnline(0),
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
@@ -240,6 +240,8 @@ namespace GObject
 		UInt8 country;              // 国家
 		UInt8 title;                // 头衔
 		UInt32 achievement;         // 战功
+        UInt8 qqvipl;               // QQ VIP等级
+        UInt8 qqvipyear;            // QQ VIP是否包年
 		UInt16 location;            // 位置
 		UInt8 inCity;               // 城市
 		UInt32 lastOnline;          // 上次上线时间
@@ -249,7 +251,7 @@ namespace GObject
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // 挂机加速次数
 		UInt32 nextIcReset;         // 
-		UInt16 formation;            // 
+		UInt16 formation;           // 
 		Lineup lineup[5];           // 
 		UInt32 totalRecharge;       // 
 		UInt32 lastExp;             // 
@@ -865,6 +867,16 @@ namespace GObject
 
         UInt32 _praplace;
         bool m_autoCopyFailed;
+
+    private:
+        UInt32 m_endTime;
+        UInt32 m_fightCnt;
+    public:
+        inline void setLastBattleEndTime(UInt32 t) { m_endTime = t; }
+        inline UInt32 getLastBattleEndTime() { return m_endTime; }
+        inline void countBattleEnd() { ++m_fightCnt; }
+        inline UInt32 getCountBattleEnd() { return m_fightCnt; }
+        inline void resetCountBattleEnd() { m_fightCnt = 0; }
 
         // 通天塔正义之吼
         UInt8 _justice_roar;

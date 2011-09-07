@@ -2173,7 +2173,7 @@ void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
                 pl->SetSessionID(-1);
                 pl->testBattlePunish();
                 pl->setOnline(false);
-                static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
+                static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::RECONNECT};
                 cl->send(kick_pkt, 4);
                 cl->SetPlayer(NULL);
                 cl->pendClose();

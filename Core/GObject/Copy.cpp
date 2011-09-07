@@ -25,7 +25,6 @@ inline void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 flo
         st << static_cast<UInt8>(6) << id << floor << spot << pl->getCopyCompleteGold() << Stream::eos;
         pl->send(st);
         pl->resetCopyCompleteGold();
-        pl->resetAutoCopyFailed();
     }
 
     PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
@@ -62,10 +61,13 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << id;
     st << cd.floor;
     st << cd.spot;
-    UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, copyGoldCnt);
+    UInt8 count = PLAYER_DATA(pl, copyGoldCnt);
     count <<= 4;
-    
-    count |= FREECNT-PLAYER_DATA(pl, copyFreeCnt);
+    count |= PLAYER_DATA(pl, copyFreeCnt);
+    st << count;
+    count = getGoldCount(pl->getVipLevel());
+    count <<=4;
+    count |= FREECNT;
     st << count;
     st << Stream::eos;
     pl->send(st);
@@ -344,6 +346,10 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         {
             if (ato)
             {
+                Stream st(REP::AUTO_COPY);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+
                 pl->setCopyFailed();
                 autoClear(pl, complete, id, tcd.floor, tcd.spot);
                 return 0;
@@ -485,6 +491,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                         return;
                     }
 
+                    // TODO:
+                    //if (pl->getVipLevel() < 5)
+                    //{
+                    //    return;
+                    //}
+
                     if (!copyCheckLevel(pl, id))
                         return;
 
@@ -492,6 +504,11 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     {
                         pl->sendMsgCode(0, 1100);
                         return;
+                    }
+                    else
+                    {
+                        ConsumeInfo ci(EnterCopy,0,0);
+                        pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael, &ci);
                     }
                 }
 
@@ -548,6 +565,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     pl->sendMsgCode(0, 1415);
                     return;
                 }
+
+                // TODO:
+                //if (pl->getVipLevel() < 9)
+                //{
+                //    return;
+                //}
 
                 autoClear(pl);
                 pl->addFlag(Player::AutoCopy);

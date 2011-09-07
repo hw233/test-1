@@ -817,6 +817,8 @@ CREATE TABLE `player` (
   `country` tinyint(1) unsigned NOT NULL,
   `title` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `archievement` int(10) unsigned NOT NULL DEFAULT '0',
+  `qqvipl` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `qqvipyear` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `location` smallint(5) unsigned NOT NULL,
   `inCity` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `lastOnline` int(10) unsigned NOT NULL DEFAULT '0',
