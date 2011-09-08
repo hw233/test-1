@@ -592,7 +592,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 	UInt16 deferRankPos = getRankPos(row, deferRank->second);
 	if(atkerRankPos != 1)
 	{
-		if (atkerRankPos <= deferRankPos || atkerRankPos - deferRankPos > 14)
+		if (atkerRankPos <= deferRankPos || ((atkerRankPos - deferRankPos > 14) && !(getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000))))
 			return;
 	}
 	else if(deferRankPos - atkerRankPos > 4)

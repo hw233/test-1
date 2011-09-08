@@ -269,17 +269,29 @@ namespace GObject
 			return;
         }
 
+        PracticeFighterExp pfexp;
+        memset(&pfexp, 0, sizeof(pfexp));
+
         //data->lock.lock();
         Fighter* fgt = 0;
+        int n = 0;
         for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
         {
             fgt = m_Player->findFighter(*i);
             if (fgt)
             {
-                fgt->addPExp(fgt->getPracticeInc() * 10); 
+                //fgt->addPExp(fgt->getPracticeInc() * 10); 
+                if(n < sizeof(pfexp.fighters))
+                {
+                    pfexp.fighters[n] = fgt;
+                    pfexp.counts[n] = 10;
+                    ++ n;
+                }
             }
         }
         //data->lock.unlock();
+        GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
+        GLOBAL().PushMsg(hdr1, &pfexp);
 
 		data->checktime -= 10;
         if ((int)data->checktime < 0)
@@ -298,6 +310,74 @@ namespace GObject
         }
         return;
     }
+
+	bool EventPlayerPractice::instantComplete()
+	{
+        PracticeData* data = practicePlace.getPracticeData(m_Player->getId());
+        if (!data) {
+			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
+			return false;
+        }
+
+        //data->lock.lock();
+        //data->lock.unlock();
+        if(data->getHookAdd() <= 0)
+            return false;
+
+		if (data->checktime > 0)
+		{
+			UInt32 count = 60;
+			if(count > data->checktime)
+			{
+				count = data->checktime;
+			}
+
+            UInt32 goldUse = GData::moneyNeed[GData::INSTANTPRACTICE].gold;
+            PracticeFighterExp pfexp;
+            memset(&pfexp, 0, sizeof(pfexp));
+            pfexp.goldUse = goldUse;
+
+            //data->lock.lock();
+            Fighter* fgt = 0;
+            int n = 0;
+            for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
+            {
+                fgt = m_Player->findFighter(*i);
+                if (fgt)
+                {
+                    //fgt->addPExp(fgt->getPracticeInc() * 10); 
+                    if(n < sizeof(pfexp.fighters))
+                    {
+                        pfexp.fighters[n] = fgt;
+                        pfexp.counts[n] = count;
+                        ++ n;
+                    }
+                }
+            }
+            GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
+            GLOBAL().PushMsg(hdr1, &pfexp);
+
+            -- data->hookadd;
+            data->checktime -= count;
+            if ((int)data->checktime < 0)
+                data->checktime = 0;
+            if(data->checktime == 0)
+            {
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '', hookadd = %u WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, data->hookadd, m_Player->getId());
+                practicePlace.stop(m_Player);
+                PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
+            }
+            else
+            {
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, hookadd = %u WHERE `id` = %"I64_FMT"u",
+                        data->checktime, data->hookadd, m_Player->getId());
+            }
+        }
+
+        return true;
+	}
+
+
 
 	bool EventPlayerTripod::Equal(UInt32 id, size_t playerid) const
 	{
@@ -1024,6 +1104,9 @@ namespace GObject
 			ItemEquip * equip;
 			for(UInt8 z = 1; z < 9; ++ z)
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
+            for(UInt8 t = 0; t < 3; ++ t)
+				m_Package->EquipTo(0, fgt, t+0x50, equip, true);
+
 			_fighters.erase(it);
 			DB().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 			if(r)
@@ -5347,65 +5430,17 @@ namespace GObject
 
     bool Player::accPractice()
     {
-        PracticeData* data = practicePlace.getPracticeData(getId());
-        if (!data) {
-			PopTimerEvent(this, EVENT_PLAYERPRACTICING, getId());
-			return false;
-        }
-
-        //data->lock.lock();
-        //data->lock.unlock();
-        if(data->getHookAdd() <= 0)
+        UInt32 goldUse = GData::moneyNeed[GData::INSTANTPRACTICE].gold;
+        if(getGold() < goldUse)
+        {
+            Stream st(REP::PRACTICE_HOOK_ADD);
+            st << static_cast<UInt8>(1) << Stream::eos;
+            send(st);
             return false;
-
-        Stream st(REP::PRACTICE_HOOK_ADD);
-		if (data->checktime > 0)
-		{
-			UInt32 count = 60;
-			if(count > data->checktime)
-			{
-				count = data->checktime;
-			}
-			UInt32 goldUse = 10 * ((count + 59) / 60);
-			if (getGold() < goldUse)
-            {
-                st << static_cast<UInt8>(1) << Stream::eos;
-                send(st);
-				return false;
-            }
-
-			ConsumeInfo ci(AccTrainFighter, 0, 0);
-			useGold(goldUse, &ci);
-
-            Fighter* fgt = 0;
-            for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
-            {
-                fgt = findFighter(*i);
-                if (fgt)
-                {
-                    fgt->addPExp(fgt->getPracticeInc() * count); 
-                }
-            }
-
-            -- data->hookadd;
-            data->checktime -= count;
-            if ((int)data->checktime < 0)
-                data->checktime = 0;
-            if(data->checktime == 0)
-            {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '', hookadd = %u WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, data->hookadd, getId());
-                practicePlace.stop(this);
-                PopTimerEvent(this, EVENT_PLAYERPRACTICING, getId());
-            }
-            else
-            {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, hookadd = %u WHERE `id` = %"I64_FMT"u",
-                        data->checktime, data->hookadd, getId());
-            }
         }
 
-        st << static_cast<UInt8>(0) << Stream::eos;
-        send(st);
+        GameMsgHdr hdr1(0x1F0, WORKER_THREAD_WORLD, this, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
 
         return true;
     }
@@ -5451,6 +5486,36 @@ namespace GObject
     void Player::sendAutoCopy()
     {
         playerCopy.sendAutoCopy(this);
+    }
+
+    void Player::AddPracticeExp(const PracticeFighterExp* pfexp)
+    {
+        if(!pfexp)
+            return;
+
+        if(pfexp->goldUse)
+        {
+            if(getGold() < pfexp->goldUse)
+            {
+                Stream st(REP::PRACTICE_HOOK_ADD);
+                st << static_cast<UInt8>(1) << Stream::eos;
+                send(st);
+                return;
+            }
+
+            ConsumeInfo ci(ExtendPackage,0,0);
+            useGold(pfexp->goldUse,&ci);
+        }
+
+        for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
+        {
+            Fighter* fgt = pfexp->fighters[i];
+            if(fgt && pfexp->counts[i])
+            {
+                fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+            }
+        }
+
     }
 
 }
