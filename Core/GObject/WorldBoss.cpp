@@ -49,6 +49,12 @@ namespace GObject
         struct tm * t = localtime(&now2);
         switch (t->tm_hour)
         {
+            case 20:
+                {
+                    if (m_level)
+                        reset();
+                }
+                break;
             case 19:
                 if (m_max >= 100)
                 {
@@ -101,6 +107,9 @@ namespace GObject
     {
         UInt8 level = getLevel(now);
         if (!level)
+            return;
+
+        if (level == m_level)
             return;
 
         reset();
@@ -249,6 +258,7 @@ namespace GObject
             }
         }
 
+        m_level = 0;
         m_boss.clear();
         DB().PushUpdateData("DELETE FROM `worldboss`");
     }
@@ -304,6 +314,7 @@ namespace GObject
             wb.level = level;
             wb.count = count;
             m_boss[loc] = wb;
+            m_level = level;
         }
     }
 
