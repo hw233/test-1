@@ -372,6 +372,24 @@ namespace GObject
                 DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, hookadd = %u WHERE `id` = %"I64_FMT"u",
                         data->checktime, data->hookadd, m_Player->getId());
             }
+
+            {
+                Stream st1(REP::PRACTICE_OCCUPY);
+                st1 << static_cast<UInt8>(0);
+                st1 << data->checktime * 60;
+                st1 << data->prot;
+                st1 << data->getHookAdd();
+                st1 << static_cast<UInt8>(m_Player->getPracticePlace()-1);
+
+                UInt8 size = data->fighters.size();
+                st1 << size;
+
+                for (std::list<UInt32>::iterator i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
+                    st1 << *i;
+
+                st1 << Stream::eos;
+                m_Player->send(st1);
+            }
         }
 
         return true;
@@ -5500,7 +5518,12 @@ namespace GObject
                 send(st);
                 return;
             }
-
+            else
+            {
+                Stream st(REP::PRACTICE_HOOK_ADD);
+                st << static_cast<UInt8>(0) << Stream::eos;
+                send(st);
+            }
             ConsumeInfo ci(ExtendPackage,0,0);
             useGold(pfexp->goldUse,&ci);
         }
