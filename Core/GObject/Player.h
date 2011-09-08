@@ -873,6 +873,7 @@ namespace GObject
         inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
+        bool accPractice();
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }

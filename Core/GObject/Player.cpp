@@ -5328,6 +5328,71 @@ namespace GObject
         return 0.0;
     }
 
+    bool Player::accPractice()
+    {
+        PracticeData* data = practicePlace.getPracticeData(getId());
+        if (!data) {
+			PopTimerEvent(this, EVENT_PLAYERPRACTICING, getId());
+			return false;
+        }
+
+        //data->lock.lock();
+        //data->lock.unlock();
+        if(data->getHookAdd() <= 0)
+            return false;
+
+        Stream st(REP::PRACTICE_HOOK_ADD);
+		if (data->checktime > 0)
+		{
+			UInt32 count = 60;
+			if(count > data->checktime)
+			{
+				count = data->checktime;
+			}
+			UInt32 goldUse = 10 * ((count + 59) / 60);
+			if (getGold() < goldUse)
+            {
+                st << static_cast<UInt8>(1) << Stream::eos;
+                send(st);
+				return false;
+            }
+
+			ConsumeInfo ci(AccTrainFighter, 0, 0);
+			useGold(goldUse, &ci);
+
+            Fighter* fgt = 0;
+            for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
+            {
+                fgt = findFighter(*i);
+                if (fgt)
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * count); 
+                }
+            }
+
+            -- data->hookadd;
+            data->checktime -= count;
+            if ((int)data->checktime < 0)
+                data->checktime = 0;
+            if(data->checktime == 0)
+            {
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '', hookadd = %u WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, data->hookadd, getId());
+                practicePlace.stop(this);
+                PopTimerEvent(this, EVENT_PLAYERPRACTICING, getId());
+            }
+            else
+            {
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, hookadd = %u WHERE `id` = %"I64_FMT"u",
+                        data->checktime, data->hookadd, getId());
+            }
+        }
+
+        st << static_cast<UInt8>(0) << Stream::eos;
+        send(st);
+
+        return true;
+    }
+
     bool Player::OperationTaskAction(int type)
     {
         switch (type)

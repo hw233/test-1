@@ -561,6 +561,12 @@ struct FighterTrain2Req
 	MESSAGE_DEF3(0x2F, UInt32, _heroID, UInt8, _priceType, UInt32, _time);
 };
 
+struct PracticeHookAddReq
+{
+    MESSAGE_DEF(REQ::PRACTICE_HOOK_ADD);
+};
+
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -3035,5 +3041,12 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 		break;
 	}
 }
+
+void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
+{
+    MSG_QUERY_PLAYER(player);
+    player->accPractice();
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

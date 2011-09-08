@@ -2879,7 +2879,7 @@ namespace GObject
 		LoadingCounter lc("Loading Practice Data");
         Player* pl = 0;
 		DBPracticeData pd;
-		if(execu->Prepare("SELECT `id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters` FROM `practice_data`", pd)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `hookadd`, `nexthareset`, `fighters` FROM `practice_data`", pd)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -2897,6 +2897,8 @@ namespace GObject
             ppd->prot = pd.prot;
             ppd->cdend = pd.cdend;
             ppd->winnerid = pd.winnerid;
+            ppd->hookadd = pd.hookadd;
+            ppd->nextHAReset = pd.nexthareset;
             StringTokenizer tk(pd.fighters, ",");
             for (size_t i = 0; i < tk.count(); ++i)
             {

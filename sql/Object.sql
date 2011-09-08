@@ -93,7 +93,7 @@ CREATE TABLE `athletics_rank` (
   `befailstreak` smallint(3) unsigned NOT NULL DEFAULT '0',
   `oldrank` int(10) NOT NULL DEFAULT '0',
   `first4rank` int(10) unsigned NOT NULL DEFAULT '0',
-  `extrachallenge` int(10) NOT NULL DEFAULT '0',
+  `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -650,6 +650,8 @@ CREATE TABLE `practice_data` (
   `prot` tinyint(3) NOT NULL,
   `cdend` int(11) NOT NULL,
   `winnerid` bigint(20) unsigned NOT NULL,
+  `hookadd` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `nexthareset` int(10) unsigned NOT NULL DEFAULT '0',
   `fighters` varchar(255) NOT NULL,
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

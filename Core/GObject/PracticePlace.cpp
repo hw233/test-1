@@ -18,6 +18,12 @@
 
 namespace GObject
 {
+
+UInt8 PracticePlace::_maxCount = 5;
+UInt8 PracticePlace::_extraCount[11] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
+UInt8 PracticePlace::_hookAddCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2};
+
+
 #define ITEM_PRACTICE_PROT 54
     // XXX: place must greater than 0
     bool PracticePlace::pay(Player* pl, UInt8 place, UInt16 slot,
@@ -223,23 +229,29 @@ namespace GObject
             return false;
         }
 
+        int nVipLevel = pl->getVipLevel();
+
+		UInt32 now = TimeUtil::Now();
+
         pp->type = type;
         pp->pricetype = priceType;
         pp->slotprice = slotprice;
         pp->protprice = protprice;
         pp->traintime = 60 * time * 8;
         pp->checktime = pp->traintime;
-        pp->trainend = TimeUtil::Now() + pp->traintime;
+        pp->trainend = now + pp->traintime;
         pp->prot = prot;
-        pp->cdend = TimeUtil::Now() + pp->traintime * 60 + 60 * 60;
+        pp->cdend = now + pp->traintime * 60 + 60 * 60;
         pp->winnerid = 0;
+        pp->hookadd = _hookAddCnt[nVipLevel];
+        pp->nextHAReset = TimeUtil::SharpDay(1, now);
 
-        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid);
+        DB().PushUpdateData("REPLACE INTO `practice_data`(`id`, `place`, `slot`, `type`, `pricetype`, `slotprice`, `protprice`, `traintime`, `checktime`, `prot`, `cdend`, `winnerid`, `hookadd`, `nexthareset`, `fighters`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %u, '')", pl->getId(), place, slot, type, priceType, slotprice, protprice, pp->traintime, pp->checktime, prot, pp->cdend, pp->winnerid, pp->hookadd, pp->nextHAReset);
 
         pl->setPracticingPlaceSlot(place << 16 | slot);
         addPractice(pl, pp, place, slot); // XXX: must be here after setPracticingPlaceSlot
 
-        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << place - 1 << static_cast<UInt8>(0) << Stream::eos;
+        st << static_cast<UInt8>(0) << pp->traintime * 60 << prot << pp->getHookAdd() << static_cast<UInt8>(place - 1) << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
         return true;
     }
@@ -345,7 +357,10 @@ namespace GObject
             return false;
         }
 
-        if (data->fighters.size() > 5)
+        int nVipLevel = pl->getVipLevel();
+        int nCount = _maxCount + _extraCount[nVipLevel];
+
+        if (data->fighters.size() > nCount)
         {
             st << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
@@ -353,7 +368,7 @@ namespace GObject
         }
 
         //data->lock.lock();
-        for (size_t i = 0; i < size && i < 5; ++i)
+        for (size_t i = 0; i < size && i < nCount; ++i)
         {
             if (!isSitdownYet(data, fgtid[i]))
             {
@@ -492,6 +507,7 @@ namespace GObject
             st1 << static_cast<UInt8>(0);
             st1 << p->checktime * 60;
             st1 << p->prot;
+            st1 << p->getHookAdd();
             st1 << static_cast<UInt8>(pl->getPracticePlace()-1);
 
             UInt8 size = p->fighters.size();
@@ -1219,6 +1235,24 @@ namespace GObject
             m_places[idx].place.slotincoming = 0;
             m_places[idx].place.protincoming = 0;
         }
+    }
+
+    UInt8 PracticeData::getHookAdd()
+    {
+        checkHookAdd();
+        return hookadd;
+    }
+
+    void PracticeData::checkHookAdd()
+    {
+		UInt32 now = TimeUtil::Now();
+		if(now >= nextHAReset)
+		{
+            int nVipLevel = globalPlayers[_id]->getVipLevel();
+			nextHAReset = TimeUtil::SharpDay(1, now);
+            hookadd = PracticePlace::_hookAddCnt[nVipLevel];
+            DB().PushUpdateData("UPDATE `practice_data` SET hookadd = %u, nexthareset = %u where `id`= %"I64_FMT"u", hookadd, nextHAReset, _id);
+		}
     }
 
 
