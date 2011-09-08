@@ -99,6 +99,8 @@ private:
     void OnCount(GObject::Player *player, std::vector<std::string>&);
     void OnThreadId(GObject::Player *player, std::vector<std::string>&);
     void OnAutoCopy(GObject::Player *player, std::vector<std::string>&);
+    void OnLock(GObject::Player *player, std::vector<std::string>&);
+    void OnUnLock(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

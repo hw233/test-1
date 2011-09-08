@@ -127,6 +127,8 @@ GMHandler::GMHandler()
     Reg(3, "wc", &GMHandler::OnCount);
     Reg(3, "tid", &GMHandler::OnThreadId);
     Reg(3, "ac", &GMHandler::OnAutoCopy);
+    Reg(3, "lock", &GMHandler::OnLock);
+    Reg(3, "unlock", &GMHandler::OnUnLock);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2246,6 +2248,57 @@ void GMHandler::OnAutoCopy(GObject::Player *player, std::vector<std::string>& ar
         UInt8 id = atoi(args[0].c_str());
         UInt8 type = atoi(args[1].c_str());
         playerCopy.autoBattle(player, id, type);
+    }
+}
+
+void GMHandler::OnLock(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+
+    if (args.size() < 1)
+        return;
+
+    UInt64 playerId = atoll(args[0].c_str());
+    UInt64 expireTime = 0;
+    if (args.size() >= 2)
+        expireTime = atoi(args[1].c_str()) * 60 * 60 + TimeUtil::Now();
+    GObject::Player * pl= GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return;
+
+    if(pl->getLockExpireTime() == static_cast<UInt32>(0))
+    {
+        pl->setLockExpireTime(static_cast<UInt32>(expireTime));
+        DB().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+        if(pl->isOnline())
+        {
+            TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
+            if(conn.get() == NULL)
+                return;
+            Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
+            cl->closeConn();
+        }
+    }
+}
+
+void GMHandler::OnUnLock(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+
+    if (args.size() < 1)
+        return;
+
+    UInt64 playerId = atoll(args[0].c_str());
+    GObject::Player * pl= GObject::globalPlayers[playerId];
+    if(pl==NULL)
+        return;
+
+    if(pl->getLockExpireTime() != static_cast<UInt32>(0))
+    {
+        pl->setLockExpireTime(0);
+        DB().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
     }
 }
 
