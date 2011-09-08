@@ -1161,11 +1161,13 @@ namespace GObject
 			}
 		}
 		st.init(REP::USER_INFO);
+        UInt8 mark = uRand(0xFF);
+        setMark(mark);
 		UInt8 status = static_cast<UInt8>(_playerData.status);
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << mark << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];

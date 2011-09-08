@@ -869,6 +869,12 @@ namespace GObject
         bool m_autoCopyFailed;
 
     private:
+        UInt8 m_mark;
+    public:
+        inline void setMark(UInt8 mark) { m_mark = mark; }
+        inline UInt8 getMark() { return m_mark; }
+
+    private:
         UInt32 m_endTime;
         UInt32 m_fightCnt;
     public:

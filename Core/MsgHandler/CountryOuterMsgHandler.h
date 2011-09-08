@@ -349,7 +349,8 @@ struct RequestChallengeReq
 };
 struct BattleEndReq
 {
-	MESSAGE_DEF(REQ::FIGHT_EXIT);
+    UInt16 mark;
+	MESSAGE_DEF1(REQ::FIGHT_EXIT, UInt16, mark);
 };
 
 struct CopyReq
@@ -2309,7 +2310,7 @@ void kick(Player* pl)
             pl->SetSessionID(-1);
             pl->testBattlePunish();
             pl->setOnline(false);
-            static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::RECONNECT};
+            static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
             cl->send(kick_pkt, 4);
             cl->SetPlayer(NULL);
             cl->pendClose();
@@ -2317,12 +2318,24 @@ void kick(Player* pl)
     }    
 }
 
-void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& )
+void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt32 now = TimeUtil::Now();
 	if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
+
+    UInt8 mark = player->getMark();
+    UInt16 nmark = req.mark;
+    nmark >>= 5; 
+    nmark += 5;
+    nmark >>= 2;
+
+    if (mark != nmark)
+    {
+        kick(player);
+        return;
+    }
 
 	player->checkLastBattled();
 	//player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
