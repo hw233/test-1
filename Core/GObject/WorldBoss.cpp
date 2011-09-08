@@ -296,7 +296,7 @@ namespace GObject
                     SYSMSG_BROADCASTV(548, fgt->getId());
                     SYSMSG_BROADCASTV(549, loc);
                 }
-                DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, 0);
+                DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, count);
             }
 
             WBoss wb;

@@ -30,7 +30,6 @@ namespace GData
 
 namespace GObject
 {
-#define PLAYER_BUFF_DISPLAY_MAX		0x0C
 #define PLAYER_BUFF_AUTOHEAL		0x00
 #define PLAYER_BUFF_ATTR1			0x01
 #define PLAYER_BUFF_ATTR2			0x02
@@ -60,6 +59,7 @@ namespace GObject
 #define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
 #define PLAYER_BUFF_AUTOCOPY        0x21	//自动副本
 
+#define PLAYER_BUFF_DISPLAY_MAX		0x30
 #define PLAYER_BUFF_COUNT			0x30
 
 #define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
@@ -208,7 +208,7 @@ namespace GObject
 		static const UInt16 INIT_PACK_SIZE = 100;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), status(0), country(0),
-			title(0), achievement(0), location(0), inCity(false), lastOnline(0),
+			title(0), achievement(0), qqvipl(0), qqvipyear(0), location(0), inCity(false), lastOnline(0),
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
@@ -240,6 +240,8 @@ namespace GObject
 		UInt8 country;              // 国家
 		UInt8 title;                // 头衔
 		UInt32 achievement;         // 战功
+        UInt8 qqvipl;               // QQ VIP等级
+        UInt8 qqvipyear;            // QQ VIP是否包年
 		UInt16 location;            // 位置
 		UInt8 inCity;               // 城市
 		UInt32 lastOnline;          // 上次上线时间
@@ -249,7 +251,7 @@ namespace GObject
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // 挂机加速次数
 		UInt32 nextIcReset;         // 
-		UInt16 formation;            // 
+		UInt16 formation;           // 
 		Lineup lineup[5];           // 
 		UInt32 totalRecharge;       // 
 		UInt32 lastExp;             // 
@@ -628,8 +630,11 @@ namespace GObject
 		//战斗相关
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, bool = false, std::vector<UInt32>* loot = NULL);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, bool = false, std::vector<UInt16>* loot = NULL);
         void autoCopyFailed(UInt8);
+        inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
+        inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
+        inline void setCopyFailed() { m_autoCopyFailed = true; }
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
@@ -645,6 +650,7 @@ namespace GObject
         void startAutoCopy(UInt8 id);
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
+        void sendAutoCopy();
 
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }
@@ -860,6 +866,23 @@ namespace GObject
 		UInt32 _exchangeTicketCount;//use for exchange plane ticket (new year activity)
 
         UInt32 _praplace;
+        bool m_autoCopyFailed;
+
+    private:
+        UInt8 m_mark;
+    public:
+        inline void setMark(UInt8 mark) { m_mark = mark; }
+        inline UInt8 getMark() { return m_mark; }
+
+    private:
+        UInt32 m_endTime;
+        UInt32 m_fightCnt;
+    public:
+        inline void setLastBattleEndTime(UInt32 t) { m_endTime = t; }
+        inline UInt32 getLastBattleEndTime() { return m_endTime; }
+        inline void countBattleEnd() { ++m_fightCnt; }
+        inline UInt32 getCountBattleEnd() { return m_fightCnt; }
+        inline void resetCountBattleEnd() { m_fightCnt = 0; }
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
@@ -900,6 +923,13 @@ namespace GObject
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
         void addPracticeFighter(UInt32* fighters, size_t size);
+
+    private:
+        UInt16 m_autoCopyComplete;
+    public:
+        inline void addCopyCompleteGold(UInt16 gold) { m_autoCopyComplete += gold; }
+        inline UInt16 getCopyCompleteGold() { return m_autoCopyComplete; }
+        inline void resetCopyCompleteGold() { m_autoCopyComplete = 0; }
 
     private:
         UInt32 m_tripodAwdId;

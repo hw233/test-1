@@ -359,10 +359,6 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 		}
 	}
 
-    Stream st(REP::MAIL_DELETE);
-    st << static_cast<UInt8>(1) << id << Stream::eos;
-    _owner->send(st);
-
 	_mailBox.erase(it);
 	DB().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
 	DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 2, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, id);

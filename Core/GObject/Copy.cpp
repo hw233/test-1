@@ -8,15 +8,25 @@
 #include "MsgID.h"
 #include "GData/Money.h"
 #include "Server/SysMsg.h"
+#include "Server/Cfg.h"
 #include "Mail.h"
 
 namespace GObject
 {
 
-inline void autoClear(Player* pl)
+inline void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0, UInt8 spot = 0)
 {
     if (!pl)
         return;
+
+    if (complete)
+    {
+        Stream st(REP::AUTO_COPY);
+        st << static_cast<UInt8>(6) << id << floor << spot << pl->getCopyCompleteGold() << Stream::eos;
+        pl->send(st);
+        pl->resetCopyCompleteGold();
+    }
+
     PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
     pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
     pl->delFlag(Player::AutoCopy);
@@ -51,10 +61,13 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << id;
     st << cd.floor;
     st << cd.spot;
-    UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, copyGoldCnt);
+    UInt8 count = PLAYER_DATA(pl, copyGoldCnt);
     count <<= 4;
-    
-    count |= FREECNT-PLAYER_DATA(pl, copyFreeCnt);
+    count |= PLAYER_DATA(pl, copyFreeCnt);
+    st << count;
+    count = getGoldCount(pl->getVipLevel());
+    count <<=4;
+    count |= FREECNT;
     st << count;
     st << Stream::eos;
     pl->send(st);
@@ -80,26 +93,41 @@ void PlayerCopy::buildInfo(Player* pl, Stream& st)
     }
 }
 
-UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id)
+bool copyCheckLevel(Player* pl, UInt8 id)
 {
+    if (!pl)
+        return false;
+
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90};
     if (pl->GetLev() < lvls[id-1]) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
-        return 1;
+        return false;
     }
+    return true;
+}
+
+UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id)
+{
+    if (!pl)
+        return 1;
+
+    if (!copyCheckLevel(pl, id))
+        return 1;
 
     if (PLAYER_DATA(pl, copyFreeCnt) < FREECNT) {
         ++PLAYER_DATA(pl, copyFreeCnt);
+        DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
         if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
             pl->sendMsgCode(0, 1101);
             return 1;
         }
-        ++PLAYER_DATA(pl, copyGoldCnt);
-
         ConsumeInfo ci(EnterCopy,0,0);
-        pl->useGold(20*PLAYER_DATA(pl, copyGoldCnt)); // 第1次20,第2次40
+        pl->useGold(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
+
+        ++PLAYER_DATA(pl, copyGoldCnt);
+        DB().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);
@@ -152,7 +180,7 @@ UInt8 PlayerCopy::getCopyFloors(UInt8 id)
     return floors;
 }
 
-UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
+UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 {
     if (!pl || !id)
         return 0;
@@ -177,7 +205,21 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
-        std::vector<UInt32> loot;
+        if (ato && complete) {
+            if (GData::moneyNeed[GData::COPY_IM].gold <= pl->getGold()) {
+                ConsumeInfo ci(AutoCopyComplete,0,0);
+                pl->useGold(GData::moneyNeed[GData::COPY_IM].gold, &ci);
+                pl->addCopyCompleteGold(GData::moneyNeed[GData::COPY_IM].gold);
+            }
+            else
+            {
+                pl->setCopyFailed();
+                autoClear(pl, complete, id, tcd.floor, tcd.spot);
+                return 0;
+            }
+        }
+
+        std::vector<UInt16> loot;
         if (pl->attackCopyNpc(fgtid, 1, id, ato, &loot)) {
             bool nextfloor = false;
             if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
@@ -194,13 +236,12 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
                 {
                     Stream st(REP::AUTO_COPY);
                     UInt8 size = loot.size();
-                    if (size)
+                    if (size > 1)
                     {
                         UInt8 rsize = loot[0];
                         if (rsize != (size-1)/2)
                         {
                             st << static_cast<UInt8>(5);
-                            autoClear(pl);
 #if 0
                             PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
                             pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
@@ -235,6 +276,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
 
                     st << Stream::eos;
                     pl->send(st);
+
+                    autoClear(pl, complete, id, tcd.floor, tcd.spot);
                 }
                 else
                 {
@@ -259,6 +302,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
                         UInt8 rsize = loot[0];
                         if (rsize != (size-1)/2)
                         {
+                            pl->setCopyFailed();
+                            autoClear(pl, complete, id, tcd.floor, tcd.spot);
                             st << static_cast<UInt8>(5);
                         }
                         else
@@ -268,7 +313,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
                         st << id << tcd.floor << tcd.spot;
 
                         st << static_cast<UInt8>((size-1)/2);
-                        for (UInt8 i = 1; i < rsize; i += 2)
+                        for (UInt8 i = 1; i < rsize*2+1; i += 2)
                         {
                             st << loot[i] << static_cast<UInt8>(loot[i+1]);
                         }
@@ -299,13 +344,22 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
         }
         else
         {
-            autoClear(pl);
-#if 0
-            PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
-            pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
-            pl->delFlag(Player::AutoCopy);
-            DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
-#endif
+            if (ato)
+            {
+                Stream st(REP::AUTO_COPY);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+
+                pl->setCopyFailed();
+                autoClear(pl, complete, id, tcd.floor, tcd.spot);
+                return 0;
+            }
+            else
+            {
+                Stream st(REP::COPY_INFO);
+                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                pl->send(st);
+            }
         }
     }
     return 0;
@@ -358,7 +412,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
     if (lock)
     {
         FastMutex::ScopedLock lk(_mutex);
-        if (pl && TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate))) {
+        if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate))) {
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
             PLAYER_DATA(pl, copyGoldCnt) = 0;
@@ -437,10 +491,24 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                         return;
                     }
 
+                    // TODO:
+                    //if (pl->getVipLevel() < 5)
+                    //{
+                    //    return;
+                    //}
+
+                    if (!copyCheckLevel(pl, id))
+                        return;
+
                     if (GData::moneyNeed[GData::COPY_AUTO1+id-1].tael > pl->getTael())
                     {
                         pl->sendMsgCode(0, 1100);
                         return;
+                    }
+                    else
+                    {
+                        ConsumeInfo ci(EnterCopy,0,0);
+                        pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael, &ci);
                     }
                 }
 
@@ -448,12 +516,17 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                 if (floors >= 1)
                     --floors;
 
-                EventAutoCopy* event = new (std::nothrow) EventAutoCopy(pl, 60, floors, id);
+                UInt8 secs = 0;
+                if (cfg.GMCheck)
+                    secs = 60;
+                else
+                    secs = 20;
+                EventAutoCopy* event = new (std::nothrow) EventAutoCopy(pl, secs, floors, id);
                 if (event)
                 {
                     PushTimerEvent(event);
                     pl->addFlag(Player::AutoCopy);
-                    pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 1, true);
+                    pl->setBuffData(PLAYER_BUFF_AUTOCOPY, id, true);
                     DB().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
 
                     CopyData& tcd = getCopyData(pl, id);
@@ -475,17 +548,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     pl->sendMsgCode(0, 1415);
                     return;
                 }
-#if 0
-                PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
-                pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
-                pl->delFlag(Player::AutoCopy);
-                DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
-#endif
+
                 autoClear(pl);
 
-                CopyData& cd = getCopyData(pl, id);
+                CopyData& tcd = getCopyData(pl, id);
                 Stream st(REP::AUTO_COPY);
-                st << static_cast<UInt8>(1) << id << cd.floor << cd.spot << Stream::eos;
+                st << static_cast<UInt8>(1) << id << tcd.floor << tcd.spot << Stream::eos;
                 pl->send(st);
             }
             break;
@@ -497,12 +565,56 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     pl->sendMsgCode(0, 1415);
                     return;
                 }
+
+                // TODO:
+                //if (pl->getVipLevel() < 9)
+                //{
+                //    return;
+                //}
+
+                autoClear(pl);
+                pl->addFlag(Player::AutoCopy);
+                pl->resetAutoCopyFailed();
+
+                CopyData& tcd = getCopyData(pl, id);
+                UInt8 sp = tcd.spot;
+                for (UInt8 f = tcd.floor; f <= GData::copyMaxManager[id]; ++f)
+                {
+                    UInt8 s = GData::copyManager[id<<8|f].size();
+                    for (UInt8 i = sp; i < s; ++i)
+                    {
+                        if (pl->isAutoCopyFailed())
+                            break;
+                        GameMsgHdr hdr(0x275, pl->getThreadId(), pl, sizeof(id));
+                        GLOBAL().PushMsg(hdr, &id);
+                    }
+                    sp = 1;
+                }
+
+                pl->delFlag(Player::AutoCopy);
+                pl->resetAutoCopyFailed();
             }
             break;
 
         default:
             break;
     }
+}
+
+void PlayerCopy::sendAutoCopy(Player* pl)
+{
+    UInt8 id = pl->getBuffData(PLAYER_BUFF_AUTOCOPY);
+    if (!id)
+        return;
+
+    FastMutex::ScopedLock lk(_mutex);
+    CopyData& tcd = getCopyData(pl, id); 
+    if (!tcd.floor)
+        return;
+
+    Stream st(REP::AUTO_COPY);
+    st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos; 
+    pl->send(st);
 }
 
 } // namespace GObject

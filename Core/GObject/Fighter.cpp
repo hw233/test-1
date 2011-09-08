@@ -1592,7 +1592,7 @@ int Fighter::hasSkill( UInt16 skill )
 {
     for (size_t i = 0; i < _skills.size(); ++i)
     {
-        if (_skills[i] == skill || SKILL_ID(_skills[i]) == SKILL_ID(skill))
+        if (SKILL_ID(_skills[i]) == SKILL_ID(skill))
             return static_cast<int>(i);
     }
     return -1;
@@ -1602,11 +1602,8 @@ int Fighter::isSkillUp(UInt16 skill)
 {
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
-        if (skill == _skill[i] || SKILL_ID(skill) == SKILL_ID(_skill[i])) {
-            if (skill != _skill[i])
-                skill = _skill[i];
+        if (SKILL_ID(skill) == SKILL_ID(_skill[i]))
             return i;
-        }
     }
     return -1;
 }
@@ -1860,11 +1857,8 @@ int Fighter::isCittaUp( UInt16 citta )
 {
     for (int i = 0; i < getUpCittasMax(); ++i)
     {
-        if (citta == _citta[i] || CITTA_ID(citta) == CITTA_ID(_citta[i])) {
-            if (citta != _citta[i])
-                citta = _citta[i];
+        if (CITTA_ID(citta) == CITTA_ID(_citta[i]))
             return i;
-        }
     }
     return -1;
 }
@@ -1934,7 +1928,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         { // upgrade
             if (_citta[idx] != citta)
             {
-                if (cb->needsoul > getMaxSoul() - getSoul())
+                const GData::CittaBase* yacb = GData::cittaManager[_citta[idx]];
+                if (!yacb)
+                    return false;
+                if (cb->needsoul > getMaxSoul() - (getSoul() - yacb->needsoul))
                     return false;
 
                 // XXX: do not send message to client
@@ -2233,7 +2230,7 @@ int Fighter::hasCitta( UInt16 citta )
 {
     for (size_t i = 0; i < _cittas.size(); ++i)
     {
-        if (_cittas[i] == citta || CITTA_ID(_cittas[i]) == CITTA_ID(citta))
+        if (CITTA_ID(_cittas[i]) == CITTA_ID(citta))
             return static_cast<int>(i);
     }
     return -1;

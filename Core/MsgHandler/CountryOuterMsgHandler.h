@@ -289,6 +289,13 @@ struct DungeonCompleteAutoReq
 	MESSAGE_DEF(REQ::BABEL_END);
 };
 
+struct AutoCopyReq
+{
+    UInt8 type;
+    UInt8 id;
+	MESSAGE_DEF2(REQ::AUTO_COPY, UInt8, type, UInt8, id);
+};
+
 struct DailyReq
 {
 	MESSAGE_DEF(REQ::DAILY);
@@ -342,7 +349,8 @@ struct RequestChallengeReq
 };
 struct BattleEndReq
 {
-	MESSAGE_DEF(REQ::FIGHT_EXIT);
+    UInt16 mark;
+	MESSAGE_DEF1(REQ::FIGHT_EXIT, UInt16, mark);
 };
 
 struct CopyReq
@@ -889,6 +897,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	}
     {
         pl->sendNewGuild();
+    }
+    {
+        pl->sendAutoCopy();
     }
 	pl->sendWallow();
 	pl->sendEvents();
@@ -1844,6 +1855,37 @@ void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
 	GLOBAL().PushMsg(hdr2, NULL);
 }
 
+void OnAutoCopy( GameMsgHdr& hdr, AutoCopyReq& dar )
+{
+	MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
+
+	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	{
+		pl->sendMsgCode(1, 1014);
+		return;
+	}
+
+    switch (dar.type)
+    {
+        case 0:
+            pl->startAutoCopy(dar.id);
+            break;
+
+        case 1:
+            pl->cancelAutoCopy(dar.id);
+            break;
+
+        case 2:
+            pl->instantAutoCopy(dar.id);
+            break;
+
+        default:
+            break;
+    }
+}
+
 struct Dungeon_Enum
 {
 	Player * player;
@@ -2263,14 +2305,76 @@ void OnInstantAutoBattleReq( GameMsgHdr& hdr, InstantAutoBattleReq& )
 	player->instantAutoBattle();
 }
 
-void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& )
+void kick(Player* pl)
+{
+    TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
+    if (conn)
+    {    
+        Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
+        if (cl) 
+        {    
+            pl->SetSessionID(-1);
+            pl->testBattlePunish();
+            pl->setOnline(false);
+            static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
+            cl->send(kick_pkt, 4);
+            cl->SetPlayer(NULL);
+            cl->pendClose();
+        }    
+    }    
+}
+
+void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt32 now = TimeUtil::Now();
-	if(now < PLAYER_DATA(player, battlecdtm))
+	if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
+
+    UInt8 mark = player->getMark();
+    UInt16 nmark = req.mark;
+    nmark >>= 5; 
+    nmark += 5;
+    nmark >>= 2;
+
+    if (mark != nmark)
+    {
+        kick(player);
+        return;
+    }
+
 	player->checkLastBattled();
-	player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+	//player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
+
+    UInt32 lastEnd = player->getLastBattleEndTime();
+    if (!lastEnd)
+    {
+        player->setLastBattleEndTime(now);
+        return;
+    }
+
+    if (now < lastEnd)
+    {
+        kick(player);
+        return;
+    }
+    else if (now - lastEnd <= 1)
+    {
+        player->countBattleEnd();
+    }
+
+    if (now - lastEnd >= 2)
+    {
+        if (player->getCountBattleEnd() >= 3)
+        {
+            kick(player);
+        }
+        else
+        {
+            player->setLastBattleEndTime(now);
+            player->resetCountBattleEnd();
+        }
+    }
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
@@ -2793,7 +2897,9 @@ void OnMailDelReq( GameMsgHdr& hdr, const void * buffer )
 	//}
 	std::vector<UInt8> rep;
 	rep.resize(4 + blen);
-	*reinterpret_cast<UInt32 *>(&rep[0]) = (REP::MAIL_DELETE << 6) | 0xFF0000 | blen;
+    *(UInt16*)(&rep[0]) = blen;
+    rep[2] = 0xFF;
+    rep[3] = REP::MAIL_DELETE;
 	memcpy(&rep[4], buffer, blen);
 	player->send(&rep[0], rep.size());
 	if(c > 0)

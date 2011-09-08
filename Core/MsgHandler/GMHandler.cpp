@@ -1683,6 +1683,30 @@ void GMHandler::OnSetLevel( GObject::Player * player, std::vector<std::string>& 
 		return;
 	if(args.size() > 1)
 	{
+        if (args.size() >= 3)
+        {
+            GObject::Player * pl = GObject::globalPlayers[atoi(args[2].c_str())];
+            if (!pl)
+                return;
+            UInt32 fighterId = atoi(args[0].c_str());
+            if (!fighterId)
+            {
+                UInt8 lvl = atoi(args[1].c_str());
+                UInt64 exp = GData::expTable.getLevelMin(lvl);
+                pl->setLevelAndExp(lvl, exp);
+            }
+            else
+            {
+                GObject::Fighter * fgt = pl->findFighter(fighterId);
+                if(fgt == NULL)
+                    return;
+                UInt8 lvl = atoi(args[1].c_str());
+                UInt64 exp = GData::expTable.getLevelMin(lvl);
+                fgt->setLevelAndExp(lvl, exp);
+            }
+            return;
+        }
+
 		UInt32 fighterId = atoi(args[0].c_str());
 		GObject::Fighter * fgt = player->findFighter(fighterId);
 		if(fgt == NULL)
@@ -2173,7 +2197,7 @@ void GMHandler::OnKick(GObject::Player *player, std::vector<std::string>& args)
                 pl->SetSessionID(-1);
                 pl->testBattlePunish();
                 pl->setOnline(false);
-                static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
+                static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::RECONNECT};
                 cl->send(kick_pkt, 4);
                 cl->SetPlayer(NULL);
                 cl->pendClose();

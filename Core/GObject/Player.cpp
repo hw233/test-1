@@ -347,9 +347,9 @@ namespace GObject
         {
             if (ret == 0)
                 m_Player->autoCopyFailed(id);
-            m_Player->delFlag(Player::AutoCopy);
-			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
-            DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", m_Player->getId());
+            //m_Player->delFlag(Player::AutoCopy);
+			//PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+            //DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", m_Player->getId());
         }
     }
 
@@ -374,7 +374,8 @@ namespace GObject
 		_isOnline(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
-		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), _justice_roar(0), m_tripodAwdId(0), m_tripodAwdNum(0), m_ulog(NULL)
+		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false), m_endTime(0), m_fightCnt(0),
+        _justice_roar(0), m_autoCopyComplete(0), m_tripodAwdId(0), m_tripodAwdNum(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -724,7 +725,14 @@ namespace GObject
 			if(_playerData.status & SGPunish)
 				_playerData.battlecdtm = data;
 			else
-				_playerData.battlecdtm = now + (data - now) / 6;
+            {
+                if (data - now >= 30)
+                    _playerData.battlecdtm = now + (data - now) / 6;
+                else
+                    _playerData.battlecdtm = now + (data - now);
+                if (data - now < 2)
+                    _playerData.battlecdtm = now + 2;
+            }
 		}
 		if(id >= PLAYER_BUFF_COUNT || _buffData[id] == data)
 			return;
@@ -750,7 +758,10 @@ namespace GObject
 	{
 		if(idx > PLAYER_BUFF_COUNT)
 			return 0;
-		if(idx != PLAYER_BUFF_AUTOHEAL && idx != PLAYER_BUFF_HOLY && _buffData[idx] > 0 && _buffData[idx] <= tm)
+		if(idx != PLAYER_BUFF_AUTOHEAL &&
+                idx != PLAYER_BUFF_HOLY && 
+                idx != PLAYER_BUFF_AUTOCOPY && 
+                _buffData[idx] > 0 && _buffData[idx] <= tm)
 		{
 			_buffData[idx] = 0;
 			updateDB(0x40 + idx, 0);
@@ -1150,11 +1161,13 @@ namespace GObject
 			}
 		}
 		st.init(REP::USER_INFO);
+        UInt8 mark = uRand(0xFF);
+        setMark(mark);
 		UInt8 status = static_cast<UInt8>(_playerData.status);
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << mark << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -1567,9 +1580,10 @@ namespace GObject
     void Player::autoCopyFailed(UInt8 id)
     {
         GObject::playerCopy.failed(this, id);
+        setCopyFailed();
     }
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, bool ato, std::vector<UInt32>* loot )
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
         // TODO:
@@ -2952,27 +2966,21 @@ namespace GObject
         if (!im) {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.shimen[i] == taskid) {
-                    //if (ColorTaskOutOfAccept(4, im))
-                    //    break;
-
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
-                    AddExp(award); // TODO:
+                    AddExp(award);
                     ++_playerData.smFinishCount;
                     _playerData.shimen[i] = 0;
                     _playerData.smcolor[i] = 0;
 
                     sendColorTask(0, 0);
-                    writeShiMen();
+                   
                     return true;
                 }
             }
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.yamen[i] == taskid) {
-                    //if (ColorTaskOutOfAccept(5, im))
-                    //    break;
-
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.ymcolor[i], GetLev());
-                    getTael(award); // TODO:
+                    getTael(award);
                     ++_playerData.ymFinishCount;
                     _playerData.yamen[i] = 0;
                     _playerData.ymcolor[i] = 0;
@@ -3155,12 +3163,21 @@ namespace GObject
 
     void Player::clearFinishCount()
     {
-        _playerData.smAcceptCount = _playerData.smAcceptCount - _playerData.smFinishCount;
-        _playerData.ymAcceptCount = _playerData.ymAcceptCount - _playerData.ymFinishCount;
         _playerData.smFinishCount = 0;
         _playerData.ymFinishCount = 0;
         _playerData.smFreeCount = 0;
         _playerData.ymFreeCount = 0;
+
+        UInt8 c = 0;
+        UInt8 n = 0;
+        for (UInt8 i=0; i<6; ++i)
+        {
+            if (_playerData.yamen[i]) ++c;
+            if (_playerData.shimen[i]) ++n;
+        }
+        _playerData.smAcceptCount = c;
+        _playerData.ymAcceptCount = n;
+
         writeShiMen();
         writeYaMen();
         if (isOnline())
@@ -3395,14 +3412,14 @@ namespace GObject
             const std::vector<UInt8>& factor = GData::GDataManager::GetFlushTaskFactor(ttype, ftype);
             UInt8 rfac[5] = {0};
             rfac[0] = factor[0];
-            for (int i = 1; i < 5; ++i) {
+            for (int i = 1; i < 5; ++i)
                 rfac[i] = rfac[i-1] + factor[i];
-            }
 
             bool percolor = false;
             do {
                 ++ncount;
-                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < SHIMEN_TASK_MAXCOUNT) || (ttype == 1 && _playerData.ymFreeCount < YAMEN_TASK_MAXCOUNT))) || ftype) {
+                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < SHIMEN_TASK_MAXCOUNT) ||
+                                (ttype == 1 && _playerData.ymFreeCount < YAMEN_TASK_MAXCOUNT))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     if (!task.size())
@@ -3415,10 +3432,10 @@ namespace GObject
                         for (int i = 0; i < 6; ++i) {
                             UInt32 j = rnd(task.size());
                             if (ttype == 0) {
-                                while (idxs.find(j) != idxs.end() && !hasCTAccept(_playerData.shimen, task[j]))
+                                while (idxs.find(j) != idxs.end() || hasCTAccept(_playerData.shimen, task[j]))
                                     j = rnd(task.size());
                             } else {
-                                while (idxs.find(j) != idxs.end() && !hasCTAccept(_playerData.yamen, task[j]))
+                                while (idxs.find(j) != idxs.end() || hasCTAccept(_playerData.yamen, task[j]))
                                     j = rnd(task.size());
                             }
                             idxs.insert(j);
@@ -5429,6 +5446,11 @@ namespace GObject
     void Player::instantAutoCopy(UInt8 id)
     {
         playerCopy.autoBattle(this, id, 2);
+    }
+
+    void Player::sendAutoCopy()
+    {
+        playerCopy.sendAutoCopy(this);
     }
 
 }

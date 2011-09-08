@@ -755,7 +755,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `qqvipl`, `qqvipyear`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
