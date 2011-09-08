@@ -47,6 +47,7 @@ enum PurchaseType
     YamenTask,
     YamenTaskFresh,
     AutoCopyComplete,
+    InstantPracticeAcc,
 };
 
 enum MoneyType

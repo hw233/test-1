@@ -94,4 +94,6 @@ MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);
 MSG_REG_2(GameMsgHdr, 0x1EF, OnRunscriptBattleReq);
 
+MSG_REG_2(GameMsgHdr, 0x1F0, OnDoInstantPracticeAccReq);
+
 MSG_HANDLER_END()

@@ -149,10 +149,12 @@ void World::calWeekDay()
 		ClanCityBattle::setMaxEnterCount(3);
 	if(_wday == 3)
 	{
+#if 0
 		size_t sz;
 		UInt16 * prices = Dungeon::getPrice(sz);
 		for(size_t i = 0; i < sz; ++ i)
 			prices[i] /= 2;	
+#endif
 	}
     if(_wday == 1)
     {

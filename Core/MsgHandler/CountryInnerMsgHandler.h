@@ -835,4 +835,11 @@ void OnArenaBetResult( GameMsgHdr& hdr, const void * data )
 		player->getTael(idata & 0xFF);
 }
 
+void OnPracticeExpAddReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    const PracticeFighterExp* pfexp = reinterpret_cast<const PracticeFighterExp*>(data);
+    player->AddPracticeExp(pfexp);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_

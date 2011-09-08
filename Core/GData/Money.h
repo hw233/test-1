@@ -69,6 +69,8 @@ enum
     GEMDETACH,
 // 装备分解
     SPLIT,
+// 修炼加速
+    INSTANTPRACTICE,
 
     MONEY_MAX,
 };

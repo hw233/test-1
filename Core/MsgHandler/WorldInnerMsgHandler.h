@@ -494,4 +494,14 @@ void OnRunscriptBattleReq( GameMsgHdr&, const void * data )
 	Script::BattleFormula::getCurrent()->runScript(script);
 }
 
+void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::EventWrapper::iterator it = GObject::eventWrapper.FindTimerEvent(player, EVENT_PLAYERPRACTICING, player->getId());
+	if(it == GObject::eventWrapper.end())
+		return;
+	GObject::EventPlayerPractice* event = static_cast<GObject::EventPlayerPractice*>(it->second);
+	event->instantComplete();
+}
+
 #endif // _WORLDINNERMSGHANDLER_H_

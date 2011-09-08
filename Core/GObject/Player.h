@@ -66,6 +66,8 @@ namespace GObject
 #define SHIMEN_TASK_MAXCOUNT        5       // 师门每日最大任务数
 #define YAMEN_TASK_MAXCOUNT         5       // 师门每日最大任务数
 
+#define MAX_PRACTICE_FIGHTRES       6       // 最大修炼散仙数
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -133,6 +135,7 @@ namespace GObject
         void Process(UInt32);
 		bool Accelerate(UInt32);
         inline UInt32 GetEnd() { return _end; }
+		bool instantComplete();
 
 	private:
         UInt32 _end;
@@ -192,6 +195,13 @@ namespace GObject
 		UInt32 accExp;
 		float  factor;
 	}; 
+
+    struct PracticeFighterExp
+    {
+        UInt32   goldUse;
+        Fighter* fighters[MAX_PRACTICE_FIGHTRES];
+        UInt8    counts[MAX_PRACTICE_FIGHTRES];
+    };
 
 	struct SecondPWDInfo
 	{
@@ -887,6 +897,7 @@ namespace GObject
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
         bool accPractice();
+        void AddPracticeExp(const PracticeFighterExp* pfexp);
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
