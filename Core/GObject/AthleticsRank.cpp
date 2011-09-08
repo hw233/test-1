@@ -437,7 +437,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	st << Stream::eos;
 	player->send(st);
 
-    if((*rank)->extrachallenge)
+    if((*rank)->extrachallenge && type == static_cast<UInt16>(0xFFFF))
     {
         Stream st(REP::FIGHT_INFO_CHANGE);
         st << static_cast<UInt16>(0) << Stream::eos;
@@ -454,7 +454,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 		return;
 
     UInt32 extrachallenge = (*atkerRank->second)->extrachallenge;
-    if((0 == extrachallenge) || (extrachallenge & 0x80000000))
+    if((0 == extrachallenge) || (extrachallenge & static_cast<UInt32>(0x80000000)))
         return;
 
     Rank tmp = _athleticses[row].begin();
@@ -476,7 +476,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
             }
             else
             {
-                setAthleticsExtraChallenge(atker, 0x80000000 | extrachallenge);
+                setAthleticsExtraChallenge(atker, static_cast<UInt32>(0x80000000) | extrachallenge);
                 std::string name = defer->getName();
                 challenge(atker, name, type);
             }
@@ -517,7 +517,11 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	if(atkerRankPos != 1)
 	{
 		if (atkerRankPos <= deferRankPos)
+        {
+            if(type)
+                setAthleticsExtraChallenge(atker, 0);
 			return;
+        }
 		if (atkerRankPos - deferRankPos > 10 && !type)
 		{
 			//Stream st(REP::ATHLETICS_CHALLENGE);
@@ -1327,13 +1331,13 @@ UInt32 AthleticsRank::setAthleticsExtraChallenge(Player* player, UInt32 extracha
 	if (found == _ranks[row].end())
 		return 0;
 
-    if(getRankPos(row, found->second) < (0x7FFFFFFF & extrachallenge) + 1)
+    if(getRankPos(row, found->second) < (static_cast<UInt32>(0x7FFFFFFF) & extrachallenge) + 1)
         return 0;
 
     (*found->second)->extrachallenge = extrachallenge;
     DB().PushUpdateData("UPDATE `athletics_rank` SET `extrachallenge` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->extrachallenge, (*found->second)->ranker->getId());
 
-    if(extrachallenge)
+    if(extrachallenge && !(static_cast<UInt32>(0x80000000) & extrachallenge))
     {
         Stream st(REP::FIGHT_INFO_CHANGE);
         st << static_cast<UInt16>(0) << Stream::eos;
@@ -1391,7 +1395,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         player1 = atker;
         player2 = defer;
 
-        if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x100) && 0 != getAthleticsExtraChallenge(atker) ) //特殊挑战胜利 一天连升200个排名
+        if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x100) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) ) //特殊挑战胜利 一天连升200个排名
         {
             cond = 16;
             color = 5;
@@ -1400,7 +1404,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 3;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && 0 != getAthleticsExtraChallenge(atker) )   //特殊挑战胜利 一天连升100个排名
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )   //特殊挑战胜利 一天连升100个排名
         {
             cond = 16;
             color = 4;
@@ -1409,7 +1413,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x400) && 0 != getAthleticsExtraChallenge(atker) )    //特殊挑战胜利 一天连升50个排名
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x400) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )    //特殊挑战胜利 一天连升50个排名
         {
             cond = 16;
             color = 3;
@@ -1418,7 +1422,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && 0 != getAthleticsExtraChallenge(atker) )    //特殊挑战胜利 一天连升20个排名
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )    //特殊挑战胜利 一天连升20个排名
         {
             cond = 16;
             color = 2;

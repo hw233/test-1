@@ -684,7 +684,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, std::vector<AttackAct>* atkAct, UInt32 dmg)
 {
-    if(bf == NULL || bo == NULL)
+    if(bf == NULL || bo == NULL || atkAct == NULL)
         return;
 
     if(bo->getStunRound() || bo->getConfuseRound() || bo->getForgetRound())
