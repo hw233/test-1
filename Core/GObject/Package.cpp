@@ -18,6 +18,7 @@
 #include "Server/Cfg.h"
 #include "GData/SkillTable.h"
 #include "GData/Money.h"
+#include "GData/Store.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -428,6 +429,8 @@ namespace GObject
 					ItemNotify(item->GetItemType().getId(), num);
 				if(fromWhere != 0 && item->getQuality() >= 3)
 					DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, num, fromWhere, TimeUtil::Now());
+                if (fromWhere == FromNpcBuy)
+                    udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
 				return item;
 			}
 			return NULL;
@@ -448,6 +451,8 @@ namespace GObject
 					ItemNotify(item->GetItemType().getId(), num);
 				if(fromWhere != 0 && item->getQuality() >= 3)
 					DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, num, fromWhere, TimeUtil::Now());
+                if (fromWhere == FromNpcBuy)
+                    udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
 				return item;
 			}
 
@@ -997,6 +1002,7 @@ namespace GObject
 				{
 					DelItem2(item, num);
 					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, num, TimeUtil::Now());
+                    udpLog(item->getClass(), id, num, GData::store.getPrice(id), "sub");
 					ret = true;
 				}				
 			}
@@ -1006,6 +1012,10 @@ namespace GObject
 					ret = false;
 				else if (GameAction()->RunItemNormalUse(m_Owner, id, param, num, false))
 				{
+                    ItemBase * item = FindItem(id, true);
+                    if (!item)
+                        item = FindItem(id, false);
+                    udpLog(item->getClass(), id, num, GData::store.getPrice(id), "sub");
 					DelItemAny(id, num);
 					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, num, TimeUtil::Now());
 					ret = true;
@@ -1024,6 +1034,19 @@ namespace GObject
 		SYSMSG_SENDV(104, player, itemid);
 		SYSMSG_SENDV(1004, player, itemid);		
 	}
+
+    void Package::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
+    {
+        if (!op || !price)
+            return;
+        char _price[32] = {0};
+        char _type[32] = {0};
+        char _id[32] = {0};
+        snprintf(_price, 32, "%u", price);
+        snprintf(_type, 32, "%u", type);
+        snprintf(_id, 32, "%u", id);
+        m_Owner->udpLog(op, _type, _id, _price, "", "", "props", num);
+    }
 
     UInt8 Package::GetItemCareer(UInt32 itemid, UInt8 bind)
     {

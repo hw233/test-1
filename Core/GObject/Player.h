@@ -874,16 +874,6 @@ namespace GObject
         inline void setMark(UInt8 mark) { m_mark = mark; }
         inline UInt8 getMark() { return m_mark; }
 
-    private:
-        UInt32 m_endTime;
-        UInt32 m_fightCnt;
-    public:
-        inline void setLastBattleEndTime(UInt32 t) { m_endTime = t; }
-        inline UInt32 getLastBattleEndTime() { return m_endTime; }
-        inline void countBattleEnd() { ++m_fightCnt; }
-        inline UInt32 getCountBattleEnd() { return m_fightCnt; }
-        inline void resetCountBattleEnd() { m_fightCnt = 0; }
-
         // 通天塔正义之吼
         UInt8 _justice_roar;
 	public:
@@ -947,7 +937,7 @@ namespace GObject
         }
 
     public:
-        void udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
+        void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);
     private:
         CUserLogger* m_ulog;

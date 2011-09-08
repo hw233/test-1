@@ -2345,36 +2345,6 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 
 	player->checkLastBattled();
 	//player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
-
-    UInt32 lastEnd = player->getLastBattleEndTime();
-    if (!lastEnd)
-    {
-        player->setLastBattleEndTime(now);
-        return;
-    }
-
-    if (now < lastEnd)
-    {
-        kick(player);
-        return;
-    }
-    else if (now - lastEnd <= 1)
-    {
-        player->countBattleEnd();
-    }
-
-    if (now - lastEnd >= 2)
-    {
-        if (player->getCountBattleEnd() >= 3)
-        {
-            kick(player);
-        }
-        else
-        {
-            player->setLastBattleEndTime(now);
-            player->resetCountBattleEnd();
-        }
-    }
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )

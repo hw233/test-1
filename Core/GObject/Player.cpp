@@ -374,7 +374,7 @@ namespace GObject
 		_isOnline(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
-		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false), m_endTime(0), m_fightCnt(0),
+		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
         _justice_roar(0), m_autoCopyComplete(0), m_tripodAwdId(0), m_tripodAwdNum(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
@@ -537,20 +537,18 @@ namespace GObject
             }
         }
 
-        {
-            char buf[1024] = {0};
-            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%u_%u_%"I64_FMT"u|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
-            udpLog(buf, "", "", "", "", "", "", "login");
-        }
+        udpLog("", "", "", "", "", "", "login");
 	}
 
-    void Player::udpLog(const char* umsg, const char* str1, const char* str2, const char* str3, const char* str4,
+    void Player::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
     {
         if (m_ulog)
         {
-            m_ulog->SetUserMsg(umsg);
+            char buf[1024] = {0};
+            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%u_%u_%"I64_FMT"u|||||%u||||||||||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
+            m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count);
         }
     }
@@ -1572,7 +1570,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
 
 		return res;
 	}
@@ -1668,7 +1666,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
 		return res;
 	}
 
@@ -3172,11 +3170,11 @@ namespace GObject
         UInt8 n = 0;
         for (UInt8 i=0; i<6; ++i)
         {
-            if (_playerData.yamen[i]) ++c;
             if (_playerData.shimen[i]) ++n;
+            if (_playerData.yamen[i]) ++c;
         }
-        _playerData.smAcceptCount = c;
-        _playerData.ymAcceptCount = n;
+        _playerData.smAcceptCount = n;
+        _playerData.ymAcceptCount = c;
 
         writeShiMen();
         writeYaMen();
