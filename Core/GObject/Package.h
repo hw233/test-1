@@ -159,6 +159,8 @@ namespace GObject
 			return iter->second;
 		}
 
+        void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
+
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 

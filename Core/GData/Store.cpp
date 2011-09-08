@@ -28,6 +28,18 @@ UInt32 Store::getPrice( UInt8 type, UInt16 itemId )
 	return it->second;
 }
 
+UInt32 Store::getPrice( UInt16 itemId )
+{
+    for (UInt8 type = 2; type <= 3; ++type)
+    {
+        std::map<UInt32, UInt32>::iterator it = _itemPrices[type - 1].find(itemId);
+        if(it == _itemPrices[type - 1].end())
+            return 0;
+        return it->second;
+    }
+    return 0;
+}
+
 void Store::sendList( UInt8 type, GObject::Player * player )
 {
 	if(type < 1 || type > 7)

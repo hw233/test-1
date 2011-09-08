@@ -218,9 +218,9 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 
 	if(writedb)
 	{
-		char title2[256], content2[2048];
+		char title2[256], content2[4096];
 		mysql_escape_string(title2, title.c_str(), 256/2-1);
-		mysql_escape_string(content2, content.c_str(), 2048/2-1);
+		mysql_escape_string(content2, content.c_str(), 4096/2-1);
 		DB().PushUpdateData("INSERT INTO `mail` (`mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId`) VALUES (%u, %"I64_FMT"u, '%s', %u, %u, '%s', '%s', %u)", mail->id, ((_owner != NULL) ? _owner->getId() : static_cast<UInt64>(0)), mail->sender.c_str(), mail->recvTime, mail->flag, title2, content2, mail->additional);
 	}
 	if(itemsInfo != NULL)
