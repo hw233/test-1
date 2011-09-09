@@ -26,6 +26,7 @@
 #include "Common/SHA1Engine.h"
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
+#include <memcache.h>
 
 struct UserDisconnectStruct
 {
