@@ -448,7 +448,7 @@ function exchangeExtraReward(player, id)
 	if id == 8 then
 		local package = player:GetPackage()
 		if package:IsFull() then
-		player:sendMsgCode(2, 1011, 0)
+            player:sendMsgCode(2, 1011, 0)
 			return;
 		end
 		if not package:DelItem(9224, 10, true) then
@@ -603,3 +603,60 @@ function exchangeExtraReward(player, id)
 	package:AddItem(9210, 1, true);	
   end
 end
+
+
+
+function PrepareTask(player)
+    local ActiveTask = {}
+    local date = os.date("%Y%m%d", os.time())
+    if date >=  "20110909" and date <= "20110912" then
+        local num = player:getBuffData(22)
+        if num == 0 then
+            local action = ActionTable:Instance();
+            action.m_ActionType = 0x70;
+            action.m_ActionToken = 1;
+            action.m_ActionID = 1; -- 领取月饼
+            action.m_ActionStep = 0;
+            action.m_ActionMsg = "中秋月饼";
+            table.insert(ActiveTask, action);
+        else
+            local action = ActionTable:Instance();
+            action.m_ActionType = 0x70;
+            action.m_ActionToken = 1;
+            action.m_ActionID = 0;
+            action.m_ActionStep = 0;
+            action.m_ActionMsg = "今日已领取中秋月饼";
+            table.insert(ActiveTask, action);
+        end
+    end
+
+    return ActiveTask
+end
+
+function RunActiveTask(player, id)
+    return PrepareTask(player)
+end
+
+function RunActiveTaskStep(player, id, actionId)
+    local ActiveTask = {}
+    if actionId == 1 then
+        local now = os.time();
+        local h = os.date("%H", os.time())
+        local m = os.date("%M", os.time())
+        local s = os.date("%S", os.time())
+        player:setBuffData(22, 24*60*60-(h*60*60+m*60+s))
+        local package = player:GetPackage()
+        package:AddItem(68, 5, true);	
+
+        local action = ActionTable:Instance();
+        action.m_ActionType = 0x70;
+        action.m_ActionToken = 1;
+        action.m_ActionID = 0;
+        action.m_ActionStep = 0;
+        action.m_ActionMsg = "今日已领取中秋月饼";
+        table.insert(ActiveTask, action);
+    elseif actionId == 2 then
+    end
+    return ActiveTask
+end
+

@@ -1503,6 +1503,18 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     sendModification(0x30, peerless);
 }
 
+UInt8 Fighter::getAcupointCnt()
+{
+    UInt8 c = 0;
+    for (UInt8 i = 0; i < ACUPOINTS_MAX; ++i)
+    {
+        if (!_acupoints[i])
+            break;
+        ++c;
+    }
+    return c;
+}
+
 void Fighter::setAcupoints( std::string& acupoints, bool writedb )
 {
     if (!acupoints.length())

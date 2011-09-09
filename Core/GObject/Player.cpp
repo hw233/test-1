@@ -274,7 +274,7 @@ namespace GObject
 
         //data->lock.lock();
         Fighter* fgt = 0;
-        int n = 0;
+        UInt8 n = 0;
         for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
         {
             fgt = m_Player->findFighter(*i);
@@ -339,7 +339,7 @@ namespace GObject
 
             //data->lock.lock();
             Fighter* fgt = 0;
-            int n = 0;
+            UInt8 n = 0;
             for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
             {
                 fgt = m_Player->findFighter(*i);
@@ -440,15 +440,8 @@ namespace GObject
 
     void EventAutoCopy::Process(UInt32 leftCount)
     {
-        UInt8 ret = GObject::playerCopy.fight(m_Player, id, true);
-        if (leftCount == 0 || ret == 2 || ret == 0)
-        {
-            if (ret == 0)
-                m_Player->autoCopyFailed(id);
-            //m_Player->delFlag(Player::AutoCopy);
-			//PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
-            //DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", m_Player->getId());
-        }
+		GameMsgHdr hdr(0x276, m_Player->getThreadId(), m_Player, sizeof(id));
+		GLOBAL().PushMsg(hdr, &id);
     }
 
     bool EventAutoCopy::Accelerate(UInt32 times)
@@ -1671,7 +1664,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.8);
 
 		return res;
 	}
@@ -1767,7 +1760,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.8);
 		return res;
 	}
 
@@ -3092,6 +3085,12 @@ namespace GObject
         } else {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fshimen[i] == taskid) {
+                    if (GetLev() < static_cast<UInt8>(30))
+                    {
+                        sendMsgCode(1, 1016);
+                        return false;
+                    }
+
                     if (ColorTaskOutOfAccept(4, im))
                         return false;
 
@@ -3117,6 +3116,12 @@ namespace GObject
             }
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fyamen[i] == taskid) {
+                    if (GetLev() < static_cast<UInt8>(30))
+                    {
+                        sendMsgCode(1, 1016);
+                        return false;
+                    }
+
                     if (ColorTaskOutOfAccept(5, im))
                         return false;
 

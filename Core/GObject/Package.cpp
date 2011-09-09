@@ -1000,9 +1000,9 @@ namespace GObject
 					ret = false;
 				else if (GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
+                    udpLog(item->getClass(), id, num, GData::store.getPrice(id), "sub");
 					DelItem2(item, num);
 					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, num, TimeUtil::Now());
-                    udpLog(item->getClass(), id, num, GData::store.getPrice(id), "sub");
 					ret = true;
 				}				
 			}

@@ -29,6 +29,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setChannelInfo", &Cfg::setChannelInfo);
 	class_def<Cfg>("setLoginLimit", &Cfg::setLoginLimit);
 	class_def<Cfg>("setLoginMax", &Cfg::setLoginMax);
+	class_def<Cfg>("setVerifyTokenServer", &Cfg::setVerifyTokenServer);
 	set("cfg", cfg);
 }
 

@@ -4,7 +4,6 @@
 #include "GObjectManager.h"
 
 #define ARMORS_MAX 7
-#define FIGHTER_BUFF_COUNT 4
 
 #include "Item.h"
 #include "GData/AttrExtra.h"
@@ -23,6 +22,9 @@ namespace GObject
 #define FIGHTER_BUFF_ATTR1		0x01
 #define FIGHTER_BUFF_ATTR2		0x02
 #define FIGHTER_BUFF_ATTR3		0x03
+#define FIGHTER_BUFF_XTHTYT     0x04
+
+#define FIGHTER_BUFF_COUNT 0x10 
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个
 #define CITTA_LEVEL_MAX 100
@@ -95,6 +97,7 @@ public:
     int hasPeerless(UInt16 pl);
 
     inline UInt8 getAcupointsCntMax() { return 3; }
+    UInt8 getAcupointCnt();
     bool setAcupoints(int idx, UInt8 v, bool = true, bool = false);
     bool incAcupointsBit(int idx, bool = true);
 

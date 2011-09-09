@@ -26,6 +26,7 @@
 #include "Common/SHA1Engine.h"
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
+#include <memcache.h>
 
 struct UserDisconnectStruct
 {
@@ -430,14 +431,24 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			UInt32 gold = GObject::prepaid.pop(pl->getId());
 			if(gold > 0)
 			{
-				GameMsgHdr hdr(0x2F0, country, pl, sizeof(UInt32));
-				GLOBAL().PushMsg(hdr, &gold);
+                struct Recharge
+                {
+                    UInt8 type;
+                    UInt32 gold;
+                } recharge;
+
+                recharge.type = 1; // XXX: 创建角色之前充值
+                recharge.gold = gold;
+
+				GameMsgHdr hdr(0x2F0, country, pl, sizeof(recharge));
+				GLOBAL().PushMsg(hdr, &recharge);
+
+                // XXX: 把创建银角色前的所有订单号置成成功
+                DB().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", pl->getId());
 			}
 
             pl->GetPackage()->AddItem(18, 1, true);
             pl->getGold(20000);
-
-            // LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]登陆成功, 新建号，返回码：%u\n", pl->getId(), res);
 		}
 	}
 
@@ -453,50 +464,73 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 {
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
 
+    std::string token;
+    std::string no;
     UInt64 player_Id;
-    UInt32 gold;
-    //std::string md5Key="kingxin";
-    //std::string md5value="";
+    UInt16 id;
+    UInt32 num;
+
+    brd>>token;
+    brd>>no;
     brd>>player_Id;
-    brd>>gold;
-    /**
-    brd>>md5value;
+    brd>>id;
+    brd>>num;
 
-    std::stringstream ss;
-    ss<<order_Id<<player_Id<<gold;
-    std::string key=ss.str()+md5Key;
+    UInt8 ret = 1;
+    std::string err = "";
 
-    HMACEngine<MD5Engine> md5(md5Key);
-    MD5Engine  md5Engine;
-
-    md5Engine.update(key);
-
-    std::string s2=md5Engine.digestToHex(md5Engine.digest());
-    if(s2==md5value)
-    **/
-
-    UInt32 ret;
-    GObject::Player * player=GObject::globalPlayers[player_Id];
-    if(player!=NULL)
+    // TODO: check token with cache
+    if (cfg.tokenServer.length() && cfg.tokenPort)
     {
-		GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(UInt32));
-		GLOBAL().PushMsg(hdr, &gold);
-        ret=0;
     }
     else
-	{
-		GObject::prepaid.push(player_Id, gold);
-        ret=2;
-	}
+        err = "we have no token server.";
+    if (no.length())
+    {
+        DB().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+                no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
+    }
+    else
+        err += "serial number error.";
 
+    if (!err.length())
+    {
+        if (id == 29999 && num)
+        {
+            GObject::Player * player=GObject::globalPlayers[player_Id];
+            if(player != NULL)
+            {
+                struct Recharge
+                {
+                    UInt8 type;
+                    UInt32 gold;
+                    char no[256];
+                } recharge;
+
+                memset(&recharge, 0x00, sizeof(recharge));
+                recharge.type = 0; // 有角色时充值
+                recharge.gold = num;
+                memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+
+                GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
+                GLOBAL().PushMsg(hdr, &recharge);
+                ret=0;
+            }
+            else
+            {
+                GObject::prepaid.push(player_Id, num, no.c_str());
+                ret=0;
+            }
+        } else
+            err += "Wrong item id or number.";
+    }
 
     Stream st;
-    st.init(REP::KEEP_ALIVE, 0x01);
-    st<<ret<<Stream::eos;
+    st.init(0x05, 0x01);
+    st<< ret << err << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
     return;
-    //return failed message.
 }
 
 void WorldAnnounce( LoginMsgHdr& hdr, const void * data )

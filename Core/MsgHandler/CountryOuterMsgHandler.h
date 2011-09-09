@@ -1959,6 +1959,9 @@ void OnTaskNpcActionReq(GameMsgHdr& hdr, TaskNpcActionReq& req)
 		break;
 	case 0x60:
 		MOAction::RunDayCopyTaskStep(player, req.m_NpcId, req.m_ActionID);
+    case 0x70:
+		MOAction::RunActiveTaskStep(player, req.m_NpcId, req.m_ActionID);
+        break;
 	default:
 		return ;
 	}

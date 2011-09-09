@@ -265,7 +265,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                         }
                         st << id << tcd.floor << tcd.spot;
 
-                        st << static_cast<UInt8>((size-1)/2);
+                        st << static_cast<UInt8>(rsize);
                         for (UInt8 i = 1, c = 0; i < size && c < rsize; i += 2, ++c)
                         {
                             st << loot[i] << static_cast<UInt8>(loot[i+1]);
@@ -512,9 +512,25 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     }
                 }
 
-                UInt8 floors = getCopyFloors(id);
-                if (floors >= 1)
-                    --floors;
+                CopyData& tcd = getCopyData(pl, id);
+                if (!tcd.floor) {
+                    tcd.floor = 1;
+                    tcd.spot = 1;
+                    DB().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)",
+                            pl->getId(), id, tcd.floor, tcd.spot);
+                }
+
+                UInt8 floors = 0;
+                UInt8 sp = tcd.spot;
+                for (UInt8 f = tcd.floor; f <= GData::copyMaxManager[id]; ++f)
+                {
+                    UInt8 s = GData::copyManager[id<<8|f].size();
+                    for (UInt8 i = sp; i < s; ++i)
+                    {
+                        ++floors;
+                    }
+                    sp = 1;
+                }
 
                 UInt8 secs = 0;
                 if (cfg.GMCheck)
@@ -522,22 +538,17 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                 else
                     secs = 20;
                 EventAutoCopy* event = new (std::nothrow) EventAutoCopy(pl, secs, floors, id);
-                if (event)
-                {
-                    PushTimerEvent(event);
-                    pl->addFlag(Player::AutoCopy);
-                    pl->setBuffData(PLAYER_BUFF_AUTOCOPY, id, true);
-                    DB().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
+                if (!event)
+                    return;
 
-                    CopyData& tcd = getCopyData(pl, id);
-                    if (!tcd.floor) {
-                        tcd.floor = 1;
-                        tcd.spot = 1;
-                    }
-                    Stream st(REP::AUTO_COPY);
-                    st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos; 
-                    pl->send(st);
-                }
+                PushTimerEvent(event);
+                pl->addFlag(Player::AutoCopy);
+                pl->setBuffData(PLAYER_BUFF_AUTOCOPY, id, true);
+                DB().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
+
+                Stream st(REP::AUTO_COPY);
+                st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos; 
+                pl->send(st);
             }
             break;
 

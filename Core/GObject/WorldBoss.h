@@ -22,7 +22,7 @@ public:
     static bool isWorldBoss(UInt32 npcid);
 
 public:
-    WorldBoss() : m_max(0) {}
+    WorldBoss() : m_level(0), m_max(0) {}
     ~WorldBoss() {}
 
     void refresh(UInt32);
@@ -37,11 +37,13 @@ public:
         if (lvl > m_max)
             m_max = lvl;
     }
+
 private:
     UInt8 getLevel(UInt32 now);
 
 private:
     std::map<UInt16, WBoss> m_boss;
+    UInt8 m_level;
     UInt8 m_max;
 };
 

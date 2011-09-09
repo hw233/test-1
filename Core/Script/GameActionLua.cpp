@@ -190,6 +190,7 @@ namespace Script
 		CLASS_DEF(Fighter, getExp);
 		CLASS_DEF(Fighter, addPExp);
 		CLASS_DEF(Fighter, getPExp);
+		CLASS_DEF(Fighter, getAcupointCnt);
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);
 		CLASS_DEF(Fighter, getClass);
@@ -572,6 +573,16 @@ namespace Script
 	Table GameActionLua::RunDayCopyTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
 	{
 		return Run<Table>(player, "RunDayCopyTaskStep", npcId, actionId);
+	}
+
+	Table GameActionLua::RunActiveTask(Player * player, UInt32 npcId)
+	{
+		return Run<Table>(player, "RunActiveTask", player, npcId);
+	}
+
+	Table GameActionLua::RunActiveTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
+	{
+		return Run<Table>(player, "RunActiveTaskStep", player, npcId, actionId);
 	}
 
 	bool GameActionLua::RunGreatTaskAction(Player * player, UInt32 fgtId)
