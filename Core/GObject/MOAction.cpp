@@ -20,6 +20,11 @@ namespace GObject
 			RunDayCopyTask(player, npcId);
 			return ;
 		}
+        if (npcId == 4130)
+        {
+            RunActiveTask(player, npcId);
+            return;
+        }
 		if ((actionType & MOT_Task) == MOT_Task)
 		{
 			TaskAction(player, npcId);
@@ -301,9 +306,41 @@ namespace GObject
 		player->send(st);
 	}
 
+	void MOAction::RunActiveTask(Player * player, UInt32 npcId)
+	{
+		Table msg = GameAction()->RunActiveTask(player, npcId);
+		UInt16 sz = static_cast<UInt16>(msg.size());
+		
+		Stream st(REP::DIALOG_START);
+		st << npcId << static_cast<UInt16>(0) << sz;
+		for (UInt16 i = 1; i <= sz; ++i)
+		{
+			Table m = msg.get<Table>(i);
+			st << m.get<UInt16>("m_ActionType") << m.get<UInt8>("m_ActionToken") << m.get<UInt32>("m_ActionID") << m.get<UInt8>("m_ActionStep") << m.get<const char*>("m_ActionMsg");
+		}
+		st << Stream::eos;
+		player->send(st);
+	}
+
 	void MOAction::RunDayCopyTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
 	{
 		Table msg = GameAction()->RunDayCopyTaskStep(player, npcId, actionId);
+		UInt16 sz = static_cast<UInt16>(msg.size());
+
+		Stream st(REP::DIALOG_START);
+		st << npcId << static_cast<UInt16>(0) << sz;
+		for (UInt16 i = 1; i <= sz; ++i)
+		{
+			Table m = msg.get<Table>(i);
+			st << m.get<UInt16>("m_ActionType") << m.get<UInt8>("m_ActionToken") << m.get<UInt32>("m_ActionID") << m.get<UInt8>("m_ActionStep") << m.get<const char*>("m_ActionMsg");
+		}
+		st << Stream::eos;
+		player->send(st);
+	}
+
+	void MOAction::RunActiveTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
+	{
+		Table msg = GameAction()->RunActiveTaskStep(player, npcId, actionId);
 		UInt16 sz = static_cast<UInt16>(msg.size());
 
 		Stream st(REP::DIALOG_START);

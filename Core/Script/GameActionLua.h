@@ -62,6 +62,8 @@ namespace Script
 		UInt32 GetGreatFighterReqFriendliness(UInt32 fightId);
 		Table RunDayCopyTask(Player *, UInt32);
 		Table RunDayCopyTaskStep(Player *, UInt32, UInt32);
+        Table RunActiveTask(Player * player, UInt32 npcId);
+        Table RunActiveTaskStep(Player *, UInt32, UInt32);
 
 		Table RunNpcDefaultAction(Player * player, UInt32 npcId);
 

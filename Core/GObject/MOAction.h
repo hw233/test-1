@@ -43,7 +43,9 @@ namespace GObject
 		static void ItemTaskAction(Player* player, UInt32 taskId, UInt32 npcId);
 
 		static void RunDayCopyTask(Player *, UInt32);
+		static void RunActiveTask(Player *, UInt32);
 		static void RunDayCopyTaskStep(Player *, UInt32, UInt32);
+        static void RunActiveTaskStep(Player *, UInt32, UInt32);
 
 		static void Action(Player* player, UInt32 npcId, UInt32 actionType);
 	};

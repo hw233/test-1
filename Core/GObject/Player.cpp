@@ -3046,12 +3046,6 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
-        if (GetLev() < static_cast<UInt8>(30))
-        {
-            sendMsgCode(1, 1016);
-            return false;
-        }
-
         // TODO:
 #if 0
         if (im) {
@@ -3091,6 +3085,12 @@ namespace GObject
         } else {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fshimen[i] == taskid) {
+                    if (GetLev() < static_cast<UInt8>(30))
+                    {
+                        sendMsgCode(1, 1016);
+                        return false;
+                    }
+
                     if (ColorTaskOutOfAccept(4, im))
                         return false;
 
@@ -3116,6 +3116,12 @@ namespace GObject
             }
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fyamen[i] == taskid) {
+                    if (GetLev() < static_cast<UInt8>(30))
+                    {
+                        sendMsgCode(1, 1016);
+                        return false;
+                    }
+
                     if (ColorTaskOutOfAccept(5, im))
                         return false;
 

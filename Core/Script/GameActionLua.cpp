@@ -575,6 +575,16 @@ namespace Script
 		return Run<Table>(player, "RunDayCopyTaskStep", npcId, actionId);
 	}
 
+	Table GameActionLua::RunActiveTask(Player * player, UInt32 npcId)
+	{
+		return Run<Table>(player, "RunActiveTask", player, npcId);
+	}
+
+	Table GameActionLua::RunActiveTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
+	{
+		return Run<Table>(player, "RunActiveTaskStep", player, npcId, actionId);
+	}
+
 	bool GameActionLua::RunGreatTaskAction(Player * player, UInt32 fgtId)
 	{
 		return Run<bool>(player, "RunGreatTaskAction", fgtId);
