@@ -19,6 +19,12 @@ namespace GObject
 #ifndef MAKECHANCE
 #define MAKECHANCE(a,b) (((0x0000FFFF & a) << 16) | (0x0000FFFF & b))
 #endif
+    struct YDItem
+    {
+        UInt32 itemId;
+        UInt8  itemNum;
+    };
+
 	class GObjectManager
 	{
 	public:
@@ -60,6 +66,8 @@ namespace GObject
         static bool loadEquipForge();
         static bool loadFightersPCChance();
         static bool loadAttrFactor();
+
+        static bool loadQQVipAward();
 
         static UInt32 getEnchantCost() { return _enchant_cost; }
         static UInt32 getMergeCost() { return _merge_cost; }
@@ -119,6 +127,29 @@ namespace GObject
                 return 0;
         }
 
+        static UInt8 getYDMaxCount()
+        {
+            return _yellow_diamond_award.size();
+        }
+
+        static std::vector<YDItem>& getYDItem(UInt8 qqvipl)
+        {
+            if(qqvipl > _yellow_diamond_award.size() - 1)
+                qqvipl = _yellow_diamond_award.size() - 1;
+
+            return _yellow_diamond_award[qqvipl];
+        }
+
+        static std::vector<YDItem>& getYearYDItem()
+        {
+            return _year_yellow_diamond_award;
+        }
+
+        static std::vector<UInt32>& getYDGem()
+        {
+            return _yellow_diamond_gem;
+        }
+
 	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -162,6 +193,11 @@ namespace GObject
 
         //战斗背景
         static std::map<UInt16, UInt16> _battle_scene;
+
+        //黄钻物品奖励
+        static std::vector<std::vector<YDItem>> _yellow_diamond_award;
+        static std::vector<YDItem>              _year_yellow_diamond_award;
+        static std::vector<UInt32>              _yellow_diamond_gem;
 	};
 }
 

@@ -52,7 +52,7 @@ namespace REQ
     /**请求修炼武将列表*/
     const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
     /**加速取消修炼散仙*/
-    const UInt8 TRAIN_FIGHTER_OP    = 0x2E;
+    const UInt8 TRAIN_FIGHTER_OP    = 0x2B;
     /**背包列表信息*/
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     /**背包添加到九疑鼎*/                      
@@ -277,6 +277,10 @@ namespace REQ
     const UInt8 FLAUNT              = 0x23;// 0xF3
     /**BUG投诉*/
     const UInt8 BUG                 = 0x25;// 0xF8
+    /**黄钻信息*/
+    const UInt8 YD_INFO             = 0x2E;
+    /**黄钻奖励领取*/
+    const UInt8 YD_AWARD_RCV        = 0x2F;
 
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
@@ -316,7 +320,8 @@ namespace REP
     const UInt8 PUB_LIST            = 0x2A;
     const UInt8 POTENCIAL           = 0xDF;// 0x2C
     const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
-    const UInt8 TRAIN_FIGHTER_OP    = 0x2E;
+
+    const UInt8 TRAIN_FIGHTER_OP    = 0x2B;
 
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     const UInt8 PACK_USE            = 0xC3;// 0x33
@@ -452,6 +457,9 @@ namespace REP
     const UInt8 FLAUNT_GOOD         = 0x23;// 0xF3
     const UInt8 SYSTEM_INFO         = 0x24;// 0xF7
     const UInt8 BUG_INFO            = 0x25;// 0xF8
+    const UInt8 YD_INFO             = 0x2E;
+    const UInt8 YD_AWARD_RCV        = 0x2F;
+
     const UInt8 SERVER_ARENA_OP     = 0xEC;
 
     const UInt8 ATHLETICS_CHALLENGE = 0xF5;// 0xD2

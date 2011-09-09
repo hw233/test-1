@@ -475,6 +475,17 @@ struct BugInfoReq
   MESSAGE_DEF2(REQ::BUG,std::string, _title,std::string,_content);
 };
 
+struct YellowDiamondInfoReq
+{
+    MESSAGE_DEF(REQ::YD_INFO);
+};
+
+struct YellowDiamondAwardRcvReq
+{
+    UInt8 m_type;
+    MESSAGE_DEF1(REQ::YD_AWARD_RCV, UInt8, m_type);
+};
+
 void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 {
 	MSG_QUERY_PLAYER(pl);
@@ -566,7 +577,7 @@ struct FighterTrain2Req
 	UInt32 _heroID;
 	UInt8  _priceType;
 	UInt32 _time;
-	MESSAGE_DEF3(0x2F, UInt32, _heroID, UInt8, _priceType, UInt32, _time);
+	MESSAGE_DEF3(0x3F, UInt32, _heroID, UInt8, _priceType, UInt32, _time);
 };
 
 struct PracticeHookAddReq
@@ -2698,6 +2709,17 @@ void OnSubmitBugInfo(GameMsgHdr& hdr,BugInfoReq& biq)
 		cfg.serverLogId, hdr.player->getId(), type.c_str(), TimeUtil::Now(), title.c_str(), content.c_str());
 }
 
+void OnYellowDiamondInfo(GameMsgHdr& hdr, YellowDiamondInfoReq& ydInfo)
+{
+    MSG_QUERY_PLAYER(player);
+    player->sendYellowDiamondInfo();
+}
+
+void OnYellowDiamondAwardRcv(GameMsgHdr& hdr, YellowDiamondAwardRcvReq& ydar)
+{
+    MSG_QUERY_PLAYER(player);
+    player->rcvYellowDiamondAward(ydar.m_type);
+}
 
 struct TradeListReq
 {

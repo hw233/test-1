@@ -5529,7 +5529,7 @@ namespace GObject
                 st << static_cast<UInt8>(0) << Stream::eos;
                 send(st);
             }
-            ConsumeInfo ci(ExtendPackage,0,0);
+            ConsumeInfo ci(InstantPracticeAcc,0,0);
             useGold(pfexp->goldUse,&ci);
         }
 
@@ -5542,6 +5542,112 @@ namespace GObject
             }
         }
 
+    }
+
+    void Player::RollYDGem()
+    {
+        std::vector<UInt32> ydGem = GObjectManager::getYDGem();
+        _playerData.ydGemId = ydGem[uRand(ydGem.size())];
+		DB().PushUpdateData("UPDATE `player` SET `ydgemid` = %u WHERE `id` = %"I64_FMT"u", _playerData.ydGemId, getId());
+    }
+
+    void Player::checkQQAward()
+    {
+		UInt32 now = TimeUtil::Now();
+		if(now >= _playerData.qqawardEnd)
+		{
+			_playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
+            _playerData.qqawardgot = 0;
+            DB().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
+            RollYDGem();
+        }
+
+        if(_playerData.ydGemId == 0)
+        {
+            RollYDGem();
+        }
+    }
+
+    void Player::sendYellowDiamondInfo()
+    {
+        checkQQAward();
+
+        Stream st(REP::YD_INFO);
+        st << _playerData.qqvipl << _playerData.qqvipyear << _playerData.qqawardgot;
+        UInt8 maxCnt = GObjectManager::getYDMaxCount();
+        st << maxCnt;
+        for(UInt8 i = 0; i < maxCnt; ++ i)
+        {
+            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
+            UInt8 itemCnt = ydItem.size();
+            st << itemCnt;
+            for(int j = 0; j < itemCnt; ++ j)
+            {
+                UInt32 itemId = ydItem[j].itemId;
+                if(GetItemSubClass(itemId) == Item_Gem)
+                    itemId = _playerData.ydGemId;
+
+                st << itemId << ydItem[j].itemNum;
+            }
+        }
+
+        std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
+        UInt8 itemCnt = ydItem.size();
+        st << itemCnt;
+        for(UInt8 j = 0; j < itemCnt; ++ j)
+            st << ydItem[j].itemId << ydItem[j].itemNum;
+
+        st << Stream::eos;
+        send(st);
+    }
+
+    UInt8 Player::rcvYellowDiamondAward(UInt8 type)
+    {
+        UInt8 nRes = 0;
+
+        Stream st(REP::YD_AWARD_RCV);
+        checkQQAward();
+
+        if(type == 1 && !(_playerData.qqawardgot & 0x1) && _playerData.qqvipl != 0)
+        {
+            nRes = 1;
+            _playerData.qqawardgot |= 0x1;
+            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(_playerData.qqvipl - 1);
+            UInt8 itemCnt = ydItem.size();
+            if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+            {
+                for(int j = 0; j < itemCnt; ++ j)
+                {
+                    UInt32 itemId = ydItem[j].itemId;
+                    if(GetItemSubClass(itemId) == Item_Gem)
+                        itemId = _playerData.ydGemId;
+
+                    GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                }
+            }
+        }
+        else if(type == 2 && !(_playerData.qqawardgot & 0x2) && _playerData.qqvipyear != 0)
+        {
+            nRes = 2;
+            _playerData.qqawardgot |= 0x2;
+            std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
+            UInt8 itemCnt = ydItem.size();
+            if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+            {
+                for(int j = 0; j < itemCnt; ++ j)
+                    GetPackage()->AddItem2(ydItem[j].itemId, ydItem[j].itemNum, true, true);
+            }
+        }
+
+        if(nRes)
+        {
+            DB().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+        }
+
+        st << nRes << Stream::eos;
+        send(st);
+
+        return nRes;
     }
 
 }
