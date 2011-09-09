@@ -697,11 +697,38 @@ void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
 void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	UInt32 gold = *static_cast<const UInt32 *>(data);
-	if(gold == 0)
-		return;
-	player->getGold(gold);
-	player->addTotalRecharge(gold);
+    UInt8 type = *(UInt8*)(data);
+    if (type == 0)
+    {
+        struct Recharge
+        {   
+            UInt8 type;
+            UInt32 gold;
+            char no[256];
+        };
+
+        Recharge* recharge = (Recharge*)(data);
+        if(recharge->gold == 0)
+            return;
+        player->getGold(recharge->gold);
+        player->addTotalRecharge(recharge->gold);
+        DB().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND %"I64_FMT"u",
+                recharge->no, player->getId());
+    }
+    else
+    {
+        struct Recharge
+        {   
+            UInt8 type;
+            UInt32 gold;
+        };
+
+        Recharge* recharge = (Recharge*)(data);
+        if(recharge->gold == 0)
+            return;
+        player->getGold(recharge->gold);
+        player->addTotalRecharge(recharge->gold);
+    }
 }
 
 void OnGmHandler(GameMsgHdr& hdr, const void * data)

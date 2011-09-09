@@ -37,7 +37,7 @@ void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
     st << count;
 
     if (needspot) {
-        sendFrontMap(st, pl, id, force);
+        sendFrontMap(st, pl, id, needspot?true:force);
     }
 
     st << Stream::eos;
@@ -83,7 +83,7 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
 {
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
 
-    if (!force && tmp.size() <= 1)
+    if (force && !tmp.size())
         return;
 
     if (!tmp.size())

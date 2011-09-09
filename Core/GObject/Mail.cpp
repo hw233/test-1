@@ -218,9 +218,9 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 
 	if(writedb)
 	{
-		char title2[256], content2[4096];
-		mysql_escape_string(title2, title.c_str(), 256/2-1);
-		mysql_escape_string(content2, content.c_str(), 4096/2-1);
+		char title2[256], content2[8192];
+		mysql_escape_string(title2, title.c_str(), title.length()>256?255:title.length());
+		mysql_escape_string(content2, content.c_str(), content.length()>4096?4095:content.length());
 		DB().PushUpdateData("INSERT INTO `mail` (`mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId`) VALUES (%u, %"I64_FMT"u, '%s', %u, %u, '%s', '%s', %u)", mail->id, ((_owner != NULL) ? _owner->getId() : static_cast<UInt64>(0)), mail->sender.c_str(), mail->recvTime, mail->flag, title2, content2, mail->additional);
 	}
 	if(itemsInfo != NULL)
@@ -840,9 +840,9 @@ void MailBox::updateMail( Mail * mail )
 	Stream st(REP::MAIL_CHANGE);
 	st << mail->id << mail->sender << mail->recvTime << mail->flag << mail->title << mail->content << mail->additional << Stream::eos;
 	_owner->send(st);
-	char title2[128], content2[4096];
-	mysql_escape_string(title2, mail->title.c_str(), (128/2)-1);
-	mysql_escape_string(content2, mail->content.c_str(), (4096/2)-1);
+	char title2[256], content2[8192];
+	mysql_escape_string(title2, mail->title.c_str(), mail->title.length()>256?256:mail->title.length());
+	mysql_escape_string(content2, mail->content.c_str(), mail->content.length()>4096?4095:mail->content.length());
 	DB().PushUpdateData("UPDATE `mail` SET `flag` = %u, `title` = '%s', `content` = '%s', `additionalId` = %u WHERE `mailId` = %u", mail->flag, title2, content2, mail->additional, mail->id);
 }
 
