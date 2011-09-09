@@ -99,6 +99,10 @@ namespace GObject
 
     std::map<UInt16, UInt16> GObjectManager::_battle_scene;
 
+    std::vector<std::vector<YDItem>> GObjectManager::_yellow_diamond_award;
+    std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
+    std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
+
 	bool GObjectManager::InitIDGen()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -138,6 +142,7 @@ namespace GObject
 		loadFighters();
 		loadClanAssist();
 		loadClanRobMonster();
+        loadQQVipAward();
 		loadAllPlayers();
 		loadAllAthletics();
 		loadAllAthleticsEvent();
@@ -743,6 +748,65 @@ namespace GObject
 		return true;
 	}
 
+    bool GObjectManager::loadQQVipAward()
+    {
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        luaopen_table(L);
+        {
+            std::string path = cfg.scriptPath + "Other/QQVipAward.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            lua_tinker::table ydTable = lua_tinker::call<lua_tinker::table>(L, "getYellowDiamondAward");
+            size_t yd_size = ydTable.size();
+            for(UInt32 i = 0; i < yd_size; i ++)
+            {
+                std::vector<YDItem> itemVt;
+                itemVt.clear();
+                lua_tinker::table itemTable = ydTable.get<lua_tinker::table>(i + 1);
+                size_t itemSize = itemTable.size();
+                for(UInt8 j = 0; j < itemSize; ++j)
+                {
+                    lua_tinker::table tempTable = itemTable.get<lua_tinker::table>(j + 1);
+                    YDItem item = {0};
+
+                    item.itemId = tempTable.get<UInt32>(1);
+                    item.itemNum = tempTable.get<UInt8>(2);
+
+
+                    itemVt.push_back(item);
+                }
+                _yellow_diamond_award.push_back(itemVt);
+            }
+
+            lua_tinker::table yydTable = lua_tinker::call<lua_tinker::table>(L, "getYearYellowDiamondAward");
+            size_t yyd_size = yydTable.size();
+            for(UInt32 j = 0; j < yyd_size; j ++)
+            {
+                lua_tinker::table tempTable = yydTable.get<lua_tinker::table>(j + 1);
+                YDItem item = {0};
+
+                item.itemId = tempTable.get<UInt32>(1);
+                item.itemNum = tempTable.get<UInt8>(2);
+
+                _year_yellow_diamond_award.push_back(item);
+            }
+
+            lua_tinker::table ydGemTable = lua_tinker::call<lua_tinker::table>(L, "getYellowDiamondGem");
+            size_t ydGem_size = ydGemTable.size();
+            for(UInt32 j = 0; j < ydGem_size; j ++)
+            {
+                _yellow_diamond_gem.push_back(ydGemTable.get<UInt32>(j + 1));
+            }
+
+        }
+        lua_close(L);
+
+        return true;
+
+    }
+
 	bool GObjectManager::loadAllPlayers()
 	{
 		UInt64 last_id;
@@ -755,7 +819,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `qqvipl`, `qqvipyear`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `status`, `country`, `title`, `archievement`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);

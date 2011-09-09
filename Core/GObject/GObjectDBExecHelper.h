@@ -730,7 +730,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(47)
+SPECIALDEF(50)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -744,6 +744,9 @@ SPECIALDEF(47)
 	UInt32, pdata.achievement,
 	UInt8, pdata.qqvipl,
 	UInt8, pdata.qqvipyear,
+    UInt8, pdata.qqawardgot,
+    UInt32, pdata.qqawardEnd,
+    UInt32, pdata.ydGemId,
 	UInt16, pdata.location,
 	UInt8, pdata.inCity,
 	UInt32, pdata.lastOnline,

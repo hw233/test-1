@@ -252,6 +252,9 @@ namespace GObject
 		UInt32 achievement;         // 战功
         UInt8 qqvipl;               // QQ VIP等级
         UInt8 qqvipyear;            // QQ VIP是否包年
+        UInt8 qqawardgot;           // QQ VIP奖励是否已领取
+        UInt32 qqawardEnd;          // QQ 奖励领取结束时间
+        UInt32 ydGemId;             // QQ VIP宝石奖励
 		UInt16 location;            // 位置
 		UInt8 inCity;               // 城市
 		UInt32 lastOnline;          // 上次上线时间
@@ -617,6 +620,12 @@ namespace GObject
 
         bool OperationTaskAction(int type);
 
+        // QQ奖励
+        void sendYellowDiamondInfo();
+        UInt8 rcvYellowDiamondAward(UInt8 type);
+        void checkQQAward();
+        void RollYDGem();
+
 	private:
 		void  greatFighterFavorSubmitCheck(GreatFighterTaskVal *, UInt32, UInt32 = TimeUtil::SharpDay(0));
 
@@ -690,7 +699,6 @@ namespace GObject
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
-
 
 	// 好友系统
 	public:
