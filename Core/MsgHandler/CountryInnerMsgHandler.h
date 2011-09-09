@@ -678,6 +678,22 @@ void OnCompleteAutoCopy( GameMsgHdr& hdr, const void * data )
     playerCopy.fight(player, id, true, true);
 }
 
+void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    if (player->isAutoCopyFailed())
+        return;
+
+    UInt8 id = *(UInt8*)data;
+    UInt8 ret = playerCopy.fight(player, id, true);
+    if (ret == 0)
+        player->autoCopyFailed(id);
+}
+
 void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
