@@ -274,7 +274,7 @@ namespace GObject
 
         //data->lock.lock();
         Fighter* fgt = 0;
-        int n = 0;
+        UInt8 n = 0;
         for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
         {
             fgt = m_Player->findFighter(*i);
@@ -339,7 +339,7 @@ namespace GObject
 
             //data->lock.lock();
             Fighter* fgt = 0;
-            int n = 0;
+            UInt8 n = 0;
             for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
             {
                 fgt = m_Player->findFighter(*i);
@@ -3053,6 +3053,12 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
+        if (GetLev() < static_cast<UInt8>(30))
+        {
+            sendMsgCode(1, 1016);
+            return false;
+        }
+
         // TODO:
 #if 0
         if (im) {

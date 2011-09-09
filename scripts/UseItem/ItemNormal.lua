@@ -320,71 +320,6 @@ function ItemNormal_00008907(iid, num, bind, param)
   end
 end
 
-function ItemNormal_00000002(iid, num, bind, param)
-  local player = GetPlayer();
-  local fgt = player:findFighter(param)
-  local package = player:GetPackage();
-	if fgt == nil then
-		return false
-	end
-  fgt:setBuffData(2, 0, true)
-  fgt:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(fgt, 1, 1800, num, 18000) then
-	package:DelItemSendMsg(2, player);
-	return true;
-  else
-	return false;
-  end
-end
-
-function ItemNormal_00000003(iid, num, bind, param)
-  local player = GetPlayer();
-  local fgt = player:findFighter(param)
-  local package = player:GetPackage();
-	if fgt == nil then
-		return false
-	end
-  fgt:setBuffData(1, 0, true)
-  fgt:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(fgt, 2, 1800, num, 18000) then
-	package:DelItemSendMsg(3, player);
-	return true;
-  else
-	return false;
-  end
-end
-
-function ItemNormal_00000004(iid, num, bind, param)
-    local player = GetPlayer();
-	local fgt = player:findFighter(param)
-  local package = player:GetPackage();
-	if fgt == nil then
-		return false
-	end
-  fgt:setBuffData(1, 0, true)
-  fgt:setBuffData(2, 0, true)
-  if ItemNormal_AddBuff(fgt, 3, 1800, num, 18000) then
- 	package:DelItemSendMsg(4, player);
-	return true;
-  else
-	return false;
-  end
-
-end
-
-function ItemNormal_00000005(iid, num, bind, param)
-  local player = GetPlayer()
-  local package = player:GetPackage();
-  player:setBuffData(2, 0, true)
-  player:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(player, 1, 1800, num, 18000) then
- 	package:DelItemSendMsg(5, player);
-	return true;
-  else
-	return false;
-  end
-end
-
 function ItemNormal_00000006(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -830,16 +765,118 @@ function ItemNormal_00000043(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    local num = player:getBuffData(24)
-    if num > 0 then
+    if num > 1 then
+		player:sendMsgCode(2, 1058, 0);
+        return false
+    end
+    local num2 = fgt:getBuffData(4)
+    if num2 > 0 then
+		player:sendMsgCode(2, 1058, 0);
         return false;
     end
 
-    fgt:addPExp(50000);
+    local cnt = fgt:getAcupointCnt()
+    if cnt == 0 then
+        cnt = 1
+    end
+    fgt:addPExp((20000*cnt)/15);
     local now = os.time() + 8*60*60 -- UTC+8
     now = now % (24*60*60)
-	if ItemNormal_AddBuff(player, 24, 24*60*60-now, num, 36000) then
+	if ItemNormal_AddBuff(fgt, 4, 24*60*60-now, num, 36000) then
 		package:DelItemSendMsg(43, player);
+		return true;
+	end
+    return true;
+end
+
+function ItemNormal_00000052(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if num > 1 then
+		player:sendMsgCode(2, 1058, 0);
+        return false
+    end
+    local num2 = fgt:getBuffData(4)
+    if num2 > 0 then
+		player:sendMsgCode(2, 1058, 0);
+        return false;
+    end
+
+    local cnt = fgt:getAcupointCnt()
+    if cnt == 0 then
+        cnt = 1
+    end
+    fgt:addPExp((2000*cnt)/15);
+    local now = os.time() + 8*60*60 -- UTC+8
+    now = now % (24*60*60)
+	if ItemNormal_AddBuff(fgt, 4, 24*60*60-now, num, 36000) then
+		package:DelItemSendMsg(52, player);
+		return true;
+	end
+    return true;
+end
+
+function ItemNormal_00000053(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if num > 1 then
+		player:sendMsgCode(2, 1058, 0);
+        return false
+    end
+    local num2 = fgt:getBuffData(4)
+    if num2 > 0 then
+		player:sendMsgCode(2, 1058, 0);
+        return false;
+    end
+
+    local cnt = fgt:getAcupointCnt()
+    if cnt == 0 then
+        cnt = 1
+    end
+    fgt:addPExp((10000*cnt)/15);
+    local now = os.time() + 8*60*60 -- UTC+8
+    now = now % (24*60*60)
+	if ItemNormal_AddBuff(fgt, 4, 24*60*60-now, num, 36000) then
+		package:DelItemSendMsg(53, player);
+		return true;
+	end
+    return true;
+end
+
+function ItemNormal_00000066(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if num > 1 then
+		player:sendMsgCode(2, 1058, 0);
+        return false
+    end
+    local num2 = fgt:getBuffData(4)
+    if num2 > 0 then
+		player:sendMsgCode(2, 1058, 0);
+        return false;
+    end
+
+    local cnt = fgt:getAcupointCnt()
+    if cnt == 0 then
+        cnt = 1
+    end
+    fgt:addPExp((5000*cnt)/15);
+    local now = os.time() + 8*60*60 -- UTC+8
+    now = now % (24*60*60)
+	if ItemNormal_AddBuff(fgt, 4, 24*60*60-now, num, 36000) then
+		package:DelItemSendMsg(53, player);
 		return true;
 	end
     return true;
@@ -5083,10 +5120,6 @@ local ItemNormal_Table = {
 	[8905] = ItemNormal_00008905,
 	[8906] = ItemNormal_00008906,
 	[8907] = ItemNormal_00008907,
---	[2] = ItemNormal_00000002,
---	[3] = ItemNormal_00000003,
---	[4] = ItemNormal_00000004,
---	[5] = ItemNormal_00000005,
 	[6] = ItemNormal_00000006,
 	[7] = ItemNormal_00000007,
 	[9] = ItemNormal_00000009,
@@ -5114,6 +5147,8 @@ local ItemNormal_Table = {
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[43] = ItemNormal_00000043,
+	[52] = ItemNormal_00000052,
+	[53] = ItemNormal_00000053,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,
