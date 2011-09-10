@@ -971,6 +971,7 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
         {2080, 2104, 2128, 2152, 2176},
         {2072, 2096, 2120, 2144, 2168}
     };
+    const UInt16 trump[] = {1608,1609,1610};
 	int idx = -1;
 	if(equipLvl == 60)
 		idx = 0;
@@ -1044,6 +1045,12 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
             makeItemSuper(package, equip, 0, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
+        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(trump[0], false, true));
+        if(equip)
+        { 
+            makeItemSuper(package, equip, 0, 9, 0, flushAttr);
+            package->EquipTo(equip->getId(), fgt, 0x50, o);
+        }
 		break;
 	case 2:
 		weapon = static_cast<GObject::ItemWeapon *>(package->AddEquip(itemIdStart[1][idx], false, true));
@@ -1093,6 +1100,12 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
         { 
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x28, o);
+        }
+        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(trump[1], false, true));
+        if(equip)
+        { 
+            makeItemSuper(package, equip, 0, 9, 0, flushAttr);
+            package->EquipTo(equip->getId(), fgt, 0x50, o);
         }
 		break;
 	case 3:
@@ -1144,6 +1157,12 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10
             makeItemSuper(package, equip, 1, enchant, gemlevel, flushAttr);
             package->EquipTo(equip->getId(), fgt, 0x28, o);
         }
+        equip = static_cast<GObject::ItemEquip *>(package->AddEquip(trump[2], false, true));
+        if(equip)
+        { 
+            makeItemSuper(package, equip, 0, 9, 0, flushAttr);
+            package->EquipTo(equip->getId(), fgt, 0x50, o);
+        }
 		break;
 	default:
 		break;
@@ -1160,7 +1179,7 @@ void addSuperClass( GObject::Player * player, UInt32 id )
     }
 	UInt64 exp = GData::expTable.getLevelMin(100);
 	fgt->addExp(exp);
-	makeSuper(fgt);
+	makeSuper(fgt, fgt->getLevel());
 }
 void GMHandler::OnPlayerWallow( GObject::Player * player, std::vector<std::string>& args )
 {
@@ -1207,7 +1226,9 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 		return;
 	player->AddExp(GData::expTable.getLevelMin(100));
     player->AddPExp(100000);
-	makeSuper(player->getMainFighter());
+    player->getGold(10000000);
+    player->getTael(10000000);
+	makeSuper(player->getMainFighter(), player->GetLev());
 	addSuperClass(player, 10);
 	addSuperClass(player, 16);
     addSuperClass(player, 13);

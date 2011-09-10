@@ -1528,7 +1528,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
 	}
@@ -1595,10 +1595,12 @@ namespace GObject
 		st << Stream::eos;
 		send(st);
 
+        bsim.applyFighterHP(0, this);
+
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns() * 2);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 		return res;
 	}
 
@@ -3796,7 +3798,7 @@ namespace GObject
 				if(hp + autohp >= maxhp)
 				{
 					autohp -= maxhp - hp;
-					hp = 0;
+					hp = maxhp;
 				}
 				else
 				{

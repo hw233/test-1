@@ -45,8 +45,6 @@ namespace GObject
 
     UInt8 WorldBoss::getLevel(UInt32 now)
     {
-        reset();
-
         time_t now2 = static_cast<time_t>(now);
         struct tm * t = localtime(&now2);
         switch (t->tm_hour)
@@ -104,6 +102,8 @@ namespace GObject
         UInt8 level = getLevel(now);
         if (!level)
             return;
+
+        reset();
 
         UInt32 npcid = 0;
         UInt8 idx = (level-1)*4;
@@ -195,12 +195,12 @@ namespace GObject
                     }
                 }
 
-                if (pl->attackNpc(npcid))
+                if (pl->attackNpc(i->second.npcId))
                 {
                     if (!vip)
                     {
                         ++i->second.count;
-                        DB().PushUpdateData("UPDATE `worldboss` SET `count` = %u WHERE `npcId` = %u", i->second.count, npcid);
+                        DB().PushUpdateData("UPDATE `worldboss` SET `count` = %u WHERE `npcId` = %u", i->second.count, i->second.npcId);
 
                         if (i->second.count < count)
                         {
@@ -224,11 +224,11 @@ namespace GObject
                         {
                             if (i->second.count >= count)
                             {
-                                SYSMSG_BROADCASTV(553, npcid);
+                                SYSMSG_BROADCASTV(553, i->second.npcId);
                             }
                             else
                             {
-                                SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, npcid);
+                                SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, i->second.npcId);
                             }
                         }
                     }
