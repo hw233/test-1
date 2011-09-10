@@ -51,7 +51,7 @@ public:
     CopyData& getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool update = false);
     UInt8 getCopyFloors(UInt8 id);
     UInt8 checkCopy(Player* pl, UInt8 id);
-
+    
 private:
     std::map<UInt64, std::map<UInt8, CopyData> > m_copys;
 	FastMutex _mutex;

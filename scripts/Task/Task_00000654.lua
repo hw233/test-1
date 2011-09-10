@@ -130,7 +130,7 @@ function Task_00000654_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(2000);
+	player:AddExp(3000);
 	player:AddClanBuilding(700);
 	player:AddClanContrib(700);
 	return true;

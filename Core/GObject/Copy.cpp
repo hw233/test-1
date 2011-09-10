@@ -13,6 +13,15 @@
 namespace GObject
 {
 
+inline void autoClear(Player* pl)
+{
+    if (!pl)
+        return;
+    PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
+    pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
+    pl->delFlag(Player::AutoCopy);
+    DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
+}
 
 void PlayerCopy::sendAllInfo(Player* pl)
 {
@@ -191,11 +200,12 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
                         if (rsize != (size-1)/2)
                         {
                             st << static_cast<UInt8>(5);
+                            autoClear(pl);
+#if 0
                             PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
                             pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
                             pl->delFlag(Player::AutoCopy);
                             DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
-#if 0
                             SYSMSG(title, 555);
                             SYSMSGV(content, 556);
                             MailPackage::MailItem mitem[size/2-rsize];
@@ -286,6 +296,16 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato)
 
             DB().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, pl->getId(), id);
             return 1;
+        }
+        else
+        {
+            autoClear(pl);
+#if 0
+            PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
+            pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
+            pl->delFlag(Player::AutoCopy);
+            DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
+#endif
         }
     }
     return 0;
@@ -455,10 +475,13 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     pl->sendMsgCode(0, 1415);
                     return;
                 }
+#if 0
                 PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
                 pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
                 pl->delFlag(Player::AutoCopy);
                 DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
+#endif
+                autoClear(pl);
 
                 CopyData& cd = getCopyData(pl, id);
                 Stream st(REP::AUTO_COPY);

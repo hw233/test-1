@@ -11,7 +11,7 @@ local Split_cost = 10
 local Forge_cost = 10
 
 --装备打孔失败概率
-local Socket_chance = {0, 0, 0, 0, 0, 0}
+local Socket_chance = {0, 0, 75, 75, 80, 80}
 
 local Split_chance = {
     {10, 0},            --绿色装备分解概率
