@@ -383,7 +383,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	}
 	Stream st(REP::ARENA_IFNO);
     st << type;
-	UInt32 now = TimeUtil::Now();
+	//UInt32 now = TimeUtil::Now();
 	//UInt32 endTime = (*rank)->challengetime + ATHLETICS_BUFF_TIME;
 	//
 	//if(player->getVipLevel() >= 2)

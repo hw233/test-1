@@ -259,7 +259,6 @@ bool World::Init()
 	if(sday < now) sday += 86400;
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
 	AddTimer(600 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 600) / 600 * 600 - now) * 1000);
-	UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
 	
     AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
     AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));

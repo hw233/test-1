@@ -883,7 +883,7 @@ namespace GObject
 					UInt32 rwd = strtoul(dbpd.nextreward.c_str(), &endptr, 10);
 					dbpd.pdata.rewardStep = rwd >> 28;
 					dbpd.pdata.nextRewardTime = rwd & 0xFFFFFF;
-					UInt32 seed = ((rwd & 0x0F000000) >> 24) + static_cast<UInt32>(id);
+					//UInt32 seed = ((rwd & 0x0F000000) >> 24) + static_cast<UInt32>(id);
 					pl->setPlayerData(dbpd.pdata);
 					pl->recalcVipLevel();
 					pl->genOnlineRewardItems();
@@ -1133,7 +1133,6 @@ namespace GObject
 			}
 			if(pl == NULL)
 				continue;
-			pl->setGreatFighterTaskVal(ffdata.fighterId, ffdata.friendliness, ffdata.submitFavorCount, ffdata.submitFavorDay);
 		}
 		lc.finalize();
 

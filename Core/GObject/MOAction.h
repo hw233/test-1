@@ -35,11 +35,6 @@ namespace GObject
 		static void LoopTaskAction(Player* player, UInt32 npcId);
 
 		static void DefaultNpcAction(Player* player, UInt32 npcId);
-
-		static void GreatFighterAction(Player* player, UInt32 npcId);
-		static void GreatFighterActionStep(Player* player, UInt32 npcId);
-		static void RunGreatCtrlActionStep(Player* player, UInt32 npcId);
-
 		static void ItemTaskAction(Player* player, UInt32 taskId, UInt32 npcId);
 
 		static void RunDayCopyTask(Player *, UInt32);

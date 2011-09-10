@@ -40,11 +40,6 @@ namespace GObject
 			LoopTaskAction(player, npcId);
 			return ;
 		}
-		if ((actionType & MOT_GreatFighter) == MOT_GreatFighter)
-		{
-			GreatFighterAction(player, npcId);
-			return ;
-		}
 		//if ((actionType & MOT_EquipStrength) == MOT_EquipStrength ||
 		//	(actionType & MOT_EquipForge) == MOT_EquipForge ||
 		//	(actionType & MOT_EquipReplace) == MOT_EquipReplace)
@@ -239,57 +234,6 @@ namespace GObject
 		player->send(st);
 	}
 
-	void MOAction::GreatFighterAction(Player * player, UInt32 npcId)
-	{
-		player->checkGreatFighterFriendliness(npcId);
-
-		UInt16 size = 0;
-		Stream st(REP::DIALOG_START);
-		st << npcId << static_cast<UInt16>(0);
-		st << static_cast<UInt16>(0);
-		Table msg = GameAction()->RunGreatFighterAction(player, npcId);
-		for (UInt16 i = 1; i <= msg.size(); ++i)
-		{
-			Table elem = msg.get<Table>(i);
-			UInt16 actionType = elem.get<UInt16>("m_ActionType");
-			if (actionType == 0) continue;
-			size++;
-			st << actionType << elem.get<UInt8>("m_ActionToken") << elem.get<UInt32>("m_ActionID") << elem.get<UInt8>("m_ActionStep") << elem.get<const char*>("m_ActionMsg");
-		}
-		st.data<UInt16>(4+4+2) = size;
-		st << Stream::eos;
-		player->send(st);
-	}
-
-	void MOAction::GreatFighterActionStep(Player * player, UInt32 npcId)
-	{
-		Table msg = GameAction()->RunGreatCollectActionStep(player, npcId);
-		UInt8 actionType = msg.get<UInt8>("m_ActionType");
-		if (actionType != 0)
-		{
-			Stream st(REP::DIALOG_INTERACTION);
-			st << static_cast<UInt32>(npcId);
-			st << msg.get<const char*>("m_NpcMsg") << actionType << msg.get<UInt8>("m_ActionToken");
-			st << msg.get<const char*>("m_ActionMsg") << msg.get<UInt32>("m_ActionID") << msg.get<UInt8>("m_ActionStep") << Stream::eos;
-			player->send(st);
-		}
-	}
-
-	void MOAction::RunGreatCtrlActionStep(Player * player, UInt32 npcId)
-	{
-		Table msg = GameAction()->RunGreatCtrlActionStep(player, npcId);
-		UInt8 actionType = msg.get<UInt8>("m_ActionType");
-		if (actionType != 0)
-		{
-			Stream st(REP::DIALOG_INTERACTION);
-			st << static_cast<UInt32>(npcId);
-			st << msg.get<const char*>("m_NpcMsg") << actionType << msg.get<UInt8>("m_ActionToken");
-			st << msg.get<const char*>("m_ActionMsg") << msg.get<UInt32>("m_ActionID") << msg.get<UInt8>("m_ActionStep") << Stream::eos;
-			player->send(st);
-		}
-	}
-
-
 	void MOAction::RunDayCopyTask(Player * player, UInt32 npcId)
 	{
 		Table msg = GameAction()->RunDayCopyTask(player, npcId);
@@ -343,15 +287,18 @@ namespace GObject
 		Table msg = GameAction()->RunActiveTaskStep(player, npcId, actionId);
 		UInt16 sz = static_cast<UInt16>(msg.size());
 
-		Stream st(REP::DIALOG_START);
-		st << npcId << static_cast<UInt16>(0) << sz;
-		for (UInt16 i = 1; i <= sz; ++i)
-		{
-			Table m = msg.get<Table>(i);
-			st << m.get<UInt16>("m_ActionType") << m.get<UInt8>("m_ActionToken") << m.get<UInt32>("m_ActionID") << m.get<UInt8>("m_ActionStep") << m.get<const char*>("m_ActionMsg");
-		}
-		st << Stream::eos;
-		player->send(st);
+        if (sz)
+        {
+            Stream st(REP::DIALOG_START);
+            st << npcId << static_cast<UInt16>(0) << sz;
+            for (UInt16 i = 1; i <= sz; ++i)
+            {
+                Table m = msg.get<Table>(i);
+                st << m.get<UInt16>("m_ActionType") << m.get<UInt8>("m_ActionToken") << m.get<UInt32>("m_ActionID") << m.get<UInt8>("m_ActionStep") << m.get<const char*>("m_ActionMsg");
+            }
+            st << Stream::eos;
+            player->send(st);
+        }
 	}
 
 }

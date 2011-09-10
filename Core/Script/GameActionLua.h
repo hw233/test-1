@@ -54,25 +54,13 @@ namespace Script
 		Table GetDayTaskCompletedCount(Player * player, UInt32 dayTaskId);
 		Table GetDayTaskFlushColor(Player * player, UInt32 dayTaskId);
 
-		Table RunGreatFighterAction(Player * player, UInt32 fightId);
-		Table RunGreatCollectActionStep(Player * player, UInt32 fightId);
-		Table RunGreatCtrlActionStep(Player * player, UInt32 fightId);
-		bool  RunGreatTaskAction(Player * player, UInt32 fgtId);
-		UInt32 GetGreatFighterFavor(UInt32 fightId);
-		UInt32 GetGreatFighterReqFriendliness(UInt32 fightId);
 		Table RunDayCopyTask(Player *, UInt32);
 		Table RunDayCopyTaskStep(Player *, UInt32, UInt32);
         Table RunActiveTask(Player * player, UInt32 npcId);
         Table RunActiveTaskStep(Player *, UInt32, UInt32);
 
 		Table RunNpcDefaultAction(Player * player, UInt32 npcId);
-
-		bool RunTakeFighterAction(Player *);
-
 		void  RunItemTaskAction(Player* player, UInt32 taskId, UInt32 dummyNpcId);
-
-		UInt8 GetGreatFighterLev(UInt32);
-		UInt8 GetGreatFighterCorlor(UInt32 fgtId);
 
 		UInt32 GetSharpDay(UInt32);
 

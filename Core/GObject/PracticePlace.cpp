@@ -358,7 +358,7 @@ UInt8 PracticePlace::_hookAddCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2};
         }
 
         int nVipLevel = pl->getVipLevel();
-        int nCount = _maxCount + _extraCount[nVipLevel];
+        UInt32 nCount = _maxCount + _extraCount[nVipLevel];
 
         if (data->fighters.size() > nCount)
         {

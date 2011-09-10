@@ -1343,121 +1343,6 @@ namespace GObject
 		return true;
 	}
 
-	void Player::checkGreatFighterFriendliness(UInt32 id)
-	{
-		std::map<UInt32, GreatFighterTaskVal>::iterator it = _greatFighterTaskVal.find(id);
-		if(it == _greatFighterTaskVal.end())
-			setGreatFighterFriendliness(id, 10);
-	}
-
-	bool Player::setGreatFighterTaskVal(UInt32 id, UInt16 friendliness, UInt16 submitFavorCount, UInt32 submitFavorDay)
-	{
-		Fighter * fgt = globalFighters[id];
-		if (fgt == NULL)
-			return false;
-		GreatFighterTaskVal& v = _greatFighterTaskVal[id];
-		v.friendliness = friendliness;
-		if (v.friendliness >= fgt->reqFriendliness)
-		{
-			v.friendliness = fgt->reqFriendliness;
-			_greatFighterFull.insert(id);
-		}
-		v.submitFavorCount = submitFavorCount;
-		v.submitFavorDay = submitFavorDay;
-		return true;
-	}
-
-	void Player::setGreatFighterFriendliness(UInt32 id, UInt16 friendliness, bool writedb)
-	{
-		if(id > GREAT_FIGHTER_MAX)
-			return;
-		Fighter * fgt = globalFighters[id];
-		if (fgt == NULL)
-			return;
-		GreatFighterTaskVal& v = _greatFighterTaskVal[id];
-		v.friendliness = friendliness;
-		v.submitFavorDay = TimeUtil::SharpDay(0);
-		if (v.friendliness >= fgt->reqFriendliness)
-		{
-			v.friendliness = fgt->reqFriendliness;
-			_greatFighterFull.insert(id);
-		}
-		if(writedb)
-		{
-			DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v.friendliness, v.submitFavorCount, v.submitFavorDay);
-			//SYSMSG_SENDV(148, this, friendliness);
-			//SYSMSG_SENDV(1048, this, id, friendliness);
-		}
-	}
-
-	UInt16 Player::getGreatFighterFriendliness( UInt32 id )
-	{
-		std::map<UInt32, GreatFighterTaskVal>::const_iterator cit = _greatFighterTaskVal.find(id);
-		if (cit == _greatFighterTaskVal.end())
-			return 0;
-		return cit->second.friendliness;
-	}
-
-	void Player::greatFighterFavorSubmitCheck(GreatFighterTaskVal * task, UInt32 fightId, UInt32 thisDay)
-	{
-		if (task->submitFavorDay != thisDay)
-		{
-			task->submitFavorDay = thisDay;
-			if(task->submitFavorCount != 0)
-			{
-				task->submitFavorCount = 0;
-				DB().PushUpdateData("UPDATE `friendliness` SET `favorSubmitCount`= %u,	`favorSubmitDay` = %u WHERE `playerId` = %"I64_FMT"u AND `fighterId` = %u", 0, thisDay, getId(), fightId);
-			}
-		}
-	}
-
-	bool Player::submitGreatFighterFavor(UInt32 id)
-	{
-		std::map<UInt32, GreatFighterTaskVal>::iterator it = _greatFighterTaskVal.find(id);
-		if (it == _greatFighterTaskVal.end())
-			return false;
-
-		UInt32 thisDay = TimeUtil::SharpDay(0);
-		GreatFighterTaskVal * v = &it->second;
-		if (v->submitFavorDay != thisDay)
-		{
-			v->submitFavorCount = 0;
-			v->submitFavorDay = thisDay;
-		}
-
-		v->submitFavorCount ++;
-		v->friendliness += 30;
-		Fighter * fgt = globalFighters[id];
-		if (fgt != NULL && v->friendliness >= fgt->reqFriendliness)
-		{
-			v->friendliness = fgt->reqFriendliness;
-			_greatFighterFull.insert(id);
-		}
-		//SYSMSG_SENDV(148, this, 30);
-		//SYSMSG_SENDV(1048, this, id, 30);
-		DB().PushUpdateData("REPLACE INTO `friendliness` (`playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay`) VALUES (%"I64_FMT"u, %u, %u, %u, %u)", getId(), id, v->friendliness, v->submitFavorCount, v->submitFavorDay);
-		DBLOG().PushUpdateData("insert into `fighter_friendness`(`server_id`, `player_id`, `fighter_id`, `friendness`, `time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, getId(), id, v->friendliness, TimeUtil::Now());		
-		GameAction()->RunGreatTaskAction(this, id);
-
-		return true;
-	}
-
-	UInt16 Player::getGreatFighterFavorSubmitCount(UInt32 id)
-	{
-		std::map<UInt32, GreatFighterTaskVal>::iterator it = _greatFighterTaskVal.find(id);
-		if (it == _greatFighterTaskVal.end())
-			return 0;
-
-		greatFighterFavorSubmitCheck(&it->second, it->first);
-		return it->second.submitFavorCount;
-	}
-
-	UInt32 Player::getGreatFighterFavor(UInt32 fightId)
-	{
-		GObject::Fighter& fighter = GObject::getGreatFighter(fightId);
-		return fighter.getId() == 0 ? 0 : fighter.favor;
-	}
-
 	bool Player::setNewGuildTaskStep(UInt32 step)
 	{
 #if 0
@@ -1925,8 +1810,6 @@ namespace GObject
 		Fighter * fgt = globalFighters[id];
 		if(fgt == NULL)
 			return NULL;
-		if(id > 6 && id <= 300)
-			setGreatFighterFriendliness(id, fgt->reqFriendliness, writedb);
 		Fighter * fgt2 = fgt->clone(this);
 		addFighter(fgt2, writedb);
 		if (_clan != NULL)
@@ -3065,7 +2948,7 @@ namespace GObject
                     _playerData.smcolor[i] = 0;
 
                     sendColorTask(0, 0);
-                   
+                    writeShiMen();
                     return true;
                 }
             }
