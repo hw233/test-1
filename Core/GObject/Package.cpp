@@ -17,6 +17,7 @@
 #include "Common/StringTokenizer.h"
 #include "Server/Cfg.h"
 #include "GData/SkillTable.h"
+#include "GData/Money.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -1309,7 +1310,7 @@ namespace GObject
         // if(ied.enchant >= enchant_max[viplvl])
         //     return 2;
 
-		UInt32 amount = GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
+		UInt32 amount = GData::moneyNeed[GData::ENCHANT].tael;//GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
 		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 1100);
@@ -1453,7 +1454,7 @@ namespace GObject
 		if(lvl >= 9) return 2;
 
 		UInt8 unbindCount = 3 - bindCount;
-		UInt32 amount = GObjectManager::getMergeCost(); // merge_cost[lvl];
+		UInt32 amount = GData::moneyNeed[GData::GEMMERGE].tael;//GObjectManager::getMergeCost(); // merge_cost[lvl];
 		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 1100);
@@ -1595,7 +1596,7 @@ namespace GObject
 	{
 		-- pos;
 		if (pos > 5) return 2;
-		UInt32 amount = GObjectManager::getDetachCost();
+		UInt32 amount = GData::moneyNeed[GData::GEMDETACH].tael;//GObjectManager::getDetachCost();
 		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 1100);
@@ -1665,7 +1666,7 @@ namespace GObject
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
 		UInt8 q = item->getQuality() - 2;
-		UInt32 amount = GObjectManager::getSplitCost();   // split_cost[q][lv];
+		UInt32 amount = GData::moneyNeed[GData::SPLIT].tael;//GObjectManager::getSplitCost();   // split_cost[q][lv];
 		if(m_Owner->getTael() < amount)
 		{
 			m_Owner->sendMsgCode(0, 1100);
@@ -1926,7 +1927,7 @@ namespace GObject
 
         while(result == 0 && bindCount >= 3)
         {
-            UInt32 amount = GObjectManager::getMergeCost();    // merge_cost[lvl];
+            UInt32 amount = GData::moneyNeed[GData::GEMMERGE].tael;//GObjectManager::getMergeCost();    // merge_cost[lvl];
             coinAmount += amount;
             if(coinAmount > myCoin)
             {
@@ -1958,13 +1959,14 @@ namespace GObject
             }
             else if(!protect)
             {
+                bindUsed += 3;
                 bindCount -= 3;
             }
         }
 
         while(result == 0 && unbindCount >= 3)
         {
-            UInt32 amount = GObjectManager::getMergeCost();        // merge_cost[lvl];
+            UInt32 amount = GData::moneyNeed[GData::GEMMERGE].tael;//GObjectManager::getMergeCost();        // merge_cost[lvl];
             coinAmount += amount;
             if(coinAmount > myCoin)
             {
@@ -1995,13 +1997,14 @@ namespace GObject
             }
             else if(!protect)
             {
+                unbindUsed += 3;
                 unbindCount -= 3;
             }
         }
 
         while(bindCount + unbindCount >= 3 && result == 0)
         {
-            UInt32 amount = GObjectManager::getMergeCost();      // merge_cost[lvl];
+            UInt32 amount = GData::moneyNeed[GData::GEMMERGE].tael;//GObjectManager::getMergeCost();      // merge_cost[lvl];
             coinAmount += amount;
             if(coinAmount > myCoin)
             {
@@ -2037,6 +2040,9 @@ namespace GObject
             }
             else if(!protect)
             {
+                bindUsed += bindCount;
+                unbindUsed += 3 - bindCount;
+
                 unbindCount -= 3 - bindCount;
                 bindCount = 0;
             }
@@ -2046,6 +2052,7 @@ namespace GObject
             DelItem(gemId, bindUsed, true);
         if(unbindUsed > 0)
             DelItem(gemId, unbindUsed, false);
+
         if(bindGemsOut > 0)
         {
             AddItem(gemIdOut, bindGemsOut, true);

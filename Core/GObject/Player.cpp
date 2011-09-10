@@ -3212,7 +3212,6 @@ namespace GObject
     {
         GetTaskMgr()->DelTask(_playerData.clanTaskId);
         _playerData.clanTaskId = 0;
-        _playerData.ctFinishCount = 0;
 
         writeClanTask();
     }

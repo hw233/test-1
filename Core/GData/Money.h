@@ -61,6 +61,15 @@ enum
 // 书商刷新
     BOOK_LIST,
 
+// 装备强化
+    ENCHANT,
+// 宝石合成
+    GEMMERGE,
+// 宝石拆卸
+    GEMDETACH,
+// 装备分解
+    SPLIT,
+
     MONEY_MAX,
 };
 

@@ -454,7 +454,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 		return;
 
     UInt32 extrachallenge = (*atkerRank->second)->extrachallenge;
-    if(0 == extrachallenge || extrachallenge & 0x80000000)
+    if((0 == extrachallenge) || (extrachallenge & 0x80000000))
         return;
 
     Rank tmp = _athleticses[row].begin();
@@ -530,35 +530,39 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	else if(deferRankPos - atkerRankPos > 4)
 		return;
 
-    if(!type)
+    if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
     {
-        if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
-        {
-            atker->sendMsgCode(0, 1413);
-            return ;
-        }
-        if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)
-            return ;
+        atker->sendMsgCode(0, 1413);
+        return ;
     }
 
-	AthleticsRankData * data = *(atkerRank->second);
-	data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
-	if (data->challengenum >= Maxchallengenum[Viplvl])
-		return ;
+    if(!type)
+    {
+        AthleticsRankData * data = *(atkerRank->second);
+        if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)
+            return ;
+
+        data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
+        if (data->challengenum >= Maxchallengenum[Viplvl])
+            return ;
+
+        data->challengenum ++;
+        gSpecialAward.newServerActivity(atker, data->challengenum);
+
+        updateAthleticsRank(data);
+
+        UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
+        if(Viplvl >= 1 && Viplvl <= 3)
+            challengeBuff=data->challengetime + 10 * 60;
+        else if (Viplvl > 3)
+            challengeBuff=data->challengetime + 5 * 60;
+
+        atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
+        DB().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
+    }
+
 	atker->addGlobalFlag(Player::Challenging);
 	defer->addGlobalFlag(Player::BeChallenging);
-	data->challengenum ++;
-	gSpecialAward.newServerActivity(atker, data->challengenum);
-    updateAthleticsRank(data);
-
-	UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
-	if(Viplvl >= 1 && Viplvl <= 3)
-		challengeBuff=data->challengetime + 10 * 60;
-    else if (Viplvl > 3)
-		challengeBuff=data->challengetime + 5 * 60;
-
-	atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
-	DB().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
 	GameMsgHdr hdr(0x212, atker->getThreadId(), atker, sizeof(Player *));
 	GLOBAL().PushMsg(hdr, &defer);
 //	DBLOG().PushUpdateData("insert into `athletics_challenge`(`server_id`, `row`, `attacker_rank`, `defender_rank`, `created_at`) values(%u, %u, %u, %u, %u)", cfg.serverLogId, row, atkerRankPos, deferRankPos, TimeUtil::Now());
@@ -1323,7 +1327,7 @@ UInt32 AthleticsRank::setAthleticsExtraChallenge(Player* player, UInt32 extracha
 	if (found == _ranks[row].end())
 		return 0;
 
-    if(getRankPos(row, found->second) < extrachallenge + 1)
+    if(getRankPos(row, found->second) < (0x7FFFFFFF & extrachallenge) + 1)
         return 0;
 
     (*found->second)->extrachallenge = extrachallenge;
