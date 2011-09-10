@@ -153,13 +153,13 @@ namespace GObject
     {
         time_t now2 = static_cast<time_t>(now);
         struct tm * t = localtime(&now2);
-        if ((t->tm_hour >= 12 && t->tm_min >= 45 && t->tm_hour < 13 && m_max >= 40) ||
-            (t->tm_hour >= 13 && t->tm_min >= 45 && t->tm_hour < 14 && m_max >= 50) ||
-            (t->tm_hour >= 14 && t->tm_min >= 45 && t->tm_hour < 15 && m_max >= 60) ||
-            (t->tm_hour >= 15 && t->tm_min >= 45 && t->tm_hour < 16 && m_max >= 70) ||
-            (t->tm_hour >= 16 && t->tm_min >= 45 && t->tm_hour < 17 && m_max >= 80) ||
-            (t->tm_hour >= 17 && t->tm_min >= 45 && t->tm_hour < 18 && m_max >= 90) ||
-            (t->tm_hour >= 18 && t->tm_min >= 45 && t->tm_hour < 19 && m_max >= 100))
+        if ((t->tm_hour == 12 && t->tm_min >= 45 && m_max >= 40) ||
+            (t->tm_hour == 13 && t->tm_min >= 45 && m_max >= 50) ||
+            (t->tm_hour == 14 && t->tm_min >= 45 && m_max >= 60) ||
+            (t->tm_hour == 15 && t->tm_min >= 45 && m_max >= 70) ||
+            (t->tm_hour == 16 && t->tm_min >= 45 && m_max >= 80) ||
+            (t->tm_hour == 17 && t->tm_min >= 45 && m_max >= 90) ||
+            (t->tm_hour == 18 && t->tm_min >= 45 && m_max >= 100))
         {
             if (60 - t->tm_min >= 5)
                 SYSMSG_BROADCASTV(547, ((60 - t->tm_min)/10)*10+5);

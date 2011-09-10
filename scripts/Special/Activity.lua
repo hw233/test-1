@@ -647,6 +647,10 @@ function RunActiveTaskStep(player, id, actionId)
         local s = os.date("%S", os.time())
         player:setBuffData(21, now+(24*60*60-(h*60*60+m*60+s)), true)
         local package = player:GetPackage()
+		if package:IsFull() then
+            player:sendMsgCode(2, 1011, 0)
+			return;
+        end
         package:AddItem(68, 5, true);	
 
         local action = ActionTable:Instance();
