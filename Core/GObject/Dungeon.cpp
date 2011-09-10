@@ -594,6 +594,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			if(viplevel < 6)
 			{
 				const UInt32 taelReq[] = {
+                    0,
                     GData::moneyNeed[GData::COPY_AUTO1].tael,
                     GData::moneyNeed[GData::COPY_AUTO2].tael,
                     GData::moneyNeed[GData::COPY_AUTO3].tael,
