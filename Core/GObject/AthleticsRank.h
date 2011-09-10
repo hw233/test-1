@@ -178,7 +178,7 @@ protected:
 
 	inline UInt8 getRankRow(UInt8 lev)
 	{
-		if (lev > 45)
+		if (lev > 44)
 			return 1;
 		if (lev > 29)
 			return 0;

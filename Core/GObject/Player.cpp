@@ -4177,7 +4177,7 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-		if ((nLev > 29 && !m_Athletics->hasEnterAthletics()) || (oLev < 46 && nLev > 45))
+		if ((nLev > 29 && !m_Athletics->hasEnterAthletics()) || (oLev < 45 && nLev > 44))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
 			GLOBAL().PushMsg(hdr, &nLev);

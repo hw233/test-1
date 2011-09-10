@@ -728,7 +728,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             AttackAct aa = {0};
             aa.bf = bo;
             aa.skill = passiveSkillInj;
-            aa.target_side = bo->getPos();
+            aa.target_side = bo->getSide();
             aa.target_pos = bo->getPos();
             aa.param = dmg;
 
