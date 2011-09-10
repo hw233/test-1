@@ -2505,6 +2505,28 @@ Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, 
 //        while(tmpColor > -1)
 //        {
             idset[tmpColor] = _summonSet[free_gold][tmpColor];
+            pl->exceptAvailableFighters(idset[tmpColor]);
+            for(std::set<UInt32>::iterator it = excepts.begin(); it != excepts.end(); ++ it)
+                idset[tmpColor].erase(*it);
+            for(std::set<UInt32>::iterator it = excepts2.begin(); idset[tmpColor].size() > 6 && it != excepts2.end(); ++ it)
+                idset[tmpColor].erase(*it);
+/*
+            if(colors == 1 && idset[tmpColor].empty())
+            {
+               -- tmpColor;
+            }
+            else
+            {
+                break;
+            }
+*/
+//        }
+
+//        if(tmpColor < 0)
+//        {
+//            break;
+//        }
+
         size_t size = idset[tmpColor].size();
         if(size == 0)
             continue;
