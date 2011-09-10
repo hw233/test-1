@@ -335,6 +335,36 @@ namespace GObject
             DB().PushUpdateData("UPDATE `tripod` SET `soul` = %u WHERE `id` = %"I64_FMT"u", data.soul, m_Player->getId());
     }
 
+    bool EventAutoCopy::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoCopy::Process(UInt32 leftCount)
+    {
+        UInt8 ret = GObject::playerCopy.fight(m_Player, id, true);
+        if (leftCount == 0 || ret == 2 || ret == 0)
+        {
+            if (ret == 0)
+                m_Player->autoCopyFailed(id);
+            m_Player->delFlag(Player::AutoCopy);
+			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
+            DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", m_Player->getId());
+        }
+    }
+
+    bool EventAutoCopy::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
 	void Lineup::updateId()
 	{
 		if(fighter != NULL) fid = fighter->getId(); else fid = 0;
@@ -1533,13 +1563,18 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId )
+    void Player::autoCopyFailed(UInt8 id)
+    {
+        GObject::playerCopy.failed(this, id);
+    }
+
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, bool ato, std::vector<UInt32>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
         // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
         //buffLeft = 0;
-		if(buffLeft > now)
+		if(buffLeft > now && !ato)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
 			return false;
@@ -1564,11 +1599,12 @@ namespace GObject
 		if(packet.size() <= 8)
 			return false;
 
-		Stream st(REP::ATTACK_NPC);
+        UInt8 atoCnt = 0;
+        UInt16 ret = 0x0100;
 		bool res = bsim.getWinner() == 1;
 		if(res)
 		{
-			st << static_cast<UInt16>(0x0101);
+			ret = 0x0101;
 			_lastNg = ng;
 			if(getBuffData(PLAYER_BUFF_TRAINP3, now))
 				pendExp(ng->getExp() * 17 / 10);
@@ -1580,20 +1616,37 @@ namespace GObject
 				pendExp(ng->getExp() * 13 / 10);
 			else
 				pendExp(ng->getExp());
-			ng->getLoots(this, _lastLoot);
+
+			ng->getLoots(this, _lastLoot, &atoCnt);
 		}
-		else
-			st << static_cast<UInt16>(0x0100);
-		st << _playerData.lastExp << static_cast<UInt8>(0);
-		UInt8 sz = _lastLoot.size();
-		st << sz;
-		for(UInt8 i = 0; i < sz; ++ i)
-		{
-			st << _lastLoot[i].id << _lastLoot[i].count;
-		}
-		st.append(&packet[8], packet.size() - 8);
-		st << Stream::eos;
-		send(st);
+
+        if (ato)
+        {
+            if (loot)
+            {
+                UInt8 sz = _lastLoot.size();
+                (*loot).push_back(atoCnt);
+                for(UInt8 i = 0; i < sz; ++ i)
+                {
+                    (*loot).push_back(_lastLoot[i].id);
+                    (*loot).push_back(_lastLoot[i].count);
+                }
+            }
+        }
+        else
+        {
+            Stream st(REP::ATTACK_NPC);
+            st << ret << _playerData.lastExp << static_cast<UInt8>(0);
+            UInt8 sz = _lastLoot.size();
+            st << sz;
+            for(UInt8 i = 0; i < sz; ++ i)
+            {
+                st << _lastLoot[i].id << _lastLoot[i].count;
+            }
+            st.append(&packet[8], packet.size() - 8);
+            st << Stream::eos;
+            send(st);
+        }
 
         bsim.applyFighterHP(0, this);
 
@@ -5296,6 +5349,21 @@ namespace GObject
 		Stream st(REP::USER_INFO_CHANGE);
 		st << static_cast<UInt8>(0x11) << static_cast<UInt32>(cny) << Stream::eos;
 		send(st);
+    }
+
+    void Player::startAutoCopy(UInt8 id)
+    {
+        playerCopy.autoBattle(this, id, 0);
+    }
+
+    void Player::cancelAutoCopy(UInt8 id)
+    {
+        playerCopy.autoBattle(this, id, 1);
+    }
+
+    void Player::instantAutoCopy(UInt8 id)
+    {
+        playerCopy.autoBattle(this, id, 2);
     }
 
 }

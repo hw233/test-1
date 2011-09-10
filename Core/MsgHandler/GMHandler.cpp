@@ -126,6 +126,7 @@ GMHandler::GMHandler()
     Reg(3, "count", &GMHandler::OnCount);
     Reg(3, "wc", &GMHandler::OnCount);
     Reg(3, "tid", &GMHandler::OnThreadId);
+    Reg(3, "ac", &GMHandler::OnAutoCopy);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -850,7 +851,7 @@ void GMHandler::OnSetDL( GObject::Player * player, std::vector<std::string>& arg
 	dg->playerJump(player, level);
 }
 
-void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt8 type, UInt8 enchant = 10, UInt8 level = 10, bool flushAttr = true )
+void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt8 type, UInt8 enchant = 8, UInt8 level = 10, bool flushAttr = true )
 {
 	if(equip == NULL || level > 10)
 		return;
@@ -959,7 +960,7 @@ void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt
 		ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, equip->getId());
 }
 
-void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 10, UInt8 gemlevel = 10, bool flushAttr = true )
+void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8, UInt8 gemlevel = 10, bool flushAttr = true )
 {
 	if(fgt == NULL)
 		return;
@@ -2208,6 +2209,19 @@ void GMHandler::OnThreadId(GObject::Player *player, std::vector<std::string>& ar
         CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
         GameMsgHdr hdr(0x1F0, threadId, player, sizeof(CountryEnterStruct));
         GLOBAL().PushMsg(hdr, &ces);
+    }
+}
+
+void GMHandler::OnAutoCopy(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+
+    if (args.size() >= 2)
+    {
+        UInt8 id = atoi(args[0].c_str());
+        UInt8 type = atoi(args[1].c_str());
+        playerCopy.autoBattle(player, id, type);
     }
 }
 

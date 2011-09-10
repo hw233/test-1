@@ -2781,10 +2781,10 @@ void OnMailDelReq( GameMsgHdr& hdr, const void * buffer )
 	{
 		mailBox->delMail(idlist[i], true);
 	}
-	if(mailBox->getNewMails() != omb)
-	{
-		mailBox->notifyNewMail();
-	}
+	//if(mailBox->getNewMails() != omb)
+	//{
+	//	mailBox->notifyNewMail();
+	//}
 	std::vector<UInt8> rep;
 	rep.resize(4 + blen);
 	*reinterpret_cast<UInt32 *>(&rep[0]) = (REP::MAIL_DELETE << 6) | 0xFF0000 | blen;

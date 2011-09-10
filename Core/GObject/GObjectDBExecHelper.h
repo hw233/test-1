@@ -531,6 +531,12 @@ struct DBAutoBattle
 	UInt16 interval;
 };
 
+struct DBAutoCopy
+{
+	UInt64 playerId;
+	UInt8 id;
+};
+
 struct DBExchangeTicket
 {
 	UInt64 playerId;
@@ -1297,6 +1303,14 @@ SPECIALDEF(4)
 	UInt32, npcId,
 	UInt16, count,
 	UInt16, interval
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAutoCopy)
+SPECIALDEF(2)
+(
+	UInt64, playerId,
+	UInt8, id
 )
 SPECIALEND()
 

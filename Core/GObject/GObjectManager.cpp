@@ -1655,6 +1655,21 @@ namespace GObject
 		}
 		lc.finalize();
 
+		lc.prepare("Loading auto copy challenge data:");
+		DBAutoCopy dac;
+		if(execu->Prepare("SELECT `playerId`, `id` FROM `autocopy`", dac) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dac.playerId];
+			if(pl == NULL)
+				continue;
+			playerCopy.autoBattle(pl, dac.id, 0, true);
+		}
+		lc.finalize();
+
 		lc.prepare("Loading auto dungeon challenge data:");
 		DBDungeonAuto dda;
 		if(execu->Prepare("SELECT `playerId`, `dungeonId`, `totalExp`, `won` FROM `dungeon_auto`", dda) != DB::DB_OK)

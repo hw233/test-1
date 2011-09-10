@@ -70,8 +70,9 @@ void NpcGroup::getLoots( GObject::Player * player )
 	}
 }
 
-void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il )
+void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, UInt8* atoCnt )
 {
+    UInt8 cnt = 0;
 	std::vector<const LootItem *>::iterator it;
 	for(it = _loots.begin(); it != _loots.end(); ++ it)
 	{
@@ -80,9 +81,12 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il )
 			continue;
         // TODO: 
 		//player->GetPackage()->Add(lr.id, lr.count, GetItemSubClass(lr.id) == Item_Favor, true, FromNpc);
-		player->GetPackage()->Add(lr.id, lr.count, false, true, FromNpc);
+		if (player->GetPackage()->Add(lr.id, lr.count, false, true, FromNpc))
+            ++cnt;
 		il.push_back(lr);
 	}
+    if (atoCnt)
+        *atoCnt = cnt;
 }
 
 void NpcGroup::calcBattlePoints( Script::BattleFormula * bformula )

@@ -45,7 +45,7 @@ public:
 	void monsterKilled(GObject::Player *, UInt32 = 1);
 	void setLoots(std::vector<const LootItem *>&);
 	void getLoots(GObject::Player *);
-	void getLoots(GObject::Player *, std::vector<LootResult>&);
+	void getLoots(GObject::Player *, std::vector<LootResult>&, UInt8* atoCnt = NULL);
 	void calcBattlePoints(Script::BattleFormula *);
 	inline float getBattlePoints() { return _bp; }
 	UInt8 getLevel();

@@ -72,6 +72,7 @@ enum MailItemType
 	BackStage,
 	Activity,
 	DismissCitta,
+    AutoCopy,
 
 };
 enum ItemFrom

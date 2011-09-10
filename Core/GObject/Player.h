@@ -58,6 +58,7 @@ namespace GObject
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 #define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
 #define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
+#define PLAYER_BUFF_AUTOCOPY        0x21	//自动副本
 
 #define PLAYER_BUFF_COUNT			0x30
 
@@ -148,6 +149,22 @@ namespace GObject
         virtual bool Equal(UInt32 id, size_t playerid) const;
         void Process(UInt32);
 		bool Accelerate(UInt32);
+    };
+
+    class EventAutoCopy : public EventBase
+    {
+    public:
+		EventAutoCopy(Player * player, UInt32 interval, UInt32 count, UInt8 id)
+			: EventBase(player, interval, count), id(id)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_AUTOCOPY; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 id;
     };
 
 	struct Lineup
@@ -300,6 +317,7 @@ namespace GObject
 			Training		= 0x00000002,
 			AutoDungeon		= 0x00000004,
 			ClanBattling	= 0x00000008,
+			AutoCopy        = 0x00000010,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -610,7 +628,8 @@ namespace GObject
 		//战斗相关
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false);
-        bool attackCopyNpc(UInt32, UInt8, UInt8);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, bool = false, std::vector<UInt32>* loot = NULL);
+        void autoCopyFailed(UInt8);
 		bool autoBattle(UInt32);
 		void pushAutoBattle(UInt32, UInt16, UInt16);
 		void pushAutoDungeon(UInt32, UInt32, UInt8);
@@ -622,6 +641,10 @@ namespace GObject
 		void sendAutoBattleEvent(EventBase *);
 		void sendOnlineReward();
 		void sendDailyInfo();
+
+        void startAutoCopy(UInt8 id);
+        void cancelAutoCopy(UInt8 id);
+        void instantAutoCopy(UInt8 id);
 
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }

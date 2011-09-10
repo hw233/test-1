@@ -218,7 +218,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     int i = 0;
     while (i < 10)
     {
-        if (id & fire_com[i])
+        if (id == fire_com[i])
             break;
         ++i;
     }
