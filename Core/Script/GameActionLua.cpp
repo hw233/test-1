@@ -94,13 +94,9 @@ namespace Script
 		CLASS_DEF(GameActionLua, RunAutoBattleAction);
 		CLASS_DEF(GameActionLua, GetDayTaskCompletedCount);
 		CLASS_DEF(GameActionLua, GetDayTaskFlushColor);
-		CLASS_DEF(GameActionLua, GetGreatFighterFavor);
-		CLASS_DEF(GameActionLua, GetGreatFighterReqFriendliness);
 		CLASS_DEF(GameActionLua, GetItemName);
 		CLASS_DEF(GameActionLua, GetGreatFighterName);
 		CLASS_DEF(GameActionLua, RunItemTaskAction);
-		CLASS_DEF(GameActionLua, GetGreatFighterLev);
-		CLASS_DEF(GameActionLua, GetGreatFighterCorlor);
         CLASS_DEF(GameActionLua, GetSharpDay);
 
 		CLASS_ADD(Player);
@@ -143,9 +139,6 @@ namespace Script
 		CLASS_DEF(Player, GetFreePackageSize);
 		CLASS_DEF(Player, addFightCurrentHp);
 		CLASS_DEF(Player, addFightCurrentHpAll);
-		CLASS_DEF(Player, getGreatFighterFriendliness);
-		CLASS_DEF(Player, getGreatFighterFavorSubmitCount);
-		CLASS_DEF(Player, getGreatFighterFavor);
 		CLASS_DEF(Player, getFighterCount);
 		CLASS_DEF(Player, getMainFighter);
 		CLASS_DEF(Player, regenHP);
@@ -416,26 +409,9 @@ namespace Script
 		return Run<Table>(player, "RunNpcDefaultAction", npcId);
 	}
 
-	bool GameActionLua::RunTakeFighterAction(Player * player)
-	{
-		return Run<bool>(player, "RunTakeFighterAction");
-	}
-
 	void GameActionLua::RunItemTaskAction(Player* player, UInt32 taskId, UInt32 dummyNpcId)
 	{
 		MOAction::ItemTaskAction(player, taskId, dummyNpcId);
-	}
-
-	UInt8 GameActionLua::GetGreatFighterLev(UInt32 fgtId)
-	{
-		Fighter& fgt = getGreatFighter(fgtId);
-		return fgt.getId() == 0 ? 0xFF : fgt.getLevel();
-	}
-
-	UInt8 GameActionLua::GetGreatFighterCorlor(UInt32 fgtId)
-	{
-		Fighter& fgt = getGreatFighter(fgtId);
-		return fgt.getColor();
 	}
 
 	UInt32 GameActionLua::GetSharpDay(UInt32 now) 
@@ -550,21 +526,6 @@ namespace Script
 		return Run<Table>(player, buffer, step);
 	}
 
-	Table GameActionLua::RunGreatFighterAction(Player * player, UInt32 fightId)
-	{
-		return Run<Table>(player, "RunGreatFighterAction", fightId);
-	}
-
-	Table GameActionLua::RunGreatCollectActionStep(Player * player, UInt32 fightId)
-	{
-		return Run<Table>(player, "RunGreatCollectActionStep", fightId);
-	}
-
-	Table GameActionLua::RunGreatCtrlActionStep(Player * player, UInt32 fightId)
-	{
-		return Run<Table>(player, "RunGreatCtrlActionStep", fightId);
-	}
-
 	Table GameActionLua::RunDayCopyTask(Player * player, UInt32 npcId)
 	{
 		return Run<Table>(player, "RunDayCopyTask", npcId);
@@ -583,23 +544,6 @@ namespace Script
 	Table GameActionLua::RunActiveTaskStep(Player * player, UInt32 npcId, UInt32 actionId)
 	{
 		return Run<Table>(player, "RunActiveTaskStep", player, npcId, actionId);
-	}
-
-	bool GameActionLua::RunGreatTaskAction(Player * player, UInt32 fgtId)
-	{
-		return Run<bool>(player, "RunGreatTaskAction", fgtId);
-	}
-
-	UInt32 GameActionLua::GetGreatFighterFavor(UInt32 fightId)
-	{
-		Fighter& fighter = getGreatFighter(fightId);
-		return fighter.favor;
-	}
-
-	UInt32 GameActionLua::GetGreatFighterReqFriendliness(UInt32 fightId)
-	{
-		Fighter& fighter = getGreatFighter(fightId);
-		return fighter.reqFriendliness;
 	}
 
 	Table GameActionLua::RunDayTask(Player* player, UInt32 npcId)

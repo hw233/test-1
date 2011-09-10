@@ -170,24 +170,6 @@ function GetDayTaskFlushColor(player, dayTaskId)
 	return _GameActionLua:GetDayTaskFlushColor(player, dayTaskId);
 end
 
-function GetGreatFighterFavor(fighterId)
-	return _GameActionLua:GetGreatFighterFavor(fighterId);
-end
-
-function GetGreatFighterLev(fighterId)
-	return _GameActionLua:GetGreatFighterLev(fighterId);
-end
-function GetGreatFighterCorlor(fighterId)
-	return _GameActionLua:GetGreatFighterCorlor(fighterId);
-end
-function GetGreatFighterReqFriendliness(fighterId)
-	return _GameActionLua:GetGreatFighterReqFriendliness(fighterId);
-end
-
-function CloneGreatFighter(player, fighterId)
-	return _GameActionLua:CloneGreatFighter(player, fighterId);
-end
-
 function GetItemName(itemId)
 	return _GameActionLua:GetItemName(itemId);
 end

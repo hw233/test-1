@@ -52,7 +52,7 @@ namespace GObject
 #define PLAYER_BUFF_REENTERCLAN		0x13
 #define PLAYER_BUFF_CLANRCENHANCE	0x14    
 #define PLAYER_BUFF_PWDLOCK			0x15	//5次密码错误 锁定10分钟
-#define PLAYER_BUFF_PRACTICE1       0x16	//修炼加成20% XXX: 暂时不用 月饭领取
+#define PLAYER_BUFF_PRACTICE1       0x16	//修炼加成20% XXX: 暂时不用
 #define PLAYER_BUFF_PRACTICE2       0x17	//修炼加成50% XXX: 暂时不用
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 #define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
@@ -370,19 +370,6 @@ namespace GObject
 			}
 		};
 
-	private:
-		struct GreatFighterTaskVal
-		{
-			UInt16 friendliness;
-			UInt16 submitFavorCount;
-			UInt32 submitFavorDay;
-			GreatFighterTaskVal() : friendliness(0), submitFavorCount(0), submitFavorDay(0) {}
-			GreatFighterTaskVal(UInt16 friendliness_, UInt16 submitFavorCount_, UInt32 submitFavorDay_)
-				: friendliness(friendliness_), submitFavorCount(submitFavorCount_), submitFavorDay(submitFavorDay_)
-			{
-			}
-		};
-
 	public:
 		Player(UInt64);
 		~Player();
@@ -603,18 +590,7 @@ namespace GObject
 		void autoRegenAll();
 		void regenAll();
 
-		void   checkGreatFighterFriendliness(UInt32 id);
-		bool   setGreatFighterTaskVal(UInt32 id, UInt16 friendliness, UInt16 submitFavorCount, UInt32 submitFavorDay);
-		void   setGreatFighterFriendliness(UInt32 id, UInt16 friendliness, bool = true);
-		UInt16 getGreatFighterFriendliness(UInt32 id);
-
         UInt32 getClientAddress();
-
-		void   sendGreatFighterFavorSubmitCount(UInt32 id);
-		bool   submitGreatFighterFavor(UInt32 id);
-		UInt16 getGreatFighterFavorSubmitCount(UInt32 id);
-		UInt32 getGreatFighterFavor(UInt32 id);
-
 		bool setNewGuildTaskStep(UInt32);
         void sendNewGuild();
 
@@ -625,9 +601,6 @@ namespace GObject
         UInt8 rcvYellowDiamondAward(UInt8 type);
         void checkQQAward();
         void RollYDGem();
-
-	private:
-		void  greatFighterFavorSubmitCheck(GreatFighterTaskVal *, UInt32, UInt32 = TimeUtil::SharpDay(0));
 
 	public:
 		Map* GetMap();
@@ -827,7 +800,6 @@ namespace GObject
 
 		std::map<UInt32, Fighter *> _fighters;
 		std::map<UInt32, TrainFighterData *> _trainFighters;
-		std::map<UInt32, GreatFighterTaskVal> _greatFighterTaskVal;
 		std::set<UInt32> _greatFighterFull;
 
 		Package* m_Package;

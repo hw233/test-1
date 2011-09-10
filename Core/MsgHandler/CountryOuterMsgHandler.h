@@ -1114,61 +1114,6 @@ void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )
 	player->send(st);
 }
 
-void OnGreatFighterActionReq( GameMsgHdr& hdr, const void * data )
-{
-	if (hdr.msgHdr.bodyLen < 5)
-		return ;
-	MSG_QUERY_PLAYER(player);
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-	UInt8 token;
-	UInt32 fightId;
-	brd >> token >> fightId;
-	if(player->hasFighter(fightId))
-		return;
-	GObject::Fighter& fighter = GObject::getGreatFighter(fightId);
-	if (fighter.getId() == 0) return ;
-	if (token == 0)
-	{
-		if(!player->hasChecked())
-			return;
-		UInt16 submitMaxCount = 10;
-		if(fighter.getColor() >= 4)
-		{
-			UInt32 viplvl = player->getVipLevel();
-			if(viplvl >= 7)
-				submitMaxCount = 30;
-			else if(viplvl >= 5)
-				submitMaxCount = 20;
-		}
-		if (player->getGreatFighterFavorSubmitCount(fightId) < submitMaxCount)
-		{
-			if (player->GetPackage()->DelItemAny(fighter.favor, 4))
-			{
-				const GData::ItemBaseType * ibt = GData::itemBaseTypeManager[fighter.favor];
-				const UInt32 expGainFromFavor[] = {0, 0, 1000, 2000, 5000, 7500, 10000};
-				player->AddExp(expGainFromFavor[ibt->quality]);
-				player->submitGreatFighterFavor(fightId);
-                GameAction()->RunOperationTaskAction0(player, 5);
-			}
-		}
-	}
-	else if (token == 1)
-	{
-		UInt32 friendliness = player->getGreatFighterFriendliness(fightId);
-		if(fighter.reqFriendliness > friendliness)
-			return;
-		if(player->isFighterFull())
-		{
-			player->sendMsgCode(0, 1200);
-			return;
-		}
-		if (GameAction()->RunAutoBattleAction(player, fightId, -1))
-		{
-			player->takeFighter(fightId, true);
-		}
-	}
-}
-
 struct FighterLeaveStruct
 {
 	UInt8 _result;
@@ -1950,12 +1895,6 @@ void OnTaskNpcActionReq(GameMsgHdr& hdr, TaskNpcActionReq& req)
 	case 0x01:
 	case 0x52:
 		MOAction::TaskActionStep(player, req.m_NpcId, req.m_ActionID, req.m_ActionStep);
-		break;
-	case 0x50:
-		MOAction::GreatFighterActionStep(player, req.m_NpcId);
-		break;
-	case 0x51:
-		MOAction::RunGreatCtrlActionStep(player, req.m_NpcId);
 		break;
 	case 0x60:
 		MOAction::RunDayCopyTaskStep(player, req.m_NpcId, req.m_ActionID);
@@ -2881,7 +2820,7 @@ void OnMailDelReq( GameMsgHdr& hdr, const void * buffer )
 	const UInt32 * idlist = reinterpret_cast<const UInt32 *>(buf + 1);
 
 	GObject::MailBox * mailBox = player->GetMailBox();
-	UInt16 omb = mailBox->getNewMails();
+	//UInt16 omb = mailBox->getNewMails();
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		mailBox->delMail(idlist[i], true);

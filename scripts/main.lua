@@ -13,7 +13,7 @@ require("UseItem/TaskItemUse")
 require("UseItem/Function")
 require("DayTask/DayTask")
 require("DayTask/DayCopyTask");
-require("DayTask/GreatFighterDayTask")
+--require("DayTask/GreatFighterDayTask")
 require("MapObject/NpcDefaultAction")
 require("Other/OperationTaskAction")
 require("Special/Activity")

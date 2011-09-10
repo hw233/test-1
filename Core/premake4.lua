@@ -22,7 +22,7 @@ project "Server.ASSS"
     	buildoptions { "-std=c++0x" }
         links { "mysqlclient" }
     configuration "not windows"
-        links { "event", "event_pthreads", "dl", "udplog" }
+        links { "event", "event_pthreads", "dl", "udplog", "memcached" }
     configuration "linux"
         defines "LUA_USE_LINUX"
     configuration "macosx"

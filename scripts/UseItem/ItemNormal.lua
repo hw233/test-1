@@ -4737,7 +4737,7 @@ function ItemNormal_00000068(iid, num, bind, param)
         player:getGold(1000);
         local val = math.random(1, 100)
         local equips = {}
-        if val < 50 then
+        if val < 75 then
             equips = Athletics_Purple_Equip_Level_50
         else
             equips = Athletics_Orange_Equip_Level_50
@@ -5183,6 +5183,7 @@ local ItemNormal_Table = {
 	[43] = ItemNormal_00000043,
 	[52] = ItemNormal_00000052,
 	[53] = ItemNormal_00000053,
+	[66] = ItemNormal_00000066,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,

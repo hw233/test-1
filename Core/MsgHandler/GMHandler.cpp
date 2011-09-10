@@ -838,7 +838,6 @@ void GMHandler::OnSetFriendliness( GObject::Player * player, std::vector<std::st
 		fgtId = atoi(args[0].c_str());
 		friendliness = static_cast<UInt16>(atoi(args[1].c_str()));
 	}
-	player->setGreatFighterFriendliness(fgtId, friendliness);
 }
 
 void GMHandler::OnSetDL( GObject::Player * player, std::vector<std::string>& args )

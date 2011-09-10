@@ -610,8 +610,9 @@ function PrepareTask(player)
     local ActiveTask = {}
     local date = os.date("%Y%m%d", os.time())
     if date >=  "20110909" and date <= "20110912" then
-        local num = player:getBuffData(22)
-        if num == 0 then
+        local num = player:getBuffData(21)
+        print(num)
+        if num <= os.time() or num == 0 then
             local action = ActionTable:Instance();
             action.m_ActionType = 0x70;
             action.m_ActionToken = 1;
@@ -644,7 +645,7 @@ function RunActiveTaskStep(player, id, actionId)
         local h = os.date("%H", os.time())
         local m = os.date("%M", os.time())
         local s = os.date("%S", os.time())
-        player:setBuffData(22, 24*60*60-(h*60*60+m*60+s))
+        player:setBuffData(21, now+(24*60*60-(h*60*60+m*60+s)), true)
         local package = player:GetPackage()
         package:AddItem(68, 5, true);	
 
