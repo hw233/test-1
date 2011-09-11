@@ -4402,7 +4402,7 @@ namespace GObject
 
         cnt = frontMap.getFrontMapSize(this);
         UInt8 fcnt = frontMap.getCount(this); // XXX: lock???
-        st << cnt << static_cast<UInt8>(GObject::FrontMap::FREECNT+GObject::FrontMap::getGoldCount(vipLevel)-(((fcnt&0xf)>>4)+(fcnt&0xf))) << static_cast<UInt8>(GObject::FrontMap::FREECNT) << static_cast<UInt8>(GObject::FrontMap::getGoldCount(vipLevel));
+        st << cnt << static_cast<UInt8>(GObject::FrontMap::FREECNT+GObject::FrontMap::getGoldCount(vipLevel)-(((fcnt&0xf0)>>4)+(fcnt&0xf))) << static_cast<UInt8>(GObject::FrontMap::FREECNT) << static_cast<UInt8>(GObject::FrontMap::getGoldCount(vipLevel));
         if(cnt)
         {
             frontMap.buildInfo(this, st);
