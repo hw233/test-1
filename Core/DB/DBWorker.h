@@ -15,11 +15,11 @@ class DBWorker:
 	public WorkerRunner<>
 {
 public:
-	DBWorker(UInt8);
+	DBWorker(UInt8, UInt8);
 	~DBWorker();
 
 public:
-	UInt8 TID() const { return WORKER_THREAD_DB; }
+	UInt8 TID() const { return m_Worker; }
 
 protected:
 	bool Init();
@@ -41,6 +41,7 @@ private:
 
 	FastMutex m_Mutex;
 	UInt8 m_Type;
+	UInt8 m_Worker;
 	std::vector<const char *> m_UpdateItems;
 };
 

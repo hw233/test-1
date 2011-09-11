@@ -105,13 +105,25 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	m_AllWorker[WORKER_THREAD_LOGIN] = new WorkerThread<Login::LoginWorker>(new Login::LoginWorker());
 
 	worker = WORKER_THREAD_DB;
-	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0));
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB));
+	worker = WORKER_THREAD_DB1;
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB1));
+	worker = WORKER_THREAD_DB2;
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB2));
+	worker = WORKER_THREAD_DB3;
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB3));
 
 	worker = WORKER_THREAD_DB_LOG;
-	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1));
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG));
 
 	//启动数据库线程处理
 	worker = WORKER_THREAD_DB;
+	m_AllWorker[worker]->Run();
+	worker = WORKER_THREAD_DB1;
+	m_AllWorker[worker]->Run();
+	worker = WORKER_THREAD_DB2;
+	m_AllWorker[worker]->Run();
+	worker = WORKER_THREAD_DB3;
 	m_AllWorker[worker]->Run();
 
 	worker = WORKER_THREAD_DB_LOG;
@@ -201,6 +213,9 @@ void WorldServer::Shutdown()
 
 	Thread::sleep(2000);
 	m_AllWorker[WORKER_THREAD_DB]->Shutdown();
+	m_AllWorker[WORKER_THREAD_DB1]->Shutdown();
+	m_AllWorker[WORKER_THREAD_DB2]->Shutdown();
+	m_AllWorker[WORKER_THREAD_DB3]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG]->Shutdown();
 }
 
@@ -218,7 +233,8 @@ GObject::World& WorldServer::GetWorld()
 
 DB::DBWorker& WorldServer::GetDB()
 {
-	return Worker<DB::DBWorker>(WORKER_THREAD_DB);
+    static unsigned long long num = 0;
+	return Worker<DB::DBWorker>(WORKER_THREAD_DB+(num++%4));
 }
 
 DB::DBWorker& WorldServer::GetDBLog()

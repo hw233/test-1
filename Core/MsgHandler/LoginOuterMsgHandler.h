@@ -26,6 +26,8 @@
 #include "Common/SHA1Engine.h"
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
+
+#if 0
 #include <libmemcached/memcached.h>
 
 static bool meminited = false;
@@ -50,6 +52,7 @@ __attribute__((destructor)) static void uninitMemcache()
 {
     memcached_free(memc);
 }
+#endif
 
 struct UserDisconnectStruct
 {
@@ -504,6 +507,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (cfg.tokenServer.length() && cfg.tokenPort)
     {
+#if 0
         initMemcache();
         if (memc)
         {
@@ -535,6 +539,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         }
         else
             err += "token server error.";
+#endif
     }
     else
         err += "we have no token server.";

@@ -611,7 +611,6 @@ function PrepareTask(player)
     local date = os.date("%Y%m%d", os.time())
     if date >=  "20110909" and date <= "20110912" then
         local num = player:getBuffData(21)
-        print(num)
         if num <= os.time() or num == 0 then
             local action = ActionTable:Instance();
             action.m_ActionType = 0x70;

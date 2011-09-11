@@ -182,7 +182,7 @@ UInt8 PlayerCopy::getCopyFloors(UInt8 id)
 
 UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 {
-    if (!pl || !id)
+    if (!pl || !id || id > 6)
         return 0;
 
 	FastMutex::ScopedLock lk(_mutex);

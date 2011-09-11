@@ -11,7 +11,7 @@
 namespace DB
 {
 
-DBWorker::DBWorker(UInt8 type) : WorkerRunner<>((type == 1 && cfg.serverLogId == 0) ? 0 : 500), m_Type(type)
+DBWorker::DBWorker(UInt8 type, UInt8 worker) : WorkerRunner<>((type == 1 && cfg.serverLogId == 0) ? 0 : 500), m_Type(type), m_Worker(worker)
 {
 }
 
@@ -88,6 +88,8 @@ void DBWorker::OnTimer()
 		else
 			m_DBExecutor.reset(gLogDBConnectionMgr->GetExecutor());
 	}
+
+#if 0
 	std::vector<const char *>::iterator it;
 	for(it = l.begin(); it != l.end(); ++ it)
 	{
@@ -95,6 +97,20 @@ void DBWorker::OnTimer()
 		TRACE_LOG("[%s] -> %d", *it, r ? 1 : 0);
 		delete[] *it;
 	}
+#else
+    if (!l.empty())
+    {
+        size_t size = l.size();
+        const char** query = &l[0];
+        while (--size)
+        {
+            bool r = DoDBQuery(*query);
+            //TRACE_LOG("[%s] -> %d", *query, r ? 1 : 0);
+            delete[] *query;
+            ++query;
+        }
+    }
+#endif
 }
 
 void DBWorker::OnPause()
@@ -141,8 +157,10 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
+#if 0
 	if(m_Type == 0)
 		DB().GetLog()->OutInfo("Push [%s]\n", p);
+#endif
 }
 
 bool DBWorker::DoDBQuery(const char* query)

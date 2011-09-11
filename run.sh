@@ -10,6 +10,7 @@ do
 #  valgrind --tool=memcheck --leak-check=full bin/Debug/Server.ASSS 2>`date +memcheck_%y%m%d_%H%M%S`
     xxx=`netstat -tnlp |grep ":$PORT"|awk '{print $7}'|awk -F"/" '{print $1}'`
     if [ "$xxx" != "" ]; then sleep 3; continue; fi;
+    cd sql && if [ -f once.sh ]; then . once.sh; rm -f once.sh; fi && cd -
     if [ -f bin/Release/Server.ASSS ]; then mv -f bin/Release/Server.ASSS bin/Release/Server.$ID; fi
     bin/Release/Server.$ID
     sleep 3
