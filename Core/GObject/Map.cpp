@@ -358,16 +358,15 @@ void Map::Broadcast( SpotData * sd, Stream& st, Player * pl )
 	size_t size = st.size();
 	if(pl == NULL)
 	{
-		std::set<Player *>::iterator it;
-		for(it = sd->m_Players.begin(); it != sd->m_Players.end(); ++ it)
+		for(std::set<Player *>::iterator it = sd->m_Players.begin(), end = sd->m_Players.end(); it != end; ++ it)
 		{
-			(*it)->send(buf, size);
+            if (*it)
+                (*it)->send(buf, size);
 		}
 	}
 	else
 	{
-		std::set<Player *>::iterator it;
-		for(it = sd->m_Players.begin(); it != sd->m_Players.end(); ++ it)
+		for(std::set<Player *>::iterator it = sd->m_Players.begin(), end = sd->m_Players.end(); it != end; ++ it)
 		{
 			if(*it != pl)
 				(*it)->send(buf, size);
@@ -389,10 +388,10 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 			for(UInt32 j = 0; j < 2; j ++)
 			{
 				const MapPlayer& playerList = _playerList[i][j];
-				MapPlayer::const_iterator it;
-				for(it = playerList.begin(); it != playerList.end(); ++ it)
+				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
 				{
-					(*it)->send(buf, size);
+                    if (*it)
+                        (*it)->send(buf, size);
 				}
 			}
 		}
@@ -404,10 +403,9 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 			for(UInt32 j = 0; j < 2; j ++)
 			{
 				const MapPlayer& playerList = _playerList[i][j];
-				MapPlayer::const_iterator it;
-				for(it = playerList.begin(); it != playerList.end(); ++ it)
+				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
 				{
-					if(*it != pl)
+					if(*it && *it != pl)
 						(*it)->send(buf, size);
 				}
 			}

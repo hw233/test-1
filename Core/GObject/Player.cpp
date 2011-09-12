@@ -3973,6 +3973,8 @@ namespace GObject
 			int starti = 0;
 			int endi = c - 1;
 			Lineup& lu1 = _playerData.lineup[0];
+            if (!lu1.fighter)
+                return;
 			bool mfSolid = lu1.fighter->getClass() == 3;
 			if(mfSolid)
 				lu1.pos = newPos[starti ++];
@@ -3981,6 +3983,8 @@ namespace GObject
 				Lineup& lu = _playerData.lineup[i];
 				if(!lu.available())
 					continue;
+                if (!lu.fighter)
+                    continue;
 				if(lu.fighter->getClass() == 3)
 					lu.pos = newPos[starti ++];
 				else
