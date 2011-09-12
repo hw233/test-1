@@ -15,15 +15,15 @@ project "Server.ASSS"
     configuration { "Debug", "vs*" }
         links { "eventd" }
     configuration { "Release", "vs*" }
-        links { "event" }
+        links { "event", "event_pthreads", "dl", "udplog", "pthread" }
     configuration { "windows", "not vs*" }
         links { "event" }
     configuration "not vs*"
-    	buildoptions { "-std=c++0x" }
+    	buildoptions { "-std=c++0x", "-pg" }
         links { "mysqlclient" }
     configuration "not windows"
         --links { "event", "event_pthreads", "dl", "udplog", "memcached" }
-        links { "event", "event_pthreads", "dl", "udplog" }
+        links { "event", "event_pthreads", "dl", "udplog", "pthread" }
     configuration "linux"
         defines "LUA_USE_LINUX"
     configuration "macosx"

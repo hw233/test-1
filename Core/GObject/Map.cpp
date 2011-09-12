@@ -47,6 +47,8 @@ void Map::changebyStatus(Player *pl)
 {
 	UInt8 country = pl->getCountry();
 	UInt8 status = getIndexbyPK(pl);
+    FastMutex::ScopedLock lk(_plck[country][status]);
+    FastMutex::ScopedLock lk1(_plck[country][1-status]);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
 		_playerList[country][status].erase(it);	
@@ -59,8 +61,11 @@ void Map::PlayerEnter(Player * pl, bool notify)
 		NotifyPlayerEnter(pl);
 		UInt8 country = pl->getCountry();
 		UInt8 status = getIndexbyPK(pl);
-		if(find(country, status, pl) == _playerList[country][status].end())
-			_playerList[country][status].insert(pl);
+        {
+            FastMutex::ScopedLock lk(_plck[country][status]);
+            if(find(country, status, pl) == _playerList[country][status].end())
+                _playerList[country][status].insert(pl);
+        }
 	}
 
 	SpotData * sd = GetSpot(PLAYER_DATA(pl, location));
@@ -76,9 +81,12 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 		NotifyPlayerLeave(pl);
 		UInt8 country = pl->getCountry();
 		UInt8 status = getIndexbyPK(pl);
-		MapPlayer::iterator it = find(country, status, pl);
-		if(it != _playerList[country][status].end())
-			_playerList[country][status].erase(it);	
+        {
+            FastMutex::ScopedLock lk(_plck[country][status]);
+            MapPlayer::iterator it = find(country, status, pl);
+            if(it != _playerList[country][status].end())
+                _playerList[country][status].erase(it);	
+        }
 	}
 
 	SpotData * sd = GetSpot(PLAYER_DATA(pl, location));
@@ -92,12 +100,15 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 
 void Map::OnPlayerLevUp(Player *pl)
 {
+#if 0
 	UInt8 country = pl->getCountry();
 	UInt8 status = getIndexbyPK(pl);
+    FastMutex::ScopedLock lk(_plck[country][status]);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
 		_playerList[country][status].erase(it);
 	_playerList[country][status].insert(pl);
+#endif
 }
 
 SpotData* Map::GetSpot(UInt16 spot)
@@ -280,11 +291,9 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 		{
 			for(UInt32 j = 0; j < 2 && c <= MAX_NUM; j ++)
 			{
-                // TODO:
-#if 0
 				if(pl->getCountry() == 1 || pl->getCountry() == 2)
 				{
-#endif
+                    FastMutex::ScopedLock lk(_plck[i][j]);
 					const MapPlayer& playerList = _playerList[i][j];
 					for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
 					{
@@ -295,11 +304,10 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 							++ c;							
 						}
 					}
-                    // TODO:
-#if 0
 				}
 				else
 				{
+                    FastMutex::ScopedLock lk(_plck[1-i][j]);
 					const MapPlayer& playerList = _playerList[1-i][j];
 					for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
 					{
@@ -311,7 +319,6 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 						}
 					}
 				}
-#endif
 			}
 		}
 		st.data<UInt8>(4) = c;
@@ -342,6 +349,7 @@ UInt32 Map::getCityPlayerNum()
 	{
 		for(UInt32 j = 0; j < 2; j ++)
 		{
+            FastMutex::ScopedLock lk(_plck[i][j]);
 			count += _playerList[i][j].size();
 		}
 	}
@@ -387,6 +395,7 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
+                FastMutex::ScopedLock lk(_plck[i][j]);
 				const MapPlayer& playerList = _playerList[i][j];
 				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
 				{
@@ -402,6 +411,7 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
+                FastMutex::ScopedLock lk(_plck[i][j]);
 				const MapPlayer& playerList = _playerList[i][j];
 				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
 				{
