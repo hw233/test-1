@@ -27,7 +27,7 @@
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
 
-#if 0
+#if 1
 #include <libmemcached/memcached.h>
 
 static bool meminited = false;
@@ -507,7 +507,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (cfg.tokenServer.length() && cfg.tokenPort)
     {
-#if 0
+#if 1
         initMemcache();
         if (memc)
         {

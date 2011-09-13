@@ -130,7 +130,7 @@ private:
 	MOMap		m_MOMap;		//地图据点所有对象的集合
 
 	std::map<UInt16, SpotData>	m_Spots;
-    FastMutex _plck[COUNTRY_MAX][2];
+    FastMutex _lck;
 	MapPlayer _playerList[COUNTRY_MAX][2];//country pk_status
 };
 

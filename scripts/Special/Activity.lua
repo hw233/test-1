@@ -639,28 +639,6 @@ end
 
 function RunActiveTaskStep(player, id, actionId)
     local ActiveTask = {}
-    if actionId == 1 then
-        local now = os.time();
-        local h = os.date("%H", os.time())
-        local m = os.date("%M", os.time())
-        local s = os.date("%S", os.time())
-        player:setBuffData(21, now+(24*60*60-(h*60*60+m*60+s)), true)
-        local package = player:GetPackage()
-		if package:IsFull() then
-            player:sendMsgCode(2, 1011, 0)
-			return;
-        end
-        package:AddItem(68, 5, true);	
-
-        local action = ActionTable:Instance();
-        action.m_ActionType = 0x70;
-        action.m_ActionToken = 1;
-        action.m_ActionID = 0;
-        action.m_ActionStep = 0;
-        action.m_ActionMsg = "今日已领取中秋月饼";
-        table.insert(ActiveTask, action);
-    elseif actionId == 2 then
-    end
     return ActiveTask
 end
 

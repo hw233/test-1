@@ -256,6 +256,12 @@ void Tripod::getAward(Player* pl)
     if (!pl)
         return;
 
+    if (pl->GetPackage()->IsFull())
+    {
+        pl->sendMsgCode(0, 1011);
+        return;
+    }
+
     FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
     if (td.awdst != 1)

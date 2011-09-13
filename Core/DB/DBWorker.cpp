@@ -105,7 +105,7 @@ void DBWorker::OnTimer()
         while (--size)
         {
             bool r = DoDBQuery(*query);
-            //TRACE_LOG("[%s] -> %d", *query, r ? 1 : 0);
+            TRACE_LOG("[%s] -> %d", *query, r ? 1 : 0);
             delete[] *query;
             ++query;
         }
