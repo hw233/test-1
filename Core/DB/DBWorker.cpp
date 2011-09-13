@@ -102,12 +102,15 @@ void DBWorker::OnTimer()
     {
         size_t size = l.size();
         const char** query = &l[0];
-        while (--size)
+        while (size)
         {
+            --size;
             bool r = DoDBQuery(*query);
             TRACE_LOG("[%s] -> %d", *query, r ? 1 : 0);
             delete[] *query;
             ++query;
+            if (!*query)
+                continue;
         }
     }
 #endif
