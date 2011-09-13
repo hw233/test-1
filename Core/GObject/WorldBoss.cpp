@@ -169,6 +169,23 @@ namespace GObject
 
     void WorldBoss::attack(Player* pl, UInt16 loc, UInt32 npcid)
     {
+        if (!m_level)
+            return;
+
+        bool in = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            if (worldboss[i+(m_level-1)*4] == npcid)
+            {
+                in = true;
+                break;
+            }
+        }
+
+        if (!in)
+            return;
+
+        FastMutex::ScopedLock lk(m_lck);
         std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
         if (i != m_boss.end())
         {
@@ -209,12 +226,12 @@ namespace GObject
                     if (!vip)
                     {
                         ++i->second.count;
-                        DB().PushUpdateData("UPDATE `worldboss` SET `count` = %u WHERE `npcId` = %u", i->second.count, i->second.npcId);
+                        DB().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
 
                         if (i->second.count < count)
                         {
                             UInt32 npcID = i->second.npcId;
-                            UInt8 idx = (i->second.level-1)*4 + i->second.count;
+                            UInt8 idx = (i->second.level-1)*4 + i->second.count/3 + 1;
                             if (cfg.GMCheck)
                             {
                                 if (idx < sizeof(worldboss)/sizeof(UInt32))
