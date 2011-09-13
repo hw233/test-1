@@ -170,7 +170,13 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 	_members.insert(cmem);
 	// updateRank(NULL, oldLeaderName);
-	player->setClan(this);
+
+    ClanOpt co = {0};
+    co.type = 0;
+    co.clan = this;
+    GameMsgHdr hdr1(0x311, player->getThreadId(), player, sizeof(co));
+    GLOBAL().PushMsg(hdr1, &co);
+
 	player->notifyFriendAct(5, _name.c_str());
 	DB().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
 	if(player->isOnline())
@@ -195,8 +201,6 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	GameMsgHdr hdr(0x310, player->getThreadId(), player, sizeof(type));
 	GLOBAL().PushMsg(hdr, &type);
 
-    if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
-        player->buildClanTask();
 	return true;
 }
 
@@ -209,7 +213,6 @@ bool Clan::join(ClanMember * cm)
 	Mutex::ScopedLock lk(_mutex);
 	if (existClanMember(player))
 		return false;
-	player->setClan(this);
 	//std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 	std::set<UInt32>::iterator found = _membersJoinTime.find(cm->joinTime);
 	while (found != _membersJoinTime.end())
@@ -218,8 +221,13 @@ bool Clan::join(ClanMember * cm)
 	_members.insert(cm);
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
-    if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
-        player->buildClanTask();
+
+    ClanOpt co = {0};
+    co.type = 0;
+    co.clan = this;
+    GameMsgHdr hdr1(0x311, player->getThreadId(), player, sizeof(co));
+    GLOBAL().PushMsg(hdr1, &co);
+
 	return true;
 }
 
@@ -274,7 +282,6 @@ bool Clan::kick(Player * player, UInt64 pid)
 
 	_members.erase(found);
 	delete member;
-	kicker->setClan(NULL);
 	ClanBattle * battleClan = kicker->getClanBattle();
 	if (battleClan != NULL)
 		battleClan->kickClanBattler(kicker);
@@ -295,6 +302,13 @@ bool Clan::kick(Player * player, UInt64 pid)
 		SYSMSG_SEND(124, kicker);
 		SYSMSG_SENDV(1024, kicker, _name.c_str());
 	}
+
+    ClanOpt co = {0};
+    co.type = 1;
+    co.clan = NULL;
+    GameMsgHdr hdr1(0x311, kicker->getThreadId(), kicker, sizeof(co));
+    GLOBAL().PushMsg(hdr1, &co);
+
 	return true;
 }
 
@@ -321,8 +335,12 @@ bool Clan::leave(Player * player)
 
 	_members.erase(found);
 	delete member;
-	player->setClan(NULL);
-    player->delClanTask();
+
+    ClanOpt co = {0};
+    co.type = 2;
+    co.clan = NULL;
+    GameMsgHdr hdr1(0x311, player->getThreadId(), player, sizeof(co));
+    GLOBAL().PushMsg(hdr1, &co);
 
 	ClanBattle * battleClan = player->getClanBattle();
 	if (battleClan != NULL)

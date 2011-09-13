@@ -48,11 +48,6 @@ struct PracticeData : public GData::ObjectBaseNT<UInt64>
     UInt8 prot;         // 是否申请保护 0-没有任何保护, 1-护法弟子保护, 2-仙府禁法
     UInt32 cdend;       // 下次可修炼时间
     UInt64 winnerid;    // 挑战胜利者ID
-    UInt8 hookadd;      // 加速次数
-    UInt32 nextHAReset; // 加速次数重置时间
-
-    UInt8 getHookAdd();
-    void checkHookAdd();
 
     //Mutex lock;
     std::list<UInt32> fighters;
@@ -143,7 +138,7 @@ public:
     bool isSitdownYet(PracticeData* pd, UInt32 id);
 
     static UInt8 _extraCount[11];
-    static UInt8 _hookAddCnt[11];
+    static UInt8 _picCnt[11];
 private:
     Mutex m_lock[PPLACE_MAX];
     PlaceData m_places[PPLACE_MAX];

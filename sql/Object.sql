@@ -650,8 +650,6 @@ CREATE TABLE `practice_data` (
   `prot` tinyint(3) NOT NULL,
   `cdend` int(11) NOT NULL,
   `winnerid` bigint(20) unsigned NOT NULL,
-  `hookadd` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `nexthareset` int(10) unsigned NOT NULL DEFAULT '0',
   `fighters` varchar(255) NOT NULL,
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -831,6 +829,8 @@ CREATE TABLE `player` (
   `mounts` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mainFighter` int(10) unsigned NOT NULL DEFAULT '0',
   `icCount` varchar(32) NOT NULL DEFAULT '',
+  `piccount` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `nextpicreset` int(10) unsigned NOT NULL DEFAULT '0',
   `formation` smallint(5) unsigned NOT NULL DEFAULT '0',
   `lineup` varchar(255) NOT NULL DEFAULT '',
   `bossLevel` smallint(4) unsigned NOT NULL DEFAULT '21',

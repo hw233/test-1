@@ -22,6 +22,7 @@
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
 #include "GObject/Tripod.h"
+#include "GObject/Clan.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -778,6 +779,31 @@ void OnOperationTaskAction( GameMsgHdr& hdr, const void* data )
     if (player)
     {
         player->OperationTaskAction(type);
+    }
+}
+
+void OnClanOption( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	const ClanOpt* co = reinterpret_cast<const ClanOpt*>(data);
+
+    switch(co->type)
+    {
+    case 0:     // 加入帮派
+        {
+            player->setClan(co->clan);
+
+            if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
+                player->buildClanTask();
+        }
+        break;
+    case 1:    // 开除帮派
+    case 2:    // 离开帮派
+        {
+            player->setClan(co->clan);
+            player->delClanTask();
+        }
+        break;
     }
 }
 

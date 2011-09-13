@@ -5,6 +5,7 @@ function update()
     mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110909_1.sql
     mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110909_2.sql
     mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110909_3.sql
+    mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110913_1.sql
 }
 
 selectAction $DBO

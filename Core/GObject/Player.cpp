@@ -321,7 +321,7 @@ namespace GObject
 
         //data->lock.lock();
         //data->lock.unlock();
-        if(data->getHookAdd() <= 0)
+        if(m_Player->getPIcCount() <= 0)
             return false;
 
 		if (data->checktime > 0)
@@ -357,20 +357,20 @@ namespace GObject
             GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
             GLOBAL().PushMsg(hdr1, &pfexp);
 
-            -- data->hookadd;
+            m_Player->incPIcCount();
             data->checktime -= count;
             if ((int)data->checktime < 0)
                 data->checktime = 0;
             if(data->checktime == 0)
             {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '', hookadd = %u WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, data->hookadd, m_Player->getId());
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
                 practicePlace.stop(m_Player);
                 PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
             }
             else
             {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, hookadd = %u WHERE `id` = %"I64_FMT"u",
-                        data->checktime, data->hookadd, m_Player->getId());
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u WHERE `id` = %"I64_FMT"u",
+                        data->checktime, m_Player->getId());
             }
 
             {
@@ -378,7 +378,7 @@ namespace GObject
                 st1 << static_cast<UInt8>(0);
                 st1 << data->checktime * 60;
                 st1 << data->prot;
-                st1 << data->getHookAdd();
+                st1 << m_Player->getPIcCount();
                 st1 << static_cast<UInt8>(m_Player->getPracticePlace()-1);
 
                 UInt8 size = data->fighters.size();
@@ -3215,10 +3215,15 @@ namespace GObject
 
     void Player::delClanTask()
     {
-        GetTaskMgr()->DelTask(_playerData.clanTaskId);
-        _playerData.clanTaskId = 0;
+        if(_playerData.clanTaskId)
+        {
+            if(!GetTaskMgr()->DelTask(_playerData.clanTaskId))
+                GetTaskMgr()->DelCanAcceptTask(_playerData.clanTaskId);
 
-        writeClanTask();
+            _playerData.clanTaskId = 0;
+
+            writeClanTask();
+        }
     }
 
     void Player::buildClanTask()
@@ -5536,6 +5541,34 @@ namespace GObject
 
         return nRes;
     }
+
+	void Player::incPIcCount( )
+	{
+        checkPIcCount();
+		++ _playerData.picCount;
+        DB().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
+	}
+
+
+    UInt8 Player::getPIcCount()
+    {
+        checkPIcCount();
+        int nVipLevel = getVipLevel();
+        return PracticePlace::_picCnt[nVipLevel] - _playerData.picCount;
+    }
+
+    void Player::checkPIcCount()
+    {
+		UInt32 now = TimeUtil::Now();
+		if(now >= _playerData.nextPIcReset)
+		{
+            int nVipLevel = getVipLevel();
+			_playerData.nextPIcReset = TimeUtil::SharpDay(1, now);
+            _playerData.picCount = PracticePlace::_picCnt[nVipLevel];
+            DB().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
+		}
+    }
+
 
 }
 

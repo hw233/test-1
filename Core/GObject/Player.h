@@ -264,6 +264,8 @@ namespace GObject
 		UInt8 gmLevel;              //
 		UInt8 icCount;              // 挂机加速次数
 		UInt32 nextIcReset;         // 
+        UInt8  picCount;            // 加速次数
+        UInt32 nextPIcReset;        // 加速次数重置时间
 		UInt16 formation;           // 
 		Lineup lineup[5];           // 
 		UInt32 totalRecharge;       // 
@@ -541,6 +543,11 @@ namespace GObject
 		void incIcCount();
 		void resetIcCount();
 		UInt8 getIcCount();
+
+        // 修为挂机加速
+		void incPIcCount();
+        UInt8 getPIcCount();
+        void checkPIcCount();
 
 		inline UInt16 getPacksize() { return _playerData.packSize; }
         inline UInt8 getMounts() { return _playerData.mounts; }

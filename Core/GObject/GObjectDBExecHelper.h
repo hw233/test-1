@@ -203,8 +203,6 @@ struct DBPracticeData
     UInt8 prot;         // 是否申请保护 0-没有任何保护, 1-护法弟子保护, 2-仙府禁法
     UInt32 cdend;       // 下次可修炼时间
     UInt64 winnerid;    // 挑战胜利者ID
-    UInt8 hookadd;      // 修炼加速次数
-    UInt32 nexthareset; // 修炼加速重置时间
     std::string fighters;
 };
 
@@ -730,7 +728,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(50)
+SPECIALDEF(52)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -754,6 +752,8 @@ SPECIALDEF(50)
 	UInt16, pdata.packSize,
 	UInt8, pdata.mounts,
 	std::string, icCount,
+    UInt8,  pdata.picCount,
+    UInt32, pdata.nextPIcReset,
 	UInt16, pdata.formation,
 	std::string, lineup,
 	UInt8, bossLevel,
@@ -893,7 +893,7 @@ SPECIALDEF(12)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPracticeData)
-SPECIALDEF(15)
+SPECIALDEF(13)
 	(
         UInt64, id,
         UInt8, place,
@@ -907,8 +907,6 @@ SPECIALDEF(15)
         UInt8, prot,
         UInt32, cdend,
         UInt64, winnerid,
-        UInt8, hookadd,
-        UInt32, nexthareset,
         std::string, fighters
     )
 SPECIALEND()

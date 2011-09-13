@@ -14,6 +14,7 @@ namespace GObject
 class Player;
 class ClanTech;
 class ClanBattle;
+class Clan;
 
 #define BASE_MEMBER_COUNT 15
 struct AllocItem
@@ -58,6 +59,12 @@ struct ClanMember
 	UInt8  enterCount;
     std::map<UInt8, ClanSkill> clanSkill;
 	std::map<UInt8, ClanPlayerPet> clanPet;
+};
+
+struct ClanOpt
+{
+    UInt8 type;
+    Clan* clan;
 };
 
 struct ClanPendingMember
