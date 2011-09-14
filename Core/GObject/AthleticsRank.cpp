@@ -1269,6 +1269,10 @@ UInt32 AthleticsRank::setAthleticsPrestige(Player* player, UInt32 prestige)
     (*found->second)->prestige = prestige;
     DB().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->prestige, (*found->second)->ranker->getId());
 
+    Stream st(REP::USER_INFO_CHANGE);
+    st << static_cast<UInt8>(0x55) << prestige << Stream::eos;
+    player->send(st);
+
 	return (*found->second)->prestige;
 }
 

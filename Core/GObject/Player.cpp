@@ -39,6 +39,7 @@
 #include "Script/BattleFormula.h"
 #include "Copy.h"
 #include "FrontMap.h"
+#include "GObject/AthleticsRank.h"
 
 #include <cmath>
 
@@ -1301,7 +1302,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << mark << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << gAthleticsRank.getAthleticsPrestige(this) << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << mark << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
