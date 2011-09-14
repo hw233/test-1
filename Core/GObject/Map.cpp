@@ -47,8 +47,6 @@ void Map::changebyStatus(Player *pl)
 {
 	UInt8 country = pl->getCountry();
 	UInt8 status = getIndexbyPK(pl);
-    FastMutex::ScopedLock lk(_lck[country][status]);
-    FastMutex::ScopedLock lk1(_lck[country][1-status]);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
 		_playerList[country][status].erase(it);	
@@ -62,7 +60,6 @@ void Map::PlayerEnter(Player * pl, bool notify)
 		UInt8 country = pl->getCountry();
 		UInt8 status = getIndexbyPK(pl);
         {
-            FastMutex::ScopedLock lk(_lck[country][status]);
             if(find(country, status, pl) == _playerList[country][status].end())
                 _playerList[country][status].insert(pl);
         }
@@ -82,7 +79,6 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 		UInt8 country = pl->getCountry();
 		UInt8 status = getIndexbyPK(pl);
         {
-            FastMutex::ScopedLock lk(_lck[country][status]);
             MapPlayer::iterator it = find(country, status, pl);
             if(it != _playerList[country][status].end())
                 _playerList[country][status].erase(it);	
@@ -292,7 +288,6 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 			{
 				if(pl->getCountry() == 1)
 				{
-                    FastMutex::ScopedLock lk(_lck[i][j]);
 					const MapPlayer& playerList = _playerList[i][j];
 					for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
 					{
@@ -308,7 +303,6 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
                 {
                     if (i < 2)
                     {
-                        FastMutex::ScopedLock lk(_lck[1-i][j]);
                         const MapPlayer& playerList = _playerList[1-i][j];
                         for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
                         {
@@ -322,7 +316,6 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
                     }
                     else
                     {
-                        FastMutex::ScopedLock lk(_lck[2][j]);
                         const MapPlayer& playerList = _playerList[2][j];
                         for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
                         {
@@ -337,7 +330,6 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 				}
                 else
                 {
-                    FastMutex::ScopedLock lk(_lck[2-i][j]);
 					const MapPlayer& playerList = _playerList[2-i][j];
 					for (MapPlayer::const_iterator plIter = playerList.begin(); plIter != playerList.end() && c <= MAX_NUM; ++plIter)
 					{
@@ -424,7 +416,6 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
-                FastMutex::ScopedLock lk(_lck[i][j]);
 				const MapPlayer& playerList = _playerList[i][j];
 				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
 				{
@@ -440,7 +431,6 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
-                FastMutex::ScopedLock lk(_lck[i][j]);
 				const MapPlayer& playerList = _playerList[i][j];
 				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
 				{

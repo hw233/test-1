@@ -31,7 +31,7 @@
 #include <libmemcached/memcached.h>
 
 static bool meminited = false;
-static memcached_st* memc = 0;
+static memcached_st* memc = NULL;
 
 __attribute__((constructor)) static void initMemcache()
 {
@@ -43,14 +43,19 @@ __attribute__((constructor)) static void initMemcache()
     memc = memcached_create(NULL);
     memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer.c_str(), cfg.tokenPort, &rc);
     if (rc != MEMCACHED_SUCCESS)
+    {
+        memcached_free(memc);
+        memc = NULL;
         return;
+    }
     rc = memcached_server_push(memc, servers);
     memcached_server_free(servers);
 }
 
 __attribute__((destructor)) static void uninitMemcache()
 {
-    memcached_free(memc);
+    if (memc)
+        memcached_free(memc);
 }
 #endif
 
@@ -505,7 +510,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     UInt8 ret = 1;
     std::string err = "";
 
-    if (cfg.tokenServer.length() && cfg.tokenPort)
+    if (memc)
     {
 #if 1
         initMemcache();
@@ -519,6 +524,8 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             size_t tlen = 0;
             unsigned int flags;
 
+            snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
+
             memcached_return rc;
             rc = memcached_mget(memc, keys, lens, 1);
             char rkey[MEMCACHED_MAX_KEY] = {0};
@@ -526,10 +533,16 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             if (rc == MEMCACHED_SUCCESS && rtoken)
             {
                 if (strncmp(token.c_str(), rtoken, token.length()) != 0)
-                    err += "token is no matched.";
+                {
+                    err += "token is not matched.";
+                    ret = 2;
+                }
             }
             else
-                err += "fetch value error.";
+            {
+                err += "fetch token oalue error.";
+                ret = 3;
+            }
 
             rc = memcached_delete(memc, key, len, (time_t)0);
             if (rc == MEMCACHED_SUCCESS)
@@ -549,7 +562,10 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
+    {
         err += "serial number error.";
+        ret = 4;
+    }
 
     if (!err.length())
     {
@@ -579,12 +595,16 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 GObject::prepaid.push(player_Id, num, no.c_str());
                 ret=0;
             }
-        } else
-            err += "Wrong item id or number.";
+        }
+        else
+        {
+            err += "wrong item id or number.";
+            ret = 4;
+        }
     }
 
     Stream st;
-    st.init(0x05, 0x01);
+    st.init(SPEP::USERRECHARGE, 0x01);
     st<< ret << err << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
