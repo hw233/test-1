@@ -475,7 +475,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			}
 
             pl->GetPackage()->AddItem(18, 1, true);
-            pl->getGold(20000);
+            pl->getCoupon(888);
 		}
 	}
 

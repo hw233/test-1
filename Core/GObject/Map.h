@@ -118,6 +118,7 @@ public:
 	void Broadcast( SpotData *, Stream&, Player * = NULL );
 	void Broadcast( Stream &, Player * = NULL );
 	void Broadcast( const void *, int, Player * = NULL );
+    void Broadcast2( const void *, int, UInt8, Player * = NULL );
 
 	SpotData* GetSpot(UInt16);
 	void MapAllSpot(std::vector<UInt16>&);

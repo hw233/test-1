@@ -262,8 +262,6 @@ bool World::Init()
 	
     AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
     AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
-    if (!cfg.GMCheck)
-        worldBoss.setLevel(100);
 
 	return true;
 }
