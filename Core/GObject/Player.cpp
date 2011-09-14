@@ -1550,7 +1550,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.8);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.5);
 
 		return res;
 	}
@@ -1646,7 +1646,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.8);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.5);
 		return res;
 	}
 
@@ -3445,7 +3445,9 @@ namespace GObject
                                     _playerData.fsmcolor[n] = j+1;
                                     if (getVipLevel() >= 3) {
                                         static UInt8 viptaskcolor[11] = {0,0,0,3,3,3,4,4,4,4,4};
-                                        _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
+                                        _playerData.fsmcolor[n] = j + viptaskcolor[getVipLevel()];
+                                        if (_playerData.fsmcolor[n] > 4)
+                                            _playerData.fsmcolor[n] = 5;
                                     }
                                 } else {
                                     _playerData.fyamen[n] = task[*i];
@@ -3453,6 +3455,9 @@ namespace GObject
                                     if (getVipLevel() >= 2) {
                                         static UInt8 viptaskcolor[11] = {0,0,3,3,3,4,4,4,4,4,4};
                                         _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
+                                        _playerData.fymcolor[n] = j + viptaskcolor[getVipLevel()];
+                                        if (_playerData.fymcolor[n] > 4)
+                                            _playerData.fymcolor[n] = 5;
                                     }
                                 }
                                 if (j+1 == color)

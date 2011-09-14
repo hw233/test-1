@@ -15,16 +15,6 @@ namespace GObject
         5103, 5470, 5471, 5472,
     };
 
-    static UInt32 worldboss1[] = {
-        5272, 5004, 5005, 5006,
-        5008, 5010, 5011, 5012,
-        5009, 5013, 5274, 5275,
-        5276, 5277, 5033, 5278,
-        5279, 5280, 5281, 5032,
-        5282, 5283, 5284, 5285,
-        5037, 5410, 5016, 5411,
-    };
-
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
         for (UInt8 i = 0; i < 6; ++i)
@@ -36,7 +26,7 @@ namespace GObject
             }
             else
             {
-                if (worldboss1[i] == npcid)
+                if (worldboss[i] == npcid)
                     return true;
             }
         }
@@ -124,9 +114,9 @@ namespace GObject
         }
         else
         {
-            if (idx >= sizeof(worldboss1)/sizeof(UInt32))
+            if (idx >= sizeof(worldboss)/sizeof(UInt32))
                 return;
-            npcid = worldboss1[idx];
+            npcid = worldboss[idx];
         }
 
         std::vector<UInt16> spots;
@@ -169,6 +159,23 @@ namespace GObject
 
     void WorldBoss::attack(Player* pl, UInt16 loc, UInt32 npcid)
     {
+        if (!m_level)
+            return;
+
+        bool in = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            if (worldboss[i+(m_level-1)*4] == npcid)
+            {
+                in = true;
+                break;
+            }
+        }
+
+        if (!in)
+            return;
+
+        FastMutex::ScopedLock lk(m_lck);
         std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
         if (i != m_boss.end())
         {
@@ -209,12 +216,12 @@ namespace GObject
                     if (!vip)
                     {
                         ++i->second.count;
-                        DB().PushUpdateData("UPDATE `worldboss` SET `count` = %u WHERE `npcId` = %u", i->second.count, i->second.npcId);
+                        DB().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
 
                         if (i->second.count < count)
                         {
                             UInt32 npcID = i->second.npcId;
-                            UInt8 idx = (i->second.level-1)*4 + i->second.count;
+                            UInt8 idx = (i->second.level-1)*4 + (i->second.count-1)/3 + 1;
                             if (cfg.GMCheck)
                             {
                                 if (idx < sizeof(worldboss)/sizeof(UInt32))
@@ -222,8 +229,8 @@ namespace GObject
                             }
                             else
                             {
-                                if (idx < sizeof(worldboss1)/sizeof(UInt32))
-                                    npcID = worldboss1[idx];
+                                if (idx < sizeof(worldboss)/sizeof(UInt32))
+                                    npcID = worldboss[idx];
                             }
                             add(i->first, npcID, i->second.level, i->second.count, true);
                         }

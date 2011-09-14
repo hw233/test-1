@@ -3,6 +3,7 @@
 #define WORLDBOSS_H_
 
 #include "Config.h"
+#include "Common/Mutex.h"
 
 namespace GObject
 {
@@ -43,6 +44,7 @@ private:
 
 private:
     std::map<UInt16, WBoss> m_boss;
+    FastMutex m_lck;
     UInt8 m_level;
     UInt8 m_max;
 };
