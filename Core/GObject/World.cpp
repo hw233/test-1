@@ -263,6 +263,9 @@ bool World::Init()
     AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
     AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
 
+    UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
+    AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
+
 	return true;
 }
 
