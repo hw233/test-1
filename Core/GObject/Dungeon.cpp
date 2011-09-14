@@ -687,7 +687,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			{
 				player->delFlag(Player::AutoDungeon);
 				DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
-				return;
+                return;
 			}
 			if(count < maxCount)
 				won = doChallenge(player, it->second, false, NULL);
@@ -706,11 +706,11 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
 			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
-			return;
+            return;
 		}
 	}
 	ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-	UInt16 gold = player->useGold(count, &ci);
+	UInt16 gold = player->useGoldOrCoupon(count, &ci);
 	Stream st_(REP::COPY_END_FIGHT);
 	st_ << static_cast<UInt8>(1) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
 	player->send(st_);

@@ -240,15 +240,22 @@ namespace GObject
 #endif
 	static void getRandomAttr2(UInt8 lv, UInt8 crr, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
     {
-		if(c == 0)
-		{
-			if(q > 2)
-				c = 3;
-			else if(q == 2)
-				c = 2;
-			else
-				c = 1;
-		}
+        switch(q)
+        {
+        case 0:
+        case 1:
+            if(c < 1)
+                c = 1;
+            break;
+        case 2:
+            if(c < 2)
+                c = 2;
+            break;
+        default:
+            if(c < 3)
+                c = 3;
+            break;
+        }
 
         if(lv < 0)
             return;
@@ -307,7 +314,9 @@ namespace GObject
                         types[j] = 0;
 						break;
 					}
-                    prev = j;
+
+                    if(types[j] != 0)
+                        prev = j;
 				}
 			}
 			while(oldt != 0 && t[i] == oldt && v[i] == oldv);
