@@ -457,7 +457,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
     {
         dpi.justice_roar = 0;
         dpi.justice = 0;
-        DB().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, player->getId());
+        DB().PushUpdateData("UPDATE `dungeon_player` SET `justice` = %u, `justice_roar` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.justice, dpi.justice_roar, _id, player->getId());
 		return true;
     }
 	leaveLevel(player, level);
