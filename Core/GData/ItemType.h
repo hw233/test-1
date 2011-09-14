@@ -86,6 +86,13 @@ inline bool IsEquip(UInt8 subClass)
 	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Trump);
 }
 
+inline bool IsFighterTypeId(UInt32 id)
+{
+    if (id == 74)
+        return true;
+    return false;
+}
+
 inline ItemClass GetItemSubClass(UInt32 id)
 {
 #if 1

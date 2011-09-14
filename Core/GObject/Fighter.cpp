@@ -1336,7 +1336,7 @@ void Fighter::getAllUpCittaAndLevel( Stream& st )
     for (int i = 0; i < cittas; ++i)
     {
         if (_citta[i]) {
-            st << static_cast<UInt8>(i);
+            // st << static_cast<UInt8>(i);
             st << _citta[i];
         }
     }
@@ -1890,6 +1890,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     if (!(idx >= 0 && idx < getUpCittasMax())) // dst
         return false;
 
+    int op = 0;
     bool swap = false;
     bool ret = false;
     int src = isCittaUp(citta);
@@ -1908,8 +1909,8 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                 {
                     _citta[j] = _citta[j-1];
                     _citta[j-1] = 0;
-                    if (_citta[j])
-                        sendModification(0x62, _citta[j], j, writedb);
+                    //if (_citta[j])
+                    //    sendModification(0x62, _citta[j], j, writedb);
                 }
             }
         } else
@@ -1920,6 +1921,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
         _citta[idx] = citta;
         ret = true;
+        op = 1;
     }
     else
     {
@@ -1927,7 +1929,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         {
             if (_citta[idx])
             { // swap
-                sendModification(0x62, _citta[idx], src, writedb);
+                // sendModification(0x62, _citta[idx], src, writedb);
 
                 _citta[src] ^= _citta[idx];
                 _citta[idx] ^= _citta[src];
@@ -1950,6 +1952,7 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                 offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
+                op = 2;
             }
         }
     }
@@ -1969,7 +1972,8 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
     {
         _attrDirty = true;
         _bPDirty = true;
-        sendModification(0x62, citta, idx, writedb);
+        //sendModification(0x62, citta, idx, writedb);
+        sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
     }
 
     return ret;
@@ -2315,11 +2319,12 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
         {
             _citta[i] = _citta[i+1];
             _citta[i+1] = 0;
-            if (_citta[i])
-                sendModification(0x62, _citta[i], i, writedb);
+            //if (_citta[i])
+            //    sendModification(0x62, _citta[i], i, writedb);
         }
     }
-    sendModification(0x62, 0, i, writedb);
+    //sendModification(0x62, 0, i, writedb);
+    sendModification(0x62, citta, 2/*1add,2del,3mod*/, writedb);
     return true;
 }
 

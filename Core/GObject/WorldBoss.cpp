@@ -232,7 +232,7 @@ namespace GObject
                                 if (idx < sizeof(worldboss)/sizeof(UInt32))
                                     npcID = worldboss[idx];
                             }
-                            add(i->first, npcID, i->second.level, i->second.count, true);
+                            add(i->first, npcID, i->second.level, i->second.count, true, false);
                         }
 
                         Map* map = pl->GetMap();
@@ -270,7 +270,7 @@ namespace GObject
         DB().PushUpdateData("DELETE FROM `worldboss`");
     }
 
-    void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool show)
+    void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool show, bool msg)
     {
         Map * map = Map::FromSpot(loc);
         if (map)
@@ -297,21 +297,17 @@ namespace GObject
                 if (!fgt)
                     return;
 
-                if (cfg.GMCheck)
+                if (msg)
                 {
-                    if (uRand(100) >= 50)
-                    {
-                        SYSMSG_BROADCASTV(548, fgt->getId());
-                    }
-                    else
+                    if (cfg.GMCheck)
                     {
                         SYSMSG_BROADCASTV(554, fgt->getId(), loc, fgt->getId());
                     }
-                }
-                else
-                {
-                    SYSMSG_BROADCASTV(548, fgt->getId());
-                    SYSMSG_BROADCASTV(549, loc);
+                    else
+                    {
+                        SYSMSG_BROADCASTV(548, fgt->getId());
+                        SYSMSG_BROADCASTV(549, loc);
+                    }
                 }
                 DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, count);
             }

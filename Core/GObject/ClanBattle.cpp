@@ -878,7 +878,7 @@ void ClanBattle::kickClanBattler(Player * player)
 		//¿çµØÍ¼
 		UInt16 spot = player->getLocation();
 		CountryEnterStruct ces(true, player->isInCity() ? 1 : 0, spot);
-		GameMsgHdr hdr(0x1F0, mapCollection.getCountryFromSpot(spot), player, sizeof(CountryEnterStruct));
+		GameMsgHdr hdr(0x1F0, player->getCountry(), player, sizeof(CountryEnterStruct));
 		GLOBAL().PushMsg( hdr, &ces );
 	}
 	player->setClanBattle(NULL);
@@ -1201,7 +1201,7 @@ void ClanBattle::clearClanBattle()
 		player = offset->first;
 		UInt16 spot = player->getLocation();
 		CountryEnterStruct ces(true, player->isInCity() ? 1 : 0, spot);
-		GameMsgHdr hdr(0x1F0, mapCollection.getCountryFromSpot(spot), player, sizeof(CountryEnterStruct));
+		GameMsgHdr hdr(0x1F0, player->getCountry(), player, sizeof(CountryEnterStruct));
 		GLOBAL().PushMsg( hdr, &ces );
 
 		Stream st(REP::CLAN_BATTLE);
@@ -1435,7 +1435,7 @@ bool ClanBattle::leaveClanCity(Player * player)
 		//¿çµØÍ¼
 		UInt16 spot = player->getLocation();
 		CountryEnterStruct ces(true, player->isInCity() ? 1 : 0, spot);
-		GameMsgHdr hdr(0x1F0, mapCollection.getCountryFromSpot(spot), player, sizeof(CountryEnterStruct));
+		GameMsgHdr hdr(0x1F0, player->getCountry(), player, sizeof(CountryEnterStruct));
 		GLOBAL().PushMsg( hdr, &ces );
 	}
 	player->setClanBattle(NULL);
