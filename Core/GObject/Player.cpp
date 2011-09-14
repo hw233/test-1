@@ -3574,7 +3574,7 @@ namespace GObject
 			}
 		}
 
-		if(_playerData.gold < maxGold)
+		if(_playerData.gold + _playerData.coupon < maxGold)
 		{
 			sendMsgCode(1, 1101);
 			return;
@@ -3743,7 +3743,7 @@ namespace GObject
 				st << static_cast<UInt16>(0);
 			writeTavernIds();
             ConsumeInfo ci(FlushFighter, 0, 0);
-            useGold(usedGold, &ci);
+            useGoldOrCoupon(usedGold, &ci);
 		}
 		else
 		{
@@ -4511,17 +4511,20 @@ namespace GObject
 		
 		if(uRand(1000) < rate)
 		{
-			p += 0.01f;
-			p = floorf(p * 100.0f + 0.5f) / 100.0f;
-
             if(isPotential)
             {
+                p += 0.01f;
+                p = floorf(p * 100.0f + 0.5f) / 100.0f;
+
                 if(p > GObjectManager::getMaxPotential()/100)
                     p = GObjectManager::getMaxPotential()/100;
                 fgt->setPotential(p);
             }
             else
             {
+                p += 0.1f;
+                p = floorf(p * 10.0f + 0.5f) / 10.0f;
+
                 if(p > GObjectManager::getMaxCapacity()/100)
                     p = GObjectManager::getMaxCapacity()/100;
                 fgt->setCapacity(p);
@@ -4539,7 +4542,7 @@ namespace GObject
                 }
                 else
                 {
-                    float decp = fgt->getCapacity() - 0.01f;
+                    float decp = fgt->getCapacity() - 0.1f;
                     float newp = std::max(std::max(decp, static_cast<float>(GObjectManager::getMinCapacity())/100), fgt_orig->getCapacity());
                     fgt->setCapacity(newp);
                 }
@@ -5358,7 +5361,7 @@ namespace GObject
             return false;
         }
 
-        GameMsgHdr hdr1(0x1F0, WORKER_THREAD_WORLD, this, 0);
+        GameMsgHdr hdr1(0x17D, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr1, NULL);
 
         return true;

@@ -81,7 +81,7 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
         {
             MapPlayer::iterator it = find(country, status, pl);
             if(it != _playerList[country][status].end())
-                _playerList[country][status].erase(it);	
+                _playerList[country][status].erase(it);
         }
 	}
 

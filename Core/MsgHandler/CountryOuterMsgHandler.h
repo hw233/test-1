@@ -826,12 +826,12 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
         return;
     if (player->getCountry() != country)
     {    
+        CURRENT_COUNTRY().PlayerLeave(player);
         player->setCountry(country);
         Stream st(REP::CAMP_SELECT);
         st << country << Stream::eos;
         player->send(st);
 
-        CURRENT_COUNTRY().PlayerLeave(player);
         player->setThreadId(country);
         PlayerData& pd = player->getPlayerData();
         CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
