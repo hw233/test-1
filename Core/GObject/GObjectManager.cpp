@@ -1164,7 +1164,7 @@ namespace GObject
 				continue;
 			fgt2->setPotential(specfgtobj.potential, false);
             fgt2->setCapacity(specfgtobj.capacity, false);
-			fgt2->setLevel(specfgtobj.level);
+			fgt2->setLevel(specfgtobj.level, true);
 			fgt2->setExp(specfgtobj.experience);
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);

@@ -129,6 +129,7 @@ MSG_REG_2(GameMsgHdr, 0x1ED, OnRunScriptReq);
 MSG_REG_2(GameMsgHdr, 0x1EF, OnRunScriptBattleReq);
 MSG_REG_2(GameMsgHdr, 0x1F0, PlayerEnter);
 MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
+MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
 
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
 MSG_REG_2(GameMsgHdr, 0x201, PlayerLogin);

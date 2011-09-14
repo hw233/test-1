@@ -95,6 +95,25 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
     tripod.getTripodData(player); // XXX: 完家登陆之后如果没有九疑鼎数据则新建
 }
 
+void OnBroadcast( GameMsgHdr& hdr, const void * data )
+{
+    struct BroadcastMsg
+    {   
+        Map* map;
+        Player* pl; 
+        int size;
+        char* msg;
+    };
+
+    BroadcastMsg* msg = (BroadcastMsg*)(data);
+
+    if (msg->map && msg->msg)
+    {
+        msg->map->Broadcast2(msg->msg, msg->size, CURRENT_COUNTRY().GetThreadID(), msg->pl);
+        delete [] msg->msg;
+    }
+}
+
 void PlayerReconnect( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

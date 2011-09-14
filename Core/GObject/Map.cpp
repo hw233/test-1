@@ -408,8 +408,37 @@ void Map::Broadcast( Stream & st, Player * pl )
 	Broadcast(&st[0], st.size(), pl);
 }
 
-void Map::Broadcast( const void * buf, int size, Player * pl )
+void Map::Broadcast2( const void * buf, int size, UInt8 cny, Player * pl )
 {
+    if (pl == NULL)
+    {
+        for(UInt32 j = 0; j < 2; j ++)
+        {
+            const MapPlayer& playerList = _playerList[cny][j];
+            for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
+            {
+                if (*it)
+                    (*it)->send(buf, size);
+            }
+        }
+    }
+    else
+    {
+        for(UInt32 j = 0; j < 2; j ++)
+        {
+            const MapPlayer& playerList = _playerList[cny][j];
+            for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
+            {
+                if(*it && *it != pl)
+                    (*it)->send(buf, size);
+            }
+        }
+    }
+}
+
+void Map::Broadcast( const void * buf, int size, Player * pl )
+{ 
+#if 0
 	if(pl == NULL)
 	{
 		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
@@ -440,6 +469,35 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 			}
 		}
 	}
+#else
+    struct BroadcastMsg
+    {
+        Map* map;
+        Player* pl;
+        int size;
+        char* msg;
+    } msg, msg1, msg2;
+
+    msg.map = msg1.map = msg2.map = this;
+    msg.pl = msg1.pl = msg2.pl = pl;
+    msg.size = msg1.size = msg2.size = size;
+    msg.msg = new char[msg.size];
+    if (msg.msg)
+        memcpy(msg.msg, buf, msg.size);
+    msg1.msg = new char[msg.size];
+    if (msg1.msg)
+        memcpy(msg1.msg, buf, msg1.size);
+    msg2.msg = new char[msg2.size];
+    if (msg2.msg)
+        memcpy(msg2.msg, buf, msg2.size);
+
+    GameMsgHdr hdr(0x1F2, 0, pl, sizeof(msg));
+    GLOBAL().PushMsg(hdr, &msg);
+    GameMsgHdr hdr1(0x1F2, 1, pl, sizeof(msg1));
+    GLOBAL().PushMsg(hdr1, &msg1);
+    GameMsgHdr hdr2(0x1F2, 2, pl, sizeof(msg2));
+    GLOBAL().PushMsg(hdr2, &msg2);
+#endif
 }
 
 void Map::NotifyPlayerEnter( Player * pl )
