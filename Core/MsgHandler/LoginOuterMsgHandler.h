@@ -208,15 +208,14 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	if(conn.get() == NULL)
 		return;
 
-#if 0
-    if (cfg.enableLoginLimit && LOGIN().Current() >= cfg.loginLimit)
+    if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
     {
 		UserLogonRepStruct rep;
 		rep._result = 5;
 		NETWORK()->SendMsgToClient(conn.get(), rep);
+		conn->pendClose();
         return;
     }
-#endif
 
 	if(ul._userid == 0)
 		conn->closeConn();
@@ -473,9 +472,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(recharge));
 				GLOBAL().PushMsg(hdr, &recharge);
-
-                // XXX: 把创建银角色前的所有订单号置成成功
-                DB().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", pl->getId());
 			}
 
             pl->GetPackage()->AddItem(18, 1, true);

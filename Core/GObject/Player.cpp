@@ -571,7 +571,12 @@ namespace GObject
 
 	UInt8 Player::GetCountryThread()
 	{
+        // XXX:
+#if 0
 		return mapCollection.getCountryFromSpot(_playerData.location);
+#else
+        return _playerData.country;
+#endif
 	}
 
 	const std::string& Player::getClanName() const
@@ -1018,6 +1023,42 @@ namespace GObject
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 		}
 	}
+
+    bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
+    {
+        switch (itemid)
+        {
+            case 74:
+                {
+                    UInt32 id = 18;
+                    if(isFighterFull())
+                    {
+                        sendMsgCode(0, 1200);
+                        return 0;
+                    }
+
+                    if (hasFighter(id))
+                    {
+                        sendMsgCode(1, 1017);
+                        return false;
+                    }
+
+                    Fighter * fgt = globalFighters[id];
+                    if(fgt == NULL)
+                        return false;
+                    Fighter * fgt2 = fgt->clone(this);
+                    addFighter(fgt2, true);
+                    notifyAddFighter(fgt2);
+                    autoLineup(fgt2);
+                    return true;
+                }
+                break;
+
+            default:
+                break;
+        }
+        return false;
+    }
 
 	void Player::notifyAddFighter( Fighter * fgt )
 	{
@@ -2849,6 +2890,7 @@ namespace GObject
 		cancelAutoDungeon();
 		GObject::Country& cny = CURRENT_COUNTRY();
 
+#if 0
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
@@ -2865,9 +2907,19 @@ namespace GObject
 			GLOBAL().PushMsg( hdr, &ces );
 			return;
 		}
+#else
+        if (getCountry() != cny.GetThreadID())
+        {
+			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);
+			cny.PlayerLeave(this);
+			_threadId = getCountry();
+			GameMsgHdr hdr(0x1F0, getCountry(), this, sizeof(CountryEnterStruct));
+			GLOBAL().PushMsg( hdr, &ces );
+			return;
+        }
+#endif
 
 		GObject::Map * map = GObject::Map::FromSpot(spot);
-
 		if(map == NULL)
 			return;
 
@@ -3444,7 +3496,7 @@ namespace GObject
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
                                     if (getVipLevel() >= 3) {
-                                        static UInt8 viptaskcolor[11] = {0,0,0,3,3,3,4,4,4,4,4};
+                                        static UInt8 viptaskcolor[11] = {0,0,0,1,1,1,2,2,2,2,2};
                                         _playerData.fsmcolor[n] = j + viptaskcolor[getVipLevel()];
                                         if (_playerData.fsmcolor[n] > 4)
                                             _playerData.fsmcolor[n] = 5;
@@ -3453,7 +3505,7 @@ namespace GObject
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
                                     if (getVipLevel() >= 2) {
-                                        static UInt8 viptaskcolor[11] = {0,0,3,3,3,4,4,4,4,4,4};
+                                        static UInt8 viptaskcolor[11] = {0,0,1,1,1,2,2,2,2,2,2};
                                         _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
                                         _playerData.fymcolor[n] = j + viptaskcolor[getVipLevel()];
                                         if (_playerData.fymcolor[n] > 4)

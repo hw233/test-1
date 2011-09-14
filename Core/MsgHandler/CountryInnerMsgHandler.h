@@ -92,14 +92,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
 	DBLOG().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %"I64_FMT"u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
-
     tripod.getTripodData(player); // XXX: 完家登陆之后如果没有九疑鼎数据则新建
-
-    {
-        UInt32 count = LOGIN().Count();
-        LOGIN().GetLog()->OutInfo("来自[%s]用户[%"I64_FMT"u]登陆[%05u]成功, 登陆流水号: %d, 当前在线人数: %d\n",
-                inet_ntoa(ip), player->getId(), cfg.serverNum, count, LOGIN().Current());
-    }
 }
 
 void PlayerReconnect( GameMsgHdr& hdr, const void * data )
@@ -115,11 +108,6 @@ void PlayerLogout( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	player->Logout();
-    {
-        LOGIN().Logout();
-        LOGIN().GetLog()->OutInfo("用户[%s][%"I64_FMT"u]正常退出游戏, 当前在线人数: %d\n",
-                player->getName().c_str(), player->getId(), LOGIN().Current());
-    }
 	player->SetSessionID(-1);
 }
 
@@ -729,6 +717,9 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
             return;
         player->getGold(recharge->gold);
         player->addTotalRecharge(recharge->gold);
+
+        // XXX: 把创建银角色前的所有订单号置成成功
+        DB().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", player->getId());
     }
 }
 

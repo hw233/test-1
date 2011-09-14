@@ -2498,14 +2498,21 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			}
 			else
 			{
-				GObject::ItemBase * item;
+                bool buyFgt = false;
+				GObject::ItemBase * item = NULL;
 				if(IsEquipTypeId(lr._itemId))
 					item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
-				else
+				else if (IsFighterTypeId(lr._itemId))
+                {
+                    buyFgt = player->addFighterFromItem(lr._itemId, price);
+                    if (buyFgt)
+                        price /= lr._count;
+                }
+                else
 					item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
-				if(item == NULL)
+				if(item == NULL && !buyFgt)
 					st << static_cast<UInt8>(2);
-				else
+				else if (item || buyFgt)
 				{
 					ConsumeInfo ci(Item,lr._itemId, lr._count);
 					player->useAchievement(price,&ci);

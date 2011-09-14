@@ -58,6 +58,7 @@ namespace GObject
 #define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
 #define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
 #define PLAYER_BUFF_AUTOCOPY        0x21	//自动副本
+#define PLAYER_BUFF_FGTBUY          0x22	//购买过武将数
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x30
 #define PLAYER_BUFF_COUNT			0x30
@@ -563,6 +564,7 @@ namespace GObject
 		Fighter * findFighter(UInt32);
 		Fighter * getMainFighter();
 		bool hasFighter(UInt32);
+        bool addFighterFromItem(UInt32, UInt32);
 		Fighter * removeFighter(UInt32);
 		Fighter * removeFighterFromLineup(UInt32);
 		void autoLineup(Fighter *);
