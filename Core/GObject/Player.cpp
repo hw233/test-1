@@ -573,7 +573,7 @@ namespace GObject
 	UInt8 Player::GetCountryThread()
 	{
         // XXX:
-#if 0
+#if 1
 		return mapCollection.getCountryFromSpot(_playerData.location);
 #else
         return _playerData.country;
@@ -2891,7 +2891,7 @@ namespace GObject
 		cancelAutoDungeon();
 		GObject::Country& cny = CURRENT_COUNTRY();
 
-#if 0
+#if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
@@ -4287,14 +4287,32 @@ namespace GObject
 			oldVipLevel = 0;
 			addStatus(TopupRewarded);
 		}
+
 		if(oldRecharge == 0)
 		{
 			SYSMSG(title, 254);
 			SYSMSG(content, 255);
-			MailPackage::MailItem mitem[1] = {{8998, 1}};
-			MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 1);
-			m_MailBox->newMail(NULL, 0x21, title, content, 8998 + 0x10000, true, &itemsInfo);
+
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[5] = {{56, 2}, {503,10}, {514,10}, {507,2}, {509,2}};
+                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 5);
+                mailPackageManager.push(mail->id, mitem, 5, true);
+
+                std::string strItems;
+                for (int i = 0; i < 5; ++i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+
+                DBLOG().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            }
 		}
+
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
 		//if(World::_newYearStage > 0)
 		//	GameAction()->onTopup(this, oldRecharge, _playerData.totalRecharge);
@@ -4830,49 +4848,76 @@ namespace GObject
 			l = 1;
 		if(h > 10)
 			h = 10;
-		for(UInt32 i = l; i <= h; ++ i)
+		for(UInt32 j = l; j <= h; ++j)
 		{
 			SYSMSG(title, 256);
-			SYSMSGV(content, 257, i);
+			SYSMSGV(content, 257, j);
 			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 			if(mail == NULL)
 				continue;
-			const UInt32 vipRollTable[10][3] = {{3001, 3002, 0}, {3003, 3004, 3005}, {3006, 3007, 3008},
-			{3009, 3010, 0}, {3011, 3012, 0}, {3013, 3014, 0}, {3015, 3016, 0}, {3017, 3018, 0},
-			{3019, 3020, 0}, {3021, 3022, 0}};
-			const UInt32 vipGoldTable[10] = { 0, 0, 0, 100, 500, 1000, 2000, 3000, 6000, 6000 };
-			MailPackage::MailItem mitem[4];
+
+			const UInt32 vipTable[11][12] =
+            {
+                {56,2,0,0,0,0,0,0,0,0,0,0},
+                {56,10,0,0,0,0,0,0,0,0,0,0},
+                {56,10,503,5,0,0,0,0,0,0,0,0},
+                {56,10,503,10,514,10,0,0,0,0,0,0},
+                {503,20,515,5,507,2,509,2,0,0,0,0},
+                {503,30,515,15,507,10,509,10,0,0,0,0},
+                {503,30,515,20,507,10,509,10,0,0,0,0},
+                {503,50,515,30,507,30,509,30,0,0,0,0},
+                {503,100,515,30,507,30,509,30,0,0,0,0},
+                {503,200,515,50,507,50,509,50,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0},
+            };
+
+			MailPackage::MailItem mitem[6];
 			UInt32 mcount = 0;
-			UInt32 g = vipGoldTable[i - 1];
-			std::string strItems;
-			if(g > 0)
-			{
-				mitem[mcount].id = MailPackage::Gold;
-				mitem[mcount ++].count = g;
-				strItems += Itoa(static_cast<UInt16>(MailPackage::Gold));
-				strItems += ",";
-				strItems += Itoa(g);
-				strItems += "|";
-			}
-			const UInt32 * t = vipRollTable[i - 1];
+            std::string strItems;
+
+			const UInt32 * t = vipTable[j-1];
 			URandom ur(mail->id);
-			for(UInt32 i = 0; i < 3 && t[i] > 0; ++ i)
+			for(UInt32 i = 0; i < 12 && t[i] > 0; i += 2)
 			{
-				const GData::LootItem * li = GData::lootTable[t[i]];
-                if (!li)
-                    continue;
-				GData::LootResult r = li->roll(&ur);
-				mitem[mcount].id = r.id;
-				mitem[mcount ++].count = r.count;
-				strItems += Itoa(r.id);
+				mitem[mcount].id = t[i];
+				mitem[mcount++].count = t[i+1];
+				strItems += Itoa(t[i]);
 				strItems += ",";
-				strItems += Itoa(r.count);
+				strItems += Itoa(t[i+1]);
 				strItems += "|";
 			}
+
+            UInt16 equips[][24] = {
+            {2544, 2545, 2546, 2547, 2548, 2549, 2550, 2551, 2552, 2553, 2554, 2555, 2556, 2557, 2558, 2559, 2560, 2561, 2562, 2563, 2564, 2565, 2566, 2567},
+            {2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591},
+            {2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591},
+            {2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591},
+            {2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591},
+            {2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591}
+            };
+
+            UInt8 lvl = GetLev();
+            if (lvl < 50)
+                lvl = 50;
+            lvl -= 50;
+            lvl /= 10;
+
+            if (lvl > 2)
+            if (j >= 5) // XXX: 玩家等级橙色装备x1
+            {
+                UInt16 id = equips[lvl][uRand(24)];
+                mitem[mcount].id = id;
+                mitem[mcount++].count = 1;
+				strItems += Itoa(id);
+				strItems += ",";
+				strItems += Itoa(1);
+            }
+
 			mailPackageManager.push(mail->id, mitem, mcount, true);
 			DBLOG().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
 		}
 	}
+
 	void Player::sendBlockBossMail(UInt8 l, UInt8 h)
 	{
 		UInt16 coupon = 0;

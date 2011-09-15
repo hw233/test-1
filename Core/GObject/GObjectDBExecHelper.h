@@ -206,6 +206,14 @@ struct DBPracticeData
     std::string fighters;
 };
 
+struct DBReRecharge
+{
+    UInt64 playerId;
+    UInt16 id;
+    UInt32 num;
+    UInt8 status;
+};
+
 struct DBFightersFriendliness
 {
 	UInt64 playerId;
@@ -910,6 +918,17 @@ SPECIALDEF(13)
         std::string, fighters
     )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBReRecharge)
+SPECIALDEF(4)
+	(
+        UInt64, playerId,
+        UInt16, id,
+        UInt32, num,
+        UInt8, status
+    )
+SPECIALEND()
+
 
 SPECIALBEGIN(GObject::DBFightersFriendliness)
 SPECIALDEF(5)

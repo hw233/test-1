@@ -52,12 +52,14 @@ struct UserReconnectStruct
 struct UserLoginStruct
 {
 	UInt64 _userid;
+    UInt8 _level;
+    UInt8 _isYear;
 	UInt32 _lang;
 	typedef Array<UInt8, 36> HashValType;
 	UInt8 _hashval[36];
 	std::string _server;
 
-	MESSAGE_DEF4(REQ::LOGIN, UInt64, _userid, UInt32, _lang, HashValType, _hashval, std::string, _server);
+	MESSAGE_DEF6(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang, HashValType, _hashval, std::string, _server);
 };
 
 struct NewUserStruct
@@ -134,11 +136,6 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
-
-#if 0
-    LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]%s登陆成功, SESSIONID: %u(%u), 返回码: %u\n",
-            player->getId(), reconnect?"重":"", hsid, sid, res);
-#endif
 	return res;
 }
 
@@ -238,11 +235,15 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		UInt8 flag = 0;
 		if(res == 0)
 		{
+            player->setQQVipl(ul._level);
+            player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
 		}
 		else if(res == 4)
 		{
+            player->setQQVipl(ul._level);
+            player->setQQVipYear(ul._isYear);
 			flag = 1;
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
@@ -494,7 +495,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         {
             memcached_free(memc);
             memc = NULL;
-            return;
+            err += "can not connect to token server.";
         }
         else
         {
@@ -513,7 +514,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
         memcached_return rc;
         char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
-        if (rc == MEMCACHED_SUCCESS && rtoken)
+        if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
         {
             if (strncmp(token.c_str(), rtoken, token.length()) != 0)
             {
@@ -566,7 +567,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
                 memset(&recharge, 0x00, sizeof(recharge));
                 recharge.type = 0; // 有角色时充值
-                recharge.gold = num;
+                recharge.gold = 10 * num;
                 memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
 
                 GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
@@ -591,6 +592,57 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     st<< ret << err << Stream::eos;
     NETWORK()->SendMsgToClient(hdr.sessionID,st);
 
+    return;
+}
+
+void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
+{
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    std::string no;
+    UInt64 player_Id;
+    UInt16 id;
+    UInt32 num;
+
+    brd>>no;
+    brd>>player_Id;
+    brd>>id;
+    brd>>num;
+
+    std::string err = "";
+    UInt8 ret = GObject::GObjectManager::reRecharge(no, id, num, err);
+    if (!ret)
+    {
+        GObject::Player * player=GObject::globalPlayers[player_Id];
+        if(player != NULL)
+        {
+            struct Recharge
+            {
+                UInt8 type;
+                UInt32 gold;
+                char no[256];
+            } recharge;
+
+            memset(&recharge, 0x00, sizeof(recharge));
+            recharge.type = 0; // 有角色时充值
+            recharge.gold = 10 * num;
+            memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+
+            GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
+            GLOBAL().PushMsg(hdr, &recharge);
+            ret=0;
+        }
+        else
+        {
+            GObject::prepaid.push(player_Id, num, no.c_str());
+            ret=0;
+        }
+    }
+
+    Stream st;
+    st.init(SPEP::RERECHARGE, 0x01);
+    st<< ret << err << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
     return;
 }
 

@@ -13,6 +13,7 @@ MSG_REG(LoginMsgHdr, NewUserReq);
 MSG_REG_2(LoginMsgHdr, SPEQ::PLAYERIDAUTH, PlayerIDAuth);
 MSG_REG_2(LoginMsgHdr, SPEQ::WORLDANNOUNCE, WorldAnnounce);
 MSG_REG_2(LoginMsgHdr, SPEQ::USERRECHARGE, onUserRecharge);
+MSG_REG_2(LoginMsgHdr, SPEQ::RERECHARGE, onUserReRecharge);
 MSG_REG_2(LoginMsgHdr,SPEQ::KILLUSER,OnKickUser);
 MSG_REG_2(LoginMsgHdr,SPEQ::LOCKUSER,LockUser);
 MSG_REG_2(LoginMsgHdr,SPEQ::UNLOCKUSER,UnlockUser);

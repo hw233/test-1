@@ -1952,9 +1952,17 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
                 offCitta(_citta[idx], false, false, writedb); // delete skills was taken out by old citta first
                 _citta[idx] = citta;
                 ret = true;
-                op = 2;
+                op = 1;
             }
         }
+    }
+
+    if (ret)
+    {
+        _attrDirty = true;
+        _bPDirty = true;
+        //sendModification(0x62, citta, idx, writedb);
+        sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
     }
 
     if (ret && !swap)
@@ -1966,14 +1974,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
             if (cb->needsoul)
                 sendModification(0x8, soul);
         }
-    }
-
-    if (ret)
-    {
-        _attrDirty = true;
-        _bPDirty = true;
-        //sendModification(0x62, citta, idx, writedb);
-        sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
     }
 
     return ret;

@@ -2985,6 +2985,41 @@ namespace GObject
         return true;
     }
 
+    UInt8 GObjectManager::reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err)
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("reRecharge");
+		DBReRecharge rrdb;
+        char buf[1024] = {0};
+        snprintf(buf, sizeof(buf), "SELECT `playerId`, `id`, `num`, `status` FROM `recharge` WHERE `no` = '%s'", no.c_str());
+		if(execu->Prepare(buf, rrdb)!= DB::DB_OK)
+        {
+            err += "db error.";
+			return 1;
+        }
+		lc.reset(1000);
+
+        bool found = false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if (rrdb.id == id && rrdb.num == num)
+            {
+                found = true;
+                break;
+            }
+        }
+		lc.finalize();
+
+        if (!found)
+        {
+            err += "not found.";
+            return 1;
+        }
+
+        return 0;
+    }
+
 	bool GObjectManager::unloadEquipments()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());

@@ -832,11 +832,13 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
         st << country << Stream::eos;
         player->send(st);
 
+#if 0
         player->setThreadId(country);
         PlayerData& pd = player->getPlayerData();
         CountryEnterStruct ces(true, pd.inCity ? 1 : 0, pd.location);
         GameMsgHdr hdr(0x1F0, country, player, sizeof(CountryEnterStruct));
         GLOBAL().PushMsg( hdr, &ces );
+#endif
     }    
 }
 

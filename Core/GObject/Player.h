@@ -439,6 +439,11 @@ namespace GObject
 		void setGMLevel(UInt8 l);
 		inline UInt8 getGMLevel()			{ return _playerData.gmLevel; }
 
+        inline void setQQVipl(UInt8 lvl) { lvl>7?_playerData.qqvipl=7:_playerData.qqvipl = lvl; }
+        inline UInt8 getQQVipl() { return _playerData.qqvipl; }
+        inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
+        inline bool getQQVipYear() { return _playerData.qqvipyear; }
+
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
 		void setTotalRecharge( UInt32 r );
