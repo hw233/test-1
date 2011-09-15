@@ -527,10 +527,13 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
             ret = 3;
         }
 
-        rc = memcached_delete(memc, key, len, (time_t)0);
         if (rc == MEMCACHED_SUCCESS)
         {
-            //err += "delete key error.";
+            rc = memcached_delete(memc, key, len, (time_t)0);
+            if (rc == MEMCACHED_SUCCESS)
+            {
+                //err += "delete key error.";
+            }
         }
     }
     else
