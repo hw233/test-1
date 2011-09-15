@@ -26,38 +26,17 @@
 #include "Common/SHA1Engine.h"
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
-
-#if 1
 #include <libmemcached/memcached.h>
 
-static bool meminited = false;
 static memcached_st* memc = NULL;
-
-__attribute__((constructor)) static void initMemcache()
-{
-    if (meminited)
-        return;
-    meminited = true;
-
-    memcached_return rc;
-    memc = memcached_create(NULL);
-    memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer.c_str(), cfg.tokenPort, &rc);
-    if (rc != MEMCACHED_SUCCESS)
-    {
-        memcached_free(memc);
-        memc = NULL;
-        return;
-    }
-    rc = memcached_server_push(memc, servers);
-    memcached_server_free(servers);
-}
-
 __attribute__((destructor)) static void uninitMemcache()
 {
     if (memc)
+    {
         memcached_free(memc);
+        memc = NULL;
+    }
 }
-#endif
 
 struct UserDisconnectStruct
 {
@@ -506,52 +485,57 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     UInt8 ret = 1;
     std::string err = "";
 
+    if (!memc)
+    {
+        memcached_return rc;
+        memc = memcached_create(NULL);
+        memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer.c_str(), cfg.tokenPort, &rc);
+        if (rc != MEMCACHED_SUCCESS)
+        {
+            memcached_free(memc);
+            memc = NULL;
+            return;
+        }
+        else
+        {
+            rc = memcached_server_push(memc, servers);
+            memcached_server_free(servers);
+        }
+    }
+
     if (memc)
     {
-#if 1
-        initMemcache();
-        if (memc)
+        size_t len = 0;
+        size_t tlen = 0;
+        unsigned int flags = 0;
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
+        memcached_return rc;
+        char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+        if (rc == MEMCACHED_SUCCESS && rtoken)
         {
-            char key[MEMCACHED_MAX_KEY] = {0};
-            char* keys[] = {key};
-            size_t len = 128;
-            size_t lens[] = {len};
-
-            size_t tlen = 0;
-            unsigned int flags;
-
-            snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
-
-            memcached_return rc;
-            rc = memcached_mget(memc, keys, lens, 1);
-            char rkey[MEMCACHED_MAX_KEY] = {0};
-            char* rtoken = memcached_fetch(memc, rkey, &len, &tlen, &flags, &rc);
-            if (rc == MEMCACHED_SUCCESS && rtoken)
+            if (strncmp(token.c_str(), rtoken, token.length()) != 0)
             {
-                if (strncmp(token.c_str(), rtoken, token.length()) != 0)
-                {
-                    err += "token is not matched.";
-                    ret = 2;
-                }
-            }
-            else
-            {
-                err += "fetch token oalue error.";
-                ret = 3;
-            }
-
-            rc = memcached_delete(memc, key, len, (time_t)0);
-            if (rc == MEMCACHED_SUCCESS)
-            {
-                //err += "delete key error.";
+                err += "token is not matched.";
+                ret = 2;
             }
         }
         else
-            err += "token server error.";
-#endif
+        {
+            err += "fetch token value error.";
+            ret = 3;
+        }
+
+        rc = memcached_delete(memc, key, len, (time_t)0);
+        if (rc == MEMCACHED_SUCCESS)
+        {
+            //err += "delete key error.";
+        }
     }
     else
-        err += "we have no token server.";
+        err += "token server error.";
+
     if (no.length())
     {
         DB().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",

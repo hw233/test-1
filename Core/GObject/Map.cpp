@@ -470,26 +470,21 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 		}
 	}
 #else
+#define MSG_MAX 4096
     struct BroadcastMsg
     {
         Map* map;
         Player* pl;
         int size;
-        char* msg;
+        char msg[MSG_MAX]; // XXX:
     } msg, msg1, msg2;
 
     msg.map = msg1.map = msg2.map = this;
     msg.pl = msg1.pl = msg2.pl = pl;
     msg.size = msg1.size = msg2.size = size;
-    msg.msg = new char[msg.size];
-    if (msg.msg)
-        memcpy(msg.msg, buf, msg.size);
-    msg1.msg = new char[msg.size];
-    if (msg1.msg)
-        memcpy(msg1.msg, buf, msg1.size);
-    msg2.msg = new char[msg2.size];
-    if (msg2.msg)
-        memcpy(msg2.msg, buf, msg2.size);
+    memcpy(msg.msg, buf, msg.size>MSG_MAX?MSG_MAX:msg.size);
+    memcpy(msg1.msg, buf, msg1.size>MSG_MAX?MSG_MAX:msg.size);
+    memcpy(msg2.msg, buf, msg2.size>MSG_MAX?MSG_MAX:msg.size);
 
     GameMsgHdr hdr(0x1F2, 0, pl, sizeof(msg));
     GLOBAL().PushMsg(hdr, &msg);

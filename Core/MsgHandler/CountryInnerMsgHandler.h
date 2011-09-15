@@ -97,21 +97,19 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 
 void OnBroadcast( GameMsgHdr& hdr, const void * data )
 {
+#define MSG_MAX 4096
     struct BroadcastMsg
     {   
         Map* map;
         Player* pl; 
         int size;
-        char* msg;
+        char msg[MSG_MAX];
     };
 
     BroadcastMsg* msg = (BroadcastMsg*)(data);
 
     if (msg->map && msg->msg)
-    {
         msg->map->Broadcast2(msg->msg, msg->size, CURRENT_COUNTRY().GetThreadID(), msg->pl);
-        delete [] msg->msg;
-    }
 }
 
 void PlayerReconnect( GameMsgHdr& hdr, const void * data )
