@@ -813,7 +813,7 @@ namespace GObject
 		}
 		if(update)
 		{
-			DB1().PushUpdateData("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);
+			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);
 		}
 	}
 
@@ -997,13 +997,13 @@ namespace GObject
 		return (!_fighters.empty()) ? _fighters.begin()->second->getExp() : 0;
 	}
 
-    void Player::upInitCitta(Fighter* fgt)
+    void Player::upInitCitta(Fighter* fgt, bool writedb)
     {
         static UInt16 cittas[] = {301, 401, 701};
         UInt16 citta = cittas[fgt->getClass()-1];
         if (fgt->hasCitta(citta) < 0) {
-            if (fgt->addNewCitta(citta, false, true)) {
-                if (fgt->upCitta(citta, 0, true)) {
+            if (fgt->addNewCitta(citta, writedb, true)) {
+                if (fgt->upCitta(citta, 0, writedb)) {
                 }
             }
         }
@@ -1017,7 +1017,7 @@ namespace GObject
 		else
 			_fighters[fgt->getId()] = fgt;
 
-        upInitCitta(fgt);
+        upInitCitta(fgt, writedb);
 
 		if(writedb)
 		{
@@ -4650,7 +4650,7 @@ namespace GObject
 		_playerData.lastExp += exp;
 		if(leaveCity)
 			_playerData.lastExp |= 0x80000000;
-		DB1().PushUpdateData("UPDATE `player` SET `lastExp` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastExp, _id);
+		DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = %u WHERE `id` = %"I64_FMT"u", _playerData.lastExp, _id);
 	}
 
 	void Player::pendTael( UInt32 t )

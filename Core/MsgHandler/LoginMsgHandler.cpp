@@ -22,4 +22,5 @@ MSG_REG_2(LoginMsgHdr,SPEQ::MAILFROMBS,MailFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::BANCHATFROMBS,BanChatFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMFROMBS,AddItemFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::BATTLEREPORT,BattleReportReq);
+MSG_REG_2(LoginMsgHdr,SPEQ::ONLINE,ServerOnlineNum);
 MSG_HANDLER_END()

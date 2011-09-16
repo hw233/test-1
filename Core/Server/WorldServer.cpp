@@ -81,6 +81,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
     else
         cfg.serverNum = num;
 
+    //cfg.serverLogId = cfg.serverNum;
+
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();
 	DB::gDataDBConnectionMgr->Init( cfg.dbDataHost.c_str(), cfg.dbDataUser.c_str(), cfg.dbDataPassword.c_str(), cfg.dbDataSource.c_str(), 1, 32, cfg.dbDataPort );

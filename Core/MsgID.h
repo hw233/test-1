@@ -483,6 +483,7 @@ namespace SPEQ
     const UInt16 ADDITEMFROMBS      = 0x108;// 0x107
     const UInt16 BATTLEREPORT       = 0x106;// 0x110
     const UInt16 RERECHARGE         = 0x109;//
+    const UInt16 ONLINE             = 0x10A;//
 }
 
 namespace SPEP
@@ -495,6 +496,7 @@ namespace SPEP
     const UInt8 BANCHATFROMBS       = 0x03;
     const UInt8 ADDITEMFROMBS       = 0x08;
     const UInt8 RERECHARGE          = 0x09;//
+    const UInt8 ONLINE              = 0x0A;//
     const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
 }
 
