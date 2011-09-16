@@ -116,7 +116,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     {
         td.soul += ib->getEnergy();
 
-        UInt8 quality = ib->getQuality() - 2;
+        UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
         int rnd = uRand(100);
         for (int i = 0; i < 4; ++i)
         {
