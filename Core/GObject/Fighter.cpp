@@ -1500,7 +1500,7 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     }
 
     peerless = pl;
-    sendModification(0x30, peerless);
+    sendModification(0x30, peerless, writedb);
 }
 
 UInt8 Fighter::getAcupointCnt()

@@ -66,7 +66,7 @@ public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	inline void setScriptPath(const char * p) {scriptPath = p;}
 	inline void setReportPath(const char * p) {reportPath = p;}
-	inline void setServerLogId(UInt32 id) {serverLogId = id;}
+	inline void setServerLogId(UInt32 id) {/*serverLogId = id;*/}
 	inline void setAnnounceFile(const char * p) {announceFile = p;}
 	inline void setDataDatabase(const char * h, UInt16 p, const char * u, const char * pw, const char * s )
 	{dbDataHost = h; dbDataPort = p; dbDataUser = u; dbDataPassword = pw; dbDataSource = s;}

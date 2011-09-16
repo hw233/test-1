@@ -986,4 +986,13 @@ void BattleReportReq(LoginMsgHdr& hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID, &(*r)[0], r->size());
 }
 
+void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
+{
+	Stream st;
+	st.init(SPEP::ONLINE,0x01);
+	st<<SERVER().GetTcpService()->getOnlineNum();
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 #endif // _LOGINOUTERMSGHANDLER_H_

@@ -190,6 +190,49 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 #endif
 }
 
+void DBWorker::PushUpdateDataL(const char * fmt, ...)
+{
+    if (m_Limit > 500)
+        return;
+    ++m_Limit;
+
+	if(m_Type == 1 && cfg.serverLogId == 0)
+		return;
+	/* Guess we need no more than 256 bytes. */
+	int size = 256;
+
+	char *p = new(std::nothrow) char[size];
+	if (p == NULL)
+		return;
+
+	while (1) {
+		va_list ap;
+		/* Try to print in the allocated space. */
+		va_start(ap, fmt);
+		int n = vsnprintf(p, size, fmt, ap);
+		va_end(ap);
+		/* If that worked, return the string. */
+		if (n > -1 && n < size)
+			break;
+		/* Else try again with more space. */
+		if (n > -1)    /* glibc 2.1 */
+			size = n+1; /* precisely what is needed */
+		else           /* glibc 2.0 */
+			size *= 2;  /* twice the old size */
+		delete[] p;
+		if ((p = new(std::nothrow) char[size]) == NULL) {
+			return;
+		}
+	}
+
+	FastMutex::ScopedLock lk(m_Mutex);
+	m_UpdateItems.push_back(p);
+#if 0
+	if(m_Type == 0)
+		DB().GetLog()->OutInfo("Push [%s]\n", p);
+#endif
+}
+
 void DBWorker::PushUpdateDataF(const char * fmt, ...)
 {
 	if(m_Type == 1 && cfg.serverLogId == 0)
