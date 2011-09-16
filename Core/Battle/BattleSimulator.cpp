@@ -1177,7 +1177,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         return 0;
     }
 
-    if(skill->cond == GData::SKILL_ENTER && false)
+    if(skill->cond == GData::SKILL_ENTER)
     {
         DefStatus defList[25];
         size_t defCount = 0;
@@ -1241,7 +1241,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             }
             else
             {
-                doSkillStatus2(bf, skill, target_side, pos, cnt, scList, scCount);
+                doSkillStatus2(bf, skill, target_side, pos, 1, scList, scCount);
             }
 
             int self_side = bf->getSide() == bo->getSide() ? 0 : 25;
@@ -3333,7 +3333,7 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
 
 void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active )
 {
-	for(UInt8 i = pos; i < pos+cnt; ++ i)
+	for(UInt8 i = pos; i < cnt; ++ i)
 	{
 		if(_objs[side][i] != NULL)
 		{
