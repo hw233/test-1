@@ -18,7 +18,9 @@ enum
 	WORKER_THREAD_WORLD,			//世界线程
 	WORKER_THREAD_LOGIN,			//登录
 	WORKER_THREAD_DB,				//DB
-	WORKER_THREAD_DB1,				//DB1
+	WORKER_THREAD_DB1,				//DB1 player
+	WORKER_THREAD_DB2,				//DB2 fighter
+	WORKER_THREAD_DB3,				//DB3 item,dungeon_player,player_copy,player_front,task_instance
 	WORKER_THREAD_DB_LOG,			//后台LOG
 	MAX_THREAD_NUM
 };

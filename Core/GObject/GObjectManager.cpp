@@ -848,7 +848,7 @@ namespace GObject
 			if(dbpd.pdata.gold > 0x7FFFFFFF)
 			{
 				dbpd.pdata.gold = 10;
-				DB().PushUpdateData("UPDATE `player` SET `gold` = 10 WHERE `id` = %"I64_FMT"u", id);
+				DB1().PushUpdateData("UPDATE `player` SET `gold` = 10 WHERE `id` = %"I64_FMT"u", id);
 			}
 
 			{

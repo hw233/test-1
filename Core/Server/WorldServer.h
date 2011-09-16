@@ -39,6 +39,9 @@ public:
 	GObject::Country& GetCountry(UInt8 worker);
 	GObject::World& GetWorld();
 	DB::DBWorker& GetDB();
+	DB::DBWorker& GetDB1();
+	DB::DBWorker& GetDB2();
+	DB::DBWorker& GetDB3();
 	DB::DBWorker& GetDBLog();
 	Login::LoginWorker& GetLogin();
 
@@ -65,6 +68,9 @@ public:
 #define NETWORK()		SERVER().GetTcpService()
 #define WORLD()			SERVER().GetWorld()
 #define DB()			SERVER().GetDB()
+#define DB1()			SERVER().GetDB1()
+#define DB2()			SERVER().GetDB2()
+#define DB3()			SERVER().GetDB3()
 #define DBLOG()			SERVER().GetDBLog()
 #define LOGIN()			SERVER().GetLogin()
 

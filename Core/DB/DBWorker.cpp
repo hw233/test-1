@@ -11,7 +11,9 @@
 namespace DB
 {
 
-DBWorker::DBWorker(UInt8 type, UInt8 worker) : WorkerRunner<>((type == 1 && cfg.serverLogId == 0) ? 0 : 500), m_Type(type), m_Worker(worker)
+DBWorker::DBWorker(UInt8 type, UInt8 worker) :
+    WorkerRunner<>((type == 1 && cfg.serverLogId == 0) ? 0 : 500),
+    m_Type(type), m_Worker(worker), m_Limit(0)
 {
 }
 
@@ -79,6 +81,7 @@ void DBWorker::OnTimer()
 			return;
 		l = m_UpdateItems;
 		m_UpdateItems.clear();
+        m_Limit = 0;
 	}
 	while(m_DBExecutor.get() == NULL || !m_DBExecutor->isConnected())
 	{
@@ -101,12 +104,13 @@ void DBWorker::OnTimer()
     if (!l.empty())
     {
         size_t size = l.size();
+        size_t sz = size;
         const char** query = &l[0];
         while (size)
         {
             --size;
             bool r = DoDBQuery(*query);
-            TRACE_LOG("[%s] -> %d", *query, r ? 1 : 0);
+            TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, *query, r ? 1 : 0);
             delete[] *query;
             ++query;
             if (!*query)
@@ -128,6 +132,65 @@ void DBWorker::OnPause()
 }
 
 void DBWorker::PushUpdateData(const char * fmt, ...)
+{
+    if (m_Worker == WORKER_THREAD_DB) // normal
+    {
+        if (m_Limit > 500)
+            return;
+    }
+
+    if (m_Worker == WORKER_THREAD_DB1) // player
+    {
+    }
+
+    if (m_Worker == WORKER_THREAD_DB2) // fighter
+    {
+    }
+
+    if (m_Worker == WORKER_THREAD_DB3) // item,dungeon_player,player_copy,player_front,task_instance
+    {
+    }
+
+    ++m_Limit;
+
+	if(m_Type == 1 && cfg.serverLogId == 0)
+		return;
+	/* Guess we need no more than 256 bytes. */
+	int size = 256;
+
+	char *p = new(std::nothrow) char[size];
+	if (p == NULL)
+		return;
+
+	while (1) {
+		va_list ap;
+		/* Try to print in the allocated space. */
+		va_start(ap, fmt);
+		int n = vsnprintf(p, size, fmt, ap);
+		va_end(ap);
+		/* If that worked, return the string. */
+		if (n > -1 && n < size)
+			break;
+		/* Else try again with more space. */
+		if (n > -1)    /* glibc 2.1 */
+			size = n+1; /* precisely what is needed */
+		else           /* glibc 2.0 */
+			size *= 2;  /* twice the old size */
+		delete[] p;
+		if ((p = new(std::nothrow) char[size]) == NULL) {
+			return;
+		}
+	}
+
+	FastMutex::ScopedLock lk(m_Mutex);
+	m_UpdateItems.push_back(p);
+#if 0
+	if(m_Type == 0)
+		DB().GetLog()->OutInfo("Push [%s]\n", p);
+#endif
+}
+
+void DBWorker::PushUpdateDataF(const char * fmt, ...)
 {
 	if(m_Type == 1 && cfg.serverLogId == 0)
 		return;
@@ -158,6 +221,7 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 		}
 	}
 
+    ++m_Limit;
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
 #if 0

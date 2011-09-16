@@ -37,7 +37,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 			return;
 		} 
 		//player->GetPackage()->AddItemFromDB(8942, 1, true);
-		//DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
+		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
 	}
 	UInt16 newLoc = ces->newLoc;
 	if(ces->inCity && (newLoc & 0xFF) == 0)
@@ -51,7 +51,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 
 	if(ces->notify)
 	{
-		DB().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", PLAYER_DATA(player, inCity), PLAYER_DATA(player, location), player->getId());
+		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", PLAYER_DATA(player, inCity), PLAYER_DATA(player, location), player->getId());
 		GObject::Map * map = GObject::Map::FromSpot(newLoc);
 		if(map == NULL)
 			return;

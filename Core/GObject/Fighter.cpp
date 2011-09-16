@@ -273,9 +273,9 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 		if(_owner == NULL)
 			return;
 		if(v > 0)
-			DB().PushUpdateData("REPLACE INTO `fighter_buff`(`playerId`, `id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u, %u)", _owner->getId(), _id, t - 0x40, v);
+			DB2().PushUpdateData("REPLACE INTO `fighter_buff`(`playerId`, `id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u, %u)", _owner->getId(), _id, t - 0x40, v);
 		else
-			DB().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - 0x40);
+			DB2().PushUpdateData("DELETE FROM `fighter_buff` WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `buffId` = %u", _owner->getId(), _id, t - 0x40);
 		return;
 	}
     if (t >= 0x50 && t < 0x50 + getMaxTrumps())
@@ -284,7 +284,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         if (getAllTrumpId(trumps)) {
             std::string str;
             if (value2string(trumps, getMaxTrumps(), str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `trump` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `trump` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
     }
@@ -293,17 +293,17 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	{
 	case 1: field = "hp"; break;
 	case 2: field = "level"; break;
-	case 3: DB().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+	case 3: DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
 		return;
 	case 4:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-            DB().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+            DB2().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
         return;
     case 5:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-            DB().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
+            DB2().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
         return;
-	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+	case 6: DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
         break;
     case 7:
             break;
@@ -316,20 +316,20 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         {
             std::string str;
             if (value2string(_acupoints, ACUPOINTS_MAX, str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `acupoints` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `acupoints` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
     case 0x31: // peerless
         break;
     case 0x32: // cittaslot
-        // DB().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
+        // DB2().PushUpdateData("UPDATE `fighter` SET `cittaslot` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _cittaslot, _id, _owner->getId());
         break;
     case 0x60:
         { // skill
             std::string str;
             if (value2string(_skill, getUpSkillsMax(), str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `skill` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
@@ -338,7 +338,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             if (_skills.size()) {
                 std::string str;
                 if (value2string(&_skills[0], _skills.size(), str)) {
-                    DB().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                    DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
                 }
             }
         }
@@ -347,7 +347,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         { // citta
             std::string str;
             if (value2string(_citta, getUpCittasNum(), str)) {
-                DB().PushUpdateData("UPDATE `fighter` SET `citta` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                DB2().PushUpdateData("UPDATE `fighter` SET `citta` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
             }
         }
         break;
@@ -356,7 +356,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             if (_cittas.size()) {
                 std::string str;
                 if (value2string(&_cittas[0], _cittas.size(), str)) {
-                    DB().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
+                    DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
                 }
             }
         }
@@ -378,7 +378,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	if(field != NULL)
 	{
 		if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
-			DB().PushUpdateData("UPDATE `fighter` SET `%s` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
+			DB2().PushUpdateData("UPDATE `fighter` SET `%s` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", field, v, _id, _owner->getId());
 	}
 }
 
@@ -1139,8 +1139,8 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 	{
 		_attrDirty = true;
 		_bPDirty = true;
-		DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
-		DB().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
+		DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
+		DB3().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
 		if(toWhere != 0 && equip->getQuality() >= 4)
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());

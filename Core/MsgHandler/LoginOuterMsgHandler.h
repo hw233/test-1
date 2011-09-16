@@ -66,8 +66,10 @@ struct NewUserStruct
 {
 	std::string _name;
 	UInt8 _class;
+    UInt8 _level;
+    UInt8 _isYear;
 
-	MESSAGE_DEF2(REQ::CREATE_ROLE, std::string, _name, UInt8, _class);
+	MESSAGE_DEF4(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear);
 };
 
 
@@ -104,7 +106,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 			if(player->getLockExpireTime() <= TimeUtil::Now())
 			{
 				player->setLockExpireTime(0);
-				DB().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+				DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
 			}
 			else
 				return 3;
@@ -125,7 +127,8 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 				static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
 				cl2->send(kick_pkt, 4);
 				cl2->SetPlayer(NULL);
-				cl2->pendClose();
+				//cl2->pendClose();
+				cl2->forceClose();
 				res = 4;
 			}
 			else
@@ -183,15 +186,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
 	if(conn.get() == NULL)
 		return;
-
-    if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
-    {
-		UserLogonRepStruct rep;
-		rep._result = 5;
-		NETWORK()->SendMsgToClient(conn.get(), rep);
-		conn->pendClose();
-        return;
-    }
 
 	if(ul._userid == 0)
 		conn->closeConn();
@@ -333,6 +327,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	if(conn.get() == NULL)
 		return;
 
+    if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
+    {
+		UserLogonRepStruct rep;
+		rep._result = 5;
+		NETWORK()->SendMsgToClient(conn.get(), rep);
+		conn->forceClose();
+        return;
+    }
+
 	trimName(nu._name);
 
 #if 1
@@ -419,7 +422,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			lup.fighter = fgt;
 			lup.updateId();
 
-			DB().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
+			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
 
 			DBLOG().PushUpdateData("insert into register_states(server_id,player_id,player_name, reg_time) values(%u,%"I64_FMT"u, '%s', %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), TimeUtil::Now());
 
@@ -456,6 +459,8 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
             pl->GetPackage()->AddItem(18, 1, true);
             pl->getCoupon(888);
+            pl->setQQVipl(nu._level);
+            pl->setQQVipYear(nu._isYear);
 		}
 	}
 
@@ -557,7 +562,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        DB1().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
@@ -724,7 +729,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
         if(pl->getLockExpireTime() == static_cast<UInt32>(0))
         {
             pl->setLockExpireTime(static_cast<UInt32>(expireTime));
-            DB().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+            DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
             st<<static_cast<Int32>(0);
 			if(pl->isOnline())
 			{
@@ -763,7 +768,7 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
         else
         {
             pl->setLockExpireTime(0);
-            DB().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
+            DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
             st<<static_cast<UInt32>(0);
         }
     }
@@ -830,7 +835,7 @@ void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 		return;
 
 	PLAYER_DATA(player, wallow) = type;
-	DB().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, pid);
+	DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, pid);
 	player->sendWallow();
 }
 

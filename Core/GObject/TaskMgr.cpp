@@ -143,7 +143,7 @@ namespace GObject
 			}
 		}
 		DB().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(m_PlayerOwner, newGuild), m_PlayerOwner->getId());
-		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` >= 111111 AND `taskId` <= 111133 AND `ownerId` = %"I64_FMT"u", m_PlayerOwner->getId());
+		DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` >= 111111 AND `taskId` <= 111133 AND `ownerId` = %"I64_FMT"u", m_PlayerOwner->getId());
 #endif
 	}
 
@@ -244,7 +244,7 @@ namespace GObject
 		task_iterator it;
 		GET_TASK_DATA_ITER(m_TaskCompletedList, taskId, it);
 		if (it == m_TaskCompletedList.end()) return false;
-		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, it->second->m_OwnerId);
+		DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, it->second->m_OwnerId);
 		SAFE_DELETE(it->second);
 		m_TaskCompletedList.erase(it);
 		return true;
@@ -255,7 +255,7 @@ namespace GObject
 		task_iterator it;
 		GET_TASK_DATA_ITER(m_TaskAcceptedList, taskId, it);
 		if (it == m_TaskAcceptedList.end()) return false;
-		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, it->second->m_OwnerId);
+		DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, it->second->m_OwnerId);
 		SAFE_DELETE(it->second);
 		m_TaskAcceptedList.erase(it);
 		return true;
@@ -266,7 +266,7 @@ namespace GObject
 		std::map<UInt32, UInt32>::iterator found = m_TaskSubmitedList.find(taskId);
 		if (found == m_TaskSubmitedList.end())
 			return false;
-		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, m_PlayerOwner->getId());
+		DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, m_PlayerOwner->getId());
 		m_TaskSubmitedList.erase(found);
 		return true;
 	}
@@ -346,12 +346,12 @@ namespace GObject
         if(taskType.m_Class == 4 || taskType.m_Class == 5 || taskType.m_Class == 6)
         {
             ResetTaskStep2(it->second);
-            DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, m_PlayerOwner->getId());
+            DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", taskId, m_PlayerOwner->getId());
         }
         else
         {
             m_TaskSubmitedList[taskId] = TimeUtil::Now();
-            DB().PushUpdateData("UPDATE `task_instance`  SET `submit` = 1,`timeEnd` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", m_TaskSubmitedList[taskId], it->second->m_TaskId, it->second->m_OwnerId);
+            DB3().PushUpdateData("UPDATE `task_instance`  SET `submit` = 1,`timeEnd` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", m_TaskSubmitedList[taskId], it->second->m_TaskId, it->second->m_OwnerId);
         }
 		SAFE_DELETE(it->second);
 		m_TaskCompletedList.erase(it);
@@ -410,7 +410,7 @@ namespace GObject
 		}
 		td = task;
 
-		DB().PushUpdateData("REPLACE INTO `task_instance` VALUES (%d, %"I64_FMT"u, %d, '%s',%d,%d,%d,%d)", task->m_TaskId, task->m_OwnerId, \
+		DB3().PushUpdateData("REPLACE INTO `task_instance` VALUES (%d, %"I64_FMT"u, %d, '%s',%d,%d,%d,%d)", task->m_TaskId, task->m_OwnerId, \
 		task->m_AcceptTime, task->m_StepStr.c_str(), task->m_TimeBegin, task->m_TimeEnd, task->m_Completed, task->m_Submit);
 //		TRACE_LOG("player[%"I64_FMT"u:%s] accept task [%d:%d]", m_PlayerOwner->getId(), m_PlayerOwner->getName().c_str(), task->m_TaskId, task->m_Id);
 
@@ -523,7 +523,7 @@ namespace GObject
 		UInt32 todayBegin = TimeUtil::SharpDay(0);
 		if (it->second->m_AcceptTime < todayBegin)
 		{
-			DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
+			DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 			SAFE_DELETE(it->second);
 			m_TaskCompletedList.erase(it);
 			return false;
@@ -541,7 +541,7 @@ namespace GObject
 		{
 			dayTaskData = dayIt->second;
 			++(dayTaskData->m_Count);
-			DB().PushUpdateData("UPDATE `day_task_instance` SET `count` = %u WHERE `loopTask` = %u AND `ownerId` = %"I64_FMT"u", dayTaskData->m_Count, dayTaskData->m_LoopTaskId, m_PlayerOwner->getId());
+			DB3().PushUpdateData("UPDATE `day_task_instance` SET `count` = %u WHERE `loopTask` = %u AND `ownerId` = %"I64_FMT"u", dayTaskData->m_Count, dayTaskData->m_LoopTaskId, m_PlayerOwner->getId());
 			return true;
 		}
 		return false;
@@ -585,7 +585,7 @@ namespace GObject
 			}
 		}
 
-		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, m_PlayerOwner->getId());
+		DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, m_PlayerOwner->getId());
 		if(dayTaskData->m_Count == 10 && dayTaskData->m_PreTaskQuality >= 4)
 			DBLOG().PushUpdateData("insert into `task_color_count`(`server_id`, `player_id`, `task_color`, `this_day`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, m_PlayerOwner->getId(), dayTaskData->m_PreTaskQuality, TimeUtil::SharpDay());
 		SAFE_DELETE(it->second);
@@ -702,7 +702,7 @@ namespace GObject
 			}
 
 			UpdateTaskStep(td, stepType, td->m_Step[stepType-1]);
-			DB().PushUpdateData("UPDATE `task_instance` SET `step` = '%s', `completed` = %d WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", td->m_StepStr.c_str(), td->m_Completed, td->m_TaskId, td->m_OwnerId);
+			DB3().PushUpdateData("UPDATE `task_instance` SET `step` = '%s', `completed` = %d WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", td->m_StepStr.c_str(), td->m_Completed, td->m_TaskId, td->m_OwnerId);
 			return true;
 		}
 		return false;
@@ -724,7 +724,7 @@ namespace GObject
 				DayTaskData* dayTaskData = GetDayTaskData(td->m_LoopTask);
 				if (dayTaskData != NULL && dayTaskData->m_CurrDay != thisDay)
 				{
-					DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", td->m_TaskId, td->m_OwnerId);
+					DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", td->m_TaskId, td->m_OwnerId);
 					SAFE_DELETE(td);
 					m_TaskAcceptedList.erase(it++);
 					continue;
@@ -748,7 +748,7 @@ namespace GObject
 				DayTaskData* dayTaskData = GetDayTaskData(td->m_LoopTask);
 				if (dayTaskData != NULL && dayTaskData->m_CurrDay != thisDay)
 				{
-					DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", td->m_TaskId, td->m_OwnerId);
+					DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", td->m_TaskId, td->m_OwnerId);
 					SAFE_DELETE(it->second);
 					m_TaskCompletedList.erase(it++);
 					continue;
@@ -1207,7 +1207,7 @@ namespace GObject
 		if (TaskCanAccept(dayTask->m_PreTaskId))
 			AddCanAcceptTask(dayTask->m_PreTaskId);
 		DB().PushUpdateData("UPDATE `day_task_instance` SET `autoCompletedTaskId` = 0 WHERE `loopTask` = %u AND `ownerId` = %"I64_FMT"u", dayTask->m_LoopTaskId, m_PlayerOwner->getId());
-		DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", task->m_TaskId, task->m_OwnerId);
+		DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", task->m_TaskId, task->m_OwnerId);
 		SAFE_DELETE(task);
 		m_PlayerOwner->getCoupon(GameAction()->GetAutoCompletedConsume());
 		{
@@ -1223,7 +1223,7 @@ namespace GObject
 		GET_TASK_DATA_ITER(m_TaskAcceptedList, taskId, it);
 		if (it != m_TaskAcceptedList.end())
 		{
-			DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
+			DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 			SAFE_DELETE(it->second);
 			m_TaskAcceptedList.erase(it);
             ret = true;
@@ -1233,7 +1233,7 @@ namespace GObject
 			GET_TASK_DATA_ITER(m_TaskCompletedList, taskId, it);
 			if (it != m_TaskCompletedList.end())
 			{
-				DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
+				DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 				SAFE_DELETE(it->second);
 				m_TaskCompletedList.erase(it);
                 ret = true;
@@ -1257,7 +1257,7 @@ namespace GObject
 		if (autoTask != dayTask->m_AutoCompletedTaskId) return false;
 		if (dayTask->m_Count >= dayTask->m_MaxFlushQualityCount) return false;
 		it->second->m_Completed = 1;
-		DB().PushUpdateData("UPDATE `task_instance` SET `completed` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", 1, it->second->m_TaskId, it->second->m_OwnerId);
+		DB3().PushUpdateData("UPDATE `task_instance` SET `completed` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", 1, it->second->m_TaskId, it->second->m_OwnerId);
 		m_TaskCompletedList[it->first] = it->second;
 		m_TaskAcceptedList.erase(it);
 
@@ -1355,7 +1355,7 @@ namespace GObject
 					st << it->second->m_TaskId << static_cast<UInt8>(2) << Stream::eos;
 					m_PlayerOwner->send(st);
 				}
-				DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
+				DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 				SAFE_DELETE(it->second);
 				m_TaskAcceptedList.erase(it++);
 			}
@@ -1372,7 +1372,7 @@ namespace GObject
 					st << it->second->m_TaskId << static_cast<UInt8>(2) << Stream::eos;
 					m_PlayerOwner->send(st);
 				}
-				DB().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
+				DB3().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, it->second->m_OwnerId);
 				SAFE_DELETE(it->second);
 				m_TaskCompletedList.erase(it++);
 			}
