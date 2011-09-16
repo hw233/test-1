@@ -1140,7 +1140,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].leftHP = bf->getHP();
                 ++ defCount;
 
-                appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 0, skill->getId(), false, false, defList, defCount, NULL, 0);
+                appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
             }
             else if(fdmg > 0 && bf->getSide() != target_side)
             {
@@ -1160,7 +1160,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].leftHP = bo->getHP();
                 ++ defCount;
 
-                appendToPacket(bf->getSide(), bf->getPos(), target_pos, 0, skill->getId(), false, false, defList, defCount, NULL, 0);
+                appendToPacket(bf->getSide(), bf->getPos(), target_pos, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
             }
 
         }
@@ -1217,7 +1217,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             defList[defCount].leftHP = bo->getHP();
             ++ defCount;
 
-            appendToPacket(bf->getSide(), bf->getPos(), bo->getPos() + self_side, 0, skill->getId(), false, false, defList, defCount, scList, scCount);
+            appendToPacket(bf->getSide(), bf->getPos(), bo->getPos() + self_side, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
             return 0;
         }
 
@@ -1253,7 +1253,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
 
         int self_side = bf->getSide() == target_side ? 25 : 0;
-        appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 0, skill->getId(), false, false, defList, defCount, NULL, 0);
+        appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
         return 0;
     }
 
