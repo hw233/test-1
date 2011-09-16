@@ -127,8 +127,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 				static UInt8 kick_pkt[4] = {0x00, 0x00, 0xFF, REP::BE_DISCONNECT};
 				cl2->send(kick_pkt, 4);
 				cl2->SetPlayer(NULL);
-				//cl2->pendClose();
-				cl2->forceClose();
+				cl2->pendClose();
 				res = 4;
 			}
 			else
@@ -332,7 +331,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		UserLogonRepStruct rep;
 		rep._result = 5;
 		NETWORK()->SendMsgToClient(conn.get(), rep);
-		conn->forceClose();
+		conn->pendClose();
         return;
     }
 
