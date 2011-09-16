@@ -64,7 +64,7 @@ namespace GObject
     UInt32 GObjectManager::_forge_cost;
     UInt32 GObjectManager::_split_chance[4][2];
     UInt32 GObjectManager::_merge_chance[9];
-    UInt32 GObjectManager::_enchant_chance[5][12];
+    UInt32 GObjectManager::_enchant_chance[6][12];
     UInt8  GObjectManager::_enchant_max[11];
 
     UInt16 GObjectManager::_attrTypeChances[3][9];
@@ -102,6 +102,7 @@ namespace GObject
     std::vector<std::vector<YDItem>> GObjectManager::_yellow_diamond_award;
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
+
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -2540,7 +2541,7 @@ namespace GObject
 				}
             }
 
-			for(q = 0; q < 5; q ++)
+			for(q = 0; q < 6; q ++)
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance", q + 1);
 				UInt32 size = std::min(12, table_temp.size());

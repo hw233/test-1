@@ -149,7 +149,11 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     }
 
     if (td.soul >= MAX_TRIPOD_SOUL)
+    {
         PopTimerEvent(pl, EVENT_PLAYERPRTRIPOD, pl->getId());
+        td.awdst = 1;
+        td.soul = MAX_TRIPOD_SOUL;
+    }
 
     DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.quality, td.needgen, pl->getId());
 }
@@ -294,6 +298,10 @@ TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)
     if (!pl)
         return nulltd;
     TripodData& td = m_tds[id];
+
+    if(pl->getVipLevel() > 2)
+        td.quality = 3;
+
     if (&data != &td)
         td = data;
     EventPlayerTripod* event = new (std::nothrow) EventPlayerTripod(pl, 60, MAX_TRIPOD_SOUL/POINT_PERMIN);
@@ -307,6 +315,9 @@ TripodData& Tripod::newTripodData(Player* pl)
     if (!pl)
         return nulltd;
     TripodData td;
+    if(pl->getVipLevel() > 2)
+        td.quality = 3;
+
     DB().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`) VALUES(%"I64_FMT"u, %u, %u, %u, %u,%u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst, td.needgen);
     return addTripodData(pl->getId(), td);
 }

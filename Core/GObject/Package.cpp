@@ -1322,10 +1322,14 @@ namespace GObject
 			return 2;
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
         UInt8 quality = 0;
-        if(equip->getClass() == Item_Trump)
+        if(equip->getClass() == Item_Weapon)
+        {
+            quality = 1;
+        }
+        else if(equip->getClass() == Item_Trump)
         {
             item_enchant_l = TRUMP_ENCHANT_L1;
-            quality = equip->getQuality() - 1;
+            quality = equip->getQuality();
         }
 
 		ItemEquipData& ied = equip->getItemEquipData();

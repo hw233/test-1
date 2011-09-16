@@ -51,7 +51,7 @@ namespace GObject
     UInt32 Player::_tavernOrangeCount = 200;
 	UInt32 Player::_tavernInterval = 2 * 3600, Player::_tavernRate = 100;
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
-	const UInt8 MaxICCount[] = {8, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24};
+	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24};
 	const UInt16 MAX_EXTEND_TIME	= 10;
 	const UInt16 EACH_EXTEND_NUM	= 50;
 	GlobalPlayers globalPlayers;
@@ -62,7 +62,7 @@ namespace GObject
 	inline UInt8 getMaxIcCount(UInt8 vipLevel)
 	{
 		UInt8 maxCount = MaxICCount[vipLevel];
-		if(World::_wday == 6)
+		//if(World::_wday == 6)
 			maxCount += 8; 
 		return maxCount;
 	}
@@ -282,9 +282,9 @@ namespace GObject
             if (fgt)
             {
                 //fgt->addPExp(fgt->getPracticeInc() * 10); 
-                if(n < sizeof(pfexp.fighters))
+                if(n < sizeof(pfexp.fids)/sizeof(UInt32))
                 {
-                    pfexp.fighters[n] = fgt;
+                    pfexp.fids[n] = *i;
                     pfexp.counts[n] = 10;
                     ++ n;
                 }
@@ -347,9 +347,9 @@ namespace GObject
                 if (fgt)
                 {
                     //fgt->addPExp(fgt->getPracticeInc() * 10); 
-                    if(n < sizeof(pfexp.fighters))
+                    if(n < sizeof(pfexp.fids)/sizeof(UInt32))
                     {
-                        pfexp.fighters[n] = fgt;
+                        pfexp.fids[n] = *i;
                         pfexp.counts[n] = count;
                         ++ n;
                     }
@@ -418,7 +418,11 @@ namespace GObject
 	void EventPlayerTripod::Process(UInt32 leftCount)
     {
         TripodData& data = tripod.getTripodData(m_Player->getId());
-        data.soul += POINT_PERMIN;
+        if(m_Player->getVipLevel() > 4)
+            data.soul += POINT_PERMIN * 2;
+        else
+            data.soul += POINT_PERMIN;
+
         if (data.soul > MAX_TRIPOD_SOUL)
             data.soul = MAX_TRIPOD_SOUL;
 
@@ -1704,16 +1708,18 @@ namespace GObject
 			return false;
 		}
 		const UInt32 eachBattle = 60;
-		UInt8 level = GetLev();
-		UInt32 count = 60 * ((level / 10) + 1);
+		//UInt8 level = GetLev();
+		UInt32 count = 60 * 8;
+#if 0
 		if(level >= LEVEL_MAX)
 			count = 60 * (LEVEL_MAX / 10);
+#endif
 
 		UInt32 viplvl = getVipLevel();
 		if(viplvl >= 4 && viplvl <= 7)
-			count += 60 * 10;
+			count += 60 * 8;
         else if (viplvl > 7 && viplvl <= 10)
-			count += 60 * 18;
+			count += 60 * 16;
 
 		UInt32 timeDur = count * eachBattle;
 
@@ -3842,6 +3848,11 @@ namespace GObject
 
         _playerData.tavernOrangeCount  = 0;
 
+        if(fgt->getColor() ==3)
+        {
+            GameAction()->onRecruitAward(this);
+        }
+
 		return fgt->getId();
 	}
 
@@ -4902,7 +4913,6 @@ namespace GObject
             lvl -= 50;
             lvl /= 10;
 
-            if (lvl > 2)
             if (j >= 5) // XXX: 玩家等级橙色装备x1
             {
                 UInt16 id = equips[lvl][uRand(24)];
@@ -5534,7 +5544,7 @@ namespace GObject
 
         for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
         {
-            Fighter* fgt = pfexp->fighters[i];
+            Fighter* fgt = findFighter(pfexp->fids[i]);
             if(fgt && pfexp->counts[i])
             {
                 fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
@@ -5669,9 +5679,8 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		if(now >= _playerData.nextPIcReset)
 		{
-            int nVipLevel = getVipLevel();
 			_playerData.nextPIcReset = TimeUtil::SharpDay(1, now);
-            _playerData.picCount = PracticePlace::_picCnt[nVipLevel];
+            _playerData.picCount = 0;
             DB().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
 		}
     }

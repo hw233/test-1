@@ -161,7 +161,7 @@ namespace GObject
         static UInt32 _forge_cost;
         static UInt32 _split_chance[4][2];
         static UInt32 _merge_chance[9];
-		static UInt32 _enchant_chance[5][12];
+		static UInt32 _enchant_chance[6][12];
 		static UInt8  _enchant_max[11];
 
 		static UInt16 _attrTypeChances[3][9];
@@ -200,6 +200,7 @@ namespace GObject
         static std::vector<std::vector<YDItem>> _yellow_diamond_award;
         static std::vector<YDItem>              _year_yellow_diamond_award;
         static std::vector<UInt32>              _yellow_diamond_gem;
+
 	};
 }
 

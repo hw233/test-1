@@ -170,7 +170,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillPreAtkId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillPreAtk.insert(_passiveSkillPreAtk.end(), skillItem);
     }
@@ -183,7 +183,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillAftAtkId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftAtk.insert(_passiveSkillAftAtk.end(), skillItem);
     }
@@ -196,7 +196,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillBeAtkId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillBeAtk.insert(_passiveSkillBeAtk.end(), skillItem);
     }
@@ -209,7 +209,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillAftEvdId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftEvd.insert(_passiveSkillAftEvd.end(), skillItem);
     }
@@ -222,7 +222,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillAftResId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftRes.insert(_passiveSkillAftRes.end(), skillItem);
     }
@@ -235,7 +235,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillEnterId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillEnter.insert(_passiveSkillEnter.end(), skillItem);
     }
@@ -248,7 +248,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillDeadId[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillDead.insert(_passiveSkillDead.end(), skillItem);
     }
@@ -261,7 +261,7 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         GData::SkillItem skillItem;
         skillItem.base = GData::skillManager[passiveSkillAftNAtk[idx]];
         skillItem.cd = 0;
-        rateExtent += skillItem.base->prob;
+        rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftNAtk.insert(_passiveSkillAftNAtk.end(), skillItem);
     }
@@ -701,12 +701,13 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
     UInt32 rnd = rand(cnt*100*100);
     const GData::SkillBase* resSkillBase = NULL;
 
-    for(size_t idx = 0; idx < cnt; idx++)
+    for(size_t idx = 0; idx < cnt; ++idx)
     {
         if(rnd < passiveSkill[idx].rateExtent && passiveSkill[idx].cd == 0)
         {
             passiveSkill[idx].cd = passiveSkill[idx].base->cd + 1;
             resSkillBase = passiveSkill[idx].base;
+            break;
         }
     }
  

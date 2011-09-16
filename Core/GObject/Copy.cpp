@@ -45,7 +45,7 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
         return 2;
     if (vipl >= 4)
         return 3;
-    return 3; // TODO:
+    return 0; // TODO:
 }
 
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)
@@ -491,10 +491,10 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     }
 
                     // TODO:
-                    //if (pl->getVipLevel() < 5)
-                    //{
-                    //    return;
-                    //}
+                    if (pl->getVipLevel() < 5)
+                    {
+                        return;
+                    }
 
                     if (!copyCheckLevel(pl, id))
                         return;
@@ -577,10 +577,10 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                 }
 
                 // TODO:
-                //if (pl->getVipLevel() < 9)
-                //{
-                //    return;
-                //}
+                if (pl->getVipLevel() < 9)
+                {
+                    return;
+                }
 
                 autoClear(pl);
                 pl->addFlag(Player::AutoCopy);

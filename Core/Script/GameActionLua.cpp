@@ -849,4 +849,9 @@ namespace Script
         Call<void>("finishAttainment", pl, attainId);
     }
 
+    void GameActionLua::onRecruitAward(Player* player)
+    {
+        Call<void>("onRecruitAward", player);
+    }
+
 }
