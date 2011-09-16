@@ -200,7 +200,7 @@ namespace GObject
     struct PracticeFighterExp
     {
         UInt32   goldUse;
-        Fighter* fighters[MAX_PRACTICE_FIGHTRES];
+        UInt32   fids[MAX_PRACTICE_FIGHTRES];
         UInt8    counts[MAX_PRACTICE_FIGHTRES];
     };
 

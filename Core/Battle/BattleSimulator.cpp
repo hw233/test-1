@@ -2344,8 +2344,15 @@ UInt32 BattleSimulator::doAttack( int pos )
             {
                 size_t idx = 0;
                 const GData::SkillBase* passiveSkill = NULL;
+                BattleFighter* bo = static_cast<BattleFighter*>(_objs[otherside][target_pos]);
                 while(NULL != (passiveSkill = bf->getPassiveSkillAftNAtk100(idx)))
                 {
+                    // 敌方
+                    if(passiveSkill->target == 1 && (!bo || bo->getHP() == 0))
+                    {
+                        continue;
+                    }
+
                     std::vector<AttackAct> atkAct;
                     atkAct.clear();
                     doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
@@ -2367,7 +2374,7 @@ UInt32 BattleSimulator::doAttack( int pos )
                 }
 
                 passiveSkill = bf->getPassiveSkillAftNAtk();
-                if(NULL != passiveSkill)
+                if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
                 {
                     std::vector<AttackAct> atkAct;
                     atkAct.clear();
@@ -2397,8 +2404,14 @@ UInt32 BattleSimulator::doAttack( int pos )
     {
         size_t idx = 0;
         const GData::SkillBase* passiveSkill = NULL;
+        BattleFighter* bo = static_cast<BattleFighter*>(_objs[otherside][target_pos]);
         while(NULL != (passiveSkill = bf->getPassiveSkillAftAtk100(idx)))
         {
+            if(passiveSkill->target == 1 && (!bo || bo->getHP() == 0))
+            {
+                continue;
+            }
+
             std::vector<AttackAct> atkAct;
             atkAct.clear();
             doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
@@ -2420,7 +2433,7 @@ UInt32 BattleSimulator::doAttack( int pos )
         }
 
         passiveSkill = bf->getPassiveSkillAftAtk();
-        if(NULL != passiveSkill)
+        if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
         {
             std::vector<AttackAct> atkAct;
             atkAct.clear();

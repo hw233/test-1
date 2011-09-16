@@ -23,7 +23,7 @@ UInt8 FrontMap::getGoldCount(UInt8 vipl)
         return 2;
     if (vipl >= 4)
         return 3;
-    return 2;
+    return 0;
 }
 
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
