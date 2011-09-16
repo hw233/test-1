@@ -1177,7 +1177,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         return 0;
     }
 
-    if(skill->cond == GData::SKILL_ENTER)
+    if(skill->cond == GData::SKILL_ENTER && false)
     {
         DefStatus defList[25];
         size_t defCount = 0;
