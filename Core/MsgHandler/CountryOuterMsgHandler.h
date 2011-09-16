@@ -2519,6 +2519,38 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				}
 			}
 			break;
+        case 7:
+            {
+                UInt32 prestige = 0; //player->gAthleticsRank.getAthleticsPrestige(player);
+                if (prestige < price)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    bool buyFgt = false;
+                    GObject::ItemBase * item = NULL;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else if (IsFighterTypeId(lr._itemId))
+                    {
+                        buyFgt = player->addFighterFromItem(lr._itemId, price);
+                        if (buyFgt)
+                            price /= lr._count;
+                    }
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL && !buyFgt)
+                        st << static_cast<UInt8>(2);
+                    else if (item || buyFgt)
+                    {
+                        ConsumeInfo ci(Item,lr._itemId, lr._count);
+                        player->useAchievement(price,&ci);
+                        st << static_cast<UInt8>(0);
+                    }
+                }
+            }
+            break;
 		default:
 			if(PLAYER_DATA(player, gold) < price)
 			{

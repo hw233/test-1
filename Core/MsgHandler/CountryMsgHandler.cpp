@@ -174,6 +174,7 @@ MSG_REG_2(GameMsgHdr, 0x294, OnTradeDataNotify);
 MSG_REG_2(GameMsgHdr, 0x295, OnDelTradeNotify);
 
 MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
+MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
 
