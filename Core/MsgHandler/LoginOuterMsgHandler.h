@@ -490,17 +490,32 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     {
         memcached_return rc;
         memc = memcached_create(NULL);
-        memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer.c_str(), cfg.tokenPort, &rc);
-        if (rc != MEMCACHED_SUCCESS)
+
+        bool hasServer = false;
+        size_t sz = cfg.tokenServer.size();
+        for (size_t i = 0; i < sz; ++i)
         {
-            memcached_free(memc);
-            memc = NULL;
-            err += "can not connect to token server.";
-        }
-        else
-        {
-            rc = memcached_server_push(memc, servers);
-            memcached_server_free(servers);
+            memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
+            if (rc != MEMCACHED_SUCCESS)
+            {
+                if (!hasServer)
+                {
+                    memcached_free(memc);
+                    memc = NULL;
+                    err += "can not connect to token server.";
+                }
+                else
+                {
+                    //err += "can not connect to token server ";
+                    //err += cfg.tokenServer[i].ip;
+                }
+            }
+            else
+            {
+                rc = memcached_server_push(memc, servers);
+                memcached_server_free(servers);
+                hasServer = true;
+            }
         }
     }
 
@@ -849,7 +864,7 @@ void BanChatFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
-    st.init(SPEP::BANCHATFROMBS,0X01);
+    st.init(SPEP::BANCHATFROMBS,0x01);
     std::string playerNameList;
     UInt32 time;
     br>>playerNameList;
@@ -900,11 +915,11 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	std::string playerNameList;
 	std::string content;
 	std::string title;
-	UInt32 money[5] = {0};
-	UInt32 moneyType[5] = {GObject::MailPackage::Coin, GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
+	UInt32 money[4] = {0};
+	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
-	br>>playerNameList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>money[4]>>nums>>bindType;
+	br>>playerNameList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	StringTokenizer stk(playerNameList,"%");
 	st << playerNameList;
 	std::string result="";
@@ -918,7 +933,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		br>>item[i].id>>count;
 		item[i].count = count;
 	}
-	for(UInt32 i = 0; i < 5; i ++)
+	for(UInt32 i = 0; i < 4; i ++)
 	{
 		if(money[i] == 0)
 			continue;

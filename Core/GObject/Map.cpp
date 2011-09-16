@@ -438,7 +438,7 @@ void Map::Broadcast2( const void * buf, int size, UInt8 cny, Player * pl )
 
 void Map::Broadcast( const void * buf, int size, Player * pl )
 { 
-#if 0
+#if 1
 	if(pl == NULL)
 	{
 		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
