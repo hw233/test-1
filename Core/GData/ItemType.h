@@ -88,7 +88,7 @@ inline bool IsEquip(UInt8 subClass)
 
 inline bool IsFighterTypeId(UInt32 id)
 {
-    if (id == 74)
+    if (id == 74 || id == 76 || id == 75 || id == 77)
         return true;
     return false;
 }

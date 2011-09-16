@@ -456,10 +456,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 				GLOBAL().PushMsg(hdr, &recharge);
 			}
 
-            pl->GetPackage()->AddItem(18, 1, true);
-            pl->getCoupon(888);
-            pl->setQQVipl(nu._level);
-            pl->setQQVipYear(nu._isYear);
+            UInt16 qqlvl = nu._level | (nu._isYear << 8);
+            GameMsgHdr hdr(0x297, country, pl, sizeof(UInt16));
+            GLOBAL().PushMsg(hdr, &qqlvl);
 		}
 	}
 

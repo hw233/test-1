@@ -878,6 +878,16 @@ void OnAddAwardGold(GameMsgHdr& hdr, const void * data)
 	player->getCoupon(Award);
 }
 
+void OnCreateAward(GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    UInt16 qqlvl = *(UInt16*)data;
+    player->GetPackage()->AddItem(18, 1, true);
+    player->getCoupon(888);
+    player->setQQVipl(qqlvl&0xff);
+    player->setQQVipYear((qqlvl>>8)&0xff);
+}
+
 void OnRunScriptReq( GameMsgHdr&, const void * data )
 {
 	const char * script = reinterpret_cast<const char *>(data);

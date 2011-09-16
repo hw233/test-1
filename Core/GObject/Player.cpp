@@ -1031,37 +1031,40 @@ namespace GObject
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
     {
-        switch (itemid)
+        if(isFighterFull())
         {
-            case 74:
-                {
-                    UInt32 id = 18;
-                    if(isFighterFull())
-                    {
-                        sendMsgCode(0, 1200);
-                        return 0;
-                    }
-
-                    if (hasFighter(id))
-                    {
-                        sendMsgCode(1, 1017);
-                        return false;
-                    }
-
-                    Fighter * fgt = globalFighters[id];
-                    if(fgt == NULL)
-                        return false;
-                    Fighter * fgt2 = fgt->clone(this);
-                    addFighter(fgt2, true);
-                    notifyAddFighter(fgt2);
-                    autoLineup(fgt2);
-                    return true;
-                }
-                break;
-
-            default:
-                break;
+            sendMsgCode(0, 1200);
+            return 0;
         }
+
+        UInt32 id = 0;
+        if (itemid == 74)
+            id = 18;
+        else if (itemid == 75)
+            id = 15;
+        else if (itemid == 76)
+            id = 43;
+        else if (itemid == 77)
+            id = 52;
+
+        if (id)
+        {
+            if (hasFighter(id))
+            {
+                sendMsgCode(1, 1017);
+                return false;
+            }
+
+            Fighter * fgt = globalFighters[id];
+            if(fgt == NULL)
+                return false;
+            Fighter * fgt2 = fgt->clone(this);
+            addFighter(fgt2, true);
+            notifyAddFighter(fgt2);
+            autoLineup(fgt2);
+            return true;
+        }
+
         return false;
     }
 
