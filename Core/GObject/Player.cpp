@@ -63,7 +63,7 @@ namespace GObject
 	{
 		UInt8 maxCount = MaxICCount[vipLevel];
 		//if(World::_wday == 6)
-			maxCount += 8; 
+	    //    maxCount += 8; 
 		return maxCount;
 	}
 
