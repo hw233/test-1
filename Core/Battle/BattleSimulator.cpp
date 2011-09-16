@@ -1210,7 +1210,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 doSkillStatus2(bf, skill, target_side, target_pos, cnt, scList, scCount);
             }
 
-            int self_side = bf->getSide() == bo->getSide() ? 0 : 25;
+            int self_side = bf->getSide() == bo->getSide() ? 25 : 0;
             defList[defCount].pos = target_pos + self_side;
             defList[defCount].damType = e_damNormal;
             defList[defCount].damage = 0;
@@ -1244,7 +1244,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 doSkillStatus2(bf, skill, target_side, pos, 1, scList, scCount);
             }
 
-            int self_side = bf->getSide() == bo->getSide() ? 0 : 25;
+            int self_side = bf->getSide() == bo->getSide() ? 25 : 0;
             defList[defCount].pos = pos + self_side;
             defList[defCount].damType = e_damNormal;
             defList[defCount].damage = 0;
@@ -1252,7 +1252,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             ++ defCount;
         }
 
-        int self_side = bf->getSide() == target_side ? 0 : 25;
+        int self_side = bf->getSide() == target_side ? 25 : 0;
         appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 0, skill->getId(), false, false, defList, defCount, NULL, 0);
         return 0;
     }
