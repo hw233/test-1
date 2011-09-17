@@ -542,7 +542,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(NULL != skill && skill->effect->state == 1)
                 {
                     float rate = skill->prob * 100;
-                    if(rate > _rnd(10000))
+                    if(skill->cond != GData::SKILL_ACTIVE || rate > _rnd(10000))
                     {
                         // poison
                         poison = true;
@@ -1498,7 +1498,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->effect->state & 0x0e)
     {
         float rate = skill->prob * 100;
-	    if(bf->getSide() != target_side && rate > _rnd(10000))
+	    if(bf->getSide() != target_side && (skill->cond != GData::SKILL_ACTIVE || rate > _rnd(10000)))
         {
             if(1 == skill->area)
             {
@@ -1559,7 +1559,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->effect->disperse > 0)
     {
         float rate = skill->prob * 100;
-	    if(bf->getSide() == target_side && rate > _rnd(10000))
+	    if(bf->getSide() == target_side && (skill->cond != GData::SKILL_ACTIVE || rate > _rnd(10000)))
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo != NULL && bo->getHP() != 0 && bo->isChar())
