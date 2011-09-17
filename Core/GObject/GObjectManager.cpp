@@ -537,7 +537,7 @@ namespace GObject
 
 		lc.prepare("Loading NPC groups:");
 		GData::DBNpcGroup dbng;
-		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `experience`, `lootId` FROM `npc_group`", dbng) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `type`, `experience`, `lootId` FROM `npc_group`", dbng) != DB::DB_OK)
 			return false;
 		std::string path = cfg.scriptPath + "formula/main.lua";
 		Script::BattleFormula bform(path.c_str());
@@ -566,6 +566,7 @@ namespace GObject
 			}
 			ngroup->setLoots(lootItem);
 			ngroup->calcBattlePoints(&bform);
+            ngroup->setType(dbng.type);
 			GData::npcGroups[dbng.id] = ngroup;
 		}
 		lc.finalize();

@@ -79,8 +79,6 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
 		LootResult lr = (*it)->roll();
 		if(lr.id == 0)
 			continue;
-        // TODO: 
-		//player->GetPackage()->Add(lr.id, lr.count, GetItemSubClass(lr.id) == Item_Favor, true, FromNpc);
 		if (player->GetPackage()->Add(lr.id, lr.count, false, true, FromNpc))
             ++cnt;
 		il.push_back(lr);
