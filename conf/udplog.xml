@@ -1,17 +1,44 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
 	<udplog_server>
-		<item ip="192.168.100.25" port="8800" />
-		<item ip="192.168.100.25" port="8801" />
+		<item ip="10.142.16.19" port="8810" />
+		<item ip="10.142.16.19" port="8811" />
     </udplog_server>
 	<log_file_type>
-		<item typeinfo="login"	id="8" /> 
-		<item typeinfo="pay"	id="9" /> 
-		<item typeinfo="props"	id="10" /> 
-		<item typeinfo="act"	id="11" /> 
-		<item typeinfo="refer"	id="12" /> 
-		<item typeinfo="guide"	id="31" /> 
-		<item typeinfo="inventory" id="32" /> 
-		<item typeinfo="feed"	id="36" /> 
+		<item id="1" typeinfo="gb"/>
+		<item id="2" typeinfo="prop" />
+		<item id="3" typeinfo="mb"/>
+		<item id="4" typeinfo="user_exp" />
+		<item id="5" typeinfo="store_exp"/>
+		<item id="6" typeinfo="tb_user"/>
+		<item id="7" typeinfo="tb_ad" />
+		<item id="8" typeinfo="login"/>
+		<item id="9" typeinfo="pay"/>
+		<item id="10" typeinfo="props"/>
+		<item id="11" typeinfo="act"/>
+		<item id="12" typeinfo="refer"/>
+		<item id="13" typeinfo="first_connect_error"/>
+		<item id="14" typeinfo="second_connect_error"/>
+		<item id="15" typeinfo="tt_stat"/>
+		<item id="16" typeinfo="db_stat"/>
+		<item id="17" typeinfo="sns_stat"/>
+		<item id="18" typeinfo="error_tt"/>
+		<item id="19" typeinfo="login_mob"/>
+		<item id="20" typeinfo="login_ip"/>
+		<item id="21" typeinfo="repair_prop"/>
+		<item id="22" typeinfo="repair_gb" />
+		<item id="23" typeinfo="guest_error"/>
+		<item id="24" typeinfo="report" />
+		<item id="25" typeinfo="async_log" />
+		<item id="26" typeinfo="monitor" />
+		<item id="27" typeinfo="act_tmp" />
+		<item id="28" typeinfo="syslog" />
+		<item id="31" typeinfo="guide" />
+		<item id="32" typeinfo="inventory" />
+		<item id="33" typeinfo="bac2" />
+		<item id="34" typeinfo="bac3" />
+		<item id="35" typeinfo="paypv" />
+		<item id="36" typeinfo="feed" />
 	</log_file_type>
 </config>
+

@@ -409,7 +409,10 @@ void Fighter::sendModification( UInt8 t, UInt16 value, int idx, bool writedb)
 		return;
 	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
-    st << static_cast<UInt8>(idx) << value;
+    if (t == 0x30)
+        st << static_cast<UInt32>(value);
+    else
+        st << static_cast<UInt8>(idx) << value;
     if (writedb)
     {
         updateToDB(t, 0);
@@ -1500,7 +1503,7 @@ void Fighter::setPeerless( UInt16 pl, bool writedb )
     }
 
     peerless = pl;
-    sendModification(0x30, peerless, writedb);
+    sendModification(0x30, peerless, 0, writedb);
 }
 
 UInt8 Fighter::getAcupointCnt()
