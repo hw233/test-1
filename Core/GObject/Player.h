@@ -872,12 +872,6 @@ namespace GObject
         UInt32 _praplace;
         bool m_autoCopyFailed;
 
-    private:
-        UInt8 m_mark;
-    public:
-        inline void setMark(UInt8 mark) { m_mark = mark; }
-        inline UInt8 getMark() { return m_mark; }
-
         // 通天塔正义之吼
         UInt8 _justice_roar;
 	public:
