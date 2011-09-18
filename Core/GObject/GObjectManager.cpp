@@ -64,7 +64,7 @@ namespace GObject
     UInt32 GObjectManager::_forge_cost;
     UInt32 GObjectManager::_split_chance[4][2];
     UInt32 GObjectManager::_merge_chance[9];
-    UInt32 GObjectManager::_enchant_chance[5][12];
+    UInt32 GObjectManager::_enchant_chance[6][12];
     UInt8  GObjectManager::_enchant_max[11];
 
     UInt16 GObjectManager::_attrTypeChances[3][9];
@@ -102,6 +102,7 @@ namespace GObject
     std::vector<std::vector<YDItem>> GObjectManager::_yellow_diamond_award;
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
+
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -415,7 +416,7 @@ namespace GObject
             fgt->setSex(dbfgt.sex);
 			ItemWeapon * nwp = GData::GDataManager::GetNpcWeapon(dbfgt.npc_weapon);
 			fgt->setWeapon(nwp, false);
-            fgt->setSkills(dbfgt.skill);
+            fgt->setSkills(dbfgt.skill, false);
 			fgt->setPotential(dbfgt.potential, false);
             fgt->setCapacity(dbfgt.capacity, false);
 			fgt->strength = dbfgt.strength;
@@ -536,7 +537,7 @@ namespace GObject
 
 		lc.prepare("Loading NPC groups:");
 		GData::DBNpcGroup dbng;
-		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `experience`, `lootId` FROM `npc_group`", dbng) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `type`, `experience`, `lootId` FROM `npc_group`", dbng) != DB::DB_OK)
 			return false;
 		std::string path = cfg.scriptPath + "formula/main.lua";
 		Script::BattleFormula bform(path.c_str());
@@ -565,6 +566,7 @@ namespace GObject
 			}
 			ngroup->setLoots(lootItem);
 			ngroup->calcBattlePoints(&bform);
+            ngroup->setType(dbng.type);
 			GData::npcGroups[dbng.id] = ngroup;
 		}
 		lc.finalize();
@@ -848,7 +850,7 @@ namespace GObject
 			if(dbpd.pdata.gold > 0x7FFFFFFF)
 			{
 				dbpd.pdata.gold = 10;
-				DB().PushUpdateData("UPDATE `player` SET `gold` = 10 WHERE `id` = %"I64_FMT"u", id);
+				DB1().PushUpdateData("UPDATE `player` SET `gold` = 10 WHERE `id` = %"I64_FMT"u", id);
 			}
 
 			{
@@ -2540,7 +2542,7 @@ namespace GObject
 				}
             }
 
-			for(q = 0; q < 5; q ++)
+			for(q = 0; q < 6; q ++)
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance", q + 1);
 				UInt32 size = std::min(12, table_temp.size());

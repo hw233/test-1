@@ -33,7 +33,7 @@ struct NpcFData
 class NpcGroup
 {
 public:
-	NpcGroup(UInt32 id): _id(id), _formation(0), _exp(0), _bp(0.0f) {}
+	NpcGroup(UInt32 id): _id(id), _formation(0), _exp(0), _bp(0.0f), _type(0) {}
 	inline UInt32 getId() { return _id; }
 	void addFighter(UInt32 id, UInt8 pos);
 	inline void setExp(UInt32 e) { _exp = e; }
@@ -51,6 +51,8 @@ public:
 	UInt8 getLevel();
 	UInt8 getClass();
 	std::vector<NpcFData>& getList() { return _npcList; }
+    inline UInt8 getType() { return _type; }
+    inline void setType(UInt8 type) { _type = type; }
 private:
 	UInt32 _id;
 	std::vector<NpcFData> _npcList;
@@ -59,6 +61,7 @@ private:
 	UInt32 _exp;
 	std::vector<const LootItem *> _loots;
 	float _bp;
+    UInt8 _type;
 };
 
 typedef std::map<UInt32, NpcGroup *> NpcGroups;

@@ -381,7 +381,7 @@ namespace GObject
 			if (ret)
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
-				DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+				DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
 				SendItemData(item);
 				return item;
 			}
@@ -400,7 +400,7 @@ namespace GObject
 			if(!item->SetItem(num))
 				return NULL;
 			m_Size = cur;
-			DB().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", item->Count(), typeId, bind ? 1 : 0, m_Owner->getId());
+			DB3().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", item->Count(), typeId, bind ? 1 : 0, m_Owner->getId());
 			SendItemData(item);
 			return item;
 		}
@@ -434,7 +434,7 @@ namespace GObject
 			bool ret = TryAddItem(item, num);
 			if (ret)
 			{
-				DB().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", item->Count(), typeId, bind, m_Owner->getId());
+				DB3().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", item->Count(), typeId, bind, m_Owner->getId());
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
@@ -456,7 +456,7 @@ namespace GObject
 			if (ret)
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
-				DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+				DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
@@ -483,7 +483,7 @@ namespace GObject
 		{
 			if (TryAddItem(exist, count))
 			{
-				DB().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", exist->Count(), typeId, bind, m_Owner->getId());
+				DB3().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", exist->Count(), typeId, bind, m_Owner->getId());
 				SendItemData(exist);
 				ItemNotify(item->GetItemType().getId(), count);
 			}
@@ -498,7 +498,7 @@ namespace GObject
 				return item;
 			m_Size = newSize;
 			m_Items[ItemKey(typeId, bind)] = item;
-			DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
+			DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
 			if(fromWhere != 0 && item->getQuality() >= 3)
@@ -630,8 +630,8 @@ namespace GObject
 				if(e == NULL)
 					++ m_Size;
 				e = equip;
-				DB().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
-				DB().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
+				DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
+				DB3().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
 				SendSingleEquipData(equip);
 				if(notify)
 					ItemNotify(equip->GetItemType().getId());
@@ -676,7 +676,7 @@ namespace GObject
 		if(e == NULL)
 			++ m_Size;
 		e = equip;
-		DB().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %"I64_FMT"u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
+		DB3().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %"I64_FMT"u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
 		SendSingleEquipData(equip);
 		ItemNotify(equip->GetItemType().getId());
 		if(FromWhere != 0 && equip->getQuality() >= 4)
@@ -702,7 +702,7 @@ namespace GObject
 			return false;
 		m_Items.erase(iter);
 		-- m_Size;
-		DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
+		DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		SendDelEquipData(equip);
 		return true;
 	}
@@ -722,10 +722,10 @@ namespace GObject
 			{
 				SAFE_DELETE(item);
 				m_Items.erase(ItemKey(id, bind));
-				DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
+				DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
 			}
 			else
-				DB().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
+				DB3().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
 		}
 		return ret;
 	}
@@ -745,10 +745,10 @@ namespace GObject
 			{
 				SAFE_DELETE(item);
 				m_Items.erase(ItemKey(id, bind));
-				DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
+				DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u AND `bindType` = %u AND `ownerId` = %"I64_FMT"u", id, bind, m_Owner->getId());
 			}
 			else
-				DB().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
+				DB3().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
 		}
 		return ret;
 	}
@@ -762,8 +762,8 @@ namespace GObject
 		ItemBase * item = iter->second;
 		m_Items.erase(iter);
 		-- m_Size;
-		DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
-		DB().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", id);
+		DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", id);
+		DB3().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", id);
 		if(toWhere != 0 && item->getQuality() >= 4)
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), item->getId(), toWhere, TimeUtil::Now());
@@ -780,8 +780,8 @@ namespace GObject
 			return false;
 		m_Items.erase(iter);
 		-- m_Size;
-		DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
-		DB().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
+		DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
+		DB3().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
 		if(toWhere != 0 && equip->getQuality() >= 4)
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
@@ -798,7 +798,7 @@ namespace GObject
 			return false;
 		m_Items.erase(iter);
 		-- m_Size;
-		DB().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
+		DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
 		SendDelEquipData(equip);
 		return true;
 	}
@@ -1322,10 +1322,14 @@ namespace GObject
 			return 2;
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
         UInt8 quality = 0;
-        if(equip->getClass() == Item_Trump)
+        if(equip->getClass() == Item_Weapon)
+        {
+            quality = 1;
+        }
+        else if(equip->getClass() == Item_Trump)
         {
             item_enchant_l = TRUMP_ENCHANT_L1;
-            quality = equip->getQuality() - 1;
+            quality = equip->getQuality();
         }
 
 		ItemEquipData& ied = equip->getItemEquipData();
@@ -1359,7 +1363,7 @@ namespace GObject
 		if(uRand(1000) < enchant/*enchant_chance[ied.enchant]*/)
 		{
 			++ ied.enchant;
-			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
+			DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			if(ied.enchant >= 5)
 				DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
 			if(!equip->GetBindStatus() && isBound)
@@ -1420,7 +1424,7 @@ namespace GObject
 		if(type == 0 && ied.enchant >= 4)
 		{
 			ied.enchant --;
-			DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
+			DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
 
             if(equip->getClass() == Item_Trump)
@@ -1483,7 +1487,7 @@ namespace GObject
 		if(uRand(100) < GObjectManager::getSocketChance(ied.sockets) /*chance[ied.sockets]*/)
 			return 1;
 		++ied.sockets;
-		DB().PushUpdateData("UPDATE `equipment` SET `sockets` = %u WHERE `id` = %u", ied.sockets, equip->getId());
+		DB3().PushUpdateData("UPDATE `equipment` SET `sockets` = %u WHERE `id` = %u", ied.sockets, equip->getId());
 		if(!equip->GetBindStatus() && isBound)
 			equip->DoEquipBind();
 		if(fgt != NULL)
@@ -1625,7 +1629,7 @@ namespace GObject
 		if(!DelItem(gemId, 1, bind))
 			return 1;
 		ied.gems[fempty] = gemId;
-		DB().PushUpdateData("UPDATE `equipment` SET `socket%u` = %u WHERE `id` = %u", fempty + 1, ied.gems[fempty], equip->getId());
+		DB3().PushUpdateData("UPDATE `equipment` SET `socket%u` = %u WHERE `id` = %u", fempty + 1, ied.gems[fempty], equip->getId());
 		if(bind)
 			equip->DoEquipBind();
 		if(fgt != NULL)
@@ -1691,7 +1695,7 @@ namespace GObject
 			return 1;
 		}
 		ied.gems[pos] = 0;
-		DB().PushUpdateData("UPDATE `equipment` SET `socket%u` = 0 WHERE `id` = %u", pos + 1, equip->getId());
+		DB3().PushUpdateData("UPDATE `equipment` SET `socket%u` = 0 WHERE `id` = %u", pos + 1, equip->getId());
 		if(!equip->GetBindStatus() && bind)
 			equip->DoEquipBind();
 		if(fgt != NULL)
@@ -2480,7 +2484,7 @@ namespace GObject
 		ied.extraAttr2.value1 = values[0];
 		ied.extraAttr2.value2 = values[1];
 		ied.extraAttr2.value3 = values[2];
-		DB().PushUpdateData("UPDATE `equipment` SET `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", types[0], values[0], types[1], values[1], types[2], values[2], equip->getId());
+		DB3().PushUpdateData("UPDATE `equipment` SET `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", types[0], values[0], types[1], values[1], types[2], values[2], equip->getId());
 	}
 
 	UInt32 Package::GetItemIdByName(const std::string& name)

@@ -34,8 +34,12 @@ public:
 
 	std::string	cryptKey1, cryptKey2;
 
-	std::string	tokenServer;
-	UInt16		tokenPort;
+    struct TokenServer
+    {
+        std::string ip;
+        UInt16 port;
+    };
+    std::vector<TokenServer> tokenServer;
 
 	UInt16 openYear;
 	UInt8 openMonth, openDay;
@@ -62,7 +66,7 @@ public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	inline void setScriptPath(const char * p) {scriptPath = p;}
 	inline void setReportPath(const char * p) {reportPath = p;}
-	inline void setServerLogId(UInt32 id) {serverLogId = id;}
+	inline void setServerLogId(UInt32 id) {/*serverLogId = id;*/}
 	inline void setAnnounceFile(const char * p) {announceFile = p;}
 	inline void setDataDatabase(const char * h, UInt16 p, const char * u, const char * pw, const char * s )
 	{dbDataHost = h; dbDataPort = p; dbDataUser = u; dbDataPassword = pw; dbDataSource = s;}
@@ -83,7 +87,14 @@ public:
 	inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }
 	inline void setLoginLimit(bool limit) { enableLoginLimit = limit; }
 	inline void setLoginMax(UInt16 max) { loginLimit = max; }
-	inline void setVerifyTokenServer(const char* server, UInt16 port) { tokenServer = server; tokenPort = port; }
+
+	inline void setVerifyTokenServer(const char* server, UInt16 port)
+    {
+        TokenServer ts;
+        ts.ip = server;
+        ts.port = port;
+        tokenServer.push_back(ts);
+    }
 
 	bool isAdminIPAllowed(UInt32);
 

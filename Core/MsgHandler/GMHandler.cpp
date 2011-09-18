@@ -765,7 +765,7 @@ void GMHandler::OnRename( GObject::Player * player, std::vector<std::string>& ar
 	player->rebuildBattleName();
 	fgt->setName(args[0]);
 	GObject::globalNamedPlayers.add(args[0], player);
-	DB().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE id = %"I64_FMT"u", nameTmp.c_str(), player->getId());
+	DB1().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE id = %"I64_FMT"u", nameTmp.c_str(), player->getId());
 	DBLOG().PushUpdateData("update `register_states` set `player_name` = '%s' where `server_id` = %u and `player_id` = %"I64_FMT"u", nameTmp.c_str(), cfg.serverLogId, player->getId());
 }
 
@@ -957,7 +957,7 @@ void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt
 			ied.gems[i] = 0;
 		}
 	}
-	DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
+	DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
 		ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, equip->getId());
 }
 
@@ -1208,7 +1208,7 @@ void GMHandler::OnPlayerWallow( GObject::Player * player, std::vector<std::strin
 	if(PLAYER_DATA(player, wallow) != type)
 	{
 		PLAYER_DATA(player, wallow) = type;
-		DB().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, player->getId());
+		DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, player->getId());
 		player->sendWallow();
 	}
 }
@@ -1738,7 +1738,7 @@ static void makeExtraAttr( GObject::Fighter * fgt, UInt8 pos, GObject::ItemEquip
 	ea2.value2 = v2;
 	ea2.type3 = t3;
 	ea2.value3 = v3;
-	DB().PushUpdateData("UPDATE `equipment` SET `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
+	DB3().PushUpdateData("UPDATE `equipment` SET `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
 		ea2.type1, ea2.value1, ea2.type2, ea2.value2, ea2.type3, ea2.value3, equip->getId());
 	fgt->sendModification(0x21 + pos, equip, false);
 }
@@ -1887,7 +1887,7 @@ static void makeEnchant( GObject::Fighter * fgt, UInt8 pos, GObject::ItemEquip *
 	if(ied.enchant == level)
 		return;
 	ied.enchant = level;
-	DB().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
+	DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 	fgt->setDirty();
 	fgt->sendModification(0x21 + pos, equip, false);
 }

@@ -200,7 +200,7 @@ namespace GObject
     struct PracticeFighterExp
     {
         UInt32   goldUse;
-        Fighter* fighters[MAX_PRACTICE_FIGHTRES];
+        UInt32   fids[MAX_PRACTICE_FIGHTRES];
         UInt8    counts[MAX_PRACTICE_FIGHTRES];
     };
 
@@ -562,7 +562,7 @@ namespace GObject
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
-        void upInitCitta(Fighter* fgt);
+        void upInitCitta(Fighter* fgt,bool = false);
 		void addFighter(Fighter * fgt, bool = true);
 		Fighter * takeFighter(UInt32, bool = true);
 		void notifyAddFighter(Fighter * fgt);

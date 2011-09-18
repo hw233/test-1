@@ -66,8 +66,10 @@ struct NewUserStruct
 {
 	std::string _name;
 	UInt8 _class;
+    UInt8 _level;
+    UInt8 _isYear;
 
-	MESSAGE_DEF2(REQ::CREATE_ROLE, std::string, _name, UInt8, _class);
+	MESSAGE_DEF4(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear);
 };
 
 
@@ -104,7 +106,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 			if(player->getLockExpireTime() <= TimeUtil::Now())
 			{
 				player->setLockExpireTime(0);
-				DB().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
+				DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
 			}
 			else
 				return 3;
@@ -183,15 +185,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
 	if(conn.get() == NULL)
 		return;
-
-    if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
-    {
-		UserLogonRepStruct rep;
-		rep._result = 5;
-		NETWORK()->SendMsgToClient(conn.get(), rep);
-		conn->pendClose();
-        return;
-    }
 
 	if(ul._userid == 0)
 		conn->closeConn();
@@ -333,6 +326,15 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	if(conn.get() == NULL)
 		return;
 
+    if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
+    {
+		UserLogonRepStruct rep;
+		rep._result = 5;
+		NETWORK()->SendMsgToClient(conn.get(), rep);
+		conn->pendClose();
+        return;
+    }
+
 	trimName(nu._name);
 
 #if 1
@@ -419,7 +421,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			lup.fighter = fgt;
 			lup.updateId();
 
-			DB().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
+			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
 
 			DBLOG().PushUpdateData("insert into register_states(server_id,player_id,player_name, reg_time) values(%u,%"I64_FMT"u, '%s', %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), TimeUtil::Now());
 
@@ -454,8 +456,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 				GLOBAL().PushMsg(hdr, &recharge);
 			}
 
-            pl->GetPackage()->AddItem(18, 1, true);
-            pl->getCoupon(888);
+            UInt16 qqlvl = nu._level | (nu._isYear << 8);
+            GameMsgHdr hdr(0x297, country, pl, sizeof(UInt16));
+            GLOBAL().PushMsg(hdr, &qqlvl);
 		}
 	}
 
@@ -490,17 +493,32 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     {
         memcached_return rc;
         memc = memcached_create(NULL);
-        memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer.c_str(), cfg.tokenPort, &rc);
-        if (rc != MEMCACHED_SUCCESS)
+
+        bool hasServer = false;
+        size_t sz = cfg.tokenServer.size();
+        for (size_t i = 0; i < sz; ++i)
         {
-            memcached_free(memc);
-            memc = NULL;
-            err += "can not connect to token server.";
-        }
-        else
-        {
-            rc = memcached_server_push(memc, servers);
-            memcached_server_free(servers);
+            memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
+            if (rc != MEMCACHED_SUCCESS)
+            {
+                if (!hasServer)
+                {
+                    memcached_free(memc);
+                    memc = NULL;
+                    err += "can not connect to token server.";
+                }
+                else
+                {
+                    //err += "can not connect to token server ";
+                    //err += cfg.tokenServer[i].ip;
+                }
+            }
+            else
+            {
+                rc = memcached_server_push(memc, servers);
+                memcached_server_free(servers);
+                hasServer = true;
+            }
         }
     }
 
@@ -542,7 +560,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        DB1().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
@@ -709,7 +727,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
         if(pl->getLockExpireTime() == static_cast<UInt32>(0))
         {
             pl->setLockExpireTime(static_cast<UInt32>(expireTime));
-            DB().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+            DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
             st<<static_cast<Int32>(0);
 			if(pl->isOnline())
 			{
@@ -748,7 +766,7 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
         else
         {
             pl->setLockExpireTime(0);
-            DB().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
+            DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
             st<<static_cast<UInt32>(0);
         }
     }
@@ -815,7 +833,7 @@ void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 		return;
 
 	PLAYER_DATA(player, wallow) = type;
-	DB().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, pid);
+	DB1().PushUpdateData("UPDATE `player` SET `wallow`=%u WHERE `id`=%"I64_FMT"u", type, pid);
 	player->sendWallow();
 }
 
@@ -849,7 +867,7 @@ void BanChatFromBs(LoginMsgHdr &hdr,const void * data)
 {
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
-    st.init(SPEP::BANCHATFROMBS,0X01);
+    st.init(SPEP::BANCHATFROMBS,0x01);
     std::string playerNameList;
     UInt32 time;
     br>>playerNameList;
@@ -900,11 +918,11 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	std::string playerNameList;
 	std::string content;
 	std::string title;
-	UInt32 money[5] = {0};
-	UInt32 moneyType[5] = {GObject::MailPackage::Coin, GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
+	UInt32 money[4] = {0};
+	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
-	br>>playerNameList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>money[4]>>nums>>bindType;
+	br>>playerNameList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	StringTokenizer stk(playerNameList,"%");
 	st << playerNameList;
 	std::string result="";
@@ -918,7 +936,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		br>>item[i].id>>count;
 		item[i].count = count;
 	}
-	for(UInt32 i = 0; i < 5; i ++)
+	for(UInt32 i = 0; i < 4; i ++)
 	{
 		if(money[i] == 0)
 			continue;
@@ -966,6 +984,15 @@ void BattleReportReq(LoginMsgHdr& hdr, const void * data)
 	if(r == NULL)
 		return;
 	NETWORK()->SendMsgToClient(hdr.sessionID, &(*r)[0], r->size());
+}
+
+void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
+{
+	Stream st;
+	st.init(SPEP::ONLINE,0x01);
+	st<<SERVER().GetTcpService()->getOnlineNum();
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

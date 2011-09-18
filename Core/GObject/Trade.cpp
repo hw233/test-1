@@ -466,7 +466,7 @@ void Trade::deleteTrade(UInt32 id)
 					continue;
 				if (IsEquipId(item->getId()))
 				{
-					DB().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", item->getId());
+					DB3().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", item->getId());
 					if(item->getQuality() >= 4)
 						DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), item->GetItemType().getId(), item->getId(), ToDelete, TimeUtil::Now());
 				}

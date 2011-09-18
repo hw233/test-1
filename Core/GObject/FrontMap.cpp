@@ -23,7 +23,7 @@ UInt8 FrontMap::getGoldCount(UInt8 vipl)
         return 2;
     if (vipl >= 4)
         return 3;
-    return 2;
+    return 0;
 }
 
 void FrontMap::sendInfo(Player* pl, UInt8 id, bool needspot, bool force)
@@ -88,7 +88,7 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
     if (!tmp.size())
     {
         tmp.resize(1);
-        DB().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
     }
 
     size_t off = st.size();
@@ -142,7 +142,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
         if (PLAYER_DATA(pl, frontFreeCnt) < FREECNT) {
             ++PLAYER_DATA(pl, frontFreeCnt);
             tmp.resize(1);
-            DB().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
             ret = 0;
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
             //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
@@ -156,7 +156,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
             ++PLAYER_DATA(pl, frontGoldCnt);
             tmp.resize(1);
-            DB().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
             ret = 0;
 
             ConsumeInfo ci(EnterFrontMap,0,0);
@@ -171,7 +171,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
         sendInfo2(pl, id, true);
 
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
-        DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
+        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
 
         UInt8 count = getCount(pl);
         Stream st(REP::FORMATTON_INFO);
@@ -190,7 +190,7 @@ UInt8 FrontMap::getCount(Player* pl)
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         PLAYER_DATA(pl, frontFreeCnt) = 0;
         PLAYER_DATA(pl, frontGoldCnt) = 0;
-        DB().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), pl->getId());
+        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), pl->getId());
     }
 
     UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, frontGoldCnt);
@@ -215,11 +215,14 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
     }
 
+    if (tmp.size() && spot != tmp.size())
+        return;
+
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
         //tmp[spot].count = 0;
         //tmp[spot].status = 0;
-        DB().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=%u,`count`=0,`status`=0", pl->getId(), id, spot); 
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=%u,`count`=0,`status`=0", pl->getId(), id, spot); 
     }
 
     UInt8 count = tmp[spot].count;
@@ -245,7 +248,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
                 st << static_cast<UInt8>(4) << id << Stream::eos;
                 pl->send(st);
                 tmp.resize(0);
-                DB().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+                DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
                 return;
             } else {
                 UInt8 nspot = spot+1;
@@ -262,7 +265,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
                 pl->send(st);
             }
 
-            DB().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u", tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
+            DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u", tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
         }
 
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
@@ -285,7 +288,7 @@ void FrontMap::reset(Player* pl, UInt8 id)
     }
 
     tmp.resize(0);
-    DB().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+    DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
 
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);

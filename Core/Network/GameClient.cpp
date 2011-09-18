@@ -5,18 +5,29 @@
 #include "MsgHandler/MsgTypes.h"
 #include "Server/GlobalObject.h"
 #include "Server/Cfg.h"
+#include "MsgID.h"
 #include <event2/buffer.h>
 
 namespace Network
 {
 
 GameClient::GameClient( int fd, Network::TcpSlaveServer * s, int id ):
-	TcpConduit(fd, s, id), m_Player(NULL), m_PlayerId(0)
+	TcpConduit(fd, s, id), m_Player(NULL), m_PlayerId(0), _chk(0xff), m_Chk(0xff), m_OldChk(0xff)
 {
 	struct sockaddr_in peerAddr;
 	getAddr(&peerAddr);
 	m_RemoteIP = ntohl(peerAddr.sin_addr.s_addr);
 	m_RemotePort = ntohs(peerAddr.sin_port);
+    setChk(0xff);
+    srand(time(NULL));
+}
+
+void GameClient::setChk(UInt8 chk)
+{
+    m_OldChk = m_Chk;
+    m_Chk = chk;
+    //m_ChkOver = time(NULL) + 10*60;
+    m_ChkOver = time(NULL) + 2*60;
 }
 
 int GameClient::parsePacket( struct evbuffer * buf, int &off, int &len )
@@ -45,19 +56,20 @@ int GameClient::parsePacket( struct evbuffer * buf, int &off, int &len )
 		return 0;
 	}
 
-	off = 4;
-	len = len2 + 4;
+	off = 5;
+	len = len2 + 5;
+    _chk = buf_[2];
 
-	switch(buf_[2])
+	switch(buf_[3])
 	{
 	case 0xFF:
-		return buf_[3];
+		return buf_[4];
 	case 0xFE:
 		if(cfg.supportCompress)
-			return buf_[3] | 0x1000000;
+			return buf_[4] | 0x1000000;
 		return 0;
 	default:
-		return ((static_cast<UInt16>(buf_[2]))<<8)+static_cast<UInt16>(buf_[3]);
+		return ((static_cast<UInt16>(buf_[3]))<<8)+static_cast<UInt16>(buf_[4]);
 	}
 	return 0;
 }
@@ -148,6 +160,30 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 	UInt8 thrd = threadFromCmd(pl, cmd);
 	if(thrd >= MAX_THREAD_NUM)
 		return;
+
+    if (cmd == REP::KEEP_ALIVE)
+    {
+        //if (!(m_ChkOver % 6))
+        {
+            UInt8 chk = rand()%257;
+            if (!chk) chk = 0xff;
+            setChk(chk);
+            Stream st(REP::USER_INFO_CHANGE);
+            st << static_cast<UInt8>(0x14) << static_cast<UInt32>(chk);
+            st << Stream::eos;
+            pl->send(st);
+        }
+    }
+
+    if (cmd != REP::KEEP_ALIVE)
+    {
+        if (_chk != m_Chk)
+        {
+            if (_chk != m_OldChk)
+                return;
+        }
+    }
+
 	if(thrd == WORKER_THREAD_LOGIN)
 	{
 		if(pl == NULL)
