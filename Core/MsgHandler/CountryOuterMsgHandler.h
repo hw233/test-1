@@ -349,8 +349,7 @@ struct RequestChallengeReq
 };
 struct BattleEndReq
 {
-    UInt16 mark;
-	MESSAGE_DEF1(REQ::FIGHT_EXIT, UInt16, mark);
+	MESSAGE_DEF(REQ::FIGHT_EXIT);
 };
 
 struct CopyReq
@@ -2286,18 +2285,6 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 	if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
 
-    UInt8 mark = player->getMark();
-    UInt16 nmark = req.mark;
-    nmark >>= 5; 
-    nmark += 5;
-    nmark >>= 2;
-
-    if (mark != nmark)
-    {
-        kick(player);
-        return;
-    }
-
 	player->checkLastBattled();
 	//player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
 }
@@ -2413,6 +2400,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
+    if (!lr._count)
+        return;
 	UInt32 price = GData::store.getPrice(lr._type, lr._itemId);
 	Stream st(REP::STORE_BUY);
 	if(price == 0 || price == 0xFFFFFFFF)

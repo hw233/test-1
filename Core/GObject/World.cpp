@@ -199,7 +199,7 @@ void World::World_Midnight_Check( World * world )
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
-	DB().PushUpdateData("UPDATE `player` SET `icCount` = 0;");
+	DB1().PushUpdateData("UPDATE `player` SET `icCount` = 0;");
 	luckyDraw.setLuckyDrawCost();
 	luckyDraw.checkCleanup();
 
