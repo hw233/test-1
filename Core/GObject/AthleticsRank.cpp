@@ -1594,7 +1594,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemId = 23;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(defer) > 3 )    //终结了XXX的(3~4)连胜
+        else if( getAthleticsWinStreak(defer) > 2 )    //终结了XXX的(3~4)连胜
         {
             cond = 11;
             value = getAthleticsWinStreak(defer);
@@ -1690,34 +1690,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
 
         if( row == 1 && getAthleticsExtraChallenge(atker) != 0 )    //特殊挑战失败
             setAthleticsExtraChallenge(atker, 0);
-        else if( getAthleticsWinStreak(atker) > 19 )                //终结了XXX的(20+)连胜
-        {
-            cond = 11;
-            value = getAthleticsWinStreak(atker);
-            itemId = 24;
-            itemCount = 1;
-        }
-        else if( getAthleticsWinStreak(atker) > 9 )    //终结了XXX的(10~19)连胜
-        {
-            cond = 11;
-            value = getAthleticsWinStreak(atker);
-            itemId = 23;
-            itemCount = 2;
-        }
-        else if( getAthleticsWinStreak(atker) > 4 )    //终结了XXX的(5~9)连胜
-        {
-            cond = 11;
-            value = getAthleticsWinStreak(atker);
-            itemId = 23;
-            itemCount = 1;
-        }
-        else if( getAthleticsWinStreak(atker) > 3 )    //终结了XXX的(3~4)连胜
-        {
-            cond = 11;
-            value = getAthleticsWinStreak(atker);
-            itemId = 22;
-            itemCount = 1;
-        }
         else if( getAthleticsBeWinStreak(defer) == 10 )    // 连续被10人挑战而不败
         {
             cond = 13;
