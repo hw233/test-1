@@ -26,7 +26,7 @@ struct TripodData
     UInt8 quality;  // 奖励品质 1-白 2-绿 3-蓝 4-紫 5-橙
     UInt8 awdst;    // 奖励状态 0-熔炼中 1-未领取
     UInt8 needgen;  // 需要重新生成奖励
-    UInt16 itemId;
+    UInt32 itemId;
     UInt8 num;
 };
 

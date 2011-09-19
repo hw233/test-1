@@ -256,7 +256,7 @@ void ClanBattle::startClanBattle(UInt32 battleThisDay, bool writedb)
 	configClanBattleData(writedb);
 	_battleThisDay = battleThisDay;
 	if (writedb)
-		DB().PushUpdateData("UPDATE `clan` SET `battleThisDay` = %u, `battleStatus` = %u WHERE `id` = %u", _battleThisDay, _isInbattling, getOwnerClanId());
+		DB5().PushUpdateData("UPDATE `clan` SET `battleThisDay` = %u, `battleStatus` = %u WHERE `id` = %u", _battleThisDay, _isInbattling, getOwnerClanId());
 }
 
 void ClanBattle::overClanBattle(UInt8 succ)
@@ -264,8 +264,8 @@ void ClanBattle::overClanBattle(UInt8 succ)
 	_isInbattling = 2;
 	UInt32 thisDay = TimeUtil::SharpDay();
 	std::swap(_nextBattleTime, _battleTime);
-	DB().PushUpdateData("UPDATE `clan` SET `battleStatus` = %u WHERE `id` = %u", _isInbattling, getOwnerClanId());
-	DB().PushUpdateData("REPLACE INTO `clan_battle_result`(`id`, `battleTime`, `result`) VALUES(%u, %u, %u)", getOwnerClanId(), thisDay, succ);
+	DB5().PushUpdateData("UPDATE `clan` SET `battleStatus` = %u WHERE `id` = %u", _isInbattling, getOwnerClanId());
+	DB5().PushUpdateData("REPLACE INTO `clan_battle_result`(`id`, `battleTime`, `result`) VALUES(%u, %u, %u)", getOwnerClanId(), thisDay, succ);
 	closingBattlerAward(succ);
 	Clan * ownerClan = getOwnerClan();
 	ClanDynamicMsg * clanDynamicMsg = NULL;
@@ -311,7 +311,7 @@ void ClanBattle::configClanBattleData(bool writedb)
 	edurance = static_cast<UInt8>(techs->getSouthEdurance());
 	_holds[2].endurance = _holds[2].totalendurance = (edurance == 0 ? 30 : edurance);
 	if (writedb)
-		DB().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u, `northEdurance` = %u, `hallEdurance` = %u WHERE `id` = %u", _holds[1].endurance, _holds[2].endurance, _holds[0].endurance, getOwnerClanId());
+		DB5().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u, `northEdurance` = %u, `hallEdurance` = %u WHERE `id` = %u", _holds[1].endurance, _holds[2].endurance, _holds[0].endurance, getOwnerClanId());
 
 	//配置宗祠守卫者
 	{
@@ -853,7 +853,7 @@ bool ClanBattle::moveToHold(Player * player, UInt16 pos)
 		else
 			buffTime = 25;
 		cbPlayer->player->setBuffData(PLAYER_BUFF_CLANMOVE, now+buffTime);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleHold` = %u WHERE `id` = %u", pos, cbPlayer->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleHold` = %u WHERE `id` = %u", pos, cbPlayer->id);
 	}
 	cbPlayer->hold = pos;
 	addClanBattlePlayer(cbPlayer);
@@ -888,7 +888,7 @@ void ClanBattle::kickClanBattler(Player * player)
 	player->delGlobalFlag(Player::ClanBattleFlag);
 	player->delFlag(Player::ClanBattling);
 	player->autoRegenAll();
-	DB().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbPlayer->hasEnter, cbPlayer->id);
+	DB5().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbPlayer->hasEnter, cbPlayer->id);
 }
 
 
@@ -1285,7 +1285,7 @@ void ClanBattle::recoveBattlePlayer(Player * player, UInt8 recoveT)
 	if ((cbp->reliveNum & 0x00FF) < 0x00FF)
 		cbp->reliveNum ++;
 	notifyClanBattlePlayerCount();
-	DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 1, `reliveNum` = %u WHERE `id` = %u", cbp->reliveNum, cbp->id);
+	DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 1, `reliveNum` = %u WHERE `id` = %u", cbp->reliveNum, cbp->id);
 }
 
 
@@ -1301,7 +1301,7 @@ bool ClanBattle::incAwardClanBattleVictor(Player * player)
 	if ((clanMember->enterCount >> 4) >= 3)
 		return false;
 	clanMember->enterCount += 0x10;
-	DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u WHERE `playerId` = %"I64_FMT"u", clanMember->enterCount, player->getId());
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u WHERE `playerId` = %"I64_FMT"u", clanMember->enterCount, player->getId());
 	return true;
 }
 
@@ -1326,7 +1326,7 @@ bool ClanBattle::setAwardClanBattleVictor(ClanBattlePlayer * cbp, bool rand)
 			if (!incAwardClanBattleVictor(cbp->player))
 				return false;	
 			cbp->hasEnter |= 0x10;
-			DB().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbp->hasEnter, cbp->id);
+			DB5().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbp->hasEnter, cbp->id);
 			SYSMSG(title, 444);
 			SYSMSG(content, 445);
 			Mail * pMail = cbp->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -1339,7 +1339,7 @@ bool ClanBattle::setAwardClanBattleVictor(ClanBattlePlayer * cbp, bool rand)
 		if (!incAwardClanBattleVictor(cbp->player))
 			return false;
 		cbp->hasEnter |= 0x10;		
-		DB().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbp->hasEnter, cbp->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbp->hasEnter, cbp->id);
 		SYSMSG(title, 444);
 		SYSMSG(content, 445);
 		Mail * pMail = cbp->player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -1400,7 +1400,7 @@ void ClanBattle::setHasBattle(UInt8 b, bool writedb)
 	_hasBattle = b;
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `hasBattle` = 1 WHERE `id` = %u", getOwnerClanId());
+		DB5().PushUpdateData("UPDATE `clan` SET `hasBattle` = 1 WHERE `id` = %u", getOwnerClanId());
 	}
 }
 
@@ -1446,7 +1446,7 @@ bool ClanBattle::leaveClanCity(Player * player)
 	player->delGlobalFlag(Player::ClanBattleFlag);
 	player->delFlag(Player::ClanBattling);
 	player->autoRegenAll();
-	DB().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbPlayer->hasEnter, cbPlayer->id);
+	DB5().PushUpdateData("UPDATE `clan_battler` SET `hasEnter` = %u WHERE `id` = %u", cbPlayer->hasEnter, cbPlayer->id);
 
 	return true;
 }
@@ -1474,7 +1474,7 @@ void ClanCityBattle::initClanBattle(bool)
 	UInt32 randTimePoint = uRand(cbTT.size());
 	_battleTime = _nextBattleTime = cbTT[randTimePoint];
 	_isInbattling = 0xFF;
-	DB().PushUpdateData("UPDATE `clan` SET `battleTime` = %u, `nextBattleTime` = %u, `battleStatus` = %u WHERE `id` = %u", _battleTime, _nextBattleTime, _isInbattling, _clan->getId());
+	DB5().PushUpdateData("UPDATE `clan` SET `battleTime` = %u, `nextBattleTime` = %u, `battleStatus` = %u WHERE `id` = %u", _battleTime, _nextBattleTime, _isInbattling, _clan->getId());
 }
 
 
@@ -1614,7 +1614,7 @@ bool ClanCityBattle::enterTotem(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), TimeUtil::SharpDay(0, now), clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), TimeUtil::SharpDay(0, now), clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
 	notifyClanBattleEnterInfo(player, 1, 0);
 	notifyClanBattlePlayerMoveInfo(player, 0, clanBattlePlayerEx->hold);
@@ -1735,9 +1735,9 @@ bool ClanCityBattle::enterClanCity(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(), player->GetLev(), _clan->getId(), thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
-	DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
 	notifyClanBattleEnterInfo(player, 2, 0, _clan->getName());
 	notifyClanBattlePlayerMoveInfo(player, 0, clanBattlePlayerEx->hold);
 	listClanHoldPlayerInfo(player, clanBattlePlayerEx->hold);
@@ -1823,7 +1823,7 @@ bool ClanCityBattle::setNextBattleTime(Player * player, UInt8 r)
 		_battleTime = r;
 		break;
 	}
-	DB().PushUpdateData("UPDATE `clan` SET `nextBattleTime` = %u WHERE `id` = %u", r, _clan->getId());
+	DB5().PushUpdateData("UPDATE `clan` SET `nextBattleTime` = %u WHERE `id` = %u", r, _clan->getId());
 
 	return true;
 }
@@ -1832,7 +1832,7 @@ bool ClanCityBattle::setNextBattleTime(Player * player, UInt8 r)
 void ClanCityBattle::incGrabAcheive(UInt32 ga)
 {
 	_grabAchieve += ga;
-	DB().PushUpdateData("UPDATE `clan` SET `grabAchieve` = %u WHERE `id` = %u", _grabAchieve, _clan->getId());
+	DB5().PushUpdateData("UPDATE `clan` SET `grabAchieve` = %u WHERE `id` = %u", _grabAchieve, _clan->getId());
 }
 
 UInt8 ClanCityBattle::getClanBattleStatus(UInt8 cbt, UInt32 now)
@@ -1946,7 +1946,7 @@ bool ClanCityBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer 
 		Stream st(REP::CLAN_BATTLE);
 		st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(_holds[3].hold) << Stream::eos;
 		cbDeath->player->send(st);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleHold` = 61444 WHERE `id` = %u", cbDeath->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleHold` = 61444 WHERE `id` = %u", cbDeath->id);
 	}
 	delClanBattlePlayer(cbDeath->hold, cbDeath->side, cbDeath->status, cbDeath->player);
 	cbDeath->hold = _holds[3].hold;
@@ -2042,7 +2042,7 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 	{
 		incEnterClanCount(atker);
 		cbAtker->hasAttack = 1;
-		DB().PushUpdateData("UPDATE `clan_battler` SET `hasAttack` = 1 WHERE `id` = %u", cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `hasAttack` = 1 WHERE `id` = %u", cbAtker->id);
 	}
 	if ((cbAtker->side == 2 && cbDefer->side == 2) && (cbAtker->hold == cbDefer->hold))
 	{
@@ -2121,8 +2121,8 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 			cbDefer->status = 0;
 			broadcastHold(cbDefer->hold, st);
 		}
-		DB().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u WHERE `id` = %u", cbAtker->wins, cbAtker->serailWins, cbAtker->maxSerailWins, cbAtker->id);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `battleHold` =%u WHERE `id` = %u", cbDefer->maxSerailWins, recover, cbDefer->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u WHERE `id` = %u", cbAtker->wins, cbAtker->serailWins, cbAtker->maxSerailWins, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `battleHold` =%u WHERE `id` = %u", cbDefer->maxSerailWins, recover, cbDefer->id);
 		UInt32 recoveTime = static_cast<UInt32>(60 + bsim.getTurns() * 1.8f);
 		cbDefer->player->setBuffData(PLAYER_BUFF_CLANRECOVE, now + recoveTime);
 		cbDefer->player->setBuffData(PLAYER_BUFF_CLANRCENHANCE, 0);
@@ -2181,8 +2181,8 @@ bool ClanCityBattle::attackPlayer(Player * atker, std::string deferName)
 			cbAtker->status = 0;
 			broadcastHold(cbAtker->hold, st);
 		}
-		DB().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u WHERE `id` = %u", cbDefer->wins, cbDefer->serailWins, cbDefer->maxSerailWins, cbDefer->id);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `battleHold` =%u WHERE `id` = %u", cbAtker->serailWins, recover, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u WHERE `id` = %u", cbDefer->wins, cbDefer->serailWins, cbDefer->maxSerailWins, cbDefer->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `battleHold` =%u WHERE `id` = %u", cbAtker->serailWins, recover, cbAtker->id);
 		UInt32 recoveTime = static_cast<UInt32>((isClanHoldDestroy(_holds[1].hold) || isClanHoldDestroy(_holds[2].hold)) ? 60 + bsim.getTurns() * 1.8f : 75 + bsim.getTurns() * 1.8f);
 		cbAtker->player->setBuffData(PLAYER_BUFF_CLANRECOVE, now + recoveTime);
 		cbAtker->player->setBuffData(PLAYER_BUFF_CLANRCENHANCE, 0);
@@ -2281,7 +2281,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 	{
 		incEnterClanCount(atker);
 		cbAtker->hasAttack = 1;
-		DB().PushUpdateData("UPDATE `clan_battler` SET `hasAttack` = 1 WHERE `id` = %u", cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `hasAttack` = 1 WHERE `id` = %u", cbAtker->id);
 	}
 	_isInAttacking = true;
 	if (r)
@@ -2296,18 +2296,18 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 			{
 			case 0:				
 				cbAtker->grabAchieve ++;	//记录杀死宗族守卫者次数，最后结算
-				DB().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
-				DB().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
+				DB5().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
+				DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
 				break;
 			case 1:
 				cbAtker->southEdurance += endurance;
-				DB().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
-				DB().PushUpdateData("UPDATE `clan_battler` SET `southEdurance` = %u WHERE `id` = %u",cbAtker->southEdurance, cbAtker->id);
+				DB5().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
+				DB5().PushUpdateData("UPDATE `clan_battler` SET `southEdurance` = %u WHERE `id` = %u",cbAtker->southEdurance, cbAtker->id);
 				break;
 			case 2:
 				cbAtker->northEdurance += endurance;
-				DB().PushUpdateData("UPDATE `clan` SET `northEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
-				DB().PushUpdateData("UPDATE `clan_battler` SET `northEdurance` = %u WHERE `id` = %u",cbAtker->northEdurance, cbAtker->id);
+				DB5().PushUpdateData("UPDATE `clan` SET `northEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
+				DB5().PushUpdateData("UPDATE `clan_battler` SET `northEdurance` = %u WHERE `id` = %u",cbAtker->northEdurance, cbAtker->id);
 				break;
 			}
 			notifyClanBattleTotemAttack();
@@ -2368,7 +2368,7 @@ bool ClanCityBattle::attackNpc(Player * atker, std::string npcName)
 		_recoverClanBattlers.insert(cbAtker);
 		notifyClanBattleRecoveData(cbAtker->player, (cbAtker->reliveNum >> 8) + 1, recoveTime);
 		notifyClanBattlePlayerCount();
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `battleHold` = %u WHERE `id` = %u", _holds[3].hold, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `battleHold` = %u WHERE `id` = %u", _holds[3].hold, cbAtker->id);
 	}
 	notifyClanBattleWinData(cbAtker->player);
 
@@ -2569,8 +2569,8 @@ void ClanCityBattle::closingBattlerAward(UInt8 succ)
 				clan->getClanBattle()->incGrabAcheive(cbp->grabAchieve);
 				clan->updateRank(cm, oldLeaderName);
 				clan->setProffer(clan->getProffer() + cbp->grabAchieve);
-				DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", cm->proffer, cm->player->getId());
-				DB().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u", cbp->grabAchieve, cbp->id);
+				DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", cm->proffer, cm->player->getId());
+				DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u", cbp->grabAchieve, cbp->id);
 			}
 			gainScore = cbp->wins * 1.0f + (cbp->northEdurance + cbp->southEdurance) * 1.5f + cbp->grabAchieve * 2.0f;
 			clanId = cbp->player->getClan()->getId();
@@ -2670,7 +2670,7 @@ void ClanRobBattle::initClanBattle(bool next)
 	{
 		_status = 0;
 		_clan = NULL;
-		DB().PushUpdateData("UPDATE `clan` SET `allyClan` = 0 WHERE `id` = 0");
+		DB5().PushUpdateData("UPDATE `clan` SET `allyClan` = 0 WHERE `id` = 0");
 	}
 }
 
@@ -2686,7 +2686,7 @@ void ClanRobBattle::setOwnerClanLev(UInt8 lev, bool writedb)
 	_heroClanLev = lev;
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `rank` = %u WHERE `id` = 0", lev);
+		DB5().PushUpdateData("UPDATE `clan` SET `rank` = %u WHERE `id` = 0", lev);
 	}
 }
 
@@ -2695,7 +2695,7 @@ void ClanRobBattle::setOwnerClanAtkCount(UInt16 cnt, bool writedb)
 	_heroClanAtkCount = cnt;
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `foundTime` = %u WHERE `id` = 0", cnt);
+		DB5().PushUpdateData("UPDATE `clan` SET `foundTime` = %u WHERE `id` = 0", cnt);
 	}
 }
 
@@ -2704,7 +2704,7 @@ void ClanRobBattle::setOwnerClanRank(UInt8 rank, bool writedb)
 	_heroClanRank = rank;
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `rank` = %u WHERE `id` = 0", rank);
+		DB5().PushUpdateData("UPDATE `clan` SET `rank` = %u WHERE `id` = 0", rank);
 	}
 }
 
@@ -2765,7 +2765,7 @@ void ClanRobBattle::configClanBattleData(bool writedb)
 	_holds[2].endurance = _holds[2].totalendurance = 30;
 	_holds[3].endurance = _holds[3].totalendurance = 0;
 	if (writedb)
-		DB().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u, `northEdurance` = %u, `hallEdurance` = %u WHERE `id` = %u", _holds[1].endurance, _holds[2].endurance, _holds[0].endurance, getOwnerClanId());
+		DB5().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u, `northEdurance` = %u, `hallEdurance` = %u WHERE `id` = %u", _holds[1].endurance, _holds[2].endurance, _holds[0].endurance, getOwnerClanId());
 
 	//////////////////////////////////////////////////////////////////////////
 	UInt8 bossLev = getBattlerLev();
@@ -2985,7 +2985,7 @@ bool ClanRobBattle::enterTotem(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),	\
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),	\
 			player->GetLev(), 0, TimeUtil::SharpDay(0, now), clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);
 	}
 	notifyBattleScore(player);
@@ -3094,10 +3094,10 @@ bool ClanRobBattle::enterClanCity(Player * player)
 	if (firstEnter)
 	{
 		clanBattlePlayerEx->id = IDGenerator::gClanBatterRecordIDGenerator.ID();
-		DB().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),
+		DB5().PushUpdateData("REPLACE INTO `clan_battler`(`id`, `battler`, `battlerLev`, `battleClanId`, `battleClanTime`, `battleHold`, `hasEnter`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", clanBattlePlayerEx->id, player->getId(),
 			player->GetLev(), 0, thisDay, clanBattlePlayerEx->hold, clanBattlePlayerEx->hasEnter);	
 	}
-	DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = %u  WHERE `playerId` = %"I64_FMT"u ", clanMember->enterCount, player->getId());
 	notifyBattleScore(player);
 	notifySelfBattleScore(player);
 	notifyClanBattleEnterInfo(player, 2, 0, _heroClanName);
@@ -3181,7 +3181,7 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 	if (atker->getClan() != _clan && cbAtker->hasAttack == 0)
 	{
 		cbAtker->hasAttack = 1;
-		DB().PushUpdateData("UPDATE `clan_battler` SET `hasAttack` = 1 WHERE `id` = %u", cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `hasAttack` = 1 WHERE `id` = %u", cbAtker->id);
 	}
 	if ((cbAtker->side == 2 && cbDefer->side == 2) && (cbAtker->hold == cbDefer->hold))
 	{
@@ -3282,8 +3282,8 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 			cbDefer->status = 0;
 			broadcastHold(cbDefer->hold, st);
 		}
-		DB().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u, `grabAchieve` = %u WHERE `id` = %u", cbAtker->wins, cbAtker->serailWins, cbAtker->maxSerailWins, cbAtker->grabAchieve, cbAtker->id);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `battleHold` =%u WHERE `id` = %u", cbDefer->maxSerailWins, recover, cbDefer->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u, `grabAchieve` = %u WHERE `id` = %u", cbAtker->wins, cbAtker->serailWins, cbAtker->maxSerailWins, cbAtker->grabAchieve, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `battleHold` =%u WHERE `id` = %u", cbDefer->maxSerailWins, recover, cbDefer->id);
 		UInt32 recoveTime = static_cast<UInt32>(60 + bsim.getTurns() * 1.8f);
 		cbDefer->player->setBuffData(PLAYER_BUFF_CLANRECOVE, now + recoveTime);
 		cbDefer->player->setBuffData(PLAYER_BUFF_CLANRCENHANCE, 0);
@@ -3342,8 +3342,8 @@ bool ClanRobBattle::attackPlayer(Player * atker,  std::string deferName)
 			cbAtker->status = 0;
 			broadcastHold(cbAtker->hold, st);
 		}
-		DB().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u WHERE `id` = %u", cbDefer->wins, cbDefer->serailWins, cbDefer->maxSerailWins, cbDefer->id);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `grabAchieve` = %u, `battleHold` =%u WHERE `id` = %u", cbAtker->serailWins, cbAtker->grabAchieve, recover, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `wins` = %u, `serialWins` = %u, `maxSerialWins` = %u WHERE `id` = %u", cbDefer->wins, cbDefer->serailWins, cbDefer->maxSerailWins, cbDefer->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `serialWins` = 0, `maxSerialWins` = %u, `grabAchieve` = %u, `battleHold` =%u WHERE `id` = %u", cbAtker->serailWins, cbAtker->grabAchieve, recover, cbAtker->id);
 		UInt32 recoveTime = static_cast<UInt32>((isClanHoldDestroy(_holds[1].hold) || isClanHoldDestroy(_holds[2].hold)) ? 60 + bsim.getTurns() * 1.8f : 75 + bsim.getTurns() * 1.8f);
 		cbAtker->player->setBuffData(PLAYER_BUFF_CLANRECOVE, now + recoveTime);
 		cbAtker->player->setBuffData(PLAYER_BUFF_CLANRCENHANCE, 0);
@@ -3388,7 +3388,7 @@ bool ClanRobBattle::attackPlayer2(ClanBattlePlayer * cbAtker, ClanBattlePlayer *
 		Stream st(REP::CLAN_BATTLE);
 		st << static_cast<UInt8>(3) << static_cast<UInt8>(0) << static_cast<UInt16>(_holds[3].hold) << Stream::eos;
 		cbDeath->player->send(st);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleHold` = 61444 WHERE `id` = %u", cbDeath->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleHold` = 61444 WHERE `id` = %u", cbDeath->id);
 	}
 	delClanBattlePlayer(cbDeath->hold, cbDeath->side, cbDeath->status, cbDeath->player);
 	cbDeath->hold = _holds[3].hold;
@@ -3488,7 +3488,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 	{
 		cbAtker->grabAchieve += (damge / 100);
 		calcBattleScore(cbAtker->player, damge / 100);
-		DB().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
 	}
 	_isInAttacking = true;
 	if (r)
@@ -3503,18 +3503,18 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 			{
 			case 0:				
 				//cbAtker->grabAchieve ++;	//记录杀死宗族守卫者次数，最后结算
-				DB().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
-				//DB().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
+				DB5().PushUpdateData("UPDATE `clan` SET `hallEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
+				//DB5().PushUpdateData("UPDATE `clan_battler` SET `grabAchieve` = %u WHERE `id` = %u",cbAtker->grabAchieve, cbAtker->id);
 				break;
 			case 1:
 				cbAtker->southEdurance += endurance;
-				DB().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
-				DB().PushUpdateData("UPDATE `clan_battler` SET `southEdurance` = %u WHERE `id` = %u",cbAtker->southEdurance, cbAtker->id);
+				DB5().PushUpdateData("UPDATE `clan` SET `southEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
+				DB5().PushUpdateData("UPDATE `clan_battler` SET `southEdurance` = %u WHERE `id` = %u",cbAtker->southEdurance, cbAtker->id);
 				break;
 			case 2:
 				cbAtker->northEdurance += endurance;
-				DB().PushUpdateData("UPDATE `clan` SET `northEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
-				DB().PushUpdateData("UPDATE `clan_battler` SET `northEdurance` = %u WHERE `id` = %u",cbAtker->northEdurance, cbAtker->id);
+				DB5().PushUpdateData("UPDATE `clan` SET `northEdurance` = %u WHERE `id` = %u", _holds[hold].endurance, getOwnerClanId());
+				DB5().PushUpdateData("UPDATE `clan_battler` SET `northEdurance` = %u WHERE `id` = %u",cbAtker->northEdurance, cbAtker->id);
 				break;
 			}
 			notifyClanBattleTotemAttack();
@@ -3578,7 +3578,7 @@ bool ClanRobBattle::attackNpc(Player * atker, std::string npcName)
 		_recoverClanBattlers.insert(cbAtker);
 		notifyClanBattleRecoveData(cbAtker->player, (cbAtker->reliveNum >> 8) + 1, recoveTime);
 		notifyClanBattlePlayerCount();
-		DB().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `battleHold` = %u WHERE `id` = %u", _holds[3].hold, cbAtker->id);
+		DB5().PushUpdateData("UPDATE `clan_battler` SET `battleStatus` = 2, `battleHold` = %u WHERE `id` = %u", _holds[3].hold, cbAtker->id);
 	}
 	notifyClanBattleWinData(cbAtker->player);
 
@@ -4366,11 +4366,11 @@ void ClanRobBattle::switchBattleClanOwner()
 		{
 			++ _heroClanAtkCount;
 			++ _heroClanRank;
-			DB().PushUpdateData("UPDATE `clan` SET `foundTime` = %u, `rank` = %u, `allyClan` = %u WHERE `id` = 0", _heroClanAtkCount, _heroClanRank, clan->getId());
+			DB5().PushUpdateData("UPDATE `clan` SET `foundTime` = %u, `rank` = %u, `allyClan` = %u WHERE `id` = 0", _heroClanAtkCount, _heroClanRank, clan->getId());
 		}
 		else
 		{
-			DB().PushUpdateData("UPDATE `clan` SET `allyClan` = %u WHERE `id` = 0", clan->getId());
+			DB5().PushUpdateData("UPDATE `clan` SET `allyClan` = %u WHERE `id` = 0", clan->getId());
 		}
 		Stream st(REP::CLAN_BATTLE);
 		st << static_cast<UInt8>(20) << clan->getId() << clan->getName() << Stream::eos;

@@ -121,7 +121,7 @@ namespace GObject
 		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
 			exp *= 1.5f;
 		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
-			exp *= 1.3f;
+			exp *= 1.2f;
 		_npcGroup->monsterKilled(m_Player);
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp));
@@ -1700,6 +1700,8 @@ namespace GObject
 			sendMsgCode(0, 1151);
 			return false;
 		}
+        if (ng->getType())
+            return false;
 		const UInt32 eachBattle = 60;
 		//UInt8 level = GetLev();
 		UInt32 count = 60 * 8;
@@ -2167,9 +2169,9 @@ namespace GObject
 			if(t >= 0x40 + PLAYER_BUFF_DISPLAY_MAX)
 				return;
 			if(v > 0)
-				DB().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
+				DB1().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
 			else
-				DB().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
+				DB1().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
 			return;
 		}
 		const char * field = NULL;

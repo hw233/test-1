@@ -2398,7 +2398,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	if(!player->hasChecked())
 		return;
     if (!lr._count)
-        return;
+        lr._count = 1;
 	UInt32 price = GData::store.getPrice(lr._type, lr._itemId);
 	Stream st(REP::STORE_BUY);
 	if(price == 0 || price == 0xFFFFFFFF)
@@ -3003,6 +3003,7 @@ struct PwdQuestion
 
 void OnPwdQuestionReq( GameMsgHdr& hdr, PwdQuestion& )
 {
+    return; // TODO::
 	MSG_QUERY_PLAYER(player);
 	Stream st(REP::SECOND_PWD);
 	st << player->getQuestionForPWD() << Stream::eos;
@@ -3011,6 +3012,7 @@ void OnPwdQuestionReq( GameMsgHdr& hdr, PwdQuestion& )
 
 void OnOpPwdReq( GameMsgHdr& hdr, const void * data)
 {
+    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 res = 0;
@@ -3054,6 +3056,7 @@ struct LockPwdReq
 
 void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
 {
+    // TODO:
 	MSG_QUERY_PLAYER(player);
 	UInt8 res = 0;
 	if(lpd.flag == 0)

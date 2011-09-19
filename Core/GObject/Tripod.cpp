@@ -35,7 +35,7 @@ void Tripod::sendTripodInfo(Player* pl, TripodData& td)
     genAward(pl, td, st);
     //if (needgen != td.needgen)
         DB().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
-                td.needgen, pl->getId(), td.itemId, td.num);
+                td.needgen, td.itemId, td.num, pl->getId());
 
     st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << td.soul << Stream::eos;
     pl->send(st);
@@ -65,8 +65,8 @@ bool Tripod::genAward(Player* pl, TripodData& td)
 void Tripod::genAward(Player* pl, TripodData& td, Stream& st)
 {
     if (genAward(pl, td)) {
-        st << td.itemId;
         st << td.num;
+        st << td.itemId;
     } else {
         st << static_cast<UInt8>(0);
         st << static_cast<UInt32>(0);
@@ -238,7 +238,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     st << Stream::eos;
     pl->send(st);
     DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
-            td.fire, td.needgen, pl->getId(), td.itemId, td.num);
+            td.fire, td.needgen, td.itemId, td.num, pl->getId());
 
     pl->GetPackage()->DelItem2(ib1, 1);
     pl->GetPackage()->DelItem2(ib2, 1);

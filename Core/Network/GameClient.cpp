@@ -175,6 +175,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
         }
     }
 
+    _chk ^= 0x33;
     if (cmd != REP::KEEP_ALIVE)
     {
         if (_chk != m_Chk)

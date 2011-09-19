@@ -20,8 +20,11 @@ enum
 	WORKER_THREAD_DB,				//DB
 	WORKER_THREAD_DB1,				//DB1 player
 	WORKER_THREAD_DB2,				//DB2 fighter
-	WORKER_THREAD_DB3,				//DB3 item,dungeon_player,player_copy,player_front,task_instance
+    WORKER_THREAD_DB3,              //DB3 dungeon_player,player_copy,player_front,task_instance
+	WORKER_THREAD_DB4,				//DB4 item,equipment
+	WORKER_THREAD_DB5,				//DB5 task_instance
 	WORKER_THREAD_DB_LOG,			//后台LOG
+	WORKER_THREAD_DB_LOG1,			//后台LOG1
 	MAX_THREAD_NUM
 };
 

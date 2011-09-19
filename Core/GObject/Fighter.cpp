@@ -1146,8 +1146,8 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 	{
 		_attrDirty = true;
 		_bPDirty = true;
-		DB3().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
-		DB3().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
+		DB4().PushUpdateData("DELETE FROM `item` WHERE `id` = %u", equip->getId());
+		DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", equip->getId());
 		if(toWhere != 0 && equip->getQuality() >= 4)
 		{
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), equip->GetItemType().getId(), equip->getId(), toWhere, TimeUtil::Now());
