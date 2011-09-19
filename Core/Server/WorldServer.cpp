@@ -81,7 +81,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
     else
         cfg.serverNum = num;
 
-    //cfg.serverLogId = cfg.serverNum;
+    cfg.serverLogId = cfg.serverNum;
 
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();

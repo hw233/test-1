@@ -167,7 +167,7 @@ void CountryBattle::process(UInt32 curtime)
 				rotate(curtime + turns * 2, lvl, 0, pos1, achieve, 2);
 			
 				UInt32 viplvl = cbd2->player->getVipLevel();
-				if(viplvl >= 6)
+				if(viplvl >= 4)
 				{
 					rotate(curtime + turns * 2, lvl, 1, pos2, loserAchieve, 1);
 					cbd2->killStreak = 0;

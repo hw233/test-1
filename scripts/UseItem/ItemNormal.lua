@@ -775,11 +775,11 @@ function ItemNormal_00000043(iid, num, bind, param)
         return false;
     end
 
-    local cnt = fgt:getAcupointCnt()
-    if cnt == 0 then
-        cnt = 1
-    end
-    fgt:addPExp((20000*cnt)/15);
+--    local cnt = fgt:getAcupointCnt()
+--    if cnt == 0 then
+--        cnt = 1
+--    end
+    fgt:addPExp(20000);
 
     local now = os.time();
     local h = os.date("%H", os.time())
@@ -809,11 +809,11 @@ function ItemNormal_00000052(iid, num, bind, param)
         return false;
     end
 
-    local cnt = fgt:getAcupointCnt()
-    if cnt == 0 then
-        cnt = 1
-    end
-    fgt:addPExp((2000*cnt)/15);
+--    local cnt = fgt:getAcupointCnt()
+--       if cnt == 0 then
+--           cnt = 1
+--    end
+    fgt:addPExp(2000);
     local now = os.time();
     local h = os.date("%H", os.time())
     local m = os.date("%M", os.time())
@@ -842,11 +842,11 @@ function ItemNormal_00000053(iid, num, bind, param)
         return false;
     end
 
-    local cnt = fgt:getAcupointCnt()
-    if cnt == 0 then
-        cnt = 1
-    end
-    fgt:addPExp((10000*cnt)/15);
+--    local cnt = fgt:getAcupointCnt()
+--    if cnt == 0 then
+--        cnt = 1
+--    end
+    fgt:addPExp(10000);
     local now = os.time();
     local h = os.date("%H", os.time())
     local m = os.date("%M", os.time())
@@ -875,11 +875,11 @@ function ItemNormal_00000066(iid, num, bind, param)
         return false;
     end
 
-    local cnt = fgt:getAcupointCnt()
-    if cnt == 0 then
-        cnt = 1
-    end
-    fgt:addPExp((5000*cnt)/15);
+--    local cnt = fgt:getAcupointCnt()
+--    if cnt == 0 then
+--        cnt = 1
+--    end
+    fgt:addPExp(5000);
     local now = os.time() + 8*60*60 -- UTC+8
     now = now % (24*60*60)
 	if ItemNormal_AddBuff(fgt, 4, 24*60*60-now, num, 36000) then
