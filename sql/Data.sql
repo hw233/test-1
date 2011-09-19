@@ -373,6 +373,7 @@ CREATE TABLE `npc_group` (
   `id` int(10) unsigned NOT NULL,
   `fighterId` varchar(255) NOT NULL DEFAULT '',
   `formationId` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `type` tinyint(3) NOT NULL DEFAULT '0',
   `experience` int(10) unsigned NOT NULL DEFAULT '0',
   `lootId` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)

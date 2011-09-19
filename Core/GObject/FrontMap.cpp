@@ -215,6 +215,9 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
     }
 
+    if (tmp.size() && spot != tmp.size())
+        return;
+
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
         //tmp[spot].count = 0;

@@ -17,6 +17,7 @@ struct DBNpcGroup
 	UInt32 id;
 	std::string fighterId;
 	UInt16 formationId;
+	UInt8 type;
 	UInt32 experience;
 	std::string lootId;
 };
@@ -1003,11 +1004,12 @@ SPECIALDEF(25)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBNpcGroup)
-SPECIALDEF(5)
+SPECIALDEF(6)
 (
 	UInt32, id,
 	std::string, fighterId,
 	UInt16, formationId,
+	UInt8, type,
 	UInt32, experience,
 	std::string, lootId
 )

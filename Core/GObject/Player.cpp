@@ -1510,9 +1510,7 @@ namespace GObject
 	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen )
 	{
 		UInt32 now = TimeUtil::Now();
-        // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        //buffLeft = 0;
 		if(buffLeft > now)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
@@ -1529,6 +1527,12 @@ namespace GObject
 			return false;
 
 		GData::NpcGroup * ng = it->second;
+
+        if (!ng)
+            return false;
+
+        if (ng->getType()) // XXX: 必须是野外怪
+            return false;
 
 		if(GameAction()->RunExploreTask(this, npcId))
 			turns = 0;
@@ -1599,7 +1603,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.5);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.3);
 
 		return res;
 	}
@@ -1613,9 +1617,7 @@ namespace GObject
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
-        // TODO:
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-        //buffLeft = 0;
 		if(buffLeft > now && !ato)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
@@ -1648,17 +1650,7 @@ namespace GObject
 		{
 			ret = 0x0101;
 			_lastNg = ng;
-			if(getBuffData(PLAYER_BUFF_TRAINP3, now))
-				pendExp(ng->getExp() * 17 / 10);
-			else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
-				pendExp(ng->getExp() * 3 / 2);
-			else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
-				pendExp(ng->getExp() * 3 / 2);
-			else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
-				pendExp(ng->getExp() * 13 / 10);
-			else
-				pendExp(ng->getExp());
-
+            pendExp(ng->getExp());
 			ng->getLoots(this, _lastLoot, &atoCnt);
 		}
 
@@ -1695,7 +1687,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.5);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.3);
 		return res;
 	}
 

@@ -490,7 +490,6 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                         return;
                     }
 
-                    // TODO:
                     if (pl->getVipLevel() < 5)
                     {
                         return;

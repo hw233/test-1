@@ -410,12 +410,16 @@ void Fighter::sendModification( UInt8 t, UInt16 value, int idx, bool writedb)
 	Stream st(REP::CHANGE_EQUIPMENT);
 	st << getId() << static_cast<UInt8>(1) << t;
     if (t == 0x30)
-        st << static_cast<UInt32>(value);
-    else
-        st << static_cast<UInt8>(idx) << value;
-    if (writedb)
     {
-        updateToDB(t, 0);
+        st << static_cast<UInt32>(value);
+        if (writedb)
+            updateToDB(t, value);
+    }
+    else
+    {
+        st << static_cast<UInt8>(idx) << value;
+        if (writedb)
+            updateToDB(t, 0);
     }
 	st << Stream::eos;
 	_owner->send(st);
