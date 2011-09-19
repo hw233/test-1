@@ -654,6 +654,8 @@ struct DBTripod
 	UInt8 fire;
 	UInt8 quality;
 	UInt8 awdst;
+    UInt16 itemId;
+    UInt8 num;
 };
 
 struct DBCopyData
@@ -1500,13 +1502,15 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBTripod)
-SPECIALDEF(5)
+SPECIALDEF(7)
 (
     UInt64, id,
     UInt32, soul,
     UInt8, fire,
     UInt8, quality,
-    UInt8, awdst
+    UInt8, awdst,
+    UInt16, itemId,
+    UInt8, num
 )
 SPECIALEND()
 

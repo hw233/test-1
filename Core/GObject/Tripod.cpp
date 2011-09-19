@@ -31,16 +31,17 @@ void Tripod::sendTripodInfo(Player* pl, TripodData& td)
     st << td.fire;
     st << td.quality;
 
-    UInt8 needgen = td.needgen;
+    //UInt8 needgen = td.needgen;
     genAward(pl, td, st);
-    if (needgen != td.needgen)
-        DB().PushUpdateData("UPDATE `tripod` SET `regen` = %u WHERE `id` = %"I64_FMT"u", td.needgen, pl->getId());
+    //if (needgen != td.needgen)
+        DB().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+                td.needgen, td.itemId, td.num, pl->getId());
 
     st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << td.soul << Stream::eos;
     pl->send(st);
 }
 
-bool Tripod::genAward(Player* pl, TripodData& td, UInt32& id, UInt8& num)
+bool Tripod::genAward(Player* pl, TripodData& td)
 {
     if (td.needgen) {
         UInt32 loot = GData::GDataManager::GetTripodAward(td.fire, 5-td.quality); // 0-橙,1-紫,2-蓝,3-绿
@@ -50,38 +51,26 @@ bool Tripod::genAward(Player* pl, TripodData& td, UInt32& id, UInt8& num)
             GData::LootResult lr = li->roll();
             if (lr.id)
             {
-                id = lr.id;
-                num = lr.count;
-                pl->setTripodAwdIdNum(id, num);
+                td.itemId = lr.id;
+                td.num = lr.count;
                 td.needgen = 0;
                 return true;
             }
         }
         return false;
-    } else {
-        pl->getTripodAwdIdNum(id, num);
-        if (id > 30000)
-        {
-            id = 0;
-            num = 0;
-        }
     }
     return true;
 }
 
 void Tripod::genAward(Player* pl, TripodData& td, Stream& st)
 {
-    UInt32 id;
-    UInt8 num;
-
-    if (genAward(pl, td, id, num)) {
-        st << num;
-        st << id;
+    if (genAward(pl, td)) {
+        st << td.num;
+        st << td.itemId;
     } else {
         st << static_cast<UInt8>(0);
         st << static_cast<UInt32>(0);
     }
-
     return;
 }
 
@@ -248,7 +237,8 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     genAward(pl, td, st);
     st << Stream::eos;
     pl->send(st);
-    DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.fire, td.needgen, pl->getId());
+    DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+            td.fire, td.needgen, td.itemId, td.num, pl->getId());
 
     pl->GetPackage()->DelItem2(ib1, 1);
     pl->GetPackage()->DelItem2(ib2, 1);
@@ -271,23 +261,22 @@ void Tripod::getAward(Player* pl)
     if (td.awdst != 1)
         return;
 
-    UInt32 id;
-    UInt8 num;
-
-    if (!genAward(pl, td, id, num))
+    if (!genAward(pl, td))
         return;
 
-    if (IsEquipTypeId(id))
-        pl->GetPackage()->AddEquip(id, true, false, FromTripod);
+    if (IsEquipTypeId(td.itemId))
+        pl->GetPackage()->AddEquip(td.itemId, true, false, FromTripod);
     else
-        pl->GetPackage()->AddItem(id, num, true, false, FromTripod);
+        pl->GetPackage()->AddItem(td.itemId, td.num, true, false, FromTripod);
 
     td.fire = 0;
     td.quality = 2;
     td.needgen = 1;
     td.awdst = 0;
     td.soul = 0;
-    DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
+    td.itemId = 0;
+    td.num = 0;
+    DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
     sendTripodInfo(pl, td);
 }
@@ -317,8 +306,7 @@ TripodData& Tripod::newTripodData(Player* pl)
     TripodData td;
     if(pl->getVipLevel() > 2)
         td.quality = 3;
-
-    DB().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`) VALUES(%"I64_FMT"u, %u, %u, %u, %u,%u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst, td.needgen);
+    DB().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst, td.needgen, td.itemId, td.num);
     return addTripodData(pl->getId(), td);
 }
 

@@ -796,6 +796,8 @@ CREATE TABLE `tripod` (
   `quality` tinyint(1) unsigned NOT NULL,
   `awdst` tinyint(1) unsigned NOT NULL,
   `regen` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `itemId` int(10) unsigned NOT NULL,
+  `num` tinyint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

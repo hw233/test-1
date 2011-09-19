@@ -26,6 +26,8 @@ struct TripodData
     UInt8 quality;  // 奖励品质 1-白 2-绿 3-蓝 4-紫 5-橙
     UInt8 awdst;    // 奖励状态 0-熔炼中 1-未领取
     UInt8 needgen;  // 需要重新生成奖励
+    UInt32 itemId;
+    UInt8 num;
 };
 
 class Player;
@@ -42,7 +44,7 @@ public:
     void makeFire(Player* pl, UInt32 id1, UInt32 id2);
     void getAward(Player* pl);
     void genAward(Player* pl, TripodData& td, Stream& st);
-    bool genAward(Player* pl, TripodData& td, UInt32& id, UInt8& num);
+    bool genAward(Player* pl, TripodData& td);
 
     TripodData& newTripodData(Player* pl);
     TripodData& addTripodData(UInt64 id, const TripodData& data);

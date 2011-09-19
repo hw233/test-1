@@ -42,6 +42,8 @@ public:
 	DB::DBWorker& GetDB1();
 	DB::DBWorker& GetDB2();
 	DB::DBWorker& GetDB3();
+	DB::DBWorker& GetDB4();
+	DB::DBWorker& GetDB5();
 	DB::DBWorker& GetDBLog();
 	Login::LoginWorker& GetLogin();
 
@@ -71,6 +73,8 @@ public:
 #define DB1()			SERVER().GetDB1()
 #define DB2()			SERVER().GetDB2()
 #define DB3()			SERVER().GetDB3()
+#define DB4()			SERVER().GetDB4()
+#define DB5()			SERVER().GetDB5()
 #define DBLOG()			SERVER().GetDBLog()
 #define LOGIN()			SERVER().GetLogin()
 

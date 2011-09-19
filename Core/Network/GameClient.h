@@ -36,6 +36,7 @@ public:
 	inline void SetPlayerId( UInt64 id ) { m_PlayerId = id; }
 	inline GObject::Player * GetPlayer() const { return m_Player.value(); }
 	inline UInt64 GetPlayerId( ) { return m_PlayerId; }
+    void setChk(UInt8);
 
 	virtual bool active();
 
@@ -44,6 +45,10 @@ private:
 	UInt32	m_RemoteIP;
 	UInt16	m_RemotePort;
 	UInt64	m_PlayerId;
+    UInt8 _chk;
+    UInt8 m_Chk;
+    UInt8 m_OldChk;
+    UInt32 m_ChkOver;
 };
 
 }

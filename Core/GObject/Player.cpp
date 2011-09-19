@@ -121,7 +121,7 @@ namespace GObject
 		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
 			exp *= 1.5f;
 		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP1, now))
-			exp *= 1.3f;
+			exp *= 1.2f;
 		_npcGroup->monsterKilled(m_Player);
 		if(m_Player->isOnline())
 			m_Player->AddExp(static_cast<UInt32>(exp));
@@ -1303,13 +1303,11 @@ namespace GObject
 			}
 		}
 		st.init(REP::USER_INFO);
-        UInt8 mark = uRand(0xFF);
-        setMark(mark);
 		UInt8 status = static_cast<UInt8>(_playerData.status);
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << gAthleticsRank.getAthleticsPrestige(this) << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << mark << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << gAthleticsRank.getAthleticsPrestige(this) << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -1702,6 +1700,8 @@ namespace GObject
 			sendMsgCode(0, 1151);
 			return false;
 		}
+        if (ng->getType())
+            return false;
 		const UInt32 eachBattle = 60;
 		//UInt8 level = GetLev();
 		UInt32 count = 60 * 8;
@@ -2169,9 +2169,9 @@ namespace GObject
 			if(t >= 0x40 + PLAYER_BUFF_DISPLAY_MAX)
 				return;
 			if(v > 0)
-				DB().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
+				DB1().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
 			else
-				DB().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
+				DB1().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
 			return;
 		}
 		const char * field = NULL;

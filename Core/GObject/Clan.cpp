@@ -107,7 +107,7 @@ bool Clan::accept(Player * player, UInt64 pid )
 			SYSMSG_SENDV(1021, accepter, _name.c_str());
 		}
 	}
-	DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, accepter->getId());
+	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, accepter->getId());
 
 	delete *it;
 	_pending.erase(it);
@@ -140,7 +140,7 @@ bool Clan::decline( Player* player, UInt64 pid )
 		st << Stream::eos;
 		broadcast(st);
 	}
-	DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `class` = 16", _id, pid);
+	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `class` = 16", _id, pid);
 
 	return true;
 }
@@ -178,7 +178,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
     GLOBAL().PushMsg(hdr1, &co);
 
 	player->notifyFriendAct(5, _name.c_str());
-	DB().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
+	DB5().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
 	if(player->isOnline())
 	{
 		sendInfo(player);
@@ -287,7 +287,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 		battleClan->kickClanBattler(kicker);
 
 	// updateRank();
-	DB().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", pid);
+	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", pid);
 
 	SYSMSGV(title, 229, _name.c_str());
 	SYSMSGV(content, 230, _name.c_str());
@@ -376,8 +376,8 @@ bool Clan::leave(Player * player)
 		disband(player);
 	else
 	{
-		DB().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", player->getId());
-		DB().PushUpdateData("DELETE FROM `clan_skill` WHERE `playerId` = %"I64_FMT"u", player->getId());
+		DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", player->getId());
+		DB5().PushUpdateData("DELETE FROM `clan_skill` WHERE `playerId` = %"I64_FMT"u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
 	
@@ -418,9 +418,9 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
     broadcastMemberInfo(*cmLeader, 1);
     broadcastMemberInfo(*cmPlayer, 1);
 
-    DB().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmLeader->cls, cmLeader->player->getId());
-    DB().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmPlayer->cls, cmPlayer->player->getId());
-	DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", pid, _id);
+    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmLeader->cls, cmLeader->player->getId());
+    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmPlayer->cls, cmPlayer->player->getId());
+	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", pid, _id);
 	// updateRank(cmLeader, cmLeader->player->getName());
 
 	return true;
@@ -522,7 +522,7 @@ bool Clan::apply( Player * player, UInt32 optime, bool writedb )
 	broadcastPendingMemberInfo(*cpm);
 	if(writedb)
 	{
-		DB().PushUpdateData("INSERT INTO `clan_pending_player` (`id`, `playerId`, `class`, `optime`) VALUES (%u, %"I64_FMT"u, 16, %u)", _id, player->getId(), cpm->opTime);
+		DB5().PushUpdateData("INSERT INTO `clan_pending_player` (`id`, `playerId`, `class`, `optime`) VALUES (%u, %"I64_FMT"u, 16, %u)", _id, player->getId(), cpm->opTime);
 
 		if(_members.size() > 0)
 		{
@@ -543,7 +543,7 @@ bool Clan::declineInvite(Player * player)
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if(it != _pending.end() && (*it)->cls == 15)
 	{
-		DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, player->getId());
+		DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, player->getId());
 
 		delete *it;
 		_pending.erase(it);
@@ -576,7 +576,7 @@ bool Clan::invite( Player * player, UInt32 optime, bool writedb )
 
 	if(writedb)
 	{
-		DB().PushUpdateData("INSERT INTO `clan_pending_player` (`id`, `playerId`, `class`, `optime`) VALUES (%u, %"I64_FMT"u, 15, %u)", _id, player->getId(), curtime);
+		DB5().PushUpdateData("INSERT INTO `clan_pending_player` (`id`, `playerId`, `class`, `optime`) VALUES (%u, %"I64_FMT"u, 15, %u)", _id, player->getId(), curtime);
 	}
 
 	return true;
@@ -658,7 +658,7 @@ UInt16 Clan::getFavorItemId(UInt8 techId)
 		_favorId[2] = FavoritemId[r_type3];
 		_favorId[3] = FavoritemId[r_type4];
 		_flushFavorTime = now;
-		DB().PushUpdateData("UPDATE `clan` SET `favorId1` = %u, `favorId2` = %u, `favorId3` = %u, `favorId4` = %u, `favorTime` = %u WHERE `id` = %u", _favorId[0], _favorId[1], _favorId[2], _favorId[3], _flushFavorTime, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `favorId1` = %u, `favorId2` = %u, `favorId3` = %u, `favorId4` = %u, `favorTime` = %u WHERE `id` = %u", _favorId[0], _favorId[1], _favorId[2], _favorId[3], _flushFavorTime, _id);
 	}
 
 	return _favorId[index];
@@ -769,7 +769,7 @@ bool Clan::GMDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
                 player->send(st);
             }
 			// updateRank(mem, oldLeaderName);
-			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());	
+			DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());	
 		}
 		//else if (type == 2)
 		//{
@@ -837,7 +837,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			}
 			setProffer(getProffer()+count);
 			addClanDonateRecord(player->getName(), techId, count, now);
-			DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());
+			DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());
 			player->GetTaskMgr()->DoAcceptedTask(62207);
 		}
 		else if (type == 2)
@@ -868,7 +868,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			//		it->second.favorCount = realCount;
 			//		it->second.favorTime = now;
 			//		UInt32 index = getTechIdIndex(it->first);
-			//		DB().PushUpdateData("UPDATE `clan_player` SET `%s` = %u, `%s` = %u, `%s` = %u WHERE `playerId` = %"I64_FMT"u;", field1[index].c_str(), it->second.petFriendness, field2[index].c_str(), it->second.favorCount, field3[index].c_str(), it->second.favorTime, player->getId());
+			//		DB5().PushUpdateData("UPDATE `clan_player` SET `%s` = %u, `%s` = %u, `%s` = %u WHERE `playerId` = %"I64_FMT"u;", field1[index].c_str(), it->second.petFriendness, field2[index].c_str(), it->second.favorCount, field3[index].c_str(), it->second.favorTime, player->getId());
 			//	}					
 			//	else
 			//	{
@@ -876,7 +876,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			//		{
 			//			it->second.petFriendness -= 1;
 			//			UInt32 index = getTechIdIndex(it->first);
-			//			DB().PushUpdateData("UPDATE `clan_player` SET `%s` = %u WHERE `playerId` = %"I64_FMT"u;", field1[index].c_str(), it->second.petFriendness, player->getId());
+			//			DB5().PushUpdateData("UPDATE `clan_player` SET `%s` = %u WHERE `playerId` = %"I64_FMT"u;", field1[index].c_str(), it->second.petFriendness, player->getId());
 			//		}
 			//	}
 			//}
@@ -927,7 +927,7 @@ void Clan::listPending( Player * player )
 		ClanPendingMember * cmem = *it;
 		if(cmem->player->getClan() != NULL)
 		{
-			DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND (`class` = 16 OR `class` = 15)", _id, cmem->player->getId());
+			DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND (`class` = 16 OR `class` = 15)", _id, cmem->player->getId());
             delete cmem;
 			_pending.erase(it);
 			continue;
@@ -1081,7 +1081,7 @@ void Clan::purgePending()
     std::vector<ClanPendingMember *>::iterator it = _pending.begin();
 	while(i < sz && (*it)->opTime < thatTime)
 	{
-		DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `class` = 16", _id, _pending[i]->player->getId());
+		DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `class` = 16", _id, _pending[i]->player->getId());
         delete *it;
 		++ i;
         _pending.erase(it);
@@ -1102,7 +1102,7 @@ void Clan::setContact( const std::string& c, bool announce )
 		broadcast(st);
 		char c2[1024];
 		mysql_escape_string(c2, c.c_str(), c.length());
-		DB().PushUpdateData("UPDATE `clan` SET `contact` = '%s' WHERE `id` = %u", c2, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `contact` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
 
@@ -1118,7 +1118,7 @@ void Clan::setAnnounce( const std::string& c, bool announce )
 		broadcast(st);
 		char c2[1024];
 		mysql_escape_string(c2, c.c_str(), c.length());
-		DB().PushUpdateData("UPDATE `clan` SET `announce` = '%s' WHERE `id` = %u", c2, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `announce` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
 
@@ -1132,7 +1132,7 @@ void Clan::setProffer( UInt32 r, bool announce )
 		Stream st(REP::CLAN_INFO_UPDATE);
 		st << static_cast<UInt8>(5) << r << Stream::eos;
 		broadcast(st);
-		DB().PushUpdateData("UPDATE `clan` SET `proffer` = %u WHERE `id` = %u", r, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `proffer` = %u WHERE `id` = %u", r, _id);
 	}
 }
 
@@ -1172,10 +1172,10 @@ void Clan::disband(Player * player)
 	globalOwnedClans[cny].remove(player->getName());
 	clanCache.push(this, false);
 	
-	DB().PushUpdateData("DELETE FROM `clan` WHERE `id` = %u", _id);
-	DB().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
-	DB().PushUpdateData("DELETE FROM `clan_player` WHERE `id` = %u", _id);
-	DB().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
+	DB5().PushUpdateData("DELETE FROM `clan` WHERE `id` = %u", _id);
+	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
+	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `id` = %u", _id);
+	DB5().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
 
 	//4): Maybe bug here
 	Members::iterator iter = _members.begin();
@@ -1340,7 +1340,7 @@ void Clan::addAllyClan(Clan * clan, bool writedb)
 	notifyAllyClanInfo(clan, 0, 0);
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `allyClan` = %u WHERE `id` = %u", _allyClanId, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `allyClan` = %u WHERE `id` = %u", _allyClanId, _id);
 	}
 }
 
@@ -1351,7 +1351,7 @@ void Clan::delAllyClan(Clan * clan)
 	_allyClanId = 0;
 	_allyClan = NULL;
 	notifyAllyClanInfo(clan, 0, 1);
-	DB().PushUpdateData("UPDATE `clan` SET `allyClan` = 0 WHERE `id` = %u", _id);
+	DB5().PushUpdateData("UPDATE `clan` SET `allyClan` = 0 WHERE `id` = %u", _id);
 }
 
 void Clan::addEnemyClanFromDB(UInt32 ci)
@@ -1425,13 +1425,13 @@ void Clan::updateEnemyClandb()
 	switch (_enemyClanId.size())
 	{
 	case 0:
-		DB().PushUpdateData("UPDATE `clan` SET `enemyClan1` = 0, `enemyClan2` = 0 WHERE `id` = %u", _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `enemyClan1` = 0, `enemyClan2` = 0 WHERE `id` = %u", _id);
 		break;
 	case 1:
-		DB().PushUpdateData("UPDATE `clan` SET `enemyClan1` = %u, `enemyClan2` = 0 WHERE `id` = %u", _enemyClanId[0], _id);	
+		DB5().PushUpdateData("UPDATE `clan` SET `enemyClan1` = %u, `enemyClan2` = 0 WHERE `id` = %u", _enemyClanId[0], _id);	
 		break;
 	case 2:
-		DB().PushUpdateData("UPDATE `clan` SET `enemyClan1` = %u, `enemyClan2` = %u WHERE `id` = %u", _enemyClanId[0], _enemyClanId[1], _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `enemyClan1` = %u, `enemyClan2` = %u WHERE `id` = %u", _enemyClanId[0], _enemyClanId[1], _id);
 		break;
 	default:
 		break;
@@ -1442,7 +1442,7 @@ void Clan::addClanDonateRecordFromDB(const std::string& dn, UInt8 si, UInt16 dc,
 {
 	MemberDonates& mds = _memberDonates[si];
 	if (mds.size() >= 30)
-		DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, dt);
+		DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, dt);
 	else
 		mds.insert(MemberDonate(dn, dc, dt));
 }
@@ -1474,7 +1474,7 @@ void Clan::addSkill(ClanMember* cm, UInt8 skillId)
     cs.id = skillId;
     cs.level = 0;
 
-	DB().PushUpdateData("REPLACE INTO `clan_skill`(`clanId`, `playerId`, `skillId`, `level`) VALUES(%u, %u, %u, %d)", _id, cm->player->getId(), skillId, 0);
+	DB5().PushUpdateData("REPLACE INTO `clan_skill`(`clanId`, `playerId`, `skillId`, `level`) VALUES(%u, %u, %u, %d)", _id, cm->player->getId(), skillId, 0);
 }
 
 UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
@@ -1539,7 +1539,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             Stream st(REP::CLAN_INFO_UPDATE);
             st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
             pl->send(st);
-            DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
+            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
         }
         cs.level++;
     } while(false);
@@ -1678,14 +1678,14 @@ void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt3
 	if (mds.size() >= 30)
 	{
 		const MemberDonate& md = *(mds.begin());
-		DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, md.donateTime);
+		DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u AND `techId` = %u AND `donateTime` = %u", _id, si, md.donateTime);
 		mds.erase(mds.begin());
 	}
 	mds.insert(MemberDonate(dn, dc, dt));
 	Stream st(REP::CLAN_SKILL);
 	st << static_cast<UInt8>(4) << si << dn << static_cast<UInt32>(dc) << dt << Stream::eos;
 	broadcast(st);
-	DB().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `techId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
+	DB5().PushUpdateData("REPLACE INTO `clan_donate_record`(`clanId`, `donateName`, `techId`, `donateCount`, `donateTime`) VALUES(%u, '%s', %u, %u, %u)", _id, dn.c_str(), si, dc, dt);
 }
 
 void Clan::sendClanDynamicMsg(Player * player, UInt8 type, UInt16 start, UInt16 count)
@@ -1722,7 +1722,7 @@ void Clan::setPurpose( const std::string& c, bool writedb )
 	{
 		char c2[1024];
 		mysql_escape_string(c2, c.c_str(), c.length());
-		DB().PushUpdateData("UPDATE `clan` SET `purpose` = '%s' WHERE `id` = %u", c2, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `purpose` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
 
@@ -1735,7 +1735,7 @@ UInt8 Clan::setRepoNum( UInt32 itemId, UInt8 itemNum, bool writedb )
 			return 0;
 		_repoNum.erase(it);
 		if(writedb)
-			DB().PushUpdateData("DELETE FROM `clan_repo` WHERE `id` = %u AND `itemId` = %u", _id, itemId);
+			DB5().PushUpdateData("DELETE FROM `clan_repo` WHERE `id` = %u AND `itemId` = %u", _id, itemId);
 		return 0;
 	}
 	if(itemNum > 90)
@@ -1746,7 +1746,7 @@ UInt8 Clan::setRepoNum( UInt32 itemId, UInt8 itemNum, bool writedb )
 	num = itemNum;
 	if(writedb)
 	{
-		DB().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, itemId, itemNum);
+		DB5().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, itemId, itemNum);
 		sendRepoInfo();
 	}
 	return itemNum;
@@ -1821,7 +1821,7 @@ void Clan::setLeaderId(UInt64 ld, bool writedb)
 	_leader = ld;
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", ld, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", ld, _id);
 	}
 }
 
@@ -1840,7 +1840,7 @@ bool Clan::setWatchmanId(UInt64 watchman, bool writedb)
     practicePlace.replaceProtecter(owner, watchman);
 	if (writedb)
 	{
-		DB().PushUpdateData("UPDATE `clan` SET `watchman` = %"I64_FMT"u WHERE `id` = %u", watchman, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `watchman` = %"I64_FMT"u WHERE `id` = %u", watchman, _id);
 	}
 
     Stream st(REP::CLAN_INFO_UPDATE);
@@ -1864,7 +1864,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     GData::clanLvlTable.testLevelUp(_level, _construction);
     if (writedb)
     {
-		DB().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, cons, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, cons, _id);
     }
 }
 
@@ -1929,7 +1929,7 @@ bool Clan::alterLeader()
 		_clanDynamicMsg->addCDMsg(9, secondLeader->player->getName(), 4, &st);
 		broadcast(st);
 	}
-	DB().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", secondLeader->player->getId(), _id);
+	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", secondLeader->player->getId(), _id);
 	// updateRank(leader, leader->player->getName());
 	return true;
 }
@@ -2043,7 +2043,7 @@ void Clan::allocateRepoAsReward( Player * player, std::map<UInt32, UInt8>& items
 		air.second.itemId = aitem.itemId;
 		air.second.itemNum = aitem.itemNum;
 		member->allocItems.insert(air);
-		DB().PushUpdateData("INSERT INTO `clan_pending_reward`(`id`, `timeAlloc`, `playerId`, `itemId`, `itemNum`) VALUES(%u, %u, %"I64_FMT"u, %u, %u)", _id, now, player->getId(), aitem.itemId, aitem.itemNum);
+		DB5().PushUpdateData("INSERT INTO `clan_pending_reward`(`id`, `timeAlloc`, `playerId`, `itemId`, `itemNum`) VALUES(%u, %u, %"I64_FMT"u, %u, %u)", _id, now, player->getId(), aitem.itemId, aitem.itemNum);
 	}
 
 	addAllocRecord(now, par);
@@ -2092,8 +2092,8 @@ void Clan::purgeAlloc( UInt32 now, ClanMember& cmem )
 		UInt8& num = _repoNum[iid];
 		num += iter->second.itemNum;
 		par.allocItems.push_back(iter->second);
-		DB().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u", _id, iter->first, cmem.player->getId());
-		DB().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, iid, num);
+		DB5().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u", _id, iter->first, cmem.player->getId());
+		DB5().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, iid, num);
 	}
 	if(par.allocItems.size() > 0)
 	{
@@ -2118,7 +2118,7 @@ void Clan::getAllocBack( ClanMember& cmem )
 			iid = 9041;
 		UInt8& num = _repoNum[iid];
 		num += iter->second.itemNum;
-		DB().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, iid, num);
+		DB5().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, iid, num);
 		par.allocItems.push_back(iter->second);
 	}
 	addAllocRecord(now, par);
@@ -2193,7 +2193,7 @@ void Clan::takeReward( Player * player, UInt8 type, UInt32 allocTime, UInt16 ite
 						iid = 9041;
 					UInt8& itemNum = _repoNum[iid];
 					itemNum += iter->second.itemNum;
-					DB().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, iid, itemNum);
+					DB5().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, iid, itemNum);
 					AllocRecord par;
 					par.allocType = 2;
 					par.playerName = player->getName();
@@ -2208,7 +2208,7 @@ void Clan::takeReward( Player * player, UInt8 type, UInt32 allocTime, UInt16 ite
 			Stream st(REP::GET_CLANREWARD);
 			st << type << itemId << allocTime << Stream::eos;
 			player->send(st);
-			DB().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u AND `itemId` = %u", _id, allocTime, player->getId(), itemId);
+			DB5().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u AND `itemId` = %u", _id, allocTime, player->getId(), itemId);
 			member->allocItems.erase(iter);
 			return;
 		}
@@ -2235,7 +2235,7 @@ void Clan::takeRewardResult( Player * player, bool result, UInt32 timeAlloc, con
 		Stream st(REP::GET_CLANREWARD);
 		st << static_cast<UInt8>(1) << static_cast<UInt16>(aitem.itemId) << timeAlloc << Stream::eos;
 		player->send(st);
-		DB().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u AND `itemId` = %u", _id, timeAlloc, player->getId(), aitem.itemId);
+		DB5().PushUpdateData("DELETE FROM `clan_pending_reward` WHERE `id` = %u AND `timeAlloc` = %u AND `playerId` = %"I64_FMT"u AND `itemId` = %u", _id, timeAlloc, player->getId(), aitem.itemId);
 	}
 	else
 	{
@@ -2300,12 +2300,12 @@ void Clan::writeRepoNumToDB( std::map<UInt32, UInt8>::iterator it )
 {
 	if(it->second == 0)
 	{
-		DB().PushUpdateData("DELETE FROM `clan_repo` WHERE `id` = %u AND `itemId` = %u", _id, it->first);
+		DB5().PushUpdateData("DELETE FROM `clan_repo` WHERE `id` = %u AND `itemId` = %u", _id, it->first);
 		_repoNum.erase(it);
 	}
 	else
 	{
-		DB().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, it->first, it->second);
+		DB5().PushUpdateData("REPLACE INTO `clan_repo`(`id`, `itemId`, `itemNum`) VALUES(%u, %u, %u)", _id, it->first, it->second);
 	}
 }
 
@@ -2328,7 +2328,7 @@ void Clan::writeAllocRecordToDB( UInt32 tm, AllocRecord& ar )
 		sprintf(pn, "%u,%u", ar.allocItems[i].itemId, ar.allocItems[i].itemNum);
 		itemstr += pn;
 	}
-	DB().PushUpdateData("INSERT INTO `clan_reward_record`(`id`, `type`, `timeAlloc`, `playerName`, `items`) VALUES(%u, %u, %u, '%s', '%s')", _id, ar.allocType, tm, ar.playerName.c_str(), itemstr.c_str());
+	DB5().PushUpdateData("INSERT INTO `clan_reward_record`(`id`, `type`, `timeAlloc`, `playerName`, `items`) VALUES(%u, %u, %u, '%s', '%s')", _id, ar.allocType, tm, ar.playerName.c_str(), itemstr.c_str());
 }
 
 void Clan::broadcastMemberInfo( Player * player )
@@ -2693,7 +2693,7 @@ void Clan::addClanFunds(UInt32 funds)
         st << Stream::eos;
         broadcast(st);
 
-		DB().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
     }
 }
 
@@ -2708,7 +2708,7 @@ void Clan::useClanFunds(UInt32 funds)
         st << Stream::eos;
         broadcast(st);
 
-		DB().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `funds` = %u WHERE `id` = %u", _funds, _id);
     }
 }
 
@@ -2750,7 +2750,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
         _members.insert(mem2);
 
 		broadcastMemberInfo(*mem2, 1);
-		DB().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cls, inviteeId);
+		DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cls, inviteeId);
     }
 
 
@@ -2802,7 +2802,7 @@ void Clan::addMemberProffer(Player*pl, UInt32 proffer)
             st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
             pl->send(st);
         }
-        DB().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
+        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
     }
 }
 

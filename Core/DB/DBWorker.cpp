@@ -135,7 +135,7 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 {
     if (m_Worker == WORKER_THREAD_DB) // normal
     {
-        if (m_Limit > 500)
+        if (m_Limit > 5000)
             return;
     }
 
@@ -147,7 +147,15 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
     {
     }
 
-    if (m_Worker == WORKER_THREAD_DB3) // item,dungeon_player,player_copy,player_front,task_instance
+    if (m_Worker == WORKER_THREAD_DB3) // dungeon_player,player_copy,player_front
+    {
+    }
+
+    if (m_Worker == WORKER_THREAD_DB4) // item,equipment
+    {
+    }
+
+    if (m_Worker == WORKER_THREAD_DB5) // task_instance
     {
     }
 
