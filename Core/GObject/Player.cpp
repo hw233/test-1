@@ -3849,7 +3849,8 @@ namespace GObject
 		ConsumeInfo ci(RecruitFighter,0,0);
 		useTael(price,&ci);
 
-        _playerData.tavernOrangeCount  = 0;
+        if(fgt->getColor() > 1)
+            _playerData.tavernOrangeCount  = 0;
 
         if(fgt->getColor() ==3)
         {
@@ -4918,7 +4919,8 @@ namespace GObject
 
             if (j >= 5) // XXX: 玩家等级橙色装备x1
             {
-                UInt16 id = equips[lvl][uRand(24)];
+                URandom tmpRand;
+                UInt16 id = equips[lvl][tmpRand(24)];
                 mitem[mcount].id = id;
                 mitem[mcount++].count = 1;
 				strItems += Itoa(id);
