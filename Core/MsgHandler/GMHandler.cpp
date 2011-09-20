@@ -2269,7 +2269,7 @@ void GMHandler::OnLock(GObject::Player *player, std::vector<std::string>& args)
     if(pl->getLockExpireTime() == static_cast<UInt32>(0))
     {
         pl->setLockExpireTime(static_cast<UInt32>(expireTime));
-        DB().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
+        DB1().PushUpdateData("REPLACE INTO `locked_player`(`player_id`, `lockExpireTime`) VALUES(%"I64_FMT"u, %u)", playerId, expireTime);
         if(pl->isOnline())
         {
             TcpConnection conn = NETWORK()->GetConn(pl->GetSessionID());
@@ -2297,7 +2297,7 @@ void GMHandler::OnUnLock(GObject::Player *player, std::vector<std::string>& args
     if(pl->getLockExpireTime() != static_cast<UInt32>(0))
     {
         pl->setLockExpireTime(0);
-        DB().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
+        DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
     }
 }
 

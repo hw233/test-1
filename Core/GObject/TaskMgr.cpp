@@ -142,7 +142,7 @@ namespace GObject
 					PLAYER_DATA(m_PlayerOwner, newGuild) |= (0x1ull << i);
 			}
 		}
-		DB().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(m_PlayerOwner, newGuild), m_PlayerOwner->getId());
+		DB1().PushUpdateData("UPDATE `player` SET `newGuild` = %"I64_FMT"u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(m_PlayerOwner, newGuild), m_PlayerOwner->getId());
 		DB5().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` >= 111111 AND `taskId` <= 111133 AND `ownerId` = %"I64_FMT"u", m_PlayerOwner->getId());
 #endif
 	}
@@ -978,7 +978,7 @@ namespace GObject
 		dayTaskData->m_CurrDay = TimeUtil::SharpDay(0);
 		dayTaskData->m_FlushCount = 0;
 		m_DayTaskList.insert(std::make_pair(dayTaskId, dayTaskData));
-		DB().PushUpdateData("REPLACE INTO `day_task_instance` (`loopTask`, `count`, `maxCount`, `maxFlushQualityCount`, `preTaskId`, `preFlushTime`, `preTaskQuality`, `ownerId`, `currDay`, `flushCount`) VALUES(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %u)",		\
+		DB5().PushUpdateData("REPLACE INTO `day_task_instance` (`loopTask`, `count`, `maxCount`, `maxFlushQualityCount`, `preTaskId`, `preFlushTime`, `preTaskQuality`, `ownerId`, `currDay`, `flushCount`) VALUES(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %u)",		\
 			dayTaskData->m_LoopTaskId, dayTaskData->m_Count, dayTaskData->m_MaxCount, dayTaskData->m_MaxFlushQualityCount, dayTaskData->m_PreTaskId, dayTaskData->m_PreFlushTime, dayTaskData->m_PreTaskQuality, m_PlayerOwner->getId(), dayTaskData->m_CurrDay, dayTaskData->m_FlushCount);
 		return dayTaskData->m_Count;
 	}
@@ -1052,7 +1052,7 @@ namespace GObject
 			dayTaskData->m_FlushCount = 0;
 		}
 		dayTaskData->m_PreFlushTime = now;
-		DB().PushUpdateData("UPDATE `day_task_instance` SET `preTaskQuality` = %u, `preFlushTime` = %u, `flushCount` = %u WHERE `loopTask` = %u AND `ownerId` = %"I64_FMT"u", dayTaskData->m_PreTaskQuality, dayTaskData->m_PreFlushTime, dayTaskData->m_FlushCount, dayTaskId, m_PlayerOwner->getId());
+		DB5().PushUpdateData("UPDATE `day_task_instance` SET `preTaskQuality` = %u, `preFlushTime` = %u, `flushCount` = %u WHERE `loopTask` = %u AND `ownerId` = %"I64_FMT"u", dayTaskData->m_PreTaskQuality, dayTaskData->m_PreFlushTime, dayTaskData->m_FlushCount, dayTaskId, m_PlayerOwner->getId());
 		color = dayTaskData->m_PreTaskQuality;
 
 		return true;
@@ -1391,7 +1391,7 @@ namespace GObject
 			if (it->second->m_CurrDay != curr)
 			{
 				DelDayTask (it->second->m_LoopTaskId, notify);
-				DB().PushUpdateData("DELETE FROM `day_task_instance` WHERE `ownerId` = %"I64_FMT"u AND `loopTask` = %u", m_PlayerOwner->getId(), it->second->m_LoopTaskId);
+				DB5().PushUpdateData("DELETE FROM `day_task_instance` WHERE `ownerId` = %"I64_FMT"u AND `loopTask` = %u", m_PlayerOwner->getId(), it->second->m_LoopTaskId);
 				SAFE_DELETE(it->second);
 				m_DayTaskList.erase(it++);
 			}

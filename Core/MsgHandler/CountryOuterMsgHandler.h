@@ -2972,10 +2972,11 @@ void OnAthleticsDataReq( GameMsgHdr& hdr, AthleticsDataReq& )
 
 struct BlockBossReq
 {
-	MESSAGE_DEF(0xD5);
+	MESSAGE_DEF(REP::BLOCKBOSS);
 };
 void OnBlockBossReq( GameMsgHdr& hdr, BlockBossReq& )
 {
+    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	if(player->GetLev() < 30)
 		return;
@@ -2992,6 +2993,7 @@ struct AttackBlockBossReq
 
 void OnAttackBlockBossReq( GameMsgHdr& hdr, AttackBlockBossReq& )
 {
+    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	player->attackBlockBoss();
 }
@@ -3071,6 +3073,7 @@ void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
 
 void OnFighterTrainListReq( GameMsgHdr& hdr, FighterTrainListReq& )
 {
+    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	Stream st;
 	player->makeTrainFighterInfo(st);
@@ -3079,6 +3082,7 @@ void OnFighterTrainListReq( GameMsgHdr& hdr, FighterTrainListReq& )
 
 void OnFighterTrain2Req( GameMsgHdr& hdr, FighterTrain2Req& req )
 {
+    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
@@ -3087,6 +3091,7 @@ void OnFighterTrain2Req( GameMsgHdr& hdr, FighterTrain2Req& req )
 
 void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 {
+    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
@@ -3114,6 +3119,7 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 
 void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
 {
+    return; // TODO:
     MSG_QUERY_PLAYER(player);
     player->accPractice();
 }

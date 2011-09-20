@@ -44,7 +44,9 @@ public:
 	DB::DBWorker& GetDB3();
 	DB::DBWorker& GetDB4();
 	DB::DBWorker& GetDB5();
+	DB::DBWorker& GetDB6();
 	DB::DBWorker& GetDBLog();
+	DB::DBWorker& GetDBLog1();
 	Login::LoginWorker& GetLogin();
 
 	inline Network::TcpServerWrapper* GetTcpService() {return m_TcpService;}
@@ -75,8 +77,10 @@ public:
 #define DB3()			SERVER().GetDB3()
 #define DB4()			SERVER().GetDB4()
 #define DB5()			SERVER().GetDB5()
+#define DB6()			SERVER().GetDB6()
 #define DBLOG()			SERVER().GetDBLog()
-#define LOGIN()			SERVER().GetLogin()
+#define DBLOG1()		SERVER().GetDBLog1()
+#define LOGIN()			SERVE().GetLogin()
 
 #define CURRENT_THREAD_ID() WorkerThread<WorkerRunner<> >::LocalWorker().GetThreadID()
 

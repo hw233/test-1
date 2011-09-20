@@ -110,6 +110,7 @@ bool enum_midnight(void * ptr, void *)
 
     pl->buildClanTask();
     pl->clearFinishCount();
+    pl->setBuffData(PLAYER_BUFF_WBOSS, 0, true);
 	return true;
 }
 

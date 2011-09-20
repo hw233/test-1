@@ -265,7 +265,7 @@ bool Trade::launchTrade(std::string& name, const std::string& title, UInt32 coin
 	char escstrTitle[256]; 
 	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length());
 
-	DB().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d, %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \
+	DB1().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d, %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \
 		trade->_tradeStatus, tradePlayer->getId(), escstrTitle, trade->_tradeTime, coin, gold, trade->_strItems.c_str());
 /*
 	TRACE_LOG("LaunchTrade : id[%d] owner[%"I64_FMT"u : %s] tradeSide[%d] trader[%"I64_FMT"u : %s] tradeTitle[%s] tradeTime[%u] coin[%d] gold[%d] items[%s]", \
@@ -338,7 +338,7 @@ bool Trade::replyTrade(UInt32 id, UInt32 coin, UInt32 gold, std::vector<TradeIte
 			trade->_items.push_back(Package::BuildItem(items[i]._itemId, items[i]._itemNum));
 		}
 	}
-	DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s' WHERE `tradeId` = %u AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
+	DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s' WHERE `tradeId` = %u AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
 /*
 	TRACE_LOG("LaunchTrade : id[%d] owner[%"I64_FMT"u : %s] tradeSide[%d] trader[%"I64_FMT"u : %s] tradeTitle[%s] tradeTime[%u] coin[%d] gold[%d] items[%s]", \
 		trade->_id, _owner->getId(), _owner->getName().c_str(), trade->_tradeSide, trade->_tradePlayer->getId(), trade->_tradePlayer->getName().c_str(),  trade->_tradeTitle.c_str(), trade->_tradeTime, coin, gold, trade->_strItems.c_str());
@@ -405,7 +405,7 @@ void Trade::cancelTrade(UInt32 id)
 			trade->_strItems.clear();
 			trade->_tradeStatus = static_cast<UInt8>(trade->_tradeSide == 0 ? TRADE_SELFCANCEL : TRADE_PEERCANCEL);
 		}
-		DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
+		DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
 
 		operateTradeNotify(trade->_id, trade->_tradeStatus);
 		delTradeTimeoutNotify(trade->_id, trade->_tradeTime);
@@ -444,7 +444,7 @@ void Trade::cancel2Trade(UInt32 id)
 		trade->_tradeStatus = static_cast<UInt8>(TRADE_TIMEOUT);
 	}
 	operateTradeNotify(trade->_id, trade->_tradeStatus);
-	DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
+	DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
 }
 
 void Trade::deleteTrade(UInt32 id)
@@ -466,7 +466,7 @@ void Trade::deleteTrade(UInt32 id)
 					continue;
 				if (IsEquipId(item->getId()))
 				{
-					DB3().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", item->getId());
+					DB4().PushUpdateData("DELETE FROM `equipment` WHERE `id` = %u", item->getId());
 					if(item->getQuality() >= 4)
 						DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, _owner->getId(), item->GetItemType().getId(), item->getId(), ToDelete, TimeUtil::Now());
 				}
@@ -476,7 +476,7 @@ void Trade::deleteTrade(UInt32 id)
 		SAFE_DELETE(trade);
 		_tradeDatas.erase(found);
 		operateTradeNotify(id, TRADE_NONE);
-		DB().PushUpdateData("DELETE FROM `trade` WHERE `tradeId` = %u AND `ownerId` = %"I64_FMT"u", id, _owner->getId());
+		DB1().PushUpdateData("DELETE FROM `trade` WHERE `tradeId` = %u AND `ownerId` = %"I64_FMT"u", id, _owner->getId());
 	}
 }
 
@@ -496,7 +496,7 @@ bool Trade::recvLaunchTrade(UInt32 id, const std::string& title, UInt32 time, Pl
 	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length());
 
 
-	DB().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d,  %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \
+	DB1().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d,  %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \
 		trade->_tradeStatus, launcher->getId(), escstrTitle, trade->_tradeTime, 0, 0, "");
 	launchTradeNotify(id, launcher->getName(), title, trade->_tradeStatus, time);
 	addTradeTimeoutNotify(trade->_id, trade->_tradeTime);
@@ -514,7 +514,7 @@ bool Trade::recvReplyTrade(UInt32 id)
 		return false;
 	trade->_tradeStatus = static_cast<UInt8>(TRADE_CONFIRM);
 
-	DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, id, _owner->getId());
+	DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, id, _owner->getId());
 	operateTradeNotify(id, trade->_tradeStatus);
 
 	return true;
@@ -567,7 +567,7 @@ bool Trade::recvConfirmTrade(UInt32 id, UInt32 coin, UInt32 gold, ItemBase** ite
 		}
 		trade->_coin = trade->_gold = 0;
 		operateTradeNotify(id, trade->_tradeStatus);
-		DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
+		DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
 		return true;
 	}
 	else if (trade->_tradeStatus == static_cast<UInt8>(TRADE_CONFIRMED))
@@ -591,7 +591,7 @@ bool Trade::recvConfirmTrade(UInt32 id, UInt32 coin, UInt32 gold, ItemBase** ite
 		}
 		trade->_coin = trade->_gold = 0;
 		operateTradeNotify(id, trade->_tradeStatus);
-		DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s'  WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
+		DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `coin` = %u, `gold` = %u, `items` = '%s'  WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, coin, gold, trade->_strItems.c_str(), trade->_id, _owner->getId());
 		return true;
 	}
 	return false;
@@ -620,7 +620,7 @@ bool Trade::recvCancelTrade(UInt32 id)
 		trade->_tradeStatus = static_cast<UInt8>(trade->_tradeSide == 0 ? TRADE_SELFCANCEL : TRADE_PEERCANCEL);
 	}
 	operateTradeNotify(id, trade->_tradeStatus);
-	DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
+	DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s' WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
 
 	return true;
 }
@@ -692,7 +692,7 @@ bool Trade::addTradeMailItems(UInt32 id)
 			else
 				trade->_tradeStatus = static_cast<UInt8>(TRADE_PACKFULLFAIL);
 			operateTradeNotify(id, trade->_tradeStatus);
-			DB().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s'  WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
+			DB1().PushUpdateData("UPDATE `trade` SET `tradeStatus` = %d, `items` = '%s'  WHERE `tradeId` = %d AND `ownerId` = %"I64_FMT"u", trade->_tradeStatus, trade->_strItems.c_str(), trade->_id, _owner->getId());
 			return true;
 		}
 	}

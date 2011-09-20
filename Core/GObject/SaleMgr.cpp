@@ -152,7 +152,7 @@ void SaleMgr::sellSale(Player * player, SalePut * salePuts, UInt8 count)
 		saleSellRespDatas[i].price = sale->_price;
 		const std::string& itemName = sale->_item->getName();
 		memcpy(saleSellRespDatas[i].itemName, itemName.c_str(), std::min(sizeof(saleSellRespDatas[i].itemName)-1, itemName.length()));
-		DB().PushUpdateData("INSERT INTO `sale` VALUES (%u,  %"I64_FMT"u, %d, %u, %d, %u, %u, %u)", sale->_id, sale->_owner->getId(), sale->_status, sale->_time, sale->_priceType, sale->_price, sale->_item->getId(), sale->_item->Count());
+		DB4().PushUpdateData("INSERT INTO `sale` VALUES (%u,  %"I64_FMT"u, %d, %u, %d, %u, %u, %u)", sale->_id, sale->_owner->getId(), sale->_status, sale->_time, sale->_priceType, sale->_price, sale->_item->getId(), sale->_item->Count());
 		_saleCheck.insert(std::make_pair(sale->_time, sale->_pos));
 		std::string comboItemId;
 		if(sale->_item->getId()>30000)
@@ -214,7 +214,7 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 			delSaleCheck(sale);
 			_salePos.erase(sale->_id);
 
-			DB().PushUpdateData("UPDATE `sale` SET `ownerId` = %"I64_FMT"u, `status` = %d WHERE `saleId` = %u", player->getId(), static_cast<UInt8>(SALE_BUY), sale->_id);
+			DB4().PushUpdateData("UPDATE `sale` SET `ownerId` = %"I64_FMT"u, `status` = %d WHERE `saleId` = %u", player->getId(), static_cast<UInt8>(SALE_BUY), sale->_id);
 			DBLOG().PushUpdateData("update sales set purchaser=%"I64_FMT"u,purchase_time=%u where sale_id=%u and server_id=%u", player->getId(), TimeUtil::Now(), sale->_id, cfg.serverLogId);
 			if(IsEquipId(sale->_item->getId()))
 			{
@@ -272,7 +272,7 @@ void SaleMgr::cancelSale(Player * player, UInt32 id)
 		return;
 	_sales[found->second] = NULL;
 	setNextIndex(found->second);
-	DB().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_CANCEL), id);
+	DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_CANCEL), id);
 	DBLOG().PushUpdateData("update sales set is_cancel=1 where sale_id=%u and server_id=%u", id, cfg.serverLogId);
 	SaleItemCancel saleItemCancel;
 	saleItemCancel.status = static_cast<UInt8>(SALE_CANCEL);
@@ -732,7 +732,7 @@ void SaleMgr::update(UInt32 curr)
 			sale = _sales[it->second];
 			_sales[it->second] = NULL;
 			setNextIndex(it->second);
-			DB().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_TIMEOUT), sale->_id);
+			DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_TIMEOUT), sale->_id);
 			DBLOG().PushUpdateData("update sales set is_cancel=1 where sale_id=%u and server_id=%u", sale->_id, cfg.serverLogId);
 			SaleItemCancel saleItemTimeout;
 			saleItemTimeout.status = static_cast<UInt8>(SALE_TIMEOUT);

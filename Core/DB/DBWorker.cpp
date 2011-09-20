@@ -159,6 +159,10 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
     {
     }
 
+    if (m_Worker == WORKER_THREAD_DB6) // 
+    {
+    }
+
     ++m_Limit;
 
 	if(m_Type == 1 && cfg.serverLogId == 0)

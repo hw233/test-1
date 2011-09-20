@@ -423,7 +423,7 @@ void ClanDynamicMsg::cleanClanDynamicMsg()
 	}
 	ClanBattleReportElems::iterator deletedStart = _cbrElem.find(deletedDay);
 	_cbrElem.erase(deletedStart, _cbrElem.end());
-	DB().PushUpdateData("DELETE FROM `clan_battle_result` WHERE `battleTime` < %u", deletedDay);
+	DB5().PushUpdateData("DELETE FROM `clan_battle_result` WHERE `battleTime` < %u", deletedDay);
 }
 	
 

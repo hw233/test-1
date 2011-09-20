@@ -106,7 +106,7 @@ void AthleticsRank::updateBatchRanker(UInt8 row, Rank rank1, Rank rank2)
 	for (; begin != end; ++begin)
 	{
 		++ (*begin)->rank;
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", (*begin)->rank, (*begin)->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", (*begin)->rank, (*begin)->ranker->getId());
 	}
 }
 
@@ -140,12 +140,12 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 			data->row = row;
 			_athleticses[0].erase(found->second);
 			_ranks[0].erase(player);
-			DB().PushUpdateData("DELETE FROM `athletics_rank` WHERE `ranker` = %"I64_FMT"u", data->ranker->getId());
+			DB6().PushUpdateData("DELETE FROM `athletics_rank` WHERE `ranker` = %"I64_FMT"u", data->ranker->getId());
 			_ranks[1][player] = _athleticses[1].insert(_athleticses[1].end(), data);;
 			data->rank = ++_maxRank[1];
             data->oldrank = data->rank;
 			data->maxrank = _athleticses[1].size();
-            DB().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->prestige, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
+            DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->prestige, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
 		}
 	}
 	if (data == NULL)
@@ -170,7 +170,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 		_ranks[row][player] = rank;
 		data->maxrank = _athleticses[row].size();
 		BuildNewBox(rank);
-        DB().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->prestige, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
+        DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->prestige, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
 		GameMsgHdr hdr(0x216, player->getThreadId(), player, 0);
 		GLOBAL().PushMsg(hdr, NULL);
 	}
@@ -482,7 +482,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
                 setAthleticsExtraChallenge(atker, 0);
                 (*atkerRank->second)->oldrank = (*atkerRank->second)->rank;
                 (*atkerRank->second)->first4rank &= 0xFFFFB0FF;
-                DB().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*atkerRank->second)->oldrank, (*atkerRank->second)->first4rank, (*atkerRank->second)->ranker->getId());
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*atkerRank->second)->oldrank, (*atkerRank->second)->first4rank, (*atkerRank->second)->ranker->getId());
             }
             else
             {
@@ -572,7 +572,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
             challengeBuff=data->challengetime + 5 * 60;
 
         atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
-        DB().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
     }
 
 	atker->addGlobalFlag(Player::Challenging);
@@ -625,8 +625,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 
 		data->winstreak = 0;
         deferdata->befailstreak = 0;
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = 0, `failstreak` = %u WHERE `ranker` = %"I64_FMT"u", data->failstreak, data->ranker->getId());
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `bewinstreak` = %u WHERE `ranker` = %"I64_FMT"u", data->bewinstreak, deferdata->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = 0, `failstreak` = %u WHERE `ranker` = %"I64_FMT"u", data->failstreak, data->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `bewinstreak` = %u WHERE `ranker` = %"I64_FMT"u", data->bewinstreak, deferdata->ranker->getId());
 		if (getRankPos(row, deferRank->second) == 1)
 		{
 			SYSMSG_BROADCASTV(324, deferdata->ranker->getName().c_str());
@@ -684,15 +684,15 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 		deferdata->bewinstreak = 0;
         data->failstreak = 0;
 
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = 0, `befailstreak` = %u WHERE `ranker` = %"I64_FMT"u", deferdata->befailstreak, deferdata->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = 0, `befailstreak` = %u WHERE `ranker` = %"I64_FMT"u", deferdata->befailstreak, deferdata->ranker->getId());
 		
 		if(atkerRankPos != 1)
         {
-			DB().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u, `maxRank` = %u, `winStreak` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, data->maxrank, data->winstreak, data->ranker->getId());
+			DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u, `maxRank` = %u, `winStreak` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, data->maxrank, data->winstreak, data->ranker->getId());
         }
 		else
 		{
-			DB().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = %u WHERE `ranker` = %"I64_FMT"u", data->winstreak, data->ranker->getId());
+			DB6().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = %u WHERE `ranker` = %"I64_FMT"u", data->winstreak, data->ranker->getId());
 		}
 
 #if 0
@@ -700,8 +700,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 		{
 			type = deferdata->awardType;
 			BuildNewBox(deferRank->second);
-			DB().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, boxFlushTime = %u WHERE `ranker` = %"I64_FMT"u", deferdata->boxcolor, deferdata->awardType, deferdata->awardCount, deferdata->boxflushtime, deferdata->ranker->getId());
-			DB().PushUpdateData("UPDATE `athletics_record` SET `awardType` = %u, `awardAtkerCount` = %u WHERE `id` = %u", type, atkerAward, id);
+			DB6().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, boxFlushTime = %u WHERE `ranker` = %"I64_FMT"u", deferdata->boxcolor, deferdata->awardType, deferdata->awardCount, deferdata->boxflushtime, deferdata->ranker->getId());
+			DB6().PushUpdateData("UPDATE `athletics_record` SET `awardType` = %u, `awardAtkerCount` = %u WHERE `id` = %u", type, atkerAward, id);
 		}
 #endif
 	}
@@ -812,7 +812,7 @@ void AthleticsRank::GetBoxSourceReq(Player *owner)
 	Stream st(REP::GETBOX);
 	st << data->boxcolor << data->awardType << data->awardCount << GetOutTimebyColor(data->boxcolor) << Stream::eos;
 	owner->send(st);
-	DB().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, boxFlushTime = %u WHERE `ranker` = %"I64_FMT"u", data->boxcolor, data->awardType, data->awardCount, data->boxflushtime, data->ranker->getId());
+	DB6().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, boxFlushTime = %u WHERE `ranker` = %"I64_FMT"u", data->boxcolor, data->awardType, data->awardCount, data->boxflushtime, data->ranker->getId());
 #endif
 }
 
@@ -845,7 +845,7 @@ bool AthleticsRank::updateBoxTimeoutAward(Rank rank, UInt8 row, UInt32 now)
 		}
 
 		BuildNewBox(rank);
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, `boxFlushTime` = %u WHERE `ranker` = %"I64_FMT"u", data->boxcolor, data->awardType, data->awardCount, data->boxflushtime, data->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `boxColor` = %u, `boxType` = %u, `boxCount` = %u, `boxFlushTime` = %u WHERE `ranker` = %"I64_FMT"u", data->boxcolor, data->awardType, data->awardCount, data->boxflushtime, data->ranker->getId());
 
 		return true;
 	}
@@ -1121,7 +1121,7 @@ UInt32 AthleticsRank::getAthleticsRankUpADay(Player* player)
     {
         (*found->second)->oldrank = (*found->second)->rank;
         (*found->second)->first4rank &= 0xFFFFB0FF;
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->oldrank, (*found->second)->first4rank, (*found->second)->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->oldrank, (*found->second)->first4rank, (*found->second)->ranker->getId());
     }
 
     if((*found->second)->oldrank > (*found->second)->rank)
@@ -1255,12 +1255,12 @@ UInt32 AthleticsRank::addAthleticsEventData(UInt8 row, Player* player1, Player* 
 	if (_athleticsesEvent[row].size() >= 15)
 	{
 		AthleticsEventData * del = _athleticsesEvent[row].front();
-        DB().PushUpdateData("DELETE FROM `athletics_event` WHERE `id` = %u", del->id);
+        DB6().PushUpdateData("DELETE FROM `athletics_event` WHERE `id` = %u", del->id);
 		SAFE_DELETE(del);
 		_athleticsesEvent[row].pop_front();
 	}
 	_athleticsesEvent[row].push_back(data);
-	DB().PushUpdateData("INSERT INTO `athletics_event` (`id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time`) VALUES(%u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u)", data->id, row, player1 ? player1->getId() : 0, player2 ? player2->getId() : 0, data->cond, data->color, data->value, data->itemCount, data->itemId, data->time);
+	DB6().PushUpdateData("INSERT INTO `athletics_event` (`id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time`) VALUES(%u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u)", data->id, row, player1 ? player1->getId() : 0, player2 ? player2->getId() : 0, data->cond, data->color, data->value, data->itemCount, data->itemId, data->time);
 
     broadcastAthleticsEvent(15);
 
@@ -1277,7 +1277,7 @@ UInt32 AthleticsRank::setAthleticsPrestige(Player* player, UInt32 prestige)
 		return 0;
 
     (*found->second)->prestige = prestige;
-    DB().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->prestige, (*found->second)->ranker->getId());
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->prestige, (*found->second)->ranker->getId());
 
     Stream st(REP::USER_INFO_CHANGE);
     st << static_cast<UInt8>(0x55) << prestige << Stream::eos;
@@ -1303,7 +1303,7 @@ UInt32 AthleticsRank::getAthleticsFirst4Rank(Player* player, UInt32 first4rank)
 	if (TimeUtil::SharpDay(0, (*found->second)->challengetime) != WORLD().ThisDay())
     {
         (*found->second)->first4rank &= 0xFFFFB0FF;
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->first4rank, (*found->second)->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->first4rank, (*found->second)->ranker->getId());
     }
 
 	return (*found->second)->first4rank & first4rank;
@@ -1319,7 +1319,7 @@ UInt32 AthleticsRank::setAthleticsFirst4Rank(Player* player, UInt32 first4rank)
 		return 0;
 
 	(*found->second)->first4rank |= first4rank;
-    DB().PushUpdateData("UPDATE `athletics_rank` SET `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->first4rank, (*found->second)->ranker->getId());
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `first4rank` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->first4rank, (*found->second)->ranker->getId());
 
 	return (*found->second)->first4rank;
 }
@@ -1356,7 +1356,7 @@ UInt32 AthleticsRank::setAthleticsExtraChallenge(Player* player, UInt32 extracha
 
 
     (*found->second)->extrachallenge = extrachallenge;
-    DB().PushUpdateData("UPDATE `athletics_rank` SET `extrachallenge` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->extrachallenge, (*found->second)->ranker->getId());
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `extrachallenge` = %u WHERE `ranker` = %"I64_FMT"u", (*found->second)->extrachallenge, (*found->second)->ranker->getId());
 
     if(extrachallenge && !(static_cast<UInt32>(0x80000000) & extrachallenge))
     {
@@ -1741,7 +1741,7 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
         data->extrachallenge = 0;
         data->oldrank = data->rank;
         data->first4rank &= 0xFFFFB0FF;
-		DB().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u, `extrachallenge` = %u WHERE `ranker` = %"I64_FMT"u", data->oldrank, data->first4rank, data->extrachallenge, data->ranker->getId());
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `oldrank` = %u, `first4rank` = %u, `extrachallenge` = %u WHERE `ranker` = %"I64_FMT"u", data->oldrank, data->first4rank, data->extrachallenge, data->ranker->getId());
     }
 
     data->challengetime = TimeUtil::Now();

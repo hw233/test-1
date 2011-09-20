@@ -97,7 +97,11 @@ namespace GObject
     {
         UInt8 level = getLevel(now);
         if (!level)
+        {
+            if (!m_boss.size())
+                reset();
             return;
+        }
 
         if (level == m_level)
             return;
@@ -187,15 +191,10 @@ namespace GObject
                 {
                     if (pl->getVipLevel() >= 2)
                     {
+
                         if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
                         {
                             pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
-                            pl->setBuffData(PLAYER_BUFF_WBOSSID, i->second.level, true);
-                            vip = true;
-                        }
-                        else if (pl->getBuffData(PLAYER_BUFF_WBOSSID) != i->second.level)
-                        {
-                            pl->setBuffData(PLAYER_BUFF_WBOSSID, i->second.level, true);
                             vip = true;
                         }
                         else
@@ -216,7 +215,7 @@ namespace GObject
                     if (!vip)
                     {
                         ++i->second.count;
-                        DB().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
+                        DB5().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
 
                         if (i->second.count < count)
                         {
@@ -267,7 +266,7 @@ namespace GObject
 
         m_level = 0;
         m_boss.clear();
-        DB().PushUpdateData("DELETE FROM `worldboss`");
+        DB5().PushUpdateData("DELETE FROM `worldboss`");
     }
 
     void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool show, bool msg)
@@ -309,7 +308,7 @@ namespace GObject
                         SYSMSG_BROADCASTV(549, loc);
                     }
                 }
-                DB().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, count);
+                DB5().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, count);
             }
 
             WBoss wb;

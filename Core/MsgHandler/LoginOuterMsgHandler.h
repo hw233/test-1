@@ -26,9 +26,48 @@
 #include "Common/SHA1Engine.h"
 #include "Common/StringTokenizer.h"
 #include "GData/Formation.h"
+#include "GData/ExpTable.h"
 #include <libmemcached/memcached.h>
 
 static memcached_st* memc = NULL;
+
+static bool initMemcache()
+{
+    bool hasServer = false;
+    if (!memc)
+    {
+        memcached_return rc;
+        memc = memcached_create(NULL);
+
+        size_t sz = cfg.tokenServer.size();
+        for (size_t i = 0; i < sz; ++i)
+        {
+            memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
+            if (rc != MEMCACHED_SUCCESS)
+            {
+                if (!hasServer)
+                {
+                    memcached_free(memc);
+                    memc = NULL;
+                    return false;
+                }
+                else
+                {
+                    //err += "can not connect to token server ";
+                    //err += cfg.tokenServer[i].ip;
+                }
+            }
+            else
+            {
+                rc = memcached_server_push(memc, servers);
+                memcached_server_free(servers);
+                hasServer = true;
+            }
+        }
+    }
+    return hasServer;
+}
+
 __attribute__((destructor)) static void uninitMemcache()
 {
     if (memc)
@@ -479,49 +518,21 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     UInt64 player_Id;
     UInt16 id;
     UInt32 num;
+    std::string uint;
+    std::string money;
 
     brd>>token;
     brd>>no;
     brd>>player_Id;
     brd>>id;
     brd>>num;
+    brd>>uint;
+    brd>>money;
 
     UInt8 ret = 1;
     std::string err = "";
 
-    if (!memc)
-    {
-        memcached_return rc;
-        memc = memcached_create(NULL);
-
-        bool hasServer = false;
-        size_t sz = cfg.tokenServer.size();
-        for (size_t i = 0; i < sz; ++i)
-        {
-            memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
-            if (rc != MEMCACHED_SUCCESS)
-            {
-                if (!hasServer)
-                {
-                    memcached_free(memc);
-                    memc = NULL;
-                    err += "can not connect to token server.";
-                }
-                else
-                {
-                    //err += "can not connect to token server ";
-                    //err += cfg.tokenServer[i].ip;
-                }
-            }
-            else
-            {
-                rc = memcached_server_push(memc, servers);
-                memcached_server_free(servers);
-                hasServer = true;
-            }
-        }
-    }
-
+    initMemcache();
     if (memc)
     {
         size_t len = 0;
@@ -554,6 +565,12 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 //err += "delete key error.";
             }
         }
+
+        if (err.length())
+        {
+            uninitMemcache();
+            initMemcache();
+        }
     }
     else
         err += "token server error.";
@@ -581,12 +598,16 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                     UInt8 type;
                     UInt32 gold;
                     char no[256];
+                    char uint[32];
+                    char money[32];
                 } recharge;
 
                 memset(&recharge, 0x00, sizeof(recharge));
                 recharge.type = 0; // 有角色时充值
                 recharge.gold = 10 * num;
                 memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
+                memcpy(recharge.uint, uint.c_str(), uint.length()>31?31:uint.length());
+                memcpy(recharge.money, money.c_str(), money.length()>31?31:money.length());
 
                 GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
                 GLOBAL().PushMsg(hdr, &recharge);
@@ -993,6 +1014,31 @@ void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 	st<<SERVER().GetTcpService()->getOnlineNum();
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::SETLEVEL,0x01);
+    UInt64 id;
+    UInt8 level;
+    br>>id;
+    br>>level;
+
+    UInt8 ret = 0;
+    GObject::Player * pl = GObject::globalPlayers[id];
+    if (pl)
+    {
+        if (level > LEVEL_MAX)
+            level = LEVEL_MAX;
+        UInt64 exp = GData::expTable.getLevelMin(level);
+        pl->setLevelAndExp(level, exp);
+        ret = 1;
+    }
+
+    st << ret << Stream::eos;
+    NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

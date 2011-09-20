@@ -147,7 +147,7 @@ void MailPackageManager::push(UInt32 id, UInt16 itemId, UInt32 cnt, bool isbind)
 	else if(isbind)
 		cnt |= 0x1000;
 	UInt16 newCount = _packages[id].push(itemId, cnt);
-	DB().PushUpdateData("REPLACE INTO `mail_package`(`id`, `itemId`, `itemCount`) VALUES(%u, %u, %u)", id, itemId, newCount);
+	DB1().PushUpdateData("REPLACE INTO `mail_package`(`id`, `itemId`, `itemCount`) VALUES(%u, %u, %u)", id, itemId, newCount);
 }
 
 void MailPackageManager::push(UInt32 id, MailPackage::MailItem * items, UInt32 count, bool isbind)
@@ -168,7 +168,7 @@ void MailPackageManager::push(UInt32 id, MailPackage::MailItem * items, UInt32 c
 		else if(isbind)
 			cnt |= 0x1000;
 		UInt16 newCount = package.push(iid, cnt);
-		DB().PushUpdateData("REPLACE INTO `mail_package`(`id`, `itemId`, `itemCount`) VALUES(%u, %u, %u)", id, iid, newCount);
+		DB1().PushUpdateData("REPLACE INTO `mail_package`(`id`, `itemId`, `itemCount`) VALUES(%u, %u, %u)", id, iid, newCount);
 	}
 }
 
@@ -187,7 +187,7 @@ void MailPackageManager::remove( UInt32 id )
 	std::map<UInt32, MailPackage>::iterator it = _packages.find(id);
 	if(it == _packages.end())
 		return;
-	DB().PushUpdateData("DELETE FROM `mail_package` WHERE `id` = %u", id);
+	DB1().PushUpdateData("DELETE FROM `mail_package` WHERE `id` = %u", id);
 	_packages.erase(id);
 }
 
@@ -221,7 +221,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 		char title2[256], content2[8192];
 		mysql_escape_string(title2, title.c_str(), title.length()>256?255:title.length());
 		mysql_escape_string(content2, content.c_str(), content.length()>4096?4095:content.length());
-		DB().PushUpdateData("INSERT INTO `mail` (`mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId`) VALUES (%u, %"I64_FMT"u, '%s', %u, %u, '%s', '%s', %u)", mail->id, ((_owner != NULL) ? _owner->getId() : static_cast<UInt64>(0)), mail->sender.c_str(), mail->recvTime, mail->flag, title2, content2, mail->additional);
+		DB1().PushUpdateData("INSERT INTO `mail` (`mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId`) VALUES (%u, %"I64_FMT"u, '%s', %u, %u, '%s', '%s', %u)", mail->id, ((_owner != NULL) ? _owner->getId() : static_cast<UInt64>(0)), mail->sender.c_str(), mail->recvTime, mail->flag, title2, content2, mail->additional);
 	}
 	if(itemsInfo != NULL)
 	{
@@ -360,7 +360,7 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 	}
 
 	_mailBox.erase(it);
-	DB().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
+	DB1().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
 	DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 2, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, id);
 
 
@@ -392,7 +392,7 @@ void MailBox::readMail( UInt32 id )
 			-- _newMails;
 			// XXX: notifyNewMail();
 		}
-		DB().PushUpdateData("UPDATE `mail` SET `flag` = %u WHERE `mailId` = %u", mail->flag, id);
+		DB1().PushUpdateData("UPDATE `mail` SET `flag` = %u WHERE `mailId` = %u", mail->flag, id);
 	}
 	Stream st(REP::MAIL_CONTENTS);
 	st << id << mail->content << mail->additional;
@@ -770,7 +770,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 		_owner->send(st);
 
 		_mailBox.erase(it);
-		DB().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
+		DB1().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
 		SAFE_DELETE(mail);
 	}
 }
@@ -843,7 +843,7 @@ void MailBox::updateMail( Mail * mail )
 	char title2[256], content2[8192];
 	mysql_escape_string(title2, mail->title.c_str(), mail->title.length()>256?256:mail->title.length());
 	mysql_escape_string(content2, mail->content.c_str(), mail->content.length()>4096?4095:mail->content.length());
-	DB().PushUpdateData("UPDATE `mail` SET `flag` = %u, `title` = '%s', `content` = '%s', `additionalId` = %u WHERE `mailId` = %u", mail->flag, title2, content2, mail->additional, mail->id);
+	DB1().PushUpdateData("UPDATE `mail` SET `flag` = %u, `title` = '%s', `content` = '%s', `additionalId` = %u WHERE `mailId` = %u", mail->flag, title2, content2, mail->additional, mail->id);
 }
 
 void MailBox::notifyNewMail()

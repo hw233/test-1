@@ -1574,7 +1574,7 @@ namespace GObject
 			ret2 = defer->GetAthletics()->addAthleticsDataFromDB(drd.id, 1, atker, drd.winSide, drd.repid, drd.time);
 			if (!ret1 && !ret2)
 			{
-				DB().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", drd.id);
+				DB1().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", drd.id);
 			}
 		}
 		lc.finalize();
@@ -1780,10 +1780,10 @@ namespace GObject
 					if(checkTime > trainTime)
 						checkTime = trainTime;
 					pl->addTrainFighterFromDB(dbft.fighterId, dbft.priceType, dbft.price, trainTime, checkTime, dbft.accExp);
-					DB().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", dbft.fighterId, dbft.ownerId, dbft.priceType, dbft.price, trainTime, checkTime);
+					DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", dbft.fighterId, dbft.ownerId, dbft.priceType, dbft.price, trainTime, checkTime);
 				}
 				else
-					DB().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", dbft.fighterId, dbft.ownerId);
+					DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", dbft.fighterId, dbft.ownerId);
 			}
 			else
 				pl->addTrainFighterFromDB(dbft.fighterId, dbft.priceType, dbft.price, dbft.trainTime, dbft.checkTime, dbft.accExp);
@@ -2131,12 +2131,12 @@ namespace GObject
 				if (!clanManager.validClanBattleTime(cl.battleTime))
 				{
 					cl.battleTime = 25;
-					DB().PushUpdateData("UPDATE `clan` SET `battleTime` = 25 WHERE `id` = %u", cl.id);
+					DB5().PushUpdateData("UPDATE `clan` SET `battleTime` = 25 WHERE `id` = %u", cl.id);
 				}
 				if (!clanManager.validClanBattleTime(cl.nextBattleTime))
 				{
 					cl.battleTime = 25;
-					DB().PushUpdateData("UPDATE `clan` SET `nextBattleTime` = 25 WHERE `id` = %u", cl.id);
+					DB5().PushUpdateData("UPDATE `clan` SET `nextBattleTime` = 25 WHERE `id` = %u", cl.id);
 				}
 				clanBattle->setBattleTime(cl.battleTime);
 				clanBattle->setNextBattleTime(cl.nextBattleTime);
@@ -2204,7 +2204,7 @@ namespace GObject
 			cm->cls = cp.cls;
 			if (thisDay != cp.thisDay)
 			{
-				DB().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
+				DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());
 				cm->enterCount = 0;
 			}
 			else
@@ -2314,7 +2314,7 @@ namespace GObject
 				clan = globalClans[ddr.clanId];
 			if (clan == NULL)
 			{
-				DB().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u", ddr.clanId);
+				DB5().PushUpdateData("DELETE FROM `clan_donate_record` WHERE `clanId` = %u", ddr.clanId);
 				continue;
 			}
 			clan->addClanDonateRecordFromDB(ddr.doanteName, ddr.techId, ddr.donateCount, ddr.donateTime);
@@ -2344,7 +2344,7 @@ namespace GObject
 				clan = globalClans[dbr.id];
 				if (clan == NULL)
 				{
-					DB().PushUpdateData("DELETE FROM `clan_battle_result` WHERE `id` = %u", dbr.id);
+					DB5().PushUpdateData("DELETE FROM `clan_battle_result` WHERE `id` = %u", dbr.id);
 					continue;
 				}
 				clanBattle = clan->getClanBattle();
@@ -2377,7 +2377,7 @@ namespace GObject
 			}
 			if (clan == NULL && clanBattle == NULL)
 			{
-				DB().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
+				DB5().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
 				continue;
 			}
 			if (clan != NULL)
@@ -2385,7 +2385,7 @@ namespace GObject
 			Player * pl = globalPlayers[cb.battler];
 			if (pl == NULL || pl->getClan() == NULL)
 			{
-				DB().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
+				DB5().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
 				continue;
 			}
 			if (clan != NULL)
@@ -2414,7 +2414,7 @@ namespace GObject
 			if (!clanBattle->resumePlayerToClanBattle(cbp, now))
 			{
 				delete cbp;
-				DB().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
+				DB5().PushUpdateData("DELETE FROM `clan_battler` WHERE `id` = %u", cb.id);
 				continue;	
 			}
 		}

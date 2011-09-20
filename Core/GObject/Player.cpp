@@ -190,12 +190,12 @@ namespace GObject
 		if(count > 0)
 		{
 			if(isNew)
-				DB().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
+				DB1().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
 			else
 				DB().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
 		}
 		else
-			DB().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
+			DB1().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
 	}
 
 	bool EventFighterTrain::Equal(UInt32 id, size_t fgtId) const
@@ -1763,7 +1763,7 @@ namespace GObject
 		Stream st(REP::TASK_RESPONSE_HOOK);
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (getMaxIcCount(_vipLevel) - getIcCount()) << Stream::eos;
 		send(st);
-		DB().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
+		DB1().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
 		delFlag(Training);
 	}
 
@@ -1967,7 +1967,7 @@ namespace GObject
 			SYSMSG_SEND(132, this);
 			SYSMSG_SENDV(1032, this, pl->getCountry(), pl->getName().c_str());
 			if(writedb)
-				DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 0, %"I64_FMT"u)", getId(), pl->getId());
+				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 0, %"I64_FMT"u)", getId(), pl->getId());
 		}
 		_friends[0].insert(pl);
 	}
@@ -1992,7 +1992,7 @@ namespace GObject
 		SYSMSG_SEND(134, this);
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
-			DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 0 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 0 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
 	}
 
 	Player * Player::_findFriend( UInt8 type, std::string& name )
@@ -2035,7 +2035,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x03) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
-		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 1, %"I64_FMT"u)", getId(), pl->getId());
+		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 1, %"I64_FMT"u)", getId(), pl->getId());
 		SYSMSG_SEND(135, this);
 		SYSMSG_SENDV(1035, this, pl->getCountry(), pl->getName().c_str());
 
@@ -2061,7 +2061,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x04) << pl->getName() << Stream::eos;
 		send(st);
-		DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 1 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+		DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 1 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
 		return true;
 	}
 
@@ -2079,7 +2079,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 		send(st);
-		DB().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
+		DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 2, %"I64_FMT"u)", getId(), pl->getId());
 		//SYSMSG_SEND(157, this);
 		//SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
 
@@ -2112,7 +2112,7 @@ namespace GObject
 		Stream st(REP::FRIEND_ACTION);
 		st << static_cast<UInt8>(0x06) << pl->getName() << Stream::eos;
 		send(st);
-		DB().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 2 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+		DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 2 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
 		return true;
 	}
 
@@ -2576,7 +2576,7 @@ namespace GObject
 		}
 		delete data;
 		_trainFighters.erase(id);
-		DB().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
+		DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
 		Stream st(REP::TRAIN_FIGHTER_OP);
 		st << id << static_cast<UInt8>(2) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
@@ -2635,7 +2635,7 @@ namespace GObject
 		data->price = price;
 		data->priceType = priceType;
 		data->trainend = TimeUtil::Now() + 60 * data->checktime;
-		DB().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", id, getId(), priceType, price, data->traintime, data->checktime);
+		DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", id, getId(), priceType, price, data->traintime, data->checktime);
 		removeFighterFromLineup(id);
 		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 60, data->checktime, fgt, data->trainend);
 		if (event == NULL) return false;
@@ -4956,7 +4956,7 @@ namespace GObject
 		_exchangeTicketCount = cnt;
 		if(writedb)
 		{
-			DB().PushUpdateData("REPLACE INTO `exchange_ticket` VALUES(%"I64_FMT"u, %u)", getId(), _exchangeTicketCount);
+			DB1().PushUpdateData("REPLACE INTO `exchange_ticket` VALUES(%"I64_FMT"u, %u)", getId(), _exchangeTicketCount);
 			DBLOG().PushUpdateData("replace into `exchange_ticket` VALUES(%u, %"I64_FMT"u, %u)", cfg.serverLogId, getId(), _exchangeTicketCount);
 		}
 	}
@@ -5340,7 +5340,7 @@ namespace GObject
 		char answerTmp[256];
 		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length());
 		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length());
-		DB().PushUpdateData("INSERT INTO `pass_word` VALUES(%"I64_FMT"u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
+		DB1().PushUpdateData("INSERT INTO `pass_word` VALUES(%"I64_FMT"u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
 		Stream st;
 		makeSenconPWDInfo(st);
 		send(st);
@@ -5355,7 +5355,7 @@ namespace GObject
 		_pwdInfo.secondPWD.clear();
 		_pwdInfo.answerForPWD.clear();
 		_pwdInfo.questionForPWD.clear();
-		DB().PushUpdateData("DELETE FROM `pass_word` WHERE `playerId` = %"I64_FMT"u", _id);
+		DB1().PushUpdateData("DELETE FROM `pass_word` WHERE `playerId` = %"I64_FMT"u", _id);
 		Stream st;
 		makeSenconPWDInfo(st);
 		send(st);
@@ -5368,7 +5368,7 @@ namespace GObject
 			return 1;
 		_pwdInfo.errCount = 0;
 		_pwdInfo.secondPWD = pwd;
-		DB().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
+		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
 		return 0;
 	}
 
@@ -5379,7 +5379,7 @@ namespace GObject
 		if(_pwdInfo.secondPWD == newPWD)
 			return 0;
 		_pwdInfo.secondPWD = newPWD;
-		DB().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
+		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
 		return 0;
 	}
 

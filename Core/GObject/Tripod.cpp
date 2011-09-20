@@ -34,7 +34,7 @@ void Tripod::sendTripodInfo(Player* pl, TripodData& td)
     //UInt8 needgen = td.needgen;
     genAward(pl, td, st);
     //if (needgen != td.needgen)
-        DB().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+        DB1().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
                 td.needgen, td.itemId, td.num, pl->getId());
 
     st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << td.soul << Stream::eos;
@@ -144,7 +144,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
         td.soul = MAX_TRIPOD_SOUL;
     }
 
-    DB().PushUpdateData("UPDATE `tripod` SET `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.quality, td.needgen, pl->getId());
+    DB1().PushUpdateData("UPDATE `tripod` SET `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.quality, td.needgen, pl->getId());
 }
 
 static UInt16 fire_begin = 47;
@@ -237,7 +237,7 @@ void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
     genAward(pl, td, st);
     st << Stream::eos;
     pl->send(st);
-    DB().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+    DB1().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
             td.fire, td.needgen, td.itemId, td.num, pl->getId());
 
     pl->GetPackage()->DelItem2(ib1, 1);
@@ -276,7 +276,7 @@ void Tripod::getAward(Player* pl)
     td.soul = 0;
     td.itemId = 0;
     td.num = 0;
-    DB().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
+    DB1().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
     sendTripodInfo(pl, td);
 }
@@ -306,7 +306,7 @@ TripodData& Tripod::newTripodData(Player* pl)
     TripodData td;
     if(pl->getVipLevel() > 2)
         td.quality = 3;
-    DB().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst, td.needgen, td.itemId, td.num);
+    DB1().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)", pl->getId(), td.soul, td.fire, td.quality, td.awdst, td.needgen, td.itemId, td.num);
     return addTripodData(pl->getId(), td);
 }
 

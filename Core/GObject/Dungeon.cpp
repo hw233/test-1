@@ -624,7 +624,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
         if(advanceLevel(player, it->second, true, totalExp))
         {
             player->delFlag(Player::AutoDungeon);
-            DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+            DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
             return;
         }
         if(player->GetPackage()->GetRestPackageSize() < 4)
@@ -633,7 +633,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
             Stream st(REP::COPY_AUTO_FIGHT);
             st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(5) << *totalExp << Stream::eos;
 			player->send(st);
-			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 			return;
 		}
         break;
@@ -643,7 +643,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << *totalExp << Stream::eos;
 			player->send(st);
-			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 			return;
 		}
 		break;
@@ -654,7 +654,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 		return;
 	UInt32 turns = 0;
 	bool r = doChallenge(player, it->second, false, &turns);
-	DB().PushUpdateData("REPLACE INTO `dungeon_auto`(`playerId`, `dungeonId`, `totalExp`, `won`) VALUES(%"I64_FMT"u, %u, %u, %u)", player->getId(), _id, *totalExp, r ? 1 : 0);
+	DB3().PushUpdateData("REPLACE INTO `dungeon_auto`(`playerId`, `dungeonId`, `totalExp`, `won`) VALUES(%"I64_FMT"u, %u, %u, %u)", player->getId(), _id, *totalExp, r ? 1 : 0);
 	EventDungeonAuto * event = new(std::nothrow) EventDungeonAuto(player, 2 * turns, this, r, *totalExp);
 	PushTimerEvent(event);
 }
@@ -662,7 +662,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 void Dungeon::cancelAutoChallengeNotify( Player * player, UInt32 exp )
 {
 	player->delFlag(Player::AutoDungeon);
-	DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+	DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
@@ -686,7 +686,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			if(advanceLevel(player, it->second, true, &exp, count))
 			{
 				player->delFlag(Player::AutoDungeon);
-				DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+				DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
                 return;
 			}
 			if(count < maxCount)
@@ -705,7 +705,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
-			DB().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
             return;
 		}
 	}

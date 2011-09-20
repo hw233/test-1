@@ -30,7 +30,7 @@ inline void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 flo
     PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
     pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
     pl->delFlag(Player::AutoCopy);
-    DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
+    DB3().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
 }
 
 void PlayerCopy::sendAllInfo(Player* pl)
@@ -544,7 +544,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                 PushTimerEvent(event);
                 pl->addFlag(Player::AutoCopy);
                 pl->setBuffData(PLAYER_BUFF_AUTOCOPY, id, true);
-                DB().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
+                DB3().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
 
                 Stream st(REP::AUTO_COPY);
                 st << static_cast<UInt8>(0) << id << tcd.floor << tcd.spot << Stream::eos; 

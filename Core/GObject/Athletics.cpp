@@ -85,7 +85,7 @@ UInt32 Athletics::addAthleticsData(UInt8 side, Player * target, UInt8 win, UInt3
 		_athleticses.pop_front();
 	}
 	_athleticses.push_back(data);
-	DB().PushUpdateData("INSERT INTO `athletics_record` (`id`, `atker`, `defer`, `repid`, `time`, `winSide`) VALUES(%u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u)", data->id, (side == 0 ? _owner->getId() : target->getId()), (side == 0 ? target->getId() : _owner->getId()), data->reptid, data->time, win);
+	DB6().PushUpdateData("INSERT INTO `athletics_record` (`id`, `atker`, `defer`, `repid`, `time`, `winSide`) VALUES(%u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u)", data->id, (side == 0 ? _owner->getId() : target->getId()), (side == 0 ? target->getId() : _owner->getId()), data->reptid, data->time, win);
 	return data->id;
 }
 
@@ -188,7 +188,7 @@ void Athletics::notifyDropAthleticsData(UInt32 id)
 		if (_athleticses[i]->id == id)
 			return ;
 	}
-	DB().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", id);
+	DB6().PushUpdateData("DELETE FROM `athletics_record` WHERE `id` = %u", id);
 }
 
 void Athletics::attack(Player * defer)

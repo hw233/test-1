@@ -711,6 +711,8 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
             UInt8 type;
             UInt32 gold;
             char no[256];
+            char uint[32];
+            char money[32];
         };
 
         Recharge* recharge = (Recharge*)(data);
@@ -720,6 +722,10 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         player->addTotalRecharge(recharge->gold);
         DB1().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND %"I64_FMT"u",
                 recharge->no, player->getId());
+        char gold[32] = {0};
+        const char* id = "29999";
+        snprintf(gold, 32, "%u", recharge->gold);
+        player->udpLog(recharge->uint, recharge->money, gold, id, "", "", "pay");
     }
     else
     {

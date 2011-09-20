@@ -59,7 +59,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
 			makeTechInfo(st, tech);
 			st << Stream::eos;
 			_clan->broadcast(st);
-			DB().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
+			DB5().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
 			return true;
 		}
 		break;
@@ -71,7 +71,7 @@ bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
 			makeTechInfo(st, tech);
 			st << Stream::eos;
 			_clan->broadcast(st);
-			DB().PushUpdateData("REPLACE INTO `clan_tech`(`clanId`, `techId`, `level`, `extra`) VALUES(%u, %u, %u, %u);", _clan->getId(), tech.techId, tech.level, tech.extra);
+			DB5().PushUpdateData("REPLACE INTO `clan_tech`(`clanId`, `techId`, `level`, `extra`) VALUES(%u, %u, %u, %u);", _clan->getId(), tech.techId, tech.level, tech.extra);
 
 			return true;
 		}
@@ -165,7 +165,7 @@ bool ClanTech::techLevelDown(UInt8 id, UInt8& level, UInt16& extra, UInt16 count
 void ClanTech::addTech(UInt8 id, UInt16 flag, UInt8 level, UInt16 extra)
 {
 	_techs[id] = ClanTechData(id, flag, level, extra);
-	DB().PushUpdateData("REPLACE INTO `clan_tech`(`clanId`, `techId`, `level`, `extra`) VALUES(%u, %u, %u, %d)", _clan->getId(), id, level, extra);
+	DB5().PushUpdateData("REPLACE INTO `clan_tech`(`clanId`, `techId`, `level`, `extra`) VALUES(%u, %u, %u, %d)", _clan->getId(), id, level, extra);
 }
 
 UInt8 ClanTech::getLev(UInt8 id)
@@ -280,7 +280,7 @@ bool ClanTech::addAchieve(UInt16 ach)
 	makeTechInfo(st, tech);
 	st << Stream::eos;
 	_clan->broadcast(st);
-	DB().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
+	DB5().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
 
 	return true;
 }
@@ -297,7 +297,7 @@ bool ClanTech::delAchieve(UInt16 ach)
 	makeTechInfo(st, tech);
 	st << Stream::eos;
 	_clan->broadcast(st);
-	DB().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
+	DB5().PushUpdateData("UPDATE `clan_tech` SET `level` = %u, `extra` = %d WHERE `clanId` = %u AND `techId` = %u", tech.level, tech.extra, _clan->getId(), tech.techId);
 
 	return true;
 }

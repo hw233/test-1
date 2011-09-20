@@ -42,7 +42,7 @@ void Sale::Init()
 		mailItem = offset->second;
 		if (!mailItem->mailSend)
 		{
-			DB().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_TIMEOUT), offset->first);
+			DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_TIMEOUT), offset->first);
 			mailItem->mailSend = true;
 			SYSMSG(title, 309);
 			SYSMSG(content, 311);
@@ -333,7 +333,7 @@ bool Sale::addSaleMailItems(UInt32 id)
 			SAFE_DELETE(item);
 	}
 	_mailItems.erase(found);
-	DB().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_DELETED), id);
+	DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_DELETED), id);
 	return true;
 }
 
@@ -342,7 +342,7 @@ void Sale::delSaleMailItems(UInt32 id)
 	std::map<UInt32, SaleMailItem *>::iterator found = _mailItems.find(id);
 	if (found == _mailItems.end() || found->second == NULL)
 		return;
-	DB().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_DELETED), id);
+	DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_DELETED), id);
 	if (found->second == NULL)
 	{
 		_mailItems.erase(found);
