@@ -14,6 +14,8 @@ template<typename _VT, typename _VK >
 class GGlobalObjectManagerT
 {
 public:
+    typedef typename std::unordered_map<_VK, _VT * >::iterator iterator;
+public:
 	_VT * newObject(const _VK key)
 	{
 		Mutex::ScopedLock lk(_objMutex);
@@ -104,6 +106,9 @@ public:
 	}
 	inline Mutex& getMutex() { return _objMutex; }
 	std::unordered_map<_VK, _VT * >& getMap() { return _objs; }
+
+    inline iterator begin() { return _objs.begin(); }
+    inline iterator end() { return _objs.end(); }
 
 protected:
 	std::unordered_map<_VK, _VT * > _objs;

@@ -1025,6 +1025,10 @@ void Clan::broadcast( Stream& st )
 	for(offset = _members.begin(); offset != _members.end(); ++ offset)
 	{
 		mem = *offset;
+        if (!mem)
+            continue;
+        if (!mem->player)
+            continue;
 		mem->player->send(st);
 	}
 }
@@ -1039,6 +1043,10 @@ void Clan::broadcast(SysMsgItem * item)
 	for (offset = _members.begin(); offset != _members.end(); ++ offset)
 	{
 		mem = *offset;
+        if (!mem)
+            continue;
+        if (mem->player)
+            continue;
 		item->send(mem->player);
 	}
 }
@@ -1051,6 +1059,10 @@ void Clan::broadcast( const void * data, size_t len)
 	for(offset = _members.begin(); offset != _members.end(); ++ offset)
 	{
 		mem = *offset;
+        if (!mem)
+            continue;
+        if (mem->player)
+            continue;
 		mem->player->send(data, len);
 	}
 }

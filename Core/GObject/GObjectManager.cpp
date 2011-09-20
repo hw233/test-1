@@ -2175,6 +2175,7 @@ namespace GObject
 		lc.reset(1000);
 		UInt32 rank = 0;
 		bool hasLeader = false;
+        clan = NULL;
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();

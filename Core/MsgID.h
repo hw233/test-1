@@ -485,6 +485,7 @@ namespace SPEQ
     const UInt16 RERECHARGE         = 0x109;//
     const UInt16 ONLINE             = 0x10A;//
     const UInt16 SETLEVEL           = 0x10B;//
+    const UInt16 ADDITEMTOALL       = 0x10C;//
 }
 
 namespace SPEP
@@ -499,6 +500,7 @@ namespace SPEP
     const UInt8 RERECHARGE          = 0x09;//
     const UInt8 ONLINE              = 0x0A;//
     const UInt8 SETLEVEL            = 0x0B;//
+    const UInt8 ADDITEMTOALL        = 0x0C;//
     const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
 }
 

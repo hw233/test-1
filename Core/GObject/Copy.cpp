@@ -247,7 +247,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                             PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
                             pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
                             pl->delFlag(Player::AutoCopy);
-                            DB().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
+                            DB1().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
                             SYSMSG(title, 555);
                             SYSMSGV(content, 556);
                             MailPackage::MailItem mitem[size/2-rsize];
