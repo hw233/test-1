@@ -574,6 +574,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         if (err.length())
         {
+            TRACE_LOG("token: %s, ret: %u, rc: %u", token.c_str(), ret, rc);
             uninitMemcache();
             initMemcache();
         }
