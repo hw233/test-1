@@ -221,12 +221,7 @@ bool Clan::join(ClanMember * cm)
 	_members.insert(cm);
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
-
-    ClanOpt co = {0};
-    co.type = 0;
-    co.clan = this;
-    GameMsgHdr hdr1(0x311, player->getThreadId(), player, sizeof(co));
-    GLOBAL().PushMsg(hdr1, &co);
+    player->setClan(this);
 
 	return true;
 }
