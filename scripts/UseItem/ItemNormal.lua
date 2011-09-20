@@ -4843,15 +4843,15 @@ function ItemNormal_athletics_2(iid, num, bind, param)
     end
 
     -- 补髓益元丹
-    package:AddItem(507, 2, true, 0, 2);
+    package:AddItem(507, 3, true, 0, 2);
     -- 凝神易经丹
-    package:AddItem(509, 2, true, 0, 2);
+    package:AddItem(509, 3, true, 0, 2);
     -- 五行精金
-    package:AddItem(515, 2, true, 0, 2);
+    package:AddItem(515, 1, true, 0, 2);
     -- 太乙精金
-    package:AddItem(503, 5, true, 0, 2);
+    package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:2]，获得[4:507]x2、 [4:509]x2、 [4:515]x2、 [4:503]x5 [4:"..equipId.."]");
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:2]，获得[4:507]x3、 [4:509]x3、 [4:515]x1、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(2, player);
 
@@ -4868,13 +4868,54 @@ function ItemNormal_athletics_3(iid, num, bind, param)
 
     local level = player:GetLev();
     level = math.floor((math.floor((level) / 10)) * 10)
-    local tmpEquipTable = Athletics_Purple_Equip[level]
+    local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 100 then
-            tmpEquipTable = Athletics_Purple_Equip[100]
+        if level > 60 then
+            tmpEquipTable = Athletics_Orange_Equip[60]
         else
-            tmpEquipTable = Athletics_Purple_Equip[40]
+            tmpEquipTable = Athletics_Orange_Equip[50]
+        end
+    end
+
+    local equipId = 0;
+    if tmpEquipTable ~= nil then
+        local tmpSize = table.getn(tmpEquipTable);
+        equipId = tmpEquipTable[math.random(1, tmpSize)];
+        package:AddEquip(equipId, 1);
+    end
+
+    -- 补髓益元丹
+    package:AddItem(507, 2, true, 0, 2);
+    -- 凝神易经丹
+    package:AddItem(509, 2, true, 0, 2);
+    -- 太乙精金
+    package:AddItem(503, 3, true, 0, 2);
+
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:3]，获得[4:507]x2、 [4:509]x2、 [4:503]x3 [4:"..equipId.."]");
+
+    package:DelItemSendMsg(3, player);
+
+    return true;
+end
+
+function ItemNormal_athletics_4(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 5 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local level = player:GetLev();
+    level = math.floor((math.floor((level) / 10)) * 10)
+    local tmpEquipTable = Athletics_Orange_Equip[level]
+
+    if tmpEquipTable == nil then
+        if level > 60 then
+            tmpEquipTable = Athletics_Orange_Equip[60]
+        else
+            tmpEquipTable = Athletics_Orange_Equip[50]
         end
     end
 
@@ -4887,19 +4928,21 @@ function ItemNormal_athletics_3(iid, num, bind, param)
 
     -- 补髓益元丹
     package:AddItem(507, 1, true, 0, 2);
-    -- 凝神易经丹
-    package:AddItem(509, 1, true, 0, 2);
+    -- 凝神丹
+    package:AddItem(508, 1, true, 0, 2);
     -- 太乙精金
-    package:AddItem(503, 2, true, 0, 2);
+    package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:3]，获得[4:507]、 [4:509]、 [4:503]x2 [4:"..equipId.."]");
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:4]，获得[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
 
-    package:DelItemSendMsg(3, player);
+    package:DelItemSendMsg(4, player);
 
     return true;
 end
 
-function ItemNormal_athletics_4(iid, num, bind, param)
+
+
+function ItemNormal_athletics_5(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 	if package:GetRestPackageSize() < 5 then		
@@ -4926,36 +4969,14 @@ function ItemNormal_athletics_4(iid, num, bind, param)
         package:AddEquip(equipId, 1);
     end
 
-    -- 补髓益元丹
-    package:AddItem(507, 1, true, 0, 2);
-    -- 凝神丹
-    package:AddItem(508, 1, true, 0, 2);
+    -- 九龙神火
+    package:AddItem(50, 1, true, 0, 2);
+    -- 乾坤净水
+    package:AddItem(49, 1, true, 0, 2);
     -- 太乙精金
-    package:AddItem(503, 1, true, 0, 2);
+    package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:4]，获得[4:507]、 [4:508]、 [4:503] [4:"..equipId.."]");
-
-    package:DelItemSendMsg(4, player);
-
-    return true;
-end
-
-
-
-function ItemNormal_athletics_5(iid, num, bind, param)
-    local player = GetPlayer();
-    local package = player:GetPackage();
-	if package:GetRestPackageSize() < 5 then		
-		player:sendMsgCode(2, 1011, 0);
-		return false;
-	end
-
-    -- 凝神丹
-    package:AddItem(508, 1, true, 0, 2);
-    -- 太乙精金
-    package:AddItem(503, 1, true, 0, 2);
-
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:5]，获得[4:508]、 [4:503]");
+    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:5]，获得[4:50]、[4:49]、[4:503]x3、[4:"..equipId.."]");
 
     package:DelItemSendMsg(5, player);
 

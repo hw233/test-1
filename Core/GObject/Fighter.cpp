@@ -27,6 +27,8 @@ namespace GObject
 
 GlobalFighters globalFighters;
 
+static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.00, 1.00};
+
 Fighter& getGreatFighter(UInt32 id)
 {
 	static Fighter null(0, NULL);
@@ -94,7 +96,7 @@ const std::string& Fighter::getBattleName()
 UInt16 Fighter::getWeaponAttack()
 {
     //TODO
-	static UInt16 atk_enc[] = {0, 10, 20, 40, 60, 100, 200, 300, 450, 600, 800, 1050, 1500};
+    static UInt16 atk_enc[] = {0, 10, 20, 40, 60, 100, 200, 300, 450, 600, 800, 1050, 1500};
 	return _weapon ? (atk_enc[_weapon->getItemEquipData().enchant]) : 0;
 }
 
@@ -959,6 +961,11 @@ void Fighter::rebuildEquipAttr()
 		if(equip->getQuality() >= 4)
 			testEquipInSet(setId, setNum, equip->GetItemType().getId());
 		addAttr(equip);
+
+        const GData::AttrExtra * ext = equip->getAttrExtra();
+
+        _attrExtraEquip.attack += ext->attack * enc_factor[equip->getItemEquipData().enchant];
+        _attrExtraEquip.magatk += ext->magatk * enc_factor[equip->getItemEquipData().enchant];
 	}
 
 	for(int i = 0; i < 5; ++ i)
@@ -969,6 +976,10 @@ void Fighter::rebuildEquipAttr()
 			if(equip->getQuality() >= 4)
 				testEquipInSet(setId, setNum, equip->GetItemType().getId());
 			addAttr(equip);
+
+            const GData::AttrExtra * ext = equip->getAttrExtra();
+            _attrExtraEquip.defend += ext->defend * enc_factor[equip->getItemEquipData().enchant];
+            _attrExtraEquip.magdef += ext->magdef * enc_factor[equip->getItemEquipData().enchant];
 		}
 	}
 
@@ -1001,6 +1012,7 @@ void Fighter::rebuildEquipAttr()
 		_attrExtraEquip += *iest->attrExtra[idx];
 		_attrExtraEquip += *iest->attrExtra[idx];
 	}
+#if 0
 	_attrExtraEquip.attack += getWeaponAttack();
 	_attrExtraEquip.magatk += getWeaponAttack();
 	UInt16 armorDefend, armorHP;
@@ -1008,6 +1020,7 @@ void Fighter::rebuildEquipAttr()
 	_attrExtraEquip.defend += armorDefend;
 	_attrExtraEquip.magdef += armorDefend;
 	_attrExtraEquip.hp += armorHP;
+#endif
 
     for (int i = 0; i < getUpCittasNum(); ++i)
     {
