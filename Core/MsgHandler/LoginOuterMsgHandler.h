@@ -468,7 +468,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 			DB1().PushUpdateData("INSERT INTO `player` (`id`, `name`, `country`, `location`, `lineup`, `wallow`, `formation`, `formations`) VALUES (%" I64_FMT "u, '%s', %u, %u, '%u,12', %u, %u, '%u,%u')", pl->getId(), nu._name.c_str(), country, loc, fgtId, PLAYER_DATA(pl, wallow), FORMATION_1, FORMATION_1, FORMATION_2);
 
-			DBLOG().PushUpdateData("insert into register_states(server_id,player_id,player_name, reg_time) values(%u,%"I64_FMT"u, '%s', %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), TimeUtil::Now());
+			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name, reg_time) values(%u,%"I64_FMT"u, '%s', %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), TimeUtil::Now());
 
 			GObject::globalPlayers.add(pl);
 			GObject::newPlayers.add(pl);

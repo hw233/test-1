@@ -1385,7 +1385,7 @@ void ClanBattle::notifyClanBattleOverReport(UInt8 succ)
 	}
 	if(_clanBattlePlayerLocs.size() != 0)
 	{
-		DBLOG().PushUpdateData("insert into `clanbattle_states`(`server_id`, `clan_id`, `clan_name`, `enter_attackers`, `enter_defenders`, `enter_friends`, `is_win`, `this_day`) values(%u, %u, '%s', %u, %u, %u, %u, %u)", cfg.serverLogId, getOwnerClanId(), getOwnerClanName().c_str(), enter_players[2], enter_players[1], enter_players[0], succ, TimeUtil::SharpDay());
+		DBLOG1().PushUpdateData("insert into `clanbattle_states`(`server_id`, `clan_id`, `clan_name`, `enter_attackers`, `enter_defenders`, `enter_friends`, `is_win`, `this_day`) values(%u, %u, '%s', %u, %u, %u, %u, %u)", cfg.serverLogId, getOwnerClanId(), getOwnerClanName().c_str(), enter_players[2], enter_players[1], enter_players[0], succ, TimeUtil::SharpDay());
 	}
 	cbrElem->first = succ;
 	st.data<UInt16>(4+2) = cnt;
@@ -1418,7 +1418,7 @@ void ClanBattle::sendClanBattleReport(Player * player, UInt32 time)
 
 void ClanBattle::pushBattleCount(UInt8 battleType)
 {
-	DBLOG().PushUpdateData("insert `clanbattle_battle_count`(`server_id`, `battle_type`, `this_day`) values(%u, %u, %u)", cfg.serverLogId, battleType, TimeUtil::SharpDay());
+	DBLOG1().PushUpdateData("insert `clanbattle_battle_count`(`server_id`, `battle_type`, `this_day`) values(%u, %u, %u)", cfg.serverLogId, battleType, TimeUtil::SharpDay());
 }
 
 

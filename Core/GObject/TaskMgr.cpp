@@ -587,7 +587,7 @@ namespace GObject
 
 		DB5().PushUpdateData("DELETE FROM `task_instance` WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", it->second->m_TaskId, m_PlayerOwner->getId());
 		if(dayTaskData->m_Count == 10 && dayTaskData->m_PreTaskQuality >= 4)
-			DBLOG().PushUpdateData("insert into `task_color_count`(`server_id`, `player_id`, `task_color`, `this_day`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, m_PlayerOwner->getId(), dayTaskData->m_PreTaskQuality, TimeUtil::SharpDay());
+			DBLOG1().PushUpdateData("insert into `task_color_count`(`server_id`, `player_id`, `task_color`, `this_day`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, m_PlayerOwner->getId(), dayTaskData->m_PreTaskQuality, TimeUtil::SharpDay());
 		SAFE_DELETE(it->second);
 		m_TaskCompletedList.erase(it);
 		DelCanAcceptTask(taskId);

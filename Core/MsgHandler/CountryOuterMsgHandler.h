@@ -2671,7 +2671,7 @@ void OnSubmitBugInfo(GameMsgHdr& hdr,BugInfoReq& biq)
 
     std::string  title=biq._title.substr(pos+1);
     std::string content=biq._content.substr(pos2+1);
-	DBLOG().PushUpdateData("insert into complaints (server_id,player_id,submit_type,submit_time,title,content) values(%u,%"I64_FMT"u,'%s',%u,'%s','%s')",
+	DBLOG1().PushUpdateData("insert into complaints (server_id,player_id,submit_type,submit_time,title,content) values(%u,%"I64_FMT"u,'%s',%u,'%s','%s')",
 		cfg.serverLogId, hdr.player->getId(), type.c_str(), TimeUtil::Now(), title.c_str(), content.c_str());
 }
 

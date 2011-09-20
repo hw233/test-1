@@ -389,7 +389,7 @@ void CountryBattle::end(UInt32 curtime)
 			_rank[&it->second] = it->first;
 		}
 	}
-	DBLOG().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
+	DBLOG1().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
 
 	_lastReport.init(REP::COUNTRY_WAR_RESULT);
 	_lastReport << _spot << _score[0] << _score[1] << _owner << static_cast<UInt16>(0);

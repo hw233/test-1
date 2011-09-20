@@ -501,7 +501,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		else
 			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, dpi.totalCount, _id, player->getId());
 		r = true;
-		DBLOG().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
+		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
 	}
 
 	if(noreport)
@@ -614,7 +614,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 				else
 					player->useTael(taelReq[_id], &ci);
 			}
-			DBLOG().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
+			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(0) << Stream::eos;
 			player->send(st);
@@ -990,7 +990,7 @@ void Dungeon::pushEnterCountBS(UInt32 now)
 		if(it->second.counterEnd > now && it->second.count != 0 && it->second.count <= 3)
 			count[it->second.count - 1] ++;
 	}
-	DBLOG().PushUpdateData("insert into `dungeon_count`(`server_id`, `dungeon_id`, `enter_players1`, `enter_players2`, `enter_players3`, `created_at`) values(%u, %u, %u, %u, %u, %u)", cfg.serverLogId, _id, count[0], count[1], count[2], now);
+	DBLOG1().PushUpdateData("insert into `dungeon_count`(`server_id`, `dungeon_id`, `enter_players1`, `enter_players2`, `enter_players3`, `created_at`) values(%u, %u, %u, %u, %u, %u)", cfg.serverLogId, _id, count[0], count[1], count[2], now);
 }
 
 void Dungeon::doJusticeRoar(Player* pl)

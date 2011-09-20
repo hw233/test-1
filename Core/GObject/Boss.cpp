@@ -550,7 +550,7 @@ void Boss::pushAttackerCountBS(bool isDead, UInt32 spawnTime)
 		bossStay = now - spawnTime;
 	else
 		bossStay = 0 - _hp[0];
-	DBLOG().PushUpdateData("insert into `boss_states`(`server_id`, `boss_id`, `boss_level`, `attacker_count`, `boss_status`, `created_at`) values(%u, %u, %u, %u, %d, %u)", cfg.serverLogId, getId(), _level, size, bossStay, now);
+	DBLOG1().PushUpdateData("insert into `boss_states`(`server_id`, `boss_id`, `boss_level`, `attacker_count`, `boss_status`, `created_at`) values(%u, %u, %u, %u, %d, %u)", cfg.serverLogId, getId(), _level, size, bossStay, now);
 }
 
 BossManager bossManager;

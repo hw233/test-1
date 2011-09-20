@@ -123,6 +123,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 	worker = WORKER_THREAD_DB_LOG;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG));
+	worker = WORKER_THREAD_DB_LOG1;
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG1));
 
 	//启动数据库线程处理
 	worker = WORKER_THREAD_DB;
@@ -141,6 +143,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	m_AllWorker[worker]->Run();
 
 	worker = WORKER_THREAD_DB_LOG;
+	m_AllWorker[worker]->Run();
+	worker = WORKER_THREAD_DB_LOG1;
 	m_AllWorker[worker]->Run();
 
 	GData::GDataManager::LoadAllData();
@@ -221,7 +225,7 @@ void WorldServer::Shutdown()
 	//关闭所有工作线程
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
-		if(worker != WORKER_THREAD_DB && worker != WORKER_THREAD_DB_LOG)
+		if(worker <= WORKER_THREAD_LOGIN)
 			m_AllWorker[worker]->Shutdown();
 	}
 
@@ -234,6 +238,7 @@ void WorldServer::Shutdown()
 	m_AllWorker[WORKER_THREAD_DB5]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB6]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG]->Shutdown();
+	m_AllWorker[WORKER_THREAD_DB_LOG1]->Shutdown();
 }
 
 

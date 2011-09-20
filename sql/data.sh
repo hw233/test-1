@@ -3,6 +3,8 @@ source conf.sh
 
 function update()
 {
+    mysql -h$H -u$U -p$P -P$PT -D$DBD < updates/Data_20110919_1.sql
+
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";

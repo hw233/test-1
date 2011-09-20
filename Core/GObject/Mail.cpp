@@ -233,7 +233,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 			strItems += Itoa(itemsInfo->items[i].count);
 			strItems += "|";
 		}
-		DBLOG().PushUpdateData("insert into mailitem_histories(`server_id`, `player_id`, `mail_id`, `mail_type`, `title`, `content_text`, `content_item`, `receive_time`) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _owner->getId(), mail->id, itemsInfo->type, title.c_str(), content.c_str(), strItems.c_str(), mail->recvTime);
+		DBLOG1().PushUpdateData("insert into mailitem_histories(`server_id`, `player_id`, `mail_id`, `mail_type`, `title`, `content_text`, `content_item`, `receive_time`) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _owner->getId(), mail->id, itemsInfo->type, title.c_str(), content.c_str(), strItems.c_str(), mail->recvTime);
 	}
 	return mail;
 }
@@ -361,7 +361,7 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 
 	_mailBox.erase(it);
 	DB1().PushUpdateData("DELETE FROM `mail` WHERE `mailId` = %u", id);
-	DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 2, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, id);
+	DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 2, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, id);
 
 
 	SAFE_DELETE(mail);
@@ -602,7 +602,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 				if(pkg == NULL)
 				{
 					delIt = true;
-					DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+					DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
 					break;
 				}
 				if(pkg->takeIt(_owner))
@@ -623,7 +623,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 					return;
 				}
 			}
-			DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+			DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
 			delIt = true;
 		}
 		break;
@@ -634,7 +634,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			if(_owner->GetAthletics()->addAthleticsExtraAward(EquipId, rank))
 			{
 				delIt = true;
-				DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where server_id = %u and mail_id = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
 			}
 		}
 		break;
@@ -664,7 +664,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			if (_owner->GetTrade()->addTradeMailItems(mail->additional))
 			{
 				delIt = true;
-				DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
 			}
 		}
 	case 0x06:
@@ -672,7 +672,7 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			if (_owner->GetSale()->addSaleMailItems(mail->additional))
 			{
 				delIt = true;
-				DBLOG().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
 			}
 		}
 		break;

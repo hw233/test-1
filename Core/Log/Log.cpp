@@ -47,7 +47,7 @@ void Log::OutError(const char * fmt, ...)
 		return ;
 	}
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] <%s:%d|%s>: ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec, __FILE__, __LINE__, __FUNCTION__);
+	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] : ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 	va_list ap;
 	va_start(ap, fmt);
 	fputs(buffer, file);
@@ -67,7 +67,7 @@ void Log::OutWarn(const char * fmt, ...)
 		return ;
 	}
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] <%s:%d|%s>: ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec, __FILE__, __LINE__, __FUNCTION__);
+	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] : ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 	fputs(buffer, file);
 	va_list ap;
 	va_start(ap, fmt);
@@ -87,7 +87,7 @@ void Log::OutDebug(const char * fmt, ...)
 		return ;
 	}
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] <%s:%d|%s>: ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec, __FILE__, __LINE__, __FUNCTION__);
+	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] : ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 	fputs(buffer, file);
 	va_list ap;
 	va_start(ap, fmt);
@@ -107,7 +107,7 @@ void Log::OutInfo(const char * fmt, ...)
 		return ;
 	}
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] <%s:%d|%s>: ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec, __FILE__, __LINE__, __FUNCTION__);
+	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] : ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 	fputs(buffer, file);
 	va_list ap;
 	va_start(ap, fmt);
@@ -127,7 +127,7 @@ void Log::OutTrace(const char * fmt, ...)
 		return ;
 	}
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] <%s:%d|%s>: ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec, __FILE__, __LINE__, __FUNCTION__);
+	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] : ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 	fputs(buffer, file);
 	va_list ap;
 	va_start(ap, fmt);
@@ -148,7 +148,7 @@ void Log::OutLog(UInt8 lev, const char * fmt, ...)
 		return ;
 	}
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] <%s:%d|%s>: ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec, __FILE__, __LINE__, __FUNCTION__);
+	snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d] : ", aTm.tm_hour, aTm.tm_min, aTm.tm_sec);
 	fputs(buffer, file);
 	va_list ap;
 	va_start(ap, fmt);

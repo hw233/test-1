@@ -766,7 +766,7 @@ void GMHandler::OnRename( GObject::Player * player, std::vector<std::string>& ar
 	fgt->setName(args[0]);
 	GObject::globalNamedPlayers.add(args[0], player);
 	DB1().PushUpdateData("UPDATE `player` SET `name` = '%s' WHERE id = %"I64_FMT"u", nameTmp.c_str(), player->getId());
-	DBLOG().PushUpdateData("update `register_states` set `player_name` = '%s' where `server_id` = %u and `player_id` = %"I64_FMT"u", nameTmp.c_str(), cfg.serverLogId, player->getId());
+	DBLOG1().PushUpdateData("update `register_states` set `player_name` = '%s' where `server_id` = %u and `player_id` = %"I64_FMT"u", nameTmp.c_str(), cfg.serverLogId, player->getId());
 }
 
 void GMHandler::OnPlayerInfo( GObject::Player * player, std::vector<std::string>& args )
@@ -1395,7 +1395,14 @@ void GMHandler::OnRunScript( std::vector<std::string>& arglist )
 void GMHandler::OnReconn( std::vector<std::string>& arglist )
 {
 	DB().Pause();
+	DB1().Pause();
+	DB2().Pause();
+	DB3().Pause();
+	DB4().Pause();
+	DB5().Pause();
+	DB6().Pause();
 	DBLOG().Pause();
+	DBLOG1().Pause();
 }
 
 void GMHandler::OnSpawn( std::vector<std::string>& arglist )

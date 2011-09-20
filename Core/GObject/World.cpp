@@ -105,7 +105,7 @@ bool enum_midnight(void * ptr, void *)
 	}
 	if(pl->getGold() > 0)
 	{
-		DBLOG().PushUpdateData("insert into `gold_accounts`(`server_id`, `player_id`, `gold`, `time`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, pl->getId(), pl->getGold(), TimeUtil::SharpDay(1));
+		DBLOG1().PushUpdateData("insert into `gold_accounts`(`server_id`, `player_id`, `gold`, `time`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, pl->getId(), pl->getGold(), TimeUtil::SharpDay(1));
 	}
 
     pl->buildClanTask();
@@ -220,7 +220,7 @@ void World::World_Midnight_Check( World * world )
 void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
-	DBLOG().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
 }
 
 void World::World_Athletics_Check( void * )
