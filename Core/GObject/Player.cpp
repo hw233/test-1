@@ -3875,7 +3875,7 @@ namespace GObject
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
         {
             Fighter* fighter = it->second;
-            if(fighter->getColor() == color)
+            if(fighter->getColor() == color && it->second->getId() > 6)
                 ++ num;
         }
 
