@@ -61,6 +61,7 @@ public:
 
     bool enableLoginLimit;
     UInt16 loginLimit;
+    UInt16 onlineLimit;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -87,6 +88,7 @@ public:
 	inline void setChannelInfo(const char * sn, int num) { slugName = sn; channelNum = num; }
 	inline void setLoginLimit(bool limit) { enableLoginLimit = limit; }
 	inline void setLoginMax(UInt16 max) { loginLimit = max; }
+	inline void setOnlineLimit(bool limit) { onlineLimit = limit; }
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

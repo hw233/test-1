@@ -242,6 +242,12 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	}
 #endif
 
+    if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
+    {
+		conn->closeConn();
+        return;
+    }
+
 	SHA1Engine sha1;
 	sha1.update(ul._hashval + 8, 4);
 	sha1.update(cfg.cryptKey1.c_str(), cfg.cryptKey1.length());

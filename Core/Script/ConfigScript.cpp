@@ -30,6 +30,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setLoginLimit", &Cfg::setLoginLimit);
 	class_def<Cfg>("setLoginMax", &Cfg::setLoginMax);
 	class_def<Cfg>("setVerifyTokenServer", &Cfg::setVerifyTokenServer);
+	class_def<Cfg>("setOnlineLimit", &Cfg::setOnlineLimit);
 	set("cfg", cfg);
 }
 
