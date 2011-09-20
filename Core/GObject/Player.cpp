@@ -3665,7 +3665,16 @@ namespace GObject
 				//for(i = 0; i < 6; ++ i)
                     //excepts2.insert(_playerData.tavernId[i]);
 				i = 0;
-                int rateidx = _playerData.tavernOrangeCount / 10;
+                int rateidx = 0;
+                if(!extraRefresh)
+                {
+                     rateidx = _playerData.tavernOrangeCount / 10;
+                }
+                else
+                {
+                     rateidx = _playerData.tavernPurpleCount / 10;
+                }
+
                 if(rateidx < 0)
                     rateidx = 0;
 
@@ -3755,6 +3764,10 @@ namespace GObject
 				if(extraRefresh)
 				{
 					extraRefresh = false;
+                    if(hasPurple)
+						_playerData.tavernPurpleCount = 0;
+					else
+						++ _playerData.tavernPurpleCount;
 				}
 				else
 				{
@@ -3763,10 +3776,6 @@ namespace GObject
 						_playerData.tavernBlueCount = 0;
 					else
 						++ _playerData.tavernBlueCount;
-					if(hasPurple)
-						_playerData.tavernPurpleCount = 0;
-					else
-						++ _playerData.tavernPurpleCount;
                     if(hasOrange)
                         _playerData.tavernOrangeCount = 0;
                     else
@@ -3842,7 +3851,10 @@ namespace GObject
 		useTael(price,&ci);
 
         if(fgt->getColor() > 1)
-            _playerData.tavernOrangeCount  = 0;
+        {
+            _playerData.tavernOrangeCount = 0;
+            _playerData.tavernPurpleCount = 0;
+        }
 
         if(fgt->getColor() ==3)
         {
@@ -3863,7 +3875,7 @@ namespace GObject
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
         {
             Fighter* fighter = it->second;
-            if(fighter->getColor() == color)
+            if(fighter->getColor() == color && it->second->getId() > 6)
                 ++ num;
         }
 

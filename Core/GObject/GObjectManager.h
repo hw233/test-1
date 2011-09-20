@@ -110,7 +110,12 @@ namespace GObject
         static UInt32 getColorFighterChance(UInt16 idx, UInt8 f_g, UInt8 color )
         {
             if(!f_g)
-                return _color_chance_free[color];
+            {
+                if( idx > _color_chance_free.size() - 1 )
+                    idx = _color_chance_free.size() - 1;
+
+                return _color_chance_free[idx][color];
+            }
             else
             {
                 if( idx > _color_chance_gold.size() - 1 )
@@ -191,7 +196,7 @@ namespace GObject
 
         // 酒馆武将品质概率
         static std::vector<std::vector<UInt32>> _color_chance_gold;
-        static UInt32 _color_chance_free[4];
+        static std::vector<std::vector<UInt32>> _color_chance_free;
 
         //战斗背景
         static std::map<UInt16, UInt16> _battle_scene;

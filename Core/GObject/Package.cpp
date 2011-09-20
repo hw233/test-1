@@ -1606,6 +1606,35 @@ namespace GObject
         }
 #endif
 
+        /***力量宝石, 敏捷宝石,  智力宝石,  耐力宝石， 意志宝石, 生命宝石， 攻击宝石， 防御宝石， 命中宝石
+         * 反击宝石， 闪避宝石， 暴击宝石， 破击宝石,身法宝石， 坚韧宝石， 法抗宝石
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Weapon
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor1 头盔
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor2 胸甲 
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor3 肩甲 
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor4 腰带 
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Armor5 腿甲 
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Amulet 项链
+         * {Item_Gem, Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4, ........., Item_Gem19}   ---- Item_Ring
+         */
+        static UInt8 equip_gem[8][19] = {
+            {1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
+            {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0}
+        };
+
+        GData::ItemGemType * igt = GData::gemTypes[gemId - LGEM_ID];
+        if(!igt)
+            return 1;
+
+        if(!equip_gem[equip->getClass() - Item_Weapon][igt->subClass - Item_Gem])
+            return 1;
+
 		ItemEquipData& ied = equip->getItemEquipData();
 		UInt8 fempty = 0xFF;
 		UInt32 gt = (gemId - 1) / 10;
