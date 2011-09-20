@@ -1498,7 +1498,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(skill->effect->state & 0x0e)
     {
         float rate = skill->prob * 100;
-	    if(bf->getSide() != target_side && ((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+	    if(bf->getSide() != target_side)
         {
             if(1 == skill->area)
             {
@@ -1508,11 +1508,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
-                    defList[defCount].damage = 0;
-                    defList[defCount].pos = pos;
-                    defList[defCount].leftHP = bo->getHP();
-                    doSkillState(bf, skill, bo, defList, defCount, atkAct);
-                    defCount ++;
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+                    {
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, atkAct);
+                        defCount ++;
+                    }
                 }
             }
             else if(0 == skill->area)
@@ -1520,11 +1523,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
-                    defList[defCount].damage = 0;
-                    defList[defCount].pos = target_pos;
-                    defList[defCount].leftHP = bo->getHP();
-                    doSkillState(bf, skill, bo, defList, defCount, atkAct);
-                    defCount ++;
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+                    {
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = target_pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, atkAct);
+                        defCount ++;
+                    }
                 }
             }
             else
@@ -1532,11 +1538,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
-                    defList[defCount].damage = 0;
-                    defList[defCount].pos = target_pos;
-                    defList[defCount].leftHP = bo->getHP();
-                    doSkillState(bf, skill, bo, defList, defCount, atkAct);
-                    defCount ++;
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+                    {
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = target_pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, atkAct);
+                        defCount ++;
+                    }
                 }
 
                 for(int i = 0; i < apcnt; ++ i)
@@ -1545,11 +1554,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
-                    defList[defCount].damage = 0;
-                    defList[defCount].pos = ap[i].pos;
-                    defList[defCount].leftHP = bo->getHP();
-                    doSkillState(bf, skill, bo, defList, defCount, atkAct);
-                    defCount ++;
+                    if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000)))
+                    {
+                        defList[defCount].damage = 0;
+                        defList[defCount].pos = ap[i].pos;
+                        defList[defCount].leftHP = bo->getHP();
+                        doSkillState(bf, skill, bo, defList, defCount, atkAct);
+                        defCount ++;
+                    }
                 }
             }
         }
