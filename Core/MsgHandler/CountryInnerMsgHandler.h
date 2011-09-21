@@ -955,7 +955,14 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
 		GameMsgHdr hdr(0x19F, WORKER_THREAD_WORLD, player, sizeof(&(props->prestige)));
 		GLOBAL().PushMsg(hdr, &(props->prestige));
     }
+}
 
+void OnSetLevelReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 level = *(UInt8*)(data);
+    UInt64 exp = GData::expTable.getLevelMin(level);
+    player->setLevelAndExp(level, exp);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
