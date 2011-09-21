@@ -44,26 +44,23 @@ static bool initMemcache()
         for (size_t i = 0; i < sz; ++i)
         {
             memcached_server_st* servers = memcached_server_list_append(NULL, cfg.tokenServer[i].ip.c_str(), cfg.tokenServer[i].port, &rc);
-            if (rc != MEMCACHED_SUCCESS)
-            {
-                if (!hasServer)
-                {
-                    memcached_free(memc);
-                    memc = NULL;
-                    return false;
-                }
-                else
-                {
-                    //err += "can not connect to token server ";
-                    //err += cfg.tokenServer[i].ip;
-                }
-            }
-            else
+            if (rc == MEMCACHED_SUCCESS)
             {
                 rc = memcached_server_push(memc, servers);
                 memcached_server_free(servers);
                 hasServer = true;
             }
+        }
+
+        if (!hasServer)
+        {
+            memcached_free(memc);
+            memc = NULL;
+        }
+        else
+        {
+            //err += "can not connect to token server ";
+            //err += cfg.tokenServer[i].ip;
         }
     }
     return hasServer;
@@ -557,6 +554,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 err += "token is not matched.";
                 ret = 2;
             }
+            free(rtoken);
         }
         else
         {
@@ -575,7 +573,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         if (err.length())
         {
-            TRACE_LOG("token: %s, ret: %u, rc: %u", token.c_str(), ret, rc);
+            TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u", key, token.c_str(), ret, rc);
             uninitMemcache();
             initMemcache();
         }
@@ -1108,6 +1106,43 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 	
 	SAFE_DELETE(item);
+}
+
+void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::SETPROPS,0x01);
+    UInt64 id;
+    UInt32 pexp;
+    UInt32 prestige;
+    UInt32 honor;
+    br>>id;
+    br>>pexp;
+    br>>prestige; // 声望
+    br>>honor; // 荣誉
+
+    UInt8 ret = 0;
+    GObject::Player * pl = GObject::globalPlayers[id];
+    if (pl)
+    {
+        struct Props
+        {
+            UInt32 pexp;
+            UInt32 prestige;
+            UInt32 honor;
+        } props;
+
+        props.pexp = pexp;
+        props.prestige = prestige;
+        props.honor = honor;
+
+        GameMsgHdr msg(0x321, pl->getThreadId(), pl, sizeof(props));
+        GLOBAL().PushMsg(msg, &props);
+        ret = 1;
+    }
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

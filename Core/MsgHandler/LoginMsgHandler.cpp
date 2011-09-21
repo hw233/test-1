@@ -25,4 +25,5 @@ MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMTOALL,AddItemToAllFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::BATTLEREPORT,BattleReportReq);
 MSG_REG_2(LoginMsgHdr,SPEQ::ONLINE,ServerOnlineNum);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETLEVEL,SetLevelFromBs);
+MSG_REG_2(LoginMsgHdr,SPEQ::SETPROPS,SetPropsFromBs);
 MSG_HANDLER_END()

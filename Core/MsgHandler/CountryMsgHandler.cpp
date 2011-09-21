@@ -196,5 +196,6 @@ MSG_REG_2(GameMsgHdr, 0x310, OnOperationTaskAction);
 MSG_REG_2(GameMsgHdr, 0x311, OnClanOption);
 
 MSG_REG_2(GameMsgHdr, 0x320, OnPracticeExpAddReq);
+MSG_REG_2(GameMsgHdr, 0x321, OnSetPropsReq);
 
 MSG_HANDLER_END()
