@@ -98,7 +98,7 @@ namespace GObject
         UInt8 level = getLevel(now);
         if (!level)
         {
-            if (!m_boss.size())
+            if (m_boss.size())
                 reset();
             return;
         }
