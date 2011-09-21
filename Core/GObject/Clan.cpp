@@ -1040,7 +1040,7 @@ void Clan::broadcast(SysMsgItem * item)
 		mem = *offset;
         if (!mem)
             continue;
-        if (mem->player)
+        if (!mem->player)
             continue;
 		item->send(mem->player);
 	}
@@ -1056,7 +1056,7 @@ void Clan::broadcast( const void * data, size_t len)
 		mem = *offset;
         if (!mem)
             continue;
-        if (mem->player)
+        if (!mem->player)
             continue;
 		mem->player->send(data, len);
 	}
