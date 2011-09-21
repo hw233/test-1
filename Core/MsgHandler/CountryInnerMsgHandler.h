@@ -948,6 +948,14 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
     Props* props = (Props*)(data);
     if (props->pexp)
         player->AddPExp(props->pexp);
+    if (props->honor)
+        player->getAchievement(props->honor);
+    if (props->prestige)
+    {
+		GameMsgHdr hdr(0x19F, WORKER_THREAD_WORLD, player, sizeof(&(props->prestige)));
+		GLOBAL().PushMsg(hdr, &(props->prestige));
+    }
+
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
