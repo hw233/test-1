@@ -33,13 +33,13 @@ void GameClient::setChk(UInt8 chk)
 int GameClient::parsePacket( struct evbuffer * buf, int &off, int &len )
 {
 	size_t l = evbuffer_get_length(buf);
-	if(l < 4)
+	if(l < 5)
 	{
 		off = 0;
 		len = 0;
 		return 0;
 	}
-	UInt8 * buf_ = static_cast<UInt8 *>(evbuffer_pullup(buf, 4));
+	UInt8 * buf_ = static_cast<UInt8 *>(evbuffer_pullup(buf, 5));
 	/* hack: 返回xml安全规则给flash客户端 */
 	if(buf_[2] == 'o' && buf_[0] == '<' && buf_[1] == 'p' && buf_[3] == 'l')
 	{
@@ -49,7 +49,7 @@ int GameClient::parsePacket( struct evbuffer * buf, int &off, int &len )
 	}
 
 	UInt32 len2 = *reinterpret_cast<UInt16 *>(buf_);
-	if(len2 + 4 > l)
+	if(len2 + 5 > l)
 	{
 		off = 0;
 		len = 0;
@@ -168,10 +168,11 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             UInt8 chk = rand()%257;
             if (!chk) chk = 0xff;
             setChk(chk);
+
             Stream st(REP::USER_INFO_CHANGE);
             st << static_cast<UInt8>(0x14) << static_cast<UInt32>(chk);
             st << Stream::eos;
-            pl->send(st);
+            send(&st[0], st.size());
         }
     }
 

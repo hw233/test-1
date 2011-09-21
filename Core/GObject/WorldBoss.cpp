@@ -210,7 +210,7 @@ namespace GObject
                     }
                 }
 
-                if (pl->attackNpc(i->second.npcId))
+                if (pl->attackNpc(i->second.npcId, 0xFFFFFFFF, true, false))
                 {
                     if (!vip)
                     {
