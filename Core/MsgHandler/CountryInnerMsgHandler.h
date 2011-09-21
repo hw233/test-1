@@ -935,4 +935,19 @@ void OnPracticeExpAddReq( GameMsgHdr& hdr, const void* data )
     player->AddPracticeExp(pfexp);
 }
 
+void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct Props
+    {    
+        UInt32 pexp;
+        UInt32 prestige;
+        UInt32 honor;
+    };
+
+    Props* props = (Props*)(data);
+    if (props->pexp)
+        player->AddPExp(props->pexp);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
