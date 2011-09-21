@@ -49,7 +49,7 @@ namespace GObject
     UInt32 Player::_tavernBlueCount = 24;
     UInt32 Player::_tavernPurpleCount = 89;
     UInt32 Player::_tavernOrangeCount = 200;
-	UInt32 Player::_tavernInterval = 2 * 3600, Player::_tavernRate = 100;
+	UInt32 Player::_tavernInterval = 1 * 3600, Player::_tavernRate = 100;
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24};
 	const UInt16 MAX_EXTEND_TIME	= 10;
@@ -1601,7 +1601,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.3);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
 	}

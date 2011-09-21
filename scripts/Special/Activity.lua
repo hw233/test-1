@@ -644,7 +644,7 @@ end
 
 function onRecruitAward(player)
     local date = os.date("%Y%m%d", os.time())
-    if date >=  "20110915" and date <= "20110922" then
+    if date >=  "20110915" then
 		local table_items = {0xA000, 1000, 1};
         sendItemPackageMail(player, '散仙召集令', '您在【散仙召集令】活动中，成功招募传奇散仙一名，恭喜您获得奖励1000礼券，感谢您对我们游戏的支持。', table_items)
     end

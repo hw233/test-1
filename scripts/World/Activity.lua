@@ -91,7 +91,7 @@ function onActivityCheck(tm)
     setDungeonPrice(2, 100)
   end
   setDungeonCount(1)
-  setTavernInterval(2 * 3600)
+  setTavernInterval(1 * 3600)
   setTavernRate(100)
   
   setRecruitCost(20);
