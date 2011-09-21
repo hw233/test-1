@@ -1505,7 +1505,7 @@ namespace GObject
 		return res;
 	}
 
-	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen )
+	bool Player::attackNpc( UInt32 npcId, UInt32 turns, bool regen, bool needtype )
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -1529,7 +1529,7 @@ namespace GObject
         if (!ng)
             return false;
 
-        if (ng->getType()) // XXX: 必须是野外怪
+        if (needtype && ng->getType()) // XXX: 必须是野外怪
             return false;
 
 		if(GameAction()->RunExploreTask(this, npcId))

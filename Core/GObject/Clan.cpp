@@ -1075,6 +1075,8 @@ void Clan::broadcastMemberInfo( ClanMember& cmem, UInt8 t )
 
 void Clan::broadcastPendingMemberInfo( ClanPendingMember& cpmem )
 {
+    if (!cpmem.player)
+        return;
 	Stream st(REP::CLAN_INFO_UPDATE);
 	st << static_cast<UInt8>(0) << cpmem.player->getId() << static_cast<UInt8>(100) << cpmem.player->getName() << cpmem.player->GetLev() << static_cast<UInt8>(cpmem.player->isOnline() ? 1 : 0) << cpmem.player->getLastOnline() << Stream::eos;
 	broadcast(st);

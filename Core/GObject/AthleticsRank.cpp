@@ -437,7 +437,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	st << Stream::eos;
 	player->send(st);
 
-    if((*rank)->extrachallenge && type == static_cast<UInt16>(0xFFFF) && !(static_cast<UInt32>(0x80000000) & extrachallenge))
+    if((*rank)->extrachallenge && type == static_cast<UInt16>(0xFFFF) && !(static_cast<UInt32>(0x80000000) & (*rank)->extrachallenge))
     {
         UInt8 color = 0;
         if((*rank)->first4rank & 0x100)
