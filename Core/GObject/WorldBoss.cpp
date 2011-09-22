@@ -17,7 +17,7 @@ namespace GObject
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
-        for (UInt8 i = 0; i < 6; ++i)
+        for (UInt8 i = 0; i < sizeof(worldboss)/sizeof(UInt32); ++i)
         {
             if (cfg.GMCheck || true)
             {
@@ -271,11 +271,13 @@ namespace GObject
 
     void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool show, bool msg)
     {
+        if (getLevel(time(NULL)) != level)
+            return;
         Map * map = Map::FromSpot(loc);
         if (map)
         {
             std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
-            if (i != m_boss.end() && npcId != i->second.npcId)
+            if (i != m_boss.end())
             {
                 map->Hide(i->second.npcId);
                 map->DelObject(i->second.npcId);
