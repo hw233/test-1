@@ -1389,15 +1389,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
     if(defRank != _athleticses[row].end())
         defer = (*(defRank))->ranker;
 
-    if(0 == getAthleticsFirst4Rank(atker, 0x80))  //第一次竞技场挑战
-    {
-        Package* package = atker->GetPackage();
-        package->AddItem(22, 1, 1);
-        addAthleticsEventData(row, atker, defer, 10, 0, 0, 1, 22);
-        setAthleticsFirst4Rank(atker, 0x80);
-        return;
-    }
-
     UInt8 cond = 0;
     UInt8 color = 0;
     UInt16 value = 0;
@@ -1415,7 +1406,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             setAthleticsFirst4Rank( defer, 0x1000 );
         }
 
-        UInt32 prestige = getAthleticsPrestige(atker) + 10;
+        UInt32 prestige = getAthleticsPrestige(atker) + (10 * (World::_wday == 1 ? 2 : 1));
 
         if(getAthleticsWinStreak(atker) > 1)
             prestige += (getAthleticsWinStreak(atker)-1) * 2;
@@ -1426,8 +1417,9 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         player1 = atker;
         player2 = defer;
 
-        if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x100) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) ) //特殊挑战胜利 一天连升200个排名
+        if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x100) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )
         {
+            //特殊挑战胜利 一天连升200个排名
             cond = 16;
             color = 5;
             value = getAthleticsExtraChallenge(atker);
@@ -1435,8 +1427,31 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 3;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )   //特殊挑战胜利 一天连升100个排名
+        else if( 1 == getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x1) )   //第一次成为竞技场第一
         {
+            cond = 1;
+            itemId = 25;
+            itemCount = 1;
+            setAthleticsFirst4Rank(atker, 0x1);
+        }
+        else if( getAthleticsRankUpADay(atker) > 199 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x100) )   //一天内提升200个排名
+        {
+            cond = 15;
+            UInt32 first4rank = 0x100;
+            if(0 == getAthleticsFirst4Rank(atker, 0x4000))
+            {
+                color = 5;
+                first4rank |= 0x4000;
+                setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.5);
+            }
+            value = getAthleticsRankUpADay(atker);
+            itemId = 25;
+            itemCount = 1;
+            setAthleticsFirst4Rank(atker, first4rank);
+        }
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )
+        {
+            //特殊挑战胜利 一天连升100个排名
             cond = 16;
             color = 4;
             value = getAthleticsExtraChallenge(atker);
@@ -1444,65 +1459,41 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsExtraChallenge(atker, 0);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x400) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )    //特殊挑战胜利 一天连升50个排名
+        else if( getAthleticsWinStreak(atker) == 30 )   //30连胜
         {
-            cond = 16;
-            color = 3;
-            value = getAthleticsExtraChallenge(atker);
+            cond = 12;
+            value = getAthleticsWinStreak(atker);
+            itemId = 25;
+            itemCount = 1;
+        }
+        else if( getAthleticsRankUpADay(atker) > 99 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x200) )  //一天内提升100个排名
+        {
+            cond = 15;
+            UInt32 first4rank = 0x200;
+            if(0 == getAthleticsFirst4Rank(atker, 0x4000))
+            {
+                color = 4;
+                first4rank |= 0x4000;
+                setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.7);
+            }
+            value = getAthleticsRankUpADay(atker);
             itemId = 24;
             itemCount = 1;
-            setAthleticsExtraChallenge(atker, 0);
+            setAthleticsFirst4Rank(atker, first4rank);
         }
-        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )    //特殊挑战胜利 一天连升20个排名
+        else if( 2 == getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x2) )     //第一次杀入竞技场二强
         {
-            cond = 16;
-            color = 2;
-            value = getAthleticsExtraChallenge(atker);
-            itemId = 23;
+            cond = 3;
+            itemId = 24;
             itemCount = 1;
-            setAthleticsExtraChallenge(atker, 0);
+            setAthleticsFirst4Rank(atker, 0x2);
         }
-        else if( 1 == getRankPos(row, atkRank) && row == 1 )
+        else if( 3 == getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x4) )    //第一次杀入竞技场三强
         {
-            if( 0 == getAthleticsFirst4Rank(atker, 0x1) )   //第一次成为竞技场第一
-            {
-                cond = 1;
-                itemId = 25;
-                itemCount = 1;
-                setAthleticsFirst4Rank(atker, 0x1);
-            }
-            else
-            {
-                cond = 2;
-            }
-        }
-        else if( 2 == getRankPos(row, atkRank) && row == 1 )
-        {
-            if( 0 == getAthleticsFirst4Rank(atker, 0x2) )     //第一次杀入竞技场二强
-            {
-                cond = 3;
-                itemId = 24;
-                itemCount = 1;
-                setAthleticsFirst4Rank(atker, 0x2);
-            }
-            else
-            {
-                cond = 4;
-            }
-        }
-        else if( 3 == getRankPos(row, atkRank) && row == 1 )
-        {
-            if( 0 == getAthleticsFirst4Rank(atker, 0x4) )    //第一次杀入竞技场三强
-            {
-                cond = 5;
-                itemId = 24;
-                itemCount = 1;
-                setAthleticsFirst4Rank(atker, 0x4);
-            }
-            else
-            {
-                cond = 6;
-            }
+            cond = 5;
+            itemId = 24;
+            itemCount = 1;
+            setAthleticsFirst4Rank(atker, 0x4);
         }
         else if( 11 > getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x8) )
         {
@@ -1511,12 +1502,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemId = 24;
             itemCount = 1;
             setAthleticsFirst4Rank(atker, 0x2008);
-        }
-        else if( 11 > getRankPos(row, atkRank) && row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x1000) )
-        {
-            //重夺竞技场10强
-            setAthleticsFirst4Rank(atker, 0x2000);
-            cond = 8;
         }
         else if( (101 > getRankPos(row, atkRank)) && 10 < getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x10) )
         {
@@ -1536,41 +1521,11 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsFirst4Rank(atker, 0x20|0x40);
         }
-        else if( (301 > getRankPos(row, atkRank)) && (200 < getRankPos(row, atkRank)) && row == 1 && (0 == getAthleticsFirst4Rank(atker, 0x40)) )
-        {
-            //第一次杀入竞技场300强
-            cond = 9;
-            value = 300;
-            itemId = 23;
-            itemCount = 1;
-            setAthleticsFirst4Rank(atker, 0x40);
-        }
-        else if( getAthleticsWinStreak(atker) == 5 )    //5连胜
-        {
-            cond = 12;
-            value = getAthleticsWinStreak(atker);
-            itemId = 22;
-            itemCount = 1;
-        }
-        else if( getAthleticsWinStreak(atker) == 10 )    //10连胜
-        {
-            cond = 12;
-            value = getAthleticsWinStreak(atker);
-            itemId = 23;
-            itemCount = 1;
-        }
-        else if( getAthleticsWinStreak(atker) == 20 )   //20连胜
+        else if( getAthleticsWinStreak(atker) == 20 )   //15连胜
         {
             cond = 12;
             value = getAthleticsWinStreak(atker);
             itemId = 24;
-            itemCount = 1;
-        }
-        else if( getAthleticsWinStreak(atker) == 30 )   //30连胜
-        {
-            cond = 12;
-            value = getAthleticsWinStreak(atker);
-            itemId = 25;
             itemCount = 1;
         }
         else if( getAthleticsWinStreak(defer) > 19 )   //终结了XXX的(20+)连胜
@@ -1587,49 +1542,15 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemId = 24;
             itemCount = 1;
         }
-        else if( getAthleticsWinStreak(defer) > 4 )    //终结了XXX的(5~9)连胜
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x400) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )
         {
-            cond = 11;
-            value = getAthleticsWinStreak(defer);
-            itemId = 23;
-            itemCount = 1;
-        }
-        else if( getAthleticsWinStreak(defer) > 2 )    //终结了XXX的(3~4)连胜
-        {
-            cond = 11;
-            value = getAthleticsWinStreak(defer);
-            itemId = 22;
-            itemCount = 1;
-        }
-        else if( getAthleticsRankUpADay(atker) > 199 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x100) )   //一天内提升200个排名
-        {
-            cond = 15;
-            UInt32 first4rank = 0x100;
-            if(0 == getAthleticsFirst4Rank(atker, 0x4000))
-            {
-                color = 5;
-                first4rank |= 0x4000;
-                setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.5);
-            }
-            value = getAthleticsRankUpADay(atker);
-            itemId = 25;
-            itemCount = 1;
-            setAthleticsFirst4Rank(atker, first4rank);
-        }
-        else if( getAthleticsRankUpADay(atker) > 99 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x200) )  //一天内提升100个排名
-        {
-            cond = 15;
-            UInt32 first4rank = 0x200;
-            if(0 == getAthleticsFirst4Rank(atker, 0x4000))
-            {
-                color = 4;
-                first4rank |= 0x4000;
-                setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.7);
-            }
-            value = getAthleticsRankUpADay(atker);
+            //特殊挑战胜利 一天连升50个排名
+            cond = 16;
+            color = 3;
+            value = getAthleticsExtraChallenge(atker);
             itemId = 24;
             itemCount = 1;
-            setAthleticsFirst4Rank(atker, first4rank);
+            setAthleticsExtraChallenge(atker, 0);
         }
         else if( getAthleticsRankUpADay(atker) > 49 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x400) )     //一天内提升50个排名
         {
@@ -1646,6 +1567,39 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsFirst4Rank(atker, first4rank);
         }
+        else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )
+        {
+            //特殊挑战胜利 一天连升20个排名
+            cond = 16;
+            color = 2;
+            value = getAthleticsExtraChallenge(atker);
+            itemId = 23;
+            itemCount = 1;
+            setAthleticsExtraChallenge(atker, 0);
+        }
+        else if( (301 > getRankPos(row, atkRank)) && (200 < getRankPos(row, atkRank)) && row == 1 && (0 == getAthleticsFirst4Rank(atker, 0x40)) )
+        {
+            //第一次杀入竞技场300强
+            cond = 9;
+            value = 300;
+            itemId = 23;
+            itemCount = 1;
+            setAthleticsFirst4Rank(atker, 0x40);
+        }
+        else if( getAthleticsWinStreak(atker) == 10 )    //10连胜
+        {
+            cond = 12;
+            value = getAthleticsWinStreak(atker);
+            itemId = 23;
+            itemCount = 1;
+        }
+        else if( getAthleticsWinStreak(defer) > 4 )    //终结了XXX的(5~9)连胜
+        {
+            cond = 11;
+            value = getAthleticsWinStreak(defer);
+            itemId = 23;
+            itemCount = 1;
+        }
         else if( getAthleticsRankUpADay(atker) > 19 && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x800) )    //一天内提升20个排名
         {
             cond = 15;
@@ -1661,28 +1615,37 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemCount = 1;
             setAthleticsFirst4Rank(atker, first4rank);
         }
-
-        if( cond == 0 && uRand(100) < 7 )    //意外之喜
+        else if( getAthleticsWinStreak(atker) == 5 )    //5连胜
         {
-            cond = 17;
+            cond = 12;
+            value = getAthleticsWinStreak(atker);
+            itemId = 22;
+            itemCount = 1;
+        }
+        else if( getAthleticsWinStreak(defer) > 2 )    //终结了XXX的(3~4)连胜
+        {
+            cond = 11;
+            value = getAthleticsWinStreak(defer);
             itemId = 22;
             itemCount = 1;
         }
 
-        if( cond != 0 )
+        if( (cond == 0 && uRand(100) < 7) || World::_wday == 3 )    //意外之喜
         {
-            AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
-
-            GameMsgHdr hdr2(0x217, atker->getThreadId(), atker, sizeof(AthleticsAward));
-            GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
-
-            addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
-            cond = 0;
+            cond = 17;
+            static UInt8 extra_roll[4] = {0, 5, 30, 100};
+            static UInt8 extra_award[4] = {25, 24, 23, 22};
+            for( int i = 0; i < 4; ++i )
+            {
+                if(uRand(100) < extra_roll[i])
+                    itemId = extra_award[i];
+            }
+            itemCount = 1;
         }
     }
     else
     {
-        UInt32 prestige = getAthleticsPrestige(atker) + 5;
+        UInt32 prestige = getAthleticsPrestige(atker) + (5 * (World::_wday == 1 ? 2 : 1));
         setAthleticsPrestige( atker, prestige );
 
         player1 = defer;
@@ -1720,17 +1683,24 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             itemId = 23;
             itemCount = 1;
         }
+    }
 
-        if( cond != 0 )
-        {
-            AthleticsAward deferAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
+    if(cond == 0 && 0 == getAthleticsFirst4Rank(atker, 0xFFFFFFFF))  //第一次竞技场挑战
+    {
+        cond = 10;
+        itemId = 22;
+        itemCount = 1;
+        setAthleticsFirst4Rank(atker, 0x80);
+    }
 
-            GameMsgHdr hdr2(0x217, defer->getThreadId(), defer, sizeof(AthleticsAward));
-            GLOBAL().PushMsg(hdr2, &deferAthleticsAward);
+    if( cond != 0 )
+    {
+        AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, itemId, itemCount };
 
-            addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
-            cond = 0;
-        }
+        GameMsgHdr hdr2(0x217, player1->getThreadId(), player1, sizeof(AthleticsAward));
+        GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
+
+        addAthleticsEventData(row, player1, player2, cond, color, value, itemCount, itemId);
     }
 }
 

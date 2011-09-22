@@ -3119,7 +3119,6 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 
 void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
 {
-    return; // TODO:
     MSG_QUERY_PLAYER(player);
     player->accPractice();
 }

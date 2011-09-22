@@ -952,7 +952,7 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
         player->getAchievement(props->honor);
     if (props->prestige)
     {
-		GameMsgHdr hdr(0x19F, WORKER_THREAD_WORLD, player, sizeof(&(props->prestige)));
+		GameMsgHdr hdr(0x1A0, WORKER_THREAD_WORLD, player, sizeof(&(props->prestige)));
 		GLOBAL().PushMsg(hdr, &(props->prestige));
     }
 

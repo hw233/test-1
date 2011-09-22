@@ -125,7 +125,7 @@ UInt8 Fighter::getColor2( float pot )
 		return 0;
 	if(pot < 1.199f)
 		return 1;
-	if(pot < 1.399f)
+	if(pot < 1.499f)
 		return 2;
 	if(pot < 1.799f)
 		return 3;
