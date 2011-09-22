@@ -15,6 +15,13 @@ void FrontMap::sendAllInfo(Player* pl)
 {
 }
 
+UInt8 FrontMap::getFreeCount()
+{
+    if (World::_wday == 7)
+        return FREECNT * 2;
+    return FREECNT;
+}
+
 UInt8 FrontMap::getGoldCount(UInt8 vipl)
 {
     if (vipl == 2)
@@ -139,7 +146,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
     UInt8 ret = 1;
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (!tmp.size()) {
-        if (PLAYER_DATA(pl, frontFreeCnt) < FREECNT) {
+        if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount()) {
             ++PLAYER_DATA(pl, frontFreeCnt);
             tmp.resize(1);
             DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
@@ -195,7 +202,7 @@ UInt8 FrontMap::getCount(Player* pl)
 
     UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, frontGoldCnt);
     count <<= 4;
-    count |= FREECNT-PLAYER_DATA(pl, frontFreeCnt);
+    count |= getFreeCount()-PLAYER_DATA(pl, frontFreeCnt);
     return count;
 }
 
@@ -205,7 +212,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
 
     FastMutex::ScopedLock lk(_mutex);
-    if (PLAYER_DATA(pl, frontFreeCnt) > FREECNT && PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))
+    if (PLAYER_DATA(pl, frontFreeCnt) > getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))
         return;
 
     Stream st(REP::FORMATTON_INFO);
@@ -241,7 +248,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
-        if (pl->attackCopyNpc(fgtid, 0, id)) {
+        if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1)) {
             ret = true;
         }
 

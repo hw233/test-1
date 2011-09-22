@@ -210,7 +210,7 @@ namespace GObject
                     }
                 }
 
-                if (pl->attackNpc(i->second.npcId, 0xFFFFFFFF, true, false))
+                if (pl->attackCopyNpc(i->second.npcId, 2, 0, World::_wday==4?2:1))
                 {
                     if (!vip)
                     {

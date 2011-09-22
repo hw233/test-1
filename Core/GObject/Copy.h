@@ -29,6 +29,7 @@ public:
     static const UInt8 GOLDCNT = 3;
     static const UInt8 FREECNT = 2;
 
+    static UInt8 getFreeCount();
     static UInt8 getGoldCount(UInt8 vipl);
 
 public:

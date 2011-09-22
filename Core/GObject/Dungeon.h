@@ -89,7 +89,7 @@ public:
 	static UInt16 * getPrice(size_t& size);
 	static void setExtraCount(UInt32 idx, UInt8 count);
 
-    static UInt8 getMaxCount() { return _maxCount; };
+    static UInt8 getMaxCount() { return _maxCount + (World::_wday==5?1:0); };
 	static UInt8 getExtraCount(UInt32 viplvl) { return _extraCount[viplvl]; }
 
     void doJusticeRoar(Player*);
@@ -107,7 +107,7 @@ private:
 	void updateToDB(Player *, DungeonPlayerInfo&);
 	void checkForTimeout(Player *, DungeonPlayerInfo&, bool);
 	void broadcast(Stream&, Player * = NULL);
-	inline static UInt8 getEnterCount() { return _maxCount; }
+	inline static UInt8 getEnterCount() { return getMaxCount(); }
 private:
 	inline UInt8 getGemLeve3Chance(UInt8 id, UInt8 bossIndex)
 	{

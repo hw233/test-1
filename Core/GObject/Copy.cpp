@@ -37,6 +37,13 @@ void PlayerCopy::sendAllInfo(Player* pl)
 {
 }
 
+UInt8 PlayerCopy::getFreeCount()
+{
+    if (World::_wday == 6)
+        return FREECNT * 2;
+    return FREECNT;
+}
+
 UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 {
     if (vipl == 2)
@@ -66,7 +73,7 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     st << count;
     count = getGoldCount(pl->getVipLevel());
     count <<=4;
-    count |= FREECNT;
+    count |= getFreeCount();
     st << count;
     st << Stream::eos;
     pl->send(st);
@@ -115,7 +122,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id)
     if (!copyCheckLevel(pl, id))
         return 1;
 
-    if (PLAYER_DATA(pl, copyFreeCnt) < FREECNT) {
+    if (PLAYER_DATA(pl, copyFreeCnt) < getFreeCount()) {
         ++PLAYER_DATA(pl, copyFreeCnt);
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         return 0;
@@ -198,7 +205,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         return 0;
     }
 
-    if (PLAYER_DATA(pl, copyFreeCnt) > FREECNT && PLAYER_DATA(pl, copyGoldCnt) > getGoldCount(pl->getVipLevel()))
+    if (PLAYER_DATA(pl, copyFreeCnt) > getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > getGoldCount(pl->getVipLevel()))
         return 0;
 
     if (!GData::copyManager[id<<8|tcd.floor].size())
@@ -221,7 +228,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         }
 
         std::vector<UInt16> loot;
-        if (pl->attackCopyNpc(fgtid, 1, id, ato, &loot)) {
+        if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, ato, &loot)) {
             bool nextfloor = false;
             if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
                 nextfloor = true;
