@@ -5187,15 +5187,18 @@ namespace GObject
             UInt16 money = 0;
             int count = 0;
 
-            if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
+            if(type == 1)
             {
+                if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
+                {
+                    updateNextBookStoreUpdate(curtime);
+                }
+                else
+                {
+                    money = GData::moneyNeed[GData::BOOK_LIST].tael;
+                }
+
                 count = 1;
-                updateNextBookStoreUpdate(curtime);
-            }
-            else if(type == 1)
-            {
-                count = 1;
-                money = GData::moneyNeed[GData::BOOK_LIST].tael;
                 // updateNextBookStoreUpdate(curtime);
             }
 

@@ -487,6 +487,7 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
             else
             {
                 setAthleticsExtraChallenge(atker, static_cast<UInt32>(0x80000000) | extrachallenge);
+                setAthleticsFirst4Rank(atker, 0x4000);
                 std::string name = defer->getName();
                 challenge(atker, name, type);
             }
@@ -1441,7 +1442,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 5;
-                first4rank |= 0x4000;
                 setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.5);
             }
             value = getAthleticsRankUpADay(atker);
@@ -1473,7 +1473,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 4;
-                first4rank |= 0x4000;
                 setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.7);
             }
             value = getAthleticsRankUpADay(atker);
@@ -1559,7 +1558,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 3;
-                first4rank |= 0x4000;
                 setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.9);
             }
             value = getAthleticsRankUpADay(atker);
@@ -1607,7 +1605,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 2;
-                first4rank |= 0x4000;
                 setAthleticsExtraChallenge(atker, getRankPos(row, atkRank)*0.95);
             }
             value = getAthleticsRankUpADay(atker);
