@@ -1,3 +1,3 @@
 #!/bin/bash
-. clear.sh
+#. clear.sh
 . new.sh
