@@ -636,7 +636,7 @@ namespace GObject
 		//’Ω∂∑œ‡πÿ
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, bool = false, std::vector<UInt16>* loot = NULL);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, bool = false, std::vector<UInt16>* loot = NULL);
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }

@@ -87,12 +87,12 @@ UInt8 Dungeon::playerEnter( Player * player )
 		leaveLevel(player, it->second.level);
 		//if(it->second.level > 0)
 		{
-            if(cfg.GMCheck && PLAYER_DATA(player, dungeonCnt) >= _maxCount + extraCount)// fix gold less?
+            if(cfg.GMCheck && PLAYER_DATA(player, dungeonCnt) >= getMaxCount() + extraCount)// fix gold less?
             {
                 return 2;
             }
 
-			if(PLAYER_DATA(player, dungeonCnt) >= _maxCount)
+			if(PLAYER_DATA(player, dungeonCnt) >= getMaxCount())
 			{
 				UInt32 price = _price[PLAYER_DATA(player, dungeonCnt)];
 				if(price > 0)
@@ -174,7 +174,7 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	player->pendExp(exp);
 	UInt32 itemId = 0;
 	UInt16 gem3Id[] = {5003, 5013, 5023, 5033, 5043, 5053, 5063, 5073, 5083, 5093, 5103, 5113, 5123};
- 	if(World::_wday == 6)
+ 	if(World::_wday == 5)
 	{
 		UInt8 bossIndex = getLevelBossIndex(_dungeon->getId(), dpi.level);
 		if(uRand(100) < getGemLeve3Chance(_dungeon->getId(), bossIndex))
@@ -609,7 +609,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 				if(player->getTael() < taelReq[_id])
 					break;
 				ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-				if(World::_wday == 3)
+				if(World::_wday == 5)
 					player->useTael(taelReq[_id] / 2, &ci);
 				else
 					player->useTael(taelReq[_id], &ci);

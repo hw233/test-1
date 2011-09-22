@@ -1043,7 +1043,7 @@ namespace GObject
         else if (itemid == 75)
             id = 15;
         else if (itemid == 76)
-            id = 43;
+            id = 28;
         else if (itemid == 77)
             id = 52;
 
@@ -1612,7 +1612,7 @@ namespace GObject
         setCopyFailed();
     }
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, bool ato, std::vector<UInt16>* loot )
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -1648,7 +1648,7 @@ namespace GObject
 		{
 			ret = 0x0101;
 			_lastNg = ng;
-            pendExp(ng->getExp());
+            pendExp(ng->getExp()*expfactor);
 			ng->getLoots(this, _lastLoot, &atoCnt);
 		}
 
@@ -2997,7 +2997,7 @@ namespace GObject
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.shimen[i] == taskid) {
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
-                    AddExp(award);
+                    AddExp(award*(World::_wday==2?2:1));
                     ++_playerData.smFinishCount;
                     _playerData.shimen[i] = 0;
                     _playerData.smcolor[i] = 0;
@@ -3010,7 +3010,7 @@ namespace GObject
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.yamen[i] == taskid) {
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.ymcolor[i], GetLev());
-                    getTael(award);
+                    getTael(award*(World::_wday==2?2:1));
                     ++_playerData.ymFinishCount;
                     _playerData.yamen[i] = 0;
                     _playerData.ymcolor[i] = 0;
@@ -3041,7 +3041,7 @@ namespace GObject
                     useGold(GData::moneyNeed[GData::SHIMEN_IM].gold, &ci);
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.fsmcolor[i], GetLev());
-                    AddExp(award);
+                    AddExp(award*(World::_wday==2?2:1));
                     ++_playerData.smFinishCount;
                     ++_playerData.smAcceptCount;
                     _playerData.fshimen[i] = 0;
@@ -3072,7 +3072,7 @@ namespace GObject
                     useGold(GData::moneyNeed[GData::YAMEN_IM].gold, &ci);
 
                     UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.fymcolor[i], GetLev());
-                    getTael(award);
+                    getTael(award*(World::_wday==2?2:1));
                     AddExp(3000);
                     ++_playerData.ymFinishCount;
                     ++_playerData.ymAcceptCount;
@@ -4490,7 +4490,7 @@ namespace GObject
         UInt8 cnt = playerCopy.getCopySize(this);
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt) << static_cast<UInt8>(GObject::PlayerCopy::FREECNT) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel));
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel));
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -4512,7 +4512,7 @@ namespace GObject
 
         cnt = frontMap.getFrontMapSize(this);
         UInt8 fcnt = frontMap.getCount(this); // XXX: lock???
-        st << cnt << static_cast<UInt8>(GObject::FrontMap::FREECNT+GObject::FrontMap::getGoldCount(vipLevel)-(((fcnt&0xf0)>>4)+(fcnt&0xf))) << static_cast<UInt8>(GObject::FrontMap::FREECNT) << static_cast<UInt8>(GObject::FrontMap::getGoldCount(vipLevel));
+        st << cnt << static_cast<UInt8>(GObject::FrontMap::getFreeCount()+GObject::FrontMap::getGoldCount(vipLevel)-(((fcnt&0xf0)>>4)+(fcnt&0xf))) << static_cast<UInt8>(GObject::FrontMap::getFreeCount()) << static_cast<UInt8>(GObject::FrontMap::getGoldCount(vipLevel));
         if(cnt)
         {
             frontMap.buildInfo(this, st);
