@@ -544,23 +544,32 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         unsigned int flags = 0;
         char key[MEMCACHED_MAX_KEY] = {0};
 
-        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
+        int retry = 3;
         memcached_return rc;
-        char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
-        if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
+        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
+        while (retry)
         {
-            if (strncmp(token.c_str(), rtoken, token.length()) != 0)
+            --retry;
+            char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
             {
-                err += "token is not matched.";
-                ret = 2;
+                ret = 0;
+                if (strncmp(token.c_str(), rtoken, token.length()) != 0)
+                    ret = 2;
+                free(rtoken);
+                break;
             }
-            free(rtoken);
+            else
+            {
+                ret = 3;
+                usleep(500);
+            }
         }
-        else
-        {
+
+        if (ret == 2)
+            err += "token is not matched.";
+        else if (ret == 3)
             err += "fetch token value error.";
-            ret = 3;
-        }
 
         if (rc == MEMCACHED_SUCCESS)
         {
@@ -1038,8 +1047,8 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
     {
         if (level > LEVEL_MAX)
             level = LEVEL_MAX;
-        UInt64 exp = GData::expTable.getLevelMin(level);
-        pl->setLevelAndExp(level, exp);
+        GameMsgHdr msg(0x322, pl->getThreadId(), pl, sizeof(level));
+        GLOBAL().PushMsg(msg, &level);
         ret = 1;
     }
 
