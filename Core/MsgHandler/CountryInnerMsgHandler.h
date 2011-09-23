@@ -723,9 +723,11 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         DB1().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND %"I64_FMT"u",
                 recharge->no, player->getId());
         char gold[32] = {0};
+        char nno[256] = {0};
         const char* id = "29999";
         snprintf(gold, 32, "%u", recharge->gold);
-        player->udpLog(recharge->uint, recharge->money, gold, id, "", "", "pay");
+        snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
+        player->udpLog(nno, recharge->money, gold, id, "", "", "pay");
     }
     else
     {
@@ -751,17 +753,43 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
 	MSG_QUERY_PLAYER(player);
     UInt8 type = *(UInt8*)(data);
 
-    if (type == 1) // 1:新黄钻用户,2:老黄钻用户
+    //1- 511x2,505x2,500x2,15x1,503x5,47x1,48x1,49x1,50x1,51x1,513x2,5033x3,9x5,56x10
+    //2- 56x2,51x1,15x1,511x1
+    if (type == 1) // 1:新黄钻用户
     {
+        player->GetPackage()->AddItem(511, 2, true);
+        player->GetPackage()->AddItem(505, 2, true);
+        player->GetPackage()->AddItem(500, 2, true);
+        player->GetPackage()->AddItem(15, 1, true);
+        player->GetPackage()->AddItem(502, 5, true);
+        player->GetPackage()->AddItem(47, 1, true);
+        player->GetPackage()->AddItem(48, 1, true);
+        player->GetPackage()->AddItem(49, 1, true);
+        player->GetPackage()->AddItem(50, 1, true);
+        player->GetPackage()->AddItem(51, 1, true);
+        player->GetPackage()->AddItem(513, 2, true);
+        player->GetPackage()->AddItem(5033, 3, true);
+        player->GetPackage()->AddItem(9, 5, true);
+        player->GetPackage()->AddItem(56, 10, true);
     }
-    else if (type == 2)
+    else if (type == 2) // 2:老黄钻用户
     {
+        player->GetPackage()->AddItem(56, 2, true);
+        player->GetPackage()->AddItem(51, 1, true);
+        player->GetPackage()->AddItem(15, 1, true);
+        player->GetPackage()->AddItem(511, 1, true);
     }
     else if (type == 3) // key 错误
     {
+        player->sendMsgCode(1, 1005);
     }
     else if (type == 4) // 已领取
     {
+        player->sendMsgCode(1, 1006);
+    }
+    else if (type == 5) // 验证服务器错
+    {
+        player->sendMsgCode(1, 1007);
     }
 }
 

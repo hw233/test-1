@@ -50,7 +50,7 @@ namespace REQ
     /**潜力洗炼*/
     const UInt8 POTENTIAL           = 0xDF;// 0x2C
     /**请求修炼武将列表*/
-    const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
+    //const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
     /**加速取消修炼散仙*/
     const UInt8 TRAIN_FIGHTER_OP    = 0x2B;
     /**背包列表信息*/
@@ -321,7 +321,6 @@ namespace REP
     const UInt8 FIGHTER_ACCEPT      = 0xD5;// 0x28
     const UInt8 PUB_LIST            = 0x2A;
     const UInt8 POTENCIAL           = 0xDF;// 0x2C
-    const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
 
     const UInt8 TRAIN_FIGHTER_OP    = 0x2B;
 

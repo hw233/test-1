@@ -92,6 +92,7 @@ MSG_REG(GameMsgHdr, OnChatItemReq);
 MSG_REG(GameMsgHdr, OnSubmitBugInfo);
 MSG_REG(GameMsgHdr, OnYellowDiamondInfo);
 MSG_REG(GameMsgHdr, OnYellowDiamondAwardRcv);
+MSG_REG(GameMsgHdr, OnYellowDiamondGetPacksRcv);
 
 MSG_REG(GameMsgHdr, OnTradeListReq);
 MSG_REG(GameMsgHdr, OnTradeDataReq);
