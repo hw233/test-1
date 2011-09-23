@@ -2,14 +2,12 @@
 source conf.sh
 function update_object()
 {
-    mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110918_1.sql
-    mysql -h$H -u$U -p$P -P$PT -D$DBO < updates/Object_20110913_1.sql
+    echo "update_object"
 }
 
 function update_data()
 {
-    mysql -h$H -u$U -p$P -P$PT -D$DBD < updates/Data_20110919_1.sql
-
+    echo "update_data"
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";
@@ -38,3 +36,4 @@ function update_data()
 
 update_data
 update_object
+

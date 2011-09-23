@@ -7,6 +7,8 @@
 #include "GData/NpcGroup.h"
 #include "Server/Cfg.h"
 
+UInt8 _bossLvl = 0;
+
 namespace GObject
 {
     static UInt32 worldboss[] = {
@@ -17,7 +19,7 @@ namespace GObject
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
     {
-        for (UInt8 i = 0; i < 6; ++i)
+        for (UInt8 i = 0; i < sizeof(worldboss)/sizeof(UInt32); ++i)
         {
             if (cfg.GMCheck || true)
             {
@@ -35,6 +37,9 @@ namespace GObject
 
     UInt8 WorldBoss::getLevel(UInt32 now)
     {
+        if (!cfg.GMCheck)
+            return _bossLvl;
+
         time_t now2 = static_cast<time_t>(now);
         struct tm * t = localtime(&now2);
         switch (t->tm_hour)
@@ -271,11 +276,16 @@ namespace GObject
 
     void WorldBoss::add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool show, bool msg)
     {
+        if (getLevel(time(NULL)) != level)
+        {
+            DB5().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
+            return;
+        }
         Map * map = Map::FromSpot(loc);
         if (map)
         {
             std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
-            if (i != m_boss.end() && npcId != i->second.npcId)
+            if (i != m_boss.end())
             {
                 map->Hide(i->second.npcId);
                 map->DelObject(i->second.npcId);
@@ -318,6 +328,11 @@ namespace GObject
             m_boss[loc] = wb;
             m_level = level;
         }
+    }
+
+    void WorldBoss::setBossLevel(UInt8 lvl)
+    {
+        _bossLvl = lvl;
     }
 
     WorldBoss worldBoss;

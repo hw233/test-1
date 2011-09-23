@@ -861,6 +861,7 @@ namespace GObject
 		if(idx != PLAYER_BUFF_AUTOHEAL &&
                 idx != PLAYER_BUFF_HOLY && 
                 idx != PLAYER_BUFF_AUTOCOPY && 
+                idx != PLAYER_BUFF_WBOSS &&
                 _buffData[idx] > 0 && _buffData[idx] <= tm)
 		{
 			_buffData[idx] = 0;
@@ -2712,27 +2713,6 @@ namespace GObject
 		if(delTrainFighter(id))
 			PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
 		return true;
-	}
-
-	void Player::makeTrainFighterInfo(Stream& st)
-	{
-		st.init(REP::TRAIN_FIGHTER_LIST);
-		UInt8 cnt = 0;
-		st << cnt;
-		if(!_trainFighters.empty())
-		{
-			UInt32 now = TimeUtil::Now();
-			for (std::map<UInt32, TrainFighterData *>::iterator it = _trainFighters.begin(); it != _trainFighters.end(); ++ it)
-			{
-				if (it->second->trainend > now)
-				{
-					st << it->first << it->second->priceType << static_cast<UInt32>(it->second->trainend - now);
-					++ cnt;
-				}
-			}
-			st.data<UInt8>(4) = cnt;
-		}
-		st << Stream::eos;
 	}
 
 	UInt32 Player::addStatus( UInt32 s )

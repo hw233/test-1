@@ -485,6 +485,12 @@ struct YellowDiamondAwardRcvReq
     MESSAGE_DEF1(REQ::YD_AWARD_RCV, UInt8, m_type);
 };
 
+struct YellowDiamondGetPacksReq
+{
+    std::string key;
+    MESSAGE_DEF1(REQ::YD_GETPACKS, std::string, key);
+};
+
 void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 {
 	MSG_QUERY_PLAYER(pl);
@@ -565,11 +571,6 @@ struct AthleticsDataReq
 	MESSAGE_DEF(REQ::ARENA_FIGHT_INFO);
 };
 #endif
-
-struct FighterTrainListReq
-{
-	MESSAGE_DEF(REQ::TRAIN_FIGHTER_LIST);
-};
 
 struct FighterTrain2Req
 {
@@ -871,11 +872,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	{
 		Stream st;
 		pl->makeFormationInfo(st);
-		conn->send(&st[0], st.size());
-	}
-	{
-		Stream st;
-		pl->makeTrainFighterInfo(st);
 		conn->send(&st[0], st.size());
 	}
 	{
@@ -2687,6 +2683,19 @@ void OnYellowDiamondAwardRcv(GameMsgHdr& hdr, YellowDiamondAwardRcvReq& ydar)
     player->rcvYellowDiamondAward(ydar.m_type);
 }
 
+void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
+{
+    MSG_QUERY_PLAYER(player);
+    struct Key
+    {
+        char key[128];
+    } key;
+
+    snprintf(key.key, sizeof(key.key), "%s", ydar.key.c_str());
+	GameMsgHdr hdr1(0x200, WORKER_THREAD_LOGIN, player, sizeof(key));
+	GLOBAL().PushMsg(hdr1, &key);
+}
+
 struct TradeListReq
 {
 	UInt16 _index;
@@ -3068,15 +3077,6 @@ void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
 
 	Stream st(REP::PWD_LOCK);
 	st << lpd.flag << res << Stream::eos;
-	player->send(st);
-}
-
-void OnFighterTrainListReq( GameMsgHdr& hdr, FighterTrainListReq& )
-{
-    return; // TODO:
-	MSG_QUERY_PLAYER(player);
-	Stream st;
-	player->makeTrainFighterInfo(st);
 	player->send(st);
 }
 

@@ -27,7 +27,6 @@ MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
 MSG_REG(GameMsgHdr, OnFighterTrain2Req);
-MSG_REG(GameMsgHdr, OnFighterTrainListReq);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);
@@ -177,6 +176,7 @@ MSG_REG_2(GameMsgHdr, 0x296, OnAddAwardGold);
 MSG_REG_2(GameMsgHdr, 0x297, OnCreateAward);
 
 MSG_REG_2(GameMsgHdr, 0x2F0, OnGoldRecharge);
+MSG_REG_2(GameMsgHdr, 0x2F1, OnYDPacks);
 
 MSG_REG_2(GameMsgHdr, 0x300, OnSalePriceCheckNotify);
 MSG_REG_2(GameMsgHdr, 0x301, OnSaleAddItemNotify);
