@@ -107,7 +107,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     if (!id)
         return false;
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90};
-    if (pl->GetLev() < lvls[id-1]) {
+    if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8)) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
         return false;
     }
