@@ -746,6 +746,25 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
     }
 }
 
+void OnYDPacks( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8*)(data);
+
+    if (type == 1) // 1:新黄钻用户,2:老黄钻用户
+    {
+    }
+    else if (type == 2)
+    {
+    }
+    else if (type == 3) // key 错误
+    {
+    }
+    else if (type == 4) // 已领取
+    {
+    }
+}
+
 void OnGmHandler(GameMsgHdr& hdr, const void * data)
 {
     std::string cmd(static_cast<const char *>(data));

@@ -26,4 +26,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::BATTLEREPORT,BattleReportReq);
 MSG_REG_2(LoginMsgHdr,SPEQ::ONLINE,ServerOnlineNum);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETLEVEL,SetLevelFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETPROPS,SetPropsFromBs);
+
+MSG_REG_2(GameMsgHdr, 0x200, OnCheckPackKey);
+
 MSG_HANDLER_END()

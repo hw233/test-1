@@ -72,7 +72,6 @@ private:
     void OnOffPeerless(GObject::Player *, std::vector<std::string>&);
     void OnSetLevel(GObject::Player *, std::vector<std::string>&);
 	void OnAttack(GObject::Player *, std::vector<std::string>&);
-	void OnSetBosslevel(GObject::Player * player, std::vector<std::string>& args);
 	void OnClanBox(GObject::Player * player, std::vector<std::string>&);
 	void OnsetWeekDay(std::vector<std::string>&);
 	void OnForge(GObject::Player *, std::vector<std::string>&);
@@ -101,6 +100,7 @@ private:
     void OnAutoCopy(GObject::Player *player, std::vector<std::string>&);
     void OnLock(GObject::Player *player, std::vector<std::string>&);
     void OnUnLock(GObject::Player *player, std::vector<std::string>&);
+    void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

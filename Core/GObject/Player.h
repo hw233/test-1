@@ -521,7 +521,6 @@ namespace GObject
 		bool addTrainFighter(UInt32, UInt8, UInt32);
 		bool accTrainFighter(UInt32, UInt32);
 		bool cancelTrainFighter(UInt32);
-		void makeTrainFighterInfo(Stream&);
 		TrainFighterData* getTrainFighterData(UInt32);
 
 		UInt32 addStatus(UInt32 s);

@@ -85,7 +85,6 @@ GMHandler::GMHandler()
 	Reg(3, "reconn", &GMHandler::OnReconn);
 	Reg(3, "settitle", &GMHandler::OnSetTitle);
 	Reg(3, "title", &GMHandler::OnSetTitle);
-	Reg(3, "setbl", &GMHandler::OnSetBosslevel);
 	Reg(3, "attack", &GMHandler::OnAttack);
 	Reg(3, "challenge", &GMHandler::OnChallenge);
 	Reg(3, "setwd", &GMHandler::OnsetWeekDay);
@@ -129,6 +128,7 @@ GMHandler::GMHandler()
     Reg(3, "ac", &GMHandler::OnAutoCopy);
     Reg(3, "lock", &GMHandler::OnLock);
     Reg(3, "unlock", &GMHandler::OnUnLock);
+    Reg(3, "setbl", &GMHandler::OnSetBosslevel);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -238,15 +238,6 @@ void GMHandler::OnClanBox(GObject::Player * player, std::vector<std::string>& ar
 	GLOBAL().PushMsg(hdr, &clb);
 }
 
-void GMHandler::OnSetBosslevel(GObject::Player * player, std::vector<std::string>& args)
-{
-	if(args.empty())
-		return;
-	UInt8 level = static_cast<UInt8>(atoi(args[0].c_str()));
-	if(level < 21 || level > 999)
-		return;
-	player->setBossLevel(level);
-}
 void GMHandler::OnClanDonate(GObject::Player * player, std::vector<std::string>& args )
 {
 	if(args.empty())
@@ -2306,5 +2297,14 @@ void GMHandler::OnUnLock(GObject::Player *player, std::vector<std::string>& args
         pl->setLockExpireTime(0);
         DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pl->getId());
     }
+}
+
+void GMHandler::OnSetBosslevel(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+    if (args.size() < 1)
+        return;
+    GObject::worldBoss.setBossLevel(atoi(args[0].c_str()));
 }
 

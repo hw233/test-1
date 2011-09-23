@@ -39,6 +39,8 @@ public:
             m_max = lvl;
     }
 
+    void setBossLevel(UInt8 lvl);
+
 private:
     UInt8 getLevel(UInt32 now);
 
