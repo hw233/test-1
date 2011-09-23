@@ -1682,6 +1682,12 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         }
     }
 
+    if((getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)))
+    {
+        // 情况特殊挑战标识
+        setAthleticsExtraChallenge(atker, 0);
+    }
+
     if(cond == 0 && 0 == getAthleticsFirst4Rank(atker, 0xFFFFFFFF))  //第一次竞技场挑战
     {
         cond = 10;
