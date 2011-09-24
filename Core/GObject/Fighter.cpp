@@ -2467,25 +2467,30 @@ Fighter * GlobalFighters::getRandomOut( Player * pl )
 	return _fighters[id].fighter;
 }
 
-Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, std::set<UInt32>& excepts2, UInt8 type, UInt32 rate )
+Fighter * GlobalFighters::getRandomOut( Player * pl, std::set<UInt32>& excepts, std::set<UInt32>& excepts2, UInt8 type, UInt32 rib, UInt32 rip, UInt32 rio)
 {
 	if(_fighters.empty())
 		return NULL;
 
 	Int8 color = 0;
-    UInt8 colors = 4;
+    UInt8 colors = 1;
     UInt8 free_gold = 0;
+    UInt32 chance4color[3] = {0};
+    chance4color[0] = GObject::GObjectManager::getColorFighterChance(rib, type, 1);
+    chance4color[1] = chance4color[0] + GObject::GObjectManager::getColorFighterChance(rip, type, 2);
+    chance4color[2] = chance4color[1] + GObject::GObjectManager::getColorFighterChance(rio, type, 3);
+
 	switch(type)
 	{
     case 0:
     case 1:
         {
             UInt32 roll = uRand(100000);
-            for(int i = 0; i < 4; ++ i)
+            for(int i = 0; i < 3; ++ i)
             {
-                if(roll < GObject::GObjectManager::getColorFighterChance(rate, type, i))
+                if(roll < chance4color[i])
                 {
-                    color = i;
+                    color = i + 1;
                     colors = 1;
                     break;
                 }

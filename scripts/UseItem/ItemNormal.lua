@@ -4851,7 +4851,7 @@ function ItemNormal_athletics_2(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:2]，获得[4:507]x3、 [4:509]x3、 [4:515]x1、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:2]，获得[4:507]x3、 [4:509]x3、 [4:515]x1、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(2, player);
 
@@ -4892,7 +4892,7 @@ function ItemNormal_athletics_3(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:3]，获得[4:507]x2、 [4:509]x2、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:3]，获得[4:507]x2、 [4:509]x2、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(3, player);
 
@@ -4933,7 +4933,7 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:4]，获得[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:4]，获得[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(4, player);
 
@@ -4976,7 +4976,7 @@ function ItemNormal_athletics_5(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:5]，获得[4:50]、[4:49]、[4:503]x3、[4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:5]，获得[4:50]、[4:49]、[4:503]x3、[4:"..equipId.."]");
 
     package:DelItemSendMsg(5, player);
 
@@ -5113,19 +5113,19 @@ function ItemNormal_athletics_24(iid, num, bind, param)
 
     package:DelItemSendMsg(24, player);
     if roll < 21 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60 和[4:"..equipId.."]");
         player:getCoupon(60);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币4000 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币4000 和[4:"..equipId.."]");
         player:getTael(4000);
     elseif roll < 61 then
 		itemId = 506;
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:506] 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:506] 和[4:"..equipId.."]");
     elseif roll < 81 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:508] 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:508] 和[4:"..equipId.."]");
 		itemId = 508;
     else
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券90 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券90 和[4:"..equipId.."]");
         player:getCoupon(90);
     end
 
@@ -5171,19 +5171,19 @@ function ItemNormal_athletics_25(iid, num, bind, param)
 
     package:DelItemSendMsg(25, player);
     if roll < 21 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100 和[4:"..equipId.."]");
         player:getCoupon(100);
     elseif roll < 41 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币10000 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币10000 和[4:"..equipId.."]");
         player:getTael(10000);
     elseif roll < 61 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:507] 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:507] 和[4:"..equipId.."]");
 		itemId = 507;
     elseif roll < 81 then
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:509] 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:509] 和[4:"..equipId.."]");
 		itemId = 509;
     else
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200 和[4:"..equipId.."]");
         player:getCoupon(200);
     end
 
