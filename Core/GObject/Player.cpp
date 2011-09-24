@@ -3478,23 +3478,20 @@ namespace GObject
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
                                     if (getVipLevel() >= 3) {
-                                        static UInt8 viptaskcolor[11] = {0,0,0,1,1,1,2,2,2,2,2};
-                                        _playerData.fsmcolor[n] = j + viptaskcolor[getVipLevel()];
-                                        if (_playerData.fsmcolor[n] > 4)
-                                            _playerData.fsmcolor[n] = 5;
+                                        static UInt8 viptaskcolor[11] = {0,0,0,3,3,3,4,4,4,4,4};
+                                        if (_playerData.fsmcolor[n] < viptaskcolor[getVipLevel()])
+                                            _playerData.fsmcolor[n] = viptaskcolor[getVipLevel()];
                                     }
                                 } else {
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
                                     if (getVipLevel() >= 2) {
-                                        static UInt8 viptaskcolor[11] = {0,0,1,1,1,2,2,2,2,2,2};
-                                        _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
-                                        _playerData.fymcolor[n] = j + viptaskcolor[getVipLevel()];
-                                        if (_playerData.fymcolor[n] > 4)
-                                            _playerData.fymcolor[n] = 5;
+                                        static UInt8 viptaskcolor[11] = {0,0,3,3,3,4,4,4,4,4,4};
+                                        if (_playerData.fymcolor[n] < viptaskcolor[getVipLevel()])
+                                            _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
                                     }
                                 }
-                                if (j+1 == color)
+                                if (color && j+1 == color)
                                     percolor = true;
                                 ++n;
                                 break;
