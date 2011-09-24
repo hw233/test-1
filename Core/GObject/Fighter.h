@@ -616,7 +616,7 @@ public:
 	Fighter *& operator[] (const UInt32& k) { return _fighters[k].fighter; }
 	Fighter * getRandomOut();
 	Fighter * getRandomOut(Player * pl);
-	Fighter * getRandomOut(Player * pl, std::set<UInt32>& excepts, std::set<UInt32>& excepts2, UInt8, UInt32 = 100);
+	Fighter * getRandomOut(Player * pl, std::set<UInt32>& excepts, std::set<UInt32>& excepts2, UInt8 type, UInt32 rib, UInt32 rip, UInt32 rio);
 	void setSpot(UInt32 id, UInt16 spot);
 	UInt16 getSpot(UInt32 id);
 	inline void setMaxFgtId(UInt32 n) { _maxFgtId = n; }

@@ -3713,6 +3713,7 @@ namespace GObject
 		bool extraRefresh = false;
 		UInt16 usedGold = 0, maxGold = _recruit_cost * count;
 
+			updateNextTavernUpdate(0);
 		if(_nextTavernUpdate == 0)
 		{
 			maxGold = 0;
@@ -3767,18 +3768,27 @@ namespace GObject
 				//for(i = 0; i < 6; ++ i)
                     //excepts2.insert(_playerData.tavernId[i]);
 				i = 0;
-                int rateidx = 0;
+                int rateidx0 = 0;
+                int rateidx1 = 0;
+                int rateidx2 = 0;
                 if(!extraRefresh)
                 {
-                     rateidx = _playerData.tavernOrangeCount / 10;
+                    rateidx0 = _playerData.tavernBlueCount / 10;
+                    rateidx1 = _playerData.tavernPurpleCount / 10;
+                    rateidx2 = _playerData.tavernOrangeCount / 10;
                 }
                 else
                 {
-                     rateidx = _playerData.tavernPurpleCount / 10;
+                    rateidx0 = _playerData.tavernBlueCount / 10;
+                    rateidx1 = _playerData.tavernPurpleCount / 10;
                 }
 
-                if(rateidx < 0)
-                    rateidx = 0;
+                if(rateidx0 < 0)
+                    rateidx0 = 0;
+                if(rateidx1 < 0)
+                    rateidx1 = 0;
+                if(rateidx2 < 0)
+                    rateidx2 = 0;
 
 				if(!extraRefresh)
 				{
@@ -3825,7 +3835,7 @@ namespace GObject
 
 				for(; i < 6; ++ i)
 				{
-					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, rateidx);
+					Fighter * fgt = globalFighters.getRandomOut(this, excepts, excepts2, extraRefresh ? 0 : 1, rateidx0, rateidx1, rateidx2);
 					if(fgt == NULL)
 					{
 						_playerData.tavernId[i] = 0;
@@ -3866,6 +3876,10 @@ namespace GObject
 				if(extraRefresh)
 				{
 					extraRefresh = false;
+					if(hasBlue)
+						_playerData.tavernBlueCount = 0;
+					else
+						++ _playerData.tavernBlueCount;
                     if(hasPurple)
 						_playerData.tavernPurpleCount = 0;
 					else
@@ -3878,6 +3892,10 @@ namespace GObject
 						_playerData.tavernBlueCount = 0;
 					else
 						++ _playerData.tavernBlueCount;
+                    if(hasPurple)
+						_playerData.tavernPurpleCount = 0;
+					else
+						++ _playerData.tavernPurpleCount;
                     if(hasOrange)
                         _playerData.tavernOrangeCount = 0;
                     else
@@ -3952,10 +3970,14 @@ namespace GObject
 		ConsumeInfo ci(RecruitFighter,0,0);
 		useTael(price,&ci);
 
-        if(fgt->getColor() > 1)
+        if(fgt->getColor() == 2)
         {
-            _playerData.tavernOrangeCount = 0;
             _playerData.tavernPurpleCount = 0;
+        }
+        else if(fgt->getColor() == 3)
+        {
+            _playerData.tavernPurpleCount = 0;
+            _playerData.tavernOrangeCount = 0;
         }
 
         if(fgt->getColor() ==3)
