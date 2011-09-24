@@ -1,17 +1,7 @@
 -- initializer
-SpringChecPoints = {
-  os.time({ ['year'] = 2011, ['month'] = 4, ['day'] = 1, ['hour'] = 0,  ['min'] = 0,  ['sec'] = 0 }),
-  os.time({ ['year'] = 2011, ['month'] = 4, ['day'] = 4, ['hour'] = 23, ['min'] = 59, ['sec'] = 55}),
-  os.time({ ['year'] = 2011, ['month'] = 4, ['day'] = 5,  ['hour'] = 0,  ['min'] = 0,  ['sec'] = 0 }),
-  os.time({ ['year'] = 2011, ['month'] = 4, ['day'] = 8,  ['hour'] = 23, ['min'] = 59, ['sec'] = 55}),
---  os.time({ ['year'] = 2011, ['month'] = 2, ['day'] = 14, ['hour'] = 0,  ['min'] = 0,  ['sec'] = 0 }),
---  os.time({ ['year'] = 2011, ['month'] = 2, ['day'] = 14, ['hour'] = 23, ['min'] = 59, ['sec'] = 55}),
---  os.time({ ['year'] = 2011, ['month'] = 2, ['day'] = 18, ['hour'] = 23, ['min'] = 59, ['sec'] = 55})
-}
 
 actTime1 = 0;
 actTime2 = 0;
-actTime3 = 0;
 
 serverName = nil
 serverNum = 0
@@ -56,16 +46,6 @@ function setServer(n, num)
 end
 
 function onActivityCheck(tm)
-  if tm >= actTime1 and tm < actTime2 then
-    setActAvailable(true);
-  else
-    setActAvailable(false);
-  end
-  if tm >= actTime1 and tm < actTime3 then
-	setActAvailable1(true);
-  else
-	setActAvailable1(false);
-  end;
   
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -99,26 +79,31 @@ function onActivityCheck(tm)
   setTavernPurpleCount(100);
   setTavernOrangeCount(400);
 
-  for i, v in ipairs(SpringChecPoints) do
-    if tm < SpringChecPoints[i] then
-      setActivityStage(i - 1);
-      return
-    end
+
+  if tm >= actTime1 and tm < actTime2 then
+    setShiMenActiveCount(5);
+    setYaMenActiveCount(5);
+    setCopyActiveCount(2);
+    setFrontMapActiveCount(2);
+    setNationalDay(true);
+  else
+    setShiMenActiveCount(0);
+    setYaMenActiveCount(0);
+    setCopyActiveCount(0);
+    setFrontMapActiveCount(0);
+    setNationalDay(false);
   end
-  setActivityStage(0);
+
 end
 
 function initActTime(y, m, d)
-  local  SerStartTm = { ['year'] = y, ['month'] = m, ['day'] = d, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--开服时间
+  --local  SerStartTm = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  local  SerStartTm = { ['year'] = 2011, ['month'] = 9, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
   actTime1 = os.time(SerStartTm);
-  actTime2 = os.time(SerStartTm) + 6 * 86400;
-  actTime3 = os.time(SerStartTm) + 7 * 86400;
+  actTime2 = os.time(SerStartTm) + 7 * 86400;
   
-  if(actTime1 >= os.time({['year'] = 2011, ['month'] =4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0})) then
-	setIsNewServer(true);
-  end
-
   onActivityCheck(os.time() + 30);
+
   loadStore();
   loadTitle();
 end
@@ -126,3 +111,4 @@ end
 function onAthleticsNewBox(t, c)
   return c
 end
+

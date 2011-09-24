@@ -6,10 +6,17 @@
 #include "Battle/BattleSimulator.h"
 #include "MsgID.h"
 #include "GData/Money.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
 
+UInt8 FrontMap::_activeCount = 0;
+
+void FrontMap::setFrontMapActiveCount(UInt8 c)
+{
+    _activeCount = c;
+}
 
 void FrontMap::sendAllInfo(Player* pl)
 {
@@ -18,8 +25,8 @@ void FrontMap::sendAllInfo(Player* pl)
 UInt8 FrontMap::getFreeCount()
 {
     if (World::_wday == 7)
-        return FREECNT * 2;
-    return FREECNT;
+        return _activeCount + FREECNT * 2;
+    return _activeCount+ FREECNT;
 }
 
 UInt8 FrontMap::getGoldCount(UInt8 vipl)
@@ -141,6 +148,13 @@ void FrontMap::enter(Player* pl, UInt8 id)
 {
     if (!pl || !id)
         return;
+
+    UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
+    if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8))
+    {
+        SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
+        return;
+    }
 
     FastMutex::ScopedLock lk(_mutex);
     UInt8 ret = 1;

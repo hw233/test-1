@@ -129,6 +129,7 @@ GMHandler::GMHandler()
     Reg(3, "lock", &GMHandler::OnLock);
     Reg(3, "unlock", &GMHandler::OnUnLock);
     Reg(3, "setbl", &GMHandler::OnSetBosslevel);
+    Reg(3, "cmd2d", &GMHandler::OnCmd2d);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2306,5 +2307,24 @@ void GMHandler::OnSetBosslevel(GObject::Player *player, std::vector<std::string>
     if (args.size() < 1)
         return;
     GObject::worldBoss.setBossLevel(atoi(args[0].c_str()));
+}
+
+void GMHandler::OnCmd2d(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (!player)
+        return;
+
+    struct Key
+    {
+        UInt16 len;
+        char key[128];
+    } key;
+
+    if (args.size() >= 1)
+        key.len = snprintf(key.key, 128, args[0].c_str());
+    else
+        key.len = snprintf(key.key, 128, "1-hello");
+	GameMsgHdr hdr(0x2D, player->getThreadId(), player, key.len+sizeof(UInt16));
+	GLOBAL().PushMsg(hdr, &key);
 }
 

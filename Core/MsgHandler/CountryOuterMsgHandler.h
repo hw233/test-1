@@ -46,6 +46,7 @@
 #include "Common/Stream.h"
 #include "Common/TimeUtil.h"
 #include "Common/BinaryReader.h"
+#include "LoginMsgHandler.h"
 
 struct NullReq
 {
@@ -2688,11 +2689,13 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
     MSG_QUERY_PLAYER(player);
     struct Key
     {
+        GObject::Player* player;
         char key[128];
     } key;
 
+    key.player = player;
     snprintf(key.key, sizeof(key.key), "%s", ydar.key.c_str());
-	GameMsgHdr hdr1(0x200, WORKER_THREAD_LOGIN, player, sizeof(key));
+	LoginMsgHdr hdr1(0x300, WORKER_THREAD_LOGIN, 0, player->GetSessionID(), sizeof(key));
 	GLOBAL().PushMsg(hdr1, &key);
 }
 

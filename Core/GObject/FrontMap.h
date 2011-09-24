@@ -28,6 +28,9 @@ public:
     static const UInt8 FREECNT = 2;
     static const UInt8 GOLDCNT = 2;
 
+    static UInt8 _activeCount;
+    static void setFrontMapActiveCount(UInt8);
+
     static UInt8 getFreeCount();
     static UInt8 getGoldCount(UInt8 vipl);
 

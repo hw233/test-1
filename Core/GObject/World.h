@@ -44,6 +44,9 @@ public:
 	inline static bool IsNewServer()
 	{ return _isNewServer;}
 
+	inline static void setNationalDay(bool aa)
+	{ _nationalDay = aa; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
 
@@ -62,6 +65,7 @@ public:
 	static bool _actAvailable1;//开服到+7日
 	static UInt8 _wday;
 	static bool _isNewServer;
+    static bool _nationalDay;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

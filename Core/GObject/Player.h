@@ -56,9 +56,9 @@ namespace GObject
 #define PLAYER_BUFF_PRACTICE2       0x17	//修炼加成50% XXX: 暂时不用
 #define PLAYER_BUFF_XTHTYT          0x18	//已使用了先天混沌元胎
 #define PLAYER_BUFF_WBOSS           0x19	//已额外打世界BOSS次数
-#define PLAYER_BUFF_WBOSSID         0x20	//已额外打世界BOSSID
+#define PLAYER_BUFF_YDOTR           0x20    //黄钻国庆充值总额
 #define PLAYER_BUFF_AUTOCOPY        0x21	//自动副本
-#define PLAYER_BUFF_FGTBUY          0x22	//购买过武将数
+#define PLAYER_BUFF_ONLINE          0x22	//累积在线时间
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x30
 #define PLAYER_BUFF_COUNT			0x30
@@ -785,11 +785,14 @@ namespace GObject
         static void setTavernBlueCount(UInt32 tavernBlueCount);
         static void setTavernPurpleCount(UInt32 tavernPurpleCount);
         static void setTavernOrangeCount(UInt32 tavernPurpleCount);
+        static void setShiMenActiveCount(UInt8);
+        static void setYaMenActiveCount(UInt8);
 
 		inline Mutex& getMutex() { return _mutex; }
 
 	private:
 		UInt32 calcVipLevel();
+		UInt32 calcYDVipLevel(UInt32);
 		Player * _findFriend( UInt8 type, std::string& name );
 		bool _hasFriend( UInt8 type, Player * pl ) const;
 		inline Player * _findFriend(std::string& name) { return _findFriend(0, name); }
@@ -805,6 +808,7 @@ namespace GObject
 		void delFriendInternal(Player *, bool = true);
 
 		void sendVIPMails(UInt8, UInt8);
+		void sendYDVIPMails(UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
 
@@ -873,6 +877,9 @@ namespace GObject
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
+    public:
+        static UInt8 _yaMenActiveCount;
+        static UInt8 _shiMenActiveCount;
 	public:
 		void setTicketCount(UInt32 cnt, bool writedb = true);
 		inline UInt32 getTicketCount(){return _exchangeTicketCount;}

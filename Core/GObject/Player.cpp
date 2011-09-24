@@ -51,6 +51,8 @@ namespace GObject
     UInt32 Player::_tavernOrangeCount = 200;
 	UInt32 Player::_tavernInterval = 1 * 3600, Player::_tavernRate = 100;
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
+    UInt8 Player::_yaMenActiveCount = 0;
+    UInt8 Player::_shiMenActiveCount = 0;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24};
 	const UInt16 MAX_EXTEND_TIME	= 10;
 	const UInt16 EACH_EXTEND_NUM	= 50;
@@ -66,6 +68,16 @@ namespace GObject
 	    //    maxCount += 8; 
 		return maxCount;
 	}
+
+    inline UInt8 getShiMenMax()
+    {
+        return SHIMEN_TASK_MAXCOUNT + Player::_shiMenActiveCount;
+    }
+
+    inline UInt8 getYaMenMax()
+    {
+        return YAMEN_TASK_MAXCOUNT + Player::_yaMenActiveCount;
+    }
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
@@ -547,6 +559,30 @@ namespace GObject
 		return vipl;
 	}
 
+	UInt32 Player::calcYDVipLevel(UInt32 total)
+	{
+#define YDVIP_OPEN_MAX 6 
+		UInt32 totalRecharge = total;
+		UInt32 vipl;
+		if(totalRecharge < 100)
+			vipl = 0;
+		else if(totalRecharge < 300)
+			vipl = 1;
+		else if(totalRecharge < 1000)
+			vipl = 2;
+		else if(totalRecharge < 3000)
+			vipl = 3;
+		else if(totalRecharge < 10000)
+			vipl = 4;
+		else if (totalRecharge < 30000)
+			vipl = 5;
+		else
+			vipl = 6;
+		if(vipl > YDVIP_OPEN_MAX)
+			return YDVIP_OPEN_MAX;
+		return vipl;
+	}
+
 	bool Player::Init()
 	{
 		if(_availInit)
@@ -862,6 +898,8 @@ namespace GObject
                 idx != PLAYER_BUFF_HOLY && 
                 idx != PLAYER_BUFF_AUTOCOPY && 
                 idx != PLAYER_BUFF_WBOSS &&
+                idx != PLAYER_BUFF_YDOTR &&
+                idx != PLAYER_BUFF_ONLINE &&
                 _buffData[idx] > 0 && _buffData[idx] <= tm)
 		{
 			_buffData[idx] = 0;
@@ -1686,7 +1724,7 @@ namespace GObject
 		if(!res)
 			checkDeath();
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns()*0.3);
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 		return res;
 	}
 
@@ -2849,7 +2887,6 @@ namespace GObject
 		for(int i = 0; i < 5; ++ i)
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
-			//if(fgt != NULL && fgt->getLevel() < mlvl)
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
@@ -3076,7 +3113,7 @@ namespace GObject
             //    SYSMSG_SENDV(2107, this, "师门");
             //    return true;
             //}
-            if (_playerData.smAcceptCount >= 5) {
+            if (_playerData.smAcceptCount >= getShiMenMax()) {
                 SYSMSG_SENDV(2107, this, "师门");
                 return true;
             }
@@ -3091,7 +3128,7 @@ namespace GObject
             //    SYSMSG_SENDV(2107, this, "衙门");
             //    return true;
             //}
-            if (_playerData.ymAcceptCount >= 5) {
+            if (_playerData.ymAcceptCount >= getYaMenMax()) {
                 SYSMSG_SENDV(2107, this, "衙门");
                 return true;
             }
@@ -3445,8 +3482,8 @@ namespace GObject
             bool percolor = false;
             do {
                 ++ncount;
-                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < SHIMEN_TASK_MAXCOUNT) ||
-                                (ttype == 1 && _playerData.ymFreeCount < YAMEN_TASK_MAXCOUNT))) || ftype) {
+                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < getShiMenMax()) ||
+                                (ttype == 1 && _playerData.ymFreeCount < getYaMenMax()))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     if (!task.size())
@@ -3478,23 +3515,20 @@ namespace GObject
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
                                     if (getVipLevel() >= 3) {
-                                        static UInt8 viptaskcolor[11] = {0,0,0,1,1,1,2,2,2,2,2};
-                                        _playerData.fsmcolor[n] = j + viptaskcolor[getVipLevel()];
-                                        if (_playerData.fsmcolor[n] > 4)
-                                            _playerData.fsmcolor[n] = 5;
+                                        static UInt8 viptaskcolor[11] = {0,0,0,3,3,3,4,4,4,4,4};
+                                        if (_playerData.fsmcolor[n] < viptaskcolor[getVipLevel()])
+                                            _playerData.fsmcolor[n] = viptaskcolor[getVipLevel()];
                                     }
                                 } else {
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
                                     if (getVipLevel() >= 2) {
-                                        static UInt8 viptaskcolor[11] = {0,0,1,1,1,2,2,2,2,2,2};
-                                        _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
-                                        _playerData.fymcolor[n] = j + viptaskcolor[getVipLevel()];
-                                        if (_playerData.fymcolor[n] > 4)
-                                            _playerData.fymcolor[n] = 5;
+                                        static UInt8 viptaskcolor[11] = {0,0,3,3,3,4,4,4,4,4,4};
+                                        if (_playerData.fymcolor[n] < viptaskcolor[getVipLevel()])
+                                            _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
                                     }
                                 }
-                                if (j+1 == color)
+                                if (color && j+1 == color)
                                     percolor = true;
                                 ++n;
                                 break;
@@ -4335,9 +4369,31 @@ namespace GObject
 		}
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
-		//if(World::_newYearStage > 0)
-		//	GameAction()->onTopup(this, oldRecharge, _playerData.totalRecharge);
+
+        UInt32 total = getBuffData(PLAYER_BUFF_YDOTR);
+		if(World::_nationalDay)
+        {
+            if (total == (UInt32)(-1))
+                return;
+
+            UInt32 oldVipLevel = calcYDVipLevel(total);
+            total += r;
+            UInt32 vipLevel = calcYDVipLevel(total);
+            sendYDVIPMails(oldVipLevel + 1, vipLevel);
+            if (vipLevel == 6)
+            {
+                setBuffData(PLAYER_BUFF_YDOTR, static_cast<UInt32>(-1), true);
+            }
+            else
+                setBuffData(PLAYER_BUFF_YDOTR, total, true);
+        }
+        else
+        {
+            if (total)
+                setBuffData(PLAYER_BUFF_YDOTR, 0, true);
+        }
 	}
+
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
 	{
 		m_MailBox->newMail(NULL, 0x01, title, content);
@@ -4486,7 +4542,7 @@ namespace GObject
 		st << static_cast<UInt8>(1);
         UInt32 curtime = TimeUtil::Now();
 		UInt32 vipLevel = getVipLevel();
-        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(SHIMEN_TASK_MAXCOUNT - _playerData.smFinishCount) << static_cast<UInt8>(YAMEN_TASK_MAXCOUNT - _playerData.ymFinishCount) << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
+        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() - _playerData.smFinishCount) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() - _playerData.ymFinishCount) << getYaMenMax() << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
         UInt8 cnt = playerCopy.getCopySize(this);
@@ -4699,6 +4755,16 @@ namespace GObject
         _recruit_cost = recruit_cost;
     }
 
+    void Player::setShiMenActiveCount(UInt8 c)
+    {
+        _shiMenActiveCount = c;
+    }
+
+    void Player::setYaMenActiveCount(UInt8 c)
+    {
+        _yaMenActiveCount = c;
+    }
+
     void Player::setTavernBlueCount(UInt32 tavernBlueCount)
     {
         _tavernBlueCount = tavernBlueCount;
@@ -4863,6 +4929,52 @@ namespace GObject
 		}
 	}
 
+	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
+	{
+		if(l < 1)
+			l = 1;
+		if(h > 6)
+			h = 6;
+
+		for(UInt32 j = l; j <= h; ++j)
+		{
+			SYSMSG(title, 2110);
+			SYSMSGV(content, 2111);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+                return;
+
+			MailPackage::MailItem mitem[2] = {{0,0},};
+			UInt32 mcount = 0;
+            std::string strItems;
+
+			const UInt32 vipTable[7][4] =
+            {
+                {56,2,0,0},
+                {57,3,0,0},
+                {GObject::MailPackage::Coupon,1000,0,0}, // --
+                {502,10,503,20},
+                {515,20,0,0},
+                {509,20,507,20},
+                {0,0,0,0},
+            };
+
+			const UInt32 * t = vipTable[j-1];
+			for(UInt32 i = 0; i < 4 && t[i] > 0; i += 2)
+			{
+				mitem[mcount].id = t[i];
+				mitem[mcount++].count = t[i+1];
+				strItems += Itoa(t[i]);
+				strItems += ",";
+				strItems += Itoa(t[i+1]);
+				strItems += "|";
+			}
+
+			mailPackageManager.push(mail->id, mitem, mcount, true);
+			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
 	void Player::sendVIPMails( UInt8 l, UInt8 h )
 	{
 		if(l < 1)
@@ -4897,7 +5009,6 @@ namespace GObject
             std::string strItems;
 
 			const UInt32 * t = vipTable[j-1];
-			URandom ur(mail->id);
 			for(UInt32 i = 0; i < 12 && t[i] > 0; i += 2)
 			{
 				mitem[mcount].id = t[i];

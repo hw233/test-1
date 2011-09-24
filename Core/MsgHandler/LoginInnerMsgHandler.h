@@ -6,83 +6,119 @@
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
 
-void OnCheckPackKey( GameMsgHdr& hdr, const void * data )
+void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
 {
-	MSG_QUERY_PLAYER(player);
     struct Key
     {
+        GObject::Player* player;
         char key[128];
     };
     Key* key = (Key*)(data);
 
     UInt8 ret = 0;
-    memcached_return rc;
-
-    initMemcache();
-    if (memc)
+    UInt8 type = 0;
+    size_t len = strlen(key->key);
+    if (cfg.GMCheck)
     {
-        size_t tlen = 0;
-        unsigned int flags = 0;
-        size_t len = strlen(key->key);
-
-        int retry = 3;
-        while (retry)
+        memcached_return rc;
+        initMemcache();
+        if (memc)
         {
-            --retry;
-            char* rtoken = memcached_get(memc, key->key, len, &tlen, &flags, &rc);
-            if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
+            size_t tlen = 0;
+            unsigned int flags = 0;
+
+            int retry = 3;
+            while (retry)
             {
-                ret = 0;
-                UInt8 type = 0;
-                if (tlen == 1 && rtoken[0] == '0')
+                --retry;
+                char* rtoken = memcached_get(memc, key->key, len, &tlen, &flags, &rc);
+                if (rc == MEMCACHED_SUCCESS && rtoken && tlen)
                 {
-                    if (key->key[0] == '1' && key->key[1] == '-')
+                    ret = 0;
+                    if (tlen == 1 && rtoken[0] == '0')
                     {
-                        type = 1;
-                    }
-                    if (key->key[0] == '2' && key->key[1] == '-')
-                    {
-                        type = 2;
+                        if (key->key[0] == '1' && key->key[1] == '-')
+                        {
+                            type = 1;
+                        }
+                        else if (key->key[0] == '2' && key->key[1] == '-')
+                        {
+                            type = 2;
+                        }
+                        else
+                        {
+                            type = 3;
+                        }
                     }
                     else
                     {
-                        type = 3;
+                        type = 4;
                     }
+
+                    free(rtoken);
+                    break;
                 }
                 else
                 {
-                    type = 4;
+                    ret = 1;
+                    usleep(500);
                 }
-
-                if (type)
-                {
-                    GameMsgHdr hdr(0x2F1, player->getThreadId(), player, sizeof(type));
-                    GLOBAL().PushMsg(hdr, &type);
-
-                    if (type == 1 || type == 2)
-                    {
-                        char id[32] = {0};
-                        size_t vlen = snprintf(id, 32, "%"I64_FMT"u", player->getId());
-                        //memcached_set(memc, key->key, len, id, vlen);
-                    }
-                }
-
-                free(rtoken);
-                break;
             }
-            else
+        }
+
+        if (ret)
+        {
+            TRACE_LOG("key: %s, rc: %u", key->key, rc);
+            uninitMemcache();
+            initMemcache();
+            type = 5;
+        }
+
+        if (key->player)
+        {
+            GameMsgHdr hdr(0x2F1, key->player->getThreadId(), key->player, sizeof(type));
+            GLOBAL().PushMsg(hdr, &type);
+
+            if (type == 1 || type == 2)
             {
-                ret = 1;
-                usleep(500);
+                char id[32] = {0};
+                size_t vlen = snprintf(id, 32, "%"I64_FMT"u", key->player->getId());
+                memcached_return_t rc = memcached_set(memc, key->key, len, id, vlen, (time_t)(60), 0);
+
+                int retry = 2;
+                while (rc != MEMCACHED_SUCCESS && retry)
+                {
+                    rc = memcached_set(memc, key->key, len, id, vlen, (time_t)(30), 0);
+                    --retry;
+                }
+
+                if (rc != MEMCACHED_SUCCESS)
+                {
+                    rc = memcached_delete(memc, key->key, len, (time_t)0);
+                }
             }
         }
     }
-
-    if (ret)
+    else
     {
-        TRACE_LOG("key: %s, rc: %u", key->key, rc);
-        uninitMemcache();
-        initMemcache();
+        UInt8 type = 1;
+        if (key->key[0] == '1' && key->key[1] == '-')
+        {
+            type = 1;
+        }
+        else if (key->key[0] == '2' && key->key[1] == '-')
+        {
+            type = 2;
+        }
+        else
+        {
+            type = 3;
+        }
+        if (key->player)
+        {
+            GameMsgHdr hdr(0x2F1, key->player->getThreadId(), key->player, sizeof(type));
+            GLOBAL().PushMsg(hdr, &type);
+        }
     }
 }
 

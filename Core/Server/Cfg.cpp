@@ -5,7 +5,7 @@
 #include "Common/StringTokenizer.h"
 
 Cfg::Cfg( ): tcpPort(8888), serverLogId(0), dbDataPort(3306), dbObjectPort(3306),
-	openYear(2010), openMonth(5), openDay(1), enableWallow(false), limitLuckyDraw(0),
+	openYear(2011), openMonth(9), openDay(23), enableWallow(false), limitLuckyDraw(0),
 	merged(false), supportCompress(true), GMCheck(true), channelNum(0), serverNum(0), arenaPort(0),
 	_filename("conf/config.lua"), enableLoginLimit(false), loginLimit(10000), onlineLimit(0)
 {
