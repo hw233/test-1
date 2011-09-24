@@ -44,7 +44,8 @@ CREATE TABLE IF NOT EXISTS `login_states` (
   `player_id` bigint(20) unsigned NOT NULL,
   `login_time` int(10) unsigned NOT NULL,
   `login_ip` varchar(255) NOT NULL,
-  `logout_time` int(10) unsigned NOT NULL
+  `logout_time` int(10) unsigned NOT NULL,
+  INDEX up_login_status (`server_id`, `player_id`, `login_time`) 
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -65,7 +66,8 @@ CREATE TABLE IF NOT EXISTS `mailitem_histories` (
   `receive_time` int(10) unsigned NOT NULL,
   `status` tinyint(3) unsigned NOT NULL,
   `delete_time` int(10) unsigned NOT NULL DEFAULT 0,
-  PRIMARY KEY (`server_id`, `player_id`, `mail_id`)
+  PRIMARY KEY (`server_id`, `player_id`, `mail_id`),
+  INDEX up_mail_status (`server_id`, `mail_id`, `status`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -80,7 +82,8 @@ CREATE TABLE IF NOT EXISTS `topup_num` (
   `player_id` bigint(20) unsigned NOT NULL,
   `topup_gold` int(10) unsigned NOT NULL,
   `rand_num` tinyint(3) unsigned NOT NULL,
-  `topup_time` int(10) unsigned NOT NULL
+  `topup_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -97,7 +100,10 @@ CREATE TABLE IF NOT EXISTS `consume_gold` (
   `consume_type` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
   `expenditure` int(10) unsigned NOT NULL,
-  `consume_time` int(10) unsigned NOT NULL
+  `consume_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`),
+  INDEX server_player_type (`server_id`, `player_id`, `consume_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -114,7 +120,10 @@ CREATE TABLE IF NOT EXISTS `consume_achievement` (
   `consume_type` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
   `expenditure` int(10) unsigned NOT NULL,
-  `consume_time` int(10) unsigned NOT NULL
+  `consume_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`),
+  INDEX server_player_type (`server_id`, `player_id`, `consume_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -131,7 +140,10 @@ CREATE TABLE IF NOT EXISTS `consume_coin` (
   `consume_type` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
   `expenditure` int(10) unsigned NOT NULL,
-  `consume_time` int(10) unsigned NOT NULL
+  `consume_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`),
+  INDEX server_player_type (`server_id`, `player_id`, `consume_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -148,7 +160,10 @@ CREATE TABLE IF NOT EXISTS `consume_tael` (
   `consume_type` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
   `expenditure` int(10) unsigned NOT NULL,
-  `consume_time` int(10) unsigned NOT NULL
+  `consume_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`),
+  INDEX server_player_type (`server_id`, `player_id`, `consume_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -165,7 +180,10 @@ CREATE TABLE IF NOT EXISTS `consume_coupon` (
   `consume_type` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
   `expenditure` int(10) unsigned NOT NULL,
-  `consume_time` int(10) unsigned NOT NULL
+  `consume_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`),
+  INDEX server_player_type (`server_id`, `player_id`, `consume_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -181,7 +199,9 @@ CREATE TABLE IF NOT EXISTS `item_courses` (
   `item_id` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
   `from_to` tinyint(3) unsigned NOT NULL,
-  `happened_time` int(10) unsigned NOT NULL
+  `happened_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -197,7 +217,8 @@ CREATE TABLE IF NOT EXISTS `equip_courses` (
   `template_id` int(10) unsigned NOT NULL,
   `equip_id` int(10) unsigned NOT NULL,
   `from_to` tinyint(3) unsigned NOT NULL,
-  `happened_time` int(10) unsigned NOT NULL
+  `happened_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -212,7 +233,9 @@ CREATE TABLE IF NOT EXISTS `item_histories` (
   `player_id` bigint(20) unsigned NOT NULL,
   `item_id` int(10) unsigned NOT NULL,
   `item_num` int(10) unsigned NOT NULL,
-  `use_time` int(10) unsigned NOT NULL
+  `use_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`),
+  INDEX server_player_item (`server_id`, `player_id`, `item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -228,7 +251,8 @@ CREATE TABLE IF NOT EXISTS `enchant_histories` (
   `equip_id` int(10) unsigned NOT NULL,
   `template_id` int(10) unsigned NOT NULL,
   `enchant_level` tinyint(3) unsigned NOT NULL,
-  `enchant_time` int(10) unsigned NOT NULL
+  `enchant_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -243,7 +267,8 @@ CREATE TABLE IF NOT EXISTS `dungeon_statistics` (
   `player_id` bigint(20) unsigned NOT NULL,
   `dungeon_id` tinyint(3) unsigned NOT NULL,
   `this_day` int(10) unsigned NOT NULL,
-  `pass_time` int(10) unsigned NOT NULL
+  `pass_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -256,7 +281,8 @@ CREATE TABLE IF NOT EXISTS `dungeon_statistics` (
 CREATE TABLE IF NOT EXISTS `online_situations` (
   `server_id` int(10) unsigned NOT NULL,
   `divtime` int(10) unsigned NOT NULL,
-  `num` int(10) unsigned NOT NULL
+  `num` int(10) unsigned NOT NULL,
+  INDEX server(`server_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -281,7 +307,8 @@ CREATE TABLE IF NOT EXISTS `country_battle` (
   `max_player3` int(10) unsigned NOT NULL,
   `max_achievement3` int(10) unsigned NOT NULL,
   `created_at` int(10) unsigned NOT NULL,
-  `num` int(10) unsigned NOT NULL
+  `num` int(10) unsigned NOT NULL,
+  INDEX server(`server_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

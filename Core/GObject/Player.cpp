@@ -51,6 +51,8 @@ namespace GObject
     UInt32 Player::_tavernOrangeCount = 200;
 	UInt32 Player::_tavernInterval = 1 * 3600, Player::_tavernRate = 100;
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
+    UInt8 Player::_yaMenActiveCount = 0;
+    UInt8 Player::_shiMenActiveCount = 0;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24};
 	const UInt16 MAX_EXTEND_TIME	= 10;
 	const UInt16 EACH_EXTEND_NUM	= 50;
@@ -66,6 +68,16 @@ namespace GObject
 	    //    maxCount += 8; 
 		return maxCount;
 	}
+
+    inline UInt8 getShiMenMax()
+    {
+        return SHIMEN_TASK_MAXCOUNT + Player::_shiMenActiveCount;
+    }
+
+    inline UInt8 getYaMenMax()
+    {
+        return YAMEN_TASK_MAXCOUNT + Player::_yaMenActiveCount;
+    }
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
@@ -3076,7 +3088,7 @@ namespace GObject
             //    SYSMSG_SENDV(2107, this, "师门");
             //    return true;
             //}
-            if (_playerData.smAcceptCount >= 5) {
+            if (_playerData.smAcceptCount >= getShiMenMax()) {
                 SYSMSG_SENDV(2107, this, "师门");
                 return true;
             }
@@ -3091,7 +3103,7 @@ namespace GObject
             //    SYSMSG_SENDV(2107, this, "衙门");
             //    return true;
             //}
-            if (_playerData.ymAcceptCount >= 5) {
+            if (_playerData.ymAcceptCount >= getYaMenMax()) {
                 SYSMSG_SENDV(2107, this, "衙门");
                 return true;
             }
@@ -3445,8 +3457,8 @@ namespace GObject
             bool percolor = false;
             do {
                 ++ncount;
-                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < SHIMEN_TASK_MAXCOUNT) ||
-                                (ttype == 1 && _playerData.ymFreeCount < YAMEN_TASK_MAXCOUNT))) || ftype) {
+                if ((!ftype && ((ttype == 0 && _playerData.smFreeCount < getShiMenMax()) ||
+                                (ttype == 1 && _playerData.ymFreeCount < getYaMenMax()))) || ftype) {
                     URandom rnd(time(NULL));
                     const std::vector<UInt32>& task = GData::GDataManager::GetShiYaMenTask(_playerData.country, ttype);
                     if (!task.size())
@@ -4461,7 +4473,7 @@ namespace GObject
 		st << static_cast<UInt8>(1);
         UInt32 curtime = TimeUtil::Now();
 		UInt32 vipLevel = getVipLevel();
-        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(SHIMEN_TASK_MAXCOUNT - _playerData.smFinishCount) << static_cast<UInt8>(YAMEN_TASK_MAXCOUNT - _playerData.ymFinishCount) << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
+        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() - _playerData.smFinishCount) << static_cast<UInt8>(getYaMenMax() - _playerData.ymFinishCount) << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
         UInt8 cnt = playerCopy.getCopySize(this);
@@ -4672,6 +4684,16 @@ namespace GObject
     void Player::setRecruitCost(UInt32 recruit_cost)
     {
         _recruit_cost = recruit_cost;
+    }
+
+    void Player::setShiMenActiveCount(UInt8 c)
+    {
+        _shiMenActiveCount = c;
+    }
+
+    void Player::setYaMenActiveCount(UInt8 c)
+    {
+        _yaMenActiveCount = c;
     }
 
     void Player::setTavernBlueCount(UInt32 tavernBlueCount)

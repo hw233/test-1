@@ -11,6 +11,12 @@
 namespace GObject
 {
 
+UInt8 FrontMap::_activeCount = 0;
+
+void FrontMap::setFrontMapActiveCount(UInt8 c)
+{
+    _activeCount = c;
+}
 
 void FrontMap::sendAllInfo(Player* pl)
 {
@@ -19,8 +25,8 @@ void FrontMap::sendAllInfo(Player* pl)
 UInt8 FrontMap::getFreeCount()
 {
     if (World::_wday == 7)
-        return FREECNT * 2;
-    return FREECNT;
+        return _activeCount + FREECNT * 2;
+    return _activeCount+ FREECNT;
 }
 
 UInt8 FrontMap::getGoldCount(UInt8 vipl)

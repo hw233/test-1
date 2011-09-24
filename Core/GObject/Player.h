@@ -785,6 +785,8 @@ namespace GObject
         static void setTavernBlueCount(UInt32 tavernBlueCount);
         static void setTavernPurpleCount(UInt32 tavernPurpleCount);
         static void setTavernOrangeCount(UInt32 tavernPurpleCount);
+        static void setShiMenActiveCount(UInt8);
+        static void setYaMenActiveCount(UInt8);
 
 		inline Mutex& getMutex() { return _mutex; }
 
@@ -873,6 +875,9 @@ namespace GObject
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
+    public:
+        static UInt8 _yaMenActiveCount;
+        static UInt8 _shiMenActiveCount;
 	public:
 		void setTicketCount(UInt32 cnt, bool writedb = true);
 		inline UInt32 getTicketCount(){return _exchangeTicketCount;}

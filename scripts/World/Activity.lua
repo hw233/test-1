@@ -56,16 +56,16 @@ function setServer(n, num)
 end
 
 function onActivityCheck(tm)
-  if tm >= actTime1 and tm < actTime2 then
-    setActAvailable(true);
-  else
-    setActAvailable(false);
-  end
-  if tm >= actTime1 and tm < actTime3 then
-	setActAvailable1(true);
-  else
-	setActAvailable1(false);
-  end;
+  --if tm >= actTime1 and tm < actTime2 then
+  --  setActAvailable(true);
+  --else
+  --  setActAvailable(false);
+  --end
+  --if tm >= actTime1 and tm < actTime3 then
+  --  setActAvailable1(true);
+  --else
+  --  setActAvailable1(false);
+  --end;
   
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -99,6 +99,18 @@ function onActivityCheck(tm)
   setTavernPurpleCount(100);
   setTavernOrangeCount(400);
 
+  setShiMenActiveCount(0);
+  setYaMenActiveCount(0);
+  setCopyActiveCount(0);
+  setFrontMapActiveCount(0);
+
+  if tm >= actTime1 and tm < actTime2 then
+    setShiMenActiveCount(5);
+    setYaMenActiveCount(5);
+    setCopyActiveCount(2);
+    setFrontMapActiveCount(2);
+  end
+
   for i, v in ipairs(SpringChecPoints) do
     if tm < SpringChecPoints[i] then
       setActivityStage(i - 1);
@@ -109,16 +121,13 @@ function onActivityCheck(tm)
 end
 
 function initActTime(y, m, d)
-  local  SerStartTm = { ['year'] = y, ['month'] = m, ['day'] = d, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--开服时间
+  local  SerStartTm = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  --local  SerStartTm = { ['year'] = 2011, ['month'] = 9, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
   actTime1 = os.time(SerStartTm);
-  actTime2 = os.time(SerStartTm) + 6 * 86400;
-  actTime3 = os.time(SerStartTm) + 7 * 86400;
+  actTime2 = os.time(SerStartTm) + 7 * 86400;
   
-  if(actTime1 >= os.time({['year'] = 2011, ['month'] =4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0})) then
-	setIsNewServer(true);
-  end
-
   onActivityCheck(os.time() + 30);
+
   loadStore();
   loadTitle();
 end
@@ -126,3 +135,4 @@ end
 function onAthleticsNewBox(t, c)
   return c
 end
+

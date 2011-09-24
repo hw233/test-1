@@ -14,6 +14,13 @@
 namespace GObject
 {
 
+UInt8 PlayerCopy::_activeCount = 0;
+
+void PlayerCopy::setCopyActiveCount(UInt8 c)
+{
+    _activeCount = c;
+}
+
 inline void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0, UInt8 spot = 0)
 {
     if (!pl)
@@ -40,8 +47,8 @@ void PlayerCopy::sendAllInfo(Player* pl)
 UInt8 PlayerCopy::getFreeCount()
 {
     if (World::_wday == 6)
-        return FREECNT * 2;
-    return FREECNT;
+        return _activeCount + FREECNT * 2;
+    return _activeCount + FREECNT;
 }
 
 UInt8 PlayerCopy::getGoldCount(UInt8 vipl)

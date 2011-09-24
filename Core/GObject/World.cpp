@@ -178,6 +178,8 @@ void World::setWeekDay(UInt8 wday)
 		for(size_t i = 0; i < sz; ++ i)
 			prices[i] /= 2;	
 	}
+    if (!cfg.GMCheck)
+        _worldScript->onActivityCheck(TimeUtil::Now()+30);
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);

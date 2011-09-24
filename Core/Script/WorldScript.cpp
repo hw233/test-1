@@ -4,6 +4,8 @@
 #include "GData/Title.h"
 #include "GObject/Dungeon.h"
 #include "GObject/Player.h"
+#include "GObject/Copy.h"
+#include "GObject/FrontMap.h"
 #include "GObject/Fighter.h"
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
@@ -44,6 +46,10 @@ void WorldScript::init()
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
+    def("setShiMenActiveCount", GObject::Player::setShiMenActiveCount);
+    def("setYaMenActiveCount", GObject::Player::setYaMenActiveCount);
+    def("setCopyActiveCount", GObject::PlayerCopy::setCopyActiveCount);
+    def("setFrontMapActiveCount", GObject::FrontMap::setFrontMapActiveCount);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
