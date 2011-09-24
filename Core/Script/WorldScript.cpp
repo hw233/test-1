@@ -43,6 +43,7 @@ void WorldScript::init()
 	def("setActAvailable1", GObject::World::setActAvailable1);
 	def("getActivityStage", GObject::World::getActivityStage);
 	def("setIsNewServer", GObject::World::setIsNewServer);
+	def("setNationalDay", GObject::World::setNationalDay);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

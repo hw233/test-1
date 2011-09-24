@@ -75,7 +75,6 @@ enum MailItemType
 	Activity,
 	DismissCitta,
     AutoCopy,
-
 };
 enum ItemFrom
 {
