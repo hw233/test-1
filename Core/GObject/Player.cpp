@@ -43,6 +43,8 @@
 
 #include <cmath>
 
+#define NTD_ONLINE_TIME (4*60*60)
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -459,9 +461,37 @@ namespace GObject
     {
 		GameMsgHdr hdr(0x276, m_Player->getThreadId(), m_Player, sizeof(id));
 		GLOBAL().PushMsg(hdr, &id);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOCOPY, m_Player->getId());
     }
 
     bool EventAutoCopy::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
+    bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventPlayerTimeTick::Process(UInt32 leftCount)
+    {
+        GameMsgHdr hdr(0x277, m_Player->getThreadId(), m_Player, sizeof(type));
+        GLOBAL().PushMsg(hdr, &type);
+
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_TIMETICK, m_Player->getId());
+    }
+
+    bool EventPlayerTimeTick::Accelerate(UInt32 times)
     {
 		UInt32 count = m_Timer.GetLeftTimes();
 		if(times > count)
@@ -660,6 +690,23 @@ namespace GObject
 		checkLastBattled();
 		GameAction()->onLogin(this);
 
+        if (World::_nationalDay)
+        {
+            UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online < NTD_ONLINE_TIME)
+                {
+                    EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, NTD_ONLINE_TIME-online, 1, 0);
+                    if (event) PushTimerEvent(event);
+                }
+                else
+                    sendNationalDayOnlineAward();
+            }
+        }
+        else
+            setBuffData(PLAYER_BUFF_ONLINE, 0, true);
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
         m_ulog = _analyzer.GetInstance(buf);
@@ -687,6 +734,31 @@ namespace GObject
                     cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count);
+        }
+    }
+
+    void Player::sendNationalDayOnlineAward()
+    {
+        if (getBuffData(PLAYER_BUFF_ONLINE) == static_cast<UInt32>(-1))
+            return;
+
+        SYSMSG(title, 2112);
+        SYSMSG(content, 2113);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100},{56,2}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+            std::string strItems;
+            for (int i = 0; i < 2; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            setBuffData(PLAYER_BUFF_ONLINE, static_cast<UInt32>(-1), true);
         }
     }
 
@@ -756,6 +828,18 @@ namespace GObject
 			GameMsgHdr hdr(0x177, WORKER_THREAD_WORLD, this, 0);
 			GLOBAL().PushMsg(hdr, NULL);
 		}
+
+        if (World::_nationalDay)
+        {
+            UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online + curtime - _playerData.lastOnline >= NTD_ONLINE_TIME)
+                    sendNationalDayOnlineAward();
+                else
+                    setBuffData(PLAYER_BUFF_ONLINE, online + curtime - _playerData.lastOnline);
+            }
+        }
 
 		removeStatus(SGPunish);
 	}
@@ -2999,6 +3083,11 @@ namespace GObject
 		DB1().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
 	}
 
+    void Player::writeShiYaMen()
+    {
+		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u', `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
+    }
+
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
         // TODO:
@@ -3237,8 +3326,7 @@ namespace GObject
         _playerData.smAcceptCount = n;
         _playerData.ymAcceptCount = c;
 
-        writeShiMen();
-        writeYaMen();
+        writeShiYaMen();
         if (isOnline())
         {
             sendColorTask(0, 0);

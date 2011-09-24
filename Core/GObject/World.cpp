@@ -111,7 +111,10 @@ bool enum_midnight(void * ptr, void *)
 
     pl->buildClanTask();
     pl->clearFinishCount();
-    pl->setBuffData(PLAYER_BUFF_WBOSS, 0, true);
+    if (pl->getBuffData(PLAYER_BUFF_WBOSS))
+        pl->setBuffData(PLAYER_BUFF_WBOSS, 0, true);
+    if (pl->getBuffData(PLAYER_BUFF_ONLINE))
+        pl->setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 	return true;
 }
 

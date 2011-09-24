@@ -171,6 +171,22 @@ namespace GObject
         UInt8 id;
     };
 
+    class EventPlayerTimeTick : public EventBase
+    {
+    public:
+		EventPlayerTimeTick(Player * player, UInt32 interval, UInt32 count, UInt8 type)
+			: EventBase(player, interval, count), type(type)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_TIMETICK; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 type;
+    };
+
 	struct Lineup
 	{
 		Lineup(): fid(0), pos(0), fighter(NULL) {}
@@ -406,6 +422,7 @@ namespace GObject
         void sendFormationList();
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
+        void sendNationalDayOnlineAward();
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -709,6 +726,7 @@ namespace GObject
 		void writeTavernIds();
 		void writeShiMen();
 		void writeYaMen();
+        void writeShiYaMen();
         bool addAwardByTaskColor(UInt32, bool = false);
         void delColorTask(UInt32);
 
