@@ -3625,7 +3625,6 @@ namespace GObject
 		bool extraRefresh = false;
 		UInt16 usedGold = 0, maxGold = _recruit_cost * count;
 
-			updateNextTavernUpdate(0);
 		if(_nextTavernUpdate == 0)
 		{
 			maxGold = 0;
