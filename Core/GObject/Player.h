@@ -255,6 +255,7 @@ namespace GObject
             memset(yamen, 0, sizeof(yamen));
             memset(ymcolor, 0, sizeof(ymcolor));
             memset(bookStore, 0, sizeof(bookStore));
+            formations.reserve(32);
         }
 
 

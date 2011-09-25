@@ -4356,7 +4356,10 @@ namespace GObject
         for( int idx = 0; idx < cnt; ++ idx )
         {
             if( act_form[idx] == formationId )
+            {
                 act_form.erase(act_form.begin() + idx);
+                cnt = act_form.size();
+            }
         }
 
         addNewFormation(newFormationId, true);
