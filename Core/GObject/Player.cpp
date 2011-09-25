@@ -120,7 +120,7 @@ namespace GObject
 			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
 		return exp * clanEffect;
 #else
-        return 2.0f * _npcGroup->getExp();
+        return 4.0f * _npcGroup->getExp();
 #endif
 	}
 
