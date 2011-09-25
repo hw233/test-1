@@ -700,6 +700,23 @@ void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
         player->autoCopyFailed(id);
 }
 
+void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8*)(data);
+    switch (type)
+    {
+        case 0:
+            {
+                player->sendNationalDayOnlineAward();
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
 void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);

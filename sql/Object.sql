@@ -877,7 +877,7 @@ DROP TABLE IF EXISTS `player_buff`;
 CREATE TABLE `player_buff` (
   `id` bigint(20) NOT NULL,
   `buffId` smallint(5) NOT NULL,
-  `data` int(10) NOT NULL,
+  `data` int(10) unsigned NOT NULL,
   UNIQUE KEY `id_buffId` (`id`,`buffId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

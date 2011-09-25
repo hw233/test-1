@@ -14,6 +14,7 @@ enum EventID
     EVENT_PLAYERPRACTICING = 5,
     EVENT_PLAYERPRTRIPOD = 6,
     EVENT_AUTOCOPY = 7,
+    EVENT_TIMETICK = 8,
 };
 
 namespace GObject
