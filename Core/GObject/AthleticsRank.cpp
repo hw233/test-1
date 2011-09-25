@@ -43,7 +43,7 @@ AthleticsRank::~AthleticsRank()
 		}
 		_athleticses[i].clear();
 
-        for (std::size_t j = 0; i < _athleticsesEvent[i].size(); ++j)
+        for (std::size_t j = 0; j < _athleticsesEvent[i].size(); ++j)
         {
             SAFE_DELETE(_athleticsesEvent[i][j]);
         }

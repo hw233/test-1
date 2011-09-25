@@ -50,7 +50,8 @@ bool existGreatFighter(UInt32 id)
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _weapon(NULL),
-    _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false), _battlePoint(0.0f),
+    _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false),
+    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _battlePoint(0.0f),
     _praadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), talent(0),
@@ -195,10 +196,12 @@ bool Fighter::addExp( UInt64 e )
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
 		}
+        _expFlush = true;
 	}
 	else
 	{
 		sendModification(3, _exp);
+        _expFlush = false;
 	}
 	return r;
 }
@@ -295,8 +298,20 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	{
 	case 1: field = "hp"; break;
 	case 2: field = "level"; break;
-	case 3: DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+	case 3: 
+        {
+            ++_expMods;
+            UInt32 now = time(NULL);
+            if (_expFlush || _expMods >= 10 || now > _expEnd)
+            {
+                DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+                _expFlush = false;
+                _expMods = 0;
+                _expEnd = now + 10*60;
+            }
+        }
 		return;
+
 	case 4:
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
             DB2().PushUpdateData("UPDATE `fighter` SET `potential` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
@@ -305,7 +320,16 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
         if(_id <= GREAT_FIGHTER_MAX && _owner != NULL)
             DB2().PushUpdateData("UPDATE `fighter` SET `capacity` = %u.%02u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v / 100, v % 100, _id, _owner->getId());
         return;
-	case 6: DB().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+	case 6:
+        {
+            ++_pexpMods;
+            if (_pexpMods >= 6) // XXX: 1小时一次
+            {
+                DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+                _pexpMods = 0;
+            }
+            return;
+        }
         break;
     case 7:
             break;

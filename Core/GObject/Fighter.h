@@ -558,6 +558,10 @@ protected:
 	bool _attrDirty;
 	UInt32 _maxHP;
 	bool _bPDirty;
+    bool _expFlush;
+    UInt16 _expMods;
+    UInt32 _expEnd;
+    UInt16 _pexpMods;
 	float _battlePoint;
 	GData::AttrExtra _attrExtraEquip;
 

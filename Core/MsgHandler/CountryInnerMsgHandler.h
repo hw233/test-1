@@ -737,7 +737,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
             return;
         player->getGold(recharge->gold);
         player->addTotalRecharge(recharge->gold);
-        DB1().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND %"I64_FMT"u",
+        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND %"I64_FMT"u",
                 recharge->no, player->getId());
         char gold[32] = {0};
         char nno[256] = {0};
@@ -761,7 +761,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         player->addTotalRecharge(recharge->gold);
 
         // XXX: 把创建银角色前的所有订单号置成成功
-        DB1().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", player->getId());
+        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE playerId = %"I64_FMT"u", player->getId());
     }
 }
 

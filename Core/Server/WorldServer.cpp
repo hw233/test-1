@@ -120,6 +120,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB5));
 	worker = WORKER_THREAD_DB6;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB6));
+	worker = WORKER_THREAD_DB7;
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB7));
+	worker = WORKER_THREAD_DB8;
+	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB8));
 
 	worker = WORKER_THREAD_DB_LOG;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG));
@@ -140,6 +144,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	worker = WORKER_THREAD_DB5;
 	m_AllWorker[worker]->Run();
 	worker = WORKER_THREAD_DB6;
+	m_AllWorker[worker]->Run();
+	worker = WORKER_THREAD_DB7;
+	m_AllWorker[worker]->Run();
+	worker = WORKER_THREAD_DB8;
 	m_AllWorker[worker]->Run();
 
 	worker = WORKER_THREAD_DB_LOG;
@@ -237,6 +245,8 @@ void WorldServer::Shutdown()
 	m_AllWorker[WORKER_THREAD_DB4]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB5]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB6]->Shutdown();
+	m_AllWorker[WORKER_THREAD_DB7]->Shutdown();
+	m_AllWorker[WORKER_THREAD_DB8]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG]->Shutdown();
 	m_AllWorker[WORKER_THREAD_DB_LOG1]->Shutdown();
 }
@@ -286,6 +296,16 @@ DB::DBWorker& WorldServer::GetDB5()
 DB::DBWorker& WorldServer::GetDB6()
 {
 	return Worker<DB::DBWorker>(WORKER_THREAD_DB6);
+}
+
+DB::DBWorker& WorldServer::GetDB7()
+{
+	return Worker<DB::DBWorker>(WORKER_THREAD_DB7);
+}
+
+DB::DBWorker& WorldServer::GetDB8()
+{
+	return Worker<DB::DBWorker>(WORKER_THREAD_DB8);
 }
 
 DB::DBWorker& WorldServer::GetDBLog()

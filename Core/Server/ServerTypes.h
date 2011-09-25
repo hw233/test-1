@@ -24,6 +24,8 @@ enum
 	WORKER_THREAD_DB4,				//9  DB4 item,equipment,sale
 	WORKER_THREAD_DB5,				//10 DB5 task_instance, clan
 	WORKER_THREAD_DB6,				//11 athletics,tripod
+	WORKER_THREAD_DB7,				//12 player_buff
+	WORKER_THREAD_DB8,				//13 recharge
 	WORKER_THREAD_DB_LOG,			//后台LOG
 	WORKER_THREAD_DB_LOG1,			//后台LOG1
 	MAX_THREAD_NUM
