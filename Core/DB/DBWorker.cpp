@@ -196,10 +196,8 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
-#if 0
 	if(m_Type == 0)
 		DB().GetLog()->OutInfo("Push [%s]\n", p);
-#endif
 }
 
 void DBWorker::PushUpdateDataL(const char * fmt, ...)
@@ -239,10 +237,8 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
-#if 0
 	if(m_Type == 0)
 		DB().GetLog()->OutInfo("Push [%s]\n", p);
-#endif
 }
 
 void DBWorker::PushUpdateDataF(const char * fmt, ...)
@@ -279,10 +275,8 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
     ++m_Limit;
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
-#if 0
 	if(m_Type == 0)
 		DB().GetLog()->OutInfo("Push [%s]\n", p);
-#endif
 }
 
 bool DBWorker::DoDBQuery(const char* query)
