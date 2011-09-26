@@ -3075,17 +3075,66 @@ namespace GObject
 
 	void Player::writeShiMen()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], _id);
+        std::string shimen = "";
+        int cnt = _playerData.shimen.size();
+        if(cnt == 0)
+            shimen = "0,0|";
+        for(int i = 0; i < cnt; ++ i)
+        {
+            shimen += Itoa(_playerData.shimen[i]);
+            shimen += ',';
+            shimen += Itoa(_playerData.smcolor[i]);
+            shimen += '|';
+        }
+
+		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%s%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", shimen.c_str(), _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], _id);
 	}
 
 	void Player::writeYaMen()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
+        std::string yamen = "";
+        int cnt = _playerData.yamen.size();
+        if(cnt == 0)
+            yamen = "0,0|";
+        for(int i = 0; i < cnt; ++ i)
+        {
+            yamen += Itoa(_playerData.yamen[i]);
+            yamen += ',';
+            yamen += Itoa(_playerData.ymcolor[i]);
+            yamen += '|';
+        }
+
+
+		DB1().PushUpdateData("UPDATE `player` SET `yamen` = '%s%u|%u|%u',`fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", yamen.c_str(), _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
 	}
 
     void Player::writeShiYaMen()
     {
-		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u', `yamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u|%u|%u', `fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", _playerData.shimen[0], _playerData.smcolor[0], _playerData.shimen[1], _playerData.smcolor[1], _playerData.shimen[2], _playerData.smcolor[2], _playerData.shimen[3], _playerData.smcolor[3], _playerData.shimen[4], _playerData.smcolor[4], _playerData.shimen[5], _playerData.smcolor[5], _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], _playerData.yamen[0], _playerData.ymcolor[0], _playerData.yamen[1], _playerData.ymcolor[1], _playerData.yamen[2], _playerData.ymcolor[2], _playerData.yamen[3], _playerData.ymcolor[3], _playerData.yamen[4], _playerData.ymcolor[4], _playerData.yamen[5], _playerData.ymcolor[5], _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
+        std::string shimen = "";
+        int cnt = _playerData.shimen.size();
+        if(cnt == 0)
+            shimen = "0,0|";
+        for(int i = 0; i < cnt; ++ i)
+        {
+            shimen += Itoa(_playerData.shimen[i]);
+            shimen += ',';
+            shimen += Itoa(_playerData.smcolor[i]);
+            shimen += '|';
+        }
+
+        std::string yamen = "";
+        cnt = _playerData.yamen.size();
+        if(cnt == 0)
+            yamen = "0,0|";
+        for(int j = 0; j < cnt; ++ j)
+        {
+            yamen += Itoa(_playerData.yamen[j]);
+            yamen += ',';
+            yamen += Itoa(_playerData.ymcolor[j]);
+            yamen += '|';
+        }
+
+		DB1().PushUpdateData("UPDATE `player` SET `shimen` = '%s|%u|%u|%u', `fshimen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u', `yamen` = '%s|%u|%u|%u', `fyamen` = '%u,%u|%u,%u|%u,%u|%u,%u|%u,%u|%u,%u' WHERE `id` = %"I64_FMT"u", shimen.c_str(), _playerData.smFreeCount, _playerData.smFinishCount, _playerData.smAcceptCount,  _playerData.fshimen[0], _playerData.fsmcolor[0], _playerData.fshimen[1], _playerData.fsmcolor[1], _playerData.fshimen[2], _playerData.fsmcolor[2], _playerData.fshimen[3], _playerData.fsmcolor[3], _playerData.fshimen[4], _playerData.fsmcolor[4], _playerData.fshimen[5], _playerData.fsmcolor[5], yamen.c_str(), _playerData.ymFreeCount, _playerData.ymFinishCount, _playerData.ymAcceptCount, _playerData.fyamen[0], _playerData.fymcolor[0], _playerData.fyamen[1], _playerData.fymcolor[1], _playerData.fyamen[2], _playerData.fymcolor[2], _playerData.fyamen[3], _playerData.fymcolor[3], _playerData.fyamen[4], _playerData.fymcolor[4], _playerData.fyamen[5], _playerData.fymcolor[5], _id);
     }
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
@@ -3100,26 +3149,34 @@ namespace GObject
         }
 #endif
         if (!im) {
-            for (int i = 0; i < 6; ++i) {
-                if (_playerData.shimen[i] == taskid) {
-                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, _playerData.smcolor[i], GetLev());
+            std::vector<UInt32>& shimen = _playerData.shimen;
+            std::vector<UInt8>& smcolor = _playerData.smcolor;
+            int cnt = shimen.size();
+            for (int i = 0; i < cnt; ++i) {
+                if (shimen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(0, smcolor[i], GetLev());
                     AddExp(award*(World::_wday==2?2:1));
                     ++_playerData.smFinishCount;
-                    _playerData.shimen[i] = 0;
-                    _playerData.smcolor[i] = 0;
+                    shimen.erase(shimen.begin() + i);
+                    smcolor.erase(smcolor.begin() + i);
+                    -- cnt;
 
                     sendColorTask(0, 0);
                     writeShiMen();
                     return true;
                 }
             }
-            for (int i = 0; i < 6; ++i) {
-                if (_playerData.yamen[i] == taskid) {
-                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, _playerData.ymcolor[i], GetLev());
+            std::vector<UInt32>& yamen = _playerData.yamen;
+            std::vector<UInt8>& ymcolor = _playerData.ymcolor;
+            cnt = yamen.size();
+            for (int i = 0; i < cnt; ++i) {
+                if (yamen[i] == taskid) {
+                    UInt32 award = Script::BattleFormula::getCurrent()->calcTaskAward(2, ymcolor[i], GetLev());
                     getTael(award*(World::_wday==2?2:1));
                     ++_playerData.ymFinishCount;
-                    _playerData.yamen[i] = 0;
-                    _playerData.ymcolor[i] = 0;
+                    yamen.erase(yamen.begin() + i);
+                    ymcolor.erase(ymcolor.begin() + i);
+                    -- cnt;
 
                     sendColorTask(1, 0);
                     writeYaMen();
@@ -3237,8 +3294,8 @@ namespace GObject
             {
                 if (_playerData.fshimen[i] == taskid)
                 {
-                    _playerData.shimen[_playerData.smAcceptCount] = taskid;
-                    _playerData.smcolor[_playerData.smAcceptCount] = _playerData.fsmcolor[i];
+                    _playerData.shimen.push_back(taskid);
+                    _playerData.smcolor.push_back(_playerData.fsmcolor[i]);
 
                     _playerData.fshimen[i] = 0;
                     _playerData.fsmcolor[i] = 0;
@@ -3256,8 +3313,8 @@ namespace GObject
             {
                 if (_playerData.fyamen[i] == taskid)
                 {
-                    _playerData.yamen[_playerData.ymAcceptCount] = taskid;
-                    _playerData.ymcolor[_playerData.ymAcceptCount] = _playerData.fymcolor[i];
+                    _playerData.yamen.push_back(taskid);
+                    _playerData.ymcolor.push_back(_playerData.fymcolor[i]);
 
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
@@ -3275,11 +3332,16 @@ namespace GObject
     {
         if (type == 4)
         {
-            for (int i = 0; i < 6; ++i)
+            std::vector<UInt32>& shimen = _playerData.shimen;
+            std::vector<UInt8>& smcolor = _playerData.smcolor;
+            int cnt = shimen.size();
+            for (int i = 0; i < cnt; ++i)
             {
-                if (_playerData.shimen[i] == taskid)
+                if (shimen[i] == taskid)
                 {
-                    _playerData.shimen[i] = 0;
+                    shimen.erase(shimen.begin() + i);
+                    smcolor.erase(smcolor.begin() + i);
+                    -- cnt;
                     if (_playerData.smAcceptCount)
                     {
                         --_playerData.smAcceptCount;
@@ -3292,11 +3354,16 @@ namespace GObject
         }
         if (type == 5)
         {
-            for (int i = 0; i < 6; ++i)
+            std::vector<UInt32>& yamen = _playerData.yamen;
+            std::vector<UInt8>& ymcolor = _playerData.ymcolor;
+            int cnt = yamen.size();
+            for (int i = 0; i < cnt; ++i)
             {
-                if (_playerData.yamen[i] == taskid)
+                if (yamen[i] == taskid)
                 {
-                    _playerData.yamen[i] = 0;
+                    yamen.erase(yamen.begin() + i);
+                    ymcolor.erase(ymcolor.begin() + i);
+                    -- cnt;
                     if (_playerData.ymAcceptCount)
                     {
                         --_playerData.ymAcceptCount;
@@ -3316,13 +3383,15 @@ namespace GObject
         _playerData.smFreeCount = 0;
         _playerData.ymFreeCount = 0;
 
-        UInt8 c = 0;
-        UInt8 n = 0;
+        UInt8 c = _playerData.shimen.size();
+        UInt8 n = _playerData.yamen.size();
+#if 0
         for (UInt8 i=0; i<6; ++i)
         {
             if (_playerData.shimen[i]) ++n;
             if (_playerData.yamen[i]) ++c;
         }
+#endif
         _playerData.smAcceptCount = n;
         _playerData.ymAcceptCount = c;
 
@@ -3504,9 +3573,10 @@ namespace GObject
         return true;
     }
 
-    inline bool hasCTAccept(UInt32 tasks[6], UInt32 task)
+    inline bool hasCTAccept(std::vector<UInt32>& tasks, UInt32 task)
     {
-        for (int i = 0; i < 6; ++i)
+        int cnt = tasks.size();
+        for (int i = 0; i < cnt; ++i)
         {
             if (tasks[i] == task)
                 return true;

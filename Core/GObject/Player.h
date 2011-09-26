@@ -248,14 +248,18 @@ namespace GObject
             memset(tavernId, 0, sizeof(tavernId));
             memset(fshimen, 0, sizeof(fshimen));
             memset(fsmcolor, 0, sizeof(fsmcolor));
-            memset(shimen, 0, sizeof(shimen));
-            memset(smcolor, 0, sizeof(smcolor));
+            //memset(shimen, 0, sizeof(shimen));
+            //memset(smcolor, 0, sizeof(smcolor));
             memset(fyamen, 0, sizeof(fyamen));
             memset(fymcolor, 0, sizeof(fymcolor));
-            memset(yamen, 0, sizeof(yamen));
-            memset(ymcolor, 0, sizeof(ymcolor));
+            //memset(yamen, 0, sizeof(yamen));
+            //memset(ymcolor, 0, sizeof(ymcolor));
             memset(bookStore, 0, sizeof(bookStore));
             formations.reserve(32);
+            shimen.reserve(32);
+            smcolor.reserve(32);
+            yamen.reserve(32);
+            ymcolor.reserve(32);
         }
 
 
@@ -300,15 +304,15 @@ namespace GObject
 		UInt16 tavernOrangeCount;    // 
         UInt32 fshimen[6];          // 刷出的师门任务
 		UInt8 fsmcolor[6];          // 刷出的师门任务的颜色
-		UInt32 shimen[6];           // 师门任务
-		UInt8 smcolor[6];           // 师门任务颜色
+        std::vector<UInt32> shimen; // 师门任务
+        std::vector<UInt8> smcolor; // 师门任务颜色
         UInt8 smFinishCount;        // 师门任务当日完成次数
         UInt8 smFreeCount;          // 师门任务当日免费刷新次数
         UInt8 smAcceptCount;        // 师门任务当日接受次数
         UInt32 fyamen[6];           // 刷出的衙门任务
 		UInt8 fymcolor[6];          // 刷出的衙门任务的颜色
-		UInt32 yamen[6];            // 衙门任务
-		UInt8 ymcolor[6];           // 衙门任务颜色
+        std::vector<UInt32> yamen;  // 衙门任务
+        std::vector<UInt8> ymcolor; // 衙门任务颜色
         UInt8 ymFinishCount;        // 衙门任务当日完成次数
         UInt8 ymFreeCount;          // 衙门任务当日免费刷新次数
         UInt8 ymAcceptCount;        // 衙门任务当日接受次数

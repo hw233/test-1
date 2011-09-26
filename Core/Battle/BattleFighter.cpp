@@ -581,7 +581,6 @@ void BattleFighter::postInit()
 const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
 {
     GData::SkillItem* resSkillItem = NULL;
-    bool has_therapy = false;
     if(NULL != _peerlessSkill.base)
     {
         if(_aura >= 100)
@@ -595,27 +594,26 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
     if(cnt == 0)
         return NULL;
 
-    size_t idx = _activeSkillIdx % cnt;
-    for(size_t i = idx; i < cnt; i++)
+    bool has_therapy = false;
+    size_t idx0 = _activeSkillIdx % cnt;
+    size_t idx = 0;
+    for(size_t i = 0; i < cnt; ++i)
     {
-        size_t idx = i % cnt;
+        idx = (idx0 + i) % cnt;
         if(NULL != _activeSkill[idx].base && _activeSkill[idx].cd == 0)
         {
             bool isTherapy = (_activeSkill[idx].base->effect->hp > 0 || _activeSkill[idx].base->effect->hpP > 0.001) && _activeSkill[idx].base->target == 0;
             // therapy skill second while need therapy
-            if(need_therapy && !has_therapy)
+            if(need_therapy && isTherapy)
             {
-                if(isTherapy)
+                if(resSkillItem)
                 {
-                    need_therapy = false;
-                    has_therapy = true;
-                    if(resSkillItem)
-                    {
-                        resSkillItem->cd = 0;
-                    }
-                    resSkillItem = &(_activeSkill[idx]);
-                    _activeSkill[idx].cd = resSkillItem->base->cd + 1;
+                    resSkillItem->cd = 0;
                 }
+                has_therapy = true;
+                resSkillItem = &(_activeSkill[idx]);
+                _activeSkill[idx].cd = resSkillItem->base->cd + 1;
+                break;
             }
 
             if(!resSkillItem)
@@ -626,13 +624,18 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
                 }
                 resSkillItem = &(_activeSkill[idx]);
                 _activeSkill[idx].cd = resSkillItem->base->cd + 1;
-                _activeSkillIdx  = idx + 1;
+                break;
             }
         }
     }
 
     if(resSkillItem)
+    {
+        if(!has_therapy)
+            _activeSkillIdx  = idx + 1;
+
         return resSkillItem->base;
+    }
 
     return NULL;
 }

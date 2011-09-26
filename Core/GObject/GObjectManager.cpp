@@ -934,24 +934,25 @@ namespace GObject
 				{
 					do {
 						size_t tcount = count;
-						if(tcount > 6)
-							tcount = 6;
+						if(count > 3)
+						{
+							PLAYER_DATA(pl, smFreeCount) = atoi(tk[count - 1].c_str());
+                            PLAYER_DATA(pl, smFinishCount) = atoi(tk[count - 2].c_str());
+                            PLAYER_DATA(pl, smAcceptCount) = atoi(tk[count - 3].c_str());
+						}
+
+						if(tcount > 32)
+							tcount = 29;
+                        if(tcount > PLAYER_DATA(pl, smAcceptCount))
+                            tcount = PLAYER_DATA(pl, smAcceptCount);
+
 						for(size_t j = 0; j < tcount; ++ j)
 						{
                             StringTokenizer tk1(tk[j].c_str(), ",");
-							PLAYER_DATA(pl, shimen)[j] = atoi(tk1[0].c_str());
-							PLAYER_DATA(pl, smcolor)[j] = atoi(tk1[1].c_str());
-						}
-						if(count > 6)
-						{
-							PLAYER_DATA(pl, smFreeCount) = atoi(tk[6].c_str());
-							if(count > 7)
-							{
-								PLAYER_DATA(pl, smFinishCount) = atoi(tk[7].c_str());
-							}
-                            if (count > 8)
+                            if(tk1.count() > 1)
                             {
-								PLAYER_DATA(pl, smAcceptCount) = atoi(tk[8].c_str());
+                                PLAYER_DATA(pl, shimen).push_back(atoi(tk1[0].c_str()));
+                                PLAYER_DATA(pl, smcolor).push_back(atoi(tk1[1].c_str()));
                             }
 						}
 					} while(0);
@@ -971,8 +972,11 @@ namespace GObject
 						for(size_t j = 0; j < tcount; ++ j)
 						{
                             StringTokenizer tk1(tk[j].c_str(), ",");
-							PLAYER_DATA(pl, fshimen)[j] = atoi(tk1[0].c_str());
-							PLAYER_DATA(pl, fsmcolor)[j] = atoi(tk1[1].c_str());
+                            if(tk1.count() > 1)
+                            {
+                                PLAYER_DATA(pl, fshimen)[j] = atoi(tk1[0].c_str());
+                                PLAYER_DATA(pl, fsmcolor)[j] = atoi(tk1[1].c_str());
+                            }
 						}
 					} while(0);
 				}
@@ -986,25 +990,26 @@ namespace GObject
 				{
 					do {
 						size_t tcount = count;
-						if(tcount > 6)
-							tcount = 6;
+						if(count > 3)
+						{
+							PLAYER_DATA(pl, ymFreeCount) = atoi(tk[count - 1].c_str());
+                            PLAYER_DATA(pl, ymFinishCount) = atoi(tk[count - 2].c_str());
+                            PLAYER_DATA(pl, ymAcceptCount) = atoi(tk[count - 3].c_str());
+						}
+
+						if(tcount > 32)
+							tcount = 29;
+                        if(tcount > PLAYER_DATA(pl, ymAcceptCount))
+                            tcount = PLAYER_DATA(pl, ymAcceptCount);
+
 						for(size_t j = 0; j < tcount; ++ j)
 						{
                             StringTokenizer tk1(tk[j].c_str(), ",");
-							PLAYER_DATA(pl, yamen)[j] = atoi(tk1[0].c_str());
-							PLAYER_DATA(pl, ymcolor)[j] = atoi(tk1[1].c_str());
-						}
-						if(count > 6)
-						{
-							PLAYER_DATA(pl, ymFreeCount) = atoi(tk[6].c_str());
-							if(count > 7)
-							{
-								PLAYER_DATA(pl, ymFinishCount) = atoi(tk[7].c_str());
-							}
-							if(count > 8)
-							{
-								PLAYER_DATA(pl, ymAcceptCount) = atoi(tk[8].c_str());
-							}
+                            if(tk1.count() > 1)
+                            {
+                                PLAYER_DATA(pl, yamen).push_back(atoi(tk1[0].c_str()));
+                                PLAYER_DATA(pl, ymcolor).push_back(atoi(tk1[1].c_str()));
+                            }
 						}
 					} while(0);
 				}
@@ -1023,8 +1028,11 @@ namespace GObject
 						for(size_t j = 0; j < tcount; ++ j)
 						{
                             StringTokenizer tk1(tk[j].c_str(), ",");
-							PLAYER_DATA(pl, fyamen)[j] = atoi(tk1[0].c_str());
-							PLAYER_DATA(pl, fymcolor)[j] = atoi(tk1[1].c_str());
+                            if(tk1.count() > 1)
+                            {
+                                PLAYER_DATA(pl, fyamen)[j] = atoi(tk1[0].c_str());
+                                PLAYER_DATA(pl, fymcolor)[j] = atoi(tk1[1].c_str());
+                            }
 						}
 					} while(0);
 				}
@@ -1033,8 +1041,11 @@ namespace GObject
             if (dbpd.clantask.length())
             {
 				StringTokenizer tk(dbpd.clantask, ",");
-                PLAYER_DATA(pl, clanTaskId) = atoi(tk[0].c_str());
-                PLAYER_DATA(pl, ctFinishCount) = atoi(tk[1].c_str());
+                if(tk.count() > 1)
+                {
+                    PLAYER_DATA(pl, clanTaskId) = atoi(tk[0].c_str());
+                    PLAYER_DATA(pl, ctFinishCount) = atoi(tk[1].c_str());
+                }
             }
 
             if (dbpd.formations.length())
