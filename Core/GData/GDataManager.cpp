@@ -382,15 +382,22 @@ namespace GData
 			SetValOrPercent(aextra->_extra.defend, aextra->_extra.defendP, ae.defend);
 			SetValOrPercent(aextra->_extra.magdef, aextra->_extra.magdefP, ae.magdef);
 			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
-			SetValOrPercent(aextra->_extra.tough, aextra->_extra.toughP, ae.tough);
+			SetValOrPercent(aextra->_extra.toughlvl, aextra->_extra.tough, ae.tough);
+            aextra->_extra.tough *= 100;
 			SetValOrPercent(aextra->_extra.action, aextra->_extra.actionP, ae.action);
-			SetValOrPercent(aextra->_extra.hitrate, aextra->_extra.hitrateP, ae.hitrate);
-			SetValOrPercent(aextra->_extra.evade, aextra->_extra.evadeP, ae.evade);
-			SetValOrPercent(aextra->_extra.critical, aextra->_extra.criticalP, ae.critical);
+			SetValOrPercent(aextra->_extra.hitrlvl, aextra->_extra.hitrate, ae.hitrate);
+            aextra->_extra.hitrate *= 100;
+			SetValOrPercent(aextra->_extra.evdlvl, aextra->_extra.evade, ae.evade);
+            aextra->_extra.evade *= 100;
+			SetValOrPercent(aextra->_extra.crilvl, aextra->_extra.critical, ae.critical);
+            aextra->_extra.critical *= 100;
 			SetValOrPercent(aextra->_extra.criticaldmg, aextra->_extra.criticaldmgP, ae.criticaldmg);
-			SetValOrPercent(aextra->_extra.pierce, aextra->_extra.pierceP, ae.pierce);
-			SetValOrPercent(aextra->_extra.counter, aextra->_extra.counterP, ae.counter);
-			SetValOrPercent(aextra->_extra.magres, aextra->_extra.magresP, ae.magres);
+			SetValOrPercent(aextra->_extra.pirlvl, aextra->_extra.pierce, ae.pierce);
+            aextra->_extra.pierce *= 100;
+			SetValOrPercent(aextra->_extra.counterlvl, aextra->_extra.counter, ae.counter);
+            aextra->_extra.counter *= 100;
+			SetValOrPercent(aextra->_extra.mreslvl, aextra->_extra.magres, ae.magres);
+            aextra->_extra.magres *= 100;
 
             StringTokenizer tk(ae.skill, ",");
             if (tk.count())
@@ -1045,15 +1052,22 @@ namespace GData
             SetValOrPercent(cft->defend, cft->defendP, cf.defend);
             SetValOrPercent(cft->magdef, cft->magdefP, cf.magdef);
             SetValOrPercent(cft->hp, cft->hpP, cf.hp);
-			SetValOrPercent(cft->tough, cft->toughP, cf.tough);
+			SetValOrPercent(cft->toughlvl, cft->tough, cf.tough);
+            cft->tough *= 100;
 			SetValOrPercent(cft->action, cft->actionP, cf.action);
-			SetValOrPercent(cft->hitrate, cft->hitrateP, cf.hitrate);
-			SetValOrPercent(cft->evade, cft->evadeP, cf.evade);
-			SetValOrPercent(cft->critical, cft->criticalP, cf.critical);
+			SetValOrPercent(cft->hitrlvl, cft->hitrate, cf.hitrate);
+            cft->hitrate *= 100;
+			SetValOrPercent(cft->evdlvl, cft->evade, cf.evade);
+            cft->evade *= 100;
+			SetValOrPercent(cft->crilvl, cft->critical, cf.critical);
+            cft->critical *= 100;
 			SetValOrPercent(cft->criticaldmg, cft->criticaldmgP, cf.criticaldmg);
-			SetValOrPercent(cft->pierce, cft->pierceP, cf.pierce);
-			SetValOrPercent(cft->counter, cft->counterP, cf.counter);
-			SetValOrPercent(cft->magres, cft->magresP, cf.magres);
+			SetValOrPercent(cft->pirlvl, cft->pierce, cf.pierce);
+            cft->pierce *= 100;
+			SetValOrPercent(cft->counterlvl, cft->counter, cf.counter);
+            cft->counter *= 100;
+			SetValOrPercent(cft->mreslvl, cft->magres, cf.magres);
+            cft->magres *= 100;
 
             StringTokenizer tk(cf.skill, ",");
             if (tk.count())

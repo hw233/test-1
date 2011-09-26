@@ -300,9 +300,9 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 2: field = "level"; break;
 	case 3: 
         {
+            UInt32 now = time(NULL);
 #if 0
             ++_expMods;
-            UInt32 now = time(NULL);
             if (_expFlush || _expMods >= 10 || now > _expEnd) // XXX: 等级变化，10次变化，10分钟
             {
 #endif
