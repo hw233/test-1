@@ -307,10 +307,10 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             {
 #endif
                 DB2().PushUpdateData("UPDATE `fighter` SET `experience` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
+#if 0
                 _expFlush = false;
                 _expMods = 0;
                 _expEnd = now + 10*60;
-#if 0
             }
 #endif
         }
