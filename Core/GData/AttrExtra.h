@@ -132,6 +132,14 @@ struct AttrExtra
 		criticalP += other.criticalP;
 		pierceP += other.pierceP;
 #endif
+    
+        hitrlvl += other.hitrlvl;
+        evdlvl += other.evdlvl;
+        crilvl += other.crilvl;
+        pirlvl += other.pirlvl;
+        counterlvl += other.counterlvl;
+        mreslvl += other.mreslvl;
+        toughlvl += other.toughlvl;
 
 		return *this;
 	}
