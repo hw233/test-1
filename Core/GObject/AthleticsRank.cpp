@@ -382,7 +382,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
             rank3num = ranksize;
 	}
 	Stream st(REP::ARENA_IFNO);
-    st << type;
+    st << static_cast<UInt16>(type & 0xF7);
 	//UInt32 now = TimeUtil::Now();
 	//UInt32 endTime = (*rank)->challengetime + ATHLETICS_BUFF_TIME;
 	//
@@ -426,7 +426,8 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 
     if(type & 0x08)
     {
-        (*rank)->ranker->GetAthletics()->appendAthleticsReport(st, 15);
+        GameMsgHdr hdr(0x221, player->getThreadId(), player, 0);
+        GLOBAL().PushMsg(hdr, NULL);
     }
 
     if(type & 0x10)
@@ -1439,6 +1440,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         {
             cond = 15;
             UInt32 first4rank = 0x100;
+            setAthleticsFirst4Rank(atker, first4rank);
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 5;
@@ -1447,7 +1449,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             value = getAthleticsRankUpADay(atker);
             itemId = 25;
             itemCount = 1;
-            setAthleticsFirst4Rank(atker, first4rank);
         }
         else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x200) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )
         {
@@ -1470,6 +1471,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         {
             cond = 15;
             UInt32 first4rank = 0x200;
+            setAthleticsFirst4Rank(atker, first4rank);
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 4;
@@ -1478,7 +1480,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             value = getAthleticsRankUpADay(atker);
             itemId = 24;
             itemCount = 1;
-            setAthleticsFirst4Rank(atker, first4rank);
         }
         else if( 2 == getRankPos(row, atkRank) && row == 1 && 0 == getAthleticsFirst4Rank(atker, 0x2) )     //第一次杀入竞技场二强
         {
@@ -1555,6 +1556,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         {
             cond = 15;
             UInt32 first4rank = 0x400;
+            setAthleticsFirst4Rank(atker, first4rank);
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 3;
@@ -1563,7 +1565,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             value = getAthleticsRankUpADay(atker);
             itemId = 23;
             itemCount = 1;
-            setAthleticsFirst4Rank(atker, first4rank);
         }
         else if( row == 1 && 0 != getAthleticsFirst4Rank(atker, 0x800) && (getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000)) )
         {
@@ -1602,6 +1603,7 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
         {
             cond = 15;
             UInt32 first4rank = 0x800;
+            setAthleticsFirst4Rank(atker, first4rank);
             if(0 == getAthleticsFirst4Rank(atker, 0x4000))
             {
                 color = 2;
@@ -1610,7 +1612,6 @@ void AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UIn
             value = getAthleticsRankUpADay(atker);
             itemId = 22;
             itemCount = 1;
-            setAthleticsFirst4Rank(atker, first4rank);
         }
         else if( getAthleticsWinStreak(atker) == 5 )    //5连胜
         {

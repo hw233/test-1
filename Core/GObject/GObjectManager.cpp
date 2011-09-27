@@ -936,9 +936,9 @@ namespace GObject
 						size_t tcount = count;
 						if(count > 3)
 						{
-							PLAYER_DATA(pl, smFreeCount) = atoi(tk[count - 1].c_str());
+							PLAYER_DATA(pl, smFreeCount) = atoi(tk[count - 3].c_str());
                             PLAYER_DATA(pl, smFinishCount) = atoi(tk[count - 2].c_str());
-                            PLAYER_DATA(pl, smAcceptCount) = atoi(tk[count - 3].c_str());
+                            PLAYER_DATA(pl, smAcceptCount) = atoi(tk[count - 1].c_str());
 						}
 
 						if(tcount > 32)
@@ -951,8 +951,13 @@ namespace GObject
                             StringTokenizer tk1(tk[j].c_str(), ",");
                             if(tk1.count() > 1)
                             {
-                                PLAYER_DATA(pl, shimen).push_back(atoi(tk1[0].c_str()));
-                                PLAYER_DATA(pl, smcolor).push_back(atoi(tk1[1].c_str()));
+                                UInt32 taskId = atoi(tk1[0].c_str());
+                                UInt8 color = atoi(tk1[1].c_str());
+                                if( taskId != 0 )
+                                {
+                                    PLAYER_DATA(pl, shimen).push_back(taskId);
+                                    PLAYER_DATA(pl, smcolor).push_back(color);
+                                }
                             }
 						}
 					} while(0);
@@ -992,9 +997,9 @@ namespace GObject
 						size_t tcount = count;
 						if(count > 3)
 						{
-							PLAYER_DATA(pl, ymFreeCount) = atoi(tk[count - 1].c_str());
+							PLAYER_DATA(pl, ymFreeCount) = atoi(tk[count - 3].c_str());
                             PLAYER_DATA(pl, ymFinishCount) = atoi(tk[count - 2].c_str());
-                            PLAYER_DATA(pl, ymAcceptCount) = atoi(tk[count - 3].c_str());
+                            PLAYER_DATA(pl, ymAcceptCount) = atoi(tk[count - 1].c_str());
 						}
 
 						if(tcount > 32)
@@ -1007,8 +1012,13 @@ namespace GObject
                             StringTokenizer tk1(tk[j].c_str(), ",");
                             if(tk1.count() > 1)
                             {
-                                PLAYER_DATA(pl, yamen).push_back(atoi(tk1[0].c_str()));
-                                PLAYER_DATA(pl, ymcolor).push_back(atoi(tk1[1].c_str()));
+                                UInt32 taskId = atoi(tk1[0].c_str());
+                                UInt8 color = atoi(tk1[1].c_str());
+                                if(taskId != 0)
+                                {
+                                    PLAYER_DATA(pl, yamen).push_back(taskId);
+                                    PLAYER_DATA(pl, ymcolor).push_back(color);
+                                }
                             }
 						}
 					} while(0);
