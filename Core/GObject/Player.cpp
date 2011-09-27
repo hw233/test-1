@@ -3341,7 +3341,6 @@ namespace GObject
                 {
                     shimen.erase(shimen.begin() + i);
                     smcolor.erase(smcolor.begin() + i);
-                    -- cnt;
                     if (_playerData.smAcceptCount)
                     {
                         --_playerData.smAcceptCount;
@@ -3363,7 +3362,6 @@ namespace GObject
                 {
                     yamen.erase(yamen.begin() + i);
                     ymcolor.erase(ymcolor.begin() + i);
-                    -- cnt;
                     if (_playerData.ymAcceptCount)
                     {
                         --_playerData.ymAcceptCount;
@@ -3383,17 +3381,8 @@ namespace GObject
         _playerData.smFreeCount = 0;
         _playerData.ymFreeCount = 0;
 
-        UInt8 c = _playerData.shimen.size();
-        UInt8 n = _playerData.yamen.size();
-#if 0
-        for (UInt8 i=0; i<6; ++i)
-        {
-            if (_playerData.shimen[i]) ++n;
-            if (_playerData.yamen[i]) ++c;
-        }
-#endif
-        _playerData.smAcceptCount = n;
-        _playerData.ymAcceptCount = c;
+        _playerData.smAcceptCount = _playerData.shimen.size();
+        _playerData.ymAcceptCount = _playerData.yamen.size();
 
         writeShiYaMen();
         if (isOnline())
@@ -3573,12 +3562,16 @@ namespace GObject
         return true;
     }
 
-    inline bool hasCTAccept(std::vector<UInt32>& tasks, UInt32 task)
+    inline bool hasCTAccept(std::vector<UInt32>& tasks, UInt32 task, int rcnt)
     {
+        if (rcnt > 100)
+            return false;
+
         int cnt = tasks.size();
+        UInt32* t = &tasks[0];
         for (int i = 0; i < cnt; ++i)
         {
-            if (tasks[i] == task)
+            if (*t++ == task)
                 return true;
         }
         return false;
@@ -3654,10 +3647,12 @@ namespace GObject
                         for (int i = 0; i < 6; ++i) {
                             UInt32 j = rnd(task.size());
                             if (ttype == 0) {
-                                while (idxs.find(j) != idxs.end() || hasCTAccept(_playerData.shimen, task[j]))
+                                int rcnt = 0;
+                                while (idxs.find(j) != idxs.end() || hasCTAccept(_playerData.shimen, task[j], ++rcnt))
                                     j = rnd(task.size());
                             } else {
-                                while (idxs.find(j) != idxs.end() || hasCTAccept(_playerData.yamen, task[j]))
+                                int rcnt = 0;
+                                while (idxs.find(j) != idxs.end() || hasCTAccept(_playerData.yamen, task[j], ++rcnt))
                                     j = rnd(task.size());
                             }
                             idxs.insert(j);
