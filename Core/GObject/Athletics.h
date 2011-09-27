@@ -52,7 +52,7 @@ public:
 	void notifyDropAthleticsData(UInt32);
 	void updateAthleticsAwardData(UInt32, UInt8, UInt32);
 
-    void appendAthleticsReport(Stream& st, UInt8 count);
+    void listAthleticsReport();
 
 public:
 	void defendergainsource(Player *, UInt32, UInt8, UInt32);

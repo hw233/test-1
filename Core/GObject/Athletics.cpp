@@ -137,17 +137,25 @@ void Athletics::notifyAthleticsData2(AthleticsData * data)
 #endif
 }
 
-void Athletics::appendAthleticsReport(Stream& st, UInt8 count)
+void Athletics::listAthleticsReport()
 {
+    UInt8 count = 15;
 	if (count > static_cast<UInt16>(_athleticses.size()))
 		count = static_cast<UInt16>(_athleticses.size());
 
+	Stream st(REP::ARENA_IFNO);
+    st << static_cast<UInt16>(0x08);
+
 	std::deque<AthleticsData *>::reverse_iterator rit = _athleticses.rbegin();
 	st << count;
-	for (UInt16 i = 0; rit != _athleticses.rend() && i < count; ++rit, ++count)
+	for (UInt16 i = 0; rit != _athleticses.rend() && i < count; ++rit, ++i)
 	{
 		st << (*rit)->target->getName() << (*rit)->target->getCountry() << static_cast<UInt8>((*rit)->win != (*rit)->side) << (*rit)->reptid;
 	}
+
+    st << Stream::eos;
+
+    _owner->send(st);
 }
 
 void Athletics::notifyAthleticsData2(UInt32 id)

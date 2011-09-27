@@ -146,6 +146,7 @@ MSG_REG_2(GameMsgHdr, 0x217, OnAthleticsAwardReq);
 MSG_REG_2(GameMsgHdr, 0x218, OnGetBoxAddSource);
 MSG_REG_2(GameMsgHdr, 0x219, OnOnAthleticsEnterNotify);
 MSG_REG_2(GameMsgHdr, 0x220, OnAthleticsResNotify);
+MSG_REG_2(GameMsgHdr, 0x221, OnAthleticsReportList);
 
 MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);

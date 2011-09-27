@@ -306,6 +306,12 @@ void OnAthleticsResNotify( GameMsgHdr& hdr, const void * data )
     player->GetAthletics()->notifyAttackRes(notify->peer, notify->win);
 }
 
+void OnAthleticsReportList( GameMsgHdr& hdr, const void * data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->GetAthletics()->listAthleticsReport();
+}
+
 void OnGetClanBattleRewardReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
