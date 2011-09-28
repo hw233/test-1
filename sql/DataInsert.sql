@@ -132,3 +132,7 @@ LOCK TABLES `frontmap` WRITE;
 source frontmap
 UNLOCK TABLES;
 
+LOCK TABLES `equipment_set` WRITE;
+source equipmentset
+UNLOCK TABLES;
+
