@@ -251,10 +251,10 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 {
                     Stream st(REP::AUTO_COPY);
                     UInt8 size = loot.size();
-                    if (size > 1)
+                    if (size >= 1)
                     {
                         UInt8 rsize = loot[0];
-                        if (rsize != (size-1)/2)
+                        if (rsize != size/2)
                         {
                             st << static_cast<UInt8>(5);
 #if 0
@@ -315,7 +315,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     if (size)
                     {
                         UInt8 rsize = loot[0];
-                        if (rsize != (size-1)/2)
+                        if (rsize != size/2)
                         {
                             pl->setCopyFailed();
                             autoClear(pl, complete, id, tcd.floor, tcd.spot);
@@ -327,7 +327,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                         }
                         st << id << tcd.floor << tcd.spot;
 
-                        st << static_cast<UInt8>((size-1)/2);
+                        st << static_cast<UInt8>(size/2);
                         for (UInt8 i = 1; i < rsize*2+1; i += 2)
                         {
                             st << loot[i] << static_cast<UInt8>(loot[i+1]);

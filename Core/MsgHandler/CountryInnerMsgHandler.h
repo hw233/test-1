@@ -1051,6 +1051,7 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
     {
         player->getGold(money->gold);
         player->getTael(money->tael);
+        player->getCoupon(money->coupon);
         player->getAchievement(money->achievement);
     }
     else if (money->type == 1)
@@ -1064,6 +1065,11 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
             player->useTael(money->tael);
         else
             player->useTael(player->getTael());
+
+        if (player->getCoupon() > money->coupon)
+            player->useCoupon(money->coupon);
+        else
+            player->useCoupon(player->getCoupon());
 
         if (player->getAchievement() > money->achievement)
             player->useAchievement(money->achievement);
