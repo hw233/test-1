@@ -26,6 +26,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::BATTLEREPORT,BattleReportReq);
 MSG_REG_2(LoginMsgHdr,SPEQ::ONLINE,ServerOnlineNum);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETLEVEL,SetLevelFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETPROPS,SetPropsFromBs);
+MSG_REG_2(LoginMsgHdr,SPEQ::SETMONEY,SetMoneyFromBs);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 

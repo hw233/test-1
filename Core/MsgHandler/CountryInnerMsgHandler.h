@@ -1035,4 +1035,35 @@ void OnSetLevelReq( GameMsgHdr& hdr, const void* data )
     player->setLevelAndExp(level, exp);
 }
 
+void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct Money
+    {
+        UInt8 type;
+        UInt32 gold;
+        UInt32 tael;
+        UInt32 coupon;
+        UInt32 achievement;
+    };
+    Money* money = (Money*)(data);
+    if (money->type == 0)
+    {
+        player->getGold(money->gold);
+        player->getTael(money->tael);
+    }
+    else if (money->type == 1)
+    {
+        if (player->getGold() > money->gold)
+            player->useGold(money->gold);
+        else
+            player->useGold(player->getGold());
+        if (player->getTael() > money->tael)
+            player->useTael(money->tael);
+        else
+            player->useTael(player->getTael());
+    }
+}
+
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
