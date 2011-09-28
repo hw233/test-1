@@ -56,13 +56,13 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 	UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(fgt));
 	UInt16 hp = static_cast<UInt16>(bformula->calcHP(fgt));
 
-	UInt16 hit = static_cast<UInt16>(bformula->calcHitrate(fgt, NULL));
-	UInt16 evd = static_cast<UInt16>(bformula->calcEvade(fgt, NULL));
-	UInt16 magres = static_cast<UInt16>(bformula->calcMagRes(fgt, NULL));
-	UInt16 cri = static_cast<UInt16>(bformula->calcCritical(fgt, NULL));
-	UInt16 prc = static_cast<UInt16>(bformula->calcPierce(fgt, NULL));
-	UInt16 cnt = static_cast<UInt16>(bformula->calcCounter(fgt, NULL));
-	UInt16 tough = static_cast<UInt16>(bformula->calcTough(fgt, NULL));
+	UInt16 hit = static_cast<float>(bformula->calcHitrate(fgt, NULL)) * 100;
+	UInt16 evd = static_cast<float>(bformula->calcEvade(fgt, NULL)) * 100;
+	UInt16 magres = static_cast<float>(bformula->calcMagRes(fgt, NULL)) * 100;
+	UInt16 cri = static_cast<float>(bformula->calcCritical(fgt, NULL)) * 100;
+	UInt16 prc = static_cast<float>(bformula->calcPierce(fgt, NULL)) * 100;
+	UInt16 cnt = static_cast<float>(bformula->calcCounter(fgt, NULL)) * 100;
+	UInt16 tough = static_cast<float>(bformula->calcTough(fgt, NULL)) * 100;
 
 	cid.st << str << agi << inte << will << phy << atk << magatk << def << magdef << hp << hit << evd << magres << cri << prc << cnt << tough << Stream::eos;
 	cid.lastAccess = TimeUtil::Now();

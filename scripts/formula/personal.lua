@@ -285,7 +285,7 @@ function calcHitrate( fgt, defgt )
   local cls = fgt:getClass()
   local hitr = fgt:getBaseHitrate()
   local hitrlvl = calcHitRateLevel(fgt)
-  return hitr + fgt:getExtraHitrate() + hitrlvl/(hitrlvl + hitrlvl_factor*deflev + hitrlvl_addon_factor)
+  return hitr + fgt:getExtraHitrate() + hitrlvl/(hitrlvl + hitrlvl_factor*deflev + hitrlvl_addon_factor)*100
 end
 
 function calcEvade( fgt, defgt )
@@ -299,7 +299,7 @@ function calcEvade( fgt, defgt )
   local cls = fgt:getClass()
   local evd = fgt:getBaseEvade()
   local evdlvl = calcEvadeLevel(fgt)
-  return evd + fgt:getExtraEvade() + evdlvl/(evdlvl + evdlvl_factor*deflev + evdlvl_addon_factor)
+  return evd + fgt:getExtraEvade() + evdlvl/(evdlvl + evdlvl_factor*deflev + evdlvl_addon_factor)*100
 end
 
 function calcCritical( fgt, defgt )
@@ -313,7 +313,7 @@ function calcCritical( fgt, defgt )
   local cls = fgt:getClass()
   local cri = fgt:getBaseCritical()
   local crilvl = calcCriticalLevel(fgt)
-  return cri + fgt:getExtraCritical() + crilvl/(crilvl + crilvl_factor*deflev + crilvl_addon_factor)
+  return cri + fgt:getExtraCritical() + crilvl/(crilvl + crilvl_factor*deflev + crilvl_addon_factor)*100
 end
 
 function calcCounter( fgt, defgt )
@@ -327,7 +327,7 @@ function calcCounter( fgt, defgt )
   local cls = fgt:getClass()
   local cnt = fgt:getBaseCounter()
   local cntlvl = calcCounterLevel(fgt)
-  return cnt + fgt:getExtraCounter() + cntlvl/(cntlvl + counterlvl_factor*deflev + counterlvl_addon_factor)
+  return cnt + fgt:getExtraCounter() + cntlvl/(cntlvl + counterlvl_factor*deflev + counterlvl_addon_factor)*100
 end
 
 function calcPierce( fgt, defgt )
@@ -341,7 +341,7 @@ function calcPierce( fgt, defgt )
   local cls = fgt:getClass()
   local prc = fgt:getBasePierce()
   local prclvl = calcPierceLevel(fgt)
-  return prc + fgt:getExtraPierce() + prclvl/(prclvl + pirlvl_factor*deflev + pirlvl_addon_factor)
+  return prc + fgt:getExtraPierce() + prclvl/(prclvl + pirlvl_factor*deflev + pirlvl_addon_factor)*100
 end
 
 function calcDamage( atk, def, atklvl )
@@ -372,7 +372,7 @@ function calcMagRes( fgt, defgt )
     local cls = fgt:getClass()
     local magres = fgt:getBaseMagRes()
     local mreslvl = calcMagResLevel(fgt)
-    return magres + fgt:getExtraMagRes() + mreslvl/(mreslvl + mreslvl_factor*deflev + mreslvl_addon_factor)
+    return magres + fgt:getExtraMagRes() + mreslvl/(mreslvl + mreslvl_factor*deflev + mreslvl_addon_factor)*100
 end
 
 function calcSoul( fgt )
@@ -395,7 +395,7 @@ function calcTough( fgt, defgt )
     local cls = fgt:getClass(0)
     local tough = fgt:getBaseTough()
     local toughlvl = calcToughLevel(fgt)
-    return tough + fgt:getExtraTough() + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)
+    return tough + fgt:getExtraTough() + toughlvl/(toughlvl + toughlvl_factor*deflev + toughlvl_addon_factor)*100
 end
 
 function calcBattlePoint( fgt )
