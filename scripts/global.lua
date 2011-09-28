@@ -28,7 +28,7 @@ function TRACE_LOG(trace_msg)
 
 end
 
---1:天族 2:魔族 3:山海大陆（中立）
+--1:峨眉 2:昆仑 3:中立
 
 
 --任务类型

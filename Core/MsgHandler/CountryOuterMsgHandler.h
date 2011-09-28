@@ -2507,7 +2507,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 			break;
         case 7:
             {
-                UInt32 prestige = 0; //player->gAthleticsRank.getAthleticsPrestige(player);
+                UInt32 prestige = player->getPrestige();
                 if (prestige < price)
                 {
                     st << static_cast<UInt8>(1);
@@ -2531,7 +2531,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     else if (item || buyFgt)
                     {
                         ConsumeInfo ci(Item,lr._itemId, lr._count);
-                        player->useAchievement(price,&ci);
+                        player->usePrestige(price,&ci);
                         st << static_cast<UInt8>(0);
                     }
                 }

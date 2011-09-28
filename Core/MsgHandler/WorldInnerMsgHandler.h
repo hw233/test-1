@@ -504,12 +504,4 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 	event->instantComplete();
 }
 
-void OnAthleticsPrestigeAdd( GameMsgHdr& hdr, const void* data)
-{
-	MSG_QUERY_PLAYER(player);
-	UInt32 prestige = *reinterpret_cast<UInt32 *>(const_cast<void *>(data));
-    prestige += GObject::gAthleticsRank.getAthleticsPrestige(player);
-    GObject::gAthleticsRank.setAthleticsPrestige(player, prestige);
-}
-
 #endif // _WORLDINNERMSGHANDLER_H_

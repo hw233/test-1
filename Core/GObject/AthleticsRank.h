@@ -47,7 +47,7 @@ struct AthleticsRankData
 	//UInt8   boxcolor;
 	//UInt8	awardType;
 	//UInt32	awardCount;
-    UInt32  prestige;
+    //UInt32  prestige;
 	UInt16	winstreak;
     UInt16  bewinstreak;
     UInt16  failstreak;
@@ -80,6 +80,7 @@ struct AthleticsAward
 	UInt8 type;
 	UInt8 side;
 	bool win;
+    UInt32 prestige;
 	UInt32 count;
 	Player *other;
     UInt32 itemId;
@@ -157,7 +158,6 @@ public:
 
 	UInt8 getChallengeNum(Player *);
     UInt32 getAthleticsRank(Player*);
-    UInt32 getAthleticsPrestige(Player*);
     UInt8 getAthleticsWinStreak(Player*);
     UInt8 getAthleticsBeWinStreak(Player*);
     UInt8 getAthleticsFailStreak(Player*);
@@ -170,7 +170,6 @@ public:
 
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
-    UInt32 setAthleticsPrestige(Player*, UInt32 prestige);
 
 public:
 	void TmExtraAward();
@@ -221,7 +220,7 @@ protected:
 
 	bool updateBoxTimeoutAward(Rank, UInt8, UInt32 = TimeUtil::Now());
 
-    void RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UInt8 win);
+    UInt32 RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, UInt8 win);
 
 public:	
 	AthleticsList *getAthleticsRank()

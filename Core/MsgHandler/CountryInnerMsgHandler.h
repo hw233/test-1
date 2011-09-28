@@ -263,6 +263,8 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
         player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1);
+    if(awd->prestige)
+        player->getPrestige(awd->prestige);
 
 	if(awd->side == 0)
 		player->GetAthletics()->defendergainsource(awd->other, awd->athleticsid, awd->type, awd->count);
@@ -1022,8 +1024,7 @@ void OnSetPropsReq( GameMsgHdr& hdr, const void* data )
         player->getAchievement(props->honor);
     if (props->prestige)
     {
-		GameMsgHdr hdr(0x1A0, WORKER_THREAD_WORLD, player, sizeof(&(props->prestige)));
-		GLOBAL().PushMsg(hdr, &(props->prestige));
+        player->getPrestige(props->prestige);
     }
 }
 
@@ -1051,6 +1052,7 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
     {
         player->getGold(money->gold);
         player->getTael(money->tael);
+        player->getCoupon(money->coupon);
         player->getAchievement(money->achievement);
     }
     else if (money->type == 1)
@@ -1064,6 +1066,11 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
             player->useTael(money->tael);
         else
             player->useTael(player->getTael());
+
+        if (player->getCoupon() > money->coupon)
+            player->useCoupon(money->coupon);
+        else
+            player->useCoupon(player->getCoupon());
 
         if (player->getAchievement() > money->achievement)
             player->useAchievement(money->achievement);

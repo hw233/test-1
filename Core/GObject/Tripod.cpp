@@ -31,11 +31,9 @@ void Tripod::sendTripodInfo(Player* pl, TripodData& td)
     st << td.fire;
     st << td.quality;
 
-    //UInt8 needgen = td.needgen;
     genAward(pl, td, st);
-    //if (needgen != td.needgen)
-        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
-                td.needgen, td.itemId, td.num, pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+            td.needgen, td.itemId, td.num, pl->getId());
 
     st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << td.soul << Stream::eos;
     pl->send(st);
@@ -144,7 +142,8 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
         td.soul = MAX_TRIPOD_SOUL;
     }
 
-    DB6().PushUpdateData("UPDATE `tripod` SET `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u", td.quality, td.needgen, pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u",
+            td.soul, td.quality, td.needgen, pl->getId());
 }
 
 static UInt16 fire_begin = 47;
@@ -276,12 +275,12 @@ void Tripod::getAward(Player* pl)
     td.soul = 0;
     td.itemId = 0;
     td.num = 0;
-    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0, `regen` = 1 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
     sendTripodInfo(pl, td);
 }
 
-TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)
+TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data, bool init)
 {
     Player* pl = globalPlayers[id];
     if (!pl)
@@ -296,6 +295,10 @@ TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data)
     EventPlayerTripod* event = new (std::nothrow) EventPlayerTripod(pl, 60, MAX_TRIPOD_SOUL/POINT_PERMIN);
     if (!event) return nulltd;
     PushTimerEvent(event);
+
+    if (init)
+        td.needgen = 0;
+    DB6().PushUpdateData("UPDATE `tripod` SET `regen` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
     return td;
 }
 
