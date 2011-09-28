@@ -43,7 +43,8 @@
 
 #include <cmath>
 
-#define NTD_ONLINE_TIME (4*60*60)
+//#define NTD_ONLINE_TIME (4*60*60)
+#define NTD_ONLINE_TIME (10*60)
 
 namespace GObject
 {

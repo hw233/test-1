@@ -1154,4 +1154,109 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::SETMONEY,0x01);
+    UInt64 id;
+    std::string token;
+    UInt8 type;
+    UInt32 gold;
+    UInt32 tael;
+    UInt32 coupon;
+    UInt32 achievement;
+
+    br>>id;
+    br>>token;
+    br>>type;
+    br>>gold;
+    br>>tael;
+    br>>coupon;
+    br>>achievement;
+
+    st<<id;
+    st<<type;
+
+    UInt8 ret = 0;
+    UInt8 retcode = 0;
+    GObject::Player * pl = GObject::globalPlayers[id];
+    if (pl)
+    {
+        struct Money
+        {
+            UInt8 type;
+            UInt32 gold;
+            UInt32 tael;
+            UInt32 coupon;
+            UInt32 achievement;
+        } money;
+
+        money.type = type;
+        money.gold = gold;
+        money.tael = tael;
+        money.coupon = coupon;
+        money.achievement = achievement;
+
+        if (cfg.GMCheck)
+        {
+            initMemcache();
+            if (memc)
+            {
+                size_t len = 0;
+                size_t tlen = 0;
+                unsigned int flags = 0;
+                char key[MEMCACHED_MAX_KEY] = {0};
+
+                int retry = 3;
+                memcached_return rc;
+                len = snprintf(key, sizeof(key), "%s", token.c_str());
+                while (retry)
+                {
+                    --retry;
+                    char* rtoken = memcached_get(memc, key, len, &tlen, &flags, &rc);
+                    if (rc == MEMCACHED_SUCCESS && rtoken)
+                    {
+                        ret = 0;
+                        free(rtoken);
+
+                        GameMsgHdr msg(0x323, pl->getThreadId(), pl, sizeof(money));
+                        GLOBAL().PushMsg(msg, &money);
+                        retcode = 1;
+
+                        break;
+                    }
+                    else
+                    {
+                        ret = 3;
+                        usleep(500);
+                    }
+                }
+
+                rc = memcached_delete(memc, key, len, (time_t)0);
+                if (rc == MEMCACHED_SUCCESS)
+                {
+                    //err += "delete key error.";
+                }
+
+                if (ret)
+                {
+                    TRACE_LOG("token: %s, ret: %u, rc: %u", token.c_str(), ret, rc);
+                    uninitMemcache();
+                    initMemcache();
+                }
+            }
+        }
+        else
+        {
+            GameMsgHdr msg(0x323, pl->getThreadId(), pl, sizeof(money));
+            GLOBAL().PushMsg(msg, &money);
+            retcode = 1;
+        }
+    }
+
+    st << retcode << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 #endif // _LOGINOUTERMSGHANDLER_H_
