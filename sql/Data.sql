@@ -411,7 +411,7 @@ DROP TABLE IF EXISTS `skills`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `skills` (
-  `id` smallint(5) NOT NULL,
+  `id` smallint(5) unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `cond` smallint(5) NOT NULL DEFAULT '0',
   `prob` float(10,4) NOT NULL DEFAULT '0.0000',

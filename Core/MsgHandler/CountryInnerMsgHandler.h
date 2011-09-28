@@ -776,6 +776,13 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 void OnYDPacks( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+
+    if (PLAYER_DATA(player, qqawardgot) & 0x04)
+    {
+        player->sendMsgCode(1, 1006);
+        return;
+    }
+
     UInt8 type = *(UInt8*)(data);
 
     //1- 511x2,505x2,500x2,15x1,503x5,47x1,48x1,49x1,50x1,51x1,513x2,5033x3,9x5,56x10
@@ -796,6 +803,9 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
         player->GetPackage()->AddItem(5033, 3, true);
         player->GetPackage()->AddItem(9, 5, true);
         player->GetPackage()->AddItem(56, 10, true);
+        PLAYER_DATA(player, qqawardgot) |= 0x04;
+        DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
+                PLAYER_DATA(player, qqawardgot), player->getId());
     }
     else if (type == 2) // 2:老黄钻用户
     {
@@ -803,6 +813,9 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
         player->GetPackage()->AddItem(51, 1, true);
         player->GetPackage()->AddItem(15, 1, true);
         player->GetPackage()->AddItem(511, 1, true);
+        PLAYER_DATA(player, qqawardgot) |= 0x04;
+        DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
+                PLAYER_DATA(player, qqawardgot), player->getId());
     }
     else if (type == 3) // key 错误
     {

@@ -483,6 +483,22 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
                 }
 				player->getAchievement(val);
 			}
+            break;
+
+        case 5:
+			{
+				UInt32 val = atoi(args[1].c_str());
+				if(val == 0)
+					return;
+
+                if (args.size() > 2) {
+                    Player* player2 = globalPlayers[atoi(args[2].c_str())];
+                    if (player2)
+                        player = player2;
+                }
+				player->getPrestige(val);
+            }
+            break;
 		}
 	}
 }
