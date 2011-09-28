@@ -16,7 +16,7 @@ class ClanTech;
 class ClanBattle;
 class Clan;
 
-#define BASE_MEMBER_COUNT 15
+#define BASE_MEMBER_COUNT 30
 struct AllocItem
 {
 	UInt32 itemId;
