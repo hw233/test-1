@@ -331,6 +331,7 @@ namespace GObject
         UInt8 frontFreeCnt;         // 阵图免费次数
         UInt8 frontGoldCnt;         // 阵图收费次数
         UInt32 frontUpdate;         // 阵图次数更新时间
+        UInt32 prestige;            // 斗剑场声望
         std::vector<UInt16> formations; // 已学会阵法
 	};
 
@@ -566,6 +567,9 @@ namespace GObject
 		UInt32 getAchievement(UInt32 a = 0);
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
+
+		UInt32 getPrestige(UInt32 a = 0);
+		UInt32 usePrestige(UInt32 a,ConsumeInfo * ci=NULL);
 
 		void incIcCount();
 		void resetIcCount();

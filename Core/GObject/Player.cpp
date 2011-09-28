@@ -1431,7 +1431,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << gAthleticsRank.getAthleticsPrestige(this) << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -2933,6 +2933,51 @@ namespace GObject
 		sendModification(8, _playerData.achievement);
 		return ;
 	}
+
+    UInt32 Player::getPrestige(UInt32 a)
+    {
+		if(a == 0)
+			return _playerData.prestige;
+		_playerData.prestige += a;
+
+		SYSMSG_SENDV(185, this, a);
+		SYSMSG_SENDV(1090, this, a);
+
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", _playerData.prestige, getId());
+
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
+        send(st);
+
+		return _playerData.prestige;
+    }
+
+    UInt32 Player::usePrestige(UInt32 a,ConsumeInfo * ci)
+    {
+		if(a == 0 || _playerData.prestige == 0)
+			return _playerData.prestige;
+		if(_playerData.prestige < a)
+			_playerData.prestige = 0;
+		else
+		{
+		    _playerData.prestige -= a;
+		    if(ci!=NULL)
+		    {
+				DBLOG1().PushUpdateData("insert into consume_prestige (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+		}
+		SYSMSG_SENDV(186, this, a);
+		SYSMSG_SENDV(1091, this, a);
+
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", _playerData.prestige, getId());
+
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
+        send(st);
+
+		return _playerData.prestige;
+    }
 
     void Player::AddPExp(UInt32 pexp)
     {
