@@ -4820,6 +4820,81 @@ function ItemNormal_00000067(iid, num, bind, param)
     return true;
 end
 
+
+
+function ItemNormal_00000078(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 2 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    -- 高级挂机加速符
+    package:AddItem(56, 8, true, 0, 2);
+    -- 修炼加速符
+    package:AddItem(57, 8, true, 0, 2);
+
+    package:DelItemSendMsg(78, player);
+    return true;
+end
+
+function ItemNormal_00000079(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 3 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    -- 太乙精金
+    package:AddItem(503, 10, true, 0, 2);
+    -- 洗练符
+    package:AddItem(500, 2, true, 0, 2);
+    -- 洗练符保护符
+    package:AddItem(501, 2, true, 0, 2);
+
+    package:DelItemSendMsg(79, player);
+    return true;
+end
+
+function ItemNormal_00000080(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 2 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    -- 兜率精金
+    package:AddItem(47, 3, true, 0, 2);
+    -- 九龙神火
+    package:AddItem(50, 3, true, 0, 2);
+
+    package:DelItemSendMsg(80, player);
+    return true;
+end
+
+function ItemNormal_00000081(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 3 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    -- 宝石保护符
+    package:AddItem(513, 6, true, 0, 2);
+    -- 精致拆卸石
+    package:AddItem(505, 2, true, 0, 2);
+    -- 高级打孔石
+    package:AddItem(512, 2, true, 0, 2);
+
+    package:DelItemSendMsg(81, player);
+    return true;
+end
+
+
 function ItemNormal_athletics_2(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -5540,6 +5615,11 @@ local ItemNormal_Table = {
 
     [68] = ItemNormal_00000068,
     [67] = ItemNormal_00000067,
+
+    [78] = ItemNormal_00000078,
+    [79] = ItemNormal_00000079,
+    [80] = ItemNormal_00000080,
+    [81] = ItemNormal_00000081,
 
     --竞技场宝箱
     [2] = ItemNormal_athletics_2,
