@@ -5733,7 +5733,7 @@ namespace GObject
 #else
         if(getBuffData(PLAYER_BUFF_PROTECT, TimeUtil::Now()))
         {
-            return 0.5;
+            return 0.2;
         }
 #endif
         return 0.0;
