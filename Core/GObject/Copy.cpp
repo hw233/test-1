@@ -251,10 +251,10 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 {
                     Stream st(REP::AUTO_COPY);
                     UInt8 size = loot.size();
-                    if (size > 1)
+                    if (size >= 1)
                     {
                         UInt8 rsize = loot[0];
-                        if (rsize != (size-1)/2)
+                        if (rsize != size/2)
                         {
                             st << static_cast<UInt8>(5);
 #if 0
@@ -315,7 +315,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     if (size)
                     {
                         UInt8 rsize = loot[0];
-                        if (rsize != (size-1)/2)
+                        if (rsize != size/2)
                         {
                             pl->setCopyFailed();
                             autoClear(pl, complete, id, tcd.floor, tcd.spot);
@@ -327,7 +327,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                         }
                         st << id << tcd.floor << tcd.spot;
 
-                        st << static_cast<UInt8>((size-1)/2);
+                        st << static_cast<UInt8>(size/2);
                         for (UInt8 i = 1; i < rsize*2+1; i += 2)
                         {
                             st << loot[i] << static_cast<UInt8>(loot[i+1]);
@@ -551,11 +551,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     secs = 60;
                 else
                     secs = 20;
-                EventAutoCopy* event = new (std::nothrow) EventAutoCopy(pl, secs, floors, id);
-                if (!event)
-                    return;
 
+                pl->resetAutoCopyFailed();
+                EventAutoCopy* event = new (std::nothrow) EventAutoCopy(pl, secs, floors, id);
+                if (!event) return;
                 PushTimerEvent(event);
+
                 pl->addFlag(Player::AutoCopy);
                 pl->setBuffData(PLAYER_BUFF_AUTOCOPY, id, true);
                 DB3().PushUpdateData("REPLACE INTO `autocopy` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
@@ -608,14 +609,20 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     UInt8 s = GData::copyManager[id<<8|f].size();
                     for (UInt8 i = sp; i < s; ++i)
                     {
+#if 0
                         if (pl->isAutoCopyFailed())
                             break;
                         GameMsgHdr hdr(0x275, pl->getThreadId(), pl, sizeof(id));
                         GLOBAL().PushMsg(hdr, &id);
+#else
+                        if (!fight(pl, id, true, true))
+                            goto _over;
+#endif
                     }
                     sp = 1;
                 }
 
+_over:
                 pl->delFlag(Player::AutoCopy);
                 pl->resetAutoCopyFailed();
             }

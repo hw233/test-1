@@ -47,7 +47,7 @@ public:
     bool genAward(Player* pl, TripodData& td);
 
     TripodData& newTripodData(Player* pl);
-    TripodData& addTripodData(UInt64 id, const TripodData& data);
+    TripodData& addTripodData(UInt64 id, const TripodData& data, bool = false);
     TripodData& getTripodData(Player* pl);
     TripodData& getTripodData(UInt64 id);
 

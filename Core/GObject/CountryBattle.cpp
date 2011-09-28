@@ -374,7 +374,8 @@ void CountryBattle::end(UInt32 curtime)
 			if(World::_activityStage > 0)
 				GameAction()->onCountryBattleAttend(it->first);
 			UInt32 awardTime = it->second.awardTime;
-			it->first->addBuffData(rewardid[side], awardTime);
+            if (it->first->getBuffData(PLAYER_BUFF_TRAINP2) && rewardid[side] != PLAYER_BUFF_TRAINP1)
+                it->first->addBuffData(rewardid[side], awardTime);
 			SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
 			it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
 			/*for back stage*/

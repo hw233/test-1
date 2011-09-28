@@ -2946,7 +2946,7 @@ namespace GObject
             td.awdst = t.awdst;
             td.itemId = t.itemId;
             td.num = t.num;
-            tripod.addTripodData(t.id, td);
+            tripod.addTripodData(t.id, td, true);
         }
 		lc.finalize();
         return true;
