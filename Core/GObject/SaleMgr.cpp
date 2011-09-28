@@ -45,20 +45,23 @@ void SaleMgr::addRowSale(SaleData * sale)
 	UInt8 quality = sale->_item->getQuality();
 	UInt32 typeId = sale->_item->GetItemType().getId();
 
-	std::vector<SaleData *>& sales = _saleRow[Index(subClass, typeId)][typeId];
+    UInt8 pIdx = 0;
+    UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
+
+	std::vector<SaleData *>& sales = _saleRow[stIdx][typeId];
 	sales.push_back(sale);
 	std::sort(sales.begin(), sales.end(), SaleRowSorter);
-	++ _itemStat[StatIndex(subClass, typeId)][quality];
-	++ _itemStat[StatIndex(subClass, typeId)][0];
+	++ _itemStat[stIdx][quality];
+	++ _itemStat[stIdx][0];
 	++ _itemStat[0][quality];
 	++ _itemStat[0][0];
-	if (IsEquipId(sale->_item->getId()))
+	if (pIdx != stIdx && pIdx != 0)
 	{
-		std::vector<SaleData *>& sales = _saleRow[5][typeId];
+		std::vector<SaleData *>& sales = _saleRow[pIdx][typeId];
 		sales.push_back(sale);
 		std::sort(sales.begin(), sales.end(), SaleRowSorter);
-		++ _itemStat[5][quality];
-		++ _itemStat[5][0];
+		++ _itemStat[pIdx][quality];
+		++ _itemStat[pIdx][0];
 	}
 }
 
@@ -68,28 +71,31 @@ void SaleMgr::delRowSale(SaleData * sale)
 	UInt8 quality = sale->_item->getQuality();
 	UInt32 typeId = sale->_item->GetItemType().getId();
 
-	std::vector<SaleData *>& sales = _saleRow[Index(subClass, typeId)][typeId];
+    UInt8 pIdx = 0;
+    UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
+
+	std::vector<SaleData *>& sales = _saleRow[stIdx][typeId];
 	std::vector<SaleData *>::iterator found = std::find(sales.begin(), sales.end(), sale);
 	if (found != sales.end())
 		sales.erase(found);
 
-	UInt32& cnt1 = _itemStat[StatIndex(subClass, typeId)][quality];
+	UInt32& cnt1 = _itemStat[stIdx][quality];
 	if (cnt1 > 0) -- cnt1;
-	UInt32& cnt2 = _itemStat[StatIndex(subClass, typeId)][0];
+	UInt32& cnt2 = _itemStat[stIdx][0];
 	if (cnt2 > 0) -- cnt2;
 	UInt32& cnt3 = _itemStat[0][quality];
 	if (cnt3 > 0) -- cnt3;
 	UInt32& cnt4 = _itemStat[0][0];
 	if (cnt4 > 0) -- cnt4;
-	if (IsEquipId(sale->_item->getId()))
+	if (pIdx != stIdx && pIdx != 0)
 	{
-		std::vector<SaleData *>& sales = _saleRow[5][typeId];
+		std::vector<SaleData *>& sales = _saleRow[pIdx][typeId];
 		std::vector<SaleData *>::iterator found = std::find(sales.begin(), sales.end(), sale);
 		if (found != sales.end())
 			sales.erase(found);
-		UInt32& cnt5 = _itemStat[5][quality];
+		UInt32& cnt5 = _itemStat[pIdx][quality];
 		if (cnt5 > 0) -- cnt5;
-		UInt32& cnt6 = _itemStat[5][0];
+		UInt32& cnt6 = _itemStat[pIdx][0];
 		if (cnt6 > 0) -- cnt6;
 	}
 }
@@ -286,24 +292,26 @@ void SaleMgr::cancelSale(Player * player, UInt32 id)
 	GLOBAL().PushMsg(hdr, &saleItemCancel);
 }
 
-void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, UInt8 sch, std::string& name, UInt8 req, UInt8 sort, UInt8 color, UInt8 eqType)
+void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::string& name, UInt8 req, UInt8 color, UInt8 career, UInt8 eqType)
 {
 	//ËÑË÷
 	if (!name.empty())
 	{
-		if (sch == 0)
-			searchSaleByItemName(player, name, start, count, sort);
+		//if (sch == 0)
+			searchSaleByItemName(player, name, start, count);
+#if 0
 		else
 		{
 			Player * beFounder = globalNamedPlayers[player->fixName(name)];
 			searchPlayerSale(player, beFounder, start, count);
 		}
+#endif
 		return;
 	}
-	if (req > 6 || sort > 1 || color > 6 || eqType > 8)
+	if (req > 8 || career > 3 || color > 6 || eqType > 16)
 		return;
-	static const UInt8 ReqCvt[] = { 0xFF, 1, 5, 2, 3, 4 };
-	if (req == 6)
+	static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 15, 18, 31};
+	if (req == 8)
 	{
 		searchPlayerSale(player, player, start, count);
 	}
@@ -328,7 +336,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, UInt8
 			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
 			if (shiftSingleSaleList(req, color, start, offset1, offset2))
-				readCount = appendSingleSaleList(player, st, req, sort, color, count, offset1, offset2);
+				readCount = appendSingleSaleList(player, st, req, career, color, count, offset1, offset2);
 			st.data<UInt16>(6) = readCount;
 			st << Stream::eos;
 			player->send(st);
@@ -349,8 +357,8 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, UInt8
 			UInt16 readCount = 0;
 			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
-			if (shiftTotalSaleList(sort, color, start, type, filter1Offset, filter0Offset))
-				readCount = appendTotalSaleList(player, st, type, sort, color, count, filter1Offset, filter0Offset);
+			if (shiftTotalSaleList(color, start, type, filter1Offset, filter0Offset))
+				readCount = appendTotalSaleList(player, st, type, career, color, count, filter1Offset, filter0Offset);
 			st.data<UInt16>(6) = readCount;
 			st << Stream::eos;
 			player->send(st);
@@ -358,14 +366,14 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, UInt8
 	}
 }
 
-UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UInt8 sort, UInt8 quality, UInt16 count, UInt16 offset1, UInt16 offset2)
+UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt16 count, UInt16 offset1, UInt16 offset2)
 {
 	UInt16 readCount = 0;
 	SaleRowType::iterator offsetIter1 = _saleRow[type].begin();
 	std::advance(offsetIter1, offset1);
 	for (; offsetIter1 != _saleRow[type].end(); ++ offsetIter1)
 	{
-		if (sort == 0)
+		//if (sort == 0)
 		{
 			//ÉýÐò
 			std::vector<SaleData *>& sales = offsetIter1->second;
@@ -376,37 +384,9 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 					continue;
 				if (quality != 0 && sale->_item->getQuality() != quality)
 					continue;
-				st << sale->_id;
-				if (player->GetSale()->hasAccessSaleItem(sale->_id))
-					st << static_cast<UInt8>(1);
-				else
-				{
-					st << static_cast<UInt8>(0) << sale->_owner->getName() << sale->_price << sale->_priceType;
-					if (IsEquipId(sale->_item->getId()))
-						Package::AppendEquipData(st, static_cast<ItemEquip *>(sale->_item));
-					else
-						Package::AppendItemData(st, sale->_item);
-					player->GetSale()->addAccessSaleItem(sale->_id);
-				}
-				++readCount;
-			}
-			if (readCount >= count)
-				break;
-			offset2 = 0;
-		}
-		else
-		{
-			//½µÐò
-			std::vector<SaleData *>& sales = offsetIter1->second;
-			std::vector<SaleData *>::reverse_iterator rit = sales.rbegin();
-			std::advance(rit, offset2);
-			for (; rit != sales.rend() && readCount < count; ++ rit)
-			{
-				SaleData * sale = *rit;
-				if (sale == NULL)
-					continue;
-				if (quality != 0 && sale->_item->getQuality() != quality)
-					continue;
+                if(career != 0 && sale->_item->GetCareer() != career)
+                    continue;
+
 				st << sale->_id;
 				if (player->GetSale()->hasAccessSaleItem(sale->_id))
 					st << static_cast<UInt8>(1);
@@ -431,12 +411,12 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 }
 
 
-UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UInt8 sort, UInt8 quality, UInt16 count, UInt16 filter1Offset, UInt16 filter0Offset)
+UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt16 count, UInt16 filter1Offset, UInt16 filter0Offset)
 {
 	UInt16 readCount = 0;
 	for (; type <= 5; ++type)
 	{
-		readCount += appendSingleSaleList(player, st, type, sort, quality, count-readCount, filter1Offset, filter0Offset);
+		readCount += appendSingleSaleList(player, st, type, career, quality, count-readCount, filter1Offset, filter0Offset);
 		if (readCount >= count)
 			break;
 		filter1Offset = filter0Offset = 0;
@@ -531,7 +511,7 @@ bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt16& offset, UI
 	return false;
 }
 
-bool SaleMgr::shiftTotalSaleList(UInt8 sort, UInt8 quality, UInt16 offset, UInt8& type, UInt16& filter1Offset, UInt16& filter0Offset)
+bool SaleMgr::shiftTotalSaleList(UInt8 quality, UInt16 offset, UInt8& type, UInt16& filter1Offset, UInt16& filter0Offset)
 {
 	if (offset > _itemStat[0][quality])
 		return false;
@@ -544,9 +524,8 @@ bool SaleMgr::shiftTotalSaleList(UInt8 sort, UInt8 quality, UInt16 offset, UInt8
 }
 
 
-void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt16 start, UInt16 count, UInt8 sort)
+void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt16 start, UInt16 count)
 {
-	if (sort > 1) return ;
 	const GData::ItemBaseType * itemBaseType = Package::GetItemBaseType(itemName);
 	if (itemBaseType == NULL)
 	{
@@ -572,36 +551,11 @@ void SaleMgr::searchSaleByItemName(Player * player, std::string& itemName, UInt1
 	if (count != 0)
 	{
 		SaleData * sale = NULL;
-		if (sort == 0)
+		//if (sort == 0)
 		{
 			for (; start < sales.size() && realRead < count; ++ start)
 			{
 				sale = sales[start];
-				if (sale == NULL)
-					continue;
-				st << sale->_id;
-				if (player->GetSale()->hasAccessSaleItem(sale->_id))
-					st << static_cast<UInt8>(1);
-				else
-				{
-					st << static_cast<UInt8>(0) << sale->_owner->getName() << sale->_price << sale->_priceType;
-					if (IsEquipId(sale->_item->getId()))
-						Package::AppendEquipData(st, static_cast<ItemEquip *>(sale->_item));
-					else
-						Package::AppendItemData(st, sale->_item);
-					player->GetSale()->addAccessSaleItem(sale->_id);
-				}
-				++realRead;
-			}
-		}
-		else
-		{
-			//½µÐò
-			std::vector<SaleData *>::reverse_iterator rit = sales.rbegin();
-			std::advance(rit, start);
-			for (; rit != sales.rend() && realRead < count; ++ rit)
-			{
-				sale = *rit;
 				if (sale == NULL)
 					continue;
 				st << sale->_id;
@@ -748,5 +702,84 @@ void SaleMgr::update(UInt32 curr)
 	}
 }
 
+UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
+{
+    //static UInt8 cvt[] = { 1, 1, 2, 1, 6, 7, 8, 9, 10, 11, 12, 13, 4, 1 };
+    static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1,         // ×°±¸£¬·¨±¦   [0-19]
+                           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,  // ÆÕÍ¨ÎïÆ·£¬ Õó·¨ [20-39]
+                           12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // ÐÄ·¨£¬ Ç¿»¯ [40-59]
+                           31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 31, 31, 31};  // ±¦Ê¯ [60-79]
+    UInt8 res = cvt[type];
+    parent = res;
+
+    if(res > 3 && res < 12)
+    {
+        parent = 3;
+    }
+    else if(res > 30 && res < 48)
+    {
+        parent = 31;
+    }
+
+    switch(res)
+    {
+    case 15:                                      //·¨±¦
+        parent = 15;
+        if(typeId > 1499 && typeId < 1600)        //±»¶¯¼¼ÄÜ·¨±¦
+            res += 1;
+        else if(typeId > 1599 && typeId < 1700)   //Ö÷¶¯¼¼ÄÜ·¨±¦
+            res += 2;
+        break;
+    case 18:                                                         //Õó·¨
+        parent = 18;
+        if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //Á½ÒÇÎ¢³¾Õó
+            res += 12;
+        else if(typeId == 1001 || (typeId > 1019 && typeId < 1031))  //ÐëÃÖ¾Å¹¬Õó
+            res += 11;
+        else if(typeId == 1002 || (typeId > 1030 && typeId < 1040))  //½ð¸Õ·üÄ§Õó
+            res += 10;
+        else if(typeId == 1003 || (typeId > 1039 && typeId < 1052))  //×ÏÞ±Ì«¼«Õó
+            res += 9;
+        else if(typeId == 1010 || (typeId > 1051 && typeId < 1059))  //ÎåÐÐÃð¾øÕó
+            res += 8;
+        else if(typeId == 1004 || (typeId > 1058 && typeId < 1065))  //ËÄÏóÔªÁéÕó
+            res += 2;
+        else if(typeId == 1005 || (typeId > 1064 && typeId < 1074))  //±±¶·ÆßÐÇÕó
+            res += 7;
+        else if(typeId == 1006 || (typeId > 1073 && typeId < 1084))  //µßµ¹°ËØÔÕó
+            res += 6;
+        else if(typeId == 1007 || (typeId > 1083 && typeId < 1096))  //¶¼ÌìÁÒ»ðÕó
+            res += 5;
+        else if(typeId == 1008 || (typeId > 1095 && typeId < 1107))  //Ììî¸µØÉ·Õó
+            res += 4;
+        else if(typeId == 1009 || (typeId > 1106 && typeId < 1116))  //ÆæÃÅ¶Ý¼×Õó
+            res += 3;
+        else if(typeId == 1111 || (typeId > 1115 && typeId < 1124))  //ÆßÉ«ËøÔÆÕó
+            res += 1;
+        break;
+    case 12:
+        {
+            parent = 12;
+            const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
+            if(itemType->career == 0)
+            {
+                res += 1;
+            }
+            else
+            {
+                res += 2;
+            }
+        }
+        break;
+    }
+
+    return res;
+}
+
+UInt8 SaleMgr::Index(UInt8 type, UInt32 typeId)
+{
+    UInt8 parent = 0;
+    return StatIndex(type, typeId, parent);
+}
 
 }
