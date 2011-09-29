@@ -1543,6 +1543,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             break;
         }
 
+
         cm->proffer -= single[level].needs;
         {
             Stream st(REP::CLAN_INFO_UPDATE);
@@ -1551,6 +1552,8 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
         }
         cs.level++;
+
+        showSkill(pl, skillId);
     } while(false);
 
     st << res;
@@ -1569,7 +1572,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl)
         return;
     }
 
-    st << cm->clanSkill.size();
+    st << static_cast<UInt8>(cm->clanSkill.size());
 	std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.begin();
 	for (; it != cm->clanSkill.end(); ++ it)
 		st << it->second.id << (GData::clanSkillTable[it->second.id][it->second.level].needs);
