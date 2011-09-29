@@ -3116,7 +3116,7 @@ namespace GObject
 
 	void Player::writeTavernIds()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _nextTavernUpdate, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _playerData.tavernOrangeCount, _nextTavernUpdate, _id);
 	}
 
 	void Player::writeShiMen()
