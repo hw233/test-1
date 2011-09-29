@@ -1259,4 +1259,12 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void LoadLuaFromBs(LoginMsgHdr &hdr, const void * data)
+{
+    UInt16 reloadFlag = 0xFFFF;
+    GameMsgHdr hdr1(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(reloadFlag));
+    GLOBAL().PushMsg(hdr1, &reloadFlag);
+}
+
 #endif // _LOGINOUTERMSGHANDLER_H_
+

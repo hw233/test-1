@@ -374,10 +374,24 @@ void CountryBattle::end(UInt32 curtime)
 			if(World::_activityStage > 0)
 				GameAction()->onCountryBattleAttend(it->first);
 			UInt32 awardTime = it->second.awardTime;
-            if (it->first->getBuffData(PLAYER_BUFF_TRAINP2) && rewardid[side] != PLAYER_BUFF_TRAINP1)
-                it->first->addBuffData(rewardid[side], awardTime);
-			SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
-			it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
+            if (rewardid[side] == PLAYER_BUFF_TRAINP1)
+            {
+                if (!it->first->getBuffData(PLAYER_BUFF_TRAINP2))
+                {
+                    it->first->addBuffData(rewardid[side], awardTime);
+                    SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
+                    it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
+                }
+            }
+            else if (rewardid[side] == PLAYER_BUFF_TRAINP2)
+            {
+                if (!it->first->getBuffData(PLAYER_BUFF_TRAINP1))
+                {
+                    it->first->addBuffData(rewardid[side], awardTime);
+                    SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
+                    it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
+                }
+            }
 			/*for back stage*/
 			UInt8 lvl = getJoinLevel(it->first->GetLev());
 			enterSize[lvl] ++;
@@ -826,7 +840,7 @@ void GlobalCountryBattle::prepare( UInt32 t )
 	else
 	{
 		_startTime = _prepareTime + 30;
-		_endTime = _startTime + 25 * 60;
+		_endTime = _startTime + 8 * 60;
 	}
 }
 
