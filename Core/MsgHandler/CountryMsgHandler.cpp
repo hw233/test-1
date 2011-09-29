@@ -202,5 +202,6 @@ MSG_REG_2(GameMsgHdr, 0x320, OnPracticeExpAddReq);
 MSG_REG_2(GameMsgHdr, 0x321, OnSetPropsReq);
 MSG_REG_2(GameMsgHdr, 0x322, OnSetLevelReq);
 MSG_REG_2(GameMsgHdr, 0x323, OnSetMoneyReq);
+MSG_REG_2(GameMsgHdr, 0x324, OnSetVipLReq);
 
 MSG_HANDLER_END()

@@ -817,6 +817,8 @@ namespace GObject
 
 		inline Mutex& getMutex() { return _mutex; }
 
+        void setVipL(UInt8 lvl); // XXX:
+
 	private:
 		UInt32 calcVipLevel();
 		UInt32 calcYDVipLevel(UInt32);

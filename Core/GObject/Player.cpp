@@ -557,6 +557,37 @@ namespace GObject
 		return true;
 	}
 
+	void Player::setVipL(UInt8 lvl)
+	{
+#define VIP_OPEN_MAX 10
+        if (!lvl || lvl > VIP_OPEN_MAX)
+            return;
+        if (lvl == 0)
+            _playerData.totalRecharge = 87;
+        else if (lvl == 1)
+            _playerData.totalRecharge = 88;
+        else if (lvl == 2)
+            _playerData.totalRecharge = 888;
+        else if (lvl == 3)
+            _playerData.totalRecharge = 1888;
+        else if (lvl == 4)
+            _playerData.totalRecharge = 65888;
+        else if (lvl == 5)
+            _playerData.totalRecharge = 18888;
+        else if (lvl == 6)
+            _playerData.totalRecharge = 58888;
+        else if (lvl == 7)
+            _playerData.totalRecharge = 88888;
+        else if (lvl == 8)
+            _playerData.totalRecharge = 188888;
+        else if (lvl == 9)
+            _playerData.totalRecharge = 288888;
+        else if (lvl == 10)
+            _playerData.totalRecharge = 588888;
+		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %"I64_FMT"u", _playerData.totalRecharge, getId());
+		sendModification(7, _playerData.totalRecharge);
+    }
+
 	UInt32 Player::calcVipLevel()
 	{
 #define VIP_OPEN_MAX 10
@@ -642,12 +673,7 @@ namespace GObject
 
 	UInt8 Player::GetCountryThread()
 	{
-        // XXX:
-#if 1
 		return mapCollection.getCountryFromSpot(_playerData.location);
-#else
-        return _playerData.country;
-#endif
 	}
 
 	const std::string& Player::getClanName() const
