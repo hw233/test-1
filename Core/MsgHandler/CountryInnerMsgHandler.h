@@ -262,7 +262,7 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1);
+        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, FromAthletAward);
     if(awd->prestige)
         player->getPrestige(awd->prestige);
 
@@ -777,11 +777,13 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 
+#if 0
     if (PLAYER_DATA(player, qqawardgot) & 0x04)
     {
         player->sendMsgCode(1, 1006);
         return;
     }
+#endif
 
     UInt8 type = *(UInt8*)(data);
 
@@ -795,7 +797,7 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
         player->GetPackage()->AddItem(15, 1, true);
         player->GetPackage()->AddItem(502, 5, true);
         player->GetPackage()->AddItem(47, 1, true);
-        player->GetPackage()->AddItem(48, 1, true);
+        player->GetPackage()->AddItem(48, 2, true);
         player->GetPackage()->AddItem(49, 1, true);
         player->GetPackage()->AddItem(50, 1, true);
         player->GetPackage()->AddItem(51, 1, true);

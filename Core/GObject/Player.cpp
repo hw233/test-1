@@ -43,8 +43,7 @@
 
 #include <cmath>
 
-//#define NTD_ONLINE_TIME (4*60*60)
-#define NTD_ONLINE_TIME (10*60)
+#define NTD_ONLINE_TIME (4*60*60)
 
 namespace GObject
 {
@@ -3116,7 +3115,7 @@ namespace GObject
 
 	void Player::writeTavernIds()
 	{
-		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _nextTavernUpdate, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _playerData.tavernOrangeCount, _nextTavernUpdate, _id);
 	}
 
 	void Player::writeShiMen()
@@ -4886,14 +4885,20 @@ namespace GObject
                 if(isPotential)
                 {
                     float decp = fgt->getPotential() - 0.01f;
-                    float newp = std::max(std::max(decp, static_cast<float>(GObjectManager::getMinPotential())/100), fgt_orig->getPotential());
-                    fgt->setPotential(newp);
+                    if (decp < static_cast<float>(GObjectManager::getMinPotential())/100)
+                        decp = static_cast<float>(GObjectManager::getMinPotential())/100;
+                    if (decp < fgt_orig->getPotential())
+                        decp = fgt_orig->getPotential();
+                    fgt->setPotential(decp);
                 }
                 else
                 {
                     float decp = fgt->getCapacity() - 0.1f;
-                    float newp = std::max(std::max(decp, static_cast<float>(GObjectManager::getMinCapacity())/100), fgt_orig->getCapacity());
-                    fgt->setCapacity(newp);
+                    if (decp < static_cast<float>(GObjectManager::getMinCapacity())/100)
+                        decp = static_cast<float>(GObjectManager::getMinCapacity())/100;
+                    if (decp < fgt_orig->getCapacity())
+                        decp = fgt_orig->getCapacity();
+                    fgt->setCapacity(decp);
                 }
 			}
 			return 1;
