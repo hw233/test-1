@@ -913,7 +913,7 @@ namespace GObject
 								PLAYER_DATA(pl, tavernPurpleCount) = atoi(tk[7].c_str());
                                 if(count >8)
                                 {
-                                    PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
+                                    //PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
                                     if(count > 9)
                                     {
                                         char * endptr;
