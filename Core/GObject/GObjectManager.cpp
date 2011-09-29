@@ -911,12 +911,16 @@ namespace GObject
 							if(count > 7)
 							{
 								PLAYER_DATA(pl, tavernPurpleCount) = atoi(tk[7].c_str());
-								if(count > 8)
-								{
-									char * endptr;
-									pl->setNextTavernUpdate(strtoul(tk[8].c_str(), &endptr, 10));
-									break;
-								}
+                                if(count >8)
+                                {
+                                    PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
+                                    if(count > 9)
+                                    {
+                                        char * endptr;
+                                        pl->setNextTavernUpdate(strtoul(tk[9].c_str(), &endptr, 10));
+                                        break;
+                                    }
+                                }
 							}
 						}
 						pl->setNextTavernUpdate(1);
