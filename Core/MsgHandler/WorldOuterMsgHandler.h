@@ -353,7 +353,7 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length());
 	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length());
 	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length());
-	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), 0, contact2, purpose2);
+	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), 0, contact2, purpose2, clan->getLev());
 	ConsumeInfo ci(ClanCreate,0,0);
 	player->useTael(GData::moneyNeed[GData::CLAN_CREATE].tael,&ci);
 	clan->initBuildClan();

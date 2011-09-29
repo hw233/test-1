@@ -801,7 +801,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	};
 	AddItems items = {type, count};
 	if(World::_wday == 4 && type == 1)
-		count *= 2;
+		//count *= 2;
 	if (_techs->donate(player, techId, type, count))
 	{
 		if (type == 1)
