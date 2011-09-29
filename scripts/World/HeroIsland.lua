@@ -1,0 +1,3 @@
+
+local minLevel = 40
+
