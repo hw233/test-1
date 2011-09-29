@@ -491,6 +491,7 @@ namespace SPEQ
     const UInt16 SETPROPS           = 0x10D;//
     const UInt16 SETMONEY           = 0x10E;//
     const UInt16 LOADLUA            = 0x10F;//
+    const UInt16 SETVIPL            = 0x110;//
 }
 
 namespace SPEP
@@ -509,6 +510,7 @@ namespace SPEP
     const UInt8 SETPROPS            = 0x0D;//
     const UInt8 SETMONEY            = 0x0E;//
     const UInt8 LOADLUA             = 0x0F;//
+    const UInt8 SETVIPL             = 0x10;//
     const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
 }
 

@@ -1094,5 +1094,12 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnSetVipLReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 lvl = *(UInt8*)(data);
+    player->setVipL(lvl);
+}
+
 
 #endif // _COUNTRYINNERMSGHANDLER_H_
