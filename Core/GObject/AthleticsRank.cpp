@@ -1207,11 +1207,11 @@ void AthleticsRank::requestAthleticsEvent(Stream& st, Player * player)
         if((*rit)->player1)
             st << (*rit)->player1->getName() << (*rit)->player1->getCountry();
         else
-            st << "" << 0;
+            st << "" << static_cast<UInt8>(0);
         if((*rit)->player2)
             st << (*rit)->player2->getName() << (*rit)->player2->getCountry();
         else
-            st << "" << 0;
+            st << "" << static_cast<UInt8>(0);
 
         st <<  (*rit)->cond << (*rit)->value << (*rit)->itemCount << (*rit)->itemId << (*rit)->color;
     }
