@@ -1575,7 +1575,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl)
     st << static_cast<UInt8>(cm->clanSkill.size());
 	std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.begin();
 	for (; it != cm->clanSkill.end(); ++ it)
-		st << it->second.id << (GData::clanSkillTable[it->second.id][it->second.level].needs);
+		st << it->second.id << it->second.level;
 
     return;
 }
@@ -1592,7 +1592,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
         return;
 
     ClanSkill& skill = it->second;
-	st << skill.id << (GData::clanSkillTable[skill.id][skill.level].needs);
+	st << skill.id << skill.level;
     return;
 }
 
