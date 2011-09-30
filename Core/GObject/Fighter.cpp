@@ -268,6 +268,8 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 		_exp = e;
 		sendModification(3, _exp);
 	}
+    if (_level >= 40)
+        _owner->send40LevelPack();
 }
 
 void Fighter::updateToDB( UInt8 t, UInt64 v )
@@ -300,8 +302,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 2: field = "level"; break;
 	case 3: 
         {
-            UInt32 now = time(NULL);
 #if 0
+            UInt32 now = time(NULL);
             ++_expMods;
             if (_expFlush || _expMods >= 10 || now > _expEnd) // XXX: 等级变化，10次变化，10分钟
             {

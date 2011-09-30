@@ -1,5 +1,6 @@
 
 #include "HeroIsland.h"
+#include "Common/Stream.h"
 
 namespace GObject
 {

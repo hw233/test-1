@@ -3,6 +3,7 @@
 #define HEROISLAND_H_
 
 #include "Config.h"
+#include "Player.h"
 #include "Script/GameActionLua.h"
 
 namespace GObject

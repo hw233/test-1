@@ -429,6 +429,7 @@ namespace GObject
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
         void sendNationalDayOnlineAward();
+        void send40LevelPack();
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);

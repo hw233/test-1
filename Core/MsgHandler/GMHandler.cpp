@@ -1243,26 +1243,6 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	addSuperClass(player, 16);
     addSuperClass(player, 13);
     addSuperClass(player, 15);
-	switch(player->GetClass())
-	{
-#if 0
-	case 1:
-		addSuperClass(player, 316);
-		addSuperClass(player, 321);
-		break;
-	case 3:
-		addSuperClass(player, 311);
-		addSuperClass(player, 321);
-		break;
-	case 5:
-		addSuperClass(player, 311);
-		addSuperClass(player, 316);
-		break;
-#else
-#endif
-	default:
-		break;
-	}
 }
 
 static void doEquipFighter( const std::pair<UInt32, GObject::Fighter *>& p, int level )
