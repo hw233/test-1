@@ -9,7 +9,7 @@ update athletics_rank a, player b set a.prestige=7200 where a.ranker=b.id and b.
 
 update athletics_rank a, player b set a.prestige=6720 where a.ranker=b.id and b.created  > '2011-09-18 12:00:00' and b.created  < '2011-09-19 12:37:07' and a.prestige > 6720;
 
-update athletics_rank a, player b set a.prestige=6240 where a.ranker=b.id and b.created  > '2011-09-19 12:00:00' and b.created  < '2011-09-18 12:37:07' and a.prestige > 6240;
+update athletics_rank a, player b set a.prestige=6240 where a.ranker=b.id and b.created  > '2011-09-19 12:00:00' and b.created  < '2011-09-20 12:37:07' and a.prestige > 6240;
 
 update athletics_rank a, player b set a.prestige=5760 where a.ranker=b.id and b.created  > '2011-09-20 12:00:00' and b.created  < '2011-09-21 12:37:07' and a.prestige > 5760;
 
