@@ -11,7 +11,7 @@ function Task_Accept_00000051()
 	if task:HasAcceptedTask(51) or task:HasCompletedTask(51) or task:HasSubmitedTask(51) then
 		return false;
 	end
-	if not task:HasSubmitedTask(70) then
+	if not task:HasSubmitedTask(127) then
 		return false;
 	end
 	return true;
@@ -33,7 +33,7 @@ function Task_Can_Accept_00000051()
 	if task:HasAcceptedTask(51) or task:HasCompletedTask(51) or task:HasSubmitedTask(51) then
 		return false;
 	end
-	if not task:HasSubmitedTask(70) then
+	if not task:HasSubmitedTask(127) then
 		return false;
 	end
 	return true;
@@ -143,7 +143,7 @@ function Task_00000051_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(10000);
+	player:AddExp(20000);
 	return true;
 end
 
