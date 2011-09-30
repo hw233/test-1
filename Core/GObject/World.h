@@ -86,6 +86,7 @@ private:
 	static void World_Athletics_Check( void * );
     static void World_Boss_Refresh(void*);
     static void World_Boss_Prepare(void*);
+    static void Hero_Island_Process(void*);
 
 private:
 	void testUpdate();
