@@ -5951,7 +5951,7 @@ namespace GObject
 		if(now >= _playerData.qqawardEnd)
 		{
 			_playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
-            _playerData.qqawardgot &= 0x80;
+            _playerData.qqawardgot &= 0xFC;
             DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
             RollYDGem();
         }
