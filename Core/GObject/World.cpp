@@ -28,6 +28,7 @@
 #include "SpecialAward.h"
 #include "PracticePlace.h"
 #include "WorldBoss.h"
+#include "HeroIsland.h"
 #include "MsgID.h"
 
 namespace GObject
@@ -244,6 +245,11 @@ void World::World_Boss_Prepare(void*)
     worldBoss.prepare(TimeUtil::Now());
 }
 
+void World::Hero_Island_Process(void*)
+{
+    heroIsland.process(TimeUtil::Now());
+}
+
 bool World::Init()
 {
 	GObjectManager::delayLoad();
@@ -269,6 +275,8 @@ bool World::Init()
 	
     AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
     AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+
+    AddTimer(1 * 60 * 1000, Hero_Island_Process, static_cast<void*>(NULL));
 
     UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);

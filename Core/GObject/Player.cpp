@@ -733,6 +733,8 @@ namespace GObject
         else
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 
+        send40LevelPack();
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
         m_ulog = _analyzer.GetInstance(buf);
@@ -785,6 +787,31 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             setBuffData(PLAYER_BUFF_ONLINE, static_cast<UInt32>(-1), true);
+        }
+    }
+
+    void Player::send40LevelPack()
+    {
+        if (GetLev() < 40 || (_playerData.qqawardgot & 0x08))
+            return;
+
+        SYSMSG(title, 2114);
+        SYSMSG(content, 2115);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[1] = {{36,1}};
+            mailPackageManager.push(mail->id, mitem, 1, true);
+
+            std::string strItems;
+            strItems += Itoa(mitem[0].id);
+            strItems += ",";
+            strItems += Itoa(mitem[0].count);
+            strItems += "|";
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+
+            _playerData.qqawardgot |= 0x08;
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
         }
     }
 
@@ -3045,6 +3072,7 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
+        send40LevelPack(); // XXX: 
 	}
 
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )

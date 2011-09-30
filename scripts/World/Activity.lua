@@ -106,6 +106,7 @@ function initActTime(y, m, d)
 
   loadStore();
   loadTitle();
+  loadRareAnimals()
 end
 
 function onAthleticsNewBox(t, c)
