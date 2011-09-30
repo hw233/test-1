@@ -10,17 +10,17 @@ function Task_Accept_00000124()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(125) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(125) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(125) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
@@ -42,17 +42,17 @@ function Task_Can_Accept_00000124()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(125) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(125) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(125) then
+		if not task:HasSubmitedTask(70) then
 			return false;
 		end
 	end
@@ -164,6 +164,7 @@ function Task_00000124_submit(itemId, itemNum)
 
 	player:AddExp(10000);
 	player:getCoupon(20);
+	player:getTael(500);
 	return true;
 end
 
