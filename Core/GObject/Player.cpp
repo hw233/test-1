@@ -5981,7 +5981,7 @@ namespace GObject
         checkQQAward();
 
         Stream st(REP::YD_INFO);
-        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>(_playerData.qqawardgot & 0x7F);
+        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>(_playerData.qqawardgot & 0x03);
         UInt8 maxCnt = GObjectManager::getYDMaxCount();
         st << maxCnt;
         for(UInt8 i = 0; i < maxCnt; ++ i)

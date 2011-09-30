@@ -130,6 +130,8 @@ GMHandler::GMHandler()
     Reg(3, "unlock", &GMHandler::OnUnLock);
     Reg(3, "setbl", &GMHandler::OnSetBosslevel);
     Reg(3, "cmd2d", &GMHandler::OnCmd2d);
+
+    Reg(3, "clanbuild", &GMHandler::OnClanBuild);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2322,5 +2324,20 @@ void GMHandler::OnCmd2d(GObject::Player *player, std::vector<std::string>& args)
         key.len = snprintf(key.key, 128, "1-hello");
 	GameMsgHdr hdr(0x2D, player->getThreadId(), player, key.len+sizeof(UInt16));
 	GLOBAL().PushMsg(hdr, &key);
+}
+
+void GMHandler::OnClanBuild(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+	if(args.size() == 1)
+	{
+		UInt32 val = atoi(args[0].c_str());
+		if(val == 0)
+			return;
+
+		player->AddClanContrib(val);
+		player->AddClanBuilding(val);
+	}
 }
 

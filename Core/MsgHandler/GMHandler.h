@@ -102,6 +102,7 @@ private:
     void OnUnLock(GObject::Player *player, std::vector<std::string>&);
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnCmd2d(GObject::Player *player, std::vector<std::string>&);
+    void OnClanBuild(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;
