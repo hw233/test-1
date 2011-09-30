@@ -274,6 +274,7 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
+
 	if(m_Type == 0)
         InfoLog(p);
 }
@@ -312,6 +313,7 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
     ++m_Limit;
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
+
 	if(m_Type == 0)
         InfoLog(p);
 }

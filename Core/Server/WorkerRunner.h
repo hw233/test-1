@@ -20,11 +20,17 @@ protected:
 		UInt32 interval;
 	};
 public:
-	WorkerRunner(UInt32 tv = 0): m_IsActive(false), m_IsPause(false), m_CheckPause(false), m_MsgHandler(NULL), m_Timerinterval(tv), _event_base(NULL) { }
+	WorkerRunner(UInt32 tv = 0): m_IsActive(false), m_IsPause(false), m_CheckPause(false),
+    m_MsgHandler(NULL), m_Timerinterval(tv), m_Log(NULL), _event_base(NULL) { }
 	virtual ~WorkerRunner() { Destroy(); }
 	inline void RunnerProc()
 	{
-		m_Log = new Log(1, GetLogName());
+        try
+        {
+            m_Log = new Log(1, GetLogName());
+        } catch (Exception& e)
+        {
+        }
 
 		_event_base = event_base_new();
 

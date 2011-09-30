@@ -390,8 +390,13 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
+#if 0
 	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
 		handleLastErrorImpl(_path);
+#else
+	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
+        fprintf(stderr, "mkdir error: %s\n", _path.c_str());
+#endif
 	return true;
 }
 
