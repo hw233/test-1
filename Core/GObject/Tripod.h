@@ -40,7 +40,7 @@ public:
 
     void getTripodInfo(Player* pl);
     void sendTripodInfo(Player* pl, TripodData& td);
-    void addItem(Player* pl, UInt32 itemid, int num, UInt8 bind);
+    void addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind);
     void makeFire(Player* pl, UInt32 id1, UInt32 id2);
     void getAward(Player* pl);
     void genAward(Player* pl, TripodData& td, Stream& st);

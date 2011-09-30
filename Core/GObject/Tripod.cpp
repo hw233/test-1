@@ -87,7 +87,7 @@ static UInt8 tripod_factor[4][4] =
 #endif
 };
 
-void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
+void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
 {
     if (!pl || !itemid || !num)
         return;
@@ -101,6 +101,9 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
     ib = pk->FindItem(itemid, bind);
     if (ib)
     {
+        if (ib->Count() < num)
+            return;
+
         td.soul += ib->getEnergy();
 
         UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
@@ -142,8 +145,8 @@ void Tripod::addItem(Player* pl, UInt32 itemid, int num, UInt8 bind)
         td.soul = MAX_TRIPOD_SOUL;
     }
 
-    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u",
-            td.soul, td.quality, td.needgen, pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u",
+            td.soul, td.quality, td.awdst, td.needgen, pl->getId());
 }
 
 static UInt16 fire_begin = 47;

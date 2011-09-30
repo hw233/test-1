@@ -131,8 +131,46 @@ void DBWorker::OnPause()
 	Resume();
 }
 
+void DBWorker::InfoLog(const char* p)
+{
+    if (!p)
+        return;
+
+    if (m_Worker == WORKER_THREAD_DB) // player
+    {
+        DB().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB1) // player
+    {
+        DB1().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB2) // fighter
+    {
+        DB2().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB3) // dungeon_player,player_copy,player_front
+    {
+        DB3().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB4) // item,equipment
+    {
+        DB4().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB5) // task_instance
+    {
+        DB5().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+    else if (m_Worker == WORKER_THREAD_DB6) // 
+    {
+        DB6().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
+    }
+}
+
 void DBWorker::PushUpdateData(const char * fmt, ...)
 {
+	if(m_Type == 1 && cfg.serverLogId == 0)
+		return;
+
     if (m_Worker == WORKER_THREAD_DB) // normal
     {
         if (m_Limit > 5000)
@@ -165,8 +203,6 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 
     ++m_Limit;
 
-	if(m_Type == 1 && cfg.serverLogId == 0)
-		return;
 	/* Guess we need no more than 256 bytes. */
 	int size = 256;
 
@@ -196,8 +232,9 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
-	if(m_Type == 0)
-		DB().GetLog()->OutInfo("Push [%s]\n", p);
+
+    if(m_Type == 0)
+        InfoLog(p);
 }
 
 void DBWorker::PushUpdateDataL(const char * fmt, ...)
@@ -238,7 +275,7 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
 	if(m_Type == 0)
-		DB().GetLog()->OutInfo("Push [%s]\n", p);
+        InfoLog(p);
 }
 
 void DBWorker::PushUpdateDataF(const char * fmt, ...)
@@ -276,7 +313,7 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 	FastMutex::ScopedLock lk(m_Mutex);
 	m_UpdateItems.push_back(p);
 	if(m_Type == 0)
-		DB().GetLog()->OutInfo("Push [%s]\n", p);
+        InfoLog(p);
 }
 
 bool DBWorker::DoDBQuery(const char* query)
