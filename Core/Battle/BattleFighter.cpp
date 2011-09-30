@@ -624,7 +624,9 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
                 }
                 resSkillItem = &(_activeSkill[idx]);
                 _activeSkill[idx].cd = resSkillItem->base->cd + 1;
-                break;
+
+                if(!need_therapy)
+                    break;
             }
         }
     }
