@@ -1202,16 +1202,16 @@ void AthleticsRank::requestAthleticsEvent(Stream& st, Player * player)
 
     std::deque<AthleticsEventData*>::reverse_iterator rit = _athleticsesEvent[row].rbegin();
     st << count;
-    for (UInt16 i = 0; rit != _athleticsesEvent[row].rend() && i < count; ++rit, ++count)
+    for (UInt16 i = 0; rit != _athleticsesEvent[row].rend() && i < count; ++rit, ++i)
     {
         if((*rit)->player1)
             st << (*rit)->player1->getName() << (*rit)->player1->getCountry();
         else
-            st << "" << 0;
+            st << "" << static_cast<UInt8>(0);
         if((*rit)->player2)
             st << (*rit)->player2->getName() << (*rit)->player2->getCountry();
         else
-            st << "" << 0;
+            st << "" << static_cast<UInt8>(0);
 
         st <<  (*rit)->cond << (*rit)->value << (*rit)->itemCount << (*rit)->itemId << (*rit)->color;
     }
