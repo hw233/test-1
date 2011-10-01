@@ -61,10 +61,10 @@ void HeroIsland::process(UInt32 now)
 {
 }
 
-void HeroIsland::getIdentity(Player* player)
+UInt8 HeroIsland::getIdentity(Player* player)
 {
     if (!player)
-        return;
+        return 0;
 
     UInt8 type = 0;
     if (_types[0] < _types[1])
@@ -90,6 +90,7 @@ void HeroIsland::getIdentity(Player* player)
         ++_types[2];
         type = 2;
     }
+    return type;
 }
 
 HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8 spot)
@@ -105,29 +106,29 @@ HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8 spot)
     return NULL;
 }
 
-void HeroIsland::enter(Player* player)
+void HeroIsland::enter(Player* player, UInt8 type)
 {
-    if (!player)
+    if (!player || type > 2)
         return;
 
     if (player->getThreadId() != COUNTRY_NEUTRAL)
     {
+        // XXX:
         return;
     }
 
     HIPlayerData* pd = findPlayer(player);
+    if (pd) return;
+
+    pd = new(std::nothrow) HIPlayerData;
     if (!pd)
-    {
-        pd = new(std::nothrow) HIPlayerData;
-        if (!pd)
-            return;
+        return;
 
-        _players[0].push_back(pd);
-    }
-    else
-    {
-    }
+    pd->player = player;
+    _players[0].push_back(pd);
 
+    pd->type = type;
+    pd->spot = 0;
     pd->straight = 0;
 
     sendPlayers(player);

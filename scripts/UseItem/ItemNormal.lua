@@ -762,6 +762,11 @@ function ItemNormal_00000036(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
 
+    if package:GetRestPackageSize() < 8 then     
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end  
+
     local viplvl = player:getVipLevel()
     if viplvl == 0 then
         player:sendMsgCode(2, 1008, 0)

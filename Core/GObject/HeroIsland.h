@@ -14,6 +14,8 @@ namespace GObject
 struct HIPlayerData
 {
     Player* player;
+    UInt8 type; // 0-天,1-地,2-人
+    UInt8 spot;
     UInt32 straight;
 };
 
@@ -46,8 +48,8 @@ private:
 public:
     void process(UInt32 now);
 
-    void getIdentity(Player* player);
-    void enter(Player* player);
+    UInt8 getIdentity(Player* player);
+    void enter(Player* player, UInt8 type);
     void leave(Player* player);
     void listPlayers(Player* player);
     void moveTo(Player* player, UInt8 spot);
