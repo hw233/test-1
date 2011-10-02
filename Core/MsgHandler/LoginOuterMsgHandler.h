@@ -592,7 +592,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB1().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        DB8().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
@@ -1284,6 +1284,29 @@ void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
     {
         GameMsgHdr msg(0x324, pl->getThreadId(), pl, sizeof(lv));
         GLOBAL().PushMsg(msg, &lv);
+        ret = 0;
+    }
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::CLSTASK,0x01);
+    UInt64 id;
+    UInt8 type;
+    br>>id;
+    br>>type;
+    st<<id;
+
+    UInt8 ret = 1;
+    GObject::Player * pl = GObject::globalPlayers[id];
+    if (pl)
+    {
+        GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
+        GLOBAL().PushMsg(msg, &type);
         ret = 0;
     }
     st << ret << Stream::eos;

@@ -1788,6 +1788,11 @@ namespace GObject
         setCopyFailed();
     }
 
+    bool Player::attackRareAnimal(UInt32 id)
+    {
+        return attackCopyNpc(id, 3, 0, 1);
+    }
+
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
@@ -3171,6 +3176,18 @@ namespace GObject
 	{
 		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _playerData.tavernOrangeCount, _nextTavernUpdate, _id);
 	}
+
+    void Player::resetShiMen()
+    {
+        _playerData.shimen.clear();
+        writeShiMen();
+    }
+
+    void Player::resetYaMen()
+    {
+        _playerData.yamen.clear();
+        writeYaMen();
+    }
 
 	void Player::writeShiMen()
 	{
