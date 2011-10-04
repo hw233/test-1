@@ -1793,7 +1793,7 @@ namespace GObject
         return attackCopyNpc(id, 3, 0, 1);
     }
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, bool ato, std::vector<UInt16>* loot )
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -1830,7 +1830,7 @@ namespace GObject
 			ret = 0x0101;
 			_lastNg = ng;
             pendExp(ng->getExp()*expfactor);
-			ng->getLoots(this, _lastLoot, &atoCnt);
+			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
 		}
 
         if (ato)

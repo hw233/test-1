@@ -121,7 +121,7 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     return true;
 }
 
-UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id)
+UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 {
     if (!pl)
         return 1;
@@ -143,6 +143,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id)
 
         ++PLAYER_DATA(pl, copyGoldCnt);
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
+        lootlvl = PLAYER_DATA(pl, copyGoldCnt);
         return 0;
     } else {
         SYSMSG_SENDV(2000, pl);
@@ -167,17 +168,19 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         return;
     }
 
-    UInt8 ret = checkCopy(pl, id);
+    UInt8 lootlvl = 0;
+    UInt8 ret = checkCopy(pl, id, lootlvl);
 
     if (!ret) {
         CopyData& tcd = getCopyData(pl, id, true);
         if (!tcd.floor) {
             tcd.floor = 1;
             tcd.spot = 1;
+            tcd.lootlvl = lootlvl;
         }
 
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
-        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, pl->getId(), id);
+        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u, `lootlvl`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u", tcd.floor, tcd.spot, lootlvl, pl->getId(), id);
     }
 
     Stream st(REP::COPY_INFO);
@@ -235,7 +238,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         }
 
         std::vector<UInt16> loot;
-        if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, ato, &loot)) {
+        if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
             bool nextfloor = false;
             if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
                 nextfloor = true;
@@ -257,22 +260,6 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                         if (rsize != size/2)
                         {
                             st << static_cast<UInt8>(5);
-#if 0
-                            PopTimerEvent(pl, EVENT_AUTOCOPY, pl->getId());
-                            pl->setBuffData(PLAYER_BUFF_AUTOCOPY, 0, true);
-                            pl->delFlag(Player::AutoCopy);
-                            DB1().PushUpdateData("DELETE FROM `autocopy` WHERE playerId = %"I64_FMT"u", pl->getId());
-                            SYSMSG(title, 555);
-                            SYSMSGV(content, 556);
-                            MailPackage::MailItem mitem[size/2-rsize];
-                            for (UInt8 i = rsize*2+1, j = 0; i < size; i += 2, ++j)
-                            {
-                                mitem[j].id = loot[i];
-                                mitem[j].count = loot[i+1];
-                            }
-                            MailItemsInfo itemsInfo(mitem, MailItemType::AutoCopy, size/2-rsize); 
-                            pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0, true, &itemsInfo);
-#endif
                         }
                         else
                         {
@@ -403,11 +390,12 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
     pl->send(st);
 }
 
-void PlayerCopy::addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot)
+void PlayerCopy::addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl)
 {
     CopyData& cd = m_copys[playerId][id];
     cd.floor = floor;
     cd.spot = spot;
+    cd.lootlvl = lootlvl;
 }
 
 CopyData& PlayerCopy::getCopyData(Player* pl, UInt8 id, bool update)

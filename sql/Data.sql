@@ -365,6 +365,9 @@ CREATE TABLE `npc_group` (
   `type` tinyint(3) NOT NULL DEFAULT '0',
   `experience` int(10) unsigned NOT NULL DEFAULT '0',
   `lootId` varchar(255) NOT NULL DEFAULT '',
+  `lootId1` varchar(255) NOT NULL DEFAULT '',
+  `lootId2` varchar(255) NOT NULL DEFAULT '',
+  `lootId3` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

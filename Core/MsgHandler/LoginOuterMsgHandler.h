@@ -571,7 +571,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         else if (ret == 3)
             err += "fetch token value error.";
 
-        if (rc == MEMCACHED_SUCCESS)
+        if (rc == MEMCACHED_SUCCESS && !ret)
         {
             rc = memcached_delete(memc, key, len, (time_t)0);
             if (rc == MEMCACHED_SUCCESS)
@@ -582,7 +582,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         if (err.length())
         {
-            TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u", key, token.c_str(), ret, rc);
+            TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u, err: %s", key, token.c_str(), ret, rc, err.c_str());
             uninitMemcache();
             initMemcache();
         }

@@ -28,6 +28,7 @@
 #include "CountryMsgStruct.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
+#include "GObject/HeroIsland.h"
 
 GMHandler gmHandler;
 
@@ -132,6 +133,12 @@ GMHandler::GMHandler()
     Reg(3, "cmd2d", &GMHandler::OnCmd2d);
 
     Reg(3, "clanbuild", &GMHandler::OnClanBuild);
+
+    Reg(3, "hienter", &GMHandler::OnEnterHI);
+    Reg(3, "hileave", &GMHandler::OnLeaveHI);
+    Reg(3, "hiattack", &GMHandler::OnAttackHI);
+    Reg(3, "himove", &GMHandler::OnMoveHI);
+    Reg(3, "hiid", &GMHandler::OnGetIDHI);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2339,5 +2346,36 @@ void GMHandler::OnClanBuild(GObject::Player *player, std::vector<std::string>& a
 		player->AddClanContrib(val);
 		player->AddClanBuilding(val);
 	}
+}
+
+void GMHandler::OnEnterHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    heroIsland.playerEnter(player, atoi(args[0].c_str()), 0);
+}
+
+void GMHandler::OnLeaveHI(GObject::Player *player, std::vector<std::string>&)
+{
+    heroIsland.playerLeave(player);
+}
+
+void GMHandler::OnAttackHI(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+    heroIsland.attack(player, atoi(args[0].c_str()), atoi(args[1].c_str()));
+}
+
+void GMHandler::OnMoveHI(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+    heroIsland.moveTo(player, atoi(args[0].c_str()), atoi(args[1].c_str()));
+}
+
+void GMHandler::OnGetIDHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    heroIsland.getIdentity(player);
 }
 

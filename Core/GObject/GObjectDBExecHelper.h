@@ -19,7 +19,7 @@ struct DBNpcGroup
 	UInt16 formationId;
 	UInt8 type;
 	UInt32 experience;
-	std::string lootId;
+	std::string lootId[4];
 };
 
 struct DBDungeon
@@ -664,6 +664,7 @@ struct DBCopyData
     UInt8 id;
     UInt8 floor;
     UInt8 spot;
+    UInt8 lootlvl;
 };
 
 struct DBFrontMapData
@@ -673,6 +674,7 @@ struct DBFrontMapData
     UInt8 spot;
     UInt8 count;
     UInt8 status;
+    UInt8 lootlvl;
 };
 struct DBAttainData
 {
@@ -1006,14 +1008,17 @@ SPECIALDEF(25)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBNpcGroup)
-SPECIALDEF(6)
+SPECIALDEF(9)
 (
 	UInt32, id,
 	std::string, fighterId,
 	UInt16, formationId,
 	UInt8, type,
 	UInt32, experience,
-	std::string, lootId
+	std::string, lootId[0],
+	std::string, lootId[1],
+	std::string, lootId[2],
+	std::string, lootId[3]
 )
 SPECIALEND()
 
@@ -1515,23 +1520,25 @@ SPECIALDEF(7)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBCopyData)
-SPECIALDEF(4)
+SPECIALDEF(5)
 (
     UInt64, playerId,
     UInt8, id,
     UInt8, floor,
-    UInt8, spot
+    UInt8, spot,
+    UInt8, lootlvl
 )
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFrontMapData)
-SPECIALDEF(5)
+SPECIALDEF(6)
 (
     UInt64, playerId,
     UInt8, id,
     UInt8, spot,
     UInt8, count,
-    UInt8, status
+    UInt8, status,
+    UInt8, lootlvl 
 )
 SPECIALEND()
 

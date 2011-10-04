@@ -196,6 +196,9 @@ bool Fighter::addExp( UInt64 e )
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
 		}
+        worldBoss.setLevel(_level);
+        if (_level >= 40)
+            _owner->send40LevelPack();
         _expFlush = true;
 	}
 	else

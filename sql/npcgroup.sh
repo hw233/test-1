@@ -22,7 +22,7 @@ function npcgroup()
         BEGIN {
             print "INSERT INTO `npc_group` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,\x27%s\x27)",$1,$2,$3,$4,$5,$6);
+            printf("(%d,\x27%s\x27,%d,%d,%d,\x27%s\x27,\x27%s\x27,\x27%s\x27,\x27%s\x27)",$1,$2,$3,$4,$5,$6,$7,$8,$9);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])
