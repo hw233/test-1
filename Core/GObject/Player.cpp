@@ -1349,8 +1349,9 @@ namespace GObject
 			SYSMSG_SENDV(111, this, fgt->getColor(), fgt->getName().c_str());
 			SYSMSG_SENDV(1011, this, fgt->getColor(), fgt->getName().c_str());
 
-            UInt32 fgts[1] = {fgt->getId()};
-            GObject::practicePlace.standup(this, fgts, 1);
+            UInt32 fgtid = fgt->getId();
+            GameMsgHdr hdr2(0x1A6, WORKER_THREAD_WORLD, this, sizeof(fgtid));
+            GLOBAL().PushMsg(hdr2, &fgtid);
 
 			return fgt;
 		}

@@ -482,6 +482,14 @@ void OnBloackBossDataReq(  GameMsgHdr& hdr, const void * data )
 	GObject::gBlockbossmgr.reqBlockBossData(player, bossLevel);
 }
 
+void OnFighterStandup( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    UInt32 fgtid = *(UInt32*)(data);
+    UInt32 fgts[1] = {fgtid};
+    GObject::practicePlace.standup(player, fgts, 1);
+}
+
 void OnRunscriptReq( GameMsgHdr&, const void * data )
 {
 	const char * script = reinterpret_cast<const char *>(data);
