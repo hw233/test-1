@@ -143,6 +143,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
         PopTimerEvent(pl, EVENT_PLAYERPRTRIPOD, pl->getId());
         td.awdst = 1;
         td.soul = MAX_TRIPOD_SOUL;
+        td.needgen = 0;
     }
 
     DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u",

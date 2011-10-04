@@ -585,6 +585,7 @@ namespace GObject
         else if (lvl == 10)
             _playerData.totalRecharge = 588888;
 		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %"I64_FMT"u", _playerData.totalRecharge, getId());
+        recalcVipLevel();
 		sendModification(7, _playerData.totalRecharge);
     }
 

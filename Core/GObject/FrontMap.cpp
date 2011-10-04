@@ -247,8 +247,9 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
-        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, %u, 0, 0, 0)",
-                pl->getId(), id, spot, tmp[0].lootlvl);
+        tmp[spot].lootlvl = tmp[spot-1].lootlvl;
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, %u, 0, 0, %u)",
+                pl->getId(), id, spot, tmp[spot].lootlvl);
     }
 
     UInt8 count = tmp[spot].count;
@@ -261,12 +262,6 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
-        if (tmp[0].lootlvl)
-        {
-            tmp[spot].lootlvl = tmp[0].lootlvl;
-            tmp[0].lootlvl = 0;
-        }
-
         if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl)) {
             ret = true;
         }
