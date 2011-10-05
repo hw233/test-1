@@ -266,7 +266,7 @@ void Tripod::getAward(Player* pl)
     td.soul = 0;
     td.itemId = 0;
     td.num = 0;
-    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0, `regen` = 1 WHERE `id` = %"I64_FMT"u", pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0, `fire` = 0, `quality`=2, `awdst` = 0, `itemId` = 0, `num` = 0, `regen` = 1 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
     sendTripodInfo(pl, td);
 }
