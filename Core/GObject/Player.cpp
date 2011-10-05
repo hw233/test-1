@@ -5745,8 +5745,8 @@ namespace GObject
 		_pwdInfo.isLocked = 1;
 		char questionTmp[256];
 		char answerTmp[256];
-		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length());
-		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length());
+		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length()>255?255:_pwdInfo.questionForPWD.length());
+		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length()>255?255:_pwdInfo.answerForPWD.length());
 		DB1().PushUpdateData("INSERT INTO `pass_word` VALUES(%"I64_FMT"u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
 		Stream st;
 		makeSenconPWDInfo(st);
