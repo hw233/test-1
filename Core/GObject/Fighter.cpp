@@ -1595,7 +1595,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 {
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
-        if (_acupoints[idx] == v)
+        if (_acupoints[idx] >= v)
             return false;
 
         const GData::AcuPra* pap = GData::acupraManager[idx<<8|v];
@@ -1610,16 +1610,20 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
             if (pap->pra > getPExp())
                 return false;
             addPExp(-pap->pra, writedb);
+
+            _acupoints[idx] = v;
+            if (_acupoints[idx] < 3)
+                ++_praadd; // 第3层不加
+        }
+        else
+        {
+            _acupoints[idx] = v;
         }
 
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
 
-        if (v < 3)
-            ++_praadd; // 第3层不加
-
-        _acupoints[idx] = v;
         _attrDirty = true;
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);

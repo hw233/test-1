@@ -95,11 +95,6 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
 	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
 
-    if (td.soul >= MAX_TRIPOD_SOUL)
-    {
-        return;
-    }
-
     Package* pk = pl->GetPackage();
     if (!pk)
         return;
@@ -120,19 +115,21 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
             {
                 if (td.quality < i+2)
                 {
-                    if (pl->getVipLevel() >= 3)
-                    {
-                        td.quality = i+3; // 2-绿,3-蓝,4-紫,5-橙
-                    }
-                    else
-                        td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
-                    if (td.quality > 5)
-                        td.quality = 5;
+                    td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
                     td.needgen = 1;
-                    break;
                 }
+                break;
             }
         }
+
+        if (pl->getVipLevel() >= 3)
+        {
+            if (td.quality < 3)
+                td.quality = 3;
+        }
+
+        if (td.quality > 5)
+            td.quality = 5;
 
         if (IsEquipId(itemid))
         {    
