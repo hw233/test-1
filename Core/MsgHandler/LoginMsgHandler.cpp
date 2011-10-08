@@ -29,6 +29,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::SETPROPS,SetPropsFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETMONEY,SetMoneyFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::LOADLUA,LoadLuaFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETVIPL,SetVIPLFromBs);
+MSG_REG_2(LoginMsgHdr,SPEQ::CLSTASK,ClearTaskFromBs);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 

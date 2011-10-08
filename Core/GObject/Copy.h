@@ -14,11 +14,12 @@ namespace GObject
 
 struct CopyData
 {
-    CopyData() : floor(0), spot(0) {}
+    CopyData() : floor(0), spot(0), lootlvl(0) {}
     void reset() { memset(this, 0x00, sizeof(*this)); }
 
     UInt8 floor;
     UInt8 spot;
+    UInt8 lootlvl;
 };
 
 class Player;
@@ -50,11 +51,11 @@ public:
     void autoBattle(Player* pl, UInt8 id, UInt8 type, bool = false);
     void failed(Player* pl, UInt8 id);
 
-    void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot);
+    void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);
     CopyData& getCopyData(Player* pl, UInt8 id, bool update = false);
     CopyData& getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool update = false);
     UInt8 getCopyFloors(UInt8 id);
-    UInt8 checkCopy(Player* pl, UInt8 id);
+    UInt8 checkCopy(Player* pl, UInt8 id, UInt8& lootlvl);
     void sendAutoCopy(Player* pl);
     
 private:

@@ -1113,7 +1113,7 @@ void Clan::setContact( const std::string& c, bool announce )
 		st << static_cast<UInt8>(3) << c << Stream::eos;
 		broadcast(st);
 		char c2[1024];
-		mysql_escape_string(c2, c.c_str(), c.length());
+		mysql_escape_string(c2, c.c_str(), c.length()>1022?1022:c.length());
 		DB5().PushUpdateData("UPDATE `clan` SET `contact` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
@@ -1129,7 +1129,7 @@ void Clan::setAnnounce( const std::string& c, bool announce )
 		st << static_cast<UInt8>(4) << c << Stream::eos;
 		broadcast(st);
 		char c2[1024];
-		mysql_escape_string(c2, c.c_str(), c.length());
+		mysql_escape_string(c2, c.c_str(), c.length()>1022?1022:c.length());
 		DB5().PushUpdateData("UPDATE `clan` SET `announce` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
@@ -1748,7 +1748,7 @@ void Clan::setPurpose( const std::string& c, bool writedb )
 	if(writedb)
 	{
 		char c2[1024];
-		mysql_escape_string(c2, c.c_str(), c.length());
+		mysql_escape_string(c2, c.c_str(), c.length()>1022?1022:c.length());
 		DB5().PushUpdateData("UPDATE `clan` SET `purpose` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }

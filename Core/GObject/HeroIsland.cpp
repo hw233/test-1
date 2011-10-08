@@ -1,6 +1,6 @@
 
 #include "HeroIsland.h"
-#include "Common/Stream.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -61,10 +61,10 @@ void HeroIsland::process(UInt32 now)
 {
 }
 
-void HeroIsland::getIdentity(Player* player)
+UInt8 HeroIsland::getIdentity(Player* player)
 {
     if (!player)
-        return;
+        return 0;
 
     UInt8 type = 0;
     if (_types[0] < _types[1])
@@ -90,85 +90,347 @@ void HeroIsland::getIdentity(Player* player)
         ++_types[2];
         type = 2;
     }
+    SYSMSG_SENDV(2116, player, type);
+    return type;
 }
 
-HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8 spot)
+HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8& spot, UInt8& pos)
 {
-    if (!player || spot > HERO_ISLAND_SPOTS)
+    if (!player || (spot > HERO_ISLAND_SPOTS && spot != 0xFF))
         return NULL;
-    size_t sz = _players[spot].size();
-    for (size_t i = 0; i < sz; ++i)
+
+    UInt8 start = 0;
+    UInt8 end = 0;
+    if (spot == 0xFF)
     {
-        if (_players[spot][i]->player == player)
-            return _players[spot][i];
+        start = 0;
+        end = HERO_ISLAND_SPOTS;
+    }
+    else
+    {
+        start = spot;
+        end = spot+1;
+    }
+
+    for (UInt8 j = start; j < end; ++j)
+    {
+        size_t sz = _players[j].size();
+        for (size_t i = 0; i < sz; ++i)
+        {
+            if (_players[j][i]->player == player)
+            {
+                spot = j;
+                pos = i;
+                return _players[j][i];
+            }
+        }
     }
     return NULL;
 }
 
-void HeroIsland::enter(Player* player)
+HIPlayerData* HeroIsland::findPlayer(UInt64 id, UInt8& spot, UInt8& pos)
 {
-    if (!player)
-        return;
+    if (!id || (spot > HERO_ISLAND_SPOTS && spot != 0xFF))
+        return NULL;
 
-    if (player->getThreadId() != COUNTRY_NEUTRAL)
+    UInt8 start = 0;
+    UInt8 end = 0;
+    if (spot == 0xFF)
     {
-        return;
-    }
-
-    HIPlayerData* pd = findPlayer(player);
-    if (!pd)
-    {
-        pd = new(std::nothrow) HIPlayerData;
-        if (!pd)
-            return;
-
-        _players[0].push_back(pd);
+        start = 0;
+        end = HERO_ISLAND_SPOTS;
     }
     else
     {
+        start = spot;
+        end = spot+1;
     }
 
-    pd->straight = 0;
-
-    sendPlayers(player);
+    for (UInt8 j = start; j < end; ++j)
+    {
+        size_t sz = _players[j].size();
+        for (size_t i = 0; i < sz; ++i)
+        {
+            if (_players[j][i]->player && _players[j][i]->player->getId() == id)
+            {
+                spot = j;
+                pos = i;
+                return _players[j][i];
+            }
+        }
+    }
+    return NULL;
 }
 
-void HeroIsland::sendPlayers(Player* player, UInt8 spot)
+RareAnimals& HeroIsland::findRareAnimal(UInt32 id, UInt8 spot)
 {
-    if (spot > HERO_ISLAND_SPOTS)
+    static RareAnimals null;
+    if (!id || spot > HERO_ISLAND_SPOTS)
+        return null;
+
+    size_t sz = _animals[spot].size();
+    for (size_t j = 0; j < sz; ++j)
+    {
+        if (_animals[spot][j].id == id)
+        {
+            return _animals[spot][j];
+        }
+    }
+    return null;
+}
+
+bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot)
+{
+    if (!player || type > 2)
+        return false;
+
+    if (player->getThreadId() != COUNTRY_NEUTRAL)
+        return false;
+
+    UInt8 pos = 0;
+    UInt8 rspot = spot;
+    HIPlayerData* pd = findPlayer(player, rspot, pos);
+    if (pd)
+        return true;
+
+    pd = new(std::nothrow) HIPlayerData;
+    if (!pd) return false;
+    pd->player = player;
+    return enter(pd, type, spot);
+}
+
+bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot)
+{
+    if (!pd || type > 2 || spot > HERO_ISLAND_SPOTS)
+        return false;
+
+    pd->type = type;
+    pd->spot = spot;
+    _players[spot].push_back(pd);
+
+    sendPlayers(pd, spot, 0, HERO_ISLANG_PAGESZ);
+    sendSkills(pd);
+    broadcast(pd, spot);
+
+    return true;
+}
+
+void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt8 page, UInt8 pagesize)
+{
+    if (!pd || !pd->player || spot > HERO_ISLAND_SPOTS)
         return;
     
     Stream st(0);
     size_t sz = _players[spot].size();
     for (size_t i = 0; i < sz; ++i)
     {
+        // TODO:
     }
     st << Stream::eos;
-    player->send(st);
+    pd->player->send(st);
 }
 
-void HeroIsland::leave(Player* player)
+void HeroIsland::sendRareAnimals(HIPlayerData* pd, UInt8 spot)
+{
+    if (spot > HERO_ISLAND_SPOTS)
+        return;
+
+    Stream st;
+    size_t sz = _animals[spot].size();
+    for (size_t i = 0; i < sz; ++i)
+    {
+        // TODO:
+    }
+    st << Stream::eos;
+    pd->player->send(st);
+}
+
+void HeroIsland::sendSkills(HIPlayerData* pd)
+{
+    if (!pd || !pd->player)
+        return;
+    Stream st;
+    // TODO:
+    st << Stream::eos;
+    pd->player->send(st);
+}
+
+void HeroIsland::broadcast(HIPlayerData* pd, UInt8 spot)
+{
+    if (!pd || spot > HERO_ISLAND_SPOTS)
+        return;
+
+    Stream st;
+    st << Stream::eos;
+    broadcast(st, spot);
+}
+
+void HeroIsland::broadcast(Stream& st, UInt8 spot)
+{
+    if (spot > HERO_ISLAND_SPOTS)
+        return;
+
+    size_t sz = _players[spot].size();
+    for (size_t i = 0; i < sz; ++i)
+        _players[spot][i]->player->send(st);
+}
+
+void HeroIsland::broadcast(Stream& st)
+{
+    for (UInt8 i = 0; i < HERO_ISLAND_SPOTS; ++i)
+        broadcast(st, i);
+}
+
+HIPlayerData* HeroIsland::leave(Player* player, UInt8 spot)
+{
+    if (!player || spot > HERO_ISLAND_SPOTS)
+        return NULL;
+
+    UInt8 rspot = spot;
+    UInt8 pos = 0;
+    HIPlayerData* pd = findPlayer(player, rspot, pos);
+    if (!pd) return NULL;
+    return leave(pd, rspot, pos);
+}
+
+HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt8 pos)
+{
+    if (!pd)
+        return NULL;
+
+    Stream st;
+    // TODO:
+    st << Stream::eos;
+    broadcast(st, pd->spot);
+
+    _players[spot].erase(_players[spot].begin()+pos);
+    return pd;
+}
+
+void HeroIsland::listPlayers(Player* player, UInt8 spot, UInt8 page, UInt8 pagesize)
 {
     if (!player)
         return;
+
+    UInt8 pos = 0;
+    HIPlayerData* pd = findPlayer(player, spot, pos);
+    if (pd)
+        sendPlayers(pd, spot, page, pagesize);
 }
 
-void HeroIsland::listPlayers(Player* player)
+bool HeroIsland::moveTo(Player* player, UInt8 from, UInt8 to)
+{
+    if (!player || from > HERO_ISLAND_SPOTS || to > HERO_ISLAND_SPOTS)
+        return false;
+
+    UInt8 pos = 0;
+    HIPlayerData* pd = findPlayer(player, from, pos);
+    if (!pd)
+        return false;
+
+    if (leave(pd, from, pos))
+        return enter(pd, pd->type, to);
+    return false;
+}
+
+bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
+{
+    if (!player || !id)
+        return false;
+
+    if (player->getBuffData(PLAYER_BUFF_ATTACKING))
+    {
+        player->sendMsgCode(0, 1412);
+        return false;
+    }
+
+    UInt8 spot = 0xFF;
+    UInt8 pos = 0;
+    HIPlayerData* pd = findPlayer(player, spot, pos);
+    if (!pd) return false;
+
+    if (!pd->spot)
+    {
+        return false;
+    }
+
+    if (type == 1) // NPC
+    {
+        RareAnimals& ra = findRareAnimal(id, pd->spot);
+        if (!ra.id)
+            return false;
+        if (pd->player->attackRareAnimal(ra.id))
+        {
+            // TODO:
+        }
+    }
+    else if (type == 2) // Player
+    {
+        UInt8 spot = pd->spot;
+        UInt8 pos = 0;
+        HIPlayerData* pd1 = findPlayer(id, spot, pos);
+        if (!pd1)
+        {
+            return false;
+        }
+
+        if (!pd1->spot)
+        {
+            return false;
+        }
+
+        int turns = 0;
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 50);
+        player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 2 * turns);
+        pd1->player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 2 * turns);
+
+        // TODO: 奖励
+        if (res)
+        {
+        }
+        else
+        {
+        }
+
+        return true;
+    }
+    return false;
+}
+
+bool HeroIsland::useSkill(Player* player, UInt8 spot)
 {
     if (!player)
-        return;
+        return false;
+
+    UInt8 pos = 0;
+    HIPlayerData* pd = findPlayer(player, spot, pos);
+    if (!pd) return false;
+    if (pd->spot)
+        return false;
+
+    // TODO:
+
+    return false;
 }
 
-void HeroIsland::moveTo(Player* player, UInt8 spot)
+void HeroIsland::playerEnter(Player* player, UInt8 type, UInt8 spot)
 {
-    if (!player || !spot)
-        return;
+    enter(player, type, spot);
 }
 
-void HeroIsland::attack(Player* player, UInt8 spot, UInt8 type, UInt64 id)
+void HeroIsland::playerLeave(Player* player)
 {
-    if (!player || !spot || !id)
+    UInt8 spot = 0xFF;
+    UInt8 pos = 0;
+    HIPlayerData* pd = findPlayer(player, spot, pos);
+    if (!pd)
         return;
+    leave(pd, spot, pos);
+    delete pd;
+}
+
+void HeroIsland::listRank(Player* player, UInt8 page, UInt8 pagesize)
+{
 }
 
 HeroIsland heroIsland;

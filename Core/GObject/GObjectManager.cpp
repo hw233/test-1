@@ -358,11 +358,11 @@ namespace GObject
         LoadingCounter lc("Loading copy:");
 		DBCopyData dbcd;
         lc.reset(2000);
-		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot` FROM `player_copy` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `id`, `floor`, `spot`, `lootlvl` FROM `player_copy` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot);
+            playerCopy.addPlayer(dbcd.playerId, dbcd.id, dbcd.floor, dbcd.spot, dbcd.lootlvl);
         }
         lc.finalize();
         return true;
@@ -376,11 +376,11 @@ namespace GObject
         LoadingCounter lc("Loading frontmap:");
 		DBFrontMapData dbcd;
         lc.reset(2000);
-		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status` FROM `player_frontmap` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `id`, `spot`, `count`, `status`, `lootlvl` FROM `player_frontmap` ORDER BY `playerId`,`id`", dbcd) != DB::DB_OK)
             return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-            frontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status);
+            frontMap.addPlayer(dbcd.playerId, dbcd.id, dbcd.spot, dbcd.count, dbcd.status, dbcd.lootlvl);
         }
         lc.finalize();
         return true;
@@ -531,7 +531,7 @@ namespace GObject
 
 		lc.prepare("Loading NPC groups:");
 		GData::DBNpcGroup dbng;
-		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `type`, `experience`, `lootId` FROM `npc_group`", dbng) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `fighterId`, `formationId`, `type`, `experience`, `lootId`, `lootId1`, `lootId2`, `lootId3` FROM `npc_group`", dbng) != DB::DB_OK)
 			return false;
 		std::string path = cfg.scriptPath + "formula/main.lua";
 		Script::BattleFormula bform(path.c_str());
@@ -549,16 +549,23 @@ namespace GObject
 			}
 			ngroup->setFormation(dbng.formationId);
 			ngroup->setExp(dbng.experience);
-			StringTokenizer tk(dbng.lootId, ",");
-			std::vector<const GData::LootItem *> lootItem;
-			for(size_t j = 0; j < tk.count(); ++ j)
-			{
-				const GData::LootItem * li = GData::lootTable[atoi(tk[j].c_str())];
-				if(li == NULL)
-					continue;
-				lootItem.push_back(li);
-			}
-			ngroup->setLoots(lootItem);
+
+            for (size_t i = 0; i < 4; ++i)
+            {
+                StringTokenizer tk(dbng.lootId[i], ",");
+                std::vector<const GData::LootItem *> lootItem;
+                for(size_t j = 0; j < tk.count(); ++ j)
+                {
+                    const GData::LootItem * li = GData::lootTable[atoi(tk[j].c_str())];
+                    if(li == NULL)
+                        continue;
+                    lootItem.push_back(li);
+                }
+
+                if (lootItem.size())
+                    ngroup->addLoots(lootItem);
+            }
+
 			ngroup->calcBattlePoints(&bform);
             ngroup->setType(dbng.type);
 			GData::npcGroups[dbng.id] = ngroup;

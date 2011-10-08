@@ -43,9 +43,9 @@ public:
 	inline UInt16 getFormation() { return _formation; }
 	void putFighters(Battle::BattleSimulator&);
 	void monsterKilled(GObject::Player *, UInt32 = 1);
-	void setLoots(std::vector<const LootItem *>&);
-	void getLoots(GObject::Player *);
-	void getLoots(GObject::Player *, std::vector<LootResult>&, UInt8* atoCnt = NULL);
+	void addLoots(std::vector<const LootItem *>&);
+	void getLoots(GObject::Player *, UInt8 lootlvl = 0);
+	void getLoots(GObject::Player *, std::vector<LootResult>&, UInt8 lootlvl = 0, UInt8* atoCnt = NULL);
 	void calcBattlePoints(Script::BattleFormula *);
 	inline float getBattlePoints() { return _bp; }
 	UInt8 getLevel();
@@ -59,7 +59,7 @@ private:
 	std::map<UInt32, UInt16> _npcCount;
 	UInt16 _formation;
 	UInt32 _exp;
-	std::vector<const LootItem *> _loots;
+    std::vector<std::vector<const LootItem *> > _loots;
 	float _bp;
     UInt8 _type;
 };

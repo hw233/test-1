@@ -204,12 +204,12 @@ namespace GObject
 		if(count > 0)
 		{
 			if(isNew)
-				DB1().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
+				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
 			else
-				DB().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
+				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
 		}
 		else
-			DB1().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
+			DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
 	}
 
 	bool EventFighterTrain::Equal(UInt32 id, size_t fgtId) const
@@ -585,6 +585,7 @@ namespace GObject
         else if (lvl == 10)
             _playerData.totalRecharge = 588888;
 		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %"I64_FMT"u", _playerData.totalRecharge, getId());
+        recalcVipLevel();
 		sendModification(7, _playerData.totalRecharge);
     }
 
@@ -1349,8 +1350,9 @@ namespace GObject
 			SYSMSG_SENDV(111, this, fgt->getColor(), fgt->getName().c_str());
 			SYSMSG_SENDV(1011, this, fgt->getColor(), fgt->getName().c_str());
 
-            UInt32 fgts[1] = {fgt->getId()};
-            GObject::practicePlace.standup(this, fgts, 1);
+            UInt32 fgtid = fgt->getId();
+            GameMsgHdr hdr2(0x1A6, WORKER_THREAD_WORLD, this, sizeof(fgtid));
+            GLOBAL().PushMsg(hdr2, &fgtid);
 
 			return fgt;
 		}
@@ -1788,7 +1790,12 @@ namespace GObject
         setCopyFailed();
     }
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, bool ato, std::vector<UInt16>* loot )
+    bool Player::attackRareAnimal(UInt32 id)
+    {
+        return attackCopyNpc(id, 3, 0, 1);
+    }
+
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -1825,7 +1832,7 @@ namespace GObject
 			ret = 0x0101;
 			_lastNg = ng;
             pendExp(ng->getExp()*expfactor);
-			ng->getLoots(this, _lastLoot, &atoCnt);
+			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
 		}
 
         if (ato)
@@ -1939,7 +1946,7 @@ namespace GObject
 		Stream st(REP::TASK_RESPONSE_HOOK);
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (getMaxIcCount(_vipLevel) - getIcCount()) << Stream::eos;
 		send(st);
-		DB1().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
+		DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
 		delFlag(Training);
 	}
 
@@ -3171,6 +3178,18 @@ namespace GObject
 	{
 		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _playerData.tavernOrangeCount, _nextTavernUpdate, _id);
 	}
+
+    void Player::resetShiMen()
+    {
+        _playerData.shimen.clear();
+        writeShiMen();
+    }
+
+    void Player::resetYaMen()
+    {
+        _playerData.yamen.clear();
+        writeYaMen();
+    }
 
 	void Player::writeShiMen()
 	{
@@ -5726,8 +5745,8 @@ namespace GObject
 		_pwdInfo.isLocked = 1;
 		char questionTmp[256];
 		char answerTmp[256];
-		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length());
-		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length());
+		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length()>255?255:_pwdInfo.questionForPWD.length());
+		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length()>255?255:_pwdInfo.answerForPWD.length());
 		DB1().PushUpdateData("INSERT INTO `pass_word` VALUES(%"I64_FMT"u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
 		Stream st;
 		makeSenconPWDInfo(st);

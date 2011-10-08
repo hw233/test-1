@@ -1111,4 +1111,18 @@ void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
     player->setFightersDirty(true);
 }
 
+void OnClearTaskReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8*)(data);
+    if (type == 1)
+    {
+        player->resetShiMen();
+    }
+    else if (type == 2)
+    {
+        player->resetYaMen();
+    }
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_

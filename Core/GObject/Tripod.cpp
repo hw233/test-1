@@ -104,7 +104,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
         if (ib->Count() < num)
             return;
 
-        td.soul += ib->getEnergy();
+        td.soul += (ib->getEnergy() * num);
 
         UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
         int rnd = uRand(100);
@@ -143,6 +143,7 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
         PopTimerEvent(pl, EVENT_PLAYERPRTRIPOD, pl->getId());
         td.awdst = 1;
         td.soul = MAX_TRIPOD_SOUL;
+        td.needgen = 0;
     }
 
     DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u",
@@ -265,7 +266,7 @@ void Tripod::getAward(Player* pl)
     td.soul = 0;
     td.itemId = 0;
     td.num = 0;
-    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0,`awdst` = 0, `itemId` = 0, `num` = 0, `regen` = 1 WHERE `id` = %"I64_FMT"u", pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0, `fire` = 0, `quality`=2, `awdst` = 0, `itemId` = 0, `num` = 0, `regen` = 1 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
     sendTripodInfo(pl, td);
 }

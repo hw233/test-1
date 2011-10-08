@@ -4,21 +4,32 @@
 
 #include "Config.h"
 #include "Player.h"
+#include "Common/Stream.h"
 #include "Script/GameActionLua.h"
 
 namespace GObject
 {
 
 #define HERO_ISLAND_SPOTS 5
+#define HERO_ISLANG_PAGESZ 12
 
 struct HIPlayerData
 {
+    HIPlayerData() : player(NULL), type(0), spot(0), movecd(0), straight(0) {}
+
     Player* player;
+    UInt8 type; // 0-天,1-地,2-人
+    UInt8 spot;
+    UInt32 movecd;
     UInt32 straight;
+    UInt32 score;
+    std::vector<UInt8> x;
 };
 
 struct RareAnimals
 {
+    RareAnimals() : id(0), last(0), cd(0), cdend(0) {}
+
     UInt32 id;
     GData::AttrExtra attr;
     UInt32 last;
@@ -46,15 +57,31 @@ private:
 public:
     void process(UInt32 now);
 
-    void getIdentity(Player* player);
-    void enter(Player* player);
-    void leave(Player* player);
-    void listPlayers(Player* player);
-    void moveTo(Player* player, UInt8 spot);
-    void attack(Player* player, UInt8 spot, UInt8 type, UInt64 id);
+    UInt8 getIdentity(Player* player);
+    bool enter(Player* player, UInt8 type, UInt8 spot);
+    bool enter(HIPlayerData* pd, UInt8 type, UInt8 spot);
+    HIPlayerData* leave(Player* player, UInt8 spot);
+    HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt8 pos);
+    void listPlayers(Player* player, UInt8 spot, UInt8 page, UInt8 pagesize);
+    bool moveTo(Player* player, UInt8 from, UInt8 to);
+    bool attack(Player* player, UInt8 type, UInt64 id);
+    bool useSkill(Player* player, UInt8 spot);
 
-    HIPlayerData* findPlayer(Player* player, UInt8 spot = 0);
-    void sendPlayers(Player* player, UInt8 spot = 0);
+    void playerEnter(Player* player, UInt8 type, UInt8 spot);
+    void playerLeave(Player* player);
+
+    HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt8& pos);
+    HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt8& pos);
+    RareAnimals& findRareAnimal(UInt32 id, UInt8 spot);
+
+    void sendPlayers(HIPlayerData* pd, UInt8 spot, UInt8 page, UInt8 pagesize);
+    void sendRareAnimals(HIPlayerData* pd, UInt8 spot);
+    void sendSkills(HIPlayerData* pd);
+    void broadcast(HIPlayerData* pd, UInt8 spot);
+    void broadcast(Stream& st, UInt8 spot);
+    void broadcast(Stream& st);
+
+    void listRank(Player* player, UInt8 page, UInt8 pagesize);
 
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }

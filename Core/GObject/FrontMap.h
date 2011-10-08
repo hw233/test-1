@@ -14,10 +14,11 @@ namespace GObject
 
 struct FrontMapData
 {
-    FrontMapData() : count(0), status(0) {}
-    void reset() { count = 0; status = 0; }
+    FrontMapData() : count(0), status(0), lootlvl(0) {}
+    void reset() { count = 0; status = 0; lootlvl = 0; }
     UInt8 count;
     UInt8 status;
+    UInt8 lootlvl;
 };
 
 class Player;
@@ -47,7 +48,7 @@ public:
     UInt8 getFrontMapSize(Player* pl);
     void buildInfo(Player* pl, Stream& st);
 
-    void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status);
+    void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status, UInt8 lootlvl);
 private:
     void sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force = false);
 
