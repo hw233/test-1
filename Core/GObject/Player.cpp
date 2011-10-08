@@ -4815,6 +4815,16 @@ namespace GObject
 		st << static_cast<UInt8>(1);
         UInt32 curtime = TimeUtil::Now();
 		UInt32 vipLevel = getVipLevel();
+        if (getShiMenMax() < _playerData.smFinishCount)
+        {
+            _playerData.smFinishCount = 0;
+            writeShiMen();
+        }
+        if (getYaMenMax() < _playerData.ymFinishCount)
+        {
+            _playerData.ymFinishCount = 0;
+            writeYaMen();
+        }
         st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() - _playerData.smFinishCount) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() - _playerData.ymFinishCount) << getYaMenMax() << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);

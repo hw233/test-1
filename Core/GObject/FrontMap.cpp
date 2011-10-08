@@ -210,19 +210,16 @@ UInt8 FrontMap::getCount(Player* pl)
     if (!pl)
         return 0;
 
-    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate))) {
+    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate)) ||
+            getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt) || getFreeCount() < PLAYER_DATA(pl, frontFreeCnt)) {
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         PLAYER_DATA(pl, frontFreeCnt) = 0;
         PLAYER_DATA(pl, frontGoldCnt) = 0;
         DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontUpdate), pl->getId());
     }
 
-    if (getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt))
-        PLAYER_DATA(pl, frontGoldCnt) = 0;
     UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, frontGoldCnt);
     count <<= 4;
-    if (getFreeCount() < PLAYER_DATA(pl, frontFreeCnt))
-        PLAYER_DATA(pl, frontFreeCnt) = 0;
     count |= getFreeCount()-PLAYER_DATA(pl, frontFreeCnt);
     return count;
 }
