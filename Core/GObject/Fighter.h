@@ -216,6 +216,8 @@ public:
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
     // 增加一个心法
     bool addNewCitta(UInt16 citta, bool = true, bool = false);
+    // 删除所有心法
+    void delAllCitta( bool = true);
     // 删除一个心法
     bool delCitta(UInt16 citta, bool = true);
     // 是否学会了此心法

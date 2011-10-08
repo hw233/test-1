@@ -571,7 +571,7 @@ namespace GObject
         else if (lvl == 3)
             _playerData.totalRecharge = 1888;
         else if (lvl == 4)
-            _playerData.totalRecharge = 65888;
+            _playerData.totalRecharge = 5888;
         else if (lvl == 5)
             _playerData.totalRecharge = 18888;
         else if (lvl == 6)
