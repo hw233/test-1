@@ -95,11 +95,6 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
 	FastMutex::ScopedLock lk(_mutex);
     TripodData& td = getTripodData(pl);
 
-    if (td.soul >= MAX_TRIPOD_SOUL)
-    {
-        return;
-    }
-
     Package* pk = pl->GetPackage();
     if (!pk)
         return;
