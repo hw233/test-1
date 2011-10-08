@@ -1154,7 +1154,7 @@ namespace GObject
             UInt32 id = config[i].sid+j;
             UInt16 num = atoi(tk[j].c_str());
 
-            UInt16 rnum = GetItemNum(id, bind);
+            UInt16 rnum = GetItemAnyNum(id);
             if (rnum < num)
                 return false;
         }
@@ -1167,7 +1167,7 @@ namespace GObject
         {
             UInt32 id = config[i].sid+j;
             UInt16 num = atoi(tk[j].c_str());
-            DelItem(id, num, bind);
+            DelItemAny(id, num, &bind);
         }
         AddItem(config[i].tid, 1, bind, false, FromFCMerge);
         return true;
