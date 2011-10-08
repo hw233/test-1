@@ -1264,6 +1264,7 @@ void OnFighterDismissReq( GameMsgHdr& hdr, FighterDismissReq& fdr )
 			GObject::mailPackageManager.push(pmail->id, mitem, 3, true);
 		}
 	}
+    fgt->delAllCitta();
 	delete fgt;
 	rep._fgtid = fdr._fgtid;
 	rep._result = 0;
@@ -1549,12 +1550,23 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 
 	Package * pkg = player->GetPackage();
 	UInt16 rcount[2] = {0, 0};
+    UInt32 amount = 0;
+
 	for(UInt16 i = 0; i < count; ++ i)
 	{
+		amount += GData::moneyNeed[GData::SPLIT].tael;//GObjectManager::getSplitCost();   // split_cost[q][lv];
+
 		UInt32 itemId;
 		br >> itemId;
 		UInt32 outId;
 		UInt8 outCount;
+
+		if(player->getTael() < amount)
+		{
+			player->sendMsgCode(0, 1100);
+            break;
+		}
+
 		if(pkg->Split(itemId, outId, outCount, /*false,*/ true) < 2)
 		{
 			switch(outId)
@@ -1572,6 +1584,10 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 		else
 			break;
 	}
+
+    ConsumeInfo ci(SplitEquipment,0,0);
+    player->useTael(amount, &ci);
+
 	Stream st(REP::EQ_BATCH_DECOMPOSE);
 	st << flag << rcount[0] << rcount[1] << Stream::eos;
 	player->send(st);
@@ -1592,9 +1608,11 @@ void OnBatchMergeReq( GameMsgHdr& hdr, BatchMergeReq& bmr )
     UInt16 gemIdOut = 0;
     UInt16 gemUnbindOut = 0;
     UInt16 gemBindOut = 0;
-	UInt8 result = player->GetPackage()->BatchMergeGem(bmr._gemId, bmr._unBindNum, bmr._bindNum, bmr._protect, gemIdOut, gemUnbindOut, gemBindOut);
+    UInt16 succTimes = 0;
+    UInt16 failedTimes = 0;
+	UInt8 result = player->GetPackage()->BatchMergeGem(bmr._gemId, bmr._unBindNum, bmr._bindNum, bmr._protect, gemIdOut, gemUnbindOut, gemBindOut, succTimes, failedTimes);
 	Stream st(REP::GEM_BATCH_UPGRADE);
-	st << result << gemIdOut << gemUnbindOut << gemBindOut;
+	st << result << gemIdOut << gemUnbindOut << gemBindOut << succTimes << failedTimes;
 	st << Stream::eos;
 	player->send(st);
 }

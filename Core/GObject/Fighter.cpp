@@ -196,6 +196,9 @@ bool Fighter::addExp( UInt64 e )
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
 		}
+        worldBoss.setLevel(_level);
+        if (_level >= 40)
+            _owner->send40LevelPack();
         _expFlush = true;
 	}
 	else
@@ -268,6 +271,8 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 		_exp = e;
 		sendModification(3, _exp);
 	}
+    if (_level >= 40)
+        _owner->send40LevelPack();
 }
 
 void Fighter::updateToDB( UInt8 t, UInt64 v )
@@ -300,8 +305,8 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 2: field = "level"; break;
 	case 3: 
         {
-            UInt32 now = time(NULL);
 #if 0
+            UInt32 now = time(NULL);
             ++_expMods;
             if (_expFlush || _expMods >= 10 || now > _expEnd) // XXX: 等级变化，10次变化，10分钟
             {
@@ -1590,7 +1595,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 {
     if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
     {
-        if (_acupoints[idx] == v)
+        if (_acupoints[idx] >= v)
             return false;
 
         const GData::AcuPra* pap = GData::acupraManager[idx<<8|v];
@@ -1605,16 +1610,20 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
             if (pap->pra > getPExp())
                 return false;
             addPExp(-pap->pra, writedb);
+
+            _acupoints[idx] = v;
+            if (_acupoints[idx] < 3)
+                ++_praadd; // 第3层不加
+        }
+        else
+        {
+            _acupoints[idx] = v;
         }
 
         soulMax += pap->soulmax;
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
 
-        if (v < 3)
-            ++_praadd; // 第3层不加
-
-        _acupoints[idx] = v;
         _attrDirty = true;
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);
@@ -2376,6 +2385,14 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
     //sendModification(0x62, 0, i, writedb);
     sendModification(0x62, citta, 2/*1add,2del,3mod*/, writedb);
     return true;
+}
+
+void Fighter::delAllCitta( bool writedb )
+{
+    for (size_t i = 0; i < _cittas.size(); ++i)
+    {
+        delCitta(_cittas[i], writedb);
+    }
 }
 
 bool Fighter::delCitta( UInt16 citta, bool writedb )

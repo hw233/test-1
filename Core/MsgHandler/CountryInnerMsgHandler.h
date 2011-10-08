@@ -262,7 +262,7 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, FromAthletAward);
+        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, 0, FromAthletAward);
     if(awd->prestige)
         player->getPrestige(awd->prestige);
 
@@ -805,9 +805,11 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
         player->GetPackage()->AddItem(5033, 3, true);
         player->GetPackage()->AddItem(9, 5, true);
         player->GetPackage()->AddItem(56, 10, true);
+#if 1
         PLAYER_DATA(player, qqawardgot) |= 0x04;
         DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(player, qqawardgot), player->getId());
+#endif
     }
     else if (type == 2) // 2:老黄钻用户
     {
@@ -815,9 +817,11 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
         player->GetPackage()->AddItem(51, 1, true);
         player->GetPackage()->AddItem(15, 1, true);
         player->GetPackage()->AddItem(511, 1, true);
+#if 2
         PLAYER_DATA(player, qqawardgot) |= 0x04;
         DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(player, qqawardgot), player->getId());
+#endif
     }
     else if (type == 3) // key 错误
     {
@@ -901,8 +905,8 @@ void OnClanOption( GameMsgHdr& hdr, const void* data )
     case 1:    // 开除帮派
     case 2:    // 离开帮派
         {
-            player->setClan(co->clan);
             player->delClanTask();
+            player->setClan(co->clan);
         }
         break;
     }
@@ -1094,5 +1098,31 @@ void OnSetMoneyReq( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnSetVipLReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 lvl = *(UInt8*)(data);
+    player->setVipL(lvl);
+}
+
+void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->setFightersDirty(true);
+}
+
+void OnClearTaskReq( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8*)(data);
+    if (type == 1)
+    {
+        player->resetShiMen();
+    }
+    else if (type == 2)
+    {
+        player->resetYaMen();
+    }
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

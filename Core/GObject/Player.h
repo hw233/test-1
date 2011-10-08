@@ -243,7 +243,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), prestige(0)
 		{
             memset(tavernId, 0, sizeof(tavernId));
             memset(fshimen, 0, sizeof(fshimen));
@@ -429,6 +429,7 @@ namespace GObject
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
         void sendNationalDayOnlineAward();
+        void send40LevelPack();
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -584,6 +585,7 @@ namespace GObject
         inline UInt8 getMounts() { return _playerData.mounts; }
         bool setMounts(UInt8 mounts);
 
+        void setFightersDirty(bool bDirty=true);
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
@@ -661,7 +663,8 @@ namespace GObject
 		//Õ½¶·Ïà¹Ø
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, bool = false, std::vector<UInt16>* loot = NULL);
+        bool attackRareAnimal(UInt32 id);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL);
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
@@ -732,6 +735,8 @@ namespace GObject
 		void PutFighters(Battle::BattleSimulator&, int side, bool fullhp = false);
 
 		inline void setNextTavernUpdate(UInt32 n) { _nextTavernUpdate = n; }
+        void resetShiMen();
+        void resetYaMen();
 		void writeTavernIds();
 		void writeShiMen();
 		void writeYaMen();
@@ -816,6 +821,8 @@ namespace GObject
         static void setYaMenActiveCount(UInt8);
 
 		inline Mutex& getMutex() { return _mutex; }
+
+        void setVipL(UInt8 lvl); // XXX:
 
 	private:
 		UInt32 calcVipLevel();

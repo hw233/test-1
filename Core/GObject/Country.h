@@ -61,6 +61,7 @@ protected:
 private:
 	static void Country_Boss_Check(void *);
 	static void Country_Battle_Check(void *);
+    static void Hero_Island_Check(void *);
 
 private:
 	UInt8		m_ThreadID;					//ËùÊôÏß³Ì

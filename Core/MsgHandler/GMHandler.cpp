@@ -28,6 +28,7 @@
 #include "CountryMsgStruct.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
+#include "GObject/HeroIsland.h"
 
 GMHandler gmHandler;
 
@@ -130,6 +131,14 @@ GMHandler::GMHandler()
     Reg(3, "unlock", &GMHandler::OnUnLock);
     Reg(3, "setbl", &GMHandler::OnSetBosslevel);
     Reg(3, "cmd2d", &GMHandler::OnCmd2d);
+
+    Reg(3, "clanbuild", &GMHandler::OnClanBuild);
+
+    Reg(3, "hienter", &GMHandler::OnEnterHI);
+    Reg(3, "hileave", &GMHandler::OnLeaveHI);
+    Reg(3, "hiattack", &GMHandler::OnAttackHI);
+    Reg(3, "himove", &GMHandler::OnMoveHI);
+    Reg(3, "hiid", &GMHandler::OnGetIDHI);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1243,26 +1252,6 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	addSuperClass(player, 16);
     addSuperClass(player, 13);
     addSuperClass(player, 15);
-	switch(player->GetClass())
-	{
-#if 0
-	case 1:
-		addSuperClass(player, 316);
-		addSuperClass(player, 321);
-		break;
-	case 3:
-		addSuperClass(player, 311);
-		addSuperClass(player, 321);
-		break;
-	case 5:
-		addSuperClass(player, 311);
-		addSuperClass(player, 316);
-		break;
-#else
-#endif
-	default:
-		break;
-	}
 }
 
 static void doEquipFighter( const std::pair<UInt32, GObject::Fighter *>& p, int level )
@@ -2342,5 +2331,51 @@ void GMHandler::OnCmd2d(GObject::Player *player, std::vector<std::string>& args)
         key.len = snprintf(key.key, 128, "1-hello");
 	GameMsgHdr hdr(0x2D, player->getThreadId(), player, key.len+sizeof(UInt16));
 	GLOBAL().PushMsg(hdr, &key);
+}
+
+void GMHandler::OnClanBuild(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+	if(args.size() == 1)
+	{
+		UInt32 val = atoi(args[0].c_str());
+		if(val == 0)
+			return;
+
+		player->AddClanContrib(val);
+		player->AddClanBuilding(val);
+	}
+}
+
+void GMHandler::OnEnterHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1)
+        return;
+    heroIsland.playerEnter(player, atoi(args[0].c_str()), 0);
+}
+
+void GMHandler::OnLeaveHI(GObject::Player *player, std::vector<std::string>&)
+{
+    heroIsland.playerLeave(player);
+}
+
+void GMHandler::OnAttackHI(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+    heroIsland.attack(player, atoi(args[0].c_str()), atoi(args[1].c_str()));
+}
+
+void GMHandler::OnMoveHI(GObject::Player *player, std::vector<std::string>& args)
+{
+	if(args.size() < 2)
+		return;
+    heroIsland.moveTo(player, atoi(args[0].c_str()), atoi(args[1].c_str()));
+}
+
+void GMHandler::OnGetIDHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    heroIsland.getIdentity(player);
 }
 

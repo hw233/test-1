@@ -758,6 +758,59 @@ function ItemNormal_00000031(iid, num, bind, param)
     return true;
 end
 
+function ItemNormal_00000036(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < 8 then     
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end  
+
+    local viplvl = player:getVipLevel()
+    if viplvl == 0 then
+        player:sendMsgCode(2, 1008, 0)
+        return false
+    end
+
+    local cls = player:GetClass()
+    if cls == 1 then
+        package:AddEquip(2544 , 1);
+        package:AddEquip(2545 , 1);
+        package:AddEquip(2546 , 1);
+        package:AddEquip(2547 , 1);
+        package:AddEquip(2548 , 1);
+        package:AddEquip(2549 , 1);
+        package:AddEquip(2550 , 1);
+        package:AddEquip(2551 , 1);
+    end
+
+    if cls == 2 then
+        package:AddEquip(2552 , 1);
+        package:AddEquip(2553 , 1);
+        package:AddEquip(2554 , 1);
+        package:AddEquip(2555 , 1);
+        package:AddEquip(2556 , 1);
+        package:AddEquip(2557 , 1);
+        package:AddEquip(2558 , 1);
+        package:AddEquip(2559 , 1);
+    end
+
+    if cls == 3 then
+        package:AddEquip(2560, 1);
+        package:AddEquip(2561, 1);
+        package:AddEquip(2562, 1);
+        package:AddEquip(2563, 1);
+        package:AddEquip(2564, 1);
+        package:AddEquip(2565, 1);
+        package:AddEquip(2566, 1);
+        package:AddEquip(2567, 1);
+    end
+
+    package:DelItemSendMsg(36, player);
+    return true;
+end
+
 function ItemNormal_00000043(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
@@ -5343,6 +5396,7 @@ local ItemNormal_Table = {
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
+	[36] = ItemNormal_00000036,
 	[43] = ItemNormal_00000043,
 	[52] = ItemNormal_00000052,
 	[53] = ItemNormal_00000053,

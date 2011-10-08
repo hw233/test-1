@@ -56,25 +56,41 @@ const std::string& NpcGroup::getName() const
 	static std::string _empty; return (_npcList.empty() ? _empty : _npcList[0].fighter->getName());
 }
 
-void NpcGroup::setLoots( std::vector<const LootItem *>& loots )
+void NpcGroup::addLoots( std::vector<const LootItem *>& loots )
 {
-	_loots = loots;
+    _loots.push_back(loots);
 }
 
-void NpcGroup::getLoots( GObject::Player * player )
+void NpcGroup::getLoots( GObject::Player * player, UInt8 lootlvl )
 {
+    if (lootlvl >= _loots.size())
+    {
+        if (_loots.size())
+            lootlvl = _loots.size() - 1;
+        else
+            return;
+    }
+
 	std::vector<const LootItem *>::iterator it;
-	for(it = _loots.begin(); it != _loots.end(); ++ it)
+	for(it = _loots[lootlvl].begin(); it != _loots[lootlvl].end(); ++ it)
 	{
 		(*it)->roll(player);
 	}
 }
 
-void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, UInt8* atoCnt )
+void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, UInt8 lootlvl, UInt8* atoCnt )
 {
+    if (lootlvl >= _loots.size())
+    {
+        if (_loots.size())
+            lootlvl = _loots.size() - 1;
+        else
+            return;
+    }
+
     UInt8 cnt = 0;
 	std::vector<const LootItem *>::iterator it;
-	for(it = _loots.begin(); it != _loots.end(); ++ it)
+	for(it = _loots[lootlvl].begin(); it != _loots[lootlvl].end(); ++ it)
 	{
 		LootResult lr = (*it)->roll();
 		if(lr.id == 0)

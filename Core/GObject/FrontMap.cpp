@@ -102,7 +102,8 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
     if (!tmp.size())
     {
         tmp.resize(1);
-        DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%"I64_FMT"u, %u, 0, 0, 0)",
+                pl->getId(), id);
     }
 
     size_t off = st.size();
@@ -163,10 +164,10 @@ void FrontMap::enter(Player* pl, UInt8 id)
         if (PLAYER_DATA(pl, frontFreeCnt) < getFreeCount()) {
             ++PLAYER_DATA(pl, frontFreeCnt);
             tmp.resize(1);
-            DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`) VALUES(%"I64_FMT"u, %u, 0, 0, 0)",
+                    pl->getId(), id);
             ret = 0;
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
-            //if (pl->getGold() < (UInt32)20*(PLAYER_DATA(pl, frontGoldCnt)+1)) {
             if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
                 Stream st(REP::FORMATTON_INFO);
                 st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
@@ -177,7 +178,9 @@ void FrontMap::enter(Player* pl, UInt8 id)
 
             ++PLAYER_DATA(pl, frontGoldCnt);
             tmp.resize(1);
-            DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=0,`count`=0,`status`=0", pl->getId(), id); 
+            tmp[0].lootlvl = PLAYER_DATA(pl, frontGoldCnt);
+            DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, 0, 0, 0, %u)", 
+                    pl->getId(), id, PLAYER_DATA(pl, frontGoldCnt));
             ret = 0;
 
             ConsumeInfo ci(EnterFrontMap,0,0);
@@ -207,11 +210,12 @@ UInt8 FrontMap::getCount(Player* pl)
     if (!pl)
         return 0;
 
-    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate))) {
+    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate)) ||
+            getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt) || getFreeCount() < PLAYER_DATA(pl, frontFreeCnt)) {
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         PLAYER_DATA(pl, frontFreeCnt) = 0;
         PLAYER_DATA(pl, frontGoldCnt) = 0;
-        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", TimeUtil::Now(), pl->getId());
+        DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = 0, `frontGoldCnt` = 0, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u", PLAYER_DATA(pl, frontUpdate), pl->getId());
     }
 
     UInt8 count = getGoldCount(pl->getVipLevel())-PLAYER_DATA(pl, frontGoldCnt);
@@ -236,20 +240,17 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
         return;
     }
 
-    if (tmp.size() && spot != tmp.size() && tmp[spot].count)
-        return;
-
     if (spot > 1)
     {
-        if (!tmp[spot-1].count)
+        if (spot > tmp.size())
             return;
     }
 
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
-        //tmp[spot].count = 0;
-        //tmp[spot].status = 0;
-        DB3().PushUpdateData("REPLACE INTO `player_frontmap` SET `playerId`=%"I64_FMT"u,`id`=%u,`spot`=%u,`count`=0,`status`=0", pl->getId(), id, spot); 
+        tmp[spot].lootlvl = tmp[spot-1].lootlvl;
+        DB3().PushUpdateData("REPLACE INTO `player_frontmap`(`playerId`, `id`, `spot`, `count`, `status`, `lootlvl`) VALUES(%"I64_FMT"u, %u, %u, 0, 0, %u)",
+                pl->getId(), id, spot, tmp[spot].lootlvl);
     }
 
     UInt8 count = tmp[spot].count;
@@ -262,7 +263,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
-        if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1)) {
+        if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl)) {
             ret = true;
         }
 
@@ -321,7 +322,7 @@ void FrontMap::reset(Player* pl, UInt8 id)
     pl->send(st);
 }
 
-void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status)
+void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status, UInt8 lootlvl)
 {
     if (!playerId || !id)
         return;
@@ -330,6 +331,7 @@ void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UIn
         tmp.resize(spot+1);
     tmp[spot].count = count;
     tmp[spot].status = status?1:0;
+    tmp[spot].lootlvl = lootlvl;
 }
 
 } // namespace GObject

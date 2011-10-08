@@ -263,7 +263,7 @@ bool Trade::launchTrade(std::string& name, const std::string& title, UInt32 coin
 	_tradeDatas[trade->_id] = trade;
 
 	char escstrTitle[256]; 
-	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length());
+	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length()>255?255:trade->_tradeTitle.length());
 
 	DB1().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d, %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \
 		trade->_tradeStatus, tradePlayer->getId(), escstrTitle, trade->_tradeTime, coin, gold, trade->_strItems.c_str());
@@ -493,7 +493,7 @@ bool Trade::recvLaunchTrade(UInt32 id, const std::string& title, UInt32 time, Pl
 	_tradeDatas[trade->_id] = trade;
 	
 	char escstrTitle[1024]; 
-	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length());
+	mysql_escape_string(escstrTitle, trade->_tradeTitle.c_str(), trade->_tradeTitle.length()>1022?1022:trade->_tradeTitle.length());
 
 
 	DB1().PushUpdateData("INSERT INTO `trade` VALUES (%d, %"I64_FMT"u, %d, %d,  %"I64_FMT"u, '%s', %d, %d, %d, '%s')", trade->_id, _owner->getId(), trade->_tradeSide, \

@@ -204,12 +204,12 @@ namespace GObject
 		if(count > 0)
 		{
 			if(isNew)
-				DB1().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
+				DB3().PushUpdateData("REPLACE INTO `auto_battle`(`playerId`, `npcId`, `count`, `interval`) VALUES(%"I64_FMT"u, %u, %u, %u)", m_Player->getId(), _npcGroup->getId(), count, m_Timer.GetInterval());
 			else
-				DB().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
+				DB3().PushUpdateData("UPDATE `auto_battle` SET `count` = %u WHERE `playerId` = %"I64_FMT"u", count, m_Player->getId());
 		}
 		else
-			DB1().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
+			DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", m_Player->getId());
 	}
 
 	bool EventFighterTrain::Equal(UInt32 id, size_t fgtId) const
@@ -557,6 +557,38 @@ namespace GObject
 		return true;
 	}
 
+	void Player::setVipL(UInt8 lvl)
+	{
+#define VIP_OPEN_MAX 10
+        if (!lvl || lvl > VIP_OPEN_MAX)
+            return;
+        if (lvl == 0)
+            _playerData.totalRecharge = 87;
+        else if (lvl == 1)
+            _playerData.totalRecharge = 88;
+        else if (lvl == 2)
+            _playerData.totalRecharge = 888;
+        else if (lvl == 3)
+            _playerData.totalRecharge = 1888;
+        else if (lvl == 4)
+            _playerData.totalRecharge = 5888;
+        else if (lvl == 5)
+            _playerData.totalRecharge = 18888;
+        else if (lvl == 6)
+            _playerData.totalRecharge = 58888;
+        else if (lvl == 7)
+            _playerData.totalRecharge = 88888;
+        else if (lvl == 8)
+            _playerData.totalRecharge = 188888;
+        else if (lvl == 9)
+            _playerData.totalRecharge = 288888;
+        else if (lvl == 10)
+            _playerData.totalRecharge = 588888;
+		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %"I64_FMT"u", _playerData.totalRecharge, getId());
+        recalcVipLevel();
+		sendModification(7, _playerData.totalRecharge);
+    }
+
 	UInt32 Player::calcVipLevel()
 	{
 #define VIP_OPEN_MAX 10
@@ -642,12 +674,7 @@ namespace GObject
 
 	UInt8 Player::GetCountryThread()
 	{
-        // XXX:
-#if 1
 		return mapCollection.getCountryFromSpot(_playerData.location);
-#else
-        return _playerData.country;
-#endif
 	}
 
 	const std::string& Player::getClanName() const
@@ -707,6 +734,8 @@ namespace GObject
         else
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 
+        send40LevelPack();
+
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
         m_ulog = _analyzer.GetInstance(buf);
@@ -759,6 +788,31 @@ namespace GObject
             }
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             setBuffData(PLAYER_BUFF_ONLINE, static_cast<UInt32>(-1), true);
+        }
+    }
+
+    void Player::send40LevelPack()
+    {
+        if (GetLev() < 40 || (_playerData.qqawardgot & 0x08))
+            return;
+
+        SYSMSG(title, 2114);
+        SYSMSG(content, 2115);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[1] = {{36,1}};
+            mailPackageManager.push(mail->id, mitem, 1, true);
+
+            std::string strItems;
+            strItems += Itoa(mitem[0].id);
+            strItems += ",";
+            strItems += Itoa(mitem[0].count);
+            strItems += "|";
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+
+            _playerData.qqawardgot |= 0x08;
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
         }
     }
 
@@ -1296,8 +1350,9 @@ namespace GObject
 			SYSMSG_SENDV(111, this, fgt->getColor(), fgt->getName().c_str());
 			SYSMSG_SENDV(1011, this, fgt->getColor(), fgt->getName().c_str());
 
-            UInt32 fgts[1] = {fgt->getId()};
-            GObject::practicePlace.standup(this, fgts, 1);
+            UInt32 fgtid = fgt->getId();
+            GameMsgHdr hdr2(0x1A6, WORKER_THREAD_WORLD, this, sizeof(fgtid));
+            GLOBAL().PushMsg(hdr2, &fgtid);
 
 			return fgt;
 		}
@@ -1735,7 +1790,12 @@ namespace GObject
         setCopyFailed();
     }
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, bool ato, std::vector<UInt16>* loot )
+    bool Player::attackRareAnimal(UInt32 id)
+    {
+        return attackCopyNpc(id, 3, 0, 1);
+    }
+
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot )
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -1772,7 +1832,7 @@ namespace GObject
 			ret = 0x0101;
 			_lastNg = ng;
             pendExp(ng->getExp()*expfactor);
-			ng->getLoots(this, _lastLoot, &atoCnt);
+			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
 		}
 
         if (ato)
@@ -1886,7 +1946,7 @@ namespace GObject
 		Stream st(REP::TASK_RESPONSE_HOOK);
 		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (getMaxIcCount(_vipLevel) - getIcCount()) << Stream::eos;
 		send(st);
-		DB1().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
+		DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
 		delFlag(Training);
 	}
 
@@ -3019,6 +3079,7 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
+        send40LevelPack(); // XXX: 
 	}
 
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )
@@ -3117,6 +3178,18 @@ namespace GObject
 	{
 		DB1().PushUpdateData("UPDATE `player` SET `tavernId` = '%u|%u|%u|%u|%u|%u|%u|%u|%u|%u' WHERE `id` = %"I64_FMT"u", _playerData.tavernId[0], _playerData.tavernId[1], _playerData.tavernId[2], _playerData.tavernId[3], _playerData.tavernId[4], _playerData.tavernId[5], _playerData.tavernBlueCount, _playerData.tavernPurpleCount, _playerData.tavernOrangeCount, _nextTavernUpdate, _id);
 	}
+
+    void Player::resetShiMen()
+    {
+        _playerData.shimen.clear();
+        writeShiMen();
+    }
+
+    void Player::resetYaMen()
+    {
+        _playerData.yamen.clear();
+        writeYaMen();
+    }
 
 	void Player::writeShiMen()
 	{
@@ -3525,7 +3598,7 @@ namespace GObject
 	void Player::writeClanTask()
 	{
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
+        st << static_cast<UInt8>(9) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
         st << Stream::eos;
         send(st);
 
@@ -4742,6 +4815,16 @@ namespace GObject
 		st << static_cast<UInt8>(1);
         UInt32 curtime = TimeUtil::Now();
 		UInt32 vipLevel = getVipLevel();
+        if (getShiMenMax() < _playerData.smFinishCount)
+        {
+            _playerData.smFinishCount = 0;
+            writeShiMen();
+        }
+        if (getYaMenMax() < _playerData.ymFinishCount)
+        {
+            _playerData.ymFinishCount = 0;
+            writeYaMen();
+        }
         st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() - _playerData.smFinishCount) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() - _playerData.ymFinishCount) << getYaMenMax() << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
@@ -5672,8 +5755,8 @@ namespace GObject
 		_pwdInfo.isLocked = 1;
 		char questionTmp[256];
 		char answerTmp[256];
-		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length());
-		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length());
+		mysql_escape_string(questionTmp, _pwdInfo.questionForPWD.c_str(), _pwdInfo.questionForPWD.length()>255?255:_pwdInfo.questionForPWD.length());
+		mysql_escape_string(answerTmp, _pwdInfo.answerForPWD.c_str(), _pwdInfo.answerForPWD.length()>255?255:_pwdInfo.answerForPWD.length());
 		DB1().PushUpdateData("INSERT INTO `pass_word` VALUES(%"I64_FMT"u, '%s', '%s', '%s')", _id, _pwdInfo.secondPWD.c_str(), questionTmp, answerTmp);
 		Stream st;
 		makeSenconPWDInfo(st);
@@ -5897,7 +5980,7 @@ namespace GObject
 		if(now >= _playerData.qqawardEnd)
 		{
 			_playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
-            _playerData.qqawardgot &= 0x80;
+            _playerData.qqawardgot &= 0xFC;
             DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
             RollYDGem();
         }
@@ -5927,7 +6010,7 @@ namespace GObject
         checkQQAward();
 
         Stream st(REP::YD_INFO);
-        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>(_playerData.qqawardgot & 0x7F);
+        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>(_playerData.qqawardgot & 0x03);
         UInt8 maxCnt = GObjectManager::getYDMaxCount();
         st << maxCnt;
         for(UInt8 i = 0; i < maxCnt; ++ i)
@@ -6038,6 +6121,17 @@ namespace GObject
             DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
 		}
     }
+
+	void Player::setFightersDirty( bool bDirty )
+	{
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            it->second->setDirty(bDirty);
+        }
+
+		return;
+	}
+
 
 
 }

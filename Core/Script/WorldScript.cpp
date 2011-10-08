@@ -12,6 +12,7 @@
 #include "GObject/SpecialAward.h"
 #include "GameActionLua.h"
 #include "Server/Cfg.h"
+#include "GObject/HeroIsland.h"
 
 namespace Script
 {
@@ -51,6 +52,7 @@ void WorldScript::init()
     def("setYaMenActiveCount", GObject::Player::setYaMenActiveCount);
     def("setCopyActiveCount", GObject::PlayerCopy::setCopyActiveCount);
     def("setFrontMapActiveCount", GObject::FrontMap::setFrontMapActiveCount);
+    def("setRareAnimals", GObject::HeroIsland::setRareAnimals);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

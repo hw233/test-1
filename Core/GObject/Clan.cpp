@@ -40,11 +40,11 @@ UInt8 ClanAuthority[5][7] =
 
 
 // °ïÅÉÃØÊõ
-#define CLAN_SKILL_HP       1
-#define CLAN_SKILL_ATTACK   2
-#define CLAN_SKILL_DEFEND   3
-#define CLAN_SKILL_MAGATK   4
-#define CLAN_SKILL_MAGDEF   5
+#define CLAN_SKILL_ATTACK   1
+#define CLAN_SKILL_DEFEND   2
+#define CLAN_SKILL_MAGATK   3
+#define CLAN_SKILL_MAGDEF   4
+#define CLAN_SKILL_HP       5
 
 static bool find_pending_member(ClanPendingMember * member, Player * p)
 {
@@ -77,20 +77,21 @@ Clan::~Clan()
 
 bool Clan::accept(Player * player, UInt64 pid )
 {
+    bool ret = false;
 	if (_clanBattle->isInBattling())
 	{
 		player->sendMsgCode(2, 1317);
-		return false;
+		return ret;
 	}
 	if (!hasClanAuthority(player, 0))
 	{
 		player->sendMsgCode(2, 1313);
-		return false;
+		return ret;
 	}
 	using namespace std::placeholders;
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member_id, _1, pid));
 	if(it == _pending.end() || (*it)->cls != 16)
-		return false;
+		return ret;
 	Player * accepter = (*it)->player;
 	if (accepter->getClan() != NULL)
 	{
@@ -106,13 +107,14 @@ bool Clan::accept(Player * player, UInt64 pid )
 			SYSMSG_SENDV(121, accepter, _name.c_str());
 			SYSMSG_SENDV(1021, accepter, _name.c_str());
 		}
+        ret = true;
 	}
 	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, accepter->getId());
 
 	delete *it;
 	_pending.erase(it);
 
-	return true;
+	return ret;
 }
 
 bool Clan::decline( Player* player, UInt64 pid )
@@ -162,6 +164,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	{
 		cmem->cls = 4;
 		cmem->proffer = 2000;
+        setLeaderId(player->getId());
 	}
 	if (cmem == NULL) return false;
     buildTechSkill(cmem);
@@ -217,7 +220,13 @@ bool Clan::join(ClanMember * cm)
 	std::set<UInt32>::iterator found = _membersJoinTime.find(cm->joinTime);
 	while (found != _membersJoinTime.end())
 		found = _membersJoinTime.find(++cm->joinTime);
-    buildTechSkill(cm);
+    //buildTechSkill(cm);
+    if(cm->cls > 4)
+        cm->cls = 0;
+    else if(cm->cls == 4 && player->getId() != getLeaderId())
+    {
+        cm->cls = 0;
+    }
 	_members.insert(cm);
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
@@ -376,6 +385,9 @@ bool Clan::leave(Player * player)
 		// updateRank(NULL, oldLeaderName);
 	}
 	
+    GameMsgHdr hdr2(0x312, player->getThreadId(), player, 0);
+    GLOBAL().PushMsg(hdr2, NULL);
+
 	return true;
 }
 
@@ -417,6 +429,7 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
     DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmPlayer->cls, cmPlayer->player->getId());
 	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", pid, _id);
 	// updateRank(cmLeader, cmLeader->player->getName());
+	setLeaderId(pid);
 
 	return true;
 }
@@ -698,9 +711,9 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	{
 		if(techId < 1 || techId > GData::clanTechTable.size())
 			return false;
-		if (getLev() >= 5 && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
+		if (cfg.GMCheck && getLev() >= 5 && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
 		{
-			//player->sendMsgCode(0, 2218);
+		    player->sendMsgCode(0, 1320);
 			return false;
 		}
 
@@ -714,10 +727,14 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			count -= techTable[level].needs;
 		}
 		if(level >= maxLev && count > 0)
+        {
+			player->sendMsgCode(0, 1319);
 			return false;
+        }
+
 		if(techTable[level].clanLev > getLev())
 		{
-			//player->sendMsgCode(0, 2222);
+			player->sendMsgCode(0, 1321);
 			return false;
 		}
 	}
@@ -800,7 +817,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		UInt32 count;
 	};
 	AddItems items = {type, count};
-	if(World::_wday == 4 && type == 1)
+	//if(World::_wday == 4 && type == 1)
 		//count *= 2;
 	if (_techs->donate(player, techId, type, count))
 	{
@@ -1110,7 +1127,7 @@ void Clan::setContact( const std::string& c, bool announce )
 		st << static_cast<UInt8>(3) << c << Stream::eos;
 		broadcast(st);
 		char c2[1024];
-		mysql_escape_string(c2, c.c_str(), c.length());
+		mysql_escape_string(c2, c.c_str(), c.length()>1022?1022:c.length());
 		DB5().PushUpdateData("UPDATE `clan` SET `contact` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
@@ -1126,7 +1143,7 @@ void Clan::setAnnounce( const std::string& c, bool announce )
 		st << static_cast<UInt8>(4) << c << Stream::eos;
 		broadcast(st);
 		char c2[1024];
-		mysql_escape_string(c2, c.c_str(), c.length());
+		mysql_escape_string(c2, c.c_str(), c.length()>1022?1022:c.length());
 		DB5().PushUpdateData("UPDATE `clan` SET `announce` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
@@ -1185,6 +1202,7 @@ void Clan::disband(Player * player)
 	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
+	DB5().PushUpdateData("DELETE FROM `clan_skill` WHERE `clanId` = %u", _id);
 
 	//4): Maybe bug here
 	Members::iterator iter = _members.begin();
@@ -1523,7 +1541,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         }
 
         ClanSkill& cs = it->second;
-        if(_techs->getSkillExtend() < cs.level)
+        if(_techs->getSkillExtend() <= cs.level)
         {
             res = 2;
             break;
@@ -1543,6 +1561,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             break;
         }
 
+
         cm->proffer -= single[level].needs;
         {
             Stream st(REP::CLAN_INFO_UPDATE);
@@ -1550,7 +1569,13 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             pl->send(st);
             DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
         }
-        cs.level++;
+        ++cs.level;
+        DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, cm->player->getId(), skillId);
+
+        GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+
+        showSkill(pl, skillId);
     } while(false);
 
     st << res;
@@ -1569,10 +1594,17 @@ void Clan::makeSkillInfo(Stream& st, Player* pl)
         return;
     }
 
-    st << cm->clanSkill.size();
+    UInt8 cnt = static_cast<UInt8>(cm->clanSkill.size());
+    if(cnt == 0)
+    {
+        buildTechSkill(cm);
+        cnt = static_cast<UInt8>(cm->clanSkill.size());
+    }
+
+    st << cnt;
 	std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.begin();
 	for (; it != cm->clanSkill.end(); ++ it)
-		st << it->second.id << (GData::clanSkillTable[it->second.id][it->second.level].needs);
+		st << it->second.id << it->second.level;
 
     return;
 }
@@ -1589,7 +1621,7 @@ void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
         return;
 
     ClanSkill& skill = it->second;
-	st << skill.id << (GData::clanSkillTable[skill.id][skill.level].needs);
+	st << skill.id << skill.level;
     return;
 }
 
@@ -1730,7 +1762,7 @@ void Clan::setPurpose( const std::string& c, bool writedb )
 	if(writedb)
 	{
 		char c2[1024];
-		mysql_escape_string(c2, c.c_str(), c.length());
+		mysql_escape_string(c2, c.c_str(), c.length()>1022?1022:c.length());
 		DB5().PushUpdateData("UPDATE `clan` SET `purpose` = '%s' WHERE `id` = %u", c2, _id);
 	}
 }
@@ -1873,7 +1905,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     GData::clanLvlTable.testLevelUp(_level, _construction);
     if (writedb)
     {
-		DB5().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, cons, _id);
+		DB5().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, _construction, _id);
     }
 }
 
@@ -1940,6 +1972,7 @@ bool Clan::alterLeader()
 	}
 	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", secondLeader->player->getId(), _id);
 	// updateRank(leader, leader->player->getName());
+	setLeaderId(secondLeader->player->getId());
 	return true;
 }
 
@@ -2708,7 +2741,7 @@ void Clan::addClanFunds(UInt32 funds)
 
 void Clan::useClanFunds(UInt32 funds)
 {
-    if(funds != 0)
+    if(funds <= _funds)
     {
         _funds -= funds;
 
@@ -2733,7 +2766,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
     if(!mem1 || !mem2)
         return false;
 
-    if(mem1->cls < 1 || mem1->cls - 2 < mem2->cls)
+    if(mem1->cls < 1 || mem1->cls - 1 < cls)
         return false;
 
     switch(cls)
@@ -2747,9 +2780,12 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
             return false;
         break;
     case 1:
-        if(getClanRankCount(cls) == 4)
-            return false;
         break;
+    case 0:
+        break;
+    case 4:
+    default:
+        return false;
     }
 
     if(mem2->cls != cls)
@@ -2813,6 +2849,15 @@ void Clan::addMemberProffer(Player*pl, UInt32 proffer)
         }
         DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
     }
+}
+
+void Clan::setMaxMemberCount(UInt8 count)
+{
+    _maxMemberCount = BASE_MEMBER_COUNT + count;
+
+    Stream st(REP::CLAN_INFO_UPDATE);
+    st << static_cast<UInt8>(10) << _maxMemberCount << Stream::eos;
+    broadcast(st);
 }
 
 }

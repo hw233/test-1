@@ -140,7 +140,7 @@ public:
 	inline void setName(const std::string& name) { _name = name; }
 	inline UInt32 getCount() { return _members.size(); }
     inline UInt32 getMaxMemberCount() { return _maxMemberCount; }
-    inline void setMaxMemberCount(UInt8 count) { _maxMemberCount = BASE_MEMBER_COUNT + count; }
+    void setMaxMemberCount(UInt8 count);
 	inline bool isFull() { return getCount() >= _maxMemberCount; }
 	inline UInt32 getFoundTime() { return _foundTime; }
 	inline UInt64 getFounder() { return _founder; }

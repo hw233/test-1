@@ -163,7 +163,7 @@ public:
 	virtual int testClanBattleStatus(UInt32, UInt32) { return 0; }
 	void startClanBattle(UInt32 = TimeUtil::SharpDay(), bool = true);
 	void overClanBattle(UInt8 = 1);
-	inline bool isInBattling()  { return _isInbattling == 1; }
+	inline bool isInBattling()  { return false; /*_isInbattling == 1;*/ }
 	inline bool isInAttacking() { return _isInAttacking; }
 	virtual void configClanBattleCheck() {}		
 	virtual void configClanBattleData(bool = true);

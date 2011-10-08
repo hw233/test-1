@@ -38,6 +38,7 @@ public:
 private:
 	bool DoDBQuery(const char* query);
 	static void CalcUserLost(DBWorker *);
+    void InfoLog(const char* query);
 
 private:
 	std::unique_ptr<DBExecutor> m_DBExecutor;      //用于数据库查询数据进行初始化

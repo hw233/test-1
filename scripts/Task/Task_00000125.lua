@@ -10,17 +10,17 @@ function Task_Accept_00000125()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(124) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(124) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(124) then
 			return false;
 		end
 	end
@@ -42,17 +42,17 @@ function Task_Can_Accept_00000125()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(124) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(124) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(48) then
+		if not task:HasSubmitedTask(124) then
 			return false;
 		end
 	end

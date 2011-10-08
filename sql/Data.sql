@@ -249,7 +249,7 @@ CREATE TABLE `item_template` (
   `quality` tinyint(3) NOT NULL COMMENT '品质',
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',
   `bindType` tinyint(1) NOT NULL COMMENT '绑定类型',
-  `energy` smallint(6) NOT NULL COMMENT '九仪鼎值',
+  `energy` smallint(6) unsigned NOT NULL COMMENT '九仪鼎值',
   `data` smallint(6) NOT NULL COMMENT '可使用道具: 作用数值',
   `enchant` smallint(6) NOT NULL COMMENT '附魔类型',
   `attrId` int(10) NOT NULL COMMENT '附加属性',
@@ -365,6 +365,9 @@ CREATE TABLE `npc_group` (
   `type` tinyint(3) NOT NULL DEFAULT '0',
   `experience` int(10) unsigned NOT NULL DEFAULT '0',
   `lootId` varchar(255) NOT NULL DEFAULT '',
+  `lootId1` varchar(255) NOT NULL DEFAULT '',
+  `lootId2` varchar(255) NOT NULL DEFAULT '',
+  `lootId3` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

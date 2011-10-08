@@ -14,4 +14,13 @@ function Monster_00005019(num)
 	if task:HasAcceptedTask(615) then
 		task:AddTaskStep2(615,1,num);
 	end
+	if task:HasAcceptedTask(635) then
+		task:AddTaskStep2(635,1,num);
+	end
+	if task:HasAcceptedTask(541) then
+		task:AddTaskStep2(541,1,num);
+	end
+	if task:HasAcceptedTask(586) then
+		task:AddTaskStep2(586,1,num);
+	end
 end

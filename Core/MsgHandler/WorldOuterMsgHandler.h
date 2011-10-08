@@ -320,12 +320,15 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		return;
 	}
 	UInt32 id = IDGenerator::gClanOidGenerator.ID();
+    while(GObject::globalClans[id] != NULL)
+        id = IDGenerator::gClanOidGenerator.ID();
+
 	if(cfg.merged && player->getId() >= 0x1000000000000ull)
 	{
 		UInt32 svno = static_cast<UInt32>(player->getId() >> 48);
 		id |= (svno << 24);
 	}
-		
+
 	GObject::Clan * clan = new(std::nothrow) GObject::Clan(id, ccr._name);
 	if(clan == NULL)
 	{
@@ -350,10 +353,10 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 	GObject::clanCache.push(clan);
 
 	char contact2[1024], purpose2[1024], name2[1024];
-	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length());
-	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length());
-	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length());
-	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, %"I64_FMT"u, '%s', '%s')", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), 0, contact2, purpose2, clan->getLev());
+	mysql_escape_string(contact2, ccr._contact.c_str(), ccr._contact.length()>1022?1022:ccr._contact.length());
+	mysql_escape_string(purpose2, ccr._purpose.c_str(), ccr._purpose.length()>1022?1022:ccr._purpose.length());
+	mysql_escape_string(name2, strNametmp.c_str(), strNametmp.length()>1022?1022:strNametmp.length());
+	DB5().PushUpdateData("INSERT INTO `clan` (`id`, `name`, `foundTime`, `founder`, `leader`, `construction`, `contact`, `purpose`, `level`) VALUES (%u, '%s', %u, %"I64_FMT"u, %"I64_FMT"u, 0, '%s', '%s', %u)", clan->getId(), name2, TimeUtil::Now(), player->getId(), player->getId(), contact2, purpose2, clan->getLev());
 	ConsumeInfo ci(ClanCreate,0,0);
 	player->useTael(GData::moneyNeed[GData::CLAN_CREATE].tael,&ci);
 	clan->initBuildClan();
@@ -440,6 +443,7 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
         case 7:
             brd >> inviteeId;
             r = clan->setWatchmanId(inviteeId);
+            break;
 		}
 	}
 	Stream st(REP::CLAN_MEMBER_OPERATE);

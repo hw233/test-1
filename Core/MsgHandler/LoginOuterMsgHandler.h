@@ -571,7 +571,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
         else if (ret == 3)
             err += "fetch token value error.";
 
-        if (rc == MEMCACHED_SUCCESS)
+        if (rc == MEMCACHED_SUCCESS && !ret)
         {
             rc = memcached_delete(memc, key, len, (time_t)0);
             if (rc == MEMCACHED_SUCCESS)
@@ -582,7 +582,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         if (err.length())
         {
-            TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u", key, token.c_str(), ret, rc);
+            TRACE_LOG("key: %s, token: %s, ret: %u, rc: %u, err: %s", key, token.c_str(), ret, rc, err.c_str());
             uninitMemcache();
             initMemcache();
         }
@@ -592,7 +592,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB1().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        DB8().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
@@ -1041,7 +1041,7 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
     br>>id;
     br>>level;
 
-    UInt8 ret = 0;
+    UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
     {
@@ -1049,7 +1049,7 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
             level = LEVEL_MAX;
         GameMsgHdr msg(0x322, pl->getThreadId(), pl, sizeof(level));
         GLOBAL().PushMsg(msg, &level);
-        ret = 1;
+        ret = 0;
     }
 
     st << ret << Stream::eos;
@@ -1131,7 +1131,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
     br>>prestige; // 声望
     br>>honor; // 荣誉
 
-    UInt8 ret = 0;
+    UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
     {
@@ -1148,7 +1148,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 
         GameMsgHdr msg(0x321, pl->getThreadId(), pl, sizeof(props));
         GLOBAL().PushMsg(msg, &props);
-        ret = 1;
+        ret = 0;
     }
     st << ret << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
@@ -1179,7 +1179,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     st<<type;
 
     UInt8 ret = 0;
-    UInt8 retcode = 0;
+    UInt8 retcode = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
     {
@@ -1222,7 +1222,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
 
                         GameMsgHdr msg(0x323, pl->getThreadId(), pl, sizeof(money));
                         GLOBAL().PushMsg(msg, &money);
-                        retcode = 1;
+                        retcode = 0;
 
                         break;
                     }
@@ -1251,7 +1251,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
         {
             GameMsgHdr msg(0x323, pl->getThreadId(), pl, sizeof(money));
             GLOBAL().PushMsg(msg, &money);
-            retcode = 1;
+            retcode = 0;
         }
     }
 
@@ -1264,6 +1264,53 @@ void LoadLuaFromBs(LoginMsgHdr &hdr, const void * data)
     UInt16 reloadFlag = 0xFFFF;
     GameMsgHdr hdr1(0x1EE, WORKER_THREAD_WORLD, NULL, sizeof(reloadFlag));
     GLOBAL().PushMsg(hdr1, &reloadFlag);
+}
+
+void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::SETVIPL,0x01);
+    UInt64 id;
+    UInt8 lv;
+    br>>id;
+    br>>lv;
+    st<<id;
+    st<<lv;
+
+    UInt8 ret = 1;
+    GObject::Player * pl = GObject::globalPlayers[id];
+    if (pl)
+    {
+        GameMsgHdr msg(0x324, pl->getThreadId(), pl, sizeof(lv));
+        GLOBAL().PushMsg(msg, &lv);
+        ret = 0;
+    }
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::CLSTASK,0x01);
+    UInt64 id;
+    UInt8 type;
+    br>>id;
+    br>>type;
+    st<<id;
+
+    UInt8 ret = 1;
+    GObject::Player * pl = GObject::globalPlayers[id];
+    if (pl)
+    {
+        GameMsgHdr msg(0x325, pl->getThreadId(), pl, sizeof(type));
+        GLOBAL().PushMsg(msg, &type);
+        ret = 0;
+    }
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_
