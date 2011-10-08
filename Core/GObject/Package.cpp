@@ -1751,14 +1751,6 @@ namespace GObject
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
 		UInt8 q = item->getQuality() - 2;
-		UInt32 amount = GData::moneyNeed[GData::SPLIT].tael;//GObjectManager::getSplitCost();   // split_cost[q][lv];
-		if(m_Owner->getTael() < amount)
-		{
-			m_Owner->sendMsgCode(0, 1100);
-			return 2;
-		}
-		ConsumeInfo ci(SplitEquipment,0,0);
-		m_Owner->useTael(amount, &ci);
 		bool isBound = item->GetBindStatus();
         UInt32 chance_low = GObjectManager::getSplitChance(q, 0);  // split_chance[q][lv][0];
 		UInt32 chance_high = GObjectManager::getSplitChance(q, 1);  // split_chance[q][lv][1];
@@ -1982,7 +1974,7 @@ namespace GObject
 		return 0;
 	}
 
-    UInt8 Package::BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut)
+    UInt8 Package::BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes)
     {
 		UInt16 protectUnbindNum = GetItemNum(ITEM_GEM_PROTECT, false);
 		UInt16 protectBindNum = GetItemNum(ITEM_GEM_PROTECT, true);
@@ -2009,6 +2001,8 @@ namespace GObject
         unbindGemsOut = 0;
         bindGemsOut = 0;
         gemIdOut = gemId + 1;
+        succTimes = 0;
+        failedTimes = 0;
 
         while(result == 0 && bindCount >= 3)
         {
@@ -2041,11 +2035,16 @@ namespace GObject
                 bindUsed += 3;
                 bindCount -= 3;
                 ++ bindGemsOut;
+                ++ succTimes;
             }
-            else if(!protect)
+            else
             {
-                bindUsed += 3;
-                bindCount -= 3;
+                ++ failedTimes;
+                if(!protect)
+                {
+                    bindUsed += 3;
+                    bindCount -= 3;
+                }
             }
         }
 
@@ -2079,11 +2078,16 @@ namespace GObject
                 unbindUsed += 3;
                 unbindCount -= 3;
                 ++ unbindGemsOut;
+                ++ succTimes;
             }
-            else if(!protect)
+            else
             {
-                unbindUsed += 3;
-                unbindCount -= 3;
+                ++ failedTimes;
+                if(!protect)
+                {
+                    unbindUsed += 3;
+                    unbindCount -= 3;
+                }
             }
         }
 
@@ -2121,15 +2125,20 @@ namespace GObject
                 bindCount = 0;
 
                 ++ bindGemsOut;
+                ++ succTimes;
                 break;
             }
-            else if(!protect)
+            else
             {
-                bindUsed += bindCount;
-                unbindUsed += 3 - bindCount;
+                ++ failedTimes;
+                if(!protect)
+                {
+                    bindUsed += bindCount;
+                    unbindUsed += 3 - bindCount;
 
-                unbindCount -= 3 - bindCount;
-                bindCount = 0;
+                    unbindCount -= 3 - bindCount;
+                    bindCount = 0;
+                }
             }
         }
 

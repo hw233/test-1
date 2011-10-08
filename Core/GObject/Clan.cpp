@@ -386,7 +386,7 @@ bool Clan::leave(Player * player)
 	}
 	
     GameMsgHdr hdr2(0x312, player->getThreadId(), player, 0);
-    GLOBAL().PushMsg(hdr1, NULL);
+    GLOBAL().PushMsg(hdr2, NULL);
 
 	return true;
 }

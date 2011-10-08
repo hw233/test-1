@@ -442,6 +442,7 @@ void OnClanOpReq( GameMsgHdr& hdr, const void * data )
         case 7:
             brd >> inviteeId;
             r = clan->setWatchmanId(inviteeId);
+            break;
 		}
 	}
 	Stream st(REP::CLAN_MEMBER_OPERATE);

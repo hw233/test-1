@@ -905,8 +905,8 @@ void OnClanOption( GameMsgHdr& hdr, const void* data )
     case 1:    // 开除帮派
     case 2:    // 离开帮派
         {
-            player->setClan(co->clan);
             player->delClanTask();
+            player->setClan(co->clan);
         }
         break;
     }
