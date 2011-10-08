@@ -1122,6 +1122,12 @@ namespace GObject
             {0, 0, NULL, 0},
         };
 
+        if (IsFull())
+        {
+            m_Owner->sendMsgCode(0, 1011);
+            return false;
+        }
+
         int k = -1;
         int i = -1;
         while (true)

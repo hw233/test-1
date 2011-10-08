@@ -43,8 +43,8 @@ public:
     void addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind);
     void makeFire(Player* pl, UInt32 id1, UInt32 id2);
     void getAward(Player* pl);
-    void genAward(Player* pl, TripodData& td, Stream& st);
-    bool genAward(Player* pl, TripodData& td);
+    void genAward(TripodData& td, Stream& st);
+    bool genAward(TripodData& td);
 
     TripodData& newTripodData(Player* pl);
     TripodData& addTripodData(UInt64 id, const TripodData& data, bool = false);

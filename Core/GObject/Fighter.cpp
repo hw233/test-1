@@ -2383,6 +2383,14 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
     return true;
 }
 
+void Fighter::delAllCitta( bool writedb )
+{
+    for (size_t i = 0; i < _cittas.size(); ++i)
+    {
+        delCitta(_cittas[i], writedb);
+    }
+}
+
 bool Fighter::delCitta( UInt16 citta, bool writedb )
 {
     int idx = hasCitta(citta);
