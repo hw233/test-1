@@ -40,11 +40,11 @@ UInt8 ClanAuthority[5][7] =
 
 
 // ∞Ô≈…√ÿ ı
-#define CLAN_SKILL_HP       1
-#define CLAN_SKILL_ATTACK   2
-#define CLAN_SKILL_DEFEND   3
-#define CLAN_SKILL_MAGATK   4
-#define CLAN_SKILL_MAGDEF   5
+#define CLAN_SKILL_ATTACK   1
+#define CLAN_SKILL_DEFEND   2
+#define CLAN_SKILL_MAGATK   3
+#define CLAN_SKILL_MAGDEF   4
+#define CLAN_SKILL_HP       5
 
 static bool find_pending_member(ClanPendingMember * member, Player * p)
 {
@@ -217,7 +217,7 @@ bool Clan::join(ClanMember * cm)
 	std::set<UInt32>::iterator found = _membersJoinTime.find(cm->joinTime);
 	while (found != _membersJoinTime.end())
 		found = _membersJoinTime.find(++cm->joinTime);
-    buildTechSkill(cm);
+    //buildTechSkill(cm);
 	_members.insert(cm);
 	//updateRank(oldLeaderName);
 	_membersJoinTime.insert(cm->joinTime);
@@ -376,6 +376,9 @@ bool Clan::leave(Player * player)
 		// updateRank(NULL, oldLeaderName);
 	}
 	
+    GameMsgHdr hdr2(0x312, player->getThreadId(), player, 0);
+    GLOBAL().PushMsg(hdr1, NULL);
+
 	return true;
 }
 
@@ -700,7 +703,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			return false;
 		if (getLev() >= 5 && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
 		{
-			//player->sendMsgCode(0, 2218);
+		    player->sendMsgCode(0, 2218);
 			return false;
 		}
 
@@ -717,7 +720,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			return false;
 		if(techTable[level].clanLev > getLev())
 		{
-			//player->sendMsgCode(0, 2222);
+			player->sendMsgCode(0, 2222);
 			return false;
 		}
 	}
@@ -800,7 +803,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		UInt32 count;
 	};
 	AddItems items = {type, count};
-	if(World::_wday == 4 && type == 1)
+	//if(World::_wday == 4 && type == 1)
 		//count *= 2;
 	if (_techs->donate(player, techId, type, count))
 	{
@@ -1185,6 +1188,7 @@ void Clan::disband(Player * player)
 	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
+	DB5().PushUpdateData("DELETE FROM `clan_skill` WHERE `clanId` = %u", _id);
 
 	//4): Maybe bug here
 	Members::iterator iter = _members.begin();
@@ -1523,7 +1527,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         }
 
         ClanSkill& cs = it->second;
-        if(_techs->getSkillExtend() < cs.level)
+        if(_techs->getSkillExtend() <= cs.level)
         {
             res = 2;
             break;
@@ -1551,7 +1555,11 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             pl->send(st);
             DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
         }
-        cs.level++;
+        ++cs.level;
+        DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, cm->player->getId(), skillId);
+
+        GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
 
         showSkill(pl, skillId);
     } while(false);
@@ -1572,7 +1580,14 @@ void Clan::makeSkillInfo(Stream& st, Player* pl)
         return;
     }
 
-    st << static_cast<UInt8>(cm->clanSkill.size());
+    UInt8 cnt = static_cast<UInt8>(cm->clanSkill.size());
+    if(cnt == 0)
+    {
+        buildTechSkill(cm);
+        cnt = static_cast<UInt8>(cm->clanSkill.size());
+    }
+
+    st << cnt;
 	std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.begin();
 	for (; it != cm->clanSkill.end(); ++ it)
 		st << it->second.id << it->second.level;
@@ -2711,7 +2726,7 @@ void Clan::addClanFunds(UInt32 funds)
 
 void Clan::useClanFunds(UInt32 funds)
 {
-    if(funds != 0)
+    if(funds <= _funds)
     {
         _funds -= funds;
 
@@ -2753,6 +2768,11 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
         if(getClanRankCount(cls) == 4)
             return false;
         break;
+    case 0:
+        break;
+    case 4:
+    default:
+        return false;
     }
 
     if(mem2->cls != cls)

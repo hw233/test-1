@@ -1105,5 +1105,10 @@ void OnSetVipLReq( GameMsgHdr& hdr, const void* data )
     player->setVipL(lvl);
 }
 
+void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->setFightersDirty(true);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

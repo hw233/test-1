@@ -34,7 +34,7 @@ void EventDungeonAuto::Complete() const
 }
 
 UInt8 Dungeon::_maxCount = 1;
-UInt16 Dungeon::_price[5] = {0, 50, 100};
+UInt16 Dungeon::_price[5] = {0, 50, 50};
 size_t Dungeon::_priceCount = 0;
 
 GGlobalObjectManagerT<Dungeon, UInt8> dungeonManager;

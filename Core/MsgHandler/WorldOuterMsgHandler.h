@@ -319,12 +319,15 @@ void OnClanCreateReq( GameMsgHdr& hdr, ClanCreateReq& ccr )
 		return;
 	}
 	UInt32 id = IDGenerator::gClanOidGenerator.ID();
+    while(GObject::globalClans[id] != NULL)
+        id = IDGenerator::gClanOidGenerator.ID();
+
 	if(cfg.merged && player->getId() >= 0x1000000000000ull)
 	{
 		UInt32 svno = static_cast<UInt32>(player->getId() >> 48);
 		id |= (svno << 24);
 	}
-		
+
 	GObject::Clan * clan = new(std::nothrow) GObject::Clan(id, ccr._name);
 	if(clan == NULL)
 	{

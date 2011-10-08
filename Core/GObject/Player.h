@@ -585,6 +585,7 @@ namespace GObject
         inline UInt8 getMounts() { return _playerData.mounts; }
         bool setMounts(UInt8 mounts);
 
+        void setFightersDirty(bool bDirty=true);
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
