@@ -15,21 +15,33 @@ ClanLvl::ClanLvl()
 bool ClanLvl::testLevelUp( UInt8& lvl, UInt64& exp )
 {
 	bool r = false;
-	while(_exp[lvl] > 0 && exp >= _exp[lvl])
+    while(_exp[lvl-1] > 0 && exp < _exp[lvl-1] && lvl > 0)
+    {
+        -- lvl;
+    }
+    if(lvl < 1)
+    {
+        lvl = 1;
+    }
+
+	while(_exp[lvl-1] > 0 && exp >= _exp[lvl-1] && lvl <= CLAN_LEVEL_MAX)
 	{
 		r = true;
 		++ lvl;
 	}
-	if(lvl == CLAN_LEVEL_MAX)
+	if(lvl >= CLAN_LEVEL_MAX)
+    {
+        lvl = CLAN_LEVEL_MAX;
 		exp = _exp[CLAN_LEVEL_MAX - 1];
+    }
 	return r;
 }
 
 void ClanLvl::setTable( UInt8 lvl, UInt64 exp )
 {
-    if (lvl >= CLAN_LEVEL_MAX)
+    if (lvl > CLAN_LEVEL_MAX)
         return;
-	_exp[lvl] = exp;
+	_exp[lvl-1] = exp;
 }
 
 UInt64 ClanLvl::getLevelMin( UInt8 lvl )

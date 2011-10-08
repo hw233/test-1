@@ -28,7 +28,15 @@ ClanTech::~ClanTech()
 void ClanTech::addTechFromDB(UInt8 techId, UInt8 level, UInt16 extra)
 {
 	_techs.insert(std::make_pair(techId, ClanTechData(techId, clanTechDonateType[techId], level, extra)));
-	if (techId == 1) _clanLev = level;
+    switch(techId)
+    {
+    case CLAN_TECH_MEMBER_COUNT:
+        _clan->setMaxMemberCount(getMemberCount());
+        break;
+    case CLAN_TECH_PRACTICE_SLOT:
+        practicePlace.addSlotFromTech(_clan->getOwner());
+        break;
+    }
 }
 
 void ClanTech::buildTech()
