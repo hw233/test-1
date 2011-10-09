@@ -320,9 +320,13 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 		if (ReqCvt[req] != 0xFF)
 		{
 			//请求单个列表
-			req = ReqCvt[req];
-			if (req == 5)
-				req += eqType;
+			if (req > 2 && req < 8)
+                req = ReqCvt[req] + eqType;
+            else if(req < 3)
+                req = ReqCvt[req];
+            else
+                req = ReqCvt[0];
+
 			UInt16 sz = static_cast<UInt16>(saleRowStat(req, color));
 			UInt16 end = start + count;
 			if (end > sz)
@@ -708,7 +712,7 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1,         // 装备，法宝   [0-19]
                            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,  // 普通物品， 阵法 [20-39]
                            12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // 心法， 强化 [40-59]
-                           31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 31, 31, 31};  // 宝石 [60-79]
+                           32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 31, 31, 31};  // 宝石 [60-79]
     UInt8 res = cvt[type];
     parent = res;
 
@@ -716,7 +720,7 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     {
         parent = 3;
     }
-    else if(res > 30 && res < 48)
+    else if(res > 31 && res < 49)
     {
         parent = 31;
     }
