@@ -2216,7 +2216,10 @@ namespace GObject
 				hasLeader = false;
 			}
 			if(clan == NULL)
+            {
+                DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", cp.playerId);
 				continue;
+            }
 			Player * pl = globalPlayers[cp.playerId];
 			if(pl == NULL)
 				continue;

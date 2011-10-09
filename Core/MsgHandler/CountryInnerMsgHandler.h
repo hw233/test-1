@@ -905,8 +905,8 @@ void OnClanOption( GameMsgHdr& hdr, const void* data )
     case 1:    // 开除帮派
     case 2:    // 离开帮派
         {
-            player->setClan(co->clan);
             player->delClanTask();
+            player->setClan(co->clan);
         }
         break;
     }
@@ -1103,6 +1103,12 @@ void OnSetVipLReq( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     UInt8 lvl = *(UInt8*)(data);
     player->setVipL(lvl);
+}
+
+void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    player->setFightersDirty(true);
 }
 
 void OnClearTaskReq( GameMsgHdr& hdr, const void* data )

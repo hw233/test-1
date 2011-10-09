@@ -3616,7 +3616,7 @@ namespace GObject
 	void Player::writeClanTask()
 	{
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(8) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
+        st << static_cast<UInt8>(9) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
         st << Stream::eos;
         send(st);
 
@@ -6139,6 +6139,17 @@ namespace GObject
             DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
 		}
     }
+
+	void Player::setFightersDirty( bool bDirty )
+	{
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            it->second->setDirty(bDirty);
+        }
+
+		return;
+	}
+
 
 
 }

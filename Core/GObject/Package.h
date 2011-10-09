@@ -130,7 +130,7 @@ namespace GObject
 		UInt8 Forge(UInt16 fighterId, UInt32 itemId, /*UInt8 t,8*/ UInt8 * types, Int16 * values, UInt8 protect);
 		UInt8 ExchangeSet(UInt32 * itemId, UInt8 type, UInt32& resultId);
 		// UInt8 BatchMergeGem(std::map<UInt16, UInt32, _GemCompare >& gems, std::vector<UInt32>& gemsOut);
-		UInt8 BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut);
+		UInt8 BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes);
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);
 
 		void AutoRegen(Fighter *);

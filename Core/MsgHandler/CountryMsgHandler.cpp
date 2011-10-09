@@ -198,6 +198,7 @@ MSG_REG_2(GameMsgHdr, 0x308, OnClanSkillDonateCheckReq);
 MSG_REG_2(GameMsgHdr, 0x309, OnClanSkillDonateBackReq);
 MSG_REG_2(GameMsgHdr, 0x310, OnOperationTaskAction);
 MSG_REG_2(GameMsgHdr, 0x311, OnClanOption);
+MSG_REG_2(GameMsgHdr, 0x312, OnClanSkillLevel);
 
 MSG_REG_2(GameMsgHdr, 0x320, OnPracticeExpAddReq);
 MSG_REG_2(GameMsgHdr, 0x321, OnSetPropsReq);
