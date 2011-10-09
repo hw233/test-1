@@ -52,7 +52,7 @@ namespace REQ
     /**请求修炼武将列表*/
     //const UInt8 TRAIN_FIGHTER_LIST  = 0x2D;
     /**加速取消修炼散仙*/
-    const UInt8 TRAIN_FIGHTER_OP    = 0x2B;
+    const UInt8 TRAIN_FIGHTER_OP    = 0x37;
     /**背包列表信息*/
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     /**背包添加到九疑鼎*/                      
@@ -322,7 +322,7 @@ namespace REP
     const UInt8 PUB_LIST            = 0x2A;
     const UInt8 POTENCIAL           = 0xDF;// 0x2C
 
-    const UInt8 TRAIN_FIGHTER_OP    = 0x2B;
+    const UInt8 TRAIN_FIGHTER_OP    = 0x37;
 
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     const UInt8 PACK_USE            = 0xC3;// 0x33
