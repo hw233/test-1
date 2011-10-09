@@ -13,17 +13,26 @@ namespace GObject
 #define HERO_ISLAND_SPOTS 5
 #define HERO_ISLANG_PAGESZ 12
 
+struct Task
+{
+    Task(UInt8 type, UInt8 status) : type(type), status(status) {}
+    UInt8 type;
+    UInt8 status;
+};
+
 struct HIPlayerData
 {
-    HIPlayerData() : player(NULL), type(0), spot(0), movecd(0), straight(0) {}
+    HIPlayerData() : player(NULL), type(0), spot(0), movecd(0), straight(0), lasttype(0xff) {}
 
     Player* player;
-    UInt8 type; // 0-天,1-地,2-人
+    UInt8 type; // 0-无,1-天,2-地,3-人
     UInt8 spot;
     UInt32 movecd;
+    UInt32 fightcd;
     UInt32 straight;
     UInt32 score;
-    std::vector<UInt8> x;
+    UInt8 lasttype;
+    std::vector<Task> compass; // 击杀任务
 };
 
 struct RareAnimals
@@ -58,31 +67,38 @@ public:
     void process(UInt32 now);
 
     UInt8 getIdentity(Player* player);
-    bool enter(Player* player, UInt8 type, UInt8 spot);
-    bool enter(HIPlayerData* pd, UInt8 type, UInt8 spot);
+    bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
+    bool enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd = true);
     HIPlayerData* leave(Player* player, UInt8 spot);
     HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt8 pos);
-    void listPlayers(Player* player, UInt8 spot, UInt8 page, UInt8 pagesize);
+    void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 from, UInt8 to);
+    bool moveTo(Player* player, UInt8 to);
     bool attack(Player* player, UInt8 type, UInt64 id);
     bool useSkill(Player* player, UInt8 spot);
 
-    void playerEnter(Player* player, UInt8 type, UInt8 spot);
+    void playerInfo(Player* player);
+    void playerEnter(Player* player);
     void playerLeave(Player* player);
 
     HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt8& pos);
     HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt8& pos);
     RareAnimals& findRareAnimal(UInt32 id, UInt8 spot);
 
-    void sendPlayers(HIPlayerData* pd, UInt8 spot, UInt8 page, UInt8 pagesize);
+    void startCompass(Player* player);
+    void stopCompass(Player* player);
+    void commitCompass(Player* player);
+
+    void sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 pagesize);
     void sendRareAnimals(HIPlayerData* pd, UInt8 spot);
     void sendSkills(HIPlayerData* pd);
     void broadcast(HIPlayerData* pd, UInt8 spot);
     void broadcast(Stream& st, UInt8 spot);
     void broadcast(Stream& st);
 
-    void listRank(Player* player, UInt8 page, UInt8 pagesize);
+    void listRank(Player* player, UInt16 start, UInt8 pagesize);
 
+    bool isActiveTime(UInt32 now);
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }
 

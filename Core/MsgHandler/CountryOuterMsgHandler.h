@@ -41,6 +41,7 @@
 #include "GObject/FrontMap.h"
 #include "GData/Money.h"
 #include "GObject/WorldBoss.h"
+#include "GObject/HeroIsland.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -585,7 +586,6 @@ struct PracticeHookAddReq
 {
     MESSAGE_DEF(REQ::PRACTICE_HOOK_ADD);
 };
-
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
@@ -3121,11 +3121,45 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 	}
 }
 
+void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type;
+    brd >> type;
+
+    switch (type)
+    {
+        case 0:
+            GObject::heroIsland.playerInfo(player);
+            break;
+        case 1:
+            GObject::heroIsland.playerEnter(player);
+            break;
+        case 2:
+            GObject::heroIsland.getIdentity(player);
+            break;
+        case 3:
+            GObject::heroIsland.startCompass(player);
+            break;
+        case 4:
+            {
+                UInt8 spot = 0;
+                brd >> spot;
+                GObject::heroIsland.moveTo(player, spot);
+            }
+            break;
+        case 5:
+            break;
+        default:
+            break;
+    }
+}
+
 void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
 {
     MSG_QUERY_PLAYER(player);
     player->accPractice();
 }
-
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

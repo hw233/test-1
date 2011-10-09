@@ -2352,7 +2352,7 @@ void GMHandler::OnEnterHI(GObject::Player *player, std::vector<std::string>& arg
 {
     if(args.size() < 1)
         return;
-    heroIsland.playerEnter(player, atoi(args[0].c_str()), 0);
+    //heroIsland.playerEnter(player, atoi(args[0].c_str()), 0);
 }
 
 void GMHandler::OnLeaveHI(GObject::Player *player, std::vector<std::string>&)

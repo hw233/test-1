@@ -509,6 +509,7 @@ namespace GObject
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
+        UInt8 allHpP();
 
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);
@@ -960,19 +961,10 @@ namespace GObject
         inline void resetCopyCompleteGold() { m_autoCopyComplete = 0; }
 
     private:
-        UInt32 m_tripodAwdId;
-        UInt8 m_tripodAwdNum;
+        UInt8 hispot;
     public:
-        void setTripodAwdIdNum(UInt32 id, UInt8 num)
-        {
-            m_tripodAwdId = id;
-            m_tripodAwdNum = num;
-        }
-        void getTripodAwdIdNum(UInt32& id, UInt8& num)
-        {
-            id = m_tripodAwdId;
-            num = m_tripodAwdNum;
-        }
+        inline void setHISpot(UInt8 spot) { hispot = spot; }
+        inline UInt8 getHISpot() { return hispot;}
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,

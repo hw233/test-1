@@ -374,6 +374,8 @@ void CountryBattle::end(UInt32 curtime)
 			if(World::_activityStage > 0)
 				GameAction()->onCountryBattleAttend(it->first);
 			UInt32 awardTime = it->second.awardTime;
+
+#if 0
             if (rewardid[side] == PLAYER_BUFF_TRAINP1)
             {
                 if (!it->first->getBuffData(PLAYER_BUFF_TRAINP2))
@@ -392,6 +394,29 @@ void CountryBattle::end(UInt32 curtime)
                     it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
                 }
             }
+#else
+            UInt16 count = awardTime / 3600 + (awardTime % 3600) ? 1: 0;
+            if (rewardid[side] == PLAYER_BUFF_TRAINP1)
+            {
+                MailPackage::MailItem mitem[1] = {{55, count}};
+                MailItemsInfo itemsInfo(mitem, CountryBattleAward, 1);
+
+                SYSMSGV(content, mailid[side], it->second.totalAchievement, count, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
+                Mail * pmail = it->first->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail != NULL)
+                    mailPackageManager.push(pmail->id, mitem, 1, false);
+            }
+            else if (rewardid[side] == PLAYER_BUFF_TRAINP2)
+            {
+                MailPackage::MailItem mitem[1] = {{56, count}};
+                MailItemsInfo itemsInfo(mitem, CountryBattleAward, 1);
+
+                SYSMSGV(content, mailid[side], it->second.totalAchievement, count, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
+                Mail * pmail = it->first->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail != NULL)
+                    mailPackageManager.push(pmail->id, mitem, 1, false);
+            }
+#endif
 			/*for back stage*/
 			UInt8 lvl = getJoinLevel(it->first->GetLev());
 			enterSize[lvl] ++;
