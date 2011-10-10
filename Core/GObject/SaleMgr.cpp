@@ -35,7 +35,7 @@ struct SaleRowSort
 	{
 		if (sale1->_priceType != sale2->_priceType)
 			return sale1->_priceType < sale2->_priceType;
-		return sale1->_price < sale2->_price;
+		return (static_cast<float>(sale1->_price)/sale1->_item->Count()) < (static_cast<float>(sale2->_price)/sale2->_item->Count());
 	}
 }SaleRowSorter;
 
