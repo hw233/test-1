@@ -847,7 +847,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 				SYSMSGVP(st, 430, mem->player->getName().c_str(), count);
 				broadcast(st);
 			}
-			setProffer(getProffer()+count);
+			//setProffer(getProffer()+count);
 			addClanDonateRecord(player->getName(), techId, count, now);
 			DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());
 			//player->GetTaskMgr()->DoAcceptedTask(62207);
