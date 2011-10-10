@@ -121,7 +121,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
                 return;
 				//revenue += 1;
 			else
-				revenue += 3;
+				revenue += _owner->getVipLevel() < 2 ? 200 : 100;
 		}
 		if (revenue > _owner->getTael())
 			return;
