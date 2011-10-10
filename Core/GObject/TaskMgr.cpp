@@ -1407,6 +1407,12 @@ namespace GObject
         if(!m_PlayerOwner->isClanTask(taskId) || m_PlayerOwner->isClanTaskFull())
             return false;
 
+        if (m_PlayerOwner->getVipLevel() < 4)
+        {
+            m_PlayerOwner->sendMsgCode(0, 1003);
+            return false;
+        }
+
 		TaskData* task = AddTask(taskId);
         if(NULL == task)
             return false;

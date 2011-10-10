@@ -3305,15 +3305,6 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
-        // TODO:
-#if 0
-        if (im) {
-            if (getVipLevel() < 3) {
-                sendMsgCode(0, 1003);
-                return false;
-            }
-        }
-#endif
         if (!im) {
             std::vector<UInt32>& shimen = _playerData.shimen;
             std::vector<UInt8>& smcolor = _playerData.smcolor;
@@ -3352,8 +3343,12 @@ namespace GObject
         } else {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fshimen[i] == taskid) {
-                    if (GetLev() < static_cast<UInt8>(30))
-                    {
+                    if (getVipLevel() < 3) {
+                        sendMsgCode(0, 1003);
+                        return false;
+                    }
+
+                    if (GetLev() < static_cast<UInt8>(30)) {
                         sendMsgCode(1, 1016);
                         return false;
                     }
