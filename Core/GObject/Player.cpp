@@ -2788,7 +2788,7 @@ namespace GObject
 		_trainFighters.erase(id);
 		DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
 		Stream st(REP::TRAIN_FIGHTER_OP);
-		st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << static_cast<UInt32>(0) << Stream::eos;
+		st << static_cast<UInt8>(2) << id << static_cast<UInt8>(1) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
 		//if (notify)
 		//	sendMsgCode(0, 2088, id);
@@ -2852,7 +2852,7 @@ namespace GObject
 		PushTimerEvent(event);
 		Stream st(REP::TRAIN_FIGHTER_OP);
 		UInt32 remain = event->GetEnd() - TimeUtil::Now();
-		st << static_cast<UInt8>(1) << id << static_cast<UInt8>(0) << remain << Stream::eos;
+		st << static_cast<UInt8>(1) << id << data->priceType << remain << Stream::eos;
 		send(st);
 
 		return true;
@@ -2895,7 +2895,7 @@ namespace GObject
 				DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, id, _id);
 				Stream st(REP::TRAIN_FIGHTER_OP);
 				UInt32 now = TimeUtil::Now();
-				st << static_cast<UInt8>(1) << id << static_cast<UInt8>(0);
+				st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0);
 				if(data->trainend > now)
 					st << static_cast<UInt32>(data->trainend - now);
 				else
