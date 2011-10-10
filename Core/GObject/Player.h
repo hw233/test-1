@@ -358,6 +358,8 @@ namespace GObject
 			AutoDungeon		= 0x00000004,
 			ClanBattling	= 0x00000008,
 			AutoCopy        = 0x00000010,
+			Copy            = 0x00000020,
+            InHeroIsland    = 0x00000040,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -509,6 +511,7 @@ namespace GObject
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
+        UInt8 allHpP();
 
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);
@@ -591,7 +594,7 @@ namespace GObject
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
         void upInitCitta(Fighter* fgt,bool = false);
-		void addFighter(Fighter * fgt, bool = true);
+		void addFighter(Fighter * fgt, bool = true, bool = false);
 		Fighter * takeFighter(UInt32, bool = true);
 		void notifyAddFighter(Fighter * fgt);
 		Fighter * findFighter(UInt32);
@@ -662,7 +665,7 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//Õ½¶·Ïà¹Ø
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL);
@@ -962,19 +965,13 @@ namespace GObject
         inline void resetCopyCompleteGold() { m_autoCopyComplete = 0; }
 
     private:
-        UInt32 m_tripodAwdId;
-        UInt8 m_tripodAwdNum;
+        UInt8 hispot;
+        UInt8 hitype;
     public:
-        void setTripodAwdIdNum(UInt32 id, UInt8 num)
-        {
-            m_tripodAwdId = id;
-            m_tripodAwdNum = num;
-        }
-        void getTripodAwdIdNum(UInt32& id, UInt8& num)
-        {
-            id = m_tripodAwdId;
-            num = m_tripodAwdNum;
-        }
+        inline void setHISpot(UInt8 spot) { hispot = spot; }
+        inline UInt8 getHISpot() { return hispot;}
+        inline void setHIType(UInt8 type) { hitype = type; }
+        inline UInt8 getHIType() { return hitype; }
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,

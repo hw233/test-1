@@ -82,8 +82,8 @@ static UInt8 tripod_factor[4][4] =
 #else
     {30,    0,      0,      0},
     {50,    70,     0,      0},
-    {30,    80,     100,    0},
-    {0,     20,     90,     100}
+    {0,     50,     100,    0},
+    {0,     0,      40,     100}
 #endif
 };
 
@@ -106,52 +106,70 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
             return;
 
         td.soul += (ib->getEnergy() * num);
-
         UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
-        int rnd = uRand(100);
-        for (int i = 0; i < 4; ++i)
+        for (UInt16 j = 0; j < num; ++j)
         {
-            if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
+            int rnd = uRand(100);
+            for (int i = 0; i < 4; ++i)
             {
-                if (td.quality < i+2)
+                if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
                 {
-                    td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
-                    td.needgen = 1;
+                    if (td.quality < i+2)
+                    {
+                        td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
+                        td.needgen = 1;
+                    }
+                    break;
                 }
-                break;
             }
         }
 
         if (pl->getVipLevel() >= 3)
         {
             if (td.quality < 3)
+            {
                 td.quality = 3;
+                td.needgen = 1;
+            }
         }
 
         if (td.quality > 5)
+        {
             td.quality = 5;
+            td.needgen = 1;
+        }
 
         if (IsEquipId(itemid))
-        {    
+        {
             pk->DelEquip(itemid, ToDesdroy);
-        }    
-        else 
-        {    
+        }
+        else
+        {
             pk->DelItem(itemid, num, bind);
-        }    
+        }
     }
+
+    {
+        Stream st(REP::TRIPOD_INFO);
+        st << static_cast<UInt8>(2);
+        st << static_cast<UInt8>(td.needgen);
+        st << Stream::eos;
+        pl->send(st);
+    }
+
+    if (td.needgen)
+        genAward(td);
 
     if (td.soul >= MAX_TRIPOD_SOUL)
     {
         PopTimerEvent(pl, EVENT_PLAYERPRTRIPOD, pl->getId());
-        genAward(td);
         td.soul = MAX_TRIPOD_SOUL;
         td.awdst = 1;
         td.needgen = 0;
     }
 
-    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u WHERE `id` = %"I64_FMT"u",
-            td.soul, td.quality, td.awdst, td.needgen, pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+            td.soul, td.quality, td.awdst, td.needgen, td.itemId, td.num, pl->getId());
 }
 
 static UInt16 fire_begin = 47;
@@ -270,7 +288,7 @@ void Tripod::getAward(Player* pl)
     td.soul = 0;
     td.itemId = 0;
     td.num = 0;
-    DB6().PushUpdateData("UPDATE `tripod` SET `soul` = 0, `fire` = 0, `quality`=2, `awdst` = 0, `itemId` = 0, `num` = 0, `regen` = 1 WHERE `id` = %"I64_FMT"u", pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=2, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u", pl->getId());
     addTripodData(pl->getId(), td);
     sendTripodInfo(pl, td);
 }
@@ -291,7 +309,7 @@ TripodData& Tripod::addTripodData(UInt64 id, const TripodData& data, bool init)
     if (!event) return nulltd;
     PushTimerEvent(event);
 
-    if (init)
+    if (init && td.itemId && td.num)
         td.needgen = 0;
     DB6().PushUpdateData("UPDATE `tripod` SET `regen` = 0 WHERE `id` = %"I64_FMT"u", pl->getId());
     return td;

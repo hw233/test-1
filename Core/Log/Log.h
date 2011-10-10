@@ -75,6 +75,7 @@ enum MailItemType
 	Activity,
 	DismissCitta,
     AutoCopy,
+    CountryBattleAward,
 };
 enum ItemFrom
 {

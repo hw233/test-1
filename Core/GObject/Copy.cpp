@@ -168,11 +168,13 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         return;
     }
 
+    CopyData& tcd = getCopyData(pl, id, true);
+    if (tcd.floor && tcd.spot)
+        return;
+
     UInt8 lootlvl = 0;
     UInt8 ret = checkCopy(pl, id, lootlvl);
-
     if (!ret) {
-        CopyData& tcd = getCopyData(pl, id, true);
         if (!tcd.floor) {
             tcd.floor = 1;
             tcd.spot = 1;

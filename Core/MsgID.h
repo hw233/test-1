@@ -229,6 +229,8 @@ namespace REQ
     const UInt8 SALE_SELL           = 0x86;// 0xC6
     /**购买或下架指定物品*/                    
     const UInt8 SALE_OP             = 0x87;// 0xC7
+    /**英雄岛*/
+    const UInt8 HERO_ISLAND         = 0x97;
     /**设置密码*/
     const UInt8 OP_PWD              = 0xCA;
     /***/
@@ -406,6 +408,7 @@ namespace REP
     const UInt8 CLAN_INFO_UPDATE    = 0x68;// 0x98
     const UInt8 CLAN_SKILL          = 0x69;// 0x99
     const UInt8 CLAN_BUILD          = 0x6A;// 0x9B
+    const UInt8 HERO_ISLAND         = 0x97;
     const UInt8 CLANREWARD          = 0x9C;
     const UInt8 GET_CLANREWARD      = 0x9D;
     const UInt8 ALLOCATECLANREWARD  = 0x9E;

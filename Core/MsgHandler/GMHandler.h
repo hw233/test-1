@@ -103,6 +103,7 @@ private:
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnCmd2d(GObject::Player *player, std::vector<std::string>&);
     void OnClanBuild(GObject::Player *player, std::vector<std::string>&);
+    void OnInfoHI(GObject::Player *player, std::vector<std::string>&);
     void OnEnterHI(GObject::Player *player, std::vector<std::string>&);
     void OnLeaveHI(GObject::Player *player, std::vector<std::string>&);
     void OnAttackHI(GObject::Player *player, std::vector<std::string>&);

@@ -392,7 +392,7 @@ namespace GObject
 		task->m_Completed = 0;
 		task->m_Submit = 0;
 		InitTaskStep(task, taskType.m_ReqStep.size());
-		if (taskType.m_Class != 3 && taskType.m_Class != 4 && taskType.m_Class != 5)
+		if (taskType.m_Class != 3)
 		{
 			task->m_TimeBegin = task->m_AcceptTime;
 			task->m_TimeEnd = (taskType.m_ReqTime != 0) ? (task->m_TimeBegin + taskType.m_ReqTime) : (static_cast<UInt32>(-1));
@@ -1407,13 +1407,20 @@ namespace GObject
         if(!m_PlayerOwner->isClanTask(taskId) || m_PlayerOwner->isClanTaskFull())
             return false;
 
+        if (m_PlayerOwner->getVipLevel() < 4)
+        {
+            m_PlayerOwner->sendMsgCode(0, 1003);
+            return false;
+        }
+
 		TaskData* task = AddTask(taskId);
         if(NULL == task)
             return false;
 
+		DelCanAcceptTask(taskId);
 		m_TaskCompletedList[taskId] = task;
         task->m_Completed = 1;
-		DelCanAcceptTask(taskId);
+        m_TaskAcceptedList.erase(taskId);
 
         return true;
     }

@@ -513,7 +513,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), m_autoCopyComplete(0), m_tripodAwdId(0), m_tripodAwdNum(0), m_ulog(NULL)
+        _justice_roar(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -1186,15 +1186,13 @@ namespace GObject
         }
     }
 
-	void Player::addFighter( Fighter * fgt, bool writedb )
+	void Player::addFighter( Fighter * fgt, bool writedb, bool load )
 	{
 		UInt32 id = fgt->getId();
 		if(id < 10)
 			_fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
 		else
 			_fighters[fgt->getId()] = fgt;
-
-        upInitCitta(fgt, writedb);
 
 		if(writedb)
 		{
@@ -1204,6 +1202,9 @@ namespace GObject
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 		}
+
+        if (!load)
+            upInitCitta(fgt, writedb);
 	}
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
@@ -1390,6 +1391,24 @@ namespace GObject
 		}
 		return 0;
 	}
+
+    UInt8 Player::allHpP()
+    {
+        UInt32 total = 0;
+        UInt32 totalmax = 0;
+        for(int i = 0; i < 5; ++ i)
+        {
+            GObject::Lineup& pd = _playerData.lineup[i];
+            if(pd.fighter != NULL)
+            {
+                total += pd.fighter->getCurrentHP();
+                totalmax += pd.fighter->getMaxHP();
+            }
+        }
+        if (!totalmax)
+            return 0;
+        return (float)total/totalmax;
+    }
 
 	void Player::addFightCurrentHpAll(UInt16 hp)
 	{
@@ -1633,7 +1652,7 @@ namespace GObject
         return false;
     }
 
-	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen )
+	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp )
 	{
 		checkLastBattled();
 		other->checkLastBattled();
@@ -1662,7 +1681,7 @@ namespace GObject
 			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling), 0))
 				other->checkHPLoss();
 		}
-		else if(sysRegen > 0)
+		else if(sysRegen > 0 && !noreghp)
 		{
 			if(res)
 			{
@@ -1675,6 +1694,14 @@ namespace GObject
 				regenAll();
 			}
 		}
+        else if (noreghp)
+        {
+            //bsim.applyFighterHP(0, this, false, sysRegen);
+            other->regenAll();
+            //bsim.applyFighterHP(1, other, false, sysRegen);
+            regenAll();
+        }
+
 		if(res)
 			other->checkDeath();
 		else
@@ -3278,15 +3305,6 @@ namespace GObject
 
     bool Player::addAwardByTaskColor(UInt32 taskid, bool im)
     {
-        // TODO:
-#if 0
-        if (im) {
-            if (getVipLevel() < 3) {
-                sendMsgCode(0, 1003);
-                return false;
-            }
-        }
-#endif
         if (!im) {
             std::vector<UInt32>& shimen = _playerData.shimen;
             std::vector<UInt8>& smcolor = _playerData.smcolor;
@@ -3325,8 +3343,12 @@ namespace GObject
         } else {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fshimen[i] == taskid) {
-                    if (GetLev() < static_cast<UInt8>(30))
-                    {
+                    if (getVipLevel() < 3) {
+                        sendMsgCode(0, 1003);
+                        return false;
+                    }
+
+                    if (GetLev() < static_cast<UInt8>(30)) {
                         sendMsgCode(1, 1016);
                         return false;
                     }
