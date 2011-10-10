@@ -4560,7 +4560,7 @@ namespace GObject
         for( int idx = 0; idx < cnt; ++ idx )
         {
             UInt32 itemId = formation->LevUpItem(idx);
-            if(0 == m_Package->GetItemNum(itemId))
+            if(0 == m_Package->GetItemAnyNum(itemId))
             {
                 st << static_cast<UInt8>(0) << Stream::eos;
                 send(st);

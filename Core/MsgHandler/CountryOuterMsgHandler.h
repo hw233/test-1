@@ -3120,7 +3120,7 @@ void OnFighterTrain2Req( GameMsgHdr& hdr, FighterTrain2Req& req )
 
 void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 {
-    return; // TODO:
+    //return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;

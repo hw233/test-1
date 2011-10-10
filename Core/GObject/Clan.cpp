@@ -711,7 +711,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	{
 		if(techId < 1 || techId > GData::clanTechTable.size())
 			return false;
-		if (cfg.GMCheck && getLev() >= 5 && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
+		if (cfg.GMCheck && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
 		{
 		    player->sendMsgCode(0, 1320);
 			return false;
@@ -832,7 +832,6 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 				st << static_cast<UInt8>(5) << mem->achieveCount << Stream::eos;
 				player->send(st);
 			}
-#endif
 			
 			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
             mem->proffer += count;
@@ -841,7 +840,8 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 				st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
 				player->send(st);
 			}
-			// updateRank(mem, oldLeaderName);
+			updateRank(mem, oldLeaderName);
+#endif
 			{
 				Stream st;
 				SYSMSGVP(st, 430, mem->player->getName().c_str(), count);
@@ -850,12 +850,12 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 			setProffer(getProffer()+count);
 			addClanDonateRecord(player->getName(), techId, count, now);
 			DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, player->getId());
-			player->GetTaskMgr()->DoAcceptedTask(62207);
+			//player->GetTaskMgr()->DoAcceptedTask(62207);
 		}
 		else if (type == 2)
 		{
             // °ïÅÉ×Ê½ð
-			std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
+			// std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 			// updateRank(mem, oldLeaderName);
 		}
 		else
