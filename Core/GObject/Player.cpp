@@ -2725,7 +2725,7 @@ namespace GObject
 			return;
 		data->traintime = tm;
 		data->checktime = ct;
-		data->factor = (priceType == 0 ? 4.0f : 2.5f);
+		data->factor = (priceType == 0 ? 8.0f : 3.0f);
 		data->price = price;
 		data->priceType = priceType;
 		data->accExp = exp;
@@ -2841,7 +2841,7 @@ namespace GObject
 		data = new TrainFighterData();
 		data->checktime = time * 60;
 		data->traintime = data->checktime;
-		data->factor = (priceType == 0 ? 4.0f : 2.5f);
+		data->factor = (priceType == 0 ? 8.0f : 3.0f);
 		data->price = price;
 		data->priceType = priceType;
 		data->trainend = TimeUtil::Now() + 60 * data->checktime;

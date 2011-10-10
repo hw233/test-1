@@ -242,10 +242,19 @@ bool Clan::kick(Player * player, UInt64 pid)
 		player->sendMsgCode(0, 1317);
 		return false;
 	}
+
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(pid);
 	if (found == _members.end())
 		return false;
+
+	UInt32 now = TimeUtil::Now();
+    if (cfg.GMCheck && now > (*found)->joinTime && now - (*found)->joinTime < 24 * 60 * 60)
+    {
+		player->sendMsgCode(0, 1322);
+		return false;
+    }
+
 	Player * kicker = (*found)->player;
 	//if (pid == getFounder())
 	//{
