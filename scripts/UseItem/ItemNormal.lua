@@ -348,7 +348,7 @@ end
 
 function ItemNormal_00000009(iid, num, bind, param)
   local player = GetPlayer()
-  if player:hasFlag(9) then
+  if player:hasFlag(73) then
     player:sendMsgCode(2, 1054, 0)
     return false;
   end
@@ -483,7 +483,7 @@ function ItemNormal_00000014(iid, num, bind, param)
 		return false;
 	end
   local oldexp = fgt:getExp();
-	fgt:addExp(5000000*num);
+	fgt:addExp(50000000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(14, player);
 	return true;

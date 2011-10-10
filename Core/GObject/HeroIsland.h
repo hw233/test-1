@@ -22,7 +22,9 @@ struct Task
 
 struct HIPlayerData
 {
-    HIPlayerData() : player(NULL), type(0), spot(0), movecd(0), straight(0), lasttype(0xff) {}
+    HIPlayerData()
+        : player(NULL), type(0), spot(0), movecd(0),
+        fightcd(0), straight(0), score(0), lasttype(0xff) {}
 
     Player* player;
     UInt8 type; // 0-无,1-天,2-地,3-人
@@ -72,7 +74,6 @@ public:
     HIPlayerData* leave(Player* player, UInt8 spot);
     HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt8 pos);
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
-    bool moveTo(Player* player, UInt8 from, UInt8 to);
     bool moveTo(Player* player, UInt8 to);
     bool attack(Player* player, UInt8 type, UInt64 id);
     bool useSkill(Player* player, UInt8 spot);
@@ -89,11 +90,12 @@ public:
     void stopCompass(Player* player);
     void commitCompass(Player* player);
 
+    void sendSpot(HIPlayerData* pd, UInt8 spot);
     void sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 pagesize);
     void sendRareAnimals(HIPlayerData* pd, UInt8 spot);
     void sendSkills(HIPlayerData* pd);
     void broadcast(HIPlayerData* pd, UInt8 spot);
-    void broadcast(Stream& st, UInt8 spot);
+    void broadcast(Stream& st, UInt8 spot, Player* = NULL);
     void broadcast(Stream& st);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);

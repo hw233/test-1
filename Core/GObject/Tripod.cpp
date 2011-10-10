@@ -106,19 +106,21 @@ void Tripod::addItem(Player* pl, UInt32 itemid, UInt16 num, UInt8 bind)
             return;
 
         td.soul += (ib->getEnergy() * num);
-
         UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
-        int rnd = uRand(100);
-        for (int i = 0; i < 4; ++i)
+        for (UInt16 j = 0; j < num; ++j)
         {
-            if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
+            int rnd = uRand(100);
+            for (int i = 0; i < 4; ++i)
             {
-                if (td.quality < i+2)
+                if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
                 {
-                    td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
-                    td.needgen = 1;
+                    if (td.quality < i+2)
+                    {
+                        td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
+                        td.needgen = 1;
+                    }
+                    break;
                 }
-                break;
             }
         }
 

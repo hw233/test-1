@@ -194,7 +194,7 @@ namespace GObject
                 UInt16 count = 9;
                 if (i->second.count >= count)
                 {
-                    if (pl->getVipLevel() >= 2)
+                    if (pl->getVipLevel() >= 1)
                     {
 
                         if (!pl->getBuffData(PLAYER_BUFF_WBOSS))

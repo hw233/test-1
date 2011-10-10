@@ -513,7 +513,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), m_autoCopyComplete(0), hispot(0), m_ulog(NULL)
+        _justice_roar(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -1651,7 +1651,7 @@ namespace GObject
         return false;
     }
 
-	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen )
+	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp )
 	{
 		checkLastBattled();
 		other->checkLastBattled();
@@ -1680,7 +1680,7 @@ namespace GObject
 			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling), 0))
 				other->checkHPLoss();
 		}
-		else if(sysRegen > 0)
+		else if(sysRegen > 0 && !noreghp)
 		{
 			if(res)
 			{
@@ -1693,6 +1693,14 @@ namespace GObject
 				regenAll();
 			}
 		}
+        else if (noreghp)
+        {
+            bsim.applyFighterHP(0, this, false, sysRegen);
+            //other->regenAll();
+            bsim.applyFighterHP(1, other, false, sysRegen);
+            //regenAll();
+        }
+
 		if(res)
 			other->checkDeath();
 		else

@@ -392,7 +392,7 @@ namespace GObject
 		task->m_Completed = 0;
 		task->m_Submit = 0;
 		InitTaskStep(task, taskType.m_ReqStep.size());
-		if (taskType.m_Class != 3 && taskType.m_Class != 4 && taskType.m_Class != 5)
+		if (taskType.m_Class != 3)
 		{
 			task->m_TimeBegin = task->m_AcceptTime;
 			task->m_TimeEnd = (taskType.m_ReqTime != 0) ? (task->m_TimeBegin + taskType.m_ReqTime) : (static_cast<UInt32>(-1));

@@ -358,6 +358,8 @@ namespace GObject
 			AutoDungeon		= 0x00000004,
 			ClanBattling	= 0x00000008,
 			AutoCopy        = 0x00000010,
+			Copy            = 0x00000020,
+            InHeroIsland    = 0x00000040,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -662,7 +664,7 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//’Ω∂∑œ‡πÿ
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL);
@@ -963,9 +965,12 @@ namespace GObject
 
     private:
         UInt8 hispot;
+        UInt8 hitype;
     public:
         inline void setHISpot(UInt8 spot) { hispot = spot; }
         inline UInt8 getHISpot() { return hispot;}
+        inline void setHIType(UInt8 type) { hitype = type; }
+        inline UInt8 getHIType() { return hitype; }
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,

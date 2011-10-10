@@ -3167,6 +3167,25 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             }
             break;
         case 5:
+            {
+                UInt8 atype;
+                brd >> atype;
+                if (atype == 0)
+                {
+                    UInt8 id = 0;
+                    brd >> id;
+                    GObject::heroIsland.attack(player, atype, id);
+                }
+                else if (atype == 1)
+                {
+                    UInt64 id = 0;
+                    brd >> id;
+                    GObject::heroIsland.attack(player, atype, id);
+                }
+            }
+            break;
+        case 6:
+            GObject::heroIsland.commitCompass(player);
             break;
         default:
             break;

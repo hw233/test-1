@@ -107,8 +107,7 @@ UInt8 HeroIsland::getIdentity(Player* player)
         type = 3;
     }
 
-    if (!enter(player, type, 0, false))
-        type = 0;
+    player->setHIType(type);
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(2) << type << Stream::eos;
@@ -215,12 +214,14 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     UInt8 rspot = spot;
     HIPlayerData* pd = findPlayer(player, rspot, pos);
     if (pd)
+    {
+        sendSpot(pd, rspot);
         return true;
+    }
 
     pd = new(std::nothrow) HIPlayerData;
     if (!pd) return false;
     pd->player = player;
-    player->setHISpot(spot);
     return enter(pd, type, spot, movecd);
 }
 
@@ -236,11 +237,18 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
     if (movecd)
         pd->movecd = TimeUtil::Now() + 40;
 
+    pd->player->setHISpot(spot);
+    sendSpot(pd, spot);
+    return true;
+}
+
+void HeroIsland::sendSpot(HIPlayerData* pd, UInt8 spot)
+{
+    if (!pd)
+        return;
     sendPlayers(pd, spot, 0, HERO_ISLANG_PAGESZ);
     sendSkills(pd);
     broadcast(pd, spot);
-
-    return true;
 }
 
 void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 pagesize)
@@ -249,20 +257,28 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
         return;
     
     Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(6);
     size_t sz = _players[spot].size();
 
     if (start > sz)
         start = 0;
 
-    st << static_cast<UInt8>(sz);
+    if (sz)
+        st << static_cast<UInt8>(sz-1);
+    else
+        st << static_cast<UInt8>(sz);
+
     for (size_t i = start; i < sz; ++i)
     {
         HIPlayerData* pd1 = _players[spot][i];
-        st << pd1->player->getId();
-        st << pd1->type;
-        st << pd1->player->allHpP();
-        st << pd1->player->GetLev();
-        st << pd1->player->getName();
+        if (pd1->player != pd->player)
+        {
+            st << pd1->player->getId();
+            st << pd1->type;
+            st << pd1->player->allHpP();
+            st << pd1->player->GetLev();
+            st << pd1->player->getName();
+        }
     }
     st << Stream::eos;
     pd->player->send(st);
@@ -307,17 +323,21 @@ void HeroIsland::broadcast(HIPlayerData* pd, UInt8 spot)
     st << pd->player->GetLev();
     st << pd->player->getName();
     st << Stream::eos;
-    broadcast(st, spot);
+    broadcast(st, spot, pd->player);
 }
 
-void HeroIsland::broadcast(Stream& st, UInt8 spot)
+void HeroIsland::broadcast(Stream& st, UInt8 spot, Player* player)
 {
     if (spot > HERO_ISLAND_SPOTS)
         return;
 
     size_t sz = _players[spot].size();
     for (size_t i = 0; i < sz; ++i)
-        _players[spot][i]->player->send(st);
+    {
+        Player* player1 = _players[spot][i]->player;
+        if (player && player != player1 && player1->hasFlag(Player::InHeroIsland))
+            player1->send(st);
+    }
 }
 
 void HeroIsland::broadcast(Stream& st)
@@ -344,8 +364,9 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt8 pos)
         return NULL;
 
     Stream st(REP::HERO_ISLAND);
-    st << pd->player->getId() << Stream::eos;
-    broadcast(st, pd->spot);
+    st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
+    broadcast(st, pd->spot, pd->player);
+
     _players[spot].erase(_players[spot].begin()+pos);
     return pd;
 }
@@ -361,34 +382,6 @@ void HeroIsland::listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pag
         sendPlayers(pd, spot, start, pagesize);
 }
 
-bool HeroIsland::moveTo(Player* player, UInt8 from, UInt8 to)
-{
-    if (!player || from > HERO_ISLAND_SPOTS || to > HERO_ISLAND_SPOTS)
-        return false;
-
-    UInt8 pos = 0;
-    HIPlayerData* pd = findPlayer(player, from, pos);
-    if (!pd)
-        return false;
-
-    if (pd->movecd > TimeUtil::Now())
-    {
-        // TODO:
-        return false;
-    }
-
-    if (leave(pd, from, pos))
-    {
-        if (enter(pd, pd->type, to))
-        {
-            Stream st(REP::HERO_ISLAND);
-            st << static_cast<UInt8>(4) << to << Stream::eos;
-            player->send(st);
-        }
-    }
-    return false;
-}
-
 bool HeroIsland::moveTo(Player* player, UInt8 to)
 {
     if (!player || to > HERO_ISLAND_SPOTS)
@@ -399,6 +392,7 @@ bool HeroIsland::moveTo(Player* player, UInt8 to)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return false;
+    player->setHISpot(spot);
 
     if (spot == to)
         return false;
@@ -416,6 +410,7 @@ bool HeroIsland::moveTo(Player* player, UInt8 to)
             Stream st(REP::HERO_ISLAND);
             st << static_cast<UInt8>(4) << to << Stream::eos;
             player->send(st);
+            return true;
         }
     }
     return false;
@@ -426,16 +421,20 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     if (!player || !id)
         return false;
 
+    if (!player->hasFlag(Player::InHeroIsland))
+        return false;
+
     if (player->getBuffData(PLAYER_BUFF_ATTACKING))
     {
-        player->sendMsgCode(0, 1412);
+        player->sendMsgCode(0, 1407);
         return false;
     }
 
-    UInt8 spot = 0xFF;
+    UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return false;
+    player->setHISpot(spot);
 
     if (!pd->spot)
     {
@@ -472,13 +471,18 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             return false;
         }
 
+        if (pd == pd1 || pd->player == pd1->player)
+        {
+            return false;
+        }
+
         if (!pd1->spot)
         {
             return false;
         }
 
         int turns = 0;
-        bool res = player->challenge(pd1->player, NULL, &turns, false, 50);
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 1, true);
         player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 2 * turns);
         pd1->player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 2 * turns);
         pd->fightcd = TimeUtil::Now() + 30;
@@ -488,12 +492,18 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         {
 
             pd->lasttype = pd1->type;
-            moveTo(pd1->player, pd1->spot, 0);
+            moveTo(pd1->player, 0);
             pd1->fightcd = TimeUtil::Now() + 30;
 
             size_t sz = pd->compass.size();
             if (sz && pd->compass[sz-1].type == pd1->type)
+            {
                 pd->compass[sz-1].status = 1;
+
+                Stream st(REP::HERO_ISLAND);
+                st << static_cast<UInt8>(5) << static_cast<UInt8>(1) << Stream::eos;
+                pd->player->send(st);
+            }
         }
         else
         {
@@ -507,6 +517,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 bool HeroIsland::useSkill(Player* player, UInt8 spot)
 {
     if (!player)
+        return false;
+
+    if (!player->hasFlag(Player::InHeroIsland))
         return false;
 
     UInt8 pos = 0;
@@ -524,19 +537,32 @@ void HeroIsland::playerInfo(Player* player)
 {
     if (!player)
         return;
-    UInt8 spot = 0xFF;
+
+    UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     UInt8 in = 0;
+    UInt8 type = 0;
+
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(0);
+
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (pd)
+    {
         in = 1;
+        type = pd->type;
+        player->setHISpot(spot);
+    }
+    else
+    {
+        type = player->getHIType();
+    }
+
     st << in;
+    st << type;
 
     if (in)
     {
-        st << pd->type;
         st << pd->spot;
         st << pd->straight;
 
@@ -546,7 +572,20 @@ void HeroIsland::playerInfo(Player* player)
             size_t i = ((sz-1)/3)*3;
             for (; i < sz; ++i)
                 st << pd->compass[i].type;
+
+            if (i%3)
+            {
+                for (size_t j = 0; j < (3-(i%3)); ++j)
+                {
+                    st << static_cast<UInt8>(0);
+                }
+            }
+
             st << pd->compass[i].status;
+        }
+        else
+        {
+            st << static_cast<UInt32>(0);
         }
     }
 
@@ -558,34 +597,33 @@ void HeroIsland::playerEnter(Player* player)
 {
     if (!player)
         return;
-
-    UInt8 spot = 0xFF;
-    UInt8 pos = 0;
+    if (!player->getHIType())
+        return;
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(1);
-    HIPlayerData* pd = findPlayer(player, spot, pos);
-    if (!pd)
-    {
-        st << static_cast<UInt8>(0);
-    }
-    else
+    if (enter(player, player->getHIType(), player->getHISpot(), false))
     {
         st << static_cast<UInt8>(1);
+        player->addFlag(Player::InHeroIsland);
     }
+    else
+        st << static_cast<UInt8>(0);
     st << Stream::eos;
     player->send(st);
 }
 
 void HeroIsland::playerLeave(Player* player)
 {
-    UInt8 spot = 0xFF;
+    UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
-    leave(pd, spot, pos);
-    delete pd;
+    if (leave(pd, spot, pos))
+        _players[0].push_back(pd);
+    player->delFlag(Player::InHeroIsland);
+    player->setHISpot(0xFF);
 }
 
 void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
@@ -597,23 +635,26 @@ void HeroIsland::startCompass(Player* player)
     if (!player)
         return;
 
-    UInt8 spot = 0xFF;
+    UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
+    player->setHISpot(spot);
 
-    Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(3);
     size_t sz = pd->compass.size();
     if (sz)
     {
         if (pd->compass[sz-1].status != 2)
+#if 0
         {
             st << static_cast<UInt8>(0) << Stream::eos;
             player->send(st);
             return;
         }
+#else
+        return;
+#endif
     }
 
     UInt8 type = uRand(4);
@@ -621,6 +662,8 @@ void HeroIsland::startCompass(Player* player)
         type = 1;
     pd->compass.push_back(Task(type, 0));
 
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(3);
     st << type << Stream::eos;
     player->send(st);
 }
@@ -635,37 +678,33 @@ void HeroIsland::commitCompass(Player* player)
 {
     if (!player)
         return;
-    UInt8 spot = 0;
+
+    UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
+    player->setHISpot(spot);
 
-    Stream st(REP::HERO_ISLAND);
     size_t sz = pd->compass.size();
-
-    if (pd->compass[sz-1].status == 0 || pd->compass[sz-1].status == 2)
-    {
-        st << static_cast<UInt8>(6) << static_cast<UInt8>(0) << Stream::eos;
-        player->send(st);
+    if (!sz)
         return;
-    }
 
-    if (sz && !(sz % 3))
+    if (pd->compass[sz-1].status != 1)
+        return;
+
+    if (sz == 1)
+        pd->straight = 1;
+    else
     {
-        bool same = true;
-        for (size_t i = 0; i < sz - 1; ++i)
-        {
-            if (pd->compass[i].type != pd->compass[i+1].type)
-            {
-                same = false;
-                break;
-            }
+        if (pd->compass[sz-1].type == pd->compass[sz-2].type)
             ++pd->straight;
-        }
+    }
+    pd->compass[sz-1].status = 2;
 
-        pd->compass[sz-1].status = 2;
-        if (same)
+    if (!(sz % 3))
+    {
+        if (pd->straight == sz)
         {
             // TODO:
         }
@@ -674,12 +713,12 @@ void HeroIsland::commitCompass(Player* player)
             pd->compass.clear();
         }
     }
-    else if (sz)
+    else
     {
-        pd->compass[sz-1].status = 2;
     }
 
-    st << static_cast<UInt8>(6) << static_cast<UInt8>(0) << Stream::eos;
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(5) << static_cast<UInt8>(2) << Stream::eos;
     player->send(st);
 }
 
