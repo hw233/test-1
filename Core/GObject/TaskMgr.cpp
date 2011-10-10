@@ -1413,7 +1413,7 @@ namespace GObject
 
 		m_TaskCompletedList[taskId] = task;
         task->m_Completed = 1;
-		m_TaskAcceptedList.erase(taskId);
+		DelCanAcceptTask(taskId);
 
         return true;
     }
