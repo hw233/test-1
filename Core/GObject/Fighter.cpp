@@ -225,21 +225,14 @@ bool Fighter::addPExp( Int32 e, bool writedb )
             _pexp = _pexpMax;
     }
 
-	bool isMain = _owner->isMainFighter(_id);
     if (e < 0)
     {
-        if(isMain)
-        {
-            SYSMSG_SENDV(2006, _owner, -e);
-        }
+        SYSMSG_SENDV(2006, _owner, -e);
         SYSMSG_SENDV(2007, _owner, _color, getName().c_str(), -e);
     }
     else
     {
-        if(isMain)
-        {
-            SYSMSG_SENDV(2004, _owner, e);
-        }
+        SYSMSG_SENDV(2004, _owner, e);
         SYSMSG_SENDV(2005, _owner, _color, getName().c_str(), e);
     }
 
@@ -332,7 +325,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 6:
         {
             ++_pexpMods;
-            if (_pexpMods >= 6) // XXX: 1小时一次
+            if (_pexpMods >= 3) // XXX: 半小时一次
             {
                 DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
                 _pexpMods = 0;
@@ -376,6 +369,10 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
                     DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
                 }
             }
+            else
+            {
+                DB2().PushUpdateData("UPDATE `fighter` SET `skills` = '' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, _owner->getId());
+            }
         }
         break;
     case 0x62:
@@ -393,6 +390,10 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
                 if (value2string(&_cittas[0], _cittas.size(), str)) {
                     DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '%s' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), _id, _owner->getId());
                 }
+            }
+            else
+            {
+                DB2().PushUpdateData("UPDATE `fighter` SET `cittas` = '' WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _id, _owner->getId());
             }
         }
         break;

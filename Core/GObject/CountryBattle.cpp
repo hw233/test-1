@@ -396,7 +396,7 @@ void CountryBattle::end(UInt32 curtime)
             }
 #else
             UInt16 count = awardTime / 3600 + (awardTime % 3600) ? 1: 0;
-            if (rewardid[side] == PLAYER_BUFF_TRAINP1)
+            if (rewardid[side] == PLAYER_BUFF_TRAINP1 && count)
             {
                 MailPackage::MailItem mitem[1] = {{55, count}};
                 MailItemsInfo itemsInfo(mitem, CountryBattleAward, 1);
@@ -406,7 +406,7 @@ void CountryBattle::end(UInt32 curtime)
                 if(pmail != NULL)
                     mailPackageManager.push(pmail->id, mitem, 1, false);
             }
-            else if (rewardid[side] == PLAYER_BUFF_TRAINP2)
+            else if (rewardid[side] == PLAYER_BUFF_TRAINP2 && count)
             {
                 MailPackage::MailItem mitem[1] = {{56, count}};
                 MailItemsInfo itemsInfo(mitem, CountryBattleAward, 1);

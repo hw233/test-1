@@ -83,7 +83,11 @@ UInt8 HeroIsland::getIdentity(Player* player)
         return 0;
 
     UInt8 type = 0;
-    if (_types[0] < _types[1])
+    if (player->hasFlag(Player::InHeroIsland))
+    {
+        type = player->getHIType();
+    }
+    else if (_types[0] < _types[1])
     {
         if (_types[2] < _types[0])
         {
@@ -227,8 +231,11 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
 
 bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
 {
-    if (!pd || type > 3 || spot > HERO_ISLAND_SPOTS)
+    if (!pd || type > 3 || (spot != 0xFF && spot > HERO_ISLAND_SPOTS))
         return false;
+
+    if (spot == 0xFF)
+        spot = 0;
 
     pd->type = type;
     pd->spot = spot;
@@ -246,6 +253,11 @@ void HeroIsland::sendSpot(HIPlayerData* pd, UInt8 spot)
 {
     if (!pd)
         return;
+
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(4) << spot << Stream::eos;
+    pd->player->send(st);
+
     sendPlayers(pd, spot, 0, HERO_ISLANG_PAGESZ);
     sendSkills(pd);
     broadcast(pd, spot);
@@ -482,7 +494,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
 
         int turns = 0;
-        bool res = player->challenge(pd1->player, NULL, &turns, false, 1, true);
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true);
         player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 2 * turns);
         pd1->player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + 2 * turns);
         pd->fightcd = TimeUtil::Now() + 30;
@@ -604,11 +616,11 @@ void HeroIsland::playerEnter(Player* player)
     st << static_cast<UInt8>(1);
     if (enter(player, player->getHIType(), player->getHISpot(), false))
     {
-        st << static_cast<UInt8>(1);
+        st << static_cast<UInt8>(0);
         player->addFlag(Player::InHeroIsland);
     }
     else
-        st << static_cast<UInt8>(0);
+        st << static_cast<UInt8>(1);
     st << Stream::eos;
     player->send(st);
 }
@@ -633,6 +645,9 @@ void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
 void HeroIsland::startCompass(Player* player)
 {
     if (!player)
+        return;
+
+    if (!player->hasFlag(Player::InHeroIsland))
         return;
 
     UInt8 spot = player->getHISpot();
@@ -677,6 +692,9 @@ void HeroIsland::stopCompass(Player* player)
 void HeroIsland::commitCompass(Player* player)
 {
     if (!player)
+        return;
+
+    if (!player->hasFlag(Player::InHeroIsland))
         return;
 
     UInt8 spot = player->getHISpot();

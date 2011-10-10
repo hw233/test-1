@@ -1186,15 +1186,13 @@ namespace GObject
         }
     }
 
-	void Player::addFighter( Fighter * fgt, bool writedb )
+	void Player::addFighter( Fighter * fgt, bool writedb, bool load )
 	{
 		UInt32 id = fgt->getId();
 		if(id < 10)
 			_fighters.insert(_fighters.begin(), std::make_pair(fgt->getId(), fgt));
 		else
 			_fighters[fgt->getId()] = fgt;
-
-        upInitCitta(fgt, writedb);
 
 		if(writedb)
 		{
@@ -1204,6 +1202,9 @@ namespace GObject
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 		}
+
+        if (!load)
+            upInitCitta(fgt, writedb);
 	}
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
@@ -1695,10 +1696,10 @@ namespace GObject
 		}
         else if (noreghp)
         {
-            bsim.applyFighterHP(0, this, false, sysRegen);
-            //other->regenAll();
-            bsim.applyFighterHP(1, other, false, sysRegen);
-            //regenAll();
+            //bsim.applyFighterHP(0, this, false, sysRegen);
+            other->regenAll();
+            //bsim.applyFighterHP(1, other, false, sysRegen);
+            regenAll();
         }
 
 		if(res)

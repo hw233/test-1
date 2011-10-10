@@ -594,7 +594,7 @@ namespace GObject
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
         void upInitCitta(Fighter* fgt,bool = false);
-		void addFighter(Fighter * fgt, bool = true);
+		void addFighter(Fighter * fgt, bool = true, bool = false);
 		Fighter * takeFighter(UInt32, bool = true);
 		void notifyAddFighter(Fighter * fgt);
 		Fighter * findFighter(UInt32);
