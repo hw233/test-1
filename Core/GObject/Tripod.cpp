@@ -187,7 +187,7 @@ static UInt8 fire_factor[][6] =
     {40,    90,     0,      100,    0,      0},
     {0,     50,     0,      0,      100,    0},
     {80,    0,      0,      100,    0,      0},
-    {50,    0,      100,    0,      0,      0},
+    {50,    0,      0,      100,    0,      0},
 };
 
 void Tripod::makeFire(Player* pl, UInt32 id1, UInt32 id2)
