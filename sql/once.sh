@@ -3,7 +3,6 @@ source conf.sh
 function update_object()
 {
     echo "update_object"
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111010_1.sql
 }
 
 function update_data()
