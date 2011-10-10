@@ -1417,9 +1417,10 @@ namespace GObject
         if(NULL == task)
             return false;
 
+		DelCanAcceptTask(taskId);
 		m_TaskCompletedList[taskId] = task;
         task->m_Completed = 1;
-		DelCanAcceptTask(taskId);
+        m_TaskAcceptedList.erase(taskId);
 
         return true;
     }
