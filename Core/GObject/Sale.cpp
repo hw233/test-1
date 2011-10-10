@@ -78,7 +78,10 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 	UInt16 ItemCount[9] = {0};
 	if(sz == 0)
 		return;
-	if (sz <= 9 && sz + _sellItems.size() <= 18)
+    UInt8 vipLvl = _owner->getVipLevel();
+    UInt32 revTael =  (vipLvl < 2) ? 200 : 100;
+    UInt8 maxItems = 12 + 6*(vipLvl > 2 ? 2 : vipLvl);
+	if (sz <= 9 && sz + _sellItems.size() <= maxItems)
 	{
 		UInt32 revenue = 0;
 		std::vector<ItemBase *> saleItems;
@@ -121,7 +124,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
                 return;
 				//revenue += 1;
 			else
-				revenue += _owner->getVipLevel() < 2 ? 200 : 100;
+				revenue += revTael;
 		}
 		if (revenue > _owner->getTael())
 			return;
@@ -186,7 +189,7 @@ void Sale::searchMySale(SaleSearchReq& req)
 	saleSearchResp.count = req.count;
 	UInt16 i = 0;
 	std::map<UInt32, SaleSellRespData *>::iterator it = _sellItems.begin();
-	for (; i < 18 && it != _sellItems.end(); ++i, ++it)
+	for (; i < 24 && it != _sellItems.end(); ++i, ++it)
 	{
 		saleSearchResp.ids[i] = it->first;
 	}

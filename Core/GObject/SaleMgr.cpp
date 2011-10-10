@@ -116,7 +116,10 @@ bool SaleMgr::addSaleFromDB(SaleData * sale)
 	}
 
 	addRowSale(sale);
-	_saleCheck.insert(std::make_pair(sale->_time, sale->_pos));
+    UInt8 idx = sale->_owner->getVipLevel();
+    if(idx > 2)
+        idx = 2;
+	_saleCheck[idx].insert(std::make_pair(sale->_time, sale->_pos));
 	_salePos[sale->_id] = sale->_pos;
 
 	return true;
@@ -159,7 +162,10 @@ void SaleMgr::sellSale(Player * player, SalePut * salePuts, UInt8 count)
 		const std::string& itemName = sale->_item->getName();
 		memcpy(saleSellRespDatas[i].itemName, itemName.c_str(), std::min(sizeof(saleSellRespDatas[i].itemName)-1, itemName.length()));
 		DB4().PushUpdateData("INSERT INTO `sale` VALUES (%u,  %"I64_FMT"u, %d, %u, %d, %u, %u, %u)", sale->_id, sale->_owner->getId(), sale->_status, sale->_time, sale->_priceType, sale->_price, sale->_item->getId(), sale->_item->Count());
-		_saleCheck.insert(std::make_pair(sale->_time, sale->_pos));
+        UInt8 idx = sale->_owner->getVipLevel();
+        if(idx > 2)
+            idx = 2;
+		_saleCheck[idx].insert(std::make_pair(sale->_time, sale->_pos));
 		std::string comboItemId;
 		if(sale->_item->getId()>30000)
             comboItemId=Itoa(sale->_item->getId())+"|"+Itoa(sale->_item->GetItemType().getId());
@@ -666,12 +672,15 @@ void SaleMgr::searchPlayerSaleResp(Player * founder, Player * beFounder, UInt16 
 void SaleMgr::delSaleCheck(SaleData * sale)
 {
 	typedef std::pair<SaleCheckType::iterator, SaleCheckType::iterator> FoundType;
-	FoundType found = _saleCheck.equal_range(sale->_time);
+    UInt8 idx = sale->_owner->getVipLevel();
+    if(idx > 2)
+        idx = 2;
+	FoundType found = _saleCheck[idx].equal_range(sale->_time);
 	for (SaleCheckType::iterator it = found.first; it != found.second; ++it)
 	{
 		if (sale->_pos == it->second)
 		{
-			_saleCheck.erase(it);
+			_saleCheck[idx].erase(it);
 			break;
 		}
 	}
@@ -682,28 +691,31 @@ void SaleMgr::update(UInt32 curr)
 {
 	SaleData * sale = NULL;
 	UInt32 sz = _sales.size();
-	SaleCheckType::iterator itUp = _saleCheck.upper_bound(curr-SALE_TIME_OUT);
-	for (SaleCheckType::iterator it = _saleCheck.begin(); it != itUp;)
-	{
-		if (it->second < sz && _sales[it->second] != NULL)
-		{
-			sale = _sales[it->second];
-			_sales[it->second] = NULL;
-			setNextIndex(it->second);
-			DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_TIMEOUT), sale->_id);
-			DBLOG().PushUpdateData("update sales set is_cancel=1 where sale_id=%u and server_id=%u", sale->_id, cfg.serverLogId);
-			SaleItemCancel saleItemTimeout;
-			saleItemTimeout.status = static_cast<UInt8>(SALE_TIMEOUT);
-			saleItemTimeout.id = sale->_id;
-			saleItemTimeout.item = sale->_item;
-			delRowSale(sale);
-			_salePos.erase(sale->_id);
-			GameMsgHdr hdr(0x304, sale->_owner->getThreadId(), sale->_owner, sizeof(SaleItemCancel));
-			GLOBAL().PushMsg(hdr, &saleItemTimeout);
-			SAFE_DELETE(sale);
-		}
-		_saleCheck.erase(it++);
-	}
+    for(int i = 0; i < 3; ++i)
+    {
+        SaleCheckType::iterator itUp = _saleCheck[i].upper_bound(curr-(SALE_TIME_OUT*(i+1)));
+        for (SaleCheckType::iterator it = _saleCheck[i].begin(); it != itUp;)
+        {
+            if (it->second < sz && _sales[it->second] != NULL)
+            {
+                sale = _sales[it->second];
+                _sales[it->second] = NULL;
+                setNextIndex(it->second);
+                DB4().PushUpdateData("UPDATE `sale` SET `status` = %d WHERE `saleId` = %u", static_cast<UInt8>(SALE_TIMEOUT), sale->_id);
+                DBLOG().PushUpdateData("update sales set is_cancel=1 where sale_id=%u and server_id=%u", sale->_id, cfg.serverLogId);
+                SaleItemCancel saleItemTimeout;
+                saleItemTimeout.status = static_cast<UInt8>(SALE_TIMEOUT);
+                saleItemTimeout.id = sale->_id;
+                saleItemTimeout.item = sale->_item;
+                delRowSale(sale);
+                _salePos.erase(sale->_id);
+                GameMsgHdr hdr(0x304, sale->_owner->getThreadId(), sale->_owner, sizeof(SaleItemCancel));
+                GLOBAL().PushMsg(hdr, &saleItemTimeout);
+                SAFE_DELETE(sale);
+            }
+            _saleCheck[i].erase(it++);
+        }
+    }
 }
 
 UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)

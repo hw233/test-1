@@ -357,7 +357,7 @@ void OnSearchSaleNotify( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	GObject::SaleSearchResp * saleSearchResp = reinterpret_cast<GObject::SaleSearchResp *>(const_cast<void *>(data));
-	GObject::gSaleMgr.searchPlayerSaleResp(saleSearchResp->founder, player, saleSearchResp->start, saleSearchResp->count, saleSearchResp->ids, 18);
+	GObject::gSaleMgr.searchPlayerSaleResp(saleSearchResp->founder, player, saleSearchResp->start, saleSearchResp->count, saleSearchResp->ids, 24);
 }
 
 void OnPutSaleNotify( GameMsgHdr& hdr, const void * data )

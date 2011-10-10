@@ -25,7 +25,8 @@ struct SaleData
 
 class SaleMgr
 {
-static const UInt32 SALE_TIME_OUT = 48 * 60 * 60;
+static const UInt32 SALE_TIME_OUT = 24 * 60 * 60;
+//static const UInt32 SALE_TIME_OUT = 5 * 60;
 
 public:
 	SaleMgr();
@@ -104,7 +105,7 @@ private:
 	std::set<UInt32> _saleIndex;
 	
 	SalePosType _salePos;
-	SaleCheckType _saleCheck;
+	SaleCheckType _saleCheck[3];
 	SaleRowType _saleRow[48];	//普通1 强化2 (0 : reversed)
                                 //装备3 武器4 头盔5 胸甲6 肩甲7 腰带8 腿甲9 项链10 戒指11
                                 //心法12 增益心法13 技能心法14
