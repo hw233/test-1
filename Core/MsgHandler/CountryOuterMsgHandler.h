@@ -573,7 +573,7 @@ struct AthleticsDataReq
 	MESSAGE_DEF(REQ::ARENA_FIGHT_INFO);
 };
 #endif
-
+#if 0
 struct FighterTrain2Req
 {
 	UInt32 _heroID;
@@ -581,6 +581,7 @@ struct FighterTrain2Req
 	UInt32 _time;
 	MESSAGE_DEF3(0x3F, UInt32, _heroID, UInt8, _priceType, UInt32, _time);
 };
+#endif
 
 struct PracticeHookAddReq
 {
@@ -875,6 +876,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		pl->makeFormationInfo(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        Stream st;
+        pl->makeTrainFighterInfo(st);
+        conn->send(&st[0], st.size());
+    }
 	{
 		if(PLAYER_DATA(pl, inCity))
 			map->SendCityNPCs(pl);
@@ -3101,6 +3107,7 @@ void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
 	player->send(st);
 }
 
+#if 0
 void OnFighterTrain2Req( GameMsgHdr& hdr, FighterTrain2Req& req )
 {
     return; // TODO:
@@ -3109,6 +3116,7 @@ void OnFighterTrain2Req( GameMsgHdr& hdr, FighterTrain2Req& req )
 		return;
 	player->addTrainFighter(req._heroID, req._priceType, req._time);
 }
+#endif
 
 void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 {
@@ -3119,23 +3127,42 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt32 fighterId = 0;
 	UInt8 type = 0;
+    UInt8 reqType = 0;
+    brd >> reqType;
+    if(reqType == 0)
+    {
+        Stream st;
+        player->makeTrainFighterInfo(st);
+        player->send(st);
+        return;
+    }
+
 	brd >> fighterId >> type;
 	if(fighterId == 0)
 		return;
-	switch (type)
-	{
-	case 0:
-		{
-			UInt32 hrs = 0;
-			brd >> hrs;
-			if(hrs > 0)
-				player->accTrainFighter(fighterId, hrs);
-		}
-		break;
-	case 1:
-		player->cancelTrainFighter(fighterId);
-		break;
-	}
+    if(reqType == 1)
+    {
+        UInt32 hrs = 0;
+        brd >> hrs;
+        player->addTrainFighter(fighterId, type, hrs);
+    }
+    else if(reqType == 2)
+    {
+        switch (type)
+        {
+        case 0:
+            {
+                UInt32 hrs = 0;
+                brd >> hrs;
+                if(hrs > 0)
+                    player->accTrainFighter(fighterId, hrs);
+            }
+            break;
+        case 1:
+            player->cancelTrainFighter(fighterId);
+            break;
+        }
+    }
 }
 
 void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )

@@ -2787,7 +2787,7 @@ namespace GObject
 		_trainFighters.erase(id);
 		DB1().PushUpdateData("DELETE FROM `fighter_train` WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", id, _id);
 		Stream st(REP::TRAIN_FIGHTER_OP);
-		st << id << static_cast<UInt8>(2) << static_cast<UInt32>(0) << Stream::eos;
+		st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << static_cast<UInt32>(0) << Stream::eos;
 		send(st);
 		//if (notify)
 		//	sendMsgCode(0, 2088, id);
@@ -2851,7 +2851,7 @@ namespace GObject
 		PushTimerEvent(event);
 		Stream st(REP::TRAIN_FIGHTER_OP);
 		UInt32 remain = event->GetEnd() - TimeUtil::Now();
-		st << id << data->priceType << remain << Stream::eos;
+		st << static_cast<UInt8>(1) << id << static_cast<UInt8>(0) << remain << Stream::eos;
 		send(st);
 
 		return true;
@@ -2894,7 +2894,7 @@ namespace GObject
 				DB().PushUpdateData("UPDATE `fighter_train` SET `checkTime` = %u, `accExp` = %u WHERE `fgtId` = %u AND `ownerId` = %"I64_FMT"u", data->checktime, data->accExp, id, _id);
 				Stream st(REP::TRAIN_FIGHTER_OP);
 				UInt32 now = TimeUtil::Now();
-				st << id << data->priceType;
+				st << static_cast<UInt8>(1) << id << static_cast<UInt8>(0);
 				if(data->trainend > now)
 					st << static_cast<UInt32>(data->trainend - now);
 				else
@@ -2922,6 +2922,27 @@ namespace GObject
 			PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
 		return true;
 	}
+
+    void Player::makeTrainFighterInfo(Stream& st)
+    {
+        st.init(REP::TRAIN_FIGHTER_OP);
+        UInt8 cnt = 0;
+        st << static_cast<UInt8>(0) << cnt;
+        if(!_trainFighters.empty())
+        {
+            UInt32 now = TimeUtil::Now();
+            for (std::map<UInt32, TrainFighterData *>::iterator it = _trainFighters.begin(); it != _trainFighters.end(); ++ it)
+            {
+                if (it->second->trainend > now)
+                {
+                    st << it->first << it->second->priceType << static_cast<UInt32>(it->second->trainend - now);
+                    ++ cnt;
+                }
+            }
+            st.data<UInt8>(5) = cnt;
+        }
+        st << Stream::eos;
+    }
 
 	UInt32 Player::addStatus( UInt32 s )
 	{

@@ -2226,13 +2226,18 @@ namespace GObject
 			ClanMember * cm = new(std::nothrow) ClanMember();
 			if (cm == NULL) return false;
 			cm->player = pl;
+			cm->cls = cp.cls;
 			if (pl->getId() == clan->getLeaderId())
 			{
 				hasLeader = true;
+                if(cp.cls != 4)
+                {
+                    cm->cls = 4;
+                    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = 4 WHERE `playerId` = %"I64_FMT"u", pl->getId());
+                }
 			}
 			cm->joinTime = cp.joinTime;
             cm->proffer = cp.proffer;
-			cm->cls = cp.cls;
 			if (thisDay != cp.thisDay)
 			{
 				DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u WHERE `playerId` = %"I64_FMT"u", thisDay, pl->getId());

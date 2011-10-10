@@ -2757,6 +2757,9 @@ void Clan::useClanFunds(UInt32 funds)
 bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 {
 	Mutex::ScopedLock lk(_mutex);
+
+    if(inviteeId == _leader || pl->getId() == inviteeId)
+        return false;
     Player* clan_pl = globalPlayers[inviteeId];
     if(!clan_pl)
         return false;

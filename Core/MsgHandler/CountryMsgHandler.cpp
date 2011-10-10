@@ -26,7 +26,7 @@ MSG_REG_2(GameMsgHdr, REQ::TASK_CYC_REFRESH, OnFlushTaskColorReq);
 MSG_REG(GameMsgHdr, OnFighterDismissReq);
 MSG_REG(GameMsgHdr, OnFighterRegenReq);
 MSG_REG(GameMsgHdr, OnFighterTrainReq);
-MSG_REG(GameMsgHdr, OnFighterTrain2Req);
+//MSG_REG(GameMsgHdr, OnFighterTrain2Req);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
