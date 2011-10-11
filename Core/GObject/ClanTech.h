@@ -22,7 +22,7 @@ class Player;
 
 struct ClanTechData
 {
-	ClanTechData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt16 e = 0) 
+	ClanTechData(UInt8 s = 0, UInt16 t = 0 , UInt8 l = 0, UInt32 e = 0) 
 		: techId(s), type(t), level(l), extra(e)
 	{
 	}
@@ -30,7 +30,7 @@ struct ClanTechData
 	UInt8  techId;
 	UInt16 type;
 	UInt8  level;	//如果 = 0， 表示此技能尚未被激活
-	UInt16 extra;
+	UInt32 extra;
 };
 
 class ClanTech
@@ -42,22 +42,22 @@ public:
 	~ClanTech();
 
 public:
-	void addTechFromDB(UInt8, UInt8, UInt16);
+	void addTechFromDB(UInt8, UInt8, UInt32);
 	void buildTech();
 
 public:
-	bool donate(Player *, UInt8, UInt16, UInt16);
+	bool donate(Player *, UInt8, UInt16, UInt32);
 	void makeTechInfo(Stream&);
 	void makeTechInfo(Stream&, ClanTechData&);
 	UInt8 getSize() { return _techs.size(); }
-	void addTech(UInt8, UInt16, UInt8, UInt16);
+	void addTech(UInt8, UInt16, UInt8, UInt32);
 	UInt8 getLev(UInt8);
-	Int32 getExtra(UInt8);
+	UInt32 getExtra(UInt8);
 	inline UInt8 getClanLev();
 	bool isTechFull(UInt8);
 
-	bool addAchieve(UInt16);
-	bool delAchieve(UInt16);
+	bool addAchieve(UInt32);
+	bool delAchieve(UInt32);
 
 	UInt32 getAtuobattleSpeed();
 	UInt16 getSouthEdurance();
@@ -74,8 +74,8 @@ public:
     UInt32 getSkillExtend();
 
 private:
-	bool techLevelUp(UInt8, UInt8&, UInt16&, UInt16);
-	bool techLevelDown(UInt8, UInt8&, UInt16&, UInt16);
+	bool techLevelUp(UInt8, UInt8&, UInt32&, UInt32);
+	bool techLevelDown(UInt8, UInt8&, UInt32&, UInt32);
 
 private:
 	UInt8 _clanLev;
