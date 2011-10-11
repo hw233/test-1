@@ -2932,6 +2932,7 @@ namespace GObject
             UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
             const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
             exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * count);
+            data->accExp += exp;
         }
 
 		if(delTrainFighter(id))
