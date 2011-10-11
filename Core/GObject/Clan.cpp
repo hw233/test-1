@@ -248,11 +248,11 @@ bool Clan::kick(Player * player, UInt64 pid)
 	if (found == _members.end())
 		return false;
 
-    UInt32 now = TimeUtil::Now();
-    if (cfg.GMCheck && now > (*found)->joinTime && now - (*found)->joinTime < 24 * 60 * 60)
+	UInt32 now = TimeUtil::Now();
+    if (now > (*found)->joinTime && now - (*found)->joinTime < 24 * 60 * 60)
     {
-        player->sendMsgCode(0, 1322);
-        return false;
+		player->sendMsgCode(0, 1322);
+		return false;
     }
 
 	Player * kicker = (*found)->player;
@@ -720,7 +720,7 @@ bool Clan::checkDonate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	{
 		if(techId < 1 || techId > GData::clanTechTable.size())
 			return false;
-		if (cfg.GMCheck && now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
+		if (now > mem->joinTime && now - mem->joinTime < 24 * 60 * 60)
 		{
 		    player->sendMsgCode(0, 1320);
 			return false;
