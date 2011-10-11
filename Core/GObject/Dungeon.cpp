@@ -982,6 +982,7 @@ void Dungeon::setExtraCount( UInt32 idx, UInt8 count )
 
 void Dungeon::pushEnterCountBS(UInt32 now)
 {
+    return;  // TODO
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.begin();
 	UInt32 count[3] = {0};
 

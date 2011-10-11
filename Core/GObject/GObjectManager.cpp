@@ -1797,13 +1797,13 @@ namespace GObject
 				continue;
 			if(dbft.trainTime > 0x10000)
 			{
-				UInt32 trainTime = dbft.trainRemain / 60;
+				UInt32 trainTime = dbft.trainRemain / 3600;
 				UInt32 endTime = dbft.trainTime + dbft.trainRemain;
 				if(endTime > dbft.checkTime)
 				{
-					UInt32 checkTime = (endTime - dbft.checkTime) / 60;
-					if(trainTime > 1440)
-						trainTime = 1440;
+					UInt32 checkTime = (endTime - dbft.checkTime) / 3600;
+					if(trainTime > 24)
+						trainTime = 24;
 					if(checkTime > trainTime)
 						checkTime = trainTime;
 					pl->addTrainFighterFromDB(dbft.fighterId, dbft.priceType, dbft.price, trainTime, checkTime, dbft.accExp);

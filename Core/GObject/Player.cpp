@@ -226,7 +226,7 @@ namespace GObject
 		}
 		count -= times;
 		m_Timer.SetLeftTimes(count);
-		_end -= times * 60;
+		_end -= times * 3600;
 		return count == 0;
 	}
 
@@ -240,7 +240,7 @@ namespace GObject
 			return;
 		}
 		const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
-		UInt32 exp = static_cast<UInt32>(levExp[_fighter->getLevel()] * data->factor);
+		UInt32 exp = static_cast<UInt32>(levExp[_fighter->getLevel()] * data->factor * 60);
 		_fighter->addExp(exp);
 		data->accExp += exp;
 		data->checktime = leftCount;
@@ -2729,8 +2729,8 @@ namespace GObject
 		data->price = price;
 		data->priceType = priceType;
 		data->accExp = exp;
-		data->trainend = TimeUtil::Now() + 60 * data->checktime;
-		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 60, data->checktime, fgt, data->trainend);
+		data->trainend = TimeUtil::Now() + 3600 * data->checktime;
+		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 3600, data->checktime, fgt, data->trainend);
 		if (event == NULL)
 		{
 			_trainFighters.erase(id);
@@ -2839,15 +2839,15 @@ namespace GObject
 		TrainFighterData *& data = _trainFighters[id];
 		if (data != NULL) delete data;
 		data = new TrainFighterData();
-		data->checktime = time * 60;
+		data->checktime = time;
 		data->traintime = data->checktime;
 		data->factor = (priceType == 0 ? 8.0f : 3.0f);
 		data->price = price;
 		data->priceType = priceType;
-		data->trainend = TimeUtil::Now() + 60 * data->checktime;
+		data->trainend = TimeUtil::Now() + 3600 * data->checktime;
 		DB1().PushUpdateData("REPLACE INTO `fighter_train`(`fgtId`, `ownerId`, `priceType`, `price`, `trainTime`, `checkTime`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u)", id, getId(), priceType, price, data->traintime, data->checktime);
 		removeFighterFromLineup(id);
-		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 60, data->checktime, fgt, data->trainend);
+		EventFighterTrain* event = new(std::nothrow) EventFighterTrain(this, 3600, data->checktime, fgt, data->trainend);
 		if (event == NULL) return false;
 		PushTimerEvent(event);
 		Stream st(REP::TRAIN_FIGHTER_OP);
@@ -2869,22 +2869,22 @@ namespace GObject
 		TrainFighterData * data = found->second;
 		if (data->checktime > 0)
 		{
-			UInt32 count = 60 * hrs;
+			UInt32 count = hrs;
 			if(count > data->checktime)
 			{
 				count = data->checktime;
 			}
-			UInt32 goldUse = 10 * ((count + 59) / 60);
+			UInt32 goldUse = 10 * count;
 			if (getGold() < goldUse)
 				return false;
 			ConsumeInfo ci(AccTrainFighter, 0, 0);
 			useGold(goldUse, &ci);
 			const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
-			UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * count);
+			UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * count * 60);
 			fighter->addExp(exp);
 			data->accExp += exp;
 			data->checktime -= count;
-			data->trainend -= count * 60;
+			data->trainend -= count * 3600;
 			if (data->checktime == 0 || fighter->getExp() >= GetExp())
 			{
 				if(delTrainFighter(id, true))
@@ -2919,8 +2919,26 @@ namespace GObject
 
 	bool Player::cancelTrainFighter(UInt32 id)
 	{
+		std::map<UInt32, TrainFighterData *>::iterator found = _trainFighters.find(id);
+		if (found == _trainFighters.end())
+			return false;
+		Fighter * fighter = findFighter(id);
+		if (fighter == NULL)
+			return false;
+		TrainFighterData * data = found->second;
+        UInt32 exp = 0;
+		if (data->checktime > 0)
+		{
+            UInt32 count = TimeUtil::Now() + (data->checktime * 3600) - data->trainend;
+            const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
+            exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * count);
+        }
+
 		if(delTrainFighter(id))
+        {
+            fighter->addExp(exp);
 			PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
+        }
 		return true;
 	}
 

@@ -105,10 +105,12 @@ bool enum_midnight(void * ptr, void *)
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, 0);
 		GLOBAL().PushMsg(hdr, NULL);
 	}
+#if 0
 	if(pl->getGold() > 0)
 	{
 		DBLOG1().PushUpdateData("insert into `gold_accounts`(`server_id`, `player_id`, `gold`, `time`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, pl->getId(), pl->getGold(), TimeUtil::SharpDay(1));
 	}
+#endif
 
     pl->buildClanTask();
     pl->clearFinishCount();
