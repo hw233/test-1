@@ -46,6 +46,8 @@ MSG_REG(GameMsgHdr, OnArenaInfoReq);
 MSG_REG(GameMsgHdr, OnArenaEliminationReq);
 MSG_REG_2(GameMsgHdr, REQ::SERVER_ARENA_OP, OnArenaOpReq);
 
+MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
+
 MSG_REG_2(ArenaMsgHdr, 0x101, OnArenaConnected);
 MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);
 MSG_REG_2(ArenaMsgHdr, 0x103, OnLineupCommited);
