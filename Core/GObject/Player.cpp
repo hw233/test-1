@@ -1203,8 +1203,8 @@ namespace GObject
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
 		}
 
-        if (!load)
-            upInitCitta(fgt, writedb);
+        if (!load || !fgt->getCittasNum())
+            upInitCitta(fgt, true);
 	}
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
@@ -1696,10 +1696,8 @@ namespace GObject
 		}
         else if (noreghp)
         {
-            //bsim.applyFighterHP(0, this, false, sysRegen);
-            other->regenAll();
-            //bsim.applyFighterHP(1, other, false, sysRegen);
-            regenAll();
+            bsim.applyFighterHP(0, this, false, sysRegen);
+            bsim.applyFighterHP(1, other, false, sysRegen);
         }
 
 		if(res)

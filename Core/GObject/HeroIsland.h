@@ -24,13 +24,14 @@ struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), straight(0), score(0), lasttype(0xff) {}
+        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff) {}
 
     Player* player;
     UInt8 type; // 0-无,1-天,2-地,3-人
     UInt8 spot;
     UInt32 movecd;
     UInt32 fightcd;
+    UInt32 injuredcd;
     UInt32 straight;
     UInt32 score;
     UInt8 lasttype;
@@ -74,7 +75,7 @@ public:
     HIPlayerData* leave(Player* player, UInt8 spot);
     HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt8 pos);
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
-    bool moveTo(Player* player, UInt8 to);
+    bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
     bool useSkill(Player* player, UInt8 spot);
 
