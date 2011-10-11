@@ -194,9 +194,8 @@ namespace GObject
                 UInt16 count = 9;
                 if (i->second.count >= count)
                 {
-                    if (pl->getVipLevel() >= 1)
-                    {
-
+                    //if (pl->getVipLevel() >= 1)
+                    //{
                         if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
                         {
                             pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
@@ -207,12 +206,12 @@ namespace GObject
                             SYSMSG_SEND(551, pl);
                             return;
                         }
-                    }
-                    else
-                    {
-                        SYSMSG_SEND(550, pl);
-                        return;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    SYSMSG_SEND(550, pl);
+                    //    return;
+                    //}
                 }
 
                 if (pl->attackCopyNpc(i->second.npcId, 2, 0, World::_wday==4?2:1))

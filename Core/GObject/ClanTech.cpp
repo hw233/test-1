@@ -25,7 +25,7 @@ ClanTech::~ClanTech()
 }
 
 
-void ClanTech::addTechFromDB(UInt8 techId, UInt8 level, UInt16 extra)
+void ClanTech::addTechFromDB(UInt8 techId, UInt8 level, UInt32 extra)
 {
 	_techs.insert(std::make_pair(techId, ClanTechData(techId, clanTechDonateType[techId], level, extra)));
     switch(techId)
@@ -46,7 +46,7 @@ void ClanTech::buildTech()
 		addTech(i, 0, 0, 0);
 }
 
-bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt16 count)
+bool ClanTech::donate(Player * player, UInt8 id, UInt16 type, UInt32 count)
 {
 	Techs::iterator found = _techs.find(id);
 	if (found == _techs.end())
@@ -112,7 +112,7 @@ void ClanTech::makeTechInfo(Stream& st, ClanTechData& tech)
 	st << tech.techId << (GData::clanTechTable[tech.techId][tech.level].accNeeds + static_cast<UInt32>(tech.extra));
 }
 
-bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt16& extra, UInt16 count)
+bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt32& extra, UInt32 count)
 {
 	bool r = false;
 	extra += count;
@@ -142,7 +142,7 @@ bool ClanTech::techLevelUp(UInt8 id, UInt8& level, UInt16& extra, UInt16 count)
 	return r;
 }
 
-bool ClanTech::techLevelDown(UInt8 id, UInt8& level, UInt16& extra, UInt16 count)
+bool ClanTech::techLevelDown(UInt8 id, UInt8& level, UInt32& extra, UInt32 count)
 {
 	bool r = false;
 	if (extra >= count)
@@ -170,7 +170,7 @@ bool ClanTech::techLevelDown(UInt8 id, UInt8& level, UInt16& extra, UInt16 count
 	return r;
 }
 
-void ClanTech::addTech(UInt8 id, UInt16 flag, UInt8 level, UInt16 extra)
+void ClanTech::addTech(UInt8 id, UInt16 flag, UInt8 level, UInt32 extra)
 {
 	_techs[id] = ClanTechData(id, flag, level, extra);
 	DB5().PushUpdateData("REPLACE INTO `clan_tech`(`clanId`, `techId`, `level`, `extra`) VALUES(%u, %u, %u, %d)", _clan->getId(), id, level, extra);
@@ -184,7 +184,7 @@ UInt8 ClanTech::getLev(UInt8 id)
 	return found->second.level;
 }
 
-Int32 ClanTech::getExtra(UInt8 id)
+UInt32 ClanTech::getExtra(UInt8 id)
 {
 	Techs::iterator found = _techs.find(id);
 	if (found == _techs.end())
@@ -276,7 +276,7 @@ bool ClanTech::isTechFull(UInt8 id)
 	return getLev(id) >= static_cast<UInt8>(GData::clanTechTable[id].size()) - 1;
 }
 
-bool ClanTech::addAchieve(UInt16 ach)
+bool ClanTech::addAchieve(UInt32 ach)
 {
 	Techs::iterator found = _techs.find(1);
 	if (found == _techs.end())
@@ -293,7 +293,7 @@ bool ClanTech::addAchieve(UInt16 ach)
 	return true;
 }
 
-bool ClanTech::delAchieve(UInt16 ach)
+bool ClanTech::delAchieve(UInt32 ach)
 {
 	Techs::iterator found = _techs.find(1);
 	if (found == _techs.end())
