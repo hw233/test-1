@@ -1347,53 +1347,5 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 	}
 }
 
-void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
-{
-    //return; // TODO:
-	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-	UInt32 fighterId = 0;
-	UInt8 type = 0;
-    UInt8 reqType = 0;
-    brd >> reqType;
-    if(reqType == 0)
-    {
-        Stream st;
-        player->makeTrainFighterInfo(st);
-        player->send(st);
-        return;
-    }
-
-	brd >> fighterId >> type;
-	if(fighterId == 0)
-		return;
-    if(reqType == 1)
-    {
-        UInt32 hrs = 0;
-        brd >> hrs;
-        player->addTrainFighter(fighterId, type, hrs);
-    }
-    else if(reqType == 2)
-    {
-        switch (type)
-        {
-        case 0:
-            {
-                UInt32 hrs = 0;
-                brd >> hrs;
-                if(hrs > 0)
-                    player->accTrainFighter(fighterId, hrs);
-            }
-            break;
-        case 1:
-            player->cancelTrainFighter(fighterId);
-            break;
-        }
-    }
-}
-
-
 
 #endif // _WORLDOUTERMSGHANDLER_H_
