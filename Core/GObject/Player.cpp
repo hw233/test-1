@@ -2929,7 +2929,7 @@ namespace GObject
         UInt32 exp = 0;
 		if (data->checktime > 0)
 		{
-            UInt32 count = TimeUtil::Now() + (data->checktime * 3600) - data->trainend;
+            UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
             const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
             exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * count);
         }
