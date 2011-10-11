@@ -2750,7 +2750,9 @@ namespace GObject
 		UInt32 count = data->checktime;
 		if (count > 0)
 		{
-			UInt32 money = data->checktime * data->price / data->traintime;
+            UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
+            UInt32 money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
+			//UInt32 money = data->checktime * data->price / data->traintime;
 			if (data->priceType == 0)
 			{
 				if (money != 0)
@@ -2880,9 +2882,12 @@ namespace GObject
 			ConsumeInfo ci(AccTrainFighter, 0, 0);
 			useGold(goldUse, &ci);
 			const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
-			UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * count * 60);
-			fighter->addExp(exp);
-			data->accExp += exp;
+            for(int i = 0; i < count; ++ i)
+            {
+                UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * 60);
+                fighter->addExp(exp);
+                data->accExp += exp;
+            }
 			data->checktime -= count;
 			data->trainend -= count * 3600;
 			if (data->checktime == 0 || fighter->getExp() >= GetExp())
