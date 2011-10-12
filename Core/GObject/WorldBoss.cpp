@@ -9,6 +9,11 @@
 
 UInt8 _bossLvl = 0;
 
+static UInt8 getWorldBossCount()
+{
+    return 10;
+}
+
 namespace GObject
 {
     static UInt32 worldboss[] = {
@@ -100,6 +105,7 @@ namespace GObject
 
     void WorldBoss::refresh(UInt32 now)
     {
+        FastMutex::ScopedLock lk(m_lck);
         UInt8 level = getLevel(now);
         if (!level)
         {
@@ -188,63 +194,59 @@ namespace GObject
         std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
         if (i != m_boss.end())
         {
-                bool extra = false;
-                UInt16 count = 10;
-                if (i->second.count >= count)
-                {
-                    if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
-                    {
-                        pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
-                        extra = true;
-                    }
-                    else
-                    {
-                        SYSMSG_SEND(551, pl);
-                        return;
-                    }
-                }
+            UInt8 count = getWorldBossCount();
+            bool final = false;
+            if (i->second.count >= count)
+            {
+                final = true;
+            }
 
-                if (pl->attackCopyNpc(i->second.npcId, 2, 0, World::_wday==4?2:1))
+            if (pl->attackWorldBoss(i->second.npcId, 0, World::_wday==4?2:1, 1, final))
+            {
+                if (!final)
                 {
-                    if (!extra)
-                    {
-                        ++i->second.count;
-                        DB5().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
+                    ++i->second.count;
+                    DB5().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
 
-                        if (i->second.count < count)
+                    if (i->second.count <= count)
+                    {
+                        UInt32 npcID = i->second.npcId;
+                        UInt8 idx = (i->second.level-1)*5 + (i->second.count-1)/3 + 1;
+                        if (cfg.GMCheck)
                         {
-                            UInt32 npcID = i->second.npcId;
-                            UInt8 idx = (i->second.level-1)*5 + (i->second.count-1)/3 + 1;
-                            if (cfg.GMCheck)
-                            {
-                                if (idx < sizeof(worldboss)/sizeof(UInt32))
-                                    npcID = worldboss[idx];
-                            }
-                            else
-                            {
-                                if (idx < sizeof(worldboss)/sizeof(UInt32))
-                                    npcID = worldboss[idx];
-                            }
-                            add(i->first, npcID, i->second.level, i->second.count, true, false);
+                            if (idx < sizeof(worldboss)/sizeof(UInt32))
+                                npcID = worldboss[idx];
                         }
-
-                        Map* map = pl->GetMap();
-                        if (map)
+                        else
                         {
-                            if (i->second.count >= count)
-                            {
-                                // XXX:
+                            if (idx < sizeof(worldboss)/sizeof(UInt32))
+                                npcID = worldboss[idx];
+                        }
+                        add(i->first, npcID, i->second.level, i->second.count, true, false);
+                    }
 
-                                SYSMSG_BROADCASTV(553, i->second.npcId);
-                            }
-                            else
-                            {
-                                SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, i->second.npcId);
-                            }
+                    Map* map = pl->GetMap();
+                    if (map)
+                    {
+                        if (i->second.count >= count)
+                        {
+                            // XXX:
+
+                            SYSMSG_BROADCASTV(553, i->second.npcId);
+                        }
+                        else
+                        {
+                            SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, i->second.npcId);
                         }
                     }
                 }
-            //}
+                else
+                {
+                }
+            }
+            else
+            {
+            }
         }
     }
 

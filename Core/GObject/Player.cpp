@@ -1904,7 +1904,7 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-		if(cfg.GMCheck && buffLeft > now) 
+		if(cfg.GMCheck && buffLeft > now)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
 			return false;
