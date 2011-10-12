@@ -32,7 +32,7 @@ struct HIPlayerData
     UInt32 movecd;
     UInt32 fightcd;
     UInt32 injuredcd;
-    UInt32 straight;
+    UInt8 straight;
     UInt32 score;
     UInt8 lasttype;
     std::vector<Task> compass; // 击杀任务

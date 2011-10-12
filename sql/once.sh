@@ -4,7 +4,7 @@ function update_object()
 {
     echo "update_object"
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111010_2.sql
-    . clearshiyamen.sh
+    #. clearshiyamen.sh
 }
 
 function update_data()

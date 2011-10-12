@@ -617,7 +617,7 @@ void HeroIsland::playerInfo(Player* player)
                 }
             }
 
-            st << pd->compass[i].status;
+            st << pd->compass[i-1].status;
         }
         else
         {
