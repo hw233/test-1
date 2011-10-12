@@ -303,11 +303,13 @@ struct DailyReq
 	MESSAGE_DEF(REQ::DAILY);
 };
 
+#if 0
 struct ChallengePlayerReq
 {
 	std::string _name;
 	MESSAGE_DEF1(REQ::CHANGE_NAME, std::string, _name);
 };
+#endif
 
 struct AttackNpcReq
 {
@@ -2104,6 +2106,7 @@ void OnRequestChallengeReq( GameMsgHdr& hdr, RequestChallengeReq& rcr)
 	attacker->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + turns * 2);
 }
 
+#if 0
 void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 {
 	MSG_QUERY_PLAYER(player);
@@ -2220,6 +2223,7 @@ void OnChallengePlayerReq( GameMsgHdr& hdr, ChallengePlayerReq& cpr )
 	player->setBuffData(PLAYER_BUFF_PKLOCK, now + 20 * 60);
 	target->addFoe(player);
 }
+#endif
 
 void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 {
