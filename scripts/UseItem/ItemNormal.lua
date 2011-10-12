@@ -376,6 +376,7 @@ function ItemNormal_00008931(iid, num, bind, param)
 end
 
 function ItemNormal_00000011(iid, num, bind, param)
+    return false
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	local num2 = player:getBuffData(0x04, os.time());

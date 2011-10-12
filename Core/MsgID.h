@@ -110,7 +110,7 @@ namespace REQ
     /**日常*/                                 
     const UInt8 DAILY               = 0xAF;// 0x5F
     /**换名字*/
-    const UInt8 CHANGE_NAME         = 0x60;
+    //const UInt8 CHANGE_NAME         = 0x60;
     /**加入国战*/
     const UInt8 CAMPS_WAR_JOIN      = 0x90;// 0x62
     /**副本数据*/
@@ -359,7 +359,7 @@ namespace REP
     const UInt8 COPY_END_FIGHT      = 0xAE;// 0x5C
     const UInt8 DAILY_DATA          = 0xAF;// 0x5F
 
-    const UInt8 CHANGE_NAME         = 0x60;
+    //const UInt8 CHANGE_NAME         = 0x60;
     const UInt8 COUNTRY_WAR_JOIN    = 0x90;// 0x62
     const UInt8 COUNTRY_WAR_PROCESS = 0x91;// 0x63
     const UInt8 COUNTRY_WAR_RESULT  = 0x92;// 0x64
