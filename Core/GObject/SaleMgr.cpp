@@ -44,6 +44,7 @@ void SaleMgr::addRowSale(SaleData * sale)
 	UInt8 subClass = sale->_item->getClass();
 	UInt8 quality = sale->_item->getQuality();
 	UInt32 typeId = sale->_item->GetItemType().getId();
+    UInt8 career = sale->_item->GetCareer();
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
@@ -51,17 +52,30 @@ void SaleMgr::addRowSale(SaleData * sale)
 	std::vector<SaleData *>& sales = _saleRow[stIdx][typeId];
 	sales.push_back(sale);
 	std::sort(sales.begin(), sales.end(), SaleRowSorter);
-	++ _itemStat[stIdx][quality];
-	++ _itemStat[stIdx][0];
-	++ _itemStat[0][quality];
-	++ _itemStat[0][0];
+	++ _itemStat[career][stIdx][quality];
+	++ _itemStat[career][stIdx][0];
+	++ _itemStat[career][0][quality];
+	++ _itemStat[career][0][0];
+    if(career != 0)
+    {
+        ++ _itemStat[0][stIdx][quality];
+        ++ _itemStat[0][stIdx][0];
+        ++ _itemStat[0][0][quality];
+        ++ _itemStat[0][0][0];
+    }
+
 	if (pIdx != stIdx && pIdx != 0)
 	{
 		std::vector<SaleData *>& sales = _saleRow[pIdx][typeId];
 		sales.push_back(sale);
 		std::sort(sales.begin(), sales.end(), SaleRowSorter);
-		++ _itemStat[pIdx][quality];
-		++ _itemStat[pIdx][0];
+		++ _itemStat[career][pIdx][quality];
+		++ _itemStat[career][pIdx][0];
+        if(career != 0)
+        {
+            ++ _itemStat[0][pIdx][quality];
+            ++ _itemStat[0][pIdx][0];
+        }
 	}
 }
 
@@ -70,6 +84,7 @@ void SaleMgr::delRowSale(SaleData * sale)
 	UInt8 subClass = sale->_item->getClass();
 	UInt8 quality = sale->_item->getQuality();
 	UInt32 typeId = sale->_item->GetItemType().getId();
+    UInt8 career = sale->_item->GetCareer();
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
@@ -79,24 +94,43 @@ void SaleMgr::delRowSale(SaleData * sale)
 	if (found != sales.end())
 		sales.erase(found);
 
-	UInt32& cnt1 = _itemStat[stIdx][quality];
+	UInt32& cnt1 = _itemStat[career][stIdx][quality];
 	if (cnt1 > 0) -- cnt1;
-	UInt32& cnt2 = _itemStat[stIdx][0];
+	UInt32& cnt2 = _itemStat[career][stIdx][0];
 	if (cnt2 > 0) -- cnt2;
-	UInt32& cnt3 = _itemStat[0][quality];
+	UInt32& cnt3 = _itemStat[career][0][quality];
 	if (cnt3 > 0) -- cnt3;
-	UInt32& cnt4 = _itemStat[0][0];
+	UInt32& cnt4 = _itemStat[career][0][0];
 	if (cnt4 > 0) -- cnt4;
+    if(career != 0)
+    {
+        UInt32& cnt1 = _itemStat[0][stIdx][quality];
+        if (cnt1 > 0) -- cnt1;
+        UInt32& cnt2 = _itemStat[0][stIdx][0];
+        if (cnt2 > 0) -- cnt2;
+        UInt32& cnt3 = _itemStat[0][0][quality];
+        if (cnt3 > 0) -- cnt3;
+        UInt32& cnt4 = _itemStat[0][0][0];
+        if (cnt4 > 0) -- cnt4;
+    }
+
 	if (pIdx != stIdx && pIdx != 0)
 	{
 		std::vector<SaleData *>& sales = _saleRow[pIdx][typeId];
 		std::vector<SaleData *>::iterator found = std::find(sales.begin(), sales.end(), sale);
 		if (found != sales.end())
 			sales.erase(found);
-		UInt32& cnt5 = _itemStat[pIdx][quality];
+		UInt32& cnt5 = _itemStat[career][pIdx][quality];
 		if (cnt5 > 0) -- cnt5;
-		UInt32& cnt6 = _itemStat[pIdx][0];
+		UInt32& cnt6 = _itemStat[career][pIdx][0];
 		if (cnt6 > 0) -- cnt6;
+        if(career != 0)
+        {
+            UInt32& cnt5 = _itemStat[0][pIdx][quality];
+            if (cnt5 > 0) -- cnt5;
+            UInt32& cnt6 = _itemStat[0][pIdx][0];
+            if (cnt6 > 0) -- cnt6;
+        }
 	}
 }
 
@@ -333,7 +367,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
             else
                 req = ReqCvt[0];
 
-			UInt16 sz = static_cast<UInt16>(saleRowStat(req, color));
+			UInt16 sz = static_cast<UInt16>(saleRowStat(req, color, career));
 			UInt16 end = start + count;
 			if (end > sz)
 				end = sz;
@@ -345,7 +379,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 			UInt16 readCount = 0;
 			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
-			if (shiftSingleSaleList(req, color, start, offset1, offset2))
+			if (shiftSingleSaleList(req, color, career, start, offset1, offset2))
 				readCount = appendSingleSaleList(player, st, req, career, color, count, offset1, offset2);
 			st.data<UInt16>(6) = readCount;
 			st << Stream::eos;
@@ -354,7 +388,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 		else
 		{
 			//请求全部列表
-			UInt16 sz = static_cast<UInt16>(saleRowStat(0, color));
+			UInt16 sz = static_cast<UInt16>(saleRowStat(0, color, career));
 			UInt16 end = start + count;
 			if (end > sz)
 				end = sz;
@@ -367,7 +401,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 			UInt16 readCount = 0;
 			Stream st(REP::SALE_LIST);
 			st << start << static_cast<UInt16>(0) << sz;
-			if (shiftTotalSaleList(color, start, type, filter1Offset, filter0Offset))
+			if (shiftTotalSaleList(color, career, start, type, filter1Offset, filter0Offset))
 				readCount = appendTotalSaleList(player, st, type, career, color, count, filter1Offset, filter0Offset);
 			st.data<UInt16>(6) = readCount;
 			st << Stream::eos;
@@ -434,9 +468,9 @@ UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UIn
 	return readCount;
 }
 
-bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt16 start, UInt16& offset1, UInt16& offset2)
+bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt8 career, UInt16 start, UInt16& offset1, UInt16& offset2)
 {
-	if (start >= _itemStat[type][quality])
+	if (start >= _itemStat[career][type][quality])
 		return false;
 	UInt16 first = 0, second = 0;
 	UInt16 count = 0;
@@ -447,9 +481,22 @@ bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt16 start, UInt1
 		std::vector<SaleData *>& sales = it->second;
 		if (sales.empty())
 			continue; 
-		if (quality != 0)
+        if (quality != 0 && career != 0)
+        {
+			// 指定颜色,职业
+			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
+			{
+                if (sales[offset2]->_item->getQuality() == quality && sales[offset2]->_item->GetCareer() == career)
+				{
+					++ count;
+					if (count >= start)
+						return true;
+				}
+			}
+        }
+        else if (quality != 0)
 		{
-			//指定颜色
+			// 指定颜色
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
 				if (sales[offset2]->_item->getQuality() == quality)
@@ -460,9 +507,22 @@ bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt16 start, UInt1
 				}
 			}
 		}
+        else if(career != 0)
+        {
+			// 指定职业
+			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
+			{
+                if (sales[offset2]->_item->GetCareer() == career)
+				{
+					++ count;
+					if (count >= start)
+						return true;
+				}
+			}
+        }
 		else
 		{
-			//任何颜色
+			//任何颜色,职业
 			second += sales.size();
 			if (start >= first && start < second)
 			{
@@ -477,7 +537,7 @@ bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt16 start, UInt1
 }
 
 
-bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt16& offset, UInt16& offset1, UInt16& offset2)
+bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt8 career, UInt16& offset, UInt16& offset1, UInt16& offset2)
 {
 	UInt16 first = 0, second = 0;
 	UInt16 count = 0;
@@ -488,22 +548,48 @@ bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt16& offset, UI
 		std::vector<SaleData *>& sales = it->second;
 		if (sales.empty())
 			continue; 
-		if (quality != 0)
-		{
+        if(quality != 0 && career != 0)
+        {
+			//指定颜色,职业
+			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
+			{
+                if (sales[offset2]->_item->getQuality() == quality && sales[offset2]->_item->GetCareer() == career)
+                {
+                    ++ count;
+                    if (count >= offset)
+                        return true;
+                }
+			}
+		}
+        else if(quality != 0)
+        {
 			//指定颜色
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
-				if (sales[offset2]->_item->getQuality() == quality)
-				{
-					++ count;
-					if (count >= offset)
-						return true;
-				}
+                if (sales[offset2]->_item->getQuality() == quality)
+                {
+                    ++ count;
+                    if (count >= offset)
+                        return true;
+                }
 			}
-		}
+        }
+        else if(career != 0)
+        {
+			//指定职业
+			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
+			{
+                if (sales[offset2]->_item->GetCareer() == career)
+                {
+                    ++ count;
+                    if (count >= offset)
+                        return true;
+                }
+			}
+        }
 		else
 		{
-			//任何颜色
+			//任何颜色,职业
 			second += sales.size();
 			if (offset >= first && offset < second)
 			{
@@ -521,13 +607,13 @@ bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt16& offset, UI
 	return false;
 }
 
-bool SaleMgr::shiftTotalSaleList(UInt8 quality, UInt16 offset, UInt8& type, UInt16& filter1Offset, UInt16& filter0Offset)
+bool SaleMgr::shiftTotalSaleList(UInt8 quality, UInt8 career, UInt16 offset, UInt8& type, UInt16& filter1Offset, UInt16& filter0Offset)
 {
-	if (offset > _itemStat[0][quality])
+	if (offset > _itemStat[career][0][quality])
 		return false;
 	for (type = 1; type <= 5; ++type)
 	{
-		if (shiftSingleSaleList2(type, quality, offset, filter1Offset, filter0Offset))
+		if (shiftSingleSaleList2(type, quality, career, offset, filter1Offset, filter0Offset))
 			return true;
 	}
 	return false;
