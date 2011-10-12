@@ -40,14 +40,13 @@ struct HIPlayerData
 
 struct RareAnimals
 {
-    RareAnimals() : id(0), last(0), cd(0), cdend(0) {}
+    RareAnimals() : id(0), last(0), cdend(0), cd(0) {}
 
     UInt32 id;
     GData::AttrExtra attr;
     UInt32 last;
-    UInt32 cd;
-
     UInt32 cdend;
+    UInt32 cd;
 };
 
 class HeroIsland

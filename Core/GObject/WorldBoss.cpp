@@ -191,7 +191,7 @@ namespace GObject
             //if (i->second.npcId == npcid)
             //{ // XXX:
                 bool vip = false;
-                UInt16 count = 9;
+                UInt16 count = 10;
                 if (i->second.count >= count)
                 {
                     //if (pl->getVipLevel() >= 1)

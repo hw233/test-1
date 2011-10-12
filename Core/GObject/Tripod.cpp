@@ -26,14 +26,20 @@ void Tripod::getTripodInfo(Player* pl)
 
 void Tripod::sendTripodInfo(Player* pl, TripodData& td)
 {
+    if (pl->getVipLevel() > 2 && td.quality < 3)
+    {
+        td.quality = 3;
+        td.needgen = 1;
+    }
+
     Stream st(REP::TRIPOD_INFO);
     st << static_cast<UInt8>(0);
     st << td.fire;
     st << td.quality;
 
     genAward(td, st);
-    DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
-            td.needgen, td.itemId, td.num, pl->getId());
+    DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+            td.needgen, td.quality, td.itemId, td.num, pl->getId());
 
     st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << td.soul << Stream::eos;
     pl->send(st);

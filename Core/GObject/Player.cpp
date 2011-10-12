@@ -1011,8 +1011,11 @@ namespace GObject
 		if(id >= PLAYER_BUFF_COUNT || _buffData[id] == data)
 			return;
 		_buffData[id] = data;
-		if(writedb)
-			sendModification(0x40 + id, data);
+		if(writedb || id == PLAYER_BUFF_HIWEAK ||
+                id == PLAYER_BUFF_HIFIGHT ||
+                id == PLAYER_BUFF_HIMASTER_SOUL ||
+                id == PLAYER_BUFF_HIMOVE)
+			sendModification(0x40 + id, data, writedb);
 	}
 
 	void Player::addBuffData(UInt8 id, UInt32 data)
@@ -1824,7 +1827,7 @@ namespace GObject
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
-		if(buffLeft > now && !ato)
+		if(cfg.GMCheck && buffLeft > now && !ato)
 		{
 			sendMsgCode(0, 1407, buffLeft - now);
 			return false;
