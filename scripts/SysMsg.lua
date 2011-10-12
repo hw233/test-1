@@ -505,9 +505,9 @@ sysMsg:set(2001, 0, "剑仙 %s 见您的修炼洞府灵气浓郁,便蛮横地占
 sysMsg:set(2002, 0, "火种制作成功")
 sysMsg:set(2003, 0, "火种制作失败，没有相关物品")
 
-sysMsg:set(2004, 0x35, "获得修为值%u")
+sysMsg:set(2004, 0x35, "[f:%u:%s]获得修为值%u")
 sysMsg:set(2005, 1, "[f:%u:%s]获得修为值%u")
-sysMsg:set(2006, 0x35, "消耗修为值%u")
+sysMsg:set(2006, 0x35, "[f:%u:%s]消耗修为值%u")
 sysMsg:set(2007, 1, "[f:%u:%s]消耗修为值%u")
 sysMsg:set(2008, 0x35, "修为不够，可以通过修炼来得到修为值")
 

@@ -1735,7 +1735,7 @@ namespace GObject
         if (!ng)
             return false;
 
-        if (needtype && ng->getType()) // XXX: 必须是野外怪
+        if (cfg.GMCheck && needtype && ng->getType()) // XXX: 必须是野外怪
             return false;
 
 		if(GameAction()->RunExploreTask(this, npcId))
@@ -1895,6 +1895,63 @@ namespace GObject
 
 		if(!res)
 			checkDeath();
+
+		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+		return res;
+	}
+
+	bool Player::attackWorldBoss( UInt32 npcId, UInt8 type, UInt8 expfactor, UInt8 lootlvl, bool final )
+	{
+		UInt32 now = TimeUtil::Now();
+		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
+		if(cfg.GMCheck && buffLeft > now) 
+		{
+			sendMsgCode(0, 1407, buffLeft - now);
+			return false;
+		}
+		checkLastBattled();
+		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+		if(it == GData::npcGroups.end())
+			return false;
+
+		GData::NpcGroup * ng = it->second;
+		Battle::BattleSimulator bsim(0, this, ng->getName(), ng->getLevel(), false);
+		PutFighters( bsim, 0 );
+		ng->putFighters( bsim );
+		bsim.start();
+		Stream& packet = bsim.getPacket();
+		if(packet.size() <= 8)
+			return false;
+
+        UInt8 atoCnt = 0;
+        UInt16 ret = 0x0100;
+		bool res = bsim.getWinner() == 1;
+		if(res)
+		{
+			ret = 0x0101;
+			_lastNg = ng;
+            if (final) // TODO:
+            {
+                pendExp(ng->getExp()*expfactor);
+            }
+            else
+            {
+                pendExp(ng->getExp()*expfactor);
+                ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
+            }
+		}
+
+        Stream st(REP::ATTACK_NPC);
+        st << ret << _playerData.lastExp << static_cast<UInt8>(0);
+        UInt8 sz = _lastLoot.size();
+        st << sz;
+        for(UInt8 i = 0; i < sz; ++ i)
+        {
+            st << _lastLoot[i].id << _lastLoot[i].count;
+        }
+        st.append(&packet[8], packet.size() - 8);
+        st << Stream::eos;
+        send(st);
 
 		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 		return res;

@@ -1131,7 +1131,7 @@ namespace GObject
         }
 
         int k = -1;
-        int i = -1;
+        int i = 0;
         while (true)
         {
             if (!config[i].sid)
@@ -1146,7 +1146,7 @@ namespace GObject
         if (k < 0)
             return false;
 
-        StringTokenizer tk(config[k].nums, ",");
+        StringTokenizer tk(config[i].nums, ",");
         if (!tk.count())
             return false;
 
