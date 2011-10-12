@@ -346,6 +346,12 @@ bool Clan::leave(Player * player)
         return false;
     }
 
+    if (player != getOwner() && now > member->joinTime && now - member->joinTime < 24 * 60 * 60)
+    {
+		player->sendMsgCode(0, 1324);
+		return false;
+    }
+
 	_members.erase(found);
 	delete member;
 
