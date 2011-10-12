@@ -1654,6 +1654,7 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
             setStatusChange2( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAura, value, skill->last, scList, scCount, false);
         }
         else
@@ -1667,6 +1668,7 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = bo->_attack * skill->effect->atkP + skill->effect->atk;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_attack * skill->effect->atkP + skill->effect->atk;
             setStatusChange2( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, value, skill->last, scList, scCount, false);
         }
         else
@@ -1680,6 +1682,7 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = bo->_defend * skill->effect->defP + skill->effect->def;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_defend * skill->effect->defP + skill->effect->def;
             setStatusChange2( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stDef, value, skill->last, scList, scCount, false);
         }
         else
@@ -1693,6 +1696,7 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
             setStatusChange2( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, value, skill->last, scList, scCount, false);
         }
         else
@@ -1706,6 +1710,7 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         float value = bo->_magdef * skill->effect->magdefP + skill->effect->magdef;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_magdef * skill->effect->magdefP + skill->effect->magdef;
             setStatusChange2( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagDef, value, skill->last, scList, scCount, false);
         }
         else
@@ -1837,6 +1842,7 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
         float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
             setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAura, value, skill->last, scList, scCount, false);
         }
         else
@@ -1850,6 +1856,7 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
         float value = bo->_attack * skill->effect->atkP + skill->effect->atk;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_attack * skill->effect->atkP + skill->effect->atk;
             setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAtk, value, skill->last, scList, scCount, false);
         }
         else
@@ -1863,6 +1870,7 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
         float value = bo->_defend * skill->effect->defP + skill->effect->def;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_defend * skill->effect->defP + skill->effect->def;
             setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stDef, value, skill->last, scList, scCount, false);
         }
         else
@@ -1876,6 +1884,7 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
         float value = bo->_magatk * skill->effect->magatkP + skill->effect->magatk;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_magatk * skill->effect->magatkP + skill->effect->magatk;
             setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagAtk, value, skill->last, scList, scCount, false);
         }
         else
@@ -1889,6 +1898,7 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
         float value = bo->_magdef * skill->effect->magdefP + skill->effect->magdef;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_magdef * skill->effect->magdefP + skill->effect->magdef;
             setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stMagDef, value, skill->last, scList, scCount, false);
         }
         else
