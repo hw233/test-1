@@ -4,7 +4,7 @@ H=localhost
 U=kingxin
 P=kingxin
 PT=3306
-DBL=log_8888
+DBL=log_6666
 
 OPTIONS="Yes/No/Exit"
 IFS=/
