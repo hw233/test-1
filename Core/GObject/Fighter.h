@@ -73,6 +73,7 @@ public:
 	inline UInt64 getExp() {return _exp;}
 	inline UInt32 getPExp() {return _pexp;}
 	inline UInt32 getPExpMax() {return _pexpMax;}
+    inline bool isPExpFull() { return _pexpMax <= _pexp; }
 	inline float getPotential() {return _potential;}
 	inline UInt16 getCurrentHP() {return _hp;}
 

@@ -239,9 +239,9 @@ bool Clan::kick(Player * player, UInt64 pid)
 {
 	if (_clanBattle->isInBattling())
 	{
-		player->sendMsgCode(0, 1317);
-		return false;
-	}
+        player->sendMsgCode(0, 1317);
+        return false;
+    }
 
 	Mutex::ScopedLock lk(_mutex);
 	Members::iterator found = find(pid);

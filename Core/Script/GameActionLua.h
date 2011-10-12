@@ -114,7 +114,7 @@ namespace Script
 
 		bool RunTaskItemUse(Player* player, UInt32 itemId);	
 		bool RunItemTaskUse(Player* player, UInt32 itemId);	
-		bool RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind);
+		UInt16 RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind);
 
 		void RunAutoRegen(Player* player, Fighter* fighter);
 

@@ -1008,11 +1008,12 @@ namespace GObject
 				ItemBase* item = GetItem(id, bind > 0);
 				if (item == NULL || item->Count() < num)
 					ret = false;
-				else if (GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
+				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
-                    udpLog(item->getClass(), id, num, GData::store.getPrice(id), "sub");
-					DelItem2(item, num);
-					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, num, TimeUtil::Now());
+                    UInt8 rn = n<num?n:num;
+                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+					DelItem2(item, rn);
+					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
 					ret = true;
 				}				
 			}
@@ -1020,14 +1021,15 @@ namespace GObject
 			{
 				if (GetItemAnyNum(id) < num)
 					ret = false;
-				else if (GameAction()->RunItemNormalUse(m_Owner, id, param, num, false))
+				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, false))
 				{
+                    UInt8 rn = n<num?n:num;
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    udpLog(item->getClass(), id, num, GData::store.getPrice(id), "sub");
-					DelItemAny(id, num);
-					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, num, TimeUtil::Now());
+                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+					DelItemAny(id, rn);
+					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
 					ret = true;
 				}
 			}

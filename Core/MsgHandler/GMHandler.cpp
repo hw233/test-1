@@ -140,6 +140,8 @@ GMHandler::GMHandler()
     Reg(3, "hiattack", &GMHandler::OnAttackHI);
     Reg(3, "himove", &GMHandler::OnMoveHI);
     Reg(3, "hiid", &GMHandler::OnGetIDHI);
+    Reg(3, "hitask", &GMHandler::OnTaskHI);
+    Reg(3, "hici", &GMHandler::OnCiTaskHI);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2381,5 +2383,15 @@ void GMHandler::OnMoveHI(GObject::Player *player, std::vector<std::string>& args
 void GMHandler::OnGetIDHI(GObject::Player *player, std::vector<std::string>& args)
 {
     heroIsland.getIdentity(player);
+}
+
+void GMHandler::OnTaskHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    heroIsland.startCompass(player);
+}
+
+void GMHandler::OnCiTaskHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    heroIsland.commitCompass(player);
 }
 
