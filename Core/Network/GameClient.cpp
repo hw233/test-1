@@ -49,30 +49,35 @@ int GameClient::parsePacket( struct evbuffer * buf, int &off, int &len )
 	}
 
     // XXX: GET / HTTP/1.1\r\nHost: s278.app27036.qqopenapp.com:443\r\n\r\n
-    if (buf_[2] == 'T' && buf_[0] == 'G' && buf_[1] == 'E' && buf_[3] == ' ' && buf_[4] == '/')
+    if (l > 48 && buf_[2] == 'T' && buf_[0] == 'G' && buf_[1] == 'E' && buf_[3] == ' ' && buf_[4] == '/')
     {
-        evbuffer_drain(buf, 16);
-        // XXX: the length of first packet must be large than 64bytes
-        UInt8 * buf__ = static_cast<UInt8 *>(evbuffer_pullup(buf, 64));
-        if (buf__[2] == 's' && buf__[0] == 'H' && buf__[1] == 'o' && buf__[3] == 't' && buf__[4] == ':')
+        // XXX: the length of first packet must be large than 48bytes
+        UInt8 off_ = 16;
+        if (buf_[off_+2] == 's' && buf_[off_] == 'H' && buf_[off_+1] == 'o' && buf_[off_+3] == 't' && buf_[off_+4] == ':')
         {
-            size_t i = 0;
-            for (; i < 64; ++i)
+            bool god = false;
+            size_t i = off_;
+            for (; i < l-4; ++i)
             {
-                if (buf__[i] == '\r' && buf__[i+1] == '\n' && buf__[i+2] == '\r' && buf__[i+3] == '\n')
+                if (buf_[i] == '\r' && buf_[i+1] == '\n' && buf_[i+2] == '\r' && buf_[i+3] == '\n')
                 {
                     i += 4;
+                    god = true;
                     break;
                 }
             }
-            evbuffer_drain(buf, i);
-            buf_ = static_cast<UInt8 *>(evbuffer_pullup(buf, 5));
-        }
-        else
-        {
-            off = 0;
-            len = 0;
-            return -1;
+
+            if (god)
+            {
+                evbuffer_drain(buf, i);
+                buf_ = static_cast<UInt8 *>(evbuffer_pullup(buf, 5));
+                if (!buf_)
+                {
+                    off = 0;
+                    len = 0;
+                    return 0;
+                }
+            }
         }
     }
 
