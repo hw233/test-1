@@ -5106,8 +5106,8 @@ function ItemNormal_athletics_4(iid, num, bind, param)
 
     -- 补髓益元丹
     package:AddItem(507, 1, true, 0, 2);
-    -- 凝神丹
-    package:AddItem(508, 1, true, 0, 2);
+    -- 凝神丹易筋丹
+    package:AddItem(509, 1, true, 0, 2);
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
