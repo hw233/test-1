@@ -12,9 +12,9 @@ UInt8 _bossLvl = 0;
 namespace GObject
 {
     static UInt32 worldboss[] = {
-        5466, 5467, 5468, 5469,
-        5162, 5473, 5474, 5475,
-        5103, 5470, 5471, 5472,
+        5466, 5467, 5468, 5469, 5469,
+        5162, 5473, 5474, 5475, 5475,
+        5103, 5470, 5471, 5472, 5472,
     };
 
     bool WorldBoss::isWorldBoss(UInt32 npcid)
@@ -114,7 +114,7 @@ namespace GObject
         reset();
 
         UInt32 npcid = 0;
-        UInt8 idx = (level-1)*4;
+        UInt8 idx = (level-1)*5;
         if (cfg.GMCheck)
         {
             if (idx >= sizeof(worldboss)/sizeof(UInt32))
@@ -172,9 +172,9 @@ namespace GObject
             return;
 
         bool in = false;
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < 5; ++i)
         {
-            if (worldboss[i+(m_level-1)*4] == npcid)
+            if (worldboss[i+(m_level-1)*5] == npcid)
             {
                 in = true;
                 break;
@@ -188,35 +188,25 @@ namespace GObject
         std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
         if (i != m_boss.end())
         {
-            //if (i->second.npcId == npcid)
-            //{ // XXX:
-                bool vip = false;
+                bool extra = false;
                 UInt16 count = 10;
                 if (i->second.count >= count)
                 {
-                    //if (pl->getVipLevel() >= 1)
-                    //{
-                        if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
-                        {
-                            pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
-                            vip = true;
-                        }
-                        else
-                        {
-                            SYSMSG_SEND(551, pl);
-                            return;
-                        }
-                    //}
-                    //else
-                    //{
-                    //    SYSMSG_SEND(550, pl);
-                    //    return;
-                    //}
+                    if (!pl->getBuffData(PLAYER_BUFF_WBOSS))
+                    {
+                        pl->setBuffData(PLAYER_BUFF_WBOSS, 1, true);
+                        extra = true;
+                    }
+                    else
+                    {
+                        SYSMSG_SEND(551, pl);
+                        return;
+                    }
                 }
 
                 if (pl->attackCopyNpc(i->second.npcId, 2, 0, World::_wday==4?2:1))
                 {
-                    if (!vip)
+                    if (!extra)
                     {
                         ++i->second.count;
                         DB5().PushUpdateData("DELETE FROM `worldboss` WHERE location = %u", loc);
@@ -224,7 +214,7 @@ namespace GObject
                         if (i->second.count < count)
                         {
                             UInt32 npcID = i->second.npcId;
-                            UInt8 idx = (i->second.level-1)*4 + (i->second.count-1)/3 + 1;
+                            UInt8 idx = (i->second.level-1)*5 + (i->second.count-1)/3 + 1;
                             if (cfg.GMCheck)
                             {
                                 if (idx < sizeof(worldboss)/sizeof(UInt32))
@@ -243,6 +233,8 @@ namespace GObject
                         {
                             if (i->second.count >= count)
                             {
+                                // XXX:
+
                                 SYSMSG_BROADCASTV(553, i->second.npcId);
                             }
                             else

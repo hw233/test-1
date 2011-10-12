@@ -543,6 +543,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
         else
         {
+            moveTo(pd->player, 0, false);
+            pd->injuredcd = now + 30;
+            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd);
         }
 
         return true;
