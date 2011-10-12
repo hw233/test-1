@@ -763,8 +763,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
     defList[defCount].pos = area_target->getPos();
     if(defList[defCount].damType == e_Poison)
     {
-        area_target->makeDamage(dmg2);
-        defList[defCount].damage = dmg2;
+        area_target->makeDamage(dmg2*0.5);
+        defList[defCount].damage = dmg2*0.5;
         defList[defCount].leftHP = area_target->getHP();
         ++defCount;
         dmg += dmg2;
@@ -784,8 +784,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
         defList[defCount].pos = area_target->getPos();
         if(defList[defCount].damType == e_Poison)
         {
-            area_target->makeDamage(dmg2 * 1.5);
-            defList[defCount].damage = dmg2 * 1.5;
+            area_target->makeDamage(dmg2);
+            defList[defCount].damage = dmg2;
             defList[defCount].leftHP = area_target->getHP();
             ++defCount;
             dmg += dmg2;
@@ -806,8 +806,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
             if(defList[defCount].damType == e_Poison)
             {
                 defList[defCount].damType = e_UnPoison;
-                area_target->makeDamage(dmg2 * 2);
-                defList[defCount].damage = dmg2 * 2;
+                area_target->makeDamage(dmg2 * 1.5);
+                defList[defCount].damage = dmg2 * 1.5;
                 defList[defCount].leftHP = area_target->getHP();
                 ++defCount;
                 dmg += dmg2;
@@ -1049,6 +1049,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         case 1:
             {
                 UInt32 dmg = abs(bo->calcPoison(boSkill));
+                bo->makeDamage(dmg*0.5);
+                defList[defCount].damage = dmg*0.5;
+                defList[defCount].leftHP = bo->getHP();
+                defList[defCount].pos = target_pos;
+                ++defCount;
+                if(bo->getHP() == 0)
+                    break;
+
                 bo->makeDamage(dmg);
                 defList[defCount].damage = dmg;
                 defList[defCount].leftHP = bo->getHP();
@@ -1059,14 +1067,6 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
                 bo->makeDamage(dmg*1.5);
                 defList[defCount].damage = dmg*1.5;
-                defList[defCount].leftHP = bo->getHP();
-                defList[defCount].pos = target_pos;
-                ++defCount;
-                if(bo->getHP() == 0)
-                    break;
-
-                bo->makeDamage(dmg*2);
-                defList[defCount].damage = dmg*2;
             }
             break;
         case 2:
