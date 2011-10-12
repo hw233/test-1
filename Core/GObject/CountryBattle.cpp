@@ -395,7 +395,7 @@ void CountryBattle::end(UInt32 curtime)
                 }
             }
 #else
-            UInt16 count = awardTime / 3600 + (awardTime % 3600) ? 1: 0;
+            UInt16 count = awardTime / 3600 + ((awardTime % 3600) ? 1: 0);
             if (rewardid[side] == PLAYER_BUFF_TRAINP1 && count)
             {
                 MailPackage::MailItem mitem[1] = {{55, count}};

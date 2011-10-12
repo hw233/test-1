@@ -193,7 +193,7 @@ function ItemNormal_00000001(iid, num, bind, param)
 	hp = num * 300;
 	fgt:regenHP(hp);
 	package:DelItemSendMsg(1, player);
-	return true;
+	return num;
 end
 
 
@@ -215,7 +215,7 @@ function ItemNormal_00008901(iid, num, bind, param)
 	hp = num * 600;
 	fgt:regenHP(hp);
 	package:DelItemSendMsg(8901, player);
-	return true;
+	return num;
 end
 
 function ItemNormal_00008902(iid, num, bind, param)
@@ -236,7 +236,7 @@ function ItemNormal_00008902(iid, num, bind, param)
 	hp = num * 1200;
 	fgt:regenHP(hp);
 	package:DelItemSendMsg(8902, player);
-	return true;
+	return num;
 end
 
 function ItemNormal_00008903(iid, num, bind, param)
@@ -257,7 +257,7 @@ function ItemNormal_00008903(iid, num, bind, param)
 	hp = num * 2000;
 	fgt:regenHP(hp);
 	package:DelItemSendMsg(8903, player);
-	return true;	
+	return num;	
 end
 
 function ItemNormal_00008904(iid, num, bind, param)
@@ -269,7 +269,7 @@ function ItemNormal_00008904(iid, num, bind, param)
   end
   if player:regenHP(num*300) then
 	package:DelItemSendMsg(8904, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -284,7 +284,7 @@ function ItemNormal_00008905(iid, num, bind, param)
   end
   if player:regenHP(num*800) then
 	package:DelItemSendMsg(8905, player);
-	return true;
+	return num;
   else
     return false;
   end
@@ -299,7 +299,7 @@ function ItemNormal_00008906(iid, num, bind, param)
   end
   if player:regenHP(num*1500) then
 	package:DelItemSendMsg(8906, player);
-	return true;
+	return num;
   else
     return false;
   end
@@ -314,7 +314,7 @@ function ItemNormal_00008907(iid, num, bind, param)
   end
   if player:regenHP(num*3000) then
     package:DelItemSendMsg(8907, player);
-	return true;
+	return num;
   else
     return false;
   end
@@ -327,7 +327,7 @@ function ItemNormal_00000006(iid, num, bind, param)
   player:setBuffData(3, 0, true)
   if ItemNormal_AddBuff(player, 2, 1800, num, 18000) then
   	package:DelItemSendMsg(6, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -340,7 +340,7 @@ function ItemNormal_00000007(iid, num, bind, param)
   player:setBuffData(2, 0, true)
   if ItemNormal_AddBuff(player, 3, 1800, num, 18000) then
    	package:DelItemSendMsg(7, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -364,7 +364,7 @@ function ItemNormal_00000009(iid, num, bind, param)
   player:setBuffData(0, num2, true);
   player:autoRegenAll();
   package:DelItemSendMsg(9, player);
-  return true
+  return num
 end
 
 function ItemNormal_00008931(iid, num, bind, param)
@@ -372,7 +372,7 @@ function ItemNormal_00008931(iid, num, bind, param)
   local package = player:GetPackage();
   package:DelItemSendMsg(8931, player);
   player:moveToHome()
-  return true
+  return num
 end
 
 function ItemNormal_00000011(iid, num, bind, param)
@@ -388,7 +388,7 @@ function ItemNormal_00000011(iid, num, bind, param)
 	end
 	package:DelItemSendMsg(11, player);
 	player:setBuffData(0x04, os.time() + num2, true);
-	return true;
+	return num;
 end
 
 function ItemNormal_00000055(iid, num, bind, param)
@@ -399,7 +399,7 @@ function ItemNormal_00000055(iid, num, bind, param)
   player:setBuffData(11, 0, true)
   if ItemNormal_AddBuff(player, 5, 3600, num, 356400) then
   	package:DelItemSendMsg(55, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -413,7 +413,7 @@ function ItemNormal_00000056(iid, num, bind, param)
   player:setBuffData(11, 0, true)
   if ItemNormal_AddBuff(player, 6, 3600, num, 356400) then
   	package:DelItemSendMsg(56, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -424,7 +424,7 @@ function ItemNormal_00000057(iid, num, bind, param)
   local package = player:GetPackage();
   if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(57, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -435,7 +435,7 @@ function ItemNormal_00000058(iid, num, bind, param)
   local package = player:GetPackage();
   if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(58, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -452,7 +452,7 @@ function ItemNormal_00000012(iid, num, bind, param)
 	fgt:addExp(5000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(12, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -469,7 +469,7 @@ function ItemNormal_00000013(iid, num, bind, param)
   fgt:addExp(500000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(13, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -486,7 +486,7 @@ function ItemNormal_00000014(iid, num, bind, param)
 	fgt:addExp(50000000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(14, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -497,7 +497,7 @@ function ItemNormal_00008938(iid, num, bind, param)
     local package = player:GetPackage();
 	package:DelItemSendMsg(8938, player);
 	player:getCoin(num * 10000);
-	return true;
+	return num;
 end
 
 function ItemNormal_00008939(iid, num, bind, param)
@@ -505,7 +505,7 @@ function ItemNormal_00008939(iid, num, bind, param)
     local package = player:GetPackage();
 	package:DelItemSendMsg(8939, player);
 	player:getCoin(num * 50000);
-	return true;
+	return num;
 end
 
 function ItemNormal_00008940(iid, num, bind, param)
@@ -513,7 +513,7 @@ function ItemNormal_00008940(iid, num, bind, param)
     local package = player:GetPackage();
 	package:DelItemSendMsg(8940, player);
 	player:getCoin(num * 100000);
-	return true;
+	return num;
 end
 
 function ItemNormal_00000017(iid, num, bind, param)  
@@ -533,7 +533,7 @@ function ItemNormal_00000017(iid, num, bind, param)
 		package:AddEquip(2007, 1);
 		package:AddItem(18, 1, 1, 0, 2);
 		player:getCoupon(30);
-		return true;
+		return num;
 	end
 	player:sendMsgCode(2, 1011, 0);
 	return false;
@@ -557,7 +557,7 @@ function ItemNormal_00000018(iid, num, bind, param)
 		   package:AddItem(9, 1, 1, 0, 2);
 		   package:AddItem(19, 1, 1, 0, 2);
 	  	   player:getCoupon(30);
-		   return true;
+		   return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -586,7 +586,7 @@ function ItemNormal_00000019(iid, num, bind, param)
 		   package:AddItem(1211, 1, 1, 0, 2);
 		   package:AddItem(20, 1, 1, 0, 2);
 		   player:getCoupon(40);
-		   return true;
+		   return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -648,7 +648,7 @@ function ItemNormal_00000020(iid, num, bind, param)
 		   package:AddItem(57, 1, 1, 0, 2);
 		   package:AddItem(21, 1, 1, 0, 2);
 		   player:getCoupon(40);
-		   return true;
+		   return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -713,7 +713,7 @@ function ItemNormal_00000021(iid, num, bind, param)
 		   package:AddItem(1212, 1, 1, 0, 2);
 		   package:AddItem(5031, 1, 1, 0, 2);
 		   player:getCoupon(40);
-		   return true;
+		   return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -729,9 +729,23 @@ function ItemNormal_00000029(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(100*num);
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+
+    local n = 0;
+    for i = 1, num do
+        fgt:addPExp(100);
+        n = n + 1
+        if fgt:isPExpFull() then
+            player:sendMsgCode(2, 1069, 0);
+            break
+        end
+    end
+
     package:DelItemSendMsg(29, player);
-    return true;
+    return n;
 end
 
 function ItemNormal_00000030(iid, num, bind, param)
@@ -741,9 +755,23 @@ function ItemNormal_00000030(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(10000*num);
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+
+    local n = 0
+    for i = 1, num do
+        fgt:addPExp(10000);
+        n = n + 1
+        if fgt:isPExpFull() then
+            player:sendMsgCode(2, 1069, 0);
+            break
+        end
+    end
+
     package:DelItemSendMsg(30, player);
-    return true;
+    return n;
 end
 
 function ItemNormal_00000031(iid, num, bind, param)
@@ -753,9 +781,24 @@ function ItemNormal_00000031(iid, num, bind, param)
 	if fgt == nil then
 		return false;
 	end
-    fgt:addPExp(1000000*num);
+
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+
+    local n = 0;
+    for i = 1, num do
+        fgt:addPExp(1000000);
+        n = n + 1
+        if fgt:isPExpFull() then
+            player:sendMsgCode(2, 1069, 0);
+            break
+        end
+    end
+
     package:DelItemSendMsg(31, player);
-    return true;
+    return n;
 end
 
 function ItemNormal_00000036(iid, num, bind, param)
@@ -808,7 +851,7 @@ function ItemNormal_00000036(iid, num, bind, param)
     end
 
     package:DelItemSendMsg(36, player);
-    return true;
+    return num;
 end
 
 function ItemNormal_00000043(iid, num, bind, param)
@@ -840,9 +883,9 @@ function ItemNormal_00000043(iid, num, bind, param)
     local s = os.date("%S", os.time())
 	if ItemNormal_AddBuff(fgt, 4, 24*60*60-(h*60*60+m*60+s), num, 86400) then
 		package:DelItemSendMsg(43, player);
-		return true;
+		return num;
 	end
-    return true;
+    return num;
 end
 
 function ItemNormal_00000052(iid, num, bind, param)
@@ -873,9 +916,9 @@ function ItemNormal_00000052(iid, num, bind, param)
     local s = os.date("%S", os.time())
 	if ItemNormal_AddBuff(fgt, 4, 24*60*60-(h*60*60+m*60+s), num, 86400) then
 		package:DelItemSendMsg(52, player);
-		return true;
+		return num;
 	end
-    return true;
+    return num;
 end
 
 function ItemNormal_00000053(iid, num, bind, param)
@@ -906,9 +949,9 @@ function ItemNormal_00000053(iid, num, bind, param)
     local s = os.date("%S", os.time())
 	if ItemNormal_AddBuff(fgt, 4, 24*60*60-(h*60*60+m*60+s), num, 86400) then
 		package:DelItemSendMsg(53, player);
-		return true;
+		return num;
 	end
-    return true;
+    return num;
 end
 
 function ItemNormal_00000066(iid, num, bind, param)
@@ -933,13 +976,15 @@ function ItemNormal_00000066(iid, num, bind, param)
 --        cnt = 1
 --    end
     fgt:addPExp(5000);
-    local now = os.time() + 8*60*60 -- UTC+8
-    now = now % (24*60*60)
-	if ItemNormal_AddBuff(fgt, 4, 24*60*60-now, num, 36000) then
-		package:DelItemSendMsg(53, player);
-		return true;
+    local now = os.time();
+    local h = os.date("%H", os.time())
+    local m = os.date("%M", os.time())
+    local s = os.date("%S", os.time())
+	if ItemNormal_AddBuff(fgt, 4, 24*60*60-(h*60*60+m*60+s), num, 86400) then
+		package:DelItemSendMsg(66, player);
+		return num;
 	end
-    return true;
+    return num;
 end
 
 function ItemNormal_00008947(iid, num, bind, param)
@@ -976,7 +1021,7 @@ function ItemNormal_00008947(iid, num, bind, param)
 		   package:AddItem(8927, 2, 1, 0, 2);
 		   package:AddItem(8926, 1, 1, 0, 2);	
 		   player:getCoupon(50);
-		   return true;
+		   return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -995,7 +1040,7 @@ function ItemNormal_00008949(iid, num, bind, param)
 	    package:DelItemSendMsg(8949, player);
 		package:AddItem(randGem, 1, 1);
 		package:AddItem(12, 1, 1);
-		return true;
+		return num;
 	end
 	player:sendMsgCode(2, 1011, 0);
 	return false;
@@ -1024,7 +1069,7 @@ function ItemNormal_00008950(iid, num, bind, param)
 		package:AddItem(randGem1, 1, 1, 0, 2);
 		package:AddItem(randGem2, 1, 1, 0, 2);
 		package:AddItem(12, 3, 1, 0, 2);
-		return true;
+		return num;
 	end
 	player:sendMsgCode(2, 1011, 0);
 	return false;
@@ -1064,7 +1109,7 @@ function ItemNormal_00008951(iid, num, bind, param)
 		package:AddItem(randGem2, 1, 1, 0, 2);
 		package:AddItem(randGem3, 1, 1, 0, 2);
 		package:AddItem(12, 4, 1, 0, 2);
-		return true;
+		return num;
 	end
 	player:sendMsgCode(2, 1011, 0);
 	return false;
@@ -1100,7 +1145,7 @@ function ItemNormal_00008952(iid, num, bind, param)
         package:AddItem(randGem3, 1, 1, 0, 2);
         package:AddItem(randGem4, 1, 1, 0, 2);
 		package:AddItem(12, 5, 1, 0, 2);
-		return true;
+		return num;
 	end
 	player:sendMsgCode(2, 1011, 0);
 	return false;
@@ -1135,7 +1180,7 @@ function ItemNormal_00008953(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(12, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1149,7 +1194,7 @@ function ItemNormal_00008953(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(12, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1186,7 +1231,7 @@ function ItemNormal_00008954(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(12, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1200,7 +1245,7 @@ function ItemNormal_00008954(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(12, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1236,7 +1281,7 @@ function ItemNormal_00008955(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(12, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1250,7 +1295,7 @@ function ItemNormal_00008955(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(12, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1285,7 +1330,7 @@ function ItemNormal_00008956(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 1, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1299,7 +1344,7 @@ function ItemNormal_00008956(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 1, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1333,7 +1378,7 @@ function ItemNormal_00008957(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1347,7 +1392,7 @@ function ItemNormal_00008957(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1381,7 +1426,7 @@ function ItemNormal_00008958(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1395,7 +1440,7 @@ function ItemNormal_00008958(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1429,7 +1474,7 @@ function ItemNormal_00008959(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1443,7 +1488,7 @@ function ItemNormal_00008959(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1477,7 +1522,7 @@ function ItemNormal_00008960(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1491,7 +1536,7 @@ function ItemNormal_00008960(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1525,7 +1570,7 @@ function ItemNormal_00008961(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1539,7 +1584,7 @@ function ItemNormal_00008961(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1573,7 +1618,7 @@ function ItemNormal_00008962(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1587,7 +1632,7 @@ function ItemNormal_00008962(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1623,7 +1668,7 @@ function ItemNormal_00008963(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1637,7 +1682,7 @@ function ItemNormal_00008963(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1673,7 +1718,7 @@ function ItemNormal_00008964(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1687,7 +1732,7 @@ function ItemNormal_00008964(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1723,7 +1768,7 @@ function ItemNormal_00008965(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1737,7 +1782,7 @@ function ItemNormal_00008965(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1773,7 +1818,7 @@ function ItemNormal_00008966(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 6, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1787,7 +1832,7 @@ function ItemNormal_00008966(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 6, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1823,7 +1868,7 @@ function ItemNormal_00008967(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 7, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1837,7 +1882,7 @@ function ItemNormal_00008967(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 7, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -1863,7 +1908,7 @@ function ItemNormal_00008968(iid, num, bind, param)
   package:AddItem(14, 2, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
-  return true;
+  return num;
 end
 
 
@@ -1885,7 +1930,7 @@ function ItemNormal_00008969(iid, num, bind, param)
   package:AddItem(14, 3, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
-  return true;
+  return num;
 end
 
 
@@ -1907,7 +1952,7 @@ function ItemNormal_00008970(iid, num, bind, param)
   package:AddItem(14, 4, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
-  return true;
+  return num;
 end
 
 
@@ -1929,7 +1974,7 @@ function ItemNormal_00008971(iid, num, bind, param)
   package:AddItem(14, 5, 1, 0, 2);
   BroadCastEquip1(player:getCountry(), player:getPName(), "橙色任务经验宝箱", GetItemName(randEquip));
 
-  return true;
+  return num;
 end
 
 
@@ -1958,7 +2003,7 @@ function ItemNormal_00008972(iid, num, bind, param)
   package:AddItem(randGem, 1, 1, 0, 2);
   package:AddItem(14, 6, 1, 0, 2);
  
-  return true;
+  return num;
 end
 
 
@@ -1989,7 +2034,7 @@ function ItemNormal_00008973(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8938, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2003,7 +2048,7 @@ function ItemNormal_00008973(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8938, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2039,7 +2084,7 @@ function ItemNormal_00008974(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8938, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2053,7 +2098,7 @@ function ItemNormal_00008974(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);		
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8938, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2089,7 +2134,7 @@ function ItemNormal_00008975(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8938, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2103,7 +2148,7 @@ function ItemNormal_00008975(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8938, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2139,7 +2184,7 @@ function ItemNormal_00008976(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 1, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2153,7 +2198,7 @@ function ItemNormal_00008976(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 1, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2189,7 +2234,7 @@ function ItemNormal_00008977(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2203,7 +2248,7 @@ function ItemNormal_00008977(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2239,7 +2284,7 @@ function ItemNormal_00008978(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2253,7 +2298,7 @@ function ItemNormal_00008978(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2288,7 +2333,7 @@ function ItemNormal_00008979(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2302,7 +2347,7 @@ function ItemNormal_00008979(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 2, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2338,7 +2383,7 @@ function ItemNormal_00008980(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2352,7 +2397,7 @@ function ItemNormal_00008980(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2388,7 +2433,7 @@ function ItemNormal_00008981(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2402,7 +2447,7 @@ function ItemNormal_00008981(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2437,7 +2482,7 @@ function ItemNormal_00008982(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2451,7 +2496,7 @@ function ItemNormal_00008982(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2486,7 +2531,7 @@ function ItemNormal_00008983(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2500,7 +2545,7 @@ function ItemNormal_00008983(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 3, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2535,7 +2580,7 @@ function ItemNormal_00008984(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2549,7 +2594,7 @@ function ItemNormal_00008984(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 4, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2585,7 +2630,7 @@ function ItemNormal_00008985(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2599,7 +2644,7 @@ function ItemNormal_00008985(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 5, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2634,7 +2679,7 @@ function ItemNormal_00008986(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 6, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2648,7 +2693,7 @@ function ItemNormal_00008986(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 6, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2684,7 +2729,7 @@ function ItemNormal_00008987(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 7, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2698,7 +2743,7 @@ function ItemNormal_00008987(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8939, 7, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2734,7 +2779,7 @@ function ItemNormal_00008988(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 2, 1, 0, 2);
 			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2749,7 +2794,7 @@ function ItemNormal_00008988(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 2, 1, 0, 2);
 			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2787,7 +2832,7 @@ function ItemNormal_00008989(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 3, 1, 0, 2);
 			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2802,7 +2847,7 @@ function ItemNormal_00008989(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 3, 1, 0, 2);
 			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2839,7 +2884,7 @@ function ItemNormal_00008990(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 4, 1, 0, 2);
 			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2854,7 +2899,7 @@ function ItemNormal_00008990(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 4, 1, 0, 2);
 			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2891,7 +2936,7 @@ function ItemNormal_00008991(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 5, 1, 0, 2);
 			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2906,7 +2951,7 @@ function ItemNormal_00008991(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 5, 1, 0, 2);
 			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2944,7 +2989,7 @@ function ItemNormal_00008992(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 6, 1, 0, 2);
 			BroadCastEquip2(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1), GetItemName(randEquip2));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -2959,7 +3004,7 @@ function ItemNormal_00008992(iid, num, bind, param)
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(8940, 6, 1, 0, 2);
 			BroadCastEquip1(player:getCountry(), player:getPName(), "橙色铜钱宝箱", GetItemName(randEquip1));
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -3084,7 +3129,7 @@ function ItemNormal_00008993(iid, num, bind, param)
 				package:AddEquip(randEquip1, 1, 0, 2);
 				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip1));
 			end
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -3166,7 +3211,7 @@ function ItemNormal_00008994(iid, num, bind, param)
 				elseif r2_8915 <=100 then
 					package:AddItem(8915, 1, 1, 0, 2);
 				end	
-				return true;				
+				return num;				
 			else
 				player:sendMsgCode(2, 1011, 0);
 				return false;
@@ -3192,7 +3237,7 @@ function ItemNormal_00008994(iid, num, bind, param)
 				elseif r2_8915 <=100 then
 					package:AddItem(8915, 1, 1, 0, 2);
 				end	
-				return true;			
+				return num;			
 			else	
 				player:sendMsgCode(2, 1011, 0);			
 				return false;
@@ -3220,7 +3265,7 @@ function ItemNormal_00008995(iid, num, bind, param)
 	fgt:addExp(50000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(8995, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -3233,7 +3278,7 @@ function ItemNormal_00000015(iid, num, bind, param)
   local package = player:GetPackage();
   package:DelItemSendMsg(15, player);
   player:getTael(1000*num)  
-  return true;
+  return num;
 end
 
 
@@ -3248,7 +3293,7 @@ function ItemNormal_00008997(iid, num, bind, param)
 		player:sendMsgCode(2, 1011, 0);			
 		return false;
 	end
-	return true;
+	return num;
 end
 
 function ItemNormal_00008998(iid, num, bind, param)
@@ -3270,7 +3315,7 @@ function ItemNormal_00008998(iid, num, bind, param)
 --    package:AddItem(8921, 2, 1, 0, 2);
 --    package:AddItem(8917, 2, 1, 0, 2);
 --    package:AddItem(8999, 2, 1, 0, 2);
-    return true;
+    return num;
   end
   player:sendMsgCode(2, 1011, 0);
   return false;
@@ -3290,7 +3335,7 @@ function ItemNormal_00009002(iid, num, bind, param)
         package:AddItem(8922, 1, 1, 0, 2);
         package:AddItem(5003, 1, 1, 0, 2);
         package:AddItem(5013, 1, 1, 0, 2);
-        return true;
+        return num;
     end
     player:sendMsgCode(2, 1011, 0);
     return false;
@@ -3314,7 +3359,7 @@ function ItemNormal_00009003(iid, num, bind, param)
   player:autoRegenAll()
   local package = player:GetPackage();
   package:DelItemSendMsg(9003, player);
-  return true
+  return num
 end
 
 function openGemBox(id, boxid)
@@ -3331,7 +3376,7 @@ function openGemBox(id, boxid)
         package:AddItem(8921, 2, 1, 0, 2);
         package:AddItem(8918, 1, 1, 0, 2);
         package:AddItem(id, 3, 1, 0, 2);
-        return true;
+        return num;
     end
     player:sendMsgCode(2, 1011, 0);
     return false;
@@ -3395,7 +3440,7 @@ function ItemNormal_00009016(iid, num, bind, param)
 	fgt:addExp(2000000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(9016, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -3415,7 +3460,7 @@ function ItemNormal_00009017(iid, num, bind, param)
 	fgt:addExp(80000000*num);
   if fgt:getExp() > oldexp then
   	package:DelItemSendMsg(9017, player);
-	return true;
+	return num;
   else
 	return false;
   end
@@ -3435,7 +3480,7 @@ function ItemNormal_00009031(iid, num, bind, param)
 	equip = math.random(1, table.getn(Orange_Equip_Level_90));
 	package:AddEquip(Orange_Equip_Level_90[equip], bind, 0, 5);--for backstatge 5 for equip from merge
 
-	return true;
+	return num;
 end
 
 
@@ -3464,7 +3509,7 @@ function ItemNormal_00009027(iid, num, bind, param)
         package:DelItemSendMsg(9027, player);
 	package:AddItem(8938, 2, 1, 0, 2);
 	package:AddItem(itemId, 1, 1, 0, 2);
-        return true;
+        return num;
 end
 
 function ItemNormal_00009028(iid, num, bind, param)
@@ -3489,7 +3534,7 @@ function ItemNormal_00009028(iid, num, bind, param)
         package:DelItemSendMsg(9028, player);
 	package:AddItem(8939, 1, 1, 0, 2);
 	package:AddItem(itemId, 1, 1, 0, 2);
-        return true;
+        return num;
 end
 
 
@@ -3515,7 +3560,7 @@ function ItemNormal_00009029(iid, num, bind, param)
         package:DelItemSendMsg(9029, player);
 	package:AddItem(8939, 2, 1, 0, 2);
 	package:AddItem(itemId, 1, 1, 0, 2);
-        return true;
+        return num;
 end
 
 function ItemNormal_00009030(iid, num, bind, param)
@@ -3539,7 +3584,7 @@ function ItemNormal_00009030(iid, num, bind, param)
   package:DelItemSendMsg(9030, player);
 	package:AddItem(8940, 2, 1, 0, 2);
 	package:AddItem(itemId, 1, 1, 0, 2);
-  return true;
+  return num;
 end
 
 function ItemNormal_00009036(iid, num, bind, param)
@@ -3580,7 +3625,7 @@ function ItemNormal_00009036(iid, num, bind, param)
 
   package:DelItemSendMsg(9036, player);
   player:GetPackage():AddItem(itemId, itemCount, true);
-  return true;
+  return num;
 end
 
 function ItemNormal_00009037(iid, num, bind, param)
@@ -3625,7 +3670,7 @@ function ItemNormal_00009037(iid, num, bind, param)
     end
     Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 轻轻地打开了 [4:9037] ，一道金光扑面而来，"..prn.."获得了 [4:"..itemId.."]");
   end
-  return true;
+  return num;
 end
 
 function ItemNormal_00009039(iid, num, bind, param)
@@ -3646,7 +3691,7 @@ function ItemNormal_00009039(iid, num, bind, param)
     package:DelItemSendMsg(9039, player);
     player:getCoupon(c);
     Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 打开 [4:9039] 获得礼券" .. c);
-    return true;
+    return num;
   end
   local itemId = 15;
   local itemCount = 1;
@@ -3669,7 +3714,7 @@ function ItemNormal_00009039(iid, num, bind, param)
   end
   package:DelItemSendMsg(9039, player);
   player:GetPackage():AddItem(itemId, itemCount, true);
-  return true;
+  return num;
 end
 
 function ItemNormal_00009040(iid, num, bind, param)
@@ -3677,7 +3722,7 @@ function ItemNormal_00009040(iid, num, bind, param)
   local package = player:GetPackage();
   package:DelItemSendMsg(9040, player);
   player:getTael(25*num)  
-  return true;
+  return num;
 end
 
 
@@ -3798,7 +3843,7 @@ function ItemNormal_00009041(iid, num, bind, param)
 				package:AddEquip(randEquip1, 1);
 				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip1));
 			end
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -3911,7 +3956,7 @@ function ItemNormal_00009201(iid, num, bind, param)
 				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip));
 			end
 				package:AddItem(Purple_Favor[math.random(1, #Purple_Favor)], 2, true);	
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -4023,7 +4068,7 @@ function ItemNormal_00009202(iid, num, bind, param)
 				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip));
 			end
 			package:AddItem(Purple_Favor[math.random(1, #Purple_Favor)], 2, true);	
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -4135,7 +4180,7 @@ function ItemNormal_00009203(iid, num, bind, param)
 				BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(randEquip));
 			end
 			package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 2, true);	
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -4238,7 +4283,7 @@ function ItemNormal_00009204(iid, num, bind, param)
 			package:AddItem(9031, 1, 1);	
 			BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(9031));
 			package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 2, true);	
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;	
@@ -4271,7 +4316,7 @@ function ItemNormal_00009216(iid, num, bind, param)
   package:AddItem(randGem, 1, 1, 0, 2);
   package:AddItem(14, 6, 1, 0, 2);
  
-  return true;
+  return num;
 end
 
 function ItemNormal_00009217(iid, num, bind, param)
@@ -4368,7 +4413,7 @@ function ItemNormal_00009217(iid, num, bind, param)
 			package:AddItem(9214, 1, 1);	
 			BroadCastEquip1(player:getCountry(), player:getPName(), "帮派宝箱", GetItemName(9214));
 			package:AddItem(Diety_Favor[math.random(1, #Diety_Favor)], 2, true);	
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;	
@@ -4402,7 +4447,7 @@ function ItemNormal_00009209(iid, num, bind, param)
 		count = 1;
 	elseif rand < 62 then
 		player:getCoupon(100);
-		return true;
+		return num;
 	elseif rand < 76 then
 		itemId = 9
 		count = 1;
@@ -4420,7 +4465,7 @@ function ItemNormal_00009209(iid, num, bind, param)
 	else
 		package:DelItemSendMsg(9209, player);	
 		package:AddItem(itemId, count, 1);
-		return true;
+		return num;
 	end
 end
 
@@ -4479,7 +4524,7 @@ function ItemNormal_00009210(iid, num, bind, param)
 	else
 		package:DelItemSendMsg(9210, player);
 		package:AddItem(itemId, count, 1);
-		return true;
+		return num;
 	end
 end
 
@@ -4493,13 +4538,13 @@ function ItemNormal_00009211(iid, num, bind, param)
 	player:setBuffData(11, 0, true)
 	if ItemNormal_AddBuff(player, 10, 3600, num, 36000) then
 		package:DelItemSendMsg(9211, player);
-		return true;
+		return num;
 	end
   else
 	player:setBuffData(10, 0, true)
 	if ItemNormal_AddBuff(player, 11, 3600, num, 36000) then
 		package:DelItemSendMsg(9211, player);
-		return true;
+		return num;
 	end
   end
 	return false;
@@ -4532,7 +4577,7 @@ function ItemNormal_00009212(iid, num, bind, param)
 			package:AddEquip(randEquip2, 1, 0, 2);
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 7, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -4546,7 +4591,7 @@ function ItemNormal_00009212(iid, num, bind, param)
 			package:AddEquip(randEquip1, 1, 0, 2);			
 			package:AddItem(randGem, 1, 1, 0, 2);
 			package:AddItem(13, 7, 1, 0, 2);
-			return true;
+			return num;
 		end
 		player:sendMsgCode(2, 1011, 0);
 		return false;
@@ -4577,7 +4622,7 @@ function ItemNormal_00009213(iid, num, bind, param)
   package:AddItem(randGem, 1, 1, 0, 2);
   package:AddItem(14, 6, 1, 0, 2);
  
-  return true;
+  return num;
 end
 
 function ItemNormal_00007xxx(iid, num, bind, param)
@@ -4591,7 +4636,7 @@ function ItemNormal_00007xxx(iid, num, bind, param)
     return false
   end
   player:GetPackage():DelItemSendMsg(iid, player)
-  return true
+  return num
 end
 
 function ItemNormal_SkillLvUp(iid, num, bind, param)
@@ -4605,7 +4650,7 @@ function ItemNormal_SkillLvUp(iid, num, bind, param)
     return false
   end
   player:GetPackage():DelItemSendMsg(iid, player)
-  return true
+  return num
 end
 
 local SkillPageRange = {
@@ -4638,7 +4683,7 @@ function ItemNormal_SkillPage(iid, num, bind, param)
     end
   end
   package:AddItem(9017 + n, num, true)
-  return true;
+  return num;
 end
 
 function ItemNormal_00009214(iid, num, bind, param)
@@ -4655,7 +4700,7 @@ function ItemNormal_00009214(iid, num, bind, param)
 	equip = math.random(1, table.getn(Orange_Equip_Level_100));
 	package:AddEquip(Orange_Equip_Level_100[equip], bind, 0, 5);--for backstatge 5 for equip from merge
 
-	return true;
+	return num;
 end
 function ItemNormal_00009223(iid, num, bind, param)
  	local player = GetPlayer()
@@ -4671,7 +4716,7 @@ function ItemNormal_00009223(iid, num, bind, param)
 		package:DelItemSendMsg(9223, player);
 		player:getCoupon(188);
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9223]，一道金光扑面而来，获得了礼券188");
-		return true;  
+		return num;  
 	elseif rand == 2 then
 		itemId = 5055;
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9223]，一道金光扑面而来，获得了[4:5055]");
@@ -4694,7 +4739,7 @@ function ItemNormal_00009223(iid, num, bind, param)
 	package:DelItemSendMsg(9223, player);
 	package:AddItem(itemId, count, 1, 0, 2);
 	package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 1, 1, 0, 2);
-	return true;
+	return num;
 end
 function ItemNormal_00009225(iid, num, bind, param)
 	local player = GetPlayer();
@@ -4714,7 +4759,7 @@ function ItemNormal_00009225(iid, num, bind, param)
 		package:DelItemSendMsg(9225, player);
 		player:getCoupon(c);
 		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:9225]，一道金光扑面而来，获得了礼券".. c);
-		return true;
+		return num;
 	end
 	local itemId = 15;
 	local itemCount = 1;
@@ -4741,7 +4786,7 @@ function ItemNormal_00009225(iid, num, bind, param)
 	package:DelItemSendMsg(9225, player);
 	package:AddItem(itemId, itemCount, true, 0, 2);
 	package:AddItem(Orange_Favor[math.random(1, #Orange_Favor)], 1, 1, 0, 2);
-	return true;
+	return num;
 end
 
 function ItemNormal_citta(iid, num, bind, param)
@@ -4763,7 +4808,7 @@ function ItemNormal_citta(iid, num, bind, param)
         return false;
     end
 	package:DelItemSendMsg(iid, player);
-    return true
+    return num
 end
 
 function ItemNormal_formation(iid, num, bind, param)
@@ -4779,7 +4824,7 @@ function ItemNormal_formation(iid, num, bind, param)
         return false;
     end
     package:DelItemSendMsg(iid, player);
-    return true
+    return num
 end
 
 function ItemNormal_00000068(iid, num, bind, param)
@@ -4806,7 +4851,7 @@ function ItemNormal_00000068(iid, num, bind, param)
         end
     end
     package:DelItemSendMsg(68, player);
-    return true;
+    return num;
 end
 
 function ItemNormal_00000067(iid, num, bind, param)
@@ -4870,7 +4915,7 @@ function ItemNormal_00000067(iid, num, bind, param)
 
 
     package:DelItemSendMsg(67, player);
-    return true;
+    return num;
 end
 
 
@@ -4889,7 +4934,7 @@ function ItemNormal_00000078(iid, num, bind, param)
     package:AddItem(57, 8, true, 0, 2);
 
     package:DelItemSendMsg(78, player);
-    return true;
+    return num;
 end
 
 function ItemNormal_00000079(iid, num, bind, param)
@@ -4908,7 +4953,7 @@ function ItemNormal_00000079(iid, num, bind, param)
     package:AddItem(501, 2, true, 0, 2);
 
     package:DelItemSendMsg(79, player);
-    return true;
+    return num;
 end
 
 function ItemNormal_00000080(iid, num, bind, param)
@@ -4925,7 +4970,7 @@ function ItemNormal_00000080(iid, num, bind, param)
     package:AddItem(50, 3, true, 0, 2);
 
     package:DelItemSendMsg(80, player);
-    return true;
+    return num;
 end
 
 function ItemNormal_00000081(iid, num, bind, param)
@@ -4944,7 +4989,7 @@ function ItemNormal_00000081(iid, num, bind, param)
     package:AddItem(512, 2, true, 0, 2);
 
     package:DelItemSendMsg(81, player);
-    return true;
+    return num;
 end
 
 
@@ -4988,7 +5033,7 @@ function ItemNormal_athletics_2(iid, num, bind, param)
 
     package:DelItemSendMsg(2, player);
 
-    return true;
+    return num;
 end
 
 function ItemNormal_athletics_3(iid, num, bind, param)
@@ -5029,7 +5074,7 @@ function ItemNormal_athletics_3(iid, num, bind, param)
 
     package:DelItemSendMsg(3, player);
 
-    return true;
+    return num;
 end
 
 function ItemNormal_athletics_4(iid, num, bind, param)
@@ -5070,7 +5115,7 @@ function ItemNormal_athletics_4(iid, num, bind, param)
 
     package:DelItemSendMsg(4, player);
 
-    return true;
+    return num;
 end
 
 
@@ -5113,7 +5158,7 @@ function ItemNormal_athletics_5(iid, num, bind, param)
 
     package:DelItemSendMsg(5, player);
 
-    return true;
+    return num;
 end
 
 
@@ -5162,7 +5207,7 @@ function ItemNormal_athletics_22(iid, num, bind, param)
         package:AddItem(itemId, 1, true, 0, 2);
     end
 
-    return true;
+    return num;
 end
 
 function ItemNormal_athletics_23(iid, num, bind, param)
@@ -5209,7 +5254,7 @@ function ItemNormal_athletics_23(iid, num, bind, param)
         package:AddItem(itemId, 1, true, 0, 2);
     end
 
-    return true;
+    return num;
 end
 
 function ItemNormal_athletics_24(iid, num, bind, param)
@@ -5268,7 +5313,7 @@ function ItemNormal_athletics_24(iid, num, bind, param)
         package:AddItem(itemId, 1, true, 0, 2);
     end
 
-    return true;
+    return num;
 end
 
 function ItemNormal_athletics_25(iid, num, bind, param)
@@ -5326,7 +5371,7 @@ function ItemNormal_athletics_25(iid, num, bind, param)
         package:AddItem(itemId, 1, true, 0, 2);
     end
 
-    return true;
+    return num;
 end
 
 

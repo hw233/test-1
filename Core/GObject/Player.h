@@ -59,6 +59,10 @@ namespace GObject
 #define PLAYER_BUFF_YDOTR           0x20    //黄钻国庆充值总额
 #define PLAYER_BUFF_AUTOCOPY        0x21	//自动副本
 #define PLAYER_BUFF_ONLINE          0x22	//累积在线时间
+#define PLAYER_BUFF_HIFIGHT         0x23    //英雄岛攻击冷却
+#define PLAYER_BUFF_HIWEAK          0x24
+#define PLAYER_BUFF_HIMASTER_SOUL   0x25
+#define PLAYER_BUFF_HIMOVE          0x26
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x30
 #define PLAYER_BUFF_COUNT			0x30

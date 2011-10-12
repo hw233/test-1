@@ -183,6 +183,7 @@ namespace Script
 		CLASS_DEF(Fighter, getExp);
 		CLASS_DEF(Fighter, addPExp);
 		CLASS_DEF(Fighter, getPExp);
+		CLASS_DEF(Fighter, isPExpFull);
 		CLASS_DEF(Fighter, getAcupointCnt);
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);
@@ -671,10 +672,10 @@ namespace Script
 		return Run<bool>(player, "RunItemTaskUse", itemId);
 	}
 
-	bool GameActionLua::RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind)
+	UInt16 GameActionLua::RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind)
 	{
 		assert(player != NULL);
-		return Run<bool>(player, "RunItemNormalUse", itemId, num, bind, param);
+		return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
 	}
 
 	Table GameActionLua::GetNpcRelationTask(UInt32 npcId)
