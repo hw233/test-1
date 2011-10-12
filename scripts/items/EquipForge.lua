@@ -33,7 +33,7 @@ local Enchant_chance = {
 local Enchant_max = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12}
 
 --2级至10级宝石的合成概率
-local Merge_chance = {900, 800, 700, 600, 500, 400, 300, 200, 100}
+local Merge_chance = {1000, 700, 500, 300, 400, 300, 200, 100, 50}
 
 
 

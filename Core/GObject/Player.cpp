@@ -2883,7 +2883,7 @@ namespace GObject
 			ConsumeInfo ci(AccTrainFighter, 0, 0);
 			useGold(goldUse, &ci);
 			const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
-            for(int i = 0; i < count; ++ i)
+            for(UInt32 i = 0; i < count; ++ i)
             {
                 UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * 60);
                 fighter->addExp(exp);
