@@ -354,7 +354,7 @@ sysMsg:set(426, 0x35, "")
 sysMsg:set(427, 0x35, "")
 sysMsg:set(428, 0x35, "")
 sysMsg:set(429, 0x45, "")
-sysMsg:set(430, 0x45, "")
+sysMsg:set(430, 0x45, "%s捐献了%u银币")
 sysMsg:set(431, 0x35, "")
 
 sysMsg:set(440, 0, "")
