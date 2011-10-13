@@ -82,6 +82,23 @@ void HeroIsland::process(UInt32 now)
     if (_running)
     {
     }
+
+    applayHP();
+}
+
+void HeroIsland::applayHP()
+{
+    UInt32 now = TimeUtil::Now();
+    size_t sz = _players[0].size();
+    for (size_t i = 0; i < sz; ++i)
+    {
+        HIPlayerData* pd = _players[0][i];
+        if (pd && pd->player && pd->injuredcd <= now)
+        {
+            pd->player->regenAll(true);
+            pd->injuredcd = static_cast<UInt32>(-1);
+        }
+    }
 }
 
 UInt8 HeroIsland::getIdentity(Player* player)
@@ -427,11 +444,15 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
     if (spot == to)
         return false;
 
-    if (movecd && pd->movecd > TimeUtil::Now())
+    UInt32 now = TimeUtil::Now();
+    if (movecd && pd->movecd > now)
     {
         // TODO:
         return false;
     }
+
+    if (pd->injuredcd <= now)
+        player->regenAll(true);
 
     if (leave(pd, spot, pos))
     {
@@ -472,6 +493,10 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     }
 
     UInt32 now = TimeUtil::Now();
+
+    if (pd->injuredcd <= now)
+        player->regenAll(true);
+
     if (type == 0) // NPC
     {
         RareAnimals& ra = findRareAnimal(id, pd->spot);

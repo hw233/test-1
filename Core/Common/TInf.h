@@ -14,7 +14,8 @@ extern "C" {
 
 	int tinf_uncompress(void *dest, unsigned int *destLen,
 		const void *source, unsigned int sourceLen);
-
+    int tinf_zlib_uncompress(void *dest, unsigned int *destLen,
+                                    const void *source, unsigned int sourceLen);
 	unsigned int tinf_adler32(const void *data, unsigned int length);
 
 	unsigned int tinf_crc32(const void *data, unsigned int length);

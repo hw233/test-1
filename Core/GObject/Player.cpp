@@ -1410,7 +1410,7 @@ namespace GObject
         }
         if (!totalmax)
             return 0;
-        return (float)total/totalmax;
+        return ((float)total)/totalmax;
     }
 
 	void Player::addFightCurrentHpAll(UInt16 hp)
@@ -2396,15 +2396,18 @@ namespace GObject
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
 		st << static_cast<UInt8>(type) << start << cnt << sz;
-		std::set<Player *>::iterator it = _friends[type].begin();
-		std::advance(it, start);
-		for(UInt8 i = 0; i < cnt; ++ i)
-		{
-			Player * pl = *it;
-			st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
-				<< pl->GetLev() << pl->GetClass() << pl->getClanName();
-			++it;
-		}
+        if (sz && cnt)
+        {
+            std::set<Player *>::iterator it = _friends[type].begin();
+            std::advance(it, start);
+            for(UInt8 i = 0; i < cnt; ++ i)
+            {
+                Player * pl = *it;
+                st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+                    << pl->GetLev() << pl->GetClass() << pl->getClanName();
+                ++it;
+            }
+        }
 		st << Stream::eos;
 		send(st);
 	}
@@ -2942,7 +2945,7 @@ namespace GObject
             UInt32 i = 0;
             for(; i < count; ++ i)
             {
-                if (_fighter->getLevel() >= GetLev())
+                if (fighter->getLevel() >= GetLev())
                     break;
 
                 UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * 60);
@@ -2954,7 +2957,7 @@ namespace GObject
 			useGold(goldUse, &ci);
 			data->checktime -= i;
 			data->trainend -= i * 3600;
-			if (data->checktime == 0 || _fighter->getLevel() >= GetLev())
+			if (data->checktime == 0 || fighter->getLevel() >= GetLev())
 			{
 				if(delTrainFighter(id, true))
 					PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
@@ -5000,14 +5003,17 @@ namespace GObject
 		send((st));
 	}
 
-	void Player::regenAll()
+	void Player::regenAll(bool full)
 	{
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& pd = _playerData.lineup[i];
 			if(pd.fighter != NULL && pd.fighter->getCurrentHP() != 0)
 			{
-				pd.fighter->setCurrentHP(0);
+                if (full)
+                    pd.fighter->setCurrentHP(pd.fighter->getMaxHP());
+                else
+                    pd.fighter->setCurrentHP(0);
 			}
 		}
 	}
