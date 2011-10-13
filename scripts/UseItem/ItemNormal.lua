@@ -376,7 +376,6 @@ function ItemNormal_00008931(iid, num, bind, param)
 end
 
 function ItemNormal_00000011(iid, num, bind, param)
-    return false
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	local num2 = player:getBuffData(0x04, os.time());
@@ -5420,7 +5419,6 @@ local ItemNormal_Table = {
 	[7] = ItemNormal_00000007,
 	[9] = ItemNormal_00000009,
 	[8931] = ItemNormal_00008931,
-	[11] = ItemNormal_00000011,
 	[55] = ItemNormal_00000055,
 	[56] = ItemNormal_00000056,
 	[57] = ItemNormal_00000057,
