@@ -2,6 +2,7 @@
 #include "TcpConduit.h"
 #include "TcpServer.h"
 #include "Common/TInf.h"
+#include "Common/Unzipper.h"
 
 #include <event2/event.h>
 #include <event2/buffer.h>
@@ -77,16 +78,30 @@ namespace Network
 				evbuffer_remove(buffer, data, len);
 				if(cmd & 0x1000000)
 				{
+#if 0
 					unsigned int decomp_size = static_cast<unsigned long>(*(UInt16*)(data + off));
 					char * decomp = new(std::nothrow) char[decomp_size];
 					if(decomp != NULL)
 					{
-						if(tinf_uncompress(decomp, &decomp_size, data + off + 2, len - off - 2) == TINF_OK)
+                        int ret = tinf_zlib_uncompress(decomp, &decomp_size, data + off + 2, len - off - 2);
+                        if (ret == TINF_OK)
 							onRecv(cmd & 0xFFFFFF, decomp_size, decomp);
 						else
 							forceClose();
-						delete[] decomp;
+                        delete[] decomp;
 					}
+#else
+					unsigned int decomp_size = static_cast<unsigned long>(*(UInt16*)(data + off));
+                    buf::Unzipper unzip(data + off + 2, len - off - 2);
+                    if (unzip.size() && decomp_size == unzip.size())
+                    {
+                        onRecv(cmd & 0xFFFFFF, decomp_size, (char*)&unzip);
+                    }
+                    else
+                    {
+                        forceClose();
+                    }
+#endif
 				}
 				else
 					onRecv(cmd, len - off, data + off);

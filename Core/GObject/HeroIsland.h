@@ -67,6 +67,7 @@ private:
 
 public:
     void process(UInt32 now);
+    void applayHP();
 
     UInt8 getIdentity(Player* player);
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);

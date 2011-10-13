@@ -637,7 +637,7 @@ namespace GObject
 		bool makeFighterInfo(Stream&, UInt32);
 
 		void autoRegenAll();
-		void regenAll();
+		void regenAll(bool = false);
 
         UInt32 getClientAddress();
 		bool setNewGuildTaskStep(UInt32);
