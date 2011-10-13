@@ -362,7 +362,7 @@ struct DBClanTech
 	UInt32 clanId;
 	UInt8  techId;
 	UInt8  level;
-	UInt16  extra;
+	UInt32  extra;
 };
 
 struct DBClanSkill
@@ -1449,7 +1449,7 @@ SPECIALDEF(4)
 	UInt32, clanId,
 	UInt8,  techId,
 	UInt8,  level,
-	UInt16, extra
+	UInt32, extra
 )
 SPECIALEND()
 
