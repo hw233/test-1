@@ -2942,7 +2942,7 @@ namespace GObject
             UInt32 i = 0;
             for(; i < count; ++ i)
             {
-                if (_fighter->getLevel() >= GetLev())
+                if (fighter->getLevel() >= GetLev())
                     break;
 
                 UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * 60);
@@ -2954,7 +2954,7 @@ namespace GObject
 			useGold(goldUse, &ci);
 			data->checktime -= i;
 			data->trainend -= i * 3600;
-			if (data->checktime == 0 || _fighter->getLevel() >= GetLev())
+			if (data->checktime == 0 || fighter->getLevel() >= GetLev())
 			{
 				if(delTrainFighter(id, true))
 					PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
