@@ -264,7 +264,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
         if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl)) {
-            pl->checkLastBattled();
+            //pl->checkLastBattled();
             ret = true;
         }
 

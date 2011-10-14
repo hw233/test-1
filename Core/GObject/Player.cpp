@@ -1404,13 +1404,18 @@ namespace GObject
             GObject::Lineup& pd = _playerData.lineup[i];
             if(pd.fighter != NULL)
             {
-                total += pd.fighter->getCurrentHP();
+                if (pd.fighter->getCurrentHP())
+                    total += pd.fighter->getCurrentHP();
+                else
+                    total += pd.fighter->getMaxHP();
                 totalmax += pd.fighter->getMaxHP();
             }
         }
         if (!totalmax)
             return 0;
-        return ((float)total)/totalmax;
+        if (!total)
+            return 100;
+        return (((float)total)/totalmax) * 100;
     }
 
 	void Player::addFightCurrentHpAll(UInt16 hp)
@@ -3320,14 +3325,26 @@ namespace GObject
 
     void Player::resetShiMen()
     {
+        _playerData.smFinishCount = 0;
+        _playerData.smFreeCount = 0;
+        _playerData.smAcceptCount = 0;
         _playerData.shimen.clear();
+
         writeShiMen();
+        if (isOnline())
+            sendColorTask(0, 0);
     }
 
     void Player::resetYaMen()
     {
+        _playerData.ymFinishCount = 0;
+        _playerData.ymFreeCount = 0;
+        _playerData.ymAcceptCount = 0;
         _playerData.yamen.clear();
+
         writeYaMen();
+        if (isOnline())
+            sendColorTask(1, 0);
     }
 
 	void Player::writeShiMen()
@@ -5008,7 +5025,7 @@ namespace GObject
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& pd = _playerData.lineup[i];
-			if(pd.fighter != NULL && pd.fighter->getCurrentHP() != 0)
+			if(pd.fighter != NULL && (pd.fighter->getCurrentHP() != 0 || full))
 			{
                 if (full)
                     pd.fighter->setCurrentHP(pd.fighter->getMaxHP());

@@ -68,7 +68,7 @@ function onActivityCheck(tm)
   else
     setDungeonPrice(0, 0)
     setDungeonPrice(1, 50)
-    setDungeonPrice(2, 100)
+    setDungeonPrice(2, 50)
   end
   setDungeonCount(1)
   setTavernInterval(1 * 3600)
