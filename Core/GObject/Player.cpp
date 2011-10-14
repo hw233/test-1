@@ -2809,7 +2809,7 @@ namespace GObject
 		if (fgt == NULL) return false;
 		TrainFighterData * data = found->second;
 		UInt32 count = data->checktime;
-		if (count > 0)
+		//if (count > 0)
 		{
             UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
             UInt32 money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
