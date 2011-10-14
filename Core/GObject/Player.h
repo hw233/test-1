@@ -142,6 +142,8 @@ namespace GObject
         inline UInt32 GetEnd() { return _end; }
 		bool instantComplete();
 
+        virtual bool IsWorldEvent() const	{ return true; }
+
 	private:
         UInt32 _end;
     };
@@ -637,7 +639,7 @@ namespace GObject
 		bool makeFighterInfo(Stream&, UInt32);
 
 		void autoRegenAll();
-		void regenAll();
+		void regenAll(bool = false);
 
         UInt32 getClientAddress();
 		bool setNewGuildTaskStep(UInt32);

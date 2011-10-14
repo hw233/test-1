@@ -241,7 +241,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
         std::vector<UInt16> loot;
         if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
-            pl->checkLastBattled();
+            if (ato)
+                pl->checkLastBattled();
             bool nextfloor = false;
             if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
                 nextfloor = true;

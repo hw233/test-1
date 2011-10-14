@@ -1199,8 +1199,8 @@ namespace GObject
 
 		if(writedb)
 		{
-			UInt32 p = static_cast<UInt32>(fgt->getPotential() * 100);
-			UInt32 c = static_cast<UInt32>(fgt->getCapacity() * 100);
+			UInt32 p = static_cast<UInt32>((fgt->getPotential()+0.005) * 100);
+			UInt32 c = static_cast<UInt32>((fgt->getCapacity()+0.05) * 100);
 			DB2().PushUpdateData("REPLACE INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
@@ -1404,13 +1404,18 @@ namespace GObject
             GObject::Lineup& pd = _playerData.lineup[i];
             if(pd.fighter != NULL)
             {
-                total += pd.fighter->getCurrentHP();
+                if (pd.fighter->getCurrentHP())
+                    total += pd.fighter->getCurrentHP();
+                else
+                    total += pd.fighter->getMaxHP();
                 totalmax += pd.fighter->getMaxHP();
             }
         }
         if (!totalmax)
             return 0;
-        return (float)total/totalmax;
+        if (!total)
+            return 100;
+        return (((float)total)/totalmax) * 100;
     }
 
 	void Player::addFightCurrentHpAll(UInt16 hp)
@@ -2396,15 +2401,18 @@ namespace GObject
 			cnt = end - start;
 		Stream st(REP::FRIEND_LIST);
 		st << static_cast<UInt8>(type) << start << cnt << sz;
-		std::set<Player *>::iterator it = _friends[type].begin();
-		std::advance(it, start);
-		for(UInt8 i = 0; i < cnt; ++ i)
-		{
-			Player * pl = *it;
-			st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
-				<< pl->GetLev() << pl->GetClass() << pl->getClanName();
-			++it;
-		}
+        if (sz && cnt)
+        {
+            std::set<Player *>::iterator it = _friends[type].begin();
+            std::advance(it, start);
+            for(UInt8 i = 0; i < cnt; ++ i)
+            {
+                Player * pl = *it;
+                st << pl->getId() << pl->getName() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+                    << pl->GetLev() << pl->GetClass() << pl->getClanName();
+                ++it;
+            }
+        }
 		st << Stream::eos;
 		send(st);
 	}
@@ -2806,7 +2814,7 @@ namespace GObject
 		if (fgt == NULL) return false;
 		TrainFighterData * data = found->second;
 		UInt32 count = data->checktime;
-		if (count > 0)
+		//if (count > 0)
 		{
             UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
             UInt32 money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
@@ -2938,17 +2946,23 @@ namespace GObject
 			if (getGold() < goldUse)
 				return false;
 			ConsumeInfo ci(AccTrainFighter, 0, 0);
-			useGold(goldUse, &ci);
 			const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
-            for(UInt32 i = 0; i < count; ++ i)
+            UInt32 i = 0;
+            for(; i < count; ++ i)
             {
+                if (fighter->getLevel() >= GetLev())
+                    break;
+
                 UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * 60);
                 fighter->addExp(exp);
                 data->accExp += exp;
             }
-			data->checktime -= count;
-			data->trainend -= count * 3600;
-			if (data->checktime == 0 || fighter->getExp() >= GetExp())
+
+            goldUse = 10 * i;
+			useGold(goldUse, &ci);
+			data->checktime -= i;
+			data->trainend -= i * 3600;
+			if (data->checktime == 0 || fighter->getLevel() >= GetLev())
 			{
 				if(delTrainFighter(id, true))
 					PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
@@ -3311,14 +3325,26 @@ namespace GObject
 
     void Player::resetShiMen()
     {
+        _playerData.smFinishCount = 0;
+        _playerData.smFreeCount = 0;
+        _playerData.smAcceptCount = 0;
         _playerData.shimen.clear();
+
         writeShiMen();
+        if (isOnline())
+            sendColorTask(0, 0);
     }
 
     void Player::resetYaMen()
     {
+        _playerData.ymFinishCount = 0;
+        _playerData.ymFreeCount = 0;
+        _playerData.ymAcceptCount = 0;
         _playerData.yamen.clear();
+
         writeYaMen();
+        if (isOnline())
+            sendColorTask(1, 0);
     }
 
 	void Player::writeShiMen()
@@ -4994,14 +5020,17 @@ namespace GObject
 		send((st));
 	}
 
-	void Player::regenAll()
+	void Player::regenAll(bool full)
 	{
 		for(int i = 0; i < 5; ++ i)
 		{
 			Lineup& pd = _playerData.lineup[i];
-			if(pd.fighter != NULL && pd.fighter->getCurrentHP() != 0)
+			if(pd.fighter != NULL && (pd.fighter->getCurrentHP() != 0 || full))
 			{
-				pd.fighter->setCurrentHP(0);
+                if (full)
+                    pd.fighter->setCurrentHP(pd.fighter->getMaxHP());
+                else
+                    pd.fighter->setCurrentHP(0);
 			}
 		}
 	}

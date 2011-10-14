@@ -424,3 +424,91 @@ int tinf_uncompress(void *dest, unsigned int *destLen,
    return TINF_OK;
 }
 
+#define A32_BASE 65521
+#define A32_NMAX 5552
+
+unsigned int tinf_adler32(const void *data, unsigned int length)
+{
+    const unsigned char *buf = (const unsigned char *)data;
+
+    unsigned int s1 = 1;
+    unsigned int s2 = 0;
+
+    while (length > 0)
+    {
+        int k = length < A32_NMAX ? length : A32_NMAX;
+        int i;
+
+        for (i = k / 16; i; --i, buf += 16)
+        {
+            s1 += buf[0];  s2 += s1; s1 += buf[1];  s2 += s1;
+            s1 += buf[2];  s2 += s1; s1 += buf[3];  s2 += s1;
+            s1 += buf[4];  s2 += s1; s1 += buf[5];  s2 += s1;
+            s1 += buf[6];  s2 += s1; s1 += buf[7];  s2 += s1;
+
+            s1 += buf[8];  s2 += s1; s1 += buf[9];  s2 += s1;
+            s1 += buf[10]; s2 += s1; s1 += buf[11]; s2 += s1;
+            s1 += buf[12]; s2 += s1; s1 += buf[13]; s2 += s1;
+            s1 += buf[14]; s2 += s1; s1 += buf[15]; s2 += s1;
+        }
+
+        for (i = k % 16; i; --i) { s1 += *buf++; s2 += s1; }
+
+        s1 %= A32_BASE;
+        s2 %= A32_BASE;
+
+        length -= k;
+    }
+
+    return (s2 << 16) | s1;
+}
+
+
+int tinf_zlib_uncompress(void *dest, unsigned int *destLen,
+        const void *source, unsigned int sourceLen)
+{
+    unsigned char *src = (unsigned char *)source;
+    unsigned char *dst = (unsigned char *)dest;
+    unsigned int a32;
+    int res;
+    unsigned char cmf, flg;
+
+    /* -- get header bytes -- */
+
+    cmf = src[0];
+    flg = src[1];
+
+    /* -- check format -- */
+
+    /* check checksum */
+    if ((256*cmf + flg) % 31) return TINF_DATA_ERROR;
+
+    /* check method is deflate */
+    if ((cmf & 0x0f) != 8) return TINF_DATA_ERROR;
+
+    /* check window size is valid */
+    if ((cmf >> 4) > 7) return TINF_DATA_ERROR;
+
+    /* check there is no preset dictionary */
+    if (flg & 0x20) return TINF_DATA_ERROR;
+
+    /* -- get adler32 checksum -- */
+
+    a32 =           src[sourceLen - 4];
+    a32 = 256*a32 + src[sourceLen - 3];
+    a32 = 256*a32 + src[sourceLen - 2];
+    a32 = 256*a32 + src[sourceLen - 1];
+
+    /* -- inflate -- */
+
+    res = tinf_uncompress(dst, destLen, src + 2, sourceLen - 6);
+
+    if (res != TINF_OK) return TINF_DATA_ERROR;
+
+    /* -- check adler32 checksum -- */
+
+    if (a32 != tinf_adler32(dst, *destLen)) return TINF_DATA_ERROR;
+
+    return TINF_OK;
+}
+
