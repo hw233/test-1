@@ -2816,8 +2816,12 @@ namespace GObject
 		UInt32 count = data->checktime;
 		//if (count > 0)
 		{
-            UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
-            UInt32 money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
+            UInt32 count = 0;
+            if((TimeUtil::Now() + (data->checktime * 3600)) > data->trainend)
+                count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
+            UInt32 money = 0;
+            if(data->checktime * 60 > count)
+                money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
 			//UInt32 money = data->checktime * data->price / data->traintime;
 			if (data->priceType == 0)
 			{
