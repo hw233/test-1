@@ -3213,6 +3213,29 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
         case 6:
             GObject::heroIsland.commitCompass(player);
             break;
+        case 7:
+            {
+                UInt16 skillid = 0;
+                brd >> skillid;
+                GObject::heroIsland.useSkill(player, skillid);
+            }
+            break;
+        case 8:
+            {
+                UInt8 id = 0;
+                brd >> id;
+                GObject::heroIsland.getAward(player, id);
+            }
+            break;
+        case 9:
+            {
+                UInt8 start = 0;
+                UInt8 pgsz = 0;
+                brd >> start;
+                brd >> pgsz;
+                GObject::heroIsland.listRank(player, start, pgsz);
+            }
+            break;
         default:
             break;
     }

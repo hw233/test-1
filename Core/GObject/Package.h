@@ -88,7 +88,8 @@ namespace GObject
 		ItemBase*  GetItem(UInt32 id, bool bind = false);
 		ItemEquip*  GetEquip(UInt32 id);
         inline bool FormulaMerge(UInt32 id, bool bind) { return FCMerge(id, bind); }
-        bool CittaMerge(UInt32 id, bool bind) { return FCMerge(id, bind); }
+        inline bool CittaMerge(UInt32 id, bool bind) { return FCMerge(id, bind); }
+        inline bool TrumpMerge(UInt32 id, bool bind) { return FCMerge(id, bind); } 
         bool FCMerge(UInt32 id, bool bind);
 
 		UInt16 GetItemNum(UInt32 id, bool bind = false);
