@@ -24,7 +24,9 @@ struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff) {}
+        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff), awardgot(0)
+    {
+    }
 
     Player* player;
     UInt8 type; // 0-无,1-天,2-地,3-人
@@ -36,18 +38,29 @@ struct HIPlayerData
     UInt32 score;
     UInt8 lasttype;
     std::vector<Task> compass; // 击杀任务
+    UInt8 awardgot;
 };
 
 struct RareAnimals
 {
-    RareAnimals() : id(0), last(0), cdend(0), cd(0) {}
+    RareAnimals() : id(0), last(0), cdlong(0), cd(0) {}
 
-    UInt32 id;
+    UInt16 id;
     GData::AttrExtra attr;
     UInt32 last;
-    UInt32 cdend;
+    UInt32 cdlong;
     UInt32 cd;
 };
+
+struct lt_score
+{
+    bool operator()(HIPlayerData* pd1, HIPlayerData* pd2) const
+    {
+        return pd1->score < pd2->score;
+    }
+};
+
+typedef std::set<HIPlayerData*, lt_score> SortType;
 
 class HeroIsland
 {
@@ -68,8 +81,9 @@ private:
 public:
     void process(UInt32 now);
     void applayHP();
+    void applayRareAnimals();
 
-    UInt8 getIdentity(Player* player);
+    UInt8 getIdentity(Player* player, bool = false);
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
     bool enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd = true);
     HIPlayerData* leave(Player* player, UInt8 spot);
@@ -77,7 +91,8 @@ public:
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
-    bool useSkill(Player* player, UInt8 spot);
+    bool useSkill(Player* player, UInt16 skillid);
+    bool getAward(Player* player, UInt8 id);
 
     void playerInfo(Player* player);
     void playerEnter(Player* player);
@@ -95,7 +110,7 @@ public:
     void sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 pagesize);
     void sendRareAnimals(HIPlayerData* pd, UInt8 spot);
     void sendSkills(HIPlayerData* pd);
-    void broadcast(HIPlayerData* pd, UInt8 spot);
+    void broadcast(HIPlayerData* pd, UInt8 spot, UInt8 type);
     void broadcast(Stream& st, UInt8 spot, Player* = NULL);
     void broadcast(Stream& st);
 
@@ -106,6 +121,7 @@ public:
     inline bool isRunning() { return _running; }
 
 public:
+    SortType _sorts;
     std::vector<HIPlayerData*> _players[HERO_ISLAND_SPOTS];
     UInt32 _types[3];
 
