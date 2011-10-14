@@ -1858,7 +1858,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     for (size_t i = 0; i < tk.count(); ++i)
     {
         s = GData::skillManager[::atoi(tk[i].c_str())];
-        if (s && s->cond)
+        if (s)
         {
             vt_skills.push_back(s);
         }
@@ -1900,6 +1900,13 @@ bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up )
     {
         idx = static_cast<int>(_skills.size());
         _skills.push_back(skill);
+        if (up)
+        {
+            UInt8  max = getUpSkillsMax();
+            UInt16 i = getUpSkillsNum();
+            if(i < max)
+                upSkill(skill, i, writedb);
+        }
         op = 1;
     }
 

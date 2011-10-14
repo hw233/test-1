@@ -142,6 +142,8 @@ namespace GObject
         inline UInt32 GetEnd() { return _end; }
 		bool instantComplete();
 
+        virtual bool IsWorldEvent() const	{ return true; }
+
 	private:
         UInt32 _end;
     };

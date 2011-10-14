@@ -2814,7 +2814,7 @@ namespace GObject
 		if (fgt == NULL) return false;
 		TrainFighterData * data = found->second;
 		UInt32 count = data->checktime;
-		if (count > 0)
+		//if (count > 0)
 		{
             UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
             UInt32 money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
@@ -2946,17 +2946,23 @@ namespace GObject
 			if (getGold() < goldUse)
 				return false;
 			ConsumeInfo ci(AccTrainFighter, 0, 0);
-			useGold(goldUse, &ci);
 			const std::vector<UInt32>& levExp = GData::GDataManager::GetLevelTrainExp();
-            for(UInt32 i = 0; i < count; ++ i)
+            UInt32 i = 0;
+            for(; i < count; ++ i)
             {
+                if (fighter->getLevel() >= GetLev())
+                    break;
+
                 UInt32 exp = static_cast<UInt32>(levExp[fighter->getLevel()] * data->factor * 60);
                 fighter->addExp(exp);
                 data->accExp += exp;
             }
-			data->checktime -= count;
-			data->trainend -= count * 3600;
-			if (data->checktime == 0 || fighter->getExp() >= GetExp())
+
+            goldUse = 10 * i;
+			useGold(goldUse, &ci);
+			data->checktime -= i;
+			data->trainend -= i * 3600;
+			if (data->checktime == 0 || fighter->getLevel() >= GetLev())
 			{
 				if(delTrainFighter(id, true))
 					PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
