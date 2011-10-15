@@ -48,6 +48,12 @@ void SaleMgr::addRowSale(SaleData * sale)
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
+    if(stIdx > 47)
+        stIdx = 1;
+    if(career > 3)
+        career = 0;
+    if(quality > 6)
+        quality = 1;
 
 	std::vector<SaleData *>& sales = _saleRow[stIdx][typeId];
 	sales.push_back(sale);
@@ -88,6 +94,12 @@ void SaleMgr::delRowSale(SaleData * sale)
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
+    if(stIdx > 47)
+        stIdx = 1;
+    if(career > 3)
+        career = 0;
+    if(quality > 6)
+        quality = 1;
 
 	std::vector<SaleData *>& sales = _saleRow[stIdx][typeId];
 	std::vector<SaleData *>::iterator found = std::find(sales.begin(), sales.end(), sale);
