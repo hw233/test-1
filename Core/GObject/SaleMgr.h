@@ -25,7 +25,8 @@ struct SaleData
 
 class SaleMgr
 {
-static const UInt32 SALE_TIME_OUT = 48 * 60 * 60;
+static const UInt32 SALE_TIME_OUT = 24 * 60 * 60;
+//static const UInt32 SALE_TIME_OUT = 5 * 60;
 
 public:
 	SaleMgr();
@@ -40,15 +41,15 @@ public:
 	void addSaleItem(Player *, UInt32, UInt32);
 	void cancelSale(Player *, UInt32);
 
-	void requestSaleList(Player *, UInt16, UInt16, UInt8, std::string&, UInt8, UInt8, UInt8, UInt8);
+	void requestSaleList(Player *, UInt16, UInt16, std::string&, UInt8, UInt8, UInt8, UInt8);
 	
 	void searchPlayerSale(Player *, Player *, UInt16, UInt16);
 	void searchPlayerSaleResp(Player *, Player *, UInt16, UInt16, UInt32 *, UInt16);
-	void searchSaleByItemName(Player *, std::string&, UInt16, UInt16, UInt8);
+	void searchSaleByItemName(Player *, std::string&, UInt16, UInt16);
 
 protected:
-	bool shiftSingleSaleList(UInt8, UInt8, UInt16, UInt16&, UInt16&);
-	bool shiftSingleSaleList2(UInt8, UInt8, UInt16&, UInt16&, UInt16&);
+	bool shiftSingleSaleList(UInt8, UInt8, UInt8, UInt16, UInt16&, UInt16&);
+	bool shiftSingleSaleList2(UInt8, UInt8, UInt8, UInt16&, UInt16&, UInt16&);
 	bool shiftTotalSaleList(UInt8, UInt8, UInt16, UInt8&, UInt16&, UInt16&);
 	UInt16 appendSingleSaleList(Player *, Stream&, UInt8, UInt8, UInt8,  UInt16, UInt16, UInt16);
 	UInt16 appendTotalSaleList(Player *, Stream&, UInt8, UInt8, UInt8, UInt16, UInt16, UInt16);
@@ -63,6 +64,13 @@ public:
 			return true;
 		return false;
 	}
+
+    void setOnOff(UInt8 on_off)
+    {
+        _on_off = on_off;
+    }
+
+    UInt8 getOnOff() { return _on_off; }
 
 protected:
 	inline UInt32 getNextIndex()
@@ -82,34 +90,13 @@ protected:
 		_saleIndex.insert(index);
 	}
 
-	inline UInt8 Index(UInt8 type, UInt32 typeId)
-	{
-		static UInt8 cvt[] = { 1, 1, 2, 1, 6, 7, 8, 9, 10, 11, 12, 13, 4, 1 };
-		if (cvt[type] != 1)
-			return cvt[type];
-		else
-		{
-			if ((typeId >= 8914 && typeId <= 8929) || typeId == 9215)
-				return 3;
-			return 1;
-		}
-	}
-	inline UInt8 StatIndex(UInt8 type, UInt32 typeId)
-	{
-		static UInt8 cvt[] = { 1, 1, 2, 1, 6, 7, 8, 9, 10, 11, 12, 13, 4, 1 };
-		if (cvt[type] != 1)
-			return cvt[type];
-		else
-		{
-			if ((typeId >= 8914 && typeId <= 8929) || typeId == 9215)
-				return 3;
-			return 1;				
-		}
-	}
+	UInt8 Index(UInt8 type, UInt32 typeId);
 
-	inline UInt32 saleRowStat(UInt8 type, UInt8 color)
+	UInt8 StatIndex(UInt8 type, UInt32 typeId, UInt8& parent);
+
+	inline UInt32 saleRowStat(UInt8 type, UInt8 color, UInt8 career)
 	{
-		return _itemStat[type][color];		
+		return _itemStat[career][type][color];
 	}
 
 	void addRowSale(SaleData *);
@@ -121,13 +108,20 @@ private:
 	typedef std::multimap<UInt32, UInt32> SaleCheckType;				//time -> itemPos
 	typedef std::map<UInt32, UInt32> SalePosType;						//id -> itemPos
 
+    UInt8 _on_off;
 	std::vector<SaleData *> _sales;
 	std::set<UInt32> _saleIndex;
 	
 	SalePosType _salePos;
-	SaleCheckType _saleCheck;
-	SaleRowType _saleRow[14];	//普通1 宝石2 强化3 喜好品4 装备5 武器6 头盔7 胸甲8 肩甲9 腰带10 腿甲11 项链12 戒指13 (0 : reversed)
-	UInt32 _itemStat[14][7];	//分类(全部0 普通1 宝石2 强化3 喜好品4 装备5 武器6 头盔7 胸甲8 肩甲9 腰带10 腿甲11 项链12 戒指13) 0全部 1白色2绿色3蓝色4紫色5橙色6暗金
+	SaleCheckType _saleCheck[3];
+	SaleRowType _saleRow[48];	//普通1 强化2 (0 : reversed)
+                                //装备3 武器4 头盔5 胸甲6 肩甲7 腰带8 腿甲9 项链10 戒指11
+                                //心法12 增益心法13 技能心法14
+                                //法宝15 被动法宝16 无双法宝17
+                                //阵法18 七绝锁云阵19 四象元灵阵20 奇门遁甲阵21 天罡地煞阵22 都天烈火阵23 颠倒八卦阵24
+                                //北斗七星阵25 五行灭绝阵26 紫微太极阵27 金刚伏魔阵28 须弥九宫阵29 两仪微尘阵30
+                                //宝石31 力量32 敏捷33 智力34 耐力35 意志36 生命37 攻击38 防御39 命中40 反击41 闪避42 暴击43 破击44 身法45 坚韧46 法抗47
+	UInt32 _itemStat[4][48][7];	//分类(全部0 儒1释2道3) (全部0 普通1 强化2 装备3.. 心法12.. 法宝15.. 阵法18.. 宝石31..) 0全部 1白色2绿色3蓝色4紫色5橙色6暗金
 };
 
 extern SaleMgr gSaleMgr;

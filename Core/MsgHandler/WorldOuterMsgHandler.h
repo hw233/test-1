@@ -157,13 +157,14 @@ struct SaleListReq
 {
 	UInt16 _start;
 	UInt16 _count;
-	UInt8  _search;
+//	UInt8  _search;
 	std::string _name;
 	UInt8  _req;
-	UInt8  _sort;
+//	UInt8  _sort;
 	UInt8  _color;
+    UInt8  _career;
 	UInt8  _eqType;
-	MESSAGE_DEF8(REQ::SALE_LIST, UInt16, _start, UInt16, _count, UInt8, _search, std::string, _name, UInt8, _req, UInt8, _sort, UInt8, _color, UInt8, _eqType);
+	MESSAGE_DEF7(REQ::SALE_LIST, UInt16, _start, UInt16, _count, std::string, _name, UInt8, _req, UInt8, _color, UInt8, _career, UInt8, _eqType);
 };
 
 struct SaleBuyAndCancelReq
@@ -1114,12 +1115,18 @@ void OnBattleReportReq( GameMsgHdr& hdr, BattleReportReq& brr)
 void OnSaleListReq( GameMsgHdr& hdr, SaleListReq& req )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::gSaleMgr.requestSaleList(player, req._start, req._count, req._search, req._name, req._req, req._sort, req._color, req._eqType);
+	GObject::gSaleMgr.requestSaleList(player, req._start, req._count, req._name, req._req, req._color, req._career, req._eqType);
 }
 
 void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
 {
 	MSG_QUERY_PLAYER(player);
+
+    if(GObject::gSaleMgr.getOnOff() == 0)
+    {
+        return;
+    }
+
 	if (req._token == 0)
 	{
 		if(!player->hasChecked())

@@ -48,6 +48,7 @@
 #include "Common/TimeUtil.h"
 #include "Common/BinaryReader.h"
 #include "LoginMsgHandler.h"
+#include "GObject/SaleMgr.h"
 
 struct NullReq
 {
@@ -2836,6 +2837,11 @@ void OnTradeOperate(GameMsgHdr& hdr, TradeOperateReq& req)
 void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 {
 	MSG_QUERY_PLAYER(player);
+    if(GObject::gSaleMgr.getOnOff() == 0)
+    {
+        return;
+    }
+
 	if(!player->hasChecked())
 		return;
 

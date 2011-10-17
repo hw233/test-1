@@ -29,6 +29,7 @@
 #include "GData/ExpTable.h"
 #include "GObject/Player.h"
 #include <libmemcached/memcached.h>
+#include "GObject/SaleMgr.h"
 
 static memcached_st* memc = NULL;
 
@@ -1312,6 +1313,25 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
     st << ret << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
+
+void reqSaleOnOffFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::SALE_ONOFF);
+    UInt8 flag;
+    br >> flag;
+
+    UInt8 ret = flag;
+    if(flag < 2)
+        GObject::gSaleMgr.setOnOff(flag);
+    else
+        ret = GObject::gSaleMgr.getOnOff();
+
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 
 #endif // _LOGINOUTERMSGHANDLER_H_
 
