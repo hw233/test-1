@@ -3198,7 +3198,7 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
                 brd >> atype;
                 if (atype == 0)
                 {
-                    UInt8 id = 0;
+                    UInt16 id = 0;
                     brd >> id;
                     GObject::heroIsland.attack(player, atype, id);
                 }
@@ -3222,9 +3222,9 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             break;
         case 8:
             {
-                UInt8 id = 0;
+                UInt8 id = 0xFF;
                 brd >> id;
-                GObject::heroIsland.getAward(player, id);
+                GObject::heroIsland.getAward(player, id, 1);
             }
             break;
         case 9:

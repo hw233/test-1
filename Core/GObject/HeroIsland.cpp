@@ -2,6 +2,7 @@
 #include "HeroIsland.h"
 #include "Server/SysMsg.h"
 #include "Common/Random.h"
+#include "GObject/Package.h"
 #include "Server/Cfg.h"
 #include "MsgID.h"
 
@@ -9,6 +10,7 @@ namespace GObject
 {
 
 std::vector<RareAnimals> HeroIsland::_animals[HERO_ISLAND_SPOTS];
+std::vector<Awards> HeroIsland::_awards;
 
 void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd)
 {
@@ -44,6 +46,28 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
     ra.cdlong = cd;
     ra.cd = 0;
     _animals[spot].push_back(ra);
+}
+
+class Sort 
+{    
+    public:
+        bool operator()(Awards a, Awards b)
+        {    
+            return a.prob < b.prob;
+        }    
+};   
+
+void HeroIsland::addHIAwardsCfg(UInt32 id, UInt32 num, UInt32 prob)
+{
+    if (!id)
+    {
+        std::sort(_awards.begin(), _awards.end(), Sort());
+        size_t sz = _awards.size();
+        for (size_t i = 1; i < sz; ++i)
+            _awards[i].prob += _awards[i-1].prob;
+        return;
+    }
+    _awards.push_back(Awards(id, num, prob));
 }
 
 bool HeroIsland::isRareAnimal(UInt32 npcid)
@@ -106,6 +130,7 @@ void HeroIsland::applayHP()
 
 void HeroIsland::applayRareAnimals()
 {
+    return; // XXX: 不需要更新，只在攻击变化时更新
     static UInt32 count = 0;
     if (!(count++ % 2))
         return;
@@ -439,7 +464,7 @@ void HeroIsland::broadcast(Stream& st, UInt8 spot, Player* player)
     for (size_t i = 0; i < sz; ++i)
     {
         Player* player1 = _players[spot][i]->player;
-        if (player && player != player1 && player1->hasFlag(Player::InHeroIsland))
+        if ((!player || (player && player != player1)) && player1 && player1->hasFlag(Player::InHeroIsland))
             player1->send(st);
     }
 }
@@ -738,6 +763,8 @@ void HeroIsland::playerInfo(Player* player)
         {
             st << static_cast<UInt32>(0);
         }
+
+        st << static_cast<UInt8>(pd->awardgot==1?1:0);
     }
 
     st << Stream::eos;
@@ -851,6 +878,9 @@ void HeroIsland::startCompass(Player* player)
         type = 1;
     pd->compass.push_back(Task(type, 1));
 
+    if (pd->awardgot == 2)
+        pd->awardgot = 0;
+
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(3);
     st << type << Stream::eos;
@@ -889,8 +919,11 @@ void HeroIsland::commitCompass(Player* player)
 
     UInt32 score = pd->score;
 
+
     if (!(sz % 3))
     {
+        pd->awardgot = 1;
+
         if (pd->straight == sz)
         {
             // TODO:
@@ -904,7 +937,9 @@ void HeroIsland::commitCompass(Player* player)
     {
     }
 
+    // TODO:
     pd->score += 1;
+
     if (score != pd->score)
         _sorts.insert(pd);
 
@@ -912,11 +947,12 @@ void HeroIsland::commitCompass(Player* player)
         _sorts.erase(_sorts.begin());
 
     Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(5) << static_cast<UInt8>(3) << pd->straight << Stream::eos;
+    st << static_cast<UInt8>(5) << static_cast<UInt8>(3) << pd->straight
+        << static_cast<UInt8>(pd->awardgot==1?1:0) << Stream::eos;
     player->send(st);
 }
 
-bool HeroIsland::getAward(Player* player, UInt8 id)
+bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 {
     if (!player || id > 4)
         return false;
@@ -931,15 +967,79 @@ bool HeroIsland::getAward(Player* player, UInt8 id)
         return false;
     player->setHISpot(spot);
 
-    if (pd->awardgot)
-        return false;
+    if (type == 1)
+    {
+        if (!pd->awardgot || pd->awardgot == 2)
+            return false;
 
-    // generate awards
-    UInt16 awards[5] = {0,};
-    // TODO:
+        UInt8 sz = _awards.size();
+        if (sz < 5)
+            return false;
 
-    pd->awardgot = 1;
-    return false;
+        struct Award
+        {
+            UInt16 id;
+            UInt8 num;
+        };
+
+        if (player->GetPackage()->IsFull())
+        {
+            player->sendMsgCode(0, 1011);
+            return false;
+        }
+
+        UInt32 total = _awards[sz-1].prob;
+        Award awards[5] = {{0,},};
+        Awards* awds = &_awards[0];
+        for (UInt8 j = 0; j < 5; ++j)
+        {
+            UInt32 v = uRand(total);
+            for (UInt8 i = 0; i < sz; ++i, ++awds)
+            {
+                if (v < awds->prob)
+                {
+                    awards[j].id = awds->id;
+                    awards[j].num = awds->num;
+                    break;
+                }
+            }
+        }
+
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(8);
+        st << static_cast<UInt8>(5);
+        for (UInt8 i = 0; i < 5; ++i)
+        {
+            st << awards[i].id;
+            st << awards[i].num;
+        }
+        st << Stream::eos;
+        player->send(st);
+
+        if (awards[id].id && awards[id].num)
+        {
+            if (awards[id].id == 0)
+            {
+                player->getTael(awards[id].num);
+            }
+            else if (awards[id].id == 1)
+            {
+                player->getCoupon(awards[id].num);
+            }
+            else
+            {
+                player->GetPackage()->Add(awards[id].id, awards[id].num, true, true);
+            }
+            pd->awardgot = 2;
+        }
+        else
+            return false;
+    }
+    else
+    {
+    }
+
+    return true;
 }
 
 HeroIsland heroIsland;

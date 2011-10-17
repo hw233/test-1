@@ -57,6 +57,19 @@ local rareAnimals = {
     [5508] = {{0,0,0,0,0,0,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},60,600,4},
 }
 
+--  奖励
+local awards = {
+    -- 物品ID 物品个数 概率
+    {18, 10, 100},
+    {19, 10, 100},
+    {1210, 1, 100},
+    {20, 11, 23},
+    {12, 1, 250},
+    {54, 1, 200},
+    {1220, 1, 100},
+    {0, 0, 0}, --  这一行必不可少
+}
+
 function loadRareAnimals()
     local attr = AttrExtra:Instance(AttrExtra)
     for k,v in pairs(rareAnimals)
@@ -84,6 +97,16 @@ function loadRareAnimals()
         attr.counter = v[1][21]
         attr.magres = v[1][22]
         setRareAnimals(v[4], k, attr, v[2], v[3]);
+    end
+
+    -- here ^_^
+    loadHIAwardsCfg()
+end
+
+function loadHIAwardsCfg()
+    for k,v in pairs(awards)
+    do
+        addHIAwardsCfg(v[1], v[2], v[3]);
     end
 end
 
