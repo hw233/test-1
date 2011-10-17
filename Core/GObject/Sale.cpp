@@ -146,7 +146,7 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 			}
 			salePuts[j].item = saleItems[j];
 			salePuts[j].priceType = sales[j].priceType;
-			salePuts[j].price = sales[j].price;
+			salePuts[j].price = sales[j].price > 99999 ? 99999 : sales[j].price;
 		}
 		GameMsgHdr hdr(0x1B2, WORKER_THREAD_WORLD, _owner, sizeof(salePuts));
 		GLOBAL().PushMsg(hdr, &salePuts);		
