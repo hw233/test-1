@@ -913,7 +913,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         {
             defList[defCount].damType = e_Confuse;
             target_bo->setConfuseLevel(SKILL_LEVEL(skill->getId()));
-            target_bo->setConfuseRound(skill->last + 1);
+            target_bo->setConfuseRound(skill->last);
         }
         break;
     case 4:
@@ -921,7 +921,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         {
             defList[defCount].damType = e_Stun;
             target_bo->setStunLevel(SKILL_LEVEL(skill->getId()));
-            target_bo->setStunRound(skill->last + 1);
+            target_bo->setStunRound(skill->last);
         }
         break;
     case 8:
@@ -929,7 +929,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         {
             defList[defCount].damType = e_Forget;
             target_bo->setForgetLevel(SKILL_LEVEL(skill->getId()));
-            target_bo->setForgetRound(skill->last + 1);
+            target_bo->setForgetRound(skill->last);
         }
         break;
     }
@@ -2147,12 +2147,12 @@ UInt32 BattleSimulator::doAttack( int pos )
     }
 #endif
     //fs.resetAction();
-    rcnt += releaseCD(bf);
-    insertFighterStatus(bf);
-
 	UInt32 stun = bf->getStunRound();
     UInt32 confuse = bf->getConfuseRound();
     UInt32 forget = bf->getForgetRound();
+
+    rcnt += releaseCD(bf);
+    insertFighterStatus(bf);
 
     if(stun > 0)
     {
@@ -3698,7 +3698,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 	}
 
 
-    UInt32 atkAdd_last = bf->getAttackAddLast();
+    UInt8& atkAdd_last = bf->getAttackAddLast();
     if(atkAdd_last > 0)
     {
         -- atkAdd_last;
@@ -3706,7 +3706,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stAtk, 0, 0, scList, scCount, false);
     }
 
-    UInt32 magAtkAdd_last = bf->getMagAttackAddLast();
+    UInt8& magAtkAdd_last = bf->getMagAttackAddLast();
     if(magAtkAdd_last > 0)
     {
         -- magAtkAdd_last;
@@ -3714,7 +3714,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stMagAtk, 0, 0, scList, scCount, false);
     }
 
-    UInt32 defAdd_last = bf->getDefendAddLast();
+    UInt8& defAdd_last = bf->getDefendAddLast();
     if(defAdd_last > 0)
     {
         -- defAdd_last;
@@ -3722,7 +3722,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stDef, 0, 0, scList, scCount, false);
     }
 
-    UInt32 magDefAdd_last = bf->getMagDefendAddLast();
+    UInt8& magDefAdd_last = bf->getMagDefendAddLast();
     if(magDefAdd_last > 0)
     {
         -- magDefAdd_last;
@@ -3730,7 +3730,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stMagDef, 0, 0, scList, scCount, false);
     }
 
-    UInt32 hitrateAdd_last = bf->getHitrateAddLast();
+    UInt8& hitrateAdd_last = bf->getHitrateAddLast();
     if(hitrateAdd_last > 0)
     {
         -- hitrateAdd_last;
@@ -3738,7 +3738,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stHitRate, 0, 0, scList, scCount, false);
     }
 
-    UInt32 evadeAdd_last = bf->getEvadeAddLast();
+    UInt8& evadeAdd_last = bf->getEvadeAddLast();
     if(evadeAdd_last > 0)
     {
         -- evadeAdd_last;
@@ -3746,7 +3746,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stEvade, 0, 0, scList, scCount, false);
     }
 
-    UInt32 criticalAdd_last = bf->getCriticalAddLast();
+    UInt8& criticalAdd_last = bf->getCriticalAddLast();
     if(criticalAdd_last > 0)
     {
         -- criticalAdd_last;
@@ -3765,7 +3765,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     }
 #endif
 
-    UInt32 pierceAdd_last = bf->getPierceAddLast();
+    UInt8& pierceAdd_last = bf->getPierceAddLast();
     if(pierceAdd_last > 0)
     {
         -- pierceAdd_last;
@@ -3773,7 +3773,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stPierce, 0, 0, scList, scCount, false);
     }
 
-    UInt32 counterAdd_last = bf->getCounterAddLast();
+    UInt8& counterAdd_last = bf->getCounterAddLast();
     if(counterAdd_last > 0)
     {
         -- counterAdd_last;
@@ -3781,7 +3781,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stCounter, 0, 0, scList, scCount, false);
     }
 
-    UInt32 magResAdd_last = bf->getMagResAddLast();
+    UInt8& magResAdd_last = bf->getMagResAddLast();
     if(magResAdd_last > 0)
     {
         -- magResAdd_last;
@@ -3789,7 +3789,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stMagRes, 0, 0, scList, scCount, false);
     }
 
-    UInt32 toughAdd_last = bf->getToughAddLast();
+    UInt8& toughAdd_last = bf->getToughAddLast();
     if(toughAdd_last > 0)
     {
         -- toughAdd_last;
@@ -3808,7 +3808,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     }
 #endif
 
-    UInt32 maxActionAdd_last = bf->getActionAddLast();
+    UInt8& maxActionAdd_last = bf->getActionAddLast();
     if(maxActionAdd_last > 0)
     {
         -- maxActionAdd_last;
