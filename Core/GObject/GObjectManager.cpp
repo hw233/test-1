@@ -1267,7 +1267,11 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull; 
 		pl = NULL;
 		ItemData idata;
+#if 0
 		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bindType` FROM `item` ORDER BY `ownerId`", idata) != DB::DB_OK)
+#else
+		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bindType` FROM `item` ORDER BY `ownerId`, `bindType` DESC", idata) != DB::DB_OK)
+#endif
 			return false;
 		lc.reset(2000);
 		while(execu->Next() == DB::DB_OK)
@@ -1280,8 +1284,37 @@ namespace GObject
 			}
 			if(pl == NULL)
 				continue;
+#if 0
 			if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
+#else
+			if (!IsEquipId(idata.id))
+            {
+                if (idata.id >= 1200 && idata.id <= 1499)
+                    pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
+                else
+                {
+                    if (!idata.bindType)
+                    {
+                        UInt16 num = pl->GetPackage()->GetItemNum(idata.id, true);
+                        if (num)
+                        {
+                            DB1().PushUpdateData("DELETE FROM `item` where `id` = %u and `ownerId` = %"I64_FMT"u and `bindType` = 0", idata.id, pl->getId());
+                            DB1().PushUpdateData("UPDATE `item` set `itemNum` = `itemNum` + %u where `id` = %u and `ownerId` = %"I64_FMT"u",
+                                    idata.itemNum, idata.id, pl->getId());
+                        }
+                        else
+                        {
+                            DB1().PushUpdateData("UPDATE `item` set `bindType` = 1 where `id` = %u and `ownerId` = %"I64_FMT"u",
+                                    idata.id, pl->getId());
+                        }
+                        pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum+num, true);
+                    }
+                    else
+                        pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, true);
+                }
+            }
+#endif
 			else
 				pl->GetPackage()->AddEquipFromDB(idata.id, idata.bindType != 0);
 		}

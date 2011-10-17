@@ -2813,7 +2813,7 @@ namespace GObject
 		Fighter * fgt = findFighter(id);
 		if (fgt == NULL) return false;
 		TrainFighterData * data = found->second;
-		UInt32 count = data->checktime;
+		//UInt32 count = data->checktime;
 		//if (count > 0)
 		{
             UInt32 count = 0;
@@ -5844,7 +5844,7 @@ namespace GObject
 			sendMsgCode(0, 1100);
 			return 0;
 		}
-		if(!m_Package->AddItem(iid, 1))
+		if(!m_Package->AddItem(iid, 1, true))
 		{
 			sendMsgCode(2, 1011);
 			return 0;
