@@ -127,7 +127,10 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 				revenue += revTael;
 		}
 		if (revenue > _owner->getTael())
+        {
+            _owner->sendMsgCode(0, 1602);
 			return;
+        }
 		_owner->useTael(revenue);
 		SalePut salePuts[9];
 		for (std::size_t j = 0; j < sz; ++j)

@@ -65,6 +65,13 @@ public:
 		return false;
 	}
 
+    void setOnOff(UInt8 on_off)
+    {
+        _on_off = on_off;
+    }
+
+    UInt8 getOnOff() { return _on_off; }
+
 protected:
 	inline UInt32 getNextIndex()
 	{
@@ -101,6 +108,7 @@ private:
 	typedef std::multimap<UInt32, UInt32> SaleCheckType;				//time -> itemPos
 	typedef std::map<UInt32, UInt32> SalePosType;						//id -> itemPos
 
+    UInt8 _on_off;
 	std::vector<SaleData *> _sales;
 	std::set<UInt32> _saleIndex;
 	

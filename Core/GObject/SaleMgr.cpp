@@ -17,7 +17,7 @@ SaleMgr gSaleMgr;
 
 SaleMgr::SaleMgr()
 {
-
+    _on_off = 1;
 }
 
 SaleMgr::~SaleMgr()

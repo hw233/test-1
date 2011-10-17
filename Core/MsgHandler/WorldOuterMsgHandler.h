@@ -1121,6 +1121,12 @@ void OnSaleListReq( GameMsgHdr& hdr, SaleListReq& req )
 void OnSaleBuyAndCancelReq( GameMsgHdr& hdr, SaleBuyAndCancelReq& req )
 {
 	MSG_QUERY_PLAYER(player);
+
+    if(GObject::gSaleMgr.getOnOff() == 0)
+    {
+        return;
+    }
+
 	if (req._token == 0)
 	{
 		if(!player->hasChecked())
