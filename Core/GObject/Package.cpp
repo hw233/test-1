@@ -992,7 +992,7 @@ namespace GObject
                 return ret;
             }
         }
-        else if (GetItemSubClass(id) == Item_Normal29)
+        else if (GetItemSubClass(id) == Item_Normal)
         {
             ItemBase* item = GetItem(id, bind > 0);
             if (item && item->getClass() == Item_Normal29)
@@ -1195,7 +1195,8 @@ namespace GObject
             UInt16 num = atoi(tk[j].c_str());
             DelItemAny(id, num, &bind);
         }
-        AddItem(config[i].tid, 1, bind, false, FromFCMerge);
+
+        Add(config[i].tid, 1, bind, false, FromFCMerge);
         return true;
     }
 
