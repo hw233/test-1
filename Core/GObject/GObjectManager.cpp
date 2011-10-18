@@ -1267,7 +1267,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull; 
 		pl = NULL;
 		ItemData idata;
-#if 0
+#if 1
 		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bindType` FROM `item` ORDER BY `ownerId`", idata) != DB::DB_OK)
 #else
 		if(execu->Prepare("SELECT `id`, `ownerId`, `itemNum`, `bindType` FROM `item` ORDER BY `ownerId`, `bindType` DESC", idata) != DB::DB_OK)
@@ -1284,7 +1284,7 @@ namespace GObject
 			}
 			if(pl == NULL)
 				continue;
-#if 0
+#if 1
 			if (!IsEquipId(idata.id))
 				pl->GetPackage()->AddItemFromDB(idata.id, idata.itemNum, idata.bindType != 0);
 #else

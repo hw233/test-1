@@ -32,7 +32,7 @@ struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff), awardgot(0)
+        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff), awardgot(0), inrank(0)
     {
     }
 
@@ -43,10 +43,11 @@ struct HIPlayerData
     UInt32 fightcd;
     UInt32 injuredcd;
     UInt8 straight;
-    UInt32 score;
+    UInt16 score;
     UInt8 lasttype;
     std::vector<Task> compass; // 击杀任务
     UInt8 awardgot; // 0-没有奖励,1-未领取,2-已领取
+    UInt8 inrank; // 0-不在,>=1-在
 };
 
 struct RareAnimals

@@ -765,6 +765,8 @@ void HeroIsland::playerInfo(Player* player)
         }
 
         st << static_cast<UInt8>(pd->awardgot==1?1:0);
+        st << pd->inrank;
+        st << pd->score;
     }
 
     st << Stream::eos;
@@ -824,6 +826,9 @@ void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(13);
+    st << start;
+    st << static_cast<UInt16>(sz);
+
     size_t off = st.size();
     st << static_cast<UInt8>(0);
 
@@ -941,10 +946,29 @@ void HeroIsland::commitCompass(Player* player)
     pd->score += 1;
 
     if (score != pd->score)
+    {
         _sorts.insert(pd);
 
-    if (_sorts.size() > 100)
-        _sorts.erase(_sorts.begin());
+        pd->inrank = 0;
+        for (SortType::iterator i = _sorts.begin(), e = _sorts.end(); i != e; ++i)
+        {
+            if (*i == pd)
+            {
+                ++pd->inrank;
+                break;
+            }
+        }
+
+        if (_sorts.size() > 100)
+        {
+            (*_sorts.begin())->inrank = 0;
+            _sorts.erase(_sorts.begin());
+        }
+
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(14) << pd->inrank << pd->score << Stream::eos;
+        player->send(st);
+    }
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(5) << static_cast<UInt8>(3) << pd->straight
