@@ -190,7 +190,10 @@ namespace GObject
         if (!in)
             return;
 
-        FastMutex::ScopedLock lk(m_lck);
+        if (pl->getLocation() != loc)
+            return;
+
+        //FastMutex::ScopedLock lk(m_lck);
         std::map<UInt16, WBoss>::iterator i = m_boss.find(loc);
         if (i != m_boss.end())
         {

@@ -1934,13 +1934,13 @@ namespace GObject
 		if(res)
 		{
 			ret = 0x0101;
-			_lastNg = ng;
             if (final) // TODO:
             {
                 pendExp(ng->getExp()*expfactor);
             }
             else
             {
+                _lastNg = ng;
                 pendExp(ng->getExp()*expfactor);
                 ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
             }
@@ -1958,7 +1958,11 @@ namespace GObject
         st << Stream::eos;
         send(st);
 
-		setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        if (final)
+            setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+            setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+
 		return res;
 	}
 
