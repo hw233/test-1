@@ -96,8 +96,12 @@ void NpcGroup::getLoots( GObject::Player * player, std::vector<LootResult>& il, 
 		if(lr.id == 0)
 			continue;
 		if (player->GetPackage()->Add(lr.id, lr.count, false, true, FromNpc))
+        {
             ++cnt;
-		il.push_back(lr);
+            il.push_back(lr);
+        }
+        else
+            continue;
 	}
     if (atoCnt)
         *atoCnt = cnt;

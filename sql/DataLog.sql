@@ -333,10 +333,27 @@ CREATE TABLE IF NOT EXISTS `country_battle` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
+--
+-- Table structure for table `sales`
+--
 
-
-
-
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `sales` (
+  `server_id` int(10) unsigned NOT NULL,
+  `sale_id` int(10) unsigned NOT NULL,
+  `player_id` bigint(20) unsigned NOT NULL,
+  `price_type` int(10) unsigned NOT NULL,
+  `price` int(10) unsigned NOT NULL,
+  `item` int(10) unsigned NOT NULL,
+  `item_num` int(10) unsigned NOT NULL,
+  `sale_time` int(10) unsigned NOT NULL,
+  `is_cancel` tinyint(1) NOT NULL DEFAULT 0,
+  `purchaser` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `purchase_time` int(10) unsigned NOT NULL DEFAULT 0,
+  INDEX server(`server_id`, `sale_id`, `player_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 
 

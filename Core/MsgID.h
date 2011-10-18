@@ -496,6 +496,7 @@ namespace SPEQ
     const UInt16 LOADLUA            = 0x10F;//
     const UInt16 SETVIPL            = 0x110;//
     const UInt16 CLSTASK            = 0x111;//
+    const UInt16 SALE_ONOFF         = 0x112;// 交易开关
 }
 
 namespace SPEP
@@ -517,6 +518,7 @@ namespace SPEP
     const UInt8 SETVIPL             = 0x10;//
     const UInt8 CLSTASK             = 0x11;//
     const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
+    const UInt8 SALE_ONOFF          = 0x12;// 交易开关
 }
 
 #endif // _MSGID_H_

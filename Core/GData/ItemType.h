@@ -87,6 +87,20 @@ inline bool IsEquip(UInt8 subClass)
 	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Trump);
 }
 
+inline UInt8 getGemLev(UInt32 id)
+{
+    UInt8 lev = id%10;
+    if(IsGemId)
+    {
+        if(lev == 0)
+            return 10;
+        else
+            return lev;
+    }
+    else
+        return 0;
+}
+
 inline bool IsFighterTypeId(UInt32 id)
 {
     if (id == 74 || id == 76 || id == 75 || id == 77)

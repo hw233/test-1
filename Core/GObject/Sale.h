@@ -95,7 +95,7 @@ struct SaleSearchReq
 
 struct SaleSearchResp
 {
-	UInt32 ids[18];
+	UInt32 ids[24];
 	UInt16 start;
 	UInt16 count;
 	Player * founder;

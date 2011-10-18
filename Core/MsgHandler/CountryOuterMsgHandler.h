@@ -48,6 +48,7 @@
 #include "Common/TimeUtil.h"
 #include "Common/BinaryReader.h"
 #include "LoginMsgHandler.h"
+#include "GObject/SaleMgr.h"
 
 struct NullReq
 {
@@ -2836,6 +2837,11 @@ void OnTradeOperate(GameMsgHdr& hdr, TradeOperateReq& req)
 void OnSaleSellReq( GameMsgHdr& hdr, SaleSellReq& req )
 {
 	MSG_QUERY_PLAYER(player);
+    if(GObject::gSaleMgr.getOnOff() == 0)
+    {
+        return;
+    }
+
 	if(!player->hasChecked())
 		return;
 
@@ -3198,7 +3204,7 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
                 brd >> atype;
                 if (atype == 0)
                 {
-                    UInt8 id = 0;
+                    UInt16 id = 0;
                     brd >> id;
                     GObject::heroIsland.attack(player, atype, id);
                 }
@@ -3222,9 +3228,9 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             break;
         case 8:
             {
-                UInt8 id = 0;
+                UInt8 id = 0xFF;
                 brd >> id;
-                GObject::heroIsland.getAward(player, id);
+                GObject::heroIsland.getAward(player, id, 1);
             }
             break;
         case 9:

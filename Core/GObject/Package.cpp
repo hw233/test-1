@@ -992,7 +992,7 @@ namespace GObject
                 return ret;
             }
         }
-        else if (GetItemSubClass(id) == Item_Normal29)
+        else if (GetItemSubClass(id) == Item_Normal)
         {
             ItemBase* item = GetItem(id, bind > 0);
             if (item && item->getClass() == Item_Normal29)
@@ -1195,7 +1195,8 @@ namespace GObject
             UInt16 num = atoi(tk[j].c_str());
             DelItemAny(id, num, &bind);
         }
-        AddItem(config[i].tid, 1, bind, false, FromFCMerge);
+
+        Add(config[i].tid, 1, bind, false, FromFCMerge);
         return true;
     }
 
@@ -1721,6 +1722,12 @@ namespace GObject
 		ItemEquipData& ied = equip->getItemEquipData();
 		if(pos >= ied.sockets || ied.gems[pos] == 0)
 			return 2;
+
+        if(protect == 0 && getGemLev(ied.gems[pos]) > 3)
+        {
+            return 2;
+        }
+
 		if(GetRestPackageSize() < 1)
 		{
 			m_Owner->sendMsgCode(0, 1011);
@@ -1747,6 +1754,7 @@ namespace GObject
 			return 2;
         ConsumeInfo ci(DetachGems,0,0);
 		m_Owner->useTael(amount,&ci);
+#if 0
 		if(protect == 0 && uRand(100) < 75)
 		{
 			if(fgt != NULL)
@@ -1755,6 +1763,7 @@ namespace GObject
 				DelEquip2(equip, ToDetachGemDesdroy);
 			return 1;
 		}
+#endif
 		ied.gems[pos] = 0;
 		DB4().PushUpdateData("UPDATE `equipment` SET `socket%u` = 0 WHERE `id` = %u", pos + 1, equip->getId());
 		if(!equip->GetBindStatus() && bind)

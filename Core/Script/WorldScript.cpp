@@ -53,6 +53,7 @@ void WorldScript::init()
     def("setCopyActiveCount", GObject::PlayerCopy::setCopyActiveCount);
     def("setFrontMapActiveCount", GObject::FrontMap::setFrontMapActiveCount);
     def("setRareAnimals", GObject::HeroIsland::setRareAnimals);
+    def("addHIAwardsCfg", GObject::HeroIsland::addHIAwardsCfg);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

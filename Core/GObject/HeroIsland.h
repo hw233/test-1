@@ -20,11 +20,19 @@ struct Task
     UInt8 status;
 };
 
+struct Awards
+{
+    Awards(UInt32 id, UInt16 num, UInt16 prob) : id(id), num(num), prob(prob) {}
+    UInt32 id;
+    UInt16 num;
+    UInt16 prob;
+};
+
 struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff), awardgot(0)
+        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff), awardgot(0), inrank(0)
     {
     }
 
@@ -35,10 +43,11 @@ struct HIPlayerData
     UInt32 fightcd;
     UInt32 injuredcd;
     UInt8 straight;
-    UInt32 score;
+    UInt16 score;
     UInt8 lasttype;
     std::vector<Task> compass; // 击杀任务
-    UInt8 awardgot;
+    UInt8 awardgot; // 0-没有奖励,1-未领取,2-已领取
+    UInt8 inrank; // 0-不在,>=1-在
 };
 
 struct RareAnimals
@@ -74,9 +83,11 @@ public:
 
 public:
     static void setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd);
+    static void addHIAwardsCfg(UInt32 id, UInt32 num, UInt32 prob);
     static bool isRareAnimal(UInt32 npcid);
 private:
     static std::vector<RareAnimals> _animals[HERO_ISLAND_SPOTS];
+    static std::vector<Awards> _awards;
 
 public:
     void process(UInt32 now);
@@ -92,7 +103,7 @@ public:
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
     bool useSkill(Player* player, UInt16 skillid);
-    bool getAward(Player* player, UInt8 id);
+    bool getAward(Player* player, UInt8 id, UInt8 type);
 
     void playerInfo(Player* player);
     void playerEnter(Player* player);

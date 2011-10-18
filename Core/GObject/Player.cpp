@@ -2813,11 +2813,15 @@ namespace GObject
 		Fighter * fgt = findFighter(id);
 		if (fgt == NULL) return false;
 		TrainFighterData * data = found->second;
-		UInt32 count = data->checktime;
+		//UInt32 count = data->checktime;
 		//if (count > 0)
 		{
-            UInt32 count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
-            UInt32 money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
+            UInt32 count = 0;
+            if((TimeUtil::Now() + (data->checktime * 3600)) > data->trainend)
+                count = (TimeUtil::Now() + (data->checktime * 3600) - data->trainend)/60;
+            UInt32 money = 0;
+            if(data->checktime * 60 > count)
+                money = data->price * static_cast<float>(data->checktime * 60 - count)/(data->traintime * 60);
 			//UInt32 money = data->checktime * data->price / data->traintime;
 			if (data->priceType == 0)
 			{
@@ -5840,7 +5844,7 @@ namespace GObject
 			sendMsgCode(0, 1100);
 			return 0;
 		}
-		if(!m_Package->AddItem(iid, 1))
+		if(!m_Package->AddItem(iid, 1, true))
 		{
 			sendMsgCode(2, 1011);
 			return 0;

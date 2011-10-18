@@ -21,7 +21,7 @@ local YearYellowDiamondAward = {
     {51, 1}, {500, 1}, {15, 1}, {56, 1}
 }
 
-local YellowDiamondGem = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141, 5151 }
+local YellowDiamondGem = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141 }
 
 function getYellowDiamondGem()
     return YellowDiamondGem

@@ -289,7 +289,7 @@ function getAttrMax(q, crr, lvl)
 end
 
 function getSocketChance()
-    return Split_chance
+    return Socket_chance
 end
 
 
