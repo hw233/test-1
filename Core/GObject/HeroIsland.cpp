@@ -213,11 +213,11 @@ void HeroIsland::process(UInt32 now)
     if (_running && now >= _endTime)
         end();
 
-    applayHPnExp();
+    applayPlayers();
     applayRareAnimals();
 }
 
-void HeroIsland::applayHPnExp()
+void HeroIsland::applayPlayers()
 {
     UInt32 now = TimeUtil::Now();
     for (UInt8 j = 0; j < HERO_ISLAND_SPOTS; ++j)
@@ -240,6 +240,16 @@ void HeroIsland::applayHPnExp()
                     pd->player->AddExp(calcExp(pd->player->GetLev())*2);
                     pd->expcd = now + 60;
                 }
+            }
+
+            if (pd && pd->player && now >= pd->attrcd && pd->attr)
+            {
+                GData::AttrExtra attr;
+                attr.reset();
+                pd->player->addAttr(attr); // XXX: 清除加成
+                pd->attrcd = static_cast<UInt32>(-1);
+                GData::AttrExtra* pattr = pd->attr;
+                // TODO: 清除BUF
             }
         }
     }
@@ -733,7 +743,11 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
         if (pd->player->attackRareAnimal(ra.id))
         {
-            // TODO:
+            player->addAttr(ra.attr);
+            pd->attrcd = now + ra.last;
+            pd->attr = &ra.attr;
+
+            // TODO: BUF
         }
         else
             moveTo(pd->player, 0, false);
@@ -1134,6 +1148,12 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
         return false;
     player->setHISpot(spot);
 
+    if (player->GetPackage()->IsFull())
+    {
+        player->sendMsgCode(0, 1011);
+        return false;
+    }
+
     if (type == 1)
     {
         if (!pd->awardgot || pd->awardgot == 0xFF)
@@ -1144,12 +1164,6 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
             UInt8 id;
             UInt32 num;
         };
-
-        if (player->GetPackage()->IsFull())
-        {
-            player->sendMsgCode(0, 1011);
-            return false;
-        }
 
         UInt8 quality = pd->straight/3;
         UInt8 sz = _awards[quality].size();

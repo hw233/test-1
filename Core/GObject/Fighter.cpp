@@ -960,6 +960,12 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 	}
 }
 
+void Fighter::addAttr( const GData::AttrExtra& attr )
+{
+	addAttrExtra(_attrExtraEquip, &attr);
+    setDirty();
+}
+
 void Fighter::addAttr( const GData::CittaEffect* ce )
 {
 	addAttrExtra(_attrExtraEquip, ce);
@@ -983,7 +989,6 @@ void Fighter::addAttr( ItemEquip * equip )
 
 void Fighter::rebuildEquipAttr()
 {
-	_attrExtraEquip.reset();
 	_attrExtraEquip.reset();
 
 	UInt32 setId[8] = {0, 0, 0, 0, 0, 0, 0, 0};

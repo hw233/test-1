@@ -34,7 +34,7 @@ struct HIPlayerData
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0),
-        score(0), lasttype(0xff), awardgot(0), inrank(0)
+        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), attr(NULL), awardgot(0), inrank(0)
     {
     }
 
@@ -48,20 +48,22 @@ struct HIPlayerData
     UInt8 straight;
     UInt16 score;
     UInt8 lasttype;
-    std::vector<Task> compass; // 击杀任务
+    UInt32 attrcd; // 奇珍异兽效果持续时间
+    GData::AttrExtra* attr;
     UInt8 awardgot; // 0-没有奖励,1-绿 2-蓝 3-紫 4-橙,0xFF-已领取
     UInt8 inrank; // 0-不在,>=1-在
+    std::vector<Task> compass; // 击杀任务
 };
 
 struct RareAnimals
 {
     RareAnimals() : id(0), last(0), cdlong(0), cd(0) {}
 
-    UInt16 id;
-    GData::AttrExtra attr;
-    UInt32 last;
-    UInt32 cdlong;
-    UInt32 cd;
+    UInt16 id; // NPC ID
+    GData::AttrExtra attr; // 攻击成功后效果加成
+    UInt32 last; // 效果持续时间
+    UInt32 cdlong; // 攻击后冷却时间，全局
+    UInt32 cd; // 冷却结束时间
 };
 
 struct lt_score
@@ -96,7 +98,7 @@ private:
 
 public:
     void process(UInt32 now);
-    void applayHPnExp();
+    void applayPlayers();
     void applayRareAnimals();
     void rankReward();
     void restart(UInt32 now);
