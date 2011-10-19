@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "Common/Mutex.h"
+#include "Player.h"
 
 namespace GObject
 {
@@ -15,6 +16,14 @@ struct WBoss
     UInt32 npcId;
     UInt8 level;
     UInt8 count;
+};
+
+struct lt
+{
+    bool operator()(Player* p1, Player* p2) const
+    {
+        return p1->getWorldBossHp() >= p2->getWorldBossHp(); // XXX: 倒
+    }
 };
 
 class WorldBoss
@@ -29,6 +38,7 @@ public:
     void refresh(UInt32);
     void prepare(UInt32 now);
     void attack(Player* pl, UInt16 loc, UInt32 npcid);
+    bool attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final = false);
     void reset();
     void add(UInt16 loc, UInt32 npcId, UInt8 level, UInt8 count, bool = false, bool = true);
 
@@ -49,6 +59,8 @@ private:
     FastMutex m_lck;
     UInt8 m_level;
     UInt8 m_max;
+    typedef std::set<Player*, lt> AttackInfo;
+    AttackInfo atkinfo;
 };
 
 extern WorldBoss worldBoss;

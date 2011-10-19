@@ -513,7 +513,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL)
+        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -1907,6 +1907,7 @@ namespace GObject
 
 	bool Player::attackWorldBoss( UInt32 npcId, UInt8 type, UInt8 expfactor, UInt8 lootlvl, bool final )
 	{
+#if 0
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
 		if(cfg.GMCheck && buffLeft > now)
@@ -1920,6 +1921,10 @@ namespace GObject
 			return false;
 
 		GData::NpcGroup * ng = it->second;
+
+        std::vector<GData::NpcFData>& nflist = ng->getList();
+        size_t sz = nflist.size();
+
 		Battle::BattleSimulator bsim(0, this, ng->getName(), ng->getLevel(), false);
 		PutFighters( bsim, 0 );
 		ng->putFighters( bsim );
@@ -1964,6 +1969,9 @@ namespace GObject
             setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
 		return res;
+#else
+        return false;
+#endif
 	}
 
 	bool Player::autoBattle( UInt32 npcId )

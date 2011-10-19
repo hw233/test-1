@@ -6,6 +6,9 @@
 #include "Fighter.h"
 #include "GData/NpcGroup.h"
 #include "Server/Cfg.h"
+#include "Battle/BattleSimulator.h"
+#include "Battle/BattleFighter.h"
+#include "MsgID.h"
 
 UInt8 _bossLvl = 0;
 
@@ -16,6 +19,14 @@ static UInt8 getWorldBossCount()
 
 namespace GObject
 {
+    struct Sort
+    {
+        bool operator()(const Player*& p1, const Player*& p2) const
+        {
+            return p1->getWorldBossHp() < p2->getWorldBossHp();
+        }
+    };
+
     static UInt32 worldboss[] = {
         5466, 5467, 5468, 5469, 5469,
         5162, 5473, 5474, 5475, 5475,
@@ -172,6 +183,72 @@ namespace GObject
         }
     }
 
+    bool WorldBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
+    {
+        if (!pl) return false;
+        UInt32 now = TimeUtil::Now();
+        UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+        if(cfg.GMCheck && buffLeft > now) 
+        {    
+            pl->sendMsgCode(0, 1407, buffLeft - now);
+            return false;
+        }    
+        pl->checkLastBattled();
+        GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+        if(it == GData::npcGroups.end())
+            return false;
+
+        GData::NpcGroup * ng = it->second;
+
+        std::vector<GData::NpcFData>& nflist = ng->getList();
+        size_t sz = nflist.size();
+
+        Battle::BattleSimulator bsim(0, pl, ng->getName(), ng->getLevel(), false);
+        pl->PutFighters( bsim, 0 ); 
+        ng->putFighters( bsim );
+        bsim.start();
+        Stream& packet = bsim.getPacket();
+        if(packet.size() <= 8)
+            return false;
+
+        UInt16 ret = 0x0100;
+        bool res = bsim.getWinner() == 1;
+        if(res)
+        {    
+            ret = 0x0101;
+            if (final)
+            {
+            }
+            else
+            {
+                pl->_lastNg = ng;
+                pl->pendExp(ng->getExp()*expfactor);
+                ng->getLoots(pl, pl->_lastLoot, 1, NULL);
+            }
+        }
+        else
+        {
+        }
+
+        Stream st(REP::ATTACK_NPC);
+        st << ret << PLAYER_DATA(pl, lastExp) << static_cast<UInt8>(0);
+        UInt8 size = pl->_lastLoot.size();
+        st << size;
+        for(UInt8 i = 0; i < size; ++ i)
+        {
+            st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
+        }
+        st.append(&packet[8], packet.size() - 8);
+        st << Stream::eos;
+        pl->send(st);
+
+        if (final)
+            pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+        else
+            pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+        return true;
+    }
+
     void WorldBoss::attack(Player* pl, UInt16 loc, UInt32 npcid)
     {
         if (!m_level)
@@ -200,11 +277,9 @@ namespace GObject
             UInt8 count = getWorldBossCount();
             bool final = false;
             if (i->second.count >= count)
-            {
                 final = true;
-            }
 
-            if (pl->attackWorldBoss(i->second.npcId, 0, World::_wday==4?2:1, 1, final))
+            if (attackWorldBoss(pl, i->second.npcId, World::_wday==4?2:1, final))
             {
                 if (!final)
                 {
@@ -233,8 +308,6 @@ namespace GObject
                     {
                         if (i->second.count >= count)
                         {
-                            // XXX:
-
                             SYSMSG_BROADCASTV(553, i->second.npcId);
                         }
                         else
@@ -245,10 +318,30 @@ namespace GObject
                 }
                 else
                 {
+                    // TODO: 打死真身时奖励及消息
+                    // 前三名显示
+                    UInt8 c = 0;
+                    for (AttackInfo::iterator i = atkinfo.begin(), e = atkinfo.end(); i != e && c < 3; ++i, ++c)
+                    {
+                    }
+                    reset();
                 }
             }
             else
             {
+                // TODO: 血量计算及通知
+
+                UInt32 hp = 0;
+                UInt8 hpper = 100;
+                SYSMSG_BROADCASTV(557, loc, hpper);
+
+                AttackInfo::iterator i = atkinfo.find(pl);
+                if (i != atkinfo.end())
+                    atkinfo.erase(i);
+                pl->pendWorldBossHp(hp);
+                atkinfo.insert(pl);
+                // TODO: hp转经验
+                pl->pendExp(hp);
             }
         }
     }
