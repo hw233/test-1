@@ -340,7 +340,7 @@ UInt8 HeroIsland::getIdentity(Player* player, bool rand)
     st << static_cast<UInt8>(2) << type << Stream::eos;
     player->send(st);
 
-    SYSMSG_SENDV(2116, player, type);
+    //SYSMSG_SENDV(2116, player, type);
     return type;
 }
 
@@ -750,7 +750,14 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             // TODO: BUF
         }
         else
+        {
+            if (cfg.GMCheck)
+                pd->injuredcd = now + 40;
+            else
+                pd->injuredcd = now + 40;
+            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd);
             moveTo(pd->player, 0, false);
+        }
 
         return true;
     }
@@ -826,12 +833,12 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
         else
         {
-            moveTo(pd->player, 0, false);
             if (cfg.GMCheck)
                 pd->injuredcd = now + 40;
             else
                 pd->injuredcd = now + 40;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd);
+            moveTo(pd->player, 0, false);
 
             broadcast(pd1, pd1->spot, 2);
         }
@@ -1080,7 +1087,7 @@ void HeroIsland::commitCompass(Player* player)
 
     if (!(sz % 3))
     {
-        pd->awardgot = pd->straight/3;
+        pd->awardgot = (pd->straight/3) + 1;
         if (!pd->awardgot)
             pd->awardgot = 1;
 

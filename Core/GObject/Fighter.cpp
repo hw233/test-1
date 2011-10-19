@@ -197,8 +197,7 @@ bool Fighter::addExp( UInt64 e )
 			_owner->checkLevUp(oldLevel, _level);
 		}
         worldBoss.setLevel(_level);
-        if (_level >= 40)
-            _owner->send40LevelPack();
+        _owner->sendLevelPack(_level);
         _expFlush = true;
 	}
 	else
@@ -264,8 +263,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 		_exp = e;
 		sendModification(3, _exp);
 	}
-    if (_level >= 40)
-        _owner->send40LevelPack();
+    _owner->sendLevelPack(_level);
 }
 
 void Fighter::updateToDB( UInt8 t, UInt64 v )

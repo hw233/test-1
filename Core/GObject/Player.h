@@ -435,7 +435,7 @@ namespace GObject
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
         void sendNationalDayOnlineAward();
-        void send40LevelPack();
+        void sendLevelPack(UInt8);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -651,6 +651,7 @@ namespace GObject
         UInt8 rcvYellowDiamondAward(UInt8 type);
         void checkQQAward();
         void RollYDGem();
+        void openLevelBox(UInt8 lvl, UInt8 cls);
 
 	public:
 		Map* GetMap();
@@ -673,7 +674,7 @@ namespace GObject
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }

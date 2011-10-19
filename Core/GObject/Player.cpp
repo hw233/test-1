@@ -734,7 +734,7 @@ namespace GObject
         else
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 
-        send40LevelPack();
+        sendLevelPack(GetLev());
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -791,28 +791,114 @@ namespace GObject
         }
     }
 
-    void Player::send40LevelPack()
+    void Player::openLevelBox(UInt8 lvl, UInt8 cls)
     {
-        if (GetLev() < 40 || (_playerData.qqawardgot & 0x08))
+        static const UInt32 itemId[3][8] = {
+            {2392,2393,2394,2395,2396,2397,2398,2399},
+            {2384,2385,2386,2387,2388,2389,2390,2391},
+            {2376,2377,2378,2379,2380,2381,2382,2383},
+        };
+
+        static const UInt32 gemId[3][8][6] = {
+            {
+                {5061,5081,5021,5031,5051,5041},
+                {5071,5081,5021,5031,5051,5041},
+                {5071,5091,5021,5031,5051,5041},
+                {5071,5091,5021,5031,5051,5041},
+                {5071,5131,5021,5031,5051,5041},
+                {5071,5101,5021,5031,5051,5041},
+                {5101,5131,5111,5021,5031,5051},
+                {5061, 5101,5131,5111,5021,5031},
+            },
+            {
+                {5061,5081,5021,5031,5051,5041},
+                {5071,5081,5021,5031,5051,5041},
+                {5071,5091,5021,5031,5051,5041},
+                {5071,5091,5021,5031,5051,5041},
+                {5071,5131,5021,5031,5051,5041},
+                {5071,5101,5021,5031,5051,5041},
+                {5101,5131,5111,5021,5031,5051},
+                {5061,5101,5131,5111,5021,5031},
+            },
+            {
+                {5061,5081,5001,5031,5051,5011},
+                {5071,5081,5001,5031,5051,5011},
+                {5071,5091,5001,5031,5051,5011},
+                {5071,5091,5001,5031,5051,5011},
+                {5071,5131,5001,5031,5051,5011},
+                {5071,5101,5001,5031,5051,5011},
+                {5101,5131,5111,5001,5031,5051},
+                {5061,5101,5131,5111,5001,5031},
+            },
+        };
+
+        if (!cls || cls > 3)
             return;
 
-        SYSMSG(title, 2114);
-        SYSMSG(content, 2115);
-        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        if(mail)
+        if (lvl == 30)
         {
-            MailPackage::MailItem mitem[1] = {{36,1}};
-            mailPackageManager.push(mail->id, mitem, 1, true);
+            for (UInt8 i = 0; i < 8; ++i)
+            {
+                ItemEquip* ie = static_cast<ItemEquip*>(GetPackage()->AddEquip(itemId[cls-1][i], true, false));
+                if (ie)
+                {
+                    ItemEquipData& ied = ie->getItemEquipData();
+                    ied.sockets = 6;
+                    for (UInt8 j = 0; j < 6; ++j)
+                    {
+                        ied.gems[j] = gemId[cls-1][i][j];
+                        DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
+                    }
+                    GetPackage()->SendSingleEquipData(ie);
+                }
+            }
+        }
+    }
 
-            std::string strItems;
-            strItems += Itoa(mitem[0].id);
-            strItems += ",";
-            strItems += Itoa(mitem[0].count);
-            strItems += "|";
-            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+    void Player::sendLevelPack(UInt8 lvl)
+    {
+        if (lvl >= 30 && !(_playerData.qqawardgot & 0x10))
+        {
+            SYSMSG(title, 2120);
+            SYSMSG(content, 2121);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {{37,1}};
+                mailPackageManager.push(mail->id, mitem, 1, true);
 
-            _playerData.qqawardgot |= 0x08;
-            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+                std::string strItems;
+                strItems += Itoa(mitem[0].id);
+                strItems += ",";
+                strItems += Itoa(mitem[0].count);
+                strItems += "|";
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+
+                _playerData.qqawardgot |= 0x10;
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+            }
+        }
+
+        if (lvl >= 40 && !(_playerData.qqawardgot & 0x08))
+        {
+            SYSMSG(title, 2114);
+            SYSMSG(content, 2115);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {{36,1}};
+                mailPackageManager.push(mail->id, mitem, 1, true);
+
+                std::string strItems;
+                strItems += Itoa(mitem[0].id);
+                strItems += ",";
+                strItems += Itoa(mitem[0].count);
+                strItems += "|";
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+
+                _playerData.qqawardgot |= 0x08;
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+            }
         }
     }
 
@@ -1825,10 +1911,10 @@ namespace GObject
 
     bool Player::attackRareAnimal(UInt32 id)
     {
-        return attackCopyNpc(id, 3, 0, 1);
+        return attackCopyNpc(id, 3, 0, 1, false, NULL, false);
     }
 
-	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot )
+	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
 	{
 		UInt32 now = TimeUtil::Now();
 		UInt32 buffLeft = getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -1896,7 +1982,8 @@ namespace GObject
             send(st);
         }
 
-        bsim.applyFighterHP(0, this);
+        if (applayhp)
+            bsim.applyFighterHP(0, this);
 
 		if(!res)
 			checkDeath();
@@ -3227,7 +3314,7 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addExp(exp);
 		}
-        send40LevelPack(); // XXX: 
+        sendLevelPack(GetLev()); // XXX: 
 	}
 
     void Player::addAttr(const GData::AttrExtra& attr)

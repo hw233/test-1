@@ -891,9 +891,11 @@ namespace GObject
 					pl->recalcVipLevel();
 					pl->genOnlineRewardItems();
 				}
+                pl->recalcVipLevel();
 			}
 
 			{
+                bool fault = false;
 				StringTokenizer tk(dbpd.tavernId, "|");
 				size_t count = tk.count();
 				if(count > 0)
@@ -914,7 +916,12 @@ namespace GObject
 								PLAYER_DATA(pl, tavernPurpleCount) = atoi(tk[7].c_str());
                                 if(count >8)
                                 {
-                                    //PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
+                                    PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
+                                    if (PLAYER_DATA(pl, tavernOrangeCount) > 10000)
+                                    {
+                                        PLAYER_DATA(pl, tavernOrangeCount) = 0;
+                                        fault = true;
+                                    }
                                     if(count > 9)
                                     {
                                         char * endptr;
@@ -929,6 +936,8 @@ namespace GObject
 				}
 				else
 					pl->setNextTavernUpdate(0);
+                if (fault)
+                    pl->writeTavernIds();
 			}
 
             if (dbpd.shimen.length())

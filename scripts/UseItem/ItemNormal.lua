@@ -854,6 +854,32 @@ function ItemNormal_00000036(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00000037(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < 8 then     
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end  
+
+    local cls = player:GetClass()
+    if cls == 1 then
+        player:openLevelBox(30, cls)
+    end
+
+    if cls == 2 then
+        player:openLevelBox(30, cls)
+    end
+
+    if cls == 3 then
+        player:openLevelBox(30, cls)
+    end
+
+    package:DelItemSendMsg(37, player);
+    return num;
+end
+
 function ItemNormal_00000043(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
@@ -5441,6 +5467,7 @@ local ItemNormal_Table = {
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[36] = ItemNormal_00000036,
+	[37] = ItemNormal_00000037,
 	[43] = ItemNormal_00000043,
 	[52] = ItemNormal_00000052,
 	[53] = ItemNormal_00000053,
