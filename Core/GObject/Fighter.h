@@ -477,9 +477,10 @@ public:
     UInt16 getPracticePlace();
     bool isGoldPractice() { return false; }
 
-protected:
+	void addAttr( const GData::AttrExtra& );
 	void addAttr( ItemEquip * );
     void addAttr( const GData::CittaEffect* ce );
+protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
 	inline void checkDirty()

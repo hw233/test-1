@@ -54,6 +54,7 @@ void WorldScript::init()
     def("setFrontMapActiveCount", GObject::FrontMap::setFrontMapActiveCount);
     def("setRareAnimals", GObject::HeroIsland::setRareAnimals);
     def("addHIAwardsCfg", GObject::HeroIsland::addHIAwardsCfg);
+    def("addRankAwards", GObject::HeroIsland::addRankAwards);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

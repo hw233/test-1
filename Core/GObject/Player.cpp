@@ -3234,6 +3234,16 @@ namespace GObject
         send40LevelPack(); // XXX: 
 	}
 
+    void Player::addAttr(const GData::AttrExtra& attr)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->addAttr(attr);
+		}
+    }
+
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )
 	{
 		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
