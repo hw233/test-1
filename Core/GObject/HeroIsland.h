@@ -33,7 +33,7 @@ struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0),
+        fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
         score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), attr(NULL), awardgot(0), inrank(0)
     {
     }
@@ -46,6 +46,7 @@ struct HIPlayerData
     UInt32 injuredcd;
     UInt32 expcd;
     UInt8 straight;
+    UInt8 round;
     UInt16 score;
     UInt8 lasttype;
     UInt32 attrcd; // 奇珍异兽效果持续时间

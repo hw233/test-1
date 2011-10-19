@@ -818,15 +818,15 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                     if (pd->compass[sz-1].type == pd->compass[sz-2].type)
                         ++pd->straight;
                 }
-
-                Stream st(REP::HERO_ISLAND);
-                st << static_cast<UInt8>(5) << static_cast<UInt8>(2) << pd->straight << Stream::eos;
-                pd->player->send(st);
             }
             else
             {
                 pd->straight = 1;
             }
+
+            Stream st(REP::HERO_ISLAND);
+            st << static_cast<UInt8>(5) << static_cast<UInt8>(2) << pd->straight << Stream::eos;
+            pd->player->send(st);
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev()));
             broadcast(pd, pd->spot, 2);
@@ -1079,26 +1079,23 @@ void HeroIsland::commitCompass(Player* player)
 
     if (pd->compass[sz-1].status != 2)
         return;
-
     pd->compass[sz-1].status = 3;
-
     UInt16 score = pd->score;
-
 
     if (!(sz % 3))
     {
-        pd->awardgot = (pd->straight/3) + 1;
-        if (!pd->awardgot)
+        ++pd->round;
+        if (pd->straight == 3)
+            pd->awardgot = pd->round+1;
+        else
             pd->awardgot = 1;
 
-        if (pd->straight == sz)
-        {
-            // TODO:
-        }
-        else
-        {
-            pd->compass.clear();
-        }
+        pd->straight = 0; // XXX: 每三次为一轮
+
+        if (pd->round > 3)
+            pd->round = 0;
+
+        pd->compass.clear();
     }
     else
     {
@@ -1120,14 +1117,6 @@ void HeroIsland::commitCompass(Player* player)
             if (*i == pd)
                 break;
         }
-
-#if 0
-        if (_sorts.size() > 100)
-        {
-            (*_sorts.begin())->inrank = 0;
-            _sorts.erase(_sorts.begin());
-        }
-#endif
 
         Stream st(REP::HERO_ISLAND);
         st << static_cast<UInt8>(14) << pd->inrank << pd->score << Stream::eos;
