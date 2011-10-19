@@ -404,7 +404,7 @@ void CountryBattle::end(UInt32 curtime)
                 SYSMSGV(content, mailid[side], it->second.totalAchievement, count, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
                 Mail * pmail = it->first->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(pmail != NULL)
-                    mailPackageManager.push(pmail->id, mitem, 1, false);
+                    mailPackageManager.push(pmail->id, mitem, 1, true);
             }
             else if (rewardid[side] == PLAYER_BUFF_TRAINP2 && count)
             {
@@ -414,7 +414,7 @@ void CountryBattle::end(UInt32 curtime)
                 SYSMSGV(content, mailid[side], it->second.totalAchievement, count, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
                 Mail * pmail = it->first->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
                 if(pmail != NULL)
-                    mailPackageManager.push(pmail->id, mitem, 1, false);
+                    mailPackageManager.push(pmail->id, mitem, 1, true);
             }
 #endif
 			/*for back stage*/

@@ -33,7 +33,7 @@ struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), injuredcd(0), expcd(0), straight(0),
+        fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0),
         score(0), lasttype(0xff), awardgot(0), inrank(0)
     {
     }
@@ -80,10 +80,6 @@ public:
     HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
-        if (cfg.GMCheck)
-            _prepareTime = TimeUtil::SharpDay(0) + 18 * 60 * 60 + 45 * 60;
-        else
-            _prepareTime = TimeUtil::Now() + 60;
     }
 
     ~HeroIsland() {}

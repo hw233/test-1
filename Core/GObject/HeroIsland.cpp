@@ -113,15 +113,15 @@ void HeroIsland::broadcastTV(UInt32 now)
         _prepareStep = 1;
         if (cfg.GMCheck)
         {
-            _prepareTime = TimeUtil::SharpDay(1) + 18 * 60 * 60 + 45 * 60;
             _startTime = _prepareTime + 15 * 60;
             _endTime = _startTime + 60 * 60;
+            _prepareTime = TimeUtil::SharpDay(1) + 18 * 60 * 60 + 45 * 60;
         }
         else
         {
+            _startTime = _prepareTime + 2 * 60;
+            _endTime = _startTime + 30 * 60;
             _prepareTime = now + 20 * 60;
-            _startTime = _prepareTime + 5 * 60;
-            _endTime = _startTime + 10 * 60;
         }
     }
 
@@ -143,6 +143,11 @@ void HeroIsland::broadcastTV(UInt32 now)
             if (now < _startTime - 5 * 60)
                 return;
             SYSMSG_BROADCASTV(2117, 5);
+            _prepareStep = 4;
+            break;
+
+        case 4:
+            SYSMSG_BROADCASTV(2118);
             _prepareStep = 0;
             break;
 
@@ -192,6 +197,14 @@ void HeroIsland::end()
 
 void HeroIsland::process(UInt32 now)
 {
+    if (!_prepareTime)
+    {
+        if (cfg.GMCheck)
+            _prepareTime = TimeUtil::SharpDay(0) + 18 * 60 * 60 + 45 * 60;
+        else
+            _prepareTime = TimeUtil::Now() + 30;
+    }
+
     broadcastTV(now);
 
     if (!_running && _startTime && now >= _startTime)
@@ -260,6 +273,7 @@ UInt8 HeroIsland::getIdentity(Player* player, bool rand)
 
     if (player->GetLev() < 40)
     {
+        player->sendMsgCode(0, 1010);
         return 0;
     }
 
@@ -653,9 +667,6 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
         return false;
     }
 
-    if (pd->injuredcd <= now)
-        player->regenAll(true);
-
     if (leave(pd, spot, pos))
     {
         if (enter(pd, pd->type, to, to?true:false))
@@ -696,9 +707,6 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
     UInt32 now = TimeUtil::Now();
 
-    if (pd->injuredcd <= now)
-        player->regenAll(true);
-
     if (type == 0) // NPC
     {
         RareAnimals& ra = findRareAnimal(id, pd->spot);
@@ -724,6 +732,8 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         {
             // TODO:
         }
+        else
+            moveTo(pd->player, 0, false);
 
         return true;
     }
@@ -905,6 +915,7 @@ void HeroIsland::playerEnter(Player* player)
 
     if (player->GetLev() < 40)
     {
+        player->sendMsgCode(0, 1010);
         return;
     }
 
