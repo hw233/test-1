@@ -220,23 +220,26 @@ void HeroIsland::process(UInt32 now)
 void HeroIsland::applayHPnExp()
 {
     UInt32 now = TimeUtil::Now();
-    size_t sz = _players[0].size();
-    for (size_t i = 0; i < sz; ++i)
+    for (UInt8 j = 0; j < HERO_ISLAND_SPOTS; ++j)
     {
-        HIPlayerData* pd = _players[0][i];
-        if (!i && pd && pd->player && pd->injuredcd <= now)
+        size_t sz = _players[j].size();
+        for (size_t i = 0; i < sz; ++i)
         {
-            pd->player->regenAll(true);
-            pd->injuredcd = static_cast<UInt32>(-1);
-            broadcast(pd, 0, 2);
-        }
-
-        if (_running)
-        {
-            if (i && pd && pd->player && pd->expcd <= now)
+            HIPlayerData* pd = _players[j][i];
+            if (!j && pd && pd->player && pd->injuredcd <= now)
             {
-                pd->player->AddExp(calcExp(pd->player->GetLev()*2));
-                pd->expcd = now + 60;
+                pd->player->regenAll(true);
+                pd->injuredcd = static_cast<UInt32>(-1);
+                broadcast(pd, 0, 2);
+            }
+
+            if (_running)
+            {
+                if (j && pd && pd->player && pd->expcd <= now)
+                {
+                    pd->player->AddExp(calcExp(pd->player->GetLev())*2);
+                    pd->expcd = now + 60;
+                }
             }
         }
     }
@@ -804,7 +807,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd->straight = 1;
             }
 
-            player->AddExp(calcExp(pd1->player?0:pd1->player->GetLev()));
+            player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev()));
             broadcast(pd, pd->spot, 2);
         }
         else
@@ -1064,6 +1067,8 @@ void HeroIsland::commitCompass(Player* player)
     if (!(sz % 3))
     {
         pd->awardgot = pd->straight/3;
+        if (!pd->awardgot)
+            pd->awardgot = 1;
 
         if (pd->straight == sz)
         {
@@ -1150,10 +1155,10 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
         UInt8 sz = _awards[quality].size();
         UInt32 total = _awards[quality][sz-1].prob;
         Award awards[5] = {{0,},};
-        Awards* awds = &_awards[quality][0];
         for (UInt8 j = 0; j < 5; ++j)
         {
             UInt32 v = uRand(total);
+            Awards* awds = &_awards[quality][0];
             for (UInt8 i = 0; i < sz; ++i, ++awds)
             {
                 if (v < awds->prob)
