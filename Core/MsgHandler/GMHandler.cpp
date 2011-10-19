@@ -2395,3 +2395,8 @@ void GMHandler::OnCiTaskHI(GObject::Player *player, std::vector<std::string>& ar
     heroIsland.commitCompass(player);
 }
 
+void GMHandler::OnRestartHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    heroIsland.restart(TimeUtil::Now());
+}
+

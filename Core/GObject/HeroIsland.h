@@ -5,6 +5,7 @@
 #include "Config.h"
 #include "Player.h"
 #include "Common/Stream.h"
+#include "Server/Cfg.h"
 #include "Script/GameActionLua.h"
 
 namespace GObject
@@ -22,17 +23,18 @@ struct Task
 
 struct Awards
 {
-    Awards(UInt32 id, UInt16 num, UInt16 prob) : id(id), num(num), prob(prob) {}
+    Awards(UInt32 id, UInt32 num, UInt32 prob) : id(id), num(num), prob(prob) {}
     UInt32 id;
-    UInt16 num;
-    UInt16 prob;
+    UInt32 num;
+    UInt32 prob;
 };
 
 struct HIPlayerData
 {
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
-        fightcd(0), injuredcd(0), straight(0), score(0), lasttype(0xff), awardgot(0), inrank(0)
+        fightcd(0), injuredcd(0), expcd(0), straight(0),
+        score(0), lasttype(0xff), awardgot(0), inrank(0)
     {
     }
 
@@ -42,11 +44,12 @@ struct HIPlayerData
     UInt32 movecd;
     UInt32 fightcd;
     UInt32 injuredcd;
+    UInt32 expcd;
     UInt8 straight;
     UInt16 score;
     UInt8 lasttype;
     std::vector<Task> compass; // 击杀任务
-    UInt8 awardgot; // 0-没有奖励,1-未领取,2-已领取
+    UInt8 awardgot; // 0-没有奖励,1-绿 2-蓝 3-紫 4-橙,0xFF-已领取
     UInt8 inrank; // 0-不在,>=1-在
 };
 
@@ -63,36 +66,46 @@ struct RareAnimals
 
 struct lt_score
 {
-    bool operator()(HIPlayerData* pd1, HIPlayerData* pd2) const
+    bool operator()(const HIPlayerData* const & pd1, const HIPlayerData* const & pd2) const
     {
-        return pd1->score < pd2->score;
+        return pd1->score - pd2->score < 0;
     }
 };
 
-typedef std::set<HIPlayerData*, lt_score> SortType;
+typedef std::multiset<HIPlayerData*, lt_score> SortType;
 
 class HeroIsland
 {
 public:
-    HeroIsland() : _running(false)
+    HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
+        if (cfg.GMCheck)
+            _prepareTime = TimeUtil::SharpDay(0) + 18 * 60 * 60 + 45 * 60;
+        else
+            _prepareTime = TimeUtil::Now() + 60;
     }
 
     ~HeroIsland() {}
 
 public:
     static void setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd);
-    static void addHIAwardsCfg(UInt32 id, UInt32 num, UInt32 prob);
+    static void addHIAwardsCfg(UInt8 type, UInt32 id, UInt32 num, UInt32 prob);
+    static void addRankAwards(UInt32 prestige);
     static bool isRareAnimal(UInt32 npcid);
 private:
     static std::vector<RareAnimals> _animals[HERO_ISLAND_SPOTS];
-    static std::vector<Awards> _awards;
+    static std::vector<Awards> _awards[4];
+    static std::vector<UInt32> _prestige;
 
 public:
     void process(UInt32 now);
-    void applayHP();
+    void applayHPnExp();
     void applayRareAnimals();
+    void rankReward();
+    void restart(UInt32 now);
+    void broadcastTV(UInt32 now);
+    void end();
 
     UInt8 getIdentity(Player* player, bool = false);
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
@@ -127,7 +140,6 @@ public:
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
 
-    bool isActiveTime(UInt32 now);
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }
 
@@ -138,6 +150,10 @@ public:
 
 private:
     bool _running;
+    UInt8 _prepareStep;
+    UInt32 _prepareTime;
+    UInt32 _startTime;
+    UInt32 _endTime;
 };
 
 extern HeroIsland heroIsland;

@@ -111,6 +111,7 @@ private:
     void OnGetIDHI(GObject::Player *player, std::vector<std::string>&);
     void OnTaskHI(GObject::Player *player, std::vector<std::string>&);
     void OnCiTaskHI(GObject::Player *player, std::vector<std::string>&);
+    void OnRestartHI(GObject::Player *player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;
