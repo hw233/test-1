@@ -834,7 +834,7 @@ void CountryBattle::sendInfo( Player * pl)
 	else
 	{
 		CBPlayerData& cbpdata = it->second;
-		st << cbpdata.totalAchievement << cbpdata.totalWin << cbpdata.totallose << cbpdata.maxKillStreak << cbpdata.currKillStreak;
+		st << cbpdata.totalAchievement << cbpdata.totalWin << cbpdata.totallose << cbpdata.currKillStreak << cbpdata.maxKillStreak;
 	}
 
 	if(_topKiller == NULL)
