@@ -512,4 +512,32 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 	event->instantComplete();
 }
 
+void OnLevelChange( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+    if(hdr.msgHdr.bodyLen != sizeof(GObject::LevelChange))
+        return;
+	const GObject::LevelChange* lvc = reinterpret_cast<const GObject::LevelChange*>(data);
+    if(lvc->oldLv == lvc->newLv)
+        return;
+    if(lvc->oldLv > 29)
+    {
+        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->oldLv);
+        if(it != GObject::globalLevelsPlayers.end())
+        {
+            GObject::LevelPlayers& lvPlayer = it->second;
+            UInt32 nSize = lvPlayer.size();
+            if(nSize != 0)
+                lvPlayer.erase(player->getId());
+        }
+    }
+    if(lvc->newLv > 29)
+    {
+        GObject::LevelPlayers& lvPlayer = GObject::globalLevelsPlayers[lvc->newLv];
+        UInt32 nSize = lvPlayer.size() + 1;
+        lvPlayer[nSize] = player->getId();
+        player->setLvPos(nSize);
+    }
+}
+
 #endif // _WORLDINNERMSGHANDLER_H_

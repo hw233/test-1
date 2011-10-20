@@ -3,6 +3,11 @@
 
 #include "Common/TimeUtil.h"
 
+namespace Battle
+{
+class BattleSimulator;
+}
+
 namespace GObject
 {
 
@@ -20,6 +25,19 @@ struct AthleticsData
 	AthleticsData() { memset(this, 0x00, sizeof(*this));}
 	AthleticsData(UInt32 id_, UInt8 side_, Player * target_, UInt8 win_, UInt32 reptid_ = 0, UInt32 time_ = TimeUtil::Now())
 		: id(id_), side(side_), target(target_), win(win_), reptid(reptid_),time(time_) {}
+};
+
+struct MartialData
+{
+    UInt8 idx;
+    Player* defer;
+    Battle::BattleSimulator* bs;
+};
+
+struct MartialHeader
+{
+    Player* owner;
+    MartialData md;
 };
 
 struct Lineup;
@@ -61,6 +79,20 @@ public:
 
 	void GetBoxAddSourceNotify(UInt8 type, UInt32 count);
 
+    void updateMartialHdr(const MartialHeader* mh);
+    void updateMartial(const MartialData* md);
+    void attackMartial(UInt8 idx);
+    void getMartialIds(UInt64* id, UInt8& len)
+    {
+        if(len > 3)
+            len = 3;
+
+        for(UInt8 idx = 0; idx < len; ++ idx)
+        {
+            if(_martial[idx])
+                id[idx] = _martial[idx]->getId();
+        }
+    }
 public:
 	bool addAthleticsExtraAward(UInt32 EquipId, UInt8 rank);
 
@@ -68,6 +100,8 @@ private:
 	Player * _owner;
 	bool _hasEnterAthletics;
 	std::deque<AthleticsData *> _athleticses;
+    Player* _martial[3];
+    Battle::BattleSimulator* _martial_battle[3];
 };
 
 }

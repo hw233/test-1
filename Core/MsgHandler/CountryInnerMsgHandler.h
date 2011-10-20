@@ -261,10 +261,24 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	MSG_QUERY_PLAYER(player);
 
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
+    GObject::LastAthAward la = {0};
+    bool notify = false;
     if(awd->itemId && awd->itemCount)
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, 0, FromAthletAward);
+    {
+        la.itemId = awd->itemId;
+        la.itemCount = awd->itemCount;
+        notify = true;
+        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, true, FromAthletAward);
+    }
     if(awd->prestige)
-        player->getPrestige(awd->prestige);
+    {
+        la.prestige = awd->prestige;
+        notify = true;
+        player->getPrestige(awd->prestige, false);
+    }
+
+    if(notify)
+        player->delayNotifyAthleticsAward(&la);
 
 	if(awd->side == 0)
 		player->GetAthletics()->defendergainsource(awd->other, awd->athleticsid, awd->type, awd->count);
@@ -1123,6 +1137,24 @@ void OnClearTaskReq( GameMsgHdr& hdr, const void* data )
     {
         player->resetYaMen();
     }
+}
+
+void OnMartialUpdateHdr( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(hdr.msgHdr.bodyLen != sizeof(GObject::MartialHeader) || !data)
+        return;
+	const GObject::MartialHeader* mh = reinterpret_cast<const GObject::MartialHeader*>(data);
+    player->GetAthletics()->updateMartialHdr(mh);
+}
+
+void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(hdr.msgHdr.bodyLen != sizeof(GObject::MartialData) || !data)
+        return;
+	const GObject::MartialData* md = reinterpret_cast<const GObject::MartialData*>(data);
+    player->GetAthletics()->updateMartial(md);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

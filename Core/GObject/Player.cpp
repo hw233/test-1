@@ -62,6 +62,7 @@ namespace GObject
 	GlobalPlayers newPlayers;
 	GlobalNamedPlayers globalNamedPlayers;
 	ChallengeCheck challengeCheck;
+    GlobalLevelsPlayers globalLevelsPlayers;
 
 	inline UInt8 getMaxIcCount(UInt8 vipLevel)
 	{
@@ -524,6 +525,7 @@ namespace GObject
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
+        _lvpos = 0;
 	}
 
 
@@ -985,6 +987,24 @@ namespace GObject
 			}
 			_lastDungeon = 0;
 		}
+        if(!_lastAthAward.empty())
+        {
+            std::vector<LastAthAward>::iterator it;
+            for(it = _lastAthAward.begin(); it != _lastAthAward.end(); ++ it)
+            {
+                if(it->itemId && it->itemCount)
+                {
+                    SYSMSG_SENDV(102, this, it->itemId, it->itemCount);
+                    SYSMSG_SENDV(1002, this, it->itemId, it->itemCount);
+                }
+                if(it->prestige)
+                {
+                    SYSMSG_SENDV(185, this, it->prestige);
+                    SYSMSG_SENDV(1090, this, it->prestige);
+                }
+            }
+            _lastAthAward.clear();
+        }
 		if(update)
 		{
 			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);
@@ -3141,14 +3161,17 @@ namespace GObject
 		return ;
 	}
 
-    UInt32 Player::getPrestige(UInt32 a)
+    UInt32 Player::getPrestige(UInt32 a, bool notify)
     {
 		if(a == 0)
 			return _playerData.prestige;
 		_playerData.prestige += a;
 
-		SYSMSG_SENDV(185, this, a);
-		SYSMSG_SENDV(1090, this, a);
+        if(notify)
+        {
+            SYSMSG_SENDV(185, this, a);
+            SYSMSG_SENDV(1090, this, a);
+        }
 
         DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", _playerData.prestige, getId());
 

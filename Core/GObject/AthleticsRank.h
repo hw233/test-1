@@ -171,6 +171,7 @@ public:
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
+    void updateAthleticsMartial(Player* pl);
 public:
 	void TmExtraAward();
 

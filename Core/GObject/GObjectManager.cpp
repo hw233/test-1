@@ -888,12 +888,13 @@ namespace GObject
 					dbpd.pdata.nextRewardTime = rwd & 0xFFFFFF;
 					//UInt32 seed = ((rwd & 0x0F000000) >> 24) + static_cast<UInt32>(id);
 					pl->setPlayerData(dbpd.pdata);
-					pl->recalcVipLevel();
 					pl->genOnlineRewardItems();
 				}
+                pl->recalcVipLevel();
 			}
 
 			{
+                bool fault = false;
 				StringTokenizer tk(dbpd.tavernId, "|");
 				size_t count = tk.count();
 				if(count > 0)
@@ -914,7 +915,13 @@ namespace GObject
 								PLAYER_DATA(pl, tavernPurpleCount) = atoi(tk[7].c_str());
                                 if(count >8)
                                 {
-                                    //PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
+                                    PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
+                                    if(PLAYER_DATA(pl, tavernOrangeCount) > 9999)
+                                    {
+                                        fault = true;
+                                        PLAYER_DATA(pl, tavernOrangeCount) = 0;
+                                    }
+
                                     if(count > 9)
                                     {
                                         char * endptr;
@@ -929,6 +936,8 @@ namespace GObject
 				}
 				else
 					pl->setNextTavernUpdate(0);
+                if(fault)
+                    pl->writeTavernIds();
 			}
 
             if (dbpd.shimen.length())
@@ -1190,6 +1199,15 @@ namespace GObject
 			Fighter * fgt2 = fgt->clone(pl);
 			if(fgt2 == NULL)
 				continue;
+            if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level > 29)
+            {
+
+                LevelPlayers& lvPlayer = globalLevelsPlayers[specfgtobj.level];
+                UInt32 nSize = lvPlayer.size() + 1;
+                lvPlayer[nSize] = pl->getId();
+                pl->setLvPos(nSize);
+            }
+
 			fgt2->setPotential(specfgtobj.potential, false);
             fgt2->setCapacity(specfgtobj.capacity, false);
 			fgt2->setLevel(specfgtobj.level, true);

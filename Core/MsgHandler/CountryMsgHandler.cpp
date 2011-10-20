@@ -207,4 +207,7 @@ MSG_REG_2(GameMsgHdr, 0x323, OnSetMoneyReq);
 MSG_REG_2(GameMsgHdr, 0x324, OnSetVipLReq);
 MSG_REG_2(GameMsgHdr, 0x325, OnClearTaskReq);
 
+MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
+MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
+
 MSG_HANDLER_END()

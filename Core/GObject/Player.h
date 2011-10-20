@@ -234,6 +234,19 @@ namespace GObject
 		SecondPWDInfo():isLocked(1), errCount(0){}
 	};
 
+    struct LastAthAward
+    {
+        UInt32 prestige;
+        UInt32 itemId;
+        UInt8  itemCount;
+    };
+
+    struct LevelChange
+    {
+        UInt8 oldLv;
+        UInt8 newLv;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 100;
@@ -522,6 +535,7 @@ namespace GObject
 		void pendCoin(UInt32);
 		void pendAchievement(UInt32);
 		inline void pendDungeon(UInt16 d) { _lastDungeon = d; }
+        inline void delayNotifyAthleticsAward(LastAthAward* aa) { _lastAthAward.push_back(*aa); }
 
 		void sendMsgCode(UInt8, UInt32, UInt32 = 0);
 
@@ -577,7 +591,7 @@ namespace GObject
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
 
-		UInt32 getPrestige(UInt32 a = 0);
+		UInt32 getPrestige(UInt32 a = 0, bool notify = true);
 		UInt32 usePrestige(UInt32 a,ConsumeInfo * ci=NULL);
 
 		void incIcCount();
@@ -906,6 +920,7 @@ namespace GObject
 		GData::NpcGroup * _lastNg;
 		UInt16 _lastDungeon;
 		std::vector<GData::LootResult> _lastLoot;
+        std::vector<LastAthAward> _lastAthAward;
 
         static UInt32 _recruit_cost;
         static UInt32 _tavernBlueCount;
@@ -920,6 +935,8 @@ namespace GObject
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
+        // 玩家在等级集合的位置 
+        UInt32 _lvpos;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -938,6 +955,8 @@ namespace GObject
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
+        inline void setLvPos(UInt32 v) { _lvpos = v; }
+        inline UInt32 getLvPos() { return _lvpos; }
 
 	protected:
 		inline void setBlockBossByLevel();
@@ -992,6 +1011,10 @@ namespace GObject
 	extern GlobalPlayers newPlayers;
 	typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;
 	extern GlobalNamedPlayers globalNamedPlayers;
+    typedef std::map<UInt32, UInt64> LevelPlayers;
+    typedef std::map<UInt8, LevelPlayers> GlobalLevelsPlayers;
+    typedef GlobalLevelsPlayers::iterator GlobalLevelsPlayersIterator;
+    extern GlobalLevelsPlayers globalLevelsPlayers;
 
 	class ChallengeCheck
 	{

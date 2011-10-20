@@ -459,7 +459,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             pr = bf->calcPierce(area_target);
             float atk = 0;
             float magatk = 0;
-            if(NULL != skill)
+            if(NULL != skill && skill->effect != NULL)
             {
                 atk = bf->calcAttack(cs, area_target);
                 magatk = bf->calcMagAttack(cs, area_target);
@@ -539,7 +539,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             {
 				onDamage(area_target, scList, scCount, true, atkAct);
 
-                if(NULL != skill && skill->effect->state == 1)
+                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1)
                 {
                     float rate = skill->prob * 100;
                     if((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000))
@@ -586,7 +586,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 		}
 
         UInt32 rhp = 0;
-        if(NULL != skill && (skill->effect->absorb || skill->effect->absorbP))
+        if(NULL != skill && skill->effect != NULL && (skill->effect->absorb || skill->effect->absorbP))
         {
             rhp = dmg * skill->effect->absorbP + skill->effect->absorb;
         }
@@ -700,6 +700,8 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
         const GData::SkillBase* passiveSkillInj = NULL;
         while(NULL != (passiveSkill = bo->getPassiveSkillBeAtk100(idx)))
         {
+            if(passiveSkill->effect == NULL)
+                continue;
             if(passiveSkillThorn == NULL && (passiveSkill->effect->thorn || passiveSkill->effect->thornP))
             {
                 passiveSkillThorn = passiveSkill;
@@ -711,7 +713,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
         }
 
         passiveSkill = bo->getPassiveSkillBeAtk();
-        if(NULL != passiveSkill)
+        if(NULL != passiveSkill && passiveSkill->effect != NULL)
         {
             if( passiveSkillThorn == NULL && (passiveSkill->effect->thorn || passiveSkill->effect->thornP))
             {
@@ -842,10 +844,15 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
 
 void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct)
 {
-    if(NULL == skill || skill->effect->state == 0 || bf == NULL)
+    if(NULL == skill || bf == NULL)
     {
         return;
     }
+
+    if(skill->effect == NULL)
+        return;
+    if(skill->effect->state == 0)
+        return;
 
     if(bf->getStunRound() || bf->getConfuseRound() || bf->getForgetRound())
     {
@@ -969,6 +976,11 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
 
 void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt)
 {
+    if(skill == NULL)
+        return;
+    if(skill->effect == NULL)
+        return;
+
     target_side = skill->target != 1 ? bf->getSide() : 1 - bf->getSide();
 
     if(1 == skill->area)
@@ -1026,6 +1038,8 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
 UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct, UInt32 skillParam)
 {
     if(NULL == skill || target_pos < 0 || bf == NULL)
+        return 0;
+    if(skill->effect == NULL)
         return 0;
 
     if(bf->getStunRound() || bf->getConfuseRound() || bf->getForgetRound() || bf->getHP() == 0)
@@ -1645,6 +1659,9 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
     if(NULL == skill || bf == NULL)
         return;
 
+    if(skill->effect == NULL)
+        return;
+
     BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
     if(NULL == bo)
         return;
@@ -1828,6 +1845,8 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
 void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt ,StatusChange* scList, size_t& scCount)
 {
     if(NULL == skill || bf == NULL)
+        return;
+    if(skill->effect == NULL)
         return;
 
     if(bf->getStunRound() || bf->getConfuseRound() || bf->getForgetRound())
@@ -3818,7 +3837,7 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 
     if(defCount > 0 || scCount > 0)
     {
-        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 0, 0, false, false, defList, defCount, scList, scCount);
+        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 5, 0, false, false, defList, defCount, scList, scCount);
         ++ rcnt;
     }
 

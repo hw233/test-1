@@ -15,7 +15,8 @@ namespace GObject
 
 Athletics::Athletics(Player * player) : _owner(player), _hasEnterAthletics(false)
 {
-
+    memset(_martial, 0, sizeof(_martial));
+    memset(_martial_battle, 0, sizeof(_martial_battle));
 }
 
 Athletics::~Athletics()
@@ -438,6 +439,89 @@ bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 		_owner->GetPackage()->AddItem(8999, 1, true, false, FromAthletAward);
 	
 	return true;
+}
+
+void Athletics::updateMartial(const MartialData* md)
+{
+    if(!md)
+        return;
+
+    if(md->idx > 2)
+        return;
+
+    _martial[md->idx] = md->defer;
+    _martial_battle[md->idx] = md->bs;
+}
+
+void Athletics::attackMartial(UInt8 idx)
+{
+    if(idx > 2)
+        return;
+
+    if(!_martial_battle[idx])
+        return;
+
+    bool res;
+    UInt32 reptid;
+    Battle::BattleSimulator& bsim = *(_martial_battle[idx]);
+	_owner->PutFighters( bsim, 0, true );
+    bsim.start();
+    res = bsim.getWinner() == 1;
+    reptid = bsim.getId();
+
+    Stream st(REP::ATTACK_NPC);
+    st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+    _owner->send(st);
+
+    if(res)
+    {
+        delete _martial_battle[idx];
+        _martial_battle[idx] = NULL;
+    }
+}
+
+void Athletics::updateMartialHdr(const MartialHeader* mh)
+{
+    Player* defer = mh->md.defer;
+    if(_owner == mh->owner)
+    {
+        if(_owner->getThreadId() == defer->getThreadId())
+        {
+            MartialData md = {0};
+            Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
+            defer->PutFighters( *bsim, 1, true );
+
+            md.idx = mh->md.idx;
+            md.defer = defer;
+            md.bs = bsim;
+            _owner->GetAthletics()->updateMartial(&md);
+        }
+        else
+        {
+            GameMsgHdr hdr2(0x330, defer->getThreadId(), defer, sizeof(MartialHeader));
+            GLOBAL().PushMsg(hdr2, (void*)mh);
+        }
+    }
+    else if(_owner == defer)
+    {
+        MartialData md = {0};
+        Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, mh->owner, defer);
+        defer->PutFighters( *bsim, 1, true );
+
+        md.idx = mh->md.idx;
+        md.defer = defer;
+        md.bs = bsim;
+
+        if(_owner->getThreadId() == defer->getThreadId())
+        {
+            mh->owner->GetAthletics()->updateMartial(&md);
+        }
+        else
+        {
+            GameMsgHdr hdr2(0x331, mh->owner->getThreadId(), mh->owner, sizeof(MartialData));
+            GLOBAL().PushMsg(hdr2, &md);
+        }
+    }
 }
 
 }

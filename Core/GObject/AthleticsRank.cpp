@@ -1705,5 +1705,77 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
     data->challengetime = TimeUtil::Now();
 }
 
+void AthleticsRank::updateAthleticsMartial(Player* pl)
+{
+    UInt32 idIdx[3] = {0};
+    UInt8 level = pl->GetLev();
+
+    UInt32 size = globalLevelsPlayers[level].size();
+    UInt8 cnt = 1;
+    while(size < 100 && (level - cnt) > 29)
+    {
+        size += globalLevelsPlayers[level - cnt].size();
+        ++ cnt;
+    }
+
+    if(size < 5)
+    {
+        int k = 0;
+        for(int i = 0; i < cnt; ++i)
+        {
+            UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
+            for(UInt32 j = 1; j < size1; ++j)
+            {
+                if(i == 0 && pl->getLvPos() == j)
+                    continue;
+                idIdx[k] = globalLevelsPlayers[level - i][j];
+                ++k;
+                if(k > 2)
+                    break;
+            }
+            if(k > 2)
+                break;
+        }
+    }
+    else
+    {
+        URandom rnd(time(NULL));
+
+        UInt32 roll0 = rnd(size) + 1;
+        while(pl->getLvPos() == roll0)
+            roll0 = ((roll0 + 1) % size) + 1;
+        UInt32 roll1 = rnd(size) + 1;
+        while(pl->getLvPos() == roll1 || roll1 == roll0)
+            roll1 = ((roll1 + 1) % size) + 1;
+        UInt32 roll2 = rnd(size) + 1;
+        while(pl->getLvPos() == roll2 || roll2 == roll0 || roll2 == roll1)
+            roll2 = ((roll2 + 1) % size) + 1;
+
+        for(int i = 0; i < cnt; ++i)
+        {
+            UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
+            if(idxId[0] == 0)
+            if(roll0 < size1)
+                idIdx[0] = globalLevelsPlayers[level - i][roll0];
+            else
+                roll0 -= size1 - 1;
+
+            if(idxId[1] == 0)
+            if(roll1 < size1)
+                idIdx[1] = globalLevelsPlayers[level - i][roll1];
+            else
+                roll1 -= size1 - 1;
+
+            if(idxId[2] == 0)
+            if(roll2 < size1)
+                idIdx[2] = globalLevelsPlayers[level - i][roll2];
+            else
+                roll2 -= size1 - 1;
+        }
+    }
+
+}
+
+
 }
 

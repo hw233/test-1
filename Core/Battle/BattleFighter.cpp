@@ -432,6 +432,9 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     if(!skill)
         return 0;
 
+    if(skill->effect == NULL)
+        return 0;
+
     float aura_factor = 1;
     if(skill->cond == GData::SKILL_PEERLESS)
     {
@@ -445,6 +448,9 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
 float BattleFighter::calcPoison(const GData::SkillBase* skill)
 {
     if(!skill)
+        return 0;
+
+    if(skill->effect == NULL)
         return 0;
 
     // µÀ
@@ -583,7 +589,7 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
     GData::SkillItem* resSkillItem = NULL;
     if(NULL != _peerlessSkill.base)
     {
-        if(_aura >= 100)
+        if(_aura >= 100 && _peerlessSkill.base->effect != NULL)
         {
             // peerless skill first
             return _peerlessSkill.base;
@@ -602,6 +608,8 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
         idx = (idx0 + i) % cnt;
         if(NULL != _activeSkill[idx].base && _activeSkill[idx].cd == 0)
         {
+            if(_activeSkill[idx].base->effect == NULL)
+                continue;
             bool isTherapy = (_activeSkill[idx].base->effect->hp > 0 || _activeSkill[idx].base->effect->hpP > 0.001) && _activeSkill[idx].base->target == 0;
             // therapy skill second while need therapy
             if(need_therapy && isTherapy)
@@ -649,6 +657,10 @@ const GData::SkillBase* BattleFighter::getPassiveSkill100(std::vector<GData::Ski
     {
         if(passiveSkill100[idx].cd == 0)
         {
+            if(passiveSkill100[idx].base == NULL)
+                continue;
+            if(passiveSkill100[idx].base->effect == NULL)
+                continue;
             passiveSkill100[idx].cd = passiveSkill100[idx].base->cd + 1;
             return passiveSkill100[idx++].base;
         }
@@ -710,6 +722,10 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
     {
         if(rnd < passiveSkill[idx].rateExtent && passiveSkill[idx].cd == 0)
         {
+            if(passiveSkill[idx].base == NULL)
+                continue;
+            if(passiveSkill[idx].base->effect == NULL)
+                continue;
             passiveSkill[idx].cd = passiveSkill[idx].base->cd + 1;
             resSkillBase = passiveSkill[idx].base;
             break;
