@@ -67,12 +67,12 @@ namespace GObject
 #define PLAYER_BUFF_HIRA1           0x27    //  5489
 #define PLAYER_BUFF_HIRA2           0x28    //  5490
 #define PLAYER_BUFF_HIRA3           0x29    //  5491
-#define PLAYER_BUFF_HIRA4           0x2a    //  5492
-#define PLAYER_BUFF_HIRA5           0x2b    //  5500
-#define PLAYER_BUFF_HIRA6           0x2c    //  5493
-#define PLAYER_BUFF_HIRA7           0x2d    //  5494
-#define PLAYER_BUFF_HIRA8           0x2e    //  5495
-#define PLAYER_BUFF_HIRA9           0x2e    //  5496
+#define PLAYER_BUFF_HIRA4           0x2A    //  5492
+#define PLAYER_BUFF_HIRA5           0x2B    //  5500
+#define PLAYER_BUFF_HIRA6           0x2C    //  5493
+#define PLAYER_BUFF_HIRA7           0x2D    //  5494
+#define PLAYER_BUFF_HIRA8           0x2E    //  5495
+#define PLAYER_BUFF_HIRA9           0x2F    //  5496
 #define PLAYER_BUFF_HIRA10          0x30    //  5501
 #define PLAYER_BUFF_HIRA11          0x31    //  5497
 #define PLAYER_BUFF_HIRA12          0x32    //  5498
@@ -83,7 +83,7 @@ namespace GObject
 #define PLAYER_BUFF_HIRA17          0x37    //  5503
 #define PLAYER_BUFF_HIRA18          0x38    //  5504
 #define PLAYER_BUFF_HIRA19          0x39    //  5506
-#define PLAYER_BUFF_HIRA20          0x49    //  5508
+#define PLAYER_BUFF_HIRA20          0x3A    //  5508
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x80
 #define PLAYER_BUFF_COUNT			0x80

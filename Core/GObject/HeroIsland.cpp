@@ -261,6 +261,7 @@ void HeroIsland::end()
 
 void HeroIsland::process(UInt32 now)
 {
+    return; // TODO:
     if (!_prepareTime)
     {
         if (cfg.GMCheck)
@@ -319,8 +320,8 @@ void HeroIsland::clearBuff(HIPlayerData* pd)
     attr.reset();
     pd->player->addAttr(attr);
     pd->attrcd = static_cast<UInt32>(-1);
-    pd->bufid = 0;
     pd->player->setBuffData(pd->bufid, 0);
+    pd->bufid = 0;
 }
 
 void HeroIsland::applayRareAnimals()
