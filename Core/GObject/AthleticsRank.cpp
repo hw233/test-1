@@ -1707,7 +1707,7 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
 
 void AthleticsRank::updateAthleticsMartial(Player* pl)
 {
-    UInt32 idIdx[3] = {0};
+    UInt64 idIdx[3] = {0};
     UInt8 level = pl->GetLev();
 
     UInt32 size = globalLevelsPlayers[level].size();
@@ -1774,6 +1774,9 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         }
     }
 
+    for(int i = 0; i < 3; ++i)
+    {
+    }
 }
 
 
