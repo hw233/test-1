@@ -356,7 +356,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2};
         int nVipLevel = pl->getVipLevel();
         UInt32 nCount = _maxCount + _extraCount[nVipLevel];
 
-        if (data->fighters.size() > nCount)
+        if (data->fighters.size() >= nCount)
         {
             st << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
