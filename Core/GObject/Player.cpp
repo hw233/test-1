@@ -699,6 +699,7 @@ namespace GObject
             }
 		}
 
+        UInt32 oldLastOnline = _playerData.lastOnline;
 		_playerData.lastOnline = curtime;
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %"I64_FMT"u", curtime, getId());
 
@@ -717,7 +718,7 @@ namespace GObject
 		checkLastBattled();
 		GameAction()->onLogin(this);
 
-        if (World::_nationalDay)
+        if (World::_nationalDay) // XXX: 国庆节活动
         {
             UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
             if (online != static_cast<UInt32>(-1))
@@ -731,8 +732,32 @@ namespace GObject
                     sendNationalDayOnlineAward();
             }
         }
+#if 0 // XXX: 所有人都已经没有这个BUFF了
         else
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
+#endif
+
+        if (World::_halloween) // XXX: 万圣节活动
+        {
+            UInt8 oday = TimeUtil::Day(oldLastOnline);
+            UInt8 nday = TimeUtil::Day(curtime);
+            if (oday != nday)
+            {
+                UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
+                if (nday - oday > 1) // XXX: 隔天
+                {
+                    setBuffData(PLAYER_BUFF_ONLINE, 1);
+                }
+                else
+                {
+                    ++online;
+                    setBuffData(PLAYER_BUFF_ONLINE, online);
+                }
+                sendHalloweenOnlineAward(online);
+            }
+        }
+        else
+            setBuffData(PLAYER_BUFF_ONLINE, 0);
 
         sendLevelPack(GetLev());
 
@@ -763,6 +788,49 @@ namespace GObject
                     cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count);
+        }
+    }
+
+    void Player::sendHalloweenOnlineAward(UInt32 count)
+    {
+        SYSMSG(title, 2122);
+        SYSMSG(content, 2123);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[1] = {{GObject::MailPackage::Coupon,50}};
+            mailPackageManager.push(mail->id, mitem, 1, true);
+            std::string strItems;
+            for (int i = 0; i < 1; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+
+        if (count >= 3)
+        {
+            SYSMSG(title, 2124);
+            SYSMSG(content, 2125);
+            Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {36,1}};
+                mailPackageManager.push(mail->id, mitem, 2, true);
+                std::string strItems;
+                for (int i = 0; i < 2; ++i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            }
+            setBuffData(PLAYER_BUFF_ONLINE, 0);
         }
     }
 

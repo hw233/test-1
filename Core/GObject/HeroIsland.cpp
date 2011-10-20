@@ -52,6 +52,70 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
     ra.last = last;
     ra.cdlong = cd;
     ra.cd = 0;
+
+    switch (ra.id)
+    {
+        case 5489:
+            ra.bufid = PLAYER_BUFF_HIRA1;
+            break;
+        case 5490:
+            ra.bufid = PLAYER_BUFF_HIRA2;
+            break;
+        case 5491:
+            ra.bufid = PLAYER_BUFF_HIRA3;
+            break;
+        case 5492:
+            ra.bufid = PLAYER_BUFF_HIRA4;
+            break;
+        case 5500:
+            ra.bufid = PLAYER_BUFF_HIRA5;
+            break;
+        case 5493:
+            ra.bufid = PLAYER_BUFF_HIRA6;
+            break;
+        case 5494:
+            ra.bufid = PLAYER_BUFF_HIRA7;
+            break;
+        case 5495:
+            ra.bufid = PLAYER_BUFF_HIRA8;
+            break;
+        case 5496:
+            ra.bufid = PLAYER_BUFF_HIRA9;
+            break;
+        case 5501:
+            ra.bufid = PLAYER_BUFF_HIRA10;
+            break;
+        case 5497:
+            ra.bufid = PLAYER_BUFF_HIRA11;
+            break;
+        case 5498:
+            ra.bufid = PLAYER_BUFF_HIRA12;
+            break;
+        case 5499:
+            ra.bufid = PLAYER_BUFF_HIRA13;
+            break;
+        case 5505:
+            ra.bufid = PLAYER_BUFF_HIRA14;
+            break;
+        case 5507:
+            ra.bufid = PLAYER_BUFF_HIRA15;
+            break;
+        case 5502:
+            ra.bufid = PLAYER_BUFF_HIRA16;
+            break;
+        case 5503:
+            ra.bufid = PLAYER_BUFF_HIRA17;
+            break;
+        case 5504:
+            ra.bufid = PLAYER_BUFF_HIRA18;
+            break;
+        case 5506:
+            ra.bufid = PLAYER_BUFF_HIRA19;
+            break;
+        case 5508:
+            ra.bufid = PLAYER_BUFF_HIRA20;
+            break;
+    }
     _animals[spot].push_back(ra);
 }
 
@@ -243,16 +307,20 @@ void HeroIsland::applayPlayers()
             }
 
             if (pd && pd->player && now >= pd->attrcd && pd->attr)
-            {
-                GData::AttrExtra attr;
-                attr.reset();
-                pd->player->addAttr(attr); // XXX: 清除加成
-                pd->attrcd = static_cast<UInt32>(-1);
-                GData::AttrExtra* pattr = pd->attr;
-                // TODO: 清除BUF
-            }
+                clearBuff(pd);
         }
     }
+}
+
+void HeroIsland::clearBuff(HIPlayerData* pd)
+{
+    if (!pd || !pd->bufid) return;
+    GData::AttrExtra attr;
+    attr.reset();
+    pd->player->addAttr(attr);
+    pd->attrcd = static_cast<UInt32>(-1);
+    pd->bufid = 0;
+    pd->player->setBuffData(pd->bufid, 0);
 }
 
 void HeroIsland::applayRareAnimals()
@@ -471,7 +539,7 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
             pd->movecd = TimeUtil::Now() + 30;
         else
             pd->movecd = TimeUtil::Now() + 3;
-        pd->player->setBuffData(PLAYER_BUFF_HIMOVE, pd->movecd);
+        pd->player->setBuffData(PLAYER_BUFF_HIMOVE, pd->movecd, false);
     }
 
     pd->player->setHISpot(spot);
@@ -743,11 +811,12 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
         if (pd->player->attackRareAnimal(ra.id))
         {
-            player->addAttr(ra.attr);
+            clearBuff(pd);
             pd->attrcd = now + ra.last;
             pd->attr = &ra.attr;
-
-            // TODO: BUF
+            pd->bufid = ra.bufid;
+            player->addAttr(ra.attr);
+            pd->player->setBuffData(ra.bufid, pd->attrcd, false);
         }
         else
         {
@@ -755,7 +824,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd->injuredcd = now + 40;
             else
                 pd->injuredcd = now + 40;
-            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd);
+            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
             moveTo(pd->player, 0, false);
         }
 
@@ -793,7 +862,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             pd->fightcd = now + 40;
         else
             pd->fightcd = now + 3;
-        pd->player->setBuffData(PLAYER_BUFF_HIFIGHT, pd->fightcd);
+        pd->player->setBuffData(PLAYER_BUFF_HIFIGHT, pd->fightcd, false);
 
         if (res)
         {
@@ -804,7 +873,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd1->injuredcd = now + 40;
             else
                 pd1->injuredcd = now + 40;
-            pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd);
+            pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd, false);
 
             size_t sz = pd->compass.size();
             if (sz && pd->compass[sz-1].type == pd1->type)
@@ -837,7 +906,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd->injuredcd = now + 40;
             else
                 pd->injuredcd = now + 40;
-            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd);
+            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
             moveTo(pd->player, 0, false);
 
             broadcast(pd1, pd1->spot, 2);

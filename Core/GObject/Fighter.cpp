@@ -962,6 +962,7 @@ void Fighter::addAttr( const GData::AttrExtra& attr )
 {
 	addAttrExtra(_attrExtraEquip, &attr);
     setDirty();
+    checkDirty();
 }
 
 void Fighter::addAttr( const GData::CittaEffect* ce )

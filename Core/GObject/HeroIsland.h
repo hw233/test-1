@@ -34,7 +34,7 @@ struct HIPlayerData
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
-        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), attr(NULL), awardgot(0), inrank(0)
+        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(0), attr(NULL), awardgot(0), inrank(0)
     {
     }
 
@@ -50,6 +50,7 @@ struct HIPlayerData
     UInt16 score;
     UInt8 lasttype;
     UInt32 attrcd; // 奇珍异兽效果持续时间
+    UInt8 bufid;
     GData::AttrExtra* attr;
     UInt8 awardgot; // 0-没有奖励,1-绿 2-蓝 3-紫 4-橙,0xFF-已领取
     UInt8 inrank; // 0-不在,>=1-在
@@ -65,6 +66,7 @@ struct RareAnimals
     UInt32 last; // 效果持续时间
     UInt32 cdlong; // 攻击后冷却时间，全局
     UInt32 cd; // 冷却结束时间
+    UInt8 bufid; // 
 };
 
 struct lt_score
@@ -116,6 +118,7 @@ public:
     bool attack(Player* player, UInt8 type, UInt64 id);
     bool useSkill(Player* player, UInt16 skillid);
     bool getAward(Player* player, UInt8 id, UInt8 type);
+    void clearBuff(HIPlayerData* pd);
 
     void playerInfo(Player* player);
     void playerEnter(Player* player);
