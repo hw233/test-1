@@ -190,13 +190,13 @@ bool HeroIsland::isRareAnimal(UInt32 npcid)
 void HeroIsland::restart(UInt32 now)
 {
     _running = false;
-    _prepareTime = now + 10;
+    _prepareTime = now;
     broadcastTV(now);
 }
 
 void HeroIsland::broadcastTV(UInt32 now)
 {
-    if (now >= _prepareTime)
+    if (now >= _prepareTime && !_prepareStep)
         _prepareStep = 1;
 
     switch (_prepareStep)
@@ -221,8 +221,10 @@ void HeroIsland::broadcastTV(UInt32 now)
             break;
 
         case 4:
+            if (now < _startTime)
+                return;
             SYSMSG_BROADCASTV(2118);
-            _prepareStep = 0;
+            _prepareStep = 5;
             break;
 
         default:
@@ -252,14 +254,16 @@ void HeroIsland::calcNext(UInt32 now)
             if (now > TimeUtil::SharpDay(0,now) + 12 * 60 * 60 + 45 * 60)
                 _prepareTime = TimeUtil::SharpDay(1,now) + 11 * 60 * 60 + 45 * 60;
         }
+
+        _startTime = _prepareTime + 15 * 60;
+        _endTime = _startTime + 60 * 60;
     }
     else
     {
-        _prepareTime = now;
+        _prepareTime = now + 30;
+        _startTime = _prepareTime + 2 * 60;
+        _endTime = _startTime + 30 * 60;
     }
-
-    _startTime = _prepareTime + 15 * 60;
-    _endTime = _startTime + 60 * 60;
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(15);
@@ -301,6 +305,7 @@ void HeroIsland::end()
     rankReward();
     calcNext(TimeUtil::Now());
     _running = false;
+    _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
 }
 
