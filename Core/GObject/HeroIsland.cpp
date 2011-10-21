@@ -79,49 +79,49 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
         case 5492:
             ra.bufid = PLAYER_BUFF_HIRA4;
             break;
-        case 5500:
+        case 5493:
             ra.bufid = PLAYER_BUFF_HIRA5;
             break;
-        case 5493:
+        case 5494:
             ra.bufid = PLAYER_BUFF_HIRA6;
             break;
-        case 5494:
+        case 5495:
             ra.bufid = PLAYER_BUFF_HIRA7;
             break;
-        case 5495:
+        case 5496:
             ra.bufid = PLAYER_BUFF_HIRA8;
             break;
-        case 5496:
+        case 5497:
             ra.bufid = PLAYER_BUFF_HIRA9;
             break;
-        case 5501:
+        case 5498:
             ra.bufid = PLAYER_BUFF_HIRA10;
             break;
-        case 5497:
+        case 5499:
             ra.bufid = PLAYER_BUFF_HIRA11;
             break;
-        case 5498:
+        case 5500:
             ra.bufid = PLAYER_BUFF_HIRA12;
             break;
-        case 5499:
+        case 5501:
             ra.bufid = PLAYER_BUFF_HIRA13;
             break;
-        case 5505:
+        case 5502:
             ra.bufid = PLAYER_BUFF_HIRA14;
             break;
-        case 5507:
+        case 5503:
             ra.bufid = PLAYER_BUFF_HIRA15;
             break;
-        case 5502:
+        case 5504:
             ra.bufid = PLAYER_BUFF_HIRA16;
             break;
-        case 5503:
+        case 5505:
             ra.bufid = PLAYER_BUFF_HIRA17;
             break;
-        case 5504:
+        case 5506:
             ra.bufid = PLAYER_BUFF_HIRA18;
             break;
-        case 5506:
+        case 5507:
             ra.bufid = PLAYER_BUFF_HIRA19;
             break;
         case 5508:
@@ -252,7 +252,8 @@ void HeroIsland::calcNext(UInt32 now)
         else
         {
             if (now > TimeUtil::SharpDay(0,now) + 12 * 60 * 60 + 45 * 60)
-                _prepareTime = TimeUtil::SharpDay(1,now) + 11 * 60 * 60 + 45 * 60;
+                //_prepareTime = TimeUtil::SharpDay(1,now) + 11 * 60 * 60 + 45 * 60;
+                _prepareTime = TimeUtil::SharpDay(0,now) + 19 * 60 * 60 + 15 * 60;
         }
 
         _startTime = _prepareTime + 15 * 60;
