@@ -545,7 +545,13 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
-        void addAttr(const GData::AttrExtra&);
+
+    private:
+        GData::AttrExtra _hiattr;
+    public:
+        void addHIAttr(const GData::AttrExtra&);
+        void clearHIAttr();
+        inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
 
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);
