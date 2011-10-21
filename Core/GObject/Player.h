@@ -99,7 +99,7 @@ namespace GObject
 #define SHIMEN_TASK_MAXCOUNT        5       // 师门每日最大任务数
 #define YAMEN_TASK_MAXCOUNT         5       // 师门每日最大任务数
 
-#define MAX_PRACTICE_FIGHTRES       6       // 最大修炼散仙数
+#define MAX_PRACTICE_FIGHTRES       10      // 最大修炼散仙数
 
 	class Map;
 	class Player;
