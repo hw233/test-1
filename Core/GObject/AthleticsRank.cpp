@@ -1707,6 +1707,9 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
 
 void AthleticsRank::updateAthleticsMartial(Player* pl)
 {
+    if(pl == NULL)
+        return;
+
     UInt64 idIdx[3] = {0};
     UInt8 level = pl->GetLev();
 
@@ -1776,6 +1779,19 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
 
     for(int i = 0; i < 3; ++i)
     {
+        if(idIdx[i] != 0)
+        {
+            Player* defer = globalPlayers[idIdx[i]];
+            if(defer == NULL)
+                continue;
+            MartialHeader mh = {0};
+            mh.owner = pl;
+            mh.md.idx = i;
+            mh.md.defer = defer;
+            mh.md.bs = NULL;
+            GameMsgHdr hdr2(0x330, defer->getThreadId(), defer, sizeof(MartialHeader));
+            GLOBAL().PushMsg(hdr2, &mh);
+        }
     }
 }
 
