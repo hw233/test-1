@@ -29,6 +29,17 @@ struct Awards
     UInt32 prob;
 };
 
+struct Skill
+{
+    Skill() : last(0), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
+    UInt32 last;
+    UInt32 lastcd;
+    UInt8 bufid;
+    UInt32 cd;
+    bool incd;
+    GData::AttrExtra* attr;
+};
+
 struct HIPlayerData
 {
     HIPlayerData()
@@ -55,6 +66,7 @@ struct HIPlayerData
     UInt8 awardgot; // 0-没有奖励,1-绿 2-蓝 3-紫 4-橙,0xFF-已领取
     UInt8 inrank; // 0-不在,>=1-在
     std::vector<Task> compass; // 击杀任务
+    Skill skills[5];
 };
 
 struct RareAnimals
@@ -85,6 +97,7 @@ public:
     HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
+        initSkillAttr();
     }
 
     ~HeroIsland() {}
@@ -94,10 +107,12 @@ public:
     static void addHIAwardsCfg(UInt8 type, UInt32 id, UInt32 num, UInt32 prob);
     static void addRankAwards(UInt32 prestige);
     static bool isRareAnimal(UInt32 npcid);
+    static bool initSkillAttr();
 private:
     static std::vector<RareAnimals> _animals[HERO_ISLAND_SPOTS];
     static std::vector<Awards> _awards[4];
     static std::vector<UInt32> _prestige;
+    static GData::AttrExtra _skillattr[5];
 
 public:
     void process(UInt32 now);
@@ -116,9 +131,9 @@ public:
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
-    bool useSkill(Player* player, UInt16 skillid);
+    bool useSkill(Player* player, UInt8 skillid);
     bool getAward(Player* player, UInt8 id, UInt8 type);
-    void clearBuff(HIPlayerData* pd);
+    void clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skillid = 0);
 
     void playerInfo(Player* player);
     void playerEnter(Player* player);

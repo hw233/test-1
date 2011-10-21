@@ -3217,11 +3217,11 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             }
             break;
         case 6:
-            GObject::heroIsland.commitCompass(player);
+            //GObject::heroIsland.commitCompass(player);
             break;
         case 7:
             {
-                UInt16 skillid = 0;
+                UInt8 skillid = 0;
                 brd >> skillid;
                 GObject::heroIsland.useSkill(player, skillid);
             }
