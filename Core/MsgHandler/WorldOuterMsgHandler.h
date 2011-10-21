@@ -1209,6 +1209,11 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
         }
         break;
     case 3:
+        {
+            std::string name;
+            brd >> name;
+            GObject::gAthleticsRank.challenge2(player, name, 3);
+        }
         break;
     }
 }

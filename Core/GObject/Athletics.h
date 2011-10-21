@@ -71,6 +71,7 @@ public:
 	void updateAthleticsAwardData(UInt32, UInt8, UInt32);
 
     void listAthleticsReport();
+    void listAthleticsMartial();
 
 public:
 	void defendergainsource(Player *, UInt32, UInt8, UInt32);
@@ -81,18 +82,7 @@ public:
 
     void updateMartialHdr(const MartialHeader* mh);
     void updateMartial(const MartialData* md);
-    void attackMartial(UInt8 idx);
-    void getMartialIds(UInt64* id, UInt8& len)
-    {
-        if(len > 3)
-            len = 3;
-
-        for(UInt8 idx = 0; idx < len; ++ idx)
-        {
-            if(_martial[idx])
-                id[idx] = _martial[idx]->getId();
-        }
-    }
+    void attackMartial(Player* defer);
 public:
 	bool addAthleticsExtraAward(UInt32 EquipId, UInt8 rank);
 

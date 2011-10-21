@@ -1216,6 +1216,7 @@ namespace GObject
                 idx != PLAYER_BUFF_WBOSS &&
                 idx != PLAYER_BUFF_YDOTR &&
                 idx != PLAYER_BUFF_ONLINE &&
+                idx != PLAYER_BUFF_AMARTIAL_WIN &&
                 _buffData[idx] > 0 && _buffData[idx] <= tm)
 		{
 			_buffData[idx] = 0;
@@ -4800,7 +4801,7 @@ namespace GObject
 			_clan->broadcastMemberInfo(this);
 		}
 		m_TaskMgr->CheckCanAcceptTaskByLev(nLev);
-		if ((nLev > 29 && !m_Athletics->hasEnterAthletics()) || (oLev < 45 && nLev > 44))
+		if ((nLev > 29 && !m_Athletics->hasEnterAthletics()) || (oLev < 40 && nLev > 39))
 		{
 			GameMsgHdr hdr(0x19E, WORKER_THREAD_WORLD, this, sizeof(nLev));
 			GLOBAL().PushMsg(hdr, &nLev);

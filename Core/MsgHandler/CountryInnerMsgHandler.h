@@ -213,6 +213,12 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	GameAction()->RunOperationTaskAction0(player, 2);
 }
 
+void OnAthleticsMartialReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    player->GetAthletics()->listAthleticsMartial();
+}
+
 void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -1155,6 +1161,13 @@ void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
         return;
 	const GObject::MartialData* md = reinterpret_cast<const GObject::MartialData*>(data);
     player->GetAthletics()->updateMartial(md);
+}
+
+void OnAthleticsMartialAttack( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Player * defer = *reinterpret_cast<GObject::Player **>(const_cast<void *>(data));
+	player->GetAthletics()->attackMartial(defer);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

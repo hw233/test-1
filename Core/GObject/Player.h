@@ -92,6 +92,8 @@ namespace GObject
 #define PLAYER_BUFF_HIJZ            0x3E    // 五行禁阵
 #define PLAYER_BUFF_HIESCAPE        0x3F    // 英雄岛逃亡
 
+#define PLAYER_BUFF_AMARTIAL_WIN    0x40    // 斗剑历练胜利次数
+
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
 

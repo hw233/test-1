@@ -450,11 +450,23 @@ void Athletics::updateMartial(const MartialData* md)
         return;
 
     _martial[md->idx] = md->defer;
+    if(_martial_battle[md->idx] != NULL)
+        delete _martial_battle;
     _martial_battle[md->idx] = md->bs;
 }
 
-void Athletics::attackMartial(UInt8 idx)
+void Athletics::attackMartial(Player* defer)
 {
+    UInt8 idx = 0xFF;
+    for(UInt8 i = 0; i < 3; ++i)
+    {
+        if(_martial[i] == defer)
+        {
+            idx = i;
+            break;
+        }
+    }
+
     if(idx > 2)
         return;
 
@@ -475,8 +487,21 @@ void Athletics::attackMartial(UInt8 idx)
 
     if(res)
     {
+        UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
+        if(wins >= 5)
+        {
+            _owner->getCoupon(20);
+            wins = 0;
+        }
+        _owner->getPrestige(10);
+        _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
         delete _martial_battle[idx];
         _martial_battle[idx] = NULL;
+        listAthleticsMartial();
+    }
+    else
+    {
+        _owner->getPrestige(5);
     }
 }
 
@@ -522,6 +547,38 @@ void Athletics::updateMartialHdr(const MartialHeader* mh)
             GLOBAL().PushMsg(hdr2, &md);
         }
     }
+}
+
+void Athletics::listAthleticsMartial()
+{
+    UInt8 count = 15;
+	if (count > static_cast<UInt16>(_athleticses.size()))
+		count = static_cast<UInt16>(_athleticses.size());
+
+	Stream st(REP::ARENA_IFNO);
+    st << static_cast<UInt16>(0x10);
+
+    UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
+	st << wins << static_cast<UInt8>(3);
+	for (UInt8 i = 0; i < 3; ++i)
+	{
+        if(_martial[i] != 0)
+        {
+            Player* pl = _martial[i];
+            if(pl == NULL)
+                st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+            else
+                st << pl->getName() << pl->getCountry() << static_cast<UInt8>(_martial_battle[i] == NULL ? 0 : 1);
+        }
+        else
+        {
+            st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+        }
+	}
+
+    st << Stream::eos;
+
+    _owner->send(st);
 }
 
 }

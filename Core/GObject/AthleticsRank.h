@@ -139,6 +139,7 @@ public:
     void requestAthleticsEvent(Stream&, Player * player);
 
 	void challenge(Player *, UInt8 type);
+	void challenge2(Player *, std::string&, UInt8 type);
 
 protected:
 	void getRandomEquip(UInt8 level, UInt16 rank, UInt16& EquipId, UInt16& cnt);
@@ -179,7 +180,7 @@ protected:
 
 	inline UInt8 getRankRow(UInt8 lev)
 	{
-		if (lev > 44)
+		if (lev > 39)
 			return 1;
 		if (lev > 29)
 			return 0;
