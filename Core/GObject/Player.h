@@ -12,6 +12,7 @@
 #include "Common/TimeUtil.h"
 
 #include "Server/WorldServer.h"
+#include "Battle/BattleSimulator.h"
 #include "kingnet_analyzer.h"
 
 namespace Battle
@@ -64,14 +65,41 @@ namespace GObject
 #define PLAYER_BUFF_HIMASTER_SOUL   0x25
 #define PLAYER_BUFF_HIMOVE          0x26
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x30
-#define PLAYER_BUFF_COUNT			0x30
+#define PLAYER_BUFF_HIRA1           0x27    //  5489
+#define PLAYER_BUFF_HIRA2           0x28    //  5490
+#define PLAYER_BUFF_HIRA3           0x29    //  5491
+#define PLAYER_BUFF_HIRA4           0x2A    //  5492
+#define PLAYER_BUFF_HIRA5           0x2B    //  5493
+#define PLAYER_BUFF_HIRA6           0x2C    //  5494
+#define PLAYER_BUFF_HIRA7           0x2D    //  5495
+#define PLAYER_BUFF_HIRA8           0x2E    //  5496
+#define PLAYER_BUFF_HIRA9           0x2F    //  5497
+#define PLAYER_BUFF_HIRA10          0x30    //  5498
+#define PLAYER_BUFF_HIRA11          0x31    //  5499
+#define PLAYER_BUFF_HIRA12          0x32    //  5500
+#define PLAYER_BUFF_HIRA13          0x33    //  5501
+#define PLAYER_BUFF_HIRA14          0x34    //  5502
+#define PLAYER_BUFF_HIRA15          0x35    //  5503
+#define PLAYER_BUFF_HIRA16          0x36    //  5504
+#define PLAYER_BUFF_HIRA17          0x37    //  5505
+#define PLAYER_BUFF_HIRA18          0x38    //  5506
+#define PLAYER_BUFF_HIRA19          0x39    //  5507
+#define PLAYER_BUFF_HIRA20          0x3A    //  5508
+
+#define PLAYER_BUFF_HIPG            0x3B    // 盘古之力
+#define PLAYER_BUFF_HIBT            0x3C    // 玲珑宝塔
+#define PLAYER_BUFF_HILN            0x3D    // 混元灵怒
+#define PLAYER_BUFF_HIJZ            0x3E    // 五行禁阵
+#define PLAYER_BUFF_HIESCAPE        0x3F    // 英雄岛逃亡
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x50
+#define PLAYER_BUFF_COUNT			0x50
 
 #define CLAN_TASK_MAXCOUNT          5       // 帮派每日最大任务数
 #define SHIMEN_TASK_MAXCOUNT        5       // 师门每日最大任务数
 #define YAMEN_TASK_MAXCOUNT         5       // 师门每日最大任务数
 
-#define MAX_PRACTICE_FIGHTRES       6       // 最大修炼散仙数
+#define MAX_PRACTICE_FIGHTRES       10      // 最大修炼散仙数
 
 	class Map;
 	class Player;
@@ -448,7 +476,8 @@ namespace GObject
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
         void sendNationalDayOnlineAward();
-        void send40LevelPack();
+        void sendHalloweenOnlineAward(UInt32);
+        void sendLevelPack(UInt8);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -529,6 +558,7 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
+        void addAttr(const GData::AttrExtra&);
 
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);
@@ -607,6 +637,7 @@ namespace GObject
         inline UInt8 getMounts() { return _playerData.mounts; }
         bool setMounts(UInt8 mounts);
 
+        void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
@@ -664,6 +695,7 @@ namespace GObject
         UInt8 rcvYellowDiamondAward(UInt8 type);
         void checkQQAward();
         void RollYDGem();
+        void openLevelBox(UInt8 lvl, UInt8 cls);
 
 	public:
 		Map* GetMap();
@@ -683,10 +715,10 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//战斗相关
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
-        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL);
+        bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }

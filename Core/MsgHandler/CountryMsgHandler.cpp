@@ -103,6 +103,8 @@ MSG_REG(GameMsgHdr, OnTradeOperate);
 
 MSG_REG(GameMsgHdr, OnSaleSellReq);
 
+MSG_REG(GameMsgHdr, OnRefreshMartialReq);
+
 MSG_REG(GameMsgHdr, OnMailListReq);
 MSG_REG(GameMsgHdr, OnMailReq);
 MSG_REG(GameMsgHdr, OnMailClickReq);

@@ -2,6 +2,8 @@
 
 actTime1 = 0;
 actTime2 = 0;
+actTime3 = 0;
+actTime4 = 0;
 
 serverName = nil
 serverNum = 0
@@ -94,13 +96,22 @@ function onActivityCheck(tm)
     setNationalDay(false);
   end
 
+  if tm >= actTime3 and tm < actTime4 then
+      setHalloween(true);
+  else
+      setHalloween(false);
+  end
+
 end
 
 function initActTime(y, m, d)
-  local  SerStartTm = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
-  --local  SerStartTm = { ['year'] = 2011, ['month'] = 9, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
-  actTime1 = os.time(SerStartTm);
-  actTime2 = os.time(SerStartTm) + 7 * 86400;
+  local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  actTime1 = os.time(SerStartTm1);
+  actTime2 = os.time(SerStartTm1) + 7 * 86400;
+
+  actTime3 = os.time(SerStartTm2);
+  actTime4 = os.time(SerStartTm2) + 4 * 86400;
   
   onActivityCheck(os.time() + 30);
 

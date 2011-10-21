@@ -540,4 +540,10 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
     }
 }
 
+void OnAthleticsMartialFlush( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    GObject::gAthleticsRank.updateAthleticsMartial(player);
+}
+
 #endif // _WORLDINNERMSGHANDLER_H_

@@ -916,12 +916,11 @@ namespace GObject
                                 if(count >8)
                                 {
                                     PLAYER_DATA(pl, tavernOrangeCount) = atoi(tk[8].c_str());
-                                    if(PLAYER_DATA(pl, tavernOrangeCount) > 9999)
+                                    if (PLAYER_DATA(pl, tavernOrangeCount) > 10000)
                                     {
-                                        fault = true;
                                         PLAYER_DATA(pl, tavernOrangeCount) = 0;
+                                        fault = true;
                                     }
-
                                     if(count > 9)
                                     {
                                         char * endptr;
@@ -936,7 +935,7 @@ namespace GObject
 				}
 				else
 					pl->setNextTavernUpdate(0);
-                if(fault)
+                if (fault)
                     pl->writeTavernIds();
 			}
 

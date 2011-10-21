@@ -45,6 +45,7 @@ void WorldScript::init()
 	def("getActivityStage", GObject::World::getActivityStage);
 	def("setIsNewServer", GObject::World::setIsNewServer);
 	def("setNationalDay", GObject::World::setNationalDay);
+	def("setHalloween", GObject::World::setHalloween);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
@@ -54,6 +55,7 @@ void WorldScript::init()
     def("setFrontMapActiveCount", GObject::FrontMap::setFrontMapActiveCount);
     def("setRareAnimals", GObject::HeroIsland::setRareAnimals);
     def("addHIAwardsCfg", GObject::HeroIsland::addHIAwardsCfg);
+    def("addRankAwards", GObject::HeroIsland::addRankAwards);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

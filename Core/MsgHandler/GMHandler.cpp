@@ -142,6 +142,8 @@ GMHandler::GMHandler()
     Reg(3, "hiid", &GMHandler::OnGetIDHI);
     Reg(3, "hitask", &GMHandler::OnTaskHI);
     Reg(3, "hici", &GMHandler::OnCiTaskHI);
+    Reg(3, "hirestart", &GMHandler::OnRestartHI);
+    Reg(3, "hiaward", &GMHandler::OnAwardHI);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2393,5 +2395,17 @@ void GMHandler::OnTaskHI(GObject::Player *player, std::vector<std::string>& args
 void GMHandler::OnCiTaskHI(GObject::Player *player, std::vector<std::string>& args)
 {
     heroIsland.commitCompass(player);
+}
+
+void GMHandler::OnRestartHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    heroIsland.restart(TimeUtil::Now());
+}
+
+void GMHandler::OnAwardHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    heroIsland.getAward(player, atoi(args[0].c_str()), 1);
 }
 

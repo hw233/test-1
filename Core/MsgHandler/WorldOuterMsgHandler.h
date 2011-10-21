@@ -1208,6 +1208,8 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
             GObject::gAthleticsRank.challenge(player, name);
         }
         break;
+    case 3:
+        break;
     }
 }
 

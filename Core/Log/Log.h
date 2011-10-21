@@ -48,6 +48,7 @@ enum PurchaseType
     YamenTaskFresh,
     AutoCopyComplete,
     InstantPracticeAcc,
+    FlushAthletics,
 };
 
 enum MoneyType
@@ -100,6 +101,7 @@ enum ItemFrom
     FromTripod,
     FromFCMerge,
     FromPExp,
+    FromHeroIsland,
 };
 
 enum ItemTo

@@ -1757,23 +1757,29 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         for(int i = 0; i < cnt; ++i)
         {
             UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
-            if(idxId[0] == 0)
-            if(roll0 < size1)
-                idIdx[0] = globalLevelsPlayers[level - i][roll0];
-            else
-                roll0 -= size1 - 1;
+            if(idIdx[0] == 0)
+            {
+                if(roll0 < size1)
+                    idIdx[0] = globalLevelsPlayers[level - i][roll0];
+                else
+                    roll0 -= size1 - 1;
+            }
 
-            if(idxId[1] == 0)
-            if(roll1 < size1)
-                idIdx[1] = globalLevelsPlayers[level - i][roll1];
-            else
-                roll1 -= size1 - 1;
+            if(idIdx[1] == 0)
+            {
+                if(roll1 < size1)
+                    idIdx[1] = globalLevelsPlayers[level - i][roll1];
+                else
+                    roll1 -= size1 - 1;
+            }
 
-            if(idxId[2] == 0)
-            if(roll2 < size1)
-                idIdx[2] = globalLevelsPlayers[level - i][roll2];
-            else
-                roll2 -= size1 - 1;
+            if(idIdx[2] == 0)
+            {
+                if(roll2 < size1)
+                    idIdx[2] = globalLevelsPlayers[level - i][roll2];
+                else
+                    roll2 -= size1 - 1;
+            }
         }
     }
 
