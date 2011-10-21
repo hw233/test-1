@@ -1570,7 +1570,10 @@ namespace GObject
             return 0;
         if (!total)
             return 100;
-        return (((float)total)/totalmax) * 100;
+        UInt8 p = (((float)total)/totalmax) * 100;
+        if (p > 100)
+            p = 100;
+        return p;
     }
 
 	void Player::addFightCurrentHpAll(UInt16 hp)
@@ -1815,11 +1818,11 @@ namespace GObject
         return false;
     }
 
-	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp )
+	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene )
 	{
 		checkLastBattled();
 		other->checkLastBattled();
-		Battle::BattleSimulator bsim(applyhp ? _playerData.location : Battle::BS_ATHLETICS1, this, other);
+		Battle::BattleSimulator bsim(applyhp ? _playerData.location : scene, this, other);
 		PutFighters( bsim, 0 );
 		other->PutFighters( bsim, 1 );
 		bsim.start();
@@ -1980,7 +1983,7 @@ namespace GObject
 
     bool Player::attackRareAnimal(UInt32 id)
     {
-        return attackCopyNpc(id, 3, 0, 1, false, NULL, false);
+        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, 1, false, NULL, false);
     }
 
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
@@ -6443,6 +6446,16 @@ namespace GObject
 			_playerData.nextPIcReset = TimeUtil::SharpDay(1, now);
             _playerData.picCount = 0;
             DB1().PushUpdateData("UPDATE `player` SET piccount = %u, nextpicreset = %u where `id`= %"I64_FMT"u", _playerData.picCount, _playerData.nextPIcReset, _id);
+		}
+    }
+
+    void Player::setLineupDirty(bool dirty)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->setDirty(dirty);
 		}
     }
 

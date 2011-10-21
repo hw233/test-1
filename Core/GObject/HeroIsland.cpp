@@ -3,6 +3,7 @@
 #include "Server/SysMsg.h"
 #include "Common/Random.h"
 #include "GObject/Package.h"
+#include "Battle/BattleSimulator.h"
 #include "MsgID.h"
 
 namespace GObject
@@ -18,6 +19,17 @@ inline UInt32 calcExp(UInt8 lvl)
 std::vector<RareAnimals> HeroIsland::_animals[HERO_ISLAND_SPOTS];
 std::vector<Awards> HeroIsland::_awards[4];
 std::vector<UInt32> HeroIsland::_prestige;
+GData::AttrExtra HeroIsland::_skillattr[5];
+
+bool HeroIsland::initSkillAttr()
+{
+    _skillattr[1].magatkP = 0.1;
+    _skillattr[1].attackP = 0.1;
+    _skillattr[2].defendP = 0.1;
+    _skillattr[2].magdefP = 0.1;
+    _skillattr[3].aura = 25;
+    return false;
+}
 
 void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd)
 {
@@ -31,7 +43,7 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
     ra.attr.intelligenceP = attr.get<UInt8>("intelligence")/(float)100;
     ra.attr.willP = attr.get<UInt8>("will")/(float)100;
     ra.attr.soulP = attr.get<UInt8>("soul")/(float)100;
-    ra.attr.auraP = attr.get<UInt8>("aura");
+    ra.attr.aura = attr.get<UInt8>("aura");
     ra.attr.auraMaxP = attr.get<UInt8>("auraMax");
     ra.attr.attackP = attr.get<UInt8>("attack")/(float)100;
     ra.attr.magatkP = attr.get<UInt8>("magatk")/(float)100;
@@ -116,7 +128,19 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
             ra.bufid = PLAYER_BUFF_HIRA20;
             break;
     }
-    _animals[spot].push_back(ra);
+
+    std::vector<RareAnimals>::iterator
+        i = _animals[spot].begin(), e = _animals[spot].end();
+    for ( ; i != e; ++i)
+    {
+        if ((*i).id > ra.id)
+        {
+            _animals[spot].insert(i, ra);
+            break;
+        }
+    }
+    if (i == e)
+        _animals[spot].push_back(ra);
 }
 
 class Sort 
@@ -165,7 +189,7 @@ bool HeroIsland::isRareAnimal(UInt32 npcid)
 
 void HeroIsland::restart(UInt32 now)
 {
-    _running = true;
+    _running = false;
     _prepareTime = now + 10;
     broadcastTV(now);
 }
@@ -231,24 +255,20 @@ void HeroIsland::rankReward()
     if (!cfg.GMCheck)
         factor = 1.0;
 
-    UInt8 nsz = _prestige.size();
     UInt8 n = 0;
+    UInt8 nsz = _prestige.size();
     for (SortType::reverse_iterator i = _sorts.rbegin(), e = _sorts.rend(); i != e; ++i)
     {
-        if (*i && (*i)->player)
+        if (!(*i) || !(*i)->player)
+            continue;
+        if (n < nsz)
         {
-            if (n < nsz)
-            {
-                (*i)->player->getPrestige(_prestige[n] * factor + (*i)->compass.size());
-                ++n;
-            }
-            else
-            {
-                (*i)->player->getPrestige(100);
-            }
+            (*i)->player->getPrestige(_prestige[n] * factor + (*i)->compass.size());
+            ++n;
         }
+        else
+            (*i)->player->getPrestige(100);
     }
-
 }
 
 void HeroIsland::end()
@@ -257,11 +277,11 @@ void HeroIsland::end()
     _endTime = 0;
     _startTime = 0;
     _running = false;
+    SYSMSG_BROADCASTV(2116);
 }
 
 void HeroIsland::process(UInt32 now)
 {
-    return; // TODO:
     if (!_prepareTime)
     {
         if (cfg.GMCheck)
@@ -308,20 +328,51 @@ void HeroIsland::applayPlayers()
             }
 
             if (pd && pd->player && now >= pd->attrcd && pd->attr)
-                clearBuff(pd);
+                clearBuff(1, pd, now);
+
+            for (UInt8 i = 0; i < 5; ++i)
+            {
+                if (now >= pd->skills[i].cd)
+                {
+                    pd->skills[i].incd = false;
+                    pd->skills[i].cd = static_cast<UInt32>(-1);
+                }
+
+                if (now >= pd->skills[i].lastcd)
+                {
+                    if (i && pd->skills[i].bufid)
+                        clearBuff(2, pd, now, i);
+                }
+            }
         }
     }
 }
 
-void HeroIsland::clearBuff(HIPlayerData* pd)
+void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skillid)
 {
     if (!pd || !pd->bufid) return;
     GData::AttrExtra attr;
-    attr.reset();
     pd->player->addAttr(attr);
-    pd->attrcd = static_cast<UInt32>(-1);
-    pd->player->setBuffData(pd->bufid, 0);
-    pd->bufid = 0;
+    if (type == 1 && pd->bufid)
+    {
+        pd->attrcd = static_cast<UInt32>(-1);
+        pd->player->setBuffData(pd->bufid, 0);
+        pd->bufid = 0;
+
+        for (UInt8 i = 1; i < 5; ++i)
+        {
+            if (now < pd->skills[i].lastcd && pd->skills[i].attr)
+                pd->player->addAttr(*pd->skills[i].attr);
+        }
+    }
+    else if (type == 2 && skillid)
+    {
+        pd->player->setBuffData(pd->skills[skillid].bufid, 0, false);
+        pd->skills[skillid].lastcd = static_cast<UInt32>(-1);
+        pd->skills[skillid].attr = NULL;
+        if (pd && pd->player && now < pd->attrcd && pd->attr)
+            pd->player->addAttr(*pd->attr);
+    }
 }
 
 void HeroIsland::applayRareAnimals()
@@ -519,6 +570,12 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     if (!pd) return false;
     pd->player = player;
     pd->expcd = TimeUtil::Now() + 60;
+
+    pd->skills[1].last = 2*60;
+    pd->skills[2].last = 2*60;
+    pd->skills[3].last = 1*60;
+    pd->skills[4].last = 2*60;
+
     return enter(pd, type, spot, movecd);
 }
 
@@ -539,7 +596,7 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
         if (cfg.GMCheck)
             pd->movecd = TimeUtil::Now() + 30;
         else
-            pd->movecd = TimeUtil::Now() + 3;
+            pd->movecd = TimeUtil::Now() + 30;
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, pd->movecd, false);
     }
 
@@ -629,8 +686,19 @@ void HeroIsland::sendSkills(HIPlayerData* pd)
 {
     if (!pd || !pd->player)
         return;
+
+    UInt32 now = TimeUtil::Now();
     Stream st(REP::HERO_ISLAND);
-    // TODO:
+    st << static_cast<UInt8>(11);
+    st << static_cast<UInt8>(5);
+    for (UInt8 i = 0; i < 5; ++i)
+    {
+        st << static_cast<UInt8>(i+1);
+        if (now >= pd->skills[i].cd)
+            st << static_cast<UInt16>(0);
+        else
+            st << static_cast<UInt16>(pd->skills[i].cd - now);
+    }
     st << Stream::eos;
     pd->player->send(st);
 }
@@ -745,7 +813,7 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
     UInt32 now = TimeUtil::Now();
     if (movecd && pd->movecd > now)
     {
-        // TODO:
+        pd->player->sendMsgCode(0, 2001);
         return false;
     }
 
@@ -797,7 +865,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
         if (ra.cd > now)
         {
-            // TODO:
+            pd->player->sendMsgCode(0, 2005);
             return false;
         }
 
@@ -812,12 +880,13 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
         if (pd->player->attackRareAnimal(ra.id))
         {
-            clearBuff(pd);
+            clearBuff(1, pd, now);
             pd->attrcd = now + ra.last;
             pd->attr = &ra.attr;
             pd->bufid = ra.bufid;
             player->addAttr(ra.attr);
             pd->player->setBuffData(ra.bufid, pd->attrcd, false);
+            pd->player->sendMsgCode(0, 2119);
         }
         else
         {
@@ -835,7 +904,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     {
         if (pd->fightcd > now)
         {
-            // TODO:
+            pd->player->sendMsgCode(0, 2004);
             return false;
         }
 
@@ -854,15 +923,22 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
         if (!pd1->spot)
         {
+            pd->player->sendMsgCode(0, 2002);
+            return false;
+        }
+
+        if (pd1->player->getBuffData(PLAYER_BUFF_HIJZ))
+        {
+            pd->player->sendMsgCode(0, 2003);
             return false;
         }
 
         int turns = 0;
-        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true);
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5);
         if (cfg.GMCheck)
             pd->fightcd = now + 40;
         else
-            pd->fightcd = now + 3;
+            pd->fightcd = now + 40;
         pd->player->setBuffData(PLAYER_BUFF_HIFIGHT, pd->fightcd, false);
 
         if (res)
@@ -888,6 +964,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                     if (pd->compass[sz-1].type == pd->compass[sz-2].type)
                         ++pd->straight;
                 }
+                commitCompass(pd->player);
             }
             else
             {
@@ -918,9 +995,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     return false;
 }
 
-bool HeroIsland::useSkill(Player* player, UInt16 skillid)
+bool HeroIsland::useSkill(Player* player, UInt8 skillid)
 {
-    if (!player)
+    if (!player || !skillid || skillid > 5)
         return false;
 
     if (!player->hasFlag(Player::InHeroIsland))
@@ -933,9 +1010,91 @@ bool HeroIsland::useSkill(Player* player, UInt16 skillid)
     if (pd->spot)
         return false;
 
-    // TODO:
+    if (pd->skills[skillid-1].incd)
+    {
+        return false;
+    }
 
-    return false;
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(12);
+    st << skillid;
+
+    UInt32 now = TimeUtil::Now();
+    switch (skillid)
+    {
+        case 1:
+            {
+                if (!pd->player->getBuffData(PLAYER_BUFF_HIWEAK))
+                {
+                    pd->player->sendMsgCode(0, 2006);
+                    return false;
+                }
+
+                UInt16 cd = 20*60;
+                pd->skills[0].cd = now + cd; // TODO:
+                pd->skills[0].bufid = 0;
+                pd->skills[0].attr = NULL;
+                pd->player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
+                st << cd;
+            }
+            break;
+
+        case 2:
+            {
+                UInt16 cd = 20*60;
+                pd->skills[1].lastcd = now + pd->skills[1].last;
+                pd->skills[1].cd = now + cd;
+                pd->skills[1].bufid = PLAYER_BUFF_HIPG;
+                pd->skills[1].attr = &_skillattr[1];
+                pd->player->setBuffData(pd->skills[1].bufid, pd->skills[1].lastcd);
+                st << cd;
+            }
+            break;
+
+        case 3:
+            {
+                UInt16 cd = 20*60;
+                pd->skills[2].lastcd = now + pd->skills[2].last;
+                pd->skills[2].cd = now + cd;
+                pd->skills[2].bufid = PLAYER_BUFF_HIBT;
+                pd->skills[2].attr = &_skillattr[2];
+                pd->player->setBuffData(pd->skills[2].bufid, pd->skills[2].lastcd);
+                st << cd;
+            }
+            break;
+
+        case 4:
+            {
+                UInt16 cd = 20*60;
+                pd->skills[3].lastcd = now + pd->skills[3].last;
+                pd->skills[3].cd = now + cd;
+                pd->skills[3].bufid = PLAYER_BUFF_HILN;
+                pd->skills[3].attr = &_skillattr[3];
+                pd->player->setBuffData(pd->skills[3].bufid, pd->skills[3].lastcd);
+                st << cd;
+            }
+            break;
+
+        case 5:
+            {
+                UInt16 cd = 20*60;
+                pd->skills[4].lastcd = now + pd->skills[4].last;
+                pd->skills[4].cd = now + cd;
+                pd->skills[4].bufid = PLAYER_BUFF_HIJZ;
+                pd->skills[4].attr = NULL;
+                pd->player->setBuffData(pd->skills[4].bufid, pd->skills[4].lastcd);
+                st << cd;
+            }
+            break;
+            
+        default:
+            break;
+    }
+
+    pd->skills[skillid-1].incd = true;
+    st << Stream::eos;
+    pd->player->send(st);
+    return true;
 }
 
 void HeroIsland::playerInfo(Player* player)
@@ -1154,18 +1313,20 @@ void HeroIsland::commitCompass(Player* player)
 
     if (!(sz % 3))
     {
-        ++pd->round;
         if (pd->straight == 3)
+        {
+            ++pd->round;
             pd->awardgot = pd->round+1;
+        }
         else
             pd->awardgot = 1;
 
-        pd->straight = 0; // XXX: 每三次为一轮
-
-        if (pd->round > 3)
+        if (sz >= 12)
+        {
             pd->round = 0;
-
-        pd->compass.clear();
+            pd->compass.clear();
+        }
+        pd->straight = 0; // XXX: 每三次为一轮
     }
     else
     {
@@ -1227,7 +1388,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 
         struct Award
         {
-            UInt8 id;
+            UInt16 id;
             UInt32 num;
         };
 
@@ -1263,6 +1424,12 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 
         if (awards[id].id && awards[id].num)
         {
+            if (awards[id].id > 5)
+            {
+                return player->GetPackage()->Add(
+                        awards[id].id, awards[id].num, true, false, FromHeroIsland);
+            }
+
             switch (awards[id].id)
             {
                 case 1:
