@@ -1038,6 +1038,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd->straight = 1;
             }
 
+            if (!sz)
+                commitCompass(pd->player);
+
             Stream st(REP::HERO_ISLAND);
             st << static_cast<UInt8>(5) << static_cast<UInt8>(2) << pd->straight << Stream::eos;
             pd->player->send(st);
@@ -1409,27 +1412,32 @@ void HeroIsland::commitCompass(Player* player)
     {
     }
 
-    pd->score += 10;
-
-    if (score != pd->score)
+    if (_running)
     {
-        SortType::iterator i = _sorts.find(pd);
-        if (i != _sorts.end())
-            _sorts.erase(i);
-        _sorts.insert(pd);
-
-        pd->inrank = 0;
-        for (SortType::reverse_iterator i = _sorts.rbegin(), e = _sorts.rend(); i != e; ++i)
+        pd->score += 10;
+        if (score != pd->score)
         {
-            ++pd->inrank;
-            if (*i == pd)
-                break;
-        }
+            SortType::iterator i = _sorts.find(pd);
+            if (i != _sorts.end())
+                _sorts.erase(i);
+            _sorts.insert(pd);
 
-        Stream st(REP::HERO_ISLAND);
-        st << static_cast<UInt8>(14) << pd->inrank << pd->score << Stream::eos;
-        player->send(st);
+            pd->inrank = 0;
+            for (SortType::reverse_iterator i = _sorts.rbegin(), e = _sorts.rend(); i != e; ++i)
+            {
+                ++pd->inrank;
+                if (*i == pd)
+                    break;
+            }
+
+            Stream st(REP::HERO_ISLAND);
+            st << static_cast<UInt8>(14) << pd->inrank << pd->score << Stream::eos;
+            player->send(st);
+        }
     }
+
+    if (!_running)
+        pd->awardgot = 0;
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(5) << static_cast<UInt8>(3) << pd->straight
