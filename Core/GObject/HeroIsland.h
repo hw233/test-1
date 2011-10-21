@@ -94,7 +94,7 @@ typedef std::multiset<HIPlayerData*, lt_score> SortType;
 class HeroIsland
 {
 public:
-    HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0)
+    HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0), _count(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
         initSkillAttr();
@@ -171,6 +171,7 @@ private:
     UInt32 _prepareTime;
     UInt32 _startTime;
     UInt32 _endTime;
+    UInt8 _count;
 };
 
 extern HeroIsland heroIsland;

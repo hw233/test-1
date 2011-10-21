@@ -1165,11 +1165,7 @@ namespace GObject
 		if(id >= PLAYER_BUFF_COUNT || _buffData[id] == data)
 			return;
 		_buffData[id] = data;
-		if(writedb || id == PLAYER_BUFF_HIWEAK ||
-                id == PLAYER_BUFF_HIFIGHT ||
-                id == PLAYER_BUFF_HIMASTER_SOUL ||
-                id == PLAYER_BUFF_HIMOVE ||
-                (id >= PLAYER_BUFF_HIRA1 && id <= PLAYER_BUFF_HIRA20))
+		if(writedb || (id >= PLAYER_BUFF_HIFIGHT && id <= PLAYER_BUFF_HIESCAPE))
 			sendModification(0x40 + id, data, writedb);
 	}
 
@@ -3389,14 +3385,20 @@ namespace GObject
         sendLevelPack(GetLev()); // XXX: 
 	}
 
-    void Player::addAttr(const GData::AttrExtra& attr)
+    void Player::addHIAttr(const GData::AttrExtra& attr)
     {
+        _hiattr += attr;
 		for(int i = 0; i < 5; ++ i)
 		{
 			GObject::Fighter * fgt = getLineup(i).fighter;
 			if(fgt != NULL)
-				fgt->addAttr(attr);
-		}
+				fgt->setDirty();
+        }
+    }
+
+    void Player::clearHIAttr()
+    {
+        _hiattr.reset();
     }
 
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )

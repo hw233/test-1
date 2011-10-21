@@ -199,17 +199,35 @@ void HeroIsland::broadcastTV(UInt32 now)
     if (now >= _prepareTime)
     {
         _prepareStep = 1;
-        if (cfg.GMCheck)
+        if (World::_wday == 6 || World::_wday == 7)
         {
-            _startTime = _prepareTime + 15 * 60;
-            _endTime = _startTime + 60 * 60;
-            _prepareTime = TimeUtil::SharpDay(1) + 18 * 60 * 60 + 45 * 60;
+            if (cfg.GMCheck)
+            {
+                _startTime = _prepareTime + 15 * 60;
+                _endTime = _startTime + 60 * 60;
+                _prepareTime = TimeUtil::SharpDay(0) + 17 * 60 * 60 + 45 * 60;
+            }
+            else
+            {
+                _startTime = _prepareTime + 2 * 60;
+                _endTime = _startTime + 30 * 60;
+                _prepareTime = now + 60 * 60;
+            }
         }
         else
         {
-            _startTime = _prepareTime + 2 * 60;
-            _endTime = _startTime + 30 * 60;
-            _prepareTime = now + 20 * 60;
+            if (cfg.GMCheck)
+            {
+                _startTime = _prepareTime + 15 * 60;
+                _endTime = _startTime + 60 * 60;
+                _prepareTime = TimeUtil::SharpDay(1) + 18 * 60 * 60 + 45 * 60;
+            }
+            else
+            {
+                _startTime = _prepareTime + 2 * 60;
+                _endTime = _startTime + 30 * 60;
+                _prepareTime = now + 40 * 60;
+            }
         }
     }
 
@@ -277,17 +295,64 @@ void HeroIsland::end()
     _endTime = 0;
     _startTime = 0;
     _running = false;
+    ++_count;
     SYSMSG_BROADCASTV(2116);
+
+    UInt32 now = TimeUtil::Now();
+    if ((World::_wday == 6 || World::_wday == 7))
+    {
+        if (_count >= 2)
+        {
+            if (cfg.GMCheck)
+            {
+                _startTime = _prepareTime + 15 * 60;
+                _endTime = _startTime + 60 * 60;
+                _prepareTime = TimeUtil::SharpDay(1) + 11 * 60 * 60 + 45 * 60;
+            }
+            else
+            {
+                _startTime = _prepareTime + 2 * 60;
+                _endTime = _startTime + 30 * 60;
+                _prepareTime = now + 60*60;
+            }
+            _count = 0;
+        }
+        return;
+    }
+    _count = 0;
 }
 
 void HeroIsland::process(UInt32 now)
 {
     if (!_prepareTime)
     {
-        if (cfg.GMCheck)
-            _prepareTime = TimeUtil::SharpDay(0) + 18 * 60 * 60 + 45 * 60;
+        if(World::_wday == 6 || World::_wday == 7)
+        {
+            if (cfg.GMCheck)
+            {
+                if (now > TimeUtil::SharpDay(0) + 12 * 60 * 60 + 45 * 60)
+                    _prepareTime = TimeUtil::SharpDay(0) + 17 * 60 * 60 + 45 * 60;
+                else
+                    _prepareTime = TimeUtil::SharpDay(0) + 11 * 60 * 60 + 45 * 60;
+            }
+            else
+                _prepareTime = TimeUtil::Now() + 30;
+        }
         else
-            _prepareTime = TimeUtil::Now() + 30;
+        {
+            if (cfg.GMCheck)
+                _prepareTime = TimeUtil::SharpDay(0) + 11 * 60 * 60 + 45 * 60;
+            else
+                _prepareTime = TimeUtil::Now() + 30;
+        }
+
+        if (now > TimeUtil::SharpDay(0) + 18 * 60 * 60 + 45 * 60)
+        {
+            if (cfg.GMCheck)
+                _prepareTime = TimeUtil::SharpDay(1) + 11 * 60 * 60 + 45 * 60;
+            else
+                _prepareTime = TimeUtil::Now() + 30;
+        }
     }
 
     broadcastTV(now);
@@ -351,8 +416,7 @@ void HeroIsland::applayPlayers()
 void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skillid)
 {
     if (!pd || !pd->bufid) return;
-    GData::AttrExtra attr;
-    pd->player->addAttr(attr);
+    pd->player->clearHIAttr();
     if (type == 1 && pd->bufid)
     {
         pd->attrcd = static_cast<UInt32>(-1);
@@ -362,7 +426,7 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
         for (UInt8 i = 1; i < 5; ++i)
         {
             if (now < pd->skills[i].lastcd && pd->skills[i].attr)
-                pd->player->addAttr(*pd->skills[i].attr);
+                pd->player->addHIAttr(*pd->skills[i].attr);
         }
     }
     else if (type == 2 && skillid)
@@ -371,7 +435,7 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
         pd->skills[skillid].lastcd = static_cast<UInt32>(-1);
         pd->skills[skillid].attr = NULL;
         if (pd && pd->player && now < pd->attrcd && pd->attr)
-            pd->player->addAttr(*pd->attr);
+            pd->player->addHIAttr(*pd->attr);
     }
 }
 
@@ -800,6 +864,9 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
     if (!player || to > HERO_ISLAND_SPOTS)
         return false;
 
+    if (!player->hasFlag(Player::InHeroIsland))
+        return false;
+
     UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
@@ -884,9 +951,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             pd->attrcd = now + ra.last;
             pd->attr = &ra.attr;
             pd->bufid = ra.bufid;
-            player->addAttr(ra.attr);
+            player->addHIAttr(ra.attr);
             pd->player->setBuffData(ra.bufid, pd->attrcd, false);
-            pd->player->sendMsgCode(0, 2119);
+            SYSMSG_SEND(2119, pd->player);
         }
         else
         {
@@ -1172,6 +1239,12 @@ void HeroIsland::playerEnter(Player* player)
         return;
     }
 
+    if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
+    {
+        // TODO:
+        return;
+    }
+
     if (!player->getHIType())
         return;
 
@@ -1190,14 +1263,18 @@ void HeroIsland::playerEnter(Player* player)
 
 void HeroIsland::playerLeave(Player* player)
 {
+    if (!player) return;
+    if (!player->hasFlag(Player::InHeroIsland))
+        return;
     UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
-    if (leave(pd, spot, pos))
-        _players[0].push_back(pd);
+    pd = leave(pd, spot, pos);
+    if (pd) delete pd;
     player->delFlag(Player::InHeroIsland);
+    player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+10*60);
     player->setHISpot(0xFF);
 }
 
