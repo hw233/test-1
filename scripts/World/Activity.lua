@@ -106,7 +106,8 @@ end
 
 function initActTime(y, m, d)
   local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
-  local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  --local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
 

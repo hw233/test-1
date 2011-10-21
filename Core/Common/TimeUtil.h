@@ -16,6 +16,12 @@ public:
 		struct tm * local = localtime(&now2);
 		return static_cast<UInt8>(local->tm_wday);
 	}
+	static inline UInt32 SharpDayT(int c = 0, UInt32 cur = Now())
+    {
+        UInt32 tmp = cur % 86400;
+		UInt32 tmptm = (cur / 86400) * 86400;
+		return tmptm + c * 86400 + tmp;
+    }
 	static inline UInt32 SharpDay(int c = 0, UInt32 cur = Now())
 	{
 		UInt32 tmptm = (cur + timezone) / 86400 * 86400 + timezone;

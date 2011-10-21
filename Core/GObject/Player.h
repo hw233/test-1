@@ -1016,6 +1016,12 @@ namespace GObject
         inline void setHIType(UInt8 type) { hitype = type; }
         inline UInt8 getHIType() { return hitype; }
 
+    private:
+        std::vector<UInt32> _enchantEqus;
+    public:
+        bool enchanted8(UInt32);
+        void sendEnchanted8Box();
+
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);

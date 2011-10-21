@@ -121,6 +121,7 @@ public:
     void rankReward();
     void restart(UInt32 now);
     void broadcastTV(UInt32 now);
+    void calcNext(UInt32 now);
     void end();
 
     UInt8 getIdentity(Player* player, bool = false);
