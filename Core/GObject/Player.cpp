@@ -6498,7 +6498,36 @@ namespace GObject
 		return;
 	}
 
+    bool Player::enchanted8( UInt32 id )
+    {
+        if (!id) return false;
+        size_t sz = _enchantEqus.size();
+        for (size_t i = 0; i < sz; ++i)
+        {
+            if (id == _enchantEqus[i])
+                return true;
+        }
+        _enchantEqus.push_back(id);
+        return false;
+    }
 
+    void Player::sendEnchanted8Box()
+    {
+        SYSMSG(title, 2126);
+        SYSMSG(content, 2127);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{507,5}, {509,5}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
 
+            std::string strItems;
+            strItems += Itoa(mitem[0].id);
+            strItems += ",";
+            strItems += Itoa(mitem[0].count);
+            strItems += "|";
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
 }
 
