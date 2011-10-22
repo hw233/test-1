@@ -1979,7 +1979,7 @@ namespace GObject
 
     bool Player::attackRareAnimal(UInt32 id)
     {
-        return attackCopyNpc(id, 4/*XXX:使用这个背景*/, 5, 1, 1, false, NULL, false);
+        return attackCopyNpc(id, 1/*XXX:使用这个背景*/, 5, 1, 1, false, NULL, false);
     }
 
 	bool Player::attackCopyNpc( UInt32 npcId, UInt8 type, UInt8 copyId, UInt8 expfactor, UInt8 lootlvl, bool ato, std::vector<UInt16>* loot, bool applayhp )
@@ -2002,8 +2002,6 @@ namespace GObject
             bs = Battle::BS_FRONTMAP1;
         else if(type == 1)
             bs = copyId - 1 + Battle::BS_COPY1;
-        else if (type == 4)
-            bs = 0x27;
 
 		Battle::BattleSimulator bsim(bs, this, ng->getName(), ng->getLevel(), false);
 		PutFighters( bsim, 0 );

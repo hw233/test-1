@@ -18,9 +18,13 @@ public:
 	}
 	static inline UInt32 SharpDayT(int c = 0, UInt32 cur = Now())
     {
-        UInt32 tmp = cur % 86400;
-		UInt32 tmptm = (cur / 86400) * 86400;
-		return tmptm + c * 86400 + tmp;
+        time_t t = cur;
+        struct tm* t_tm = localtime(&t);
+        t_tm->tm_hour = 0;
+        t_tm->tm_min = 0;
+        t_tm->tm_sec = 0;
+        time_t t2 = mktime(t_tm);
+		return t2 + c * 24 * 60 * 60;
     }
 	static inline UInt32 SharpDay(int c = 0, UInt32 cur = Now())
 	{
