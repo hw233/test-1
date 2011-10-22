@@ -6306,15 +6306,23 @@ namespace GObject
     void Player::checkQQAward()
     {
 		UInt32 now = TimeUtil::Now();
+
+        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        if(flag)
+        {
+            qqvipl = _playerData.qqvipl%10 + 1;
+        }
+
 		if(now >= _playerData.qqawardEnd)
 		{
 			_playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
-            _playerData.qqawardgot &= 0xFC;
+            _playerData.qqawardgot &= 0xFCFC;
             DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
             RollYDGem();
         }
 
-        if( !(_playerData.qqawardgot & 0x80) && _playerData.qqvipl )
+        if( !(_playerData.qqawardgot & (0x80<<flag)) && _playerData.qqvipl )
         {
             if(GetFreePackageSize() < 1)
             {
@@ -6322,7 +6330,7 @@ namespace GObject
             }
             else
             {
-                _playerData.qqawardgot |= 0x80;
+                _playerData.qqawardgot |= (0x80<<flag);
                 GetPackage()->AddItem2(67, 1, true, true);
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
@@ -6338,12 +6346,24 @@ namespace GObject
     {
         checkQQAward();
 
+        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        if(flag)
+        {
+            qqvipl = _playerData.qqvipl%10 + 1;
+        }
+
         Stream st(REP::YD_INFO);
-        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>(_playerData.qqawardgot & 0x03);
+        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
         UInt8 maxCnt = GObjectManager::getYDMaxCount();
-        st << maxCnt;
+        if(flag)
+            st << static_cast<UInt8>(maxCnt - 1);
+        else
+            st << maxCnt;
         for(UInt8 i = 0; i < maxCnt; ++ i)
         {
+            if(flag && i == 0)
+                continue;
             std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
             UInt8 itemCnt = ydItem.size();
             st << itemCnt;
@@ -6374,14 +6394,21 @@ namespace GObject
         Stream st(REP::YD_AWARD_RCV);
         checkQQAward();
 
-        if(type == 1 && !(_playerData.qqawardgot & 0x1) && _playerData.qqvipl != 0)
+        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        if(flag)
         {
-            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(_playerData.qqvipl - 1);
+            qqvipl = _playerData.qqvipl%10 + 1;
+        }
+
+        if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && _playerData.qqvipl != 0)
+        {
+            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
             UInt8 itemCnt = ydItem.size();
             if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
             {
                  nRes = 1;
-                _playerData.qqawardgot |= 0x1;
+                _playerData.qqawardgot |= (0x1<<flag);
                 for(int j = 0; j < itemCnt; ++ j)
                 {
                     UInt32 itemId = ydItem[j].itemId;
@@ -6396,14 +6423,14 @@ namespace GObject
                 sendMsgCode(2, 1011);
             }
         }
-        else if(type == 2 && !(_playerData.qqawardgot & 0x2) && _playerData.qqvipyear != 0)
+        else if(type == 2 && !(_playerData.qqawardgot & (0x2<<flag)) && _playerData.qqvipyear != 0)
         {
             std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
             UInt8 itemCnt = ydItem.size();
             if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
             {
                 nRes = 2;
-                _playerData.qqawardgot |= 0x2;
+                _playerData.qqawardgot |= (0x2<<flag);
 
                 for(int j = 0; j < itemCnt; ++ j)
                     GetPackage()->AddItem2(ydItem[j].itemId, ydItem[j].itemNum, true, true);
