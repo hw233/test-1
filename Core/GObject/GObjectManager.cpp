@@ -49,7 +49,7 @@
 #include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
-#include "GObject/WorldBoss.h"
+#include "GObject/WBossMgr.h"
 
 #include <fcntl.h>
 
@@ -3018,7 +3018,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
-            worldBoss.add(t.loc, t.npcId, t.level, t.count);
+            //worldBoss.add(t.loc, t.npcId, t.level, t.count);
         }
 		lc.finalize();
         return true;

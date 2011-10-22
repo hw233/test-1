@@ -27,7 +27,7 @@
 #include "Script/BattleFormula.h"
 #include "SpecialAward.h"
 #include "PracticePlace.h"
-#include "WorldBoss.h"
+#include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
 
@@ -240,12 +240,7 @@ void World::World_Athletics_Check( void * )
 
 void World::World_Boss_Refresh(void*)
 {
-    worldBoss.refresh(TimeUtil::Now());
-}
-
-void World::World_Boss_Prepare(void*)
-{
-    worldBoss.prepare(TimeUtil::Now());
+    worldBoss.process(TimeUtil::Now());
 }
 
 bool World::Init()
@@ -271,7 +266,6 @@ bool World::Init()
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
 	AddTimer(600 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 600) / 600 * 600 - now) * 1000);
 	
-    AddTimer(5 * 60 * 1000, World_Boss_Prepare, static_cast<void*>(NULL));
     AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
 
     UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;

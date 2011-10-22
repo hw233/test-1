@@ -40,7 +40,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GData/Money.h"
-#include "GObject/WorldBoss.h"
+#include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
 
 #include "Common/Serialize.h"
@@ -2250,7 +2250,7 @@ void OnAttackNpcReq( GameMsgHdr& hdr, AttackNpcReq& anr )
 		return;
 	}
 
-    if (WorldBoss::isWorldBoss(anr._npcId))
+    if (WBossMgr::isWorldBoss(anr._npcId))
         worldBoss.attack(player, loc, anr._npcId);
     else
         player->attackNpc(anr._npcId, 0xFFFFFFFF, player->GetLev() <= 20);
