@@ -261,7 +261,7 @@ void HeroIsland::calcNext(UInt32 now)
     {
         _prepareTime = now;
         _startTime = _prepareTime + 30;
-        _endTime = _startTime + 20 * 60;
+        _endTime = _startTime + 10 * 60;
     }
 
     Stream st(REP::HERO_ISLAND);
@@ -303,6 +303,8 @@ void HeroIsland::end()
 {
     rankReward();
     calcNext(TimeUtil::Now());
+    reset();
+
     _running = false;
     _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
@@ -334,7 +336,16 @@ void HeroIsland::process(UInt32 now)
     broadcastTV(now);
 
     if (!_running && _startTime && now >= _startTime)
+    {
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(15);
+        st << now; 
+        st << _startTime;
+        st << _endTime;
+        st << Stream::eos;
+        broadcast(st);
         _running = true;
+    }
 
     if (_running && now >= _endTime)
         end();
