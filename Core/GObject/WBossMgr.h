@@ -9,15 +9,30 @@ namespace GObject
 
 class Player;
 
+struct AttackInfo
+{
+};
+
 class WBoss
 {
 public:
-    WBoss();
-    ~WBoss();
+    WBoss(UInt8 cnt, UInt8 max, UInt16 loc, UInt8 lvl)
+        : m_count(cnt), m_maxcnt(max), m_loc(loc), m_lvl(lvl), m_final(false) {}
+    ~WBoss() {}
+
+    inline void setFinal(bool f) { m_final = f; }
+    inline bool isFinal() const { return m_final; }
+
+    bool attack(Player* pl, UInt32 id);
+    void appear(UInt32 npcid, UInt32 oldid);
+    void disapper(UInt32 npcid);
 
 private:
     UInt8 m_count;
     UInt8 m_maxcnt;
+    UInt16 m_loc;
+    UInt8 m_lvl;
+    bool m_final;
 };
 
 class WBossMgr
@@ -26,9 +41,12 @@ public:
     static bool isWorldBoss(UInt32 npcid);
 
 public:
-    WBossMgr() : _prepareTime(0), _prepareStep(0), _appearTime(0), _disapperTime(0), m_level(0), m_maxlvl(0) {}
+    WBossMgr()
+        : _prepareTime(0), _prepareStep(0), _appearTime(0),
+        _disapperTime(0), m_level(0), m_maxlvl(0), m_boss(NULL) {}
     ~WBossMgr() {}
 
+    void initWBoss();
     void process(UInt32 now);
     void appear(UInt8 level, UInt32 now);
     void disapper(UInt8 level, UInt32 now);
@@ -49,9 +67,10 @@ private:
     UInt8 _prepareStep;
     UInt32 _appearTime;
     UInt32 _disapperTime;
+
     UInt8 m_level;
     UInt8 m_maxlvl;
-    std::vector<WBoss> m_bosses;
+    WBoss* m_boss;
 };
 
 extern WBossMgr worldBoss;

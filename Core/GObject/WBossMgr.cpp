@@ -18,6 +18,65 @@ static UInt32 worldboss[] = {
     5103, 5470, 5471, 5472, 5472,
 };
 
+bool WBoss::attack(Player* pl, UInt32 id)
+{
+    bool in = false;
+    for (int i = 0; i < 5; ++i)
+    {
+        if (worldboss[i+(m_lvl-1)*5] == id)
+        {
+            in = true;
+            break;
+        }
+    }
+    if (!in) return false;
+
+    bool res = pl->attackCopyNpc(id, 2, 0, World::_wday==4?2:1);
+    if (res)
+        ++m_count;
+    if (m_count >= m_maxcnt)
+        m_final = true;
+    return res;
+}
+
+void WBoss::appear(UInt32 npcid, UInt32 oldid)
+{
+    if (!npcid) return;
+
+    Fighter* fgt = globalFighters[npcid];
+    if (!fgt) return;
+
+    GData::NpcGroup* ng = GData::npcGroups[npcid];
+    if (!ng) return;
+
+    Map * map = Map::FromSpot(m_loc);
+    if (!map) return;
+
+    if (oldid)
+    {
+        map->Hide(oldid);
+        map->DelObject(oldid);
+    }
+
+    MOData mo;
+    mo.m_ID = npcid;
+    mo.m_Hide = false;
+    mo.m_Spot = m_loc;
+    mo.m_Type = 6;
+    mo.m_ActionType = 0;
+    map->AddObject(mo);
+    map->Show(npcid, true, mo.m_Type);
+}
+
+void WBoss::disapper(UInt32 npcid)
+{
+    if (!npcid) return;
+    Map * map = Map::FromSpot(m_loc);
+    if (!map) return;
+    map->Hide(npcid);
+    map->DelObject(npcid);
+}
+
 bool WBossMgr::isWorldBoss(UInt32 npcid)
 {
     for (UInt8 i = 0; i < sizeof(worldboss)/sizeof(UInt32); ++i)
@@ -159,6 +218,7 @@ void WBossMgr::appear(UInt8 level, UInt32 now)
     if (!spot)
         return;
 
+#if 0
     Fighter* fgt = globalFighters[npcid];
     if (!fgt)
         return;
@@ -186,27 +246,7 @@ void WBossMgr::appear(UInt8 level, UInt32 now)
     mo.m_ActionType = 0;
     map->AddObject(mo);
 
-    if (show)
-    {
-        map->Show(npcId, true, mo.m_Type);
-        Fighter* fgt = globalFighters[npcId];
-        if (!fgt)
-            return;
-
-        if (msg)
-        {
-            if (cfg.GMCheck)
-            {
-                SYSMSG_BROADCASTV(554, fgt->getId(), loc, fgt->getId());
-            }
-            else
-            {
-                SYSMSG_BROADCASTV(548, fgt->getId());
-                SYSMSG_BROADCASTV(549, loc);
-            }
-        }
-        DB5().PushUpdateData("REPLACE INTO `worldboss` (`npcId`, `level`, `location`, `count`) VALUES (%u,%u,%u,%u)", npcId, level, loc, count);
-    }
+    map->Show(npcId, true, mo.m_Type);
 
     WBoss wb;
     wb.npcId = npcId;
@@ -214,6 +254,7 @@ void WBossMgr::appear(UInt8 level, UInt32 now)
     wb.count = count;
     m_boss[loc] = wb;
     m_level = level;
+#endif
 }
 
 void WBossMgr::disapper(UInt8 level, UInt32 now)
