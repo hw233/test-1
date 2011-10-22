@@ -190,7 +190,7 @@ bool HeroIsland::isRareAnimal(UInt32 npcid)
 void HeroIsland::restart(UInt32 now)
 {
     _running = false;
-    _prepareTime = now;
+    _prepareTime = now + 60;
     _prepareStep = 0;
     broadcastTV(now);
 }
