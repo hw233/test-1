@@ -197,8 +197,7 @@ bool Fighter::addExp( UInt64 e )
 			_owner->checkLevUp(oldLevel, _level);
 		}
         worldBoss.setLevel(_level);
-        if (_level >= 40)
-            _owner->send40LevelPack();
+        _owner->sendLevelPack(_level);
         _expFlush = true;
 	}
 	else
@@ -264,8 +263,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 		_exp = e;
 		sendModification(3, _exp);
 	}
-    if (_level >= 40)
-        _owner->send40LevelPack();
+    _owner->sendLevelPack(_level);
 }
 
 void Fighter::updateToDB( UInt8 t, UInt64 v )
@@ -960,12 +958,6 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 	}
 }
 
-void Fighter::addAttr( const GData::AttrExtra& attr )
-{
-	addAttrExtra(_attrExtraEquip, &attr);
-    setDirty();
-}
-
 void Fighter::addAttr( const GData::CittaEffect* ce )
 {
 	addAttrExtra(_attrExtraEquip, ce);
@@ -1083,6 +1075,13 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.defend += clan->getSkillDefendEffect(_owner);
         _attrExtraEquip.magatk += clan->getSkillMagAtkEffect(_owner);
         _attrExtraEquip.magdef += clan->getSkillMagDefentEffect(_owner);
+    }
+
+    if (_owner)
+    {
+        const GData::AttrExtra* ae = _owner->getHIAttr();
+        if (ae)
+            addAttrExtra(_attrExtraEquip, ae);
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);

@@ -100,6 +100,7 @@ enum ItemFrom
     FromTripod,
     FromFCMerge,
     FromPExp,
+    FromHeroIsland,
 };
 
 enum ItemTo

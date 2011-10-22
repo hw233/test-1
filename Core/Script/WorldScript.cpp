@@ -45,6 +45,7 @@ void WorldScript::init()
 	def("getActivityStage", GObject::World::getActivityStage);
 	def("setIsNewServer", GObject::World::setIsNewServer);
 	def("setNationalDay", GObject::World::setNationalDay);
+	def("setHalloween", GObject::World::setHalloween);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

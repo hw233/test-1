@@ -46,6 +46,15 @@ UInt8 ClanAuthority[5][7] =
 #define CLAN_SKILL_MAGDEF   4
 #define CLAN_SKILL_HP       5
 
+#define CLAN_SKILL_HIHC     6
+#define CLAN_SKILL_HIML     7
+#define CLAN_SKILL_HIBJ     8
+#define CLAN_SKILL_HILS     9
+#define CLAN_SKILL_HIZT     10
+#define CLAN_SKILL_HIYH     11
+#define CLAN_SKILL_HIHH     12
+#define CLAN_SKILL_HIKW     13
+
 static bool find_pending_member(ClanPendingMember * member, Player * p)
 {
 	return member->player == p;

@@ -46,6 +46,8 @@ public:
 
 	inline static void setNationalDay(bool aa)
 	{ _nationalDay = aa; }
+    inline static void setHalloween(bool v)
+    { _halloween = v; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -66,6 +68,7 @@ public:
 	static UInt8 _wday;
 	static bool _isNewServer;
     static bool _nationalDay;
+    static bool _halloween;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

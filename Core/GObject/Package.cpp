@@ -1121,7 +1121,7 @@ namespace GObject
             {1054,  1058,   "1,1,1,1,1",            1053},
             {1061,  1064,   "1,1,1,1",              1060},
             {1067,  1073,   "1,1,1,1,1,1,1",        1066},
-            {1076,  1083,   "1,1,1,1,1,1,1",        1075},
+            {1076,  1083,   "1,1,1,1,1,1,1,1",      1075},
             {1086,  1095,   "1,1,1,1,1,1,1,1,1,1",  1085},
             {1098,  1106,   "1,1,1,1,1,1,1,1,1",    1097},
             {1109,  1115,   "1,1,1,1,1,1,1",        1108},
@@ -1449,7 +1449,14 @@ namespace GObject
 			case 10:
 			case 11:
 			case 12:
-				SYSMSG_BROADCASTV(275, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId(), ied.enchant);
+                {
+                    if (World::_halloween && ied.enchant == 8 && equip->GetItemType().subClass != Item_Trump)
+                    {
+                        if (!m_Owner->enchanted8(equip->getId()))
+                            m_Owner->sendEnchanted8Box();
+                    }
+                    SYSMSG_BROADCASTV(275, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId(), ied.enchant);
+                }
 				break;
 			}
 			return 0;

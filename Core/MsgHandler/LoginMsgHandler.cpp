@@ -31,6 +31,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::LOADLUA,LoadLuaFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SETVIPL,SetVIPLFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::CLSTASK,ClearTaskFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SALE_ONOFF,reqSaleOnOffFromBs);
+MSG_REG_2(LoginMsgHdr,SPEQ::PLAYERINFO,PlayerInfoFromBs);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 

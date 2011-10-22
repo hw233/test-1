@@ -142,6 +142,7 @@ GMHandler::GMHandler()
     Reg(3, "hiid", &GMHandler::OnGetIDHI);
     Reg(3, "hitask", &GMHandler::OnTaskHI);
     Reg(3, "hici", &GMHandler::OnCiTaskHI);
+    Reg(3, "hirestart", &GMHandler::OnRestartHI);
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
 }
 

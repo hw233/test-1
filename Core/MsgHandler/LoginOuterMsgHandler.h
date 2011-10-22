@@ -20,6 +20,7 @@
 #include "GObject/Player.h"
 #include "GObject/Fighter.h"
 #include "GObject/Package.h"
+#include "GObject/Clan.h"
 #include "Battle/BattleReport.h"
 #include "MsgHandler/GMHandler.h"
 #include "Common/BinaryReader.h"
@@ -1318,7 +1319,7 @@ void reqSaleOnOffFromBs(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
-	st.init(SPEP::SALE_ONOFF);
+	st.init(SPEP::SALE_ONOFF,0x1);
     UInt8 flag;
     br >> flag;
 
@@ -1332,6 +1333,70 @@ void reqSaleOnOffFromBs(LoginMsgHdr &hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::PLAYERINFO,0x1);
+    UInt8 type;
+    br >> type;
+
+    GObject::Player* player = NULL;
+    if (type == 1)
+    {
+        UInt64 pid;
+        br >> pid;
+        player = GObject::globalPlayers[pid];
+    }
+    else if (type == 2)
+    {
+        std::string playerName;
+        br >> playerName;
+        player = GObject::globalNamedPlayers[playerName];
+    }
+    else
+        return;
+
+    if (player)
+    {
+        st << player->getId();
+        st << player->getName();
+        st << player->GetLev();
+        st << player->getCountry();
+        st << player->GetClass();
+        st << static_cast<UInt8>(player->IsMale()?0:1);
+        st << player->getTael();
+        st << player->getGold();
+        st << player->getCoupon();
+        if (player->getClan())
+        {
+            st << player->getClan()->getId();
+            st << player->getClan()->getName();
+        }
+        else
+        {
+            st << static_cast<UInt32>(0);
+            st << "";
+        }
+
+        if(player->getLockExpireTime() > 0)
+        {
+            if(player->getLockExpireTime() <= TimeUtil::Now())
+                st << static_cast<UInt8>(0);
+            else
+                st << static_cast<UInt8>(1);
+        }
+        else
+            st << static_cast<UInt8>(0);
+        if(player->getBuffData(PLAYER_BUFF_BANCHAT)!=0)
+            st << static_cast<UInt8>(1);
+        else
+            st << static_cast<UInt8>(0);
+    }
+
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
 
 #endif // _LOGINOUTERMSGHANDLER_H_
 
