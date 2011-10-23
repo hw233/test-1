@@ -266,7 +266,10 @@ bool World::Init()
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
 	AddTimer(600 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 600) / 600 * 600 - now) * 1000);
 	
-    AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+    if (cfg.GMCheck)
+        AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+    else
+        AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
 
     UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);

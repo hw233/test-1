@@ -16,18 +16,22 @@ struct AttackInfo
 class WBoss
 {
 public:
-    WBoss(UInt8 cnt, UInt8 max, UInt16 loc, UInt8 lvl)
-        : m_count(cnt), m_maxcnt(max), m_loc(loc), m_lvl(lvl), m_final(false) {}
+    WBoss(UInt32 id, UInt8 cnt, UInt8 max, UInt16 loc, UInt8 lvl)
+        : m_id(id), m_count(cnt), m_maxcnt(max), m_loc(loc), m_lvl(lvl), m_final(false) {}
     ~WBoss() {}
 
     inline void setFinal(bool f) { m_final = f; }
     inline bool isFinal() const { return m_final; }
 
-    bool attack(Player* pl, UInt32 id);
-    void appear(UInt32 npcid, UInt32 oldid);
-    void disapper(UInt32 npcid);
+    inline void setId(UInt32 id) { m_id = id; }
+    inline UInt32 getId() const { return m_id; }
+    bool attack(Player* pl, UInt16 loc, UInt32 id);
+    void appear(UInt32 npcid, UInt32 oldid = 0);
+    void disapper();
+    bool attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final = false);
 
 private:
+    UInt32 m_id;
     UInt8 m_count;
     UInt8 m_maxcnt;
     UInt16 m_loc;
@@ -44,23 +48,25 @@ public:
     WBossMgr()
         : _prepareTime(0), _prepareStep(0), _appearTime(0),
         _disapperTime(0), m_level(0), m_maxlvl(0), m_boss(NULL) {}
-    ~WBossMgr() {}
+    ~WBossMgr()
+    {
+        if (m_boss)
+        {
+            delete m_boss;
+            m_boss = NULL;
+        }
+    }
 
     void initWBoss();
     void process(UInt32 now);
     void appear(UInt8 level, UInt32 now);
-    void disapper(UInt8 level, UInt32 now);
+    void disapper();
     void attack(Player* pl, UInt16 loc, UInt32 npcid);
-    bool attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final = false);
     void broadcastTV(UInt32 now);
     void calcNext(UInt32 now);
 
-    inline void setLevel(UInt8 lvl)
-    {   
-        if (lvl > m_maxlvl)
-            m_maxlvl = lvl;
-    }
-    void setBossLevel(UInt8 lvl);
+    inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
+    inline void setBossLevel(UInt8 lvl) { m_level = lvl; }
 
 private:
     UInt32 _prepareTime;
