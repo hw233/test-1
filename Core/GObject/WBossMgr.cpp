@@ -40,13 +40,26 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     if(it == GData::npcGroups.end())
         return false;
 
-    GData::NpcGroup * ng = it->second;
+    GData::NpcGroup* ng = it->second;
+    if (!ng) return false;
+
     std::vector<GData::NpcFData>& nflist = ng->getList();
     size_t sz = nflist.size();
+    _hp.resize(sz);
 
     Battle::BattleSimulator bsim(0, pl, ng->getName(), ng->getLevel(), false);
     pl->PutFighters( bsim, 0 ); 
     ng->putFighters( bsim );
+
+    for(size_t i = 0; i < sz; ++ i)
+    {
+        if(_hp[i] == 0xFFFFFFFF)
+            continue;
+        GData::NpcFData& nfdata = nflist[i];
+        Battle::BattleFighter * bf = bsim.newFighter(1, nfdata.pos, nfdata.fighter);
+        bf->setHP(_hp[i]);
+    }
+
     bsim.start();
     Stream& packet = bsim.getPacket();
     if(packet.size() <= 8)
@@ -81,12 +94,56 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     st.append(&packet[8], packet.size() - 8);
     st << Stream::eos;
     pl->send(st);
+    bsim.applyFighterHP(0, pl);
+
+    UInt32 oldHP = _hp[0];
+    for(size_t i = 0; i < sz; ++ i)
+    {
+        GData::NpcFData& nfdata = nflist[i];
+        Battle::BattleObject * obj = bsim(1, nfdata.pos);
+        if(obj == NULL || !obj->isChar())
+            continue;
+        Battle::BattleFighter * bfgt = static_cast<Battle::BattleFighter *>(obj);
+        UInt32 nHP = bfgt->getHP();
+        if(nHP == 0)
+            nHP = 0xFFFFFFFF;
+        if(_hp[i] != 0xFFFFFFFF && _hp[i] != nHP)
+        {
+            if(i == 0 && nHP != 0xFFFFFFFF)
+            {
+                UInt32 nPercent = (nHP - 1) * 10 / bfgt->getMaxHP();
+                if(nPercent < 9 && nPercent != _hppercent)
+                    _hppercent = nPercent;
+            }
+            _hp[i] = nHP;
+        }
+    }
 
     if (final)
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
     else
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
-    return true;
+
+    if(oldHP == 0xFFFFFFFF)
+        return res;
+
+    if(oldHP == 0)
+        oldHP = nflist[0].fighter->getMaxHP();
+    UInt32 newHP = (_hp[0] == 0xFFFFFFFF) ? 0 : _hp[0];
+    if(oldHP > newHP)
+    {
+        UInt32 damage = oldHP - newHP;
+        UInt32 exp = damage;
+        pl->pendExp(exp, !res);
+    }
+    else
+        pl->pendExp(0, !res);
+    UInt32 newPercent = newHP * 10 / nflist[0].fighter->getMaxHP();
+
+    //if(newPercent <= 4 && oldHP * 10 / nflist[0].fighter->getMaxHP() > 4 && newHP != 0)
+    //    BroadCastTV(nflist[0].fighter->getMaxHP());
+
+    return res;
 }
 
 bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
@@ -164,6 +221,9 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         m_id = npcid;
     }
 
+    fprintf(stderr, "appear: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
+
+    m_disappered = false;
     if (m_count == 10)
         { SYSMSG_BROADCASTV(553, npcid); }
     if (!m_count)
@@ -176,6 +236,8 @@ void WBoss::disapper()
     if (!map) return;
     map->Hide(m_id);
     map->DelObject(m_id);
+    m_disappered = true;
+    fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
 }
 
 bool WBossMgr::isWorldBoss(UInt32 npcid)
@@ -196,6 +258,22 @@ bool WBossMgr::isWorldBoss(UInt32 npcid)
     return false;
 }
 
+void WBossMgr::nextDay(UInt32 now)
+{
+    m_level = 0;
+    _prepareTime = TimeUtil::SharpDayT(1,now) + 12 * 60 * 60 + 45 * 60;
+    _appearTime = _prepareTime + 15 * 60;;
+    _disapperTime = _appearTime + 60 * 60 - 10;
+    if (m_boss)
+    {
+        m_boss->disapper();
+        delete m_boss;
+        m_boss = NULL;
+    }
+    fprintf(stderr, "out of time. next day\n");
+    return;
+}
+
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
@@ -210,14 +288,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 20*60*60+60 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+50 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+40 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+30 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+20 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+10 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+5 * 60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+10,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+14*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+12*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+8*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+6*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+4*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+2*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -226,28 +304,41 @@ void WBossMgr::calcNext(UInt32 now)
     {
         if (now >= appears[i] && i == 0)
         {
-            m_level = 0;
-            _prepareTime = TimeUtil::SharpDayT(1,now) + 12 * 60 * 60 + 45 * 60;
-            _appearTime = _prepareTime + 15 * 60;;
-            _disapperTime = _appearTime + 60 * 60;
-            m_boss->disapper();
+            nextDay(now);
             return;
         }
 
-        if (i <= WBOSS_NUM && now >= appears[i] && m_maxlvl >= (30+i*10))
+        if (i <= WBOSS_NUM && now >= appears[i] && m_maxlvl >= (40+(WBOSS_NUM-i)*10))
         {
-            _prepareTime = appears[i];
+            if (m_boss && m_boss->isDisappered())
+            {
+                if (i == 1)
+                {
+                    nextDay(now);
+                    return;
+                }
+                else
+                {
+                    _prepareTime = appears[i-1];
+                    m_level = WBOSS_NUM - i + 2;
+                }
+            }
+            else
+            {
+                _prepareTime = appears[i];
+                m_level = WBOSS_NUM - i + 1;
+            }
+
             if (cfg.GMCheck)
             {
                 _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60;
+                _disapperTime = _appearTime + 60 * 60 - 10;
             }
             else
             {
                 _appearTime = _prepareTime + 20;
-                _disapperTime = _appearTime + 5 * 60;
+                _disapperTime = _appearTime + 60 - 10;
             }
-            m_level = WBOSS_NUM - i + 1;
             break;
         }
 
@@ -257,16 +348,19 @@ void WBossMgr::calcNext(UInt32 now)
             if (cfg.GMCheck)
             {
                 _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60;
+                _disapperTime = _appearTime + 60 * 60 - 10;
             }
             else
             {
                 _appearTime = _prepareTime + 30;
-                _disapperTime = _appearTime + 5 * 60;
+                _disapperTime = _appearTime + 60 - 10;
             }
             m_level = 1;
         }
     }
+
+    if (!cfg.GMCheck)
+        fprintf(stderr, "lvl: %u\n", m_level);
 }
 
 void WBossMgr::process(UInt32 now)
@@ -274,6 +368,8 @@ void WBossMgr::process(UInt32 now)
     if (!_prepareTime)
         calcNext(now);
     broadcastTV(now);
+    if (now >= _disapperTime && m_boss && !m_boss->isDisappered())
+        disapper(now);
 }
 
 void WBossMgr::broadcastTV(UInt32 now)
@@ -285,12 +381,14 @@ void WBossMgr::broadcastTV(UInt32 now)
     {    
         case 1:
             SYSMSG_BROADCASTV(547, 15); 
+            fprintf(stderr, "15 mins\n");
             _prepareStep = 2; 
             break;
 
         case 2:
             if (now < _appearTime - 10 * 60)
                 return;
+            fprintf(stderr, "10 mins\n");
             SYSMSG_BROADCASTV(547, 10); 
             _prepareStep = 3; 
             break;
@@ -298,6 +396,7 @@ void WBossMgr::broadcastTV(UInt32 now)
         case 3:
             if (now < _appearTime - 5 * 60)
                 return;
+            fprintf(stderr, "5 mins\n");
             SYSMSG_BROADCASTV(547, 5);
             _prepareStep = 4; 
             break;
@@ -322,7 +421,10 @@ void WBossMgr::appear(UInt8 level, UInt32 now)
     UInt32 npcid = 0;
     UInt8 idx = (level-1)*5;
     if (idx >= sizeof(worldboss)/sizeof(UInt32))
+    {
+        nextDay(now);
         return;
+    }
     npcid = worldboss[idx];
 
     std::vector<UInt16> spots;
@@ -338,8 +440,14 @@ void WBossMgr::appear(UInt8 level, UInt32 now)
         m_boss->appear(npcid, 0);
     }
     else
+    {
+        if (level != m_boss->getLevel())
+        {
+            m_boss->setLevel(level);
+            m_boss->setLoc(spot);
+        }
         m_boss->appear(npcid, m_boss->getId());
-    calcNext(now);
+    }
 }
 
 void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
@@ -351,23 +459,16 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
     bool res = m_boss->attack(pl, loc, npcid);
     if (res && m_boss->isFinal())
     {
-        disapper();
-    }
-    else
-    {
+        disapper(TimeUtil::Now());
     }
 }
 
-void WBossMgr::disapper()
+void WBossMgr::disapper(UInt32 now)
 {
-    if (m_boss)
-    {
+    if (m_boss && !m_boss->isDisappered())
         m_boss->disapper();
-        delete m_boss;
-        m_boss = NULL;
-    }
-    calcNext(TimeUtil::Now());
     _prepareStep = 0;
+    calcNext(now);
 }
 
 WBossMgr worldBoss;
