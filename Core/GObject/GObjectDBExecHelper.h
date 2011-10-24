@@ -755,7 +755,7 @@ SPECIALDEF(52)
 	UInt32, pdata.achievement,
 	UInt8, pdata.qqvipl,
 	UInt8, pdata.qqvipyear,
-    UInt8, pdata.qqawardgot,
+    UInt32, pdata.qqawardgot,
     UInt32, pdata.qqawardEnd,
     UInt32, pdata.ydGemId,
 	UInt16, pdata.location,
