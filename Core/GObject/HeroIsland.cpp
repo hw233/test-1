@@ -1256,9 +1256,6 @@ void HeroIsland::playerEnter(Player* player)
     if (!player->getHIType())
         return;
 
-    if (player->hasFlag(Player::InHeroIsland))
-        return;
-
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(1);
     if (enter(player, player->getHIType(), player->getHISpot(), false))
@@ -1524,6 +1521,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 
         if (awards[id].id && awards[id].num)
         {
+            pd->awardgot = 0xFF;
             if (awards[id].id > 5)
             {
                 return player->GetPackage()->Add(
@@ -1551,7 +1549,6 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                 default:
                     break;
             }
-            pd->awardgot = 0xFF;
         }
         else
             return false;

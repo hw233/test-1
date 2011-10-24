@@ -175,6 +175,7 @@ namespace Script
 		CLASS_DEF(Player, GetAttainMgr);
 		CLASS_DEF(Player, addNewFormation);
 		CLASS_DEF(Player, openLevelBox);
+		CLASS_DEF(Player, sendMailPack);
 		
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
