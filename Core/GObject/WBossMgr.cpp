@@ -20,9 +20,9 @@ static UInt8 getAttackMax()
 }
 
 static UInt32 worldboss[] = {
-    5466, 5467, 5468, 5469, 5469,
-    5162, 5473, 5474, 5475, 5475,
-    5103, 5470, 5471, 5472, 5472,
+    5466, 5467, 5468, 5469, 5509,
+    5162, 5473, 5474, 5475, 5510,
+    5103, 5470, 5471, 5472, 5511,
 };
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
@@ -43,21 +43,24 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     GData::NpcGroup* ng = it->second;
     if (!ng) return false;
 
-    std::vector<GData::NpcFData>& nflist = ng->getList();
-    size_t sz = nflist.size();
-    _hp.resize(sz);
-
     Battle::BattleSimulator bsim(0, pl, ng->getName(), ng->getLevel(), false);
     pl->PutFighters( bsim, 0 ); 
     ng->putFighters( bsim );
 
-    for(size_t i = 0; i < sz; ++ i)
+    std::vector<GData::NpcFData>& nflist = ng->getList();
+    size_t sz = nflist.size();
+
+    if (final)
     {
-        if(_hp[i] == 0xFFFFFFFF)
-            continue;
-        GData::NpcFData& nfdata = nflist[i];
-        Battle::BattleFighter * bf = bsim.newFighter(1, nfdata.pos, nfdata.fighter);
-        bf->setHP(_hp[i]);
+        _hp.resize(sz);
+        for(size_t i = 0; i < sz; ++ i)
+        {
+            if(_hp[i] == 0xFFFFFFFF)
+                continue;
+            GData::NpcFData& nfdata = nflist[i];
+            Battle::BattleFighter * bf = bsim.newFighter(1, nfdata.pos, nfdata.fighter);
+            bf->setHP(_hp[i]);
+        }
     }
 
     bsim.start();
@@ -96,52 +99,54 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     pl->send(st);
     bsim.applyFighterHP(0, pl);
 
-    UInt32 oldHP = _hp[0];
-    for(size_t i = 0; i < sz; ++ i)
-    {
-        GData::NpcFData& nfdata = nflist[i];
-        Battle::BattleObject * obj = bsim(1, nfdata.pos);
-        if(obj == NULL || !obj->isChar())
-            continue;
-        Battle::BattleFighter * bfgt = static_cast<Battle::BattleFighter *>(obj);
-        UInt32 nHP = bfgt->getHP();
-        if(nHP == 0)
-            nHP = 0xFFFFFFFF;
-        if(_hp[i] != 0xFFFFFFFF && _hp[i] != nHP)
-        {
-            if(i == 0 && nHP != 0xFFFFFFFF)
-            {
-                UInt32 nPercent = (nHP - 1) * 10 / bfgt->getMaxHP();
-                if(nPercent < 9 && nPercent != _hppercent)
-                    _hppercent = nPercent;
-            }
-            _hp[i] = nHP;
-        }
-    }
-
     if (final)
+    {
+        UInt32 oldHP = _hp[0];
+        for(size_t i = 0; i < sz; ++ i)
+        {
+            GData::NpcFData& nfdata = nflist[i];
+            Battle::BattleObject * obj = bsim(1, nfdata.pos);
+            if(obj == NULL || !obj->isChar())
+                continue;
+            Battle::BattleFighter * bfgt = static_cast<Battle::BattleFighter *>(obj);
+            UInt32 nHP = bfgt->getHP();
+            if(nHP == 0)
+                nHP = 0xFFFFFFFF;
+            if(_hp[i] != 0xFFFFFFFF && _hp[i] != nHP)
+            {
+                if(i == 0 && nHP != 0xFFFFFFFF)
+                {
+                    UInt32 nPercent = (nHP - 1) * 10 / bfgt->getMaxHP();
+                    if(nPercent < 9 && nPercent != _hppercent)
+                        _hppercent = nPercent;
+                }
+                _hp[i] = nHP;
+            }
+        }
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
+
+        if(oldHP == 0xFFFFFFFF)
+            return res;
+
+        if(oldHP == 0)
+            oldHP = nflist[0].fighter->getMaxHP();
+        UInt32 newHP = (_hp[0] == 0xFFFFFFFF) ? 0 : _hp[0];
+        if(oldHP > newHP)
+        {
+            UInt32 damage = oldHP - newHP;
+            UInt32 exp = damage;
+            pl->pendExp(exp, !res);
+        }
+        else
+            pl->pendExp(0, !res);
+        UInt32 newPercent = newHP * 10 / nflist[0].fighter->getMaxHP();
+
+        //if(newPercent <= 4 && oldHP * 10 / nflist[0].fighter->getMaxHP() > 4 && newHP != 0)
+        //    BroadCastTV(nflist[0].fighter->getMaxHP());
+
+    }
     else
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
-
-    if(oldHP == 0xFFFFFFFF)
-        return res;
-
-    if(oldHP == 0)
-        oldHP = nflist[0].fighter->getMaxHP();
-    UInt32 newHP = (_hp[0] == 0xFFFFFFFF) ? 0 : _hp[0];
-    if(oldHP > newHP)
-    {
-        UInt32 damage = oldHP - newHP;
-        UInt32 exp = damage;
-        pl->pendExp(exp, !res);
-    }
-    else
-        pl->pendExp(0, !res);
-    UInt32 newPercent = newHP * 10 / nflist[0].fighter->getMaxHP();
-
-    //if(newPercent <= 4 && oldHP * 10 / nflist[0].fighter->getMaxHP() > 4 && newHP != 0)
-    //    BroadCastTV(nflist[0].fighter->getMaxHP());
 
     return res;
 }
@@ -171,11 +176,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
     bool res = attackWorldBoss(pl, m_id, World::_wday==4?2:1, m_final);
     if (res && !m_final)
     {
-        if (m_count >= m_maxcnt)
-            m_final = true;
-
         ++m_count;
-
         if (m_count <= m_maxcnt)
         {
             SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, m_id);
@@ -225,7 +226,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     m_disappered = false;
     if (m_count == 10)
-        { SYSMSG_BROADCASTV(553, npcid); }
+        { SYSMSG_BROADCASTV(553, npcid); m_final = true; }
     if (!m_count)
         { SYSMSG_BROADCASTV(554, fgt->getId(), m_loc, fgt->getId()); }
 }
@@ -237,6 +238,10 @@ void WBoss::disapper()
     map->Hide(m_id);
     map->DelObject(m_id);
     m_disappered = true;
+    m_final = false;
+    _hppercent = 0;
+    _hp.clear();
+    m_atkinfo.clear();
     fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
 }
 
@@ -288,14 +293,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+14*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+12*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+8*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+6*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+4*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+2*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60+10,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+80*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -337,7 +342,7 @@ void WBossMgr::calcNext(UInt32 now)
             else
             {
                 _appearTime = _prepareTime + 20;
-                _disapperTime = _appearTime + 60 - 10;
+                _disapperTime = _appearTime + 10 * 60 - 10;
             }
             break;
         }
@@ -353,7 +358,7 @@ void WBossMgr::calcNext(UInt32 now)
             else
             {
                 _appearTime = _prepareTime + 30;
-                _disapperTime = _appearTime + 60 - 10;
+                _disapperTime = _appearTime + 10 * 60 - 10;
             }
             m_level = 1;
         }
