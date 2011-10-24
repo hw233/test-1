@@ -488,7 +488,7 @@ void Athletics::attackMartial(Player* defer)
     if(res)
     {
         UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
-        if(wins >= 5)
+        if(wins >= 3)
         {
             _owner->getCoupon(20);
             wins = 0;
@@ -558,6 +558,7 @@ void Athletics::listAthleticsMartial()
 	Stream st(REP::ARENA_IFNO);
     st << static_cast<UInt16>(0x10);
 
+    UInt8 needRefresh = true;
     UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
 	st << wins << static_cast<UInt8>(3);
 	for (UInt8 i = 0; i < 3; ++i)
@@ -565,6 +566,9 @@ void Athletics::listAthleticsMartial()
         if(_martial[i] != 0)
         {
             Player* pl = _martial[i];
+            if( pl != NULL && _martial_battle[i] != NULL)
+                needRefresh = false;
+
             if(pl == NULL)
                 st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0);
             else
@@ -579,6 +583,12 @@ void Athletics::listAthleticsMartial()
     st << Stream::eos;
 
     _owner->send(st);
+
+    if(needRefresh)
+    {
+        GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, _owner, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
+    }
 }
 
 }

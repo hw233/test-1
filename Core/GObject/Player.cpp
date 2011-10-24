@@ -3329,7 +3329,7 @@ namespace GObject
             SYSMSG_SENDV(1090, this, a);
         }
 
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", _playerData.prestige, getId());
+        DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;
@@ -3356,7 +3356,7 @@ namespace GObject
 		SYSMSG_SENDV(186, this, a);
 		SYSMSG_SENDV(1091, this, a);
 
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u WHERE `ranker` = %"I64_FMT"u", _playerData.prestige, getId());
+        DB6().PushUpdateData("UPDATE `player` SET `prestige` = %u WHERE `id` = %"I64_FMT"u", _playerData.prestige, getId());
 
         Stream st(REP::USER_INFO_CHANGE);
         st << static_cast<UInt8>(0x55) << _playerData.prestige << Stream::eos;

@@ -47,7 +47,8 @@ struct AthleticsRankData
 	//UInt8   boxcolor;
 	//UInt8	awardType;
 	//UInt32	awardCount;
-    //UInt32  prestige;
+    UInt32  prestige;
+    UInt32  tael;
 	UInt16	winstreak;
     UInt16  bewinstreak;
     UInt16  failstreak;

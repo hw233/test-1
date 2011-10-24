@@ -663,7 +663,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 	UInt32 atkerAward = 0;
 	UInt8 newRank = 0;
     UInt16 flag = 0x09;    // 战报和基本信息
-    UInt32 prestige = 0;
+    //UInt32 prestige = 0;
 
 	if (!win)
 	{
@@ -764,7 +764,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
         deferdata->ranker->send(st);
     }
 
-	AthleticsAward atkerAthleticsAward = { id, type, static_cast<UInt8>(1 + newRank), win, prestige, atkerAward, deferdata->ranker, 0, 0 };
+	AthleticsAward atkerAthleticsAward = { id, type, static_cast<UInt8>(1 + newRank), win, 0, atkerAward, deferdata->ranker, 0, 0 };
 	AthleticsAward deferAthleticsAward = { id, type, 0, !win, 0, atkerAward, atker, 0, 0 };
 
 	GameMsgHdr hdr1(0x217, atker->getThreadId(), atker, sizeof(AthleticsAward));
@@ -957,6 +957,32 @@ void AthleticsRank::TmExtraAward()
             }
 
         }
+    }
+
+	AthleticsList::iterator start1 = _athleticses[1].begin();
+	AthleticsList::iterator end1 = _athleticses[1].end();
+	for (UInt32 i = 1; start1 != end; ++start1, ++i)
+    {
+        UInt32 prestige = 0;
+        UInt32 tael = 0;
+        if( i < 25 )
+            prestige = 850 - ( 25 * ( i - 1 ) - ( i - 1 ) * ( i - 2 ) / 2 );
+        else if( i < 501 )
+            prestige = 551 - i;
+        else
+            prestige = 50;
+
+        if( i < 39 )
+            tael = 18000 - ( 400 * ( i - 1 ) - 10 * ( i - 1 ) * ( i - 2 ) / 2 );
+        else if( i < 501 )
+            tael = 9830 - ( i - 39 ) * 20;
+        else
+            tael = 600;
+
+        AthleticsRankData *rank = *start1;
+        rank->prestige = prestige;
+        rank->tael = tael;
+		DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u, `tael` = %u WHERE `ranker` = %"I64_FMT"u", rank->prestige, rank->tael, rank->ranker->getId());
     }
 
     return;
