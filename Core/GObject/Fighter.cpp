@@ -964,13 +964,6 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 	}
 }
 
-void Fighter::addAttr( const GData::AttrExtra& attr )
-{
-	addAttrExtra(_attrExtraEquip, &attr);
-    setDirty();
-    checkDirty();
-}
-
 void Fighter::addAttr( const GData::CittaEffect* ce )
 {
 	addAttrExtra(_attrExtraEquip, ce);
@@ -1053,8 +1046,12 @@ void Fighter::rebuildEquipAttr()
 		if(iest == NULL)
 			continue;
 		UInt32 idx = setNum[i] / 2 - 1;
-		_attrExtraEquip += *iest->attrExtra[idx];
-		_attrExtraEquip += *iest->attrExtra[idx];
+        while(idx > -1)
+        {
+            _attrExtraEquip += *iest->attrExtra[idx];
+            --idx;
+        }
+		//_attrExtraEquip += *iest->attrExtra[idx];
 	}
 #if 0
 	_attrExtraEquip.attack += getWeaponAttack();
@@ -1088,6 +1085,13 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.defend += clan->getSkillDefendEffect(_owner);
         _attrExtraEquip.magatk += clan->getSkillMagAtkEffect(_owner);
         _attrExtraEquip.magdef += clan->getSkillMagDefentEffect(_owner);
+    }
+
+    if (_owner)
+    {
+        const GData::AttrExtra* ae = _owner->getHIAttr();
+        if (ae)
+            addAttrExtra(_attrExtraEquip, ae);
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);

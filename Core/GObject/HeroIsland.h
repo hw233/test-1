@@ -32,6 +32,14 @@ struct Awards
 struct Skill
 {
     Skill() : last(0), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
+    void reset()
+    {
+        lastcd = 0;
+        bufid = 0;
+        cd = 0;
+        incd = false;
+        attr = NULL;
+    }
     UInt32 last;
     UInt32 lastcd;
     UInt8 bufid;
@@ -47,6 +55,33 @@ struct HIPlayerData
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
         score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(0), attr(NULL), awardgot(0), inrank(0)
     {
+    }
+
+    void reset()
+    {
+        movecd = 0;
+        fightcd = 0;
+        injuredcd = 0;
+        expcd = 0;
+        straight = 0;
+        round = 0;
+        score = 0;
+        lasttype = 0;
+        attrcd = static_cast<UInt32>(-1);
+        bufid = 0;
+        attr = NULL;
+        awardgot = 0;
+        inrank = 0;
+        compass.clear();
+        for (UInt8 i = 0; i < 5; ++i)
+            skills[i].reset();
+        if (player)
+        {
+            player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
+            player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
+            player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
+            player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
+        }
     }
 
     Player* player;
@@ -94,7 +129,7 @@ typedef std::multiset<HIPlayerData*, lt_score> SortType;
 class HeroIsland
 {
 public:
-    HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0)
+    HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0), _count(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
         initSkillAttr();
@@ -121,7 +156,9 @@ public:
     void rankReward();
     void restart(UInt32 now);
     void broadcastTV(UInt32 now);
+    void calcNext(UInt32 now);
     void end();
+    void reset();
 
     UInt8 getIdentity(Player* player, bool = false);
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
@@ -171,6 +208,7 @@ private:
     UInt32 _prepareTime;
     UInt32 _startTime;
     UInt32 _endTime;
+    UInt8 _count;
 };
 
 extern HeroIsland heroIsland;

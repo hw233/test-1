@@ -1449,7 +1449,14 @@ namespace GObject
 			case 10:
 			case 11:
 			case 12:
-				SYSMSG_BROADCASTV(275, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId(), ied.enchant);
+                {
+                    if (World::_halloween && ied.enchant == 8 && equip->GetItemType().subClass != Item_Trump)
+                    {
+                        if (!m_Owner->enchanted8(equip->getId()))
+                            m_Owner->sendEnchanted8Box();
+                    }
+                    SYSMSG_BROADCASTV(275, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId(), ied.enchant);
+                }
 				break;
 			}
 			return 0;

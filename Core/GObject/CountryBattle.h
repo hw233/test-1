@@ -7,8 +7,8 @@
 namespace GObject
 {
 
-#define COUNTRY_BATTLE_BARRIER1 60
-#define COUNTRY_BATTLE_BARRIER2 80
+#define COUNTRY_BATTLE_BARRIER1 59
+#define COUNTRY_BATTLE_BARRIER2 79
 
 class Player;
 

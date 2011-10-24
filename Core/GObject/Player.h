@@ -321,7 +321,7 @@ namespace GObject
 		UInt32 achievement;         // 战功
         UInt8 qqvipl;               // QQ VIP等级
         UInt8 qqvipyear;            // QQ VIP是否包年
-        UInt8 qqawardgot;           // QQ VIP奖励是否已领取
+        UInt32 qqawardgot;          // QQ VIP奖励是否已领取
         UInt32 qqawardEnd;          // QQ 奖励领取结束时间
         UInt32 ydGemId;             // QQ VIP宝石奖励
 		UInt16 location;            // 位置
@@ -513,7 +513,16 @@ namespace GObject
 		void setGMLevel(UInt8 l);
 		inline UInt8 getGMLevel()			{ return _playerData.gmLevel; }
 
-        inline void setQQVipl(UInt8 lvl) { lvl>7?_playerData.qqvipl=7:_playerData.qqvipl = lvl; }
+        inline void setQQVipl(UInt8 lvl)
+        {
+            _playerData.qqvipl = lvl;
+            if(lvl > 7 && lvl < 10)
+                _playerData.qqvipl = 7;
+            else if(lvl == 10)
+                _playerData.qqvipl = 0;
+            else if(lvl > 16 && lvl < 20)
+                _playerData.qqvipl = 16;
+        }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
         inline bool getQQVipYear() { return _playerData.qqvipyear; }
@@ -560,7 +569,13 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
-        void addAttr(const GData::AttrExtra&);
+
+    private:
+        GData::AttrExtra _hiattr;
+    public:
+        void addHIAttr(const GData::AttrExtra&);
+        void clearHIAttr();
+        inline const GData::AttrExtra* getHIAttr() const { return &_hiattr; }
 
 		void pendTael(UInt32);
 		void pendCoupon(UInt32);
@@ -1030,6 +1045,12 @@ namespace GObject
         inline UInt8 getHISpot() { return hispot;}
         inline void setHIType(UInt8 type) { hitype = type; }
         inline UInt8 getHIType() { return hitype; }
+
+    private:
+        std::vector<UInt32> _enchantEqus;
+    public:
+        bool enchanted8(UInt32);
+        void sendEnchanted8Box();
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
