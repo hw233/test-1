@@ -1409,7 +1409,7 @@ void HeroIsland::commitCompass(Player* player)
         return;
     pd->compass[sz-1].status = 3;
 
-    if (!(sz % 3))
+    if (sz && !(sz % 3))
     {
         if (pd->straight == 3)
         {
