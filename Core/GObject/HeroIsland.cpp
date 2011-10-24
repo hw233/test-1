@@ -1006,10 +1006,11 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
             if (_running)
             {
+                UInt8 status = 0;
                 size_t sz = pd->compass.size();
                 if (sz && pd->compass[sz-1].type == pd1->type)
                 {
-                    pd->compass[sz-1].status = 2;
+                    status = pd->compass[sz-1].status = 2;
 
                     if (sz == 1)
                         pd->straight = 1;
@@ -1027,11 +1028,11 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
                 if (!sz)
                     commitCompass(pd->player);
-            }
 
-            Stream st(REP::HERO_ISLAND);
-            st << static_cast<UInt8>(5) << static_cast<UInt8>(2) << pd->straight << Stream::eos;
-            pd->player->send(st);
+                Stream st(REP::HERO_ISLAND);
+                st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
+                pd->player->send(st);
+            }
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev()));
             broadcast(pd, pd->spot, 2);

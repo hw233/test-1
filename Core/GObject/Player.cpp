@@ -818,7 +818,7 @@ namespace GObject
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {36,1}};
+                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {4996,1}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
                 std::string strItems;
                 for (int i = 0; i < 2; ++i)
