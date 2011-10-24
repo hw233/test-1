@@ -39,6 +39,7 @@
 #include "Script/BattleFormula.h"
 #include "Copy.h"
 #include "FrontMap.h"
+#include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 
 #include <cmath>
@@ -3417,6 +3418,9 @@ namespace GObject
 		cancelAutoBattle();
 		cancelAutoDungeon();
 		GObject::Country& cny = CURRENT_COUNTRY();
+
+        if (_playerData.location == 8977)
+            heroIsland.playerLeave(this);
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);

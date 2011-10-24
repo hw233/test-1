@@ -236,6 +236,7 @@ void HeroIsland::broadcastTV(UInt32 now)
 
 void HeroIsland::calcNext(UInt32 now)
 {
+#if 0
     if (cfg.GMCheck)
     {
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 45 * 60;
@@ -257,11 +258,19 @@ void HeroIsland::calcNext(UInt32 now)
         _startTime = _prepareTime + 15 * 60;
         _endTime = _startTime + 60 * 60;
     }
+#else
+    if (cfg.GMCheck)
+    {
+        _prepareTime = now + 30 * 60;
+        _startTime = _prepareTime + 15 * 60;
+        _endTime = _startTime + 60 * 60;
+    }
+#endif
     else
     {
         _prepareTime = now;
         _startTime = _prepareTime + 30;
-        _endTime = _startTime + 10 * 60;
+        _endTime = _startTime + 30 * 60;
     }
 
     Stream st(REP::HERO_ISLAND);
@@ -1022,9 +1031,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                     commitCompass(pd->player);
                 }
                 else
-                {
-                    pd->straight = 1;
-                }
+                    pd->straight = 0;
 
                 if (!sz)
                     commitCompass(pd->player);
@@ -1176,7 +1183,7 @@ void HeroIsland::playerInfo(Player* player)
     st << static_cast<UInt8>(0);
 
     HIPlayerData* pd = findPlayer(player, spot, pos);
-    if (pd)
+    if (pd && pd->player && pd->player->hasFlag(Player::InHeroIsland))
     {
         in = 1;
         type = pd->type;
@@ -1249,6 +1256,9 @@ void HeroIsland::playerEnter(Player* player)
     if (!player->getHIType())
         return;
 
+    if (player->hasFlag(Player::InHeroIsland))
+        return;
+
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(1);
     if (enter(player, player->getHIType(), player->getHISpot(), false))
@@ -1272,11 +1282,18 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
+#if 1
+    moveTo(player, 0, false);
+#else
     pd = leave(pd, spot, pos);
     if (pd) delete pd;
-    player->delFlag(Player::InHeroIsland);
-    player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+10*60);
     player->setHISpot(0xFF);
+#endif
+    player->delFlag(Player::InHeroIsland);
+    if (cfg.GMCheck)
+        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+5*60);
+    else
+        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+60);
 }
 
 void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
