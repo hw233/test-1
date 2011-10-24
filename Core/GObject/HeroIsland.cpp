@@ -226,6 +226,7 @@ void HeroIsland::broadcastTV(UInt32 now)
                 return;
             SYSMSG_BROADCASTV(2118);
             _prepareStep = 5;
+            reset();
             break;
 
         default:
@@ -1432,9 +1433,17 @@ void HeroIsland::commitCompass(Player* player)
 
     {
         pd->score += 10;
+#if 1
+        for (SortType::iterator i = _sorts.begin(), e = _sorts.end(); i != e; ++i)
+        {
+            if (*i && (*i)->player == pd->player)
+                _sorts.erase(i);
+        }
+#else
         SortType::iterator i = _sorts.find(pd);
         if (i != _sorts.end())
             _sorts.erase(i);
+#endif
         _sorts.insert(pd);
 
         pd->inrank = 0;

@@ -78,10 +78,14 @@ struct HIPlayerData
             skills[i].reset();
         if (player)
         {
-            player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
-            player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
-            player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
-            player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIFIGHT))
+                player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIMOVE))
+                player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIWEAK))
+                player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
+                player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
         }
     }
 
