@@ -14,6 +14,7 @@
 #include "Server/WorldServer.h"
 #include "Battle/BattleSimulator.h"
 #include "kingnet_analyzer.h"
+#include "Script/lua_tinker.h"
 
 namespace Battle
 {
@@ -1036,6 +1037,9 @@ namespace GObject
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);
     private:
         CUserLogger* m_ulog;
+
+    public:
+        void sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

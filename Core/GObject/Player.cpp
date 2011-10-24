@@ -39,6 +39,7 @@
 #include "Script/BattleFormula.h"
 #include "Copy.h"
 #include "FrontMap.h"
+#include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 
 #include <cmath>
@@ -818,7 +819,7 @@ namespace GObject
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {36,1}};
+                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {4996,1}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
                 std::string strItems;
                 for (int i = 0; i < 2; ++i)
@@ -920,6 +921,37 @@ namespace GObject
                     GetPackage()->SendSingleEquipData(ie);
                 }
             }
+        }
+    }
+
+    void Player::sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items)
+    {
+        UInt32 size = items.size();
+        if (!size || size > 100)
+            return;
+
+        SYSMSG(_title, title);
+        SYSMSG(_content, content);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, _title, _content, 0xFFFE0000);
+        if(mail)
+        {
+            std::string strItems;
+
+            MailPackage::MailItem* mitem = new MailPackage::MailItem[size];
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                lua_tinker::table tmp = items.get<lua_tinker::table>(i);;
+                mitem[i].id = tmp.get<UInt32>(0);
+                mitem[i].count = tmp.get<UInt32>(1);
+
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, true);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+            delete mitem;
         }
     }
 
@@ -3417,6 +3449,9 @@ namespace GObject
 		cancelAutoBattle();
 		cancelAutoDungeon();
 		GObject::Country& cny = CURRENT_COUNTRY();
+
+        if (_playerData.location == 8977)
+            heroIsland.playerLeave(this);
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
