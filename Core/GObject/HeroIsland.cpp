@@ -236,6 +236,7 @@ void HeroIsland::broadcastTV(UInt32 now)
 
 void HeroIsland::calcNext(UInt32 now)
 {
+#if 0
     if (cfg.GMCheck)
     {
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 45 * 60;
@@ -257,11 +258,19 @@ void HeroIsland::calcNext(UInt32 now)
         _startTime = _prepareTime + 15 * 60;
         _endTime = _startTime + 60 * 60;
     }
+#else
+    if (cfg.GMCheck)
+    {
+        _prepareTime = now + 30 * 60;
+        _startTime = _prepareTime + 15 * 60;
+        _endTime = _startTime + 60 * 60;
+    }
+#endif
     else
     {
         _prepareTime = now;
         _startTime = _prepareTime + 30;
-        _endTime = _startTime + 20 * 60;
+        _endTime = _startTime + 30 * 60;
     }
 
     Stream st(REP::HERO_ISLAND);
@@ -303,6 +312,8 @@ void HeroIsland::end()
 {
     rankReward();
     calcNext(TimeUtil::Now());
+    reset();
+
     _running = false;
     _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
@@ -334,7 +345,16 @@ void HeroIsland::process(UInt32 now)
     broadcastTV(now);
 
     if (!_running && _startTime && now >= _startTime)
+    {
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(15);
+        st << now; 
+        st << _startTime;
+        st << _endTime;
+        st << Stream::eos;
+        broadcast(st);
         _running = true;
+    }
 
     if (_running && now >= _endTime)
         end();
@@ -995,10 +1015,11 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
             if (_running)
             {
+                UInt8 status = 0;
                 size_t sz = pd->compass.size();
                 if (sz && pd->compass[sz-1].type == pd1->type)
                 {
-                    pd->compass[sz-1].status = 2;
+                    status = pd->compass[sz-1].status = 2;
 
                     if (sz == 1)
                         pd->straight = 1;
@@ -1010,17 +1031,15 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                     commitCompass(pd->player);
                 }
                 else
-                {
-                    pd->straight = 1;
-                }
+                    pd->straight = 0;
 
                 if (!sz)
                     commitCompass(pd->player);
-            }
 
-            Stream st(REP::HERO_ISLAND);
-            st << static_cast<UInt8>(5) << static_cast<UInt8>(2) << pd->straight << Stream::eos;
-            pd->player->send(st);
+                Stream st(REP::HERO_ISLAND);
+                st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
+                pd->player->send(st);
+            }
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev()));
             broadcast(pd, pd->spot, 2);
@@ -1164,7 +1183,7 @@ void HeroIsland::playerInfo(Player* player)
     st << static_cast<UInt8>(0);
 
     HIPlayerData* pd = findPlayer(player, spot, pos);
-    if (pd)
+    if (pd && pd->player && pd->player->hasFlag(Player::InHeroIsland))
     {
         in = 1;
         type = pd->type;
@@ -1260,11 +1279,18 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
+#if 1
+    moveTo(player, 0, false);
+#else
     pd = leave(pd, spot, pos);
     if (pd) delete pd;
-    player->delFlag(Player::InHeroIsland);
-    player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+10*60);
     player->setHISpot(0xFF);
+#endif
+    player->delFlag(Player::InHeroIsland);
+    if (cfg.GMCheck)
+        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+5*60);
+    else
+        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+60);
 }
 
 void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
@@ -1495,6 +1521,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 
         if (awards[id].id && awards[id].num)
         {
+            pd->awardgot = 0xFF;
             if (awards[id].id > 5)
             {
                 return player->GetPackage()->Add(
@@ -1522,7 +1549,6 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                 default:
                     break;
             }
-            pd->awardgot = 0xFF;
         }
         else
             return false;

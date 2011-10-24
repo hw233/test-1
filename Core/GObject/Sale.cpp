@@ -120,6 +120,11 @@ void Sale::sellSaleReq(std::vector<SaleSellData>& sales)
 			}
 			ItemCount[i] = sales[i].count;
 
+            if(sales[i].count == 0)
+                return;
+            if(sales[i].price == 0)
+                return;
+
 			if (sales[i].priceType == 0)
                 return;
 				//revenue += 1;
