@@ -14,6 +14,7 @@
 #include "Server/WorldServer.h"
 #include "Battle/BattleSimulator.h"
 #include "kingnet_analyzer.h"
+#include "Script/lua_tinker.h"
 
 namespace Battle
 {
@@ -306,7 +307,7 @@ namespace GObject
 		UInt32 achievement;         // 战功
         UInt8 qqvipl;               // QQ VIP等级
         UInt8 qqvipyear;            // QQ VIP是否包年
-        UInt8 qqawardgot;           // QQ VIP奖励是否已领取
+        UInt32 qqawardgot;          // QQ VIP奖励是否已领取
         UInt32 qqawardEnd;          // QQ 奖励领取结束时间
         UInt32 ydGemId;             // QQ VIP宝石奖励
 		UInt16 location;            // 位置
@@ -498,7 +499,16 @@ namespace GObject
 		void setGMLevel(UInt8 l);
 		inline UInt8 getGMLevel()			{ return _playerData.gmLevel; }
 
-        inline void setQQVipl(UInt8 lvl) { lvl>7?_playerData.qqvipl=7:_playerData.qqvipl = lvl; }
+        inline void setQQVipl(UInt8 lvl)
+        {
+            _playerData.qqvipl = lvl;
+            if(lvl > 7 && lvl < 10)
+                _playerData.qqvipl = 7;
+            else if(lvl == 10)
+                _playerData.qqvipl = 0;
+            else if(lvl > 16 && lvl < 20)
+                _playerData.qqvipl = 16;
+        }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
         inline bool getQQVipYear() { return _playerData.qqvipyear; }
@@ -1036,6 +1046,9 @@ namespace GObject
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);
     private:
         CUserLogger* m_ulog;
+
+    public:
+        void sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

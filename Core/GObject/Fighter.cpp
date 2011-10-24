@@ -1039,9 +1039,13 @@ void Fighter::rebuildEquipAttr()
 		const GData::ItemEquipSetType * iest = GData::itemEquipSetTypeManager[setId[i]];
 		if(iest == NULL)
 			continue;
-		UInt32 idx = setNum[i] / 2 - 1;
-		_attrExtraEquip += *iest->attrExtra[idx];
-		_attrExtraEquip += *iest->attrExtra[idx];
+		int idx = setNum[i] / 2 - 1;
+        while(idx >= 0)
+        {
+            _attrExtraEquip += *iest->attrExtra[idx];
+            --idx;
+        }
+		//_attrExtraEquip += *iest->attrExtra[idx];
 	}
 #if 0
 	_attrExtraEquip.attack += getWeaponAttack();

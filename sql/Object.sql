@@ -821,7 +821,7 @@ CREATE TABLE `player` (
   `archievement` int(10) unsigned NOT NULL DEFAULT '0',
   `qqvipl` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `qqvipyear` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `qqawardgot` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `qqawardgot` int(11) unsigned NOT NULL DEFAULT '0',
   `qqawardEnd` int(10) unsigned NOT NULL DEFAULT '0',
   `ydGemId` int(10) unsigned NOT NULL DEFAULT '0',
   `location` smallint(5) unsigned NOT NULL,

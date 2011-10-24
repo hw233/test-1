@@ -39,6 +39,7 @@
 #include "Script/BattleFormula.h"
 #include "Copy.h"
 #include "FrontMap.h"
+#include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 
 #include <cmath>
@@ -818,7 +819,7 @@ namespace GObject
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {36,1}};
+                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {4996,1}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
                 std::string strItems;
                 for (int i = 0; i < 2; ++i)
@@ -920,6 +921,37 @@ namespace GObject
                     GetPackage()->SendSingleEquipData(ie);
                 }
             }
+        }
+    }
+
+    void Player::sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items)
+    {
+        UInt32 size = items.size();
+        if (!size || size > 100)
+            return;
+
+        SYSMSG(_title, title);
+        SYSMSG(_content, content);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, _title, _content, 0xFFFE0000);
+        if(mail)
+        {
+            std::string strItems;
+
+            MailPackage::MailItem* mitem = new MailPackage::MailItem[size];
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                lua_tinker::table tmp = items.get<lua_tinker::table>(i);;
+                mitem[i].id = tmp.get<UInt32>(0);
+                mitem[i].count = tmp.get<UInt32>(1);
+
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, true);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+            delete mitem;
         }
     }
 
@@ -3429,6 +3461,9 @@ namespace GObject
 		cancelAutoBattle();
 		cancelAutoDungeon();
 		GObject::Country& cny = CURRENT_COUNTRY();
+
+        if (_playerData.location == 8977)
+            heroIsland.playerLeave(this);
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
@@ -6318,15 +6353,23 @@ namespace GObject
     void Player::checkQQAward()
     {
 		UInt32 now = TimeUtil::Now();
+
+        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        if(flag)
+        {
+            qqvipl = _playerData.qqvipl%10 + 1;
+        }
+
 		if(now >= _playerData.qqawardEnd)
 		{
 			_playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
-            _playerData.qqawardgot &= 0xFC;
+            _playerData.qqawardgot &= 0xFCFC;
             DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
             RollYDGem();
         }
 
-        if( !(_playerData.qqawardgot & 0x80) && _playerData.qqvipl )
+        if( !(_playerData.qqawardgot & (0x80<<flag)) && _playerData.qqvipl )
         {
             if(GetFreePackageSize() < 1)
             {
@@ -6334,7 +6377,7 @@ namespace GObject
             }
             else
             {
-                _playerData.qqawardgot |= 0x80;
+                _playerData.qqawardgot |= (0x80<<flag);
                 GetPackage()->AddItem2(67, 1, true, true);
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
@@ -6350,12 +6393,24 @@ namespace GObject
     {
         checkQQAward();
 
+        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        if(flag)
+        {
+            qqvipl = _playerData.qqvipl%10 + 1;
+        }
+
         Stream st(REP::YD_INFO);
-        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>(_playerData.qqawardgot & 0x03);
+        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
         UInt8 maxCnt = GObjectManager::getYDMaxCount();
-        st << maxCnt;
+        if(flag)
+            st << static_cast<UInt8>(maxCnt - 1);
+        else
+            st << maxCnt;
         for(UInt8 i = 0; i < maxCnt; ++ i)
         {
+            if(flag && i == 0)
+                continue;
             std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
             UInt8 itemCnt = ydItem.size();
             st << itemCnt;
@@ -6386,14 +6441,21 @@ namespace GObject
         Stream st(REP::YD_AWARD_RCV);
         checkQQAward();
 
-        if(type == 1 && !(_playerData.qqawardgot & 0x1) && _playerData.qqvipl != 0)
+        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        if(flag)
         {
-            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(_playerData.qqvipl - 1);
+            qqvipl = _playerData.qqvipl%10 + 1;
+        }
+
+        if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && _playerData.qqvipl != 0)
+        {
+            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
             UInt8 itemCnt = ydItem.size();
             if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
             {
                  nRes = 1;
-                _playerData.qqawardgot |= 0x1;
+                _playerData.qqawardgot |= (0x1<<flag);
                 for(int j = 0; j < itemCnt; ++ j)
                 {
                     UInt32 itemId = ydItem[j].itemId;
@@ -6408,14 +6470,14 @@ namespace GObject
                 sendMsgCode(2, 1011);
             }
         }
-        else if(type == 2 && !(_playerData.qqawardgot & 0x2) && _playerData.qqvipyear != 0)
+        else if(type == 2 && !(_playerData.qqawardgot & (0x2<<flag)) && _playerData.qqvipyear != 0)
         {
             std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
             UInt8 itemCnt = ydItem.size();
             if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
             {
                 nRes = 2;
-                _playerData.qqawardgot |= 0x2;
+                _playerData.qqawardgot |= (0x2<<flag);
 
                 for(int j = 0; j < itemCnt; ++ j)
                     GetPackage()->AddItem2(ydItem[j].itemId, ydItem[j].itemNum, true, true);
