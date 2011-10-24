@@ -1523,7 +1523,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
         {
             st << awards[i].id;
             if (awards[id].id == 2)
-                st << static_cast<UInt16>(awards[id].num * calcExp(player->GetLev()));
+                st << static_cast<UInt32>(awards[id].num * calcExp(player->GetLev()));
             else
                 st << awards[i].num;
         }
