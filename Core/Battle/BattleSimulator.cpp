@@ -1351,6 +1351,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
         else if(1 == skill->area)
         {
+            int i = 0;
             for(UInt8 pos = 0; pos < 25; ++ pos)
             {
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
@@ -1360,7 +1361,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 if(bo->getLostHP() == 0)
                     continue;
 
-                UInt32 hpr = bo->regenHP(rhp);
+                UInt32 hpr = bo->regenHP(rhp) * skill->factor[i];
+                ++i;
                 if(hpr == 0)
                     continue;
 
@@ -1427,13 +1429,15 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         {
             if(1 == skill->area)
             {
+                int i = 0;
                 for(UInt8 pos = 0; pos < 25; ++ pos)
                 {
                     BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][pos]);
                     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
-                    UInt32 dmg = abs(bf->calcPoison(skill));
+                    UInt32 dmg = abs(bf->calcPoison(skill)) * skill->factor[i];
+                    ++i;
                     bo->makeDamage(dmg);
                     defList[defCount].pos = pos;
                     defList[defCount].damType = e_damNormal;
@@ -1626,11 +1630,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
         else if(1 == skill->area)
         {
+            int i = 0;
             for(UInt8 pos = 0; pos < 25; pos++)
             {
                 if(_objs[target_side][pos] == NULL || _objs[target_side][pos]->getHP() == 0)
                     continue;
-                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][pos], 1, defList, defCount, scList, scCount);
+                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][pos], skill->factor[i], defList, defCount, scList, scCount);
+                ++i;
             }
         }
         else
