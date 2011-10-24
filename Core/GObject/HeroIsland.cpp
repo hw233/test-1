@@ -270,7 +270,8 @@ void HeroIsland::calcNext(UInt32 now)
     {
         _prepareTime = now;
         _startTime = _prepareTime + 30;
-        _endTime = _startTime + 30 * 60;
+        //_endTime = _startTime + 30 * 60;
+        _endTime = _startTime + 10 * 60;
     }
 
     Stream st(REP::HERO_ISLAND);
@@ -321,7 +322,7 @@ void HeroIsland::end()
 
 void HeroIsland::reset()
 {
-    for (UInt8 i = 1; i < HERO_ISLAND_SPOTS; ++i)
+    for (UInt8 i = 0; i < HERO_ISLAND_SPOTS; ++i)
     {
         size_t sz = _players[i].size();
         for (size_t j = 0; j < sz; ++j)
@@ -330,11 +331,11 @@ void HeroIsland::reset()
             if (pd && pd->player)
             {
                 pd->reset();
-                _sorts.clear();
                 moveTo(pd->player, 0, false);
             }
         }
     }
+    _sorts.clear();
 }
 
 void HeroIsland::process(UInt32 now)
@@ -1408,7 +1409,6 @@ void HeroIsland::commitCompass(Player* player)
         return;
     pd->compass[sz-1].status = 3;
 
-    UInt16 score = pd->score;
     if (!(sz % 3))
     {
         if (pd->straight == 3)
@@ -1430,9 +1430,8 @@ void HeroIsland::commitCompass(Player* player)
     {
     }
 
-    pd->score += 10;
-    if (score != pd->score)
     {
+        pd->score += 10;
         SortType::iterator i = _sorts.find(pd);
         if (i != _sorts.end())
             _sorts.erase(i);
@@ -1514,7 +1513,10 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
         for (UInt8 i = 0; i < 5; ++i)
         {
             st << awards[i].id;
-            st << awards[i].num;
+            if (awards[id].id == 2)
+                st << static_cast<UInt16>(awards[id].num * calcExp(player->GetLev()));
+            else
+                st << awards[i].num;
         }
         st << Stream::eos;
         player->send(st);
@@ -1535,7 +1537,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                     break;
 
                 case 2:
-                    player->AddExp(awards[id].num * calcExp(player->GetLev()));
+                    player->AddExp(awards[id].num);
                     break;
 
                 case 3:

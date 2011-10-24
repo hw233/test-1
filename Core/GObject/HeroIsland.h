@@ -34,6 +34,7 @@ struct Skill
     Skill() : last(0), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
     void reset()
     {
+        last = 0;
         lastcd = 0;
         bufid = 0;
         cd = 0;
@@ -120,7 +121,7 @@ struct lt_score
 {
     bool operator()(const HIPlayerData* const & pd1, const HIPlayerData* const & pd2) const
     {
-        return pd1->score - pd2->score < 0;
+        return pd1->score < pd2->score;
     }
 };
 
