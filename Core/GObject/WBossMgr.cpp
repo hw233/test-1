@@ -52,7 +52,6 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 
     if (final)
     {
-        _hp.resize(sz);
         for(size_t i = 0; i < sz; ++ i)
         {
             if(_hp[i] == 0xFFFFFFFF)
@@ -159,6 +158,8 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
         if (worldboss[i+(m_lvl-1)*5] == id)
         {
             in = true;
+            if (i == 4)
+                m_final = true;
             break;
         }
     }
@@ -200,6 +201,16 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     GData::NpcGroup* ng = GData::npcGroups[npcid];
     if (!ng) return;
 
+    _hp.clear();
+    std::vector<GData::NpcFData>& nflist = ng->getList();
+    size_t sz = nflist.size();
+    _hp.resize(sz);
+    for(size_t i = 0; i < sz; ++ i)
+    {
+        if(_hp[i] == 0 || _hp[i] >= 0xFFFFFFF0)
+            _hp[i] = nflist[i].fighter->getMaxHP();
+    }
+
     Map * map = Map::FromSpot(m_loc);
     if (!map) return;
 
@@ -226,7 +237,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     m_disappered = false;
     if (m_count == 10)
-        { SYSMSG_BROADCASTV(553, npcid); m_final = true; }
+        { SYSMSG_BROADCASTV(553, npcid); }
     if (!m_count)
         { SYSMSG_BROADCASTV(554, fgt->getId(), m_loc, fgt->getId()); }
 }
@@ -293,14 +304,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+80*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+18*60+10,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+80*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
