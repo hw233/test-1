@@ -479,7 +479,7 @@ namespace GObject
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
         void sendNationalDayOnlineAward();
-        void sendHalloweenOnlineAward(UInt32);
+        void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
 
 	public:
@@ -966,12 +966,14 @@ namespace GObject
 
 		SecondPWDInfo _pwdInfo;
 
+    public:
 		// Last battled monster
 		GData::NpcGroup * _lastNg;
-		UInt16 _lastDungeon;
 		std::vector<GData::LootResult> _lastLoot;
         std::vector<LastAthAward> _lastAthAward;
 
+    private:
+		UInt16 _lastDungeon;
         static UInt32 _recruit_cost;
         static UInt32 _tavernBlueCount;
         static UInt32 _tavernPurpleCount;
@@ -1026,6 +1028,13 @@ namespace GObject
 		std::string& getQuestionForPWD(){ return _pwdInfo.questionForPWD; }
 		void makeSenconPWDInfo(Stream& st);
 		bool hasChecked();
+
+    private:
+        UInt32 _worldBossHp;
+    public:
+        inline void pendWorldBossHp(UInt32 hp) { _worldBossHp += hp; }
+        inline void resetWorldBossHp() { _worldBossHp = 0; }
+        inline UInt32 getWorldBossHp() const { return _worldBossHp; }
 
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);

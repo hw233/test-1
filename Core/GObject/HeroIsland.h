@@ -34,6 +34,7 @@ struct Skill
     Skill() : last(0), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
     void reset()
     {
+        last = 2*60;
         lastcd = 0;
         bufid = 0;
         cd = 0;
@@ -59,6 +60,18 @@ struct HIPlayerData
 
     void reset()
     {
+        if (player)
+        {
+            if (player->getBuffData(PLAYER_BUFF_HIFIGHT))
+                player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIMOVE))
+                player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIWEAK))
+                player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
+                player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
+        }
+
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;
@@ -75,13 +88,12 @@ struct HIPlayerData
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
-        if (player)
-        {
-            player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
-            player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
-            player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
-            player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
-        }
+#if 0
+        pd->skills[1].last = 2*60;
+        pd->skills[2].last = 2*60;
+        pd->skills[3].last = 2*60;
+        pd->skills[4].last = 2*60;
+#endif
     }
 
     Player* player;
@@ -120,7 +132,7 @@ struct lt_score
 {
     bool operator()(const HIPlayerData* const & pd1, const HIPlayerData* const & pd2) const
     {
-        return pd1->score - pd2->score < 0;
+        return pd1->score < pd2->score;
     }
 };
 

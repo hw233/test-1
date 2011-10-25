@@ -320,26 +320,52 @@ function ItemNormal_00008907(iid, num, bind, param)
   end
 end
 
-function ItemNormal_00000006(iid, num, bind, param)
+function ItemNormal_00000026(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  player:setBuffData(1, 0, true)
+  player:setBuffData(2, 0, true)
   player:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(player, 2, 1800, num, 18000) then
-  	package:DelItemSendMsg(6, player);
+  if ItemNormal_AddBuff(player, 1, 3600, num, 86400) then
+  	package:DelItemSendMsg(26, player);
 	return num;
   else
 	return false;
   end
 end
 
-function ItemNormal_00000007(iid, num, bind, param)
+function ItemNormal_00000038(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(2, 0, true)
+  player:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(player, 1, 3600, num, 86400) then
+  	package:DelItemSendMsg(38, player);
+	return num;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00000039(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(1, 0, true)
+  player:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(player, 2, 3600, num, 86400) then
+  	package:DelItemSendMsg(39, player);
+	return num;
+  else
+	return false;
+  end
+end
+
+function ItemNormal_00000040(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
   player:setBuffData(1, 0, true)
   player:setBuffData(2, 0, true)
-  if ItemNormal_AddBuff(player, 3, 1800, num, 18000) then
-   	package:DelItemSendMsg(7, player);
+  if ItemNormal_AddBuff(player, 3, 3600, num, 86400) then
+  	package:DelItemSendMsg(40, player);
 	return num;
   else
 	return false;
@@ -5463,11 +5489,15 @@ local ItemNormal_Table = {
 	[19] = ItemNormal_00000019,
 	[20] = ItemNormal_00000020,
 	[21] = ItemNormal_00000021,
+    [26] = ItemNormal_00000026,
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[36] = ItemNormal_00000036,
 	[37] = ItemNormal_00000037,
+	[38] = ItemNormal_00000038,
+	[39] = ItemNormal_00000039,
+	[40] = ItemNormal_00000040,
 	[43] = ItemNormal_00000043,
 	[52] = ItemNormal_00000052,
 	[53] = ItemNormal_00000053,

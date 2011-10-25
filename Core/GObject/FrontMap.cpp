@@ -7,6 +7,8 @@
 #include "MsgID.h"
 #include "GData/Money.h"
 #include "Server/SysMsg.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 
 namespace GObject
 {
@@ -278,6 +280,8 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
                 pl->send(st);
                 tmp.resize(0);
                 DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+                if (World::_halloween) // XXX: 万怪节
+                    GameAction()->onFrontMapWin(pl, id, spot);
                 return;
             } else {
                 UInt8 nspot = spot+1;

@@ -270,7 +270,8 @@ void HeroIsland::calcNext(UInt32 now)
     {
         _prepareTime = now;
         _startTime = _prepareTime + 30;
-        _endTime = _startTime + 30 * 60;
+        //_endTime = _startTime + 30 * 60;
+        _endTime = _startTime + 10 * 60;
     }
 
     Stream st(REP::HERO_ISLAND);
@@ -321,7 +322,7 @@ void HeroIsland::end()
 
 void HeroIsland::reset()
 {
-    for (UInt8 i = 1; i < HERO_ISLAND_SPOTS; ++i)
+    for (UInt8 i = 0; i < HERO_ISLAND_SPOTS; ++i)
     {
         size_t sz = _players[i].size();
         for (size_t j = 0; j < sz; ++j)
@@ -330,11 +331,11 @@ void HeroIsland::reset()
             if (pd && pd->player)
             {
                 pd->reset();
-                _sorts.clear();
                 moveTo(pd->player, 0, false);
             }
         }
     }
+    _sorts.clear();
 }
 
 void HeroIsland::process(UInt32 now)
@@ -629,11 +630,6 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     pd->player = player;
     pd->expcd = TimeUtil::Now() + 60;
 
-    pd->skills[1].last = 2*60;
-    pd->skills[2].last = 2*60;
-    pd->skills[3].last = 2*60;
-    pd->skills[4].last = 2*60;
-
     return enter(pd, type, spot, movecd);
 }
 
@@ -692,11 +688,10 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
     if (start > sz)
         start = 0;
 
-    if (sz)
-        st << static_cast<UInt16>(sz-1);
-    else
-        st << static_cast<UInt16>(sz);
+    size_t off = st.size();
+    st << static_cast<UInt16>(0);
 
+    UInt16 count = 0;
     UInt8 l1 = pd->player->GetLev();
     for (size_t i = start; i < sz; ++i)
     {
@@ -714,8 +709,10 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
             st << pd1->player->allHpP();
             st << pd1->player->GetLev();
             st << pd1->player->getName();
+            ++count;
         }
     }
+    st.data<UInt16>(off) = count;
     st << Stream::eos;
     pd->player->send(st);
 }
@@ -1247,9 +1244,15 @@ void HeroIsland::playerEnter(Player* player)
         return;
     }
 
-    if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
+    UInt32 now = TimeUtil::Now();
+    UInt32 left = player->getBuffData(PLAYER_BUFF_HIESCAPE);
+    if (left > now)
+        left -= now;
+    else
+        left = 0;
+    if (left)
     {
-        player->sendMsgCode(0, 2007);
+        player->sendMsgCode(0, 2007, left);
         return;
     }
 
@@ -1261,6 +1264,9 @@ void HeroIsland::playerEnter(Player* player)
     if (enter(player, player->getHIType(), player->getHISpot(), false))
     {
         st << static_cast<UInt8>(0);
+        st << now; 
+        st << _startTime;
+        st << _endTime;
         player->addFlag(Player::InHeroIsland);
     }
     else
@@ -1408,8 +1414,7 @@ void HeroIsland::commitCompass(Player* player)
         return;
     pd->compass[sz-1].status = 3;
 
-    UInt16 score = pd->score;
-    if (!(sz % 3))
+    if (sz && !(sz % 3))
     {
         if (pd->straight == 3)
         {
@@ -1430,12 +1435,19 @@ void HeroIsland::commitCompass(Player* player)
     {
     }
 
-    pd->score += 10;
-    if (score != pd->score)
     {
+        pd->score += 10;
+#if 1
+        for (SortType::iterator i = _sorts.begin(), e = _sorts.end(); i != e; ++i)
+        {
+            if (*i && (*i)->player == pd->player)
+                _sorts.erase(i);
+        }
+#else
         SortType::iterator i = _sorts.find(pd);
         if (i != _sorts.end())
             _sorts.erase(i);
+#endif
         _sorts.insert(pd);
 
         pd->inrank = 0;
@@ -1502,7 +1514,10 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                 if (v < awds->prob)
                 {
                     awards[j].id = awds->id;
-                    awards[j].num = awds->num;
+                    if (awds->id == 2)
+                        awards[j].num = awds->num * calcExp(player->GetLev());
+                    else
+                        awards[j].num = awds->num;
                     break;
                 }
             }
@@ -1535,7 +1550,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                     break;
 
                 case 2:
-                    player->AddExp(awards[id].num * calcExp(player->GetLev()));
+                    player->AddExp(awards[id].num);
                     break;
 
                 case 3:
