@@ -60,6 +60,18 @@ struct HIPlayerData
 
     void reset()
     {
+        if (player)
+        {
+            if (player->getBuffData(PLAYER_BUFF_HIFIGHT))
+                player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIMOVE))
+                player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIWEAK))
+                player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
+            if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
+                player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
+        }
+
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;
@@ -82,18 +94,6 @@ struct HIPlayerData
         pd->skills[3].last = 2*60;
         pd->skills[4].last = 2*60;
 #endif
-
-        if (player)
-        {
-            if (player->getBuffData(PLAYER_BUFF_HIFIGHT))
-                player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
-            if (player->getBuffData(PLAYER_BUFF_HIMOVE))
-                player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
-            if (player->getBuffData(PLAYER_BUFF_HIWEAK))
-                player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
-            if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
-                player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
-        }
     }
 
     Player* player;
