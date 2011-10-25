@@ -113,12 +113,13 @@ bool enum_midnight(void * ptr, void *)
 	}
 #endif
 
+    if (World::_halloween && pl->isOnline())
+        pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
+
     pl->buildClanTask();
     pl->clearFinishCount();
     if (pl->getBuffData(PLAYER_BUFF_WBOSS))
         pl->setBuffData(PLAYER_BUFF_WBOSS, 0, true);
-    if (pl->getBuffData(PLAYER_BUFF_ONLINE))
-        pl->setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 	return true;
 }
 

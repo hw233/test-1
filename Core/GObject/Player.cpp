@@ -700,7 +700,11 @@ namespace GObject
             }
 		}
 
-        UInt32 oldLastOnline = _playerData.lastOnline;
+        if (World::_halloween)
+            sendHalloweenOnlineAward(curtime);
+        else
+            setBuffData(PLAYER_BUFF_ONLINE, 0);
+
 		_playerData.lastOnline = curtime;
 		DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %"I64_FMT"u", curtime, getId());
 
@@ -738,28 +742,6 @@ namespace GObject
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 #endif
 
-        if (World::_halloween) // XXX: 万圣节活动
-        {
-            UInt8 oday = TimeUtil::Day(oldLastOnline);
-            UInt8 nday = TimeUtil::Day(curtime);
-            if (oday != nday)
-            {
-                UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
-                if (nday - oday > 1) // XXX: 隔天
-                {
-                    setBuffData(PLAYER_BUFF_ONLINE, 1);
-                }
-                else
-                {
-                    ++online;
-                    setBuffData(PLAYER_BUFF_ONLINE, online);
-                }
-                sendHalloweenOnlineAward(online);
-            }
-        }
-        else
-            setBuffData(PLAYER_BUFF_ONLINE, 0);
-
         sendLevelPack(GetLev());
 
         char buf[64] = {0};
@@ -792,8 +774,42 @@ namespace GObject
         }
     }
 
-    void Player::sendHalloweenOnlineAward(UInt32 count)
+    void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
+        UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
+        if (online == static_cast<UInt32>(-1))
+            return;
+
+        UInt8 oday = TimeUtil::Day(_playerData.lastOnline);
+        UInt8 nday = TimeUtil::Day(now);
+        if (oday != nday || _online)
+        {
+            if (nday - oday > 1) // XXX: 隔天
+            {
+                setBuffData(PLAYER_BUFF_ONLINE, 1);
+            }
+            else
+            {
+                ++online;
+                setBuffData(PLAYER_BUFF_ONLINE, online);
+            }
+            if (_online)
+            {
+                _playerData.lastOnline = now;
+                DB1().PushUpdateData("UPDATE `player` SET `lastOnline` = %u WHERE `id` = %"I64_FMT"u", now, getId());
+            }
+        }
+        else
+        {
+            if (!online)
+            {
+                ++online;
+                setBuffData(PLAYER_BUFF_ONLINE, online);
+            }
+            else
+                return;
+        }
+
         SYSMSG(title, 2122);
         SYSMSG(content, 2123);
         Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -812,14 +828,14 @@ namespace GObject
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
 
-        if (count >= 3)
+        if (online >= 3)
         {
             SYSMSG(title, 2124);
             SYSMSG(content, 2125);
             Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {4996,1}};
+                MailPackage::MailItem mitem[2] = {{GObject::MailPackage::Coupon,100}, {1750,1}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
                 std::string strItems;
                 for (int i = 0; i < 2; ++i)
@@ -831,7 +847,7 @@ namespace GObject
                 }
                 DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
-            setBuffData(PLAYER_BUFF_ONLINE, 0);
+            setBuffData(PLAYER_BUFF_ONLINE, -1);
         }
     }
 

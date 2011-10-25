@@ -464,7 +464,7 @@ namespace GObject
         bool checkFormation(UInt16);
         bool checkFormation_ID(UInt16);
         void sendNationalDayOnlineAward();
-        void sendHalloweenOnlineAward(UInt32);
+        void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
 
 	public:
