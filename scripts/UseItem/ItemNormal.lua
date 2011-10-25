@@ -325,7 +325,7 @@ function ItemNormal_00000026(iid, num, bind, param)
   local package = player:GetPackage();
   player:setBuffData(2, 0, true)
   player:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(player, 1, 1800, num, 18000) then
+  if ItemNormal_AddBuff(player, 1, 3600, num, 86400) then
   	package:DelItemSendMsg(26, player);
 	return num;
   else
@@ -338,7 +338,7 @@ function ItemNormal_00000007(iid, num, bind, param)
   local package = player:GetPackage();
   player:setBuffData(1, 0, true)
   player:setBuffData(2, 0, true)
-  if ItemNormal_AddBuff(player, 3, 1800, num, 18000) then
+  if ItemNormal_AddBuff(player, 3, 3600, num, 86400) then
    	package:DelItemSendMsg(7, player);
 	return num;
   else

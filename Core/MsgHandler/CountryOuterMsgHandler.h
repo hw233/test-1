@@ -3242,6 +3242,11 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
                 GObject::heroIsland.listRank(player, start, pgsz);
             }
             break;
+        case 10:
+            {
+                GObject::heroIsland.playerLeave(player);
+            }
+            break;
         default:
             break;
     }
