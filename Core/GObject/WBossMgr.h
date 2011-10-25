@@ -3,6 +3,7 @@
 #define WBOSSMGR_H_
 
 #include "Config.h"
+#include "GData/NpcGroup.h"
 
 namespace GObject
 {
@@ -11,8 +12,15 @@ class Player;
 
 struct AttackInfo
 {
+    AttackInfo(UInt64 id, UInt32 score) : playerId(id), score(score) {}
     UInt64 playerId;
     UInt32 score;
+
+    const AttackInfo& operator += (const AttackInfo& atk)
+    {
+        score += atk.score;
+        return *this;
+    }
 };
 
 struct lt
@@ -23,12 +31,14 @@ struct lt
     }
 };
 
+typedef std::multiset<AttackInfo, lt> AtkInfoType;
+
 class WBoss
 {
 public:
     WBoss(UInt32 id, UInt8 cnt, UInt8 max, UInt16 loc, UInt8 lvl)
         : m_id(id), m_count(cnt), m_maxcnt(max), m_loc(loc),
-        m_lvl(lvl), m_disappered(false), m_final(false) {}
+        m_lvl(lvl), m_disappered(false), _percent(100), _ng(NULL), m_final(false) {}
     ~WBoss() {}
 
     inline void setFinal(bool f) { m_final = f; }
@@ -55,9 +65,11 @@ private:
     UInt8 m_lvl;
     bool m_disappered;
 
+    UInt8 _percent;
+    GData::NpcGroup* _ng;
     std::vector<UInt32> _hp;
     bool m_final;
-    std::multiset<AttackInfo, lt> m_atkinfo;
+    AtkInfoType m_atkinfo;
 };
 
 class WBossMgr

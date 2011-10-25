@@ -5,7 +5,6 @@
 #include "Server/SysMsg.h"
 #include "Fighter.h"
 #include "Map.h"
-#include "GData/NpcGroup.h"
 #include "MsgID.h"
 
 namespace GObject
@@ -36,18 +35,16 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         return false;
     }    
     pl->checkLastBattled();
+
     GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
     if(it == GData::npcGroups.end())
         return false;
 
-    GData::NpcGroup* ng = it->second;
-    if (!ng) return false;
-
-    Battle::BattleSimulator bsim(0, pl, ng->getName(), ng->getLevel(), false);
+    Battle::BattleSimulator bsim(0, pl, _ng->getName(), _ng->getLevel(), false);
     pl->PutFighters( bsim, 0 ); 
-    ng->putFighters( bsim );
+    _ng->putFighters( bsim );
 
-    std::vector<GData::NpcFData>& nflist = ng->getList();
+    std::vector<GData::NpcFData>& nflist = _ng->getList();
     size_t sz = nflist.size();
 
     if (final)
@@ -72,23 +69,18 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     if(res)
     {    
         ret = 0x0101;
-        if (final)
+        if (!final)
         {
+            pl->_lastNg = _ng;
+            pl->pendExp(_ng->getExp()*expfactor);
+            _ng->getLoots(pl, pl->_lastLoot, 1, NULL);
         }
-        else
-        {
-            pl->_lastNg = ng;
-            pl->pendExp(ng->getExp()*expfactor);
-            ng->getLoots(pl, pl->_lastLoot, 1, NULL);
-        }
-    }
-    else
-    {
     }
 
     Stream st(REP::ATTACK_NPC);
     st << ret << PLAYER_DATA(pl, lastExp) << static_cast<UInt8>(0);
     UInt8 size = pl->_lastLoot.size();
+    st << size;
     for (UInt8 i = 0; i < size; ++i)
     {
         st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
@@ -98,7 +90,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     pl->send(st);
     bsim.applyFighterHP(0, pl);
 
-    if (final)
+    if (sz && final)
     {
         UInt32 oldHP = _hp[0];
         for(size_t i = 0; i < sz; ++ i)
@@ -125,21 +117,42 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         if(oldHP > newHP)
         {
             UInt32 damage = oldHP - newHP;
-            UInt32 exp = damage;
-            pl->pendExp(exp, !res);
-        }
-        else
-            pl->pendExp(0, !res);
+            UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+            pl->pendExp(exp);
 
-        UInt32 newPercent = float(newHP * 100) / nflist[0].fighter->getMaxHP();
-        if (!newPercent)
-        {
-        }
-        else if (newPercent <= 5)
-        {
-        }
-        else if (newPercent <= 10)
-        {
+            AttackInfo info(pl->getId(), damage);
+            AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
+            for ( ; i != e; ++i)
+            {
+                if ((*i).playerId == pl->getId())
+                {
+                    info += *i;
+                    m_atkinfo.erase(i);
+                    break;
+                }
+            }
+            m_atkinfo.insert(info);
+
+            UInt8 newPercent = float(newHP * 100) / nflist[0].fighter->getMaxHP();
+            if (newPercent > 100)
+                newPercent = 100;
+            if (_percent < newPercent)
+                _percent = newPercent;
+            if (!newPercent)
+            {
+                SYSMSG_BROADCASTV(550, nflist[0].fighter->getId());
+                _percent = 0;
+            }
+            else if (newPercent <= 5)
+            {
+                SYSMSG_BROADCASTV(548, pl->getName().c_str(), newPercent);
+                _percent = newPercent;
+            }
+            else if (_percent - newPercent >= 10)
+            {
+                SYSMSG_BROADCASTV(548, pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
+                _percent = newPercent;
+            }
         }
     }
     else
@@ -172,6 +185,12 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
     if (!m_id)
         return false;
 
+    if (m_disappered)
+    {
+        SYSMSG_BROADCASTV(551);
+        return false;
+    }
+
     bool res = attackWorldBoss(pl, m_id, World::_wday==4?2:1, m_final);
     if (res && !m_final)
     {
@@ -193,15 +212,17 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 {
     if (!npcid) return;
 
-    Fighter* fgt = globalFighters[npcid];
-    if (!fgt) return;
+    GData::NpcGroups::iterator it = GData::npcGroups.find(npcid);
+    if(it == GData::npcGroups.end())
+        return;
 
-    GData::NpcGroup* ng = GData::npcGroups[npcid];
-    if (!ng) return;
+    _ng = it->second;
+    if (!_ng) return;
 
     _hp.clear();
-    std::vector<GData::NpcFData>& nflist = ng->getList();
+    std::vector<GData::NpcFData>& nflist = _ng->getList();
     size_t sz = nflist.size();
+    if (!sz) return;
     _hp.resize(sz);
     for(size_t i = 0; i < sz; ++ i)
     {
@@ -237,7 +258,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (m_count == 10)
         { SYSMSG_BROADCASTV(553, npcid); }
     if (!m_count)
-        { SYSMSG_BROADCASTV(554, fgt->getId(), m_loc, fgt->getId()); }
+        { SYSMSG_BROADCASTV(554, nflist[0].fighter->getId(), m_loc, nflist[0].fighter->getId()); }
 }
 
 void WBoss::disapper()
@@ -250,6 +271,8 @@ void WBoss::disapper()
     m_count = 0;
     m_disappered = true;
     m_final = false;
+    _percent = 100;
+    _ng = NULL;
     _hp.clear();
     m_atkinfo.clear();
     fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
@@ -303,14 +326,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+80*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+12*60+10,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -474,6 +497,10 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
     bool res = m_boss->attack(pl, loc, npcid);
     if (res && m_boss->isFinal())
     {
+        // TODO: 前三名奖励
+
+        // TODO: pl的额外奖励
+
         disapper(TimeUtil::Now());
     }
 }
