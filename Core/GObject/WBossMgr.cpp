@@ -6,6 +6,7 @@
 #include "Fighter.h"
 #include "Map.h"
 #include "MsgID.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -120,11 +121,11 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
             pl->pendExp(exp);
 
-            AttackInfo info(pl->getId(), damage);
+            AttackInfo info(pl, damage);
             AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
             for ( ; i != e; ++i)
             {
-                if ((*i).playerId == pl->getId())
+                if ((*i).player == pl)
                 {
                     info += *i;
                     m_atkinfo.erase(i);
@@ -142,10 +143,11 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             {
                 SYSMSG_BROADCASTV(550, nflist[0].fighter->getId());
                 _percent = 0;
+                reward(pl);
             }
             else if (newPercent <= 5)
             {
-                SYSMSG_BROADCASTV(548, pl->getName().c_str(), newPercent);
+                SYSMSG_BROADCASTV(548, pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                 _percent = newPercent;
             }
             else if (_percent - newPercent >= 10)
@@ -159,6 +161,57 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
 
     return res;
+}
+
+void WBoss::reward(Player* player)
+{
+    static UInt16 trumps[] = {90, 222, 221, 223, };
+
+    UInt8 j = 0;
+    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend() ; i != e; ++i)
+    {
+        if (j == 0)
+        {
+            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
+            (*i).player->GetPackage()->Add(equip, true);
+            (*i).player->GetPackage()->Add(514, 3, true);
+
+            UInt8 idx = _ng->getLevel();
+            if (idx < 40)
+                idx = 40;
+            if (idx > 100)
+                idx = 100;
+            idx -= 40;
+            idx /= 10;
+
+            if (idx > sizeof(trumps)/sizeof(UInt16))
+                continue;
+            (*i).player->GetPackage()->Add(trumps[idx], 1, true);
+            SYSMSG_BROADCASTV(557, j+1, (*i).player->getName().c_str(), equip, 514, 3, trumps[idx], 1);
+        }
+        if (j == 1)
+        {
+            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
+            (*i).player->GetPackage()->Add(equip, true);
+            (*i).player->GetPackage()->Add(514, 2, true);
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 2);
+        }
+        if (j == 2)
+        {
+            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
+            (*i).player->GetPackage()->Add(equip, true);
+            (*i).player->GetPackage()->Add(514, 1, true);
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 3);
+        }
+        ++j;
+    }
+
+    if (player)
+    {
+        player->GetPackage()->Add(56, 5, true);
+        player->getTael(10000);
+        SYSMSG_BROADCASTV(559, player->getName().c_str(), 56, 5);
+    }
 }
 
 bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
@@ -185,11 +238,17 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
     if (!m_id)
         return false;
 
+    if (!_ng)
+        return false;
+
     if (m_disappered)
     {
         SYSMSG_BROADCASTV(551);
         return false;
     }
+
+    if (!_percent)
+        return false;
 
     bool res = attackWorldBoss(pl, m_id, World::_wday==4?2:1, m_final);
     if (res && !m_final)
@@ -326,14 +385,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 13*60*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+10,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -497,10 +556,6 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
     bool res = m_boss->attack(pl, loc, npcid);
     if (res && m_boss->isFinal())
     {
-        // TODO: 前三名奖励
-
-        // TODO: pl的额外奖励
-
         disapper(TimeUtil::Now());
     }
 }

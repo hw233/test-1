@@ -12,8 +12,8 @@ class Player;
 
 struct AttackInfo
 {
-    AttackInfo(UInt64 id, UInt32 score) : playerId(id), score(score) {}
-    UInt64 playerId;
+    AttackInfo(Player* player, UInt32 score) : player(player), score(score) {}
+    Player* player;
     UInt32 score;
 
     const AttackInfo& operator += (const AttackInfo& atk)
@@ -56,6 +56,8 @@ public:
     inline UInt8 getLevel() const { return m_lvl; }
     inline void setLoc(UInt16 loc) { m_loc = loc; }
     inline UInt16 getLoc() const { return m_loc; }
+
+    void reward(Player* player);
 
 private:
     UInt32 m_id;
