@@ -55,7 +55,6 @@ private:
     UInt8 m_lvl;
     bool m_disappered;
 
-    UInt8 _hppercent;
     std::vector<UInt32> _hp;
     bool m_final;
     std::multiset<AttackInfo, lt> m_atkinfo;

@@ -112,15 +112,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             if(nHP == 0)
                 nHP = 0xFFFFFFFF;
             if(_hp[i] != 0xFFFFFFFF && _hp[i] != nHP)
-            {
-                if(i == 0 && nHP != 0xFFFFFFFF)
-                {
-                    UInt32 nPercent = (nHP - 1) * 10 / bfgt->getMaxHP();
-                    if(nPercent < 9 && nPercent != _hppercent)
-                        _hppercent = nPercent;
-                }
                 _hp[i] = nHP;
-            }
         }
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
 
@@ -138,11 +130,17 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         }
         else
             pl->pendExp(0, !res);
-        UInt32 newPercent = newHP * 10 / nflist[0].fighter->getMaxHP();
 
-        //if(newPercent <= 4 && oldHP * 10 / nflist[0].fighter->getMaxHP() > 4 && newHP != 0)
-        //    BroadCastTV(nflist[0].fighter->getMaxHP());
-
+        UInt32 newPercent = float(newHP * 100) / nflist[0].fighter->getMaxHP();
+        if (!newPercent)
+        {
+        }
+        else if (newPercent <= 5)
+        {
+        }
+        else if (newPercent <= 10)
+        {
+        }
     }
     else
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
@@ -248,9 +246,10 @@ void WBoss::disapper()
     if (!map) return;
     map->Hide(m_id);
     map->DelObject(m_id);
+
+    m_count = 0;
     m_disappered = true;
     m_final = false;
-    _hppercent = 0;
     _hp.clear();
     m_atkinfo.clear();
     fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
