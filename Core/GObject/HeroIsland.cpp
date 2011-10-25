@@ -1264,6 +1264,9 @@ void HeroIsland::playerEnter(Player* player)
     if (enter(player, player->getHIType(), player->getHISpot(), false))
     {
         st << static_cast<UInt8>(0);
+        st << now; 
+        st << _startTime;
+        st << _endTime;
         player->addFlag(Player::InHeroIsland);
     }
     else
@@ -1511,7 +1514,10 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                 if (v < awds->prob)
                 {
                     awards[j].id = awds->id;
-                    awards[j].num = awds->num;
+                    if (awds->id == 2)
+                        awards[j].num = awds->num * calcExp(player->GetLev());
+                    else
+                        awards[j].num = awds->num;
                     break;
                 }
             }
@@ -1523,10 +1529,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
         for (UInt8 i = 0; i < 5; ++i)
         {
             st << awards[i].id;
-            if (awards[id].id == 2)
-                st << static_cast<UInt32>(awards[id].num * calcExp(player->GetLev()));
-            else
-                st << awards[i].num;
+            st << awards[i].num;
         }
         st << Stream::eos;
         player->send(st);
