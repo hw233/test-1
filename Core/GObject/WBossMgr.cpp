@@ -201,7 +201,7 @@ void WBoss::reward(Player* player)
             UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
             (*i).player->GetPackage()->Add(equip, true);
             (*i).player->GetPackage()->Add(514, 1, true);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 3);
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 1);
         }
         ++j;
     }
@@ -385,14 +385,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 18*60*60+34*60+10,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
