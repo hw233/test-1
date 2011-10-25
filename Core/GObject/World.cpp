@@ -27,7 +27,7 @@
 #include "Script/BattleFormula.h"
 #include "SpecialAward.h"
 #include "PracticePlace.h"
-#include "WorldBoss.h"
+#include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
 
@@ -241,7 +241,7 @@ void World::World_Athletics_Check( void * )
 
 void World::World_Boss_Refresh(void*)
 {
-    worldBoss.refresh(TimeUtil::Now());
+    worldBoss.process(TimeUtil::Now());
 }
 
 bool World::Init()
