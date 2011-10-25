@@ -267,24 +267,18 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	MSG_QUERY_PLAYER(player);
 
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
-    GObject::LastAthAward la = {0};
-    bool notify = false;
     if(awd->itemId && awd->itemCount)
     {
-        la.itemId = awd->itemId;
-        la.itemCount = awd->itemCount;
-        notify = true;
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, true, FromAthletAward);
+        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
     }
     if(awd->prestige)
     {
-        la.prestige = awd->prestige;
-        notify = true;
-        player->getPrestige(awd->prestige, false);
+        player->getPrestige(awd->prestige);
     }
-
-    if(notify)
-        player->delayNotifyAthleticsAward(&la);
+    if(awd->tael)
+    {
+        player->getTael(awd->tael);
+    }
 
 	if(awd->side == 0)
 		player->GetAthletics()->defendergainsource(awd->other, awd->athleticsid, awd->type, awd->count);

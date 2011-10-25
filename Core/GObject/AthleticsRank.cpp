@@ -158,7 +158,8 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 		data->ranker = player;
 		data->challengenum = 0;
 		data->challengetime = 0;
-        //data->prestige = 0;
+        data->prestige = 0;
+        data->tael = 0;
 		data->winstreak = 0;
         data->bewinstreak = 0;
         data->failstreak = 0;
@@ -170,7 +171,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 		_ranks[row][player] = rank;
 		data->maxrank = _athleticses[row].size();
 		BuildNewBox(rank);
-        DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, 0, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
+        DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, 0, 0, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge);
 		GameMsgHdr hdr(0x216, player->getThreadId(), player, 0);
 		GLOBAL().PushMsg(hdr, NULL);
 	}
@@ -339,6 +340,13 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
     if(type == 0)
         type = 0xFFFF;
 
+    if(type & 0x10)
+    {
+        GameMsgHdr hdr(0x232, player->getThreadId(), player, 0);
+        GLOBAL().PushMsg(hdr, NULL);
+        //requestAthleticsEvent(st, player);
+    }
+
 	UInt8 row = getRankRow(player->GetLev());
 	if (row == 0xFF)
 		return ;
@@ -382,7 +390,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
             rank3num = ranksize;
 	}
 	Stream st(REP::ARENA_IFNO);
-    st << static_cast<UInt16>(type & 0xF7);
+    st << static_cast<UInt16>(type & 0xE7);
 	//UInt32 now = TimeUtil::Now();
 	//UInt32 endTime = (*rank)->challengetime + ATHLETICS_BUFF_TIME;
 	//
@@ -394,7 +402,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	(*rank)->challengenum = updateChallengeNum((*rank)->challengenum, (*rank)->challengetime);
     if(type & 0x01)
     {
-        st << static_cast<UInt32>(getRankPos(row, rank)) << (*rank)->maxrank << (*rank)->challengenum << (*rank)->winstreak << static_cast<UInt16>(player->getBuffLeft(PLAYER_BUFF_ATHLETICS)) << player->getPrestige();
+        st << static_cast<UInt32>(getRankPos(row, rank)) << (*rank)->maxrank << (*rank)->challengenum << (*rank)->winstreak << static_cast<UInt16>(player->getBuffLeft(PLAYER_BUFF_ATHLETICS)) << (*rank)->prestige << (*rank)->tael;
     }
 
     if(type & 0x02)
@@ -428,13 +436,6 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
     {
         GameMsgHdr hdr(0x221, player->getThreadId(), player, 0);
         GLOBAL().PushMsg(hdr, NULL);
-    }
-
-    if(type & 0x10)
-    {
-        GameMsgHdr hdr(0x232, player->getThreadId(), player, 0);
-        GLOBAL().PushMsg(hdr, NULL);
-        //requestAthleticsEvent(st, player);
     }
 
 	st << Stream::eos;
@@ -508,7 +509,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	if (defer == NULL || atker == defer)
 		return ;
 	UInt8 row = getRankRow(defer->GetLev());
-	if (row != 0xFF)
+	if (row == 0xFF)
 		return ;
 	if (row != getRankRow(atker->GetLev()))
 	{
@@ -570,7 +571,8 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
         gSpecialAward.newServerActivity(atker, data->challengenum);
 #endif
 
-        updateAthleticsRank(data);
+        //updateAthleticsRank(data);
+        data->challengetime = TimeUtil::Now();
 
         UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
         if(Viplvl >= 1 && Viplvl <= 3)
@@ -615,6 +617,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
 
     data->challengenum ++;
 
+    data->challengetime = TimeUtil::Now();
+
     UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
     if(Viplvl >= 1 && Viplvl <= 3)
         challengeBuff=data->challengetime + 10 * 60;
@@ -630,7 +634,34 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
 //	DBLOG().PushUpdateData("insert into `athletics_challenge`(`server_id`, `row`, `attacker_rank`, `defender_rank`, `created_at`) values(%u, %u, %u, %u, %u)", cfg.serverLogId, row, atkerRankPos, deferRankPos, TimeUtil::Now());
 }
 
+void AthleticsRank::notifyAthMartialOver(Player* pl, UInt8 cancel)
+{
+    if(!pl)
+        return;
+    pl->delGlobalFlag(Player::Challenging);
 
+	UInt8 row = getRankRow(pl->GetLev());
+	RankList::iterator plRank = _ranks[row].find(pl);
+	if (plRank == _ranks[row].end())
+		return ;
+
+    AthleticsRankData * data = *(plRank->second);
+    if(!data)
+        return;
+
+    if(cancel)
+    {
+        -- data->challengenum;
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, pl->getId());
+    }
+    else
+    {
+        Stream st(REP::FIGHT_INFO_CHANGE);
+        st << static_cast<UInt16>(0x01);
+        st << Stream::eos;
+        pl->send(st);
+    }
+}
 
 void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 id, bool win)
 {
@@ -764,8 +795,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
         deferdata->ranker->send(st);
     }
 
-	AthleticsAward atkerAthleticsAward = { id, type, static_cast<UInt8>(1 + newRank), win, 0, atkerAward, deferdata->ranker, 0, 0 };
-	AthleticsAward deferAthleticsAward = { id, type, 0, !win, 0, atkerAward, atker, 0, 0 };
+	AthleticsAward atkerAthleticsAward = { id, type, static_cast<UInt8>(1 + newRank), win, 0, 0, atkerAward, deferdata->ranker, 0, 0 };
+	AthleticsAward deferAthleticsAward = { id, type, 0, !win, 0, 0, atkerAward, atker, 0, 0 };
 
 	GameMsgHdr hdr1(0x217, atker->getThreadId(), atker, sizeof(AthleticsAward));
 	GLOBAL().PushMsg(hdr1, &atkerAthleticsAward);
@@ -1754,7 +1785,7 @@ UInt32 AthleticsRank::RunAthleticsEvent(UInt8 row, Rank atkRank, Rank defRank, U
 
     if( cond != 0 )
     {
-        AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, itemId, itemCount };
+        AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, 0, itemId, itemCount };
 
         GameMsgHdr hdr2(0x217, player1->getThreadId(), player1, sizeof(AthleticsAward));
         GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
@@ -1874,6 +1905,21 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     }
 }
 
+void AthleticsRank::giveAward( Player* pl )
+{
+	RankList::iterator found = _ranks[1].find(pl);
+	if (found == _ranks[1].end())
+		return;
+
+    AthleticsRankData* rankData = *found->second;
+    if(rankData->prestige == 0 && rankData->tael == 0)
+        return;
+
+    AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, rankData->prestige, rankData->tael, 0, 0, 0, 0};
+
+    GameMsgHdr hdr2(0x217, pl->getThreadId(), pl, sizeof(AthleticsAward));
+    GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
+}
 
 }
 

@@ -596,7 +596,6 @@ struct AthleticsRefreshMartialReq
 	MESSAGE_DEF(REQ::ATHLETICS_REFRESH_MARTIAL);
 };
 
-
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;

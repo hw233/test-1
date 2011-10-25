@@ -451,58 +451,74 @@ void Athletics::updateMartial(const MartialData* md)
 
     _martial[md->idx] = md->defer;
     if(_martial_battle[md->idx] != NULL)
-        delete _martial_battle;
+        delete _martial_battle[md->idx];
     _martial_battle[md->idx] = md->bs;
+    listAthleticsMartial();
 }
 
 void Athletics::attackMartial(Player* defer)
 {
-    UInt8 idx = 0xFF;
-    for(UInt8 i = 0; i < 3; ++i)
+    UInt8 cancel = 1;
+    do
     {
-        if(_martial[i] == defer)
+        UInt8 idx = 0xFF;
+        for(UInt8 i = 0; i < 3; ++i)
         {
-            idx = i;
+            if(_martial[i] == defer)
+            {
+                idx = i;
+                break;
+            }
+        }
+
+        if(idx > 2)
             break;
-        }
-    }
 
-    if(idx > 2)
-        return;
+        if(!_martial_battle[idx])
+            break;
 
-    if(!_martial_battle[idx])
-        return;
+        cancel = 0;
+        bool res;
+        UInt32 reptid;
+        Battle::BattleSimulator& bsim = *(_martial_battle[idx]);
+        _owner->PutFighters( bsim, 0, true );
+        bsim.start();
+        res = bsim.getWinner() == 1;
+        reptid = bsim.getId();
 
-    bool res;
-    UInt32 reptid;
-    Battle::BattleSimulator& bsim = *(_martial_battle[idx]);
-	_owner->PutFighters( bsim, 0, true );
-    bsim.start();
-    res = bsim.getWinner() == 1;
-    reptid = bsim.getId();
+        Stream st(REP::ATTACK_NPC);
+        st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+        _owner->send(st);
 
-    Stream st(REP::ATTACK_NPC);
-    st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
-    _owner->send(st);
-
-    if(res)
-    {
-        UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
-        if(wins >= 3)
+        GObject::LastAthAward la = {0};
+        if(res)
         {
-            _owner->getCoupon(20);
-            wins = 0;
+            UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
+            if(wins >= 5)
+            {
+                _owner->GetPackage()->AddItem(6, 1, 1, true, FromAthletAward);
+                la.itemId = 6;
+                la.itemCount = 1;
+                wins = 0;
+            }
+            la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
+            _owner->getPrestige(la.prestige, false);
+            _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
+            delete _martial_battle[idx];
+            _martial_battle[idx] = NULL;
+            listAthleticsMartial();
         }
-        _owner->getPrestige(10);
-        _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
-        delete _martial_battle[idx];
-        _martial_battle[idx] = NULL;
-        listAthleticsMartial();
-    }
-    else
-    {
-        _owner->getPrestige(5);
-    }
+        else
+        {
+            la.prestige = 5 * (World::_wday == 3 ? 2 : 1);
+            _owner->getPrestige(la.prestige, false);
+        }
+
+        _owner->delayNotifyAthleticsAward(&la);
+    }while(false);
+
+    GameMsgHdr hdr2(0x1F2, WORKER_THREAD_WORLD, _owner, 1);
+    GLOBAL().PushMsg(hdr2, &cancel);
 }
 
 void Athletics::updateMartialHdr(const MartialHeader* mh)
@@ -559,7 +575,7 @@ void Athletics::listAthleticsMartial()
     st << static_cast<UInt16>(0x10);
 
     UInt8 needRefresh = true;
-    UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
+    UInt8 wins =  5 - _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
 	st << wins << static_cast<UInt8>(3);
 	for (UInt8 i = 0; i < 3; ++i)
 	{
@@ -570,13 +586,13 @@ void Athletics::listAthleticsMartial()
                 needRefresh = false;
 
             if(pl == NULL)
-                st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+                st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
             else
-                st << pl->getName() << pl->getCountry() << static_cast<UInt8>(_martial_battle[i] == NULL ? 0 : 1);
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << static_cast<UInt8>(_martial_battle[i] == NULL ? 0 : 1);
         }
         else
         {
-            st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+            st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
         }
 	}
 

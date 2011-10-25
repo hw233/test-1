@@ -222,6 +222,11 @@ struct AthleticsListReq
 	MESSAGE_DEF1(REQ::ARENA_INFO, UInt16, _type);
 };
 
+struct AthleticsGetAwardReq
+{
+    MESSAGE_DEF(REQ::ATHLETICS_GET_AWARD);
+};
+
 #if 0
 struct AthleticsChallengeReq
 {
@@ -1197,18 +1202,20 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
 
     switch(type)
     {
+#if 0
     case 0:
     case 1:
         GObject::gAthleticsRank.challenge(player, type);
         break;
-    case 2:
+#endif
+    case 1:
         {
             std::string name;
             brd >> name;
             GObject::gAthleticsRank.challenge(player, name);
         }
         break;
-    case 3:
+    case 2:
         {
             std::string name;
             brd >> name;
@@ -1217,6 +1224,13 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
         break;
     }
 }
+
+void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::gAthleticsRank.giveAward(player);
+}
+
 
 struct GetBoxReq
 {

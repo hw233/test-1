@@ -245,6 +245,8 @@ namespace REQ
     const UInt8 ATHLETICS_CHALLENGE = 0xC6;//0xF8;// 0xD2
     /**刷新历练*/
     const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
+    /**斗剑领取奖励*/
+    const UInt8 ATHLETICS_GET_AWARD = 0xC8;
     /**???*/
     const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/

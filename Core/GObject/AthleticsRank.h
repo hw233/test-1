@@ -82,6 +82,7 @@ struct AthleticsAward
 	UInt8 side;
 	bool win;
     UInt32 prestige;
+    UInt32 tael;
 	UInt32 count;
 	Player *other;
     UInt32 itemId;
@@ -174,6 +175,11 @@ public:
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
     void updateAthleticsMartial(Player* pl);
+
+    void giveAward(Player* pl);
+
+    void notifyAthMartialOver(Player* pl, UInt8 cancel);
+
 public:
 	void TmExtraAward();
 

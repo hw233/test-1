@@ -94,6 +94,13 @@ void OnAthleticsOver( GameMsgHdr& hdr, const void * data )
 	GObject::gAthleticsRank.notifyAthletcisOver(ar->side == 0 ? player : ar->defer, ar->side == 0 ? ar->defer : player, ar->id, ar->result);
 }
 
+void OnAthMartialOver( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	UInt8 cancel = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+	GObject::gAthleticsRank.notifyAthMartialOver(player, cancel);
+}
+
 void OnAthleticsEnter( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
