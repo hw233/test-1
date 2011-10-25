@@ -31,7 +31,7 @@ struct Awards
 
 struct Skill
 {
-    Skill() : last(0), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
+    Skill() : last(2*60), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
     void reset()
     {
         last = 2*60;
