@@ -10,6 +10,8 @@
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
 #include "Mail.h"
+#include "Script/GameActionLua.h"
+#include "Country.h"
 
 namespace GObject
 {
@@ -294,6 +296,9 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     pl->send(st);
                 }
 
+                if (World::_halloween)
+                    GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot);
+
                 tcd.floor = 0;
                 tcd.spot = 0;
                 DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
@@ -310,7 +315,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                         {
                             pl->setCopyFailed();
                             autoClear(pl, complete, id, tcd.floor, tcd.spot);
-                            st << static_cast<UInt8>(5);
+                            st << static_cast<UInt8>(6); // 5???
                         }
                         else
                         {

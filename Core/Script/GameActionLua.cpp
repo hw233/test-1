@@ -796,6 +796,16 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
+	void GameActionLua::onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot )
+	{
+		Call<void>("onCopyWin", player, id, floor, spot);
+	}
+
+	void GameActionLua::onFrontMapWin( Player* player, UInt8 id, UInt8 spot )
+	{
+		Call<void>("onFrontMapWin", player, id, spot);
+    }
+
 	bool GameActionLua::onOnlineAward(Player* player, UInt32 itemId, UInt8 count)
 	{
 		return Call<bool>("onOnlineAward", player, itemId, count);
