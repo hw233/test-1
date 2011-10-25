@@ -688,11 +688,10 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
     if (start > sz)
         start = 0;
 
-    if (sz)
-        st << static_cast<UInt16>(sz-1);
-    else
-        st << static_cast<UInt16>(sz);
+    size_t off = st.size();
+    st << static_cast<UInt16>(0);
 
+    UInt16 count = 0;
     UInt8 l1 = pd->player->GetLev();
     for (size_t i = start; i < sz; ++i)
     {
@@ -710,8 +709,10 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
             st << pd1->player->allHpP();
             st << pd1->player->GetLev();
             st << pd1->player->getName();
+            ++count;
         }
     }
+    st.data<UInt16>(off) = count;
     st << Stream::eos;
     pd->player->send(st);
 }
