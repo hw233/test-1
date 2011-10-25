@@ -1244,9 +1244,15 @@ void HeroIsland::playerEnter(Player* player)
         return;
     }
 
-    if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
+    UInt32 now = TimeUtil::Now();
+    UInt32 left = player->getBuffData(PLAYER_BUFF_HIESCAPE);
+    if (left > now)
+        left -= now;
+    else
+        left = 0;
+    if (left)
     {
-        player->sendMsgCode(0, 2007);
+        player->sendMsgCode(0, 2007, left);
         return;
     }
 
