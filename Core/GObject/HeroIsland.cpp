@@ -226,7 +226,6 @@ void HeroIsland::broadcastTV(UInt32 now)
                 return;
             SYSMSG_BROADCASTV(2118);
             _prepareStep = 5;
-            reset();
             break;
 
         default:
@@ -630,11 +629,6 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     if (!pd) return false;
     pd->player = player;
     pd->expcd = TimeUtil::Now() + 60;
-
-    pd->skills[1].last = 2*60;
-    pd->skills[2].last = 2*60;
-    pd->skills[3].last = 2*60;
-    pd->skills[4].last = 2*60;
 
     return enter(pd, type, spot, movecd);
 }

@@ -34,7 +34,7 @@ struct Skill
     Skill() : last(0), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
     void reset()
     {
-        last = 0;
+        last = 2*60;
         lastcd = 0;
         bufid = 0;
         cd = 0;
@@ -76,6 +76,13 @@ struct HIPlayerData
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
+#if 0
+        pd->skills[1].last = 2*60;
+        pd->skills[2].last = 2*60;
+        pd->skills[3].last = 2*60;
+        pd->skills[4].last = 2*60;
+#endif
+
         if (player)
         {
             if (player->getBuffData(PLAYER_BUFF_HIFIGHT))
