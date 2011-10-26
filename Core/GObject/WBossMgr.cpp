@@ -23,6 +23,7 @@ static UInt32 worldboss[] = {
     5466, 5467, 5468, 5469, 5509,
     5162, 5473, 5474, 5475, 5510,
     5103, 5470, 5471, 5472, 5511,
+    5168, 5476, 5477, 5478, 5512,
 };
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
@@ -121,6 +122,15 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
             pl->pendExp(exp);
 
+            {
+                Stream st(REP::DAILY_DATA);
+                st << static_cast<UInt8>(6);
+                st << static_cast<UInt8>(2);
+                st << damage;
+                st << Stream::eos;
+                NETWORK()->Broadcast(st);
+            }
+
             AttackInfo info(pl, damage);
             AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
             for ( ; i != e; ++i)
@@ -154,6 +164,15 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             {
                 SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                 _percent = newPercent;
+            }
+
+            {
+                Stream st(REP::DAILY_DATA);
+                st << static_cast<UInt8>(6);
+                st << static_cast<UInt8>(1);
+                st << _hp[0];
+                st << Stream::eos;
+                NETWORK()->Broadcast(st);
             }
         }
     }
@@ -214,7 +233,7 @@ void WBoss::reward(Player* player)
             UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
             (*i).player->GetPackage()->Add(equip, true);
             (*i).player->GetPackage()->Add(514, 1, true);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 1);
+            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 1);
 
             if (idx >= 3)
                 break;
@@ -226,8 +245,8 @@ void WBoss::reward(Player* player)
     if (player)
     {
         player->GetPackage()->Add(56, 5, true);
-        player->getTael(10000);
-        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5);
+        player->getTael(20000);
+        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 20000);
     }
 }
 
@@ -239,8 +258,6 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
         if (worldboss[i+(m_lvl-1)*5] == id)
         {
             in = true;
-            if (i == 4)
-                m_final = true;
             break;
         }
     }
@@ -278,6 +295,8 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
             UInt32 id = 0;
             if (idx < sizeof(worldboss)/sizeof(UInt32))
                 id = worldboss[idx];
+            if (idx == 4)
+                m_final = true;
             appear(id, m_id);
         }
     }
@@ -339,6 +358,21 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         { SYSMSG_BROADCASTV(553, npcid); }
     if (!m_count)
         { SYSMSG_BROADCASTV(554, nflist[0].fighter->getId(), m_loc, nflist[0].fighter->getId()); }
+
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    if (m_final)
+    {
+        st << static_cast<UInt8>(0);
+        st << _hp[0];
+    }
+    else
+    {
+        st << static_cast<UInt8>(3);
+        st << static_cast<UInt32>(m_count);
+    }
+    st << Stream::eos;
+    NETWORK()->Broadcast(st);
 }
 
 void WBoss::disapper()
@@ -406,14 +440,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+21*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+18*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+15*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+12*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+9*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+6*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+3*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+10,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+21*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+18*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+15*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+12*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+9*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+6*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+3*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -426,11 +460,11 @@ void WBossMgr::calcNext(UInt32 now)
             return;
         }
 
-        if (i <= WBOSS_NUM && now >= appears[i] && m_maxlvl >= (40+(WBOSS_NUM-i)*10))
+        if (i <= WBOSS_NUM && now >= appears[i])
         {
             if (m_boss && m_boss->isDisappered())
             {
-                if (i == 1)
+                if (i == 1 || m_maxlvl < (40+(WBOSS_NUM-i)*10))
                 {
                     nextDay(now);
                     return;
@@ -452,6 +486,12 @@ void WBossMgr::calcNext(UInt32 now)
             }
             else
             {
+                if (m_maxlvl < (40+(WBOSS_NUM-i)*10))
+                {
+                    nextDay(now);
+                    return;
+                }
+
                 _prepareTime = appears[i];
                 m_level = WBOSS_NUM - i + 1;
             }
@@ -505,7 +545,7 @@ void WBossMgr::broadcastTV(UInt32 now)
         _prepareStep = 1; 
 
     switch (_prepareStep)
-    {    
+    {
         case 1:
             SYSMSG_BROADCASTV(547, 15); 
             fprintf(stderr, "15 mins\n");

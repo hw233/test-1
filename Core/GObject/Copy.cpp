@@ -23,7 +23,7 @@ void PlayerCopy::setCopyActiveCount(UInt8 c)
     _activeCount = c;
 }
 
-inline void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0, UInt8 spot = 0)
+void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 floor = 0, UInt8 spot = 0)
 {
     if (!pl)
         return;
