@@ -147,12 +147,12 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             }
             else if (newPercent <= 5)
             {
-                SYSMSG_BROADCASTV(548, pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
+                SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                 _percent = newPercent;
             }
             else if (_percent - newPercent >= 10)
             {
-                SYSMSG_BROADCASTV(548, pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
+                SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                 _percent = newPercent;
             }
         }
@@ -204,6 +204,9 @@ void WBoss::reward(Player* player)
             SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 1);
         }
         ++j;
+
+        if (j >= 3)
+            break;
     }
 
     if (player)
@@ -256,7 +259,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
         ++m_count;
         if (m_count <= m_maxcnt)
         {
-            SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, m_id);
+            SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, m_count, m_id);
             UInt8 idx = (m_lvl-1)*5 + (m_count-1)/3 + 1;
             UInt32 id = 0;
             if (idx < sizeof(worldboss)/sizeof(UInt32))
@@ -385,14 +388,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 19*60*60+26*60+10,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
