@@ -38,7 +38,8 @@ class WBoss
 public:
     WBoss(UInt32 id, UInt8 cnt, UInt8 max, UInt16 loc, UInt8 lvl)
         : m_id(id), m_count(cnt), m_maxcnt(max), m_loc(loc),
-        m_lvl(lvl), m_disappered(false), _percent(100), _ng(NULL), m_final(false) {}
+        m_lvl(lvl), m_disappered(false),
+        _percent(100), _ng(NULL), m_final(false) {}
     ~WBoss() {}
 
     inline void setFinal(bool f) { m_final = f; }

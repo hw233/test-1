@@ -145,7 +145,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 _percent = 0;
                 reward(pl);
             }
-            else if (newPercent <= 5)
+            else if (newPercent <= 5 && _percent - newPercent >= 5)
             {
                 SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                 _percent = newPercent;
@@ -167,7 +167,9 @@ void WBoss::reward(Player* player)
 {
     static UInt16 trumps[] = {90, 222, 221, 223, };
 
-    UInt8 j = 0;
+    size_t sz = m_atkinfo.size();
+    UInt32 idx = uRand(sz);
+    UInt32 j = 0;
     for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend() ; i != e; ++i)
     {
         if (j == 0)
@@ -187,33 +189,45 @@ void WBoss::reward(Player* player)
             if (idx > sizeof(trumps)/sizeof(UInt16))
                 continue;
             (*i).player->GetPackage()->Add(trumps[idx], 1, true);
-            SYSMSG_BROADCASTV(557, j+1, (*i).player->getName().c_str(), equip, 514, 3, trumps[idx], 1);
+            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 3, trumps[idx], 1);
         }
         if (j == 1)
         {
             UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
             (*i).player->GetPackage()->Add(equip, true);
             (*i).player->GetPackage()->Add(514, 2, true);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 2);
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 2);
         }
         if (j == 2)
         {
             UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
             (*i).player->GetPackage()->Add(equip, true);
             (*i).player->GetPackage()->Add(514, 1, true);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getName().c_str(), equip, 514, 1);
-        }
-        ++j;
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 1);
 
-        if (j >= 3)
-            break;
+            if (idx <= j)
+                break;
+        }
+
+        if (j == idx)
+        {
+            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
+            (*i).player->GetPackage()->Add(equip, true);
+            (*i).player->GetPackage()->Add(514, 1, true);
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 1);
+
+            if (idx >= 3)
+                break;
+        }
+
+        ++j;
     }
 
     if (player)
     {
         player->GetPackage()->Add(56, 5, true);
         player->getTael(10000);
-        SYSMSG_BROADCASTV(559, player->getName().c_str(), 56, 5);
+        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5);
     }
 }
 
@@ -392,14 +406,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+15*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+5*60,
-        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+10,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+21*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+18*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+15*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+12*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+9*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+6*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+3*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+24*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -423,8 +437,17 @@ void WBossMgr::calcNext(UInt32 now)
                 }
                 else
                 {
-                    _prepareTime = appears[i-1];
-                    m_level = WBOSS_NUM - i + 2;
+                    m_level = WBOSS_NUM - i + 1;
+                    if (m_level != m_boss->getLevel())
+                    {
+                        _prepareTime = appears[i];
+                        m_level = WBOSS_NUM - i + 1;
+                    }
+                    else
+                    {
+                        _prepareTime = appears[i-1];
+                        m_level = WBOSS_NUM - i + 2;
+                    }
                 }
             }
             else
