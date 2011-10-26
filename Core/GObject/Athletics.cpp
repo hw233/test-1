@@ -498,7 +498,7 @@ void Athletics::attackMartial(Player* defer)
             AthleticsBeData abd = { _owner, _owner->getFormation(), static_cast<UInt16>(_owner->getMainFighter() != NULL ? _owner->getMainFighter()->getId() : 0) };
             for(int i = 0; i < 5; ++ i)
                 abd.lineup[i] = _owner->getLineup(i);
-            GameMsgHdr hdr(0x235, tid, defer, sizeof(AthleticsBeData));
+            GameMsgHdr hdr(0x234, tid, defer, sizeof(AthleticsBeData));
             GLOBAL().PushMsg(hdr, &abd);
 
             return;
