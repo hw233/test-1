@@ -542,7 +542,7 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
             GObject::LevelPlayers& lvPlayer = it->second;
             UInt32 nSize = lvPlayer.size();
             if(nSize != 0)
-                lvPlayer.erase(player->getId());
+                lvPlayer.erase(player->getLvPos());
         }
     }
     if(lvc->newLv > 29)
