@@ -1125,6 +1125,8 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
                 pd->skills[0].attr = NULL;
                 pd->player->regenAll(true);
                 pd->player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
+                pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
+                pd->player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
                 SYSMSG_SEND(2134, pd->player);
                 st << cd;
             }
@@ -1138,6 +1140,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
                 pd->skills[1].bufid = PLAYER_BUFF_HIPG;
                 pd->skills[1].attr = &_skillattr[1];
                 pd->player->setBuffData(pd->skills[1].bufid, pd->skills[1].lastcd);
+                pd->player->addHIAttr(*pd->skills[1].attr);
                 SYSMSG_SEND(2130, pd->player);
                 st << cd;
             }
@@ -1151,6 +1154,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
                 pd->skills[2].bufid = PLAYER_BUFF_HIBT;
                 pd->skills[2].attr = &_skillattr[2];
                 pd->player->setBuffData(pd->skills[2].bufid, pd->skills[2].lastcd);
+                pd->player->addHIAttr(*pd->skills[2].attr);
                 SYSMSG_SEND(2131, pd->player);
                 st << cd;
             }
@@ -1164,6 +1168,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
                 pd->skills[3].bufid = PLAYER_BUFF_HILN;
                 pd->skills[3].attr = &_skillattr[3];
                 pd->player->setBuffData(pd->skills[3].bufid, pd->skills[3].lastcd);
+                pd->player->addHIAttr(*pd->skills[3].attr);
                 SYSMSG_SEND(2132, pd->player);
                 st << cd;
             }
