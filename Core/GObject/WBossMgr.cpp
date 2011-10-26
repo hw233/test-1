@@ -267,6 +267,10 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
             appear(id, m_id);
         }
     }
+    else if (res && m_final)
+    {
+        disapper();
+    }
     return res;
 }
 
@@ -377,7 +381,7 @@ void WBossMgr::nextDay(UInt32 now)
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
-#if 1
+#if 0
         TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
         TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60,
@@ -388,14 +392,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+9*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+6*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+3*60,
-        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+10,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+15*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+5*60,
+        TimeUtil::SharpDayT(0,now) + 14*60*60+24*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -556,11 +560,7 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
         return;
     if (!m_boss)
         return;
-    bool res = m_boss->attack(pl, loc, npcid);
-    if (res && m_boss->isFinal())
-    {
-        disapper(TimeUtil::Now());
-    }
+    m_boss->attack(pl, loc, npcid);
 }
 
 void WBossMgr::disapper(UInt32 now)
