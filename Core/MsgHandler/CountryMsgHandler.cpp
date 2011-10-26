@@ -213,5 +213,7 @@ MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
 MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
 MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
+MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
+MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
 MSG_HANDLER_END()

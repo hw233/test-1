@@ -1164,4 +1164,31 @@ void OnAthleticsMartialAttack( GameMsgHdr& hdr, const void* data )
 	player->GetAthletics()->attackMartial(defer);
 }
 
+void OnAthleticsMartialBeAttack( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct AthleticsBeData
+	{
+		Player * attacker;
+		UInt8 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	AthleticsBeData * abd = reinterpret_cast<AthleticsBeData *>(const_cast<void *>(data));
+	player->GetAthletics()->beAttackMartial(abd->attacker, abd->formation, abd->portrait, abd->lineup);
+}
+
+void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct AthleticsResNotify
+    {
+        GObject::Player * peer;
+        bool win;
+    };
+    AthleticsResNotify * notify = reinterpret_cast<AthleticsResNotify *>(const_cast<void *>(data));
+
+    player->GetAthletics()->awardMartial(notify->peer, notify->win);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_

@@ -629,37 +629,37 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
     DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
 
 	atker->addGlobalFlag(Player::Challenging);
+	defer->addGlobalFlag(Player::BeChallenging);
 	GameMsgHdr hdr(0x233, atker->getThreadId(), atker, sizeof(Player *));
 	GLOBAL().PushMsg(hdr, &defer);
 //	DBLOG().PushUpdateData("insert into `athletics_challenge`(`server_id`, `row`, `attacker_rank`, `defender_rank`, `created_at`) values(%u, %u, %u, %u, %u)", cfg.serverLogId, row, atkerRankPos, deferRankPos, TimeUtil::Now());
 }
 
-void AthleticsRank::notifyAthMartialOver(Player* pl, UInt8 cancel)
+void AthleticsRank::notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res)
 {
-    if(!pl)
-        return;
-    pl->delGlobalFlag(Player::Challenging);
+    atker->delGlobalFlag(Player::Challenging);
+	defer->delGlobalFlag(Player::BeChallenging);
 
-	UInt8 row = getRankRow(pl->GetLev());
-	RankList::iterator plRank = _ranks[row].find(pl);
-	if (plRank == _ranks[row].end())
+	UInt8 row = getRankRow(atker->GetLev());
+	RankList::iterator atkerRank = _ranks[row].find(atker);
+	if (atkerRank == _ranks[row].end())
 		return ;
 
-    AthleticsRankData * data = *(plRank->second);
+    AthleticsRankData * data = *(atkerRank->second);
     if(!data)
         return;
 
-    if(cancel)
+    if(res == 2)
     {
         -- data->challengenum;
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, pl->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, atker->getId());
     }
     else
     {
         Stream st(REP::FIGHT_INFO_CHANGE);
-        st << static_cast<UInt16>(0x01);
+        st << static_cast<UInt16>(0x09);
         st << Stream::eos;
-        pl->send(st);
+        atker->send(st);
     }
 }
 
@@ -1898,8 +1898,8 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             mh.owner = pl;
             mh.md.idx = i;
             mh.md.defer = defer;
-            mh.md.bs = NULL;
-            GameMsgHdr hdr2(0x330, defer->getThreadId(), defer, sizeof(MartialHeader));
+            mh.md.canAttack = 0;
+            GameMsgHdr hdr2(0x330, pl->getThreadId(), pl, sizeof(MartialHeader));
             GLOBAL().PushMsg(hdr2, &mh);
         }
     }
