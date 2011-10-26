@@ -1924,6 +1924,14 @@ void AthleticsRank::giveAward( Player* pl )
     rankData->tael = 0;
 
     DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u, `tael` = %u WHERE `ranker` = %"I64_FMT"u", rankData->prestige, rankData->tael, rankData->ranker->getId());
+
+    {
+        Stream st(REP::FIGHT_INFO_CHANGE);
+        st << static_cast<UInt16>(0x01);
+        st << Stream::eos;
+        pl->send(st);
+    }
+
 }
 
 }
