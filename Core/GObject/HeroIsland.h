@@ -141,7 +141,8 @@ typedef std::multiset<HIPlayerData*, lt_score> SortType;
 class HeroIsland
 {
 public:
-    HeroIsland() : _running(false), _prepareStep(0), _prepareTime(0), _startTime(0), _endTime(0), _count(0)
+    HeroIsland() : _running(false), _notifyTime(0), _prepareStep(0),
+    _prepareTime(0), _startTime(0), _endTime(0), _count(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
         initSkillAttr();
@@ -203,6 +204,7 @@ public:
     void broadcast(HIPlayerData* pd, UInt8 spot, UInt8 type);
     void broadcast(Stream& st, UInt8 spot, Player* = NULL);
     void broadcast(Stream& st);
+    void notifyCount(UInt32 now);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
 
@@ -216,6 +218,7 @@ public:
 
 private:
     bool _running;
+    UInt32 _notifyTime;
     UInt8 _prepareStep;
     UInt32 _prepareTime;
     UInt32 _startTime;

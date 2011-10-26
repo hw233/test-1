@@ -56,9 +56,11 @@ bool DBWorker::Init()
 	case 1:
 		{
 			m_DBExecutor.reset(gLogDBConnectionMgr->GetExecutor());
+#if 0
 			UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 			if(sday < now) sday += 86400;
 			AddTimer(86400 * 1000, CalcUserLost, this, (sday - now) * 1000);
+#endif
 		}
 		break;
 	}

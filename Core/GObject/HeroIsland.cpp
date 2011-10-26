@@ -360,8 +360,34 @@ void HeroIsland::process(UInt32 now)
     if (_running && now >= _endTime)
         end();
 
+    if (now >= _notifyTime)
+        notifyCount(now);
+
     applayPlayers();
     applayRareAnimals();
+}
+
+void HeroIsland::notifyCount(UInt32 now)
+{
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(16);
+
+    size_t off = st.size();
+    st << static_cast<UInt8>(0);
+
+    UInt8 count = 0;
+    for (UInt8 j = 0; j < HERO_ISLAND_SPOTS; ++j)
+    {
+        UInt16 sz = _players[j].size();
+        st << j;
+        st << sz;
+        ++count;
+    }
+    st.data<UInt8>(off) = count;
+    st << Stream::eos;
+    broadcast(st);
+
+    _notifyTime = now + 5;
 }
 
 void HeroIsland::applayPlayers()
@@ -828,7 +854,7 @@ HIPlayerData* HeroIsland::leave(Player* player, UInt8 spot)
 
 HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt8 pos)
 {
-    if (!pd)
+    if (!pd || spot > HERO_ISLAND_SPOTS || pos > _players[spot].size())
         return NULL;
 
     Stream st(REP::HERO_ISLAND);
@@ -1285,12 +1311,22 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
+#if 0
 #if 1
     moveTo(player, 0, false);
 #else
     pd = leave(pd, spot, pos);
     if (pd) delete pd;
     player->setHISpot(0xFF);
+#endif
+#else
+    pd = leave(pd, spot, pos);
+    if (pd)
+    {
+        pd->spot = 0;
+        _players[0].push_back(pd);
+        player->setHISpot(0);
+    }
 #endif
     player->delFlag(Player::InHeroIsland);
     if (cfg.GMCheck)
