@@ -992,7 +992,7 @@ void AthleticsRank::TmExtraAward()
 
 	AthleticsList::iterator start1 = _athleticses[1].begin();
 	AthleticsList::iterator end1 = _athleticses[1].end();
-	for (UInt32 i = 1; start1 != end; ++start1, ++i)
+	for (UInt32 i = 1; start1 != end1; ++start1, ++i)
     {
         UInt32 prestige = 0;
         UInt32 tael = 0;
@@ -1919,6 +1919,11 @@ void AthleticsRank::giveAward( Player* pl )
 
     GameMsgHdr hdr2(0x217, pl->getThreadId(), pl, sizeof(AthleticsAward));
     GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
+
+    rankData->prestige = 0;
+    rankData->tael = 0;
+
+    DB6().PushUpdateData("UPDATE `athletics_rank` SET `prestige` = %u, `tael` = %u WHERE `ranker` = %"I64_FMT"u", rankData->prestige, rankData->tael, rankData->ranker->getId());
 }
 
 }

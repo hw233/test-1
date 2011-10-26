@@ -87,6 +87,7 @@ CREATE TABLE `athletics_rank` (
   /*`boxCount` int(10) NOT NULL DEFAULT '0',*/
   /*`boxFlushTime` int(10) NOT NULL DEFAULT '0',*/
   `prestige`  int(10) unsigned NOT NULL DEFAULT '0',
+  `tael`  int(10) unsigned NOT NULL DEFAULT '0',
   `winStreak` smallint(3) unsigned NOT NULL DEFAULT '0',
   `bewinstreak` smallint(3) unsigned NOT NULL DEFAULT '0',
   `failstreak` smallint(3) unsigned NOT NULL DEFAULT '0',
@@ -815,6 +816,7 @@ CREATE TABLE `player` (
   `coupon` int(10) unsigned NOT NULL DEFAULT '0',
   `tael` int(10) unsigned NOT NULL DEFAULT '0',
   `coin` int(10) unsigned NOT NULL DEFAULT '100000',
+  `prestige`  int(10) unsigned NOT NULL DEFAULT '0',
   `status` int(10) unsigned NOT NULL DEFAULT '0',
   `country` tinyint(1) unsigned NOT NULL,
   `title` tinyint(3) unsigned NOT NULL DEFAULT '0',

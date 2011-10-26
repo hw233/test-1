@@ -70,6 +70,7 @@ public:
 	inline UInt16 getExtraHP() { return _attrExtra.hp; }
 	inline float getExtraHPP() { return _attrExtra.hpP; }
 	inline float getExtraAction() { return _attrExtra.action; }
+	inline float getExtraActionP() { return _attrExtra.actionP; }
 	inline float getExtraHitrate() { return _attrExtra.hitrate; }
 	inline float getExtraEvade() { return _attrExtra.evade; }
 	inline float getExtraCritical() { return _attrExtra.critical; }

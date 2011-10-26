@@ -584,11 +584,13 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
 		}
+        defList[defCount].pos = pos + (bf->getSide() == side ? 25 : 0);
+        ++ defCount;
 
         UInt32 rhp = 0;
         if(NULL != skill && skill->effect != NULL && (skill->effect->absorb || skill->effect->absorbP))
         {
-            rhp = dmg * skill->effect->absorbP + skill->effect->absorb;
+            rhp = (dmg + magdmg) * skill->effect->absorbP + skill->effect->absorb;
         }
  
         if(rhp > 0)
@@ -597,9 +599,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             defList[defCount].damType = e_damAbsorb;
             defList[defCount].rhp= rhp;
             defList[defCount].rLeftHP = bf->getHP();
+            defList[defCount].pos = bf->getPos() + 25;
+            ++ defCount;
         }
-        defList[defCount].pos = pos + (bf->getSide() == side ? 25 : 0);
-        ++ defCount;
 
         // 中毒
         if(poison)

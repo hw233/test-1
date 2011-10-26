@@ -159,7 +159,7 @@ function calcAction( fgt )
   end
   local cls = fgt:getClass()
   local lvl = fgt:getLevel() - 1
-  return act + action_factor[cls] * lvl + fgt:getExtraAction();
+  return (act + action_factor[cls] * lvl) * (1 + fgt:getExtraActionPercent()) + fgt:getExtraAction();
 end
 
 
