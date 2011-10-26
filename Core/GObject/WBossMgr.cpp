@@ -377,7 +377,7 @@ void WBossMgr::nextDay(UInt32 now)
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
-#if 0
+#if 1
         TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
         TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60,
@@ -388,14 +388,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+48*60+10,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+9*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+6*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+3*60,
+        TimeUtil::SharpDayT(0,now) + 21*60*60+13*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -432,12 +432,12 @@ void WBossMgr::calcNext(UInt32 now)
             if (cfg.GMCheck)
             {
                 _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60 - 10;
+                _disapperTime = _appearTime + 60 * 60 - 60;
             }
             else
             {
                 _appearTime = _prepareTime + 20;
-                _disapperTime = _appearTime + 10 * 60 - 10;
+                _disapperTime = _appearTime + 2 * 60 - 10;
             }
             break;
         }
@@ -448,12 +448,12 @@ void WBossMgr::calcNext(UInt32 now)
             if (cfg.GMCheck)
             {
                 _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60 - 10;
+                _disapperTime = _appearTime + 60 * 60 - 60;
             }
             else
             {
                 _appearTime = _prepareTime + 30;
-                _disapperTime = _appearTime + 10 * 60 - 10;
+                _disapperTime = _appearTime + 2 * 60 - 10;
             }
             m_level = 1;
         }
