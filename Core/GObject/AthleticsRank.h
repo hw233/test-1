@@ -178,7 +178,7 @@ public:
 
     void giveAward(Player* pl);
 
-    void notifyAthMartialOver(Player* pl, UInt8 cancel);
+    void notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res);
 
 public:
 	void TmExtraAward();

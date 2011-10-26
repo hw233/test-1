@@ -97,8 +97,15 @@ void OnAthleticsOver( GameMsgHdr& hdr, const void * data )
 void OnAthMartialOver( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-	UInt8 cancel = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
-	GObject::gAthleticsRank.notifyAthMartialOver(player, cancel);
+	struct AthleticsResult
+	{
+		UInt32 id;
+		UInt8 side;
+		GObject::Player * defer;
+		UInt8 result;
+	};
+	AthleticsResult * ar = reinterpret_cast<AthleticsResult *>(const_cast<void *>(data));
+	GObject::gAthleticsRank.notifyAthMartialOver(ar->side == 0 ? player : ar->defer, ar->side == 0 ? ar->defer : player, ar->id, ar->result);
 }
 
 void OnAthleticsEnter( GameMsgHdr& hdr, const void * data )
