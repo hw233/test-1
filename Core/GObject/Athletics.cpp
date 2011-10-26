@@ -9,6 +9,7 @@
 #include "Mail.h"
 #include "Package.h"
 #include "MsgID.h"
+#include "Script/BattleFormula.h"
 
 namespace GObject
 {
@@ -481,6 +482,7 @@ void Athletics::attackMartial(Player* defer)
         bool res;
         UInt32 reptid;
         Battle::BattleSimulator& bsim = *(_martial_battle[idx]);
+        bsim.setFormula(Script::BattleFormula::getCurrent());
         _owner->PutFighters( bsim, 0, true );
         bsim.start();
         res = bsim.getWinner() == 1;

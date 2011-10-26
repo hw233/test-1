@@ -48,6 +48,7 @@ public:
 	void getFighterHP(UInt8, GObject::Fighter **, UInt8 *, UInt32 * hp, UInt32 = 0);
 	inline void setPortrait(UInt8 side, UInt16 por) { _portrait[side] = por; }
 	BattleFighter * newFighter(UInt8 side, UInt8 pos, GObject::Fighter *);
+	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
 private:
 	struct FighterStatus
