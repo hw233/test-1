@@ -350,6 +350,7 @@ public:
 	inline UInt16 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
 	inline float getExtraHPP() { checkDirty(); return _attrExtraEquip.hpP; }
 	inline float getExtraAction() { checkDirty(); return _attrExtraEquip.action; }
+	inline float getExtraActionP() { checkDirty(); return _attrExtraEquip.actionP; }
 	inline float getExtraHitrate() { checkDirty(); return _attrExtraEquip.hitrate; }
 	inline float getExtraEvade() { checkDirty(); return _attrExtraEquip.evade; }
 	inline float getExtraCritical() { checkDirty(); return _attrExtraEquip.critical; }

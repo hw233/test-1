@@ -59,6 +59,7 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraHP", &GObject::Fighter::getExtraHP);
 	class_def<GObject::Fighter>("getExtraHPPercent", &GObject::Fighter::getExtraHPP);
 	class_def<GObject::Fighter>("getExtraAction", &GObject::Fighter::getExtraAction);
+	class_def<GObject::Fighter>("getExtraActionPercent", &GObject::Fighter::getExtraActionP);
 	class_def<GObject::Fighter>("getExtraHitrate", &GObject::Fighter::getExtraHitrate);
 	class_def<GObject::Fighter>("getExtraEvade", &GObject::Fighter::getExtraEvade);
 	class_def<GObject::Fighter>("getExtraCritical", &GObject::Fighter::getExtraCritical);
@@ -139,6 +140,7 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraHP", &Battle::BattleFighter::getExtraHP);
 	class_def<Battle::BattleFighter>("getExtraHPPercent", &Battle::BattleFighter::getExtraHPP);
 	class_def<Battle::BattleFighter>("getExtraAction", &Battle::BattleFighter::getExtraAction);
+	class_def<Battle::BattleFighter>("getExtraActionPercent", &Battle::BattleFighter::getExtraActionP);
 	class_def<Battle::BattleFighter>("getExtraHitrate", &Battle::BattleFighter::getExtraHitrate);
 	class_def<Battle::BattleFighter>("getExtraEvade", &Battle::BattleFighter::getExtraEvade);
 	class_def<Battle::BattleFighter>("getExtraCritical", &Battle::BattleFighter::getExtraCritical);

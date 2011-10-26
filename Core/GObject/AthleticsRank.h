@@ -47,7 +47,8 @@ struct AthleticsRankData
 	//UInt8   boxcolor;
 	//UInt8	awardType;
 	//UInt32	awardCount;
-    //UInt32  prestige;
+    UInt32  prestige;
+    UInt32  tael;
 	UInt16	winstreak;
     UInt16  bewinstreak;
     UInt16  failstreak;
@@ -81,6 +82,7 @@ struct AthleticsAward
 	UInt8 side;
 	bool win;
     UInt32 prestige;
+    UInt32 tael;
 	UInt32 count;
 	Player *other;
     UInt32 itemId;
@@ -139,6 +141,7 @@ public:
     void requestAthleticsEvent(Stream&, Player * player);
 
 	void challenge(Player *, UInt8 type);
+	void challenge2(Player *, std::string&, UInt8 type);
 
 protected:
 	void getRandomEquip(UInt8 level, UInt16 rank, UInt16& EquipId, UInt16& cnt);
@@ -171,6 +174,12 @@ public:
     UInt32 getAthleticsFirst4Rank(Player*, UInt32 first4rank);
     UInt32 setAthleticsFirst4Rank(Player*, UInt32 first4rank);
 
+    void updateAthleticsMartial(Player* pl);
+
+    void giveAward(Player* pl);
+
+    void notifyAthMartialOver(Player* pl, UInt8 cancel);
+
 public:
 	void TmExtraAward();
 
@@ -178,7 +187,7 @@ protected:
 
 	inline UInt8 getRankRow(UInt8 lev)
 	{
-		if (lev > 44)
+		if (lev > 39)
 			return 1;
 		if (lev > 29)
 			return 0;

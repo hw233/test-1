@@ -565,6 +565,7 @@ struct DBAthleticsData
 	//UInt32 boxcount;
 	//UInt32 boxFlushTime;
     UInt32  prestige;
+    UInt32  tael;
 	UInt16	winstreak;
     UInt16   bewinstreak;
     UInt16   failstreak;
@@ -741,7 +742,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(52)
+SPECIALDEF(53)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -749,6 +750,7 @@ SPECIALDEF(52)
 	UInt32, pdata.coupon,
 	UInt32, pdata.tael,
 	UInt32, pdata.coin,
+	UInt32, pdata.prestige,
 	UInt32, pdata.status,
 	UInt8, pdata.country,
 	UInt8, pdata.title,
@@ -1358,7 +1360,7 @@ SPECIALDEF(2)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAthleticsData)
-SPECIALDEF(14)
+SPECIALDEF(15)
 (
 	UInt8,  row,
 	UInt32, rank,
@@ -1371,6 +1373,7 @@ SPECIALDEF(14)
 	//UInt32, boxcount,
 	//UInt32, boxFlushTime,
     UInt32, prestige,
+    UInt32, tael,
 	UInt16,  winstreak,
     UInt16,  bewinstreak,
     UInt16,  failstreak,

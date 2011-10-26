@@ -392,6 +392,7 @@ namespace GData
 			SetValOrPercent(aextra->_extra.crilvl, aextra->_extra.critical, ae.critical);
             aextra->_extra.critical *= 100;
 			SetValOrPercent(aextra->_extra.criticaldmg, aextra->_extra.criticaldmgP, ae.criticaldmg);
+            aextra->_extra.criticaldmg /= 100;
 			SetValOrPercent(aextra->_extra.pirlvl, aextra->_extra.pierce, ae.pierce);
             aextra->_extra.pierce *= 100;
 			SetValOrPercent(aextra->_extra.counterlvl, aextra->_extra.counter, ae.counter);
@@ -948,7 +949,7 @@ namespace GData
             ptal->action = tal.action;
             ptal->evade = tal.evade;
             ptal->critical = tal.critical;
-            ptal->criticaldmg = tal.criticaldmg;
+            ptal->criticaldmg = tal.criticaldmg / 100;
             ptal->pierce = tal.pierce;
             ptal->counter = tal.counter;
             ptal->magres = tal.magres;
@@ -1062,6 +1063,7 @@ namespace GData
 			SetValOrPercent(cft->crilvl, cft->critical, cf.critical);
             cft->critical *= 100;
 			SetValOrPercent(cft->criticaldmg, cft->criticaldmgP, cf.criticaldmg);
+            cft->criticaldmg /= 100;
 			SetValOrPercent(cft->pirlvl, cft->pierce, cf.pierce);
             cft->pierce *= 100;
 			SetValOrPercent(cft->counterlvl, cft->counter, cf.counter);

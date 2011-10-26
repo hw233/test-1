@@ -48,6 +48,7 @@ enum PurchaseType
     YamenTaskFresh,
     AutoCopyComplete,
     InstantPracticeAcc,
+    FlushAthletics,
 };
 
 enum MoneyType

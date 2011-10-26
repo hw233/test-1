@@ -591,6 +591,11 @@ struct PracticeHookAddReq
     MESSAGE_DEF(REQ::PRACTICE_HOOK_ADD);
 };
 
+struct AthleticsRefreshMartialReq
+{
+	MESSAGE_DEF(REQ::ATHLETICS_REFRESH_MARTIAL);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -3257,5 +3262,19 @@ void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
     MSG_QUERY_PLAYER(player);
     player->accPractice();
 }
+
+void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(player->getTael() < 100)
+        return;
+
+    ConsumeInfo ci(FlushAthletics,0,0);
+    player->useTael(100, &ci);
+
+    GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, player, 0);
+    GLOBAL().PushMsg(hdr2, NULL);
+}
+
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

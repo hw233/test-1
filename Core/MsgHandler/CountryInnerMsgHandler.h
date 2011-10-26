@@ -213,6 +213,12 @@ void OnAthleticsReq( GameMsgHdr& hdr, const void * data )
 	GameAction()->RunOperationTaskAction0(player, 2);
 }
 
+void OnAthleticsMartialReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    player->GetAthletics()->listAthleticsMartial();
+}
+
 void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -262,9 +268,17 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, 0, FromAthletAward);
+    {
+        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
+    }
     if(awd->prestige)
+    {
         player->getPrestige(awd->prestige);
+    }
+    if(awd->tael)
+    {
+        player->getTael(awd->tael);
+    }
 
 	if(awd->side == 0)
 		player->GetAthletics()->defendergainsource(awd->other, awd->athleticsid, awd->type, awd->count);
@@ -1123,6 +1137,31 @@ void OnClearTaskReq( GameMsgHdr& hdr, const void* data )
     {
         player->resetYaMen();
     }
+}
+
+void OnMartialUpdateHdr( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(hdr.msgHdr.bodyLen != sizeof(GObject::MartialHeader) || !data)
+        return;
+	const GObject::MartialHeader* mh = reinterpret_cast<const GObject::MartialHeader*>(data);
+    player->GetAthletics()->updateMartialHdr(mh);
+}
+
+void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    if(hdr.msgHdr.bodyLen != sizeof(GObject::MartialData) || !data)
+        return;
+	const GObject::MartialData* md = reinterpret_cast<const GObject::MartialData*>(data);
+    player->GetAthletics()->updateMartial(md);
+}
+
+void OnAthleticsMartialAttack( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Player * defer = *reinterpret_cast<GObject::Player **>(const_cast<void *>(data));
+	player->GetAthletics()->attackMartial(defer);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

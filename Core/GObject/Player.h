@@ -93,6 +93,8 @@ namespace GObject
 #define PLAYER_BUFF_HIJZ            0x3E    // 五行禁阵
 #define PLAYER_BUFF_HIESCAPE        0x3F    // 英雄岛逃亡
 
+#define PLAYER_BUFF_AMARTIAL_WIN    0x40    // 斗剑历练胜利次数
+
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
 
@@ -263,11 +265,24 @@ namespace GObject
 		SecondPWDInfo():isLocked(1), errCount(0){}
 	};
 
+    struct LastAthAward
+    {
+        UInt32 prestige;
+        UInt32 itemId;
+        UInt8  itemCount;
+    };
+
+    struct LevelChange
+    {
+        UInt8 oldLv;
+        UInt8 newLv;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 100;
 		PlayerData()
-			: gold(0), coupon(0), tael(0), coin(0), status(0), country(0),
+			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
@@ -276,7 +291,7 @@ namespace GObject
             smFinishCount(0), smFreeCount(0), smAcceptCount(0), ymFinishCount(0), ymFreeCount(0), ymAcceptCount(0),
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
-            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0), prestige(0)
+            copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
 		{
             memset(tavernId, 0, sizeof(tavernId));
             memset(fshimen, 0, sizeof(fshimen));
@@ -301,6 +316,7 @@ namespace GObject
 		UInt32 coupon;	            // 礼券
 		UInt32 tael;	            // 银两
 		UInt32 coin;	            // 铜钱
+        UInt32 prestige;            // 声望
 		UInt32 status;              // 状态:0x01 - pk打开 0x02 - 切磋开 0x04 - 小秘书关 0x80 - 禁止探险
 		UInt8 country;              // 国家
 		UInt8 title;                // 头衔
@@ -364,7 +380,6 @@ namespace GObject
         UInt8 frontFreeCnt;         // 阵图免费次数
         UInt8 frontGoldCnt;         // 阵图收费次数
         UInt32 frontUpdate;         // 阵图次数更新时间
-        UInt32 prestige;            // 斗剑场声望
         std::vector<UInt16> formations; // 已学会阵法
 	};
 
@@ -568,6 +583,7 @@ namespace GObject
 		void pendCoin(UInt32);
 		void pendAchievement(UInt32);
 		inline void pendDungeon(UInt16 d) { _lastDungeon = d; }
+        inline void delayNotifyAthleticsAward(LastAthAward* aa) { _lastAthAward.push_back(*aa); }
 
 		void sendMsgCode(UInt8, UInt32, UInt32 = 0);
 
@@ -623,7 +639,7 @@ namespace GObject
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
 
-		UInt32 getPrestige(UInt32 a = 0);
+		UInt32 getPrestige(UInt32 a = 0, bool notify = true);
 		UInt32 usePrestige(UInt32 a,ConsumeInfo * ci=NULL);
 
 		void incIcCount();
@@ -954,6 +970,7 @@ namespace GObject
 		// Last battled monster
 		GData::NpcGroup * _lastNg;
 		std::vector<GData::LootResult> _lastLoot;
+        std::vector<LastAthAward> _lastAthAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -970,6 +987,8 @@ namespace GObject
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
+        // 玩家在等级集合的位置 
+        UInt32 _lvpos;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -988,6 +1007,8 @@ namespace GObject
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
+        inline void setLvPos(UInt32 v) { _lvpos = v; }
+        inline UInt32 getLvPos() { return _lvpos; }
 
 	protected:
 		inline void setBlockBossByLevel();
@@ -1058,6 +1079,10 @@ namespace GObject
 	extern GlobalPlayers newPlayers;
 	typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;
 	extern GlobalNamedPlayers globalNamedPlayers;
+    typedef std::map<UInt32, UInt64> LevelPlayers;
+    typedef std::map<UInt8, LevelPlayers> GlobalLevelsPlayers;
+    typedef GlobalLevelsPlayers::iterator GlobalLevelsPlayersIterator;
+    extern GlobalLevelsPlayers globalLevelsPlayers;
 
 	class ChallengeCheck
 	{

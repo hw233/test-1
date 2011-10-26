@@ -5213,6 +5213,11 @@ function ItemNormal_athletics_5(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_athletics_6(iid, num, bind, param)
+    local player = GetPlayer();
+    player:getCoupon(15);
+    return 1;
+end
 
 
 
@@ -5781,6 +5786,7 @@ local ItemNormal_Table = {
     [3] = ItemNormal_athletics_3,
     [4] = ItemNormal_athletics_4,
     [5] = ItemNormal_athletics_5,
+    [6] = ItemNormal_athletics_6,
 
     [22] = ItemNormal_athletics_22,
     [23] = ItemNormal_athletics_23,

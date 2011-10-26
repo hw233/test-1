@@ -103,6 +103,8 @@ MSG_REG(GameMsgHdr, OnTradeOperate);
 
 MSG_REG(GameMsgHdr, OnSaleSellReq);
 
+MSG_REG(GameMsgHdr, OnRefreshMartialReq);
+
 MSG_REG(GameMsgHdr, OnMailListReq);
 MSG_REG(GameMsgHdr, OnMailReq);
 MSG_REG(GameMsgHdr, OnMailClickReq);
@@ -206,5 +208,10 @@ MSG_REG_2(GameMsgHdr, 0x322, OnSetLevelReq);
 MSG_REG_2(GameMsgHdr, 0x323, OnSetMoneyReq);
 MSG_REG_2(GameMsgHdr, 0x324, OnSetVipLReq);
 MSG_REG_2(GameMsgHdr, 0x325, OnClearTaskReq);
+
+MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
+MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
+MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
+MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 
 MSG_HANDLER_END()

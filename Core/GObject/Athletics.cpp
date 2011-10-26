@@ -15,7 +15,8 @@ namespace GObject
 
 Athletics::Athletics(Player * player) : _owner(player), _hasEnterAthletics(false)
 {
-
+    memset(_martial, 0, sizeof(_martial));
+    memset(_martial_battle, 0, sizeof(_martial_battle));
 }
 
 Athletics::~Athletics()
@@ -438,6 +439,172 @@ bool Athletics::addAthleticsExtraAward(UInt32 EquipId, UInt8 rank)
 		_owner->GetPackage()->AddItem(8999, 1, true, false, FromAthletAward);
 	
 	return true;
+}
+
+void Athletics::updateMartial(const MartialData* md)
+{
+    if(!md)
+        return;
+
+    if(md->idx > 2)
+        return;
+
+    _martial[md->idx] = md->defer;
+    if(_martial_battle[md->idx] != NULL)
+        delete _martial_battle[md->idx];
+    _martial_battle[md->idx] = md->bs;
+    listAthleticsMartial();
+}
+
+void Athletics::attackMartial(Player* defer)
+{
+    UInt8 cancel = 1;
+    do
+    {
+        UInt8 idx = 0xFF;
+        for(UInt8 i = 0; i < 3; ++i)
+        {
+            if(_martial[i] == defer)
+            {
+                idx = i;
+                break;
+            }
+        }
+
+        if(idx > 2)
+            break;
+
+        if(!_martial_battle[idx])
+            break;
+
+        cancel = 0;
+        bool res;
+        UInt32 reptid;
+        Battle::BattleSimulator& bsim = *(_martial_battle[idx]);
+        _owner->PutFighters( bsim, 0, true );
+        bsim.start();
+        res = bsim.getWinner() == 1;
+        reptid = bsim.getId();
+
+        Stream st(REP::ATTACK_NPC);
+        st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+        _owner->send(st);
+
+        GObject::LastAthAward la = {0};
+        if(res)
+        {
+            UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
+            if(wins >= 5)
+            {
+                _owner->GetPackage()->AddItem(6, 1, 1, true, FromAthletAward);
+                la.itemId = 6;
+                la.itemCount = 1;
+                wins = 0;
+            }
+            la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
+            _owner->getPrestige(la.prestige, false);
+            _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
+            delete _martial_battle[idx];
+            _martial_battle[idx] = NULL;
+            listAthleticsMartial();
+        }
+        else
+        {
+            la.prestige = 5 * (World::_wday == 3 ? 2 : 1);
+            _owner->getPrestige(la.prestige, false);
+        }
+
+        _owner->delayNotifyAthleticsAward(&la);
+    }while(false);
+
+    GameMsgHdr hdr2(0x1F2, WORKER_THREAD_WORLD, _owner, 1);
+    GLOBAL().PushMsg(hdr2, &cancel);
+}
+
+void Athletics::updateMartialHdr(const MartialHeader* mh)
+{
+    Player* defer = mh->md.defer;
+    if(_owner == mh->owner)
+    {
+        if(_owner->getThreadId() == defer->getThreadId())
+        {
+            MartialData md = {0};
+            Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
+            defer->PutFighters( *bsim, 1, true );
+
+            md.idx = mh->md.idx;
+            md.defer = defer;
+            md.bs = bsim;
+            _owner->GetAthletics()->updateMartial(&md);
+        }
+        else
+        {
+            GameMsgHdr hdr2(0x330, defer->getThreadId(), defer, sizeof(MartialHeader));
+            GLOBAL().PushMsg(hdr2, (void*)mh);
+        }
+    }
+    else if(_owner == defer)
+    {
+        MartialData md = {0};
+        Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, mh->owner, defer);
+        defer->PutFighters( *bsim, 1, true );
+
+        md.idx = mh->md.idx;
+        md.defer = defer;
+        md.bs = bsim;
+
+        if(_owner->getThreadId() == defer->getThreadId())
+        {
+            mh->owner->GetAthletics()->updateMartial(&md);
+        }
+        else
+        {
+            GameMsgHdr hdr2(0x331, mh->owner->getThreadId(), mh->owner, sizeof(MartialData));
+            GLOBAL().PushMsg(hdr2, &md);
+        }
+    }
+}
+
+void Athletics::listAthleticsMartial()
+{
+    UInt8 count = 15;
+	if (count > static_cast<UInt16>(_athleticses.size()))
+		count = static_cast<UInt16>(_athleticses.size());
+
+	Stream st(REP::ARENA_IFNO);
+    st << static_cast<UInt16>(0x10);
+
+    UInt8 needRefresh = true;
+    UInt8 wins =  5 - _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
+	st << wins << static_cast<UInt8>(3);
+	for (UInt8 i = 0; i < 3; ++i)
+	{
+        if(_martial[i] != 0)
+        {
+            Player* pl = _martial[i];
+            if( pl != NULL && _martial_battle[i] != NULL)
+                needRefresh = false;
+
+            if(pl == NULL)
+                st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+            else
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << static_cast<UInt8>(_martial_battle[i] == NULL ? 0 : 1);
+        }
+        else
+        {
+            st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+        }
+	}
+
+    st << Stream::eos;
+
+    _owner->send(st);
+
+    if(needRefresh)
+    {
+        GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, _owner, 0);
+        GLOBAL().PushMsg(hdr2, NULL);
+    }
 }
 
 }

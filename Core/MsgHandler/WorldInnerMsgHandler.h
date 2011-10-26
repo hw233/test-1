@@ -94,6 +94,13 @@ void OnAthleticsOver( GameMsgHdr& hdr, const void * data )
 	GObject::gAthleticsRank.notifyAthletcisOver(ar->side == 0 ? player : ar->defer, ar->side == 0 ? ar->defer : player, ar->id, ar->result);
 }
 
+void OnAthMartialOver( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	UInt8 cancel = *reinterpret_cast<UInt8 *>(const_cast<void *>(data));
+	GObject::gAthleticsRank.notifyAthMartialOver(player, cancel);
+}
+
 void OnAthleticsEnter( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -510,6 +517,40 @@ void OnDoInstantPracticeAccReq( GameMsgHdr& hdr, const void* data)
 		return;
 	GObject::EventPlayerPractice* event = static_cast<GObject::EventPlayerPractice*>(it->second);
 	event->instantComplete();
+}
+
+void OnLevelChange( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+    if(hdr.msgHdr.bodyLen != sizeof(GObject::LevelChange))
+        return;
+	const GObject::LevelChange* lvc = reinterpret_cast<const GObject::LevelChange*>(data);
+    if(lvc->oldLv == lvc->newLv)
+        return;
+    if(lvc->oldLv > 29)
+    {
+        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->oldLv);
+        if(it != GObject::globalLevelsPlayers.end())
+        {
+            GObject::LevelPlayers& lvPlayer = it->second;
+            UInt32 nSize = lvPlayer.size();
+            if(nSize != 0)
+                lvPlayer.erase(player->getId());
+        }
+    }
+    if(lvc->newLv > 29)
+    {
+        GObject::LevelPlayers& lvPlayer = GObject::globalLevelsPlayers[lvc->newLv];
+        UInt32 nSize = lvPlayer.size() + 1;
+        lvPlayer[nSize] = player->getId();
+        player->setLvPos(nSize);
+    }
+}
+
+void OnAthleticsMartialFlush( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    GObject::gAthleticsRank.updateAthleticsMartial(player);
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_

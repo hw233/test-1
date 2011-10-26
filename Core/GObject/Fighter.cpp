@@ -179,6 +179,12 @@ bool Fighter::addExp( UInt64 e )
 	bool isMain = _owner->isMainFighter(_id);
 	if(isMain)
 	{
+        if(oldLevel != _level && _level > 29)
+        {
+            LevelChange data = { oldLevel, _level };
+            GameMsgHdr hdr(0x1F0, WORKER_THREAD_WORLD, _owner, sizeof(LevelChange));
+            GLOBAL().PushMsg(hdr, &data);
+        }
 		SYSMSG_SENDV(100, _owner, e);
 	}
 	SYSMSG_SENDV(1000, _owner, _color, getName().c_str(), e);
