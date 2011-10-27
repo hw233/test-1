@@ -200,7 +200,8 @@ public:
 	bool calcPierce(BattleFighter* defender);
     float calcTherapy(const GData::SkillBase* skill);
     float calcMagAttack(bool& isCritical, BattleFighter* defender);
-    float calcPoison(const GData::SkillBase* skill);
+    float calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs);
+    void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk);
 
 	inline void addAction(UInt32 p);
 

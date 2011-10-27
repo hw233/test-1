@@ -461,8 +461,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             float magatk = 0;
             if(NULL != skill && skill->effect != NULL)
             {
-                atk = bf->calcAttack(cs, area_target);
-                magatk = bf->calcMagAttack(cs, area_target);
+                bf->calcSkillAttack(cs, area_target, atk, magatk);
+                //atk = bf->calcAttack(cs, area_target);
+                //magatk = bf->calcMagAttack(cs, area_target);
                 atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs ? bf->getCriticalDmg() : 1));
                 magatk = aura_factor * (magatk * skill->effect->magdamP + skill->effect->addmag * (cs ? bf->getCriticalDmg() : 1));
             }
@@ -606,7 +607,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         // 中毒
         if(poison)
         {
-            doPoisonAttack(bf, skill, area_target, factor, defList, defCount, scList, scCount, atkAct);
+            doPoisonAttack(bf, cs, skill, area_target, factor, defList, defCount, scList, scCount, atkAct);
         }
 
         doPassiveSkillBeAtk(bf, area_target, atkAct, dmg + magdmg);
@@ -753,7 +754,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
     }
 }
 
-UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase* skill, BattleFighter* area_target, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, std::vector<AttackAct>* atkAct)
+UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::SkillBase* skill, BattleFighter* area_target, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, std::vector<AttackAct>* atkAct)
 {
     if(bf->getStunRound() || bf->getConfuseRound() || bf->getForgetRound())
     {
@@ -761,7 +762,7 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, const GData::SkillBase
     }
 
     UInt32 dmg = 0;
-    UInt32 dmg2 = abs(bf->calcPoison(skill)) * factor;
+    UInt32 dmg2 = abs(bf->calcPoison(skill, area_target, cs)) * factor;
     // 第一波毒
     doSkillState(bf, skill, area_target, defList, defCount, atkAct);
     defList[defCount].pos = area_target->getPos();
@@ -1064,7 +1065,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         {
         case 1:
             {
-                UInt32 dmg = abs(bo->calcPoison(boSkill));
+                UInt32 dmg = abs(bo->calcPoison(boSkill, bo, false));
                 bo->makeDamage(dmg*0.5);
                 defList[defCount].damage = dmg*0.5;
                 defList[defCount].leftHP = bo->getHP();
@@ -1460,7 +1461,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
-                    UInt32 dmg = abs(bf->calcPoison(skill)) * skill->factor[i];
+                    UInt32 dmg = abs(bf->calcPoison(skill, bo, false)) * skill->factor[i];
                     ++i;
                     bo->makeDamage(dmg);
                     defList[defCount].pos = pos;
@@ -1480,7 +1481,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
-                    UInt32 dmg = abs(bf->calcPoison(skill));
+                    UInt32 dmg = abs(bf->calcPoison(skill, bo, false));
                     bo->makeDamage(dmg);
                     defList[defCount].pos = target_pos;
                     defList[defCount].damType = e_damNormal;
@@ -1499,7 +1500,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
-                    UInt32 dmg = abs(bf->calcPoison(skill)) * skill->factor[0];
+                    UInt32 dmg = abs(bf->calcPoison(skill, bo, false)) * skill->factor[0];
                     bo->makeDamage(dmg);
                     defList[defCount].pos = target_pos;
                     defList[defCount].damType = e_damNormal;
@@ -1519,7 +1520,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                         continue;
 
-                    UInt32 dmg = abs(bf->calcPoison(skill)) * ap[i].factor;
+                    UInt32 dmg = abs(bf->calcPoison(skill, bo, false)) * ap[i].factor;
                     bo->makeDamage(dmg);
                     defList[defCount].pos = ap[i].pos;
                     defList[defCount].damType = e_damNormal;
