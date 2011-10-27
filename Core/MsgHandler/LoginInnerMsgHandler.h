@@ -16,7 +16,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
     Key* key = (Key*)(data);
 
     UInt8 ret = 0;
-    UInt8 type = 0;
+    UInt8 type = 0xFF;
     size_t len = strlen(key->key);
     if (cfg.GMCheck)
     {
@@ -37,22 +37,12 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
                     ret = 0;
                     if (tlen == 1 && rtoken[0] == '0')
                     {
-                        if (key->key[0] == '1' && key->key[1] == '-')
-                        {
-                            type = 1;
-                        }
-                        else if (key->key[0] == '2' && key->key[1] == '-')
-                        {
-                            type = 2;
-                        }
-                        else
-                        {
-                            type = 3;
-                        }
+                        if (isdigit(key->key[0]) && key->key[1] == '-')
+                            type = key->key[0] - '0';
                     }
                     else
                     {
-                        type = 4;
+                        type = 0xFE; // XXX: 已领取
                     }
 
                     free(rtoken);
@@ -61,17 +51,17 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
                 else
                 {
                     ret = 1;
+                    type = 0xFD;
                     usleep(500);
                 }
             }
         }
 
-        if (ret)
+        if (ret == 1)
         {
             TRACE_LOG("key: %s, rc: %u", key->key, rc);
             uninitMemcache();
             initMemcache();
-            type = 5;
         }
 
         if (key->player)
@@ -79,7 +69,7 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
             GameMsgHdr hdr(0x2F1, key->player->getThreadId(), key->player, sizeof(type));
             GLOBAL().PushMsg(hdr, &type);
 
-            if (type == 1 || type == 2)
+            if (type != 0xFF)
             {
                 char id[32] = {0};
                 size_t vlen = snprintf(id, 32, "%"I64_FMT"u", key->player->getId());
@@ -101,19 +91,10 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
     }
     else
     {
-        UInt8 type = 1;
-        if (key->key[0] == '1' && key->key[1] == '-')
-        {
-            type = 1;
-        }
-        else if (key->key[0] == '2' && key->key[1] == '-')
-        {
-            type = 2;
-        }
-        else
-        {
-            type = 3;
-        }
+        UInt8 type = 0xFF;
+        if (isdigit(key->key[0]) && key->key[1] == '-')
+            type = key->key[0] - '0';
+
         if (key->player)
         {
             GameMsgHdr hdr(0x2F1, key->player->getThreadId(), key->player, sizeof(type));

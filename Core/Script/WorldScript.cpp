@@ -56,6 +56,7 @@ void WorldScript::init()
     def("setRareAnimals", GObject::HeroIsland::setRareAnimals);
     def("addHIAwardsCfg", GObject::HeroIsland::addHIAwardsCfg);
     def("addRankAwards", GObject::HeroIsland::addRankAwards);
+    def("clearAllHICfg", GObject::HeroIsland::clearAllHICfg);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

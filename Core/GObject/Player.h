@@ -1078,6 +1078,7 @@ namespace GObject
 
     public:
         void sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items);
+        void setVipAwardFlag(UInt8 type, UInt32 value);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

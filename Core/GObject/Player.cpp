@@ -949,6 +949,22 @@ namespace GObject
         }
     }
 
+    void Player::setVipAwardFlag(UInt8 type, UInt32 value)
+    {
+        switch (type)
+        {
+            case 2:
+            case 1:
+                _playerData.qqawardgot |= value;
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
+                        _playerData.qqawardgot, getId());
+            break;
+
+            default:
+            break;
+        }
+    }
+
     void Player::sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items)
     {
         UInt32 size = items.size();

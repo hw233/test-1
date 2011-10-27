@@ -776,64 +776,22 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
 void OnYDPacks( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-
-#if 0
-    if (PLAYER_DATA(player, qqawardgot) & 0x04)
-    {
-        player->sendMsgCode(1, 1006);
-        return;
-    }
-#endif
-
     UInt8 type = *(UInt8*)(data);
-
-    //1- 511x2,505x2,500x2,15x1,503x5,47x1,48x1,49x1,50x1,51x1,513x2,5033x3,9x5,56x10
-    //2- 56x2,51x1,15x1,511x1
-    if (type == 1) // 1:新黄钻用户
-    {
-        player->GetPackage()->AddItem(511, 2, true);
-        player->GetPackage()->AddItem(505, 2, true);
-        player->GetPackage()->AddItem(500, 2, true);
-        player->GetPackage()->AddItem(15, 1, true);
-        player->GetPackage()->AddItem(502, 5, true);
-        player->GetPackage()->AddItem(47, 1, true);
-        player->GetPackage()->AddItem(48, 2, true);
-        player->GetPackage()->AddItem(49, 1, true);
-        player->GetPackage()->AddItem(50, 1, true);
-        player->GetPackage()->AddItem(51, 1, true);
-        player->GetPackage()->AddItem(513, 2, true);
-        player->GetPackage()->AddItem(5033, 3, true);
-        player->GetPackage()->AddItem(9, 5, true);
-        player->GetPackage()->AddItem(56, 10, true);
-#if 1
-        PLAYER_DATA(player, qqawardgot) |= 0x04;
-        DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
-                PLAYER_DATA(player, qqawardgot), player->getId());
-#endif
-    }
-    else if (type == 2) // 2:老黄钻用户
-    {
-        player->GetPackage()->AddItem(56, 2, true);
-        player->GetPackage()->AddItem(51, 1, true);
-        player->GetPackage()->AddItem(15, 1, true);
-        player->GetPackage()->AddItem(511, 1, true);
-#if 2
-        PLAYER_DATA(player, qqawardgot) |= 0x04;
-        DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u",
-                PLAYER_DATA(player, qqawardgot), player->getId());
-#endif
-    }
-    else if (type == 3) // key 错误
+    if (type == 0xFF) // key 错误
     {
         player->sendMsgCode(1, 1005);
     }
-    else if (type == 4) // 已领取
+    else if (type == 0xFE) // 已领取
     {
         player->sendMsgCode(1, 1006);
     }
-    else if (type == 5) // 验证服务器错
+    else if (type == 0xFD) // 验证服务器错
     {
         player->sendMsgCode(1, 1007);
+    }
+    else
+    {
+        GameAction()->onGetVipPack(player, type);
     }
 }
 
