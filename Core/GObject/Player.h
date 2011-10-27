@@ -745,6 +745,7 @@ namespace GObject
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
+        bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }
