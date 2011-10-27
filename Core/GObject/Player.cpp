@@ -6332,7 +6332,10 @@ namespace GObject
             else
             {
                 _playerData.qqawardgot |= (0x80<<flag);
-                GetPackage()->AddItem2(67, 1, true, true);
+                if(flag)
+                    GetPackage()->AddItem2(7, 1, true, true);
+                else
+                    GetPackage()->AddItem2(67, 1, true, true);
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
