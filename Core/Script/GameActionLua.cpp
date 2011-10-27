@@ -176,6 +176,7 @@ namespace Script
 		CLASS_DEF(Player, addNewFormation);
 		CLASS_DEF(Player, openLevelBox);
 		CLASS_DEF(Player, sendMailPack);
+		CLASS_DEF(Player, setVipAwardFlag);
 		
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -789,6 +790,11 @@ namespace Script
 	{
 		Call<void>("onLevelup", player, olev, nlev);
         doAttainment(player, 10001, nlev);
+	}
+
+	void GameActionLua::onGetVipPack( Player* player, UInt8 type )
+	{
+		Call<void>("onGetVipPack", player, type);
 	}
 
 	void GameActionLua::onEnchant( Player* player, UInt8 level )

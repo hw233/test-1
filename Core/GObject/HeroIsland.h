@@ -144,15 +144,17 @@ class HeroIsland
 {
 public:
     HeroIsland() : _running(false), _notifyTime(0), _prepareStep(0),
-    _prepareTime(0), _startTime(0), _endTime(0), _count(0)
+    _prepareTime(0), _startTime(0), _endTime(0), _count(0), _expTime(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
+        _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
         initSkillAttr();
     }
 
     ~HeroIsland() {}
 
 public:
+    static void clearAllHICfg();
     static void setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd);
     static void addHIAwardsCfg(UInt8 type, UInt32 id, UInt32 num, UInt32 prob);
     static void addRankAwards(UInt32 prestige);
@@ -207,6 +209,7 @@ public:
     void broadcast(Stream& st, UInt8 spot, Player* = NULL);
     void broadcast(Stream& st);
     void notifyCount(UInt32 now);
+    void expFactor(UInt32 now);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
 
@@ -226,6 +229,8 @@ private:
     UInt32 _startTime;
     UInt32 _endTime;
     UInt8 _count;
+    float _expfactor[4];
+    UInt32 _expTime;
 };
 
 extern HeroIsland heroIsland;

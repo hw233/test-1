@@ -31,6 +31,15 @@ bool HeroIsland::initSkillAttr()
     return false;
 }
 
+void HeroIsland::clearAllHICfg()
+{
+    for (UInt8 i = 0; i < HERO_ISLAND_SPOTS; ++i)
+        _animals[i].clear();
+    for (UInt8 i = 0; i < 4; ++i)
+        _awards[i].clear();
+    _prestige.clear();
+}
+
 void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd)
 {
     if (spot > HERO_ISLAND_SPOTS)
@@ -362,6 +371,8 @@ void HeroIsland::process(UInt32 now)
 
     if (now >= _notifyTime)
         notifyCount(now);
+    if (_running && now >= _expTime)
+        expFactor(now);
 
     applayPlayers();
     applayRareAnimals();
@@ -390,6 +401,47 @@ void HeroIsland::notifyCount(UInt32 now)
     _notifyTime = now + 5;
 }
 
+void HeroIsland::expFactor(UInt32 now)
+{
+    static float factor[4] = {1.5, 2.0, 2.5, 3.0};
+    for (UInt8 n = 0; n < 4; ++n)
+    {
+        UInt8 i = uRand(4);
+        if (n == i)
+        {
+            UInt8 j = uRand(4);
+            float tmp = factor[i];
+            factor[i] = factor[j];
+            factor[j] = tmp;
+        }
+        else
+        {
+            float tmp = factor[n];
+            factor[n] = factor[i];
+            factor[i] = tmp;
+        }
+    }
+
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(17);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt8>(0); // XXX: 中立区
+    st << static_cast<UInt8>(0);
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        _expfactor[i] = factor[i];
+        st << static_cast<UInt8>(i+1);
+        st << static_cast<UInt8>(2*_expfactor[i]); // XXX: *2
+    }
+    st << Stream::eos;
+    broadcast(st);
+
+    if (cfg.GMCheck)
+        _expTime = now + 10 * 60;
+    else
+        _expTime = now + 30;
+}
+
 void HeroIsland::applayPlayers()
 {
     UInt32 now = TimeUtil::Now();
@@ -410,7 +462,7 @@ void HeroIsland::applayPlayers()
             {
                 if (j && pd && pd->player && pd->expcd <= now)
                 {
-                    pd->player->AddExp(calcExp(pd->player->GetLev())*2);
+                    pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]);
                     pd->expcd = now + 60;
                 }
             }
@@ -1334,6 +1386,7 @@ void HeroIsland::playerLeave(Player* player)
     }
 #endif
     player->delFlag(Player::InHeroIsland);
+    player->regenAll();
     if (cfg.GMCheck)
         player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+5*60);
     else
