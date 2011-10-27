@@ -5472,8 +5472,8 @@ local ItemNormal_Table = {
 	[8905] = ItemNormal_00008905,
 	[8906] = ItemNormal_00008906,
 	[8907] = ItemNormal_00008907,
-	[6] = ItemNormal_00000006,
-	[7] = ItemNormal_00000007,
+--	[6] = ItemNormal_00000006,
+--	[7] = ItemNormal_00000007,
 	[9] = ItemNormal_00000009,
 	[8931] = ItemNormal_00008931,
 	[55] = ItemNormal_00000055,
@@ -5787,6 +5787,8 @@ local ItemNormal_Table = {
     [4] = ItemNormal_athletics_4,
     [5] = ItemNormal_athletics_5,
     [6] = ItemNormal_athletics_6,
+
+    [7] = ItemNormal_00000067,
 
     [22] = ItemNormal_athletics_22,
     [23] = ItemNormal_athletics_23,

@@ -1309,6 +1309,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
     memset(defList, 0, sizeof(defList));
     // 免疫降灵气
+    bool dostatus = true;
     if(skill->effect->state == 64)
     {
         BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
@@ -1318,20 +1319,41 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         UInt8 immune = bo->getImmune();
         if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel())
         {
+            dostatus = false;
             defList[defCount].damType = e_Immune;
             defList[defCount].pos = target_pos;
             defList[defCount].damage = 0;
             defList[defCount].leftHP = bo->getHP();
             ++ defCount;
         }
+    }
+    if(dostatus)
+    {
+        if(1 == skill->area)
+        {
+            for(UInt8 pos = 0; pos < 25; ++ pos)
+            {
+                doSkillStatus(bf, skill, target_side, pos, 1, scList, scCount);
+            }
+        }
+        else if(0 == skill->area)
+        {
+            doSkillStatus(bf, skill, target_side, target_pos, 1, scList, scCount);
+        }
         else
         {
-            doSkillStatus(bf, skill, target_side, target_pos, cnt, scList, scCount);
+            BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+            if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+            {
+                doSkillStatus(bf, skill, target_side, target_pos, 1, scList, scCount);
+            }
+
+            for(int i = 0; i < apcnt; ++ i)
+            {
+                doSkillStatus(bf, skill, target_side, ap[i].pos, 1, scList, scCount);
+            }
+
         }
-    }
-    else
-    {
-        doSkillStatus(bf, skill, target_side, target_pos, cnt, scList, scCount);
     }
 
     // therapy skill
