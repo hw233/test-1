@@ -527,6 +527,14 @@ namespace GObject
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
         inline bool getQQVipYear() { return _playerData.qqvipyear; }
+        inline UInt8 getPF()
+        {
+            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
+                return 2;
+            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+                return 1;
+            return 0;
+        }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
@@ -737,7 +745,6 @@ namespace GObject
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
-        bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }

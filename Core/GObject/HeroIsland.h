@@ -32,6 +32,7 @@ struct Awards
 struct Skill
 {
     Skill() : last(2*60), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
+
     void reset()
     {
         last = 2*60;
@@ -41,6 +42,7 @@ struct Skill
         incd = false;
         attr = NULL;
     }
+
     UInt32 last;
     UInt32 lastcd;
     UInt8 bufid;
@@ -211,7 +213,7 @@ public:
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }
 
-public:
+private:
     SortType _sorts;
     std::vector<HIPlayerData*> _players[HERO_ISLAND_SPOTS];
     UInt32 _types[3];
