@@ -2628,6 +2628,7 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 
 	Stream st(REP::CHAT);
 	UInt8 office = player->getTitle(), guard = 0;
+    guard = player->getPF();
 	st << cr._type << player->getName() << player->getCountry() << static_cast<UInt8>(player->IsMale() ? 0 : 1)
 		<< office << guard << cr._text << Stream::eos;
 	switch(cr._type)
@@ -2666,7 +2667,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.cny = 0;
 		rep.sex = 0;
 		rep.office = player->getTitle();
-		rep.guard = 0;
+		rep.guard = player->getPF();
 		player->send(rep);
 	}
 	else
@@ -2676,7 +2677,7 @@ void OnPrivChatReq( GameMsgHdr& hdr, PrivChatReq& pcr )
 		rep.cny = player->getCountry();
 		rep.sex = player->IsMale() ? 0 : 1;
 		rep.office = player->getTitle();
-		rep.guard = 0;
+		rep.guard = player->getPF();
 		pl->send(rep);
 	}
 }

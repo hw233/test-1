@@ -1457,6 +1457,12 @@ void HeroIsland::commitCompass(Player* player)
 
     if (sz && !(sz % 3))
     {
+        if (sz >= 12)
+        {
+            pd->round = 0;
+            pd->compass.clear();
+        }
+
         if (pd->straight == 3)
         {
             ++pd->round;
@@ -1465,11 +1471,6 @@ void HeroIsland::commitCompass(Player* player)
         else
             pd->awardgot = 1;
 
-        if (sz >= 12)
-        {
-            pd->round = 0;
-            pd->compass.clear();
-        }
         pd->straight = 0; // XXX: 每三次为一轮
     }
     else
@@ -1542,7 +1543,11 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
             UInt32 num;
         };
 
-        UInt8 quality = pd->straight/3;
+        UInt8 quality = pd->awardgot;
+        if (quality)
+            quality -= 1;
+        if (quality > 3)
+            quality = 3;
         UInt8 sz = _awards[quality].size();
         UInt32 total = _awards[quality][sz-1].prob;
         Award awards[5] = {{0,},};

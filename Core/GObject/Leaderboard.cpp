@@ -18,6 +18,7 @@ struct LeaderboardItem
 {
 	UInt64 id;
 	std::string name;
+    UInt8 pf;
 	UInt8 lvl;
 	UInt8 country;
 	UInt32 value;
@@ -57,7 +58,7 @@ void buildPacket(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem>& l
 		LeaderboardItem& item = list[i];
 		if(merge)
 			Player::patchMergedName(item.id, item.name);
-		st << item.name << item.lvl << item.country << item.value << item.clan;
+		st << item.name << item.pf << item.lvl << item.country << item.value << item.clan;
 	}
 	st << Stream::eos;
 }
@@ -98,6 +99,7 @@ void Leaderboard::doUpdate()
 	{
 		blist[i].id = (*it)->ranker->getId();
 		blist[i].name = (*it)->ranker->getName();
+		blist[i].pf = (*it)->ranker->getPF();
 		blist[i].lvl = (*it)->ranker->GetLev();
 		blist[i].country = (*it)->ranker->getCountry();
 		blist[i].value = i + 1;

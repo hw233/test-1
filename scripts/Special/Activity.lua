@@ -120,6 +120,7 @@ function onLogin(player)
 end
 
 function onLevelup(player, olev, nlev)
+    print('level up')
 end
 
 function onDungeonWin(player, id, level)
@@ -653,12 +654,10 @@ end
 function onCopyWin(player, id, floor, spot)
 	local package = player:GetPackage();
 	package:AddItem(26, 1, false);	
-    print('-----------------26')
 end
 
 function onFrontMapWin(player, id, spot)
 	local package = player:GetPackage();
 	package:AddItem(26, 1, false);	
-    print('-----------------26')
 end
 

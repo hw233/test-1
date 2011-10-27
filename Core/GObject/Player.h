@@ -527,6 +527,14 @@ namespace GObject
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
         inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
         inline bool getQQVipYear() { return _playerData.qqvipyear; }
+        inline UInt8 getPF()
+        {
+            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
+                return 2;
+            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+                return 1;
+            return 0;
+        }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
