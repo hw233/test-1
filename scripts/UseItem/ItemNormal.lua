@@ -4906,6 +4906,69 @@ function ItemNormal_00000068(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00000007(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+	if package:GetRestPackageSize() < 20 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local fgt = player:getMainFighter();
+	if fgt == nil then
+		return false;
+	end
+    local cls = fgt:getClass()
+
+
+    -- 太乙精金
+    package:AddItem(503, 5, true, 0, 2);
+    -- 五行精金
+    package:AddItem(515, 1, true, 0, 2);
+    -- 高级挂机加速符
+    package:AddItem(56, 12, true, 0, 2);
+    -- 修炼加速符
+    package:AddItem(57, 12, true, 0, 2);
+    -- 五级暴击石
+    package:AddItem(5115, 1, true, 0, 2);
+    -- 精致拆卸石
+    package:AddItem(505, 1, true, 0, 2);
+    -- 宝石保护符
+    package:AddItem(513, 3, true, 0, 2);
+    -- 初级打孔石
+    package:AddItem(510, 2, true, 0, 2);
+    -- 中级打孔石
+    package:AddItem(511, 2, true, 0, 2);
+    -- 高级打孔石
+    package:AddItem(512, 2, true, 0, 2);
+    -- 兜率精金
+    package:AddItem(47, 1, true, 0, 2);
+    -- 九龙神火
+    package:AddItem(50, 1, true, 0, 2);
+    -- 凝神易经丹
+    package:AddItem(509, 2, true, 0, 2);
+    -- 补髓益元丹
+    package:AddItem(507, 2, true, 0, 2);
+    -- 自动回血符
+    package:AddItem(9, 5, true, 0, 2);
+    -- 洗练符
+    package:AddItem(500, 5, true, 0, 2);
+    -- 洗练符保护符
+    package:AddItem(501, 2, true, 0, 2);
+    -- 银票
+    package:AddItem(15, 10, true, 0, 2);
+
+    local Equip30 = {2393, 2385, 2377}
+    local Equip50 = {2545, 2553, 2561}
+    -- 30紫头
+    package:AddEquip(Equip30[cls], 1);
+    -- 50橙头
+    package:AddEquip(Equip50[cls], 1);
+
+    package:DelItemSendMsg(7, player);
+    return num;
+end
+
 function ItemNormal_00000067(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -5788,7 +5851,7 @@ local ItemNormal_Table = {
     [5] = ItemNormal_athletics_5,
     [6] = ItemNormal_athletics_6,
 
-    [7] = ItemNormal_00000067,
+    [7] = ItemNormal_00000007,
 
     [22] = ItemNormal_athletics_22,
     [23] = ItemNormal_athletics_23,
