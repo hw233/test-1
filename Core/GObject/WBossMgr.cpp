@@ -429,7 +429,7 @@ void WBossMgr::nextDay(UInt32 now)
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
-#if 0
+#if 1
         TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
         TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60,
