@@ -112,7 +112,10 @@ bool copyCheckLevel(Player* pl, UInt8 id)
         return false;
 
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90};
-    if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8)) {
+    if (id > sizeof(lvls)/sizeof(UInt8))
+        return false;
+
+    if (pl->GetLev() < lvls[id-1]) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
         return false;
     }
@@ -205,7 +208,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
     if (!pl || !id || id > 6)
         return 0;
 
-	FastMutex::ScopedLock lk(_mutex);
+	FastMutex::ScopedLock lk(_mutex); // XXX:
+
     if (pl->hasFlag(Player::AutoCopy) && !ato) {
         pl->sendMsgCode(0, 1414);
         return 0;
@@ -355,7 +359,8 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
     if (!pl)
         return;
 
-	FastMutex::ScopedLock lk(_mutex);
+	FastMutex::ScopedLock lk(_mutex); // XXX:
+
     Stream st(REP::COPY_INFO);
     CopyData& tcd = getCopyData(pl, id);
     if (!tcd.floor) {
@@ -466,6 +471,8 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
 {
     if (!pl || !id)
         return;
+
+    //FastMutex::ScopedLock lk(_mutex);
 
     switch (type) {
         case 0:
