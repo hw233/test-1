@@ -828,7 +828,7 @@ namespace GObject
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
 
-        if (online >= 3)
+        if (online == 3)
         {
             SYSMSG(title, 2124);
             SYSMSG(content, 2125);
@@ -847,8 +847,10 @@ namespace GObject
                 }
                 DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
             }
-            setBuffData(PLAYER_BUFF_ONLINE, -1);
         }
+
+        if (online >= 4)
+            setBuffData(PLAYER_BUFF_ONLINE, -1);
     }
 
     void Player::sendNationalDayOnlineAward()
