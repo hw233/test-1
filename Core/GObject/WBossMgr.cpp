@@ -326,14 +326,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+33*60+10,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 12*60*60+3*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
