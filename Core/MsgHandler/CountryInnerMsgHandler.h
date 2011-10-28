@@ -745,7 +745,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
             return;
         player->getGold(recharge->gold);
         player->addTotalRecharge(recharge->gold);
-        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND %"I64_FMT"u",
+        DB8().PushUpdateData("UPDATE `recharge` SET `status` = 1 WHERE no = '%s' AND playerId = %"I64_FMT"u",
                 recharge->no, player->getId());
         char gold[32] = {0};
         char nno[256] = {0};

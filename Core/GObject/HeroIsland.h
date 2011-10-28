@@ -90,6 +90,7 @@ struct HIPlayerData
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
+
 #if 0
         pd->skills[1].last = 2*60;
         pd->skills[2].last = 2*60;
@@ -174,7 +175,7 @@ public:
     void restart(UInt32 now);
     void broadcastTV(UInt32 now);
     void calcNext(UInt32 now);
-    void end();
+    void end(UInt32 now);
     void reset();
 
     UInt8 getIdentity(Player* player, bool = false);

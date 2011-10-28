@@ -741,7 +741,7 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//’Ω∂∑œ‡πÿ
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, bool = true);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
