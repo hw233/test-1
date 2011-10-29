@@ -1122,6 +1122,7 @@ namespace GObject
             }
         }
 
+        heroIsland.playerLeave(this);
 		removeStatus(SGPunish);
 	}
 
@@ -3453,6 +3454,12 @@ namespace GObject
     void Player::clearHIAttr()
     {
         _hiattr.reset();
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->setDirty();
+        }
     }
 
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )
