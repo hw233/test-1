@@ -1353,7 +1353,7 @@ namespace GObject
 		m_Owner->send(st);
 	}
 
-	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type/*, bool protect*/ )
+	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
 		if (type > 3) return 2;
 		Fighter * fgt = NULL;
@@ -1376,6 +1376,9 @@ namespace GObject
 		ItemEquipData& ied = equip->getItemEquipData();
         if(ied.enchant >= ENCHANT_LEVEL_MAX)
             return 2;
+
+        if(count !=0 && type != 1)
+            return 2;
 		
         UInt32 enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
         if(enchant == 0)
@@ -1385,25 +1388,62 @@ namespace GObject
 		// const UInt8 enchant_max[] = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12};
         // if(ied.enchant >= enchant_max[viplvl])
         //     return 2;
-
-		UInt32 amount = GData::moneyNeed[GData::ENCHANT].tael;//GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
-		if(m_Owner->getTael() < amount)
+        //GObjectManager::getEnchantCost();  // enchant_cost[ied.enchant];
+		UInt32 amount = GData::moneyNeed[GData::ENCHANT].tael;
+		if(m_Owner->getTael() < (amount * (count > 0 ? count : 1)))
 		{
 			m_Owner->sendMsgCode(0, 1100);
 			return 2;
 		}
 		bool isBound = equip->GetBindStatus();
-		if(!DelItemAny(item_enchant_l + type, 1, &isBound))
-		{
-			return 2;
-		}
-		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, 1, TimeUtil::Now());
-		ConsumeInfo ci(EnchantEquipment,0,0);
-		m_Owner->useTael(amount,&ci);
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
-		if(uRand(1000) < enchant/*enchant_chance[ied.enchant]*/)
-		{
+        bool flag_suc = false;
+        UInt32 enc_times = 0;
+        if(0 == count && uRand(1000) < enchant)
+        {
+            flag_suc = true;
 			++ ied.enchant;
+            enc_times = 1;
+        }
+        else
+        {
+            int i = 0;
+            for(; i < count; ++i)
+            {
+                if(uRand(1000) < enchant)
+                {
+                    ++success;
+                    flag_suc = true;
+                    ++ ied.enchant;
+                    ++enc_times;
+                    if(ied.enchant == level)
+                        break;
+
+                    enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
+                    if(enchant == 0)
+                        break;
+                }
+                else
+                {
+                    ++failed;
+                    ++enc_times;
+                }
+            }
+        }
+
+        if(!DelItemAny(item_enchant_l + type, enc_times, &isBound))
+        {
+            success = 0;
+            failed = 0;
+            return 2;
+        }
+
+        DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
+        ConsumeInfo ci(EnchantEquipment,0,0);
+        m_Owner->useTael(amount * enc_times, &ci);
+
+		if(flag_suc/*enchant_chance[ied.enchant]*/)
+		{
 			DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			if(ied.enchant >= 5)
 				DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
@@ -1469,6 +1509,7 @@ namespace GObject
 			}
 			return 0;
 		}
+
 		if(type == 0 && ied.enchant >= 4)
 		{
 			ied.enchant --;
