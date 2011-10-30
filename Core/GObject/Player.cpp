@@ -2872,7 +2872,9 @@ namespace GObject
 		{
 			if(ci!=NULL)
 			{
-				DBLOG1().PushUpdateData("insert into consume_tael (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)", cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                std::string tbn("consume_tael");
+                DBLOG1().GetMultiDBName(tbn);
+				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
 		}
@@ -2891,8 +2893,10 @@ namespace GObject
 		{
 			if(ci!=NULL)
 			{
-				DBLOG1().PushUpdateData("insert into consume_tael (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
-					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                std::string tbn("consume_tael");
+                DBLOG1().GetMultiDBName(tbn);
+				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+					tbn.c_str(),cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
 		}
@@ -3438,8 +3442,8 @@ namespace GObject
     }
 
 	void Player::AddExp(UInt64 exp, UInt8 mlvl)
-	{
-		if(exp == 0)
+    {
+    	if(exp == 0)
 			return;
 		if(mlvl == 0)
 			mlvl = 255;
