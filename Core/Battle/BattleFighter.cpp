@@ -427,6 +427,25 @@ float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender)
     return magatk;
 }
 
+void BattleFighter::calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk)
+{
+    float rate = getCritical(defender);
+    isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
+
+    magatk = getMagAttack();
+	atk = getAttack();
+
+    float factor = getCriticalDmg() - defender->getTough(this);
+    if(factor < 1)
+        factor = 1;
+
+    if(isCritical)
+    {
+        magatk = magatk * factor;
+		atk = atk * factor;
+    }
+}
+
 float BattleFighter::calcTherapy(const GData::SkillBase* skill)
 {
     if(!skill)
@@ -445,7 +464,7 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     return aura_factor * ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
 }
 
-float BattleFighter::calcPoison(const GData::SkillBase* skill)
+float BattleFighter::calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs)
 {
     if(!skill)
         return 0;
@@ -453,14 +472,26 @@ float BattleFighter::calcPoison(const GData::SkillBase* skill)
     if(skill->effect == NULL)
         return 0;
 
+    float magatk = getMagAttack();
+    float atk = getAttack();
+
+    float factor = getCriticalDmg() - defender->getTough(this);
+    if(factor < 1)
+        factor = 1;
+
+    if(!cs)
+    {
+        factor = 1;
+    }
+
     // µÀ
     if(getClass() == 3)
     {
-        return ((_attack+ _attackAdd + _attackAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp) * (950 + uRand(100)) / 1000;
+        return (atk * skill->effect->hpP + skill->effect->hp + skill->effect->addhp) * factor * (950 + uRand(100)) / 1000;
     }
 
     // ÈåÊÍ
-    return ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->hp + skill->effect->addhp) *  (950 + uRand(100)) / 1000;
+    return (magatk * skill->effect->hpP + skill->effect->hp + skill->effect->addhp) * factor *  (950 + uRand(100)) / 1000;
 }
 
 bool BattleFighter::calcHit( BattleFighter * defender )

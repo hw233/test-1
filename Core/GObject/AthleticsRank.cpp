@@ -629,37 +629,37 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
     DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, data->challengetime, data->ranker->getId());
 
 	atker->addGlobalFlag(Player::Challenging);
+	defer->addGlobalFlag(Player::BeChallenging);
 	GameMsgHdr hdr(0x233, atker->getThreadId(), atker, sizeof(Player *));
 	GLOBAL().PushMsg(hdr, &defer);
 //	DBLOG().PushUpdateData("insert into `athletics_challenge`(`server_id`, `row`, `attacker_rank`, `defender_rank`, `created_at`) values(%u, %u, %u, %u, %u)", cfg.serverLogId, row, atkerRankPos, deferRankPos, TimeUtil::Now());
 }
 
-void AthleticsRank::notifyAthMartialOver(Player* pl, UInt8 cancel)
+void AthleticsRank::notifyAthMartialOver(Player * atker, Player * defer, UInt32 id, UInt8 res)
 {
-    if(!pl)
-        return;
-    pl->delGlobalFlag(Player::Challenging);
+    atker->delGlobalFlag(Player::Challenging);
+	defer->delGlobalFlag(Player::BeChallenging);
 
-	UInt8 row = getRankRow(pl->GetLev());
-	RankList::iterator plRank = _ranks[row].find(pl);
-	if (plRank == _ranks[row].end())
+	UInt8 row = getRankRow(atker->GetLev());
+	RankList::iterator atkerRank = _ranks[row].find(atker);
+	if (atkerRank == _ranks[row].end())
 		return ;
 
-    AthleticsRankData * data = *(plRank->second);
+    AthleticsRankData * data = *(atkerRank->second);
     if(!data)
         return;
 
-    if(cancel)
+    if(res == 2)
     {
         -- data->challengenum;
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, pl->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u WHERE `ranker` = %"I64_FMT"u", data->challengenum, atker->getId());
     }
     else
     {
         Stream st(REP::FIGHT_INFO_CHANGE);
-        st << static_cast<UInt16>(0x01);
+        st << static_cast<UInt16>(0x09);
         st << Stream::eos;
-        pl->send(st);
+        atker->send(st);
     }
 }
 
@@ -1858,13 +1858,34 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         while(pl->getLvPos() == roll2 || roll2 == roll0 || roll2 == roll1)
             roll2 = ((roll2 + 1) % size) + 1;
 
+        UInt32 *lv_idx = new UInt32[cnt*3];
+        memset( lv_idx, 0, sizeof(UInt32)*cnt*3);
         for(int i = 0; i < cnt; ++i)
         {
             UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
             if(idIdx[0] == 0)
             {
                 if(roll0 < size1)
-                    idIdx[0] = globalLevelsPlayers[level - i][roll0];
+                {
+                    int j = i;
+                    for(; j >= 0; --j)
+                    {
+                        if((roll0 == pl->getLvPos() && j == 0) || roll0 == lv_idx[j*3+1] || roll0 == lv_idx[j*3+2])
+                        {
+                            --roll0;
+                            if(roll0 == 0)
+                                roll0 = size1 - 1;
+                            continue;
+                        }
+                        else
+                            break;
+                    }
+                    if(j != -1)
+                    {
+                        idIdx[0] = globalLevelsPlayers[level - i][roll0];
+                        lv_idx[i*3] = roll0;
+                    }
+                }
                 else
                     roll0 -= size1 - 1;
             }
@@ -1872,7 +1893,26 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             if(idIdx[1] == 0)
             {
                 if(roll1 < size1)
-                    idIdx[1] = globalLevelsPlayers[level - i][roll1];
+                {
+                    int j = i;
+                    for(; j >= 0; --j)
+                    {
+                        if((roll1 == pl->getLvPos() && j == 0) || roll1 == lv_idx[j*3] || roll1 == lv_idx[j*3+2])
+                        {
+                            --roll1;
+                            if(roll1 == 0)
+                                roll1 = size1 - 1;
+                            continue;
+                        }
+                        else
+                            break;
+                    }
+                    if(j != -1)
+                    {
+                        idIdx[1] = globalLevelsPlayers[level - i][roll1];
+                        lv_idx[i*3+1] = roll1;
+                    }
+                }
                 else
                     roll1 -= size1 - 1;
             }
@@ -1880,11 +1920,31 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             if(idIdx[2] == 0)
             {
                 if(roll2 < size1)
-                    idIdx[2] = globalLevelsPlayers[level - i][roll2];
+                {
+                    int j = i;
+                    for(; j >= 0; --j)
+                    {
+                        if((roll2 == pl->getLvPos() && j == 0) || roll2 == lv_idx[j*3] || roll2 == lv_idx[j*3+1])
+                        {
+                            --roll2;
+                            if(roll2 == 0)
+                                roll2 = size1 - 1;
+                            continue;
+                        }
+                        else
+                            break;
+                    }
+                    if(j != -1)
+                    {
+                        idIdx[2] = globalLevelsPlayers[level - i][roll2];
+                        lv_idx[i*3+2] = roll2;
+                    }
+                }
                 else
                     roll2 -= size1 - 1;
             }
         }
+        delete lv_idx;
     }
 
     for(int i = 0; i < 3; ++i)
@@ -1898,8 +1958,8 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             mh.owner = pl;
             mh.md.idx = i;
             mh.md.defer = defer;
-            mh.md.bs = NULL;
-            GameMsgHdr hdr2(0x330, defer->getThreadId(), defer, sizeof(MartialHeader));
+            mh.md.canAttack = 0;
+            GameMsgHdr hdr2(0x330, pl->getThreadId(), pl, sizeof(MartialHeader));
             GLOBAL().PushMsg(hdr2, &mh);
         }
     }

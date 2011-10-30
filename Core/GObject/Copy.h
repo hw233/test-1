@@ -15,7 +15,10 @@ namespace GObject
 struct CopyData
 {
     CopyData() : floor(0), spot(0), lootlvl(0) {}
-    void reset() { memset(this, 0x00, sizeof(*this)); }
+    inline void reset()
+    {
+        memset(this, 0x00, sizeof(*this));
+    }
 
     UInt8 floor;
     UInt8 spot;
@@ -37,13 +40,12 @@ public:
     static UInt8 getGoldCount(UInt8 vipl);
 
 public:
+    void getCount(Player* pl, UInt8* free, UInt8* gold, bool = false);
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id);
     void enter(Player* pl, UInt8 id);
     UInt8 fight(Player* pl, UInt8 id, bool = false, bool = false);
     void reset(Player* pl, UInt8 id);
-
-    void getCount(Player* pl, UInt8* free, UInt8* gold, bool = false);
 
     UInt8 getCopySize(Player* pl);
     void buildInfo(Player* pl, Stream& st);

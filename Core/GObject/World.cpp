@@ -312,7 +312,7 @@ bool World::Init()
     else
         AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
 
-    UInt32 athChkPoint = TimeUtil::SharpDay(0, now) + EXTRAREWARDTM;
+    UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 
 	return true;

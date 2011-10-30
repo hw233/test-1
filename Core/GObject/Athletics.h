@@ -31,7 +31,8 @@ struct MartialData
 {
     UInt8 idx;
     Player* defer;
-    Battle::BattleSimulator* bs;
+    //Battle::BattleSimulator* bs;
+    UInt8 canAttack;
 };
 
 struct MartialHeader
@@ -83,6 +84,10 @@ public:
     void updateMartialHdr(const MartialHeader* mh);
     void updateMartial(const MartialData* md);
     void attackMartial(Player* defer);
+
+    void beAttackMartial(Player * atker, UInt8 formation, UInt16 portrait, Lineup * lineup);
+    void awardMartial(Player *, bool win);
+
 public:
 	bool addAthleticsExtraAward(UInt32 EquipId, UInt8 rank);
 
@@ -91,7 +96,8 @@ private:
 	bool _hasEnterAthletics;
 	std::deque<AthleticsData *> _athleticses;
     Player* _martial[3];
-    Battle::BattleSimulator* _martial_battle[3];
+    //Battle::BattleSimulator* _martial_battle[3];
+    UInt8 _canAttack[3];
 };
 
 }

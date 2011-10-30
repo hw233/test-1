@@ -17,7 +17,7 @@ namespace GObject
 Athletics::Athletics(Player * player) : _owner(player), _hasEnterAthletics(false)
 {
     memset(_martial, 0, sizeof(_martial));
-    memset(_martial_battle, 0, sizeof(_martial_battle));
+    memset(_canAttack, 0, sizeof(_canAttack));
 }
 
 Athletics::~Athletics()
@@ -451,15 +451,22 @@ void Athletics::updateMartial(const MartialData* md)
         return;
 
     _martial[md->idx] = md->defer;
-    if(_martial_battle[md->idx] != NULL)
-        delete _martial_battle[md->idx];
-    _martial_battle[md->idx] = md->bs;
+    _canAttack[md->idx] = md->canAttack;
     listAthleticsMartial();
 }
 
 void Athletics::attackMartial(Player* defer)
 {
-    UInt8 cancel = 1;
+    struct AthleticsResult
+    {
+        UInt32 id;
+        UInt8 side;
+        Player * defer;
+        UInt8 result;
+    };
+
+    UInt8 res = 2;
+    UInt32 id = 0;
     do
     {
         UInt8 idx = 0xFF;
@@ -475,14 +482,31 @@ void Athletics::attackMartial(Player* defer)
         if(idx > 2)
             break;
 
-        if(!_martial_battle[idx])
+        if(0 == _canAttack[idx])
             break;
 
-        cancel = 0;
-        bool res;
+        UInt8 tid = defer->getThreadId();
+        if(_owner->getThreadId() != tid)
+        {
+            struct AthleticsBeData
+            {
+                Player * attacker;
+                UInt16 formation;
+                UInt16 portrait;
+                Lineup lineup[5];
+            };
+            AthleticsBeData abd = { _owner, _owner->getFormation(), static_cast<UInt16>(_owner->getMainFighter() != NULL ? _owner->getMainFighter()->getId() : 0) };
+            for(int i = 0; i < 5; ++ i)
+                abd.lineup[i] = _owner->getLineup(i);
+            GameMsgHdr hdr(0x234, tid, defer, sizeof(AthleticsBeData));
+            GLOBAL().PushMsg(hdr, &abd);
+
+            return;
+        }
+
         UInt32 reptid;
-        Battle::BattleSimulator& bsim = *(_martial_battle[idx]);
-        bsim.setFormula(Script::BattleFormula::getCurrent());
+        Battle::BattleSimulator bsim = Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
+        defer->PutFighters( bsim, 1, true );
         _owner->PutFighters( bsim, 0, true );
         bsim.start();
         res = bsim.getWinner() == 1;
@@ -492,52 +516,120 @@ void Athletics::attackMartial(Player* defer)
         st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
         _owner->send(st);
 
-        GObject::LastAthAward la = {0};
-        if(res)
-        {
-            UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
-            if(wins >= 5)
-            {
-                _owner->GetPackage()->AddItem(6, 1, 1, true, FromAthletAward);
-                la.itemId = 6;
-                la.itemCount = 1;
-                wins = 0;
-            }
-            la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
-            _owner->getPrestige(la.prestige, false);
-            _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
-            delete _martial_battle[idx];
-            _martial_battle[idx] = NULL;
-            listAthleticsMartial();
-        }
-        else
-        {
-            la.prestige = 5 * (World::_wday == 3 ? 2 : 1);
-            _owner->getPrestige(la.prestige, false);
-        }
+        awardMartial(defer, res);
 
-        _owner->delayNotifyAthleticsAward(&la);
+        UInt32 time = TimeUtil::Now();
+		id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
+		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
     }while(false);
 
-    GameMsgHdr hdr2(0x1F2, WORKER_THREAD_WORLD, _owner, 1);
-    GLOBAL().PushMsg(hdr2, &cancel);
+	AthleticsResult ar = {id, 0, defer, res };
+
+	GameMsgHdr hdr(0x1F2, WORKER_THREAD_WORLD, _owner, sizeof(AthleticsResult));
+	GLOBAL().PushMsg(hdr, &ar);
+}
+
+void Athletics::beAttackMartial(Player * atker, UInt8 formation, UInt16 portrait, Lineup * lineup)
+{
+	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
+	bsim.setFormation( 0, formation );
+	bsim.setPortrait( 0, portrait );
+	for(int i = 0; i < 5; ++ i)
+	{
+		if(lineup[i].fighter != NULL)
+		{
+			Battle::BattleFighter * bf = bsim.newFighter(0, lineup[i].pos, lineup[i].fighter);
+			bf->setHP(0);
+		}
+	}
+	_owner->PutFighters( bsim, 1, true );
+	bsim.start();
+	bool res = bsim.getWinner() == 1;
+
+	Stream st(REP::ATTACK_NPC);
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	atker->send(st);
+
+	struct AthleticsResult
+	{
+		UInt32 id;
+		UInt8 side;
+		Player * atker;
+		bool result;
+	};
+	UInt32 time = TimeUtil::Now();
+	UInt32 id = addAthleticsData(1, atker, res ? 0 : 1, bsim.getId(), time);
+	notifyAthleticsDeferData(1, atker, id, res ? 0 : 1, bsim.getId(), time);
+	AthleticsResult ar = {id, 1, atker, res };
+
+	GameMsgHdr hdr(0x1F2, WORKER_THREAD_WORLD, _owner, sizeof(AthleticsResult));
+	GLOBAL().PushMsg(hdr, &ar);
+
+	struct AthleticsResNotify
+	{
+		Player * peer;
+		bool win;
+	};
+	AthleticsResNotify notify = { _owner, res };
+	GameMsgHdr hdr2(0x235, atker->getThreadId(), atker, sizeof(AthleticsResNotify));
+	GLOBAL().PushMsg(hdr2, &notify);
+}
+
+void Athletics::awardMartial(Player* defer, bool win)
+{
+    GObject::LastAthAward la = {0};
+    if(win)
+    {
+        for(UInt8 i = 0; i < 3; ++i)
+        {
+            if(_martial[i] == defer)
+            {
+                _canAttack[i] = 0;
+                break;
+            }
+        }
+
+        UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
+        if(wins >= 5)
+        {
+            _owner->GetPackage()->AddItem(6, 1, 1, true, FromAthletAward);
+            la.itemId = 6;
+            la.itemCount = 1;
+            wins = 0;
+        }
+        la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
+        _owner->getPrestige(la.prestige, false);
+        _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
+
+        listAthleticsMartial();
+    }
+    else
+    {
+        la.prestige = 5 * (World::_wday == 3 ? 2 : 1);
+        _owner->getPrestige(la.prestige, false);
+    }
+
+    _owner->delayNotifyAthleticsAward(&la);
 }
 
 void Athletics::updateMartialHdr(const MartialHeader* mh)
 {
     Player* defer = mh->md.defer;
+
+    MartialData md = {0};
+
+    md.idx = mh->md.idx;
+    md.defer = defer;
+    md.canAttack = 1;
+    _owner->GetAthletics()->updateMartial(&md);
+
+#if 0
     if(_owner == mh->owner)
     {
         if(_owner->getThreadId() == defer->getThreadId())
         {
-            MartialData md = {0};
-            Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
-            defer->PutFighters( *bsim, 1, true );
-
-            md.idx = mh->md.idx;
-            md.defer = defer;
-            md.bs = bsim;
-            _owner->GetAthletics()->updateMartial(&md);
+            //Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
+            //defer->PutFighters( *bsim, 1, true );
         }
         else
         {
@@ -547,17 +639,10 @@ void Athletics::updateMartialHdr(const MartialHeader* mh)
     }
     else if(_owner == defer)
     {
-        MartialData md = {0};
-        Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, mh->owner, defer);
-        defer->PutFighters( *bsim, 1, true );
-
-        md.idx = mh->md.idx;
-        md.defer = defer;
-        md.bs = bsim;
-
+        //Battle::BattleSimulator* bsim = new Battle::BattleSimulator(Battle::BS_ATHLETICS1, mh->owner, defer);
+        //defer->PutFighters( *bsim, 1, true );
         if(_owner->getThreadId() == defer->getThreadId())
         {
-            mh->owner->GetAthletics()->updateMartial(&md);
         }
         else
         {
@@ -565,14 +650,11 @@ void Athletics::updateMartialHdr(const MartialHeader* mh)
             GLOBAL().PushMsg(hdr2, &md);
         }
     }
+#endif
 }
 
 void Athletics::listAthleticsMartial()
 {
-    UInt8 count = 15;
-	if (count > static_cast<UInt16>(_athleticses.size()))
-		count = static_cast<UInt16>(_athleticses.size());
-
 	Stream st(REP::ARENA_IFNO);
     st << static_cast<UInt16>(0x10);
 
@@ -584,13 +666,13 @@ void Athletics::listAthleticsMartial()
         if(_martial[i] != 0)
         {
             Player* pl = _martial[i];
-            if( pl != NULL && _martial_battle[i] != NULL)
+            if( pl != NULL && _canAttack[i] != 0)
                 needRefresh = false;
 
             if(pl == NULL)
                 st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
             else
-                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << static_cast<UInt8>(_martial_battle[i] == NULL ? 0 : 1);
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << _canAttack[i];
         }
         else
         {

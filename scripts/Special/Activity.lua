@@ -120,6 +120,7 @@ function onLogin(player)
 end
 
 function onLevelup(player, olev, nlev)
+    print('level up')
 end
 
 function onDungeonWin(player, id, level)
@@ -653,12 +654,49 @@ end
 function onCopyWin(player, id, floor, spot)
 	local package = player:GetPackage();
 	package:AddItem(26, 1, false);	
-    print('-----------------26')
 end
 
 function onFrontMapWin(player, id, spot)
 	local package = player:GetPackage();
 	package:AddItem(26, 1, false);	
-    print('-----------------26')
+end
+
+local vippack = {
+    [1] = {{511,2},{505,2},{500,2},{15,1},{502,5},{47,1},{48,2},{49,1},{50,1},{51,1},{513,2},{5033,3},{9,5},{56,10}},
+    [2] = {{56,2},{51,1},{15,1},{511,1}},
+    [3] = {{15,1},{1101,1},{510,1},{502,1}},
+    [4] = {{511,1},{512,1},{505,2},{500,1},{15,1},{503,3},{47,1},{48,2},{49,1},{50,1},{51,1},{513,1},{5034,1},{9,5},{56,10},{57,10}},
+    [5] = {{511,4},{512,2},{505,2},{500,5},{15,5},{503,5},{47,1},{48,2},{49,1},{50,1},{51,2},{513,1},{5034,1},{9,5},{56,12},{57,12},{514,3}},
+    [6] = {{511,4},{512,2},{505,2},{500,5},{15,6},{503,5},{47,1},{48,2},{49,1},{50,1},{51,2},{513,1},{5034,1},{9,5},{56,12},{57,12},{514,3},{506,2},{508,2}},
+    [7] = {{511,4},{512,2},{505,2},{500,5},{15,6},{503,5},{47,1},{48,2},{49,1},{50,1},{51,2},{513,1},{5034,1},{9,5},{56,12},{57,12},{514,3},{506,5},{508,5}},
+};
+
+local packsize = {
+    14,4,16,17,4,19,19,
+};
+
+function onGetVipPack(player, _type)
+    if _type == 0 then
+        return
+    end
+
+	local package = player:GetPackage();
+    local needsize = packsize[_type];
+    if needsize == nil then
+        return
+    end
+
+    if  package:GetRestPackageSize() < needsize then
+        player:sendMsgCode(2, 1011, 0)
+        return
+    end
+
+    if vippack[_type] == nil then
+        return
+    end
+
+    for k, v in pairs(vippack[_type]) do
+        package:AddItem(v[1], v[2], 1)
+    end
 end
 

@@ -103,7 +103,7 @@ inline UInt8 getGemLev(UInt32 id)
 
 inline bool IsFighterTypeId(UInt32 id)
 {
-    if (id == 74 || id == 76 || id == 75 || id == 77)
+    if (id == 73 || id == 74 || id == 75 || id == 76 || id == 75 || id == 77)
         return true;
     return false;
 }

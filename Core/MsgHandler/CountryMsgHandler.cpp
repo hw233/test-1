@@ -160,7 +160,6 @@ MSG_REG_2(GameMsgHdr, 0x270, OnGetClanBattleRewardReq);
 MSG_REG_2(GameMsgHdr, 0x271, OnClanTakeRewardReq);
 MSG_REG_2(GameMsgHdr, 0x272, OnClanBattleAttendReq);
 MSG_REG_2(GameMsgHdr, 0x274, OnExpGainByInstantCompleteReq);
-MSG_REG_2(GameMsgHdr, 0x275, OnCompleteAutoCopy);
 MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
 
@@ -213,5 +212,7 @@ MSG_REG_2(GameMsgHdr, 0x330, OnMartialUpdateHdr);
 MSG_REG_2(GameMsgHdr, 0x331, OnMartialUpdate);
 MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
+MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
+MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
 MSG_HANDLER_END()
