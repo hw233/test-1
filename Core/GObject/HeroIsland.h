@@ -62,7 +62,7 @@ struct HIPlayerData
     {
     }
 
-    void reset()
+    void reset(bool running)
     {
         if (player)
         {
@@ -82,7 +82,8 @@ struct HIPlayerData
         expcd = 0;
         straight = 0;
         round = 0;
-        score = 0;
+        if (!running)
+            score = 0;
         lasttype = 0;
         attrcd = static_cast<UInt32>(-1);
         bufid = DEFAULT_BUFID;
@@ -92,13 +93,6 @@ struct HIPlayerData
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
-
-#if 0
-        pd->skills[1].last = 2*60;
-        pd->skills[2].last = 2*60;
-        pd->skills[3].last = 2*60;
-        pd->skills[4].last = 2*60;
-#endif
     }
 
     Player* player;
