@@ -21,6 +21,19 @@ std::vector<Awards> HeroIsland::_awards[4];
 std::vector<UInt32> HeroIsland::_prestige;
 GData::AttrExtra HeroIsland::_skillattr[5];
 
+HeroIsland::~HeroIsland()
+{
+    for (UInt8 j = 0; j < HERO_ISLAND_SPOTS; ++j)
+    {
+        for (std::vector<HIPlayerData*>::iterator
+                i = _players[j].begin(), e = _players[j].end(); i != e; ++i)
+        {
+            delete *i;
+        }
+        _players[j].clear();
+    }
+}
+
 bool HeroIsland::initSkillAttr()
 {
     _skillattr[1].magatkP = 0.1;
@@ -135,6 +148,9 @@ void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 las
             break;
         case 5508:
             ra.bufid = PLAYER_BUFF_HIRA20;
+            break;
+        default:
+            ra.bufid = DEFAULT_BUFID;
             break;
     }
 
@@ -483,7 +499,7 @@ void HeroIsland::applayPlayers()
 
                 if (now >= pd->skills[i].lastcd)
                 {
-                    if (i && pd->skills[i].bufid)
+                    if (i && pd->skills[i].bufid != DEFAULT_BUFID)
                         clearBuff(2, pd, now, i);
                 }
             }
@@ -499,11 +515,11 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
 
     if (now)
     {
-        if (type == 1 && pd->bufid)
+        if (type == 1 && pd->bufid != DEFAULT_BUFID)
         {
             pd->attrcd = static_cast<UInt32>(-1);
             pd->player->setBuffData(pd->bufid, 0);
-            pd->bufid = 0;
+            pd->bufid = DEFAULT_BUFID;
 
             for (UInt8 i = 1; i < 5; ++i)
             {
@@ -513,7 +529,8 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
         }
         else if (type == 2 && skillid)
         {
-            pd->player->setBuffData(pd->skills[skillid].bufid, 0, false);
+            if (pd->skills[skillid].bufid != DEFAULT_BUFID)
+                pd->player->setBuffData(pd->skills[skillid].bufid, 0, false);
             pd->skills[skillid].lastcd = static_cast<UInt32>(-1);
             pd->skills[skillid].attr = NULL;
 
@@ -528,17 +545,19 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
     {
         if (type == 1)
         {
-            pd->player->setBuffData(pd->bufid, 0);
+            if (pd->bufid != DEFAULT_BUFID)
+                pd->player->setBuffData(pd->bufid, 0);
             pd->attrcd = static_cast<UInt32>(-1);
-            pd->bufid = 0;
+            pd->bufid = DEFAULT_BUFID;
         }
         else if (type == 2)
         {
             for (UInt8 i = 1; i < 5; ++i)
             {
-                pd->player->setBuffData(pd->skills[i].bufid, 0, false);
+                if (pd->skills[i].bufid != DEFAULT_BUFID)
+                    pd->player->setBuffData(pd->skills[i].bufid, 0, false);
                 pd->skills[i].lastcd = static_cast<UInt32>(-1);
-                pd->skills[i].bufid = 0;
+                pd->skills[i].bufid = DEFAULT_BUFID;
                 pd->skills[i].attr = NULL;
             }
         }
@@ -730,7 +749,11 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     HIPlayerData* pd = findPlayer(player, rspot, pos);
     if (pd)
     {
+        UInt32 now = TimeUtil::Now();
+        pd->expcd = now + 60;
+        pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
         ++_nplayers[spot];
+
         sendSpot(pd, rspot);
         return true;
     }
@@ -1215,7 +1238,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
 
                 UInt16 cd = 20*60;
                 pd->skills[0].cd = now + cd; // TODO:
-                pd->skills[0].bufid = 0;
+                pd->skills[0].bufid = DEFAULT_BUFID;
                 pd->skills[0].attr = NULL;
                 pd->player->regenAll(true);
                 pd->player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
@@ -1402,27 +1425,38 @@ void HeroIsland::playerEnter(Player* player)
 
 void HeroIsland::playerLeave(Player* player)
 {
-    if (!player) return;
+    if (!player)
+        return;
+
     if (!player->hasFlag(Player::InHeroIsland))
         return;
+
     UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
 
-    pd = leave(pd, spot, pos);
-    if (pd)
+    if (spot)
     {
-        clearBuff(1, pd, 0);
-        clearBuff(2, pd, 0); // XXX: must before reset
-
-        pd->spot = 0;
-        if (!_running)
-            pd->reset();
-        player->setHISpot(0);
-        _players[0].push_back(pd);
+        pd = leave(pd, spot, pos);
+        if (pd)
+        {
+            pd->spot = 0;
+            player->setHISpot(0);
+            _players[0].push_back(pd);
+        }
     }
+    else
+    {
+        if (_nplayers[0])
+            --_nplayers[0];
+    }
+
+    clearBuff(1, pd, 0);
+    clearBuff(2, pd, 0); // XXX: must before reset
+    if (!_running)
+        pd->reset();
 
     player->delFlag(Player::InHeroIsland);
     player->regenAll();

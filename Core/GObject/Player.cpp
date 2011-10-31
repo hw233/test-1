@@ -783,6 +783,7 @@ namespace GObject
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
+        _online = false; // XXX: fuck
         UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
         if (online == static_cast<UInt32>(-1))
             return;
@@ -857,7 +858,7 @@ namespace GObject
         }
 
         if (online >= 4)
-            setBuffData(PLAYER_BUFF_ONLINE, -1);
+            setBuffData(PLAYER_BUFF_ONLINE, static_cast<UInt32>(-1));
     }
 
     void Player::sendNationalDayOnlineAward()
@@ -3534,6 +3535,12 @@ namespace GObject
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
+
+        // XXX: TODO 应对回血符不能使用的情况
+        {
+            if (spot != 8977)
+                heroIsland.playerLeave(this);
+        }
 
 		if(inCity)
 		{

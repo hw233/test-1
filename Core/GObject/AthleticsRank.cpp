@@ -572,6 +572,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 #endif
 
         //updateAthleticsRank(data);
+        data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
         data->challengetime = TimeUtil::Now();
 
         UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
@@ -581,7 +582,8 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
             challengeBuff=data->challengetime + 5 * 60;
 
         atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
-        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u", data->challengetime, data->ranker->getId());
+        DB6().PushUpdateData("UPDATE `athletics_rank` SET `challengeNum` = %u, `challengeTime` = %u WHERE `ranker` = %"I64_FMT"u",
+                data->challengenum, data->challengetime, data->ranker->getId());
     }
 
 	atker->addGlobalFlag(Player::Challenging);
@@ -1850,13 +1852,25 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
 
         UInt32 roll0 = rnd(size) + 1;
         while(pl->getLvPos() == roll0)
-            roll0 = ((roll0 + 1) % size) + 1;
+        {
+            roll0 = ((roll0 + 1) % (size+1));
+            if (!roll0)
+                roll0 = 1;
+        }
         UInt32 roll1 = rnd(size) + 1;
         while(pl->getLvPos() == roll1 || roll1 == roll0)
-            roll1 = ((roll1 + 1) % size) + 1;
+        {
+            roll1 = ((roll1 + 1) % (size+1));
+            if (!roll1)
+                roll1 = 1;
+        }
         UInt32 roll2 = rnd(size) + 1;
         while(pl->getLvPos() == roll2 || roll2 == roll0 || roll2 == roll1)
-            roll2 = ((roll2 + 1) % size) + 1;
+        {
+            roll2 = ((roll2 + 1) % (size+1));
+            if (!roll2)
+                roll2 = 1;
+        }
 
         UInt32 *lv_idx = new UInt32[cnt*3];
         memset( lv_idx, 0, sizeof(UInt32)*cnt*3);

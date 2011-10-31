@@ -209,6 +209,12 @@ void GameClient::onRecv( int cmd, int len, void * buf )
         }
     }
 
+    if ((cmd == REQ::CHAT || cmd == REQ::WHISPER) &&  len > 200)
+    {
+        pendClose();
+        return;
+    }
+
     _chk ^= 0x33;
     if (cmd != REP::KEEP_ALIVE)
     {
