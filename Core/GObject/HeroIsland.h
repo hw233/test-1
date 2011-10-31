@@ -13,6 +13,8 @@ namespace GObject
 
 #define HERO_ISLAND_SPOTS 5
 #define HERO_ISLANG_PAGESZ 12
+#define DEFAULT_BUFID (static_cast<UInt8>(-1))
+#define DEFAULT_CD (static_cast<UInt32>(-1))
 
 struct Task
 {
@@ -31,13 +33,13 @@ struct Awards
 
 struct Skill
 {
-    Skill() : last(2*60), lastcd(0), bufid(0), cd(0), incd(false), attr(NULL) {}
+    Skill() : last(2*60), lastcd(0), bufid(DEFAULT_BUFID), cd(0), incd(false), attr(NULL) {}
 
     void reset()
     {
         last = 2*60;
         lastcd = 0;
-        bufid = 0;
+        bufid = DEFAULT_BUFID;
         cd = 0;
         incd = false;
         attr = NULL;
@@ -56,11 +58,11 @@ struct HIPlayerData
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
-        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(0), attr(NULL), awardgot(0), inrank(0)
+        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(DEFAULT_BUFID), attr(NULL), awardgot(0), inrank(0)
     {
     }
 
-    void reset()
+    void reset(bool running)
     {
         if (player)
         {
@@ -80,23 +82,17 @@ struct HIPlayerData
         expcd = 0;
         straight = 0;
         round = 0;
-        score = 0;
+        if (!running)
+            score = 0;
         lasttype = 0;
         attrcd = static_cast<UInt32>(-1);
-        bufid = 0;
+        bufid = DEFAULT_BUFID;
         attr = NULL;
         awardgot = 0;
         inrank = 0;
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
-
-#if 0
-        pd->skills[1].last = 2*60;
-        pd->skills[2].last = 2*60;
-        pd->skills[3].last = 2*60;
-        pd->skills[4].last = 2*60;
-#endif
     }
 
     Player* player;
@@ -121,7 +117,7 @@ struct HIPlayerData
 
 struct RareAnimals
 {
-    RareAnimals() : id(0), last(0), cdlong(0), cd(0) {}
+    RareAnimals() : id(0), last(0), cdlong(0), cd(0), bufid(DEFAULT_BUFID) {}
 
     UInt16 id; // NPC ID
     GData::AttrExtra attr; // 攻击成功后效果加成
@@ -153,7 +149,7 @@ public:
         initSkillAttr();
     }
 
-    ~HeroIsland() {}
+    ~HeroIsland();
 
 public:
     static void clearAllHICfg();
