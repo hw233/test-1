@@ -73,9 +73,9 @@ namespace GObject
 		ItemBase*  Add(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
 		ItemBase*  SetItem(UInt32 typeId, UInt32 num, bool bind = false);
 		bool   DelItemAll(UInt32 id, bool bind = false);
-		bool   DelItem(UInt32 id, UInt16 num, bool bind = false);
-		bool   DelItem2(ItemBase* item, UInt16 num);
-		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL);
+		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt8 toWhere = 0);
+		bool   DelItem2(ItemBase* item, UInt16 num, UInt8 toWhere = 0);
+		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt8 toWhere = 0);
 		bool   DelEquip(UInt32 id, UInt8 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt8 toWhere = 0);
 		bool   DelEquip3(ItemEquip *);

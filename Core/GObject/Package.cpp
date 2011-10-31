@@ -707,7 +707,7 @@ namespace GObject
 		return true;
 	}
 
-	bool Package::DelItem(UInt32 id, UInt16 num, bool bind)
+	bool Package::DelItem(UInt32 id, UInt16 num, bool bind, UInt8 toWhere)
 	{
 		if (num == 0 || IsEquipId(id))
 			return false;
@@ -726,11 +726,16 @@ namespace GObject
 			}
 			else
 				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
+
+            if(toWhere != 0 && item->getQuality() >= 3)
+            {
+				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), cnt, toWhere, TimeUtil::Now());
+            }
 		}
 		return ret;
 	}
 
-	bool Package::DelItem2(ItemBase* item, UInt16 num)
+	bool Package::DelItem2(ItemBase* item, UInt16 num, UInt8 toWhere)
 	{
 		if (num == 0 || item == NULL || IsEquipId(item->getId()))
 			return false;
@@ -749,6 +754,11 @@ namespace GObject
 			}
 			else
 				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
+
+            if(toWhere != 0 && item->getQuality() >= 3)
+            {
+				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), cnt, toWhere, TimeUtil::Now());
+            }
 		}
 		return ret;
 	}
@@ -940,7 +950,7 @@ namespace GObject
 		if (item == NULL) return 0;
 		UInt32 price = item->getPrice();
 		if (price == 0) return 0;
-		if (DelItem2(item, num))
+		if (DelItem2(item, num, ToSellNpc))
 		{
 			return price * num;
 		}
@@ -1377,6 +1387,9 @@ namespace GObject
         if(ied.enchant >= ENCHANT_LEVEL_MAX)
             return 2;
 
+        if(level != 0 && ied.enchant >= level)
+            return 2;
+
         if(count !=0 && type != 1)
             return 2;
 		
@@ -1398,16 +1411,16 @@ namespace GObject
 		bool isBound = equip->GetBindStatus();
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
         bool flag_suc = false;
-        UInt32 enc_times = 0;
+        UInt32 enc_times = 1;
         if(0 == count && uRand(1000) < enchant)
         {
             flag_suc = true;
 			++ ied.enchant;
-            enc_times = 1;
         }
-        else
+        else if( 0 != count )
         {
             int i = 0;
+            enc_times = 0;
             for(; i < count; ++i)
             {
                 if(uRand(1000) < enchant)
@@ -1416,7 +1429,7 @@ namespace GObject
                     flag_suc = true;
                     ++ ied.enchant;
                     ++enc_times;
-                    if(ied.enchant == level)
+                    if(ied.enchant >= level)
                         break;
 
                     enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
@@ -1744,7 +1757,7 @@ namespace GObject
 				return 2;
 			fempty = ied.sockets - 1;
 		}
-		if(!DelItem(gemId, 1, bind))
+		if(!DelItem(gemId, 1, bind, ToGemAttach))
 			return 1;
 		ied.gems[fempty] = gemId;
 		DB4().PushUpdateData("UPDATE `equipment` SET `socket%u` = %u WHERE `id` = %u", fempty + 1, ied.gems[fempty], equip->getId());
@@ -2234,19 +2247,19 @@ namespace GObject
         }
 
         if(bindUsed > 0)
-            DelItem(gemId, bindUsed, true);
+            DelItem(gemId, bindUsed, true, ToGemMgerge);
         if(unbindUsed > 0)
-            DelItem(gemId, unbindUsed, false);
+            DelItem(gemId, unbindUsed, false, ToGemMgerge);
 
         if(bindGemsOut > 0)
         {
-            AddItem(gemIdOut, bindGemsOut, true);
+            AddItem(gemIdOut, bindGemsOut, true, FromMerge);
             if(World::_activityStage > 0)
                 GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
         }
         if(unbindGemsOut > 0)
         {
-            AddItem(gemIdOut, unbindGemsOut, false);
+            AddItem(gemIdOut, unbindGemsOut, false, FromMerge);
             if(World::_activityStage > 0)
                 GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
         }
@@ -2254,9 +2267,9 @@ namespace GObject
 		ConsumeInfo ci(MergeGems,0,0);
 		m_Owner->useTael(coinAmount, &ci);
 		if(protectBindUsed > 0)
-			DelItem(ITEM_GEM_PROTECT, protectBindUsed, true);
+			DelItem(ITEM_GEM_PROTECT, protectBindUsed, true, ToGemMgerge);
 		if(protectUnbindUsed > 0)
-			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false);
+			DelItem(ITEM_GEM_PROTECT, protectUnbindUsed, false, ToGemMgerge);
 
 		return result;
     }
@@ -2552,6 +2565,8 @@ namespace GObject
 				++ c;
 			if(!DelItemAny(ITEM_FORGE_PROTECT, c))
 				protect = 0;
+            else
+                DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
 		}
 		ItemEquipData& ied = equip->getItemEquipData();
 		types[0] = ied.extraAttr2.type1;
@@ -2648,7 +2663,7 @@ namespace GObject
 		GameAction()->RunAutoRegen(m_Owner, fighter);
 	}
 
-	bool Package::DelItemAny( UInt32 id, UInt16 num, bool * hasBind )
+	bool Package::DelItemAny( UInt32 id, UInt16 num, bool * hasBind, UInt8 toWhere )
 	{
 		if(num == 0)
 			return true;
@@ -2669,7 +2684,7 @@ namespace GObject
 				*hasBind = true;
 			if(bcount >= num)
 			{
-				DelItem2(item, num);
+				DelItem2(item, num, toWhere);
 				return true;
 			}
 		}
@@ -2683,7 +2698,7 @@ namespace GObject
 			if(bcount + ucount >= num)
 			{
 				if(item != NULL && bcount > 0)
-					DelItem2(item, bcount);
+					DelItem2(item, bcount, toWhere);
 				DelItem2(item2, num - bcount);
 				if(!bind && hasBind != NULL)
 					*hasBind = true;

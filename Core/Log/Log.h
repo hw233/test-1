@@ -119,6 +119,7 @@ enum ItemTo
 	ToClanDonate,
 	ToGemMgerge,
 	ToActivateAttr,
+	ToGemAttach,	
 };
 
 
