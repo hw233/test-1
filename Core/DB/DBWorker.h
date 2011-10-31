@@ -34,7 +34,7 @@ public:
 	void PushUpdateData(const char *, ...);
     void PushUpdateDataF(const char * fmt, ...); // force
     void PushUpdateDataL(const char * fmt, ...); // lazy
-
+    void GetMultiDBName(std::string& oriName);
 private:
 	bool DoDBQuery(const char* query);
 	static void CalcUserLost(DBWorker *);

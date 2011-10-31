@@ -68,6 +68,30 @@ public:
 		return tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
 	}
+    static inline void GetDMY(UInt32* pDay = NULL, UInt32* pM = NULL, UInt32* pY = NULL)
+    {
+        time_t now = static_cast<time_t>( Now());
+        struct tm* pLocal = localtime(&now);
+        if(pDay)
+            *pDay = pLocal->tm_mday;
+        if(pM)
+            *pM = pLocal->tm_mon + 1;
+        if(pY)
+            *pY = pLocal->tm_year + 1900;
+    }
+    static inline void GetNextMY(UInt32& m, UInt32* pY)
+    {
+        if(m>=1 && m<12)
+        {
+            ++m;
+        }
+        else
+        {
+            m = 1;
+            if(pY)
+               ++ (*pY) ;
+        }
+    }
 };
 
 #endif // _TIMEUTIL_H_

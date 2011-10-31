@@ -11,7 +11,7 @@ function equipmentset()
 {
     f=$1
     d=equipmentset
-    sed -i /name/d $f
+    sed -i /itemId/d $f
     sed -i /REF/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f

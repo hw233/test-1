@@ -226,8 +226,42 @@ void World::World_Midnight_Check( World * world )
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);
+    World_CreateNewDB_Check();
 }
-
+void World::World_CreateNewDB_Check()
+{
+    UInt32 day = 1;
+    UInt32 mon = 1;
+    UInt32 year = 2011;
+    TimeUtil::GetDMY(&day, &mon, &year);
+    if(day == 28)//28日开始建数据库
+    {
+        TimeUtil::GetNextMY(mon, &year);
+        CreateNewDB(mon, year);
+    }
+}
+void CreateNewDB(UInt32 mon , UInt32 year)
+{
+   //TO DO 配置
+   //if(0 == mon)
+   //{
+   //    UInt32 day = 1;
+   //    TimeUtil::GetDMY(&day, &mon, &year);
+   //}
+   DBLOG1().PushUpdateData("CREATE TABLE IF NOT EXISTS `consume_tael_%u_%u`\
+           ( `server_id` int(10) unsigned NOT NULL,\
+             `player_id` bigint(20) unsigned NOT NULL,\
+             `item_id` int(10) unsigned NOT NULL,\
+             `consume_type` int(10) unsigned NOT NULL,\
+             `item_num` int(10) unsigned NOT NULL,\
+             `expenditure` int(10) unsigned NOT NULL,\
+             `consume_time` int(10) unsigned NOT NULL,\
+             INDEX server_player (`server_id`, `player_id`),\
+             INDEX server_player_item (`server_id`, `player_id`, `item_id`),\
+             INDEX server_player_type (`server_id`, `player_id`, `consume_type`)\
+           ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",year, mon);
+ 
+}
 void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
@@ -256,7 +290,13 @@ bool World::Init()
 	_battleFormula = new Script::BattleFormula(path.c_str());
 
 	calWeekDay();
-
+    UInt32 day = 1;
+    UInt32 mon = 1;
+    UInt32 year = 2011;
+    TimeUtil::GetDMY(&day, &mon, &year);
+    CreateNewDB(mon, year);
+    TimeUtil::GetNextMY(mon, &year);
+    CreateNewDB(mon, year);
 	AddTimer(60 * 1000, World_testUpdate, this);
 	AddTimer(LEADERBOARD_UPDATE_INTERVAL * 1000, World_Leaderboard_Update);
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);

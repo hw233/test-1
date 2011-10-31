@@ -130,7 +130,7 @@ GMHandler::GMHandler()
     Reg(3, "lock", &GMHandler::OnLock);
     Reg(3, "unlock", &GMHandler::OnUnLock);
     Reg(3, "setbl", &GMHandler::OnSetBosslevel);
-    Reg(3, "cmd2d", &GMHandler::OnCmd2d);
+    Reg(3, "qqkey", &GMHandler::OnQQVipKey);
 
     Reg(3, "clanbuild", &GMHandler::OnClanBuild);
 
@@ -2319,7 +2319,7 @@ void GMHandler::OnSetBosslevel(GObject::Player *player, std::vector<std::string>
     GObject::worldBoss.setBossLevel(atoi(args[0].c_str()));
 }
 
-void GMHandler::OnCmd2d(GObject::Player *player, std::vector<std::string>& args)
+void GMHandler::OnQQVipKey(GObject::Player *player, std::vector<std::string>& args)
 {
     if (!player)
         return;

@@ -31,6 +31,15 @@ bool HeroIsland::initSkillAttr()
     return false;
 }
 
+void HeroIsland::clearAllHICfg()
+{
+    for (UInt8 i = 0; i < HERO_ISLAND_SPOTS; ++i)
+        _animals[i].clear();
+    for (UInt8 i = 0; i < 4; ++i)
+        _awards[i].clear();
+    _prestige.clear();
+}
+
 void HeroIsland::setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd)
 {
     if (spot > HERO_ISLAND_SPOTS)
@@ -236,7 +245,7 @@ void HeroIsland::broadcastTV(UInt32 now)
 
 void HeroIsland::calcNext(UInt32 now)
 {
-#if 0
+#if 1
     if (cfg.GMCheck)
     {
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 45 * 60;
@@ -261,7 +270,7 @@ void HeroIsland::calcNext(UInt32 now)
 #else
     if (cfg.GMCheck)
     {
-        _prepareTime = now + 30 * 60;
+        _prepareTime = now;
         _startTime = _prepareTime + 15 * 60;
         _endTime = _startTime + 60 * 60;
     }
@@ -271,7 +280,7 @@ void HeroIsland::calcNext(UInt32 now)
         _prepareTime = now;
         _startTime = _prepareTime + 30;
         //_endTime = _startTime + 30 * 60;
-        _endTime = _startTime + 10 * 60;
+        _endTime = _startTime + 20 * 60;
     }
 
     Stream st(REP::HERO_ISLAND);
@@ -305,14 +314,17 @@ void HeroIsland::rankReward()
             ++n;
         }
         else
-            (*i)->player->getPrestige(100);
+        {
+            if (nsz)
+                (*i)->player->getPrestige(_prestige[nsz-1] * factor + (*i)->compass.size() * 10);
+        }
     }
 }
 
-void HeroIsland::end()
+void HeroIsland::end(UInt32 now)
 {
     rankReward();
-    calcNext(TimeUtil::Now());
+    calcNext(now);
     reset();
 
     _running = false;
@@ -330,8 +342,9 @@ void HeroIsland::reset()
             HIPlayerData* pd = _players[i][j];
             if (pd && pd->player)
             {
+                //clearBuff(1, pd, 0);
+                //clearBuff(2, pd, 0);
                 pd->reset();
-                moveTo(pd->player, 0, false);
             }
         }
     }
@@ -358,10 +371,12 @@ void HeroIsland::process(UInt32 now)
     }
 
     if (_running && now >= _endTime)
-        end();
+        end(now);
 
     if (now >= _notifyTime)
         notifyCount(now);
+    if (_running && now >= _expTime)
+        expFactor(now);
 
     applayPlayers();
     applayRareAnimals();
@@ -378,9 +393,8 @@ void HeroIsland::notifyCount(UInt32 now)
     UInt8 count = 0;
     for (UInt8 j = 0; j < HERO_ISLAND_SPOTS; ++j)
     {
-        UInt16 sz = _players[j].size();
         st << j;
-        st << sz;
+        st << _nplayers[j];
         ++count;
     }
     st.data<UInt8>(off) = count;
@@ -388,6 +402,47 @@ void HeroIsland::notifyCount(UInt32 now)
     broadcast(st);
 
     _notifyTime = now + 5;
+}
+
+void HeroIsland::expFactor(UInt32 now)
+{
+    static float factor[4] = {1.5, 2.0, 2.5, 3.0};
+    for (UInt8 n = 0; n < 4; ++n)
+    {
+        UInt8 i = uRand(4);
+        if (n == i)
+        {
+            UInt8 j = uRand(4);
+            float tmp = factor[i];
+            factor[i] = factor[j];
+            factor[j] = tmp;
+        }
+        else
+        {
+            float tmp = factor[n];
+            factor[n] = factor[i];
+            factor[i] = tmp;
+        }
+    }
+
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(17);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt8>(0); // XXX: 中立区
+    st << static_cast<UInt8>(0);
+    for (UInt8 i = 0; i < 4; ++i)
+    {
+        _expfactor[i] = factor[i];
+        st << static_cast<UInt8>(i+1);
+        st << static_cast<UInt8>(2*_expfactor[i]); // XXX: *2
+    }
+    st << Stream::eos;
+    broadcast(st);
+
+    if (cfg.GMCheck)
+        _expTime = now + 10 * 60;
+    else
+        _expTime = now + 30;
 }
 
 void HeroIsland::applayPlayers()
@@ -410,7 +465,7 @@ void HeroIsland::applayPlayers()
             {
                 if (j && pd && pd->player && pd->expcd <= now)
                 {
-                    pd->player->AddExp(calcExp(pd->player->GetLev())*2);
+                    pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]);
                     pd->expcd = now + 60;
                 }
             }
@@ -438,27 +493,55 @@ void HeroIsland::applayPlayers()
 
 void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skillid)
 {
-    if (!pd || !pd->bufid) return;
-    pd->player->clearHIAttr();
-    if (type == 1 && pd->bufid)
-    {
-        pd->attrcd = static_cast<UInt32>(-1);
-        pd->player->setBuffData(pd->bufid, 0);
-        pd->bufid = 0;
+    if (!pd) return;
 
-        for (UInt8 i = 1; i < 5; ++i)
+    pd->player->clearHIAttr();
+
+    if (now)
+    {
+        if (type == 1 && pd->bufid)
         {
-            if (now < pd->skills[i].lastcd && pd->skills[i].attr)
-                pd->player->addHIAttr(*pd->skills[i].attr);
+            pd->attrcd = static_cast<UInt32>(-1);
+            pd->player->setBuffData(pd->bufid, 0);
+            pd->bufid = 0;
+
+            for (UInt8 i = 1; i < 5; ++i)
+            {
+                if (now < pd->skills[i].lastcd && pd->skills[i].attr)
+                    pd->player->addHIAttr(*pd->skills[i].attr);
+            }
+        }
+        else if (type == 2 && skillid)
+        {
+            pd->player->setBuffData(pd->skills[skillid].bufid, 0, false);
+            pd->skills[skillid].lastcd = static_cast<UInt32>(-1);
+            pd->skills[skillid].attr = NULL;
+
+            for (UInt8 i = 1; i < 5; ++i)
+            {
+                if (now < pd->skills[i].lastcd && pd->skills[i].attr && i != skillid)
+                    pd->player->addHIAttr(*pd->skills[i].attr);
+            }
         }
     }
-    else if (type == 2 && skillid)
+    else
     {
-        pd->player->setBuffData(pd->skills[skillid].bufid, 0, false);
-        pd->skills[skillid].lastcd = static_cast<UInt32>(-1);
-        pd->skills[skillid].attr = NULL;
-        if (pd && pd->player && now < pd->attrcd && pd->attr)
-            pd->player->addHIAttr(*pd->attr);
+        if (type == 1)
+        {
+            pd->player->setBuffData(pd->bufid, 0);
+            pd->attrcd = static_cast<UInt32>(-1);
+            pd->bufid = 0;
+        }
+        else if (type == 2)
+        {
+            for (UInt8 i = 1; i < 5; ++i)
+            {
+                pd->player->setBuffData(pd->skills[i].bufid, 0, false);
+                pd->skills[i].lastcd = static_cast<UInt32>(-1);
+                pd->skills[i].bufid = 0;
+                pd->skills[i].attr = NULL;
+            }
+        }
     }
 }
 
@@ -647,6 +730,7 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     HIPlayerData* pd = findPlayer(player, rspot, pos);
     if (pd)
     {
+        ++_nplayers[spot];
         sendSpot(pd, rspot);
         return true;
     }
@@ -682,6 +766,7 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
 
     pd->player->setHISpot(spot);
     sendSpot(pd, spot);
+    ++_nplayers[spot];
     return true;
 }
 
@@ -722,7 +807,7 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
     for (size_t i = start; i < sz; ++i)
     {
         HIPlayerData* pd1 = _players[spot][i];
-        if (pd1->player && pd1->player != pd->player)
+        if (pd1->player && pd1->player != pd->player && pd1->player->hasFlag(Player::InHeroIsland))
         {
             UInt8 l2 = pd1->player->GetLev();
             if (l1 < l2 && l2 - l1 > 20)
@@ -788,6 +873,12 @@ void HeroIsland::broadcast(HIPlayerData* pd, UInt8 spot, UInt8 type)
 {
     if (!pd || spot > HERO_ISLAND_SPOTS)
         return;
+
+    if (spot && !pd->player->allHpP())
+    {
+        fprintf(stderr, "error spot: %u, type: %u, hp: %u\n", spot, type, pd->player->allHpP());
+        return;
+    }
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(7);
@@ -857,11 +948,14 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt8 pos)
     if (!pd || spot > HERO_ISLAND_SPOTS || pos > _players[spot].size())
         return NULL;
 
+    _players[spot].erase(_players[spot].begin()+pos);
+
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
-    broadcast(st, pd->spot, pd->player);
+    broadcast(st, pd->spot);
 
-    _players[spot].erase(_players[spot].begin()+pos);
+    if (_nplayers[spot])
+        --_nplayers[spot];
     return pd;
 }
 
@@ -1018,7 +1112,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
 
         int turns = 0;
-        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5);
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5, false);
         if (cfg.GMCheck)
             pd->fightcd = now + 40;
         else
@@ -1064,7 +1158,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd->player->send(st);
             }
 
-            player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev()));
+            player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev())/2);
             broadcast(pd, pd->spot, 2);
         }
         else
@@ -1316,24 +1410,23 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
-#if 0
-#if 1
-    moveTo(player, 0, false);
-#else
-    pd = leave(pd, spot, pos);
-    if (pd) delete pd;
-    player->setHISpot(0xFF);
-#endif
-#else
+
     pd = leave(pd, spot, pos);
     if (pd)
     {
+        clearBuff(1, pd, 0);
+        clearBuff(2, pd, 0); // XXX: must before reset
+
         pd->spot = 0;
-        _players[0].push_back(pd);
+        if (!_running)
+            pd->reset();
         player->setHISpot(0);
+        _players[0].push_back(pd);
     }
-#endif
+
     player->delFlag(Player::InHeroIsland);
+    player->regenAll();
+
     if (cfg.GMCheck)
         player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+5*60);
     else
@@ -1352,6 +1445,12 @@ void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
     if (pagesize > sz)
         pagesize = sz;
 
+    if (pagesize > 100)
+        pagesize = 100;
+
+    if (start > 100)
+        start = 0;
+
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(13);
     st << start;
@@ -1361,6 +1460,7 @@ void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
     st << static_cast<UInt8>(0);
 
     UInt32 jump = start;
+    UInt32 num = start+1;
     UInt8 count = 0;
     for (SortType::reverse_iterator i = _sorts.rbegin(), e = _sorts.rend(); i != e; ++i)
     {
@@ -1369,6 +1469,10 @@ void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
             --jump;
             continue;
         }
+
+        if (num > 100)
+            break;
+        ++num;
 
         st << (*i)->player->getName();
         st << (*i)->player->GetLev();
@@ -1478,18 +1582,21 @@ void HeroIsland::commitCompass(Player* player)
     }
 
     {
-        pd->score += 10;
 #if 1
         for (SortType::iterator i = _sorts.begin(), e = _sorts.end(); i != e; ++i)
         {
             if (*i && (*i)->player == pd->player)
+            {
                 _sorts.erase(i);
+                break;
+            }
         }
 #else
         SortType::iterator i = _sorts.find(pd);
         if (i != _sorts.end())
             _sorts.erase(i);
 #endif
+        pd->score += 10;
         _sorts.insert(pd);
 
         pd->inrank = 0;

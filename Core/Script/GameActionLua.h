@@ -131,6 +131,7 @@ namespace Script
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
+		void onGetVipPack(Player* player, UInt8 type);
         void onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot);
 		void onEnchant(Player* player, UInt8 level);

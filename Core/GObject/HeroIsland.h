@@ -90,6 +90,7 @@ struct HIPlayerData
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
+
 #if 0
         pd->skills[1].last = 2*60;
         pd->skills[2].last = 2*60;
@@ -144,15 +145,18 @@ class HeroIsland
 {
 public:
     HeroIsland() : _running(false), _notifyTime(0), _prepareStep(0),
-    _prepareTime(0), _startTime(0), _endTime(0), _count(0)
+    _prepareTime(0), _startTime(0), _endTime(0), _count(0), _expTime(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
+        _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
+        _nplayers[0] = _nplayers[1] = _nplayers[2]= _nplayers[3] = 0;
         initSkillAttr();
     }
 
     ~HeroIsland() {}
 
 public:
+    static void clearAllHICfg();
     static void setRareAnimals(UInt8 spot, UInt32 npcid, Table attr, UInt32 last, UInt32 cd);
     static void addHIAwardsCfg(UInt8 type, UInt32 id, UInt32 num, UInt32 prob);
     static void addRankAwards(UInt32 prestige);
@@ -172,7 +176,7 @@ public:
     void restart(UInt32 now);
     void broadcastTV(UInt32 now);
     void calcNext(UInt32 now);
-    void end();
+    void end(UInt32 now);
     void reset();
 
     UInt8 getIdentity(Player* player, bool = false);
@@ -207,6 +211,7 @@ public:
     void broadcast(Stream& st, UInt8 spot, Player* = NULL);
     void broadcast(Stream& st);
     void notifyCount(UInt32 now);
+    void expFactor(UInt32 now);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
 
@@ -216,6 +221,7 @@ public:
 private:
     SortType _sorts;
     std::vector<HIPlayerData*> _players[HERO_ISLAND_SPOTS];
+    UInt16 _nplayers[HERO_ISLAND_SPOTS];
     UInt32 _types[3];
 
 private:
@@ -226,6 +232,8 @@ private:
     UInt32 _startTime;
     UInt32 _endTime;
     UInt8 _count;
+    float _expfactor[4];
+    UInt32 _expTime;
 };
 
 extern HeroIsland heroIsland;

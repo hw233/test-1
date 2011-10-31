@@ -346,5 +346,13 @@ std::string DBWorker::GetLogName()
 	}
 	return "";
 }
-
+void  DBWorker::GetMultiDBName(std::string& oriName)
+{
+    char app[64] = {0};
+    UInt32 m = 0;
+    UInt32 y = 0;
+    TimeUtil::GetDMY(NULL, &m, &y);
+    snprintf(app, 64, "_%u_%u", y, m);
+    oriName  += app;
+}
 }
