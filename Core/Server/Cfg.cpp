@@ -2,6 +2,7 @@
 #include "Cfg.h"
 #include "Network/Network.h"
 #include "Script/ConfigScript.h"
+#include "Script/DepartDBScript.h"
 #include "Common/StringTokenizer.h"
 
 #include <sys/ioctl.h> // for ioctl
@@ -23,6 +24,11 @@ void Cfg::load(const char * scriptStr)
 		return;
 	}
 	script.doFile(_filename.c_str());
+
+    // load departDB name 
+    Script::DepartDBScript s(this);
+    std::string dbNamePath = scriptPath + "DepartDB.lua";
+    s.doFile(dbNamePath.c_str());
 }
 
 void Cfg::setIfName(const char* iname)

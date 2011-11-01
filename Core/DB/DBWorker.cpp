@@ -167,7 +167,6 @@ void DBWorker::InfoLog(const char* p)
         DB6().GetLog()->OutInfo("[%u]Push [%s]\n", m_Worker, p);
     }
 }
-
 void DBWorker::PushUpdateData(const char * fmt, ...)
 {
 	if(m_Type == 1 && cfg.serverLogId == 0)
