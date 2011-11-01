@@ -51,6 +51,11 @@ enum PurchaseType
     FlushAthletics,
 };
 
+enum IncomingType
+{
+    InFromSale = 128,
+};
+
 enum MoneyType
 {
   Gold=1,

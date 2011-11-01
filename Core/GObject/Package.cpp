@@ -717,6 +717,12 @@ namespace GObject
 		if (ret)
 		{
 			UInt16 cnt = item->Count();
+
+            if(toWhere != 0 && item->getQuality() >= 3)
+            {
+				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+            }
+
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -726,11 +732,6 @@ namespace GObject
 			}
 			else
 				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
-
-            if(toWhere != 0 && item->getQuality() >= 3)
-            {
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), cnt, toWhere, TimeUtil::Now());
-            }
 		}
 		return ret;
 	}
@@ -743,6 +744,12 @@ namespace GObject
 		if (ret)
 		{
 			UInt16 cnt = item->Count();
+
+            if(toWhere != 0 && item->getQuality() >= 3)
+            {
+				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+            }
+
 			SendItemData(item);
 			UInt32 id = item->getId();
 			bool bind = item->GetBindStatus();
@@ -754,11 +761,6 @@ namespace GObject
 			}
 			else
 				DB4().PushUpdateData("UPDATE `item` SET `itemNum` = %u WHERE `id` = %u AND `bindType` = %u AND`ownerId` = %"I64_FMT"u", cnt, id, bind, m_Owner->getId());
-
-            if(toWhere != 0 && item->getQuality() >= 3)
-            {
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), cnt, toWhere, TimeUtil::Now());
-            }
 		}
 		return ret;
 	}
@@ -2254,13 +2256,13 @@ namespace GObject
 
         if(bindGemsOut > 0)
         {
-            AddItem(gemIdOut, bindGemsOut, true, FromMerge);
+            AddItem(gemIdOut, bindGemsOut, true, false, FromMerge);
             if(World::_activityStage > 0)
                 GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
         }
         if(unbindGemsOut > 0)
         {
-            AddItem(gemIdOut, unbindGemsOut, false, FromMerge);
+            AddItem(gemIdOut, unbindGemsOut, false, false, FromMerge);
             if(World::_activityStage > 0)
                 GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
         }

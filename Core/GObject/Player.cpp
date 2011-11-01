@@ -2676,7 +2676,7 @@ namespace GObject
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
 	}
 
-	UInt32 Player::getGold( UInt32 c )
+	UInt32 Player::getGold( UInt32 c, UInt8 incomingType )
 	{
 		if(c == 0)
 			return _playerData.gold;
@@ -2684,6 +2684,13 @@ namespace GObject
 		SYSMSG_SENDV(149, this, c);
 		SYSMSG_SENDV(1049, this, c);
 		sendModification(1, _playerData.gold);
+
+        if(incomingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,0,0,%u,%u)",
+                cfg.serverLogId, getId(), incomingType, c, TimeUtil::Now());
+        }
+
 		return _playerData.gold;
 	}
 

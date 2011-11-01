@@ -309,7 +309,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer)
 		}
 		else
 		{
-			_owner->getGold(saleSellRespData->price);
+			_owner->getGold(saleSellRespData->price, InFromSale);
 			SYSMSGV(content, 314, saleSellRespData->itemName, buyer->getName().c_str(), saleSellRespData->price);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content);
 		}
