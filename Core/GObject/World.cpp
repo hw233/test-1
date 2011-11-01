@@ -30,6 +30,7 @@
 #include "WorldBoss.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
+#include "GObject/DCLogger.h"
 
 namespace GObject
 {
@@ -247,7 +248,8 @@ void CreateNewDB(UInt32 mon , UInt32 year)
    //{
    //    UInt32 day = 1;
    //    TimeUtil::GetDMY(&day, &mon, &year);
-   //}
+   //
+#if 0
    DBLOG1().PushUpdateData("CREATE TABLE IF NOT EXISTS `consume_tael_%u_%u`\
            ( `server_id` int(10) unsigned NOT NULL,\
              `player_id` bigint(20) unsigned NOT NULL,\
@@ -260,12 +262,17 @@ void CreateNewDB(UInt32 mon , UInt32 year)
              INDEX server_player_item (`server_id`, `player_id`, `item_id`),\
              INDEX server_player_type (`server_id`, `player_id`, `consume_type`)\
            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",year, mon);
- 
+#endif
+
+    DBLOG1().PushUpdateData(cfg.sql_consume_tael.c_str(), year, mon);
+    DBLOG1().PushUpdateData(cfg.sql_item_courses.c_str(), year, mon);
+    DBLOG1().PushUpdateData(cfg.sql_item_histories.c_str(), year, mon);
 }
 void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+    dclogger.online(onlineNums);
 }
 
 void World::World_Athletics_Check( void * )
@@ -288,6 +295,7 @@ bool World::Init()
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
 	_battleFormula = new Script::BattleFormula(path.c_str());
+    dclogger.init(); // XXX:
 
 	calWeekDay();
     UInt32 day = 1;

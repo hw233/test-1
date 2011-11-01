@@ -212,18 +212,6 @@ public:
 	inline void addFlag(UInt32 f) { _flag |= f; }
 	inline void delFlag(UInt32 f) { _flag &= ~f; }
 	inline bool hasFlag(UInt32 f) { return (_flag & f) > 0;}
-	inline UInt32 getPoisonRound() { return (_flag & PoisonRound) >> 22; }
-	inline UInt32 getStunRound() { return (_flag & StunRound) >> 25; }
-	inline void setPoisonRound(UInt32 r) { _flag = (_flag & ~PoisonRound) + (r << 22); }
-	inline void setStunRound(UInt32 r) { _flag = (_flag & ~StunRound) + (r << 25); }
-	inline UInt32 getStunLevel() { return (_flag & Stun) >> 5; }
-	inline UInt32 getPoisonLevel() { return (_flag & Poison) >> 8; }
-	inline UInt32 getConfuseLevel() { return (_flag & Confuse) >> 11; }
-	inline void setStunLevel(UInt32 l) { _flag = (_flag & ~Stun) + (l << 5); }
-	inline void setPoisonLevel(UInt32 l) { _flag = (_flag & ~Poison) + (l << 8); }
-	inline void setConfuseLevel(UInt32 l) { _flag = (_flag & ~Confuse) + (l << 11); }
-    inline UInt32 getConfuseRound() { return (_flag & ConfuseRound) >> 28; }
-    inline void setConfuseRound(UInt32 l) { _flag = (_flag & ~ConfuseRound) + (l << 28); }
 	void setAttrExtra(UInt8, UInt8, UInt8);
     inline void setImmuneLevel(UInt8 f) { _immuneLevel = f; }
     inline void setImmune(UInt8 f) { _immune |= f; }
@@ -236,6 +224,20 @@ public:
     inline UInt8 getForgetLevel() { return _forgetLevel; }
     inline UInt8 getForgetRound() { return _forgetRound; }
 
+	inline UInt8 getPoisonRound() { return _poisonRound; }
+	inline void setPoisonRound(UInt8 r) { _poisonRound = r; }
+	inline void setPoisonLevel(UInt8 l) { _poisonLevel = l; }
+	inline UInt8 getPoisonLevel() { return _poisonLevel; }
+
+	inline UInt8 getStunRound() { return _stunRound; }
+	inline void setStunRound(UInt8 r) { _stunRound = r; }
+	inline UInt8 getStunLevel() { return _stunLevel; }
+	inline void setStunLevel(UInt8 l) { _stunLevel = l; }
+
+	inline UInt32 getConfuseLevel() { return _confuseLevel; }
+	inline void setConfuseLevel(UInt32 l) { _confuseLevel = l; }
+    inline UInt32 getConfuseRound() { return _confuseRound; }
+    inline void setConfuseRound(UInt32 r) { _confuseRound = r; }
 
     const GData::SkillBase* getActiveSkill(bool need_therapy = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
@@ -353,6 +355,14 @@ private:
 	   b4:愈战愈勇
 	   28-31bit: holy level */
 	UInt32 _flag;
+
+    UInt8 _poisonRound;
+    UInt8 _poisonLevel;
+    UInt8 _stunRound;
+    UInt8 _stunLevel;
+    UInt8 _confuseRound;
+    UInt8 _confuseLevel;
+
 	GData::AttrExtra _attrExtraEquip; // 装备附加一级属性和
 	GData::AttrExtra _attrExtra; // 全部附加一级属性和
 	GData::AttrExtra _attrbylevel;

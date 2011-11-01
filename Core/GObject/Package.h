@@ -151,6 +151,8 @@ namespace GObject
 		bool TryAddItem(ItemBase * item, UInt16 num);
 		bool TryDelItem(ItemBase * item, UInt16 num);
 
+        void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);
+        void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere);
 	public:
 		inline ItemBase * FindItem(UInt32 id, bool bind = false)
 		{

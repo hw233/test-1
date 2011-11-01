@@ -2,9 +2,13 @@
 #include "Cfg.h"
 #include "Network/Network.h"
 #include "Script/ConfigScript.h"
+#include "Script/DepartDBScript.h"
 #include "Common/StringTokenizer.h"
 
-Cfg::Cfg( ): tcpPort(8888), serverLogId(0), dbDataPort(3306), dbObjectPort(3306),
+#include <sys/ioctl.h> // for ioctl
+#include <net/if.h> // for struct ifreq, IF_NAMESIZE
+
+Cfg::Cfg( ): tcpPort(8888), serverIp(0), serverLogId(0), dbDataPort(3306), dbObjectPort(3306),
 	openYear(2011), openMonth(9), openDay(23), enableWallow(false), limitLuckyDraw(0),
 	merged(false), supportCompress(true), GMCheck(true), channelNum(0), serverNum(0), arenaPort(0),
 	enableLoginLimit(false), loginLimit(10000), onlineLimit(0), _filename("conf/config.lua")
@@ -20,6 +24,34 @@ void Cfg::load(const char * scriptStr)
 		return;
 	}
 	script.doFile(_filename.c_str());
+
+    // load departDB name 
+    Script::DepartDBScript s(this);
+    std::string dbNamePath = scriptPath + "DepartDB.lua";
+    s.doFile(dbNamePath.c_str());
+}
+
+void Cfg::setIfName(const char* iname)
+{
+    if (!iname)
+        ifName = "eth0";
+    else
+        ifName = iname;
+
+    int fd; 
+    fd = socket(AF_INET , SOCK_DGRAM , 0); 
+    if (fd < 0)
+        return;
+
+    struct ifreq ifr;
+    size_t ilen = strlen(ifName.c_str());
+    ilen = ilen > IF_NAMESIZE ? IF_NAMESIZE - 1: ilen;
+    memset(ifr.ifr_name, 0x00, sizeof(ifr.ifr_name));
+    strncpy(ifr.ifr_name , ifName.c_str(), ilen);
+    if (ioctl(fd, SIOCGIFADDR , &ifr) < 0)
+        return;
+
+    serverIp = ((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 }
 
 Cfg::IPMask Cfg::parseAddress(const std::string& addr)
