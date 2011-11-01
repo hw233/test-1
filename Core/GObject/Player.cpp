@@ -41,6 +41,7 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
+#include "GObject/DCLogger.h"
 
 #include <cmath>
 
@@ -761,6 +762,7 @@ namespace GObject
         }
 
         udpLog("", "", "", "", "", "", "login");
+        dclogger.login(this);
 	}
 
     void Player::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
@@ -783,6 +785,7 @@ namespace GObject
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
+        _online = false; // XXX: fuck
         UInt32 online = getBuffData(PLAYER_BUFF_ONLINE);
         if (online == static_cast<UInt32>(-1))
             return;
@@ -857,7 +860,7 @@ namespace GObject
         }
 
         if (online >= 4)
-            setBuffData(PLAYER_BUFF_ONLINE, -1);
+            setBuffData(PLAYER_BUFF_ONLINE, static_cast<UInt32>(-1));
     }
 
     void Player::sendNationalDayOnlineAward()
@@ -1122,6 +1125,8 @@ namespace GObject
             }
         }
 
+        heroIsland.playerLeave(this);
+        dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
 
@@ -1908,7 +1913,7 @@ namespace GObject
         return false;
     }
 
-	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene )
+	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene, bool report )
 	{
 		checkLastBattled();
 		other->checkLastBattled();
@@ -1922,7 +1927,20 @@ namespace GObject
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		send(st);
 		st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
-		other->send(st);
+
+        if (report)
+            other->send(st);
+        else
+        {
+            if (res)
+            {
+                SYSMSG_SENDV(2141, other, getCountry(), getName().c_str());
+            }
+            else
+            {
+                SYSMSG_SENDV(2140, other, getCountry(), getName().c_str());
+            }
+        }
 
 		if(turns != NULL)
 			*turns = bsim.getTurns();
@@ -2827,7 +2845,9 @@ namespace GObject
 		{
 			if(ci!=NULL)
 			{
-				DBLOG1().PushUpdateData("insert into consume_tael (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)", cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                std::string tbn("consume_tael");
+                DBLOG1().GetMultiDBName(tbn);
+				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
 		}
@@ -2846,8 +2866,10 @@ namespace GObject
 		{
 			if(ci!=NULL)
 			{
-				DBLOG1().PushUpdateData("insert into consume_tael (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
-					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                std::string tbn("consume_tael");
+                DBLOG1().GetMultiDBName(tbn);
+				DBLOG1().PushUpdateData("insert into %s (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+					tbn.c_str(),cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
 			}
 			_playerData.tael -= c;
 		}
@@ -3393,8 +3415,8 @@ namespace GObject
     }
 
 	void Player::AddExp(UInt64 exp, UInt8 mlvl)
-	{
-		if(exp == 0)
+    {
+    	if(exp == 0)
 			return;
 		if(mlvl == 0)
 			mlvl = 255;
@@ -3440,6 +3462,12 @@ namespace GObject
     void Player::clearHIAttr()
     {
         _hiattr.reset();
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = getLineup(i).fighter;
+			if(fgt != NULL)
+				fgt->setDirty();
+        }
     }
 
 	void Player::setLevelAndExp( UInt8 l, UInt64 e )
@@ -3510,6 +3538,12 @@ namespace GObject
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
+
+        // XXX: TODO 应对回血符不能使用的情况
+        {
+            if (spot != 8977)
+                heroIsland.playerLeave(this);
+        }
 
 		if(inCity)
 		{

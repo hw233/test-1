@@ -1,0 +1,175 @@
+--ÈÎÎñµÄ½ÓÊÜÌõ¼ş
+function Task_Accept_00000128()
+	local player = GetPlayer();
+	if player:GetLev() < 38 then
+		return false;
+	end
+	local task =  player:GetTaskMgr();
+	if task:HasAcceptedTask(128) or task:HasCompletedTask(128) or task:HasSubmitedTask(128) then
+		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(60) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(60) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(60) then
+			return false;
+		end
+	end
+	return true;
+end
+
+
+
+
+-----¿É½ÓÈÎÎñÌõ¼ş
+function Task_Can_Accept_00000128()
+	local player = GetPlayer();
+	local task =  player:GetTaskMgr();
+	if player:GetLev() < 38 then
+		return false;
+	end
+	if task:HasAcceptedTask(128) or task:HasCompletedTask(128) or task:HasSubmitedTask(128) then
+		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(60) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(60) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(60) then
+			return false;
+		end
+	end
+	return true;
+end
+
+
+--ÈÎÎñÍê³ÉÌõ¼ş
+function Task_Submit_00000128()
+	if GetPlayer():GetTaskMgr():HasCompletedTask(128) then
+		return true;
+	end
+	return false;
+end
+
+
+---------------------------------------
+------NPC½»»¥µÄÈÎÎñ½Å±¾
+---------------------------------------
+function Task_00000128(npcId)
+	local player = GetPlayer();
+	local task = player:GetTaskMgr();
+	local action = ActionTable:Instance();
+
+	if task:GetTaskAcceptNpc(128) == npcId and Task_Accept_00000128 () then
+		action.m_ActionType = 0x0001;
+		action.m_ActionID = 128
+		action.m_ActionToken = 1;
+		action.m_ActionStep = 01;
+		action.m_ActionMsg = "æ¯æ—¥æŒ‚æœº";
+	elseif task:GetTaskSubmitNpc(128) == npcId then
+		if Task_Submit_00000128() then
+			action.m_ActionType = 0x0001;
+			action.m_ActionID = 128
+			action.m_ActionToken = 2;
+			action.m_ActionStep = 10;
+			action.m_ActionMsg = "æ¯æ—¥æŒ‚æœº";
+		elseif task:HasAcceptedTask(128) then
+			action.m_ActionType = 0x0001;
+			action.m_ActionID = 128
+			action.m_ActionToken = 0;
+			action.m_ActionStep = 0;
+			action.m_ActionMsg = "æ¯æ—¥æŒ‚æœº";
+		end
+	end
+	return action;
+end
+
+-------------------------------------------------
+--------ÈÎÎñ½»»¥²½Öè
+-------------------------------------------------
+function Task_00000128_step_01()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
+	action.m_ActionStep = 0;
+	action.m_NpcMsg = "æ¯å¤©é™¤äº†æ­£å¸¸çš„ä»»åŠ¡æµç¨‹å’Œå‰¯æœ¬ã€é˜µå›¾çš„é”»ç‚¼ä¹‹å¤–ï¼Œé—²æš‡æ—¶é—´"..GetPlayerName(GetPlayer()).."ä½ å¯ä»¥å°è¯•ä¸€ä¸‹æŒ‚æœºæ‰“æ€ªï¼Œè¿™ç§æ–¹å¼æ¯”è¾ƒçœåŠ›ï¼Œæ¯å¤©æ¯ä¸ªäººéƒ½æœ‰ä¸€å®šçš„åŠ é€Ÿæ¬¡æ•°ï¼Œå½“ç„¶è¦æ¶ˆè€—ä¸€å®šæ•°é‡çš„ç¤¼åˆ¸ã€‚";
+	action.m_ActionMsg = "è¿™ç§æ–¹å¼å¬èµ·æ¥ä¸é”™ï¼";
+	return action;
+end
+
+function Task_00000128_step_10()
+	local action = ActionTable:Instance();
+	action.m_ActionType = 0x0001;
+	action.m_ActionToken = 3;
+	action.m_ActionStep = 0;
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."ä½ çœŸæ˜¯å¥½èº«æ‰‹ã€‚";
+	action.m_ActionMsg = "";
+	return action;
+end
+
+local Task_00000128_step_table = {
+		[1] = Task_00000128_step_01,
+		[10] = Task_00000128_step_10,
+		};
+
+function Task_00000128_step(step)
+	if Task_00000128_step_table[step] ~= nil then
+		return Task_00000128_step_table[step]();
+	end
+	return ActionTable:Instance();
+end
+
+--½ÓÊÜÈÎÎñ
+function Task_00000128_accept()
+	local player = GetPlayer();
+	local task = player:GetTaskMgr();
+	if not Task_Accept_00000128() then
+		return false;
+	end
+	if not task:AcceptTask(128) then
+		return false;
+	end
+	task:AddTaskStep(128);
+	return true;
+end
+
+
+
+--Ìá½»ÈÎÎñ
+function Task_00000128_submit(itemId, itemNum)
+	local player = GetPlayer();
+
+	local package = player:GetPackage();
+
+	if not player:GetTaskMgr():SubmitTask(128) then
+		return false;
+	end
+
+
+	player:AddExp(5000);
+	player:getCoupon(40);
+	return true;
+end
+
+--·ÅÆúÈÎÎñ
+function Task_00000128_abandon()
+	local package = GetPlayer():GetPackage();
+	return GetPlayer():GetTaskMgr():AbandonTask(128);
+end

@@ -1,4 +1,6 @@
 
+VERSION=`data +%y%m%d%H%M`
+
 all:debug
 
 debug:

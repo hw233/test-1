@@ -162,7 +162,7 @@ function Task_00000147_submit(itemId, itemNum)
 	end
 
 
-	player:AddExp(120000);
+	player:AddExp(90000);
 	return true;
 end
 

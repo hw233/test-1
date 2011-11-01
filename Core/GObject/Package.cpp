@@ -440,6 +440,22 @@ namespace GObject
 		return AddItem2(typeId, num, !silence, bind, fromWhere);
 	}
 
+    //add log
+    void  Package::AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere)
+    {
+         std::string tbn("item_courses");
+         DBLOG().GetMultiDBName(tbn); 
+         DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", tbn.c_str(),cfg.serverLogId, m_Owner->getId(), typeId, num, fromWhere, TimeUtil::Now());
+    }
+
+    //add log
+    void  Package::AddItemHistoriesLog(UInt32 itemId, UInt32 num)
+    {
+        std::string tbn("item_histories");
+        DBLOG().GetMultiDBName(tbn);
+        DBLOG().PushUpdateData("insert into %s (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), itemId, num, TimeUtil::Now());
+        
+    }
 	ItemBase* Package::AddItem2(UInt32 typeId, UInt32 num, bool notify, bool bind, UInt8 fromWhere)
 	{
         if (!typeId || !num) return NULL;
@@ -457,8 +473,10 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				if(fromWhere != 0 && item->getQuality() >= 3)
-					DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, num, fromWhere, TimeUtil::Now());
+				if(fromWhere != 0  && item->getQuality() >= 3)
+                {
+                    AddItemCoursesLog(typeId, num, fromWhere);
+                }
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
 				return item;
@@ -479,8 +497,8 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				if(fromWhere != 0 && item->getQuality() >= 3)
-					DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, num, fromWhere, TimeUtil::Now());
+				//if(fromWhere != 0 && item->getQuality() >= 3)
+                     AddItemCoursesLog(typeId, num, fromWhere);
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
 				return item;
@@ -507,7 +525,9 @@ namespace GObject
 				ItemNotify(item->GetItemType().getId(), count);
 			}
 			if(fromWhere != 0 && item->getQuality() >= 3)
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, count, fromWhere, TimeUtil::Now());
+            {
+                AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
+            }
 			return item;
 		}
 		else
@@ -521,7 +541,9 @@ namespace GObject
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
 			if(fromWhere != 0 && item->getQuality() >= 3)
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, count, fromWhere, TimeUtil::Now());
+            {
+                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
+            }
 			return NULL;
 		}
 	}
@@ -1045,8 +1067,9 @@ namespace GObject
                     UInt8 rn = n<num?n:num;
                     udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
 					DelItem2(item, rn);
-					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
-					ret = true;
+					//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
+					AddItemHistoriesLog(id, rn);
+                    ret = true;
 				}				
 			}
 			else
@@ -1061,8 +1084,9 @@ namespace GObject
                         item = FindItem(id, false);
                     udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
 					DelItemAny(id, rn);
-					DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
-					ret = true;
+					//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
+                    AddItemHistoriesLog(id, rn);
+                    ret = true;
 				}
 			}
 		}
@@ -1416,8 +1440,9 @@ namespace GObject
 		{
 			return 2;
 		}
-		DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, 1, TimeUtil::Now());
-		ConsumeInfo ci(EnchantEquipment,0,0);
+		//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, 1, TimeUtil::Now());
+		AddItemHistoriesLog(item_enchant_l + type, 1);
+        ConsumeInfo ci(EnchantEquipment,0,0);
 		m_Owner->useTael(amount,&ci);
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
 		if(uRand(1000) < enchant/*enchant_chance[ied.enchant]*/)
@@ -1473,6 +1498,7 @@ namespace GObject
 			switch(ied.enchant)
 			{
 			case 8:
+            case 9:
 			case 10:
 			case 11:
 			case 12:
@@ -1532,19 +1558,22 @@ namespace GObject
 		{
 			if(!DelItemAny(ITEM_SOCKET_L3, 1, &isBound))
 				return 2;
-			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L3, 1, TimeUtil::Now());
+            AddItemHistoriesLog(ITEM_SOCKET_L3, 1);
+			//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L3, 1, TimeUtil::Now());
 		}
 		else if(ied.sockets >= 2)
 		{
 			if(!DelItemAny(ITEM_SOCKET_L2, 1, &isBound))
 				return 2;
-			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L2, 1, TimeUtil::Now());
+             AddItemHistoriesLog(ITEM_SOCKET_L2, 1);
+			//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L2, 1, TimeUtil::Now());
 		}
 		else
 		{
 			if(!DelItemAny(ITEM_SOCKET_L1, 1, &isBound))
 				return 2;
-			DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L1, 1, TimeUtil::Now());
+             AddItemHistoriesLog(ITEM_SOCKET_L1, 1);
+			//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_SOCKET_L1, 1, TimeUtil::Now());
 		}
 		//if(World::_wday == 6)
 		//{
@@ -1774,7 +1803,8 @@ namespace GObject
                 bind = true;
             else if(!DelItem(ITEM_DETACH_RUNE, 1, false))
                 return 2;
-            DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_RUNE, 1, TimeUtil::Now());
+             AddItemHistoriesLog(ITEM_DETACH_RUNE, 1);
+            //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_RUNE, 1, TimeUtil::Now());
         }
         else
         {
@@ -1782,7 +1812,8 @@ namespace GObject
                 bind = true;
             else if(!DelItem(ITEM_DETACH_PROTECT, 1, false))
                 return 2;
-            DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_PROTECT, 1, TimeUtil::Now());
+             AddItemHistoriesLog(ITEM_DETACH_RUNE, 1);
+            //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_DETACH_PROTECT, 1, TimeUtil::Now());
         }
 		if(!AddItem(ied.gems[pos], 1, bind | equip->GetBindStatus(), false, FromDetachGem))
 			return 2;
@@ -2516,7 +2547,8 @@ namespace GObject
 		default:
 			return 2;
 		}
-        DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
+        AddItemHistoriesLog(ITEM_FORGE_L1,  1);
+        //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
 		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
 		UInt8 q = equip->getQuality() - 3;
 		if(protect)

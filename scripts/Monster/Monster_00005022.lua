@@ -2,9 +2,6 @@ function Monster_00005022(num)
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
 	local package = player:GetPackage();
-	if task:HasAcceptedTask(63) then
-		task:AddTaskStep2(63,1,num);
-	end
 	if task:HasAcceptedTask(522) then
 		task:AddTaskStep2(522,1,num);
 	end
@@ -19,5 +16,8 @@ function Monster_00005022(num)
 	end
 	if task:HasAcceptedTask(592) then
 		task:AddTaskStep2(592,1,num);
+	end
+	if task:HasAcceptedTask(63) then
+		task:AddTaskStep2(63,1,num);
 	end
 end

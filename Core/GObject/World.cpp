@@ -30,6 +30,7 @@
 #include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
+#include "GObject/DCLogger.h"
 
 namespace GObject
 {
@@ -226,12 +227,52 @@ void World::World_Midnight_Check( World * world )
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);
+    World_CreateNewDB_Check();
 }
+void World::World_CreateNewDB_Check()
+{
+    UInt32 day = 1;
+    UInt32 mon = 1;
+    UInt32 year = 2011;
+    TimeUtil::GetDMY(&day, &mon, &year);
+    if(day == 28)//28日开始建数据库
+    {
+        TimeUtil::GetNextMY(mon, &year);
+        CreateNewDB(mon, year);
+    }
+}
+void CreateNewDB(UInt32 mon , UInt32 year)
+{
+   //TO DO 配置
+   //if(0 == mon)
+   //{
+   //    UInt32 day = 1;
+   //    TimeUtil::GetDMY(&day, &mon, &year);
+   //
+#if 0
+   DBLOG1().PushUpdateData("CREATE TABLE IF NOT EXISTS `consume_tael_%u_%u`\
+           ( `server_id` int(10) unsigned NOT NULL,\
+             `player_id` bigint(20) unsigned NOT NULL,\
+             `item_id` int(10) unsigned NOT NULL,\
+             `consume_type` int(10) unsigned NOT NULL,\
+             `item_num` int(10) unsigned NOT NULL,\
+             `expenditure` int(10) unsigned NOT NULL,\
+             `consume_time` int(10) unsigned NOT NULL,\
+             INDEX server_player (`server_id`, `player_id`),\
+             INDEX server_player_item (`server_id`, `player_id`, `item_id`),\
+             INDEX server_player_type (`server_id`, `player_id`, `consume_type`)\
+           ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",year, mon);
+#endif
 
+    DBLOG1().PushUpdateData(cfg.sql_consume_tael.c_str(), year, mon);
+    DBLOG1().PushUpdateData(cfg.sql_item_courses.c_str(), year, mon);
+    DBLOG1().PushUpdateData(cfg.sql_item_histories.c_str(), year, mon);
+}
 void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+    dclogger.online(onlineNums);
 }
 
 void World::World_Athletics_Check( void * )
@@ -254,9 +295,16 @@ bool World::Init()
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
 	_battleFormula = new Script::BattleFormula(path.c_str());
+    dclogger.init(); // XXX:
 
 	calWeekDay();
-
+    UInt32 day = 1;
+    UInt32 mon = 1;
+    UInt32 year = 2011;
+    TimeUtil::GetDMY(&day, &mon, &year);
+    CreateNewDB(mon, year);
+    TimeUtil::GetNextMY(mon, &year);
+    CreateNewDB(mon, year);
 	AddTimer(60 * 1000, World_testUpdate, this);
 	AddTimer(LEADERBOARD_UPDATE_INTERVAL * 1000, World_Leaderboard_Update);
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);

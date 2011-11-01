@@ -738,6 +738,8 @@ void Dungeon::pushChallenge( Player * player, UInt32 exp, bool won )
 {
 	player->addFlag(Player::AutoDungeon);
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
+    if (it == _players.end())
+        return;
 	EventDungeonAuto * event = new(std::nothrow) EventDungeonAuto(player, 1 + uRand(20), this, won, exp);
 	PushTimerEvent(event);
 }

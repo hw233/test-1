@@ -741,7 +741,7 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//’Ω∂∑œ‡πÿ
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, bool = true);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
@@ -1079,6 +1079,21 @@ namespace GObject
     public:
         void sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items);
         void setVipAwardFlag(UInt8 type, UInt32 value);
+
+    private:
+        std::string m_domain;
+        std::string m_openid;
+        std::string m_openkey;
+        std::string m_source;
+    public:
+        inline void setDomain(const std::string& domain) { m_domain = domain; }
+        inline void setOpenId(const std::string& openid) { m_openid = openid; }
+        inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
+        inline void setSource(const std::string& source) { m_source = source; }
+        inline const std::string& getDomain() const { return m_domain; }
+        inline const std::string& getOpenId() const { return m_openid; }
+        inline const std::string& getOpenKey() const { return m_openkey; }
+        inline const std::string& getSource() const { return m_source; }
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
