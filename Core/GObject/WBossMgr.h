@@ -59,6 +59,7 @@ public:
     inline UInt16 getLoc() const { return m_loc; }
 
     void reward(Player* player);
+    void getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret);
 
 private:
     UInt32 m_id;

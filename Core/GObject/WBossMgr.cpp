@@ -182,71 +182,154 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     return res;
 }
 
+void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
+{
+    if (sz >= 3)
+    {
+        if (sz <= 10)
+        {
+            for (UInt8 i = 0; i < 7; ++i)
+                ret.insert(i+3);
+        }
+        else
+        {
+            URandom rnd(time(NULL));
+            for (UInt32 i = 0; i < num; ++i)
+            {
+                UInt32 j = rnd(sz-3);
+                while (ret.find(j+3) != ret.end())
+                    j = rnd(sz-3);
+                ret.insert(j+3);
+            }
+        }
+    }
+}
+
 void WBoss::reward(Player* player)
 {
-    static UInt16 trumps[] = {90, 222, 221, 223, };
+    static UInt16 trumps[] = {222,90,221,223,};
+    static UInt8 trumpnum[] = {3,2,1};
+    static UInt8 trumpprob[] = {80,70,60,60,60,60,60,};
+    static UInt16 gems[] = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142};
 
     size_t sz = m_atkinfo.size();
-    UInt32 idx = uRand(sz);
+    if (!sz) return;
+
+    UInt8 lvl = _ng->getLevel();
+    UInt8 tlvl = lvl;
+
+    if (tlvl < 40)
+        tlvl = 40;
+    if (tlvl > 100)
+        tlvl = 100;
+
+    tlvl -= 40;
+    tlvl /= 10;
+
+    UInt32 lucky1 = uRand(sz);
+    if (lucky1 < 10)
+        lucky1 = 10;
+    UInt32 lucky2 = uRand(sz);
+    if (lucky2 < 10)
+        lucky2 = 10;
+
+    if (lucky1 == lucky2)
+        lucky2 += uRand(10);
+
+    if (lucky2 >= sz)
+        lucky2 = sz-1;
+
+    if (lucky1 >= sz)
+        lucky1 = 0;
+    if (lucky2 >= sz)
+        lucky2 = 0;
+
+    std::set<UInt32> equip_lucky;
+    std::set<UInt32> breath;
+    std::set<UInt32> gem;
+
+    UInt32 luckynum = 0;
+    if (lvl == 40)
+        luckynum = (float)10 * sz / 100;
+    else
+        luckynum = (float)5 * sz / 100;
+    getRandList(sz, luckynum, equip_lucky);
+
+    luckynum = (float)5 * sz / 100;
+    getRandList(sz, luckynum, breath);
+    getRandList(sz, luckynum, gem);
+
     UInt32 j = 0;
-    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend() ; i != e; ++i)
+    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend(); i != e; ++i, ++j)
     {
-        if (j == 0)
+        if (j < 3)
         {
-            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
+            UInt16 equip = 0;
+            if (lvl == 40)
+                equip = GObject::getRandPEquip(lvl);
+            else
+                equip = GObject::getRandOEquip(lvl);
+
             (*i).player->GetPackage()->Add(equip, true);
-            (*i).player->GetPackage()->Add(514, 3, true);
+            (*i).player->GetPackage()->Add(514, trumpnum[j], true);
 
-            UInt8 idx = _ng->getLevel();
-            if (idx < 40)
-                idx = 40;
-            if (idx > 100)
-                idx = 100;
-            idx -= 40;
-            idx /= 10;
 
-            if (idx > sizeof(trumps)/sizeof(UInt16))
+            if (tlvl > sizeof(trumps)/sizeof(UInt16))
                 continue;
-            (*i).player->GetPackage()->Add(trumps[idx], 1, true);
-            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 3, trumps[idx], 1);
+            (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
+            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, trumpnum[j], trumps[tlvl], 1);
         }
-        if (j == 1)
+        else if ((j >= 3 && j <= 9) || j == lucky1 || j == lucky2)
         {
-            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
-            (*i).player->GetPackage()->Add(equip, true);
-            (*i).player->GetPackage()->Add(514, 2, true);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 2);
+            UInt8 u = uRand(100);
+            if (u <= trumpprob[j-3])
+            {
+                (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
+                SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
+            }
+
+            if (j == lucky1 || j == lucky2)
+            {
+                SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
+            }
         }
-        if (j == 2)
+
+        if (j >= 3)
         {
-            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
-            (*i).player->GetPackage()->Add(equip, true);
-            (*i).player->GetPackage()->Add(514, 1, true);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 1);
+            if (equip_lucky.find(j) != equip_lucky.end())
+            {
+                UInt16 equip = 0;
+                if (lvl == 40)
+                    equip = GObject::getRandPEquip(lvl);
+                else
+                    equip = GObject::getRandOEquip(lvl);
+                if (equip)
+                {
+                    (*i).player->GetPackage()->Add(equip, 1, true);
+                    SYSMSG_BROADCASTV(561, (*i).player->getCountry(), (*i).player->getName().c_str(), equip);
+                }
+            }
 
-            if (idx <= j)
-                break;
+            if (breath.find(j) != breath.end())
+            {
+                (*i).player->GetPackage()->Add(508, 1, true);
+                SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 508, 1);
+            }
+
+            if (gem.find(j) != gem.end())
+            {
+                UInt8 idx = uRand(sizeof(gems)/sizeof(UInt16));
+                (*i).player->GetPackage()->Add(gems[idx], 1, true);
+                SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), gems[idx], 1);
+            }
         }
-
-        if (j == idx)
-        {
-            UInt16 equip = GObject::getRandOEquip(_ng->getLevel());
-            (*i).player->GetPackage()->Add(equip, true);
-            (*i).player->GetPackage()->Add(514, 1, true);
-            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, 1);
-
-            if (idx >= 3)
-                break;
-        }
-
-        ++j;
     }
 
     if (player)
     {
         player->GetPackage()->Add(56, 5, true);
-        player->getTael(20000);
-        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 20000);
+        player->getTael(10000);
+        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 10000);
     }
 }
 
@@ -324,10 +407,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!sz) return;
     _hp.resize(sz);
     for(size_t i = 0; i < sz; ++ i)
-    {
-        if(_hp[i] == 0 || _hp[i] >= 0xFFFFFFF0)
-            _hp[i] = nflist[i].fighter->getMaxHP();
-    }
+        _hp[i] = nflist[i].fighter->getMaxHP();
 
     Map * map = Map::FromSpot(m_loc);
     if (!map) return;
@@ -429,7 +509,7 @@ void WBossMgr::nextDay(UInt32 now)
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
-#if 1
+#if 0
         TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
         TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60,
@@ -440,14 +520,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+21*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+18*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+15*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+12*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+9*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+6*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+3*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+55*60+10,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -504,7 +584,7 @@ void WBossMgr::calcNext(UInt32 now)
             else
             {
                 _appearTime = _prepareTime + 20;
-                _disapperTime = _appearTime + 2 * 60 - 10;
+                _disapperTime = _appearTime + 20 * 60 - 10;
             }
             break;
         }
@@ -520,7 +600,7 @@ void WBossMgr::calcNext(UInt32 now)
             else
             {
                 _appearTime = _prepareTime + 30;
-                _disapperTime = _appearTime + 2 * 60 - 10;
+                _disapperTime = _appearTime + 20 * 60 - 10;
             }
             m_level = 1;
         }

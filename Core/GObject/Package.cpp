@@ -53,6 +53,25 @@ namespace GObject
         return equipid;
     }
 
+    UInt16 getRandPEquip(UInt8 lvl)
+    {
+        static const UInt16* equips[] = {PEquip40, };
+
+        UInt16 equipid = 0;
+
+        if (lvl < 40)
+            lvl = 40;
+        if (lvl > 40)
+            lvl = 40;
+
+        lvl -= 40;
+        lvl /= 10;
+
+        UInt8 idx = uRand(24);
+        equipid = equips[lvl][idx];
+        return equipid;
+    }
+
 #if 0
 	static UInt32 enchant_cost[] = {200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000};
 	static UInt32 merge_cost[] = {50, 100, 150, 200, 250, 300, 350, 400, 500};
