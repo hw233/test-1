@@ -72,7 +72,7 @@ public:
 	inline UInt16 getCount(UInt8 side)
     {
         return static_cast<UInt16>(_players[0][side].size() + _players[1][side].size() + _players[2][side].size()); }
-	inline UInt16 getScore(UInt8 side) { return _score[side]; }
+	inline UInt32 getScore(UInt8 side) { return _score[side]; }
 	inline std::vector<CountryBattleData *>::iterator playerEnd(UInt8 lvl, UInt8 side) { return _players[lvl][side].end(); }
 	void padPlayerData(Stream&, UInt8);
 	void sendInfo(Player *);
@@ -103,7 +103,7 @@ private:
 	Map * _map;
 	UInt32 _rewardTime;
 	UInt16 _spot;
-	UInt16 _score[2];
+	UInt32 _score[2];
 	Player * _topKiller;
 	UInt8 _topStreak;
 	std::map<Player *, CBPlayerData> _battleDuration[COUNTRY_NEUTRAL];

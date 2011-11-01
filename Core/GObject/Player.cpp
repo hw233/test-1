@@ -41,6 +41,7 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
+#include "GObject/DCLogger.h"
 
 #include <cmath>
 
@@ -761,6 +762,7 @@ namespace GObject
         }
 
         udpLog("", "", "", "", "", "", "login");
+        dclogger.login(this);
 	}
 
     void Player::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
@@ -1124,6 +1126,7 @@ namespace GObject
         }
 
         heroIsland.playerLeave(this);
+        dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
 

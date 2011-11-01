@@ -360,7 +360,7 @@ void HeroIsland::reset()
             {
                 //clearBuff(1, pd, 0);
                 //clearBuff(2, pd, 0);
-                pd->reset();
+                pd->reset(false);
             }
         }
     }
@@ -1455,8 +1455,7 @@ void HeroIsland::playerLeave(Player* player)
 
     clearBuff(1, pd, 0);
     clearBuff(2, pd, 0); // XXX: must before reset
-    if (!_running)
-        pd->reset();
+    pd->reset(_running);
 
     player->delFlag(Player::InHeroIsland);
     player->regenAll();
