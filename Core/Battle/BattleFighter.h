@@ -395,7 +395,15 @@ private:
     UInt8 _immune;
     UInt8 _immuneRound;
     bool _evade100;
+    UInt8 _evade100_cd;
+    UInt8 _evade100_last;
+    UInt8 _evade100_base_cd;
+    UInt8 _evade100_base_last;
     bool _defend100;
+    UInt8 _defend100_cd;
+    UInt8 _defend100_last;
+    UInt8 _defend100_base_cd;
+    UInt8 _defend100_base_last;
 	float _attackAdd2, _magAtkAdd2, _defAdd2, _magDefAdd2, _hitrateAdd2, _evadeAdd2;
     float _criticalAdd2, _criticalDmgAdd2, _pierceAdd2, _counterAdd2, _magResAdd2, _toughAdd2;
 	UInt32 _maxhpAdd2, _maxActionAdd2;
