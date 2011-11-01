@@ -174,7 +174,7 @@ function Task_00000144_submit(itemId, itemNum)
 		package:AddItem(1267,1,1);
 	end
 
-	player:AddExp(70000);
+	player:AddExp(100000);
 	return true;
 end
 

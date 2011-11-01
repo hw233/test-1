@@ -1,7 +1,7 @@
 --任务的接受条件
 function Task_Accept_00000062()
 	local player = GetPlayer();
-	if player:GetLev() < 35 then
+	if player:GetLev() < 39 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
@@ -10,17 +10,17 @@ function Task_Accept_00000062()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(60) then
+		if not task:HasSubmitedTask(61) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(60) then
+		if not task:HasSubmitedTask(61) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(60) then
+		if not task:HasSubmitedTask(61) then
 			return false;
 		end
 	end
@@ -34,7 +34,7 @@ end
 function Task_Can_Accept_00000062()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 35 then
+	if player:GetLev() < 39 then
 		return false;
 	end
 	if task:HasAcceptedTask(62) or task:HasCompletedTask(62) or task:HasSubmitedTask(62) then
@@ -42,17 +42,17 @@ function Task_Can_Accept_00000062()
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(60) then
+		if not task:HasSubmitedTask(61) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(60) then
+		if not task:HasSubmitedTask(61) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(60) then
+		if not task:HasSubmitedTask(61) then
 			return false;
 		end
 	end

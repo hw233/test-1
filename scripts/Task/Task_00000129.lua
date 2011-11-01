@@ -1,26 +1,26 @@
 --����Ľ�������
-function Task_Accept_00000063()
+function Task_Accept_00000129()
 	local player = GetPlayer();
-	if player:GetLev() < 39 then
+	if player:GetLev() < 38 then
 		return false;
 	end
 	local task =  player:GetTaskMgr();
-	if task:HasAcceptedTask(63) or task:HasCompletedTask(63) or task:HasSubmitedTask(63) then
+	if task:HasAcceptedTask(129) or task:HasCompletedTask(129) or task:HasSubmitedTask(129) then
 		return false;
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(62) then
+		if not task:HasSubmitedTask(128) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(62) then
+		if not task:HasSubmitedTask(128) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(62) then
+		if not task:HasSubmitedTask(128) then
 			return false;
 		end
 	end
@@ -31,28 +31,28 @@ end
 
 
 -----�ɽ���������
-function Task_Can_Accept_00000063()
+function Task_Can_Accept_00000129()
 	local player = GetPlayer();
 	local task =  player:GetTaskMgr();
-	if player:GetLev() < 39 then
+	if player:GetLev() < 38 then
 		return false;
 	end
-	if task:HasAcceptedTask(63) or task:HasCompletedTask(63) or task:HasSubmitedTask(63) then
+	if task:HasAcceptedTask(129) or task:HasCompletedTask(129) or task:HasSubmitedTask(129) then
 		return false;
 	end
 	local state = GetPlayerData(6);
 	if state == 0 then
-		if not task:HasSubmitedTask(62) then
+		if not task:HasSubmitedTask(128) then
 			return false;
 		end
 	end
 	if state == 1 then
-		if not task:HasSubmitedTask(62) then
+		if not task:HasSubmitedTask(128) then
 			return false;
 		end
 	end
 	if state == 2 then
-		if not task:HasSubmitedTask(62) then
+		if not task:HasSubmitedTask(128) then
 			return false;
 		end
 	end
@@ -61,8 +61,8 @@ end
 
 
 --�����������
-function Task_Submit_00000063()
-	if GetPlayer():GetTaskMgr():HasCompletedTask(63) then
+function Task_Submit_00000129()
+	if GetPlayer():GetTaskMgr():HasCompletedTask(129) then
 		return true;
 	end
 	return false;
@@ -72,30 +72,30 @@ end
 ---------------------------------------
 ------NPC����������ű�
 ---------------------------------------
-function Task_00000063(npcId)
+function Task_00000129(npcId)
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
 	local action = ActionTable:Instance();
 
-	if task:GetTaskAcceptNpc(63) == npcId and Task_Accept_00000063 () then
+	if task:GetTaskAcceptNpc(129) == npcId and Task_Accept_00000129 () then
 		action.m_ActionType = 0x0001;
-		action.m_ActionID = 63
+		action.m_ActionID = 129
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "修炼邪功";
-	elseif task:GetTaskSubmitNpc(63) == npcId then
-		if Task_Submit_00000063() then
+		action.m_ActionMsg = "多次加速";
+	elseif task:GetTaskSubmitNpc(129) == npcId then
+		if Task_Submit_00000129() then
 			action.m_ActionType = 0x0001;
-			action.m_ActionID = 63
+			action.m_ActionID = 129
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "修炼邪功";
-		elseif task:HasAcceptedTask(63) then
+			action.m_ActionMsg = "多次加速";
+		elseif task:HasAcceptedTask(129) then
 			action.m_ActionType = 0x0001;
-			action.m_ActionID = 63
+			action.m_ActionID = 129
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "修炼邪功";
+			action.m_ActionMsg = "多次加速";
 		end
 	end
 	return action;
@@ -104,46 +104,46 @@ end
 -------------------------------------------------
 --------���񽻻�����
 -------------------------------------------------
-function Task_00000063_step_01()
+function Task_00000129_step_01()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个鬼道人奸猾得很，见我来了帮手就逃进了后洞丹室，他劫掠了不少的少年男女在极阴洞里修炼邪功，少侠可一定不要放过他。";
-	action.m_ActionMsg = "真是聪明的大猩猩。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你现在就可以去尝试一下，以你现在的水平去福仙潭底毒石的地方挂机比较不错，没有危险又比较省力，正常消灭200个怪可是很艰巨的任务，不过你试着去挂机的话，就很轻松省力了。";
+	action.m_ActionMsg = "好的，我这就去。";
 	return action;
 end
 
-function Task_00000063_step_10()
+function Task_00000129_step_10()
 	local action = ActionTable:Instance();
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "小样，看你得瑟的，会玩飞剑了不起啊……等你拿到紫青双剑再来显摆吧。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是好身手。";
 	action.m_ActionMsg = "";
 	return action;
 end
 
-local Task_00000063_step_table = {
-		[1] = Task_00000063_step_01,
-		[10] = Task_00000063_step_10,
+local Task_00000129_step_table = {
+		[1] = Task_00000129_step_01,
+		[10] = Task_00000129_step_10,
 		};
 
-function Task_00000063_step(step)
-	if Task_00000063_step_table[step] ~= nil then
-		return Task_00000063_step_table[step]();
+function Task_00000129_step(step)
+	if Task_00000129_step_table[step] ~= nil then
+		return Task_00000129_step_table[step]();
 	end
 	return ActionTable:Instance();
 end
 
 --��������
-function Task_00000063_accept()
+function Task_00000129_accept()
 	local player = GetPlayer();
 	local task = player:GetTaskMgr();
-	if not Task_Accept_00000063() then
+	if not Task_Accept_00000129() then
 		return false;
 	end
-	if not task:AcceptTask(63) then
+	if not task:AcceptTask(129) then
 		return false;
 	end
 	return true;
@@ -152,12 +152,12 @@ end
 
 
 --�ύ����
-function Task_00000063_submit(itemId, itemNum)
+function Task_00000129_submit(itemId, itemNum)
 	local player = GetPlayer();
 
 	local package = player:GetPackage();
 
-	if not player:GetTaskMgr():SubmitTask(63) then
+	if not player:GetTaskMgr():SubmitTask(129) then
 		return false;
 	end
 
@@ -167,7 +167,7 @@ function Task_00000063_submit(itemId, itemNum)
 end
 
 --��������
-function Task_00000063_abandon()
+function Task_00000129_abandon()
 	local package = GetPlayer():GetPackage();
-	return GetPlayer():GetTaskMgr():AbandonTask(63);
+	return GetPlayer():GetTaskMgr():AbandonTask(129);
 end
