@@ -481,7 +481,9 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
                     itemsStr1+="|";
 					if(notify->items[i]->getQuality() >= 3)
 					{
-						DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, notify->launcher->getId(), notify->items[i]->getId(), notify->items[i]->Count(), FromTrade, now);
+                        std::string tbn("item_courses");
+                        DBLOG().GetMultiDBName(tbn);
+						DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, notify->launcher->getId(), notify->items[i]->getId(), notify->items[i]->Count(), FromTrade, now);
 					}
               }
             }
@@ -510,7 +512,9 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
                 itemsStr2+="|";
 				if((*it)->getQuality() >= 3)
 				{
-					DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
+                    std::string tbn("item_courses");
+                    DBLOG().GetMultiDBName(tbn);
+					DBLOG().PushUpdateData("insert into `%S`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
 				}
             }
         }
