@@ -10,6 +10,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 {
 	class_add<Cfg>("Cfg");
 	class_def<Cfg>("setTcpPort", &Cfg::setTcpPort);
+	class_def<Cfg>("setIfName", &Cfg::setIfName);
 	class_def<Cfg>("setScriptPath", &Cfg::setScriptPath);
 	class_def<Cfg>("setReportPath", &Cfg::setReportPath);
 	class_def<Cfg>("setServerLogId", &Cfg::setServerLogId);

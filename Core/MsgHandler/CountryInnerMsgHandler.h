@@ -23,6 +23,7 @@
 #include "Script/BattleFormula.h"
 #include "GObject/Tripod.h"
 #include "GObject/Clan.h"
+#include "GObject/DCLogger.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -941,6 +942,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     player->getCoupon(888);
     player->setQQVipl(qqlvl&0xff);
     player->setQQVipYear((qqlvl>>8)&0xff);
+    dclogger.reg(player);
 }
 
 void OnRunScriptReq( GameMsgHdr&, const void * data )

@@ -9,6 +9,8 @@ public:
 	inline void setFilename(const char * fn) {_filename = fn;}
 
 	UInt16		tcpPort;
+    UInt32      serverIp;
+    std::string ifName;
 	std::string	scriptPath;
 	std::string reportPath;
 	UInt32		serverLogId;
@@ -65,6 +67,7 @@ public:
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
+	void setIfName(const char* iname);
 	inline void setScriptPath(const char * p) {scriptPath = p;}
 	inline void setReportPath(const char * p) {reportPath = p;}
 	inline void setServerLogId(UInt32 id) {/*serverLogId = id;*/}

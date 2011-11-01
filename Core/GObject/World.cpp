@@ -30,6 +30,7 @@
 #include "WorldBoss.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
+#include "GObject/DCLogger.h"
 
 namespace GObject
 {
@@ -266,6 +267,7 @@ void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+    dclogger.online(onlineNums);
 }
 
 void World::World_Athletics_Check( void * )
@@ -288,6 +290,7 @@ bool World::Init()
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
 	_battleFormula = new Script::BattleFormula(path.c_str());
+    dclogger.init(); // XXX:
 
 	calWeekDay();
     UInt32 day = 1;
