@@ -286,7 +286,9 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 			{
 				if(sale->_item->getQuality() >= 3)
 				{
-					DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, player->getId(), sale->_item->getId(), sale->_item->Count(), FromSale, TimeUtil::Now());
+                    std::string tbn("item_courses");
+                    DBLOG().GetMultiDBName(tbn);
+					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), sale->_item->getId(), sale->_item->Count(), FromSale, TimeUtil::Now());
 				}
 			}
 			saleItemBuy.id = id;
