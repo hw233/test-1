@@ -2,6 +2,7 @@
 #include "Cfg.h"
 #include "Network/Network.h"
 #include "Script/ConfigScript.h"
+#include "Script/DepartDBScript.h"
 #include "Common/StringTokenizer.h"
 
 Cfg::Cfg( ): tcpPort(8888), serverLogId(0), dbDataPort(3306), dbObjectPort(3306),
@@ -20,6 +21,11 @@ void Cfg::load(const char * scriptStr)
 		return;
 	}
 	script.doFile(_filename.c_str());
+
+    // load departDB name 
+    Script::DepartDBScript s(this);
+    std::string dbNamePath = scriptPath + "DepartDB.lua";
+    s.doFile(dbNamePath.c_str());
 }
 
 Cfg::IPMask Cfg::parseAddress(const std::string& addr)

@@ -63,6 +63,11 @@ public:
     UInt16 loginLimit;
     UInt16 onlineLimit;
 
+    std::string sql_consume_tael;
+    std::string sql_item_courses;
+    std::string sql_item_histories;
+    std::string sql_mailitem_histories;
+
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	inline void setScriptPath(const char * p) {scriptPath = p;}
@@ -100,6 +105,10 @@ public:
 
 	bool isAdminIPAllowed(UInt32);
 
+    inline void SetSQLConsumetael(const char* p){sql_consume_tael = p;}
+    inline void SetSQLItemCourses(const char* p){ sql_item_courses = p;}
+    inline void SetSQLItemHistories(const char* p){ sql_item_histories = p;}
+    inline void SetSQLMailItemHistories(const char* p){ sql_mailitem_histories = p;}
 private:
 	struct IPMask
 	{

@@ -247,7 +247,8 @@ void CreateNewDB(UInt32 mon , UInt32 year)
    //{
    //    UInt32 day = 1;
    //    TimeUtil::GetDMY(&day, &mon, &year);
-   //}
+   //
+#if 0
    DBLOG1().PushUpdateData("CREATE TABLE IF NOT EXISTS `consume_tael_%u_%u`\
            ( `server_id` int(10) unsigned NOT NULL,\
              `player_id` bigint(20) unsigned NOT NULL,\
@@ -260,7 +261,11 @@ void CreateNewDB(UInt32 mon , UInt32 year)
              INDEX server_player_item (`server_id`, `player_id`, `item_id`),\
              INDEX server_player_type (`server_id`, `player_id`, `consume_type`)\
            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",year, mon);
- 
+#endif
+
+    DBLOG1().PushUpdateData(cfg.sql_consume_tael.c_str(), year, mon);
+    DBLOG1().PushUpdateData(cfg.sql_item_courses.c_str(), year, mon);
+    DBLOG1().PushUpdateData(cfg.sql_item_histories.c_str(), year, mon);
 }
 void World::World_Online_Log( void * )
 {
