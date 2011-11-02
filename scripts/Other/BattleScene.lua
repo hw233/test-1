@@ -36,6 +36,7 @@ local Battle_Scene = {
     {0xFF06, 7},        -- 幻波池副本
     {0xFE01, 11},       -- 阵图
     {0xFD01, 3}         -- 斗剑场
+    {0xFC01, 12}        -- 世界Boss
 }
 
 
