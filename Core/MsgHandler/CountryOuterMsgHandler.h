@@ -141,8 +141,10 @@ struct EnchantReq
 	UInt16 _fighterId;
 	UInt32 _itemid;
 	UInt8 _type;
+    UInt16 _count;
+    UInt8 _level;
 	// UInt8 _protect;
-	MESSAGE_DEF3(REQ::EQ_ENHANCE, UInt16, _fighterId, UInt32, _itemid, UInt8, _type/*, UInt8, _protect*/);
+	MESSAGE_DEF5(REQ::EQ_ENHANCE, UInt16, _fighterId, UInt32, _itemid, UInt8, _type, UInt16, _count, UInt8, _level/*, UInt8, _protect*/);
 };
 
 struct OpenSocketReq
@@ -1444,7 +1446,15 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 	if(!player->hasChecked())
 		return;
 	Stream st(REP::EQ_TO_STRONG);
-	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type/*, er._protect > 0*/) << er._fighterId << er._itemid << Stream::eos;
+    UInt16 success = 0;
+    UInt16 failed = 0;
+	st << player->GetPackage()->Enchant(er._fighterId, er._itemid, er._type, er._count, er._level, success, failed/*, er._protect > 0*/) << er._fighterId << er._itemid;
+
+    if(er._count != 0)
+        st << success << failed;
+
+    st << Stream::eos;
+
 	player->send(st);
     GameAction()->RunOperationTaskAction1(player, 1, 2);
 }

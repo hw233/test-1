@@ -504,6 +504,8 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 {
 	UInt32 Viplvl = atker->getVipLevel();
 	//const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20};
+    if( atker->hasFlag(GObject::Player::InHeroIsland) )
+        return;
 
 	Player * defer = globalNamedPlayers[atker->fixName(name)];
 	if (defer == NULL || atker == defer)
@@ -597,6 +599,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
 {
 	UInt32 Viplvl = atker->getVipLevel();
 	const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20};
+    if( atker->hasFlag(GObject::Player::InHeroIsland) )
+        return;
 
 	Player * defer = globalNamedPlayers[atker->fixName(name)];
 	if (defer == NULL || atker == defer || type != 3)
@@ -1872,8 +1876,6 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
                 roll2 = 1;
         }
 
-        UInt32 *lv_idx = new UInt32[cnt*3];
-        memset( lv_idx, 0, sizeof(UInt32)*cnt*3);
         for(int i = 0; i < cnt; ++i)
         {
             UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
@@ -1881,24 +1883,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             {
                 if(roll0 < size1)
                 {
-                    int j = i;
-                    for(; j >= 0; --j)
-                    {
-                        if((roll0 == pl->getLvPos() && j == 0) || roll0 == lv_idx[j*3+1] || roll0 == lv_idx[j*3+2])
-                        {
-                            --roll0;
-                            if(roll0 == 0)
-                                roll0 = size1 - 1;
-                            continue;
-                        }
-                        else
-                            break;
-                    }
-                    if(j != -1)
-                    {
-                        idIdx[0] = globalLevelsPlayers[level - i][roll0];
-                        lv_idx[i*3] = roll0;
-                    }
+                    idIdx[0] = globalLevelsPlayers[level - i][roll0];
                 }
                 else
                     roll0 -= size1 - 1;
@@ -1908,24 +1893,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             {
                 if(roll1 < size1)
                 {
-                    int j = i;
-                    for(; j >= 0; --j)
-                    {
-                        if((roll1 == pl->getLvPos() && j == 0) || roll1 == lv_idx[j*3] || roll1 == lv_idx[j*3+2])
-                        {
-                            --roll1;
-                            if(roll1 == 0)
-                                roll1 = size1 - 1;
-                            continue;
-                        }
-                        else
-                            break;
-                    }
-                    if(j != -1)
-                    {
-                        idIdx[1] = globalLevelsPlayers[level - i][roll1];
-                        lv_idx[i*3+1] = roll1;
-                    }
+                    idIdx[1] = globalLevelsPlayers[level - i][roll1];
                 }
                 else
                     roll1 -= size1 - 1;
@@ -1935,30 +1903,12 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             {
                 if(roll2 < size1)
                 {
-                    int j = i;
-                    for(; j >= 0; --j)
-                    {
-                        if((roll2 == pl->getLvPos() && j == 0) || roll2 == lv_idx[j*3] || roll2 == lv_idx[j*3+1])
-                        {
-                            --roll2;
-                            if(roll2 == 0)
-                                roll2 = size1 - 1;
-                            continue;
-                        }
-                        else
-                            break;
-                    }
-                    if(j != -1)
-                    {
-                        idIdx[2] = globalLevelsPlayers[level - i][roll2];
-                        lv_idx[i*3+2] = roll2;
-                    }
+                    idIdx[2] = globalLevelsPlayers[level - i][roll2];
                 }
                 else
                     roll2 -= size1 - 1;
             }
         }
-        delete lv_idx;
     }
 
     for(int i = 0; i < 3; ++i)

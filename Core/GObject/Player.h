@@ -598,9 +598,9 @@ namespace GObject
 		void sendModification(UInt8, UInt32, bool = true);
 		void updateDB(UInt8, UInt32);
 
-		UInt32 getGold(UInt32 c = 0);
+		UInt32 getGold(UInt32 c = 0, UInt8 incomingType = 0);
 		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
-		bool holdGold(UInt32 c, UInt8);
+		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
 
 		UInt32 getGoldOrCoupon();
 		UInt32 useGoldOrCoupon(UInt32,ConsumeInfo * ci=NULL);//return gold
@@ -949,6 +949,7 @@ namespace GObject
 		MailBox* m_MailBox;
 
 		bool _isOnline;
+        bool _isHoding;
 
 		PlayerData _playerData;
 		UInt32 _buffData[PLAYER_BUFF_COUNT];

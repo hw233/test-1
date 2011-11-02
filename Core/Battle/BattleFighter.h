@@ -299,8 +299,24 @@ public:
     }
     inline void setEvad100( bool evd100 ) { _evade100 = evd100; }
     inline bool getEvad100() { return _evade100; }
+    inline void setEvad100BaseCD( UInt8 evd100_cd ) { _evade100_base_cd = evd100_cd; }
+    inline UInt8 getEvad100BaseCD() { return _evade100_base_cd; }
+    inline void setEvad100CD( UInt8 evd100_cd ) { _evade100_cd = evd100_cd; }
+    inline UInt8& getEvad100CD() { return _evade100_cd; }
+    inline void setEvad100BaseLast( UInt8 evd100_last ) { _evade100_base_last = evd100_last; }
+    inline UInt8 getEvad100BaseLast() { return _evade100_base_last; }
+    inline void setEvad100Last( UInt8 evd100_last ) { _evade100_last = evd100_last; }
+    inline UInt8& getEvad100Last() { return _evade100_last; }
     inline void setDefend100( bool def100 ) { _defend100 = def100; }
     inline bool getDefend100() { return _defend100; }
+    inline void setDefend100BaseCD( UInt8 def100_cd ) { _defend100_base_cd = def100_cd; }
+    inline UInt8 getDefend100BaseCD() { return _defend100_base_cd; }
+    inline void setDefend100CD( UInt8 def100_cd ) { _defend100_cd = def100_cd; }
+    inline UInt8& getDefend100CD() { return _defend100_cd; }
+    inline void setDefend100BaseLast( UInt8 def100_last ) { _defend100_base_last = def100_last; }
+    inline UInt8 getDefend100BaseLast() { return _defend100_base_last; }
+    inline void setDefend100Last( UInt8 def100_last ) { _defend100_last = def100_last; }
+    inline UInt8& getDefend100Last() { return _defend100_last; }
 
 	inline float getAttackAdd2() {return _attackAdd2;}
     inline float getMagAttackAdd2() {return _magAtkAdd2;}
@@ -395,7 +411,15 @@ private:
     UInt8 _immune;
     UInt8 _immuneRound;
     bool _evade100;
+    UInt8 _evade100_cd;
+    UInt8 _evade100_last;
+    UInt8 _evade100_base_cd;
+    UInt8 _evade100_base_last;
     bool _defend100;
+    UInt8 _defend100_cd;
+    UInt8 _defend100_last;
+    UInt8 _defend100_base_cd;
+    UInt8 _defend100_base_last;
 	float _attackAdd2, _magAtkAdd2, _defAdd2, _magDefAdd2, _hitrateAdd2, _evadeAdd2;
     float _criticalAdd2, _criticalDmgAdd2, _pierceAdd2, _counterAdd2, _magResAdd2, _toughAdd2;
 	UInt32 _maxhpAdd2, _maxActionAdd2;

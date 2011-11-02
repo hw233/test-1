@@ -34,7 +34,7 @@ UInt8 ClanAuthority[5][7] =
 	{ 0, 1, 0, 0, 0, 0, 0 },
 	{ 0, 1, 0, 0, 0, 0, 0 },
 	{ 1, 1, 0, 0, 0, 0, 0 },
-	{ 1, 1, 1, 0, 0, 0, 0 },
+	{ 1, 1, 1, 1, 0, 0, 0 },
 	{ 1, 1, 1, 1, 1, 1, 1 }
 };
 
@@ -275,6 +275,9 @@ bool Clan::kick(Player * player, UInt64 pid)
 	if (player == kicker)
 		return false;
 	ClanMember * member = *found;
+    if(getClanRank(player) <= member->cls)
+        return false;
+
 	getAllocBack(*member);
 
 	{
