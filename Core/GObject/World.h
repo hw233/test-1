@@ -104,6 +104,7 @@ private:
 	UInt32 _now;
 	UInt32 _today;
 	UInt32 _announceLast;
+    std::vector<UInt32> _domain_nums;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

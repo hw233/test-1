@@ -28,7 +28,9 @@ namespace Battle
         BS_FRONTMAP1 = 0xFE01,
 
         // 斗剑场
-        BS_ATHLETICS1 = 0xFD01
+        BS_ATHLETICS1 = 0xFD01,
+        // 世界BOSS 
+        BS_WBOSS = 0xFC01
     };
 
 

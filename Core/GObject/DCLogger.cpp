@@ -169,7 +169,7 @@ bool DCLogger::logout(Player* player)
     return true;
 }
 
-bool DCLogger::online(UInt32 num)
+bool DCLogger::online(UInt32 num, UInt8 domain)
 {
 #ifndef _DEBUG
     if (!m_logger)
@@ -184,6 +184,7 @@ bool DCLogger::online(UInt32 num)
     msg << "&time=";
     msg << time(NULL);
     msg << "&domain="; // TODO:
+    msg << domain;
     msg << "&worldid=";
     msg << cfg.serverNum;
     msg << "&optype=5&actionid=14";
