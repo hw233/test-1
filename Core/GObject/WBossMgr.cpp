@@ -121,15 +121,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             UInt32 damage = oldHP - newHP;
             UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
             pl->pendExp(exp);
-
-            {
-                Stream st(REP::DAILY_DATA);
-                st << static_cast<UInt8>(6);
-                st << static_cast<UInt8>(2);
-                st << damage;
-                st << Stream::eos;
-                NETWORK()->Broadcast(st);
-            }
+            sendDmg(damage);
 
             AttackInfo info(pl, damage);
             AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
@@ -165,15 +157,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                 _percent = newPercent;
             }
-
-            {
-                Stream st(REP::DAILY_DATA);
-                st << static_cast<UInt8>(6);
-                st << static_cast<UInt8>(1);
-                st << _hp[0];
-                st << Stream::eos;
-                NETWORK()->Broadcast(st);
-            }
+            sendHp();
         }
     }
     else
@@ -441,40 +425,13 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!m_count)
         { SYSMSG_BROADCASTV(554, nflist[0].fighter->getId(), m_loc, nflist[0].fighter->getId()); }
 
-    {
-        Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(6);
-        if (m_final)
-        {
-            st << static_cast<UInt8>(0);
-            st << _hp[0];
-        }
-        else
-        {
-            st << static_cast<UInt8>(3);
-            st << static_cast<UInt32>(m_count);
-        }
-        st << Stream::eos;
-        NETWORK()->Broadcast(st);
-    }
+    if (m_final)
+        sendHpMax();
+    else
+        sendCount();
 
-    {
-        Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(6);
-        st << static_cast<UInt8>(4);
-        st << static_cast<UInt32>(m_id);
-        st << Stream::eos;
-        NETWORK()->Broadcast(st);
-    }
-
-    {
-        Stream st(REP::DAILY_DATA);
-        st << static_cast<UInt8>(6);
-        st << static_cast<UInt8>(5);
-        st << static_cast<UInt32>(m_loc);
-        st << Stream::eos;
-        NETWORK()->Broadcast(st);
-    }
+    sendId();
+    sendLoc();
 }
 
 void WBoss::disapper()
@@ -492,6 +449,94 @@ void WBoss::disapper()
     _hp.clear();
     m_atkinfo.clear();
     fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
+}
+
+void WBoss::sendHpMax(Player* player)
+{
+    if (!_ng)
+        return;
+    if (!_hp.size())
+        return;
+
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(0);
+
+    std::vector<GData::NpcFData>& nflist = _ng->getList();
+    size_t sz = nflist.size();
+    if (!sz) return;
+
+    st << nflist[0].fighter->getMaxHP();
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
+}
+
+void WBoss::sendHp(Player* player)
+{
+    if (!_hp.size())
+        return;
+
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(1);
+    st << _hp[0];
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
+}
+
+void WBoss::sendDmg(UInt32 damage)
+{
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(2);
+    st << damage;
+    st << Stream::eos;
+    NETWORK()->Broadcast(st);
+}
+
+void WBoss::sendLoc(Player* player)
+{
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(5);
+    st << static_cast<UInt32>(m_loc);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
+}
+
+void WBoss::sendId(Player* player)
+{
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(4);
+    st << static_cast<UInt32>(m_id);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
+}
+
+void WBoss::sendCount(Player* player)
+{
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(3);
+    st << static_cast<UInt32>(m_count);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
 }
 
 bool WBossMgr::isWorldBoss(UInt32 npcid)
@@ -542,14 +587,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 20*60*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 20*60*60+10,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -734,6 +779,20 @@ void WBossMgr::disapper(UInt32 now)
         m_boss->disapper();
     _prepareStep = 0;
     calcNext(now);
+}
+
+void WBossMgr::sendDaily(Player* player)
+{
+    if (!player)
+        return;
+    if (m_boss && !m_boss->isDisappered())
+    {
+        m_boss->sendHpMax(player);
+        m_boss->sendHp(player);
+        m_boss->sendCount(player);
+        m_boss->sendId(player);
+        m_boss->sendLoc(player);
+    }
 }
 
 WBossMgr worldBoss;

@@ -61,6 +61,13 @@ public:
     void reward(Player* player);
     void getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret);
 
+    void sendHpMax(Player* player = NULL);
+    void sendHp(Player* player = NULL);
+    void sendDmg(UInt32 damage);
+    void sendLoc(Player* player = NULL);
+    void sendId(Player* player = NULL);
+    void sendCount(Player* player = NULL);
+
 private:
     UInt32 m_id;
     UInt8 m_count;
@@ -102,6 +109,7 @@ public:
     void broadcastTV(UInt32 now);
     void calcNext(UInt32 now);
     void nextDay(UInt32 now);
+    void sendDaily(Player* player);
 
     inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
     inline void setBossLevel(UInt8 lvl) { m_level = lvl; }
