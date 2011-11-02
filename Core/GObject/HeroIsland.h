@@ -83,13 +83,18 @@ struct HIPlayerData
         straight = 0;
         round = 0;
         if (!running)
+        {
             score = 0;
+            inrank = 0;
+        }
+        else
+        {
+        }
         lasttype = 0;
         attrcd = static_cast<UInt32>(-1);
         bufid = DEFAULT_BUFID;
         attr = NULL;
         awardgot = 0;
-        inrank = 0;
         compass.clear();
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
