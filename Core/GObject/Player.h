@@ -4,6 +4,7 @@
 #include "GObjectManager.h"
 #include "TaskData.h"
 #include "EventBase.h"
+#include "Var.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
 
@@ -952,6 +953,8 @@ namespace GObject
 
 		PlayerData _playerData;
 		UInt32 _buffData[PLAYER_BUFF_COUNT];
+
+        VarSystem* m_pVars;
 
 		AtomicVal<UInt8> _threadId;
 		AtomicVal<int> _session;

@@ -526,6 +526,7 @@ namespace GObject
 		m_MailBox = new MailBox(this);
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
+        m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         _lvpos = 0;
 	}
@@ -674,6 +675,8 @@ namespace GObject
 		SAFE_DELETE(m_Athletics);
 
 		SAFE_DELETE(m_MailBox);
+
+        SAFE_DELETE(m_pVars);
 	}
 
 	UInt8 Player::GetCountryThread()

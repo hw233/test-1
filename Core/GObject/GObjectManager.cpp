@@ -1152,6 +1152,26 @@ namespace GObject
 		}
 		lc.finalize();
 
+        lc.prepare("Loading player vars:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+        pl = NULL;
+        DBPlayerVar playerVar;
+        if(execu->Prepare("SELECT `playerId`, `id`, `data`, `over` FROM `Var` ORDER BY `playerId`", playerVar) != DB::DB_OK)
+            return false;
+        lc.reset(100);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if(playerVar.playerId != last_id)
+            {
+                last_id = playerVar.playerId;
+                pl = globalPlayers[last_id];
+            }
+            if(pl == NULL) continue;
+            //TODO
+        }
+        lc.finalize();
+
 		lc.prepare("Loading friendliness:");
 		DBFightersFriendliness ffdata;
 		if(execu->Prepare("SELECT `playerId`, `fighterId`, `friendliness`, `favorSubmitCount`, `favorSubmitDay` FROM `friendliness` ORDER BY `playerId`", ffdata) != DB::DB_OK)

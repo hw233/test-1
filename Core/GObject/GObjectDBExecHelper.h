@@ -128,6 +128,14 @@ struct DBPlayerBuffData
 	UInt32 data;
 };
 
+struct DBPlayerVar
+{
+    UInt64 playerId;
+    UInt16 id;
+    UInt32 data;
+    UInt32 overTime;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -815,6 +823,16 @@ SPECIALDEF(3)
 	UInt8, buffId,
 	UInt32, data
 	)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBPlayerVar)
+SPECIALDEF(4)
+    (
+    UInt64, playerId,
+    UInt16, id,
+    UInt32, data,
+    UInt32, overTime
+    )
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterBuffData)
