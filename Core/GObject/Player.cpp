@@ -5249,6 +5249,8 @@ namespace GObject
 #endif
 		st << Stream::eos;
 		send((st));
+
+        worldBoss.sendDaily(this);
 	}
 
 	void Player::regenAll(bool full)
