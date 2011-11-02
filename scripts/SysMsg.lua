@@ -457,7 +457,7 @@ sysMsg:set(557, 0x16, "世界BOSS奖励，第%u名[p:%u:%s]获得了: [4:%u], [4
 sysMsg:set(558, 0x27, "世界BOSS奖励，第%u名[p:%u:%s]获得了: [4:%u]x%u");
 sysMsg:set(559, 0x27, "世界BOSS击杀奖励，[p:%u:%s]获得了: [4:%u]x%u, %u银币");
 sysMsg:set(560, 0x27, "世界BOSS幸运奖励，[p:%u:%s]获得了: [4:%u]x%u");
-sysMsg:set(561, 0x27, "世界BOSS奖励，[p:%u:%s]获得了: [4:%u]");
+sysMsg:set(561, 0x27, "世界BOSS幸运奖励，[p:%u:%s]获得了: [4:%u]");
 
 sysMsg:set(555, 0, "自动副本掉落物品")
 sysMsg:set(556, 0, "在自动副本时掉落的物品无法放入包裹，以邮件的形式发送给玩家，请查收!")

@@ -177,12 +177,11 @@ void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
         }
         else
         {
-            URandom rnd(time(NULL));
+            UInt32 j = uRand(sz-3);
             for (UInt32 i = 0; i < num; ++i)
             {
-                UInt32 j = rnd(sz-3);
                 while (ret.find(j+3) != ret.end())
-                    j = rnd(sz-3);
+                    j = uRand(sz-3);
                 ret.insert(j+3);
             }
         }
