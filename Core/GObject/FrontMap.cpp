@@ -275,9 +275,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
                 pl->send(st);
                 tmp.resize(0);
 
-                if (World::_halloween) // XXX: 万怪节
-                    GameAction()->onFrontMapWin(pl, id, spot);
-
+                GameAction()->onFrontMapWin(pl, id, spot);
                 DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
                 return;
             } else {
