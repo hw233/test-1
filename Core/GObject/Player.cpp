@@ -1125,7 +1125,7 @@ namespace GObject
             }
         }
 
-        heroIsland.playerLeave(this);
+        //heroIsland.playerLeave(this);
         dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
