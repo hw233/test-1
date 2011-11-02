@@ -530,9 +530,9 @@ namespace GObject
         inline UInt8 getPF()
         {
             if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
-                return 2;
-            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
-                return 1;
+                return (2<<4)|_playerData.qqvipl;
+            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 16)
+                return (1<<4)|_playerData.qqvipl;
             return 0;
         }
 

@@ -46,6 +46,8 @@ void WorldScript::init()
 	def("setIsNewServer", GObject::World::setIsNewServer);
 	def("setNationalDay", GObject::World::setNationalDay);
 	def("setHalloween", GObject::World::setHalloween);
+	def("setSingleDay", GObject::World::setSingleDay);
+	def("getSingleDay", GObject::World::getSingleDay);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

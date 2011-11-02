@@ -1125,7 +1125,7 @@ namespace GObject
             }
         }
 
-        heroIsland.playerLeave(this);
+        //heroIsland.playerLeave(this);
         dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
@@ -5268,6 +5268,7 @@ namespace GObject
 #endif
 		st << Stream::eos;
 		send((st));
+
 	}
 
 	void Player::regenAll(bool full)

@@ -102,17 +102,26 @@ function onActivityCheck(tm)
       setHalloween(false);
   end
 
+  if tm >= actTime5 and tm < actTime6 then
+      setSingleDay(true);
+  else
+      setSingleDay(false);
+  end
+
 end
 
 function initActTime(y, m, d)
-  local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
-  --local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
-  local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };--活动时间
+  local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
 
   actTime3 = os.time(SerStartTm2);
   actTime4 = os.time(SerStartTm2) + 4 * 86400;
+
+  actTime5 = os.time(SerStartTm3);
+  actTime6 = os.time(SerStartTm3) + 3 * 86400;
   
   onActivityCheck(os.time() + 30);
 
