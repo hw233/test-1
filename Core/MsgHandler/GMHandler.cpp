@@ -2414,6 +2414,9 @@ void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& 
 {
     if (args.size() < 1)
         return;
-    worldBoss.bossAppear(atoi(args[0].c_str()));
+    if (args.size() >= 2)
+        worldBoss.bossAppear(atoi(args[0].c_str()), atoi(args[1].c_str()));
+    else
+        worldBoss.bossAppear(atoi(args[0].c_str()));
 }
 

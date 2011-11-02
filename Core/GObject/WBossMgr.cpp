@@ -364,7 +364,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
             UInt32 id = 0;
             if (idx < sizeof(worldboss)/sizeof(UInt32))
                 id = worldboss[idx];
-            if (idx == 4)
+            if (!((idx+1) % 5))
                 m_final = true;
             appear(id, m_id);
         }
@@ -587,14 +587,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 22*60*60+17*60+10,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 10*60*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -795,7 +795,7 @@ void WBossMgr::sendDaily(Player* player)
     }
 }
 
-void WBossMgr::bossAppear(UInt8 lvl)
+void WBossMgr::bossAppear(UInt8 lvl, bool force)
 {
     if (lvl > 7)
         return;
@@ -804,13 +804,20 @@ void WBossMgr::bossAppear(UInt8 lvl)
         m_boss->disapper();
 
     UInt32 now = TimeUtil::Now();
-    _prepareTime = now - 14 * 60;
-    _appearTime = _prepareTime + 20;
-    _disapperTime = _appearTime + 60 * 60 - 10;
-    _prepareStep = 0;
-
-    if (m_boss)
-        m_boss->setLevel(lvl);
+    if (!force)
+    {
+        if (lvl)
+        {
+            _prepareTime = now - 14 * 60;
+            _appearTime = _prepareTime + 20;
+            _disapperTime = _appearTime + 60 * 60 - 10;
+            _prepareStep = 0;
+        }
+    }
+    else
+    {
+        appear(lvl, now);
+    }
 }
 
 WBossMgr worldBoss;
