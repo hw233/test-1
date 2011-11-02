@@ -24,7 +24,7 @@ public:
     bool reg(Player* player);
     bool login(Player* player);
     bool logout(Player* player);
-    bool online(UInt32 num);
+    bool online(UInt32 num, UInt8 domain);
 
     void normal();
 

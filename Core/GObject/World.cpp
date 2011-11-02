@@ -273,7 +273,7 @@ void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
-    dclogger.online(onlineNums);
+    dclogger.online(onlineNums, 1);
 }
 
 void World::World_Athletics_Check( void * )

@@ -42,7 +42,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     if(it == GData::npcGroups.end())
         return false;
 
-    Battle::BattleSimulator bsim(0, pl, _ng->getName(), _ng->getLevel(), false);
+    Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
     pl->PutFighters( bsim, 0 ); 
     _ng->putFighters( bsim );
 
@@ -428,7 +428,10 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!m_final || m_count == 10)
         sendCount();
     if (m_final)
+    {
+        sendHpMax();
         sendHp();
+    }
 
     sendId();
     sendLoc();
