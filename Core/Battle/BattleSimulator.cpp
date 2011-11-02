@@ -540,7 +540,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             {
 				onDamage(area_target, scList, scCount, true, atkAct);
 
-                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1)
+                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1 && !defend100)
                 {
                     float rate = skill->prob * 100;
                     if((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000))
@@ -1217,10 +1217,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             else if(skill->effect->evade == GData::SKILL_EFFECT_FALG_VALUE)
             {
                 bo->setEvad100(true);
+                bf->setEvad100CD(skill->cd + 1);
+                bf->setEvad100BaseCD(skill->cd + 1);
             }
             else if(skill->effect->def == GData::SKILL_EFFECT_FALG_VALUE)
             {
                 bo->setDefend100(true);
+                bf->setDefend100CD(skill->cd + 1);
+                bf->setDefend100BaseCD(skill->cd + 1);
             }
             else
             {
@@ -1251,10 +1255,14 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             else if(skill->effect->evade == GData::SKILL_EFFECT_FALG_VALUE)
             {
                 bo->setEvad100(true);
+                bf->setEvad100CD(skill->cd + 1);
+                bf->setEvad100BaseCD(skill->cd + 1);
             }
             else if(skill->effect->def == GData::SKILL_EFFECT_FALG_VALUE)
             {
                 bo->setDefend100(true);
+                bf->setDefend100CD(skill->cd + 1);
+                bf->setDefend100BaseCD(skill->cd + 1);
             }
             else
             {
@@ -3845,6 +3853,28 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
         -- toughAdd_last;
        if(0 == toughAdd_last)
             setStatusChange( bf->getSide(), bf->getPos(), 1, 0, e_stTough, 0, 0, scList, scCount, false);
+    }
+
+    UInt8& evad100CD = bf->getEvad100CD();
+    if(evad100CD > 0)
+    {
+        --evad100CD;
+        if(0 == evad100CD)
+        {
+            bf->setEvad100(true);
+            bf->setEvad100CD(bf->getEvad100BaseCD());
+        }
+    }
+
+    UInt8& defend100CD = bf->getDefend100CD();
+    if(defend100CD > 0)
+    {
+        --defend100CD;
+        if(0 == defend100CD)
+        {
+            bf->setDefend100(true);
+            bf->setDefend100CD(bf->getDefend100BaseCD());
+        }
     }
 
     // TODO

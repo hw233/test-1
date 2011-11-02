@@ -222,10 +222,11 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 {
 	if (saleItemBuy.item != NULL)
 	{
+        ConsumeInfo ci(PurchaseSale,saleItemBuy.item->getId(),saleItemBuy.item->Count());
 		if (saleItemBuy.priceType == 0)
 			_owner->holdCoin(saleItemBuy.price, 1);
 		else
-			_owner->holdGold(saleItemBuy.price, 1);
+			_owner->holdGold(saleItemBuy.price, 1, &ci);
 		SaleMailItem* & mailItem = _mailItems[saleItemBuy.id];
 		if (mailItem != NULL)
 		{

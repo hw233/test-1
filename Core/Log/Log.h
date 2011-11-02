@@ -49,6 +49,7 @@ enum PurchaseType
     AutoCopyComplete,
     InstantPracticeAcc,
     FlushAthletics,
+    PurchaseSale,
 };
 
 enum IncomingType

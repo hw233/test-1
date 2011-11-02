@@ -504,6 +504,8 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 {
 	UInt32 Viplvl = atker->getVipLevel();
 	//const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20};
+    if( atker->hasFlag(GObject::Player::InHeroIsland) )
+        return;
 
 	Player * defer = globalNamedPlayers[atker->fixName(name)];
 	if (defer == NULL || atker == defer)
@@ -597,6 +599,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
 {
 	UInt32 Viplvl = atker->getVipLevel();
 	const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20};
+    if( atker->hasFlag(GObject::Player::InHeroIsland) )
+        return;
 
 	Player * defer = globalNamedPlayers[atker->fixName(name)];
 	if (defer == NULL || atker == defer || type != 3)

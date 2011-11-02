@@ -304,7 +304,7 @@ namespace GObject
                         {
                             if(aidx < GObjectManager::getAttrChance(q, k))
                             {
-                                UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
+                                UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k) + (k == 7 ? 1 : 0);
                                 UInt32 factor = GObjectManager::getAttrDics(q, k) + uRand(dics);
                                 v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
                                 break;
@@ -2536,10 +2536,7 @@ namespace GObject
 			values[1] = ied.extraAttr2.value2;
 			types[2] = ied.extraAttr2.type3;
 			values[2] = ied.extraAttr2.value3;
-            UInt8 crr = 0;
-            const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
-            if(itype)
-                crr = itype->career;
+            UInt8 crr = equip->GetCareer();
 			getRandomAttr2(lv, crr, q, c, protect, types, values);
 			if(!equip->GetBindStatus() && isBound)
 				equip->DoEquipBind();
@@ -2611,10 +2608,7 @@ namespace GObject
 		values[2] = ied.extraAttr2.value3;
 		ConsumeInfo ci(ForgeEquipment,0,0);
 		m_Owner->useTael(amount,&ci);
-        UInt8 crr = 0;
-		const GData::ItemBaseType * itype = GData::itemBaseTypeManager[itemId];
-		if(itype)
-            crr = itype->career;
+        UInt8 crr = equip->GetCareer();
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
 
 		ApplyAttr2(equip, types, values);
