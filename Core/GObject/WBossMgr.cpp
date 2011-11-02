@@ -279,7 +279,8 @@ void WBoss::reward(Player* player)
             (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
             SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, trumpnum[j], trumps[tlvl], 1);
         }
-        else if ((j >= 3 && j <= 9) || j == lucky1 || j == lucky2)
+
+        if ((j >= 3 && j <= 9))
         {
             UInt8 u = uRand(100);
             if (u <= trumpprob[j-3])
@@ -287,11 +288,12 @@ void WBoss::reward(Player* player)
                 (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
                 SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
             }
+        }
 
-            if (j == lucky1 || j == lucky2)
-            {
-                SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
-            }
+        if (j == lucky1 || j == lucky2)
+        {
+            (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
+            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
         }
 
         if (j >= 3)
@@ -439,20 +441,40 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!m_count)
         { SYSMSG_BROADCASTV(554, nflist[0].fighter->getId(), m_loc, nflist[0].fighter->getId()); }
 
-    Stream st(REP::DAILY_DATA);
-    st << static_cast<UInt8>(6);
-    if (m_final)
     {
-        st << static_cast<UInt8>(0);
-        st << _hp[0];
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(6);
+        if (m_final)
+        {
+            st << static_cast<UInt8>(0);
+            st << _hp[0];
+        }
+        else
+        {
+            st << static_cast<UInt8>(3);
+            st << static_cast<UInt32>(m_count);
+        }
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
     }
-    else
+
     {
-        st << static_cast<UInt8>(3);
-        st << static_cast<UInt32>(m_count);
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(6);
+        st << static_cast<UInt8>(4);
+        st << static_cast<UInt32>(m_id);
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
     }
-    st << Stream::eos;
-    NETWORK()->Broadcast(st);
+
+    {
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(6);
+        st << static_cast<UInt8>(5);
+        st << static_cast<UInt32>(m_loc);
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
 }
 
 void WBoss::disapper()
@@ -520,14 +542,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 15*60*60+19*60+10,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+70*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+60*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+50*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+40*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+30*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+20*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+10*60,
+        TimeUtil::SharpDayT(0,now) + 20*60*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };

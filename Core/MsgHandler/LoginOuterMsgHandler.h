@@ -97,8 +97,17 @@ struct UserLoginStruct
 	typedef Array<UInt8, 36> HashValType;
 	UInt8 _hashval[36];
 	std::string _server;
+#if _NEED_OPENID
+    std::string _platform;
+    std::string _openid;
+    std::string _openkey;
+	MESSAGE_DEF9(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang,
+            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey);
+#else
+	MESSAGE_DEF6(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear,
+            UInt32, _lang, HashValType, _hashval, std::string, _server);
+#endif
 
-	MESSAGE_DEF6(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang, HashValType, _hashval, std::string, _server);
 };
 
 struct NewUserStruct
@@ -107,8 +116,16 @@ struct NewUserStruct
 	UInt8 _class;
     UInt8 _level;
     UInt8 _isYear;
-
+#if _NEED_OPENID
+    std::string _platform;
+    std::string _openid;
+    std::string _openkey;
+	MESSAGE_DEF7(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey);
+#else
 	MESSAGE_DEF4(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear);
+#endif
+
 };
 
 
@@ -287,6 +304,15 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
 		}
+
+#ifdef _NEED_OPENID
+        if (player)
+        {
+            player->setDomain(ul._platform);
+            player->setOpenId(ul._openid);
+            player->setOpenKey(ul._openkey);
+        }
+#endif
 	}
 	else
 		res = 2;
@@ -500,6 +526,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(recharge));
 				GLOBAL().PushMsg(hdr, &recharge);
 			}
+
+#ifdef _NEED_OPENID
+            pl->setDomain(nu._platform);
+            pl->setOpenId(nu._openid);
+            pl->setOpenKey(nu._openkey);
+#endif
 
             UInt16 qqlvl = nu._level | (nu._isYear << 8);
             GameMsgHdr hdr(0x297, country, pl, sizeof(UInt16));
