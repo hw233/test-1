@@ -145,6 +145,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             {
                 SYSMSG_BROADCASTV(550, nflist[0].fighter->getId());
                 _percent = 0;
+                _hp[0] = 0;
                 reward(pl);
             }
             else if (newPercent <= 5 && _percent - newPercent >= 5)
@@ -424,10 +425,10 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!m_count)
         { SYSMSG_BROADCASTV(554, nflist[0].fighter->getId(), m_loc, nflist[0].fighter->getId()); }
 
-    if (m_final)
-        sendHpMax();
-    else
+    if (!m_final || m_count == 10)
         sendCount();
+    if (m_final)
+        sendHp();
 
     sendId();
     sendLoc();
