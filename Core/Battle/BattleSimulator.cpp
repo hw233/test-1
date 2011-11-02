@@ -713,6 +713,16 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             {
                 passiveSkillInj = passiveSkill;
             }
+            else
+            {
+                AttackAct aa = {0};
+                aa.bf = bo;
+                aa.skill = passiveSkill;
+                aa.target_side = bf->getSide();
+                aa.target_pos = bf->getPos();
+
+                atkAct->push_back(aa);
+            }
         }
 
         passiveSkill = bo->getPassiveSkillBeAtk();
@@ -725,6 +735,16 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             else if(passiveSkillInj == NULL && (passiveSkill->effect->inj2hpP || passiveSkill->effect->inj2hp))
             {
                 passiveSkillInj = passiveSkill;
+            }
+            else
+            {
+                AttackAct aa = {0};
+                aa.bf = bo;
+                aa.skill = passiveSkill;
+                aa.target_side = bf->getSide();
+                aa.target_pos = bf->getPos();
+
+                atkAct->push_back(aa);
             }
         }
 
@@ -1158,6 +1178,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 ++ defCount;
 
                 appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
+
+                return 0;
             }
             else if(fdmg > 0 && bf->getSide() != target_side)
             {
@@ -1178,11 +1200,11 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 ++ defCount;
 
                 appendToPacket(bf->getSide(), bf->getPos(), target_pos, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
+
+                return 0;
             }
 
         }
-
-        return 0;
     }
 
     if(skill->cond == GData::SKILL_AFTEVD
