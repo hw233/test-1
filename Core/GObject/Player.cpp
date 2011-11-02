@@ -5249,6 +5249,7 @@ namespace GObject
 #endif
 		st << Stream::eos;
 		send((st));
+
 	}
 
 	void Player::regenAll(bool full)
