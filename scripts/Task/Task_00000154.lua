@@ -8,6 +8,22 @@ function Task_Accept_00000154()
 	if task:HasAcceptedTask(154) or task:HasCompletedTask(154) or task:HasSubmitedTask(154) then
 		return false;
 	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(153) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(153) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(153) then
+			return false;
+		end
+	end
 	return true;
 end
 
@@ -23,6 +39,22 @@ function Task_Can_Accept_00000154()
 	end
 	if task:HasAcceptedTask(154) or task:HasCompletedTask(154) or task:HasSubmitedTask(154) then
 		return false;
+	end
+	local state = GetPlayerData(6);
+	if state == 0 then
+		if not task:HasSubmitedTask(153) then
+			return false;
+		end
+	end
+	if state == 1 then
+		if not task:HasSubmitedTask(153) then
+			return false;
+		end
+	end
+	if state == 2 then
+		if not task:HasSubmitedTask(153) then
+			return false;
+		end
 	end
 	return true;
 end

@@ -309,7 +309,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
                             Player * player = (*plIter);
                             if(player != pl && (player)->isOnline())
                             {
-                                st << player->getName() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
+                                st << player->getName() << player->getPF() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
                                 ++ c;
                             }
                         }
@@ -322,7 +322,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
                             Player * player = (*plIter);
                             if(player != pl && (player)->isOnline())
                             {
-                                st << player->getName() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
+                                st << player->getName() << player->getPF() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
                                 ++ c;
                             }
                         }
@@ -336,7 +336,7 @@ void Map::SendAtCity(Player * pl, bool inCity, bool notify)
 						Player * player = (*plIter);
 						if(player != pl && (player)->isOnline())
 						{
-							st << player->getName() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
+							st << player->getName() << player->getPF() << player->GetClassAndSex() << player->getCountry() << player->GetLev() << static_cast<UInt8>(PLAYER_DATA(player, status));
 							++ c;
 						}
 					}
@@ -501,7 +501,7 @@ void Map::NotifyPlayerEnter( Player * pl )
 	if(map == NULL)
 		return;
 	Stream st(REP::MAP_POINT_JOIN);
-	st << static_cast<UInt8>(0) << pl->getName() << pl->GetClassAndSex() << pl->getCountry() << pl->GetLev() << static_cast<UInt8>(PLAYER_DATA(pl, status)) << Stream::eos;
+	st << static_cast<UInt8>(0) << pl->getName() << pl->getPF() << pl->GetClassAndSex() << pl->getCountry() << pl->GetLev() << static_cast<UInt8>(PLAYER_DATA(pl, status)) << Stream::eos;
 	map->Broadcast(st, pl);
 }
 
