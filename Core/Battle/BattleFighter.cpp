@@ -23,8 +23,10 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _formEffect(NULL), _formula(bf),
-    _forgetLevel(0), _forgetRound(0), _flag(0), _immuneLevel(0), _immune(0), _immuneRound(0),
-    _evade100(0), _defend100(0),
+    _forgetLevel(0), _forgetRound(0), _flag(0), _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
+     _confuseRound(0), _confuseLevel(0), _immuneLevel(0), _immune(0), _immuneRound(0),
+    _evade100(0), _evade100_cd(0), _evade100_last(0), _evade100_base_cd(0), _evade100_base_last(0),
+    _defend100(0), _defend100_cd(0), _defend100_last(0), _defend100_base_cd(0), _defend100_base_last(0),
 	_attackAdd2(0), _magAtkAdd2(0), _defAdd2(0), _magDefAdd2(0), _hitrateAdd2(0), _evadeAdd2(0),
     _criticalAdd2(0), _criticalDmgAdd2(0), _pierceAdd2(0), _counterAdd2(0), _magResAdd2(0), _toughAdd2(0),
 	_maxhpAdd2(0), _maxActionAdd2(0)

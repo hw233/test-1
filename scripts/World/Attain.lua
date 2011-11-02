@@ -149,6 +149,9 @@ local attain_table = {
     [10008] = OnIncarnationAttain
 }
 
+local attain_fin_table = {
+}
+
 
 function doAttainment( player, attainId, param )
 	local trigger = attain_table[attainId];

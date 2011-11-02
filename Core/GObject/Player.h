@@ -531,9 +531,9 @@ namespace GObject
         inline UInt8 getPF()
         {
             if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9)
-                return 2;
+                return (2<<4)|_playerData.qqvipl;
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
-                return 1;
+                return (1<<4)|(_playerData.qqvipl-10);
             return 0;
         }
 
@@ -599,9 +599,9 @@ namespace GObject
 		void sendModification(UInt8, UInt32, bool = true);
 		void updateDB(UInt8, UInt32);
 
-		UInt32 getGold(UInt32 c = 0);
+		UInt32 getGold(UInt32 c = 0, UInt8 incomingType = 0);
 		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
-		bool holdGold(UInt32 c, UInt8);
+		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
 
 		UInt32 getGoldOrCoupon();
 		UInt32 useGoldOrCoupon(UInt32,ConsumeInfo * ci=NULL);//return gold
@@ -950,6 +950,7 @@ namespace GObject
 		MailBox* m_MailBox;
 
 		bool _isOnline;
+        bool _isHoding;
 
 		PlayerData _playerData;
 		UInt32 _buffData[PLAYER_BUFF_COUNT];

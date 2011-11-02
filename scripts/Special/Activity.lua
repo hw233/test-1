@@ -652,13 +652,9 @@ function onRecruitAward(player)
 end
 
 function onCopyWin(player, id, floor, spot)
-	local package = player:GetPackage();
-	package:AddItem(26, 1, false);	
 end
 
 function onFrontMapWin(player, id, spot)
-	local package = player:GetPackage();
-	package:AddItem(26, 1, false);	
 end
 
 local vippack = {

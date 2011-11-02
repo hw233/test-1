@@ -62,6 +62,7 @@ bool World::_actAvailable1 = false;
 bool World::_isNewServer = false;
 bool World::_nationalDay = false;
 bool World::_halloween = false;
+bool World::_singleday = false;
 
 #define LEADERBOARD_UPDATE_INTERVAL 3600
 

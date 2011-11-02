@@ -341,9 +341,8 @@ void HeroIsland::end(UInt32 now)
 {
     rankReward();
     calcNext(now);
-    reset();
-
     _running = false;
+    reset();
     _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
 }

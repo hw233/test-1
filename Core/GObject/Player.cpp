@@ -512,7 +512,7 @@ namespace GObject
 	}
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
-		_isOnline(false), _threadId(0xFF), _session(-1),
+		_isOnline(false), _isHoding(false), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
@@ -1128,7 +1128,7 @@ namespace GObject
             }
         }
 
-        heroIsland.playerLeave(this);
+        //heroIsland.playerLeave(this);
         dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
@@ -2682,7 +2682,7 @@ namespace GObject
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
 	}
 
-	UInt32 Player::getGold( UInt32 c )
+	UInt32 Player::getGold( UInt32 c, UInt8 incomingType )
 	{
 		if(c == 0)
 			return _playerData.gold;
@@ -2690,6 +2690,13 @@ namespace GObject
 		SYSMSG_SENDV(149, this, c);
 		SYSMSG_SENDV(1049, this, c);
 		sendModification(1, _playerData.gold);
+
+        if(incomingType != 0)
+        {
+            DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,0,0,%u,%u)",
+                cfg.serverLogId, getId(), incomingType, c, TimeUtil::Now());
+        }
+
 		return _playerData.gold;
 	}
 
@@ -2714,7 +2721,7 @@ namespace GObject
 		return _playerData.gold;
 	}
 
-	bool Player::holdGold(UInt32 c, UInt8 action)
+	bool Player::holdGold(UInt32 c, UInt8 action, ConsumeInfo * ci)
 	{
 		switch(action)
 		{
@@ -2722,20 +2729,32 @@ namespace GObject
 			{
 				if (c > _playerData.gold)
 					return false;
+                if(_isHoding)
+                    return false;
 				_playerData.gold -= c;
+                _isHoding = true;
 			}
 			break;
 		case 1:
 			{
 				sendModification(1, _playerData.gold);
+
+                if(ci!=NULL)
+                {
+                    DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                        cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
+                }
+
 				SYSMSG_SENDV(150, this, c);
 				SYSMSG_SENDV(1050, this, c);
+                _isHoding = false;
 			}
 			break;
 		case 2:
 			{
 				_playerData.gold += c;
 				updateDB(1, _playerData.gold);
+                _isHoding = false;
 			}
 			break;
 		}
@@ -5252,6 +5271,7 @@ namespace GObject
 #endif
 		st << Stream::eos;
 		send((st));
+
 	}
 
 	void Player::regenAll(bool full)

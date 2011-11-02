@@ -49,6 +49,12 @@ enum PurchaseType
     AutoCopyComplete,
     InstantPracticeAcc,
     FlushAthletics,
+    PurchaseSale,
+};
+
+enum IncomingType
+{
+    InFromSale = 128,
 };
 
 enum MoneyType
@@ -119,6 +125,7 @@ enum ItemTo
 	ToClanDonate,
 	ToGemMgerge,
 	ToActivateAttr,
+	ToGemAttach,	
 };
 
 

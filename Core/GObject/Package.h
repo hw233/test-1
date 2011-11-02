@@ -73,9 +73,9 @@ namespace GObject
 		ItemBase*  Add(UInt32 typeId, UInt32 num, bool bind = false, bool silence = false, UInt8 FromWhere = 0);
 		ItemBase*  SetItem(UInt32 typeId, UInt32 num, bool bind = false);
 		bool   DelItemAll(UInt32 id, bool bind = false);
-		bool   DelItem(UInt32 id, UInt16 num, bool bind = false);
-		bool   DelItem2(ItemBase* item, UInt16 num);
-		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL);
+		bool   DelItem(UInt32 id, UInt16 num, bool bind = false, UInt8 toWhere = 0);
+		bool   DelItem2(ItemBase* item, UInt16 num, UInt8 toWhere = 0);
+		bool   DelItemAny(UInt32 id, UInt16 num, bool * = NULL, UInt8 toWhere = 0);
 		bool   DelEquip(UInt32 id, UInt8 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt8 toWhere = 0);
 		bool   DelEquip3(ItemEquip *);
@@ -121,7 +121,7 @@ namespace GObject
 
 	public:
 		// Ìú½³
-		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type/*, bool protect*/);
+		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/);
 		UInt8 OpenSocket(UInt16 fighterId, UInt32 itemId);
 		UInt8 MergeGem(UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid);
 		UInt8 AttachGem(UInt16 fighterId, UInt32 itemId, UInt32 gemId, bool bind);
