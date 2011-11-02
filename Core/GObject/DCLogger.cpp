@@ -14,9 +14,13 @@ bool DCLogger::init()
     if (!m_logger)
         return false;
 
+#if 0
     char buf[32] = {0};
     snprintf(buf, sizeof(buf), "app%u", _APPID); 
     std::string appname = buf;
+#else
+    std::string appname = "appoperlog";
+#endif
     if (m_logger->init(appname))
         return false;
 
@@ -66,7 +70,7 @@ bool DCLogger::reg(Player* player)
 #ifndef _DEBUG
     std::string data = msg.str();
     FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_NORMAL, data, true))
+    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
 #endif
 
@@ -112,7 +116,7 @@ bool DCLogger::login(Player* player)
 #ifndef _DEBUG
     std::string data = msg.str();
     FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_NORMAL, data, true))
+    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
 #endif
 
@@ -158,7 +162,7 @@ bool DCLogger::logout(Player* player)
 #ifndef _DEBUG
     std::string data = msg.str();
     FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_NORMAL, data, true))
+    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
 #endif
 
@@ -193,7 +197,7 @@ bool DCLogger::online(UInt32 num)
 #ifndef _DEBUG
     std::string data = msg.str();
     FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_NORMAL, data, true))
+    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
 #endif
 

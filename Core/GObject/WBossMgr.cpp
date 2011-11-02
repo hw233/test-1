@@ -291,21 +291,21 @@ void WBoss::reward(Player* player)
                 if (equip)
                 {
                     (*i).player->GetPackage()->Add(equip, 1, true);
-                    SYSMSG_BROADCASTV(561, (*i).player->getCountry(), (*i).player->getName().c_str(), equip);
+                    //SYSMSG_BROADCASTV(561, (*i).player->getCountry(), (*i).player->getName().c_str(), equip);
                 }
             }
 
             if (breath.find(j) != breath.end())
             {
                 (*i).player->GetPackage()->Add(508, 1, true);
-                SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 508, 1);
+                //SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 508, 1);
             }
 
             if (gem.find(j) != gem.end())
             {
                 UInt8 idx = uRand(sizeof(gems)/sizeof(UInt16));
                 (*i).player->GetPackage()->Add(gems[idx], 1, true);
-                SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), gems[idx], 1);
+                //SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), gems[idx], 1);
             }
         }
     }
