@@ -69,20 +69,12 @@ int CountryBattle::top(UInt32 curtime, UInt8 lvl, UInt8 side)
 inline void addAchievement(UInt32& achieve, UInt8 lvl, UInt8& killStreak1, UInt8& killStreak2)
 {
 	++ killStreak1;
-	switch(killStreak1)
-	{
-	case 1:
-		achieve += 8 * (lvl + 1);
-		break;
-	case 2:
-		achieve += 12 * (lvl + 1);
-		break;
-	default:
-		achieve += 16 * (lvl + 1);
-		break;
-	}
-	if(killStreak2 >= 5)
-		achieve += 10 * (lvl + 1);
+
+    if (killStreak2)
+        achieve += (8 + 2 * (killStreak1 - 1) + 2 * (killStreak2 - 1));
+    else
+        achieve += (8 + 2 * (killStreak1 - 1));
+
 	if(World::_wday == 1)
 		achieve *= 2;
 }
