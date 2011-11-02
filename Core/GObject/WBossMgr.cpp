@@ -576,7 +576,7 @@ void WBossMgr::nextDay(UInt32 now)
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
-#if 0
+#if 1
         TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
         TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60,
@@ -793,6 +793,24 @@ void WBossMgr::sendDaily(Player* player)
         m_boss->sendId(player);
         m_boss->sendLoc(player);
     }
+}
+
+void WBossMgr::bossAppear(UInt8 lvl)
+{
+    if (lvl > 7)
+        return;
+
+    if (m_boss && (!m_boss->isDisappered() || !lvl))
+        m_boss->disapper();
+
+    UInt32 now = TimeUtil::Now();
+    _prepareTime = now - 14 * 60;
+    _appearTime = _prepareTime + 20;
+    _disapperTime = _appearTime + 60 * 60 - 10;
+    _prepareStep = 0;
+
+    if (m_boss)
+        m_boss->setLevel(lvl);
 }
 
 WBossMgr worldBoss;

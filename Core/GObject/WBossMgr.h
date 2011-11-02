@@ -114,6 +114,8 @@ public:
     inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
     inline void setBossLevel(UInt8 lvl) { m_level = lvl; }
 
+    void bossAppear(UInt8 lvl);
+
 private:
     UInt32 _prepareTime;
     UInt8 _prepareStep;

@@ -144,6 +144,7 @@ GMHandler::GMHandler()
     Reg(3, "hici", &GMHandler::OnCiTaskHI);
     Reg(3, "hirestart", &GMHandler::OnRestartHI);
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
+    Reg(3, "appearboss", &GMHandler::OnAppearBoss);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2407,5 +2408,12 @@ void GMHandler::OnAwardHI(GObject::Player *player, std::vector<std::string>& arg
     if (args.size() < 1)
         return;
     heroIsland.getAward(player, atoi(args[0].c_str()), 1);
+}
+
+void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    worldBoss.bossAppear(atoi(args[0].c_str()));
 }
 
