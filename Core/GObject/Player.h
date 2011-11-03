@@ -950,6 +950,7 @@ namespace GObject
 
 		bool _isOnline;
         bool _isHoding;
+        UInt32 _holdGold;
 
 		PlayerData _playerData;
 		UInt32 _buffData[PLAYER_BUFF_COUNT];

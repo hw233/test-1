@@ -512,7 +512,7 @@ namespace GObject
 	}
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
-		_isOnline(false), _isHoding(false), _threadId(0xFF), _session(-1),
+		_isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
@@ -2728,12 +2728,13 @@ namespace GObject
 					return false;
                 if(_isHoding)
                     return false;
-				_playerData.gold -= c;
                 _isHoding = true;
+                _holdGold = c;
 			}
 			break;
 		case 1:
 			{
+                _playerData.gold -= _holdGold;
 				sendModification(1, _playerData.gold);
 
                 if(ci!=NULL)
@@ -2749,7 +2750,7 @@ namespace GObject
 			break;
 		case 2:
 			{
-				_playerData.gold += c;
+                _holdGold = 0;
 				updateDB(1, _playerData.gold);
                 _isHoding = false;
 			}

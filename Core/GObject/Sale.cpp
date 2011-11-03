@@ -208,7 +208,7 @@ void Sale::searchMySale(SaleSearchReq& req)
 
 void Sale::checkSaleBuyPrice(SalePriceCheck& check)
 {
-	if ((check.priceType == 0 && _owner->holdCoin(check.price, 0)) || (check.priceType == 1 && _owner->holdGold(check.price, 0)))
+	if (/*(check.priceType == 0 && _owner->holdCoin(check.price, 0)) || */(check.priceType == 1 && _owner->holdGold(check.price, 0)))
 	{
 		char buffer[8];
 		*reinterpret_cast<UInt32 *>(buffer) = check.id;
@@ -223,9 +223,11 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 	if (saleItemBuy.item != NULL)
 	{
         ConsumeInfo ci(PurchaseSale,saleItemBuy.item->getId(),saleItemBuy.item->Count());
+#if 0
 		if (saleItemBuy.priceType == 0)
 			_owner->holdCoin(saleItemBuy.price, 1);
 		else
+#endif
 			_owner->holdGold(saleItemBuy.price, 1, &ci);
 		SaleMailItem* & mailItem = _mailItems[saleItemBuy.id];
 		if (mailItem != NULL)
@@ -246,9 +248,11 @@ void Sale::buySellResp(SaleItemBuy& saleItemBuy)
 	}
 	else
 	{
+#if 0
 		if (saleItemBuy.priceType == 0)
 			_owner->holdCoin(saleItemBuy.price, 2);
 		else
+#endif
 			_owner->holdGold(saleItemBuy.price, 2);
 		_owner->sendMsgCode(0, 1055);
 	}
@@ -304,7 +308,7 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer)
 		SYSMSG(title, 312);
 		if (saleSellRespData->priceType == 0)
 		{
-			_owner->getCoin(saleSellRespData->price);
+			//_owner->getCoin(saleSellRespData->price);
 			//SYSMSGV(content, 313, saleSellRespData->itemName, buyer->getName().c_str(), saleSellRespData->price);
 			//_owner->GetMailBox()->newMail(_owner, 0x07, title, content);	
 		}
