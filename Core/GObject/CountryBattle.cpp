@@ -252,7 +252,7 @@ void CountryBattle::process(UInt32 curtime)
 			padPlayerData(st, *it);
 			++ proc_count;
 		}
-		st.data<UInt16>(8) = proc_count;
+		st.data<UInt16>(12) = proc_count;
 		st << Stream::eos;
 		broadcast(st);
 		_cbsdlist.clear();
@@ -432,7 +432,7 @@ void CountryBattle::end(UInt32 curtime)
 	}
 	_lastReport << Stream::eos;
 
-	bool cansend = _lastReport.size() >= 12;
+	bool cansend = _lastReport.size() >= 16;
 	UInt8 rnk = 0;
 	for(std::map<CBPlayerData *, Player *, _rankCompare>::iterator it = _rank.begin(); it != _rank.end(); ++ it)
 	{
@@ -441,7 +441,7 @@ void CountryBattle::end(UInt32 curtime)
 		it->first->rank = rnk;
 		if(cansend && pl->getLocation() == _spot)
 		{
-			_lastReport.data<UInt16>(11) = rnk;
+			_lastReport.data<UInt16>(15) = rnk;
 			pl->send(_lastReport);
 		}
 	}

@@ -1082,16 +1082,16 @@ namespace GObject
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
     private:
-        UInt8 m_domain;
+        std::string m_domain;
         std::string m_openid;
         std::string m_openkey;
         std::string m_source;
     public:
-        inline void setDomain(const std::string& domain) { m_domain = atoi(domain.c_str()); }
+        inline void setDomain(const std::string& domain) { m_domain = domain; }
         inline void setOpenId(const std::string& openid) { m_openid = openid; }
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
-        inline const UInt8 getDomain() const { return m_domain; }
+        inline const std::string& getDomain() const { return m_domain; }
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
