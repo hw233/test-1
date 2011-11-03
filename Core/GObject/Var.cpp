@@ -13,6 +13,7 @@ namespace GObject
         m_PlayerID = playerid;
         memset(m_Vars, 0, sizeof(m_Vars));
         memset(m_OverTime, 0, sizeof(m_OverTime));
+        m_Offset = 0;
     }
 
     VarSystem::~VarSystem()
@@ -30,7 +31,7 @@ namespace GObject
 
     UInt32 VarSystem::GetVar(UInt32 id)
     {
-        if(id >= VAR_MAX) return 0;
+        if(id >= VAR_MAX || m_Vars[id] == 0) return 0;
 
         if(CheckReset(id)) UpdateDB(id);
         
@@ -58,9 +59,17 @@ namespace GObject
         UpdateDB(id);
     }
 
+    void VarSystem::LoadVar(UInt32 id, UInt32 data, UInt32 overTime)
+    {
+        if(id >= VAR_MAX) return;
+
+        m_Vars[id] = data;
+        m_OverTime[id] = overTime;
+    }
+
     bool VarSystem::CheckReset(UInt32 id)
     {
-        UInt32 now = TimeUtil::Now();
+        UInt32 now = TimeUtil::Now() + m_Offset;
         if(now < m_OverTime[id]) return false;
         
         UInt32 oldtime = m_OverTime[id];
@@ -121,7 +130,7 @@ namespace GObject
 
     void VarSystem::UpdateDB(UInt32 id)
     {
-       DB7().PushUpdateData("REPLACE INTO `var`(`playerId`, `id`, `data`, `over`) VALUES(%"I64_FMT"u, %u, %u, %u)"
+       DB7().PushUpdateData("REPLACE INTO `var` (`playerId`, `id`, `data`, `over`) VALUES (%"I64_FMT"u, %u, %u, %u)"
                ,m_PlayerID, id, m_Vars[id], m_OverTime[id]);
     }
 }

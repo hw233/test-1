@@ -1314,6 +1314,31 @@ namespace GObject
 		return buff - tm;
 	}
 
+    UInt32 Player::GetVar(UInt32 id)
+    {
+        return m_pVars->GetVar(id);
+    }
+
+    void Player::LoadVar(UInt32 id, UInt32 val, UInt32 overTime)
+    {
+        m_pVars->LoadVar(id, val, overTime);
+    }
+
+    void Player::SetVar(UInt32 id, UInt32 val)
+    {
+        m_pVars->SetVar(id,val);
+    }
+
+    void Player::AddVar(UInt32 id, UInt32 val)
+    {
+        m_pVars->AddVar(id,val);
+    }
+
+    void Player::SetVarOffset(UInt32 offset)
+    {
+        m_pVars->SetOffset(offset);
+    }
+
 	void Player::send( const void * buf, int size )
 	{
 		if(!_isOnline) return;

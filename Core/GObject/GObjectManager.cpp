@@ -1156,7 +1156,7 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
         pl = NULL;
         DBPlayerVar playerVar;
-        if(execu->Prepare("SELECT `playerId`, `id`, `data`, `over` FROM `Var` ORDER BY `playerId`", playerVar) != DB::DB_OK)
+        if(execu->Prepare("SELECT `playerId`, `id`, `data`, `over` FROM `var` ORDER BY `playerId`", playerVar) != DB::DB_OK)
             return false;
         lc.reset(100);
         while(execu->Next() == DB::DB_OK)
@@ -1168,7 +1168,7 @@ namespace GObject
                 pl = globalPlayers[last_id];
             }
             if(pl == NULL) continue;
-            //TODO
+            pl->LoadVar(playerVar.id, playerVar.data, playerVar.overTime);
         }
         lc.finalize();
 

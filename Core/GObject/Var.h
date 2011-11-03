@@ -22,7 +22,7 @@ namespace GObject
 
     enum VarID{
         VAR_INVALID = 0,    //无效变量
-        
+       
         VAR_MAX,
     };
 
@@ -50,6 +50,8 @@ namespace GObject
         UInt32 GetVar(UInt32 id);
         void SetVar(UInt32 id, UInt32 data);
         void AddVar(UInt32 id, UInt32 data);
+        void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
+        void SetOffset(UInt32 offset){ m_Offset = offset; }
 
     private:
         UInt32 GetType(UInt32 id) const;
@@ -61,6 +63,7 @@ namespace GObject
         UInt64 m_PlayerID;
         UInt32 m_Vars[VAR_MAX];
         UInt32 m_OverTime[VAR_MAX];
+        UInt32 m_Offset;
 
         static UInt32 m_VarTypes[VAR_MAX];
     };
