@@ -1434,7 +1434,12 @@ void HeroIsland::playerLeave(Player* player)
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
-        return;
+    {
+        spot = 0xFF;
+        pd = findPlayer(player, spot, pos);
+        if (!pd)
+            return;
+    }
 
     if (spot)
     {
