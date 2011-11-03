@@ -215,7 +215,7 @@ bool HeroIsland::isRareAnimal(UInt32 npcid)
 void HeroIsland::restart(UInt32 now)
 {
     _running = false;
-    _prepareTime = now;
+    _prepareTime = now + 60;
     _prepareStep = 0;
     broadcastTV(now);
 }
@@ -1591,6 +1591,7 @@ void HeroIsland::commitCompass(Player* player)
         return;
     pd->compass[sz-1].status = 3;
 
+    UInt8 straight = pd->straight;
     if (sz && !(sz % 3))
     {
         if (sz >= 12)
@@ -1645,7 +1646,7 @@ void HeroIsland::commitCompass(Player* player)
     }
 
     Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(5) << static_cast<UInt8>(3) << pd->straight
+    st << static_cast<UInt8>(5) << static_cast<UInt8>(3) << straight
         << static_cast<UInt8>(pd->awardgot==0xFF?0:pd->awardgot) << Stream::eos;
     player->send(st);
 }

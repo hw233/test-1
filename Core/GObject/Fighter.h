@@ -11,7 +11,7 @@
 #include "Server/ServerTypes.h"
 #include "GData/SkillTable.h"
 #include "GData/CittaTable.h"
-#include "GObject/WorldBoss.h"
+#include "GObject/WBossMgr.h"
 
 namespace GObject
 {

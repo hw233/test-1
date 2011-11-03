@@ -34,6 +34,44 @@
 
 namespace GObject
 {
+    UInt16 getRandOEquip(UInt8 lvl)
+    {
+        static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70};
+
+        UInt16 equipid = 0;
+
+        if (lvl < 50)
+            lvl = 50;
+        if (lvl > 70)
+            lvl = 70;
+
+        lvl -= 50;
+        lvl /= 10;
+
+        UInt8 idx = uRand(24);
+        equipid = equips[lvl][idx];
+        return equipid;
+    }
+
+    UInt16 getRandPEquip(UInt8 lvl)
+    {
+        static const UInt16* equips[] = {PEquip40, };
+
+        UInt16 equipid = 0;
+
+        if (lvl < 40)
+            lvl = 40;
+        if (lvl > 40)
+            lvl = 40;
+
+        lvl -= 40;
+        lvl /= 10;
+
+        UInt8 idx = uRand(24);
+        equipid = equips[lvl][idx];
+        return equipid;
+    }
+
 #if 0
 	static UInt32 enchant_cost[] = {200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000};
 	static UInt32 merge_cost[] = {50, 100, 150, 200, 250, 300, 350, 400, 500};
@@ -1181,14 +1219,14 @@ namespace GObject
             {203,   205,    "1,1,1",                1617},
             {206,   208,    "1,1,1",                1618},
             {1413,  1415,   "1,1,1",                1252},
-            {209,   214,    "1,1,1,1,1,1",          1621},
-            {215,   220,    "1,1,1,1,1,1",          1620},
-            {222,   222,    "5",                    1635},    
-            {90,    90,     "5",                    1636},
-            {221,   221,    "5",                    1628},
-            {223,   223,    "5",                    1619},
-            {1416,  1418,   "1,1,1",                1232},
-            {1419,  1421,   "1,1,1",                1239},
+            {209,   216,    "1,1,1,1,1,1,1,1",      1621},
+            {217,   224,    "1,1,1,1,1,1,1,1",      1620},
+            {225,   225,    "10",                   1628},    
+            {90,    90,     "10",                   1524},
+            {226,   226,    "10",                   1635},
+            {227,   227,    "10",                   1619},
+            {1416,  1420,   "1,1,1,1,1",            1232},
+            {1421,  1426,   "1,1,1,1,1,1",          1239},
             {0, 0, NULL, 0},
         };
 
