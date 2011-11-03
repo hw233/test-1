@@ -250,6 +250,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 nextfloor = true;
 
             if (nextfloor) {
+                GameAction()->onCopyFloorWin(pl, id, tcd.floor, tcd.spot);
                 ++tcd.floor;
                 tcd.spot = 1;
             } else {
@@ -288,11 +289,11 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     pl->send(st);
                 }
 
+                GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot);
+
                 tcd.floor = 0;
                 tcd.spot = 0;
                 DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
-
-                GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot);
                 return 2;
             } else {
                 if (ato) {

@@ -77,6 +77,7 @@ namespace Script
 		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
+		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 
 		CLASS_DEF(GameActionLua, Print);
@@ -805,10 +806,20 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
+	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot )
+	{
+		Call<void>("onCopyFloorWin", player, id, floor, spot);
+	}
+
 	void GameActionLua::onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot )
 	{
 		Call<void>("onCopyWin", player, id, floor, spot);
 	}
+
+	void GameActionLua::onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot )
+	{
+		Call<void>("onFrontMapFloorWin", player, id, spot);
+    }
 
 	void GameActionLua::onFrontMapWin( Player* player, UInt8 id, UInt8 spot )
 	{

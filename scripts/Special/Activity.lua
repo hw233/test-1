@@ -651,7 +651,22 @@ function onRecruitAward(player)
     end
 end
 
+function onCopyFloorWin(player, id, floor, spot)
+    if getSingleDay() then
+        if id == 1 and floor == 2 and spot == 5 then -- 杨花
+            print('杀死杨花')
+        end
+
+        if id == 1 and floor == 3 and spot == 5 then -- 智通
+            print('杀死智通')
+        end
+    end
+end
+
 function onCopyWin(player, id, floor, spot)
+end
+
+function onFrontMapFloorWin(player, id, spot)
 end
 
 function onFrontMapWin(player, id, spot)

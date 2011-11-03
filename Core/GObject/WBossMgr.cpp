@@ -266,12 +266,12 @@ void WBoss::reward(Player* player)
 
         if ((j >= 3 && j <= 9))
         {
-            UInt8 u = uRand(100);
-            if (u <= trumpprob[j-3])
-            {
+            //UInt8 u = uRand(100);
+            //if (u <= trumpprob[j-3])
+            //{
                 (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
                 SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
-            }
+            //}
         }
 
         if (j == lucky1 || j == lucky2)
