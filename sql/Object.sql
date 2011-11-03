@@ -1172,7 +1172,7 @@ CREATE TABLE `var` (
   `playerId` bigint(20) unsigned NOT NULL,
   `id` smallint(5) NOT NULL,
   `data` int(10) unsigned NOT NULL,
-  `over` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY `id_var` (`playerId`,`id`)
+  `over` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
