@@ -177,6 +177,9 @@ namespace Script
 		CLASS_DEF(Player, openLevelBox);
 		CLASS_DEF(Player, sendMailPack);
 		CLASS_DEF(Player, setVipAwardFlag);
+        CLASS_DEF(Player, GetVar);
+        CLASS_DEF(Player, SetVar);
+        CLASS_DEF(Player, AddVar);
 		
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

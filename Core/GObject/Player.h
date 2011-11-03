@@ -4,6 +4,7 @@
 #include "GObjectManager.h"
 #include "TaskData.h"
 #include "EventBase.h"
+#include "Var.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
 
@@ -553,6 +554,13 @@ namespace GObject
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
 
+
+        UInt32 GetVar(UInt32 id);
+        void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
+        void SetVar(UInt32 id, UInt32 val);
+        void AddVar(UInt32 id, UInt32 val);
+        void SetVarOffset(UInt32 offset);
+
 		inline const std::string& getName() { return _playerData.name; }
 		inline const char * getPName() { return _playerData.name.c_str(); }
 		inline const std::string& getBattleName() { if(_battleName.empty()) rebuildBattleName(); return _battleName; }
@@ -955,6 +963,8 @@ namespace GObject
 		PlayerData _playerData;
 		UInt32 _buffData[PLAYER_BUFF_COUNT];
 
+        VarSystem* m_pVars;
+
 		AtomicVal<UInt8> _threadId;
 		AtomicVal<int> _session;
 		bool _availInit;
@@ -1083,16 +1093,16 @@ namespace GObject
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
     private:
-        UInt8 m_domain;
+        std::string m_domain;
         std::string m_openid;
         std::string m_openkey;
         std::string m_source;
     public:
-        inline void setDomain(const std::string& domain) { m_domain = atoi(domain.c_str()); }
+        inline void setDomain(const std::string& domain) { m_domain = domain; }
         inline void setOpenId(const std::string& openid) { m_openid = openid; }
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
-        inline const UInt8 getDomain() const { return m_domain; }
+        inline const std::string& getDomain() const { return m_domain; }
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
