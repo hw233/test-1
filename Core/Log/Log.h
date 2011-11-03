@@ -126,6 +126,7 @@ enum ItemTo
 	ToGemMgerge,
 	ToActivateAttr,
 	ToGemAttach,	
+	ToTrainFighter,	
 };
 
 
