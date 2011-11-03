@@ -184,7 +184,7 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     msg << "&time=";
     msg << time(NULL);
     msg << "&domain="; // TODO:
-    msg << domain;
+    msg << (int)domain;
     msg << "&worldid=";
     msg << cfg.serverNum;
     msg << "&optype=5&actionid=14";
