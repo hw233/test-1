@@ -4,6 +4,7 @@
 #include "GObjectManager.h"
 #include "TaskData.h"
 #include "EventBase.h"
+#include "Var.h"
 #include "GData/LootTable.h"
 #include "GData/AttrExtra.h"
 
@@ -553,6 +554,13 @@ namespace GObject
 		void addBuffData(UInt8, UInt32);
 		void testBattlePunish();
 
+
+        UInt32 GetVar(UInt32 id);
+        void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
+        void SetVar(UInt32 id, UInt32 val);
+        void AddVar(UInt32 id, UInt32 val);
+        void SetVarOffset(UInt32 offset);
+
 		inline const std::string& getName() { return _playerData.name; }
 		inline const char * getPName() { return _playerData.name.c_str(); }
 		inline const std::string& getBattleName() { if(_battleName.empty()) rebuildBattleName(); return _battleName; }
@@ -953,6 +961,8 @@ namespace GObject
 
 		PlayerData _playerData;
 		UInt32 _buffData[PLAYER_BUFF_COUNT];
+
+        VarSystem* m_pVars;
 
 		AtomicVal<UInt8> _threadId;
 		AtomicVal<int> _session;

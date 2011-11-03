@@ -4,6 +4,7 @@
 #include "GObject/GObjectManager.h"
 #include "GObject/World.h"
 #include "GObject/Country.h"
+#include "GObject/Var.h"
 #include "Battle/BattleReport.h"
 #include "GObject/ClanManager.h"
 #include "DB/DBWorker.h"
@@ -68,6 +69,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	Network::Initialize();
 	//∂¡»°≈‰÷√Œƒº˛
 	TimeUtil::Init();
+    GObject::VarSystem::Init();
 	cfg.load(scriptStr);
 	globalSysMsg.load();
 	Battle::battleReport.init();

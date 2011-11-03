@@ -1,6 +1,7 @@
 #ifndef _TIMEUTIL_H_
 #define _TIMEUTIL_H_
 
+#include "Platform.h"
 #ifndef _WIN32
 #include <sys/time.h>
 #endif
@@ -13,18 +14,56 @@ public:
 	static inline UInt8 Day(UInt32 now = Now())
 	{
 		time_t now2 = static_cast<time_t>(now);
-		struct tm * local = localtime(&now2);
-		return static_cast<UInt8>(local->tm_wday);
+		struct tm local;
+        localtime_r(&now2,&local);
+		return static_cast<UInt8>(local.tm_wday);
 	}
 	static inline UInt32 SharpDayT(int c = 0, UInt32 cur = Now())
     {
         time_t t = cur;
-        struct tm* t_tm = localtime(&t);
-        t_tm->tm_hour = 0;
-        t_tm->tm_min = 0;
-        t_tm->tm_sec = 0;
-        time_t t2 = mktime(t_tm);
+        struct tm t_tm;
+        localtime_r(&t,&t_tm);
+        t_tm.tm_hour = 0;
+        t_tm.tm_min = 0;
+        t_tm.tm_sec = 0;
+        time_t t2 = mktime(&t_tm);
 		return t2 + c * 24 * 60 * 60;
+    }
+    static inline UInt32 SharpWeek(int c = 0, UInt32 cur = Now())
+    {
+        time_t t = cur;
+        struct tm t_tm;
+        localtime_r(&t,&t_tm);
+        if(t_tm.tm_wday == 0) t_tm.tm_wday = 7;
+        t = t + (7 * c + 1 - t_tm.tm_wday) * 86400;
+        return SharpDayT(0,t);
+    }
+    static inline UInt32 SharpMonth(int c = 0, UInt32 cur = Now())
+    {
+        time_t t = cur;
+        struct tm t_tm;
+        localtime_r(&t,&t_tm);
+        t_tm.tm_mon = t_tm.tm_mon + c;
+        t_tm.tm_year = t_tm.tm_year + t_tm.tm_mon / 12;
+        t_tm.tm_mon = t_tm.tm_mon % 12;
+        t_tm.tm_mday = 1;
+        t_tm.tm_hour = 0;
+        t_tm.tm_min = 0;
+        t_tm.tm_sec = 0;
+        return  mktime(&t_tm);
+    }
+    static inline UInt32 SharpYear(int c = 0, UInt32 cur = Now())
+    {
+        time_t t = cur;
+        struct tm t_tm;
+        localtime_r(&t,&t_tm);
+        t_tm.tm_year = t_tm.tm_year + c;
+        t_tm.tm_mon = 0;
+        t_tm.tm_mday = 1;
+        t_tm.tm_hour = 0;
+        t_tm.tm_min = 0;
+        t_tm.tm_sec = 0;
+        return mktime(&t_tm);
     }
 	static inline UInt32 SharpDay(int c = 0, UInt32 cur = Now())
 	{
@@ -71,13 +110,14 @@ public:
     static inline void GetDMY(UInt32* pDay = NULL, UInt32* pM = NULL, UInt32* pY = NULL)
     {
         time_t now = static_cast<time_t>( Now());
-        struct tm* pLocal = localtime(&now);
+        struct tm local;
+        localtime_r(&now,&local);
         if(pDay)
-            *pDay = pLocal->tm_mday;
+            *pDay = local.tm_mday;
         if(pM)
-            *pM = pLocal->tm_mon + 1;
+            *pM = local.tm_mon + 1;
         if(pY)
-            *pY = pLocal->tm_year + 1900;
+            *pY = local.tm_year + 1900;
     }
     static inline void GetNextMY(UInt32& m, UInt32* pY)
     {
