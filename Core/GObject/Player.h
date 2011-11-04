@@ -16,6 +16,7 @@
 #include "Battle/BattleSimulator.h"
 #include "kingnet_analyzer.h"
 #include "Script/lua_tinker.h"
+#include "Mail.h"
 
 namespace Battle
 {
@@ -1088,6 +1089,7 @@ namespace GObject
 
     public:
         void sendMailPack(UInt16 title, UInt16 content, lua_tinker::table items);
+        void sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind = true);
         void setVipAwardFlag(UInt8 type, UInt32 value);
 
     private:

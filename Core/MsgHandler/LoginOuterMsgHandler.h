@@ -31,6 +31,7 @@
 #include "GObject/Player.h"
 #include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
+#include "GObject/WBossMgr.h"
 
 static memcached_st* memc = NULL;
 
@@ -1428,6 +1429,16 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
 
     st << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void WBossMgrFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::WBOSS,0x1);
+    UInt8 lvl;
+    br >> lvl;
+    GObject::worldBoss.bossAppear(lvl, true);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

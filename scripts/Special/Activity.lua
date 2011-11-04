@@ -654,11 +654,21 @@ end
 function onCopyFloorWin(player, id, floor, spot)
     if getSingleDay() then
         if id == 1 and floor == 2 and spot == 5 then -- 杨花
-            print('杀死杨花')
+            local package = player:GetPackage();
+            local shengyi = player:GetVar(2);
+            if shengyi == 0 then
+                package:AddItem(70, 1, 1)
+                player:SetVar(2, 70)
+            end
         end
 
         if id == 1 and floor == 3 and spot == 5 then -- 智通
-            print('杀死智通')
+            local package = player:GetPackage();
+            local apron = player:GetVar(3);
+            if apron == 0 then
+                package:AddItem(71, 1, 1)
+                player:SetVar(3, 71)
+            end
         end
     end
 end

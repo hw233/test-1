@@ -57,9 +57,18 @@ public:
     inline UInt8 getLevel() const { return m_lvl; }
     inline void setLoc(UInt16 loc) { m_loc = loc; }
     inline UInt16 getLoc() const { return m_loc; }
+    inline UInt32 getHP()
+    {
+        if (m_final)
+        {
+            return _hp[0];
+        }
+        return 0;
+    }
 
     void reward(Player* player);
     void getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret);
+    void flee();
 
     void sendHpMax(Player* player = NULL);
     void sendHp(Player* player = NULL);

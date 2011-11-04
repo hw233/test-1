@@ -68,6 +68,77 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 
     UInt16 ret = 0x0100;
     bool res = bsim.getWinner() == 1;
+
+    if (sz && final)
+    {
+        UInt32 oldHP = _hp[0];
+        for(size_t i = 0; i < sz; ++ i)
+        {
+            GData::NpcFData& nfdata = nflist[i];
+            Battle::BattleObject * obj = bsim(1, nfdata.pos);
+            if(obj == NULL || !obj->isChar())
+                continue;
+            Battle::BattleFighter * bfgt = static_cast<Battle::BattleFighter *>(obj);
+            UInt32 nHP = bfgt->getHP();
+            if(nHP == 0)
+                nHP = 0xFFFFFFFF;
+            if(_hp[i] != 0xFFFFFFFF && _hp[i] != nHP)
+                _hp[i] = nHP;
+        }
+
+        if(oldHP != 0xFFFFFFFF)
+        {
+            if(oldHP == 0)
+                oldHP = nflist[0].fighter->getMaxHP();
+            UInt32 newHP = (_hp[0] == 0xFFFFFFFF) ? 0 : _hp[0];
+            if(oldHP > newHP)
+            {
+                UInt32 damage = oldHP - newHP;
+                UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                pl->pendExp(exp);
+                sendDmg(damage);
+
+                AttackInfo info(pl, damage);
+                AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
+                for ( ; i != e; ++i)
+                {
+                    if ((*i).player == pl)
+                    {
+                        info += *i;
+                        m_atkinfo.erase(i);
+                        break;
+                    }
+                }
+                m_atkinfo.insert(info);
+
+                UInt8 newPercent = float(newHP * 100) / nflist[0].fighter->getMaxHP();
+                if (newPercent > 100)
+                    newPercent = 100;
+                if (_percent < newPercent)
+                    _percent = newPercent;
+                if (!newPercent)
+                {
+                    SYSMSG_BROADCASTV(550, nflist[0].fighter->getId());
+                    _percent = 0;
+                    _hp[0] = 0;
+                    reward(pl);
+                    res = true;
+                }
+                else if (newPercent <= 5 && _percent - newPercent >= 5)
+                {
+                    SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
+                    _percent = newPercent;
+                }
+                else if (_percent - newPercent >= 10)
+                {
+                    SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
+                    _percent = newPercent;
+                }
+                sendHp();
+            }
+        }
+    }
+
     if(res)
     {    
         ret = 0x0101;
@@ -92,78 +163,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     pl->send(st);
     bsim.applyFighterHP(0, pl);
 
-    if (sz && final)
-    {
-        UInt32 oldHP = _hp[0];
-        for(size_t i = 0; i < sz; ++ i)
-        {
-            GData::NpcFData& nfdata = nflist[i];
-            Battle::BattleObject * obj = bsim(1, nfdata.pos);
-            if(obj == NULL || !obj->isChar())
-                continue;
-            Battle::BattleFighter * bfgt = static_cast<Battle::BattleFighter *>(obj);
-            UInt32 nHP = bfgt->getHP();
-            if(nHP == 0)
-                nHP = 0xFFFFFFFF;
-            if(_hp[i] != 0xFFFFFFFF && _hp[i] != nHP)
-                _hp[i] = nHP;
-        }
-        pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
-
-        if(oldHP == 0xFFFFFFFF)
-            return res;
-
-        if(oldHP == 0)
-            oldHP = nflist[0].fighter->getMaxHP();
-        UInt32 newHP = (_hp[0] == 0xFFFFFFFF) ? 0 : _hp[0];
-        if(oldHP > newHP)
-        {
-            UInt32 damage = oldHP - newHP;
-            UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
-            pl->pendExp(exp);
-            sendDmg(damage);
-
-            AttackInfo info(pl, damage);
-            AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
-            for ( ; i != e; ++i)
-            {
-                if ((*i).player == pl)
-                {
-                    info += *i;
-                    m_atkinfo.erase(i);
-                    break;
-                }
-            }
-            m_atkinfo.insert(info);
-
-            UInt8 newPercent = float(newHP * 100) / nflist[0].fighter->getMaxHP();
-            if (newPercent > 100)
-                newPercent = 100;
-            if (_percent < newPercent)
-                _percent = newPercent;
-            if (!newPercent)
-            {
-                SYSMSG_BROADCASTV(550, nflist[0].fighter->getId());
-                _percent = 0;
-                _hp[0] = 0;
-                reward(pl);
-            }
-            else if (newPercent <= 5 && _percent - newPercent >= 5)
-            {
-                SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
-                _percent = newPercent;
-            }
-            else if (_percent - newPercent >= 10)
-            {
-                SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
-                _percent = newPercent;
-            }
-            sendHp();
-        }
-    }
-    else
-        pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
-
+    pl->setBuffData(PLAYER_BUFF_ATTACKING, now + 30);
     return res;
 }
 
@@ -189,11 +189,15 @@ void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
     }
 }
 
+void WBoss::flee()
+{
+    SYSMSG_BROADCASTV(570, m_id);
+}
+
 void WBoss::reward(Player* player)
 {
     static UInt16 trumps[] = {226,90,225,227,};
     static UInt8 trumpnum[] = {3,2,1};
-    static UInt8 trumpprob[] = {80,70,60,60,60,60,60,};
     static UInt16 gems[] = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142};
 
     size_t sz = m_atkinfo.size();
@@ -254,29 +258,27 @@ void WBoss::reward(Player* player)
             else
                 equip = GObject::getRandOEquip(lvl);
 
-            (*i).player->GetPackage()->Add(equip, true);
-            (*i).player->GetPackage()->Add(514, trumpnum[j], true);
-
-
             if (tlvl > sizeof(trumps)/sizeof(UInt16))
                 continue;
-            (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
+
+            MailPackage::MailItem item[] = {{equip,1},{514,trumpnum[j]},};
+            (*i).player->sendMailItem(564, 565, item, 2);
+            MailPackage::MailItem item1[] = {{trumps[tlvl],1},};
+            (*i).player->sendMailItem(564, 565, item1, 1, false);
             SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, trumpnum[j], trumps[tlvl], 1);
         }
 
         if ((j >= 3 && j <= 9))
         {
-            //UInt8 u = uRand(100);
-            //if (u <= trumpprob[j-3])
-            //{
-                (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
-                SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
-            //}
+            MailPackage::MailItem item[] = {{trumps[tlvl],1},};
+            (*i).player->sendMailItem(564, 565, item, 1, false);
+            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
         }
 
         if (j == lucky1 || j == lucky2)
         {
-            (*i).player->GetPackage()->Add(trumps[tlvl], 1, false);
+            MailPackage::MailItem item[] = {{trumps[tlvl],1},};
+            (*i).player->sendMailItem(562, 563, item, 1, false);
             SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
         }
 
@@ -291,32 +293,36 @@ void WBoss::reward(Player* player)
                     equip = GObject::getRandOEquip(lvl);
                 if (equip)
                 {
-                    (*i).player->GetPackage()->Add(equip, 1, true);
-                    //SYSMSG_BROADCASTV(561, (*i).player->getCountry(), (*i).player->getName().c_str(), equip);
+                    MailPackage::MailItem item[] = {{equip,1},};
+                    (*i).player->sendMailItem(562, 563, item, 1);
                 }
             }
 
             if (breath.find(j) != breath.end())
             {
-                (*i).player->GetPackage()->Add(508, 1, true);
-                //SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), 508, 1);
+                MailPackage::MailItem item[] = {{508,1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
             }
 
             if (gem.find(j) != gem.end())
             {
                 UInt8 idx = uRand(sizeof(gems)/sizeof(UInt16));
-                (*i).player->GetPackage()->Add(gems[idx], 1, true);
-                //SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), gems[idx], 1);
+                MailPackage::MailItem item[] = {{gems[idx],1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
             }
         }
+
+        MailPackage::MailItem item[] = {{55,1},};
+        (*i).player->sendMailItem(568, 569, item, 1);
     }
 
     if (player)
     {
-        player->GetPackage()->Add(56, 5, true);
-        player->getTael(10000);
+        MailPackage::MailItem item[] = {{56,5},{MailPackage::Tael,10000},};
+        player->sendMailItem(566, 567, item, 2);
         SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 10000);
     }
+    m_atkinfo.clear();
 }
 
 bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
@@ -450,7 +456,6 @@ void WBoss::disapper()
     _percent = 100;
     _ng = NULL;
     _hp.clear();
-    m_atkinfo.clear();
     fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
 }
 
@@ -590,14 +595,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 10*60*60+70*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+60*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+50*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+40*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+30*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+20*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+10*60,
-        TimeUtil::SharpDayT(0,now) + 10*60*60+10,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+8*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+7*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+6*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+5*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+4*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+3*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+2*60,
+        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -654,7 +659,7 @@ void WBossMgr::calcNext(UInt32 now)
             else
             {
                 _appearTime = _prepareTime + 20;
-                _disapperTime = _appearTime + 20 * 60 - 10;
+                _disapperTime = _appearTime + 1 * 60 - 10;
             }
             break;
         }
@@ -670,7 +675,7 @@ void WBossMgr::calcNext(UInt32 now)
             else
             {
                 _appearTime = _prepareTime + 30;
-                _disapperTime = _appearTime + 20 * 60 - 10;
+                _disapperTime = _appearTime + 1 * 60 - 10;
             }
             m_level = 1;
         }
@@ -686,7 +691,11 @@ void WBossMgr::process(UInt32 now)
         calcNext(now);
     broadcastTV(now);
     if (now >= _disapperTime && m_boss && !m_boss->isDisappered())
+    {
         disapper(now);
+        if (m_boss)
+            m_boss->flee();
+    }
 }
 
 void WBossMgr::broadcastTV(UInt32 now)
@@ -811,10 +820,20 @@ void WBossMgr::bossAppear(UInt8 lvl, bool force)
     {
         if (lvl)
         {
-            _prepareTime = now - 14 * 60;
-            _appearTime = _prepareTime + 20;
-            _disapperTime = _appearTime + 60 * 60 - 10;
-            _prepareStep = 0;
+            if (cfg.GMCheck)
+            {
+                _prepareTime = now - 14 * 60;
+                _appearTime = _prepareTime + 20;
+                _disapperTime = _appearTime + 60 * 60 - 10;
+                _prepareStep = 0;
+            }
+            else
+            {
+                _prepareTime = now;
+                _appearTime = _prepareTime;
+                _disapperTime = _appearTime + 2 * 60 - 10;
+                _prepareStep = 0;
+            }
         }
     }
     else
