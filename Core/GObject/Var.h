@@ -20,7 +20,8 @@ namespace GObject
     };
 
 
-    enum VarID{
+    enum VarID
+    {
         VAR_INVALID = 0,    //无效变量
         VAR_SINGLE_CHOPSTICKS = 1, //光棍节送筷子
         VAR_SENGYI = 2,     // 僧衣

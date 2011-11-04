@@ -33,6 +33,9 @@
 #include "GObject/SaleMgr.h"
 #include "GObject/WBossMgr.h"
 
+#include "GObject/DCLogger.h"
+
+
 static memcached_st* memc = NULL;
 
 static bool initMemcache()
@@ -136,6 +139,9 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 	//player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
+
+    GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain().c_str()));
+
     //LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]断开连接，发送指令0x200\n", player->getId());
 }
 
@@ -288,9 +294,22 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			pid |= (getServerNo(ul._server) << 48);
 		}
 		res = doLogin(cl, pid, hdr.sessionID, player);
+
+        std::string domain = "";
+#ifdef _NEED_OPENID
+        if (player)
+        {
+            domain = player->getDomain();
+            player->setDomain(ul._platform);
+            player->setOpenId(ul._openid);
+            player->setOpenKey(ul._openkey);
+        }
+#endif
+
 		UInt8 flag = 0;
 		if(res == 0)
 		{
+            GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
             player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
@@ -298,6 +317,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		}
 		else if(res == 4)
 		{
+            GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
+            GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
             player->setQQVipYear(ul._isYear);
 			flag = 1;
@@ -305,18 +326,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
 		}
-
-#ifdef _NEED_OPENID
-        if (player)
-        {
-            player->setDomain(ul._platform);
-            player->setOpenId(ul._openid);
-            player->setOpenKey(ul._openkey);
-        }
-#endif
 	}
 	else
 		res = 2;
+
 	if(res > 0)
 	{
 		UserLogonRepStruct rep;
@@ -506,6 +519,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
 
+#ifdef _NEED_OPENID
+            pl->setDomain(nu._platform);
+            pl->setOpenId(nu._openid);
+            pl->setOpenKey(nu._openkey);
+#endif
+
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
 			GLOBAL().PushMsg(imh, &ces);
@@ -527,13 +546,6 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(recharge));
 				GLOBAL().PushMsg(hdr, &recharge);
 			}
-
-#ifdef _NEED_OPENID
-            pl->setDomain(nu._platform);
-            pl->setOpenId(nu._openid);
-            pl->setOpenKey(nu._openkey);
-#endif
-
             UInt16 qqlvl = nu._level | (nu._isYear << 8);
             GameMsgHdr hdr(0x297, country, pl, sizeof(UInt16));
             GLOBAL().PushMsg(hdr, &qqlvl);

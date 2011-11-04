@@ -111,7 +111,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 }
                 m_atkinfo.insert(info);
 
-                UInt8 newPercent = float(newHP * 100) / nflist[0].fighter->getMaxHP();
+                UInt8 newPercent = (float(newHP) / nflist[0].fighter->getMaxHP()) * 100;
+                
                 if (newPercent > 100)
                     newPercent = 100;
                 if (_percent < newPercent)
@@ -325,7 +326,7 @@ void WBoss::reward(Player* player)
     m_atkinfo.clear();
 }
 
-bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
+bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
 {
     bool in = false;
     for (int i = 0; i < 5; ++i)
@@ -377,7 +378,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
     }
     else if (res && m_final)
     {
-        disapper();
+        mgr->disapper(TimeUtil::Now());
     }
     return res;
 }
@@ -423,6 +424,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         m_id = npcid;
     }
 
+    TRACE_LOG("appear: %u(%u:%u), lvl: %u, loc: %u, count: %u", m_id, npcid, oldid, m_lvl, m_loc, m_count);
     fprintf(stderr, "appear: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
 
     m_disappered = false;
@@ -445,6 +447,9 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
 void WBoss::disapper()
 {
+    if (m_disappered)
+        return;
+
     Map * map = Map::FromSpot(m_loc);
     if (!map) return;
     map->Hide(m_id);
@@ -456,7 +461,8 @@ void WBoss::disapper()
     _percent = 100;
     _ng = NULL;
     _hp.clear();
-    fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
+    
+    TRACE_LOG("disapper: %u, lvl: %u, loc: %u", m_id, m_lvl, m_loc);
 }
 
 void WBoss::sendHpMax(Player* player)
@@ -567,17 +573,24 @@ bool WBossMgr::isWorldBoss(UInt32 npcid)
 
 void WBossMgr::nextDay(UInt32 now)
 {
-    m_level = 0;
+    m_level = 1;
+#if 1
     _prepareTime = TimeUtil::SharpDayT(1,now) + 12 * 60 * 60 + 45 * 60;
-    _appearTime = _prepareTime + 15 * 60;;
+    _appearTime = _prepareTime + 15 * 60;
     _disapperTime = _appearTime + 60 * 60 - 10;
+#else
+    _prepareTime = TimeUtil::SharpDayT(1,now) + 15 * 60 * 60 + 45 * 60;
+    _appearTime = _prepareTime + 15 * 60;
+    _disapperTime = _appearTime + 60 * 60 - 10;
+#endif
     if (m_boss)
     {
         m_boss->disapper();
         delete m_boss;
         m_boss = NULL;
     }
-    fprintf(stderr, "out of time. next day\n");
+    TRACE_LOG("out of time. next day: %u", _prepareTime);
+    fprintf(stderr, "out of time. next day: %u\n", _prepareTime);
     return;
 }
 
@@ -595,14 +608,14 @@ void WBossMgr::calcNext(UInt32 now)
         TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
         TimeUtil::SharpDayT(0,now),
 #else
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+8*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+7*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+6*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+5*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+4*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+3*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+2*60,
-        TimeUtil::SharpDayT(0,now) + 17*60*60+29*60+10,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+21*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+18*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+15*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+12*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+9*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+6*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+3*60,
+        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+10,
         TimeUtil::SharpDayT(0,now),
 #endif
     };
@@ -619,7 +632,7 @@ void WBossMgr::calcNext(UInt32 now)
         {
             if (m_boss && m_boss->isDisappered())
             {
-                if (i == 1 || m_maxlvl < (40+(WBOSS_NUM-i)*10))
+                if (i == 1 || m_maxlvl < (40+(WBOSS_NUM-i+1)*10))
                 {
                     nextDay(now);
                     return;
@@ -658,8 +671,8 @@ void WBossMgr::calcNext(UInt32 now)
             }
             else
             {
-                _appearTime = _prepareTime + 20;
-                _disapperTime = _appearTime + 1 * 60 - 10;
+                _appearTime = _prepareTime + 15 * 60;
+                _disapperTime = _appearTime + 60 * 60 - 60;
             }
             break;
         }
@@ -674,15 +687,18 @@ void WBossMgr::calcNext(UInt32 now)
             }
             else
             {
-                _appearTime = _prepareTime + 30;
-                _disapperTime = _appearTime + 1 * 60 - 10;
+                _appearTime = _prepareTime + 15 * 60;
+                _disapperTime = _appearTime + 60 * 60 - 60;
             }
             m_level = 1;
         }
     }
 
     if (!cfg.GMCheck)
-        fprintf(stderr, "lvl: %u\n", m_level);
+    {
+        fprintf(stderr, "lvl: %u, time: %u\n", m_level, _prepareTime);
+    }
+    TRACE_LOG("lvl: %u, time: %u", m_level, _prepareTime);
 }
 
 void WBossMgr::process(UInt32 now)
@@ -782,7 +798,7 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
         return;
     if (!m_boss)
         return;
-    m_boss->attack(pl, loc, npcid);
+    m_boss->attack(this, pl, loc, npcid);
 }
 
 void WBossMgr::disapper(UInt32 now)

@@ -9,6 +9,7 @@ namespace GObject
 {
 
 class Player;
+class WBossMgr;
 
 struct AttackInfo
 {
@@ -48,7 +49,7 @@ public:
 
     inline void setId(UInt32 id) { m_id = id; }
     inline UInt32 getId() const { return m_id; }
-    bool attack(Player* pl, UInt16 loc, UInt32 id);
+    bool attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id);
     void appear(UInt32 npcid, UInt32 oldid = 0);
     void disapper();
     bool attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final = false);
@@ -100,7 +101,7 @@ public:
 public:
     WBossMgr()
         : _prepareTime(0), _prepareStep(0), _appearTime(0),
-        _disapperTime(0), m_level(0), m_maxlvl(0), m_boss(NULL) {}
+        _disapperTime(0), m_level(1), m_maxlvl(0), m_boss(NULL) {}
     ~WBossMgr()
     {
         if (m_boss)
