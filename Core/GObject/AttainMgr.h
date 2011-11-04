@@ -38,11 +38,13 @@ namespace GObject
         bool HasFinishAttainment(UInt16 attainId);
         bool HasAttained(UInt16 attainId);
         bool CanAttain(UInt16 attainId);
+
+        void CheckAttainWithStatus(UInt16 attainId,  UInt32 tarStatus,  UInt32 step);
         void UpdateAttainment(UInt16 attainId, UInt32 status);
         UInt32 getAttainStatus(UInt16 attainId);
         void MidnightCheckAttain();
         void sendAttainment();
-
+        void UpdateDB(const AttainData* ad, bool bInsert);
     private:
         Player* m_PlayerOwner;
         AttainList m_AttainList;

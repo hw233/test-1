@@ -134,6 +134,9 @@ MSG_REG_2(GameMsgHdr, 0x1F0, PlayerEnter);
 MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
 
+MSG_REG_2(GameMsgHdr, 0x1FF, OnDoAttainment); //真真真真
+
+
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
 MSG_REG_2(GameMsgHdr, 0x201, PlayerLogin);
 MSG_REG_2(GameMsgHdr, 0x202, PlayerReconnect);
@@ -200,6 +203,8 @@ MSG_REG_2(GameMsgHdr, 0x309, OnClanSkillDonateBackReq);
 MSG_REG_2(GameMsgHdr, 0x310, OnOperationTaskAction);
 MSG_REG_2(GameMsgHdr, 0x311, OnClanOption);
 MSG_REG_2(GameMsgHdr, 0x312, OnClanSkillLevel);
+//MSG_REG_2(GameMsgHdr, 0x313, OnFriendLevUp);
+
 
 MSG_REG_2(GameMsgHdr, 0x320, OnPracticeExpAddReq);
 MSG_REG_2(GameMsgHdr, 0x321, OnSetPropsReq);

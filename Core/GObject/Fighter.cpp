@@ -728,6 +728,17 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
     return 0;
 }
 
+UInt32  Fighter:: getTrumpNum()
+{
+
+    UInt32 num = 0;
+     for (int i = 0; i < getMaxTrumps(); ++i)
+     {
+        if (_trump[i])
+            num ++ ;
+     }
+     return num;
+}
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
@@ -770,6 +781,13 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 
             _attrDirty = true;
             _bPDirty = true;
+
+            if(writedb  &&  getTrumpNum() == 2)
+            {
+                //判断穿法宝的成就
+                GameAction()->doAttainment(_owner, 10211, 0);
+            }
+
             sendModification(0x50+idx, _trump[idx], writedb);
         }
     }
@@ -1645,6 +1663,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         sendModification(7, _pexpMax);
         sendModification(9, soulMax);
         sendModification(0x32, getUpCittasMax());
+        GameAction()->doAttainment(this->_owner, 10051, idx); //增加穴道的成就
         return true;
     }
     return false;
@@ -2044,6 +2063,9 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         _bPDirty = true;
         //sendModification(0x62, citta, idx, writedb);
         sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
+
+        //装备上心法成就
+        GameAction()->doAttainment(_owner, 10084,getUpCittasNum());
     }
 
     if (ret && !swap)
@@ -2059,7 +2081,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
     return ret;
 }
-
 bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
 {
     const GData::CittaBase* cb = GData::cittaManager[citta];
@@ -2075,7 +2096,44 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
         int i = hasCitta(citta);
         if (i < 0)
             return false;
-        return addNewCitta(citta+1, writedb, false);
+        bool re =  addNewCitta(citta+1, writedb, false);
+
+        if(re )
+        {
+            //升级心法成功
+            UInt16 curLev = CITTA_LEVEL(citta + 1);
+            if(curLev == 9 )
+            {
+                //check lev9 attain
+                GameAction()->doAttainment(_owner, 10071,cb->type);
+
+                UInt32 num9 = 0;     //所有心法9级的
+                UInt32 num9Type8;
+                for (size_t i = 0; i < _cittas.size(); ++i)
+                {
+                    if(CITTA_LEVEL(citta) > 9 )
+                    {
+                        const GData::CittaBase* cb = GData::cittaManager[citta];
+                        if(cb)
+                        {
+                            num9 ++; 
+                            if(cb->type >= 8)
+                                num9Type8 ++;
+                        }
+                    }
+                }
+                if(num9>=6)
+                {
+                     GameAction()->doAttainment(_owner, 10073, num9);
+                }
+                if(num9Type8 >=3)
+                {
+                     GameAction()->doAttainment(_owner,  10086, num9Type8);
+                }
+            }
+            
+        }
+        return re;
     }
     else
     {
@@ -2354,6 +2412,10 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
     _attrDirty = true;
     _bPDirty = true;
     sendModification(0x63, citta, op/*1add,2del,3mod*/, writedb);
+
+    //获取心法
+    GameAction()->doAttainment(this->_owner, 10061, getCittasNum());
+    GameAction()->doAttainment(this->_owner, 10074, cb->type);
     return true;
 }
 
@@ -2468,6 +2530,9 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     _attrDirty = true;
     _bPDirty = true;
     sendModification(0x63, citta, 2/*1add,2del,3mod*/, writedb);
+
+    //散功成就
+    GameAction()->doAttainment(_owner, 10081, 0);
     return true;
 }
 

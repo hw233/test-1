@@ -19,6 +19,31 @@ namespace Script
 {
 	extern 	void SysBroadcast(UInt8 type, const char * msg);
 
+    enum AttainType
+    {
+        ADD_FRIEND = 10451,
+        ONE_FRIEND_LEV_UP = 10453,
+        FIVE_FRIEND_LEV_50 = 10454,
+        FIVE_FRIEND_LEV_80 = 10456,
+        JOIN_CLAN = 10501,
+        CLAN_ADD_MEMBER = 10502,
+        CLAN_LEVUP = 10504,
+
+        BATTLE_MISS_3 = ,
+        BATTLE_MISS_9 = ,
+        BATTLE_CS_3 = ,
+        BATTLE_CS_9 = ,
+        BATTLE_PR_3 = ,
+        BATTLE_PR_9 = ,
+        BATTLE_FJ_3 = ,
+        BATTLE_FJ_9 = ,
+        BATTLE_SKILLDMG_300 = ,
+        BATTLE_SKILLDMG_1000 = ,
+        BATTLE_SKILLDMG_5000 = ,
+        BATTLE_PL_1000 = ,
+        BATTLE_PL_5000 = ,
+        BATTLE_PL_1W   = ,
+    };
 	class GameActionLua:
 		public Script
 	{

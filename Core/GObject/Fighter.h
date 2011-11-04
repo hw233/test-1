@@ -227,7 +227,6 @@ public:
     int isCittaUp(UInt16 citta);
     // 升级心法
     bool lvlUpCitta(UInt16 citta, bool = true);
-
     // 取得装备的心法数
     UInt8 getUpCittasNum();
     // 取得最大装备心法数
@@ -270,6 +269,7 @@ public:
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
 
+    UInt32 getTrumpNum();
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -606,7 +606,6 @@ public:
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
 };
-
 class GlobalFighters
 {
 public:

@@ -1503,6 +1503,26 @@ namespace GObject
 			DB2().PushUpdateData("REPLACE INTO `fighter` (`id`, `playerId`, `potential`, `capacity`, `level`, `experience`)\
                     VALUES(%u, %"I64_FMT"u, %u.%02u, %u.%02u, %u, %u)",
                     id, getId(), p / 100, p % 100, c / 100, c % 100, fgt->getLevel(), fgt->getExp());
+
+            //招募散仙荣誉
+            UInt8 col  = fgt->getColor();
+            GameAction()->doAttainment(this, 10101, col);
+
+            UInt8 minCol = col;
+
+            std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+
+            while(it != _fighters.end())
+            {
+                if(it->second->getId() >=  10 )
+                    minCol = min(minCol, it->second->getColor());
+                it ++ ;
+            }
+
+            if(_fighters.size() == 5)
+                GameAction()->doAttainment(this, 10102, minCol);
+            if(_fighters.size() == 10)
+                GameAction()->doAttainment(this, 10108, minCol);
 		}
 
         if (!load || !fgt->getCittasNum())
@@ -1650,6 +1670,9 @@ namespace GObject
 
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
+
+            if(fgt->getColor()== 3) //删除散仙荣誉
+                GameAction()->doAttainment(this, 10107, fgt->getColor());
 			if(r)
 				sendMsgCode(0, 1201);
 			SYSMSG_SENDV(111, this, fgt->getColor(), fgt->getName().c_str());
@@ -2105,6 +2128,8 @@ namespace GObject
                     pendExp(ng->getExp());
                 ng->getLoots(this, _lastLoot);
             }
+            //战胜特定NPC之后 荣誉
+            GameAction()->doAttainment(this, 10351, npcId);
 		}
 		else
 			st << static_cast<UInt16>(0x0100);
@@ -2505,6 +2530,9 @@ namespace GObject
 				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 0, %"I64_FMT"u)", getId(), pl->getId());
 		}
 		_friends[0].insert(pl);
+        //增加好友成就
+        GameAction()->doAttainment(this, Script::ADD_FRIEND,       _friends[0].size());
+        GameAction()->doAttainment(this, Script::ONE_FRIEND_LEV_UP, pl->GetLev);
 	}
 
 	void Player::delFriend( Player * pl )
@@ -4902,6 +4930,36 @@ namespace GObject
 #endif
 	}
 
+    void Player::OnFriendLevUp(UInt8 nLev)
+    {
+    
+        //一个好友的等级上升
+        GameAction()->doAttainment(this, ONE_FRIEND_LEV_UP, nLev);
+
+        UInt32 f80 = 0;
+        UInt32 f50 = 0;
+        std::set<Player *> :: iterator it = _friends[0].begin();
+
+        while(it != _friends[0].end())
+        {
+            UInt8 curLev = (*it)->GetLev();
+            if(curLev >= 50)
+                f50 ++ ;
+            if(curLev >= 80)
+                f80 ++;
+            it ++;
+        }
+
+        if(f80 >= 5)
+        {
+            GameAction()->doAttainment(this,  Script::FIVE_FRIEND_LEV_80, 0);
+        }
+        if(f50>= 5)
+        {
+            GameAction()->doAttainment(this,   Script:: FIVE_FRIEND_LEV_50, 0);
+        }
+
+    }
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
 		if(_clan != NULL)
@@ -4931,6 +4989,21 @@ namespace GObject
 			GameMsgHdr hdr1(0x1A4, WORKER_THREAD_WORLD, this, 7);
 			GLOBAL().PushMsg(hdr1, buffer);
 		}
+
+        //TELL my frined that my Level up  so get the Attainment!
+        if(nLev >= 50)
+        {
+            stAttainMsg  msg;
+            msg .attainID = Script::ONE_FRIEND_LEV_UP;
+            msg.param = nLev;
+            std::set<Player *> :: iterator it = _friends[0].begin();
+            while(it != _friends[0].end())
+            {
+                
+                GameMsgHdr hdr(0x1FF, (*it)->getThreadId(), *it, sizeof(msg));
+                GLOBAL().PushMsg(hdr, &msg);
+            }
+        }
 	}
 
     void Player::sendFormationList()
@@ -5035,7 +5108,6 @@ namespace GObject
 
         std::string formations = "";
         int cnt = _playerData.formations.size();
-
         formations += Itoa(_playerData.formations[0]);
         for(int idx = 1; idx < cnt; ++ idx)
         {
@@ -5044,8 +5116,10 @@ namespace GObject
         }
 
         SYSMSG_SENDV(2104, this, newformation->getName().c_str());
-		DB1().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
+        DB1().PushUpdateData("UPDATE `player` SET `formations` = '%s' WHERE id = %" I64_FMT "u", formations.c_str(), _id);
 
+        //学习阵法的成就
+        GameAction()->doAttainment(this, 10251, cnt); 
         Stream st(REP::RANK_DATA);
         st << static_cast<UInt8>(2) << newformationId << Stream::eos;
         send(st);
@@ -5342,6 +5416,31 @@ namespace GObject
 		}
 	}
 
+    UInt8 Player::GetFullPotFighterNum()
+    {
+        UInt8 num = 0 ; 
+        std::map<UInt32, Fighter *> ::iterator it = _fighters.begin();
+        while(it != _fighters.end())
+        {
+            if(it->second->getPotential() == GObjectManager::getMaxPotential()/100 )
+                num ++ ;
+            it ++ ;
+        }
+        return num;
+    }
+
+    UInt8 Player::GetFullCapFighterNum()
+    {
+        UInt8 num = 0 ; 
+        std::map<UInt32, Fighter *> ::iterator it = _fighters.begin();
+        while(it != _fighters.end())
+        {
+            if(it->second->getCapacity() == GObjectManager::getMaxCapacity()/100 )
+                num ++; 
+            it ++ ;
+        }
+        return num;
+    }
 	UInt8 Player::trainFighter( UInt32 id, UInt8 type )
 	{
 #define ITEM_TRAIN_TYPE1 506         // 补髓丹(不带保护) 资质
@@ -5403,14 +5502,35 @@ namespace GObject
 		
 		if(uRand(1000) < rate)
 		{
+            bool bMainFighter = isMainFighter( fgt->getId()) ; 
             if(isPotential)
             {
                 p += 0.01f;
                 p = floorf(p * 100.0f + 0.5f) / 100.0f;
 
                 if(p > GObjectManager::getMaxPotential()/100)
+                {
                     p = GObjectManager::getMaxPotential()/100;
+
+                    //触发潜力满 成就
+                    UInt8 num = GetFullPotFighterNum();
+                    GameAction()->doAttainment(this, 10109 , num);
+                    if(num == 10 && GetFullCapFighterNum() == 10)
+                    {
+                        //十个人全满
+                        GameAction()->doAttainment(this, 10115, 0);
+                    }
+                   // if(bMainFighter)
+                     //   GameAction()->doAttainment(this, , 0);
+
+                }
                 fgt->setPotential(p);
+                if(bMainFighter)
+                {
+                    //主将潜力增加成就
+                    GameAction()->doAttainment(this, 10117 ,fgt->getColor());
+                }
+
             }
             else
             {
@@ -5418,8 +5538,31 @@ namespace GObject
                 p = floorf(p * 10.0f + 0.5f) / 10.0f;
 
                 if(p > GObjectManager::getMaxCapacity()/100)
+                {
                     p = GObjectManager::getMaxCapacity()/100;
+                    UInt8 num = GetFullCapFighterNum();
+                    //资质练满
+                    GameAction()->doAttainment(this, 10110  , num);
+
+                    if(num == 10 && GetFullPotFighterNum() == 10)
+                    {
+                        //十个人全满
+                        
+                        GameAction()->doAttainment(this, 10115, 0);
+                    }
+
+                    if(bMainFighter)
+                        //主将潜质练满
+                        GameAction()->doAttainment(this,10112 , 0);
+
+                }
                 fgt->setCapacity(p);
+
+                if(bMainFighter)
+                {
+                    GameAction()->doAttainment(this,10119 , static_cast<UInt32>(p));
+                }
+
             }
 		}
 		else
@@ -5982,6 +6125,11 @@ namespace GObject
 		return isWin;
 	}
 
+    void Player::OnDoAttainment(UInt32 attId,   UInt32, param)
+    {
+        GameAction()->doAttainment(this, attId, param);
+    }
+
 
 	void Player::setClan(Clan * c)
 	{
@@ -5989,8 +6137,11 @@ namespace GObject
 			return;
 		_clan = c;
 		rebuildBattleName();
-	}
 
+        //加入帮会成就
+        GameAction()->doAttainment(this,Script::JOIN_CLAN,0 );
+	}
+    
 	void Player::testBattlePunish()
 	{
 		UInt32 atktime = _buffData[PLAYER_BUFF_ATTACKING];
@@ -6625,20 +6776,20 @@ namespace GObject
 		}
     }
 
-	void Player::setFightersDirty( bool bDirty )
-	{
-		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+    void Player::setFightersDirty( bool bDirty )
+    {
+        for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
         {
             it->second->setDirty(bDirty);
         }
-
-		return;
-	}
+        return;
+    }
 
     bool Player::enchanted8( UInt32 id )
     {
-        if (!id) return false;
-        size_t sz = _enchantEqus.size();
+       if (!id) return false;
+       size_t sz = _enchantEqus.size();
+
         for (size_t i = 0; i < sz; ++i)
         {
             if (id == _enchantEqus[i])

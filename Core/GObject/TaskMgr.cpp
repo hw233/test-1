@@ -663,6 +663,10 @@ namespace GObject
 				completedToken = true;
 				m_TaskCompletedList[it->first] = it->second;
 				m_TaskAcceptedList.erase(it);
+                //
+                GameAction()->doAttainment(this->m_PlayerOwner, 10305 , taskType.m_TypeId);
+
+                
 			}
 			if (notify)
 			{
@@ -1400,5 +1404,4 @@ namespace GObject
 
         return true;
     }
-
 }
