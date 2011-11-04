@@ -294,10 +294,11 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		}
 		res = doLogin(cl, pid, hdr.sessionID, player);
 
-        std::string domain = player->getDomain();
+        std::string domain = "";
 #ifdef _NEED_OPENID
         if (player)
         {
+            domain = player->getDomain();
             player->setDomain(ul._platform);
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
