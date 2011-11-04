@@ -751,7 +751,6 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         UInt32 now = TimeUtil::Now();
         pd->expcd = now + 60;
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
-        ++_nplayers[spot];
 
         sendSpot(pd, rspot);
         return true;
