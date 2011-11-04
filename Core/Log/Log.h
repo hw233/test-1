@@ -83,6 +83,7 @@ enum MailItemType
 	DismissCitta,
     AutoCopy,
     CountryBattleAward,
+	SaleSell,
 };
 enum ItemFrom
 {
@@ -126,6 +127,7 @@ enum ItemTo
 	ToGemMgerge,
 	ToActivateAttr,
 	ToGemAttach,	
+	ToTrainFighter,	
 };
 
 

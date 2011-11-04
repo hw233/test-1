@@ -5395,7 +5395,7 @@ namespace GObject
 		if(rate == 0)
 			return 1;
 
-		if(!m_Package->DelItemAny(itemId, 1))
+		if(!m_Package->DelItemAny(itemId, 1, NULL, ToTrainFighter))
 			return 2;
 		
 		if(uRand(1000) < rate)
