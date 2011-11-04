@@ -3193,6 +3193,9 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
     UInt8 type;
     brd >> type;
 
+    if (_playerData.location != 8977)
+        return;
+
     switch (type)
     {
         case 0:
