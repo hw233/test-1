@@ -98,6 +98,14 @@ void World::World_Multi_Check( World * world )
 	clanManager.process(now, world->_today);
 }
 
+
+
+
+typedef std::multimap<UInt32, Player*> ChopStickSortMap;
+ChopStickSortMap chopStickSortMap;
+
+bool bSingleDayEnd = false;
+
 bool enum_midnight(void * ptr, void *)
 {
 	Player * pl = static_cast<Player *>(ptr);
@@ -114,6 +122,15 @@ bool enum_midnight(void * ptr, void *)
 		DBLOG1().PushUpdateData("insert into `gold_accounts`(`server_id`, `player_id`, `gold`, `time`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, pl->getId(), pl->getGold(), TimeUtil::SharpDay(1));
 	}
 #endif
+
+    if(bSingleDayEnd)
+    {
+        UInt32 num = pl->GetVar(VAR_SINGLE_CHOPSTICKS);
+        if(num > 0)
+        {
+            chopStickSortMap.insert(std::make_pair(num, pl));
+        }
+    }
 
     if (World::_halloween && pl->isOnline())
         pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
@@ -210,6 +227,8 @@ bool enum_dungeon_midnight(void * ptr, void * data)
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
+
+    bool bSingleDay = getSingleDay();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
@@ -217,7 +236,39 @@ void World::World_Midnight_Check( World * world )
 	luckyDraw.setLuckyDrawCost();
 	luckyDraw.checkCleanup();
 
+    chopStickSortMap.clear();
+    //光棍节活动是否结束
+    bSingleDayEnd = bSingleDay && !getSingleDay();
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
+
+    //根据筷子数名次给予奖励
+    if(bSingleDayEnd)
+    {
+        int pos = 0;
+        UInt32 chopStickNum = 0xFFFFFFFF;
+        for(ChopStickSortMap::reverse_iterator iter = chopStickSortMap.rbegin();
+                iter != chopStickSortMap.rend(); ++iter)
+        {
+            if(iter->first != chopStickNum)
+            {
+                ++pos;
+                chopStickNum = iter->first;
+            }
+            if(pos == 1)
+            {
+            }
+            else if(pos == 2)
+            {
+            }
+            else if(pos == 3)
+            {
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);

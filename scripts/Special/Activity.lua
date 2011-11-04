@@ -664,6 +664,10 @@ function onCopyFloorWin(player, id, floor, spot)
 end
 
 function onCopyWin(player, id, floor, spot)
+    if getSingleDay() then
+        local package = player:GetPackage();
+        package:AddItem(69, 1, false);    
+    end
 end
 
 function onFrontMapFloorWin(player, id, spot)
