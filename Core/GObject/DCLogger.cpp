@@ -27,7 +27,31 @@ bool DCLogger::init()
     version = _VERSION;
     appid = _APPID;
 
+    memset(m_onlineNum_domain, 0, sizeof(m_onlineNum_domain));
+    for(int i = 0; i < MAX_DOMAIN; ++i)
+    {
+        m_domain[i] = i + 1;
+    }
+
     return true;
+}
+
+void DCLogger::incDomainOnlineNum(UInt8 domain)
+{
+    for(int i = 0; i < MAX_DOMAIN; ++i)
+    {
+        if(domain == m_domain[i])
+            ++ m_onlineNum_domain[i];
+    }
+}
+
+void DCLogger::decDomainOnlineNum(UInt8 domain)
+{
+    for(int i = 0; i < MAX_DOMAIN; ++i)
+    {
+        if(domain == m_domain[i] && m_onlineNum_domain[i] > 0)
+            -- m_onlineNum_domain[i];
+    }
 }
 
 bool DCLogger::reg(Player* player)
@@ -169,6 +193,15 @@ bool DCLogger::logout(Player* player)
     return true;
 }
 
+void DCLogger::online()
+{
+    for(int i = 0; i < MAX_DOMAIN; ++ i)
+    {
+        if(m_onlineNum_domain[i])
+            online(m_onlineNum_domain[i], m_domain[i]);
+    }
+}
+
 bool DCLogger::online(UInt32 num, UInt8 domain)
 {
 #ifndef _DEBUG
@@ -190,6 +223,8 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     msg << "&optype=5&actionid=14";
     msg << "&user_num=";
     msg << num;
+    msg << "&opuid=";
+    msg << cfg.serverNum;
 
 #ifdef _DEBUG
     fprintf(stderr, "%s\n", msg.str().c_str());
