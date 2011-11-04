@@ -247,7 +247,7 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     return true;
 }
 
-void DCLogger::fee(Player* player, Int32 c)
+void DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
 #ifndef _DEBUG
     if (!m_logger)
@@ -278,6 +278,8 @@ void DCLogger::fee(Player* player, Int32 c)
     msg << player->getOpenKey();
     msg << "&modifyfee=";
     msg << c*10; // TODO:
+    msg << "&totalfee=";
+    msg << total*10; // TODO:
 
 #ifdef _DEBUG
     fprintf(stderr, "%s\n", msg.str().c_str());
