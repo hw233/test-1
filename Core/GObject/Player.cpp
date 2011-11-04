@@ -1002,6 +1002,29 @@ namespace GObject
         }
     }
 
+    void Player::sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind)
+    {
+        if (!mitem || !size)
+            return;
+
+        SYSMSG(_title, title);
+        SYSMSG(_content, content);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, _title, _content, 0xFFFE0000);
+        if(mail)
+        {
+            std::string strItems;
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, bind);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
     void Player::sendLevelPack(UInt8 lvl)
     {
         if (lvl >= 30 && !(_playerData.qqawardgot & 0x10))
