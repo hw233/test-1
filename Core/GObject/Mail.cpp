@@ -225,7 +225,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 	}
 	if(itemsInfo != NULL)
 	{
-		std::string strItems;
+		std::string strItems = "";
 		for(UInt32 i = 0; i < itemsInfo->count; i ++)
 		{
 			strItems += Itoa(itemsInfo->items[i].id);
@@ -235,6 +235,7 @@ Mail * MailBox::newMail( Player * sender, UInt8 type, const std::string& title, 
 		}
 		DBLOG1().PushUpdateData("insert into mailitem_histories(`server_id`, `player_id`, `mail_id`, `mail_type`, `title`, `content_text`, `content_item`, `receive_time`) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, _owner->getId(), mail->id, itemsInfo->type, title.c_str(), content.c_str(), strItems.c_str(), mail->recvTime);
 	}
+
 	return mail;
 }
 
