@@ -3,6 +3,7 @@
 #include "Common/Itoa.h"
 #include "Player.h"
 #include "Server/Cfg.h"
+#include "Log/Log.h"
 #include <sstream>
 
 namespace GObject
@@ -96,6 +97,7 @@ bool DCLogger::reg(Player* player)
     FastMutex::ScopedLock lck(m_lck);
     if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
+    TRACE_LOG("%s", data.c_str());
 #endif
 
     return true;
@@ -142,6 +144,7 @@ bool DCLogger::login(Player* player)
     FastMutex::ScopedLock lck(m_lck);
     if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
+    TRACE_LOG("%s", data.c_str());
 #endif
 
     return true;
@@ -176,6 +179,8 @@ bool DCLogger::logout(Player* player)
     msg << player->getOpenId();
     msg << "&key=";
     msg << player->getOpenKey();
+    msg << "&onlinetime=";
+    msg << time(NULL) - player->getLastOnline(); // TODO:
     msg << "&source=";
     msg << player->getSource();
 
@@ -188,6 +193,7 @@ bool DCLogger::logout(Player* player)
     FastMutex::ScopedLock lck(m_lck);
     if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
+    TRACE_LOG("%s", data.c_str());
 #endif
 
     return true;
@@ -235,6 +241,7 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     FastMutex::ScopedLock lck(m_lck);
     if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
         return false;
+    TRACE_LOG("%s", data.c_str());
 #endif
 
     return true;
