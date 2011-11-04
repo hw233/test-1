@@ -516,7 +516,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				//if(fromWhere != 0 && item->getQuality() >= 3)
+				if(fromWhere != 0 && item->getQuality() >= 3)
                      AddItemCoursesLog(typeId, num, fromWhere);
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
