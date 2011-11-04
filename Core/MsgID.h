@@ -502,6 +502,7 @@ namespace SPEQ
     const UInt16 CLSTASK            = 0x111;//
     const UInt16 SALE_ONOFF         = 0x112;// 交易开关
     const UInt16 PLAYERINFO         = 0x113;
+    const UInt16 WBOSS              = 0x114;
 }
 
 namespace SPEP
@@ -525,6 +526,7 @@ namespace SPEP
     const UInt8 PLAYERIDAUTH        = 0xFC;// 0xFD
     const UInt8 SALE_ONOFF          = 0x12;// 交易开关
     const UInt8 PLAYERINFO          = 0x13;
+    const UInt8 WBOSS               = 0x14;
 }
 
 #endif // _MSGID_H_

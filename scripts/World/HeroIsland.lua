@@ -247,6 +247,7 @@ local awards1 = {
 }
 
 function loadRareAnimals()
+    clearAllHICfg()
     local attr = AttrExtra:Instance(AttrExtra)
     for k,v in pairs(rareAnimals)
     do

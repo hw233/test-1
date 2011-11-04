@@ -1048,13 +1048,13 @@ function ItemNormal_00000069(id, num, bind, param)
 
 	local fgt = player:findFighter(param);
 	if fgt == nil then
-		return 0;
+		return false;
 	end
     
     local oldexp = fgt:getExp();
 	fgt:addExp(5000 * num);
     if fgt:getExp() == oldexp then
-        return 0;
+        return false;
     end
   	    
     local package = player:GetPackage();

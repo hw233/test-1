@@ -83,6 +83,7 @@ enum MailItemType
 	DismissCitta,
     AutoCopy,
     CountryBattleAward,
+	SaleSell,
 };
 enum ItemFrom
 {
