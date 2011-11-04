@@ -247,6 +247,51 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     return true;
 }
 
+void DCLogger::fee(Player* player, Int32 c)
+{
+#ifndef _DEBUG
+    if (!m_logger)
+        return false;
+#endif
+    std::ostringstream msg;
+
+    msg << "version=";
+    msg << version;
+    msg << "&appid=";
+    msg << appid;
+    msg << "&userip=";
+    msg << player->getClientAddress();
+    msg << "&svrip=";
+    msg << cfg.serverIp;
+    msg << "&time=";
+    msg << time(NULL);
+    msg << "&domain=";
+    msg << player->getDomain();
+    msg << "&worldid=";
+    msg << cfg.serverNum;
+    msg << "&optype=1&actionid=5";
+    msg << "&opuid=";
+    msg << player->getId();
+    msg << "&opopenid=";
+    msg << player->getOpenId();
+    msg << "&key=";
+    msg << player->getOpenKey();
+    msg << "&modifyfee=";
+    msg << c; // TODO:
+
+#ifdef _DEBUG
+    fprintf(stderr, "%s\n", msg.str().c_str());
+#endif
+
+#ifndef _DEBUG
+    std::string data = msg.str();
+    FastMutex::ScopedLock lck(m_lck);
+    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
+        return false;
+    TRACE_LOG("%s", data.c_str());
+#endif
+}
+
 DCLogger dclogger;
 
 } // namespace GObject
