@@ -1141,4 +1141,18 @@ void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
     player->GetAthletics()->awardMartial(notify->peer, notify->win);
 }
 
+void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
+{
+     MSG_QUERY_PLAYER(player);
+     const stAttainMsg* co = reinterpret_cast<const stAttainMsg*>(data);
+
+     if(co->attainID == Script::ONE_FRIEND_LEV_UP)
+     {
+        player->OnFriendLevUp(co->param);
+     }
+     else
+     {
+        player->OnDoAttainment(co->attainID, co->param);
+     }
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_

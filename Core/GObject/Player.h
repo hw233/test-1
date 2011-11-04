@@ -472,6 +472,7 @@ namespace GObject
 		void checkHPLoss();
 		void checkDeath();
 
+        void OnFriendLevUp(UInt8 nLev);
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
@@ -779,6 +780,7 @@ namespace GObject
 		inline void setClanBattle(ClanBattle * c)  { _clanBattle = c; }
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
+        void OnDoAttainment(UInt32 attId,   UInt32, param);
 		//////////////////////////////////////////////////////////////////////////
 		//组队系统
 		inline bool IsInTeam() const { return false; }	//TODO
@@ -1094,6 +1096,9 @@ namespace GObject
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
+
+        UInt8 GetFullPotFighterNum();
+        UInt8 GetFullCapFighterNum();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -497,6 +497,9 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		{
 			dpi.firstPass = TimeUtil::Now();
 			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u, `firstPass` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, dpi.totalCount, dpi.firstPass, _id, player->getId());
+
+            //第一次通关给荣誉
+            GameAction()->doAttainment(player, 10354, _id);
 		}
 		else
 			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, dpi.totalCount, _id, player->getId());

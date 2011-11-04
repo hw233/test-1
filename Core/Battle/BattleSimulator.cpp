@@ -48,6 +48,8 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
 	_portrait[0] = 0;
 	_portrait[1] = 0;
     _cur_fgtlist_idx = 0;
+
+    InitAttainRecord();
 }
 
 BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObject::Player * player2, bool rpt, UInt32 fr): BattleField(), _id(rpt ? IDGenerator::gBattleOidGenerator.ID() : 0), _winner(0), _turns(0), _report(rpt), _fake_turns(fr), _formula(Script::BattleFormula::getCurrent())
@@ -61,8 +63,26 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
 	_portrait[0] = 0;
 	_portrait[1] = 0;
     _cur_fgtlist_idx = 0;
+
+    InitAttainRecord();
 }
 
+void  BattleSimulator::InitAttainRecord()
+{
+    for (UInt8 i = 0 ; i< 2; i++)
+    {
+        _evadeNum[i] = 0;
+        _csNum[i] = 0;
+        _prNum[i] = 0;
+        _fjNum[i] = 0;
+        _skillDmg300[i] = false;
+        _skillDmg1k[i] = false;
+        _skillDmg5k[i] = false;
+        _peerlessDmg1k[i] = false;
+        _peerlessDmg5k[i] = false;
+        _peerlessDmg1w[i] = false;
+    }
+}
 // #############################
 // change the battle queue but not pass client check
 void BattleSimulator::start()
@@ -240,8 +260,33 @@ void BattleSimulator::start()
 
 	if(_report || !cfg.GMCheck)
 		battleReport.addReport(_id, _packet);
+
+    CheckAttain();
 }
 
+void BattleSimulator::CheckAttain()
+{
+
+   for(UInt8 i = 0; i < 2; i++)
+   {
+        if(_player[i])
+        {
+            if(_evade3OK[i])
+            {
+                stAttainMsg  msg;
+                msg.attainID = Script:: CLAN_ADD_MEMBER;
+
+                
+            }
+            if(_evade9ok[i])
+            {
+
+            }
+            if()
+    
+        }
+   }
+}
 void BattleSimulator::insertFighterStatus( BattleFighter* bf )
 {
     Int8 next_fgtlist_idx = _cur_fgtlist_idx == 0 ? 1 : 0;
@@ -682,6 +727,31 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 		++ defCount;
 	}
 
+//to get attainment
+    UInt8 s = bf->getSide();
+    if(skill && s < 2 &&  _player[s] != NULL)
+    {
+        UInt32 d = magdmg + dmg;
+        if(skill->cond == GData::SKILL_PEERLESS)
+        {
+            if(d  >= 1000)
+                _peerlessDmg1k[s] = true;
+            else if(d >= 5000)
+                 _peerlessDmg5k[s] = true;
+            else if(d >= 10000)
+                 _peerlessDmg1w[s] = true;
+                           
+        }
+        else
+        {
+            if(d >= 300)
+                _skillDmg300[s] = true;
+            else if(d >= 1000)
+                _skillDmg1k[s] = true;
+            else if(d >= 5000)
+                _skillDmg5k[s] = true;
+        }
+    }
 	return dmg + magdmg;
 }
 
@@ -3169,6 +3239,28 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 	_packet << static_cast<UInt8>(from_side);
 	// attack mode
 	_packet << static_cast<UInt8>(atk_type | (cs ? 0x80 : 0) | (pr ? 0x40 : 0)) << add_id;
+
+    //攻击成就判断
+    if(from_side < 2 && _player[from_side])
+    {
+        if(cs)
+        {
+            _csNum[from_side] ++ ;
+            if(_csNum[from_side] ==3)
+                 _cs3ok[from_side] = true;
+
+            if(_csNum[from_side] == 9)
+                _cs9ok[from_side] = true;
+        }
+        if(pr)
+        {
+            _prNum[from_side] ++ ;
+            if(_prNum[from_side] == 3)
+                  _pr3ok[from_side] = true;
+            if(_prNum[from_side]== 9)
+                _pr9ok[from_side] = true;
+        }
+    }
 	// reserved
 	_packet << static_cast<UInt8>(0);
 	// attack point
@@ -3192,6 +3284,47 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 		{
 			_packet << defList[i].counterDmg << defList[i].counterLeft;
 		}
+
+        //成就判断
+        if(from_side<2)
+        {
+            bool bDamage = defList[i].damage != 0;
+
+            if( bDamage)
+            {
+                if(!cs)
+                    _csNum[from_side] = 0; //打断连续情况
+                if(!pr)
+                    _prNum[from_side] = 0;
+            }
+            UInt8 o_side = (from_side + 1) %2;
+            if(defList[i].damType == e_damEvade)
+            {
+                 _evadeNum[o_side] ++ ;
+                 if(_evadeNum[o_side] == 3)
+                    _evade3OK[o_side] = true;
+                 if(_evadeNum[o_side] == 9)
+                    _evade9ok[o_side] = true;
+            }
+            else if( bDamage)
+            {
+                _evadeNum[o_side] = 0;
+            }
+
+            if((defList[i].damType2 & 0x80) == 0x80)
+            {
+                _fjNum[o_side] ++ ;
+                if(_fjNum [o_side] == 3)
+                    _fj3ok[o_side] = true;
+                if(_fjNum[o_side] == 9)
+                    _fj9ok[o_side] = true;
+            }
+            else if(bDamage)
+            {
+                _fjNum[o_side] = 0;
+            }
+        }
+
 	}
 	// status change
 	_packet << static_cast<UInt8>(scCount);

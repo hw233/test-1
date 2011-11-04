@@ -103,5 +103,14 @@ struct CollectNpcActinoResp
 
 	MESSAGE_DEF1(REP::COLLECTNPCACTION, UInt32, m_NpcId);
 };
+//send attainMsg bettwen contries
+struct stAttainMsg
+{
+    UInt32  attainID;
+    UInt32  param;
+    stAttainMsg() : attainID(0), param(0)
+    {
 
+    }
+};
 #endif // _COUNTRYMSGSTRUCT_H_
