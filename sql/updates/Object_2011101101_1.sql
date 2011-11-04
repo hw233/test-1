@@ -1,4 +1,5 @@
 
+DROP TABLE IF EXISTS `var`;
 CREATE TABLE IF NOT EXISTS `var` (
       `playerId` bigint(20) unsigned NOT NULL,
       `id` smallint(5) NOT NULL,
