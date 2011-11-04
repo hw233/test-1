@@ -10,6 +10,7 @@ using namespace DataCollector;
 
 namespace GObject
 {
+#define MAX_DOMAIN 10
 
 class Player;
 
@@ -25,12 +26,20 @@ public:
     bool login(Player* player);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
+    void online();
 
     void normal();
+    void incDomainOnlineNum(UInt8 domain);
+    void decDomainOnlineNum(UInt8 domain);
+
+    void fee(Player* player, Int32 c);
 
 private:
     CLogger* m_logger;
     FastMutex m_lck;
+
+    UInt32 m_onlineNum_domain[MAX_DOMAIN];
+    UInt32 m_domain[MAX_DOMAIN];
 
     UInt32 version;
     UInt32 appid;

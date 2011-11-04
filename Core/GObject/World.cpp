@@ -324,7 +324,7 @@ void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
-    dclogger.online(onlineNums, 1);
+    dclogger.online();
 }
 
 void World::World_Athletics_Check( void * )
@@ -366,11 +366,7 @@ bool World::Init()
 	if(sday < now) sday += 86400;
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
     AddTimer(5 * 60 * 1000, World_Online_Log, static_cast<void *>(NULL), ((now + 300) / 300 * 300 - now) * 1000);
-	
-    if (cfg.GMCheck)
-        AddTimer(1 * 60 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
-    else
-        AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
+    AddTimer(5 * 1000, World_Boss_Refresh, static_cast<void*>(NULL));
 
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);

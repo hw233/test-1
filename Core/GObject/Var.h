@@ -20,10 +20,11 @@ namespace GObject
     };
 
 
-    enum VarID{
         VAR_INVALID = 0,    //无效变量
         VAR_SINGLE_CHOPSTICKS = 1, //光棍节送筷子
-
+        VAR_SENGYI = 2,     // 僧衣
+        VAR_APRON = 3,      // 肚兜
+       
         VAR_MAX,
     };
 
@@ -47,6 +48,8 @@ namespace GObject
         {
             //在此使用REGISTER_VAR注册变量
             REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
+            REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
+            REGISTER_VAR(VAR_APRON, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id);

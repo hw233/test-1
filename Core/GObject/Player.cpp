@@ -1002,6 +1002,29 @@ namespace GObject
         }
     }
 
+    void Player::sendMailItem(UInt16 title, UInt16 content, MailPackage::MailItem* mitem, UInt16 size, bool bind)
+    {
+        if (!mitem || !size)
+            return;
+
+        SYSMSG(_title, title);
+        SYSMSG(_content, content);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, _title, _content, 0xFFFE0000);
+        if(mail)
+        {
+            std::string strItems;
+            for (UInt32 i = 0; i < size; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            mailPackageManager.push(mail->id, mitem, size, bind);
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, _title, _content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
     void Player::sendLevelPack(UInt8 lvl)
     {
         if (lvl >= 30 && !(_playerData.qqawardgot & 0x10))
@@ -1793,7 +1816,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << _playerData.qqvipl << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -2722,6 +2745,7 @@ namespace GObject
                 cfg.serverLogId, getId(), incomingType, c, TimeUtil::Now());
         }
 
+        dclogger.fee(this, c);
 		return _playerData.gold;
 	}
 
@@ -2739,6 +2763,7 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
+            dclogger.fee(this, -c);
         }
 		SYSMSG_SENDV(150, this, c);
 		SYSMSG_SENDV(1050, this, c);
@@ -2771,6 +2796,7 @@ namespace GObject
                         cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
                 }
 
+                dclogger.fee(this, -_holdGold);
 				SYSMSG_SENDV(150, this, c);
 				SYSMSG_SENDV(1050, this, c);
                 _isHoding = false;
@@ -6417,7 +6443,10 @@ namespace GObject
         UInt8 flag = 8*(_playerData.qqvipl / 10);
         if(flag)
         {
-            qqvipl = _playerData.qqvipl%10 + 1;
+            if(_playerData.qqvipl % 10 == 0)
+                qqvipl = 0;
+            else
+                qqvipl = _playerData.qqvipl%10 + 1;
         }
 
 		if(now >= _playerData.qqawardEnd)
@@ -6428,7 +6457,7 @@ namespace GObject
             RollYDGem();
         }
 
-        if( !(_playerData.qqawardgot & (0x80<<flag)) && _playerData.qqvipl )
+        if( !(_playerData.qqawardgot & (0x80<<flag)) && qqvipl )
         {
             if(GetFreePackageSize() < 1)
             {
@@ -6455,15 +6484,11 @@ namespace GObject
     {
         checkQQAward();
 
-        UInt8 qqvipl = _playerData.qqvipl;
+        UInt8 qqvipl = _playerData.qqvipl % 10;
         UInt8 flag = 8*(_playerData.qqvipl / 10);
-        if(flag)
-        {
-            qqvipl = _playerData.qqvipl%10 + 1;
-        }
 
         Stream st(REP::YD_INFO);
-        st << _playerData.qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
+        st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
         UInt8 maxCnt = GObjectManager::getYDMaxCount();
         if(flag)
             st << static_cast<UInt8>(maxCnt - 1);
@@ -6507,10 +6532,13 @@ namespace GObject
         UInt8 flag = 8*(_playerData.qqvipl / 10);
         if(flag)
         {
-            qqvipl = _playerData.qqvipl%10 + 1;
+            if(_playerData.qqvipl % 10 == 0)
+                qqvipl = 0;
+            else
+                qqvipl = _playerData.qqvipl%10 + 1;
         }
 
-        if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && _playerData.qqvipl != 0)
+        if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)
         {
             std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
             UInt8 itemCnt = ydItem.size();

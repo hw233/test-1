@@ -326,13 +326,13 @@ void HeroIsland::rankReward()
             continue;
         if (n < nsz)
         {
-            (*i)->player->getPrestige(_prestige[n] * factor + (*i)->compass.size() * 10);
+            (*i)->player->getPrestige(_prestige[n] * factor + (*i)->tasks * 10);
             ++n;
         }
         else
         {
             if (nsz)
-                (*i)->player->getPrestige(_prestige[nsz-1] * factor + (*i)->compass.size() * 10);
+                (*i)->player->getPrestige(_prestige[nsz-1] * factor + (*i)->tasks * 10);
         }
     }
 }
@@ -751,7 +751,6 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         UInt32 now = TimeUtil::Now();
         pd->expcd = now + 60;
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
-        ++_nplayers[spot];
 
         sendSpot(pd, rspot);
         return true;
@@ -1167,13 +1166,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                         if (pd->compass[sz-1].type == pd->compass[sz-2].type)
                             ++pd->straight;
                     }
+                    ++pd->tasks;
                     commitCompass(pd->player);
                 }
-                else
-                    pd->straight = 0;
-
-                if (!sz)
-                    commitCompass(pd->player);
 
                 Stream st(REP::HERO_ISLAND);
                 st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
@@ -1478,6 +1473,9 @@ void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
     size_t sz = _sorts.size();
     if (start > sz)
         return;
+
+    if (sz > 100)
+        sz = 100;
 
     if (pagesize > sz)
         pagesize = sz;
