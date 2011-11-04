@@ -58,7 +58,8 @@ struct HIPlayerData
     HIPlayerData()
         : player(NULL), type(0), spot(0), movecd(0),
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
-        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(DEFAULT_BUFID), attr(NULL), awardgot(0), inrank(0)
+        score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(DEFAULT_BUFID),
+        attr(NULL), awardgot(0), inrank(0), tasks(0)
     {
     }
 
@@ -96,6 +97,7 @@ struct HIPlayerData
         attr = NULL;
         awardgot = 0;
         compass.clear();
+        tasks = 0;
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
     }
@@ -117,6 +119,7 @@ struct HIPlayerData
     UInt8 awardgot; // 0-没有奖励,1-绿 2-蓝 3-紫 4-橙,0xFF-已领取
     UInt8 inrank; // 0-不在,>=1-在
     std::vector<Task> compass; // 击杀任务
+    UInt16 tasks; // 总完成任务数
     Skill skills[5];
 };
 
