@@ -205,7 +205,7 @@ private:
     UInt32 releaseCD(BattleFighter* bf);
 
     void  InitAttainRecord();
-    void BattleSimulator::CheckAttain();
+    void  CheckAttain();
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;

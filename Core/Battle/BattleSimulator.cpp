@@ -282,7 +282,7 @@ void BattleSimulator::CheckAttain()
             {
 
             }
-            if()
+            
     
         }
    }
