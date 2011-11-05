@@ -419,7 +419,7 @@ namespace GObject
 			if (ret)
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
-				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+			//	DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
 				SendItemData(item);
 				return item;
 			}
@@ -516,7 +516,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				//if(fromWhere != 0 && item->getQuality() >= 3)
+				if(fromWhere != 0 && item->getQuality() >= 3)
                      AddItemCoursesLog(typeId, num, fromWhere);
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
@@ -780,7 +780,9 @@ namespace GObject
 
             if(toWhere != 0 && item->getQuality() >= 3)
             {
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+				std::string tbn("item_courses");
+				DBLOG().GetMultiDBName(tbn); 
+				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
 
 			SendItemData(item);
@@ -807,7 +809,9 @@ namespace GObject
 
             if(toWhere != 0 && item->getQuality() >= 3)
             {
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+				std::string tbn("item_courses");
+				DBLOG().GetMultiDBName(tbn); 
+				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
 
 			SendItemData(item);
