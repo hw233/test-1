@@ -251,7 +251,7 @@ void DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
 #ifndef _DEBUG
     if (!m_logger)
-        return false;
+        return;
 #endif
     std::ostringstream msg;
 
@@ -289,7 +289,7 @@ void DCLogger::fee(Player* player, UInt32 total, Int32 c)
     std::string data = msg.str();
     FastMutex::ScopedLock lck(m_lck);
     if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return false;
+        return;
     TRACE_LOG("%s", data.c_str());
 #endif
 }

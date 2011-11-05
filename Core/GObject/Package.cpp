@@ -1481,6 +1481,10 @@ namespace GObject
         {
             flag_suc = true;
 			++ ied.enchant;
+            if (equip->getClass() == Item_Trump && ied.enchant == 1)
+            {
+                ((ItemTrump*)equip)->fixSkills();
+            }
         }
         else if( 0 != count )
         {
@@ -1493,6 +1497,12 @@ namespace GObject
                     ++success;
                     flag_suc = true;
                     ++ ied.enchant;
+
+                    if (equip->getClass() == Item_Trump && ied.enchant == 1)
+                    {
+                        ((ItemTrump*)equip)->fixSkills();
+                    }
+
                     ++enc_times;
                     if(ied.enchant >= level)
                         break;
@@ -1533,22 +1543,12 @@ namespace GObject
 
             if(equip->getClass() == Item_Trump)
             {
-                if (ied.enchant == 1)
-                {
-                    ((ItemTrump*)equip)->fixSkills();
-                    if (fgt)
-                    {
-                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                        fgt->addSkillsFromCT(attr->skills, true);
-                    }
-                }
-                else
-                {
-                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                if(ied.enchant != 1)
                     ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                    if (fgt)
-                        fgt->addSkillsFromCT(attr->skills, true);
-                }
+
+                if (fgt)
+                    fgt->addSkillsFromCT(attr->skills, true);
             }
 
 			if(fgt != NULL)

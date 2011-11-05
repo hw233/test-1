@@ -3613,12 +3613,6 @@ namespace GObject
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
 
-        // XXX: TODO 应对回血符不能使用的情况
-        {
-            if (spot != 8977)
-                heroIsland.playerLeave(this);
-        }
-
 		if(inCity)
 		{
 			bool notify = !sameMap || !oldInCity;
