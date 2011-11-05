@@ -256,12 +256,15 @@ void World::World_Midnight_Check( World * world )
             }
             if(pos == 1)
             {
+                iter->second->setTitle(1);
             }
             else if(pos == 2)
             {
+                iter->second->setTitle(2);
             }
             else if(pos == 3)
             {
+                iter->second->setTitle(3);
             }
             else
             {
