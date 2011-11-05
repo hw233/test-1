@@ -588,7 +588,7 @@ void WBossMgr::nextDay(UInt32 now)
         delete m_boss;
         m_boss = NULL;
     }
-    TRACE_LOG("out of time. next day: %u", _prepareTime);
+    TRACE_LOG("out of time. next day: %u, %u", _prepareTime, _prepareStep);
     fprintf(stderr, "out of time. next day: %u\n", _prepareTime);
     return;
 }
@@ -598,13 +598,13 @@ void WBossMgr::calcNext(UInt32 now)
     UInt32 appears[] = {
 #if 1
         TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
-        TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60,
-        TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60,
-        TimeUtil::SharpDayT(0,now) + 16 * 60 * 60 + 45 * 60,
-        TimeUtil::SharpDayT(0,now) + 15 * 60 * 60 + 45 * 60,
-        TimeUtil::SharpDayT(0,now) + 14 * 60 * 60 + 45 * 60,
-        TimeUtil::SharpDayT(0,now) + 13 * 60 * 60 + 45 * 60,
-        TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60,
+        TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60, /*100*/
+        TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60, /*90*/
+        TimeUtil::SharpDayT(0,now) + 16 * 60 * 60 + 45 * 60, /*80*/
+        TimeUtil::SharpDayT(0,now) + 15 * 60 * 60 + 45 * 60, /*70*/
+        TimeUtil::SharpDayT(0,now) + 14 * 60 * 60 + 45 * 60, /*60*/
+        TimeUtil::SharpDayT(0,now) + 13 * 60 * 60 + 45 * 60, /*50*/
+        TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60, /*40*/
         TimeUtil::SharpDayT(0,now),
 #else
         TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+21*60,
@@ -619,6 +619,12 @@ void WBossMgr::calcNext(UInt32 now)
 #endif
     };
 
+    if ((m_level+1) * 5 > sizeof(worldboss)/sizeof(UInt32))
+    {
+        nextDay(now);
+        return;
+    }
+
     for (UInt8 i = 0; i < WBOSS_NUM+2; ++i)
     {
         if (now >= appears[i] && i == 0)
@@ -631,24 +637,22 @@ void WBossMgr::calcNext(UInt32 now)
         {
             if (m_boss && m_boss->isDisappered())
             {
-                if (i == 1 || m_maxlvl < (40+(WBOSS_NUM-i+1)*10))
+                UInt8 dstlvl = WBOSS_NUM-i+1;
+                if (i == 1 && dstlvl == m_level)
                 {
                     nextDay(now);
                     return;
                 }
+
+                if (dstlvl == m_level)
+                {
+                    _prepareTime = appears[i-1];
+                    m_level = dstlvl + 1;
+                }
                 else
                 {
-                    m_level = WBOSS_NUM - i + 1;
-                    if (m_level != m_boss->getLevel())
-                    {
-                        _prepareTime = appears[i];
-                        m_level = WBOSS_NUM - i + 1;
-                    }
-                    else
-                    {
-                        _prepareTime = appears[i-1];
-                        m_level = WBOSS_NUM - i + 2;
-                    }
+                    _prepareTime = appears[i];
+                    m_level = dstlvl;
                 }
             }
             else
@@ -803,7 +807,16 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
 void WBossMgr::disapper(UInt32 now)
 {
     if (m_boss && !m_boss->isDisappered())
+    {
         m_boss->disapper();
+
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(6);
+        st << static_cast<UInt8>(5);
+        st << static_cast<UInt32>(0);
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+    }
     _prepareStep = 0;
     calcNext(now);
 }
