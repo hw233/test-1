@@ -247,11 +247,11 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     return true;
 }
 
-void DCLogger::fee(Player* player, Int32 c)
+void DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
 #ifndef _DEBUG
     if (!m_logger)
-        return false;
+        return;
 #endif
     std::ostringstream msg;
 
@@ -276,8 +276,8 @@ void DCLogger::fee(Player* player, Int32 c)
     msg << player->getOpenId();
     msg << "&key=";
     msg << player->getOpenKey();
-    msg << "&modifyfee=";
-    msg << c*10; // TODO:
+    msg << "&totalfee=";
+    msg << total*10; // TODO:
 
 #ifdef _DEBUG
     fprintf(stderr, "%s\n", msg.str().c_str());
@@ -287,7 +287,7 @@ void DCLogger::fee(Player* player, Int32 c)
     std::string data = msg.str();
     FastMutex::ScopedLock lck(m_lck);
     if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return false;
+        return;
     TRACE_LOG("%s", data.c_str());
 #endif
 }

@@ -32,7 +32,7 @@ public:
     void incDomainOnlineNum(UInt8 domain);
     void decDomainOnlineNum(UInt8 domain);
 
-    void fee(Player* player, Int32 c);
+    void fee(Player* player, UInt32 total, Int32 c);
 
 private:
     CLogger* m_logger;

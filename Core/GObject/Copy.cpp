@@ -250,7 +250,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 nextfloor = true;
 
             if (nextfloor) {
-                GameAction()->onCopyFloorWin(pl, id, tcd.floor, tcd.spot);
+                GameAction()->onCopyFloorWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
                 ++tcd.floor;
                 tcd.spot = 1;
             } else {
@@ -289,7 +289,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     pl->send(st);
                 }
 
-                GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot);
+                GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
                 tcd.floor = 0;
                 tcd.spot = 0;
@@ -404,6 +404,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
     if (lock) {
         FastMutex::ScopedLock lk(_mutex);
         if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) ||
+                TimeUtil::Day(TimeUtil::Now()) > (TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) + 86400) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
@@ -421,6 +422,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
         }
     } else {
         if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) ||
+                TimeUtil::Day(TimeUtil::Now()) > (TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) + 86400) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;

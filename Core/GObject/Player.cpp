@@ -774,13 +774,8 @@ namespace GObject
         if (m_ulog)
         {
             char buf[1024] = {0};
-#if 0
-            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%u_%u_%"I64_FMT"u|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
-#else
-            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%"I64_FMT"u|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getId(), GetLev(), cfg.serverNum);
-#endif
+            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum);
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count);
         }
@@ -2745,7 +2740,7 @@ namespace GObject
                 cfg.serverLogId, getId(), incomingType, c, TimeUtil::Now());
         }
 
-        dclogger.fee(this, c);
+        dclogger.fee(this, _playerData.gold, c);
 		return _playerData.gold;
 	}
 
@@ -2763,7 +2758,7 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
-            dclogger.fee(this, -c);
+            dclogger.fee(this, _playerData.gold, -c);
         }
 		SYSMSG_SENDV(150, this, c);
 		SYSMSG_SENDV(1050, this, c);
@@ -2796,7 +2791,7 @@ namespace GObject
                         cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
                 }
 
-                dclogger.fee(this, -_holdGold);
+                dclogger.fee(this, _playerData.gold, -_holdGold);
 				SYSMSG_SENDV(150, this, c);
 				SYSMSG_SENDV(1050, this, c);
                 _isHoding = false;
@@ -3612,12 +3607,6 @@ namespace GObject
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
-
-        // XXX: TODO 应对回血符不能使用的情况
-        {
-            if (spot != 8977)
-                heroIsland.playerLeave(this);
-        }
 
 		if(inCity)
 		{

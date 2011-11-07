@@ -4,8 +4,9 @@ H=localhost
 U=kingxin
 P=kingxin
 PT=3306
-DBD=data_5555
-DBO=asss_5555
+
+DBD=data_xxxx
+DBO=asss_xxxx
 
 OPTIONS="Yes/No/Exit"
 IFS=/

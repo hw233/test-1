@@ -515,7 +515,7 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
 				{
                     std::string tbn("item_courses");
                     DBLOG().GetMultiDBName(tbn);
-					DBLOG().PushUpdateData("insert into `%S`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
+					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
 				}
             }
         }

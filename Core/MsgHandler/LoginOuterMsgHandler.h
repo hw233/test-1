@@ -525,6 +525,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenKey(nu._openkey);
 #endif
 
+            GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
 			GLOBAL().PushMsg(imh, &ces);
