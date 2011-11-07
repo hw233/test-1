@@ -774,13 +774,8 @@ namespace GObject
         if (m_ulog)
         {
             char buf[1024] = {0};
-#if 0
-            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%u_%u_%"I64_FMT"u|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), cfg.serverNum, cfg.tcpPort, getId(), GetLev(), cfg.serverNum);
-#else
-            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%"I64_FMT"u|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getId(), GetLev(), cfg.serverNum);
-#endif
+            snprintf(buf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum);
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count);
         }
