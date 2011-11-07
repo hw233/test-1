@@ -806,24 +806,24 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
-	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot )
+	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )
 	{
-		Call<void>("onCopyFloorWin", player, id, floor, spot);
+		Call<void>("onCopyFloorWin", player, id, floor, spot, lootlvl);
 	}
 
-	void GameActionLua::onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot )
+	void GameActionLua::onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )
 	{
-		Call<void>("onCopyWin", player, id, floor, spot);
+		Call<void>("onCopyWin", player, id, floor, spot, lootlvl);
 	}
 
-	void GameActionLua::onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot )
+	void GameActionLua::onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl )
 	{
-		Call<void>("onFrontMapFloorWin", player, id, spot);
+		Call<void>("onFrontMapFloorWin", player, id, spot, lootlvl);
     }
 
-	void GameActionLua::onFrontMapWin( Player* player, UInt8 id, UInt8 spot )
+	void GameActionLua::onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl )
 	{
-		Call<void>("onFrontMapWin", player, id, spot);
+		Call<void>("onFrontMapWin", player, id, spot, lootlvl);
     }
 
 	bool GameActionLua::onOnlineAward(Player* player, UInt32 itemId, UInt8 count)

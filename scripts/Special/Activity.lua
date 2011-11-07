@@ -651,13 +651,13 @@ function onRecruitAward(player)
     end
 end
 
-function onCopyFloorWin(player, id, floor, spot)
+function onCopyFloorWin(player, id, floor, spot, lootlvl)
     if getSingleDay() then
         if id == 1 and floor == 2 and spot == 5 then -- 杨花
             local package = player:GetPackage();
             local shengyi = player:GetVar(2);
             if shengyi == 0 then
-                package:AddItem(70, 1, 1)
+                package:AddItem(70, 1, true)
                 player:SetVar(2, 70)
             end
         end
@@ -666,20 +666,20 @@ function onCopyFloorWin(player, id, floor, spot)
             local package = player:GetPackage();
             local apron = player:GetVar(3);
             if apron == 0 then
-                package:AddItem(71, 1, 1)
+                package:AddItem(71, 1, true)
                 player:SetVar(3, 71)
             end
         end
     end
 end
 
-function onCopyWin(player, id, floor, spot)
+function onCopyWin(player, id, floor, spot, lootlvl)
 end
 
-function onFrontMapFloorWin(player, id, spot)
+function onFrontMapFloorWin(player, id, spot, lootlvl)
 end
 
-function onFrontMapWin(player, id, spot)
+function onFrontMapWin(player, id, spot, lootlvl)
 end
 
 local vippack = {

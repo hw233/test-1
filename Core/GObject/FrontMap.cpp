@@ -275,7 +275,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
                 pl->send(st);
                 tmp.resize(0);
 
-                GameAction()->onFrontMapWin(pl, id, spot);
+                GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
                 DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
                 return;
             } else {
@@ -293,6 +293,7 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
                 st << Stream::eos;
                 pl->send(st);
+                GameAction()->onFrontMapFloorWin(pl, id, spot, tmp[spot].lootlvl);
             }
 
             DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u",
