@@ -681,9 +681,14 @@ function onCopyWin(player, id, floor, spot)
 end
 
 function onFrontMapFloorWin(player, id, spot)
+
 end
 
 function onFrontMapWin(player, id, spot)
+    if getSingleDay() then
+        local package = player:GetPackage();
+        package:AddItem(69, 1, false);    
+    end
 end
 
 local vippack = {
