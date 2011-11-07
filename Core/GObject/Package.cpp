@@ -419,7 +419,7 @@ namespace GObject
 			if (ret)
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
-				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+			//	DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
 				SendItemData(item);
 				return item;
 			}
@@ -516,7 +516,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				//if(fromWhere != 0 && item->getQuality() >= 3)
+				if(fromWhere != 0 && item->getQuality() >= 3)
                      AddItemCoursesLog(typeId, num, fromWhere);
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
@@ -780,7 +780,9 @@ namespace GObject
 
             if(toWhere != 0 && item->getQuality() >= 3)
             {
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+				std::string tbn("item_courses");
+				DBLOG().GetMultiDBName(tbn); 
+				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
 
 			SendItemData(item);
@@ -807,7 +809,9 @@ namespace GObject
 
             if(toWhere != 0 && item->getQuality() >= 3)
             {
-				DBLOG().PushUpdateData("insert into `item_courses`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
+				std::string tbn("item_courses");
+				DBLOG().GetMultiDBName(tbn); 
+				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
 
 			SendItemData(item);
@@ -1481,6 +1485,10 @@ namespace GObject
         {
             flag_suc = true;
 			++ ied.enchant;
+            if (equip->getClass() == Item_Trump && ied.enchant == 1)
+            {
+                ((ItemTrump*)equip)->fixSkills();
+            }
         }
         else if( 0 != count )
         {
@@ -1493,6 +1501,12 @@ namespace GObject
                     ++success;
                     flag_suc = true;
                     ++ ied.enchant;
+
+                    if (equip->getClass() == Item_Trump && ied.enchant == 1)
+                    {
+                        ((ItemTrump*)equip)->fixSkills();
+                    }
+
                     ++enc_times;
                     if(ied.enchant >= level)
                         break;
@@ -1533,22 +1547,12 @@ namespace GObject
 
             if(equip->getClass() == Item_Trump)
             {
-                if (ied.enchant == 1)
-                {
-                    ((ItemTrump*)equip)->fixSkills();
-                    if (fgt)
-                    {
-                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                        fgt->addSkillsFromCT(attr->skills, true);
-                    }
-                }
-                else
-                {
-                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                if(ied.enchant != 1)
                     ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                    if (fgt)
-                        fgt->addSkillsFromCT(attr->skills, true);
-                }
+
+                if (fgt)
+                    fgt->addSkillsFromCT(attr->skills, true);
             }
 
 			if(fgt != NULL)
