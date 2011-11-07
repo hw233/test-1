@@ -1052,7 +1052,7 @@ function ItemNormal_00000069(id, num, bind, param)
 	end
     
     local oldexp = fgt:getExp();
-	fgt:addExp(5000 * num);
+	fgt:addExp(1000 * num);
     if fgt:getExp() == oldexp then
         return false;
     end
