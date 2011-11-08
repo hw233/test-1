@@ -15,6 +15,7 @@
 #include "SysMsg.h"
 #include "Common/TimeUtil.h"
 #include "kingnet_analyzer.h"
+#include "GObject/DCLogger.h"
 
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
@@ -74,6 +75,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	globalSysMsg.load();
 	Battle::battleReport.init();
     _analyzer.Init();
+    GObject::dclogger.init();
 
     if (!num)
     {

@@ -296,7 +296,6 @@ bool World::Init()
 	_worldScript = new Script::WorldScript(path.c_str());
 	path = cfg.scriptPath + "formula/main.lua";
 	_battleFormula = new Script::BattleFormula(path.c_str());
-    dclogger.init(); // XXX:
 
 	calWeekDay();
     UInt32 day = 1;
