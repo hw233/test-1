@@ -1823,12 +1823,24 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     UInt64 idIdx[3] = {0};
     UInt8 level = pl->GetLev();
 
-    UInt32 size = globalLevelsPlayers[level].size();
+    GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
+    if(it == GObject::globalLevelsPlayers.end())
+        return;
+
+    GObject::LevelPlayers* lvPlayer = it->second;
+
+    UInt32 size = lvPlayer->size();
+    UInt32 size2 = size;
     UInt8 cnt = 1;
     while(size < 100 && (level - cnt) > 29)
     {
-        size += globalLevelsPlayers[level - cnt].size();
+        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level - cnt);
         ++ cnt;
+        if(it == GObject::globalLevelsPlayers.end())
+            continue;
+        GObject::LevelPlayers* lvPlayer2 = it->second;
+
+        size += lvPlayer2->size();
     }
 
     if(size < 5)
@@ -1836,12 +1848,17 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         int k = 0;
         for(int i = 0; i < cnt; ++i)
         {
-            UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
-            for(UInt32 j = 1; j < size1; ++j)
+            GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level - i);
+            if(it == GObject::globalLevelsPlayers.end())
+                continue;
+            GObject::LevelPlayers* lvPlayer2 = it->second;
+
+            UInt32 size1 = lvPlayer2->size();
+            for(UInt32 j = 0; j < size1; ++j)
             {
-                if(i == 0 && pl->getLvPos() == j)
+                if(i == 0 && pl->getId() == (*lvPlayer2)[j])
                     continue;
-                idIdx[k] = globalLevelsPlayers[level - i][j];
+                idIdx[k] = (*lvPlayer2)[j];
                 ++k;
                 if(k > 2)
                     break;
@@ -1854,59 +1871,61 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     {
         URandom rnd(time(NULL));
 
-        UInt32 roll0 = rnd(size) + 1;
-        while(pl->getLvPos() == roll0)
+        UInt32 roll0 = rnd(size);
+        while(size2 > roll0 && pl->getId() == (*lvPlayer)[roll0])
         {
-            roll0 = ((roll0 + 1) % (size+1));
-            if (!roll0)
-                roll0 = 1;
+            roll0 = (roll0 + 1) % size;
         }
-        UInt32 roll1 = rnd(size) + 1;
-        while(pl->getLvPos() == roll1 || roll1 == roll0)
+        UInt32 roll1 = rnd(size);
+        while((size2 > roll1 && pl->getId() == (*lvPlayer)[roll1]) || roll1 == roll0)
         {
-            roll1 = ((roll1 + 1) % (size+1));
-            if (!roll1)
-                roll1 = 1;
+            roll1 = (roll1 + 1) % size;
         }
-        UInt32 roll2 = rnd(size) + 1;
-        while(pl->getLvPos() == roll2 || roll2 == roll0 || roll2 == roll1)
+        UInt32 roll2 = rnd(size);
+        while((size2 > roll2 && pl->getId() == (*lvPlayer)[roll2]) || roll2 == roll0 || roll2 == roll1)
         {
-            roll2 = ((roll2 + 1) % (size+1));
-            if (!roll2)
-                roll2 = 1;
+            roll2 = (roll2 + 1) % size;
         }
 
         for(int i = 0; i < cnt; ++i)
         {
-            UInt32 size1 = globalLevelsPlayers[level - i].size() + 1;
+            GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level - i);
+            if(it == GObject::globalLevelsPlayers.end())
+                continue;
+            GObject::LevelPlayers* lvPlayer2 = it->second;
+
+            UInt32 size1 = lvPlayer2->size();
+            if(size1 == 0)
+                continue;
+
             if(idIdx[0] == 0)
             {
                 if(roll0 < size1)
                 {
-                    idIdx[0] = globalLevelsPlayers[level - i][roll0];
+                    idIdx[0] = (*lvPlayer2)[roll0];
                 }
                 else
-                    roll0 -= size1 - 1;
+                    roll0 -= size1;
             }
 
             if(idIdx[1] == 0)
             {
                 if(roll1 < size1)
                 {
-                    idIdx[1] = globalLevelsPlayers[level - i][roll1];
+                    idIdx[1] = (*lvPlayer2)[roll1];
                 }
                 else
-                    roll1 -= size1 - 1;
+                    roll1 -= size1;
             }
 
             if(idIdx[2] == 0)
             {
                 if(roll2 < size1)
                 {
-                    idIdx[2] = globalLevelsPlayers[level - i][roll2];
+                    idIdx[2] = (*lvPlayer2)[roll2];
                 }
                 else
-                    roll2 -= size1 - 1;
+                    roll2 -= size1;
             }
         }
     }

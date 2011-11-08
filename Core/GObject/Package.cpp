@@ -1434,7 +1434,7 @@ namespace GObject
 
 	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
-		if (type > 3) return 2;
+		if (type > 1) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
@@ -1453,7 +1453,7 @@ namespace GObject
         }
 
 		ItemEquipData& ied = equip->getItemEquipData();
-        if(ied.enchant >= ENCHANT_LEVEL_MAX)
+        if(ied.enchant >= ENCHANT_LEVEL_MAX || level > ENCHANT_LEVEL_MAX)
             return 2;
 
         if(level != 0 && ied.enchant >= level)
@@ -1461,7 +1461,10 @@ namespace GObject
 
         if(count !=0 && type != 1)
             return 2;
-		
+
+		if(GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
+            return 2;
+
         UInt32 enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
         if(enchant == 0)
             return 2;
@@ -1481,6 +1484,7 @@ namespace GObject
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
         bool flag_suc = false;
         UInt32 enc_times = 1;
+	    UInt8 oldEnchant = ied.enchant;
         if(0 == count && uRand(1000) < enchant)
         {
             flag_suc = true;
@@ -1492,7 +1496,7 @@ namespace GObject
         }
         else if( 0 != count )
         {
-            int i = 0;
+            UInt32 i = 0;
             enc_times = 0;
             for(; i < count; ++i)
             {
@@ -1527,6 +1531,7 @@ namespace GObject
         {
             success = 0;
             failed = 0;
+            ied.enchant = oldEnchant;
             return 2;
         }
 
@@ -2640,7 +2645,8 @@ namespace GObject
 			if(!DelItemAny(ITEM_FORGE_PROTECT, c))
 				protect = 0;
             else
-                DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
+                AddItemHistoriesLog(ITEM_FORGE_PROTECT,  c);
+                //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
 		}
 		ItemEquipData& ied = equip->getItemEquipData();
 		types[0] = ied.extraAttr2.type1;
