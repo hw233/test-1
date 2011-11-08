@@ -1484,6 +1484,7 @@ namespace GObject
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
         bool flag_suc = false;
         UInt32 enc_times = 1;
+	    UInt8 oldEnchant = ied.enchant;
         if(0 == count && uRand(1000) < enchant)
         {
             flag_suc = true;
@@ -1530,6 +1531,7 @@ namespace GObject
         {
             success = 0;
             failed = 0;
+            ied.enchant = oldEnchant;
             return 2;
         }
 
