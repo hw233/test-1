@@ -32,7 +32,6 @@
 #include "Common/Itoa.h"
 #include "ClanDynamicMsg.h"
 #include "PracticePlace.h"
-#include "Tripod.h"
 #include <mysql.h>
 #include "GData/Formation.h"
 #include "GData/Money.h"
@@ -65,6 +64,7 @@ namespace GObject
 	GlobalNamedPlayers globalNamedPlayers;
 	ChallengeCheck challengeCheck;
     GlobalLevelsPlayers globalLevelsPlayers;
+    static TripodData nulltd;
 
 	inline UInt8 getMaxIcCount(UInt8 vipLevel)
 	{
@@ -413,8 +413,6 @@ namespace GObject
         return true;
 	}
 
-
-
 	bool EventPlayerTripod::Equal(UInt32 id, size_t playerid) const
 	{
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -434,7 +432,7 @@ namespace GObject
 
 	void EventPlayerTripod::Process(UInt32 leftCount)
     {
-        TripodData& data = tripod.getTripodData(m_Player->getId());
+        TripodData& data = m_Player->getTripodData();
         if(m_Player->getVipLevel() > 4)
             data.soul += POINT_PERMIN * 2;
         else
@@ -516,7 +514,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL)
+        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_hasTripod(false)
 	{
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -5107,6 +5105,8 @@ namespace GObject
             if (total)
                 setBuffData(PLAYER_BUFF_YDOTR, 0, true);
         }
+
+        sendTripodInfo();
 	}
 
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
@@ -6652,5 +6652,289 @@ namespace GObject
             DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
         }
     }
-}
+
+    void Player::sendTripodInfo()
+    {
+        if (!m_hasTripod)
+            newTripodData();
+
+        if (getVipLevel() > 2 && m_td.quality < 3)
+        {
+            m_td.quality = 3;
+            m_td.needgen = 1;
+        }
+
+        Stream st(REP::TRIPOD_INFO);
+        st << static_cast<UInt8>(0);
+        st << m_td.fire;
+        st << m_td.quality;
+
+        genAward(st);
+        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+                m_td.needgen, m_td.quality, m_td.itemId, m_td.num, getId());
+
+        st << static_cast<UInt32>(MAX_TRIPOD_SOUL) << m_td.soul << Stream::eos;
+        send(st);
+    }
+
+    bool Player::genAward()
+    {
+        if (m_td.needgen) {
+            UInt32 loot = GData::GDataManager::GetTripodAward(m_td.fire, 5-m_td.quality); // 0-橙,1-紫,2-蓝,3-绿
+            const GData::LootItem* li = GData::lootTable[loot];
+            if (li)
+            {
+                GData::LootResult lr = li->roll();
+                if (lr.id)
+                {
+                    m_td.itemId = lr.id;
+                    m_td.num = lr.count;
+                    m_td.needgen = 0;
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    void Player::genAward(Stream& st)
+    {
+        if (genAward()) {
+            st << m_td.num;
+            st << m_td.itemId;
+        } else {
+            st << static_cast<UInt8>(0);
+            st << static_cast<UInt32>(0);
+        }
+        return;
+    }
+
+    static UInt8 tripod_factor[4][4] =
+    {
+        {30,    0,      0,      0},
+        {50,    70,     0,      0},
+        {0,     50,     100,    0},
+        {0,     0,      30,     100}
+    };
+
+    void Player::addItem(UInt32 itemid, UInt16 num, UInt8 bind)
+    {
+        if (!itemid || !num)
+            return;
+
+        Package* pk = GetPackage();
+        if (!pk) return;
+
+        ItemBase* ib = NULL;
+        ib = pk->FindItem(itemid, bind);
+        if (ib)
+        {
+            if (ib->Count() < num)
+                return;
+
+            m_td.soul += (ib->getEnergy() * num);
+            UInt8 quality = ib->getQuality() > 1 ? ib->getQuality() - 2 : 0;
+            for (UInt16 j = 0; j < num; ++j)
+            {
+                int rnd = uRand(100);
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (tripod_factor[quality][i] && rnd <= tripod_factor[quality][i])
+                    {
+                        if (m_td.quality < i+2)
+                        {
+                            m_td.quality = i+2; // 2-绿,3-蓝,4-紫,5-橙
+                            m_td.needgen = 1;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (getVipLevel() >= 3)
+            {
+                if (m_td.quality < 3)
+                {
+                    m_td.quality = 3;
+                    m_td.needgen = 1;
+                }
+            }
+
+            if (m_td.quality > 5)
+            {
+                m_td.quality = 5;
+                m_td.needgen = 1;
+            }
+
+            if (IsEquipId(itemid))
+            {
+                pk->DelEquip(itemid, ToDesdroy);
+            }
+            else
+            {
+                pk->DelItem(itemid, num, bind);
+            }
+        }
+
+        {
+            Stream st(REP::TRIPOD_INFO);
+            st << static_cast<UInt8>(2);
+            st << static_cast<UInt8>(m_td.needgen);
+            st << Stream::eos;
+            send(st);
+        }
+
+        if (m_td.needgen)
+            genAward();
+
+        if (m_td.soul >= MAX_TRIPOD_SOUL)
+        {
+            PopTimerEvent(this, EVENT_PLAYERPRTRIPOD, getId());
+            m_td.soul = MAX_TRIPOD_SOUL;
+            m_td.awdst = 1;
+            m_td.needgen = 0;
+        }
+
+        DB6().PushUpdateData("UPDATE `tripod` SET `soul` = %u, `quality` = %u, `awdst` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+                m_td.soul, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num, getId());
+    }
+
+    static UInt16 fire_begin = 47;
+    static UInt16 fire_end = 51;
+    static UInt8 fire_id2bit[] = {16/*47*/, 8/*48*/, 4/*49*/, 2/*50*/, 1/*51*/};
+    static UInt8 fire_com[] = {24,20,18,17,12,10,9,6,5,3};
+    static UInt8 fire_factor[][6] = 
+    {
+        {0,     0,      100,    0,      0,      0},
+        {0,     0,      0,      0,      100,    0},
+        {0,     0,      0,      0,      0,      100},
+        {0,     0,      0,      100,    0,      0},
+        {0,     80,     100,    0,      0,      0},
+        {0,     50,     100,    0,      0,      0},
+        {40,    90,     0,      100,    0,      0},
+        {0,     50,     0,      0,      100,    0},
+        {80,    0,      0,      100,    0,      0},
+        {50,    0,      0,      100,    0,      0},
+    };
+
+    void Player::makeFire(UInt32 id1, UInt32 id2)
+    {
+        Stream st(REP::TRIPOD_INFO);
+        if (id1 < fire_begin)
+            id1 = fire_begin;
+        if (id2 < fire_begin)
+            id2 = fire_begin;
+        if (id1 > fire_end)
+            id1 = fire_end;
+        if (id2 > fire_end)
+            id2 = fire_end;
+
+        ItemBase* ib1 = GetPackage()->GetItem(id1, true);
+        if (!ib1)
+            ib1 = GetPackage()->GetItem(id1);
+        if (!ib1) {
+            SYSMSG_SEND(2003, this);
+            return;
+        }
+        ItemBase* ib2 = GetPackage()->GetItem(id2, true);
+        if (!ib2)
+            ib2 = GetPackage()->GetItem(id2);
+        if (!ib2) {
+            SYSMSG_SEND(2003, this);
+            return;
+        }
+
+        UInt32 id = fire_id2bit[id1-fire_begin] | fire_id2bit[id2-fire_begin];
+        int i = 0;
+        while (i < 10)
+        {
+            if (id == fire_com[i])
+                break;
+            ++i;
+        }
+        UInt8 rnd = uRand(100);
+        int j = 0;
+        while (j < 6)
+        {
+            if (fire_factor[i][j] && rnd <= fire_factor[i][j])
+                break;
+            ++j;
+        }
+        if (j < 6)
+            m_td.fire = j+1;
+
+        m_td.needgen = 1;
+
+        st << static_cast<UInt8>(1);
+        st << m_td.fire;
+        st << m_td.quality;
+        genAward(st);
+        st << Stream::eos;
+        send(st);
+        DB6().PushUpdateData("UPDATE `tripod` SET `fire` = %u, `regen` = %u, `itemId` = %u, `num` = %u WHERE `id` = %"I64_FMT"u",
+                m_td.fire, m_td.needgen, m_td.itemId, m_td.num, getId());
+
+        GetPackage()->DelItem2(ib1, 1);
+        GetPackage()->DelItem2(ib2, 1);
+        SYSMSG_SEND(2002, this);
+    }
+
+    void Player::getAward()
+    {
+        if (GetPackage()->IsFull())
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+
+        if (m_td.awdst != 1)
+            return;
+
+        if (!genAward())
+            return;
+
+        if (IsEquipTypeId(m_td.itemId))
+            GetPackage()->AddEquip(m_td.itemId, true, false, FromTripod);
+        else
+            GetPackage()->AddItem(m_td.itemId, m_td.num, true, false, FromTripod);
+
+        m_td.fire = 0;
+        m_td.quality = 2;
+        m_td.needgen = 1;
+        m_td.awdst = 0;
+        m_td.soul = 0;
+        m_td.itemId = 0;
+        m_td.num = 0;
+        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=2, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u", getId());
+        runTripodData(m_td);
+        sendTripodInfo();
+    }
+
+    TripodData& Player::runTripodData(TripodData& data, bool init)
+    {
+        if(getVipLevel() > 2)
+            m_td.quality = 3;
+
+        if (&data != &m_td)
+            m_td = data;
+
+        EventPlayerTripod* event = new (std::nothrow) EventPlayerTripod(this, 60, MAX_TRIPOD_SOUL/POINT_PERMIN);
+        if (!event) return nulltd;
+        PushTimerEvent(event);
+
+        if (init && m_td.itemId && m_td.num)
+            m_td.needgen = 0;
+        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = 0, `quality` = %u WHERE `id` = %"I64_FMT"u", m_td.quality, getId());
+        m_hasTripod = true;
+        return m_td;
+    }
+
+    TripodData& Player::newTripodData()
+    {
+        DB6().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)" , getId(), m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num);
+        return runTripodData(m_td);
+    }
+
+} // namespace GObject
 

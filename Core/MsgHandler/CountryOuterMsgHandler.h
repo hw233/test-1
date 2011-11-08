@@ -36,7 +36,6 @@
 #include "Server/SysMsg.h"
 #include "Battle/BattleSimulator.h"
 #include "GMHandler.h"
-#include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GData/Money.h"
@@ -658,7 +657,7 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-        tripod.addItem(pl, itemId, itemNum, bindType);
+        pl->addItem(itemId, itemNum, bindType);
 	}
 	SYSMSG_SEND(115, pl);
 	SYSMSG_SEND(1015, pl);
@@ -673,7 +672,7 @@ void OnTripodReq( GameMsgHdr& hdr, const void* data )
     br >> type;
     if (type == 0)
     {
-        tripod.getTripodInfo(player);
+        player->sendTripodInfo();
     }
     else if (type == 1)
     {
@@ -686,11 +685,11 @@ void OnTripodReq( GameMsgHdr& hdr, const void* data )
         br >> id1;
         br >> id2;
 
-        tripod.makeFire(player, id1, id2);
+        player->makeFire(id1, id2);
     }
     else if (type == 2)
     {
-        tripod.getAward(player);
+        player->getAward();
     }
 }
 
