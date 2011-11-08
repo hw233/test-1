@@ -24,6 +24,15 @@ namespace GObject
         VAR_INVALID = 0,    // 无效变量
         VAR_SENGYI = 2,     // 僧衣
         VAR_APRON = 3,      // 肚兜
+
+        VAR_KEYPACK1 = 10,  // KEY礼包
+        VAR_KEYPACK2,
+        VAR_KEYPACK3,
+        VAR_KEYPACK4,
+        VAR_KEYPACK5,
+        VAR_KEYPACK6,
+        VAR_KEYPACK7,
+        VAR_KEYPACK8,
        
         VAR_MAX,
     };
@@ -49,6 +58,14 @@ namespace GObject
             //在此使用REGISTER_VAR注册变量
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK3, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK4, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK5, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK6, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK7, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK8, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id);

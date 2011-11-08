@@ -41,7 +41,7 @@
 #include "FrontMap.h"
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
-#include "GObject/DCLogger.h"
+#include "DCLogger.h"
 
 #include <cmath>
 
@@ -2739,7 +2739,6 @@ namespace GObject
                 cfg.serverLogId, getId(), incomingType, c, TimeUtil::Now());
         }
 
-        dclogger.fee(this, _playerData.gold, c);
 		return _playerData.gold;
 	}
 
@@ -2757,7 +2756,6 @@ namespace GObject
 				DBLOG1().PushUpdateData("insert into consume_gold (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
 					cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
             }
-            dclogger.fee(this, _playerData.gold, -c);
         }
 		SYSMSG_SENDV(150, this, c);
 		SYSMSG_SENDV(1050, this, c);
@@ -2790,7 +2788,6 @@ namespace GObject
                         cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, c, TimeUtil::Now());
                 }
 
-                dclogger.fee(this, _playerData.gold, -_holdGold);
 				SYSMSG_SENDV(150, this, c);
 				SYSMSG_SENDV(1050, this, c);
                 _isHoding = false;

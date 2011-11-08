@@ -796,6 +796,11 @@ namespace Script
         doAttainment(player, 10001, nlev);
 	}
 
+	bool GameActionLua::testTakePack( UInt8 type, UInt8 freq )
+	{
+		return Call<bool>("testTakePack", type, freq);
+	}
+
 	void GameActionLua::onGetVipPack( Player* player, UInt8 type )
 	{
 		Call<void>("onGetVipPack", player, type);

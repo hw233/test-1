@@ -42,6 +42,7 @@
 #include "GData/Money.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/Var.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -2735,6 +2736,17 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
 
     key.player = player;
     snprintf(key.key, sizeof(key.key), "%s", ydar.key.c_str());
+
+    UInt8 type = 0;
+    if (isdigit(key.key[0]) && key.key[1] == '-')
+        type = key.key[0] - '0';
+
+    if (type && !GameAction()->testTakePack(type, player->GetVar(VAR_KEYPACK1+type-1)))
+    {
+		player->sendMsgCode(1, 1018);
+        return;
+    }
+
 	LoginMsgHdr hdr1(0x300, WORKER_THREAD_LOGIN, 0, player->GetSessionID(), sizeof(key));
 	GLOBAL().PushMsg(hdr1, &key);
 }
