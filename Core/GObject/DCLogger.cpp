@@ -276,8 +276,13 @@ void DCLogger::fee(Player* player, UInt32 total, Int32 c)
     msg << player->getOpenId();
     msg << "&key=";
     msg << player->getOpenKey();
-    msg << "&totalfee=";
-    msg << total*10; // TODO:
+    msg << "&modifyfee=";
+    msg << c*10; // TODO:
+    if (total)
+    {
+        msg << "&totalfee=";
+        msg << total*10; // TODO:
+    }
 
 #ifdef _DEBUG
     fprintf(stderr, "%s\n", msg.str().c_str());

@@ -58,7 +58,11 @@ void buildPacket(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem>& l
 		LeaderboardItem& item = list[i];
 		if(merge)
 			Player::patchMergedName(item.id, item.name);
-		st << item.name << item.pf << item.lvl << item.country << item.value << item.clan;
+        Player* pl = globalPlayers[item.id];
+        if (pl)
+            st << item.name << pl->getPF() << item.lvl << item.country << item.value << item.clan;
+        else
+            st << item.name << item.pf << item.lvl << item.country << item.value << item.clan;
 	}
 	st << Stream::eos;
 }

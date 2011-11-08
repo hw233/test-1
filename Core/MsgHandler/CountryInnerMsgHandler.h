@@ -797,6 +797,8 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
     else
     {
         GameAction()->onGetVipPack(player, type);
+        UInt8 cnt = player->GetVar(type+VAR_KEYPACK1-1);
+        player->SetVar(type+VAR_KEYPACK1-1, cnt+1);
     }
 }
 

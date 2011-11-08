@@ -26,6 +26,15 @@ namespace GObject
         VAR_SINGLE_CHOPSTICKS = 1, //¹â¹÷½ÚËÍ¿ê×Ó
         VAR_SENGYI = 2,     // É®ÒÂ
         VAR_APRON = 3,      // ¶Ç¶µ
+
+        VAR_KEYPACK1 = 10,  // KEYÀñ°ü
+        VAR_KEYPACK2,
+        VAR_KEYPACK3,
+        VAR_KEYPACK4,
+        VAR_KEYPACK5,
+        VAR_KEYPACK6,
+        VAR_KEYPACK7,
+        VAR_KEYPACK8,
        
         VAR_MAX,
     };
@@ -52,6 +61,14 @@ namespace GObject
             REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK3, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK4, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK5, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK6, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK7, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK8, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id);
