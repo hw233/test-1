@@ -237,11 +237,11 @@ void World::World_Midnight_Check( World * world )
 	luckyDraw.checkCleanup();
 
     chopStickSortMap.clear();
-    //¹â¹÷½Ú»î¶¯ÊÇ·ñ½áÊø
+    //åˆ¤æ–­æ˜¯ä¸æ˜¯å…‰æ£èŠ‚ç»“æŸ
     bSingleDayEnd = bSingleDay && !getSingleDay();
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
 
-    //¸ù¾İ¿ê×ÓÊıÃû´Î¸øÓè½±Àø
+    //ç»™ç­·å­
     if(bSingleDayEnd)
     {
         int pos = 0;
@@ -254,22 +254,13 @@ void World::World_Midnight_Check( World * world )
                 ++pos;
                 chopStickNum = iter->first;
             }
-            if(pos == 1)
-            {
-                iter->second->setTitle(1);
-            }
-            else if(pos == 2)
-            {
-                iter->second->setTitle(2);
-            }
-            else if(pos == 3)
-            {
-                iter->second->setTitle(3);
-            }
-            else
-            {
-                break;
-            }
+            if(pos > 3) break;
+
+            UInt32 titles[] = {0, 1, 2, 3};
+           
+            Player* player = iter->second;
+            player->setTitle(titles[pos]);
+            SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]); 
         }
     }
 	
