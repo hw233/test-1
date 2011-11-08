@@ -69,7 +69,8 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
             GameMsgHdr hdr(0x2F1, key->player->getThreadId(), key->player, sizeof(type));
             GLOBAL().PushMsg(hdr, &type);
 
-            if (type != 0xFF)
+            if (type < 0xF0)
+            //if (type != 0xFF)
             {
                 char id[32] = {0};
                 size_t vlen = snprintf(id, 32, "%"I64_FMT"u", key->player->getId());

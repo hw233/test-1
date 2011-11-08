@@ -757,6 +757,9 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         snprintf(gold, 32, "%u", recharge->gold);
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
         player->udpLog(nno, recharge->money, gold, id, "", "", "pay");
+
+        UInt32 mny = atoi(recharge->money);
+        dclogger.fee(player, 0, mny);
     }
     else
     {

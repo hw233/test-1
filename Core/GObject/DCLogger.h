@@ -17,7 +17,7 @@ class Player;
 class DCLogger
 {
 public:
-    DCLogger() : m_logger(NULL) {}
+    DCLogger() : m_logger(NULL), m_inited(true) {}
     ~DCLogger() { delete m_logger; }
 
     bool init();
@@ -26,26 +26,24 @@ public:
     bool login(Player* player);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
+    bool fee(Player* player, UInt32 total, Int32 c);
+
     void online();
 
     void normal();
     void incDomainOnlineNum(UInt8 domain);
     void decDomainOnlineNum(UInt8 domain);
 
-    void fee(Player* player, UInt32 total, Int32 c);
-
 private:
     CLogger* m_logger;
+    bool m_inited;
     FastMutex m_lck;
-
-    UInt32 m_onlineNum_domain[MAX_DOMAIN];
-    UInt32 m_domain[MAX_DOMAIN];
 
     UInt32 version;
     UInt32 appid;
-    UInt32 svrip;
-    UInt32 area; // worldid
-    std::string pf; // domain
+
+    UInt32 m_onlineNum_domain[MAX_DOMAIN];
+    UInt32 m_domain[MAX_DOMAIN];
 };
 
 extern DCLogger dclogger;

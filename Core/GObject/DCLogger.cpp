@@ -9,8 +9,23 @@
 namespace GObject
 {
 
+#define COMMIT() \
+{ \
+    UInt8 succ = 0; \
+    std::string data = msg.str(); \
+    if (m_inited) \
+    { \
+        FastMutex::ScopedLock lck(m_lck); \
+        if (m_logger && m_logger->write_baselog(LT_BASE, data, true)) \
+            return false; \
+        succ = 1; \
+    } \
+    TRACE_LOG("%s -> %u", data.c_str(), succ); \
+}
+
 bool DCLogger::init()
 {
+#ifndef _DEBUG
     m_logger = new (std::nothrow) CLogger();
     if (!m_logger)
         return false;
@@ -23,7 +38,11 @@ bool DCLogger::init()
     std::string appname = "appoperlog";
 #endif
     if (m_logger->init(appname))
+    {
+        ERROR_LOG("Init DCLogger");
         return false;
+    }
+#endif
 
     version = _VERSION;
     appid = _APPID;
@@ -34,6 +53,7 @@ bool DCLogger::init()
         m_domain[i] = i + 1;
     }
 
+    m_inited = true;
     return true;
 }
 
@@ -93,11 +113,7 @@ bool DCLogger::reg(Player* player)
 #endif
 
 #ifndef _DEBUG
-    std::string data = msg.str();
-    FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return false;
-    TRACE_LOG("%s", data.c_str());
+    COMMIT();
 #endif
 
     return true;
@@ -140,11 +156,7 @@ bool DCLogger::login(Player* player)
 #endif
 
 #ifndef _DEBUG
-    std::string data = msg.str();
-    FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return false;
-    TRACE_LOG("%s", data.c_str());
+    COMMIT();
 #endif
 
     return true;
@@ -189,11 +201,7 @@ bool DCLogger::logout(Player* player)
 #endif
 
 #ifndef _DEBUG
-    std::string data = msg.str();
-    FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return false;
-    TRACE_LOG("%s", data.c_str());
+    COMMIT();
 #endif
 
     return true;
@@ -237,21 +245,17 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
 #endif
 
 #ifndef _DEBUG
-    std::string data = msg.str();
-    FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return false;
-    TRACE_LOG("%s", data.c_str());
+    COMMIT();
 #endif
 
     return true;
 }
 
-void DCLogger::fee(Player* player, UInt32 total, Int32 c)
+bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
 #ifndef _DEBUG
     if (!m_logger)
-        return;
+        return false;
 #endif
     std::ostringstream msg;
 
@@ -289,12 +293,9 @@ void DCLogger::fee(Player* player, UInt32 total, Int32 c)
 #endif
 
 #ifndef _DEBUG
-    std::string data = msg.str();
-    FastMutex::ScopedLock lck(m_lck);
-    if (m_logger && m_logger->write_baselog(LT_BASE, data, true))
-        return;
-    TRACE_LOG("%s", data.c_str());
+    COMMIT();
 #endif
+    return true;
 }
 
 DCLogger dclogger;

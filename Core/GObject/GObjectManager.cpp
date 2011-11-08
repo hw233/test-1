@@ -1219,11 +1219,18 @@ namespace GObject
 				continue;
             if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level > 29)
             {
+                GObject::LevelPlayers* lvPlayer = NULL;
+                GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(specfgtobj.level);
+                if(it != GObject::globalLevelsPlayers.end())
+                     lvPlayer = it->second;
 
-                LevelPlayers& lvPlayer = globalLevelsPlayers[specfgtobj.level];
-                UInt32 nSize = lvPlayer.size() + 1;
-                lvPlayer[nSize] = pl->getId();
-                pl->setLvPos(nSize);
+                if(lvPlayer == NULL)
+                {
+                    lvPlayer = new GObject::LevelPlayers();
+                    GObject::globalLevelsPlayers[specfgtobj.level] = lvPlayer;
+                }
+
+                lvPlayer->push_back(pl->getId());
             }
 
 			fgt2->setPotential(specfgtobj.potential, false);
