@@ -1006,8 +1006,6 @@ namespace GObject
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
-        // 玩家在等级集合的位置 
-        UInt32 _lvpos;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1026,8 +1024,6 @@ namespace GObject
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
-        inline void setLvPos(UInt32 v) { _lvpos = v; }
-        inline UInt32 getLvPos() { return _lvpos; }
 
 	protected:
 		inline void setBlockBossByLevel();
@@ -1115,8 +1111,8 @@ namespace GObject
 	extern GlobalPlayers newPlayers;
 	typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;
 	extern GlobalNamedPlayers globalNamedPlayers;
-    typedef std::map<UInt32, UInt64> LevelPlayers;
-    typedef std::map<UInt8, LevelPlayers> GlobalLevelsPlayers;
+    typedef std::vector<UInt64> LevelPlayers;
+    typedef std::map<UInt8, LevelPlayers*> GlobalLevelsPlayers;
     typedef GlobalLevelsPlayers::iterator GlobalLevelsPlayersIterator;
     extern GlobalLevelsPlayers globalLevelsPlayers;
 

@@ -528,7 +528,6 @@ namespace GObject
 		m_AttainMgr = new AttainMgr(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
-        _lvpos = 0;
 	}
 
 

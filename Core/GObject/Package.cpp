@@ -2643,7 +2643,8 @@ namespace GObject
 			if(!DelItemAny(ITEM_FORGE_PROTECT, c))
 				protect = 0;
             else
-                DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
+                AddItemHistoriesLog(ITEM_FORGE_PROTECT,  c);
+                //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
 		}
 		ItemEquipData& ied = equip->getItemEquipData();
 		types[0] = ied.extraAttr2.type1;

@@ -539,18 +539,34 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
         GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->oldLv);
         if(it != GObject::globalLevelsPlayers.end())
         {
-            GObject::LevelPlayers& lvPlayer = it->second;
-            UInt32 nSize = lvPlayer.size();
-            if(nSize != 0)
-                lvPlayer.erase(player->getLvPos());
+            GObject::LevelPlayers* lvPlayer = it->second;
+            UInt32 nSize = lvPlayer->size();
+            UInt64* ppid = &(*lvPlayer)[0];
+            for(UInt32 i = 0; i < nSize; ++i)
+            {
+                if(player->getId() == *ppid)
+                {
+                    ++ppid;
+                    lvPlayer->erase(lvPlayer->begin() + i);
+                    break;
+                }
+            }
         }
     }
     if(lvc->newLv > 29)
     {
-        GObject::LevelPlayers& lvPlayer = GObject::globalLevelsPlayers[lvc->newLv];
-        UInt32 nSize = lvPlayer.size() + 1;
-        lvPlayer[nSize] = player->getId();
-        player->setLvPos(nSize);
+        GObject::LevelPlayers* lvPlayer = NULL;
+        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->oldLv);
+        if(it != GObject::globalLevelsPlayers.end())
+             lvPlayer = it->second;
+
+        if(lvPlayer == NULL)
+        {
+            lvPlayer = new GObject::LevelPlayers();
+            GObject::globalLevelsPlayers[lvc->newLv] = lvPlayer;
+        }
+
+        lvPlayer->push_back(player->getId());
     }
 }
 
