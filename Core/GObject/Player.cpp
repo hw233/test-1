@@ -6482,12 +6482,12 @@ namespace GObject
         st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
         UInt8 maxCnt = GObjectManager::getYDMaxCount();
         if(flag)
-            st << static_cast<UInt8>(maxCnt - 1);
+            st << static_cast<UInt8>(maxCnt - 2);
         else
             st << maxCnt;
         for(UInt8 i = 0; i < maxCnt; ++ i)
         {
-            if(flag && i == 0)
+            if(flag && (i == 0 || i > 6))
                 continue;
             std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
             UInt8 itemCnt = ydItem.size();

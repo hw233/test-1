@@ -540,8 +540,8 @@ namespace GObject
         inline void setQQVipl(UInt8 lvl)
         {
             _playerData.qqvipl = lvl;
-            if(lvl > 7 && lvl < 10)
-                _playerData.qqvipl = 7;
+            if(lvl > 8 && lvl < 10)
+                _playerData.qqvipl = 8;
             else if(lvl > 16 && lvl < 20)
                 _playerData.qqvipl = 16;
         }
