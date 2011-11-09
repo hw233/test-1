@@ -1071,7 +1071,8 @@ namespace GObject
         else if (GetItemSubClass(id) == Item_Normal)
         {
             ItemBase* item = GetItem(id, bind > 0);
-            if (item && item->getClass() == Item_Normal29)
+            if (item && (item->getClass() == Item_Normal29 ||
+                         item->getClass() == Item_Normal28))
             {
                 ret = TrumpMerge(id, bind > 0);
                 if (ret)
