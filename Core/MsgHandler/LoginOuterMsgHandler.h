@@ -32,6 +32,7 @@
 #include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
 #include "GObject/WBossMgr.h"
+
 #include "GObject/DCLogger.h"
 
 
@@ -670,9 +671,6 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 memcpy(recharge.no, no.c_str(), no.length()>255?255:no.length());
                 memcpy(recharge.uint, uint.c_str(), uint.length()>31?31:uint.length());
                 memcpy(recharge.money, money.c_str(), money.length()>31?31:money.length());
-
-                UInt32 mny = atoi(money.c_str());
-                GObject::dclogger.fee(player, 0, mny);
 
                 GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
                 GLOBAL().PushMsg(hdr, &recharge);

@@ -112,6 +112,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 m_atkinfo.insert(info);
 
                 UInt8 newPercent = (float(newHP) / nflist[0].fighter->getMaxHP()) * 100;
+                
                 if (newPercent > 100)
                     newPercent = 100;
                 if (_percent < newPercent)
@@ -460,8 +461,8 @@ void WBoss::disapper()
     _percent = 100;
     _ng = NULL;
     _hp.clear();
+    
     TRACE_LOG("disapper: %u, lvl: %u, loc: %u", m_id, m_lvl, m_loc);
-    fprintf(stderr, "disapper: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
 }
 
 void WBoss::sendHpMax(Player* player)
