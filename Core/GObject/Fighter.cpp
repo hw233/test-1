@@ -1083,6 +1083,7 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
+    for(int i = 0; i < getTrump
     // 帮派秘术对额外属性的加成
     Clan* clan = _owner == NULL ? NULL : _owner->getClan();
     if(clan != NULL)

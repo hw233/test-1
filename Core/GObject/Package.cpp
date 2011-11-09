@@ -2811,4 +2811,97 @@ namespace GObject
 			SYSMSG_SENDV(1002, m_Owner, id, num);
 		}
 	}
+
+    UInt8 Package::TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId)
+    {
+		Fighter * fgt = NULL;
+		UInt8 pos = 0;
+		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
+		ItemEquip * item = FindEquip(fgt, pos, 0, itemId);
+		if(trump == NULL || trump->getClass() != Item_Trump || item == NULL || item->getClass() != Item_Trump)
+			return 2;
+
+		bool isBound = item->GetBindStatus();
+		ItemEquipData& ied_trump = trump->getItemEquipData();
+		ItemEquipData& ied_item = trump->getItemEquipData();
+
+        UInt8 q = trump->getQuality();
+        UInt8 l = ied_trump.tRank;
+        UInt32 rankUpExp = GObjectManager::getTrumpExpRank(q, l);
+        if(l >= ied_trump.maxTRank || rankUpExp == 0)
+            return 2;
+
+		const GData::ItemBaseType& ibt = item->GetItemType();
+        UInt32 exp = ibt.trumpExp + (ied_item.trumpExp - ibt.trumpExp) * 0.6;
+        if(DelEquip(itemId, ToTrumpUpgrade))
+            return 2;
+
+        ied_trump.trumpExp += exp;
+
+        if(ied_trump.trumpExp >= rankUpExp)
+        {
+            ++ied_trump.tRank;
+			DB4().PushUpdateData("UPDATE `equipment` SET `tRank` = %u, `trumpExp` = %u WHERE `id` = %u", ied_trump.tRank, ied_trump.trumpExp, trump->getId());
+            DBLOG().PushUpdateData("insert into upgrade_histories (server_id, player_id, equip_id, template_id, equip_rank, upgrade_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), trump->getId(), trump->GetItemType().getId(), ied_trump.tRank, TimeUtil::Now());
+        }
+        else
+        {
+			DB4().PushUpdateData("UPDATE `equipment` SET `trumpExp` = %u WHERE `id` = %u", ied_trump.trumpExp, trump->getId());
+        }
+
+		if(fgt != NULL)
+        {
+            if(l != ied_trump.tRank)
+                fgt->setDirty();
+			fgt->sendModification(0x50 + pos, trump, false);
+        }
+		else
+			SendSingleEquipData(trump);
+
+		if(!trump->GetBindStatus() && isBound)
+			trump->DoEquipBind();
+
+        return 0;
+    }
+
+    UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId)
+    {
+#define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
+#define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
+		Fighter * fgt = NULL;
+		UInt8 pos = 0;
+		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
+		if(trump == NULL || trump->getClass() != Item_Trump)
+			return 2;
+
+        UInt8 q = trump->getQuality();
+		ItemEquipData& ied_trump = trump->getItemEquipData();
+        UInt8 l = ied_trump.maxTRank;
+        if(l >= MAX_TRUMP_LORDER_ITEM)
+            return 2;
+
+		bool isBound = trump->GetBindStatus();
+
+        if(!DelItemAny(TRUMP_LORDER_ITEM, 1, &isBound))
+            return 2;
+        AddItemHistoriesLog(TRUMP_LORDER_ITEM, 1);
+
+        UInt32 chance = GObjectManager::getTrumpLOrderChance(q, l);
+        if(uRand(1000) >= chance)
+            return 1;
+
+        ++ ied_trump.maxTRank;
+        DB4().PushUpdateData("UPDATE `equipment` SET `maxTRank` = %u WHERE `id` = %u", ied_trump.maxTRank, trump->getId());
+        DBLOG().PushUpdateData("insert into lorder_histories (server_id, player_id, equip_id, template_id, equip_maxrank, upgrade_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), trump->getId(), trump->GetItemType().getId(), ied_trump.maxTRank, TimeUtil::Now());
+
+		if(!trump->GetBindStatus() && isBound)
+			trump->DoEquipBind();
+		if(fgt != NULL)
+			fgt->sendModification(0x50 + pos, trump, false);
+		else
+			SendSingleEquipData(trump);
+
+        return 0;
+    }
+
 }

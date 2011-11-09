@@ -141,6 +141,8 @@ namespace GObject
 		// UInt8 BatchMergeGem(std::map<UInt16, UInt32, _GemCompare >& gems, std::vector<UInt32>& gemsOut);
 		UInt8 BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes);
 		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);
+		UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId);
+		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId);
 
 		void AutoRegen(Fighter *);
 

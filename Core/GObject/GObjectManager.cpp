@@ -67,6 +67,9 @@ namespace GObject
     UInt32 GObjectManager::_enchant_chance[6][12];
     UInt8  GObjectManager::_enchant_max[11];
 
+    UInt32 GObjectManager::_trump_lorder_chance[6][12];
+    UInt32 GObjectManager::_trump_exp_rank[6][12];
+
     UInt16 GObjectManager::_attrTypeChances[3][9];
     UInt16 GObjectManager::_attrChances[3][9];
     float  GObjectManager::_attrMax[3][4][12][9];
@@ -2663,6 +2666,27 @@ namespace GObject
 				{
 					_enchant_chance[q][j] =  table_temp.get<UInt32>(j + 1);
 				}
+
+            }
+
+			for(q = 0; q < 6; q ++)
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpLOrderChance", q + 1);
+				UInt32 size = std::min(12, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_trump_lorder_chance[q][j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+			for(q = 0; q < 6; q ++)
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpExpRank", q + 1);
+				UInt32 size = std::min(12, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_trump_exp_rank[q][j] =  table_temp.get<UInt32>(j + 1);
+				}
             }
 
             {
@@ -2835,7 +2859,7 @@ namespace GObject
 
             LoadingCounter lc("Loading equipments:");
             DBEquipment dbe;
-            if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
+            if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `tRank`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
                 return false;
 
             lc.reset(2000);
@@ -2856,26 +2880,29 @@ namespace GObject
                 case Item_Ring:
                 case Item_Amulet:
                 case Item_Trump:
+                {
+                    ItemEquipData ied;
+                    ied.enchant = dbe.enchant;
+                    ied.sockets = dbe.sockets;
+                    ied.gems[0] = dbe.socket1;
+                    ied.gems[1] = dbe.socket2;
+                    ied.gems[2] = dbe.socket3;
+                    ied.gems[3] = dbe.socket4;
+                    ied.gems[4] = dbe.socket5;
+                    ied.gems[5] = dbe.socket6;
+                    ied.enchant = dbe.enchant;
+                    ied.tRank = dbe.tRank;
+                    ied.maxTRank = dbe.maxTRank;
+                    ied.trumpExp = dbe.trumpExp == 0 ? itype->trumpExp : dbe.trumpExp;
+                    ItemEquip * equip;
+                    switch(itype->subClass)
                     {
-                        ItemEquipData ied;
-                        ied.enchant = dbe.enchant;
-                        ied.sockets = dbe.sockets;
-                        ied.gems[0] = dbe.socket1;
-                        ied.gems[1] = dbe.socket2;
-                        ied.gems[2] = dbe.socket3;
-                        ied.gems[3] = dbe.socket4;
-                        ied.gems[4] = dbe.socket5;
-                        ied.gems[5] = dbe.socket6;
-                        ied.enchant = dbe.enchant;
-                        ItemEquip * equip;
-                        switch(itype->subClass)
-                        {
-                        case Item_Weapon:
-                            equip = new ItemWeapon(dbe.id, itype, ied);
-                            break;
-                        case Item_Armor1:
-                        case Item_Armor2:
-                        case Item_Armor3:
+                    case Item_Weapon:
+                        equip = new ItemWeapon(dbe.id, itype, ied);
+                        break;
+                    case Item_Armor1:
+                    case Item_Armor2:
+                    case Item_Armor3:
 					case Item_Armor4:
 					case Item_Armor5:
 						equip = new ItemArmor(dbe.id, itype, ied);

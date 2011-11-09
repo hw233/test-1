@@ -125,6 +125,10 @@ MSG_REG(GameMsgHdr, OnPwdQuestionReq);
 MSG_REG_2(GameMsgHdr, REQ::OP_PWD, OnOpPwdReq);
 MSG_REG(GameMsgHdr, OnLockPwdReq);
 
+MSG_REG_2(GameMsgHdr, REQ::EQ_TRUMP_UPGRADE, OnTrumpUpgrade);
+MSG_REG(GameMsgHdr, OnTrumpLOrder);
+
+
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);

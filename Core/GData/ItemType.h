@@ -156,6 +156,7 @@ namespace GData
 		UInt16		maxQuantity;
 		UInt8		bindType;
 		UInt16		energy;
+		UInt32		trumpExp;
         UInt16      data;
         UInt8       career;
 

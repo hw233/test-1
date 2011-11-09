@@ -93,6 +93,9 @@ namespace GObject
         static UInt8 getPierceFactor() { return _pierce_factor; }
         static UInt8 getToughFactor() { return _tough_factor; }
 
+        static UInt32 getTrumpLOrderChance( UInt8 q, UInt8 lvl ) { return _trump_lorder_chance[q][lvl]; }
+        static UInt32 getTrumpExpRank( UInt8 q, UInt8 lvl ) { return _trump_exp_rank[q][lvl]; }
+
         static float getHiterateMax() { return _hiterate_max; }
         static float getEvadeMax() { return _evade_max; }
         static float getCriticalMax() { return _critical_max; }
@@ -168,6 +171,8 @@ namespace GObject
         static UInt32 _merge_chance[9];
 		static UInt32 _enchant_chance[6][12];
 		static UInt8  _enchant_max[11];
+		static UInt32 _trump_lorder_chance[6][12];
+		static UInt32 _trump_exp_rank[6][12];
 
 		static UInt16 _attrTypeChances[3][9];
 		static UInt16 _attrChances[3][9];

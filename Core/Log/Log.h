@@ -50,6 +50,8 @@ enum PurchaseType
     InstantPracticeAcc,
     FlushAthletics,
     PurchaseSale,
+    TrumpUpgrade,
+    TrumpLOrder,
 };
 
 enum IncomingType
@@ -128,6 +130,7 @@ enum ItemTo
 	ToActivateAttr,
 	ToGemAttach,	
 	ToTrainFighter,	
+	ToTrumpUpgrade,	
 };
 
 
