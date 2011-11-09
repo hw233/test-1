@@ -336,6 +336,36 @@ function ItemNormal_00000026(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000027(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 3;
+    if reqGrids <= 	package:GetRestPackageSize() then
+        package:DelItemSendMsg(27, player);
+        package:AddEquip(1636, 1);
+        package:AddItem(508, 7, 1, 0, 2);
+        package:AddItem(506, 7, 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return false;
+end
+
+function ItemNormal_00000028(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 3;
+    if reqGrids <= 	package:GetRestPackageSize() then
+        package:DelItemSendMsg(28, player);
+        package:AddEquip(1636, 1);
+        package:AddItem(514, 15, 1, 0, 2);
+        package:AddItem(515, 15, 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return false;
+end
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -5589,6 +5619,8 @@ local ItemNormal_Table = {
 	[20] = ItemNormal_00000020,
 	[21] = ItemNormal_00000021,
     [26] = ItemNormal_00000026,
+    [27] = ItemNormal_00000027,
+    [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,

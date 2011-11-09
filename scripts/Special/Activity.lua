@@ -659,6 +659,8 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
             if shengyi == 0 then
                 package:AddItem(70, 1, true)
                 player:SetVar(2, 70)
+                SendMsg(player, 0x35, "你获得了杨花珍藏的：智通的僧衣");
+                SendMsg(player, 1, "你获得了杨花珍藏的：智通的僧衣");
             end
         end
 
@@ -668,6 +670,8 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
             if apron == 0 then
                 package:AddItem(71, 1, true)
                 player:SetVar(3, 71)
+                SendMsg(player, 0x35, "获得了智通珍藏的：杨花的肚兜");
+                SendMsg(player, 1, "获得了智通珍藏的：杨花的肚兜");
             end
         end
     end
