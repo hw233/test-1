@@ -748,7 +748,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             }
         }
 
-        if(passiveSkillInj)
+        if(passiveSkillInj && dmg)
         {
             AttackAct aa = {0};
             aa.bf = bo;
@@ -760,7 +760,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             atkAct->push_back(aa);
         }
 
-        if(passiveSkillThorn && bf->getSide() != bo->getSide())
+        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg)
         {
             AttackAct aa = {0};
             aa.bf = bo;
@@ -881,6 +881,29 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     {
         return;
     }
+    UInt8 state[3] = {0};
+    UInt8 cnt = 0;
+    UInt8 state_idx = 0;
+    state[0] = skill->effect->state;
+    if(skill->effect->state & 0xe)
+    {
+        if(skill->effect->state & 0x2)
+        {
+            state[cnt] = 0x2;
+            ++cnt;
+        }
+        if(skill->effect->state & 0x4)
+        {
+            state[cnt] = 0x4;
+            ++cnt;
+        }
+        if(skill->effect->state & 0x8)
+        {
+            state[cnt] = 0x8;
+            ++cnt;
+        }
+        state_idx = _rnd(cnt);
+    }
 
     BattleFighter* target_bo = static_cast<BattleFighter*>(bo);
     size_t idx = 0;
@@ -888,7 +911,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     UInt8 immune = target_bo->getImmune();
     if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= target_bo->getImmuneLevel())
     {
-        switch(skill->effect->state)
+        switch(state[state_idx])
         {
         case 1:
         case 2:
@@ -928,7 +951,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         }
     }
 
-    switch(skill->effect->state)
+    switch(state[state_idx])
     {
     case 1:
         if(target_bo->getPoisonRound() < 1)
@@ -1081,7 +1104,34 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             return 0;
 
         const GData::SkillBase* boSkill = GData::skillManager[skillParam];
-        switch(boSkill->effect->state)
+        if(boSkill == NULL || boSkill->effect == NULL)
+            return 0;
+
+        UInt8 state[3] = {0};
+        UInt8 cnt = 0;
+        UInt8 idx = 0;
+        state[0] = boSkill->effect->state;
+        if(boSkill->effect->state & 0xe)
+        {
+            if(boSkill->effect->state & 0x2)
+            {
+                state[cnt] = 0x2;
+                ++cnt;
+            }
+            if(boSkill->effect->state & 0x4)
+            {
+                state[cnt] = 0x4;
+                ++cnt;
+            }
+            if(boSkill->effect->state & 0x8)
+            {
+                state[cnt] = 0x8;
+                ++cnt;
+            }
+            idx = _rnd(cnt);
+        }
+
+        switch(state[idx])
         {
         case 1:
             {
