@@ -64,10 +64,15 @@ namespace GObject
                 --size;
                 bool r = false;
 #ifndef _DEBUG
-                if (m_inited && m_logger && !m_logger->write_baselog(LT_BASE, data, true))
-                    r = true;
+                if (*msg)
+                {
+                    std::string data = *msg;
+                    if (m_inited && m_logger && !m_logger->write_baselog(LT_BASE, data, true))
+                        r = true;
+                }
 #endif
-                TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, *msg, r ? 1 : 0);
+                if (*msg)
+                    TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, *msg, r ? 1 : 0);
 
                 delete[] *msg;
                 ++msg;
