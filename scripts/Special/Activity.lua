@@ -677,13 +677,35 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
     end
 end
 
-function onCopyWin(player, id, floor, spot, lootlvl)
+function SingleDayReward(player, lootlvl)
+    if getSingleDay() then
+        if lootlvl > 3 then
+            return;
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+
+        local package = player:GetPackage();
+        package:AddItem(69, itemNum[lootlvl], false);    
+    end
 end
+
+function onCopyWin(player, id, floor, spot, lootlvl)
+    SingleDayReward(player, lootlvl);
+end
+
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
 end
 
 function onFrontMapWin(player, id, spot, lootlvl)
+    SingleDayReward(player, lootlvl);
 end
 
 local vippack = {
