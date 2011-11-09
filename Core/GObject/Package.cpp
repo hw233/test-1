@@ -1071,7 +1071,8 @@ namespace GObject
         else if (GetItemSubClass(id) == Item_Normal)
         {
             ItemBase* item = GetItem(id, bind > 0);
-            if (item && item->getClass() == Item_Normal29)
+            if (item && (item->getClass() == Item_Normal29 ||
+                         item->getClass() == Item_Normal28))
             {
                 ret = TrumpMerge(id, bind > 0);
                 if (ret)
@@ -1212,11 +1213,6 @@ namespace GObject
             {1349,  1357,   "1,1,1,1,1,1,1,1,1",    1303},
             {1358,  1366,   "1,1,1,1,1,1,1,1,1",    1248},
             {1367,  1375,   "1,1,1,1,1,1,1,1,1",    1298},
-            {69,    69,     "5",                    47},
-            {70,    70,     "5",                    48},
-            {71,    71,     "5",                    49},
-            {72,    72,     "5",                    50},
-            {73,    73,     "5",                    51},
             {82,    85,     "1,1,1,1 ",             1510},
             {86,    89,     "1,1,1,1 ",             1512},
             {200,   202,    "1,1,1",                1613},

@@ -43,6 +43,7 @@ enum ItemClass
 	Item_Trump,			//法宝 10
 	Item_Mounts,		//坐骑 11
 	Item_Normal = 20,	//普通物品 20~29
+    Item_Normal28 = 28,
     Item_Normal29 = 29,
 	Item_Formula = 30,	//阵法 30~39
 	Item_Formula1, Item_Formula2, Item_Formula3,
