@@ -336,6 +336,36 @@ function ItemNormal_00000026(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000027(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 3;
+    if reqGrids <= 	package:GetRestPackageSize() then
+        package:DelItemSendMsg(27, player);
+        package:AddEquip(1636, 1);
+        package:AddItem(508, 7, 1, 0, 2);
+        package:AddItem(506, 7, 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return false;
+end
+
+function ItemNormal_00000028(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 3;
+    if reqGrids <= 	package:GetRestPackageSize() then
+        package:DelItemSendMsg(28, player);
+        package:AddEquip(1636, 1);
+        package:AddItem(514, 15, 1, 0, 2);
+        package:AddItem(515, 15, 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return false;
+end
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -473,25 +503,27 @@ end
 function ItemNormal_00000012(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
-  local package = player:GetPackage();
-	if fgt == nil then
+    local mainFgt = player:getMainFighter();
+    local package = player:GetPackage();
+    if fgt == nil or fgt == mainFgt then
 		return false;
 	end
-  local oldexp = fgt:getExp();
+    local oldexp = fgt:getExp();
 	fgt:addExp(5000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(12, player);
-	return num;
-  else
-	return false;
-  end
+    if fgt:getExp() > oldexp then
+  	    package:DelItemSendMsg(12, player);
+	    return num;
+    else
+	    return false;
+    end
 end
 
 function ItemNormal_00000013(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
+    local mainFgt = player:getMainFighter();
     local package = player:GetPackage();
-	if fgt == nil then
+	if fgt == nil or fgt == mainFgt then
 		return false;
 	end
   local oldexp = fgt:getExp();
@@ -507,8 +539,9 @@ end
 function ItemNormal_00000014(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
+    local mainFgt = player:getMainFighter();
     local package = player:GetPackage();
-	if fgt == nil then
+	if fgt == nil or fgt == mainFgt then
 		return false;
 	end
   local oldexp = fgt:getExp();
@@ -1039,6 +1072,31 @@ function ItemNormal_00000066(iid, num, bind, param)
 		package:DelItemSendMsg(66, player);
 		return num;
 	end
+    return num;
+end
+
+function ItemNormal_00000069(id, num, bind, param)
+    
+    local player = GetPlayer();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    
+    local oldexp = fgt:getExp();
+	fgt:addExp(1000 * num);
+    if fgt:getExp() == oldexp then
+        return false;
+    end
+  	    
+    local package = player:GetPackage();
+    package:DelItemSendMsg(69, player);
+
+    if getSingleDay() then
+        player:AddVar(1, num);
+    end
+
     return num;
 end
 
@@ -5561,6 +5619,8 @@ local ItemNormal_Table = {
 	[20] = ItemNormal_00000020,
 	[21] = ItemNormal_00000021,
     [26] = ItemNormal_00000026,
+    [27] = ItemNormal_00000027,
+    [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
@@ -5573,6 +5633,7 @@ local ItemNormal_Table = {
 	[52] = ItemNormal_00000052,
 	[53] = ItemNormal_00000053,
 	[66] = ItemNormal_00000066,
+    [69] = ItemNormal_00000069,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,

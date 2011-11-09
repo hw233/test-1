@@ -659,6 +659,8 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
             if shengyi == 0 then
                 package:AddItem(70, 1, true)
                 player:SetVar(2, 70)
+                SendMsg(player, 0x35, "你获得了杨花珍藏的：智通的僧衣");
+                SendMsg(player, 1, "你获得了杨花珍藏的：智通的僧衣");
             end
         end
 
@@ -668,18 +670,42 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
             if apron == 0 then
                 package:AddItem(71, 1, true)
                 player:SetVar(3, 71)
+                SendMsg(player, 0x35, "获得了智通珍藏的：杨花的肚兜");
+                SendMsg(player, 1, "获得了智通珍藏的：杨花的肚兜");
             end
         end
     end
 end
 
-function onCopyWin(player, id, floor, spot, lootlvl)
+function SingleDayReward(player, lootlvl)
+    if getSingleDay() then
+        if lootlvl > 3 then
+            return;
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+
+        local package = player:GetPackage();
+        package:AddItem(69, itemNum[lootlvl], false);    
+    end
 end
+
+function onCopyWin(player, id, floor, spot, lootlvl)
+    SingleDayReward(player, lootlvl);
+end
+
 
 function onFrontMapFloorWin(player, id, spot, lootlvl)
 end
 
 function onFrontMapWin(player, id, spot, lootlvl)
+    SingleDayReward(player, lootlvl);
 end
 
 local vippack = {
