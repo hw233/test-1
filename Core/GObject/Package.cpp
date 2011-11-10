@@ -2906,7 +2906,7 @@ namespace GObject
             }
             isRankUp = true;
             rankUpExp = GObjectManager::getTrumpExpRank(q-2, ied_trump.tRank);
-            if(l >= ied_trump.maxTRank || rankUpExp == 0)
+            if(ied_trump.tRank >= ied_trump.maxTRank || rankUpExp == 0)
             {
                 ied_trump.trumpExp = GObjectManager::getTrumpExpRank(q-2, ied_trump.maxTRank);
                 break;
