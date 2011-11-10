@@ -5,10 +5,12 @@
 
 
 #define TAGNAME_UDPLOG_SERVER				"udplog_server"
+#define TAGNAME_UDPLOG_SERVER_DOMAIN		"udplog_server_domain"
 #define TAGNAME_LOGFILE_TYPE				"log_file_type"
 #define TAGNAME_ITEM						"item"
 
 #define ATTRIBUTE_ID						"id"
+#define ATTRIBUTE_DOMAIN					"domain"
 #define ATTRIBUTE_IP						"ip"
 #define ATTRIBUTE_PORT						"port"
 #define ATTRIBUTE_TYPEINFO					"typeinfo"
@@ -62,6 +64,64 @@ int32_t CUdpLogConfig::InitServerInfo(TiXmlElement* pRoot)
 		host.nPort = (int16_t)port;
 		
 		m_vHosts.push_back(host);
+
+		pItem = pItem->NextSiblingElement();
+	}
+	return S_OK;
+}
+
+int32_t CUdpLogConfig::InitDomainServerInfo(TiXmlElement* pRoot)
+{
+	if(NULL == pRoot)
+	{
+		return E_FAIL;
+	}
+	TiXmlElement *pServer = pRoot->FirstChildElement(TAGNAME_UDPLOG_SERVER_DOMAIN);
+	if(NULL == pServer)
+	{
+		return E_FAIL;
+	}
+	
+    for (int i = 0; i < MAX_DOMAIN; ++i)
+        m_vHostsDomain[i].clear();
+
+	const char* pszValue = NULL;
+	TiXmlElement *pItem = pServer->FirstChildElement(TAGNAME_ITEM);
+	while (NULL != pItem)
+	{
+		stHost host;
+
+        pszValue = pItem->Attribute(ATTRIBUTE_DOMAIN);
+        if (NULL == pszValue)
+        {
+            return E_FAIL;
+        }
+
+        int domain = atoi(pszValue);
+        if (!domain || domain > MAX_DOMAIN)
+        {
+            return E_FAIL;
+        }
+
+		pszValue = pItem->Attribute(ATTRIBUTE_IP);
+		if (NULL == pszValue)
+		{
+			return E_FAIL;
+		}
+#ifndef WIN32
+		strncpy(host.szIP, pszValue, MAX_IPADDR_LENGTH-1);
+#else
+		strncpy_s(host.szIP, sizeof(host.szIP), pszValue, strlen(pszValue));
+#endif
+		int32_t port ;
+		pszValue = pItem->Attribute(ATTRIBUTE_PORT,&port);
+		if (NULL == pszValue)
+		{
+			return E_FAIL;
+		}
+		host.nPort = (int16_t)port;
+		
+		m_vHostsDomain[domain-1].push_back(host);
 
 		pItem = pItem->NextSiblingElement();
 	}
@@ -130,6 +190,13 @@ int32_t CUdpLogConfig::Init(const char* szFileName/* = DEFAULT_CONFIGFILENAME*/)
 	{
 		return ret;
 	}
+
+    ret = InitDomainServerInfo(pRoot);
+    if (ret < 0)
+    {
+        // return ret;
+    }
+
 	ret = InitFileTypeInfo(pRoot);
 	if(ret < 0)
 	{
@@ -150,6 +217,24 @@ int32_t CUdpLogConfig::GetHostRandomly(stHost& host)
 	int32_t index = rand()%size;
 	
 	host = m_vHosts[index];
+
+	return S_OK;
+}
+
+int32_t CUdpLogConfig::GetHostRandomlyDomain(stHost& host, int domain)
+{
+    if (!domain || domain > MAX_DOMAIN)
+        return E_FAIL;
+
+	int32_t size = (int32_t)m_vHostsDomain[domain-1].size();
+	if(0 == size)
+	{
+		return E_FAIL;
+	}
+	
+	int32_t index = rand()%size;
+	
+	host = m_vHostsDomain[domain-1][index];
 
 	return S_OK;
 }

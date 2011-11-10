@@ -55,11 +55,11 @@ public:
 
 	}
 	//send msg to remote
-	int32_t LogMsg(const char* str1, const char* str2, const char* str3, const char* str4, const char* str5, const char* str6, const char*type = "login",int32_t nCount = 1);
+	int32_t LogMsg(const char* str1, const char* str2, const char* str3, const char* str4, const char* str5, const char* str6, const char*type = "login",int32_t nCount = 1, int32_t domain = 0);
 
 private:
 
-	int32_t SendUDPLog(int32_t uid, int32_t type, const char* msg);
+	int32_t SendUDPLog(int32_t uid, int32_t type, const char* msg, int32_t domain = 0);
 };
 
 class CKingnetAnalyzer

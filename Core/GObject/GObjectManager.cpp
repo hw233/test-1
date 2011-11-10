@@ -46,7 +46,6 @@
 #include "Common/StringTokenizer.h"
 #include "Common/DirectoryIterator.h"
 #include "GObject/PracticePlace.h"
-#include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
@@ -3098,7 +3097,10 @@ namespace GObject
             td.awdst = t.awdst;
             td.itemId = t.itemId;
             td.num = t.num;
-            tripod.addTripodData(t.id, td, true);
+
+            Player* player = globalPlayers[t.id];
+            if (player)
+                player->runTripodData(td, true);
         }
 		lc.finalize();
         return true;

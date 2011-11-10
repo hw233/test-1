@@ -2677,6 +2677,18 @@ namespace GObject
 
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
 
+        float v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr) * 90;
+        if ((float)values[0] > v0 && !(protect & 1))
+        {
+            SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
+        }
+
+        float v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr) * 90;
+        if ((float)values[1] > v1 && !(protect & 2))
+        {
+            SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
+        }
+
 		ApplyAttr2(equip, types, values);
 		if(!equip->GetBindStatus() && isBound)
 			equip->DoEquipBind();

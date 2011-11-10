@@ -17,8 +17,8 @@ class Player;
 class DCLogger
 {
 public:
-    DCLogger() : m_logger(NULL), m_inited(true) {}
-    ~DCLogger() { delete m_logger; }
+    DCLogger() {}
+    ~DCLogger() {}
 
     bool init();
 
@@ -35,13 +35,8 @@ public:
     void decDomainOnlineNum(UInt8 domain);
 
 private:
-    CLogger* m_logger;
-    bool m_inited;
-    FastMutex m_lck;
-
     UInt32 version;
     UInt32 appid;
-
     UInt32 m_onlineNum_domain[MAX_DOMAIN];
     UInt32 m_domain[MAX_DOMAIN];
 };
@@ -53,5 +48,4 @@ extern DCLogger dclogger;
 #endif // DCLOGGER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-
 
