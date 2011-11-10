@@ -136,7 +136,7 @@ struct DBSkillEffect
     std::string magatk; // 法术攻击 [+/-]num/num%
     std::string magdef; // 法术防御 [+/-]num/num%
     float tough;        // 坚韧[+/-]
-    float action;       // 身法[+/-]
+    std::string action; // 身法[+/-]num/num%
     float hitrate;      // 命中[+/-]
     float evade;        // 闪避[+/-]
     float critical;     // 暴击[+/-]
@@ -504,7 +504,7 @@ SPECIALDEF(26)
         std::string, magatk,
         std::string, magdef,
         float, tough,
-        float, action,
+        std::string, action,
         float, hitrate,
         float, evade,
         float, pierce,

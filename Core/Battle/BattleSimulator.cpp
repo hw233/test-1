@@ -1860,11 +1860,12 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
         }
     }
 
-    if(skill->effect->action)
+    if(skill->effect->action || skill->effect->actionP)
     {
-        float value = skill->effect->action;
+        float value = bo->_maxAction * skill->effect->actionP + skill->effect->action;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_maxAction * skill->effect->actionP + skill->effect->action;
             setStatusChange2( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAction, value, skill->last, scList, scCount, false);
         }
         else
@@ -2054,11 +2055,12 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
         }
     }
 
-    if(skill->effect->action)
+    if(skill->effect->action || skill->effect->actionP)
     {
-        float value = skill->effect->action;
+        float value = bo->_maxAction * skill->effect->actionP + skill->effect->action;
         if(value > 0 && bf->getSide() != target_side)
         {
+            float value = bf->_maxAction * skill->effect->actionP + skill->effect->action;
             setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAction, value, skill->last, scList, scCount, false);
         }
         else
