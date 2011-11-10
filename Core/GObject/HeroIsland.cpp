@@ -742,7 +742,7 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         return false;
 
     UInt8 pos = 0;
-    UInt8 rspot = spot;
+    UInt8 rspot = 0xFF; //spot;
     HIPlayerData* pd = findPlayer(player, rspot, pos);
     if (pd)
     {
