@@ -17,7 +17,7 @@ int32_t CKingnetAnalyzer::Init(const char* path/* = DEFAULT_CONFIGFILENAME*/)
 	return _config.Init(path);
 }
 
-int32_t CUserLogger::LogMsg(const char *str1, const char *str2, const char *str3, const char *str4, const char *str5, const char *str6, const char *typeinfo/* = "login"*/, int32_t nCount/* = 1*/)
+int32_t CUserLogger::LogMsg(const char *str1, const char *str2, const char *str3, const char *str4, const char *str5, const char *str6, const char *typeinfo/* = "login"*/, int32_t nCount/* = 1*/, int32_t domain)
 {
 	if(NULL == str1 || NULL == str2 || NULL == str3 || NULL == str4 || NULL == str5 || NULL == str6 || NULL == typeinfo )
 	{
@@ -37,12 +37,12 @@ int32_t CUserLogger::LogMsg(const char *str1, const char *str2, const char *str3
 	_snprintf(m_szLogBuffer,sizeof(m_szLogBuffer), "%s|%s|%s|%s|%s|%s|%d|%s|%d|%s",str1, str2, str3, str4, str5, str6, nCount,m_szUserIP, m_nTime,m_szUserMsg);
 #endif
 	
-	SendUDPLog(m_nUid, type, m_szLogBuffer);
+	SendUDPLog(m_nUid, type, m_szLogBuffer, domain);
 
 	return S_OK;
 }
 
-int32_t CUserLogger::SendUDPLog(int32_t uid, int32_t type, const char* msg)
+int32_t CUserLogger::SendUDPLog(int32_t uid, int32_t type, const char* msg, int domain)
 {
 	if(NULL == msg)
 	{
@@ -51,7 +51,10 @@ int32_t CUserLogger::SendUDPLog(int32_t uid, int32_t type, const char* msg)
 
 	int32_t ret = S_OK;
 	stHost host;
-	ret = _config.GetHostRandomly(host);
+    if (domain)
+        ret = _config.GetHostRandomlyDomain(host, domain);
+    else
+        ret = _config.GetHostRandomly(host);
 	if(ret < 0)
 	{
 		return ret;

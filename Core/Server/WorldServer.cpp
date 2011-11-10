@@ -15,6 +15,7 @@
 #include "SysMsg.h"
 #include "Common/TimeUtil.h"
 #include "kingnet_analyzer.h"
+#include "GObject/DCWorker.h"
 #include "GObject/DCLogger.h"
 
 const char* s_HelpInfo = "";
@@ -110,6 +111,9 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	worker = WORKER_THREAD_LOGIN;
 	m_AllWorker[WORKER_THREAD_LOGIN] = new WorkerThread<Login::LoginWorker>(new Login::LoginWorker());
 
+	worker = WORKER_THREAD_DC;
+	m_AllWorker[worker] = new WorkerThread<GObject::DCWorker>(new GObject::DCWorker(0, WORKER_THREAD_DC));
+
 	worker = WORKER_THREAD_DB;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(0, WORKER_THREAD_DB));
 	worker = WORKER_THREAD_DB1;
@@ -133,6 +137,9 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG));
 	worker = WORKER_THREAD_DB_LOG1;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG1));
+
+	worker = WORKER_THREAD_DC;
+	m_AllWorker[worker]->Run();
 
 	//启动数据库线程处理
 	worker = WORKER_THREAD_DB;
@@ -237,7 +244,7 @@ void WorldServer::Shutdown()
 	//关闭所有工作线程
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
-		if(worker <= WORKER_THREAD_LOGIN)
+		if(worker <= WORKER_THREAD_DC)
 			m_AllWorker[worker]->Shutdown();
 	}
 
@@ -265,6 +272,11 @@ GObject::Country& WorldServer::GetCountry(UInt8 worker)
 GObject::World& WorldServer::GetWorld()
 {
 	return Worker<GObject::World>(WORKER_THREAD_WORLD);
+}
+
+GObject::DCWorker& WorldServer::GetDC()
+{
+	return Worker<GObject::DCWorker>(WORKER_THREAD_DC);
 }
 
 DB::DBWorker& WorldServer::GetDB()

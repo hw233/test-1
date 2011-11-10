@@ -546,17 +546,17 @@ void OnLevelChange( GameMsgHdr& hdr, const void* data)
             {
                 if(player->getId() == *ppid)
                 {
-                    ++ppid;
                     lvPlayer->erase(lvPlayer->begin() + i);
                     break;
                 }
+                ++ppid;
             }
         }
     }
     if(lvc->newLv > 29)
     {
         GObject::LevelPlayers* lvPlayer = NULL;
-        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->oldLv);
+        GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(lvc->newLv);
         if(it != GObject::globalLevelsPlayers.end())
              lvPlayer = it->second;
 

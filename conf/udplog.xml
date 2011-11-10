@@ -4,6 +4,14 @@
 		<item ip="10.142.16.19" port="8810" />
 		<item ip="10.142.16.19" port="8811" />
     </udplog_server>
+	<udplog_server_domain>
+		<item domain="10" ip="10.142.16.19" port="8820" />
+		<item domain="10" ip="10.142.16.19" port="8821" />
+		<item domain="1" ip="10.142.16.19" port="8830" />
+		<item domain="1" ip="10.142.16.19" port="8831" />
+		<item domain="2" ip="10.142.16.19" port="8840" />
+		<item domain="2" ip="10.142.16.19" port="8841" />
+    </udplog_server_domain>
 	<log_file_type>
 		<item id="1" typeinfo="gb"/>
 		<item id="2" typeinfo="prop" />

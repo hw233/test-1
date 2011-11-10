@@ -1,6 +1,9 @@
-function loadStore()
-local store = GetStore()
+function loadStore() local store = GetStore()
 store:clear()
+if getSingleDay() then
+    store:add(1,27,111)
+    store:add(1,28,1111)
+end
 store:add(1,78,120)
 store:add(1,79,200)
 store:add(1,80,450)

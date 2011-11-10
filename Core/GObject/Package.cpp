@@ -1227,7 +1227,7 @@ namespace GObject
             {227,   227,    "10",                   1619},
             {1416,  1420,   "1,1,1,1,1",            1232},
             {1421,  1426,   "1,1,1,1,1,1",          1239},
-            {70,    71,     "1,1",                  72},
+            {70,    71,     "1,1",                  1751},
             {0, 0, NULL, 0},
         };
 
@@ -2639,7 +2639,10 @@ namespace GObject
 			if(protect & 4)
 				++ c;
 			if(!DelItemAny(ITEM_FORGE_PROTECT, c))
+            {
 				protect = 0;
+                return 2;
+            }
             else
                 AddItemHistoriesLog(ITEM_FORGE_PROTECT,  c);
                 //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
@@ -2655,6 +2658,18 @@ namespace GObject
 		m_Owner->useTael(amount,&ci);
         UInt8 crr = equip->GetCareer();
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
+
+        float v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr) * 90;
+        if ((float)values[0] > v0 && !(protect & 1))
+        {
+            SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
+        }
+
+        float v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr) * 90;
+        if ((float)values[1] > v1 && !(protect & 2))
+        {
+            SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
+        }
 
 		ApplyAttr2(equip, types, values);
 		if(!equip->GetBindStatus() && isBound)

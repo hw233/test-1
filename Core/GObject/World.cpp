@@ -116,6 +116,11 @@ bool enum_midnight(void * ptr, void *)
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, 0);
 		GLOBAL().PushMsg(hdr, NULL);
 	}
+    else
+    {
+        pl->buildClanTask();
+        pl->clearFinishCount();
+    }
 #if 0
 	if(pl->getGold() > 0)
 	{
@@ -135,10 +140,6 @@ bool enum_midnight(void * ptr, void *)
     if (World::_halloween && pl->isOnline())
         pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
 
-    pl->buildClanTask();
-    pl->clearFinishCount();
-    if (pl->getBuffData(PLAYER_BUFF_WBOSS))
-        pl->setBuffData(PLAYER_BUFF_WBOSS, 0, true);
 	return true;
 }
 

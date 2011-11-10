@@ -106,6 +106,9 @@ namespace GObject
 
 #define MAX_PRACTICE_FIGHTRES       10      // ×î´óÐÞÁ¶É¢ÏÉÊý
 
+#define MAX_TRIPOD_SOUL 100000
+#define POINT_PERMIN (60*10)
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -122,6 +125,24 @@ namespace GObject
 	class Athletics;
     struct PracticeData;
     class AttainMgr;
+
+    struct TripodData
+    {
+        TripodData()
+        {
+            memset(this, 0x00, sizeof(*this));
+            quality = 2;
+            needgen = 1;
+        }
+
+        UInt32 soul;    // ÔªÆøÖµ
+        UInt8 fire;     // »ðÖÖ: 0-ÆÕÍ¨µÄ»ð 1-õ÷Ä¿öÎ»ð 2-¼«µØÙý»ð 3-ÅÌÄ¾Ðþ»ð 4-Á¶ÓüÚ¤»ð 5-ÈýÃÁÕæ»ð 6-¾ÅÌìÀë»ð 
+        UInt8 quality;  // ½±ÀøÆ·ÖÊ 1-°× 2-ÂÌ 3-À¶ 4-×Ï 5-³È
+        UInt8 awdst;    // ½±Àø×´Ì¬ 0-ÈÛÁ¶ÖÐ 1-Î´ÁìÈ¡
+        UInt8 needgen;  // ÐèÒªÖØÐÂÉú³É½±Àø
+        UInt32 itemId;
+        UInt8 num;
+    };
 
 	class EventAutoBattle : public EventBase
 	{
@@ -519,8 +540,8 @@ namespace GObject
         inline void setQQVipl(UInt8 lvl)
         {
             _playerData.qqvipl = lvl;
-            if(lvl > 7 && lvl < 10)
-                _playerData.qqvipl = 7;
+            if(lvl > 8 && lvl < 10)
+                _playerData.qqvipl = 8;
             else if(lvl > 16 && lvl < 20)
                 _playerData.qqvipl = 16;
         }
@@ -1102,6 +1123,23 @@ namespace GObject
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
+
+    public:
+        void sendTripodInfo();
+        void addItem(UInt32 itemid, UInt16 num, UInt8 bind);
+        void makeFire(UInt32 id1, UInt32 id2);
+
+        void getAward();
+        void genAward(Stream& st);
+        bool genAward();
+
+        inline TripodData& getTripodData() { return m_td; }
+        TripodData& newTripodData();
+        TripodData& runTripodData(TripodData& data, bool = false);
+
+    private:
+        bool m_hasTripod;
+        TripodData m_td;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
