@@ -2440,6 +2440,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	if(price == 0 || price == 0xFFFFFFFF)
 	{
 		st << static_cast<UInt8>(3);
+        GData::store.sendList(lr._type, player);
 	}
 	else
 	{
