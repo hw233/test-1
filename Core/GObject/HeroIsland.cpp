@@ -751,6 +751,8 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
 
         sendSpot(pd, rspot);
+        if (!rspot)
+            ++_nplayers[0];
         return true;
     }
 
@@ -1426,16 +1428,10 @@ void HeroIsland::playerLeave(Player* player)
     if (!player->hasFlag(Player::InHeroIsland))
         return;
 
-    UInt8 spot = player->getHISpot();
+    UInt8 spot = 0xFF;
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
-    if (!pd)
-    {
-        spot = 0xFF;
-        pd = findPlayer(player, spot, pos);
-        if (!pd)
-            return;
-    }
+    if (!pd) return;
 
     if (spot)
     {
