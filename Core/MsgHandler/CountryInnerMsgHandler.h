@@ -600,6 +600,9 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
 
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
+
+    pl->buildClanTask();
+    pl->clearFinishCount();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
