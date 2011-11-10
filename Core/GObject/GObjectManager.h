@@ -97,6 +97,15 @@ namespace GObject
         static UInt32 getTrumpLOrderChance( UInt8 q, UInt8 lvl ) { return _trump_lorder_chance[q][lvl]; }
         static UInt32 getTrumpExpRank( UInt8 q, UInt8 lvl ) { return _trump_exp_rank[q][lvl]; }
         static AttrFactor& getTrumpTRankFactor( UInt8 q, UInt8 l ) { return _trump_rank_factor[q][l]; }
+        static UInt16 getTrumpMaxRankChance( UInt8 idx )
+        {
+            if(idx >= _trump_maxrank_chance.size())
+                return 0;
+
+            return _trump_maxrank_chance[idx];
+        }
+
+        static float  getTrumpAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr ) { return _trumpAttrMax[q][crr][lvl][t]; }
 
         static float getHiterateMax() { return _hiterate_max; }
         static float getEvadeMax() { return _evade_max; }
@@ -176,6 +185,7 @@ namespace GObject
 		static UInt32 _trump_lorder_chance[6][12];
 		static UInt32 _trump_exp_rank[6][12];
 		static AttrFactor _trump_rank_factor[6][12];
+		static float  _trumpAttrMax[3][4][12][9];
 
 		static UInt16 _attrTypeChances[3][9];
 		static UInt16 _attrChances[3][9];
@@ -214,6 +224,7 @@ namespace GObject
         static std::vector<YDItem>              _year_yellow_diamond_award;
         static std::vector<UInt32>              _yellow_diamond_gem;
 
+		static std::vector<UInt16> _trump_maxrank_chance;
 	};
 }
 

@@ -69,6 +69,8 @@ namespace GObject
     UInt32 GObjectManager::_trump_lorder_chance[6][12];
     UInt32 GObjectManager::_trump_exp_rank[6][12];
     AttrFactor GObjectManager::_trump_rank_factor[6][12];
+    std::vector<UInt16> GObjectManager::_trump_maxrank_chance;
+    float  GObjectManager::_trumpAttrMax[3][4][12][9];
 
     UInt16 GObjectManager::_attrTypeChances[3][9];
     UInt16 GObjectManager::_attrChances[3][9];
@@ -136,13 +138,13 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
+        loadEquipForge();
 		loadMapData();
         loadAttrFactor();
         loadCopy();
         loadFrontMap();
 		loadEquipments();
         loadFightersPCChance();
-        loadEquipForge();
 		loadFighters();
 		loadClanAssist();
 		loadClanRobMonster();
@@ -2724,6 +2726,15 @@ namespace GObject
             }
 
             {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpMaxRankChance");
+				UInt32 size = std::min(5, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+                    _trump_maxrank_chance.push_back(table_temp.get<UInt16>(j + 1));
+				}
+            }
+
+            {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantMax");
 				UInt32 size = std::min(11, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
@@ -2771,6 +2782,22 @@ namespace GObject
                         for(UInt8 t = 0; t < size; ++t)
                         {
                             _attrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
+                        }
+                    }
+                }
+            }
+
+            for(UInt8 q = 0; q < 3; ++q)
+            {
+                for(UInt8 crr = 0; crr < 4; ++crr)
+                {
+                    for(UInt8 lvl = 0; lvl < 12; ++lvl)
+                    {
+                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpAttrMax", q + 1, crr + 1, lvl + 1);
+                        UInt32 size = std::min(9, table_temp.size());
+                        for(UInt8 t = 0; t < size; ++t)
+                        {
+                            _trumpAttrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
                         }
                     }
                 }
@@ -2926,8 +2953,8 @@ namespace GObject
                     ied.gems[5] = dbe.socket6;
                     ied.enchant = dbe.enchant;
                     ied.tRank = dbe.tRank;
-                    ied.maxTRank = dbe.maxTRank;
-                    ied.trumpExp = dbe.trumpExp == 0 ? itype->trumpExp : dbe.trumpExp;
+                    ied.maxTRank = dbe.maxTRank == 0 ? 3 : dbe.maxTRank;
+                    ied.trumpExp = dbe.trumpExp;
                     ItemEquip * equip;
                     switch(itype->subClass)
                     {

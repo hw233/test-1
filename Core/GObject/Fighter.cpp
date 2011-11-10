@@ -593,6 +593,11 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			}
 			ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 			ea2.appendAttrToStream(st);
+
+            if(equip->getClass() == Item_Trump)
+            {
+                st << ied.maxTRank << ied.trumpExp;
+            }
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}

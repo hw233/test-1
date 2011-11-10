@@ -3338,14 +3338,17 @@ void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
 		}
 
 		res = pkg->TrumpUpgrade(fgtId, trumpId, itemId);
-        if(res != 0)
+        if(res == 2)
+        {
+            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
             break;
+        }
 	}
 
     ConsumeInfo ci(TrumpUpgrade,0,0);
     player->useTael(amount, &ci);
 
-	Stream st(REP::EQ_BATCH_DECOMPOSE);
+	Stream st(REP::EQ_TRUMP_UPGRADE);
 	st << res << fgtId << trumpId << Stream::eos;
 	player->send(st);
 }
@@ -3357,14 +3360,17 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 		return;
 
     UInt8 res = 0;
-    UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
-    ConsumeInfo ci(TrumpLOrder,0,0);
-    player->useTael(amount, &ci);
 
 	Package * pkg = player->GetPackage();
     res = pkg->TrumpLOrder(req._fgtId, req._itemId);
+    if(res != 2)
+    {
+        UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
+        ConsumeInfo ci(TrumpLOrder,0,0);
+        player->useTael(amount, &ci);
+    }
 
-	Stream st(REP::EQ_BATCH_DECOMPOSE);
+	Stream st(REP::EQ_TRUMP_L_ORDER);
 	st << res << req._fgtId << req._itemId << Stream::eos;
 	player->send(st);
 }
