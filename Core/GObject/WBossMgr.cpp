@@ -654,6 +654,12 @@ void WBossMgr::calcNext(UInt32 now)
                     _prepareTime = appears[i];
                     m_level = dstlvl;
                 }
+
+                if (m_maxlvl < (40+(m_level-1)*10))
+                {
+                    nextDay(now);
+                    return;
+                }
             }
             else
             {
