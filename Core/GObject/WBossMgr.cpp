@@ -703,6 +703,12 @@ void WBossMgr::calcNext(UInt32 now)
         }
     }
 
+    if ((m_level) * 5 > sizeof(worldboss)/sizeof(UInt32))
+    {
+        nextDay(now);
+        return;
+    }
+
     if (!cfg.GMCheck)
     {
         fprintf(stderr, "lvl: %u, time: %u\n", m_level, _prepareTime);
