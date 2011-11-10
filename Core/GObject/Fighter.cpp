@@ -992,6 +992,20 @@ void Fighter::addAttr( ItemEquip * equip )
 	}
 }
 
+void Fighter::addTrumpAttr( ItemTrump * trump )
+{
+    GData::AttrExtra ae(*(trump->getAttrExtra()));
+	ItemEquipData& ied = trump->getItemEquipData();
+
+    UInt8 q = trump->getQuality();
+    UInt8 l = ied.tRank;
+
+    ae *= (1 + GObjectManager::getTrumpTRankFactor(q, l));
+	addAttrExtra(_attrExtraEquip, &ae);
+
+	addEquipAttr2(_attrExtraEquip, trump->getEquipAttr2(), _level);
+}
+
 void Fighter::rebuildEquipAttr()
 {
 	_attrExtraEquip.reset();
@@ -1083,7 +1097,15 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
-    for(int i = 0; i < getTrump
+    for(int i = 0; i < getMaxTrumps(); ++i)
+    {
+		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
+		if(trump != NULL)
+        {
+            addTrumpAttr(trump);
+        }
+    }
+
     // 帮派秘术对额外属性的加成
     Clan* clan = _owner == NULL ? NULL : _owner->getClan();
     if(clan != NULL)

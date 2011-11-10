@@ -252,6 +252,7 @@ CREATE TABLE `item_template` (
   `energy` smallint(6) unsigned NOT NULL COMMENT '九仪鼎值',
   `data` smallint(6) NOT NULL COMMENT '可使用道具: 作用数值',
   `enchant` smallint(6) NOT NULL COMMENT '附魔类型',
+  `trumpExp` smallint(6) NOT NULL COMMENT '法宝经验',
   `attrId` int(10) NOT NULL COMMENT '附加属性',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -3,6 +3,7 @@
 
 #include "ObjectManager.h"
 #include "CittaTable.h"
+#include "GObject/AttrFactor.h"
 
 namespace GData
 {
@@ -81,6 +82,60 @@ struct AttrExtra
 
 		return *this;
 	}
+
+	AttrExtra& operator *=(const GObject::AttrFactor& af)
+	{
+		strength *= af.strength;
+		physique *= af.physique;
+		agility *= af.agility;
+		intelligence *= af.intelligence;
+		will *= af.will;
+		soul *= af.soul;
+		aura = af.aura;
+		auraMax = af.auraMax;
+		attack *= af.attack;
+        magatk *= af.magatk;
+		defend *= af.defend;
+        magdef *= af.magdef;
+		hp *= af.hp;
+		tough *= af.tough;
+		action *= af.action;
+		hitrate *= af.hitrate;
+		evade *= af.evade;
+		critical *= af.critical;
+		criticaldmg *= af.criticaldmg;
+		pierce *= af.pierce;
+		counter *= af.counter;
+        magres *= af.magres;
+
+		strengthP *= af.strength;
+		physiqueP *= af.physique;
+		agilityP *= af.agility;
+		intelligenceP *= af.intelligence;
+		willP *= af.will;
+		soulP *= af.soul;
+		attackP *= af.attack;
+        magatkP *= af.magatk;
+		defendP *= af.defend;
+        magdefP *= af.magdef;
+
+		hpP *= af.hp;
+		actionP *= af.action;
+		criticaldmgP *= af.criticaldmg;
+		counterP *= af.counter;
+        magresP *= af.magres;
+    
+        hitrlvl *= af.hitrate;
+        evdlvl *= af.evade;
+        crilvl *= af.critical;
+        pirlvl *= af.pierce;
+        counterlvl *= af.counter;
+        mreslvl *= af.magres;
+        toughlvl *= af.tough;
+
+		return *this;
+	}
+
 
 	AttrExtra& operator +=(const CittaEffect& other)
 	{

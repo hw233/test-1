@@ -69,6 +69,7 @@ namespace GObject
 
     UInt32 GObjectManager::_trump_lorder_chance[6][12];
     UInt32 GObjectManager::_trump_exp_rank[6][12];
+    AttrFactor GObjectManager::_trump_rank_factor[6][12];
 
     UInt16 GObjectManager::_attrTypeChances[3][9];
     UInt16 GObjectManager::_attrChances[3][9];
@@ -2686,6 +2687,40 @@ namespace GObject
 				for(UInt32 j = 0; j < size; j ++)
 				{
 					_trump_exp_rank[q][j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+			for(q = 0; q < 6; q ++)
+            {
+				for(UInt32 j = 0; j < 12; j ++)
+				{
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpRankFactor", q + 1, j + 1);
+                    UInt32 size = table_temp.size();
+                    if(size > 22)
+                    {
+                        _trump_rank_factor[q][j].strength =  table_temp.get<float>(1);
+                        _trump_rank_factor[q][j].physique =  table_temp.get<float>(2);
+                        _trump_rank_factor[q][j].agility =  table_temp.get<float>(3);
+                        _trump_rank_factor[q][j].intelligence =  table_temp.get<float>(4);
+                        _trump_rank_factor[q][j].will =  table_temp.get<float>(5);
+                        _trump_rank_factor[q][j].soul =  table_temp.get<float>(6);
+                        _trump_rank_factor[q][j].aura =  table_temp.get<float>(7);
+                        _trump_rank_factor[q][j].auraMax =  table_temp.get<float>(8);
+                        _trump_rank_factor[q][j].attack =  table_temp.get<float>(9);
+                        _trump_rank_factor[q][j].magatk =  table_temp.get<float>(10);
+                        _trump_rank_factor[q][j].defend =  table_temp.get<float>(11);
+                        _trump_rank_factor[q][j].magdef =  table_temp.get<float>(12);
+                        _trump_rank_factor[q][j].hp =  table_temp.get<float>(13);
+                        _trump_rank_factor[q][j].tough =  table_temp.get<float>(14);
+                        _trump_rank_factor[q][j].action =  table_temp.get<float>(15);
+                        _trump_rank_factor[q][j].hitrate =  table_temp.get<float>(16);
+                        _trump_rank_factor[q][j].evade =  table_temp.get<float>(17);
+                        _trump_rank_factor[q][j].critical =  table_temp.get<float>(18);
+                        _trump_rank_factor[q][j].criticaldmg =  table_temp.get<float>(19);
+                        _trump_rank_factor[q][j].pierce =  table_temp.get<float>(20);
+                        _trump_rank_factor[q][j].counter =  table_temp.get<float>(21);
+                        _trump_rank_factor[q][j].magres =  table_temp.get<float>(22);
+                    }
 				}
             }
 

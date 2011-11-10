@@ -1396,6 +1396,11 @@ namespace GObject
 		}
 		ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 		ea2.appendAttrToStream(st);
+
+        if(equip->getClass() == Item_Trump)
+        {
+            st << ied.tRank << ied.maxTRank << ied.trumpExp;
+        }
 	}
 
 	void Package::AppendItemData( Stream& st, ItemBase * item )
