@@ -1434,7 +1434,7 @@ namespace GObject
 
 	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
-		if (type > 3) return 2;
+		if (type > 1) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
@@ -1453,7 +1453,7 @@ namespace GObject
         }
 
 		ItemEquipData& ied = equip->getItemEquipData();
-        if(ied.enchant >= ENCHANT_LEVEL_MAX)
+        if(ied.enchant >= ENCHANT_LEVEL_MAX || level > ENCHANT_LEVEL_MAX)
             return 2;
 
         if(level != 0 && ied.enchant >= level)
@@ -1461,7 +1461,10 @@ namespace GObject
 
         if(count !=0 && type != 1)
             return 2;
-		
+
+		if(GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
+            return 2;
+
         UInt32 enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
         if(enchant == 0)
             return 2;
@@ -1492,7 +1495,7 @@ namespace GObject
         }
         else if( 0 != count )
         {
-            int i = 0;
+            UInt32 i = 0;
             enc_times = 0;
             for(; i < count; ++i)
             {
