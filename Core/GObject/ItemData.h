@@ -73,7 +73,7 @@ namespace GObject
 		UInt16	gems[SOCKETS_MAX];			//宝石镶嵌增加附加属性
 		ItemEquipAttr2 extraAttr2;
 
-		ItemEquipData(): sockets(0), enchant(0) { memset(gems, 0, sizeof(gems)); }
+		ItemEquipData(): sockets(0), enchant(0), tRank(0), maxTRank(0), trumpExp(0) { memset(gems, 0, sizeof(gems)); }
 	};
 }
 

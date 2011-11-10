@@ -31,6 +31,8 @@
 #define ITEM_DETACH_RUNE 504    // 粗制拆卸石
 #define ITEM_FORGE_PROTECT 501  // 洗炼保护符
 #define ITEM_ACTIVATE_ATTR 9215
+#define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
+#define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
 
 namespace GObject
 {
@@ -637,8 +639,14 @@ namespace GObject
 
 				UInt8 lv = (itype->reqLev + 5) / 10 - 1;
                 UInt8 crr = itype->career;
-				if(itype->quality > 2 && itype->subClass != Item_Trump)
+				if(itype->quality > 2)
 				{
+                    if(itype->subClass == Item_Trump)
+                    {
+                        edata.maxTRank = uRand(MAX_TRUMP_LORDER_ITEM) + 1;
+                        lv = 0;
+                    }
+
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};
 					Int16 v[3] = {0, 0, 0};
@@ -1399,7 +1407,7 @@ namespace GObject
 
         if(equip->getClass() == Item_Trump)
         {
-            st << ied.tRank << ied.maxTRank << ied.trumpExp;
+            st << ied.maxTRank << ied.trumpExp;
         }
 	}
 
@@ -2586,6 +2594,10 @@ namespace GObject
 			types[2] = ied.extraAttr2.type3;
 			values[2] = ied.extraAttr2.value3;
             UInt8 crr = equip->GetCareer();
+
+            if(equip->GetItemType().subClass == Item_Trump)
+                lv = ied.tRank;
+
 			getRandomAttr2(lv, crr, q, c, protect, types, values);
 			if(!equip->GetBindStatus() && isBound)
 				equip->DoEquipBind();
@@ -2659,6 +2671,10 @@ namespace GObject
 		ConsumeInfo ci(ForgeEquipment,0,0);
 		m_Owner->useTael(amount,&ci);
         UInt8 crr = equip->GetCareer();
+
+        if(equip->GetItemType().subClass == Item_Trump)
+            lv = ied.tRank;
+
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
 
 		ApplyAttr2(equip, types, values);
@@ -2827,8 +2843,10 @@ namespace GObject
 		ItemEquipData& ied_item = trump->getItemEquipData();
 
         UInt8 q = trump->getQuality();
+        if(q < 2)
+            return 2;
         UInt8 l = ied_trump.tRank;
-        UInt32 rankUpExp = GObjectManager::getTrumpExpRank(q, l);
+        UInt32 rankUpExp = GObjectManager::getTrumpExpRank(q-2, l);
         if(l >= ied_trump.maxTRank || rankUpExp == 0)
             return 2;
 
@@ -2867,8 +2885,6 @@ namespace GObject
 
     UInt8 Package::TrumpLOrder(UInt16 fighterId, UInt32 trumpId)
     {
-#define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
-#define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
@@ -2876,9 +2892,12 @@ namespace GObject
 			return 2;
 
         UInt8 q = trump->getQuality();
+        if(q < 2)
+            return 2;
+
 		ItemEquipData& ied_trump = trump->getItemEquipData();
         UInt8 l = ied_trump.maxTRank;
-        if(l >= MAX_TRUMP_LORDER_ITEM)
+        if(l >= MAX_TRUMP_LORDER_ITEM || l < 1)
             return 2;
 
 		bool isBound = trump->GetBindStatus();
@@ -2887,7 +2906,7 @@ namespace GObject
             return 2;
         AddItemHistoriesLog(TRUMP_LORDER_ITEM, 1);
 
-        UInt32 chance = GObjectManager::getTrumpLOrderChance(q, l);
+        UInt32 chance = GObjectManager::getTrumpLOrderChance(q-2, l-1);
         if(uRand(1000) >= chance)
             return 1;
 

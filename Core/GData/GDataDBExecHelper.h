@@ -37,6 +37,7 @@ struct DBItemType
 	UInt16		energy;         // 九仪鼎值
 	UInt16		data;           // 可使用道具: 作用数值
     UInt16      enchant;        // 附魔类型
+    UInt16      trumpExp;       // 法宝经验
 	UInt32		attrExtra;      // 属性附加
 };
 
@@ -326,7 +327,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(13)
+SPECIALDEF(14)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -340,6 +341,7 @@ SPECIALDEF(13)
 	UInt16,		energy,
 	UInt16,		data,
 	UInt16,		enchant,
+    UInt16,     trumpExp,
 	UInt32,		attrExtra
 	)
 SPECIALEND()
