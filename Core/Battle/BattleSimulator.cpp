@@ -1969,15 +1969,19 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
 
     if(skill->effect->auraP || skill->effect->aura)
     {
-        float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
-        if(value > 0 && bf->getSide() != target_side)
+        float rate = skill->prob * 100;
+        if(rate > _rnd(10000))
         {
-            float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
-            setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAura, value, skill->last, scList, scCount, false);
-        }
-        else
-        {
-            setStatusChange( target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, scList, scCount, bf->getSide() != target_side);
+            float value = bo->_aura * skill->effect->auraP + skill->effect->aura;
+            if(value > 0 && bf->getSide() != target_side)
+            {
+                float value = bf->_aura * skill->effect->auraP + skill->effect->aura;
+                setStatusChange( bf->getSide(), bf->getPos(), 1, skill->getId(), e_stAura, value, skill->last, scList, scCount, false);
+            }
+            else
+            {
+                setStatusChange( target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill->getId(), e_stAura, value, skill->last, scList, scCount, bf->getSide() != target_side);
+            }
         }
     }
 
