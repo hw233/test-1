@@ -140,8 +140,6 @@ bool enum_midnight(void * ptr, void *)
     if (World::_halloween && pl->isOnline())
         pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
 
-    if (pl->getBuffData(PLAYER_BUFF_WBOSS))
-        pl->setBuffData(PLAYER_BUFF_WBOSS, 0, true);
 	return true;
 }
 

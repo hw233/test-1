@@ -286,9 +286,9 @@ void HeroIsland::calcNext(UInt32 now)
 #else
     if (cfg.GMCheck)
     {
-        _prepareTime = now;
-        _startTime = _prepareTime + 15 * 60;
-        _endTime = _startTime + 60 * 60;
+        _prepareTime = now + 5 * 60;
+        _startTime = _prepareTime + 5 * 60;
+        _endTime = _startTime + 50 * 60;
     }
 #endif
     else
@@ -405,7 +405,7 @@ void HeroIsland::notifyCount(UInt32 now)
     for (UInt8 j = 0; j < HERO_ISLAND_SPOTS; ++j)
     {
         st << j;
-        st << _nplayers[j];
+        st << static_cast<UInt16>(_players[j].size());
         ++count;
     }
     st.data<UInt8>(off) = count;
@@ -751,6 +751,7 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
 
         sendSpot(pd, rspot);
+        INFO_LOG("OLDENTER: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", player->getId(), player->getName().c_str(), rspot, pos);
         return true;
     }
 
@@ -759,6 +760,7 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     pd->player = player;
     pd->expcd = TimeUtil::Now() + 60;
 
+    INFO_LOG("NEWENTER: id: %"I64_FMT"u, name: %s, spot: %u", player->getId(), player->getName().c_str(), spot);
     return enter(pd, type, spot, movecd);
 }
 
@@ -785,7 +787,7 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
 
     pd->player->setHISpot(spot);
     sendSpot(pd, spot);
-    ++_nplayers[spot];
+    INFO_LOG("ENTER: id: %"I64_FMT"u, name: %s, spot: %u", pd->player->getId(), pd->player->getName().c_str(), spot);
     return true;
 }
 
@@ -799,9 +801,9 @@ void HeroIsland::sendSpot(HIPlayerData* pd, UInt8 spot)
     pd->player->send(st);
 
     sendPlayers(pd, spot, 0, HERO_ISLANG_PAGESZ);
-    if (!spot)
+    //if (!spot)
         sendSkills(pd);
-    else
+    //else
         sendRareAnimals(pd, spot);
     broadcast(pd, spot, 0);
 }
@@ -974,9 +976,7 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt8 pos)
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
     broadcast(st, pd->spot);
-
-    if (_nplayers[spot])
-        --_nplayers[spot];
+    INFO_LOG("LEAVE: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", pd->player->getId(), pd->player->getName().c_str(), spot, pos);
     return pd;
 }
 
@@ -1002,9 +1002,7 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
     UInt8 spot = player->getHISpot();
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
-    if (!pd)
-        return false;
-    player->setHISpot(spot);
+    if (!pd) return false;
 
     if (spot == to)
         return false;
@@ -1089,9 +1087,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         else
         {
             if (cfg.GMCheck)
-                pd->injuredcd = now + 40;
+                pd->injuredcd = now + 10;
             else
-                pd->injuredcd = now + 40;
+                pd->injuredcd = now + 10;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
             moveTo(pd->player, 0, false);
         }
@@ -1143,14 +1141,14 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         {
             pd->lasttype = pd1->type;
             if (cfg.GMCheck)
-                pd1->injuredcd = now + 40;
+                pd1->injuredcd = now + 10;
             else
-                pd1->injuredcd = now + 40;
+                pd1->injuredcd = now + 10;
             pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd, false);
 
             if (_running)
             {
-                UInt8 status = 0;
+                UInt8 status = 1;
                 size_t sz = pd->compass.size();
                 if (sz && pd->compass[sz-1].type == pd1->type)
                 {
@@ -1170,6 +1168,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 Stream st(REP::HERO_ISLAND);
                 st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
                 pd->player->send(st);
+                INFO_LOG("KILL: %"I64_FMT"u name: %s kill %"I64_FMT"u name: %s => 连杀数: %u, 任务数: %u",
+                        pd->player->getId(), pd->player->getName().c_str(),
+                        pd1->player->getId(), pd1->player->getName().c_str(), pd->straight, pd->tasks);
             }
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev())/2);
@@ -1180,9 +1181,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         else
         {
             if (cfg.GMCheck)
-                pd->injuredcd = now + 40;
+                pd->injuredcd = now + 10;
             else
-                pd->injuredcd = now + 40;
+                pd->injuredcd = now + 10;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
 
             moveTo(pd->player, 0, false);
@@ -1294,9 +1295,6 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
                 pd->player->setBuffData(pd->skills[4].bufid, pd->skills[4].lastcd);
                 SYSMSG_SEND(2133, pd->player);
                 st << cd;
-
-                if (_nplayers[pd->spot])
-                    --_nplayers[pd->spot];
             }
             break;
             
@@ -1426,16 +1424,10 @@ void HeroIsland::playerLeave(Player* player)
     if (!player->hasFlag(Player::InHeroIsland))
         return;
 
-    UInt8 spot = player->getHISpot();
+    UInt8 spot = 0xFF;
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
-    if (!pd)
-    {
-        spot = 0xFF;
-        pd = findPlayer(player, spot, pos);
-        if (!pd)
-            return;
-    }
+    if (!pd) return;
 
     if (spot)
     {
@@ -1446,11 +1438,6 @@ void HeroIsland::playerLeave(Player* player)
             player->setHISpot(0);
             _players[0].push_back(pd);
         }
-    }
-    else
-    {
-        if (_nplayers[0])
-            --_nplayers[0];
     }
 
     clearBuff(1, pd, 0);
@@ -1611,13 +1598,14 @@ void HeroIsland::commitCompass(Player* player)
         }
 
         pd->straight = 0; // XXX: 每三次为一轮
+        INFO_LOG("COMMIT: %"I64_FMT"u name: %s round: %u, awardgot: %u",
+                pd->player->getId(), pd->player->getName().c_str(), pd->round, pd->awardgot);
     }
     else
     {
     }
 
     {
-#if 1
         for (SortType::iterator i = _sorts.begin(), e = _sorts.end(); i != e; ++i)
         {
             if (*i && (*i)->player == pd->player)
@@ -1626,11 +1614,7 @@ void HeroIsland::commitCompass(Player* player)
                 break;
             }
         }
-#else
-        SortType::iterator i = _sorts.find(pd);
-        if (i != _sorts.end())
-            _sorts.erase(i);
-#endif
+        // XXX: 这行代码只允许放在这里
         pd->score += 10;
         _sorts.insert(pd);
 
