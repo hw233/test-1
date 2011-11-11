@@ -990,7 +990,7 @@ namespace GData
             SetValOrPercent(ef->magatk, ef->magatkP, effs.magatk);
             SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
             ef->tough = effs.tough;
-            ef->action = effs.action;
+            SetValOrPercent(ef->action, ef->actionP, effs.action);
             ef->evade = effs.evade;
             ef->critical = effs.critical;
             ef->pierce = effs.pierce;

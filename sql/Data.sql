@@ -452,7 +452,7 @@ CREATE TABLE `skill_effect` (
   `magatk` varchar(255) NOT NULL DEFAULT '',
   `magdef` varchar(255) NOT NULL DEFAULT '',
   `tough` float(10,4) NOT NULL DEFAULT '0.0000',
-  `action` float(10,4) NOT NULL DEFAULT '0.0000',
+  `action` varchar(255) NOT NULL DEFAULT '',
   `hitrate` float(10,4) NOT NULL DEFAULT '0.0000',
   `evade` float(10,4) NOT NULL DEFAULT '0.0000',
   `critical` float(10,4) NOT NULL DEFAULT '0.0000',
