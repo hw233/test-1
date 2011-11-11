@@ -79,7 +79,7 @@ local TrumpMelt_Pro = {
 }
 
 --法宝最大星阶概率
-local TrumpMelt_Maxl =  { 300 ,250 ,200 ,150 ,100 }
+local TrumpMelt_Maxl = { 300 ,550 ,750 ,900 ,1000 }
 
 
 
@@ -569,8 +569,8 @@ function getTrumpLOrderChance(q)
     return TrumpMelt_Pro[q]
 end
 
-function getTrumpRankFactor(q, lvl)
-    return TrumpMelt[q][lvl]
+function getTrumpRankFactor(lvl, q)
+    return TrumpMelt[lvl][q]
 end
 
 function getTrumpMaxRankChance()

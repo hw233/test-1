@@ -451,7 +451,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         float aura_factor = 1;
         if(skill && skill->cond == GData::SKILL_PEERLESS)
         {
-            aura_factor = bf->getAura() / 100;
+            aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
         }
 
 		if(!enterEvade && (target_stun > 0 || bf->calcHit(area_target)))

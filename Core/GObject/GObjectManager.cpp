@@ -2691,13 +2691,13 @@ namespace GObject
 				}
             }
 
-			for(q = 0; q < 6; q ++)
+            for(UInt32 j = 0; j < 9; j ++)
             {
-				for(UInt32 j = 0; j < 12; j ++)
+                for(q = 0; q < 6; q ++)
 				{
-                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpRankFactor", q + 1, j + 1);
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpRankFactor", j + 1, q + 1);
                     UInt32 size = table_temp.size();
-                    if(size > 22)
+                    if(size > 21)
                     {
                         _trump_rank_factor[q][j].strength =  table_temp.get<float>(1);
                         _trump_rank_factor[q][j].physique =  table_temp.get<float>(2);

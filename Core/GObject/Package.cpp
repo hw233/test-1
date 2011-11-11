@@ -345,7 +345,7 @@ namespace GObject
                             if(aidx < GObjectManager::getAttrChance(q, k))
                             {
                                 UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k) + (k == 7 ? 1 : 0);
-                                UInt32 factor = GObjectManager::getAttrDics(q, k) + uRand(dics);
+                                UInt32 factor = GObjectManager::getAttrDics(q, k) + (dics !=0 ? uRand(dics) : 0);
                                 if(equip_t == 0)
                                     v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
                                 else
@@ -2880,7 +2880,7 @@ namespace GObject
 
 		bool isBound = item->GetBindStatus();
 		ItemEquipData& ied_trump = trump->getItemEquipData();
-		ItemEquipData& ied_item = trump->getItemEquipData();
+		ItemEquipData& ied_item = item->getItemEquipData();
 
         UInt8 q = trump->getQuality();
         if(q < 2)
@@ -2904,17 +2904,20 @@ namespace GObject
             {
                 UInt8 lv = ied_trump.tRank;
                 UInt8 crr = trump->GetCareer();
-                UInt8 q = trump->getQuality() - 3;
-                UInt8 t[3] = {0, 0, 0};
-                Int16 v[3] = {0, 0, 0};
-                getRandomAttr2(lv, crr, q, 0, 0, t, v, 1);
-                ApplyAttr2(trump, t, v);
+                if(trump->getQuality() > 2)
+                {
+                    UInt8 q = trump->getQuality() - 3;
+                    UInt8 t[3] = {0, 0, 0};
+                    Int16 v[3] = {0, 0, 0};
+                    getRandomAttr2(lv, crr, q, 0, 0, t, v, 1);
+                    ApplyAttr2(trump, t, v);
+                }
             }
             isRankUp = true;
             rankUpExp = GObjectManager::getTrumpExpRank(q-2, ied_trump.tRank);
             if(ied_trump.tRank >= ied_trump.maxTRank || rankUpExp == 0)
             {
-                ied_trump.trumpExp = GObjectManager::getTrumpExpRank(q-2, ied_trump.maxTRank);
+                ied_trump.trumpExp = GObjectManager::getTrumpExpRank(q-2, ied_trump.maxTRank-1);
                 break;
             }
         }
@@ -2929,6 +2932,9 @@ namespace GObject
 			DB4().PushUpdateData("UPDATE `equipment` SET `trumpExp` = %u WHERE `id` = %u", ied_trump.trumpExp, trump->getId());
         }
 
+		if(!trump->GetBindStatus() && isBound)
+			trump->DoEquipBind();
+
 		if(fgt != NULL)
         {
             if(l != ied_trump.tRank)
@@ -2937,9 +2943,6 @@ namespace GObject
         }
 		else
 			SendSingleEquipData(trump);
-
-		if(!trump->GetBindStatus() && isBound)
-			trump->DoEquipBind();
 
         return 0;
     }
