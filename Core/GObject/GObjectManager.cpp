@@ -2953,7 +2953,7 @@ namespace GObject
                     ied.gems[5] = dbe.socket6;
                     ied.enchant = dbe.enchant;
                     ied.tRank = dbe.tRank;
-                    ied.maxTRank = dbe.maxTRank == 0 ? 3 : dbe.maxTRank;
+                    ied.maxTRank = dbe.maxTRank == 0 ? 2 : dbe.maxTRank;
                     ied.trumpExp = dbe.trumpExp;
                     ItemEquip * equip;
                     switch(itype->subClass)
