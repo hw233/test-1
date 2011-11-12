@@ -73,31 +73,27 @@ struct HIPlayerData
                 player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
             if (player->getBuffData(PLAYER_BUFF_HIWEAK))
                 player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
-            if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
-                player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
+        }
+
+        if (!running)
+        {
+            straight = 0;
+            round = 0;
+            score = 0;
+            inrank = 0;
+            tasks = 0;
+            awardgot = 0;
+            lasttype = 0;
+            compass.clear();
         }
 
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;
         expcd = 0;
-        straight = 0;
-        round = 0;
-        if (!running)
-        {
-            score = 0;
-            inrank = 0;
-        }
-        else
-        {
-        }
-        lasttype = 0;
         attrcd = static_cast<UInt32>(-1);
         bufid = DEFAULT_BUFID;
         attr = NULL;
-        awardgot = 0;
-        compass.clear();
-        tasks = 0;
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
     }

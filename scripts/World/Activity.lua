@@ -48,7 +48,6 @@ function setServer(n, num)
 end
 
 function onActivityCheck(tm)
-  
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
     local freeEnter = false
@@ -108,6 +107,7 @@ function onActivityCheck(tm)
       setSingleDay(false);
   end
 
+  loadStore()
 end
 
 function initActTime(y, m, d)

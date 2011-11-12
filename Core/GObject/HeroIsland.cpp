@@ -356,11 +356,7 @@ void HeroIsland::reset()
         {
             HIPlayerData* pd = _players[i][j];
             if (pd && pd->player)
-            {
-                //clearBuff(1, pd, 0);
-                //clearBuff(2, pd, 0);
                 pd->reset(false);
-            }
         }
     }
     _sorts.clear();
@@ -677,6 +673,7 @@ HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8& spot, UInt8& pos)
             {
                 spot = j;
                 pos = i;
+                player->setHISpot(spot);
                 return _players[j][i];
             }
         }
@@ -711,6 +708,7 @@ HIPlayerData* HeroIsland::findPlayer(UInt64 id, UInt8& spot, UInt8& pos)
             {
                 spot = j;
                 pos = i;
+                _players[j][i]->player->setHISpot(spot);
                 return _players[j][i];
             }
         }
@@ -828,7 +826,9 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
     for (size_t i = start; i < sz; ++i)
     {
         HIPlayerData* pd1 = _players[spot][i];
-        if (pd1->player && pd1->player != pd->player && pd1->player->hasFlag(Player::InHeroIsland))
+        if (pd1->player && pd1->player != pd->player &&
+                pd1->player->hasFlag(Player::InHeroIsland) &&
+                !pd1->skills[4].cd)
         {
             UInt8 l2 = pd1->player->GetLev();
             if (l1 < l2 && l2 - l1 > 20)
@@ -1047,7 +1047,6 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     UInt8 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return false;
-    player->setHISpot(spot);
 
     if (!pd->spot)
     {
@@ -1142,8 +1141,6 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
         if (res)
         {
-            moveTo(pd1->player, 0, false);
-
             pd->lasttype = pd1->type;
             if (cfg.GMCheck)
                 pd1->injuredcd = now + 40;
@@ -1176,6 +1173,8 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             }
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev())/2);
+
+            moveTo(pd1->player, 0, false);
             broadcast(pd, pd->spot, 2);
         }
         else
@@ -1185,8 +1184,8 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             else
                 pd->injuredcd = now + 40;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
-            moveTo(pd->player, 0, false);
 
+            moveTo(pd->player, 0, false);
             broadcast(pd1, pd1->spot, 2);
         }
 
@@ -1295,6 +1294,9 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
                 pd->player->setBuffData(pd->skills[4].bufid, pd->skills[4].lastcd);
                 SYSMSG_SEND(2133, pd->player);
                 st << cd;
+
+                if (_nplayers[pd->spot])
+                    --_nplayers[pd->spot];
             }
             break;
             
@@ -1326,7 +1328,6 @@ void HeroIsland::playerInfo(Player* player)
     {
         in = 1;
         type = pd->type;
-        player->setHISpot(spot);
     }
     else
     {
@@ -1542,7 +1543,6 @@ void HeroIsland::startCompass(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
-    player->setHISpot(spot);
 
     size_t sz = pd->compass.size();
     if (sz)
@@ -1584,7 +1584,6 @@ void HeroIsland::commitCompass(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
-    player->setHISpot(spot);
 
     size_t sz = pd->compass.size();
     if (!sz)
@@ -1597,12 +1596,6 @@ void HeroIsland::commitCompass(Player* player)
     UInt8 straight = pd->straight;
     if (sz && !(sz % 3))
     {
-        if (sz >= 12)
-        {
-            pd->round = 0;
-            pd->compass.clear();
-        }
-
         if (pd->straight == 3)
         {
             ++pd->round;
@@ -1610,6 +1603,12 @@ void HeroIsland::commitCompass(Player* player)
         }
         else
             pd->awardgot = 1;
+
+        if (sz >= 9)
+        {
+            pd->round = 0;
+            pd->compass.clear();
+        }
 
         pd->straight = 0; // XXX: 每三次为一轮
     }
@@ -1667,7 +1666,6 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return false;
-    player->setHISpot(spot);
 
     if (player->GetPackage()->IsFull())
     {
