@@ -297,7 +297,7 @@ namespace REQ
 namespace REP
 {
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00
-    const UInt8 RECONNECT           = 0x01;
+    const UInt8 RECONNECT           = 0x01;// 帐号被封
     const UInt8 ENTER_ARENA         = 0x02;
     const UInt8 LINEUP_CHANGE       = 0x03;
     const UInt8 NEXT_ARENA          = 0x04;
