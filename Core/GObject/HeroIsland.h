@@ -149,7 +149,6 @@ public:
     {
         _types[0] = _types[1] = _types[2] = 0;
         _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
-        _nplayers[0] = _nplayers[1] = _nplayers[2]= _nplayers[3] = 0;
         initSkillAttr();
     }
 
@@ -200,7 +199,6 @@ public:
     RareAnimals& findRareAnimal(UInt32 id, UInt8 spot);
 
     void startCompass(Player* player);
-    void stopCompass(Player* player);
     void commitCompass(Player* player);
 
     void sendSpot(HIPlayerData* pd, UInt8 spot);
@@ -221,7 +219,6 @@ public:
 private:
     SortType _sorts;
     std::vector<HIPlayerData*> _players[HERO_ISLAND_SPOTS];
-    UInt16 _nplayers[HERO_ISLAND_SPOTS];
     UInt32 _types[3];
 
 private:

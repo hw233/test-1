@@ -50,6 +50,7 @@ enum PurchaseType
     InstantPracticeAcc,
     FlushAthletics,
     PurchaseSale,
+    HeroIslandSkill,
 };
 
 enum IncomingType

@@ -71,6 +71,8 @@ enum
     SPLIT,
 // 修炼加速
     INSTANTPRACTICE,
+// 英雄岛技能
+    HISKILL,
 
     MONEY_MAX,
 };
