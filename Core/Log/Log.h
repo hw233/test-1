@@ -109,6 +109,7 @@ enum ItemFrom
     FromFCMerge,
     FromPExp,
     FromHeroIsland,
+    FromAttainment,
 };
 
 enum ItemTo

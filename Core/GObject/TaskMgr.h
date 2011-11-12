@@ -4,7 +4,7 @@
 #include <list>
 #include <algorithm>
 #include "TaskData.h"
-
+#include "GData/GDataManager.h"
 namespace GObject
 {
 	class Player;
@@ -75,6 +75,7 @@ namespace GObject
 		UInt32 AcceptTask(UInt32 taskId);	
 		bool   AbandonTask(UInt32 taskId);
 		bool   SubmitTask(UInt32 taskId);
+        void CheckTaskAttainment(UInt32 taskId,  const GData::TaskType* taskType);
 
 		TaskData* AddTask(UInt32 taskId);
 		bool DelTask(UInt32 taskId);
@@ -95,6 +96,7 @@ namespace GObject
 
         bool isShiMenTask(UInt32 taskid);
         bool isYaMenTask(UInt32 taskid);
+        bool isClanTask(UInt32 taskid);
 		void CheckCanAcceptTaskByTask(UInt32 taskId);
 		void CheckCanAcceptTaskByLev(UInt16 lev, bool = true);
 		bool TaskCanAccept(UInt32 taskId);

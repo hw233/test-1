@@ -19,7 +19,8 @@
 #include "Common/Itoa.h"
 #include "GObject/PracticePlace.h"
 #include "MsgID.h"
-
+#include "Script/GameActionLua.h"
+#include "MsgHandler/CountryMsgStruct.h"
 #include <mysql.h>
 
 namespace GObject
@@ -205,7 +206,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
         if (!mem->player)
             continue;
 
-        GameMsgHdr h(0x1FF,  mem ->player->getThreadId(), m->player, sizeof(msg));
+        GameMsgHdr h(0x1FF,  mem ->player->getThreadId(), mem->player, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
     }
     //
@@ -1966,8 +1967,12 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     }
     if(bUp && writedb && _level >= 5)
     {
-        //¿¿¿¿¿¿¿¿¿ ¿¿¿¿
+        //¿¿¿¿¿
         UInt32 nLev  = static_cast<UInt32> (_level);
+
+        stAttainMsg m;
+        m.attainID = Script::CLAN_LEVUP;
+        m.param    = nLev;
         ClanMember * mem = NULL;
         Members::iterator offset;
         for(offset = _members.begin(); offset != _members.end(); ++ offset)
@@ -1977,9 +1982,9 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
             continue;
             if (!mem->player)
                 continue;
-
-            GameMsgHdr h(0x315,  mem ->player->getThreadId(), m->player, sizeof(nLev));
-            GLOBAL().PushMsg(h, & nLev);
+            
+            GameMsgHdr h(0x1FF,  mem ->player->getThreadId(), mem->player, sizeof(m));
+            GLOBAL().PushMsg(h, & m);
         }
     }
 

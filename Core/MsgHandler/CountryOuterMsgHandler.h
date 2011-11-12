@@ -837,7 +837,8 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
     if (country > 2) 
         return;
     if (player->getCountry() != country)
-    {    
+    {   //before leave thread
+        player->OnSelectCountry();
         CURRENT_COUNTRY().PlayerLeave(player);
         player->setCountry(country);
         Stream st(REP::CAMP_SELECT);
@@ -1979,6 +1980,11 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
         {
             GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
             succ1 = player->finishClanTask(req.m_TaskId);
+        }
+        else
+        {
+            if(succ) //完成衙门 师门
+                player->GetTaskMgr()->CheckTaskAttainment(req.m_TaskId, NULL);
         }
 
         break;

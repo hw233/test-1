@@ -120,14 +120,14 @@ namespace GObject
         if(bInsert)
             DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%"I64_FMT"u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, TimeUtil::Now());
         else
-            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u  `updatetime` = %u WHERE `ownerId` = %u AND `attainId` = %u", ad->status,ad->ownerId, ad->attainId,  TimeUtil::Now());
-
-
+            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u , `updatetime` = %u WHERE `ownerId` = %"I64_FMT"u AND `attainId` = %u",ad->status, TimeUtil::Now(),ad->ownerId, ad->attainId);
     }
+
+
     void AttainMgr::UpdateAttainment(UInt16 attainId, UInt32 status)
     {
         Stream st(REP::ACHIEVEMENT);
-        st << static_cast<UInt8>(1);
+        st << static_cast<UInt16>(1);
         st << attainId;
 
         attain_iterator it = m_AttainList.find(attainId);

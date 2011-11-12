@@ -1150,6 +1150,10 @@ void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
      {
         player->OnFriendLevUp(co->param);
      }
+     else if(co->attainID ==  Script:: ADD_FRIEND)
+     {
+        player->OnAddOneFriend() ;
+     }
      else
      {
         player->OnDoAttainment(co->attainID, co->param);

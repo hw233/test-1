@@ -388,7 +388,7 @@ void BattleFighter::updateBuffExtras()
     }
 }
 
-float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender)
+float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender, float* pCf)
 {
 	// ¼ÆËã±©»÷ÂÊ
     float rate = getCritical(defender);
@@ -408,10 +408,13 @@ float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender)
 	{
 		atk = atk * factor;
 	}
+
+    if(pCf)
+        *pCf = factor;
 	return atk;
 }
 
-float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender)
+float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender , float* pCf)
 {
     float rate = getCritical(defender);
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
@@ -426,10 +429,12 @@ float BattleFighter::calcMagAttack(bool& isCritical, BattleFighter* defender)
         magatk = magatk * factor;
     }
 
+    if(pCf)
+        *pCf = factor;
     return magatk;
 }
 
-void BattleFighter::calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk)
+void BattleFighter::calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf)
 {
     float rate = getCritical(defender);
     isCritical = uRand(10000) < (rate > 0 ? rate : 0) * 100;
@@ -446,6 +451,9 @@ void BattleFighter::calcSkillAttack(bool& isCritical, BattleFighter* defender, f
         magatk = magatk * factor;
 		atk = atk * factor;
     }
+
+    if(pCf)
+        *pCf = factor;
 }
 
 float BattleFighter::calcTherapy(const GData::SkillBase* skill)

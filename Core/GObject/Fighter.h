@@ -480,6 +480,8 @@ public:
 
 	void addAttr( ItemEquip * );
     void addAttr( const GData::CittaEffect* ce );
+    void    CheckEquipEnchantAttainment(UInt8 e);
+    bool  IsEquipEnchantLev(UInt8 e);
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
@@ -532,6 +534,7 @@ protected:
 	UInt8 _level;
 	UInt64 _exp;        // 经验
     UInt32 _pexp;       // 修炼经验
+    UInt32 _pexpAddTmp; // for Attainment  
     UInt32 _pexpMax;    // 修炼最大经验
 	float _potential;   // 潜力
 	float _capacity;    // 资质

@@ -474,6 +474,7 @@ namespace GObject
 		void checkHPLoss();
 		void checkDeath();
 
+        void OnAddOneFriend();
         void OnFriendLevUp(UInt8 nLev);
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
@@ -503,6 +504,7 @@ namespace GObject
 		inline UInt8 getCountry() const		{ return _playerData.country; }
 		void setCountry(UInt8 cny);
 
+        void OnSelectCountry();
 		inline UInt16 getLocation()			{ return _playerData.location; }
 		inline void setLocation(UInt16 loc)	{ _playerData.location = loc; }
 
@@ -673,6 +675,7 @@ namespace GObject
 
         void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
+        bool IsFighterEquipEnchantLev(UInt8 en, UInt8 num);
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
@@ -787,7 +790,7 @@ namespace GObject
 		inline void setClanBattle(ClanBattle * c)  { _clanBattle = c; }
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
-        void OnDoAttainment(UInt32 attId,   UInt32, param);
+        void OnDoAttainment(UInt32 attId,   UInt32  param);
 		//////////////////////////////////////////////////////////////////////////
 		//组队系统
 		inline bool IsInTeam() const { return false; }	//TODO
@@ -811,6 +814,7 @@ namespace GObject
 		void addBlockFromDB(Player *);
 		void addFoeFromDB(Player *);
 		bool addFriend(Player *);
+        void AddFriendAttainment( Player* other);
 		void delFriend(Player *);
 		bool addBlock(Player *);
 		bool delBlock(Player *);

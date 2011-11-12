@@ -305,7 +305,7 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 {
 	if(args.empty())
 		return;
-	if(args.size() == 1)
+    if(args.size() == 1)
 	{
 		UInt32 exp = atoi(args[0].c_str());
 		if(exp == 0)

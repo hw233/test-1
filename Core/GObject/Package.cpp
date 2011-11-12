@@ -19,7 +19,7 @@
 #include "GData/SkillTable.h"
 #include "GData/Money.h"
 #include "GData/Store.h"
-
+#include "AttainMgr.h"
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
 #define ITEM_SOCKET_L2 511
@@ -514,11 +514,11 @@ namespace GObject
 				m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
                 //增加获取物品的荣誉
-                GameAction()->doAttainment(m_Owner, 10253, typeId);
+                GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				//if(fromWhere != 0 && item->getQuality() >= 3)
+				if(fromWhere != 0 && item->getQuality() >= 3)
                      AddItemCoursesLog(typeId, num, fromWhere);
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
@@ -561,6 +561,8 @@ namespace GObject
 			DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
+            //获得物品
+            GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
 			if(fromWhere != 0 && item->getQuality() >= 3)
             {
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
@@ -699,12 +701,8 @@ namespace GObject
 					ItemNotify(equip->GetItemType().getId());
 				if(FromWhere != 0 && itype->quality >= 4)
 					DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromWhere, TimeUtil::Now());
-                //获取法宝成就
-                if(itype->subClass == Item_Trump)
-                {
-                    GameAction()->doAttainment(this->m_Owner, 10200, itype->quality);
-                }
-
+                
+                OnAddEquipAndCheckAttainment(itype, FromWhere);
 				return equip;
 			}
 		default:
@@ -713,6 +711,34 @@ namespace GObject
 		return NULL;
 	}
 
+    void  Package::OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere)
+    {
+        if(FromWhere == FromDungeon || FromWhere  == FromNpc)
+        {
+                    //获取法宝成就
+            if(itype->subClass == Item_Trump)
+            {
+                GameAction()->doAttainment(this->m_Owner, Script::ADD_TRUMP, itype->quality);
+    //                if(itype->quality == 5)
+               //获得累计法宝 
+                GameAction()->doAttainment(this->m_Owner, Script::ADD_NTRUMP,1 );
+                
+                    
+            }
+            else
+            {
+                if(itype ->quality == 4 )
+                {
+                    GameAction()->doAttainment(this->m_Owner, Script::AddPEquip, 1 );
+                }
+                else if(itype ->quality == 5)
+                {
+                    GameAction()->doAttainment(this->m_Owner,  Script::AddYEquip, 1);
+                }
+            }
+        }
+
+    }
 	ItemBase* Package::AddEquipN( UInt32 typeId, UInt32 num, bool bind, bool silence, UInt8 FromWhere )
 	{
 		if(GetRestPackageSize() < num)
@@ -749,6 +775,8 @@ namespace GObject
 		ItemNotify(equip->GetItemType().getId());
 		if(FromWhere != 0 && equip->getQuality() >= 4)
 			DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), equip->GetItemType().getId(), equip->getId(), FromWhere, TimeUtil::Now());
+
+        OnAddEquipAndCheckAttainment(& (equip->GetItemType() ),  FromWhere);
 		return equip;
 	}
 
@@ -1441,6 +1469,7 @@ namespace GObject
 		if (type > 3) return 2;
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
+        UInt32 failThisTime = 0; 
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if(equip == NULL || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet)
 			return 2;
@@ -1514,6 +1543,7 @@ namespace GObject
                 else
                 {
                     ++failed;
+                    ++failThisTime;
                     ++enc_times;
                 }
             }
@@ -1571,11 +1601,9 @@ namespace GObject
             {
                 //装备强化
                  GameAction()->doAttainment(this->m_Owner, 10164, ied.enchant);
-                 if(ied.enchant == 9)
-                 {
-                    
-                 }
 
+                 if(fgt)
+                     fgt->CheckEquipEnchantAttainment(ied.enchant);
             }
 
 			if(fgt != NULL)
@@ -1616,6 +1644,22 @@ namespace GObject
 			}
 			return 0;
 		}
+
+        //if fail
+        if(failThisTime == 0)
+            failThisTime  =1;
+    
+        UInt32  ft = m_Owner->GetVar(GObject::VAR_FAIL_ENCH);
+        ft += failThisTime;
+
+        if(ft >= 999)
+        {
+            GameAction()->doAttainment(this->m_Owner, Script::FAIL_ENCH, ft);
+        }
+        else
+        {
+            m_Owner->SetVar( GObject::VAR_FAIL_ENCH ,ft);
+        }
 
 		if(type == 0 && ied.enchant >= 4)
 		{
@@ -1995,6 +2039,29 @@ namespace GObject
 					got = 2;
 			}
 		}
+        const GData::ItemBaseType& t = item->GetItemType();
+        if(IsEquip(t.subClass))
+        {
+            if(t.subClass == Item_Trump)
+            {
+                UInt32 n = m_Owner->GetVar(VAR_SPLIT_THRUMP);
+                n ++ ;
+                m_Owner->SetVar(VAR_SPLIT_THRUMP, n);//分解法宝的次数
+
+                GameAction()->doAttainment(this->m_Owner, Script:: SPLIT_THRUMP , n);
+
+                GameAction()->doAttainment(this->m_Owner, Script::SPLIT_THRUMP_COLOR, t.quality );
+            }
+            else
+            {
+                UInt32 n = m_Owner->GetVar(VAR_SPLIT_EQUIP);
+                n ++ ;
+                m_Owner->SetVar(VAR_SPLIT_EQUIP, n);
+
+                GameAction()->doAttainment(this->m_Owner, Script:: SPLIT_EQUIP , n);
+                GameAction()->doAttainment(this->m_Owner, Script:: SPLIT_EQUIP_COLOR, t.quality );
+            }
+        }
 		if(got)
 		{
 			enchantId = ITEM_ENCHANT_L1 + got - 1;
@@ -2005,6 +2072,8 @@ namespace GObject
 			return 0;
 		}
 		DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
+
+        
 		return 1;
 	}
 

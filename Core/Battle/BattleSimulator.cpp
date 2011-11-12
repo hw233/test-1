@@ -10,7 +10,8 @@
 #include "Common/DirectoryIterator.h"
 #include "Server/Cfg.h"
 #include "MsgID.h"
-
+#include "MsgHandler/CountryMsgStruct.h"
+#include "Script/GameActionLua.h"
 namespace Battle
 {
 
@@ -75,12 +76,26 @@ void  BattleSimulator::InitAttainRecord()
         _csNum[i] = 0;
         _prNum[i] = 0;
         _fjNum[i] = 0;
-        _skillDmg300[i] = false;
+
+        _maxEvade [i] = 0;
+
+         _maxCS[i] = 0;
+
+         _maxPR[i] = 0;
+         _maxFJ[i] = 0;
+         _maxSkillDmg[i] = 0;
+         _maxPeerLessDmg[i] = 0;
+         _maxAura[i] = 0;
+         _maxCSFactor[i] = 0.0f;
+
+         _attackRound = 0;
+         _firstPLDmg[0] = false;
+       /* _skillDmg300[i] = false;
         _skillDmg1k[i] = false;
         _skillDmg5k[i] = false;
         _peerlessDmg1k[i] = false;
         _peerlessDmg5k[i] = false;
-        _peerlessDmg1w[i] = false;
+        _peerlessDmg1w[i] = false;*/
     }
 }
 // #############################
@@ -171,6 +186,10 @@ void BattleSimulator::start()
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
 					_packet << aura << maxAura <<static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
+
+                    //add maxAura
+                    if(maxAura > _maxAura[i])
+                        _maxAura[i] = maxAura;
                     // TODO: up skills
 					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f) << static_cast<UInt16>(bf->getTough(NULL) * 100.0f) << static_cast<UInt16>(bf->getMagRes(NULL) * 100.0f);
                     _packet << bf->getFighter()->getPeerlessAndLevel();
@@ -215,6 +234,7 @@ void BattleSimulator::start()
 		int pos = findFirstAttacker();
 
 		act_count += doAttack(pos);
+         _attackRound ++ ;
 #ifdef _DEBUG
         char path[1024], path2[1024];
         sprintf(path, "%s0/0", cfg.reportPath.c_str());
@@ -263,29 +283,82 @@ void BattleSimulator::start()
 
     CheckAttain();
 }
+void  BattleSimulator::SendAttainMsgToPlayer( GObject::Player* player, UInt32 id, UInt32 param)
+{
+                 stAttainMsg  msg; 
+                 msg.attainID = id;
+                 msg.param = param;
+                 GameMsgHdr h(0x1FF,  player->getThreadId(), player, sizeof(msg));
+                 GLOBAL().PushMsg(h, & msg);
 
+}
 void BattleSimulator::CheckAttain()
 {
 
-   for(UInt8 i = 0; i < 2; i++)
-   {
-        if(_player[i])
+  // for(UInt8 i = 0; i < 2; i++)
+  //only  attacker
+        if(_player[0])
         {
-            if(_evade3OK[i])
+            UInt32 max = _maxEvade[0];
+            if( max >= 3  &&  max <= 9 &&  max  > _player[0] -> GetVar(VAR_BATTLE_MISS))
             {
-                stAttainMsg  msg;
-                msg.attainID = Script:: CLAN_ADD_MEMBER;
-
-                
+                SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_MISS, max);
             }
-            if(_evade9ok[i])
+            max = _maxCS[0];
+            if( max >= 3  &&  max<= 9 && max  > _player[0] -> GetVar(VAR_BATTLE_CS))
             {
+                 SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_CS, max);
+            }
+            max = _maxPR[0];
+            if( max >= 3  &&  max <= 9 && max  > _player[0] -> GetVar(VAR_BATTLE_PR))
+            {
+                 SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_PR, max);
+            }
 
+            max =  _maxFJ[0];
+            if( max >=3  &&  max <= 9 && max  > _player[0] -> GetVar(VAR_BATTLE_FJ))
+            {
+                 SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_FJ, max);
+            }
+            max  = _maxSkillDmg[0];
+            if(max >= 300  &&  max >  _player[0] -> GetVar(VAR_BATTLE_SKILL_DMG))
+            {
+                 SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_SKILLDMG, max);
+            }
+            max  =  _maxPeerLessDmg[0];
+            if(max >= 1000  &&  max >  _player[0] -> GetVar(VAR_BATTLE_PEERLESS_DMG))
+            {
+                 SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_PLDMG, max);
+            }
+            max = _maxAura[0];
+            if(max >= 200)
+            {
+                SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_MAX_AURA, max);
             }
             
-    
+            float fMax = _maxCSFactor[0];
+            if(fMax >= 3.0)
+            {
+                SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_CSFactor, 0);
+            }
+
+            if(_firstPLDmg[0])
+            {
+                   SendAttainMsgToPlayer(_player[0] ,  Script::BATTLE_FIRST_PEERLESS_ATTACK, 0);
+            }
         }
-   }
+
+        for (UInt8 i = 0 ; i < 2; i ++)
+        {
+            printf("miss %u\n",   _maxEvade[i]   );
+            printf("%u\n" , _maxCS[i]);
+            printf("%u\n" , _maxPR[i]);
+            printf("%u\n" , _maxFJ[i]);
+            printf("%u\n" , _maxSkillDmg[i]);
+            printf("%u\n" , _maxPeerLessDmg[i]);
+            printf("%u\n" , _maxAura[i]);
+            printf("%f\n" , _maxCSFactor[i]);
+        }
 }
 void BattleSimulator::insertFighterStatus( BattleFighter* bf )
 {
@@ -506,7 +579,16 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             float magatk = 0;
             if(NULL != skill && skill->effect != NULL)
             {
-                bf->calcSkillAttack(cs, area_target, atk, magatk);
+                float  cf;
+                bf->calcSkillAttack(cs, area_target, atk, magatk , & cf);
+                if(cs )
+                {
+                     UInt8 s = bf->getSide();
+                    if(s < 2)
+                        _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+
+ 
+                }
                 //atk = bf->calcAttack(cs, area_target);
                 //magatk = bf->calcMagAttack(cs, area_target);
                 atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs ? bf->getCriticalDmg() : 1));
@@ -514,7 +596,15 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             }
             else
             {
-                atk = bf->calcAttack(cs, area_target);
+                float cf = 0.0f;
+                atk = bf->calcAttack(cs, area_target, &cf);
+                if(cs )
+                {
+                    UInt8 s = bf->getSide();
+                    if(s < 2)
+                        _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+
+                }
             }
 
 #if 0
@@ -716,7 +806,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 	}
 	else // if attacked a barrier
 	{
-        float atk = bf->calcAttack(cs, 0);
+        float atk = bf->calcAttack(cs, 0, NULL);
 		dmg = static_cast<int>(factor * atk) * (950 + _rnd(100)) / 1000;
 		area_target_obj->makeDamage(dmg);
 		defList[defCount].pos = area_target_obj->getPos() + (bf->getSide() == area_target_obj->getSide() ? 25 : 0);
@@ -734,22 +824,28 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         UInt32 d = magdmg + dmg;
         if(skill->cond == GData::SKILL_PEERLESS)
         {
-            if(d  >= 1000)
+          /*  if(d  >= 1000)
                 _peerlessDmg1k[s] = true;
             else if(d >= 5000)
                  _peerlessDmg5k[s] = true;
             else if(d >= 10000)
                  _peerlessDmg1w[s] = true;
-                           
+                           */
+            if( 0 == _attackRound )
+                _firstPLDmg[s] = true;
+            _maxPeerLessDmg[s] = std::max( _maxPeerLessDmg[s], d);
         }
         else
         {
+            /*
             if(d >= 300)
                 _skillDmg300[s] = true;
             else if(d >= 1000)
                 _skillDmg1k[s] = true;
             else if(d >= 5000)
                 _skillDmg5k[s] = true;
+                */
+            _maxSkillDmg[s] = std::max(_maxSkillDmg[s], d);
         }
     }
 	return dmg + magdmg;
@@ -3276,19 +3372,24 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
         if(cs)
         {
             _csNum[from_side] ++ ;
+            /*
             if(_csNum[from_side] ==3)
                  _cs3ok[from_side] = true;
 
             if(_csNum[from_side] == 9)
                 _cs9ok[from_side] = true;
+                */
+            _maxCS[from_side] = std::max(  _csNum[from_side],  _maxCS[from_side]);
         }
         if(pr)
         {
             _prNum[from_side] ++ ;
+            /*
             if(_prNum[from_side] == 3)
                   _pr3ok[from_side] = true;
             if(_prNum[from_side]== 9)
-                _pr9ok[from_side] = true;
+                _pr9ok[from_side] = true;*/
+             _maxPR[from_side] =std:: max(  _prNum[from_side],  _maxPR[from_side]);
         }
     }
 	// reserved
@@ -3331,10 +3432,12 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
             if(defList[i].damType == e_damEvade)
             {
                  _evadeNum[o_side] ++ ;
+                 /*
                  if(_evadeNum[o_side] == 3)
                     _evade3OK[o_side] = true;
                  if(_evadeNum[o_side] == 9)
-                    _evade9ok[o_side] = true;
+                    _evade9ok[o_side] = true;*/
+                 _maxEvade[o_side] = std::max(_maxEvade[o_side], _evadeNum[o_side]);
             }
             else if( bDamage)
             {
@@ -3344,10 +3447,12 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
             if((defList[i].damType2 & 0x80) == 0x80)
             {
                 _fjNum[o_side] ++ ;
+                /*
                 if(_fjNum [o_side] == 3)
                     _fj3ok[o_side] = true;
                 if(_fjNum[o_side] == 9)
-                    _fj9ok[o_side] = true;
+                    _fj9ok[o_side] = true;*/
+                _maxFJ[o_side] = std::max( _maxFJ[o_side] ,  _fjNum[o_side]);
             }
             else if(bDamage)
             {

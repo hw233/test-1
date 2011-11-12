@@ -87,6 +87,9 @@ public:
 #define LOGIN()			SERVE().GetLogin()
 
 #define CURRENT_THREAD_ID() WorkerThread<WorkerRunner<> >::LocalWorker().GetThreadID()
-
+inline  bool  IsMainThread()
+{
+    return Thread::current() == 0;
+}
 #endif
 

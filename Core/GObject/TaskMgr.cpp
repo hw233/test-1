@@ -330,6 +330,30 @@ namespace GObject
 		return false;
 	}
 
+    void TaskMgr::CheckTaskAttainment(UInt32 taskId,  const GData::TaskType* taskType)
+    {
+        if(NULL == taskType )
+        {
+            taskType = &(GData::GDataManager::GetTaskTypeData(taskId));
+
+        }
+        GameAction()->doAttainment(m_PlayerOwner,  Script::SUBMIT_SPECIAL_TASK, taskId);
+        GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_TASKS,   1);
+
+        if(taskType->m_Class == 4)
+        {//¿¿
+            GameAction()->doAttainment(m_PlayerOwner,  Script::SUBMIT_SHIMEN_TASKS,   1);
+        }
+        else if(taskType->m_Class == 5)
+        {//¿¿
+            GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_YAMEN_TASKS,   1);
+        }
+        else if(taskType->m_Class == 6)
+        {//¿¿
+            GameAction()->doAttainment(m_PlayerOwner,  Script:: SUBMIT_CLAN_TASKS,   1);
+        }
+	
+    }
 	bool TaskMgr::SubmitTask(UInt32 taskId)
 	{
   		task_iterator it;
@@ -352,8 +376,10 @@ namespace GObject
         {
             m_TaskSubmitedList[taskId] = TimeUtil::Now();
             DB5().PushUpdateData("UPDATE `task_instance`  SET `submit` = 1,`timeEnd` = %u WHERE `taskId` = %d AND `ownerId` = %"I64_FMT"u", m_TaskSubmitedList[taskId], it->second->m_TaskId, it->second->m_OwnerId);
+        
         }
-		SAFE_DELETE(it->second);
+        CheckTaskAttainment(taskId,& taskType);
+    	SAFE_DELETE(it->second);
 		m_TaskCompletedList.erase(it);
 		CheckCanAcceptTaskByTask(taskId);
 		if(taskId < 111111 || taskId > 111200)
@@ -461,6 +487,14 @@ namespace GObject
         return false;
     }
 
+    bool TaskMgr::isClanTask(UInt32 taskid)
+    {
+        const TaskType& taskType= GDataManager::GetTaskTypeData(taskid);
+        if (taskType.m_Class == 6)
+            return true;
+        return false;
+
+    }
 	void TaskMgr::CheckCanAcceptTaskByLev(UInt16 lev, bool notify)
 	{
 		m_CanAcceptTaskList.clear();
@@ -663,9 +697,7 @@ namespace GObject
 				completedToken = true;
 				m_TaskCompletedList[it->first] = it->second;
 				m_TaskAcceptedList.erase(it);
-                //
-                GameAction()->doAttainment(this->m_PlayerOwner, 10305 , taskType.m_TypeId);
-
+                //GameAction()->doAttainment(this->m_PlayerOwner, 10305 , taskType.m_TypeId);
                 
 			}
 			if (notify)
@@ -1405,3 +1437,5 @@ namespace GObject
         return true;
     }
 }
+
+

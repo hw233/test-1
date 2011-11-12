@@ -1136,7 +1136,8 @@ CREATE TABLE `attainment` (
   `ownerId` bigint(20) unsigned NOT NULL,
   `attainId` smallint(5) unsigned NOT NULL,
   `status` int(10) unsigned NOT NULL,
-  `updatetime` int(10) unsigned NOT NULL
+  `updatetime` int(10) unsigned NOT NULL,
+   PRIMARY KEY (`ownerId`,`attainId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

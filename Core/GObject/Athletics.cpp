@@ -10,7 +10,7 @@
 #include "Package.h"
 #include "MsgID.h"
 #include "Script/BattleFormula.h"
-
+#include "MsgHandler/CountryMsgStruct.h"
 namespace GObject
 {
 
@@ -235,6 +235,11 @@ void Athletics::attack(Player * defer)
 		AthleticsResult ar = { id, 0, defer, res };
 		GameMsgHdr hdr(0x19D, WORKER_THREAD_WORLD, _owner, sizeof(AthleticsResult));
 		GLOBAL().PushMsg(hdr, &ar);
+
+        //in same thread
+        Player* winner =  res ? _owner : defer;
+
+        GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
 		return;
 	}
 	struct AthleticsBeData
@@ -295,6 +300,21 @@ void Athletics::beAttack(Player * atker, UInt8 formation, UInt16 portrait, Lineu
 	AthleticsResNotify notify = { _owner, res };
 	GameMsgHdr hdr2(0x220, atker->getThreadId(), atker, sizeof(AthleticsResNotify));
 	GLOBAL().PushMsg(hdr2, &notify);
+
+    if( !res)
+    {
+        //owner win
+        GameAction()->doAttainment(_owner,  Script::ATHLETICS_WIN , 1);
+    }
+    else
+    {
+        //in other thread
+        stAttainMsg  msg;
+        msg.attainID = Script:: ATHLETICS_WIN ;
+        msg.param = 1;
+        GameMsgHdr h(0x1FF,   atker->getThreadId(), atker, sizeof(msg));
+        GLOBAL().PushMsg(h, & msg);
+    }
 
 }
 
@@ -521,6 +541,14 @@ void Athletics::attackMartial(Player* defer)
         UInt32 time = TimeUtil::Now();
 		id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
 		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
+
+        
+       
+        Player* winner =  res ? _owner : defer;
+
+        GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
+
+       
     }while(false);
 
 	AthleticsResult ar = {id, 0, defer, res };
@@ -573,6 +601,23 @@ void Athletics::beAttackMartial(Player * atker, UInt8 formation, UInt16 portrait
 	AthleticsResNotify notify = { _owner, res };
 	GameMsgHdr hdr2(0x235, atker->getThreadId(), atker, sizeof(AthleticsResNotify));
 	GLOBAL().PushMsg(hdr2, &notify);
+
+    if( !res)
+    {
+        //owner win
+        GameAction()->doAttainment(_owner,  Script::ATHLETICS_WIN , 1);
+    }
+    else
+    {
+        //in other thread
+        stAttainMsg  msg;
+        msg.attainID = Script:: ATHLETICS_WIN ;
+        msg.param = 1;
+        GameMsgHdr h(0x1FF,   atker->getThreadId(), atker, sizeof(msg));
+        GLOBAL().PushMsg(h, & msg);
+    }
+
+
 }
 
 void Athletics::awardMartial(Player* defer, bool win)
