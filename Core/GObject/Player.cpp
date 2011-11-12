@@ -5338,6 +5338,18 @@ namespace GObject
 		}
 	}
 
+    void Player::setHPPercent(UInt8 p)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			Lineup& pd = _playerData.lineup[i];
+			if(pd.fighter != NULL)
+			{
+                pd.fighter->addHPPercent(p);
+			}
+		}
+    }
+
 	UInt8 Player::trainFighter( UInt32 id, UInt8 type )
 	{
 #define ITEM_TRAIN_TYPE1 506         // 补髓丹(不带保护) 资质
