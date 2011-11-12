@@ -773,6 +773,10 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                 {
                     addSkillsFromCT(attr->skills, writedb);
                 }
+#if 0
+                if (1636 == trump->GetItemType().getId())
+                    _owner->sendSingleEnchant(trump->getItemEquipData().enchant);
+#endif
             }
 
             _attrDirty = true;

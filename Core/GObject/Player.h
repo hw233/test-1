@@ -1138,6 +1138,9 @@ namespace GObject
         TripodData& newTripodData();
         TripodData& runTripodData(TripodData& data, bool = false);
 
+    public:
+        void sendSingleEnchant(UInt8 enchant);
+
     private:
         bool m_hasTripod;
         TripodData m_td;

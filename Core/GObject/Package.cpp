@@ -727,6 +727,12 @@ namespace GObject
 		if(e == NULL)
 			++ m_Size;
 		e = equip;
+
+#if 0
+        if (1636 == equip->GetItemType().getId())
+            m_Owner->sendSingleEnchant(equip->getItemEquipData().enchant);
+#endif
+
 		return equip;
 	}
 

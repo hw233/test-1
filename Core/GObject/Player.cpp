@@ -6981,5 +6981,24 @@ namespace GObject
         return runTripodData(m_td);
     }
 
+    // XXX: 光棍节强化光棍补偿
+    void Player::sendSingleEnchant(UInt8 enchant)
+    {
+        if (enchant && enchant <= 10)
+        {
+            MailPackage::MailItem item[][1] = {
+                {{514, 1},},
+                {{514, 2},},
+                {{514, 3},},
+                {{514, 5},},
+                {{514, 10},},
+                {{515, 10},},
+                {{515, 20},},
+                {{515, 30},},
+            };   
+            sendMailItem(2205, 2206, item[enchant-1], 1);
+        }
+    }
+
 } // namespace GObject
 
