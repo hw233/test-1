@@ -291,6 +291,9 @@ struct DBEquipment
 	UInt32 id;
 	UInt32 itemId;
 	UInt8 enchant;
+    UInt8 tRank;
+    UInt8 maxTRank;
+    UInt32 trumpExp;
 	UInt8 attrType1;
 	Int16 attrValue1;
 	UInt8 attrType2;
@@ -1272,11 +1275,14 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBEquipment)
-SPECIALDEF(17)
+SPECIALDEF(20)
 (
 	UInt32, id,
 	UInt32, itemId,
 	UInt8, enchant,
+    UInt8, tRank,
+    UInt8, maxTRank,
+    UInt32, trumpExp,
 	UInt8, attrType1,
 	Int16, attrValue1,
 	UInt8, attrType2,

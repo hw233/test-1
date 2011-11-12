@@ -598,6 +598,13 @@ struct AthleticsRefreshMartialReq
 	MESSAGE_DEF(REQ::ATHLETICS_REFRESH_MARTIAL);
 };
 
+struct TrumpLOrderReq
+{
+    UInt16 _fgtId;
+    UInt32 _itemId;
+    MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -3302,5 +3309,77 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     GLOBAL().PushMsg(hdr2, NULL);
 }
 
+void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 res = 0;
+    UInt16 fgtId = 0;
+    UInt32 trumpId = 0;
+    UInt16 itemCnt = 0;
+    UInt32 amount = 0;
+
+	Package * pkg = player->GetPackage();
+
+    br >> fgtId >> trumpId >> itemCnt;
+	for(UInt16 i = 0; i < itemCnt; ++ i)
+	{
+		amount += GData::moneyNeed[GData::TRUMPUPGRADE].tael;
+
+		UInt32 itemId;
+		br >> itemId;
+
+		if(player->getTael() < amount)
+		{
+            res = 2;
+			player->sendMsgCode(0, 1100);
+            break;
+		}
+
+		res = pkg->TrumpUpgrade(fgtId, trumpId, itemId);
+        if(res == 2)
+        {
+            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
+            break;
+        }
+	}
+
+    ConsumeInfo ci(TrumpUpgrade,0,0);
+    player->useTael(amount, &ci);
+
+	Stream st(REP::EQ_TRUMP_UPGRADE);
+	st << res << fgtId << trumpId << Stream::eos;
+	player->send(st);
+}
+
+void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+
+    UInt8 res = 0;
+
+    UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
+    if(player->getTael() < amount)
+    {
+        player->sendMsgCode(0, 1100);
+        return;
+    }
+
+	Package * pkg = player->GetPackage();
+    res = pkg->TrumpLOrder(req._fgtId, req._itemId);
+    if(res != 2)
+    {
+        ConsumeInfo ci(TrumpLOrder,0,0);
+        player->useTael(amount, &ci);
+    }
+
+	Stream st(REP::EQ_TRUMP_L_ORDER);
+	st << res << req._fgtId << req._itemId << Stream::eos;
+	player->send(st);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

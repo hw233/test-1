@@ -421,7 +421,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBItemType idt;
-		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `data`, `enchant`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `name`, `subClass`, `career`, `reqLev`, `coin`, `quality`, `maxQuantity`, `bindType`, `energy`, `data`, `enchant`, `trumpExp`, `attrId` FROM `item_template`", idt) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -493,6 +493,7 @@ namespace GData
 			wt->maxQuantity = idt.maxQuantity;
 			wt->bindType = idt.bindType;
 			wt->energy = idt.energy;
+			wt->trumpExp = idt.trumpExp;
 			wt->data = idt.data;
             wt->career = idt.career;
 			itemBaseTypeManager.add(wt);
@@ -964,7 +965,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkillEffect effs;
-		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres` FROM `skill_effect`", effs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres` FROM `skill_effect`", effs) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -978,6 +979,8 @@ namespace GData
             ef->adddam = effs.adddam;
             SetValOrPercent(ef->magdam, ef->magdamP, effs.magdam);
             ef->addmag = effs.addmag;
+            SetValOrPercent(ef->crrdam, ef->crrdamP, effs.crrdam);
+            ef->addcrr = effs.addcrr;
             SetValOrPercent(ef->hp, ef->hpP, effs.hp);
             ef->addhp = effs.addhp;
             SetValOrPercent(ef->absorb, ef->absorbP, effs.absorb);
@@ -989,7 +992,7 @@ namespace GData
             SetValOrPercent(ef->magatk, ef->magatkP, effs.magatk);
             SetValOrPercent(ef->magdef, ef->magdefP, effs.magdef);
             ef->tough = effs.tough;
-            ef->action = effs.action;
+            SetValOrPercent(ef->action, ef->actionP, effs.action);
             ef->evade = effs.evade;
             ef->critical = effs.critical;
             ef->pierce = effs.pierce;

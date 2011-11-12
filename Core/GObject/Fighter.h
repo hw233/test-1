@@ -480,6 +480,7 @@ public:
     bool isGoldPractice() { return false; }
 
 	void addAttr( ItemEquip * );
+	void addTrumpAttr( ItemTrump * );
     void addAttr( const GData::CittaEffect* ce );
 protected:
 	void rebuildEquipAttr();
