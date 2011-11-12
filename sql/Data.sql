@@ -441,6 +441,8 @@ CREATE TABLE `skill_effect` (
   `adddam` float(10,4) NOT NULL DEFAULT '0.0000',
   `magdam` varchar(255) NOT NULL DEFAULT '',
   `addmag` float(10,4) NOT NULL DEFAULT '0.0000',
+  `crrdam` varchar(255) NOT NULL DEFAULT '',
+  `addcrr` float(10,4) NOT NULL DEFAULT '0.0000',
   `hp` varchar(255) NOT NULL DEFAULT '',
   `addhp` float(10,4) NOT NULL DEFAULT '0.0000',
   `absorb` varchar(255) NOT NULL DEFAULT '',

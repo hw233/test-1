@@ -79,7 +79,7 @@ namespace GObject
         static UInt32 getForgeCost() { return _forge_cost; }
         static UInt32 getSplitChance( UInt8 q, UInt8 l_h ) { return _split_chance[q][l_h]; }
         static UInt32 getMergeChance( UInt8 lvl ) { return _merge_chance[lvl]; }
-        static UInt32 getEnchantChance( UInt8 q, UInt8 lvl ) { return _enchant_chance[q][lvl]; }
+        static UInt32 getEnchantChance( UInt8 t, UInt8 q, UInt8 lvl ) { return _enchant_chance[t][q][lvl]; }
         static UInt8 getEnchantMax( UInt8 vip ) { return _enchant_max[vip]; }
         static UInt32 getSocketChance( UInt8 s ) { return _socket_chance[s]; }
         static UInt32 getMinPotential() { return _min_potential; }
@@ -180,7 +180,7 @@ namespace GObject
         static UInt32 _forge_cost;
         static UInt32 _split_chance[4][2];
         static UInt32 _merge_chance[9];
-		static UInt32 _enchant_chance[6][12];
+		static UInt32 _enchant_chance[2][6][12];
 		static UInt8  _enchant_max[11];
 		static UInt32 _trump_lorder_chance[6][12];
 		static UInt32 _trump_exp_rank[6][12];

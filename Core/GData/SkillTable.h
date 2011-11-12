@@ -58,6 +58,9 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     Int16 magdam;
     float magdamP;
     float addmag;
+    Int16 crrdam;
+    float crrdamP;
+    float addcrr;
     Int16 hp;
     float hpP;
     float addhp;

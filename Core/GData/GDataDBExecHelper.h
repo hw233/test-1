@@ -126,6 +126,8 @@ struct DBSkillEffect
     float adddam;       // 物理伤害附加(具体值)
     std::string magdam; // 法术伤害 num/num%
     float addmag;       // 法术伤害附加(具体值)
+    std::string crrdam; // 职业伤害 num/num%
+    float addcrr;       // 职业伤害附加(具体值)
     std::string hp;     // HP改变 [+/-]num/num%
     float addhp;        // HP改变附加(具体值)[+/-]
     std::string absorb; // 伤害吸血 num/num%
@@ -485,7 +487,7 @@ SPECIALDEF(10)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(26)
+SPECIALDEF(28)
     (
         UInt16, id,
         UInt8, state,
@@ -495,6 +497,8 @@ SPECIALDEF(26)
         float, adddam,
         std::string, magdam,
         float, addmag,
+        std::string, crrdam,
+        float, addcrr,
         std::string, hp,
         float, addhp,
         std::string, absorb,

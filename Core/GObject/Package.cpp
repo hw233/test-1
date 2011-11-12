@@ -1485,7 +1485,7 @@ namespace GObject
 		if(GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
             return 2;
 
-        UInt32 enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
+        UInt32 enchant = GObjectManager::getEnchantChance(type, quality, ied.enchant);
         if(enchant == 0)
             return 2;
 
@@ -1535,7 +1535,7 @@ namespace GObject
                     if(ied.enchant >= level)
                         break;
 
-                    enchant = GObjectManager::getEnchantChance(quality, ied.enchant);
+                    enchant = GObjectManager::getEnchantChance(type, quality, ied.enchant);
                     if(enchant == 0)
                         break;
                 }

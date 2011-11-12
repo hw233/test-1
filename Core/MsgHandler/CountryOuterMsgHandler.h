@@ -3333,6 +3333,7 @@ void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
 
 		if(player->getTael() < amount)
 		{
+            res = 2;
 			player->sendMsgCode(0, 1100);
             break;
 		}
@@ -3361,11 +3362,17 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 
     UInt8 res = 0;
 
+    UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
+    if(player->getTael() < amount)
+    {
+        player->sendMsgCode(0, 1100);
+        return;
+    }
+
 	Package * pkg = player->GetPackage();
     res = pkg->TrumpLOrder(req._fgtId, req._itemId);
     if(res != 2)
     {
-        UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
         ConsumeInfo ci(TrumpLOrder,0,0);
         player->useTael(amount, &ci);
     }
