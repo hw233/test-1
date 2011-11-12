@@ -113,6 +113,7 @@ private:
     void OnCiTaskHI(GObject::Player *player, std::vector<std::string>&);
     void OnRestartHI(GObject::Player *player, std::vector<std::string>&);
     void OnAwardHI(GObject::Player *player, std::vector<std::string>&);
+    void OnUseSkillHI(GObject::Player *player, std::vector<std::string>&);
     void OnAppearBoss(GObject::Player *player, std::vector<std::string>&);
 };
 
