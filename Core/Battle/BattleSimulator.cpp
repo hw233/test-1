@@ -891,25 +891,42 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     UInt8 state[3] = {0};
     UInt8 cnt = 0;
     UInt8 state_idx = 0;
-    state[0] = skill->effect->state;
-    if(skill->effect->state & 0xe)
+    UInt8 effect_state = skill->effect->state;
+    if(SKILL_ID(skill->getId()) == 136) // 光棍
     {
-        if(skill->effect->state & 0x2)
+        switch(bf->getClass())
+        {
+        case 1:
+            effect_state = 0x02;
+            break;
+        case 2:
+            return;
+        case 3:
+            effect_state = 0x04;
+            break;
+        }
+    }
+
+    state[0] = effect_state;
+    if(effect_state & 0xe)
+    {
+        if(effect_state & 0x2)
         {
             state[cnt] = 0x2;
             ++cnt;
         }
-        if(skill->effect->state & 0x4)
+        if(effect_state & 0x4)
         {
             state[cnt] = 0x4;
             ++cnt;
         }
-        if(skill->effect->state & 0x8)
+        if(effect_state & 0x8)
         {
             state[cnt] = 0x8;
             ++cnt;
         }
-        state_idx = _rnd(cnt);
+        if(cnt > 1)
+            state_idx = _rnd(cnt);
     }
 
     BattleFighter* target_bo = static_cast<BattleFighter*>(bo);
@@ -1982,6 +1999,9 @@ void BattleSimulator::doSkillStatus(BattleFighter* bf, const GData::SkillBase* s
 
     if(skill->effect->auraP || skill->effect->aura)
     {
+        if(SKILL_ID(skill->getId()) == 136 && bf->getClass() != 2) // 光棍
+            return;
+
         float rate = skill->prob * 100;
         if(rate > _rnd(10000))
         {
