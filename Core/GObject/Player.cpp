@@ -775,11 +775,16 @@ namespace GObject
             char* pbuf = &buf[0];
             pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u|",
                     cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum);
-            if (platform)
-                snprintf(pbuf, pbuf - buf, "|%u|", platform);
 
             m_ulog->SetUserMsg(buf);
-            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
+
+            if (platform)
+            {
+                snprintf(pbuf, pbuf - buf, "|%u|", platform);
+                m_ulog->SetUserMsg(buf);
+                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+            }
             TRACE_LOG("%s", buf);
         }
     }
@@ -5332,6 +5337,18 @@ namespace GObject
 			}
 		}
 	}
+
+    void Player::setHPPercent(UInt8 p)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			Lineup& pd = _playerData.lineup[i];
+			if(pd.fighter != NULL)
+			{
+                pd.fighter->addHPPercent(p);
+			}
+		}
+    }
 
 	UInt8 Player::trainFighter( UInt32 id, UInt8 type )
 	{

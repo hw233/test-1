@@ -172,7 +172,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 				DB1().PushUpdateData("DELETE FROM `locked_player` WHERE `player_id` = %"I64_FMT"u", pid);
 			}
 			else
-				return 3;
+				return 6;
 		}
 	}
 	UInt32 sid = player->GetSessionID();
@@ -224,13 +224,24 @@ void UserReconnectReq(LoginMsgHdr& hdr, UserReconnectStruct& ur)
 
 	Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 	GObject::Player * player = NULL;
-	if(doLogin(cl, ur._userid, hdr.sessionID, player, false, true) != 0)
+    UInt8 res = doLogin(cl, ur._userid, hdr.sessionID, player, false, true);
+    if (res == 6)
+    {
+		UserLogonRepStruct rep;
+		rep._result = 6;
+		NETWORK()->SendMsgToClient(conn.get(), rep);
+		conn->pendClose();
+        return;
+    }
+
+	if(res != 0)
 	{
 		Stream st(REP::RECONNECT);
 		st << static_cast<UInt8>(1) << Stream::eos;
 		cl->send(&st[0], st.size());
 		return;
 	}
+
 	GameMsgHdr imh(0x202, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
 }
@@ -336,7 +347,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		rep._result = res;
 		NETWORK()->SendMsgToClient(conn.get(), rep);
 	}
-	if(res == 2 || res == 3)
+	if(res == 2 || res == 3 || res == 6)
 		conn->pendClose();
 }
 

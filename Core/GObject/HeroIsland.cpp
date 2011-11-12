@@ -1094,7 +1094,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             if (cfg.GMCheck)
                 pd->injuredcd = now + 10;
             else
-                pd->injuredcd = now + 40;
+                pd->injuredcd = now + 10;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
             moveTo(pd->player, 0, false);
         }
@@ -1148,7 +1148,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             if (cfg.GMCheck)
                 pd1->injuredcd = now + 10;
             else
-                pd1->injuredcd = now + 40;
+                pd1->injuredcd = now + 10;
             pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd, false);
 
             if (_running)
@@ -1188,7 +1188,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             if (cfg.GMCheck)
                 pd->injuredcd = now + 10;
             else
-                pd->injuredcd = now + 40;
+                pd->injuredcd = now + 10;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
 
             moveTo(pd->player, 0, false);

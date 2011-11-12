@@ -737,6 +737,7 @@ namespace GObject
 
 		void autoRegenAll();
 		void regenAll(bool = false);
+        void setHPPercent(UInt8 p);
 
         UInt32 getClientAddress();
 		bool setNewGuildTaskStep(UInt32);
