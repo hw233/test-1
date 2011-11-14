@@ -735,6 +735,10 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
     {
         ItemEquip* t = 0;
         t = GObjectManager::fetchEquipment(trump);
+#if 1
+        if (t && 1636 == t->GetItemType().getId())
+            _owner->sendSingleEnchant(t->getItemEquipData().enchant);
+#endif
         return setTrump(t, idx, writedb);
     }
     return 0;
@@ -778,10 +782,6 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                 {
                     addSkillsFromCT(attr->skills, writedb);
                 }
-#if 0
-                if (1636 == trump->GetItemType().getId())
-                    _owner->sendSingleEnchant(trump->getItemEquipData().enchant);
-#endif
             }
 
             _attrDirty = true;

@@ -1018,6 +1018,8 @@ namespace GObject
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
+                if (!mitem[i].id)
+                    continue;
                 strItems += Itoa(mitem[i].id);
                 strItems += ",";
                 strItems += Itoa(mitem[i].count);
@@ -1154,7 +1156,6 @@ namespace GObject
             }
         }
 
-        //heroIsland.playerLeave(this);
         dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
@@ -3562,7 +3563,10 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
+        {
             heroIsland.playerLeave(this);
+            delFlag(Player::InHeroIsland);
+        }
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
@@ -6986,17 +6990,17 @@ namespace GObject
     {
         if (enchant && enchant <= 10)
         {
-            MailPackage::MailItem item[][1] = {
-                {{514, 1},},
-                {{514, 2},},
-                {{514, 3},},
-                {{514, 5},},
-                {{514, 10},},
-                {{515, 10},},
-                {{515, 20},},
-                {{515, 30},},
-            };   
-            sendMailItem(2205, 2206, item[enchant-1], 1);
+            MailPackage::MailItem item[][3] = {
+                {{514, 1}, {507, 5},{509, 5}},
+                {{514, 2}, {507, 5},{509, 5}},
+                {{514, 3}, {507, 5},{509, 5}},
+                {{514, 5}, {507, 5},{509, 5}},
+                {{514, 10},{507, 5},{509, 5}},
+                {{515, 10},{507, 5},{509, 5}},
+                {{515, 20},{507, 5},{509, 5}},
+                {{515, 30},{507, 5},{509, 5}},
+            };
+            sendMailItem(2205, 2206, item[enchant-1], 3);
         }
     }
 
