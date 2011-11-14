@@ -1688,10 +1688,6 @@ namespace GObject
 		}
 		lc.finalize();
 
-#if 0
-        sleep(120);
-#endif
-
 		lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;
