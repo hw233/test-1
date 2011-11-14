@@ -593,11 +593,13 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			}
 			ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 			ea2.appendAttrToStream(st);
-
+//TODO
+#if 0
             if(equip->getClass() == Item_Trump)
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
+#endif
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -1124,7 +1126,8 @@ void Fighter::rebuildEquipAttr()
             }
         }
     }
-
+    //TODO
+#if 0 
     for(int i = 0; i < getMaxTrumps(); ++i)
     {
 		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
@@ -1133,6 +1136,7 @@ void Fighter::rebuildEquipAttr()
             addTrumpAttr(trump);
         }
     }
+#endif
 
     // 帮派秘术对额外属性的加成
     Clan* clan = _owner == NULL ? NULL : _owner->getClan();
