@@ -1121,12 +1121,18 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
+    bool hasActiveTrump = false;
     for(int i = 0; i < getMaxTrumps(); ++i)
     {
 		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
+
 		if(trump != NULL)
         {
-            addTrumpAttr(trump);
+            if(!hasActiveTrump)
+                addTrumpAttr(trump);
+
+            if(trump->getId() >= 1600)
+                hasActiveTrump = true;
         }
     }
 
