@@ -2892,6 +2892,9 @@ namespace GObject
 
 		const GData::ItemBaseType& ibt = item->GetItemType();
         UInt32 exp = ibt.trumpExp + ied_item.trumpExp * 0.5;
+        if(exp == 0)
+            return 2;
+
         if(!DelEquip(itemId, ToTrumpUpgrade))
             return 2;
 
