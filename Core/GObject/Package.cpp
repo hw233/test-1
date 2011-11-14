@@ -1421,13 +1421,11 @@ namespace GObject
 		}
 		ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 		ea2.appendAttrToStream(st);
-//TODO
-#if 0
+
         if(equip->getClass() == Item_Trump)
         {
             st << ied.maxTRank << ied.trumpExp;
         }
-#endif
 	}
 
 	void Package::AppendItemData( Stream& st, ItemBase * item )
@@ -2708,13 +2706,21 @@ namespace GObject
 
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values, equip_t);
 
-        float v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr) * 90;
+        float v0 = 0;
+        if(equip_t == 0)
+            v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
+        else
+            v0 = GObjectManager::getTrumpAttrMax(lv, types[0]-1, q, crr)*90;
         if ((float)values[0] > v0 && !(protect & 1))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
 
-        float v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr) * 90;
+        float v1 = 0;
+        if(equip_t == 0)
+            v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*90;
+        else
+            v1 = GObjectManager::getTrumpAttrMax(lv, types[1]-1, q, crr)*90;
         if ((float)values[1] > v1 && !(protect & 2))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());

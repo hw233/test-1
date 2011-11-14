@@ -3311,7 +3311,6 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
 
 void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
 {
-    return;//TODO
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
@@ -3359,7 +3358,6 @@ void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
 
 void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 {
-    return;//TODO
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
