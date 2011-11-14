@@ -1018,8 +1018,6 @@ namespace GObject
             std::string strItems;
             for (UInt32 i = 0; i < size; ++i)
             {
-                if (!mitem[i].id)
-                    continue;
                 strItems += Itoa(mitem[i].id);
                 strItems += ",";
                 strItems += Itoa(mitem[i].count);
@@ -6990,16 +6988,17 @@ namespace GObject
     {
         if (enchant && enchant <= 10)
         {
-            MailPackage::MailItem item[][3] = {
-                {{514, 1}, {507, 5},{509, 5}},
-                {{514, 2}, {507, 5},{509, 5}},
-                {{514, 3}, {507, 5},{509, 5}},
-                {{514, 5}, {507, 5},{509, 5}},
-                {{514, 10},{507, 5},{509, 5}},
-                {{515, 10},{507, 5},{509, 5}},
-                {{515, 20},{507, 5},{509, 5}},
-                {{515, 30},{507, 5},{509, 5}},
-            };
+            MailPackage::MailItem item1[3] = {{514, 1}, {507, 5},{509, 5}};
+            MailPackage::MailItem item2[3] = {{514, 2}, {507, 5},{509, 5}};
+            MailPackage::MailItem item3[3] = {{514, 3}, {507, 5},{509, 5}};
+            MailPackage::MailItem item4[3] = {{514, 5}, {507, 5},{509, 5}};
+            MailPackage::MailItem item5[3] = {{514, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item6[3] = {{515, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item7[3] = {{515, 20},{507, 5},{509, 5}};
+            MailPackage::MailItem item8[3] = {{515, 30},{507, 5},{509, 5}};
+
+            MailPackage::MailItem* item[8] = {item1,item2,item3,item4,item5,item6,item7,item8};
+
             sendMailItem(2205, 2206, item[enchant-1], 3);
         }
     }

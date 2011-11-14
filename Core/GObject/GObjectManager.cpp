@@ -1426,48 +1426,6 @@ namespace GObject
 		}
 		lc.finalize();
 
-		lc.prepare("Loading mail package:");
-		last_id = 0xFFFFFFFFFFFFFFFFull;
-		pl = NULL;
-		DBMailPackageData mpdata;
-		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
-			return false;
-		lc.reset(50);
-		UInt32 last_pid = 0xFFFFFFFF;
-		MailPackage * mp = NULL;
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			if(mpdata.id != last_pid)
-			{
-				last_pid = mpdata.id;
-				mp = mailPackageManager.add(last_pid);
-			}
-			mp->push(mpdata.itemId, mpdata.itemCount);
-		}
-		lc.finalize();
-
-		lc.prepare("Loading mails:");
-		last_id = 0xFFFFFFFFFFFFFFFFull;
-		pl = NULL;
-		DBMailData mdata;
-		if(execu->Prepare("SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` ORDER BY `playerId`, `mailId`", mdata) != DB::DB_OK)
-			return false;
-		lc.reset(500);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			if(mdata.playerId != last_id)
-			{
-				last_id = mdata.playerId;
-				pl = globalPlayers[last_id];
-			}
-			if(pl == NULL)
-				continue;
-			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
-		}
-		lc.finalize();
-
 		lc.prepare("Loading boss data:");
 		DBBossHP bosshp;
 		if(execu->Prepare("SELECT `id`, `level`, `pos`, `hp` FROM `boss`", bosshp) != DB::DB_OK)
@@ -1727,6 +1685,50 @@ namespace GObject
 			attain->status = dadata.status;
 			attain->updatetime = dadata.updatetime;
 			pl->GetAttainMgr()->LoadAttain(attain);
+		}
+		lc.finalize();
+
+#if 0
+        sleep(120);
+#endif
+
+		lc.prepare("Loading mail package:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		DBMailPackageData mpdata;
+		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
+			return false;
+		lc.reset(50);
+		UInt32 last_pid = 0xFFFFFFFF;
+		MailPackage * mp = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(mpdata.id != last_pid)
+			{
+				last_pid = mpdata.id;
+				mp = mailPackageManager.add(last_pid);
+			}
+			mp->push(mpdata.itemId, mpdata.itemCount);
+		}
+		lc.finalize();
+
+		lc.prepare("Loading mails:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		DBMailData mdata;
+		if(execu->Prepare("SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` ORDER BY `playerId`, `mailId`", mdata) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(mdata.playerId != last_id)
+			{
+				last_id = mdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
 		lc.finalize();
 		/////////////////////////////////

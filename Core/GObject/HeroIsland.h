@@ -91,8 +91,8 @@ struct HIPlayerData
         fightcd = 0;
         injuredcd = 0;
         expcd = 0;
-        attrcd = static_cast<UInt32>(-1);
-        bufid = DEFAULT_BUFID;
+        //attrcd = static_cast<UInt32>(-1);
+        //bufid = DEFAULT_BUFID;
         attr = NULL;
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
@@ -183,7 +183,7 @@ public:
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
     bool enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd = true);
     HIPlayerData* leave(Player* player, UInt8 spot);
-    HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt8 pos);
+    HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt16 pos);
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
@@ -195,8 +195,8 @@ public:
     void playerEnter(Player* player);
     void playerLeave(Player* player);
 
-    HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt8& pos);
-    HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt8& pos);
+    HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt16& pos);
+    HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt16& pos);
     RareAnimals& findRareAnimal(UInt32 id, UInt8 spot);
 
     void startCompass(Player* player);

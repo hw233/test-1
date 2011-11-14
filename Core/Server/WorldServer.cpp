@@ -168,8 +168,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 	GData::GDataManager::LoadAllData();
 	GObject::GObjectManager::InitGlobalObject();
-	GObject::GObjectManager::InitIDGen();	    //将各表的最大ID值存入缓存
 	GObject::GObjectManager::loadAllData();
+	GObject::GObjectManager::InitIDGen();	    //将各表的最大ID值存入缓存
 
 	return true;
 }

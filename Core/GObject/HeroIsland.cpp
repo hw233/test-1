@@ -357,6 +357,8 @@ void HeroIsland::reset()
             HIPlayerData* pd = _players[i][j];
             if (pd && pd->player)
                 pd->reset(false);
+            //clearBuff(1, pd, 0);
+            //clearBuff(2, pd, 0);
         }
     }
     _sorts.clear();
@@ -646,7 +648,7 @@ UInt8 HeroIsland::getIdentity(Player* player, bool rand)
     return type;
 }
 
-HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8& spot, UInt8& pos)
+HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8& spot, UInt16& pos)
 {
     if (!player || (spot > HERO_ISLAND_SPOTS && spot != 0xFF))
         return NULL;
@@ -681,7 +683,7 @@ HIPlayerData* HeroIsland::findPlayer(Player* player, UInt8& spot, UInt8& pos)
     return NULL;
 }
 
-HIPlayerData* HeroIsland::findPlayer(UInt64 id, UInt8& spot, UInt8& pos)
+HIPlayerData* HeroIsland::findPlayer(UInt64 id, UInt8& spot, UInt16& pos)
 {
     if (!id || (spot > HERO_ISLAND_SPOTS && spot != 0xFF))
         return NULL;
@@ -741,7 +743,7 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     if (player->getThreadId() != COUNTRY_NEUTRAL)
         return false;
 
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     UInt8 rspot = 0xFF; //spot;
     HIPlayerData* pd = findPlayer(player, rspot, pos);
     if (pd)
@@ -962,18 +964,26 @@ HIPlayerData* HeroIsland::leave(Player* player, UInt8 spot)
         return NULL;
 
     UInt8 rspot = spot;
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, rspot, pos);
     if (!pd) return NULL;
     return leave(pd, rspot, pos);
 }
 
-HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt8 pos)
+HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt16 pos)
 {
     if (!pd || spot > HERO_ISLAND_SPOTS || pos > _players[spot].size())
         return NULL;
 
-    _players[spot].erase(_players[spot].begin()+pos);
+    std::vector<HIPlayerData*>::iterator it = _players[spot].begin();
+    std::advance(it, pos);
+    if (it != _players[spot].end())
+        _players[spot].erase(it);
+    else
+    {
+        INFO_LOG("LEAVEERROR: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", pd->player->getId(), pd->player->getName().c_str(), spot, pos);
+        return NULL;
+    }
 
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
@@ -989,7 +999,7 @@ void HeroIsland::listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pag
     if (!player)
         return;
 
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (pd)
         sendPlayers(pd, spot, start, pagesize);
@@ -1004,7 +1014,7 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
         return false;
 
     UInt8 spot = 0xFF; // player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return false;
 
@@ -1046,7 +1056,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     }
 
     UInt8 spot = player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return false;
 
@@ -1109,7 +1119,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
 
         UInt8 spot = pd->spot;
-        UInt8 pos = 0;
+        UInt16 pos = 0;
         HIPlayerData* pd1 = findPlayer(id, spot, pos);
         if (!pd1)
         {
@@ -1208,7 +1218,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid)
         return false;
 
     UInt8 spot = player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return false;
     if (pd->spot)
@@ -1318,7 +1328,7 @@ void HeroIsland::playerInfo(Player* player)
         return;
 
     UInt8 spot = 0xFF; // player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     UInt8 in = 0;
     UInt8 type = 0;
 
@@ -1429,7 +1439,7 @@ void HeroIsland::playerLeave(Player* player)
         return;
 
     UInt8 spot = 0xFF;
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return;
 
@@ -1535,7 +1545,7 @@ void HeroIsland::startCompass(Player* player)
     }
 
     UInt8 spot = player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
@@ -1576,7 +1586,7 @@ void HeroIsland::commitCompass(Player* player)
         return;
 
     UInt8 spot = player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return;
@@ -1655,7 +1665,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
         return false;
 
     UInt8 spot = player->getHISpot();
-    UInt8 pos = 0;
+    UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd)
         return false;
