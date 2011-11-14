@@ -35,9 +35,9 @@ struct DBItemType
 	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
 	UInt16		energy;         // 九仪鼎值
+    UInt16      trumpExp;       // 法宝经验
 	UInt16		data;           // 可使用道具: 作用数值
     UInt16      enchant;        // 附魔类型
-    UInt16      trumpExp;       // 法宝经验
 	UInt32		attrExtra;      // 属性附加
 };
 
@@ -341,9 +341,9 @@ SPECIALDEF(14)
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
 	UInt16,		energy,
+    UInt16,     trumpExp,
 	UInt16,		data,
 	UInt16,		enchant,
-    UInt16,     trumpExp,
 	UInt32,		attrExtra
 	)
 SPECIALEND()

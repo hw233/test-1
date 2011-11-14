@@ -3326,21 +3326,23 @@ void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
     br >> fgtId >> trumpId >> itemCnt;
 	for(UInt16 i = 0; i < itemCnt; ++ i)
 	{
-		amount += GData::moneyNeed[GData::TRUMPUPGRADE].tael;
 
 		UInt32 itemId;
 		br >> itemId;
 
+        amount += GData::moneyNeed[GData::TRUMPUPGRADE].tael;
 		if(player->getTael() < amount)
 		{
-            res = 2;
-			player->sendMsgCode(0, 1100);
+            res = 3;
+            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
             break;
 		}
 
 		res = pkg->TrumpUpgrade(fgtId, trumpId, itemId);
         if(res == 2)
         {
+            if( i > 0 )
+                res = 0;
             amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
             break;
         }
