@@ -747,7 +747,7 @@ namespace GObject
 			++ m_Size;
 		e = equip;
 
-#if 1
+#if 0
         if (1636 == equip->GetItemType().getId())
             m_Owner->sendSingleEnchant(equip->getItemEquipData().enchant);
 #endif

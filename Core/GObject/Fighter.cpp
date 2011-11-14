@@ -735,7 +735,7 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
     {
         ItemEquip* t = 0;
         t = GObjectManager::fetchEquipment(trump);
-#if 1
+#if 0
         if (t && 1636 == t->GetItemType().getId())
             _owner->sendSingleEnchant(t->getItemEquipData().enchant);
 #endif
