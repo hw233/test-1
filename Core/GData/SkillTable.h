@@ -45,7 +45,7 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
         damage(0), damageP(0), adddam(0), magdam(0), magdamP(0), addmag(0),
         hp(0), hpP(0), addhp(0), absorb(0), absorbP(0), thorn(0), thornP(0),inj2hp(0), inj2hpP(0),
         aura(0), auraP(0), atk(0), atkP(0), def(0), defP(0), magatk(0),
-        magatkP(0), magdef(0), magdefP(0), tough(0), action(0), hitrate(0), evade(0),
+        magatkP(0), magdef(0), magdefP(0), tough(0), action(0), actionP(0), hitrate(0), evade(0),
         critical(0), pierce(0), counter(0), magres(0) {}
     ~SkillEffect() {}
 
@@ -58,6 +58,9 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     Int16 magdam;
     float magdamP;
     float addmag;
+    Int16 crrdam;
+    float crrdamP;
+    float addcrr;
     Int16 hp;
     float hpP;
     float addhp;
@@ -79,6 +82,7 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float magdefP;
     float tough;
     float action;
+    float actionP;
     float hitrate;
     float evade;
     float critical;

@@ -21,7 +21,6 @@
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
 #include "Script/BattleFormula.h"
-#include "GObject/Tripod.h"
 #include "GObject/Clan.h"
 #include "GObject/DCLogger.h"
 
@@ -93,7 +92,7 @@ void PlayerLogin( GameMsgHdr& hdr, const void * data )
 	struct in_addr ip;
 	ip.s_addr=htonl(player->getClientAddress());
 	DBLOG1().PushUpdateData("insert into login_states (server_id,player_id,login_time,login_ip) values(%u, %"I64_FMT"u, %u, '%s')", cfg.serverLogId, player->getId(), TimeUtil::Now(), inet_ntoa(ip));
-    tripod.getTripodData(player); // XXX: 完家登陆之后如果没有九疑鼎数据则新建
+    player->sendTripodInfo();
 }
 
 void OnBroadcast( GameMsgHdr& hdr, const void * data )
@@ -515,7 +514,7 @@ void OnConfirmTradeNotify( GameMsgHdr& hdr, const void * data )
 				{
                     std::string tbn("item_courses");
                     DBLOG().GetMultiDBName(tbn);
-					DBLOG().PushUpdateData("insert into `%S`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
+					DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, player->getId(), (*it)->getId(), (*it)->Count(), FromTrade, now);
 				}
             }
         }
@@ -601,6 +600,9 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
 
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
+
+    player->buildClanTask();
+    player->clearFinishCount();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -758,6 +760,9 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         snprintf(gold, 32, "%u", recharge->gold);
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
         player->udpLog(nno, recharge->money, gold, id, "", "", "pay");
+
+        UInt32 mny = atoi(recharge->money);
+        dclogger.fee(player, 0, mny);
     }
     else
     {
@@ -797,6 +802,8 @@ void OnYDPacks( GameMsgHdr& hdr, const void * data )
     else
     {
         GameAction()->onGetVipPack(player, type);
+        UInt8 cnt = player->GetVar(type+VAR_KEYPACK1-1);
+        player->SetVar(type+VAR_KEYPACK1-1, cnt+1);
     }
 }
 

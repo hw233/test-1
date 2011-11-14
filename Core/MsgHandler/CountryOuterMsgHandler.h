@@ -36,12 +36,12 @@
 #include "Server/SysMsg.h"
 #include "Battle/BattleSimulator.h"
 #include "GMHandler.h"
-#include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GData/Money.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/Var.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -598,6 +598,13 @@ struct AthleticsRefreshMartialReq
 	MESSAGE_DEF(REQ::ATHLETICS_REFRESH_MARTIAL);
 };
 
+struct TrumpLOrderReq
+{
+    UInt16 _fgtId;
+    UInt32 _itemId;
+    MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -657,7 +664,7 @@ void OnDestroyItemReq( GameMsgHdr& hdr, const void * buffer )
 		bool  bindType = *reinterpret_cast<const bool*>(data+offset+4);
 		UInt16 itemNum = *reinterpret_cast<const UInt16*>(data+offset+4+1);
 		offset += 7;
-        tripod.addItem(pl, itemId, itemNum, bindType);
+        pl->addItem(itemId, itemNum, bindType);
 	}
 	SYSMSG_SEND(115, pl);
 	SYSMSG_SEND(1015, pl);
@@ -672,7 +679,7 @@ void OnTripodReq( GameMsgHdr& hdr, const void* data )
     br >> type;
     if (type == 0)
     {
-        tripod.getTripodInfo(player);
+        player->sendTripodInfo();
     }
     else if (type == 1)
     {
@@ -685,11 +692,11 @@ void OnTripodReq( GameMsgHdr& hdr, const void* data )
         br >> id1;
         br >> id2;
 
-        tripod.makeFire(player, id1, id2);
+        player->makeFire(id1, id2);
     }
     else if (type == 2)
     {
-        tripod.getAward(player);
+        player->getAward();
     }
 }
 
@@ -2440,6 +2447,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	if(price == 0 || price == 0xFFFFFFFF)
 	{
 		st << static_cast<UInt8>(3);
+        GData::store.sendList(lr._type, player);
 	}
 	else
 	{
@@ -2735,6 +2743,17 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
 
     key.player = player;
     snprintf(key.key, sizeof(key.key), "%s", ydar.key.c_str());
+
+    UInt8 type = 0;
+    if (isdigit(key.key[0]) && key.key[1] == '-')
+        type = key.key[0] - '0';
+
+    if (type && !GameAction()->testTakePack(type, player->GetVar(VAR_KEYPACK1+type-1)))
+    {
+		player->sendMsgCode(1, 1018);
+        return;
+    }
+
 	LoginMsgHdr hdr1(0x300, WORKER_THREAD_LOGIN, 0, player->GetSessionID(), sizeof(key));
 	GLOBAL().PushMsg(hdr1, &key);
 }
@@ -3193,6 +3212,9 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
     UInt8 type;
     brd >> type;
 
+    if (PLAYER_DATA(player,location) != 8977)
+        return;
+
     switch (type)
     {
         case 0:
@@ -3287,5 +3309,79 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     GLOBAL().PushMsg(hdr2, NULL);
 }
 
+void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 res = 0;
+    UInt16 fgtId = 0;
+    UInt32 trumpId = 0;
+    UInt16 itemCnt = 0;
+    UInt32 amount = 0;
+
+	Package * pkg = player->GetPackage();
+
+    br >> fgtId >> trumpId >> itemCnt;
+	for(UInt16 i = 0; i < itemCnt; ++ i)
+	{
+
+		UInt32 itemId;
+		br >> itemId;
+
+        amount += GData::moneyNeed[GData::TRUMPUPGRADE].tael;
+		if(player->getTael() < amount)
+		{
+            res = 3;
+            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
+            break;
+		}
+
+		res = pkg->TrumpUpgrade(fgtId, trumpId, itemId);
+        if(res == 2)
+        {
+            if( i > 0 )
+                res = 0;
+            amount -= GData::moneyNeed[GData::TRUMPUPGRADE].tael;
+            break;
+        }
+	}
+
+    ConsumeInfo ci(TrumpUpgrade,0,0);
+    player->useTael(amount, &ci);
+
+	Stream st(REP::EQ_TRUMP_UPGRADE);
+	st << res << fgtId << trumpId << Stream::eos;
+	player->send(st);
+}
+
+void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+
+    UInt8 res = 0;
+
+    UInt32 amount = GData::moneyNeed[GData::TRUMPLORDER].tael;
+    if(player->getTael() < amount)
+    {
+        player->sendMsgCode(0, 1100);
+        return;
+    }
+
+	Package * pkg = player->GetPackage();
+    res = pkg->TrumpLOrder(req._fgtId, req._itemId);
+    if(res != 2)
+    {
+        ConsumeInfo ci(TrumpLOrder,0,0);
+        player->useTael(amount, &ci);
+    }
+
+	Stream st(REP::EQ_TRUMP_L_ORDER);
+	st << res << req._fgtId << req._itemId << Stream::eos;
+	player->send(st);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

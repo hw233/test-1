@@ -144,6 +144,7 @@ GMHandler::GMHandler()
     Reg(3, "hici", &GMHandler::OnCiTaskHI);
     Reg(3, "hirestart", &GMHandler::OnRestartHI);
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
+    Reg(3, "hiuseskill", &GMHandler::OnUseSkillHI);
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
 }
 
@@ -2409,6 +2410,14 @@ void GMHandler::OnAwardHI(GObject::Player *player, std::vector<std::string>& arg
         return;
     heroIsland.getAward(player, atoi(args[0].c_str()), 1);
 }
+
+void GMHandler::OnUseSkillHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    heroIsland.useSkill(player, atoi(args[0].c_str()));
+}
+
 
 void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& args)
 {

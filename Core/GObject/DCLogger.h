@@ -17,8 +17,8 @@ class Player;
 class DCLogger
 {
 public:
-    DCLogger() : m_logger(NULL) {}
-    ~DCLogger() { delete m_logger; }
+    DCLogger() {}
+    ~DCLogger() {}
 
     bool init();
 
@@ -26,26 +26,19 @@ public:
     bool login(Player* player);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
+    bool fee(Player* player, UInt32 total, Int32 c);
+
     void online();
 
     void normal();
     void incDomainOnlineNum(UInt8 domain);
     void decDomainOnlineNum(UInt8 domain);
 
-    void fee(Player* player, UInt32 total, Int32 c);
-
 private:
-    CLogger* m_logger;
-    FastMutex m_lck;
-
-    UInt32 m_onlineNum_domain[MAX_DOMAIN];
-    UInt32 m_domain[MAX_DOMAIN];
-
     UInt32 version;
     UInt32 appid;
-    UInt32 svrip;
-    UInt32 area; // worldid
-    std::string pf; // domain
+    UInt32 m_onlineNum_domain[MAX_DOMAIN];
+    UInt32 m_domain[MAX_DOMAIN];
 };
 
 extern DCLogger dclogger;
@@ -55,5 +48,4 @@ extern DCLogger dclogger;
 #endif // DCLOGGER_H_
 
 /* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
-
 

@@ -48,7 +48,6 @@ function setServer(n, num)
 end
 
 function onActivityCheck(tm)
-  
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
     local freeEnter = false
@@ -108,12 +107,14 @@ function onActivityCheck(tm)
       setSingleDay(false);
   end
 
+  loadStore()
 end
 
 function initActTime(y, m, d)
   local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
 

@@ -159,12 +159,6 @@ namespace GObject
 
         void fixSkills()
         {
-            if (fix)
-            {
-                delete _itemBaseType;
-                fix = false;
-            }
-
             const GData::ItemEquipType* ibt = static_cast<const GData::ItemEquipType*>(_itemBaseType);
             if (ibt) {
                 GData::ItemEquipType* nibt = new GData::ItemEquipType(ibt->getId(), ibt->getName(), 0);
@@ -177,6 +171,7 @@ namespace GObject
                 nibt->maxQuantity = ibt->maxQuantity;
                 nibt->bindType = ibt->bindType;
                 nibt->energy = ibt->energy;
+                nibt->trumpExp = ibt->trumpExp;
                 nibt->data = ibt->data;
                 nibt->career = ibt->career;
                 const GData::AttrExtra* attr = ibt->attrExtra;
@@ -190,6 +185,10 @@ namespace GObject
                         if (size)
                             enchant(this->getItemEquipData().enchant, tmp);
                         nibt->setAttr(tmp, true);
+
+                        if (fix)
+                            delete _itemBaseType;
+
                         _itemBaseType = nibt;
                         fix = true;
                         return;

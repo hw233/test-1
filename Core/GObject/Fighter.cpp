@@ -179,7 +179,7 @@ bool Fighter::addExp( UInt64 e )
 	bool isMain = _owner->isMainFighter(_id);
 	if(isMain)
 	{
-        if(oldLevel != _level && _level > 29)
+        if(oldLevel != _level && _level > 29 && _owner)
         {
             LevelChange data = { oldLevel, _level };
             GameMsgHdr hdr(0x1F0, WORKER_THREAD_WORLD, _owner, sizeof(LevelChange));
@@ -259,6 +259,13 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 		SYSMSG_SENDV(1001, _owner, _color, getName().c_str(), _level);
 		if (_owner != NULL && _owner->isMainFighter(_id))
 		{
+            if(oldLevel != _level && _level > 29)
+            {
+                LevelChange data = { oldLevel, _level };
+                GameMsgHdr hdr(0x1F0, WORKER_THREAD_WORLD, _owner, sizeof(LevelChange));
+                GLOBAL().PushMsg(hdr, &data);
+            }
+
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
 		}
@@ -586,6 +593,11 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			}
 			ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 			ea2.appendAttrToStream(st);
+
+            if(equip->getClass() == Item_Trump)
+            {
+                st << ied.maxTRank << ied.trumpExp;
+            }
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -830,6 +842,18 @@ void Fighter::setCurrentHP( UInt16 hp, bool writedb )
 		_hp = hp;
 }
 
+void Fighter::addHPPercent( UInt8 p, bool writedb )
+{
+    UInt32 maxhp = getMaxHP();
+    UInt32 hp = (p / (float)100) * maxhp;
+    _hp += hp;
+    if (_hp > maxhp)
+        _hp = maxhp;
+
+    if (writedb)
+        sendModification(1, _hp);
+}
+
 UInt32 Fighter::regenHP( UInt32 hp )
 {
 	if(_hp == 0)
@@ -1003,6 +1027,27 @@ void Fighter::addAttr( ItemEquip * equip )
 	}
 }
 
+void Fighter::addTrumpAttr( ItemTrump * trump )
+{
+    GData::AttrExtra ae(*(trump->getAttrExtra()));
+	ItemEquipData& ied = trump->getItemEquipData();
+
+    UInt8 q = trump->getQuality();
+    UInt8 l = ied.tRank;
+    AttrFactor af = GObjectManager::getTrumpTRankFactor(q-2, l-1);
+    if(trump->getId() < 1600)
+        af.aura = 0;
+    else
+        af.auraMax = 0;
+
+    if(l > 0 && q > 1)
+        ae *= af;
+
+	addAttrExtra(_attrExtraEquip, &ae);
+
+	addEquipAttr2(_attrExtraEquip, trump->getEquipAttr2(), _level);
+}
+
 void Fighter::rebuildEquipAttr()
 {
 	_attrExtraEquip.reset();
@@ -1091,6 +1136,21 @@ void Fighter::rebuildEquipAttr()
                 if (cb->effect)
                     addAttr(cb->effect);
             }
+        }
+    }
+
+    bool hasActiveTrump = false;
+    for(int i = 0; i < getMaxTrumps(); ++i)
+    {
+		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
+
+		if(trump != NULL)
+        {
+            if(!hasActiveTrump)
+                addTrumpAttr(trump);
+
+            if(trump->getId() >= 1600)
+                hasActiveTrump = true;
         }
     }
 

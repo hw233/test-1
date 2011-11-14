@@ -106,6 +106,9 @@ namespace GObject
 
 #define MAX_PRACTICE_FIGHTRES       10      // 最大修炼散仙数
 
+#define MAX_TRIPOD_SOUL 100000
+#define POINT_PERMIN (60*10)
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -122,6 +125,24 @@ namespace GObject
 	class Athletics;
     struct PracticeData;
     class AttainMgr;
+
+    struct TripodData
+    {
+        TripodData()
+        {
+            memset(this, 0x00, sizeof(*this));
+            quality = 2;
+            needgen = 1;
+        }
+
+        UInt32 soul;    // 元气值
+        UInt8 fire;     // 火种: 0-普通的火 1-貅目鑫火 2-极地冽火 3-盘木玄火 4-炼狱冥火 5-三昧真火 6-九天离火 
+        UInt8 quality;  // 奖励品质 1-白 2-绿 3-蓝 4-紫 5-橙
+        UInt8 awdst;    // 奖励状态 0-熔炼中 1-未领取
+        UInt8 needgen;  // 需要重新生成奖励
+        UInt32 itemId;
+        UInt8 num;
+    };
 
 	class EventAutoBattle : public EventBase
 	{
@@ -520,8 +541,8 @@ namespace GObject
         inline void setQQVipl(UInt8 lvl)
         {
             _playerData.qqvipl = lvl;
-            if(lvl > 7 && lvl < 10)
-                _playerData.qqvipl = 7;
+            if(lvl > 8 && lvl < 10)
+                _playerData.qqvipl = 8;
             else if(lvl > 16 && lvl < 20)
                 _playerData.qqvipl = 16;
         }
@@ -717,6 +738,7 @@ namespace GObject
 
 		void autoRegenAll();
 		void regenAll(bool = false);
+        void setHPPercent(UInt8 p);
 
         UInt32 getClientAddress();
 		bool setNewGuildTaskStep(UInt32);
@@ -1008,8 +1030,6 @@ namespace GObject
 
         // 通天塔正义之吼
         UInt8 _justice_roar;
-        // 玩家在等级集合的位置 
-        UInt32 _lvpos;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1028,8 +1048,6 @@ namespace GObject
 
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
-        inline void setLvPos(UInt32 v) { _lvpos = v; }
-        inline UInt32 getLvPos() { return _lvpos; }
 
 	protected:
 		inline void setBlockBossByLevel();
@@ -1109,8 +1127,22 @@ namespace GObject
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
 
-        UInt8 GetFullPotFighterNum();
-        UInt8 GetFullCapFighterNum();
+    public:
+        void sendTripodInfo();
+        void addItem(UInt32 itemid, UInt16 num, UInt8 bind);
+        void makeFire(UInt32 id1, UInt32 id2);
+
+        void getAward();
+        void genAward(Stream& st);
+        bool genAward();
+
+        inline TripodData& getTripodData() { return m_td; }
+        TripodData& newTripodData();
+        TripodData& runTripodData(TripodData& data, bool = false);
+
+    private:
+        bool m_hasTripod;
+        TripodData m_td;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
@@ -1120,8 +1152,8 @@ namespace GObject
 	extern GlobalPlayers newPlayers;
 	typedef GGlobalObjectManagerIStringT<Player> GlobalNamedPlayers;
 	extern GlobalNamedPlayers globalNamedPlayers;
-    typedef std::map<UInt32, UInt64> LevelPlayers;
-    typedef std::map<UInt8, LevelPlayers> GlobalLevelsPlayers;
+    typedef std::vector<UInt64> LevelPlayers;
+    typedef std::map<UInt8, LevelPlayers*> GlobalLevelsPlayers;
     typedef GlobalLevelsPlayers::iterator GlobalLevelsPlayersIterator;
     extern GlobalLevelsPlayers globalLevelsPlayers;
 
