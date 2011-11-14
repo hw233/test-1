@@ -113,6 +113,7 @@ struct DBPlayerData
 	std::string fyamen;
     std::string clantask;
     std::string formations;
+    std::string atohicfg;
 };
 
 struct DBPrepaid
@@ -291,6 +292,9 @@ struct DBEquipment
 	UInt32 id;
 	UInt32 itemId;
 	UInt8 enchant;
+    UInt8 tRank;
+    UInt8 maxTRank;
+    UInt32 trumpExp;
 	UInt8 attrType1;
 	Int16 attrValue1;
 	UInt8 attrType2;
@@ -750,7 +754,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(53)
+SPECIALDEF(54)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -799,6 +803,7 @@ SPECIALDEF(53)
 	UInt8, pdata.frontGoldCnt,
 	UInt32, pdata.frontUpdate,
     std::string, formations,
+    std::string, atohicfg,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
     UInt8,  pdata.dungeonCnt,
@@ -1272,11 +1277,14 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBEquipment)
-SPECIALDEF(17)
+SPECIALDEF(20)
 (
 	UInt32, id,
 	UInt32, itemId,
 	UInt8, enchant,
+    UInt8, tRank,
+    UInt8, maxTRank,
+    UInt32, trumpExp,
 	UInt8, attrType1,
 	Int16, attrValue1,
 	UInt8, attrType2,

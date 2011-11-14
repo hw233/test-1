@@ -593,6 +593,11 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			}
 			ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 			ea2.appendAttrToStream(st);
+
+            if(equip->getClass() == Item_Trump)
+            {
+                st << ied.maxTRank << ied.trumpExp;
+            }
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -1004,6 +1009,27 @@ void Fighter::addAttr( ItemEquip * equip )
 	}
 }
 
+void Fighter::addTrumpAttr( ItemTrump * trump )
+{
+    GData::AttrExtra ae(*(trump->getAttrExtra()));
+	ItemEquipData& ied = trump->getItemEquipData();
+
+    UInt8 q = trump->getQuality();
+    UInt8 l = ied.tRank;
+    AttrFactor af = GObjectManager::getTrumpTRankFactor(q-2, l-1);
+    if(trump->getId() < 1600)
+        af.aura = 0;
+    else
+        af.auraMax = 0;
+
+    if(l > 0 && q > 1)
+        ae *= af;
+
+	addAttrExtra(_attrExtraEquip, &ae);
+
+	addEquipAttr2(_attrExtraEquip, trump->getEquipAttr2(), _level);
+}
+
 void Fighter::rebuildEquipAttr()
 {
 	_attrExtraEquip.reset();
@@ -1092,6 +1118,21 @@ void Fighter::rebuildEquipAttr()
                 if (cb->effect)
                     addAttr(cb->effect);
             }
+        }
+    }
+
+    bool hasActiveTrump = false;
+    for(int i = 0; i < getMaxTrumps(); ++i)
+    {
+		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
+
+		if(trump != NULL)
+        {
+            if(!hasActiveTrump)
+                addTrumpAttr(trump);
+
+            if(trump->getId() >= 1600)
+                hasActiveTrump = true;
         }
     }
 

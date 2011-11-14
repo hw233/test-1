@@ -1154,7 +1154,6 @@ namespace GObject
             }
         }
 
-        //heroIsland.playerLeave(this);
         dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
@@ -3562,7 +3561,10 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
+        {
             heroIsland.playerLeave(this);
+            delFlag(Player::InHeroIsland);
+        }
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
@@ -6979,6 +6981,26 @@ namespace GObject
     {
         DB6().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)" , getId(), m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num);
         return runTripodData(m_td);
+    }
+
+    // XXX: 光棍节强化光棍补偿
+    void Player::sendSingleEnchant(UInt8 enchant)
+    {
+        if (enchant && enchant <= 10)
+        {
+            MailPackage::MailItem item1[3] = {{514, 1}, {507, 5},{509, 5}};
+            MailPackage::MailItem item2[3] = {{514, 2}, {507, 5},{509, 5}};
+            MailPackage::MailItem item3[3] = {{514, 3}, {507, 5},{509, 5}};
+            MailPackage::MailItem item4[3] = {{514, 5}, {507, 5},{509, 5}};
+            MailPackage::MailItem item5[3] = {{514, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item6[3] = {{515, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item7[3] = {{515, 20},{507, 5},{509, 5}};
+            MailPackage::MailItem item8[3] = {{515, 30},{507, 5},{509, 5}};
+
+            MailPackage::MailItem* item[8] = {item1,item2,item3,item4,item5,item6,item7,item8};
+
+            sendMailItem(2205, 2206, item[enchant-1], 3);
+        }
     }
 
 } // namespace GObject

@@ -171,6 +171,7 @@ namespace GObject
                 nibt->maxQuantity = ibt->maxQuantity;
                 nibt->bindType = ibt->bindType;
                 nibt->energy = ibt->energy;
+                nibt->trumpExp = ibt->trumpExp;
                 nibt->data = ibt->data;
                 nibt->career = ibt->career;
                 const GData::AttrExtra* attr = ibt->attrExtra;

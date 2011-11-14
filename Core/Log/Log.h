@@ -50,6 +50,8 @@ enum PurchaseType
     InstantPracticeAcc,
     FlushAthletics,
     PurchaseSale,
+    TrumpUpgrade,
+    TrumpLOrder,
     HeroIslandSkill,
 };
 
@@ -129,6 +131,7 @@ enum ItemTo
 	ToActivateAttr,
 	ToGemAttach,	
 	ToTrainFighter,	
+	ToTrumpUpgrade,	
 };
 
 

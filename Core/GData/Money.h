@@ -71,6 +71,10 @@ enum
     SPLIT,
 // 修炼加速
     INSTANTPRACTICE,
+// 法宝升阶
+    TRUMPLORDER,
+// 法宝精炼
+    TRUMPUPGRADE,
 // 英雄岛技能
     HISKILL,
 
