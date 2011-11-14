@@ -130,6 +130,7 @@ namespace GObject
 	public:
 		// Ìú½³
 		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/);
+        void  OnFailEnchAttainment( UInt32 f);
 		UInt8 OpenSocket(UInt16 fighterId, UInt32 itemId);
 		UInt8 MergeGem(UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid);
 		UInt8 AttachGem(UInt16 fighterId, UInt32 itemId, UInt32 gemId, bool bind);

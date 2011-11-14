@@ -1563,6 +1563,8 @@ namespace GObject
 
 		if(flag_suc/*enchant_chance[ied.enchant]*/)
 		{
+            if(failThisTime)
+                OnFailEnchAttainment(failThisTime);
 			DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 			if(ied.enchant >= 5)
 				DBLOG().PushUpdateData("insert into enchant_histories (server_id, player_id, equip_id, template_id, enchant_level, enchant_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), equip->getId(), equip->GetItemType().getId(), ied.enchant, TimeUtil::Now());
@@ -1646,21 +1648,10 @@ namespace GObject
 		}
 
         //if fail
-        if(failThisTime == 0)
+        if(0 == failThisTime)
             failThisTime  =1;
     
-        UInt32  ft = m_Owner->GetVar(GObject::VAR_FAIL_ENCH);
-        ft += failThisTime;
-
-        if(ft >= 999)
-        {
-            GameAction()->doAttainment(this->m_Owner, Script::FAIL_ENCH, ft);
-        }
-        else
-        {
-            m_Owner->SetVar( GObject::VAR_FAIL_ENCH ,ft);
-        }
-
+        OnFailEnchAttainment(failThisTime);
 		if(type == 0 && ied.enchant >= 4)
 		{
 			ied.enchant --;
@@ -1690,6 +1681,21 @@ namespace GObject
 		return 1;
 	}
 
+    void  Package::OnFailEnchAttainment( UInt32 failThisTime)
+    {
+    
+        UInt32  ft = m_Owner->GetVar(GObject::VAR_FAIL_ENCH);
+        ft += failThisTime;
+
+        if(ft >= 999)
+        {
+            GameAction()->doAttainment(this->m_Owner, Script::FAIL_ENCH, ft);
+        }
+        else
+        {
+            m_Owner->SetVar( GObject::VAR_FAIL_ENCH ,ft);
+        }
+    }
 	UInt8 Package::OpenSocket( UInt16 fighterId, UInt32 itemId )
 	{
 		Fighter * fgt = NULL;

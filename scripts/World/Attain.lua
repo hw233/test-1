@@ -563,8 +563,31 @@ function  OnAddSFormation(player, param)
 end
 --PKNPC成功
 local  pk_npc = {
-    [5032] = 10353, --智通
-    
+    [5032] = 10351, --杨花
+    [5033] = 10352, --四大金刚
+    [5037] = 10353, --智通
+    [5063] = 10356, --七魔许人龙
+    [5065] = 10357, --六魔厉吼
+    [5068] = 10358, --三魔钱青选
+    [5071] = 10359, --魏枫娘
+    [5214] = 10361, --钟敢
+    [5213] = 10362, --戎敦
+    [5212] = 10363, --穷奇
+    [5211] = 10364, --无华氏
+    [5229] = 10365, --三凤
+    [5230] = 10366, --二凤
+    [5231] = 10367, --初凤
+    [5233] = 10368, --金须奴
+    [5254] = 10370, --守灵侍卫
+    [5255] = 10371, --烈焰侍者
+    [5256] = 10372, --护卫神侍
+    [5257] = 10373, --守灵真龙
+    [5258] = 10374, --连山遗蜕
+    [5270] = 10376, --阴四娘
+    [5268] = 10377, --丙融
+    [5271] = 10378, --毒手摩什
+    [5267] = 10379, --圣姑遗蜕
+    [5266] = 10380, --崔盈
 }
 function OnPKNpc(player, param)
        return MapFinder(player, param, pk_npc );   
@@ -1033,6 +1056,8 @@ local attain_table = {
 function doAttainment( player, attainId, param )
     local trigger = attain_table[attainId];
 	if trigger == nil then
+        print (param);
+        print ("can not find")
     --    print (param .. " doAttainment: can not find it!")
 		return;
 	end
