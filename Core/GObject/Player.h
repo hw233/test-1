@@ -1144,6 +1144,12 @@ namespace GObject
     private:
         bool m_hasTripod;
         TripodData m_td;
+
+    public:
+        inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
+        inline const std::string& getAtoHICfg() const { return m_hicfg; }
+    private:
+        std::string m_hicfg;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

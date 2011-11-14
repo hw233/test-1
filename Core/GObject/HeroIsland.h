@@ -214,6 +214,8 @@ public:
     void expFactor(UInt32 now);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
+    void saveAtoCfg(Player* player, const std::string& cfg);
+    void sendAtoCfg(Player* player);
 
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }

@@ -1423,6 +1423,9 @@ void HeroIsland::playerEnter(Player* player)
         st << _startTime;
         st << _endTime;
         player->addFlag(Player::InHeroIsland);
+
+        if (player->getAtoHICfg().length())
+            sendAtoCfg(player);
     }
     else
         st << static_cast<UInt8>(1);
@@ -1763,6 +1766,20 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
     }
 
     return true;
+}
+
+void HeroIsland::saveAtoCfg(Player* player, const std::string& cfg)
+{
+    if (!player || !cfg.length())
+        return;
+    player->setAtoHICfg(cfg);
+    DB3().PushUpdateData("UPDATE `player` set `atohicfg` = '%s' WHERE `id` = %"I64_FMT"u", player->getId());
+}
+
+void HeroIsland::sendAtoCfg(Player* player)
+{
+    if (!player)
+        return;
 }
 
 HeroIsland heroIsland;

@@ -860,6 +860,7 @@ CREATE TABLE `player` (
   `frontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `frontUpdate` int(10) unsigned NOT NULL DEFAULT '0',
   `formations` varchar(255) NOT NULL DEFAULT '',
+  `atohicfg` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `dungeonCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
