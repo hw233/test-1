@@ -1090,6 +1090,31 @@ void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
+{
+	Stream st;
+	st.init(SPEP::ONLINEPF,0x01);
+    UInt32 nums[MAX_DOMAIN] = {0,};
+    GObject::dclogger.getOnline(nums);
+    size_t off = st.size();
+    st << static_cast<UInt8>(0);
+
+    UInt8 count = 0;
+    for (UInt8 i = 0; i < MAX_DOMAIN; ++i)
+    {
+        if (nums[i])
+        {
+            st << (i+1);
+            st << nums[i];
+            ++count;
+        }
+    }
+
+    st.data<UInt8>(off) = count;
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
