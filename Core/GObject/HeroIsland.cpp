@@ -1532,6 +1532,23 @@ void HeroIsland::playerLeave(Player* player)
         player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+60);
 }
 
+void HeroIsland::playerOffline(Player* player)
+{
+    if (!player)
+        return;
+
+    if (!player->hasFlag(Player::InHeroIsland))
+        return;
+
+    UInt8 spot = 0xFF;
+    UInt16 pos = 0;
+    HIPlayerData* pd = findPlayer(player, spot, pos);
+    if (!pd) return;
+
+    if (_nplayers[spot])
+        --_nplayers[spot];
+}
+
 void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)
 {
     if (!player)
