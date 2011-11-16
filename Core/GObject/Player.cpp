@@ -478,6 +478,33 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoFrontMap::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoFrontMap::Process(UInt32 leftCount)
+    {
+        UInt16 idspot = (id << 8) + spot;
+		GameMsgHdr hdr(0x278, m_Player->getThreadId(), m_Player, sizeof(idspot));
+		GLOBAL().PushMsg(hdr, &idspot);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOFRONTMAP, m_Player->getId());
+        ++spot;
+    }
+
+    bool EventAutoFrontMap::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -1155,7 +1182,6 @@ namespace GObject
         }
 
         dclogger.logout(this);
-        heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
 	}
 
@@ -2136,6 +2162,12 @@ namespace GObject
 
 		return res;
 	}
+
+    void Player::autoFrontMapFailed()
+    {
+        //PopTimerEvent(this, EVENT_AUTOFRONTMAP, getId());
+        //delFlag(Player::AutoFrontMap);
+    }
 
     void Player::autoCopyFailed(UInt8 id)
     {

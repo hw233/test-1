@@ -229,6 +229,23 @@ namespace GObject
         UInt8 id;
     };
 
+    class EventAutoFrontMap : public EventBase
+    {
+    public:
+		EventAutoFrontMap(Player * player, UInt32 interval, UInt32 count, UInt8 id, UInt8 spot)
+			: EventBase(player, interval, count), id(id), spot(spot)
+		{}
+
+        virtual UInt32 GetID() const { return EVENT_AUTOFRONTMAP; }
+        virtual bool Equal(UInt32 id, size_t playerid) const;
+        void Process(UInt32);
+		bool Accelerate(UInt32);
+
+    private:
+        UInt8 id;
+        UInt8 spot;
+    };
+
     class EventPlayerTimeTick : public EventBase
     {
     public:
@@ -431,6 +448,7 @@ namespace GObject
 			AutoCopy        = 0x00000010,
 			Copy            = 0x00000020,
             InHeroIsland    = 0x00000040,
+            AutoFrontMap    = 0x00000080,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -775,6 +793,7 @@ namespace GObject
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
         bool attackWorldBoss(UInt32, UInt8, UInt8, UInt8, bool = false);
+        void autoFrontMapFailed();
         void autoCopyFailed(UInt8);
         inline bool isAutoCopyFailed() { return m_autoCopyFailed; }
         inline void resetAutoCopyFailed() { m_autoCopyFailed = false; }

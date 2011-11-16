@@ -1843,6 +1843,21 @@ namespace GObject
 		}
 		lc.finalize();
 
+		lc.prepare("Loading auto frontmat challenge data:");
+		DBAutoFrontMap afm;
+		if(execu->Prepare("SELECT `playerId`, `id` FROM `auto_frontmap`", afm) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[afm.playerId];
+			if(pl == NULL)
+				continue;
+			frontMap.autoBattle(pl, afm.id, 0, true);
+		}
+		lc.finalize();
+
 		lc.prepare("Loading auto dungeon challenge data:");
 		DBDungeonAuto dda;
 		if(execu->Prepare("SELECT `playerId`, `dungeonId`, `totalExp`, `won` FROM `dungeon_auto`", dda) != DB::DB_OK)

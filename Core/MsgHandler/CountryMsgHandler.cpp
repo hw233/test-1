@@ -166,6 +166,7 @@ MSG_REG_2(GameMsgHdr, 0x272, OnClanBattleAttendReq);
 MSG_REG_2(GameMsgHdr, 0x274, OnExpGainByInstantCompleteReq);
 MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
+MSG_REG_2(GameMsgHdr, 0x278, OnAutoFrontMapAttack);
 
 MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 

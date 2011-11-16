@@ -42,11 +42,14 @@ public:
     UInt8 getCount(Player* pl);
 
     void enter(Player* pl, UInt8 id);
-    void fight(Player* pl, UInt8 id, UInt8 spot);
+    UInt8 fight(Player* pl, UInt8 id, UInt8 spot, bool ato = false, bool complete = false);
     void reset(Player* pl, UInt8 id);
 
     UInt8 getFrontMapSize(Player* pl);
     void buildInfo(Player* pl, Stream& st);
+
+    bool checkLevel(Player* pl, UInt8 id);
+    void autoBattle(Player* pl, UInt8 id, UInt8 type, bool = false);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status, UInt8 lootlvl);
 private:

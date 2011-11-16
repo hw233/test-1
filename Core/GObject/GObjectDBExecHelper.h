@@ -558,6 +558,12 @@ struct DBAutoCopy
 	UInt8 id;
 };
 
+struct DBAutoFrontMap
+{
+	UInt64 playerId;
+	UInt8 id;
+};
+
 struct DBExchangeTicket
 {
 	UInt64 playerId;
@@ -1370,6 +1376,14 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAutoCopy)
+SPECIALDEF(2)
+(
+	UInt64, playerId,
+	UInt8, id
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBAutoFrontMap)
 SPECIALDEF(2)
 (
 	UInt64, playerId,
