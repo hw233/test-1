@@ -52,6 +52,7 @@ enum PurchaseType
     PurchaseSale,
     TrumpUpgrade,
     TrumpLOrder,
+    AthleticPaging, 
 };
 
 enum IncomingType

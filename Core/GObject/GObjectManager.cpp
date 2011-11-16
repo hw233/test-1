@@ -1743,7 +1743,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1775,6 +1775,7 @@ namespace GObject
             data->oldrank = dbd.oldrank;
             data->first4rank = dbd.first4rank;
             data->extrachallenge = dbd.extrachallenge;
+            data->pageNum = dbd.pageNum;
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
 		lc.finalize();

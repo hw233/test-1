@@ -1147,5 +1147,10 @@ void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
 
     player->GetAthletics()->awardMartial(notify->peer, notify->win);
 }
+void OnAthlectisPayPaging( GameMsgHdr & hdr,  const void* data)
+{
+    MSG_QUERY_PLAYER(player);
 
+    player->GetAthletics()->PayForPaging();
+}
 #endif // _COUNTRYINNERMSGHANDLER_H_
