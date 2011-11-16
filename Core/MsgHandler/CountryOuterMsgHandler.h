@@ -3285,6 +3285,25 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
                 GObject::heroIsland.playerLeave(player);
             }
             break;
+        case 11:
+            {
+                GObject::heroIsland.sendAtoCfg(player);
+            }
+            break;
+        case 12:
+            {
+                std::string cfg;
+                brd >> cfg;
+                GObject::heroIsland.saveAtoCfg(player, cfg);
+            }
+            break;
+        case 13:
+            {
+                UInt8 onoff = 0;
+                brd >> onoff;
+                GObject::heroIsland.setAto(player, onoff);
+            }
+            break;
         default:
             break;
     }

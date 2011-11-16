@@ -1437,6 +1437,7 @@ void HeroIsland::playerInfo(Player* player)
         st << static_cast<UInt8>(pd->awardgot==0xFF?0:pd->awardgot);
         st << pd->inrank;
         st << static_cast<UInt16>(pd->score);
+        st << static_cast<UInt8>(pd->ato?1:0);
     }
 
     st << Stream::eos;
@@ -1717,7 +1718,25 @@ void HeroIsland::commitCompass(Player* player)
         }
 
         Stream st(REP::HERO_ISLAND);
-        st << static_cast<UInt8>(14) << pd->inrank << pd->score << Stream::eos;
+        st << static_cast<UInt8>(14) << pd->inrank << pd->score;
+
+        size_t off = st.size();
+        st << static_cast<UInt8>(0);
+
+        UInt8 j = 0;
+        UInt8 count = 0;
+        for (SortType::reverse_iterator i = _sorts.rbegin(), e = _sorts.rend(); i != e && j < 3; ++i, ++j)
+        {
+            if (*i)
+            {
+                st << (*i)->player->getName();
+                st << (*i)->score;
+                ++count;
+            }
+        }
+
+        st.data<UInt8>(off) = count;
+        st << Stream::eos;
         player->send(st);
     }
 
@@ -1848,6 +1867,29 @@ void HeroIsland::sendAtoCfg(Player* player)
 {
     if (!player)
         return;
+    const std::string& cfg = player->getAtoHICfg();
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(18);
+    st << cfg;
+    st << Stream::eos;
+    player->send(st);
+}
+
+void HeroIsland::setAto(Player* player, bool onoff)
+{
+    if (!player)
+        return;
+
+    if (!player->hasFlag(Player::InHeroIsland))
+        return;
+
+    UInt8 spot = player->getHISpot();
+    UInt16 pos = 0;
+    HIPlayerData* pd = findPlayer(player, spot, pos);
+    if (!pd)
+        return;
+
+    pd->ato = onoff;
 }
 
 HeroIsland heroIsland;
