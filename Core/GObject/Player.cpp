@@ -478,6 +478,33 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoFrontMap::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoFrontMap::Process(UInt32 leftCount)
+    {
+        UInt16 idspot = (id << 8) + spot;
+		GameMsgHdr hdr(0x278, m_Player->getThreadId(), m_Player, sizeof(idspot));
+		GLOBAL().PushMsg(hdr, &idspot);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOFRONTMAP, m_Player->getId());
+        ++spot;
+    }
+
+    bool EventAutoFrontMap::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -1154,7 +1181,6 @@ namespace GObject
             }
         }
 
-        //heroIsland.playerLeave(this);
         dclogger.logout(this);
 		removeStatus(SGPunish);
 	}
@@ -2136,6 +2162,12 @@ namespace GObject
 
 		return res;
 	}
+
+    void Player::autoFrontMapFailed()
+    {
+        //PopTimerEvent(this, EVENT_AUTOFRONTMAP, getId());
+        //delFlag(Player::AutoFrontMap);
+    }
 
     void Player::autoCopyFailed(UInt8 id)
     {
@@ -3562,7 +3594,10 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
+        {
             heroIsland.playerLeave(this);
+            delFlag(Player::InHeroIsland);
+        }
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
@@ -6979,6 +7014,26 @@ namespace GObject
     {
         DB6().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)" , getId(), m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num);
         return runTripodData(m_td);
+    }
+
+    // XXX: 光棍节强化光棍补偿
+    void Player::sendSingleEnchant(UInt8 enchant)
+    {
+        if (enchant && enchant <= 10)
+        {
+            MailPackage::MailItem item1[3] = {{514, 1}, {507, 5},{509, 5}};
+            MailPackage::MailItem item2[3] = {{514, 2}, {507, 5},{509, 5}};
+            MailPackage::MailItem item3[3] = {{514, 3}, {507, 5},{509, 5}};
+            MailPackage::MailItem item4[3] = {{514, 5}, {507, 5},{509, 5}};
+            MailPackage::MailItem item5[3] = {{514, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item6[3] = {{515, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item7[3] = {{515, 20},{507, 5},{509, 5}};
+            MailPackage::MailItem item8[3] = {{515, 30},{507, 5},{509, 5}};
+
+            MailPackage::MailItem* item[8] = {item1,item2,item3,item4,item5,item6,item7,item8};
+
+            sendMailItem(2205, 2206, item[enchant-1], 3);
+        }
     }
 
 } // namespace GObject

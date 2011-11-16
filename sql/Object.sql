@@ -860,6 +860,7 @@ CREATE TABLE `player` (
   `frontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `frontUpdate` int(10) unsigned NOT NULL DEFAULT '0',
   `formations` varchar(255) NOT NULL DEFAULT '',
+  `atohicfg` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `dungeonCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1154,6 +1155,13 @@ CREATE TABLE `worldboss` (
 
 DROP TABLE IF EXISTS `autocopy`;
 CREATE TABLE `autocopy` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `auto_frontmap`;
+CREATE TABLE `auto_frontmap` (
   `playerId` bigint(20) unsigned NOT NULL,
   `id` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)

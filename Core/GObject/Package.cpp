@@ -2700,13 +2700,21 @@ namespace GObject
 
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values, equip_t);
 
-        float v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr) * 90;
+        float v0 = 0;
+        if(equip_t == 0)
+            v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
+        else
+            v0 = GObjectManager::getTrumpAttrMax(lv, types[0]-1, q, crr)*90;
         if ((float)values[0] > v0 && !(protect & 1))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
 
-        float v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr) * 90;
+        float v1 = 0;
+        if(equip_t == 0)
+            v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*90;
+        else
+            v1 = GObjectManager::getTrumpAttrMax(lv, types[1]-1, q, crr)*90;
         if ((float)values[1] > v1 && !(protect & 2))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
@@ -2892,6 +2900,9 @@ namespace GObject
 
 		const GData::ItemBaseType& ibt = item->GetItemType();
         UInt32 exp = ibt.trumpExp + ied_item.trumpExp * 0.5;
+        if(exp == 0)
+            return 2;
+
         if(!DelEquip(itemId, ToTrumpUpgrade))
             return 2;
 
