@@ -63,6 +63,7 @@ bool World::_isNewServer = false;
 bool World::_nationalDay = false;
 bool World::_halloween = false;
 bool World::_singleday = false;
+bool World::_thanksgiving = false;
 
 #define LEADERBOARD_UPDATE_INTERVAL 3600
 
@@ -120,6 +121,8 @@ bool enum_midnight(void * ptr, void *)
     {
         pl->buildClanTask();
         pl->clearFinishCount();
+        if (World::_thanksgiving)
+            pl->resetThanksgiving();
     }
 #if 0
 	if(pl->getGold() > 0)

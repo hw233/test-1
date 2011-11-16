@@ -5555,6 +5555,10 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_xxx(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+end
 
 local ItemNormal_Table = {
   [7001] = ItemNormal_00007xxx,

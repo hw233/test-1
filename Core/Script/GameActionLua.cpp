@@ -79,6 +79,7 @@ namespace Script
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
+		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
@@ -834,6 +835,11 @@ namespace Script
 	bool GameActionLua::onOnlineAward(Player* player, UInt32 itemId, UInt8 count)
 	{
 		return Call<bool>("onOnlineAward", player, itemId, count);
+	}
+
+	bool GameActionLua::onThanksgivingDay(Player* player)
+	{
+		return Call<bool>("onThanksgivingDay", player);
 	}
 
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)

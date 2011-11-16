@@ -45,6 +45,11 @@
 #include <cmath>
 
 #define NTD_ONLINE_TIME (4*60*60)
+#ifndef _DEBUG
+#define TGD_ONLINE_TIME (3*60*60)
+#else
+#define TGD_ONLINE_TIME (60)
+#endif
 
 namespace GObject
 {
@@ -772,6 +777,21 @@ namespace GObject
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 #endif
 
+        if (World::_thanksgiving)
+        {
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online < TGD_ONLINE_TIME)
+                {
+                    EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME-online, 1, 1);
+                    if (event) PushTimerEvent(event);
+                }
+                else
+                    GameAction()->onThanksgivingDay(this);
+            }
+        }
+
         sendLevelPack(GetLev());
 
         char buf[64] = {0};
@@ -1178,6 +1198,18 @@ namespace GObject
                     sendNationalDayOnlineAward();
                 else
                     setBuffData(PLAYER_BUFF_ONLINE, online + curtime - _playerData.lastOnline);
+            }
+        }
+
+        if (World::_thanksgiving)
+        {
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online + curtime - _playerData.lastOnline >= TGD_ONLINE_TIME)
+                    GameAction()->onThanksgivingDay(this);
+                else
+                    SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
 
@@ -7033,6 +7065,16 @@ namespace GObject
             MailPackage::MailItem* item[8] = {item1,item2,item3,item4,item5,item6,item7,item8};
 
             sendMailItem(2205, 2206, item[enchant-1], 3);
+        }
+    }
+
+    void Player::resetThanksgiving()
+    {
+        SetVar(VAR_TGDT, 0);
+        if (isOnline())
+        {
+            EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME, 1, 1);
+            if (event) PushTimerEvent(event);
         }
     }
 

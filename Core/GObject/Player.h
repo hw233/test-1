@@ -522,6 +522,7 @@ namespace GObject
         void sendNationalDayOnlineAward();
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
+        void resetThanksgiving();
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);

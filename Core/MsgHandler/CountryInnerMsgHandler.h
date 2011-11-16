@@ -603,6 +603,8 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
 
     player->buildClanTask();
     player->clearFinishCount();
+    if (World::_thanksgiving)
+        player->resetThanksgiving();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -737,6 +739,12 @@ void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
         case 0:
             {
                 player->sendNationalDayOnlineAward();
+            }
+            break;
+
+        case 1:
+            {
+                GameAction()->onThanksgivingDay(player);
             }
             break;
 
