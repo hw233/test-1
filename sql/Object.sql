@@ -95,6 +95,7 @@ CREATE TABLE `athletics_rank` (
   `oldrank` int(10) NOT NULL DEFAULT '0',
   `first4rank` int(10) unsigned NOT NULL DEFAULT '0',
   `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0',
+  `pageNum` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
