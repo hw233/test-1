@@ -247,6 +247,9 @@ namespace REQ
     const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
     /**斗剑领取奖励*/
     const UInt8 ATHLETICS_GET_AWARD = 0xC8;
+
+    /**斗剑翻页*/
+    const UInt8 ATHLETICS_PAGING    = 0xC9;
     /**???*/
     const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/

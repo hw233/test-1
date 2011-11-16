@@ -56,6 +56,7 @@ struct AthleticsRankData
     UInt32  oldrank;
     UInt32  first4rank;
     UInt32  extrachallenge;
+    UInt16  pageNum; //¿¿¿
     //UInt32  first4rank;
     // 0x1 µÚÒ»´Î³ÉÎª¾º¼¼³¡µÚÒ»
     // 0x2 µÚÒ»´ÎÉ±Èë¾º¼¼³¡¶þÇ¿
@@ -72,6 +73,9 @@ struct AthleticsRankData
     // 0x1000 Ê§È¥10Ç¿ÅÅÃû
     // 0x2000 ¶áµÃ10Ç¿ÅÅÃû
     // 0x4000 ÒÑÌØÊâÌôÕ½
+    AthleticsRankData() : pageNum(0)
+    {
+    }
 };
 
 struct AthleticsAward
@@ -106,7 +110,10 @@ struct AthleticsEventData
 		: id(id_), player1(player1_), player2(player2_), cond(cond_), color(color_), value(value_), itemCount(itemCount_), itemId(itemId_), time(time_) {}
 };
 
-
+struct AthleticsPayPaging
+{
+    UInt8  moneyEnough;
+};
 
 static const UInt16 TimeOutbyColor[] = {2 * 60 * 60, 4 * 60 * 60, 6 * 60 * 60, 6 * 60 * 60};//±¦ÏäµÄÊ±¼ä ÂÌÉ«:2Ð¡Ê± À¶É«:4Ð¡Ê± ×ÏÉ«:6Ð¡Ê± ³ÈÉ«:6Ð¡Ê±
 //static const UInt8 PLUND_RATE = 3;
@@ -128,7 +135,8 @@ public:
 public:
 	void addAthleticsFromDB(UInt8, AthleticsRankData *);
 	bool enterAthleticsReq(Player *, UInt8 row);
-
+    void RequestPageNum(GObject::Player*); // client -> world
+    void AddPageNum(Player* player, bool bMoneyEnough); // country -> world
 public:
 	void requestAthleticsList(Player *, UInt16 type);
 	void challenge(Player *, std::string&, UInt8 type = 0);
@@ -223,6 +231,7 @@ protected:
     void updateAthleticsRank(AthleticsRankData* data);
 	void updateBatchRanker(UInt8, Rank, Rank);
 	UInt8 updateChallengeNum(UInt8, UInt32);
+    void  updatePageNum(Rank r);
 	void getRankUpNeighbour(UInt8, Rank, Rank&);
 	void getRankDownNeighbour(UInt8, Rank, Rank&);
 	void getRankNeighbour(UInt8, Rank, Rank&, Rank&);

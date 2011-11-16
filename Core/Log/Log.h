@@ -53,6 +53,8 @@ enum PurchaseType
     TrumpUpgrade,
     TrumpLOrder,
     AutoFrontMapComplete,
+    AthleticPaging, 
+
 };
 
 enum IncomingType

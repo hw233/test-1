@@ -436,6 +436,7 @@ namespace GObject
 			Challenging = 0x00000010,		//竞技状态, 世界线程处理
 			BeChallenging = 0x00000020,		//非竞技状态
 			SGPunish	= 0x00000040,		//变速惩罚
+            AthPayForPage = 0x00000080,     //in athletics range for paging
 			AllGlobalFlags	= 0xFFFFFFFF
 		};
 
