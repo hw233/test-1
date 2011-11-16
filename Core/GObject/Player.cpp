@@ -1210,6 +1210,7 @@ namespace GObject
         }
 
         dclogger.logout(this);
+        heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
 	}
 
