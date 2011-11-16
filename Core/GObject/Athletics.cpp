@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Country.h"
 #include "Athletics.h"
+#include "AthleticsRank.h"
 #include "Server/OidGenerator.h"
 #include "Script/GameActionLua.h"
 #include "Battle/BattleSimulator.h"
@@ -689,6 +690,27 @@ void Athletics::listAthleticsMartial()
         GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, _owner, 0);
         GLOBAL().PushMsg(hdr2, NULL);
     }
+}
+void  Athletics:: PayForPaging()
+{
+    UInt8   MoneyEnough = 0 ;
+    UInt32 amount = 100 ;
+    if(_owner->getTael() < amount)
+    {
+       _owner->sendMsgCode(0, 1100);
+    }
+    else
+    {
+        ConsumeInfo ci(AthleticPaging,0,0);
+        _owner->useTael(amount,&ci);
+        MoneyEnough = 1;
+    }
+
+    GObject::AthleticsPayPaging  msg;
+    msg.moneyEnough = MoneyEnough;
+
+    GameMsgHdr hdr(0x19A, WORKER_THREAD_WORLD, _owner, sizeof(msg));
+    GLOBAL().PushMsg(hdr, &msg);
 }
 
 }

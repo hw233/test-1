@@ -1224,7 +1224,11 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
         break;
     }
 }
-
+void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
+{
+     MSG_QUERY_PLAYER(player);
+     GObject::gAthleticsRank.RequestPageNum(player);
+}
 void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
 {
     MSG_QUERY_PLAYER(player);

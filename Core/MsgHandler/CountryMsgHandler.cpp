@@ -154,6 +154,7 @@ MSG_REG_2(GameMsgHdr, 0x218, OnGetBoxAddSource);
 MSG_REG_2(GameMsgHdr, 0x219, OnOnAthleticsEnterNotify);
 MSG_REG_2(GameMsgHdr, 0x220, OnAthleticsResNotify);
 MSG_REG_2(GameMsgHdr, 0x221, OnAthleticsReportList);
+MSG_REG_2(GameMsgHdr, 0x222, OnAthlectisPayPaging);
 
 MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
@@ -166,6 +167,7 @@ MSG_REG_2(GameMsgHdr, 0x272, OnClanBattleAttendReq);
 MSG_REG_2(GameMsgHdr, 0x274, OnExpGainByInstantCompleteReq);
 MSG_REG_2(GameMsgHdr, 0x276, OnAutoCopyAttack);
 MSG_REG_2(GameMsgHdr, 0x277, OnPlayerTimeTick);
+MSG_REG_2(GameMsgHdr, 0x278, OnAutoFrontMapAttack);
 
 MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 

@@ -52,6 +52,8 @@ enum PurchaseType
     PurchaseSale,
     TrumpUpgrade,
     TrumpLOrder,
+    AutoFrontMapComplete,
+    AthleticPaging, 
     HeroIslandSkill,
 };
 
@@ -87,6 +89,7 @@ enum MailItemType
     AutoCopy,
     CountryBattleAward,
 	SaleSell,
+    AutoFrontMap,
 };
 enum ItemFrom
 {

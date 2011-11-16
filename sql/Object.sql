@@ -95,6 +95,7 @@ CREATE TABLE `athletics_rank` (
   `oldrank` int(10) NOT NULL DEFAULT '0',
   `first4rank` int(10) unsigned NOT NULL DEFAULT '0',
   `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0',
+  `pageNum` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1155,6 +1156,13 @@ CREATE TABLE `worldboss` (
 
 DROP TABLE IF EXISTS `autocopy`;
 CREATE TABLE `autocopy` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `auto_frontmap`;
+CREATE TABLE `auto_frontmap` (
   `playerId` bigint(20) unsigned NOT NULL,
   `id` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)

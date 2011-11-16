@@ -28,6 +28,7 @@
 #include "CountryMsgStruct.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
+#include "GObject/FrontMap.h"
 #include "GObject/HeroIsland.h"
 
 GMHandler gmHandler;
@@ -110,6 +111,7 @@ GMHandler::GMHandler()
 	Reg(3, "enchant", &GMHandler::OnEnchant);
 	Reg(3, "resetic", &GMHandler::OnResetIc);
 	Reg(3, "autocb", &GMHandler::OnAutoCB);
+	Reg(3, "autofb", &GMHandler::OnAutoFB);
 
 	Reg(3, "nextarena", &GMHandler::OnNextArena);
 	Reg(3, "pay4pra", &GMHandler::OnPay4Pra);
@@ -1994,6 +1996,15 @@ void GMHandler::OnAutoCB( GObject::Player * player, std::vector<std::string>& ar
 		player->autoCB();
 	else
 		player->autoCB(false);
+}
+
+void GMHandler::OnAutoFB( GObject::Player * player, std::vector<std::string>& args )
+{
+    UInt8 id = 0;
+    UInt8 type = 0;
+    id = atoi(args[0].c_str());
+    type = atoi(args[1].c_str());
+    frontMap.autoBattle(player, id, type, false);
 }
 
 void GMHandler::OnEnterArena( GObject::Player * player, std::vector<std::string>& )

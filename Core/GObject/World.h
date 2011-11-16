@@ -52,6 +52,10 @@ public:
     { _singleday = v; }
     inline static bool getSingleDay()
     { return _singleday; }
+    inline static void setThanksgiving(bool v)
+    { _thanksgiving = v; }
+    inline static bool getThanksgiving()
+    { return _thanksgiving; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -74,6 +78,7 @@ public:
     static bool _nationalDay;
     static bool _halloween;
     static bool _singleday;
+    static bool _thanksgiving;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
