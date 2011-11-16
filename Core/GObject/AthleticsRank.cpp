@@ -497,7 +497,7 @@ void AthleticsRank::RequestPageNum(Player* player)
     if(( (*rank)->pageNum *10 + 11) >= rankpos) 
         return;
 
-    if((*rank)->pageNum >= 2)
+    if((*rank)->pageNum >= 10)
     {
         player->sendMsgCode(0, 1499); //最多翻10页
         return;
