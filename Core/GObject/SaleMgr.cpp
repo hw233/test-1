@@ -364,7 +364,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 	}
 	if (req > 8 || career > 3 || color > 6 || eqType > 16)
 		return;
-	static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 15, 18, 31};
+	static const UInt8 ReqCvt[] = { 0xFF, 1, 2, 3, 12, 16, 20, 33};
 	if (req == 8)
 	{
 		searchPlayerSale(player, player, start, count);
@@ -821,10 +821,10 @@ void SaleMgr::update(UInt32 curr)
 UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
 {
     //static UInt8 cvt[] = { 1, 1, 2, 1, 6, 7, 8, 9, 10, 11, 12, 13, 4, 1 };
-    static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 15, 1, 1, 1, 1, 1, 1, 1, 1, 1,         // 装备，法宝   [0-19]
-                           1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18,  // 普通物品， 阵法 [20-39]
+    static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 16, 1, 1, 1, 1, 1, 1, 1, 1, 1,         // 装备，法宝   [0-19]
+                           1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  // 普通物品， 阵法 [20-39]
                            12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // 心法， 强化 [40-59]
-                           32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 31, 31, 31, 31};  // 宝石 [60-79]
+                           34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 33, 33, 33, 33};  // 宝石 [60-79]
 
     UInt8 res = cvt[type];
     if(type > sizeof(cvt) - 1)
@@ -836,16 +836,18 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
     {
         parent = 3;
     }
-    else if(res > 31 && res < 48)
+    else if(res > 33 && res < 50)
     {
-        parent = 31;
+        parent = 33;
     }
 
     switch(res)
     {
-    case 15:                                      //法宝
-        parent = 15;
-        if(typeId > 1499 && typeId < 1600)        //被动技能法宝
+    case 16:                                      //法宝
+        parent = 16;
+        if(type == 29)
+            res += 3;
+        else if(typeId > 1499 && typeId < 1600)        //被动技能法宝
             res += 1;
         else if(typeId > 1599 && typeId < 1700)   //主动技能法宝
             res += 2;
@@ -881,7 +883,9 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
         {
             parent = 12;
             const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[typeId];
-            if(itemType->career == 0)
+            if(type == 45)
+                res += 3;
+            else if(itemType->career == 0)
             {
                 res += 1;
             }
