@@ -820,18 +820,14 @@ namespace GObject
             UInt8 platform = atoi(getDomain().c_str());
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
-
             if (platform)
-            {
-                snprintf(pbuf, pbuf - buf, "|%u|", platform);
-                m_ulog->SetUserMsg(buf);
                 m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
-            }
+
             TRACE_LOG("%s", buf);
         }
     }
