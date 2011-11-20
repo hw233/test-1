@@ -42,7 +42,7 @@ public:
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
-	void start();
+	void start(UInt8 prevWin = 0xFF);
 	inline Stream& getPacket() {return _packet;}
 	inline Script::BattleFormula * getFormula() { return _formula; }
 	inline int getWinner() { return _winner; } // returns 1 for attacker winning, 2 for defender winning, or 0 for that game's still in progress
@@ -52,6 +52,8 @@ public:
 	BattleFighter * newFighter(UInt8 side, UInt8 pos, GObject::Fighter *);
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
+    void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
+    void clearLastBattle(UInt8 winner);
 private:
 	struct FighterStatus
 	{
@@ -220,6 +222,12 @@ private:
 	GObject::Player * _player[2];
 	std::string _other_name;
 	UInt8 _other_level;
+
+    UInt8 _teams[2];
+	std::string _team_name[2][2];
+	UInt8 _team_level[2][2];
+	UInt16 _team_portrait[2][2];
+
 	URandom _rnd;
 };
 

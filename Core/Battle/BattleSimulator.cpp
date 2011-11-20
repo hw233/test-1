@@ -48,6 +48,17 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
 	_portrait[0] = 0;
 	_portrait[1] = 0;
     _cur_fgtlist_idx = 0;
+
+    for(int i = 0; i < 2; ++i)
+    {
+        _teams[i] = 0;
+        _team_name[i][0] = "";
+        _team_name[i][1] = "";
+        _team_level[i][0] = 0;
+        _team_level[i][1] = 0;
+        _team_portrait[i][0] = 0;
+        _team_portrait[i][1] = 0;
+    }
 }
 
 BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObject::Player * player2, bool rpt, UInt32 fr): BattleField(), _id(rpt ? IDGenerator::gBattleOidGenerator.ID() : 0), _winner(0), _turns(0), _report(rpt), _fake_turns(fr), _formula(Script::BattleFormula::getCurrent())
@@ -61,12 +72,59 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
 	_portrait[0] = 0;
 	_portrait[1] = 0;
     _cur_fgtlist_idx = 0;
+
+    for(int i = 0; i < 2; ++i)
+    {
+        _teams[i] = 0;
+        _team_name[i][0] = "";
+        _team_name[i][1] = "";
+        _team_level[i][0] = 0;
+        _team_level[i][1] = 0;
+        _team_portrait[i][0] = 0;
+        _team_portrait[i][1] = 0;
+    }
+}
+
+void BattleSimulator::putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side)
+{
+    if(side > 2)
+        return;
+    UInt8 idx = _teams[side];
+    ++_teams[side];
+    _team_name[side][idx] = name;
+    _team_level[side][idx] = level;
+    _team_portrait[side][idx] = portrait;
+}
+
+void BattleSimulator::clearLastBattle(UInt8 side)
+{
+    if(side > 1)
+        return;
+    _id = IDGenerator::gBattleOidGenerator.ID();
+    for(int i = 0; i < 25; ++ i)
+    {
+        if(_objs[side][i] && !_isBody[side][i])
+        {
+            delete _objs[side][i];
+            _objs[side][i] = NULL;
+        }
+    }
+
+    _teams[side] = 0;
+    _team_name[side][0] = "";
+    _team_name[side][1] = "";
+    _team_level[side][0] = 0;
+    _team_level[side][1] = 0;
+    _team_portrait[side][0] = 0;
 }
 
 // #############################
 // change the battle queue but not pass client check
-void BattleSimulator::start()
+// prevWin for 组队
+void BattleSimulator::start(UInt8 prevWin)
 {
+    if(prevWin != 0xFF && (prevWin == 0 || prevWin > 2))
+        return;
 	_packet.clear();
 	_fgtlist[0].clear();
 	_fgtlist[1].clear();
@@ -81,18 +139,30 @@ void BattleSimulator::start()
 
 	_packet << _player[0]->getName() << _other_name;
 
+    //组队
+    for(int tidx = 0; tidx < 2; ++tidx)
+    {
+        for(int idx = 0; idx < _teams[tidx]; ++idx)
+        {
+            _packet << _team_name[idx] << _team_level[idx] << _team_portrait[idx];
+        }
+    }
+
 	size_t offset = _packet.size();
 
 	_packet << static_cast<UInt16>(0);
 
     // for the insertFighterStatus can only insert to next fgtlist, so to make sure to insert fighter status to _figtlist[0] and set the _cur_fgtlist to 1
-    _cur_fgtlist_idx = 1;
+    UInt8 cur_idx = _cur_fgtlist_idx;
+    _cur_fgtlist_idx = (cur_idx + 1)%2;
 	UInt8 cnt[2] = {0, 0};
 	bool loaded[2] = {false, false};
 	bool checkEnh = _player[1] == NULL;
 	UInt32 now = TimeUtil::Now();
 	for(int i = 0; i < 2; ++ i)
 	{
+        if((prevWin-1) == i)
+            continue;
 		UInt32 flag = 0;
 		if(_player[i] != NULL)
 		{
@@ -132,7 +202,7 @@ void BattleSimulator::start()
 								loaded[i] = true;
 							}
 						}
-						bf->initStats(checkEnh);
+                        bf->initStats(checkEnh);
                         UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
                         if(justice_roar)
                             bf->AddAura(justice_roar);
@@ -150,16 +220,17 @@ void BattleSimulator::start()
 					_packet << static_cast<UInt8>(bf->getFighter()->getColor())
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
-					_packet << aura << maxAura <<static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
+					_packet << aura << maxAura << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getMagAttack())
+                        << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getMagDefend()) << static_cast<UInt16>(bf->getAction());
                     // TODO: up skills
-					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f) << static_cast<UInt16>(bf->getTough(NULL) * 100.0f) << static_cast<UInt16>(bf->getMagRes(NULL) * 100.0f);
+					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f) << static_cast<UInt16>(bf->getTough(NULL) * 100.0f) << static_cast<UInt16>(bf->getCriticalDmg() * 100.0f) << static_cast<UInt16>(bf->getMagRes(NULL) * 100.0f);
                     _packet << bf->getFighter()->getPeerlessAndLevel();
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);
                     
 					if(ismain)
 					{
-						bf->postInit();
+                        bf->postInit();
 						// FighterStatus fs(bf);
 						// Insert into action queue
 						insertFighterStatus(bf);
@@ -175,7 +246,7 @@ void BattleSimulator::start()
 	}
 
     // after insert fighter status to _fgtlist[0] set the _cur_fgtlist_idx to 0
-    _cur_fgtlist_idx = 0;
+    _cur_fgtlist_idx = cur_idx;
 	if(_fgtlist[_cur_fgtlist_idx].empty())
 	{
 		_packet.clear();
@@ -767,7 +838,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             atkAct->push_back(aa);
         }
 
-        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg)
+        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg && bo->getHP() > 0)
         {
             AttackAct aa = {0};
             aa.bf = bo;
@@ -2319,175 +2390,49 @@ UInt32 BattleSimulator::doAttack( int pos )
     UInt32 confuse = bf->getConfuseRound();
     UInt32 forget = bf->getForgetRound();
 
-    rcnt += releaseCD(bf);
     insertFighterStatus(bf);
 
-    if(stun > 0)
+    do
     {
-        return rcnt;
-    }
-
-    int target_pos;
-    int otherside = 1 - bf->getSide();
-    UInt32 dmg = 0;
-    if(confuse > 0)
-    {
-        BattleFighter* rnd_bf = NULL; 
-        if(_rnd(2) == bf->getSide())
+        if(stun > 0)
         {
-            UInt8 myPos = bf->getPos();
-            rnd_bf = getRandomFighter(bf->getSide(), &myPos, 1);
+            break;
         }
 
-        if(NULL == rnd_bf)
+        int target_pos;
+        int otherside = 1 - bf->getSide();
+        UInt32 dmg = 0;
+        if(confuse > 0)
         {
-	        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
-        }
-        else
-        {
-            target_pos = rnd_bf->getPos();
-            otherside = bf->getSide();
-        }
-
-        if(target_pos < 0)
-            return rcnt;
-
-        std::vector<AttackAct> atkAct;
-        atkAct.clear();
-        dmg += doNormalAttack(bf, otherside, target_pos, rnd_bf != NULL ? &atkAct : NULL);
-        ++ rcnt;
-
-        if(rnd_bf && rnd_bf->getHP() == 0)
-        {
-            onDead(rnd_bf, &atkAct);
-        }
-
-        size_t actCnt = atkAct.size();
-        for(size_t idx = 0; idx < actCnt; idx++)
-        {
-            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-            BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-            if(tmpbo && tmpbo->getHP() == 0)
+            BattleFighter* rnd_bf = NULL; 
+            if(_rnd(2) == bf->getSide())
             {
-                onDead(tmpbo, &atkAct);
-                actCnt = atkAct.size();
+                UInt8 myPos = bf->getPos();
+                rnd_bf = getRandomFighter(bf->getSide(), &myPos, 1);
             }
-            ++ rcnt;
-        }
 
-        atkAct.clear();
-
-        return rcnt;
-    }
-    else if(forget > 0)
-    {
-        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
-
-        if(target_pos < 0)
-            return rcnt;
-
-        std::vector<AttackAct> atkAct;
-        atkAct.clear();
-        dmg += doNormalAttack(bf, otherside, target_pos, &atkAct);
-        ++ rcnt;
-
-        size_t actCnt = atkAct.size();
-        for(size_t idx = 0; idx < actCnt; idx++)
-        {
-            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-            BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-            if(tmpbo && tmpbo->getHP() == 0)
+            if(NULL == rnd_bf)
             {
-                onDead(tmpbo, &atkAct);
-                actCnt = atkAct.size();
-            }
-            ++ rcnt;
-        }
-        atkAct.clear();
-
-        return rcnt;
-    }
-    else
-    {
-        const GData::SkillBase* skill = NULL;
-        // do preve attack passive skill that must act
-        size_t skillIdx = 0;
-        int cnt = 0;
-        while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx)))
-        {
-            getSkillTarget(bf, skill, otherside, target_pos, cnt);
-            if(cnt < 1)
-                return rcnt;
-
-            std::vector<AttackAct> atkAct;
-            atkAct.clear();
-            dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
-            ++ rcnt;
-
-            size_t actCnt = atkAct.size();
-            for(size_t idx = 0; idx < actCnt; idx++)
-            {
-                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-                if(tmpbo && tmpbo->getHP() == 0)
-                {
-                    onDead(tmpbo, &atkAct);
-                    actCnt = atkAct.size();
-                }
-                ++ rcnt;
-            }
-            atkAct.clear();
-        }
-
-        skill = bf->getPassiveSkillPreAtk();
-        if(NULL != skill)
-        {
-            getSkillTarget(bf, skill, otherside, target_pos, cnt);
-            if(cnt < 1)
-                return rcnt;
-
-            std::vector<AttackAct> atkAct;
-            atkAct.clear();
-            dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
-            ++ rcnt;
-
-            size_t actCnt = atkAct.size();
-            for(size_t idx = 0; idx < actCnt; idx++)
-            {
-                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-                if(tmpbo && tmpbo->getHP() == 0)
-                {
-                    onDead(tmpbo, &atkAct);
-                    actCnt = atkAct.size();
-                }
-                ++ rcnt;
-            }
-            atkAct.clear();
-        }
-
-        // do active skill
-        BattleFighter* therapy_bf = getTherapyTarget(bf);
-        skill = bf->getActiveSkill(therapy_bf!= NULL);
-        if(NULL != skill)
-        {
-            if(NULL != therapy_bf && (skill->effect->hpP > 0 || skill->effect->hp > 0 || skill->effect->addhp > 0) && skill->target == 0)
-            {
-                otherside = therapy_bf->getSide();
-                target_pos = therapy_bf->getPos();
-                cnt = 1;
+                target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
             }
             else
             {
-                getSkillTarget(bf, skill, otherside, target_pos, cnt);
+                target_pos = rnd_bf->getPos();
+                otherside = bf->getSide();
             }
-            if(cnt < 1)
-                return rcnt;
+
+            if(target_pos < 0)
+                break;
 
             std::vector<AttackAct> atkAct;
             atkAct.clear();
-            dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
+            dmg += doNormalAttack(bf, otherside, target_pos, rnd_bf != NULL ? &atkAct : NULL);
             ++ rcnt;
+
+            if(rnd_bf && rnd_bf->getHP() == 0)
+            {
+                onDead(rnd_bf, &atkAct);
+            }
 
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
@@ -2501,14 +2446,17 @@ UInt32 BattleSimulator::doAttack( int pos )
                 }
                 ++ rcnt;
             }
+
             atkAct.clear();
+
+            break;
         }
-        else
+        else if(forget > 0)
         {
             target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
 
             if(target_pos < 0)
-                return rcnt;
+                break;
 
             std::vector<AttackAct> atkAct;
             atkAct.clear();
@@ -2529,441 +2477,569 @@ UInt32 BattleSimulator::doAttack( int pos )
             }
             atkAct.clear();
 
-            // 普通攻击后的被动技能
-            if(bf->getHP() > 0)
+            break;
+        }
+        else
+        {
+            const GData::SkillBase* skill = NULL;
+            // do preve attack passive skill that must act
+            size_t skillIdx = 0;
+            int cnt = 0;
+            while(NULL != (skill = bf->getPassiveSkillPrvAtk100(skillIdx)))
             {
-                size_t idx = 0;
-                const GData::SkillBase* passiveSkill = NULL;
-                BattleFighter* bo = static_cast<BattleFighter*>(_objs[otherside][target_pos]);
-                while(NULL != (passiveSkill = bf->getPassiveSkillAftNAtk100(idx)))
+                getSkillTarget(bf, skill, otherside, target_pos, cnt);
+                if(cnt < 1)
+                    break;
+
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
+                ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
                 {
-                    // 敌方
-                    if(passiveSkill->target == 1 && (!bo || bo->getHP() == 0))
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                    BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                    if(tmpbo && tmpbo->getHP() == 0)
+                    {
+                        onDead(tmpbo, &atkAct);
+                        actCnt = atkAct.size();
+                    }
+                    ++ rcnt;
+                }
+                atkAct.clear();
+            }
+
+            skill = bf->getPassiveSkillPreAtk();
+            if(NULL != skill)
+            {
+                getSkillTarget(bf, skill, otherside, target_pos, cnt);
+                if(cnt < 1)
+                    break;
+
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
+                ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
+                {
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                    BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                    if(tmpbo && tmpbo->getHP() == 0)
+                    {
+                        onDead(tmpbo, &atkAct);
+                        actCnt = atkAct.size();
+                    }
+                    ++ rcnt;
+                }
+                atkAct.clear();
+            }
+
+            // do active skill
+            BattleFighter* therapy_bf = getTherapyTarget(bf);
+            skill = bf->getActiveSkill(therapy_bf!= NULL);
+            if(NULL != skill)
+            {
+                if(NULL != therapy_bf && (skill->effect->hpP > 0 || skill->effect->hp > 0 || skill->effect->addhp > 0) && skill->target == 0)
+                {
+                    otherside = therapy_bf->getSide();
+                    target_pos = therapy_bf->getPos();
+                    cnt = 1;
+                }
+                else
+                {
+                    getSkillTarget(bf, skill, otherside, target_pos, cnt);
+                }
+                if(cnt < 1)
+                    break;
+
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
+                ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
+                {
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                    BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                    if(tmpbo && tmpbo->getHP() == 0)
+                    {
+                        onDead(tmpbo, &atkAct);
+                        actCnt = atkAct.size();
+                    }
+                    ++ rcnt;
+                }
+                atkAct.clear();
+            }
+            else
+            {
+                target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
+
+                if(target_pos < 0)
+                    break;
+
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                dmg += doNormalAttack(bf, otherside, target_pos, &atkAct);
+                ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
+                {
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                    BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                    if(tmpbo && tmpbo->getHP() == 0)
+                    {
+                        onDead(tmpbo, &atkAct);
+                        actCnt = atkAct.size();
+                    }
+                    ++ rcnt;
+                }
+                atkAct.clear();
+
+                // 普通攻击后的被动技能
+                if(bf->getHP() > 0)
+                {
+                    size_t idx = 0;
+                    const GData::SkillBase* passiveSkill = NULL;
+                    BattleFighter* bo = static_cast<BattleFighter*>(_objs[otherside][target_pos]);
+                    while(NULL != (passiveSkill = bf->getPassiveSkillAftNAtk100(idx)))
+                    {
+                        // 敌方
+                        if(passiveSkill->target == 1 && (!bo || bo->getHP() == 0))
+                        {
+                            continue;
+                        }
+
+                        std::vector<AttackAct> atkAct;
+                        atkAct.clear();
+                        doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                        ++ rcnt;
+
+                        size_t actCnt = atkAct.size();
+                        for(size_t idx = 0; idx < actCnt; idx++)
+                        {
+                            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                            BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                            if(tmpbo && tmpbo->getHP() == 0)
+                            {
+                                onDead(tmpbo, &atkAct);
+                                actCnt = atkAct.size();
+                            }
+                            ++ rcnt;
+                        }
+                        atkAct.clear();
+                    }
+
+                    passiveSkill = bf->getPassiveSkillAftNAtk();
+                    if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
+                    {
+                        std::vector<AttackAct> atkAct;
+                        atkAct.clear();
+                        doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                        ++ rcnt;
+
+                        size_t actCnt = atkAct.size();
+                        for(size_t idx = 0; idx < actCnt; idx++)
+                        {
+                            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                            BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                            if(tmpbo && tmpbo->getHP() == 0)
+                            {
+                                onDead(tmpbo, &atkAct);
+                                actCnt = atkAct.size();
+                            }
+                            ++ rcnt;
+                        }
+                        atkAct.clear();
+                    }
+                }
+            }
+        }
+
+        // 攻击后的被动技能
+        if(bf->getHP() > 0)
+        {
+            size_t idx = 0;
+            const GData::SkillBase* passiveSkill = NULL;
+            BattleFighter* bo = static_cast<BattleFighter*>(_objs[otherside][target_pos]);
+            while(NULL != (passiveSkill = bf->getPassiveSkillAftAtk100(idx)))
+            {
+                if(passiveSkill->target == 1 && (!bo || bo->getHP() == 0))
+                {
+                    continue;
+                }
+
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
+                {
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                    BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                    if(tmpbo && tmpbo->getHP() == 0)
+                    {
+                        onDead(tmpbo, &atkAct);
+                        actCnt = atkAct.size();
+                    }
+                    ++ rcnt;
+                }
+                atkAct.clear();
+            }
+
+            passiveSkill = bf->getPassiveSkillAftAtk();
+            if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
+            {
+                std::vector<AttackAct> atkAct;
+                atkAct.clear();
+                doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                ++ rcnt;
+
+                size_t actCnt = atkAct.size();
+                for(size_t idx = 0; idx < actCnt; idx++)
+                {
+                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
+                    BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
+                    if(tmpbo && tmpbo->getHP() == 0)
+                    {
+                        onDead(tmpbo, &atkAct);
+                        actCnt = atkAct.size();
+                    }
+                    ++ rcnt;
+                }
+                atkAct.clear();
+            }
+        }
+
+#if 0
+        if(target_object != NULL)
+        {
+            // find all targets that are hit
+            GData::Area * area = NULL;
+            GObject::ItemWeapon * weapon = bf->getFighter()->getWeapon();
+            if(weapon != NULL)
+            {
+                // TODO: no weapon_def
+                // area = &weapon->getWeaponDef().getArea();
+                area = &GData::Area::getDefault();
+            }
+            else
+            {
+                area = &GData::Area::getDefault();
+            }
+            int cnt = area->getCount();
+            if(cnt <= 0)
+                return 0;
+
+            DefStatus defList[25];
+            size_t defCount = 0;
+            StatusChange scList[50];
+            size_t scCount = 0;
+
+            // calculate damage
+            bool cs = false;
+            bool pr = bf->calcPierce();
+            float atk = bf->calcAttack(cs);
+
+            float factor = (*area)[0].factor;
+
+            rcnt += tryPreUseSkill(bf, target_object);
+            UInt32 dmg = 0;
+            if(cnt > 1)
+            {
+                AttackPoint ap[25];
+                int apcnt = 0;
+                int x_ = target_pos % 5;
+                int y_ = target_pos / 5;
+                for(int i = 1; i < cnt; ++ i)
+                {
+                    GData::Area::Data& ad = (*area)[i];
+                    int x = x_ + ad.x;
+                    int y = y_ + ad.y;
+                    if(x < 0 || x > 4 || y < 0 || y > 4)
                     {
                         continue;
                     }
-
-                    std::vector<AttackAct> atkAct;
-                    atkAct.clear();
-                    doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
-                    ++ rcnt;
-
-                    size_t actCnt = atkAct.size();
-                    for(size_t idx = 0; idx < actCnt; idx++)
+                    ap[apcnt].pos = x + y * 5;
+                    ap[apcnt].type = ad.type;
+                    ap[apcnt ++].factor = ad.factor;
+                }
+                // attack the target on center
+                dmg = attackOnce(bf, atk, cs, pr, target_object, factor, defList, defCount, scList, scCount, apcnt, ap);
+                for(int i = 0; i < apcnt; ++ i)
+                {
+                    switch(ap[i].type)
                     {
-                        doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                        BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-                        if(tmpbo && tmpbo->getHP() == 0)
+                    case 0:
+                        factor = ap[i].factor;
+                        attackOnce(bf, atk, cs, pr, _objs[otherside][ap[i].pos], factor, defList, defCount, scList, scCount);
+                        break;
+                    case 1:
+                        factor = (*area)[0].factor;
+                    case 2:
                         {
-                            onDead(tmpbo, &atkAct);
-                            actCnt = atkAct.size();
+                            float newfactor = factor * ap[i].factor;
+                            if(attackOnce(bf, atk, cs, pr, _objs[otherside][ap[i].pos], newfactor, defList, defCount, scList, scCount))
+                                factor = newfactor;
                         }
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // attack only one target
+                dmg = attackOnce(bf, atk, cs, pr, target_object, factor, defList, defCount, scList, scCount, 0);
+            }
+            // damage by skill or buff
+            UInt16 skillid = 0;
+            if(_winner == 0)
+            {
+                if(dmg > 0 && target_object->isChar())
+                {
+                    // TODO: 
+                    BattleFighter * target_fighter = static_cast<BattleFighter *>(target_object);
+                    UInt16 myskillid = bf->getFighter()->getSkill();
+                    if(target_fighter->getHP() > 0)
+                    {
+                        switch(myskillid)
+                        {
+                        case 202:
+                        case 203:
+                        case 204:
+                        case 209:
+                            {
+                                UInt8 poisonLevel = target_fighter->getPoisonLevel();
+                                if(myskillid - 201 <= poisonLevel)
+                                {
+                                    poisonLevel = 0;
+                                    break;
+                                }
+                                Script::BattleFormula::SkillData& sd = _formula->skillData(1, myskillid - 201, bf->getFighter()->getSkillLevel());
+                                if(_rnd(100) >= sd.rate)
+                                {
+                                    poisonLevel = 0;
+                                    break;
+                                }
+                                poisonLevel = static_cast<UInt8>(myskillid - 201);
+                                if(poisonLevel > 3)
+                                    poisonLevel = 4;
+                                target_fighter->setPoisonLevel(poisonLevel);
+                                skillid = myskillid;
+                                UInt32 round = sd.value3;
+                                if(round > 0)
+                                {
+                                    UInt32 fdmg;
+                                    if(target_fighter->hasFlag(BattleFighter::IsMirror))
+                                    {
+                                        fdmg = target_fighter->getHP();
+                                    }
+                                    else
+                                    {
+                                        const UInt16 poisonSid[] = {0, 1, 2, 3, 8};
+                                        Script::BattleFormula::SkillData& sd = _formula->skillData(1, poisonSid[poisonLevel], bf->getFighter()->getSkillLevel());
+                                        float pdmg = static_cast<float>(sd.value1) * bf->getAttack();
+                                        fdmg = _formula->calcDamage(pdmg, target_fighter->getDefend());
+                                    }
+                                    -- round;
+                                    defList[defCount].damType = (round > 0) ? 6 : 7;
+                                    defList[defCount].damage = fdmg;
+                                    defList[defCount].pos = target_pos;
+                                    target_object->makeDamage(fdmg);
+                                    defList[defCount].leftHP = target_fighter->getHP();
+                                    ++ defCount;
+                                    target_fighter->setPoisonRound(round);
+                                    if(round == 0)
+                                        target_fighter->setPoisonLevel(0);
+                                    // killed
+                                    if(target_object->getHP() == 0)
+                                        onDead(target_fighter);
+                                    else if(_winner == 0)
+                                    {
+                                        onDamage(target_fighter, scList, scCount, true);
+                                        FighterStatus fs2(target_fighter, bf->getAction() * 3 / 4, fdmg);
+                                        insertFighterStatus(fs2);
+                                    }
+                                }
+                            }
+                            break;
+                        case 305:
+                        case 306:
+                        case 307:
+                        case 309:
+                            {
+                                UInt8 confuseLevel = target_fighter->getConfuseLevel();
+                                if(myskillid - 304 <= confuseLevel)
+                                    break;
+                                Script::BattleFormula::SkillData& sd = _formula->skillData(2, myskillid - 301, bf->getFighter()->getSkillLevel());
+                                if(_rnd(100) >= sd.rate)
+                                    break;
+                                if(confuseLevel > 0)
+                                {
+                                    target_fighter->_hitrateAdd = 0;
+                                }
+                                confuseLevel = myskillid - 304;
+                                if(confuseLevel > 3)
+                                    confuseLevel = 4;
+                                target_fighter->setConfuseLevel(confuseLevel);
+                                skillid = myskillid;
+                                switch(confuseLevel)
+                                {
+                                case 1:
+                                case 2:
+                                    setStatusChange(target_fighter->getSide(), target_pos, 1, myskillid, 4, -sd.value1, scList, scCount, true);
+                                    break;
+                                case 3:
+                                    setStatusChange(target_fighter->getSide(), (target_pos / 5 * 5), 5, myskillid, 4, -sd.value1, scList, scCount, true);
+                                    break;
+                                case 4:
+                                    setStatusChange(target_fighter->getSide(), 0, 25, myskillid, 4, -sd.value1, scList, scCount, true);
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    if(bf->getHP() > 0)
+                    {
+                        switch(myskillid)
+                        {
+                        case 107:
+                        case 108:
+                            {
+                                Script::BattleFormula::SkillData& sd = _formula->skillData(0, myskillid - 101, bf->getFighter()->getSkillLevel());
+                                if(_rnd(100) >= sd.rate)
+                                    break;
+                                UInt32 rhp = static_cast<UInt32>(sd.value1 * dmg);
+                                if(rhp == 0)
+                                    rhp = 1;
+                                defList[defCount].damType = 3;
+                                defList[defCount].damage = rhp;
+                                defList[defCount].pos = 25 + bf->getPos();
+                                bf->regenHP(rhp);
+                                defList[defCount].leftHP = bf->getHP();
+                                ++ defCount;
+                                skillid = myskillid;
+                            }
+                            break;
+                        }
+                        if(_winner == 0 && defCount > 0 && (defList[0].damType & 0x17) == 0 && target_fighter->getHP() > 0)
+                        {
+                            UInt8 thornType = target_fighter->getThornLevel();
+                            UInt16 tskillid = target_fighter->getFighter()->getSkill();
+                            switch(tskillid)
+                            {
+                            case 101:
+                            case 102:
+                            case 103:
+                            case 109:
+                                {
+                                    if(tskillid - 100 <= thornType)
+                                        break;
+                                    Script::BattleFormula::SkillData& sd = _formula->skillData(0, tskillid - 101, target_fighter->getFighter()->getSkillLevel());
+                                    if(_rnd(100) >= sd.rate)
+                                        break;
+                                    thornType = static_cast<UInt8>(tskillid - 100);
+                                    if(thornType > 3)
+                                        thornType = 4;
+                                    target_fighter->setThornLevel(thornType);
+                                }
+                                break;
+                            }
+                            if(thornType > 0)
+                            {
+                                const UInt16 thronSid[] = {0, 0, 1, 2, 8};
+                                Script::BattleFormula::SkillData& sd = _formula->skillData(0, thronSid[thornType], target_fighter->getFighter()->getSkillLevel());
+                                float cdmg;
+                                switch(thornType)
+                                {
+                                case 1:
+                                case 2:
+                                    cdmg = static_cast<float>(sd.value1);
+                                    break;
+                                case 3:
+                                case 4:
+                                default:
+                                    cdmg = sd.value1 * target_fighter->getMaxHP();
+                                    break;
+                                }
+                                UInt32 fdmg = _formula->calcDamage(cdmg, bf->getDefend());
+                                defList[0].damType = 5;
+                                defList[0].counterDmg = fdmg;
+                                bf->makeDamage(fdmg);
+                                defList[0].counterLeft = bf->getHP();
+                                // killed
+                                if(bf->getHP() == 0)
+                                    onDead(bf);
+                                else if(_winner == 0)
+                                    onDamage(bf, scList, scCount, false);
+                            }
+                        }
+                    }
+                }
+                UInt8 confuseLevel = bf->getConfuseLevel();
+                if(confuseLevel > 0)
+                {
+                    bf->setConfuseLevel(0);
+                    setStatusChange(bf->getSide(), pos, 1, 0, 4, static_cast<UInt32>(0), scList, scCount, false);
+                }
+            }
+
+            appendToPacket(bf->getSide(), bf->getPos(), target_pos, static_cast<UInt8>(skillid > 0 ? 2 : 0), skillid, cs, pr, defList, defCount, scList, scCount);
+            ++ rcnt;
+            if(_winner == 0 && bf->getHP() > 0)
+                rcnt += tryDelayUseSkill(bf, target_object);
+
+            if(target_object->getHP() > 0)
+            {
+                BattleFighter * tmp_bf = bf;
+                float atkRate;
+                UInt16 skillId = 0;
+                if((atkRate = testLink(tmp_bf, skillId)) > 0.0f && tmp_bf != NULL)
+                {
+                    bool tmp_cs = false;
+                    bool tmp_pr = tmp_bf->calcPierce();
+                    float tmp_atk = tmp_bf->calcAttack(tmp_cs) * atkRate;
+                    defCount = 0;
+                    scCount = 0;
+                    GData::Area * area2 = NULL;
+                    if(tmp_bf->getFighter()->getWeapon() != NULL)
+                    {
+                        // TODO: no weapon_def
+                        // area2 = &tmp_bf->getFighter()->getWeapon()->getWeaponDef().getArea();
+                    }
+                    else
+                    {
+                        area2 = &GData::Area::getDefault();
+                    }
+                    if(area2->getCount() > 0)
+                        atkRate *= (*area)[0].factor;
+                    if(skillId > 0)
+                    {
+                        appendToPacket(bf->getSide(), bf->getPos(), tmp_bf->getPos() + 25, 2, skillId, false, false, NULL, 0, NULL, 0);
                         ++ rcnt;
                     }
-                    atkAct.clear();
-                }
-
-                passiveSkill = bf->getPassiveSkillAftNAtk();
-                if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
-                {
-                    std::vector<AttackAct> atkAct;
-                    atkAct.clear();
-                    doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
-                    ++ rcnt;
-
-                    size_t actCnt = atkAct.size();
-                    for(size_t idx = 0; idx < actCnt; idx++)
+                    attackOnce(tmp_bf, tmp_atk, tmp_cs, tmp_pr, NULL, target_object, atkRate, defList, defCount, scList, scCount);
+                    if(defCount > 0)
                     {
-                        doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                        BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-                        if(tmpbo && tmpbo->getHP() == 0)
-                        {
-                            onDead(tmpbo, &atkAct);
-                            actCnt = atkAct.size();
-                        }
+                        appendToPacket(bf->getSide(), tmp_bf->getPos(), target_pos, 0, 0, tmp_cs, tmp_pr, defList, defCount, scList, scCount);
                         ++ rcnt;
                     }
-                    atkAct.clear();
                 }
             }
         }
-    }
-
-    // 攻击后的被动技能
-    if(bf->getHP() > 0)
-    {
-        size_t idx = 0;
-        const GData::SkillBase* passiveSkill = NULL;
-        BattleFighter* bo = static_cast<BattleFighter*>(_objs[otherside][target_pos]);
-        while(NULL != (passiveSkill = bf->getPassiveSkillAftAtk100(idx)))
-        {
-            if(passiveSkill->target == 1 && (!bo || bo->getHP() == 0))
-            {
-                continue;
-            }
-
-            std::vector<AttackAct> atkAct;
-            atkAct.clear();
-            doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
-            ++ rcnt;
-
-            size_t actCnt = atkAct.size();
-            for(size_t idx = 0; idx < actCnt; idx++)
-            {
-                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-                if(tmpbo && tmpbo->getHP() == 0)
-                {
-                    onDead(tmpbo, &atkAct);
-                    actCnt = atkAct.size();
-                }
-                ++ rcnt;
-            }
-            atkAct.clear();
-        }
-
-        passiveSkill = bf->getPassiveSkillAftAtk();
-        if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
-        {
-            std::vector<AttackAct> atkAct;
-            atkAct.clear();
-            doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
-            ++ rcnt;
-
-            size_t actCnt = atkAct.size();
-            for(size_t idx = 0; idx < actCnt; idx++)
-            {
-                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                BattleFighter* tmpbo = static_cast<BattleFighter*>(_objs[atkAct[idx].target_side][atkAct[idx].target_pos]);
-                if(tmpbo && tmpbo->getHP() == 0)
-                {
-                    onDead(tmpbo, &atkAct);
-                    actCnt = atkAct.size();
-                }
-                ++ rcnt;
-            }
-            atkAct.clear();
-        }
-    }
-
-#if 0
-	if(target_object != NULL)
-	{
-		// find all targets that are hit
-		GData::Area * area = NULL;
-		GObject::ItemWeapon * weapon = bf->getFighter()->getWeapon();
-		if(weapon != NULL)
-		{
-            // TODO: no weapon_def
-			// area = &weapon->getWeaponDef().getArea();
-            area = &GData::Area::getDefault();
-		}
-		else
-		{
-			area = &GData::Area::getDefault();
-		}
-		int cnt = area->getCount();
-		if(cnt <= 0)
-			return 0;
-
-		DefStatus defList[25];
-		size_t defCount = 0;
-		StatusChange scList[50];
-		size_t scCount = 0;
-
-		// calculate damage
-		bool cs = false;
-		bool pr = bf->calcPierce();
-		float atk = bf->calcAttack(cs);
-
-		float factor = (*area)[0].factor;
-
-		rcnt += tryPreUseSkill(bf, target_object);
-		UInt32 dmg = 0;
-		if(cnt > 1)
-		{
-			AttackPoint ap[25];
-			int apcnt = 0;
-			int x_ = target_pos % 5;
-			int y_ = target_pos / 5;
-			for(int i = 1; i < cnt; ++ i)
-			{
-				GData::Area::Data& ad = (*area)[i];
-				int x = x_ + ad.x;
-				int y = y_ + ad.y;
-				if(x < 0 || x > 4 || y < 0 || y > 4)
-				{
-					continue;
-				}
-				ap[apcnt].pos = x + y * 5;
-				ap[apcnt].type = ad.type;
-				ap[apcnt ++].factor = ad.factor;
-			}
-			// attack the target on center
-			dmg = attackOnce(bf, atk, cs, pr, target_object, factor, defList, defCount, scList, scCount, apcnt, ap);
-			for(int i = 0; i < apcnt; ++ i)
-			{
-				switch(ap[i].type)
-				{
-				case 0:
-					factor = ap[i].factor;
-					attackOnce(bf, atk, cs, pr, _objs[otherside][ap[i].pos], factor, defList, defCount, scList, scCount);
-					break;
-				case 1:
-					factor = (*area)[0].factor;
-				case 2:
-					{
-						float newfactor = factor * ap[i].factor;
-						if(attackOnce(bf, atk, cs, pr, _objs[otherside][ap[i].pos], newfactor, defList, defCount, scList, scCount))
-							factor = newfactor;
-					}
-					break;
-				}
-			}
-		}
-		else
-		{
-			// attack only one target
-			dmg = attackOnce(bf, atk, cs, pr, target_object, factor, defList, defCount, scList, scCount, 0);
-		}
-		// damage by skill or buff
-		UInt16 skillid = 0;
-		if(_winner == 0)
-		{
-			if(dmg > 0 && target_object->isChar())
-			{
-                // TODO: 
-				BattleFighter * target_fighter = static_cast<BattleFighter *>(target_object);
-				UInt16 myskillid = bf->getFighter()->getSkill();
-				if(target_fighter->getHP() > 0)
-				{
-					switch(myskillid)
-					{
-					case 202:
-					case 203:
-					case 204:
-					case 209:
-						{
-							UInt8 poisonLevel = target_fighter->getPoisonLevel();
-							if(myskillid - 201 <= poisonLevel)
-							{
-								poisonLevel = 0;
-								break;
-							}
-							Script::BattleFormula::SkillData& sd = _formula->skillData(1, myskillid - 201, bf->getFighter()->getSkillLevel());
-							if(_rnd(100) >= sd.rate)
-							{
-								poisonLevel = 0;
-								break;
-							}
-							poisonLevel = static_cast<UInt8>(myskillid - 201);
-							if(poisonLevel > 3)
-								poisonLevel = 4;
-							target_fighter->setPoisonLevel(poisonLevel);
-							skillid = myskillid;
-							UInt32 round = sd.value3;
-							if(round > 0)
-							{
-								UInt32 fdmg;
-								if(target_fighter->hasFlag(BattleFighter::IsMirror))
-								{
-									fdmg = target_fighter->getHP();
-								}
-								else
-								{
-									const UInt16 poisonSid[] = {0, 1, 2, 3, 8};
-									Script::BattleFormula::SkillData& sd = _formula->skillData(1, poisonSid[poisonLevel], bf->getFighter()->getSkillLevel());
-									float pdmg = static_cast<float>(sd.value1) * bf->getAttack();
-									fdmg = _formula->calcDamage(pdmg, target_fighter->getDefend());
-								}
-								-- round;
-								defList[defCount].damType = (round > 0) ? 6 : 7;
-								defList[defCount].damage = fdmg;
-								defList[defCount].pos = target_pos;
-								target_object->makeDamage(fdmg);
-								defList[defCount].leftHP = target_fighter->getHP();
-								++ defCount;
-								target_fighter->setPoisonRound(round);
-								if(round == 0)
-									target_fighter->setPoisonLevel(0);
-								// killed
-								if(target_object->getHP() == 0)
-									onDead(target_fighter);
-								else if(_winner == 0)
-								{
-									onDamage(target_fighter, scList, scCount, true);
-									FighterStatus fs2(target_fighter, bf->getAction() * 3 / 4, fdmg);
-									insertFighterStatus(fs2);
-								}
-							}
-						}
-						break;
-					case 305:
-					case 306:
-					case 307:
-					case 309:
-						{
-							UInt8 confuseLevel = target_fighter->getConfuseLevel();
-							if(myskillid - 304 <= confuseLevel)
-								break;
-							Script::BattleFormula::SkillData& sd = _formula->skillData(2, myskillid - 301, bf->getFighter()->getSkillLevel());
-							if(_rnd(100) >= sd.rate)
-								break;
-							if(confuseLevel > 0)
-							{
-								target_fighter->_hitrateAdd = 0;
-							}
-							confuseLevel = myskillid - 304;
-							if(confuseLevel > 3)
-								confuseLevel = 4;
-							target_fighter->setConfuseLevel(confuseLevel);
-							skillid = myskillid;
-							switch(confuseLevel)
-							{
-							case 1:
-							case 2:
-								setStatusChange(target_fighter->getSide(), target_pos, 1, myskillid, 4, -sd.value1, scList, scCount, true);
-								break;
-							case 3:
-								setStatusChange(target_fighter->getSide(), (target_pos / 5 * 5), 5, myskillid, 4, -sd.value1, scList, scCount, true);
-								break;
-							case 4:
-								setStatusChange(target_fighter->getSide(), 0, 25, myskillid, 4, -sd.value1, scList, scCount, true);
-								break;
-							}
-						}
-						break;
-					}
-				}
-				if(bf->getHP() > 0)
-				{
-					switch(myskillid)
-					{
-					case 107:
-					case 108:
-						{
-							Script::BattleFormula::SkillData& sd = _formula->skillData(0, myskillid - 101, bf->getFighter()->getSkillLevel());
-							if(_rnd(100) >= sd.rate)
-								break;
-							UInt32 rhp = static_cast<UInt32>(sd.value1 * dmg);
-							if(rhp == 0)
-								rhp = 1;
-							defList[defCount].damType = 3;
-							defList[defCount].damage = rhp;
-							defList[defCount].pos = 25 + bf->getPos();
-							bf->regenHP(rhp);
-							defList[defCount].leftHP = bf->getHP();
-							++ defCount;
-							skillid = myskillid;
-						}
-						break;
-					}
-					if(_winner == 0 && defCount > 0 && (defList[0].damType & 0x17) == 0 && target_fighter->getHP() > 0)
-					{
-						UInt8 thornType = target_fighter->getThornLevel();
-						UInt16 tskillid = target_fighter->getFighter()->getSkill();
-						switch(tskillid)
-						{
-						case 101:
-						case 102:
-						case 103:
-						case 109:
-							{
-								if(tskillid - 100 <= thornType)
-									break;
-								Script::BattleFormula::SkillData& sd = _formula->skillData(0, tskillid - 101, target_fighter->getFighter()->getSkillLevel());
-								if(_rnd(100) >= sd.rate)
-									break;
-								thornType = static_cast<UInt8>(tskillid - 100);
-								if(thornType > 3)
-									thornType = 4;
-								target_fighter->setThornLevel(thornType);
-							}
-							break;
-						}
-						if(thornType > 0)
-						{
-							const UInt16 thronSid[] = {0, 0, 1, 2, 8};
-							Script::BattleFormula::SkillData& sd = _formula->skillData(0, thronSid[thornType], target_fighter->getFighter()->getSkillLevel());
-							float cdmg;
-							switch(thornType)
-							{
-							case 1:
-							case 2:
-								cdmg = static_cast<float>(sd.value1);
-								break;
-							case 3:
-							case 4:
-							default:
-								cdmg = sd.value1 * target_fighter->getMaxHP();
-								break;
-							}
-							UInt32 fdmg = _formula->calcDamage(cdmg, bf->getDefend());
-							defList[0].damType = 5;
-							defList[0].counterDmg = fdmg;
-							bf->makeDamage(fdmg);
-							defList[0].counterLeft = bf->getHP();
-							// killed
-							if(bf->getHP() == 0)
-								onDead(bf);
-							else if(_winner == 0)
-								onDamage(bf, scList, scCount, false);
-						}
-					}
-				}
-			}
-			UInt8 confuseLevel = bf->getConfuseLevel();
-			if(confuseLevel > 0)
-			{
-				bf->setConfuseLevel(0);
-				setStatusChange(bf->getSide(), pos, 1, 0, 4, static_cast<UInt32>(0), scList, scCount, false);
-			}
-		}
-
-		appendToPacket(bf->getSide(), bf->getPos(), target_pos, static_cast<UInt8>(skillid > 0 ? 2 : 0), skillid, cs, pr, defList, defCount, scList, scCount);
-		++ rcnt;
-		if(_winner == 0 && bf->getHP() > 0)
-			rcnt += tryDelayUseSkill(bf, target_object);
-
-		if(target_object->getHP() > 0)
-		{
-			BattleFighter * tmp_bf = bf;
-			float atkRate;
-			UInt16 skillId = 0;
-			if((atkRate = testLink(tmp_bf, skillId)) > 0.0f && tmp_bf != NULL)
-			{
-				bool tmp_cs = false;
-				bool tmp_pr = tmp_bf->calcPierce();
-				float tmp_atk = tmp_bf->calcAttack(tmp_cs) * atkRate;
-				defCount = 0;
-				scCount = 0;
-				GData::Area * area2 = NULL;
-				if(tmp_bf->getFighter()->getWeapon() != NULL)
-				{
-                    // TODO: no weapon_def
-					// area2 = &tmp_bf->getFighter()->getWeapon()->getWeaponDef().getArea();
-				}
-				else
-				{
-					area2 = &GData::Area::getDefault();
-				}
-				if(area2->getCount() > 0)
-					atkRate *= (*area)[0].factor;
-				if(skillId > 0)
-				{
-					appendToPacket(bf->getSide(), bf->getPos(), tmp_bf->getPos() + 25, 2, skillId, false, false, NULL, 0, NULL, 0);
-					++ rcnt;
-				}
-				attackOnce(tmp_bf, tmp_atk, tmp_cs, tmp_pr, NULL, target_object, atkRate, defList, defCount, scList, scCount);
-				if(defCount > 0)
-				{
-					appendToPacket(bf->getSide(), tmp_bf->getPos(), target_pos, 0, 0, tmp_cs, tmp_pr, defList, defCount, scList, scCount);
-					++ rcnt;
-				}
-			}
-		}
-	}
 #endif
+    }
+    while(false);
+
+    rcnt += releaseCD(bf);
 	return rcnt;
 }
 
