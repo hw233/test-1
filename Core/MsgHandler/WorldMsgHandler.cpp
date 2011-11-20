@@ -37,6 +37,7 @@ MSG_REG(GameMsgHdr, OnPracticeSitDownReq);
 MSG_REG(GameMsgHdr, OnPracticeStopReq);
 MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_CHALLENGE, OnAthleticsChallengeReq);
+MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_PAGING,    OnAthleticsPaging);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
 
@@ -74,6 +75,9 @@ MSG_REG_2(GameMsgHdr, 0x181, OnCompleteDungeonAutoReq);
 
 MSG_REG_2(GameMsgHdr, 0x198, OnPopTimerEvent);
 MSG_REG_2(GameMsgHdr, 0x199, OnPushTimerEvent);
+
+MSG_REG_2(GameMsgHdr, 0x19A, OnAthleticsPayRet);
+
 MSG_REG_2(GameMsgHdr, 0x19C, OnSearchEvents);
 
 MSG_REG_2(GameMsgHdr, 0x19D, OnAthleticsOver);

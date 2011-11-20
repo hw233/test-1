@@ -52,6 +52,9 @@ enum PurchaseType
     PurchaseSale,
     TrumpUpgrade,
     TrumpLOrder,
+    AutoFrontMapComplete,
+    AthleticPaging, 
+
 };
 
 enum IncomingType
@@ -86,6 +89,7 @@ enum MailItemType
     AutoCopy,
     CountryBattleAward,
 	SaleSell,
+    AutoFrontMap,
 };
 enum ItemFrom
 {

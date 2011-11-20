@@ -33,6 +33,11 @@ public:
     void normal();
     void incDomainOnlineNum(UInt8 domain);
     void decDomainOnlineNum(UInt8 domain);
+    void getOnline(UInt32* buf)
+    {
+        if (!buf) return;
+        memcpy(buf, m_onlineNum_domain, sizeof(m_onlineNum_domain));
+    }
 
 private:
     UInt32 version;

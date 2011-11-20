@@ -405,6 +405,38 @@ function ItemNormal_00000040(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000008(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 then		
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+    local prob = {15, 29, 32, 45, 53, 58, 73, 86, 98, 100,}
+    local items = {{9,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
+
+    local p = math.random(1, 100)
+    for i = 1, #prob do
+        if p <= prob[i] then
+            break
+        end
+    end
+
+    local item = items[i]
+    if item[1] == 0 then
+        local equip = getRandPEquip(player:GetLev())
+		package:AddEquip(equip, 1, true);
+        if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
+            SendMsg(player, 0x35, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
+        end
+    else
+        package:AddItem(item[1], item[2], true, 0, 2);
+        if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
+            SendMsg(player, 0x35, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."x"..item[2].."]");
+        end
+    end
+end
+
 function ItemNormal_00000009(iid, num, bind, param)
   local player = GetPlayer()
   if player:hasFlag(73) then
@@ -5555,7 +5587,6 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     return num;
 end
 
-
 local ItemNormal_Table = {
   [7001] = ItemNormal_00007xxx,
   [7002] = ItemNormal_00007xxx,
@@ -5598,6 +5629,7 @@ local ItemNormal_Table = {
 	[8907] = ItemNormal_00008907,
 --	[6] = ItemNormal_00000006,
 --	[7] = ItemNormal_00000007,
+	[8] = ItemNormal_00000008,
 	[9] = ItemNormal_00000009,
 	[8931] = ItemNormal_00008931,
 	[55] = ItemNormal_00000055,

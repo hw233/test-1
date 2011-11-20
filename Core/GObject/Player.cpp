@@ -45,6 +45,11 @@
 #include <cmath>
 
 #define NTD_ONLINE_TIME (4*60*60)
+#ifndef _DEBUG
+#define TGD_ONLINE_TIME (3*60*60)
+#else
+#define TGD_ONLINE_TIME (60)
+#endif
 
 namespace GObject
 {
@@ -478,6 +483,33 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoFrontMap::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoFrontMap::Process(UInt32 leftCount)
+    {
+        UInt16 idspot = (id << 8) + spot;
+		GameMsgHdr hdr(0x278, m_Player->getThreadId(), m_Player, sizeof(idspot));
+		GLOBAL().PushMsg(hdr, &idspot);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOFRONTMAP, m_Player->getId());
+        ++spot;
+    }
+
+    bool EventAutoFrontMap::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -745,6 +777,21 @@ namespace GObject
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 #endif
 
+        if (World::_thanksgiving)
+        {
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online < TGD_ONLINE_TIME)
+                {
+                    EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME-online, 1, 1);
+                    if (event) PushTimerEvent(event);
+                }
+                else
+                    GameAction()->onThanksgivingDay(this);
+            }
+        }
+
         sendLevelPack(GetLev());
 
         char buf[64] = {0};
@@ -773,18 +820,14 @@ namespace GObject
             UInt8 platform = atoi(getDomain().c_str());
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
-
             if (platform)
-            {
-                snprintf(pbuf, pbuf - buf, "|%u|", platform);
-                m_ulog->SetUserMsg(buf);
                 m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
-            }
+
             TRACE_LOG("%s", buf);
         }
     }
@@ -1151,6 +1194,18 @@ namespace GObject
                     sendNationalDayOnlineAward();
                 else
                     setBuffData(PLAYER_BUFF_ONLINE, online + curtime - _playerData.lastOnline);
+            }
+        }
+
+        if (World::_thanksgiving)
+        {
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online + curtime - _playerData.lastOnline >= TGD_ONLINE_TIME)
+                    GameAction()->onThanksgivingDay(this);
+                else
+                    SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
 
@@ -2135,6 +2190,12 @@ namespace GObject
 
 		return res;
 	}
+
+    void Player::autoFrontMapFailed()
+    {
+        //PopTimerEvent(this, EVENT_AUTOFRONTMAP, getId());
+        //delFlag(Player::AutoFrontMap);
+    }
 
     void Player::autoCopyFailed(UInt8 id)
     {
@@ -7000,6 +7061,16 @@ namespace GObject
             MailPackage::MailItem* item[8] = {item1,item2,item3,item4,item5,item6,item7,item8};
 
             sendMailItem(2205, 2206, item[enchant-1], 3);
+        }
+    }
+
+    void Player::resetThanksgiving()
+    {
+        SetVar(VAR_TGDT, 0);
+        if (isOnline())
+        {
+            EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME, 1, 1);
+            if (event) PushTimerEvent(event);
         }
     }
 

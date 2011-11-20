@@ -474,8 +474,6 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
     if (!pl || !id)
         return;
 
-    //FastMutex::ScopedLock lk(_mutex);
-
     switch (type) {
         case 0:
             {

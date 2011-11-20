@@ -48,6 +48,8 @@ void WorldScript::init()
 	def("setHalloween", GObject::World::setHalloween);
 	def("setSingleDay", GObject::World::setSingleDay);
 	def("getSingleDay", GObject::World::getSingleDay);
+	def("setThanksgiving", GObject::World::setThanksgiving);
+	def("getThanksgiving", GObject::World::getThanksgiving);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
