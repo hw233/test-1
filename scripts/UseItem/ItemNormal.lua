@@ -899,6 +899,14 @@ function ItemNormal_00000031(iid, num, bind, param)
     return n;
 end
 
+function ItemNormal_00000035(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  package:DelItemSendMsg(35, player);
+  player:getTael(100*num)  
+  return num;
+end
+
 function ItemNormal_00000036(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
@@ -5643,9 +5651,7 @@ local ItemNormal_Table = {
 	[12] = ItemNormal_00000012,
 	[13] = ItemNormal_00000013,
 	[14] = ItemNormal_00000014,
-
 	[15] = ItemNormal_00000015,
-	
 	[8938] = ItemNormal_00008938,
 	[8939] = ItemNormal_00008939,
 	[8940] = ItemNormal_00008940,
@@ -5660,6 +5666,7 @@ local ItemNormal_Table = {
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
+	[35] = ItemNormal_00000035,
 	[36] = ItemNormal_00000036,
 	[37] = ItemNormal_00000037,
 	[38] = ItemNormal_00000038,
@@ -5718,7 +5725,6 @@ local ItemNormal_Table = {
 	[8993] = ItemNormal_00008993,
 	[8994] = ItemNormal_00008994,
 	[8995] = ItemNormal_00008995,
-	[15] = ItemNormal_00000015,
 	[8997] = ItemNormal_00008997,
 	[8998] = ItemNormal_00008998,
 	[9002] = ItemNormal_00009002,
