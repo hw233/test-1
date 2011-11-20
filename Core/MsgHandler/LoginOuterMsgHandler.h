@@ -1552,7 +1552,35 @@ void WBossMgrFromBs(LoginMsgHdr &hdr, const void * data)
 	st.init(SPEP::WBOSS,0x1);
     UInt8 lvl;
     br >> lvl;
+    st << Stream::eos;
     GObject::worldBoss.bossAppear(lvl, true);
+}
+
+void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::ADDFIGHTER,0x1);
+    UInt64 playerId = 0;
+    UInt16 fgtid = 0;
+
+    br >> playerId;
+    br >> fgtid;
+
+    UInt8 ret = 0;
+    GObject::Fighter * fgt = GObject::globalFighters[fgtid];
+    if(fgt == NULL)
+        ret = 1;
+
+    GObject::Player* player = GObject::globalPlayers[playerId];
+    if (player == NULL)
+        ret = 1;
+
+    player->takeFighter(fgtid, true);
+
+    st << playerId << fgtid << ret;
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

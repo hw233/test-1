@@ -416,25 +416,29 @@ function ItemNormal_00000008(iid, num, bind, param)
     local items = {{9,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
 
     local p = math.random(1, 100)
-    for i = 1, #prob do
-        if p <= prob[i] then
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
             break
         end
     end
 
     local item = items[i]
     if item[1] == 0 then
-        local equip = getRandPEquip(player:GetLev())
+        local equip = getRandOEquip(player:GetLev())
 		package:AddEquip(equip, 1, true);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
-            SendMsg(player, 0x35, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
         end
     else
         package:AddItem(item[1], item[2], true, 0, 2);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
-            SendMsg(player, 0x35, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."x"..item[2].."]");
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."]x"..item[2]);
         end
     end
+    package:DelItemSendMsg(8, player);
+    return num
 end
 
 function ItemNormal_00000009(iid, num, bind, param)

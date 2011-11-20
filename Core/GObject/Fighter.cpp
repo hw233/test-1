@@ -990,12 +990,16 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 
 void Fighter::addAttr( const GData::CittaEffect* ce )
 {
+    if (!ce)
+        return;
 	addAttrExtra(_attrExtraEquip, ce);
 	addEquipAttr2(_attrExtraEquip, ce, _level);
 }
 
 void Fighter::addAttr( ItemEquip * equip )
 {
+    if (!equip)
+        return;
 	addAttrExtra(_attrExtraEquip, equip->getAttrExtra());
 	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2(), _level);
 	ItemEquipData& ied = equip->getItemEquipData();
@@ -1011,7 +1015,12 @@ void Fighter::addAttr( ItemEquip * equip )
 
 void Fighter::addTrumpAttr( ItemTrump * trump )
 {
-    GData::AttrExtra ae(*(trump->getAttrExtra()));
+    if (!trump)
+        return;
+    const GData::AttrExtra* pae = trump->getAttrExtra();
+    if (!pae)
+        return;
+    GData::AttrExtra ae(*pae);
 	ItemEquipData& ied = trump->getItemEquipData();
 
     UInt8 q = trump->getQuality();

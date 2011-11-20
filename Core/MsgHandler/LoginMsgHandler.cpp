@@ -35,6 +35,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::PLAYERINFO,PlayerInfoFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::WBOSS,WBossMgrFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::ONLINEPF,ServerOnlinePFNum);
 MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMFROMBSBYID,  AddItemFromBsById);
+MSG_REG_2(LoginMsgHdr,SPEQ::ADDFIGHTER,  AddFighterFromBs);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 
