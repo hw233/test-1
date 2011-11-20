@@ -513,6 +513,7 @@ namespace SPEQ
     const UInt16 PLAYERINFO         = 0x113;
     const UInt16 WBOSS              = 0x114;
     const UInt16 ONLINEPF           = 0x115;
+    const UInt16 ADDITEMFROMBSBYID  = 0x116;
 }
 
 namespace SPEP
@@ -538,6 +539,7 @@ namespace SPEP
     const UInt8 PLAYERINFO          = 0x13;
     const UInt8 WBOSS               = 0x14;
     const UInt8 ONLINEPF            = 0x15;
+    const UInt8 ADDITEMFROMBSBYID   = 0x16;
 }
 
 #endif // _MSGID_H_

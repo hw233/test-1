@@ -80,6 +80,8 @@ namespace Script
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
+		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
+		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
 
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
