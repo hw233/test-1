@@ -142,6 +142,7 @@ void BattleSimulator::start(UInt8 prevWin)
     //组队
     for(int tidx = 0; tidx < 2; ++tidx)
     {
+        _packet << _teams[tidx];
         for(int idx = 0; idx < _teams[tidx]; ++idx)
         {
             _packet << _team_name[idx] << _team_level[idx] << _team_portrait[idx];
