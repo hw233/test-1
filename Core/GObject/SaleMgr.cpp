@@ -48,8 +48,11 @@ void SaleMgr::addRowSale(SaleData * sale)
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
-    if(stIdx > 47)
+    if(stIdx > 49)
+    {
         stIdx = 1;
+        pIdx = 1;
+    }
     if(career > 3)
         career = 0;
     if(quality > 6)
@@ -94,8 +97,11 @@ void SaleMgr::delRowSale(SaleData * sale)
 
     UInt8 pIdx = 0;
     UInt8 stIdx = StatIndex(subClass, typeId, pIdx);
-    if(stIdx > 47)
+    if(stIdx > 49)
+    {
         stIdx = 1;
+        pIdx = 1;
+    }
     if(career > 3)
         career = 0;
     if(quality > 6)
@@ -903,7 +909,14 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
 UInt8 SaleMgr::Index(UInt8 type, UInt32 typeId)
 {
     UInt8 parent = 0;
-    return StatIndex(type, typeId, parent);
+    UInt8 stIdx = StatIndex(type, typeId, parent);
+    if(stIdx > 49)
+    {
+        stIdx = 1;
+        parent = 1;
+    }
+
+    return stIdx;
 }
 
 }
