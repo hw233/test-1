@@ -26,6 +26,18 @@ namespace GObject
         UInt8  itemNum;
     };
 
+    struct stMergeS
+    {
+        UInt32  id;
+        UInt32  num;
+    };
+    struct stMergeStf
+    {
+        std::vector<stMergeS>  m_stfs;
+        UInt32  m_to;
+    };
+
+
 	class GObjectManager
 	{
 	public:
@@ -171,7 +183,7 @@ namespace GObject
             return _yellow_diamond_gem;
         }
 
-	private:
+       	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
         static UInt32 _merge_cost;
@@ -225,6 +237,32 @@ namespace GObject
         static std::vector<UInt32>              _yellow_diamond_gem;
 
 		static std::vector<UInt16> _trump_maxrank_chance;
+
+       // static std::vector<stMergeStf>  _mergeStfs;
+        typedef std::vector<stMergeStf>   vMergeStfs;
+        typedef std::map <UInt32,  std::vector<UInt32> >  mMergeStfsIndex;
+        static  vMergeStfs   _vMergeStfs;
+        static  mMergeStfsIndex  _mMergeStfsIndex;
+
+        public:
+        static  vMergeStfs  getMergeStfs( UInt32 id)
+        {
+            vMergeStfs  re;
+
+            mMergeStfsIndex ::iterator it = _mMergeStfsIndex.find(id);
+            if(it != _mMergeStfsIndex.end())
+            {
+                std::vector<UInt32>& v = it->second;
+                for(UInt32 i = 0 ; i < v.size(); i ++)
+                {
+                    if(v[i] < _vMergeStfs.size())
+                        re.push_back(_vMergeStfs[v[i]]);
+                }
+
+            }
+            return re;
+        }
+
 	};
 }
 
