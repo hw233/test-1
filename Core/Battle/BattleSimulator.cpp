@@ -3490,7 +3490,7 @@ BattleFighter * BattleSimulator::newFighter( UInt8 side, UInt8 pos, GObject::Fig
 
 void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, StatusChange * scList, size_t& scCount, bool active )
 {
-	for(UInt8 i = pos; i < cnt; ++ i)
+	for(UInt8 i = pos; i < pos + cnt; ++ i)
 	{
 		if(_objs[side][i] != NULL)
 		{
@@ -3523,7 +3523,7 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
 
 void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active )
 {
-	for(UInt8 i = pos; i < cnt; ++ i)
+	for(UInt8 i = pos; i < pos + cnt; ++ i)
 	{
 		if(_objs[side][i] != NULL)
 		{

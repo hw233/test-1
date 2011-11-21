@@ -252,7 +252,7 @@ void Athletics::attack(Player * defer)
 	GLOBAL().PushMsg(hdr, &abd);
 }
 
-void Athletics::beAttack(Player * atker, UInt8 formation, UInt16 portrait, Lineup * lineup)
+void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
@@ -530,7 +530,7 @@ void Athletics::attackMartial(Player* defer)
 	GLOBAL().PushMsg(hdr, &ar);
 }
 
-void Athletics::beAttackMartial(Player * atker, UInt8 formation, UInt16 portrait, Lineup * lineup)
+void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
