@@ -194,6 +194,7 @@ public:
     void playerInfo(Player* player);
     void playerEnter(Player* player);
     void playerLeave(Player* player);
+    void playerOffline(Player* player);
 
     HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt16& pos);
     HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt16& pos);
