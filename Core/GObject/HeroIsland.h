@@ -91,8 +91,8 @@ struct HIPlayerData
         fightcd = 0;
         injuredcd = 0;
         expcd = 0;
-        attrcd = static_cast<UInt32>(-1);
-        bufid = DEFAULT_BUFID;
+        //attrcd = static_cast<UInt32>(-1);
+        //bufid = DEFAULT_BUFID;
         attr = NULL;
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
@@ -149,7 +149,7 @@ public:
     {
         _types[0] = _types[1] = _types[2] = 0;
         _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
-        _nplayers[0] = _nplayers[1] = _nplayers[2]= _nplayers[3] = 0;
+        _nplayers[0] = _nplayers[1] = _nplayers[2] = _nplayers[3] = _nplayers[4] = 0;
         initSkillAttr();
     }
 
@@ -183,7 +183,7 @@ public:
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
     bool enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd = true);
     HIPlayerData* leave(Player* player, UInt8 spot);
-    HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt8 pos);
+    HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt16 pos);
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
@@ -194,9 +194,10 @@ public:
     void playerInfo(Player* player);
     void playerEnter(Player* player);
     void playerLeave(Player* player);
+    void playerOffline(Player* player);
 
-    HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt8& pos);
-    HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt8& pos);
+    HIPlayerData* findPlayer(Player* player, UInt8& spot, UInt16& pos);
+    HIPlayerData* findPlayer(UInt64 id, UInt8& spot, UInt16& pos);
     RareAnimals& findRareAnimal(UInt32 id, UInt8 spot);
 
     void startCompass(Player* player);
@@ -214,6 +215,8 @@ public:
     void expFactor(UInt32 now);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
+    void saveAtoCfg(Player* player, const std::string& cfg);
+    void sendAtoCfg(Player* player);
 
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }

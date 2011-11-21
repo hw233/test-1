@@ -593,6 +593,11 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			}
 			ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 			ea2.appendAttrToStream(st);
+
+            if(equip->getClass() == Item_Trump)
+            {
+                st << ied.maxTRank << ied.trumpExp;
+            }
 			if(writedb)
 				updateToDB(t[i], equip->getId());
 		}
@@ -819,6 +824,18 @@ void Fighter::setCurrentHP( UInt16 hp, bool writedb )
 		_hp = hp;
 }
 
+void Fighter::addHPPercent( UInt8 p, bool writedb )
+{
+    UInt32 maxhp = getMaxHP();
+    UInt32 hp = (p / (float)100) * maxhp;
+    _hp += hp;
+    if (_hp > maxhp)
+        _hp = maxhp;
+
+    if (writedb)
+        sendModification(1, _hp);
+}
+
 UInt32 Fighter::regenHP( UInt32 hp )
 {
 	if(_hp == 0)
@@ -973,12 +990,16 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 
 void Fighter::addAttr( const GData::CittaEffect* ce )
 {
+    if (!ce)
+        return;
 	addAttrExtra(_attrExtraEquip, ce);
 	addEquipAttr2(_attrExtraEquip, ce, _level);
 }
 
 void Fighter::addAttr( ItemEquip * equip )
 {
+    if (!equip)
+        return;
 	addAttrExtra(_attrExtraEquip, equip->getAttrExtra());
 	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2(), _level);
 	ItemEquipData& ied = equip->getItemEquipData();
@@ -990,6 +1011,32 @@ void Fighter::addAttr( ItemEquip * equip )
 			addAttrExtra(_attrExtraEquip, igt->attrExtra);
 		}
 	}
+}
+
+void Fighter::addTrumpAttr( ItemTrump * trump )
+{
+    if (!trump)
+        return;
+    const GData::AttrExtra* pae = trump->getAttrExtra();
+    if (!pae)
+        return;
+    GData::AttrExtra ae(*pae);
+	ItemEquipData& ied = trump->getItemEquipData();
+
+    UInt8 q = trump->getQuality();
+    UInt8 l = ied.tRank;
+    AttrFactor af = GObjectManager::getTrumpTRankFactor(q-2, l-1);
+    if(trump->getId() < 1600)
+        af.aura = 0;
+    else
+        af.auraMax = 0;
+
+    if(l > 0 && q > 1)
+        ae *= af;
+
+	addAttrExtra(_attrExtraEquip, &ae);
+
+	addEquipAttr2(_attrExtraEquip, trump->getEquipAttr2(), _level);
 }
 
 void Fighter::rebuildEquipAttr()
@@ -1080,6 +1127,21 @@ void Fighter::rebuildEquipAttr()
                 if (cb->effect)
                     addAttr(cb->effect);
             }
+        }
+    }
+
+    bool hasActiveTrump = false;
+    for(int i = 0; i < getMaxTrumps(); ++i)
+    {
+		ItemTrump* trump = static_cast<ItemTrump*>(getTrump(i));
+
+		if(trump != NULL)
+        {
+            if(!hasActiveTrump)
+                addTrumpAttr(trump);
+
+            if(trump->getId() >= 1600)
+                hasActiveTrump = true;
         }
     }
 

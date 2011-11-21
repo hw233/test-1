@@ -76,12 +76,14 @@ void ChatItem::post( UInt8 type, UInt64 pid, UInt32 id, Player * player )
 	{
 	case 0x01:
 		{
+			FastMutex::ScopedLock lk(_itemMutex);
 			addItem(player, id);
 			return;
 		}
 		break;
 	case 0x02:
 		{
+			FastMutex::ScopedLock lk(_fighterMutex);
 			addFighter(player, id);
 			return;
 		}

@@ -26,6 +26,8 @@ namespace GObject
         VAR_SINGLE_CHOPSTICKS = 1, //光棍节送筷子
         VAR_SENGYI = 2,     // 僧衣
         VAR_APRON = 3,      // 肚兜
+        VAR_TGDT = 4,       // 感恩节在线时间
+        VAR_TGDCNT = 5,     // 感恩节连续在线3小时次数
 
         VAR_KEYPACK1 = 10,  // KEY礼包
         VAR_KEYPACK2,
@@ -61,6 +63,8 @@ namespace GObject
             REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
+            REGISTER_VAR(VAR_TGDT, CYCLE_MONTH);
+            REGISTER_VAR(VAR_TGDCNT, CYCLE_MONTH);
             REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK3, CYCLE_NONE);

@@ -576,4 +576,13 @@ void OnAthleticsMartialFlush( GameMsgHdr& hdr, const void* data )
     GObject::gAthleticsRank.updateAthleticsMartial(player);
 }
 
+void OnAthleticsPayRet( GameMsgHdr& hdr,  const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+    const GObject::AthleticsPayPaging * msg = reinterpret_cast<const GObject::AthleticsPayPaging*>(data);
+    if(msg)
+     GObject::gAthleticsRank.AddPageNum(player, msg->moneyEnough == 1);
+
+}
 #endif // _WORLDINNERMSGHANDLER_H_

@@ -28,6 +28,7 @@
 #include "CountryMsgStruct.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/Copy.h"
+#include "GObject/FrontMap.h"
 #include "GObject/HeroIsland.h"
 
 GMHandler gmHandler;
@@ -110,6 +111,7 @@ GMHandler::GMHandler()
 	Reg(3, "enchant", &GMHandler::OnEnchant);
 	Reg(3, "resetic", &GMHandler::OnResetIc);
 	Reg(3, "autocb", &GMHandler::OnAutoCB);
+	Reg(3, "autofb", &GMHandler::OnAutoFB);
 
 	Reg(3, "nextarena", &GMHandler::OnNextArena);
 	Reg(3, "pay4pra", &GMHandler::OnPay4Pra);
@@ -144,6 +146,7 @@ GMHandler::GMHandler()
     Reg(3, "hici", &GMHandler::OnCiTaskHI);
     Reg(3, "hirestart", &GMHandler::OnRestartHI);
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
+    Reg(3, "hiuseskill", &GMHandler::OnUseSkillHI);
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
 }
 
@@ -1995,6 +1998,15 @@ void GMHandler::OnAutoCB( GObject::Player * player, std::vector<std::string>& ar
 		player->autoCB(false);
 }
 
+void GMHandler::OnAutoFB( GObject::Player * player, std::vector<std::string>& args )
+{
+    UInt8 id = 0;
+    UInt8 type = 0;
+    id = atoi(args[0].c_str());
+    type = atoi(args[1].c_str());
+    frontMap.autoBattle(player, id, type, false);
+}
+
 void GMHandler::OnEnterArena( GObject::Player * player, std::vector<std::string>& )
 {
 	GObject::Arena::enterArena(player);
@@ -2409,6 +2421,14 @@ void GMHandler::OnAwardHI(GObject::Player *player, std::vector<std::string>& arg
         return;
     heroIsland.getAward(player, atoi(args[0].c_str()), 1);
 }
+
+void GMHandler::OnUseSkillHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    heroIsland.useSkill(player, atoi(args[0].c_str()));
+}
+
 
 void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& args)
 {

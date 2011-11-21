@@ -113,6 +113,7 @@ struct DBPlayerData
 	std::string fyamen;
     std::string clantask;
     std::string formations;
+    std::string atohicfg;
 };
 
 struct DBPrepaid
@@ -291,6 +292,9 @@ struct DBEquipment
 	UInt32 id;
 	UInt32 itemId;
 	UInt8 enchant;
+    UInt8 tRank;
+    UInt8 maxTRank;
+    UInt32 trumpExp;
 	UInt8 attrType1;
 	Int16 attrValue1;
 	UInt8 attrType2;
@@ -558,6 +562,12 @@ struct DBAutoCopy
 	UInt8 id;
 };
 
+struct DBAutoFrontMap
+{
+	UInt64 playerId;
+	UInt8 id;
+};
+
 struct DBExchangeTicket
 {
 	UInt64 playerId;
@@ -585,6 +595,7 @@ struct DBAthleticsData
     UInt32  oldrank;
     UInt32  first4rank;
     UInt32  extrachallenge;
+    UInt8   pageNum;
 };
 
 struct DBAthleticsEventData
@@ -754,7 +765,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(53)
+SPECIALDEF(54)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -803,6 +814,7 @@ SPECIALDEF(53)
 	UInt8, pdata.frontGoldCnt,
 	UInt32, pdata.frontUpdate,
     std::string, formations,
+    std::string, atohicfg,
 	UInt8, pdata.gmLevel,
 	UInt8, pdata.wallow,
     UInt8,  pdata.dungeonCnt,
@@ -1280,11 +1292,14 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBEquipment)
-SPECIALDEF(17)
+SPECIALDEF(20)
 (
 	UInt32, id,
 	UInt32, itemId,
 	UInt8, enchant,
+    UInt8, tRank,
+    UInt8, maxTRank,
+    UInt32, trumpExp,
 	UInt8, attrType1,
 	Int16, attrValue1,
 	UInt8, attrType2,
@@ -1377,6 +1392,14 @@ SPECIALDEF(2)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBAutoFrontMap)
+SPECIALDEF(2)
+(
+	UInt64, playerId,
+	UInt8, id
+)
+SPECIALEND()
+
 SPECIALBEGIN(GObject::DBExchangeTicket)
 SPECIALDEF(2)
 (
@@ -1386,7 +1409,7 @@ SPECIALDEF(2)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBAthleticsData)
-SPECIALDEF(15)
+SPECIALDEF(16)
 (
 	UInt8,  row,
 	UInt32, rank,
@@ -1406,7 +1429,8 @@ SPECIALDEF(15)
     UInt16,  befailstreak,
     UInt32, oldrank,
     UInt32, first4rank,
-    UInt32, extrachallenge
+    UInt32, extrachallenge,
+    UInt8,  pageNum
 )
 SPECIALEND()
 

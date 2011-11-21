@@ -90,7 +90,7 @@ public:
 
 public:
 	bool addAthleticsExtraAward(UInt32 EquipId, UInt8 rank);
-
+    void PayForPaging();
 private:
 	Player * _owner;
 	bool _hasEnterAthletics;

@@ -46,6 +46,11 @@
 #include <cmath>
 
 #define NTD_ONLINE_TIME (4*60*60)
+#ifndef _DEBUG
+#define TGD_ONLINE_TIME (3*60*60)
+#else
+#define TGD_ONLINE_TIME (10*60)
+#endif
 
 namespace GObject
 {
@@ -479,6 +484,33 @@ namespace GObject
 		return count == 0;
     }
 
+    bool EventAutoFrontMap::Equal(UInt32 id, size_t playerid) const
+    {
+		return 	id == GetID() && playerid == m_Player->getId();
+    }
+
+    void EventAutoFrontMap::Process(UInt32 leftCount)
+    {
+        UInt16 idspot = (id << 8) + spot;
+		GameMsgHdr hdr(0x278, m_Player->getThreadId(), m_Player, sizeof(idspot));
+		GLOBAL().PushMsg(hdr, &idspot);
+        if (!leftCount)
+			PopTimerEvent(m_Player, EVENT_AUTOFRONTMAP, m_Player->getId());
+        ++spot;
+    }
+
+    bool EventAutoFrontMap::Accelerate(UInt32 times)
+    {
+		UInt32 count = m_Timer.GetLeftTimes();
+		if(times > count)
+		{
+			times = count;
+		}
+		count -= times;
+		m_Timer.SetLeftTimes(count);
+		return count == 0;
+    }
+
     bool EventPlayerTimeTick::Equal(UInt32 id, size_t playerid) const
     {
 		return 	id == GetID() && playerid == m_Player->getId();
@@ -749,6 +781,21 @@ namespace GObject
             setBuffData(PLAYER_BUFF_ONLINE, 0, true);
 #endif
 
+        if (World::_thanksgiving)
+        {
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online < TGD_ONLINE_TIME)
+                {
+                    EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME-online, 1, 1);
+                    if (event) PushTimerEvent(event);
+                }
+                else
+                    GameAction()->onThanksgivingDay(this);
+            }
+        }
+
         sendLevelPack(GetLev());
 
         char buf[64] = {0};
@@ -777,13 +824,14 @@ namespace GObject
             UInt8 platform = atoi(getDomain().c_str());
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum);
-            if (platform)
-                snprintf(pbuf, pbuf - buf, "|%u|", platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
-            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
+            if (platform)
+                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+
             TRACE_LOG("%s", buf);
         }
     }
@@ -1153,8 +1201,21 @@ namespace GObject
             }
         }
 
-        //heroIsland.playerLeave(this);
+        if (World::_thanksgiving)
+        {
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online + curtime - _playerData.lastOnline >= TGD_ONLINE_TIME)
+                    GameAction()->onThanksgivingDay(this);
+                else
+                    SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
+            }
+        }
+
         dclogger.logout(this);
+        heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
 	}
 
@@ -2138,6 +2199,12 @@ namespace GObject
 
 		return res;
 	}
+
+    void Player::autoFrontMapFailed()
+    {
+        //PopTimerEvent(this, EVENT_AUTOFRONTMAP, getId());
+        //delFlag(Player::AutoFrontMap);
+    }
 
     void Player::autoCopyFailed(UInt8 id)
     {
@@ -3565,7 +3632,10 @@ namespace GObject
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
+        {
             heroIsland.playerLeave(this);
+            delFlag(Player::InHeroIsland);
+        }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
 #if 1
@@ -5344,6 +5414,18 @@ namespace GObject
 		}
 	}
 
+    void Player::setHPPercent(UInt8 p)
+    {
+		for(int i = 0; i < 5; ++ i)
+		{
+			Lineup& pd = _playerData.lineup[i];
+			if(pd.fighter != NULL)
+			{
+                pd.fighter->addHPPercent(p);
+			}
+		}
+    }
+
 	UInt8 Player::trainFighter( UInt32 id, UInt8 type )
 	{
 #define ITEM_TRAIN_TYPE1 506         // 补髓丹(不带保护) 资质
@@ -6973,6 +7055,37 @@ namespace GObject
     {
         DB6().PushUpdateData("REPLACE INTO `tripod`(`id`, `soul`, `fire`, `quality`, `awdst`, `regen`, `itemId`, `num`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u,%u)" , getId(), m_td.soul, m_td.fire, m_td.quality, m_td.awdst, m_td.needgen, m_td.itemId, m_td.num);
         return runTripodData(m_td);
+    }
+
+    // XXX: 光棍节强化光棍补偿
+    void Player::sendSingleEnchant(UInt8 enchant)
+    {
+        if (enchant && enchant <= 10)
+        {
+            MailPackage::MailItem item1[3] = {{514, 1}, {507, 5},{509, 5}};
+            MailPackage::MailItem item2[3] = {{514, 2}, {507, 5},{509, 5}};
+            MailPackage::MailItem item3[3] = {{514, 3}, {507, 5},{509, 5}};
+            MailPackage::MailItem item4[3] = {{514, 5}, {507, 5},{509, 5}};
+            MailPackage::MailItem item5[3] = {{514, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item6[3] = {{515, 10},{507, 5},{509, 5}};
+            MailPackage::MailItem item7[3] = {{515, 20},{507, 5},{509, 5}};
+            MailPackage::MailItem item8[3] = {{515, 30},{507, 5},{509, 5}};
+
+            MailPackage::MailItem* item[8] = {item1,item2,item3,item4,item5,item6,item7,item8};
+
+            sendMailItem(2205, 2206, item[enchant-1], 3);
+        }
+    }
+
+    void Player::resetThanksgiving()
+    {
+        SetVar(VAR_TGDT, 0);
+        if (isOnline())
+        {
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
+            EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME, 1, 1);
+            if (event) PushTimerEvent(event);
+        }
     }
 
 } // namespace GObject

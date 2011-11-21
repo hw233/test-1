@@ -247,6 +247,9 @@ namespace REQ
     const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
     /**斗剑领取奖励*/
     const UInt8 ATHLETICS_GET_AWARD = 0xC8;
+
+    /**斗剑翻页*/
+    const UInt8 ATHLETICS_PAGING    = 0xC9;
     /**???*/
     const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/
@@ -290,13 +293,18 @@ namespace REQ
     /**黄钻奖励领取*/
     const UInt8 YD_AWARD_RCV        = 0x2F;
 
-   
     /**非战斗时信息请求*/
     const UInt8 CLAN_RANKBATTLE_REQINIT = 0x59;
     /**战斗时信息请求*/
     const UInt8 CLAN_RANKBATTLE_REQ     = 0x5A;
     /**帮会战排名列表*/
     const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B;
+    
+    /** 法宝精炼*/
+    const UInt8 EQ_TRUMP_UPGRADE    = 0xB7;
+    /** 法宝升阶*/
+    const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
+    
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
 }
@@ -304,7 +312,7 @@ namespace REQ
 namespace REP
 {
     const UInt8 KEEP_ALIVE          = 0x00;// 0x00
-    const UInt8 RECONNECT           = 0x01;
+    const UInt8 RECONNECT           = 0x01;// 帐号被封
     const UInt8 ENTER_ARENA         = 0x02;
     const UInt8 LINEUP_CHANGE       = 0x03;
     const UInt8 NEXT_ARENA          = 0x04;
@@ -357,6 +365,8 @@ namespace REP
     const UInt8 EQ_EXCHANGE_POS     = 0x4A;
     const UInt8 GEM_BATCH_UPGRADE   = 0xB6;// 0x4B
     const UInt8 EQ_ACTIVE           = 0x4C;
+    const UInt8 EQ_TRUMP_UPGRADE    = 0xB7;
+    const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
 
     const UInt8 CITY_INSIDE_MOVE    = 0xA0;// 0x51
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
@@ -515,6 +525,9 @@ namespace SPEQ
     const UInt16 SALE_ONOFF         = 0x112;// 交易开关
     const UInt16 PLAYERINFO         = 0x113;
     const UInt16 WBOSS              = 0x114;
+    const UInt16 ONLINEPF           = 0x115;
+    const UInt16 ADDITEMFROMBSBYID  = 0x116;
+    const UInt16 ADDFIGHTER         = 0x117;
 }
 
 namespace SPEP
@@ -539,6 +552,9 @@ namespace SPEP
     const UInt8 SALE_ONOFF          = 0x12;// 交易开关
     const UInt8 PLAYERINFO          = 0x13;
     const UInt8 WBOSS               = 0x14;
+    const UInt8 ONLINEPF            = 0x15;
+    const UInt8 ADDITEMFROMBSBYID   = 0x16;
+    const UInt8 ADDFIGHTER          = 0x17;
 }
 
 #endif // _MSGID_H_

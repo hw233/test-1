@@ -95,6 +95,7 @@ CREATE TABLE `athletics_rank` (
   `oldrank` int(10) NOT NULL DEFAULT '0',
   `first4rank` int(10) unsigned NOT NULL DEFAULT '0',
   `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0',
+  `pageNum` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -513,6 +514,9 @@ CREATE TABLE `equipment` (
   `id` int(10) unsigned NOT NULL,
   `itemId` int(10) unsigned NOT NULL,
   `enchant` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `tRank` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `maxTRank` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `trumpExp` int(10) unsigned NOT NULL DEFAULT '0',
   `attrType1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `attrValue1` smallint(6) NOT NULL DEFAULT '0',
   `attrType2` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -859,6 +863,7 @@ CREATE TABLE `player` (
   `frontGoldCnt` tinyint(3) unsigned NOT NULL DEFAULT '0', 
   `frontUpdate` int(10) unsigned NOT NULL DEFAULT '0',
   `formations` varchar(255) NOT NULL DEFAULT '',
+  `atohicfg` varchar(255) NOT NULL DEFAULT '',
   `gmLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `wallow` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `dungeonCnt` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1155,6 +1160,13 @@ CREATE TABLE `worldboss` (
 
 DROP TABLE IF EXISTS `autocopy`;
 CREATE TABLE `autocopy` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `id` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `auto_frontmap`;
+CREATE TABLE `auto_frontmap` (
   `playerId` bigint(20) unsigned NOT NULL,
   `id` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`playerId`)

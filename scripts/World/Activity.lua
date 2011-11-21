@@ -107,6 +107,12 @@ function onActivityCheck(tm)
       setSingleDay(false);
   end
 
+  if tm >= actTime7 and tm < actTime8 then
+      setThanksgiving(true);
+  else
+      setThanksgiving(false);
+  end
+
   loadStore()
 end
 
@@ -114,7 +120,8 @@ function initActTime(y, m, d)
   local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  --local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm4 = { ['year'] = 2011, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
 
@@ -124,6 +131,9 @@ function initActTime(y, m, d)
   actTime5 = os.time(SerStartTm3);
   actTime6 = os.time(SerStartTm3) + 3 * 86400;
   
+  actTime7 = os.time(SerStartTm4);
+  actTime8 = os.time(SerStartTm4) + 7 * 86400;
+
   onActivityCheck(os.time() + 30);
 
   loadStore();

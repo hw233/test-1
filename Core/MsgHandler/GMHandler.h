@@ -79,6 +79,7 @@ private:
 	void OnEnchant(GObject::Player *, std::vector<std::string>&);
 	void OnResetIc(GObject::Player *, std::vector<std::string>&);
 	void OnAutoCB(GObject::Player *, std::vector<std::string>&);
+	void OnAutoFB(GObject::Player *, std::vector<std::string>&);
 	void OnEnterArena(GObject::Player *, std::vector<std::string>&);
 	void OnNextArena(GObject::Player *, std::vector<std::string>&);
 	void OnEnterClan(GObject::Player *, std::vector<std::string>&);
@@ -113,6 +114,7 @@ private:
     void OnCiTaskHI(GObject::Player *player, std::vector<std::string>&);
     void OnRestartHI(GObject::Player *player, std::vector<std::string>&);
     void OnAwardHI(GObject::Player *player, std::vector<std::string>&);
+    void OnUseSkillHI(GObject::Player *player, std::vector<std::string>&);
     void OnAppearBoss(GObject::Player *player, std::vector<std::string>&);
 };
 
