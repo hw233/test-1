@@ -1674,7 +1674,7 @@ void HeroIsland::commitCompass(Player* player)
     UInt8 straight = pd->straight;
     if (sz && !(sz % 3))
     {
-        if (pd->straight == 3)
+        if (straight >= 3)
         {
             ++pd->round;
             pd->awardgot = pd->round+1;
