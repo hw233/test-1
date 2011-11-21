@@ -1173,7 +1173,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 {
                     status = pd->compass[sz-1].status = 2;
 
-                    if (sz == 1)
+                    if (sz == 1 || sz == 4 || sz == 7)
                         pd->straight = 1;
                     else if (sz > 1)
                     {
