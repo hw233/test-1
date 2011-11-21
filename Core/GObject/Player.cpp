@@ -48,7 +48,7 @@
 #ifndef _DEBUG
 #define TGD_ONLINE_TIME (3*60*60)
 #else
-#define TGD_ONLINE_TIME (60)
+#define TGD_ONLINE_TIME (10*60)
 #endif
 
 namespace GObject
@@ -1199,6 +1199,7 @@ namespace GObject
 
         if (World::_thanksgiving)
         {
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
             UInt32 online = GetVar(VAR_TGDT);
             if (online != static_cast<UInt32>(-1))
             {
@@ -7070,6 +7071,7 @@ namespace GObject
         SetVar(VAR_TGDT, 0);
         if (isOnline())
         {
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
             EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME, 1, 1);
             if (event) PushTimerEvent(event);
         }

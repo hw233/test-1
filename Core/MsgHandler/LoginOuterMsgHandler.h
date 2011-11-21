@@ -201,6 +201,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 	}
 	player->SetSessionID(hsid);
 	cl->SetPlayer(player);
+
 	return res;
 }
 
@@ -1070,6 +1071,70 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 
 }
 
+void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+	Stream st;
+	st.init(SPEP::ADDITEMFROMBSBYID,0x01);
+	std::string playerIDList;
+	std::string content;
+	std::string title;
+	UInt32 money[4] = {0};
+	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
+	UInt16 nums = 0;
+	UInt8 bindType = 1;
+	br>>playerIDList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
+	StringTokenizer stk(playerIDList,"%");
+	st << playerIDList;
+	std::string result="";
+	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
+	if(item == NULL)
+		return;
+	UInt8 count = {0};
+	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+	for(UInt32 i = 0; i < nums; i ++)
+	{
+		br>>item[i].id>>count;
+		item[i].count = count;
+	}
+	for(UInt32 i = 0; i < 4; i ++)
+	{
+		if(money[i] == 0)
+			continue;
+		item[nums].id = moneyType[i];
+		item[nums++].count = money[i];
+	}
+	for(StringTokenizer::Iterator it=stk.begin();it!=stk.end();it++)
+	{
+		UInt64 playerID = strtoll((*it).c_str(),NULL, 10);
+		GObject::Player *player=GObject::globalPlayers[playerID];
+		if(player==NULL)
+		{
+			result+="1 ";
+		}
+		else
+		{
+			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			if(pmail != NULL)
+			{
+				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
+				result +="0 ";
+			}
+			else
+			{
+				result +="2 ";				
+			}
+		}
+	}
+	result=result.substr(0,result.length()-1);
+	st<<result;
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+	
+	SAFE_DELETE(item);
+
+}
 void BattleReportReq(LoginMsgHdr& hdr, const void * data)
 {
 	if(hdr.msgHdr.bodyLen < sizeof(UInt32))
@@ -1487,7 +1552,35 @@ void WBossMgrFromBs(LoginMsgHdr &hdr, const void * data)
 	st.init(SPEP::WBOSS,0x1);
     UInt8 lvl;
     br >> lvl;
+    st << Stream::eos;
     GObject::worldBoss.bossAppear(lvl, true);
+}
+
+void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::ADDFIGHTER,0x1);
+    UInt64 playerId = 0;
+    UInt16 fgtid = 0;
+
+    br >> playerId;
+    br >> fgtid;
+
+    UInt8 ret = 0;
+    GObject::Fighter * fgt = GObject::globalFighters[fgtid];
+    if(fgt == NULL)
+        ret = 1;
+
+    GObject::Player* player = GObject::globalPlayers[playerId];
+    if (player == NULL)
+        ret = 1;
+
+    player->takeFighter(fgtid, true);
+
+    st << playerId << fgtid << ret;
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_
