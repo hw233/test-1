@@ -1959,7 +1959,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		
-        // Í¨ÌìËş¹ÖÅäÖÃ
+        // Í¨??????????
 		LoadingCounter lc("Loading dungeon monster templates:");
 		GData::DBDungeonMonster dmon;
 		if(execu->Prepare("SELECT `id`, `formated`, `monsters`, `experience` FROM `dungeon_monster`", dmon) != DB::DB_OK)
@@ -2020,7 +2020,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-        // Í¨ÌìËşÅäÖÃ
+        // Í¨????????
 		lc.prepare("Loading dungeon templates:");
 		GData::DBDungeon dd;
 		if(execu->Prepare("SELECT `id`, `name`, `location`, `type`, `lvlReq` FROM `dungeon`", dd) != DB::DB_OK)
@@ -2038,7 +2038,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-        // Í¨ÌìËş²ãÅäÖÃ
+        // Í¨??????????
 		lc.prepare("Loading dungeon level templates:");
 		GData::DBDungeonLevel dlvl;
 		if(execu->Prepare("SELECT `id`, `level`, `monsterSet`, `lootSet` FROM `dungeon_level`", dlvl) != DB::DB_OK)
@@ -2064,7 +2064,7 @@ namespace GObject
 		
 		GData::dungeons.enumerate(dungeon_enum, NULL);
 
-        // Í¨ÌìËşÓÃ»§Êı¾İ
+        // Í¨?????Ã»?????
 		lc.prepare("Loading dungeon player data:");
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
@@ -2202,10 +2202,10 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) 
 			return false;
 
-        // °ï»áĞÅÏ¢
+        // ??????Ï¢
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `battleRanking` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;
@@ -2230,6 +2230,8 @@ namespace GObject
 				clan->setLeaderId(cl.leader, false);
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
+                clan->LoadBattleScore(cl.battleScore);
+                clan->LoadBattleRanking(cl.battleRanking);
 				clanBattle->setOwnerClanId(cl.id);
 				if (!clanManager.validClanBattleTime(cl.battleTime))
 				{
@@ -2269,10 +2271,10 @@ namespace GObject
 		UInt32 thisDay = TimeUtil::SharpDay(0, now);
 		resetClanData(now);
 
-        // °ï»á³ÉÔ±
+        // ??????Ô±
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankClanField` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);
@@ -2330,6 +2332,10 @@ namespace GObject
 					cm->clanPet.insert(std::make_pair(i + 7, GObject::ClanPlayerPet(cp.favorCount[i], cp.lastFavorTime[i], cp.petFriendness[i])));
 				}
 			}
+
+            cm->signupRankBattleTime = cp.signupRankBattleTime;
+            cm->rankBattleField = cp.rankBattleField;
+
 			if (clan->join(cm))
 			{
 				if (cm->cls == 4)
@@ -2343,7 +2349,7 @@ namespace GObject
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
 
-        //°ïÅÉ¿Æ¼¼
+        //???É¿Æ¼?
 		lc.prepare("Loading clan tech:");
 		DBClanTech ct;
 		if(execu->Prepare("SELECT `clanId`, `techId`, `level`, `extra` FROM `clan_tech` ORDER BY `clanId`", ct) != DB::DB_OK)
@@ -2362,7 +2368,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-        // °ïÅÉ¼¼ÄÜ
+        // ???É¼???
         lc.prepare("Loading clan skill:");
         DBClanSkill cs;
 		if(execu->Prepare("SELECT `clanId`, `playerId`, `skillId`, `level` FROM `clan_skill` ORDER BY `clanId`, `skillId`, `playerId`", cs) != DB::DB_OK)
@@ -2384,7 +2390,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-        //ÉêÇë°ïÅÉÇëÇó
+        //????????????
 		lc.prepare("Loading clan pending players:");
 		DBClanPendingPlayer cpp;
 		if(execu->Prepare("SELECT `id`, `playerId`, `class`, `opTime` FROM `clan_pending_player` ORDER BY `id`", cpp) != DB::DB_OK)
@@ -2411,7 +2417,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-        //°ï»á¾èÏ×
+        //????????
 		lc.prepare("Loading clan donate record:");
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
@@ -2437,7 +2443,7 @@ namespace GObject
 		clanManager.resumeRobClanBattleData();
 		//clanManager.updateAllocated();
 
-        // °ï»áÕ½±¨
+        // ????Õ½??
 		lc.prepare("Loading clan battle result record:");
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
@@ -2466,7 +2472,7 @@ namespace GObject
 		lc.finalize();
 
 
-		//¼ÓÔØ°ï»áÕ½³¡Íæ¼ÒÊı¾İ
+		//???Ø°???Õ½??????????
 		lc.prepare("Loading clan battler:");
 		clan = NULL;
 		lastId = 0xFFFFFFFF;
@@ -2554,7 +2560,7 @@ namespace GObject
 		}
 		lc.finalize();
 
-        //°ï»á½±Àø
+        //???á½±??
 		lc.prepare("Loading clan pending rewards:");
 		DBClanPendingReward cpr;
 		if(execu->Prepare("SELECT `id`, `timeAlloc`, `playerId`, `itemId`, `itemNum` FROM `clan_pending_reward` ORDER BY `id`", cpr) != DB::DB_OK)
@@ -2788,7 +2794,7 @@ namespace GObject
             }
 
             {
-                // ¾Æ¹İÃâ·ÑË¢ĞÂÎä½«¸ÅÂÊ
+                // ?Æ¹?????Ë¢???ä½«????
                 lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance_Free");
                 size_t ct_size =  ct.size();
                 _color_chance_free.resize(ct_size);
@@ -2805,7 +2811,7 @@ namespace GObject
             }
 
             {
-                // ¾Æ¹İ½ğ±ÒË¢ĞÂÎä½«¸ÅÂÊ
+                // ?Æ¹İ½???Ë¢???ä½«????
                 lua_tinker::table ct = lua_tinker::call<lua_tinker::table>(L, "getColorFighterChance_Gold");
                 size_t ct_size =  ct.size();
                 _color_chance_gold.resize(ct_size);
@@ -3017,7 +3023,7 @@ namespace GObject
         return true;
     }
 
-    bool GObjectManager::LoadTripodData() // XXX: ĞèÒªÑÓ³Ù¼ÓÔØ,ÔÚWorld::InitÀï¼ÓÔØ
+    bool GObjectManager::LoadTripodData() // XXX: ??Òª?Ó³Ù¼???,??World::Init??????
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
@@ -3044,7 +3050,7 @@ namespace GObject
         return true;
     }
 
-    bool GObjectManager::LoadWorldBoss() // XXX: ĞèÒªÑÓ³Ù¼ÓÔØ,ÔÚWorld::InitÀï¼ÓÔØ
+    bool GObjectManager::LoadWorldBoss() // XXX: ??Òª?Ó³Ù¼???,??World::Init??????
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
@@ -3061,7 +3067,7 @@ namespace GObject
         return true;
     }
 
-    bool GObjectManager::LoadPracticeData() // XXX: ĞèÒªÑÓ³Ù¼ÓÔØ,ÔÚWorld::InitÀï¼ÓÔØ
+    bool GObjectManager::LoadPracticeData() // XXX: ??Òª?Ó³Ù¼???,??World::Init??????
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;

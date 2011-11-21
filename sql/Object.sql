@@ -325,6 +325,8 @@ CREATE TABLE `clan_player` (
   `lastFavorTime3` smallint(5) unsigned NOT NULL,
   `favorCount4` smallint(5) unsigned NOT NULL,
   `lastFavorTime4` smallint(5) unsigned NOT NULL,
+  `signupRankBattleTime` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '报名帮会排名战时间',
+  `rankBattleField` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战战役',  
   PRIMARY KEY (`playerId`),
   KEY `id` (`id`),
   KEY `playerId` (`playerId`)
@@ -1041,6 +1043,8 @@ CREATE TABLE `clan` (
   `northEdurance` smallint(5) unsigned NOT NULL DEFAULT '30',
   `hallEdurance` smallint(5) unsigned NOT NULL DEFAULT '30',
   `hasBattle` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `battleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战分数',
+  `battleRanking` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上周帮会战排名', 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -41,6 +41,7 @@
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 #include "DCLogger.h"
+#include "ClanRankBattle.h"
 
 #include <cmath>
 
@@ -516,6 +517,9 @@ namespace GObject
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
         _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_hasTripod(false)
 	{
+        m_ClanBattleStatus = 0;
+        m_ClanBattleScore = 0;
+
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
 		m_TaskMgr = new TaskMgr(this);
@@ -1972,13 +1976,16 @@ namespace GObject
 		bsim.start();
 		bool res = bsim.getWinner() == 1;
 
-		Stream st(REP::ATTACK_NPC);
-		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
-		send(st);
-		st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
 
         if (report)
+        {
+            Stream st(REP::ATTACK_NPC);
+		    st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		    send(st);
+		    st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
+            
             other->send(st);
+        }
         else
         {
             if (res)
@@ -3554,10 +3561,12 @@ namespace GObject
 
 		cancelAutoBattle();
 		cancelAutoDungeon();
+
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
             heroIsland.playerLeave(this);
+        ClanRankBattleMgr::Instance().PlayerLeave(this);
 
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
@@ -3607,6 +3616,8 @@ namespace GObject
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
+
+        ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		if(inCity)
 		{

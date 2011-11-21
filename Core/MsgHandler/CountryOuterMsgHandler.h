@@ -42,6 +42,7 @@
 #include "GObject/WBossMgr.h"
 #include "GObject/HeroIsland.h"
 #include "GObject/Var.h"
+#include "GObject/ClanRankBattle.h"
 
 #include "Common/Serialize.h"
 #include "Common/Stream.h"
@@ -556,6 +557,7 @@ struct FriendOpReq
 	std::string _name;
 	MESSAGE_DEF2(REQ::FRIEND_ACTION, UInt8, _op, std::string, _name);
 };
+
 
 #if 0
 struct FriendActReq
@@ -3282,6 +3284,135 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             break;
     }
 }
+
+void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+    {
+        hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+        GLOBAL().PushMsg(hdr, (void*)data);
+        return;
+    }
+
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    switch(type)
+    {
+        case 0: //请求帮会战状态信息
+            {
+                ClanRankBattleMgr::Instance().SendInitStatus(player);
+            }
+            break;
+        case 1: //报名进入战斗
+            {
+                UInt8 field = 0;
+                brd >> field;
+                ClanRankBattleMgr::Instance().Signup(player, field);
+            }
+            break;
+        case 2: //取消报名
+            {
+                ClanRankBattleMgr::Instance().Signout(player);
+            }
+            break;
+        case 3: //请求奖励信息
+            {
+                ClanRankBattleMgr::Instance().SendRewards(player);
+            }
+            break;
+        case 4: //领取奖励
+            {
+                ClanRankBattleMgr::Instance().GetRewards(player);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+
+void OnClanRankBattleReq(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+	if(player->getThreadId() != WORKER_THREAD_NEUTRAL) return;
+    if(player->getLocation() != RANK_BATTLE_LOCATION) return;
+    
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    brd >> type;
+
+    switch(type)
+    {
+        case 0: //请求帮派战状态信息
+            {
+                ClanRankBattleMgr::Instance().SendBattleStatus(player);
+            }
+            break;
+        case 1: //请求帮派战技能信息
+            {
+                ClanRankBattleMgr::Instance().SendSkillList(player);
+            }
+            break;
+        case 2: //请求帮派战报名玩家信息
+            {
+                ClanRankBattleMgr::Instance().SendPlayerList(player);
+            }
+            break;
+        case 3: //设置出战顺序
+            {
+                UInt64 playerId = 0;
+                UInt8 fieldId = 0;
+                UInt8 pos = 0;
+                brd >> playerId >> fieldId >> pos;
+                Player* member = globalPlayers[playerId];
+                if(member == NULL) return;
+                ClanRankBattleMgr::Instance().AdjustPlayerPos(player, member, fieldId, pos);
+            }
+            break;
+        case 4: //购买使用帮派战技能
+            {
+                ClanRankBattleMgr::Instance().BuySkill(player);
+            }
+            break; 
+        case 5: //请求战况信息
+            {
+                ClanRankBattleMgr::Instance().SendBattleInfo(player);
+            }
+            break;
+        case 6: //出战顺序按等级排序
+            {
+                ClanRankBattleMgr::Instance().SortClanPlayers(player);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+
+	if(player->getThreadId() != WORKER_THREAD_NEUTRAL)
+    {
+        hdr.msgHdr.desWorkerID = WORKER_THREAD_NEUTRAL;
+        GLOBAL().PushMsg(hdr, (void*)data);
+        return;
+    }
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt16 startId = 0;
+    UInt8 count = 0;
+    brd >> startId >> count;
+
+    ClanRankBattleMgr::Instance().SendSortList(player, startId, count);
+}
+
 
 void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
 {

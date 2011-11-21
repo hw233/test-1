@@ -1,6 +1,7 @@
 #ifndef _CLAN_H_
 #define _CLAN_H_
 
+#include <set>
 #include "Common/Stream.h"
 #include "Common/TimeUtil.h"
 #include "GObjectManager.h"
@@ -41,7 +42,7 @@ struct ClanPlayerPet
 struct ClanSkill
 {
     UInt8 id;
-	UInt8 level;	//Èç¹û = 0£¬ ±íÊ¾´Ë¼¼ÄÜÉĞÎ´±»¼¤»î
+	UInt8 level;	//???? = 0?? ??Ê¾?Ë¼?????Î´??????
 };
 
 struct ClanMember
@@ -50,6 +51,8 @@ struct ClanMember
 	{
 		enterCount = 0;
 		proffer = 0;
+        signupRankBattleTime = 0;
+        rankBattleField = 0;
 	}
 	std::multimap<UInt32, AllocItem> allocItems;
 	Player * player;
@@ -57,9 +60,13 @@ struct ClanMember
 	UInt32 joinTime;
     UInt32 proffer;
 	UInt8  enterCount;
+    UInt32 signupRankBattleTime;
+    UInt32 rankBattleField;
     std::map<UInt8, ClanSkill> clanSkill;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
+
+typedef Visitor<ClanMember> ClanMemberVisitor;
 
 struct ClanOpt
 {
@@ -93,6 +100,12 @@ typedef std::multiset<MemberDonate> MemberDonates;
 class Clan:
 	public GObjectBaseT<Clan>
 {
+public:
+    //å¸®ä¼šæ’åæˆ˜æŠ¥åæ•°ä¸‹é™
+    const static UInt32 RANK_BATTLE_MIN_SIGNUP_NUM = 5;
+
+private:
+
 	friend class ClanCache;
 	friend class ClanBattle;
 	friend class ClanCityBattle;
@@ -126,7 +139,7 @@ public:
 	static void patchMergedName(UInt32 id, std::string& name);
 public:
 	UInt16 getFavorItemId(UInt8 skilId);
-	inline UInt32 getTechIdIndex(UInt8 skillId){return skillId - 7;}// ÇàÁú7¡¢°×»¢8¡¢ÖìÈ¸9¡¢ĞşÎä10 fix??????
+	inline UInt32 getTechIdIndex(UInt8 skillId){return skillId - 7;}// ????7???×»?8????È¸9??????10 fix??????
 
 public:
 	UInt16 getPetFriendness(ClanMember *mem, UInt8 skillId){return mem->clanPet[skillId].petFriendness;}
@@ -204,12 +217,40 @@ public:
     void sendPracticePlaceInfo(Player* pl);
     void broadcastPracticePlaceInfo();
 
-    // °ïÅÉÖ°Î»
+    // ????Ö°Î»
     bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);
     UInt8 getClanRank(Player* pl);
     UInt8 getClanRankCount(UInt8 cls);
 
     void addMemberProffer(Player*pl, UInt32);
+
+    /**
+     *@brief æŠ¥åå¸®ä¼šæ’åæˆ˜
+     */
+    UInt32 GetRankBattleField(Player* player, UInt32 now);
+    bool SignupRankBattle(Player* player, UInt32 field, UInt32 now);
+    bool SignoutRankBattle(Player* player, UInt32 now);
+    UInt32 GetSignupRankBattleNum(UInt32 now);
+    UInt32 AdjustRankBattleField(Player* player, UInt32 field, UInt32 now);
+
+    /**
+     *@brief åˆ¤æ–­æ˜¯å¦æ»¡è¶³å‚èµ›èµ„æ ¼ï¼Œå¹¶è·å–æŠ¥ååˆ—è¡¨
+     *@return 0è¡¨ç¤ºæ²¡æŠ¥å 1è¡¨ç¤ºæŠ¥åäº†äººæ•°æ²¡å¤Ÿ 2è¡¨ç¤ºæœ‰èµ„æ ¼
+     */
+    UInt32 CheckJoinRankBattle(UInt32 now, std::map<UInt32, std::vector<Player*> >& list);
+    /**
+     *@brief æˆ˜æ–—ç§¯åˆ†ç›¸å…³
+     */
+    void SetBattleScore(UInt32 score);
+    UInt32 GetBattleScore() const { return m_BattleScore; }
+    void LoadBattleScore(UInt32 score){ m_BattleScore = score;}
+
+    /**
+     *@brief å¸®ä¼šæˆ˜æ’åç›¸å…³
+     */
+    void SetBattleRanking(UInt32 ranking);
+    UInt32 GetBattleRanking() const { return m_BattleRanking; }
+    void LoadBattleRanking(UInt32 ranking){ m_BattleRanking = ranking;}
 
 public:
 	inline bool alive() { return !_deleted; }
@@ -254,13 +295,13 @@ public:
 	void addClanDonateRecordFromDB(const std::string&, UInt8, UInt16, UInt32);
 	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
 
-    // °ïÅÉ×Ê½ğ
+    // ?????Ê½?
     void setClanFunds(UInt32 funds) { _funds = funds; }
     void addClanFunds(UInt32 funds);
     void useClanFunds(UInt32 funds);
     UInt32 getClanFunds() { return _funds; }
 
-// °ïÅÉ¼¼ÄÜ
+// ???É¼???
     void addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level);
     void addSkill(ClanMember* cm, UInt8 skillId);
     UInt8 getSkillLevel(Player* pl, UInt8 skillId);
@@ -290,6 +331,7 @@ public:
 		return NULL;
 	}
 
+    void VisitMembers(ClanMemberVisitor& visitor);
 	void listMembers(Player *);
 	void listPending(Player *);
 	void sendInfo(Player *);
@@ -329,7 +371,7 @@ private:
 	std::string _name;
 	Members _members;
     UInt8 _maxMemberCount;
-	std::set<UInt32> _membersJoinTime;	// ±£Ö¤Ã¿¸ö³ÉÔ±¼ÓÈëµÄÊ±¼ä²»Ò»Ñù
+	std::set<UInt32> _membersJoinTime;	// ??Ö¤Ã¿????Ô±??????Ê±?ä²»Ò»??
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
@@ -337,12 +379,15 @@ private:
 	UInt64 _founder;
 	std::string _founderName;
 	UInt64 _leader;
-	UInt64 _construction;            // °ïÅÉ½¨Éè¶È
+	UInt64 _construction;            // ???É½?????
 	UInt32 _nextPurgeTime;
 	std::string _contact;
 	std::string _announce;
 	std::string _purpose;
 	UInt32 _proffer;
+
+    UInt32 m_BattleScore;   //æˆ˜æ–—ç§¯åˆ†
+    UInt32 m_BattleRanking; //ä¸Šå‘¨æˆ˜æ–—åæ¬¡
 
 	UInt32 _favorId[4];
 	UInt32 _flushFavorTime;
@@ -363,8 +408,8 @@ private:
 	ClanDynamicMsg * _clanDynamicMsg;
 	ClanBattle * _clanBattle;
 
-    UInt32 _funds;          // °ïÅÉ×Ê½ğ
-	UInt64 _watchman;       // °ïÅÉĞŞÁ¶µØ»¤·¨
+    UInt32 _funds;          // ?????Ê½?
+	UInt64 _watchman;       // ??????Á¶?Ø»???
 
 	Mutex _mutex;
 };

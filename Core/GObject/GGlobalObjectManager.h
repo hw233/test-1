@@ -10,6 +10,15 @@
 namespace GObject
 {
 
+template<typename _VT>
+class Visitor
+{
+public:
+    virtual ~Visitor(){}
+
+    virtual bool operator()(_VT* ptr) = 0;
+};
+
 template<typename _VT, typename _VK >
 class GGlobalObjectManagerT
 {
@@ -104,6 +113,19 @@ public:
 				return;
 		}
 	}
+
+
+    void enumerate(Visitor<_VT>& visitor)
+    {
+        Mutex::ScopedLock lk(_objMutex);
+        typename std::unordered_map<_VK, _VT * >::iterator it;
+		for(it = _objs.begin(); it != _objs.end(); ++ it)
+		{
+			if(!visitor(it->second))
+				return;
+		}
+    }
+
 	inline Mutex& getMutex() { return _objMutex; }
 	std::unordered_map<_VK, _VT * >& getMap() { return _objs; }
 

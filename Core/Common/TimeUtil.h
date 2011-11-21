@@ -38,6 +38,14 @@ public:
         t = t + (7 * c + 1 - t_tm.tm_wday) * 86400;
         return SharpDayT(0,t);
     }
+    static inline UInt32 GetWeekDay(UInt32 time)
+    {
+        time_t t = time;
+        struct tm t_tm;
+        localtime_r(&t,&t_tm);
+        if(t_tm.tm_wday == 0) t_tm.tm_wday = 7;
+        return t_tm.tm_wday;
+    }
     static inline UInt32 SharpMonth(int c = 0, UInt32 cur = Now())
     {
         time_t t = cur;

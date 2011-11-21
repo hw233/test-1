@@ -290,6 +290,13 @@ namespace REQ
     /**黄钻奖励领取*/
     const UInt8 YD_AWARD_RCV        = 0x2F;
 
+   
+    /**非战斗时信息请求*/
+    const UInt8 CLAN_RANKBATTLE_REQINIT = 0x59;
+    /**战斗时信息请求*/
+    const UInt8 CLAN_RANKBATTLE_REQ     = 0x5A;
+    /**帮会战排名列表*/
+    const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B;
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
 }
@@ -412,6 +419,7 @@ namespace REP
     const UInt8 CLAN_INFO_UPDATE    = 0x68;// 0x98
     const UInt8 CLAN_SKILL          = 0x69;// 0x99
     const UInt8 CLAN_BUILD          = 0x6A;// 0x9B
+    
     const UInt8 HERO_ISLAND         = 0x97;
     const UInt8 CLANREWARD          = 0x9C;
     const UInt8 GET_CLANREWARD      = 0x9D;
@@ -475,6 +483,10 @@ namespace REP
     const UInt8 WINSTREAK           = 0xF6;// 0xD3
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
+
+    const UInt8 CLAN_RANKBATTLE_REPINIT = 0x59;  //非战斗时信息返回
+    const UInt8 CLAN_RANKBATTLE_REP     = 0x5A;  //战斗时信息返回
+    const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B; //帮会战排名列表
 }
 
 namespace SPEQ

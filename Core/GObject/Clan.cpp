@@ -39,7 +39,7 @@ UInt8 ClanAuthority[5][7] =
 };
 
 
-// °ïÅÉÃØÊõ
+// ????????
 #define CLAN_SKILL_ATTACK   1
 #define CLAN_SKILL_DEFEND   2
 #define CLAN_SKILL_MAGATK   3
@@ -75,6 +75,9 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	memset(_favorId, 0, sizeof(_favorId));
 	_clanDynamicMsg = new ClanDynamicMsg();
 	_clanBattle = new ClanCityBattle(this);
+
+    m_BattleScore = 0;
+    m_BattleRanking = 0;
 }
 
 Clan::~Clan()
@@ -164,7 +167,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	if (existClanMember(player))
 		return false;
 	UInt32 joinTime = TimeUtil::Now();
-	//½øÐÐÊ±¼ä×Ôµ÷Õû
+	//????Ê±???Ôµ???
 	std::set<UInt32>::iterator found = _membersJoinTime.find(joinTime);
 	while (found != _membersJoinTime.end())
 		found = _membersJoinTime.find(++joinTime);
@@ -353,7 +356,7 @@ bool Clan::leave(Player * player)
 	// std::string oldLeaderName = (*_members.begin())->player->getName();
     if( player == getOwner() && _members.size() != 1)
     {
-        // XXX °ïÖ÷²»ÄÜÍË³ö°ïÅÉ, °ïÅÉÖ»Ê£ÏÂ°ïÖ÷Ò»ÈËÊ±£¬¿É½âÉ¢°ïÅÉ
+        // XXX ?????????Ë³?????, ????Ö»Ê£?Â°???Ò»??Ê±???É½?É¢????
 		player->sendMsgCode(0, 1318);
         return false;
     }
@@ -453,8 +456,8 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
     broadcastMemberInfo(*cmLeader, 1);
     broadcastMemberInfo(*cmPlayer, 1);
 
-    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmLeader->cls, cmLeader->player->getId());
-    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cmPlayer->cls, cmPlayer->player->getId());
+    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %"I64_FMT"u", cmLeader->cls, cmLeader->player->getId());
+    DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %"I64_FMT"u", cmPlayer->cls, cmPlayer->player->getId());
 	DB5().PushUpdateData("UPDATE `clan` SET `leader` = %"I64_FMT"u WHERE `id` = %u", pid, _id);
 	// updateRank(cmLeader, cmLeader->player->getName());
 	setLeaderId(pid);
@@ -851,7 +854,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	{
 		if (type == 1)
 		{
-            // ¸öÈË×Ê½ð
+            // ?????Ê½?
 			thisDay = TimeUtil::SharpDay(0, now);
 #if 0
 			mem->achieveCount = items.count + mem->achieveCount;
@@ -882,7 +885,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		}
 		else if (type == 2)
 		{
-            // °ïÅÉ×Ê½ð
+            // ?????Ê½?
 			// std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 			// updateRank(mem, oldLeaderName);
 		}
@@ -932,6 +935,18 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	GameMsgHdr hdr(0x309, player->getThreadId(), player, sizeof(AddItems));
 	GLOBAL().PushMsg(hdr, &items);
 	return false;
+}
+
+void Clan::VisitMembers(ClanMemberVisitor& visitor)
+{
+    Mutex::ScopedLock lk(_mutex);
+    for(Members::iterator iter = _members.begin();
+            iter != _members.end(); ++iter)
+    {
+        ClanMember* mem = *iter;
+        if(mem == NULL || mem->player == NULL) continue;
+        if(!visitor(mem)) break;
+    }
 }
 
 void Clan::listMembers( Player * player )
@@ -1209,14 +1224,14 @@ void Clan::initBuildClan()
 void Clan::disband(Player * player)
 {
 	Mutex::ScopedLock lk(_mutex);
-	//1):Çå³ýÍ¬ÃË×Ú×å
+	//1):????Í¬??????
 	if (_allyClan != NULL)
 		_allyClan->delAllyClan(this);
 
-	//2):Çå³ý×Ú×åÕ½¼ì²â
+	//2):????????Õ½????
 	clanManager.delBattleClan(_clanBattle);
 
-	//3):´ÓÈ«¾ÖÖÐÉ¾³ý
+	//3):??È«????É¾??
 	const std::string& clanName = getName();
 	UInt8 cny = player->getCountry();
 	globalClans.remove(_id);
@@ -1298,7 +1313,7 @@ void Clan::notifyAllyClanInfo(Clan * clan, UInt8 type, UInt8 action, Player * pl
 }
 
 
-//player : ÊÇÖ÷¶¯·½
+//player : ???÷¶¯·?
 bool Clan::addAllyClan(Player * player, Player * allyPlayer, Clan * allyClan)
 {
 	if (allyClan->getId() == _id)
@@ -1529,7 +1544,7 @@ void Clan::addSkill(ClanMember* cm, UInt8 skillId)
     cs.id = skillId;
     cs.level = 0;
 
-	DB5().PushUpdateData("REPLACE INTO `clan_skill`(`clanId`, `playerId`, `skillId`, `level`) VALUES(%u, %u, %u, %d)", _id, cm->player->getId(), skillId, 0);
+	DB5().PushUpdateData("REPLACE INTO `clan_skill`(`clanId`, `playerId`, `skillId`, `level`) VALUES(%u, %"I64_FMT"u, %u, %d)", _id, cm->player->getId(), skillId, 0);
 }
 
 UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
@@ -1595,10 +1610,10 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             Stream st(REP::CLAN_INFO_UPDATE);
             st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
             pl->send(st);
-            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
+            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", cm->proffer, cm->player->getId());
         }
         ++cs.level;
-        DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, cm->player->getId(), skillId);
+        DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %"I64_FMT"u and `skillId`=%u", cs.level, cm->player->getId(), skillId);
 
         GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, 0);
         GLOBAL().PushMsg(hdr1, NULL);
@@ -2826,7 +2841,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
         _members.insert(mem2);
 
 		broadcastMemberInfo(*mem2, 1);
-		DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %u", cls, inviteeId);
+		DB5().PushUpdateData("UPDATE `clan_player` SET `cls` = %u WHERE `playerId` = %"I64_FMT"u", cls, inviteeId);
     }
 
 
@@ -2835,6 +2850,7 @@ bool Clan::setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls)
 
 UInt8 Clan::getClanRank(Player* pl)
 {
+	Mutex::ScopedLock lk(_mutex);
     ClanMember * mem = getClanMember(pl);
     if(mem != NULL)
     {
@@ -2869,7 +2885,7 @@ UInt8 Clan::getClanRankCount(UInt8 cls)
 void Clan::addMemberProffer(Player*pl, UInt32 proffer)
 {
 	Mutex::ScopedLock lk(_mutex);
-    ClanMember * mem = getClanMember(pl);
+    ClanMember* mem = getClanMember(pl);
     if(mem)
     {
         mem->proffer += proffer;
@@ -2878,8 +2894,163 @@ void Clan::addMemberProffer(Player*pl, UInt32 proffer)
             st << static_cast<UInt8>(5) << mem->proffer << Stream::eos;
             pl->send(st);
         }
-        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", mem->proffer, mem->player->getId());
+        DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", mem->proffer, mem->player->getId());
     }
+}
+
+UInt32 Clan::GetRankBattleField(Player* player, UInt32 now)
+{
+    UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
+
+    Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(player);
+    if(mem == NULL) return UInt32(-1);
+
+    if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) == dayBegin)
+    {
+        return mem->rankBattleField;
+    }
+    return UInt32(-1);
+}
+
+bool Clan::SignupRankBattle(Player* player, UInt32 field, UInt32 now)
+{
+    UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
+   
+    Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(player);
+    if(mem == NULL) return false;
+
+    //å·²æŠ¥è¿‡åäº†
+    if(TimeUtil::SharpDayT(0,mem->signupRankBattleTime) == dayBegin) return false;
+
+    //åˆ¤æ–­è¯¥æˆ˜åœºäººæ•°
+    UInt32 num = 0;
+    for(Members::iterator iter = _members.begin();
+            iter != _members.end(); ++iter)
+    {
+        ClanMember* member = *iter;
+        if(TimeUtil::SharpDayT(0, member->signupRankBattleTime) == dayBegin
+                && member->rankBattleField == field)
+        {
+            ++num;
+        }
+    }
+    if(num >= 30)
+    {
+        SYSMSG_SENDV(2230, player, 30);
+        return false;
+    }
+
+    mem->signupRankBattleTime = now;
+    mem->rankBattleField = field;
+    DB5().PushUpdateData("UPDATE `clan_player` SET `signupRankBattleTime`=%u AND `rankBattleField`=%u WHERE `playerId` = %"I64_FMT"u", now, field, mem->player->getId());
+    return true;
+}
+
+bool Clan::SignoutRankBattle(Player* player, UInt32 now)
+{
+    UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
+
+    Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(player);
+    if(mem == NULL) return false;
+
+    //è¿˜æ²¡æŠ¥å
+    if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) != dayBegin) return false;
+
+    mem->signupRankBattleTime = 0;
+    DB5().PushUpdateData("UPDATE `clan_player` SET `signupRankBattleTime`=0 WHERE `playerId`=%"I64_FMT"u", mem->player->getId());
+    return true;
+}
+
+UInt32 Clan::GetSignupRankBattleNum(UInt32 now)
+{
+    UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
+   
+    Mutex::ScopedLock lk(_mutex);
+    //åˆ¤æ–­è¯¥æˆ˜åœºäººæ•°
+    UInt32 num = 0;
+    for(Members::iterator iter = _members.begin();
+            iter != _members.end(); ++iter)
+    {
+        if(TimeUtil::SharpDayT(0, (*iter)->signupRankBattleTime) == dayBegin)
+            ++num;
+    }
+    return num;
+}
+
+
+UInt32 Clan::AdjustRankBattleField(Player* player, UInt32 field, UInt32 now)
+{
+    UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
+
+    Mutex::ScopedLock lk(_mutex);
+    ClanMember* mem = getClanMember(player);
+    if(mem == NULL) return 0;
+
+    //è¿˜æ²¡æŠ¥å
+    if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) != dayBegin) return UInt32(-1);
+    if(mem->rankBattleField == field) return field;
+
+    UInt32 num = 0;
+    for(Members::iterator iter = _members.begin();
+            iter != _members.end(); ++iter)
+    {
+        if(TimeUtil::SharpDayT(0, (*iter)->signupRankBattleTime) == dayBegin
+                && (*iter)->rankBattleField == field)
+        {
+            ++num;
+        }
+    }
+    if(num >= 30)
+    {
+        //TODO æç¤º
+        return UInt32(-1);
+    }  
+
+    UInt32 oldField = mem->rankBattleField;
+    mem->rankBattleField = field;
+    DB5().PushUpdateData("UPDATE `clan_player` SET `rankBattleField`=%u WHERE `playerId`=%"I64_FMT"u", mem->rankBattleField, mem->player->getId());
+    return oldField;
+}
+
+UInt32 Clan::CheckJoinRankBattle(UInt32 now, std::map<UInt32, std::vector<Player*> >& list)
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    UInt32 dayBegin = TimeUtil::SharpDayT(0, now);
+    UInt32 num = 0;
+    for(Members::const_iterator iter = _members.begin();
+            iter != _members.end(); ++iter)
+    {
+        //å½“å¤©æŠ¥åçš„
+        if(TimeUtil::SharpDayT(0,(*iter)->signupRankBattleTime) == dayBegin)
+        {
+            ++num;
+            list[(*iter)->rankBattleField].push_back((*iter)->player);
+        }
+    }
+    
+    if(num > RANK_BATTLE_MIN_SIGNUP_NUM) return 2;
+    else if(num > 0) return 1;
+    return 0;
+}
+
+void Clan::SetBattleScore(UInt32 score)
+{
+    if(m_BattleScore == score) return;
+
+    m_BattleScore = score;
+    DB5().PushUpdateData("UPDATE `clan` SET `battleScore`=%u WHERE `id`=%u", m_BattleScore, getId());
+}
+
+void Clan::SetBattleRanking(UInt32 ranking)
+{
+    if(m_BattleRanking == ranking) return;
+
+    m_BattleRanking = ranking;
+    DB5().PushUpdateData("UPDATE `clan` SET `battleRanking`=%u WHERE `id`=%u", m_BattleRanking, getId());
 }
 
 void Clan::setMaxMemberCount(UInt8 count)
