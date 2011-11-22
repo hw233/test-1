@@ -2747,6 +2747,8 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
     UInt8 type = 0;
     if (isdigit(key.key[0]) && key.key[1] == '-')
         type = key.key[0] - '0';
+    if (!type)
+        type = 3;
 
     if (type && !GameAction()->testTakePack(type, player->GetVar(VAR_KEYPACK1+type-1)))
     {

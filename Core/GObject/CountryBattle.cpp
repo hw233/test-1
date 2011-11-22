@@ -214,7 +214,6 @@ void CountryBattle::process(UInt32 curtime)
 				data.streakOther = cbd1->killStreak;
 				_cbsdlist.push_back(data);
 
-				UInt8 archiveLose = 1 * (lvl + 1);
 				if(cbd2->player->isOnline())
 					cbd2->player->pendAchievement(achieve);
 				else
@@ -240,7 +239,7 @@ void CountryBattle::process(UInt32 curtime)
 				}
 				else
 				{
-					doLeave(curtime, lvl, 0, pos1, archiveLose, 1);
+					doLeave(curtime, lvl, 0, pos1, loserAchieve, 1);
 				}
 			
 				if(cbd2->killStreak >= 10 && World::_actAvailable && gSpecialAward.getAwardSize(0) < 3)

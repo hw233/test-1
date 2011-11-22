@@ -108,6 +108,8 @@ namespace GObject
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
 
+    GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
+    std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -2675,6 +2677,61 @@ namespace GObject
 				}
             }
 
+            {
+                 lua_tinker::table table_tmp = lua_tinker::call<lua_tinker::table>(L, "getMergeStuff");
+                 UInt32 size  = table_tmp.size();
+                 for (UInt32 j = 0; j < size; j++)
+                 {
+                     stMergeStf  s;
+
+                     lua_tinker::table t1 = table_tmp.get<lua_tinker::table>(j + 1);
+                     UInt32  tSize = t1.size();
+                       // for (UInt32 i = 0 ; i < t; i++)
+                        for (UInt32 i = 0 ; i< tSize; i++ )
+                        {
+                            if(i == tSize - 1)
+                            {
+                               s.m_to = t1.get<UInt32>(i + 1);
+                            }
+                            else
+                            {
+
+                                lua_tinker::table c = t1.get<lua_tinker::table>(i + 1);
+                                UInt32  cSize = c.size();
+                                if(cSize == 2)
+                                {
+                                    stMergeS  ms;
+                                    ms.id = c.get<UInt32>(1);
+                                    std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
+                                    v.push_back(j);
+
+                                    ms.num = c.get<UInt32>(2);
+                                    s.m_stfs.push_back(ms);
+                                }
+                                if(cSize == 3)
+                                {
+                                    UInt32  id1 = c.get<UInt32>(1);
+                                    UInt32  id2 = c.get<UInt32>(2);
+                                    UInt32  num = c.get<UInt32>(3);
+                                    if(id1 < id2)
+                                    {
+                                        for(;id1<= id2; id1++)
+                                        {
+                                            stMergeS ms;
+                                            std::vector<UInt32>& v = _mMergeStfsIndex[id1];
+                                            v.push_back(j);
+                                            ms.id = id1;
+                                            ms.num = num;
+                                            s.m_stfs.push_back(ms);
+                                        }
+                                    }
+                                }
+                            }
+                         
+                        }
+                      _vMergeStfs.push_back(s); 
+                 }
+            }
 			for(UInt8 t = 0; t < 2; ++t) 
             {
                 for(q = 0; q < 6; q ++)
