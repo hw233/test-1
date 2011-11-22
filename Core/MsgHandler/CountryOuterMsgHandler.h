@@ -3383,7 +3383,9 @@ void OnClanRankBattleReq(GameMsgHdr& hdr, const void* data)
             break;
         case 4: //购买使用帮派战技能
             {
-                ClanRankBattleMgr::Instance().BuySkill(player);
+                UInt8 skillId = 0;
+                brd >> skillId;
+                ClanRankBattleMgr::Instance().UseSkill(player, skillId);
             }
             break; 
         case 5: //请求战况信息

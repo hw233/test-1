@@ -15,11 +15,14 @@ namespace GObject
 
     class Clan;
     class Player;
+    class ClanRankBattle;
 
     //一场战斗战场数
     const static UInt32 RANK_BATTLE_FIELD_NUM = 6;
     //战斗据点
     const static UInt32 RANK_BATTLE_LOCATION = 100;
+    //帮会战技能列表
+    const static UInt32 RANK_BATTLE_SKILL_NUM = 5;
 
     /**
      *@brief 排名战帮会信息
@@ -30,7 +33,7 @@ namespace GObject
         typedef std::map<UInt32, PlayerVec> PlayerMap;
 
     public:
-        ClanRankBattleInfo(Clan* _clan):clan(_clan), m_bLowerHead(true){}
+        ClanRankBattleInfo(Clan* _clan):clan(_clan), battle(NULL), m_bLowerHead(true){}
 
     public:
 
@@ -49,15 +52,31 @@ namespace GObject
     public:
         //帮会
         Clan* clan;
+        //当前战争
+        ClanRankBattle* battle;
         //当前排列顺序是否为才从小到大
         bool m_bLowerHead;
         //队伍
         PlayerMap  players;
     };
 
+    
+    /**
+     *@brief 帮会战技能
+     */
+    struct ClanBattleSkill
+    {
+        ClanBattleSkill()
+            :id(0),price(0){}
 
+        //id
+        UInt32 id;
+        //价格
+        UInt32 price;
+        //技能加成属性
+        GData::AttrExtra  attrs;
+    };
 
-    class ClanRankBattle;
 
     /**
      *@brief 帮会排名战役
@@ -111,7 +130,7 @@ namespace GObject
         /**
          *@brief 获取帮会贡献
          */
-        void AddProffer(UInt32 extScore1, UInt32 extScore2);
+        void End(UInt32 extScore1, UInt32 extScore2);
 
 
         void FillPlayers(Stream& stream, UInt32 clan);
@@ -120,6 +139,7 @@ namespace GObject
 
     private:
         void ResetPlayerStatus(UInt32 clan);
+        void ClearPlayerData(Player* player);
 
     private:
         //id
@@ -136,6 +156,7 @@ namespace GObject
         std::map<UInt32, PlayerVec>   m_DeadPlayers;
         //状态改变
         std::map<UInt64, UInt32>  m_StatusChanged;
+
         //开始时间
         UInt32 m_StartTime;
         //轮次
@@ -190,10 +211,24 @@ namespace GObject
         ClanRankBattleInfo* GetOtherClan(UInt32 id);
 
         /**
+         *@brief 使用技能
+         */
+        void UseSkill(Player* player, ClanBattleSkill* skill);
+
+        /**
          *@brief 发送相关信息
          */
         void SendBattleStatus(Player* player);
         void SendBattleInfo(Player* player);
+
+        /**
+         *@brief 广播
+         */
+        void Broadcast(Stream& stream, bool bAll = false)
+        {
+            m_Clan1->Broadcast(stream, bAll);
+            m_Clan2->Broadcast(stream, bAll);
+        }
     private:
         /**
          *@brief 获取战役
@@ -237,6 +272,7 @@ namespace GObject
             STATE_BATTLE,  //战斗状态
         };
 
+
     public:
         ClanRankBattleMgr();
         ~ClanRankBattleMgr();
@@ -277,9 +313,9 @@ namespace GObject
         void GetRewards(Player* player);
 
         /**
-         *@brief 购买技能
+         *@brief 使用技能
          */
-        void BuySkill(Player* player);
+        void UseSkill(Player* player, UInt32 id);
 
         /**
          *@brief 发送相关信息
@@ -314,11 +350,6 @@ namespace GObject
          *@brief 获取一个帮会的信息
          */
         ClanRankBattleInfo* GetClanInfo(UInt32 id);
-
-        /**
-         *@brief 获取帮会当前战斗
-         */
-        ClanRankBattle* GetClanBattle(UInt32 id);
 
         /**
          *@brief 获取可以参加帮会战的帮派
@@ -356,8 +387,8 @@ namespace GObject
         //战斗列表
         BattleVec m_Battles;
 
-        //帮会-战斗
-        BattleMap m_ClanBattles;
+        //帮派技能
+        ClanBattleSkill m_Skills[RANK_BATTLE_SKILL_NUM];
     };
 }
 

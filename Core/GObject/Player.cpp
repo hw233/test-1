@@ -549,8 +549,10 @@ namespace GObject
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
         _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_hasTripod(false)
 	{
-        m_ClanBattleStatus = 0;
+        m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
+        m_ClanBattleWinTimes = 0;
+        m_ClanBattleSkillFlag = 0;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);

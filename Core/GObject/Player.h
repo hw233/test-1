@@ -861,6 +861,10 @@ namespace GObject
         void IncClanBattleWinTimes() { ++m_ClanBattleWinTimes; }
         UInt32 GetClanBattleWinTimes() const { return m_ClanBattleWinTimes; }
 
+        void SetClanBattleSkillFlag(UInt8 skillId) { m_ClanBattleSkillFlag |= (1 << skillId); }
+        bool CheckClanBattleSkillFlag(UInt8 skillId) { return (m_ClanBattleSkillFlag & (1 << skillId)) != 0; }
+        void ClearClanBattleSkillFlag() { m_ClanBattleSkillFlag = 0; }
+
 		void addFriendFromDB(Player *);
 		void addBlockFromDB(Player *);
 		void addFoeFromDB(Player *);
@@ -1041,9 +1045,10 @@ namespace GObject
 
 		SecondPWDInfo _pwdInfo;
 
-        UInt8 m_ClanBattleStatus; //帮会战状态
-        UInt32 m_ClanBattleScore; //帮会战个人积分
-        UInt32 m_ClanBattleWinTimes; //帮会战连胜次数
+        UInt8 m_ClanBattleStatus;     //帮会战状态
+        UInt32 m_ClanBattleScore;     //帮会战个人积分
+        UInt32 m_ClanBattleWinTimes;  //帮会战连胜次数
+        UInt32 m_ClanBattleSkillFlag; //帮派战已使用技能位
 
     public:
 		// Last battled monster

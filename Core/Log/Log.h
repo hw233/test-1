@@ -54,7 +54,7 @@ enum PurchaseType
     TrumpLOrder,
     AutoFrontMapComplete,
     AthleticPaging, 
-
+    ClanRankBattleSkill,
 };
 
 enum IncomingType
@@ -162,7 +162,7 @@ public:
 	void OutInfo(const char * fmt, ...);
 	void OutTrace(const char * fmt, ...);
 	void OutLog(UInt8 lev, const char * fmt, ...);
-	//只是把要输出的日志，打包成字符串
+	//只?前?要????????志?????????址???
 
 	void FlushLog(UInt8 lev, tm& aTm, const char* buffer);
 
@@ -170,7 +170,7 @@ protected:
 	FILE* GetFileHandler(UInt8 lev, tm& aTm);	//fail : NULL
 private:
 	UInt8		m_LogLev;
-	std::string m_LogDir;		//日志目录
+	std::string m_LogDir;		//??志目录
 
 	FILE*		m_ErrorFile;
 	FILE*		m_WarnFile;
