@@ -277,7 +277,6 @@ void GameClient::OnTick(UInt32 now)
     {
         if(m_Now > m_CreateTime + VERIFY_TIMEOUT)
         {
-            printf("verify timeout\n");
             //验证超时
             closeConn();
             return;
@@ -285,7 +284,6 @@ void GameClient::OnTick(UInt32 now)
     }
     else if(m_Now > m_RecvTime + HEARTBEAT_TIMEOUT)
     {
-        printf("heartbeat timeout\n");
         //心跳超时
         closeConn();
         return;
