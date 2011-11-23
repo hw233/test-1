@@ -858,8 +858,8 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
         else if(typeId > 1599 && typeId < 1700)   //主动技能法宝
             res += 2;
         break;
-    case 18:                                                         //阵法
-        parent = 18;
+    case 20:                                                         //阵法
+        parent = 20;
         if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //两仪微尘阵
             res += 12;
         else if(typeId == 1001 || (typeId > 1019 && typeId < 1031))  //须弥九宫阵

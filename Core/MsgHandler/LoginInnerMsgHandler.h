@@ -39,6 +39,8 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
                     {
                         if (isdigit(key->key[0]) && key->key[1] == '-')
                             type = key->key[0] - '0';
+                        else
+                            type = 3;
                     }
                     else
                     {
@@ -95,6 +97,8 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
         UInt8 type = 0xFF;
         if (isdigit(key->key[0]) && key->key[1] == '-')
             type = key->key[0] - '0';
+        else
+            type = 3;
 
         if (key->player)
         {

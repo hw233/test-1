@@ -1168,7 +1168,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 {
                     status = pd->compass[sz-1].status = 2;
 
-                    if (sz == 1)
+                    if (sz == 1 || sz == 4 || sz == 7)
                         pd->straight = 1;
                     else if (sz > 1)
                     {
@@ -1446,6 +1446,7 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return;
 
+#if 0
     if (spot)
     {
         pd = leave(pd, spot, pos);
@@ -1461,6 +1462,10 @@ void HeroIsland::playerLeave(Player* player)
         if (_nplayers[0])
             --_nplayers[0];
     }
+#else
+    if (_nplayers[spot])
+        --_nplayers[spot];
+#endif
 
     clearBuff(1, pd, 0);
     clearBuff(2, pd, 0); // XXX: must before reset
@@ -1488,6 +1493,9 @@ void HeroIsland::playerOffline(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return;
 
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
+    broadcast(st, pd->spot);
     if (_nplayers[spot])
         --_nplayers[spot];
 }
@@ -1622,7 +1630,7 @@ void HeroIsland::commitCompass(Player* player)
     UInt8 straight = pd->straight;
     if (sz && !(sz % 3))
     {
-        if (pd->straight == 3)
+        if (straight >= 3)
         {
             ++pd->round;
             pd->awardgot = pd->round+1;

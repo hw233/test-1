@@ -59,7 +59,7 @@ public:
 	UInt32 addAthleticsData(UInt8, Player *, UInt8, UInt32, UInt32 = TimeUtil::Now());
 	void addAthleticsDataFromTarget(UInt8, Player *, UInt32, UInt8, UInt32, UInt32);
 	void attack(Player *);
-	void beAttack(Player *, UInt8, UInt16, Lineup*);
+	void beAttack(Player *, UInt16, UInt16, Lineup*);
     void notifyAttackRes(Player *, bool);
 
 
@@ -85,7 +85,7 @@ public:
     void updateMartial(const MartialData* md);
     void attackMartial(Player* defer);
 
-    void beAttackMartial(Player * atker, UInt8 formation, UInt16 portrait, Lineup * lineup);
+    void beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
     void awardMartial(Player *, bool win);
 
 public:

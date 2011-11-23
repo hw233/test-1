@@ -225,7 +225,7 @@ void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 	struct AthleticsBeData
 	{
 		Player * attacker;
-		UInt8 formation;
+		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
@@ -1148,7 +1148,7 @@ void OnAthleticsMartialBeAttack( GameMsgHdr& hdr, const void* data )
 	struct AthleticsBeData
 	{
 		Player * attacker;
-		UInt8 formation;
+		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
