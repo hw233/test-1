@@ -1149,7 +1149,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
 
         int turns = 0;
-        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5, false);
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5, pd->ato?0x00:0x01);
         if (cfg.GMCheck)
             pd->fightcd = now + 40;
         else

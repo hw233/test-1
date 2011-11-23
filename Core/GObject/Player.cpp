@@ -2023,7 +2023,7 @@ namespace GObject
         return false;
     }
 
-	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene, bool report )
+	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene, UInt8 report )
 	{
 		checkLastBattled();
 		other->checkLastBattled();
@@ -2035,11 +2035,27 @@ namespace GObject
 
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
-		send(st);
-		st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
+        if (report & 0x01)
+        {
+            send(st);
+        }
+        else
+        {
+            if (res)
+            {
+                SYSMSG_SENDV(2141, this, getCountry(), getName().c_str());
+            }
+            else
+            {
+                SYSMSG_SENDV(2140, this, getCountry(), getName().c_str());
+            }
+        }
 
-        if (report)
+        if (report & 0x02)
+        {
+            st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
             other->send(st);
+        }
         else
         {
             if (res)
