@@ -294,7 +294,6 @@ void BattleSimulator::reQueueFighterStatus(BattleFighter* bf)
             {
                 cur_fgtlist.erase(cur_fgtlist.begin() + i);
                 -- c;
-
                 std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[fgtlist_idx];
                 int cnt = static_cast<int>(cur_fgtlist.size());
                 int idx = 0;
@@ -311,7 +310,10 @@ void BattleSimulator::reQueueFighterStatus(BattleFighter* bf)
                 }
 
                 if( idx == cnt )
+                {
                     cur_fgtlist.insert(cur_fgtlist.end(), bf);
+                }
+                return;
 
             }
             else
@@ -2201,7 +2203,8 @@ UInt32 BattleSimulator::FightersEnter()
 {
     UInt32 rcnt = 0;
 
-    std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
+    std::vector<BattleFighter*>  cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
+
     size_t cnt = cur_fgtlist.size();
 
     for(size_t idx = 0; idx < cnt; idx++)
