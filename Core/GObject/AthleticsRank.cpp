@@ -614,7 +614,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	UInt16 atkerRankPos = getRankPos(row, atkerRank->second);
 	UInt16 deferRankPos = getRankPos(row, deferRank->second);
     UInt16 pageNum = (*atkerRank->second)->pageNum; //得到攻击者的页面
-	if(atkerRankPos != 1)
+	if(atkerRankPos > 10 )
 	{
 		if (atkerRankPos <= deferRankPos)
         {
@@ -631,8 +631,11 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 			return ;
 		}
 	}
-	else if(deferRankPos - atkerRankPos > 4)
-		return;
+	else 
+    {
+        if(deferRankPos > 10)
+		    return;
+    }
 
     if (defer->hasGlobalFlag(Player::Challenging) || defer->hasGlobalFlag(Player::BeChallenging))
     {
@@ -684,28 +687,22 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
 	const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20};
     if( atker->hasFlag(GObject::Player::InHeroIsland) )
         return;
-
 	Player * defer = globalNamedPlayers[atker->fixName(name)];
 	if (defer == NULL || atker == defer || type != 3)
 		return ;
-
 	UInt8 row = getRankRow(atker->GetLev());
 	if (row == 0xFF)
 		return ;
 	RankList::iterator atkerRank = _ranks[row].find(atker);
 	if (atkerRank == _ranks[row].end())
 		return ;
-
     AthleticsRankData * data = *(atkerRank->second);
     if (atker->hasGlobalFlag(Player::Challenging) || atker->hasGlobalFlag(Player::BeChallenging) || atker->getBuffLeft(PLAYER_BUFF_ATHLETICS) != 0)
-        return ;
-
+        return ; 
     data->challengenum = updateChallengeNum(data->challengenum, data->challengetime);
     if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
         return ;
-
     data->challengenum ++;
-
     data->challengetime = TimeUtil::Now();
 
     UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
@@ -771,13 +768,16 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
     AthleticsRankData * data = *(atkerRank->second);
 	UInt16 atkerRankPos = getRankPos(row, atkerRank->second);
 	UInt16 deferRankPos = getRankPos(row, deferRank->second);
-	if(atkerRankPos != 1)
+	if(atkerRankPos >10)
 	{
 		if (atkerRankPos <= deferRankPos || (atkerRankPos - deferRankPos > 10*(data->pageNum + 1)))// && !(getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000))))
 			return;
 	}
-	else if(deferRankPos - atkerRankPos > 4)
-		return;
+	else 
+    {
+        if(deferRankPos >10)
+		     return;
+    }
 	AthleticsRankData * deferdata = *(deferRank->second);
 	UInt8 type = 0xFF;
 	//UInt8 color = deferdata->boxcolor;
@@ -823,7 +823,11 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 #endif
 
 //		AthleticsRankData * data = *(atkerRank->second);
-		if(atkerRankPos != 1)
+        bool bNeedChangePos =  true;
+        if(  atkerRankPos <=  deferRankPos)
+            bNeedChangePos = false;
+//		if(atkerRankPos != 1)
+        if(bNeedChangePos)
 		{
             flag |= 0x04;
 			data->rank = deferdata->rank;
@@ -860,7 +864,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 
 		//DB6().PushUpdateData("UPDATE `athletics_rank` SET `winStreak` = 0, `befailstreak` = %u WHERE `ranker` = %"I64_FMT"u", deferdata->befailstreak, deferdata->ranker->getId());
 		
-		if(atkerRankPos != 1)
+//		if(atkerRankPos != 1)
+        if(bNeedChangePos)
         {
 			DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u, `maxRank` = %u, `winStreak` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, data->maxrank, data->winstreak, data->ranker->getId());
         }
