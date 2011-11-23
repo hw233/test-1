@@ -6489,6 +6489,26 @@ namespace GObject
         playerCopy.sendAutoCopy(this);
     }
 
+    void Player::startAutoFrontMap(UInt8 id)
+    {
+        frontMap.autoBattle(this, id, 0);
+    }
+
+    void Player::cancelAutoFrontMap(UInt8 id)
+    {
+        frontMap.autoBattle(this, id, 1);
+    }
+
+    void Player::instantAutoFrontMap(UInt8 id)
+    {
+        frontMap.autoBattle(this, id, 2);
+    }
+
+    void Player::sendAutoFrontMap()
+    {
+        frontMap.sendAutoFrontMap(this);
+    }
+
     void Player::AddPracticeExp(const PracticeFighterExp* pfexp)
     {
         if(!pfexp)
