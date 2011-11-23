@@ -7,8 +7,42 @@
 #include "Server/ServerTypes.h"
 #include "Common/Mutex.h"
 
+
+/**
+ *@brief 空闲块队列
+ */
+class MemBlockPool
+{
+    /**
+     *@brief 内存块
+     */
+    struct MemBlock
+    {
+        MemBlock* next;   //下一个内存块
+        char   data[1];   //用户数据区
+    };
+
+public:
+    explicit MemBlockPool(size_t size);
+    ~MemBlockPool();
+
+    void* Alloc();
+    void Free(void* ptr);
+
+private:
+    //每块大小
+    const size_t  m_Size;
+    //内存块链表
+    MemBlock* m_pBlockList;
+    //互斥锁
+    FastMutex m_Mutex;
+};
+
+
 class GlobalObject : public Singleton<GlobalObject>
-{ 
+{
+    const static size_t MEMPOOL_NUM = 10;
+
 protected:
 	GlobalObject() {};
 	virtual ~GlobalObject() {};
@@ -36,9 +70,16 @@ public:
 		return true;
 	}
 
+public: //分配释放空闲块
+
+    void* AllocMsgBlock(size_t size);
+    void  FreeMsgBlock(void* ptr);
+
 private:
 	MsgQueue			m_MsgQueue[MAX_THREAD_NUM];
 	FastMutex			m_MsgQueueCs[MAX_THREAD_NUM];
+
+    MemBlockPool*       m_Pools[MEMPOOL_NUM];
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -48,7 +89,7 @@ inline void GlobalObject::PushMsg(const MsgHdrType& hdr, void* msgBody)
 	UInt8 workerId = hdr.msgHdr.desWorkerID;
 	if( workerId >= (UInt8)MAX_THREAD_NUM )
 		return;
-	char* buffer = new(std::nothrow) char[sizeof(MsgHdrType) + hdr.msgHdr.bodyLen];
+	char* buffer = (char*)AllocMsgBlock(sizeof(MsgHdrType) + hdr.msgHdr.bodyLen);
 	if(buffer == NULL)
 		return;
 	memcpy(buffer, &hdr, sizeof(MsgHdrType));
