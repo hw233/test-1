@@ -188,7 +188,7 @@ public:
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
-    bool useSkill(Player* player, UInt8 skillid);
+    bool useSkill(Player* player, UInt8 skillid, UInt8 type);
     bool getAward(Player* player, UInt8 id, UInt8 type);
     void clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skillid = 0);
 

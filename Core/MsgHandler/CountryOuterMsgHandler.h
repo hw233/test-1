@@ -3262,8 +3262,10 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
         case 7:
             {
                 UInt8 skillid = 0;
+                UInt8 type = 0;
                 brd >> skillid;
-                GObject::heroIsland.useSkill(player, skillid);
+                brd >> type;
+                GObject::heroIsland.useSkill(player, skillid, type);
             }
             break;
         case 8:
