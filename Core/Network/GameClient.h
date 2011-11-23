@@ -16,6 +16,16 @@ namespace Network
 class GameClient:
 	public TcpConduit
 {
+    const static UInt32 VERIFY_TIMEOUT = 120;  //2分钟验证超时
+    const static UInt32 HEARTBEAT_TIMEOUT = 180; //3分钟心跳超时
+
+public:
+    enum GameClientStatus
+    {
+        UNVERIFIED,  //未验证
+        NORMAL,      //一般状态
+    };
+
 public:
 	GameClient(int fd, Network::TcpSlaveServer * s, int id);
 
@@ -40,6 +50,11 @@ public:
 
 	virtual bool active();
 
+    void OnTick(UInt32 now);
+
+    GameClientStatus GetStatus() const { return m_Status; }
+    void SetStatus(GameClientStatus status){ m_Status = status; }
+
 private:
 	AtomicVal<GObject::Player *>	m_Player;
 	UInt32	m_RemoteIP;
@@ -49,6 +64,12 @@ private:
     UInt8 m_Chk;
     UInt8 m_OldChk;
     UInt32 m_ChkOver;
+
+    UInt32 m_Now;     //当前时间
+    GameClientStatus m_Status; //当前状态
+
+    UInt32 m_CreateTime;  //连接建立时间
+    UInt32 m_RecvTime;    //上次收到消息包时间
 };
 
 }

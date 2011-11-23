@@ -2,6 +2,7 @@
 
 #include "TcpServer.h"
 #include "Common/Thread.h"
+#include "Common/TimeUtil.h"
 
 #include <event2/event.h>
 #include <event2/util.h>
@@ -77,6 +78,13 @@ void TcpSlaveServer::postInitServer()
 		struct timeval tv = {0, 250000};
 		event_add(_evOp, &tv);
 	}
+
+    _evTick = event_new(_ev_base, -1, EV_PERSIST, _ev_tick_event, this);
+    if(_evTick != NULL)
+    {
+        struct timeval tv = {1, 0};
+        event_add(_evTick, &tv);
+    }
 }
 
 void TcpSlaveServer::initConnection(int stype)
@@ -251,6 +259,11 @@ void TcpSlaveServer::destroy()
 		event_del(_evOp);
 		_evOp = NULL;
 	}
+    if(_evTick != NULL)
+    {
+        event_del(_evTick);
+        _evTick = NULL;
+    }
 	TcpServer::destroy();
 }
 
@@ -281,6 +294,20 @@ void TcpSlaveServer::onOpCheck()
 				_remove(_os.data);
 		}
 	}
+}
+
+void TcpSlaveServer::_ev_tick_event(int, short, void* arg)
+{
+    static_cast<TcpSlaveServer*>(arg)->onTick(TimeUtil::Now());
+}
+
+void TcpSlaveServer::onTick(UInt32 now)
+{
+    for(_ConduitList::iterator iter = _conduits.begin();
+            iter != _conduits.end(); ++iter)
+    {
+        (*iter)->OnTick(now);
+    }
 }
 
 TcpMasterServer::TcpMasterServer(UInt16 port):
