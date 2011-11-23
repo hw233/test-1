@@ -1374,7 +1374,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
 
         int self_side = bf->getSide() == target_side ? 25 : 0;
-        appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
+        appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
         return 0;
     }
 
