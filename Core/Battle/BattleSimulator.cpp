@@ -412,7 +412,6 @@ void BattleSimulator::reQueueFighterStatus(BattleFighter* bf)
             {
                 cur_fgtlist.erase(cur_fgtlist.begin() + i);
                 -- c;
-
                 std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[fgtlist_idx];
                 int cnt = static_cast<int>(cur_fgtlist.size());
                 int idx = 0;
@@ -429,7 +428,10 @@ void BattleSimulator::reQueueFighterStatus(BattleFighter* bf)
                 }
 
                 if( idx == cnt )
+                {
                     cur_fgtlist.insert(cur_fgtlist.end(), bf);
+                }
+                return;
 
             }
             else
@@ -1527,7 +1529,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
 
         int self_side = bf->getSide() == target_side ? 25 : 0;
-        appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
+        appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
         return 0;
     }
 
@@ -2354,7 +2356,8 @@ UInt32 BattleSimulator::FightersEnter()
 {
     UInt32 rcnt = 0;
 
-    std::vector<BattleFighter*>& cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
+    std::vector<BattleFighter*>  cur_fgtlist = _fgtlist[_cur_fgtlist_idx];
+
     size_t cnt = cur_fgtlist.size();
 
     for(size_t idx = 0; idx < cnt; idx++)
@@ -3715,7 +3718,7 @@ BattleFighter * BattleSimulator::newFighter( UInt8 side, UInt8 pos, GObject::Fig
 
 void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, UInt32 value, StatusChange * scList, size_t& scCount, bool active )
 {
-	for(UInt8 i = pos; i < cnt; ++ i)
+	for(UInt8 i = pos; i < pos + cnt; ++ i)
 	{
 		if(_objs[side][i] != NULL)
 		{
@@ -3748,7 +3751,7 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
 
 void BattleSimulator::setStatusChange2( UInt8 side, UInt8 pos, int cnt, UInt16 skillId, UInt8 type, float value, UInt16 last, StatusChange * scList, size_t& scCount, bool active )
 {
-	for(UInt8 i = pos; i < cnt; ++ i)
+	for(UInt8 i = pos; i < pos + cnt; ++ i)
 	{
 		if(_objs[side][i] != NULL)
 		{

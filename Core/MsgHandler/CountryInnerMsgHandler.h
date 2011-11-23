@@ -225,7 +225,7 @@ void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 	struct AthleticsBeData
 	{
 		Player * attacker;
-		UInt8 formation;
+		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
@@ -603,6 +603,8 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
 
     player->buildClanTask();
     player->clearFinishCount();
+    if (World::_thanksgiving)
+        player->resetThanksgiving();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -715,6 +717,19 @@ void OnAutoCopyAttack( GameMsgHdr& hdr, const void * data )
         player->autoCopyFailed(id);
 }
 
+void OnAutoFrontMapAttack( GameMsgHdr& hdr, const void * data )
+{
+    if (!data)
+        return;
+
+	MSG_QUERY_PLAYER(player);
+
+    UInt16 idspot = *(UInt16*)data;
+    UInt8 ret = frontMap.fight(player, (idspot>>8)&0xFF, idspot&0xFF, true);
+    if (ret == 0)
+        player->autoFrontMapFailed();
+}
+
 void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -724,6 +739,12 @@ void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
         case 0:
             {
                 player->sendNationalDayOnlineAward();
+            }
+            break;
+
+        case 1:
+            {
+                GameAction()->onThanksgivingDay(player);
             }
             break;
 
@@ -1127,7 +1148,7 @@ void OnAthleticsMartialBeAttack( GameMsgHdr& hdr, const void* data )
 	struct AthleticsBeData
 	{
 		Player * attacker;
-		UInt8 formation;
+		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
@@ -1147,6 +1168,11 @@ void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
 
     player->GetAthletics()->awardMartial(notify->peer, notify->win);
 }
+void OnAthlectisPayPaging( GameMsgHdr & hdr,  const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->GetAthletics()->PayForPaging();
+}
 
 void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
 {
@@ -1165,5 +1191,6 @@ void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
      {
         player->OnDoAttainment(co->attainID, co->param);
      }
+    player->GetAthletics()->PayForPaging();
 }
 #endif // _COUNTRYINNERMSGHANDLER_H_

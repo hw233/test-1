@@ -405,6 +405,42 @@ function ItemNormal_00000040(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000008(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    if package:GetRestPackageSize() < 1 then		
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+    local prob = {15, 29, 32, 45, 53, 58, 73, 86, 98, 100,}
+    local items = {{9,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i]
+    if item[1] == 0 then
+        local equip = getRandOEquip(player:GetLev())
+		package:AddEquip(equip, 1, true);
+        if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
+        end
+    else
+        package:AddItem(item[1], item[2], true, 0, 2);
+        if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."]x"..item[2]);
+        end
+    end
+    package:DelItemSendMsg(8, player);
+    return num
+end
+
 function ItemNormal_00000009(iid, num, bind, param)
   local player = GetPlayer()
   if player:hasFlag(73) then
@@ -861,6 +897,14 @@ function ItemNormal_00000031(iid, num, bind, param)
 
     package:DelItemSendMsg(31, player);
     return n;
+end
+
+function ItemNormal_00000035(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  package:DelItemSendMsg(35, player);
+  player:getTael(100*num)  
+  return num;
 end
 
 function ItemNormal_00000036(iid, num, bind, param)
@@ -5555,7 +5599,6 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     return num;
 end
 
-
 local ItemNormal_Table = {
   [7001] = ItemNormal_00007xxx,
   [7002] = ItemNormal_00007xxx,
@@ -5598,6 +5641,7 @@ local ItemNormal_Table = {
 	[8907] = ItemNormal_00008907,
 --	[6] = ItemNormal_00000006,
 --	[7] = ItemNormal_00000007,
+	[8] = ItemNormal_00000008,
 	[9] = ItemNormal_00000009,
 	[8931] = ItemNormal_00008931,
 	[55] = ItemNormal_00000055,
@@ -5607,9 +5651,7 @@ local ItemNormal_Table = {
 	[12] = ItemNormal_00000012,
 	[13] = ItemNormal_00000013,
 	[14] = ItemNormal_00000014,
-
 	[15] = ItemNormal_00000015,
-	
 	[8938] = ItemNormal_00008938,
 	[8939] = ItemNormal_00008939,
 	[8940] = ItemNormal_00008940,
@@ -5624,6 +5666,7 @@ local ItemNormal_Table = {
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
+	[35] = ItemNormal_00000035,
 	[36] = ItemNormal_00000036,
 	[37] = ItemNormal_00000037,
 	[38] = ItemNormal_00000038,
@@ -5682,7 +5725,6 @@ local ItemNormal_Table = {
 	[8993] = ItemNormal_00008993,
 	[8994] = ItemNormal_00008994,
 	[8995] = ItemNormal_00008995,
-	[15] = ItemNormal_00000015,
 	[8997] = ItemNormal_00008997,
 	[8998] = ItemNormal_00008998,
 	[9002] = ItemNormal_00009002,

@@ -7,6 +7,7 @@
 #include "MsgID.h"
 #include "GData/Money.h"
 #include "Server/SysMsg.h"
+#include "Server/Cfg.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
 
@@ -14,6 +15,20 @@ namespace GObject
 {
 
 UInt8 FrontMap::_activeCount = 0;
+
+void autoClear(Player* pl, bool complete = false, UInt8 id = 0, UInt8 spot = 0)
+{
+    if (!pl)
+        return;
+
+    if (complete)
+    {
+    }
+
+    PopTimerEvent(pl, EVENT_AUTOFRONTMAP, pl->getId());
+    pl->delFlag(Player::AutoFrontMap);
+    DB3().PushUpdateData("DELETE FROM `auto_frontmap` WHERE playerId = %"I64_FMT"u", pl->getId());
+}
 
 void FrontMap::setFrontMapActiveCount(UInt8 c)
 {
@@ -137,16 +152,23 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
         st.data<UInt8>(off) = size;
 }
 
+bool FrontMap::checkLevel(Player* pl, UInt8 id)
+{
+    UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
+    if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8)) {
+        SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
+        return false;
+    }
+    return true;
+}
+
 void FrontMap::enter(Player* pl, UInt8 id)
 {
     if (!pl || !id)
         return;
 
-    UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
-    if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8)) {
-        SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
+    if (!checkLevel(pl, id))
         return;
-    }
 
     FastMutex::ScopedLock lk(_mutex); // XXX: ???
     UInt8 ret = 1;
@@ -221,26 +243,26 @@ UInt8 FrontMap::getCount(Player* pl)
     return count;
 }
 
-void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
+UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
 {
     if (!pl || !id || !spot)
-        return;
+        return 0;
 
     FastMutex::ScopedLock lk(_mutex);
     if (PLAYER_DATA(pl, frontFreeCnt) > getFreeCount() &&
             PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))
-        return;
+        return 0;
 
     Stream st(REP::FORMATTON_INFO);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (spot > GData::frontMapMaxManager[id]) {
         // TODO: 
-        return;
+        return 0;
     }
 
     if (spot > 1) {
         if (spot > tmp.size())
-            return;
+            return 0;
     }
 
     if (spot >= tmp.size()) {
@@ -254,14 +276,14 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
     if (count >= GData::frontMapManager[id][spot].count) {
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(0) << Stream::eos;
         pl->send(st);
-        return;
+        return 0;
     }
 
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
     if (fgtid) {
-        if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl)) {
-            //pl->checkLastBattled();
+        std::vector<UInt16> loot;
+        if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl, ato, &loot)) {
             ret = true;
         }
 
@@ -277,7 +299,9 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
                 GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
                 DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
-                return;
+                if (ato)
+                    autoClear(pl, complate);
+                return 2;
             } else {
                 UInt8 nspot = spot+1;
                 while (!GData::frontMapManager[id][nspot].count && nspot <= GData::frontMapMaxManager[id])
@@ -302,8 +326,15 @@ void FrontMap::fight(Player* pl, UInt8 id, UInt8 spot)
 
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
         pl->send(st);
+
+        if (ato && !ret)
+        {
+            autoClear(pl, complate);
+        }
+
+        return ret?1:0;
     }
-    return;
+    return 0;
 }
 
 void FrontMap::reset(Player* pl, UInt8 id)
@@ -340,6 +371,108 @@ void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UIn
     tmp[spot].count = count;
     tmp[spot].status = status?1:0;
     tmp[spot].lootlvl = lootlvl;
+}
+
+void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
+{
+    if (!pl || !id)
+        return;
+
+    switch (type)
+    {
+        case 0:
+            {
+                if (!init) {
+                    if (pl->hasFlag(Player::AutoFrontMap)) {
+                        pl->sendMsgCode(0, 1414);
+                        return;
+                    }
+
+                    if (pl->getVipLevel() < 5)
+                        return;
+
+                    if (!checkLevel(pl, id))
+                        return;
+
+                    if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael > pl->getTael()) {
+                        pl->sendMsgCode(0, 1100);
+                        return;
+                    } else {
+                        ConsumeInfo ci(EnterFrontMap,0,0);
+                        pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
+                    }
+                }
+
+                std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+                if (!tmp.size())
+                    return;
+
+                UInt8 max = GData::frontMapMaxManager[id];
+                UInt8 count = max - tmp.size() + 1;
+                UInt8 nspot = tmp.size();
+                if (nspot != 1 && !tmp[nspot-1].status)
+                    --nspot;
+                if (!nspot)
+                    nspot = 1;
+
+                UInt8 secs = 0;
+                if (cfg.GMCheck)
+                    secs = 60; 
+                else
+                    secs = 20; 
+
+                EventAutoFrontMap* event = new (std::nothrow) EventAutoFrontMap(pl, secs, count, id, nspot);
+                if (!event) return;
+                PushTimerEvent(event);
+
+                pl->addFlag(Player::AutoFrontMap);
+                DB3().PushUpdateData("REPLACE INTO `auto_frontmap` (`playerId`, `id`) VALUES (%"I64_FMT"u, %u)", pl->getId(), id);
+            }
+            break;
+
+        case 1:
+            {
+                if (!pl->hasFlag(Player::AutoFrontMap)) {
+                    pl->sendMsgCode(0, 1415);
+                    return;
+                }
+
+                autoClear(pl);
+            }
+            break;
+
+        case 2:
+            {
+                if (!pl->hasFlag(Player::AutoFrontMap)) {
+                    pl->sendMsgCode(0, 1415);
+                    return;
+                }
+
+                if (pl->getVipLevel() < 9)
+                    return;
+
+                std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+                if (!tmp.size())
+                    return;
+
+                UInt8 max = GData::frontMapMaxManager[id];
+                UInt8 nspot = tmp.size();
+                if (nspot != 1 && !tmp[nspot-1].status)
+                    --nspot;
+                if (!nspot)
+                    nspot = 1;
+
+                for (UInt8 i = nspot; i <= max; ++i)
+                {
+                    if (!fight(pl, id, i, true, true))
+                        break;
+                }
+            }
+            break;
+
+        default:
+            break;
+    }
 }
 
 } // namespace GObject

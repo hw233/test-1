@@ -1242,6 +1242,7 @@ namespace GObject
 
     bool Package::FCMerge(UInt32 id, bool bind)
     {
+        /*
         static struct {
             UInt32 sid; // start id
             UInt32 eid; // end id
@@ -1284,7 +1285,7 @@ namespace GObject
             {1421,  1426,   "1,1,1,1,1,1",          1239},
             {70,    71,     "1,1",                  1751},
             {0, 0, NULL, 0},
-        };
+        };*/
 
         if (IsFull())
         {
@@ -1292,8 +1293,30 @@ namespace GObject
             return false;
         }
 
-        int k = -1;
-        int i = 0;
+        std::vector<stMergeStf> stfs = GObjectManager::getMergeStfs(id);
+
+        if(stfs.size()  == 0 )
+            return false;
+
+        for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
+        {
+            UInt32 id = stfs[0].m_stfs[i].id;
+            UInt32 num = stfs[0].m_stfs[i].num;
+
+            if( GetItemAnyNum(id) < num)
+                return false;
+        }
+
+         
+        for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
+        {
+                UInt32 id = stfs[0].m_stfs[i].id;
+            UInt32 num = stfs[0].m_stfs[i].num;
+            
+            DelItemAny(id, num, &bind);
+
+        }
+        /*
         while (true)
         {
             if (!config[i].sid)
@@ -1333,8 +1356,8 @@ namespace GObject
             UInt16 num = atoi(tk[j].c_str());
             DelItemAny(id, num, &bind);
         }
-
-        Add(config[i].tid, 1, bind, false, FromFCMerge);
+*/
+        Add( stfs[0].m_to, 1, bind, false, FromFCMerge);
         return true;
     }
 

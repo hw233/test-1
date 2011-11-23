@@ -108,6 +108,8 @@ namespace GObject
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
 
+    GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
+    std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
 
 	bool GObjectManager::InitIDGen()
 	{
@@ -827,7 +829,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `archievement`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `archievement`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1113,6 +1115,7 @@ namespace GObject
 			}
 
 			pl->setBossLevel(dbpd.bossLevel, false);
+            pl->setAtoHICfg(dbpd.atohicfg);
 
 			pl->patchMergedName();
 			globalPlayers.add(id, pl);
@@ -1426,48 +1429,6 @@ namespace GObject
 		}
 		lc.finalize();
 
-		lc.prepare("Loading mail package:");
-		last_id = 0xFFFFFFFFFFFFFFFFull;
-		pl = NULL;
-		DBMailPackageData mpdata;
-		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
-			return false;
-		lc.reset(50);
-		UInt32 last_pid = 0xFFFFFFFF;
-		MailPackage * mp = NULL;
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			if(mpdata.id != last_pid)
-			{
-				last_pid = mpdata.id;
-				mp = mailPackageManager.add(last_pid);
-			}
-			mp->push(mpdata.itemId, mpdata.itemCount);
-		}
-		lc.finalize();
-
-		lc.prepare("Loading mails:");
-		last_id = 0xFFFFFFFFFFFFFFFFull;
-		pl = NULL;
-		DBMailData mdata;
-		if(execu->Prepare("SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` ORDER BY `playerId`, `mailId`", mdata) != DB::DB_OK)
-			return false;
-		lc.reset(500);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			if(mdata.playerId != last_id)
-			{
-				last_id = mdata.playerId;
-				pl = globalPlayers[last_id];
-			}
-			if(pl == NULL)
-				continue;
-			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
-		}
-		lc.finalize();
-
 		lc.prepare("Loading boss data:");
 		DBBossHP bosshp;
 		if(execu->Prepare("SELECT `id`, `level`, `pos`, `hp` FROM `boss`", bosshp) != DB::DB_OK)
@@ -1729,6 +1690,46 @@ namespace GObject
 			pl->GetAttainMgr()->LoadAttain(attain);
 		}
 		lc.finalize();
+
+		lc.prepare("Loading mail package:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		DBMailPackageData mpdata;
+		if(execu->Prepare("SELECT `id`, `itemId`, `itemCount` FROM `mail_package` ORDER BY `id`", mpdata) != DB::DB_OK)
+			return false;
+		lc.reset(50);
+		UInt32 last_pid = 0xFFFFFFFF;
+		MailPackage * mp = NULL;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(mpdata.id != last_pid)
+			{
+				last_pid = mpdata.id;
+				mp = mailPackageManager.add(last_pid);
+			}
+			mp->push(mpdata.itemId, mpdata.itemCount);
+		}
+		lc.finalize();
+
+		lc.prepare("Loading mails:");
+		last_id = 0xFFFFFFFFFFFFFFFFull;
+		DBMailData mdata;
+		if(execu->Prepare("SELECT `mailId`, `playerId`, `sender`, `recvTime`, `flag`, `title`, `content`, `additionalId` FROM `mail` ORDER BY `playerId`, `mailId`", mdata) != DB::DB_OK)
+			return false;
+		lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(mdata.playerId != last_id)
+			{
+				last_id = mdata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
+		}
+		lc.finalize();
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
@@ -1743,7 +1744,7 @@ namespace GObject
 
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1775,6 +1776,7 @@ namespace GObject
             data->oldrank = dbd.oldrank;
             data->first4rank = dbd.first4rank;
             data->extrachallenge = dbd.extrachallenge;
+            data->pageNum = dbd.pageNum;
 			gAthleticsRank.addAthleticsFromDB(dbd.row, data);
 		}
 		lc.finalize();
@@ -1841,6 +1843,21 @@ namespace GObject
 			if(pl == NULL)
 				continue;
 			playerCopy.autoBattle(pl, dac.id, 0, true);
+		}
+		lc.finalize();
+
+		lc.prepare("Loading auto frontmat challenge data:");
+		DBAutoFrontMap afm;
+		if(execu->Prepare("SELECT `playerId`, `id` FROM `auto_frontmap`", afm) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[afm.playerId];
+			if(pl == NULL)
+				continue;
+			frontMap.autoBattle(pl, afm.id, 0, true);
 		}
 		lc.finalize();
 
@@ -2660,6 +2677,61 @@ namespace GObject
 				}
             }
 
+            {
+                 lua_tinker::table table_tmp = lua_tinker::call<lua_tinker::table>(L, "getMergeStuff");
+                 UInt32 size  = table_tmp.size();
+                 for (UInt32 j = 0; j < size; j++)
+                 {
+                     stMergeStf  s;
+
+                     lua_tinker::table t1 = table_tmp.get<lua_tinker::table>(j + 1);
+                     UInt32  tSize = t1.size();
+                       // for (UInt32 i = 0 ; i < t; i++)
+                        for (UInt32 i = 0 ; i< tSize; i++ )
+                        {
+                            if(i == tSize - 1)
+                            {
+                               s.m_to = t1.get<UInt32>(i + 1);
+                            }
+                            else
+                            {
+
+                                lua_tinker::table c = t1.get<lua_tinker::table>(i + 1);
+                                UInt32  cSize = c.size();
+                                if(cSize == 2)
+                                {
+                                    stMergeS  ms;
+                                    ms.id = c.get<UInt32>(1);
+                                    std::vector<UInt32>& v = _mMergeStfsIndex[ms.id];
+                                    v.push_back(j);
+
+                                    ms.num = c.get<UInt32>(2);
+                                    s.m_stfs.push_back(ms);
+                                }
+                                if(cSize == 3)
+                                {
+                                    UInt32  id1 = c.get<UInt32>(1);
+                                    UInt32  id2 = c.get<UInt32>(2);
+                                    UInt32  num = c.get<UInt32>(3);
+                                    if(id1 < id2)
+                                    {
+                                        for(;id1<= id2; id1++)
+                                        {
+                                            stMergeS ms;
+                                            std::vector<UInt32>& v = _mMergeStfsIndex[id1];
+                                            v.push_back(j);
+                                            ms.id = id1;
+                                            ms.num = num;
+                                            s.m_stfs.push_back(ms);
+                                        }
+                                    }
+                                }
+                            }
+                         
+                        }
+                      _vMergeStfs.push_back(s); 
+                 }
+            }
 			for(UInt8 t = 0; t < 2; ++t) 
             {
                 for(q = 0; q < 6; q ++)

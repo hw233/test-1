@@ -313,8 +313,8 @@ void WBoss::reward(Player* player)
             }
         }
 
-        MailPackage::MailItem item[] = {{55,1},};
-        (*i).player->sendMailItem(568, 569, item, 1);
+        MailPackage::MailItem item[] = {{55,1},{MailPackage::Tael,500}};
+        (*i).player->sendMailItem(568, 569, item, 2);
     }
 
     if (player)

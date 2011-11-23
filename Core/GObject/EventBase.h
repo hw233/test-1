@@ -15,6 +15,7 @@ enum EventID
     EVENT_PLAYERPRTRIPOD = 6,
     EVENT_AUTOCOPY = 7,
     EVENT_TIMETICK = 8,
+    EVENT_AUTOFRONTMAP = 9,
 };
 
 namespace GObject

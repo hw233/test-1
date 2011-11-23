@@ -247,6 +247,9 @@ namespace REQ
     const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
     /**斗剑领取奖励*/
     const UInt8 ATHLETICS_GET_AWARD = 0xC8;
+
+    /**斗剑翻页*/
+    const UInt8 ATHLETICS_PAGING    = 0xC9;
     /**???*/
     const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/
@@ -509,6 +512,9 @@ namespace SPEQ
     const UInt16 SALE_ONOFF         = 0x112;// 交易开关
     const UInt16 PLAYERINFO         = 0x113;
     const UInt16 WBOSS              = 0x114;
+    const UInt16 ONLINEPF           = 0x115;
+    const UInt16 ADDITEMFROMBSBYID  = 0x116;
+    const UInt16 ADDFIGHTER         = 0x117;
 }
 
 namespace SPEP
@@ -533,6 +539,9 @@ namespace SPEP
     const UInt8 SALE_ONOFF          = 0x12;// 交易开关
     const UInt8 PLAYERINFO          = 0x13;
     const UInt8 WBOSS               = 0x14;
+    const UInt8 ONLINEPF            = 0x15;
+    const UInt8 ADDITEMFROMBSBYID   = 0x16;
+    const UInt8 ADDFIGHTER          = 0x17;
 }
 
 #endif // _MSGID_H_

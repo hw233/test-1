@@ -32,11 +32,11 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
 	else
 		duration = curtime + 60 - nextReward;
 	UInt8 plvl = player->GetLev();
-	if(plvl < 90)
+	if(plvl <= 90)
 		player->AddExp(duration * ((plvl - 40) * 6 + 20));
-	else if(plvl < 100)
+	else if(plvl <= 100)
 		player->AddExp(duration * ((plvl - 90) * 22 + 320));
-	else if(plvl < 114)
+	else if(plvl <= 114)
 		player->AddExp(duration * ((plvl - 100) * 140 + 540));
 	else
 		player->AddExp(duration * 2500);
@@ -227,7 +227,6 @@ void CountryBattle::process(UInt32 curtime)
 				data.streakOther = cbd1->killStreak;
 				_cbsdlist.push_back(data);
 
-				UInt8 archiveLose = 1 * (lvl + 1);
 				if(cbd2->player->isOnline())
 					cbd2->player->pendAchievement(achieve);
 				else
@@ -253,7 +252,7 @@ void CountryBattle::process(UInt32 curtime)
 				}
 				else
 				{
-					doLeave(curtime, lvl, 0, pos1, archiveLose, 1);
+					doLeave(curtime, lvl, 0, pos1, loserAchieve, 1);
 				}
 			
 				if(cbd2->killStreak >= 10 && World::_actAvailable && gSpecialAward.getAwardSize(0) < 3)
