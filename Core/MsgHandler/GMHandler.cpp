@@ -144,6 +144,7 @@ GMHandler::GMHandler()
     Reg(3, "hici", &GMHandler::OnCiTaskHI);
     Reg(3, "hirestart", &GMHandler::OnRestartHI);
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
+    Reg(3, "hiuseskill", &GMHandler::OnUseSkillHI);
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
 }
 
@@ -305,6 +306,24 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 {
 	if(args.empty())
 		return;
+
+#if 0
+    //only for test liuhuiting
+    //
+    for (int i = 10001; i<= 11001; i ++)
+    {
+        for (int j = 1; j < 10 ; j ++)
+        {
+         player->OnDoAttainment(i , j);
+        }
+
+        for (int j = 10; j<= 80; j= j + 10)
+        {
+             player->OnDoAttainment(i ,j);
+        }
+         player->OnDoAttainment(i , 500);
+    }
+#endif
     if(args.size() == 1)
 	{
 		UInt32 exp = atoi(args[0].c_str());
@@ -2409,6 +2428,14 @@ void GMHandler::OnAwardHI(GObject::Player *player, std::vector<std::string>& arg
         return;
     heroIsland.getAward(player, atoi(args[0].c_str()), 1);
 }
+
+void GMHandler::OnUseSkillHI(GObject::Player *player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    heroIsland.useSkill(player, atoi(args[0].c_str()));
+}
+
 
 void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& args)
 {

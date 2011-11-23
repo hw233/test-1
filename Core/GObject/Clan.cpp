@@ -206,7 +206,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
         if (!mem->player)
             continue;
 
-        GameMsgHdr h(0x1FF,  mem ->player->getThreadId(), mem->player, sizeof(msg));
+        GameMsgHdr h(0x244,  mem ->player->getThreadId(), mem->player, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
     }
     //
@@ -216,7 +216,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
         stAttainMsg m;
         m.attainID = Script::CLAN_LEVUP;
         m.param    = lev;
-        GameMsgHdr h(0x1FF,  player->getThreadId(), player, sizeof(m));
+        GameMsgHdr h(0x244,  player->getThreadId(), player, sizeof(m));
         GLOBAL().PushMsg(h, & m);
     }
 	player->notifyFriendAct(5, _name.c_str());
@@ -1983,7 +1983,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
             if (!mem->player)
                 continue;
             
-            GameMsgHdr h(0x1FF,  mem ->player->getThreadId(), mem->player, sizeof(m));
+            GameMsgHdr h(0x244,  mem ->player->getThreadId(), mem->player, sizeof(m));
             GLOBAL().PushMsg(h, & m);
         }
     }

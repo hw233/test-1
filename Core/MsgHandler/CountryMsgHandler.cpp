@@ -125,6 +125,10 @@ MSG_REG(GameMsgHdr, OnPwdQuestionReq);
 MSG_REG_2(GameMsgHdr, REQ::OP_PWD, OnOpPwdReq);
 MSG_REG(GameMsgHdr, OnLockPwdReq);
 
+MSG_REG_2(GameMsgHdr, REQ::EQ_TRUMP_UPGRADE, OnTrumpUpgrade);
+MSG_REG(GameMsgHdr, OnTrumpLOrder);
+
+
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);
@@ -134,7 +138,6 @@ MSG_REG_2(GameMsgHdr, 0x1F0, PlayerEnter);
 MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
 
-MSG_REG_2(GameMsgHdr, 0x1FF, OnDoAttainment); //真真真真
 
 
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
@@ -156,6 +159,8 @@ MSG_REG_2(GameMsgHdr, 0x221, OnAthleticsReportList);
 
 MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
+
+MSG_REG_2(GameMsgHdr, 0x244, OnDoAttainment);
 
 MSG_REG_2(GameMsgHdr, 0x269, OnDailyCheck);
 

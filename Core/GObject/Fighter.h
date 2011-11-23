@@ -60,6 +60,7 @@ public:
 	void setLevelAndExp(UInt8 l, UInt64 e);
 	void setPotential(float p, bool = true);
 	void setCurrentHP(UInt16 hp, bool = true);
+	void addHPPercent(UInt8 p, bool = true);
 
 	const std::string& getName();
 	const std::string& getBattleName();
@@ -479,6 +480,7 @@ public:
     bool isGoldPractice() { return false; }
 
 	void addAttr( ItemEquip * );
+	void addTrumpAttr( ItemTrump * );
     void addAttr( const GData::CittaEffect* ce );
     void    CheckEquipEnchantAttainment(UInt8 e);
     bool  IsEquipEnchantLev(UInt8 e);

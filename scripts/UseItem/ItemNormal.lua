@@ -85,6 +85,8 @@ Athletics_Green_Equip_Level_70 = {
     2120, 2121, 2122, 2123, 2124, 2125, 2126, 2127, 2128, 2129, 2130, 2131, 2132, 2133, 2134, 2135, 2136, 2137, 2138, 2139, 2140, 2141, 2142, 2143}
 Athletics_Blue_Equip_Level_70 = {
     2304, 2305, 2306, 2307, 2308, 2309, 2310, 2311, 2312, 2313, 2314, 2315, 2316, 2317, 2318, 2319, 2320, 2321, 2322, 2323, 2324, 2325, 2326, 2327}
+Athletics_Orange_Equip_Level_70 = {
+    2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615}
 
 Athletics_Purple_Equip_Level_80 = {
     2472, 2473, 2474, 2475, 2476, 2477, 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485, 2486, 2487, 2488, 2489, 2490, 2491, 2492, 2493, 2494, 2495}
@@ -137,7 +139,8 @@ Athletics_Purple_Equip = {
 
 Athletics_Orange_Equip = {
     [50] = Athletics_Orange_Equip_Level_50,
-    [60] = Athletics_Orange_Equip_Level_60
+    [60] = Athletics_Orange_Equip_Level_60,
+    [70] = Athletics_Orange_Equip_Level_70
 }
 
 
@@ -333,6 +336,36 @@ function ItemNormal_00000026(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000027(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 3;
+    if reqGrids <= 	package:GetRestPackageSize() then
+        package:DelItemSendMsg(27, player);
+        package:AddEquip(1636, 1);
+        package:AddItem(508, 7, 1, 0, 2);
+        package:AddItem(506, 7, 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return false;
+end
+
+function ItemNormal_00000028(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqGrids = 3;
+    if reqGrids <= 	package:GetRestPackageSize() then
+        package:DelItemSendMsg(28, player);
+        package:AddEquip(1636, 1);
+        package:AddItem(514, 15, 1, 0, 2);
+        package:AddItem(515, 15, 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return false;
+end
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -470,25 +503,27 @@ end
 function ItemNormal_00000012(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
-  local package = player:GetPackage();
-	if fgt == nil then
+    local mainFgt = player:getMainFighter();
+    local package = player:GetPackage();
+    if fgt == nil or fgt == mainFgt then
 		return false;
 	end
-  local oldexp = fgt:getExp();
+    local oldexp = fgt:getExp();
 	fgt:addExp(5000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(12, player);
-	return num;
-  else
-	return false;
-  end
+    if fgt:getExp() > oldexp then
+  	    package:DelItemSendMsg(12, player);
+	    return num;
+    else
+	    return false;
+    end
 end
 
 function ItemNormal_00000013(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
+    local mainFgt = player:getMainFighter();
     local package = player:GetPackage();
-	if fgt == nil then
+	if fgt == nil or fgt == mainFgt then
 		return false;
 	end
   local oldexp = fgt:getExp();
@@ -504,8 +539,9 @@ end
 function ItemNormal_00000014(iid, num, bind, param)
     local player = GetPlayer()
 	local fgt = player:findFighter(param);
+    local mainFgt = player:getMainFighter();
     local package = player:GetPackage();
-	if fgt == nil then
+	if fgt == nil or fgt == mainFgt then
 		return false;
 	end
   local oldexp = fgt:getExp();
@@ -1036,6 +1072,31 @@ function ItemNormal_00000066(iid, num, bind, param)
 		package:DelItemSendMsg(66, player);
 		return num;
 	end
+    return num;
+end
+
+function ItemNormal_00000069(id, num, bind, param)
+    
+    local player = GetPlayer();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    
+    local oldexp = fgt:getExp();
+	fgt:addExp(1000 * num);
+    if fgt:getExp() == oldexp then
+        return false;
+    end
+  	    
+    local package = player:GetPackage();
+    package:DelItemSendMsg(69, player);
+
+    if getSingleDay() then
+        player:AddVar(1, num);
+    end
+
     return num;
 end
 
@@ -5121,8 +5182,8 @@ function ItemNormal_athletics_2(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 60 then
-            tmpEquipTable = Athletics_Orange_Equip[60]
+        if level > 70 then
+            tmpEquipTable = Athletics_Orange_Equip[70]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5164,8 +5225,8 @@ function ItemNormal_athletics_3(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 60 then
-            tmpEquipTable = Athletics_Orange_Equip[60]
+        if level > 70 then
+            tmpEquipTable = Athletics_Orange_Equip[70]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5205,8 +5266,8 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 60 then
-            tmpEquipTable = Athletics_Orange_Equip[60]
+        if level > 70 then
+            tmpEquipTable = Athletics_Orange_Equip[70]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5452,8 +5513,8 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 60 then
-            tmpEquipTable = Athletics_Orange_Equip[60]
+        if level > 70 then
+            tmpEquipTable = Athletics_Orange_Equip[70]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5558,6 +5619,8 @@ local ItemNormal_Table = {
 	[20] = ItemNormal_00000020,
 	[21] = ItemNormal_00000021,
     [26] = ItemNormal_00000026,
+    [27] = ItemNormal_00000027,
+    [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
@@ -5570,6 +5633,7 @@ local ItemNormal_Table = {
 	[52] = ItemNormal_00000052,
 	[53] = ItemNormal_00000053,
 	[66] = ItemNormal_00000066,
+    [69] = ItemNormal_00000069,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,

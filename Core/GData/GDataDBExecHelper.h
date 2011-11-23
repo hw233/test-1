@@ -35,6 +35,7 @@ struct DBItemType
 	UInt16		maxQuantity;    // 最大重叠数
 	UInt8		bindType;       // 是否绑定
 	UInt16		energy;         // 九仪鼎值
+    UInt16      trumpExp;       // 法宝经验
 	UInt16		data;           // 可使用道具: 作用数值
     UInt16      enchant;        // 附魔类型
 	UInt32		attrExtra;      // 属性附加
@@ -125,6 +126,8 @@ struct DBSkillEffect
     float adddam;       // 物理伤害附加(具体值)
     std::string magdam; // 法术伤害 num/num%
     float addmag;       // 法术伤害附加(具体值)
+    std::string crrdam; // 职业伤害 num/num%
+    float addcrr;       // 职业伤害附加(具体值)
     std::string hp;     // HP改变 [+/-]num/num%
     float addhp;        // HP改变附加(具体值)[+/-]
     std::string absorb; // 伤害吸血 num/num%
@@ -136,7 +139,7 @@ struct DBSkillEffect
     std::string magatk; // 法术攻击 [+/-]num/num%
     std::string magdef; // 法术防御 [+/-]num/num%
     float tough;        // 坚韧[+/-]
-    float action;       // 身法[+/-]
+    std::string action; // 身法[+/-]num/num%
     float hitrate;      // 命中[+/-]
     float evade;        // 闪避[+/-]
     float critical;     // 暴击[+/-]
@@ -326,7 +329,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(13)
+SPECIALDEF(14)
 	(
 	UInt32,		typeId,
 	std::string,name,
@@ -338,6 +341,7 @@ SPECIALDEF(13)
 	UInt16,		maxQuantity,
 	UInt8,		bindType,
 	UInt16,		energy,
+    UInt16,     trumpExp,
 	UInt16,		data,
 	UInt16,		enchant,
 	UInt32,		attrExtra
@@ -483,7 +487,7 @@ SPECIALDEF(10)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBSkillEffect)
-SPECIALDEF(26)
+SPECIALDEF(28)
     (
         UInt16, id,
         UInt8, state,
@@ -493,6 +497,8 @@ SPECIALDEF(26)
         float, adddam,
         std::string, magdam,
         float, addmag,
+        std::string, crrdam,
+        float, addcrr,
         std::string, hp,
         float, addhp,
         std::string, absorb,
@@ -504,7 +510,7 @@ SPECIALDEF(26)
         std::string, magatk,
         std::string, magdef,
         float, tough,
-        float, action,
+        std::string, action,
         float, hitrate,
         float, evade,
         float, pierce,

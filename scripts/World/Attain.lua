@@ -193,7 +193,7 @@ function OnAddPExp(player,  param)
         return;
     end
 
-    local cur = player : GetVar(19); --VAR_PEXP_GET = 19,
+    local cur = player : GetVar(35); --VAR_PEXP_GET = 35,
 
     if cur > 9000000 then
         return ;
@@ -212,7 +212,7 @@ function OnAddPExp(player,  param)
         AttempToUpdate(player,  10091, attained);
     end
 
-    player : SetVar(19 ,  cur);
+    player : SetVar(35 ,  cur);
     
 end
 --学会心法 param 个数
@@ -368,12 +368,12 @@ function   OnMainFighterCapFull(player, param)
 end
 --获得紫色装备
 function   OnAddPEquip(player, param)
-    local cur = player:GetVar(20);  -- VAR_PURPLE_EQUIP_NUM  20
+    local cur = player:GetVar(36);  -- VAR_PURPLE_EQUIP_NUM = 36,
 
     cur = cur + 1;
 
     if cur >=1 then
-        ttempToUpdate(player ,   10151, attained);
+        AttempToUpdate(player ,   10151, attained);
     end
 
     if cur >= 10 then
@@ -384,38 +384,42 @@ function   OnAddPEquip(player, param)
         AttempToUpdate(player ,  10153, attained);
     end
 
-    if cur >= 1000 then
+    if cur >= 500 then
         AttempToUpdate(player ,  10154, attained);
     end
 
-    player:SetVar(20 , cur);
+    player:SetVar(36 , cur);
 
 end
 
 --获得金色装备
 
 function   OnAddYEquip(player, param)
-    local cur = player:GetVar(21);  --  VAR_YELLOW_EQUIP_NUM = 21,
+    local cur = player:GetVar(37);  --  VAR_YELLOW_EQUIP_NUM 37
 
     cur = cur + 1;
 
     if cur >=1 then
-        ttempToUpdate(player ,   10155, attained);
+        AttempToUpdate(player ,   10155, attained);
     end
 
     if cur >= 10 then
         AttempToUpdate(player ,  10156, attained);
     end
 
+    if cur >= 30 then
+        AttempToUpdate(player ,  10160, attained);
+    end
+
+    if cur >= 50 then
+        AttempToUpdate(player ,  10161, attained);
+    end
+
     if cur >= 100 then
-        AttempToUpdate(player ,  10157, attained);
+        AttempToUpdate(player,   10163, attained);
     end
 
-    if cur >= 1000 then
-        AttempToUpdate(player ,  10158, attained);
-    end
-
-    player:SetVar(21 , cur);
+    player:SetVar(37 , cur);
 
 end
 
@@ -524,12 +528,12 @@ end
 --得到累计多个法宝 
 function  OnAddNTrump(player, param)
     
-    local cur = player:GetVar(22) ; -- VAR_YELLOW_THRUMP_NUM=22,
+    local cur = player:GetVar(38) ; -- VAR_YELLOW_THRUMP_NUM= 38,
 
     cur = cur + 1;
 
     if cur < 5 then
-        player:SetVar(22, cur);
+        player:SetVar(38, cur);
     end
     if cur == 5 then
         AttempToUpdate(player, 10201, attained);    
@@ -568,7 +572,7 @@ local  pk_npc = {
     [5037] = 10353, --智通
     [5063] = 10356, --七魔许人龙
     [5065] = 10357, --六魔厉吼
-    [5068] = 10358, --三魔钱青选
+    [5067] = 10358, --三魔钱青选
     [5071] = 10359, --魏枫娘
     [5214] = 10361, --钟敢
     [5213] = 10362, --戎敦
@@ -668,7 +672,7 @@ function OnFailEnchance (player, param)
         AttempToUpdate(player, 10169,  attained);
     end
 
-    player:SetVar(4, param);
+    player:SetVar(20, param);-- VAR_FAIL_ENCH = 20, 
 end
 
 --分解装备
@@ -717,10 +721,10 @@ function  OnCountryBattleWin(player,  param)
     if param >= 100 then
         AttempToUpdate(player, 10553, attained);
     end
-    if param >= 1000 then
+    if param >= 1000 then  
         AttempToUpdate(player, 10554, attained);
     end
-    player:SetVar(13,param);  -- VAR_COUNTRY_BATTLE_WIN
+    player:SetVar(29,param);  --VAR_COUNTRY_BATTLE_WIN =29,
 end
 
 --阵营战中连续击杀 param 击杀数
@@ -739,7 +743,9 @@ end
 --斗剑中累积胜利 param 累计获胜数量
 function  OnAthleticWin(player, param)
 
-    if param >= 100 then
+    local t = player:GetVar(30); -- VAR_ATHLETICS_WIN = 30 ,
+    t = t + 1;
+    if param >= 100 then 
         AttempToUpdate(player, 10558, attained);
     end
 
@@ -747,7 +753,7 @@ function  OnAthleticWin(player, param)
         AttempToUpdate(player, 10559, attained);
     end
 
-    player:SetVar(14, param); -- VAR_ATHLETICS_WIN
+    player:SetVar(30, t); -- VAR_ATHLETICS_WIN = 30 ,
 end
 -- 战斗中闪避
 function OnBattleMiss(player, param)
@@ -763,7 +769,7 @@ function OnBattleMiss(player, param)
     end
 
     if target > 0 then
-        player:SetVar(7, target); --VAR_BATTLE_MISS = 7,
+        player:SetVar(23, target); -- VAR_BATTLE_MISS = 23
     end
 end
 -- 战斗中重击
@@ -780,7 +786,7 @@ function OnBattleCS(player, param)
     end
 
     if target > 0 then
-        player:SetVar(8, target); --VAR_BATTLE_MISS = 7,
+        player:SetVar(24, target); --VAR_BATTLE_CS  = 24,,
     end
 end
 -- 战斗中破击
@@ -797,7 +803,7 @@ function OnBattlePR(player, param)
     end
 
     if target > 0 then
-        player:SetVar(9, target); --VAR_BATTLE_MISS = 7,
+        player:SetVar(25, target); --VAR_BATTLE_PR = 25
     end
 end
 
@@ -815,7 +821,7 @@ function OnBattleFJ(player, param)
     end
 
     if target > 0 then
-        player:SetVar(10, target); --VAR_BATTLE_MISS = 7,
+        player:SetVar(26, target); --VAR_BATTLE_FJ = 26,
     end
 end
 
@@ -839,7 +845,7 @@ function  OnBattleSkillDmg(player, param)
 
     print(target);
     if target  > 0 then
-        player:SetVar(11 , target); --VAR_BATTLE_SKILL_DMG = 11,
+        player:SetVar(27 , target); -- VAR_BATTLE_SKILL_DMG = 27
     end
 end
 --战斗无双伤害
@@ -856,12 +862,12 @@ function  OnBattlePLDmg(player, param)
         target = 10000;
     end
 
-    if playeraram >= 10000 then
+    if param >= 10000 then
         AttempToUpdate(player, 10614,  attained);
     end 
 
     if target  > 0 then
-        player:SetVar(12 , target); --VAR_BATTLE_PEERLESS_DMG = 12,
+        player:SetVar(28 , target); --VAR_BATTLE_PEERLESS_DMG = 28
     end
 end
 
@@ -883,7 +889,7 @@ end
 --完成任务数量  
 function  OnSubmitTasks(player, param)
     
-    local cur = player:GetVar(15);  -- vAR_TASK_SUBMITTED = 15
+    local cur = player:GetVar(31);  -- vAR_TASK_SUBMITTED = 31,
 
     cur = cur + 1;
     if cur >= 10  then
@@ -900,7 +906,7 @@ function  OnSubmitTasks(player, param)
         AttempToUpdate(player, 10304,  attained);
     end
 
-    player:SetVar(15 ,cur);
+    player:SetVar(31 ,cur);
 end
 --特殊任务ID 完成了 给成就
 local special_task = {
@@ -917,22 +923,23 @@ end
 --完成衙门任务
 function OnSubmitYamenTask(player, param)
 
-    local cur = player:GetVar(16); --VAR_YAMEN_TASK_SUBMITTED = 16
+    local cur = player:GetVar(32); --VAR_YAMEN_TASK_SUBMITTED = 32,
+
     cur = cur +1;
 
-    if cur >=100 then
+    if cur >= 50 then
         AttempToUpdate(player, 10313,  attained);
     end
-    if cur >= 1000 then
+    if cur >= 5000 then
         AttempToUpdate(player, 10314,  attained);
     end
 
-    player:SetVar(16, cur);
+    player:SetVar(32, cur);
 end
 
 --完成师门任务
 function OnSubmitShimenTask(player, param)
-    local cur = player:GetVar(17); --VAR_SHIMEN_TASK_SUBMITTED = 17,
+    local cur = player:GetVar(33); --VAR_SHIMEN_TASK_SUBMITTED = 33,,
     cur = cur +1;
 
  if cur >=100 then
@@ -942,12 +949,12 @@ function OnSubmitShimenTask(player, param)
         AttempToUpdate(player, 10316,  attained);
     end
 
-    player:SetVar(17,cur);
+    player:SetVar(33,cur);
 
 end
 --完成帮派任务
 function OnSubmitClanTask(player, param)
-    local cur = player:GetVar(18); --  VAR_CLAN_TASK_SUBMITTED - 18,
+    local cur = player:GetVar(34); -- VAR_CLAN_TASK_SUBMITTED  = 34,
     cur = cur +1;
 
     if cur >=100 then
@@ -957,7 +964,7 @@ function OnSubmitClanTask(player, param)
         AttempToUpdate(player, 10318,  attained);
     end
 
-    player:SetVar(18 , cur);
+    player:SetVar(34 , cur);
    
 end
 --一天五次师门任务

@@ -312,7 +312,7 @@ void Athletics::beAttack(Player * atker, UInt8 formation, UInt16 portrait, Lineu
         stAttainMsg  msg;
         msg.attainID = Script:: ATHLETICS_WIN ;
         msg.param = 1;
-        GameMsgHdr h(0x1FF,   atker->getThreadId(), atker, sizeof(msg));
+        GameMsgHdr h(0x244,   atker->getThreadId(), atker, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
     }
 
@@ -613,7 +613,7 @@ void Athletics::beAttackMartial(Player * atker, UInt8 formation, UInt16 portrait
         stAttainMsg  msg;
         msg.attainID = Script:: ATHLETICS_WIN ;
         msg.param = 1;
-        GameMsgHdr h(0x1FF,   atker->getThreadId(), atker, sizeof(msg));
+        GameMsgHdr h(0x244,   atker->getThreadId(), atker, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
     }
 

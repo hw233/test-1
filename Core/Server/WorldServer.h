@@ -14,6 +14,7 @@ extern const char* s_HelpInfo;
 namespace GObject
 {
 	class Country;
+    class DCWorker;
 }
 
 class BaseThread;
@@ -38,6 +39,7 @@ public:
 public:
 	GObject::Country& GetCountry(UInt8 worker);
 	GObject::World& GetWorld();
+	GObject::DCWorker& GetDC();
 	DB::DBWorker& GetDB();
 	DB::DBWorker& GetDB1();
 	DB::DBWorker& GetDB2();
@@ -73,6 +75,7 @@ public:
 #define SERVER()		WorldServer::Instance()
 #define NETWORK()		SERVER().GetTcpService()
 #define WORLD()			SERVER().GetWorld()
+#define DC()			SERVER().GetDC()
 #define DB()			SERVER().GetDB()
 #define DB1()			SERVER().GetDB1()
 #define DB2()			SERVER().GetDB2()

@@ -20,32 +20,44 @@ namespace GObject
     };
 
 
-    enum VarID{
-        VAR_INVALID = 0,    // ÎÞÐ§±äÁ¿
+    enum VarID
+    {
+        VAR_INVALID = 0,    //ÎÞÐ§±äÁ¿
+        VAR_SINGLE_CHOPSTICKS = 1, //¹â¹÷½ÚËÍ¿ê×Ó
         VAR_SENGYI = 2,     // É®ÒÂ
         VAR_APRON = 3,      // ¶Ç¶µ
-        VAR_FAIL_ENCH = 4,  // fail to enchat equip
-        VAR_SPLIT_EQUIP = 5 , //split equip times
-        VAR_SPLIT_THRUMP = 6,//split thrump times
-        VAR_BATTLE_MISS = 7, //¿¿¿¿¿¿¿
-        VAR_BATTLE_CS  = 8,  //
-        VAR_BATTLE_PR = 9,   //¿¿¿¿¿¿¿
-        VAR_BATTLE_FJ = 10,  //¿¿¿¿¿¿¿
-        VAR_BATTLE_SKILL_DMG = 11, //¿¿¿¿¿¿¿
-        VAR_BATTLE_PEERLESS_DMG = 12,//¿¿¿¿¿¿¿¿
+
+        VAR_KEYPACK1 = 10,  // KEYÀñ°ü
+        VAR_KEYPACK2,
+        VAR_KEYPACK3,
+        VAR_KEYPACK4,
+        VAR_KEYPACK5,
+        VAR_KEYPACK6,
+        VAR_KEYPACK7,
+        VAR_KEYPACK8,
+       
+        VAR_FAIL_ENCH = 20,  // fail to enchat equip
+        VAR_SPLIT_EQUIP = 21 , //split equip times
+        VAR_SPLIT_THRUMP = 22,//split thrump times
+        VAR_BATTLE_MISS = 23, //¿¿¿¿¿¿¿
+        VAR_BATTLE_CS  = 24,  //
+        VAR_BATTLE_PR = 25,   //¿¿¿¿¿¿¿
+        VAR_BATTLE_FJ = 26,  //¿¿¿¿¿¿¿
+        VAR_BATTLE_SKILL_DMG = 27, //¿¿¿¿¿¿¿
+        VAR_BATTLE_PEERLESS_DMG = 28,//¿¿¿¿¿¿¿¿
         
-        VAR_COUNTRY_BATTLE_WIN =13,
-        VAR_ATHLETICS_WIN = 14,
+        VAR_COUNTRY_BATTLE_WIN =29,
+        VAR_ATHLETICS_WIN = 30 ,
 
-        vAR_TASK_SUBMITTED = 15,
-        VAR_YAMEN_TASK_SUBMITTED = 16,
-        VAR_SHIMEN_TASK_SUBMITTED = 17,
-        VAR_CLAN_TASK_SUBMITTED  = 18,
+        vAR_TASK_SUBMITTED = 31,
+        VAR_YAMEN_TASK_SUBMITTED = 32,
+        VAR_SHIMEN_TASK_SUBMITTED = 33,
+        VAR_CLAN_TASK_SUBMITTED  = 34,
 
-        VAR_PEXP_GET = 19,
-        VAR_PURPLE_EQUIP_NUM = 20,
-        VAR_YELLOW_EQUIP_NUM = 21,
-        VAR_YELLOW_THRUMP_NUM=22,
+        VAR_PEXP_GET = 35,
+        VAR_PURPLE_EQUIP_NUM = 36,
+        VAR_YELLOW_EQUIP_NUM = 37,
+        VAR_YELLOW_THRUMP_NUM= 38,
         VAR_MAX,
     };
 
@@ -68,8 +80,20 @@ namespace GObject
         static void Init()
         {
             //ÔÚ´ËÊ¹ÓÃREGISTER_VAR×¢²á±äÁ¿
+            REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
+          
+            REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK3, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK4, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK5, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK6, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK7, CYCLE_NONE);
+            REGISTER_VAR(VAR_KEYPACK8, CYCLE_NONE);
+
+
             REGISTER_VAR(VAR_FAIL_ENCH, CYCLE_NONE);
             REGISTER_VAR(VAR_SPLIT_EQUIP, CYCLE_NONE);
             REGISTER_VAR(VAR_SPLIT_THRUMP, CYCLE_NONE);
@@ -89,6 +113,7 @@ namespace GObject
             REGISTER_VAR(  VAR_PURPLE_EQUIP_NUM,  CYCLE_NONE);
             REGISTER_VAR(  VAR_YELLOW_EQUIP_NUM,  CYCLE_NONE);
             REGISTER_VAR(  VAR_YELLOW_THRUMP_NUM,  CYCLE_NONE);
+
         }
         
         UInt32 GetVar(UInt32 id);

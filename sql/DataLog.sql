@@ -356,6 +356,42 @@ CREATE TABLE IF NOT EXISTS `sales` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
+--
+-- Table structure for table `upgrade_histories`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `upgrade_histories` (
+  `server_id` int(10) unsigned NOT NULL,
+  `player_id` bigint(20) unsigned NOT NULL,
+  `equip_id` int(10) unsigned NOT NULL,
+  `template_id` int(10) unsigned NOT NULL,
+  `equip_rank` tinyint(3) unsigned NOT NULL,
+  `upgrade_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `lorder_histories`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `lorder_histories` (
+  `server_id` int(10) unsigned NOT NULL,
+  `player_id` bigint(20) unsigned NOT NULL,
+  `equip_id` int(10) unsigned NOT NULL,
+  `template_id` int(10) unsigned NOT NULL,
+  `equip_maxrank` tinyint(3) unsigned NOT NULL,
+  `upgrade_time` int(10) unsigned NOT NULL,
+  INDEX server_player (`server_id`, `player_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
 
 
 

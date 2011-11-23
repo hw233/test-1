@@ -374,18 +374,6 @@ void BattleFighter::updateBuffExtras()
 		_attrExtra.agilityP += extAttr;
 		_attrExtra.intelligenceP += extAttr;
 	}
-
-    // 帮派秘术对额外属性的加成
-    GObject::Player* pl = _fighter->getOwner();
-    GObject::Clan* clan = pl == NULL ? NULL : pl->getClan();
-    if(clan != NULL)
-    {
-        _attrExtraEquip.hp += clan->getSkillHPEffect(_fighter->getOwner());
-        _attrExtraEquip.attack += clan->getSkillAtkEffect(_fighter->getOwner());
-        _attrExtraEquip.defend += clan->getSkillDefendEffect(_fighter->getOwner());
-        _attrExtraEquip.magatk += clan->getSkillMagAtkEffect(_fighter->getOwner());
-        _attrExtraEquip.magdef += clan->getSkillMagDefentEffect(_fighter->getOwner());
-    }
 }
 
 float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender, float* pCf)

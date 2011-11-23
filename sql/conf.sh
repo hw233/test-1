@@ -4,6 +4,7 @@ H=localhost
 U=kingxin
 P=kingxin
 PT=3306
+
 DBD=data_7777
 DBO=asss_7777
 

@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+#define MAX_DOMAIN 10
+
 struct stHost
 {
 	char szIP[MAX_IPADDR_LENGTH];
@@ -29,6 +31,7 @@ public:
 	
 	//随机取一个host返回，返回值 < 0 表示获取失败
 	int32_t GetHostRandomly(stHost& host);
+    int32_t GetHostRandomlyDomain(stHost& host, int domain);
 	
 	//根据文件名字获取对应的ID，返回值 < 0 表示获取失败
 	int32_t GetLogFileID(const char* typeinfo);
@@ -36,12 +39,14 @@ public:
 private:
 
 	int32_t InitServerInfo(TiXmlElement* pRoot);
+    int32_t InitDomainServerInfo(TiXmlElement* pRoot);
 
 	int32_t InitFileTypeInfo(TiXmlElement* pRoot);
 
 private:
 	std::map<std::string, int32_t>	m_mLogFileTypeInfo;
 	std::vector<stHost>				m_vHosts;
+	std::vector<stHost>				m_vHostsDomain[MAX_DOMAIN];
 };
 
 #define	CREATE_UDPLOGCONFIG_INSTANCE	CSingleton<CUdpLogConfig>::CreateInstance

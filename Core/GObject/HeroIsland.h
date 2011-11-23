@@ -73,31 +73,27 @@ struct HIPlayerData
                 player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
             if (player->getBuffData(PLAYER_BUFF_HIWEAK))
                 player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
-            if (player->getBuffData(PLAYER_BUFF_HIESCAPE))
-                player->setBuffData(PLAYER_BUFF_HIESCAPE, 0, false);
+        }
+
+        if (!running)
+        {
+            straight = 0;
+            round = 0;
+            score = 0;
+            inrank = 0;
+            tasks = 0;
+            awardgot = 0;
+            lasttype = 0;
+            compass.clear();
         }
 
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;
         expcd = 0;
-        straight = 0;
-        round = 0;
-        if (!running)
-        {
-            score = 0;
-            inrank = 0;
-        }
-        else
-        {
-        }
-        lasttype = 0;
         attrcd = static_cast<UInt32>(-1);
         bufid = DEFAULT_BUFID;
         attr = NULL;
-        awardgot = 0;
-        compass.clear();
-        tasks = 0;
         for (UInt8 i = 0; i < 5; ++i)
             skills[i].reset();
     }
@@ -153,7 +149,6 @@ public:
     {
         _types[0] = _types[1] = _types[2] = 0;
         _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
-        _nplayers[0] = _nplayers[1] = _nplayers[2]= _nplayers[3] = 0;
         initSkillAttr();
     }
 
@@ -225,7 +220,6 @@ public:
 private:
     SortType _sorts;
     std::vector<HIPlayerData*> _players[HERO_ISLAND_SPOTS];
-    UInt16 _nplayers[HERO_ISLAND_SPOTS];
     UInt32 _types[3];
 
 private:

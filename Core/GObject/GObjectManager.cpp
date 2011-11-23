@@ -46,7 +46,6 @@
 #include "Common/StringTokenizer.h"
 #include "Common/DirectoryIterator.h"
 #include "GObject/PracticePlace.h"
-#include "GObject/Tripod.h"
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
@@ -64,8 +63,14 @@ namespace GObject
     UInt32 GObjectManager::_forge_cost;
     UInt32 GObjectManager::_split_chance[4][2];
     UInt32 GObjectManager::_merge_chance[9];
-    UInt32 GObjectManager::_enchant_chance[6][12];
+    UInt32 GObjectManager::_enchant_chance[2][6][12];
     UInt8  GObjectManager::_enchant_max[11];
+
+    UInt32 GObjectManager::_trump_lorder_chance[6][12];
+    UInt32 GObjectManager::_trump_exp_rank[6][12];
+    AttrFactor GObjectManager::_trump_rank_factor[6][12];
+    std::vector<UInt16> GObjectManager::_trump_maxrank_chance;
+    float  GObjectManager::_trumpAttrMax[3][4][12][9];
 
     UInt16 GObjectManager::_attrTypeChances[3][9];
     UInt16 GObjectManager::_attrChances[3][9];
@@ -133,13 +138,13 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
+        loadEquipForge();
 		loadMapData();
         loadAttrFactor();
         loadCopy();
         loadFrontMap();
 		loadEquipments();
         loadFightersPCChance();
-        loadEquipForge();
 		loadFighters();
 		loadClanAssist();
 		loadClanRobMonster();
@@ -1220,11 +1225,18 @@ namespace GObject
 				continue;
             if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level > 29)
             {
+                GObject::LevelPlayers* lvPlayer = NULL;
+                GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(specfgtobj.level);
+                if(it != GObject::globalLevelsPlayers.end())
+                     lvPlayer = it->second;
 
-                LevelPlayers& lvPlayer = globalLevelsPlayers[specfgtobj.level];
-                UInt32 nSize = lvPlayer.size() + 1;
-                lvPlayer[nSize] = pl->getId();
-                pl->setLvPos(nSize);
+                if(lvPlayer == NULL)
+                {
+                    lvPlayer = new GObject::LevelPlayers();
+                    GObject::globalLevelsPlayers[specfgtobj.level] = lvPlayer;
+                }
+
+                lvPlayer->push_back(pl->getId());
             }
 
 			fgt2->setPotential(specfgtobj.potential, false);
@@ -2648,13 +2660,80 @@ namespace GObject
 				}
             }
 
+			for(UInt8 t = 0; t < 2; ++t) 
+            {
+                for(q = 0; q < 6; q ++)
+                {
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance", t + 1, q + 1);
+                    UInt32 size = std::min(12, table_temp.size());
+                    for(UInt32 j = 0; j < size; j ++)
+                    {
+                        _enchant_chance[t][q][j] =  table_temp.get<UInt32>(j + 1);
+                    }
+
+                }
+            }
+
 			for(q = 0; q < 6; q ++)
             {
-				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChance", q + 1);
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpLOrderChance", q + 1);
 				UInt32 size = std::min(12, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
 				{
-					_enchant_chance[q][j] =  table_temp.get<UInt32>(j + 1);
+					_trump_lorder_chance[q][j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+			for(q = 0; q < 6; q ++)
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpExpRank", q + 1);
+				UInt32 size = std::min(12, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_trump_exp_rank[q][j] =  table_temp.get<UInt32>(j + 1);
+				}
+            }
+
+            for(UInt32 j = 0; j < 9; j ++)
+            {
+                for(q = 0; q < 6; q ++)
+				{
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpRankFactor", j + 1, q + 1);
+                    UInt32 size = table_temp.size();
+                    if(size > 21)
+                    {
+                        _trump_rank_factor[q][j].strength =  table_temp.get<float>(1);
+                        _trump_rank_factor[q][j].physique =  table_temp.get<float>(2);
+                        _trump_rank_factor[q][j].agility =  table_temp.get<float>(3);
+                        _trump_rank_factor[q][j].intelligence =  table_temp.get<float>(4);
+                        _trump_rank_factor[q][j].will =  table_temp.get<float>(5);
+                        _trump_rank_factor[q][j].soul =  table_temp.get<float>(6);
+                        _trump_rank_factor[q][j].aura =  table_temp.get<float>(7);
+                        _trump_rank_factor[q][j].auraMax =  table_temp.get<float>(8);
+                        _trump_rank_factor[q][j].attack =  table_temp.get<float>(9);
+                        _trump_rank_factor[q][j].magatk =  table_temp.get<float>(10);
+                        _trump_rank_factor[q][j].defend =  table_temp.get<float>(11);
+                        _trump_rank_factor[q][j].magdef =  table_temp.get<float>(12);
+                        _trump_rank_factor[q][j].hp =  table_temp.get<float>(13);
+                        _trump_rank_factor[q][j].tough =  table_temp.get<float>(14);
+                        _trump_rank_factor[q][j].action =  table_temp.get<float>(15);
+                        _trump_rank_factor[q][j].hitrate =  table_temp.get<float>(16);
+                        _trump_rank_factor[q][j].evade =  table_temp.get<float>(17);
+                        _trump_rank_factor[q][j].critical =  table_temp.get<float>(18);
+                        _trump_rank_factor[q][j].criticaldmg =  table_temp.get<float>(19);
+                        _trump_rank_factor[q][j].pierce =  table_temp.get<float>(20);
+                        _trump_rank_factor[q][j].counter =  table_temp.get<float>(21);
+                        _trump_rank_factor[q][j].magres =  table_temp.get<float>(22);
+                    }
+				}
+            }
+
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpMaxRankChance");
+				UInt32 size = std::min(5, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+                    _trump_maxrank_chance.push_back(table_temp.get<UInt16>(j + 1));
 				}
             }
 
@@ -2706,6 +2785,22 @@ namespace GObject
                         for(UInt8 t = 0; t < size; ++t)
                         {
                             _attrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
+                        }
+                    }
+                }
+            }
+
+            for(UInt8 q = 0; q < 3; ++q)
+            {
+                for(UInt8 crr = 0; crr < 4; ++crr)
+                {
+                    for(UInt8 lvl = 0; lvl < 12; ++lvl)
+                    {
+                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpAttrMax", q + 1, crr + 1, lvl + 1);
+                        UInt32 size = std::min(9, table_temp.size());
+                        for(UInt8 t = 0; t < size; ++t)
+                        {
+                            _trumpAttrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
                         }
                     }
                 }
@@ -2828,7 +2923,7 @@ namespace GObject
 
             LoadingCounter lc("Loading equipments:");
             DBEquipment dbe;
-            if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
+            if(execu->Prepare("SELECT `equipment`.`id`, `itemId`, `enchant`, `tRank`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`, `socket3`, `socket4`, `socket5`, `socket6`, `bindType`  FROM `equipment` LEFT JOIN `item` ON `equipment`.`id` = `item`.`id` OR `item`.`id` = NULL", dbe) != DB::DB_OK)
                 return false;
 
             lc.reset(2000);
@@ -2849,26 +2944,29 @@ namespace GObject
                 case Item_Ring:
                 case Item_Amulet:
                 case Item_Trump:
+                {
+                    ItemEquipData ied;
+                    ied.enchant = dbe.enchant;
+                    ied.sockets = dbe.sockets;
+                    ied.gems[0] = dbe.socket1;
+                    ied.gems[1] = dbe.socket2;
+                    ied.gems[2] = dbe.socket3;
+                    ied.gems[3] = dbe.socket4;
+                    ied.gems[4] = dbe.socket5;
+                    ied.gems[5] = dbe.socket6;
+                    ied.enchant = dbe.enchant;
+                    ied.tRank = dbe.tRank;
+                    ied.maxTRank = dbe.maxTRank == 0 ? 2 : dbe.maxTRank;
+                    ied.trumpExp = dbe.trumpExp;
+                    ItemEquip * equip;
+                    switch(itype->subClass)
                     {
-                        ItemEquipData ied;
-                        ied.enchant = dbe.enchant;
-                        ied.sockets = dbe.sockets;
-                        ied.gems[0] = dbe.socket1;
-                        ied.gems[1] = dbe.socket2;
-                        ied.gems[2] = dbe.socket3;
-                        ied.gems[3] = dbe.socket4;
-                        ied.gems[4] = dbe.socket5;
-                        ied.gems[5] = dbe.socket6;
-                        ied.enchant = dbe.enchant;
-                        ItemEquip * equip;
-                        switch(itype->subClass)
-                        {
-                        case Item_Weapon:
-                            equip = new ItemWeapon(dbe.id, itype, ied);
-                            break;
-                        case Item_Armor1:
-                        case Item_Armor2:
-                        case Item_Armor3:
+                    case Item_Weapon:
+                        equip = new ItemWeapon(dbe.id, itype, ied);
+                        break;
+                    case Item_Armor1:
+                    case Item_Armor2:
+                    case Item_Armor3:
 					case Item_Armor4:
 					case Item_Armor5:
 						equip = new ItemArmor(dbe.id, itype, ied);
@@ -3029,7 +3127,10 @@ namespace GObject
             td.awdst = t.awdst;
             td.itemId = t.itemId;
             td.num = t.num;
-            tripod.addTripodData(t.id, td, true);
+
+            Player* player = globalPlayers[t.id];
+            if (player)
+                player->runTripodData(td, true);
         }
 		lc.finalize();
         return true;
