@@ -306,7 +306,7 @@ void TcpSlaveServer::onTick(UInt32 now)
     for(_ConduitList::iterator iter = _conduits.begin();
             iter != _conduits.end(); ++iter)
     {
-        (*iter)->OnTick(now);
+        if((*iter).get() != NULL) (*iter)->OnTick(now);
     }
 }
 
