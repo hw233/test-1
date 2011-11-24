@@ -380,14 +380,21 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u",
                     tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
         }
+        else
+        {
+            if (ato)
+            {
+                Stream st(REP::AUTO_FRONTMAP);
+                st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+                pl->send(st);
+
+                autoClear(pl, complate);
+                return 0;
+            }
+        }
 
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
         pl->send(st);
-
-        if (ato && !ret)
-        {
-            autoClear(pl, complate);
-        }
 
         return ret?1:0;
     }
