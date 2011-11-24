@@ -1954,6 +1954,15 @@ void HeroIsland::setAto(Player* player, bool onoff)
     if (!player->hasFlag(Player::InHeroIsland))
         return;
 
+    UInt32 goldUse = GData::moneyNeed[GData::AUTOHI].gold;
+    if (player->getGold() < goldUse)
+    {
+        player->sendMsgCode(0, 1101);
+        return;
+    }
+    ConsumeInfo ci(HeroIslandAuto,0,0);
+    player->useGold(goldUse, &ci);
+
     UInt8 spot = player->getHISpot();
     UInt16 pos = 0;
     HIPlayerData* pd = findPlayer(player, spot, pos);

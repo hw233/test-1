@@ -55,6 +55,7 @@ enum PurchaseType
     AutoFrontMapComplete,
     AthleticPaging, 
     HeroIslandSkill,
+    HeroIslandAuto,
 };
 
 enum IncomingType

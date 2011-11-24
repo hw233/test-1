@@ -90,6 +90,8 @@ enum
     TRUMPUPGRADE,
 // 英雄岛技能
     HISKILL,
+// 自动英雄岛
+    AUTOHI,
 
     MONEY_MAX,
 };
