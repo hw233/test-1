@@ -1,9 +1,11 @@
 #include "ClanRankBattle.h"
+#include <algorithm>
 #include "Clan.h"
 #include "Server/SysMsg.h"
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Player.h"
-#include <algorithm>
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 namespace GObject
 {        
@@ -398,27 +400,48 @@ namespace GObject
 
     void ClanRankBattleField::ResetPlayerStatus(UInt32 clan)
     {
+        std::vector<Player*> winPlayers;
+
         PlayerVec& players = m_WaitPlayers[clan];
         for(PlayerVec::iterator iter = players.begin();
-                iter != players.end(); ++iter)
+                iter != players.end(); )
         {
-            if((*iter)->GetClanBattleStatus() == PLAYER_BATTLE)
+            Player* player = *iter;
+            
+            if(player->GetClanBattleStatus() != PLAYER_BATTLE)
             {
-                (*iter)->SetClanBattleStatus(PLAYER_WAIT);
-                m_StatusChanged[(*iter)->getId()] = PLAYER_WAIT;
+                ++iter;
+                continue;
+            }
+
+            if(player->GetClanBattleWinTimes() == 10) //连胜10场了
+            {
+                player->SetClanBattleStatus(PLAYER_WIN);
+                m_StatusChanged[player->getId()] = PLAYER_WIN;
+                winPlayers.push_back(player);
+                    
+                iter = players.erase(iter);
+            }
+            else
+            {
+                player->SetClanBattleStatus(PLAYER_WAIT);
+                m_StatusChanged[player->getId()] = PLAYER_WAIT;
+                    
+                ++iter;
             }
         }
 
         players = m_DeadPlayers[clan];
-        for(PlayerVec::iterator iter = players.begin();
-                iter != players.end(); ++iter)
+        for(PlayerVec::reverse_iterator iter = players.rbegin();
+                iter != players.rend(); ++iter)
         {
-            if((*iter)->GetClanBattleStatus() == PLAYER_BATTLE)
-            {
-                (*iter)->SetClanBattleStatus(PLAYER_DEAD);
-                m_StatusChanged[(*iter)->getId()] = PLAYER_DEAD;
-            }
+            if((*iter)->GetClanBattleStatus() != PLAYER_BATTLE) break; //战斗状态都在队尾
+                
+            (*iter)->SetClanBattleStatus(PLAYER_DEAD);
+            m_StatusChanged[(*iter)->getId()] = PLAYER_DEAD;
         }
+
+        players.assign(winPlayers.begin(), winPlayers.end());
     }
 
     void ClanRankBattleField::ClearPlayerData(Player* player)
@@ -684,6 +707,7 @@ namespace GObject
         m_SignupCountDown = 0;
         m_BattleNo = 0;
         m_Now = 0;
+        m_expTime = 0;
     }
 
     ClanRankBattleMgr::~ClanRankBattleMgr()
@@ -719,6 +743,29 @@ namespace GObject
         }
 
         SortClans();
+
+        Table buffs = GameAction()->GetClanBattleBuffs();
+        size_t buffNum = buffs.size();
+        for(UInt32 i = 0; i < buffNum && i < RANK_BATTLE_SKILL_NUM; ++i)
+        {
+            Table buff = buffs.get<Table>(i + 1);
+            if(buff.size() < 13) continue;
+
+            m_Skills[i].id = i;
+            m_Skills[i].price = buff.get<UInt32>(1);
+            m_Skills[i].attrs.attackP = m_Skills[i].attrs.magatkP = buff.get<float>(2);
+            m_Skills[i].attrs.defendP = m_Skills[i].attrs.magdefP = buff.get<float>(3);
+            m_Skills[i].attrs.hpP = buff.get<float>(4);
+            m_Skills[i].attrs.actionP = buff.get<float>(5);
+            m_Skills[i].attrs.hitrateP = buff.get<float>(6);
+            m_Skills[i].attrs.evadeP = buff.get<float>(7);
+            m_Skills[i].attrs.criticalP = buff.get<float>(8);
+            m_Skills[i].attrs.criticaldmg = buff.get<float>(9);
+            m_Skills[i].attrs.pierceP = buff.get<float>(10);
+            m_Skills[i].attrs.counterP = buff.get<float>(11);
+            m_Skills[i].attrs.magresP = buff.get<float>(12);
+            m_Skills[i].attrs.aura = buff.get<float>(13);
+        }
     }
 
     void ClanRankBattleMgr::UnInit()
@@ -744,11 +791,13 @@ namespace GObject
             case STATE_SIGNUP:
                 {
                     ProcessSignup(now);
+                    CheckAddExp();
                 }
                 break;
             case STATE_BATTLE:
                 {
                     ProcessBattle(now);
+                    CheckAddExp();
                 }
                 break;
         }
@@ -1583,6 +1632,32 @@ namespace GObject
             Stream stream;
             sysMsgItem->getvap(&stream, 40);
             clan->clan->broadcast(stream);
+        }
+    }
+
+    void ClanRankBattleMgr::CheckAddExp()
+    {
+        if(m_Now > m_expTime)
+        {
+
+            class AddExpVisitor : public PlayerVisitor
+            {
+            public:
+                bool operator()(Player* player)
+                {
+                    UInt32 exp = ((player->GetLev() - 10) * UInt32(player->GetLev() / 10) * 5 + 25) * 2;
+                    player->AddExp(exp);
+                    return true;
+                }
+            };
+            AddExpVisitor visitor;
+            Map* map = Map::FromSpot(RANK_BATTLE_LOCATION);
+            if(map != NULL)
+            {
+                map->VisitPlayers(visitor, RANK_BATTLE_LOCATION);
+            }
+
+            m_expTime = m_Now + 60;
         }
     }
 }

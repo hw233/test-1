@@ -1,4 +1,4 @@
---Ö÷³ÌÐò¼ÓÔØ
+--??????????
 require("global")
 require("World/Attain")
 require("Task/Task_All")
@@ -17,3 +17,5 @@ require("DayTask/DayCopyTask");
 require("MapObject/NpcDefaultAction")
 require("Other/OperationTaskAction")
 require("Special/Activity")
+require("Other/ClanBattle")
+

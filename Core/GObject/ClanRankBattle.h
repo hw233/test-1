@@ -87,9 +87,10 @@ namespace GObject
 
         enum PlayerBattleStatus
         {
-            PLAYER_WAIT = 1,
-            PLAYER_BATTLE = 2,
-            PLAYER_DEAD = 3,
+            PLAYER_WAIT = 1,     //等待
+            PLAYER_BATTLE = 2,   //战斗中
+            PLAYER_DEAD = 3,     //死亡
+            PLAYER_WIN = 4,      //连胜10场
         };
 
     public:
@@ -300,7 +301,6 @@ namespace GObject
         void PlayerEnter(Player* player);
         void PlayerLeave(Player* player);
 
-
         /**
          *@brief 重排列帮会的出战队伍
          */
@@ -366,6 +366,11 @@ namespace GObject
          */
         void SetNoTurns(ClanRankBattleInfo* clan);
 
+        /**
+         *@brief 给经验奖励，一分钟一次
+         */
+        void CheckAddExp();
+
     private:
         //当前状态
         BattleState m_State;
@@ -373,6 +378,8 @@ namespace GObject
         UInt32 m_Now;
         //帮会战开始时间(包括报名准备阶段)
         UInt32 m_StartTime;
+        //加经验次数
+        UInt32 m_expTime;
         
         //参加战斗的帮会列表
         ClanMap m_Clans;

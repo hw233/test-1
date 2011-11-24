@@ -145,7 +145,7 @@ void Map::AddSpot( UInt16 id, const std::string& name, UInt8 type, UInt8 country
 		sd.m_PosX = x;
 		sd.m_PosY = y;
 
-		// 如果是国战，则初始化国战信息
+		// ?????枪?战??????始????战??息
 		if(countryBattle)
 		{
 			sd.InitCountryBattle();
@@ -556,5 +556,18 @@ void Map::Show( UInt32 id, bool notify, UInt8 type )
 		Broadcast(&st[0], st.size());
 	}
 }
+
+void Map::VisitPlayers(PlayerVisitor& visitor, UInt16 location)
+{
+    SpotData* spot = GetSpot(location);
+    if(spot == NULL) return;
+
+    for(std::set<Player*>::iterator iter = spot->m_Players.begin();
+            iter != spot->m_Players.end();++iter)
+    {
+        if(!visitor(*iter)) return;
+    }
+}
+
 
 }

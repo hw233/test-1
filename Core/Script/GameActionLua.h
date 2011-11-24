@@ -84,16 +84,18 @@ namespace Script
 
 		Table RunCollectTask(Player* player, UInt32 npcId);
 		bool RunCollectTaskItem(Player* player, UInt32 npcId);
-		//这里在脚本中把探索类的消息发给client
-		bool RunExploreTask(Player* player, UInt32 npcId);	//true:有探索任务， false:没有探索任务
+		//?????诮疟??邪?探????????息????client
+		bool RunExploreTask(Player* player, UInt32 npcId);	//true:??探???????? false:没??探??????
 
 		bool  RunAutoBattleAction(Player* player, UInt32 npcId, UInt32 turns);
 		
-		bool  CheckTaskAcceptCondition(Player* player, UInt32 taskId);	//任务接受条件检查
+		bool  CheckTaskAcceptCondition(Player* player, UInt32 taskId);	//????????????????
 		Table RunTask(Player* player, UInt32 taskId, UInt32 npcId);
 		Table RunTaskStep(Player* player, UInt32 taskId, UInt8 step);
 		Table RunDayTask(Player* player, UInt32 npcId);
 		Table RunDayTaskAccept(Player* player, UInt32 taskId, UInt32 npcId);
+
+        Table GetClanBattleBuffs();
 
 		bool  MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum = 1);
 
@@ -107,7 +109,6 @@ namespace Script
 		bool RunConveyAction(Player* player, UInt32 taskId);
 		UInt32 GetConveyMonster(Player* player, UInt32 path, UInt16 spot);
 		bool UpdateConveyStep(Player* player, UInt32 taskId, UInt16 spot, bool succ);
-
 
 		bool IsItemTaskItem(UInt32 itemId);
 		bool IsTaskItemItem(UInt32 itemId);
@@ -180,23 +181,23 @@ namespace Script
 
 
 	protected:
-		void RegisterActionInterface();						//注册C++函数接口
+		void RegisterActionInterface();						//注??C++?????涌?
 
 	public:
 		Player* GetPlayer1() { return _player1; }
 		Player* GetPlayer2() { return _player2; }
 
-    // 成就达成
+    // ?删痛???
     public:
         void doAttainment(Player* pl, UInt16 attainId, UInt32 param);
         void finishAttainment(Player* pl, UInt16 attainId);
 
 	private:
-		Player* _player1;	//脚本动作行为主体1
-		Player* _player2;	//脚本动作行为主体2
+		Player* _player1;	//?疟???????为????1
+		Player* _player2;	//?疟???????为????2
 
 	private:
-		UInt8 _tid;	// 所属线程ID
+		UInt8 _tid;	// ?????叱?ID
 	};
 
 #include "GameActionLuaImpl.inl"

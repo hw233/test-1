@@ -1244,6 +1244,9 @@ namespace GObject
 	};
 	extern ChallengeCheck challengeCheck;
 
+
+    typedef Visitor<Player> PlayerVisitor;
+
 }
 
 #endif // _PLAYER_H_
