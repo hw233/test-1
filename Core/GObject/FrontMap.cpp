@@ -524,6 +524,16 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                 if (pl->getVipLevel() < 9)
                     return;
 
+                if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGold())
+                {
+                    pl->sendMsgCode(0, 1101);
+                    return;
+                }
+
+                ConsumeInfo ci(AutoFrontMapComplete,0,0);
+                pl->useGold(GData::moneyNeed[GData::FRONTMAP_IM].gold, &ci);
+                pl->addCopyCompleteGold(GData::moneyNeed[GData::FRONTMAP_IM].gold);
+
                 std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
                 if (!tmp.size())
                     return;
