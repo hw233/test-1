@@ -583,7 +583,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 	case 0:
 		{
 			UInt32 viplevel = player->getVipLevel();
-			if(viplevel < 5)
+			if(viplevel < 6)
 			{
 				const UInt32 taelReq[] = {
                     0,
@@ -594,13 +594,19 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
                     GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
                 };
 
-				if(player->getTael() < taelReq[_id])
-					break;
 				ConsumeInfo ci(DungeonAutoConsume, 0, 0);
 				if(World::_wday == 5)
+                {
+                    if(player->getTael() < taelReq[_id] / 2)
+                        return;
 					player->useTael(taelReq[_id] / 2, &ci);
+                }
 				else
+                {
+                    if(player->getTael() < taelReq[_id])
+                        return;
 					player->useTael(taelReq[_id], &ci);
+                }
 			}
 			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(REP::COPY_AUTO_FIGHT);
