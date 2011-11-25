@@ -52,11 +52,11 @@ UInt8 PlayerCopy::getFreeCount()
 
 UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 {
-    if (vipl == 2)
+    if (vipl == 1)
         return 1;
-    if (vipl == 3)
+    if (vipl == 2)
         return 2;
-    if (vipl >= 4)
+    if (vipl >= 3)
         return 3;
     return 0; // TODO:
 }
@@ -486,7 +486,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                         return;
                     }
 
-                    if (pl->getVipLevel() < 5)
+                    if (pl->getVipLevel() < 4)
                         return;
 
                     if (!copyCheckLevel(pl, id))
@@ -562,7 +562,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     return;
                 }
 
-                if (pl->getVipLevel() < 9)
+                if (pl->getVipLevel() < 6)
                     return;
 
                 if (GData::moneyNeed[GData::COPY_IM].gold > pl->getGold())
