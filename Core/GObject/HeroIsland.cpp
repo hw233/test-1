@@ -492,17 +492,19 @@ void HeroIsland::applayPlayers()
                 {
                     pd->skills[i].incd = false;
                     pd->skills[i].cd = 0;
-                    if (i == 4)
-                    {
-                        broadcast(pd, pd->spot, 0);
-                        ++_nplayers[pd->spot];
-                    }
                 }
 
                 if (pd->skills[i].lastcd && now >= pd->skills[i].lastcd)
                 {
                     if (i && pd->skills[i].bufid != DEFAULT_BUFID)
+                    {
                         clearBuff(2, pd, now, i);
+                        if (i == 4)
+                        {
+                            broadcast(pd, pd->spot, 0);
+                            ++_nplayers[pd->spot];
+                        }
+                    }
                 }
             }
         }
@@ -851,7 +853,7 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
         HIPlayerData* pd1 = _players[spot][i];
         if (pd1->player && pd1->player != pd->player &&
                 pd1->player->hasFlag(Player::InHeroIsland) &&
-                !pd1->skills[4].incd)
+                (!pd1->skills[4].lastcd || pd1->skills[4].lastcd == static_cast<UInt32>(-1)))
         {
             UInt8 l2 = pd1->player->GetLev();
             if (l1 < l2 && l2 - l1 > 20)
