@@ -1,63 +1,15 @@
 #include "Config.h"
 #include "GlobalObject.h"
 
-MemBlockPool::MemBlockPool(size_t size)
-    :m_Size(size),m_pBlockList(NULL)
-{
-}
-
-MemBlockPool::~MemBlockPool()
-{
-    while(m_pBlockList != NULL)
-    {
-        MemBlock* ptr = m_pBlockList;
-        m_pBlockList = m_pBlockList->next;
-        free(ptr);
-    }
-}
-
-void* MemBlockPool::Alloc()
-{
-    void* ret = NULL;
-    m_Mutex.lock();
-    if(m_pBlockList != NULL)
-    {
-        ret = &m_pBlockList->data;
-        m_pBlockList = m_pBlockList->next;
-    }
-    m_Mutex.unlock();
-    if(ret == NULL)
-    {
-        MemBlock* block = (MemBlock*)malloc(sizeof(MemBlock) + m_Size);
-        if(block != NULL)
-        {
-            ret = &block->data;
-        }
-    }
-    return ret;
-}
-
-void MemBlockPool::Free(void* ptr)
-{
-    if(ptr == NULL) return;
-
-    const static size_t DATA_OFFSET = (char*)(&((MemBlock*)1)->data) - (char*)(1);
-    MemBlock* block = (MemBlock*)((char*)ptr - DATA_OFFSET);
-    m_Mutex.lock();
-    block->next = m_pBlockList;
-    m_pBlockList = block;
-    m_Mutex.unlock();
-}
-
-
-//各级内存块大小
-size_t MEMPOOL_SIZE[] = {128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
 
 bool GlobalObject::Init()
 {
+    size_t size = MIN_MEMBLOCK_SIZE;
     for(UInt32 i = 0; i < MEMPOOL_NUM; ++i)
     {
-        m_Pools[i] = new MemBlockPool(MEMPOOL_SIZE[i]);
+        m_MaxPoolSize = size;
+        m_Pools[i] = new MemBlockPool(size);
+        size *= 2;
     }
 	return true;
 }
@@ -87,14 +39,14 @@ void* GlobalObject::AllocMsgBlock(size_t size)
     char* ptr = NULL;
 
     size += sizeof(size_t);
-    if(size > 65536)
+    if(size > m_MaxPoolSize)
     {
         ptr = (char*)malloc(size); //直接分配
     }
     else
     {
         size_t index = 0;
-        size_t poolSize = 128;
+        size_t poolSize = MIN_MEMBLOCK_SIZE;
         while(size > poolSize){
             ++index;
             poolSize *= 2;
@@ -112,14 +64,14 @@ void GlobalObject::FreeMsgBlock(void* ptr)
 
     char* mem = (char*)ptr - sizeof(size_t);
     size_t size = *(size_t*)mem;
-    if(size > 65536)
+    if(size > m_MaxPoolSize)
     {
         free(mem); //直接回收
     }
     else
     {
         size_t index = 0;
-        size_t poolSize = 128;
+        size_t poolSize = MIN_MEMBLOCK_SIZE;
         while(size > poolSize){
             ++index;
             poolSize *= 2;

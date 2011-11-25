@@ -58,6 +58,7 @@ MSG_REG(GameMsgHdr, OnDungeonBattleReq);
 MSG_REG(GameMsgHdr, OnDungeonAutoReq);
 MSG_REG(GameMsgHdr, OnDungeonCompleteAutoReq);
 MSG_REG(GameMsgHdr, OnAutoCopy);
+MSG_REG(GameMsgHdr, OnAutoFrontMap);
 MSG_REG(GameMsgHdr, OnDailyReq);
 MSG_REG(GameMsgHdr, OnNpcTriggerReq);
 MSG_REG(GameMsgHdr, OnPlayerGetTaskReq);

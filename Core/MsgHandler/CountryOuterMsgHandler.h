@@ -302,6 +302,13 @@ struct AutoCopyReq
 	MESSAGE_DEF2(REQ::AUTO_COPY, UInt8, type, UInt8, id);
 };
 
+struct AutoFrontMapReq
+{
+    UInt8 type;
+    UInt8 id;
+	MESSAGE_DEF2(REQ::AUTO_FRONTMAP, UInt8, type, UInt8, id);
+};
+
 struct DailyReq
 {
 	MESSAGE_DEF(REQ::DAILY);
@@ -926,6 +933,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         pl->sendAutoCopy();
+    }
+    {
+        pl->sendAutoFrontMap();
     }
 	pl->sendWallow();
 	pl->sendEvents();
@@ -1876,6 +1886,37 @@ void OnAutoCopy( GameMsgHdr& hdr, AutoCopyReq& dar )
 
         case 2:
             pl->instantAutoCopy(dar.id);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OnAutoFrontMap( GameMsgHdr& hdr, AutoFrontMapReq& dar )
+{
+	MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
+
+	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	{
+		pl->sendMsgCode(1, 1014);
+		return;
+	}
+
+    switch (dar.type)
+    {
+        case 0:
+            pl->startAutoFrontMap(dar.id);
+            break;
+
+        case 1:
+            pl->cancelAutoFrontMap(dar.id);
+            break;
+
+        case 2:
+            pl->instantAutoFrontMap(dar.id);
             break;
 
         default:
