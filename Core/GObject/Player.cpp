@@ -1142,7 +1142,7 @@ namespace GObject
 
 		UInt32 curtime = TimeUtil::Now();
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		_playerData.lastOnline = curtime;
+		//_playerData.lastOnline = curtime; // XXX: 在线时间统计问题
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);

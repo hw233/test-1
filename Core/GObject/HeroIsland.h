@@ -59,7 +59,7 @@ struct HIPlayerData
         : player(NULL), type(0), spot(0), movecd(0),
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
         score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(DEFAULT_BUFID),
-        attr(NULL), awardgot(0), inrank(0), tasks(0), ato(false)
+        attr(NULL), awardgot(0), inrank(0), tasks(0), ato(0)
     {
     }
 
@@ -87,6 +87,7 @@ struct HIPlayerData
             compass.clear();
         }
 
+        ato = 0;
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;
@@ -116,7 +117,7 @@ struct HIPlayerData
     UInt8 inrank; // 0-不在,>=1-在
     std::vector<Task> compass; // 击杀任务
     UInt16 tasks; // 总完成任务数
-    bool ato;
+    UInt8 ato; // 0-未自动 1-自动中 2-暂停自动
     Skill skills[5];
 };
 
@@ -217,7 +218,7 @@ public:
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
     void saveAtoCfg(Player* player, const std::string& cfg);
     void sendAtoCfg(Player* player);
-    void setAto(Player* player, bool onoff);
+    void setAto(Player* player, UInt8 onoff);
 
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }

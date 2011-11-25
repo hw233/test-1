@@ -318,15 +318,27 @@ void HeroIsland::rankReward()
     if (!cfg.GMCheck)
         factor = 1.0;
 
+    SYSMSG_BROADCASTV(2212);
+
     UInt8 n = 0;
     UInt8 nsz = _prestige.size();
     for (SortType::reverse_iterator i = _sorts.rbegin(), e = _sorts.rend(); i != e; ++i)
     {
         if (!(*i) || !(*i)->player)
             continue;
+
         if (n < nsz)
         {
-            (*i)->player->getPrestige(_prestige[n] * factor + (*i)->tasks * 10);
+            UInt16 prestige = _prestige[n] * factor + (*i)->tasks * 10;
+            (*i)->player->getPrestige(prestige);
+
+            if (n < 3)
+            {
+                MailPackage::MailItem item[] = {{10,1},};
+                (*i)->player->sendMailItem(2210, 2211, item, 1);
+                SYSMSG_BROADCASTV(2213, n+1, (*i)->player->getCountry(), (*i)->player->getName().c_str(), prestige);
+            }
+
             ++n;
         }
         else
@@ -471,10 +483,17 @@ void HeroIsland::applayPlayers()
             if (pd && pd->player && !pd->player->hasFlag(Player::InHeroIsland))
                 continue;
 
+#ifdef _DEBUG
+            if (!j)
+                INFO_LOG("%s,%"I64_FMT"u injuredcd: %u , now: %u, injuredcd <= now: %u",
+                        pd->player->getName().c_str(), pd->player->getId(), pd->injuredcd, now, pd->injuredcd<=now);
+#endif
+
             if (!j && pd && pd->player && pd->injuredcd <= now)
             {
                 pd->player->regenAll(true);
                 pd->injuredcd = static_cast<UInt32>(-1);
+                pd->player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
                 broadcast(pd, 0, 2);
             }
 
@@ -526,7 +545,7 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
         if (type == 1 && pd->bufid != DEFAULT_BUFID)
         {
             pd->attrcd = static_cast<UInt32>(-1);
-            pd->player->setBuffData(pd->bufid, 0);
+            pd->player->setBuffData(pd->bufid, 0, false);
             pd->bufid = DEFAULT_BUFID;
 
             for (UInt8 i = 1; i < 5; ++i)
@@ -554,7 +573,7 @@ void HeroIsland::clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skill
         if (type == 1)
         {
             if (pd->bufid != DEFAULT_BUFID)
-                pd->player->setBuffData(pd->bufid, 0);
+                pd->player->setBuffData(pd->bufid, 0, false);
             pd->attrcd = static_cast<UInt32>(-1);
             pd->bufid = DEFAULT_BUFID;
         }
@@ -1126,10 +1145,10 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         else
         {
             if (cfg.GMCheck)
-                pd->injuredcd = now + 10;
+                pd->injuredcd = now + 11;
             else
-                pd->injuredcd = now + 10;
-            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
+                pd->injuredcd = now + 11;
+            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd+4, false);
             moveTo(pd->player, 0, false);
         }
 
@@ -1169,7 +1188,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         }
 
         int turns = 0;
-        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5, pd->ato?0x00:0x01);
+        bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5, pd->ato==1?0x00:0x01);
         if (cfg.GMCheck)
             pd->fightcd = now + 40;
         else
@@ -1180,10 +1199,10 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         {
             pd->lasttype = pd1->type;
             if (cfg.GMCheck)
-                pd1->injuredcd = now + 10;
+                pd1->injuredcd = now + 11;
             else
-                pd1->injuredcd = now + 10;
-            pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd, false);
+                pd1->injuredcd = now + 11;
+            pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd+4, false);
 
             if (_running)
             {
@@ -1220,10 +1239,10 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         else
         {
             if (cfg.GMCheck)
-                pd->injuredcd = now + 10;
+                pd->injuredcd = now + 11;
             else
-                pd->injuredcd = now + 10;
-            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd, false);
+                pd->injuredcd = now + 11;
+            pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd+4, false);
 
             moveTo(pd->player, 0, false);
             broadcast(pd1, pd1->spot, 2);
@@ -1359,7 +1378,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
                 pd->skills[2].bufid = PLAYER_BUFF_HIBT;
                 pd->skills[2].attr = &_skillattr[2];
-                pd->player->setBuffData(pd->skills[2].bufid, pd->skills[2].lastcd);
+                pd->player->setBuffData(pd->skills[2].bufid, pd->skills[2].lastcd, false);
                 pd->player->addHIAttr(*pd->skills[2].attr);
                 SYSMSG_SEND(2131, pd->player);
                 st << cd;
@@ -1388,7 +1407,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
                 pd->skills[3].bufid = PLAYER_BUFF_HILN;
                 pd->skills[3].attr = &_skillattr[3];
-                pd->player->setBuffData(pd->skills[3].bufid, pd->skills[3].lastcd);
+                pd->player->setBuffData(pd->skills[3].bufid, pd->skills[3].lastcd, false);
                 pd->player->addHIAttr(*pd->skills[3].attr);
                 SYSMSG_SEND(2132, pd->player);
                 st << cd;
@@ -1417,7 +1436,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
                 pd->skills[4].bufid = PLAYER_BUFF_HIJZ;
                 pd->skills[4].attr = NULL;
-                pd->player->setBuffData(pd->skills[4].bufid, pd->skills[4].lastcd);
+                pd->player->setBuffData(pd->skills[4].bufid, pd->skills[4].lastcd, false);
                 SYSMSG_SEND(2133, pd->player);
                 st << cd;
 
@@ -1500,7 +1519,7 @@ void HeroIsland::playerInfo(Player* player)
         st << static_cast<UInt8>(pd->awardgot==0xFF?0:pd->awardgot);
         st << pd->inrank;
         st << static_cast<UInt16>(pd->score);
-        st << static_cast<UInt8>(pd->ato?1:0);
+        st << static_cast<UInt8>(pd->ato);
     }
 
     st << Stream::eos;
@@ -1595,9 +1614,9 @@ void HeroIsland::playerLeave(Player* player)
     player->regenAll(true);
 
     if (cfg.GMCheck)
-        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+5*60);
+        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+5*60, false);
     else
-        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+60);
+        player->setBuffData(PLAYER_BUFF_HIESCAPE, TimeUtil::Now()+60, false);
 }
 
 void HeroIsland::playerOffline(Player* player)
@@ -1952,22 +1971,13 @@ void HeroIsland::sendAtoCfg(Player* player)
     player->send(st);
 }
 
-void HeroIsland::setAto(Player* player, bool onoff)
+void HeroIsland::setAto(Player* player, UInt8 onoff)
 {
-    if (!player)
+    if (!player || !onoff)
         return;
 
     if (!player->hasFlag(Player::InHeroIsland))
         return;
-
-    UInt32 goldUse = GData::moneyNeed[GData::AUTOHI].gold;
-    if (player->getGold() < goldUse)
-    {
-        player->sendMsgCode(0, 1101);
-        return;
-    }
-    ConsumeInfo ci(HeroIslandAuto,0,0);
-    player->useGold(goldUse, &ci);
 
     UInt8 spot = player->getHISpot();
     UInt16 pos = 0;
@@ -1975,9 +1985,23 @@ void HeroIsland::setAto(Player* player, bool onoff)
     if (!pd)
         return;
 
+    if (onoff == 1 && !pd->ato)
+    {
+        UInt32 goldUse = GData::moneyNeed[GData::AUTOHI].gold;
+        if (player->getGold() < goldUse)
+        {
+            player->sendMsgCode(0, 1101);
+            return;
+        }
+        ConsumeInfo ci(HeroIslandAuto,0,0);
+        player->useGold(goldUse, &ci);
+    }
+
+    if (onoff > 2)
+        onoff = 2;
     pd->ato = onoff;
     Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(20) << static_cast<UInt8>(onoff?1:0) << Stream::eos;
+    st << static_cast<UInt8>(20) << static_cast<UInt8>(onoff) << Stream::eos;
     player->send(st);
 }
 
