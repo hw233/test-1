@@ -1800,8 +1800,8 @@ void HeroIsland::commitCompass(Player* player)
             {
                 if (*i)
                 {
-                    st << (*i)->player->getName();
-                    st << (*i)->score;
+                    st1 << (*i)->player->getName();
+                    st1 << (*i)->score;
                     ++count;
                 }
             }

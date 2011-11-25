@@ -2043,11 +2043,11 @@ namespace GObject
         {
             if (res)
             {
-                SYSMSG_SENDV(2141, this, getCountry(), getName().c_str());
+                SYSMSG_SENDV(2144, this, other->getCountry(), other->getName().c_str());
             }
             else
             {
-                SYSMSG_SENDV(2140, this, getCountry(), getName().c_str());
+                SYSMSG_SENDV(2143, this, other->getCountry(), other->getName().c_str());
             }
         }
 
