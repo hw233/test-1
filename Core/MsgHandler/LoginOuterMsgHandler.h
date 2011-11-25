@@ -338,6 +338,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
 		}
+
+        cl->SetStatus(Network::GameClient::NORMAL);
 	}
 	else
 		res = 2;

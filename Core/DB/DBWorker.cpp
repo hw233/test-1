@@ -15,6 +15,8 @@ DBWorker::DBWorker(UInt8 type, UInt8 worker) :
     WorkerRunner<>((type == 1 && cfg.serverLogId == 0) ? 0 : 500),
     m_Type(type), m_Worker(worker), m_Limit(0)
 {
+    memset(m_Pools, 0, sizeof(m_Pools));
+    m_MaxPoolSize = 0;
 }
 
 DBWorker::~DBWorker()
@@ -48,6 +50,15 @@ void DBWorker::CalcUserLost(DBWorker * worker)
 
 bool DBWorker::Init()
 {
+    size_t size = MIN_MEMBLOCK_SIZE;
+    for(UInt32 i = 0; i < MEMPOOL_NUM; ++i)
+    {
+        m_MaxPoolSize = size;
+        m_Pools[i] = new MemBlockPool(size);
+        size *= 2;
+    }
+
+
 	switch(m_Type)
 	{
 	case 0:
@@ -72,11 +83,17 @@ void DBWorker::UnInit()
 {
 	OnTimer();
 	m_DBExecutor.reset();
+
+    for(UInt32 i = 0; i < MEMPOOL_NUM; ++i)
+    {
+        delete m_Pools[i];
+        m_Pools[i] = NULL;
+    }
 }
 
 void DBWorker::OnTimer()
 {
-	std::vector<const char *> l;
+	std::vector<char *> l;
 	{
 		FastMutex::ScopedLock lk(m_Mutex);
 		if(m_UpdateItems.empty())
@@ -107,13 +124,13 @@ void DBWorker::OnTimer()
     {
         size_t size = l.size();
         size_t sz = size;
-        const char** query = &l[0];
+        char** query = &l[0];
         while (size)
         {
             --size;
             bool r = DoDBQuery(*query);
             TRACE_LOG("[%u]%u:%u-[%s] -> %d", m_Worker, sz, size, *query, r ? 1 : 0);
-            delete[] *query;
+            FreeMemBlock(*query);
             ++query;
             if (!*query)
                 continue;
@@ -205,9 +222,9 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
     ++m_Limit;
 
 	/* Guess we need no more than 256 bytes. */
-	int size = 256;
+	int size = 240;
 
-	char *p = new(std::nothrow) char[size];
+	char *p = (char*)AllocMemBlock(size);
 	if (p == NULL)
 		return;
 
@@ -225,8 +242,8 @@ void DBWorker::PushUpdateData(const char * fmt, ...)
 			size = n+1; /* precisely what is needed */
 		else           /* glibc 2.0 */
 			size *= 2;  /* twice the old size */
-		delete[] p;
-		if ((p = new(std::nothrow) char[size]) == NULL) {
+        FreeMemBlock(p);
+		if ((p = (char*)AllocMemBlock(size)) == NULL) {
 			return;
 		}
 	}
@@ -247,9 +264,9 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 	if(m_Type == 1 && cfg.serverLogId == 0)
 		return;
 	/* Guess we need no more than 256 bytes. */
-	int size = 256;
+	int size = 240;
 
-	char *p = new(std::nothrow) char[size];
+	char *p = (char*)AllocMemBlock(size);
 	if (p == NULL)
 		return;
 
@@ -267,8 +284,8 @@ void DBWorker::PushUpdateDataL(const char * fmt, ...)
 			size = n+1; /* precisely what is needed */
 		else           /* glibc 2.0 */
 			size *= 2;  /* twice the old size */
-		delete[] p;
-		if ((p = new(std::nothrow) char[size]) == NULL) {
+        FreeMemBlock(p);
+		if ((p = (char*)AllocMemBlock(size)) == NULL) {
 			return;
 		}
 	}
@@ -285,9 +302,9 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 	if(m_Type == 1 && cfg.serverLogId == 0)
 		return;
 	/* Guess we need no more than 256 bytes. */
-	int size = 256;
+	int size = 240;
 
-	char *p = new(std::nothrow) char[size];
+	char *p = (char*)AllocMemBlock(size);
 	if (p == NULL)
 		return;
 
@@ -305,8 +322,8 @@ void DBWorker::PushUpdateDataF(const char * fmt, ...)
 			size = n+1; /* precisely what is needed */
 		else           /* glibc 2.0 */
 			size *= 2;  /* twice the old size */
-		delete[] p;
-		if ((p = new(std::nothrow) char[size]) == NULL) {
+        FreeMemBlock(p);
+		if ((p = (char*)AllocMemBlock(size)) == NULL) {
 			return;
 		}
 	}
@@ -354,4 +371,54 @@ void  DBWorker::GetMultiDBName(std::string& oriName)
     snprintf(app, 64, "_%u_%u", y, m);
     oriName  += app;
 }
+
+void* DBWorker::AllocMemBlock(size_t size)
+{
+    char* ptr = NULL;
+
+    size += sizeof(size_t);
+    if(size > m_MaxPoolSize)
+    {
+        ptr = (char*)malloc(size); //直接分配
+    }
+    else
+    {
+        size_t index = 0;
+        size_t poolSize = MIN_MEMBLOCK_SIZE;
+        while(size > poolSize){
+            ++index;
+            poolSize *= 2;
+        }
+        if(m_Pools[index] == NULL) return NULL;
+        ptr = (char*)m_Pools[index]->Alloc();
+    }
+    if(ptr == NULL) return NULL;
+    *(size_t*)ptr = size;
+    return ptr + sizeof(size_t);
+}
+
+void DBWorker::FreeMemBlock(void* ptr)
+{
+    if(ptr == NULL) return;
+
+    char* mem = (char*)ptr - sizeof(size_t);
+    size_t size = *(size_t*)mem;
+    if(size > m_MaxPoolSize)
+    {
+        free(mem); //直接回收
+    }
+    else
+    {
+        size_t index = 0;
+        size_t poolSize = MIN_MEMBLOCK_SIZE;
+        while(size > poolSize){
+            ++index;
+            poolSize *= 2;
+        }
+        m_Pools[index]->Free(mem);
+    }
+}
+
+
+
 }
