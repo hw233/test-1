@@ -19,7 +19,12 @@ GameClient::GameClient( int fd, Network::TcpSlaveServer * s, int id ):
 	m_RemoteIP = ntohl(peerAddr.sin_addr.s_addr);
 	m_RemotePort = ntohs(peerAddr.sin_port);
     setChk(0xff);
-    srand(time(NULL));
+    
+    m_Now = (UInt32)time(NULL);
+    m_CreateTime = m_RecvTime = m_Now;
+    srand(m_Now);
+
+    m_Status = UNVERIFIED;
 }
 
 void GameClient::setChk(UInt8 chk)
@@ -40,7 +45,7 @@ int GameClient::parsePacket( struct evbuffer * buf, int &off, int &len )
 		return 0;
 	}
 	UInt8 * buf_ = static_cast<UInt8 *>(evbuffer_pullup(buf, 5));
-	/* hack: ·µ»Øxml°²È«¹æÔò¸øflash¿Í»§¶Ë */
+	/* hack: ????xml??È«??????flash?Í»??? */
 	if(buf_[2] == 'o' && buf_[0] == '<' && buf_[1] == 'p' && buf_[3] == 'l')
 	{
 		off = 0;
@@ -126,7 +131,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, // 0x60
 		1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, // 0x70
 		0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, // 0x80
-		0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, // 0x90
+		0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, // 0x90
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0xA0
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, // 0xB0
 		0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, // 0xC0
@@ -167,10 +172,10 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 	return MAX_THREAD_NUM;
 }
 
-//ÔÚ´Ë¶ÔÏûÏ¢µÄ³¤¶È×ö³ö¼ì²é£¬ Èç¹û·¢ÏÖ´Ëcmd¶ÔÓ¦µÄÏûÏ¢°ü³¤¶È²»¶Ô£¬ÔòÖ±½Ó¶Ï¿ª´ËÁ¬½Ó, ²¢·¢ËÍÄÚ²¿ÏûÏ¢µ½Ïß³ÌÄÚ²¿£¬ ÊÍ·Å´ËÓÃ»§µÄÏà¹ØÊý¾Ý
+//?Ú´Ë¶???Ï¢?Ä³??????????é£¬ ???????Ö´?cmd??Ó¦????Ï¢?????È²??Ô£???Ö±?Ó¶Ï¿???Á¬??, ???????Ú²???Ï¢???ß³??Ú²??? ?Í·Å´??Ã»???????????
 void GameClient::onRecv( int cmd, int len, void * buf )
 {
-	/* hack: ·µ»Øxml°²È«¹æÔò¸øflash¿Í»§¶Ë */
+	/* hack: ????xml??È«??????flash?Í»??? */
 	if(cmd > 0x1FF)
 	{
 		static char resp[1024] = {0};
@@ -189,11 +194,6 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 		return;
 	}
 
-	GObject::Player * pl = m_Player.value();
-	UInt8 thrd = threadFromCmd(pl, cmd);
-	if(thrd >= MAX_THREAD_NUM)
-		return;
-
     if (cmd == REP::KEEP_ALIVE)
     {
         //if (!(m_ChkOver % 6))
@@ -207,7 +207,13 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             st << Stream::eos;
             send(&st[0], st.size());
         }
+        m_RecvTime = m_Now;
     }
+
+	GObject::Player * pl = m_Player.value();
+	UInt8 thrd = threadFromCmd(pl, cmd);
+	if(thrd >= MAX_THREAD_NUM)
+		return;
 
     if ((cmd == REQ::CHAT || cmd == REQ::WHISPER) &&  len > 200)
     {
@@ -259,6 +265,29 @@ bool GameClient::active()
 {
 	GObject::Player * player = m_Player.value();
 	return player != NULL && player->isOnline();
+}
+
+void GameClient::OnTick(UInt32 now)
+{
+    TcpConduit::OnTick(now);
+
+    m_Now = now;
+        
+    if(m_Status == UNVERIFIED)
+    {
+        if(m_Now > m_CreateTime + VERIFY_TIMEOUT)
+        {
+            //éªŒè¯è¶…æ—¶
+            closeConn();
+            return;
+        }
+    }
+    else if(m_Now > m_RecvTime + HEARTBEAT_TIMEOUT)
+    {
+        //å¿ƒè·³è¶…æ—¶
+        closeConn();
+        return;
+    }
 }
 
 void GameClient::SetClientAddr( const struct sockaddr * addr )

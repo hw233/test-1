@@ -427,12 +427,12 @@ function ItemNormal_00000008(iid, num, bind, param)
     local item = items[i]
     if item[1] == 0 then
         local equip = getRandOEquip(player:GetLev())
-		package:AddEquip(equip, 1, true);
+		package:AddEquip(equip, 1, false);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
         end
     else
-        package:AddItem(item[1], item[2], true, 0, 2);
+        package:AddItem(item[1], item[2], true, false, 2);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."]x"..item[2]);
         end
