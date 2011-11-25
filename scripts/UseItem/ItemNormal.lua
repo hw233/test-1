@@ -5138,16 +5138,19 @@ function ItemNormal_00000067(iid, num, bind, param)
     return num;
 end
 
-
 function ItemNormal_00000072(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 20 then		
+	if package:GetRestPackageSize() < 2 then		
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 
+    package:AddItem(514, 10, true, 0, 2);
+    package:AddItem(515, 10, true, 0, 2);
+
+    package:DelItemSendMsg(72, player);
     return num
 end
 
