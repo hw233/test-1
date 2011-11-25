@@ -496,6 +496,8 @@ function ItemNormal_00000010(iid, num, bind, param)
       n = 6
   elseif lvl >= 70 and lvl <= 74 then
       n = 7
+  elseif lvl >= 75 then
+      n = 7
   end
 
   if n == 0 then
@@ -507,7 +509,9 @@ function ItemNormal_00000010(iid, num, bind, param)
       return
   end
 
-  package:AddItem(items[n][m], 1, 1, 0, 2);
+  package:Add(items[n][m], 1, 1, 0, 2);
+
+  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[英雄遗迹]，获得了[4:"..items[n][m].."]")
   package:DelItemSendMsg(10, player);
   return num
 end
