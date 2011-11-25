@@ -21,7 +21,7 @@ namespace GObject
 
 UInt8 PracticePlace::_maxCount = 5;
 UInt8 PracticePlace::_extraCount[11] = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5};
-UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2};
+UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
 
 #define ITEM_PRACTICE_PROT 54
