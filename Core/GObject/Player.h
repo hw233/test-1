@@ -817,6 +817,11 @@ namespace GObject
         void instantAutoCopy(UInt8 id);
         void sendAutoCopy();
 
+        void startAutoFrontMap(UInt8 id);
+        void cancelAutoFrontMap(UInt8 id);
+        void instantAutoFrontMap(UInt8 id);
+        void sendAutoFrontMap();
+
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }
 		void setNextExtraReward(UInt32 ner);

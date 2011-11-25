@@ -30,11 +30,11 @@ UInt32 Store::getPrice( UInt8 type, UInt16 itemId )
 
 UInt32 Store::getPrice( UInt16 itemId )
 {
-    for (UInt8 type = 2; type <= 3; ++type)
+    for (UInt8 type = 1; type <= 3; ++type)
     {
         std::map<UInt32, UInt32>::iterator it = _itemPrices[type - 1].find(itemId);
         if(it == _itemPrices[type - 1].end())
-            return 0;
+            continue;
         return it->second;
     }
     return 0;
