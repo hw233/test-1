@@ -3427,4 +3427,45 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 	player->send(st);
 }
 
+void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+    case 1:
+        {
+            UInt32 start = 0;
+            UInt32 count = 0;
+            UInt8 type = 0;
+            br >> start >> count >> type;
+            teamCopyManager.reqTeamList(player, start, count, type);
+        }
+        break;
+    case 2:
+        break;
+    case 3:
+        break;
+    case 4:
+        break;
+    case 5:
+        break;
+    case 11:
+        break;
+    case 12:
+        break;
+    case 13:
+        break;
+    case 14:
+        break;
+    default:
+        return;
+    }
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_

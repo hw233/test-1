@@ -53,7 +53,7 @@ public:
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
     void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
-    void clearLastBattle(UInt8 winner);
+    void clearLastBattle(UInt8 side);
 private:
 	struct FighterStatus
 	{
@@ -186,6 +186,7 @@ private:
 	float testLink(BattleFighter *& bf, UInt16& skillId);
 	void onDead(BattleObject * bo, std::vector<AttackAct>* atkAct = NULL);
 	int testWinner();
+	int testWinner2();
 	void appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount);
 	UInt32 tryPreUseSkill(BattleFighter * bf, BattleObject * target_object);
 	UInt32 tryDelayUseSkill(BattleFighter * bf, BattleObject * target_object);

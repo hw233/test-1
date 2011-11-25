@@ -558,6 +558,8 @@ namespace GObject
 		m_AttainMgr = new AttainMgr(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
+        memset(&m_ctp, 0, sizeof(m_ctp));
+        m_teamData = NULL;
 	}
 
 
@@ -7096,6 +7098,26 @@ namespace GObject
             EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME, 1, 1);
             if (event) PushTimerEvent(event);
         }
+    }
+
+    TeamData* Player::getTeamData()
+    {
+        return m_teamData;
+    }
+
+    void Player::setTeamData(TeamData* td)
+    {
+        m_teamData = td;
+    }
+
+    CopyTeamPage& Player::getCopyTeamPage()
+    {
+        return m_ctp;
+    }
+
+    void Player::clearCopyTeamPage()
+    {
+        memset(&m_ctp, 0, sizeof(m_ctp));
     }
 
 } // namespace GObject

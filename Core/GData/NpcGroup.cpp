@@ -123,6 +123,14 @@ UInt8 NpcGroup::getLevel()
 	return (_npcList.empty() ? 0 : _npcList[0].fighter->getLevel());
 }
 
+UInt16 NpcGroup::getPortrait()
+{
+	if(_npcList[0].fighter->getId() <= GREAT_FIGHTER_MAX)
+		bsim.setPortrait(1, _npcList[0].fighter->getId());
+	else
+		bsim.setPortrait(1, _npcList[0].fighter->favor);
+}
+
 UInt8 NpcGroup::getClass()
 {
 	return (_npcList.empty() ? 0 : _npcList[0].fighter->getClass());

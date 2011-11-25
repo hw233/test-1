@@ -100,7 +100,14 @@ void BattleSimulator::clearLastBattle(UInt8 side)
 {
     if(side > 1)
         return;
+
+    int oldID = _id; 
+
     _id = IDGenerator::gBattleOidGenerator.ID();
+    _packet.data<UInt32>(3) = _id;
+
+    battleReport.addReport(oldID, _packet);
+
     for(int i = 0; i < 25; ++ i)
     {
         if(_objs[side][i] && !_isBody[side][i])
@@ -131,7 +138,7 @@ void BattleSimulator::start(UInt8 prevWin)
 
 	// [[ Make packet header data
 	_packet.init(REP::FIGHT_START);
-	_packet << _id << _position;
+	_packet << _id << static_cast<UInt32>(0) << _position;
 	for(int i = 0; i < 2; ++ i)
 		_packet << (_formation[i] ? _formation[i]->getId() : static_cast<UInt16>(0));
 	_packet << _player[0]->GetLev() << _other_level;
@@ -203,7 +210,9 @@ void BattleSimulator::start(UInt8 prevWin)
 								loaded[i] = true;
 							}
 						}
-                        bf->initStats(checkEnh);
+
+                        if((prevWin-1) != i)
+                            bf->initStats(checkEnh);
                         UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
                         if(justice_roar)
                             bf->AddAura(justice_roar);
@@ -229,7 +238,7 @@ void BattleSimulator::start(UInt8 prevWin)
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);
                     
-					if(ismain)
+					if(ismain && (prevWin-1) != i)
 					{
                         bf->postInit();
 						// FighterStatus fs(bf);
@@ -284,6 +293,9 @@ void BattleSimulator::start(UInt8 prevWin)
         }
 #endif
 	}
+    if(_winner == 0)
+        _winner = testWinner2();
+
 	_packet << static_cast<UInt8>(_winner);
 	_packet.data<UInt32>(cnt_pos) = act_count;
 	_packet << Stream::eos;
@@ -306,9 +318,6 @@ void BattleSimulator::start(UInt8 prevWin)
 #endif
 
 	_turns = act_count;
-
-	if(act_count == 0)
-		_winner = 1;
 
 	if(_report || !cfg.GMCheck)
 		battleReport.addReport(_id, _packet);
@@ -3360,6 +3369,22 @@ int BattleSimulator::testWinner()
 	else if(alive[1] == 0)
 		return 1;
 	return 0;
+}
+
+int BattleSimulator::testWinner2()
+{
+    UInt32 leftHPAll[2] = {0, 0};
+	for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
+    {
+        std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
+        size_t c = fgtlist.size();
+        for(size_t i = 0; i < c; ++ i)
+        {
+            leftHPAll[fgtlist[i]->getSide()] += fgtlist[i]->getHP();
+        }
+    }
+
+    return leftHPAll[0] > leftHPAll[1];
 }
 
 void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount)

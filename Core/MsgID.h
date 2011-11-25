@@ -301,6 +301,9 @@ namespace REQ
     const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
+
+    /** 组队副本*/
+    const UInt8 TEAM_COPY_REQ       = 0x9C;
 }
 
 namespace REP
@@ -487,6 +490,8 @@ namespace REP
     const UInt8 WINSTREAK           = 0xF6;// 0xD3
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
+
+    const UInt8 TEAM_COPY_REQ       = 0x9C;
 }
 
 namespace SPEQ

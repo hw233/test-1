@@ -129,6 +129,8 @@ MSG_REG(GameMsgHdr, OnLockPwdReq);
 MSG_REG_2(GameMsgHdr, REQ::EQ_TRUMP_UPGRADE, OnTrumpUpgrade);
 MSG_REG(GameMsgHdr, OnTrumpLOrder);
 
+MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
+
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
