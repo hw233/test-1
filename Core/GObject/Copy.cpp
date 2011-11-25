@@ -228,6 +228,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
     if (fgtid) {
+        // XXX: 取消每层1元，改为总共10元
+#if 0
         if (ato && complete) {
             if (GData::moneyNeed[GData::COPY_IM].gold <= pl->getGold()) {
                 ConsumeInfo ci(AutoCopyComplete,0,0);
@@ -239,6 +241,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 return 0;
             }
         }
+#endif
 
         std::vector<UInt16> loot;
         if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
@@ -561,6 +564,16 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
 
                 if (pl->getVipLevel() < 9)
                     return;
+
+                if (GData::moneyNeed[GData::COPY_IM].gold > pl->getGold())
+                {
+                    pl->sendMsgCode(0, 1101);
+                    return;
+                }
+
+                ConsumeInfo ci(AutoCopyComplete,0,0);
+                pl->useGold(GData::moneyNeed[GData::COPY_IM].gold, &ci);
+                pl->addCopyCompleteGold(GData::moneyNeed[GData::COPY_IM].gold);
 
                 autoClear(pl);
                 pl->addFlag(Player::AutoCopy);
