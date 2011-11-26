@@ -322,6 +322,7 @@ namespace GObject
     struct CopyTeamPage
     {
         UInt8 copyId;
+        UInt8 t;   //дя╤х
         UInt32 start;
         UInt32 end;
         UInt8 type;
