@@ -49,6 +49,7 @@
 #include "Common/BinaryReader.h"
 #include "LoginMsgHandler.h"
 #include "GObject/SaleMgr.h"
+#include "GObject/TeamCopy.h"
 
 struct NullReq
 {
@@ -3444,24 +3445,72 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 count = 0;
             UInt8 type = 0;
             br >> start >> count >> type;
-            teamCopyManager.reqTeamList(player, start, count, type);
+            teamCopyManager->reqTeamList(player, start, count, type);
         }
         break;
     case 2:
+        {
+            std::string pwd;
+            UInt8 upLevel = 0;
+            UInt8 dnLevel = 0;
+            br >> pwd >> upLevel >> dnLevel;
+            teamCopyManager->createTeam(player, pwd, upLevel, dnLevel);
+        }
         break;
     case 3:
+        {
+            UInt32 teamId = 0;
+            std::string pwd;
+            br >> teamId >> pwd;
+            teamCopyManager->joinTeam(player, teamId, pwd);
+        }
         break;
     case 4:
+        {
+            teamCopyManager->leaveTeam(player);
+        }
         break;
     case 5:
+        {
+            UInt8 type = 0;
+            br >> type;
+            if(type == 0)
+            {
+                UInt8 copyId = 0;
+                UInt8 t = 0;
+                br >> copyId >> t;
+                teamCopyManager->enterTeamCopy(player, copyId, t);
+            }
+            else
+                teamCopyManager->leaveTeamCopy(player);
+        }
         break;
     case 11:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            teamCopyManager->handoverLeader(player, playerId);
+        }
         break;
     case 12:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            teamCopyManager->teamKick(player, playerId);
+        }
         break;
     case 13:
+        {
+            UInt8 idx0 = 0;
+            UInt8 idx1 = 0;
+            br >> idx0 >> idx1;
+            teamCopyManager->reQueueTeam(player, idx0, idx1);
+        }
         break;
     case 14:
+        {
+            teamCopyManager->teamBattleStart(player);
+        }
         break;
     default:
         return;

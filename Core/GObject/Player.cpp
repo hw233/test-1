@@ -41,6 +41,7 @@
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 #include "DCLogger.h"
+#include "TeamCopy.h"
 
 #include <cmath>
 
@@ -1158,6 +1159,9 @@ namespace GObject
 		}
 
 		UInt32 curtime = TimeUtil::Now();
+
+        if(hasFlag(InCopyTeam))
+            teamCopyManager->leaveTeamCopy(this);
 
 		if(cfg.enableWallow && _playerData.wallow)
 		{
@@ -3631,6 +3635,8 @@ namespace GObject
             delFlag(Player::InHeroIsland);
         }
 
+        if(hasFlag(InCopyTeam))
+            teamCopyManager->leaveTeamCopy(this);
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)

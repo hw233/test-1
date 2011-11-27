@@ -303,7 +303,7 @@ namespace REQ
     // const UInt8 BLOCKBOSS           = 0xD5;
 
     /** 组队副本*/
-    const UInt8 TEAM_COPY_REQ       = 0x9C;
+    const UInt8 TEAM_COPY_REQ       = 0x99;
 }
 
 namespace REP
@@ -491,7 +491,7 @@ namespace REP
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
 
-    const UInt8 TEAM_COPY_REQ       = 0x9C;
+    const UInt8 TEAM_COPY_REQ       = 0x99;
 }
 
 namespace SPEQ
