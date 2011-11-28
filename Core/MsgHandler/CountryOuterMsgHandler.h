@@ -3439,42 +3439,11 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 
     switch(op)
     {
-    case 1:
-        {
-            UInt32 start = 0;
-            UInt32 count = 0;
-            UInt8 type = 0;
-            br >> start >> count >> type;
-            teamCopyManager->reqTeamList(player, start, count, type);
-        }
-        break;
-    case 2:
-        {
-            std::string pwd;
-            UInt8 upLevel = 0;
-            UInt8 dnLevel = 0;
-            br >> pwd >> upLevel >> dnLevel;
-            teamCopyManager->createTeam(player, pwd, upLevel, dnLevel);
-        }
-        break;
-    case 3:
-        {
-            UInt32 teamId = 0;
-            std::string pwd;
-            br >> teamId >> pwd;
-            teamCopyManager->joinTeam(player, teamId, pwd);
-        }
-        break;
-    case 4:
-        {
-            teamCopyManager->leaveTeam(player);
-        }
-        break;
-    case 5:
+    case 0x0:
         {
             bool res = 0;
             Stream st(REP::TEAM_COPY_REQ);
-            st << static_cast<UInt8>(0x05);
+            st << static_cast<UInt8>(0x00);
 
             UInt8 resCopyId = 0;
             UInt8 resT = 0;
@@ -3499,21 +3468,70 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             player->send(st);
         }
         break;
-    case 11:
+    case 0x1:
+        {
+            UInt32 start = 0;
+            UInt32 count = 0;
+            UInt8 type = 0;
+            br >> start >> count >> type;
+            teamCopyManager->reqTeamList(player, start, count, type);
+        }
+        break;
+    case 0x2:
+        {
+            std::string pwd;
+            UInt8 upLevel = 0;
+            UInt8 dnLevel = 0;
+            br >> pwd >> upLevel >> dnLevel;
+
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x02);
+
+            UInt32 teamId = teamCopyManager->createTeam(player, pwd, upLevel, dnLevel);
+            st << teamId;
+
+            player->send(st);
+        }
+        break;
+    case 0x3:
+        {
+            UInt32 teamId = 0;
+            std::string pwd;
+            br >> teamId >> pwd;
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x03);
+
+            UInt32 teamId2 = teamCopyManager->joinTeam(player, teamId, pwd);
+            st << teamId2;
+
+            player->send(st);
+        }
+        break;
+    case 0x4:
+        {
+            teamCopyManager->leaveTeam(player);
+        }
+        break;
+    case 0x10:
+        {
+            teamCopyManager->reqTeamInfo(player);
+        }
+        break;
+    case 0x11:
         {
             UInt64 playerId = 0;
             br >> playerId;
             teamCopyManager->handoverLeader(player, playerId);
         }
         break;
-    case 12:
+    case 0x12:
         {
             UInt64 playerId = 0;
             br >> playerId;
             teamCopyManager->teamKick(player, playerId);
         }
         break;
-    case 13:
+    case 0x13:
         {
             UInt8 idx0 = 0;
             UInt8 idx1 = 0;
@@ -3522,7 +3540,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             teamCopyManager->reQueueTeam(player, idx0, idx1, idx2);
         }
         break;
-    case 14:
+    case 0x14:
         {
             teamCopyManager->teamBattleStart(player);
         }
