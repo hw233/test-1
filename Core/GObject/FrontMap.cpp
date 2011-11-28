@@ -49,11 +49,11 @@ UInt8 FrontMap::getFreeCount()
 
 UInt8 FrontMap::getGoldCount(UInt8 vipl)
 {
-    if (vipl == 2)
+    if (vipl == 1)
         return 1;
-    if (vipl == 3)
+    if (vipl == 2)
         return 2;
-    if (vipl >= 4)
+    if (vipl >= 3)
         return 3;
     return 0;
 }
@@ -521,8 +521,18 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     return;
                 }
 
-                if (pl->getVipLevel() < 9)
+                if (pl->getVipLevel() < 7)
                     return;
+
+                if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGold())
+                {
+                    pl->sendMsgCode(0, 1101);
+                    return;
+                }
+
+                ConsumeInfo ci(AutoFrontMapComplete,0,0);
+                pl->useGold(GData::moneyNeed[GData::FRONTMAP_IM].gold, &ci);
+                pl->addCopyCompleteGold(GData::moneyNeed[GData::FRONTMAP_IM].gold);
 
                 std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
                 if (!tmp.size())

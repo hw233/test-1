@@ -491,7 +491,7 @@ void AthleticsRank::RequestPageNum(Player* player)
     }
     Rank rank = found->second;
     UInt16 rankpos = getRankPos(row, rank);
-    if(rankpos <=10)
+    if(rankpos <=500)
         return;
 
     if(( (*rank)->pageNum *10 + 11) >= rankpos) 

@@ -667,7 +667,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 		if(left >= duration)
 		{
 			if(!hasP2)
-				exp *= 1.5f;
+				exp *= 1.6f; // XXX: 1.5f
 			player->setBuffData(PLAYER_BUFF_TRAINP2, p - duration);
 		}
 		else
@@ -687,7 +687,7 @@ void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
 		if(left >= duration)
 		{
 			if(!hasP2)
-				exp *= 1.3f;
+				exp *= 1.3f; // XXX: 1.2f
 			player->setBuffData(PLAYER_BUFF_TRAINP1, p - duration);
 		}
 		else
