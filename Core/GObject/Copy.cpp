@@ -136,13 +136,13 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
-        if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
+        if (pl->getGoldOrCoupon() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
             pl->sendMsgCode(0, 1101);
             return 1;
         }
 
         ConsumeInfo ci(EnterCopy,0,0);
-        pl->useGold(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
+        pl->useGoldOrCoupon(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
 
         ++PLAYER_DATA(pl, copyGoldCnt);
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
@@ -498,12 +498,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                     if (mtype == 1)
                     {
-                        if (GData::moneyNeed[GData::COPY_AUTO].gold > pl->getGold()) {
+                        if (GData::moneyNeed[GData::COPY_AUTO].gold > pl->getGoldOrCoupon()) {
                             pl->sendMsgCode(0, 1104);
                             return;
                         } else {
                             ConsumeInfo ci(EnterCopy,0,0);
-                            pl->useGold(GData::moneyNeed[GData::COPY_AUTO].gold, &ci);
+                            pl->useGoldOrCoupon(GData::moneyNeed[GData::COPY_AUTO].gold, &ci);
                         }
                     }
                     else
@@ -574,14 +574,14 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                 if (pl->getVipLevel() < 6)
                     return;
 
-                if (GData::moneyNeed[GData::COPY_IM].gold > pl->getGold())
+                if (GData::moneyNeed[GData::COPY_IM].gold > pl->getGoldOrCoupon())
                 {
                     pl->sendMsgCode(0, 1101);
                     return;
                 }
 
                 ConsumeInfo ci(AutoCopyComplete,0,0);
-                pl->useGold(GData::moneyNeed[GData::COPY_IM].gold, &ci);
+                pl->useGoldOrCoupon(GData::moneyNeed[GData::COPY_IM].gold, &ci);
                 pl->addCopyCompleteGold(GData::moneyNeed[GData::COPY_IM].gold);
 
                 autoClear(pl);

@@ -590,15 +590,15 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
                     ConsumeInfo ci(DungeonAutoConsume, 0, 0);
                     if(World::_wday == 5)
                     {
-                        if(player->getGold() < GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2)
+                        if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2)
                             return;
-                        player->useGold(GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2, &ci);
+                        player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2, &ci);
                     }
                     else
                     {
-                        if(player->getGold() < GData::moneyNeed[GData::DUNGEON_AUTO].gold)
+                        if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold)
                             return;
-                        player->useGold(GData::moneyNeed[GData::DUNGEON_AUTO].gold, &ci);
+                        player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold, &ci);
                     }
                 }
                 else
@@ -689,7 +689,8 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
-	UInt32 maxCount = player->getCoupon() + player->getGold();
+    if (player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_IM].gold)
+        return;
 	UInt32 count = 0;
 
     ConsumeInfo ci(DungeonAutoConsume, 0, 0);
@@ -708,10 +709,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 				DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
                 return;
 			}
-			if(count < maxCount)
-				won = doChallenge(player, it->second, false, NULL);
-			else
-				break;
+            won = doChallenge(player, it->second, false, NULL);
 		}
 		else
 		{

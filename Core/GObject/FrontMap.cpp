@@ -182,7 +182,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
                     pl->getId(), id);
             ret = 0;
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
-            if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
+            if (pl->getGoldOrCoupon() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
                 Stream st(REP::FORMATTON_INFO);
                 st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
                 pl->send(st);
@@ -198,7 +198,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ret = 0;
 
             ConsumeInfo ci(EnterFrontMap,0,0);
-            pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
+            pl->useGoldOrCoupon(20*PLAYER_DATA(pl, frontGoldCnt));
         } else {
             // XXX:
             return;
@@ -460,12 +460,12 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                     if (mtype == 1)
                     {
-                        if (GData::moneyNeed[GData::FRONTMAP_AUTO].gold > pl->getGold()) {
+                        if (GData::moneyNeed[GData::FRONTMAP_AUTO].gold > pl->getGoldOrCoupon()) {
                             pl->sendMsgCode(0, 1104);
                             return;
                         } else {
                             ConsumeInfo ci(EnterFrontMap,0,0);
-                            pl->useGold(GData::moneyNeed[GData::FRONTMAP_AUTO].gold, &ci);
+                            pl->useGoldOrCoupon(GData::moneyNeed[GData::FRONTMAP_AUTO].gold, &ci);
                         }
                     }
                     else
@@ -537,14 +537,14 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 if (pl->getVipLevel() < 7)
                     return;
 
-                if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGold())
+                if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGoldOrCoupon())
                 {
                     pl->sendMsgCode(0, 1101);
                     return;
                 }
 
                 ConsumeInfo ci(AutoFrontMapComplete,0,0);
-                pl->useGold(GData::moneyNeed[GData::FRONTMAP_IM].gold, &ci);
+                pl->useGoldOrCoupon(GData::moneyNeed[GData::FRONTMAP_IM].gold, &ci);
                 pl->addCopyCompleteGold(GData::moneyNeed[GData::FRONTMAP_IM].gold);
 
                 std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
