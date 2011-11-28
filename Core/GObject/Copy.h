@@ -50,7 +50,7 @@ public:
     UInt8 getCopySize(Player* pl);
     void buildInfo(Player* pl, Stream& st);
 
-    void autoBattle(Player* pl, UInt8 id, UInt8 type, bool = false);
+    void autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype = 0, bool = false);
     void failed(Player* pl, UInt8 id);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);

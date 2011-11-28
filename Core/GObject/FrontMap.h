@@ -49,7 +49,7 @@ public:
     void buildInfo(Player* pl, Stream& st);
 
     bool checkLevel(Player* pl, UInt8 id);
-    void autoBattle(Player* pl, UInt8 id, UInt8 type, bool = false);
+    void autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype = 0, bool = false);
     void sendAutoFrontMap(Player* pl);
 
     void addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UInt8 status, UInt8 lootlvl);

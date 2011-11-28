@@ -1141,6 +1141,20 @@ namespace GObject
 		}
 
 		UInt32 curtime = TimeUtil::Now();
+
+        if (World::_thanksgiving)
+        {
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online + curtime - _playerData.lastOnline >= TGD_ONLINE_TIME)
+                    GameAction()->onThanksgivingDay(this);
+                else
+                    SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
+            }
+        }
+
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
 		//_playerData.lastOnline = curtime; // XXX: 在线时间统计问题
 		writeOnlineRewardToDB();
@@ -6485,9 +6499,9 @@ namespace GObject
 		send(st);
     }
 
-    void Player::startAutoCopy(UInt8 id)
+    void Player::startAutoCopy(UInt8 id, UInt8 mtype = 0)
     {
-        playerCopy.autoBattle(this, id, 0);
+        playerCopy.autoBattle(this, id, 0, mtype);
     }
 
     void Player::cancelAutoCopy(UInt8 id)
@@ -6505,9 +6519,9 @@ namespace GObject
         playerCopy.sendAutoCopy(this);
     }
 
-    void Player::startAutoFrontMap(UInt8 id)
+    void Player::startAutoFrontMap(UInt8 id, UInt8 mtype = 0)
     {
-        frontMap.autoBattle(this, id, 0);
+        frontMap.autoBattle(this, id, 0, mtype);
     }
 
     void Player::cancelAutoFrontMap(UInt8 id)

@@ -1187,6 +1187,11 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             return false;
         }
 
+        if (!pd1->player->hasFlag(Player::InHeroIsland))
+        {
+            return false;
+        }
+
         int turns = 0;
         bool res = player->challenge(pd1->player, NULL, &turns, false, 0, true, Battle::BS_COPY5, pd->ato==1?0x00:0x01);
         if (cfg.GMCheck)
@@ -1585,26 +1590,11 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return;
 
-#if 0
-    if (spot)
-    {
-        pd = leave(pd, spot, pos);
-        if (pd)
-        {
-            pd->spot = 0;
-            player->setHISpot(0);
-            _players[0].push_back(pd);
-        }
-    }
-    else
-    {
-        if (_nplayers[0])
-            --_nplayers[0];
-    }
-#else
+    Stream st(REP::HERO_ISLAND);
+    st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
+    broadcast(st, pd->spot);
     if (_nplayers[spot])
         --_nplayers[spot];
-#endif
 
     clearBuff(1, pd, 0);
     clearBuff(2, pd, 0); // XXX: must before reset

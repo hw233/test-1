@@ -812,12 +812,12 @@ namespace GObject
 		void sendOnlineReward();
 		void sendDailyInfo();
 
-        void startAutoCopy(UInt8 id);
+        void startAutoCopy(UInt8 id, UInt8 mtype);
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
         void sendAutoCopy();
 
-        void startAutoFrontMap(UInt8 id);
+        void startAutoFrontMap(UInt8 id, UInt8 mtype);
         void cancelAutoFrontMap(UInt8 id);
         void instantAutoFrontMap(UInt8 id);
         void sendAutoFrontMap();

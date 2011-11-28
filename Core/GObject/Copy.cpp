@@ -472,7 +472,7 @@ void PlayerCopy::failed(Player* pl, UInt8 id)
     pl->send(st);
 }
 
-void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
+void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool init)
 {
     if (!pl || !id)
         return;
@@ -480,6 +480,10 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
     switch (type) {
         case 0:
             {
+                CopyData& tcd = getCopyData(pl, id);
+                if (!tcd.floor)
+                    return;
+
                 if (!init) {
                     if (pl->hasFlag(Player::AutoCopy)) {
                         pl->sendMsgCode(0, 1414);
@@ -492,21 +496,26 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     if (!copyCheckLevel(pl, id))
                         return;
 
-                    if (GData::moneyNeed[GData::COPY_AUTO1+id-1].tael > pl->getTael()) {
-                        pl->sendMsgCode(0, 1100);
-                        return;
-                    } else {
-                        ConsumeInfo ci(EnterCopy,0,0);
-                        pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael, &ci);
+                    if (mtype == 1)
+                    {
+                        if (GData::moneyNeed[GData::COPY_AUTO].gold > pl->getGold()) {
+                            pl->sendMsgCode(0, 1104);
+                            return;
+                        } else {
+                            ConsumeInfo ci(EnterCopy,0,0);
+                            pl->useGold(GData::moneyNeed[GData::COPY_AUTO].gold, &ci);
+                        }
                     }
-                }
-
-                CopyData& tcd = getCopyData(pl, id);
-                if (!tcd.floor) {
-                    tcd.floor = 1;
-                    tcd.spot = 1;
-                    DB3().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)",
-                            pl->getId(), id, tcd.floor, tcd.spot);
+                    else
+                    {
+                        if (GData::moneyNeed[GData::COPY_AUTO1+id-1].tael > pl->getTael()) {
+                            pl->sendMsgCode(0, 1100);
+                            return;
+                        } else {
+                            ConsumeInfo ci(EnterCopy,0,0);
+                            pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael, &ci);
+                        }
+                    }
                 }
 
                 UInt8 floors = 0;
