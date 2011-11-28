@@ -3024,15 +3024,16 @@ UInt32 Clan::CheckJoinRankBattle(UInt32 now, std::map<UInt32, std::vector<Player
     for(Members::const_iterator iter = _members.begin();
             iter != _members.end(); ++iter)
     {
+        ClanMember* mem = *iter;
         //当天报名的
-        if(TimeUtil::SharpDayT(0,(*iter)->signupRankBattleTime) == dayBegin)
+        if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) == dayBegin)
         {
             ++num;
-            list[(*iter)->rankBattleField].push_back((*iter)->player);
+            list[mem->rankBattleField].push_back(mem->player);
         }
     }
     
-    if(num > RANK_BATTLE_MIN_SIGNUP_NUM) return 2;
+    if(num >= RANK_BATTLE_MIN_SIGNUP_NUM) return 2;
     else if(num > 0) return 1;
     return 0;
 }

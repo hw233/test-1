@@ -366,7 +366,6 @@ namespace GObject
     {
         if(clan != m_Clan1 && clan != m_Clan2) return;
 
-
         PlayerVec& players = m_WaitPlayers[clan];
         for(PlayerVec::iterator iter = players.begin();
                 iter != players.end(); ++iter)
@@ -524,10 +523,16 @@ namespace GObject
         
             Broadcast(stream1, true);
         }
+
+        m_Clan1->battle = this;
+        m_Clan2->battle = this;
     }
 
     void ClanRankBattle::End()
     {
+        m_Clan1->battle = NULL;
+        m_Clan2->battle = NULL;
+
         if(m_State == STATE_PREPARE) return;
 
         //结算积分
@@ -708,6 +713,8 @@ namespace GObject
         m_BattleNo = 0;
         m_Now = 0;
         m_expTime = 0;
+
+        memset(m_Skills, 0, sizeof(m_Skills));
     }
 
     ClanRankBattleMgr::~ClanRankBattleMgr()
@@ -727,10 +734,12 @@ namespace GObject
         else if(m_Now < m_StartTime + RANK_BATTLE_SIGNUP_TIME) //报名时间
         {
             m_State = STATE_SIGNUP;
+            //倒计时
             m_SignupCountDown = (m_StartTime + RANK_BATTLE_SIGNUP_TIME - m_Now) / 60;
         }
         else if(m_Now < m_StartTime + RANK_BATTLE_SIGNUP_TIME + FULL_BATTLE_TIME * 3) //战斗时间
         {
+            //获取有资格的帮会
             GetCanBattleClans(false);
 
             m_State = STATE_BATTLE;
@@ -744,6 +753,7 @@ namespace GObject
 
         SortClans();
 
+        //获取技能buff配置
         Table buffs = GameAction()->GetClanBattleBuffs();
         size_t buffNum = buffs.size();
         for(UInt32 i = 0; i < buffNum && i < RANK_BATTLE_SKILL_NUM; ++i)
@@ -1304,7 +1314,7 @@ namespace GObject
     {
         if(now >= m_StartTime)
         {
-            //切换到报名状态
+            //切换到报名状态，初始10次倒计时
             m_SignupCountDown = RANK_BATTLE_SIGNUP_TIME / 60;
             m_State = STATE_SIGNUP;
             SyncState();
@@ -1314,7 +1324,7 @@ namespace GObject
             //新的一周重新设置积分和排名
             if(TimeUtil::GetWeekDay(m_Now) == 7 && TimeUtil::GetWeekDay(now) == 1)
             {
-                //清空原积分
+                //清空原积分排名
                 class ClearClanVisitor : public Visitor<Clan>
                 {
                 public:
@@ -1339,6 +1349,9 @@ namespace GObject
                 {
                     (*iter)->SetBattleRanking(++rank);
                 }
+
+                //清空本周积分排行
+                m_ClanRanking.clear();
             }
         }
     }
@@ -1378,7 +1391,7 @@ namespace GObject
             {
                 //第二天战斗开始时间
                 m_Clans.clear();
-                m_StartTime = TimeUtil::SharpDayT(1, now) + RANK_BATTLE_SIGNUP_BEGINTIME;
+                m_StartTime = m_StartTime + 24 * 60 * 60;
                 m_State = STATE_INIT;
                 SyncState();
 
@@ -1462,6 +1475,7 @@ namespace GObject
     {
         typedef std::vector<ClanRankBattleInfo*> InfoVec;
 
+        //根据当前积分排序
         InfoVec clans;
         for(ClanMap::iterator iter = m_Clans.begin();
                 iter != m_Clans.end(); ++iter)
@@ -1508,12 +1522,6 @@ namespace GObject
 
     void ClanRankBattleMgr::EndOneBattle()
     {
-        for(ClanMap::iterator iter = m_Clans.begin();
-                iter != m_Clans.end(); ++iter)
-        {
-            iter->second.battle = NULL;
-        }
-
         for(BattleVec::iterator iter = m_Battles.begin();
                 iter != m_Battles.end(); ++iter)
         {
@@ -1531,8 +1539,6 @@ namespace GObject
         if(battle == NULL) return false;
         battle->Start(m_Now);
         m_Battles.push_back(battle);
-        clan1->battle = battle;
-        clan2->battle = battle;
 
         return true;
     }
