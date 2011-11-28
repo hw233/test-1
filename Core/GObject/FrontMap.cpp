@@ -437,7 +437,7 @@ void FrontMap::addPlayer(UInt64 playerId, UInt8 id, UInt8 spot, UInt8 count, UIn
     tmp[spot].lootlvl = lootlvl;
 }
 
-void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
+void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool init)
 {
     if (!pl || !id)
         return;
@@ -458,12 +458,25 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, bool init)
                     if (!checkLevel(pl, id))
                         return;
 
-                    if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael > pl->getTael()) {
-                        pl->sendMsgCode(0, 1100);
-                        return;
-                    } else {
-                        ConsumeInfo ci(EnterFrontMap,0,0);
-                        pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
+                    if (mtype == 1)
+                    {
+                        if (GData::moneyNeed[GData::FRONTMAP_AUTO].gold > pl->getGold()) {
+                            pl->sendMsgCode(0, 1104);
+                            return;
+                        } else {
+                            ConsumeInfo ci(EnterFrontMap,0,0);
+                            pl->useGold(GData::moneyNeed[GData::FRONTMAP_AUTO].gold, &ci);
+                        }
+                    }
+                    else
+                    {
+                        if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael > pl->getTael()) {
+                            pl->sendMsgCode(0, 1100);
+                            return;
+                        } else {
+                            ConsumeInfo ci(EnterFrontMap,0,0);
+                            pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
+                        }
                     }
                 }
 

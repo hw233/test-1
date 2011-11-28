@@ -74,10 +74,10 @@ public:
 	void playerJump(Player *, UInt8);
 	void startChallenge(Player *);
 	void sendAutoChallengeStart(Player *);
-	void processAutoChallenge(Player *, UInt8, UInt32 *);
+	void processAutoChallenge(Player *, UInt8, UInt32 *, UInt8 = 0);
 	void cancelAutoChallengeNotify(Player *, UInt32);
 	void completeAutoChallenge(Player *, UInt32, bool);
-	void autoChallenge(Player *);
+	void autoChallenge(Player *, UInt8 = 0);
 	void pushChallenge(Player *, UInt32, bool);
 	void sendDungeonInfo(Player *);
 	void sendMyLootInfo(Player *);
