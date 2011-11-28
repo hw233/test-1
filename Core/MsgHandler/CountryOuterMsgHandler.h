@@ -3472,6 +3472,12 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 5:
         {
+            bool res = 0;
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x05);
+
+            UInt8 resCopyId = 0;
+            UInt8 resT = 0;
             UInt8 type = 0;
             br >> type;
             if(type == 0)
@@ -3479,10 +3485,18 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
                 UInt8 copyId = 0;
                 UInt8 t = 0;
                 br >> copyId >> t;
-                teamCopyManager->enterTeamCopy(player, copyId, t);
+                res = teamCopyManager->enterTeamCopy(player, copyId, t);
+                if(res)
+                {
+                    resCopyId = copyId;
+                    resT = t;
+                }
             }
             else
-                teamCopyManager->leaveTeamCopy(player);
+                res = teamCopyManager->leaveTeamCopy(player);
+
+            st << resCopyId << resT;
+            player->send(st);
         }
         break;
     case 11:
@@ -3503,8 +3517,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         {
             UInt8 idx0 = 0;
             UInt8 idx1 = 0;
-            br >> idx0 >> idx1;
-            teamCopyManager->reQueueTeam(player, idx0, idx1);
+            UInt8 idx2 = 0;
+            br >> idx0 >> idx1 >> idx2;
+            teamCopyManager->reQueueTeam(player, idx0, idx1, idx2);
         }
         break;
     case 14:

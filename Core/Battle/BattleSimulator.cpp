@@ -803,7 +803,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             {
                 passiveSkillInj = passiveSkill;
             }
-            else
+            else if(bf->getHP() > 0)
             {
                 AttackAct aa = {0};
                 aa.bf = bo;
@@ -826,7 +826,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             {
                 passiveSkillInj = passiveSkill;
             }
-            else
+            else if(bf->getHP() > 0)
             {
                 AttackAct aa = {0};
                 aa.bf = bo;
@@ -850,7 +850,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             atkAct->push_back(aa);
         }
 
-        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg && bo->getHP() > 0)
+        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg && bf->getHP() > 0)
         {
             AttackAct aa = {0};
             aa.bf = bo;
