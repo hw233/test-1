@@ -342,7 +342,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                     if (size) {
                         UInt8 rsize = loot[0];
                         if (rsize != size/2) {
-                            st << static_cast<UInt8>(6); // 5???
+                            st << static_cast<UInt8>(5);
                         } else {
                             st << static_cast<UInt8>(3);
                         }

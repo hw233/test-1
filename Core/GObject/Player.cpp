@@ -2231,8 +2231,8 @@ namespace GObject
 
     void Player::autoCopyFailed(UInt8 id)
     {
-        GObject::playerCopy.failed(this, id);
-        setCopyFailed();
+        //GObject::playerCopy.failed(this, id);
+        //setCopyFailed();
     }
 
     bool Player::attackRareAnimal(UInt32 id)
@@ -6563,15 +6563,37 @@ namespace GObject
             useGold(pfexp->goldUse,&ci);
         }
 
+        UInt32 now = TimeUtil::Now();
+        UInt32 duration = 60*60;
+        UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
+        UInt32 left = 0;
+        if (p > 0)
+            left = p - now;
+
         for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
         {
             Fighter* fgt = findFighter(pfexp->fids[i]);
             if(fgt && pfexp->counts[i])
             {
-                fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                if(left >= duration || left)
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i] * 1.2f); 
+                }
+                else
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                }
             }
         }
-
+        if (left >= duration)
+        {
+            left -= duration;
+            setBuffData(PLAYER_BUFF_PROTECT, left+now);
+        }
+        else if (left)
+        {
+            setBuffData(PLAYER_BUFF_PROTECT, 0);
+        }
     }
 
     void Player::RollYDGem()
