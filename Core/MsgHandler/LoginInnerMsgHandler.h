@@ -6,6 +6,8 @@
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
 
+static unsigned long long failed_cnt = 0;
+
 void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
 {
     struct Key
@@ -62,8 +64,11 @@ void OnCheckPackKey( LoginMsgHdr& hdr, const void * data )
         if (ret == 1)
         {
             TRACE_LOG("key: %s, rc: %u", key->key, rc);
-            uninitMemcache();
-            initMemcache();
+            if (rc == MEMCACHED_HOST_LOOKUP_FAILURE || rc == MEMCACHED_NO_SERVERS || rc == MEMCACHED_SERVER_ERROR || MEMCACHED_SERVER_MARKED_DEAD)
+            {
+                uninitMemcache();
+                initMemcache();
+            }
         }
 
         if (key->player)
