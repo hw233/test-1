@@ -1036,7 +1036,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         {
             defList[defCount].damType = e_Res;
             idx = 0;
-            while(NULL != (passiveSkill = target_bo->getPassiveSkillAftRes100(idx)));
+            while(NULL == (passiveSkill = target_bo->getPassiveSkillAftRes100(idx)));
 
             if( passiveSkill == NULL)
                 passiveSkill = target_bo->getPassiveSkillAftRes();
@@ -2405,8 +2405,7 @@ UInt32 BattleSimulator::doAttack( int pos )
 
     insertFighterStatus(bf);
 
-    do
-    {
+    do {
         if(stun > 0)
         {
             break;
@@ -3728,6 +3727,8 @@ void BattleSimulator::setStatusChange( UInt8 side, UInt8 pos, int cnt, UInt16 sk
 					sc.pos += 25;
 				sc.statusId = skillId;
 				sc.type = type;
+                if(last != 0xFFFF)
+                    ++last;
 				switch(type)
 				{
                 case e_stAtk:

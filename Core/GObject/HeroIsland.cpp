@@ -467,6 +467,10 @@ void HeroIsland::applayPlayers()
         for (size_t i = 0; i < sz; ++i)
         {
             HIPlayerData* pd = _players[j][i];
+
+            if (pd && pd->player && !pd->player->hasFlag(Player::InHeroIsland))
+                continue;
+
             if (!j && pd && pd->player && pd->injuredcd <= now)
             {
                 pd->player->regenAll(true);

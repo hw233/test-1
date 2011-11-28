@@ -506,18 +506,6 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 
 	if(noreport)
 	{
-		if(r && gold > 0)
-		{
-			ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-			UInt16 gold_ = player->useGoldOrCoupon(gold, &ci);
-			if(online)
-			{
-				Stream st_(REP::COPY_END_FIGHT);
-				st_ << static_cast<UInt8>(0) << gold_ << static_cast<UInt16>(gold - gold_) << Stream::eos;
-				player->send(st_);
-			}
-		}
-
 		if(online)
 		{
 			Stream st(REP::COPY_AUTO_FIGHT);
@@ -606,13 +594,19 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
                     GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
                 };
 
-				if(player->getTael() < taelReq[_id])
-					break;
 				ConsumeInfo ci(DungeonAutoConsume, 0, 0);
 				if(World::_wday == 5)
+                {
+                    if(player->getTael() < taelReq[_id] / 2)
+                        return;
 					player->useTael(taelReq[_id] / 2, &ci);
+                }
 				else
+                {
+                    if(player->getTael() < taelReq[_id])
+                        return;
 					player->useTael(taelReq[_id], &ci);
+                }
 			}
 			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(REP::COPY_AUTO_FIGHT);
@@ -678,9 +672,15 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 		return;
 	UInt32 maxCount = player->getCoupon() + player->getGold();
 	UInt32 count = 0;
+
+    ConsumeInfo ci(DungeonAutoConsume, 0, 0);
+    UInt16 gold = player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_IM].gold, &ci);
+    Stream st_(REP::COPY_END_FIGHT);
+    st_ << static_cast<UInt8>(0) << gold << static_cast<UInt16>(GData::moneyNeed[GData::DUNGEON_IM].gold - gold) << Stream::eos;
+    player->send(st_);
+
 	while(1)
 	{
-		count += GData::moneyNeed[GData::DUNGEON_IM].gold;
 		if(won)
 		{
 			if(advanceLevel(player, it->second, true, &exp, count))
@@ -697,11 +697,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 		else
 		{
 			player->delFlag(Player::AutoDungeon);
-			ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-			UInt16 gold = player->useGoldOrCoupon(count, &ci);
-			Stream st_(REP::COPY_END_FIGHT);
-			st_ << static_cast<UInt8>(0) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
-			player->send(st_);
+
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
@@ -709,11 +705,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
             return;
 		}
 	}
-	ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-	UInt16 gold = player->useGoldOrCoupon(count, &ci);
-	Stream st_(REP::COPY_END_FIGHT);
-	st_ << static_cast<UInt8>(1) << gold << static_cast<UInt16>(count - gold) << Stream::eos;
-	player->send(st_);
+
 	processAutoChallenge(player, 3, &exp);
 }
 
