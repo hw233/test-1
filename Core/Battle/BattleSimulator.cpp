@@ -955,7 +955,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         {
             defList[defCount].damType = e_Res;
             idx = 0;
-            while(NULL != (passiveSkill = target_bo->getPassiveSkillAftRes100(idx)));
+            while(NULL == (passiveSkill = target_bo->getPassiveSkillAftRes100(idx)));
 
             if( passiveSkill == NULL)
                 passiveSkill = target_bo->getPassiveSkillAftRes();
