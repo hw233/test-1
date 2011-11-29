@@ -1945,6 +1945,10 @@ void HeroIsland::saveAtoCfg(Player* player, const std::string& cfg)
 {
     if (!player || !cfg.length())
         return;
+
+    if (player->getVipLevel() < 3)
+        return;
+
     player->setAtoHICfg(cfg);
     DB3().PushUpdateData("UPDATE `player` set `atohicfg` = '%s' WHERE `id` = %"I64_FMT"u", cfg.c_str(), player->getId());
 }
@@ -1967,6 +1971,9 @@ void HeroIsland::setAto(Player* player, UInt8 onoff)
         return;
 
     if (!player->hasFlag(Player::InHeroIsland))
+        return;
+
+    if (player->getVipLevel() < 3)
         return;
 
     UInt8 spot = player->getHISpot();

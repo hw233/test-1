@@ -361,6 +361,9 @@ void PlayerCopy::reset(Player* pl, UInt8 id)
 
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);
+
+    if (pl->hasFlag(Player::AutoCopy))
+        autoClear(pl);
 }
 
 void PlayerCopy::addPlayer(UInt64 playerId, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl)
