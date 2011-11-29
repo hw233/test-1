@@ -39,7 +39,7 @@ namespace GObject
 
         bool HasPlayer(Player* player);
         UInt32 GetBattleField(Player* player);
-        void RemovePlayer(Player* player);
+        void RemovePlayer(Player* player, UInt32 field = UInt32(-1));
         void AddPlayer(Player* player, UInt32 field);
         UInt32 GetMinPlayerField();
         UInt32 GetPlayerNum();
@@ -330,9 +330,9 @@ namespace GObject
         void SendRewards(Player* player);
 
     private:
-        void ProcessInit(UInt32 now);
-        void ProcessSignup(UInt32 now);
-        void ProcessBattle(UInt32 now);
+        void ProcessInit(bool bWeekChange);
+        void ProcessSignup();
+        void ProcessBattle();
 
     private:
         /**
@@ -374,7 +374,7 @@ namespace GObject
     private:
         //当前状态
         BattleState m_State;
-        //当天时间
+        //当前时间
         UInt32 m_Now;
         //帮会战开始时间(包括报名准备阶段)
         UInt32 m_StartTime;

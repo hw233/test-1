@@ -49,21 +49,34 @@ namespace GObject
         return false;
     }
 
-    void ClanRankBattleInfo::RemovePlayer(Player* player)
+
+#define REMOVE_PLAYER_IN_LIST(List, Player) \
+    do{ \
+        for(PlayerVec::iterator iter = List.begin(); \
+            iter != List.end(); ++iter){ \
+            if(*iter == Player) { \
+                list.erase(iter); \
+                return; \
+            } \
+        } \
+    }while(false);
+ 
+
+    void ClanRankBattleInfo::RemovePlayer(Player* player, UInt32 field)
     {
-        for(PlayerMap::iterator iter = players.begin();
-                iter != players.end(); ++iter)
+        if(field >= RANK_BATTLE_FIELD_NUM)
         {
-            PlayerVec& list = iter->second;
-            for(PlayerVec::iterator iter2 = list.begin();
-                    iter2 != list.end(); ++iter2)
+            for(PlayerMap::iterator iter = players.begin();
+                iter != players.end(); ++iter)
             {
-                if(*iter2 == player)
-                {
-                    list.erase(iter2);
-                    return;
-                }
+                PlayerVec& list = iter->second;
+                REMOVE_PLAYER_IN_LIST(list, player)
             }
+        }
+        else
+        {
+            PlayerVec& list = players[field];
+            REMOVE_PLAYER_IN_LIST(list, player)
         }
      }
 
@@ -791,28 +804,30 @@ namespace GObject
 
     void ClanRankBattleMgr::Process(UInt32 now)
     {
+        UInt32 oldTime = m_Now;
+        m_Now = now;
+        
         switch(m_State)
         {
             case STATE_INIT:
                 {
-                    ProcessInit(now);
+                    bool bWeekChange = TimeUtil::GetWeekDay(oldTime) == 7 && TimeUtil::GetWeekDay(m_Now) == 1;
+                    ProcessInit(bWeekChange);
                 }
                 break;
             case STATE_SIGNUP:
                 {
-                    ProcessSignup(now);
+                    ProcessSignup();
                     CheckAddExp();
                 }
                 break;
             case STATE_BATTLE:
                 {
-                    ProcessBattle(now);
+                    ProcessBattle();
                     CheckAddExp();
                 }
                 break;
         }
-        
-        m_Now = now;
     }
 
     void ClanRankBattleMgr::Signup(Player* player, UInt32 fieldId)
@@ -1025,10 +1040,16 @@ namespace GObject
         PlayerVec& players = pInfo->players[field];
         if(pos == 0 || pos > players.size()) return;
 
+        if(players.size() >= 30)
+        {
+            SYSMSG_SENDV(2234, player, 30);
+            return;
+        }
+
         UInt32 oldField = clan->AdjustRankBattleField(member, field, m_Now);
         if(oldField >= RANK_BATTLE_FIELD_NUM) return;
 
-        pInfo->RemovePlayer(member);
+        pInfo->RemovePlayer(member, oldField);
 
         PlayerVec::iterator posIter = players.begin();
         while(--pos > 0) ++posIter;
@@ -1310,9 +1331,9 @@ namespace GObject
         //TODO
     }
 
-    void ClanRankBattleMgr::ProcessInit(UInt32 now)
+    void ClanRankBattleMgr::ProcessInit(bool bWeekChange)
     {
-        if(now >= m_StartTime)
+        if(m_Now >= m_StartTime)
         {
             //切换到报名状态，初始10次倒计时
             m_SignupCountDown = RANK_BATTLE_SIGNUP_TIME / 60;
@@ -1322,7 +1343,7 @@ namespace GObject
         else
         {
             //新的一周重新设置积分和排名
-            if(TimeUtil::GetWeekDay(m_Now) == 7 && TimeUtil::GetWeekDay(now) == 1)
+            if(bWeekChange)
             {
                 //清空原积分排名
                 class ClearClanVisitor : public Visitor<Clan>
@@ -1356,19 +1377,19 @@ namespace GObject
         }
     }
 
-    void ClanRankBattleMgr::ProcessSignup(UInt32 now)
+    void ClanRankBattleMgr::ProcessSignup()
     {
         if(m_SignupCountDown > 0)
         {
             //报名倒计时
-            if(now >= m_StartTime + RANK_BATTLE_SIGNUP_TIME - m_SignupCountDown * 60
+            if(m_Now >= m_StartTime + RANK_BATTLE_SIGNUP_TIME - m_SignupCountDown * 60
                     && (m_SignupCountDown == 5 || m_SignupCountDown == 1))
             {
                 SYSMSG_BROADCASTV( 2210, m_SignupCountDown);
                 --m_SignupCountDown;
             }
         }
-        else if(now >= m_StartTime + RANK_BATTLE_SIGNUP_TIME) //战斗开始
+        else if(m_Now >= m_StartTime + RANK_BATTLE_SIGNUP_TIME) //战斗开始
         {
             SYSMSG_BROADCAST(2211);
 
@@ -1381,9 +1402,9 @@ namespace GObject
         }
     }
 
-    void ClanRankBattleMgr::ProcessBattle(UInt32 now)
+    void ClanRankBattleMgr::ProcessBattle()
     {
-        if(now >= m_StartTime + RANK_BATTLE_SIGNUP_TIME + m_BattleNo * FULL_BATTLE_TIME)
+        if(m_Now >= m_StartTime + RANK_BATTLE_SIGNUP_TIME + m_BattleNo * FULL_BATTLE_TIME)
         {
             EndOneBattle();
 
@@ -1396,7 +1417,7 @@ namespace GObject
                 SyncState();
 
                 //每周最后一场结束发邮件
-                if(TimeUtil::GetWeekDay(now) == 7)
+                if(TimeUtil::GetWeekDay(m_Now) == 7)
                 {
                     SysMsgItem* msg = globalSysMsg[2214];
                     UInt32 ranking = 0;
@@ -1459,7 +1480,7 @@ namespace GObject
         for(BattleVec::iterator iter = m_Battles.begin();
                 iter != m_Battles.end(); ++iter)
         {
-            (*iter)->Process(now);
+            (*iter)->Process(m_Now);
         }
     }
 

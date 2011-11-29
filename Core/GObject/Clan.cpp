@@ -3003,9 +3003,8 @@ UInt32 Clan::AdjustRankBattleField(Player* player, UInt32 field, UInt32 now)
             ++num;
         }
     }
-    if(num >= 30)
+    if(num >= 30) //目标战场超过了30人的限制
     {
-        //TODO 提示
         return UInt32(-1);
     }  
 
