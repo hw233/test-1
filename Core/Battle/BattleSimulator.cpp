@@ -1269,7 +1269,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].damage = 0;
                 defList[defCount].damType = e_Confuse;
                 bo->setConfuseLevel(SKILL_LEVEL(boSkill->getId()));
-                bo->setConfuseRound(boSkill->last);
+                bo->setConfuseRound(boSkill->last + 1);
             }
             break;
         case 4:
@@ -1278,7 +1278,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].damage = 0;
                 defList[defCount].damType = e_Stun;
                 bo->setStunLevel(SKILL_LEVEL(boSkill->getId()));
-                bo->setStunRound(boSkill->last);
+                bo->setStunRound(boSkill->last + 1);
             }
             break;
         case 8:
@@ -1287,7 +1287,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].damage = 0;
                 defList[defCount].damType = e_Forget;
                 bo->setForgetLevel(SKILL_LEVEL(boSkill->getId()));
-                bo->setForgetRound(boSkill->last);
+                bo->setForgetRound(boSkill->last + 1);
             }
             break;
         }
