@@ -344,9 +344,9 @@ namespace GObject
                         {
                             if(aidx < GObjectManager::getAttrChance(q, k))
                             {
-                                UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k) + (k == 7 ? 1 : 0);
+                                UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
                                 UInt32 tmp = uRand(100) + 1;
-                                float factor = GObjectManager::getAttrDics(q, k) + static_cast<float>(dics * tmp) / 100;
+                                UInt32 factor = GObjectManager::getAttrDics(q, k) + static_cast<float>(dics * tmp) / 100;
                                 if(equip_t == 0)
                                     v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
                                 else
@@ -2953,19 +2953,13 @@ namespace GObject
 
         ied_trump.trumpExp += exp;
         bool isRankUp = false;
+        bool newAttr2 = false;
         while(ied_trump.trumpExp >= rankUpExp)
         {
             ++ied_trump.tRank;
             if(ied_trump.tRank == 1)
             {
-                UInt8 lv = ied_trump.tRank;
-                if(q > 2)
-                {
-                    UInt8 t[3] = {0, 0, 0};
-                    Int16 v[3] = {0, 0, 0};
-                    getRandomAttr2(lv, crr, q1, 0, 0, t, v, 1);
-                    ApplyAttr2(trump, t, v);
-                }
+                newAttr2 = true;
             }
             isRankUp = true;
             rankUpExp = GObjectManager::getTrumpExpRank(q-2, ied_trump.tRank);
@@ -2976,6 +2970,18 @@ namespace GObject
             }
         }
 
+        if(newAttr2)
+        {
+            UInt8 lv = ied_trump.tRank;
+            if(q > 2)
+            {
+                UInt8 t[3] = {0, 0, 0};
+                Int16 v[3] = {0, 0, 0};
+                getRandomAttr2(lv, crr, q1, 0, 0, t, v, 1);
+                ApplyAttr2(trump, t, v);
+            }
+        }
+
         if(oldlv != ied_trump.tRank && q > 2 && oldlv > 0)
         {
             Int16 values2[3] = {0};
@@ -2983,17 +2989,30 @@ namespace GObject
             if(maxv[0] > 0.00001)
             {
                 float v = GObjectManager::getTrumpAttrMax(lv, types[0]-1, q1, crr);
-                values2[0] = v * (values[0] / maxv[0]);
+                float tmp = (v * static_cast<float>(values[0])) / maxv[0] + 0.9;
+                if(tmp > v * 100)
+                    values2[0] = v * 100;
+                else
+                    values2[0] = tmp;
+
             }
             if(maxv[1] > 0.00001)
             {
                 float v = GObjectManager::getTrumpAttrMax(lv, types[1]-1, q1, crr);
-                values2[1] = v * (values[1] / maxv[1]);
+                float tmp = (v * static_cast<float>(values[1])) / maxv[1] + 0.9;
+                if(tmp > v * 100)
+                    values2[1] = v * 100;
+                else
+                    values2[1] = tmp;
             }
             if(maxv[2] > 0.00001)
             {
                 float v = GObjectManager::getTrumpAttrMax(lv, types[2]-1, q1, crr);
-                values2[2] = v * (values[2] / maxv[2]);
+                float tmp = (v * static_cast<float>(values[2])) / maxv[2] + 0.9;
+                if(tmp > v * 100)
+                    values2[2] = v * 100;
+                else
+                    values2[2] = tmp;
             }
             ApplyAttr2(trump, types, values2);
         }
