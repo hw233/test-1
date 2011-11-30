@@ -283,6 +283,10 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
     UInt8 t = ctp.t;
+
+    if(pl->getTeamData() != NULL)
+        return 0;
+
     if(!checkTeamCopy(pl, copyId, t))
         return 0;
     
@@ -334,10 +338,12 @@ void TeamCopy::leaveTeam(Player* pl)
         {
             res = 1;
             td->members[i] = NULL;
-            for(UInt8 j = i+1; j < td->count; ++j)
+            UInt8 j = i+1;
+            for(; j < td->count; ++j)
             {
                 td->members[j-1] = td->members[j];
             }
+            td->members[j] = NULL;
             --td->count;
             break;
         }
@@ -360,6 +366,7 @@ void TeamCopy::leaveTeam(Player* pl)
             {
                 ct.erase(ct.begin() + i);
                 sendTeamCopyPageUpdate(copyId, t, i);
+                break;
             }
         }
 
@@ -408,6 +415,7 @@ void TeamCopy::teamKick(Player* pl, UInt64 playerId)
         if(td->members[i] == member)
         {
             res = 1;
+            member->setTeamData(NULL);
             td->members[i] = NULL;
             for(UInt8 j = i+1; j < td->count; ++j)
             {
@@ -418,9 +426,7 @@ void TeamCopy::teamKick(Player* pl, UInt64 playerId)
         }
     }
 
-    member->setTeamData(NULL);
     st << res;
-
     st << Stream::eos;
     for(UInt8 i = 0; i < td->count; ++i)
     {
@@ -506,8 +512,8 @@ bool TeamCopy::enterTeamCopy(Player* pl, UInt8 copyId, UInt8 t)
     if(pl->hasFlag(GObject::Player::InCopyTeam))
         return false;
 
-//    TeamCopyNpc& npcIds = m_tcNpcId[t][copyIdx];
-//    pl->moveTo(npcIds.location, false);
+    TeamCopyNpc& npcIds = m_tcNpcId[t][copyIdx];
+    pl->moveTo(npcIds.location, true);
 
     pl->addFlag(GObject::Player::InCopyTeam);
     m_playerIdle[t][copyIdx].push_back(pl);
