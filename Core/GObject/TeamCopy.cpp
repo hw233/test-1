@@ -158,8 +158,6 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type)
         for(int i = 0; i < ct[idx]->count; ++i)
         {
             Player* mem = ct[idx]->members[i];
-            if(mem == ct[idx]->leader)
-                continue;
             Fighter* fgt =  mem->getMainFighter();
             st << mem->getId() << fgt->getLevel() << fgt->getColor() << static_cast<UInt16>(fgt->getId());
         }
