@@ -121,8 +121,7 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type)
     UInt32 sz = ct.size();
     if(start > sz)
     {
-        start = sz - count;
-        count = maxPageLen;
+        start = sz > count ? sz - count : 0;
     }
     UInt32 end = start + count;
     if(end > sz)
@@ -167,7 +166,7 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type)
     }
 
     ctp.start = start;
-    ctp.end = start + idx;
+    ctp.end = idx > (start + maxPageLen) ? idx : (start + maxPageLen);
     ctp.type = type;
 
     st << Stream::eos;
