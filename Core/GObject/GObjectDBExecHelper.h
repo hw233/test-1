@@ -47,6 +47,14 @@ struct DBDungeonMonster
 	UInt32 experience;
 };
 
+struct DBTeamCopy
+{
+    UInt8 id;
+    UInt8 type;
+    UInt16 location;
+    std::string npcgroups;
+};
+
 struct DBClanAssistant
 {
 	UInt32 id;
@@ -1082,6 +1090,16 @@ SPECIALDEF(4)
 	UInt8, formated,
 	std::string, monsters,
 	UInt32, experience
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTeamCopy)
+SPECIALDEF(4)
+	(
+	UInt8, id,
+	UInt8, type,
+	UInt16, location, 
+	std::string, npcgroups
 	)
 SPECIALEND()
 

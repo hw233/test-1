@@ -3465,6 +3465,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
                 res = teamCopyManager->leaveTeamCopy(player);
 
             st << resCopyId << resT;
+            st << Stream::eos;
             player->send(st);
         }
         break;
@@ -3490,6 +3491,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 teamId = teamCopyManager->createTeam(player, pwd, upLevel, dnLevel);
             st << teamId;
 
+            st << Stream::eos;
             player->send(st);
         }
         break;
@@ -3504,6 +3506,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             UInt32 teamId2 = teamCopyManager->joinTeam(player, teamId, pwd);
             st << teamId2;
 
+            st << Stream::eos;
             player->send(st);
         }
         break;

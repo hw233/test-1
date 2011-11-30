@@ -8,6 +8,11 @@ namespace Battle
     class BattleSimulator;
 }
 
+namespace GData
+{
+    class NpcGroup;
+}
+
 namespace GObject
 {
 class Player;
@@ -68,6 +73,8 @@ class TeamCopy
         void decLevelTeamCnt(UInt8 copyId, UInt8 t, UInt8 upLevel, UInt8 dnLevel);
         UInt16 getIdleTeamNumber(UInt8 copyId, UInt8 t);
         void recycleTeamNumber(UInt8 copyId, UInt8 t, UInt16 number);
+        void addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npcId);
+        void sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim);
 
     private:
         typedef std::vector<TeamData*> CopyTeams;

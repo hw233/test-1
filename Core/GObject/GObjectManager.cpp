@@ -49,6 +49,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
+#include "GObject/TeamCopy.h"
 
 #include <fcntl.h>
 
@@ -157,6 +158,7 @@ namespace GObject
 		unloadEquipments();
 		loadAllFriends();
 		LoadDungeon();
+        loadTeamCopy();
 		loadAllClans();
 		LoadSpecialAward();
 		LoadLuckyDraw();
@@ -2114,6 +2116,30 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+
+	bool GObjectManager::loadTeamCopy()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		
+        // 组队副本配置
+		LoadingCounter lc("Loading team copy templates:");
+		GData::DBTeamCopy dbtc;
+		if(execu->Prepare("SELECT `id`, `type`, `location`, `npcgroups` FROM `team_copy`", dbtc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			StringTokenizer tk(dbtc.npcgroups, ",");
+			for(size_t i = 0; i < tk.count(); ++ i)
+			{
+                teamCopyManager->addTeamCopyNpc(dbtc.id, dbtc.type, dbtc.location, atoi(tk[i].c_str()));
+            }
+        }
+        lc.finalize();
+        return true;
+    }
 
 	static bool configLoadedClanData(Clan * clan, void * data)
 	{

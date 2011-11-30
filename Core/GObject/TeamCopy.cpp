@@ -71,6 +71,17 @@ bool TeamCopy::checkTeamCopy(Player* pl, UInt8 copyId, UInt8 t)
     return true;
 }
 
+void TeamCopy::addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npcId)
+{
+    UInt8 copyIdx = copyId - 1;
+    if( copyId > maxCopyCnt || t > 1)
+        return;
+
+    TeamCopyNpc& tcNpc = m_tcNpcId[t][copyIdx];
+    tcNpc.location = location;
+    tcNpc.npcId.push_back(npcId);
+}
+
 void TeamCopy::sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 tdIdx)
 {
     UInt8 copyIdx = copyId - 1;
@@ -159,6 +170,7 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type)
     ctp.end = start + idx;
     ctp.type = type;
 
+    st << Stream::eos;
     pl->send(st);
 }
 
@@ -178,6 +190,7 @@ void TeamCopy::reqTeamInfo(Player* pl)
         st << fgt->getLevel() << fgt->getColor() << static_cast<UInt16>(fgt->getId()) << td->members[idx]->getFormation();
     }
 
+    st << Stream::eos;
     pl->send(st);
 }
 
@@ -353,7 +366,7 @@ void TeamCopy::leaveTeam(Player* pl)
             }
         }
 
-        recycleTeamNumber(copyIdx, t, td->id >> 8);
+        recycleTeamNumber(copyId, t, td->id >> 8);
     }
     else if(pl == td->leader)
     {
@@ -361,6 +374,7 @@ void TeamCopy::leaveTeam(Player* pl)
     }
 
     st << td->leader->getId() << pl->getId();
+    st << Stream::eos;
     // send team info to members ::TODO
     for(UInt8 j = 0; j < td->count; ++j)
     {
@@ -410,6 +424,7 @@ void TeamCopy::teamKick(Player* pl, UInt64 playerId)
     member->setTeamData(NULL);
     st << res;
 
+    st << Stream::eos;
     for(UInt8 i = 0; i < td->count; ++i)
     {
         td->members[i]->send(st);
@@ -448,6 +463,7 @@ void TeamCopy::reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1, UInt8 idx2)
     }
 
     st << idx0 << idx1 << idx2;
+    st << Stream::eos;
     for(UInt8 i = 0; i < td->count; ++i)
     {
         td->members[i]->send(st);
@@ -478,6 +494,7 @@ void TeamCopy::handoverLeader(Player* pl, UInt64 playerId)
     Stream st(REP::TEAM_COPY_REQ);
     st << static_cast<UInt8>(0x11) << td->leader->getId();
 
+    st << Stream::eos;
     for(UInt8 i = 0; i < td->count; ++i)
     {
         td->members[i]->send(st);
@@ -579,10 +596,10 @@ void TeamCopy::teamBattleStart(Player* pl)
 
     UInt8 npcIdx = 0;
     UInt8 memIdx = 0;
-    bool res = 0;
+    UInt8 res = 0;
     for(; memIdx < td->count; ++memIdx)
     {
-        if(npcIdx < cnt)
+        if(npcIdx >= cnt)
             break;
 
         member = td->members[memIdx];
@@ -590,7 +607,9 @@ void TeamCopy::teamBattleStart(Player* pl)
             break;
 
         if(res == 1)
-            bsim.clearLastBattle(1);
+        {
+            sendBattleReport(td, NULL, bsim);
+        }
 
         member->PutFighters( bsim, 0 );
         for(UInt8 mIdx = 1; mIdx <= td->count; ++mIdx)
@@ -607,7 +626,7 @@ void TeamCopy::teamBattleStart(Player* pl)
         {
             if( 2 == res )
             {
-                bsim.clearLastBattle(0);
+                sendBattleReport(td, NULL, bsim);
             }
 
             ng = ngs[npcIdx];
@@ -633,6 +652,8 @@ void TeamCopy::teamBattleStart(Player* pl)
         }
     }
 
+    sendBattleReport(td, NULL, bsim);
+
     if( 1 == res )
     {
         for(UInt8 i = 0; i < td->count; ++i)
@@ -641,6 +662,61 @@ void TeamCopy::teamBattleStart(Player* pl)
 
 
     recycleTeamNumber(copyId, t, td->id >> 8);
+}
+
+void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim)
+{
+    Stream& packet = bsim.getPacket();
+    if(packet.size() <= 8)
+        return;
+
+    UInt8 res = bsim.getWinner() == 1;
+    UInt16 r = 0;
+    if(res == 1)
+    {
+        if(!ng)
+            bsim.clearLastBattle(1);
+
+        r = static_cast<UInt16>(0x0101);
+    }
+    else if(res == 2)
+    {
+        if(!ng)
+            bsim.clearLastBattle(0);
+
+        r = static_cast<UInt16>(0x0100);
+    }
+
+    for(UInt8 i = td->count; i < td->count; ++i)
+    {
+        Player* pl = td->members[i];
+        if(!pl)
+            continue;
+        if(ng && res == 1)
+        {
+            pl->_lastNg = ng;
+
+            if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
+            {
+                pl->pendExp(ng->getExp());
+                ng->getLoots(pl, pl->_lastLoot);
+            }
+        }
+
+        Stream st(REP::ATTACK_NPC);
+        st << pl->getPendExp() << static_cast<UInt8>(0) << r;
+        UInt8 sz = pl->_lastLoot.size();
+        st << sz;
+        for(UInt8 j = 0; j < sz; ++ j)
+        {
+            st << pl->_lastLoot[j].id << pl->_lastLoot[j].count;
+        }
+
+        st.append(&packet[8], packet.size() - 8);
+        st << Stream::eos;
+
+        pl->send(st);
+    }
 }
 
 }
