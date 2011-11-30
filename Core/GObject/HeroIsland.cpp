@@ -994,9 +994,13 @@ void HeroIsland::broadcast(Stream& st, UInt8 spot, Player* player)
     for (size_t i = 0; i < sz; ++i)
     {
         Player* player1 = _players[spot][i]->player;
-        if ((!player || (player && player != player1)) && player1 && player1->hasFlag(Player::InHeroIsland))
+        if (!player1)
+            continue;
+        if (!player1->hasFlag(Player::InHeroIsland))
+            continue;
+        if (!player || (player && player != player1))
         {
-            if (player && player1)
+            if (player)
             {
                 UInt8 l1 = player1->GetLev();
                 UInt8 l2 = player->GetLev();
