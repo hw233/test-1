@@ -1618,6 +1618,7 @@ namespace GObject
             return 2;
         }
 
+        GameAction()->doAty(this->m_Owner,  AtyEnchant, 0, 0);
 		AddItemHistoriesLog(item_enchant_l + type, enc_times);
         //DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), item_enchant_l + type, enc_times, TimeUtil::Now());
         ConsumeInfo ci(EnchantEquipment,0,0);
@@ -2087,7 +2088,9 @@ namespace GObject
 		}
 		else
 #endif
+        GameAction()->doAty(this->m_Owner, AtySplit, 0,0);    
 		{
+
 			UInt32 r = uRand(100);
 			if(r < chance_low)
 				got = 1;
@@ -2098,6 +2101,7 @@ namespace GObject
 					got = 2;
 			}
 		}
+
         const GData::ItemBaseType& t = item->GetItemType();
         if(IsEquip(t.subClass))
         {
@@ -2806,6 +2810,7 @@ namespace GObject
         //
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
+        GameAction()->doAty(this->m_Owner, AtyForge, 0, 0);
 		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
 		UInt8 q = equip->getQuality() - 3;
 		if(protect)

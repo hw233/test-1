@@ -7,7 +7,7 @@ typedef lua_tinker::table Table;
 
 #include "GData/GDataManager.h"
 #include "GObject/TaskData.h"
-
+#include "GObject/ActivityMgr.h"
 namespace GObject
 {
 	class Player;
@@ -203,6 +203,8 @@ namespace Script
 		UInt32 onTavernFlush(UInt8 color);
 		bool onTakeMailPackage(Player* player, UInt32 pkgId);
 		lua_tinker::table onGetMailItems(UInt32 pkgId);
+        lua_tinker::table GetOnlineReward();
+        void   GetAtyReward(Player* p, UInt32 flag);
 		UInt32 onLuckyDrawItemRoll(UInt8 type);
 		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 level, bool isBoss);
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
@@ -250,6 +252,8 @@ namespace Script
         void doAttainment(Player* pl, UInt16 attainId, UInt32 param);
         void finishAttainment(Player* pl, UInt16 attainId);
 
+    public:
+        void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
 	private:
 		Player* _player1;	//脚本动作行为主体1
 		Player* _player2;	//脚本动作行为主体2

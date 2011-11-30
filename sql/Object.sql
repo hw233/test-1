@@ -1146,6 +1146,18 @@ CREATE TABLE `attainment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `activityData`;
+CREATE TABLE `activityData` (
+   `playerId` bigint(20) unsigned NOT NULL,
+   `overTime` int(10) unsigned NOT NULL,
+   `awardId`  int(10) unsigned NOT NULL,
+    `point`   int(10) unsigned NOT NULL,
+    `award`   int(10) unsigned NOT NULL,
+   `flags`    varchar(255) NOT NULL DEFAULT '',
+    PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
 DROP TABLE IF EXISTS `worldboss`;
 CREATE TABLE `worldboss` (
   `npcId` int(10) unsigned NOT NULL,

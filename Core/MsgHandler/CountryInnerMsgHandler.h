@@ -1191,6 +1191,11 @@ void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
      {
         player->OnDoAttainment(co->attainID, co->param);
      }
-    player->GetAthletics()->PayForPaging();
+}
+void  OnDoActivity( GameMsgHdr& hdr, const void* data)
+{
+     MSG_QUERY_PLAYER(player);
+     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
+     GameAction()->doAty(player, co->id, co->param1, co->param2);
 }
 #endif // _COUNTRYINNERMSGHANDLER_H_

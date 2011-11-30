@@ -710,6 +710,15 @@ struct DBWorldBoss
     UInt16 loc;
     UInt8 count;
 };
+struct DBActivityData
+{
+    UInt64 playerId;
+    UInt32 overTime;
+    UInt32 awardID;
+    UInt32 point;
+    UInt32 award;
+    std::string flags;
+};
 
 }
 
@@ -761,7 +770,7 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPlayerData)
-SPECIALDEF(54)
+SPECIALDEF(55)
 	(
 	UInt64, id,
 	std::string, pdata.name,
@@ -774,6 +783,7 @@ SPECIALDEF(54)
 	UInt8, pdata.country,
 	UInt8, pdata.title,
 	UInt32, pdata.achievement,
+    UInt32, pdata.attainment,
 	UInt8, pdata.qqvipl,
 	UInt8, pdata.qqvipyear,
     UInt32, pdata.qqawardgot,
@@ -1594,6 +1604,18 @@ SPECIALDEF(4)
     UInt16, attainId,
     UInt32, status,
     UInt32, updatetime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBActivityData)
+SPECIALDEF(6)
+(
+    UInt64,playerId,
+    UInt32, overTime,
+    UInt32, awardID,
+    UInt32, point,
+    UInt32, award,
+    std::string, flags    
 )
 SPECIALEND()
 

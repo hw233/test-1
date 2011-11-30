@@ -188,6 +188,8 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u, `lootlvl`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
                 tcd.floor, tcd.spot, lootlvl, pl->getId(), id);
+
+        GameAction()->doAty(pl,  AtyCopy , 0,0);
     }
 
     Stream st(REP::COPY_INFO);

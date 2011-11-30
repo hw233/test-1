@@ -5,7 +5,8 @@
 #include "GObject/Package.h"
 #include "Battle/BattleSimulator.h"
 #include "MsgID.h"
-
+#include "Country.h"
+#include "MsgHandler/CountryMsgStruct.h"
 namespace GObject
 {
 
@@ -333,6 +334,19 @@ void HeroIsland::rankReward()
         {
             if (nsz)
                 (*i)->player->getPrestige(_prestige[nsz-1] * factor + (*i)->tasks * 10);
+        }
+
+        //
+        if((*i)->player->getThreadId() != WORKER_THREAD_NEUTRAL)
+        {
+            stActivityMsg msg;
+            msg.id = AtyHeroIsland;
+            GameMsgHdr hdr2(0x245, (*i)->player->getThreadId(), (*i)->player, sizeof(stActivityMsg));
+            GLOBAL().PushMsg(hdr2, &msg);
+        }
+        else
+        {
+            GameAction()->doAty((*i)->player, AtyHeroIsland, 0 ,0);
         }
     }
 }
@@ -1754,6 +1768,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 
         if (awards[id].id && awards[id].num)
         {
+
             pd->awardgot = 0xFF;
             if (awards[id].id > 5)
             {

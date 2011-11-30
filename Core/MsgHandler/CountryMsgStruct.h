@@ -113,4 +113,15 @@ struct stAttainMsg
 
     }
 };
+struct stActivityMsg
+{
+    UInt32 id;
+    UInt32 param1;
+    UInt32 param2;
+
+    stActivityMsg() : id(0), param1(0), param2(0)
+    {
+
+    }
+};
 #endif // _COUNTRYMSGSTRUCT_H_

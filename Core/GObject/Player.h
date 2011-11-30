@@ -125,6 +125,7 @@ namespace GObject
 	class Athletics;
     struct PracticeData;
     class AttainMgr;
+    class ActivityMgr;
 
     struct TripodData
     {
@@ -323,7 +324,7 @@ namespace GObject
 		static const UInt16 INIT_PACK_SIZE = 100;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
-			title(0), achievement(0), qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
+			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
 			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
@@ -361,6 +362,7 @@ namespace GObject
 		UInt8 country;              // 国家
 		UInt8 title;                // 头衔
 		UInt32 achievement;         // 战功
+        UInt32 attainment;          //  
         UInt8 qqvipl;               // QQ VIP等级
         UInt8 qqvipyear;            // QQ VIP是否包年
         UInt32 qqawardgot;          // QQ VIP奖励是否已领取
@@ -698,6 +700,9 @@ namespace GObject
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
 
+        UInt32 getAttainment(UInt32 a = 0);
+        UInt32 useAttainment(UInt32 a, ConsumeInfo * ci=NULL);
+
 		UInt32 getPrestige(UInt32 a = 0, bool notify = true);
 		UInt32 usePrestige(UInt32 a,ConsumeInfo * ci=NULL);
 
@@ -846,7 +851,7 @@ namespace GObject
 		TaskMgr* GetTaskMgr() { return m_TaskMgr; }
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
-
+        ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1003,7 +1008,7 @@ namespace GObject
 		Athletics* m_Athletics;
 
 		AttainMgr* m_AttainMgr;
-
+        ActivityMgr*  m_ActivityMgr;
 		MailBox* m_MailBox;
 
 		bool _isOnline;

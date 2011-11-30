@@ -5,6 +5,7 @@
 #include "Package.h"
 #include "TaskMgr.h"
 #include "AttainMgr.h"
+#include "ActivityMgr.h"
 #include "Trade.h"
 #include "Sale.h"
 #include "Country.h"
@@ -380,6 +381,11 @@ namespace GObject
             GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
             GLOBAL().PushMsg(hdr1, &pfexp);
 
+            stActivityMsg msg;
+            msg.id = AtyPSpeed;
+            GameMsgHdr hdr2(0x245, m_Player->getThreadId(), m_Player, sizeof(stActivityMsg));
+            GLOBAL().PushMsg(hdr2, &msg);
+
             m_Player->incPIcCount();
             data->checktime -= count;
             if ((int)data->checktime < 0)
@@ -556,6 +562,7 @@ namespace GObject
 		m_MailBox = new MailBox(this);
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
+        m_ActivityMgr = new ActivityMgr(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
 	}
@@ -706,6 +713,8 @@ namespace GObject
 		SAFE_DELETE(m_MailBox);
 
         SAFE_DELETE(m_pVars);
+        SAFE_DELETE(m_AttainMgr);
+        SAFE_DELETE(m_ActivityMgr);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -1904,7 +1913,7 @@ namespace GObject
 		if(cfg.limitLuckyDraw == 2 || (cfg.limitLuckyDraw == 1 && _vipLevel < 2))
 			status |= 0x80;
 		st << _playerData.country << _playerData.gold << _playerData.coupon << _playerData.tael << _playerData.coin << getClanName()
-			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
+			<< status << _playerData.title << static_cast<UInt8>(0) << _playerData.totalRecharge << static_cast<UInt8>(_playerData.qqvipl%10) << _playerData.qqvipyear << _playerData.achievement << _playerData.prestige<< _playerData.attainment << _playerData.packSize << _playerData.newGuild <<  _playerData.mounts << c;
 		for(UInt8 i = 0; i < c; ++ i)
 		{
 			st << buffid[i] << buffleft[i];
@@ -2418,6 +2427,7 @@ namespace GObject
         incIcCount();
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
+        GameAction()->doAty(this, AtyTaskHook, 0,0);
 	}
 
 	void Player::sendEvents()
@@ -2842,8 +2852,9 @@ namespace GObject
 		case 5: field = "status"; v &= ~0x80; break;
 		case 6: field = "title"; break;
 		case 7: field = "totalRecharge"; break;
-		case 8: field = "archievement"; break;
+        case 8: field = "archievement"; break;
 		case 9: field = "mounts"; break;
+        case 0x0B:field = "attainment"; break;
 		case 0x20: field = "packSize"; break;
 		}
 		if(field != NULL)
@@ -3526,7 +3537,8 @@ namespace GObject
 		sendModification(8, _playerData.achievement);
 		return _playerData.achievement;
 	}
-	void Player::useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci)
+
+   	void Player::useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci)
 	{
 		if(a == 0 || _playerData.achievement == 0)
 			return ;
@@ -3547,6 +3559,33 @@ namespace GObject
 		return ;
 	}
 
+    UInt32  Player::getAttainment( UInt32 a)
+    {
+        if(a == 0)
+            return _playerData.attainment;
+
+        _playerData.attainment += a;
+        
+        sendModification(0x0B, _playerData.attainment);
+        return _playerData.attainment;
+    }
+    
+    UInt32 Player::useAttainment(UInt32 a, ConsumeInfo* ci)
+    {
+        if(a == 0 || _playerData.attainment == 0)
+            return _playerData.attainment;
+        if(_playerData.attainment < a)
+            _playerData.attainment = 0;
+        else
+            _playerData.attainment -= a;
+
+        if(ci)
+        {
+
+        }
+        sendModification(0x0B,  _playerData.attainment);
+        return _playerData.attainment;
+    }
     UInt32 Player::getPrestige(UInt32 a, bool notify)
     {
 		if(a == 0)
@@ -4698,6 +4737,8 @@ namespace GObject
 		}
 		st << Stream::eos;
 		send(st);
+        if(type > 0)
+            GameAction()->doAty(this, AtyBarRef, 0, 0);
 	}
 
 	UInt16 Player::calcNextTavernUpdate(UInt32 curtime)
@@ -6439,6 +6480,8 @@ namespace GObject
 		}
 		st << Stream::eos;
 		send(st);
+        if(type > 0)
+            GameAction()->doAty(this, AtyBookStore, 0 , 0);
 	}
 
 	UInt16 Player::calcNextBookStoreUpdate(UInt32 curtime)
@@ -6658,7 +6701,6 @@ namespace GObject
 
         GameMsgHdr hdr1(0x17D, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr1, NULL);
-
         return true;
     }
 
@@ -7226,6 +7268,8 @@ namespace GObject
         GetPackage()->DelItem2(ib1, 1);
         GetPackage()->DelItem2(ib2, 1);
         SYSMSG_SEND(2002, this);
+
+        GameAction()->doAty(this, AtyTripodFire , 0, 0);
     }
 
     void Player::getAward()

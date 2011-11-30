@@ -162,7 +162,7 @@ MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
 
 MSG_REG_2(GameMsgHdr, 0x244, OnDoAttainment);
-
+MSG_REG_2(GameMsgHdr, 0x245, OnDoActivity);
 MSG_REG_2(GameMsgHdr, 0x269, OnDailyCheck);
 
 MSG_REG_2(GameMsgHdr, 0x270, OnGetClanBattleRewardReq);

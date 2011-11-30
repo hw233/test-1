@@ -2479,6 +2479,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				    ConsumeInfo ci(Item,lr._itemId,lr._count);
 					player->useCoupon(price,&ci);
 					st << static_cast<UInt8>(0);
+
+                    GameAction()->doAty( player, AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -2501,6 +2503,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				    ConsumeInfo ci(Item,lr._itemId,lr._count);
 					player->useTael(price,&ci);
 					st << static_cast<UInt8>(0);
+                    GameAction()->doAty( player,AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -2555,6 +2558,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId, lr._count);
 					player->useAchievement(price,&ci);
 					st << static_cast<UInt8>(0);
+                    GameAction()->doAty( player, AtyBuy, 0,0);
 				}
 			}
 			break;
@@ -2586,6 +2590,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         ConsumeInfo ci(Item,lr._itemId, lr._count);
                         player->usePrestige(price,&ci);
                         st << static_cast<UInt8>(0);
+
+                        GameAction()->doAty(player, AtyBuy, 0,0);
                     }
                 }
             }
@@ -2609,6 +2615,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
                     player->useGold(price,&ci);
 					st << static_cast<UInt8>(0);
+
+                    GameAction()->doAty(player, AtyBuy ,0,0);
                 }
 			}
 			break;

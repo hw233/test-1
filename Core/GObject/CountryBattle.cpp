@@ -544,6 +544,7 @@ bool CountryBattle::playerEnter( Player * player )
 	SYSMSG_SEND(141, player);
 	SYSMSG_SENDV(1041, player, player->getCountry());
 
+    GameAction()->doAty( player, AtyCountryWar, 0, 0);
 	return true;
 }
 
