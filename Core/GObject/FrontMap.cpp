@@ -182,11 +182,11 @@ void FrontMap::enter(Player* pl, UInt8 id)
                     pl->getId(), id);
             ret = 0;
         } else if (PLAYER_DATA(pl, frontGoldCnt) < getGoldCount(pl->getVipLevel())) {
-            if (pl->getGoldOrCoupon() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
+            if (pl->getGold() < GData::moneyNeed[GData::FRONTMAP_ENTER1+PLAYER_DATA(pl, frontGoldCnt)].gold) {
                 Stream st(REP::FORMATTON_INFO);
                 st << static_cast<UInt8>(1) << id << static_cast<UInt8>(1) << Stream::eos;
                 pl->send(st);
-                pl->sendMsgCode(0, 1101);
+                pl->sendMsgCode(0, 1104);
                 return;
             }  
 
@@ -198,7 +198,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ret = 0;
 
             ConsumeInfo ci(EnterFrontMap,0,0);
-            pl->useGoldOrCoupon(20*PLAYER_DATA(pl, frontGoldCnt));
+            pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
         } else {
             // XXX:
             return;
@@ -286,6 +286,8 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
         std::vector<UInt16> loot;
         if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl, ato, &loot)) {
             ret = true;
+            if (ato)
+                pl->checkLastBattled();
         }
 
         if (ret) {
@@ -539,7 +541,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                 if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGoldOrCoupon())
                 {
-                    pl->sendMsgCode(0, 1101);
+                    pl->sendMsgCode(0, 1104);
                     return;
                 }
 

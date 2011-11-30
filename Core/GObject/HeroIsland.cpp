@@ -443,9 +443,24 @@ void HeroIsland::notifyCount(UInt32 now)
     _notifyTime = now + 5;
 }
 
+#define EXPFACTOR() \
+    Stream st(REP::HERO_ISLAND); \
+    st << static_cast<UInt8>(17); \
+    st << static_cast<UInt8>(5); \
+    st << static_cast<UInt8>(0); \
+    st << static_cast<UInt8>(0); \
+    for (UInt8 i = 0; i < 4; ++i) \
+    { \
+        _expfactor[i] = factor[i]; \
+        st << static_cast<UInt8>(i+1); \
+        st << static_cast<UInt8>(2*_expfactor[i]); \
+    } \
+    st << Stream::eos;
+
+static float factor[4] = {1.5, 2.0, 2.5, 3.0};
+
 void HeroIsland::expFactor(UInt32 now)
 {
-    static float factor[4] = {1.5, 2.0, 2.5, 3.0};
     for (UInt8 n = 0; n < 4; ++n)
     {
         UInt8 i = uRand(4);
@@ -464,24 +479,22 @@ void HeroIsland::expFactor(UInt32 now)
         }
     }
 
-    Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(17);
-    st << static_cast<UInt8>(5);
-    st << static_cast<UInt8>(0); // XXX: 中立区
-    st << static_cast<UInt8>(0);
-    for (UInt8 i = 0; i < 4; ++i)
-    {
-        _expfactor[i] = factor[i];
-        st << static_cast<UInt8>(i+1);
-        st << static_cast<UInt8>(2*_expfactor[i]); // XXX: *2
-    }
-    st << Stream::eos;
+    EXPFACTOR();
     broadcast(st);
 
     if (cfg.GMCheck)
         _expTime = now + 10 * 60;
     else
         _expTime = now + 30;
+}
+
+void HeroIsland::sendExpFactor(Player* player)
+{
+    if (!player)
+        return;
+
+    EXPFACTOR();
+    player->send(st);
 }
 
 void HeroIsland::applayPlayers()
@@ -858,7 +871,8 @@ void HeroIsland::sendSpot(HIPlayerData* pd, UInt8 spot)
         sendRareAnimals(pd, spot);
 #else
     sendSkills(pd);
-    sendRareAnimals(pd, spot);
+    if (spot)
+        sendRareAnimals(pd, spot);
 #endif
     if (!ISINJZ(pd))
     {
@@ -1284,7 +1298,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
     UInt32 goldUse = GData::moneyNeed[GData::HISKILL].gold; \
     if (pd->player->getGold() < goldUse) \
     { \
-        pd->player->sendMsgCode(0, 1101); \
+        pd->player->sendMsgCode(0, 1104); \
         return false; \
     } \
     ConsumeInfo ci(HeroIslandSkill,0,0); \
@@ -1356,12 +1370,17 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
         case 2:
             {
+                if (pd->skills[1].cd)
+                    cd = static_cast<UInt16>(cd - (now + cd - pd->skills[1].cd));
                 if (pd->skills[1].cd && now < pd->skills[1].cd)
                 {
                     if (type)
                     {
                         CHECK_MONEY();
-                        pd->skills[1].lastcd += pd->skills[1].last;
+                        if (!pd->skills[1].lastcd || pd->skills[1].lastcd == static_cast<UInt32>(-1))
+                            pd->skills[1].lastcd = now + pd->skills[1].last;
+                        else
+                            pd->skills[1].lastcd += pd->skills[1].last;
                     }
                     else
                     {
@@ -1375,7 +1394,7 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                 }
                 pd->skills[1].bufid = PLAYER_BUFF_HIPG;
                 pd->skills[1].attr = &_skillattr[1];
-                pd->player->setBuffData(pd->skills[1].bufid, pd->skills[1].lastcd);
+                pd->player->setBuffData(pd->skills[1].bufid, pd->skills[1].lastcd, false);
                 pd->player->addHIAttr(*pd->skills[1].attr);
                 SYSMSG_SEND(2130, pd->player);
                 st << cd;
@@ -1384,12 +1403,17 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
         case 3:
             {
+                if (pd->skills[2].cd)
+                    cd = static_cast<UInt16>(cd - (now + cd - pd->skills[2].cd));
                 if (pd->skills[2].cd && now < pd->skills[2].cd)
                 {
                     if (type)
                     {
                         CHECK_MONEY();
-                        pd->skills[2].lastcd += pd->skills[2].last;
+                        if (!pd->skills[2].lastcd || pd->skills[2].lastcd == static_cast<UInt32>(-1))
+                            pd->skills[2].lastcd = now + pd->skills[2].last;
+                        else
+                            pd->skills[2].lastcd += pd->skills[2].last;
                     }
                     else
                     {
@@ -1413,12 +1437,17 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
         case 4:
             {
+                if (pd->skills[3].cd)
+                    cd = static_cast<UInt16>(cd - (now + cd - pd->skills[3].cd));
                 if (pd->skills[3].cd && now < pd->skills[3].cd)
                 {
                     if (type)
                     {
                         CHECK_MONEY();
-                        pd->skills[3].lastcd += pd->skills[3].last;
+                        if (!pd->skills[3].lastcd || pd->skills[3].lastcd == static_cast<UInt32>(-1))
+                            pd->skills[3].lastcd = now + pd->skills[3].last;
+                        else
+                            pd->skills[3].lastcd += pd->skills[3].last;
                     }
                     else
                     {
@@ -1442,12 +1471,17 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
 
         case 5:
             {
+                if (pd->skills[4].cd)
+                    cd = static_cast<UInt16>(cd - (now + cd - pd->skills[4].cd));
                 if (pd->skills[4].cd && now < pd->skills[4].cd)
                 {
                     if (type)
                     {
                         CHECK_MONEY();
-                        pd->skills[4].lastcd += pd->skills[4].last;
+                        if (!pd->skills[4].lastcd || pd->skills[4].lastcd == static_cast<UInt32>(-1))
+                            pd->skills[4].lastcd = now + pd->skills[4].last;
+                        else
+                            pd->skills[4].lastcd += pd->skills[4].last;
                     }
                     else
                     {
@@ -1596,6 +1630,7 @@ void HeroIsland::playerEnter(Player* player)
         st << static_cast<UInt8>(1);
     st << Stream::eos;
     player->send(st);
+    sendExpFactor(player);
 }
 
 void HeroIsland::playerLeave(Player* player)
@@ -2014,7 +2049,7 @@ void HeroIsland::setAto(Player* player, UInt8 onoff)
         UInt32 goldUse = GData::moneyNeed[GData::AUTOHI].gold;
         if (player->getGold() < goldUse)
         {
-            player->sendMsgCode(0, 1101);
+            player->sendMsgCode(0, 1104);
             return;
         }
         ConsumeInfo ci(HeroIslandAuto,0,0);

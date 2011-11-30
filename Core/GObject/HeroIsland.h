@@ -96,7 +96,12 @@ struct HIPlayerData
         //bufid = DEFAULT_BUFID;
         attr = NULL;
         for (UInt8 i = 0; i < 5; ++i)
-            skills[i].reset();
+        {
+            if (running)
+                skills[i].lastcd = 0;
+            else
+                skills[i].reset();
+        }
     }
 
     Player* player;
@@ -214,6 +219,7 @@ public:
     void broadcast(Stream& st);
     void notifyCount(UInt32 now);
     void expFactor(UInt32 now);
+    void sendExpFactor(Player* player);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
     void saveAtoCfg(Player* player, const std::string& cfg);

@@ -136,13 +136,13 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
                 PLAYER_DATA(pl, copyFreeCnt), PLAYER_DATA(pl, copyGoldCnt), pl->getId());
         return 0;
     } else if (PLAYER_DATA(pl, copyGoldCnt) < getGoldCount(pl->getVipLevel())) {
-        if (pl->getGoldOrCoupon() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
-            pl->sendMsgCode(0, 1101);
+        if (pl->getGold() < GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold) {
+            pl->sendMsgCode(0, 1104);
             return 1;
         }
 
         ConsumeInfo ci(EnterCopy,0,0);
-        pl->useGoldOrCoupon(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
+        pl->useGold(GData::moneyNeed[GData::COPY_ENTER1+PLAYER_DATA(pl, copyGoldCnt)].gold, &ci);
 
         ++PLAYER_DATA(pl, copyGoldCnt);
         DB1().PushUpdateData("UPDATE `player` SET `copyFreeCnt` = %u, `copyGoldCnt` = %u WHERE `id` = %"I64_FMT"u",
@@ -468,7 +468,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     if (mtype == 1)
                     {
                         if (GData::moneyNeed[GData::COPY_AUTO].gold > pl->getGoldOrCoupon()) {
-                            pl->sendMsgCode(0, 1104);
+                            pl->sendMsgCode(0, 1101);
                             return;
                         } else {
                             ConsumeInfo ci(EnterCopy,0,0);
