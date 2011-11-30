@@ -222,4 +222,6 @@ MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
+MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
+
 MSG_HANDLER_END()

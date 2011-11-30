@@ -10,6 +10,8 @@
 namespace GObject
 {
 
+#define ISINJZ(pd) (pd->skills[4].lastcd && pd->skills[4].lastcd != static_cast<UInt32>(-1))
+
 inline UInt32 calcExp(UInt8 lvl)
 {
     if (lvl < 10)
@@ -327,11 +329,10 @@ void HeroIsland::rankReward()
         if (!(*i) || !(*i)->player)
             continue;
 
+        UInt16 prestige = 0;
         if (n < nsz)
         {
-            UInt16 prestige = _prestige[n] * factor + (*i)->tasks * 10;
-            (*i)->player->getPrestige(prestige);
-
+            prestige = _prestige[n] * factor + (*i)->tasks * 10;
             if (n < 3)
             {
                 MailPackage::MailItem item[] = {{10,1},};
@@ -344,7 +345,20 @@ void HeroIsland::rankReward()
         else
         {
             if (nsz)
-                (*i)->player->getPrestige(_prestige[nsz-1] * factor + (*i)->tasks * 10);
+            {
+                prestige = _prestige[nsz-1] * factor + (*i)->tasks * 10;
+            }
+        }
+
+        if (prestige)
+        {
+            if ((*i)->player->getThreadId() != WORKER_THREAD_NEUTRAL)
+            {
+                GameMsgHdr hdr(0x236, (*i)->player->getThreadId(), (*i)->player, sizeof(prestige));
+                GLOBAL().PushMsg(hdr, &prestige);
+            }
+            else
+                (*i)->player->getPrestige(prestige);
         }
     }
 }
@@ -789,8 +803,6 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
 
         sendSpot(pd, rspot);
-        INFO_LOG("OLDENTER: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", player->getId(), player->getName().c_str(), rspot, pos);
-        ++_nplayers[rspot];
         return true;
     }
 
@@ -826,8 +838,6 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
 
     pd->player->setHISpot(spot);
     sendSpot(pd, spot);
-    INFO_LOG("ENTER: id: %"I64_FMT"u, name: %s, spot: %u", pd->player->getId(), pd->player->getName().c_str(), spot);
-    ++_nplayers[spot];
     return true;
 }
 
@@ -850,8 +860,12 @@ void HeroIsland::sendSpot(HIPlayerData* pd, UInt8 spot)
     sendSkills(pd);
     sendRareAnimals(pd, spot);
 #endif
-    if (!pd->skills[4].incd)
+    if (!ISINJZ(pd))
+    {
         broadcast(pd, spot, 0);
+        INFO_LOG("ENTER: id: %"I64_FMT"u, name: %s, spot: %u", pd->player->getId(), pd->player->getName().c_str(), spot);
+        ++_nplayers[spot];
+    }
 }
 
 void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 pagesize)
@@ -876,7 +890,7 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
         HIPlayerData* pd1 = _players[spot][i];
         if (pd1->player && pd1->player != pd->player &&
                 pd1->player->hasFlag(Player::InHeroIsland) &&
-                (!pd1->skills[4].lastcd || pd1->skills[4].lastcd == static_cast<UInt32>(-1)))
+                (!ISINJZ(pd1)))
         {
             UInt8 l2 = pd1->player->GetLev();
             if (l1 < l2 && l2 - l1 > 20)
@@ -1029,12 +1043,15 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt16 pos)
         return NULL;
     }
 
-    Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
-    broadcast(st, pd->spot);
+    if (!ISINJZ(pd))
+    {
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
+        broadcast(st, pd->spot);
+        if (_nplayers[spot])
+            --_nplayers[spot];
+    }
     INFO_LOG("LEAVE: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", pd->player->getId(), pd->player->getName().c_str(), spot, pos);
-    if (_nplayers[spot])
-        --_nplayers[spot];
     return pd;
 }
 
@@ -1590,11 +1607,14 @@ void HeroIsland::playerLeave(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return;
 
-    Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
-    broadcast(st, pd->spot);
-    if (_nplayers[spot])
-        --_nplayers[spot];
+    if (!ISINJZ(pd))
+    {
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
+        broadcast(st, pd->spot);
+        if (_nplayers[spot])
+            --_nplayers[spot];
+    }
 
     clearBuff(1, pd, 0);
     clearBuff(2, pd, 0); // XXX: must before reset
@@ -1622,11 +1642,14 @@ void HeroIsland::playerOffline(Player* player)
     HIPlayerData* pd = findPlayer(player, spot, pos);
     if (!pd) return;
 
-    Stream st(REP::HERO_ISLAND);
-    st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
-    broadcast(st, pd->spot);
-    if (_nplayers[spot])
-        --_nplayers[spot];
+    if (!ISINJZ(pd))
+    {
+        Stream st(REP::HERO_ISLAND);
+        st << static_cast<UInt8>(7) << static_cast<UInt8>(1) << pd->player->getId() << Stream::eos;
+        broadcast(st, pd->spot);
+        if (_nplayers[spot])
+            --_nplayers[spot];
+    }
 }
 
 void HeroIsland::listRank(Player* player, UInt16 start, UInt8 pagesize)

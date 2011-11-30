@@ -1174,4 +1174,13 @@ void OnAthlectisPayPaging( GameMsgHdr & hdr,  const void* data)
 
     player->GetAthletics()->PayForPaging();
 }
+
+void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt16 prestige = *(UInt16*)(data);
+    if (prestige)
+        player->getPrestige(prestige);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
