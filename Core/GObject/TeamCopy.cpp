@@ -101,7 +101,7 @@ void TeamCopy::sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 tdIdx)
     }
 }
 
-void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type)
+void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt8 count, UInt8 type)
 {
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
@@ -153,13 +153,13 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type)
         }
         ++cnt;
 
-        st << ct[idx]->id << ct[idx]->leader->getId() << ct[idx]->upLevel << ct[idx]->dnLevel << static_cast<UInt8>(ct[idx]->pwd.length() > 0 ? 1 : 0);
+        st << ct[idx]->id << ct[idx]->leader->getId() << ct[idx]->dnLevel << ct[idx]->upLevel << static_cast<UInt8>(ct[idx]->pwd.length() > 0 ? 1 : 0);
         st << ct[idx]->count;
         for(int i = 0; i < ct[idx]->count; ++i)
         {
             Player* mem = ct[idx]->members[i];
             Fighter* fgt =  mem->getMainFighter();
-            st << mem->getId() << fgt->getLevel() << fgt->getColor() << static_cast<UInt16>(fgt->getId());
+            st << mem->getId() << mem->getName() << fgt->getLevel() << fgt->getColor() << static_cast<UInt16>(fgt->getId());
         }
     }
 

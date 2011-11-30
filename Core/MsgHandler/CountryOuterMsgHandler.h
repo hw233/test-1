@@ -3472,7 +3472,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     case 0x1:
         {
             UInt32 start = 0;
-            UInt32 count = 0;
+            UInt8 count = 0;
             UInt8 type = 0;
             br >> start >> count >> type;
             teamCopyManager->reqTeamList(player, start, count, type);
@@ -3483,7 +3483,7 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             std::string pwd;
             UInt8 upLevel = 0;
             UInt8 dnLevel = 0;
-            br >> pwd >> upLevel >> dnLevel;
+            br >> pwd >> dnLevel >> upLevel;
 
             Stream st(REP::TEAM_COPY_REQ);
             st << static_cast<UInt8>(0x02);

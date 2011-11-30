@@ -28,7 +28,6 @@ struct TeamData
         t = 0;
         upLevel = 0;
         dnLevel = 0;
-        pwd = "";
     }
 
     //CopyId + (CopyTeamsIdx << 8)
@@ -57,7 +56,7 @@ class TeamCopy
 
         bool enterTeamCopy(Player* pl, UInt8 copyId, UInt8 t);
         bool leaveTeamCopy(Player* pl);
-        void reqTeamList(Player* pl, UInt32 start, UInt32 count, UInt8 type);
+        void reqTeamList(Player* pl, UInt32 start, UInt8 count, UInt8 type);
         void reqTeamInfo(Player* pl);
         UInt32 createTeam(Player* pl, std::string pwd, UInt8 upLevel, UInt8 dnLevel);
         UInt32 joinTeam(Player* pl, UInt32 teamId, std::string pwd);
