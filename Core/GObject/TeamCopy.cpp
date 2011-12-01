@@ -82,7 +82,7 @@ void TeamCopy::addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npc
     tcNpc.npcId.push_back(npcId);
 }
 
-void TeamCopy::sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 tdIdx)
+void TeamCopy::sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 startIdx, UInt32 endIdx)
 {
     UInt8 copyIdx = copyId - 1;
     TeamCopyPlayer& tcp = m_playerIdle[t][copyIdx];
@@ -94,7 +94,7 @@ void TeamCopy::sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 tdIdx)
             continue;
 
         CopyTeamPage& ctp = pl->getCopyTeamPage();
-        if(ctp.start < tdIdx && ctp.end > tdIdx)
+        if(ctp.start <= startIdx && ctp.end >= endIdx)
         {
             reqTeamList(pl, ctp.start, maxPageLen, ctp.type);
         }
@@ -178,13 +178,26 @@ void TeamCopy::reqTeamInfo(Player* pl)
         return;
     Stream st(REP::TEAM_COPY_REQ);
     st << static_cast<UInt8>(0x10);
-    st << td->leader->getId() << td->count;
+    st << td->id << td->leader->getId() << td->count;
 
     for(UInt8 idx = 0; idx < td->count; ++idx)
     {
         st << td->members[idx]->getId() << td->members[idx]->getName();
-        Fighter* fgt = td->members[idx]->getMainFighter();
-        st << fgt->getLevel() << fgt->getColor() << static_cast<UInt16>(fgt->getId()) << td->members[idx]->getFormation();
+        Fighter* mainfgt = td->members[idx]->getMainFighter();
+        st << mainfgt->getLevel() << mainfgt->getColor() << static_cast<UInt16>(mainfgt->getId()) << td->members[idx]->getFormation();
+        UInt8 pos = st.size();
+        UInt8 cnt = 0;
+        st << cnt;
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Fighter * fgt = td->members[idx]->getLineup(i).fighter;
+			if(fgt != NULL && fgt != mainfgt)
+            {
+                st << fgt->getId() << fgt->getLevel() << fgt->getColor();
+                ++cnt;
+            }
+		}
+        st.data<UInt8>(pos) = cnt;
     }
 
     st << Stream::eos;
@@ -247,7 +260,7 @@ UInt32 TeamCopy::createTeam(Player* pl, std::string pwd, UInt8 upLevel, UInt8 dn
     upLevel = upLevel < LEVEL_MAX ? upLevel : LEVEL_MAX;
     incLevelTeamCnt(copyId, t, upLevel, dnLevel);
 
-    sendTeamCopyPageUpdate(copyId, t, ct.size());
+    sendTeamCopyPageUpdate(copyId, t, ctp.start, ctp.end);
 
     return td->id;
 }
@@ -307,6 +320,7 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
     td->members[td->count] = pl;
     ++td->count;
 
+    sendTeamCopyPageUpdate(copyId, t, ctp.start, ctp.end);
     // send team info to members ::TODO
     for(UInt8 j = 0; j < td->count; ++j)
     {
@@ -343,7 +357,7 @@ void TeamCopy::leaveTeam(Player* pl)
             {
                 td->members[j-1] = td->members[j];
             }
-            td->members[j] = NULL;
+            td->members[j-1] = NULL;
             --td->count;
             break;
         }
@@ -365,7 +379,6 @@ void TeamCopy::leaveTeam(Player* pl)
             if (td == ct[i])
             {
                 ct.erase(ct.begin() + i);
-                sendTeamCopyPageUpdate(copyId, t, i);
                 break;
             }
         }
@@ -377,12 +390,14 @@ void TeamCopy::leaveTeam(Player* pl)
         td->leader = td->members[0];
     }
 
+    sendTeamCopyPageUpdate(copyId, t, ctp.start, ctp.end);
+
     st << td->leader->getId() << pl->getId();
     st << Stream::eos;
     // send team info to members ::TODO
     for(UInt8 j = 0; j < td->count; ++j)
     {
-        td->members[j]->send(st);
+        reqTeamInfo(td->members[j]);
     }
 
     pl->send(st);
@@ -425,6 +440,8 @@ void TeamCopy::teamKick(Player* pl, UInt64 playerId)
             break;
         }
     }
+
+    sendTeamCopyPageUpdate(copyId, t, ctp.start, ctp.end);
 
     st << res;
     st << Stream::eos;
@@ -642,7 +659,7 @@ void TeamCopy::teamBattleStart(Player* pl)
                 if(idx == 0)
                     break;
 
-                bsim.putTeams(ngs[idx]->getName(), ngs[idx]->getLevel(), ngs[idx]->getPortrait(), 0);
+                bsim.putTeams(ngs[idx]->getName(), ngs[idx]->getLevel(), ngs[idx]->getPortrait(), 1);
             }
 
             bsim.start();
@@ -655,12 +672,12 @@ void TeamCopy::teamBattleStart(Player* pl)
         }
     }
 
-    sendBattleReport(td, NULL, bsim);
+    sendBattleReport(td, ng, bsim);
 
     if( 1 == res )
     {
-        for(UInt8 i = 0; i < td->count; ++i)
-            leaveTeamCopy(td->members[i]);
+        for(UInt8 i = td->count; i > 0; --i)
+            leaveTeamCopy(td->members[i-1]);
     }
 
 
@@ -690,7 +707,7 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
         r = static_cast<UInt16>(0x0100);
     }
 
-    for(UInt8 i = td->count; i < td->count; ++i)
+    for(UInt8 i = 0; i < td->count; ++i)
     {
         Player* pl = td->members[i];
         if(!pl)

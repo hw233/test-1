@@ -87,9 +87,11 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
 
 void BattleSimulator::putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side)
 {
-    if(side > 2)
+    if(side > 1)
         return;
     UInt8 idx = _teams[side];
+    if(idx > 1)
+        return;
     ++_teams[side];
     _team_name[side][idx] = name;
     _team_level[side][idx] = level;

@@ -65,7 +65,7 @@ class TeamCopy
         void reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1, UInt8 idx2);
         void handoverLeader(Player* pl, UInt64 playerId);
         void teamBattleStart(Player* pl);
-        void sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 tdIdx);
+        void sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 startIdx, UInt32 endIdx);
 
         bool checkTeamCopy(Player* pl, UInt8 copyId, UInt8 t);
         void incLevelTeamCnt(UInt8 copyId, UInt8 t, UInt8 upLevel, UInt8 dnLevel);
