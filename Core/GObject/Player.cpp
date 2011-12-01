@@ -1141,8 +1141,22 @@ namespace GObject
 		}
 
 		UInt32 curtime = TimeUtil::Now();
+
+        if (World::_thanksgiving)
+        {
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
+            UInt32 online = GetVar(VAR_TGDT);
+            if (online != static_cast<UInt32>(-1))
+            {
+                if (online + curtime - _playerData.lastOnline >= TGD_ONLINE_TIME)
+                    GameAction()->onThanksgivingDay(this);
+                else
+                    SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
+            }
+        }
+
 		DBLOG1().PushUpdateData("update login_states set logout_time=%u where server_id=%u and player_id=%"I64_FMT"u and login_time=%u", curtime, cfg.serverLogId, _id, _playerData.lastOnline);
-		_playerData.lastOnline = curtime;
+		//_playerData.lastOnline = curtime; // XXX: 在线时间统计问题
 		writeOnlineRewardToDB();
 
 		removeStatus(SGPunish);
@@ -2023,7 +2037,7 @@ namespace GObject
         return false;
     }
 
-	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene, bool report )
+	bool Player::challenge( Player * other, UInt32 * rid, int * turns, bool applyhp, UInt32 sysRegen, bool noreghp, UInt32 scene, UInt8 report )
 	{
 		checkLastBattled();
 		other->checkLastBattled();
@@ -2035,11 +2049,27 @@ namespace GObject
 
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
-		send(st);
-		st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
+        if (report & 0x01)
+        {
+            send(st);
+        }
+        else
+        {
+            if (res)
+            {
+                SYSMSG_SENDV(2144, this, other->getCountry(), other->getName().c_str());
+            }
+            else
+            {
+                SYSMSG_SENDV(2143, this, other->getCountry(), other->getName().c_str());
+            }
+        }
 
-        if (report)
+        if (report & 0x02)
+        {
+            st.data<UInt8>(4) = static_cast<UInt8>(res ? 0 : 1);
             other->send(st);
+        }
         else
         {
             if (res)
@@ -2201,8 +2231,8 @@ namespace GObject
 
     void Player::autoCopyFailed(UInt8 id)
     {
-        GObject::playerCopy.failed(this, id);
-        setCopyFailed();
+        //GObject::playerCopy.failed(this, id);
+        //setCopyFailed();
     }
 
     bool Player::attackRareAnimal(UInt32 id)
@@ -6469,9 +6499,9 @@ namespace GObject
 		send(st);
     }
 
-    void Player::startAutoCopy(UInt8 id)
+    void Player::startAutoCopy(UInt8 id, UInt8 mtype = 0)
     {
-        playerCopy.autoBattle(this, id, 0);
+        playerCopy.autoBattle(this, id, 0, mtype);
     }
 
     void Player::cancelAutoCopy(UInt8 id)
@@ -6489,9 +6519,9 @@ namespace GObject
         playerCopy.sendAutoCopy(this);
     }
 
-    void Player::startAutoFrontMap(UInt8 id)
+    void Player::startAutoFrontMap(UInt8 id, UInt8 mtype = 0)
     {
-        frontMap.autoBattle(this, id, 0);
+        frontMap.autoBattle(this, id, 0, mtype);
     }
 
     void Player::cancelAutoFrontMap(UInt8 id)
@@ -6531,6 +6561,23 @@ namespace GObject
             }
             ConsumeInfo ci(InstantPracticeAcc,0,0);
             useGold(pfexp->goldUse,&ci);
+
+            UInt32 now = TimeUtil::Now();
+            UInt32 duration = 60*60;
+            UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
+            UInt32 left = 0;
+            if (p > 0)
+                left = p - now;
+
+            if (left >= duration)
+            {
+                left -= duration;
+                setBuffData(PLAYER_BUFF_PROTECT, left+now);
+            }
+            else if (left)
+            {
+                setBuffData(PLAYER_BUFF_PROTECT, 0);
+            }
         }
 
         for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
@@ -6541,7 +6588,6 @@ namespace GObject
                 fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
             }
         }
-
     }
 
     void Player::RollYDGem()

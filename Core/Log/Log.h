@@ -54,7 +54,8 @@ enum PurchaseType
     TrumpLOrder,
     AutoFrontMapComplete,
     AthleticPaging, 
-
+    HeroIslandSkill,
+    HeroIslandAuto,
 };
 
 enum IncomingType

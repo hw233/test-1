@@ -99,10 +99,10 @@ UInt8 Dungeon::playerEnter( Player * player )
 				{
 					if(!player->hasChecked())
 						return 3;
-					if(player->getGold() < price)
+					if(player->getGoldOrCoupon() < price)
 						return 3;
 					ConsumeInfo ci(VipEnterDungeon,0,0);
-					player->useGold(price, &ci);
+					player->useGoldOrCoupon(price, &ci);
 				}
 			}
 
@@ -573,7 +573,7 @@ void Dungeon::sendAutoChallengeStart( Player * player )
 	player->send(st);
 }
 
-void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalExp )
+void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalExp, UInt8 mtype )
 {
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
@@ -585,27 +585,46 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			UInt32 viplevel = player->getVipLevel();
 			if(viplevel < 6)
 			{
-				const UInt32 taelReq[] = {
-                    0,
-                    GData::moneyNeed[GData::DUNGEON_AUTO1].tael,
-                    GData::moneyNeed[GData::DUNGEON_AUTO2].tael,
-                    GData::moneyNeed[GData::DUNGEON_AUTO3].tael,
-                    GData::moneyNeed[GData::DUNGEON_AUTO4].tael,
-                    GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
-                };
-
-				ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-				if(World::_wday == 5)
+                if (mtype == 1)
                 {
-                    if(player->getTael() < taelReq[_id] / 2)
-                        return;
-					player->useTael(taelReq[_id] / 2, &ci);
+                    ConsumeInfo ci(DungeonAutoConsume, 0, 0);
+                    if(World::_wday == 5)
+                    {
+                        if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2)
+                            return;
+                        player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2, &ci);
+                    }
+                    else
+                    {
+                        if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold)
+                            return;
+                        player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold, &ci);
+                    }
                 }
-				else
+                else
                 {
-                    if(player->getTael() < taelReq[_id])
-                        return;
-					player->useTael(taelReq[_id], &ci);
+                    const UInt32 taelReq[] = {
+                        0,
+                        GData::moneyNeed[GData::DUNGEON_AUTO1].tael,
+                        GData::moneyNeed[GData::DUNGEON_AUTO2].tael,
+                        GData::moneyNeed[GData::DUNGEON_AUTO3].tael,
+                        GData::moneyNeed[GData::DUNGEON_AUTO4].tael,
+                        GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
+                    };
+
+                    ConsumeInfo ci(DungeonAutoConsume, 0, 0);
+                    if(World::_wday == 5)
+                    {
+                        if(player->getTael() < taelReq[_id] / 2)
+                            return;
+                        player->useTael(taelReq[_id] / 2, &ci);
+                    }
+                    else
+                    {
+                        if(player->getTael() < taelReq[_id])
+                            return;
+                        player->useTael(taelReq[_id], &ci);
+                    }
                 }
 			}
 			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
@@ -670,7 +689,8 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
-	UInt32 maxCount = player->getCoupon() + player->getGold();
+    if (player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_IM].gold)
+        return;
 	UInt32 count = 0;
 
     ConsumeInfo ci(DungeonAutoConsume, 0, 0);
@@ -689,10 +709,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 				DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
                 return;
 			}
-			if(count < maxCount)
-				won = doChallenge(player, it->second, false, NULL);
-			else
-				break;
+            won = doChallenge(player, it->second, false, NULL);
 		}
 		else
 		{
@@ -709,7 +726,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 	processAutoChallenge(player, 3, &exp);
 }
 
-void Dungeon::autoChallenge( Player * player )
+void Dungeon::autoChallenge( Player * player, UInt8 mtype )
 {
 	if(player->hasFlag(Player::AutoDungeon))
 		return;
@@ -723,7 +740,7 @@ void Dungeon::autoChallenge( Player * player )
 	player->checkLastBattled();
 	player->addFlag(Player::AutoDungeon);
 	UInt32 exp = 0;
-	processAutoChallenge(player, 0, &exp);
+	processAutoChallenge(player, 0, &exp, mtype);
 }
 
 void Dungeon::pushChallenge( Player * player, UInt32 exp, bool won )

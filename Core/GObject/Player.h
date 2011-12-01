@@ -790,7 +790,7 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//’Ω∂∑œ‡πÿ
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, bool = true);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, UInt8 = 0x03);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
@@ -812,12 +812,12 @@ namespace GObject
 		void sendOnlineReward();
 		void sendDailyInfo();
 
-        void startAutoCopy(UInt8 id);
+        void startAutoCopy(UInt8 id, UInt8 mtype);
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
         void sendAutoCopy();
 
-        void startAutoFrontMap(UInt8 id);
+        void startAutoFrontMap(UInt8 id, UInt8 mtype);
         void cancelAutoFrontMap(UInt8 id);
         void instantAutoFrontMap(UInt8 id);
         void sendAutoFrontMap();

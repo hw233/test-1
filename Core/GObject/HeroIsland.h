@@ -59,7 +59,7 @@ struct HIPlayerData
         : player(NULL), type(0), spot(0), movecd(0),
         fightcd(0), injuredcd(static_cast<UInt32>(-1)), expcd(0), straight(0), round(0),
         score(0), lasttype(0xff), attrcd(static_cast<UInt32>(-1)), bufid(DEFAULT_BUFID),
-        attr(NULL), awardgot(0), inrank(0), tasks(0)
+        attr(NULL), awardgot(0), inrank(0), tasks(0), ato(0)
     {
     }
 
@@ -87,6 +87,7 @@ struct HIPlayerData
             compass.clear();
         }
 
+        ato = 0;
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;
@@ -95,7 +96,12 @@ struct HIPlayerData
         //bufid = DEFAULT_BUFID;
         attr = NULL;
         for (UInt8 i = 0; i < 5; ++i)
-            skills[i].reset();
+        {
+            if (running)
+                skills[i].lastcd = 0;
+            else
+                skills[i].reset();
+        }
     }
 
     Player* player;
@@ -116,6 +122,7 @@ struct HIPlayerData
     UInt8 inrank; // 0-不在,>=1-在
     std::vector<Task> compass; // 击杀任务
     UInt16 tasks; // 总完成任务数
+    UInt8 ato; // 0-未自动 1-自动中 2-暂停自动
     Skill skills[5];
 };
 
@@ -187,7 +194,7 @@ public:
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
     bool moveTo(Player* player, UInt8 to, bool = true);
     bool attack(Player* player, UInt8 type, UInt64 id);
-    bool useSkill(Player* player, UInt8 skillid);
+    bool useSkill(Player* player, UInt8 skillid, UInt8 type);
     bool getAward(Player* player, UInt8 id, UInt8 type);
     void clearBuff(UInt8 type, HIPlayerData* pd, UInt32 now, UInt8 skillid = 0);
 
@@ -201,7 +208,6 @@ public:
     RareAnimals& findRareAnimal(UInt32 id, UInt8 spot);
 
     void startCompass(Player* player);
-    void stopCompass(Player* player);
     void commitCompass(Player* player);
 
     void sendSpot(HIPlayerData* pd, UInt8 spot);
@@ -213,10 +219,12 @@ public:
     void broadcast(Stream& st);
     void notifyCount(UInt32 now);
     void expFactor(UInt32 now);
+    void sendExpFactor(Player* player);
 
     void listRank(Player* player, UInt16 start, UInt8 pagesize);
     void saveAtoCfg(Player* player, const std::string& cfg);
     void sendAtoCfg(Player* player);
+    void setAto(Player* player, UInt8 onoff);
 
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }

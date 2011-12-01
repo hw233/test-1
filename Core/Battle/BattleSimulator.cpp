@@ -956,10 +956,20 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
 
         if(atkAct)
         {
-            while(NULL == (passiveSkill = target_bo->getPassiveSkillAftRes100(idx)));
-
-            if( passiveSkill == NULL)
+            if(passiveSkill == NULL)
                 passiveSkill = target_bo->getPassiveSkillAftRes();
+
+            if(passiveSkill == NULL)
+            {
+                idx = 0;
+                size_t oidx = idx;
+                while(NULL == passiveSkill)
+                {
+                    passiveSkill = target_bo->getPassiveSkillAftRes100(idx);
+                    if (oidx == idx)
+                        break;
+                }
+            }
 
             if(NULL != passiveSkill)
             {
