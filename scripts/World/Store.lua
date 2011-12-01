@@ -1,7 +1,7 @@
 function loadStore()
 local store = GetStore()
 store:clear()
-store:add(1,517,10)
+store:add(1,72,720)
 store:add(1,78,120)
 store:add(1,79,200)
 store:add(1,80,450)

@@ -2426,7 +2426,7 @@ void GMHandler::OnUseSkillHI(GObject::Player *player, std::vector<std::string>& 
 {
     if (args.size() < 1)
         return;
-    heroIsland.useSkill(player, atoi(args[0].c_str()));
+    heroIsland.useSkill(player, atoi(args[0].c_str()), 1);
 }
 
 

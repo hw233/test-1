@@ -57,6 +57,9 @@ require("scripts/Monster/Monster_00005108")
 require("scripts/Monster/Monster_00005132")
 require("scripts/Monster/Monster_00005133")
 require("scripts/Monster/Monster_00005137")
+require("scripts/Monster/Monster_00005138")
+require("scripts/Monster/Monster_00005143")
+require("scripts/Monster/Monster_00005147")
 require("scripts/Monster/Monster_00005174")
 require("scripts/Monster/Monster_00005175")
 require("scripts/Monster/Monster_00005176")
@@ -135,6 +138,9 @@ local Monster_Function_Table = {
 	[5132] = Monster_00005132,
 	[5133] = Monster_00005133,
 	[5137] = Monster_00005137,
+	[5138] = Monster_00005138,
+	[5143] = Monster_00005143,
+	[5147] = Monster_00005147,
 	[5174] = Monster_00005174,
 	[5175] = Monster_00005175,
 	[5176] = Monster_00005176,
