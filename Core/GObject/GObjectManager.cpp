@@ -1466,6 +1466,27 @@ namespace GObject
 		}
 		lc.finalize();
 
+        lc.prepare("Loading team copy player:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBTeamCopyPlayer dbtcp;
+        if(execu->Prepare("SELECT `playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime` FROM `teamcopy_player` ORDER BY `playerId`, `copyId`, `type`", dbtcp) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbtcp.playerId];
+            if(!pl)
+                continue;
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(!tcpInfo)
+                continue;
+
+            tcpInfo->setPassFromDB(dbtcp.copyId, dbtcp.type, dbtcp.pass);
+            tcpInfo->setPassTimesFromDB(dbtcp.copyId, dbtcp.type, dbtcp.passTimes, dbtcp.vTime);
+        }
+		lc.finalize();
+
 		lc.prepare("Loading player pending tasks:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
@@ -1501,6 +1522,10 @@ namespace GObject
 			task->m_Submit = dtdata.m_Submit;
 			task->m_StepStr = dtdata.m_TaskStep;
 			pl->GetTaskMgr()->LoadTask(task);
+
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(tcpInfo && dtdata.m_Completed)
+                tcpInfo->checkCopyPass(dtdata.m_TaskId);
 		}
 		lc.finalize();
 
@@ -1524,6 +1549,10 @@ namespace GObject
 			const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(dtdata2.m_TaskId);
 			if (taskType.m_TypeId == 0) continue;
 			pl->GetTaskMgr()->LoadSubmitedTask(dtdata2.m_TaskId, dtdata2.m_TimeEnd);
+
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(tcpInfo)
+                tcpInfo->checkCopyPass(dtdata.m_TaskId);
 		}
 		lc.finalize();
 
@@ -1732,6 +1761,8 @@ namespace GObject
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
 		lc.finalize();
+
+
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);

@@ -17,6 +17,13 @@ namespace GObject
 {
 class Player;
 
+#define TEAMCOPY_MAXTYPECNT 2 
+#define TEAMCOPY_MAXCOPYCNT 6 
+#define TEAMCOPY_MAXMEMCNT  3 
+#define TEAMCOPY_MAXPAGECNT 6 
+#define TEAMCOPY_MAXPWDCNT  6 
+#define TEAMCOPY_MAXTEAMCNT 600 
+
 struct TeamData
 {
     TeamData()
@@ -33,7 +40,7 @@ struct TeamData
     //CopyId + (CopyTeamsIdx << 8)
     UInt32 id;
     Player* leader;
-    Player* members[3];
+    Player* members[TEAMCOPY_MAXMEMCNT];
     UInt8 count;
     UInt8 t;
     UInt8 upLevel;
@@ -41,14 +48,35 @@ struct TeamData
     std::string pwd;
 };
 
+class TeamCopyPlayerInfo
+{
+    private:
+        bool m_pass[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        UInt8 m_passTimes[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        UInt32 m_vTime[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        Player* m_owner;
+        UInt8 m_maxPass;
+
+    public:
+        TeamCopyPlayerInfo(Player* owner);
+
+        void setPassFromDB(UInt8 copyId, UInt8 t, bool pass);
+        void setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime);
+
+        bool getPass(UInt8 copyId, UInt8 t);
+        UInt8 getPassTimes(UInt8 copyId, UInt8 t);
+        void setPass(UInt8 copyId, UInt8 t, bool pass);
+        void setPassTimes(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime);
+        void incPass(UInt8 copyId, UInt8 t);
+        bool checkTeamCopyPlayer(UInt8 copyId, UInt8 t);
+        void checkCopyPass(UInt32 taskId);
+};
+
+
 class TeamCopy
 {
-    static const UInt8 maxCopyCnt = 6;
-    static const UInt8 maxMemCnt = 3;
-    static const UInt8 maxPageLen = 6;
-    static const UInt8 maxPWDLen = 8;
-    static const UInt8 lvls[6];
-    static const UInt32 maxTeamCnt = 600;
+    public:
+        static const UInt8 lvls[TEAMCOPY_MAXCOPYCNT];
 
     public:
         TeamCopy();
@@ -58,6 +86,7 @@ class TeamCopy
         bool leaveTeamCopy(Player* pl);
         void reqTeamList(Player* pl, UInt32 start, UInt8 count, UInt8 type);
         void reqTeamInfo(Player* pl);
+        void updateTeamInfo(Player* pl);
         UInt32 createTeam(Player* pl, std::string pwd, UInt8 upLevel, UInt8 dnLevel);
         UInt32 joinTeam(Player* pl, UInt32 teamId, std::string pwd);
         void leaveTeam(Player* pl);
@@ -66,6 +95,7 @@ class TeamCopy
         void handoverLeader(Player* pl, UInt64 playerId);
         void teamBattleStart(Player* pl);
         void sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 startIdx, UInt32 endIdx);
+        bool quikJoinTeam(Player* pl);
 
         bool checkTeamCopy(Player* pl, UInt8 copyId, UInt8 t);
         void incLevelTeamCnt(UInt8 copyId, UInt8 t, UInt8 upLevel, UInt8 dnLevel);
@@ -73,7 +103,7 @@ class TeamCopy
         UInt16 getIdleTeamNumber(UInt8 copyId, UInt8 t);
         void recycleTeamNumber(UInt8 copyId, UInt8 t, UInt16 number);
         void addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npcId);
-        void sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim);
+        void sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid);
 
     private:
         typedef std::vector<TeamData*> CopyTeams;
@@ -94,12 +124,12 @@ class TeamCopy
         typedef std::vector<Player*> TeamCopyPlayer;
 
         // [t难度][副本idx]
-        TeamNumber m_tnIdle[2][6];
-        TeamCopyPlayer m_playerIdle[2][6];
-        CopyTeams* m_copysTeam[2][6];
-        LevelTeamCnt m_clvTeamCnt[2][6];
+        TeamNumber m_tnIdle[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        TeamCopyPlayer m_playerIdle[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        CopyTeams* m_copysTeam[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        LevelTeamCnt m_clvTeamCnt[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         AllCopyTeams m_allCopyTeams;
-        TeamCopyNpc m_tcNpcId[2][6];
+        TeamCopyNpc m_tcNpcId[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
 };
 
 extern TeamCopy* teamCopyManager;

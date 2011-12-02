@@ -98,15 +98,23 @@ void BattleSimulator::putTeams(const std::string& name, UInt8 level, UInt16 port
     _team_portrait[side][idx] = portrait;
 }
 
-void BattleSimulator::clearLastBattle(UInt8 side)
+UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
 {
     if(side > 1)
-        return;
+        return 0;
 
-    int oldID = _id; 
+    if(_id == 0)
+    {
+        _id = IDGenerator::gBattleOidGenerator.ID();
+        _packet.data<UInt32>(4) = _id;
+    }
 
-    _id = IDGenerator::gBattleOidGenerator.ID();
-    _packet.data<UInt32>(3) = _id;
+    UInt32 oldID = _id; 
+    if(!isLast)
+    {
+        _id = IDGenerator::gBattleOidGenerator.ID();
+        _packet.data<UInt32>(8) = _id;
+    }
 
     battleReport.addReport(oldID, _packet);
 
@@ -125,6 +133,8 @@ void BattleSimulator::clearLastBattle(UInt8 side)
     _team_level[side][0] = 0;
     _team_level[side][1] = 0;
     _team_portrait[side][0] = 0;
+
+    return oldID;
 }
 
 // #############################
@@ -154,7 +164,7 @@ void BattleSimulator::start(UInt8 prevWin)
         _packet << _teams[tidx];
         for(int idx = 0; idx < _teams[tidx]; ++idx)
         {
-            _packet << _team_name[idx] << _team_level[idx] << _team_portrait[idx];
+            _packet << _team_name[tidx][idx] << _team_level[tidx][idx] << _team_portrait[tidx][idx];
         }
     }
 

@@ -126,6 +126,7 @@ namespace GObject
     struct PracticeData;
     class AttainMgr;
     struct TeamData;
+    struct TeamCopyPlayerInfo;
 
     struct TripodData
     {
@@ -1182,12 +1183,14 @@ namespace GObject
         void setTeamData(TeamData* td);
         CopyTeamPage& getCopyTeamPage();
         void clearCopyTeamPage();
+        TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
 
     private:
         bool m_hasTripod;
         TripodData m_td;
         TeamData* m_teamData;
         CopyTeamPage m_ctp;
+        TeamCopyPlayerInfo* m_tcpInfo;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }

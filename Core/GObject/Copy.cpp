@@ -12,6 +12,7 @@
 #include "Mail.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "GObject/TeamCopy.h"
 
 namespace GObject
 {
@@ -276,6 +277,11 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 }
 
                 GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+                TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+                if(tcpInfo && tcpInfo->getPass(id, 0) == false)
+                {
+                    tcpInfo->setPass(id, 0, true);
+                }
 
                 tcd.floor = 0;
                 tcd.spot = 0;

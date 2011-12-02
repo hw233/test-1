@@ -13,11 +13,11 @@ const UInt8 TeamCopy::lvls[6] = {30, 45, 60, 70, 80, 90};
 
 TeamCopy::TeamCopy()
 {
-    for(int t = 0; t < 2; ++t)
+    for(int t = 0; t < TEAMCOPY_MAXTYPECNT; ++t)
     {
-        for(int i = 0; i < maxCopyCnt; ++i)
+        for(int i = 0; i < TEAMCOPY_MAXCOPYCNT; ++i)
         {
-            for(UInt16 j = 0; j < maxTeamCnt; ++j)
+            for(UInt16 j = 0; j < TEAMCOPY_MAXTEAMCNT; ++j)
             {
                 m_tnIdle[t][i].push_back(j + 1);
             }
@@ -28,16 +28,16 @@ TeamCopy::TeamCopy()
 
 TeamCopy::~TeamCopy()
 {
-    for(UInt8 t = 0; t < 2; ++t)
+    for(UInt8 t = 0; t < TEAMCOPY_MAXTYPECNT; ++t)
     {
-        for(UInt8 idx = 0; idx < maxCopyCnt; ++idx)
+        for(UInt8 idx = 0; idx < TEAMCOPY_MAXCOPYCNT; ++idx)
         {
             m_clvTeamCnt[t][idx].clear();
             m_tnIdle[t][idx].clear();
             m_playerIdle[t][idx].clear();
         }
 
-        for(UInt8 idx = 0; idx < maxCopyCnt; ++idx)
+        for(UInt8 idx = 0; idx < TEAMCOPY_MAXCOPYCNT; ++idx)
         {
             if(m_copysTeam[t][idx])
             {
@@ -65,7 +65,7 @@ bool TeamCopy::checkTeamCopy(Player* pl, UInt8 copyId, UInt8 t)
     if(pl == NULL)
         return false;
     UInt8 level = pl->GetLev();
-    if( copyId > maxCopyCnt || level < lvls[copyIdx] || t > 1)
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
         return false;
 
     return true;
@@ -74,7 +74,7 @@ bool TeamCopy::checkTeamCopy(Player* pl, UInt8 copyId, UInt8 t)
 void TeamCopy::addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npcId)
 {
     UInt8 copyIdx = copyId - 1;
-    if( copyId > maxCopyCnt || t > 1)
+    if( copyId > TEAMCOPY_MAXCOPYCNT || t > TEAMCOPY_MAXTYPECNT)
         return;
 
     TeamCopyNpc& tcNpc = m_tcNpcId[t][copyIdx];
@@ -96,7 +96,7 @@ void TeamCopy::sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 startIdx, UI
         CopyTeamPage& ctp = pl->getCopyTeamPage();
         if(ctp.start <= startIdx && ctp.end >= endIdx)
         {
-            reqTeamList(pl, ctp.start, maxPageLen, ctp.type);
+            reqTeamList(pl, ctp.start, TEAMCOPY_MAXPAGECNT, ctp.type);
         }
     }
 }
@@ -108,7 +108,7 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt8 count, UInt8 type)
     UInt8 copyIdx = ctp.copyId - 1;
     UInt8 t = ctp.t;
     UInt8 level = pl->GetLev();
-    if(copyIdx >= maxCopyCnt )
+    if(copyIdx >= TEAMCOPY_MAXCOPYCNT)
         return;
 
     if(!checkTeamCopy(pl, copyId, t))
@@ -143,11 +143,12 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt8 count, UInt8 type)
 
     Stream st(REP::TEAM_COPY_REQ);
     st << static_cast<UInt8>(0x01) << sz << start << type << count;
+    UInt8 pos = st.size();
     UInt8 cnt = 0;
     UInt32 idx = start;
     for(; idx < sz && cnt < count; ++idx)
     {
-        if(type == 1 && ((ct[idx]->upLevel > 0 && ct[idx]->upLevel < level) || (ct[idx]->dnLevel > 0 && ct[idx]->dnLevel > level) || ct[idx]->pwd.length() > 0 || ct[idx]->count >= maxMemCnt))
+        if(type == 1 && ((ct[idx]->upLevel > 0 && ct[idx]->upLevel < level) || (ct[idx]->dnLevel > 0 && ct[idx]->dnLevel > level) || ct[idx]->pwd.length() > 0 || ct[idx]->count >= TEAMCOPY_MAXMEMCNT ))
         {
             continue;
         }
@@ -164,11 +165,24 @@ void TeamCopy::reqTeamList(Player* pl, UInt32 start, UInt8 count, UInt8 type)
     }
 
     ctp.start = start;
-    ctp.end = idx > (start + maxPageLen) ? idx : (start + maxPageLen);
+    ctp.end = idx > (start + TEAMCOPY_MAXPAGECNT) ? idx : (start + TEAMCOPY_MAXPAGECNT);
     ctp.type = type;
 
+    st.data<UInt8>(pos) = cnt;
     st << Stream::eos;
     pl->send(st);
+}
+
+void TeamCopy::updateTeamInfo(Player* pl)
+{
+    TeamData* td = pl->getTeamData();
+    if(!td)
+        return;
+
+    for(UInt8 j = 0; j < td->count; ++j)
+    {
+        reqTeamInfo(td->members[j]);
+    }
 }
 
 void TeamCopy::reqTeamInfo(Player* pl)
@@ -268,27 +282,65 @@ UInt32 TeamCopy::createTeam(Player* pl, std::string pwd, UInt8 upLevel, UInt8 dn
 void TeamCopy::incLevelTeamCnt(UInt8 copyId, UInt8 t, UInt8 upLevel, UInt8 dnLevel)
 {
     UInt8 copyIdx = copyId - 1;
+    if(!dnLevel)
+        dnLevel = lvls[copyIdx];
+    if(!upLevel)
+        upLevel = LEVEL_MAX;
     for(UInt8 i = dnLevel; i <= upLevel; ++i)
     {
         LevelTeamCnt& lvt = m_clvTeamCnt[t][copyIdx];
         LevelTeamCntIterator lvIt = lvt.find(i);
         if(lvIt == lvt.end())
             lvt[i] = 1;
-        ++lvt[i];
+        else
+            ++lvt[i];
     }
 }
 
 void TeamCopy::decLevelTeamCnt(UInt8 copyId, UInt8 t, UInt8 upLevel, UInt8 dnLevel)
 {
     UInt8 copyIdx = copyId - 1;
+    if(!dnLevel)
+        dnLevel = lvls[copyIdx];
+    if(!upLevel)
+        upLevel = LEVEL_MAX;
     for(UInt8 i = dnLevel; i <= upLevel; ++i)
     {
         LevelTeamCnt& lvt = m_clvTeamCnt[t][copyIdx];
         LevelTeamCntIterator lvIt = lvt.find(i);
         if(lvIt == lvt.end())
-            lvt[i] = 1;
+            continue;
         --lvt[i];
     }
+}
+
+bool TeamCopy::quikJoinTeam(Player* pl)
+{
+    CopyTeamPage& ctp = pl->getCopyTeamPage();
+    UInt8 copyId = ctp.copyId;
+    UInt8 copyIdx = ctp.copyId - 1;
+    UInt8 t = ctp.t;
+
+    if(pl->getTeamData() != NULL)
+        return false;
+    if(!checkTeamCopy(pl, copyId, t))
+        return false;
+
+    CopyTeams& ct = *(m_copysTeam[t][copyIdx]);
+    UInt32 sz = ct.size();
+
+    bool res = false;
+    for(UInt32 idx = 0; idx < sz; ++idx)
+    {
+        if(ct[idx]->count < TEAMCOPY_MAXMEMCNT && ct[idx]->pwd.length() == 0)
+        {
+            res = true;
+            joinTeam(pl, ct[idx]->id, "");
+            break;
+        }
+    }
+
+    return res;
 }
 
 UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
@@ -310,7 +362,7 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
         return 0;
 
     TeamData* td = it->second;
-    if(td->count >= maxMemCnt || t != td->t)
+    if(td->count >= TEAMCOPY_MAXMEMCNT || t != td->t)
         return 0;
 
     if(td->pwd != pwd)
@@ -383,6 +435,9 @@ void TeamCopy::leaveTeam(Player* pl)
             }
         }
 
+        UInt8 dnLevel = td->dnLevel > lvls[copyIdx] ? td->dnLevel : lvls[copyIdx];
+        UInt8 upLevel = td->upLevel < LEVEL_MAX ? td->upLevel : LEVEL_MAX;
+        decLevelTeamCnt(copyId, t, upLevel, dnLevel);
         recycleTeamNumber(copyId, t, td->id >> 8);
     }
     else if(pl == td->leader)
@@ -529,6 +584,10 @@ bool TeamCopy::enterTeamCopy(Player* pl, UInt8 copyId, UInt8 t)
     if(pl->hasFlag(GObject::Player::InCopyTeam))
         return false;
 
+    TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+    if(!tcpInfo->checkTeamCopyPlayer(copyId, t))
+        return false;
+
     TeamCopyNpc& npcIds = m_tcNpcId[t][copyIdx];
     pl->moveTo(npcIds.location, true);
 
@@ -617,6 +676,7 @@ void TeamCopy::teamBattleStart(Player* pl)
     UInt8 npcIdx = 0;
     UInt8 memIdx = 0;
     UInt8 res = 0;
+    UInt32 rptid = 0;
     for(; memIdx < td->count; ++memIdx)
     {
         if(npcIdx >= cnt)
@@ -626,9 +686,9 @@ void TeamCopy::teamBattleStart(Player* pl)
         if(!member)
             break;
 
-        if(res == 1)
+        if(res == 2)
         {
-            sendBattleReport(td, NULL, bsim);
+            sendBattleReport(td, NULL, bsim, rptid);
         }
 
         member->PutFighters( bsim, 0 );
@@ -644,68 +704,90 @@ void TeamCopy::teamBattleStart(Player* pl)
 
         while(npcIdx < cnt)
         {
-            if( 2 == res )
+            if( 1 == res )
             {
-                sendBattleReport(td, NULL, bsim);
+                sendBattleReport(td, NULL, bsim, rptid);
             }
 
-            ng = ngs[npcIdx];
-            if(!ng)
-                break;
-            ng->putFighters( bsim );
-            for(UInt8 nIdx = 1; nIdx <= cnt; ++nIdx)
+            if( 2 != res )
             {
-                UInt8 idx = nIdx % cnt;
-                if(idx == 0)
+                ng = ngs[npcIdx];
+                if(!ng)
                     break;
+                ng->putFighters( bsim );
 
-                bsim.putTeams(ngs[idx]->getName(), ngs[idx]->getLevel(), ngs[idx]->getPortrait(), 1);
+                for(UInt8 nIdx = 1; nIdx <= cnt; ++nIdx)
+                {
+                    UInt8 idx = nIdx % cnt;
+                    if(idx == 0)
+                        break;
+
+                    bsim.putTeams(ngs[idx]->getName(), ngs[idx]->getLevel(), ngs[idx]->getPortrait(), 1);
+                }
             }
 
             bsim.start();
-            res = bsim.getWinner() == 1;
-            ++npcIdx;
-            if( 1 == res )
+            res = bsim.getWinner();
+            if( 2 == res )
             {
                 break;
             }
+            ++npcIdx;
         }
     }
 
-    sendBattleReport(td, ng, bsim);
+    sendBattleReport(td, ng, bsim, rptid);
 
     if( 1 == res )
     {
+        Stream st(REP::TEAM_COPY_REQ);
+        st << static_cast<UInt8>(0x00);
+        st << static_cast<UInt8>(0) << static_cast<UInt8>(t);
+        st << Stream::eos;
+
         for(UInt8 i = td->count; i > 0; --i)
-            leaveTeamCopy(td->members[i-1]);
+        {
+            Player* pl = td->members[i-1];
+            if(pl == NULL)
+                continue;
+
+            pl->send(st);
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            tcpInfo->incPass(copyId, t);
+            if(t == 0 && tcpInfo->getPass(copyId, 1) == false)
+            {
+                tcpInfo->setPass(copyId, 1, true);
+            }
+
+            leaveTeamCopy(pl);
+        }
     }
 
 
     recycleTeamNumber(copyId, t, td->id >> 8);
 }
 
-void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim)
+void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid)
 {
     Stream& packet = bsim.getPacket();
     if(packet.size() <= 8)
         return;
 
-    UInt8 res = bsim.getWinner() == 1;
+    bool isLast = (ng != NULL);
+    UInt8 side = 0;
+    UInt8 res = bsim.getWinner();
     UInt16 r = 0;
     if(res == 1)
     {
-        if(!ng)
-            bsim.clearLastBattle(1);
-
-        r = static_cast<UInt16>(0x0101);
+        side = 1;
+        r = static_cast<UInt16>(0x0201);
     }
     else if(res == 2)
     {
-        if(!ng)
-            bsim.clearLastBattle(0);
-
-        r = static_cast<UInt16>(0x0100);
+        r = static_cast<UInt16>(0x0200);
     }
+
+    UInt32 id = bsim.clearLastBattle(side, isLast);
 
     for(UInt8 i = 0; i < td->count; ++i)
     {
@@ -723,27 +805,154 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
             }
         }
 
-        Stream st(REP::ATTACK_NPC);
-        st << pl->getPendExp() << static_cast<UInt8>(0) << r;
-        UInt8 sz = pl->_lastLoot.size();
-        st << sz;
-        for(UInt8 j = 0; j < sz; ++ j)
+        if(rptid == 0)
         {
-            st << pl->_lastLoot[j].id << pl->_lastLoot[j].count;
+            Stream st(REP::ATTACK_NPC);
+            st << r << id << Stream::eos;
+            pl->send(st);
         }
+    }
 
-        st.append(&packet[8], packet.size() - 8);
-        st << Stream::eos;
+    if(rptid == 0)
+        rptid = id;
+}
 
-        pl->send(st);
+TeamCopyPlayerInfo::TeamCopyPlayerInfo(Player* owner)
+{
+    memset(m_pass, 0, sizeof(m_pass));
+    memset(m_passTimes, 0, sizeof(m_passTimes));
+    memset(m_vTime, 0, sizeof(m_vTime));
+    m_owner = owner;
+    m_maxPass = 100;
+}
+
+bool TeamCopyPlayerInfo::getPass(UInt8 copyId, UInt8 t)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return false;
+
+    return m_pass[t][copyIdx];
+}
+
+UInt8 TeamCopyPlayerInfo::getPassTimes(UInt8 copyId, UInt8 t)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT || m_pass[t][copyIdx] == false )
+        return 0xFF;
+
+    UInt32 now = TimeUtil::Now();
+    if(now > m_vTime[t][copyIdx])
+    {
+        m_vTime[t][copyIdx] = TimeUtil::SharpDayT(1, now);
+        m_passTimes[t][copyIdx] = 0;
+        DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %"I64_FMT"u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
+    }
+
+    return m_passTimes[t][copyIdx];
+}
+
+void TeamCopyPlayerInfo::setPassFromDB(UInt8 copyId, UInt8 t, bool pass)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return;
+
+    m_pass[t][copyIdx] = pass;
+}
+
+void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return;
+
+    m_pass[t][copyIdx] = pass;
+    DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
+}
+
+void TeamCopyPlayerInfo::setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return;
+
+    m_passTimes[t][copyIdx] = passTimes;
+    m_vTime[t][copyIdx] = vTime;
+}
+
+void TeamCopyPlayerInfo::setPassTimes(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return;
+
+    m_passTimes[t][copyIdx] = passTimes;
+    m_vTime[t][copyIdx] = vTime;
+
+    DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %"I64_FMT"u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
+}
+
+void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return;
+
+    ++m_passTimes[t][copyIdx];
+
+    UInt32 now = TimeUtil::Now();
+    if(now > m_vTime[t][copyIdx])
+    {
+        m_vTime[t][copyIdx] = TimeUtil::SharpDayT(1, now);
+        m_passTimes[t][copyIdx] = 0;
+    }
+
+    DB3().PushUpdateData("UPDATE `teamcopy_player` SET `passTimes`=%u,`vTime`=%u WHERE `playerId` = %"I64_FMT"u AND `copyId` = %u AND `type` = %u", m_passTimes[t][copyIdx], m_vTime[t][copyIdx], m_owner->getId(), copyId, t);
+}
+
+bool TeamCopyPlayerInfo::checkTeamCopyPlayer(UInt8 copyId, UInt8 t)
+{
+    UInt8 copyIdx = copyId - 1;
+    UInt8 level = m_owner->GetLev();
+    if( copyId > TEAMCOPY_MAXCOPYCNT || level < TeamCopy::lvls[copyIdx] || t >= TEAMCOPY_MAXTYPECNT )
+        return false;
+
+    UInt8 passTimes = getPassTimes(copyId, t);
+    if(passTimes >= m_maxPass)
+        return false;
+
+    return m_pass[t][copyIdx];
+}
+
+void TeamCopyPlayerInfo::checkCopyPass(UInt32 taskId)
+{
+    switch(taskId)
+    {
+    case 121:
+        setPass(1, 0, true);
+        break;
+    case 94:
+        setPass(2, 0, true);
+        break;
+    case 148:
+        setPass(3, 0, true);
+        break;
+    case 157:
+        setPass(4, 0, true);
+        break;
     }
 }
 
+
 }
-
-
-
-
 
 
 

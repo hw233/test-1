@@ -3543,6 +3543,15 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             teamCopyManager->leaveTeam(player);
         }
         break;
+    case 0x5:
+        {
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x05);
+            bool res = teamCopyManager->quikJoinTeam(player);
+            st << static_cast<UInt8>(res ? 1 : 0) << Stream::eos;
+            player->send(st);
+        }
+        break;
     case 0x10:
         {
             teamCopyManager->reqTeamInfo(player);

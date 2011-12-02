@@ -105,6 +105,16 @@ struct DBMailData
 	UInt32		additionalId;
 };
 
+struct DBTeamCopyPlayer
+{
+    UInt64 playerId;
+    UInt8 copyId;
+    UInt8 type;
+    UInt8 pass;
+    UInt8 passTimes;
+    UInt32 vTime;
+};
+
 struct DBPlayerData
 {
 	UInt64 id;
@@ -885,6 +895,18 @@ SPECIALDEF(8)
 	std::string,title,
 	std::string,content,
 	UInt32,		additionalId
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamCopyPlayer)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt8,  copyId,
+    UInt8,  type,
+    UInt8,  pass,
+    UInt8,  passTimes,
+    UInt32, vTime
 )
 SPECIALEND()
 

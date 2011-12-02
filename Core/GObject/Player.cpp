@@ -561,12 +561,15 @@ namespace GObject
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
+        m_tcpInfo = new TeamCopyPlayerInfo(this);
 	}
 
 
 	Player::~Player()
 	{
 		UnInit();
+        delete m_tcpInfo;
+        m_tcpInfo = NULL;
 	}
 
 	bool Player::Load()
@@ -1859,6 +1862,11 @@ namespace GObject
 			return true;
 		_playerData.formation = f;
 		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
+
+        if(hasFlag(GObject::Player::InCopyTeam))
+        {
+            teamCopyManager->updateTeamInfo(this);
+        }
 
         return true;
 	}
@@ -7170,6 +7178,11 @@ namespace GObject
     void Player::clearCopyTeamPage()
     {
         memset(&m_ctp, 0, sizeof(m_ctp));
+    }
+
+    TeamCopyPlayerInfo* Player::getTeamCopyPlayerInfo()
+    {
+        return m_tcpInfo;
     }
 
 } // namespace GObject
