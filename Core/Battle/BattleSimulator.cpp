@@ -962,9 +962,9 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
             if(passiveSkill == NULL)
             {
                 idx = 0;
-                size_t oidx = idx;
                 while(NULL == passiveSkill)
                 {
+                    size_t oidx = idx;
                     passiveSkill = target_bo->getPassiveSkillAftRes100(idx);
                     if (oidx == idx)
                         break;
