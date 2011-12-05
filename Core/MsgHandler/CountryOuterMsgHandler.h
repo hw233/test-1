@@ -3585,6 +3585,12 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             teamCopyManager->teamBattleStart(player);
         }
         break;
+    case 0xFF:
+        {
+            TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+            tcpInfo->reqTeamCopyInfo();
+        }
+        break;
     default:
         return;
     }

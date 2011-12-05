@@ -70,6 +70,8 @@ class TeamCopyPlayerInfo
         void incPass(UInt8 copyId, UInt8 t);
         bool checkTeamCopyPlayer(UInt8 copyId, UInt8 t);
         void checkCopyPass(UInt32 taskId);
+        void reqTeamCopyInfo();
+        void sendUpdateTeamCopyInfo(UInt8 copyId, UInt8 t);
 };
 
 
