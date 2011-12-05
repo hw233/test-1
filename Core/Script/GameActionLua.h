@@ -210,7 +210,7 @@ namespace Script
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
         void onRecruitAward(Player* player);
-
+       
 	public:
 
 		template <typename R>
@@ -254,6 +254,8 @@ namespace Script
 
     public:
         void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
+        UInt32  GetAtyCheckFlag(UInt32 idx);
+        UInt32  GetMaxActivity(UInt32 vip);
 	private:
 		Player* _player1;	//脚本动作行为主体1
 		Player* _player2;	//脚本动作行为主体2

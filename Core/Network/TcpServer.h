@@ -43,7 +43,7 @@ namespace Network
 	{
 		friend class TcpMasterServer;
 	public:
-		TcpSlaveServer(UInt32 idx): TcpServer(), _slave_idx(idx), _count(0), _evOp(NULL) { for(int i = 0; i < TCP_CONN_IDX_MAX; ++ i) _connUp[i] = -1; }
+		TcpSlaveServer(UInt32 idx): TcpServer(), _slave_idx(idx), _count(0), _evOp(NULL), _evTick(NULL) { for(int i = 0; i < TCP_CONN_IDX_MAX; ++ i) _connUp[i] = -1; }
 		void initConnection(int = 1);
 		void lostConnection(int = 1);
 		void accepted(int);
@@ -64,6 +64,9 @@ namespace Network
 		static void _ev_op_event(int, short, void *);
 		void onOpCheck();
 
+        static void _ev_tick_event(int, short, void*);
+        void onTick(UInt32 now);
+
 		template<typename PredType>
 		void broadcast(const void *, int, PredType pred);
 		void broadcast(const void *, int);
@@ -83,6 +86,7 @@ namespace Network
 		UInt32 _count;
 
 		struct event * _evOp;
+        struct event * _evTick;
 		FastMutex _opMutex;
 		struct _OpStruct
 		{

@@ -427,12 +427,12 @@ function ItemNormal_00000008(iid, num, bind, param)
     local item = items[i]
     if item[1] == 0 then
         local equip = getRandOEquip(player:GetLev())
-		package:AddEquip(equip, 1, true);
+		package:AddEquip(equip, 1, false);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
         end
     else
-        package:AddItem(item[1], item[2], true, 0, 2);
+        package:AddItem(item[1], item[2], true, false, 2);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."]x"..item[2]);
         end
@@ -459,6 +459,60 @@ function ItemNormal_00000009(iid, num, bind, param)
   player:setBuffData(0, num2, true);
   player:autoRegenAll();
   package:DelItemSendMsg(9, player);
+  return num
+end
+
+function ItemNormal_00000010(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  local lvl = player:GetLev()
+
+  if lvl < 40 then
+      return
+  end
+
+  local items = {
+      {1600,1601,1602},
+      {1604,1605,1606},
+      {1603,1608,1609},
+      {1610,1614,1615},
+      {1612,1616,1607,1611},
+      {200,201,202,203,204,205,206,207,208},
+      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224},
+  }
+
+  local n = 0
+  if lvl >= 40 and lvl <= 44 then
+      n = 1
+  elseif lvl >= 45 and lvl <= 49 then
+      n = 2
+  elseif lvl >= 50 and lvl <= 54 then
+      n = 3
+  elseif lvl >= 55 and lvl <= 59 then
+      n = 4
+  elseif lvl >= 60 and lvl <= 64 then
+      n = 5
+  elseif lvl >= 65 and lvl <= 69 then
+      n = 6
+  elseif lvl >= 70 and lvl <= 74 then
+      n = 7
+  elseif lvl >= 75 then
+      n = 7
+  end
+
+  if n == 0 then
+      return
+  end
+
+  local m = math.random(1, #items[n])
+  if items[n][m] == nil then
+      return
+  end
+
+  package:Add(items[n][m], 1, 1, 0, 2);
+
+  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[英雄遗迹]，获得了[4:"..items[n][m].."]")
+  package:DelItemSendMsg(10, player);
   return num
 end
 
@@ -5138,6 +5192,21 @@ function ItemNormal_00000067(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00000072(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 2 then		
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    package:AddItem(514, 10, true, 0, 2);
+    package:AddItem(515, 10, true, 0, 2);
+
+    package:DelItemSendMsg(72, player);
+    return num
+end
 
 
 function ItemNormal_00000078(iid, num, bind, param)
@@ -5643,6 +5712,7 @@ local ItemNormal_Table = {
 --	[7] = ItemNormal_00000007,
 	[8] = ItemNormal_00000008,
 	[9] = ItemNormal_00000009,
+	[10] = ItemNormal_00000010,
 	[8931] = ItemNormal_00008931,
 	[55] = ItemNormal_00000055,
 	[56] = ItemNormal_00000056,
@@ -5944,6 +6014,7 @@ local ItemNormal_Table = {
 
     [68] = ItemNormal_00000068,
     [67] = ItemNormal_00000067,
+    [72] = ItemNormal_00000072,
 
     [78] = ItemNormal_00000078,
     [79] = ItemNormal_00000079,

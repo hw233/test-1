@@ -1865,7 +1865,7 @@ namespace GObject
 			Player * pl = globalPlayers[dac.playerId];
 			if(pl == NULL)
 				continue;
-			playerCopy.autoBattle(pl, dac.id, 0, true);
+			playerCopy.autoBattle(pl, dac.id, 0, 0, true);
 		}
 		lc.finalize();
 
@@ -1880,7 +1880,7 @@ namespace GObject
 			Player * pl = globalPlayers[afm.playerId];
 			if(pl == NULL)
 				continue;
-			frontMap.autoBattle(pl, afm.id, 0, true);
+			frontMap.autoBattle(pl, afm.id, 0, 0, true);
 		}
 		lc.finalize();
 

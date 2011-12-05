@@ -221,7 +221,7 @@ void UserReconnectReq(LoginMsgHdr& hdr, UserReconnectStruct& ur)
 		return;
 
 	if(ur._userid == 0)
-		conn->closeConn();
+		conn->pendClose();
 
 	Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 	GObject::Player * player = NULL;
@@ -262,7 +262,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		return;
 
 	if(ul._userid == 0)
-		conn->closeConn();
+		conn->pendClose();
 
     // TODO: 可能是这个地方导致登陆后不久断线
 #if 0
@@ -280,7 +280,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 
     if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
     {
-		conn->closeConn();
+		conn->pendClose();
         return;
     }
 
@@ -338,6 +338,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
 		}
+
+        cl->SetStatus(Network::GameClient::NORMAL);
 	}
 	else
 		res = 2;
@@ -453,7 +455,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 #if 0
 	if(nu._country < 1 || nu._country > 2/* || !StringFilter::Checkup(nu._name)*/)
 	{
-		conn->closeConn();
+		conn->pendClose();
 		return;
 	}
 #endif

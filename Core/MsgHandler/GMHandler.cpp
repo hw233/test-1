@@ -309,6 +309,23 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 	if(args.empty())
 		return;
 
+    ActivityMgr* mgr = player->GetActivityMgr();
+    if(args.size() == 1)
+    {
+        int i = atoi(args[0].c_str());
+
+        if( i == 1)
+            mgr->ActivityList(7);
+        else if( i == 2)
+            mgr->ChangeOnlineReward();
+
+    }
+    else if(args.size() == 2)
+    {
+        int i = atoi(args[0].c_str());
+         mgr->GetReward(i);
+    }
+    return;
 #if 0
     //only for test liuhuiting
     //
@@ -2444,7 +2461,7 @@ void GMHandler::OnUseSkillHI(GObject::Player *player, std::vector<std::string>& 
 {
     if (args.size() < 1)
         return;
-    heroIsland.useSkill(player, atoi(args[0].c_str()));
+    heroIsland.useSkill(player, atoi(args[0].c_str()), 1);
 }
 
 

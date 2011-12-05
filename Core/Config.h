@@ -65,5 +65,5 @@ namespace std
 #endif
 
 #define SAFE_DELETE(obj) do { delete(obj); obj = NULL; } while(0)
-
+#define NO_ATTAINMENT
 #endif // _CONFIG_H_

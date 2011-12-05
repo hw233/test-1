@@ -81,7 +81,7 @@ namespace Script
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
-
+        lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -906,6 +906,9 @@ namespace Script
 	}
     void GameActionLua::doAttainment(Player* pl, UInt16 attainId, UInt32 param)
     {
+#ifdef NO_ATTAINMENT
+        return;
+#endif
         Call<void>("doAttainment", pl, attainId, param);
     }
     void GameActionLua::finishAttainment(Player* pl, UInt16 attainId)
@@ -920,5 +923,13 @@ namespace Script
     void GameActionLua::doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2)
     {
         Call<void>("doAty", pl, id, param1, param2);
+    }
+    UInt32  GameActionLua::GetAtyCheckFlag(UInt32 idx)
+    {
+        return Call<UInt32>("GetAtyCheckFlag", idx);
+    }
+    UInt32  GameActionLua::GetMaxActivity(UInt32 vip)
+    {
+        return Call<UInt32>(  "GetMaxActivity", vip);
     }
 }

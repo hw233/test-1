@@ -1167,11 +1167,15 @@ void Fighter::rebuildEquipAttr()
 
 		if(trump != NULL)
         {
-            if(!hasActiveTrump)
+            if(!hasActiveTrump && trump->getId() >= 1600)
+            {
                 addTrumpAttr(trump);
-
-            if(trump->getId() >= 1600)
                 hasActiveTrump = true;
+            }
+            else
+            {
+                addTrumpAttr(trump);
+            }
         }
     }
 

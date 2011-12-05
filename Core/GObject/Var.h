@@ -28,7 +28,8 @@ namespace GObject
         VAR_APRON = 3,      // 肚兜
         VAR_TGDT = 4,       // 感恩节在线时间
         VAR_TGDCNT = 5,     // 感恩节连续在线3小时次数
-
+        VAR_ATOFM = 6,     // 自动阵图id
+        VAR_TODAY_ONLINE = 9,     // time -- online today
         VAR_KEYPACK1 = 10,  // KEY礼包
         VAR_KEYPACK2,
         VAR_KEYPACK3,
@@ -87,6 +88,9 @@ namespace GObject
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
             REGISTER_VAR(VAR_TGDT, CYCLE_MONTH);
             REGISTER_VAR(VAR_TGDCNT, CYCLE_MONTH);
+            REGISTER_VAR(VAR_ATOFM, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_TODAY_ONLINE,  CYCLE_DAY);
             REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK3, CYCLE_NONE);
@@ -119,15 +123,15 @@ namespace GObject
 
         }
         
-        UInt32 GetVar(UInt32 id);
-        void SetVar(UInt32 id, UInt32 data);
-        void AddVar(UInt32 id, UInt32 data);
+        UInt32 GetVar(UInt32 id, UInt32 now = 0);
+        void SetVar(UInt32 id, UInt32 data, UInt32 now = 0);
+        void AddVar(UInt32 id, UInt32 data, UInt32 now = 0);
         void LoadVar(UInt32 id, UInt32 data, UInt32 overTime);
         void SetOffset(UInt32 offset){ m_Offset = offset; }
 
     private:
         UInt32 GetType(UInt32 id) const;
-        bool CheckReset(UInt32 id);
+        bool CheckReset(UInt32 id, UInt32 now);
         void UpdateDB(UInt32 id);
 
     private:

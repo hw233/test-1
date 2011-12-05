@@ -325,7 +325,7 @@ namespace GObject
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
-			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
+			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
@@ -508,6 +508,12 @@ namespace GObject
 		void Logout(bool = false);	//玩家下线操作
 		void selfKick();
 
+        UInt32 GetOnlineTimeToday();
+        UInt32 GetOnlineTimeTodaySinceLastLogin(UInt32 now);
+
+    private:
+        void LogoutSaveOnlineTimeToday();
+    public:
 		void sendWallow();
 		void makeWallow(Stream& st);
 
@@ -600,10 +606,15 @@ namespace GObject
 		void testBattlePunish();
 
 
-        UInt32 GetVar(UInt32 id);
+        UInt32 GetVar(UInt32 id );
         void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
-        void SetVar(UInt32 id, UInt32 val);
-        void AddVar(UInt32 id, UInt32 val);
+        void SetVar(UInt32 id, UInt32 val );
+        void AddVar(UInt32 id, UInt32 val );
+
+        UInt32 GetVarNow(UInt32 id, UInt32 now);
+        void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
+        void AddVarNow(UInt32 id , UInt32 val, UInt32 now);
+
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
@@ -799,7 +810,7 @@ namespace GObject
 		void moveToNeutralHome();
 
 		//战斗相关
-		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, bool = true);
+		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, UInt8 = 0x03);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
         bool attackCopyNpc(UInt32, UInt8, UInt8, UInt8, UInt8 = 0, bool = false, std::vector<UInt16>* loot = NULL, bool = true);
@@ -821,10 +832,18 @@ namespace GObject
 		void sendOnlineReward();
 		void sendDailyInfo();
 
-        void startAutoCopy(UInt8 id);
+        void GetFuben(UInt8& copy, UInt8& copyMax, UInt8& dung, UInt8& dungMax, UInt8& format, UInt8& formatMax );
+        void GetDailyTask(UInt8& shimenF, UInt8& shimenMax, UInt8& yamenF, UInt8& yamenMax, UInt8& clanF, UInt8& clanMax);
+
+        void startAutoCopy(UInt8 id, UInt8 mtype);
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
         void sendAutoCopy();
+
+        void startAutoFrontMap(UInt8 id, UInt8 mtype);
+        void cancelAutoFrontMap(UInt8 id);
+        void instantAutoFrontMap(UInt8 id);
+        void sendAutoFrontMap();
 
 		inline UInt32 getNextExtraReward()
 		{ return _playerData.nextExtraReward; }
@@ -1182,6 +1201,8 @@ namespace GObject
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
         inline const std::string& getAtoHICfg() const { return m_hicfg; }
+    public:
+        static  UInt8 getMaxIcCount(UInt8 vipLevel);
     private:
         std::string m_hicfg;
 	};

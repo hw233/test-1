@@ -25,6 +25,7 @@
 #include "GObject/Trade.h"
 #include "GObject/TaskMgr.h"
 #include "GObject/AttainMgr.h"
+#include "GObject/ActivityMgr.h"
 #include "GObject/Athletics.h"
 #include "GObject/Dungeon.h"
 #include "GObject/ChatItem.h"
@@ -286,19 +287,13 @@ struct DungeonBattleReq
 struct DungeonAutoReq
 {
 	UInt8 type;
-	MESSAGE_DEF1(REQ::BABEL_AUTO_START, UInt8, type);
+    UInt8 mtype;
+	MESSAGE_DEF2(REQ::BABEL_AUTO_START, UInt8, type, UInt8, mtype);
 };
 
 struct DungeonCompleteAutoReq
 {
 	MESSAGE_DEF(REQ::BABEL_END);
-};
-
-struct AutoCopyReq
-{
-    UInt8 type;
-    UInt8 id;
-	MESSAGE_DEF2(REQ::AUTO_COPY, UInt8, type, UInt8, id);
 };
 
 struct DailyReq
@@ -925,6 +920,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     {
         pl->sendAutoCopy();
+    }
+    {
+        pl->sendAutoFrontMap();
     }
 	pl->sendWallow();
 	pl->sendEvents();
@@ -1841,7 +1839,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	GObject::Dungeon * dg = GObject::dungeonManager[dar.type];
 	if(dg == NULL)
 		return;
-	dg->autoChallenge(pl);
+	dg->autoChallenge(pl, dar.mtype);
 }
 
 void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
@@ -1851,7 +1849,7 @@ void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
 	GLOBAL().PushMsg(hdr2, NULL);
 }
 
-void OnAutoCopy( GameMsgHdr& hdr, AutoCopyReq& dar )
+void OnAutoCopy( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(pl);
 	if(!pl->hasChecked())
@@ -1863,18 +1861,69 @@ void OnAutoCopy( GameMsgHdr& hdr, AutoCopyReq& dar )
 		return;
 	}
 
-    switch (dar.type)
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 id = 0;
+    brd >> type;
+    brd >> id;
+
+    switch (type)
     {
         case 0:
-            pl->startAutoCopy(dar.id);
+            {
+                UInt8 mtype = 0;
+                brd >> mtype;
+                pl->startAutoCopy(id, mtype);
+            }
             break;
 
         case 1:
-            pl->cancelAutoCopy(dar.id);
+            pl->cancelAutoCopy(id);
             break;
 
         case 2:
-            pl->instantAutoCopy(dar.id);
+            pl->instantAutoCopy(id);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OnAutoFrontMap( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(pl);
+	if(!pl->hasChecked())
+		return;
+
+	if(pl->GetPackage()->GetRestPackageSize() < 4)
+	{
+		pl->sendMsgCode(1, 1014);
+		return;
+	}
+
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 id = 0;
+    brd >> type;
+    brd >> id;
+
+    switch (type)
+    {
+        case 0:
+            {
+                UInt8 mtype = 0;
+                brd >> mtype;
+                pl->startAutoFrontMap(id, mtype);
+            }
+            break;
+
+        case 1:
+            pl->cancelAutoFrontMap(id);
+            break;
+
+        case 2:
+            pl->instantAutoFrontMap(id);
             break;
 
         default:
@@ -3276,8 +3325,10 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
         case 7:
             {
                 UInt8 skillid = 0;
+                UInt8 type = 0;
                 brd >> skillid;
-                GObject::heroIsland.useSkill(player, skillid);
+                brd >> type;
+                GObject::heroIsland.useSkill(player, skillid, type);
             }
             break;
         case 8:
@@ -3299,6 +3350,25 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
         case 10:
             {
                 GObject::heroIsland.playerLeave(player);
+            }
+            break;
+        case 11:
+            {
+                GObject::heroIsland.sendAtoCfg(player);
+            }
+            break;
+        case 12:
+            {
+                std::string cfg;
+                brd >> cfg;
+                GObject::heroIsland.saveAtoCfg(player, cfg);
+            }
+            break;
+        case 13:
+            {
+                UInt8 onoff = 0;
+                brd >> onoff;
+                GObject::heroIsland.setAto(player, onoff);
             }
             break;
         default:
@@ -3399,5 +3469,38 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 	st << res << req._fgtId << req._itemId << Stream::eos;
 	player->send(st);
 }
+void OnActivityList( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    //BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    ActivityMgr* mgr = player->GetActivityMgr();
+    mgr->ActivityList(7);
 
+}
+void OnActivityReward(  GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    ActivityMgr* mgr = player->GetActivityMgr();
+    UInt8 type = 0;
+    brd >> type;
+    switch(type )
+    {
+        case 0:
+            mgr->ChangeOnlineReward();
+            break;
+
+        case 1:
+            // getDailyReward
+            mgr ->GetReward(2);
+            break;
+        case 2:
+            UInt16 flag = 0;
+            brd >> flag;
+            mgr->GetReward(flag);
+            break;
+
+    }
+}
 #endif // _COUNTRYOUTERMSGHANDLER_H_

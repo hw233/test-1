@@ -53,7 +53,6 @@ MSG_REG(GameMsgHdr, OnDungeonInfoReq);
 MSG_REG(GameMsgHdr, OnDungeonBattleReq);
 MSG_REG(GameMsgHdr, OnDungeonAutoReq);
 MSG_REG(GameMsgHdr, OnDungeonCompleteAutoReq);
-MSG_REG(GameMsgHdr, OnAutoCopy);
 MSG_REG(GameMsgHdr, OnDailyReq);
 MSG_REG(GameMsgHdr, OnNpcTriggerReq);
 MSG_REG(GameMsgHdr, OnPlayerGetTaskReq);
@@ -75,6 +74,8 @@ MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 
 MSG_REG_2(GameMsgHdr, REQ::FORMATION_DATA, OnFrontMapReq);
+MSG_REG_2(GameMsgHdr, REQ::AUTO_COPY, OnAutoCopy);
+MSG_REG_2(GameMsgHdr, REQ::AUTO_FRONTMAP, OnAutoFrontMap);
 
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
@@ -127,7 +128,8 @@ MSG_REG(GameMsgHdr, OnLockPwdReq);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_TRUMP_UPGRADE, OnTrumpUpgrade);
 MSG_REG(GameMsgHdr, OnTrumpLOrder);
-
+MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
+MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -226,5 +228,7 @@ MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
+
+MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 
 MSG_HANDLER_END()

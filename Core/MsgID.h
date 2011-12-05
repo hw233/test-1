@@ -119,6 +119,8 @@ namespace REQ
     const UInt8 FORMATION_DATA      = 0x95;// 0x68
     /**自动副本*/
     const UInt8 AUTO_COPY           = 0x96;// ??
+    /**自动阵图*/
+    const UInt8 AUTO_FRONTMAP       = 0x98;// ??
     /**请求战报*/
     const UInt8 FIGHT_REPORT        = 0x9A;// 0x6C
     /**打怪*/                                 
@@ -205,6 +207,10 @@ namespace REQ
     const UInt8 MAIL_SEND           = 0x44;// 0xA3
     /**邮件信息改变*/
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
+    /**活跃度请求*/
+    const UInt8 ACTIVITY_LIST        = 0X4A; 
+    /**活跃度领取奖励*/
+    const UInt8 ACTIVITY_REWARD     = 0x4B;
     /**关系列表请求*/
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     /**关系列表操作*/
@@ -380,6 +386,7 @@ namespace REP
     const UInt8 COPY_INFO           = 0x94;// 0x67
     const UInt8 FORMATTON_INFO      = 0x95;// 0x68
     const UInt8 AUTO_COPY           = 0x96;// ??
+    const UInt8 AUTO_FRONTMAP       = 0x98;// ??
     const UInt8 FIGHT_START         = 0x9A;// 0x6C
     const UInt8 ATTACK_NPC          = 0x9B;// 0x61
     const UInt8 TASK_RESPONSE_HOOK  = 0x9D;// 0x6D
@@ -435,6 +442,11 @@ namespace REP
     const UInt8 MAIL_NEW            = 0x45;// 0xA4
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
 
+    /**活跃度请求*/
+    const UInt8 ACTIVITY_LIST        = 0X4A; 
+    /**活跃度领取奖励*/
+    const UInt8 ACTIVITY_REWARD     = 0x4B;
+ 
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9
 

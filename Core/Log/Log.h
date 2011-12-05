@@ -54,7 +54,9 @@ enum PurchaseType
     TrumpLOrder,
     AutoFrontMapComplete,
     AthleticPaging, 
-
+    HeroIslandSkill,
+    HeroIslandAuto,
+    DailyActivity,
 };
 
 enum IncomingType
@@ -116,6 +118,7 @@ enum ItemFrom
     FromPExp,
     FromHeroIsland,
     FromAttainment,
+    FromDailyActivity,
 };
 
 enum ItemTo

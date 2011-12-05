@@ -29,32 +29,39 @@ namespace GObject
     }
 
 
-    UInt32 VarSystem::GetVar(UInt32 id)
+    UInt32 VarSystem::GetVar(UInt32 id, UInt32 now)
     {
         if(id >= VAR_MAX || m_Vars[id] == 0) return 0;
 
-        if(CheckReset(id)) UpdateDB(id);
+        if(CheckReset(id , now)) UpdateDB(id);
         
         return m_Vars[id];
     }
 
-    void VarSystem::SetVar(UInt32 id, UInt32 data)
+    void VarSystem::SetVar(UInt32 id, UInt32 data, UInt32 now)
     {
         if(id >= VAR_MAX) return;
-
+#ifdef NO_ATTAINMENT
+        if (id >=  VAR_FAIL_ENCH &&  id <= VAR_YELLOW_THRUMP_NUM)
+            return;
+#endif
         UInt32 oldVal = m_Vars[id];
-        bool bUpdateDB = CheckReset(id);
+       // m_Vars[id] = data;
+        bool bUpdateDB = CheckReset(id , now);
         m_Vars[id] = data;
-
-        bUpdateDB = bUpdateDB || (oldVal != data);
+        bUpdateDB = bUpdateDB || (oldVal != m_Vars[id]);
         if(bUpdateDB) UpdateDB(id);
     }
 
-    void VarSystem::AddVar(UInt32 id, UInt32 data)
+    void VarSystem::AddVar(UInt32 id, UInt32 data, UInt32 now)
     {
         if(id >= VAR_MAX || data == 0) return;
 
-        CheckReset(id);
+#ifdef NO_ATTAINMENT 
+        if (id >=  VAR_FAIL_ENCH &&  id <= VAR_YELLOW_THRUMP_NUM)
+            return;
+#endif
+        CheckReset(id , now);
         m_Vars[id] += data;
         UpdateDB(id);
     }
@@ -67,9 +74,13 @@ namespace GObject
         m_OverTime[id] = overTime;
     }
 
-    bool VarSystem::CheckReset(UInt32 id)
+    bool VarSystem::CheckReset(UInt32 id, UInt32  now)
     {
-        UInt32 now = TimeUtil::Now() + m_Offset;
+        if(now == 0 )
+             now = TimeUtil::Now() + m_Offset;
+        else
+            now += m_Offset;
+
         if(now < m_OverTime[id]) return false;
         
         UInt32 oldtime = m_OverTime[id];

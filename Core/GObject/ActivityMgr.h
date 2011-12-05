@@ -1,5 +1,6 @@
 #ifndef  _ACTIVITYMGR_H
 #define  _ACTIVITYMGR_H
+class Stream;
 namespace GObject
 {
 
@@ -15,22 +16,24 @@ namespace GObject
         AtyForge,     //装备洗练
         AtyBuy,       //购买物品
         AtyLongTime,  //在线时间足够长
+        AtyHeroIsland,//英雄岛
+        AtyBoss,      //世界BOSS
+        AtyCountryWar,//阵营战
+        AtyClanWar,   //帮派战
+        AtyAthletics, //斗剑
         AtyMaxFlag,      //标志记录的个数
 
-                AtyShimenTask = 1000,//师门任务
-                AtyYamenTask, //衙门任务
-                AtyClanTask,  //帮会任务
-                AtyDungeon,   //决战之地
-                AtyCopy,      //副本
-                AtyFormation, //阵图
-                AtyAthletics, //斗剑
-                AtyGroupCopy, //组队副本
-                AtyHeroIsland,//英雄岛
-                AtyBoss,      //世界BOSS
-                AtyCountryWar,//阵营战
-                AtyClanWar,   //帮派战
-                AtyTaskHook,  //挂机加速
-                AtyPSpeed,    //修炼加速
+        AtyBegin      = 99,
+        AtyShimenTask = 100,//师门任务
+        AtyYamenTask, //衙门任务
+        AtyClanTask,  //帮会任务
+        AtyDungeon,   //决战之地
+        AtyCopy,      //副本
+        AtyFormation, //阵图
+        AtyTaskHook,  //挂机加速
+        AtyPSpeed,    //修炼加速
+        AtyGroupCopy, //组队副本
+        AtyEnd,
     };
 
           
@@ -62,26 +65,45 @@ namespace GObject
                 awardID = aid;
             if(ot)
                 overTime = ot;
+            point = 10;
         }
     };
+    struct stRtyReward
+    {
+        UInt32 id;
+        UInt8 num;
+    };
+
+    typedef std::vector<stRtyReward>  RtyRewards;
+    typedef std::vector<RtyRewards> OnlineRewards;
+//    struct stOnlineReward
+  //  {
+     //   Rty
+   // };
     struct DBActivityData;
     class ActivityMgr
     {
         private :
             enum{
-                AtyOnlineReward = 1,
-                AtyReward1 = 2,  //60
-                AtyReward2 = 4,  //80
-                AtyReward3 = 8,  //100
-                AtyReward4 = 16, //120
-                AtyReward5 = 32, //160
+                AtyOnlineFree = 1, //是否已经用去免费领取
+                AtyOnlineReward = 2, //是否已经领取了
+                AtyReward1 = 4,  //60
+                AtyReward2 = 8,  //80
+                AtyReward3 = 16,  //100
+                AtyReward4 = 32, //120
+                AtyReward5 = 64, //160
             };
             Player*  _owner;
             ActivityItem  _item;
-
+            RtyRewards    _onlineReward;
+            //std::Map<UInt32, UInt32> _randmap;  //上线奖励中， 多种奖中励随机一个的，需要记录这个随机值。
             //func
             UInt32 GetRandomReward() ;
-            std::vector<UInt32> GetOnlineReward();
+            //std::vector<stOnlineReward> GetOnlineReward();
+            void GetOnlineReward();
+            UInt32 GetOnlineRewardNum();
+            void SendOnlineReward(Stream& s);
+            void SendActivityInfo(Stream& s);
         public:
             ActivityMgr(Player* player);
             ~ActivityMgr();
@@ -93,7 +115,7 @@ namespace GObject
            /**
             * @brief 领取奖励后置领取位
             */
-           void  AddRewardFlag(UInt32 flag);
+           void  AddRewardFlag(UInt32 flag, bool db = true);
 
 
            //data base
@@ -116,6 +138,11 @@ namespace GObject
             * @brief  c->s  改变上线奖励
             */
            void  ChangeOnlineReward();
+
+           /**
+            * @brief s->c  刷新列表
+            */
+           void ActivityList(UInt8 type);
     };
 
 }
