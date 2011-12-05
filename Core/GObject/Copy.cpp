@@ -155,7 +155,6 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     return 1;
 }
 
-
 void PlayerCopy::enter(Player* pl, UInt8 id)
 {
     if (!pl || !id)
@@ -227,114 +226,113 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
         return 0;
 
     UInt32 fgtid = GData::copyManager[id<<8|tcd.floor][tcd.spot];
-    if (fgtid) {
-        std::vector<UInt16> loot;
-        if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
-            if (ato)
-                pl->checkLastBattled();
-            bool nextfloor = false;
+    if (!fgtid)
+        return 0;
 
-            if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
-                nextfloor = true;
+    std::vector<UInt16> loot;
+    if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
+        if (ato)
+            pl->checkLastBattled();
+        bool nextfloor = false;
 
-            if (nextfloor) {
-                GameAction()->onCopyFloorWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
-                ++tcd.floor;
-                tcd.spot = 1;
-            } else {
-                ++tcd.spot;
-            }
+        if (tcd.spot >= (GData::copyManager[id<<8|tcd.floor].size() - 1))
+            nextfloor = true;
 
-            if (tcd.floor > GData::copyMaxManager[id]) {
-                if (ato) {
-                    Stream st(REP::AUTO_COPY);
-                    UInt8 size = loot.size();
-                    if (size >= 1) {
-                        UInt8 rsize = loot[0];
-                        if (rsize != size/2)
-                            st << static_cast<UInt8>(5);
-                        else
-                            st << static_cast<UInt8>(4);
-
-                        st << id << tcd.floor << tcd.spot;
-                        st << static_cast<UInt8>(rsize);
-
-                        for (UInt8 i = 1, c = 0; i < size && c < rsize; i += 2, ++c)
-                            st << loot[i] << static_cast<UInt8>(loot[i+1]);
-                    } else {
-                        st << static_cast<UInt8>(4) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
-                    }
-
-                    st << Stream::eos;
-                    pl->send(st);
-
-                    autoClear(pl, complete, id, tcd.floor, tcd.spot);
-                } else {
-                    Stream st(REP::COPY_INFO);
-                    st << static_cast<UInt8>(5);
-                    st << id;
-                    st << Stream::eos;
-                    pl->send(st);
-                }
-
-                GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
-
-                tcd.floor = 0;
-                tcd.spot = 0;
-                DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
-                return 2;
-            } else {
-                if (ato) {
-                    Stream st(REP::AUTO_COPY);
-                    UInt8 size = loot.size();
-                    if (size) {
-                        UInt8 rsize = loot[0];
-                        if (rsize != size/2) {
-                            autoClear(pl, complete, id, tcd.floor, tcd.spot);
-                            st << static_cast<UInt8>(5);
-                        } else {
-                            st << static_cast<UInt8>(3);
-                        }
-                        st << id << tcd.floor << tcd.spot;
-
-                        st << static_cast<UInt8>(size/2);
-                        for (UInt8 i = 1; i < rsize*2+1; i += 2)
-                            st << loot[i] << static_cast<UInt8>(loot[i+1]);
-
-                        for (UInt8 i = rsize*2+1; i < size; i += 2) {
-                            // TODO: MAIL
-                        }
-                    } else {
-                        st << static_cast<UInt8>(3) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
-                    }
-
-                    st << Stream::eos;
-                    pl->send(st);
-                } else {
-                    Stream st(REP::COPY_INFO);
-                    st << static_cast<UInt8>(6);
-                    st << id << tcd.floor << tcd.spot;
-                    st << Stream::eos;
-                    pl->send(st);
-                }
-            }
-
-            DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
-                    tcd.floor, tcd.spot, pl->getId(), id);
-            return 1;
+        if (nextfloor) {
+            GameAction()->onCopyFloorWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+            ++tcd.floor;
+            tcd.spot = 1;
         } else {
+            ++tcd.spot;
+        }
+
+        if (tcd.floor > GData::copyMaxManager[id]) {
             if (ato) {
                 Stream st(REP::AUTO_COPY);
-                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                UInt8 size = loot.size();
+                if (size >= 1) {
+                    UInt8 rsize = loot[0];
+                    if (rsize != size/2)
+                        st << static_cast<UInt8>(5);
+                    else
+                        st << static_cast<UInt8>(4);
+
+                    st << id << tcd.floor << tcd.spot;
+                    st << static_cast<UInt8>(rsize);
+
+                    for (UInt8 i = 1, c = 0; i < size && c < rsize; i += 2, ++c)
+                        st << loot[i] << static_cast<UInt8>(loot[i+1]);
+                } else {
+                    st << static_cast<UInt8>(4) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
+                }
+
+                st << Stream::eos;
                 pl->send(st);
 
                 autoClear(pl, complete, id, tcd.floor, tcd.spot);
-                return 0;
             } else {
                 Stream st(REP::COPY_INFO);
-                st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+                st << static_cast<UInt8>(5);
+                st << id;
+                st << Stream::eos;
                 pl->send(st);
             }
+
+            GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+
+            tcd.floor = 0;
+            tcd.spot = 0;
+            DB3().PushUpdateData("DELETE FROM `player_copy` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+            return 2;
+        } else {
+            if (ato) {
+                Stream st(REP::AUTO_COPY);
+                UInt8 size = loot.size();
+                if (size) {
+                    UInt8 rsize = loot[0];
+                    if (rsize != size/2) {
+                        autoClear(pl, complete, id, tcd.floor, tcd.spot);
+                        st << static_cast<UInt8>(5);
+                    } else {
+                        st << static_cast<UInt8>(3);
+                    }
+                    st << id << tcd.floor << tcd.spot;
+
+                    st << static_cast<UInt8>(size/2);
+                    for (UInt8 i = 1; i < rsize*2+1; i += 2)
+                        st << loot[i] << static_cast<UInt8>(loot[i+1]);
+
+                    for (UInt8 i = rsize*2+1; i < size; i += 2) {
+                        // TODO: MAIL
+                    }
+                } else {
+                    st << static_cast<UInt8>(3) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
+                }
+
+                st << Stream::eos;
+                pl->send(st);
+            } else {
+                Stream st(REP::COPY_INFO);
+                st << static_cast<UInt8>(6);
+                st << id << tcd.floor << tcd.spot;
+                st << Stream::eos;
+                pl->send(st);
+            }
+        }
+
+        DB3().PushUpdateData("UPDATE `player_copy` SET `floor`=%u,`spot`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u",
+                tcd.floor, tcd.spot, pl->getId(), id);
+        return 1;
+    } else {
+        if (ato) {
+            Stream st(REP::AUTO_COPY);
+            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+            pl->send(st);
+            autoClear(pl, complete, id, tcd.floor, tcd.spot);
+        } else {
+            Stream st(REP::COPY_INFO);
+            st << static_cast<UInt8>(2) << id << tcd.floor << tcd.spot << Stream::eos;
+            pl->send(st);
         }
     }
     return 0;
@@ -528,6 +526,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                 autoClear(pl);
 
                 CopyData& tcd = getCopyData(pl, id);
+                if (!tcd.floor) return;
                 Stream st(REP::AUTO_COPY);
                 st << static_cast<UInt8>(1) << id << tcd.floor << tcd.spot << Stream::eos;
                 pl->send(st);
@@ -558,6 +557,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                 pl->addFlag(Player::AutoCopy);
 
                 CopyData& tcd = getCopyData(pl, id);
+                if (!tcd.floor) return;
                 UInt8 sp = tcd.spot;
                 for (UInt8 f = tcd.floor; f <= GData::copyMaxManager[id]; ++f) {
                     UInt8 s = GData::copyManager[id<<8|f].size();

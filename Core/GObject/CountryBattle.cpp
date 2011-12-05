@@ -475,7 +475,6 @@ void CountryBattle::rotate( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UInt
 		return;
 
 	CountryBattleData * cbd = blist[pos];
-	cbd->resetEndTime = curtime + 30;
 	cbd->restCountTime = 0;
 	
 	CBPlayerData& cbpdata = _battleDuration[cbd->player->getCountry()][cbd->player];
@@ -483,6 +482,7 @@ void CountryBattle::rotate( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UInt
 	cbd->sendAchieveUpdate(cbpdata.totalAchievement);
 	if(flag == 2)
 	{
+        cbd->resetEndTime = curtime + 25;
 		cbpdata.totalWin ++;
 		cbpdata.currKillStreak = cbd->killStreak;
 		if(cbpdata.currKillStreak > cbpdata.maxKillStreak)
@@ -490,6 +490,7 @@ void CountryBattle::rotate( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UInt
 	}
 	else if(flag == 1)
 	{
+        cbd->resetEndTime = curtime + 30;
 		cbpdata.totallose ++;
 	}
 

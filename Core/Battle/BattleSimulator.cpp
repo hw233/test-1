@@ -1105,22 +1105,23 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         }
     }
 
-    if(atkAct)
+    float rate = target_bo->getMagRes(bf) * 100;
+    if(rate > _rnd(10000))
     {
-        float rate = target_bo->getMagRes(bf) * 100;
-        if(rate > _rnd(10000))
-        {
-            defList[defCount].damType = e_Res;
+        defList[defCount].damType = e_Res;
+        idx = 0;
 
+        if(atkAct)
+        {
             if(passiveSkill == NULL)
                 passiveSkill = target_bo->getPassiveSkillAftRes();
 
             if(passiveSkill == NULL)
             {
                 idx = 0;
-                size_t oidx = idx;
                 while(NULL == passiveSkill)
                 {
+                    size_t oidx = idx;
                     passiveSkill = target_bo->getPassiveSkillAftRes100(idx);
                     if (oidx == idx)
                         break;
@@ -1139,9 +1140,8 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
                 atkAct->push_back(aa);
                 defList[defCount].damType = e_ResR;
             }
-
-            return;
         }
+        return;
     }
 
     switch(state[state_idx])
