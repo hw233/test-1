@@ -308,7 +308,7 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 {
 	if(args.empty())
 		return;
-
+#if 0
     ActivityMgr* mgr = player->GetActivityMgr();
     if(args.size() == 1)
     {
@@ -326,7 +326,6 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
          mgr->GetReward(i);
     }
     return;
-#if 0
     //only for test liuhuiting
     //
     for (int i = 10001; i<= 11001; i ++)
