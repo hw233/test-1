@@ -27,6 +27,7 @@ enum
     FRONTMAP_ENTER2,
     FRONTMAP_ENTER3,
     FRONTMAP_IM,
+    FRONTMAP_AUTO,
     FRONTMAP_AUTO1,
     FRONTMAP_AUTO2,
     FRONTMAP_AUTO3,
@@ -44,6 +45,7 @@ enum
     COPY_ENTER2,
     COPY_ENTER3,
     COPY_IM,
+    COPY_AUTO,
     COPY_AUTO1,
     COPY_AUTO2,
     COPY_AUTO3,
@@ -52,6 +54,7 @@ enum
     COPY_AUTO6,
 // 通天塔
     DUNGEON_IM,
+    DUNGEON_AUTO,
     DUNGEON_AUTO1,
     DUNGEON_AUTO2,
     DUNGEON_AUTO3,
@@ -88,6 +91,10 @@ enum
     TRUMPLORDER,
 // 法宝精炼
     TRUMPUPGRADE,
+// 英雄岛技能
+    HISKILL,
+// 自动英雄岛
+    AUTOHI,
 
     MONEY_MAX,
 };

@@ -1842,7 +1842,7 @@ namespace GObject
 			Player * pl = globalPlayers[dac.playerId];
 			if(pl == NULL)
 				continue;
-			playerCopy.autoBattle(pl, dac.id, 0, true);
+			playerCopy.autoBattle(pl, dac.id, 0, 0, true);
 		}
 		lc.finalize();
 
@@ -1857,7 +1857,7 @@ namespace GObject
 			Player * pl = globalPlayers[afm.playerId];
 			if(pl == NULL)
 				continue;
-			frontMap.autoBattle(pl, afm.id, 0, true);
+			frontMap.autoBattle(pl, afm.id, 0, 0, true);
 		}
 		lc.finalize();
 
@@ -2297,7 +2297,7 @@ namespace GObject
         // ??????Ա
 		lc.prepare("Loading clan players:");
 		DBClanPlayer cp;
-		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankClanField` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `playerId`, `joinTime`, `proffer`, `cls`, `enterCount`, `thisDay`, `petFriendness1`, `petFriendness2`, `petFriendness3`, `petFriendness4`, `favorCount1`, `favorCount2`, `favorCount3`, `favorCount4`, `lastFavorTime1`, `lastFavorTime2`, `lastFavorTime3`, `lastFavorTime4`, `signupRankBattleTime`, `rankBattleField` FROM `clan_player` ORDER BY `id`, `proffer` DESC, `joinTime` ASC", cp) != DB::DB_OK)
 			return false;
 		UInt32 lastId = 0xFFFFFFFF;
 		lc.reset(1000);

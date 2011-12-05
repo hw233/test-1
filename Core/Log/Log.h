@@ -54,6 +54,8 @@ enum PurchaseType
     TrumpLOrder,
     AutoFrontMapComplete,
     AthleticPaging, 
+    HeroIslandSkill,
+    HeroIslandAuto,
     ClanRankBattleSkill,
 };
 

@@ -102,7 +102,7 @@ class Clan:
 {
 public:
     //帮会排名战报名数下限
-    const static UInt32 RANK_BATTLE_MIN_SIGNUP_NUM = 5;
+    const static UInt32 RANK_BATTLE_MIN_SIGNUP_NUM = 2;
 
 private:
 

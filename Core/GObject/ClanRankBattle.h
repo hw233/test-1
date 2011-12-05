@@ -20,7 +20,7 @@ namespace GObject
     //一场战斗战场数
     const static UInt32 RANK_BATTLE_FIELD_NUM = 6;
     //战斗据点
-    const static UInt32 RANK_BATTLE_LOCATION = 100;
+    const static UInt32 RANK_BATTLE_LOCATION = 0x0713;
     //帮会战技能列表
     const static UInt32 RANK_BATTLE_SKILL_NUM = 5;
 
@@ -221,6 +221,8 @@ namespace GObject
          */
         void SendBattleStatus(Player* player);
         void SendBattleInfo(Player* player);
+        void BroadcastStatus();
+        void BroadcastScores();
 
         /**
          *@brief 广播
@@ -244,9 +246,14 @@ namespace GObject
         BattleState m_State;
         //开始时间
         UInt32 m_StartTime;
+        //当前时间
+        UInt32 m_Now;
         //战斗双方帮会
         ClanRankBattleInfo* m_Clan1;
         ClanRankBattleInfo* m_Clan2;
+        //双方积分
+        UInt32 m_ClanScore1;
+        UInt32 m_ClanScore2;
         //战役
         ClanRankBattleField m_Fields[RANK_BATTLE_FIELD_NUM];
     };

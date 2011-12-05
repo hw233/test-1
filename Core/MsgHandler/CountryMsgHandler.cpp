@@ -57,8 +57,6 @@ MSG_REG(GameMsgHdr, OnDungeonInfoReq);
 MSG_REG(GameMsgHdr, OnDungeonBattleReq);
 MSG_REG(GameMsgHdr, OnDungeonAutoReq);
 MSG_REG(GameMsgHdr, OnDungeonCompleteAutoReq);
-MSG_REG(GameMsgHdr, OnAutoCopy);
-MSG_REG(GameMsgHdr, OnAutoFrontMap);
 MSG_REG(GameMsgHdr, OnDailyReq);
 MSG_REG(GameMsgHdr, OnNpcTriggerReq);
 MSG_REG(GameMsgHdr, OnPlayerGetTaskReq);
@@ -80,6 +78,8 @@ MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 
 MSG_REG_2(GameMsgHdr, REQ::FORMATION_DATA, OnFrontMapReq);
+MSG_REG_2(GameMsgHdr, REQ::AUTO_COPY, OnAutoCopy);
+MSG_REG_2(GameMsgHdr, REQ::AUTO_FRONTMAP, OnAutoFrontMap);
 
 MSG_REG(GameMsgHdr, OnDayTaskAutoCompletedReq);
 MSG_REG(GameMsgHdr, OnQueryAutoCompletedTaskTimeReq);
@@ -226,5 +226,6 @@ MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
+MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 
 MSG_HANDLER_END()
