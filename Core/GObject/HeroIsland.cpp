@@ -1250,6 +1250,8 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 size_t sz = pd->compass.size();
                 if (sz && pd->compass[sz-1].type == pd1->type)
                 {
+                    if (pd->compass[sz-1].status == 2 || pd->compass[sz-1].status == 3)
+                        return false;
                     status = pd->compass[sz-1].status = 2;
 
                     if (sz == 1 || sz == 4 || sz == 7)
