@@ -19,7 +19,8 @@
 #include "Common/Itoa.h"
 #include "GObject/PracticePlace.h"
 #include "MsgID.h"
-
+#include "Script/GameActionLua.h"
+#include "MsgHandler/CountryMsgStruct.h"
 #include <mysql.h>
 
 namespace GObject
@@ -189,6 +190,35 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
     GameMsgHdr hdr1(0x311, player->getThreadId(), player, sizeof(co));
     GLOBAL().PushMsg(hdr1, &co);
 
+    //send num of clan to all member so to get attainment!
+     UInt32 nNum  =  _members.size();
+
+    stAttainMsg  msg;
+    msg.attainID = Script:: CLAN_ADD_MEMBER;
+    msg.param = nNum ;
+    ClanMember * mem = NULL;
+    Members::iterator offset;
+    for(offset = _members.begin(); offset != _members.end(); ++ offset)
+    {
+        mem = *offset;
+        if (!mem)
+            continue;
+        if (!mem->player)
+            continue;
+
+        GameMsgHdr h(0x244,  mem ->player->getThreadId(), mem->player, sizeof(msg));
+        GLOBAL().PushMsg(h, & msg);
+    }
+    //
+    if(_level >= 5)
+    {
+        UInt32 lev = static_cast<UInt32> (_level);
+        stAttainMsg m;
+        m.attainID = Script::CLAN_LEVUP;
+        m.param    = lev;
+        GameMsgHdr h(0x244,  player->getThreadId(), player, sizeof(m));
+        GLOBAL().PushMsg(h, & m);
+    }
 	player->notifyFriendAct(5, _name.c_str());
 	DB5().PushUpdateData("INSERT INTO `clan_player` (`id`, `playerId`, `joinTime`, `cls`, `proffer`) VALUES (%u, %"I64_FMT"u, %u, %u, %u)", _id, player->getId(), cmem->joinTime, cmem->cls, cmem->proffer);
 	if(player->isOnline())
@@ -1930,11 +1960,34 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     st << Stream::eos;
     broadcast(st);
 
-    GData::clanLvlTable.testLevelUp(_level, _construction);
+    bool bUp=  GData::clanLvlTable.testLevelUp(_level, _construction);
     if (writedb)
     {
 		DB5().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, _construction, _id);
     }
+    if(bUp && writedb && _level >= 5)
+    {
+        //¿¿¿¿¿
+        UInt32 nLev  = static_cast<UInt32> (_level);
+
+        stAttainMsg m;
+        m.attainID = Script::CLAN_LEVUP;
+        m.param    = nLev;
+        ClanMember * mem = NULL;
+        Members::iterator offset;
+        for(offset = _members.begin(); offset != _members.end(); ++ offset)
+        {
+            mem = *offset;
+            if (!mem)
+            continue;
+            if (!mem->player)
+                continue;
+            
+            GameMsgHdr h(0x244,  mem ->player->getThreadId(), mem->player, sizeof(m));
+            GLOBAL().PushMsg(h, & m);
+        }
+    }
+
 }
 
 void Clan::addConstruction(UInt64 cons, bool writedb)

@@ -206,6 +206,9 @@ private:
 
     UInt32 releaseCD(BattleFighter* bf);
 
+    void  InitAttainRecord();
+    void  CheckAttain();
+    void  SendAttainMsgToPlayer( GObject::Player* player, UInt32 id, UInt32 param);
 private:
 	int _id, _winner, _turns;
 	UInt8 _position;
@@ -221,6 +224,39 @@ private:
 	std::string _other_name;
 	UInt8 _other_level;
 	URandom _rnd;
+
+    //成就记录
+    UInt32   _evadeNum[2]; //连续闪避次数
+    UInt32  _csNum[2]; //连续暴击次数
+    UInt32  _prNum[2]; //连续破击次数
+    UInt32  _fjNum[2]; //反击次数
+
+    UInt32  _maxEvade[2]; //最高闪避
+    UInt32  _maxCS[2];    //最高连续暴击次数
+    UInt32  _maxPR[2];    //最高破击次数
+    UInt32  _maxFJ[2];    //最高反击次数
+    UInt32  _maxSkillDmg[2]; //最高技能伤害
+    UInt32  _maxPeerLessDmg[2]; //最高无双伤害
+    UInt32  _maxAura[2]; //最大灵气上限
+    float   _maxCSFactor[2]; //暴击比例
+    UInt32  _attackRound; //攻击回合
+    bool  _firstPLDmg[2]; //第一回合打出无双技能
+    /*
+    bool    _evade3OK[2]; //达成次数
+    bool    _evade9ok[2]; //达成次数
+    bool    _cs3ok[2]; 
+    bool    _cs9ok[2]; 
+    bool    _pr3ok[2];
+    bool    _pr9ok[2];
+    bool    _fj3ok[2];
+    bool    _fj9ok[2];
+
+    bool    _skillDmg300[2];
+    bool    _skillDmg1k[2];
+    bool    _skillDmg5k[2];
+    bool    _peerlessDmg1k[2];
+    bool    _peerlessDmg5k[2];
+    bool    _peerlessDmg1w[2];*/
 };
 
 }

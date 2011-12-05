@@ -87,6 +87,7 @@ private:
 	void padPlayerData(Stream&, CBStatusData&);
 	void broadcast(Stream&);
 
+    void LeaveGetAttainment(Player* p,CBPlayerData& data );
 	static inline UInt8 getJoinLevel(UInt8 level)
     {
         if (level <= COUNTRY_BATTLE_BARRIER1)

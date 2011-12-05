@@ -17,3 +17,4 @@ require("DayTask/DayCopyTask");
 require("MapObject/NpcDefaultAction")
 require("Other/OperationTaskAction")
 require("Special/Activity")
+require("World/ActivityMgr")

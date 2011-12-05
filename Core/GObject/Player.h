@@ -125,6 +125,7 @@ namespace GObject
 	class Athletics;
     struct PracticeData;
     class AttainMgr;
+    class ActivityMgr;
 
     struct TripodData
     {
@@ -323,8 +324,8 @@ namespace GObject
 		static const UInt16 INIT_PACK_SIZE = 100;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
-			title(0), achievement(0), qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
-			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),
+			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
+			newGuild(0), packSize(INIT_PACK_SIZE), mounts(0), gmLevel(0), icCount(0), nextIcReset(0),picCount(0) , nextPIcReset(0),
 			formation(0), totalRecharge(0), lastExp(0), lastResource(0),
 			rewardStep(0), nextRewardItem(0), nextRewardCount(0), nextRewardTime(0),
 			nextExtraReward(0), tavernBlueCount(0), tavernPurpleCount(0), tavernOrangeCount(0),
@@ -361,6 +362,7 @@ namespace GObject
 		UInt8 country;              // 国家
 		UInt8 title;                // 头衔
 		UInt32 achievement;         // 战功
+        UInt32 attainment;          //  
         UInt8 qqvipl;               // QQ VIP等级
         UInt8 qqvipyear;            // QQ VIP是否包年
         UInt32 qqawardgot;          // QQ VIP奖励是否已领取
@@ -506,6 +508,12 @@ namespace GObject
 		void Logout(bool = false);	//玩家下线操作
 		void selfKick();
 
+        UInt32 GetOnlineTimeToday();
+        UInt32 GetOnlineTimeTodaySinceLastLogin(UInt32 now);
+
+    private:
+        void LogoutSaveOnlineTimeToday();
+    public:
 		void sendWallow();
 		void makeWallow(Stream& st);
 
@@ -514,6 +522,8 @@ namespace GObject
 		void checkHPLoss();
 		void checkDeath();
 
+        void OnAddOneFriend();
+        void OnFriendLevUp(UInt8 nLev);
 		void checkLevUp(UInt8, UInt8);
         bool formationLevUp(UInt16);
         bool addNewFormation(UInt16 newformationId, bool writedb = false);
@@ -543,6 +553,7 @@ namespace GObject
 		inline UInt8 getCountry() const		{ return _playerData.country; }
 		void setCountry(UInt8 cny);
 
+        void OnSelectCountry();
 		inline UInt16 getLocation()			{ return _playerData.location; }
 		inline void setLocation(UInt16 loc)	{ _playerData.location = loc; }
 
@@ -595,10 +606,15 @@ namespace GObject
 		void testBattlePunish();
 
 
-        UInt32 GetVar(UInt32 id);
+        UInt32 GetVar(UInt32 id );
         void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
-        void SetVar(UInt32 id, UInt32 val);
-        void AddVar(UInt32 id, UInt32 val);
+        void SetVar(UInt32 id, UInt32 val );
+        void AddVar(UInt32 id, UInt32 val );
+
+        UInt32 GetVarNow(UInt32 id, UInt32 now);
+        void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
+        void AddVarNow(UInt32 id , UInt32 val, UInt32 now);
+
         void SetVarOffset(UInt32 offset);
 
 		inline const std::string& getName() { return _playerData.name; }
@@ -695,6 +711,9 @@ namespace GObject
 		UInt32 useAchievement(UInt32 a,ConsumeInfo * ci=NULL);
 		void useAchievement2( UInt32 a, Player *attacker, ConsumeInfo * ci = NULL);
 
+        UInt32 getAttainment(UInt32 a = 0);
+        UInt32 useAttainment(UInt32 a, ConsumeInfo * ci=NULL);
+
 		UInt32 getPrestige(UInt32 a = 0, bool notify = true);
 		UInt32 usePrestige(UInt32 a,ConsumeInfo * ci=NULL);
 
@@ -713,6 +732,7 @@ namespace GObject
 
         void setLineupDirty(bool = true);
         void setFightersDirty(bool bDirty=true);
+        bool IsFighterEquipEnchantLev(UInt8 en, UInt8 num);
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
 		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
@@ -812,6 +832,9 @@ namespace GObject
 		void sendOnlineReward();
 		void sendDailyInfo();
 
+        void GetFuben(UInt8& copy, UInt8& copyMax, UInt8& dung, UInt8& dungMax, UInt8& format, UInt8& formatMax );
+        void GetDailyTask(UInt8& shimenF, UInt8& shimenMax, UInt8& yamenF, UInt8& yamenMax, UInt8& clanF, UInt8& clanMax);
+
         void startAutoCopy(UInt8 id, UInt8 mtype);
         void cancelAutoCopy(UInt8 id);
         void instantAutoCopy(UInt8 id);
@@ -834,6 +857,7 @@ namespace GObject
 		inline void setClanBattle(ClanBattle * c)  { _clanBattle = c; }
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
+        void OnDoAttainment(UInt32 attId,   UInt32  param);
 		//////////////////////////////////////////////////////////////////////////
 		//组队系统
 		inline bool IsInTeam() const { return false; }	//TODO
@@ -846,7 +870,7 @@ namespace GObject
 		TaskMgr* GetTaskMgr() { return m_TaskMgr; }
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
-
+        ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -857,6 +881,7 @@ namespace GObject
 		void addBlockFromDB(Player *);
 		void addFoeFromDB(Player *);
 		bool addFriend(Player *);
+        void AddFriendAttainment( Player* other);
 		void delFriend(Player *);
 		bool addBlock(Player *);
 		bool delBlock(Player *);
@@ -912,6 +937,8 @@ namespace GObject
 		UInt32 purchaseBook(UInt8);
 		void updateNextBookStoreUpdate(UInt32);
 
+        UInt8 GetFullPotFighterNum();
+        UInt8 GetFullCapFighterNum();
 		UInt8 trainFighter(UInt32 id, UInt8 type);
 
 		inline UInt32 getVipLevel() { return _vipLevel; }
@@ -1000,7 +1027,7 @@ namespace GObject
 		Athletics* m_Athletics;
 
 		AttainMgr* m_AttainMgr;
-
+        ActivityMgr*  m_ActivityMgr;
 		MailBox* m_MailBox;
 
 		bool _isOnline;
@@ -1174,6 +1201,8 @@ namespace GObject
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
         inline const std::string& getAtoHICfg() const { return m_hicfg; }
+    public:
+        static  UInt8 getMaxIcCount(UInt8 vipLevel);
     private:
         std::string m_hicfg;
 	};

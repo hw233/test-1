@@ -56,6 +56,7 @@ enum PurchaseType
     AthleticPaging, 
     HeroIslandSkill,
     HeroIslandAuto,
+    DailyActivity,
 };
 
 enum IncomingType
@@ -116,6 +117,8 @@ enum ItemFrom
     FromFCMerge,
     FromPExp,
     FromHeroIsland,
+    FromAttainment,
+    FromDailyActivity,
 };
 
 enum ItemTo

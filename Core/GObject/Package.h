@@ -14,7 +14,7 @@ namespace GObject
     static const UInt16 OEquip70[] = {2592,2593,2594,2595,2596,2597,2598,2599,2600,2601,2602,2603,2604,2605,2606,2607,2608,2609,2610,2611,2612,2613,2614,2615};
     UInt16 getRandOEquip(UInt8 lvl);
     UInt16 getRandPEquip(UInt8 lvl);
-
+    UInt32 getRandGem(UInt8 lev);
 #define ITEM_ENCHANT_L1 502   //太乙真金
 #define ITEM_ENCHANT_L2 503   //太乙精金
 #define TRUMP_ENCHANT_L1 514   //五行精英
@@ -130,6 +130,7 @@ namespace GObject
 	public:
 		// 铁匠
 		UInt8 Enchant(UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/);
+        void  OnFailEnchAttainment( UInt32 f);
 		UInt8 OpenSocket(UInt16 fighterId, UInt32 itemId);
 		UInt8 MergeGem(UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid);
 		UInt8 AttachGem(UInt16 fighterId, UInt32 itemId, UInt32 gemId, bool bind);
@@ -163,6 +164,8 @@ namespace GObject
 
         void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);
         void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere);
+
+        void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere);
 	public:
 		inline ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
