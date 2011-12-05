@@ -128,6 +128,7 @@ namespace Script
 		void onExchange(Player* player);
 		bool onOnlineAward(Player* player, UInt32 itemId, UInt8 count);
         bool onThanksgivingDay(Player* player);
+        bool onChristmas(Player* player);
 		void onAttackBoss(Player* player);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);

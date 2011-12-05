@@ -844,6 +844,11 @@ namespace Script
 		return Call<bool>("onThanksgivingDay", player);
 	}
 
+	bool GameActionLua::onChristmas(Player* player)
+	{
+		return Call<bool>("onChristmas", player);
+	}
+
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)
 	{
 		return Call<bool>("getActivateAttrResult", lastActivateCount, quality);

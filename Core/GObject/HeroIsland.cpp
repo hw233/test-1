@@ -510,12 +510,6 @@ void HeroIsland::applayPlayers()
             if (pd && pd->player && !pd->player->hasFlag(Player::InHeroIsland))
                 continue;
 
-#ifdef _DEBUG
-            if (!j)
-                INFO_LOG("%s,%"I64_FMT"u injuredcd: %u , now: %u, injuredcd <= now: %u",
-                        pd->player->getName().c_str(), pd->player->getId(), pd->injuredcd, now, pd->injuredcd<=now);
-#endif
-
             if (!j && pd && pd->player && pd->injuredcd <= now)
             {
                 pd->player->regenAll(true);
@@ -824,7 +818,6 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
     pd->player = player;
     pd->expcd = TimeUtil::Now() + 60;
 
-    INFO_LOG("NEWENTER: id: %"I64_FMT"u, name: %s, spot: %u", player->getId(), player->getName().c_str(), spot);
     return enter(pd, type, spot, movecd);
 }
 
@@ -864,20 +857,13 @@ void HeroIsland::sendSpot(HIPlayerData* pd, UInt8 spot)
     pd->player->send(st);
 
     sendPlayers(pd, spot, 0, HERO_ISLANG_PAGESZ);
-#if 0
-    if (!spot)
-        sendSkills(pd);
-    else
-        sendRareAnimals(pd, spot);
-#else
     sendSkills(pd);
     if (spot)
         sendRareAnimals(pd, spot);
-#endif
+
     if (!ISINJZ(pd))
     {
         broadcast(pd, spot, 0);
-        INFO_LOG("ENTER: id: %"I64_FMT"u, name: %s, spot: %u", pd->player->getId(), pd->player->getName().c_str(), spot);
         ++_nplayers[spot];
     }
 }
@@ -1057,7 +1043,6 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt16 pos)
         _players[spot].erase(it);
     else
     {
-        INFO_LOG("LEAVEERROR: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", pd->player->getId(), pd->player->getName().c_str(), spot, pos);
         return NULL;
     }
 
@@ -1069,7 +1054,6 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt16 pos)
         if (_nplayers[spot])
             --_nplayers[spot];
     }
-    INFO_LOG("LEAVE: id: %"I64_FMT"u, name: %s, spot: %u, pos: %u", pd->player->getId(), pd->player->getName().c_str(), spot, pos);
     return pd;
 }
 
@@ -1268,9 +1252,6 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 Stream st(REP::HERO_ISLAND);
                 st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
                 pd->player->send(st);
-                INFO_LOG("KILL: %"I64_FMT"u name: %s kill %"I64_FMT"u name: %s => 连杀数: %u, 任务数: %u",
-                        pd->player->getId(), pd->player->getName().c_str(),
-                        pd1->player->getId(), pd1->player->getName().c_str(), pd->straight, pd->tasks);
             }
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev())/2);
@@ -1625,6 +1606,8 @@ void HeroIsland::playerEnter(Player* player)
         st << _endTime;
         player->addFlag(Player::InHeroIsland);
 
+        sendExpFactor(player);
+
         if (player->getAtoHICfg().length())
             sendAtoCfg(player);
     }
@@ -1632,7 +1615,6 @@ void HeroIsland::playerEnter(Player* player)
         st << static_cast<UInt8>(1);
     st << Stream::eos;
     player->send(st);
-    sendExpFactor(player);
 }
 
 void HeroIsland::playerLeave(Player* player)
@@ -1832,8 +1814,6 @@ void HeroIsland::commitCompass(Player* player)
         }
 
         pd->straight = 0; // XXX: 每三次为一轮
-        INFO_LOG("COMMIT: %"I64_FMT"u name: %s round: %u, awardgot: %u",
-                pd->player->getId(), pd->player->getName().c_str(), pd->round, pd->awardgot);
     }
     else
     {

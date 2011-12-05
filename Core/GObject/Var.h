@@ -29,6 +29,8 @@ namespace GObject
         VAR_TGDT = 4,       // 感恩节在线时间
         VAR_TGDCNT = 5,     // 感恩节连续在线3小时次数
         VAR_ATOFM = 6,     // 自动阵图id
+        VAR_ICEMAN = 7,     // 雪人
+        VAR_BOOT = 8,     // 圣诞靴
 
         VAR_KEYPACK1 = 10,  // KEY礼包
         VAR_KEYPACK2,
@@ -67,6 +69,8 @@ namespace GObject
             REGISTER_VAR(VAR_TGDT, CYCLE_MONTH);
             REGISTER_VAR(VAR_TGDCNT, CYCLE_MONTH);
             REGISTER_VAR(VAR_ATOFM, CYCLE_NONE);
+            REGISTER_VAR(VAR_ICEMAN, CYCLE_MONTH);
+            REGISTER_VAR(VAR_BOOT, CYCLE_MONTH);
             REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK3, CYCLE_NONE);

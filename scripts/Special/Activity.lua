@@ -120,7 +120,9 @@ function onLogin(player)
 end
 
 function onLevelup(player, olev, nlev)
-    print('level up')
+    if getChristmas() then
+        onChristmas(player)
+    end
 end
 
 function onDungeonWin(player, id, level)
@@ -696,8 +698,34 @@ function SingleDayReward(player, lootlvl)
     end
 end
 
+function Christmas(player, lootlvl, where)
+    if getChristmas() then
+        if lootlvl > 3 then
+            return;
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+
+        local package = player:GetPackage();
+        -- package:AddItem(69, itemNum[lootlvl], false);
+        -- TODO:
+        if where == 0 then
+            Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 副本通关，获得【圣诞女郎变身卡】x" .. itemNum[lootlvl])
+        else
+            Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 阵图通关，获得【圣诞女郎变身卡】x" .. itemNum[lootlvl])
+        end
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
+    Christmas(player, lootlvl, 0);
 end
 
 
@@ -706,6 +734,7 @@ end
 
 function onFrontMapWin(player, id, spot, lootlvl)
     SingleDayReward(player, lootlvl);
+    Christmas(player, lootlvl, 1);
 end
 
 local vippack = {
@@ -780,6 +809,33 @@ function onThanksgivingDay(player)
 
     if cnt == 6 then
         sendItemPackageMail(player, "感恩节连续在线奖励", "恭喜您获得感恩节连续七天在线奖励【火鸡】*5\n 11月23日-11月29日活动期间，每日在线达到3小时就可以获得感恩节在线奖励【感恩节大餐】*3\n 11月23日-11月29日活动期间，连续七天，每天在线都达到3小时还可以获得法宝【火鸡】*5\n 【火鸡】可在法宝熔炼时使用，提升法宝熔炼值。", {1525,5,1});
+    end
+end
+
+function onChristmas(player)
+    if not getChristmas() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 30 then
+        return
+    end
+
+    if lvl == 30 then
+        if player:GetVar(7) == 1 then
+            return
+        end
+        sendItemPackageMail(player, "圣诞节活动奖励", "恭喜您获得法宝【雪人】\n 12月21日-12月27日登陆并且等级达到30级玩家，即可获得法宝【雪人】 ", {8,3,1});
+        player:SetVar(7,1)
+    end
+
+    if lvl == 40 then
+        if player:GetVar(8) == 1 then
+            return
+        end
+        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞靴】\n 12月25日-12月27日登陆并且等级达到30级玩家，即可获得节日套装奖励【圣诞靴】 ", {8,3,1});
+        player:SetVar(8,1)
     end
 end
 
