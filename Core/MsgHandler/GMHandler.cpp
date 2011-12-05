@@ -983,7 +983,7 @@ void makeItemSuper( GObject::Package * package, GObject::ItemEquip * equip, UInt
 			ied.gems[i] = 0;
 		}
 	}
-	DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
+	DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
 		ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, equip->getId());
 }
 
@@ -995,13 +995,13 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	if(player == NULL)
 		return;
 	const UInt32 itemIdStart[3][5] = {
-        {2088, 2112, 2136, 2160, 2184},
-        {2080, 2104, 2128, 2152, 2176},
-        {2072, 2096, 2120, 2144, 2168}
+        {2568, 2592, 2616, 2160, 2184},
+        {2576, 2600, 2600, 2152, 2176},
+        {2584, 2608, 2624, 2144, 2168}
     };
     const UInt16 trump[] = {1608,1609,1610};
 	int idx = -1;
-	if(equipLvl == 60)
+	if(equipLvl <= 60)
 		idx = 0;
 	else if(equipLvl == 70)
 		idx = 1;

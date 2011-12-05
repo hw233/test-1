@@ -173,15 +173,6 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	exp = dm->exp;
 	player->pendExp(exp);
 	UInt32 itemId = 0;
-	UInt16 gem3Id[] = {5003, 5013, 5023, 5033, 5043, 5053, 5063, 5073, 5083, 5093, 5103, 5113, 5123};
- 	if(World::_wday == 5)
-	{
-		UInt8 bossIndex = getLevelBossIndex(_dungeon->getId(), dpi.level);
-		if(uRand(100) < getGemLeve3Chance(_dungeon->getId(), bossIndex))
-		{
-			itemId = gem3Id[uRand(13)];
-		}
-	}
 	if(World::_activityStage > 0)
 	{
         // TODO: lua function
@@ -631,6 +622,7 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(0) << Stream::eos;
 			player->send(st);
+            player->addFlag(Player::AutoDungeon);
 		}
 		break;
     case 1:
@@ -737,18 +729,18 @@ void Dungeon::autoChallenge( Player * player, UInt8 mtype )
 		player->sendMsgCode(0, 1407, buffLeft - now);
 		return;
 	}
+
 	player->checkLastBattled();
-	player->addFlag(Player::AutoDungeon);
 	UInt32 exp = 0;
 	processAutoChallenge(player, 0, &exp, mtype);
 }
 
 void Dungeon::pushChallenge( Player * player, UInt32 exp, bool won )
 {
-	player->addFlag(Player::AutoDungeon);
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
     if (it == _players.end())
         return;
+	player->addFlag(Player::AutoDungeon);
 	EventDungeonAuto * event = new(std::nothrow) EventDungeonAuto(player, 1 + uRand(20), this, won, exp);
 	PushTimerEvent(event);
 }
