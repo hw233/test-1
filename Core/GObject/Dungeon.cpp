@@ -173,15 +173,6 @@ void Dungeon::takeLoot( Player * player, DungeonPlayerInfo& dpi, UInt32& exp )
 	exp = dm->exp;
 	player->pendExp(exp);
 	UInt32 itemId = 0;
-	UInt16 gem3Id[] = {5003, 5013, 5023, 5033, 5043, 5053, 5063, 5073, 5083, 5093, 5103, 5113, 5123};
- 	if(World::_wday == 5)
-	{
-		UInt8 bossIndex = getLevelBossIndex(_dungeon->getId(), dpi.level);
-		if(uRand(100) < getGemLeve3Chance(_dungeon->getId(), bossIndex))
-		{
-			itemId = gem3Id[uRand(13)];
-		}
-	}
 	if(World::_activityStage > 0)
 	{
         // TODO: lua function
