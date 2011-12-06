@@ -64,6 +64,8 @@ bool World::_nationalDay = false;
 bool World::_halloween = false;
 bool World::_singleday = false;
 bool World::_thanksgiving = false;
+bool World::_christmas = false;
+bool World::_newyear = false;
 
 #define LEADERBOARD_UPDATE_INTERVAL 3600
 

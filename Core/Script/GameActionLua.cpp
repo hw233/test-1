@@ -808,9 +808,14 @@ namespace Script
         doAttainment(player, 10001, nlev);
 	}
 
-	bool GameActionLua::testTakePack( UInt8 type, UInt8 freq )
+	bool GameActionLua::testTakePack( Player* player, UInt8 type, UInt8 freq )
 	{
-		return Call<bool>("testTakePack", type, freq);
+		return Call<bool>("testTakePack", player, type, freq);
+	}
+
+	bool GameActionLua::testTakePackSize( Player* player, UInt8 type )
+	{
+		return Call<bool>("testTakePackSize", player, type);
 	}
 
 	void GameActionLua::onGetVipPack( Player* player, UInt8 type )
@@ -851,6 +856,11 @@ namespace Script
 	bool GameActionLua::onThanksgivingDay(Player* player)
 	{
 		return Call<bool>("onThanksgivingDay", player);
+	}
+
+	bool GameActionLua::onChristmas(Player* player)
+	{
+		return Call<bool>("onChristmas", player);
 	}
 
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)

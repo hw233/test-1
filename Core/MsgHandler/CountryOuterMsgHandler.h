@@ -2813,7 +2813,9 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
     if (!type)
         type = 3;
 
-    if (type && !GameAction()->testTakePack(type, player->GetVar(VAR_KEYPACK1+type-1)))
+    if (type && !GameAction()->testTakePackSize(player, type))
+        return;
+    if (type && !GameAction()->testTakePack(player, type, player->GetVar(VAR_KEYPACK1+type-1)))
     {
 		player->sendMsgCode(1, 1018);
         return;
