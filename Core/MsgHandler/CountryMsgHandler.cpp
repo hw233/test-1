@@ -132,7 +132,8 @@ MSG_REG(GameMsgHdr, OnLockPwdReq);
 
 MSG_REG_2(GameMsgHdr, REQ::EQ_TRUMP_UPGRADE, OnTrumpUpgrade);
 MSG_REG(GameMsgHdr, OnTrumpLOrder);
-
+MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
+MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -142,6 +143,8 @@ MSG_REG_2(GameMsgHdr, 0x1EF, OnRunScriptBattleReq);
 MSG_REG_2(GameMsgHdr, 0x1F0, PlayerEnter);
 MSG_REG_2(GameMsgHdr, 0x1F1, PlayerLeave);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnBroadcast);
+
+
 
 MSG_REG_2(GameMsgHdr, 0x200, PlayerLogout);
 MSG_REG_2(GameMsgHdr, 0x201, PlayerLogin);
@@ -164,6 +167,8 @@ MSG_REG_2(GameMsgHdr, 0x222, OnAthlectisPayPaging);
 MSG_REG_2(GameMsgHdr, 0x230, OnArenaBet);
 MSG_REG_2(GameMsgHdr, 0x231, OnArenaBetResult);
 
+MSG_REG_2(GameMsgHdr, 0x244, OnDoAttainment);
+MSG_REG_2(GameMsgHdr, 0x245, OnDoActivity);
 MSG_REG_2(GameMsgHdr, 0x269, OnDailyCheck);
 
 MSG_REG_2(GameMsgHdr, 0x270, OnGetClanBattleRewardReq);
@@ -211,6 +216,8 @@ MSG_REG_2(GameMsgHdr, 0x309, OnClanSkillDonateBackReq);
 MSG_REG_2(GameMsgHdr, 0x310, OnOperationTaskAction);
 MSG_REG_2(GameMsgHdr, 0x311, OnClanOption);
 MSG_REG_2(GameMsgHdr, 0x312, OnClanSkillLevel);
+//MSG_REG_2(GameMsgHdr, 0x313, OnFriendLevUp);
+
 
 MSG_REG_2(GameMsgHdr, 0x320, OnPracticeExpAddReq);
 MSG_REG_2(GameMsgHdr, 0x321, OnSetPropsReq);

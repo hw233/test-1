@@ -193,15 +193,15 @@ public:
 	void updateAllAttr();
 	void initStats(bool);
 	void postInit();
-	float calcAttack(bool& isCritical, BattleFighter* defender);
+	float calcAttack(bool& isCritical, BattleFighter* defender , float* pCf);
 	bool calcHit(BattleFighter * defender);
 	bool calcCounter(BattleFighter* attacker, bool ranged = false);
 	bool canBeCounter();
 	bool calcPierce(BattleFighter* defender);
     float calcTherapy(const GData::SkillBase* skill);
-    float calcMagAttack(bool& isCritical, BattleFighter* defender);
+    float calcMagAttack(bool& isCritical, BattleFighter* defender, float* pCf);
     float calcPoison(const GData::SkillBase* skill, BattleFighter* defender, bool cs);
-    void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk);
+    void calcSkillAttack(bool& isCritical, BattleFighter* defender, float& atk, float& magatk, float* pCf);
 
 	inline void addAction(UInt32 p);
 

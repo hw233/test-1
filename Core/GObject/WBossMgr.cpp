@@ -7,7 +7,9 @@
 #include "Map.h"
 #include "MsgID.h"
 #include "Package.h"
-
+#include "MsgHandler/CountryMsgStruct.h"
+#include "Country.h"
+#include "Script/GameActionLua.h"
 namespace GObject
 {
 
@@ -315,6 +317,7 @@ void WBoss::reward(Player* player)
 
         MailPackage::MailItem item[] = {{55,1},{MailPackage::Tael,500}};
         (*i).player->sendMailItem(568, 569, item, 2);
+        GameAction()->doAty((*i).player, AtyBoss, 0 , 0 );
     }
 
     if (player)

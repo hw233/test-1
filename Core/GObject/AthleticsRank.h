@@ -246,6 +246,7 @@ public:
 		return _athleticses;
 	}
 
+    static UInt8 GetMaxchallengenum(UInt32 vip);
 private:	
 	RankList		_ranks[2];
 	AthleticsList	_athleticses[2];

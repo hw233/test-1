@@ -15,7 +15,9 @@
 #include "Server/SysMsg.h"
 #include "Mail.h"
 #include "MsgID.h"
-
+#include "Country.h"
+#include "MsgHandler/CountryMsgStruct.h"
+#include "Script/GameActionLua.h"
 namespace GObject
 {
 
@@ -378,6 +380,12 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         //data->lock.unlock();
 
         st << static_cast<UInt8>(0) << Stream::eos;
+
+        stActivityMsg msg;
+        msg.id = AtyPractice;
+        GameMsgHdr hdr(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+        GLOBAL().PushMsg(hdr, &msg);
+ 
         //pl->send(st);
         return true;
     }
@@ -708,8 +716,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pl->sendMsgCode(0, 3100);
             return false;
         }
-
-
+        
         Stream st(REP::PRACTICE_ROB);
         Player* def = 0;
         bool sumfalg = false;
@@ -753,7 +760,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             st << static_cast<UInt8>(idx);
             st << Stream::eos;
             pl->send(st);
-            return true;
+
+           return true;
         }
 
         Battle::BattleSimulator bsim(pl->getLocation(), pl, def, false);
@@ -825,7 +833,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
         st << Stream::eos;
         pl->send(st);
-
+ 
         return true;
     }
 

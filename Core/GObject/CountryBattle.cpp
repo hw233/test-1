@@ -86,7 +86,18 @@ inline void addAchievement(UInt32& achieve, UInt8 lvl, UInt8& killStreak1, UInt8
 	if(World::_wday == 1)
 		achieve *= 2;
 }
+void CountryBattle::LeaveGetAttainment(Player* p, CBPlayerData& data)
+{
+    if(data.totalWin)
+    {
+        UInt32 w = p->GetVar( VAR_COUNTRY_BATTLE_WIN);
 
+        GameAction()->doAttainment(  p  , Script:: COUNTRY_BATTLE_WIN, data.totalWin + w);
+    }
+    if(data.maxKillStreak)
+     GameAction()->doAttainment(p, Script:: COUNTRY_BATTLE_KILL_STREAK, data.maxKillStreak);
+    
+}
 void CountryBattle::process(UInt32 curtime)
 {
 	if(curtime >= _rewardTime)
@@ -118,6 +129,8 @@ void CountryBattle::process(UInt32 curtime)
 
 			int turns = 0;
 			bool res = cbd1->player->challenge(cbd2->player, NULL, &turns, false, 50);
+
+           
 			GameAction()->RunOperationTaskAction1(cbd1->player, 2, res);
 			GameAction()->RunOperationTaskAction1(cbd2->player, 2, !res);
 			cbd1->player->setBuffData(PLAYER_BUFF_ATTACKING, curtime + 2 * turns);
@@ -426,6 +439,7 @@ void CountryBattle::end(UInt32 curtime)
 				maxPlayer[lvl] = it->first->getId();
 			}
 			_rank[&it->second] = it->first;
+            LeaveGetAttainment(it->first, it->second);
 		}
 	}
 	DBLOG1().PushUpdateData("insert into `country_battle`(`server_id`, `total_achievement1`, `total_players1`, `total_achievement2`, `total_players2`, `total_achievement3`, `total_players3`, `max_player1`, `max_achievement1`, `max_player2`, `max_achievement2`, `max_player3`, `max_achievement3`, `created_at`) values(%u, %u, %u, %u, %u, %u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, totalAchievement[0], enterSize[0], totalAchievement[1], enterSize[1], totalAchievement[2], enterSize[2], maxPlayer[0], maxAchievement[0], maxPlayer[1], maxAchievement[1], maxPlayer[2], maxAchievement[2], TimeUtil::Now());
@@ -531,6 +545,7 @@ bool CountryBattle::playerEnter( Player * player )
 	SYSMSG_SEND(141, player);
 	SYSMSG_SENDV(1041, player, player->getCountry());
 
+    GameAction()->doAty( player, AtyCountryWar, 0, 0);
 	return true;
 }
 
@@ -589,6 +604,9 @@ void CountryBattle::doLeave( UInt32 curtime, UInt8 lvl, UInt8 side, int pos, UIn
 		cbpdata.awardTime += (dur << 1);
 	
 	player->delFlag(Player::CountryBattle);
+
+   // printf("离开阵营战 ： killall %u , streak : %u\n",  cbpdata.totalWin, cbpdata.maxKillStreak);
+    LeaveGetAttainment(player,  cbpdata);
 	blist.erase(blist.begin() + pos);
 	delete cbd;
 }

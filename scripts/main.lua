@@ -17,5 +17,9 @@ require("DayTask/DayCopyTask");
 require("MapObject/NpcDefaultAction")
 require("Other/OperationTaskAction")
 require("Special/Activity")
+<<<<<<< HEAD
 require("Other/ClanBattle")
 
+=======
+require("World/ActivityMgr")
+>>>>>>> master

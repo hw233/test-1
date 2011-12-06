@@ -25,6 +25,7 @@
 #include "GObject/Trade.h"
 #include "GObject/TaskMgr.h"
 #include "GObject/AttainMgr.h"
+#include "GObject/ActivityMgr.h"
 #include "GObject/Athletics.h"
 #include "GObject/Dungeon.h"
 #include "GObject/ChatItem.h"
@@ -840,7 +841,8 @@ void OnSelectCountry( GameMsgHdr& hdr, SelectCountry& req )
     if (country > 2) 
         return;
     if (player->getCountry() != country)
-    {    
+    {   //before leave thread
+        player->OnSelectCountry();
         CURRENT_COUNTRY().PlayerLeave(player);
         player->setCountry(country);
         Stream st(REP::CAMP_SELECT);
@@ -2037,6 +2039,11 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
             GameAction()->SubmitTask(player, req.m_TaskId, req.m_ItemId, req.m_ItemNum); //提交
             succ1 = player->finishClanTask(req.m_TaskId);
         }
+        else
+        {
+            if(succ) //完成衙门 师门
+                player->GetTaskMgr()->CheckTaskAttainment(req.m_TaskId, NULL);
+        }
 
         break;
 	default:
@@ -2523,6 +2530,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				    ConsumeInfo ci(Item,lr._itemId,lr._count);
 					player->useCoupon(price,&ci);
 					st << static_cast<UInt8>(0);
+
+                    GameAction()->doAty( player, AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -2545,6 +2554,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				    ConsumeInfo ci(Item,lr._itemId,lr._count);
 					player->useTael(price,&ci);
 					st << static_cast<UInt8>(0);
+                    GameAction()->doAty( player,AtyBuy, 0,0);
                 }
 			}
 			break;
@@ -2599,6 +2609,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId, lr._count);
 					player->useAchievement(price,&ci);
 					st << static_cast<UInt8>(0);
+                    GameAction()->doAty( player, AtyBuy, 0,0);
 				}
 			}
 			break;
@@ -2630,6 +2641,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         ConsumeInfo ci(Item,lr._itemId, lr._count);
                         player->usePrestige(price,&ci);
                         st << static_cast<UInt8>(0);
+
+                        GameAction()->doAty(player, AtyBuy, 0,0);
                     }
                 }
             }
@@ -2653,6 +2666,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
                     player->useGold(price,&ci);
 					st << static_cast<UInt8>(0);
+
+                    GameAction()->doAty(player, AtyBuy ,0,0);
                 }
 			}
 			break;
@@ -3587,5 +3602,38 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 	st << res << req._fgtId << req._itemId << Stream::eos;
 	player->send(st);
 }
+void OnActivityList( GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    //BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    ActivityMgr* mgr = player->GetActivityMgr();
+    mgr->ActivityList(7);
 
+}
+void OnActivityReward(  GameMsgHdr& hdr, const void * data)
+{
+    MSG_QUERY_PLAYER(player);
+    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+
+    ActivityMgr* mgr = player->GetActivityMgr();
+    UInt8 type = 0;
+    brd >> type;
+    switch(type )
+    {
+        case 0:
+            mgr->ChangeOnlineReward();
+            break;
+
+        case 1:
+            // getDailyReward
+            mgr ->GetReward(2);
+            break;
+        case 2:
+            UInt16 flag = 0;
+            brd >> flag;
+            mgr->GetReward(flag);
+            break;
+
+    }
+}
 #endif // _COUNTRYOUTERMSGHANDLER_H_

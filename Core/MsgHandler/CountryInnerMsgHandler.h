@@ -1171,10 +1171,33 @@ void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
 void OnAthlectisPayPaging( GameMsgHdr & hdr,  const void* data)
 {
     MSG_QUERY_PLAYER(player);
-
     player->GetAthletics()->PayForPaging();
 }
 
+void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)
+{
+     MSG_QUERY_PLAYER(player);
+     const stAttainMsg* co = reinterpret_cast<const stAttainMsg*>(data);
+
+     if(co->attainID == Script::ONE_FRIEND_LEV_UP)
+     {
+        player->OnFriendLevUp(co->param);
+     }
+     else if(co->attainID ==  Script:: ADD_FRIEND)
+     {
+        player->OnAddOneFriend() ;
+     }
+     else
+     {
+        player->OnDoAttainment(co->attainID, co->param);
+     }
+}
+void  OnDoActivity( GameMsgHdr& hdr, const void* data)
+{
+     MSG_QUERY_PLAYER(player);
+     const stActivityMsg* co = reinterpret_cast<const stActivityMsg*>(data);
+     GameAction()->doAty(player, co->id, co->param1, co->param2);
+}
 void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

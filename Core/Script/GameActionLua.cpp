@@ -8,7 +8,6 @@
 #include "GObject/Package.h"
 #include "GObject/MOAction.h"
 #include "GObject/AttainMgr.h"
-
 #include "GObject/Country.h"
 #include "Log/Log.h"
 #include "MsgID.h"
@@ -82,7 +81,7 @@ namespace Script
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
-
+        lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -177,6 +176,7 @@ namespace Script
         CLASS_DEF(Player, AddClanBuilding);
         CLASS_DEF(Player, AddClanContrib);
 		CLASS_DEF(Player, GetAttainMgr);
+        CLASS_DEF(Player, GetActivityMgr);
 		CLASS_DEF(Player, addNewFormation);
 		CLASS_DEF(Player, openLevelBox);
 		CLASS_DEF(Player, sendMailPack);
@@ -184,7 +184,8 @@ namespace Script
         CLASS_DEF(Player, GetVar);
         CLASS_DEF(Player, SetVar);
         CLASS_DEF(Player, AddVar);
-		
+		CLASS_DEF(Player, getAttainment);
+
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
 		CLASS_DEF(Fighter, getCurrentHP);
@@ -253,6 +254,16 @@ namespace Script
         CLASS_DEF(AttainMgr, CanAttain);
 
 		//????
+        CLASS_ADD(ActivityMgr);
+        CLASS_DEF(ActivityMgr, GetFlag);
+        CLASS_DEF(ActivityMgr, UpdateFlag);
+        CLASS_DEF(ActivityMgr, CheckTimeOver);
+        CLASS_DEF(ActivityMgr, AddPoint);
+        CLASS_DEF(ActivityMgr, UpdateToDB);
+        CLASS_DEF(ActivityMgr, GetPoint);
+        CLASS_DEF(ActivityMgr, AddRewardFlag);
+		
+        //????
 		CLASS_ADD(Package);
 		CLASS_DEF(Package, Add);
 		CLASS_DEF(Package, AddItem);
@@ -878,6 +889,15 @@ namespace Script
 		return Call<lua_tinker::table>("onGetMailItems", pkgId);	
 	}
 
+    lua_tinker::table GameActionLua::GetOnlineReward()
+    {
+        return Call<lua_tinker::table>("GetOnlineReward");
+    }
+
+    void   GameActionLua::GetAtyReward(Player* p, UInt32 flag)
+    {
+        Call<void>("GetAtyReward", p , flag);
+    }
 	UInt32 GameActionLua::onLuckyDrawItemRoll( UInt8 type )
 	{
 		return Call<UInt32>("onLuckyDrawItemRoll", type);
@@ -893,6 +913,9 @@ namespace Script
 	}
     void GameActionLua::doAttainment(Player* pl, UInt16 attainId, UInt32 param)
     {
+#ifdef NO_ATTAINMENT
+        return;
+#endif
         Call<void>("doAttainment", pl, attainId, param);
     }
     void GameActionLua::finishAttainment(Player* pl, UInt16 attainId)
@@ -904,5 +927,16 @@ namespace Script
     {
         Call<void>("onRecruitAward", player);
     }
-
+    void GameActionLua::doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2)
+    {
+        Call<void>("doAty", pl, id, param1, param2);
+    }
+    UInt32  GameActionLua::GetAtyCheckFlag(UInt32 idx)
+    {
+        return Call<UInt32>("GetAtyCheckFlag", idx);
+    }
+    UInt32  GameActionLua::GetMaxActivity(UInt32 vip)
+    {
+        return Call<UInt32>(  "GetMaxActivity", vip);
+    }
 }
