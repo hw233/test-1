@@ -2944,7 +2944,7 @@ bool Clan::SignupRankBattle(Player* player, UInt32 field, UInt32 now)
 
     mem->signupRankBattleTime = now;
     mem->rankBattleField = field;
-    DB5().PushUpdateData("UPDATE `clan_player` SET `signupRankBattleTime`=%u AND `rankBattleField`=%u WHERE `playerId` = %"I64_FMT"u", now, field, mem->player->getId());
+    DB5().PushUpdateData("UPDATE `clan_player` SET `signupRankBattleTime`=%u,`rankBattleField`=%u WHERE `playerId` = %"I64_FMT"u", now, field, mem->player->getId());
     return true;
 }
 
@@ -2957,6 +2957,7 @@ bool Clan::SignoutRankBattle(Player* player, UInt32 now)
     if(mem == NULL) return false;
 
     //还没报名
+
     if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) != dayBegin) return false;
 
     mem->signupRankBattleTime = 0;
@@ -2987,10 +2988,10 @@ UInt32 Clan::AdjustRankBattleField(Player* player, UInt32 field, UInt32 now)
 
     Mutex::ScopedLock lk(_mutex);
     ClanMember* mem = getClanMember(player);
-    if(mem == NULL) return 0;
+    if(mem == NULL) return UInt32(-1);
 
     //还没报名
-    if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) != dayBegin) return UInt32(-1);
+    if(TimeUtil::SharpDayT(0, mem->signupRankBattleTime) != dayBegin) return UInt32(-2);
     if(mem->rankBattleField == field) return field;
 
     UInt32 num = 0;
@@ -3005,7 +3006,7 @@ UInt32 Clan::AdjustRankBattleField(Player* player, UInt32 field, UInt32 now)
     }
     if(num >= 30) //目标战场超过了30人的限制
     {
-        return UInt32(-1);
+        return UInt32(-3);
     }  
 
     UInt32 oldField = mem->rankBattleField;

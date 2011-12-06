@@ -54,6 +54,8 @@ struct ClanMember
         signupRankBattleTime = 0;
         rankBattleField = 0;
 	}
+
+
 	std::multimap<UInt32, AllocItem> allocItems;
 	Player * player;
 	UInt8  cls;

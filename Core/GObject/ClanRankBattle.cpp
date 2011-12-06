@@ -76,7 +76,7 @@ namespace GObject
             PlayerVec& list = players[field];
             REMOVE_PLAYER_IN_LIST(list, player)
         }
-     }
+    }
 
     void ClanRankBattleInfo::AddPlayer(Player* player, UInt32 field)
     {
@@ -178,6 +178,8 @@ namespace GObject
         m_bEnd = false;
         m_Winner = 0;
         m_Round = 0;
+
+        TRACE_LOG("clanrankbattle field(%u) start(%u:%u)(%u:%u).", m_Id, clan1, UInt32(team1.size()), clan2, UInt32(team2.size()));
     }
 
 
@@ -776,6 +778,8 @@ namespace GObject
         }
         stream << Stream::eos;
         player->send(stream);
+
+        DEBUG_LOG("send clanrankbattle info clan1(%u:%u),clan2(%u,%u).", myClan->clan->getId(), num1, otherClan->clan->getId(), num2);
     }
 
 
@@ -1094,27 +1098,33 @@ namespace GObject
         ClanRankBattleInfo* pInfo = GetClanInfo(clan->getId());
         if(pInfo == NULL) return; //该帮没有参加
 
-        if(pInfo->HasPlayer(player)) return; //没报名
+        if(!pInfo->HasPlayer(player)) return; //没报名
 
         if(clan->getClanRank(player) < 2) return; //没权力
 
 
         PlayerVec& players = pInfo->players[field];
-        if(pos == 0 || pos > players.size()) return;
+        if(pos > players.size()) pos = players.size();
 
-        if(players.size() >= 30)
-        {
-            SYSMSG_SENDV(2234, player, 30);
-            return;
-        }
 
         UInt32 oldField = clan->AdjustRankBattleField(member, field, m_Now);
-        if(oldField >= RANK_BATTLE_FIELD_NUM) return;
+        if(oldField >= RANK_BATTLE_FIELD_NUM)
+        {
+            if(oldField == UInt32(-3))
+            {
+                SYSMSG_SENDV(2234, player, 30);
+            }
+            return;
+        }
 
         pInfo->RemovePlayer(member, oldField);
 
         PlayerVec::iterator posIter = players.begin();
-        while(--pos > 0) ++posIter;
+        while(pos > 0 && posIter != players.end())
+        {
+            ++posIter;
+            --pos;
+        }
         players.insert(posIter, member);
 
         //刷新出战顺序 
@@ -1133,7 +1143,7 @@ namespace GObject
             Player* member = *iter;
             stream << member->getId();
             stream << UInt8(oldField);
-            stream << UInt8(++index);
+            stream << UInt8(index++);
         }
 
         if(field != oldField)
@@ -1146,7 +1156,7 @@ namespace GObject
                 Player* member = *iter;
                 stream << member->getId();
                 stream << UInt8(field);
-                stream << UInt8(++index);
+                stream << UInt8(index++);
             }
         }
 
@@ -1219,7 +1229,6 @@ namespace GObject
         }
         stream << time;
         
-        printf("req:status:%u time:%u", m_State, time);
         UInt32 field = clan->GetRankBattleField(player, m_Now);
         stream << UInt8(field < RANK_BATTLE_FIELD_NUM ? 1:0);
         stream << UInt8(clan->GetSignupRankBattleNum(m_Now));
@@ -1347,8 +1356,6 @@ namespace GObject
                 }
                 break;
         }
-
-        printf("current status:%u  lefttime:%u",m_State, time);
 
         class NotifyClanVisitor : public Visitor<Clan>
         {
@@ -1668,6 +1675,9 @@ namespace GObject
     {
         ClanRankBattle* battle = new(std::nothrow) ClanRankBattle(clan1, clan2);
         if(battle == NULL) return false;
+        TRACE_LOG("create battle clan1(%u:%u) clan2(%u:%u)"
+                ,clan1->clan->getId(),clan1->GetPlayerNum()
+                ,clan2->clan->getId(),clan2->GetPlayerNum());
         battle->Start(m_Now);
         m_Battles.push_back(battle);
 
