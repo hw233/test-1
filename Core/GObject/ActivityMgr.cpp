@@ -152,11 +152,11 @@ void ActivityMgr::GetOnlineReward()
 UInt32  ActivityMgr::GetOnlineRewardNum()
 {
     UInt32 s = _onlineReward.size();
-    /*if(s == 0)
+    if(s == 0)
     {
         GetOnlineReward();
         s = _onlineReward.size();
-    }*/
+    }
      return s;
 }
 /**
