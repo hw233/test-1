@@ -43,8 +43,8 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
 UInt32 ActivityMgr::GetRandomReward()
 {
     UInt32 s = GetOnlineRewardNum();
-    if(s == 0)
-        return 1;
+   // if(s == 0)
+     //   return 1;
     UInt32 idx = uRand(s);
     return idx + 1;
 }
@@ -152,11 +152,11 @@ void ActivityMgr::GetOnlineReward()
 UInt32  ActivityMgr::GetOnlineRewardNum()
 {
     UInt32 s = _onlineReward.size();
-    if(s == 0)
+    /*if(s == 0)
     {
         GetOnlineReward();
         s = _onlineReward.size();
-    }
+    }*/
      return s;
 }
 /**
