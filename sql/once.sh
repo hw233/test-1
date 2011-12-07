@@ -12,6 +12,7 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111114_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111115_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111122.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111129_1.sql
     #. clearshiyamen.sh
 }
 

@@ -254,6 +254,11 @@ public:
     UInt32 GetBattleRanking() const { return m_BattleRanking; }
     void LoadBattleRanking(UInt32 ranking){ m_BattleRanking = ranking;}
 
+    /**
+     *@brief 广播帮会战相关数据
+     */
+    void BroadcastBattleData(UInt32 now);
+
 public:
 	inline bool alive() { return !_deleted; }
 

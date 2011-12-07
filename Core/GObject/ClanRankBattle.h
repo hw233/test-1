@@ -22,7 +22,7 @@ namespace GObject
     //战斗据点
     const static UInt32 RANK_BATTLE_LOCATION = 0x0713;
     //帮会战技能列表
-    const static UInt32 RANK_BATTLE_SKILL_NUM = 5;
+    const static UInt32 RANK_BATTLE_SKILL_NUM = 12;
 
     /**
      *@brief 排名战帮会信息
@@ -402,7 +402,7 @@ namespace GObject
         BattleVec m_Battles;
 
         //帮派技能
-        ClanBattleSkill m_Skills[RANK_BATTLE_SKILL_NUM];
+        ClanBattleSkill m_Skills[RANK_BATTLE_SKILL_NUM + 1];
     };
 }
 

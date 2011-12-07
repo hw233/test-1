@@ -128,7 +128,6 @@ namespace GObject
 
 
 
-
     ClanRankBattleField::ClanRankBattleField()
     {
         m_Id = 0;
@@ -348,8 +347,14 @@ namespace GObject
         {
             Player* player = *iter;
             player->AddClanBattleScore(extScore1);
+            
             Clan* clan = player->getClan();
-            if(clan != NULL) clan->addMemberProffer(player, player->GetClanBattleScore() * 10);
+            if(clan != NULL)
+            {
+                UInt32 proffer = player->GetClanBattleScore() * 10;
+                clan->addMemberProffer(player, proffer);
+                player->AddVar(VAR_CLANBATTLE_HONOUR, proffer);
+            }
             
             player->clearHIAttr();
             player->regenAll();
@@ -362,8 +367,14 @@ namespace GObject
         {
             Player* player = *iter;
             player->AddClanBattleScore(extScore2);
+             
             Clan* clan = player->getClan();
-            if(clan != NULL) clan->addMemberProffer(player, player->GetClanBattleScore() * 10);
+            if(clan != NULL)
+            {
+                UInt32 proffer = player->GetClanBattleScore() * 10;
+                clan->addMemberProffer(player, proffer);
+                player->AddVar(VAR_CLANBATTLE_HONOUR, proffer);
+            }
             
             player->clearHIAttr();
             player->regenAll();
@@ -613,6 +624,9 @@ namespace GObject
                 m_Fields[i].End(extScore1, extScore2 + BATTLE_FIELD_SCORE[i]);
             }
         }
+
+        m_Clan1->clan->BroadcastBattleData(m_Now);
+        m_Clan2->clan->BroadcastBattleData(m_Now);
     }
 
     void ClanRankBattle::OnPlayerLeave(Player* player)
@@ -835,9 +849,9 @@ namespace GObject
         //获取技能buff配置
         Table buffs = GameAction()->GetClanBattleBuffs();
         size_t buffNum = buffs.size();
-        for(UInt32 i = 0; i < buffNum && i < RANK_BATTLE_SKILL_NUM; ++i)
+        for(UInt32 i = 1; i <= buffNum && i <= RANK_BATTLE_SKILL_NUM; ++i)
         {
-            Table buff = buffs.get<Table>(i + 1);
+            Table buff = buffs.get<Table>(i);
             if(buff.size() < 13) continue;
 
             m_Skills[i].id = i;
@@ -931,6 +945,8 @@ namespace GObject
             stream << Stream::eos;
             info->Broadcast(stream);
         }
+
+        clan->BroadcastBattleData(m_Now);
         
         Stream stream(REP::CLAN_RANKBATTLE_REPINIT);
         stream << UInt8(1) << UInt8(0) << Stream::eos;
@@ -969,6 +985,8 @@ namespace GObject
             stream << Stream::eos;
             info->Broadcast(stream);
         }
+        
+        clan->BroadcastBattleData(m_Now);
 
         Stream stream(REP::CLAN_RANKBATTLE_REPINIT);
         stream << UInt8(2) << UInt8(0) << Stream::eos;
@@ -1179,7 +1197,7 @@ namespace GObject
     {
         if(m_State != STATE_BATTLE) return;
 
-        if(id >= RANK_BATTLE_SKILL_NUM) return;
+        if(id == 0 || id > RANK_BATTLE_SKILL_NUM) return;
 
         Clan* clan = player->getClan();
         if(clan == NULL) return;
@@ -1203,6 +1221,7 @@ namespace GObject
         Stream stream(REP::CLAN_RANKBATTLE_REPINIT);
         stream << UInt8(0);
         stream << UInt32(clan->GetBattleScore());
+        stream << UInt32(player->GetVar(VAR_CLANBATTLE_HONOUR));
         stream << UInt16(clan->GetBattleRanking());
         stream << UInt8(m_State);
         UInt32 time = 0;
@@ -1784,28 +1803,28 @@ namespace GObject
 
     void ClanRankBattleMgr::CheckAddExp()
     {
-        if(m_Now > m_expTime)
+        if(m_Now < m_expTime) return;
+       
+
+        class AddExpVisitor : public PlayerVisitor
         {
-
-            class AddExpVisitor : public PlayerVisitor
+        public:
+            bool operator()(Player* player)
             {
-            public:
-                bool operator()(Player* player)
-                {
-                    UInt32 exp = ((player->GetLev() - 10) * UInt32(player->GetLev() / 10) * 5 + 25) * 2;
-                    player->AddExp(exp);
-                    return true;
-                }
-            };
-            AddExpVisitor visitor;
-            Map* map = Map::FromSpot(RANK_BATTLE_LOCATION);
-            if(map != NULL)
-            {
-                map->VisitPlayers(visitor, RANK_BATTLE_LOCATION);
+                UInt32 exp = ((player->GetLev() - 10) * UInt32(player->GetLev() / 10) * 5 + 25) * 2;
+                player->AddExp(exp);
+                return true;
             }
-
-            m_expTime = m_Now + 60;
+        };
+        AddExpVisitor visitor;
+            
+        Map* map = Map::FromSpot(RANK_BATTLE_LOCATION);
+        if(map != NULL)
+        {
+            map->VisitPlayers(visitor, RANK_BATTLE_LOCATION);
         }
+
+        m_expTime = m_Now + 60;
     }
 }
 

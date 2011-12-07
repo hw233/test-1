@@ -1982,7 +1982,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     }
     if(bUp && writedb && _level >= 5)
     {
-        //�����
+        //?????
         UInt32 nLev  = static_cast<UInt32> (_level);
 
         stAttainMsg m;
@@ -3105,6 +3105,40 @@ void Clan::SetBattleRanking(UInt32 ranking)
 
     m_BattleRanking = ranking;
     DB5().PushUpdateData("UPDATE `clan` SET `battleRanking`=%u WHERE `id`=%u", m_BattleRanking, getId());
+}
+
+void Clan::BroadcastBattleData(UInt32 now)
+{
+    UInt8 signupNum = GetSignupRankBattleNum(now);
+    UInt32 battleScore = GetBattleScore();
+
+    class SendDataVisitor : public Visitor<ClanMember>
+    {
+    public:
+        SendDataVisitor(UInt8 signupNum, UInt32 battleScore)
+            :m_SignupNum(signupNum), m_BattleScore(battleScore){}
+
+        bool operator()(ClanMember* member)
+        {
+            if(!member->player->isOnline()) return true;
+                
+            Stream stream(REP::CLAN_RANKBATTLE_REPINIT);
+            stream << UInt8(6) << m_BattleScore
+                << (UInt32)member->player->GetVar(VAR_CLANBATTLE_HONOUR)
+                << m_SignupNum;
+            stream << Stream::eos;
+            member->player->send(stream);
+
+            return true;
+        }
+
+    private:
+        UInt8 m_SignupNum;      //报名人数
+        UInt32 m_BattleScore;   //帮会帮战积分
+    };
+
+    SendDataVisitor visitor(signupNum, battleScore);
+    VisitMembers(visitor);
 }
 
 void Clan::setMaxMemberCount(UInt8 count)
