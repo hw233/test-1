@@ -314,6 +314,7 @@ namespace REP
     const UInt8 ENTER_ARENA         = 0x02;
     const UInt8 LINEUP_CHANGE       = 0x03;
     const UInt8 NEXT_ARENA          = 0x04;
+    const UInt8 CHKMARK             = 0x05;
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     const UInt8 CAMP_SELECT         = 0xF1;// 0x0D
     const UInt8 BE_DISCONNECT       = 0xF2;// 0x0E

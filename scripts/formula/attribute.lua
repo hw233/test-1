@@ -1,7 +1,7 @@
 evdlvl_factor = 10
 evdlvl_addon_factor = 800
 hitrlvl_factor = 10
-hitrlvl_addon_factor = 750
+hitrlvl_addon_factor = 800
 crilvl_factor = 10
 crilvl_addon_factor = 800
 pirlvl_factor = 10
