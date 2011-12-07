@@ -212,7 +212,6 @@ void ActivityMgr::GetReward(UInt32 flag)
         if(_item.awardID == 0)
             return;
 
-       // OnlineRewards v = GetOnlineReward() ;
         UInt32 s =  _onlineReward.size();
         if(s == 0)
             return;
@@ -333,7 +332,9 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     {
         c1 = static_cast<UInt8>(_item.flag[i]);
         if( i == AtyAthletics )
+        {
             m1 = AthleticsRank::GetMaxchallengenum(vipLevel);
+        }
         else if( i == AtyBoss)
         {
             UInt8 lev =  worldBoss.getLevel();
@@ -343,6 +344,10 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             }
             else
                 m1 = 0;
+        }
+        else if( i == AtyClanWar)
+        {
+            m1 = 0;//暂时屏蔽掉
         }
         else
             m1 = static_cast<UInt8>(GameAction()->GetAtyCheckFlag(i));
