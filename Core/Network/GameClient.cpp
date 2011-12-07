@@ -278,14 +278,14 @@ void GameClient::OnTick(UInt32 now)
         if(m_Now > m_CreateTime + VERIFY_TIMEOUT)
         {
             //验证超时
-            closeConn();
+            //closeConn(); 暂时屏蔽
             return;
         }
     }
     else if(m_Now > m_RecvTime + HEARTBEAT_TIMEOUT)
     {
         //心跳超时
-        closeConn();
+        //closeConn(); 暂时屏蔽
         return;
     }
 }
