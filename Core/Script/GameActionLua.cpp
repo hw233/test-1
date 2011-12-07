@@ -77,6 +77,7 @@ namespace Script
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
+		lua_tinker::def(_L, "getChristmas",	GObject::World::getChristmas);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
