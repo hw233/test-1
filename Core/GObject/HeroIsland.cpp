@@ -420,6 +420,14 @@ void HeroIsland::process(UInt32 now)
         st << _endTime;
         st << Stream::eos;
         broadcast(st);
+        if (cfg.GMCheck)
+            _disperseTime = now + 5 * 60;
+        else
+            _disperseTime = now + 30;
+        if (cfg.GMCheck)
+            _expTime = now + 10 * 60;
+        else
+            _expTime = now + 30;
         _running = true;
     }
 
@@ -430,9 +438,41 @@ void HeroIsland::process(UInt32 now)
         notifyCount(now);
     if (_running && now >= _expTime)
         expFactor(now);
+    if (_running && now >= _disperseTime)
+        disperse(now);
 
     applayPlayers();
     applayRareAnimals();
+}
+
+void HeroIsland::disperse(UInt32 now)
+{
+    size_t sz = _players[0].size();
+    while (sz)
+    {
+        HIPlayerData* pd = _players[0].back();
+        if (pd && pd->player && !pd->player->hasFlag(Player::InHeroIsland))
+            continue;
+        if (pd && pd->player)
+        {
+            if (!pd->injuredcd || pd->injuredcd == static_cast<UInt32>(-1))
+            {
+                UInt8 to = uRand(100);
+                to %= 5;
+                if (!to) to = uRand(5);
+                if (!to) to = 1;
+                moveTo(pd->player, to, false);
+            }
+        }
+        --sz;
+    }
+
+    if (cfg.GMCheck)
+        _disperseTime = now + 5 * 60;
+    else
+        _disperseTime = now + 30;
+
+    SYSMSG_BROADCAST(2214);
 }
 
 void HeroIsland::notifyCount(UInt32 now)
@@ -822,6 +862,7 @@ bool HeroIsland::enter(Player* player, UInt8 type, UInt8 spot, bool movecd)
         UInt32 now = TimeUtil::Now();
         pd->expcd = now + 60;
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
+        pd->type = type;
 
         sendSpot(pd, rspot);
         return true;
@@ -850,9 +891,9 @@ bool HeroIsland::enter(HIPlayerData* pd, UInt8 type, UInt8 spot, bool movecd)
     if (movecd)
     {
         if (cfg.GMCheck)
-            pd->movecd = TimeUtil::Now() + 30;
+            pd->movecd = TimeUtil::Now() + 10;
         else
-            pd->movecd = TimeUtil::Now() + 30;
+            pd->movecd = TimeUtil::Now() + 10;
         pd->player->setBuffData(PLAYER_BUFF_HIMOVE, pd->movecd, false);
     }
 
@@ -1178,9 +1219,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         else
         {
             if (cfg.GMCheck)
-                pd->injuredcd = now + 11;
+                pd->injuredcd = now + 6;
             else
-                pd->injuredcd = now + 11;
+                pd->injuredcd = now + 6;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd+4, false);
             moveTo(pd->player, 0, false);
         }
@@ -1237,9 +1278,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         {
             pd->lasttype = pd1->type;
             if (cfg.GMCheck)
-                pd1->injuredcd = now + 11;
+                pd1->injuredcd = now + 6;
             else
-                pd1->injuredcd = now + 11;
+                pd1->injuredcd = now + 6;
             pd1->player->setBuffData(PLAYER_BUFF_HIWEAK, pd1->injuredcd+4, false);
 
             if (_running)
@@ -1276,9 +1317,9 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
         else
         {
             if (cfg.GMCheck)
-                pd->injuredcd = now + 11;
+                pd->injuredcd = now + 6;
             else
-                pd->injuredcd = now + 11;
+                pd->injuredcd = now + 6;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd+4, false);
 
             moveTo(pd->player, 0, false);

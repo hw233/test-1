@@ -758,7 +758,21 @@ local packFrequency = {
     1,1,7,1,1,1,1,1
 };
 
-function testTakePack(_type, _freq)
+function testTakePackSize(player, _type)
+	local package = player:GetPackage();
+    local needsize = packsize[_type];
+    if needsize == nil then
+        return false
+    end
+
+    if package:GetRestPackageSize() < needsize then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    return true
+end
+
+function testTakePack(player, _type, _freq)
     local freq = packFrequency[_type];
     if freq == nil then
         return false 
@@ -782,7 +796,7 @@ function onGetVipPack(player, _type)
         return
     end
 
-    if  package:GetRestPackageSize() < needsize then
+    if package:GetRestPackageSize() < needsize then
         player:sendMsgCode(2, 1011, 0)
         return
     end

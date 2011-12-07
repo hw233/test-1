@@ -1951,7 +1951,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriend dbfr;
-		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` WHERE `id` < `friendId` ORDER BY `id`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` ORDER BY `id`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
