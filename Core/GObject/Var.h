@@ -5,16 +5,16 @@
 
 namespace GObject
 {
-    //ÖÜÆÚÀàÐÍ
+    //????????
     enum CycleType
     {
-        CYCLE_NONE =    0,  //ÎÞÖÜÆÚ£¬¼´³ÖÐøÐÔ
-        CYCLE_MIN =     1,  //ÒÔ·ÖÎªÖÜÆÚ
-        CYCLE_HOUR =    2,  //ÒÔÐ¡Ê±ÎªÖÜÆÚ
-        CYCLE_DAY =     3,   //ÒÔÌìÎªÖÜÆÚ
-        CYCLE_WEEK =    4,  //ÒÔ×ÔÈ»ÖÜÎªÖÜÆÚ£¬ÖÜÒ»¿ªÊ¼µ½ÖÜÈÕÎªÒ»ÖÜ
-        CYCLE_MONTH =   5, //ÒÔ×ÔÈ»ÔÂÎªÖÜÆÚ
-        CYCLE_YEAR =    6,  //ÒÔÄêÎªÖÜÆÚ
+        CYCLE_NONE =    0,  //?????Ú£?????????
+        CYCLE_MIN =     1,  //?Ô·?Îª????
+        CYCLE_HOUR =    2,  //??Ð¡Ê±Îª????
+        CYCLE_DAY =     3,   //????Îª????
+        CYCLE_WEEK =    4,  //????È»??Îª???Ú£???Ò»??Ê¼??????ÎªÒ»??
+        CYCLE_MONTH =   5, //????È»??Îª????
+        CYCLE_YEAR =    6,  //????Îª????
         
         CYCLE_MAX,
     };
@@ -22,15 +22,17 @@ namespace GObject
 
     enum VarID
     {
-        VAR_INVALID = 0,    //ÎÞÐ§±äÁ¿
-        VAR_SINGLE_CHOPSTICKS = 1, //¹â¹÷½ÚËÍ¿ê×Ó
-        VAR_SENGYI = 2,     // É®ÒÂ
-        VAR_APRON = 3,      // ¶Ç¶µ
-        VAR_TGDT = 4,       // ¸Ð¶÷½ÚÔÚÏßÊ±¼ä
-        VAR_TGDCNT = 5,     // ¸Ð¶÷½ÚÁ¬ÐøÔÚÏß3Ð¡Ê±´ÎÊý
-        VAR_ATOFM = 6,     // ×Ô¶¯ÕóÍ¼id
+        VAR_INVALID = 0,    //??Ð§??Á¿
+        VAR_SINGLE_CHOPSTICKS = 1, //???????Í¿???
+        VAR_SENGYI = 2,     // É®??
+        VAR_APRON = 3,      // ?Ç¶?
+        VAR_TGDT = 4,       // ?Ð¶???????Ê±??
+        VAR_TGDCNT = 5,     // ?Ð¶???Á¬??????3Ð¡Ê±????
+        VAR_ATOFM = 6,     // ?Ô¶???Í¼id
+        VAR_ICEMAN = 7,     // Ñ©??
+        VAR_BOOT = 8,     // Ê¥??Ñ¥
         VAR_TODAY_ONLINE = 9,     // time -- online today
-        VAR_KEYPACK1 = 10,  // KEYÀñ°ü
+        VAR_KEYPACK1 = 10,  // KEY????
         VAR_KEYPACK2,
         VAR_KEYPACK3,
         VAR_KEYPACK4,
@@ -42,12 +44,12 @@ namespace GObject
         VAR_FAIL_ENCH = 20,  // fail to enchat equip
         VAR_SPLIT_EQUIP = 21 , //split equip times
         VAR_SPLIT_THRUMP = 22,//split thrump times
-        VAR_BATTLE_MISS = 23, //¿¿¿¿¿¿¿
+        VAR_BATTLE_MISS = 23, //???????
         VAR_BATTLE_CS  = 24,  //
-        VAR_BATTLE_PR = 25,   //¿¿¿¿¿¿¿
-        VAR_BATTLE_FJ = 26,  //¿¿¿¿¿¿¿
-        VAR_BATTLE_SKILL_DMG = 27, //¿¿¿¿¿¿¿
-        VAR_BATTLE_PEERLESS_DMG = 28,//¿¿¿¿¿¿¿¿
+        VAR_BATTLE_PR = 25,   //???????
+        VAR_BATTLE_FJ = 26,  //???????
+        VAR_BATTLE_SKILL_DMG = 27, //???????
+        VAR_BATTLE_PEERLESS_DMG = 28,//????????
         
         VAR_COUNTRY_BATTLE_WIN =29,
         VAR_ATHLETICS_WIN = 30 ,
@@ -70,7 +72,7 @@ namespace GObject
 
 
     /** 
-     *@brief ±äÁ¿ÏµÍ³
+     *@brief ??Á¿ÏµÍ³
      */
     class VarSystem
     {
@@ -82,14 +84,15 @@ namespace GObject
 
         static void Init()
         {
-            //ÔÚ´ËÊ¹ÓÃREGISTER_VAR×¢²á±äÁ¿
+            //?Ú´?Ê¹??REGISTER_VAR×¢????Á¿
             REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
             REGISTER_VAR(VAR_TGDT, CYCLE_MONTH);
             REGISTER_VAR(VAR_TGDCNT, CYCLE_MONTH);
             REGISTER_VAR(VAR_ATOFM, CYCLE_NONE);
-
+            REGISTER_VAR(VAR_ICEMAN, CYCLE_MONTH);
+            REGISTER_VAR(VAR_BOOT, CYCLE_MONTH);
             REGISTER_VAR(VAR_TODAY_ONLINE,  CYCLE_DAY);
             REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);
@@ -135,7 +138,7 @@ namespace GObject
         void UpdateDB(UInt32 id);
 
     private:
-        //Íæ¼Òid
+        //????id
         UInt64 m_PlayerID;
         UInt32 m_Vars[VAR_MAX];
         UInt32 m_OverTime[VAR_MAX];
