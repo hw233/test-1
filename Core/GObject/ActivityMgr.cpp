@@ -300,40 +300,40 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     c1 =static_cast<UInt8>( GameAction()->GetMaxActivity(vipLevel));
     s<< static_cast<UInt8>(_item.point) << c1;
 
-    printf("活跃度 : %u  %u\n",  static_cast<UInt8>(_item.point) , c1);
+    //printf("活跃度 : %u  %u\n",  static_cast<UInt8>(_item.point) , c1);
     //个数
     c1 = static_cast<UInt8>(AtyEnd - AtyBegin - 1 + AtyMaxFlag);
     s<< c1;
 
-    printf("个数 %u  \n" ,c1);
+   // printf("个数 %u  \n" ,c1);
 
     //各个各个项
     _owner->GetDailyTask(c1,m1,c2,m2,c3,m3);
 
    s<< GetAtyIDInClient( AtyShimenTask) << c1 << m1;
-   printf("师门任务, %u  %u\n",c1 ,m1);
+   //printf("师门任务, %u  %u\n",c1 ,m1);
 
    s<< GetAtyIDInClient( AtyYamenTask) << c2 << m2;
-   printf("衙门, %u  %u\n",c1 ,m1);
+  // printf("衙门, %u  %u\n",c1 ,m1);
 
    s<< GetAtyIDInClient( AtyClanTask) << c3 << m3;
-   printf("帮拍  %u  %u\n" , c3 ,m3);
+   //printf("帮拍  %u  %u\n" , c3 ,m3);
 
 
    _owner-> GetFuben(c1,m1,c2,m2,c3,m3);
     s<< GetAtyIDInClient( AtyCopy ) << c1 << m1;
-    printf("副本  %u  %u\n" , c1 ,m1);
+    //printf("副本  %u  %u\n" , c1 ,m1);
 
     s<< GetAtyIDInClient( AtyDungeon)  << c2 << m2;
-    printf("通天塔  %u  %u\n" , c2 ,m2);
+    //printf("通天塔  %u  %u\n" , c2 ,m2);
 
     s<< GetAtyIDInClient( AtyFormation ) << c3 << m3;
-    printf("阵图  %u  %u\n" , c3 ,m3);
+    //printf("阵图  %u  %u\n" , c3 ,m3);
 
     c1 = _owner->getIcCount();
     m1 =  Player::getMaxIcCount(vipLevel);
     s<< GetAtyIDInClient( AtyTaskHook ) << c1 << m1;
-    printf("挂机加速  %u  %u\n" , c1 ,m1);
+    //printf("挂机加速  %u  %u\n" , c1 ,m1);
 
     //c1 = _owner->getPlayerData().picCount;//_owner->getPIcCount();
     c1 = _owner->getPIcCount();
@@ -342,12 +342,12 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     if(c1 <= m1)
         c1 = m1 - c1;
     s<< GetAtyIDInClient( AtyPSpeed ) << c1 << m1;
-    printf("修炼加速  %u  %u\n" , c1 ,m1);
+    //printf("修炼加速  %u  %u\n" , c1 ,m1);
 
     c1 = 0;
     m1 = 0;
     s<< static_cast<UInt8> ( AtyGroupCopy) << c1 << m1;
-    printf("副本组队  %u  %u\n" , c1 ,m1);
+    //printf("副本组队  %u  %u\n" , c1 ,m1);
 
     for(UInt32 i = 0 ; i <  AtyMaxFlag; i ++  )
     {
@@ -368,7 +368,7 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             m1 = static_cast<UInt8>(GameAction()->GetAtyCheckFlag(i));
 
         s<< GetAtyIDInClient(i ) << c1 << m1;
-        printf("项目%d : %u  %u\n" , i, c1 ,m1);
+       // printf("项目%d : %u  %u\n" , i, c1 ,m1);
     }
     //奖励
     s<<static_cast<UInt16>(_item.award);
