@@ -218,6 +218,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
         Stream st(REP::FORMATTON_INFO);
         st << static_cast<UInt8>(3) << count << Stream::eos;
         pl->send(st);
+        GameAction()->doAty(pl, AtyFormation, 0 ,0 );
     } else {
         sendInfo2(pl, id, false);
     }

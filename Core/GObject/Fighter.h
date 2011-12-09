@@ -228,7 +228,6 @@ public:
     int isCittaUp(UInt16 citta);
     // 升级心法
     bool lvlUpCitta(UInt16 citta, bool = true);
-
     // 取得装备的心法数
     UInt8 getUpCittasNum();
     // 取得最大装备心法数
@@ -271,6 +270,7 @@ public:
     int getAllTrumpId(UInt32* trumps, int size = TRUMP_UPMAX);
     void getAllTrumps(Stream& st);
 
+    UInt32 getTrumpNum();
 	UInt32 getMaxHP();
 
 	UInt32 regenHP(UInt32);
@@ -482,6 +482,8 @@ public:
 	void addAttr( ItemEquip * );
 	void addTrumpAttr( ItemTrump * );
     void addAttr( const GData::CittaEffect* ce );
+    void    CheckEquipEnchantAttainment(UInt8 e);
+    bool  IsEquipEnchantLev(UInt8 e);
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
@@ -534,6 +536,7 @@ protected:
 	UInt8 _level;
 	UInt64 _exp;        // 经验
     UInt32 _pexp;       // 修炼经验
+    UInt32 _pexpAddTmp; // for Attainment  
     UInt32 _pexpMax;    // 修炼最大经验
 	float _potential;   // 潜力
 	float _capacity;    // 资质
@@ -608,7 +611,6 @@ public:
 	struct Offset { Int8 x, y; };
 	std::vector<Offset> extraPos;
 };
-
 class GlobalFighters
 {
 public:

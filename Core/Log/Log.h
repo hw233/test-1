@@ -57,6 +57,7 @@ enum PurchaseType
     HeroIslandSkill,
     HeroIslandAuto,
     TeamCopyAwardRoll,
+    DailyActivity,
 };
 
 enum IncomingType
@@ -118,6 +119,8 @@ enum ItemFrom
     FromPExp,
     FromHeroIsland,
     FromTeamCopy,
+    FromAttainment,
+    FromDailyActivity,
 };
 
 enum ItemTo

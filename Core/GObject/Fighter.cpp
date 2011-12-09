@@ -21,7 +21,7 @@
 #include "Script/BattleFormula.h"
 #include "GData/FighterProb.h"
 #include "GObject/Mail.h"
-
+#include "AttainMgr.h"
 namespace GObject
 {
 
@@ -48,7 +48,7 @@ bool existGreatFighter(UInt32 id)
 }
 
 Fighter::Fighter(UInt32 id, Player * owner):
-	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0), _pexpMax(0), _potential(1.0f),
+	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false),
     _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _battlePoint(0.0f),
@@ -228,6 +228,8 @@ bool Fighter::addPExp( Int32 e, bool writedb )
         _pexp += e;
         if (_pexp > _pexpMax)
             _pexp = _pexpMax;
+
+        _pexpAddTmp += e;
     }
 
     if (e < 0)
@@ -340,6 +342,13 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
             {
                 DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
                 _pexpMods = 0;
+            }
+
+            if(_pexpAddTmp > 0)
+            {
+               if(CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
+                      GameAction()->doAttainment( _owner ,Script::AddPExp , _pexpAddTmp );
+               _pexpAddTmp = 0;
             }
             return;
         }
@@ -616,9 +625,11 @@ ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
 		_bPDirty = true;
 		if(w != NULL)
 		{
+            CheckEquipEnchantAttainment( w->getItemEquipData().enchant);
 			w->DoEquipBind(true);
 		}
 		sendModification(0x21, w);
+
 	}
 	return r;
 }
@@ -633,6 +644,7 @@ ItemArmor * Fighter::setArmor( int idx, ItemArmor * a, bool writedb )
 		_bPDirty = true;
 		if(a != NULL)
 		{
+            CheckEquipEnchantAttainment( a->getItemEquipData().enchant);
 			a->DoEquipBind(true);
 		}
 		sendModification(0x22 + idx, a);
@@ -740,6 +752,17 @@ ItemEquip* Fighter::setTrump( UInt32 trump, int idx, bool writedb )
     return 0;
 }
 
+UInt32  Fighter:: getTrumpNum()
+{
+
+    UInt32 num = 0;
+     for (int i = 0; i < getMaxTrumps(); ++i)
+     {
+        if (_trump[i])
+            num ++ ;
+     }
+     return num;
+}
 ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 {
     ItemEquip* t = 0;
@@ -782,6 +805,13 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
 
             _attrDirty = true;
             _bPDirty = true;
+
+            if(writedb  &&  getTrumpNum() == 2)
+            {
+                //判断穿法宝的成就
+                GameAction()->doAttainment(_owner, 10211, 0);
+            }
+
             sendModification(0x50+idx, _trump[idx], writedb);
         }
     }
@@ -1681,7 +1711,8 @@ void Fighter::setAcupoints( std::string& acupoints, bool writedb )
 // XXX: 穴道 id (0-14) lvl [1-3]
 bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
 {
-    if (idx >= 0  && idx < ACUPOINTS_MAX && v <= getAcupointsCntMax())
+    UInt8 vMax =  getAcupointsCntMax();
+    if (idx >= 0  && idx < ACUPOINTS_MAX && v <= vMax)
     {
         if (_acupoints[idx] >= v)
             return false;
@@ -1709,6 +1740,10 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         }
 
         soulMax += pap->soulmax;
+
+        if(!init)
+        //增加元神力后 查看成就
+            GameAction()->doAttainment(this->_owner, Script::AddSoulMax , soulMax);
         _pexpMax += pap->pramax;
         _cittaslot += pap->citslot;
 
@@ -1718,6 +1753,8 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         sendModification(7, _pexpMax);
         sendModification(9, soulMax);
         sendModification(0x32, getUpCittasMax());
+        if(!init && v ==vMax )
+            GameAction()->doAttainment(this->_owner, Script::AddAcupoint, idx); //增加穴道的成就
         return true;
     }
     return false;
@@ -2117,6 +2154,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
         _bPDirty = true;
         //sendModification(0x62, citta, idx, writedb);
         sendModification(0x62, citta, op/*1add,2del,3mod*/, writedb);
+
+        if(writedb && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
+        //装备上心法成就
+            GameAction()->doAttainment(_owner, 10084,getUpCittasNum());
     }
 
     if (ret && !swap)
@@ -2132,7 +2173,6 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
     return ret;
 }
-
 bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
 {
     const GData::CittaBase* cb = GData::cittaManager[citta];
@@ -2148,7 +2188,44 @@ bool Fighter::lvlUpCitta(UInt16 citta, bool writedb)
         int i = hasCitta(citta);
         if (i < 0)
             return false;
-        return addNewCitta(citta+1, writedb, false);
+        bool re =  addNewCitta(citta+1, writedb, false);
+
+        if(re )
+        {
+            //升级心法成功
+            UInt16 curLev = CITTA_LEVEL(citta + 1);
+            if(curLev == 9 )
+            {
+                //check lev9 attain
+                GameAction()->doAttainment(_owner, 10071,cb->type);
+
+                UInt32 num9 = 0;     //所有心法9级的
+                UInt32 num9Type8 = 0;
+                for (size_t i = 0; i < _cittas.size(); ++i)
+                {
+                    if(CITTA_LEVEL(_cittas[i]) >= 9 )
+                    {
+                        const GData::CittaBase* cb = GData::cittaManager[_cittas[i]];
+                        if(cb)
+                        {
+                            num9 ++; 
+                            if(cb->type >= 8)
+                                num9Type8 ++;
+                        }
+                    }
+                }
+                if(num9>=6)
+                {
+                     GameAction()->doAttainment(_owner, 10073, num9);
+                }
+                if(num9Type8 >=3)
+                {
+                     GameAction()->doAttainment(_owner,  10086, num9Type8);
+                }
+            }
+            
+        }
+        return re;
     }
     else
     {
@@ -2427,6 +2504,13 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
     _attrDirty = true;
     _bPDirty = true;
     sendModification(0x63, citta, op/*1add,2del,3mod*/, writedb);
+
+    if(!init && CURRENT_THREAD_ID() <= WORKER_THREAD_NEUTRAL)
+    {
+    //获取心法
+        GameAction()->doAttainment(this->_owner, 10061, getCittasNum());
+        GameAction()->doAttainment(this->_owner, 10074, cb->type);
+    }
     return true;
 }
 
@@ -2541,6 +2625,9 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     _attrDirty = true;
     _bPDirty = true;
     sendModification(0x63, citta, 2/*1add,2del,3mod*/, writedb);
+
+    //散功成就
+    GameAction()->doAttainment(_owner, 10081, 0);
     return true;
 }
 
@@ -2584,6 +2671,35 @@ UInt16 Fighter::getPracticePlace()
     return _owner->getPracticePlace();
 }
 
+void  Fighter::CheckEquipEnchantAttainment(UInt8 e)
+{
+    if(e >= 8 &&  _owner->GetAttainMgr()->CanAttain(Script::ONE_FIGHTER_ENCHANT_8))
+    {
+        if(IsEquipEnchantLev(8))
+            GameAction()->doAttainment(this->_owner, Script::ONE_FIGHTER_ENCHANT_8, 1);
+    }
+
+    if(e>= 9 &&  _owner->GetAttainMgr()->CanAttain(Script::FIVE_FIGHTER_ENCHANT_9))
+    {
+        if(_owner->IsFighterEquipEnchantLev(9 , 5))
+            GameAction()->doAttainment(this->_owner, Script::FIVE_FIGHTER_ENCHANT_9, 1);
+    }
+
+}
+bool  Fighter::IsEquipEnchantLev(UInt8 e)
+{
+    if( _weapon == NULL  ||   _weapon-> getItemEquipData().enchant  < e)
+        return false;
+
+    for(int i = 0; i < 5; ++ i)
+    {
+       if(_armor[i] == NULL  || _armor[i]->getItemEquipData().enchant  < e)
+       {
+           return false;
+       }
+    }
+    return true;
+}
 Fighter * GlobalFighters::getRandomOut()
 {
 	if(_fighters.empty())

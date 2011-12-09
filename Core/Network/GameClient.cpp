@@ -202,9 +202,8 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             if (!chk) chk = 0xff;
             setChk(chk);
 
-            Stream st(REP::USER_INFO_CHANGE);
-            st << static_cast<UInt8>(0x14) << static_cast<UInt32>(chk);
-            st << Stream::eos;
+            Stream st(REP::CHKMARK);
+            st << chk << Stream::eos;
             send(&st[0], st.size());
         }
         m_RecvTime = m_Now;
@@ -278,14 +277,14 @@ void GameClient::OnTick(UInt32 now)
         if(m_Now > m_CreateTime + VERIFY_TIMEOUT)
         {
             //验证超时
-            closeConn();
+            //closeConn(); 暂时屏蔽
             return;
         }
     }
     else if(m_Now > m_RecvTime + HEARTBEAT_TIMEOUT)
     {
         //心跳超时
-        closeConn();
+        //closeConn(); 暂时屏蔽
         return;
     }
 }

@@ -66,6 +66,7 @@ namespace GObject
         return true;
     }
 
+    //是否可以达成 在一切非达成状态都可以
     bool AttainMgr::CanAttain(UInt16 attainId)
     {
         attain_c_iterator it = m_AttainList.find(attainId);
@@ -78,10 +79,55 @@ namespace GObject
         return true;
     }
 
+    //是否可以在某个状态达成  step 向达成方向前进
+    void  AttainMgr::CheckAttainWithStatus(UInt16 attainId,  UInt32 tarStatus,  UInt32 step)
+    {
+        attain_iterator it = m_AttainList.find(attainId);
+        if(it != m_AttainList.end())
+        {
+            //已经达成了
+            if(it->second->status >= _ATTAINED_)
+                return;
+        }
+
+        if(it == m_AttainList.end())
+        {
+            //直接达成
+            if(step >= tarStatus)
+            {
+                UpdateAttainment( attainId, _ATTAINED_);
+            }
+            else
+                UpdateAttainment( attainId, step);
+            //UpdateDB(ad, true);
+        }
+        else
+        {
+            if(step >= tarStatus || it->second->status >= (tarStatus - step))
+            {
+                //达成
+                UpdateAttainment(attainId, _ATTAINED_);
+            }
+            else
+            {
+                UpdateAttainment(attainId, it->second->status + step);
+            }
+        }
+
+    }
+    void AttainMgr::UpdateDB(const AttainData* ad, bool bInsert)
+    {
+        if(bInsert)
+            DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%"I64_FMT"u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, TimeUtil::Now());
+        else
+            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u , `updatetime` = %u WHERE `ownerId` = %"I64_FMT"u AND `attainId` = %u",ad->status, TimeUtil::Now(),ad->ownerId, ad->attainId);
+    }
+
+
     void AttainMgr::UpdateAttainment(UInt16 attainId, UInt32 status)
     {
         Stream st(REP::ACHIEVEMENT);
-        st << static_cast<UInt8>(1);
+        st << static_cast<UInt16>(1);
         st << attainId;
 
         attain_iterator it = m_AttainList.find(attainId);
@@ -93,7 +139,7 @@ namespace GObject
             ad->status = status;
             ad->updatetime = TimeUtil::Now();
             m_AttainList[attainId] = ad;
-            DB().PushUpdateData("INSERT INTO `attainment` (`ownerId`, `attainId`, `status`, `updatetime`) VALUES (%"I64_FMT"u, %u, %u, %u)", ad->ownerId, ad->attainId, ad->status, ad->updatetime);
+            UpdateDB(ad, true );
             if(ad->status == _ATTAINED_)
             {
                 st << static_cast<UInt8>(1);
@@ -110,8 +156,7 @@ namespace GObject
         else
         {
             it->second->status = status;
-            DB().PushUpdateData("UPDATE `attainment` SET `status` = %u WHERE `ownerId` = %u AND `attainId` = %u", it->second->status, it->second->ownerId, it->second->attainId);
-
+            UpdateDB(it->second, false);
             if(it->second->status == _ATTAINED_)
             {
                 st << static_cast<UInt8>(1);

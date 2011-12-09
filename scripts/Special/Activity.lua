@@ -120,7 +120,9 @@ function onLogin(player)
 end
 
 function onLevelup(player, olev, nlev)
-    print('level up')
+    if getChristmas() then
+        onChristmas(player)
+    end
 end
 
 function onDungeonWin(player, id, level)
@@ -696,8 +698,34 @@ function SingleDayReward(player, lootlvl)
     end
 end
 
+function Christmas(player, lootlvl, where)
+    if getChristmas() then
+        if lootlvl > 3 then
+            return;
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+
+        local package = player:GetPackage();
+        -- package:AddItem(69, itemNum[lootlvl], false);
+        -- TODO:
+        if where == 0 then
+            Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 副本通关，获得【圣诞女郎变身卡】x" .. itemNum[lootlvl])
+        else
+            Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 阵图通关，获得【圣诞女郎变身卡】x" .. itemNum[lootlvl])
+        end
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
+    Christmas(player, lootlvl, 0);
 end
 
 
@@ -706,6 +734,7 @@ end
 
 function onFrontMapWin(player, id, spot, lootlvl)
     SingleDayReward(player, lootlvl);
+    Christmas(player, lootlvl, 1);
 end
 
 local vippack = {
@@ -729,7 +758,21 @@ local packFrequency = {
     1,1,7,1,1,1,1,1
 };
 
-function testTakePack(_type, _freq)
+function testTakePackSize(player, _type)
+	local package = player:GetPackage();
+    local needsize = packsize[_type];
+    if needsize == nil then
+        return false
+    end
+
+    if package:GetRestPackageSize() < needsize then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+    return true
+end
+
+function testTakePack(player, _type, _freq)
     local freq = packFrequency[_type];
     if freq == nil then
         return false 
@@ -753,7 +796,7 @@ function onGetVipPack(player, _type)
         return
     end
 
-    if  package:GetRestPackageSize() < needsize then
+    if package:GetRestPackageSize() < needsize then
         player:sendMsgCode(2, 1011, 0)
         return
     end
@@ -783,4 +826,30 @@ function onThanksgivingDay(player)
     end
 end
 
+function onChristmas(player)
+    if not getChristmas() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 30 then
+        return
+    end
+
+    if lvl == 30 then
+        if player:GetVar(7) == 1 then
+            return
+        end
+        sendItemPackageMail(player, "圣诞节活动奖励", "恭喜您获得法宝【雪人】\n 12月21日-12月27日登陆并且等级达到30级玩家，即可获得法宝【雪人】 ", {8,3,1});
+        player:SetVar(7,1)
+    end
+
+    if lvl == 40 then
+        if player:GetVar(8) == 1 then
+            return
+        end
+        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞靴】\n 12月25日-12月27日登陆并且等级达到30级玩家，即可获得节日套装奖励【圣诞靴】 ", {8,3,1});
+        player:SetVar(8,1)
+    end
+end
 

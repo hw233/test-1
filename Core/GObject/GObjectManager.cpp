@@ -50,7 +50,7 @@
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
 #include "GObject/TeamCopy.h"
-
+#include "ActivityMgr.h"
 #include <fcntl.h>
 
 namespace GObject
@@ -831,7 +831,7 @@ namespace GObject
 		LoadingCounter lc("Loading players:");
 		// load players
 		DBPlayerData dbpd;
-		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `archievement`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
+		if(execu->Prepare("SELECT `player`.`id`, `name`, `gold`, `coupon`, `tael`, `coin`, `prestige`, `status`, `country`, `title`, `archievement`, `attainment`, `qqvipl`, `qqvipyear`, `qqawardgot`, `qqawardEnd`, `ydGemId`, `location`, `inCity`, `lastOnline`, `newGuild`, `packSize`, `mounts`, `icCount`, `piccount`, `nextpicreset`, `formation`, `lineup`, `bossLevel`, `totalRecharge`, `nextReward`, `nextExtraReward`, `lastExp`, `lastResource`, `tavernId`, `bookStore`, `shimen`, `fshimen`, `yamen`, `fyamen`, `clantask`, `copyFreeCnt`, `copyGoldCnt`, `copyUpdate`, `frontFreeCnt`, `frontGoldCnt`, `frontUpdate`, `formations`, `atohicfg`, `gmLevel`, `wallow`, `dungeonCnt`, `dungeonEnd`, UNIX_TIMESTAMP(`created`), `locked_player`.`lockExpireTime` FROM `player` LEFT JOIN `locked_player` ON `player`.`id` = `locked_player`.`player_id`", dbpd) != DB::DB_OK)
             return false;
 
 		lc.reset(200);
@@ -1742,6 +1742,29 @@ namespace GObject
 		}
 		lc.finalize();
 
+        // Load player activity
+        lc.prepare("Loading player activityData:");
+    	last_id = 0xFFFFFFFFFFFFFFFFull;
+		pl = NULL;
+		DBActivityData atydata;
+		if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(atydata.playerId != last_id)
+			{
+				last_id = atydata.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			pl->GetActivityMgr()->LoadFromDB(atydata);
+		}
+
+        
+        lc.finalize();
 		lc.prepare("Loading mail package:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		DBMailPackageData mpdata;
@@ -1981,7 +2004,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriend dbfr;
-		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` WHERE `id` < `friendId` ORDER BY `id`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` ORDER BY `id`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)

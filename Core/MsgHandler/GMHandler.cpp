@@ -310,7 +310,41 @@ void GMHandler::OnAddExp( GObject::Player * player, std::vector<std::string>& ar
 {
 	if(args.empty())
 		return;
-	if(args.size() == 1)
+#if 0
+    ActivityMgr* mgr = player->GetActivityMgr();
+    if(args.size() == 1)
+    {
+        int i = atoi(args[0].c_str());
+
+        if( i == 1)
+            mgr->ActivityList(7);
+        else if( i == 2)
+            mgr->ChangeOnlineReward();
+
+    }
+    else if(args.size() == 2)
+    {
+        int i = atoi(args[0].c_str());
+         mgr->GetReward(i);
+    }
+    return;
+    //only for test liuhuiting
+    //
+    for (int i = 10001; i<= 11001; i ++)
+    {
+        for (int j = 1; j < 10 ; j ++)
+        {
+         player->OnDoAttainment(i , j);
+        }
+
+        for (int j = 10; j<= 80; j= j + 10)
+        {
+             player->OnDoAttainment(i ,j);
+        }
+         player->OnDoAttainment(i , 500);
+    }
+#endif
+    if(args.size() == 1)
 	{
 		UInt32 exp = atoi(args[0].c_str());
 		if(exp == 0)

@@ -7,7 +7,7 @@ typedef lua_tinker::table Table;
 
 #include "GData/GDataManager.h"
 #include "GObject/TaskData.h"
-
+#include "GObject/ActivityMgr.h"
 namespace GObject
 {
 	class Player;
@@ -19,6 +19,65 @@ namespace Script
 {
 	extern 	void SysBroadcast(UInt8 type, const char * msg);
 
+    enum AttainType
+    {
+        AddAcupoint = 10051,
+        AddSoulMax = 10087,
+        AddPExp = 10089,
+        FIGHTER_POT_FULL = 10109,
+        FIGHTER_CAP_FULL = 10110,
+        AddMainFighterCapacity = 10111,
+        MainFighterCapFull = 10112,
+        TEN_FIGHTER_PC_FULL = 10115,
+        MainFighterColChange = 10117,
+        MainFighterFullPot = 10119,
+        AddPEquip = 10151,
+        AddYEquip = 10155,
+        ONE_FIGHTER_ENCHANT_8 = 10167,
+        FIVE_FIGHTER_ENCHANT_9 = 10168,
+        FAIL_ENCH = 10169,
+        SPLIT_EQUIP = 10176,
+        SPLIT_EQUIP_COLOR = 10178,
+        
+        ADD_TRUMP  = 10200,
+        ADD_NTRUMP = 10201,
+        SPLIT_THRUMP = 10208,
+        SPLIT_THRUMP_COLOR = 10210,
+
+        LEARNED_FORMATION = 10251,
+        LEARNED_SFORMATION =10265,
+        ON_ADD_ITEM = 10253,
+        SUBMIT_TASKS = 10301,
+        SUBMIT_SPECIAL_TASK =10305,
+        SUBMIT_YAMEN_TASKS = 10313,
+        SUBMIT_SHIMEN_TASKS = 10315,
+        SUBMIT_CLAN_TASKS = 10317,
+
+        ADD_FRIEND = 10451,
+        ONE_FRIEND_LEV_UP = 10453,
+        FIVE_FRIEND_LEV_50 = 10454,
+        FIVE_FRIEND_LEV_80 = 10456,
+        JOIN_CLAN = 10501,
+        CLAN_ADD_MEMBER = 10502,
+        CLAN_LEVUP = 10504,
+        SELECT_COUNTRY = 10551,
+        COUNTRY_BATTLE_WIN = 10552,
+        COUNTRY_BATTLE_KILL_STREAK = 10555,
+        ATHLETICS_WIN = 10558,
+    
+        BATTLE_MISS = 10601,
+        BATTLE_CS = 10602,
+        BATTLE_PR = 10603,
+        BATTLE_FJ = 10604,
+        BATTLE_SKILLDMG = 10609,
+        BATTLE_PLDMG= 10612,
+        BATTLE_FIRST_PEERLESS_ATTACK = 10615,
+        BATTLE_MAX_AURA = 10616,
+        BATTLE_CSFactor = 10617,
+
+        SHIMEN_5_TODAY = 11000,
+        YAMEN_5_TODAY = 11001,
+    };
 	class GameActionLua:
 		public Script
 	{
@@ -128,12 +187,14 @@ namespace Script
 		void onExchange(Player* player);
 		bool onOnlineAward(Player* player, UInt32 itemId, UInt8 count);
         bool onThanksgivingDay(Player* player);
+        bool onChristmas(Player* player);
 		void onAttackBoss(Player* player);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
 		void onGetVipPack(Player* player, UInt8 type);
-		bool testTakePack(UInt8 type, UInt8 freq);
+		bool testTakePack(Player* player, UInt8 type, UInt8 freq);
+		bool testTakePackSize(Player* player, UInt8 type);
         void onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);
         void onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
@@ -144,12 +205,14 @@ namespace Script
 		UInt32 onTavernFlush(UInt8 color);
 		bool onTakeMailPackage(Player* player, UInt32 pkgId);
 		lua_tinker::table onGetMailItems(UInt32 pkgId);
+        lua_tinker::table GetOnlineReward();
+        void   GetAtyReward(Player* p, UInt32 flag);
 		UInt32 onLuckyDrawItemRoll(UInt8 type);
 		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 level, bool isBoss);
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
         void onRecruitAward(Player* player);
-
+       
 	public:
 
 		template <typename R>
@@ -191,6 +254,10 @@ namespace Script
         void doAttainment(Player* pl, UInt16 attainId, UInt32 param);
         void finishAttainment(Player* pl, UInt16 attainId);
 
+    public:
+        void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
+        UInt32  GetAtyCheckFlag(UInt32 idx);
+        UInt32  GetMaxActivity(UInt32 vip);
 	private:
 		Player* _player1;	//脚本动作行为主体1
 		Player* _player2;	//脚本动作行为主体2
