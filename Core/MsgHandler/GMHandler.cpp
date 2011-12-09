@@ -30,6 +30,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/TeamCopy.h"
 
 GMHandler gmHandler;
 
@@ -148,6 +149,7 @@ GMHandler::GMHandler()
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
     Reg(3, "hiuseskill", &GMHandler::OnUseSkillHI);
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
+    Reg(3, "resettcplayer", &GMHandler::OnResetTeamCopyPlayer);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2438,5 +2440,27 @@ void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& 
         worldBoss.bossAppear(atoi(args[0].c_str()), atoi(args[1].c_str()));
     else
         worldBoss.bossAppear(atoi(args[0].c_str()));
+}
+
+void GMHandler::OnResetTeamCopyPlayer(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+    {
+        TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+        if(tcpInfo)
+            tcpInfo->resetTCPlayer();
+        return;
+    }
+    else
+    {
+        UInt64 playerId = atoll(args[0].c_str());
+        GObject::Player * pl = GObject::globalPlayers[playerId];
+        if(pl == NULL)
+            return;
+
+        TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+        if(tcpInfo)
+            tcpInfo->resetTCPlayer();
+    }
 }
 

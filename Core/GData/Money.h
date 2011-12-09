@@ -95,6 +95,8 @@ enum
     HISKILL,
 // 自动英雄岛
     AUTOHI,
+// 组队副本通关抽奖
+   TEAMCOPYAWARD_ROLL, 
 
     MONEY_MAX,
 };

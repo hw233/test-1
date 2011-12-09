@@ -115,6 +115,15 @@ struct DBTeamCopyPlayer
     UInt32 vTime;
 };
 
+struct DBTeamCopyPlayerAward
+{
+    UInt64 playerId;
+    UInt8  rollId;
+    UInt8  roll;
+    UInt32 awardId;
+    UInt32 awardCnt;
+};
+
 struct DBPlayerData
 {
 	UInt64 id;
@@ -909,6 +918,19 @@ SPECIALDEF(6)
     UInt32, vTime
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamCopyPlayerAward)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8,  rollId,
+    UInt8,  roll,
+    UInt32, awardId,
+    UInt32, awardCnt
+)
+SPECIALEND()
+
+
 
 SPECIALBEGIN(GObject::DBFighter)
 SPECIALDEF(33)

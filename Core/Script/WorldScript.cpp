@@ -13,6 +13,7 @@
 #include "GameActionLua.h"
 #include "Server/Cfg.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/TeamCopy.h"
 
 namespace Script
 {
@@ -61,6 +62,8 @@ void WorldScript::init()
     def("addHIAwardsCfg", GObject::HeroIsland::addHIAwardsCfg);
     def("addRankAwards", GObject::HeroIsland::addRankAwards);
     def("clearAllHICfg", GObject::HeroIsland::clearAllHICfg);
+    def("addTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::addTeamCopyAwardCfg);
+    def("clearTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::clearTeamCopyAwardCfg);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

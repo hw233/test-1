@@ -304,6 +304,9 @@ namespace REQ
 
     /** 组队副本*/
     const UInt8 TEAM_COPY_REQ       = 0x99;
+
+    /** 战报数据*/
+    const UInt8 FIGHT_REPORT2       = 0x0F;
 }
 
 namespace REP
@@ -492,6 +495,9 @@ namespace REP
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
 
     const UInt8 TEAM_COPY_REQ       = 0x99;
+
+    /** 战报数据*/
+    const UInt8 FIGHT_REPORT2       = 0x0F;
 }
 
 namespace SPEQ

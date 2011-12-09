@@ -48,30 +48,54 @@ struct TeamData
     std::string pwd;
 };
 
+struct TeamCopyAwards
+{
+    TeamCopyAwards(UInt32 id, UInt32 num) : id(id), num(num) {}
+    UInt32 id;
+    UInt32 num;
+};
+
 class TeamCopyPlayerInfo
 {
+    public:
+        static const UInt8 _needRoll;
+        static const UInt8 _hasRoll;
+        static std::vector<TeamCopyAwards> _awards[TEAMCOPY_MAXCOPYCNT];
+        static void addTeamCopyAwardCfg(UInt8 rollId, UInt32 awardId, UInt32 awardCnt);
+        static void clearTeamCopyAwardCfg();
+
     private:
         bool m_pass[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         UInt8 m_passTimes[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         UInt32 m_vTime[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         Player* m_owner;
         UInt8 m_maxPass;
+        UInt8 m_roll;
+        UInt8 m_rollId;
+        UInt32 m_awardId;
+        UInt32 m_awardCnt;
 
     public:
         TeamCopyPlayerInfo(Player* owner);
 
         void setPassFromDB(UInt8 copyId, UInt8 t, bool pass);
         void setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime);
+        void rollAward(UInt8 type);
+        bool getAward();
+        void sendAwardInfo();
+        void loadAwardInfoFromDB(UInt8 copyId, UInt8 roll, UInt32 awardId, UInt32 awardCnt);
+        void setAwardRoll(UInt8 copyId);
 
         bool getPass(UInt8 copyId, UInt8 t);
         UInt8 getPassTimes(UInt8 copyId, UInt8 t);
-        void setPass(UInt8 copyId, UInt8 t, bool pass);
+        void setPass(UInt8 copyId, UInt8 t, bool pass, bool notify = false);
         void setPassTimes(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime);
         void incPass(UInt8 copyId, UInt8 t);
         bool checkTeamCopyPlayer(UInt8 copyId, UInt8 t);
         void checkCopyPass(UInt32 taskId);
         void reqTeamCopyInfo();
-        void sendUpdateTeamCopyInfo(UInt8 copyId, UInt8 t);
+        void sendUpdateTeamCopyInfo(UInt8 copyId);
+        void resetTCPlayer();
 };
 
 
@@ -93,7 +117,7 @@ class TeamCopy
         UInt32 joinTeam(Player* pl, UInt32 teamId, std::string pwd);
         void leaveTeam(Player* pl);
         void teamKick(Player* pl, UInt64 playerId);
-        void reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1, UInt8 idx2);
+        void reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1);
         void handoverLeader(Player* pl, UInt64 playerId);
         void teamBattleStart(Player* pl);
         void sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 startIdx, UInt32 endIdx);

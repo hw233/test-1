@@ -926,6 +926,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	pl->sendWallow();
 	pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
+    {
+        TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+        tcpInfo->sendAwardInfo();
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -3511,7 +3515,12 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             std::string pwd;
             UInt8 upLevel = 0;
             UInt8 dnLevel = 0;
-            br >> pwd >> dnLevel >> upLevel;
+
+            if(br.data<UInt16>(br.pos()) > 6)
+                break;
+
+            br >> pwd;
+            br >> dnLevel >> upLevel;
 
             Stream st(REP::TEAM_COPY_REQ);
             st << static_cast<UInt8>(0x02);
@@ -3527,7 +3536,12 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         {
             UInt32 teamId = 0;
             std::string pwd;
-            br >> teamId >> pwd;
+            br >> teamId;
+
+            if(br.data<UInt16>(br.pos()) > 6)
+                break;
+
+            br >> pwd;
             Stream st(REP::TEAM_COPY_REQ);
             st << static_cast<UInt8>(0x03);
 
@@ -3575,9 +3589,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         {
             UInt8 idx0 = 0;
             UInt8 idx1 = 0;
-            UInt8 idx2 = 0;
-            br >> idx0 >> idx1 >> idx2;
-            teamCopyManager->reQueueTeam(player, idx0, idx1, idx2);
+            //UInt8 idx2 = 0;
+            br >> idx0 >> idx1;  // >> idx2;
+            teamCopyManager->reQueueTeam(player, idx0, idx1);
         }
         break;
     case 0x14:
@@ -3585,10 +3599,27 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
             teamCopyManager->teamBattleStart(player);
         }
         break;
-    case 0xFF:
+    case 0x0F:
         {
             TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
             tcpInfo->reqTeamCopyInfo();
+        }
+        break;
+    case 0x0D:
+        {
+            UInt8 type = 0;
+            br >> type;
+            TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+            tcpInfo->rollAward(type);
+        }
+        break;
+    case 0x0E:
+        {
+            TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+            bool res = tcpInfo->getAward();
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x0E) << static_cast<UInt8>(res ? 1 : 0) << Stream::eos;
+            player->send(st);
         }
         break;
     default:

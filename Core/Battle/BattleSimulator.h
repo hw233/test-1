@@ -53,6 +53,8 @@ public:
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
     void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
+    void switchPlayer(GObject::Player* player, UInt8 side);
+    void switchPlayer(const std::string& name, UInt8 level);
     UInt32 clearLastBattle(UInt8 side, bool isLast);
 private:
 	struct FighterStatus

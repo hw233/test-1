@@ -171,6 +171,12 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         return;
     }
 
+    if(pl->hasFlag(Player::InCopyTeam))
+    {
+        pl->sendMsgCode(0, 2106);
+        return;
+    }
+
     CopyData& tcd = getCopyData(pl, id, true);
     if (tcd.floor && tcd.spot)
         return;
@@ -210,6 +216,12 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
     if (pl->hasFlag(Player::AutoCopy) && !ato) {
         pl->sendMsgCode(0, 1414);
+        return 0;
+    }
+
+    if(pl->hasFlag(Player::InCopyTeam))
+    {
+        pl->sendMsgCode(0, 2106);
         return 0;
     }
 
@@ -269,7 +281,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
                 if(tcpInfo && tcpInfo->getPass(id, 0) == false)
                 {
-                    tcpInfo->setPass(id, 0, true);
+                    tcpInfo->setPass(id, 0, true, true);
                 }
                 st << Stream::eos;
                 pl->send(st);
@@ -450,6 +462,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 {
     if (!pl || !id)
         return;
+
+    if(pl->hasFlag(Player::InCopyTeam))
+    {
+        pl->sendMsgCode(0, 2106);
+        return;
+    }
 
     switch (type) {
         case 0:

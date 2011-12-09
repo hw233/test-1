@@ -125,7 +125,7 @@ UInt8 NpcGroup::getLevel()
 
 UInt16 NpcGroup::getPortrait()
 {
-	if(_npcList[0].fighter->getId() <= GREAT_FIGHTER_MAX)
+	if(_npcList[0].fighter->getId() <= NPC_FIGHTER_MAX)
 		return _npcList[0].fighter->getId();
 	else
 		return _npcList[0].fighter->favor;

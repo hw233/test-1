@@ -139,6 +139,7 @@ function initActTime(y, m, d)
   loadStore();
   loadTitle();
   loadRareAnimals()
+  loadTeamCopyAwardsCfg()
 end
 
 function onAthleticsNewBox(t, c)

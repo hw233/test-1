@@ -56,6 +56,7 @@ enum PurchaseType
     AthleticPaging, 
     HeroIslandSkill,
     HeroIslandAuto,
+    TeamCopyAwardRoll,
 };
 
 enum IncomingType
@@ -116,6 +117,7 @@ enum ItemFrom
     FromFCMerge,
     FromPExp,
     FromHeroIsland,
+    FromTeamCopy,
 };
 
 enum ItemTo

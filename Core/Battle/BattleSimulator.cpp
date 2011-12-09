@@ -85,6 +85,20 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
     }
 }
 
+void BattleSimulator::switchPlayer(GObject::Player* player, UInt8 side)
+{
+    if(side > 1)
+        return;
+
+	_player[side] = player;
+}
+
+void BattleSimulator::switchPlayer(const std::string& name, UInt8 level)
+{
+	_other_name = name;
+	_other_level = level;
+}
+
 void BattleSimulator::putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side)
 {
     if(side > 1)
@@ -118,12 +132,15 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
 
     battleReport.addReport(oldID, _packet);
 
-    for(int i = 0; i < 25; ++ i)
+    if(!isLast)
     {
-        if(_objs[side][i] && !_isBody[side][i])
+        for(int i = 0; i < 25; ++ i)
         {
-            delete _objs[side][i];
-            _objs[side][i] = NULL;
+            if(_objs[side][i] && !_isBody[side][i])
+            {
+                delete _objs[side][i];
+                _objs[side][i] = NULL;
+            }
         }
     }
 
@@ -145,8 +162,11 @@ void BattleSimulator::start(UInt8 prevWin)
     if(prevWin != 0xFF && (prevWin == 0 || prevWin > 2))
         return;
 	_packet.clear();
-	_fgtlist[0].clear();
-	_fgtlist[1].clear();
+    if(prevWin == 0xFF)
+    {
+        _fgtlist[0].clear();
+        _fgtlist[1].clear();
+    }
 
 	// [[ Make packet header data
 	_packet.init(REP::FIGHT_START);
@@ -181,8 +201,6 @@ void BattleSimulator::start(UInt8 prevWin)
 	UInt32 now = TimeUtil::Now();
 	for(int i = 0; i < 2; ++ i)
 	{
-        if((prevWin-1) == i)
-            continue;
 		UInt32 flag = 0;
 		if(_player[i] != NULL)
 		{

@@ -1343,6 +1343,13 @@ namespace GObject
             }
             _lastAthAward.clear();
         }
+
+        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
+        if(tcpInfo)
+        {
+            tcpInfo->sendAwardInfo();
+        }
+
 		if(update)
 		{
 			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);

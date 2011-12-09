@@ -1487,6 +1487,26 @@ namespace GObject
         }
 		lc.finalize();
 
+        lc.prepare("Loading team copy player award:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBTeamCopyPlayerAward dbtcpa;
+        if(execu->Prepare("SELECT `playerId`, `rollId`, `roll`, `awardId`, `awardCnt` FROM `teamcopy_player_award` ORDER BY `playerId`", dbtcpa) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbtcpa.playerId];
+            if(!pl)
+                continue;
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(!tcpInfo)
+                continue;
+
+            tcpInfo->loadAwardInfoFromDB(dbtcpa.rollId, dbtcpa.roll, dbtcpa.awardId, dbtcpa.awardCnt);
+        }
+		lc.finalize();
+
 		lc.prepare("Loading player pending tasks:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
@@ -1552,7 +1572,7 @@ namespace GObject
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo)
-                tcpInfo->checkCopyPass(dtdata.m_TaskId);
+                tcpInfo->checkCopyPass(dtdata2.m_TaskId);
 		}
 		lc.finalize();
 
