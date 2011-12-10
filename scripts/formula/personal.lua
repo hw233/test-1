@@ -17,7 +17,7 @@ magdef_factor = { 0,   0,   0}  -- 法防
 
 tough_factor       = { 0,  0,  0}  -- 坚韧
 action_factor      = {11, 12, 10}  -- 身法
-hitrate_factor     = { 0,  0,  0}  -- 命中
+hitrate_factor     = { 1,  1,  1}  -- 命中
 evade_factor       = { 0,  0,  0}  -- 闪避
 critical_factor    = { 0,  0,  0}  -- 暴击
 criticaldmg_factor = { 0,  0,  0}  -- 暴击伤害
@@ -201,7 +201,9 @@ function calcHitRateLevel( fgt )
         return 0
     end
     local hrate = fgt:getExtraHitrateLevel()
-    return hrate
+    local cls = fgt:getClass()
+    local lvl = fgt:getLevel() - 1
+    return hrate + hitrate_factor[cls] * lvl
 end
 
 function calcToughLevel( fgt )
