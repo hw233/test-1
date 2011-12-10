@@ -337,7 +337,7 @@ void BattleSimulator::start(UInt8 prevWin)
 
 	UInt32 act_count = 0;
 	_winner = testWinner();
-    act_count += FightersEnter();
+    act_count += FightersEnter(prevWin);
 	while(_winner == 0 && act_count < _fake_turns)
 	{
 		int pos = findFirstAttacker();
@@ -2486,7 +2486,7 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     return NULL;
 }
 
-UInt32 BattleSimulator::FightersEnter()
+UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 {
     UInt32 rcnt = 0;
 
@@ -2498,7 +2498,8 @@ UInt32 BattleSimulator::FightersEnter()
     {
         BattleFighter* bf = cur_fgtlist[idx];
 
-        rcnt += doSkillAttackAftEnter(bf);
+        if((prevWin-1) != bf->getSide())
+            rcnt += doSkillAttackAftEnter(bf);
     }
 
     return rcnt;

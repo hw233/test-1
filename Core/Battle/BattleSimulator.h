@@ -178,7 +178,7 @@ private:
 private:
 	int findFirstAttacker();
 	UInt32 doAttack(int);
-    UInt32 FightersEnter();
+    UInt32 FightersEnter(UInt8 prevWin = 0xFF);
     UInt32 doSkillAttackAftEnter(BattleFighter* bf);
     void reQueueFighterStatus(BattleFighter* bf);
 	void insertFighterStatus(BattleFighter* bf);
