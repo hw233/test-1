@@ -205,6 +205,13 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             Stream st(REP::CHKMARK);
             st << chk << Stream::eos;
             send(&st[0], st.size());
+
+            {
+                Stream st(REP::USER_INFO_CHANGE);
+                st << static_cast<UInt8>(0x14) << static_cast<UInt32>(chk);
+                st << Stream::eos;
+                send(&st[0], st.size());
+            }
         }
         m_RecvTime = m_Now;
     }
