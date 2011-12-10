@@ -400,6 +400,8 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 
     if(td->pwd != pwd)
     {
+        if(pwd.length() == 0)
+            return 1;
 		pl->sendMsgCode(1, 2104);
         return 0;
     }
@@ -859,8 +861,19 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
 
             if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
             {
+                UInt32 now = TimeUtil::Now();
+                UInt32 chkPoint1 = TimeUtil::SharpDayT(0, now) + TEAMCOPY_EXTRAREWARDTM1;
+                UInt32 chkPoint2 = TimeUtil::SharpDayT(0, now) + TEAMCOPY_EXTRAREWARDTM2;
+                bool flag = (now > chkPoint1 && now < chkPoint1 + 3600) || (now > chkPoint2 && now < chkPoint2 + 3600);
+                if(flag)
+                {
+                    pl->pendExp(ng->getExp());
+                    //TODO
+                    //ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
+                }
+
                 pl->pendExp(ng->getExp());
-                ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
+                //ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
             }
         }
 
@@ -1139,6 +1152,8 @@ bool TeamCopyPlayerInfo::getAward()
 
 void TeamCopyPlayerInfo::setAwardRoll(UInt8 rollId)
 {
+    // TODO
+    return;
     m_rollId = rollId;
     m_roll = _needRoll;
 

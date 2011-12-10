@@ -679,8 +679,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 		UInt8 pos = area_target->getPos();
         UInt8 target_stun = area_target->getStunRound();
         bool enterEvade = area_target->getEvad100();
-        if(enterEvade)
-            area_target->setEvad100(false);
+        bool defend100 = area_target->getDefend100();
 
         float aura_factor = 1;
         if(skill && skill->cond == GData::SKILL_PEERLESS)
@@ -688,7 +687,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
         }
 
-		if(!enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
+		if(!defend100 && !enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
 		{
             pr = bf->calcPierce(area_target);
             float atk = 0;
@@ -765,18 +764,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 			}
 
-            bool defend100 = area_target->getDefend100();
-            if(defend100)
-            {
-                dmg = dmg > 0 ? 1 : 0;
-                magdmg = magdmg > 0 ? 1 : 0;
-                defList[defCount].damType = e_damOut;
-                area_target->setDefend100(false);
-            }
-            else
-            {
-                defList[defCount].damType = e_damNormal;
-            }
+            defList[defCount].damType = e_damNormal;
             area_target->makeDamage(dmg + magdmg);
             defList[defCount].damage = dmg + magdmg;
 
@@ -798,7 +786,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             {
 				onDamage(area_target, scList, scCount, true, atkAct);
 
-                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1 && !defend100)
+                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1)
                 {
                     float rate = skill->prob * 100;
                     if((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000))
@@ -839,6 +827,20 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             }
 
 			defList[defCount].damType = e_damEvade;
+            if(enterEvade)
+                area_target->setEvad100(false);
+
+            if(defend100)
+            {
+                defList[defCount].damType = e_damOut;
+                area_target->setDefend100(false);
+                if(counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
+                {
+                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
+                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
+                }
+            }
+            
 			defList[defCount].damage = 0;
 			defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
