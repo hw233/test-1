@@ -208,7 +208,7 @@ namespace REQ
     /**邮件信息改变*/
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
     /**活跃度请求*/
-    const UInt8 ACTIVITY_LIST        = 0X4A; 
+    const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     /**关系列表请求*/
@@ -450,7 +450,7 @@ namespace REP
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
 
     /**活跃度请求*/
-    const UInt8 ACTIVITY_LIST        = 0X4A; 
+    const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
  
@@ -459,6 +459,7 @@ namespace REP
 
     const UInt8 STORE_LIST          = 0xDC;// 0xB0
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
+    const UInt8 STORE_LIST_EXCHANGE = 0xDE;// ??
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1

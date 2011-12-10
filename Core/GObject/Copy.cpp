@@ -409,8 +409,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
     UInt64 playerId = pl->getId();
     if (lock) {
         FastMutex::ScopedLock lk(_mutex);
-        if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) ||
-                TimeUtil::Day(TimeUtil::Now()) > (TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) + 86400) ||
+        if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
@@ -427,8 +426,7 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
                 *gold = PLAYER_DATA(pl, copyGoldCnt);
         }
     } else {
-        if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) ||
-                TimeUtil::Day(TimeUtil::Now()) > (TimeUtil::Day(PLAYER_DATA(pl, copyUpdate)) + 86400) ||
+        if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, copyUpdate)) ||
                 getFreeCount() < PLAYER_DATA(pl, copyFreeCnt) || getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, copyGoldCnt)) {
             PLAYER_DATA(pl, copyUpdate) = TimeUtil::Now();
             PLAYER_DATA(pl, copyFreeCnt) = 0;
