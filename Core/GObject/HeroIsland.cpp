@@ -950,7 +950,7 @@ void HeroIsland::sendPlayers(HIPlayerData* pd, UInt8 spot, UInt16 start, UInt8 p
             UInt8 l2 = pd1->player->GetLev();
             if (l1 < l2 && l2 - l1 > 20)
                 continue;
-            if (l1 > l2 && l1 - l2 > 5)
+            if (l1 > l2 && l1 - l2 > 10)
                 continue;
 
             st << pd1->player->getId();
@@ -1061,7 +1061,7 @@ void HeroIsland::broadcast(Stream& st, UInt8 spot, Player* player)
                 UInt8 l2 = player->GetLev();
                 if (l1 < l2 && l2 - l1 > 20)
                     continue;
-                if (l1 > l2 && l1 - l2 > 5)
+                if (l1 > l2 && l1 - l2 > 10)
                     continue;
             }
             player1->send(st);

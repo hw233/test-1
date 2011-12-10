@@ -1587,6 +1587,12 @@ namespace GObject
             if (equip->getClass() == Item_Trump && ied.enchant == 1)
             {
                 ((ItemTrump*)equip)->fixSkills();
+                if (fgt)
+                {
+                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                    if (attr)
+                        fgt->addSkillsFromCT(attr->skills, true);
+                }
             }
         }
         else if( 0 != count )
@@ -1655,7 +1661,7 @@ namespace GObject
                 if(ied.enchant != 1)
                 {
                     ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                    if (fgt)
+                    if (fgt && attr)
                         fgt->addSkillsFromCT(attr->skills, true);
                 }
                 //法宝强化
@@ -1729,7 +1735,7 @@ namespace GObject
             {
                 GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
                 ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                if (fgt)
+                if (fgt && attr)
                     fgt->addSkillsFromCT(attr->skills, true);
             }
 
