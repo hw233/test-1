@@ -19,6 +19,8 @@ UInt32 URandom::operator()()
 
 UInt32 URandom::operator()( UInt32 modulo )
 {
+    if (!modulo)
+        return 0;
 	return next() % modulo;
 }
 

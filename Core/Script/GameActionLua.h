@@ -188,12 +188,14 @@ namespace Script
 		void onExchange(Player* player);
 		bool onOnlineAward(Player* player, UInt32 itemId, UInt8 count);
         bool onThanksgivingDay(Player* player);
+        bool onChristmas(Player* player);
 		void onAttackBoss(Player* player);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
 		void onGetVipPack(Player* player, UInt8 type);
-		bool testTakePack(UInt8 type, UInt8 freq);
+		bool testTakePack(Player* player, UInt8 type, UInt8 freq);
+		bool testTakePackSize(Player* player, UInt8 type);
         void onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);
         void onCopyWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl);
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);

@@ -47,6 +47,14 @@ struct DBDungeonMonster
 	UInt32 experience;
 };
 
+struct DBTeamCopy
+{
+    UInt8 id;
+    UInt8 type;
+    UInt16 location;
+    std::string npcgroups;
+};
+
 struct DBClanAssistant
 {
 	UInt32 id;
@@ -95,6 +103,25 @@ struct DBMailData
 	std::string	title;
 	std::string	content;
 	UInt32		additionalId;
+};
+
+struct DBTeamCopyPlayer
+{
+    UInt64 playerId;
+    UInt8 copyId;
+    UInt8 type;
+    UInt8 pass;
+    UInt8 passTimes;
+    UInt32 vTime;
+};
+
+struct DBTeamCopyPlayerAward
+{
+    UInt64 playerId;
+    UInt8  rollId;
+    UInt8  roll;
+    UInt32 awardId;
+    UInt32 awardCnt;
 };
 
 struct DBPlayerData
@@ -894,6 +921,31 @@ SPECIALDEF(8)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBTeamCopyPlayer)
+SPECIALDEF(6)
+(
+    UInt64, playerId,
+    UInt8,  copyId,
+    UInt8,  type,
+    UInt8,  pass,
+    UInt8,  passTimes,
+    UInt32, vTime
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBTeamCopyPlayerAward)
+SPECIALDEF(5)
+(
+    UInt64, playerId,
+    UInt8,  rollId,
+    UInt8,  roll,
+    UInt32, awardId,
+    UInt32, awardCnt
+)
+SPECIALEND()
+
+
+
 SPECIALBEGIN(GObject::DBFighter)
 SPECIALDEF(33)
 (
@@ -1096,6 +1148,16 @@ SPECIALDEF(4)
 	UInt8, formated,
 	std::string, monsters,
 	UInt32, experience
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBTeamCopy)
+SPECIALDEF(4)
+	(
+	UInt8, id,
+	UInt8, type,
+	UInt16, location, 
+	std::string, npcgroups
 	)
 SPECIALEND()
 

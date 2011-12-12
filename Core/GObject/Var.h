@@ -29,6 +29,8 @@ namespace GObject
         VAR_TGDT = 4,       // ?ж???????ʱ??
         VAR_TGDCNT = 5,     // ?ж???��??????3Сʱ????
         VAR_ATOFM = 6,     // ?Զ???ͼid
+        VAR_ICEMAN = 7,     // ѩ??
+        VAR_BOOT = 8,     // ʥ??ѥ
         VAR_TODAY_ONLINE = 9,     // time -- online today
         VAR_KEYPACK1 = 10,  // KEY????
         VAR_KEYPACK2,
@@ -92,7 +94,8 @@ namespace GObject
             REGISTER_VAR(VAR_TGDT, CYCLE_MONTH);
             REGISTER_VAR(VAR_TGDCNT, CYCLE_MONTH);
             REGISTER_VAR(VAR_ATOFM, CYCLE_NONE);
-
+            REGISTER_VAR(VAR_ICEMAN, CYCLE_MONTH);
+            REGISTER_VAR(VAR_BOOT, CYCLE_MONTH);
             REGISTER_VAR(VAR_TODAY_ONLINE,  CYCLE_DAY);
             REGISTER_VAR(VAR_KEYPACK1, CYCLE_NONE);
             REGISTER_VAR(VAR_KEYPACK2, CYCLE_NONE);

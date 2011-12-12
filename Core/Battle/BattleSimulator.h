@@ -42,7 +42,7 @@ public:
 	BattleSimulator(UInt32, GObject::Player *, GObject::Player *, bool report = true, UInt32 fake_turns = 500);
 	inline int getId() {return _id;}
 	inline int getTurns() {return _turns;}
-	void start();
+	void start(UInt8 prevWin = 0xFF);
 	inline Stream& getPacket() {return _packet;}
 	inline Script::BattleFormula * getFormula() { return _formula; }
 	inline int getWinner() { return _winner; } // returns 1 for attacker winning, 2 for defender winning, or 0 for that game's still in progress
@@ -52,6 +52,10 @@ public:
 	BattleFighter * newFighter(UInt8 side, UInt8 pos, GObject::Fighter *);
 	inline void setFormula(Script::BattleFormula * formula) { _formula = formula; }
 
+    void putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side);
+    void switchPlayer(GObject::Player* player, UInt8 side);
+    void switchPlayer(const std::string& name, UInt8 level);
+    UInt32 clearLastBattle(UInt8 side, bool isLast);
 private:
 	struct FighterStatus
 	{
@@ -174,7 +178,7 @@ private:
 private:
 	int findFirstAttacker();
 	UInt32 doAttack(int);
-    UInt32 FightersEnter();
+    UInt32 FightersEnter(UInt8 prevWin = 0xFF);
     UInt32 doSkillAttackAftEnter(BattleFighter* bf);
     void reQueueFighterStatus(BattleFighter* bf);
 	void insertFighterStatus(BattleFighter* bf);
@@ -184,6 +188,7 @@ private:
 	float testLink(BattleFighter *& bf, UInt16& skillId);
 	void onDead(BattleObject * bo, std::vector<AttackAct>* atkAct = NULL);
 	int testWinner();
+	int testWinner2();
 	void appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount);
 	UInt32 tryPreUseSkill(BattleFighter * bf, BattleObject * target_object);
 	UInt32 tryDelayUseSkill(BattleFighter * bf, BattleObject * target_object);
@@ -223,6 +228,12 @@ private:
 	GObject::Player * _player[2];
 	std::string _other_name;
 	UInt8 _other_level;
+
+    UInt8 _teams[2];
+	std::string _team_name[2][2];
+	UInt8 _team_level[2][2];
+	UInt16 _team_portrait[2][2];
+
 	URandom _rnd;
 
     //成就记录

@@ -43,6 +43,7 @@
 #include "GObject/AthleticsRank.h"
 #include "DCLogger.h"
 #include "ClanRankBattle.h"
+#include "TeamCopy.h"
 
 #include <cmath>
 
@@ -571,12 +572,17 @@ namespace GObject
         m_ActivityMgr = new ActivityMgr(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
+        memset(&m_ctp, 0, sizeof(m_ctp));
+        m_teamData = NULL;
+        m_tcpInfo = new TeamCopyPlayerInfo(this);
 	}
 
 
 	Player::~Player()
 	{
 		UnInit();
+        delete m_tcpInfo;
+        m_tcpInfo = NULL;
 	}
 
 	bool Player::Load()
@@ -835,8 +841,8 @@ namespace GObject
             UInt8 platform = atoi(getDomain().c_str());
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), cfg.serverNum, platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
@@ -1222,6 +1228,9 @@ namespace GObject
 
 		UInt32 curtime = TimeUtil::Now();
 
+        if(hasFlag(InCopyTeam))
+            teamCopyManager->leaveTeamCopy(this);
+
 		if(cfg.enableWallow && _playerData.wallow)
 		{
 			_onlineDuration = _onlineDuration + curtime - _playerData.lastOnline;
@@ -1386,6 +1395,13 @@ namespace GObject
             }
             _lastAthAward.clear();
         }
+
+        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
+        if(tcpInfo)
+        {
+            tcpInfo->sendAwardInfo();
+        }
+
 		if(update)
 		{
 			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);
@@ -1948,6 +1964,11 @@ namespace GObject
 			return true;
 		_playerData.formation = f;
 		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
+
+        if(hasFlag(GObject::Player::InCopyTeam))
+        {
+            teamCopyManager->updateTeamInfo(this);
+        }
 
         return true;
 	}
@@ -3813,6 +3834,8 @@ namespace GObject
         }
         ClanRankBattleMgr::Instance().PlayerLeave(this);
 
+        if(hasFlag(InCopyTeam))
+            teamCopyManager->leaveTeamCopy(this);
 #if 1
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
@@ -7531,6 +7554,31 @@ namespace GObject
             EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, TGD_ONLINE_TIME, 1, 1);
             if (event) PushTimerEvent(event);
         }
+    }
+
+    TeamData* Player::getTeamData()
+    {
+        return m_teamData;
+    }
+
+    void Player::setTeamData(TeamData* td)
+    {
+        m_teamData = td;
+    }
+
+    CopyTeamPage& Player::getCopyTeamPage()
+    {
+        return m_ctp;
+    }
+
+    void Player::clearCopyTeamPage()
+    {
+        memset(&m_ctp, 0, sizeof(m_ctp));
+    }
+
+    TeamCopyPlayerInfo* Player::getTeamCopyPlayerInfo()
+    {
+        return m_tcpInfo;
     }
 
 } // namespace GObject

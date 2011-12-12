@@ -13,6 +13,7 @@
 #include "GameActionLua.h"
 #include "Server/Cfg.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/TeamCopy.h"
 
 namespace Script
 {
@@ -50,6 +51,10 @@ void WorldScript::init()
 	def("getSingleDay", GObject::World::getSingleDay);
 	def("setThanksgiving", GObject::World::setThanksgiving);
 	def("getThanksgiving", GObject::World::getThanksgiving);
+	def("getChristmas", GObject::World::getChristmas);
+	def("setChristmas", GObject::World::setChristmas);
+	def("getNewYear", GObject::World::getNewYear);
+	def("setNewYear", GObject::World::setNewYear);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
@@ -61,10 +66,13 @@ void WorldScript::init()
     def("addHIAwardsCfg", GObject::HeroIsland::addHIAwardsCfg);
     def("addRankAwards", GObject::HeroIsland::addRankAwards);
     def("clearAllHICfg", GObject::HeroIsland::clearAllHICfg);
+    def("addTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::addTeamCopyAwardCfg);
+    def("clearTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::clearTeamCopyAwardCfg);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
 	class_def<GData::Store>("add", &GData::Store::add);
+	class_def<GData::Store>("addExchange", &GData::Store::addExchange);
 	class_def<GData::Store>("update", &GData::Store::makePacket);
 	class_add<GData::TitleList>("TitleList");
 	class_def<GData::TitleList>("set", &GData::TitleList::set);

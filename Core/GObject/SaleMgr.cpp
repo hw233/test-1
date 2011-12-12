@@ -478,7 +478,7 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 UInt16 SaleMgr::appendTotalSaleList(Player * player, Stream& st, UInt8 type, UInt8 career, UInt8 quality, UInt16 count, UInt16 filter1Offset, UInt16 filter0Offset)
 {
 	UInt16 readCount = 0;
-	for (; type <= 5; ++type)
+	for (; type <= 7; ++type)
 	{
 		readCount += appendSingleSaleList(player, st, type, career, quality, count-readCount, filter1Offset, filter0Offset);
 		if (readCount >= count)
@@ -631,7 +631,7 @@ bool SaleMgr::shiftTotalSaleList(UInt8 quality, UInt8 career, UInt16 offset, UIn
 {
 	if (offset > _itemStat[career][0][quality])
 		return false;
-	for (type = 1; type <= 5; ++type)
+	for (type = 1; type <= 7; ++type)
 	{
 		if (shiftSingleSaleList2(type, quality, career, offset, filter1Offset, filter0Offset))
 			return true;

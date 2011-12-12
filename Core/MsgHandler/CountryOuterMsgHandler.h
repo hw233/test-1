@@ -51,6 +51,7 @@
 #include "Common/BinaryReader.h"
 #include "LoginMsgHandler.h"
 #include "GObject/SaleMgr.h"
+#include "GObject/TeamCopy.h"
 
 struct NullReq
 {
@@ -929,6 +930,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	pl->sendWallow();
 	pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
+    {
+        TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+        tcpInfo->sendAwardInfo();
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -2647,6 +2652,33 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
             }
             break;
+        case 8:
+            {
+                UInt32 priceID = price&0xFFFF;
+                UInt32 priceNum = (price>>16)&0xFF;
+
+                if (player->GetPackage()->GetItemAnyNum(priceID) < priceNum)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    GObject::ItemBase * item;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL)
+                        st << static_cast<UInt8>(2);
+                    else
+                    {
+                        bool bind = true;
+                        player->GetPackage()->DelItemAny(priceID, priceNum, &bind);
+                        st << static_cast<UInt8>(0);
+                    }
+                }
+            }
+            break;
 		default:
 			if(PLAYER_DATA(player, gold) < price)
 			{
@@ -2815,7 +2847,9 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
     if (!type)
         type = 3;
 
-    if (type && !GameAction()->testTakePack(type, player->GetVar(VAR_KEYPACK1+type-1)))
+    if (type && !GameAction()->testTakePackSize(player, type))
+        return;
+    if (type && !GameAction()->testTakePack(player, type, player->GetVar(VAR_KEYPACK1+type-1)))
     {
 		player->sendMsgCode(1, 1018);
         return;
@@ -3614,7 +3648,6 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
-
     ActivityMgr* mgr = player->GetActivityMgr();
     UInt8 type = 0;
     brd >> type;
@@ -3636,4 +3669,172 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 
     }
 }
+
+void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+    case 0x0:
+        {
+            bool res = 0;
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x00);
+
+            UInt8 resCopyId = 0;
+            UInt8 resT = 0;
+            UInt8 type = 0;
+            br >> type;
+            if(type == 0)
+            {
+                UInt8 copyId = 0;
+                UInt8 t = 0;
+                br >> copyId >> t;
+                res = teamCopyManager->enterTeamCopy(player, copyId, t);
+                if(res)
+                {
+                    resCopyId = copyId;
+                    resT = t;
+                }
+            }
+            else
+                res = teamCopyManager->leaveTeamCopy(player);
+
+            st << resCopyId << resT;
+            st << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 0x1:
+        {
+            UInt32 start = 0;
+            UInt8 count = 0;
+            UInt8 type = 0;
+            br >> start >> count >> type;
+            teamCopyManager->reqTeamList(player, start, count, type);
+        }
+        break;
+    case 0x2:
+        {
+            std::string pwd;
+            UInt8 upLevel = 0;
+            UInt8 dnLevel = 0;
+
+            if(br.data<UInt16>(br.pos()) > 6)
+                break;
+
+            br >> pwd;
+            br >> dnLevel >> upLevel;
+
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x02);
+
+            UInt32 teamId = teamCopyManager->createTeam(player, pwd, upLevel, dnLevel);
+            st << teamId;
+
+            st << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 0x3:
+        {
+            UInt32 teamId = 0;
+            std::string pwd;
+            br >> teamId;
+
+            if(br.data<UInt16>(br.pos()) > 6)
+                break;
+
+            br >> pwd;
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x03);
+
+            UInt32 teamId2 = teamCopyManager->joinTeam(player, teamId, pwd);
+            st << teamId2;
+
+            st << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 0x4:
+        {
+            teamCopyManager->leaveTeam(player);
+        }
+        break;
+    case 0x5:
+        {
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x05);
+            bool res = teamCopyManager->quikJoinTeam(player);
+            st << static_cast<UInt8>(res ? 1 : 0) << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 0x10:
+        {
+            teamCopyManager->reqTeamInfo(player);
+        }
+        break;
+    case 0x11:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            teamCopyManager->handoverLeader(player, playerId);
+        }
+        break;
+    case 0x12:
+        {
+            UInt64 playerId = 0;
+            br >> playerId;
+            teamCopyManager->teamKick(player, playerId);
+        }
+        break;
+    case 0x13:
+        {
+            UInt8 idx0 = 0;
+            UInt8 idx1 = 0;
+            //UInt8 idx2 = 0;
+            br >> idx0 >> idx1;  // >> idx2;
+            teamCopyManager->reQueueTeam(player, idx0, idx1);
+        }
+        break;
+    case 0x14:
+        {
+            teamCopyManager->teamBattleStart(player);
+        }
+        break;
+    case 0x0F:
+        {
+            TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+            tcpInfo->reqTeamCopyInfo();
+        }
+        break;
+    case 0x0D:
+        {
+            UInt8 type = 0;
+            br >> type;
+            TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+            tcpInfo->rollAward(type);
+        }
+        break;
+    case 0x0E:
+        {
+            TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+            bool res = tcpInfo->getAward();
+            Stream st(REP::TEAM_COPY_REQ);
+            st << static_cast<UInt8>(0x0E) << static_cast<UInt8>(res ? 1 : 0) << Stream::eos;
+            player->send(st);
+        }
+        break;
+    default:
+        return;
+    }
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_

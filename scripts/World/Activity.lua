@@ -113,6 +113,18 @@ function onActivityCheck(tm)
       setThanksgiving(false);
   end
 
+  if tm >= actTime9 and tm < actTime10 then
+      setChristmas(true)
+  else
+      setChristmas(false)
+  end
+
+  if tm >= actTime11 and tm < actTime12 then
+      setNewYear(true)
+  else
+      setNewYear(false)
+  end
+
   loadStore()
 end
 
@@ -121,6 +133,8 @@ function initActTime(y, m, d)
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm4 = { ['year'] = 2011, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm6 = { ['year'] = 2011, ['month'] = 12, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -134,11 +148,18 @@ function initActTime(y, m, d)
   actTime7 = os.time(SerStartTm4);
   actTime8 = os.time(SerStartTm4) + 7 * 86400;
 
+  actTime9 = os.time(SerStartTm5);
+  actTime10 = os.time(SerStartTm5) + 7 * 86400;
+
+  actTime11 = os.time(SerStartTm6);
+  actTime12 = os.time(SerStartTm6) + 3 * 86400;
+
   onActivityCheck(os.time() + 30);
 
   loadStore();
   loadTitle();
   loadRareAnimals()
+  loadTeamCopyAwardsCfg()
 end
 
 function onAthleticsNewBox(t, c)

@@ -56,8 +56,9 @@ enum PurchaseType
     AthleticPaging, 
     HeroIslandSkill,
     HeroIslandAuto,
-    ClanRankBattleSkill,
+    TeamCopyAwardRoll,
     DailyActivity,
+    ClanRankBattleSkill,
 };
 
 enum IncomingType
@@ -118,6 +119,7 @@ enum ItemFrom
     FromFCMerge,
     FromPExp,
     FromHeroIsland,
+    FromTeamCopy,
     FromAttainment,
     FromDailyActivity,
 };

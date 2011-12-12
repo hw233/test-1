@@ -43,14 +43,10 @@ void ActivityMgr::LoadFromDB(DBActivityData& data)
 UInt32 ActivityMgr::GetRandomReward()
 {
     UInt32 s = GetOnlineRewardNum();
+    if(s == 0)
+      return 1;
     UInt32 idx = uRand(s);
     return idx + 1;
-    /*
-    if(idx < s )
-    {
-         return v[idx];
-    }
-    return 0;*/
 }
 /**
  *   @return  是否到期 需要重置数据库
@@ -62,10 +58,9 @@ bool ActivityMgr::CheckTimeOver()
     if(now < _item.overTime)
         return false;
     UInt32 over = TimeUtil::SharpDayT(1 , now);
-  //  UInt32 rewardID = GetRandomReward();
-     _item.Reset( 0  , over);
- _onlineReward.clear() ;
-     GetOnlineReward();
+    _item.Reset( 0  , over);
+    _onlineReward.clear() ;
+    GetOnlineReward();
     UpdateToDB();
     return true;
 }
@@ -120,10 +115,8 @@ void ActivityMgr::UpdateToDB()
 
 void ActivityMgr::GetOnlineReward()
 {
-    //_onlineReward.clear();
     lua_tinker::table t = GameAction()->GetOnlineReward();
     
-    //OnlineRewards re;
     UInt32 size = t.size();
     for(UInt32 i = 0; i< size; i++)
     {
@@ -158,19 +151,12 @@ void ActivityMgr::GetOnlineReward()
 
 UInt32  ActivityMgr::GetOnlineRewardNum()
 {
-    /*
-     lua_tinker::table t = GameAction()->GetOnlineReward();
-     
-      UInt32 size = t.size();
-      UInt32 re = 0;
-     for(UInt32 i = 0; i< size; i++)
-     {
-        lua_tinker::table t2 = t.get<lua_tinker::table>(i + 1);
-        if(t2.size() > 0 )
-            re ++;
-     }
-*/
     UInt32 s = _onlineReward.size();
+    if(s == 0)
+    {
+        GetOnlineReward();
+        s = _onlineReward.size();
+    }
      return s;
 }
 /**
@@ -226,7 +212,6 @@ void ActivityMgr::GetReward(UInt32 flag)
         if(_item.awardID == 0)
             return;
 
-       // OnlineRewards v = GetOnlineReward() ;
         UInt32 s =  _onlineReward.size();
         if(s == 0)
             return;
@@ -240,16 +225,10 @@ void ActivityMgr::GetReward(UInt32 flag)
        {
            _owner->sendMsgCode(0, 1011);
            return;
-        }
+       }
 
-      // if(v[idx].size() == 1)
-            _owner->GetPackage()->Add(_onlineReward[idx].id, _onlineReward[idx].num, true, false, FromDailyActivity);
+        _owner->GetPackage()->Add(_onlineReward[idx].id, _onlineReward[idx].num, true, false, FromDailyActivity);
 
-      /* else
-       {
-            UInt32 ran = uRand(v[idx].size());
-             _owner->GetPackage()->Add(v[idx][ran].id, v[idx][ran].num, true, false, FromDailyActivity);
-       }*/
         AddRewardFlag(flag);
     }
     else
@@ -353,7 +332,9 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     {
         c1 = static_cast<UInt8>(_item.flag[i]);
         if( i == AtyAthletics )
+        {
             m1 = AthleticsRank::GetMaxchallengenum(vipLevel);
+        }
         else if( i == AtyBoss)
         {
             UInt8 lev =  worldBoss.getLevel();
@@ -363,6 +344,10 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             }
             else
                 m1 = 0;
+        }
+        else if( i == AtyClanWar)
+        {
+            m1 = 0;//暂时屏蔽掉
         }
         else
             m1 = static_cast<UInt8>(GameAction()->GetAtyCheckFlag(i));
@@ -396,15 +381,6 @@ void ActivityMgr::ActivityList(UInt8 type)
     Stream st(REP::ACTIVITY_LIST);
     st<<static_cast<UInt8> (type);
 
- /*   if(type == 0)
-    {
-        SendOnlineReward(st);
-        SendActivityInfo(st);
-        st <<  Stream::eos;
-         _owner->send(st);
-    }
-    else
-    {*/
         if(type & 0x01)
         {
             SendOnlineReward(st);
@@ -412,8 +388,6 @@ void ActivityMgr::ActivityList(UInt8 type)
         if(type & 0x02)
         {
             SendActivityInfo(st);
-          //  st << Stream::eos;
-          //  _owner->send(st);
         }
 
          if(type & 0x04)
@@ -424,6 +398,5 @@ void ActivityMgr::ActivityList(UInt8 type)
          }
         st << Stream::eos;
         _owner->send(st);
-   // }
 }
 }

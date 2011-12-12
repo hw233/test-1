@@ -49,6 +49,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
+#include "GObject/TeamCopy.h"
 #include "ActivityMgr.h"
 #include <fcntl.h>
 
@@ -157,6 +158,7 @@ namespace GObject
 		unloadEquipments();
 		loadAllFriends();
 		LoadDungeon();
+        loadTeamCopy();
 		loadAllClans();
 		LoadSpecialAward();
 		LoadLuckyDraw();
@@ -1464,6 +1466,47 @@ namespace GObject
 		}
 		lc.finalize();
 
+        lc.prepare("Loading team copy player:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBTeamCopyPlayer dbtcp;
+        if(execu->Prepare("SELECT `playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime` FROM `teamcopy_player` ORDER BY `playerId`, `copyId`, `type`", dbtcp) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbtcp.playerId];
+            if(!pl)
+                continue;
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(!tcpInfo)
+                continue;
+
+            tcpInfo->setPassFromDB(dbtcp.copyId, dbtcp.type, dbtcp.pass);
+            tcpInfo->setPassTimesFromDB(dbtcp.copyId, dbtcp.type, dbtcp.passTimes, dbtcp.vTime);
+        }
+		lc.finalize();
+
+        lc.prepare("Loading team copy player award:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBTeamCopyPlayerAward dbtcpa;
+        if(execu->Prepare("SELECT `playerId`, `rollId`, `roll`, `awardId`, `awardCnt` FROM `teamcopy_player_award` ORDER BY `playerId`", dbtcpa) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbtcpa.playerId];
+            if(!pl)
+                continue;
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(!tcpInfo)
+                continue;
+
+            tcpInfo->loadAwardInfoFromDB(dbtcpa.rollId, dbtcpa.roll, dbtcpa.awardId, dbtcpa.awardCnt);
+        }
+		lc.finalize();
+
 		lc.prepare("Loading player pending tasks:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
@@ -1499,6 +1542,10 @@ namespace GObject
 			task->m_Submit = dtdata.m_Submit;
 			task->m_StepStr = dtdata.m_TaskStep;
 			pl->GetTaskMgr()->LoadTask(task);
+
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(tcpInfo && dtdata.m_Completed)
+                tcpInfo->checkCopyPass(dtdata.m_TaskId);
 		}
 		lc.finalize();
 
@@ -1522,6 +1569,10 @@ namespace GObject
 			const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(dtdata2.m_TaskId);
 			if (taskType.m_TypeId == 0) continue;
 			pl->GetTaskMgr()->LoadSubmitedTask(dtdata2.m_TaskId, dtdata2.m_TimeEnd);
+
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(tcpInfo)
+                tcpInfo->checkCopyPass(dtdata2.m_TaskId);
 		}
 		lc.finalize();
 
@@ -1753,6 +1804,8 @@ namespace GObject
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
 		lc.finalize();
+
+
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
@@ -1951,7 +2004,7 @@ namespace GObject
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
 		Player * pl = NULL;
 		DBFriend dbfr;
-		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` WHERE `id` < `friendId` ORDER BY `id`", dbfr) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `type`, `friendId` FROM `friend` ORDER BY `id`", dbfr) != DB::DB_OK)
 			return false;
 		lc.reset(500);
 		while(execu->Next() == DB::DB_OK)
@@ -2137,6 +2190,30 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+
+	bool GObjectManager::loadTeamCopy()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		
+        // 组队副本配置
+		LoadingCounter lc("Loading team copy templates:");
+		GData::DBTeamCopy dbtc;
+		if(execu->Prepare("SELECT `id`, `type`, `location`, `npcgroups` FROM `team_copy`", dbtc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			StringTokenizer tk(dbtc.npcgroups, ",");
+			for(size_t i = 0; i < tk.count(); ++ i)
+			{
+                teamCopyManager->addTeamCopyNpc(dbtc.id, dbtc.type, dbtc.location, atoi(tk[i].c_str()));
+            }
+        }
+        lc.finalize();
+        return true;
+    }
 
 	static bool configLoadedClanData(Clan * clan, void * data)
 	{

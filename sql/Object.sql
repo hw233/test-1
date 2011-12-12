@@ -1205,3 +1205,25 @@ CREATE TABLE `var` (
   PRIMARY KEY (`playerId`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `teamcopy_player`;
+CREATE TABLE `teamcopy_player` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `copyId` tinyint(3) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
+  `pass` tinyint(3) unsigned NOT NULL,
+  `passTimes` tinyint(3) unsigned NOT NULL,
+  `vTime` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`,`id`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `teamcopy_player_award`;
+CREATE TABLE `teamcopy_player_award` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `rollId` tinyint(3) unsigned NOT NULL,
+  `roll` tinyint(3) unsigned NOT NULL,
+  `awardId` int(10) unsigned NOT NULL,
+  `awardCnt` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

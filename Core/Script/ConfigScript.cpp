@@ -19,6 +19,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setObjectDatabase", &Cfg::setObjectDatabase);
 	class_def<Cfg>("setLogDatabase", &Cfg::setLogDatabase);
 	class_def<Cfg>("setCryptKeys", &Cfg::setCryptKeys);
+	class_def<Cfg>("setGMCryptKeys", &Cfg::setGMCryptKeys);
 	class_def<Cfg>("setAdminAllowedIP", &Cfg::setAdminAllowedIP);
 	class_def<Cfg>("setOpening", &Cfg::setOpening);
 	class_def<Cfg>("setWallow", &Cfg::setWallow);

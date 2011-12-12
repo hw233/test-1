@@ -577,7 +577,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 {
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     std::string token;
     std::string no;
@@ -587,13 +587,13 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     std::string uint;
     std::string money;
 
-    brd>>token;
-    brd>>no;
-    brd>>player_Id;
-    brd>>id;
-    brd>>num;
-    brd>>uint;
-    brd>>money;
+    br>>token;
+    br>>no;
+    br>>player_Id;
+    br>>id;
+    br>>num;
+    br>>uint;
+    br>>money;
 
     UInt8 ret = 1;
     std::string err = "";
@@ -713,17 +713,17 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
 void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 {
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     std::string no;
     UInt64 player_Id;
     UInt16 id;
     UInt32 num;
 
-    brd>>no;
-    brd>>player_Id;
-    brd>>id;
-    brd>>num;
+    br>>no;
+    br>>player_Id;
+    br>>id;
+    br>>num;
 
     std::string err = "";
     UInt8 ret = GObject::GObjectManager::reRecharge(no, id, num, err);
@@ -762,12 +762,40 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
     return;
 }
 
+bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
+{
+	SHA1Engine sha1;
+	sha1.update(_hashval + 8, 4);
+	sha1.update(cfg.gmCryptKey1.c_str(), cfg.gmCryptKey1.length());
+	sha1.update(_hashval, 4);
+	sha1.update(&_userid, sizeof(UInt64));
+	sha1.update(_hashval + 12, 4);
+	sha1.update(cfg.gmCryptKey2.c_str(), cfg.gmCryptKey2.length());
+	sha1.update(_hashval + 4, 4);
+
+	std::vector<UInt8> buf = sha1.digest();
+
+	if(memcmp(&buf.front(), _hashval + 16, 20) == 0)
+        return true;
+    return false;
+}
+
+#define CHKKEY() \
+{\
+    UInt8 hash[64] = {0};\
+    if (!br.read(hash, 36))\
+        return;\
+    if (!checkKey(hash))\
+        return;\
+}
+
 void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 {
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type;
 	std::string msg;
-	brd >> type >> msg;
+    CHKKEY();
+	br >> type >> msg;
 	Stream st(REP::SYSTEM_INFO);
 	st << type << msg << Stream::eos;
 	NETWORK()->Broadcast(st);
@@ -780,6 +808,7 @@ void OnKickUser(LoginMsgHdr& hdr,const void * data)
     st.init(REP::RECONNECT, 0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
+    CHKKEY();
     br>>playerId;
     st<<playerId;
 	GObject::Player * pl= GObject::globalPlayers[playerId];
@@ -812,6 +841,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
     UInt64 expireTime;
+    CHKKEY();
     br>>playerId;
     br>>expireTime;
     st<<playerId;
@@ -850,6 +880,7 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
     st.init(SPEP::UNLOCKUSER,0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
+    CHKKEY();
     br>>playerId;
     st<<playerId;
     GObject::Player * pl= GObject::globalPlayers[playerId];
@@ -879,6 +910,7 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
     st.init(SPEP::GMHANDLERFROMBS,0x01);
     std::string playerNameList;
     std::string cmd;
+    CHKKEY();
     br>>playerNameList;
     br>>cmd;
 	if(cmd.empty())
@@ -918,10 +950,11 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 
 void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 {
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
 	UInt64 pid;
-	brd >> type >> pid;
+    CHKKEY();
+	br >> type >> pid;
 	GObject::Player * player = GObject::globalPlayers[pid];
 	Stream st(SPEP::PLAYERIDAUTH);
 	st << type << pid;
@@ -937,13 +970,14 @@ void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 
 void MailFromBs(LoginMsgHdr &hdr,const void * data)
 {
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
     std::string playerName;
     std::string title;
     std::string content;
-    brd>>playerName;
-    brd>>title;
-    brd>>content;
+    CHKKEY();
+    br>>playerName;
+    br>>title;
+    br>>content;
     GObject::Player *pl= GObject::globalNamedPlayers[playerName];
     Stream st;
     st.init(SPEP::MAILFROMBS, 0x01);
@@ -968,6 +1002,7 @@ void BanChatFromBs(LoginMsgHdr &hdr,const void * data)
     st.init(SPEP::BANCHATFROMBS,0x01);
     std::string playerNameList;
     UInt32 time;
+    CHKKEY();
     br>>playerNameList;
     br>>time;
     StringTokenizer stk(playerNameList,"%");
@@ -1020,6 +1055,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
+    CHKKEY();
 	br>>playerNameList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	StringTokenizer stk(playerNameList,"%");
 	st << playerNameList;
@@ -1085,6 +1121,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
+    CHKKEY();
 	br>>playerIDList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	StringTokenizer stk(playerIDList,"%");
 	st << playerIDList;
@@ -1150,8 +1187,10 @@ void BattleReportReq(LoginMsgHdr& hdr, const void * data)
 
 void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 {
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
 	st.init(SPEP::ONLINE,0x01);
+    CHKKEY();
 	st<<SERVER().GetTcpService()->getOnlineNum();
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
@@ -1159,8 +1198,10 @@ void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 
 void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
 {
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
 	st.init(SPEP::ONLINEPF,0x01);
+    CHKKEY();
     UInt32 nums[MAX_DOMAIN] = {0,};
     GObject::dclogger.getOnline(nums);
     size_t off = st.size();
@@ -1189,6 +1230,7 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
 	st.init(SPEP::SETLEVEL,0x01);
     UInt64 id;
     UInt8 level;
+    CHKKEY();
     br>>id;
     br>>level;
 
@@ -1218,6 +1260,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
+    CHKKEY();
 	br>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	std::string result="";
 	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
@@ -1277,6 +1320,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
     UInt32 pexp;
     UInt32 prestige;
     UInt32 honor;
+    CHKKEY();
     br>>id;
     br>>pexp;
     br>>prestige; // 声望
@@ -1318,6 +1362,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     UInt32 coupon;
     UInt32 achievement;
 
+    CHKKEY();
     br>>id;
     br>>token;
     br>>type;
@@ -1424,6 +1469,7 @@ void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
 	st.init(SPEP::SETVIPL,0x01);
     UInt64 id;
     UInt8 lv;
+    CHKKEY();
     br>>id;
     br>>lv;
     st<<id;
@@ -1448,6 +1494,7 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
 	st.init(SPEP::CLSTASK,0x01);
     UInt64 id;
     UInt8 type;
+    CHKKEY();
     br>>id;
     br>>type;
     st<<id;
@@ -1470,6 +1517,7 @@ void reqSaleOnOffFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::SALE_ONOFF,0x1);
     UInt8 flag;
+    CHKKEY();
     br >> flag;
 
     UInt8 ret = flag;
@@ -1488,6 +1536,7 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::PLAYERINFO,0x1);
     UInt8 type;
+    CHKKEY();
     br >> type;
 
     GObject::Player* player = NULL;
@@ -1553,6 +1602,7 @@ void WBossMgrFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::WBOSS,0x1);
     UInt8 lvl;
+    CHKKEY();
     br >> lvl;
     st << Stream::eos;
     GObject::worldBoss.bossAppear(lvl, true);
@@ -1566,6 +1616,7 @@ void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
     UInt64 playerId = 0;
     UInt16 fgtid = 0;
 
+    CHKKEY();
     br >> playerId;
     br >> fgtid;
 

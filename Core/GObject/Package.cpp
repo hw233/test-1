@@ -1300,6 +1300,7 @@ namespace GObject
             {0, 0, NULL, 0},
         };*/
 
+        bool b = false; //绑定
         if (IsFull())
         {
             m_Owner->sendMsgCode(0, 1011);
@@ -1323,54 +1324,14 @@ namespace GObject
          
         for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
         {
-                UInt32 id = stfs[0].m_stfs[i].id;
+            UInt32 id = stfs[0].m_stfs[i].id;
             UInt32 num = stfs[0].m_stfs[i].num;
             
             DelItemAny(id, num, &bind);
-
+            if( bind )
+                b = true;
         }
-        /*
-        while (true)
-        {
-            if (!config[i].sid)
-                break;
-            if (id >= config[i].sid && id <= config[i].eid) {
-                k = i;
-                break;
-            }
-            ++i;
-        }
-
-        if (k < 0)
-            return false;
-
-        StringTokenizer tk(config[i].nums, ",");
-        if (!tk.count())
-            return false;
-
-        UInt8 j = 0;
-        for (; j < tk.count(); ++j)
-        {
-            UInt32 id = config[i].sid+j;
-            UInt16 num = atoi(tk[j].c_str());
-
-            UInt16 rnum = GetItemAnyNum(id);
-            if (rnum < num)
-                return false;
-        }
-
-        if (config[i].eid != (j-1) + config[i].sid) {
-            return false;
-        }
-
-        for (j = 0; j < tk.count(); ++j)
-        {
-            UInt32 id = config[i].sid+j;
-            UInt16 num = atoi(tk[j].c_str());
-            DelItemAny(id, num, &bind);
-        }
-*/
-        Add( stfs[0].m_to, 1, bind, false, FromFCMerge);
+        Add( stfs[0].m_to, 1, b, false, FromFCMerge);
         return true;
     }
 
@@ -1587,6 +1548,12 @@ namespace GObject
             if (equip->getClass() == Item_Trump && ied.enchant == 1)
             {
                 ((ItemTrump*)equip)->fixSkills();
+                if (fgt)
+                {
+                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                    if (attr)
+                        fgt->addSkillsFromCT(attr->skills, true);
+                }
             }
         }
         else if( 0 != count )
@@ -1655,7 +1622,7 @@ namespace GObject
                 if(ied.enchant != 1)
                 {
                     ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                    if (fgt)
+                    if (fgt && attr)
                         fgt->addSkillsFromCT(attr->skills, true);
                 }
                 //法宝强化
@@ -1729,7 +1696,7 @@ namespace GObject
             {
                 GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
                 ((ItemTrump*)equip)->enchant(ied.enchant, attr);
-                if (fgt)
+                if (fgt && attr)
                     fgt->addSkillsFromCT(attr->skills, true);
             }
 

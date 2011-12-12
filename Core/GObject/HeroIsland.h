@@ -152,7 +152,7 @@ class HeroIsland
 {
 public:
     HeroIsland() : _running(false), _notifyTime(0), _prepareStep(0),
-    _prepareTime(0), _startTime(0), _endTime(0), _count(0), _expTime(0)
+    _prepareTime(0), _startTime(0), _endTime(0), _count(0), _expTime(0), _disperseTime(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
         _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
@@ -185,6 +185,7 @@ public:
     void calcNext(UInt32 now);
     void end(UInt32 now);
     void reset();
+    void disperse(UInt32 now);
 
     UInt8 getIdentity(Player* player, bool = false);
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
@@ -192,7 +193,7 @@ public:
     HIPlayerData* leave(Player* player, UInt8 spot);
     HIPlayerData* leave(HIPlayerData* pd, UInt8 spot, UInt16 pos);
     void listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pagesize);
-    bool moveTo(Player* player, UInt8 to, bool = true);
+    bool moveTo(Player* player, UInt8 to, bool movecd = true, bool force = false);
     bool attack(Player* player, UInt8 type, UInt64 id);
     bool useSkill(Player* player, UInt8 skillid, UInt8 type);
     bool getAward(Player* player, UInt8 id, UInt8 type);
@@ -245,6 +246,7 @@ private:
     UInt8 _count;
     float _expfactor[4];
     UInt32 _expTime;
+    UInt32 _disperseTime;
 };
 
 extern HeroIsland heroIsland;
