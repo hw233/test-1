@@ -69,6 +69,7 @@ void WorldScript::init()
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
 	class_def<GData::Store>("add", &GData::Store::add);
+	class_def<GData::Store>("addExchange", &GData::Store::addExchange);
 	class_def<GData::Store>("update", &GData::Store::makePacket);
 	class_add<GData::TitleList>("TitleList");
 	class_def<GData::TitleList>("set", &GData::TitleList::set);

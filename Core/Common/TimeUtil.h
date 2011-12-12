@@ -29,6 +29,15 @@ public:
         time_t t2 = mktime(&t_tm);
 		return t2 + c * 24 * 60 * 60;
     }
+    static inline bool SameDay(UInt32 a, UInt32 b)
+    {
+        time_t t1 = a;
+        time_t t2 = b;
+        struct tm t_tm1, t_tm2;
+        localtime_r(&t1,&t_tm1);
+        localtime_r(&t2,&t_tm2);
+        return t_tm1.tm_yday == t_tm2.tm_yday;
+    }
     static inline UInt32 SharpWeek(int c = 0, UInt32 cur = Now())
     {
         time_t t = cur;

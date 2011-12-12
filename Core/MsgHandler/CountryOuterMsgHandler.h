@@ -2645,6 +2645,33 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                 }
             }
             break;
+        case 8:
+            {
+                UInt32 priceID = price&0xFFFF;
+                UInt32 priceNum = (price>>16)&0xFF;
+
+                if (player->GetPackage()->GetItemAnyNum(priceID) < priceNum)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    GObject::ItemBase * item;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL)
+                        st << static_cast<UInt8>(2);
+                    else
+                    {
+                        bool bind = true;
+                        player->GetPackage()->DelItemAny(priceID, priceNum, &bind);
+                        st << static_cast<UInt8>(0);
+                    }
+                }
+            }
+            break;
 		default:
 			if(PLAYER_DATA(player, gold) < price)
 			{

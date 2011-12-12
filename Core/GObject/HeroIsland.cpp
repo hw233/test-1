@@ -447,10 +447,11 @@ void HeroIsland::process(UInt32 now)
 
 void HeroIsland::disperse(UInt32 now)
 {
-    size_t sz = _players[0].size();
-    while (sz)
+    std::vector<HIPlayerData*> l = _players[0];
+    size_t sz = l.size();
+    for (size_t i = 0; i < sz; ++i)
     {
-        HIPlayerData* pd = _players[0].back();
+        HIPlayerData* pd = l[i];
         if (pd && pd->player && !pd->player->hasFlag(Player::InHeroIsland))
             continue;
         if (pd && pd->player)
@@ -461,10 +462,9 @@ void HeroIsland::disperse(UInt32 now)
                 to %= 5;
                 if (!to) to = uRand(5);
                 if (!to) to = 1;
-                moveTo(pd->player, to, false);
+                moveTo(pd->player, to, false, true);
             }
         }
-        --sz;
     }
 
     if (cfg.GMCheck)
@@ -1123,7 +1123,7 @@ void HeroIsland::listPlayers(Player* player, UInt8 spot, UInt16 start, UInt8 pag
         sendPlayers(pd, spot, start, pagesize);
 }
 
-bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
+bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd, bool force)
 {
     if (!player || to > HERO_ISLAND_SPOTS)
         return false;
@@ -1140,15 +1140,21 @@ bool HeroIsland::moveTo(Player* player, UInt8 to, bool movecd)
         return false;
 
     UInt32 now = TimeUtil::Now();
-    if (movecd && pd->movecd > now)
+    if (!force)
     {
-        pd->player->sendMsgCode(0, 2001);
-        return false;
+        if (movecd && pd->movecd > now)
+        {
+            pd->player->sendMsgCode(0, 2001);
+            return false;
+        }
     }
 
     if (leave(pd, spot, pos))
     {
-        if (enter(pd, pd->type, to, to?true:false))
+        bool cd = to?true:false;
+        if (!movecd)
+            cd = false;
+        if (enter(pd, pd->type, to, cd))
         {
             Stream st(REP::HERO_ISLAND);
             st << static_cast<UInt8>(4) << to << Stream::eos;
@@ -1223,7 +1229,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
             else
                 pd->injuredcd = now + 6;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd+4, false);
-            moveTo(pd->player, 0, false);
+            moveTo(pd->player, 0, false, true);
         }
 
         return true;
@@ -1285,10 +1291,10 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
 
             if (_running)
             {
-                UInt8 status = 1;
                 size_t sz = pd->compass.size();
                 if (sz && pd->compass[sz-1].type == pd1->type)
                 {
+                    UInt8 status = 1;
                     if (pd->compass[sz-1].status == 2 || pd->compass[sz-1].status == 3)
                         return false;
                     status = pd->compass[sz-1].status = 2;
@@ -1302,16 +1308,16 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                     }
                     ++pd->tasks;
                     commitCompass(pd->player);
-                }
 
-                Stream st(REP::HERO_ISLAND);
-                st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
-                pd->player->send(st);
+                    Stream st(REP::HERO_ISLAND);
+                    st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
+                    pd->player->send(st);
+                }
             }
 
             player->pendExp(calcExp(!pd1->player?0:pd1->player->GetLev())/2);
 
-            moveTo(pd1->player, 0, false);
+            moveTo(pd1->player, 0, false, true);
             broadcast(pd, pd->spot, 2);
         }
         else
@@ -1322,7 +1328,7 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                 pd->injuredcd = now + 6;
             pd->player->setBuffData(PLAYER_BUFF_HIWEAK, pd->injuredcd+4, false);
 
-            moveTo(pd->player, 0, false);
+            moveTo(pd->player, 0, false, true);
             broadcast(pd1, pd1->spot, 2);
         }
 

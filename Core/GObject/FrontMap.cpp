@@ -229,7 +229,7 @@ UInt8 FrontMap::getCount(Player* pl)
     if (!pl)
         return 0;
 
-    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate)) ||
+    if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, frontUpdate)) ||
             getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt) ||
             getFreeCount() < PLAYER_DATA(pl, frontFreeCnt)) {
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
