@@ -140,7 +140,7 @@ namespace GObject
 
     private:
         void ResetPlayerStatus(UInt32 clan);
-        void ClearPlayerData(Player* player);
+        void ResetPlayerData(Player* player);
 
     private:
         //id
@@ -229,9 +229,10 @@ namespace GObject
          */
         void Broadcast(Stream& stream, bool bAll = false)
         {
-            m_Clan1->Broadcast(stream, bAll);
-            m_Clan2->Broadcast(stream, bAll);
+            if(m_Clan1 != NULL) m_Clan1->Broadcast(stream, bAll);
+            if(m_Clan2 != NULL) m_Clan2->Broadcast(stream, bAll);
         }
+
     private:
         /**
          *@brief 获取战役
