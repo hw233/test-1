@@ -804,8 +804,6 @@ void TeamCopy::teamBattleStart(Player* pl)
                 tcpInfo->setPass(copyId, 1, true, true);
             }
 
-            leaveTeamCopy(pl);
-
             if(t == 1)
             {
                 tcpInfo->setAwardRoll(copyId);
@@ -818,6 +816,8 @@ void TeamCopy::teamBattleStart(Player* pl)
         Player* pl = td->members[i-1];
         if(pl == NULL)
             continue;
+
+        leaveTeamCopy(pl);
 
         bsim.applyFighterHP(0, pl);
 
@@ -868,12 +868,11 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
                 if(flag)
                 {
                     pl->pendExp(ng->getExp());
-                    //TODO
-                    //ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
+                    ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
                 }
 
                 pl->pendExp(ng->getExp());
-                //ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
+                ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
             }
         }
 
@@ -1152,8 +1151,6 @@ bool TeamCopyPlayerInfo::getAward()
 
 void TeamCopyPlayerInfo::setAwardRoll(UInt8 rollId)
 {
-    // TODO
-    return;
     m_rollId = rollId;
     m_roll = _needRoll;
 
