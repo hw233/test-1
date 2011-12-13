@@ -32,8 +32,10 @@
 #include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
 #include "GObject/WBossMgr.h"
-
 #include "GObject/DCLogger.h"
+#include "GObject/FrontMap.h"
+#include "GObject/Copy.h"
+#include "GObject/Dungeon.h"
 
 
 static memcached_st* memc = NULL;
@@ -762,6 +764,53 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
     return;
 }
 
+bool getId(char buf[64])
+{
+    if (cfg.GMCheck)
+    {
+        UInt8 ret = 1;
+        initMemcache();
+        if (!memc)
+            return false;
+
+        size_t len = 0;
+        size_t tlen = 0;
+        unsigned int flags = 0;
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        int retry = 3;
+        memcached_return rc;
+        len = snprintf(key, sizeof(key), "sscq_gmtool_key_id");
+        while (retry)
+        {
+            --retry;
+            char* rid = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            if (rc == MEMCACHED_SUCCESS && rid && tlen)
+            {
+                ret = 0;
+                memcpy(buf, rid, tlen>63?63:tlen);
+                free(rid);
+                break;
+            }
+            else
+            {
+                ret = 1;
+                usleep(500);
+            }
+        }
+
+        if (ret)
+            return false;
+    }
+    else
+    {
+        //memcpy(buf, "20110503ll", 10);
+        const char* id = "";
+        memcpy(buf, id, strlen(id));
+    }
+    return true;
+}
+
 bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
 {
 	SHA1Engine sha1;
@@ -785,7 +834,10 @@ bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
     UInt8 hash[64] = {0};\
     if (!br.read(hash, 36))\
         return;\
-    if (!checkKey(hash))\
+    char id[64] = {0};\
+    if (!getId(id))\
+        return;\
+    if (!checkKey(hash, atoll(id)))\
         return;\
 }
 
@@ -800,7 +852,6 @@ void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 	st << type << msg << Stream::eos;
 	NETWORK()->Broadcast(st);
 }
-
 
 void OnKickUser(LoginMsgHdr& hdr,const void * data)
 {
@@ -1590,6 +1641,14 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
             st << static_cast<UInt8>(1);
         else
             st << static_cast<UInt8>(0);
+        UInt8 freeCnt, goldCnt;
+        GObject::playerCopy.getCount(player, &freeCnt, &goldCnt, true);
+        st << freeCnt << goldCnt;
+        UInt8 fcnt = GObject::frontMap.getCount(player);
+        st << static_cast<UInt8>(GObject::FrontMap::getFreeCount()-(fcnt&0xf));
+        st << static_cast<UInt8>(GObject::FrontMap::getGoldCount(player->getVipLevel())-((fcnt&0xf0)>>4));
+        st << static_cast<UInt8>(PLAYER_DATA(player, dungeonCnt));
+        st << static_cast<UInt8>(GObject::Dungeon::getExtraCount(player->getVipLevel()));
     }
 
     st << Stream::eos;

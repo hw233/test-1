@@ -260,7 +260,6 @@ void HeroIsland::broadcastTV(UInt32 now)
         default:
             break;
     }
-
 }
 
 void HeroIsland::calcNext(UInt32 now)

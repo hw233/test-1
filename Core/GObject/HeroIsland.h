@@ -85,9 +85,9 @@ struct HIPlayerData
             awardgot = 0;
             lasttype = 0;
             compass.clear();
+            ato = 0;
         }
 
-        ato = 0;
         movecd = 0;
         fightcd = 0;
         injuredcd = 0;

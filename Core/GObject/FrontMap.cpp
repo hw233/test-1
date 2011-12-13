@@ -491,7 +491,10 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 UInt8 count = max - tmp.size() + 1;
                 UInt8 nspot = tmp.size();
                 if (nspot != 1 && !tmp[nspot-1].status)
+                {
                     --nspot;
+                    ++count;
+                }
                 if (!nspot)
                     nspot = 1;
 

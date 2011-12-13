@@ -1031,9 +1031,9 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	if(player == NULL)
 		return;
 	const UInt32 itemIdStart[3][5] = {
-        {2568, 2592, 2616, 2160, 2184},
-        {2576, 2600, 2600, 2152, 2176},
-        {2584, 2608, 2624, 2144, 2168}
+        {2568, 2592, 2160, 2160, 2184},
+        {2576, 2600, 2152, 2152, 2176},
+        {2584, 2608, 2144, 2144, 2168}
     };
     const UInt16 trump[] = {1608,1609,1610};
 	int idx = -1;
