@@ -255,17 +255,15 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))
         return 0;
 
-    Stream st(REP::FORMATTON_INFO);
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
-    if (spot > GData::frontMapMaxManager[id]) {
-        // TODO: 
+    if (!tmp.size())
         return 0;
-    }
 
-    if (spot > 1) {
-        if (spot > tmp.size())
-            return 0;
-    }
+    if (spot > GData::frontMapMaxManager[id])
+        return 0;
+
+    if (spot > 1 && spot > tmp.size())
+        return 0;
 
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
@@ -274,6 +272,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 pl->getId(), id, spot, tmp[spot].lootlvl);
     }
 
+    Stream st(REP::FORMATTON_INFO);
     UInt8 count = tmp[spot].count;
     if (count >= GData::frontMapManager[id][spot].count) {
         st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(0) << Stream::eos;
@@ -283,125 +282,122 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
 
     bool ret = false;
     UInt32 fgtid = GData::frontMapManager[id][spot].fighterId;
-    if (fgtid) {
-        std::vector<UInt16> loot;
-        if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl, ato, &loot)) {
-            ret = true;
-            if (ato)
-                pl->checkLastBattled();
-        }
+    if (!fgtid)
+        return 0;
 
-        if (ret) {
-            ++tmp[spot].count;
-            tmp[spot].status = 1;
+    std::vector<UInt16> loot;
+    if (pl->attackCopyNpc(fgtid, 0, id, World::_wday==7?2:1, tmp[spot].lootlvl, ato, &loot)) {
+        ret = true;
+        if (ato)
+            pl->checkLastBattled();
+    }
 
-            if (spot >= GData::frontMapMaxManager[id]) {
-                if (ato)
-                {
-                    Stream st(REP::AUTO_FRONTMAP);
-                    UInt8 size = loot.size();
-                    if (size >= 1) {
-                        UInt8 rsize = loot[0];
-                        if (rsize != size/2)
-                            st << static_cast<UInt8>(5);
-                        else
-                            st << static_cast<UInt8>(4);
+    if (ret) {
+        ++tmp[spot].count;
+        tmp[spot].status = 1;
 
-                        st << id << spot;
-
-                        st << static_cast<UInt8>(rsize);
-
-                        for (UInt8 i = 1, c = 0; i < size && c < rsize; i += 2, ++c)
-                            st << loot[i] << static_cast<UInt8>(loot[i+1]);
-                    } else {
-                        st << static_cast<UInt8>(4) << id << spot << static_cast<UInt8>(0);
-                    }
-
-                    st << Stream::eos;
-                    pl->send(st);
-                }
-                else
-                {
-                    Stream st(REP::FORMATTON_INFO);
-                    st << static_cast<UInt8>(4) << id << Stream::eos;
-                    pl->send(st);
-                }
-                tmp.resize(0);
-
-                GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
-                DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
-                if (ato)
-                    autoClear(pl, complate);
-                return 2;
-            } else {
-                UInt8 nspot = spot+1;
-                while (!GData::frontMapManager[id][nspot].count && nspot <= GData::frontMapMaxManager[id])
-                    ++nspot;
-
-                if (ato)
-                {
-                    Stream st(REP::AUTO_FRONTMAP);
-                    UInt8 size = loot.size();
-                    if (size) {
-                        UInt8 rsize = loot[0];
-                        if (rsize != size/2) {
-                            st << static_cast<UInt8>(5);
-                        } else {
-                            st << static_cast<UInt8>(3);
-                        }
-                        st << id << spot;
-
-                        st << static_cast<UInt8>(size/2);
-                        for (UInt8 i = 1; i < rsize*2+1; i += 2)
-                            st << loot[i] << static_cast<UInt8>(loot[i+1]);
-
-                        for (UInt8 i = rsize*2+1; i < size; i += 2) {
-                        }
-                    } else {
-                        st << static_cast<UInt8>(3) << id << spot << static_cast<UInt8>(0);
-                    }
-
-                    st << Stream::eos;
-                    pl->send(st);
-                }
-                else
-                {
-                    Stream st(REP::FORMATTON_INFO);
-                    st << static_cast<UInt8>(5) << id << nspot;
-
-                    if (nspot < tmp.size())
-                        st << static_cast<UInt8>(GData::frontMapManager[id][nspot].count - tmp[nspot].count);
-                    else
-                        st << GData::frontMapManager[id][nspot].count;
-
-                    st << Stream::eos;
-                    pl->send(st);
-                }
-                GameAction()->onFrontMapFloorWin(pl, id, spot, tmp[spot].lootlvl);
-            }
-
-            DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u",
-                    tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
-        }
-        else
-        {
+        if (spot >= GData::frontMapMaxManager[id]) {
             if (ato)
             {
                 Stream st(REP::AUTO_FRONTMAP);
-                st << static_cast<UInt8>(2) << id << spot << Stream::eos;
-                pl->send(st);
+                UInt8 size = loot.size();
+                if (size >= 1) {
+                    UInt8 rsize = loot[0];
+                    if (rsize != size/2)
+                        st << static_cast<UInt8>(5);
+                    else
+                        st << static_cast<UInt8>(4);
 
-                autoClear(pl, complate);
-                return 0;
+                    st << id << spot;
+
+                    st << static_cast<UInt8>(rsize);
+
+                    for (UInt8 i = 1, c = 0; i < size && c < rsize; i += 2, ++c)
+                        st << loot[i] << static_cast<UInt8>(loot[i+1]);
+                } else {
+                    st << static_cast<UInt8>(4) << id << spot << static_cast<UInt8>(0);
+                }
+
+                st << Stream::eos;
+                pl->send(st);
             }
+            else
+            {
+                Stream st(REP::FORMATTON_INFO);
+                st << static_cast<UInt8>(4) << id << Stream::eos;
+                pl->send(st);
+            }
+            tmp.resize(0);
+
+            GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
+            DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
+            if (ato)
+                autoClear(pl, complate);
+            return 2;
+        } else {
+            UInt8 nspot = spot+1;
+            while (!GData::frontMapManager[id][nspot].count && nspot <= GData::frontMapMaxManager[id])
+                ++nspot;
+
+            if (ato)
+            {
+                Stream st(REP::AUTO_FRONTMAP);
+                UInt8 size = loot.size();
+                if (size) {
+                    UInt8 rsize = loot[0];
+                    if (rsize != size/2) {
+                        st << static_cast<UInt8>(5);
+                    } else {
+                        st << static_cast<UInt8>(3);
+                    }
+                    st << id << spot;
+
+                    st << static_cast<UInt8>(size/2);
+                    for (UInt8 i = 1; i < rsize*2+1; i += 2)
+                        st << loot[i] << static_cast<UInt8>(loot[i+1]);
+                } else {
+                    st << static_cast<UInt8>(3) << id << spot << static_cast<UInt8>(0);
+                }
+
+                st << Stream::eos;
+                pl->send(st);
+            }
+            else
+            {
+                Stream st(REP::FORMATTON_INFO);
+                st << static_cast<UInt8>(5) << id << nspot;
+
+                if (nspot < tmp.size())
+                    st << static_cast<UInt8>(GData::frontMapManager[id][nspot].count - tmp[nspot].count);
+                else
+                    st << GData::frontMapManager[id][nspot].count;
+
+                st << Stream::eos;
+                pl->send(st);
+            }
+            GameAction()->onFrontMapFloorWin(pl, id, spot, tmp[spot].lootlvl);
         }
 
-        st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
-        pl->send(st);
-
-        return ret?1:0;
+        DB3().PushUpdateData("UPDATE `player_frontmap` SET `count`=%u,`status`=%u WHERE `playerId` = %"I64_FMT"u AND `id` = %u AND `spot`=%u",
+                tmp[spot].count, tmp[spot].status, pl->getId(), id, spot);
     }
-    return 0;
+    else
+    {
+        if (ato)
+        {
+            Stream st(REP::AUTO_FRONTMAP);
+            st << static_cast<UInt8>(2) << id << spot << Stream::eos;
+            pl->send(st);
+
+            autoClear(pl, complate);
+            return 0;
+        }
+    }
+
+    st << static_cast<UInt8>(5) << id << spot << static_cast<UInt8>(GData::frontMapManager[id][spot].count - tmp[spot].count) << Stream::eos;
+    pl->send(st);
+
+    return ret?1:0;
 }
 
 void FrontMap::reset(Player* pl, UInt8 id)
@@ -445,6 +441,10 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
     if (!pl || !id)
         return;
 
+    std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
+    if (!tmp.size())
+        return;
+
     switch (type)
     {
         case 0:
@@ -482,10 +482,6 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                         }
                     }
                 }
-
-                std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
-                if (!tmp.size())
-                    return;
 
                 UInt8 max = GData::frontMapMaxManager[id];
                 UInt8 count = max - tmp.size() + 1;
@@ -552,10 +548,6 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 ConsumeInfo ci(AutoFrontMapComplete,0,0);
                 pl->useGoldOrCoupon(GData::moneyNeed[GData::FRONTMAP_IM].gold, &ci);
                 pl->addCopyCompleteGold(GData::moneyNeed[GData::FRONTMAP_IM].gold);
-
-                std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
-                if (!tmp.size())
-                    return;
 
                 UInt8 max = GData::frontMapMaxManager[id];
                 UInt8 nspot = tmp.size();
