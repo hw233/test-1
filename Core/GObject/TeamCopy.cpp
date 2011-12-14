@@ -487,7 +487,7 @@ void TeamCopy::leaveTeam(Player* pl)
 
     sendTeamCopyPageUpdate(copyId, t, ctp.start, ctp.end);
 
-    st << td->leader->getId() << pl->getId();
+    st << res;
     st << Stream::eos;
     // send team info to members ::TODO
     for(UInt8 j = 0; j < td->count; ++j)

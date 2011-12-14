@@ -1959,11 +1959,6 @@ namespace GObject
 		_playerData.formation = f;
 		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
 
-        if(hasFlag(GObject::Player::InCopyTeam))
-        {
-            teamCopyManager->updateTeamInfo(this);
-        }
-
         return true;
 	}
 
@@ -2023,6 +2018,11 @@ namespace GObject
 		}
 		st.data<UInt8>(6) = c;
 		st << Stream::eos;
+
+        if(hasFlag(GObject::Player::InCopyTeam))
+        {
+            teamCopyManager->updateTeamInfo(this);
+        }
 	}
 
 	void Player::makeFighterList( Stream& st )
