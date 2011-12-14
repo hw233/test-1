@@ -818,7 +818,10 @@ void TeamCopy::teamBattleStart(Player* pl)
         if(pl == NULL)
             continue;
 
-        leaveTeamCopy(pl);
+        if( 1 == res )
+            leaveTeamCopy(pl);
+        else
+            leaveTeam(pl);
 
         bsim.applyFighterHP(0, pl);
 
