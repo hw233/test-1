@@ -36,6 +36,9 @@ public:
     static UInt8 getGoldCount(UInt8 vipl);
 
 public:
+    FrontMap() {}
+    ~FrontMap() {}
+
     void sendAllInfo(Player* pl);
     void sendInfo(Player* pl, UInt8 id, bool = false, bool = false);
     void sendInfo2(Player* pl, UInt8 id, bool = false);

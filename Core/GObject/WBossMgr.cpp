@@ -109,9 +109,10 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     if ((*i).player == pl)
                     {
                         info += *i;
-                        m_atkinfo.erase(i++);
+                        m_atkinfo.erase(i);
                         break;
                     }
+                    ++i;
                 }
                 m_atkinfo.insert(info);
 
