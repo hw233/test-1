@@ -134,6 +134,9 @@ class TeamCopy
         void addTeamCopyNpc(UInt8 copyId, UInt8 t, UInt16 location, UInt32 npcId);
         void sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid);
 
+        void process(UInt32 now);
+        void sendDaily(Player* player);
+
     private:
         typedef std::vector<TeamData*> CopyTeams;
         typedef std::map<UInt32, TeamData*> AllCopyTeams;
@@ -159,6 +162,9 @@ class TeamCopy
         LevelTeamCnt m_clvTeamCnt[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         AllCopyTeams m_allCopyTeams;
         TeamCopyNpc m_tcNpcId[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
+        bool _notify1;
+        bool _notify2;
+        bool _isDoubleExp;
 };
 
 extern TeamCopy* teamCopyManager;

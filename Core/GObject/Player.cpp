@@ -5700,6 +5700,9 @@ namespace GObject
 		send((st));
 
         worldBoss.sendDaily(this);
+        heroIsland.sendDaily(this);
+        globalCountryBattle.sendDaily(this);
+        teamCopyManager->sendDaily(this);
 	}
 
 	void Player::regenAll(bool full)

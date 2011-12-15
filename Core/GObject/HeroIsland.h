@@ -186,6 +186,7 @@ public:
     void end(UInt32 now);
     void reset();
     void disperse(UInt32 now);
+    void sendDaily(Player* player);
 
     UInt8 getIdentity(Player* player, bool = false);
     bool enter(Player* player, UInt8 type, UInt8 spot, bool movecd = true);
