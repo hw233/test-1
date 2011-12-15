@@ -31,6 +31,7 @@
 #include "HeroIsland.h"
 #include "MsgID.h"
 #include "GObject/DCLogger.h"
+#include "GObject/TeamCopy.h"
 
 namespace GObject
 {
@@ -337,6 +338,11 @@ void World::World_Boss_Refresh(void*)
     worldBoss.process(TimeUtil::Now());
 }
 
+void World::Team_Copy_Process(void*)
+{
+    teamCopyManager->process(TimeUtil::Now());
+}
+
 bool World::Init()
 {
 	GObjectManager::delayLoad();
@@ -370,6 +376,7 @@ bool World::Init()
     UInt32 athChkPoint = TimeUtil::SharpDayT(0, now) + EXTRAREWARDTM;
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 
+    AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
 	return true;
 }
 

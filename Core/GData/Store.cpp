@@ -27,7 +27,7 @@ void Store::addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceN
     exchange.priceID = static_cast<UInt16>(priceID);
     exchange.priceNum = static_cast<UInt16>(priceNum);
 	_itemsExchange[type - EXCHANGE].push_back(exchange);
-	_itemPrices[type - EXCHANGE][itemId] = priceID + (priceNum << 16);
+	_itemPricesExchange[type - EXCHANGE][itemId] = priceID + (priceNum << 16);
 }
 
 UInt32 Store::getPrice( UInt8 type, UInt16 itemId )

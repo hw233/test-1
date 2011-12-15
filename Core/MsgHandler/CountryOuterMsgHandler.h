@@ -2504,7 +2504,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	}
 	else
 	{
-		price *= lr._count;
+        if (lr._type < 8)
+            price *= lr._count;
 		switch(lr._type)
 		{
 		case 4:
@@ -2647,6 +2648,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
             {
                 UInt32 priceID = price&0xFFFF;
                 UInt32 priceNum = (price>>16)&0xFF;
+                priceNum *= lr._count;
 
                 if (player->GetPackage()->GetItemAnyNum(priceID) < priceNum)
                 {
@@ -2835,7 +2837,7 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
     UInt8 type = 0;
     if (isdigit(key.key[0]) && key.key[1] == '-')
         type = key.key[0] - '0';
-    if (!type)
+    if (!type || type == 9)
         type = 3;
 
     if (type && !GameAction()->testTakePackSize(player, type))
