@@ -57,6 +57,7 @@ enum PurchaseType
     HeroIslandSkill,
     HeroIslandAuto,
     DailyActivity,
+    ForEquipUpgrade,    
 };
 
 enum IncomingType
@@ -119,6 +120,7 @@ enum ItemFrom
     FromHeroIsland,
     FromAttainment,
     FromDailyActivity,
+    FromEquipUpgrade,
 };
 
 enum ItemTo
@@ -139,6 +141,7 @@ enum ItemTo
 	ToGemAttach,	
 	ToTrainFighter,	
 	ToTrumpUpgrade,	
+    ToEquipUpgrade,
 };
 
 

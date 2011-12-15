@@ -87,6 +87,7 @@ namespace GObject
 		bool   DelEquip(UInt32 id, UInt8 toWhere = 0);
 		bool   DelEquip2(ItemEquip *, UInt8 toWhere = 0);
 		bool   DelEquip3(ItemEquip *);
+        UInt8  GetPart(ItemEquip*);
 		bool   EquipTo(UInt32 id, Fighter * fgt, UInt8 part, ItemEquip *&, bool = false);
 		UInt32 SellItem(UInt32 id, UInt16 num, bool bind = false);
 		UInt32 SellEquip(UInt32 id);
@@ -156,6 +157,9 @@ namespace GObject
 		static const GData::ItemBaseType * GetItemBaseType(const std::string&);
 		ItemEquip * FindEquip(Fighter *& fgt, UInt8& pos, UInt16 fgtId, UInt32 id);
 
+        ItemEquip* AddUpgradeEquip(UInt32 typeId, bool notify, bool bind , ItemEquipData& ed);
+        const GData::ItemBaseType*  CheckBeforeEquipUpgrade(UInt32 typeId);
+        UInt8 EquipUpgrade( UInt16 fighterId, UInt32 itemId , UInt32* pNewID);
 	private:
 		static UInt16 GetNewUsedGrids(const GData::ItemBaseType& type, UInt16 num);
 		static UInt16 GetNewUsedGrids(UInt32 id, UInt16 num = 1);

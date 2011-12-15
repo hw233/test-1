@@ -244,6 +244,8 @@ namespace GObject
         static  vMergeStfs   _vMergeStfs;
         static  mMergeStfsIndex  _mMergeStfsIndex;
 
+        //static std::map<UInt32, UInt32>  _EUpgradeIdMap;
+
         public:
         static  vMergeStfs  getMergeStfs( UInt32 id)
         {
@@ -262,6 +264,14 @@ namespace GObject
             }
             return re;
         }
+        /*
+        static UInt32 getEUpgradeId(UInt32 id)
+        {
+            std::map<UInt32, UInt32> ::iterator it = _EUpgradeIdMap.find(id);
+            if(it != _EUpgradeIdMap.end())
+                return it->second;
+             return 0;
+        }*/
 
 	};
 }

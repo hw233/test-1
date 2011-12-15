@@ -23,7 +23,7 @@
 #include "FighterProb.h"
 #include "Money.h"
 #include "Common/StringTokenizer.h"
-
+#include "EUpgradeTable.h"
 #include "Script/lua_tinker.h"
 
 namespace GData
@@ -105,6 +105,12 @@ namespace GData
 			fprintf(stderr, "Load FormationData Error !\n");
 			return false;
 		}
+
+        if(!LoadEUpgradeData())
+        {
+            fprintf(stderr, "Load EUpgradeData Error !\n");
+            return false;
+        }
 		if (!LoadTaskTypeData())
 		{
 			fprintf(stderr, "Load TaskTypeData Error !\n");
@@ -1333,6 +1339,40 @@ namespace GData
 		return true;
 	}
 
+    bool GDataManager::LoadEUpgradeData()
+    {
+         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+          if (execu.get() == NULL || !execu->isConnected()) return false;
+
+          DBEUpgrade dbeu;
+          if(execu->Prepare("SELECT `eqid`, `stuff`,`targetid`  FROM `eupgrade`", dbeu) != DB::DB_OK)
+            return false;
+
+        while(execu->Next() == DB::DB_OK)
+        {
+            StringTokenizer tk(dbeu.stfs, "|");
+            size_t cnt = tk.count();
+            if(cnt == 0)
+                continue;
+
+           stEUpgradeItem& item = eUpgradeTable[dbeu.id]; 
+           item.toId = dbeu.toId;
+
+            for(size_t j = 0; j < cnt; ++ j)
+            {
+                StringTokenizer tk2(tk[j], ",");
+                size_t tcnt = tk2.count();
+                if(tcnt < 2)
+                    continue;
+                stUseItem itm;
+                itm.id = atoi(tk2[0].c_str());
+                itm.num = atoi(tk2[1].c_str());
+                item.stfs.push_back(itm);
+            }
+
+       }
+        return true;
+    }
 	bool GDataManager::LoadLootData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());

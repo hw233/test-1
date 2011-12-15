@@ -272,7 +272,12 @@ struct DBLootItem
 	std::string table;
 	UInt8 isPack;
 };
-
+struct DBEUpgrade
+{
+    UInt32 id;
+    std::string stfs;
+    UInt32 toId;
+};
 struct DBStoreItem
 {
 	UInt8 type;
@@ -423,6 +428,15 @@ SPECIALDEF(3)
 	UInt32, id,
 	std::string, table,
 	UInt8, isPack
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBEUpgrade)
+SPECIALDEF(3)
+	(
+	UInt32, id,
+	std::string, stfs,
+    UInt32, toId
 	)
 SPECIALEND()
 

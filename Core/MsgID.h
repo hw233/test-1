@@ -303,6 +303,8 @@ namespace REQ
     const UInt8 EQ_TRUMP_UPGRADE    = 0xB7;
     /** 法宝升阶*/
     const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
+    /***装备升级*/
+    const UInt8 EQ_UPGRADE          = 0xB9;
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
 }
@@ -365,6 +367,7 @@ namespace REP
     const UInt8 EQ_ACTIVE           = 0x4C;
     const UInt8 EQ_TRUMP_UPGRADE    = 0xB7;
     const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
+    const UInt8 EQ_UPGRADE          = 0xB9;
 
     const UInt8 CITY_INSIDE_MOVE    = 0xA0;// 0x51
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52
