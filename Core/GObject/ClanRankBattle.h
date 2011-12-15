@@ -1,6 +1,7 @@
 #ifndef _CLAN_RANK_BATTLE_H_
 #define _CLAN_RANK_BATTLE_H_
 
+#include <set>
 #include <map>
 #include <vector>
 #include "Config.h"
@@ -270,6 +271,7 @@ namespace GObject
         typedef std::map<UInt32, ClanRankBattle*> BattleMap;
         typedef std::vector<Clan*> ClanVec;
         typedef std::vector<Player*> PlayerVec;
+        typedef std::set<Player*> PlayerSet;
 
         /**
          *@brief 战斗状态
@@ -370,11 +372,6 @@ namespace GObject
         void SortClans();
 
         /**
-         *@brief 没得到机会
-         */
-        void SetNoTurns(ClanRankBattleInfo* clan);
-
-        /**
          *@brief 给经验奖励，一分钟一次
          */
         void CheckAddExp();
@@ -391,9 +388,11 @@ namespace GObject
         
         //参加战斗的帮会列表
         ClanMap m_Clans;
-
         //当前帮会积分排名
         ClanVec m_ClanRanking;
+        //在据点上的玩家列表
+        PlayerSet m_InplacePlayers;
+
         
         //播报报名公告倒计时
         UInt32 m_SignupCountDown;

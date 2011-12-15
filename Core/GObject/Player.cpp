@@ -605,6 +605,8 @@ namespace GObject
 		{
 			globalCountryBattle.addAutoCB(this);
 		}
+        
+        ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		setBlockBossByLevel();
 		return true;

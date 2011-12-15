@@ -16,6 +16,8 @@ namespace GObject
     const static UInt32 BATTLE_TIME = 5 * 60;
     //完整战斗时间
     const static UInt32 FULL_BATTLE_TIME = PREPARE_TIME + BATTLE_TIME;
+    //每天战斗次数
+    const static UInt32 BATTLE_NUM_PER_DAY = 8;
 
 
     //每个战场的分数
@@ -232,7 +234,7 @@ namespace GObject
 
                     int turns = 0;
                     UInt32 rid = 0;
-                    bool fightRes = player1->challenge(player2, &rid, &turns, false, 0, true, Battle::BS_COPY5, 0);
+                    bool fightRes = player1->challenge(player2, &rid, &turns, false, 0, true, Battle::BS_COPY5, 0x03);
                     player1->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
                     player2->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
 
@@ -337,10 +339,12 @@ namespace GObject
 
     void ClanRankBattleField::End(UInt32 extScore1, UInt32 extScore2)
     {
-        m_WaitPlayers[m_Clan1].assign(m_DeadPlayers[m_Clan1].begin(), m_DeadPlayers[m_Clan1].end());
-        m_WaitPlayers[m_Clan2].assign(m_DeadPlayers[m_Clan2].begin(), m_DeadPlayers[m_Clan2].end());
-
         PlayerVec& players1 = m_WaitPlayers[m_Clan1];
+        PlayerVec& players2 = m_WaitPlayers[m_Clan2];
+
+        players1.insert(players1.end(), m_DeadPlayers[m_Clan1].begin(), m_DeadPlayers[m_Clan1].end());
+        players2.insert(players2.end(), m_DeadPlayers[m_Clan2].begin(), m_DeadPlayers[m_Clan2].end());
+
         for(PlayerVec::iterator iter = players1.begin();
                 iter != players1.end(); ++iter)
         {
@@ -358,7 +362,6 @@ namespace GObject
             ResetPlayerData(player);
         }
 
-        PlayerVec& players2 = m_WaitPlayers[m_Clan2];
         for(PlayerVec::iterator iter = players2.begin();
                 iter != players2.end(); ++iter)
         {
@@ -509,7 +512,8 @@ namespace GObject
                         PlayerVec& players1 = m_Clan1->players[i];
                         for(PlayerVec::iterator iter = players1.begin(); iter != players1.end(); ++iter)
                         {
-                            if((*iter)->getLocation() == RANK_BATTLE_LOCATION) battleList1.push_back(*iter); //选取当前在国战点上的玩家战斗
+                            if((*iter)->getLocation() == RANK_BATTLE_LOCATION
+                                    && (*iter)->getThreadId() == WORKER_THREAD_NEUTRAL)  battleList1.push_back(*iter); //选取当前在国战点上的玩家战斗
                         }
                     }
 
@@ -521,7 +525,8 @@ namespace GObject
                         PlayerVec& players2 = m_Clan2->players[i];
                         for(PlayerVec::iterator iter = players2.begin(); iter != players2.end(); ++iter)
                         {
-                            if((*iter)->getLocation() == RANK_BATTLE_LOCATION) battleList2.push_back(*iter);
+                            if((*iter)->getLocation() == RANK_BATTLE_LOCATION
+                                    && (*iter)->getThreadId() == WORKER_THREAD_NEUTRAL)  battleList2.push_back(*iter);
                         }
                     }
                     
@@ -578,8 +583,9 @@ namespace GObject
             if(msg != NULL)
             {
                 msg->getvap(&stream1, m_Clan2->clan->getName().c_str());
+                m_Clan1->clan->broadcast(stream1);
                 msg->getvap(&stream2, m_Clan1->clan->getName().c_str());
-                Broadcast(stream1, true);
+                m_Clan2->clan->broadcast(stream2);
             }
             m_Clan1->battle = this;
             m_Clan2->battle = this;
@@ -694,7 +700,7 @@ namespace GObject
 
         if(player->getGold() < skill->price)
         {
-            player->sendMsgCode(0, 1101);
+            player->sendMsgCode(0, 1104);
             return;
         }
 
@@ -872,7 +878,7 @@ namespace GObject
             //倒计时
             m_SignupCountDown = (m_StartTime + RANK_BATTLE_SIGNUP_TIME - m_Now) / 60;
         }
-        else if(m_Now < m_StartTime + RANK_BATTLE_SIGNUP_TIME + FULL_BATTLE_TIME * 3) //战斗时间
+        else if(m_Now < m_StartTime + RANK_BATTLE_SIGNUP_TIME + FULL_BATTLE_TIME * BATTLE_NUM_PER_DAY) //战斗时间
         {
             //获取有资格的帮会
             GetCanBattleClans(false);
@@ -1017,8 +1023,6 @@ namespace GObject
             info->RemovePlayer(player);
             if(info->battle != NULL) info->battle->OnPlayerLeave(player);
 
-            player->autoRegenAll();
-            
             //更新列表
             Stream stream(REP::CLAN_RANKBATTLE_REP);
             stream << UInt8(7);
@@ -1039,15 +1043,18 @@ namespace GObject
 
     void ClanRankBattleMgr::PlayerEnter(Player* player)
     {
-        if(m_State != STATE_BATTLE) return;
-
         if(player->getLocation() != RANK_BATTLE_LOCATION) return;
+        if(!m_InplacePlayers.insert(player).second) return;
+        
+        if(m_State != STATE_BATTLE) return;
 
         Clan* clan = player->getClan();
         if(clan == NULL) return;
 
         ClanRankBattleInfo* info = GetClanInfo(clan->getId());
         if(info == NULL) return; //帮会没参加
+
+        if(!info->HasPlayer(player)) return;
        
         UInt32 field = clan->GetRankBattleField(player, m_Now);
         if(field >= RANK_BATTLE_FIELD_NUM) return;
@@ -1056,16 +1063,19 @@ namespace GObject
         Stream stream(REP::CLAN_RANKBATTLE_REP);
         stream << UInt8(9);
         stream << player->getId();
-        stream << UInt8(player->getLocation() == RANK_BATTLE_LOCATION ? 1 : 0);
+        stream << UInt8(1);
         stream << Stream::eos;
-        player->send(stream);
+        info->Broadcast(stream);
     }
 
     void ClanRankBattleMgr::PlayerLeave(Player* player)
     {
-        if(m_State != STATE_BATTLE) return;
-        
         if(player->getLocation() != RANK_BATTLE_LOCATION) return;
+        PlayerSet::iterator iter = m_InplacePlayers.find(player);
+        if(iter == m_InplacePlayers.end()) return;
+        m_InplacePlayers.erase(iter);
+        
+        if(m_State != STATE_BATTLE) return;
 
         Clan* clan = player->getClan();
         if(clan == NULL) return;
@@ -1077,15 +1087,13 @@ namespace GObject
 
         if(info->battle != NULL) info->battle->OnPlayerLeave(player);
 
-        player->autoRegenAll();
-
         //通知状态变化
         Stream stream(REP::CLAN_RANKBATTLE_REP);
         stream << UInt8(9);
         stream << player->getId();
-        stream << UInt8(player->getLocation() == RANK_BATTLE_LOCATION ? 1 : 0);
+        stream << UInt8(0);
         stream << Stream::eos;
-        player->send(stream);
+        info->Broadcast(stream);
     }
 
 
@@ -1281,9 +1289,9 @@ namespace GObject
                 }
                 break;
             case STATE_BATTLE:
-                if(m_StartTime + RANK_BATTLE_SIGNUP_TIME + 3 * FULL_BATTLE_TIME > m_Now)
+                if(m_StartTime + RANK_BATTLE_SIGNUP_TIME + BATTLE_NUM_PER_DAY * FULL_BATTLE_TIME > m_Now)
                 {
-                    time = m_StartTime + RANK_BATTLE_SIGNUP_TIME + 3 * FULL_BATTLE_TIME - m_Now;
+                    time = m_StartTime + RANK_BATTLE_SIGNUP_TIME + BATTLE_NUM_PER_DAY * FULL_BATTLE_TIME - m_Now;
                 }
                 break;
         }
@@ -1410,9 +1418,9 @@ namespace GObject
                 }
                 break;
             case STATE_BATTLE:
-                if(m_StartTime + RANK_BATTLE_SIGNUP_TIME + 3 * FULL_BATTLE_TIME > m_Now)
+                if(m_StartTime + RANK_BATTLE_SIGNUP_TIME + BATTLE_NUM_PER_DAY * FULL_BATTLE_TIME > m_Now)
                 {
-                    time = m_StartTime + RANK_BATTLE_SIGNUP_TIME + 3 * FULL_BATTLE_TIME - m_Now;
+                    time = m_StartTime + RANK_BATTLE_SIGNUP_TIME + BATTLE_NUM_PER_DAY * FULL_BATTLE_TIME - m_Now;
                 }
                 break;
         }
@@ -1585,7 +1593,7 @@ namespace GObject
         {
             EndOneBattle();
 
-            if(++m_BattleNo > 3) //今天的比赛结束了
+            if(++m_BattleNo > BATTLE_NUM_PER_DAY) //今天的比赛结束了
             {
                 //第二天战斗开始时间
                 m_Clans.clear();
@@ -1833,23 +1841,17 @@ namespace GObject
         if(m_Now < m_expTime) return;
        
 
-        class AddExpVisitor : public PlayerVisitor
+        for(PlayerSet::iterator iter = m_InplacePlayers.begin();
+                iter != m_InplacePlayers.end(); ++iter)
         {
-        public:
-            bool operator()(Player* player)
+            Player* player = *iter;
+            if(player->getLocation() == RANK_BATTLE_LOCATION
+                && player->getThreadId() == WORKER_THREAD_NEUTRAL)
             {
                 UInt32 exp = ((player->GetLev() - 10) * UInt32(player->GetLev() / 10) * 5 + 25) * 2;
                 player->AddExp(exp);
-                return true;
             }
-        };
-        AddExpVisitor visitor;
-            
-        Map* map = Map::FromSpot(RANK_BATTLE_LOCATION);
-        if(map != NULL)
-        {
-            map->VisitPlayers(visitor, RANK_BATTLE_LOCATION);
-        }
+        } 
 
         m_expTime = m_Now + 60;
     }
