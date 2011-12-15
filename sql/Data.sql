@@ -245,6 +245,7 @@ CREATE TABLE `item_template` (
   `subClass` tinyint(3) NOT NULL COMMENT '物品类型',
   `career` tinyint(3) NOT NULL COMMENT '职业',
   `reqLev` smallint(6) NOT NULL DEFAULT '1' COMMENT '等级需求',
+  `vLev` smallint(6) NOT NULL DEFAULT '1' COMMENT '价值等级',
   `coin` int(10) NOT NULL COMMENT '铜币售价',
   `quality` tinyint(3) NOT NULL COMMENT '品质',
   `maxQuantity` smallint(6) NOT NULL DEFAULT '1' COMMENT '最大堆叠数量',

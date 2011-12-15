@@ -23,6 +23,12 @@ namespace GObject
 	class Fighter;
 	class Player;
 
+    struct SplitItemOut
+    {
+        UInt16 itemId;
+        UInt16 count;
+    };
+
 	struct ItemKey
 	{
 		ItemKey(UInt32 id_ = 0, bool bind_ = false):
@@ -135,7 +141,7 @@ namespace GObject
 		UInt8 MergeGem(UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid);
 		UInt8 AttachGem(UInt16 fighterId, UInt32 itemId, UInt32 gemId, bool bind);
 		UInt8 DetachGem(UInt16 fighterId, UInt32 itemId, UInt8 pos, UInt8 protect);
-		UInt8 Split(UInt32 itemId, UInt32& enchantId, UInt8& count, /*bool protect,*/ bool silence = false);
+		UInt8 Split(UInt32 itemId, std::vector<SplitItemOut>& splitOut, /*bool protect,*/ bool silence = false);
 		UInt8 Exchange(UInt32 * itemId, UInt32& resultId);
 		UInt8 Forge(UInt16 fighterId, UInt32 itemId, /*UInt8 t,8*/ UInt8 * types, Int16 * values, UInt8 protect);
 		UInt8 ExchangeSet(UInt32 * itemId, UInt8 type, UInt32& resultId);

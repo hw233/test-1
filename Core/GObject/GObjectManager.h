@@ -37,6 +37,11 @@ namespace GObject
         UInt32  m_to;
     };
 
+    struct stAttrMax
+    {
+        stAttrMax() { memset( attrMax, 0, sizeof(attrMax)); }
+        float attrMax[3][4][9];
+    };
 
 	class GObjectManager
 	{
@@ -118,8 +123,6 @@ namespace GObject
             return _trump_maxrank_chance[idx];
         }
 
-        static float  getTrumpAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr ) { return _trumpAttrMax[q][crr][lvl][t]; }
-
         static float getHiterateMax() { return _hiterate_max; }
         static float getEvadeMax() { return _evade_max; }
         static float getCriticalMax() { return _critical_max; }
@@ -131,7 +134,23 @@ namespace GObject
 
         static UInt16 getAttrTypeChance(UInt8 q, UInt8 idx) { return _attrTypeChances[q][idx]; }
         static UInt16 getAttrChance( UInt8 q, UInt8 idx ) { return _attrChances[q][idx]; }
-        static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr ) { return _attrMax[q][crr][lvl][t]; }
+        static float  getAttrMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
+        {
+            if(q > 2)
+                q = 2;
+            if(t > 8)
+                t = 8;
+            if(crr > 3)
+                crr = 3;
+            std::map<UInt8, stAttrMax*>::iterator it = _attrMax.find(lvl);
+            stAttrMax* attr = NULL;
+            if(it != _attrMax.end())
+                attr = it->second;
+            else
+                attr = _attrMax[10];
+
+            return attr->attrMax[q][crr][t];
+        }
         static UInt16 getAttrDics(UInt8 q, UInt8 idx) { return _attrDics[q][idx]; }
 
         static UInt32 getColorFighterChance(UInt16 idx, UInt8 f_g, UInt8 color )
@@ -184,6 +203,43 @@ namespace GObject
             return _yellow_diamond_gem;
         }
 
+        static UInt32 getTeamMatieralChance(UInt8 q)
+        {
+            if(q > 2)
+                q = 2;
+
+            return _team_m_chance[q];
+        }
+
+        static UInt32 getTeamMatieralItemFromSplit(UInt8 q)
+        {
+            if(q > 2)
+                q = 2;
+
+            return _team_m_item[q];
+        }
+
+        static UInt32 getOrangeTeamMatieralChance(UInt32 itemId, UInt8 type)
+        {
+            if(type > 2)
+                type = 0;
+
+            std::map<UInt32, UInt32>::iterator it = _team_om_chance[type].find(itemId);
+            if(it != _team_om_chance[type].end())
+                return it->second;
+            else
+                return 0;
+        }
+
+        static UInt32 getOrangeTeamMatieralItemFromSplit(UInt32 itemId)
+        {
+            std::map<UInt32, UInt32>::iterator it = _team_om_item.find(itemId);
+            if(it != _team_om_item.end())
+                return it->second;
+            else
+                return 0;
+        }
+
        	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -198,11 +254,10 @@ namespace GObject
 		static UInt32 _trump_lorder_chance[6][12];
 		static UInt32 _trump_exp_rank[6][12];
 		static AttrFactor _trump_rank_factor[6][12];
-		static float  _trumpAttrMax[3][4][12][9];
 
 		static UInt16 _attrTypeChances[3][9];
 		static UInt16 _attrChances[3][9];
-		static float  _attrMax[3][4][12][9];
+		static std::map<UInt8, stAttrMax*> _attrMax;
         static UInt16 _attrDics[3][9];
 
         static UInt32 _socket_chance[6];
@@ -244,6 +299,11 @@ namespace GObject
         typedef std::map <UInt32,  std::vector<UInt32> >  mMergeStfsIndex;
         static  vMergeStfs   _vMergeStfs;
         static  mMergeStfsIndex  _mMergeStfsIndex;
+
+        static UInt32 _team_m_chance[3];
+        static UInt32 _team_m_item[3];
+        static std::map<UInt32, UInt32> _team_om_chance[3];
+        static std::map<UInt32, UInt32> _team_om_item;
 
         public:
         static  vMergeStfs  getMergeStfs( UInt32 id)
