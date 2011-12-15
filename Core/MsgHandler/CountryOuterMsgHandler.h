@@ -1621,6 +1621,8 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
     st << cnt;
     for(UInt16 idx = 0; idx < cnt; ++idx)
     {
+        SYSMSG_SENDV(102, player, splitOut[idx].itemId, splitOut[idx].count);
+        SYSMSG_SENDV(1002, player, splitOut[idx].itemId, splitOut[idx].count);
         st << splitOut[idx].itemId << splitOut[idx].count;
     }
 
