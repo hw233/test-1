@@ -5,7 +5,8 @@
 #include "Package.h"
 #include "Server/Cfg.h"
 #include "GData/Money.h"
-
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 namespace GObject
 {
@@ -954,6 +955,7 @@ void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass, bool notify)
         sendUpdateTeamCopyInfo(copyId);
 
     DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
+
 }
 
 void TeamCopyPlayerInfo::setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)
@@ -989,6 +991,11 @@ void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
 
     ++m_passTimes[t][copyIdx];
 
+    if(m_passTimes[t][copyIdx] == 1)
+    {
+
+               GameAction()->doAty(m_owner, AtyGroupCopy, 1,0);
+    }
     UInt32 now = TimeUtil::Now();
     if(now > m_vTime[t][copyIdx])
     {
@@ -1202,6 +1209,17 @@ void TeamCopyPlayerInfo::resetTCPlayer()
     memset(m_passTimes, 0, sizeof(m_passTimes));
 }
 
+UInt8 TeamCopyPlayerInfo::getPassNum()
+{
+    UInt8 num = 0;
+    for (UInt8 i = 0 ; i < TEAMCOPY_MAXCOPYCNT ; i ++)
+    {
+        for(UInt8 j = 0 ; j < TEAMCOPY_MAXTYPECNT; j ++)
+        if( m_passTimes[j][i] )
+            num ++;
+    }
+    return num;
+}
 }
 
 

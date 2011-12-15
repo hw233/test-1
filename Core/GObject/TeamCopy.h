@@ -99,6 +99,7 @@ class TeamCopyPlayerInfo
         void reqTeamCopyInfo();
         void sendUpdateTeamCopyInfo(UInt8 copyId);
         void resetTCPlayer();
+        UInt8 getPassNum();
 };
 
 
