@@ -24,7 +24,7 @@ class Player;
 #define TEAMCOPY_MAXPWDCNT  6 
 #define TEAMCOPY_MAXTEAMCNT 600 
 
-static const UInt32 TEAMCOPY_EXTRAREWARDTM1 = 7 * 3600;
+static const UInt32 TEAMCOPY_EXTRAREWARDTM1 = 19 * 3600;
 static const UInt32 TEAMCOPY_EXTRAREWARDTM2 = 11 * 3600;
 
 struct TeamData
