@@ -1133,6 +1133,7 @@ void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
 	if(r == NULL)
 		return;
     st.append(&(*r)[4], r->size() - 4);
+    st << Stream::eos;
 	player->send(st);
 }
 

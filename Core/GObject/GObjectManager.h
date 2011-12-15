@@ -300,6 +300,7 @@ namespace GObject
         static  vMergeStfs   _vMergeStfs;
         static  mMergeStfsIndex  _mMergeStfsIndex;
 
+        //static std::map<UInt32, UInt32>  _EUpgradeIdMap;
         static UInt32 _team_m_chance[3];
         static UInt32 _team_m_item[3];
         static std::map<UInt32, UInt32> _team_om_chance[3];
@@ -323,6 +324,14 @@ namespace GObject
             }
             return re;
         }
+        /*
+        static UInt32 getEUpgradeId(UInt32 id)
+        {
+            std::map<UInt32, UInt32> ::iterator it = _EUpgradeIdMap.find(id);
+            if(it != _EUpgradeIdMap.end())
+                return it->second;
+             return 0;
+        }*/
 
 	};
 }

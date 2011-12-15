@@ -469,13 +469,13 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
         return;
     }
 
+    CopyData& tcd = getCopyData(pl, id);
+    if (!tcd.floor)
+        return;
+
     switch (type) {
         case 0:
             {
-                CopyData& tcd = getCopyData(pl, id);
-                if (!tcd.floor)
-                    return;
-
                 if (!init) {
                     if (pl->hasFlag(Player::AutoCopy)) {
                         pl->sendMsgCode(0, 1414);
@@ -548,8 +548,6 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                 autoClear(pl);
 
-                CopyData& tcd = getCopyData(pl, id);
-                if (!tcd.floor) return;
                 Stream st(REP::AUTO_COPY);
                 st << static_cast<UInt8>(1) << id << tcd.floor << tcd.spot << Stream::eos;
                 pl->send(st);
@@ -579,8 +577,6 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                 autoClear(pl);
                 pl->addFlag(Player::AutoCopy);
 
-                CopyData& tcd = getCopyData(pl, id);
-                if (!tcd.floor) return;
                 UInt8 sp = tcd.spot;
                 for (UInt8 f = tcd.floor; f <= GData::copyMaxManager[id]; ++f) {
                     UInt8 s = GData::copyManager[id<<8|f].size();

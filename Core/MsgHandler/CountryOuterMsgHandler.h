@@ -602,7 +602,13 @@ struct TrumpLOrderReq
     UInt32 _itemId;
     MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
 };
+struct EquipUpgradeReq
+{
+    UInt16 _fgtId;
+    UInt32 _itemId;
+    MESSAGE_DEF2(REQ::EQ_UPGRADE, UInt16, _fgtId, UInt32, _itemId);
 
+};
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -1598,11 +1604,17 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 		}
 
 		if(pkg->Split(itemId, splitOut, /*false,*/ true) == 2)
+        {
+            amount -= GData::moneyNeed[GData::SPLIT].tael;
 			break;
+        }
 	}
 
-    ConsumeInfo ci(SplitEquipment,0,0);
-    player->useTael(amount, &ci);
+    if(amount > 0)
+    {
+        ConsumeInfo ci(SplitEquipment,0,0);
+        player->useTael(amount, &ci);
+    }
 
 	Stream st(REP::EQ_BATCH_DECOMPOSE);
 	st << flag;
@@ -1611,6 +1623,8 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
     st << cnt;
     for(UInt16 idx = 0; idx < cnt; ++idx)
     {
+        SYSMSG_SENDV(102, player, splitOut[idx].itemId, splitOut[idx].count);
+        SYSMSG_SENDV(1002, player, splitOut[idx].itemId, splitOut[idx].count);
         st << splitOut[idx].itemId << splitOut[idx].count;
     }
 
@@ -3630,6 +3644,28 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 	Stream st(REP::EQ_TRUMP_L_ORDER);
 	st << res << req._fgtId << req._itemId << Stream::eos;
 	player->send(st);
+}
+
+void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
+{
+
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    Package * pkg = player->GetPackage();
+    UInt32 newId = 0;
+    UInt16 fid = req._fgtId;
+    UInt8 res = pkg->EquipUpgrade(req._fgtId, req._itemId,  &newId , &fid);
+
+
+    Stream st(REP::EQ_UPGRADE);
+    if(res == 0)
+        st << res << fid << newId << Stream::eos;
+    else
+        st << res << fid << req._itemId << Stream::eos;
+
+    printf("%u\n", fid);
+    player->send(st);
 }
 void OnActivityList( GameMsgHdr& hdr, const void * data)
 {

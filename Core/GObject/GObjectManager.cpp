@@ -116,7 +116,7 @@ namespace GObject
 
     GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
     std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
-
+    //std::map <UInt32, UInt32>  GObjectManager::_EUpgradeIdMap;
 	bool GObjectManager::InitIDGen()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -2870,6 +2870,45 @@ namespace GObject
                         }
                       _vMergeStfs.push_back(s); 
                  }
+            }
+
+            {
+                /*lua_tinker::table t = lua_tinker::call<lua_tinker::table>(L, "getEUpgradeIdMap");
+                UInt32  tSize = t.size();
+                for (UInt32 i = 0; i< tSize; i++)
+                {
+                    lua_tinker::table t_idmap = t.get< lua_tinker::table >(i + 1);
+                    if(t_idmap.size() == 2)
+                    {
+                        lua_tinker::table  t_from = t_idmap.get< lua_tinker::table >(1);
+
+                        lua_tinker::table  t_to = t_idmap.get< lua_tinker::table >(2);
+                        
+                        UInt32 sFrom = t_from.size();
+                        UInt32 sTo = t_to.size();
+                        if(sFrom  == sTo)
+                        {
+                            if(sFrom == 1)
+                                _EUpgradeIdMap[t_from.get<UInt32>(1)] = t_to.get<UInt32>(1);
+                            else if(sFrom == 2)
+                            {
+                                UInt32 fromId1 = t_from.get<UInt32>(1) ;
+                                UInt32 fromId2 = t_from.get<UInt32>(2);
+                                UInt32 toId1 = t_to.get<UInt32>(1);
+                                UInt32 toId2 = t_to.get<UInt32>(2);
+                                if(fromId1 < fromId2 && toId1 < toId2 &&  fromId2 - fromId1 == toId2 - toId1 )
+                                {
+                                   do
+                                   {
+                                       _EUpgradeIdMap[fromId1 ++ ] = toId1 ++ ;
+                                   }
+                                    while(fromId1 != fromId2);
+                                }
+                            }
+                        }
+
+                    }
+                }*/
             }
 			for(UInt8 t = 0; t < 2; ++t) 
             {

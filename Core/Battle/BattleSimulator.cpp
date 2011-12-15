@@ -1514,6 +1514,9 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         if(NULL == bo)
             return 0;
 
+        if(bo->getHP() == 0)
+            return 0;
+
         if(bf->getHP() > 0 && bo->getHP() > 0)
         {
             DefStatus defList[25];

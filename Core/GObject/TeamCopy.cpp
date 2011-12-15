@@ -487,7 +487,7 @@ void TeamCopy::leaveTeam(Player* pl)
 
     sendTeamCopyPageUpdate(copyId, t, ctp.start, ctp.end);
 
-    st << td->leader->getId() << pl->getId();
+    st << res;
     st << Stream::eos;
     // send team info to members ::TODO
     for(UInt8 j = 0; j < td->count; ++j)
@@ -818,7 +818,10 @@ void TeamCopy::teamBattleStart(Player* pl)
         if(pl == NULL)
             continue;
 
-        leaveTeamCopy(pl);
+        if( 1 == res )
+            leaveTeamCopy(pl);
+        else
+            leaveTeam(pl);
 
         bsim.applyFighterHP(0, pl);
 
@@ -860,7 +863,7 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
         {
             pl->_lastNg = ng;
 
-            if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
+            //if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
             {
                 UInt32 now = TimeUtil::Now();
                 UInt32 chkPoint1 = TimeUtil::SharpDayT(0, now) + TEAMCOPY_EXTRAREWARDTM1;

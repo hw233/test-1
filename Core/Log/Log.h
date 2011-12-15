@@ -59,6 +59,7 @@ enum PurchaseType
     TeamCopyAwardRoll,
     DailyActivity,
     ClanRankBattleSkill,
+    ForEquipUpgrade,    
 };
 
 enum IncomingType
@@ -122,6 +123,7 @@ enum ItemFrom
     FromTeamCopy,
     FromAttainment,
     FromDailyActivity,
+    FromEquipUpgrade,
 };
 
 enum ItemTo
@@ -142,6 +144,7 @@ enum ItemTo
 	ToGemAttach,	
 	ToTrainFighter,	
 	ToTrumpUpgrade,	
+    ToEquipUpgrade,
 };
 
 
