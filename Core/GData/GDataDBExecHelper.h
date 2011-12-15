@@ -30,6 +30,7 @@ struct DBItemType
 	UInt8		subClass;       // 物品类型 - 
     UInt8       career;         // 职业
 	UInt16		reqLev;         // 物品(可装备)等级
+	UInt16		vLev;           // 物品(价值)等级
 	UInt32		coin;           // 价格(铜)
 	UInt8		quality;        // 品质 1-白 2-绿 3-蓝 4-紫 5-橙
 	UInt16		maxQuantity;    // 最大重叠数
@@ -329,13 +330,14 @@ SPECIALDEF(5)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBItemType)
-SPECIALDEF(14)
+SPECIALDEF(15)
 	(
 	UInt32,		typeId,
 	std::string,name,
 	UInt8,		subClass,
     UInt8,      career,
 	UInt16,		reqLev,
+	UInt16,		vLev,
 	UInt32,		coin,
 	UInt8,		quality,
 	UInt16,		maxQuantity,

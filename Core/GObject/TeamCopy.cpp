@@ -5,7 +5,8 @@
 #include "Package.h"
 #include "Server/Cfg.h"
 #include "GData/Money.h"
-
+#include "Country.h"
+#include "Script/GameActionLua.h"
 
 namespace GObject
 {
@@ -17,7 +18,7 @@ const UInt8 TeamCopyPlayerInfo::_needRoll = 1;
 const UInt8 TeamCopyPlayerInfo::_hasRoll = 2;
 std::vector<TeamCopyAwards> TeamCopyPlayerInfo::_awards[TEAMCOPY_MAXCOPYCNT];
 
-TeamCopy::TeamCopy()
+TeamCopy::TeamCopy() : _notify1(false), _notify2(false), _isDoubleExp(false)
 {
     for(int t = 0; t < TEAMCOPY_MAXTYPECNT; ++t)
     {
@@ -804,8 +805,6 @@ void TeamCopy::teamBattleStart(Player* pl)
                 tcpInfo->setPass(copyId, 1, true, true);
             }
 
-            leaveTeamCopy(pl);
-
             if(t == 1)
             {
                 tcpInfo->setAwardRoll(copyId);
@@ -818,6 +817,8 @@ void TeamCopy::teamBattleStart(Player* pl)
         Player* pl = td->members[i-1];
         if(pl == NULL)
             continue;
+
+        leaveTeamCopy(pl);
 
         bsim.applyFighterHP(0, pl);
 
@@ -868,12 +869,11 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
                 if(flag)
                 {
                     pl->pendExp(ng->getExp());
-                    //TODO
-                    //ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
+                    ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
                 }
 
                 pl->pendExp(ng->getExp());
-                //ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
+                ng->getLoots(pl, pl->_lastLoot, td->count - 1, NULL);
             }
         }
 
@@ -887,6 +887,55 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
 
     if(rptid == 0)
         rptid = id;
+}
+
+void TeamCopy::process(UInt32 now)
+{
+    UInt32 notify1 = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60;
+    UInt32 notifyEnd1 = TimeUtil::SharpDayT(0,now) + 12 * 60 * 60;
+    UInt32 notify2 = TimeUtil::SharpDayT(0,now) + 19 * 60 * 60;
+    UInt32 notifyEnd2 = TimeUtil::SharpDayT(0,now) + 20 * 60 * 60;
+
+    if (now >= notify1 && now < notifyEnd1 && !_notify1)
+    {
+        _notify1 = true;
+        _isDoubleExp = true;
+        sendDaily(NULL);
+    }
+
+    if (now >= notify2 && now < notifyEnd2 && !_notify2)
+    {
+        _notify2 = true;
+        _isDoubleExp = true;
+        sendDaily(NULL);
+    }
+
+    if (now >= notifyEnd1 && notify2)
+    {
+        _isDoubleExp = false;
+        sendDaily(NULL);
+    }
+
+    if (now >= notifyEnd2 && _isDoubleExp)
+    {
+        _notify1 = _notify2 = false;
+        _isDoubleExp = false;
+        sendDaily(NULL);
+    }
+}
+
+void TeamCopy::sendDaily(Player* player)
+{
+    if (player && !_isDoubleExp)
+        return;
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(7);
+    st << static_cast<UInt8>(_isDoubleExp?0:1);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
 }
 
 TeamCopyPlayerInfo::TeamCopyPlayerInfo(Player* owner)
@@ -954,6 +1003,7 @@ void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass, bool notify)
         sendUpdateTeamCopyInfo(copyId);
 
     DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
+
 }
 
 void TeamCopyPlayerInfo::setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)
@@ -989,6 +1039,11 @@ void TeamCopyPlayerInfo::incPass(UInt8 copyId, UInt8 t)
 
     ++m_passTimes[t][copyIdx];
 
+    if(m_passTimes[t][copyIdx] == 1)
+    {
+
+               GameAction()->doAty(m_owner, AtyGroupCopy, 1,0);
+    }
     UInt32 now = TimeUtil::Now();
     if(now > m_vTime[t][copyIdx])
     {
@@ -1152,8 +1207,6 @@ bool TeamCopyPlayerInfo::getAward()
 
 void TeamCopyPlayerInfo::setAwardRoll(UInt8 rollId)
 {
-    // TODO
-    return;
     m_rollId = rollId;
     m_roll = _needRoll;
 
@@ -1202,6 +1255,17 @@ void TeamCopyPlayerInfo::resetTCPlayer()
     memset(m_passTimes, 0, sizeof(m_passTimes));
 }
 
+UInt8 TeamCopyPlayerInfo::getPassNum()
+{
+    UInt8 num = 0;
+    for (UInt8 i = 0 ; i < TEAMCOPY_MAXCOPYCNT ; i ++)
+    {
+        for(UInt8 j = 0 ; j < TEAMCOPY_MAXTYPECNT; j ++)
+        if( m_passTimes[j][i] )
+            num ++;
+    }
+    return num;
+}
 }
 
 

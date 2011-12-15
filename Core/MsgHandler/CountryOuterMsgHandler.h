@@ -1581,8 +1581,8 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 	br >> flag >> count;
 
 	Package * pkg = player->GetPackage();
-	UInt16 rcount[2] = {0, 0};
     UInt32 amount = 0;
+    std::vector<SplitItemOut> splitOut;
 
 	for(UInt16 i = 0; i < count; ++ i)
 	{
@@ -1590,8 +1590,6 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 
 		UInt32 itemId;
 		br >> itemId;
-		UInt32 outId;
-		UInt8 outCount;
 
 		if(player->getTael() < amount)
 		{
@@ -1599,21 +1597,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
             break;
 		}
 
-		if(pkg->Split(itemId, outId, outCount, /*false,*/ true) < 2)
-		{
-			switch(outId)
-			{
-			case ITEM_ENCHANT_L1:
-				rcount[0] += outCount;
-				break;
-			case ITEM_ENCHANT_L2:
-				rcount[1] += outCount;
-				break;
-			default:
-				break;
-			}
-		}
-		else
+		if(pkg->Split(itemId, splitOut, /*false,*/ true) == 2)
 			break;
 	}
 
@@ -1621,7 +1605,16 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
     player->useTael(amount, &ci);
 
 	Stream st(REP::EQ_BATCH_DECOMPOSE);
-	st << flag << rcount[0] << rcount[1] << Stream::eos;
+	st << flag;
+
+    UInt16 cnt = splitOut.size();
+    st << cnt;
+    for(UInt16 idx = 0; idx < cnt; ++idx)
+    {
+        st << splitOut[idx].itemId << splitOut[idx].count;
+    }
+
+    st << Stream::eos;
 	player->send(st);
 }
 
@@ -2513,7 +2506,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	}
 	else
 	{
-		price *= lr._count;
+        if (lr._type < 8)
+            price *= lr._count;
 		switch(lr._type)
 		{
 		case 4:
@@ -2656,6 +2650,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
             {
                 UInt32 priceID = price&0xFFFF;
                 UInt32 priceNum = (price>>16)&0xFF;
+                priceNum *= lr._count;
 
                 if (player->GetPackage()->GetItemAnyNum(priceID) < priceNum)
                 {
@@ -2844,7 +2839,7 @@ void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)
     UInt8 type = 0;
     if (isdigit(key.key[0]) && key.key[1] == '-')
         type = key.key[0] - '0';
-    if (!type)
+    if (!type || type == 9)
         type = 3;
 
     if (type && !GameAction()->testTakePackSize(player, type))

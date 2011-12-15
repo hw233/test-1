@@ -99,7 +99,7 @@ function GetMaxActivity(vip)
 
         return 165;
     else
-        ap = ap - 15;
+        ap = ap - 3;
         return ap;
     end
 end

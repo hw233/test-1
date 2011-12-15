@@ -290,7 +290,7 @@ namespace GObject
 		}
 	}
 #endif
-	static void getRandomAttr2(UInt8 lv, UInt8 crr, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v, UInt8 equip_t)
+	static void getRandomAttr2(UInt8 lv, UInt8 crr, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
     {
         switch(q)
         {
@@ -359,10 +359,7 @@ namespace GObject
                                 UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
                                 UInt32 tmp = uRand(100) + 1;
                                 UInt32 factor = GObjectManager::getAttrDics(q, k) + static_cast<float>(dics * tmp) / 100;
-                                if(equip_t == 0)
-                                    v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
-                                else
-                                    v[i] = GObjectManager::getTrumpAttrMax(lv, t[i]-1, q, crr)*factor;
+                                v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
                                 break;
                             }
                         }
@@ -657,14 +654,14 @@ namespace GObject
 				ItemEquip * equip;
 				ItemEquipData edata;
 
-				UInt8 lv = (itype->reqLev + 5) / 10 - 1;
+				UInt8 lv = itype->vLev;
                 UInt8 crr = itype->career;
 				if(itype->quality > 2 && itype->subClass != Item_Trump)
 				{
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};
 					Int16 v[3] = {0, 0, 0};
-					getRandomAttr2(lv, crr, q, 0, 0, t, v, 0);
+					getRandomAttr2(lv, crr, q, 0, 0, t, v);
 					edata.extraAttr2.type1 = t[0];
 					edata.extraAttr2.value1 = v[0];
 					edata.extraAttr2.type2 = t[1];
@@ -2046,9 +2043,29 @@ namespace GObject
 		return 0;
 	}
 
-	UInt8 Package::Split( UInt32 itemId, UInt32& enchantId, UInt8& count, /*bool protect,*/ bool silence )
+    static void pushBackSplitItem( std::vector<SplitItemOut>& splitOut, UInt16 itemId, UInt16 count )
+    {
+        UInt32 cnt = splitOut.size();
+        bool find = false;
+        for( UInt32 i = 0; i < cnt; ++i )
+        {
+            if(splitOut[i].itemId == itemId)
+            {
+                find = true;
+                splitOut[i].count += count;
+            }
+        }
+
+        if(!find)
+        {
+            SplitItemOut sio = {itemId, count};
+            splitOut.push_back(sio);
+        }
+    }
+
+	UInt8 Package::Split( UInt32 itemId, std::vector<SplitItemOut>& splitOut, /*bool protect,*/ bool silence )
 	{
-		count = 0;
+        UInt8 res = 1;
 		if (!IsEquipId(itemId)) return 2;
 		ItemBase * item = FindItem(itemId);
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
@@ -2068,6 +2085,9 @@ namespace GObject
 		}
 		else
 #endif
+        const GData::ItemBaseType& t = item->GetItemType();
+        UInt32 itemOutId = 0;
+        UInt32 count = 0;
         GameAction()->doAty(this->m_Owner, AtySplit, 0,0);    
 		{
 
@@ -2080,9 +2100,33 @@ namespace GObject
 				if(r < chance_high)
 					got = 2;
 			}
+
+			r = uRand(100);
+            if(q < 3)
+            {
+                UInt32 chance_team_matieral = GObjectManager::getTeamMatieralChance(q);
+                if(r < chance_team_matieral)
+                {
+                    itemOutId = GObjectManager::getTeamMatieralItemFromSplit(q);
+                    count = 1;
+                }
+            }
+            else
+            {
+                UInt32 count = 0;
+                UInt32 typeId = t.getId();
+                if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 0))
+                    count = 1;
+                else if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 1))
+                    count = 2;
+                else if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 2))
+                    count = 3;
+
+                if(count)
+                    itemOutId = GObjectManager::getOrangeTeamMatieralItemFromSplit(typeId);
+            }
 		}
 
-        const GData::ItemBaseType& t = item->GetItemType();
         if(IsEquip(t.subClass))
         {
             if(t.subClass == Item_Trump)
@@ -2105,19 +2149,36 @@ namespace GObject
                 GameAction()->doAttainment(this->m_Owner, Script:: SPLIT_EQUIP_COLOR, t.quality );
             }
         }
+
+        if(itemOutId != 0 && count != 0)
+        {
+            if(item != NULL)
+                DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
+            AddItem(itemOutId, count, isBound, silence, FromSplit);
+
+            item = NULL;
+            pushBackSplitItem( splitOut, itemOutId, count );
+            res = 0;
+        }
+
 		if(got)
 		{
-			enchantId = ITEM_ENCHANT_L1 + got - 1;
-			isBound |= item->GetBindStatus();
-			DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
-		    count = 1;
-			AddItem(enchantId, count, isBound, silence, FromSplit);
-			return 0;
-		}
-		DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
+			UInt32 itemOutId = ITEM_ENCHANT_L1 + got - 1;
+            UInt32 count = 1;
+            if(item != NULL)
+                DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
 
+            item = NULL;
+			AddItem(itemOutId, count, isBound, silence, FromSplit);
+
+            pushBackSplitItem( splitOut, itemOutId, count );
+            res = 0;
+		}
+
+        if(item != NULL)
+            DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
         
-		return 1;
+		return res;
 	}
 
 	static UInt32 getRandomEquipment( UInt8 l, UInt8 q, UInt8 t = 0 )
@@ -2731,14 +2792,13 @@ namespace GObject
 			values[2] = ied.extraAttr2.value3;
             UInt8 crr = equip->GetCareer();
 
-            UInt8 equip_t = 0;
+            lv = equip->getValueLev();
             if(equip->GetItemType().subClass == Item_Trump)
             {
-                equip_t = 1;
-                lv = ied.tRank;
+                lv = (ied.tRank + 1) * 10;
             }
 
-			getRandomAttr2(lv, crr, q, c, protect, types, values, equip_t);
+			getRandomAttr2(lv, crr, q, c, protect, types, values);
 			if(!equip->GetBindStatus() && isBound)
 				equip->DoEquipBind();
 			ApplyAttr2(equip, types, values);
@@ -2791,7 +2851,7 @@ namespace GObject
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
         GameAction()->doAty(this->m_Owner, AtyForge, 0, 0);
-		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
+		UInt8 lv = equip->getValueLev();
 		UInt8 q = equip->getQuality() - 3;
 		if(protect)
 		{
@@ -2821,30 +2881,22 @@ namespace GObject
 		m_Owner->useTael(amount,&ci);
         UInt8 crr = equip->GetCareer();
 
-        UInt8 equip_t = 0;
         if(equip->GetItemType().subClass == Item_Trump)
         {
-            equip_t = 1;
-            lv = ied.tRank;
+            lv = (ied.tRank + 1) * 10;
         }
 
-		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values, equip_t);
+		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
 
         float v0 = 0;
-        if(equip_t == 0)
-            v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
-        else
-            v0 = GObjectManager::getTrumpAttrMax(lv, types[0]-1, q, crr)*90;
+        v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
         if ((float)values[0] > v0 && !(protect & 1))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
 
         float v1 = 0;
-        if(equip_t == 0)
-            v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*90;
-        else
-            v1 = GObjectManager::getTrumpAttrMax(lv, types[1]-1, q, crr)*90;
+        v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*90;
         if ((float)values[1] > v1 && !(protect & 2))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
@@ -3037,7 +3089,7 @@ namespace GObject
             return 2;
 
         UInt8 q1 = q - 3;
-        UInt8 oldlv = ied_trump.tRank;
+        UInt8 oldTRank = ied_trump.tRank;
         UInt8 crr = trump->GetCareer();
         UInt8 types[3] = {0};
         UInt16 values[3] = {0};
@@ -3052,9 +3104,10 @@ namespace GObject
 
         if(ied_trump.tRank > 0 && q > 2)
         {
-            maxv[0] = GObjectManager::getTrumpAttrMax(oldlv, types[0]-1, q1, crr);
-            maxv[1] = GObjectManager::getTrumpAttrMax(oldlv, types[1]-1, q1, crr);
-            maxv[2] = GObjectManager::getTrumpAttrMax(oldlv, types[2]-1, q1, crr);
+            UInt8 lv = (ied_trump.tRank + 1) * 10;
+            maxv[0] = GObjectManager::getAttrMax(lv, types[0]-1, q1, crr);
+            maxv[1] = GObjectManager::getAttrMax(lv, types[1]-1, q1, crr);
+            maxv[2] = GObjectManager::getAttrMax(lv, types[2]-1, q1, crr);
         }
 
         ied_trump.trumpExp += exp;
@@ -3078,23 +3131,23 @@ namespace GObject
 
         if(newAttr2)
         {
-            UInt8 lv = ied_trump.tRank;
+            UInt8 lv = (ied_trump.tRank + 1) * 10;
             if(q > 2)
             {
                 UInt8 t[3] = {0, 0, 0};
                 Int16 v[3] = {0, 0, 0};
-                getRandomAttr2(lv, crr, q1, 0, 0, t, v, 1);
+                getRandomAttr2(lv, crr, q1, 0, 0, t, v);
                 ApplyAttr2(trump, t, v);
             }
         }
 
-        if(oldlv != ied_trump.tRank && q > 2 && oldlv > 0)
+        if(oldTRank != ied_trump.tRank && q > 2 && oldTRank > 0)
         {
+            UInt8 lv = (ied_trump.tRank + 1) * 10;
             Int16 values2[3] = {0};
-            UInt8 lv = ied_trump.tRank;
             if(maxv[0] > 0.00001)
             {
-                float v = GObjectManager::getTrumpAttrMax(lv, types[0]-1, q1, crr);
+                float v = GObjectManager::getAttrMax(lv, types[0]-1, q1, crr);
                 float tmp = (v * static_cast<float>(values[0])) / maxv[0] + 0.9;
                 if(tmp > v * 100)
                     values2[0] = v * 100;
@@ -3104,7 +3157,7 @@ namespace GObject
             }
             if(maxv[1] > 0.00001)
             {
-                float v = GObjectManager::getTrumpAttrMax(lv, types[1]-1, q1, crr);
+                float v = GObjectManager::getAttrMax(lv, types[1]-1, q1, crr);
                 float tmp = (v * static_cast<float>(values[1])) / maxv[1] + 0.9;
                 if(tmp > v * 100)
                     values2[1] = v * 100;
@@ -3113,7 +3166,7 @@ namespace GObject
             }
             if(maxv[2] > 0.00001)
             {
-                float v = GObjectManager::getTrumpAttrMax(lv, types[2]-1, q1, crr);
+                float v = GObjectManager::getAttrMax(lv, types[2]-1, q1, crr);
                 float tmp = (v * static_cast<float>(values[2])) / maxv[2] + 0.9;
                 if(tmp > v * 100)
                     values2[2] = v * 100;

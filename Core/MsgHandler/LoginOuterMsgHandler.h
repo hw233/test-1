@@ -32,8 +32,10 @@
 #include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
 #include "GObject/WBossMgr.h"
-
 #include "GObject/DCLogger.h"
+#include "GObject/FrontMap.h"
+#include "GObject/Copy.h"
+#include "GObject/Dungeon.h"
 
 
 static memcached_st* memc = NULL;
@@ -136,13 +138,10 @@ struct NewUserStruct
 void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 {
 	MSG_QUERY_PLAYER(player);
-	//player->SetSessionID(-1);
+	player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
-
     GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain().c_str()));
-
-    //LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]断开连接，发送指令0x200\n", player->getId());
 }
 
 struct UserLogonRepStruct
@@ -184,6 +183,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 		{
 			if(kickOld)
 			{
+                TRACE_LOG("被踢, %"I64_FMT"u, %u, %u", player->getId(), sid, hsid);
 				Network::GameClient * cl2 = static_cast<Network::GameClient *>(c.get());
 				player->SetSessionID(-1);
 				player->testBattlePunish();
@@ -264,20 +264,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	if(ul._userid == 0)
 		conn->pendClose();
 
-    // TODO: 可能是这个地方导致登陆后不久断线
-#if 0
-	UInt32 now = TimeUtil::Now();
-	UInt32 loginTime = *reinterpret_cast<UInt32*>(ul._hashval + 12);
-	if(cfg.GMCheck && (now + 300 < loginTime || now > loginTime + 600))
-	{
-		UserLogonRepStruct rep;
-		rep._result = 2;
-		NETWORK()->SendMsgToClient(conn.get(), rep);
-		conn->pendClose();
-		return;
-	}
-#endif
-
     if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
     {
 		conn->pendClose();
@@ -308,7 +294,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		res = doLogin(cl, pid, hdr.sessionID, player);
 
         std::string domain = "";
-#ifdef _NEED_OPENID
         if (player)
         {
             domain = player->getDomain();
@@ -316,7 +301,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
         }
-#endif
 
 		UInt8 flag = 0;
 		if(res == 0)
@@ -326,6 +310,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
+            TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u", ul._openid.c_str(), ul._userid, pid, hdr.sessionID);
 		}
 		else if(res == 4)
 		{
@@ -337,6 +322,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
+            TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u", ul._openid.c_str(), ul._userid, pid, hdr.sessionID);
 		}
 
         cl->SetStatus(Network::GameClient::NORMAL);
@@ -762,6 +748,52 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
     return;
 }
 
+bool getId(char buf[64])
+{
+    if (cfg.GMCheck)
+    {
+        UInt8 ret = 1;
+        initMemcache();
+        if (!memc)
+            return false;
+
+        size_t len = 0;
+        size_t tlen = 0;
+        unsigned int flags = 0;
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        int retry = 3;
+        memcached_return rc;
+        len = snprintf(key, sizeof(key), "sscq_gmtool_key_id");
+        while (retry)
+        {
+            --retry;
+            char* rid = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            if (rc == MEMCACHED_SUCCESS && rid && tlen)
+            {
+                ret = 0;
+                memcpy(buf, rid, tlen>63?63:tlen);
+                free(rid);
+                break;
+            }
+            else
+            {
+                ret = 1;
+                usleep(500);
+            }
+        }
+
+        if (ret)
+            return false;
+    }
+    else
+    {
+        const char* id = "20110503ll";
+        memcpy(buf, id, strlen(id));
+    }
+    return true;
+}
+
 bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
 {
 	SHA1Engine sha1;
@@ -785,7 +817,10 @@ bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
     UInt8 hash[64] = {0};\
     if (!br.read(hash, 36))\
         return;\
-    if (!checkKey(hash))\
+    char id[64] = {0};\
+    if (!getId(id))\
+        return;\
+    if (!checkKey(hash, atoll(id)))\
         return;\
 }
 
@@ -801,7 +836,6 @@ void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 	NETWORK()->Broadcast(st);
 }
 
-
 void OnKickUser(LoginMsgHdr& hdr,const void * data)
 {
     Stream st;
@@ -811,6 +845,7 @@ void OnKickUser(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerId;
     st<<playerId;
+    INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
 	GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
     {
@@ -844,6 +879,7 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
     CHKKEY();
     br>>playerId;
     br>>expireTime;
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, expireTime);
     st<<playerId;
     GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
@@ -882,6 +918,7 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
     UInt64 playerId;
     CHKKEY();
     br>>playerId;
+    INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
     st<<playerId;
     GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
@@ -1065,10 +1102,12 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		return;
 	UInt8 count = {0};
 	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
 	for(UInt32 i = 0; i < nums; i ++)
 	{
 		br>>item[i].id>>count;
 		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
 	for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1131,10 +1170,12 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 		return;
 	UInt8 count = {0};
 	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
 	for(UInt32 i = 0; i < nums; i ++)
 	{
 		br>>item[i].id>>count;
 		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
 	for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1234,6 +1275,8 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
     br>>id;
     br>>level;
 
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, level);
+
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
@@ -1268,10 +1311,13 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		return;
 	UInt8 count = {0};
 	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
 	for(UInt32 i = 0; i < nums; i ++)
 	{
 		br>>item[i].id>>count;
 		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
 	for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1326,6 +1372,8 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
     br>>prestige; // 声望
     br>>honor; // 荣誉
 
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u, %u, %u", __PRETTY_FUNCTION__, id, pexp, prestige, honor);
+
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
@@ -1370,6 +1418,9 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     br>>tael;
     br>>coupon;
     br>>achievement;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %s, %u, %u, %u, %u, %u",
+            __PRETTY_FUNCTION__, id, token.c_str(), type, gold, tael, coupon, achievement);
 
     st<<id;
     st<<type;
@@ -1475,6 +1526,8 @@ void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
     st<<id;
     st<<lv;
 
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, lv);
+
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
@@ -1498,6 +1551,8 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
     br>>id;
     br>>type;
     st<<id;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, type);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -1590,6 +1645,14 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
             st << static_cast<UInt8>(1);
         else
             st << static_cast<UInt8>(0);
+        UInt8 freeCnt, goldCnt;
+        GObject::playerCopy.getCount(player, &freeCnt, &goldCnt, true);
+        st << freeCnt << goldCnt;
+        UInt8 fcnt = GObject::frontMap.getCount(player);
+        st << static_cast<UInt8>(GObject::FrontMap::getFreeCount()-(fcnt&0xf));
+        st << static_cast<UInt8>(GObject::FrontMap::getGoldCount(player->getVipLevel())-((fcnt&0xf0)>>4));
+        st << static_cast<UInt8>(PLAYER_DATA(player, dungeonCnt));
+        st << static_cast<UInt8>(GObject::Dungeon::getExtraCount(player->getVipLevel()));
     }
 
     st << Stream::eos;
@@ -1619,6 +1682,8 @@ void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
     CHKKEY();
     br >> playerId;
     br >> fgtid;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, fgtid);
 
     UInt8 ret = 0;
     GObject::Fighter * fgt = GObject::globalFighters[fgtid];

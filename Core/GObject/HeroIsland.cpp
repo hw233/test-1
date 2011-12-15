@@ -260,7 +260,6 @@ void HeroIsland::broadcastTV(UInt32 now)
         default:
             break;
     }
-
 }
 
 void HeroIsland::calcNext(UInt32 now)
@@ -285,7 +284,7 @@ void HeroIsland::calcNext(UInt32 now)
         }
 
         _startTime = _prepareTime + 15 * 60;
-        _endTime = _startTime + 60 * 60;
+        _endTime = _startTime + 55 * 60;
     }
 #else
     if (cfg.GMCheck)
@@ -385,6 +384,7 @@ void HeroIsland::end(UInt32 now)
     reset();
     _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
+    sendDaily(NULL);
 }
 
 void HeroIsland::reset()
@@ -429,6 +429,7 @@ void HeroIsland::process(UInt32 now)
         else
             _expTime = now + 30;
         _running = true;
+        sendDaily(NULL);
     }
 
     if (_running && now >= _endTime)
@@ -1379,7 +1380,6 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
     {
         case 1:
             {
-                //if (!pd->player->getBuffData(PLAYER_BUFF_HIWEAK) && pd->player->allHpP() >= 100)
                 if (pd->player->allHpP() >= 100)
                 {
                     pd->player->sendMsgCode(0, 2006);
@@ -1406,7 +1406,6 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                 pd->player->setHPPercent(10);
                 pd->player->setBuffData(PLAYER_BUFF_HIWEAK, 0, false);
                 pd->player->setBuffData(PLAYER_BUFF_HIMOVE, 0, false);
-                pd->player->setBuffData(PLAYER_BUFF_HIFIGHT, 0, false);
                 SYSMSG_SEND(2134, pd->player);
                 st << cd;
             }
@@ -2106,6 +2105,20 @@ void HeroIsland::setAto(Player* player, UInt8 onoff)
     Stream st(REP::HERO_ISLAND);
     st << static_cast<UInt8>(20) << static_cast<UInt8>(onoff) << Stream::eos;
     player->send(st);
+}
+
+void HeroIsland::sendDaily(Player* player)
+{
+    if (player && !isRunning())
+        return;
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(8);
+    st << static_cast<UInt8>(isRunning()?0:1);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
 }
 
 HeroIsland heroIsland;

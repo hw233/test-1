@@ -133,7 +133,7 @@ function initActTime(y, m, d)
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm4 = { ['year'] = 2011, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm6 = { ['year'] = 2011, ['month'] = 12, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
@@ -149,7 +149,7 @@ function initActTime(y, m, d)
   actTime8 = os.time(SerStartTm4) + 7 * 86400;
 
   actTime9 = os.time(SerStartTm5);
-  actTime10 = os.time(SerStartTm5) + 7 * 86400;
+  actTime10 = os.time(SerStartTm5) + 11 * 86400;
 
   actTime11 = os.time(SerStartTm6);
   actTime12 = os.time(SerStartTm6) + 3 * 86400;

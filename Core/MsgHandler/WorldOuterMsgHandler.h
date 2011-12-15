@@ -156,7 +156,8 @@ struct BattleReportReq
 struct BattleReportReq2
 {
 	UInt32 _reportId;
-	MESSAGE_DEF1(REQ::FIGHT_REPORT2, UInt32, _reportId);
+    UInt8 type;
+	MESSAGE_DEF2(REQ::FIGHT_REPORT2, UInt32, _reportId, UInt8, type);
 };
 
 struct SaleListReq
@@ -1127,6 +1128,7 @@ void OnBattleReportReq2( GameMsgHdr& hdr, BattleReportReq2& brr)
 {
 	MSG_QUERY_PLAYER(player);
     Stream st(REP::FIGHT_REPORT2);
+    st << brr.type;
 	std::vector<UInt8> *r = Battle::battleReport[brr._reportId];
 	if(r == NULL)
 		return;

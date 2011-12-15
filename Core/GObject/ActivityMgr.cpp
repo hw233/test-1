@@ -11,6 +11,7 @@
 #include "PracticePlace.h"
 #include "AthleticsRank.h"
 #include "GObject/Package.h"
+#include "TeamCopy.h"
 #include <stdio.h>
 using namespace std;
 
@@ -325,9 +326,31 @@ void ActivityMgr::SendActivityInfo(Stream& s)
 
     c1 = 0;
     m1 = 0;
-    s<< static_cast<UInt8> ( AtyGroupCopy) << c1 << m1;
+    TeamCopyPlayerInfo* pInfo = _owner->getTeamCopyPlayerInfo();
+    if(pInfo)
+    {
+        c1 = pInfo->getPassNum();
+    }
+    Fighter* fgt = _owner->getMainFighter();
+    if(fgt)
+    {
+        UInt8 lev = fgt->getLevel();
+        if(lev >= 35 && lev < 45)
+            m1 = 2;
+        else if(lev >= 45 && lev < 60)
+            m1 = 4;
+        else if(lev >= 60 && lev <70)
+            m1 = 6;
+        else if(lev >= 70 && lev < 80)
+            m1 = 8;
+        else if(lev >= 80 && lev < 90)
+            m1 = 10;
+        else if(lev >= 90)
+            m1 =12;
+    }
+    s<< GetAtyIDInClient( AtyGroupCopy) << c1 << m1;
     //printf("副本组队  %u  %u\n" , c1 ,m1);
-
+    
     for(UInt32 i = 0 ; i <  AtyMaxFlag; i ++  )
     {
         c1 = static_cast<UInt8>(_item.flag[i]);

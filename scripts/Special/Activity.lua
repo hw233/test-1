@@ -713,8 +713,7 @@ function Christmas(player, lootlvl, where)
 
 
         local package = player:GetPackage();
-        -- package:AddItem(69, itemNum[lootlvl], false);
-        -- TODO:
+        package:AddItem(401, itemNum[lootlvl], false);
         if where == 0 then
             Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 副本通关，获得【圣诞女郎变身卡】x" .. itemNum[lootlvl])
         else
@@ -840,7 +839,7 @@ function onChristmas(player)
         if player:GetVar(7) == 1 then
             return
         end
-        sendItemPackageMail(player, "圣诞节活动奖励", "恭喜您获得法宝【雪人】\n 12月21日-12月27日登陆并且等级达到30级玩家，即可获得法宝【雪人】 ", {8,3,1});
+        sendItemPackageMail(player, "圣诞节活动奖励", "恭喜您获得法宝【雪人】\n 12月21日-12月27日登陆并且等级达到30级玩家，即可获得法宝【雪人】 ", {637,1,1});
         player:SetVar(7,1)
     end
 
@@ -848,7 +847,7 @@ function onChristmas(player)
         if player:GetVar(8) == 1 then
             return
         end
-        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞靴】\n 12月25日-12月27日登陆并且等级达到30级玩家，即可获得节日套装奖励【圣诞靴】 ", {8,3,1});
+        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞靴】\n 12月25日-12月27日登陆并且等级达到30级玩家，即可获得节日套装奖励【圣诞靴】 ", {1752,1,1});
         player:SetVar(8,1)
     end
 end
