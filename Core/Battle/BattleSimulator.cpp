@@ -870,8 +870,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             doPoisonAttack(bf, cs, skill, area_target, factor, defList, defCount, scList, scCount, atkAct);
         }
 
-        doPassiveSkillBeAtk(bf, area_target, atkAct, dmg + magdmg);
-
         // target fighter will do not counter while fighter is the same side
         bool can_counter = true;
         if(target_stun > 0 || bf->getSide() == area_target->getSide())
@@ -928,6 +926,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 #endif
 			}
 		}
+
+        doPassiveSkillBeAtk(bf, area_target, atkAct, dmg + magdmg);
 	}
 	else // if attacked a barrier
 	{
@@ -1512,9 +1512,6 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
 
         if(NULL == bo)
-            return 0;
-
-        if(bo->getHP() == 0)
             return 0;
 
         if(bf->getHP() > 0 && bo->getHP() > 0)
