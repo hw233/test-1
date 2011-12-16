@@ -2070,6 +2070,13 @@ namespace GObject
 		ItemBase * item = FindItem(itemId);
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
+
+        if(GetRestPackageSize() < 2)
+        {
+            m_Owner->sendMsgCode(0, 1011);
+            return 2;
+        }
+
 		UInt8 q = item->getQuality() - 2;
 		bool isBound = item->GetBindStatus();
         UInt32 chance_low = GObjectManager::getSplitChance(q, 0);  // split_chance[q][lv][0];
