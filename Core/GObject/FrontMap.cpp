@@ -229,7 +229,7 @@ UInt8 FrontMap::getCount(Player* pl)
     if (!pl)
         return 0;
 
-    if (TimeUtil::Day(TimeUtil::Now()) != TimeUtil::Day(PLAYER_DATA(pl, frontUpdate)) ||
+    if (!TimeUtil::SameDay(TimeUtil::Now(), PLAYER_DATA(pl, frontUpdate)) ||
             getGoldCount(pl->getVipLevel()) < PLAYER_DATA(pl, frontGoldCnt) ||
             getFreeCount() < PLAYER_DATA(pl, frontFreeCnt)) {
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
@@ -491,7 +491,10 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                 UInt8 count = max - tmp.size() + 1;
                 UInt8 nspot = tmp.size();
                 if (nspot != 1 && !tmp[nspot-1].status)
+                {
                     --nspot;
+                    ++count;
+                }
                 if (!nspot)
                     nspot = 1;
 

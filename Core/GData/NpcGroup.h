@@ -50,6 +50,7 @@ public:
 	inline float getBattlePoints() { return _bp; }
 	UInt8 getLevel();
 	UInt8 getClass();
+    UInt16 getPortrait();
 	std::vector<NpcFData>& getList() { return _npcList; }
     inline UInt8 getType() { return _type; }
     inline void setType(UInt8 type) { _type = type; }

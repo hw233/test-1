@@ -153,6 +153,7 @@ namespace GData
 		ItemClass	subClass;
 		UInt32		price;
 		UInt16		reqLev;
+		UInt16		vLev;
 		UInt8		quality;
 		UInt16		maxQuantity;
 		UInt8		bindType;

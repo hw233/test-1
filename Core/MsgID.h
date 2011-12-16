@@ -208,7 +208,7 @@ namespace REQ
     /**邮件信息改变*/
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
     /**活跃度请求*/
-    const UInt8 ACTIVITY_LIST        = 0X4A; 
+    const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
     /**关系列表请求*/
@@ -307,6 +307,12 @@ namespace REQ
     const UInt8 EQ_UPGRADE          = 0xB9;
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
+
+    /** 组队副本*/
+    const UInt8 TEAM_COPY_REQ       = 0x99;
+
+    /** 战报数据*/
+    const UInt8 FIGHT_REPORT2       = 0x0F;
 }
 
 namespace REP
@@ -316,6 +322,7 @@ namespace REP
     const UInt8 ENTER_ARENA         = 0x02;
     const UInt8 LINEUP_CHANGE       = 0x03;
     const UInt8 NEXT_ARENA          = 0x04;
+    const UInt8 CHKMARK             = 0x05;
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     const UInt8 CAMP_SELECT         = 0xF1;// 0x0D
     const UInt8 BE_DISCONNECT       = 0xF2;// 0x0E
@@ -446,7 +453,7 @@ namespace REP
     const UInt8 MAIL_CHANGE         = 0x46;// 0xA5
 
     /**活跃度请求*/
-    const UInt8 ACTIVITY_LIST        = 0X4A; 
+    const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
  
@@ -455,6 +462,7 @@ namespace REP
 
     const UInt8 STORE_LIST          = 0xDC;// 0xB0
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
+    const UInt8 STORE_LIST_EXCHANGE = 0xDE;// ??
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
@@ -499,6 +507,11 @@ namespace REP
     const UInt8 WINSTREAK           = 0xF6;// 0xD3
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
+
+    const UInt8 TEAM_COPY_REQ       = 0x99;
+
+    /** 战报数据*/
+    const UInt8 FIGHT_REPORT2       = 0x0F;
 }
 
 namespace SPEQ

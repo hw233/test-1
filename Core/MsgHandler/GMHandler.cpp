@@ -30,6 +30,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/HeroIsland.h"
+#include "GObject/TeamCopy.h"
 
 GMHandler gmHandler;
 
@@ -148,6 +149,7 @@ GMHandler::GMHandler()
     Reg(3, "hiaward", &GMHandler::OnAwardHI);
     Reg(3, "hiuseskill", &GMHandler::OnUseSkillHI);
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
+    Reg(3, "resettcplayer", &GMHandler::OnResetTeamCopyPlayer);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1029,9 +1031,9 @@ void makeSuper( GObject::Fighter * fgt, UInt8 equipLvl = 100, UInt8 enchant = 8,
 	if(player == NULL)
 		return;
 	const UInt32 itemIdStart[3][5] = {
-        {2568, 2592, 2616, 2160, 2184},
-        {2576, 2600, 2600, 2152, 2176},
-        {2584, 2608, 2624, 2144, 2168}
+        {2568, 2592, 2160, 2160, 2184},
+        {2576, 2600, 2152, 2152, 2176},
+        {2584, 2608, 2144, 2144, 2168}
     };
     const UInt16 trump[] = {1608,1609,1610};
 	int idx = -1;
@@ -2472,5 +2474,27 @@ void GMHandler::OnAppearBoss(GObject::Player *player, std::vector<std::string>& 
         worldBoss.bossAppear(atoi(args[0].c_str()), atoi(args[1].c_str()));
     else
         worldBoss.bossAppear(atoi(args[0].c_str()));
+}
+
+void GMHandler::OnResetTeamCopyPlayer(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+    {
+        TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+        if(tcpInfo)
+            tcpInfo->resetTCPlayer();
+        return;
+    }
+    else
+    {
+        UInt64 playerId = atoll(args[0].c_str());
+        GObject::Player * pl = GObject::globalPlayers[playerId];
+        if(pl == NULL)
+            return;
+
+        TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+        if(tcpInfo)
+            tcpInfo->resetTCPlayer();
+    }
 }
 

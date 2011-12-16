@@ -125,6 +125,8 @@ namespace GObject
 	class Athletics;
     struct PracticeData;
     class AttainMgr;
+    struct TeamData;
+    struct TeamCopyPlayerInfo;
     class ActivityMgr;
 
     struct TripodData
@@ -319,6 +321,15 @@ namespace GObject
         UInt8 newLv;
     };
 
+    struct CopyTeamPage
+    {
+        UInt8 copyId;
+        UInt8 t;   //дя╤х
+        UInt32 start;
+        UInt32 end;
+        UInt8 type;
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 100;
@@ -452,6 +463,7 @@ namespace GObject
 			Copy            = 0x00000020,
             InHeroIsland    = 0x00000040,
             AutoFrontMap    = 0x00000080,
+            InCopyTeam      = 0x00000100,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -1194,9 +1206,18 @@ namespace GObject
     public:
         void sendSingleEnchant(UInt8 enchant);
 
+        TeamData* getTeamData();
+        void setTeamData(TeamData* td);
+        CopyTeamPage& getCopyTeamPage();
+        void clearCopyTeamPage();
+        TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
+
     private:
         bool m_hasTripod;
         TripodData m_td;
+        TeamData* m_teamData;
+        CopyTeamPage m_ctp;
+        TeamCopyPlayerInfo* m_tcpInfo;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }

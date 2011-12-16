@@ -50,6 +50,16 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
 	_portrait[1] = 0;
     _cur_fgtlist_idx = 0;
 
+    for(int i = 0; i < 2; ++i)
+    {
+        _teams[i] = 0;
+        _team_name[i][0] = "";
+        _team_name[i][1] = "";
+        _team_level[i][0] = 0;
+        _team_level[i][1] = 0;
+        _team_portrait[i][0] = 0;
+        _team_portrait[i][1] = 0;
+    }
     InitAttainRecord();
 }
 
@@ -65,7 +75,86 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
 	_portrait[1] = 0;
     _cur_fgtlist_idx = 0;
 
+    for(int i = 0; i < 2; ++i)
+    {
+        _teams[i] = 0;
+        _team_name[i][0] = "";
+        _team_name[i][1] = "";
+        _team_level[i][0] = 0;
+        _team_level[i][1] = 0;
+        _team_portrait[i][0] = 0;
+        _team_portrait[i][1] = 0;
+    }
     InitAttainRecord();
+}
+
+void BattleSimulator::switchPlayer(GObject::Player* player, UInt8 side)
+{
+    if(side > 1)
+        return;
+
+	_player[side] = player;
+}
+
+void BattleSimulator::switchPlayer(const std::string& name, UInt8 level)
+{
+	_other_name = name;
+	_other_level = level;
+}
+
+void BattleSimulator::putTeams(const std::string& name, UInt8 level, UInt16 portrait, UInt8 side)
+{
+    if(side > 1)
+        return;
+    UInt8 idx = _teams[side];
+    if(idx > 1)
+        return;
+    ++_teams[side];
+    _team_name[side][idx] = name;
+    _team_level[side][idx] = level;
+    _team_portrait[side][idx] = portrait;
+}
+
+UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
+{
+    if(side > 1)
+        return 0;
+
+    if(_id == 0)
+    {
+        _id = IDGenerator::gBattleOidGenerator.ID();
+        _packet.data<UInt32>(4) = _id;
+    }
+
+    UInt32 oldID = _id; 
+    if(!isLast)
+    {
+        _id = IDGenerator::gBattleOidGenerator.ID();
+        _packet.data<UInt32>(8) = _id;
+    }
+
+    battleReport.addReport(oldID, _packet);
+
+    if(!isLast)
+    {
+        for(int i = 0; i < 25; ++ i)
+        {
+            if(_objs[side][i] && !_isBody[side][i])
+            {
+                delete _objs[side][i];
+                _objs[side][i] = NULL;
+            }
+        }
+    }
+
+    _teams[side] = 0;
+    _team_name[side][0] = "";
+    _team_name[side][1] = "";
+    _team_level[side][0] = 0;
+    _team_level[side][1] = 0;
+    _team_portrait[side][0] = 0;
+
+    return oldID;
 }
 
 void  BattleSimulator::InitAttainRecord()
@@ -100,15 +189,21 @@ void  BattleSimulator::InitAttainRecord()
 }
 // #############################
 // change the battle queue but not pass client check
-void BattleSimulator::start()
+// prevWin for 组队
+void BattleSimulator::start(UInt8 prevWin)
 {
+    if(prevWin != 0xFF && (prevWin == 0 || prevWin > 2))
+        return;
 	_packet.clear();
-	_fgtlist[0].clear();
-	_fgtlist[1].clear();
+    if(prevWin == 0xFF)
+    {
+        _fgtlist[0].clear();
+        _fgtlist[1].clear();
+    }
 
 	// [[ Make packet header data
 	_packet.init(REP::FIGHT_START);
-	_packet << _id << _position;
+	_packet << _id << static_cast<UInt32>(0) << _position;
 	for(int i = 0; i < 2; ++ i)
 		_packet << (_formation[i] ? _formation[i]->getId() : static_cast<UInt16>(0));
 	_packet << _player[0]->GetLev() << _other_level;
@@ -116,12 +211,23 @@ void BattleSimulator::start()
 
 	_packet << _player[0]->getName() << _other_name;
 
+    //组队
+    for(int tidx = 0; tidx < 2; ++tidx)
+    {
+        _packet << _teams[tidx];
+        for(int idx = 0; idx < _teams[tidx]; ++idx)
+        {
+            _packet << _team_name[tidx][idx] << _team_level[tidx][idx] << _team_portrait[tidx][idx];
+        }
+    }
+
 	size_t offset = _packet.size();
 
 	_packet << static_cast<UInt16>(0);
 
     // for the insertFighterStatus can only insert to next fgtlist, so to make sure to insert fighter status to _figtlist[0] and set the _cur_fgtlist to 1
-    _cur_fgtlist_idx = 1;
+    UInt8 cur_idx = _cur_fgtlist_idx;
+    _cur_fgtlist_idx = (cur_idx + 1)%2;
 	UInt8 cnt[2] = {0, 0};
 	bool loaded[2] = {false, false};
 	bool checkEnh = _player[1] == NULL;
@@ -167,7 +273,9 @@ void BattleSimulator::start()
 								loaded[i] = true;
 							}
 						}
-						bf->initStats(checkEnh);
+
+                        if((prevWin-1) != i)
+                            bf->initStats(checkEnh);
                         UInt8 justice_roar = (_player[i] != NULL ? _player[i]->getJusticeRoar() : 0);
                         if(justice_roar)
                             bf->AddAura(justice_roar);
@@ -185,20 +293,21 @@ void BattleSimulator::start()
 					_packet << static_cast<UInt8>(bf->getFighter()->getColor())
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
-					_packet << aura << maxAura <<static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getAction());
+					_packet << aura << maxAura << static_cast<UInt16>(bf->getAttack()) << static_cast<UInt16>(bf->getMagAttack())
+                        << static_cast<UInt16>(bf->getDefend()) << static_cast<UInt16>(bf->getMagDefend()) << static_cast<UInt16>(bf->getAction());
 
                     //add maxAura
                     if(maxAura > _maxAura[i])
                         _maxAura[i] = maxAura;
                     // TODO: up skills
-					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f) << static_cast<UInt16>(bf->getTough(NULL) * 100.0f) << static_cast<UInt16>(bf->getMagRes(NULL) * 100.0f);
+					_packet << static_cast<UInt16>(bf->getHitrate(NULL) * 100.0f) << static_cast<UInt16>(bf->getEvade(NULL) * 100.0f) << static_cast<UInt16>(bf->getCritical(NULL) * 100.0f) << static_cast<UInt16>(bf->getPierce(NULL) * 100.0f) << static_cast<UInt16>(bf->getCounter(NULL) * 100.0f) << static_cast<UInt16>(bf->getTough(NULL) * 100.0f) << static_cast<UInt16>(bf->getCriticalDmg() * 100.0f) << static_cast<UInt16>(bf->getMagRes(NULL) * 100.0f);
                     _packet << bf->getFighter()->getPeerlessAndLevel();
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);
                     
-					if(ismain)
+					if(ismain && (prevWin-1) != i)
 					{
-						bf->postInit();
+                        bf->postInit();
 						// FighterStatus fs(bf);
 						// Insert into action queue
 						insertFighterStatus(bf);
@@ -214,7 +323,7 @@ void BattleSimulator::start()
 	}
 
     // after insert fighter status to _fgtlist[0] set the _cur_fgtlist_idx to 0
-    _cur_fgtlist_idx = 0;
+    _cur_fgtlist_idx = cur_idx;
 	if(_fgtlist[_cur_fgtlist_idx].empty())
 	{
 		_packet.clear();
@@ -228,7 +337,7 @@ void BattleSimulator::start()
 
 	UInt32 act_count = 0;
 	_winner = testWinner();
-    act_count += FightersEnter();
+    act_count += FightersEnter(prevWin);
 	while(_winner == 0 && act_count < _fake_turns)
 	{
 		int pos = findFirstAttacker();
@@ -252,6 +361,9 @@ void BattleSimulator::start()
         }
 #endif
 	}
+    if(_winner == 0)
+        _winner = testWinner2();
+
 	_packet << static_cast<UInt8>(_winner);
 	_packet.data<UInt32>(cnt_pos) = act_count;
 	_packet << Stream::eos;
@@ -274,9 +386,6 @@ void BattleSimulator::start()
 #endif
 
 	_turns = act_count;
-
-	if(act_count == 0)
-		_winner = 1;
 
 	if(_report || !cfg.GMCheck)
 		battleReport.addReport(_id, _packet);
@@ -570,8 +679,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 		UInt8 pos = area_target->getPos();
         UInt8 target_stun = area_target->getStunRound();
         bool enterEvade = area_target->getEvad100();
-        if(enterEvade)
-            area_target->setEvad100(false);
+        bool defend100 = area_target->getDefend100();
 
         float aura_factor = 1;
         if(skill && skill->cond == GData::SKILL_PEERLESS)
@@ -579,7 +687,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             aura_factor = 1 + static_cast<float>(bf->getAura()-100) * 0.0025;
         }
 
-		if(!enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
+		if(!defend100 && !enterEvade && (target_stun > 0 || bf->calcHit(area_target)))
 		{
             pr = bf->calcPierce(area_target);
             float atk = 0;
@@ -656,18 +764,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 			}
 
-            bool defend100 = area_target->getDefend100();
-            if(defend100)
-            {
-                dmg = dmg > 0 ? 1 : 0;
-                magdmg = magdmg > 0 ? 1 : 0;
-                defList[defCount].damType = e_damOut;
-                area_target->setDefend100(false);
-            }
-            else
-            {
-                defList[defCount].damType = e_damNormal;
-            }
+            defList[defCount].damType = e_damNormal;
             area_target->makeDamage(dmg + magdmg);
             defList[defCount].damage = dmg + magdmg;
 
@@ -689,7 +786,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             {
 				onDamage(area_target, scList, scCount, true, atkAct);
 
-                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1 && !defend100)
+                if(NULL != skill && skill->effect != NULL && skill->effect->state == 1)
                 {
                     float rate = skill->prob * 100;
                     if((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || rate > _rnd(10000))
@@ -730,6 +827,20 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             }
 
 			defList[defCount].damType = e_damEvade;
+            if(enterEvade)
+                area_target->setEvad100(false);
+
+            if(defend100)
+            {
+                defList[defCount].damType = e_damOut;
+                area_target->setDefend100(false);
+                if(counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
+                {
+                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
+                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
+                }
+            }
+            
 			defList[defCount].damage = 0;
 			defList[defCount].leftHP = area_target->getHP();
 //			printf("%u:%u hits %u:%u, but missed!\n", 1-side, from_pos, side, pos);
@@ -879,7 +990,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             {
                 passiveSkillInj = passiveSkill;
             }
-            else
+            else if(bf->getHP() > 0)
             {
                 AttackAct aa = {0};
                 aa.bf = bo;
@@ -902,7 +1013,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             {
                 passiveSkillInj = passiveSkill;
             }
-            else
+            else if(bf->getHP() > 0)
             {
                 AttackAct aa = {0};
                 aa.bf = bo;
@@ -926,7 +1037,7 @@ void BattleSimulator::doPassiveSkillBeAtk(BattleFighter* bf, BattleFighter* bo, 
             atkAct->push_back(aa);
         }
 
-        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg)
+        if(passiveSkillThorn && bf->getSide() != bo->getSide() && dmg && bf->getHP() > 0)
         {
             AttackAct aa = {0};
             aa.bf = bo;
@@ -2375,7 +2486,7 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
     return NULL;
 }
 
-UInt32 BattleSimulator::FightersEnter()
+UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)
 {
     UInt32 rcnt = 0;
 
@@ -2387,7 +2498,8 @@ UInt32 BattleSimulator::FightersEnter()
     {
         BattleFighter* bf = cur_fgtlist[idx];
 
-        rcnt += doSkillAttackAftEnter(bf);
+        if((prevWin-1) != bf->getSide())
+            rcnt += doSkillAttackAftEnter(bf);
     }
 
     return rcnt;
@@ -3463,6 +3575,22 @@ int BattleSimulator::testWinner()
 	else if(alive[1] == 0)
 		return 1;
 	return 0;
+}
+
+int BattleSimulator::testWinner2()
+{
+    UInt32 leftHPAll[2] = {0, 0};
+	for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
+    {
+        std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
+        size_t c = fgtlist.size();
+        for(size_t i = 0; i < c; ++ i)
+        {
+            leftHPAll[fgtlist[i]->getSide()] += fgtlist[i]->getHP();
+        }
+    }
+
+    return leftHPAll[0] > leftHPAll[1];
 }
 
 void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount)

@@ -32,8 +32,10 @@
 #include <libmemcached/memcached.h>
 #include "GObject/SaleMgr.h"
 #include "GObject/WBossMgr.h"
-
 #include "GObject/DCLogger.h"
+#include "GObject/FrontMap.h"
+#include "GObject/Copy.h"
+#include "GObject/Dungeon.h"
 
 
 static memcached_st* memc = NULL;
@@ -136,13 +138,10 @@ struct NewUserStruct
 void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 {
 	MSG_QUERY_PLAYER(player);
-	//player->SetSessionID(-1);
+	player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
-
     GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain().c_str()));
-
-    //LOGIN().GetLog()->OutInfo("用户[%"I64_FMT"u]断开连接，发送指令0x200\n", player->getId());
 }
 
 struct UserLogonRepStruct
@@ -184,6 +183,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
 		{
 			if(kickOld)
 			{
+                TRACE_LOG("被踢, %"I64_FMT"u, %u, %u", player->getId(), sid, hsid);
 				Network::GameClient * cl2 = static_cast<Network::GameClient *>(c.get());
 				player->SetSessionID(-1);
 				player->testBattlePunish();
@@ -264,20 +264,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 	if(ul._userid == 0)
 		conn->pendClose();
 
-    // TODO: 可能是这个地方导致登陆后不久断线
-#if 0
-	UInt32 now = TimeUtil::Now();
-	UInt32 loginTime = *reinterpret_cast<UInt32*>(ul._hashval + 12);
-	if(cfg.GMCheck && (now + 300 < loginTime || now > loginTime + 600))
-	{
-		UserLogonRepStruct rep;
-		rep._result = 2;
-		NETWORK()->SendMsgToClient(conn.get(), rep);
-		conn->pendClose();
-		return;
-	}
-#endif
-
     if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
     {
 		conn->pendClose();
@@ -308,7 +294,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		res = doLogin(cl, pid, hdr.sessionID, player);
 
         std::string domain = "";
-#ifdef _NEED_OPENID
         if (player)
         {
             domain = player->getDomain();
@@ -316,7 +301,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
         }
-#endif
 
 		UInt8 flag = 0;
 		if(res == 0)
@@ -326,6 +310,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
+            TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u", ul._openid.c_str(), ul._userid, pid, hdr.sessionID);
 		}
 		else if(res == 4)
 		{
@@ -337,6 +322,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
+            TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u", ul._openid.c_str(), ul._userid, pid, hdr.sessionID);
 		}
 
         cl->SetStatus(Network::GameClient::NORMAL);
@@ -577,7 +563,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 {
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     std::string token;
     std::string no;
@@ -587,13 +573,13 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     std::string uint;
     std::string money;
 
-    brd>>token;
-    brd>>no;
-    brd>>player_Id;
-    brd>>id;
-    brd>>num;
-    brd>>uint;
-    brd>>money;
+    br>>token;
+    br>>no;
+    br>>player_Id;
+    br>>id;
+    br>>num;
+    br>>uint;
+    br>>money;
 
     UInt8 ret = 1;
     std::string err = "";
@@ -713,17 +699,17 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
 void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
 {
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
 
     std::string no;
     UInt64 player_Id;
     UInt16 id;
     UInt32 num;
 
-    brd>>no;
-    brd>>player_Id;
-    brd>>id;
-    brd>>num;
+    br>>no;
+    br>>player_Id;
+    br>>id;
+    br>>num;
 
     std::string err = "";
     UInt8 ret = GObject::GObjectManager::reRecharge(no, id, num, err);
@@ -762,17 +748,93 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
     return;
 }
 
+bool getId(char buf[64])
+{
+    if (cfg.GMCheck)
+    {
+        UInt8 ret = 1;
+        initMemcache();
+        if (!memc)
+            return false;
+
+        size_t len = 0;
+        size_t tlen = 0;
+        unsigned int flags = 0;
+        char key[MEMCACHED_MAX_KEY] = {0};
+
+        int retry = 3;
+        memcached_return rc;
+        len = snprintf(key, sizeof(key), "sscq_gmtool_key_id");
+        while (retry)
+        {
+            --retry;
+            char* rid = memcached_get(memc, key, len, &tlen, &flags, &rc);
+            if (rc == MEMCACHED_SUCCESS && rid && tlen)
+            {
+                ret = 0;
+                memcpy(buf, rid, tlen>63?63:tlen);
+                free(rid);
+                break;
+            }
+            else
+            {
+                ret = 1;
+                usleep(500);
+            }
+        }
+
+        if (ret)
+            return false;
+    }
+    else
+    {
+        const char* id = "20110503ll";
+        memcpy(buf, id, strlen(id));
+    }
+    return true;
+}
+
+bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
+{
+	SHA1Engine sha1;
+	sha1.update(_hashval + 8, 4);
+	sha1.update(cfg.gmCryptKey1.c_str(), cfg.gmCryptKey1.length());
+	sha1.update(_hashval, 4);
+	sha1.update(&_userid, sizeof(UInt64));
+	sha1.update(_hashval + 12, 4);
+	sha1.update(cfg.gmCryptKey2.c_str(), cfg.gmCryptKey2.length());
+	sha1.update(_hashval + 4, 4);
+
+	std::vector<UInt8> buf = sha1.digest();
+
+	if(memcmp(&buf.front(), _hashval + 16, 20) == 0)
+        return true;
+    return false;
+}
+
+#define CHKKEY() \
+{\
+    UInt8 hash[64] = {0};\
+    if (!br.read(hash, 36))\
+        return;\
+    char id[64] = {0};\
+    if (!getId(id))\
+        return;\
+    if (!checkKey(hash, atoll(id)))\
+        return;\
+}
+
 void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 {
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type;
 	std::string msg;
-	brd >> type >> msg;
+    CHKKEY();
+	br >> type >> msg;
 	Stream st(REP::SYSTEM_INFO);
 	st << type << msg << Stream::eos;
 	NETWORK()->Broadcast(st);
 }
-
 
 void OnKickUser(LoginMsgHdr& hdr,const void * data)
 {
@@ -780,8 +842,10 @@ void OnKickUser(LoginMsgHdr& hdr,const void * data)
     st.init(REP::RECONNECT, 0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
+    CHKKEY();
     br>>playerId;
     st<<playerId;
+    INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
 	GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
     {
@@ -812,8 +876,10 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
     UInt64 expireTime;
+    CHKKEY();
     br>>playerId;
     br>>expireTime;
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, expireTime);
     st<<playerId;
     GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
@@ -850,7 +916,9 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
     st.init(SPEP::UNLOCKUSER,0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
+    CHKKEY();
     br>>playerId;
+    INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
     st<<playerId;
     GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
@@ -879,6 +947,7 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
     st.init(SPEP::GMHANDLERFROMBS,0x01);
     std::string playerNameList;
     std::string cmd;
+    CHKKEY();
     br>>playerNameList;
     br>>cmd;
 	if(cmd.empty())
@@ -918,10 +987,11 @@ void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
 
 void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 {
-	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
 	UInt64 pid;
-	brd >> type >> pid;
+    CHKKEY();
+	br >> type >> pid;
 	GObject::Player * player = GObject::globalPlayers[pid];
 	Stream st(SPEP::PLAYERIDAUTH);
 	st << type << pid;
@@ -937,13 +1007,14 @@ void PlayerIDAuth( LoginMsgHdr& hdr, const void * data )
 
 void MailFromBs(LoginMsgHdr &hdr,const void * data)
 {
-    BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
     std::string playerName;
     std::string title;
     std::string content;
-    brd>>playerName;
-    brd>>title;
-    brd>>content;
+    CHKKEY();
+    br>>playerName;
+    br>>title;
+    br>>content;
     GObject::Player *pl= GObject::globalNamedPlayers[playerName];
     Stream st;
     st.init(SPEP::MAILFROMBS, 0x01);
@@ -968,6 +1039,7 @@ void BanChatFromBs(LoginMsgHdr &hdr,const void * data)
     st.init(SPEP::BANCHATFROMBS,0x01);
     std::string playerNameList;
     UInt32 time;
+    CHKKEY();
     br>>playerNameList;
     br>>time;
     StringTokenizer stk(playerNameList,"%");
@@ -1020,6 +1092,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
+    CHKKEY();
 	br>>playerNameList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	StringTokenizer stk(playerNameList,"%");
 	st << playerNameList;
@@ -1029,10 +1102,12 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		return;
 	UInt8 count = {0};
 	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
 	for(UInt32 i = 0; i < nums; i ++)
 	{
 		br>>item[i].id>>count;
 		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
 	for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1085,6 +1160,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
+    CHKKEY();
 	br>>playerIDList>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	StringTokenizer stk(playerIDList,"%");
 	st << playerIDList;
@@ -1094,10 +1170,12 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 		return;
 	UInt8 count = {0};
 	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
 	for(UInt32 i = 0; i < nums; i ++)
 	{
 		br>>item[i].id>>count;
 		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
 	for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1150,8 +1228,10 @@ void BattleReportReq(LoginMsgHdr& hdr, const void * data)
 
 void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 {
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
 	st.init(SPEP::ONLINE,0x01);
+    CHKKEY();
 	st<<SERVER().GetTcpService()->getOnlineNum();
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
@@ -1159,8 +1239,10 @@ void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 
 void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
 {
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
 	st.init(SPEP::ONLINEPF,0x01);
+    CHKKEY();
     UInt32 nums[MAX_DOMAIN] = {0,};
     GObject::dclogger.getOnline(nums);
     size_t off = st.size();
@@ -1189,8 +1271,11 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
 	st.init(SPEP::SETLEVEL,0x01);
     UInt64 id;
     UInt8 level;
+    CHKKEY();
     br>>id;
     br>>level;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, level);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -1218,6 +1303,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
+    CHKKEY();
 	br>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	std::string result="";
 	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
@@ -1225,10 +1311,13 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		return;
 	UInt8 count = {0};
 	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
 	for(UInt32 i = 0; i < nums; i ++)
 	{
 		br>>item[i].id>>count;
 		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
 	for(UInt32 i = 0; i < 4; i ++)
 	{
@@ -1277,10 +1366,13 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
     UInt32 pexp;
     UInt32 prestige;
     UInt32 honor;
+    CHKKEY();
     br>>id;
     br>>pexp;
     br>>prestige; // 声望
     br>>honor; // 荣誉
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u, %u, %u", __PRETTY_FUNCTION__, id, pexp, prestige, honor);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -1318,6 +1410,7 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     UInt32 coupon;
     UInt32 achievement;
 
+    CHKKEY();
     br>>id;
     br>>token;
     br>>type;
@@ -1325,6 +1418,9 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     br>>tael;
     br>>coupon;
     br>>achievement;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %s, %u, %u, %u, %u, %u",
+            __PRETTY_FUNCTION__, id, token.c_str(), type, gold, tael, coupon, achievement);
 
     st<<id;
     st<<type;
@@ -1424,10 +1520,13 @@ void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
 	st.init(SPEP::SETVIPL,0x01);
     UInt64 id;
     UInt8 lv;
+    CHKKEY();
     br>>id;
     br>>lv;
     st<<id;
     st<<lv;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, lv);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -1448,9 +1547,12 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
 	st.init(SPEP::CLSTASK,0x01);
     UInt64 id;
     UInt8 type;
+    CHKKEY();
     br>>id;
     br>>type;
     st<<id;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, type);
 
     UInt8 ret = 1;
     GObject::Player * pl = GObject::globalPlayers[id];
@@ -1470,6 +1572,7 @@ void reqSaleOnOffFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::SALE_ONOFF,0x1);
     UInt8 flag;
+    CHKKEY();
     br >> flag;
 
     UInt8 ret = flag;
@@ -1488,6 +1591,7 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::PLAYERINFO,0x1);
     UInt8 type;
+    CHKKEY();
     br >> type;
 
     GObject::Player* player = NULL;
@@ -1541,6 +1645,14 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
             st << static_cast<UInt8>(1);
         else
             st << static_cast<UInt8>(0);
+        UInt8 freeCnt, goldCnt;
+        GObject::playerCopy.getCount(player, &freeCnt, &goldCnt, true);
+        st << freeCnt << goldCnt;
+        UInt8 fcnt = GObject::frontMap.getCount(player);
+        st << static_cast<UInt8>(GObject::FrontMap::getFreeCount()-(fcnt&0xf));
+        st << static_cast<UInt8>(GObject::FrontMap::getGoldCount(player->getVipLevel())-((fcnt&0xf0)>>4));
+        st << static_cast<UInt8>(PLAYER_DATA(player, dungeonCnt));
+        st << static_cast<UInt8>(GObject::Dungeon::getExtraCount(player->getVipLevel()));
     }
 
     st << Stream::eos;
@@ -1553,6 +1665,7 @@ void WBossMgrFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::WBOSS,0x1);
     UInt8 lvl;
+    CHKKEY();
     br >> lvl;
     st << Stream::eos;
     GObject::worldBoss.bossAppear(lvl, true);
@@ -1566,8 +1679,11 @@ void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
     UInt64 playerId = 0;
     UInt16 fgtid = 0;
 
+    CHKKEY();
     br >> playerId;
     br >> fgtid;
+
+    INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, fgtid);
 
     UInt8 ret = 0;
     GObject::Fighter * fgt = GObject::globalFighters[fgtid];

@@ -49,6 +49,7 @@
 #include "GObject/Copy.h"
 #include "GObject/FrontMap.h"
 #include "GObject/WBossMgr.h"
+#include "GObject/TeamCopy.h"
 #include "ActivityMgr.h"
 #include <fcntl.h>
 
@@ -70,11 +71,10 @@ namespace GObject
     UInt32 GObjectManager::_trump_exp_rank[6][12];
     AttrFactor GObjectManager::_trump_rank_factor[6][12];
     std::vector<UInt16> GObjectManager::_trump_maxrank_chance;
-    float  GObjectManager::_trumpAttrMax[3][4][12][9];
 
     UInt16 GObjectManager::_attrTypeChances[3][9];
     UInt16 GObjectManager::_attrChances[3][9];
-    float  GObjectManager::_attrMax[3][4][12][9];
+    std::map<UInt8, stAttrMax*> GObjectManager::_attrMax;
     UInt16 GObjectManager::_attrDics[3][9];
 
     UInt32 GObjectManager::_socket_chance[6];
@@ -84,6 +84,12 @@ namespace GObject
     UInt32 GObjectManager::_max_capacity;
     std::vector<UInt32> GObjectManager::_potential_chance;
     std::vector<UInt32> GObjectManager::_capacity_chance;
+
+
+    UInt32 GObjectManager::_team_m_chance[3];
+    UInt32 GObjectManager::_team_m_item[3];
+    std::map<UInt32, UInt32> GObjectManager::_team_om_chance[3];
+    std::map<UInt32, UInt32> GObjectManager::_team_om_item;
 
     UInt8 GObjectManager::_evade_factor;
     UInt8 GObjectManager::_hitrate_factor;
@@ -157,6 +163,7 @@ namespace GObject
 		unloadEquipments();
 		loadAllFriends();
 		LoadDungeon();
+        loadTeamCopy();
 		loadAllClans();
 		LoadSpecialAward();
 		LoadLuckyDraw();
@@ -1464,6 +1471,47 @@ namespace GObject
 		}
 		lc.finalize();
 
+        lc.prepare("Loading team copy player:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBTeamCopyPlayer dbtcp;
+        if(execu->Prepare("SELECT `playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime` FROM `teamcopy_player` ORDER BY `playerId`, `copyId`, `type`", dbtcp) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbtcp.playerId];
+            if(!pl)
+                continue;
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(!tcpInfo)
+                continue;
+
+            tcpInfo->setPassFromDB(dbtcp.copyId, dbtcp.type, dbtcp.pass);
+            tcpInfo->setPassTimesFromDB(dbtcp.copyId, dbtcp.type, dbtcp.passTimes, dbtcp.vTime);
+        }
+		lc.finalize();
+
+        lc.prepare("Loading team copy player award:");
+        last_id = 0xFFFFFFFFFFFFFFFFull;
+        DBTeamCopyPlayerAward dbtcpa;
+        if(execu->Prepare("SELECT `playerId`, `rollId`, `roll`, `awardId`, `awardCnt` FROM `teamcopy_player_award` ORDER BY `playerId`", dbtcpa) != DB::DB_OK)
+            return false;
+        lc.reset(500);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[dbtcpa.playerId];
+            if(!pl)
+                continue;
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(!tcpInfo)
+                continue;
+
+            tcpInfo->loadAwardInfoFromDB(dbtcpa.rollId, dbtcpa.roll, dbtcpa.awardId, dbtcpa.awardCnt);
+        }
+		lc.finalize();
+
 		lc.prepare("Loading player pending tasks:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
@@ -1499,6 +1547,10 @@ namespace GObject
 			task->m_Submit = dtdata.m_Submit;
 			task->m_StepStr = dtdata.m_TaskStep;
 			pl->GetTaskMgr()->LoadTask(task);
+
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(tcpInfo && dtdata.m_Completed)
+                tcpInfo->checkCopyPass(dtdata.m_TaskId);
 		}
 		lc.finalize();
 
@@ -1522,6 +1574,10 @@ namespace GObject
 			const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(dtdata2.m_TaskId);
 			if (taskType.m_TypeId == 0) continue;
 			pl->GetTaskMgr()->LoadSubmitedTask(dtdata2.m_TaskId, dtdata2.m_TimeEnd);
+
+            TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
+            if(tcpInfo)
+                tcpInfo->checkCopyPass(dtdata2.m_TaskId);
 		}
 		lc.finalize();
 
@@ -1753,6 +1809,8 @@ namespace GObject
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
 		lc.finalize();
+
+
 		/////////////////////////////////
 
 		globalPlayers.enumerate(player_load, 0);
@@ -2137,6 +2195,30 @@ namespace GObject
 		lc.finalize();
 		return true;
 	}
+
+	bool GObjectManager::loadTeamCopy()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		
+        // 组队副本配置
+		LoadingCounter lc("Loading team copy templates:");
+		GData::DBTeamCopy dbtc;
+		if(execu->Prepare("SELECT `id`, `type`, `location`, `npcgroups` FROM `team_copy`", dbtc) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			StringTokenizer tk(dbtc.npcgroups, ",");
+			for(size_t i = 0; i < tk.count(); ++ i)
+			{
+                teamCopyManager->addTeamCopyNpc(dbtc.id, dbtc.type, dbtc.location, atoi(tk[i].c_str()));
+            }
+        }
+        lc.finalize();
+        return true;
+    }
 
 	static bool configLoadedClanData(Clan * clan, void * data)
 	{
@@ -2692,6 +2774,34 @@ namespace GObject
 			}
 
             {
+                lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTeamMatieralSplit");
+				UInt32 size = table_temp.size();
+				for(UInt32 j = 0; j < size; j ++)
+				{
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j + 1);
+					UInt8 q = table_temp2.get<UInt8>(1);
+                    if(q > 2)
+                        continue;
+                    _team_m_chance[q] = table_temp2.get<UInt32>(2);
+                    _team_m_item[q] = table_temp2.get<UInt32>(3);
+                }
+            }
+
+            {
+                lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getOrangeTeamMatieralSplit");
+				UInt32 size = table_temp.size();
+				for(UInt32 j = 0; j < size; j ++)
+				{
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j + 1);
+					UInt32 itemId = table_temp2.get<UInt32>(1);
+                    _team_om_chance[0][itemId] = table_temp2.get<UInt32>(2);
+                    _team_om_chance[1][itemId] = table_temp2.get<UInt32>(3);
+                    _team_om_chance[2][itemId] = table_temp2.get<UInt32>(4);
+                    _team_om_item[itemId] = table_temp2.get<UInt32>(5);
+                }
+            }
+
+            {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getMergeChance");
 				UInt32 size = std::min(9, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
@@ -2908,34 +3018,33 @@ namespace GObject
                 }
             }
 
-            for(UInt8 q = 0; q < 3; ++q)
             {
-                for(UInt8 crr = 0; crr < 4; ++crr)
+                lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrMax");
+                UInt32 size = table_temp.size();
+                for(UInt8 i = 0; i < size; ++i)
                 {
-                    for(UInt8 lvl = 0; lvl < 12; ++lvl)
-                    {
-                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrMax", q + 1, crr + 1, lvl + 1);
-                        UInt32 size = std::min(9, table_temp.size());
-                        for(UInt8 t = 0; t < size; ++t)
-                        {
-                            _attrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
-                        }
-                    }
-                }
-            }
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i+1);
+                    UInt8 q = table_temp2.get<float>(1) - 3;
+                    UInt8 lvl = table_temp2.get<float>(2);
+                    UInt8 crr = table_temp2.get<float>(3);
+                    UInt32 size2 = table_temp2.size();
 
-            for(UInt8 q = 0; q < 3; ++q)
-            {
-                for(UInt8 crr = 0; crr < 4; ++crr)
-                {
-                    for(UInt8 lvl = 0; lvl < 12; ++lvl)
+                    if(q > 2 || crr > 3)
+                        continue;
+
+                    for(UInt8 t = 3; t < size2; ++t)
                     {
-                        lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpAttrMax", q + 1, crr + 1, lvl + 1);
-                        UInt32 size = std::min(9, table_temp.size());
-                        for(UInt8 t = 0; t < size; ++t)
+                        std::map<UInt8, stAttrMax*>::iterator it = _attrMax.find(lvl);
+                        stAttrMax* attr = NULL;
+                        if(it != _attrMax.end())
+                            attr = it->second;
+                        else
                         {
-                            _trumpAttrMax[q][crr][lvl][t] =  table_temp.get<float>(t + 1);
+                            attr = new stAttrMax();
+                            _attrMax[lvl] = attr;
                         }
+
+                        attr->attrMax[q][crr][t-3] = table_temp2.get<float>(t+1);
                     }
                 }
             }

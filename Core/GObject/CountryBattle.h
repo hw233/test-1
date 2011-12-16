@@ -128,6 +128,7 @@ public:
 	inline void setCountryBattle(CountryBattle * cb) { _countryBattle = cb; }
 	void addAutoCB(Player *);
 	void delAutoCB(Player *);
+    void sendDaily(Player*);
 
 private:
 	bool _running;

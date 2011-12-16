@@ -27,6 +27,7 @@ MSG_REG(GameMsgHdr, OnStoreListReq);
 MSG_REG(GameMsgHdr, OnLeaderboardReq);
 MSG_REG(GameMsgHdr, OnOwnLeaderboardReq);
 MSG_REG(GameMsgHdr, OnBattleReportReq);
+MSG_REG(GameMsgHdr, OnBattleReportReq2);
 MSG_REG(GameMsgHdr, OnSaleListReq);
 MSG_REG(GameMsgHdr, OnSaleBuyAndCancelReq);
 MSG_REG(GameMsgHdr, OnPracticePlaceReq);

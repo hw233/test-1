@@ -99,7 +99,7 @@ function GetMaxActivity(vip)
 
         return 165;
     else
-        ap = ap - 15;
+        ap = ap - 3;
         return ap;
     end
 end
@@ -113,7 +113,7 @@ function GetAtyReward(player, flag)
 
     local mgr = player:GetActivityMgr();
     if mgr:GetPoint() < needPoint then
-        return;
+       return;
     end
 
 
@@ -129,24 +129,17 @@ function GetAtyReward(player, flag)
         local gemid =  getRandGem(1);
         package:AddItem(gemid, 1, true, false, 24 ); 
 
-        if rand <= 20 then
-            player:getTael(500);
-        end
     end
 
     if flag == 8 then
 
+        player:getTael(500);
         package:AddItem(502, 1, true, false, 24 );
-        if rand <= 20 then
-            player:getTael(1000);
-        end
     end
 
     if flag == 16 then
        player:getCoupon(20); 
-       if rand <= 20 then
-            package:AddItem(503, 1, true, false, 24 );
-       end
+       package:AddItem(503, 1, true, false, 24 );
     end
 
     if flag == 32 then
@@ -156,7 +149,8 @@ function GetAtyReward(player, flag)
          end
     end
     if flag == 64 then
-        package:AddItem(30, 2 , true, false , 24)
+        package:AddItem(30, 2 , true, false , 24);
+        package:AddItem(509, 1 , true, false , 24)
         if rand <= 20 then
             package:AddItem(515, 1, true, false, 24 );
         end

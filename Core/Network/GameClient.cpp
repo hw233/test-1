@@ -122,7 +122,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 	static int cmdTypes[] =
 	{
 	/*  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
-		0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x00
+		0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, // 0x00
 		2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x10
 		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x20
 		1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x30
@@ -131,7 +131,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, // 0x60
 		1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, // 0x70
 		0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, // 0x80
-		0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, // 0x90
+		0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, // 0x90
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0xA0
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, // 0xB0
 		0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, // 0xC0
@@ -202,10 +202,16 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             if (!chk) chk = 0xff;
             setChk(chk);
 
-            Stream st(REP::USER_INFO_CHANGE);
-            st << static_cast<UInt8>(0x14) << static_cast<UInt32>(chk);
-            st << Stream::eos;
+            Stream st(REP::CHKMARK);
+            st << chk << Stream::eos;
             send(&st[0], st.size());
+
+            {
+                Stream st(REP::USER_INFO_CHANGE);
+                st << static_cast<UInt8>(0x14) << static_cast<UInt32>(chk);
+                st << Stream::eos;
+                send(&st[0], st.size());
+            }
         }
         m_RecvTime = m_Now;
     }

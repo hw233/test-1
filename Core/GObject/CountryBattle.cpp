@@ -907,6 +907,7 @@ void GlobalCountryBattle::end( )
 	_running = false;
 	UInt32 curtime = TimeUtil::Now();
 	_countryBattle->end(curtime);
+    sendDaily(NULL);
 
 	_prepareTime = 0;
 	_startTime = 0;
@@ -951,6 +952,7 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 				_countryBattle->playerEnter(player);
 			}
 		}
+        sendDaily(NULL);
 		break;
 	case 3:
 		{
@@ -996,6 +998,20 @@ void GlobalCountryBattle::addAutoCB( Player * player )
 void GlobalCountryBattle::delAutoCB( Player * player )
 {
 	_autoList.erase( player );
+}
+
+void GlobalCountryBattle::sendDaily(Player* player)
+{
+    if (player && !isRunning())
+        return;
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(9);
+    st << static_cast<UInt8>(isRunning()?0:1);
+    st << Stream::eos;
+    if (player)
+        player->send(st);
+    else
+        NETWORK()->Broadcast(st);
 }
 
 }
