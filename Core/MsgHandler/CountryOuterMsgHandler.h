@@ -1602,11 +1602,17 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 		}
 
 		if(pkg->Split(itemId, splitOut, /*false,*/ true) == 2)
+        {
+            amount -= GData::moneyNeed[GData::SPLIT].tael;
 			break;
+        }
 	}
 
-    ConsumeInfo ci(SplitEquipment,0,0);
-    player->useTael(amount, &ci);
+    if(amount > 0)
+    {
+        ConsumeInfo ci(SplitEquipment,0,0);
+        player->useTael(amount, &ci);
+    }
 
 	Stream st(REP::EQ_BATCH_DECOMPOSE);
 	st << flag;
