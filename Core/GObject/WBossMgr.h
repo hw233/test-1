@@ -32,7 +32,8 @@ struct lt
     }
 };
 
-typedef std::multiset<AttackInfo, lt> AtkInfoType;
+//typedef std::multiset<AttackInfo, lt> AtkInfoType;
+typedef std::set<AttackInfo, lt> AtkInfoType;
 
 class WBoss
 {

@@ -99,10 +99,10 @@ UInt8 Dungeon::playerEnter( Player * player )
 				{
 					if(!player->hasChecked())
 						return 3;
-					if(player->getGoldOrCoupon() < price)
+					if(player->getGold() < price)
 						return 3;
 					ConsumeInfo ci(VipEnterDungeon,0,0);
-					player->useGoldOrCoupon(price, &ci);
+					player->useGold(price, &ci);
 				}
 			}
 
