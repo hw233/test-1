@@ -3375,7 +3375,7 @@ namespace GObject
 
         if(ied_trump.tRank > 0 && q > 2)
         {
-            UInt8 lv = (ied_trump.tRank + 1) * 10;
+            UInt8 lv = ied_trump.tRank;
             maxv[0] = GObjectManager::getAttrTrumpMax(lv, types[0]-1, q1, crr);
             maxv[1] = GObjectManager::getAttrTrumpMax(lv, types[1]-1, q1, crr);
             maxv[2] = GObjectManager::getAttrTrumpMax(lv, types[2]-1, q1, crr);
@@ -3414,7 +3414,7 @@ namespace GObject
 
         if(oldTRank != ied_trump.tRank && q > 2 && oldTRank > 0)
         {
-            UInt8 lv = (ied_trump.tRank + 1) * 10;
+            UInt8 lv = ied_trump.tRank;
             Int16 values2[3] = {0};
             if(maxv[0] > 0.00001)
             {
