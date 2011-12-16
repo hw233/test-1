@@ -2113,7 +2113,6 @@ namespace GObject
             }
             else
             {
-                UInt32 count = 0;
                 UInt32 typeId = t.getId();
                 if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 0))
                     count = 1;
