@@ -516,6 +516,23 @@ function ItemNormal_00000010(iid, num, bind, param)
   return num
 end
 
+function ItemNormal_00000011(iid, num, bind, param)
+    local player = GetPlayer()
+	local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+    if fgt == nil then
+		return false;
+	end
+    local oldexp = fgt:getExp();
+	fgt:addExp(10000*num);
+    if fgt:getExp() > oldexp then
+  	    package:DelItemSendMsg(11, player);
+	    return num;
+    else
+	    return false;
+    end
+end
+
 function ItemNormal_00008931(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -524,7 +541,7 @@ function ItemNormal_00008931(iid, num, bind, param)
   return num
 end
 
-function ItemNormal_00000011(iid, num, bind, param)
+function ItemNormal_000000111(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
 	local num2 = player:getBuffData(0x04, os.time());
@@ -897,6 +914,32 @@ function ItemNormal_00000029(iid, num, bind, param)
     end
 
     package:DelItemSendMsg(29, player);
+    return n;
+end
+
+function ItemNormal_00000400(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+
+    local n = 0;
+    for i = 1, num do
+        fgt:addPExp(1000);
+        n = n + 1
+        if fgt:isPExpFull() then
+            player:sendMsgCode(2, 1069, 0);
+            break
+        end
+    end
+
+    package:DelItemSendMsg(400, player);
     return n;
 end
 
@@ -5713,6 +5756,7 @@ local ItemNormal_Table = {
 	[8] = ItemNormal_00000008,
 	[9] = ItemNormal_00000009,
 	[10] = ItemNormal_00000010,
+	[11] = ItemNormal_00000011,
 	[8931] = ItemNormal_00008931,
 	[55] = ItemNormal_00000055,
 	[56] = ItemNormal_00000056,
@@ -5734,6 +5778,7 @@ local ItemNormal_Table = {
     [27] = ItemNormal_00000027,
     [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
+	[400] = ItemNormal_00000400,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[35] = ItemNormal_00000035,
