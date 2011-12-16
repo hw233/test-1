@@ -274,6 +274,13 @@ CREATE TABLE `loot` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `eupgrade`;
+CREATE TABLE `eupgrade` (
+ `eqid` int(10) unsigned NOT NULL,
+ `stuff` varchar(512) NOT NULL DEFAULT '',
+  `targetid` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`eqid`)
+)ENGINE=MyISAM DEFAULT CHARSET=utf8;
 --
 -- Table structure for table `lvl_exp`
 --

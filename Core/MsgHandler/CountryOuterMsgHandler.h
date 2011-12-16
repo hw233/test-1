@@ -600,7 +600,13 @@ struct TrumpLOrderReq
     UInt32 _itemId;
     MESSAGE_DEF2(REQ::EQ_TRUMP_L_ORDER, UInt16, _fgtId, UInt32, _itemId);
 };
+struct EquipUpgradeReq
+{
+    UInt16 _fgtId;
+    UInt32 _itemId;
+    MESSAGE_DEF2(REQ::EQ_UPGRADE, UInt16, _fgtId, UInt32, _itemId);
 
+};
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -3497,6 +3503,28 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 	Stream st(REP::EQ_TRUMP_L_ORDER);
 	st << res << req._fgtId << req._itemId << Stream::eos;
 	player->send(st);
+}
+
+void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
+{
+
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    Package * pkg = player->GetPackage();
+    UInt32 newId = 0;
+    UInt16 fid = req._fgtId;
+    UInt8 res = pkg->EquipUpgrade(req._fgtId, req._itemId,  &newId , &fid);
+
+
+    Stream st(REP::EQ_UPGRADE);
+    if(res == 0)
+        st << res << fid << newId << Stream::eos;
+    else
+        st << res << fid << req._itemId << Stream::eos;
+
+    printf("%u\n", fid);
+    player->send(st);
 }
 void OnActivityList( GameMsgHdr& hdr, const void * data)
 {
