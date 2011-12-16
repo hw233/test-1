@@ -19,6 +19,7 @@
 #include "GData/SkillTable.h"
 #include "GData/Money.h"
 #include "GData/Store.h"
+#include "GData/EUpgradeTable.h"
 #include "AttainMgr.h"
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -740,6 +741,82 @@ namespace GObject
 		return NULL;
 	}
 
+    ItemEquip* Package::AddUpgradeEquip(UInt32 typeId, bool notify, bool bind , ItemEquipData& ed, float * maxv)
+    {
+        const GData::ItemBaseType * itype = CheckBeforeEquipUpgrade(typeId);
+        if(itype == NULL)
+            return NULL;
+
+        //ItemEquipData ed = oldEquip->getItemEquipData();
+        ItemEquipData edata = ed;
+
+        ItemEquip * equip = NULL;
+
+        UInt8 lv =  itype->vLev ;
+        UInt8 crr = itype->career;
+        if(itype->quality > 2 )
+        {
+            UInt8 q = itype->quality - 3;
+            UInt8 t[3] = {edata.extraAttr2.type1, edata.extraAttr2.type2, edata.extraAttr2.type3};
+            Int16 v[3] = {  edata.extraAttr2.value1 ,  edata.extraAttr2.value2 ,  edata.extraAttr2.value3};
+            for(int i =0 ; i < 3 ; i ++)
+            {
+                if(maxv[i] > 0.00001 && t[i] - 1 >= 0)
+                {
+                    float value = GObjectManager::getAttrMax(lv, t[i]-1, q, crr);
+                    float tmp  = (value * static_cast<float>(v[i])) / maxv[i] + 0.9;
+                    if(tmp > value * 100)
+                       v[i] =  static_cast<Int16> (value * 100);
+                    else
+                       v[i] = static_cast<Int16> (tmp);
+                }
+            }
+            edata.extraAttr2.type1 = t[0];
+            edata.extraAttr2.value1 = v[0];
+            edata.extraAttr2.type2 = t[1];
+            edata.extraAttr2.value2 = v[1];
+            edata.extraAttr2.type3 = t[2];
+            edata.extraAttr2.value3 = v[2];
+        }
+
+        UInt32 id = IDGenerator::gItemOidGenerator.ID();
+        switch(itype->subClass)
+        {
+            case Item_Weapon:
+                equip = new(std::nothrow) ItemWeapon(id, itype, edata);
+                break;
+            case Item_Armor1:
+            case Item_Armor2:
+            case Item_Armor3:
+            case Item_Armor4:
+            case Item_Armor5:
+                equip = new ItemArmor(id, itype, edata);
+                break;
+            default:
+                equip = new ItemEquip(id, itype, edata);
+                break;
+        }
+        if(equip == NULL)
+           return NULL;
+
+        ITEM_BIND_CHECK(itype->bindType,bind);
+        equip->SetBindStatus(bind);
+        ItemBase *& e = m_Items[id];
+        if(e == NULL)
+           ++ m_Size;
+        e = equip;
+
+        DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
+        DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`,`socket3`,`socket4`, `socket5`, `socket6`) VALUES(%u, %u, %u, %u, %d, %u, %d, %u, %d, %u, %u,%u,%u,%u,%u,%u)", id, typeId, edata.enchant,edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3, edata.sockets, edata.gems[0], edata.gems[1], edata.gems[2], edata.gems[3], edata.gems[4],edata.gems[5]);
+        SendSingleEquipData(equip);
+        if(notify)
+            ItemNotify(equip->GetItemType().getId());
+        if( itype->quality >= 4)
+            DBLOG().PushUpdateData("insert into `equip_courses`(`server_id`, `player_id`, `template_id`, `equip_id`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)", cfg.serverLogId, m_Owner->getId(), typeId, id, FromEquipUpgrade, TimeUtil::Now());
+                                                                                        
+        // OnAddEquipAndCheckAttainment(itype, FromWhere);
+         return equip;
+    }
     void  Package::OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere)
     {
         if(FromWhere == FromDungeon || FromWhere  == FromNpc)
@@ -944,6 +1021,56 @@ namespace GObject
 		return true;
 	}
 
+    /**
+     *  @return  0表示有问题
+     */
+    UInt8 Package::GetPart( ItemEquip* eq)
+    {
+        if(!eq)
+            return 0;
+        UInt8 c  = eq->getClass();
+        
+        switch (c)
+        {
+            case Item_Weapon:
+                return  0x21;
+                
+            case Item_Armor1:
+                return  0x22;
+               
+            case Item_Armor2:
+                return  0x23;
+                break;
+            case Item_Armor3:
+                return  0x24;
+                break;
+            case Item_Armor4:
+                return  0x25;
+                
+            case Item_Armor5:
+                return  0x26;
+               
+            case Item_Amulet:
+                return  0x27;
+                
+            case  Item_Ring:
+                return 0x28;
+        }
+        return 0;
+    }
+    /*bool Package::EquipTo( ItemEquip * eq, Fighter * fgt,bool noCheckFull)
+    {
+        if(!eq || !fgt)
+            return false;
+        UInt8 c  = eq->getClass();
+        UInt8 part = GetPart( eq);
+        if(part == 0 )
+            return false;
+
+        ItemEquip* newItem = NULL;
+        return EquipTo(eq->getId(), fgt, part, newItem, noCheckFull);
+
+    }*/
 	bool Package::EquipTo( UInt32 id, Fighter * fgt, UInt8 part, ItemEquip *& newOne, bool noCheckFull )
 	{
 		newOne = NULL;
@@ -2070,6 +2197,13 @@ namespace GObject
 		ItemBase * item = FindItem(itemId);
 		if(item == NULL || item->getQuality() < 2 || item->getReqLev() < 1)
 			return 2;
+
+        if(GetRestPackageSize() < 2)
+        {
+            m_Owner->sendMsgCode(0, 1011);
+            return 2;
+        }
+
 		UInt8 q = item->getQuality() - 2;
 		bool isBound = item->GetBindStatus();
         UInt32 chance_low = GObjectManager::getSplitChance(q, 0);  // split_chance[q][lv][0];
@@ -2113,7 +2247,6 @@ namespace GObject
             }
             else
             {
-                UInt32 count = 0;
                 UInt32 typeId = t.getId();
                 if(r < GObjectManager::getOrangeTeamMatieralChance(typeId, 0))
                     count = 1;
@@ -2814,6 +2947,128 @@ namespace GObject
 		++ _lastActivateCount;
 		return 1;
 	}
+
+    const GData::ItemBaseType*  Package::CheckBeforeEquipUpgrade(UInt32 typeId)
+    {
+        const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
+        if(itype == NULL)
+            return NULL;
+        if(itype->subClass < Item_Weapon || itype->subClass > Item_Ring )
+            return NULL;
+        if(m_Size >= m_Owner->getPacksize())
+            return NULL;
+        return itype;
+
+    }
+
+    /***
+     *  @param  pNewId 新生成的物品ID
+     */
+    UInt8 Package::EquipUpgrade( UInt16 fighterId, UInt32 itemId, UInt32 * pNewId , UInt16* pFgtId)
+    {
+        Fighter * fgt = NULL;
+        UInt8 pos = 0;
+        
+        ItemEquip * oldEquip = FindEquip(fgt, pos, fighterId, itemId);
+        if (oldEquip == NULL) return 2;
+        
+        if(this->IsFull()){
+             m_Owner->sendMsgCode(0, 1011);
+             return 2;
+        }
+
+        if(this->m_Owner->getTael() < 10)
+        {
+            this->m_Owner->sendMsgCode(0, 1100);
+            return 2;
+        }
+
+        UInt8 part = GetPart(oldEquip);
+        if( part == 0 )
+            return  2;
+        const GData::ItemBaseType& itype =  oldEquip-> GetItemType();
+        //UInt32 newId  = GObjectManager::getEUpgradeId(itype.getId());
+
+        //if(newId == 0 )
+            //return 2;
+
+        GData::EUpgradeTable::iterator it =  GData::eUpgradeTable.find(itype.getId());
+        if(it == GData::eUpgradeTable.end())
+            return 2;
+
+        UInt32 newId = it->second.toId;
+
+        const GData::ItemBaseType* newType =  CheckBeforeEquipUpgrade(newId);
+        if(newType == NULL)
+            return 2;
+
+        for(UInt32 i = 0 ;  i < it->second.stfs.size(); i++)
+        {
+            GData::stUseItem&  itm = it->second.stfs[i]; 
+            if(  GetItemAnyNum(itm.id) < itm.num)
+                return 2;
+        }
+        bool bind = oldEquip->GetBindStatus();
+
+        for(UInt32 i = 0 ;  i < it->second.stfs.size(); i++)
+        {
+            bool b = false;
+            GData::stUseItem&  itm = it->second.stfs[i];
+            DelItemAny(itm.id, itm.num, &b);
+            if(b)
+                bind = true;
+        }
+
+        ItemEquipData ed = oldEquip->getItemEquipData();
+
+        UInt8 lv = itype.vLev ;
+        UInt8 crr = itype.career;
+        float maxv[3] = {0};
+        if(itype.quality > 2 )
+        {
+             UInt8 q = itype.quality - 3;
+             UInt8 t[3] = {ed.extraAttr2.type1, ed.extraAttr2.type2, ed.extraAttr2.type3};
+
+             for(UInt8 i = 0 ; i < 3; i ++ )
+             {
+                if(t[i] - 1 >= 0)
+                  maxv[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr);
+             }             
+        }
+
+        //删除原有物品
+        if(fgt)
+        {
+            ItemEquip* ptmp = NULL;
+            EquipTo(0, fgt, part, ptmp, true);
+        }
+
+        if( false == DelEquip2(oldEquip, ToEquipUpgrade))
+            return 2;
+        
+
+        ItemEquip*  pEquip = AddUpgradeEquip(newId, true, bind, ed , maxv);
+        if( pEquip == NULL)
+            return 2;
+
+
+        if(pNewId)
+            *pNewId =  pEquip->getId();
+        ConsumeInfo ci(ForEquipUpgrade,0,0);
+        m_Owner->useTael(10,&ci);
+
+        if(fgt)
+        {
+            UInt8 newPart = GetPart(pEquip);
+            ItemEquip* ptmp = NULL;
+            if(EquipTo(pEquip->getId(), fgt, newPart,  ptmp, true) == false)
+            {
+                if(pFgtId)
+                    *pFgtId = 0;
+            }
+        }
+        return 0;
+    }
 
 	UInt8 Package::Forge( UInt16 fighterId, UInt32 itemId, /*UInt8 t,*/ UInt8 * types, Int16 * values, UInt8 protect )
 	{

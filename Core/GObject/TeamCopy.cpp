@@ -860,7 +860,7 @@ void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::Battl
         {
             pl->_lastNg = ng;
 
-            if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
+            //if (ng->getLevel() <= pl->GetLev() || (ng->getLevel() > pl->GetLev() && (ng->getLevel() - pl->GetLev()) < 10))
             {
                 UInt32 now = TimeUtil::Now();
                 UInt32 chkPoint1 = TimeUtil::SharpDayT(0, now) + TEAMCOPY_EXTRAREWARDTM1;

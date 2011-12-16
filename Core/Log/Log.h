@@ -58,6 +58,7 @@ enum PurchaseType
     HeroIslandAuto,
     TeamCopyAwardRoll,
     DailyActivity,
+    ForEquipUpgrade,    
 };
 
 enum IncomingType
@@ -121,6 +122,7 @@ enum ItemFrom
     FromTeamCopy,
     FromAttainment,
     FromDailyActivity,
+    FromEquipUpgrade,
 };
 
 enum ItemTo
@@ -141,6 +143,7 @@ enum ItemTo
 	ToGemAttach,	
 	ToTrainFighter,	
 	ToTrumpUpgrade,	
+    ToEquipUpgrade,
 };
 
 
