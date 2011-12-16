@@ -2780,7 +2780,7 @@ namespace GObject
 				for(UInt32 j = 0; j < size; j ++)
 				{
                     lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j + 1);
-					UInt8 q = table_temp2.get<UInt8>(1);
+					UInt8 q = table_temp2.get<UInt8>(1) - 2;
                     if(q > 2)
                         continue;
                     _team_m_chance[q] = table_temp2.get<UInt32>(2);
