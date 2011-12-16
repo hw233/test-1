@@ -109,7 +109,7 @@ function Task_00000118_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."我追踪那无影倒是韦居到此，他与雪窟双魔劫走了余英男，在此地欲谋求那冰蚕。我正愁双拳难敌四手，就遇到少侠，真是天助我也。我听闻你剑术高超对付这几个妖人应该不在话下，而我正好可以去后洞救出英男姑娘，你看可好。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer()).."我追踪那无影道士韦居到此，他与雪窟双魔劫走了余英男，在此地欲谋求那冰蚕。我正愁双拳难敌四手，就遇到少侠，真是天助我也。我听闻你剑术高超对付这几个妖人应该不在话下，而我正好可以去后洞救出英男姑娘，你看可好。";
 	action.m_ActionMsg = "就这么办吧，看我去教训这几个鬼鬼祟祟的妖人。";
 	return action;
 end
