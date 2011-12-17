@@ -772,6 +772,8 @@ namespace GObject
 
 		checkLastBattled();
 		GameAction()->onLogin(this);
+        if (World::getChristmas())
+            GameAction()->onChristmas(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {

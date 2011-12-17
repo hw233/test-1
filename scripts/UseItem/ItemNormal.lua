@@ -336,6 +336,20 @@ function ItemNormal_00000026(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000401(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(2, 0, true)
+  player:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(player, 1, 3600, num, 86400) then
+    -- TODO
+  	package:DelItemSendMsg(401, player);
+	return num;
+  else
+	return false;
+  end
+end
+
 function ItemNormal_00000027(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -5780,6 +5794,7 @@ local ItemNormal_Table = {
     [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
 	[400] = ItemNormal_00000400,
+    [401] = ItemNormal_00000401,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[35] = ItemNormal_00000035,
