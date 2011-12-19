@@ -851,6 +851,19 @@ namespace GObject
         }
     }
 
+    void Player::moneyLog(int type, int gold, int coupon, int tael, int achievement, int prestige)
+    {
+        if (!type || type > 2) return;
+        UInt32 now = TimeUtil::Now();
+        int today = TimeUtil::GetYYMMDD(now);
+        if (!(World::_moneyLogged & type) || !TimeUtil::SameDay(now, WORLD().ThisDay()))
+            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, type);
+        DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
+        World::_moneyLogged |= type;
+
+        World::_moneyIn[type-1].gold += gold;
+    }
+
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
     {
         _online = false; // XXX: fuck

@@ -3531,7 +3531,6 @@ void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
     else
         st << res << fid << req._itemId << Stream::eos;
 
-    printf("%u\n", fid);
     player->send(st);
 }
 void OnActivityList( GameMsgHdr& hdr, const void * data)

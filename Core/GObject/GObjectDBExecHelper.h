@@ -712,6 +712,17 @@ struct DBTripod
     UInt8 num;
 };
 
+struct DBMoneyLog
+{
+    Int32 time;
+    Int32 type;
+    Int32 gold;
+    Int32 coupon;
+    Int32 tael;
+    Int32 achievement;
+    Int32 prestige;
+};
+
 struct DBCopyData
 {
     UInt64 playerId;
@@ -1649,6 +1660,19 @@ SPECIALDEF(7)
     UInt8, awdst,
     UInt16, itemId,
     UInt8, num
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBMoneyLog)
+SPECIALDEF(7)
+(
+    Int32, time,
+    Int32, type,
+    Int32, gold,
+    Int32, coupon,
+    Int32, tael,
+    Int32, achievement,
+    Int32, prestige
 )
 SPECIALEND()
 

@@ -174,6 +174,7 @@ namespace GObject
 		LoadArena();
         LoadPracticePlace();
         LoadWorldBoss();
+        InitMoneyLog();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -3421,6 +3422,26 @@ namespace GObject
             practicePlace.addPlace(place, i++);
         }
 		lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::InitMoneyLog()
+    {
+        int today = TimeUtil::GetYYMMDD();
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 1);
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 2);
+
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		DBMoneyLog t;
+        char buf[1024] = {0};
+        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 1", today);
+		execu->Extract(buf, t);
+        World::_moneyIn[0].gold = t.gold;
+        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 2", today);
+		execu->Extract(buf, t);
+        World::_moneyIn[1].gold = t.gold;
         return true;
     }
 

@@ -211,11 +211,12 @@ void FrontMap::enter(Player* pl, UInt8 id)
     if (!ret) {
         sendInfo2(pl, id, true);
 
+        UInt8 count = getCount(pl);
+
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
 
-        UInt8 count = getCount(pl);
         Stream st(REP::FORMATTON_INFO);
         st << static_cast<UInt8>(3) << count << Stream::eos;
         pl->send(st);
