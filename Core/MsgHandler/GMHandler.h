@@ -116,7 +116,8 @@ private:
     void OnAwardHI(GObject::Player *player, std::vector<std::string>&);
     void OnUseSkillHI(GObject::Player *player, std::vector<std::string>&);
     void OnAppearBoss(GObject::Player *player, std::vector<std::string>&);
-    void OnResetTeamCopyPlayer(GObject::Player* player, std::vector<std::string>& args);
+    void OnResetTeamCopyPlayer(GObject::Player* player, std::vector<std::string>&);
+    void OnMoneyIn(GObject::Player* player, std::vector<std::string>&);
 };
 
 extern GMHandler gmHandler;

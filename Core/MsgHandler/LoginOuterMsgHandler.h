@@ -36,6 +36,7 @@
 #include "GObject/FrontMap.h"
 #include "GObject/Copy.h"
 #include "GObject/Dungeon.h"
+#include "GObject/World.h"
 
 
 static memcached_st* memc = NULL;
@@ -675,6 +676,8 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
                 GLOBAL().PushMsg(hdr, &recharge);
                 ret=0;
+
+                player->moneyLog(1, recharge.gold);
             }
             else
             {
@@ -733,6 +736,8 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
             GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
             GLOBAL().PushMsg(hdr, &recharge);
             ret=0;
+
+            player->moneyLog(1, recharge.gold);
         }
         else
         {
@@ -1132,6 +1137,8 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
 				result +="0 ";
+
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
 			}
 			else
 			{
@@ -1200,6 +1207,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
 				result +="0 ";
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
 			}
 			else
 			{
@@ -1342,6 +1350,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
 				result +="0 ";
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
 			}
 			else
 			{
@@ -1399,6 +1408,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 
 void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
 {
+    return; // XXX: 取消这个功能 yangyoufa@ 19/12/11 21:04:59 
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
 	st.init(SPEP::SETMONEY,0x01);
@@ -1697,6 +1707,20 @@ void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
     player->takeFighter(fgtid, true);
 
     st << playerId << fgtid << ret;
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::GETMONEY,0x1);
+
+    CHKKEY();
+    st << GObject::World::_moneyIn[0].gold;
+    st << GObject::World::_moneyIn[1].gold;
+
     st << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }

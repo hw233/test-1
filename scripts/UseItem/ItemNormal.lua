@@ -338,11 +338,16 @@ end
 
 function ItemNormal_00000401(iid, num, bind, param)
   local player = GetPlayer()
+  local fgt = player:findFighter(param);
   local package = player:GetPackage();
-  player:setBuffData(2, 0, true)
-  player:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(player, 1, 3600, num, 86400) then
-    -- TODO
+
+  if fgt == nil then
+      return false
+  end
+
+  fgt:setBuffData(2, 0, true)
+  fgt:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(fgt, 1, 3600, num, 86400) then
   	package:DelItemSendMsg(401, player);
 	return num;
   else
