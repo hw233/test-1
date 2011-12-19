@@ -3611,7 +3611,7 @@ int BattleSimulator::testWinner2()
         }
     }
 
-    return leftHPAll[0] > leftHPAll[1];
+    return leftHPAll[0] > leftHPAll[1] ? 1 : 2;
 }
 
 void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount)

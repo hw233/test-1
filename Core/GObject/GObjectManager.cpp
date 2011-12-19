@@ -52,6 +52,7 @@
 #include "GObject/TeamCopy.h"
 #include "ActivityMgr.h"
 #include <fcntl.h>
+#include "HoneyFall.h"
 
 namespace GObject
 {
@@ -91,6 +92,8 @@ namespace GObject
     UInt32 GObjectManager::_team_m_item[3];
     std::map<UInt32, UInt32> GObjectManager::_team_om_chance[3];
     std::map<UInt32, UInt32> GObjectManager::_team_om_item;
+
+    std::vector<stHftChance> GObjectManager::_hft_chance[6][12];
 
     UInt8 GObjectManager::_evade_factor;
     UInt8 GObjectManager::_hitrate_factor;
@@ -1132,6 +1135,24 @@ namespace GObject
 				newPlayers.add(id, pl);
 			}
 			globalNamedPlayers.add(pl->getName(), pl);
+		}
+		lc.finalize();
+
+		lc.prepare("Loading Player HoneyFall:");
+        pl = NULL;
+		DBHoneyFall hfData;
+		if(execu->Prepare("SELECT `playerId`, `type`, `value` FROM `player_honeyfall`", hfData) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            pl = globalPlayers[hfData.playerId];
+            if(pl == NULL)
+                continue;
+
+            HoneyFall* hf = pl->getHoneyFall();
+            hf->setHftValue(hfData.type, hfData.value);
 		}
 		lc.finalize();
 
@@ -2916,6 +2937,25 @@ namespace GObject
                         _enchant_chance[t][q][j] =  table_temp.get<UInt32>(j + 1);
                     }
 
+                }
+            }
+
+            {
+                for(UInt8 q = 0; q < 6; q ++)
+                {
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChanceAdv", q + 1);
+                    UInt32 size = table_temp.size();
+                    for(UInt32 j = 0; j < size; j ++)
+                    {
+                        stHftChance hftc;
+                        lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j+1);
+                        UInt8 lv = table_temp2.get<UInt8>(1) - 1;
+                        if(lv > 12)
+                            continue;
+                        hftc.times = table_temp2.get<UInt8>(2);
+                        hftc.chance = table_temp2.get<UInt32>(3);
+                        _hft_chance[q][lv].push_back(hftc);
+                    }
                 }
             }
 

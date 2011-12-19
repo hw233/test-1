@@ -43,6 +43,13 @@ namespace GObject
         float attrMax[3][4][9];
     };
 
+    struct stHftChance
+    {
+        stHftChance() { times = 0; chance = 0; }
+        UInt8 times;
+        UInt32 chance;
+    };
+
 	class GObjectManager
 	{
 	public:
@@ -257,6 +264,23 @@ namespace GObject
                 return 0;
         }
 
+        static UInt32 getChanceFromHft(UInt8 q, UInt8 lv, UInt8 v)
+        {
+            if(q > 5)
+                q = 0;
+            if(lv > 11)
+                lv = 0;
+
+            UInt8 cnt = _hft_chance[q][lv].size();
+            for(UInt8 i = cnt - 1; i >= 0; --i)
+            {
+                if(_hft_chance[q][lv][i].times <= v)
+                    return _hft_chance[q][lv][i].chance;
+            }
+
+            return 0;
+        }
+
        	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -311,6 +335,9 @@ namespace GObject
         static std::vector<UInt32>              _yellow_diamond_gem;
 
 		static std::vector<UInt16> _trump_maxrank_chance;
+
+        // 强化人品
+        static std::vector<stHftChance> _hft_chance[6][12];
 
        // static std::vector<stMergeStf>  _mergeStfs;
         typedef std::vector<stMergeStf>   vMergeStfs;

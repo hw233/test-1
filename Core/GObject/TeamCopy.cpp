@@ -377,6 +377,12 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 
     if(!checkTeamCopy(pl, copyId, t))
         return 0;
+
+    UInt8 teamCopyId = teamId & 0x1F;
+    UInt8 teamCopyTyep = (teamId >> 5 & 0x07);
+
+    if(copyId != teamCopyId || t != teamCopyTyep)
+        return 0;
     
     AllCopyTeamsIterator it = m_allCopyTeams.find(teamId);
     if(it == m_allCopyTeams.end() || it->second == NULL)
@@ -461,6 +467,7 @@ void TeamCopy::leaveTeam(Player* pl)
 
     pl->setTeamData(NULL);
     // send team info to members ::TODO
+    bool find = false;
     if(td->count == 0)
     {
         m_allCopyTeams.erase(td->id);
@@ -470,8 +477,29 @@ void TeamCopy::leaveTeam(Player* pl)
         {
             if (td == ct[i])
             {
+                find = true;
                 ct.erase(ct.begin() + i);
                 break;
+            }
+        }
+
+        if(!find)
+        {
+            for(UInt8 i = 0; i < TEAMCOPY_MAXTYPECNT; ++i)
+            {
+                for(UInt8 j = 0; j < TEAMCOPY_MAXCOPYCNT; ++j)
+                {
+                    CopyTeams& ct = *(m_copysTeam[i][j]);
+                    for(UInt32 k = 0; k < ct.size(); ++k)
+                    {
+                        if (td == ct[k])
+                        {
+                            find = true;
+                            ct.erase(ct.begin() + k);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -496,6 +524,9 @@ void TeamCopy::leaveTeam(Player* pl)
     }
 
     pl->send(st);
+
+    if(find)
+        delete td;
 }
 
 void TeamCopy::teamKick(Player* pl, UInt64 playerId)
@@ -643,7 +674,6 @@ bool TeamCopy::leaveTeamCopy(Player* pl)
         return false;
     }
 
-    pl->delFlag(GObject::Player::InCopyTeam);
     for(UInt16 idx = 0; idx < m_playerIdle[t][copyIdx].size(); ++idx)
     {
         if(m_playerIdle[t][copyIdx][idx] == pl)
@@ -660,6 +690,7 @@ bool TeamCopy::leaveTeamCopy(Player* pl)
     }
 
     pl->clearCopyTeamPage();
+    pl->delFlag(GObject::Player::InCopyTeam);
 
     return true;
 }
