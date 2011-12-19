@@ -230,7 +230,8 @@ void BattleSimulator::start(UInt8 prevWin)
     _cur_fgtlist_idx = (cur_idx + 1)%2;
 	UInt8 cnt[2] = {0, 0};
 	bool loaded[2] = {false, false};
-	bool checkEnh = _player[1] == NULL;
+	//bool checkEnh = _player[1] == NULL;
+	bool checkEnh = true; // XXX: 对怪对人都有用
 	UInt32 now = TimeUtil::Now();
 	for(int i = 0; i < 2; ++ i)
 	{

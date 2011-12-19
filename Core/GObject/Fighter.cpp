@@ -1977,6 +1977,10 @@ void Fighter::setSkills( std::string& skills, bool writedb )
         //addNewSkill(::atoi(tk[i].c_str()), writedb);
     }
 
+    bool up = false;
+    if (_id >= 999)
+        up = true;
+
     const GData::SkillBase* s  = 0;
     std::vector<const GData::SkillBase*> vt_skills;
     for (size_t i = 0; i < tk.count(); ++i)
@@ -1989,7 +1993,7 @@ void Fighter::setSkills( std::string& skills, bool writedb )
     }
 
     if (vt_skills.size())
-        addSkillsFromCT(vt_skills, writedb, true);
+        addSkillsFromCT(vt_skills, writedb, up);
 }
 
 bool Fighter::addNewSkill( UInt16 skill, bool writedb, bool up )
