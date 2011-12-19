@@ -288,9 +288,16 @@ void BattleSimulator::start(UInt8 prevWin)
 					_packet << static_cast<UInt8>(j + 1) << bf->getFighter()->getBattleName();
 					if(bf->getFighter()->isNpc())
 						_packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
-					else
+                    else
 						_packet << bf->getFighter()->getClassAndSex();
-					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << bf->getPortrait() << static_cast<UInt8>(bf->getFlag() & 0x03);
+
+                    UInt16 portrait = 0;
+                    if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
+                        portrait = 137;
+                    else
+                        portrait = bf->getPortrait();
+
+					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << portrait << static_cast<UInt8>(bf->getFlag() & 0x03);
 					_packet << static_cast<UInt8>(bf->getFighter()->getColor())
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
@@ -1390,6 +1397,56 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
     if(bf->getHP() == 0)
     {
+        return 0;
+    }
+
+    // 雪球
+    if(skill->getId() == 137)
+    {
+        size_t defCount = 0;
+        DefStatus defList[25];
+
+        UInt8 cnt = 1;
+        for(UInt8 i = 0; i < cnt; ++i)
+        {
+			UInt8 posList[25];
+			size_t posCount = 0;
+			UInt8 side = bf->getSide();
+			UInt8 y = 0;
+			while(y < 5)
+			{
+				UInt8 p = y * 5;
+				for(UInt8 x = 0; x < 5; ++ x, ++ p)
+				{
+					if(_objs[side][p] == NULL || _objs[side][p]->getHP() == 0)
+						posList[posCount ++] = p;
+				}
+				++ y;
+			}
+			if(posCount == 0)
+				break;
+			bf->addFlag(BattleFighter::Mirrored);
+			UInt8 pos = posList[_rnd(posCount)];
+            GObject::Fighter * fgt = globalFighters[137];
+			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);
+			if(newf == NULL)
+				break;
+            newf->initStats(false);
+			newf->setSideAndPos(side, pos);
+			newf->addFlag(BattleFighter::IsMirror);
+			setObject(side, pos, newf);
+            
+            defList[i].pos = pos + 25;
+            defList[i].damType = e_Summon;
+            defList[i].damage = 137;
+            defList[i].leftHP = newf->getHP();
+            ++defCount;
+
+			//FighterStatus fs(newf);
+			// insert fighter into queue by order
+			insertFighterStatus(newf);
+        }
+        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
         return 0;
     }
 

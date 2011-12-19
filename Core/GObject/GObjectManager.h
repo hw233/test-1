@@ -272,7 +272,7 @@ namespace GObject
                 lv = 0;
 
             UInt8 cnt = _hft_chance[q][lv].size();
-            for(UInt8 i = cnt - 1; i >= 0; --i)
+            for(int i = cnt - 1; i >= 0; --i)
             {
                 if(_hft_chance[q][lv][i].times <= v)
                     return _hft_chance[q][lv][i].chance;

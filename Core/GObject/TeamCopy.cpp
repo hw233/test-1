@@ -695,7 +695,7 @@ bool TeamCopy::leaveTeamCopy(Player* pl)
     return true;
 }
 
-void TeamCopy::teamBattleStart(Player* pl)
+void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
 {
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
