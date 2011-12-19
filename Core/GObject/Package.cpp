@@ -37,6 +37,9 @@
 
 namespace GObject
 {
+#define EQUIPTYPE_EQUIP 0
+#define EQUIPTYPE_TRUMP 1
+
     UInt16 getRandOEquip(UInt8 lvl)
     {
         static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70};
@@ -291,7 +294,7 @@ namespace GObject
 		}
 	}
 #endif
-	static void getRandomAttr2(UInt8 lv, UInt8 crr, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v)
+	static void getRandomAttr2(UInt8 lv, UInt8 crr, UInt8 q, int c, UInt8 mask, UInt8 * t, Int16 * v, UInt8 equip_t = EQUIPTYPE_EQUIP)
     {
         switch(q)
         {
@@ -360,7 +363,10 @@ namespace GObject
                                 UInt32 dics = GObjectManager::getAttrDics(q, k+1) - GObjectManager::getAttrDics(q, k);
                                 UInt32 tmp = uRand(100) + 1;
                                 UInt32 factor = GObjectManager::getAttrDics(q, k) + static_cast<float>(dics * tmp) / 100;
-                                v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
+                                if(equip_t == EQUIPTYPE_EQUIP)
+                                    v[i] = GObjectManager::getAttrMax(lv, t[i]-1, q, crr)*factor;
+                                else if(equip_t == EQUIPTYPE_TRUMP)
+                                    v[i] = GObjectManager::getAttrTrumpMax(lv, t[i]-1, q, crr)*factor;
                                 break;
                             }
                         }
@@ -2925,13 +2931,15 @@ namespace GObject
 			values[2] = ied.extraAttr2.value3;
             UInt8 crr = equip->GetCareer();
 
+            UInt8 equip_t = EQUIPTYPE_EQUIP;
             lv = equip->getValueLev();
             if(equip->GetItemType().subClass == Item_Trump)
             {
-                lv = (ied.tRank + 1) * 10;
+                equip_t = EQUIPTYPE_TRUMP;
+                lv = ied.tRank;
             }
 
-			getRandomAttr2(lv, crr, q, c, protect, types, values);
+			getRandomAttr2(lv, crr, q, c, protect, types, values, equip_t);
 			if(!equip->GetBindStatus() && isBound)
 				equip->DoEquipBind();
 			ApplyAttr2(equip, types, values);
@@ -3136,22 +3144,30 @@ namespace GObject
 		m_Owner->useTael(amount,&ci);
         UInt8 crr = equip->GetCareer();
 
+        UInt8 equip_t = EQUIPTYPE_EQUIP;
         if(equip->GetItemType().subClass == Item_Trump)
         {
-            lv = (ied.tRank + 1) * 10;
+            equip_t = EQUIPTYPE_TRUMP;
+            lv = ied.tRank;
         }
 
-		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values);
+		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values, equip_t);
 
         float v0 = 0;
-        v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
+        if(equip_t == EQUIPTYPE_EQUIP)
+            v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
+        else if(equip_t == EQUIPTYPE_TRUMP)
+            v0 = GObjectManager::getAttrTrumpMax(lv, types[0]-1, q, crr)*90;
         if ((float)values[0] > v0 && !(protect & 1))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
 
         float v1 = 0;
-        v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*90;
+        if(equip_t == EQUIPTYPE_EQUIP)
+            v1 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*90;
+        else if(equip_t == EQUIPTYPE_TRUMP)
+            v1 = GObjectManager::getAttrTrumpMax(lv, types[1]-1, q, crr)*90;
         if ((float)values[1] > v1 && !(protect & 2))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
@@ -3359,10 +3375,10 @@ namespace GObject
 
         if(ied_trump.tRank > 0 && q > 2)
         {
-            UInt8 lv = (ied_trump.tRank + 1) * 10;
-            maxv[0] = GObjectManager::getAttrMax(lv, types[0]-1, q1, crr);
-            maxv[1] = GObjectManager::getAttrMax(lv, types[1]-1, q1, crr);
-            maxv[2] = GObjectManager::getAttrMax(lv, types[2]-1, q1, crr);
+            UInt8 lv = ied_trump.tRank;
+            maxv[0] = GObjectManager::getAttrTrumpMax(lv, types[0]-1, q1, crr);
+            maxv[1] = GObjectManager::getAttrTrumpMax(lv, types[1]-1, q1, crr);
+            maxv[2] = GObjectManager::getAttrTrumpMax(lv, types[2]-1, q1, crr);
         }
 
         ied_trump.trumpExp += exp;
@@ -3386,23 +3402,23 @@ namespace GObject
 
         if(newAttr2)
         {
-            UInt8 lv = (ied_trump.tRank + 1) * 10;
+            UInt8 lv = ied_trump.tRank;
             if(q > 2)
             {
                 UInt8 t[3] = {0, 0, 0};
                 Int16 v[3] = {0, 0, 0};
-                getRandomAttr2(lv, crr, q1, 0, 0, t, v);
+                getRandomAttr2(lv, crr, q1, 0, 0, t, v, EQUIPTYPE_TRUMP);
                 ApplyAttr2(trump, t, v);
             }
         }
 
         if(oldTRank != ied_trump.tRank && q > 2 && oldTRank > 0)
         {
-            UInt8 lv = (ied_trump.tRank + 1) * 10;
+            UInt8 lv = ied_trump.tRank;
             Int16 values2[3] = {0};
             if(maxv[0] > 0.00001)
             {
-                float v = GObjectManager::getAttrMax(lv, types[0]-1, q1, crr);
+                float v = GObjectManager::getAttrTrumpMax(lv, types[0]-1, q1, crr);
                 float tmp = (v * static_cast<float>(values[0])) / maxv[0] + 0.9;
                 if(tmp > v * 100)
                     values2[0] = v * 100;
@@ -3412,7 +3428,7 @@ namespace GObject
             }
             if(maxv[1] > 0.00001)
             {
-                float v = GObjectManager::getAttrMax(lv, types[1]-1, q1, crr);
+                float v = GObjectManager::getAttrTrumpMax(lv, types[1]-1, q1, crr);
                 float tmp = (v * static_cast<float>(values[1])) / maxv[1] + 0.9;
                 if(tmp > v * 100)
                     values2[1] = v * 100;
@@ -3421,7 +3437,7 @@ namespace GObject
             }
             if(maxv[2] > 0.00001)
             {
-                float v = GObjectManager::getAttrMax(lv, types[2]-1, q1, crr);
+                float v = GObjectManager::getAttrTrumpMax(lv, types[2]-1, q1, crr);
                 float tmp = (v * static_cast<float>(values[2])) / maxv[2] + 0.9;
                 if(tmp > v * 100)
                     values2[2] = v * 100;

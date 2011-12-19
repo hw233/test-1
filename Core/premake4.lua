@@ -19,11 +19,13 @@ project "Server.ASSS"
     configuration { "windows", "not vs*" }
         links { "event" }
     configuration "not vs*"
-    	buildoptions { "-std=c++0x", "-pg" }
+    	buildoptions { "-std=c++0x" }
         links { "mysqlclient" }
+    configuration { "Debug", "not vs*"}
+    	buildoptions { "-pg" }
+        linkoptions { "-pg" }
     configuration "not windows"
         links { "event", "event_pthreads", "dl", "udplog", "memcached", "dcapi_cpp-64" }
-        --links { "event", "event_pthreads", "dl", "udplog", "pthread" }
     configuration "linux"
         defines "LUA_USE_LINUX"
     configuration "macosx"
@@ -40,6 +42,8 @@ project "Server.lua"
     files { "lua/*.c", "lua/*.h" }
     configuration "linux"
         defines "LUA_USE_LINUX"
+    configuration { "Debug", "not vs*"}
+    	buildoptions { "-pg" }
     configuration "macosx"
         defines "LUA_USE_MACOSX"
 else
@@ -49,6 +53,8 @@ project "Server.lua.jit"
     files { "luajit/*.c", "luajit/*.h" }
     configuration "linux"
         defines "LUA_USE_LINUX"
+    configuration { "Debug", "not vs*"}
+    	buildoptions { "-pg" }
     configuration "macosx"
         defines "LUA_USE_MACOSX"
 end

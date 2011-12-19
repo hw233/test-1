@@ -772,6 +772,8 @@ namespace GObject
 
 		checkLastBattled();
 		GameAction()->onLogin(this);
+        if (World::getChristmas())
+            GameAction()->onChristmas(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -1959,11 +1961,6 @@ namespace GObject
 		_playerData.formation = f;
 		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
 
-        if(hasFlag(GObject::Player::InCopyTeam))
-        {
-            teamCopyManager->updateTeamInfo(this);
-        }
-
         return true;
 	}
 
@@ -2023,6 +2020,11 @@ namespace GObject
 		}
 		st.data<UInt8>(6) = c;
 		st << Stream::eos;
+
+        if(hasFlag(GObject::Player::InCopyTeam))
+        {
+            teamCopyManager->updateTeamInfo(this);
+        }
 	}
 
 	void Player::makeFighterList( Stream& st )
@@ -7480,32 +7482,48 @@ namespace GObject
             GetPackage()->AddItem(m_td.itemId, m_td.num, true, false, FromTripod);
 
         m_td.fire = 0;
-        m_td.quality = 2;
+        if (getVipLevel() > 2)
+            m_td.quality = 3;
+        else
+            m_td.quality = 2;
         m_td.needgen = 1;
         m_td.awdst = 0;
         m_td.soul = 0;
         m_td.itemId = 0;
         m_td.num = 0;
-        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=2, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u", getId());
+        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=%u, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u",
+                m_td.quality, getId());
         runTripodData(m_td);
         sendTripodInfo();
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
     {
-        if(getVipLevel() > 2)
-            m_td.quality = 3;
-
         if (&data != &m_td)
             m_td = data;
+
+        bool update = false;
+        if(getVipLevel() > 2 && m_td.quality < 3)
+        {
+            m_td.quality = 3;
+            update = true;
+        }
 
         EventPlayerTripod* event = new (std::nothrow) EventPlayerTripod(this, 60, MAX_TRIPOD_SOUL/POINT_PERMIN);
         if (!event) return nulltd;
         PushTimerEvent(event);
 
-        if (init && m_td.itemId && m_td.num)
+        if (init && m_td.itemId && m_td.num && m_td.needgen)
+        {
             m_td.needgen = 0;
-        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = 0, `quality` = %u WHERE `id` = %"I64_FMT"u", m_td.quality, getId());
+            update = true;
+        }
+
+        if (update)
+        {
+            DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u WHERE `id` = %"I64_FMT"u",
+                    m_td.needgen, m_td.quality, getId());
+        }
         m_hasTripod = true;
         return m_td;
     }

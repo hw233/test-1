@@ -1602,11 +1602,17 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 		}
 
 		if(pkg->Split(itemId, splitOut, /*false,*/ true) == 2)
+        {
+            amount -= GData::moneyNeed[GData::SPLIT].tael;
 			break;
+        }
 	}
 
-    ConsumeInfo ci(SplitEquipment,0,0);
-    player->useTael(amount, &ci);
+    if(amount > 0)
+    {
+        ConsumeInfo ci(SplitEquipment,0,0);
+        player->useTael(amount, &ci);
+    }
 
 	Stream st(REP::EQ_BATCH_DECOMPOSE);
 	st << flag;
@@ -1615,6 +1621,8 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
     st << cnt;
     for(UInt16 idx = 0; idx < cnt; ++idx)
     {
+        SYSMSG_SENDV(102, player, splitOut[idx].itemId, splitOut[idx].count);
+        SYSMSG_SENDV(1002, player, splitOut[idx].itemId, splitOut[idx].count);
         st << splitOut[idx].itemId << splitOut[idx].count;
     }
 

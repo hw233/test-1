@@ -373,6 +373,7 @@ void BattleFighter::updateBuffExtras()
 		_attrExtra.physiqueP += extAttr;
 		_attrExtra.agilityP += extAttr;
 		_attrExtra.intelligenceP += extAttr;
+		_attrExtra.willP += extAttr;
 	}
 }
 

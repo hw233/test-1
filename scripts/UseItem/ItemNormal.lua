@@ -336,6 +336,20 @@ function ItemNormal_00000026(iid, num, bind, param)
   end
 end
 
+function ItemNormal_00000401(iid, num, bind, param)
+  local player = GetPlayer()
+  local package = player:GetPackage();
+  player:setBuffData(2, 0, true)
+  player:setBuffData(3, 0, true)
+  if ItemNormal_AddBuff(player, 1, 3600, num, 86400) then
+    -- TODO
+  	package:DelItemSendMsg(401, player);
+	return num;
+  else
+	return false;
+  end
+end
+
 function ItemNormal_00000027(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -479,6 +493,7 @@ function ItemNormal_00000010(iid, num, bind, param)
       {1612,1616,1607,1611},
       {200,201,202,203,204,205,206,207,208},
       {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224},
+      {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
   }
 
   local n = 0
@@ -497,7 +512,7 @@ function ItemNormal_00000010(iid, num, bind, param)
   elseif lvl >= 70 and lvl <= 74 then
       n = 7
   elseif lvl >= 75 then
-      n = 7
+      n = 8
   end
 
   if n == 0 then
@@ -5842,6 +5857,7 @@ local ItemNormal_Table = {
 	[400] = ItemNormal_00000400,
     [402] = ItemNormal_00000402,
     [403] = ItemNormal_00000403,
+    [401] = ItemNormal_00000401,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[35] = ItemNormal_00000035,

@@ -41,7 +41,7 @@ solution "HoHH"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
-        buildoptions { "-Wall", "-fexceptions", "-fno-strict-aliasing", "-Wno-multichar", "-pg" }
+        buildoptions { "-Wall", "-fexceptions", "-fno-strict-aliasing", "-Wno-multichar" }
     configuration {"not vs*", "windows"}
         buildoptions { "-static-libgcc", "-static-libstdc++" }
 

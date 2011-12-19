@@ -10,6 +10,8 @@
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Country.h"
 #include "Script/GameActionLua.h"
+#include "MapCollection.h"
+
 namespace GObject
 {
 
@@ -102,7 +104,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 
                 AttackInfo info(pl, damage);
                 AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
-                for ( ; i != e; ++i)
+                while (i != e)
                 {
                     if ((*i).player == pl)
                     {
@@ -110,6 +112,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                         m_atkinfo.erase(i);
                         break;
                     }
+                    ++i;
                 }
                 m_atkinfo.insert(info);
 
@@ -346,6 +349,9 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
         return false;
 
     if (loc != m_loc)
+        return false;
+
+    if (pl->getThreadId() !=  mapCollection.getCountryFromSpot(loc))
         return false;
 
     if (!m_id)
