@@ -150,6 +150,7 @@ GMHandler::GMHandler()
     Reg(3, "hiuseskill", &GMHandler::OnUseSkillHI);
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
     Reg(3, "resettcplayer", &GMHandler::OnResetTeamCopyPlayer);
+    Reg(3, "moneyin", &GMHandler::OnMoneyIn);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2496,5 +2497,11 @@ void GMHandler::OnResetTeamCopyPlayer(GObject::Player* player, std::vector<std::
         if(tcpInfo)
             tcpInfo->resetTCPlayer();
     }
+}
+
+void GMHandler::OnMoneyIn(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->moneyLog(1, 1);
+    player->moneyLog(2, 1);
 }
 

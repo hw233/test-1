@@ -74,6 +74,7 @@ namespace GObject
         static bool LoadTripodData();
         static bool LoadWorldBoss();
         static bool loadTeamCopy();
+        static bool InitMoneyLog();
 
         static UInt8 reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err);
 

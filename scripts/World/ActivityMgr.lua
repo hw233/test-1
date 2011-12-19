@@ -77,10 +77,23 @@ local onlineReward =
     { {5061,1} ,  {5071, 1} , {5081, 1}, {5091, 1}, {5101, 1}, {5111 , 1 }, {5121, 1} } , 
     { {510,1}},
 }
-
+local christmasReward = {
+    { { 403,1} },
+    { { 403,2} },
+    { { 403,3} },
+    { { 402,1}},
+    { { 402,2}},
+    { { 402,3}},
+    { { 401,1}},
+}
 --获取上线奖励
 function GetOnlineReward()
-    return onlineReward;
+    local isChristmas = getChristmas();
+    if isChristmas == false then
+        return onlineReward;
+    else 
+        return christmasReward;
+    end
 end
 
 --某一项的最大值
@@ -125,21 +138,36 @@ function GetAtyReward(player, flag)
 
     local rand = math.random(100);
 
+    local isChristmas = getChristmas();
     if flag == 4 then
         local gemid =  getRandGem(1);
         package:AddItem(gemid, 1, true, false, 24 ); 
-
+        if  isChristmas == true then
+            package:AddItem(401, 1, true, false, 24 );
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得【圣诞女郎变身卡】");
+        end
     end
 
     if flag == 8 then
 
         player:getTael(500);
         package:AddItem(502, 1, true, false, 24 );
+
+         if  isChristmas == true then
+            package:AddItem(402, 1, true, false, 24 );
+        end
+
     end
 
     if flag == 16 then
        player:getCoupon(20); 
        package:AddItem(503, 1, true, false, 24 );
+
+        if  isChristmas == true then
+            package:AddItem(401, 2, true, false, 24 );
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得【圣诞女郎变身卡】");
+        end
+
     end
 
     if flag == 32 then
@@ -147,6 +175,11 @@ function GetAtyReward(player, flag)
          if rand <= 20 then
              package:AddItem(514, 1, true, false, 24 );
          end
+        if  isChristmas == true then
+            package:AddItem(402, 1, true, false, 24 );
+            package:AddItem(403, 1, true, false, 24 );
+        end
+
     end
     if flag == 64 then
         package:AddItem(30, 2 , true, false , 24);
@@ -154,6 +187,11 @@ function GetAtyReward(player, flag)
         if rand <= 20 then
             package:AddItem(515, 1, true, false, 24 );
         end
+         if  isChristmas == true then
+            package:AddItem(401, 3, true, false, 24 );
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得【圣诞女郎变身卡】");
+        end
+
     end
     mgr:AddRewardFlag(flag,true);
 end
