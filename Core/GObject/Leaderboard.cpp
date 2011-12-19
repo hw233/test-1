@@ -364,6 +364,8 @@ void _searchInside(Stream& st, T1 mapv, T2 v)
 
 void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 {
+    if (isSorting())
+        return;
 	Stream st(REP::SORT_PERSONAL);
 	if(id == _id)
 	{
@@ -394,3 +396,4 @@ void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 }
 
 }
+

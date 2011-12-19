@@ -2,7 +2,7 @@
 #define _LEADERBOARD_H_
 
 #include "Common/Stream.h"
-#include "Common/Mutex.h"
+#include "Common/AtomicVal.h"
 
 namespace GObject
 {
@@ -12,12 +12,16 @@ class Player;
 class Leaderboard
 {
 public:
-	Leaderboard(): _id(0), _maxLevel(100) {}
+	Leaderboard(): _id(0), _maxLevel(100), m_sorting(false) {}
 	void update();
 	bool hasUpdate(UInt32);
 	bool getPacket(UInt8, Stream*&);
 	void sendOwnRank(Player *, UInt32);
 	inline UInt8 getMaxLevel() { return _maxLevel; }
+
+    void begin() { m_sorting = true; }
+    void end() { m_sorting = false; }
+    bool isSorting() const { return m_sorting; }
 private:
 	void doUpdate();
 
@@ -36,6 +40,8 @@ private:
 	std::map<UInt64, UInt16> _achievementRankCountry[2];
 	std::map<UInt32, UInt16> _clanRankWorld;
 	std::map<UInt32, UInt16> _clanRankCountry[2];
+
+    AtomicVal<bool> m_sorting;
 };
 
 extern Leaderboard leaderboard;
