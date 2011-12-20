@@ -25,7 +25,7 @@ namespace GObject
 
 
     //帮会排名战报名开始时间
-    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 22 * 60 * 60;
+    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 21 * 60 * 60;
     //帮会排名战报名持续时间
     const static UInt32 RANK_BATTLE_SIGNUP_TIME = 10 * 60;
 
@@ -207,14 +207,16 @@ namespace GObject
 
             if(fightNum > 0)
             {
-                std::map<UInt32, PlayerVec> fightPlayers;
+                PlayerVec fightPlayers1;
+                PlayerVec fightPlayers2;
+
                 //从队伍头取出对阵玩家
                 for(UInt32 i = 0; i < fightNum; ++i)
                 {
-                    fightPlayers[m_Clan1].push_back(*waitPlayers1.begin());
+                    fightPlayers1.push_back(*waitPlayers1.begin());
                     waitPlayers1.erase(waitPlayers1.begin());
 
-                    fightPlayers[m_Clan2].push_back(*waitPlayers2.begin());
+                    fightPlayers2.push_back(*waitPlayers2.begin());
                     waitPlayers2.erase(waitPlayers2.begin());
                 }
 
@@ -225,8 +227,8 @@ namespace GObject
 
                 for(UInt32 i = 0; i < fightNum; ++i)
                 {
-                    Player* player1 = fightPlayers[m_Clan1][i];
-                    Player* player2 = fightPlayers[m_Clan2][i];
+                    Player* player1 = fightPlayers1[i];
+                    Player* player2 = fightPlayers2[i];
  
                     player1->SetClanBattleStatus(PLAYER_BATTLE);
                     player2->SetClanBattleStatus(PLAYER_BATTLE);
@@ -350,6 +352,8 @@ namespace GObject
 
         players1.insert(players1.end(), m_DeadPlayers[m_Clan1].begin(), m_DeadPlayers[m_Clan1].end());
         players2.insert(players2.end(), m_DeadPlayers[m_Clan2].begin(), m_DeadPlayers[m_Clan2].end());
+        m_DeadPlayers[m_Clan1].clear();
+        m_DeadPlayers[m_Clan2].clear();
 
         for(PlayerVec::iterator iter = players1.begin();
                 iter != players1.end(); ++iter)
@@ -423,8 +427,6 @@ namespace GObject
 
     void ClanRankBattleField::ResetPlayerStatus(UInt32 clan)
     {
-        std::vector<Player*> winPlayers;
-
         PlayerVec& players1 = m_WaitPlayers[clan];
         PlayerVec& players2 = m_DeadPlayers[clan];
         
@@ -459,10 +461,12 @@ namespace GObject
         for(PlayerVec::iterator iter = players2.begin();
                 iter != players2.end(); ++iter)
         {
-            if((*iter)->GetClanBattleStatus() != PLAYER_BATTLE){ continue; }
+            Player* player = *iter;
+
+            if(player->GetClanBattleStatus() != PLAYER_BATTLE) continue;
                 
-            (*iter)->SetClanBattleStatus(PLAYER_DEAD);
-            m_StatusChanged[(*iter)->getId()] = PLAYER_DEAD;
+            player->SetClanBattleStatus(PLAYER_DEAD);
+            m_StatusChanged[player->getId()] = PLAYER_DEAD;
         }
     }
 
