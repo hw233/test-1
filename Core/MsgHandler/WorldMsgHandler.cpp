@@ -39,6 +39,7 @@ MSG_REG(GameMsgHdr, OnPracticeStopReq);
 MSG_REG(GameMsgHdr, OnAthleticsListReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_CHALLENGE, OnAthleticsChallengeReq);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_PAGING,    OnAthleticsPaging);
+MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_KILLCD,    OnAthleticsKillCD);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
 

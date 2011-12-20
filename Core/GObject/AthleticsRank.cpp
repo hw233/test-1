@@ -476,6 +476,45 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
         player->send(st);
     }
 }
+
+void AthleticsRank::RequestKillCD(Player* player)
+{
+    if(player->hasGlobalFlag(Player::AthPayForKillCD))
+        return;
+
+    UInt8 row = getRankRow(player->GetLev());
+    if(0xFF  == row )
+        return;
+
+    RankList::iterator found = _ranks[row].find(player);
+    if (found == _ranks[row].end())
+        return;
+    Rank rank = found->second;
+    UInt16 rankpos = getRankPos(row, rank);
+    if(rankpos <=500)
+        return;
+
+    if(player->getBuffLeft(PLAYER_BUFF_ATHLETICS) == 0)
+        return;
+
+    player->addGlobalFlag(Player::AthPayForKillCD);
+    AthleticsPay  msg;
+    msg.type = AthleticsPayForKillCD;
+    GameMsgHdr hdr1(0x222, player->getThreadId(), player, sizeof(msg));
+    GLOBAL().PushMsg(hdr1, &msg);
+
+}
+
+void AthleticsRank::KillCD(Player* player, bool bEnough)
+{
+    if(player->hasGlobalFlag(Player::AthPayForKillCD) == false)
+        return;
+     player->delGlobalFlag(Player::AthPayForKillCD);
+
+     if(bEnough)
+        player->setBuffData(PLAYER_BUFF_ATHLETICS, 0);
+     requestAthleticsList(player, 0x01);
+}
 void AthleticsRank::RequestPageNum(Player* player)
 {
     if(player->hasGlobalFlag(Player::AthPayForPage))
@@ -505,7 +544,8 @@ void AthleticsRank::RequestPageNum(Player* player)
     player->addGlobalFlag(Player::AthPayForPage);
    // (*rank)->pageNum  ++ ;
    // send msg to Country
-    AthleticsPayPaging  msg;
+    AthleticsPay  msg;
+    msg.type = AthleticsPayForPaging;
     GameMsgHdr hdr1(0x222, player->getThreadId(), player, sizeof(msg));
     GLOBAL().PushMsg(hdr1, &msg);
 
