@@ -164,10 +164,12 @@ namespace GObject
         for(PlayerVec::const_iterator iter = team1.begin();
                 iter != team1.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
+            (*iter)->addFlag(Player::ClanRankBattle);
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
+            (*iter)->addFlag(Player::ClanRankBattle);
         }
 
         m_WaitPlayers.clear();
@@ -190,8 +192,11 @@ namespace GObject
         //开始下一轮
         if(now >= m_StartTime + m_Round * RANK_BATTLE_FIGHT_TIME)
         {
-            UInt32 fightNum1 = m_WaitPlayers[m_Clan1].size();
-            UInt32 fightNum2 = m_WaitPlayers[m_Clan2].size();
+            PlayerVec& waitPlayers1 = m_WaitPlayers[m_Clan1];
+            PlayerVec& waitPlayers2 = m_WaitPlayers[m_Clan2];
+
+            UInt32 fightNum1 = waitPlayers1.size();
+            UInt32 fightNum2 = waitPlayers2.size();
 
             m_StatusChanged.clear();
             ResetPlayerStatus(m_Clan1);
@@ -206,13 +211,11 @@ namespace GObject
                 //从队伍头取出对阵玩家
                 for(UInt32 i = 0; i < fightNum; ++i)
                 {
-                    PlayerVec::iterator iter1 = m_WaitPlayers[m_Clan1].begin();
-                    fightPlayers[m_Clan1].push_back(*iter1);
-                    m_WaitPlayers[m_Clan1].erase(iter1);
+                    fightPlayers[m_Clan1].push_back(*waitPlayers1.begin());
+                    waitPlayers1.erase(waitPlayers1.begin());
 
-                    PlayerVec::iterator iter2 = m_WaitPlayers[m_Clan2].begin();
-                    fightPlayers[m_Clan2].push_back(*iter2);
-                    m_WaitPlayers[m_Clan2].erase(iter2);
+                    fightPlayers[m_Clan2].push_back(*waitPlayers2.begin());
+                    waitPlayers2.erase(waitPlayers2.begin());
                 }
 
 
@@ -246,7 +249,7 @@ namespace GObject
 
                         player1->AddClanBattleScore(player1->GetClanBattleWinTimes());
 
-                        m_WaitPlayers[m_Clan1].push_back(player1); //放回等待队列
+                        waitPlayers1.push_back(player1); //放回等待队列
                         m_DeadPlayers[m_Clan2].push_back(player2); //死亡
 
                         battleStream << UInt8(1);
@@ -261,7 +264,8 @@ namespace GObject
                         player2->AddClanBattleScore(player2->GetClanBattleWinTimes());
 
                         m_DeadPlayers[m_Clan1].push_back(player1);
-                        m_WaitPlayers[m_Clan2].push_back(player2);
+                        waitPlayers2.push_back(player2);
+
                         battleStream << UInt8(2);
                     }
 
@@ -469,7 +473,8 @@ namespace GObject
         player->SetClanBattleStatus(PLAYER_WAIT);
         player->SetClanBattleScore(0);
         player->SetClanBattleWinTimes(0);
-        player->ClearClanBattleSkillFlag();   
+        player->ClearClanBattleSkillFlag();
+        player->delFlag(Player::ClanRankBattle);
     }
 
     void ClanRankBattleField::Broadcast(UInt32 clan, Stream& stream)

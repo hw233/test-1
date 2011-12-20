@@ -2482,7 +2482,7 @@ namespace GObject
 
         lc.prepare("Loading clan item:");
         DBClanItem ci;
-        if(execu->Prepare("SELECT `clanid`, `playerid`, `itemid`, `itemnum` FROM `clan_item` ORDEF BY `clanid`", ci) != DB::DB_OK)
+        if(execu->Prepare("SELECT `clanid`, `playerid`, `itemid`, `itemnum` FROM `clan_item` ORDER BY `clanid`", ci) != DB::DB_OK)
             return false;
         lastId = 0xFFFFFFFF;
         clan = NULL;

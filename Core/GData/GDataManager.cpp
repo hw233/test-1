@@ -230,7 +230,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBClanLvl dbexp;
-		if(execu->Prepare("SELECT `lvl`, `exp` FROM `clan_lvl`", dbexp) != DB::DB_OK)
+		if(execu->Prepare("SELECT `lvl`, `exp`, `pkgsize`, `weal` FROM `clan_lvl`", dbexp) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{

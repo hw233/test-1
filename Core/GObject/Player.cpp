@@ -2224,9 +2224,9 @@ namespace GObject
 
 		if(applyhp)
 		{
-			if(bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling), 0))
+			if(bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling | ClanRankBattle), 0))
 				checkHPLoss();
-			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling), 0))
+			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling | ClanRankBattle), 0))
 				other->checkHPLoss();
 		}
 		else if(sysRegen > 0 && !noreghp)
@@ -4977,7 +4977,7 @@ namespace GObject
 
 	void Player::autoRegenAll()
 	{
-		if(hasFlag(CountryBattle | ClanBattling))
+		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
 			return;
 		UInt32 autohp = getBuffData(0);
 		if(autohp == 0)
@@ -6425,7 +6425,7 @@ namespace GObject
 			bf->setAttrExtra(1, bf->getClass(), _bossLevel);
 		}
 		bsim.start();
-		bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling));
+		bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling | ClanRankBattle));
 		for(size_t i = 0; i < size; ++ i)
 		{
 			SAFE_DELETE(fgt_clone[i]);
