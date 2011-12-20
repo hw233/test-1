@@ -36,6 +36,7 @@
 #include "GObject/FrontMap.h"
 #include "GObject/Copy.h"
 #include "GObject/Dungeon.h"
+#include "GObject/World.h"
 
 
 static memcached_st* memc = NULL;
@@ -103,17 +104,11 @@ struct UserLoginStruct
 	typedef Array<UInt8, 36> HashValType;
 	UInt8 _hashval[36];
 	std::string _server;
-#if _NEED_OPENID
     std::string _platform;
     std::string _openid;
     std::string _openkey;
 	MESSAGE_DEF9(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang,
             HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey);
-#else
-	MESSAGE_DEF6(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear,
-            UInt32, _lang, HashValType, _hashval, std::string, _server);
-#endif
-
 };
 
 struct NewUserStruct
@@ -122,15 +117,11 @@ struct NewUserStruct
 	UInt8 _class;
     UInt8 _level;
     UInt8 _isYear;
-#if _NEED_OPENID
     std::string _platform;
     std::string _openid;
     std::string _openkey;
 	MESSAGE_DEF7(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey);
-#else
-	MESSAGE_DEF4(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear);
-#endif
 
 };
 
@@ -519,11 +510,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
 
-#ifdef _NEED_OPENID
             pl->setDomain(nu._platform);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
-#endif
 
             GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
 			CountryEnterStruct ces(false, 1, loc);
@@ -675,6 +664,8 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
                 GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
                 GLOBAL().PushMsg(hdr, &recharge);
                 ret=0;
+
+                player->moneyLog(1, recharge.gold);
             }
             else
             {
@@ -733,6 +724,8 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
             GameMsgHdr hdr(0x2F0, player->getThreadId(), player, sizeof(recharge));
             GLOBAL().PushMsg(hdr, &recharge);
             ret=0;
+
+            player->moneyLog(1, recharge.gold);
         }
         else
         {
@@ -1132,6 +1125,8 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
 				result +="0 ";
+
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
 			}
 			else
 			{
@@ -1200,6 +1195,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
 				result +="0 ";
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
 			}
 			else
 			{
@@ -1342,6 +1338,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
 				result +="0 ";
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
 			}
 			else
 			{
@@ -1399,6 +1396,7 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
 
 void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
 {
+    return; // XXX: 取消这个功能 yangyoufa@ 19/12/11 21:04:59 
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
 	st.init(SPEP::SETMONEY,0x01);
@@ -1697,6 +1695,20 @@ void AddFighterFromBs(LoginMsgHdr &hdr, const void * data)
     player->takeFighter(fgtid, true);
 
     st << playerId << fgtid << ret;
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    Stream st;
+	st.init(SPEP::GETMONEY,0x1);
+
+    CHKKEY();
+    st << GObject::World::_moneyIn[0].gold;
+    st << GObject::World::_moneyIn[1].gold;
+
     st << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }

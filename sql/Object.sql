@@ -1224,4 +1224,15 @@ CREATE TABLE `teamcopy_player_award` (
   PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `money`;
+CREATE TABLE `money` (
+  `time` int(10) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
+  `gold` int(10) unsigned NOT NULL,
+  `coupon` int(10) unsigned NOT NULL,
+  `tael` int(10) unsigned NOT NULL,
+  `achievement` int(10) unsigned NOT NULL,
+  `prestige` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`time`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

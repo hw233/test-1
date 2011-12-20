@@ -264,18 +264,18 @@ void HeroIsland::broadcastTV(UInt32 now)
 
 void HeroIsland::calcNext(UInt32 now)
 {
-#if 1
     if (cfg.GMCheck)
     {
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 45 * 60;
 
         if(World::_wday == 6 || World::_wday == 7)
         {
-            if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
-                _prepareTime = TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60;
-
-            if (now > TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60)
+            if (now >= TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60)
                 _prepareTime = TimeUtil::SharpDayT(1,now) + 11 * 60 * 60 + 45 * 60;
+            else if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
+                _prepareTime = TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60;
+            else
+                _prepareTime += 24 * 60 * 60;
         }
         else
         {
@@ -286,14 +286,6 @@ void HeroIsland::calcNext(UInt32 now)
         _startTime = _prepareTime + 15 * 60;
         _endTime = _startTime + 55 * 60;
     }
-#else
-    if (cfg.GMCheck)
-    {
-        _prepareTime = now + 5 * 60;
-        _startTime = _prepareTime + 5 * 60;
-        _endTime = _startTime + 50 * 60;
-    }
-#endif
     else
     {
         _prepareTime = now;
@@ -2073,6 +2065,9 @@ void HeroIsland::sendAtoCfg(Player* player)
 void HeroIsland::setAto(Player* player, UInt8 onoff)
 {
     if (!player || !onoff)
+        return;
+
+    if (!isRunning())
         return;
 
     if (!player->hasFlag(Player::InHeroIsland))

@@ -19,6 +19,15 @@ namespace Script
 namespace GObject
 {
 
+struct MoneyIn
+{
+    int gold;
+    int coupon;
+    int tael;
+    int achievement;
+    int prestige;
+};
+
 class World:
 	public WorkerRunner<WorldMsgHandler>
 {
@@ -78,6 +87,9 @@ public:
 	static void calWeekDay();
 
 public:
+    static UInt32 _moneyLogged;
+    static MoneyIn _moneyIn[2];
+
 	static int _activityStage;
 	static bool _actAvailable;//开服到+6日
 	static bool _actAvailable1;//开服到+7日
