@@ -171,7 +171,8 @@ void FrontMap::enter(Player* pl, UInt8 id)
     if (!checkLevel(pl, id))
         return;
 
-    FastMutex::ScopedLock lk(_mutex); // XXX: ???
+    FastMutex::ScopedLock lk(_mutex);
+
     UInt8 ret = 1;
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (!tmp.size()) {
@@ -210,11 +211,12 @@ void FrontMap::enter(Player* pl, UInt8 id)
     if (!ret) {
         sendInfo2(pl, id, true);
 
+        UInt8 count = getCount(pl);
+
         PLAYER_DATA(pl, frontUpdate) = TimeUtil::Now();
         DB1().PushUpdateData("UPDATE `player` SET `frontFreeCnt` = %u, `frontGoldCnt` = %u, `frontUpdate` = %u WHERE `id` = %"I64_FMT"u",
                 PLAYER_DATA(pl, frontFreeCnt), PLAYER_DATA(pl,frontGoldCnt), TimeUtil::Now(), pl->getId());
 
-        UInt8 count = getCount(pl);
         Stream st(REP::FORMATTON_INFO);
         st << static_cast<UInt8>(3) << count << Stream::eos;
         pl->send(st);
@@ -251,17 +253,21 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
         return 0;
 
     FastMutex::ScopedLock lk(_mutex);
+    // 是否在次数范围内
     if (PLAYER_DATA(pl, frontFreeCnt) > getFreeCount() &&
             PLAYER_DATA(pl, frontGoldCnt) > getGoldCount(pl->getVipLevel()))
         return 0;
 
+    // 是否进入过阵图
     std::vector<FrontMapData>& tmp = m_frts[pl->getId()][id];
     if (!tmp.size())
         return 0;
 
+    // 阵图据点是否合法
     if (spot > GData::frontMapMaxManager[id])
         return 0;
 
+    // 是否跳点打
     if (spot > 1 && spot > tmp.size())
         return 0;
 
@@ -296,7 +302,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
         ++tmp[spot].count;
         tmp[spot].status = 1;
 
-        if (spot >= GData::frontMapMaxManager[id]) {
+        if (spot >= GData::frontMapMaxManager[id]) { // 通关
             if (ato)
             {
                 Stream st(REP::AUTO_FRONTMAP);
@@ -334,7 +340,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             if (ato)
                 autoClear(pl, complate);
             return 2;
-        } else {
+        } else { // 打过某一点
             UInt8 nspot = spot+1;
             while (!GData::frontMapManager[id][nspot].count && nspot <= GData::frontMapMaxManager[id])
                 ++nspot;

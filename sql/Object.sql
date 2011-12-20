@@ -827,6 +827,7 @@ CREATE TABLE `player` (
   `country` tinyint(1) unsigned NOT NULL,
   `title` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `archievement` int(10) unsigned NOT NULL DEFAULT '0',
+  `attainment` int(10) unsigned NOT NULL DEFAULT '0',
   `qqvipl` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `qqvipyear` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `qqawardgot` int(11) unsigned NOT NULL DEFAULT '0',
@@ -920,7 +921,8 @@ CREATE TABLE `sale` (
   `priceType` int(10) NOT NULL DEFAULT '0',
   `price` int(10) NOT NULL DEFAULT '0',
   `itemId` int(10) NOT NULL,
-  `itemNum` int(10) NOT NULL
+  `itemNum` int(10) NOT NULL,
+  PRIMARY KEY (`saleId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1213,7 +1215,7 @@ CREATE TABLE `teamcopy_player` (
   `pass` tinyint(3) unsigned NOT NULL,
   `passTimes` tinyint(3) unsigned NOT NULL,
   `vTime` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`playerId`,`id`,`type`)
+  PRIMARY KEY (`playerId`,`copyId`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `teamcopy_player_award`;
@@ -1247,4 +1249,15 @@ CREATE TABLE `clan_item_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `money`;
+CREATE TABLE `money` (
+  `time` int(10) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL,
+  `gold` int(10) unsigned NOT NULL,
+  `coupon` int(10) unsigned NOT NULL,
+  `tael` int(10) unsigned NOT NULL,
+  `achievement` int(10) unsigned NOT NULL,
+  `prestige` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`time`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

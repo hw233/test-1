@@ -76,6 +76,7 @@ namespace GObject
     UInt16 GObjectManager::_attrChances[3][9];
     std::map<UInt8, stAttrMax*> GObjectManager::_attrMax;
     UInt16 GObjectManager::_attrDics[3][9];
+    std::map<UInt8, stAttrMax*> GObjectManager::_attrTrumpMax;
 
     UInt32 GObjectManager::_socket_chance[6];
     UInt32 GObjectManager::_min_potential;
@@ -170,6 +171,7 @@ namespace GObject
 		LoadArena();
         LoadPracticePlace();
         LoadWorldBoss();
+        InitMoneyLog();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -2829,7 +2831,7 @@ namespace GObject
 				for(UInt32 j = 0; j < size; j ++)
 				{
                     lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j + 1);
-					UInt8 q = table_temp2.get<UInt8>(1);
+					UInt8 q = table_temp2.get<UInt8>(1) - 2;
                     if(q > 2)
                         continue;
                     _team_m_chance[q] = table_temp2.get<UInt32>(2);
@@ -3092,6 +3094,37 @@ namespace GObject
                         {
                             attr = new stAttrMax();
                             _attrMax[lvl] = attr;
+                        }
+
+                        attr->attrMax[q][crr][t-3] = table_temp2.get<float>(t+1);
+                    }
+                }
+            }
+
+            {
+                lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getAttrTrumpMax");
+                UInt32 size = table_temp.size();
+                for(UInt8 i = 0; i < size; ++i)
+                {
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i+1);
+                    UInt8 q = table_temp2.get<float>(1) - 3;
+                    UInt8 lvl = table_temp2.get<float>(2);
+                    UInt8 crr = table_temp2.get<float>(3);
+                    UInt32 size2 = table_temp2.size();
+
+                    if(q > 2 || crr > 3)
+                        continue;
+
+                    for(UInt8 t = 3; t < size2; ++t)
+                    {
+                        std::map<UInt8, stAttrMax*>::iterator it = _attrTrumpMax.find(lvl);
+                        stAttrMax* attr = NULL;
+                        if(it != _attrTrumpMax.end())
+                            attr = it->second;
+                        else
+                        {
+                            attr = new stAttrMax();
+                            _attrTrumpMax[lvl] = attr;
                         }
 
                         attr->attrMax[q][crr][t-3] = table_temp2.get<float>(t+1);
@@ -3399,6 +3432,26 @@ namespace GObject
             practicePlace.addPlace(place, i++);
         }
 		lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::InitMoneyLog()
+    {
+        int today = TimeUtil::GetYYMMDD();
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 1);
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 2);
+
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		DBMoneyLog t;
+        char buf[1024] = {0};
+        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 1", today);
+		execu->Extract(buf, t);
+        World::_moneyIn[0].gold = t.gold;
+        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 2", today);
+		execu->Extract(buf, t);
+        World::_moneyIn[1].gold = t.gold;
         return true;
     }
 

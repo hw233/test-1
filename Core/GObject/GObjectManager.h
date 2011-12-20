@@ -74,6 +74,7 @@ namespace GObject
         static bool LoadTripodData();
         static bool LoadWorldBoss();
         static bool loadTeamCopy();
+        static bool InitMoneyLog();
 
         static UInt8 reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err);
 
@@ -152,7 +153,24 @@ namespace GObject
             return attr->attrMax[q][crr][t];
         }
         static UInt16 getAttrDics(UInt8 q, UInt8 idx) { return _attrDics[q][idx]; }
+        static float  getAttrTrumpMax( UInt8 lvl, UInt8 t, UInt8 q, UInt8 crr )
+        {
+            if(q > 2)
+                q = 2;
+            if(t > 8)
+                t = 8;
+            if(crr > 3)
+                crr = 3;
+            std::map<UInt8, stAttrMax*>::iterator it = _attrTrumpMax.find(lvl);
+            stAttrMax* attr = NULL;
+            if(it != _attrTrumpMax.end())
+                attr = it->second;
+            else
+                attr = _attrTrumpMax[0];
 
+            return attr->attrMax[q][crr][t];
+        }
+        
         static UInt32 getColorFighterChance(UInt16 idx, UInt8 f_g, UInt8 color )
         {
             if(!f_g)
@@ -258,6 +276,7 @@ namespace GObject
 		static UInt16 _attrTypeChances[3][9];
 		static UInt16 _attrChances[3][9];
 		static std::map<UInt8, stAttrMax*> _attrMax;
+		static std::map<UInt8, stAttrMax*> _attrTrumpMax;
         static UInt16 _attrDics[3][9];
 
         static UInt32 _socket_chance[6];

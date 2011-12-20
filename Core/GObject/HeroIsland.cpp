@@ -271,11 +271,10 @@ void HeroIsland::calcNext(UInt32 now)
 
         if(World::_wday == 6 || World::_wday == 7)
         {
-            if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
-                _prepareTime = TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60;
-
-            if (now > TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60)
+            if (now >= TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60)
                 _prepareTime = TimeUtil::SharpDayT(1,now) + 11 * 60 * 60 + 45 * 60;
+            else if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
+                _prepareTime = TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60;
         }
         else
         {
@@ -2073,6 +2072,9 @@ void HeroIsland::sendAtoCfg(Player* player)
 void HeroIsland::setAto(Player* player, UInt8 onoff)
 {
     if (!player || !onoff)
+        return;
+
+    if (!isRunning())
         return;
 
     if (!player->hasFlag(Player::InHeroIsland))

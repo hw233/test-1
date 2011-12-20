@@ -38,6 +38,15 @@ public:
         localtime_r(&t2,&t_tm2);
         return t_tm1.tm_yday == t_tm2.tm_yday;
     }
+    static inline int GetYYMMDD(UInt32 now = Now())
+    {
+        struct tm t_tm;
+        time_t _now = now;
+        localtime_r(&_now,&t_tm);
+        char _today[32] = {0};
+        snprintf(_today, 32, "%d%d%d", t_tm.tm_year+1900, t_tm.tm_mon+1, t_tm.tm_mday);
+        return atoi(_today);
+    }
     static inline UInt32 SharpWeek(int c = 0, UInt32 cur = Now())
     {
         time_t t = cur;

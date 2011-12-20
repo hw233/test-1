@@ -252,10 +252,11 @@ void  ActivityMgr::AddRewardFlag(UInt32 flag, bool db)
 
 void ActivityMgr::SendOnlineReward(Stream& s)
 {
-    if(_onlineReward.size() == 0)
-    {
+    //if(_onlineReward.size() == 0)
+    //{
+        _onlineReward.clear();
         GetOnlineReward();
-    }
+    //}
     s<< static_cast<UInt8>(_item.awardID ) << static_cast<UInt8>(_onlineReward.size());
 
     for(UInt32 i = 0 ; i < _onlineReward.size(); i ++ )

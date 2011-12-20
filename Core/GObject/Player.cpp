@@ -780,6 +780,8 @@ namespace GObject
 
 		checkLastBattled();
 		GameAction()->onLogin(this);
+        if (World::getChristmas())
+            GameAction()->onChristmas(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -853,6 +855,19 @@ namespace GObject
 
             TRACE_LOG("%s", buf);
         }
+    }
+
+    void Player::moneyLog(int type, int gold, int coupon, int tael, int achievement, int prestige)
+    {
+        if (!type || type > 2) return;
+        UInt32 now = TimeUtil::Now();
+        int today = TimeUtil::GetYYMMDD(now);
+        if (!(World::_moneyLogged & type) || !TimeUtil::SameDay(now, WORLD().ThisDay()))
+            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, type);
+        DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
+        World::_moneyLogged |= type;
+
+        World::_moneyIn[type-1].gold += gold;
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -7493,32 +7508,48 @@ namespace GObject
             GetPackage()->AddItem(m_td.itemId, m_td.num, true, false, FromTripod);
 
         m_td.fire = 0;
-        m_td.quality = 2;
+        if (getVipLevel() > 2)
+            m_td.quality = 3;
+        else
+            m_td.quality = 2;
         m_td.needgen = 1;
         m_td.awdst = 0;
         m_td.soul = 0;
         m_td.itemId = 0;
         m_td.num = 0;
-        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=2, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u", getId());
+        DB6().PushUpdateData("UPDATE `tripod` SET `soul`=0, `fire`=0, `quality`=%u, `awdst`=0, `itemId`=0, `num`=0, `regen`=1 WHERE `id` = %"I64_FMT"u",
+                m_td.quality, getId());
         runTripodData(m_td);
         sendTripodInfo();
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
     {
-        if(getVipLevel() > 2)
-            m_td.quality = 3;
-
         if (&data != &m_td)
             m_td = data;
+
+        bool update = false;
+        if(getVipLevel() > 2 && m_td.quality < 3)
+        {
+            m_td.quality = 3;
+            update = true;
+        }
 
         EventPlayerTripod* event = new (std::nothrow) EventPlayerTripod(this, 60, MAX_TRIPOD_SOUL/POINT_PERMIN);
         if (!event) return nulltd;
         PushTimerEvent(event);
 
-        if (init && m_td.itemId && m_td.num)
+        if (init && m_td.itemId && m_td.num && m_td.needgen)
+        {
             m_td.needgen = 0;
-        DB6().PushUpdateData("UPDATE `tripod` SET `regen` = 0, `quality` = %u WHERE `id` = %"I64_FMT"u", m_td.quality, getId());
+            update = true;
+        }
+
+        if (update)
+        {
+            DB6().PushUpdateData("UPDATE `tripod` SET `regen` = %u, `quality` = %u WHERE `id` = %"I64_FMT"u",
+                    m_td.needgen, m_td.quality, getId());
+        }
         m_hasTripod = true;
         return m_td;
     }
