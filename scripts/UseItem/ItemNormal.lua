@@ -348,8 +348,13 @@ function ItemNormal_00000401(iid, num, bind, param)
   fgt:setBuffData(2, 0, true)
   fgt:setBuffData(3, 0, true)
   if ItemNormal_AddBuff(fgt, 1, 3600, num, 86400) then
-  	package:DelItemSendMsg(401, player);
-	return num;
+    if ItemNormal_AddBuff(fgt, 5, 3600, num, 86400) then
+      package:DelItemSendMsg(401, player);
+	  return num;
+    else
+      fgt:setBuffData(1, 0, true)
+      return false
+    end
   else
 	return false;
   end
