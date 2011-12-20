@@ -23,6 +23,8 @@
 #include "MsgHandler/CountryMsgStruct.h"
 #include <mysql.h>
 
+#include "ClanRankBattle.h"
+
 namespace GObject
 {
 
@@ -66,11 +68,141 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 	return member->player->getId() == id;
 }
 
+
+
+
+bool ClanItemPkg::CheckAddItem(UInt16 id, UInt32 num)
+{
+    if(num == 0) return true;
+    if(IsEquipId(id)) return m_MaxGrid - m_Grid >= num;
+
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+    if(itemType == NULL) return false;
+    
+    UInt32 oldnum = GetItemNum(id);
+    
+    UInt32 oldGrid = ( oldnum + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
+    UInt32 newGrid = ( oldnum + num + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
+
+    return m_MaxGrid - m_Grid >= newGrid - oldGrid;
+}
+
+void ClanItemPkg::LoadItem(UInt16 id, UInt32 num)
+{
+    if(IsEquipId(id))
+    {
+        num = num > m_MaxGrid - m_Grid ? m_MaxGrid - m_Grid : num;
+        
+        m_Grid = m_Grid + num;
+    }
+    else
+    {
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+        if(itemType == NULL) return;
+
+        UInt32 maxnum = ( m_MaxGrid - m_Grid ) * itemType->maxQuantity;
+        num = num > maxnum ? maxnum : num;
+        UInt32 grid = (num + itemType->maxQuantity - 1) / itemType->maxQuantity;
+        
+        m_Grid = m_Grid + grid;
+    }
+
+    m_Items[id] = num;
+}
+
+UInt32 ClanItemPkg::AddItem(UInt16 id, UInt32 num)
+{
+    if(num == 0) return 0;
+    if(IsEquipId(id))
+    {
+        num = num > m_MaxGrid - m_Grid ? m_MaxGrid - m_Grid : num;
+        
+        m_Grid = m_Grid + num;
+    }
+    else
+    {
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+        if(itemType == NULL) return 0;
+
+        UInt32 oldnum = GetItemNum(id);
+
+        UInt32 oldGrid = ( oldnum + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
+        UInt32 maxnum = ( oldGrid + m_MaxGrid - m_Grid ) * itemType->maxQuantity;
+        num = num > maxnum ? maxnum : num;
+        UInt32 newGrid = (oldnum + num + itemType->maxQuantity - 1) / itemType->maxQuantity;
+        
+        m_Grid = m_Grid + (newGrid - oldGrid);
+    }
+
+    ItemMap::iterator iter = m_Items.find(id);
+    if(iter != m_Items.end())
+    {
+        iter->second += num;
+        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
+                ,iter->second, m_ClanId, m_PlayerId, id);
+    }
+    else
+    {
+        m_Items.insert(std::make_pair(id, num));
+        DB5().PushUpdateData("INSERT INTO `clan_item`(`clanid`,`playerid`,`itemid`,`itemnum`) VALUES('%u','%"I64_FMT"u','%u','%u')"
+                ,m_ClanId, m_PlayerId, id, num);
+    }
+    return num;
+}
+
+UInt32 ClanItemPkg::GetItemNum(UInt16 id) const
+{
+    ItemMap::const_iterator iter = m_Items.find(id);
+    if(iter != m_Items.end())
+    {
+        return iter->second;
+    }
+    return 0;
+}
+
+void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
+{
+    ItemMap::iterator iter = m_Items.find(id);
+    if(iter == m_Items.end()) return;
+
+    if(IsEquipId(id))
+    {
+        UInt32 oldNum = iter->second;
+        iter->second = iter->second > num ? iter->second - num : 0;
+        m_Grid = m_Grid - (oldNum - iter->second);
+    }
+    else
+    {
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+        if(itemType == NULL) return;
+
+        UInt32 oldGrid = (iter->second + itemType->maxQuantity - 1) / itemType->maxQuantity;
+        iter->second = iter->second > num ? iter->second - num : 0;
+        UInt32 newGrid = (iter->second + itemType->maxQuantity - 1) / itemType->maxQuantity;
+
+        m_Grid = m_Grid - (oldGrid - newGrid);
+    }
+
+    if(iter->second == 0)
+    {
+        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'", m_ClanId, m_PlayerId, id); 
+    }
+    else
+    {
+        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
+                ,iter->second, m_ClanId, m_PlayerId, id);
+    }
+}
+
+
+
 Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	GObjectBaseT<Clan>(id), _name(name), _rank(0), _level(lvl), _foundTime(ft == 0 ? TimeUtil::Now() : ft),
     _founder(0), _leader(0), _construction(0), _nextPurgeTime(0), _proffer(0),
     _flushFavorTime(0), _allyClan(NULL), _allyClanId(0), _deleted(false), _funds(0), _watchman(0)
 {
+    _itemPkg.Init(_id, 0, GData::clanLvlTable.getPkgSize(_level));
+
 	_techs = new ClanTech(this);
     _maxMemberCount = BASE_MEMBER_COUNT + _techs->getMemberCount();
 	memset(_favorId, 0, sizeof(_favorId));
@@ -79,6 +211,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 
     m_BattleScore = 0;
     m_BattleRanking = 0;
+    m_LastBattleRanking = 0;
 }
 
 Clan::~Clan()
@@ -173,6 +306,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	while (found != _membersJoinTime.end())
 		found = _membersJoinTime.find(++joinTime);
 	ClanMember * cmem = new(std::nothrow) ClanMember(player, 0, joinTime);
+    cmem->itemPkg.Init(_id, player->getId(), PKGSIZE_PER_MEMBER);
 	if(jt == 4)
 	{
 		cmem->cls = 4;
@@ -258,6 +392,7 @@ bool Clan::join(ClanMember * cm)
 	Mutex::ScopedLock lk(_mutex);
 	if (existClanMember(player))
 		return false;
+    cm->itemPkg.Init(_id, player->getId(), PKGSIZE_PER_MEMBER);
 	//std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 	std::set<UInt32>::iterator found = _membersJoinTime.find(cm->joinTime);
 	while (found != _membersJoinTime.end())
@@ -310,6 +445,8 @@ bool Clan::kick(Player * player, UInt64 pid)
 	ClanMember * member = *found;
     if(getClanRank(player) <= member->cls)
         return false;
+
+    ClanRankBattleMgr::Instance().Signout(kicker);
 
 	getAllocBack(*member);
 
@@ -382,6 +519,11 @@ bool Clan::leave(Player * player)
 		player->sendMsgCode(0, 1317);
 		return false;
 	}
+    if(ClanRankBattleMgr::Instance().IsInBattle(this))
+    {
+        SYSMSG_SEND(2235, player);          
+        return false;
+    }
     getAllocBack(*member);
 	// std::string oldLeaderName = (*_members.begin())->player->getName();
     if( player == getOwner() && _members.size() != 1)
@@ -397,6 +539,8 @@ bool Clan::leave(Player * player)
 		player->sendMsgCode(0, 1324);
 		return false;
     }
+    
+    ClanRankBattleMgr::Instance().Signout(player);
 
 	_members.erase(found);
 	delete member;
@@ -443,6 +587,7 @@ bool Clan::leave(Player * player)
 	{
 		DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", player->getId());
 		DB5().PushUpdateData("DELETE FROM `clan_skill` WHERE `playerId` = %"I64_FMT"u", player->getId());
+        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %"I64_FMT"u", player->getId());
 		// updateRank(NULL, oldLeaderName);
 	}
 	
@@ -1276,6 +1421,7 @@ void Clan::disband(Player * player)
 	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_skill` WHERE `clanId` = %u", _id);
+    DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid` = %u", _id);
 
 	//4): Maybe bug here
 	Members::iterator iter = _members.begin();
@@ -1976,6 +2122,10 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     broadcast(st);
 
     bool bUp=  GData::clanLvlTable.testLevelUp(_level, _construction);
+    if(bUp)
+    {
+        _itemPkg.SetMaxGrid(GData::clanLvlTable.getPkgSize(_level));
+    }
     if (writedb)
     {
 		DB5().PushUpdateData("UPDATE `clan` SET `level` = %u, `construction` = %"I64_FMT"u WHERE `id` = %u", _level, _construction, _id);
@@ -2989,9 +3139,9 @@ bool Clan::SignupRankBattle(Player* player, UInt32 field, UInt32 now)
             ++num;
         }
     }
-    if(num >= 30)
+    if(num >= RANK_BATTLE_FIELD_PLAYERNUM)
     {
-        SYSMSG_SENDV(2230, player, 30);
+        SYSMSG_SENDV(2230, player, RANK_BATTLE_FIELD_PLAYERNUM);
         return false;
     }
 
@@ -3057,7 +3207,7 @@ UInt32 Clan::AdjustRankBattleField(Player* player, UInt32 field, UInt32 now)
             ++num;
         }
     }
-    if(num >= 30) //目标战场超过了30人的限制
+    if(num >= RANK_BATTLE_FIELD_PLAYERNUM) //目标战场超过了30人的限制
     {
         return UInt32(-3);
     }  
@@ -3099,12 +3249,12 @@ void Clan::SetBattleScore(UInt32 score)
     DB5().PushUpdateData("UPDATE `clan` SET `battleScore`=%u WHERE `id`=%u", m_BattleScore, getId());
 }
 
-void Clan::SetBattleRanking(UInt32 ranking)
+void Clan::SetLastBattleRanking(UInt32 ranking)
 {
-    if(m_BattleRanking == ranking) return;
+    if(m_LastBattleRanking == ranking) return;
 
-    m_BattleRanking = ranking;
-    DB5().PushUpdateData("UPDATE `clan` SET `battleRanking`=%u WHERE `id`=%u", m_BattleRanking, getId());
+    m_LastBattleRanking = ranking;
+    DB5().PushUpdateData("UPDATE `clan` SET `battleRanking`=%u WHERE `id`=%u", m_LastBattleRanking, getId());
 }
 
 void Clan::BroadcastBattleData(UInt32 now)
@@ -3139,6 +3289,38 @@ void Clan::BroadcastBattleData(UInt32 now)
 
     SendDataVisitor visitor(signupNum, battleScore);
     VisitMembers(visitor);
+}
+
+void Clan::LoadItem(UInt64 playerid, UInt32 itemid, UInt32 itemnum)
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    if(playerid == 0)
+    {
+        _itemPkg.LoadItem(itemid, itemnum);
+    }
+    else
+    {
+        Members::iterator found = find(playerid);
+        if(found == _members.end()) return;
+        (*found)->itemPkg.LoadItem(itemid, itemnum);
+    }
+}
+
+void Clan::LoadItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr)
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    _itemHistories.push_back(ClanItemHistory(type, time, playerId, itemstr));
+}
+
+void Clan::AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr)
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    _itemHistories.push_back(ClanItemHistory(type, time, playerId, itemstr));
+    DB5().PushUpdateData("INSERT INTO `clan_item_history`(`clanid`,`type`,`time`,`playerid`,`itemstr`) VALUES('%u','%u','%u','%"I64_FMT"u','%s')",
+            _id, type, time, playerId, itemstr.c_str());
 }
 
 void Clan::setMaxMemberCount(UInt8 count)

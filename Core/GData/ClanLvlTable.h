@@ -11,10 +11,14 @@ class ClanLvl
 public:
 	ClanLvl();
 	bool testLevelUp(UInt8& lvl, UInt64& exp);
-	void setTable(UInt8 lvl, UInt64 exp);
+	void setTable(UInt8 lvl, UInt64 exp, UInt32 pkgsize, UInt32 weal);
 	UInt64 getLevelMin(UInt8 lvl);
+    UInt32 getPkgSize(UInt8 lvl);
+    UInt32 getWeal(UInt8 lvl);
 private:
 	UInt64 _exp[CLAN_LEVEL_MAX];
+    UInt32 _pkgsize[CLAN_LEVEL_MAX];
+    UInt32 _weal[CLAN_LEVEL_MAX];
 };
 
 extern ClanLvl clanLvlTable;

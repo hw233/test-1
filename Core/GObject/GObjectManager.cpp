@@ -2201,7 +2201,7 @@ namespace GObject
         std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		
-        // 组队副本配置
+        // ???痈???????
 		LoadingCounter lc("Loading team copy templates:");
 		GData::DBTeamCopy dbtc;
 		if(execu->Prepare("SELECT `id`, `type`, `location`, `npcgroups` FROM `team_copy`", dbtc) != DB::DB_OK)
@@ -2359,7 +2359,7 @@ namespace GObject
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
                 clan->LoadBattleScore(cl.battleScore);
-                clan->LoadBattleRanking(cl.battleRanking);
+                clan->LoadLastBattleRanking(cl.battleRanking);
 				clanBattle->setOwnerClanId(cl.id);
 				if (!clanManager.validClanBattleTime(cl.battleTime))
 				{
@@ -2476,6 +2476,50 @@ namespace GObject
 		}
 		lc.finalize();
 		globalClans.enumerate(cacheClan, 0);
+
+
+        lc.prepare("Loading clan item:");
+        DBClanItem ci;
+        if(execu->Prepare("SELECT `clanid`, `playerid`, `itemid`, `itemnum` FROM `clan_item` ORDEF BY `clanid`", ci) != DB::DB_OK)
+            return false;
+        lastId = 0xFFFFFFFF;
+        clan = NULL;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if(ci.clanid != lastId)
+            {
+                lastId = ci.clanid;
+                clan = globalClans[ci.clanid];
+            }
+            if(clan == NULL)
+                continue;
+
+            clan->LoadItem(ci.playerid, ci.itemid, ci.itemnum);
+        }
+        lc.finalize();
+
+        lc.prepare("Loading clan item history:");
+        DBClanItemHistory cih;
+        if(execu->Prepare("SELECT `id`, `clanid`, `type`, `time`, `playerid`, `itemstr` FROM `clan_item_history` ORDER BY `clanid`,`time`", cih) != DB::DB_OK)
+            return false;
+        lastId == 0xFFFFFFFF;
+        clan = NULL;
+        lc.reset(1000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            if(cih.clanid != lastId)
+            {
+                lastId = cih.clanid;
+                clan = globalClans[cih.clanid];
+            }
+            if(clan == NULL) continue;
+
+            clan->LoadItemHistory(cih.type, cih.time, cih.playerid, cih.itemstr);
+        }
+        lc.finalize();
 
         //???煽萍?
 		lc.prepare("Loading clan tech:");

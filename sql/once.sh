@@ -15,6 +15,9 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111207_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111122.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111129_1.sql
+
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111110_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20111219_1.sql
     #. clearshiyamen.sh
 }
 
@@ -27,6 +30,8 @@ function update_data()
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20111129_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20111211_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20111213_1.sql
+    
+    mysql -h$H -u$U -p$P -P$PT $DBD < updates/Data_20111219_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from loot; source loot;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from map_object; source mapobject;";
     mysql -h$H -u$U -p$P -P$PT $DBD -e "SET NAMES UTF8;delete from item_template; source itemtemplate;";

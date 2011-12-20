@@ -109,7 +109,10 @@ void Country::PlayerEnter(Player * pl, bool notify)
 		{
 			Map * map = pl->GetMap();
 			if(map != NULL)
+            {
 				map->PlayerEnter(pl, true);
+                ClanRankBattleMgr::Instance().PlayerEnter(pl);
+            }
 		}
 	}
 }

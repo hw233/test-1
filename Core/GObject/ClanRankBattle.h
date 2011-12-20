@@ -142,6 +142,7 @@ namespace GObject
     private:
         void ResetPlayerStatus(UInt32 clan);
         void ResetPlayerData(Player* player);
+        void Broadcast(UInt32 clan, Stream& stream);
 
     private:
         //id
@@ -200,6 +201,8 @@ namespace GObject
          */
         void Start(UInt32 now);
         void End();
+        void Clear();
+        bool IsEnd() const { return m_bEnd; }
 
         /**
          *@brief 玩家离开
@@ -223,7 +226,7 @@ namespace GObject
         void SendBattleStatus(Player* player);
         void SendBattleInfo(Player* player);
         void BroadcastStatus();
-        void BroadcastScores();
+        void BroadcastScores(bool bEnd = false);
 
         /**
          *@brief 广播
@@ -250,6 +253,8 @@ namespace GObject
         UInt32 m_StartTime;
         //当前时间
         UInt32 m_Now;
+        //是否结束
+        bool m_bEnd;
         //战斗双方帮会
         ClanRankBattleInfo* m_Clan1;
         ClanRankBattleInfo* m_Clan2;
@@ -293,6 +298,11 @@ namespace GObject
          */
         void Init();
         void UnInit();
+
+        /**
+         *@brief 是否在帮会战报名战斗期间
+         */
+        bool IsInBattle(Clan* clan);
 
         /**
          *@brief 定时处理
@@ -369,7 +379,7 @@ namespace GObject
         /**
          *@brief 给帮会排名
          */
-        void SortClans();
+        void SortClans(bool bNotify);
 
         /**
          *@brief 给经验奖励，一分钟一次

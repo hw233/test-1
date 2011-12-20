@@ -234,7 +234,7 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-			clanLvlTable.setTable(dbexp.lvl, dbexp.exp);
+			clanLvlTable.setTable(dbexp.lvl, dbexp.exp, dbexp.pkgsize, dbexp.weal);
 		}
 		return true;
 	}
@@ -1495,7 +1495,7 @@ namespace GData
 		return cit != m_TaskNpcRelationList.end() ? cit->second : null;
 	}
 
-	//日常任务
+	//?粘?????
 	const std::set<UInt32>& GDataManager::GetTaskDayData(UInt32 taskId)
 	{
 		static std::set<UInt32> null;

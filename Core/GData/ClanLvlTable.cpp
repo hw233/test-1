@@ -37,11 +37,13 @@ bool ClanLvl::testLevelUp( UInt8& lvl, UInt64& exp )
 	return r;
 }
 
-void ClanLvl::setTable( UInt8 lvl, UInt64 exp )
+void ClanLvl::setTable( UInt8 lvl, UInt64 exp, UInt32 pkgsize, UInt32 weal )
 {
     if (lvl > CLAN_LEVEL_MAX)
         return;
 	_exp[lvl-1] = exp;
+    _pkgsize[lvl - 1] = pkgsize;
+    _weal[lvl - 1] = weal;
 }
 
 UInt64 ClanLvl::getLevelMin( UInt8 lvl )
@@ -51,6 +53,18 @@ UInt64 ClanLvl::getLevelMin( UInt8 lvl )
 	if(lvl >= CLAN_LEVEL_MAX)
 		return _exp[CLAN_LEVEL_MAX - 1];
 	return _exp[lvl - 1];
+}
+
+UInt32 ClanLvl::getWeal(UInt8 lvl)
+{
+    if(lvl > CLAN_LEVEL_MAX || lvl == 0) return 0;
+    return _weal[lvl];
+}
+
+UInt32 ClanLvl::getPkgSize(UInt8 lvl)
+{
+    if(lvl > CLAN_LEVEL_MAX || lvl == 0) return 0;
+    return _pkgsize[lvl];
 }
 
 }

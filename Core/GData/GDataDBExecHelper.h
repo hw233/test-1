@@ -186,6 +186,8 @@ struct DBClanLvl
 {
 	UInt8 lvl;          // 帮派等级
 	UInt64 exp;         // 建设度值
+    UInt32 pkgsize;     // 仓库大小
+    UInt32 weal;        // 福利
 };
 
 struct DBClanTechType
@@ -452,10 +454,12 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBClanLvl)
-SPECIALDEF(2)
+SPECIALDEF(4)
 	(
 	UInt8,			lvl,
-	UInt64,			exp
+	UInt64,			exp,
+    UInt32,         pkgsize,
+    UInt32,         weal
 	)
 SPECIALEND()
 
