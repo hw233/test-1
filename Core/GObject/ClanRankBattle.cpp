@@ -25,7 +25,7 @@ namespace GObject
 
 
     //帮会排名战报名开始时间
-    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 21 * 60 * 60;
+    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 22 * 60 * 60;
     //帮会排名战报名持续时间
     const static UInt32 RANK_BATTLE_SIGNUP_TIME = 10 * 60;
 
@@ -180,7 +180,6 @@ namespace GObject
         m_Winner = 0;
         m_Round = 0;
 
-        TRACE_LOG("clanrankbattle field(%u) start(%u:%u)(%u:%u).", m_Id, clan1, UInt32(team1.size()), clan2, UInt32(team2.size()));
     }
 
 
@@ -482,14 +481,12 @@ namespace GObject
                 iter != players1.end(); ++iter)
         {
             (*iter)->send(stream);
-            TRACE_LOG("send battle report to player %s.", (*iter)->getName().c_str());
         }
 
         for(PlayerVec::iterator iter = players2.begin();
                 iter != players2.end(); ++iter)
         {
             (*iter)->send(stream);
-            TRACE_LOG("send battle report to player %s.", (*iter)->getName().c_str());
         }
     }
 
