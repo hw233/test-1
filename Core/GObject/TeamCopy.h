@@ -34,6 +34,7 @@ struct TeamData
         id = 0;
         leader = NULL;
         memset( members, 0, sizeof(members) );
+        memset( status, 0, sizeof(status) );
         count = 0;
         t = 0;
         upLevel = 0;

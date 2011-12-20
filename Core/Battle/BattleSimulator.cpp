@@ -293,7 +293,7 @@ void BattleSimulator::start(UInt8 prevWin)
 
                     UInt16 portrait = 0;
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
-                        portrait = 137;
+                        portrait = 1058;
                     else
                         portrait = bf->getPortrait();
 
@@ -688,6 +688,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         UInt8 target_stun = area_target->getStunRound();
         bool enterEvade = area_target->getEvad100();
         bool defend100 = area_target->getDefend100();
+        // 雪人
+        if(area_target->getId() == 5679)
+            target_stun = 1;
 
         // target fighter will do not counter while fighter is the same side
         bool can_counter = true;
@@ -1401,12 +1404,61 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     }
 
     // 雪球
-    if(skill->getId() == 137)
+    if(SKILL_ID(skill->getId()) == 137)
     {
         size_t defCount = 0;
         DefStatus defList[25];
 
         UInt8 cnt = 1;
+        UInt8 level = SKILL_LEVEL(skill->getId());
+        UInt8 roll = _rnd(100);
+        switch(level)
+        {
+        case 2:
+            if(roll < 20)
+                cnt = 2;
+            break;
+        case 3:
+            if(roll < 40)
+                cnt = 2;
+            break;
+        case 4:
+            if(roll < 60)
+                cnt = 2;
+            break;
+        case 5:
+            if(roll < 20)
+                cnt = 3;
+            else if(roll < 80)
+                cnt = 2;
+            break;
+        default:
+            {
+                if(level > 5 && level < 9)
+                    cnt = 2;
+
+                switch(level)
+                {
+                case 6:
+                    if(roll < 40)
+                        cnt = 3;
+                    break;
+                case 7:
+                    if(roll < 60)
+                        cnt = 3;
+                    break;
+                case 8:
+                    if(roll < 80)
+                        cnt = 3;
+                    break;
+                case 9:
+                    cnt = 3;
+                    break;
+                }
+                break;
+            }
+        }
+
         for(UInt8 i = 0; i < cnt; ++i)
         {
 			UInt8 posList[25];
@@ -1427,7 +1479,9 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 				break;
 			bf->addFlag(BattleFighter::Mirrored);
 			UInt8 pos = posList[_rnd(posCount)];
-            GObject::Fighter * fgt = globalFighters[137];
+            GObject::Fighter * fgt = globalFighters[5679];
+            if(fgt == NULL)
+                break;
 			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);
 			if(newf == NULL)
 				break;
@@ -1438,7 +1492,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             
             defList[i].pos = pos + 25;
             defList[i].damType = e_Summon;
-            defList[i].damage = 137;
+            defList[i].damage = 5679;
             defList[i].leftHP = newf->getHP();
             ++defCount;
 
@@ -2676,6 +2730,10 @@ UInt32 BattleSimulator::doAttack( int pos )
         {
             break;
         }
+
+        // 雪人
+        if(bf->getId() == 5679)
+            break;
 
         int target_pos;
         int otherside = 1 - bf->getSide();

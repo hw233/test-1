@@ -379,6 +379,8 @@ private:
     UInt8 _stunLevel;
     UInt8 _confuseRound;
     UInt8 _confuseLevel;
+    UInt8 _weakRound;
+    UInt8 _weakLevel;
 
 	GData::AttrExtra _attrExtraEquip; // 装备附加一级属性和
 	GData::AttrExtra _attrExtra; // 全部附加一级属性和
