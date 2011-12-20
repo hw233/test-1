@@ -104,17 +104,11 @@ struct UserLoginStruct
 	typedef Array<UInt8, 36> HashValType;
 	UInt8 _hashval[36];
 	std::string _server;
-#if _NEED_OPENID
     std::string _platform;
     std::string _openid;
     std::string _openkey;
 	MESSAGE_DEF9(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang,
             HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey);
-#else
-	MESSAGE_DEF6(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear,
-            UInt32, _lang, HashValType, _hashval, std::string, _server);
-#endif
-
 };
 
 struct NewUserStruct
@@ -123,15 +117,11 @@ struct NewUserStruct
 	UInt8 _class;
     UInt8 _level;
     UInt8 _isYear;
-#if _NEED_OPENID
     std::string _platform;
     std::string _openid;
     std::string _openkey;
 	MESSAGE_DEF7(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey);
-#else
-	MESSAGE_DEF4(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear);
-#endif
 
 };
 
@@ -520,11 +510,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
 
-#ifdef _NEED_OPENID
             pl->setDomain(nu._platform);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
-#endif
 
             GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
 			CountryEnterStruct ces(false, 1, loc);

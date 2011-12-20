@@ -857,6 +857,8 @@ void Fighter::setCurrentHP( UInt16 hp, bool writedb )
 void Fighter::addHPPercent( UInt8 p, bool writedb )
 {
     UInt32 maxhp = getMaxHP();
+    if (!_hp)
+        _hp = maxhp;
     UInt32 hp = (p / (float)100) * maxhp;
     _hp += hp;
     if (_hp > maxhp)
