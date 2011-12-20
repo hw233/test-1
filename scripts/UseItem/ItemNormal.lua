@@ -993,7 +993,9 @@ function ItemNormal_00000402(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+        if i <= 3 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+        end
     end
     package:DelItemSendMsg(402, player);
     return num
@@ -1023,7 +1025,9 @@ function ItemNormal_00000403(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+        if i<= 4 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+        end
     end
     package:DelItemSendMsg(403, player);
     return num
