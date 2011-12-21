@@ -396,7 +396,6 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
         return 0;
     }
 
-
     if(pl->getTeamData() != NULL)
         return 0;
 

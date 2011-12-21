@@ -1406,58 +1406,34 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     // 雪球
     if(SKILL_ID(skill->getId()) == 137)
     {
+        static UInt8 skill_prob_137[10][3] = {
+            {0, 0, 0},
+            {97, 99, 100},
+            {92, 97, 100},
+            {85, 95, 100},
+            {79, 93, 100},
+            {73, 91, 100},
+            {67, 89, 100},
+            {61, 87, 100},
+            {55, 85, 100},
+            {49, 83, 100}
+        };
         size_t defCount = 0;
         DefStatus defList[25];
+        size_t scCount = 0;
+        StatusChange scList[25];
 
-        UInt8 cnt = 1;
+        UInt8 cnt = 0;
         UInt8 level = SKILL_LEVEL(skill->getId());
+        if(level > 9)
+            level = 9;
         UInt8 roll = _rnd(100);
-        switch(level)
-        {
-        case 2:
-            if(roll < 20)
-                cnt = 2;
-            break;
-        case 3:
-            if(roll < 40)
-                cnt = 2;
-            break;
-        case 4:
-            if(roll < 60)
-                cnt = 2;
-            break;
-        case 5:
-            if(roll < 20)
-                cnt = 3;
-            else if(roll < 80)
-                cnt = 2;
-            break;
-        default:
-            {
-                if(level > 5 && level < 9)
-                    cnt = 2;
-
-                switch(level)
-                {
-                case 6:
-                    if(roll < 40)
-                        cnt = 3;
-                    break;
-                case 7:
-                    if(roll < 60)
-                        cnt = 3;
-                    break;
-                case 8:
-                    if(roll < 80)
-                        cnt = 3;
-                    break;
-                case 9:
-                    cnt = 3;
-                    break;
-                }
-                break;
-            }
-        }
+        if(skill_prob_137[level][0] > roll)
+            cnt = 1;
+        else if(skill_prob_137[level][1] > roll)
+            cnt = 2;
+        else if(skill_prob_137[level][2] > roll)
+            cnt = 3;
 
         for(UInt8 i = 0; i < cnt; ++i)
         {
@@ -1500,7 +1476,11 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 			// insert fighter into queue by order
 			insertFighterStatus(newf);
         }
-        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, NULL, 0);
+
+        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
+
+        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
+
         return 0;
     }
 
