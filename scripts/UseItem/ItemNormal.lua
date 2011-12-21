@@ -967,7 +967,7 @@ function ItemNormal_00000402(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
-    local prob = {11, 22, 33, 44, 55, 67, 78, 90, 100,}    
+    local prob = {10, 20, 22, 32, 47, 57, 77, 99, 100,}
     local items = {{503,1}, {514,1}, {515,1}, {511,1}, {15,2}, {500,1}, {502,1}, {9,1}, {0,0},}
 
     local p = math.random(1, 100)
@@ -999,7 +999,7 @@ function ItemNormal_00000403(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
-    local prob = {11, 22, 33, 44, 55, 67, 78, 90, 100,}    
+    local prob = {10, 20, 22, 25, 40, 52, 72, 99, 100,}
     local items = {{506,1}, {508,1}, {509,1}, {507,1}, {15,2}, {30,1}, {502,1}, {9,1}, {0,0},}
 
     local p = math.random(1, 100)
