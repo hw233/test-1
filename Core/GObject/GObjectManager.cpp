@@ -3447,23 +3447,49 @@ namespace GObject
         return true;
     }
 
+    void getMoneyLog(int today, int type, DBMoneyLog& r)
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return ;
+
+        memset(&r, 0x00, sizeof(r));
+        char buf[1024] = {0};
+        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = %d", today, type);
+		execu->Extract(buf, r);
+    }
+
+    void assignMoneyLog(DBMoneyLog& r, MoneyIn& mi)
+    {
+        mi.gold = r.gold;
+    }
+
     bool GObjectManager::InitMoneyLog()
     {
-        int today = TimeUtil::GetYYMMDD();
-        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 1);
-        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 2);
+        UInt32 now = TimeUtil::Now();
 
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
+        int today[7] = {
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-6, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-5, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-4, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-3, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-2, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-1, now)),
+            TimeUtil::GetYYMMDD(now),
+        };
+
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today[6], 1);
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today[6], 2);
 
 		DBMoneyLog t;
-        char buf[1024] = {0};
-        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 1", today);
-		execu->Extract(buf, t);
-        World::_moneyIn[0].gold = t.gold;
-        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 2", today);
-		execu->Extract(buf, t);
-        World::_moneyIn[1].gold = t.gold;
+        for (int i = 0; i < 7; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                getMoneyLog(today[i], j+1, t);
+                assignMoneyLog(t, World::_moneyIn[i][j]);
+            }
+        }
+
         return true;
     }
 

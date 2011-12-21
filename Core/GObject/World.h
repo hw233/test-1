@@ -88,7 +88,7 @@ public:
 
 public:
     static UInt32 _moneyLogged;
-    static MoneyIn _moneyIn[2];
+    static MoneyIn _moneyIn[7][2];
 
 	static int _activityStage;
 	static bool _actAvailable;//开服到+6日

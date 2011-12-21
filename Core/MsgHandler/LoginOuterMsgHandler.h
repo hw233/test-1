@@ -1704,10 +1704,37 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
 	st.init(SPEP::GETMONEY,0x1);
+    UInt32 date = 0;
+    br >> date;
 
     CHKKEY();
-    st << GObject::World::_moneyIn[0].gold;
-    st << GObject::World::_moneyIn[1].gold;
+
+    UInt32 now = TimeUtil::Now();
+
+    int today[7] = {
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-6, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-5, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-4, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-3, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-2, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-1, now)),
+        TimeUtil::GetYYMMDD(now),
+    };  
+
+    bool found = false;
+    for (int i = 0; i < 7; ++i)
+    {
+        if (today[i] == (int)date)
+        {
+            st << GObject::World::_moneyIn[i][0].gold;
+            st << GObject::World::_moneyIn[i][1].gold;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        st << static_cast<UInt32>(0) << static_cast<UInt32>(0);
 
     st << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
