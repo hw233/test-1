@@ -889,7 +889,7 @@ end
 --完成任务数量  
 function  OnSubmitTasks(player, param)
     
-    local cur = player:GetVar(31);  -- vAR_TASK_SUBMITTED = 31,
+    local cur = player:GetVar(31);  -- VAR_TASK_SUBMITTED = 31,
 
     cur = cur + 1;
     if cur >= 10  then

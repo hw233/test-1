@@ -1171,7 +1171,14 @@ void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
 void OnAthlectisPayPaging( GameMsgHdr & hdr,  const void* data)
 {
     MSG_QUERY_PLAYER(player);
-    player->GetAthletics()->PayForPaging();
+
+    const GObject::AthleticsPay * co = reinterpret_cast<const GObject::AthleticsPay*>(data);
+
+    if(co->type == AthleticsRank::AthleticsPayForPaging)
+        player->GetAthletics()->PayForPaging(co->type);
+    else if(co->type == AthleticsRank::AthleticsPayForKillCD)
+        player->GetAthletics()->PayForKillCD(co->type);
+
 }
 
 void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)

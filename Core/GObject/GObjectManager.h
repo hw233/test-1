@@ -218,6 +218,19 @@ namespace GObject
             return _yellow_diamond_award[qqvipl];
         }
 
+        static UInt8 getD3D6MaxCount()
+        {
+            return _d3d6_diamond_award.size();
+        }
+
+        static std::vector<YDItem>& getD3D6Item(UInt8 qqvipl)
+        {
+            if(qqvipl > _d3d6_diamond_award.size() - 1)
+                qqvipl = _d3d6_diamond_award.size() - 1;
+
+            return _d3d6_diamond_award[qqvipl];
+        }
+
         static std::vector<YDItem>& getYearYDItem()
         {
             return _year_yellow_diamond_award;
@@ -332,6 +345,7 @@ namespace GObject
 
         //黄钻物品奖励
         static std::vector<std::vector<YDItem>> _yellow_diamond_award;
+        static std::vector<std::vector<YDItem>> _d3d6_diamond_award;
         static std::vector<YDItem>              _year_yellow_diamond_award;
         static std::vector<UInt32>              _yellow_diamond_gem;
 
