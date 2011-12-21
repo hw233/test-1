@@ -128,6 +128,7 @@ namespace GObject
     struct TeamData;
     struct TeamCopyPlayerInfo;
     class ActivityMgr;
+    class HoneyFall;
 
     struct TripodData
     {
@@ -450,6 +451,7 @@ namespace GObject
 			BeChallenging = 0x00000020,		//非竞技状态
 			SGPunish	= 0x00000040,		//变速惩罚
             AthPayForPage = 0x00000080,     //in athletics range for paging
+            AthPayForKillCD=0x00000100,     
 			AllGlobalFlags	= 0xFFFFFFFF
 		};
 
@@ -1212,6 +1214,7 @@ namespace GObject
         CopyTeamPage& getCopyTeamPage();
         void clearCopyTeamPage();
         TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
+        HoneyFall* getHoneyFall();
 
     private:
         bool m_hasTripod;
@@ -1219,6 +1222,7 @@ namespace GObject
         TeamData* m_teamData;
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
+        HoneyFall* m_hf;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }

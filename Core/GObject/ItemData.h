@@ -3,7 +3,8 @@
 
 #include "Common/Stream.h"
 
-#define ENCHANT_LEVEL_MAX 12
+#define ENCHANT_LEVEL_MAX 10
+#define TRUMP_ENCHANT_LEVEL_MAX 8
 #define SOCKETS_MAX 6
 
 namespace GObject

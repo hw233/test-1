@@ -3703,7 +3703,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 0x14:
         {
-            teamCopyManager->teamBattleStart(player);
+            UInt8 type = 0;
+            br >> type;
+            teamCopyManager->teamBattleStart(player, type);
         }
         break;
     case 0x0F:

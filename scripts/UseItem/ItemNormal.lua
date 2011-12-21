@@ -337,27 +337,19 @@ function ItemNormal_00000026(iid, num, bind, param)
 end
 
 function ItemNormal_00000401(iid, num, bind, param)
-  local player = GetPlayer()
-  local fgt = player:findFighter(param);
-  local package = player:GetPackage();
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
 
-  if fgt == nil then
-      return false
-  end
-
-  fgt:setBuffData(2, 0, true)
-  fgt:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(fgt, 1, 3600, num, 86400) then
-    if ItemNormal_AddBuff(fgt, 5, 3600, num, 86400) then
-      package:DelItemSendMsg(401, player);
-	  return num;
-    else
-      fgt:setBuffData(1, 0, true)
-      return false
+    if fgt == nil then
+        return false
     end
-  else
-	return false;
-  end
+
+    if ItemNormal_AddBuff(fgt, 5, 3600, num, 86400) then
+        package:DelItemSendMsg(401, player);
+        return num;
+    end
+    return false
 end
 
 function ItemNormal_00000027(iid, num, bind, param)
@@ -993,7 +985,9 @@ function ItemNormal_00000402(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+        if i <= 3 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+        end
     end
     package:DelItemSendMsg(402, player);
     return num
@@ -1023,7 +1017,9 @@ function ItemNormal_00000403(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+        if i<= 4 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+        end
     end
     package:DelItemSendMsg(403, player);
     return num

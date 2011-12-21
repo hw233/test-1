@@ -34,6 +34,7 @@ struct TeamData
         id = 0;
         leader = NULL;
         memset( members, 0, sizeof(members) );
+        memset( status, 0, sizeof(status) );
         count = 0;
         t = 0;
         upLevel = 0;
@@ -44,6 +45,7 @@ struct TeamData
     UInt32 id;
     Player* leader;
     Player* members[TEAMCOPY_MAXMEMCNT];
+    UInt8 status[TEAMCOPY_MAXMEMCNT];
     UInt8 count;
     UInt8 t;
     UInt8 upLevel;
@@ -123,7 +125,7 @@ class TeamCopy
         void teamKick(Player* pl, UInt64 playerId);
         void reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1);
         void handoverLeader(Player* pl, UInt64 playerId);
-        void teamBattleStart(Player* pl);
+        void teamBattleStart(Player* pl, UInt8 type);
         void sendTeamCopyPageUpdate(UInt8 copyId, UInt8 t, UInt32 startIdx, UInt32 endIdx);
         bool quikJoinTeam(Player* pl);
 

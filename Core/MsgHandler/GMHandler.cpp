@@ -31,7 +31,7 @@
 #include "GObject/FrontMap.h"
 #include "GObject/HeroIsland.h"
 #include "GObject/TeamCopy.h"
-
+#include "GObject/AthleticsRank.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -2501,7 +2501,9 @@ void GMHandler::OnResetTeamCopyPlayer(GObject::Player* player, std::vector<std::
 
 void GMHandler::OnMoneyIn(GObject::Player* player, std::vector<std::string>& args)
 {
-    player->moneyLog(1, 1);
-    player->moneyLog(2, 1);
+    if (args.size() < 1)
+        player->moneyLog(1, 1);
+    else
+        player->moneyLog(atoi(args[0].c_str()), 1);
 }
 
