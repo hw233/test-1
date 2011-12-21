@@ -1249,6 +1249,12 @@ void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
      MSG_QUERY_PLAYER(player);
      GObject::gAthleticsRank.RequestPageNum(player);
 }
+
+void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
+{
+     MSG_QUERY_PLAYER(player);
+     GObject::gAthleticsRank.RequestKillCD(player);
+}
 void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
 {
     MSG_QUERY_PLAYER(player);

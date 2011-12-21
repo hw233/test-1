@@ -738,7 +738,7 @@ void Athletics::listAthleticsMartial()
         GLOBAL().PushMsg(hdr2, NULL);
     }
 }
-void  Athletics:: PayForPaging()
+void  Athletics:: PayForPaging(UInt8 type)
 {
     UInt8   MoneyEnough = 0 ;
     UInt32 amount = 100 ;
@@ -753,12 +753,30 @@ void  Athletics:: PayForPaging()
         MoneyEnough = 1;
     }
 
-    GObject::AthleticsPayPaging  msg;
+    GObject::AthleticsPay  msg;
+    msg.type = type;
     msg.moneyEnough = MoneyEnough;
 
     GameMsgHdr hdr(0x19A, WORKER_THREAD_WORLD, _owner, sizeof(msg));
     GLOBAL().PushMsg(hdr, &msg);
 }
+void Athletics:: PayForKillCD(UInt8 type)
+{
+    UInt32 cost = 1;
+    GObject::AthleticsPay msg;
+    msg.type = AthleticsRank::AthleticsPayForKillCD;
+    msg.moneyEnough = 0;
+   if(_owner->getGold() < cost) 
+       _owner->sendMsgCode(0, 1104);
 
+   else
+   {
+        ConsumeInfo ci(AthleticPaging,0,0);
+        _owner->useGold(cost, &ci);
+        msg.moneyEnough = 1;
+   }
+   GameMsgHdr hdr(0x19A, WORKER_THREAD_WORLD, _owner, sizeof(msg));
+   GLOBAL().PushMsg(hdr, &msg);
+}
 }
 

@@ -31,7 +31,7 @@
 #include "GObject/FrontMap.h"
 #include "GObject/HeroIsland.h"
 #include "GObject/TeamCopy.h"
-
+#include "GObject/AthleticsRank.h"
 GMHandler gmHandler;
 
 GMHandler::GMHandler()

@@ -56,23 +56,23 @@ struct AthleticsRankData
     UInt32  oldrank;
     UInt32  first4rank;
     UInt32  extrachallenge;
-    UInt16  pageNum; //¿¿¿
-    //UInt32  first4rank;
-    // 0x1 µÚÒ»´Î³ÉÎª¾º¼¼³¡µÚÒ»
-    // 0x2 µÚÒ»´ÎÉ±Èë¾º¼¼³¡¶şÇ¿
-    // 0x4 µÚÒ»´ÎÉ±Èë¾º¼¼³¡ÈıÇ¿
-    // 0x8 µÚÒ»´ÎÉ±Èë¾º¼¼³¡10Ç¿
-    // 0x10 µÚÒ»´ÎÉ±Èë¾º¼¼³¡100Ç¿
-    // 0x20 µÚÒ»´ÎÉ±Èë¾º¼¼³¡200Ç¿
-    // 0x40 µÚÒ»´ÎÉ±Èë¾º¼¼³¡300Ç¿
-    // 0x80 µÚÒ»´Î¾º¼¼³¡ÌôÕ½
-    // 0x100 Ò»ÌìÄÚÌáÉı200¸öÅÅÃû
-    // 0x200 Ò»ÌìÄÚÌáÉı100¸öÅÅÃû
-    // 0x400 Ò»ÌìÄÚÌáÉı50¸öÅÅÃû
-    // 0x800 Ò»ÌìÄÚÌáÉı20¸öÅÅÃû
-    // 0x1000 Ê§È¥10Ç¿ÅÅÃû
-    // 0x2000 ¶áµÃ10Ç¿ÅÅÃû
-    // 0x4000 ÒÑÌØÊâÌôÕ½
+    UInt16  pageNum; //???
+        //UInt32  first4rank;
+        //// 0x1 ç¬¬ä¸€æ¬¡æˆä¸ºç«æŠ€åœºç¬¬ä¸€
+        //// 0x2 ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœºäºŒå¼º
+        //// 0x4 ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœºä¸‰å¼º
+        //// 0x8 ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº10å¼º
+        //// 0x10 ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº100å¼º
+        //// 0x20 ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº200å¼º
+        //// 0x40 ç¬¬ä¸€æ¬¡æ€å…¥ç«æŠ€åœº300å¼º
+        //// 0x80 ç¬¬ä¸€æ¬¡ç«æŠ€åœºæŒ‘æˆ˜
+        //// 0x100 ä¸€å¤©å†…æå‡200ä¸ªæ’å
+        //// 0x200 ä¸€å¤©å†…æå‡100ä¸ªæ’å
+        //// 0x400 ä¸€å¤©å†…æå‡50ä¸ªæ’å
+        //// 0x800 ä¸€å¤©å†…æå‡20ä¸ªæ’å
+        //// 0x1000 å¤±å»10å¼ºæ’å
+        //// 0x2000 å¤ºå¾—10å¼ºæ’å
+        //// 0x4000 å·²ç‰¹æ®ŠæŒ‘æˆ˜
     AthleticsRankData() : pageNum(0)
     {
     }
@@ -110,12 +110,13 @@ struct AthleticsEventData
 		: id(id_), player1(player1_), player2(player2_), cond(cond_), color(color_), value(value_), itemCount(itemCount_), itemId(itemId_), time(time_) {}
 };
 
-struct AthleticsPayPaging
+struct AthleticsPay
 {
-    UInt8  moneyEnough;
+    Int8  moneyEnough;
+    UInt8 type;
 };
 
-static const UInt16 TimeOutbyColor[] = {2 * 60 * 60, 4 * 60 * 60, 6 * 60 * 60, 6 * 60 * 60};//±¦ÏäµÄÊ±¼ä ÂÌÉ«:2Ğ¡Ê± À¶É«:4Ğ¡Ê± ×ÏÉ«:6Ğ¡Ê± ³ÈÉ«:6Ğ¡Ê±
+static const UInt16 TimeOutbyColor[] = {2 * 60 * 60, 4 * 60 * 60, 6 * 60 * 60, 6 * 60 * 60};//??????Ê±?? ??É«:2Ğ¡Ê± À¶É«:4Ğ¡Ê± ??É«:6Ğ¡Ê± ??É«:6Ğ¡Ê±
 //static const UInt8 PLUND_RATE = 3;
 static const UInt32 EXTRAREWARDTM = 19 * 3600;
 
@@ -128,6 +129,13 @@ class AthleticsRank
 	typedef std::map<Player *, Rank> RankList;
 
 	static const UInt32 ATHLETICS_BUFF_TIME = 15 * 60;
+
+    public:
+    enum
+    {
+        AthleticsPayForPaging,
+        AthleticsPayForKillCD,
+    };
 public:
 	AthleticsRank();
 	~AthleticsRank();
@@ -136,7 +144,9 @@ public:
 	void addAthleticsFromDB(UInt8, AthleticsRankData *);
 	bool enterAthleticsReq(Player *, UInt8 row);
     void RequestPageNum(GObject::Player*); // client -> world
+    void RequestKillCD(Player* player);
     void AddPageNum(Player* player, bool bMoneyEnough); // country -> world
+    void KillCD(Player*, bool);
 public:
 	void requestAthleticsList(Player *, UInt16 type);
 	void challenge(Player *, std::string&, UInt8 type = 0);
@@ -250,7 +260,7 @@ public:
 private:	
 	RankList		_ranks[2];
 	AthleticsList	_athleticses[2];
-	UInt32			_maxRank[2];	//ÓÃÓÚ¼ÍÂ¼×î´óÎ»ÖÃĞòºÅ
+	UInt32			_maxRank[2];	//???Ú¼?Â¼????Î»??????
 
 	std::deque<AthleticsEventData *> _athleticsesEvent[2];
 };
