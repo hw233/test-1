@@ -809,7 +809,7 @@ namespace GObject
             {
                 std::vector<YDItem> itemVt;
                 itemVt.clear();
-                lua_tinker::table itemTable = ydTable.get<lua_tinker::table>(i + 1);
+                lua_tinker::table itemTable = d3Table.get<lua_tinker::table>(i + 1);
                 size_t itemSize = itemTable.size();
                 for(UInt8 j = 0; j < itemSize; ++j)
                 {

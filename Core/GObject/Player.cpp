@@ -7065,6 +7065,7 @@ namespace GObject
         {
             st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_3366));
             UInt8 maxCnt = GObjectManager::getD3D6MaxCount();
+            st << maxCnt;
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
                 std::vector<YDItem>& ydItem = GObjectManager::getD3D6Item(i);
@@ -7124,18 +7125,13 @@ namespace GObject
 
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
-        UInt8 qqvipl = _playerData.qqvipl;
-        UInt8 flag = 8*(_playerData.qqvipl / 10);
-        if(flag)
-        {
-            if(_playerData.qqvipl % 10 == 0)
-                qqvipl = 0;
-            else
-                qqvipl = _playerData.qqvipl%10 + 1;
-        }
 
         if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20)
         {
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+            if (!qqvipl)
+                return 0;
+
             UInt32 award = GetVar(VAR_AWARD_3366);
             if (!award)
             {
@@ -7162,6 +7158,16 @@ namespace GObject
         }
         else if (_playerData.qqvipl < 20)
         {
+            UInt8 qqvipl = _playerData.qqvipl;
+            UInt8 flag = 8*(_playerData.qqvipl / 10);
+            if(flag)
+            {
+                if(_playerData.qqvipl % 10 == 0)
+                    qqvipl = 0;
+                else
+                    qqvipl = _playerData.qqvipl%10 + 1;
+            }
+
             if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)
             {
                 std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
