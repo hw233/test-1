@@ -607,8 +607,11 @@ void TeamCopy::reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1)
 
     Player* ptmp = NULL;
     ptmp = td->members[idx1];
+    UInt8 tmpStatus = td->status[idx1];
     td->members[idx1] = td->members[idx0];
     td->members[idx0] = ptmp;
+    td->status[idx1] = td->status[idx0];
+    td->status[idx0] = tmpStatus;
 
     updateTeamInfo(pl);
 }
