@@ -85,7 +85,7 @@ void World::World_testUpdate( World * world )
 
 void World::World_Leaderboard_Update( void * )
 {
-	leaderboard.update();
+	//leaderboard.update(); // XXX: 移到单独线程去处理
 }
 
 void World::World_ChatItem_Purge( void * )
@@ -363,7 +363,7 @@ bool World::Init()
     TimeUtil::GetNextMY(mon, &year);
     CreateNewDB(mon, year);
 	AddTimer(60 * 1000, World_testUpdate, this);
-	AddTimer(3600 * 1000, World_Leaderboard_Update);
+	//AddTimer(3600 * 1000, World_Leaderboard_Update);
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
 	AddTimer(5000, World_Multi_Check, this);
 

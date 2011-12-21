@@ -39,6 +39,7 @@ public:
 public:
 	GObject::Country& GetCountry(UInt8 worker);
 	GObject::World& GetWorld();
+	GObject::DCWorker& GetSort();
 	GObject::DCWorker& GetDC();
 	DB::DBWorker& GetDB();
 	DB::DBWorker& GetDB1();

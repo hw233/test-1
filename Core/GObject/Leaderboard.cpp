@@ -126,7 +126,7 @@ void Leaderboard::doUpdate()
 	execu->ExtractData("SELECT `clan`.`id`, `player`.`name`, `clan`.`level`, `player`.`country`, COUNT(`clan_player`.`id`) AS `pcount`, `clan`.`name` FROM "
 		"`clan`, `clan_player`, `player` "
 		"WHERE `clan`.`id` = `clan_player`.`id` AND `clan`.`leader` = `player`.`id` "
-		"GROUP BY `clan_player`.`id` ORDER BY `clan`.`proffer` DESC, `pcount` DESC LIMIT 0, 100", blist);
+		"GROUP BY `clan_player`.`id` ORDER BY `clan`.`level` DESC, `pcount` DESC LIMIT 0, 100", blist);
 	buildPacket(_clanStream, 3, _id, blist);
 
 	std::vector<UInt64> ilist;
@@ -332,6 +332,9 @@ bool Leaderboard::hasUpdate( UInt32 id )
 
 bool Leaderboard::getPacket( UInt8 t, Stream*& st )
 {
+    if (isSorting())
+        return false;
+
 	switch(t)
 	{
 	case 0:
@@ -364,6 +367,8 @@ void _searchInside(Stream& st, T1 mapv, T2 v)
 
 void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 {
+    if (isSorting())
+        return;
 	Stream st(REP::SORT_PERSONAL);
 	if(id == _id)
 	{
@@ -394,3 +399,4 @@ void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 }
 
 }
+

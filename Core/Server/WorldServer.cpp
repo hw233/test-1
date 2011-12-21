@@ -17,6 +17,7 @@
 #include "kingnet_analyzer.h"
 #include "GObject/DCWorker.h"
 #include "GObject/DCLogger.h"
+#include "GObject/SortWorker.h"
 
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
@@ -110,6 +111,9 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 	worker = WORKER_THREAD_LOGIN;
 	m_AllWorker[WORKER_THREAD_LOGIN] = new WorkerThread<Login::LoginWorker>(new Login::LoginWorker());
+
+	worker = WORKER_THREAD_SORT;
+	m_AllWorker[worker] = new WorkerThread<GObject::SortWorker>(new GObject::SortWorker(0, WORKER_THREAD_SORT));
 
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker] = new WorkerThread<GObject::DCWorker>(new GObject::DCWorker(0, WORKER_THREAD_DC));
@@ -205,6 +209,9 @@ void WorldServer::Run()
 {
 	int worker;
 
+	worker = WORKER_THREAD_SORT;
+	m_AllWorker[worker]->Run();
+
 	worker = WORKER_THREAD_WORLD;
 	m_AllWorker[worker]->Run();
 
@@ -272,6 +279,11 @@ GObject::Country& WorldServer::GetCountry(UInt8 worker)
 GObject::World& WorldServer::GetWorld()
 {
 	return Worker<GObject::World>(WORKER_THREAD_WORLD);
+}
+
+GObject::DCWorker& WorldServer::GetSort()
+{
+	return Worker<GObject::DCWorker>(WORKER_THREAD_SORT);
 }
 
 GObject::DCWorker& WorldServer::GetDC()
