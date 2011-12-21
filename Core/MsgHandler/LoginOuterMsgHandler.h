@@ -1705,9 +1705,9 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
     Stream st;
 	st.init(SPEP::GETMONEY,0x1);
     UInt32 date = 0;
-    br >> date;
 
     CHKKEY();
+    br >> date;
 
     UInt32 now = TimeUtil::Now();
 
