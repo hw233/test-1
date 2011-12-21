@@ -735,13 +735,16 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
     if(!checkTeamCopy(pl, copyId, t))
         return;
 
-    if(type == 1)
+    if(type == 1 || type == 2)
     {
         for(int i = 0; i < td->count; ++i)
         {
             if(td->members[i] == pl)
             {
-                td->status[i] = 1;
+                if(type == 1)
+                    td->status[i] = 1;
+                else
+                    td->status[i] = 0;
                 break;
             }
         }
