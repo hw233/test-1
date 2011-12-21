@@ -332,6 +332,9 @@ bool Leaderboard::hasUpdate( UInt32 id )
 
 bool Leaderboard::getPacket( UInt8 t, Stream*& st )
 {
+    if (isSorting())
+        return false;
+
 	switch(t)
 	{
 	case 0:

@@ -1075,7 +1075,8 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
 	Stream * st;
 	if(GObject::leaderboard.hasUpdate(lr._id) && GObject::leaderboard.getPacket(lr._type, st))
 	{
-		player->send(*st);
+        if (!GObject::leaderboard.isSorting())
+            player->send(*st);
 	}
 	else
 	{
