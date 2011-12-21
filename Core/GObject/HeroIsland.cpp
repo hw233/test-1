@@ -1366,7 +1366,11 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
     st << static_cast<UInt8>(12);
     st << skillid;
 
-    UInt16 cd = 20*60;
+    UInt16 cd = 0;
+    if (cfg.GMCheck)
+        cd = 20*60;
+    else
+        cd = 60;
     UInt32 now = TimeUtil::Now();
     switch (skillid)
     {
@@ -1425,7 +1429,10 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                 else
                 {
                     pd->skills[1].cd = now + cd;
-                    pd->skills[1].lastcd = now + pd->skills[1].last;
+                    if (!pd->skills[1].lastcd || pd->skills[1].lastcd == static_cast<UInt32>(-1))
+                        pd->skills[1].lastcd = now + pd->skills[1].last;
+                    else
+                        pd->skills[1].lastcd += pd->skills[1].last;
                 }
                 pd->skills[1].bufid = PLAYER_BUFF_HIPG;
                 pd->skills[1].attr = &_skillattr[1];
@@ -1458,7 +1465,10 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                 else
                 {
                     pd->skills[2].cd = now + cd;
-                    pd->skills[2].lastcd = now + pd->skills[2].last;
+                    if (!pd->skills[2].lastcd || pd->skills[2].lastcd == static_cast<UInt32>(-1))
+                        pd->skills[2].lastcd = now + pd->skills[2].last;
+                    else
+                        pd->skills[2].lastcd += pd->skills[2].last;
                 }
 
                 pd->skills[2].bufid = PLAYER_BUFF_HIBT;
@@ -1492,7 +1502,10 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                 else
                 {
                     pd->skills[3].cd = now + cd;
-                    pd->skills[3].lastcd = now + pd->skills[3].last;
+                    if (!pd->skills[3].lastcd || pd->skills[3].lastcd == static_cast<UInt32>(-1))
+                        pd->skills[3].lastcd = now + pd->skills[3].last;
+                    else
+                        pd->skills[3].lastcd += pd->skills[3].last;
                 }
 
                 pd->skills[3].bufid = PLAYER_BUFF_HILN;
@@ -1526,7 +1539,10 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                 else
                 {
                     pd->skills[4].cd = now + cd;
-                    pd->skills[4].lastcd = now + pd->skills[4].last;
+                    if (!pd->skills[4].lastcd || pd->skills[4].lastcd == static_cast<UInt32>(-1))
+                        pd->skills[4].lastcd = now + pd->skills[4].last;
+                    else
+                        pd->skills[4].lastcd += pd->skills[4].last;
                 }
 
                 pd->skills[4].bufid = PLAYER_BUFF_HIJZ;
