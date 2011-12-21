@@ -345,7 +345,7 @@ function ItemNormal_00000401(iid, num, bind, param)
         return false
     end
 
-    if ItemNormal_AddBuff(fgt, 5, 3600, num, 86400) then
+    if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
         package:DelItemSendMsg(401, player);
         return num;
     end
