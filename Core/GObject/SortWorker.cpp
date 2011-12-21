@@ -6,8 +6,7 @@
 namespace GObject
 {
     SortWorker::SortWorker(UInt8 type, UInt8 worker) :
-        //WorkerRunner<>(60*60*1000), m_Type(type), m_Worker(worker)
-        WorkerRunner<>(60*1000), m_Type(type), m_Worker(worker), m_inited(false)
+        WorkerRunner<>(60*60*1000), m_Type(type), m_Worker(worker)
     {}
 
     SortWorker::~SortWorker()
@@ -25,7 +24,9 @@ namespace GObject
     void SortWorker::OnTimer()
     {
         leaderboard.begin();
+        TRACE_LOG("Sorting Begin...");
         leaderboard.update();
+        TRACE_LOG("Sorting End...");
         leaderboard.end();
     }
 

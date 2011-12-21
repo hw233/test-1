@@ -126,7 +126,7 @@ void Leaderboard::doUpdate()
 	execu->ExtractData("SELECT `clan`.`id`, `player`.`name`, `clan`.`level`, `player`.`country`, COUNT(`clan_player`.`id`) AS `pcount`, `clan`.`name` FROM "
 		"`clan`, `clan_player`, `player` "
 		"WHERE `clan`.`id` = `clan_player`.`id` AND `clan`.`leader` = `player`.`id` "
-		"GROUP BY `clan_player`.`id` ORDER BY `clan`.`proffer` DESC, `pcount` DESC LIMIT 0, 100", blist);
+		"GROUP BY `clan_player`.`id` ORDER BY `clan`.`level` DESC, `pcount` DESC LIMIT 0, 100", blist);
 	buildPacket(_clanStream, 3, _id, blist);
 
 	std::vector<UInt64> ilist;

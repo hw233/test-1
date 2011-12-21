@@ -142,8 +142,6 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	worker = WORKER_THREAD_DB_LOG1;
 	m_AllWorker[worker] = new WorkerThread<DB::DBWorker>(new DB::DBWorker(1, WORKER_THREAD_DB_LOG1));
 
-	worker = WORKER_THREAD_SORT;
-	m_AllWorker[worker]->Run();
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker]->Run();
 
@@ -210,6 +208,9 @@ bool WorldServer::IsActive() const
 void WorldServer::Run()
 {
 	int worker;
+
+	worker = WORKER_THREAD_SORT;
+	m_AllWorker[worker]->Run();
 
 	worker = WORKER_THREAD_WORLD;
 	m_AllWorker[worker]->Run();

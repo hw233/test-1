@@ -30,7 +30,6 @@ private:
 	FastMutex m_Mutex;
 	UInt8 m_Type;
 	UInt8 m_Worker;
-    bool m_inited;
 };
 
 }
