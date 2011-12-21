@@ -41,6 +41,7 @@ public:
 	inline UInt8 getLevel() { return _fighter->getLevel(); }
 	inline UInt8 getColor() { return _fighter->getColor(); }
 	inline float getPotential() { return _fighter->getPotential(); }
+    inline UInt32 getBuffData( UInt8 idx, UInt32 now ) { return _fighter->getBuffData(idx, now); }
 
 	inline UInt16 getExtraStrength() { return _attrExtra.strength; }
 	inline UInt16 getExtraPhysique() { return _attrExtra.physique; }
@@ -378,6 +379,8 @@ private:
     UInt8 _stunLevel;
     UInt8 _confuseRound;
     UInt8 _confuseLevel;
+    UInt8 _weakRound;
+    UInt8 _weakLevel;
 
 	GData::AttrExtra _attrExtraEquip; // 装备附加一级属性和
 	GData::AttrExtra _attrExtra; // 全部附加一级属性和

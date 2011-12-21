@@ -21,6 +21,8 @@
 #include "GData/Store.h"
 #include "GData/EUpgradeTable.h"
 #include "AttainMgr.h"
+#include "HoneyFall.h"
+
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
 #define ITEM_SOCKET_L2 511
@@ -1628,32 +1630,51 @@ namespace GObject
         const GData::ItemBaseType& itemType =  equip-> GetItemType();
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
         UInt8 quality = 0;
+        UInt8 maxEnchantLevel = ENCHANT_LEVEL_MAX;
         if(equip->getClass() == Item_Weapon)
         {
             quality = 1;
         }
         else if(equip->getClass() == Item_Trump)
         {
+            maxEnchantLevel = TRUMP_ENCHANT_LEVEL_MAX;
             item_enchant_l = TRUMP_ENCHANT_L1;
             quality = equip->getQuality();
         }
 
 		ItemEquipData& ied = equip->getItemEquipData();
-        if(ied.enchant >= ENCHANT_LEVEL_MAX || level > ENCHANT_LEVEL_MAX)
+        if(ied.enchant >= maxEnchantLevel || level > maxEnchantLevel)
             return 2;
 
         if(level != 0 && ied.enchant >= level)
             return 2;
 
+        // count不为0则type必须为1，表示自动强化时必须消耗精金
         if(count !=0 && type != 1)
             return 2;
 
 		if(GetItemAnyNum(item_enchant_l + type) < (count > 0 ? count : 1))
             return 2;
 
-        UInt32 enchant = GObjectManager::getEnchantChance(type, quality, ied.enchant);
-        if(enchant == 0)
-            return 2;
+        HoneyFall* hf = m_Owner->getHoneyFall();
+
+        HoneyFallType hft;
+        if(equip->getClass() == Item_Trump)
+            hft = e_HFT_Trump_Enchant;
+        else
+            hft = e_HFT_Equip_Enchant;
+
+        UInt32 enchant = 0;
+        if(type == 0)
+        {
+            enchant = GObjectManager::getEnchantChance(type, quality, ied.enchant);
+            if(enchant == 0)
+                return 2;
+        }
+        else
+        {
+            enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
+        }
 
 		// UInt32 viplvl = this->m_Owner->getVipLevel();
 		// const UInt8 enchant_max[] = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12};
@@ -1669,21 +1690,37 @@ namespace GObject
 		bool isBound = equip->GetBindStatus();
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
         bool flag_suc = false;
+        bool updateHft = false;
         UInt32 enc_times = 1;
 	    UInt8 oldEnchant = ied.enchant;
-        if(0 == count && uRand(1000) < enchant)
+        UInt8 oldHfValue = hf->getHftValue(hft);
+        if(0 == count)
         {
-            flag_suc = true;
-			++ ied.enchant;
-            if (equip->getClass() == Item_Trump && ied.enchant == 1)
+            if(uRand(100000) < enchant)
             {
-                ((ItemTrump*)equip)->fixSkills();
-                if (fgt)
+                if(type != 0 && ied.enchant > 3)
                 {
-                    GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
-                    if (attr)
-                        fgt->addSkillsFromCT(attr->skills, true);
+                    updateHft = true;
+                    hf->setHftValue(hft, 0);
                 }
+
+                flag_suc = true;
+                ++ ied.enchant;
+                if (equip->getClass() == Item_Trump && ied.enchant == 1)
+                {
+                    ((ItemTrump*)equip)->fixSkills();
+                    if (fgt)
+                    {
+                        GData::AttrExtra* attr = const_cast<GData::AttrExtra*>(equip->getAttrExtra());
+                        if (attr)
+                            fgt->addSkillsFromCT(attr->skills, true);
+                    }
+                }
+            }
+            else if(type != 0 && ied.enchant > 3)
+            {
+                updateHft = true;
+                hf->incHftValue(hft);
             }
         }
         else if( 0 != count )
@@ -1692,12 +1729,17 @@ namespace GObject
             enc_times = 0;
             for(; i < count; ++i)
             {
-                if(uRand(1000) < enchant)
+                if(uRand(100000) < enchant)
                 {
                     ++success;
                     flag_suc = true;
                     ++ ied.enchant;
 
+                    if(ied.enchant > 3)
+                    {
+                        updateHft = true;
+                        hf->setHftValue(hft, 0);
+                    }
                     if (equip->getClass() == Item_Trump && ied.enchant == 1)
                     {
                         ((ItemTrump*)equip)->fixSkills();
@@ -1706,17 +1748,21 @@ namespace GObject
                     ++enc_times;
                     if(ied.enchant >= level)
                         break;
-
-                    enchant = GObjectManager::getEnchantChance(type, quality, ied.enchant);
-                    if(enchant == 0)
-                        break;
                 }
                 else
                 {
+                    if(ied.enchant > 3)
+                    {
+                        updateHft = true;
+                        hf->incHftValue(hft);
+                    }
+
                     ++failed;
                     ++failThisTime;
                     ++enc_times;
                 }
+
+                enchant = hf->getChanceFromHft(quality, ied.enchant, hft);
             }
         }
 
@@ -1725,8 +1771,12 @@ namespace GObject
             success = 0;
             failed = 0;
             ied.enchant = oldEnchant;
+            hf->setHftValue(hft, oldHfValue);
             return 2;
         }
+
+        if(updateHft)
+            hf->updateHftValueToDB(hft);
 
         GameAction()->doAty(this->m_Owner,  AtyEnchant, 0, 0);
 		AddItemHistoriesLog(item_enchant_l + type, enc_times);

@@ -43,6 +43,7 @@
 #include "GObject/AthleticsRank.h"
 #include "DCLogger.h"
 #include "TeamCopy.h"
+#include "HoneyFall.h"
 
 #include <cmath>
 
@@ -569,6 +570,7 @@ namespace GObject
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
+        m_hf = new HoneyFall(this);
 	}
 
 
@@ -7662,6 +7664,11 @@ namespace GObject
     TeamCopyPlayerInfo* Player::getTeamCopyPlayerInfo()
     {
         return m_tcpInfo;
+    }
+
+    HoneyFall* Player::getHoneyFall()
+    {
+        return m_hf;
     }
 
 } // namespace GObject

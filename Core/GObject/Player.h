@@ -128,6 +128,7 @@ namespace GObject
     struct TeamData;
     struct TeamCopyPlayerInfo;
     class ActivityMgr;
+    class HoneyFall;
 
     struct TripodData
     {
@@ -1213,6 +1214,7 @@ namespace GObject
         CopyTeamPage& getCopyTeamPage();
         void clearCopyTeamPage();
         TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
+        HoneyFall* getHoneyFall();
 
     private:
         bool m_hasTripod;
@@ -1220,6 +1222,7 @@ namespace GObject
         TeamData* m_teamData;
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
+        HoneyFall* m_hf;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
