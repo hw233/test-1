@@ -158,6 +158,8 @@ bool enum_clan_midnight(void * ptr, void * data)
 	Player * leader = clan->getLeader();
 	if (leader == NULL)
 		return true;
+
+    clan->ClearDueItemHistory();
 #if 0
 	UInt32 now = *reinterpret_cast<UInt32 *>(data);
 	UInt32 lastOnline = leader->getLastOnline();

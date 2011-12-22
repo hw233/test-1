@@ -46,6 +46,14 @@ struct ClanSkill
 };
 
 
+class ClanItemVisitor
+{
+public:
+    virtual ~ClanItemVisitor(){}
+
+    virtual bool operator()(UInt16 id, UInt32 num) = 0;
+};
+
 
 /**
  *@brief 帮派道具包裹
@@ -67,7 +75,17 @@ public:
         m_MaxGrid = maxgrid;
     }
 
+    /**
+     *@brief 设置获取最大格子数
+     */
     void SetMaxGrid(UInt32 maxgrid){ if(maxgrid > m_MaxGrid) m_MaxGrid = maxgrid; }
+    UInt32 GetMaxGrid() const { return m_MaxGrid; }
+
+    /**
+     *@brief 获取已使用格子数和剩余格子数
+     */
+    UInt32 GetGrid() const { return m_Grid; }
+    UInt32 GetLeftGrid() const { return m_MaxGrid - m_Grid; }
 
     void LoadItem(UInt16 id, UInt32 num);
 
@@ -82,6 +100,19 @@ public:
      */
     UInt32 GetItemNum(UInt16 id) const; 
     void RemoveItem(UInt16 id, UInt32 num);
+
+    /**
+     *@brief 遍历道具列表
+     */
+    void VisitItems(ClanItemVisitor& visitor)
+    {
+        for(ItemMap::iterator iter = m_Items.begin(); iter != m_Items.end(); ++iter){
+            if(!visitor(iter->first, iter->second)) return;
+        }
+    }
+
+    void FillItems(Stream& stream);
+    void GetItems(Player* player);
 
 public:
     //帮会id
@@ -120,7 +151,7 @@ struct ClanItemHistory
 
 
 //个人帮会仓库大小
-const static UInt32 PKGSIZE_PER_MEMBER = 50;
+const static UInt32 PKGSIZE_PER_MEMBER = 20;
 
 
 struct ClanMember
@@ -349,13 +380,36 @@ public:
      */
     void BroadcastBattleData(UInt32 now);
 
+
+
     /**
      *@brief 加载仓库道具
      */
     void LoadItem(UInt64 playerid, UInt32 itemid, UInt32 num);
     void LoadItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
 
+    void AddItem(UInt32 itemid, UInt32 num);
     void AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
+
+    /**
+     *@brief 发送仓库信息
+     */
+    void SendPackageInfo(Player* player);
+    void SendItemList(Player* player);
+    void SendItemHistory(Player* player, UInt16 start, UInt8 count);
+    void SendSelfItemList(Player* player);
+    void ClearDueItemHistory();
+
+    /**
+     *@brief 分配奖励
+     */
+    void DistributeItem(Player* player, UInt64 memId, UInt16 itemId, UInt16 num);
+
+    /**
+     *@brief 获取福利和道具奖励
+     */
+    void GetWeal(Player* player);
+    void GetItems(Player* player);
 
 public:
 	inline bool alive() { return !_deleted; }

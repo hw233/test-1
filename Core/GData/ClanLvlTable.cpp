@@ -58,13 +58,13 @@ UInt64 ClanLvl::getLevelMin( UInt8 lvl )
 UInt32 ClanLvl::getWeal(UInt8 lvl)
 {
     if(lvl > CLAN_LEVEL_MAX || lvl == 0) return 0;
-    return _weal[lvl];
+    return _weal[lvl - 1];
 }
 
 UInt32 ClanLvl::getPkgSize(UInt8 lvl)
 {
     if(lvl > CLAN_LEVEL_MAX || lvl == 0) return 0;
-    return _pkgsize[lvl];
+    return _pkgsize[lvl - 1];
 }
 
 }

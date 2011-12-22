@@ -138,11 +138,11 @@ namespace GObject
         void FillPlayers(Stream& stream, UInt32 clan);
         void FillPlayer(Stream& stream, Player* player);
         void NotifyPlayerLeave(Player* player);
+        void Broadcast(UInt32 clan, Stream& stream);
 
     private:
         void ResetPlayerStatus(UInt32 clan);
         void ResetPlayerData(Player* player);
-        void Broadcast(UInt32 clan, Stream& stream);
 
     private:
         //id
@@ -226,7 +226,7 @@ namespace GObject
         void SendBattleStatus(Player* player);
         void SendBattleInfo(Player* player);
         void BroadcastStatus();
-        void BroadcastScores(bool bEnd = false);
+        void BroadcastScores(UInt8 fightId, UInt32 winner, UInt32 extScore = 0);
 
         /**
          *@brief 广播
@@ -236,6 +236,11 @@ namespace GObject
             if(m_Clan1 != NULL) m_Clan1->Broadcast(stream, bAll);
             if(m_Clan2 != NULL) m_Clan2->Broadcast(stream, bAll);
         }
+
+        /**
+         *@brief 广播给战斗中玩家
+         */
+        void BroadcastBattle(UInt32 clan, Stream& stream);
 
     private:
         /**

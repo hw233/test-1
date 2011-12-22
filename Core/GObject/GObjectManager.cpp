@@ -2495,8 +2495,7 @@ namespace GObject
                 lastId = ci.clanid;
                 clan = globalClans[ci.clanid];
             }
-            if(clan == NULL)
-                continue;
+            if(clan == NULL) continue;
 
             clan->LoadItem(ci.playerid, ci.itemid, ci.itemnum);
         }

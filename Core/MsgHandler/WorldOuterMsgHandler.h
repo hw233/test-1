@@ -39,7 +39,7 @@ struct ClanListReq
 	UInt8 _type;
 	UInt16 _startidx;
 	UInt8 _count;
-    UInt8 _flag;      // 0-¶ëáÒ 1-À¥ÂØ 2-È«²¿
+    UInt8 _flag;      // 0-???? 1-À¥?? 2-È«??
 	std::string _name;
 	MESSAGE_DEF5(REQ::CLAN_LIST, UInt8, _type, UInt16, _startidx, UInt8, _count, UInt8, _flag, std::string, _name);
 };
@@ -95,6 +95,13 @@ struct ClanQuery2Req
 {
 	UInt8 _type;
 	MESSAGE_DEF1(REQ::CLAN_PLAYER_LIST, UInt8, _type);
+};
+
+struct ClanItemHistoryReq
+{
+    UInt16 _startId;
+    UInt8 _count;
+    MESSAGE_DEF2(REQ::CLAN_PACKAGE_RECORD, UInt16, _startId, UInt8, _count);
 };
 
 #if 0
@@ -739,6 +746,61 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 	}
 }
 
+void OnClanPackageReq( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+	GObject::Clan * clan = player->getClan();
+	if (clan == NULL) return;
+
+	BinaryReader brd(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    brd >> op;
+    
+    switch(op)
+    {
+    case 0: //å¸®æ´¾ä»“åº“åŸºç¡€ä¿¡æ¯è¯·æ±‚
+        {
+            clan->SendPackageInfo(player); 
+        }
+        break;
+    case 1: //å¸®æ´¾ä»“åº“åˆ—è¡¨è¯·æ±‚
+        {
+            clan->SendItemList(player);
+            clan->SendSelfItemList(player);
+        }
+        break;
+    case 2: //åˆ†é…ä»“åº“ç‰©å“
+        {
+            UInt64 memId = 0;
+            UInt16 itemId = 0;
+            UInt16 itemNum = 0;
+            brd >> memId >> itemId >> itemNum;
+            clan->DistributeItem(player, memId, itemId, itemNum);
+        }
+        break;
+    case 3: //é¢†å–ä¸ªäººç¦åˆ©
+        {
+            clan->GetWeal(player);
+        }
+        break;
+    case 4: //é¢†å–ä¸ªäººå¥–åŠ±
+        {
+            clan->GetItems(player);
+        }
+        break;
+    }
+    //TODO
+}
+
+void OnItemHistoryReq( GameMsgHdr& hdr, ClanItemHistoryReq& req)
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::Clan* clan = player->getClan();
+    if(clan == NULL) return;
+
+    clan->SendItemHistory(player, req._startId, req._count);
+}
+
 
 void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 {
@@ -855,7 +917,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 				{
 				case 1:
 					{
-						//½áÃË
+						//????
 						if (clan->hasAllyClan())
 						{
 							r = false;
@@ -901,7 +963,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 					break;
 				case 3:
 					{
-						//Ê÷Á¢µÐÃË
+						//??Á¢????
 						if (clan->hasEnemyClan(allyClan))
 						{
 							r = false;
@@ -918,7 +980,7 @@ void OnClanCityBattleReq( GameMsgHdr& hdr, const void * data )
 					break;
 				case 4:
 					{
-						//½â³ýµÐÃË
+						//????????
 						if (clan->hasEnemyClan(allyClan))
 							clan->delEnemyClan(player, allyClan);
 					}

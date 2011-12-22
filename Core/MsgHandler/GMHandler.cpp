@@ -136,6 +136,7 @@ GMHandler::GMHandler()
     Reg(3, "qqkey", &GMHandler::OnQQVipKey);
 
     Reg(3, "clanbuild", &GMHandler::OnClanBuild);
+    Reg(3, "clanitem", &GMHandler::OnClanItem);
 
     Reg(3, "hiinfo", &GMHandler::OnInfoHI);
     Reg(3, "hienter", &GMHandler::OnEnterHI);
@@ -2401,6 +2402,24 @@ void GMHandler::OnClanBuild(GObject::Player *player, std::vector<std::string>& a
 		player->AddClanContrib(val);
 		player->AddClanBuilding(val);
 	}
+}
+
+void GMHandler::OnClanItem(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1) return;
+
+    UInt16 itemId = 0;
+    UInt32 itemNum = 0;
+    
+    itemId = (UInt16)atoi(args[0].c_str());
+    if(args.size() > 1)
+    {
+        itemNum = (UInt32)atoi(args[1].c_str());
+    }
+    if(player->getClan() != NULL)
+    {
+        player->getClan()->AddItem(itemId, itemNum);
+    }
 }
 
 void GMHandler::OnInfoHI(GObject::Player *player, std::vector<std::string>& args)

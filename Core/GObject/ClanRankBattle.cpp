@@ -22,6 +22,8 @@ namespace GObject
 
     //每个战场的分数
     const static UInt32 BATTLE_FIELD_SCORE[] = {3, 5, 6, 7, 8, 10};
+    //胜利方额外积分
+    const static UInt32 WINNER_EXTRA_SCORE = 20;
 
 
     //帮会排名战报名开始时间
@@ -31,7 +33,7 @@ namespace GObject
 
     //每次战斗时间
     const static UInt32 RANK_BATTLE_FIGHT_TIME = 40;
-
+   
 
 
     bool ClanRankBattleInfo::HasPlayer(Player* player)
@@ -222,6 +224,7 @@ namespace GObject
 
 
                 Stream battleStream(REP::CLAN_RANKBATTLE_REP);
+                battleStream << UInt8(m_Id);
                 battleStream << UInt8(10);
                 battleStream << UInt8(fightNum);
 
@@ -271,12 +274,13 @@ namespace GObject
                         battleStream << UInt8(2);
                     }
 
+                    battleStream << player1->getName() << player2->getName();
                     battleStream << rid;
                 }
 
                 battleStream << Stream::eos;
-                Broadcast(m_Clan1, battleStream);
-                Broadcast(m_Clan2, battleStream);
+                m_pBattle->BroadcastBattle(m_Clan1, battleStream);
+                m_pBattle->BroadcastBattle(m_Clan2, battleStream);
             }
             else
             {
@@ -287,17 +291,21 @@ namespace GObject
             }
 
             //刷新状态变化
-            Stream stream(REP::CLAN_RANKBATTLE_REP);
-            stream << UInt8(6);
-            stream << UInt8(m_StatusChanged.size());
-            for(std::map<UInt64,UInt32>::iterator iter = m_StatusChanged.begin();
-                iter != m_StatusChanged.end(); ++iter)
+            if(!m_StatusChanged.empty())
             {
-                stream << UInt64(iter->first);
-                stream << UInt8(iter->second);
+                Stream stream(REP::CLAN_RANKBATTLE_REP);
+                stream << UInt8(6);
+                stream << UInt8(m_StatusChanged.size());
+                for(std::map<UInt64,UInt32>::iterator iter = m_StatusChanged.begin();
+                    iter != m_StatusChanged.end(); ++iter)
+                {
+                    stream << UInt64(iter->first);
+                    stream << UInt8(iter->second);
+                }
+                stream << Stream::eos;
+                m_pBattle->BroadcastBattle(m_Clan1, stream);
+                m_pBattle->BroadcastBattle(m_Clan2, stream);
             }
-            stream << Stream::eos;
-            m_pBattle->Broadcast(stream);
 
             ++m_Round;
         }
@@ -422,7 +430,8 @@ namespace GObject
     {
         Stream stream(REP::CLAN_RANKBATTLE_REP);
         stream << UInt8(8) << player->getId() << Stream::eos;
-        m_pBattle->Broadcast(stream);
+        m_pBattle->BroadcastBattle(m_Clan1, stream);
+        m_pBattle->BroadcastBattle(m_Clan2, stream);
     }
 
     void ClanRankBattleField::ResetPlayerStatus(UInt32 clan)
@@ -582,10 +591,11 @@ namespace GObject
                     if(m_Clan1 != NULL && m_Clan2 != NULL && m_Fields[i].IsEnd())
                     {
                         UInt32 winner = m_Fields[i].GetWinner();
+                        if(winner == 0) continue;
                    
-                        if(m_Clan1 != NULL && winner == m_Clan1->clan->getId()) m_ClanScore1 += BATTLE_FIELD_SCORE[i];
-                        else if(m_Clan2 != NULL && winner == m_Clan2->clan->getId()) m_ClanScore2 += BATTLE_FIELD_SCORE[i];
-                        BroadcastScores();
+                        if(winner == m_Clan1->clan->getId()) m_ClanScore1 += BATTLE_FIELD_SCORE[i];
+                        else if(winner == m_Clan2->clan->getId()) m_ClanScore2 += BATTLE_FIELD_SCORE[i];
+                        BroadcastScores(i, winner);
                     }
                 }
             }
@@ -668,20 +678,26 @@ namespace GObject
 
         if(m_ClanScore1 > m_ClanScore2)
         {
-            m_ClanScore1 += 20;
-            if(m_Clan1 != NULL) winner = m_Clan1->clan->getId();
-            extScore1 = 20;
+            m_ClanScore1 += WINNER_EXTRA_SCORE;
+            if(m_Clan1 != NULL) 
+            {
+                winner = m_Clan1->clan->getId();
+                extScore1 = 20;
+            }
         }
         else if(m_ClanScore2 > m_ClanScore1)
         {
-            m_ClanScore2 += 20;
-            if(m_Clan2 != NULL) winner = m_Clan2->clan->getId();
-            extScore2 = 20;
+            m_ClanScore2 += WINNER_EXTRA_SCORE;
+            if(m_Clan2 != NULL)
+            {
+                winner = m_Clan2->clan->getId();
+                extScore2 = 20;
+            }
         }
         else
         {
-            if(m_Clan1 != NULL && winner == m_Clan1->clan->getId()) m_ClanScore1 += 20;
-            else m_ClanScore2 += 20;
+            if(m_Clan1 != NULL && winner == m_Clan1->clan->getId()) m_ClanScore1 += WINNER_EXTRA_SCORE;
+            else m_ClanScore2 += WINNER_EXTRA_SCORE;
         }
 
         if(m_Clan1 != NULL) m_Clan1->clan->SetBattleScore(m_Clan1->clan->GetBattleScore() + m_ClanScore1);
@@ -704,7 +720,7 @@ namespace GObject
         if(m_Clan1 != NULL) m_Clan1->clan->BroadcastBattleData(m_Now);
         if(m_Clan2 != NULL) m_Clan2->clan->BroadcastBattleData(m_Now);
 
-        BroadcastScores(true);
+        BroadcastScores(UInt8(-1), winner, WINNER_EXTRA_SCORE);
     }
 
     void ClanRankBattle::Clear()
@@ -817,15 +833,31 @@ namespace GObject
         Broadcast(stream);
     }
 
-    void ClanRankBattle::BroadcastScores(bool bEnd)
+    void ClanRankBattle::BroadcastScores(UInt8 fightId, UInt32 winner, UInt32 extScore)
     {
-        Stream stream1(REP::CLAN_RANKBATTLE_REP);
-        stream1 << UInt8(11) << UInt8(bEnd ? 1 : 0) << m_ClanScore1 << m_ClanScore2 << Stream::eos;
-        if(m_Clan1 != NULL) m_Clan1->Broadcast(stream1);
+        if(m_Clan1 != NULL)
+        {
+            Stream stream1(REP::CLAN_RANKBATTLE_REP);
+            stream1 << UInt8(11) << UInt8(m_Clan1->clan->getId() == winner ? 1 : 0)
+                << fightId << m_ClanScore1 << m_ClanScore2 << extScore << Stream::eos;
+            BroadcastBattle(m_Clan1->clan->getId(), stream1);
+        }
 
-        Stream stream2(REP::CLAN_RANKBATTLE_REP);
-        stream2 << UInt8(11) << UInt8(bEnd ? 1 : 0) << m_ClanScore2 << m_ClanScore1 << Stream::eos;
-        if(m_Clan2 != NULL) m_Clan2->Broadcast(stream2);
+        if(m_Clan2 != NULL)
+        {
+            Stream stream2(REP::CLAN_RANKBATTLE_REP);
+            stream2 << UInt8(11) << UInt8(m_Clan2->clan->getId() == winner ? 1 : 0)
+                << fightId << m_ClanScore2 << m_ClanScore1 << extScore << Stream::eos;
+            BroadcastBattle(m_Clan2->clan->getId(), stream2);
+        }
+    }
+
+    void ClanRankBattle::BroadcastBattle(UInt32 clan, Stream& stream)
+    {
+        for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
+        {
+            m_Fields[i].Broadcast(clan, stream);
+        }
     }
 
     void ClanRankBattle::SendBattleInfo(Player* player)
@@ -837,35 +869,32 @@ namespace GObject
         
         ClanRankBattleInfo* myClan = NULL;
         ClanRankBattleInfo* otherClan = NULL;
-        UInt32 myScore = 0;
-        UInt32 otherScore = 0;
+        
         if(m_Clan1 != NULL && player->getClan() == m_Clan1->clan)
         {
             myClan = m_Clan1;
-            myScore = m_ClanScore1;
-            otherClan = m_Clan2;
-            otherScore = m_ClanScore2;
+            stream << ((m_Clan2 != NULL) ? m_Clan2->clan->getName() : "");
+            stream << m_ClanScore1 << m_ClanScore2;
         }
         else if(m_Clan2 != NULL && player->getClan() == m_Clan2->clan)
         {
             myClan = m_Clan2;
-            myScore = m_ClanScore2;
-            otherClan = m_Clan1;
-            otherScore = m_ClanScore1;
+            stream << ((m_Clan1 != NULL) ? m_Clan1->clan->getName() : "");
+            stream << m_ClanScore2 << m_ClanScore1;
         }
         else
         {
             return;
         }
 
-        stream << ((otherClan != NULL) ? otherClan->clan->getName() : "");
-        stream << myScore;
-        stream << otherScore;
-
         UInt32 num1 = 0;
         UInt32 num2 = 0;
         for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
         {
+            if(m_Fields[i].GetWinner() == 0) stream << UInt8(0);
+            else if(m_Fields[i].GetWinner() == myClan->clan->getId()) stream << UInt8(1);
+            else stream << UInt8(2);
+
             if(myClan != NULL) num1 += m_Fields[i].GetPlayerNum(myClan->clan->getId());
             if(otherClan != NULL) num2 += m_Fields[i].GetPlayerNum(otherClan->clan->getId());
         }
@@ -914,7 +943,8 @@ namespace GObject
     void ClanRankBattleMgr::Init()
     {
         m_Now = TimeUtil::Now();
-        m_StartTime = TimeUtil::SharpDayT(0, m_Now) + RANK_BATTLE_SIGNUP_BEGINTIME;
+        //m_StartTime = TimeUtil::SharpDayT(0, m_Now) + RANK_BATTLE_SIGNUP_BEGINTIME;
+        m_StartTime = m_Now - m_Now % ( 2 * 60 * 60 );
       
         if(m_Now < m_StartTime) //还没开始
         {
@@ -937,7 +967,8 @@ namespace GObject
         else
         {
             m_State = STATE_INIT;
-            m_StartTime = m_StartTime + 24 * 60 * 60; //第二天战斗开始时间
+            //m_StartTime = m_StartTime + 24 * 60 * 60; //第二天战斗开始时间
+            m_StartTime = m_StartTime + 2 * 60 * 60;
         }
 
         SortClans(false);
@@ -952,17 +983,17 @@ namespace GObject
 
             m_Skills[i].id = i;
             m_Skills[i].price = buff.get<UInt32>(1);
-            m_Skills[i].attrs.attackP = m_Skills[i].attrs.magatkP = buff.get<float>(2);
-            m_Skills[i].attrs.defendP = m_Skills[i].attrs.magdefP = buff.get<float>(3);
-            m_Skills[i].attrs.hpP = buff.get<float>(4);
-            m_Skills[i].attrs.actionP = buff.get<float>(5);
-            m_Skills[i].attrs.hitrateP = buff.get<float>(6);
-            m_Skills[i].attrs.evadeP = buff.get<float>(7);
-            m_Skills[i].attrs.criticalP = buff.get<float>(8);
-            m_Skills[i].attrs.criticaldmg = buff.get<float>(9);
-            m_Skills[i].attrs.pierceP = buff.get<float>(10);
-            m_Skills[i].attrs.counterP = buff.get<float>(11);
-            m_Skills[i].attrs.magresP = buff.get<float>(12);
+            m_Skills[i].attrs.attackP = m_Skills[i].attrs.magatkP = buff.get<float>(2) / 100;
+            m_Skills[i].attrs.defendP = m_Skills[i].attrs.magdefP = buff.get<float>(3) / 100;
+            m_Skills[i].attrs.hpP = buff.get<float>(4) / 100;
+            m_Skills[i].attrs.actionP = buff.get<float>(5) / 100;
+            m_Skills[i].attrs.hitrateP = buff.get<float>(6) / 100;
+            m_Skills[i].attrs.evadeP = buff.get<float>(7) / 100;
+            m_Skills[i].attrs.criticalP = buff.get<float>(8) / 100;
+            m_Skills[i].attrs.criticaldmg = buff.get<float>(9) / 100;
+            m_Skills[i].attrs.pierceP = buff.get<float>(10) / 100;
+            m_Skills[i].attrs.counterP = buff.get<float>(11) / 100;
+            m_Skills[i].attrs.magresP = buff.get<float>(12) / 100;
             m_Skills[i].attrs.aura = buff.get<float>(13);
         }
     }
@@ -1186,10 +1217,6 @@ namespace GObject
 
         pInfo->m_bLowerHead = !pInfo->m_bLowerHead;
         ClanPlayerLevelSorter sorter(pInfo->m_bLowerHead);
-        for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
-        {
-            std::sort(pInfo->players[i].begin(), pInfo->players[i].end(), sorter);
-        }
 
         Stream stream(REP::CLAN_RANKBATTLE_REP);
         stream << UInt8(3);
@@ -1198,6 +1225,8 @@ namespace GObject
         {
             UInt32 pos = 0;
             PlayerVec& players = pInfo->players[i];
+            std::sort(players.begin(), players.end(), sorter);
+            
             for(PlayerVec::iterator iter = players.begin();
                     iter != players.end(); ++iter)
             {
@@ -1653,12 +1682,13 @@ namespace GObject
             {
                 //第二天战斗开始时间
                 m_Clans.clear();
-                m_StartTime = m_StartTime + 24 * 60 * 60;
+                //m_StartTime = m_StartTime + 24 * 60 * 60;
+                m_StartTime = m_StartTime + 2 * 60 * 60;
                 m_State = STATE_INIT;
                 SyncState();
 
                 //每周最后一场结束发邮件
-                if(TimeUtil::GetWeekDay(m_Now) == 7)
+                if(TimeUtil::GetWeekDay(m_Now) == 7 && TimeUtil::GetWeekDay(m_StartTime) != 7)
                 {
                     SysMsgItem* msg = globalSysMsg[2214];
                     UInt32 ranking = 0;

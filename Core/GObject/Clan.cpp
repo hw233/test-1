@@ -22,6 +22,7 @@
 #include "Script/GameActionLua.h"
 #include "MsgHandler/CountryMsgStruct.h"
 #include <mysql.h>
+#include <sstream>
 
 #include "ClanRankBattle.h"
 
@@ -74,33 +75,37 @@ static bool find_pending_member_id(ClanPendingMember * member, UInt64 id)
 bool ClanItemPkg::CheckAddItem(UInt16 id, UInt32 num)
 {
     if(num == 0) return true;
-    if(IsEquipId(id)) return m_MaxGrid - m_Grid >= num;
 
     const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
     if(itemType == NULL) return false;
     
-    UInt32 oldnum = GetItemNum(id);
+    if(IsEquipId(id))
+    {
+        return GetLeftGrid()  >=  num; //装备不叠加
+    }
+    else{
+        UInt32 oldnum = GetItemNum(id);
     
-    UInt32 oldGrid = ( oldnum + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
-    UInt32 newGrid = ( oldnum + num + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
+        UInt32 oldGrid = ( oldnum + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
+        UInt32 newGrid = ( oldnum + num + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
 
-    return m_MaxGrid - m_Grid >= newGrid - oldGrid;
+        return GetLeftGrid() >= newGrid - oldGrid;
+    }
 }
 
 void ClanItemPkg::LoadItem(UInt16 id, UInt32 num)
 {
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+    if(itemType == NULL) return;
+
     if(IsEquipId(id))
     {
-        num = num > m_MaxGrid - m_Grid ? m_MaxGrid - m_Grid : num;
-        
+        num = num > GetLeftGrid() ? GetLeftGrid() : num;
         m_Grid = m_Grid + num;
     }
     else
     {
-        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
-        if(itemType == NULL) return;
-
-        UInt32 maxnum = ( m_MaxGrid - m_Grid ) * itemType->maxQuantity;
+        UInt32 maxnum = GetLeftGrid() * itemType->maxQuantity;
         num = num > maxnum ? maxnum : num;
         UInt32 grid = (num + itemType->maxQuantity - 1) / itemType->maxQuantity;
         
@@ -113,22 +118,21 @@ void ClanItemPkg::LoadItem(UInt16 id, UInt32 num)
 UInt32 ClanItemPkg::AddItem(UInt16 id, UInt32 num)
 {
     if(num == 0) return 0;
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+    if(itemType == NULL) return 0;
+    
     if(IsEquipId(id))
     {
-        num = num > m_MaxGrid - m_Grid ? m_MaxGrid - m_Grid : num;
-        
+        num = num > GetLeftGrid() ? GetLeftGrid() : num;
         m_Grid = m_Grid + num;
     }
     else
     {
-        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
-        if(itemType == NULL) return 0;
-
         UInt32 oldnum = GetItemNum(id);
 
         UInt32 oldGrid = ( oldnum + itemType->maxQuantity - 1 ) / itemType->maxQuantity;
-        UInt32 maxnum = ( oldGrid + m_MaxGrid - m_Grid ) * itemType->maxQuantity;
-        num = num > maxnum ? maxnum : num;
+        UInt32 maxnum = ( oldGrid + GetLeftGrid() ) * itemType->maxQuantity;
+        num = oldnum + num > maxnum ? maxnum - oldnum : num;
         UInt32 newGrid = (oldnum + num + itemType->maxQuantity - 1) / itemType->maxQuantity;
         
         m_Grid = m_Grid + (newGrid - oldGrid);
@@ -165,17 +169,17 @@ void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
     ItemMap::iterator iter = m_Items.find(id);
     if(iter == m_Items.end()) return;
 
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
+    if(itemType == NULL) return;
+    
     if(IsEquipId(id))
     {
         UInt32 oldNum = iter->second;
-        iter->second = iter->second > num ? iter->second - num : 0;
+        iter->second = oldNum > num ? oldNum - num : 0;
         m_Grid = m_Grid - (oldNum - iter->second);
     }
     else
     {
-        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[id];
-        if(itemType == NULL) return;
-
         UInt32 oldGrid = (iter->second + itemType->maxQuantity - 1) / itemType->maxQuantity;
         iter->second = iter->second > num ? iter->second - num : 0;
         UInt32 newGrid = (iter->second + itemType->maxQuantity - 1) / itemType->maxQuantity;
@@ -185,7 +189,8 @@ void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
 
     if(iter->second == 0)
     {
-        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'", m_ClanId, m_PlayerId, id); 
+        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'", m_ClanId, m_PlayerId, id);
+        m_Items.erase(iter);
     }
     else
     {
@@ -193,6 +198,57 @@ void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
                 ,iter->second, m_ClanId, m_PlayerId, id);
     }
 }
+
+void ClanItemPkg::FillItems(Stream& stream)
+{
+    UInt16 itemNum = UInt16(m_Items.size());
+    stream << itemNum;
+
+    for(ItemMap::iterator iter = m_Items.begin();
+            iter != m_Items.end(); ++iter)
+    {
+        stream << UInt16(iter->first);
+        stream << UInt16(iter->second);
+    }
+}
+
+void ClanItemPkg::GetItems(Player* player)
+{
+    if(player == NULL || player->getClan() == NULL) return;
+
+    UInt16 grid = 1;
+    for(ItemMap::iterator iter = m_Items.begin(); iter != m_Items.end(); ++iter)
+    {
+        grid += player->GetPackage()->GetItemUsedGrids(iter->first, iter->second, true);
+    }
+
+    if(grid > player->GetPackage()->GetRestPackageSize())
+    {
+        player->sendMsgCode(0, 1011);
+        return;
+    }
+
+    std::ostringstream itemstream;
+    for(ItemMap::iterator iter = m_Items.begin(); iter != m_Items.end(); ++iter)
+    {
+        itemstream << iter->first << "," << iter->second << ";";
+        player->GetPackage()->Add(iter->first, iter->second, true, false, FromClan);
+    }
+
+    player->getClan()->AddItemHistory(ClanItemHistory::ALLOCATED, TimeUtil::Now(), player->getId(), itemstream.str());
+
+    DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid`='%"I64_FMT"u'", m_PlayerId);
+    
+    m_Items.clear();
+    m_Grid = 0;
+
+    Stream stream(REP::CLAN_PACKAGE);
+    stream << UInt8(3);
+    FillItems(stream);
+    stream << Stream::eos;
+    player->send(stream);
+}
+
 
 
 
@@ -483,6 +539,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 
 	// updateRank();
 	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", pid);
+	DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid` = %"I64_FMT"u", _id, pid);
 
 	SYSMSGV(title, 229, _name.c_str());
 	SYSMSGV(content, 230, _name.c_str());
@@ -1422,6 +1479,7 @@ void Clan::disband(Player * player)
 	DB5().PushUpdateData("DELETE FROM `clan_tech` WHERE `clanId` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_skill` WHERE `clanId` = %u", _id);
     DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid` = %u", _id);
+    DB5().PushUpdateData("DELETE FROM `clan_item_history` WHERE `clanid` = %u", _id);
 
 	//4): Maybe bug here
 	Members::iterator iter = _members.begin();
@@ -3259,6 +3317,8 @@ void Clan::SetLastBattleRanking(UInt32 ranking)
 
 void Clan::BroadcastBattleData(UInt32 now)
 {
+    Mutex::ScopedLock lk(_mutex);
+    
     UInt8 signupNum = GetSignupRankBattleNum(now);
     UInt32 battleScore = GetBattleScore();
 
@@ -3314,6 +3374,23 @@ void Clan::LoadItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::
     _itemHistories.push_back(ClanItemHistory(type, time, playerId, itemstr));
 }
 
+void Clan::AddItem(UInt32 itemid, UInt32 itemnum)
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    UInt32 num = _itemPkg.AddItem(itemid, itemnum);
+    if(num != 0)
+    {
+        Stream clanPkgStream(REP::CLAN_PACKAGE);
+        clanPkgStream << UInt8(2);
+        clanPkgStream << UInt8(0);
+        clanPkgStream << UInt16(itemid);
+        clanPkgStream << UInt16(num);
+        clanPkgStream << Stream::eos;
+        broadcast(clanPkgStream); 
+    }
+}
+
 void Clan::AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr)
 {
     Mutex::ScopedLock lk(_mutex);
@@ -3321,6 +3398,192 @@ void Clan::AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::s
     _itemHistories.push_back(ClanItemHistory(type, time, playerId, itemstr));
     DB5().PushUpdateData("INSERT INTO `clan_item_history`(`clanid`,`type`,`time`,`playerid`,`itemstr`) VALUES('%u','%u','%u','%"I64_FMT"u','%s')",
             _id, type, time, playerId, itemstr.c_str());
+}
+
+void Clan::SendPackageInfo(Player* player)
+{
+    if(player == NULL || player->getClan() != this) return;
+
+    Mutex::ScopedLock lk(_mutex);
+    
+    Stream stream(REP::CLAN_PACKAGE);
+    stream << UInt8(0);
+    stream << UInt16(_itemPkg.GetMaxGrid());
+    stream << UInt16(_itemPkg.GetGrid());
+    stream << UInt32(GData::clanLvlTable.getWeal(_level));
+    stream << UInt8(player->GetVar(VAR_CLAN_WEAL) == 0 ? 1 : 0); 
+    stream << Stream::eos;
+    player->send(stream); 
+}
+
+
+void Clan::SendItemList(Player* player)
+{
+    if(player == NULL || player->getClan() != this) return;
+
+    Mutex::ScopedLock lk(_mutex);
+    
+    Stream stream(REP::CLAN_PACKAGE);
+    stream << UInt8(1);
+    _itemPkg.FillItems(stream);
+    stream << Stream::eos;
+    player->send(stream);
+}
+
+void Clan::SendSelfItemList(Player* player)
+{
+    if(player == NULL) return;
+
+    Mutex::ScopedLock lk(_mutex);
+   
+    ClanMember* member = getClanMember(player);
+    if(member == NULL) return;
+    
+    Stream stream(REP::CLAN_PACKAGE);
+    stream << UInt8(3);
+    member->itemPkg.FillItems(stream);
+    stream << Stream::eos;
+    player->send(stream);
+}
+
+void Clan::SendItemHistory(Player* player, UInt16 startIndex, UInt8 count)
+{
+    if(player == NULL || player->getClan() != this) return;
+
+    Mutex::ScopedLock lk(_mutex);
+    
+    UInt16 recordNum = UInt16(_itemHistories.size());
+    
+    Stream stream(REP::CLAN_PACKAGE_RECORD);
+    stream << recordNum;
+
+    UInt16 index = 0;
+    ItemHistoryList::reverse_iterator iter = _itemHistories.rbegin();
+    while( index < startIndex && iter != _itemHistories.rend())
+    {
+        ++index;
+        ++iter;
+    }
+
+    count = UInt8((recordNum > index + count) ? count : (recordNum - index));
+    stream << index;
+    stream << count;
+
+    while(count-- > 0)
+    {
+        stream << UInt8(iter->m_Type);
+        stream << UInt32(iter->m_Time);
+        Player* player = globalPlayers[iter->m_PlayerId];
+        if(player != NULL) stream << player->getName();
+        else stream << "";
+        stream << iter->m_ItemStr;
+        
+        ++iter;
+    }
+    stream << Stream::eos;
+    player->send(stream);
+}
+
+void Clan::ClearDueItemHistory()
+{
+    Mutex::ScopedLock lk(_mutex);
+
+    bool bRemoved = false;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 dueTime = now - 30 * 24 * 60 * 60;
+    for(ItemHistoryList::iterator iter = _itemHistories.begin();
+            iter != _itemHistories.end();)
+    {
+        if(iter->m_Time < dueTime)
+        {
+            bRemoved = true;
+            iter = _itemHistories.erase(iter);
+        }
+        else ++iter;
+    }
+
+    if(bRemoved)
+    {
+        DB5().PushUpdateData("DELETE FROM `clan_item_history` WHERE `time`<'%u'", dueTime);
+    }
+}
+
+void Clan::DistributeItem(Player* player, UInt64 memId, UInt16 itemId, UInt16 num)
+{
+    Mutex::ScopedLock lk(_mutex);
+    
+    if(player != getOwner()) return;
+     
+    Clan::Members::iterator found = find(memId);
+    if(found == _members.end()) return;
+
+    if(_itemPkg.GetItemNum(itemId) < num) return;
+
+    ClanMember* member = *found;
+
+    if(!member->itemPkg.CheckAddItem(itemId, num))
+    {
+        player->sendMsgCode(0, 1325);
+        return;
+    }
+
+    _itemPkg.RemoveItem(itemId, num);
+   
+    //通知player更新仓库
+    Stream clanPkgStream(REP::CLAN_PACKAGE);
+    clanPkgStream << UInt8(2);
+    clanPkgStream << UInt8(1);
+    clanPkgStream << UInt16(itemId);
+    clanPkgStream << UInt16(num);
+    clanPkgStream << Stream::eos;
+    broadcast(clanPkgStream); 
+
+    member->itemPkg.AddItem(itemId, num);
+    
+    if(member->player != NULL && member->player->isOnline())
+    {
+        //通知更新个人仓库
+        Stream playerPkgStream(REP::CLAN_PACKAGE);
+        playerPkgStream << UInt8(4);
+        playerPkgStream << UInt8(0);
+        playerPkgStream << UInt16(itemId);
+        playerPkgStream << UInt16(num);
+        playerPkgStream << Stream::eos;
+        member->player->send(playerPkgStream);
+    }
+}
+
+void Clan::GetWeal(Player* player)
+{
+    if(player == NULL) return;
+
+    Mutex::ScopedLock lk(_mutex);
+   
+    ClanMember* member = getClanMember(player);
+    if(member == NULL) return;
+
+    if(player->GetVar(VAR_CLAN_WEAL) != 0) return; //今天已经领过
+   
+    UInt32 tael = GData::clanLvlTable.getWeal(_level);
+    if(tael == 0) return;
+
+    player->getTael(tael);
+    player->AddVar(VAR_CLAN_WEAL, tael);
+
+    SendPackageInfo(player);
+}
+
+void Clan::GetItems(Player* player)
+{
+    if(player == NULL) return;
+    
+    Mutex::ScopedLock lk(_mutex);
+   
+    ClanMember* member = getClanMember(player);
+    if(member == NULL) return;
+
+    member->itemPkg.GetItems(player);
 }
 
 void Clan::setMaxMemberCount(UInt8 count)

@@ -124,6 +124,7 @@ enum ItemFrom
     FromAttainment,
     FromDailyActivity,
     FromEquipUpgrade,
+    FromClan,
 };
 
 enum ItemTo
