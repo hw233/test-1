@@ -376,6 +376,7 @@ namespace GObject
 		UInt32 achievement;         // 战功
         UInt32 attainment;          //  
         UInt8 qqvipl;               // QQ VIP等级
+        UInt8 qqvipl1;              // 3366时的QQ VIP等级
         UInt8 qqvipyear;            // QQ VIP是否包年
         UInt32 qqawardgot;          // QQ VIP奖励是否已领取
         UInt32 qqawardEnd;          // QQ 奖励领取结束时间
@@ -589,8 +590,17 @@ namespace GObject
                 _playerData.qqvipl = 8;
             else if(lvl > 16 && lvl < 20)
                 _playerData.qqvipl = 16;
+            else if (lvl > 26)
+                _playerData.qqvipl = 26;
+        }
+        inline void setQQVipl1(UInt8 lvl)
+        {
+            _playerData.qqvipl1 = lvl;
+            if (lvl < 10 || lvl >= 20)
+                 _playerData.qqvipl1 = 16;
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
+        inline UInt8 getQQVipl1() { return _playerData.qqvipl1; }
         inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
         inline bool getQQVipYear() { return _playerData.qqvipyear; }
         inline UInt8 getPF()
@@ -599,6 +609,8 @@ namespace GObject
                 return (2<<4)|_playerData.qqvipl;
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
                 return (1<<4)|(_playerData.qqvipl-10);
+            if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
+                return (3<<4)|(_playerData.qqvipl-20);
             return 0;
         }
 
@@ -801,7 +813,7 @@ namespace GObject
 
         // QQ奖励
         void sendYellowDiamondInfo();
-        UInt8 rcvYellowDiamondAward(UInt8 type);
+        UInt8 rcvYellowDiamondAward(UInt8 type, UInt8 d3d6);
         void checkQQAward();
         void RollYDGem();
         void openLevelBox(UInt8 lvl, UInt8 cls);

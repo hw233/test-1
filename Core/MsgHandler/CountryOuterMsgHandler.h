@@ -485,7 +485,8 @@ struct YellowDiamondInfoReq
 struct YellowDiamondAwardRcvReq
 {
     UInt8 m_type;
-    MESSAGE_DEF1(REQ::YD_AWARD_RCV, UInt8, m_type);
+    UInt8 m_d3d6;
+    MESSAGE_DEF2(REQ::YD_AWARD_RCV, UInt8, m_type, UInt8, m_d3d6);
 };
 
 struct YellowDiamondGetPacksReq
@@ -2833,7 +2834,7 @@ void OnYellowDiamondInfo(GameMsgHdr& hdr, YellowDiamondInfoReq& ydInfo)
 void OnYellowDiamondAwardRcv(GameMsgHdr& hdr, YellowDiamondAwardRcvReq& ydar)
 {
     MSG_QUERY_PLAYER(player);
-    player->rcvYellowDiamondAward(ydar.m_type);
+    player->rcvYellowDiamondAward(ydar.m_type, ydar.m_d3d6);
 }
 
 void OnYellowDiamondGetPacksRcv(GameMsgHdr& hdr, YellowDiamondGetPacksReq& ydar)

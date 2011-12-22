@@ -7010,42 +7010,51 @@ namespace GObject
 
     void Player::checkQQAward()
     {
-        if (_playerData.qqvipl < 20)
+        UInt32 now = TimeUtil::Now();
+        UInt8 qqvipl = 0;
+        UInt8 flag = 0;
+
+        if (_playerData.qqvipl >= 20)
         {
-            UInt32 now = TimeUtil::Now();
-            UInt8 qqvipl = _playerData.qqvipl;
-            UInt8 flag = 8*(_playerData.qqvipl / 10);
-            if(flag)
-            {
-                if(_playerData.qqvipl % 10 == 0)
-                    qqvipl = 0;
-                else
-                    qqvipl = _playerData.qqvipl%10 + 1;
-            }
+            qqvipl = _playerData.qqvipl1;
+            flag = 8*(_playerData.qqvipl1 / 10);
+        }
+        else
+        {
+            qqvipl = _playerData.qqvipl;
+            flag = 8*(_playerData.qqvipl / 10);
+        }
 
-            if(now >= _playerData.qqawardEnd)
-            {
-                _playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
-                _playerData.qqawardgot &= 0xFCFC;
-                DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
-                RollYDGem();
-            }
+        if(flag)
+        {
+            if(qqvipl % 10 == 0)
+                qqvipl = 0;
+            else
+                qqvipl = qqvipl%10 + 1;
+        }
 
-            if( !(_playerData.qqawardgot & (0x80<<flag)) && qqvipl )
+        if(now >= _playerData.qqawardEnd)
+        {
+            _playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
+            _playerData.qqawardgot &= 0xFCFC;
+            DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
+            RollYDGem();
+        }
+
+        if( !(_playerData.qqawardgot & (0x80<<flag)) && qqvipl )
+        {
+            if(GetFreePackageSize() < 1)
             {
-                if(GetFreePackageSize() < 1)
-                {
-                    sendMsgCode(2, 1011);
-                }
+                sendMsgCode(2, 1011);
+            }
+            else
+            {
+                _playerData.qqawardgot |= (0x80<<flag);
+                if(flag)
+                    GetPackage()->AddItem2(7, 1, true, true);
                 else
-                {
-                    _playerData.qqawardgot |= (0x80<<flag);
-                    if(flag)
-                        GetPackage()->AddItem2(7, 1, true, true);
-                    else
-                        GetPackage()->AddItem2(67, 1, true, true);
-                    DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
-                }
+                    GetPackage()->AddItem2(67, 1, true, true);
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
         }
 
@@ -7059,13 +7068,16 @@ namespace GObject
     {
         checkQQAward();
 
-        UInt8 qqvipl = _playerData.qqvipl % 10;
-        Stream st(REP::YD_INFO);
+        bool blue = false;
         if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20)
         {
+            Stream st(REP::YD_INFO);
+
+            UInt8 qqvipl = _playerData.qqvipl % 10;
             st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_3366));
             UInt8 maxCnt = GObjectManager::getD3D6MaxCount();
             st << maxCnt;
+            st << static_cast<UInt8>(1);
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
                 std::vector<YDItem>& ydItem = GObjectManager::getD3D6Item(i);
@@ -7081,16 +7093,37 @@ namespace GObject
                 }
             }
             st << static_cast<UInt8>(0);
+            st << Stream::eos;
+            send(st);
+
+            blue = true;
         }
-        else if (_playerData.qqvipl < 20)
+
+        if (_playerData.qqvipl < 20 || blue)
         {
-            UInt8 flag = 8*(_playerData.qqvipl / 10);
+            Stream st(REP::YD_INFO);
+
+            UInt8 qqvipl = 0;
+            UInt8 flag = 0;
+
+            if (blue)
+            {
+                flag = 8*(_playerData.qqvipl1 / 10);
+                qqvipl = _playerData.qqvipl1 % 10;
+            }
+            else
+            {
+                flag = 8*(_playerData.qqvipl / 10);
+                qqvipl = _playerData.qqvipl % 10;
+            }
+
             st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
             if(flag)
                 st << static_cast<UInt8>(maxCnt - 2);
             else
                 st << maxCnt;
+            st << static_cast<UInt8>(0);
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
                 if(flag && (i == 0 || i > 6))
@@ -7113,20 +7146,19 @@ namespace GObject
             st << itemCnt;
             for(UInt8 j = 0; j < itemCnt; ++ j)
                 st << ydItem[j].itemId << ydItem[j].itemNum;
+            st << Stream::eos;
+            send(st);
         }
-
-        st << Stream::eos;
-        send(st);
     }
 
-    UInt8 Player::rcvYellowDiamondAward(UInt8 type)
+    UInt8 Player::rcvYellowDiamondAward(UInt8 type, UInt8 d3d6)
     {
         checkQQAward();
 
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
 
-        if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20)
+        if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
             if (!qqvipl)
@@ -7156,16 +7188,27 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20)
+        else if (_playerData.qqvipl < 20 || (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 0))
         {
-            UInt8 qqvipl = _playerData.qqvipl;
-            UInt8 flag = 8*(_playerData.qqvipl / 10);
+            UInt8 qqvipl = 0;
+            UInt8 flag = 0;
+            if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 0)
+            {
+                qqvipl = _playerData.qqvipl1;
+                flag = 8*(_playerData.qqvipl1 / 10);
+            }
+            else
+            {
+                qqvipl = _playerData.qqvipl;
+                flag = 8*(_playerData.qqvipl / 10);
+            }
+
             if(flag)
             {
-                if(_playerData.qqvipl % 10 == 0)
+                if(qqvipl % 10 == 0)
                     qqvipl = 0;
                 else
-                    qqvipl = _playerData.qqvipl%10 + 1;
+                    qqvipl = qqvipl%10 + 1;
             }
 
             if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)

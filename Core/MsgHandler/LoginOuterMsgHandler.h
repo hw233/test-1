@@ -99,6 +99,7 @@ struct UserLoginStruct
 {
 	UInt64 _userid;
     UInt8 _level;
+    UInt8 _level1;
     UInt8 _isYear;
 	UInt32 _lang;
 	typedef Array<UInt8, 36> HashValType;
@@ -107,7 +108,7 @@ struct UserLoginStruct
     std::string _platform;
     std::string _openid;
     std::string _openkey;
-	MESSAGE_DEF9(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang,
+	MESSAGE_DEF10(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
             HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey);
 };
 
@@ -116,11 +117,12 @@ struct NewUserStruct
 	std::string _name;
 	UInt8 _class;
     UInt8 _level;
+    UInt8 _level1;
     UInt8 _isYear;
     std::string _platform;
     std::string _openid;
     std::string _openkey;
-	MESSAGE_DEF7(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear,
+	MESSAGE_DEF8(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey);
 
 };
@@ -298,6 +300,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		{
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
+            player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
@@ -308,6 +311,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
+            player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
 			flag = 1;
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
@@ -536,9 +540,11 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(recharge));
 				GLOBAL().PushMsg(hdr, &recharge);
 			}
-            UInt16 qqlvl = nu._level | (nu._isYear << 8);
-            GameMsgHdr hdr(0x297, country, pl, sizeof(UInt16));
-            GLOBAL().PushMsg(hdr, &qqlvl);
+            pl->setQQVipl(nu._level);
+            pl->setQQVipl1(nu._level1);
+            pl->setQQVipYear(nu._isYear);
+            GameMsgHdr hdr(0x297, country, pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
 		}
 	}
 
