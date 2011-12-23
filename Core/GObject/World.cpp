@@ -58,7 +58,7 @@ namespace GObject
 {
 UInt8 World::_wday = 0;
 UInt32 World::_moneyLogged = 0;
-MoneyIn World::_moneyIn[2] = {{0,},};
+MoneyIn World::_moneyIn[7][2] = {{{0,},{0,}},};
 int World::_activityStage = 0;
 bool World::_actAvailable = false;
 bool World::_actAvailable1 = false;

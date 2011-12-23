@@ -856,19 +856,20 @@ namespace GObject
         if (!type || type > 2) return;
         UInt32 now = TimeUtil::Now();
         int today = TimeUtil::GetYYMMDD(now);
-        if (!(World::_moneyLogged & type) || !TimeUtil::SameDay(now, WORLD().ThisDay()))
+        bool sameDay = TimeUtil::SameDay(World::_moneyLogged, now);
+        if (!sameDay)
         {
-            World::_moneyLogged = 0;
             for (int i = 0; i < 6; ++i)
                 memcpy(&World::_moneyIn[i], &World::_moneyIn[i+1], sizeof(World::_moneyIn[i]));
             World::_moneyIn[6] = {{0,},};
 
-            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, type);
+            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,1,0,0,0,0,0)", today);
+            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,2,0,0,0,0,0)", today);
         }
         DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
 
+        World::_moneyLogged = now;
         // TODO:
-        World::_moneyLogged |= type;
         World::_moneyIn[6][type-1].gold += gold;
     }
 
