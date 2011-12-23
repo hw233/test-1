@@ -18,6 +18,15 @@ local YellowDiamondAward = {
     { {503, 2}, {57,3}, {56, 3}, {15, 3}, {5001, 1}, {48, 1} },
 }
 
+local Double3Double6Award = {
+    {{502,1},},
+    {{502,1},{15,1},{5001,1},{518,1},},
+    {{502,3},{15,1},{5001,1},{518,1},},
+    {{502,5},{15,2},{5001,1},{518,1},},
+    {{502,5},{15,2},{5001,1},{56,1},{518,3},},
+    {{502,5},{15,3},{5001,1},{56,2},{518,5},},
+}
+
 local YearYellowDiamondAward = {
     --混元离土x1，洗炼符x1，银票x1，高级挂机加速符x1
     {51, 1}, {500, 1}, {15, 1}, {56, 1}
@@ -35,5 +44,9 @@ end
 
 function getYearYellowDiamondAward()
     return YearYellowDiamondAward;
+end
+
+function getDouble3Double6Award()
+    return Double3Double6Award
 end
 

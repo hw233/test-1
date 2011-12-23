@@ -712,11 +712,11 @@ function Christmas(player, lootlvl, where)
 
         local package = player:GetPackage();
         package:AddItem(401, itemNum[lootlvl], false);
-        if where == 0 then
-            Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 副本通关，获得【圣诞萌萌变身卡】x" .. itemNum[lootlvl])
-        else
-            Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 阵图通关，获得【圣诞萌萌变身卡】x" .. itemNum[lootlvl])
-        end
+        --if where == 0 then
+        --    Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 副本通关，获得【圣诞萌萌变身卡】x" .. itemNum[lootlvl])
+        --else
+        --    Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 阵图通关，获得【圣诞萌萌变身卡】x" .. itemNum[lootlvl])
+        --end
     end
 end
 
@@ -845,7 +845,7 @@ function onChristmas(player)
         if player:GetVar(8) == 1 then
             return
         end
-        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞雪地靴】\n 2011年12月23日-2012年1月3日登陆并且等级达到40级玩家，即可获得节日套装奖励【圣诞靴】 ", {1752,1,1});
+        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞萌萌靴】\n 2011年12月23日-2012年1月3日登陆并且等级达到40级玩家，即可获得节日套装奖励【圣诞萌萌靴】 ", {1752,1,1});
         player:SetVar(8,1)
     end
 end

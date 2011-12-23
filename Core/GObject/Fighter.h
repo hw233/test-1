@@ -23,6 +23,7 @@ namespace GObject
 #define FIGHTER_BUFF_ATTR2		0x02
 #define FIGHTER_BUFF_ATTR3		0x03
 #define FIGHTER_BUFF_XTHTYT     0x04
+#define FIGHTER_BUFF_CRMASGIRL  0x05
 
 #define FIGHTER_BUFF_COUNT 0x10 
 
