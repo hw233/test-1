@@ -44,6 +44,7 @@
 #include "DCLogger.h"
 #include "ClanRankBattle.h"
 #include "TeamCopy.h"
+#include "HoneyFall.h"
 
 #include <cmath>
 
@@ -575,6 +576,7 @@ namespace GObject
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
+        m_hf = new HoneyFall(this);
 	}
 
 
@@ -862,12 +864,21 @@ namespace GObject
         if (!type || type > 2) return;
         UInt32 now = TimeUtil::Now();
         int today = TimeUtil::GetYYMMDD(now);
-        if (!(World::_moneyLogged & type) || !TimeUtil::SameDay(now, WORLD().ThisDay()))
-            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, type);
-        DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
-        World::_moneyLogged |= type;
+        bool sameDay = TimeUtil::SameDay(World::_moneyLogged, now);
+        if (!sameDay)
+        {
+            for (int i = 0; i < 6; ++i)
+                memcpy(&World::_moneyIn[i], &World::_moneyIn[i+1], sizeof(World::_moneyIn[i]));
+            World::_moneyIn[6] = {{0,},};
 
-        World::_moneyIn[type-1].gold += gold;
+            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,1,0,0,0,0,0)", today);
+            DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,2,0,0,0,0,0)", today);
+        }
+        DB8().PushUpdateData("UPDATE `money` SET `gold` = `gold` + %d, `coupon` = `coupon` + %d, `tael` = `tael` + %d, `achievement` = `achievement` + %d, `prestige` = `prestige` + %d WHERE `time` = %d AND `type` = %d", gold, coupon, tael, achievement, prestige, today, type);
+
+        World::_moneyLogged = now;
+        // TODO:
+        World::_moneyIn[6][type-1].gold += gold;
     }
 
     void Player::sendHalloweenOnlineAward(UInt32 now, bool _online)
@@ -7012,21 +7023,32 @@ namespace GObject
 
     void Player::checkQQAward()
     {
-		UInt32 now = TimeUtil::Now();
+        UInt32 now = TimeUtil::Now();
+        UInt8 qqvipl = 0;
+        UInt8 flag = 0;
 
-        UInt8 qqvipl = _playerData.qqvipl;
-        UInt8 flag = 8*(_playerData.qqvipl / 10);
-        if(flag)
+        if (_playerData.qqvipl >= 20)
         {
-            if(_playerData.qqvipl % 10 == 0)
-                qqvipl = 0;
-            else
-                qqvipl = _playerData.qqvipl%10 + 1;
+            qqvipl = _playerData.qqvipl1;
+            flag = 8*(_playerData.qqvipl1 / 10);
+        }
+        else
+        {
+            qqvipl = _playerData.qqvipl;
+            flag = 8*(_playerData.qqvipl / 10);
         }
 
-		if(now >= _playerData.qqawardEnd)
-		{
-			_playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
+        if(flag)
+        {
+            if(qqvipl % 10 == 0)
+                qqvipl = 0;
+            else
+                qqvipl = qqvipl%10 + 1;
+        }
+
+        if(now >= _playerData.qqawardEnd)
+        {
+            _playerData.qqawardEnd = TimeUtil::SharpDay(1, now);
             _playerData.qqawardgot &= 0xFCFC;
             DB1().PushUpdateData("UPDATE `player` SET `qqawardEnd` = %u, `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardEnd, _playerData.qqawardgot, getId());
             RollYDGem();
@@ -7059,103 +7081,193 @@ namespace GObject
     {
         checkQQAward();
 
-        UInt8 qqvipl = _playerData.qqvipl % 10;
-        UInt8 flag = 8*(_playerData.qqvipl / 10);
+        bool blue = false;
+        if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20)
+        {
+            Stream st(REP::YD_INFO);
 
-        Stream st(REP::YD_INFO);
-        st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
-        UInt8 maxCnt = GObjectManager::getYDMaxCount();
-        if(flag)
-            st << static_cast<UInt8>(maxCnt - 2);
-        else
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_3366));
+            UInt8 maxCnt = GObjectManager::getD3D6MaxCount();
             st << maxCnt;
-        for(UInt8 i = 0; i < maxCnt; ++ i)
-        {
-            if(flag && (i == 0 || i > 6))
-                continue;
-            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
-            UInt8 itemCnt = ydItem.size();
-            st << itemCnt;
-            for(int j = 0; j < itemCnt; ++ j)
+            st << static_cast<UInt8>(1);
+            for(UInt8 i = 0; i < maxCnt; ++ i)
             {
-                UInt32 itemId = ydItem[j].itemId;
-                if(GetItemSubClass(itemId) == Item_Gem)
-                    itemId = _playerData.ydGemId;
-
-                st << itemId << ydItem[j].itemNum;
-            }
-        }
-
-        std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
-        UInt8 itemCnt = ydItem.size();
-        st << itemCnt;
-        for(UInt8 j = 0; j < itemCnt; ++ j)
-            st << ydItem[j].itemId << ydItem[j].itemNum;
-
-        st << Stream::eos;
-        send(st);
-    }
-
-    UInt8 Player::rcvYellowDiamondAward(UInt8 type)
-    {
-        UInt8 nRes = 0;
-
-        Stream st(REP::YD_AWARD_RCV);
-        checkQQAward();
-
-        UInt8 qqvipl = _playerData.qqvipl;
-        UInt8 flag = 8*(_playerData.qqvipl / 10);
-        if(flag)
-        {
-            if(_playerData.qqvipl % 10 == 0)
-                qqvipl = 0;
-            else
-                qqvipl = _playerData.qqvipl%10 + 1;
-        }
-
-        if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)
-        {
-            std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
-            UInt8 itemCnt = ydItem.size();
-            if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
-            {
-                 nRes = 1;
-                _playerData.qqawardgot |= (0x1<<flag);
+                std::vector<YDItem>& ydItem = GObjectManager::getD3D6Item(i);
+                UInt8 itemCnt = ydItem.size();
+                st << itemCnt;
                 for(int j = 0; j < itemCnt; ++ j)
                 {
                     UInt32 itemId = ydItem[j].itemId;
                     if(GetItemSubClass(itemId) == Item_Gem)
                         itemId = _playerData.ydGemId;
 
-                    GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                    st << itemId << ydItem[j].itemNum;
                 }
             }
+            st << static_cast<UInt8>(0);
+            st << Stream::eos;
+            send(st);
+
+            blue = true;
+        }
+
+        if (_playerData.qqvipl < 20 || blue)
+        {
+            Stream st(REP::YD_INFO);
+
+            UInt8 qqvipl = 0;
+            UInt8 flag = 0;
+
+            if (blue)
+            {
+                flag = 8*(_playerData.qqvipl1 / 10);
+                qqvipl = _playerData.qqvipl1 % 10;
+            }
             else
             {
-                sendMsgCode(2, 1011);
+                flag = 8*(_playerData.qqvipl / 10);
+                qqvipl = _playerData.qqvipl % 10;
             }
-        }
-        else if(type == 2 && !(_playerData.qqawardgot & (0x2<<flag)) && _playerData.qqvipyear != 0)
-        {
+
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
+            UInt8 maxCnt = GObjectManager::getYDMaxCount();
+            if(flag)
+                st << static_cast<UInt8>(maxCnt - 2);
+            else
+                st << maxCnt;
+            st << static_cast<UInt8>(0);
+            for(UInt8 i = 0; i < maxCnt; ++ i)
+            {
+                if(flag && (i == 0 || i > 6))
+                    continue;
+                std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
+                UInt8 itemCnt = ydItem.size();
+                st << itemCnt;
+                for(int j = 0; j < itemCnt; ++ j)
+                {
+                    UInt32 itemId = ydItem[j].itemId;
+                    if(GetItemSubClass(itemId) == Item_Gem)
+                        itemId = _playerData.ydGemId;
+
+                    st << itemId << ydItem[j].itemNum;
+                }
+            }
+
             std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
             UInt8 itemCnt = ydItem.size();
-            if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
-            {
-                nRes = 2;
-                _playerData.qqawardgot |= (0x2<<flag);
+            st << itemCnt;
+            for(UInt8 j = 0; j < itemCnt; ++ j)
+                st << ydItem[j].itemId << ydItem[j].itemNum;
+            st << Stream::eos;
+            send(st);
+        }
+    }
 
-                for(int j = 0; j < itemCnt; ++ j)
-                    GetPackage()->AddItem2(ydItem[j].itemId, ydItem[j].itemNum, true, true);
+    UInt8 Player::rcvYellowDiamondAward(UInt8 type, UInt8 d3d6)
+    {
+        checkQQAward();
+
+        UInt8 nRes = 0;
+        Stream st(REP::YD_AWARD_RCV);
+
+        if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 1)
+        {
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+            if (!qqvipl)
+                return 0;
+
+            UInt32 award = GetVar(VAR_AWARD_3366);
+            if (!award)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getD3D6Item(qqvipl - 1);
+                UInt8 itemCnt = ydItem.size();
+                if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+                {
+                    nRes = 3;
+                    SetVar(VAR_AWARD_3366, 1);
+                    for(int j = 0; j < itemCnt; ++ j)
+                    {
+                        UInt32 itemId = ydItem[j].itemId;
+                        if(GetItemSubClass(itemId) == Item_Gem)
+                            itemId = _playerData.ydGemId;
+
+                        GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                    }
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
+            }
+        }
+        else if (_playerData.qqvipl < 20 || (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 0))
+        {
+            UInt8 qqvipl = 0;
+            UInt8 flag = 0;
+            if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 0)
+            {
+                qqvipl = _playerData.qqvipl1;
+                flag = 8*(_playerData.qqvipl1 / 10);
             }
             else
             {
-                sendMsgCode(2, 1011);
+                qqvipl = _playerData.qqvipl;
+                flag = 8*(_playerData.qqvipl / 10);
             }
-        }
 
-        if(nRes)
-        {
-            DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+            if(flag)
+            {
+                if(qqvipl % 10 == 0)
+                    qqvipl = 0;
+                else
+                    qqvipl = qqvipl%10 + 1;
+            }
+
+            if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
+                UInt8 itemCnt = ydItem.size();
+                if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+                {
+                    nRes = 1;
+                    _playerData.qqawardgot |= (0x1<<flag);
+                    for(int j = 0; j < itemCnt; ++ j)
+                    {
+                        UInt32 itemId = ydItem[j].itemId;
+                        if(GetItemSubClass(itemId) == Item_Gem)
+                            itemId = _playerData.ydGemId;
+
+                        GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                    }
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
+            }
+            else if(type == 2 && !(_playerData.qqawardgot & (0x2<<flag)) && _playerData.qqvipyear != 0)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getYearYDItem();
+                UInt8 itemCnt = ydItem.size();
+                if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+                {
+                    nRes = 2;
+                    _playerData.qqawardgot |= (0x2<<flag);
+
+                    for(int j = 0; j < itemCnt; ++ j)
+                        GetPackage()->AddItem2(ydItem[j].itemId, ydItem[j].itemNum, true, true);
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
+            }
+
+            if(nRes)
+            {
+                DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
+            }
         }
 
         st << nRes << Stream::eos;
@@ -7615,6 +7727,11 @@ namespace GObject
     TeamCopyPlayerInfo* Player::getTeamCopyPlayerInfo()
     {
         return m_tcpInfo;
+    }
+
+    HoneyFall* Player::getHoneyFall()
+    {
+        return m_hf;
     }
 
 } // namespace GObject

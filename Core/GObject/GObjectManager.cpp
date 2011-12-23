@@ -52,6 +52,7 @@
 #include "GObject/TeamCopy.h"
 #include "ActivityMgr.h"
 #include <fcntl.h>
+#include "HoneyFall.h"
 
 namespace GObject
 {
@@ -92,6 +93,8 @@ namespace GObject
     std::map<UInt32, UInt32> GObjectManager::_team_om_chance[3];
     std::map<UInt32, UInt32> GObjectManager::_team_om_item;
 
+    std::vector<stHftChance> GObjectManager::_hft_chance[6][12];
+
     UInt8 GObjectManager::_evade_factor;
     UInt8 GObjectManager::_hitrate_factor;
     UInt8 GObjectManager::_critcal_factor;
@@ -112,6 +115,7 @@ namespace GObject
     std::map<UInt16, UInt16> GObjectManager::_battle_scene;
 
     std::vector<std::vector<YDItem>> GObjectManager::_yellow_diamond_award;
+    std::vector<std::vector<YDItem>> GObjectManager::_d3d6_diamond_award;
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
 
@@ -799,6 +803,27 @@ namespace GObject
                 _yellow_diamond_award.push_back(itemVt);
             }
 
+            lua_tinker::table d3Table = lua_tinker::call<lua_tinker::table>(L, "getDouble3Double6Award");
+            size_t d3_size = d3Table.size();
+            for(UInt32 i = 0; i < d3_size; i ++)
+            {
+                std::vector<YDItem> itemVt;
+                itemVt.clear();
+                lua_tinker::table itemTable = d3Table.get<lua_tinker::table>(i + 1);
+                size_t itemSize = itemTable.size();
+                for(UInt8 j = 0; j < itemSize; ++j)
+                {
+                    lua_tinker::table tempTable = itemTable.get<lua_tinker::table>(j + 1);
+                    YDItem item = {0};
+
+                    item.itemId = tempTable.get<UInt32>(1);
+                    item.itemNum = tempTable.get<UInt8>(2);
+
+                    itemVt.push_back(item);
+                }
+                _d3d6_diamond_award.push_back(itemVt);
+            }
+
             lua_tinker::table yydTable = lua_tinker::call<lua_tinker::table>(L, "getYearYellowDiamondAward");
             size_t yyd_size = yydTable.size();
             for(UInt32 j = 0; j < yyd_size; j ++)
@@ -1133,6 +1158,24 @@ namespace GObject
 				newPlayers.add(id, pl);
 			}
 			globalNamedPlayers.add(pl->getName(), pl);
+		}
+		lc.finalize();
+
+		lc.prepare("Loading Player HoneyFall:");
+        pl = NULL;
+		DBHoneyFall hfData;
+		if(execu->Prepare("SELECT `playerId`, `type`, `value` FROM `player_honeyfall`", hfData) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            pl = globalPlayers[hfData.playerId];
+            if(pl == NULL)
+                continue;
+
+            HoneyFall* hf = pl->getHoneyFall();
+            hf->setHftValue(hfData.type, hfData.value);
 		}
 		lc.finalize();
 
@@ -2969,6 +3012,25 @@ namespace GObject
                 }
             }
 
+            {
+                for(UInt8 q = 0; q < 6; q ++)
+                {
+                    lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantChanceAdv", q + 1);
+                    UInt32 size = table_temp.size();
+                    for(UInt32 j = 0; j < size; j ++)
+                    {
+                        stHftChance hftc;
+                        lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(j+1);
+                        UInt8 lv = table_temp2.get<UInt8>(1) - 1;
+                        if(lv > 12)
+                            continue;
+                        hftc.times = table_temp2.get<UInt8>(2);
+                        hftc.chance = table_temp2.get<UInt32>(3);
+                        _hft_chance[q][lv].push_back(hftc);
+                    }
+                }
+            }
+
 			for(q = 0; q < 6; q ++)
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpLOrderChance", q + 1);
@@ -3434,23 +3496,49 @@ namespace GObject
         return true;
     }
 
+    void getMoneyLog(int today, int type, DBMoneyLog& r)
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return ;
+
+        memset(&r, 0x00, sizeof(r));
+        char buf[1024] = {0};
+        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = %d", today, type);
+		execu->Extract(buf, r);
+    }
+
+    void assignMoneyLog(DBMoneyLog& r, MoneyIn& mi)
+    {
+        mi.gold = r.gold;
+    }
+
     bool GObjectManager::InitMoneyLog()
     {
-        int today = TimeUtil::GetYYMMDD();
-        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 1);
-        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today, 2);
+        UInt32 now = TimeUtil::Now();
 
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
+        int today[7] = {
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-6, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-5, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-4, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-3, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-2, now)),
+            TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-1, now)),
+            TimeUtil::GetYYMMDD(now),
+        };
+
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today[6], 1);
+        DB8().PushUpdateData("INSERT INTO `money` (`time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige`) VALUES (%d,%d,0,0,0,0,0)", today[6], 2);
 
 		DBMoneyLog t;
-        char buf[1024] = {0};
-        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 1", today);
-		execu->Extract(buf, t);
-        World::_moneyIn[0].gold = t.gold;
-        snprintf(buf, sizeof(buf), "SELECT `time`, `type`, `gold`, `coupon`, `tael`, `achievement`, `prestige` FROM `money` WHERE `time` = %d AND `type` = 2", today);
-		execu->Extract(buf, t);
-        World::_moneyIn[1].gold = t.gold;
+        for (int i = 0; i < 7; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                getMoneyLog(today[i], j+1, t);
+                assignMoneyLog(t, World::_moneyIn[i][j]);
+            }
+        }
+
         return true;
     }
 

@@ -143,6 +143,13 @@ struct DBPlayerData
     std::string atohicfg;
 };
 
+struct DBHoneyFall
+{
+    UInt64 playerId;
+    UInt8 type;
+    UInt32 value;
+};
+
 struct DBPrepaid
 {
 	UInt64 id;
@@ -888,6 +895,15 @@ SPECIALDEF(55)
 	UInt32, pdata.created,
 	UInt32, pdata.lockExpireTime
     )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBHoneyFall)
+SPECIALDEF(3)
+	(
+    UInt64, playerId,
+    UInt8,  type,
+    UInt32, value
+	)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBPrepaid)

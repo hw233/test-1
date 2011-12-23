@@ -128,6 +128,7 @@ namespace GObject
     struct TeamData;
     struct TeamCopyPlayerInfo;
     class ActivityMgr;
+    class HoneyFall;
 
     struct TripodData
     {
@@ -375,6 +376,7 @@ namespace GObject
 		UInt32 achievement;         // ս??
         UInt32 attainment;          //  
         UInt8 qqvipl;               // QQ VIP?ȼ?
+        UInt8 qqvipl1;              // 3366ʱ??QQ VIP?ȼ?
         UInt8 qqvipyear;            // QQ VIP?Ƿ?????
         UInt32 qqawardgot;          // QQ VIP?????Ƿ?????ȡ
         UInt32 qqawardEnd;          // QQ ??????ȡ????ʱ??
@@ -450,6 +452,7 @@ namespace GObject
 			BeChallenging = 0x00000020,		//?Ǿ???״̬
 			SGPunish	= 0x00000040,		//???ٳͷ?
             AthPayForPage = 0x00000080,     //in athletics range for paging
+            AthPayForKillCD=0x00000100,     
 			AllGlobalFlags	= 0xFFFFFFFF
 		};
 
@@ -588,8 +591,17 @@ namespace GObject
                 _playerData.qqvipl = 8;
             else if(lvl > 16 && lvl < 20)
                 _playerData.qqvipl = 16;
+            else if (lvl > 26)
+                _playerData.qqvipl = 26;
+        }
+        inline void setQQVipl1(UInt8 lvl)
+        {
+            _playerData.qqvipl1 = lvl;
+            if (lvl < 10 || lvl >= 20)
+                 _playerData.qqvipl1 = 16;
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
+        inline UInt8 getQQVipl1() { return _playerData.qqvipl1; }
         inline void setQQVipYear(bool is) { _playerData.qqvipyear = is?1:0; }
         inline bool getQQVipYear() { return _playerData.qqvipyear; }
         inline UInt8 getPF()
@@ -598,6 +610,8 @@ namespace GObject
                 return (2<<4)|_playerData.qqvipl;
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
                 return (1<<4)|(_playerData.qqvipl-10);
+            if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
+                return (3<<4)|(_playerData.qqvipl-20);
             return 0;
         }
 
@@ -800,7 +814,7 @@ namespace GObject
 
         // QQ????
         void sendYellowDiamondInfo();
-        UInt8 rcvYellowDiamondAward(UInt8 type);
+        UInt8 rcvYellowDiamondAward(UInt8 type, UInt8 d3d6);
         void checkQQAward();
         void RollYDGem();
         void openLevelBox(UInt8 lvl, UInt8 cls);
@@ -1234,6 +1248,7 @@ namespace GObject
         CopyTeamPage& getCopyTeamPage();
         void clearCopyTeamPage();
         TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
+        HoneyFall* getHoneyFall();
 
     private:
         bool m_hasTripod;
@@ -1241,6 +1256,7 @@ namespace GObject
         TeamData* m_teamData;
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
+        HoneyFall* m_hf;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }

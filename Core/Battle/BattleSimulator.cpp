@@ -288,9 +288,16 @@ void BattleSimulator::start(UInt8 prevWin)
 					_packet << static_cast<UInt8>(j + 1) << bf->getFighter()->getBattleName();
 					if(bf->getFighter()->isNpc())
 						_packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
-					else
+                    else
 						_packet << bf->getFighter()->getClassAndSex();
-					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << bf->getPortrait() << static_cast<UInt8>(bf->getFlag() & 0x03);
+
+                    UInt16 portrait = 0;
+                    if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
+                        portrait = 1058;
+                    else
+                        portrait = bf->getPortrait();
+
+					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << portrait << static_cast<UInt8>(bf->getFlag() & 0x03);
 					_packet << static_cast<UInt8>(bf->getFighter()->getColor())
 						<< static_cast<UInt32>(_isBody[i][j] ? 0 : bf->getHP()) << static_cast<UInt32>(maxhp);
 
@@ -681,6 +688,9 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         UInt8 target_stun = area_target->getStunRound();
         bool enterEvade = area_target->getEvad100();
         bool defend100 = area_target->getDefend100();
+        // 雪人
+        if(area_target->getId() == 5679)
+            target_stun = 1;
 
         // target fighter will do not counter while fighter is the same side
         bool can_counter = true;
@@ -1390,6 +1400,87 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
     if(bf->getHP() == 0)
     {
+        return 0;
+    }
+
+    // 雪球
+    if(SKILL_ID(skill->getId()) == 137)
+    {
+        static UInt8 skill_prob_137[10][3] = {
+            {0, 0, 0},
+            {97, 99, 100},
+            {85, 96, 100},
+            {73, 93, 100},
+            {61, 90, 100},
+            {49, 87, 100},
+            {37, 84, 100},
+            {25, 81, 100},
+            {13, 78, 100},
+            {0, 75, 100}
+        };
+        size_t defCount = 0;
+        DefStatus defList[25];
+        size_t scCount = 0;
+        StatusChange scList[25];
+
+        UInt8 cnt = 0;
+        UInt8 level = SKILL_LEVEL(skill->getId());
+        if(level > 9)
+            level = 9;
+        UInt8 roll = _rnd(100);
+        if(skill_prob_137[level][0] > roll)
+            cnt = 1;
+        else if(skill_prob_137[level][1] > roll)
+            cnt = 2;
+        else if(skill_prob_137[level][2] > roll)
+            cnt = 3;
+
+        for(UInt8 i = 0; i < cnt; ++i)
+        {
+			UInt8 posList[25];
+			size_t posCount = 0;
+			UInt8 side = bf->getSide();
+			UInt8 y = 0;
+			while(y < 5)
+			{
+				UInt8 p = y * 5;
+				for(UInt8 x = 0; x < 5; ++ x, ++ p)
+				{
+					if(_objs[side][p] == NULL || _objs[side][p]->getHP() == 0)
+						posList[posCount ++] = p;
+				}
+				++ y;
+			}
+			if(posCount == 0)
+				break;
+			bf->addFlag(BattleFighter::Mirrored);
+			UInt8 pos = posList[_rnd(posCount)];
+            GObject::Fighter * fgt = globalFighters[5679];
+            if(fgt == NULL)
+                break;
+			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);
+			if(newf == NULL)
+				break;
+            newf->initStats(false);
+			newf->setSideAndPos(side, pos);
+			newf->addFlag(BattleFighter::IsMirror);
+			setObject(side, pos, newf);
+            
+            defList[i].pos = pos + 25;
+            defList[i].damType = e_Summon;
+            defList[i].damage = 5679;
+            defList[i].leftHP = newf->getHP();
+            ++defCount;
+
+			//FighterStatus fs(newf);
+			// insert fighter into queue by order
+			insertFighterStatus(newf);
+        }
+
+        setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, -1 * bf->getAura(), 0, scList, scCount, false);
+
+        appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
+
         return 0;
     }
 
@@ -2620,6 +2711,10 @@ UInt32 BattleSimulator::doAttack( int pos )
             break;
         }
 
+        // 雪人
+        if(bf->getId() == 5679)
+            break;
+
         int target_pos;
         int otherside = 1 - bf->getSide();
         UInt32 dmg = 0;
@@ -3612,7 +3707,7 @@ int BattleSimulator::testWinner2()
         }
     }
 
-    return leftHPAll[0] > leftHPAll[1];
+    return leftHPAll[0] > leftHPAll[1] ? 1 : 2;
 }
 
 void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount)

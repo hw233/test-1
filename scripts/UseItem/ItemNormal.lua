@@ -337,22 +337,19 @@ function ItemNormal_00000026(iid, num, bind, param)
 end
 
 function ItemNormal_00000401(iid, num, bind, param)
-  local player = GetPlayer()
-  local fgt = player:findFighter(param);
-  local package = player:GetPackage();
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
 
-  if fgt == nil then
-      return false
-  end
+    if fgt == nil then
+        return false
+    end
 
-  fgt:setBuffData(2, 0, true)
-  fgt:setBuffData(3, 0, true)
-  if ItemNormal_AddBuff(fgt, 1, 3600, num, 86400) then
-  	package:DelItemSendMsg(401, player);
-	return num;
-  else
-	return false;
-  end
+    if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
+        package:DelItemSendMsg(401, player);
+        return num;
+    end
+    return false
 end
 
 function ItemNormal_00000027(iid, num, bind, param)
@@ -970,7 +967,7 @@ function ItemNormal_00000402(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
-    local prob = {11, 22, 33, 44, 55, 67, 78, 90, 100,}    
+    local prob = {10, 20, 22, 32, 47, 57, 77, 99, 100,}
     local items = {{503,1}, {514,1}, {515,1}, {511,1}, {15,2}, {500,1}, {502,1}, {9,1}, {0,0},}
 
     local p = math.random(1, 100)
@@ -988,7 +985,9 @@ function ItemNormal_00000402(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+        if i <= 3 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+        end
     end
     package:DelItemSendMsg(402, player);
     return num
@@ -1000,7 +999,7 @@ function ItemNormal_00000403(iid, num, bind, param)
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
-    local prob = {11, 22, 33, 44, 55, 67, 78, 90, 100,}    
+    local prob = {10, 20, 22, 25, 40, 52, 72, 99, 100,}
     local items = {{506,1}, {508,1}, {509,1}, {507,1}, {15,2}, {30,1}, {502,1}, {9,1}, {0,0},}
 
     local p = math.random(1, 100)
@@ -1018,7 +1017,9 @@ function ItemNormal_00000403(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+        if i<= 4 then
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+        end
     end
     package:DelItemSendMsg(403, player);
     return num

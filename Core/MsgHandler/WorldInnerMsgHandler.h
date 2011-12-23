@@ -580,9 +580,14 @@ void OnAthleticsPayRet( GameMsgHdr& hdr,  const void* data)
 {
     MSG_QUERY_PLAYER(player);
 
-    const GObject::AthleticsPayPaging * msg = reinterpret_cast<const GObject::AthleticsPayPaging*>(data);
-    if(msg)
-     GObject::gAthleticsRank.AddPageNum(player, msg->moneyEnough == 1);
+    const GObject::AthleticsPay * msg = reinterpret_cast<const GObject::AthleticsPay*>(data);
+    if(msg == NULL)
+        return;
+
+    if(msg->type == GObject::AthleticsRank::AthleticsPayForPaging)
+         GObject::gAthleticsRank.AddPageNum(player, msg->moneyEnough == 1);
+    else if(msg->type == GObject::AthleticsRank::AthleticsPayForKillCD)
+        GObject::gAthleticsRank.KillCD(player, msg->moneyEnough == 1);
 
 }
 #endif // _WORLDINNERMSGHANDLER_H_

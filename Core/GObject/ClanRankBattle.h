@@ -91,7 +91,7 @@ namespace GObject
             PLAYER_WAIT = 1,     //等待
             PLAYER_BATTLE = 2,   //战斗中
             PLAYER_DEAD = 3,     //死亡
-            PLAYER_WIN = 4,      //连胜10场
+            PLAYER_WIN = 4,      //连胜8场
         };
 
     public:

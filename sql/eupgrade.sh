@@ -11,6 +11,7 @@ function eupgrade()
 {
     f=$1
     d=eupgrade
+    sed -i /stuff/d $f
     sed -i /isPack/d $f
     sed -i /ID/d $f
     sed -i /REF/d $f

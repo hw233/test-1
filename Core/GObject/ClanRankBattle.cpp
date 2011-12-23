@@ -13,7 +13,7 @@ namespace GObject
     //战斗准备时间
     const static UInt32 PREPARE_TIME = 5 * 60;
     //实际战斗时间
-    const static UInt32 BATTLE_TIME = 15 * 60;
+    const static UInt32 BATTLE_TIME = 7 * 60;
     //完整战斗时间
     const static UInt32 FULL_BATTLE_TIME = PREPARE_TIME + BATTLE_TIME;
     //每天战斗次数
@@ -224,8 +224,8 @@ namespace GObject
 
 
                 Stream battleStream(REP::CLAN_RANKBATTLE_REP);
-                battleStream << UInt8(m_Id);
                 battleStream << UInt8(10);
+                battleStream << UInt8(m_Id);
                 battleStream << UInt8(fightNum);
 
                 for(UInt32 i = 0; i < fightNum; ++i)
@@ -372,7 +372,7 @@ namespace GObject
             Clan* clan = player->getClan();
             if(clan != NULL) //增加帮贡献
             {
-                UInt32 proffer = player->GetClanBattleScore() * 10;
+                UInt32 proffer = player->GetClanBattleScore() * 5;
                 clan->addMemberProffer(player, proffer);
                 player->AddVar(VAR_CLANBATTLE_HONOUR, proffer);
             }
@@ -389,7 +389,7 @@ namespace GObject
             Clan* clan = player->getClan();
             if(clan != NULL) //增加帮贡献
             {
-                UInt32 proffer = player->GetClanBattleScore() * 10;
+                UInt32 proffer = player->GetClanBattleScore() * 5;
                 clan->addMemberProffer(player, proffer);
                 player->AddVar(VAR_CLANBATTLE_HONOUR, proffer);
             }
@@ -450,7 +450,7 @@ namespace GObject
                 continue;
             }
 
-            if(player->GetClanBattleWinTimes() == 10) //连胜10场了
+            if(player->GetClanBattleWinTimes() == 8) //连胜8场了
             {
                 player->SetClanBattleStatus(PLAYER_WIN);
                 m_StatusChanged[player->getId()] = PLAYER_WIN;
@@ -873,12 +873,14 @@ namespace GObject
         if(m_Clan1 != NULL && player->getClan() == m_Clan1->clan)
         {
             myClan = m_Clan1;
+            otherClan = m_Clan2;
             stream << ((m_Clan2 != NULL) ? m_Clan2->clan->getName() : "");
             stream << m_ClanScore1 << m_ClanScore2;
         }
         else if(m_Clan2 != NULL && player->getClan() == m_Clan2->clan)
         {
             myClan = m_Clan2;
+            otherClan = m_Clan1;
             stream << ((m_Clan1 != NULL) ? m_Clan1->clan->getName() : "");
             stream << m_ClanScore2 << m_ClanScore1;
         }

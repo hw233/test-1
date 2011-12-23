@@ -172,6 +172,7 @@ private:
         e_Res = 19,
         e_ResR = 20,
         e_Disperse = 21,
+        e_Summon = 22,
     };
 
 

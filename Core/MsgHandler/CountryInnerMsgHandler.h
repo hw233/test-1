@@ -969,11 +969,8 @@ void OnAddAwardGold(GameMsgHdr& hdr, const void * data)
 void OnCreateAward(GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
-    UInt16 qqlvl = *(UInt16*)data;
     player->GetPackage()->AddItem(18, 1, true);
     player->getCoupon(888);
-    player->setQQVipl(qqlvl&0xff);
-    player->setQQVipYear((qqlvl>>8)&0xff);
     dclogger.reg(player);
 }
 
@@ -1171,7 +1168,14 @@ void OnAwardAthleticsMartial( GameMsgHdr& hdr, const void* data )
 void OnAthlectisPayPaging( GameMsgHdr & hdr,  const void* data)
 {
     MSG_QUERY_PLAYER(player);
-    player->GetAthletics()->PayForPaging();
+
+    const GObject::AthleticsPay * co = reinterpret_cast<const GObject::AthleticsPay*>(data);
+
+    if(co->type == AthleticsRank::AthleticsPayForPaging)
+        player->GetAthletics()->PayForPaging(co->type);
+    else if(co->type == AthleticsRank::AthleticsPayForKillCD)
+        player->GetAthletics()->PayForKillCD(co->type);
+
 }
 
 void  OnDoAttainment(  GameMsgHdr& hdr, const void* data)

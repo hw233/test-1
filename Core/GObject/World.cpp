@@ -58,7 +58,7 @@ namespace GObject
 {
 UInt8 World::_wday = 0;
 UInt32 World::_moneyLogged = 0;
-MoneyIn World::_moneyIn[2] = {{0,},};
+MoneyIn World::_moneyIn[7][2] = {{{0,},{0,}},};
 int World::_activityStage = 0;
 bool World::_actAvailable = false;
 bool World::_actAvailable1 = false;
@@ -85,7 +85,7 @@ void World::World_testUpdate( World * world )
 
 void World::World_Leaderboard_Update( void * )
 {
-	leaderboard.update();
+	//leaderboard.update(); // XXX: 移到单独线程去处理
 }
 
 void World::World_ChatItem_Purge( void * )
@@ -365,7 +365,7 @@ bool World::Init()
     TimeUtil::GetNextMY(mon, &year);
     CreateNewDB(mon, year);
 	AddTimer(60 * 1000, World_testUpdate, this);
-	AddTimer(3600 * 1000, World_Leaderboard_Update);
+	//AddTimer(3600 * 1000, World_Leaderboard_Update);
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
 	AddTimer(5000, World_Multi_Check, this);
 

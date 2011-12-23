@@ -99,22 +99,17 @@ struct UserLoginStruct
 {
 	UInt64 _userid;
     UInt8 _level;
+    UInt8 _level1;
     UInt8 _isYear;
 	UInt32 _lang;
 	typedef Array<UInt8, 36> HashValType;
 	UInt8 _hashval[36];
 	std::string _server;
-#if _NEED_OPENID
     std::string _platform;
     std::string _openid;
     std::string _openkey;
-	MESSAGE_DEF9(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear, UInt32, _lang,
+	MESSAGE_DEF10(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
             HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey);
-#else
-	MESSAGE_DEF6(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _isYear,
-            UInt32, _lang, HashValType, _hashval, std::string, _server);
-#endif
-
 };
 
 struct NewUserStruct
@@ -122,16 +117,13 @@ struct NewUserStruct
 	std::string _name;
 	UInt8 _class;
     UInt8 _level;
+    UInt8 _level1;
     UInt8 _isYear;
-#if _NEED_OPENID
     std::string _platform;
     std::string _openid;
     std::string _openkey;
-	MESSAGE_DEF7(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear,
+	MESSAGE_DEF8(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
             std::string, _platform, std::string, _openid, std::string, _openkey);
-#else
-	MESSAGE_DEF4(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _isYear);
-#endif
 
 };
 
@@ -308,6 +300,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		{
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
+            player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
@@ -318,6 +311,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
+            player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
 			flag = 1;
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
@@ -520,11 +514,9 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 			Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 			cl->SetPlayer(pl);
 
-#ifdef _NEED_OPENID
             pl->setDomain(nu._platform);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
-#endif
 
             GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
 			CountryEnterStruct ces(false, 1, loc);
@@ -548,9 +540,11 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 				GameMsgHdr hdr(0x2F0, country, pl, sizeof(recharge));
 				GLOBAL().PushMsg(hdr, &recharge);
 			}
-            UInt16 qqlvl = nu._level | (nu._isYear << 8);
-            GameMsgHdr hdr(0x297, country, pl, sizeof(UInt16));
-            GLOBAL().PushMsg(hdr, &qqlvl);
+            pl->setQQVipl(nu._level);
+            pl->setQQVipl1(nu._level1);
+            pl->setQQVipYear(nu._isYear);
+            GameMsgHdr hdr(0x297, country, pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
 		}
 	}
 
@@ -1716,10 +1710,37 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     Stream st;
 	st.init(SPEP::GETMONEY,0x1);
+    UInt32 date = 0;
 
     CHKKEY();
-    st << GObject::World::_moneyIn[0].gold;
-    st << GObject::World::_moneyIn[1].gold;
+    br >> date;
+
+    UInt32 now = TimeUtil::Now();
+
+    int today[7] = {
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-6, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-5, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-4, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-3, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-2, now)),
+        TimeUtil::GetYYMMDD(TimeUtil::SharpDay(-1, now)),
+        TimeUtil::GetYYMMDD(now),
+    };  
+
+    bool found = false;
+    for (int i = 0; i < 7; ++i)
+    {
+        if (today[i] == (int)date)
+        {
+            st << GObject::World::_moneyIn[i][0].gold;
+            st << GObject::World::_moneyIn[i][1].gold;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+        st << static_cast<UInt32>(0) << static_cast<UInt32>(0);
 
     st << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);

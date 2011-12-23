@@ -1137,7 +1137,8 @@ void OnLeaderboardReq( GameMsgHdr& hdr, LeaderboardReq& lr )
 	Stream * st;
 	if(GObject::leaderboard.hasUpdate(lr._id) && GObject::leaderboard.getPacket(lr._type, st))
 	{
-		player->send(*st);
+        if (!GObject::leaderboard.isSorting())
+            player->send(*st);
 	}
 	else
 	{
@@ -1310,6 +1311,12 @@ void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
 {
      MSG_QUERY_PLAYER(player);
      GObject::gAthleticsRank.RequestPageNum(player);
+}
+
+void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
+{
+     MSG_QUERY_PLAYER(player);
+     GObject::gAthleticsRank.RequestKillCD(player);
 }
 void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
 {

@@ -537,7 +537,7 @@ void BattleFighter::initStats(bool checkEnh)
 				_flag |= 3;
 			else if(_fighter->getBuffData(FIGHTER_BUFF_ATTR2, now))
 				_flag |= 2;
-			else if(_fighter->getBuffData(FIGHTER_BUFF_ATTR1, now))
+			else if(_fighter->getBuffData(FIGHTER_BUFF_ATTR1, now) || _fighter->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
 				_flag |= 1;
 			_flag |= (_fighter->getOwner()->getBuffData(PLAYER_BUFF_HOLY, 0)) << 28;
 		}

@@ -203,11 +203,11 @@ void TeamCopy::reqTeamInfo(Player* pl)
         return;
     Stream st(REP::TEAM_COPY_REQ);
     st << static_cast<UInt8>(0x10);
-    st << td->id << td->leader->getId() << td->count;
+    st << td->id << td->leader->getId() << td->dnLevel << td->count;
 
     for(UInt8 idx = 0; idx < td->count; ++idx)
     {
-        st << td->members[idx]->getId() << td->members[idx]->getName();
+        st << td->members[idx]->getId() << td->members[idx]->getName() << td->status[idx];
         Fighter* mainfgt = td->members[idx]->getMainFighter();
         st << mainfgt->getLevel() << mainfgt->getColor() << static_cast<UInt16>(mainfgt->getId()) << td->members[idx]->getFormation();
         UInt8 pos = st.size();
@@ -254,6 +254,14 @@ UInt32 TeamCopy::createTeam(Player* pl, std::string pwd, UInt8 upLevel, UInt8 dn
     UInt8 copyId = ctp.copyId;
     UInt8 copyIdx = ctp.copyId - 1;
     UInt8 t = ctp.t;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+    if(cfg.GMCheck && buffLeft > now)
+    {
+        pl->sendMsgCode(0, 1407, buffLeft - now);
+        return 0;
+    }
 
     if(!checkTeamCopy(pl, copyId, t))
         return 0;
@@ -337,6 +345,14 @@ bool TeamCopy::quikJoinTeam(Player* pl)
     UInt8 copyIdx = ctp.copyId - 1;
     UInt8 t = ctp.t;
 
+    UInt32 now = TimeUtil::Now();
+    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+    if(cfg.GMCheck && buffLeft > now)
+    {
+        pl->sendMsgCode(0, 1407, buffLeft - now);
+        return 0;
+    }
+
     if(pl->getTeamData() != NULL)
         return false;
     if(!checkTeamCopy(pl, copyId, t))
@@ -371,6 +387,14 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
     UInt8 t = ctp.t;
+
+    UInt32 now = TimeUtil::Now();
+    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+    if(cfg.GMCheck && buffLeft > now)
+    {
+        pl->sendMsgCode(0, 1407, buffLeft - now);
+        return 0;
+    }
 
     if(pl->getTeamData() != NULL)
         return 0;
@@ -449,12 +473,15 @@ void TeamCopy::leaveTeam(Player* pl)
         {
             res = 1;
             td->members[i] = NULL;
+            td->status[i] = 0;
             UInt8 j = i+1;
             for(; j < td->count; ++j)
             {
                 td->members[j-1] = td->members[j];
+                td->status[j-1] = td->status[j];
             }
             td->members[j-1] = NULL;
+            td->status[j-1] = 0;
             --td->count;
             break;
         }
@@ -580,8 +607,11 @@ void TeamCopy::reQueueTeam(Player* pl, UInt8 idx0, UInt8 idx1)
 
     Player* ptmp = NULL;
     ptmp = td->members[idx1];
+    UInt8 tmpStatus = td->status[idx1];
     td->members[idx1] = td->members[idx0];
     td->members[idx0] = ptmp;
+    td->status[idx1] = td->status[idx0];
+    td->status[idx0] = tmpStatus;
 
     updateTeamInfo(pl);
 }
@@ -695,17 +725,8 @@ bool TeamCopy::leaveTeamCopy(Player* pl)
     return true;
 }
 
-void TeamCopy::teamBattleStart(Player* pl)
+void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
 {
-    UInt32 now = TimeUtil::Now();
-    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
-    if(cfg.GMCheck && buffLeft > now)
-    {
-        pl->sendMsgCode(0, 1407, buffLeft - now);
-        return;
-    }
-    pl->checkLastBattled();
-
     TeamData* td = pl->getTeamData();
     if(td == NULL)
         return;
@@ -717,8 +738,52 @@ void TeamCopy::teamBattleStart(Player* pl)
     if(!checkTeamCopy(pl, copyId, t))
         return;
 
-    if(td->leader != pl)
+    if(type == 1 || type == 2)
+    {
+        for(int i = 0; i < td->count; ++i)
+        {
+            if(td->members[i] == pl)
+            {
+                if(type == 1)
+                    td->status[i] = 1;
+                else
+                    td->status[i] = 0;
+                break;
+            }
+        }
+
+        for(int j = 0; j < td->count; ++j)
+        {
+            reqTeamInfo(td->members[j]);
+        }
         return;
+    }
+    else if(td->leader != pl)
+    {
+        return;
+    }
+    else
+    {
+        UInt32 now = TimeUtil::Now();
+        for(int i = 0; i < td->count; ++i)
+        {
+            if(td->status[i] != 1 && td->members[i] != pl)
+                return;
+
+            Player* member = td->members[i];
+            UInt32 buffLeft = member->getBuffData(PLAYER_BUFF_ATTACKING, now);
+            if(cfg.GMCheck && buffLeft > now)
+            {
+                member->sendMsgCode(0, 1407, buffLeft - now);
+                return;
+            }
+        }
+
+        for(int j = 0; j < td->count; ++j)
+        {
+            td->members[j]->checkLastBattled();
+        }
+    }
 
     Player* member = td->members[0];
     if(!member)
@@ -843,6 +908,7 @@ void TeamCopy::teamBattleStart(Player* pl)
         }
     }
 
+    UInt32 now = TimeUtil::Now();
     for(UInt8 i = td->count; i > 0; --i)
     {
         Player* pl = td->members[i-1];
@@ -858,9 +924,9 @@ void TeamCopy::teamBattleStart(Player* pl)
 
         if(res != 1)
             pl->checkDeath();
-    }
 
-    pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+        pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+    }
 }
 
 void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid)

@@ -242,7 +242,7 @@ namespace REQ
     /**英雄岛*/
     const UInt8 HERO_ISLAND         = 0x97;
     /**设置密码*/
-    const UInt8 OP_PWD              = 0xCA;
+    const UInt8 OP_PWD              = 0xCD;
     /***/
     const UInt8 PWD_QUESTION        = 0xCB;
     /***/
@@ -260,6 +260,8 @@ namespace REQ
 
     /**斗剑翻页*/
     const UInt8 ATHLETICS_PAGING    = 0xC9;
+    /**斗剑去CD*/
+    const UInt8 ATHLETICS_KILLCD    = 0xCA;
     /**???*/
     const UInt8 ATTACK_BLOCKBOSS    = 0xD6;
     /**修炼地信息*/
@@ -486,7 +488,7 @@ namespace REP
     const UInt8 TRADE_OPERATE       = 0x84;// 0xC4
     const UInt8 SALE_LIST           = 0x85;// 0xC5
     const UInt8 SALE_SELL           = 0x86;// 0xC6
-    const UInt8 OP_PWD              = 0xCA;
+    const UInt8 OP_PWD              = 0xCD;
     const UInt8 SECOND_PWD          = 0xCB;
     const UInt8 PWD_DAILOG          = 0xCC;
     const UInt8 PWD_LOCK            = 0xCE;
