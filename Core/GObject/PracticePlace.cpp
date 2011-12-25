@@ -53,6 +53,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         }
 
         PracticeData* p = getPracticeData(pl);
+        // TODO:
+#if 0
         if (place != PPLACE_MAX && p && p->cdend > TimeUtil::Now())
         {
             st << static_cast<UInt8>(1) << Stream::eos;
@@ -60,6 +62,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pl->sendMsgCode(0, 2200, p->cdend - TimeUtil::Now());
             return false;
         }
+#endif
 
         PPlace& data = m_places[place-1].place;
         Player* owner = globalPlayers[data.ownerid];
@@ -718,11 +721,14 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             return false;
 
         PracticeData* p = getPracticeData(pl);
+        // TODO:
+#if 0
         if (p && p->cdend > TimeUtil::Now())
         {
             pl->sendMsgCode(0, 2200, p->cdend - TimeUtil::Now());
             return false;
         }
+#endif
         
         Stream st(REP::PRACTICE_ROB);
         Player* def = 0;
