@@ -11,10 +11,10 @@ if [ $? -eq 1 ]; then
     echo "do removing..."
 else
     echo "Cancelled!!!"
-    exit
+    return
 fi
 
-mysql -h$H -u$U -p$P -P$PT $DBO -e "select f.playerId from player as p, fighter as f where p.lastOnline <= unix_timestamp(\"$ONLINE\") and p.gold = 0 and p.totalRecharge = 0 and p.id = f.playerId and f.level < $LVL group by f.playerId order by f.level desc;" > $IDS
+#mysql -h$H -u$U -p$P -P$PT $DBO -e "select f.playerId from player as p, fighter as f where p.lastOnline <= unix_timestamp(\"$ONLINE\") and p.gold = 0 and p.totalRecharge = 0 and p.id = f.playerId and f.level < $LVL group by f.playerId order by f.level desc;" > $IDS
 
 awk '{ system(". dorm.sh " $1); }' $IDS
 
