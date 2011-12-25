@@ -1244,8 +1244,12 @@ void Clan::sendInfo( Player * player )
     Player* watchman = globalPlayers[_watchman];
     PlayerData& pd = player->getPlayerData();
 
+    UInt8 place = PPLACE_MAX;
+    practicePlace.getPlaceData(owner, place);
+
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
-        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT) << static_cast<UInt32>(getConstruction()) << getClanFunds() << member->proffer
+        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT) << static_cast<UInt32>(getConstruction())
+        << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
         << _contact << _announce << _purpose;
 #if 0
@@ -2735,7 +2739,7 @@ void Clan::sendPracticePlaceInfo(Player* pl)
     Stream st(REP::CLAN_BUILD);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
         << static_cast<UInt8>(pd->place.slotmoney) << static_cast<UInt8>(pd->place.protmoney) << pd->place.slotincoming << pd->place.protincoming
-        << pd->place.enemyCount - pd->place.winCount << pd->place.winCount << place;
+        << pd->place.enemyCount - pd->place.winCount << pd->place.winCount;
 
     st << Stream::eos;
     pl->send(st);
@@ -2758,7 +2762,7 @@ void Clan::broadcastPracticePlaceInfo()
     Stream st(REP::CLAN_BUILD);
     st << static_cast<UInt8>(0) << static_cast<UInt8>(pd->place.maxslot) << static_cast<UInt8>(pd->used) << static_cast<UInt16>(price)
         << static_cast<UInt8>(pd->place.slotmoney) << static_cast<UInt8>(pd->place.protmoney) << pd->place.slotincoming << pd->place.protincoming
-        << pd->place.winCount << pd->place.enemyCount - pd->place.winCount << place;
+        << pd->place.winCount << pd->place.enemyCount - pd->place.winCount;
 
     st << Stream::eos;
     broadcast(st);

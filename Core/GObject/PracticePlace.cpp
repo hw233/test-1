@@ -52,9 +52,9 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             }
         }
 
-        PracticeData* p = getPracticeData(pl);
         // TODO:
 #if 0
+        PracticeData* p = getPracticeData(pl);
         if (place != PPLACE_MAX && p && p->cdend > TimeUtil::Now())
         {
             st << static_cast<UInt8>(1) << Stream::eos;
@@ -720,9 +720,9 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         if(NULL == owner)
             return false;
 
-        PracticeData* p = getPracticeData(pl);
         // TODO:
 #if 0
+        PracticeData* p = getPracticeData(pl);
         if (p && p->cdend > TimeUtil::Now())
         {
             pl->sendMsgCode(0, 2200, p->cdend - TimeUtil::Now());
@@ -1093,8 +1093,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         if (!place || place >= PPLACE_MAX)
             return;
 
-        std::map<UInt64, PracticeData*>::iterator i = m_pradata.begin(), e = m_pradata.end();
-        while (i != e)
+        for (std::map<UInt64, PracticeData*>::iterator i = m_pradata.begin(), e = m_pradata.end(); i != e; ++i)
         {
             if (i->second && i->second->place == place)
             {
@@ -1103,7 +1102,6 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                 if (pl)
                     pl->setPracticingPlaceSlot(PPLACE_MAX << 16);
             }
-            ++i;
         }
 
         m_places[place-1].reset();
@@ -1149,12 +1147,11 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
         Player* oldpl = globalPlayers[getPlaceOwnerId(place)];
         if (oldpl)
-        { // 易主
+        { // 易主易帮
             PlaceData& pd = m_places[place-1];
             GObject::Clan* oldclan = oldpl->getClan();
-            if(oldclan != clan) // 易主易帮
+            if(oldclan != clan) // 易帮
             {
-                moveAllToMax(place);
                 for (UInt8 i = 0; i < PPLACE_MAX - 1; ++i) // 原有帮移走
                 {
                     PlaceData& pd = m_places[i];
@@ -1163,6 +1160,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                         moveAllToMax(i+1);
                     }
                 }
+                moveAllToMax(place);
 
                 pd.place.openslot = 0;
                 UInt8 techslot = clan->getPracticeSlot();
@@ -1310,7 +1308,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             m_places[idx].place.protincoming = 0;
         }
     }
-
-
 } // namespace GObject
+
+/* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

@@ -6991,6 +6991,15 @@ namespace GObject
             ConsumeInfo ci(InstantPracticeAcc,0,0);
             useGold(pfexp->goldUse,&ci);
 
+            for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
+            {
+                Fighter* fgt = findFighter(pfexp->fids[i]);
+                if(fgt && pfexp->counts[i])
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                }
+            }
+
             UInt32 now = TimeUtil::Now();
             UInt32 duration = 60*60;
             UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
@@ -7008,13 +7017,15 @@ namespace GObject
                 setBuffData(PLAYER_BUFF_PROTECT, 0);
             }
         }
-
-        for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
+        else
         {
-            Fighter* fgt = findFighter(pfexp->fids[i]);
-            if(fgt && pfexp->counts[i])
+            for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
             {
-                fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                Fighter* fgt = findFighter(pfexp->fids[i]);
+                if(fgt && pfexp->counts[i])
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                }
             }
         }
     }
