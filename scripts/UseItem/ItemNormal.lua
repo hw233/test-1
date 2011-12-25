@@ -525,7 +525,7 @@ function ItemNormal_00000409(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(409, player);
-        package:AddItem(1526, 2, 1, 0, 2);
+        package:AddEquipN(1526, 2, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -555,7 +555,7 @@ function ItemNormal_00000410(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(410, player);
-        package:AddItem(1526, 3, 1, 0, 2);
+        package:AddEquipN(1526, 3, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -585,7 +585,7 @@ function ItemNormal_00000411(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(411, player);
-        package:AddItem(1526, 4, 1, 0, 2);
+        package:AddEquipN(1526, 4, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -615,7 +615,7 @@ function ItemNormal_00000412(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(412, player);
-        package:AddItem(1526, 6, 1, 0, 2);
+        package:AddEquipN(1526, 6, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end

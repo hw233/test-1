@@ -1820,7 +1820,7 @@ namespace GObject
 
             bool operator()(ClanMember* member)
             {
-                member->player->GetMailBox()->newMail(member->player, 0x41, m_Title, m_Content, m_Score, true, m_pInfo);
+                member->player->GetMailBox()->newMail(NULL, 0x41, m_Title, m_Content, m_Score, true, m_pInfo);
                 return true;
             }
 
@@ -1871,6 +1871,7 @@ namespace GObject
             iter != m_ClanRanking.end();++iter)
         {
             Clan* clan = *iter;
+            ++ranking;
 
             if (idx < PPLACE_MAX)
             {
@@ -1890,7 +1891,7 @@ namespace GObject
 
                 bool operator()(ClanMember* member)
                 {
-                    member->player->GetMailBox()->newMail(member->player, 0x42, m_Title, m_Content, m_Score, true, m_pInfo);
+                    member->player->GetMailBox()->newMail(NULL, 0x42, m_Title, m_Content, m_Score, true, m_pInfo);
                     return true;
                 }
 
