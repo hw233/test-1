@@ -269,6 +269,7 @@ namespace Script
 		CLASS_DEF(Package, Add);
 		CLASS_DEF(Package, AddItem);
 		CLASS_DEF(Package, AddEquip);
+        CLASS_DEF(Package, AddEquipN);
 		CLASS_DEF(Package, SetItem);
 		CLASS_DEF(Package, DelItemAll);
 		CLASS_DEF(Package, DelItem);
