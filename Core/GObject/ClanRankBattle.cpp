@@ -172,11 +172,14 @@ namespace GObject
                 iter != team1.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
+
+            GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
+             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
 
         m_WaitPlayers.clear();

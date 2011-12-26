@@ -369,10 +369,6 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             else
                 m1 = 0;
         }
-        else if( i == AtyClanWar)
-        {
-            m1 = 0;//暂时屏蔽掉
-        }
         else
             m1 = static_cast<UInt8>(GameAction()->GetAtyCheckFlag(i));
 
