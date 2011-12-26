@@ -53,12 +53,6 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, cons
     for(int i = 0; i < 2; ++i)
     {
         _teams[i] = 0;
-        _team_name[i][0] = "";
-        _team_name[i][1] = "";
-        _team_level[i][0] = 0;
-        _team_level[i][1] = 0;
-        _team_portrait[i][0] = 0;
-        _team_portrait[i][1] = 0;
     }
     InitAttainRecord();
 }
@@ -78,12 +72,6 @@ BattleSimulator::BattleSimulator(UInt32 location, GObject::Player * player, GObj
     for(int i = 0; i < 2; ++i)
     {
         _teams[i] = 0;
-        _team_name[i][0] = "";
-        _team_name[i][1] = "";
-        _team_level[i][0] = 0;
-        _team_level[i][1] = 0;
-        _team_portrait[i][0] = 0;
-        _team_portrait[i][1] = 0;
     }
     InitAttainRecord();
 }
@@ -110,9 +98,9 @@ void BattleSimulator::putTeams(const std::string& name, UInt8 level, UInt16 port
     if(idx > 1)
         return;
     ++_teams[side];
-    _team_name[side][idx] = name;
-    _team_level[side][idx] = level;
-    _team_portrait[side][idx] = portrait;
+    _team_name[side].push_back(name);
+    _team_level[side].push_back(level);
+    _team_portrait[side].push_back(portrait);
 }
 
 UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
@@ -137,6 +125,20 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
 
     if(!isLast)
     {
+        for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
+        {
+            std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
+            size_t c = fgtlist.size();
+            for(size_t i = 0; i < c; ++ i)
+            {
+                if(fgtlist[i]->getSide() == side)
+                {
+                    fgtlist.erase(fgtlist.begin() + i);
+                    -- c;
+                }
+            }
+        }
+
         for(int i = 0; i < 25; ++ i)
         {
             if(_objs[side][i] && !_isBody[side][i])
@@ -148,11 +150,9 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
     }
 
     _teams[side] = 0;
-    _team_name[side][0] = "";
-    _team_name[side][1] = "";
-    _team_level[side][0] = 0;
-    _team_level[side][1] = 0;
-    _team_portrait[side][0] = 0;
+    _team_name[side].clear();
+    _team_level[side].clear();
+    _team_portrait[side].clear();
 
     return oldID;
 }
