@@ -298,16 +298,17 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		UInt8 flag = 0;
 		if(res == 0)
 		{
+            TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
             player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
-            TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u", ul._openid.c_str(), ul._userid, pid, hdr.sessionID);
 		}
 		else if(res == 4)
 		{
+            TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
             GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
             player->setQQVipl(ul._level);
@@ -317,7 +318,6 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 			GameMsgHdr imh(0x201, player->getThreadId(), player, 1);
 			GLOBAL().PushMsg(imh, &flag);
 			res = 0;
-            TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u", ul._openid.c_str(), ul._userid, pid, hdr.sessionID);
 		}
 
         cl->SetStatus(Network::GameClient::NORMAL);

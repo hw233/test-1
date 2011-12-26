@@ -274,8 +274,6 @@ void HeroIsland::calcNext(UInt32 now)
                 _prepareTime = TimeUtil::SharpDayT(1,now) + 11 * 60 * 60 + 45 * 60;
             else if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
                 _prepareTime = TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60;
-            else
-                _prepareTime += 24 * 60 * 60;
         }
         else
         {

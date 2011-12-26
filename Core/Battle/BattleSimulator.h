@@ -106,6 +106,19 @@ private:
 	};
 	struct DefStatus
 	{
+        DefStatus()
+        {
+            pos = 0;
+            damType = 0;
+            damType2 = 0;
+            damage = 0;
+            leftHP = 0;
+            rhp = 0;
+            rLeftHP = 0;
+            counterDmg = 0;
+            counterLeft = 0;
+        }
+
 		UInt8 pos;
 		UInt8 damType;
 		UInt8 damType2;
@@ -118,6 +131,14 @@ private:
 	};
 	struct StatusChange
 	{
+        StatusChange()
+        {
+            pos = 0;
+            statusId = 0;
+            type = 0;
+            data = 0;
+        }
+
 		UInt8 pos;
 		UInt16 statusId;
 		UInt8 type;
@@ -231,9 +252,9 @@ private:
 	UInt8 _other_level;
 
     UInt8 _teams[2];
-	std::string _team_name[2][2];
-	UInt8 _team_level[2][2];
-	UInt16 _team_portrait[2][2];
+    std::vector<std::string> _team_name[2];
+    std::vector<UInt8> _team_level[2];
+    std::vector<UInt16> _team_portrait[2];
 
 	URandom _rnd;
 
