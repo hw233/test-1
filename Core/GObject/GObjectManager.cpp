@@ -2548,7 +2548,7 @@ namespace GObject
         DBClanItemHistory cih;
         if(execu->Prepare("SELECT `id`, `clanid`, `type`, `time`, `playerid`, `itemstr` FROM `clan_item_history` ORDER BY `clanid`,`time`", cih) != DB::DB_OK)
             return false;
-        lastId == 0xFFFFFFFF;
+        lastId = 0xFFFFFFFF;
         clan = NULL;
         lc.reset(1000);
         while(execu->Next() == DB::DB_OK)
