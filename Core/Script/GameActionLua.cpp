@@ -586,6 +586,21 @@ namespace Script
         return Run<Table>(NULL, "getClanBattleBuffs");
     }
 
+    Table GameActionLua::GetClanBattleDailyRewards()
+    {
+        return Run<Table>(NULL, "getClanBattleDailyRewards");
+    }
+
+    Table GameActionLua::GetClanBattleWeekSortRewards()
+    {
+        return Run<Table>(NULL, "getClanBattleWeekSortRewards");
+    }
+
+    Table GameActionLua::GetClanBattleWeekScoreRewards()
+    {
+        return Run<Table>(NULL, "getClanBattleWeekScoreRewards");
+    }
+
 
 	bool GameActionLua::MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum)
 	{

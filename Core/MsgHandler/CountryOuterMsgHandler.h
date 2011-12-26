@@ -3456,16 +3456,6 @@ void OnClanRankBattleReqInit(GameMsgHdr& hdr,const void* data)
                 ClanRankBattleMgr::Instance().Signout(player);
             }
             break;
-        case 3: //请求奖励信息
-            {
-                ClanRankBattleMgr::Instance().SendRewards(player);
-            }
-            break;
-        case 4: //领取奖励
-            {
-                ClanRankBattleMgr::Instance().GetRewards(player);
-            }
-            break;
         default:
             break;
     }
@@ -3526,6 +3516,13 @@ void OnClanRankBattleReq(GameMsgHdr& hdr, const void* data)
         case 6: //出战顺序按等级排序
             {
                 ClanRankBattleMgr::Instance().SortClanPlayers(player);
+            }
+            break;
+        case 7: //请求战报
+            {
+                UInt8 fightId = 0;
+                brd >> fightId;
+                ClanRankBattleMgr::Instance().SendBattleReport(player, fightId);
             }
             break;
         default:

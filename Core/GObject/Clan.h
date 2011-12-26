@@ -365,6 +365,11 @@ public:
     UInt32 GetBattleScore() const { return m_BattleScore; }
     void LoadBattleScore(UInt32 score){ m_BattleScore = score;}
 
+    void SetDailyBattleScore(UInt32 score);
+    UInt32 GetDailyBattleScore() const { return m_DailyBattleScore; }
+    void LoadDailyBattleScore(UInt32 score) { m_DailyBattleScore = score; }
+
+
     /**
      *@brief 帮会战排名相关
      */
@@ -379,7 +384,6 @@ public:
      *@brief 广播帮会战相关数据
      */
     void BroadcastBattleData(UInt32 now);
-
 
 
     /**
@@ -550,6 +554,7 @@ private:
 	UInt32 _proffer;
 
     UInt32 m_BattleScore;   //战斗积分
+    UInt32 m_DailyBattleScore;  //每日战斗积分
     UInt32 m_LastBattleRanking; //上周战斗名次
     UInt32 m_BattleRanking;  //本周战斗名次
 

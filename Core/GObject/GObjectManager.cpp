@@ -2378,7 +2378,7 @@ namespace GObject
         // ??????Ϣ
 		LoadingCounter lc("Loading clans:");
 		DBClan cl;
-		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `battleRanking` FROM `clan`", cl) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `rank`, `level`, `funds`, `foundTime`, `founder`, `leader`, `watchman`, `construction`, `contact`, `announce`, `purpose`, `proffer`, `grabAchieve`, `battleTime`, `nextBattleTime`, `allyClan`, `enemyClan1`, `enemyClan2`, `battleThisDay`, `battleStatus`, `southEdurance`, `northEdurance`, `hallEdurance`, `hasBattle`, `battleScore`, `dailyBattleScore` `battleRanking` FROM `clan`", cl) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		Clan * clan = NULL;

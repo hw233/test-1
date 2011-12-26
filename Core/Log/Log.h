@@ -95,6 +95,7 @@ enum MailItemType
     CountryBattleAward,
 	SaleSell,
     AutoFrontMap,
+    ClanBattleAward,
 };
 enum ItemFrom
 {

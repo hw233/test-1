@@ -1051,6 +1051,7 @@ CREATE TABLE `clan` (
   `hallEdurance` smallint(5) unsigned NOT NULL DEFAULT '30',
   `hasBattle` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `battleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会排名战分数',
+  `dailyBattleScore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '帮会战日积分',
   `battleRanking` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '上周帮会战排名', 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1234,7 +1235,7 @@ CREATE TABLE `clan_item` (
   `playerid` bigint(20) unsigned NOT NULL,
   `itemid` int(10) unsigned NOT NULL,
   `itemnum` int(10) unsigned DEFAULT 0,
-  PRIMARY KEY(`clanid`, `playerid`, `itemid`)
+  PRIMARY KEY(`playerid`, `itemid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `clan_item_history`;

@@ -9,7 +9,7 @@
 #include "Common/TimeUtil.h"
 #include "Common/Singleton.h"
 #include "GData/AttrExtra.h"
-
+#include "Mail.h"
 
 namespace GObject
 {
@@ -61,6 +61,11 @@ namespace GObject
         PlayerMap  players;
     };
 
+    /**
+     *@brief 帮会战奖励
+     */
+    typedef MailPackage::MailItem ClanBattleReward;
+
     
     /**
      *@brief 帮会战技能
@@ -80,11 +85,30 @@ namespace GObject
 
 
     /**
+     *@brief 帮会战战报信息
+     */
+    struct ClanRankBattleReport
+    {
+        ClanRankBattleReport():result(0), reportid(0){}
+
+        //战斗结果 1为玩家1胜  2为玩家2胜
+        UInt8 result;
+        //玩家1
+        std::string player1;
+        //玩家2
+        std::string player2;
+        //战报id
+        UInt32 reportid;
+    };
+
+
+    /**
      *@brief 帮会排名战役
      */
     class ClanRankBattleField
     {
         typedef std::vector<Player*> PlayerVec;
+        typedef std::vector<ClanRankBattleReport> ReportVec;
 
         enum PlayerBattleStatus
         {
@@ -113,36 +137,43 @@ namespace GObject
          *@brief 判断是否结束
          */
         bool IsEnd() const { return m_bEnd; }
-
+        /**
+         *@brief 结算 
+         */
+        void End(UInt32 extScore1, UInt32 extScore2);
         /**
          *@brief 战役结束后获取胜利方
          */
         UInt32 GetWinner() const { return m_Winner; }
-
         /**
          *@brief 玩家退出
          */
         bool OnPlayerLeave(Player* player);
-   
         /**
          *@brief 获取一个帮会玩家数
          */
         UInt32 GetPlayerNum(UInt32 clan);
-
         /**
-         *@brief 获取帮会贡献
+         *@brief 重置
          */
-        void End(UInt32 extScore1, UInt32 extScore2);
-
+        void Reset();
+        /**
+         *@brief 获取连胜玩家数
+         */
+        UInt32 GetWinStateNum() const;
+        
 
         void FillPlayers(Stream& stream, UInt32 clan);
         void FillPlayer(Stream& stream, Player* player);
         void NotifyPlayerLeave(Player* player);
         void Broadcast(UInt32 clan, Stream& stream);
+        void Broadcast(Stream& stream);
+        void SendBattleReport(Player* player);
 
     private:
         void ResetPlayerStatus(UInt32 clan);
         void ResetPlayerData(Player* player);
+        void GetReportsData(Stream& stream);
 
     private:
         //id
@@ -160,6 +191,16 @@ namespace GObject
         //状态改变
         std::map<UInt64, UInt32>  m_StatusChanged;
 
+        //战报时间
+        UInt32 m_ReportTime;
+        //本次战报
+        ReportVec m_Reports;
+
+        //最后连胜方
+        UInt32 m_LastWinClan;
+
+        //当前时间
+        UInt32 m_Now;
         //开始时间
         UInt32 m_StartTime;
         //轮次
@@ -201,7 +242,7 @@ namespace GObject
          */
         void Start(UInt32 now);
         void End();
-        void Clear();
+        void Reset();
         bool IsEnd() const { return m_bEnd; }
 
         /**
@@ -225,22 +266,20 @@ namespace GObject
          */
         void SendBattleStatus(Player* player);
         void SendBattleInfo(Player* player);
+        void SendBattleReport(Player* player, UInt8 fightId);
         void BroadcastStatus();
         void BroadcastScores(UInt8 fightId, UInt32 winner, UInt32 extScore = 0);
 
         /**
          *@brief 广播
          */
-        void Broadcast(Stream& stream, bool bAll = false)
-        {
-            if(m_Clan1 != NULL) m_Clan1->Broadcast(stream, bAll);
-            if(m_Clan2 != NULL) m_Clan2->Broadcast(stream, bAll);
-        }
+        void Broadcast(Stream& stream, bool bAll = false);
 
         /**
          *@brief 广播给战斗中玩家
          */
         void BroadcastBattle(UInt32 clan, Stream& stream);
+        void BroadcastBattle(Stream& stream);
 
     private:
         /**
@@ -268,6 +307,8 @@ namespace GObject
         UInt32 m_ClanScore2;
         //战役
         ClanRankBattleField m_Fields[RANK_BATTLE_FIELD_NUM];
+        //最终胜利方
+        UInt32 m_Winner;
     };
 
      
@@ -282,6 +323,9 @@ namespace GObject
         typedef std::vector<Clan*> ClanVec;
         typedef std::vector<Player*> PlayerVec;
         typedef std::set<Player*> PlayerSet;
+
+        typedef std::vector<ClanBattleReward> RewardVec;
+        typedef std::map<UInt32, RewardVec> RewardsMap;
 
         /**
          *@brief 战斗状态
@@ -333,11 +377,6 @@ namespace GObject
         void AdjustPlayerPos(Player* player, Player* member, UInt32 field, UInt32 pos);
 
         /**
-         *@brief 领取奖励
-         */
-        void GetRewards(Player* player);
-
-        /**
          *@brief 使用技能
          */
         void UseSkill(Player* player, UInt32 id);
@@ -352,7 +391,28 @@ namespace GObject
         void SendPlayerList(Player* player);
         void SendBattleInfo(Player* player);
         void SendSkillList(Player* player);
-        void SendRewards(Player* player);
+        void SendBattleReport(Player* player, UInt8 fightId);
+
+        /**
+         *@brief 奖励相关
+         */
+        void GiveDailyRewards();
+        void GiveWeeklyRewards();
+        void GiveClanRewards(Clan* clan, RewardVec& rewards);
+
+        /**
+         *@brief 创建邮件消息内容
+         */
+        void MakeDailyMailInfo(UInt32 score, Stream& st);
+        void MakeWeeklyMailInfo(UInt32 score, Stream& st);
+        void MakeMailInfo(Stream& st, RewardVec& rewards);
+
+        /**
+         *@brief 添加道具
+         */
+        bool AddDailyMailItems(Player* player, UInt32 score);
+        bool AddWeeklyMailItems(Player* player, UInt32 score);
+        bool AddMailItems(Player* player, RewardVec& rewards);
 
     private:
         void ProcessInit(bool bWeekChange);
@@ -418,6 +478,15 @@ namespace GObject
 
         //帮派技能
         ClanBattleSkill m_Skills[RANK_BATTLE_SKILL_NUM + 1];
+
+        //每日个人奖励
+        RewardsMap  m_DailyRewards;
+        //每周个人奖励
+        RewardsMap  m_WeeklyRewards;
+        //每周帮会积分奖励
+        RewardsMap  m_WeeklyClanRewards;
+        //每周帮会排名奖励
+        RewardsMap  m_WeeklyClanSortRewards;
     };
 }
 

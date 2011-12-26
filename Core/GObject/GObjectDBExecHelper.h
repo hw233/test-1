@@ -381,6 +381,7 @@ struct DBClan
 	UInt8  hallEdurance;
 	UInt8  hasBattle;
     UInt32 battleScore;
+    UInt32 dailyBattleScore;
     UInt32 battleRanking;
 };
 
@@ -1216,7 +1217,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(28)
+SPECIALDEF(29)
 (
 	UInt32, id,
 	std::string, name,
@@ -1245,6 +1246,7 @@ SPECIALDEF(28)
 	UInt8,  hallEdurance,
 	UInt8,  hasBattle,
     UInt32, battleScore,
+    UInt32, dailyBattleScore,
     UInt32, battleRanking
 )
 SPECIALEND()

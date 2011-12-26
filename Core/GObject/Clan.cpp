@@ -142,7 +142,7 @@ UInt32 ClanItemPkg::AddItem(UInt16 id, UInt32 num)
     if(iter != m_Items.end())
     {
         iter->second += num;
-        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
+        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
                 ,iter->second, m_ClanId, m_PlayerId, id);
     }
     else
@@ -189,12 +189,12 @@ void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
 
     if(iter->second == 0)
     {
-        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'", m_ClanId, m_PlayerId, id);
+        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'", m_ClanId, m_PlayerId, id);
         m_Items.erase(iter);
     }
     else
     {
-        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
+        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
                 ,iter->second, m_ClanId, m_PlayerId, id);
     }
 }
@@ -266,6 +266,7 @@ Clan::Clan( UInt32 id, const std::string& name, UInt32 ft, UInt8 lvl ) :
 	_clanBattle = new ClanCityBattle(this);
 
     m_BattleScore = 0;
+    m_DailyBattleScore = 0;
     m_BattleRanking = 0;
     m_LastBattleRanking = 0;
 }
@@ -503,6 +504,7 @@ bool Clan::kick(Player * player, UInt64 pid)
         return false;
 
     ClanRankBattleMgr::Instance().Signout(kicker);
+    player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
 
 	getAllocBack(*member);
 
@@ -539,7 +541,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 
 	// updateRank();
 	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", pid);
-	DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid` = %"I64_FMT"u", _id, pid);
+	DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %"I64_FMT"u", _id, pid);
 
 	SYSMSGV(title, 229, _name.c_str());
 	SYSMSGV(content, 230, _name.c_str());
@@ -598,6 +600,7 @@ bool Clan::leave(Player * player)
     }
     
     ClanRankBattleMgr::Instance().Signout(player);
+    player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
 
 	_members.erase(found);
 	delete member;
@@ -3305,6 +3308,14 @@ void Clan::SetBattleScore(UInt32 score)
 
     m_BattleScore = score;
     DB5().PushUpdateData("UPDATE `clan` SET `battleScore`=%u WHERE `id`=%u", m_BattleScore, getId());
+}
+
+void Clan::SetDailyBattleScore(UInt32 score)
+{
+    if(m_DailyBattleScore == score) return;
+
+    m_DailyBattleScore = score;
+    DB5().PushUpdateData("UPDATE `clan` SET `dailyBattleScore`=%u WHERE `id`=%u", m_DailyBattleScore, getId());
 }
 
 void Clan::SetLastBattleRanking(UInt32 ranking)

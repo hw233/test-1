@@ -20,6 +20,8 @@
 #include "Country.h"
 #include "Script/lua_tinker.h"
 #include <mysql.h>
+#include "ClanRankBattle.h"
+
 
 #ifdef _WIN32
 #pragma comment(lib, "libmysql.lib")
@@ -539,6 +541,20 @@ void MailBox::readMail( UInt32 id )
 				st.data<UInt16>(off) = num;
 			}
 			break;
+        case 0x41://clanbattle daily
+            {
+                st << static_cast<UInt8>(1);
+				st << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0);
+                ClanRankBattleMgr::Instance().MakeDailyMailInfo(mail->additional, st);
+            }
+            break;
+        case 0x42://clanbattle weekly
+            {
+                st << static_cast<UInt8>(1);
+				st << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0) << static_cast<UInt32>(0);
+                ClanRankBattleMgr::Instance().MakeWeeklyMailInfo(mail->additional, st);
+            }
+            break;
 		default://ÓÊ¼þÃ»ÓÐÎïÆ·
 			{
 				st << static_cast<UInt8>(0);	
@@ -677,6 +693,24 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 			}
 		}
 		break;
+    case 0x41:
+        {
+            if(ClanRankBattleMgr::Instance().AddDailyMailItems(_owner, mail->additional))
+            {
+                delIt = true;
+				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+            }
+        }
+        break;
+    case 0x42:
+        {
+            if(ClanRankBattleMgr::Instance().AddWeeklyMailItems(_owner, mail->additional))
+            {
+                delIt = true;
+				DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+            }
+        }
+        break;
 	case 0x22:
 		{
 			Player * p = GObject::globalNamedPlayers[_owner->fixName(mail->sender)];

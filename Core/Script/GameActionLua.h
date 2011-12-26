@@ -155,6 +155,9 @@ namespace Script
 		Table RunDayTaskAccept(Player* player, UInt32 taskId, UInt32 npcId);
 
         Table GetClanBattleBuffs();
+        Table GetClanBattleDailyRewards();
+        Table GetClanBattleWeekSortRewards();
+        Table GetClanBattleWeekScoreRewards();
 
 		bool  MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum = 1);
 
