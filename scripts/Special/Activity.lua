@@ -833,18 +833,12 @@ function onChristmas(player)
         return
     end
 
-    if lvl >= 30 then
-        if player:GetVar(7) == 1 then
-            return
-        end
+    if lvl >= 30 and player:GetVar(7) == 0 then
         sendItemPackageMail(player, "圣诞节活动奖励", "恭喜您获得法宝【雪人】\n 2011年12月23日-2012年1月3日登陆并且等级达到30级玩家，即可获得法宝【雪人】 ", {1637,1,1});
         player:SetVar(7,1)
     end
 
-    if lvl >= 40 then
-        if player:GetVar(8) == 1 then
-            return
-        end
+    if lvl >= 40 and player:GetVar(8) == 0 then
         sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞萌萌靴】\n 2011年12月23日-2012年1月3日登陆并且等级达到40级玩家，即可获得节日套装奖励【圣诞萌萌靴】 ", {1752,1,1});
         player:SetVar(8,1)
     end

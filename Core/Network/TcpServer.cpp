@@ -240,6 +240,7 @@ void TcpSlaveServer::_remove( int id )
 
 void TcpSlaveServer::broadcast( const void * buf, int len )
 {
+    Mutex::ScopedLock lk(_mutex);
 	for(_ConduitList::iterator it = _conduits.begin(); it != _conduits.end(); ++ it)
 	{
 		if((*it).get() != NULL && (*it)->active())
