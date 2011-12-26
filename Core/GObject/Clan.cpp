@@ -142,8 +142,8 @@ UInt32 ClanItemPkg::AddItem(UInt16 id, UInt32 num)
     if(iter != m_Items.end())
     {
         iter->second += num;
-        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
-                ,iter->second, m_ClanId, m_PlayerId, id);
+        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
+                ,iter->second, m_ClanId,  m_PlayerId, id);
     }
     else
     {
@@ -189,13 +189,13 @@ void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
 
     if(iter->second == 0)
     {
-        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'", m_ClanId, m_PlayerId, id);
+        DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'",m_ClanId,  m_PlayerId, id);
         m_Items.erase(iter);
     }
     else
     {
         DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
-                ,iter->second, m_ClanId, m_PlayerId, id);
+                ,iter->second, m_PlayerId, id);
     }
 }
 
@@ -237,7 +237,7 @@ void ClanItemPkg::GetItems(Player* player)
 
     player->getClan()->AddItemHistory(ClanItemHistory::ALLOCATED, TimeUtil::Now(), player->getId(), itemstream.str());
 
-    DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid`='%"I64_FMT"u'", m_PlayerId);
+    DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u'", m_ClanId, m_PlayerId);
     
     m_Items.clear();
     m_Grid = 0;
@@ -541,7 +541,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 
 	// updateRank();
 	DB5().PushUpdateData("DELETE FROM `clan_player` WHERE `playerId` = %"I64_FMT"u", pid);
-	DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %"I64_FMT"u", _id, pid);
+	DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `playerid` = %"I64_FMT"u", pid);
 
 	SYSMSGV(title, 229, _name.c_str());
 	SYSMSGV(content, 230, _name.c_str());

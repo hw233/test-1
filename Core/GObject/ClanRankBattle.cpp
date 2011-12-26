@@ -13,13 +13,13 @@ namespace GObject
 {        
     
     //战斗准备时间
-    const static UInt32 PREPARE_TIME = 2 * 60;
+    const static UInt32 PREPARE_TIME = 5 * 60;
     //实际战斗时间
-    const static UInt32 BATTLE_TIME = 4 * 60;
+    const static UInt32 BATTLE_TIME = 7 * 60;
     //完整战斗时间
     const static UInt32 FULL_BATTLE_TIME = PREPARE_TIME + BATTLE_TIME;
     //每天战斗次数
-    const static UInt32 BATTLE_NUM_PER_DAY = 7;
+    const static UInt32 BATTLE_NUM_PER_DAY = 5;
 
 
     //每个战场的分数
@@ -1031,8 +1031,8 @@ namespace GObject
     void ClanRankBattleMgr::Init()
     {
         m_Now = TimeUtil::Now();
-        //m_StartTime = TimeUtil::SharpDayT(0, m_Now) + RANK_BATTLE_SIGNUP_BEGINTIME;
-        m_StartTime = m_Now - m_Now % ( 2 * 60 * 60 );
+        m_StartTime = TimeUtil::SharpDayT(0, m_Now) + RANK_BATTLE_SIGNUP_BEGINTIME;
+        //m_StartTime = m_Now - m_Now % ( 2 * 60 * 60 );
       
         if(m_Now < m_StartTime) //还没开始
         {
@@ -1055,8 +1055,8 @@ namespace GObject
         else
         {
             m_State = STATE_INIT;
-            //m_StartTime = m_StartTime + 24 * 60 * 60; //第二天战斗开始时间
-            m_StartTime = m_StartTime + 2 * 60 * 60;
+            m_StartTime = m_StartTime + 24 * 60 * 60; //第二天战斗开始时间
+            //m_StartTime = m_StartTime + 2 * 60 * 60;
         }
 
         //获取帮派排行
@@ -2131,8 +2131,8 @@ namespace GObject
             if(++m_BattleNo > BATTLE_NUM_PER_DAY) //今天的比赛结束了
             {
                 //第二天战斗开始时间
-                //m_StartTime = m_StartTime + 24 * 60 * 60;
-                m_StartTime = m_StartTime + 2 * 60 * 60;
+                m_StartTime = m_StartTime + 24 * 60 * 60;
+                //m_StartTime = m_StartTime + 2 * 60 * 60;
                 m_State = STATE_INIT;
                 SyncState();
    

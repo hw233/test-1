@@ -388,7 +388,7 @@ function ItemNormal_00000405(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(29, 5, 1);
     
-    local prob = {50, 50}
+    local prob = {50, 100}
     local items = {{55,1}, {510,1}}
 
     local p = math.random(1, 100)
@@ -418,8 +418,8 @@ function ItemNormal_00000406(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(29, 10, 1);
 
-    local prob = {25, 25, 25, 25}
-    local items = {{9,1}, {15,1}, {55,1}, {510,1}}
+    local prob = {50, 100}
+    local items = {{9,1}, {15,1}}
 
     local p = math.random(1, 100)
     local i = 1
@@ -448,8 +448,8 @@ function ItemNormal_00000407(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(29, 15, 1);
 
-    local prob = {25, 25, 25, 25}
-    local items = {{56,1}, {57,1}, {9,1}, {15,1}}
+    local prob = {50, 100}
+    local items = {{56,1}, {57,1}}
 
     local p = math.random(1, 100)
     local i = 1
@@ -478,8 +478,8 @@ function ItemNormal_00000408(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(29, 20, 1);
 
-    local prob = {25, 25, 25, 25}
-    local items = {{503,1}, {500,1}, {56,1}, {57,1}}
+    local prob = {50, 100}
+    local items = {{503,1}, {500,1}}
 
     local p = math.random(1, 100)
     local i = 1
@@ -508,7 +508,7 @@ function ItemNormal_00000409(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(1526, 2, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{55,1}, {510,1}, {502,1}}
 
     local p = math.random(1, 100)
@@ -538,7 +538,7 @@ function ItemNormal_00000410(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(1526, 3, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{56,1}, {511,1}, {15,1}}
 
     local p = math.random(1, 100)
@@ -568,7 +568,7 @@ function ItemNormal_00000411(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(1526, 4, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{503,1}, {514,1}, {512,1}}
 
     local p = math.random(1, 100)
@@ -598,7 +598,7 @@ function ItemNormal_00000412(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
 
     local p = math.random(1, 100)
@@ -628,7 +628,7 @@ function ItemNormal_00000413(id, num, bind, param)
     local package = player:GetPackage();
     --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
 
     local p = math.random(1, 100)
@@ -659,7 +659,7 @@ function ItemNormal_00000414(id, num, bind, param)
     local package = player:GetPackage();
     --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
 
     local p = math.random(1, 100)
@@ -690,7 +690,7 @@ function ItemNormal_00000415(id, num, bind, param)
     local package = player:GetPackage();
     --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
 
     local p = math.random(1, 100)
@@ -721,7 +721,7 @@ function ItemNormal_00000416(id, num, bind, param)
     local package = player:GetPackage();
     --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
 
-    local prob = {33, 33, 34}
+    local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
 
     local p = math.random(1, 100)

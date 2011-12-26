@@ -1235,7 +1235,7 @@ CREATE TABLE `clan_item` (
   `playerid` bigint(20) unsigned NOT NULL,
   `itemid` int(10) unsigned NOT NULL,
   `itemnum` int(10) unsigned DEFAULT 0,
-  PRIMARY KEY(`playerid`, `itemid`)
+  PRIMARY KEY(`clanid`,`playerid`, `itemid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `clan_item_history`;
