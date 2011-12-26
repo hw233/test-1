@@ -98,6 +98,17 @@ void SysMsgItem::getva( char * str, ... )
 	str[1023] = 0;
 }
 
+void SysMsgItem::getva(std::string& str, ...)
+{
+    char cstr[1024];
+    va_list ap;
+    va_start(ap, str);
+    vsnprintf(cstr, 1023, _msgBody.c_str(), ap);
+    va_end(ap);
+    cstr[1023] = 0;
+    str.append(cstr);
+}
+
 void SysMsgItem::getvap( Stream * st, ... )
 {
 	int size = 256;

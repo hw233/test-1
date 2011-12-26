@@ -12,6 +12,7 @@
 #include "Log/Log.h"
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
+#include "ClanRankBattle.h"
 
 namespace GObject
 {
@@ -40,6 +41,11 @@ void Country::Hero_Island_Check(void *)
     heroIsland.process(TimeUtil::Now());
 }
 
+void Country::ClanRankBattleCheck(void *)
+{
+    ClanRankBattleMgr::Instance().Process(TimeUtil::Now());
+}
+
 bool Country::Init()
 {
 	//GameActionLua
@@ -52,9 +58,11 @@ bool Country::Init()
 		UInt32 now = TimeUtil::Now();
 		bossManager.getNextBoss();
 		bossManager.process(now);
+        ClanRankBattleMgr::Instance().Init();
 		AddTimer(30000, Country_Boss_Check);
 		AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
+        AddTimer(1000, ClanRankBattleCheck);
 	}
 
 	return true;
@@ -71,7 +79,12 @@ bool shutdown_enum(Player * pl, UInt8 tid)
 
 void Country::UnInit()
 {
-	//发送登出信息给所有在线玩家
+    if(TID() == WORKER_THREAD_NEUTRAL)
+    {
+        ClanRankBattleMgr::Instance().UnInit();
+    }
+
+	//???偷浅???息??????????????
 	globalPlayers.enumerate(shutdown_enum, m_ThreadID);
 
 	SAFE_DELETE(m_GameActionLua);
@@ -96,7 +109,10 @@ void Country::PlayerEnter(Player * pl, bool notify)
 		{
 			Map * map = pl->GetMap();
 			if(map != NULL)
+            {
 				map->PlayerEnter(pl, true);
+                ClanRankBattleMgr::Instance().PlayerEnter(pl);
+            }
 		}
 	}
 }

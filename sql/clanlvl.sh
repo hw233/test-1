@@ -16,6 +16,8 @@ function clanlvl()
     sed -i /lvl/d $f
     sed -i /REF/d $f
     sed -i /construction/d $f
+    sed -i /pkgsize/d $f
+    sed -i /weal/d $f
     sed -i /^$/d $f
     sed -i s/\"//g $f
     export lines=`wc -l $f | awk '{print $1}'`
@@ -24,7 +26,7 @@ function clanlvl()
         BEGIN {
             print "INSERT INTO `clan_lvl` VALUES";
         } {
-            printf("(%d,%s)",$1,$2);
+            printf("(%d,%d,%d,%d)",$1,$2,$3,$4);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

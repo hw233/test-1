@@ -380,6 +380,9 @@ struct DBClan
 	UInt8  northEdurance;
 	UInt8  hallEdurance;
 	UInt8  hasBattle;
+    UInt32 battleScore;
+    UInt32 dailyBattleScore;
+    UInt32 battleRanking;
 };
 
 struct DBClanRepo
@@ -401,6 +404,26 @@ struct DBClanPlayer
 	UInt16 petFriendness[4];
 	UInt16 favorCount[4];
 	UInt32 lastFavorTime[4];
+    UInt32 signupRankBattleTime;
+    UInt32 rankBattleField;
+};
+
+struct DBClanItem
+{
+    UInt32 clanid;
+    UInt64 playerid;
+    UInt32 itemid;
+    UInt32 itemnum;
+};
+
+struct DBClanItemHistory
+{
+    UInt32 id;
+    UInt32 clanid;
+    UInt8  type;
+    UInt32 time;
+    UInt64 playerid;
+    std::string itemstr;
 };
 
 struct DBClanTech
@@ -1194,7 +1217,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBClan)
-SPECIALDEF(26)
+SPECIALDEF(29)
 (
 	UInt32, id,
 	std::string, name,
@@ -1221,7 +1244,10 @@ SPECIALDEF(26)
 	UInt8,  southEdurance,
 	UInt8,  northEdurance,
 	UInt8,  hallEdurance,
-	UInt8,  hasBattle
+	UInt8,  hasBattle,
+    UInt32, battleScore,
+    UInt32, dailyBattleScore,
+    UInt32, battleRanking
 )
 SPECIALEND()
 
@@ -1249,7 +1275,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBClanPlayer)
-SPECIALDEF(19)
+SPECIALDEF(21)
 (
 	UInt32, id,
 	UInt64, playerId,
@@ -1269,7 +1295,31 @@ SPECIALDEF(19)
 	UInt32, lastFavorTime[0],
 	UInt32, lastFavorTime[1],
 	UInt32, lastFavorTime[2],
-	UInt32, lastFavorTime[3]
+	UInt32, lastFavorTime[3],
+    UInt32, signupRankBattleTime,
+    UInt32, rankBattleField
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanItem)
+SPECIALDEF(4)
+(
+    UInt32, clanid,
+    UInt64, playerid,
+    UInt32, itemid,
+    UInt32, itemnum
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBClanItemHistory)
+SPECIALDEF(6)
+(
+    UInt32, id,
+    UInt32, clanid,
+    UInt8,  type,
+    UInt32, time,
+    UInt64, playerid,
+    std::string, itemstr
 )
 SPECIALEND()
 

@@ -42,6 +42,7 @@
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 #include "DCLogger.h"
+#include "ClanRankBattle.h"
 #include "TeamCopy.h"
 #include "HoneyFall.h"
 
@@ -556,6 +557,11 @@ namespace GObject
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
         _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_hasTripod(false)
 	{
+        m_ClanBattleStatus = 1;
+        m_ClanBattleScore = 0;
+        m_ClanBattleWinTimes = 0;
+        m_ClanBattleSkillFlag = 0;
+
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
 		m_TaskMgr = new TaskMgr(this);
@@ -601,6 +607,8 @@ namespace GObject
 		{
 			globalCountryBattle.addAutoCB(this);
 		}
+        
+        ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		setBlockBossByLevel();
 		return true;
@@ -2183,6 +2191,7 @@ namespace GObject
 		bsim.start();
 		bool res = bsim.getWinner() == 1;
 
+            
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
         if (report & 0x01)
@@ -2226,9 +2235,9 @@ namespace GObject
 
 		if(applyhp)
 		{
-			if(bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling), 0))
+			if(bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling | ClanRankBattle), 0))
 				checkHPLoss();
-			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling), 0))
+			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling | ClanRankBattle), 0))
 				other->checkHPLoss();
 		}
 		else if(sysRegen > 0 && !noreghp)
@@ -3843,6 +3852,7 @@ namespace GObject
 
 		cancelAutoBattle();
 		cancelAutoDungeon();
+
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
@@ -3850,6 +3860,7 @@ namespace GObject
             heroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        ClanRankBattleMgr::Instance().PlayerLeave(this);
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
@@ -3901,6 +3912,8 @@ namespace GObject
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
+
+        ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		if(inCity)
 		{
@@ -4975,7 +4988,7 @@ namespace GObject
 
 	void Player::autoRegenAll()
 	{
-		if(hasFlag(CountryBattle | ClanBattling))
+		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
 			return;
 		UInt32 autohp = getBuffData(0);
 		if(autohp == 0)
@@ -6423,7 +6436,7 @@ namespace GObject
 			bf->setAttrExtra(1, bf->getClass(), _bossLevel);
 		}
 		bsim.start();
-		bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling));
+		bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling | ClanRankBattle));
 		for(size_t i = 0; i < size; ++ i)
 		{
 			SAFE_DELETE(fgt_clone[i]);

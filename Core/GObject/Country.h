@@ -43,7 +43,7 @@ public:
 	}
 
 public:
-	bool PlayerMapSwitch(UInt8 index, UInt32 playerId);		//玩家跨国家切换处理
+	bool PlayerMapSwitch(UInt8 index, UInt32 playerId);		//???铱??????谢?????
 	void MergePendingPlayerList();
 	void PlayerEnter(Player * pl, bool = true);
 	void PlayerLeave(Player * pl);
@@ -62,9 +62,10 @@ private:
 	static void Country_Boss_Check(void *);
 	static void Country_Battle_Check(void *);
     static void Hero_Island_Check(void *);
+    static void ClanRankBattleCheck(void *);
 
 private:
-	UInt8		m_ThreadID;					//所属线程
+	UInt8		m_ThreadID;					//?????叱?
 
 	std::vector<Map *>	m_MapManager;
 	

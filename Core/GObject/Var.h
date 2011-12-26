@@ -5,16 +5,16 @@
 
 namespace GObject
 {
-    //????????
+    //变量周期类型
     enum CycleType
     {
-        CYCLE_NONE =    0,  //?????ڣ?????????
-        CYCLE_MIN =     1,  //?Է?Ϊ????
-        CYCLE_HOUR =    2,  //??СʱΪ????
-        CYCLE_DAY =     3,   //????Ϊ????
-        CYCLE_WEEK =    4,  //????Ȼ??Ϊ???ڣ???һ??ʼ??????Ϊһ??
-        CYCLE_MONTH =   5, //????Ȼ??Ϊ????
-        CYCLE_YEAR =    6,  //????Ϊ????
+        CYCLE_NONE =    0,  //无周期
+        CYCLE_MIN =     1,  //分
+        CYCLE_HOUR =    2,  //时
+        CYCLE_DAY =     3,  //日
+        CYCLE_WEEK =    4,  //周
+        CYCLE_MONTH =   5,  //月
+        CYCLE_YEAR =    6,  //年
         
         CYCLE_MAX,
     };
@@ -64,7 +64,11 @@ namespace GObject
         VAR_YELLOW_EQUIP_NUM = 37,
         VAR_YELLOW_THRUMP_NUM= 38,
 
-        VAR_AWARD_3366,
+        VAR_AWARD_3366 = 39,
+        
+        VAR_CLANBATTLE_HONOUR = 40, //帮派战今日贡献
+        VAR_CLAN_WEAL = 41,         //今日领取的福利数
+
         VAR_MAX,
     };
 
@@ -74,7 +78,7 @@ namespace GObject
 
 
     /** 
-     *@brief ??��ϵͳ
+     *@brief 变量系统
      */
     class VarSystem
     {
@@ -86,7 +90,7 @@ namespace GObject
 
         static void Init()
         {
-            //?ڴ?ʹ??REGISTER_VARע????��
+            //注册变量
             REGISTER_VAR(VAR_SINGLE_CHOPSTICKS, CYCLE_YEAR)
             REGISTER_VAR(VAR_SENGYI, CYCLE_NONE);
             REGISTER_VAR(VAR_APRON, CYCLE_NONE);
@@ -109,6 +113,7 @@ namespace GObject
             REGISTER_VAR(VAR_FAIL_ENCH, CYCLE_NONE);
             REGISTER_VAR(VAR_SPLIT_EQUIP, CYCLE_NONE);
             REGISTER_VAR(VAR_SPLIT_THRUMP, CYCLE_NONE);
+
             REGISTER_VAR(VAR_BATTLE_MISS, CYCLE_NONE);
             REGISTER_VAR(VAR_BATTLE_CS, CYCLE_NONE);
             REGISTER_VAR(VAR_BATTLE_PR, CYCLE_NONE);
@@ -125,7 +130,11 @@ namespace GObject
             REGISTER_VAR(VAR_PURPLE_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_EQUIP_NUM, CYCLE_NONE);
             REGISTER_VAR(VAR_YELLOW_THRUMP_NUM, CYCLE_NONE);
+            
             REGISTER_VAR(VAR_AWARD_3366, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
@@ -140,7 +149,7 @@ namespace GObject
         void UpdateDB(UInt32 id);
 
     private:
-        //????id
+        //玩家
         UInt64 m_PlayerID;
         UInt32 m_Vars[VAR_MAX];
         UInt32 m_OverTime[VAR_MAX];
