@@ -704,6 +704,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			{
 				player->delFlag(Player::AutoDungeon);
 				DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+                player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
                 return;
 			}
             won = doChallenge(player, it->second, false, NULL);
@@ -716,6 +717,7 @@ void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(2) << exp << Stream::eos;
 			player->send(st);
 			DB3().PushUpdateData("DELETE FROM `dungeon_auto` WHERE `playerId` = %"I64_FMT"u", player->getId());
+            player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
             return;
 		}
 	}
