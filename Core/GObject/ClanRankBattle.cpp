@@ -1922,7 +1922,7 @@ namespace GObject
                 {
                     std::string content2;
                     if(msg2 != NULL) msg2->getva(content2, ranking);
-                    SendTextMailVisitor visitor(title1, content2);
+                    SendTextMailVisitor visitor(title2, content2);
                     clan->VisitMembers(visitor);
                     
                     GiveClanRewards(clan, iter->second);
