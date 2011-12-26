@@ -12,7 +12,7 @@ local checkFlag = {
     [9] = 1,--AtyHeroIsland,//英雄岛
     [10] = 7,-- AtyBoss,      //世界BOSS
     [11] = 1,-- AtyCountryWar,//阵营战
-    [12] = 3, -- AtyClanWar,   //帮派战
+    [12] = 5, -- AtyClanWar,   //帮派战
     [13] = 24,-- AtyAthletics, //斗剑
 }
 --增加的活跃度
@@ -53,17 +53,17 @@ local rewardNeedPoint = {
 }
 --一天活跃度的最大值
 local maxActivity = {
-    [0] = 107,
-    [1] = 115,
-    [2] = 125,
-    [3] = 135,
-    [4] = 153,
-    [5] = 153,
-    [6] = 163,
-    [7] = 163,
-    [8] = 165,
-    [9] = 165,
-    [10] = 165,
+    [0] = 109,
+    [1] = 117,
+    [2] = 127,
+    [3] = 137,
+    [4] = 155,
+    [5] = 155,
+    [6] = 165,
+    [7] = 165,
+    [8] = 167,
+    [9] = 167,
+    [10] = 167,
 }
 
 --上线奖励
@@ -110,9 +110,8 @@ function GetMaxActivity(vip)
     local ap = maxActivity [vip]
     if ap == nil then
 
-        return 165;
+        return 167;
     else
-        ap = ap - 3;
         return ap;
     end
 end
