@@ -169,6 +169,8 @@ private:
         e_stMagRes,
         e_stCriticalDmg,
         e_stHitRate,
+        e_stAtkReduce,
+        e_stMagAtkReduce,
     };
 
     enum StateType
@@ -194,6 +196,8 @@ private:
         e_ResR = 20,
         e_Disperse = 21,
         e_Summon = 22,
+        e_Weak = 23,
+        e_UnWeak = 24,
     };
 
 

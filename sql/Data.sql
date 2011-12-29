@@ -471,6 +471,8 @@ CREATE TABLE `skill_effect` (
   `pierce` float(10,4) NOT NULL DEFAULT '0.0000',
   `counter` float(10,4) NOT NULL DEFAULT '0.0000',
   `magres` float(10,4) NOT NULL DEFAULT '0.0000',
+  `atkreduce` float(10,4) NOT NULL DEFAULT '0.0000',
+  `magatkreduce` float(10,4) NOT NULL DEFAULT '0.0000',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

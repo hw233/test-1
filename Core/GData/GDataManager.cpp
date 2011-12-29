@@ -972,7 +972,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBSkillEffect effs;
-		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres` FROM `skill_effect`", effs) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `state`, `immune`, `disperse`, `damage`, `adddam`, `magdam`, `addmag`, `crrdam`, `addcrr`, `hp`, `addhp`, `absorb`, `thorn`, `inj2hp`, `aura`, `atk`, `def`, `magatk`, `magdef`, `tough`, `action`, `hitrate`, `evade`, `critical`, `pierce`, `counter`, `magres`, `atkreduce`, `magatkreduce` FROM `skill_effect`", effs) != DB::DB_OK)
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
@@ -1005,6 +1005,8 @@ namespace GData
             ef->pierce = effs.pierce;
             ef->counter = effs.counter;
             ef->magres = effs.magres;
+            ef->atkreduce = effs.atkreduce;
+            ef->magatkreduce = effs.magatkreduce;
             skillEffectManager.add(ef);
         }
         return true;

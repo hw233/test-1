@@ -89,6 +89,8 @@ struct SkillEffect : public ObjectBaseNT<UInt16>
     float pierce;
     float counter;
     float magres;
+    float atkreduce;
+    float magatkreduce;
 };
 
 struct SkillBase : public ObjectBaseT<UInt16>

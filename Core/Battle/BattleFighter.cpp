@@ -16,19 +16,21 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	BattleObject(BattleObject::Char, side, pos),
 	_strength(0), _agility(0), _physique(0), _intelligence(0), _will(0), _soul(0), _aura(0), _auraMax(0), _tough(0),
 	_attack(0), _magatk(0), _defend(0), _magdef(0), _hitrate(0), _evade(0), _critical(0), _criticaldmg(0), _pierce(0), _counter(0), _magres(0),
+    _atkreduce(0), _magatkreduce(0),
 	_maxhp(f->getMaxHP()), _maxAction(0),
 	_attackAdd(0), _magAtkAdd(0), _defAdd(0), _magDefAdd(0), _hitrateAdd(0), _evadeAdd(0), _criticalAdd(0), _criticalDmgAdd(0),
     _pierceAdd(0), _counterAdd(0), _magResAdd(0), _toughAdd(0),
 	_maxhpAdd(0), _maxActionAdd(0),
     _atkAdd_last(0), _magAtkAdd_last(0), _defAdd_last(0), _magDefAdd_last(0), _hitrateAdd_last(0), _evadeAdd_last(0),
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
-    _maxhpAdd_last(0), _maxActionAdd_last(0), _formEffect(NULL), _formula(bf),
+    _maxhpAdd_last(0), _maxActionAdd_last(0), _atkreduce_last(0), _magatkreduce_last(0), _formEffect(NULL), _formula(bf),
     _forgetLevel(0), _forgetRound(0), _flag(0), _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
-     _confuseRound(0), _confuseLevel(0), _immuneLevel(0), _immune(0), _immuneRound(0),
+     _confuseRound(0), _confuseLevel(0), _weakRound(0), _weakLevel(0), _immuneLevel(0), _immune(0), _immuneRound(0),
     _evade100(0), _evade100_cd(0), _evade100_last(0), _evade100_base_cd(0), _evade100_base_last(0),
     _defend100(0), _defend100_cd(0), _defend100_last(0), _defend100_base_cd(0), _defend100_base_last(0),
 	_attackAdd2(0), _magAtkAdd2(0), _defAdd2(0), _magDefAdd2(0), _hitrateAdd2(0), _evadeAdd2(0),
     _criticalAdd2(0), _criticalDmgAdd2(0), _pierceAdd2(0), _counterAdd2(0), _magResAdd2(0), _toughAdd2(0),
+    _atkreduce2(0), _magatkreduce2(0),
 	_maxhpAdd2(0), _maxActionAdd2(0)
 {
 	setFighter(f);
@@ -553,6 +555,9 @@ void BattleFighter::initStats(bool checkEnh)
 
 UInt32 BattleFighter::regenHP( UInt32 u )
 {
+    if(_weakRound > 0)
+        u /= 2;
+
 	UInt32 oldhp = _hp;
 	if(oldhp >= _maxhp)
 	{

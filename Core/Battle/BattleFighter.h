@@ -155,6 +155,9 @@ public:
 	inline UInt32 getMaxHPAdd() {return _maxhpAdd;}
 	inline UInt32 getActionAdd() {return _maxActionAdd;}
     inline float getToughAdd() { return _toughAdd;}
+    inline float getAtkReduce() { return _atkreduce + _atkreduce2; }
+    inline float getMagAtkReduce() { return _magatkreduce + _magatkreduce2; }
+
 	inline void setAttackAdd(float v, UInt16 last = 0) {_attackAdd = v; _atkAdd_last = last;}
 	inline void setMagAttackAdd(float v, UInt16 last = 0) {_magAtkAdd = v; _magAtkAdd_last = last;}
 	inline void setDefendAdd(float v, UInt16 last = 0) {_defAdd = v; _defAdd_last = last;}
@@ -171,6 +174,8 @@ public:
     inline void AddAura(Int32 v) {_aura += v; if(_aura > _auraMax) _aura = _auraMax; else if(_aura < 0) _aura = 0;}
     inline void setAura(UInt32 v) {_aura = v > _auraMax ? _auraMax : v;}
     inline void setToughAdd(float v, UInt16 last) {_toughAdd = v; _toughAdd_last = last;}
+    inline void setAtkReduce(float v, UInt16 last) { _atkreduce = v; _atkreduce_last = last; }
+    inline void setMagAtkReduce(float v, UInt16 last) { _magatkreduce = v; _magatkreduce_last = last; }
 
 	inline UInt8& getAttackAddLast() {return _atkAdd_last;}
     inline UInt8& getMagAttackAddLast() {return _magAtkAdd_last;}
@@ -186,6 +191,8 @@ public:
 	inline UInt8& getMaxHPAddLast() {return _maxhpAdd_last;}
 	inline UInt8& getActionAddLast() {return _maxActionAdd_last;}
     inline UInt8& getToughAddLast() { return _toughAdd_last;}
+    inline UInt8& getAtkReduceLast() { return _atkreduce_last;}
+    inline UInt8& getMagAtkReduceLast() { return _magatkreduce_last;}
 
 	inline UInt32 getLostHP() { UInt32 mhp = _maxhp + _maxhpAdd; if(mhp > _hp) return mhp - _hp; return 0; }
 
@@ -239,6 +246,11 @@ public:
 	inline void setConfuseLevel(UInt32 l) { _confuseLevel = l; }
     inline UInt32 getConfuseRound() { return _confuseRound; }
     inline void setConfuseRound(UInt32 r) { _confuseRound = r; }
+
+	inline UInt32 getWeakLevel() { return _weakLevel; }
+	inline void setWeakLevel(UInt32 l) { _weakLevel = l; }
+    inline UInt32 getWeakRound() { return _weakRound; }
+    inline void setWeakRound(UInt32 r) { _weakRound = r; }
 
     const GData::SkillBase* getActiveSkill(bool need_therapy = false);
     const GData::SkillBase* getPassiveSkillPrvAtk100(size_t& idx);
@@ -333,6 +345,9 @@ public:
 	inline UInt32 getMaxHPAdd2() {return _maxhpAdd2;}
 	inline UInt32 getActionAdd2() {return _maxActionAdd2;}
     inline float getToughAdd2() { return _toughAdd2;}
+    inline float getAtkReduce2() { return _atkreduce2; }
+    inline float getMagAtkReduce2() { return _magatkreduce2; }
+
 	inline void setAttackAdd2(float v) {_attackAdd2 = v;}
 	inline void setMagAttackAdd2(float v) {_magAtkAdd2 = v;}
 	inline void setDefendAdd2(float v) {_defAdd2 = v;}
@@ -347,6 +362,8 @@ public:
 	inline void setMaxHPAdd2(UInt32 v) {_maxhpAdd = v;}
 	inline void setActionAdd2(UInt32 v) {_maxActionAdd2 = v;}
     inline void setToughAdd2(float v) {_toughAdd2 = v;}
+    inline void setAtkReduce2(float v) { _atkreduce2 = v; }
+    inline void setMagAtkReduce2(float v) { _magatkreduce2 = v; }
 
 
 private:
@@ -357,6 +374,7 @@ private:
 	float _strength, _agility, _physique, _intelligence, _will, _soul, _aura, _auraMax, _tough;
 	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
     float _critical, _criticaldmg, _pierce, _counter, _magres;
+    float _atkreduce, _magatkreduce;
 	UInt32 _maxhp, _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
@@ -364,6 +382,7 @@ private:
     UInt8 _atkAdd_last, _magAtkAdd_last, _defAdd_last, _magDefAdd_last, _hitrateAdd_last, _evadeAdd_last;
     UInt8 _criticalAdd_last, _criticalDmgAdd_last, _pierceAdd_last, _counterAdd_last, _magResAdd_last, _toughAdd_last;
     UInt8 _maxhpAdd_last, _maxActionAdd_last;
+    UInt8 _atkreduce_last, _magatkreduce_last;
 	const GData::Formation::GridEffect * _formEffect;
 	Script::BattleFormula * _formula;
     UInt8 _forgetLevel, _forgetRound;
@@ -425,6 +444,7 @@ private:
     UInt8 _defend100_base_last;
 	float _attackAdd2, _magAtkAdd2, _defAdd2, _magDefAdd2, _hitrateAdd2, _evadeAdd2;
     float _criticalAdd2, _criticalDmgAdd2, _pierceAdd2, _counterAdd2, _magResAdd2, _toughAdd2;
+    float _atkreduce2, _magatkreduce2;
 	UInt32 _maxhpAdd2, _maxActionAdd2;
 
 public:
