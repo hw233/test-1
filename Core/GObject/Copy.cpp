@@ -320,10 +320,6 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                     st << static_cast<UInt8>(size/2);
                     for (UInt8 i = 1; i < rsize*2+1; i += 2)
                         st << loot[i] << static_cast<UInt8>(loot[i+1]);
-
-                    for (UInt8 i = rsize*2+1; i < size; i += 2) {
-                        // TODO: MAIL
-                    }
                 } else {
                     st << static_cast<UInt8>(3) << id << tcd.floor << tcd.spot << static_cast<UInt8>(0);
                 }

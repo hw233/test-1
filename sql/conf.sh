@@ -13,7 +13,7 @@ IFS=/
 
 function selectAction()
 {
-echo -e "Update !!!!!!!!!!>>>>>> $1 <<<<<<!!!!!!!!!!"
+echo -e "!!!!!!!!!!>>>>>> $1 <<<<<<!!!!!!!!!!"
 select selected in $OPTIONS;do
     case $selected in
         Yes)

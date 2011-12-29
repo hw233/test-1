@@ -267,7 +267,7 @@ namespace GObject
         void SendBattleStatus(Player* player);
         void SendBattleInfo(Player* player);
         void SendBattleReport(Player* player, UInt8 fightId);
-        void BroadcastStatus();
+        void BroadcastStatus(ClanRankBattleInfo* clan);
         void BroadcastScores(UInt8 fightId, UInt32 winner, UInt32 extScore = 0);
 
         /**
@@ -439,7 +439,7 @@ namespace GObject
         /**
          *@brief 获取可以参加帮会战的帮派
          */
-        void GetCanBattleClans(bool bNotify = true);
+        void GetCanBattleClans(bool bBegin = true);
 
         /**
          *@brief 给帮会排名

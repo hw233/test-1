@@ -87,6 +87,8 @@ Athletics_Blue_Equip_Level_70 = {
     2304, 2305, 2306, 2307, 2308, 2309, 2310, 2311, 2312, 2313, 2314, 2315, 2316, 2317, 2318, 2319, 2320, 2321, 2322, 2323, 2324, 2325, 2326, 2327}
 Athletics_Orange_Equip_Level_70 = {
     2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615}
+Athletics_Orange_Equip_Level_80 = {
+    2616, 2617, 2618, 2619, 2620, 2621, 2622, 2623, 2624, 2625, 2626, 2627, 2628, 2629, 2630, 2631, 2632, 2633, 2634, 2635, 2636, 2637, 2638, 2639}
 
 Athletics_Purple_Equip_Level_80 = {
     2472, 2473, 2474, 2475, 2476, 2477, 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485, 2486, 2487, 2488, 2489, 2490, 2491, 2492, 2493, 2494, 2495}
@@ -140,7 +142,8 @@ Athletics_Purple_Equip = {
 Athletics_Orange_Equip = {
     [50] = Athletics_Orange_Equip_Level_50,
     [60] = Athletics_Orange_Equip_Level_60,
-    [70] = Athletics_Orange_Equip_Level_70
+    [70] = Athletics_Orange_Equip_Level_70,
+    [80] = Athletics_Orange_Equip_Level_80
 }
 
 
@@ -525,7 +528,7 @@ function ItemNormal_00000409(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(409, player);
-        package:AddItem(1526, 2, 1, 0, 2);
+        package:AddEquipN(1526, 2, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -555,7 +558,7 @@ function ItemNormal_00000410(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(410, player);
-        package:AddItem(1526, 3, 1, 0, 2);
+        package:AddEquipN(1526, 3, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -585,7 +588,7 @@ function ItemNormal_00000411(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(411, player);
-        package:AddItem(1526, 4, 1, 0, 2);
+        package:AddEquipN(1526, 4, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -615,7 +618,7 @@ function ItemNormal_00000412(id, num, bind, param)
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(412, player);
-        package:AddItem(1526, 6, 1, 0, 2);
+        package:AddEquipN(1526, 6, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -626,7 +629,8 @@ end
 function ItemNormal_00000413(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6017);
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -641,12 +645,11 @@ function ItemNormal_00000413(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(413, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -657,7 +660,8 @@ end
 function ItemNormal_00000414(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6026);
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -672,12 +676,11 @@ function ItemNormal_00000414(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(414, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -688,7 +691,8 @@ end
 function ItemNormal_00000415(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6035);
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -703,12 +707,11 @@ function ItemNormal_00000415(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(415, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -719,7 +722,8 @@ end
 function ItemNormal_00000416(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6053)
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -734,12 +738,11 @@ function ItemNormal_00000416(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(416, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -861,8 +864,9 @@ function ItemNormal_00000010(iid, num, bind, param)
       {1610,1614,1615},
       {1612,1616,1607,1611},
       {200,201,202,203,204,205,206,207,208},
-      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224},
+      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
       {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
+      {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
   }
 
   local n = 0
@@ -880,8 +884,10 @@ function ItemNormal_00000010(iid, num, bind, param)
       n = 6
   elseif lvl >= 70 and lvl <= 74 then
       n = 7
-  elseif lvl >= 75 then
+  elseif lvl >= 75 and lvl < 80 then
       n = 8
+  elseif lvl >= 80 then
+      n = 9
   end
 
   if n == 0 then
@@ -1289,12 +1295,15 @@ function ItemNormal_00000029(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(100);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 100);
     end
 
     package:DelItemSendMsg(29, player);
@@ -1315,7 +1324,6 @@ function ItemNormal_00000400(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(1000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
@@ -1323,9 +1331,14 @@ function ItemNormal_00000400(iid, num, bind, param)
         end
     end
 
+    if n ~= 0 then
+        fgt:addPExp(n * 1000);
+    end
+
     package:DelItemSendMsg(400, player);
     return n;
 end
+
 function ItemNormal_00000402(iid, num, bind, param)
 
     local player = GetPlayer()
@@ -1352,13 +1365,14 @@ function ItemNormal_00000402(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        if i <= 3 then
+        if item[1] == 515 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
         end
     end
     package:DelItemSendMsg(402, player);
     return num
 end
+
 function ItemNormal_00000403(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -1384,7 +1398,7 @@ function ItemNormal_00000403(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        if i<= 4 then
+        if item[1] == 509 or item[1] == 507 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
         end
     end
@@ -1406,12 +1420,15 @@ function ItemNormal_00000030(iid, num, bind, param)
 
     local n = 0
     for i = 1, num do
-        fgt:addPExp(10000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 10000);
     end
 
     package:DelItemSendMsg(30, player);
@@ -1433,12 +1450,15 @@ function ItemNormal_00000031(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(1000000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 1000000);
     end
 
     package:DelItemSendMsg(31, player);
@@ -5787,8 +5807,8 @@ function ItemNormal_athletics_2(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5830,8 +5850,8 @@ function ItemNormal_athletics_3(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5871,8 +5891,8 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -6118,8 +6138,8 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end

@@ -2404,6 +2404,7 @@ namespace GObject
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
                 clan->LoadBattleScore(cl.battleScore);
+                clan->LoadDailyBattleScore(cl.dailyBattleScore);
                 clan->LoadLastBattleRanking(cl.battleRanking);
 				clanBattle->setOwnerClanId(cl.id);
 				if (!clanManager.validClanBattleTime(cl.battleTime))
