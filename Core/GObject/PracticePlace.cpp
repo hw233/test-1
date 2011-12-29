@@ -1153,17 +1153,6 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             GObject::Clan* oldclan = oldpl->getClan();
             if(oldclan != clan) // 易帮
             {
-                for (UInt8 i = 0; i < PPLACE_MAX - 1; ++i) // 原有帮移走
-                {
-                    PlaceData& pd = m_places[i];
-                    if (pd.place.ownerid == newpl->getId())
-                    {
-                        moveAllToMax(i+1);
-                        break;
-                    }
-                }
-                moveAllToMax(place);
-
                 pd.place.openslot = 0;
                 UInt8 techslot = clan->getPracticeSlot();
                 UInt8 slotadd = techslot - pd.place.techslot;

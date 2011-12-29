@@ -1865,6 +1865,9 @@ namespace GObject
         SYSMSG(title2, 2238);
         SysMsgItem* msg2 = globalSysMsg[2239];
 
+        // 所有人移走
+        practicePlace.moveAllToMax();
+
         UInt8 idx = 0;
         UInt32 ranking = 0;
         for(ClanVec::iterator iter = m_ClanRanking.begin();
