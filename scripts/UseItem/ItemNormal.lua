@@ -629,7 +629,7 @@ end
 function ItemNormal_00000413(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local xinfa = math.random(6000, 6017);
+    local xinfa = math.random(6000, 6001);
     local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
@@ -660,7 +660,7 @@ end
 function ItemNormal_00000414(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local xinfa = math.random(6000, 6026);
+    local xinfa = math.random(6000, 6002);
     local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
@@ -691,7 +691,7 @@ end
 function ItemNormal_00000415(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local xinfa = math.random(6000, 6035);
+    local xinfa = math.random(6000, 6003);
     local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
@@ -722,7 +722,7 @@ end
 function ItemNormal_00000416(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    local xinfa = math.random(6000, 6053)
+    local xinfa = math.random(6000, 6005)
     local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}

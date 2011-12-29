@@ -388,6 +388,8 @@ public:
     void AddItem(UInt32 itemid, UInt32 num);
     void AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
 
+    UInt32 GetGridNum() const { return _itemPkg.GetLeftGrid(); }
+
     /**
      *@brief 发送仓库信息
      */

@@ -1228,8 +1228,7 @@ namespace GObject
         {
             case STATE_INIT:
                 {
-                    bool bWeekChange = TimeUtil::GetWeekDay(oldTime) == 7 && TimeUtil::GetWeekDay(m_Now) == 1;
-                    ProcessInit(bWeekChange);
+                    ProcessInit(oldTime);
                 }
                 break;
             case STATE_SIGNUP:
@@ -2073,7 +2072,7 @@ namespace GObject
         return true;
     }
 
-    void ClanRankBattleMgr::ProcessInit(bool bWeekChange)
+    void ClanRankBattleMgr::ProcessInit(UInt32 oldtime)
     {
         if(m_Now >= m_StartTime)
         {
@@ -2084,8 +2083,11 @@ namespace GObject
         }
         else
         {
+            UInt32 oldweekday = TimeUtil::GetWeekDay(oldtime);
+            UInt32 newweekday = TimeUtil::GetWeekDay(m_Now);
+            
             //新的一周重新设置积分和排名
-            if(bWeekChange)
+            if(oldweekday == 7 && newweekday != 7)
             {
                 //清空原积分排名
                 class ClearClanVisitor : public Visitor<Clan>
@@ -2116,6 +2118,41 @@ namespace GObject
 
                 //清空本周积分排行
                 m_ClanRanking.clear();
+            }
+
+
+            //新的一天发邮件
+            if(oldweekday != newweekday)
+            {
+                SYSMSG(title, 2240);
+                SYSMSG(content, 2241);
+
+                //发放清理仓库通知邮件
+                class ClearStorageVisitor : public Visitor<Clan>
+                {
+                public:
+                    ClearStorageVisitor(const std::string& title, const std::string& content)
+                        :m_Title(title), m_Content(content){}
+                    ~ClearStorageVisitor(){}
+
+                public:
+                    bool operator()(Clan* clan)
+                    {
+                        if(clan->GetGridNum() < 25
+                                && clan->getOwner() != NULL)
+                        {
+                            clan->getOwner()->GetMailBox()->newMail(NULL, 0x01, m_Title, m_Content); 
+                        }
+                        return true;
+                    }
+
+                private:
+                    std::string m_Title;
+                    std::string m_Content;
+                };
+
+                ClearStorageVisitor visitor(title, content);
+                globalClans.enumerate(visitor);
             }
         }
     }

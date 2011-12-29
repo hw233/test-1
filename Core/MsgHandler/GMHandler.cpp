@@ -137,6 +137,7 @@ GMHandler::GMHandler()
 
     Reg(3, "clanbuild", &GMHandler::OnClanBuild);
     Reg(3, "clanitem", &GMHandler::OnClanItem);
+    Reg(3, "clanbattlescore", &GMHandler::OnClanBattleScore);
 
     Reg(3, "hiinfo", &GMHandler::OnInfoHI);
     Reg(3, "hienter", &GMHandler::OnEnterHI);
@@ -2418,6 +2419,17 @@ void GMHandler::OnClanItem(GObject::Player *player, std::vector<std::string>& ar
     if(player->getClan() != NULL)
     {
         player->getClan()->AddItem(itemId, itemNum);
+    }
+}
+
+void GMHandler::OnClanBattleScore(GObject::Player *player, std::vector<std::string>& args)
+{
+    if(args.size() < 1) return;
+
+    UInt32 score = (UInt32)atoi(args[0].c_str());
+    if(player->getClan() != NULL)
+    {
+        player->getClan()->SetBattleScore(score);
     }
 }
 
