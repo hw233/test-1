@@ -202,7 +202,7 @@ void WBoss::flee()
 
 void WBoss::reward(Player* player)
 {
-    static UInt16 trumps[] = {226,90,225,227,};
+    static UInt16 trumps[] = {226,90,225,227,270,};
     static UInt8 trumpnum[] = {3,2,1};
     static UInt16 gems[] = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142};
 

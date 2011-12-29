@@ -87,6 +87,8 @@ Athletics_Blue_Equip_Level_70 = {
     2304, 2305, 2306, 2307, 2308, 2309, 2310, 2311, 2312, 2313, 2314, 2315, 2316, 2317, 2318, 2319, 2320, 2321, 2322, 2323, 2324, 2325, 2326, 2327}
 Athletics_Orange_Equip_Level_70 = {
     2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615}
+Athletics_Orange_Equip_Level_80 = {
+    2616, 2617, 2618, 2619, 2620, 2621, 2622, 2623, 2624, 2625, 2626, 2627, 2628, 2629, 2630, 2631, 2632, 2633, 2634, 2635, 2636, 2637, 2638, 2639}
 
 Athletics_Purple_Equip_Level_80 = {
     2472, 2473, 2474, 2475, 2476, 2477, 2478, 2479, 2480, 2481, 2482, 2483, 2484, 2485, 2486, 2487, 2488, 2489, 2490, 2491, 2492, 2493, 2494, 2495}
@@ -140,7 +142,8 @@ Athletics_Purple_Equip = {
 Athletics_Orange_Equip = {
     [50] = Athletics_Orange_Equip_Level_50,
     [60] = Athletics_Orange_Equip_Level_60,
-    [70] = Athletics_Orange_Equip_Level_70
+    [70] = Athletics_Orange_Equip_Level_70,
+    [80] = Athletics_Orange_Equip_Level_80
 }
 
 
@@ -861,8 +864,9 @@ function ItemNormal_00000010(iid, num, bind, param)
       {1610,1614,1615},
       {1612,1616,1607,1611},
       {200,201,202,203,204,205,206,207,208},
-      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224},
+      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
       {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
+      {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
   }
 
   local n = 0
@@ -880,8 +884,10 @@ function ItemNormal_00000010(iid, num, bind, param)
       n = 6
   elseif lvl >= 70 and lvl <= 74 then
       n = 7
-  elseif lvl >= 75 then
+  elseif lvl >= 75 and lvl < 80 then
       n = 8
+  elseif lvl >= 80 then
+      n = 9
   end
 
   if n == 0 then
@@ -5801,8 +5807,8 @@ function ItemNormal_athletics_2(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5844,8 +5850,8 @@ function ItemNormal_athletics_3(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -5885,8 +5891,8 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
@@ -6132,8 +6138,8 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     local tmpEquipTable = Athletics_Orange_Equip[level]
 
     if tmpEquipTable == nil then
-        if level > 70 then
-            tmpEquipTable = Athletics_Orange_Equip[70]
+        if level > 80 then
+            tmpEquipTable = Athletics_Orange_Equip[80]
         else
             tmpEquipTable = Athletics_Orange_Equip[50]
         end
