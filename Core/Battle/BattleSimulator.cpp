@@ -1198,7 +1198,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     }
 
     state[0] = effect_state;
-    if(effect_state & 0xe)
+    if(effect_state & 0x2e)
     {
         if(effect_state & 0x2)
         {
@@ -1228,18 +1228,10 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
     size_t idx = 0;
     const GData::SkillBase* passiveSkill = NULL;
     UInt8 immune = target_bo->getImmune();
-    if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= target_bo->getImmuneLevel())
+    if((state[state_idx] & immune) && SKILL_LEVEL(skill->getId()) <= target_bo->getImmuneLevel())
     {
-        switch(state[state_idx])
-        {
-        case 1:
-        case 2:
-        case 4:
-        case 8:
-        case 0x20:
-            defList[defCount].damType = e_Immune;
-            return;
-        }
+        defList[defCount].damType = e_Immune;
+        return;
     }
 
     float rate = target_bo->getMagRes(bf) * 100;
@@ -3110,9 +3102,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                             continue;
                         }
 
+                        int cnt = 0;
+                        getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                         std::vector<AttackAct> atkAct;
                         atkAct.clear();
-                        doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                        doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
                         ++ rcnt;
 
                         size_t actCnt = atkAct.size();
@@ -3135,9 +3129,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                     passiveSkill = bf->getPassiveSkillAftNAtk();
                     if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
                     {
+                        int cnt = 0;
+                        getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                         std::vector<AttackAct> atkAct;
                         atkAct.clear();
-                        doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                        doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
                         ++ rcnt;
 
                         size_t actCnt = atkAct.size();
@@ -3173,9 +3169,11 @@ UInt32 BattleSimulator::doAttack( int pos )
                     continue;
                 }
 
+                int cnt = 0;
+                getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
                 ++ rcnt;
 
                 size_t actCnt = atkAct.size();
@@ -3198,9 +3196,11 @@ UInt32 BattleSimulator::doAttack( int pos )
             passiveSkill = bf->getPassiveSkillAftAtk();
             if(NULL != passiveSkill && (passiveSkill->target != 1 || (passiveSkill->target == 1 && bo && bo->getHP() > 0)) )
             {
+                int cnt = 0;
+                getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                doSkillAttack(bf, passiveSkill, otherside, target_pos, 1, &atkAct);
+                doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
                 ++ rcnt;
 
                 size_t actCnt = atkAct.size();
