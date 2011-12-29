@@ -3853,6 +3853,11 @@ namespace GObject
 		cancelAutoBattle();
 		cancelAutoDungeon();
 
+        if (getBuffData(PLAYER_BUFF_AUTOCOPY))
+            cancelAutoCopy(getBuffData(PLAYER_BUFF_AUTOCOPY));
+        if (GetVar(VAR_ATOFM))
+            cancelAutoFrontMap(GetVar(VAR_ATOFM));
+
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
@@ -6304,25 +6309,9 @@ namespace GObject
 				strItems += "|";
 			}
 
-            UInt16 equips[][24] = {
-            {2544, 2545, 2546, 2547, 2548, 2549, 2550, 2551, 2552, 2553, 2554, 2555, 2556, 2557, 2558, 2559, 2560, 2561, 2562, 2563, 2564, 2565, 2566, 2567},
-            {2568, 2569, 2570, 2571, 2572, 2573, 2574, 2575, 2576, 2577, 2578, 2579, 2580, 2581, 2582, 2583, 2584, 2585, 2586, 2587, 2588, 2589, 2590, 2591},
-            {2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615},
-            {2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615},
-            {2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615},
-            {2592, 2593, 2594, 2595, 2596, 2597, 2598, 2599, 2600, 2601, 2602, 2603, 2604, 2605, 2606, 2607, 2608, 2609, 2610, 2611, 2612, 2613, 2614, 2615},
-            };
-
-            UInt8 lvl = GetLev();
-            if (lvl < 50)
-                lvl = 50;
-            lvl -= 50;
-            lvl /= 10;
-
             if (j >= 5) // XXX: 玩家等级橙色装备x1
             {
-                URandom tmpRand;
-                UInt16 id = equips[lvl][tmpRand(24)];
+                UInt16 id = getRandOEquip(GetLev());
                 mitem[mcount].id = id;
                 mitem[mcount++].count = 1;
 				strItems += Itoa(id);
@@ -6986,6 +6975,15 @@ namespace GObject
             ConsumeInfo ci(InstantPracticeAcc,0,0);
             useGold(pfexp->goldUse,&ci);
 
+            for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
+            {
+                Fighter* fgt = findFighter(pfexp->fids[i]);
+                if(fgt && pfexp->counts[i])
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                }
+            }
+
             UInt32 now = TimeUtil::Now();
             UInt32 duration = 60*60;
             UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
@@ -7003,13 +7001,15 @@ namespace GObject
                 setBuffData(PLAYER_BUFF_PROTECT, 0);
             }
         }
-
-        for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
+        else
         {
-            Fighter* fgt = findFighter(pfexp->fids[i]);
-            if(fgt && pfexp->counts[i])
+            for(int i = 0; i < MAX_PRACTICE_FIGHTRES; ++ i)
             {
-                fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                Fighter* fgt = findFighter(pfexp->fids[i]);
+                if(fgt && pfexp->counts[i])
+                {
+                    fgt->addPExp(fgt->getPracticeInc() * pfexp->counts[i]); 
+                }
             }
         }
     }

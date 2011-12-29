@@ -52,13 +52,17 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             }
         }
 
+        // TODO:
+#if 0
         PracticeData* p = getPracticeData(pl);
         if (place != PPLACE_MAX && p && p->cdend > TimeUtil::Now())
         {
             st << static_cast<UInt8>(1) << Stream::eos;
             pl->send(st);
+            pl->sendMsgCode(0, 2200, p->cdend - TimeUtil::Now());
             return false;
         }
+#endif
 
         PPlace& data = m_places[place-1].place;
         Player* owner = globalPlayers[data.ownerid];
@@ -82,6 +86,9 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         if(!clanflag)
         {
             if (place != PPLACE_MAX) {
+                // TODO: 目前不支持非本帮人修炼
+                return false;
+
                 PracticeData*& pd = m_places[place-1].data[slot];
                 if (pd)
                 {
@@ -233,6 +240,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
 		UInt32 now = TimeUtil::Now();
 
+        pp->place = place;
         pp->type = type;
         pp->pricetype = priceType;
         pp->slotprice = slotprice;
@@ -284,7 +292,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pd->cdend = TimeUtil::Now() + 10 * 60;
 
             //DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
-            DB1().PushUpdateData("UPDATE `practice_data` SET place = 7, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u", pd->cdend, pl->getId());
+            DB1().PushUpdateData("UPDATE `practice_data` SET place = %u, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u",
+                    PPLACE_MAX, pd->cdend, pl->getId());
             PopTimerEvent(pl, EVENT_PLAYERPRACTICING, pl->getId());
 
             if(place == PPLACE_MAX || clan != pl->getClan())
@@ -297,7 +306,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pl->getTael(remain);
             data.slotincoming += money;
             data.protincoming += money2;
-            DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
+            DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u",
+                    data.protincoming, data.slotincoming, place);
 
             pd->checktime = 0; // XXX:
 
@@ -322,7 +332,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
             st << trained * 60 << money << remain << Stream::eos;
             //delPracticeData(pl);
-        } else
+        }
+        else
         {
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
         }
@@ -710,12 +721,15 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         if(NULL == owner)
             return false;
 
+        // TODO:
+#if 0
         PracticeData* p = getPracticeData(pl);
         if (p && p->cdend > TimeUtil::Now())
         {
-            pl->sendMsgCode(0, 3100);
+            pl->sendMsgCode(0, 2200, p->cdend - TimeUtil::Now());
             return false;
         }
+#endif
         
         Stream st(REP::PRACTICE_ROB);
         Player* def = 0;
@@ -1067,22 +1081,34 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         return false;
     }
 
+    void PracticePlace::moveAllToMax()
+    {
+        for (UInt8 i = 0; i < PPLACE_MAX-1; ++i)
+        {
+            moveAllToMax(i+1);
+        }
+    }
+
     void PracticePlace::moveAllToMax(UInt8 place)
     {
-        if (!place || place > PPLACE_MAX)
+        if (!place || place >= PPLACE_MAX)
             return;
 
-        //ScopedLocker<Mutex> lock1(m_lock[place-1]);
-        //ScopedLocker<Mutex> lock2(m_lock[PPLACE_MAX-1]);
-
-        PlaceData& pd = m_places[PPLACE_MAX-1];
-        for (auto i = m_places[place-1].data.begin(), e = m_places[place-1].data.end(); i != e; ++i)
+        for (std::map<UInt64, PracticeData*>::iterator i = m_pradata.begin(), e = m_pradata.end(); i != e; ++i)
         {
-            pd.data.push_back(*i);
-            *i = 0;
-
-            // TODO: notify client
+            if (i->second && i->second->place == place)
+            {
+                i->second->place = PPLACE_MAX;
+                Player* pl = globalPlayers[i->second->getId()];
+                if (pl)
+                    pl->setPracticingPlaceSlot(PPLACE_MAX << 16);
+            }
         }
+
+        m_places[place-1].reset();
+
+        DB1().PushUpdateData("UPDATE `practice_data` SET `place` = %u, `slot` = 0, `type` = 0, `slotprice` = 0, `protprice` = 0, `prot` = 0 WHERE `place` = %u", PPLACE_MAX, place);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = 0, `protid` = 0, `maxslot` = 30, `openslot` = 0, `protmoney` = 0, `slotmoney` = 0, `enemyCount` = 0, `winCount` = 0, `slotincoming` = 0, `protincoming` = 0 WHERE id = %u", place);
         return;
     }
 
@@ -1093,13 +1119,13 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         return pd.place.ownerid;
     }
 
-    bool PracticePlace::replaceOwner(Player* oldpl, Player* newpl)
+    bool PracticePlace::replaceOwner(Player* newpl, Player* oldpl)
     {
-        UInt8 idx = 0;
-        if (!oldpl || !newpl)
+        if (!newpl || !oldpl)
             return false;
 
-        for(; idx < PPLACE_MAX; idx ++)
+        UInt8 idx = 0;
+        for(; idx < PPLACE_MAX; ++idx)
         {
             if(oldpl->getId() == m_places[idx].place.ownerid)
                 break;
@@ -1108,30 +1134,62 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         if(idx == PPLACE_MAX)
             return false;
 
-        PlaceData& pd = m_places[idx];
+        return replaceOwner(newpl, idx+1);
+    }
 
-        GObject::Clan* clan = newpl->getClan();
-        if(clan == NULL)
+    bool PracticePlace::replaceOwner(Player* newpl, UInt8 place)
+    {
+        if (!newpl || place >= PPLACE_MAX)
             return false;
 
-        GObject::Clan* oldclan = oldpl->getClan();
-        if(oldclan != clan)
-        {
+        GObject::Clan* clan = newpl->getClan();
+        if(!clan)
+            return false;
+
+        Player* oldpl = globalPlayers[getPlaceOwnerId(place)];
+        if (oldpl)
+        { // 易主易帮
+            PlaceData& pd = m_places[place-1];
+            GObject::Clan* oldclan = oldpl->getClan();
+            if(oldclan != clan) // 易帮
+            {
+                pd.place.openslot = 0;
+                UInt8 techslot = clan->getPracticeSlot();
+                UInt8 slotadd = techslot - pd.place.techslot;
+
+                pd.place.maxslot += slotadd;
+                pd.place.techslot += techslot;
+                pd.data.resize(pd.place.maxslot);
+            }
+            else // 易主
+            {
+                // XXX:
+            }
+            pd.place.ownerid = newpl->getId();
+
+            clan->broadcastPracticePlaceInfo();
+            oldclan->broadcastPracticePlaceInfo();
+
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                    pd.place.ownerid, pd.place.maxslot, place);
+        }
+        else
+        { // 设主
+            PlaceData& pd = m_places[place-1];
             pd.place.openslot = 0;
             UInt8 techslot = clan->getPracticeSlot();
             UInt8 slotadd = techslot - pd.place.techslot;
-
             pd.place.maxslot += slotadd;
             pd.place.techslot += techslot;
             pd.data.resize(pd.place.maxslot);
+
+            pd.place.ownerid = newpl->getId();
+            clan->broadcastPracticePlaceInfo();
+
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                    pd.place.ownerid, pd.place.maxslot, place);
         }
 
-        pd.place.ownerid = newpl->getId();
-
-        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, idx + 1);
-
-        clan->broadcastPracticePlaceInfo();
-        oldclan->broadcastPracticePlaceInfo();
         return true;
     }
 
@@ -1166,7 +1224,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             oldpd.data.resize(oldpd.place.maxslot);
 
             oldpd.place.ownerid = 0;
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                    oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
         }
 
         if(place >= PPLACE_MAX)
@@ -1183,7 +1242,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
         pd.place.ownerid = pl->getId();
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, place);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                pd.place.ownerid, pd.place.maxslot, place);
 
         clan->broadcastPracticePlaceInfo();
 
@@ -1240,7 +1300,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             m_places[idx].place.protincoming = 0;
         }
     }
-
-
 } // namespace GObject
+
+/* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
 

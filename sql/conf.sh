@@ -5,15 +5,15 @@ U=kingxin
 P=kingxin
 PT=3306
 
-DBD=data_5555
-DBO=asss_5555
+DBD=data_8888
+DBO=asss_8888
 
 OPTIONS="Yes/No/Exit"
 IFS=/
 
 function selectAction()
 {
-echo -e "Update !!!!!!!!!!>>>>>> $1 <<<<<<!!!!!!!!!!"
+echo -e "!!!!!!!!!!>>>>>> $1 <<<<<<!!!!!!!!!!"
 select selected in $OPTIONS;do
     case $selected in
         Yes)
