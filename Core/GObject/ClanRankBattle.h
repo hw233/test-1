@@ -415,7 +415,7 @@ namespace GObject
         bool AddMailItems(Player* player, RewardVec& rewards);
 
     private:
-        void ProcessInit(bool bWeekChange);
+        void ProcessInit(UInt32 oldtime);
         void ProcessSignup();
         void ProcessBattle();
 

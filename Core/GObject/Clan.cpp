@@ -138,6 +138,8 @@ UInt32 ClanItemPkg::AddItem(UInt16 id, UInt32 num)
         m_Grid = m_Grid + (newGrid - oldGrid);
     }
 
+    if(num == 0) return 0;
+
     ItemMap::iterator iter = m_Items.find(id);
     if(iter != m_Items.end())
     {
@@ -3583,8 +3585,9 @@ void Clan::GetWeal(Player* player)
     UInt32 tael = GData::clanLvlTable.getWeal(_level);
     if(tael == 0) return;
 
-    player->getTael(tael);
+    addMemberProffer(player, tael);
     player->AddVar(VAR_CLAN_WEAL, tael);
+    SYSMSG_SENDV(2242, player, tael);
 
     SendPackageInfo(player);
 }
