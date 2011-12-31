@@ -3534,6 +3534,7 @@ namespace GObject
                 assignMoneyLog(t, World::_moneyIn[i][j]);
             }
         }
+        World::_moneyLogged = today[6];
 
         return true;
     }
