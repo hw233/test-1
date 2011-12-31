@@ -699,7 +699,6 @@ namespace GObject
         m_ClanScore2 = 0;
         m_Winner = m_Clan1->clan->getId();
 
-
         if(m_Clan2 == NULL)
         {
             m_ClanScore1 = 20;
@@ -712,37 +711,51 @@ namespace GObject
       
                 m_Winner = m_Fields[i].GetWinner();
 
-                if(m_Clan1 != NULL && m_Winner == m_Clan1->clan->getId()) m_ClanScore1 += BATTLE_FIELD_SCORE[i];
-                else if(m_Clan2 != NULL && m_Winner == m_Clan2->clan->getId()) m_ClanScore2 += BATTLE_FIELD_SCORE[i];
+                if(m_Clan1 != NULL && m_Winner == m_Clan1->clan->getId())
+                {
+                    m_ClanScore1 += BATTLE_FIELD_SCORE[i];
+                }
+                else if(m_Clan2 != NULL && m_Winner == m_Clan2->clan->getId())
+                {
+                    m_ClanScore2 += BATTLE_FIELD_SCORE[i];
+                }
             }
         }
 
         //个人额外积分
-        UInt32 extScore1 = 5;
-        UInt32 extScore2 = 5;
+        UInt32 playerScore1 = m_ClanScore1 + 5;
+        UInt32 playerScore2 = m_ClanScore2 + 5;
 
         if(m_ClanScore1 > m_ClanScore2)
         {
             m_ClanScore1 += WINNER_EXTRA_SCORE;
+            playerScore1 += 15;
             if(m_Clan1 != NULL) 
             {
                 m_Winner = m_Clan1->clan->getId();
-                extScore1 = 20;
             }
         }
         else if(m_ClanScore2 > m_ClanScore1)
         {
             m_ClanScore2 += WINNER_EXTRA_SCORE;
+            playerScore2 += 15;
             if(m_Clan2 != NULL)
             {
                 m_Winner = m_Clan2->clan->getId();
-                extScore2 = 20;
             }
         }
         else
         {
-            if(m_Clan1 != NULL && m_Winner == m_Clan1->clan->getId()) m_ClanScore1 += WINNER_EXTRA_SCORE;
-            else m_ClanScore2 += WINNER_EXTRA_SCORE;
+            if(m_Clan1 != NULL && m_Winner == m_Clan1->clan->getId())
+            {
+                m_ClanScore1 += WINNER_EXTRA_SCORE;
+                playerScore1 += 15;
+            }
+            else
+            {
+                m_ClanScore2 += WINNER_EXTRA_SCORE;
+                playerScore2 += 15;
+            }
         }
 
         if(m_Clan1 != NULL) 
@@ -756,18 +769,10 @@ namespace GObject
             m_Clan2->clan->SetDailyBattleScore(m_Clan2->clan->GetDailyBattleScore() + m_ClanScore2);
         }
 
+
         for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
         {
-            UInt32 winner = m_Fields[i].GetWinner();
-
-            if(m_Clan1 != NULL && winner == m_Clan1->clan->getId())
-            {
-                m_Fields[i].End(extScore1 + BATTLE_FIELD_SCORE[i], extScore2);
-            }
-            else if(m_Clan2 != NULL && winner == m_Clan2->clan->getId())
-            {
-                m_Fields[i].End(extScore1, extScore2 + BATTLE_FIELD_SCORE[i]);
-            }
+            m_Fields[i].End(playerScore1, playerScore2);
         }
 
         if(m_Clan1 != NULL) m_Clan1->clan->BroadcastBattleData(m_Now);
