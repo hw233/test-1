@@ -2762,7 +2762,7 @@ UInt32 BattleSimulator::doSkillAttackAftEnter(BattleFighter* bf)
     {
         int target_side, target_pos, cnt;
         getSkillTarget(bf, passiveSkill, target_side, target_pos, cnt);
-        doSkillAttack(bf, passiveSkill, target_side, target_pos, 1, NULL);
+        doSkillAttack(bf, passiveSkill, target_side, target_pos, cnt, NULL);
         ++ rcnt;
     }
 
