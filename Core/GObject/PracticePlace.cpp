@@ -332,7 +332,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
             st << trained * 60 << money << remain << Stream::eos;
             //delPracticeData(pl);
-        } else
+        }
+        else
         {
             st << static_cast<UInt32>(0) << static_cast<UInt16>(0) << static_cast<UInt16>(0) << Stream::eos;
         }
@@ -1158,6 +1159,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                     if (pd.place.ownerid == newpl->getId())
                     {
                         moveAllToMax(i+1);
+                        break;
                     }
                 }
                 moveAllToMax(place);
@@ -1179,13 +1181,11 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             clan->broadcastPracticePlaceInfo();
             oldclan->broadcastPracticePlaceInfo();
 
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, place);
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                    pd.place.ownerid, pd.place.maxslot, place);
         }
         else
         { // 设主
-            if (place == PPLACE_MAX)
-                return false;
-
             PlaceData& pd = m_places[place-1];
             pd.place.openslot = 0;
             UInt8 techslot = clan->getPracticeSlot();
@@ -1197,7 +1197,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pd.place.ownerid = newpl->getId();
             clan->broadcastPracticePlaceInfo();
 
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, place);
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                    pd.place.ownerid, pd.place.maxslot, place);
         }
 
         return true;
@@ -1234,7 +1235,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             oldpd.data.resize(oldpd.place.maxslot);
 
             oldpd.place.ownerid = 0;
-            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
+            DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                    oldpd.place.ownerid, oldpd.place.maxslot, idx + 1);
         }
 
         if(place >= PPLACE_MAX)
@@ -1251,7 +1253,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
         pd.place.ownerid = pl->getId();
 
-        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u", pd.place.ownerid, pd.place.maxslot, place);
+        DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
+                pd.place.ownerid, pd.place.maxslot, place);
 
         clan->broadcastPracticePlaceInfo();
 
