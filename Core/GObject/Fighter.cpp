@@ -2570,9 +2570,10 @@ bool Fighter::offCitta( UInt16 citta, bool flip, bool offskill, bool writedb )
 
 void Fighter::delAllCitta( bool writedb )
 {
-    for (size_t i = 0; i < _cittas.size(); ++i)
+    std::vector<UInt16> cittas = _cittas;
+    for (size_t i = 0; i < cittas.size(); ++i)
     {
-        delCitta(_cittas[i], writedb);
+        delCitta(cittas[i], writedb);
     }
 }
 
