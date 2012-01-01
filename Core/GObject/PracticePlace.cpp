@@ -1006,6 +1006,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                 return false;
             }
 
+            oldpd->place = place;
+
             EventPlayerPractice* event = new (std::nothrow) EventPlayerPractice(pl, 60*10, pd->checktime/10, pd->trainend);
             if (event == NULL) return false;
             PushTimerEvent(event);

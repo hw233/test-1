@@ -2173,6 +2173,7 @@ void GMHandler::OnOcupyPlace(GObject::Player * player, std::vector<std::string>&
 		return;
 
     UInt8 place = atoi(args[1].c_str());
+    practicePlace.moveAllToMax(place);
     practicePlace.replaceOwner(pl, place);
 }
 
