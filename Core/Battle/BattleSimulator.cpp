@@ -129,13 +129,15 @@ UInt32 BattleSimulator::clearLastBattle(UInt8 side, bool isLast)
         {
             std::vector<BattleFighter*>& fgtlist = _fgtlist[fgtlist_idx];
             size_t c = fgtlist.size();
-            for(size_t i = 0; i < c; ++ i)
+            for(size_t i = 0; i < c;)
             {
                 if(fgtlist[i]->getSide() == side)
                 {
                     fgtlist.erase(fgtlist.begin() + i);
                     -- c;
                 }
+                else
+                    ++ i;
             }
         }
 
@@ -3696,6 +3698,9 @@ int BattleSimulator::testWinner()
 
 int BattleSimulator::testWinner2()
 {
+    if(_player[1] == NULL)
+        return 2;
+
     UInt32 leftHPAll[2] = {0, 0};
 	for(Int8 fgtlist_idx = 0; fgtlist_idx < 2; fgtlist_idx++)
     {
