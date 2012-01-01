@@ -17,6 +17,7 @@ public:
 	
 	void get(char *);
 	void getva(char *, ...);
+    void getva(std::string& str, ...);
 	void getvap(Stream *, ...);
 
 private:

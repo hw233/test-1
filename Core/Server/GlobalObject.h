@@ -12,6 +12,7 @@
 class GlobalObject : public Singleton<GlobalObject>
 {
     const static size_t MIN_MEMBLOCK_SIZE = 128;
+    
     const static size_t MEMPOOL_NUM = 10;
 
 protected:
@@ -54,6 +55,7 @@ private:
 	FastMutex			m_MsgQueueCs[MAX_THREAD_NUM];
 
     MemBlockPool*       m_Pools[MEMPOOL_NUM];
+    
     size_t              m_MaxPoolSize;
 };
 

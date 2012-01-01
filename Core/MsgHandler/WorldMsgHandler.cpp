@@ -43,6 +43,10 @@ MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_KILLCD,    OnAthleticsKillCD);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
 
+MSG_REG(GameMsgHdr, OnItemHistoryReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_PACKAGE, OnClanPackageReq);
+
+
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);

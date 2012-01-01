@@ -1,6 +1,7 @@
 #ifndef _CLAN_H_
 #define _CLAN_H_
 
+#include <set>
 #include "Common/Stream.h"
 #include "Common/TimeUtil.h"
 #include "GObjectManager.h"
@@ -41,25 +42,146 @@ struct ClanPlayerPet
 struct ClanSkill
 {
     UInt8 id;
-	UInt8 level;	//��� = 0�� ��ʾ�˼�����δ������
+	UInt8 level;	//???? = 0?? ??ʾ?˼?????δ??????
 };
+
+
+class ClanItemVisitor
+{
+public:
+    virtual ~ClanItemVisitor(){}
+
+    virtual bool operator()(UInt16 id, UInt32 num) = 0;
+};
+
+
+/**
+ *@brief 帮派道具包裹
+ */
+struct ClanItemPkg
+{
+    typedef std::map<UInt16, UInt32>    ItemMap;
+
+public:
+    ClanItemPkg()
+        :m_ClanId(0),m_PlayerId(0),m_MaxGrid(0), m_Grid(0){}
+    ~ClanItemPkg(){}
+
+public:
+    void Init(UInt32 clanid, UInt64 playerId, UInt32 maxgrid)
+    {
+        m_ClanId = clanid;
+        m_PlayerId = playerId;
+        m_MaxGrid = maxgrid;
+    }
+
+    /**
+     *@brief 设置获取最大格子数
+     */
+    void SetMaxGrid(UInt32 maxgrid){ if(maxgrid > m_MaxGrid) m_MaxGrid = maxgrid; }
+    UInt32 GetMaxGrid() const { return m_MaxGrid; }
+
+    /**
+     *@brief 获取已使用格子数和剩余格子数
+     */
+    UInt32 GetGrid() const { return m_Grid; }
+    UInt32 GetLeftGrid() const { return m_MaxGrid - m_Grid; }
+
+    void LoadItem(UInt16 id, UInt32 num);
+
+    /**
+     *@brief 判断和添加道具
+     */
+    bool CheckAddItem(UInt16 id, UInt32 num);
+    UInt32 AddItem(UInt16 id, UInt32 num);
+ 
+    /**
+     *@brief 获取道具数和移除道具
+     */
+    UInt32 GetItemNum(UInt16 id) const; 
+    void RemoveItem(UInt16 id, UInt32 num);
+
+    /**
+     *@brief 遍历道具列表
+     */
+    void VisitItems(ClanItemVisitor& visitor)
+    {
+        for(ItemMap::iterator iter = m_Items.begin(); iter != m_Items.end(); ++iter){
+            if(!visitor(iter->first, iter->second)) return;
+        }
+    }
+
+    void FillItems(Stream& stream);
+    void GetItems(Player* player);
+
+public:
+    //帮会id
+    UInt32      m_ClanId;
+    //玩家id
+    UInt64      m_PlayerId;
+    //道具列表
+    ItemMap     m_Items;
+    //最大格子数
+    UInt32      m_MaxGrid;
+    //已经使用格子数
+    UInt32      m_Grid;
+};
+
+
+/**
+ * @brief 帮派道具奖励历史记录
+ */
+struct ClanItemHistory
+{
+    enum Type
+    {
+        CLANBATTLE = 0, //帮会战奖励
+        ALLOCATED = 1,  //分配获得
+        DRAWWEAL = 2,   //领取福利
+    };
+
+    ClanItemHistory(UInt8 type, UInt32 time, UInt64 playerid, const std::string& itemstr)
+        :m_Type(type), m_Time(time), m_PlayerId(playerid), m_ItemStr(itemstr){}
+
+    UInt8       m_Type;
+    UInt32      m_Time;
+    UInt64      m_PlayerId;
+    std::string m_ItemStr;
+};
+
+
+//个人帮会仓库大小
+const static UInt32 PKGSIZE_PER_MEMBER = 20;
+
 
 struct ClanMember
 {
-	ClanMember(Player * pl = NULL, UInt8 c = 0, UInt32 jt = 0) : player(pl), cls(c), joinTime(jt)
+	ClanMember(Player * pl = NULL, UInt8 c = 0, UInt32 jt = 0) :
+        player(pl), cls(c), joinTime(jt)
 	{
 		enterCount = 0;
 		proffer = 0;
+        signupRankBattleTime = 0;
+        rankBattleField = 0;
 	}
+
+
 	std::multimap<UInt32, AllocItem> allocItems;
 	Player * player;
+
+    ClanItemPkg itemPkg;
 	UInt8  cls;
 	UInt32 joinTime;
     UInt32 proffer;
 	UInt8  enterCount;
+    UInt32 signupRankBattleTime;
+    UInt32 rankBattleField;
     std::map<UInt8, ClanSkill> clanSkill;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
+
+
+typedef Visitor<ClanMember> ClanMemberVisitor;
 
 struct ClanOpt
 {
@@ -93,6 +215,17 @@ typedef std::multiset<MemberDonate> MemberDonates;
 class Clan:
 	public GObjectBaseT<Clan>
 {
+public:
+    //帮会排名战报名数下限
+    const static UInt32 RANK_BATTLE_MIN_SIGNUP_NUM = 5;
+    //帮会排名战单个战役人数
+    const static UInt32 RANK_BATTLE_FIELD_PLAYERNUM = 15;
+
+    //道具分配记录
+    typedef std::list<ClanItemHistory> ItemHistoryList;
+
+private:
+
 	friend class ClanCache;
 	friend class ClanBattle;
 	friend class ClanCityBattle;
@@ -126,7 +259,7 @@ public:
 	static void patchMergedName(UInt32 id, std::string& name);
 public:
 	UInt16 getFavorItemId(UInt8 skilId);
-	inline UInt32 getTechIdIndex(UInt8 skillId){return skillId - 7;}// ����7���׻�8����ȸ9������10 fix??????
+	inline UInt32 getTechIdIndex(UInt8 skillId){return skillId - 7;}// ????7???׻?8????ȸ9??????10 fix??????
 
 public:
 	UInt16 getPetFriendness(ClanMember *mem, UInt8 skillId){return mem->clanPet[skillId].petFriendness;}
@@ -204,12 +337,83 @@ public:
     void sendPracticePlaceInfo(Player* pl);
     void broadcastPracticePlaceInfo();
 
-    // ����ְλ
+    // ????ְλ
     bool setClanRank(Player* pl, UInt64 inviteeId, UInt8 cls);
     UInt8 getClanRank(Player* pl);
     UInt8 getClanRankCount(UInt8 cls);
 
     void addMemberProffer(Player*pl, UInt32);
+
+    /**
+     *@brief 报名帮会排名战
+     */
+    UInt32 GetRankBattleField(Player* player, UInt32 now);
+    bool SignupRankBattle(Player* player, UInt32 field, UInt32 now);
+    bool SignoutRankBattle(Player* player, UInt32 now);
+    UInt32 GetSignupRankBattleNum(UInt32 now);
+    UInt32 AdjustRankBattleField(Player* player, UInt32 field, UInt32 now);
+
+    /**
+     *@brief 判断是否满足参赛资格，并获取报名列表
+     *@return 0表示没报名 1表示报名了人数没够 2表示有资格
+     */
+    UInt32 CheckJoinRankBattle(UInt32 now, std::map<UInt32, std::vector<Player*> >& list);
+    /**
+     *@brief 战斗积分相关
+     */
+    void SetBattleScore(UInt32 score);
+    UInt32 GetBattleScore() const { return m_BattleScore; }
+    void LoadBattleScore(UInt32 score){ m_BattleScore = score;}
+
+    void SetDailyBattleScore(UInt32 score);
+    UInt32 GetDailyBattleScore() const { return m_DailyBattleScore; }
+    void LoadDailyBattleScore(UInt32 score) { m_DailyBattleScore = score; }
+
+
+    /**
+     *@brief 帮会战排名相关
+     */
+    void SetLastBattleRanking(UInt32 ranking);
+    UInt32 GetLastBattleRanking() const { return m_LastBattleRanking; }
+    void LoadLastBattleRanking(UInt32 ranking){ m_LastBattleRanking = ranking;}
+
+    void SetBattleRanking(UInt32 ranking){ m_BattleRanking = ranking; }
+    UInt32 GetBattleRanking() const { return m_BattleRanking; }
+
+    /**
+     *@brief 广播帮会战相关数据
+     */
+    void BroadcastBattleData(UInt32 now);
+
+
+    /**
+     *@brief 加载仓库道具
+     */
+    void LoadItem(UInt64 playerid, UInt32 itemid, UInt32 num);
+    void LoadItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
+
+    void AddItem(UInt32 itemid, UInt32 num);
+    void AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
+
+    /**
+     *@brief 发送仓库信息
+     */
+    void SendPackageInfo(Player* player);
+    void SendItemList(Player* player);
+    void SendItemHistory(Player* player, UInt16 start, UInt8 count);
+    void SendSelfItemList(Player* player);
+    void ClearDueItemHistory();
+
+    /**
+     *@brief 分配奖励
+     */
+    void DistributeItem(Player* player, UInt64 memId, UInt16 itemId, UInt16 num);
+
+    /**
+     *@brief 获取福利和道具奖励
+     */
+    void GetWeal(Player* player);
+    void GetItems(Player* player);
 
 public:
 	inline bool alive() { return !_deleted; }
@@ -254,13 +458,13 @@ public:
 	void addClanDonateRecordFromDB(const std::string&, UInt8, UInt16, UInt32);
 	void addClanDonateRecord(const std::string&, UInt8, UInt16, UInt32);
 
-    // �����ʽ�
+    // ?????ʽ?
     void setClanFunds(UInt32 funds) { _funds = funds; }
     void addClanFunds(UInt32 funds);
     void useClanFunds(UInt32 funds);
     UInt32 getClanFunds() { return _funds; }
 
-// ���ɼ���
+// ???ɼ???
     void addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level);
     void addSkill(ClanMember* cm, UInt8 skillId);
     UInt8 getSkillLevel(Player* pl, UInt8 skillId);
@@ -290,6 +494,7 @@ public:
 		return NULL;
 	}
 
+    void VisitMembers(ClanMemberVisitor& visitor);
 	void listMembers(Player *);
 	void listPending(Player *);
 	void sendInfo(Player *);
@@ -329,20 +534,29 @@ private:
 	std::string _name;
 	Members _members;
     UInt8 _maxMemberCount;
-	std::set<UInt32> _membersJoinTime;	// ��֤ÿ����Ա�����ʱ�䲻һ��
+	std::set<UInt32> _membersJoinTime;	// ??֤ÿ????Ա??????ʱ?䲻һ??
 	std::vector<ClanPendingMember *> _pending;
 	UInt8 _rank;
 	UInt8 _level;
-	UInt32 _foundTime;
+    
+    ClanItemPkg _itemPkg;
+    ItemHistoryList _itemHistories;	
+    
+    UInt32 _foundTime;
 	UInt64 _founder;
 	std::string _founderName;
 	UInt64 _leader;
-	UInt64 _construction;            // ���ɽ����
+	UInt64 _construction;            // ???ɽ?????
 	UInt32 _nextPurgeTime;
 	std::string _contact;
 	std::string _announce;
 	std::string _purpose;
 	UInt32 _proffer;
+
+    UInt32 m_BattleScore;   //战斗积分
+    UInt32 m_DailyBattleScore;  //每日战斗积分
+    UInt32 m_LastBattleRanking; //上周战斗名次
+    UInt32 m_BattleRanking;  //本周战斗名次
 
 	UInt32 _favorId[4];
 	UInt32 _flushFavorTime;
@@ -363,8 +577,8 @@ private:
 	ClanDynamicMsg * _clanDynamicMsg;
 	ClanBattle * _clanBattle;
 
-    UInt32 _funds;          // �����ʽ�
-	UInt64 _watchman;       // ���������ػ���
+    UInt32 _funds;          // ?????ʽ?
+	UInt64 _watchman;       // ??????��?ػ???
 
 	Mutex _mutex;
 };

@@ -115,6 +115,8 @@ DROP TABLE IF EXISTS `clan_lvl`;
 CREATE TABLE `clan_lvl` (
   `lvl` tinyint(3) unsigned NOT NULL,
   `exp` bigint(20) unsigned NOT NULL,
+  `pkgsize` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `weal` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`lvl`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 

@@ -13,7 +13,7 @@ mreslvl_addon_factor = 800
 counterlvl_factor = 10
 counterlvl_addon_factor = 800
 
-deflvl_factor = 200
+deflvl_factor = 250
 deflvl_addon_factor = 1500
 
 hitrate_max = 150

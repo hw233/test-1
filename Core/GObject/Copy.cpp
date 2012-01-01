@@ -586,6 +586,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     }
                     sp = 1;
                 }
+                pl->setBuffData(PLAYER_BUFF_ATTACKING, 0);
             }
 _over:
             break;

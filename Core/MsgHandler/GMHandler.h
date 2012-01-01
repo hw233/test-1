@@ -104,6 +104,7 @@ private:
     void OnSetBosslevel(GObject::Player *player, std::vector<std::string>&);
     void OnQQVipKey(GObject::Player *player, std::vector<std::string>&);
     void OnClanBuild(GObject::Player *player, std::vector<std::string>&);
+    void OnClanItem(GObject::Player *player, std::vector<std::string>&);
     void OnInfoHI(GObject::Player *player, std::vector<std::string>&);
     void OnEnterHI(GObject::Player *player, std::vector<std::string>&);
     void OnLeaveHI(GObject::Player *player, std::vector<std::string>&);
