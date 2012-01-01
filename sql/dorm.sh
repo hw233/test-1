@@ -28,6 +28,7 @@ function dorm()
         delete from practice_place where ownerid = $1;\
         delete from player_copy where playerId = $1;\
         delete from player_frontmap where playerId = $1;\
+        delete from athletics_rank where ranker = $1;\
         delete from player where id = $1;";
 
     if [ $? -eq 0 ]; then
