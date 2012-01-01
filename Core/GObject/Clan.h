@@ -38,12 +38,6 @@ struct ClanPlayerPet
 	ClanPlayerPet(UInt16 count = 0,UInt32 tm = 0, UInt16 friendness = 0):favorCount(count), favorTime(tm), petFriendness(friendness){}
 };
 
-struct ClanSkill
-{
-    UInt8 id;
-	UInt8 level;	//如果 = 0， 表示此技能尚未被激活
-};
-
 struct ClanMember
 {
 	ClanMember(Player * pl = NULL, UInt8 c = 0, UInt32 jt = 0) : player(pl), cls(c), joinTime(jt)
@@ -57,7 +51,6 @@ struct ClanMember
 	UInt32 joinTime;
     UInt32 proffer;
 	UInt8  enterCount;
-    std::map<UInt8, ClanSkill> clanSkill;
 	std::map<UInt8, ClanPlayerPet> clanPet;
 };
 
@@ -259,23 +252,6 @@ public:
     void addClanFunds(UInt32 funds);
     void useClanFunds(UInt32 funds);
     UInt32 getClanFunds() { return _funds; }
-
-// 帮派技能
-    void addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level);
-    void addSkill(ClanMember* cm, UInt8 skillId);
-    UInt8 getSkillLevel(Player* pl, UInt8 skillId);
-    UInt8 skillLevelUp(Player* pl, UInt8 skillId);
-	void makeSkillInfo(Stream&, Player*);
-	void makeSkillInfo(Stream&, Player*, UInt8 skillId);
-    void listSkills(Player * player);
-    void showSkill(Player* player, UInt8 skillId);
-    UInt32 getSkillHPEffect(Player* pl);
-    UInt32 getSkillAtkEffect(Player* pl);
-    UInt32 getSkillDefendEffect(Player* pl);
-    UInt32 getSkillMagAtkEffect(Player* pl);
-    UInt32 getSkillMagDefentEffect(Player* pl);
-
-    void buildTechSkill(ClanMember* cm);
 
 public:
 	inline UInt8 getLev() { return _level; }

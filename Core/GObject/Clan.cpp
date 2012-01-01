@@ -40,7 +40,7 @@ UInt8 ClanAuthority[5][7] =
 };
 
 
-// °ïÅÉÃØÊõ
+// ????????
 #define CLAN_SKILL_ATTACK   1
 #define CLAN_SKILL_DEFEND   2
 #define CLAN_SKILL_MAGATK   3
@@ -165,7 +165,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	if (existClanMember(player))
 		return false;
 	UInt32 joinTime = TimeUtil::Now();
-	//½øÐÐÊ±¼ä×Ôµ÷Õû
+	//????Ê±???Ôµ???
 	std::set<UInt32>::iterator found = _membersJoinTime.find(joinTime);
 	while (found != _membersJoinTime.end())
 		found = _membersJoinTime.find(++joinTime);
@@ -383,7 +383,7 @@ bool Clan::leave(Player * player)
 	// std::string oldLeaderName = (*_members.begin())->player->getName();
     if( player == getOwner() && _members.size() != 1)
     {
-        // XXX °ïÖ÷²»ÄÜÍË³ö°ïÅÉ, °ïÅÉÖ»Ê£ÏÂ°ïÖ÷Ò»ÈËÊ±£¬¿É½âÉ¢°ïÅÉ
+        // XXX ?????????Ë³?????, ????Ö»Ê£?Â°???Ò»??Ê±???É½?É¢????
 		player->sendMsgCode(0, 1318);
         return false;
     }
@@ -881,7 +881,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 	{
 		if (type == 1)
 		{
-            // ¸öÈË×Ê½ð
+            // ?????Ê½?
 			thisDay = TimeUtil::SharpDay(0, now);
 #if 0
 			mem->achieveCount = items.count + mem->achieveCount;
@@ -912,7 +912,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		}
 		else if (type == 2)
 		{
-            // °ïÅÉ×Ê½ð
+            // ?????Ê½?
 			// std::string oldLeaderName = (_members.empty() ? "" : (*_members.begin())->player->getName());
 			// updateRank(mem, oldLeaderName);
 		}
@@ -1239,14 +1239,14 @@ void Clan::initBuildClan()
 void Clan::disband(Player * player)
 {
 	Mutex::ScopedLock lk(_mutex);
-	//1):Çå³ýÍ¬ÃË×Ú×å
+	//1):????Í¬??????
 	if (_allyClan != NULL)
 		_allyClan->delAllyClan(this);
 
-	//2):Çå³ý×Ú×åÕ½¼ì²â
+	//2):????????Õ½????
 	clanManager.delBattleClan(_clanBattle);
 
-	//3):´ÓÈ«¾ÖÖÐÉ¾³ý
+	//3):??È«????É¾??
 	const std::string& clanName = getName();
 	UInt8 cny = player->getCountry();
 	globalClans.remove(_id);
@@ -1328,7 +1328,7 @@ void Clan::notifyAllyClanInfo(Clan * clan, UInt8 type, UInt8 action, Player * pl
 }
 
 
-//player : ÊÇÖ÷¶¯·½
+//player : ???÷¶¯·?
 bool Clan::addAllyClan(Player * player, Player * allyPlayer, Clan * allyClan)
 {
 	if (allyClan->getId() == _id)
@@ -1532,245 +1532,6 @@ void Clan::addClanDonateRecordFromDB(const std::string& dn, UInt8 si, UInt16 dc,
 		mds.insert(MemberDonate(dn, dc, dt));
 }
 
-void Clan::addSkillFromDB(Player* pl, UInt8 skillId, UInt8 level)
-{
-	ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return;
-
-    ClanSkill& cs = cm->clanSkill[skillId];
-    cs.id = skillId;
-    cs.level = level;
-}
-
-void Clan::buildTechSkill(ClanMember* cm)
-{
-    UInt8 skillNum = GData::clanSkillTable.size();
-    for(UInt8 i = 1; i < skillNum; ++ i)
-        addSkill(cm, i);
-}
-
-void Clan::addSkill(ClanMember* cm, UInt8 skillId)
-{
-    if(cm == NULL)
-        return;
-
-    ClanSkill& cs = cm->clanSkill[skillId];
-    cs.id = skillId;
-    cs.level = 0;
-
-	DB5().PushUpdateData("REPLACE INTO `clan_skill`(`clanId`, `playerId`, `skillId`, `level`) VALUES(%u, %u, %u, %d)", _id, cm->player->getId(), skillId, 0);
-}
-
-UInt8 Clan::getSkillLevel(Player* pl, UInt8 skillId)
-{
-	ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return 0;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
-    if(it == cm->clanSkill.end())
-        return 0;
-
-    ClanSkill& cs = it->second;
-    return cs.level;
-}
-
-UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
-{
-	Stream st(REP::CLAN_SKILL);
-	st << static_cast<UInt8>(8) << skillId;
-
-    UInt8 res = 0;
-    do
-    {
-        ClanMember* cm = getClanMember(pl);
-        if(cm == NULL)
-        {
-            res = 3;
-            break;
-        }
-
-        std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
-        if(it == cm->clanSkill.end())
-        {
-            res = 3;
-            break;
-        }
-
-        ClanSkill& cs = it->second;
-        if(_techs->getSkillExtend() <= cs.level)
-        {
-            res = 2;
-            break;
-        }
-
-        UInt8 level = cs.level + 1;
-        GData::SingleClanSkillTable & single = GData::clanSkillTable[cs.id];
-        if(level > single.size())
-        {
-            res = 2;
-            break;
-        }
-
-        if(cm->proffer < single[level].needs)
-        {
-            res = 1;
-            break;
-        }
-
-
-        cm->proffer -= single[level].needs;
-        {
-            Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
-            pl->send(st);
-            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
-        }
-        ++cs.level;
-        DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, cm->player->getId(), skillId);
-
-        GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, 0);
-        GLOBAL().PushMsg(hdr1, NULL);
-
-        showSkill(pl, skillId);
-    } while(false);
-
-    st << res;
-	st << Stream::eos;
-	pl->send(st);
-    return res;
-}
-
-void Clan::makeSkillInfo(Stream& st, Player* pl)
-{
-	Mutex::ScopedLock lk(_mutex);
-	ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-    {
-        st << static_cast<UInt8>(0);
-        return;
-    }
-
-    UInt8 cnt = static_cast<UInt8>(cm->clanSkill.size());
-    if(cnt == 0)
-    {
-        buildTechSkill(cm);
-        cnt = static_cast<UInt8>(cm->clanSkill.size());
-    }
-
-    st << cnt;
-	std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.begin();
-	for (; it != cm->clanSkill.end(); ++ it)
-		st << it->second.id << it->second.level;
-
-    return;
-}
-
-void Clan::makeSkillInfo(Stream& st, Player* pl, UInt8 skillId)
-{
-	Mutex::ScopedLock lk(_mutex);
-	ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
-    if(it == cm->clanSkill.end())
-        return;
-
-    ClanSkill& skill = it->second;
-	st << skill.id << skill.level;
-    return;
-}
-
-void Clan::listSkills(Player * player)
-{
-	Stream st(REP::CLAN_SKILL);
-	st << static_cast<UInt8>(6);
-	makeSkillInfo(st, player);
-	st << Stream::eos;
-	player->send(st);
-}
-
-void Clan::showSkill(Player* player, UInt8 skillId)
-{
-    Stream st(REP::CLAN_SKILL);
-    st << static_cast<UInt8>(7);
-    makeSkillInfo(st, player, skillId);
-	st << Stream::eos;
-	player->send(st);
-}
-
-UInt32 Clan::getSkillHPEffect(Player* pl)
-{
-    ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return 0;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_HP);
-    if(it == cm->clanSkill.end())
-        return 0;
-
-    ClanSkill& skill = it->second;
-	return GData::clanSkillTable[skill.id][skill.level].hp;
-}
-
-UInt32 Clan::getSkillAtkEffect(Player* pl)
-{
-    ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return 0;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_ATTACK);
-    if(it == cm->clanSkill.end())
-        return 0;
-
-    ClanSkill& skill = it->second;
-	return GData::clanSkillTable[skill.id][skill.level].attack;
-}
-
-UInt32 Clan::getSkillDefendEffect(Player* pl)
-{
-    ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return 0;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_DEFEND);
-    if(it == cm->clanSkill.end())
-        return 0;
-
-    ClanSkill& skill = it->second;
-	return GData::clanSkillTable[skill.id][skill.level].defend;
-}
-
-UInt32 Clan::getSkillMagAtkEffect(Player* pl)
-{
-    ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return 0;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_MAGATK);
-    if(it == cm->clanSkill.end())
-        return 0;
-
-    ClanSkill& skill = it->second;
-	return GData::clanSkillTable[skill.id][skill.level].magatk;
-}
-
-UInt32 Clan::getSkillMagDefentEffect(Player* pl)
-{
-    ClanMember* cm = getClanMember(pl);
-    if(cm == NULL)
-        return 0;
-
-    std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(CLAN_SKILL_MAGDEF);
-    if(it == cm->clanSkill.end())
-        return 0;
-
-    ClanSkill& skill = it->second;
-	return GData::clanSkillTable[skill.id][skill.level].magdef;
-}
-
 void Clan::addClanDonateRecord(const std::string& dn, UInt8 si, UInt16 dc, UInt32 dt)
 {
 	MemberDonates& mds = _memberDonates[si];
@@ -1967,7 +1728,7 @@ void Clan::setConstruction(UInt64 cons, bool writedb)
     }
     if(bUp && writedb && _level >= 5)
     {
-        //¿¿¿¿¿
+        //?????
         UInt32 nLev  = static_cast<UInt32> (_level);
 
         stAttainMsg m;
@@ -2942,6 +2703,64 @@ void Clan::setMaxMemberCount(UInt8 count)
     Stream st(REP::CLAN_INFO_UPDATE);
     st << static_cast<UInt8>(10) << _maxMemberCount << Stream::eos;
     broadcast(st);
+}
+
+UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
+{
+    Stream st(REP::CLAN_SKILL);
+    st << static_cast<UInt8>(8) << skillId;
+
+    UInt8 res = 0;
+    do
+    {
+        ClanMember* cm = getClanMember(pl);
+        if(cm == NULL)
+        {
+            res = 3;
+            break;
+        }
+
+        UInt8 skillLevel = pl->getSkillLevel(skillId);
+        if(skillLevel == 0xFF)
+        {
+            res = 3;
+            break;
+        }
+
+        if(_techs->getSkillExtend() <= skillLevel)
+        {
+            res = 2;
+            break;
+        }
+
+        UInt8 level = skillLevel + 1;
+        GData::SingleClanSkillTable & single = GData::clanSkillTable[skilId];
+        if(level > single.size())
+        {
+            res = 2;
+            break;
+        }
+
+        if(cm->proffer < single[level].needs)
+        {
+            res = 1;
+            break;
+        }
+
+        cm->proffer -= single[level].needs;
+        {
+            Stream st(REP::CLAN_INFO_UPDATE);
+            st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
+            pl->send(st);
+            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
+        }
+
+        GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+
+    } while(false);
+
+    return res;
 }
 
 }

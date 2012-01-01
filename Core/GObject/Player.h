@@ -331,6 +331,12 @@ namespace GObject
         UInt8 type;
     };
 
+    struct ClanSkill
+    {
+        UInt8 id;
+        UInt8 level;	//如果 = 0， 表示此技能尚未被激活
+    };
+
 	struct PlayerData
 	{
 		static const UInt16 INIT_PACK_SIZE = 100;
@@ -1228,6 +1234,23 @@ namespace GObject
         TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
         HoneyFall* getHoneyFall();
 
+        // 帮派技能
+        void addSkillFromDB(UInt8 skillId, UInt8 level);
+        void addSkill(UInt8 skillId);
+        UInt8 getSkillLevel(UInt8 skillId);
+        UInt8 skillLevelUp(UInt8 skillId);
+        void makeSkillInfo(Stream&);
+        void makeSkillInfo(Stream&, UInt8 skillId);
+        void listSkills();
+        void showSkill(UInt8 skillId);
+        UInt32 getSkillHPEffect();
+        UInt32 getSkillAtkEffect();
+        UInt32 getSkillDefendEffect();
+        UInt32 getSkillMagAtkEffect();
+        UInt32 getSkillMagDefentEffect();
+
+        void buildTechSkill();
+
     private:
         bool m_hasTripod;
         TripodData m_td;
@@ -1235,6 +1258,7 @@ namespace GObject
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
         HoneyFall* m_hf;
+        std::map<UInt8, ClanSkill> m_clanSkill;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
