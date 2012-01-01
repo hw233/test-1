@@ -3853,6 +3853,11 @@ namespace GObject
 		cancelAutoBattle();
 		cancelAutoDungeon();
 
+        if (getBuffData(PLAYER_BUFF_AUTOCOPY))
+            cancelAutoCopy(getBuffData(PLAYER_BUFF_AUTOCOPY));
+        if (GetVar(VAR_ATOFM))
+            cancelAutoFrontMap(GetVar(VAR_ATOFM));
+
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
