@@ -28,6 +28,7 @@ static UInt32 worldboss[] = {
     5162, 5473, 5474, 5475, 5510,
     5103, 5470, 5471, 5472, 5511,
     5168, 5476, 5477, 5478, 5512,
+    5127, 5479, 5480, 5481, 5513,
 };
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
