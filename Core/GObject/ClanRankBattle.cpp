@@ -2290,14 +2290,14 @@ namespace GObject
     }
 
 
-    void ClanRankBattleMgr::GetCanBattleClans(bool bNotify)
+    void ClanRankBattleMgr::GetCanBattleClans(bool bBegin)
     {
         m_Clans.clear();
         class GetRankBattleClansVisitor : public Visitor<Clan>
         {
         public:
-            GetRankBattleClansVisitor(ClanMap& clanMap, UInt32 now, bool bnotify)
-                :m_ClanMap(clanMap),m_Now(now),m_bNotify(bnotify){}
+            GetRankBattleClansVisitor(ClanMap& clanMap, UInt32 now, bool bbegin)
+                :m_ClanMap(clanMap),m_Now(now),m_bBegin(bbegin){}
 
             bool operator()(Clan* clan)
             {
@@ -2305,10 +2305,10 @@ namespace GObject
                 UInt32 res = clan->CheckJoinRankBattle(m_Now, info.players);
                 if(res == 2) //满足报名条件
                 {
-                    clan->SetDailyBattleScore(0);
+                    if(m_bBegin) clan->SetDailyBattleScore(0);
                     m_ClanMap.insert(std::make_pair(clan->getId(), info));
                 }
-                else if(res == 1 && m_bNotify) //有报名但未达人数
+                else if(res == 1 && m_bBegin) //有报名但未达人数
                 {
                     //系统提示
                     SysMsgItem *sysMsgItem = globalSysMsg[2215];
@@ -2325,9 +2325,9 @@ namespace GObject
         private:
             ClanMap& m_ClanMap;
             UInt32 m_Now;
-            bool m_bNotify;
+            bool m_bBegin;
         };
-        GetRankBattleClansVisitor visitor(m_Clans, m_Now, bNotify);
+        GetRankBattleClansVisitor visitor(m_Clans, m_Now, bBegin);
         globalClans.enumerate(visitor);
     }
 
