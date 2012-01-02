@@ -43,6 +43,10 @@ MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_KILLCD,    OnAthleticsKillCD);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
 
+MSG_REG(GameMsgHdr, OnItemHistoryReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_PACKAGE, OnClanPackageReq);
+
+
 MSG_REG_2(GameMsgHdr, REQ::CLAN_SKILL, OnClanTechOpReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_BATTLE, OnClanCityBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLANCITYBATTLELIST, OnClanCityBattleListReq);
@@ -105,5 +109,7 @@ MSG_REG_2(GameMsgHdr, 0x1EF, OnRunscriptBattleReq);
 MSG_REG_2(GameMsgHdr, 0x1F0, OnLevelChange);
 MSG_REG_2(GameMsgHdr, 0x1F1, OnAthleticsMartialFlush);
 MSG_REG_2(GameMsgHdr, 0x1F2, OnAthMartialOver);
+
+MSG_REG_2(GameMsgHdr, 0x1F3, OnReleaseClanSkillLevelOp);
 
 MSG_HANDLER_END()

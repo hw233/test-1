@@ -1181,19 +1181,15 @@ void Fighter::rebuildEquipAttr()
         }
     }
 
-    // 帮派秘术对额外属性的加成
-    Clan* clan = _owner == NULL ? NULL : _owner->getClan();
-    if(clan != NULL)
-    {
-        _attrExtraEquip.hp += clan->getSkillHPEffect(_owner);
-        _attrExtraEquip.attack += clan->getSkillAtkEffect(_owner);
-        _attrExtraEquip.defend += clan->getSkillDefendEffect(_owner);
-        _attrExtraEquip.magatk += clan->getSkillMagAtkEffect(_owner);
-        _attrExtraEquip.magdef += clan->getSkillMagDefentEffect(_owner);
-    }
-
     if (_owner)
     {
+        // 帮派秘术对额外属性的加成
+        _attrExtraEquip.hp += _owner->getClanSkillHPEffect();
+        _attrExtraEquip.attack += _owner->getClanSkillAtkEffect();
+        _attrExtraEquip.defend += _owner->getClanSkillDefendEffect();
+        _attrExtraEquip.magatk += _owner->getClanSkillMagAtkEffect();
+        _attrExtraEquip.magdef += _owner->getClanSkillMagDefentEffect();
+
         const GData::AttrExtra* ae = _owner->getHIAttr();
         if (ae)
             addAttrExtra(_attrExtraEquip, ae);

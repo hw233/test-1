@@ -567,6 +567,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     if (!fight(pl, id, i, true, true))
                         break;
                 }
+                pl->setBuffData(PLAYER_BUFF_ATTACKING, 0);
             }
             break;
 

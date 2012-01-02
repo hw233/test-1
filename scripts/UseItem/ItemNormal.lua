@@ -382,6 +382,373 @@ function ItemNormal_00000028(iid, num, bind, param)
     return false;
 end
 
+--帮派战奖励相关
+function ItemNormal_00000405(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(29, 5, 1);
+    
+    local prob = {50, 100}
+    local items = {{55,1}, {510,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(405, player);
+        package:AddItem(29, 5, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000406(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(29, 10, 1);
+
+    local prob = {50, 100}
+    local items = {{9,1}, {15,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(406, player);
+        package:AddItem(29, 10, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000407(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(29, 15, 1);
+
+    local prob = {50, 100}
+    local items = {{56,1}, {57,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(407, player);
+        package:AddItem(29, 15, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000408(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(29, 20, 1);
+
+    local prob = {50, 100}
+    local items = {{503,1}, {500,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(408, player);
+        package:AddItem(29, 20, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000409(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(1526, 2, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{55,1}, {510,1}, {502,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(409, player);
+        package:AddItem(1526, 2, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000410(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(1526, 3, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{56,1}, {511,1}, {15,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(410, player);
+        package:AddItem(1526, 3, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000411(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(1526, 4, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{503,1}, {514,1}, {512,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(411, player);
+        package:AddItem(1526, 4, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000412(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{515,1}, {507,1}, {509,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(412, player);
+        package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000413(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{515,1}, {507,1}, {509,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(413, player);
+        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000414(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{515,1}, {507,1}, {509,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(414, player);
+        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000415(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{515,1}, {507,1}, {509,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(415, player);
+        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+function ItemNormal_00000416(id, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+
+    local prob = {33, 66, 100}
+    local items = {{515,1}, {507,1}, {509,1}}
+
+    local p = math.random(1, 100)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i];
+    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
+    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+
+    if reqgrids <= package:GetRestPackageSize() then 
+        package:DelItemSendMsg(416, player);
+        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(item[1], item[2], 1, 0, 2);
+        return num;
+    end
+    player:sendMsgCode(2, 1011, 0);
+    return 0;
+end
+
+
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -5860,6 +6227,18 @@ local ItemNormal_Table = {
     [27] = ItemNormal_00000027,
     [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
+    [405] = ItemNormal_00000405,
+    [406] = ItemNormal_00000406,
+    [407] = ItemNormal_00000407,
+    [408] = ItemNormal_00000408,
+    [409] = ItemNormal_00000409,
+    [410] = ItemNormal_00000410,
+    [411] = ItemNormal_00000411,
+    [412] = ItemNormal_00000412,
+    [413] = ItemNormal_00000413,
+    [414] = ItemNormal_00000414,
+    [415] = ItemNormal_00000415,
+    [416] = ItemNormal_00000416,
 	[400] = ItemNormal_00000400,
     [402] = ItemNormal_00000402,
     [403] = ItemNormal_00000403,

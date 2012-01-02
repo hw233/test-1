@@ -274,8 +274,6 @@ void HeroIsland::calcNext(UInt32 now)
                 _prepareTime = TimeUtil::SharpDayT(1,now) + 11 * 60 * 60 + 45 * 60;
             else if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
                 _prepareTime = TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60;
-            else
-                _prepareTime += 24 * 60 * 60;
         }
         else
         {
@@ -312,7 +310,7 @@ void HeroIsland::rankReward()
     if (!cfg.GMCheck)
         factor = 1.0;
 
-    SYSMSG_BROADCASTV(2212);
+    SYSMSG_BROADCASTV(2312);
 
     UInt8 n = 0;
     UInt8 nsz = _prestige.size();
@@ -328,8 +326,8 @@ void HeroIsland::rankReward()
             if (n < 3)
             {
                 MailPackage::MailItem item[] = {{10,1},};
-                (*i)->player->sendMailItem(2210, 2211, item, 1);
-                SYSMSG_BROADCASTV(2213, n+1, (*i)->player->getCountry(), (*i)->player->getName().c_str(), prestige);
+                (*i)->player->sendMailItem(2310, 2311, item, 1);
+                SYSMSG_BROADCASTV(2313, n+1, (*i)->player->getCountry(), (*i)->player->getName().c_str(), prestige);
             }
 
             ++n;
@@ -465,7 +463,7 @@ void HeroIsland::disperse(UInt32 now)
     else
         _disperseTime = now + 30;
 
-    SYSMSG_BROADCAST(2214);
+    SYSMSG_BROADCAST(2314);
 }
 
 void HeroIsland::notifyCount(UInt32 now)

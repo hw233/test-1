@@ -29,6 +29,10 @@ MSG_REG(GameMsgHdr, OnFighterTrainReq);
 //MSG_REG(GameMsgHdr, OnFighterTrain2Req);
 MSG_REG_2(GameMsgHdr, REQ::TRAIN_FIGHTER_OP, OnFighterTrainOpReq);
 MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_REQINIT, OnClanRankBattleReqInit);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_REQ, OnClanRankBattleReq);
+MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_SORTLIST, OnClanRankBattleSortList);
+
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);
 MSG_REG(GameMsgHdr, OnTakeOnlineRewardReq);
@@ -206,7 +210,7 @@ MSG_REG_2(GameMsgHdr, 0x300, OnSalePriceCheckNotify);
 MSG_REG_2(GameMsgHdr, 0x301, OnSaleAddItemNotify);
 MSG_REG_2(GameMsgHdr, 0x302, OnSaleSellReqNotify);
 MSG_REG_2(GameMsgHdr, 0x303, OnSaleSellRespNotify);
-MSG_REG_2(GameMsgHdr, 0x304, OnSaleItemCancel);	//取消 & 超时
+MSG_REG_2(GameMsgHdr, 0x304, OnSaleItemCancel);	//取?? & ??时
 MSG_REG_2(GameMsgHdr, 0x305, OnSaleItemSearchReq);
 
 
@@ -219,6 +223,7 @@ MSG_REG_2(GameMsgHdr, 0x309, OnClanSkillDonateBackReq);
 MSG_REG_2(GameMsgHdr, 0x310, OnOperationTaskAction);
 MSG_REG_2(GameMsgHdr, 0x311, OnClanOption);
 MSG_REG_2(GameMsgHdr, 0x312, OnClanSkillLevel);
+MSG_REG_2(GameMsgHdr, 0x313, OnClanSkillList);
 //MSG_REG_2(GameMsgHdr, 0x313, OnFriendLevUp);
 
 

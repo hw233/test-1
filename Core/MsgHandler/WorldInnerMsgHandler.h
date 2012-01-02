@@ -590,4 +590,12 @@ void OnAthleticsPayRet( GameMsgHdr& hdr,  const void* data)
         GObject::gAthleticsRank.KillCD(player, msg->moneyEnough == 1);
 
 }
+
+void OnReleaseClanSkillLevelOp( GameMsgHdr& hdr,  const void* data)
+{
+    MSG_QUERY_PLAYER(player);
+    player->setClanSkillFlag(0);
+}
+
+
 #endif // _WORLDINNERMSGHANDLER_H_

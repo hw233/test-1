@@ -42,8 +42,12 @@
 #include "HeroIsland.h"
 #include "GObject/AthleticsRank.h"
 #include "DCLogger.h"
+#include "ClanRankBattle.h"
 #include "TeamCopy.h"
 #include "HoneyFall.h"
+#include "GData/ClanTechTable.h"
+#include "GData/ClanLvlTable.h"
+#include "GData/ClanSkillTable.h"
 
 #include <cmath>
 
@@ -53,6 +57,12 @@
 #else
 #define TGD_ONLINE_TIME (10*60)
 #endif
+
+#define CLAN_SKILL_ATTACK   1
+#define CLAN_SKILL_DEFEND   2
+#define CLAN_SKILL_MAGATK   3
+#define CLAN_SKILL_MAGDEF   4
+#define CLAN_SKILL_HP       5
 
 namespace GObject
 {
@@ -556,6 +566,11 @@ namespace GObject
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
         _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_hasTripod(false)
 	{
+        m_ClanBattleStatus = 1;
+        m_ClanBattleScore = 0;
+        m_ClanBattleWinTimes = 0;
+        m_ClanBattleSkillFlag = 0;
+
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
 		m_TaskMgr = new TaskMgr(this);
@@ -571,6 +586,7 @@ namespace GObject
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
+        m_csFlag = 0;
 	}
 
 
@@ -601,6 +617,8 @@ namespace GObject
 		{
 			globalCountryBattle.addAutoCB(this);
 		}
+        
+        ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		setBlockBossByLevel();
 		return true;
@@ -2183,6 +2201,7 @@ namespace GObject
 		bsim.start();
 		bool res = bsim.getWinner() == 1;
 
+            
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
         if (report & 0x01)
@@ -2226,9 +2245,9 @@ namespace GObject
 
 		if(applyhp)
 		{
-			if(bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling), 0))
+			if(bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling | ClanRankBattle), 0))
 				checkHPLoss();
-			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling), 0))
+			if(bsim.applyFighterHP(1, other, !other->hasFlag(CountryBattle | ClanBattling | ClanRankBattle), 0))
 				other->checkHPLoss();
 		}
 		else if(sysRegen > 0 && !noreghp)
@@ -3843,6 +3862,7 @@ namespace GObject
 
 		cancelAutoBattle();
 		cancelAutoDungeon();
+
 		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
@@ -3850,6 +3870,7 @@ namespace GObject
             heroIsland.playerLeave(this);
             delFlag(Player::InHeroIsland);
         }
+        ClanRankBattleMgr::Instance().PlayerLeave(this);
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
@@ -3901,6 +3922,8 @@ namespace GObject
 		_playerData.inCity = inCity ? 1 : 0;
 		_playerData.location = spot;
 		DB1().PushUpdateData("UPDATE `player` SET `inCity` = %u, `location` = %u WHERE id = %" I64_FMT "u", _playerData.inCity, _playerData.location, getId());
+
+        ClanRankBattleMgr::Instance().PlayerEnter(this);
 
 		if(inCity)
 		{
@@ -4975,7 +4998,7 @@ namespace GObject
 
 	void Player::autoRegenAll()
 	{
-		if(hasFlag(CountryBattle | ClanBattling))
+		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
 			return;
 		UInt32 autohp = getBuffData(0);
 		if(autohp == 0)
@@ -6423,7 +6446,7 @@ namespace GObject
 			bf->setAttrExtra(1, bf->getClass(), _bossLevel);
 		}
 		bsim.start();
-		bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling));
+		bsim.applyFighterHP(0, this, !hasFlag(CountryBattle | ClanBattling | ClanRankBattle));
 		for(size_t i = 0; i < size; ++ i)
 		{
 			SAFE_DELETE(fgt_clone[i]);
@@ -7721,21 +7744,21 @@ namespace GObject
         return m_hf;
     }
 
-    void Player::addSkillFromDB(UInt8 skillId, UInt8 level)
+    void Player::addClanSkillFromDB(UInt8 skillId, UInt8 level)
     {
         ClanSkill& cs = m_clanSkill[skillId];
         cs.id = skillId;
         cs.level = level;
     }
 
-    void Player::buildTechSkill()
+    void Player::buildClanTechSkill()
     {
         UInt8 skillNum = GData::clanSkillTable.size();
         for(UInt8 i = 1; i < skillNum; ++ i)
-            addSkill(i);
+            addClanSkill(i);
     }
 
-    void Player::addSkill(UInt8 skillId)
+    void Player::addClanSkill(UInt8 skillId)
     {
         ClanSkill& cs = m_clanSkill[skillId];
         cs.id = skillId;
@@ -7744,7 +7767,7 @@ namespace GObject
         DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%u, %u, 0)", getId(), skillId);
     }
 
-    UInt8 Player::getSkillLevel(UInt8 skillId)
+    UInt8 Player::getClanSkillLevel(UInt8 skillId)
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(skillId);
         if(it == m_clanSkill.end())
@@ -7754,78 +7777,47 @@ namespace GObject
         return cs.level;
     }
 
-UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
-{
-    Stream st(REP::CLAN_SKILL);
-    st << static_cast<UInt8>(8) << skillId;
-
-    UInt8 res = 0;
-    do
+    UInt8 Player::clanSkillLevelUp(UInt8 skillId)
     {
-        ClanMember* cm = getClanMember(pl);
-        if(cm == NULL)
+        if(m_csFlag != 1)
+            return 3;
+
+        Stream st(REP::CLAN_SKILL);
+        st << static_cast<UInt8>(8) << skillId;
+
+        UInt8 res = 0;
+        do
         {
-            res = 3;
-            break;
-        }
+            std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(skillId);
+            if(it == m_clanSkill.end())
+            {
+                res = 3;
+                break;
+            }
 
-        std::map<UInt8, ClanSkill>::iterator it = cm->clanSkill.find(skillId);
-        if(it == cm->clanSkill.end())
-        {
-            res = 3;
-            break;
-        }
+            ClanSkill& cs = it->second;
+            ++ cs.level;
+            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, getId(), skillId);
 
-        ClanSkill& cs = it->second;
-        if(_techs->getSkillExtend() <= cs.level)
-        {
-            res = 2;
-            break;
-        }
+            showClanSkill(skillId);
+        } while(false);
 
-        UInt8 level = cs.level + 1;
-        GData::SingleClanSkillTable & single = GData::clanSkillTable[cs.id];
-        if(level > single.size())
-        {
-            res = 2;
-            break;
-        }
+        st << res;
+        st << Stream::eos;
+        send(st);
 
-        if(cm->proffer < single[level].needs)
-        {
-            res = 1;
-            break;
-        }
-
-
-        cm->proffer -= single[level].needs;
-        {
-            Stream st(REP::CLAN_INFO_UPDATE);
-            st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
-            pl->send(st);
-            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
-        }
-        ++cs.level;
-        DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, cm->player->getId(), skillId);
-
-        GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, 0);
+        GameMsgHdr hdr1(0x1F3, WORKER_THREAD_WORLD, this, 0);
         GLOBAL().PushMsg(hdr1, NULL);
 
-        showSkill(pl, skillId);
-    } while(false);
+        return res;
+    }
 
-    st << res;
-    st << Stream::eos;
-    pl->send(st);
-    return res;
-}
-
-    void Player::makeSkillInfo(Stream& st)
+    void Player::makeClanSkillInfo(Stream& st)
     {
         UInt8 cnt = static_cast<UInt8>(m_clanSkill.size());
         if(cnt == 0)
         {
-            buildTechSkill();
+            buildClanTechSkill();
             cnt = static_cast<UInt8>(m_clanSkill.size());
         }
 
@@ -7837,7 +7829,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         return;
     }
 
-    void Player::makeSkillInfo(Stream& st, UInt8 skillId)
+    void Player::makeClanSkillInfo(Stream& st, UInt8 skillId)
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(skillId);
         if(it == m_clanSkill.end())
@@ -7848,25 +7840,25 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         return;
     }
 
-    void Player::listSkills()
+    void Player::listClanSkills()
     {
         Stream st(REP::CLAN_SKILL);
         st << static_cast<UInt8>(6);
-        makeSkillInfo(st, player);
+        makeClanSkillInfo(st);
         st << Stream::eos;
-        player->send(st);
+        send(st);
     }
 
-    void Player::showSkill(UInt8 skillId)
+    void Player::showClanSkill(UInt8 skillId)
     {
         Stream st(REP::CLAN_SKILL);
         st << static_cast<UInt8>(7);
-        makeSkillInfo(st, player, skillId);
+        makeClanSkillInfo(st, skillId);
         st << Stream::eos;
-        player->send(st);
+        send(st);
     }
 
-    UInt32 Player::getSkillHPEffect()
+    UInt32 Player::getClanSkillHPEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_HP);
         if(it == m_clanSkill.end())
@@ -7876,7 +7868,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         return GData::clanSkillTable[skill.id][skill.level].hp;
     }
 
-    UInt32 Player::getSkillAtkEffect()
+    UInt32 Player::getClanSkillAtkEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_ATTACK);
         if(it == m_clanSkill.end())
@@ -7886,7 +7878,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         return GData::clanSkillTable[skill.id][skill.level].attack;
     }
 
-    UInt32 Player::getSkillDefendEffect()
+    UInt32 Player::getClanSkillDefendEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_DEFEND);
         if(it == m_clanSkill.end())
@@ -7896,7 +7888,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         return GData::clanSkillTable[skill.id][skill.level].defend;
     }
 
-    UInt32 Player::getSkillMagAtkEffect()
+    UInt32 Player::getClanSkillMagAtkEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_MAGATK);
         if(it == m_clanSkill.end())
@@ -7906,7 +7898,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
         return GData::clanSkillTable[skill.id][skill.level].magatk;
     }
 
-    UInt32 Player::getSkillMagDefentEffect()
+    UInt32 Player::getClanSkillMagDefentEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_MAGDEF);
         if(it == m_clanSkill.end())

@@ -94,37 +94,37 @@ namespace GObject
                 break;
             case CYCLE_MIN:
                 {
-                    //ÏÂ¸ö·ÖÖÓ
+                    //åˆ†
                     m_OverTime[id] = TimeUtil::SharpMinute(1, now);
                 }
                 break;
             case CYCLE_HOUR:
                 {
-                    //ÏÂ¸öÐ¡Ê±
+                    //æ—¶
                     m_OverTime[id] = TimeUtil::SharpHour(1, now);
                 }
                 break;
             case CYCLE_DAY:
                 {
-                    //ÏÂÒ»×ÔÈ»Ìì
+                    //å¤©
                     m_OverTime[id] = TimeUtil::SharpDayT(1, now);
                 }
                 break;
             case CYCLE_WEEK:
                 {
-                    //ÏÂÒ»¸ö×ÔÈ»ÖÜ
+                    //å‘¨
                     m_OverTime[id] = TimeUtil::SharpWeek(1, now);
                 }
                 break;
             case CYCLE_MONTH:
                 {
-                    //ÏÂÒ»¸ö×ÔÈ»ÔÂ
+                    //æœˆ
                     m_OverTime[id] = TimeUtil::SharpMonth(1, now);
                 }
                 break;
             case CYCLE_YEAR:
                 {
-                    //ÏÂÒ»¸ö×ÔÈ»Äê
+                    //å¹´
                     m_OverTime[id] = TimeUtil::SharpYear(1, now);
                 }
                 break;
@@ -135,7 +135,6 @@ namespace GObject
         UInt32 oldVar = m_Vars[id];
         m_Vars[id] = 0;
 
-        //·µ»ØÊÇ·ñ·¢Éú±ä»¯
         return oldtime != m_OverTime[id] || oldVar != 0;
     }
 

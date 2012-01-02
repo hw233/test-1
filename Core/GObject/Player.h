@@ -38,32 +38,32 @@ namespace GObject
 #define PLAYER_BUFF_ATTR1			0x01
 #define PLAYER_BUFF_ATTR2			0x02
 #define PLAYER_BUFF_ATTR3			0x03
-#define PLAYER_BUFF_PROTECT			0x04    //ÐÞÁ¶¼Ó³É
+#define PLAYER_BUFF_PROTECT			0x04    //??Á¶?Ó³?
 #define PLAYER_BUFF_TRAINP1			0x05
 #define PLAYER_BUFF_TRAINP2			0x06
-#define PLAYER_BUFF_CLANMOVE		0x07	//×Ú×å³ÇÕ½ÐÐ×ßBUFF
+#define PLAYER_BUFF_CLANMOVE		0x07	//??????Õ½????BUFF
 #define PLAYER_BUFF_BANCHAT			0x08
 #define PLAYER_BUFF_BOSSWEAK		0x09
-#define PLAYER_BUFF_TRAINP3			0x0A	//ÌÀÔ²Éý¼¶¼ÓËÙ+70%
-#define PLAYER_BUFF_TRAINP4			0x0B	//ÌÀÔ²Éý¼¶¼ÓËÙ+50%
-#define PLAYER_BUFF_ATHLETICS		0x0C	//´¦ÓÚ¾º¼¼buffer, ÊÀ½çÏß³Ì´¦Àí
+#define PLAYER_BUFF_TRAINP3			0x0A	//??Ô²????????+70%
+#define PLAYER_BUFF_TRAINP4			0x0B	//??Ô²????????+50%
+#define PLAYER_BUFF_ATHLETICS		0x0C	//???Ú¾???buffer, ?À½??ß³Ì´???
 #define PLAYER_BUFF_PKLOCK			0x0D
 #define PLAYER_BUFF_WEAK			0x0E
 #define PLAYER_BUFF_HOLY			0x0F
 #define PLAYER_BUFF_ATTACKING		0x10
-#define PLAYER_BUFF_CLANBATTING		0x11	//´¦ÔÚ×Ú×å³ÇÕ½
+#define PLAYER_BUFF_CLANBATTING		0x11	//??????????Õ½
 #define PLAYER_BUFF_CLANRECOVE		0x12	//
 #define PLAYER_BUFF_REENTERCLAN		0x13
 #define PLAYER_BUFF_CLANRCENHANCE	0x14    
-#define PLAYER_BUFF_PWDLOCK			0x15	//5´ÎÃÜÂë´íÎó Ëø¶¨10·ÖÖÓ
-#define PLAYER_BUFF_PRACTICE1       0x16	//ÐÞÁ¶¼Ó³É20% XXX: ÔÝÊ±²»ÓÃ
-#define PLAYER_BUFF_PRACTICE2       0x17	//ÐÞÁ¶¼Ó³É50% XXX: ÔÝÊ±²»ÓÃ
-#define PLAYER_BUFF_XTHTYT          0x18	//ÒÑÊ¹ÓÃÁËÏÈÌì»ìãçÔªÌ¥
-#define PLAYER_BUFF_WBOSS           0x19	//ÒÑ¶îÍâ´òÊÀ½çBOSS´ÎÊý
-#define PLAYER_BUFF_YDOTR           0x20    //»Æ×ê¹úÇì³äÖµ×Ü¶î
-#define PLAYER_BUFF_AUTOCOPY        0x21	//×Ô¶¯¸±±¾
-#define PLAYER_BUFF_ONLINE          0x22	//ÀÛ»ýÔÚÏßÊ±¼ä
-#define PLAYER_BUFF_HIFIGHT         0x23    //Ó¢ÐÛµº¹¥»÷ÀäÈ´
+#define PLAYER_BUFF_PWDLOCK			0x15	//5?????????? ????10????
+#define PLAYER_BUFF_PRACTICE1       0x16	//??Á¶?Ó³?20% XXX: ??Ê±????
+#define PLAYER_BUFF_PRACTICE2       0x17	//??Á¶?Ó³?50% XXX: ??Ê±????
+#define PLAYER_BUFF_XTHTYT          0x18	//??Ê¹????????????ÔªÌ¥
+#define PLAYER_BUFF_WBOSS           0x19	//?Ñ¶??????À½?BOSS????
+#define PLAYER_BUFF_YDOTR           0x20    //??????????Öµ?Ü¶?
+#define PLAYER_BUFF_AUTOCOPY        0x21	//?Ô¶?????
+#define PLAYER_BUFF_ONLINE          0x22	//?Û»?????Ê±??
+#define PLAYER_BUFF_HIFIGHT         0x23    //Ó¢?Ûµ???????È´
 #define PLAYER_BUFF_HIWEAK          0x24
 #define PLAYER_BUFF_HIMASTER_SOUL   0x25
 #define PLAYER_BUFF_HIMOVE          0x26
@@ -89,22 +89,22 @@ namespace GObject
 #define PLAYER_BUFF_HIRA19          0x39    //  5507
 #define PLAYER_BUFF_HIRA20          0x3A    //  5508
 
-#define PLAYER_BUFF_HIPG            0x3B    // ÅÌ¹ÅÖ®Á¦
-#define PLAYER_BUFF_HIBT            0x3C    // Ááçç±¦Ëþ
-#define PLAYER_BUFF_HILN            0x3D    // »ìÔªÁéÅ­
-#define PLAYER_BUFF_HIJZ            0x3E    // ÎåÐÐ½ûÕó
-#define PLAYER_BUFF_HIESCAPE        0x3F    // Ó¢ÐÛµºÌÓÍö
+#define PLAYER_BUFF_HIPG            0x3B    // ?Ì¹?Ö®Á¦
+#define PLAYER_BUFF_HIBT            0x3C    // ???ç±¦??
+#define PLAYER_BUFF_HILN            0x3D    // ??Ôª??Å­
+#define PLAYER_BUFF_HIJZ            0x3E    // ???Ð½???
+#define PLAYER_BUFF_HIESCAPE        0x3F    // Ó¢?Ûµ?????
 
-#define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ¶·½£ÀúÁ·Ê¤Àû´ÎÊý
+#define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????Á·Ê¤??????
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
 
-#define CLAN_TASK_MAXCOUNT          5       // °ïÅÉÃ¿ÈÕ×î´óÈÎÎñÊý
-#define SHIMEN_TASK_MAXCOUNT        5       // Ê¦ÃÅÃ¿ÈÕ×î´óÈÎÎñÊý
-#define YAMEN_TASK_MAXCOUNT         5       // Ê¦ÃÅÃ¿ÈÕ×î´óÈÎÎñÊý
+#define CLAN_TASK_MAXCOUNT          5       // ????Ã¿????????????
+#define SHIMEN_TASK_MAXCOUNT        5       // Ê¦??Ã¿????????????
+#define YAMEN_TASK_MAXCOUNT         5       // Ê¦??Ã¿????????????
 
-#define MAX_PRACTICE_FIGHTRES       10      // ×î´óÐÞÁ¶É¢ÏÉÊý
+#define MAX_PRACTICE_FIGHTRES       10      // ??????Á¶É¢????
 
 #define MAX_TRIPOD_SOUL 100000
 #define POINT_PERMIN (60*10)
@@ -139,11 +139,11 @@ namespace GObject
             needgen = 1;
         }
 
-        UInt32 soul;    // ÔªÆøÖµ
-        UInt8 fire;     // »ðÖÖ: 0-ÆÕÍ¨µÄ»ð 1-õ÷Ä¿öÎ»ð 2-¼«µØÙý»ð 3-ÅÌÄ¾Ðþ»ð 4-Á¶ÓüÚ¤»ð 5-ÈýÃÁÕæ»ð 6-¾ÅÌìÀë»ð 
-        UInt8 quality;  // ½±ÀøÆ·ÖÊ 1-°× 2-ÂÌ 3-À¶ 4-×Ï 5-³È
-        UInt8 awdst;    // ½±Àø×´Ì¬ 0-ÈÛÁ¶ÖÐ 1-Î´ÁìÈ¡
-        UInt8 needgen;  // ÐèÒªÖØÐÂÉú³É½±Àø
+        UInt32 soul;    // Ôª??Öµ
+        UInt8 fire;     // ????: 0-??Í¨?Ä»? 1-??Ä¿?Î»? 2-???????? 3-??Ä¾???? 4-Á¶??Ú¤?? 5-???????? 6-???????? 
+        UInt8 quality;  // ????Æ·?? 1-?? 2-?? 3-À¶ 4-?? 5-??
+        UInt8 awdst;    // ????×´Ì¬ 0-??Á¶?? 1-Î´??È¡
+        UInt8 needgen;  // ??Òª???????É½???
         UInt32 itemId;
         UInt8 num;
     };
@@ -325,7 +325,7 @@ namespace GObject
     struct CopyTeamPage
     {
         UInt8 copyId;
-        UInt8 t;   //ÄÑ¶È
+        UInt8 t;   //?Ñ¶?
         UInt32 start;
         UInt32 end;
         UInt8 type;
@@ -334,7 +334,7 @@ namespace GObject
     struct ClanSkill
     {
         UInt8 id;
-        UInt8 level;	//Èç¹û = 0£¬ ±íÊ¾´Ë¼¼ÄÜÉÐÎ´±»¼¤»î
+        UInt8 level;	//???? = 0?? ??Ê¾?Ë¼?????Î´??????
     };
 
 	struct PlayerData
@@ -370,34 +370,34 @@ namespace GObject
         }
 
 
-		std::string name;           // Ãû×Ö
-		UInt32 gold;	            // Ôª±¦
-		UInt32 coupon;	            // ÀñÈ¯
-		UInt32 tael;	            // ÒøÁ½
+		std::string name;           // ????
+		UInt32 gold;	            // Ôª??
+		UInt32 coupon;	            // ??È¯
+		UInt32 tael;	            // ??Á½
 		UInt32 coin;	            // Í­Ç®
-        UInt32 prestige;            // ÉùÍû
-		UInt32 status;              // ×´Ì¬:0x01 - pk´ò¿ª 0x02 - ÇÐ´è¿ª 0x04 - Ð¡ÃØÊé¹Ø 0x80 - ½ûÖ¹Ì½ÏÕ
-		UInt8 country;              // ¹ú¼Ò
-		UInt8 title;                // Í·ÏÎ
-		UInt32 achievement;         // Õ½¹¦
+        UInt32 prestige;            // ????
+		UInt32 status;              // ×´Ì¬:0x01 - pk???? 0x02 - ?Ð´è¿ª 0x04 - Ð¡?????? 0x80 - ??Ö¹Ì½??
+		UInt8 country;              // ????
+		UInt8 title;                // Í·??
+		UInt32 achievement;         // Õ½??
         UInt32 attainment;          //  
-        UInt8 qqvipl;               // QQ VIPµÈ¼¶
-        UInt8 qqvipl1;              // 3366Ê±µÄQQ VIPµÈ¼¶
-        UInt8 qqvipyear;            // QQ VIPÊÇ·ñ°üÄê
-        UInt32 qqawardgot;          // QQ VIP½±ÀøÊÇ·ñÒÑÁìÈ¡
-        UInt32 qqawardEnd;          // QQ ½±ÀøÁìÈ¡½áÊøÊ±¼ä
-        UInt32 ydGemId;             // QQ VIP±¦Ê¯½±Àø
-		UInt16 location;            // Î»ÖÃ
-		UInt8 inCity;               // ³ÇÊÐ
-		UInt32 lastOnline;          // ÉÏ´ÎÉÏÏßÊ±¼ä
-		UInt64 newGuild;            // ÐÂÊÖÒýµ¼ÈÎÎñ
-		UInt16 packSize;            // Íæ¼Ò±³°üÈÝÁ¿
-		UInt8 mounts;               // ×øÆï
+        UInt8 qqvipl;               // QQ VIP?È¼?
+        UInt8 qqvipl1;              // 3366Ê±??QQ VIP?È¼?
+        UInt8 qqvipyear;            // QQ VIP?Ç·?????
+        UInt32 qqawardgot;          // QQ VIP?????Ç·?????È¡
+        UInt32 qqawardEnd;          // QQ ??????È¡????Ê±??
+        UInt32 ydGemId;             // QQ VIP??Ê¯????
+		UInt16 location;            // Î»??
+		UInt8 inCity;               // ????
+		UInt32 lastOnline;          // ?Ï´?????Ê±??
+		UInt64 newGuild;            // ????????????
+		UInt16 packSize;            // ???Ò±?????Á¿
+		UInt8 mounts;               // ????
 		UInt8 gmLevel;              //
-		UInt8 icCount;              // ¹Ò»ú¼ÓËÙ´ÎÊý
+		UInt8 icCount;              // ?Ò»????Ù´???
 		UInt32 nextIcReset;         // 
-        UInt8  picCount;            // ¼ÓËÙ´ÎÊý
-        UInt32 nextPIcReset;        // ¼ÓËÙ´ÎÊýÖØÖÃÊ±¼ä
+        UInt8  picCount;            // ???Ù´???
+        UInt32 nextPIcReset;        // ???Ù´???????Ê±??
 		UInt16 formation;           // 
 		Lineup lineup[5];           // 
 		UInt32 totalRecharge;       // 
@@ -412,36 +412,36 @@ namespace GObject
 		UInt8 tavernBlueCount;      // 
 		UInt8 tavernPurpleCount;    // 
 		UInt16 tavernOrangeCount;    // 
-        UInt32 fshimen[6];          // Ë¢³öµÄÊ¦ÃÅÈÎÎñ
-		UInt8 fsmcolor[6];          // Ë¢³öµÄÊ¦ÃÅÈÎÎñµÄÑÕÉ«
-        std::vector<UInt32> shimen; // Ê¦ÃÅÈÎÎñ
-        std::vector<UInt8> smcolor; // Ê¦ÃÅÈÎÎñÑÕÉ«
-        UInt8 smFinishCount;        // Ê¦ÃÅÈÎÎñµ±ÈÕÍê³É´ÎÊý
-        UInt8 smFreeCount;          // Ê¦ÃÅÈÎÎñµ±ÈÕÃâ·ÑË¢ÐÂ´ÎÊý
-        UInt8 smAcceptCount;        // Ê¦ÃÅÈÎÎñµ±ÈÕ½ÓÊÜ´ÎÊý
-        UInt32 fyamen[6];           // Ë¢³öµÄÑÃÃÅÈÎÎñ
-		UInt8 fymcolor[6];          // Ë¢³öµÄÑÃÃÅÈÎÎñµÄÑÕÉ«
-        std::vector<UInt32> yamen;  // ÑÃÃÅÈÎÎñ
-        std::vector<UInt8> ymcolor; // ÑÃÃÅÈÎÎñÑÕÉ«
-        UInt8 ymFinishCount;        // ÑÃÃÅÈÎÎñµ±ÈÕÍê³É´ÎÊý
-        UInt8 ymFreeCount;          // ÑÃÃÅÈÎÎñµ±ÈÕÃâ·ÑË¢ÐÂ´ÎÊý
-        UInt8 ymAcceptCount;        // ÑÃÃÅÈÎÎñµ±ÈÕ½ÓÊÜ´ÎÊý
-        UInt32 clanTaskId;          // °ïÅÉÈÎÎñ
-        UInt8 ctFinishCount;        // °ïÅÉÈÎÎñµ±ÈÕÍê³É¸öÊý
+        UInt32 fshimen[6];          // Ë¢????Ê¦??????
+		UInt8 fsmcolor[6];          // Ë¢????Ê¦??????????É«
+        std::vector<UInt32> shimen; // Ê¦??????
+        std::vector<UInt8> smcolor; // Ê¦????????É«
+        UInt8 smFinishCount;        // Ê¦?????????????É´???
+        UInt8 smFreeCount;          // Ê¦??????????????Ë¢?Â´???
+        UInt8 smAcceptCount;        // Ê¦?????????Õ½??Ü´???
+        UInt32 fyamen[6];           // Ë¢????????????
+		UInt8 fymcolor[6];          // Ë¢????????????????É«
+        std::vector<UInt32> yamen;  // ????????
+        std::vector<UInt8> ymcolor; // ??????????É«
+        UInt8 ymFinishCount;        // ???????????????É´???
+        UInt8 ymFreeCount;          // ????????????????Ë¢?Â´???
+        UInt8 ymAcceptCount;        // ???????????Õ½??Ü´???
+        UInt32 clanTaskId;          // ????????
+        UInt8 ctFinishCount;        // ???????????????É¸???
 		UInt16 bookStore[6];        // 
 		UInt32 created;             // 
 		UInt32 lockExpireTime;      // 
 		UInt8 wallow;               // 
 		UInt32 battlecdtm;          // 
-        UInt8 dungeonCnt;           // Í¨ÌìËþµ±Ç°´ÎÊý
-        UInt32 dungeonEnd;          // Í¨ÌìËþµ±Ìì½áÊøÊ±¼ä
-        UInt8 copyFreeCnt;          // ¸±±¾Ãâ·Ñ´ÎÊý
-        UInt8 copyGoldCnt;          // ¸±±¾ÊÕ·Ñ´ÎÊý
-        UInt32 copyUpdate;          // ¸±±¾´ÎÊý¸üÐÂÊ±¼ä
-        UInt8 frontFreeCnt;         // ÕóÍ¼Ãâ·Ñ´ÎÊý
-        UInt8 frontGoldCnt;         // ÕóÍ¼ÊÕ·Ñ´ÎÊý
-        UInt32 frontUpdate;         // ÕóÍ¼´ÎÊý¸üÐÂÊ±¼ä
-        std::vector<UInt16> formations; // ÒÑÑ§»áÕó·¨
+        UInt8 dungeonCnt;           // Í¨??????Ç°????
+        UInt32 dungeonEnd;          // Í¨????????????Ê±??
+        UInt8 copyFreeCnt;          // ???????Ñ´???
+        UInt8 copyGoldCnt;          // ?????Õ·Ñ´???
+        UInt32 copyUpdate;          // ????????????Ê±??
+        UInt8 frontFreeCnt;         // ??Í¼???Ñ´???
+        UInt8 frontGoldCnt;         // ??Í¼?Õ·Ñ´???
+        UInt32 frontUpdate;         // ??Í¼????????Ê±??
+        std::vector<UInt16> formations; // ??Ñ§??????
 	};
 
 	class Player:
@@ -454,9 +454,9 @@ namespace GObject
 		{
 			ClanBattleFlag = 0x00000001,
 			CanTaskInit	= 0x00000002,
-			Challenging = 0x00000010,		//¾º¼¼×´Ì¬, ÊÀ½çÏß³Ì´¦Àí
-			BeChallenging = 0x00000020,		//·Ç¾º¼¼×´Ì¬
-			SGPunish	= 0x00000040,		//±äËÙ³Í·£
+			Challenging = 0x00000010,		//????×´Ì¬, ?À½??ß³Ì´???
+			BeChallenging = 0x00000020,		//?Ç¾???×´Ì¬
+			SGPunish	= 0x00000040,		//???Ù³Í·?
             AthPayForPage = 0x00000080,     //in athletics range for paging
             AthPayForKillCD=0x00000100,     
 			AllGlobalFlags	= 0xFFFFFFFF
@@ -473,6 +473,7 @@ namespace GObject
             InHeroIsland    = 0x00000040,
             AutoFrontMap    = 0x00000080,
             InCopyTeam      = 0x00000100,
+            ClanRankBattle  = 0x00000200,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -526,7 +527,7 @@ namespace GObject
 
 		void Reconnect();
 
-		void Logout(bool = false);	//Íæ¼ÒÏÂÏß²Ù×÷
+		void Logout(bool = false);	//???????ß²???
 		void selfKick();
 
         UInt32 GetOnlineTimeToday();
@@ -753,7 +754,7 @@ namespace GObject
 		void resetIcCount();
 		UInt8 getIcCount();
 
-        // ÐÞÎª¹Ò»ú¼ÓËÙ
+        // ??Îª?Ò»?????
 		void incPIcCount();
         UInt8 getPIcCount();
         void checkPIcCount();
@@ -817,7 +818,7 @@ namespace GObject
 
         bool OperationTaskAction(int type);
 
-        // QQ½±Àø
+        // QQ????
         void sendYellowDiamondInfo();
         UInt8 rcvYellowDiamondAward(UInt8 type, UInt8 d3d6);
         void checkQQAward();
@@ -841,7 +842,7 @@ namespace GObject
 		void moveToHome();
 		void moveToNeutralHome();
 
-		//Õ½¶·Ïà¹Ø
+		//Õ½??????
 		bool challenge(Player *, UInt32 * = NULL, int * = NULL, bool = true, UInt32 = 0, bool = false, UInt32 = Battle::BS_ATHLETICS1, UInt8 = 0x03);
 		bool attackNpc(UInt32, UInt32 = 0xFFFFFFFF, bool = false, bool = true);
         bool attackRareAnimal(UInt32 id);
@@ -882,7 +883,7 @@ namespace GObject
 		void setNextExtraReward(UInt32 ner);
 		void exchangeForExtraReward();
 
-		//×Ú×åÏµÍ³
+		//????ÏµÍ³
 		const std::string& getClanName() const;
 		void setClan(Clan * c);
 		inline Clan * getClan() { return _clan; }
@@ -891,7 +892,7 @@ namespace GObject
 
         void OnDoAttainment(UInt32 attId,   UInt32  param);
 		//////////////////////////////////////////////////////////////////////////
-		//×é¶ÓÏµÍ³
+		//????ÏµÍ³
 		inline bool IsInTeam() const { return false; }	//TODO
 
 	public:
@@ -907,8 +908,24 @@ namespace GObject
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
 
-	// ºÃÓÑÏµÍ³
+	// ????ÏµÍ³
 	public:
+
+        void SetClanBattleStatus(UInt8 status) { m_ClanBattleStatus = status;}
+        UInt8 GetClanBattleStatus() const { return m_ClanBattleStatus; }
+
+        void SetClanBattleScore(UInt32 score) { m_ClanBattleScore = score; }
+        void AddClanBattleScore(UInt32 score) { m_ClanBattleScore += score; }
+        UInt32 GetClanBattleScore() const { return m_ClanBattleScore; }
+       
+        void SetClanBattleWinTimes(UInt32 times) { m_ClanBattleWinTimes = times; }
+        void IncClanBattleWinTimes() { ++m_ClanBattleWinTimes; }
+        UInt32 GetClanBattleWinTimes() const { return m_ClanBattleWinTimes; }
+
+        void SetClanBattleSkillFlag(UInt8 skillId) { m_ClanBattleSkillFlag |= (1 << skillId); }
+        bool CheckClanBattleSkillFlag(UInt8 skillId) { return (m_ClanBattleSkillFlag & (1 << skillId)) != 0; }
+        void ClearClanBattleSkillFlag() { m_ClanBattleSkillFlag = 0; }
+
 		void addFriendFromDB(Player *);
 		void addBlockFromDB(Player *);
 		void addFoeFromDB(Player *);
@@ -1092,6 +1109,11 @@ namespace GObject
 
 		SecondPWDInfo _pwdInfo;
 
+        UInt8 m_ClanBattleStatus;     //å¸®ä¼šæˆ˜çŠ¶æ€
+        UInt32 m_ClanBattleScore;     //å¸®ä¼šæˆ˜ä¸ªäººç§¯åˆ†
+        UInt32 m_ClanBattleWinTimes;  //å¸®ä¼šæˆ˜è¿žèƒœæ¬¡æ•°
+        UInt32 m_ClanBattleSkillFlag; //å¸®æ´¾æˆ˜å·²ä½¿ç”¨æŠ€èƒ½ä½
+
     public:
 		// Last battled monster
 		GData::NpcGroup * _lastNg;
@@ -1111,7 +1133,7 @@ namespace GObject
         UInt32 _praplace;
         bool m_autoCopyFailed;
 
-        // Í¨ÌìËþÕýÒåÖ®ºð
+        // Í¨????????Ö®??
         UInt8 _justice_roar;
     public:
         static UInt8 _yaMenActiveCount;
@@ -1234,22 +1256,24 @@ namespace GObject
         TeamCopyPlayerInfo* getTeamCopyPlayerInfo();
         HoneyFall* getHoneyFall();
 
-        // °ïÅÉ¼¼ÄÜ
-        void addSkillFromDB(UInt8 skillId, UInt8 level);
-        void addSkill(UInt8 skillId);
-        UInt8 getSkillLevel(UInt8 skillId);
-        UInt8 skillLevelUp(UInt8 skillId);
-        void makeSkillInfo(Stream&);
-        void makeSkillInfo(Stream&, UInt8 skillId);
-        void listSkills();
-        void showSkill(UInt8 skillId);
-        UInt32 getSkillHPEffect();
-        UInt32 getSkillAtkEffect();
-        UInt32 getSkillDefendEffect();
-        UInt32 getSkillMagAtkEffect();
-        UInt32 getSkillMagDefentEffect();
+        // å¸®æ´¾æŠ€èƒ½
+        void addClanSkillFromDB(UInt8 skillId, UInt8 level);
+        void addClanSkill(UInt8 skillId);
+        UInt8 getClanSkillLevel(UInt8 skillId);
+        UInt8 clanSkillLevelUp(UInt8 skillId);
+        void makeClanSkillInfo(Stream&);
+        void makeClanSkillInfo(Stream&, UInt8 skillId);
+        void listClanSkills();
+        void showClanSkill(UInt8 skillId);
+        UInt32 getClanSkillHPEffect();
+        UInt32 getClanSkillAtkEffect();
+        UInt32 getClanSkillDefendEffect();
+        UInt32 getClanSkillMagAtkEffect();
+        UInt32 getClanSkillMagDefentEffect();
 
-        void buildTechSkill();
+        void buildClanTechSkill();
+        UInt8 getClanSkillFlag() { return m_csFlag; }
+        void setClanSkillFlag(UInt8 csFlag) { m_csFlag = csFlag; }
 
     private:
         bool m_hasTripod;
@@ -1259,6 +1283,7 @@ namespace GObject
         TeamCopyPlayerInfo* m_tcpInfo;
         HoneyFall* m_hf;
         std::map<UInt8, ClanSkill> m_clanSkill;
+        UInt8 m_csFlag;
 
     public:
         inline void setAtoHICfg(const std::string& cfg) { m_hicfg = cfg; }
@@ -1317,6 +1342,9 @@ namespace GObject
 		FastMutex _mutex;
 	};
 	extern ChallengeCheck challengeCheck;
+
+
+    typedef Visitor<Player> PlayerVisitor;
 
 }
 

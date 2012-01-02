@@ -1097,7 +1097,20 @@ void OnSetVipLReq( GameMsgHdr& hdr, const void* data )
 void OnClanSkillLevel( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
+    UInt8 skillId = *(UInt8*)(data);
+    player->clanSkillLevelUp(skillId);
     player->setFightersDirty(true);
+}
+
+void OnClanSkillList( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 skillId = *(UInt8*)(data);
+
+    if(0 == skillId)
+        player->listClanSkills();
+    else
+        player->showClanSkill(skillId);
 }
 
 void OnClearTaskReq( GameMsgHdr& hdr, const void* data )

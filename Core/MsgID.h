@@ -187,6 +187,10 @@ namespace REQ
     const UInt8 CLAN_SKILL          = 0x69;// 0x99
     /**帮派驻地信息*/
     const UInt8 CLAN_BUILD          = 0x6A;// 0x9B
+    /**帮会仓库*/
+    const UInt8 CLAN_PACKAGE        = 0x6B;// 0x6B
+    /**帮会仓库记录*/
+    const UInt8 CLAN_PACKAGE_RECORD = 0x6C;
     /**请求宗族奖励物品*/
     const UInt8 CLANREWARD          = 0x9C;
     /**领取宗族奖励*/
@@ -301,12 +305,21 @@ namespace REQ
     /**黄钻奖励领取*/
     const UInt8 YD_AWARD_RCV        = 0x2F;
 
+    /**非战斗时信息请求*/
+    const UInt8 CLAN_RANKBATTLE_REQINIT = 0x59;
+    /**战斗时信息请求*/
+    const UInt8 CLAN_RANKBATTLE_REQ     = 0x5A;
+    /**帮会战排名列表*/
+    const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B;
+    
     /** 法宝精炼*/
     const UInt8 EQ_TRUMP_UPGRADE    = 0xB7;
     /** 法宝升阶*/
     const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
+    
     /***装备升级*/
     const UInt8 EQ_UPGRADE          = 0xB9;
+    
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
 
@@ -440,6 +453,9 @@ namespace REP
     const UInt8 CLAN_INFO_UPDATE    = 0x68;// 0x98
     const UInt8 CLAN_SKILL          = 0x69;// 0x99
     const UInt8 CLAN_BUILD          = 0x6A;// 0x9B
+    const UInt8 CLAN_PACKAGE        = 0x6B;//
+    const UInt8 CLAN_PACKAGE_RECORD = 0x6C;
+
     const UInt8 HERO_ISLAND         = 0x97;
     const UInt8 CLANREWARD          = 0x9C;
     const UInt8 GET_CLANREWARD      = 0x9D;
@@ -510,6 +526,10 @@ namespace REP
     const UInt8 GETBOX              = 0xF7;// 0xD4
     const UInt8 BLOCKBOSS           = 0xF9;// 0xD5
 
+    const UInt8 CLAN_RANKBATTLE_REPINIT = 0x59;  //非战斗时信息返回
+    const UInt8 CLAN_RANKBATTLE_REP     = 0x5A;  //战斗时信息返回
+    const UInt8 CLAN_RANKBATTLE_SORTLIST = 0x5B; //帮会战排名列表
+    
     const UInt8 TEAM_COPY_REQ       = 0x99;
 
     /** 战报数据*/

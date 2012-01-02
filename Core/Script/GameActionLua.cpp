@@ -207,7 +207,7 @@ namespace Script
 		CLASS_DEF(Fighter, skillLevelUp);
 		CLASS_DEF(Fighter, addNewCitta);
 
-		//任务
+		//????
 		CLASS_ADD(TaskMgr);
 		CLASS_DEF(TaskMgr, AddTask);
 		CLASS_DEF(TaskMgr, TaskCanAccept);
@@ -245,7 +245,7 @@ namespace Script
 		CLASS_DEF(TaskMgr, DelCanAcceptTask2);
 		CLASS_DEF(TaskMgr, SendCanAcceptTaskInfor);
 
-        // 成就达成
+        // ?删痛???
 		CLASS_ADD(AttainMgr);
         CLASS_DEF(AttainMgr, HasFinishAttainment);
         CLASS_DEF(AttainMgr, HasAttained);
@@ -254,6 +254,7 @@ namespace Script
         CLASS_DEF(AttainMgr, MidnightCheckAttain);
         CLASS_DEF(AttainMgr, CanAttain);
 
+		//????
         CLASS_ADD(ActivityMgr);
         CLASS_DEF(ActivityMgr, GetFlag);
         CLASS_DEF(ActivityMgr, UpdateFlag);
@@ -262,7 +263,8 @@ namespace Script
         CLASS_DEF(ActivityMgr, UpdateToDB);
         CLASS_DEF(ActivityMgr, GetPoint);
         CLASS_DEF(ActivityMgr, AddRewardFlag);
-		//背包
+		
+        //????
 		CLASS_ADD(Package);
 		CLASS_DEF(Package, Add);
 		CLASS_DEF(Package, AddItem);
@@ -288,7 +290,7 @@ namespace Script
 		CLASS_DEF(Package, DelItemSendMsg);
 		CLASS_DEF(Package, GetItemCareer);
 		
-		//物品
+		//??品
 		CLASS_ADD(ItemBase);
 		CLASS_DEF(ItemBase, Count);
 
@@ -579,6 +581,26 @@ namespace Script
 		return Run<Table>(player, buffer, npcId);
 	}
 
+    Table GameActionLua::GetClanBattleBuffs()
+    {
+        return Run<Table>(NULL, "getClanBattleBuffs");
+    }
+
+    Table GameActionLua::GetClanBattleDailyRewards()
+    {
+        return Run<Table>(NULL, "getClanBattleDailyRewards");
+    }
+
+    Table GameActionLua::GetClanBattleWeekSortRewards()
+    {
+        return Run<Table>(NULL, "getClanBattleWeekSortRewards");
+    }
+
+    Table GameActionLua::GetClanBattleWeekScoreRewards()
+    {
+        return Run<Table>(NULL, "getClanBattleWeekScoreRewards");
+    }
+
 
 	bool GameActionLua::MonsterKilled(Player* player, UInt32 monsterId, UInt16 monsterNum)
 	{
@@ -624,7 +646,7 @@ namespace Script
 		}
 		st << Stream::eos;
 		TaskMgr* taskMgr = player->GetTaskMgr();
-		taskMgr->SetConvey();			//置护送状态
+		taskMgr->SetConvey();			//?没???状态
 		taskMgr->SetConveyTask(taskId);
 		taskMgr->SetConveyNpc(npcId);
 		player->send(&st[0], st.size());
@@ -632,7 +654,7 @@ namespace Script
 		return true;
 	}
 
-	//采集类NPC走的接口
+	//?杉???NPC?叩慕涌?
 	Table GameActionLua::RunCollectTask(Player* player, UInt32 npcId)
 	{
 		return Run<Table>(player, "RunCollectTask", npcId);
@@ -658,7 +680,7 @@ namespace Script
 		return Run<UInt32>(player, "GetConveyMonster", taskId, spot);
 	}
 
-	//更新护送任务的进度
+	//???禄????????慕???
 	bool GameActionLua::UpdateConveyStep(Player* player, UInt32 taskId, UInt16 spot, bool succ)
 	{
 		TaskMgr* taskMgr = player->GetTaskMgr();
@@ -722,14 +744,14 @@ namespace Script
 		if (player == NULL) return "";
 		if (player->getCountry() == 0)
 		{
-			return "峨眉";
+			return "??眉";
 		}
 		if (player->getCountry() == 1)
 		{
-			return "昆仑";
+			return "昆??";
         }
 		else{
-			return "中立";
+			return "??立";
 		}
 	}
 
