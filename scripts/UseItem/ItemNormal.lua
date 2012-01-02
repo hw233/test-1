@@ -1289,12 +1289,15 @@ function ItemNormal_00000029(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(100);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 100);
     end
 
     package:DelItemSendMsg(29, player);
@@ -1315,7 +1318,6 @@ function ItemNormal_00000400(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(1000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
@@ -1323,9 +1325,14 @@ function ItemNormal_00000400(iid, num, bind, param)
         end
     end
 
+    if n ~= 0 then
+        fgt:addPExp(n * 1000);
+    end
+
     package:DelItemSendMsg(400, player);
     return n;
 end
+
 function ItemNormal_00000402(iid, num, bind, param)
 
     local player = GetPlayer()
@@ -1352,13 +1359,14 @@ function ItemNormal_00000402(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        if i <= 3 then
+        if item[1] == 515 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
         end
     end
     package:DelItemSendMsg(402, player);
     return num
 end
+
 function ItemNormal_00000403(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -1384,7 +1392,7 @@ function ItemNormal_00000403(iid, num, bind, param)
         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
-        if i<= 4 then
+        if item[1] == 509 or item[1] == 507 then
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
         end
     end
@@ -1406,12 +1414,15 @@ function ItemNormal_00000030(iid, num, bind, param)
 
     local n = 0
     for i = 1, num do
-        fgt:addPExp(10000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 10000);
     end
 
     package:DelItemSendMsg(30, player);
@@ -1433,12 +1444,15 @@ function ItemNormal_00000031(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(1000000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 1000000);
     end
 
     package:DelItemSendMsg(31, player);
