@@ -1289,12 +1289,15 @@ function ItemNormal_00000029(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(100);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 100);
     end
 
     package:DelItemSendMsg(29, player);
@@ -1315,12 +1318,15 @@ function ItemNormal_00000400(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(1000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 1000);
     end
 
     package:DelItemSendMsg(400, player);
@@ -1406,12 +1412,15 @@ function ItemNormal_00000030(iid, num, bind, param)
 
     local n = 0
     for i = 1, num do
-        fgt:addPExp(10000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 10000);
     end
 
     package:DelItemSendMsg(30, player);
@@ -1433,12 +1442,15 @@ function ItemNormal_00000031(iid, num, bind, param)
 
     local n = 0;
     for i = 1, num do
-        fgt:addPExp(1000000);
         n = n + 1
         if fgt:isPExpFull() then
             player:sendMsgCode(2, 1069, 0);
             break
         end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 1000000);
     end
 
     package:DelItemSendMsg(31, player);
