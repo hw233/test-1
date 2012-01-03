@@ -439,7 +439,7 @@ namespace GObject
         /**
          *@brief 获取可以参加帮会战的帮派
          */
-        void GetCanBattleClans(bool bNotify = true);
+        void GetCanBattleClans(bool bBegin = true);
 
         /**
          *@brief 给帮会排名
