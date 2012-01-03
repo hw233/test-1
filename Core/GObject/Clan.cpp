@@ -676,7 +676,7 @@ bool Clan::handoverLeader(Player * leader, UInt64 pid)
 	cmPlayer->cls = 4;
 	_members.insert(cmLeader);
 	_members.insert(cmPlayer);
-    practicePlace.replaceOwner(cmLeader->player, cmPlayer->player);
+    practicePlace.replaceOwner(cmPlayer->player, cmLeader->player);
 	{
 		Stream st;
 		_clanDynamicMsg->addCDMsg(9, cmPlayer->player->getName(), 4, &st);

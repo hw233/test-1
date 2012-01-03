@@ -31,6 +31,22 @@ struct PPlace
     UInt16 winCount;
     UInt32 protincoming;
     UInt32 slotincoming;
+
+    void reset()
+    {
+        ownerid = 0;
+        protid = 0;
+        maxslot = 30;
+        protmoney = 0;
+        slotmoney = 0;
+        openslot = 0;
+        techslot = 0;
+        open = 1;
+        enemyCount = 0;
+        winCount = 0;
+        protincoming = 0;
+        slotincoming = 0;
+    }
 };
 
 struct PracticeData : public GData::ObjectBaseNT<UInt64>
@@ -38,6 +54,7 @@ struct PracticeData : public GData::ObjectBaseNT<UInt64>
     PracticeData(UInt64 id) :GData::ObjectBaseNT<UInt64>(id) {}
     ~PracticeData() { fighters.clear(); }
 
+    UInt8 place;        // 修炼地
     UInt8 type;         // 修炼类型 0-8小时, 1-24小时
     UInt8 pricetype;    // 付费方式 0-金币， 1-银币
     UInt16 slotprice;   // 洞府花了多少钱
@@ -60,6 +77,13 @@ struct PlaceData
         bzero(&place, sizeof(place));
     }
     ~PlaceData() { }
+
+    void reset()
+    {
+        place.reset();
+        data.clear();
+        used = 0;
+    }
 
     PPlace place;
     std::vector<PracticeData*> data;
@@ -103,6 +127,7 @@ public:
     bool setProtCharges(Player* pl, UInt8 place, UInt16 money);
     // 将所有修炼人放入无主之地
     void moveAllToMax(UInt8 place);
+    void moveAllToMax();
 
     // 挑战
     bool doChallenge(Player* pl, UInt8 place, UInt16 idx, const std::string& name);
@@ -115,7 +140,8 @@ public:
     bool addSlotFromTech(Player* pl, UInt8 place = 0);
 
     // 山头易主
-    bool replaceOwner(Player* oldpl, Player* newpl);
+    bool replaceOwner(Player* newpl, Player* oldpl);
+    bool replaceOwner(Player* newpl, UInt8 place);
 
     // 占领山头
     bool ocupyPlace(Player* pl, UInt8 place);

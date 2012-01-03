@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Package.h"
 #include "Country.h"
+#include "PracticePlace.h"
 #include "Script/GameActionLua.h"
 #include <sstream>
 
@@ -1864,11 +1865,21 @@ namespace GObject
         SYSMSG(title2, 2238);
         SysMsgItem* msg2 = globalSysMsg[2239];
 
+        UInt8 idx = 0;
         UInt32 ranking = 0;
         for(ClanVec::iterator iter = m_ClanRanking.begin();
             iter != m_ClanRanking.end();++iter)
         {
             Clan* clan = *iter;
+
+            if (idx < PPLACE_MAX)
+            {
+                if (clan && clan->getOwner())
+                {
+                    practicePlace.replaceOwner(clan->getOwner(), idx+1);
+                    ++idx;
+                }
+            }
 
             //邮件通知
             class SendMailVisitor : public Visitor<ClanMember>
