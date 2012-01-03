@@ -626,7 +626,8 @@ end
 function ItemNormal_00000413(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6017);
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -641,12 +642,11 @@ function ItemNormal_00000413(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(413, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -657,7 +657,8 @@ end
 function ItemNormal_00000414(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6026);
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -672,12 +673,11 @@ function ItemNormal_00000414(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(414, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -688,7 +688,8 @@ end
 function ItemNormal_00000415(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6035);
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -703,12 +704,11 @@ function ItemNormal_00000415(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(415, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end
@@ -719,7 +719,8 @@ end
 function ItemNormal_00000416(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
-    --local reqgrids = package:GetItemUsedGrids(1526, 6, 1);
+    local xinfa = math.random(6000, 6053)
+    local reqgrids = package:GetItemUsedGrids(xinfa, 1, 1);
 
     local prob = {33, 66, 100}
     local items = {{515,1}, {507,1}, {509,1}}
@@ -734,12 +735,11 @@ function ItemNormal_00000416(id, num, bind, param)
     end
 
     local item = items[i];
-    -- reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
-    local reqgrids = package:GetItemUsedGrids(item[1], item[2], 1); 
+    reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
         package:DelItemSendMsg(416, player);
-        --package:AddItem(1526, 6, 1, 0, 2);
+        package:AddItem(xinfa, 1, 1, 0, 2);
         package:AddItem(item[1], item[2], 1, 0, 2);
         return num;
     end

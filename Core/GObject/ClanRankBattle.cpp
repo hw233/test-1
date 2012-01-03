@@ -619,7 +619,8 @@ namespace GObject
                 }
                 //切换到战斗状态
                 m_State = STATE_BATTLE;
-                BroadcastStatus();
+                BroadcastStatus(m_Clan1);
+                BroadcastStatus(m_Clan2);
             }
         }
         else
@@ -682,7 +683,8 @@ namespace GObject
             m_Clan2->battle = this;
         }
 
-        BroadcastStatus();
+        BroadcastStatus(m_Clan1);
+        BroadcastStatus(m_Clan2);
     }
 
     void ClanRankBattle::End()
@@ -843,48 +845,58 @@ namespace GObject
         UInt32 time = 0;
         if(m_State == STATE_PREPARE)
         {
-            if(m_StartTime + PREPARE_TIME > m_Now)
-            {
-                time = m_StartTime + PREPARE_TIME - m_Now;
-            }
+            if(m_StartTime + PREPARE_TIME > m_Now) time = m_StartTime + PREPARE_TIME - m_Now;
         }
         else
         {
-            if(m_StartTime + FULL_BATTLE_TIME > m_Now)
-            {
-                time = m_StartTime + FULL_BATTLE_TIME - m_Now;
-            }
+            if(m_StartTime + FULL_BATTLE_TIME > m_Now) time = m_StartTime + FULL_BATTLE_TIME - m_Now;
         }
-        
         stream << time;
+
+        if(m_Clan1 != NULL && player->getClan() == m_Clan1->clan)
+        {
+            stream << ((m_Clan2 != NULL) ? m_Clan2->clan->getName() : "");
+        }
+        else if(m_Clan2 != NULL && player->getClan() == m_Clan2->clan)
+        {
+            stream << ((m_Clan1 != NULL) ? m_Clan1->clan->getName() : "");
+        }
+        else return;
+
         stream << Stream::eos;
         player->send(stream);
     }
 
-    void ClanRankBattle::BroadcastStatus()
+    void ClanRankBattle::BroadcastStatus(ClanRankBattleInfo* clan)
     {
+        if(clan == NULL) return;
+
         Stream stream(REP::CLAN_RANKBATTLE_REP);
         stream << UInt8(0);
         stream << UInt8(m_State);
         UInt32 time = 0;
         if(m_State == STATE_PREPARE)
         {
-            if(m_StartTime + PREPARE_TIME > m_Now)
-            {
-                time = m_StartTime + PREPARE_TIME - m_Now;
-            }
+            if(m_StartTime + PREPARE_TIME > m_Now) time = m_StartTime + PREPARE_TIME - m_Now;
         }
         else
         {
-            if(m_StartTime + FULL_BATTLE_TIME > m_Now)
-            {
-                time = m_StartTime + FULL_BATTLE_TIME - m_Now;
-            }
+            if(m_StartTime + FULL_BATTLE_TIME > m_Now) time = m_StartTime + FULL_BATTLE_TIME - m_Now;
         }
-
         stream << time;
+        
+        if(clan == m_Clan1)
+        {
+            stream << ((m_Clan2 != NULL) ? m_Clan2->clan->getName() : "");
+        }
+        else if(clan == m_Clan2)
+        {
+            stream << ((m_Clan1 != NULL) ? m_Clan1->clan->getName() : "");
+        }
+        else return;
+
         stream << Stream::eos;
-        Broadcast(stream);
+        clan->Broadcast(stream);
     }
 
     void ClanRankBattle::BroadcastScores(UInt8 fightId, UInt32 winner, UInt32 extScore)
@@ -943,7 +955,6 @@ namespace GObject
         {
             myClan = m_Clan1;
             otherClan = m_Clan2;
-            stream << ((m_Clan2 != NULL) ? m_Clan2->clan->getName() : "");
             if(m_Winner != 0) stream << UInt8(m_Winner == m_Clan1->clan->getId()?1:2);
             else stream << UInt8(0);
             stream << m_ClanScore1 << m_ClanScore2;
@@ -953,7 +964,6 @@ namespace GObject
         {
             myClan = m_Clan2;
             otherClan = m_Clan1;
-            stream << ((m_Clan1 != NULL) ? m_Clan1->clan->getName() : "");
             if(m_Winner != 0) stream << UInt8(m_Winner == m_Clan2->clan->getId()?1:2);
             else stream << UInt8(0);
             stream << m_ClanScore2 << m_ClanScore1;
