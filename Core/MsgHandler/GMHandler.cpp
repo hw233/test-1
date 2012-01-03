@@ -2172,8 +2172,7 @@ void GMHandler::OnOcupyPlace(GObject::Player * player, std::vector<std::string>&
 		return;
 
     UInt8 place = atoi(args[1].c_str());
-
-    practicePlace.ocupyPlace(pl, place);
+    practicePlace.replaceOwner(pl, place);
 }
 
 void GMHandler::OnEnterCopy(GObject::Player *player, std::vector<std::string>& args)
