@@ -277,6 +277,7 @@ namespace GObject
         /**
          *@brief 广播
          */
+        void Broadcast(UInt32 clan, Stream& stream, bool bAll = false);
         void Broadcast(Stream& stream, bool bAll = false);
 
         /**

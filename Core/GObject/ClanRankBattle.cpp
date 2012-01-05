@@ -857,10 +857,17 @@ namespace GObject
         player->SetClanBattleSkillFlag(skill->id);
 
         Stream stream(REP::CLAN_RANKBATTLE_REP);
-        stream << UInt8(4);
-        stream << UInt8(skill->id);
+        stream << UInt8(1);
+        stream << player->getId();
+        stream << UInt16(player->GetClanBattleSkillFlag());
         stream << Stream::eos;
-        player->send(stream);
+        Broadcast(player->getClan()->getId(), stream);
+
+        //Stream stream(REP::CLAN_RANKBATTLE_REP);
+        //stream << UInt8(4);
+        //stream << UInt8(skill->id);
+        //stream << Stream::eos;
+        //player->send(stream);
     }
 
     void ClanRankBattle::SendBattleStatus(Player* player)
@@ -942,6 +949,12 @@ namespace GObject
                 << fightId << m_ClanScore2 << m_ClanScore1 << extScore << Stream::eos;
             BroadcastBattle(m_Clan2->clan->getId(), stream2);
         }
+    }
+
+    void ClanRankBattle::Broadcast(UInt32 id, Stream& stream, bool bAll)
+    {
+        if(m_Clan1 != NULL && m_Clan1->clan->getId() == id) m_Clan1->Broadcast(stream, bAll);
+        if(m_Clan2 != NULL && m_Clan2->clan->getId() == id) m_Clan2->Broadcast(stream, bAll);
     }
     
     void ClanRankBattle::Broadcast(Stream& stream, bool bAll)
@@ -1650,23 +1663,10 @@ namespace GObject
 
         if(!info->HasPlayer(player)) return;
 
-        std::vector<UInt32> skills;
-        for(UInt32 i = 0; i < RANK_BATTLE_SKILL_NUM; ++i)
-        {
-            if(player->CheckClanBattleSkillFlag(i))
-            {
-                skills.push_back(i);
-            }
-        }
-
         Stream st(REP::CLAN_RANKBATTLE_REP);
         st << UInt8(1);
-        st << UInt8(skills.size());
-        for(std::vector<UInt32>::iterator iter = skills.begin();
-                iter != skills.end(); ++iter)
-        {
-            st << UInt8(*iter);
-        }
+        st << player->getId();
+        st << UInt16(player->GetClanBattleSkillFlag());
         st << Stream::eos;
         player->send(st);
     }
@@ -1792,6 +1792,7 @@ namespace GObject
                 stream << UInt8(member->GetLev());
                 stream << UInt8(i);
                 stream << UInt8(member->getLocation() == RANK_BATTLE_LOCATION ? 1 : 0);
+                stream << UInt16(member->GetClanBattleSkillFlag());
             }
         }
         stream << Stream::eos;

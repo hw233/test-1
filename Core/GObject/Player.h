@@ -927,6 +927,7 @@ namespace GObject
         void SetClanBattleSkillFlag(UInt8 skillId) { m_ClanBattleSkillFlag |= (1 << skillId); }
         bool CheckClanBattleSkillFlag(UInt8 skillId) { return (m_ClanBattleSkillFlag & (1 << skillId)) != 0; }
         void ClearClanBattleSkillFlag() { m_ClanBattleSkillFlag = 0; }
+        UInt32 GetClanBattleSkillFlag() const { return m_ClanBattleSkillFlag; }
 
 		void addFriendFromDB(Player *);
 		void addBlockFromDB(Player *);
