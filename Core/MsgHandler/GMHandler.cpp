@@ -153,6 +153,7 @@ GMHandler::GMHandler()
     Reg(3, "appearboss", &GMHandler::OnAppearBoss);
     Reg(3, "resettcplayer", &GMHandler::OnResetTeamCopyPlayer);
     Reg(3, "moneyin", &GMHandler::OnMoneyIn);
+    Reg(3, "newyear", &GMHandler::OnNewYear);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2537,4 +2538,13 @@ void GMHandler::OnMoneyIn(GObject::Player* player, std::vector<std::string>& arg
     else
         player->moneyLog(atoi(args[0].c_str()), 1);
 }
+
+void GMHandler::OnNewYear(GObject::Player* player, std::vector<std::string>& args)
+{
+    World::_newyear = World::_newyear?false:true;
+	Stream st(REP::DAILY_DATA);
+    World::makeActivityInfo(st);
+	NETWORK()->Broadcast(st);
+}
+
 

@@ -419,6 +419,8 @@ namespace GObject
         bool AddWeeklyMailItems(Player* player, UInt32 score);
         bool AddMailItems(Player* player, RewardVec& rewards);
 
+        const ClanVec& getClanRanking() const { return m_ClanRanking; }
+
     private:
         void ProcessInit(UInt32 oldtime);
         void ProcessSignup();

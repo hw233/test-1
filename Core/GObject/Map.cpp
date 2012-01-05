@@ -96,14 +96,12 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 
 void Map::OnPlayerLevUp(Player *pl)
 {
-#if 0
 	UInt8 country = pl->getCountry();
 	UInt8 status = getIndexbyPK(pl);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
 		_playerList[country][status].erase(it);
 	_playerList[country][status].insert(pl);
-#endif
 }
 
 SpotData* Map::GetSpot(UInt16 spot)

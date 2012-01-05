@@ -173,7 +173,8 @@ bool enum_clan_midnight(void * ptr, void * data)
 void World::makeActivityInfo(Stream &st)
 {
 	st.init(REP::DAILY_DATA);
-	st << static_cast<UInt8>(5) << _wday << static_cast<UInt8>(_activityStage) << Stream::eos;
+	st << static_cast<UInt8>(5) << _wday;
+    st << static_cast<UInt8>(_newyear?1:0) << Stream::eos;
 }
 void World::calWeekDay()
 {

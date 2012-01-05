@@ -255,7 +255,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		return;
 
 	if(ul._userid == 0)
+    {
 		conn->pendClose();
+        return;
+    }
 
     if (cfg.onlineLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.onlineLimit)
     {
@@ -405,6 +408,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	TcpConnection conn = NETWORK()->GetConn(hdr.sessionID);
 	if(conn.get() == NULL)
 		return;
+
+    if (!hdr.playerID)
+    {
+		conn->pendClose();
+        return;
+    }
 
     if (cfg.enableLoginLimit && SERVER().GetTcpService()->getOnlineNum() > cfg.loginLimit)
     {

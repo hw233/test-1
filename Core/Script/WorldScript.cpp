@@ -68,6 +68,8 @@ void WorldScript::init()
     def("clearAllHICfg", GObject::HeroIsland::clearAllHICfg);
     def("addTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::addTeamCopyAwardCfg);
     def("clearTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::clearTeamCopyAwardCfg);
+    def("addGM", GObject::GObjectManager::addGM);
+    def("delGM", GObject::GObjectManager::delGM);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

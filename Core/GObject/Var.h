@@ -69,6 +69,8 @@ namespace GObject
         VAR_CLANBATTLE_HONOUR = 40, //帮派战今日贡献
         VAR_CLAN_WEAL = 41,         //今日领取的福利数
 
+        VAR_NEWYEAR_PACK = 42, // 新年活动等级(30级)礼包
+
         VAR_MAX,
     };
 
@@ -135,6 +137,8 @@ namespace GObject
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_NEWYEAR_PACK, CYCLE_YEAR);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
