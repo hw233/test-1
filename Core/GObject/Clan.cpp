@@ -1282,8 +1282,16 @@ void Clan::appendListInfo( Stream& st )
 
 void Clan::listTechs(Player * player)
 {
+    UInt8 cnt = static_cast<UInt8>(_techs->getSize());
+    UInt8 techNum = GData::clanTechTable.size();
+    if(cnt < techNum)
+    {
+        _techs->buildTech();
+        cnt = static_cast<UInt8>(_techs->getSize());
+    }
+
 	Stream st(REP::CLAN_SKILL);
-	st << static_cast<UInt8>(0) << _techs->getSize();
+	st << static_cast<UInt8>(0) << cnt;
 	_techs->makeTechInfo(st);
 	st << Stream::eos;
 	player->send(st);
