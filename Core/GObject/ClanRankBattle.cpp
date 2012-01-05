@@ -173,7 +173,7 @@ namespace GObject
                 iter != team1.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
-            (*iter)->regenAll();
+            (*iter)->regenAll(true);
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
@@ -181,7 +181,7 @@ namespace GObject
                 iter != team2.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
-            (*iter)->regenAll();
+            (*iter)->regenAll(true);
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
@@ -276,7 +276,7 @@ namespace GObject
 
                     waitPlayers1.push_back(player1); //放回等待队列
                     m_DeadPlayers[m_Clan2].push_back(player2); //死亡
-                    player2->regenAll();
+                    player2->regenAll(true);
 
                     report.result = 1;
                     m_LastWinClan = m_Clan1;
@@ -290,7 +290,7 @@ namespace GObject
 
                     m_DeadPlayers[m_Clan1].push_back(player1);
                     waitPlayers2.push_back(player2);
-                    player1->regenAll();
+                    player1->regenAll(true);
 
                     report.result = 2;
                     m_LastWinClan = m_Clan2;
@@ -512,7 +512,7 @@ namespace GObject
     void ClanRankBattleField::ResetPlayerData(Player* player)
     {                
         player->clearHIAttr();
-        player->regenAll();
+        player->regenAll(true);
         player->SetClanBattleStatus(PLAYER_WAIT);
         player->SetClanBattleScore(0);
         player->SetClanBattleWinTimes(0);
