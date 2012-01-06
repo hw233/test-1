@@ -60,6 +60,7 @@ enum PurchaseType
     DailyActivity,
     ClanRankBattleSkill,
     ForEquipUpgrade,    
+    PrintDemon, // 除魔印消费
 };
 
 enum IncomingType

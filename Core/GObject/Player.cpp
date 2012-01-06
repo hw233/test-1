@@ -3345,6 +3345,14 @@ namespace GObject
 		return true;
 	}
 
+    bool Player::useDemonLog(UInt32 id, UInt32 num, ConsumeInfo* ci)
+    {
+        if (!ci)
+            return false;
+        DBLOG1().PushUpdateData("insert into consume_demon (server_id,player_id,consume_type,item_id,item_num,id,num,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u,%u)", cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, id, num, TimeUtil::Now());
+        return true;
+    }
+
 	TrainFighterData* Player::getTrainFighterData(UInt32 id)
 	{
 		std::map<UInt32, TrainFighterData *>::iterator found = _trainFighters.find(id);

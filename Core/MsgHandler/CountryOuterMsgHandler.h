@@ -2683,7 +2683,9 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     else
                     {
                         bool bind = true;
+                        ConsumeInfo ci(PrintDemon, lr._itemId, lr._count);
                         player->GetPackage()->DelItemAny(priceID, priceNum, &bind);
+                        player->useDemonLog(priceID, priceNum, &ci);
                         st << static_cast<UInt8>(0);
                     }
                 }
