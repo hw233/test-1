@@ -343,7 +343,12 @@ namespace GObject
 		if(leftCount == 0 || data->checktime == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+#if 0
             practicePlace.stop(m_Player);
+#else
+            GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
+            GLOBAL().PushMsg(hdr1, NULL);
+#endif
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
 			return;
 		}
@@ -389,7 +394,6 @@ namespace GObject
                 fgt = m_Player->findFighter(*i);
                 if (fgt)
                 {
-                    //fgt->addPExp(fgt->getPracticeInc() * 10); 
                     if(n < sizeof(pfexp.fids)/sizeof(UInt32))
                     {
                         pfexp.fids[n] = *i;

@@ -625,7 +625,7 @@ void OnPracticeAddExp( GameMsgHdr& hdr,  const void* data )
 
     Fighter* fgt = 0;
     UInt8 n = 0;
-    for (auto i = _data->fighters.begin(), e = _data->fighters.end(); i != e; ++i)
+    for (std::list<UInt32>::iterator i = _data->fighters.begin(); i != _data->fighters.end(); ++i)
     {
         fgt = player->findFighter(*i);
         if (fgt)
@@ -638,8 +638,19 @@ void OnPracticeAddExp( GameMsgHdr& hdr,  const void* data )
             }
         }
     }
-    GameMsgHdr hdr1(0x320, player->getThreadId(), player, sizeof(PracticeFighterExp));
-    GLOBAL().PushMsg(hdr1, &pfexp);
+
+    if (n)
+    {
+        GameMsgHdr hdr1(0x320, player->getThreadId(), player, sizeof(PracticeFighterExp));
+        GLOBAL().PushMsg(hdr1, &pfexp);
+    }
+}
+
+void OnPracticeStop( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    practicePlace.stop(player);
 }
 
 #endif // _WORLDINNERMSGHANDLER_H_
