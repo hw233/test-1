@@ -21,7 +21,7 @@ function clanskill()
         BEGIN {
             print "INSERT INTO `clan_skill_template` VALUES";
         } {
-            printf("(%d,\x27%s\x27,%d,%d,%d,%d,%d,%d,%d)",$1,$2,$3,$4,$5,$6,$7,$8,$9);
+            printf("(%d,\x27%s\x27,%d,%d,%d)",$1,$2,$3,$4,$5);
             if (NR <= ENVIRON["lines"]-1)
                 printf(",");
             else if (NR >= ENVIRON["lines"])

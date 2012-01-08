@@ -713,34 +713,6 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
 				GLOBAL().PushMsg(hdr, &items);
 			}
 			break;
-		case 3:
-            {
-#if 0
-			{
-				UInt8 skillId;
-				brd	>> skillId;
-				if(skillId < 7 || skillId > 10)
-					return;
-				UInt16 favorId = clan->getFavorItemId(skillId);
-				Stream st(REP::CLAN_SKILL);
-				st << static_cast<UInt8>(5) << skillId << favorId << Stream::eos;
-				player->send(st);
-			}
-#endif
-                UInt8 skillId = 0;
-                GameMsgHdr hdr1(0x313, player->getThreadId(), player, sizeof(skillId));
-                GLOBAL().PushMsg(hdr1, &skillId);
-            }
-			break;
-        case 4:
-			{
-				UInt8 skillId;
-				brd >> skillId;
-
-                GameMsgHdr hdr1(0x313, player->getThreadId(), player, sizeof(skillId));
-                GLOBAL().PushMsg(hdr1, &skillId);
-			}
-            break;
         case 5:
             {
                 UInt8 skillId;
@@ -750,6 +722,27 @@ void OnClanTechOpReq(GameMsgHdr& hdr, const void * data)
             break;
 		}	
 	}
+
+    switch (op)
+    {
+    case 3:
+        {
+            UInt8 skillId = 0;
+            GameMsgHdr hdr1(0x313, player->getThreadId(), player, sizeof(skillId));
+            GLOBAL().PushMsg(hdr1, &skillId);
+        }
+        break;
+    case 4:
+        {
+            UInt8 skillId;
+            brd >> skillId;
+
+            GameMsgHdr hdr1(0x313, player->getThreadId(), player, sizeof(skillId));
+            GLOBAL().PushMsg(hdr1, &skillId);
+        }
+        break;
+    }
+
 }
 
 void OnClanPackageReq( GameMsgHdr& hdr, const void * data )

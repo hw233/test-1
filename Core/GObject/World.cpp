@@ -122,7 +122,7 @@ bool enum_midnight(void * ptr, void *)
 	}
     else
     {
-        pl->buildClanTask();
+        pl->buildClanTask(true);
         pl->clearFinishCount();
         if (World::_thanksgiving)
             pl->resetThanksgiving();

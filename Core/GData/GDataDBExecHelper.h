@@ -208,11 +208,7 @@ struct DBClanSkillType
     std::string name;   // 技能名
 	UInt8  level;       // 技能等级
 	UInt32 needs;       // 升级所需
-    UInt32 hp;          // HP
-    UInt32 attack;      // 物攻
-    UInt32 defend;      // 物防
-    UInt32 magatk;      // 法攻
-    UInt32 magdef;      // 法防
+    float value;        // 技能效果值
 };
 
 struct DBCitta
@@ -478,17 +474,13 @@ SPECIALDEF(6)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBClanSkillType)
-SPECIALDEF(9)
+SPECIALDEF(5)
 	(
 	UInt16, id,
     std::string, name,
 	UInt8,  level,
 	UInt32, needs,
-    UInt32, hp,
-    UInt32, attack,
-    UInt32, defend,
-    UInt32, magatk,
-    UInt32, magdef
+    float, value
 	)
 SPECIALEND()
 

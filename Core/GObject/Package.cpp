@@ -1628,6 +1628,9 @@ namespace GObject
 			return 2;
 
         const GData::ItemBaseType& itemType =  equip-> GetItemType();
+        if(itemType.getId() == 1525 || itemType.getId() == 1526)
+            return 2;
+
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
         UInt8 quality = 0;
         UInt8 maxEnchantLevel = ENCHANT_LEVEL_MAX;
@@ -2000,7 +2003,7 @@ namespace GObject
 		{
 			protect = false;
 		}
-		if(uRand(100) < GObjectManager::getMergeChance(lvl) /*merge_chance[lvl]*/)
+		if(uRand(1000) < GObjectManager::getMergeChance(lvl) /*merge_chance[lvl]*/)
 		{
 			if(bindCount > 0)
 				DelItem(gemId, bindCount, true);
@@ -2572,6 +2575,8 @@ namespace GObject
         if (GetItemSubClass(gemId) != Item_Gem)
             return 3;
         UInt32 lvl = (gemId - 1) % 10;
+        if(lvl == 9)
+            return 3;
 
         if(bindCount > 0 && GetItemNum(gemId, true) < bindCount)
             return 3;
@@ -2611,7 +2616,7 @@ namespace GObject
                     ++ protectBindUsed;
             }
 
-            if(rnd(100) < merge_chance[lvl])
+            if(rnd(1000) < GObjectManager::getMergeChance(lvl))
             {
                 bindUsed += 3;
                 bindCount -= 3;
@@ -2654,7 +2659,7 @@ namespace GObject
                 else
                     ++ protectUnbindUsed;
             }
-            if(rnd(100) < merge_chance[lvl])
+            if(rnd(1000) < GObjectManager::getMergeChance(lvl))
             {
                 unbindUsed += 3;
                 unbindCount -= 3;
@@ -2697,7 +2702,7 @@ namespace GObject
                 else
                     ++ protectBindUsed;
             }
-            if(rnd(100) < merge_chance[lvl])
+            if(rnd(1000) < GObjectManager::getMergeChance(lvl))
             {
                 bindUsed += bindCount;
                 unbindUsed += 3 - bindCount;
@@ -3342,7 +3347,7 @@ namespace GObject
 			{
 				if(item != NULL && bcount > 0)
 					DelItem2(item, bcount, toWhere);
-				DelItem2(item2, num - bcount);
+				DelItem2(item2, num - bcount, toWhere);
 				if(!bind && hasBind != NULL)
 					*hasBind = true;
 				return true;
@@ -3401,8 +3406,10 @@ namespace GObject
         if(l >= ied_trump.maxTRank || rankUpExp == 0)
             return 2;
 
+        UInt8 item_q = item->getQuality();
+        UInt8 item_enchant = ied_item.enchant;
 		const GData::ItemBaseType& ibt = item->GetItemType();
-        UInt32 exp = ibt.trumpExp + ied_item.trumpExp * 0.5;
+        UInt32 exp = (ibt.trumpExp * GObjectManager::getTrumpSmelt(item_q - 2, item_enchant)) + ied_item.trumpExp * 0.5;
         if(exp == 0)
             return 2;
 

@@ -3387,7 +3387,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             break;
         }
 
-        if(_techs->getSkillExtend() <= skillLevel)
+        if(_techs->getSkillExtend(skillId) <= skillLevel)
         {
             res = 2;
             break;

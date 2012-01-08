@@ -126,11 +126,7 @@ CREATE TABLE `clan_skill_template` (
   `name` varchar(255) NOT NULL,
   `level` smallint(6) NOT NULL,
   `needs` int(11) NOT NULL,
-  `hp` int(11) NOT NULL,
-  `attack` int(11) NOT NULL,
-  `defend` int(11) NOT NULL,
-  `magatk` int(11) NOT NULL,
-  `magdef` int(11) NOT NULL,
+  `value` int(11) NOT NULL,
   PRIMARY KEY (`id`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

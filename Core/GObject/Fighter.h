@@ -279,6 +279,7 @@ public:
 	bool addPExp(Int32, bool = true);
 
 	void sendModification(UInt8 t, UInt64 v);
+	void sendMaxSoul();
 	void sendModification(UInt8 n, UInt8 * t, UInt64 * v);
 	void sendModification(UInt8 t, ItemEquip * v, bool = true);
 	void sendModification(UInt8 n, UInt8 * t, ItemEquip ** v, bool = true);
@@ -425,7 +426,7 @@ public:
 
 	inline Int16 getBaseSoul() { return baseSoul; }
     inline Int16 getSoul() { return soul; }
-    inline Int16 getMaxSoul() { return soulMax; }
+    Int16 getMaxSoul();
 
 	inline float getBaseEvade()
     {

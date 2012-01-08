@@ -885,6 +885,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
         if(bNeedChangePos)
 		{
             flag |= 0x04;
+            UInt32 atkDataRank = data->rank;
 			data->rank = deferdata->rank;
 			UInt32 deferPos = static_cast<UInt32>(getRankPos(row, deferRank->second));
 			data->maxrank = std::min(data->maxrank, deferPos);
@@ -901,11 +902,25 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
                 flag |= 0x02;
             }
 			
-			Rank rankUp;
-			getRankUpNeighbour(row, atkerRank->second, rankUp);
-			updateBatchRanker(row, deferRank->second, rankUp);
-			_athleticses[row].erase(atkerRank->second);
-			_ranks[row][atker] = _athleticses[row].insert(deferRank->second, data);
+            if(atkDataRank < 500 )
+            {
+                deferdata->rank = atkDataRank;
+                Rank atk = atkerRank->second;
+                Rank def = deferRank->second;
+
+                *atkerRank->second = deferdata;
+                *deferRank->second = data;
+                _ranks[row][atker] = def;
+                _ranks[row][defer] = atk;
+            }
+            else
+            {
+                Rank rankUp;
+                getRankUpNeighbour(row, atkerRank->second, rankUp);
+                updateBatchRanker(row, deferRank->second, rankUp);
+                _athleticses[row].erase(atkerRank->second);
+                _ranks[row][atker] = _athleticses[row].insert(deferRank->second, data);
+            }
 		}
 
 		++ data->winstreak;

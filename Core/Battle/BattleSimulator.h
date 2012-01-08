@@ -198,6 +198,7 @@ private:
         e_Summon = 22,
         e_Weak = 23,
         e_UnWeak = 24,
+        e_skill = 25,
     };
 
 
@@ -205,7 +206,7 @@ private:
 	int findFirstAttacker();
 	UInt32 doAttack(int);
     UInt32 FightersEnter(UInt8 prevWin = 0xFF);
-    UInt32 doSkillAttackAftEnter(BattleFighter* bf);
+    UInt32 doSkillAttackAftEnter(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
     void reQueueFighterStatus(BattleFighter* bf);
 	void insertFighterStatus(BattleFighter* bf);
 	void removeFighterStatus(BattleFighter* bf);

@@ -73,6 +73,8 @@ namespace GObject
     AttrFactor GObjectManager::_trump_rank_factor[6][12];
     std::vector<UInt16> GObjectManager::_trump_maxrank_chance;
 
+    std::vector<float> GObjectManager::_trump_smelt[4];
+
     UInt16 GObjectManager::_attrTypeChances[3][9];
     UInt16 GObjectManager::_attrChances[3][9];
     std::map<UInt8, stAttrMax*> GObjectManager::_attrMax;
@@ -3091,6 +3093,17 @@ namespace GObject
 				{
                     _trump_maxrank_chance.push_back(table_temp.get<UInt16>(j + 1));
 				}
+            }
+
+
+            for(q = 0; q < 4; ++ q)
+            {
+                lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getTrumpSmelt", q + 1);
+                UInt32 size = std::min(8, table_temp.size());
+                for(UInt32 j = 0; j < size; j ++)
+                {
+                    _trump_smelt[q].push_back(table_temp.get<float>(j + 1));
+                }
             }
 
             {
