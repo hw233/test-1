@@ -173,6 +173,7 @@ namespace GObject
                 iter != team1.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
+            (*iter)->regenAll();
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
@@ -180,7 +181,9 @@ namespace GObject
                 iter != team2.end(); ++iter){
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
-             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
+            (*iter)->regenAll();
+
+            GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
 
         m_WaitPlayers.clear();
@@ -205,119 +208,131 @@ namespace GObject
         //开始下一轮
         if(now >= m_StartTime + m_Round * RANK_BATTLE_FIGHT_TIME)
         {
-            m_StatusChanged.clear();
-            ResetPlayerStatus(m_Clan1);
-            ResetPlayerStatus(m_Clan2);
-           
-            m_ReportTime = now;
-            m_Reports.clear();
+            ProcessRound(now, true);
+        }
+    }
+
+    void ClanRankBattleField::ProcessRound(UInt32 now, bool bNotify)
+    {
             
-            PlayerVec& waitPlayers1 = m_WaitPlayers[m_Clan1];
-            PlayerVec& waitPlayers2 = m_WaitPlayers[m_Clan2];
+        m_StatusChanged.clear();
+        ResetPlayerStatus(m_Clan1);
+        ResetPlayerStatus(m_Clan2);
+       
+        m_ReportTime = now;
+        m_Reports.clear();
+        
+        PlayerVec& waitPlayers1 = m_WaitPlayers[m_Clan1];
+        PlayerVec& waitPlayers2 = m_WaitPlayers[m_Clan2];
 
-            UInt32 fightNum1 = waitPlayers1.size();
-            UInt32 fightNum2 = waitPlayers2.size();
+        UInt32 fightNum1 = waitPlayers1.size();
+        UInt32 fightNum2 = waitPlayers2.size();
 
-            UInt32 fightNum = std::min(fightNum1, fightNum2);
-            if(fightNum > 3) fightNum = 3;
+        UInt32 fightNum = std::min(fightNum1, fightNum2);
+        if(fightNum > 3) fightNum = 3;
 
-            if(fightNum > 0)
+        if(fightNum > 0)
+        {
+            PlayerVec fightPlayers1;
+            PlayerVec fightPlayers2;
+
+            //从队伍头取出对阵玩家
+            for(UInt32 i = 0; i < fightNum; ++i)
             {
-                PlayerVec fightPlayers1;
-                PlayerVec fightPlayers2;
+                fightPlayers1.push_back(*waitPlayers1.begin());
+                waitPlayers1.erase(waitPlayers1.begin());
 
-                //从队伍头取出对阵玩家
-                for(UInt32 i = 0; i < fightNum; ++i)
+                fightPlayers2.push_back(*waitPlayers2.begin());
+                waitPlayers2.erase(waitPlayers2.begin());
+            }
+
+
+            for(UInt32 i = 0; i < fightNum; ++i)
+            {
+                Player* player1 = fightPlayers1[i];
+                Player* player2 = fightPlayers2[i];
+
+                player1->SetClanBattleStatus(PLAYER_BATTLE);
+                player2->SetClanBattleStatus(PLAYER_BATTLE);
+
+                m_StatusChanged[player1->getId()] = PLAYER_BATTLE;
+                m_StatusChanged[player2->getId()] = PLAYER_BATTLE;
+
+                ClanRankBattleReport report;
+                int turns = 0;
+                bool fightRes = player1->challenge(player2, &report.reportid, &turns, false, 0, true, Battle::BS_COPY5, 0x03);
+                //player1->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
+                //player2->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
+
+                report.player1 = player1->getName();
+                report.player2 = player2->getName();
+
+                if(fightRes) //玩家1胜
                 {
-                    fightPlayers1.push_back(*waitPlayers1.begin());
-                    waitPlayers1.erase(waitPlayers1.begin());
+                    player1->IncClanBattleWinTimes();   //增加本场连胜次数
+                    player1->AddClanBattleScore(player1->GetClanBattleWinTimes());
+                    
+                    player2->SetClanBattleWinTimes(0);
 
-                    fightPlayers2.push_back(*waitPlayers2.begin());
-                    waitPlayers2.erase(waitPlayers2.begin());
+                    waitPlayers1.push_back(player1); //放回等待队列
+                    m_DeadPlayers[m_Clan2].push_back(player2); //死亡
+                    player2->regenAll();
+
+                    report.result = 1;
+                    m_LastWinClan = m_Clan1;
+                }
+                else //玩家2胜
+                {
+                    player1->SetClanBattleWinTimes(0);
+
+                    player2->IncClanBattleWinTimes();
+                    player2->AddClanBattleScore(player2->GetClanBattleWinTimes());
+
+                    m_DeadPlayers[m_Clan1].push_back(player1);
+                    waitPlayers2.push_back(player2);
+                    player1->regenAll();
+
+                    report.result = 2;
+                    m_LastWinClan = m_Clan2;
                 }
 
+                m_Reports.push_back(report);
+            }
 
-                for(UInt32 i = 0; i < fightNum; ++i)
-                {
-                    Player* player1 = fightPlayers1[i];
-                    Player* player2 = fightPlayers2[i];
- 
-                    player1->SetClanBattleStatus(PLAYER_BATTLE);
-                    player2->SetClanBattleStatus(PLAYER_BATTLE);
-
-                    m_StatusChanged[player1->getId()] = PLAYER_BATTLE;
-                    m_StatusChanged[player2->getId()] = PLAYER_BATTLE;
-
-                    ClanRankBattleReport report;
-                    int turns = 0;
-                    bool fightRes = player1->challenge(player2, &report.reportid, &turns, false, 0, true, Battle::BS_COPY5, 0x03);
-                    player1->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
-                    player2->setBuffData(PLAYER_BUFF_ATTACKING, now + 2 * turns);
-
-                    report.player1 = player1->getName();
-                    report.player2 = player2->getName();
-
-                    if(fightRes) //玩家1胜
-                    {
-                        player1->IncClanBattleWinTimes();   //增加本场连胜次数
-                        player1->AddClanBattleScore(player1->GetClanBattleWinTimes());
-                        
-                        player2->SetClanBattleWinTimes(0);
-
-                        waitPlayers1.push_back(player1); //放回等待队列
-                        m_DeadPlayers[m_Clan2].push_back(player2); //死亡
-
-                        report.result = 1;
-                        m_LastWinClan = m_Clan1;
-                    }
-                    else //玩家2胜
-                    {
-                        player1->SetClanBattleWinTimes(0);
-
-                        player2->IncClanBattleWinTimes();
-                        player2->AddClanBattleScore(player2->GetClanBattleWinTimes());
-
-                        m_DeadPlayers[m_Clan1].push_back(player1);
-                        waitPlayers2.push_back(player2);
-
-                        report.result = 2;
-                        m_LastWinClan = m_Clan2;
-                    }
-
-                    m_Reports.push_back(report);
-                }
-
+            if(bNotify)
+            {
                 Stream battleStream(REP::CLAN_RANKBATTLE_REP);
                 battleStream << UInt8(10);
                 GetReportsData(battleStream);
                 m_pBattle->BroadcastBattle(battleStream);
             }
-            else
-            {
-                m_bEnd = true;
-                if(fightNum1 > 0) m_Winner = m_Clan1;
-                else if(fightNum2 > 0) m_Winner = m_Clan2;
-                else m_Winner = m_LastWinClan;
-            }
-
-            //刷新状态变化
-            if(!m_StatusChanged.empty())
-            {
-                Stream stream(REP::CLAN_RANKBATTLE_REP);
-                stream << UInt8(6);
-                stream << UInt8(m_StatusChanged.size());
-                for(std::map<UInt64,UInt32>::iterator iter = m_StatusChanged.begin();
-                    iter != m_StatusChanged.end(); ++iter)
-                {
-                    stream << UInt64(iter->first);
-                    stream << UInt8(iter->second);
-                }
-                stream << Stream::eos;
-                m_pBattle->BroadcastBattle(stream);
-            }
-
-            ++m_Round;
         }
+        else
+        {
+            m_bEnd = true;
+            if(fightNum1 > 0) m_Winner = m_Clan1;
+            else if(fightNum2 > 0) m_Winner = m_Clan2;
+            else m_Winner = m_LastWinClan;
+        }
+
+        //刷新状态变化
+        if(bNotify && !m_StatusChanged.empty())
+        {
+            Stream stream(REP::CLAN_RANKBATTLE_REP);
+            stream << UInt8(6);
+            stream << UInt8(m_StatusChanged.size());
+            for(std::map<UInt64,UInt32>::iterator iter = m_StatusChanged.begin();
+                iter != m_StatusChanged.end(); ++iter)
+            {
+                stream << UInt64(iter->first);
+                stream << UInt8(iter->second);
+            }
+            stream << Stream::eos;
+            m_pBattle->BroadcastBattle(stream);
+        }
+
+        ++m_Round;
+
     }
 
     bool ClanRankBattleField::OnPlayerLeave(Player* player)
@@ -647,10 +662,11 @@ namespace GObject
             }
             if(endNum == RANK_BATTLE_FIELD_NUM)
             {
-                End();
+                End(false);
             }
         }
     }
+
 
     void ClanRankBattle::Start(UInt32 now)
     {
@@ -688,7 +704,7 @@ namespace GObject
         BroadcastStatus(m_Clan2);
     }
 
-    void ClanRankBattle::End()
+    void ClanRankBattle::End(bool bTimeout)
     {
         if(m_State == STATE_PREPARE) return;
         if(IsEnd()) return;
@@ -707,7 +723,11 @@ namespace GObject
         {
             for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
             {
-                if(!m_Fields[i].IsEnd()) continue;
+                int times = 100;
+                while(!m_Fields[i].IsEnd() && times-- > 0)
+                {
+                    m_Fields[i].ProcessRound(m_Now, false);
+                }
       
                 m_Winner = m_Fields[i].GetWinner();
 
@@ -778,7 +798,7 @@ namespace GObject
         if(m_Clan1 != NULL) m_Clan1->clan->BroadcastBattleData(m_Now);
         if(m_Clan2 != NULL) m_Clan2->clan->BroadcastBattleData(m_Now);
 
-        BroadcastScores(UInt8(-1), m_Winner, WINNER_EXTRA_SCORE);
+        BroadcastScores(bTimeout ? UInt8(-2) : UInt8(-1), m_Winner, WINNER_EXTRA_SCORE);
     }
 
     void ClanRankBattle::Reset()
@@ -2312,7 +2332,7 @@ namespace GObject
         for(BattleVec::iterator iter = m_Battles.begin();
                 iter != m_Battles.end(); ++iter)
         {
-            (*iter)->End();
+            (*iter)->End(true);
             (*iter)->Reset();
             delete *iter;
         }
