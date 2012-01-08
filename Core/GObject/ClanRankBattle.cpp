@@ -1865,9 +1865,10 @@ namespace GObject
         SysMsgItem* msg2 = globalSysMsg[2239];
 
         // 所有人移走
-        practicePlace.moveAllToMax();
+        // practicePlace.moveAllToMax(); // TODO:
+        GameMsgHdr hdr(0x1F4, WORKER_THREAD_WORLD, NULL, 0);
+        GLOBAL().PushMsg(hdr, NULL);
 
-        UInt8 idx = 0;
         UInt32 ranking = 0;
         for(ClanVec::iterator iter = m_ClanRanking.begin();
             iter != m_ClanRanking.end();++iter)
@@ -1875,12 +1876,14 @@ namespace GObject
             Clan* clan = *iter;
             ++ranking;
 
-            if (idx < PPLACE_MAX)
+            if (ranking < PPLACE_MAX)
             {
                 if (clan && clan->getOwner())
                 {
-                    practicePlace.replaceOwner(clan->getOwner(), idx+1);
-                    ++idx;
+                    // TODO:
+                    // practicePlace.replaceOwner(clan->getOwner(), ranking);
+                    GameMsgHdr hdr(0x1F5, WORKER_THREAD_WORLD, clan->getOwner(), sizeof(ranking));
+                    GLOBAL().PushMsg(hdr, &ranking);
                 }
             }
 

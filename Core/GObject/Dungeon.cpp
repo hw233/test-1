@@ -578,51 +578,54 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 	{
 	case 0:
 		{
-			UInt32 viplevel = player->getVipLevel();
-			if(viplevel < 6)
-			{
-                if (mtype == 1)
+            if (!World::getNewYear())
+            {
+                UInt32 viplevel = player->getVipLevel();
+                if(viplevel < 6)
                 {
-                    ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-                    if(World::_wday == 5)
+                    if (mtype == 1)
                     {
-                        if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2)
-                            return;
-                        player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2, &ci);
+                        ConsumeInfo ci(DungeonAutoConsume, 0, 0);
+                        if(World::_wday == 5)
+                        {
+                            if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2)
+                                return;
+                            player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold / 2, &ci);
+                        }
+                        else
+                        {
+                            if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold)
+                                return;
+                            player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold, &ci);
+                        }
                     }
                     else
                     {
-                        if(player->getGoldOrCoupon() < GData::moneyNeed[GData::DUNGEON_AUTO].gold)
-                            return;
-                        player->useGoldOrCoupon(GData::moneyNeed[GData::DUNGEON_AUTO].gold, &ci);
-                    }
-                }
-                else
-                {
-                    const UInt32 taelReq[] = {
-                        0,
-                        GData::moneyNeed[GData::DUNGEON_AUTO1].tael,
-                        GData::moneyNeed[GData::DUNGEON_AUTO2].tael,
-                        GData::moneyNeed[GData::DUNGEON_AUTO3].tael,
-                        GData::moneyNeed[GData::DUNGEON_AUTO4].tael,
-                        GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
-                    };
+                        const UInt32 taelReq[] = {
+                            0,
+                            GData::moneyNeed[GData::DUNGEON_AUTO1].tael,
+                            GData::moneyNeed[GData::DUNGEON_AUTO2].tael,
+                            GData::moneyNeed[GData::DUNGEON_AUTO3].tael,
+                            GData::moneyNeed[GData::DUNGEON_AUTO4].tael,
+                            GData::moneyNeed[GData::DUNGEON_AUTO5].tael,
+                        };
 
-                    ConsumeInfo ci(DungeonAutoConsume, 0, 0);
-                    if(World::_wday == 5)
-                    {
-                        if(player->getTael() < taelReq[_id] / 2)
-                            return;
-                        player->useTael(taelReq[_id] / 2, &ci);
-                    }
-                    else
-                    {
-                        if(player->getTael() < taelReq[_id])
-                            return;
-                        player->useTael(taelReq[_id], &ci);
+                        ConsumeInfo ci(DungeonAutoConsume, 0, 0);
+                        if(World::_wday == 5)
+                        {
+                            if(player->getTael() < taelReq[_id] / 2)
+                                return;
+                            player->useTael(taelReq[_id] / 2, &ci);
+                        }
+                        else
+                        {
+                            if(player->getTael() < taelReq[_id])
+                                return;
+                            player->useTael(taelReq[_id], &ci);
+                        }
                     }
                 }
-			}
+            }
 			DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id + 100, TimeUtil::SharpDay(0), TimeUtil::Now());
 			Stream st(REP::COPY_AUTO_FIGHT);
 			st << _id << static_cast<UInt8>(it->second.level) << static_cast<UInt8>(0) << Stream::eos;

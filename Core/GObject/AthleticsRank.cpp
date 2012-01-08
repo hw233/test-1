@@ -706,9 +706,14 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
         data->challengetime = TimeUtil::Now();
 
         UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
-        if(Viplvl >= 1 && Viplvl <= 3)
-            challengeBuff=data->challengetime + 10 * 60;
-        else if (Viplvl > 3)
+        if (!World::getNewYear())
+        {
+            if(Viplvl >= 1 && Viplvl <= 3)
+                challengeBuff=data->challengetime + 10 * 60;
+            else if (Viplvl > 3)
+                challengeBuff=data->challengetime + 5 * 60;
+        }
+        else
             challengeBuff=data->challengetime + 5 * 60;
 
         atker->setBuffData(PLAYER_BUFF_ATHLETICS, challengeBuff);
