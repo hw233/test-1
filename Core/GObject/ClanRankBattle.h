@@ -134,6 +134,10 @@ namespace GObject
          */
         void Process(UInt32 now);
         /**
+         *@brief 处理一轮
+         */
+        void ProcessRound(UInt32 now, bool bNotify);
+        /**
          *@brief 判断是否结束
          */
         bool IsEnd() const { return m_bEnd; }
@@ -241,7 +245,7 @@ namespace GObject
          *@brief 开始结束
          */
         void Start(UInt32 now);
-        void End();
+        void End(bool bTimeout);
         void Reset();
         bool IsEnd() const { return m_bEnd; }
 
@@ -273,6 +277,7 @@ namespace GObject
         /**
          *@brief 广播
          */
+        void Broadcast(UInt32 clan, Stream& stream, bool bAll = false);
         void Broadcast(Stream& stream, bool bAll = false);
 
         /**
@@ -413,6 +418,8 @@ namespace GObject
         bool AddDailyMailItems(Player* player, UInt32 score);
         bool AddWeeklyMailItems(Player* player, UInt32 score);
         bool AddMailItems(Player* player, RewardVec& rewards);
+
+        const ClanVec& getClanRanking() const { return m_ClanRanking; }
 
     private:
         void ProcessInit(UInt32 oldtime);

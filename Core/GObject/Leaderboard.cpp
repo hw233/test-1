@@ -10,6 +10,7 @@
 #include "DB/DBConnectionMgr.h"
 #include "DB/DBExecutor.h"
 #include "MsgID.h"
+#include "ClanRankBattle.h"
 
 namespace GObject
 {
@@ -123,11 +124,40 @@ void Leaderboard::doUpdate()
 	buildPacket(_achievementStream, 2, _id, blist, false);
 
 	blist.clear();
+#if 0
 	execu->ExtractData("SELECT `clan`.`id`, `player`.`name`, `clan`.`level`, `player`.`country`, COUNT(`clan_player`.`id`) AS `pcount`, `clan`.`name` FROM "
 		"`clan`, `clan_player`, `player` "
 		"WHERE `clan`.`id` = `clan_player`.`id` AND `clan`.`leader` = `player`.`id` "
 		"GROUP BY `clan_player`.`id` ORDER BY `clan`.`level` DESC, `pcount` DESC LIMIT 0, 100", blist);
 	buildPacket(_clanStream, 3, _id, blist);
+#else
+    i = 0;
+    const std::vector<Clan*> clanRanking = ClanRankBattleMgr::Instance().getClanRanking();
+    UInt32 size = clanRanking.size();
+    if (size > 1000) size = 100;
+	blist.resize(size);
+    for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++i, ++it)
+    {
+		blist[i].id = (*it)->getId();
+        Player* owner = (*it)->getOwner();
+        if (owner)
+        {
+            blist[i].name = owner->getName();
+            blist[i].pf = owner->getPF();
+            blist[i].country = owner->getCountry();
+        }
+        else
+        {
+            blist[i].name = "";
+            blist[i].pf = 0;
+            blist[i].country = 2;
+        }
+		blist[i].lvl = (*it)->getLev();
+		blist[i].value = (*it)->getCount();
+		blist[i].clan = (*it)->getName();
+    }
+	buildPacket(_clanStream, 3, _id, blist);
+#endif
 
 	std::vector<UInt64> ilist;
 	size_t cnt;

@@ -83,6 +83,9 @@ namespace GObject
         static bool loadTeamCopy();
         static bool InitMoneyLog();
 
+        static bool addGM(UInt64 id, UInt8 lvl);
+        static bool delGM(UInt64 id);
+
         static UInt8 reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err);
 
 		static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备

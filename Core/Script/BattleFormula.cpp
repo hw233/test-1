@@ -174,13 +174,13 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getBasePierce", &Battle::BattleFighter::getBasePierce);
 	class_def<Battle::BattleFighter>("getBaseCounter", &Battle::BattleFighter::getBaseCounter);
 	class_def<Battle::BattleFighter>("getBaseMagRes", &Battle::BattleFighter::getBaseMagRes);
-	class_def<Battle::BattleFighter>("getExtraHitrateLevel", &GObject::Fighter::getExtraHitrateLevel);
-	class_def<Battle::BattleFighter>("getExtraEvadeLevel", &GObject::Fighter::getExtraEvadeLevel);
-	class_def<Battle::BattleFighter>("getExtraCriticalLevel", &GObject::Fighter::getExtraCriticalLevel);
-	class_def<Battle::BattleFighter>("getExtraPierceLevel", &GObject::Fighter::getExtraPierceLevel);
-	class_def<Battle::BattleFighter>("getExtraCounterLevel", &GObject::Fighter::getExtraCounterLevel);
-	class_def<Battle::BattleFighter>("getExtraToughLevel", &GObject::Fighter::getExtraToughLevel);
-	class_def<Battle::BattleFighter>("getExtraMagResLevel", &GObject::Fighter::getExtraMagResLevel);
+	class_def<Battle::BattleFighter>("getExtraHitrateLevel", &Battle::BattleFighter::getExtraHitrateLevel);
+	class_def<Battle::BattleFighter>("getExtraEvadeLevel", &Battle::BattleFighter::getExtraEvadeLevel);
+	class_def<Battle::BattleFighter>("getExtraCriticalLevel", &Battle::BattleFighter::getExtraCriticalLevel);
+	class_def<Battle::BattleFighter>("getExtraPierceLevel", &Battle::BattleFighter::getExtraPierceLevel);
+	class_def<Battle::BattleFighter>("getExtraCounterLevel", &Battle::BattleFighter::getExtraCounterLevel);
+	class_def<Battle::BattleFighter>("getExtraToughLevel", &Battle::BattleFighter::getExtraToughLevel);
+	class_def<Battle::BattleFighter>("getExtraMagResLevel", &Battle::BattleFighter::getExtraMagResLevel);
 }
 
 void BattleFormula::postInit()

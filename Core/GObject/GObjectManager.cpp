@@ -871,6 +871,9 @@ namespace GObject
 		UInt32 nextDay = TimeUtil::SharpDay(1);
 		while(execu->Next() == DB::DB_OK)
 		{
+            if (!dbpd.id)
+                continue;
+
 			lc.advance();
 #define LOAD_LINEUP(lus, lud) \
 			{ \
@@ -3534,8 +3537,24 @@ namespace GObject
                 assignMoneyLog(t, World::_moneyIn[i][j]);
             }
         }
+        World::_moneyLogged = today[6];
 
         return true;
+    }
+
+    bool GObjectManager::addGM(UInt64 id, UInt8 lvl)
+    {
+        if (!id)
+            return false;
+        Player* player = globalPlayers[id];
+        if (player)
+            player->setGMLevel(lvl);
+        return true;
+    }
+
+    bool GObjectManager::delGM(UInt64 id)
+    {
+        return addGM(id, 0);
     }
 
     bool GObjectManager::LoadTripodData() // XXX: ??Ҫ?ӳټ???,??World::Init??????

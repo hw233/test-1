@@ -86,8 +86,21 @@ local christmasReward = {
     { { 402,3}},
     { { 401,1}},
 }
+local newYearReward = {
+    { { 433,1}},
+    { { 434,1}},
+    { { 433,2}},
+    { { 434,2}},
+    { { 433,3}},
+    { { 434,3}},
+    { { 435,1}},
+}
 --获取上线奖励
 function GetOnlineReward()
+    local isNewYear = getNewYear();
+    if isNewYear then
+        return newYearReward;
+    end
     local isChristmas = getChristmas();
     if isChristmas == false then
         return onlineReward;

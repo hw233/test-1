@@ -23,6 +23,7 @@
 #include "Script/WorldScript.h"
 #include "Script/BattleFormula.h"
 #include "GObject/SpecialAward.h"
+#include "GObject/PracticePlace.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -597,5 +598,48 @@ void OnReleaseClanSkillLevelOp( GameMsgHdr& hdr,  const void* data)
     player->setClanSkillFlag(0);
 }
 
+void OnMoveAllToMax( GameMsgHdr& hdr,  const void* data )
+{
+    GObject::practicePlace.moveAllToMax();
+}
+
+void OnReplaceOwner( GameMsgHdr& hdr,  const void* data )
+{
+    MSG_QUERY_PLAYER(newpl);
+    UInt32 ranking = *(UInt32*)data;
+    GObject::practicePlace.replaceOwner(newpl, ranking);
+}
+
+void OnPracticeAddExp( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    PracticeData* _data = practicePlace.getPracticeData(player->getId());
+    if (!_data) {
+        PopTimerEvent(player, EVENT_PLAYERPRACTICING, player->getId());
+        return;
+    }
+
+    PracticeFighterExp pfexp;
+    memset(&pfexp, 0, sizeof(pfexp));
+
+    Fighter* fgt = 0;
+    UInt8 n = 0;
+    for (auto i = _data->fighters.begin(), e = _data->fighters.end(); i != e; ++i)
+    {
+        fgt = player->findFighter(*i);
+        if (fgt)
+        {
+            if(n < sizeof(pfexp.fids)/sizeof(UInt32))
+            {
+                pfexp.fids[n] = *i;
+                pfexp.counts[n] = 10;
+                ++ n;
+            }
+        }
+    }
+    GameMsgHdr hdr1(0x320, player->getThreadId(), player, sizeof(PracticeFighterExp));
+    GLOBAL().PushMsg(hdr1, &pfexp);
+}
 
 #endif // _WORLDINNERMSGHANDLER_H_

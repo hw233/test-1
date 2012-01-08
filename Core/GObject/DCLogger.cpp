@@ -208,6 +208,66 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
     return true;
 }
 
+bool DCLogger::blue(Player* player)
+{
+    std::ostringstream msg;
+
+    msg << "version=";
+    msg << version;
+    msg << "&appid=";
+    msg << appid;
+    msg << "&userip=";
+    msg << player->getClientAddress();
+    msg << "&svrip=";
+    msg << cfg.serverIp;
+    msg << "&time=";
+    msg << time(NULL);
+    msg << "&domain=";
+    msg << player->getDomain();
+    msg << "&worldid=";
+    msg << cfg.serverNum;
+    msg << "&optype=5&actionid=101";
+    msg << "&opuid=";
+    msg << player->getId();
+    msg << "&opopenid=";
+    msg << player->getOpenId();
+    msg << "&key=";
+    msg << player->getOpenKey();
+
+    DC().Push(msg.str().c_str(), msg.str().length());
+    return true;
+}
+
+bool DCLogger::d3d6(Player* player)
+{
+    std::ostringstream msg;
+
+    msg << "version=";
+    msg << version;
+    msg << "&appid=";
+    msg << appid;
+    msg << "&userip=";
+    msg << player->getClientAddress();
+    msg << "&svrip=";
+    msg << cfg.serverIp;
+    msg << "&time=";
+    msg << time(NULL);
+    msg << "&domain=";
+    msg << player->getDomain();
+    msg << "&worldid=";
+    msg << cfg.serverNum;
+    msg << "&optype=5&actionid=102";
+    msg << "&opuid=";
+    msg << player->getId();
+    msg << "&opopenid=";
+    msg << player->getOpenId();
+    msg << "&key=";
+    msg << player->getOpenKey();
+
+    DC().Push(msg.str().c_str(), msg.str().length());
+    return true;
+}
+
 DCLogger dclogger;
 
 } // namespace GObject

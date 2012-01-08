@@ -141,7 +141,7 @@ namespace GObject
 			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
 		return exp * clanEffect;
 #else
-        return 4.0f * _npcGroup->getExp();
+        return 8.0f * _npcGroup->getExp();
 #endif
 	}
 
@@ -305,6 +305,7 @@ namespace GObject
 			return;
         }
 
+#if 0
         PracticeFighterExp pfexp;
         memset(&pfexp, 0, sizeof(pfexp));
 
@@ -328,6 +329,10 @@ namespace GObject
         //data->lock.unlock();
         GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
         GLOBAL().PushMsg(hdr1, &pfexp);
+#else
+        GameMsgHdr hdr1(0x1F6, WORKER_THREAD_WORLD, m_Player, 0);
+        GLOBAL().PushMsg(hdr1, NULL);
+#endif
 
 		data->checktime -= 10;
         if ((int)data->checktime < 0)
@@ -794,6 +799,8 @@ namespace GObject
 		GameAction()->onLogin(this);
         if (World::getChristmas())
             GameAction()->onChristmas(this);
+        if (World::getNewYear())
+            GameAction()->onNewYear(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -4118,9 +4125,12 @@ namespace GObject
         } else {
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fshimen[i] == taskid) {
-                    if (getVipLevel() < 3) {
-                        sendMsgCode(0, 1003);
-                        return false;
+                    if (!World::getNewYear())
+                    {
+                        if (getVipLevel() < 3) {
+                            sendMsgCode(0, 1003);
+                            return false;
+                        }
                     }
 
                     if (GetLev() < static_cast<UInt8>(30)) {
@@ -4154,6 +4164,14 @@ namespace GObject
 
             for (int i = 0; i < 6; ++i) {
                 if (_playerData.fyamen[i] == taskid) {
+                    if (!World::getNewYear())
+                    {
+                        if (getVipLevel() < 3) {
+                            sendMsgCode(0, 1003);
+                            return false;
+                        }
+                    }
+
                     if (GetLev() < static_cast<UInt8>(30)) {
                         sendMsgCode(1, 1016);
                         return false;
@@ -5364,14 +5382,16 @@ namespace GObject
         }
 
         std::vector<UInt16>& act_form = _playerData.formations;
-        cnt = act_form.size();
-        for( int idx = 0; idx < cnt; ++ idx )
+        int c = act_form.size();
+        for( int idx = 0; idx < c; )
         {
             if( act_form[idx] == formationId )
             {
                 act_form.erase(act_form.begin() + idx);
-                cnt = act_form.size();
+                c = act_form.size();
             }
+            else
+                ++idx;
         }
 
         addNewFormation(newFormationId, true);
@@ -7204,6 +7224,8 @@ namespace GObject
 
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
+
+                    dclogger.d3d6(this);
                 }
                 else
                 {
@@ -7250,6 +7272,8 @@ namespace GObject
 
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
+
+                    dclogger.blue(this);
                 }
                 else
                 {

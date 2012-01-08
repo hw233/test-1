@@ -462,30 +462,33 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                         return;
                     }
 
-                    if (pl->getVipLevel() < 5)
-                        return;
-
                     if (!checkLevel(pl, id))
                         return;
 
-                    if (mtype == 1)
+                    if (!World::getNewYear())
                     {
-                        if (GData::moneyNeed[GData::FRONTMAP_AUTO].gold > pl->getGoldOrCoupon()) {
-                            pl->sendMsgCode(0, 1104);
+                        if (pl->getVipLevel() < 5)
                             return;
-                        } else {
-                            ConsumeInfo ci(EnterFrontMap,0,0);
-                            pl->useGoldOrCoupon(GData::moneyNeed[GData::FRONTMAP_AUTO].gold, &ci);
+
+                        if (mtype == 1)
+                        {
+                            if (GData::moneyNeed[GData::FRONTMAP_AUTO].gold > pl->getGoldOrCoupon()) {
+                                pl->sendMsgCode(0, 1104);
+                                return;
+                            } else {
+                                ConsumeInfo ci(EnterFrontMap,0,0);
+                                pl->useGoldOrCoupon(GData::moneyNeed[GData::FRONTMAP_AUTO].gold, &ci);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael > pl->getTael()) {
-                            pl->sendMsgCode(0, 1100);
-                            return;
-                        } else {
-                            ConsumeInfo ci(EnterFrontMap,0,0);
-                            pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
+                        else
+                        {
+                            if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael > pl->getTael()) {
+                                pl->sendMsgCode(0, 1100);
+                                return;
+                            } else {
+                                ConsumeInfo ci(EnterFrontMap,0,0);
+                                pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
+                            }
                         }
                     }
                 }
@@ -543,8 +546,11 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     return;
                 }
 
-                if (pl->getVipLevel() < 7)
-                    return;
+                if (!World::getNewYear())
+                {
+                    if (pl->getVipLevel() < 7)
+                        return;
+                }
 
                 if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGoldOrCoupon())
                 {

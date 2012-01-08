@@ -191,8 +191,8 @@ void ClanItemPkg::RemoveItem(UInt16 id, UInt32 num)
     }
     else
     {
-        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
-                ,iter->second, m_PlayerId, id);
+        DB5().PushUpdateData("UPDATE `clan_item` SET `itemnum`='%u' WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u' AND `itemid`='%u'"
+                ,iter->second, m_ClanId, m_PlayerId, id);
     }
 }
 

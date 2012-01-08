@@ -134,7 +134,7 @@ function initActTime(y, m, d)
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm4 = { ['year'] = 2011, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm6 = { ['year'] = 2011, ['month'] = 12, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm6 = { ['year'] = 2012, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -152,7 +152,7 @@ function initActTime(y, m, d)
   actTime10 = os.time(SerStartTm5) + 12 * 86400;
 
   actTime11 = os.time(SerStartTm6);
-  actTime12 = os.time(SerStartTm6) + 3 * 86400;
+  actTime12 = os.time(SerStartTm6) + 26 * 86400;
 
   onActivityCheck(os.time() + 30);
 

@@ -27,6 +27,8 @@ public:
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
     bool fee(Player* player, UInt32 total, Int32 c);
+    bool blue(Player* player);
+    bool d3d6(Player* player);
 
     void online();
 

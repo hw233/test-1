@@ -750,7 +750,408 @@ function ItemNormal_00000416(id, num, bind, param)
     return 0;
 end
 
+function ItemNormal_00000417(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
 
+    -- TODO
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    --local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(503, 6*factor, true, 0, 2);
+        package:AddItem(500, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(417, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000418(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(514, 6*factor, true, 0, 2);
+        package:AddItem(1526, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(418, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000419(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(515, 3*factor, true, 0, 2);
+        package:AddItem(1526, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(419, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000420(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 24, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(511, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(420, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000421(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(512, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(421, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000422(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 26, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(508, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(422, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000423(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(506, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(423, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000424(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(30, 6*factor, true, 0, 2);
+
+        package:DelItemSendMsg(424, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000425(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+        package:AddItem(507, 3*factor, true, 0, 2);
+        package:AddItem(509, 3*factor, true, 0, 2);
+
+        package:DelItemSendMsg(425, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000426(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 30, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+
+        local equip = getRandOEquip(player:GetLev())
+        package:AddEquip(equip, 1, false);
+        if factor == 2 then
+            equip = getRandOEquip(player:GetLev())
+            package:AddEquip(equip, 1, false);
+        end
+
+        package:DelItemSendMsg(426, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000427(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 2, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+
+        local gem = {5005, 5015, 5025, 5035, 5045}
+
+        local g = math.random(1, #gem)
+        package:AddItem(gem[g], 1, true, 0, 2);
+        if factor == 2 then
+            g = math.random(1, #gem)
+            package:AddItem(gem[g], 1, true, 0, 2);
+        end
+
+        package:DelItemSendMsg(427, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000428(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = { ['year'] = 2012, ['month'] = 2, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
+    start = os.time(date)
+    doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        package:AddItem(56, 6*factor, true, 0, 2);
+        package:AddItem(57, 6*factor, true, 0, 2);
+
+        local items = {
+            {1600,1601,1602},
+            {1604,1605,1606},
+            {1603,1608,1609},
+            {1610,1614,1615},
+            {1612,1616,1607,1611},
+            {200,201,202,203,204,205,206,207,208},
+            {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
+            {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
+            {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
+        }
+
+        local lvl = player:GetLev()
+        if lvl < 40 then
+            lvl = 40
+        end
+
+        local n = 0
+        if lvl >= 40 and lvl <= 44 then
+            n = 1
+        elseif lvl >= 45 and lvl <= 49 then
+            n = 2
+        elseif lvl >= 50 and lvl <= 54 then
+            n = 3
+        elseif lvl >= 55 and lvl <= 59 then
+            n = 4
+        elseif lvl >= 60 and lvl <= 64 then
+            n = 5
+        elseif lvl >= 65 and lvl <= 69 then
+            n = 6
+        elseif lvl >= 70 and lvl <= 74 then
+            n = 7
+        elseif lvl >= 75 and lvl < 80 then
+            n = 8
+        elseif lvl >= 80 then
+            n = 9
+        else
+            n = 1
+        end
+
+        local m = math.random(1, #items[n])
+        package:Add(items[n][m], 1, 1, 0, 2);
+        if factor == 2 then
+            m = math.random(1, #items[n])
+            package:Add(items[n][m], 1, 1, 0, 2);
+        end
+
+        package:DelItemSendMsg(428, player);
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+end
+
+function ItemNormal_00000429(iid, num, bind, param)
+end
+
+function ItemNormal_00000430(iid, num, bind, param)
+end
+
+function ItemNormal_00000431(iid, num, bind, param)
+end
+
+function ItemNormal_00000432(iid, num, bind, param)
+end
+
+function ItemNormal_00000433(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(433, player);
+    player:getTael(2000*num)
+    return num;
+end
+
+function ItemNormal_00000434(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(434, player);
+    player:getCoupon(10*num)
+    return num;
+end
+
+function ItemNormal_00000435(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(434, player);
+    player:getTael(10000*num)
+    player:getCoupon(100*num)
+    return num;
+end
 
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
@@ -1293,11 +1694,12 @@ function ItemNormal_00000029(iid, num, bind, param)
         return false
     end
 
+    local pexp = fgt:getPExp()
     local n = 0;
     for i = 1, num do
         n = n + 1
-        if fgt:isPExpFull() then
-            player:sendMsgCode(2, 1069, 0);
+        pexp = pexp + 100
+        if pexp >= fgt:getPExpMax() then
             break
         end
     end
@@ -1418,11 +1820,12 @@ function ItemNormal_00000030(iid, num, bind, param)
         return false
     end
 
+    local pexp = fgt:getPExp()
     local n = 0
     for i = 1, num do
         n = n + 1
-        if fgt:isPExpFull() then
-            player:sendMsgCode(2, 1069, 0);
+        pexp = pexp + 10000
+        if pexp >= fgt:getPExpMax() then
             break
         end
     end
@@ -1448,11 +1851,12 @@ function ItemNormal_00000031(iid, num, bind, param)
         return false
     end
 
+    local pexp = fgt:getPExp()
     local n = 0;
     for i = 1, num do
         n = n + 1
-        if fgt:isPExpFull() then
-            player:sendMsgCode(2, 1069, 0);
+        pexp = pexp + 1000000
+        if pexp >= fgt:getPExpMax() then
             break
         end
     end
@@ -6276,6 +6680,25 @@ local ItemNormal_Table = {
 	[53] = ItemNormal_00000053,
 	[66] = ItemNormal_00000066,
     [69] = ItemNormal_00000069,
+    [417] = ItemNormal_00000417,
+    [418] = ItemNormal_00000418,
+    [419] = ItemNormal_00000419,
+    [420] = ItemNormal_00000420,
+    [421] = ItemNormal_00000421,
+    [422] = ItemNormal_00000422,
+    [423] = ItemNormal_00000423,
+    [424] = ItemNormal_00000424,
+    [425] = ItemNormal_00000425,
+    [426] = ItemNormal_00000426,
+    [427] = ItemNormal_00000427,
+    [428] = ItemNormal_00000428,
+    [429] = ItemNormal_00000429,
+    [430] = ItemNormal_00000430,
+    [431] = ItemNormal_00000431,
+    [432] = ItemNormal_00000432,
+    [433] = ItemNormal_00000433,
+    [434] = ItemNormal_00000434,
+    [435] = ItemNormal_00000435,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,

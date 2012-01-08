@@ -844,3 +844,32 @@ function onChristmas(player)
     end
 end
 
+function onNewYear(player)
+    if not getNewYear() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 30 then
+        return
+    end
+
+    if lvl >= 30 and player:GetVar(42) == 0 then
+        local msg = "恭喜您获得龙年迎新礼包，礼包的封印将会在对应日期解除， 届时可打开获得丰厚道具，若是在解除封印当天打开的话可获得双倍奖励哦。（如果觉得占包包可以先不接受的说）"
+        sendItemPackageMail(player, "龙年迎新礼包-小年夜礼包", msg, {417,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-大年夜礼包", msg, {418,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初一礼包", msg, {419,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初二礼包", msg, {420,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初三礼包", msg, {421,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初四礼包", msg, {422,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初五礼包", msg, {423,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初六礼包", msg, {424,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初七礼包", msg, {425,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-初八礼包", msg, {426,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-立春礼包", msg, {427,1,1});
+        sendItemPackageMail(player, "龙年迎新礼包-元宵礼包", msg, {428,1,1});
+        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装【中国结】。\n 1月12日-2月6日 登陆游戏，并且等级达到30的玩家可以获得节日套装【中国结】 ", {1753,1,1});
+        player:SetVar(42,1)
+    end
+end
+

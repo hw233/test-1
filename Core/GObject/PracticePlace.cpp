@@ -1133,7 +1133,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                 break;
         }
 
-        if(idx == PPLACE_MAX)
+        if(idx >= PPLACE_MAX - 1)
             return false;
 
         return replaceOwner(newpl, idx+1);
@@ -1170,7 +1170,8 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pd.place.ownerid = newpl->getId();
 
             clan->broadcastPracticePlaceInfo();
-            oldclan->broadcastPracticePlaceInfo();
+            if (oldclan)
+                oldclan->broadcastPracticePlaceInfo();
 
             DB1().PushUpdateData("UPDATE `practice_place` SET `ownerid` = %"I64_FMT"u, `maxslot` = %u WHERE id = %u",
                     pd.place.ownerid, pd.place.maxslot, place);

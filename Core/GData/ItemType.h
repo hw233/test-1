@@ -18,7 +18,9 @@
 #define RARM_ID         4999
 #define LGEM_ID         5000
 #define RGEM_ID         5200
-#define LOTHER_ID       5201
+#define LCITTA1_ID      6000
+#define RCITTA1_ID      7000
+#define LOTHER_ID       7001
 #define ROTHER_ID       65535
 
 enum ItemClass
@@ -111,7 +113,6 @@ inline bool IsFighterTypeId(UInt32 id)
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
-#if 1
     if (id >= LNORMAL_ID && id <= RNORMAL_ID)
         return Item_Normal;
     if (id >= LENHANCE_ID && id <= RENHANCE_ID)
@@ -120,28 +121,11 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_Task;
     if (id >= LFORMULA_ID && id <= RFORMULA_ID)
         return Item_Formula;
-    if (id >= LCITTA_ID && id <= RCITTA_ID)
+    if ((id >= LCITTA_ID && id <= RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID))
         return Item_Citta;
-    //if (id >= LARM_ID && id <= RARM_ID)
-    //    return Item_Weapon; // XXX: 
     if (id >= LGEM_ID && id <= RGEM_ID)
 		return Item_Gem;
 	return Item_Other;
-#else
-    if(id <= 5000)
-        return Item_Other;
-    if(id <= 5800)
-        return Item_Gem;
-    //if(id <= 7000)
-    //    return Item_Favor;
-    if(id <= 10000)
-        return Item_Normal;
-    if(id <= 15000)
-        return Item_Other;
-    if(id <= 25000)
-        return Item_Task;
-    return Item_Other;
-#endif
 }
 
 namespace GData
