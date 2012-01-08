@@ -63,6 +63,9 @@
 #define CLAN_SKILL_MAGATK   3
 #define CLAN_SKILL_MAGDEF   4
 #define CLAN_SKILL_HP       5
+#define CLAN_SKILL_ACTION   6
+#define CLAN_SKILL_HITRATE  7
+#define CLAN_SKILL_MAXSOUL  8
 
 namespace GObject
 {
@@ -4344,38 +4347,49 @@ namespace GObject
         }
     }
 
-    void Player::buildClanTask()
+    void Player::buildClanTask(bool fReset)
     {
-        if(getClan() == NULL)
+        bool writeDB = false;
+        do
         {
-            return;
-        }
+            if(getClan() == NULL)
+            {
+                break;
+            }
 
-        const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
-        if(task.size() == 0)
-            return;
+            const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
+            if(task.size() == 0)
+                break;
 
-        if(_playerData.clanTaskId == 0)
-        {
-            URandom rnd(time(NULL));
-            _playerData.clanTaskId = task[rnd(task.size())];
-        }
-        else
-        {
-            const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(_playerData.clanTaskId);
-            if(taskType.m_Class != 6)
+            if(_playerData.clanTaskId == 0)
             {
                 URandom rnd(time(NULL));
                 _playerData.clanTaskId = task[rnd(task.size())];
+                writeDB = true;
             }
+            else
+            {
+                const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(_playerData.clanTaskId);
+                if(taskType.m_Class != 6)
+                {
+                    URandom rnd(time(NULL));
+                    _playerData.clanTaskId = task[rnd(task.size())];
+                    writeDB = true;
+                }
+            }
+
+            GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        } while(false);
+
+        if(fReset && _playerData.ctFinishCount != 0)
+        {
+            _playerData.ctFinishCount = 0;
+            writeDB = true;
         }
 
-        GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
-        _playerData.ctFinishCount = 0;
-        writeClanTask();
-
+        if(writeDB)
+            writeClanTask();
     }
-
 
 	void Player::writeClanTask()
 	{
@@ -7760,6 +7774,10 @@ namespace GObject
 
     void Player::addClanSkill(UInt8 skillId)
     {
+        std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(skillId);
+        if(it != m_clanSkill.end())
+            return;
+
         ClanSkill& cs = m_clanSkill[skillId];
         cs.id = skillId;
         cs.level = 0;
@@ -7799,6 +7817,15 @@ namespace GObject
             ++ cs.level;
             DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, getId(), skillId);
 
+            if(skillId == CLAN_SKILL_MAXSOUL)
+            {
+                for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+                {
+                    Fighter * fgt = it->second;
+                    fgt->sendMaxSoul();
+                }
+            }
+
             showClanSkill(skillId);
         } while(false);
 
@@ -7815,7 +7842,8 @@ namespace GObject
     void Player::makeClanSkillInfo(Stream& st)
     {
         UInt8 cnt = static_cast<UInt8>(m_clanSkill.size());
-        if(cnt == 0)
+        UInt8 skillNum = GData::clanSkillTable.size();
+        if(cnt < skillNum)
         {
             buildClanTechSkill();
             cnt = static_cast<UInt8>(m_clanSkill.size());
@@ -7858,56 +7886,85 @@ namespace GObject
         send(st);
     }
 
-    UInt32 Player::getClanSkillHPEffect()
+    float Player::getClanSkillHPEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_HP);
         if(it == m_clanSkill.end())
             return 0;
 
         ClanSkill& skill = it->second;
-        return GData::clanSkillTable[skill.id][skill.level].hp;
+        return GData::clanSkillTable[skill.id][skill.level].value;
     }
 
-    UInt32 Player::getClanSkillAtkEffect()
+    float Player::getClanSkillAtkEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_ATTACK);
         if(it == m_clanSkill.end())
             return 0;
 
         ClanSkill& skill = it->second;
-        return GData::clanSkillTable[skill.id][skill.level].attack;
+        return GData::clanSkillTable[skill.id][skill.level].value;
     }
 
-    UInt32 Player::getClanSkillDefendEffect()
+    float Player::getClanSkillDefendEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_DEFEND);
         if(it == m_clanSkill.end())
             return 0;
 
         ClanSkill& skill = it->second;
-        return GData::clanSkillTable[skill.id][skill.level].defend;
+        return GData::clanSkillTable[skill.id][skill.level].value;
     }
 
-    UInt32 Player::getClanSkillMagAtkEffect()
+    float Player::getClanSkillMagAtkEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_MAGATK);
         if(it == m_clanSkill.end())
             return 0;
 
         ClanSkill& skill = it->second;
-        return GData::clanSkillTable[skill.id][skill.level].magatk;
+        return GData::clanSkillTable[skill.id][skill.level].value;
     }
 
-    UInt32 Player::getClanSkillMagDefentEffect()
+    float Player::getClanSkillMagDefentEffect()
     {
         std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_MAGDEF);
         if(it == m_clanSkill.end())
             return 0;
 
         ClanSkill& skill = it->second;
-        return GData::clanSkillTable[skill.id][skill.level].magdef;
+        return GData::clanSkillTable[skill.id][skill.level].value;
     }
 
+    float Player::getClanSkillActionEffect()
+    {
+        std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_ACTION);
+        if(it == m_clanSkill.end())
+            return 0;
+
+        ClanSkill& skill = it->second;
+        return GData::clanSkillTable[skill.id][skill.level].value;
+    }
+
+    float Player::getClanSkillHitrLvlEffect()
+    {
+        std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_HITRATE);
+        if(it == m_clanSkill.end())
+            return 0;
+
+        ClanSkill& skill = it->second;
+        return GData::clanSkillTable[skill.id][skill.level].value;
+    }
+
+    float Player::getClanSkillMaxSoulEffect()
+    {
+        std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_MAXSOUL);
+        if(it == m_clanSkill.end())
+            return 0;
+
+        ClanSkill& skill = it->second;
+        return GData::clanSkillTable[skill.id][skill.level].value;
+    }
 
 } // namespace GObject
 

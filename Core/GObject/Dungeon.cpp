@@ -425,7 +425,7 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 		st << Stream::eos;
 		player->send(st);
 		bsim.applyFighterHP(0, player);
-		player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + turns_ * 2);
+		player->setBuffData(PLAYER_BUFF_ATTACKING, TimeUtil::Now() + turns_);
 	}
 
 	if(turns != NULL)

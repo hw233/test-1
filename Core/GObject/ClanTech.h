@@ -19,6 +19,7 @@ class Player;
 #define CLAN_TECH_PRACTICE_SLOT     2
 #define CLAN_TECH_MEMBER_COUNT      3
 #define CLAN_TECH_SKILL_EXTEND      4
+#define CLAN_TECH_SKILL_EXTEND2     5
 
 struct ClanTechData
 {
@@ -71,7 +72,7 @@ public:
     UInt32 getPracticeSpeed();
     UInt32 getPracticeSlot();
     UInt32 getMemberCount();
-    UInt32 getSkillExtend();
+    UInt32 getSkillExtend(UInt8 skillId);
 
 private:
 	bool techLevelUp(UInt8, UInt8&, UInt32&, UInt32);

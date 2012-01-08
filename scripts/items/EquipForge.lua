@@ -26,6 +26,14 @@ local Team_Split_green = {
         {4,70,518},        --紫色装备组队装备普通材料分解概率
 }
 
+local trump_smelt = {
+
+	{ 1.1,1.23,1.46,1.78,2.19,2.96,3.59,4.56 },	--绿色法宝强化后熔炼系数
+	{ 1.1,1.25,1.55,1.94,2.69,3.96,4.75,6.56 },	--蓝色法宝强化后熔炼系数
+	{ 1.1,1.29,1.61,2.24,3.03,4.46,5.59,7.56 },	--紫色法宝强化后熔炼系数
+	{ 1.1,1.34,1.71,2.44,3.69,5.96,7.25,9.23 },	--橙色法宝强化后熔炼系数
+}
+
 local Team_Split_orange = {
 --组队装备特殊材料橙色装备分解概率
 
@@ -1061,6 +1069,7 @@ local mergeStuff = {
 	{ {252,    260,   1}, 1625},
 	{ {261,    269,   1}, 1638},
 	{ {270,       10}, 1627},
+	{ {103,110,       1}, 1518},
 }
 
 function getMergeStuff()
@@ -1149,6 +1158,10 @@ end
 
 function getTeamMatieralSplit()
     return Team_Split_green
+end
+
+function getTrumpSmelt(q)
+     return trump_smelt[q]
 end
 
 function getOrangeTeamMatieralSplit()

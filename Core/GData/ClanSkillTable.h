@@ -9,10 +9,8 @@ namespace GData
 struct ClanSkillTableData
 {
 	ClanSkillTableData(UInt16 id = 0, const std::string& name = std::string(),
-            UInt8 level = 0, UInt32 needs = 0, UInt32 hp = 0, UInt32 attack = 0,
-            UInt32 defend = 0, UInt32 magatk = 0, UInt32 magdef = 0)
-        : id(id), name(name), level(level), needs(needs), hp(hp),
-        attack(attack), defend(defend), magatk(magatk), magdef(magdef) {} 
+            UInt8 level = 0, UInt32 needs = 0, UInt32 value = 0)
+        : id(id), name(name), level(level), needs(needs), value(value) {} 
 
     ClanSkillTableData(const ClanSkillTableData& cstd)
     {
@@ -20,11 +18,7 @@ struct ClanSkillTableData
         name = cstd.name;
         level = cstd.level;
         needs = cstd.needs;
-        hp = cstd.hp;
-        attack = cstd.attack;
-        defend = cstd.defend;
-        magatk = cstd.magatk;
-        magdef = cstd.magdef;
+        value = cstd.value;
     }
 
     ClanSkillTableData& operator= (const ClanSkillTableData& cstd)
@@ -33,11 +27,7 @@ struct ClanSkillTableData
         name = cstd.name;
         level = cstd.level;
         needs = cstd.needs;
-        hp = cstd.hp;
-        attack = cstd.attack;
-        defend = cstd.defend;
-        magatk = cstd.magatk;
-        magdef = cstd.magdef;
+        value = cstd.value;
         return *this;
     }
 
@@ -45,11 +35,7 @@ struct ClanSkillTableData
     std::string name;
 	UInt8  level;
 	UInt32 needs;
-    UInt32 hp;
-    UInt32 attack;
-    UInt32 defend;
-    UInt32 magatk;
-    UInt32 magdef;
+    float value;
 };
 
 typedef std::vector<ClanSkillTableData>		SingleClanSkillTable;

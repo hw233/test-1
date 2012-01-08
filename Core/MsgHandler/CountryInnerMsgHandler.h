@@ -601,7 +601,7 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
 	player->GetTaskMgr()->CheckDayTask(TimeUtil::SharpDay(0));
 	player->sendDailyInfo();
 
-    player->buildClanTask();
+    player->buildClanTask(true);
     player->clearFinishCount();
     if (World::_thanksgiving)
         player->resetThanksgiving();

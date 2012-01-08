@@ -958,7 +958,7 @@ namespace GObject
 
         bool finishClanTask(UInt32);
         void delClanTask();
-        void buildClanTask();
+        void buildClanTask(bool fReset = false);
         void resetClanTask();
         UInt32 getClanTaskId();
         bool isClanTask(UInt32);
@@ -1267,11 +1267,14 @@ namespace GObject
         void makeClanSkillInfo(Stream&, UInt8 skillId);
         void listClanSkills();
         void showClanSkill(UInt8 skillId);
-        UInt32 getClanSkillHPEffect();
-        UInt32 getClanSkillAtkEffect();
-        UInt32 getClanSkillDefendEffect();
-        UInt32 getClanSkillMagAtkEffect();
-        UInt32 getClanSkillMagDefentEffect();
+        float getClanSkillHPEffect();
+        float getClanSkillAtkEffect();
+        float getClanSkillDefendEffect();
+        float getClanSkillMagAtkEffect();
+        float getClanSkillMagDefentEffect();
+        float getClanSkillActionEffect();
+        float getClanSkillHitrLvlEffect();
+        float getClanSkillMaxSoulEffect();
 
         void buildClanTechSkill();
         UInt8 getClanSkillFlag() { return m_csFlag; }

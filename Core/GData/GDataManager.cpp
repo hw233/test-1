@@ -1148,7 +1148,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		DBClanSkillType cst;
-		if (execu->Prepare("SELECT `id`, `name`, `level`, `needs`, `hp`, `attack`, `defend`, `magatk`, `magdef` FROM `clan_skill_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
+		if (execu->Prepare("SELECT `id`, `name`, `level`, `needs`, `value` FROM `clan_skill_template` ORDER BY `id` ASC, `level` ASC", cst) != DB::DB_OK)
 			return false;
 		while (execu->Next() == DB::DB_OK)
 		{
@@ -1159,7 +1159,7 @@ namespace GData
 			SingleClanSkillTable & single = clanSkillTable[cst.id];
 			if (cst.level >= single.size())
 				single.resize(cst.level + 1);
-			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.hp, cst.attack, cst.defend, cst.magatk, cst.magdef);
+			single[cst.level] = ClanSkillTableData(cst.id, cst.name, cst.level, cst.needs, cst.value);
 		}
 
 		return true;

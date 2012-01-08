@@ -563,7 +563,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, UInt64 * v )
 		{
 			st << static_cast<UInt32>(v[i]);
 		}
-		updateToDB(t[i], v[i]);
+        updateToDB(t[i], v[i]);
 	}
 	st << Stream::eos;
 	_owner->send(st);
@@ -1189,6 +1189,8 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.defend += _owner->getClanSkillDefendEffect();
         _attrExtraEquip.magatk += _owner->getClanSkillMagAtkEffect();
         _attrExtraEquip.magdef += _owner->getClanSkillMagDefentEffect();
+        _attrExtraEquip.action += _owner->getClanSkillActionEffect();
+        _attrExtraEquip.hitrlvl += _owner->getClanSkillHitrLvlEffect();
 
         const GData::AttrExtra* ae = _owner->getHIAttr();
         if (ae)
@@ -1749,7 +1751,7 @@ bool Fighter::setAcupoints( int idx, UInt8 v, bool writedb, bool init )
         _bPDirty = true;
         sendModificationAcupoints(0x29, idx, writedb);
         sendModification(7, _pexpMax);
-        sendModification(9, soulMax);
+        sendModification(9, getMaxSoul() );
         sendModification(0x32, getUpCittasMax());
         if(!init && v ==vMax )
             GameAction()->doAttainment(this->_owner, Script::AddAcupoint, idx); //增加穴道的成就
@@ -2889,6 +2891,14 @@ void GlobalFighters::buildSummonSet()
     }
 }
 
+Int16 Fighter::getMaxSoul()
+{
+    if(_owner == NULL)
+        return soulMax;
+    else
+        return soulMax + _owner->getClanSkillMaxSoulEffect();
+}
+
 void GlobalFighters::setAllDirty()
 {
 	size_t sz = _fighters.size();
@@ -2897,6 +2907,18 @@ void GlobalFighters::setAllDirty()
 		if(_fighters[i].fighter != NULL)
 			_fighters[i].fighter->setDirty();
 	}
+}
+
+void Fighter::sendMaxSoul()
+{
+	if(_owner == NULL)
+		return;
+
+	Stream st(REP::CHANGE_EQUIPMENT);
+	st << getId() << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(9) << static_cast<UInt32>(getMaxSoul());
+	st << Stream::eos;
+	_owner->send(st);
 }
 
 }

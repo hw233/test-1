@@ -340,14 +340,29 @@ UInt32 ClanTech::getMemberCount()
 	return GData::clanTechTable[CLAN_TECH_MEMBER_COUNT][found->second.level].effect1;
 }
 
-UInt32 ClanTech::getSkillExtend()
+UInt32 ClanTech::getSkillExtend(UInt8 skillId)
 {
+    static UInt8 tech_skill_extend[] = {
+        0,
+        CLAN_TECH_SKILL_EXTEND,
+        CLAN_TECH_SKILL_EXTEND,
+        CLAN_TECH_SKILL_EXTEND,
+        CLAN_TECH_SKILL_EXTEND,
+        CLAN_TECH_SKILL_EXTEND,
+        CLAN_TECH_SKILL_EXTEND2,
+        CLAN_TECH_SKILL_EXTEND2,
+        CLAN_TECH_SKILL_EXTEND2
+    };
+
+    if(skillId > sizeof(tech_skill_extend))
+        return 0;
+
 	Mutex::ScopedLock lk(_mutex);
-    Techs::iterator found = _techs.find(CLAN_TECH_SKILL_EXTEND);
+    Techs::iterator found = _techs.find(tech_skill_extend[skillId]);
     if(found == _techs.end())
         return 0;
 
-	return GData::clanTechTable[CLAN_TECH_SKILL_EXTEND][found->second.level].effect1;
+	return GData::clanTechTable[tech_skill_extend[skillId]][found->second.level].effect1;
 }
 
 UInt8 ClanTech::getClanLev()

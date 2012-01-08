@@ -131,6 +131,19 @@ namespace GObject
             return _trump_maxrank_chance[idx];
         }
 
+        static float getTrumpSmelt(UInt8 q, UInt8 enchant)
+        {
+            if(q > 3)
+                q = 0;
+            int size = _trump_smelt[q].size();
+
+            if(enchant == 0 || enchant > size)
+                return 1;
+
+            UInt8 idx = enchant - 1;
+            return _trump_smelt[q][idx];
+        }
+
         static float getHiterateMax() { return _hiterate_max; }
         static float getEvadeMax() { return _evade_max; }
         static float getCriticalMax() { return _critical_max; }
@@ -350,6 +363,7 @@ namespace GObject
         static std::vector<UInt32>              _yellow_diamond_gem;
 
 		static std::vector<UInt16> _trump_maxrank_chance;
+        static std::vector<float> _trump_smelt[4];
 
         // 强化人品
         static std::vector<stHftChance> _hft_chance[6][12];
