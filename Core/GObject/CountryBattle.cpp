@@ -513,11 +513,14 @@ bool CountryBattle::playerEnter( Player * player )
 		player->sendMsgCode(0, 1401);
 		return false;
 	}
+    // XXX: yangyoufa@ 08/01/12 21:15:02 
+#if 0
 	if(player->getBuffData(PLAYER_BUFF_ATTACKING, curtime))
 	{
 		player->sendMsgCode(0, 1412);
 		return false;
 	}
+#endif
 	UInt8 lvl, side;
 	int pos = findPlayer(player, lvl, side);
 	if(pos >= 0)

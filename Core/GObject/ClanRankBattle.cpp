@@ -1891,7 +1891,6 @@ namespace GObject
         SysMsgItem* msg2 = globalSysMsg[2239];
 
         // 所有人移走
-        // practicePlace.moveAllToMax(); // TODO:
         GameMsgHdr hdr(0x1F4, WORKER_THREAD_WORLD, NULL, 0);
         GLOBAL().PushMsg(hdr, NULL);
 
@@ -1906,8 +1905,6 @@ namespace GObject
             {
                 if (clan && clan->getOwner())
                 {
-                    // TODO:
-                    // practicePlace.replaceOwner(clan->getOwner(), ranking);
                     GameMsgHdr hdr(0x1F5, WORKER_THREAD_WORLD, clan->getOwner(), sizeof(ranking));
                     GLOBAL().PushMsg(hdr, &ranking);
                 }

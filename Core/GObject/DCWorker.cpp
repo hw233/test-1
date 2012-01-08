@@ -76,8 +76,6 @@ namespace GObject
 
                 delete[] *msg;
                 ++msg;
-                if (!*msg)
-                    continue;
             }
         }
     }

@@ -133,7 +133,10 @@ void Leaderboard::doUpdate()
 #else
     i = 0;
     const std::vector<Clan*> clanRanking = ClanRankBattleMgr::Instance().getClanRanking();
-    for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++it)
+    UInt32 size = clanRanking.size();
+    if (size > 1000) size = 100;
+	blist.resize(size);
+    for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++i, ++it)
     {
 		blist[i].id = (*it)->getId();
         Player* owner = (*it)->getOwner();
@@ -150,10 +153,9 @@ void Leaderboard::doUpdate()
             blist[i].country = 2;
         }
 		blist[i].lvl = (*it)->getLev();
-		blist[i].value = i + 1;
+		blist[i].value = (*it)->getCount();
 		blist[i].clan = (*it)->getName();
     }
-    blist.resize(i);
 	buildPacket(_clanStream, 3, _id, blist);
 #endif
 

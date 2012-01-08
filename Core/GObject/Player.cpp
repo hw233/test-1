@@ -141,7 +141,7 @@ namespace GObject
 			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
 		return exp * clanEffect;
 #else
-        return 4.0f * _npcGroup->getExp();
+        return 8.0f * _npcGroup->getExp();
 #endif
 	}
 
@@ -7224,6 +7224,8 @@ namespace GObject
 
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
+
+                    dclogger.d3d6(this);
                 }
                 else
                 {
@@ -7270,6 +7272,8 @@ namespace GObject
 
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
+
+                    dclogger.blue(this);
                 }
                 else
                 {
