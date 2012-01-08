@@ -78,6 +78,7 @@ namespace Script
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
 		lua_tinker::def(_L, "getChristmas",	GObject::World::getChristmas);
+		lua_tinker::def(_L, "getNewYear",	GObject::World::getNewYear);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -195,6 +196,7 @@ namespace Script
 		CLASS_DEF(Fighter, getExp);
 		CLASS_DEF(Fighter, addPExp);
 		CLASS_DEF(Fighter, getPExp);
+		CLASS_DEF(Fighter, getPExpMax);
 		CLASS_DEF(Fighter, isPExpFull);
 		CLASS_DEF(Fighter, getAcupointCnt);
 		CLASS_DEF(Fighter, getBuffData);
@@ -885,6 +887,11 @@ namespace Script
 	bool GameActionLua::onChristmas(Player* player)
 	{
 		return Call<bool>("onChristmas", player);
+	}
+
+	bool GameActionLua::onNewYear(Player* player)
+	{
+		return Call<bool>("onNewYear", player);
 	}
 
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)

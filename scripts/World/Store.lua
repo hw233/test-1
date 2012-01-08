@@ -1,6 +1,12 @@
 function loadStore()
 local store = GetStore()
 store:clear()
+if getNewYear() then
+store:add(1,430,10)
+store:add(1,431,20)
+store:add(1,432,50)
+store:add(5,429,1000)
+end
 store:add(1,72,720)
 store:add(1,78,120)
 store:add(1,79,200)
