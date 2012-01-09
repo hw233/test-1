@@ -1202,22 +1202,22 @@ void Clan::listPending( Player * player )
 	Stream st(REP::CLAN_MEMBER_LIST);
 	UInt8 c = 0;
 	st << static_cast<UInt8>(1) << c;
-	size_t i = 0;
     std::vector<ClanPendingMember *>::iterator it = _pending.begin();
-	while(i < _pending.size())
+	while(it != _pending.end())
 	{
-		ClanPendingMember * cmem = *it;
+		ClanPendingMember* cmem = *it;
 		if(cmem->player->getClan() != NULL)
 		{
 			DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND (`class` = 16 OR `class` = 15)", _id, cmem->player->getId());
-            delete cmem;
-			_pending.erase(it);
-			continue;
+            delete cmem; cmem = NULL;
+			it = _pending.erase(it);
 		}
-		st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime;
-		++ c;
-        it = _pending.begin() + i;
-		++ i;
+        else
+        {
+            st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime;
+            ++ c;
+            ++ it;
+        }
 	}
 	st.data<UInt8>(5) = c;
 	st << Stream::eos;
