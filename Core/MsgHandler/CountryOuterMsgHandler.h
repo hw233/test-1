@@ -3322,7 +3322,7 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    UInt8 type;
+    UInt8 type = 0;
     brd >> type;
 
     if (PLAYER_DATA(player,location) != 8977)

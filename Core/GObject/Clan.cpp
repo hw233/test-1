@@ -225,14 +225,11 @@ void ClanItemPkg::GetItems(Player* player)
         return;
     }
 
-    std::ostringstream itemstream;
     for(ItemMap::iterator iter = m_Items.begin(); iter != m_Items.end(); ++iter)
     {
-        itemstream << iter->first << "," << iter->second << ";";
         player->GetPackage()->Add(iter->first, iter->second, true, false, FromClan);
     }
 
-    player->getClan()->AddItemHistory(ClanItemHistory::ALLOCATED, TimeUtil::Now(), player->getId(), itemstream.str());
 
     DB5().PushUpdateData("DELETE FROM `clan_item` WHERE `clanid`='%u' AND `playerid`='%"I64_FMT"u'", m_ClanId, m_PlayerId);
     
@@ -1202,22 +1199,22 @@ void Clan::listPending( Player * player )
 	Stream st(REP::CLAN_MEMBER_LIST);
 	UInt8 c = 0;
 	st << static_cast<UInt8>(1) << c;
-	size_t i = 0;
     std::vector<ClanPendingMember *>::iterator it = _pending.begin();
-	while(i < _pending.size())
+	while(it != _pending.end())
 	{
-		ClanPendingMember * cmem = *it;
+		ClanPendingMember* cmem = *it;
 		if(cmem->player->getClan() != NULL)
 		{
 			DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND (`class` = 16 OR `class` = 15)", _id, cmem->player->getId());
-            delete cmem;
-			_pending.erase(it);
-			continue;
+            delete cmem; cmem = NULL;
+			it = _pending.erase(it);
 		}
-		st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime;
-		++ c;
-        it = _pending.begin() + i;
-		++ i;
+        else
+        {
+            st << cmem->player->getId() << cmem->player->getName() << cmem->player->GetLev() << cmem->opTime;
+            ++ c;
+            ++ it;
+        }
 	}
 	st.data<UInt8>(5) = c;
 	st << Stream::eos;
@@ -3315,6 +3312,10 @@ void Clan::DistributeItem(Player* player, UInt64 memId, UInt16 itemId, UInt16 nu
     broadcast(clanPkgStream); 
 
     member->itemPkg.AddItem(itemId, num);
+    
+    std::ostringstream itemstream;
+    itemstream << itemId << "," << num << ";";
+    AddItemHistory(ClanItemHistory::ALLOCATED, TimeUtil::Now(), memId, itemstream.str());
     
     if(member->player != NULL && member->player->isOnline())
     {
