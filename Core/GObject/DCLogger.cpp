@@ -3,9 +3,12 @@
 #include "Common/Itoa.h"
 #include "Player.h"
 #include "Server/Cfg.h"
+#include "Server/SysMsg.h"
 #include "Log/Log.h"
 #include "DCWorker.h"
 #include <sstream>
+
+class SysMsgItem;
 
 namespace GObject
 {
@@ -196,6 +199,21 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
     msg << player->getOpenId();
     msg << "&key=";
     msg << player->getOpenKey();
+    msg << "&itemid=29999";
+    msg << "&itemtype=";
+    SysMsgItem* mi = globalSysMsg[2999];
+    if (mi)
+    {
+        char tmp[2048] = {0};
+        mi->get(tmp);
+        msg << tmp;
+    }
+    else
+    {
+        msg << "SengokuPack";
+    }
+    msg << "&itemcnt=";
+    msg << (c+9)/10;
     msg << "&modifyfee=";
     msg << c*10; // TODO:
     if (total)
