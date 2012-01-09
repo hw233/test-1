@@ -3901,7 +3901,7 @@ namespace GObject
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
-#if 1
+
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
@@ -3918,17 +3918,6 @@ namespace GObject
 			GLOBAL().PushMsg( hdr, &ces );
 			return;
 		}
-#else
-        if (getCountry() != cny.GetThreadID())
-        {
-			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);
-			cny.PlayerLeave(this);
-			_threadId = getCountry();
-			GameMsgHdr hdr(0x1F0, getCountry(), this, sizeof(CountryEnterStruct));
-			GLOBAL().PushMsg( hdr, &ces );
-			return;
-        }
-#endif
 
 		GObject::Map * map = GObject::Map::FromSpot(spot);
 		if(map == NULL)
