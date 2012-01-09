@@ -1875,7 +1875,8 @@ namespace GObject
 
 		LoadingCounter lc("Loading athletics_rank:");
 		DBAthleticsData dbd;
-		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum` FROM `athletics_rank` ORDER BY `rank`", dbd) != DB::DB_OK)
+        UInt32 rank[2] = {0,0};
+		if(execu->Prepare("SELECT `row`, `rank`, `ranker`, `maxRank`, `challengeNum`, `challengeTime`, `prestige`, `tael`, `winStreak`, `beWinStreak`, `failStreak`, `beFailStreak`, `oldRank`, `first4Rank`, `extrachallenge`, `pageNum` FROM `athletics_rank` ORDER BY `rank`, `maxRank`", dbd) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1888,7 +1889,24 @@ namespace GObject
 			AthleticsRankData * data = new AthleticsRankData();
 			data->row = dbd.row;
 			data->ranker = pl;
-			data->rank = dbd.rank;
+
+            if(rank[dbd.row] == 0)
+                rank[dbd.row] = dbd.rank;
+            else
+            {
+                if(dbd.rank <= rank[dbd.row])
+                {
+                    ++ rank[dbd.row];
+                    data->rank = rank[dbd.row];
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, dbd.ranker);
+                }
+                else
+                {
+                    data->rank = dbd.rank;
+                    rank[dbd.row] = data->rank;
+                }
+            }
+
 			data->maxrank = dbd.maxRank;
 			data->challengenum = dbd.challengeNum;
 			data->challengetime = dbd.challengeTime;

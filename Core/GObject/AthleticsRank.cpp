@@ -912,6 +912,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
                 *deferRank->second = data;
                 _ranks[row][atker] = def;
                 _ranks[row][defer] = atk;
+
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", deferdata->rank, deferdata->ranker->getId());
             }
             else
             {

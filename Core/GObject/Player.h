@@ -715,6 +715,8 @@ namespace GObject
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);
 		bool holdCoin(UInt32 c, UInt8);
 
+        bool useDemonLog(UInt32 id, UInt32 num, ConsumeInfo* ci);
+
 		void addTrainFighterFromDB(UInt32, UInt8, UInt32, UInt32, UInt32, UInt32);
 		bool delTrainFighter(UInt32, bool = false);
 		bool hasTrainFighter(UInt32);

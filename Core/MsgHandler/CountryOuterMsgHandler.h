@@ -2683,7 +2683,9 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                     else
                     {
                         bool bind = true;
+                        ConsumeInfo ci(PrintDemon, lr._itemId, lr._count);
                         player->GetPackage()->DelItemAny(priceID, priceNum, &bind);
+                        player->useDemonLog(priceID, priceNum, &ci);
                         st << static_cast<UInt8>(0);
                     }
                 }
@@ -3320,7 +3322,7 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
-    UInt8 type;
+    UInt8 type = 0;
     brd >> type;
 
     if (PLAYER_DATA(player,location) != 8977)

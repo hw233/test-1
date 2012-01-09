@@ -172,6 +172,10 @@ bool ClanTech::techLevelDown(UInt8 id, UInt8& level, UInt32& extra, UInt32 count
 
 void ClanTech::addTech(UInt8 id, UInt16 flag, UInt8 level, UInt32 extra)
 {
+    std::map<UInt8, ClanTechData>::iterator it = _techs.find(id);
+    if(it != _techs.end())
+        return;
+
 	_techs[id] = ClanTechData(id, flag, level, extra);
 	DB5().PushUpdateData("REPLACE INTO `clan_tech`(`clanId`, `techId`, `level`, `extra`) VALUES(%u, %u, %u, %d)", _clan->getId(), id, level, extra);
 }

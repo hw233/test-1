@@ -343,7 +343,12 @@ namespace GObject
 		if(leftCount == 0 || data->checktime == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+#if 0
             practicePlace.stop(m_Player);
+#else
+            GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
+            GLOBAL().PushMsg(hdr1, NULL);
+#endif
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
 			return;
 		}
@@ -389,7 +394,6 @@ namespace GObject
                 fgt = m_Player->findFighter(*i);
                 if (fgt)
                 {
-                    //fgt->addPExp(fgt->getPracticeInc() * 10); 
                     if(n < sizeof(pfexp.fids)/sizeof(UInt32))
                     {
                         pfexp.fids[n] = *i;
@@ -3345,6 +3349,14 @@ namespace GObject
 		return true;
 	}
 
+    bool Player::useDemonLog(UInt32 id, UInt32 num, ConsumeInfo* ci)
+    {
+        if (!ci)
+            return false;
+        DBLOG1().PushUpdateData("insert into consume_demon (server_id,player_id,consume_type,item_id,item_num,id,num,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u,%u)", cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, id, num, TimeUtil::Now());
+        return true;
+    }
+
 	TrainFighterData* Player::getTrainFighterData(UInt32 id)
 	{
 		std::map<UInt32, TrainFighterData *>::iterator found = _trainFighters.find(id);
@@ -3889,7 +3901,7 @@ namespace GObject
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
-#if 1
+
 		UInt8 new_cny = GObject::mapCollection.getCountryFromSpot(spot);
         if (new_cny > WORKER_THREAD_LOGIN)
         {
@@ -3906,17 +3918,6 @@ namespace GObject
 			GLOBAL().PushMsg( hdr, &ces );
 			return;
 		}
-#else
-        if (getCountry() != cny.GetThreadID())
-        {
-			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);
-			cny.PlayerLeave(this);
-			_threadId = getCountry();
-			GameMsgHdr hdr(0x1F0, getCountry(), this, sizeof(CountryEnterStruct));
-			GLOBAL().PushMsg( hdr, &ces );
-			return;
-        }
-#endif
 
 		GObject::Map * map = GObject::Map::FromSpot(spot);
 		if(map == NULL)

@@ -45,7 +45,7 @@ UInt32 Map::getIndexbyPK(Player *pl)
 
 void Map::changebyStatus(Player *pl)
 {
-	UInt8 country = pl->getCountry();
+	UInt8 country = pl->getThreadId();
 	UInt8 status = getIndexbyPK(pl);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
@@ -57,7 +57,7 @@ void Map::PlayerEnter(Player * pl, bool notify)
 	if(notify)
 	{
 		NotifyPlayerEnter(pl);
-		UInt8 country = pl->getCountry();
+		UInt8 country = pl->getThreadId();
 		UInt8 status = getIndexbyPK(pl);
         {
             if(find(country, status, pl) == _playerList[country][status].end())
@@ -76,7 +76,7 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 	if(notify)
 	{
 		NotifyPlayerLeave(pl);
-		UInt8 country = pl->getCountry();
+		UInt8 country = pl->getThreadId();
 		UInt8 status = getIndexbyPK(pl);
         {
             MapPlayer::iterator it = find(country, status, pl);
@@ -96,7 +96,7 @@ void Map::PlayerLeave(Player * pl, bool onlogout, bool notify)
 
 void Map::OnPlayerLevUp(Player *pl)
 {
-	UInt8 country = pl->getCountry();
+	UInt8 country = pl->getThreadId();
 	UInt8 status = getIndexbyPK(pl);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
@@ -436,7 +436,6 @@ void Map::Broadcast2( const void * buf, int size, UInt8 cny, Player * pl )
 
 void Map::Broadcast( const void * buf, int size, Player * pl )
 { 
-#if 1
 	if(pl == NULL)
 	{
 		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
@@ -467,30 +466,6 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 			}
 		}
 	}
-#else
-#define MSG_MAX 4096
-    struct BroadcastMsg
-    {
-        Map* map;
-        Player* pl;
-        int size;
-        char msg[MSG_MAX]; // XXX:
-    } msg, msg1, msg2;
-
-    msg.map = msg1.map = msg2.map = this;
-    msg.pl = msg1.pl = msg2.pl = pl;
-    msg.size = msg1.size = msg2.size = size;
-    memcpy(msg.msg, buf, msg.size>MSG_MAX?MSG_MAX:msg.size);
-    memcpy(msg1.msg, buf, msg1.size>MSG_MAX?MSG_MAX:msg.size);
-    memcpy(msg2.msg, buf, msg2.size>MSG_MAX?MSG_MAX:msg.size);
-
-    GameMsgHdr hdr(0x1F2, 0, pl, sizeof(msg));
-    GLOBAL().PushMsg(hdr, &msg);
-    GameMsgHdr hdr1(0x1F2, 1, pl, sizeof(msg1));
-    GLOBAL().PushMsg(hdr1, &msg1);
-    GameMsgHdr hdr2(0x1F2, 2, pl, sizeof(msg2));
-    GLOBAL().PushMsg(hdr2, &msg2);
-#endif
 }
 
 void Map::NotifyPlayerEnter( Player * pl )
