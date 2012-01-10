@@ -997,13 +997,22 @@ inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext, UInt
 
 inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 {
-    if (id < 2000)
-        return;
+    if(id - 1750 < 8)
+    {
+        id = 1;
+    }
+    else
+    {
+        if (id < 2000)
+            return;
 
-	id -= 2000;
-    id /= 8;
+        id -= 2000;
+        id /= 8;
+    }
+
 	if(id == 0)
 		return;
+
 	for(int i = 0; i < 8; ++ i)
 	{
 		if(setId[i] == 0)
