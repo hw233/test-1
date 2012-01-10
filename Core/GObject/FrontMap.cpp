@@ -199,7 +199,7 @@ void FrontMap::enter(Player* pl, UInt8 id)
             ret = 0;
 
             ConsumeInfo ci(EnterFrontMap,0,0);
-            pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt));
+            pl->useGold(20*PLAYER_DATA(pl, frontGoldCnt), &ci);
         } else {
             // XXX:
             return;

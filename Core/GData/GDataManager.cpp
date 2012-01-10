@@ -511,9 +511,17 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
-            if (est.id < 2000)
-                continue;
-			ItemEquipSetType * iest = new ItemEquipSetType((est.id-2000)/8, est.name);
+            ItemEquipSetType * iest = NULL;
+            if(est.id - 1750 < 8)
+            {
+                iest = new ItemEquipSetType(1, est.name);
+            }
+            else
+            {
+                if (est.id < 2000)
+                    continue;
+                iest = new ItemEquipSetType((est.id-2000)/8, est.name);
+            }
 			for(int j = 0; j < 4; ++ j)
 			{
 				iest->attrExtra[j] = *attrExtraManager[est.attrId[j]];
