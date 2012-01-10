@@ -1824,11 +1824,51 @@ UInt16 Fighter::getUpSkillsNum()
     return c;
 }
 
+bool Fighter::testMutual( UInt16 skill )
+{
+    UInt16 mutualSkills[] = {
+        1,5,
+        2,6,
+        3,7,
+        10,28,
+        11,15,
+        12,16,
+        19,23,
+        20,24,
+        21,25,
+    };
+
+    UInt16 j = 0;
+    UInt16 id = SKILL_ID(skill);
+    for (UInt16 i = 0; i < sizeof(mutualSkills)/sizeof(UInt16); ++i)
+    {
+        if (mutualSkills[i] != id)
+            continue;
+
+        if (i % 2)
+            j = i - 1;
+        else
+            j = i + 1;
+
+        if (isSkillUp(SKILLANDLEVEL(mutualSkills[j], 0)) >= 0)
+        {
+            if(_owner != NULL)
+                _owner->sendMsgCode(0, 1703);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
 {
     if (!skill)
         return false;
     if (!(idx >= 0 && idx < getUpSkillsMax())) // dst
+        return false;
+
+    if (testMutual(skill))
         return false;
 
     bool ret = false;

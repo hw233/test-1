@@ -492,7 +492,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                                 pl->sendMsgCode(0, 1101);
                                 return;
                             } else {
-                                ConsumeInfo ci(EnterCopy,0,0);
+                                ConsumeInfo ci(EnterAutoCopy,0,0);
                                 pl->useGoldOrCoupon(GData::moneyNeed[GData::COPY_AUTO].gold, &ci);
                             }
                         }
@@ -502,7 +502,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                                 pl->sendMsgCode(0, 1100);
                                 return;
                             } else {
-                                ConsumeInfo ci(EnterCopy,0,0);
+                                ConsumeInfo ci(EnterAutoCopy,0,0);
                                 pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael, &ci);
                             }
                         }
