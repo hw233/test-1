@@ -174,6 +174,8 @@ namespace GObject
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
             (*iter)->regenAll(true);
+            (*iter)->SetVar(VAR_DAILY_CLANBATTLE, 1);
+            (*iter)->SetVar(VAR_WEEKLY_CLANBATTLE, 1);
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
@@ -182,6 +184,8 @@ namespace GObject
             (*iter)->SetClanBattleStatus(PLAYER_WAIT);
             (*iter)->addFlag(Player::ClanRankBattle);
             (*iter)->regenAll(true);
+            (*iter)->SetVar(VAR_DAILY_CLANBATTLE, 1);
+            (*iter)->SetVar(VAR_WEEKLY_CLANBATTLE, 1);
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
         }
@@ -1845,7 +1849,11 @@ namespace GObject
 
             bool operator()(ClanMember* member)
             {
-                member->player->GetMailBox()->newMail(NULL, 0x41, m_Title, m_Content, m_Score, true, m_pInfo);
+                if(member->player->GetVar(VAR_DAILY_CLANBATTLE) != 0)
+                {
+                    member->player->GetMailBox()->newMail(NULL, 0x41, m_Title, m_Content, m_Score, true, m_pInfo);
+                    member->player->SetVar(VAR_DAILY_CLANBATTLE, 0);
+                }
                 return true;
             }
 
@@ -1919,7 +1927,11 @@ namespace GObject
 
                 bool operator()(ClanMember* member)
                 {
-                    member->player->GetMailBox()->newMail(NULL, 0x42, m_Title, m_Content, m_Score, true, m_pInfo);
+                    if(member->player->GetVar(VAR_WEEKLY_CLANBATTLE) != 0)
+                    {
+                        member->player->GetMailBox()->newMail(NULL, 0x42, m_Title, m_Content, m_Score, true, m_pInfo);
+                        member->player->SetVar(VAR_WEEKLY_CLANBATTLE, 0);
+                    }
                     return true;
                 }
 
