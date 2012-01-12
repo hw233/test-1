@@ -1647,8 +1647,6 @@ namespace GObject
         ClanRankBattleInfo* info = GetClanInfo(clan->getId());
         if(info == NULL) return;
 
-        if(!info->HasPlayer(player)) return;
-
         if(info->battle != NULL)
         {
             info->battle->SendBattleStatus(player);
