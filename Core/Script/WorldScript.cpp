@@ -55,6 +55,8 @@ void WorldScript::init()
 	def("setChristmas", GObject::World::setChristmas);
 	def("getNewYear", GObject::World::getNewYear);
 	def("setNewYear", GObject::World::setNewYear);
+	def("getBlueactiveday", GObject::World::getBlueactiveday);
+	def("setBlueactiveday", GObject::World::setBlueactiveday);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

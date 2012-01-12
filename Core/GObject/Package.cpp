@@ -516,7 +516,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				if(fromWhere != 0  && item->getQuality() >= 3)
+				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
@@ -542,7 +542,7 @@ namespace GObject
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
-				if(fromWhere != 0 && item->getQuality() >= 3)
+				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                      AddItemCoursesLog(typeId, num, fromWhere);
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
@@ -569,7 +569,7 @@ namespace GObject
 				SendItemData(exist);
 				ItemNotify(item->GetItemType().getId(), count);
 			}
-			if(fromWhere != 0 && item->getQuality() >= 3)
+            if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             {
                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             }
@@ -587,7 +587,7 @@ namespace GObject
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品
             GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
-			if(fromWhere != 0 && item->getQuality() >= 3)
+            if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
             {
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             }
@@ -928,7 +928,7 @@ namespace GObject
 		{
 			UInt16 cnt = item->Count();
 
-            if(toWhere != 0 && item->getQuality() >= 3)
+            if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
             {
 				std::string tbn("item_courses");
 				DBLOG().GetMultiDBName(tbn); 
@@ -957,7 +957,7 @@ namespace GObject
 		{
 			UInt16 cnt = item->Count();
 
-            if(toWhere != 0 && item->getQuality() >= 3)
+            if((toWhere!= 0  && item->getQuality() >= 3) || (toWhere == ToGemMgerge && item->getQuality() >= 2))
             {
 				std::string tbn("item_courses");
 				DBLOG().GetMultiDBName(tbn); 

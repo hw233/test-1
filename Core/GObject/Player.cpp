@@ -843,6 +843,9 @@ namespace GObject
             }
         }
 
+        if (World::_blueactiveday)
+            onBlueactiveday();
+
         sendLevelPack(GetLev());
 
         char buf[64] = {0};
@@ -7991,6 +7994,26 @@ namespace GObject
 
         ClanSkill& skill = it->second;
         return GData::clanSkillTable[skill.id][skill.level].value;
+    }
+
+    void Player::onBlueactiveday()
+    {
+        if (!(atoi(m_domain.c_str()) == 11 || atoi(m_domain.c_str()) == 10))
+            return;
+
+        UInt32 online = GetOnlineTimeToday();
+        UInt32 maxOnline = 60 * 60;
+        if (!cfg.GMCheck)
+            maxOnline = 60;
+        if (online < maxOnline)
+        {
+            EventPlayerTimeTick* event = new(std::nothrow) EventPlayerTimeTick(this, maxOnline - online, 1, 2);
+            if (event) PushTimerEvent(event);
+        }
+        else if (!GetVar(VAR_BLUE_ACTIVE_GET))
+        {
+            GameAction()->onBlueactiveday(this);
+        }
     }
 
 } // namespace GObject

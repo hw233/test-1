@@ -287,7 +287,7 @@ void BattleFighter::updateAllAttr()
 	_pierce = _formula->calcPierce(this, NULL);
 	_counter = _formula->calcCounter(this, NULL);
 	_maxAction = _formula->calcAction(this);
-	UInt32 oldhp = _maxhp;
+	UInt32 oldhp = getMaxHP();
 	_maxhp = _formula->calcHP(this);
     _criticaldmg = _formula->calcCriticalDmg(this);
 
@@ -303,13 +303,13 @@ void BattleFighter::updateAllAttr()
     if(_maxhp == 0)
         _maxhp = 1;
 
-	if((_flag & BlockBoss) == 0 && oldhp > 0 && _hp > 0 && oldhp < _maxhp)
+	if((_flag & BlockBoss) == 0 && oldhp > 0 && _hp > 0 && oldhp < getMaxHP())
 	{
-		_hp = _hp + _maxhp - oldhp;
+		_hp = _hp + getMaxHP() - oldhp;
 	}
-	if(_hp > _maxhp)
+	if(_hp > getMaxHP())
 	{
-		_hp = _maxhp;
+		_hp = getMaxHP();
 	}
 }
 
@@ -559,16 +559,16 @@ UInt32 BattleFighter::regenHP( UInt32 u )
         u /= 2;
 
 	UInt32 oldhp = _hp;
-	if(oldhp >= _maxhp)
+	if(oldhp >= getMaxHP())
 	{
-		_hp = _maxhp;
+		_hp = getMaxHP();
 		return 0;
 	}
 	_hp += u;
-	if(_hp > _maxhp)
+	if(_hp > getMaxHP())
 	{
-		_hp = _maxhp;
-		return _maxhp - oldhp;
+		_hp = getMaxHP();
+		return getMaxHP() - oldhp;
 	}
 	return u;
 }
@@ -854,8 +854,11 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
     else
         hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2;
 
-    if(hiterate > GObject::GObjectManager::getHiterateMax())
+    if(hiterate > GObject::GObjectManager::getHiterateMax() && !isNpc())
         hiterate = GObject::GObjectManager::getHiterateMax();
+
+    if(hiterate < 0)
+        return 0;
 
     return hiterate;
 }
@@ -868,8 +871,11 @@ float BattleFighter::getEvade(BattleFighter* defgt)
     else
         evade = _formula->calcEvade(this, defgt) + _evadeAdd + _evadeAdd2;
 
-    if(evade > GObject::GObjectManager::getEvadeMax())
+    if(evade > GObject::GObjectManager::getEvadeMax() && !isNpc())
         evade = GObject::GObjectManager::getEvadeMax();
+
+    if(evade < 0)
+        return 0;
 
     return evade;
 }
@@ -882,8 +888,11 @@ float BattleFighter::getCritical(BattleFighter* defgt)
     else
         critical = _formula->calcCritical(this, defgt) + _criticalAdd + _criticalAdd2;
 
-    if(critical > GObject::GObjectManager::getCriticalMax())
+    if(critical > GObject::GObjectManager::getCriticalMax() && !isNpc())
         critical = GObject::GObjectManager::getCriticalMax();
+
+    if(critical < 0)
+        return 0;
 
     return critical;
 }
@@ -896,8 +905,11 @@ float BattleFighter::getPierce(BattleFighter* defgt)
     else
         pierce = _formula->calcPierce(this, defgt) + _pierceAdd + _pierceAdd2;
 
-    if(pierce > GObject::GObjectManager::getPierceMax())
+    if(pierce > GObject::GObjectManager::getPierceMax() && !isNpc())
         pierce = GObject::GObjectManager::getPierceMax();
+
+    if(pierce < 0)
+        return 0;
 
     return pierce;
 }
@@ -910,8 +922,11 @@ float BattleFighter::getCounter(BattleFighter* defgt)
     else
         counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2;
 
-    if(counter > GObject::GObjectManager::getCounterMax())
+    if(counter > GObject::GObjectManager::getCounterMax() && !isNpc())
         counter = GObject::GObjectManager::getCounterMax();
+
+    if(counter < 0)
+        return 0;
 
     return counter;
 }
@@ -924,8 +939,11 @@ float BattleFighter::getMagRes(BattleFighter* defgt)
     else
         magres = _formula->calcMagRes(this, defgt) + _magResAdd + _magResAdd2;
 
-    if(magres > GObject::GObjectManager::getMagResMax())
+    if(magres > GObject::GObjectManager::getMagResMax() && !isNpc())
         magres = GObject::GObjectManager::getMagResMax();
+
+    if(magres < 0)
+        return 0;
 
     return magres;
 }
@@ -938,8 +956,11 @@ float BattleFighter::getTough(BattleFighter* defgt)
     else
         tough = _formula->calcTough(this, defgt) + _toughAdd + _toughAdd2;
 
-    if(tough > GObject::GObjectManager::getToughMax())
+    if(tough > GObject::GObjectManager::getToughMax() && !isNpc())
         tough = GObject::GObjectManager::getToughMax();
+
+    if(tough < 0)
+        return 0;
 
     return tough;
 }

@@ -61,6 +61,8 @@ enum PurchaseType
     ClanRankBattleSkill,
     ForEquipUpgrade,    
     PrintDemon, // 除魔印消费
+    EnterAutoFrontMap,
+    EnterAutoCopy,
 };
 
 enum IncomingType

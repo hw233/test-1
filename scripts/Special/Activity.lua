@@ -876,3 +876,16 @@ function onNewYear(player)
     end
 end
 
+function onBlueactiveday(player)
+    if not getBlueactiveday() then
+        return
+    end
+
+    if player:GetVar(45) >= 1 then
+        return
+    end
+
+    sendItemPackageMail(player, "在线1小时奖励", "恭喜您通过QQ游戏大厅登陆《蜀山传奇》在线达到一小时，获得以下奖励：自动回血符*1，太乙真金*1，初级打孔石*1，初级挂机加速符*1，初级道法金丹*1，混元离土*2。 \n1月16日-2月6日，每日通过QQ游戏大厅登陆《蜀山传奇》在线达到一小时都可以获得此奖励。", {9,1,1, 502,1,1, 510,1,1, 55,1,1, 29,1,1, 51,2,1});
+    player:SetVar(45, 1);
+end
+

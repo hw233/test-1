@@ -73,6 +73,10 @@ public:
     { _newyear = v; }
     inline static bool getNewYear()
     { return _newyear; }
+    inline static void setBlueactiveday(bool v)
+    { _blueactiveday = v; }
+    inline static bool getBlueactiveday()
+    { return _blueactiveday; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -101,6 +105,7 @@ public:
     static bool _thanksgiving;
     static bool _christmas;
     static bool _newyear;
+    static bool _blueactiveday;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

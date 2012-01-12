@@ -426,6 +426,7 @@ void FrontMap::reset(Player* pl, UInt8 id)
     st << static_cast<UInt8>(2) << id << static_cast<UInt8>(0) << Stream::eos;
     pl->send(st);
 
+    TRACE_LOG("%s: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, pl->getId(), id);
     DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
 }
 
@@ -476,7 +477,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                                 pl->sendMsgCode(0, 1104);
                                 return;
                             } else {
-                                ConsumeInfo ci(EnterFrontMap,0,0);
+                                ConsumeInfo ci(EnterAutoFrontMap,0,0);
                                 pl->useGoldOrCoupon(GData::moneyNeed[GData::FRONTMAP_AUTO].gold, &ci);
                             }
                         }
@@ -486,7 +487,7 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                                 pl->sendMsgCode(0, 1100);
                                 return;
                             } else {
-                                ConsumeInfo ci(EnterFrontMap,0,0);
+                                ConsumeInfo ci(EnterAutoFrontMap,0,0);
                                 pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
                             }
                         }

@@ -125,6 +125,12 @@ function onActivityCheck(tm)
       setNewYear(false)
   end
 
+  if tm >= actTime13 and tm < actTime14 then
+      setBlueactiveday(true)
+  else
+      setBlueactiveday(false)
+  end
+
   loadStore()
 end
 
@@ -135,6 +141,7 @@ function initActTime(y, m, d)
   local  SerStartTm4 = { ['year'] = 2011, ['month'] = 11, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm6 = { ['year'] = 2012, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm7 = { ['year'] = 2012, ['month'] = 1, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -153,6 +160,9 @@ function initActTime(y, m, d)
 
   actTime11 = os.time(SerStartTm6);
   actTime12 = os.time(SerStartTm6) + 26 * 86400;
+
+  actTime13 = os.time(SerStartTm7);
+  actTime14 = os.time(SerStartTm7) + 22 * 86400;
 
   onActivityCheck(os.time() + 30);
 

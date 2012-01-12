@@ -1300,6 +1300,9 @@ namespace GObject
         static  UInt8 getMaxIcCount(UInt8 vipLevel);
     private:
         std::string m_hicfg;
+
+    public:
+        void onBlueactiveday();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
