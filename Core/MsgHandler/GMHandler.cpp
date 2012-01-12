@@ -2209,9 +2209,10 @@ void GMHandler::OnGmCheck(GObject::Player *player, std::vector<std::string>& arg
 
 inline bool give_money(Player * p, UInt32* money)
 {
-    UInt32* moneys = (UInt32*)money;
+    UInt32 lvl = *(UInt32*)(money);
+    UInt32* moneys = (UInt32*)(money+1);
 
-    if (p)
+    if (p && p->GetLev() >= lvl)
     {
         if (moneys[0])
             p->getGold(moneys[0]);
@@ -2227,18 +2228,26 @@ void GMHandler::OnMoney2All(GObject::Player *player, std::vector<std::string>& a
 {
     if (!player)
         return;
+
+    if (args.size() <= 1)
+        return;
+
     UInt32 gold = 1000;
     UInt32 tael = 0;
     UInt32 ticket = 0;
 
-    if (args.size() >= 1)
-        gold = atoi(args[0].c_str());
-    if (args.size() >= 2)
-        tael = atoi(args[1].c_str());
-    if (args.size() >= 3)
-        ticket = atoi(args[2].c_str());
+    UInt8 lvl = atoi(args[0].c_str());
+    if (lvl < 60)
+        lvl = 60;
 
-    UInt32 moneys[] = {gold, tael, ticket};
+    if (args.size() >= 2)
+        gold = atoi(args[1].c_str());
+    if (args.size() >= 3)
+        tael = atoi(args[2].c_str());
+    if (args.size() >= 4)
+        ticket = atoi(args[3].c_str());
+
+    UInt32 moneys[] = {lvl, gold, tael, ticket};
     globalPlayers.enumerate(give_money, (UInt32*)moneys);
 }
 
