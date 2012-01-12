@@ -713,6 +713,11 @@ bool Clan::invite(Player * inviter, std::string invitee)
 		inviteePlayer->GetMailBox()->newMail(inviter, 0x22, title, content);
 		return true;
 	}
+    else
+    {
+        if(_pending.size() > 99)
+            inviter->sendMsgCode(0, 1326);
+    }
 	return false;
 }
 
@@ -764,6 +769,12 @@ bool Clan::apply( Player * player, UInt32 optime, bool writedb )
 		return false;
 
     Mutex::ScopedLock lk(_mutex);
+
+    if(_pending.size() > 99)
+    {
+		player->sendMsgCode(0, 1326);
+        return false;
+    }
 
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if(it != _pending.end() && (*it)->cls == 16)
@@ -826,6 +837,11 @@ bool Clan::invite( Player * player, UInt32 optime, bool writedb )
 
 	if (player->getClan() != NULL)
 		return false;
+
+    if(_pending.size() > 99)
+    {
+        return false;
+    }
 
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if (it != _pending.end())

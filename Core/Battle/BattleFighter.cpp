@@ -854,7 +854,7 @@ float BattleFighter::getHitrate(BattleFighter* defgt)
     else
         hiterate = _formula->calcHitrate(this, defgt) + _hitrateAdd + _hitrateAdd2;
 
-    if(hiterate > GObject::GObjectManager::getHiterateMax())
+    if(hiterate > GObject::GObjectManager::getHiterateMax() && !isNpc())
         hiterate = GObject::GObjectManager::getHiterateMax();
 
     if(hiterate < 0)
@@ -871,7 +871,7 @@ float BattleFighter::getEvade(BattleFighter* defgt)
     else
         evade = _formula->calcEvade(this, defgt) + _evadeAdd + _evadeAdd2;
 
-    if(evade > GObject::GObjectManager::getEvadeMax())
+    if(evade > GObject::GObjectManager::getEvadeMax() && !isNpc())
         evade = GObject::GObjectManager::getEvadeMax();
 
     if(evade < 0)
@@ -888,7 +888,7 @@ float BattleFighter::getCritical(BattleFighter* defgt)
     else
         critical = _formula->calcCritical(this, defgt) + _criticalAdd + _criticalAdd2;
 
-    if(critical > GObject::GObjectManager::getCriticalMax())
+    if(critical > GObject::GObjectManager::getCriticalMax() && !isNpc())
         critical = GObject::GObjectManager::getCriticalMax();
 
     if(critical < 0)
@@ -905,7 +905,7 @@ float BattleFighter::getPierce(BattleFighter* defgt)
     else
         pierce = _formula->calcPierce(this, defgt) + _pierceAdd + _pierceAdd2;
 
-    if(pierce > GObject::GObjectManager::getPierceMax())
+    if(pierce > GObject::GObjectManager::getPierceMax() && !isNpc())
         pierce = GObject::GObjectManager::getPierceMax();
 
     if(pierce < 0)
@@ -922,7 +922,7 @@ float BattleFighter::getCounter(BattleFighter* defgt)
     else
         counter = _formula->calcCounter(this, defgt) + _counterAdd + _counterAdd2;
 
-    if(counter > GObject::GObjectManager::getCounterMax())
+    if(counter > GObject::GObjectManager::getCounterMax() && !isNpc())
         counter = GObject::GObjectManager::getCounterMax();
 
     if(counter < 0)
@@ -939,7 +939,7 @@ float BattleFighter::getMagRes(BattleFighter* defgt)
     else
         magres = _formula->calcMagRes(this, defgt) + _magResAdd + _magResAdd2;
 
-    if(magres > GObject::GObjectManager::getMagResMax())
+    if(magres > GObject::GObjectManager::getMagResMax() && !isNpc())
         magres = GObject::GObjectManager::getMagResMax();
 
     if(magres < 0)
@@ -956,7 +956,7 @@ float BattleFighter::getTough(BattleFighter* defgt)
     else
         tough = _formula->calcTough(this, defgt) + _toughAdd + _toughAdd2;
 
-    if(tough > GObject::GObjectManager::getToughMax())
+    if(tough > GObject::GObjectManager::getToughMax() && !isNpc())
         tough = GObject::GObjectManager::getToughMax();
 
     if(tough < 0)

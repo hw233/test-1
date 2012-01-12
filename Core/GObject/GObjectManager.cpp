@@ -1257,6 +1257,22 @@ namespace GObject
 		}
 		lc.finalize();
 
+        // ???ɼ???
+        lc.prepare("Loading clan skill:");
+        DBClanSkill cs;
+		if(execu->Prepare("SELECT `playerId`, `skillId`, `level` FROM `clan_skill` ORDER BY `skillId`, `playerId`", cs) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			Player * pl = globalPlayers[cs.playerId];
+			if(pl == NULL)
+				continue;
+            pl->addClanSkillFromDB(cs.skillId, cs.level);
+		}
+		lc.finalize();
+
 		lc.prepare("Loading fighters:");
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
@@ -2608,23 +2624,6 @@ namespace GObject
 			if (clan == NULL)
 				continue;
 			clan->getClanTech()->addTechFromDB(ct.techId, ct.level, ct.extra);
-		}
-		lc.finalize();
-
-        // ???ɼ???
-        lc.prepare("Loading clan skill:");
-        DBClanSkill cs;
-		if(execu->Prepare("SELECT `playerId`, `skillId`, `level` FROM `clan_skill` ORDER BY `skillId`, `playerId`", cs) != DB::DB_OK)
-			return false;
-		lastId = 0xFFFFFFFF;
-		lc.reset(1000);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			Player * pl = globalPlayers[cs.playerId];
-			if(pl == NULL)
-				continue;
-            pl->addClanSkillFromDB(cs.skillId, cs.level);
 		}
 		lc.finalize();
 
