@@ -6,6 +6,7 @@
 #include "CountryBattle.h"
 #include "Common/TimeUtil.h"
 #include "MsgID.h"
+#include "MapCollection.h"
 
 namespace GObject
 {
@@ -385,7 +386,8 @@ void Map::Broadcast( SpotData * sd, Stream& st, Player * pl )
 	size_t size = st.size();
 	if(pl == NULL)
 	{
-		for(std::set<Player *>::iterator it = sd->m_Players.begin(), end = sd->m_Players.end(); it != end; ++ it)
+        std::set<Player *>::iterator it;
+        for(it = sd->m_Players.begin(); it != sd->m_Players.end(); ++ it)
 		{
             if (*it)
                 (*it)->send(buf, size);
@@ -393,7 +395,8 @@ void Map::Broadcast( SpotData * sd, Stream& st, Player * pl )
 	}
 	else
 	{
-		for(std::set<Player *>::iterator it = sd->m_Players.begin(), end = sd->m_Players.end(); it != end; ++ it)
+        std::set<Player *>::iterator it;
+        for(it = sd->m_Players.begin(); it != sd->m_Players.end(); ++ it)
 		{
 			if(*it != pl)
 				(*it)->send(buf, size);
@@ -413,7 +416,8 @@ void Map::Broadcast2( const void * buf, int size, UInt8 cny, Player * pl )
         for(UInt32 j = 0; j < 2; j ++)
         {
             const MapPlayer& playerList = _playerList[cny][j];
-            for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
+            MapPlayer::const_iterator it;
+            for(it = playerList.begin(); it != playerList.end(); ++ it)
             {
                 if (*it)
                     (*it)->send(buf, size);
@@ -425,7 +429,8 @@ void Map::Broadcast2( const void * buf, int size, UInt8 cny, Player * pl )
         for(UInt32 j = 0; j < 2; j ++)
         {
             const MapPlayer& playerList = _playerList[cny][j];
-            for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
+            MapPlayer::const_iterator it;
+            for(it = playerList.begin(); it != playerList.end(); ++ it)
             {
                 if(*it && *it != pl)
                     (*it)->send(buf, size);
@@ -438,12 +443,15 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 { 
 	if(pl == NULL)
 	{
-		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
+        // XXX: Only broadcast to current thread
+		//for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
+		UInt32 i = mapCollection.getCountry(getId());
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
 				const MapPlayer& playerList = _playerList[i][j];
-				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
+                MapPlayer::const_iterator it;
+                for(it = playerList.begin(); it != playerList.end(); ++ it)
 				{
                     if (*it)
                         (*it)->send(buf, size);
@@ -453,12 +461,14 @@ void Map::Broadcast( const void * buf, int size, Player * pl )
 	}
 	else
 	{
-		for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
+		//for(UInt32 i = 0; i < COUNTRY_MAX; i ++)
+		UInt32 i = mapCollection.getCountry(getId());
 		{
 			for(UInt32 j = 0; j < 2; j ++)
 			{
 				const MapPlayer& playerList = _playerList[i][j];
-				for(std::set<Player *>::iterator it = playerList.begin(), end = playerList.end(); it != end; ++ it)
+                MapPlayer::const_iterator it;
+                for(it = playerList.begin(); it != playerList.end(); ++ it)
 				{
 					if(*it && *it != pl)
 						(*it)->send(buf, size);
