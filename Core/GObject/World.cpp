@@ -69,6 +69,7 @@ bool World::_singleday = false;
 bool World::_thanksgiving = false;
 bool World::_christmas = false;
 bool World::_newyear = false;
+bool World::_blueactiveday = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -119,6 +120,9 @@ bool enum_midnight(void * ptr, void *)
 	{
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, 0);
 		GLOBAL().PushMsg(hdr, NULL);
+
+        if (World::_blueactiveday)
+            pl->onBlueactiveday();
 	}
     else
     {
