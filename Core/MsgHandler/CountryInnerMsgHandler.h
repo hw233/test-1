@@ -748,6 +748,12 @@ void OnPlayerTimeTick( GameMsgHdr& hdr, const void * data )
             }
             break;
 
+        case 2:
+            {
+                GameAction()->onBlueactiveday(player);
+            }
+            break;
+
         default:
             break;
     }
