@@ -135,7 +135,7 @@ UInt8 Dungeon::playerLeave( Player * player )
 	cancelAutoChallengeNotify(player, 0);
 
 	leaveLevel(player, it->second.level);
-	it->second.level = 0xFF;
+	it->second.level = 0;
 	updateToDB(player, it->second);
 
 	return 0;
@@ -574,6 +574,9 @@ void Dungeon::sendAutoChallengeStart( Player * player )
 
 void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalExp, UInt8 mtype )
 {
+	if(!player->hasFlag(Player::AutoDungeon))
+		return;
+
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
@@ -689,6 +692,9 @@ void Dungeon::cancelAutoChallengeNotify( Player * player, UInt32 exp )
 
 void Dungeon::completeAutoChallenge( Player * player, UInt32 exp, bool won )
 {
+	if(!player->hasFlag(Player::AutoDungeon))
+		return;
+
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
 	if(it == _players.end())
 		return;
