@@ -3162,7 +3162,7 @@ void Clan::LoadItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::
     _itemHistories.push_back(ClanItemHistory(type, time, playerId, itemstr));
 }
 
-void Clan::AddItem(UInt32 itemid, UInt32 itemnum)
+UInt32 Clan::AddItem(UInt32 itemid, UInt32 itemnum)
 {
     Mutex::ScopedLock lk(_mutex);
 
@@ -3177,6 +3177,7 @@ void Clan::AddItem(UInt32 itemid, UInt32 itemnum)
         clanPkgStream << Stream::eos;
         broadcast(clanPkgStream); 
     }
+    return num;
 }
 
 void Clan::AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr)
