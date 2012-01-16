@@ -2017,8 +2017,11 @@ namespace GObject
         for(RewardVec::iterator iter = rewards.begin();
             iter != rewards.end(); ++iter)
         {
-            clan->AddItem(iter->id, iter->count);
-            itemstream << iter->id << ',' << iter->count << ';';
+            UInt32 num = clan->AddItem(iter->id, iter->count);
+            if(num != 0)
+            {
+                itemstream << iter->id << ',' << num << ';';
+            }
         }
 
         if(!itemstream.str().empty())

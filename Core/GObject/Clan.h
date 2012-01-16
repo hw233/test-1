@@ -385,7 +385,7 @@ public:
     void LoadItem(UInt64 playerid, UInt32 itemid, UInt32 num);
     void LoadItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
 
-    void AddItem(UInt32 itemid, UInt32 num);
+    UInt32 AddItem(UInt32 itemid, UInt32 num);
     void AddItemHistory(UInt8 type, UInt32 time, UInt64 playerId, const std::string& itemstr);
 
     UInt32 GetGridNum() const { return _itemPkg.GetLeftGrid(); }
