@@ -132,9 +132,12 @@ UInt8 Dungeon::playerLeave( Player * player )
 	if(it->second.level == 0)
 		return 0;
 
+	cancelAutoChallengeNotify(player, 0);
+
 	leaveLevel(player, it->second.level);
 	it->second.level = 0;
 	updateToDB(player, it->second);
+
 	return 0;
 }
 
