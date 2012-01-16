@@ -2533,7 +2533,7 @@ namespace GObject
 		const UInt32 eachBattle = 60;
 		UInt32 count = 60 * 8;
 
-        if (!World::getNewYear())
+        if (!World::getNewYear() || GetLev() < 45)
         {
             UInt32 viplvl = getVipLevel();
             if(viplvl >= 4 && viplvl <= 7)
@@ -2563,6 +2563,8 @@ namespace GObject
 	{
 		if(npcId == 0 || count == 0 || interval == 0)
 			return;
+        if (count > 1440 && GetLev() < 45) // XXX: 45级以下不允许挂机240小时
+            return;
 		GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
 		if(it == GData::npcGroups.end())
 			return;
@@ -8096,8 +8098,9 @@ namespace GObject
 
     void Player::onBlueactiveday()
     {
-        if (!(atoi(m_domain.c_str()) == 11 || atoi(m_domain.c_str()) == 10))
-            return;
+        // XXX: 原来是为蓝钻准备的，现在全平台也要了
+        //if (!(atoi(m_domain.c_str()) == 11 || atoi(m_domain.c_str()) == 10))
+        //    return;
 
         UInt32 online = GetOnlineTimeToday();
         UInt32 maxOnline = 60 * 60;

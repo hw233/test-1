@@ -594,7 +594,7 @@ void OnSaleItemSearchReq( GameMsgHdr& hdr, const void * data )
 	player->GetSale()->searchMySale(*saleSearchReq);
 }
 
-void  OnDailyCheck( GameMsgHdr& hdr, const void * )
+void OnDailyCheck( GameMsgHdr& hdr, const void * )
 {
 	MSG_QUERY_PLAYER(player);
 
@@ -605,6 +605,8 @@ void  OnDailyCheck( GameMsgHdr& hdr, const void * )
     player->clearFinishCount();
     if (World::_thanksgiving)
         player->resetThanksgiving();
+    if (World::_blueactiveday)
+        player->onBlueactiveday();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )

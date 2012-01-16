@@ -121,9 +121,6 @@ bool enum_midnight(void * ptr, void *)
 	{
 		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, 0);
 		GLOBAL().PushMsg(hdr, NULL);
-
-        if (World::_blueactiveday)
-            pl->onBlueactiveday();
 	}
     else
     {

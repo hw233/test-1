@@ -3112,7 +3112,7 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
 	if(pl == NULL || pl == player)
 	{
-		player->sendMsgCode(0, 1500);
+		player->sendMsgCode(0, 1506);
 		return;
 	}
 	switch(fr._op)
