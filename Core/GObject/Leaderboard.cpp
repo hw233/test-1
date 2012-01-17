@@ -409,6 +409,10 @@ void Leaderboard::sendOwnRank( Player * player, UInt32 id )
 		st << _id;
 		UInt64 pid = player->getId();
 		UInt8 country = player->getCountry();
+
+        if(country > 1)
+            return;
+
 		_searchInside(st, _levelRankWorld, pid);
 		_searchInside(st, _levelRankCountry[country], pid);
 		_searchInside(st, _moneyRankWorld, pid);

@@ -56,7 +56,8 @@ namespace GObject
         lvl -= 50;
         lvl /= 10;
 
-        UInt8 idx = uRand(24);
+        URandom rnd(time(NULL));
+        UInt8 idx = rnd(24);
         equipid = equips[lvl][idx];
         return equipid;
     }
@@ -75,7 +76,8 @@ namespace GObject
         lvl -= 40;
         lvl /= 10;
 
-        UInt8 idx = uRand(24);
+        URandom rnd(time(NULL));
+        UInt8 idx = rnd(24);
         equipid = equips[lvl][idx];
         return equipid;
     }
@@ -84,7 +86,8 @@ namespace GObject
     static UInt32  gem[] = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141 };
     UInt32 getRandGem(UInt8 lev)
     {
-        UInt8 idx = uRand(15);
+        URandom rnd(time(NULL));
+        UInt8 idx = rnd(15);
 
         if(lev > 1 && lev <= 9)
             return gem[idx] + lev;
