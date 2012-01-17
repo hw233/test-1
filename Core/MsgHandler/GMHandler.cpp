@@ -2237,8 +2237,8 @@ void GMHandler::OnMoney2All(GObject::Player *player, std::vector<std::string>& a
     UInt32 ticket = 0;
 
     UInt8 lvl = atoi(args[0].c_str());
-    if (lvl < 60)
-        lvl = 60;
+    //if (lvl < 30)
+    //    lvl = 60;
 
     if (args.size() >= 2)
         gold = atoi(args[1].c_str());

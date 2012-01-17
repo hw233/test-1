@@ -941,6 +941,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
         tcpInfo->sendAwardInfo();
     }
+
+    pl->sendRechargeInfo();
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )

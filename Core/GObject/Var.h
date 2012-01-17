@@ -75,6 +75,7 @@ namespace GObject
         VAR_WEEKLY_CLANBATTLE = 44, //每周帮派战
 
         VAR_BLUE_ACTIVE_GET = 45, //蓝钻登陆1小时在线奖励
+        VAR_RECHARGE_TOTAL = 46, //新年充值活动
 
         VAR_MAX,
     };
@@ -149,6 +150,7 @@ namespace GObject
             REGISTER_VAR(VAR_WEEKLY_CLANBATTLE, CYCLE_WEEK);
 
             REGISTER_VAR(VAR_BLUE_ACTIVE_GET, CYCLE_DAY);
+            REGISTER_VAR(VAR_RECHARGE_TOTAL, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

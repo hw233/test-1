@@ -811,6 +811,7 @@ namespace GObject
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
+        void sendRechargeInfo();
 
 		void autoRegenAll();
 		void regenAll(bool = false);
@@ -1044,6 +1045,7 @@ namespace GObject
 	private:
 		UInt32 calcVipLevel();
 		UInt32 calcYDVipLevel(UInt32);
+        UInt8 calcRechargeLevel(UInt32);
 		Player * _findFriend( UInt8 type, std::string& name );
 		bool _hasFriend( UInt8 type, Player * pl ) const;
 		inline Player * _findFriend(std::string& name) { return _findFriend(0, name); }
@@ -1060,6 +1062,7 @@ namespace GObject
 
 		void sendVIPMails(UInt8, UInt8);
 		void sendYDVIPMails(UInt8, UInt8);
+        void sendRechargeMails(UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
 

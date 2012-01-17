@@ -131,6 +131,12 @@ function onActivityCheck(tm)
       setBlueactiveday(false)
   end
 
+  if tm >= actTime15 and tm < actTime16 then
+      setRechargeActive(true)
+  else
+      setRechargeActive(false)
+  end
+
   loadStore()
 end
 
@@ -142,6 +148,7 @@ function initActTime(y, m, d)
   local  SerStartTm5 = { ['year'] = 2011, ['month'] = 12, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm6 = { ['year'] = 2012, ['month'] = 1, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm7 = { ['year'] = 2012, ['month'] = 1, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm8 = { ['year'] = 2012, ['month'] = 1, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -163,6 +170,9 @@ function initActTime(y, m, d)
 
   actTime13 = os.time(SerStartTm7);
   actTime14 = os.time(SerStartTm7) + 22 * 86400;
+
+  actTime15 = os.time(SerStartTm8);
+  actTime16 = os.time(SerStartTm8) + 21 * 86400;
 
   onActivityCheck(os.time() + 30);
 

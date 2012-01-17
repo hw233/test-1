@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `register_states` (
   `player_id` bigint(20) unsigned NOT NULL,
   `player_name` varchar(255) NOT NULL,
   `level` tinyint(3) unsigned NOT NULL,
+  `platform` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `reg_time` int(10) unsigned NOT NULL,
   PRIMARY KEY (`server_id`, `player_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -724,6 +724,27 @@ namespace GObject
 		return vipl;
 	}
 
+    static UInt32 recharge[] = {188,288,688,888,1888,2012,2888,3888,4888,5888,6888,7888,8888,9888,9999};
+    UInt8 Player::calcRechargeLevel(UInt32 total)
+    {
+        UInt32 totalRecharge = total;
+        for (UInt8 i = 0; i < sizeof(recharge)/sizeof(UInt32); ++i)
+        {
+            if (totalRecharge < recharge[i])
+                return i;
+        }
+        return 15;
+    }
+
+    inline UInt32 levelToRecharge(UInt8 lvl)
+    {
+        if (lvl < 1)
+            return 0;
+        if (lvl > sizeof(recharge)/sizeof(UInt32))
+            lvl = 15;
+        return recharge[lvl-1];
+    }
+
 	bool Player::Init()
 	{
 		if(_availInit)
@@ -5521,22 +5542,33 @@ namespace GObject
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
 
+        if (World::_rechargeactive)
+        {
+            UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
+            UInt8 oldVipLevel = calcRechargeLevel(total);
+            total += r;
+            UInt8 vipLevel = calcRechargeLevel(total);
+            sendRechargeMails(oldVipLevel + 1, vipLevel);
+            SetVar(VAR_RECHARGE_TOTAL, total);
+            sendRechargeInfo();
+        }
+
         UInt32 total = getBuffData(PLAYER_BUFF_YDOTR);
 		if(World::_nationalDay)
         {
-            if (total == (UInt32)(-1))
-                return;
-
-            UInt32 oldVipLevel = calcYDVipLevel(total);
-            total += r;
-            UInt32 vipLevel = calcYDVipLevel(total);
-            sendYDVIPMails(oldVipLevel + 1, vipLevel);
-            if (vipLevel == 6)
+            if (total != (UInt32)(-1))
             {
-                setBuffData(PLAYER_BUFF_YDOTR, static_cast<UInt32>(-1), true);
+                UInt32 oldVipLevel = calcYDVipLevel(total);
+                total += r;
+                UInt32 vipLevel = calcYDVipLevel(total);
+                sendYDVIPMails(oldVipLevel + 1, vipLevel);
+                if (vipLevel == 6)
+                {
+                    setBuffData(PLAYER_BUFF_YDOTR, static_cast<UInt32>(-1), true);
+                }
+                else
+                    setBuffData(PLAYER_BUFF_YDOTR, total, true);
             }
-            else
-                setBuffData(PLAYER_BUFF_YDOTR, total, true);
         }
         else
         {
@@ -5546,6 +5578,17 @@ namespace GObject
 
         sendTripodInfo();
 	}
+
+    void Player::sendRechargeInfo()
+    {
+        if (!World::_rechargeactive)
+            return;
+
+        UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
+		Stream st(REP::DAILY_DATA);
+		st << static_cast<UInt8>(12) << total << Stream::eos;
+		send((st));
+    }
 
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
 	{
@@ -6368,6 +6411,61 @@ namespace GObject
 				strItems += ",";
 				strItems += Itoa(1);
             }
+
+			mailPackageManager.push(mail->id, mitem, mcount, true);
+			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+		}
+	}
+
+	void Player::sendRechargeMails( UInt8 l, UInt8 h )
+	{
+		if(l < 1)
+			l = 1;
+		if(h > 15)
+			h = 15;
+
+		for(UInt32 j = l; j <= h; ++j)
+		{
+			SYSMSGV(title, 2320, levelToRecharge(j));
+			SYSMSG(content, 2321);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+				continue;
+
+			const UInt32 vipTable[16][12] =
+            {
+                {430,2,0,0,0,0,0,0,0,0,0,0},
+                {430,2,6006,2,0,0,0,0,0,0,0,0},
+                {431,2,6006,3,6008,1,0,0,0,0,0,0},
+                {MailPackage::Tael,1000,MailPackage::Coupon,20,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,2000,MailPackage::Coupon,40,0,0,0,0,0,0,0,0},
+                {432,2,6006,5,507,2,509,2,6008,3,30,2},
+                {MailPackage::Tael,3000,MailPackage::Coupon,60,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,4000,MailPackage::Coupon,80,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,5000,MailPackage::Coupon,100,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,6000,MailPackage::Coupon,120,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,7000,MailPackage::Coupon,140,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,8000,MailPackage::Coupon,160,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,9000,MailPackage::Coupon,180,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,10000,MailPackage::Coupon,200,0,0,0,0,0,0,0,0},
+                {432,10,6008,6,507,5,509,5,30,10,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0},
+            };
+
+			MailPackage::MailItem mitem[6];
+			UInt32 mcount = 0;
+            std::string strItems;
+
+			const UInt32 * t = vipTable[j-1];
+			for(UInt32 i = 0; i < 12 && t[i] > 0; i += 2)
+			{
+				mitem[mcount].id = t[i];
+				mitem[mcount++].count = t[i+1];
+				strItems += Itoa(t[i]);
+				strItems += ",";
+				strItems += Itoa(t[i+1]);
+				strItems += "|";
+			}
 
 			mailPackageManager.push(mail->id, mitem, mcount, true);
 			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
