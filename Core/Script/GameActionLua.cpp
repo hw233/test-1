@@ -200,6 +200,8 @@ namespace Script
 		CLASS_DEF(Fighter, getPExp);
 		CLASS_DEF(Fighter, getPExpMax);
 		CLASS_DEF(Fighter, isPExpFull);
+		CLASS_DEF(Fighter, getExpMax);
+		CLASS_DEF(Fighter, isExpFull);
 		CLASS_DEF(Fighter, getAcupointCnt);
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);

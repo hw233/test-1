@@ -78,6 +78,8 @@ public:
     inline bool isPExpFull() { return _pexpMax <= _pexp; }
 	inline float getPotential() {return _potential;}
 	inline UInt16 getCurrentHP() {return _hp;}
+    bool isExpFull();
+    UInt64 getExpMax();
 
     void setCapacity(float c, bool = true);
 	inline float getCapacity() {return _capacity;}

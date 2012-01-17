@@ -13,6 +13,8 @@
 		<item domain="2" ip="10.142.16.19" port="8841" />
 		<item domain="11" ip="10.142.16.19" port="8850" />
 		<item domain="11" ip="10.142.16.19" port="8851" />
+		<item domain="4" ip="10.142.16.19" port="8860" />
+		<item domain="4" ip="10.142.16.19" port="8861" />
     </udplog_server_domain>
 	<log_file_type>
 		<item id="1" typeinfo="gb"/>

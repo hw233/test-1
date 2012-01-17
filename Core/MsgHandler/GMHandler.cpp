@@ -2551,6 +2551,7 @@ void GMHandler::OnMoneyIn(GObject::Player* player, std::vector<std::string>& arg
 void GMHandler::OnNewYear(GObject::Player* player, std::vector<std::string>& args)
 {
     World::_newyear = World::_newyear?false:true;
+    World::_rechargeactive = World::_rechargeactive?false:true;
 	Stream st(REP::DAILY_DATA);
     World::makeActivityInfo(st);
 	NETWORK()->Broadcast(st);

@@ -281,6 +281,30 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
     _owner->sendLevelPack(_level);
 }
 
+bool Fighter::isExpFull()
+{
+    if (!_owner)
+        return true;
+
+    if (_exp >= getExpMax())
+        return true;
+    return false;
+}
+
+UInt64 Fighter::getExpMax()
+{
+    if (!_owner)
+        return 0;
+    bool isMain = _owner->isMainFighter(_id);
+    if (isMain)
+    {
+        UInt64 maxexp = GData::expTable.getLevelMin(LEVEL_MAX);
+        return maxexp;
+    }
+    UInt64 mexp = _owner->GetExp();
+    return mexp;
+}
+
 void Fighter::updateToDB( UInt8 t, UInt64 v )
 {
 	const char * field = NULL;

@@ -179,7 +179,10 @@ void World::makeActivityInfo(Stream &st)
 {
 	st.init(REP::DAILY_DATA);
 	st << static_cast<UInt8>(5) << _wday;
-    st << static_cast<UInt8>(_newyear?1:0) << Stream::eos;
+
+    UInt8 active = _newyear?1:0;
+    active |= _rechargeactive?2:0;
+    st << active << Stream::eos;
 }
 void World::calWeekDay()
 {
@@ -224,6 +227,7 @@ void World::setWeekDay(UInt8 wday)
 	}
     if (!cfg.GMCheck)
         _worldScript->onActivityCheck(TimeUtil::Now()+30);
+
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);

@@ -1290,6 +1290,9 @@ function ItemNormal_00000432(iid, num, bind, param)
         v = v + items[n][3]
         if i <= v then
             package:AddItem(items[n][1], items[n][2], 0, 0, 2);
+            if items[n][1] == 47 or items[n][1] == 515 then
+                Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:"..items[n][1].."]")
+            end
             break
         end
     end
@@ -1297,8 +1300,10 @@ function ItemNormal_00000432(iid, num, bind, param)
     if t <= 20 then
         if r <= 50 then
             package:AddItem(6007, 1, 0, 0, 2);
+            Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6007]")
         else
             package:AddItem(6008, 1, 0, 0, 2);
+            Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6008]")
         end
     end
 
@@ -1508,14 +1513,25 @@ function ItemNormal_00000011(iid, num, bind, param)
     if fgt == nil then
 		return false;
 	end
-    local oldexp = fgt:getExp();
-	fgt:addExp(10000*num);
-    if fgt:getExp() > oldexp then
-  	    package:DelItemSendMsg(11, player);
-	    return num;
-    else
-	    return false;
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
     end
+
+    local exp = fgt:getExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 10000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(10000*n);
+    package:DelItemSendMsg(11, player);
+    return n
 end
 
 function ItemNormal_00008931(iid, num, bind, param)
@@ -1600,14 +1616,25 @@ function ItemNormal_00000012(iid, num, bind, param)
     if fgt == nil or fgt == mainFgt then
 		return false;
 	end
-    local oldexp = fgt:getExp();
-	fgt:addExp(5000*num);
-    if fgt:getExp() > oldexp then
-  	    package:DelItemSendMsg(12, player);
-	    return num;
-    else
-	    return false;
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
     end
+
+    local exp = fgt:getExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 5000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(5000*n);
+    package:DelItemSendMsg(12, player);
+    return n
 end
 
 function ItemNormal_00000013(iid, num, bind, param)
@@ -1618,14 +1645,25 @@ function ItemNormal_00000013(iid, num, bind, param)
 	if fgt == nil or fgt == mainFgt then
 		return false;
 	end
-  local oldexp = fgt:getExp();
-  fgt:addExp(500000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(13, player);
-	return num;
-  else
-	return false;
-  end
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
+    end
+
+    local exp = fgt:getExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 500000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(500000*n);
+    package:DelItemSendMsg(13, player);
+    return n
 end
 
 function ItemNormal_00000014(iid, num, bind, param)
@@ -1636,14 +1674,25 @@ function ItemNormal_00000014(iid, num, bind, param)
 	if fgt == nil or fgt == mainFgt then
 		return false;
 	end
-  local oldexp = fgt:getExp();
-	fgt:addExp(50000000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(14, player);
-	return num;
-  else
-	return false;
-  end
+
+    if fgt:isExpFull() then
+        player:sendMsgCode(2, 1070, 0);
+        return false
+    end
+
+    local exp = fgt:getExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        exp = exp + 50000000
+        if exp >= fgt:getExpMax() then
+            break
+        end
+    end
+
+	fgt:addExp(50000000*n);
+    package:DelItemSendMsg(14, player);
+    return n
 end
 
 function ItemNormal_00008938(iid, num, bind, param)
@@ -4569,31 +4618,6 @@ function ItemNormal_00008994(iid, num, bind, param)
 	return false;
 end
 
-
-
-
-function ItemNormal_00008995(iid, num, bind, param)
-  local player = GetPlayer()
-    local package = player:GetPackage();
-  if player:isMainFighter(param) then
-    return false
-  end
-	local fgt = player:findFighter(param);
-	if fgt == nil then
-		return false;
-	end
-  local oldexp = fgt:getExp();
-	fgt:addExp(50000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(8995, player);
-	return num;
-  else
-	return false;
-  end
-end
-
-
-
 function ItemNormal_00000015(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -4745,46 +4769,6 @@ end
 
 function ItemNormal_00009015(iid, num, bind, param)
   return openGemBox(5083, 9015)
-end
-
-function ItemNormal_00009016(iid, num, bind, param)
-  local player = GetPlayer()
-    local package = player:GetPackage();
-  if player:isMainFighter(param) then
-    return false
-  end
-	local fgt = player:findFighter(param);
-	if fgt == nil then
-		return false;
-	end
-  local oldexp = fgt:getExp();
-	fgt:addExp(2000000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(9016, player);
-	return num;
-  else
-	return false;
-  end
-end
-
-function ItemNormal_00009017(iid, num, bind, param)
-  local player = GetPlayer()
-    local package = player:GetPackage();
-  if player:isMainFighter(param) then
-    return false
-  end
-	local fgt = player:findFighter(param);
-	if fgt == nil then
-		return false;
-	end
-  local oldexp = fgt:getExp();
-	fgt:addExp(80000000*num);
-  if fgt:getExp() > oldexp then
-  	package:DelItemSendMsg(9017, player);
-	return num;
-  else
-	return false;
-  end
 end
 
 function ItemNormal_00009031(iid, num, bind, param)
@@ -6942,7 +6926,6 @@ local ItemNormal_Table = {
 	[8992] = ItemNormal_00008992,
 	[8993] = ItemNormal_00008993,
 	[8994] = ItemNormal_00008994,
-	[8995] = ItemNormal_00008995,
 	[8997] = ItemNormal_00008997,
 	[8998] = ItemNormal_00008998,
 	[9002] = ItemNormal_00009002,
@@ -6958,8 +6941,6 @@ local ItemNormal_Table = {
 	[9013] = ItemNormal_00009013,
 	[9014] = ItemNormal_00009014,
 	[9015] = ItemNormal_00009015,
-	[9016] = ItemNormal_00009016,
-	[9017] = ItemNormal_00009017,
 	[9031] = ItemNormal_00009031,
 	[9027] = ItemNormal_00009027,
 	[9028] = ItemNormal_00009028,

@@ -6432,32 +6432,32 @@ namespace GObject
 			if(mail == NULL)
 				continue;
 
-			const UInt32 vipTable[16][12] =
+			const UInt32 vipTable[16][14] =
             {
-                {430,2,0,0,0,0,0,0,0,0,0,0},
-                {430,2,6006,2,0,0,0,0,0,0,0,0},
-                {431,2,6006,3,6008,1,0,0,0,0,0,0},
-                {MailPackage::Tael,1000,MailPackage::Coupon,20,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,2000,MailPackage::Coupon,40,0,0,0,0,0,0,0,0},
-                {432,2,6006,5,507,2,509,2,6008,3,30,2},
-                {MailPackage::Tael,3000,MailPackage::Coupon,60,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,4000,MailPackage::Coupon,80,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,5000,MailPackage::Coupon,100,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,6000,MailPackage::Coupon,120,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,7000,MailPackage::Coupon,140,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,8000,MailPackage::Coupon,160,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,9000,MailPackage::Coupon,180,0,0,0,0,0,0,0,0},
-                {MailPackage::Tael,10000,MailPackage::Coupon,200,0,0,0,0,0,0,0,0},
-                {432,10,6008,6,507,5,509,5,30,10,0,0},
-                {0,0,0,0,0,0,0,0,0,0,0,0},
+                {430,2,0,0,0,0,0,0,0,0,0,0,0,0},
+                {430,2,6006,2,0,0,0,0,0,0,0,0,0,0},
+                {431,2,6006,3,6008,1,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,1000,MailPackage::Coupon,20,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,2000,MailPackage::Coupon,40,0,0,0,0,0,0,0,0,0,0},
+                {432,2,6006,5,507,2,509,2,6008,3,30,2,MailPackage::Coupon,500},
+                {MailPackage::Tael,3000,MailPackage::Coupon,60,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,4000,MailPackage::Coupon,80,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,5000,MailPackage::Coupon,100,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,6000,MailPackage::Coupon,120,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,7000,MailPackage::Coupon,140,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,8000,MailPackage::Coupon,160,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,9000,MailPackage::Coupon,180,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Tael,10000,MailPackage::Coupon,200,0,0,0,0,0,0,0,0,0,0},
+                {432,10,6008,6,507,5,509,5,30,10,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
 
-			MailPackage::MailItem mitem[6];
+			MailPackage::MailItem mitem[7];
 			UInt32 mcount = 0;
             std::string strItems;
 
 			const UInt32 * t = vipTable[j-1];
-			for(UInt32 i = 0; i < 12 && t[i] > 0; i += 2)
+			for(UInt32 i = 0; i < 14 && t[i] > 0; i += 2)
 			{
 				mitem[mcount].id = t[i];
 				mitem[mcount++].count = t[i+1];
