@@ -574,7 +574,7 @@ void Dungeon::sendAutoChallengeStart( Player * player )
 
 void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalExp, UInt8 mtype )
 {
-	if(!player->hasFlag(Player::AutoDungeon))
+	if(type != 0 && !player->hasFlag(Player::AutoDungeon))
 		return;
 
 	std::map<Player *, DungeonPlayerInfo>::iterator it = _players.find(player);
