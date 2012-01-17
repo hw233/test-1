@@ -716,7 +716,7 @@ bool Clan::invite(Player * inviter, std::string invitee)
     else
     {
         if(_pending.size() > 99)
-            inviter->sendMsgCode(0, 1326);
+            inviter->sendMsgCode(0, 1328);
     }
 	return false;
 }
@@ -758,27 +758,27 @@ Clan::Members::iterator Clan::end()
 	return _members.end();
 }
 
-bool Clan::apply( Player * player, UInt32 optime, bool writedb )
+UInt8 Clan::apply( Player * player, UInt32 optime, bool writedb )
 {
 	using namespace std::placeholders;
 
 	if(getCountry() != player->getCountry())
-		return false;
+		return 1;
 
 	if(player->getClan() != NULL)
-		return false;
+		return 2;
 
     Mutex::ScopedLock lk(_mutex);
 
-    if(_pending.size() > 99)
-    {
-		player->sendMsgCode(0, 1326);
-        return false;
-    }
-
 	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
 	if(it != _pending.end() && (*it)->cls == 16)
-		return false;
+		return 4;
+
+    if(it == _pending.end() && _pending.size() > 99)
+    {
+		//player->sendMsgCode(0, 1328);
+        return 3;
+    }
 
 	ClanPendingMember * cpm = NULL;
 	if (it != _pending.end())
@@ -790,7 +790,7 @@ bool Clan::apply( Player * player, UInt32 optime, bool writedb )
 	{
 		cpm = new(std::nothrow) ClanPendingMember(player, 16, (writedb ? TimeUtil::Now() : optime));
 		if (cpm == NULL)
-			return false;
+			return 5;
 		_pending.push_back(cpm);
 	}
 	broadcastPendingMemberInfo(*cpm);
@@ -807,7 +807,7 @@ bool Clan::apply( Player * player, UInt32 optime, bool writedb )
 		}
 	}
 
-	return true;
+	return 0;
 }
 
 
@@ -838,14 +838,14 @@ bool Clan::invite( Player * player, UInt32 optime, bool writedb )
 	if (player->getClan() != NULL)
 		return false;
 
+	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
+	if (it != _pending.end())
+		return false;
+
     if(_pending.size() > 99)
     {
         return false;
     }
-
-	std::vector<ClanPendingMember *>::iterator it = std::find_if(_pending.begin(), _pending.end(), std::bind(find_pending_member, _1, player));
-	if (it != _pending.end())
-		return false;
 
 	UInt32 curtime = writedb ? TimeUtil::Now() : optime;
 	ClanPendingMember * cpm = new(std::nothrow) ClanPendingMember(player, 15, curtime);

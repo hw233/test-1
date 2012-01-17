@@ -403,15 +403,15 @@ void OnClanApplyReq( GameMsgHdr& hdr, ClanApplyReq& car )
 		return;
 	}
 
-	bool r = clan->apply(player);
-	if(r)
+	UInt8 r = clan->apply(player);
+	if(r == 0)
 	{
 		SYSMSG_SENDV(119, player, clan->getName().c_str());
 		SYSMSG_SENDV(1019, player, clan->getName().c_str());
 	}
 
 	Stream st(REP::CLAN_JOIN_IN);
-	st << static_cast<UInt8>(r ? 0: 1) << Stream::eos;
+	st << r << Stream::eos;
 	player->send(st);
 }
 

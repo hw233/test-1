@@ -293,7 +293,7 @@ public:
 	bool handoverLeader(Player *, UInt64);
 	bool invite(Player *, std::string);
 	bool invite(Player *, UInt32 = 0, bool = true);
-	bool apply(Player *, UInt32 = 0, bool = true);
+	UInt8 apply(Player *, UInt32 = 0, bool = true);
 	bool declineInvite(Player *);
 	void updateRank(ClanMember * = NULL, std::string = "");
 	static UInt8 buildRank(UInt16); 
