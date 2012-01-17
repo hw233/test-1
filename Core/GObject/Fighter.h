@@ -113,6 +113,7 @@ public:
     // 学习技能
 	bool learnSkill(UInt16 skill);
 #endif
+    bool testMutual(UInt16 skill);
     // 装备技能
     bool upSkill(UInt16 skill, int idx, bool = true);
     // 卸下技能
