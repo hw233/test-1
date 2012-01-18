@@ -39,19 +39,24 @@ Map::~Map()
 }
 UInt32 Map::getIndexbyPK(Player *pl)
 {
+    return 1;
+#if 0
 	if(pl->hasStatus(Player::PK))
 		return 0;
 	return 1;
+#endif
 }
 
 void Map::changebyStatus(Player *pl)
 {
+#if 0
 	UInt8 country = pl->getThreadId();
 	UInt8 status = getIndexbyPK(pl);
 	MapPlayer::iterator it = find(country, status, pl);
 	if(it != _playerList[country][status].end())
 		_playerList[country][status].erase(it);	
 	_playerList[country][1-status].insert(pl);
+#endif
 }
 void Map::PlayerEnter(Player * pl, bool notify)
 {
@@ -483,6 +488,8 @@ void Map::NotifyPlayerEnter( Player * pl )
 	GObject::Map * map = pl->GetMap();
 	if(map == NULL)
 		return;
+    if (map != this)
+        return;
 	Stream st(REP::MAP_POINT_JOIN);
 	st << static_cast<UInt8>(0) << pl->getName() << pl->getPF() << pl->GetClassAndSex() << pl->getCountry() << pl->GetLev() << static_cast<UInt8>(PLAYER_DATA(pl, status)) << Stream::eos;
 	map->Broadcast(st, pl);
@@ -493,6 +500,8 @@ void Map::NotifyPlayerLeave( Player * pl )
 	GObject::Map * map = pl->GetMap();
 	if(map == NULL)
 		return;
+    if (map != this)
+        return;
 	Stream st(REP::MAP_POINT_JOIN);
 	st << static_cast<UInt8>(1) << pl->getName() << Stream::eos;
 	map->Broadcast(st, pl);

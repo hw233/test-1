@@ -572,7 +572,7 @@ namespace GObject
 	}
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
-		_isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
+		_isJumpingMap(false), _isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
@@ -1359,6 +1359,9 @@ namespace GObject
                     SetVar(VAR_TGDT, online + curtime - _playerData.lastOnline);
             }
         }
+
+        if (World::_blueactiveday)
+            PopTimerEvent(this, EVENT_TIMETICK, getId());
 
         LogoutSaveOnlineTimeToday();
         dclogger.logout(this);
@@ -3909,6 +3912,8 @@ namespace GObject
 	{
 		if (spot == _playerData.location && inCity == (_playerData.inCity > 0))
 			return;
+        if (isJumpingMap())
+            return;
 
 		cancelAutoBattle();
 		cancelAutoDungeon();
@@ -3941,7 +3946,8 @@ namespace GObject
 		{
 			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);
 			cny.PlayerLeave(this);
-			_threadId = new_cny;
+			// _threadId = new_cny; // XXX: why here???
+            setJumpingMap(true);
 			GameMsgHdr hdr(0x1F0, new_cny, this, sizeof(CountryEnterStruct));
 			GLOBAL().PushMsg( hdr, &ces );
 			return;

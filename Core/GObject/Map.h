@@ -95,8 +95,8 @@ public:
 	static Map * FromSpot(UInt16 spotID);
 	static Map * FromID(UInt8 mapID);
 	static SpotData * Spot(UInt16 spotID);
-	static void NotifyPlayerEnter( Player * );
-	static void NotifyPlayerLeave( Player * );
+	void NotifyPlayerEnter( Player * );
+	void NotifyPlayerLeave( Player * );
     static void GetAllSpot(std::vector<UInt16>&);
 
 	void SendCityNPCs( Player * );

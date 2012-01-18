@@ -39,6 +39,7 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 		//player->GetPackage()->AddItemFromDB(8942, 1, true);
 		//DB3().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(8942, 1, %"I64_FMT"u, 1)", player->getId());
 	}
+
 	UInt16 newLoc = ces->newLoc;
 	if(ces->inCity && (newLoc & 0xFF) == 0)
 		newLoc += 1;
@@ -61,6 +62,8 @@ void PlayerEnter( GameMsgHdr& hdr, const void * data )
 		}
 		map->SendAtCity(player, ces->inCity == 1);
 	}
+
+    player->setJumpingMap(false);
 }
 
 void PlayerLeave( GameMsgHdr& hdr, const void *)

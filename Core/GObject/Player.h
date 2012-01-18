@@ -1066,6 +1066,12 @@ namespace GObject
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
 
+    private:
+        bool _isJumpingMap;
+    public:
+        bool isJumpingMap() { return _isJumpingMap; }
+        void setJumpingMap(bool v) { _isJumpingMap = v; }
+
 	private:
 		Mutex _mutex;
 
