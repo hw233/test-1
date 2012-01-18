@@ -994,6 +994,7 @@ void OnPurchaseBookReq( GameMsgHdr& hdr, PurchaseBookReq& pbr )
 
 void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 {
+#if 0
 	if(scr._id < 1 || scr._id > 8)
 		return;
 	MSG_QUERY_PLAYER(player);
@@ -1038,6 +1039,7 @@ void OnStatusChangeReq( GameMsgHdr& hdr, StatusChangeReq& scr )
 		player->addStatus(v);
 	}
 	GObject::Map::NotifyPlayerEnter(player);
+#endif
 }
 
 void OnFormationReq( GameMsgHdr& hdr, const void * data )
@@ -1872,17 +1874,17 @@ void OnAutoCopy( GameMsgHdr& hdr, const void* data )
 	if(!pl->hasChecked())
 		return;
 
-	if(pl->GetPackage()->GetRestPackageSize() < 4)
-	{
-		pl->sendMsgCode(1, 1014);
-		return;
-	}
-
     BinaryReader brd(data, hdr.msgHdr.bodyLen);
     UInt8 type = 0;
     UInt8 id = 0;
     brd >> type;
     brd >> id;
+
+	if((type == 0 || type == 2) && pl->GetPackage()->GetRestPackageSize() < 4)
+	{
+		pl->sendMsgCode(1, 1014);
+		return;
+	}
 
     switch (type)
     {

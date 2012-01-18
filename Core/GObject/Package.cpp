@@ -42,6 +42,8 @@ namespace GObject
 #define EQUIPTYPE_EQUIP 0
 #define EQUIPTYPE_TRUMP 1
 
+    static URandom equrnd(time(0)); // XXX: 加载和运行时都需要使用
+
     UInt16 getRandOEquip(UInt8 lvl)
     {
         static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80};
@@ -56,8 +58,7 @@ namespace GObject
         lvl -= 50;
         lvl /= 10;
 
-        URandom rnd(time(NULL));
-        UInt8 idx = rnd(24);
+        UInt8 idx = equrnd(24);
         equipid = equips[lvl][idx];
         return equipid;
     }
@@ -76,18 +77,15 @@ namespace GObject
         lvl -= 40;
         lvl /= 10;
 
-        URandom rnd(time(NULL));
-        UInt8 idx = rnd(24);
+        UInt8 idx = equrnd(24);
         equipid = equips[lvl][idx];
         return equipid;
     }
 
-
     static UInt32  gem[] = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141 };
     UInt32 getRandGem(UInt8 lev)
     {
-        URandom rnd(time(NULL));
-        UInt8 idx = rnd(15);
+        UInt8 idx = equrnd(15);
 
         if(lev > 1 && lev <= 9)
             return gem[idx] + lev;
