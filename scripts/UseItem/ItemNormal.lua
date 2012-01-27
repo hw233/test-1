@@ -1237,9 +1237,9 @@ function ItemNormal_00000430(iid, num, bind, param)
     local i = math.random(1, #items)
     local t = math.random(1,100)
 
-    package:AddItem(items[i][1], items[i][2], true, 0, 2);
+    package:AddItem(items[i][1], items[i][2], 0, 0, 2);
     if t <= 20 then
-        package:AddItem(6006, 1, true, 0, 2);
+        package:AddItem(6006, 1, 0, 0, 2);
     end
 
     package:DelItemSendMsg(430, player);
@@ -1260,9 +1260,9 @@ function ItemNormal_00000431(iid, num, bind, param)
     local i = math.random(1, #items)
     local t = math.random(1,100)
 
-    package:AddItem(items[i][1], items[i][2], true, 0, 2);
+    package:AddItem(items[i][1], items[i][2], 0, 0, 2);
     if t <= 20 then
-        package:AddItem(6010, 1, true, 0, 2);
+        package:AddItem(6010, 1, 0, 0, 2);
     end
 
     package:DelItemSendMsg(431, player);
@@ -1289,16 +1289,16 @@ function ItemNormal_00000432(iid, num, bind, param)
     for n = 1, #items do
         v = v + items[n][3]
         if i <= v then
-            package:AddItem(items[n][1], items[n][2], true, 0, 2);
+            package:AddItem(items[n][1], items[n][2], 0, 0, 2);
             break
         end
     end
 
     if t <= 20 then
         if r <= 50 then
-            package:AddItem(6007, 1, true, 0, 2);
+            package:AddItem(6007, 1, 0, 0, 2);
         else
-            package:AddItem(6008, 1, true, 0, 2);
+            package:AddItem(6008, 1, 0, 0, 2);
         end
     end
 

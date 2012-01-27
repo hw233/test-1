@@ -39,10 +39,9 @@ function calcPracticeInc( fgt )
         capacity = 5
     end
 
-    -- TODO: BUF加成
     buffactor = fgt:getPracticeBufFactor()
 
-    -- 穴道加成 + BUF加成 + (资质 - 5) * 0.16 + 山头加成
+    -- (基础 + 穴道加成) * (1 + ((资质 - 5) * 0.16 + 山头加成 + 帮派加成 + BUFF加成))
     return ((prabase+fgt:getAcuPraAdd()) * (1 + (capacity - 5) * capfactor + placeadd + clantechaddon + buffactor))
 end
 
