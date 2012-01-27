@@ -200,26 +200,15 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
     msg << "&key=";
     msg << player->getOpenKey();
     msg << "&itemid=29999";
-    msg << "&itemtype=";
-    SysMsgItem* mi = globalSysMsg[2999];
-    if (mi)
-    {
-        char tmp[2048] = {0};
-        mi->get(tmp);
-        msg << tmp;
-    }
-    else
-    {
-        msg << "SengokuPack";
-    }
+    msg << "&itemtype=29";
     msg << "&itemcnt=";
     msg << (c+9)/10;
     msg << "&modifyfee=";
-    msg << c*10; // TODO:
+    msg << c*10;
     if (total)
     {
         msg << "&totalfee=";
-        msg << total*10; // TODO:
+        msg << total*10;
     }
 
     DC().Push(msg.str().c_str(), msg.str().length());

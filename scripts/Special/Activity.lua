@@ -123,6 +123,9 @@ function onLevelup(player, olev, nlev)
     if getChristmas() then
         onChristmas(player)
     end
+    if getNewYear() then
+        onNewYear(player)
+    end
 end
 
 function onDungeonWin(player, id, level)

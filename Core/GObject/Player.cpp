@@ -2507,18 +2507,20 @@ namespace GObject
         if (ng->getType())
             return false;
 		const UInt32 eachBattle = 60;
-		//UInt8 level = GetLev();
 		UInt32 count = 60 * 8;
-#if 0
-		if(level >= LEVEL_MAX)
-			count = 60 * (LEVEL_MAX / 10);
-#endif
 
-		UInt32 viplvl = getVipLevel();
-		if(viplvl >= 4 && viplvl <= 7)
-			count += 60 * 8;
-        else if (viplvl > 7 && viplvl <= 10)
-			count += 60 * 16;
+        if (!World::getNewYear())
+        {
+            UInt32 viplvl = getVipLevel();
+            if(viplvl >= 4 && viplvl <= 7)
+                count += 60 * 8;
+            else if (viplvl > 7 && viplvl <= 10)
+                count += 60 * 16;
+        }
+        else
+        {
+            count = 60 * 240;
+        }
 
 		UInt32 timeDur = count * eachBattle;
 
