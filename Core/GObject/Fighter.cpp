@@ -1058,7 +1058,7 @@ void Fighter::addTrumpAttr( ItemTrump * trump )
     UInt8 q = trump->getQuality();
     UInt8 l = ied.tRank;
     AttrFactor af = GObjectManager::getTrumpTRankFactor(q-2, l-1);
-    if(trump->getId() < 1600)
+    if(trump->GetItemType().getId() < 1600)
         af.aura = 0;
     else
         af.auraMax = 0;

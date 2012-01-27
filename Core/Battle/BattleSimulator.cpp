@@ -1388,10 +1388,10 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
             for(int i = 0; i < 25; ++ i)
             {
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[side][i]);
-                if(!bo || bo->getId() == 5679)  // 雪人
+                if(!bo)  // 雪人
                     continue;
 
-                if(bo->getAura() > 99)
+                if(bo->getAura() > 99 || bo->getId() == 5679)
                 {
                     excepts[exceptCnt] = i;
                     ++ exceptCnt;

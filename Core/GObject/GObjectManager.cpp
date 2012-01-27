@@ -1892,8 +1892,8 @@ namespace GObject
 
             if(rank[dbd.row] == 0)
             {
-                rank[dbd.row] = dbd.rank;
-                data->rank = dbd.rank;
+                rank[dbd.row] = ((dbd.rank == 0) ? 1 : dbd.rank);
+                data->rank = rank[dbd.row];
             }
             else
             {
