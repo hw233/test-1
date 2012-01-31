@@ -51,8 +51,9 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false),
-    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _battlePoint(0.0f),
-    _praadd(0), favor(0), reqFriendliness(0), strength(0), physique(0),
+    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _battlePoint(0.0f), _praadd(0),
+    _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
+    favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
     attack(0), defend(0), maxhp(0), action(0), peerless(0), talent(0),
     hitrate(0), evade(0), critical(0), criticaldmg(0), pierce(0), counter(0), magres(0)
@@ -970,8 +971,8 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
 	switch(type)
 	{
     case 1:
-        break;
         ae.hp += value;
+        break;
     case 2:
         ae.action += value;
         break;
@@ -998,6 +999,72 @@ inline void addEquipAttr2( GData::AttrExtra& ae, UInt8 type, UInt16 value, UInt8
 	}
 }
 
+inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
+{
+    if (!type)
+        return;
+
+	switch(type)
+	{
+    case 1:
+        ae.strengthP += value/10000;
+        break;
+    case 2:
+        ae.physiqueP += value/10000;
+        break;
+	case 3:
+        ae.agilityP += value/10000;
+		break;
+	case 4:
+        ae.intelligenceP += value/10000;
+		break;
+	case 5:
+        ae.willP += value/10000;
+		break;
+	case 6:
+        ae.attackP += value/10000;
+		break;
+    case 7:
+        ae.magatkP += value/10000;
+        break;
+	case 8:
+        ae.defendP += value/10000;
+		break;
+    case 9:
+        ae.magdefP += value/10000;
+        break;
+    case 10:
+        ae.hpP += value/10000;
+        break;
+    case 11:
+        ae.tough += value/10000; // XXX:
+        break;
+    case 12:
+        ae.actionP += value/10000;
+        break;
+    case 13:
+        ae.hitrate += value/10000;
+        break;
+    case 14:
+        ae.evade += value/10000;
+        break;
+    case 15:
+        ae.critical += value/10000;
+        break;
+    case 16:
+        ae.criticaldmg += value/10000;
+        break;
+    case 17:
+        ae.pierce += value/10000;
+        break;
+    case 18:
+        ae.counter += value/10000;
+        break;
+    case 19:
+        ae.magres += value/10000;
+        break;
+	}
+}
 // TODO:
 inline void addEquipAttr2( GData::AttrExtra& ae, const GData::CittaEffect* ce, UInt8 level)
 {
@@ -1181,6 +1248,10 @@ void Fighter::rebuildEquipAttr()
 	_attrExtraEquip.magdef += armorDefend;
 	_attrExtraEquip.hp += armorHP;
 #endif
+
+    addTalentAttr(_attrExtraEquip, getAttrType1(), getAttrValue1());
+    addTalentAttr(_attrExtraEquip, getAttrType2(), getAttrValue2());
+    addTalentAttr(_attrExtraEquip, getAttrType3(), getAttrValue3());
 
     for (int i = 0; i < getUpCittasNum(); ++i)
     {
@@ -2995,4 +3066,258 @@ void Fighter::sendMaxSoul()
 	_owner->send(st);
 }
 
+void Fighter::setAttrType1(UInt8 t)
+{
+    _attrType1 = t;
 }
+
+void Fighter::setAttrValue1(UInt16 v)
+{
+    _attrValue1 = v;
+}
+
+void Fighter::setAttrType2(UInt8 t)
+{
+    if (_potential >= 1.5 && _capacity >= 7.0)
+        _attrType2 = t;
+}
+
+void Fighter::setAttrValue2(UInt16 v)
+{
+    if (_potential >= 1.5 && _capacity >= 7.0)
+        _attrValue2 = v;
+}
+
+void Fighter::setAttrType3(UInt8 t)
+{
+    _attrType3 = t;
+}
+
+void Fighter::setAttrValue3(UInt16 v)
+{
+    _attrValue3 = v;
+}
+
+UInt8 Fighter::getAttrType1(bool notify)
+{
+    UInt8 ret = 1;
+    if (!_attrType1)
+        ret = forge(1);
+    if (!ret)
+        updateForgeAttr(notify);
+    return _attrType1;
+}
+
+UInt16 Fighter::getAttrValue1(bool notify)
+{
+    UInt8 ret = 1;
+    if (!_attrType1)
+        ret = forge(1);
+    if (!ret)
+        updateForgeAttr(notify);
+    return _attrValue1;
+}
+
+UInt8 Fighter::getAttrType2(bool notify)
+{
+    UInt8 ret = 1;
+    if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
+        ret = forge(2);
+    if (!ret)
+        updateForgeAttr(notify);
+    return _attrType2;
+}
+
+UInt16 Fighter::getAttrValue2(bool notify)
+{
+    UInt8 ret = 1;
+    if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
+        ret = forge(2);
+    if (!ret)
+        updateForgeAttr(notify);
+    return _attrValue2;
+}
+
+UInt8 Fighter::getAttrType3(bool notify)
+{
+    // TODO:
+    return _attrType3;
+}
+
+UInt16 Fighter::getAttrValue3(bool notify)
+{
+    // TODO:
+    return _attrValue3;
+}
+
+UInt8 Fighter::forge(UInt8 which, UInt8 lock)
+{
+#define FF_FORGE_ITEM 516
+#define FF_FORGE_PROT_ITEM 547
+
+    if (!_owner)
+        return 1;
+
+    switch (which)
+    {
+        case 1:
+            {
+                UInt8 type = 0;
+                do
+                {
+                    type = GObjectManager::getFFType();
+                    if (!type)
+                        return 1;
+                }
+                while (type == _attrType2 || type == _attrType3);
+
+                UInt16 value = GObjectManager::getFFValue(type);
+                if (!value)
+                    return 1;
+
+                _attrType1 = type;
+                _attrValue1 = value; // XXX: /10000
+                return 0;
+            }
+            break;
+
+        case 2:
+            {
+                UInt8 type = 0;
+                do
+                {
+                    type = GObjectManager::getFFType();
+                    if (!type)
+                        return 1;
+                }
+                while (type == _attrType1 || type == _attrType3);
+
+                UInt16 value = GObjectManager::getFFValue(type);
+                if (!value)
+                    return 1;
+
+                _attrType2 = type;
+                _attrValue2 = value; // XXX: /10000
+                return 0;
+            }
+            break;
+
+        case 3:
+            {
+                return 0; // TODO:
+                UInt8 type = 0;
+                do
+                {
+                    type = GObjectManager::getFFType();
+                    if (!type)
+                        return 1;
+                }
+                while (type == _attrType2 || type == _attrType1);
+
+                UInt16 value = GObjectManager::getFFValue(type);
+                if (!value)
+                    return 1;
+
+                _attrType3 = type;
+                _attrValue3 = value; // XXX: /10000
+                return 0;
+            }
+            break;
+
+        default:
+            {
+                if (lock == 0x7)
+                    return 1;
+
+                if (!_owner->GetPackage()->DelItemAny(FF_FORGE_ITEM, 1, NULL, ToForgeFighter))
+                    return 2;
+                _owner->GetPackage()->AddItemHistoriesLog(FF_FORGE_ITEM, 1);
+
+                UInt8 ret = 1;
+                if (!lock)
+                {
+                    ret = forge(1);
+                    if (ret)
+                        return ret;
+                    ret = forge(2);
+                    if (ret)
+                        return ret;
+                    ret = forge(3);
+                    if (ret)
+                        return ret;
+                    broadcastForge(lock);
+                    return 0;
+                }
+
+                UInt8 num = 0;
+                if (lock & 0x1)
+                    ++num;
+                if (lock & 0x2)
+                    ++num;
+                if (lock & 0x4)
+                    ++num;
+
+                if (!_owner->GetPackage()->DelItemAny(FF_FORGE_PROT_ITEM, num, NULL, ToForgeFighter))
+                    return 2;
+                _owner->GetPackage()->AddItemHistoriesLog(FF_FORGE_PROT_ITEM, num);
+
+                if (!(lock & 0x1))
+                {
+                    ret = forge(1);
+                    if (ret)
+                        return ret;
+                }
+                if (!(lock & 0x2))
+                {
+                    ret = forge(2);
+                    if (ret)
+                        return ret;
+                }
+                if (!(lock & 0x4))
+                {
+                    ret = forge(3);
+                    if (ret)
+                        return ret;
+                }
+
+                broadcastForge(lock);
+                return 0;
+            }
+            break;
+    }
+
+    return 1;
+}
+
+void Fighter::updateForgeAttr(bool notify)
+{
+    if (!_owner)
+        return;
+
+    if (notify)
+    {
+        Stream st(REP::CHANGE_EQUIPMENT);
+        st << getId() << static_cast<UInt8>(1) << static_cast<UInt8>(0x46);
+        st << _attrType1 << _attrValue1 << _attrType2 << _attrValue2 << _attrType3 << _attrValue3 << Stream::eos;
+        _owner->send(st);
+    }
+
+    DB2().PushUpdateData("UPDATE `fighter` SET `attrType1` = %u, `attrValue1` = %u, `attrType2` = %u, `attrValue2` = %u, `attrType3` = %u, `attrValue3` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _attrType1, _attrValue1, _attrType2, _attrValue2, _attrType3, _attrValue3, _id, _owner->getId());
+}
+
+void Fighter::broadcastForge(UInt8 lock)
+{
+    bool b = false;
+    if (!(lock & 0x1) && ((_attrValue1 / (double)(100.f)) / GObjectManager::getFFMaxVal(_attrType1))  > 0.9f)
+        b = true;
+    if (!(lock & 0x2) && ((_attrValue2 / (double)(100.f)) / GObjectManager::getFFMaxVal(_attrType2))  > 0.9f)
+        b = true;
+    if (!(lock & 0x4) && ((_attrValue3 / (double)(100.f)) / GObjectManager::getFFMaxVal(_attrType3))  > 0.9f)
+        b = true;
+
+    if (b)
+        SYSMSG_BROADCASTV(2330, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str());
+}
+
+}
+

@@ -1767,6 +1767,10 @@ namespace GObject
 
         if (!load && !fgt->getCittasNum())
             upInitCitta(fgt, true);
+
+        fgt->getAttrType1(true);
+        fgt->getAttrType2(true);
+        fgt->getAttrType3(true);
 	}
 
     bool Player::addFighterFromItem(UInt32 itemid, UInt32 price)
@@ -1820,6 +1824,15 @@ namespace GObject
             << fgt->getSoul() << fgt->getMaxSoul();
 		st << Stream::eos;
 		send(st);
+
+        { // XXX: 更全的信息
+            Stream st(REP::FIGHTER_INFO);
+            st << static_cast<UInt8>(1);
+            makeFighterInfo(st, fgt);
+            st << Stream::eos;
+            send(st);
+        }
+
 		SYSMSG_SENDV(110, this, fgt->getColor(), fgt->getName().c_str());
 		SYSMSG_SENDV(1010, this, fgt->getColor(), fgt->getName().c_str());
 	}
@@ -2125,7 +2138,14 @@ namespace GObject
 		st << static_cast<UInt16>(fgt->getId()) << fgt->getPotential()
             << fgt->getCapacity() << fgt->getLevel() << fgt->getExp()
             << fgt->getPExp() << fgt->getPExpMax() << fgt->getSoul() << fgt->getMaxSoul();
-		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP() << fgt->getUpCittasMax();
+		st << fgt->getPeerlessAndLevel() << fgt->getCurrentHP();
+        st << fgt->getAttrType1();
+        st << fgt->getAttrValue1();
+        st << fgt->getAttrType2();
+        st << fgt->getAttrValue2();
+        st << fgt->getAttrType3();
+        st << fgt->getAttrValue3();
+        st << fgt->getUpCittasMax();
 		if(withequip)
 		{
 			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)
@@ -3914,6 +3934,7 @@ namespace GObject
 			return;
         if (isJumpingMap())
             return;
+        setJumpingMap(true);
 
 		cancelAutoBattle();
 		cancelAutoDungeon();
@@ -3939,6 +3960,7 @@ namespace GObject
         if (new_cny > WORKER_THREAD_LOGIN)
         {
             SYSMSG_SENDV(621, this, new_cny);
+            setJumpingMap(false);
             return;
         }
 
@@ -3947,7 +3969,7 @@ namespace GObject
 			CountryEnterStruct ces(true, inCity ? 1 : 0, spot);
 			cny.PlayerLeave(this);
 			// _threadId = new_cny; // XXX: why here???
-            setJumpingMap(true);
+            // setJumpingMap(true);
 			GameMsgHdr hdr(0x1F0, new_cny, this, sizeof(CountryEnterStruct));
 			GLOBAL().PushMsg( hdr, &ces );
 			return;
@@ -3955,7 +3977,10 @@ namespace GObject
 
 		GObject::Map * map = GObject::Map::FromSpot(spot);
 		if(map == NULL)
+        {
+            setJumpingMap(false);
 			return;
+        }
 
 		UInt16 oldLoc = _playerData.location;
 		bool sameMap = ((oldLoc >> 8) == (spot >> 8));
@@ -3985,6 +4010,7 @@ namespace GObject
 			map->PlayerEnter(this, !sameMap);
 		}
 		map->SendAtCity(this, inCity, !sameMap);
+        setJumpingMap(false);
 	}
 
 	bool Player::regenHP( UInt32 hp )
@@ -5912,6 +5938,15 @@ namespace GObject
 		if(fgt == NULL)
 			return 1;
 
+        if (type > 4 && (type&0xF) == 5)
+        {
+            UInt8 lock = type >> 4;
+            UInt8 ret = fgt->forge(0, lock);
+            if (!ret)
+                fgt->updateForgeAttr();
+            return ret;
+        }
+
         bool isPotential = false;
         float p = 0; 
 		UInt32 rate = 0;
@@ -6947,6 +6982,8 @@ namespace GObject
 			return 1;
 		if(_pwdInfo.secondPWD == newPWD)
 			return 0;
+		if(newPWD.length() != 6)
+			return 1;
 		_pwdInfo.secondPWD = newPWD;
 		DB1().PushUpdateData("UPDATE `pass_word` SET `password` = '%s' WHERE `playerId` =  %"I64_FMT"u", _pwdInfo.secondPWD.c_str(), _id);
 		return 0;

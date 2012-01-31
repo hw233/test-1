@@ -60,7 +60,6 @@ protected:
 	void initState(UInt32 seed, char* arg_state, Int32 n);
 	static UInt32 goodRand(Int32 x);
 
-private:
 	enum
 	{
 		MAX_TYPES = 5,

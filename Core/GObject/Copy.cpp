@@ -128,6 +128,9 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     if (!pl)
         return 1;
 
+    if (!pl->hasChecked())
+        return 1;
+
     if (!copyCheckLevel(pl, id))
         return 1;
 
@@ -570,6 +573,9 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     if (pl->getVipLevel() < 6)
                         return;
                 }
+
+                if (!pl->hasChecked())
+                    return;
 
                 if (GData::moneyNeed[GData::COPY_IM].gold > pl->getGoldOrCoupon())
                 {

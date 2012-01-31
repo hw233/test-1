@@ -74,6 +74,10 @@ void WorldScript::init()
     def("clearTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::clearTeamCopyAwardCfg);
     def("addGM", GObject::GObjectManager::addGM);
     def("delGM", GObject::GObjectManager::delGM);
+    def("setFFTypeChance", GObject::GObjectManager::setFFTypeChance);
+    def("setFFAttrChance", GObject::GObjectManager::setFFAttrChance);
+    def("setFFAttrMaxValProp", GObject::GObjectManager::setFFAttrMaxValProp);
+    def("setFFAttrMaxVal", GObject::GObjectManager::setFFAttrMaxVal);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);

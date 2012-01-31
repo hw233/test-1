@@ -11,6 +11,7 @@ public:
 	URandom(UInt32);
 	UInt32 operator()();
 	UInt32 operator()(UInt32 modulo);
+	UInt32 operator()(UInt32 min, UInt32 max);
 };
 
 UInt32 uRand();
