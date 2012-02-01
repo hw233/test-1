@@ -246,7 +246,7 @@ namespace REQ
     /***/
     const UInt8 PWD_QUESTION        = 0xCB;
     /***/
-    const UInt8 PWD_LOCK            = 0xFA;// 0xCE
+    const UInt8 PWD_LOCK            = 0xCC;// 0xCE
     /**斗剑场信息*/
     const UInt8 ARENA_INFO          = 0xC5;// 0xD0
     /**斗剑场挑战*/
@@ -490,8 +490,8 @@ namespace REP
     const UInt8 SALE_SELL           = 0x86;// 0xC6
     const UInt8 OP_PWD              = 0xCD;
     const UInt8 SECOND_PWD          = 0xCB;
-    const UInt8 PWD_DAILOG          = 0xCC;
-    const UInt8 PWD_LOCK            = 0xCE;
+    const UInt8 PWD_DAILOG          = 0xCA;
+    const UInt8 PWD_LOCK            = 0xCC;
 
     const UInt8 ARENA_IFNO          = 0xC5;// 0xD0
     const UInt8 FIGHT_INFO_CHANGE   = 0xC6;// 0xD1

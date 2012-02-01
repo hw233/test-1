@@ -1315,6 +1315,8 @@ void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
 void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
 {
      MSG_QUERY_PLAYER(player);
+     if (!player->hasChecked())
+         return;
      GObject::gAthleticsRank.RequestKillCD(player);
 }
 void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 

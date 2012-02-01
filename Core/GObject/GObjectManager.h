@@ -101,6 +101,17 @@ namespace GObject
 
         static bool loadQQVipAward();
 
+        static void setFFTypeChance(UInt32);
+        static void setFFAttrChance(UInt32);
+        static void setFFAttrMaxValProp(UInt32);
+        static void setFFAttrMaxVal(UInt32);
+
+        static UInt8 getFFType();
+        static UInt16 getFFValue(UInt8,bool = false);
+        static UInt8 getFFMaxVal(UInt8);
+
+        static UInt8 getFFAttr(UInt8& type, UInt16& value);
+
         static UInt32 getEnchantCost() { return _enchant_cost; }
         static UInt32 getMergeCost() { return _merge_cost; }
         static UInt32 getDetachCost() { return _detach_cost; }
@@ -351,6 +362,12 @@ namespace GObject
         static float _tough_max;
         static float _counter_max;
         static float _mres_max;
+
+        // 天赋洗炼
+        static std::vector<UInt32> _FFTypeChance;
+        static std::vector<UInt32> _FFAttrChance;
+        static std::vector<UInt32> _FFAttrMaxValProb;
+        static std::vector<UInt32> _FFAttrMaxVal;
 
         // 酒馆武将品质概率
         static std::vector<std::vector<UInt32>> _color_chance_gold;

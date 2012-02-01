@@ -150,6 +150,7 @@ enum ItemTo
 	ToTrainFighter,	
 	ToTrumpUpgrade,	
     ToEquipUpgrade,
+    ToForgeFighter,
 };
 
 

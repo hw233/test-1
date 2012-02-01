@@ -56,6 +56,8 @@
 
 namespace GObject
 {
+    URandom GRND(time(0)); // XXX: 加载和运行时都需要使用
+
 	std::map<UInt32, ItemEquip *> GObjectManager::equips;
 
     UInt32 GObjectManager::_enchant_cost;
@@ -89,6 +91,10 @@ namespace GObject
     std::vector<UInt32> GObjectManager::_potential_chance;
     std::vector<UInt32> GObjectManager::_capacity_chance;
 
+    std::vector<UInt32> GObjectManager::_FFTypeChance;
+    std::vector<UInt32> GObjectManager::_FFAttrChance;
+    std::vector<UInt32> GObjectManager::_FFAttrMaxValProb;
+    std::vector<UInt32> GObjectManager::_FFAttrMaxVal;
 
     UInt32 GObjectManager::_team_m_chance[3];
     UInt32 GObjectManager::_team_m_item[3];
@@ -1278,7 +1284,7 @@ namespace GObject
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1336,6 +1342,12 @@ namespace GObject
             fgt2->setUpSkills(specfgtobj.skill, false);
             fgt2->setCittas(specfgtobj.cittas, false);
             fgt2->setUpCittas(specfgtobj.citta, false);
+            fgt2->setAttrType1(specfgtobj.attrType1);
+            fgt2->setAttrValue1(specfgtobj.attrValue1);
+            fgt2->setAttrType2(specfgtobj.attrType2);
+            fgt2->setAttrValue2(specfgtobj.attrValue2);
+            fgt2->setAttrType3(specfgtobj.attrType3);
+            fgt2->setAttrValue3(specfgtobj.attrValue3);
 			pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;
@@ -3588,6 +3600,84 @@ namespace GObject
     bool GObjectManager::delGM(UInt64 id)
     {
         return addGM(id, 0);
+    }
+
+    void GObjectManager::setFFTypeChance(UInt32 v)
+    {
+        _FFTypeChance.push_back(v);
+    }
+
+    void GObjectManager::setFFAttrChance(UInt32 v)
+    {
+        _FFAttrChance.push_back(v);
+    }
+
+    void GObjectManager::setFFAttrMaxValProp(UInt32 v)
+    {
+        _FFAttrMaxValProb.push_back(v);
+    }
+
+    void GObjectManager::setFFAttrMaxVal(UInt32 v)
+    {
+        _FFAttrMaxVal.push_back(v);
+    }
+
+    UInt8 GObjectManager::getFFType()
+    {
+        UInt32 size = _FFTypeChance.size();
+        UInt32 v = GRND(10000);
+        if (!size)
+            return 0;
+        for (UInt32 i = 0; i < size; ++i)
+        {
+            if (v <= _FFTypeChance[i])
+                return i+1;
+        }
+        return 0;
+    }
+
+    UInt16 GObjectManager::getFFValue(UInt8 type, bool initmain)
+    {
+        if (!type)
+            return 0;
+
+        if (type > _FFTypeChance.size())
+            return 0;
+        if (type > _FFAttrMaxVal.size())
+            return 0;
+
+        if (initmain)
+            return GRND(20, 40) * _FFAttrMaxVal[type-1];
+
+        UInt32 size = _FFAttrChance.size();
+        if (!size)
+            return 0;
+
+        UInt32 v = GRND(10000);
+        UInt8 prob = 0;
+        for (UInt32 i = 0; i < size; ++i)
+        {
+            if (v <= _FFAttrChance[i])
+            {
+                prob = i;
+                break;
+            }
+        }
+
+        if (prob >= _FFAttrMaxValProb.size())
+            return 0;
+        if ((UInt8)(prob+1) >= _FFAttrMaxValProb.size())
+            return 0;
+
+        UInt32 v1 = GRND(_FFAttrMaxValProb[prob], _FFAttrMaxValProb[prob+1]);
+        return v1 * _FFAttrMaxVal[type-1];
+    }
+
+    UInt8 GObjectManager::getFFMaxVal(UInt8 type)
+    {
+        if (type > _FFAttrMaxVal.size())
+            return 100;
+        return _FFAttrMaxVal[type-1];
     }
 
     bool GObjectManager::LoadTripodData() // XXX: ??Ҫ?ӳټ???,??World::Init??????

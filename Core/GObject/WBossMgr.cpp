@@ -33,6 +33,8 @@ static UInt32 worldboss[] = {
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
 {
+    static UInt32 sendflag = 3;
+
     if (!pl) return false;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -101,7 +103,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 UInt32 damage = oldHP - newHP;
                 UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 pl->pendExp(exp);
-                sendDmg(damage);
+                if (!(sendflag % 3))
+                    sendDmg(damage);
 
                 AttackInfo info(pl, damage);
                 AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
@@ -130,6 +133,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     _hp[0] = 0;
                     reward(pl);
                     res = true;
+                    if (sendflag % 3)
+                        sendHp();
                 }
                 else if (newPercent <= 5 && _percent - newPercent >= 5)
                 {
@@ -141,7 +146,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                     _percent = newPercent;
                 }
-                sendHp();
+                if (!(sendflag % 3))
+                    sendHp();
             }
         }
     }
@@ -215,8 +221,8 @@ void WBoss::reward(Player* player)
 
     if (tlvl < 40)
         tlvl = 40;
-    if (tlvl > 100)
-        tlvl = 100;
+    if (tlvl > LEVEL_MAX)
+        tlvl = LEVEL_MAX;
 
     tlvl -= 40;
     tlvl /= 10;
@@ -254,6 +260,7 @@ void WBoss::reward(Player* player)
     getRandList(sz, luckynum, breath);
     getRandList(sz, luckynum, gem);
 
+    bool notified = false;
     UInt32 j = 0;
     for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend(); i != e; ++i, ++j)
     {
@@ -279,7 +286,11 @@ void WBoss::reward(Player* player)
         {
             MailPackage::MailItem item[] = {{trumps[tlvl],1},};
             (*i).player->sendMailItem(564, 565, item, 1, false);
-            SYSMSG_BROADCASTV(558, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
+            if (!notified)
+            {
+                SYSMSG_BROADCASTV(558, trumps[tlvl], 1);
+                notified = true;
+            }
         }
 
         if (j == lucky1 || j == lucky2)
@@ -630,7 +641,7 @@ void WBossMgr::calcNext(UInt32 now)
 #endif
     };
 
-    if ((m_level+1) * 5 > sizeof(worldboss)/sizeof(UInt32))
+    if ((m_level+1) * 5 > (UInt8)(sizeof(worldboss)/sizeof(UInt32)))
     {
         nextDay(now);
         return;

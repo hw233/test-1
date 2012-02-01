@@ -319,6 +319,12 @@ struct DBFighterObj
     std::string citta;      // 装备的心法
     std::string skills;     // 学会的技能, ID1,ID2,...
     std::string cittas;     // 学会的心法, ID1,ID2,...
+    UInt8 attrType1;
+    UInt16 attrValue1;
+    UInt8 attrType2;
+    UInt16 attrValue2;
+    UInt8 attrType3;
+    UInt16 attrValue3;
 };
 
 struct DBEquipment
@@ -1120,7 +1126,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighterObj)
-SPECIALDEF(25)
+SPECIALDEF(31)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1146,7 +1152,13 @@ SPECIALDEF(25)
     std::string, skill,
     std::string, citta,
     std::string, skills,
-    std::string, cittas
+    std::string, cittas,
+    UInt8, attrType1,
+    UInt16, attrValue1,
+    UInt8, attrType2,
+    UInt16, attrValue2,
+    UInt8, attrType3,
+    UInt16, attrValue3
 	)
 SPECIALEND()
 

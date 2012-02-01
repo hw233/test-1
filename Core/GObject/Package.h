@@ -174,11 +174,11 @@ namespace GObject
 		bool TryAddItem(ItemBase * item, UInt16 num);
 		bool TryDelItem(ItemBase * item, UInt16 num);
 
+        void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere);
+	public:
         void  AddItemHistoriesLog(UInt32 itemId, UInt32 num);
         void  AddItemCoursesLog(UInt32 typeId, UInt32 num, UInt8 fromWhere);
 
-        void OnAddEquipAndCheckAttainment(const GData::ItemBaseType * itype, UInt8 FromWhere);
-	public:
 		inline ItemBase * FindItem(UInt32 id, bool bind = false)
 		{
 			item_elem_iter iter = m_Items.find(ItemKey(id, bind));

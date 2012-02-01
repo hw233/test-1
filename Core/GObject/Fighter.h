@@ -27,12 +27,12 @@ namespace GObject
 
 #define FIGHTER_BUFF_COUNT 0x10 
 
-#define SKILL_UPMAX 3 // ¼¼ÄÜ×î³õ¾ÍÄÜ×°±¸3¸ö
+#define SKILL_UPMAX 3 // æŠ€èƒ½æœ€åˆå°±èƒ½è£…å¤‡3ä¸ª
 #define CITTA_LEVEL_MAX 100
 #define CITTA_UPMAX 6
-#define CITTA_INIT 2 // ĞÄ·¨×î³õÖ»ÄÜ×°2¸ö,ÓÉÑ¨µÀ¿ØÖÆ×°±¸¸öÊı
+#define CITTA_INIT 2 // å¿ƒæ³•æœ€åˆåªèƒ½è£…2ä¸ª,ç”±ç©´é“æ§åˆ¶è£…å¤‡ä¸ªæ•°
 #define TRUMP_UPMAX 3
-#define TRUMP_INIT 1 // ·¨±¦×î³õÖ»ÄÜ×°1¸ö,ÓÉVIPµÈ¼¶¿ØÖÆ×°±¸¸öÊı
+#define TRUMP_INIT 1 // æ³•å®æœ€åˆåªèƒ½è£…1ä¸ª,ç”±VIPç­‰çº§æ§åˆ¶è£…å¤‡ä¸ªæ•°
 #define ACUPOINTS_MAX 15
 
 #define PEERLESS_UPMAX 1
@@ -84,21 +84,21 @@ public:
     void setCapacity(float c, bool = true);
 	inline float getCapacity() {return _capacity;}
 
-    // ×°±¸ÎŞË«¼¼ÄÜ
+    // è£…å¤‡æ— åŒæŠ€èƒ½
     void setPeerless(UInt16 pl, bool = true);
     inline void upPeerless(UInt16 pl, bool writedb = true) { setPeerless(pl, writedb); }
-    // Ğ¶ÏÂÎŞË«¼¼ÄÜ
+    // å¸ä¸‹æ— åŒæŠ€èƒ½
     void offPeerless(bool = true);
-    // Ôö¼ÓÒ»¸ö¿É×°±¸µÄÎŞË«¼¼ÄÜ
+    // å¢åŠ ä¸€ä¸ªå¯è£…å¤‡çš„æ— åŒæŠ€èƒ½
     bool addNewPeerless(UInt16 pl, bool = true, bool = false); 
-    // É¾³ıÒ»¸ö¿É×°±¸µÄÎŞË«¼¼ÄÜ
+    // åˆ é™¤ä¸€ä¸ªå¯è£…å¤‡çš„æ— åŒæŠ€èƒ½
     bool delPeerless(UInt16 pl, bool = true);
     inline UInt16 getPeerless() { return peerless / SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessLevel() { return peerless % SKILL_LEVEL_MAX; }
     inline UInt16 getPeerlessAndLevel() { return peerless; }
-    // ÊÇ·ñ×°±¸ÁËplÕâ¸öÎŞË«¼¼ÄÜ
+    // æ˜¯å¦è£…å¤‡äº†plè¿™ä¸ªæ— åŒæŠ€èƒ½
     inline bool isPeerlessUp(UInt16 pl) { return SKILL_ID(peerless) == SKILL_ID(pl); }
-    // ÊÇ·ñÓĞplÕâ¸ö¿É×°±¸µÄÎŞË«¼¼ÄÜ
+    // æ˜¯å¦æœ‰plè¿™ä¸ªå¯è£…å¤‡çš„æ— åŒæŠ€èƒ½
     int hasPeerless(UInt16 pl);
 
     inline UInt8 getAcupointsCntMax() { return 3; }
@@ -110,154 +110,154 @@ public:
     void getAllAcupointsBits(Stream& st);
     void setAcupoints(std::string& acupoints, bool = true);
 
-    // XXX: ÓÉĞÄ·¨ºÍ·¨±¦´ø³ö¼¼ÄÜ£¬ÇÒ¼¼ÄÜ²»ĞèÒªÉı¼¶
+    // XXX: ç”±å¿ƒæ³•å’Œæ³•å®å¸¦å‡ºæŠ€èƒ½ï¼Œä¸”æŠ€èƒ½ä¸éœ€è¦å‡çº§
 #if 0
-    // Ñ§Ï°¼¼ÄÜ
+    // å­¦ä¹ æŠ€èƒ½
 	bool learnSkill(UInt16 skill);
 #endif
     bool testMutual(UInt16 skill);
-    // ×°±¸¼¼ÄÜ
+    // è£…å¤‡æŠ€èƒ½
     bool upSkill(UInt16 skill, int idx, bool = true);
-    // Ğ¶ÏÂ¼¼ÄÜ
+    // å¸ä¸‹æŠ€èƒ½
     bool offSkill(UInt16 skill, bool = true);
-    // ¸üĞÂ¼¼ÄÜ
+    // æ›´æ–°æŠ€èƒ½
     bool updateSkill(UInt16 skill, UInt16 nskill, bool sync = true, bool = true);
-    // Éı¼¶¼¼ÄÜ
+    // å‡çº§æŠ€èƒ½
 	bool skillLevelUp(UInt16 skill, UInt8 lv);
-    // ¼¼ÄÜÊÇ·ñ¿É×°±¸
+    // æŠ€èƒ½æ˜¯å¦å¯è£…å¤‡
     int hasSkill(UInt16 skill);
-    // ÊÇ·ñ×°±¸´Ë¼¼ÄÜ
+    // æ˜¯å¦è£…å¤‡æ­¤æŠ€èƒ½
     int isSkillUp(UInt16 skill);
-    // Í¨¹ıË÷ÒıĞ¶ÏÂ¼¼ÄÜ
+    // é€šè¿‡ç´¢å¼•å¸ä¸‹æŠ€èƒ½
     bool offSkillByIdx(UInt8 idx);
-    // È¡µÃ×°±¸µÄ¼¼ÄÜ¸öÊı
+    // å–å¾—è£…å¤‡çš„æŠ€èƒ½ä¸ªæ•°
     UInt16 getUpSkillsNum();
-    // È¡µÃËùÓĞ±»¶¯¼¼ÄÜµÄ¸öÊı
+    // å–å¾—æ‰€æœ‰è¢«åŠ¨æŠ€èƒ½çš„ä¸ªæ•°
     UInt16 getPSkillsNum();
-    // È¡µÃ100%±»¶¯¼¼ÄÜµÄ¸öÊı
+    // å–å¾—100%è¢«åŠ¨æŠ€èƒ½çš„ä¸ªæ•°
     UInt16 getP100SkillsNum();
-    // È¡µÃ¸ÅÂÊ±»¶¯¼¼ÄÜµÄ¸öÊı
+    // å–å¾—æ¦‚ç‡è¢«åŠ¨æŠ€èƒ½çš„ä¸ªæ•°
     UInt16 getPnSkillsNum();
-    // Ôö¼ÓÒ»¸öĞÂ¼¼ÄÜ,°üÀ¨¼¼ÄÜÉı¼¶
+    // å¢åŠ ä¸€ä¸ªæ–°æŠ€èƒ½,åŒ…æ‹¬æŠ€èƒ½å‡çº§
     bool addNewSkill(UInt16 skill, bool = true, bool = false);
-    // É¾³ıÒ»¸ö¿É×°±¸µÄ¼¼ÄÜ
+    // åˆ é™¤ä¸€ä¸ªå¯è£…å¤‡çš„æŠ€èƒ½
     bool delSkill(UInt16 skill, bool = true, bool = true, bool = true);
-    // È¡µÃ×°±¸¼¼ÄÜµÄ×î´óÊı
+    // å–å¾—è£…å¤‡æŠ€èƒ½çš„æœ€å¤§æ•°
     inline UInt8 getUpSkillsMax() { return SKILL_UPMAX; }
-    // È¡µÃ¼¼ÄÜ×°±¸Î»ÖÃidx´¦µÄ¼¼ÄÜID
+    // å–å¾—æŠ€èƒ½è£…å¤‡ä½ç½®idxå¤„çš„æŠ€èƒ½ID
 	inline UInt16 getUpSkill(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] / SKILL_LEVEL_MAX : 0; }
-    // È¡µÃ¼¼ÄÜ×°±¸Î»ÖÃidx´¦µÄ¼¼ÄÜµÈ¼¶
+    // å–å¾—æŠ€èƒ½è£…å¤‡ä½ç½®idxå¤„çš„æŠ€èƒ½ç­‰çº§
 	inline UInt8 getUpSkillLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] % SKILL_LEVEL_MAX : 0; }
-    // È¡µÃ¼¼ÄÜ×°±¸Î»ÖÃidx´¦µÄ¼¼ÄÜIDºÍµÈ¼¶
+    // å–å¾—æŠ€èƒ½è£…å¤‡ä½ç½®idxå¤„çš„æŠ€èƒ½IDå’Œç­‰çº§
 	inline UInt16 getUpSkillAndLevel(int idx = 0) { return (idx >= 0 && idx < SKILL_UPMAX) ? _skill[idx] : 0; }
-    // È¡µÃÄ¬ÈÏ¼¼ÄÜ
+    // å–å¾—é»˜è®¤æŠ€èƒ½
     inline UInt16 getDefaultSkillAndLevel() { return _skills.size()?_skills[0]:0; }
-    // È¡µÃ¿É×°±¸µÄ¼¼ÄÜÊı
+    // å–å¾—å¯è£…å¤‡çš„æŠ€èƒ½æ•°
     UInt8 getSkillsNum();
-    // È¡µÃËùÓĞ×°±¸µÄ¼¼ÄÜºÍµÈ¼¶
+    // å–å¾—æ‰€æœ‰è£…å¤‡çš„æŠ€èƒ½å’Œç­‰çº§
     void getAllUpSkillAndLevel(Stream& st);
-    // È¡µÃËùÓĞ±»¶¯¼¼ÄÜ
+    // å–å¾—æ‰€æœ‰è¢«åŠ¨æŠ€èƒ½
     void getAllPSkillAndLevel(Stream& st);
-    // È¡µÃËùÓĞÑ§Ï°µÄ¼¼ÄÜºÍµÈ¼¶
+    // å–å¾—æ‰€æœ‰å­¦ä¹ çš„æŠ€èƒ½å’Œç­‰çº§
     void getAllSkillsAndLevel(Stream& st);
-    // È¡µÃ×°±¸ÁËµÄºÍÑ§Ï°ÁËµÄ¼¼ÄÜºÍµÈ¼¶
+    // å–å¾—è£…å¤‡äº†çš„å’Œå­¦ä¹ äº†çš„æŠ€èƒ½å’Œç­‰çº§
     void getAllSkillAndLevel(Stream& st);
-    // ³õÊ¼»¯×°±¸µÄ¼¼ÄÜ
+    // åˆå§‹åŒ–è£…å¤‡çš„æŠ€èƒ½
     void setUpSkills(std::string& skill, bool = true);
-    // ³õÊ¼»¯¿É×°±¸µÄ¼¼ÄÜ
+    // åˆå§‹åŒ–å¯è£…å¤‡çš„æŠ€èƒ½
     void setSkills(std::string& skills, bool = true);
-    // ¸üĞÂ±»¶¯¼¼ÄÜ±í
+    // æ›´æ–°è¢«åŠ¨æŠ€èƒ½è¡¨
     bool upPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
-    // ×°±¸±»¶¯¼¼ÄÜ
+    // è£…å¤‡è¢«åŠ¨æŠ€èƒ½
     bool upPassiveSkill(UInt16* skill, UInt8 size, bool = true);
-    // ¸üĞÂ±»¶¯¼¼ÄÜ
+    // æ›´æ–°è¢«åŠ¨æŠ€èƒ½
     bool offPassiveSkill(UInt16 skill, UInt16 type, bool = false, bool = true);
 
-    // È¡µÃËùÓĞÖ÷¶¯¼¼ÄÜ
+    // å–å¾—æ‰€æœ‰ä¸»åŠ¨æŠ€èƒ½
     void getUpSkillAndLevel(std::vector<UInt16>& skills);
-    // È¡µÃ¹¥»÷Ç°±»¶¯100%´¥·¢¼¼ÄÜ
+    // å–å¾—æ”»å‡»å‰è¢«åŠ¨100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillPreAtk100() { return _passkl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
-    // È¡µÃ¹¥»÷ºó±»¶¯100%´¥·¢¼¼ÄÜ
+    // å–å¾—æ”»å‡»åè¢«åŠ¨100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftAtk100() { return _passkl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
-    // È¡µÃÆÕÍ¨¹¥»÷ºó±»¶¯100%´¥·¢¼¼ÄÜ
+    // å–å¾—æ™®é€šæ”»å‡»åè¢«åŠ¨100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftNAtk100() { return _passkl[GData::SKILL_AFTNATK-GData::SKILL_PASSSTART]; }
-    // È¡µÃ±»¹¥»÷ºó±»¶¯100%´¥·¢¼¼ÄÜ
+    // å–å¾—è¢«æ”»å‡»åè¢«åŠ¨100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillBeAtk100() { return _passkl[GData::SKILL_BEATKED-GData::SKILL_PASSSTART]; }
-    // È¡µÃÉÁ±Üºó±»¶¯100%´¥·¢¼¼ÄÜ
+    // å–å¾—é—ªé¿åè¢«åŠ¨100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftEvd100() { return _passkl[GData::SKILL_AFTEVD-GData::SKILL_PASSSTART]; }
-    // È¡µÃ·¨ÊõµÖ¿¹ºó±»¶¯100%´¥·¢¼¼ÄÜ
+    // å–å¾—æ³•æœ¯æŠµæŠ—åè¢«åŠ¨100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftRes100() { return _passkl[GData::SKILL_AFTRES-GData::SKILL_PASSSTART]; }
-    // È¡µÃÈë³¡Ê±¸ÅÂÊ100%´¥·¢¼¼ÄÜ
+    // å–å¾—å…¥åœºæ—¶æ¦‚ç‡100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillEnter100() { return _passkl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
-    // È¡µÃËÀÍöºó¸ÅÂÊ100%´¥·¢¼¼ÄÜ
+    // å–å¾—æ­»äº¡åæ¦‚ç‡100%è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillDead100() { return _passkl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
 
-    // È¡µÃ¹¥»÷Ç°±»¶¯¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—æ”»å‡»å‰è¢«åŠ¨æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillPreAtk() { return _rpasskl[GData::SKILL_PREATK-GData::SKILL_PASSSTART]; }
-    // È¡µÃ¹¥»÷ºó±»¶¯¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—æ”»å‡»åè¢«åŠ¨æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftAtk() { return _rpasskl[GData::SKILL_AFTATK-GData::SKILL_PASSSTART]; }
-    // È¡µÃÆÕÍ¨¹¥»÷ºó±»¶¯¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—æ™®é€šæ”»å‡»åè¢«åŠ¨æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftNAtk() { return _rpasskl[GData::SKILL_AFTNATK-GData::SKILL_PASSSTART]; }
-    // È¡µÃ±»¹¥»÷ºó±»¶¯¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—è¢«æ”»å‡»åè¢«åŠ¨æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillBeAtk() { return _rpasskl[GData::SKILL_BEATKED-GData::SKILL_PASSSTART]; }
-    // È¡µÃÉÁ±Üºó±»¶¯¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—é—ªé¿åè¢«åŠ¨æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftEvd() { return _rpasskl[GData::SKILL_AFTEVD-GData::SKILL_PASSSTART]; }
-    // È¡µÃ·¨ÊõµÖ¿¹ºó±»¶¯¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—æ³•æœ¯æŠµæŠ—åè¢«åŠ¨æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillAftRes() { return _rpasskl[GData::SKILL_AFTRES-GData::SKILL_PASSSTART]; }
-    // È¡µÃÈë³¡Ê±¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—å…¥åœºæ—¶æ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillEnter() { return _rpasskl[GData::SKILL_ENTER-GData::SKILL_PASSSTART]; }
-    // È¡µÃËÀÍöºó¸ÅÂÊ´¥·¢¼¼ÄÜ
+    // å–å¾—æ­»äº¡åæ¦‚ç‡è§¦å‘æŠ€èƒ½
     inline std::vector<UInt16>& getPassiveSkillDead() { return _rpasskl[GData::SKILL_DEAD-GData::SKILL_PASSSTART]; }
 
-    // È¡µÃĞÄ·¨´ø³ö¼¼ÄÜµÄID±í
+    // å–å¾—å¿ƒæ³•å¸¦å‡ºæŠ€èƒ½çš„IDè¡¨
     const std::vector<const GData::SkillBase*>& skillFromCitta(UInt16 citta);
 
-    // ³õÊ¼»¯×°±¸µÄĞÄ·¨
+    // åˆå§‹åŒ–è£…å¤‡çš„å¿ƒæ³•
     void setUpCittas(std::string& citta, bool = false);
-    // ³õÊ¼»¯¿É×°±¸µÄĞÄ·¨
+    // åˆå§‹åŒ–å¯è£…å¤‡çš„å¿ƒæ³•
     void setCittas(std::string& cittas, bool = true);
-    // ×°±¸ĞÄ·¨
+    // è£…å¤‡å¿ƒæ³•
     bool upCitta(UInt16 citta, int idx, bool = true);
-    // Ğ¶ÏÂĞÄ·¨
+    // å¸ä¸‹å¿ƒæ³•
     bool offCitta(UInt16 citta, bool = false, bool = false, bool = true);
-    // Ôö¼ÓÒ»¸öĞÄ·¨
+    // å¢åŠ ä¸€ä¸ªå¿ƒæ³•
     bool addNewCitta(UInt16 citta, bool = true, bool = false);
-    // É¾³ıËùÓĞĞÄ·¨
+    // åˆ é™¤æ‰€æœ‰å¿ƒæ³•
     void delAllCitta( bool = true);
-    // É¾³ıÒ»¸öĞÄ·¨
+    // åˆ é™¤ä¸€ä¸ªå¿ƒæ³•
     bool delCitta(UInt16 citta, bool = true);
-    // ÊÇ·ñÑ§»áÁË´ËĞÄ·¨
+    // æ˜¯å¦å­¦ä¼šäº†æ­¤å¿ƒæ³•
     int hasCitta(UInt16 citta);
-    // ÊÇ·ñ×°±¸ÁË´ËĞÄ·¨
+    // æ˜¯å¦è£…å¤‡äº†æ­¤å¿ƒæ³•
     int isCittaUp(UInt16 citta);
-    // Éı¼¶ĞÄ·¨
+    // å‡çº§å¿ƒæ³•
     bool lvlUpCitta(UInt16 citta, bool = true);
-    // È¡µÃ×°±¸µÄĞÄ·¨Êı
+    // å–å¾—è£…å¤‡çš„å¿ƒæ³•æ•°
     UInt8 getUpCittasNum();
-    // È¡µÃ×î´ó×°±¸ĞÄ·¨Êı
+    // å–å¾—æœ€å¤§è£…å¤‡å¿ƒæ³•æ•°
     inline UInt8 getUpCittasMax() { return _cittaslot <= CITTA_UPMAX ? _cittaslot : CITTA_UPMAX; }
-    // È¡µÃ×°±¸Î»ÖÃidx´¦Ëù×°±¸µÄĞÄ·¨µÄID
+    // å–å¾—è£…å¤‡ä½ç½®idxå¤„æ‰€è£…å¤‡çš„å¿ƒæ³•çš„ID
 	inline UInt16 getUpCitta(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax() ) ? CITTA_ID(_citta[idx]) : 0; }
-    // È¡µÃ×°±¸Î»ÖÃidx´¦Ëù×°±¸µÄĞÄ·¨µÈ¼¶
+    // å–å¾—è£…å¤‡ä½ç½®idxå¤„æ‰€è£…å¤‡çš„å¿ƒæ³•ç­‰çº§
 	inline UInt8 getUpCittaLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax() ) ? CITTA_LEVEL(_citta[idx]) : 0; }
-    // È¡µÃ×°±¸Î»ÖÃidx´¦Ëù×°±¸µÄĞÄ·¨µÄIDºÍµÈ¼¶
+    // å–å¾—è£…å¤‡ä½ç½®idxå¤„æ‰€è£…å¤‡çš„å¿ƒæ³•çš„IDå’Œç­‰çº§
 	inline UInt16 getUpCittaAndLevel(int idx = 0) { return (idx >= 0 && idx < getUpCittasMax()) ? _citta[idx] : 0; }
-    // È¡µÃÄ¬ÈÏĞÄ·¨
+    // å–å¾—é»˜è®¤å¿ƒæ³•
 	inline UInt16 getDefaultCittaAndLevel() { return getUpCittaAndLevel(0); }
-    // È¡µÃ¿É×°±¸µÄĞÄ·¨Êı
+    // å–å¾—å¯è£…å¤‡çš„å¿ƒæ³•æ•°
     UInt8 getCittasNum();
-    // È¡µÃËùÓĞ×°±¸µÄĞÄ·¨ºÍµÈ¼¶
+    // å–å¾—æ‰€æœ‰è£…å¤‡çš„å¿ƒæ³•å’Œç­‰çº§
     void getAllUpCittaAndLevel(Stream& st);
-    // È¡µÃËùÓĞÑ§Ï°µÄĞÄ·¨ºÍµÈ¼¶
+    // å–å¾—æ‰€æœ‰å­¦ä¹ çš„å¿ƒæ³•å’Œç­‰çº§
     void getAllCittasAndLevel(Stream& st);
-    // È¡µÃ×°±¸ÁËµÄºÍÑ§Ï°ÁËµÄĞÄ·¨ºÍµÈ¼¶
+    // å–å¾—è£…å¤‡äº†çš„å’Œå­¦ä¹ äº†çš„å¿ƒæ³•å’Œç­‰çº§
     void getAllCittaAndLevel(Stream& st);
-    // È¡µÃËùÓĞÑ§»áµÄÎŞË«¼¼ÄÜ
+    // å–å¾—æ‰€æœ‰å­¦ä¼šçš„æ— åŒæŠ€èƒ½
     void getAllPeerlessAndLevel(Stream& st);
 
-    // È¡µÃ¿É×°±¸µÄÎŞË«¼¼ÄÜ
+    // å–å¾—å¯è£…å¤‡çš„æ— åŒæŠ€èƒ½
     void getAllPeerless(Stream& st);
-    // È¡µÃ¿É×°±¸µÄÎŞË«¼¼ÄÜµÄ¸öÊı
+    // å–å¾—å¯è£…å¤‡çš„æ— åŒæŠ€èƒ½çš„ä¸ªæ•°
     inline UInt8 getPeerlessNum() { return _peerless.size(); }
 
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false);
@@ -326,6 +326,23 @@ public:
     bool hasTrumpType(UInt32 trumpid);
     bool canSetTrump(UInt8 idx, UInt32 trumpid);
 
+    void setAttrType1(UInt8 t);
+    void setAttrValue1(UInt16 v);
+    void setAttrType2(UInt8 t);
+    void setAttrValue2(UInt16 v);
+    void setAttrType3(UInt8 t);
+    void setAttrValue3(UInt16 v);
+    UInt8 getAttrType1(bool = false, bool = false);
+    UInt16 getAttrValue1(bool = false, bool = false);
+    UInt8 getAttrType2(bool = false);
+    UInt16 getAttrValue2(bool = false);
+    UInt8 getAttrType3(bool = false);
+    UInt16 getAttrValue3(bool = false);
+
+    UInt8 forge(UInt8 which, UInt8 lock = 0, bool = false);
+    void updateForgeAttr(bool = true);
+    void broadcastForge(UInt8);
+
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
 	inline UInt16 getExtraStrength() { checkDirty(); return _attrExtraEquip.strength; }
@@ -377,7 +394,7 @@ public:
 	inline Int16 getBaseStrength()
     {
         return strength;
-        // XXX: ÔİÊ±²»ÆôÓÃ
+        // XXX: æš‚æ—¶ä¸å¯ç”¨
         if (_id > 9)
             return strength;
         static const Int16 add[9][9] = {
@@ -536,38 +553,38 @@ protected:
 	Player * _owner;
 
 	std::string _name;
-    UInt8 _sex;         // ĞÔ±ğ
+    UInt8 _sex;         // æ€§åˆ«
 	UInt8 _class;
 	UInt8 _level;
-	UInt64 _exp;        // ¾­Ñé
-    UInt32 _pexp;       // ĞŞÁ¶¾­Ñé
+	UInt64 _exp;        // ç»éªŒ
+    UInt32 _pexp;       // ä¿®ç‚¼ç»éªŒ
     UInt32 _pexpAddTmp; // for Attainment  
-    UInt32 _pexpMax;    // ĞŞÁ¶×î´ó¾­Ñé
-	float _potential;   // Ç±Á¦
-	float _capacity;    // ×ÊÖÊ
+    UInt32 _pexpMax;    // ä¿®ç‚¼æœ€å¤§ç»éªŒ
+	float _potential;   // æ½œåŠ›
+	float _capacity;    // èµ„è´¨
 	UInt8 _color;
 	UInt16 _hp;
 
-    UInt8 _acupoints[ACUPOINTS_MAX];    // Ñ¨µÀ
+    UInt8 _acupoints[ACUPOINTS_MAX];    // ç©´é“
 
-    UInt16 _skill[SKILL_UPMAX];     // ×°±¸µÄ¼¼ÄÜ _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
-    std::vector<UInt16> _skills;    // ¿É×°±¸µÄ¼¼ÄÜ TODO: Èç¹ûËùÓĞ¼¼ÄÜ¶¼½«ÊÇÓÉĞÄ·¨´ø³ö,ÔòÊı¾İ±íÀï²»ĞèÒª´æÕâ¸ö×Ö¶Î
+    UInt16 _skill[SKILL_UPMAX];     // è£…å¤‡çš„æŠ€èƒ½ _skill[i] % SKILL_LEVEL_MAX => skilllevel, _skill[i]/SKILL_LEVEL_MAX=> skillid 
+    std::vector<UInt16> _skills;    // å¯è£…å¤‡çš„æŠ€èƒ½ TODO: å¦‚æœæ‰€æœ‰æŠ€èƒ½éƒ½å°†æ˜¯ç”±å¿ƒæ³•å¸¦å‡º,åˆ™æ•°æ®è¡¨é‡Œä¸éœ€è¦å­˜è¿™ä¸ªå­—æ®µ
 
-    UInt8 _cittaslot;               // ¿É×°±¸ĞÄ·¨×î´óÊı
-    UInt16 _citta[CITTA_UPMAX];     // ×°±¸µÄĞÄ·¨
-    std::vector<UInt16> _cittas;    // ¿É×°±¸µÄĞÄ·¨
+    UInt8 _cittaslot;               // å¯è£…å¤‡å¿ƒæ³•æœ€å¤§æ•°
+    UInt16 _citta[CITTA_UPMAX];     // è£…å¤‡çš„å¿ƒæ³•
+    std::vector<UInt16> _cittas;    // å¯è£…å¤‡çš„å¿ƒæ³•
 
-    std::vector<UInt16> _peerless;  // ¿É×°±¸µÄÎŞË«¼¼ÄÜ
+    std::vector<UInt16> _peerless;  // å¯è£…å¤‡çš„æ— åŒæŠ€èƒ½
 
-    // ±»¶¯´¥·¢¼¼ÄÜ, ·ÖÌ¯¸ÅÂÊ´¥·¢, XXX: ×¢Òâ×°±¸ºÍÉ¾³ıĞÄ·¨»ò·¨±¦Ê±Ğè¸üĞÂ
+    // è¢«åŠ¨è§¦å‘æŠ€èƒ½, åˆ†æ‘Šæ¦‚ç‡è§¦å‘, XXX: æ³¨æ„è£…å¤‡å’Œåˆ é™¤å¿ƒæ³•æˆ–æ³•å®æ—¶éœ€æ›´æ–°
     std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
-    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%´¥·¢¼¼ÄÜ
+    std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%è§¦å‘æŠ€èƒ½
 
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
 	ItemEquip * _ring;
 	ItemEquip * _amulet;
-	ItemEquip * _trump[TRUMP_UPMAX];// ·¨±¦
+	ItemEquip * _trump[TRUMP_UPMAX];// æ³•å®
 
 	bool _attrDirty;
 	UInt32 _maxHP;
@@ -581,8 +598,15 @@ protected:
 
 	UInt32 _buffData[FIGHTER_BUFF_COUNT];
 
-    Int32 _praadd;  // Ñ¨µÀ¶ÔĞŞÎªÔö³¤µÄ¼Ó³É
+    Int32 _praadd;  // ç©´é“å¯¹ä¿®ä¸ºå¢é•¿çš„åŠ æˆ
 
+    // å¤©èµ‹å±æ€§
+    UInt8 _attrType1;
+    UInt16 _attrValue1;
+    UInt8 _attrType2;
+    UInt16 _attrValue2;
+    UInt8 _attrType3;
+    UInt16 _attrValue3;
 public:
 	UInt32 favor;
 	UInt32 reqFriendliness;
@@ -591,11 +615,11 @@ public:
 	Int32 agility;
 	Int32 intelligence;
     Int32 will;
-    Int32 soulMax;  // ×î´óÔªÉñÁ¦,Ñ¨µÀ»áÔö¼ÓÔªÉñÁ¦ÉÏÏŞ
-    Int32 soul;     // ÒÑÊ¹ÓÃÔªÉñÁ¦,×°±¸ĞÄ·¨»áÏûºÄÔªÉñÁ¦
-    Int32 baseSoul; // ³õÊ¼ÔªÉñÁ¦
-    Int32 aura;     // µ±Ç°ÁéÆø
-    Int32 auraMax;  // ×î´óÁéÆø
+    Int32 soulMax;  // æœ€å¤§å…ƒç¥åŠ›,ç©´é“ä¼šå¢åŠ å…ƒç¥åŠ›ä¸Šé™
+    Int32 soul;     // å·²ä½¿ç”¨å…ƒç¥åŠ›,è£…å¤‡å¿ƒæ³•ä¼šæ¶ˆè€—å…ƒç¥åŠ›
+    Int32 baseSoul; // åˆå§‹å…ƒç¥åŠ›
+    Int32 aura;     // å½“å‰çµæ°”
+    Int32 auraMax;  // æœ€å¤§çµæ°”
     Int32 tough;
 	Int32 attack;
 	Int32 magatk;
@@ -603,8 +627,8 @@ public:
 	Int32 magdef;
 	Int32 maxhp;
 	UInt32 action;
-    UInt16 peerless;// ×°±¸µÄÎŞË«¼¼ÄÜ
-    UInt16 talent;  // Ìì¸³
+    UInt16 peerless;// è£…å¤‡çš„æ— åŒæŠ€èƒ½
+    UInt16 talent;  // å¤©èµ‹
 	float hitrate;
 	float evade;
 	float critical;

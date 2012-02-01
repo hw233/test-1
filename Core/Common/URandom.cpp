@@ -24,6 +24,17 @@ UInt32 URandom::operator()( UInt32 modulo )
 	return next() % modulo;
 }
 
+UInt32 URandom::operator()(UInt32 min, UInt32 max)
+{
+    if(min==max)
+        return min;
+    else if (min > max)
+        return max + (int) (((double) min - (double)max + 1.0) * rand_r(_fptr) / (RAND_MAX + 1.0));
+    else
+        return min + (int) (((double) max - (double)min + 1.0) * rand_r(_fptr) / (RAND_MAX + 1.0));
+    return 0;
+}
+
 UInt32 uRand()
 {
 	return static_cast<BaseThread *>(Thread::current())->uRandom();

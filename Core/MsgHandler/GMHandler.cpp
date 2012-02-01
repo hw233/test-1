@@ -154,6 +154,7 @@ GMHandler::GMHandler()
     Reg(3, "resettcplayer", &GMHandler::OnResetTeamCopyPlayer);
     Reg(3, "moneyin", &GMHandler::OnMoneyIn);
     Reg(3, "newyear", &GMHandler::OnNewYear);
+    Reg(3, "ff", &GMHandler::OnFgtForge);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2557,4 +2558,19 @@ void GMHandler::OnNewYear(GObject::Player* player, std::vector<std::string>& arg
 	NETWORK()->Broadcast(st);
 }
 
+void GMHandler::OnFgtForge(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (!args.size())
+        return;
+    UInt8 lock = 0x7;
+    if (args.size() < 2)
+        lock = 0;
+    else
+        lock = atoi(args[1].c_str());
+	UInt32 id = atoi(args[0].c_str());
+	GObject::Fighter * fgt = player->findFighter(id);
+    if (!fgt)
+        return;
+    fgt->forge(0, lock);
+}
 

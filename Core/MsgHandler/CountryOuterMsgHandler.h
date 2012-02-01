@@ -499,6 +499,8 @@ struct YellowDiamondGetPacksReq
 void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 {
 	MSG_QUERY_PLAYER(pl);
+    if (!pl->hasChecked())
+        return;
 	if (GetItemSubClass(req.m_ItemId) == Item_Task)
 		pl->GetPackage()->UseTaskItem(req.m_ItemId, req.m_ItemBindType);
 	else
@@ -688,6 +690,8 @@ void OnTripodReq( GameMsgHdr& hdr, const void* data )
     }
     else if (type == 1)
     {
+        if (!player->hasChecked())
+            return;
         UInt8 num = 0;
         UInt32 id1 = 0;
         UInt32 id2 = 0;
@@ -975,6 +979,8 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 void OnBookStoreListReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
 	br >> type;
@@ -984,6 +990,8 @@ void OnBookStoreListReq( GameMsgHdr& hdr, const void * data )
 void OnPurchaseBookReq( GameMsgHdr& hdr, PurchaseBookReq& pbr )
 {
 	MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
 	if(pbr._pos >= 6)
 		return;
 	UInt32 id = player->purchaseBook(pbr._pos);
@@ -1154,6 +1162,8 @@ struct FighterLeaveStruct
 void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 {
 	MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+        return;
 	GObject::Fighter * fgt = player->findFighter(fer._id);
 	if(fgt == NULL)
 		return;
@@ -1323,6 +1333,12 @@ void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
 void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 {
 	MSG_QUERY_PLAYER(player);
+    if (ftr._type > 4 && (ftr._type&0xF) == 5)
+    {
+        player->trainFighter(ftr._fgtId, ftr._type);
+        return;
+    }
+
 	Stream st(REP::POTENCIAL);
 	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
 	player->send(st);
@@ -1486,6 +1502,8 @@ void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
 void OnOpenSocketReq( GameMsgHdr& hdr, OpenSocketReq& osr )
 {
 	MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
 	Stream st(REP::EQ_TO_PUNCH);
 	st << player->GetPackage()->OpenSocket(osr._fighterId, osr._itemid) << osr._fighterId << osr._itemid << Stream::eos;
 	player->send(st);
@@ -2048,6 +2066,8 @@ void OnTaskActionReq(GameMsgHdr& hdr, TaskActionReq& req)
 		succ = GameAction()->AbandonTask(player, req.m_TaskId);
 		break;
     case 3:
+        if (!player->hasChecked())
+            return;
         // 师门，衙门任务立即完成
         succ = player->addAwardByTaskColor(req.m_TaskId, true);
 		succ1 = player->GetTaskMgr()->CompleteClanTaskDirect(req.m_TaskId);
@@ -3070,6 +3090,8 @@ struct MailSendRep
 void OnMailSendReq( GameMsgHdr& hdr, MailSendReq& msr )
 {
 	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
 	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(msr._target)];
 	if(pl == NULL)
 	{
@@ -3198,7 +3220,6 @@ struct PwdQuestion
 
 void OnPwdQuestionReq( GameMsgHdr& hdr, PwdQuestion& )
 {
-    return; // TODO::
 	MSG_QUERY_PLAYER(player);
 	Stream st(REP::SECOND_PWD);
 	st << player->getQuestionForPWD() << Stream::eos;
@@ -3207,7 +3228,6 @@ void OnPwdQuestionReq( GameMsgHdr& hdr, PwdQuestion& )
 
 void OnOpPwdReq( GameMsgHdr& hdr, const void * data)
 {
-    return; // TODO:
 	MSG_QUERY_PLAYER(player);
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt8 res = 0;
@@ -3251,7 +3271,6 @@ struct LockPwdReq
 
 void OnLockPwdReq( GameMsgHdr& hdr, LockPwdReq&  lpd)
 {
-    // TODO:
 	MSG_QUERY_PLAYER(player);
 	UInt8 res = 0;
 	if(lpd.flag == 0)
@@ -3376,6 +3395,8 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             break;
         case 7:
             {
+                if (!player->hasChecked())
+                    return;
                 UInt8 skillid = 0;
                 UInt8 type = 0;
                 brd >> skillid;
@@ -3418,6 +3439,8 @@ void OnHeroIslandReq( GameMsgHdr& hdr, const void * data )
             break;
         case 13:
             {
+                if (!player->hasChecked())
+                    return;
                 UInt8 onoff = 0;
                 brd >> onoff;
                 GObject::heroIsland.setAto(player, onoff);
@@ -3509,6 +3532,8 @@ void OnClanRankBattleReq(GameMsgHdr& hdr, const void* data)
             break;
         case 4: //购买使用帮派战技能
             {
+                if (!player->hasChecked())
+                    return;
                 UInt8 skillId = 0;
                 brd >> skillId;
                 ClanRankBattleMgr::Instance().UseSkill(player, skillId);
@@ -3559,12 +3584,16 @@ void OnClanRankBattleSortList(GameMsgHdr& hdr, const void* data)
 void OnPracticeHookAddReq( GameMsgHdr& hdr, PracticeHookAddReq& req)
 {
     MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
     player->accPractice();
 }
 
 void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
 {
     MSG_QUERY_PLAYER(player);
+    if (!player->hasChecked())
+        return;
     if(player->getTael() < 100)
         return;
 
@@ -3688,6 +3717,8 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
     switch(type )
     {
         case 0:
+            if (!player->hasChecked())
+                return;
             mgr->ChangeOnlineReward();
             break;
 

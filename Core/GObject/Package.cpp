@@ -42,7 +42,7 @@ namespace GObject
 #define EQUIPTYPE_EQUIP 0
 #define EQUIPTYPE_TRUMP 1
 
-    static URandom equrnd(time(0)); // XXX: 加载和运行时都需要使用
+    extern URandom GRND;
 
     UInt16 getRandOEquip(UInt8 lvl)
     {
@@ -58,7 +58,7 @@ namespace GObject
         lvl -= 50;
         lvl /= 10;
 
-        UInt8 idx = equrnd(24);
+        UInt8 idx = GRND(24);
         equipid = equips[lvl][idx];
         return equipid;
     }
@@ -77,7 +77,7 @@ namespace GObject
         lvl -= 40;
         lvl /= 10;
 
-        UInt8 idx = equrnd(24);
+        UInt8 idx = GRND(24);
         equipid = equips[lvl][idx];
         return equipid;
     }
@@ -85,7 +85,7 @@ namespace GObject
     static UInt32  gem[] = { 5001, 5011, 5021, 5031, 5041, 5051, 5061, 5071, 5081, 5091, 5101, 5111, 5121, 5131, 5141 };
     UInt32 getRandGem(UInt8 lev)
     {
-        UInt8 idx = equrnd(15);
+        UInt8 idx = GRND(15);
 
         if(lev > 1 && lev <= 9)
             return gem[idx] + lev;

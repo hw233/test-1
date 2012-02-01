@@ -168,6 +168,9 @@ void FrontMap::enter(Player* pl, UInt8 id)
     if (!pl || !id)
         return;
 
+    if (!pl->hasChecked())
+        return;
+
     if (!checkLevel(pl, id))
         return;
 
@@ -552,6 +555,9 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                     if (pl->getVipLevel() < 7)
                         return;
                 }
+
+                if (!pl->hasChecked())
+                    return;
 
                 if (GData::moneyNeed[GData::FRONTMAP_IM].gold > pl->getGoldOrCoupon())
                 {
