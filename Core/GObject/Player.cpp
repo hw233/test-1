@@ -1768,7 +1768,7 @@ namespace GObject
         if (!load && !fgt->getCittasNum())
             upInitCitta(fgt, true);
 
-        fgt->getAttrType1(true, isMainFighter(fgt->getId()));
+        fgt->getAttrType1(true);
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
 	}

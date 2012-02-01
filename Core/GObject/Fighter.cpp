@@ -1007,46 +1007,46 @@ inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 	switch(type)
 	{
     case 1:
-        ae.strengthP += (value/10000);
+        ae.strengthP += ((double)value/10000.f);
         break;
     case 2:
-        ae.physiqueP += (value/10000);
+        ae.physiqueP += ((double)value/10000.f);
         break;
 	case 3:
-        ae.agilityP += (value/10000);
+        ae.agilityP += ((double)value/10000.f);
 		break;
 	case 4:
-        ae.intelligenceP += (value/10000);
+        ae.intelligenceP += ((double)value/10000.f);
 		break;
 	case 5:
-        ae.willP += (value/10000);
+        ae.willP += ((double)value/10000.f);
 		break;
     case 6:
-        ae.tough += (value/10000); // XXX:
+        ae.tough += ((double)value/100.f);
         break;
     case 7:
-        ae.actionP += (value/10000);
+        ae.actionP += ((double)value/10000.f);
         break;
     case 8:
-        ae.hitrate += (value/10000);
+        ae.hitrate += ((double)value/100.f);
         break;
     case 9:
-        ae.evade += (value/10000);
+        ae.evade += ((double)value/100.f);
         break;
     case 10:
-        ae.critical += (value/10000);
+        ae.critical += ((double)value/100.f);
         break;
     case 11:
-        ae.criticaldmg += (value/10000);
+        ae.criticaldmg += ((double)value/10000.f);
         break;
     case 12:
-        ae.pierce += (value/10000);
+        ae.pierce += ((double)value/100.f);
         break;
     case 13:
-        ae.counter += (value/10000);
+        ae.counter += ((double)value/100.f);
         break;
     case 14:
-        ae.magres += (value/10000);
+        ae.magres += ((double)value/100.f);
         break;
 	}
 }
@@ -3083,21 +3083,21 @@ void Fighter::setAttrValue3(UInt16 v)
     _attrValue3 = v;
 }
 
-UInt8 Fighter::getAttrType1(bool notify, bool initmain)
+UInt8 Fighter::getAttrType1(bool notify)
 {
     UInt8 ret = 1;
     if (!_attrType1)
-        ret = forge(1, 0, initmain);
+        ret = forge(1, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrType1;
 }
 
-UInt16 Fighter::getAttrValue1(bool notify, bool initmain)
+UInt16 Fighter::getAttrValue1(bool notify)
 {
     UInt8 ret = 1;
     if (!_attrType1)
-        ret = forge(1, 0, initmain);
+        ret = forge(1, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrValue1;
@@ -3107,7 +3107,7 @@ UInt8 Fighter::getAttrType2(bool notify)
 {
     UInt8 ret = 1;
     if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
-        ret = forge(2);
+        ret = forge(2, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrType2;
@@ -3117,7 +3117,7 @@ UInt16 Fighter::getAttrValue2(bool notify)
 {
     UInt8 ret = 1;
     if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
-        ret = forge(2);
+        ret = forge(2, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrValue2;
@@ -3177,7 +3177,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 }
                 while (type == _attrType1 || type == _attrType3);
 
-                UInt16 value = GObjectManager::getFFValue(type);
+                UInt16 value = GObjectManager::getFFValue(type, initmain);
                 if (!value)
                     return 1;
 
@@ -3199,7 +3199,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 }
                 while (type == _attrType2 || type == _attrType1);
 
-                UInt16 value = GObjectManager::getFFValue(type);
+                UInt16 value = GObjectManager::getFFValue(type, initmain);
                 if (!value)
                     return 1;
 
@@ -3304,15 +3304,18 @@ void Fighter::updateForgeAttr(bool notify)
 void Fighter::broadcastForge(UInt8 lock)
 {
     bool b = false;
-    if (!(lock & 0x1) && (((((double)_attrValue1 / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.9f))
+    if (!(lock & 0x1) && (((((double)_attrValue1 / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.909f))
         b = true;
-    if (!(lock & 0x2) && (((((double)_attrValue2 / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.9f))
+    if (!(lock & 0x2) && (((((double)_attrValue2 / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.909f))
         b = true;
-    if (!(lock & 0x4) && (((((double)_attrValue3 / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.9f))
+    if (!(lock & 0x4) && (((((double)_attrValue3 / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.909f))
         b = true;
 
     if (b)
+    {
+        fprintf(stderr, "%u, %u, %u, %u, %u, %u\n", _attrType1, _attrValue1,  _attrType2, _attrValue2,  _attrType3, _attrValue3);
         SYSMSG_BROADCASTV(2330, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str());
+    }
 }
 
 }
