@@ -11,7 +11,7 @@ local attrChance = {3950, 6450, 7950, 8950, 9450, 9850, 9950, 10000}
 -- 各区间最大值(百分比)
 local attrMaxValProp = {20, 25, 50, 60, 70, 80, 90, 96, 100}
 -- 各属性的最大值(百分比)
-local attrMaxVal = {30,35,40,30,40,8,15,4,4,4,6,4,4,4}
+local attrMaxVal = {25,30,30,25,30,4,15,4,4,4,6,4,4,4}
 
 function loadFighterForge()
     for k,v in pairs(attrTypeChance)

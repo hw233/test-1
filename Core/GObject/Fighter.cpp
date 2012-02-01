@@ -1022,31 +1022,31 @@ inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
         ae.willP += ((double)value/10000.f);
 		break;
     case 6:
-        ae.tough += ((double)value/10000.f); // XXX:
+        ae.tough += ((double)value/100.f);
         break;
     case 7:
         ae.actionP += ((double)value/10000.f);
         break;
     case 8:
-        ae.hitrate += ((double)value/10000.f);
+        ae.hitrate += ((double)value/100.f);
         break;
     case 9:
-        ae.evade += ((double)value/10000.f);
+        ae.evade += ((double)value/100.f);
         break;
     case 10:
-        ae.critical += ((double)value/10000.f);
+        ae.critical += ((double)value/100.f);
         break;
     case 11:
         ae.criticaldmg += ((double)value/10000.f);
         break;
     case 12:
-        ae.pierce += ((double)value/10000.f);
+        ae.pierce += ((double)value/100.f);
         break;
     case 13:
-        ae.counter += ((double)value/10000.f);
+        ae.counter += ((double)value/100.f);
         break;
     case 14:
-        ae.magres += ((double)value/10000.f);
+        ae.magres += ((double)value/100.f);
         break;
 	}
 }
