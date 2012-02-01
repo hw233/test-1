@@ -353,7 +353,7 @@ public:
 	inline UInt16 getExtraSoul() { checkDirty(); return _attrExtraEquip.soul; }
 	inline UInt16 getExtraAura() { checkDirty(); return _attrExtraEquip.aura; }
 	inline UInt16 getExtraAuraMax() { checkDirty(); return _attrExtraEquip.auraMax; }
-	inline UInt16 getExtraTough() { checkDirty(); return _attrExtraEquip.tough; }
+	inline float getExtraTough() { checkDirty(); return _attrExtraEquip.tough; }
 	inline float getExtraStrengthP() { checkDirty(); return _attrExtraEquip.strengthP; }
 	inline float getExtraPhysiqueP() { checkDirty(); return _attrExtraEquip.physiqueP; }
 	inline float getExtraAgilityP() { checkDirty(); return _attrExtraEquip.agilityP; }
