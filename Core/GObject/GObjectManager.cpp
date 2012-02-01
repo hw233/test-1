@@ -3636,7 +3636,7 @@ namespace GObject
         return 0;
     }
 
-    UInt16 GObjectManager::getFFValue(UInt8 type)
+    UInt16 GObjectManager::getFFValue(UInt8 type, bool initmain)
     {
         if (!type)
             return 0;
@@ -3645,6 +3645,9 @@ namespace GObject
             return 0;
         if (type > _FFAttrMaxVal.size())
             return 0;
+
+        if (initmain)
+            return GRND(20, 40) * _FFAttrMaxVal[type-1];
 
         UInt32 size = _FFAttrChance.size();
         if (!size)

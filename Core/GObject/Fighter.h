@@ -332,14 +332,14 @@ public:
     void setAttrValue2(UInt16 v);
     void setAttrType3(UInt8 t);
     void setAttrValue3(UInt16 v);
-    UInt8 getAttrType1(bool = false);
-    UInt16 getAttrValue1(bool = false);
+    UInt8 getAttrType1(bool = false, bool = false);
+    UInt16 getAttrValue1(bool = false, bool = false);
     UInt8 getAttrType2(bool = false);
     UInt16 getAttrValue2(bool = false);
     UInt8 getAttrType3(bool = false);
     UInt16 getAttrValue3(bool = false);
 
-    UInt8 forge(UInt8 which, UInt8 lock = 0);
+    UInt8 forge(UInt8 which, UInt8 lock = 0, bool = false);
     void updateForgeAttr(bool = true);
     void broadcastForge(UInt8);
 

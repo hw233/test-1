@@ -1333,6 +1333,12 @@ void OnFighterRegenReq( GameMsgHdr& hdr, FighterRegenReq& frr )
 void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 {
 	MSG_QUERY_PLAYER(player);
+    if (ftr._type > 4 && (ftr._type&0xF) == 5)
+    {
+        player->trainFighter(ftr._fgtId, ftr._type);
+        return;
+    }
+
 	Stream st(REP::POTENCIAL);
 	st << ftr._type << player->trainFighter(ftr._fgtId, ftr._type) << Stream::eos;;
 	player->send(st);

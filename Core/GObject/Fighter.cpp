@@ -1007,61 +1007,46 @@ inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 	switch(type)
 	{
     case 1:
-        ae.strengthP += value/10000;
+        ae.strengthP += (value/10000);
         break;
     case 2:
-        ae.physiqueP += value/10000;
+        ae.physiqueP += (value/10000);
         break;
 	case 3:
-        ae.agilityP += value/10000;
+        ae.agilityP += (value/10000);
 		break;
 	case 4:
-        ae.intelligenceP += value/10000;
+        ae.intelligenceP += (value/10000);
 		break;
 	case 5:
-        ae.willP += value/10000;
+        ae.willP += (value/10000);
 		break;
-	case 6:
-        ae.attackP += value/10000;
-		break;
-    case 7:
-        ae.magatkP += value/10000;
+    case 6:
+        ae.tough += (value/10000); // XXX:
         break;
-	case 8:
-        ae.defendP += value/10000;
-		break;
+    case 7:
+        ae.actionP += (value/10000);
+        break;
+    case 8:
+        ae.hitrate += (value/10000);
+        break;
     case 9:
-        ae.magdefP += value/10000;
+        ae.evade += (value/10000);
         break;
     case 10:
-        ae.hpP += value/10000;
+        ae.critical += (value/10000);
         break;
     case 11:
-        ae.tough += value/10000; // XXX:
+        ae.criticaldmg += (value/10000);
         break;
     case 12:
-        ae.actionP += value/10000;
+        ae.pierce += (value/10000);
         break;
     case 13:
-        ae.hitrate += value/10000;
+        ae.counter += (value/10000);
         break;
     case 14:
-        ae.evade += value/10000;
-        break;
-    case 15:
-        ae.critical += value/10000;
-        break;
-    case 16:
-        ae.criticaldmg += value/10000;
-        break;
-    case 17:
-        ae.pierce += value/10000;
-        break;
-    case 18:
-        ae.counter += value/10000;
-        break;
-    case 19:
-        ae.magres += value/10000;
+        ae.magres += (value/10000);
         break;
 	}
 }
@@ -3098,21 +3083,21 @@ void Fighter::setAttrValue3(UInt16 v)
     _attrValue3 = v;
 }
 
-UInt8 Fighter::getAttrType1(bool notify)
+UInt8 Fighter::getAttrType1(bool notify, bool initmain)
 {
     UInt8 ret = 1;
     if (!_attrType1)
-        ret = forge(1);
+        ret = forge(1, 0, initmain);
     if (!ret)
         updateForgeAttr(notify);
     return _attrType1;
 }
 
-UInt16 Fighter::getAttrValue1(bool notify)
+UInt16 Fighter::getAttrValue1(bool notify, bool initmain)
 {
     UInt8 ret = 1;
     if (!_attrType1)
-        ret = forge(1);
+        ret = forge(1, 0, initmain);
     if (!ret)
         updateForgeAttr(notify);
     return _attrValue1;
@@ -3150,7 +3135,7 @@ UInt16 Fighter::getAttrValue3(bool notify)
     return _attrValue3;
 }
 
-UInt8 Fighter::forge(UInt8 which, UInt8 lock)
+UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
 {
 #define FF_FORGE_ITEM 516
 #define FF_FORGE_PROT_ITEM 547
@@ -3171,7 +3156,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock)
                 }
                 while (type == _attrType2 || type == _attrType3);
 
-                UInt16 value = GObjectManager::getFFValue(type);
+                UInt16 value = GObjectManager::getFFValue(type, initmain);
                 if (!value)
                     return 1;
 
@@ -3239,9 +3224,13 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock)
                     ret = forge(1);
                     if (ret)
                         return ret;
-                    ret = forge(2);
-                    if (ret)
-                        return ret;
+                    if ((_potential >= 1.5f && _capacity >= 7.0f) || _attrType2)
+                    {
+                        ret = forge(2);
+                        if (ret)
+                            return ret;
+                    }
+                    // TODO
                     ret = forge(3);
                     if (ret)
                         return ret;
@@ -3269,12 +3258,16 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock)
                 }
                 if (!(lock & 0x2))
                 {
-                    ret = forge(2);
-                    if (ret)
-                        return ret;
+                    if ((_potential >= 1.5f && _capacity >= 7.0f) || _attrType2)
+                    {
+                        ret = forge(2);
+                        if (ret)
+                            return ret;
+                    }
                 }
                 if (!(lock & 0x4))
                 {
+                    // TODO:
                     ret = forge(3);
                     if (ret)
                         return ret;
@@ -3303,16 +3296,19 @@ void Fighter::updateForgeAttr(bool notify)
     }
 
     DB2().PushUpdateData("UPDATE `fighter` SET `attrType1` = %u, `attrValue1` = %u, `attrType2` = %u, `attrValue2` = %u, `attrType3` = %u, `attrValue3` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", _attrType1, _attrValue1, _attrType2, _attrValue2, _attrType3, _attrValue3, _id, _owner->getId());
+
+    _attrDirty = true;
+    _bPDirty = true;
 }
 
 void Fighter::broadcastForge(UInt8 lock)
 {
     bool b = false;
-    if (!(lock & 0x1) && ((_attrValue1 / (double)(100.f)) / GObjectManager::getFFMaxVal(_attrType1))  > 0.9f)
+    if (!(lock & 0x1) && (((((double)_attrValue1 / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.9f))
         b = true;
-    if (!(lock & 0x2) && ((_attrValue2 / (double)(100.f)) / GObjectManager::getFFMaxVal(_attrType2))  > 0.9f)
+    if (!(lock & 0x2) && (((((double)_attrValue2 / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.9f))
         b = true;
-    if (!(lock & 0x4) && ((_attrValue3 / (double)(100.f)) / GObjectManager::getFFMaxVal(_attrType3))  > 0.9f)
+    if (!(lock & 0x4) && (((((double)_attrValue3 / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.9f))
         b = true;
 
     if (b)

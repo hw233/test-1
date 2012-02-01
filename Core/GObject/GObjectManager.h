@@ -107,7 +107,7 @@ namespace GObject
         static void setFFAttrMaxVal(UInt32);
 
         static UInt8 getFFType();
-        static UInt16 getFFValue(UInt8);
+        static UInt16 getFFValue(UInt8,bool = false);
         static UInt8 getFFMaxVal(UInt8);
 
         static UInt8 getFFAttr(UInt8& type, UInt16& value);

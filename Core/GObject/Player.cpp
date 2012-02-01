@@ -1768,7 +1768,7 @@ namespace GObject
         if (!load && !fgt->getCittasNum())
             upInitCitta(fgt, true);
 
-        fgt->getAttrType1(true);
+        fgt->getAttrType1(true, isMainFighter(fgt->getId()));
         fgt->getAttrType2(true);
         fgt->getAttrType3(true);
 	}
@@ -6123,6 +6123,9 @@ namespace GObject
 			}
 			return 1;
 		}
+
+        if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
+            fgt->getAttrType2(true);
 		return 0;
 	}
 
