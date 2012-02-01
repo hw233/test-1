@@ -221,12 +221,12 @@ public:
 	inline void delFlag(UInt32 f) { _flag &= ~f; }
 	inline bool hasFlag(UInt32 f) { return (_flag & f) > 0;}
 	void setAttrExtra(UInt8, UInt8, UInt8);
-    inline void setImmuneLevel(UInt8 f) { _immuneLevel = f; }
-    inline void setImmune(UInt8 f) { _immune |= f; }
-    inline void setImmuneRound(UInt8 f) { _immuneRound = f; }
-    inline UInt8 getImmuneLevel() { return _immuneLevel; }
+    void setImmuneLevel(UInt8 state, UInt8 f);
+    void setImmune(UInt8 f) { _immune |= f; }
+    void setImmuneRound(UInt8 state, UInt8 f);
+    UInt8 getImmuneLevel(UInt8 state);
     inline UInt8 getImmune() { return _immune; }
-    inline UInt8 getImmuneRound() { return _immuneRound; }
+    UInt8 getImmuneRound(UInt8 state);
     inline void setForgetLevel(UInt8 f) { _forgetLevel = f; }
     inline void setForgetRound(UInt8 f) { _forgetRound = f; }
     inline UInt8 getForgetLevel() { return _forgetLevel; }
@@ -429,9 +429,9 @@ private:
     bool _revival;
     UInt8 _activeSkillIdx;
     // 入场时技能效果
-    UInt8 _immuneLevel;
+    UInt8 _immuneLevel[8];
     UInt8 _immune;
-    UInt8 _immuneRound;
+    UInt8 _immuneRound[8];
     bool _evade100;
     UInt8 _evade100_cd;
     UInt8 _evade100_last;

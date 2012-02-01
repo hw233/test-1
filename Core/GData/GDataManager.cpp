@@ -389,7 +389,6 @@ namespace GData
 			SetValOrPercent(aextra->_extra.magdef, aextra->_extra.magdefP, ae.magdef);
 			SetValOrPercent(aextra->_extra.hp, aextra->_extra.hpP, ae.hp);
 			SetValOrPercent(aextra->_extra.toughlvl, aextra->_extra.tough, ae.tough);
-            aextra->_extra.tough *= 100;
 			SetValOrPercent(aextra->_extra.action, aextra->_extra.actionP, ae.action);
 			SetValOrPercent(aextra->_extra.hitrlvl, aextra->_extra.hitrate, ae.hitrate);
             aextra->_extra.hitrate *= 100;
@@ -1074,7 +1073,6 @@ namespace GData
             SetValOrPercent(cft->magdef, cft->magdefP, cf.magdef);
             SetValOrPercent(cft->hp, cft->hpP, cf.hp);
 			SetValOrPercent(cft->toughlvl, cft->tough, cf.tough);
-            cft->tough *= 100;
 			SetValOrPercent(cft->action, cft->actionP, cf.action);
 			SetValOrPercent(cft->hitrlvl, cft->hitrate, cf.hitrate);
             cft->hitrate *= 100;
