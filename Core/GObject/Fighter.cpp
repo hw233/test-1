@@ -1007,46 +1007,46 @@ inline void addTalentAttr( GData::AttrExtra& ae, UInt8 type, UInt16 value )
 	switch(type)
 	{
     case 1:
-        ae.strengthP += (value/10000);
+        ae.strengthP += ((double)value/10000.f);
         break;
     case 2:
-        ae.physiqueP += (value/10000);
+        ae.physiqueP += ((double)value/10000.f);
         break;
 	case 3:
-        ae.agilityP += (value/10000);
+        ae.agilityP += ((double)value/10000.f);
 		break;
 	case 4:
-        ae.intelligenceP += (value/10000);
+        ae.intelligenceP += ((double)value/10000.f);
 		break;
 	case 5:
-        ae.willP += (value/10000);
+        ae.willP += ((double)value/10000.f);
 		break;
     case 6:
-        ae.tough += (value/10000); // XXX:
+        ae.tough += ((double)value/10000.f); // XXX:
         break;
     case 7:
-        ae.actionP += (value/10000);
+        ae.actionP += ((double)value/10000.f);
         break;
     case 8:
-        ae.hitrate += (value/10000);
+        ae.hitrate += ((double)value/10000.f);
         break;
     case 9:
-        ae.evade += (value/10000);
+        ae.evade += ((double)value/10000.f);
         break;
     case 10:
-        ae.critical += (value/10000);
+        ae.critical += ((double)value/10000.f);
         break;
     case 11:
-        ae.criticaldmg += (value/10000);
+        ae.criticaldmg += ((double)value/10000.f);
         break;
     case 12:
-        ae.pierce += (value/10000);
+        ae.pierce += ((double)value/10000.f);
         break;
     case 13:
-        ae.counter += (value/10000);
+        ae.counter += ((double)value/10000.f);
         break;
     case 14:
-        ae.magres += (value/10000);
+        ae.magres += ((double)value/10000.f);
         break;
 	}
 }
@@ -3312,7 +3312,10 @@ void Fighter::broadcastForge(UInt8 lock)
         b = true;
 
     if (b)
+    {
+        fprintf(stderr, "%u, %u, %u, %u, %u, %u\n", _attrType1, _attrValue1,  _attrType2, _attrValue2,  _attrType3, _attrValue3);
         SYSMSG_BROADCASTV(2330, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str());
+    }
 }
 
 }
