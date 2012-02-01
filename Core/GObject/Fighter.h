@@ -332,8 +332,8 @@ public:
     void setAttrValue2(UInt16 v);
     void setAttrType3(UInt8 t);
     void setAttrValue3(UInt16 v);
-    UInt8 getAttrType1(bool = false, bool = false);
-    UInt16 getAttrValue1(bool = false, bool = false);
+    UInt8 getAttrType1(bool = false);
+    UInt16 getAttrValue1(bool = false);
     UInt8 getAttrType2(bool = false);
     UInt16 getAttrValue2(bool = false);
     UInt8 getAttrType3(bool = false);
@@ -342,6 +342,9 @@ public:
     UInt8 forge(UInt8 which, UInt8 lock = 0, bool = false);
     void updateForgeAttr(bool = true);
     void broadcastForge(UInt8);
+
+    static inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
+    inline bool isMainFighter() { return isMainFighter(_id); }
 
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }

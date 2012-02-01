@@ -3083,21 +3083,21 @@ void Fighter::setAttrValue3(UInt16 v)
     _attrValue3 = v;
 }
 
-UInt8 Fighter::getAttrType1(bool notify, bool initmain)
+UInt8 Fighter::getAttrType1(bool notify)
 {
     UInt8 ret = 1;
     if (!_attrType1)
-        ret = forge(1, 0, initmain);
+        ret = forge(1, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrType1;
 }
 
-UInt16 Fighter::getAttrValue1(bool notify, bool initmain)
+UInt16 Fighter::getAttrValue1(bool notify)
 {
     UInt8 ret = 1;
     if (!_attrType1)
-        ret = forge(1, 0, initmain);
+        ret = forge(1, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrValue1;
@@ -3107,7 +3107,7 @@ UInt8 Fighter::getAttrType2(bool notify)
 {
     UInt8 ret = 1;
     if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
-        ret = forge(2);
+        ret = forge(2, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrType2;
@@ -3117,7 +3117,7 @@ UInt16 Fighter::getAttrValue2(bool notify)
 {
     UInt8 ret = 1;
     if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
-        ret = forge(2);
+        ret = forge(2, 0, true);
     if (!ret)
         updateForgeAttr(notify);
     return _attrValue2;
@@ -3177,7 +3177,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 }
                 while (type == _attrType1 || type == _attrType3);
 
-                UInt16 value = GObjectManager::getFFValue(type);
+                UInt16 value = GObjectManager::getFFValue(type, initmain);
                 if (!value)
                     return 1;
 
@@ -3199,7 +3199,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 }
                 while (type == _attrType2 || type == _attrType1);
 
-                UInt16 value = GObjectManager::getFFValue(type);
+                UInt16 value = GObjectManager::getFFValue(type, initmain);
                 if (!value)
                     return 1;
 

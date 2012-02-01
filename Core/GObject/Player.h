@@ -772,7 +772,7 @@ namespace GObject
         bool IsFighterEquipEnchantLev(UInt8 en, UInt8 num);
 		inline size_t getFighterCount() { return _fighters.size(); }
 		bool isFighterFull() const;
-		inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
+		inline bool isMainFighter(UInt32 id) { return Fighter::isMainFighter(id); }
         void upInitCitta(Fighter* fgt,bool = false);
 		void addFighter(Fighter * fgt, bool = true, bool = false);
 		Fighter * takeFighter(UInt32, bool = true);
