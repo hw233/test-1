@@ -369,7 +369,7 @@ namespace GObject
             _evade_max = lua_tinker::call<float>(L, "getEvadeMax");
             _critical_max = lua_tinker::call<float>(L, "getCriticalMax");
             _pierce_max = lua_tinker::call<float>(L, "getPierceMax");
-            _tough_max = lua_tinker::call<float>(L, "getToughMax") / 100;
+            _tough_max = lua_tinker::call<float>(L, "getToughMax");
             _counter_max = lua_tinker::call<float>(L, "getCounterMax");
             _mres_max = lua_tinker::call<float>(L, "getMagResMax");
         }

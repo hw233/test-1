@@ -950,6 +950,15 @@ float BattleFighter::getMagRes(BattleFighter* defgt)
     return magres;
 }
 
+float BattleFighter::calcCriticalDmg(BattleFighter* defender)
+{
+    float factor = getCriticalDmg() - defender->getTough(this);
+    if(factor < 1)
+        factor = 1;
+
+    return factor;
+}
+
 float BattleFighter::getTough(BattleFighter* defgt)
 {
     float tough = 0;
@@ -964,7 +973,7 @@ float BattleFighter::getTough(BattleFighter* defgt)
     if(tough < 0)
         return 0;
 
-    return tough;
+    return (tough/100);
 }
 
 void BattleFighter::setImmuneLevel(UInt8 state, UInt8 f)

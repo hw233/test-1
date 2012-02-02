@@ -51,7 +51,7 @@ public:
 	inline UInt16 getExtraSoul() { return _attrExtra.soul; }
 	inline UInt16 getExtraAura() { return _attrExtra.aura; }
 	inline UInt16 getExtraAuraMax() { return _attrExtra.auraMax; }
-	inline UInt16 getExtraTough() { return _attrExtra.tough; }
+	inline float getExtraTough() { return _attrExtra.tough; }
 	inline float getExtraStrengthP() { return _attrExtra.strengthP; }
 	inline float getExtraPhysiqueP() { return _attrExtra.physiqueP; }
 	inline float getExtraAgilityP() { return _attrExtra.agilityP; }
@@ -133,6 +133,7 @@ public:
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
 	inline float getCriticalDmg() {float ret = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2; return (ret > 0 ? ret : 0);}
+    float calcCriticalDmg(BattleFighter* defender);
 	float getPierce(BattleFighter* defgt);
 	float getCounter(BattleFighter* defgt);
 	float getMagRes(BattleFighter* defgt);

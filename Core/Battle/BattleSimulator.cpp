@@ -729,12 +729,12 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 float crratk = 0;
                 float crrmagatk = 0;
                 if(bf->getClass() == 3)
-                    crratk = aura_factor * (atk * skill->effect->crrdamP + skill->effect->addcrr * (cs ? bf->getCriticalDmg() : 1));
+                    crratk = aura_factor * (atk * skill->effect->crrdamP + skill->effect->addcrr * (cs ? bf->calcCriticalDmg(area_target) : 1));
                 else
-                    crrmagatk = aura_factor * (magatk * skill->effect->crrdamP + skill->effect->addcrr * (cs ? bf->getCriticalDmg() : 1));
+                    crrmagatk = aura_factor * (magatk * skill->effect->crrdamP + skill->effect->addcrr * (cs ? bf->calcCriticalDmg(area_target) : 1));
 
-                atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs ? bf->getCriticalDmg() : 1)) + crratk;
-                magatk = aura_factor * (magatk * skill->effect->magdamP + skill->effect->addmag * (cs ? bf->getCriticalDmg() : 1)) + crrmagatk;
+                atk = aura_factor * (atk * skill->effect->damageP + skill->effect->adddam * (cs ? bf->calcCriticalDmg(area_target) : 1)) + crratk;
+                magatk = aura_factor * (magatk * skill->effect->magdamP + skill->effect->addmag * (cs ? bf->calcCriticalDmg(area_target) : 1)) + crrmagatk;
             }
             else
             {
@@ -934,12 +934,21 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 				{
                     defList[0].damType2 |= 0x80;
 					bool cs = false;
-					float atk = target_fighter->getAttack();
+                    float cf = 0.0f;
+                    float atk = target_fighter->calcAttack(cs, bf, &cf);
+                    if(cs )
+                    {
+                        UInt8 s = target_fighter->getSide();
+                        if(s < 2)
+                            _maxCSFactor[s] = std::max( cf, _maxCSFactor[s] ) ;
+
+                    }
+					//float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
 					bool pr = target_fighter->calcPierce(bf);
 					UInt32 dmg2 = (pr ? static_cast<UInt32>(atk) : _formula->calcDamage(atk, def, target_fighter->getLevel()));
 
-                    float atkreduce = area_target->getAtkReduce();
+                    float atkreduce = bf->getAtkReduce();
                     if(atkreduce && dmg2 > 0)
                         dmg2 -= factor * atk * atkreduce / 100;
 
