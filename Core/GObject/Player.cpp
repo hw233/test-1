@@ -3932,6 +3932,12 @@ namespace GObject
 	{
 		if (spot == _playerData.location && inCity == (_playerData.inCity > 0))
 			return;
+
+		GObject::Country& cny = CURRENT_COUNTRY();
+		UInt8 old_cny = GObject::mapCollection.getCountryFromSpot(_playerData.location);
+        if (old_cny != cny.GetThreadID())
+            return;
+
         if (isJumpingMap())
             return;
         setJumpingMap(true);
@@ -3943,8 +3949,6 @@ namespace GObject
             cancelAutoCopy(getBuffData(PLAYER_BUFF_AUTOCOPY));
         if (GetVar(VAR_ATOFM))
             cancelAutoFrontMap(GetVar(VAR_ATOFM));
-
-		GObject::Country& cny = CURRENT_COUNTRY();
 
         if (_playerData.location == 8977)
         {

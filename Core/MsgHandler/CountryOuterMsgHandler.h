@@ -911,14 +911,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
 	pl->sendDailyInfo();
-    // TODO: 暂时不发送
-#if 0
 	{
 		Stream st;
 		pl->makeSenconPWDInfo(st);
 		conn->send(&st[0], st.size());
 	}
-#endif
 	if (level >= 30)
 	{
 		GameMsgHdr hdr(0x19F, WORKER_THREAD_WORLD, pl, 0);
@@ -3222,7 +3219,7 @@ void OnPwdQuestionReq( GameMsgHdr& hdr, PwdQuestion& )
 {
 	MSG_QUERY_PLAYER(player);
 	Stream st(REP::SECOND_PWD);
-	st << player->getQuestionForPWD() << Stream::eos;
+    player->makeSenconPWDInfo(st);
 	player->send(st);
 }
 
