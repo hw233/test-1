@@ -557,6 +557,8 @@ namespace GObject
         void sendLevelPack(UInt8);
         void resetThanksgiving();
 
+        void sendShusanLoveTitleCard(int);
+
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
 	public:
@@ -672,6 +674,7 @@ namespace GObject
 		UInt64 GetExp() const;
 		void AddExp(UInt64, UInt8 = 0);
 		void AddPExp(UInt32);
+		void AddPExpBy(Player*,UInt32);
 		void pendExp(UInt32, bool = false);
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }

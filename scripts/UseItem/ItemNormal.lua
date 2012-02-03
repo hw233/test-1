@@ -355,6 +355,38 @@ function ItemNormal_00000401(iid, num, bind, param)
     return false
 end
 
+function ItemNormal_00000438(iid, num, bind, param)
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+
+    if fgt == nil then
+        return false
+    end
+
+    if ItemNormal_AddBuff(fgt, 7, 7200, num, 356400) then
+        package:DelItemSendMsg(438, player);
+        return num;
+    end
+    return false
+end
+
+function ItemNormal_00000439(iid, num, bind, param)
+    local player = GetPlayer()
+    local fgt = player:findFighter(param);
+    local package = player:GetPackage();
+
+    if fgt == nil then
+        return false
+    end
+
+    if ItemNormal_AddBuff(fgt, 8, 7200, num, 356400) then
+        package:DelItemSendMsg(439, player);
+        return num;
+    end
+    return false
+end
+
 function ItemNormal_00000027(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
@@ -1349,6 +1381,14 @@ function ItemNormal_00000437(iid, num, bind, param)
     local package = player:GetPackage();
     package:DelItemSendMsg(437, player);
     player:getTael(5000*num)
+    return num;
+end
+
+function ItemNormal_shusanLoveCard(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(iid-442+5)
+    package:DelItemSendMsg(iid, player);
     return num;
 end
 
@@ -6845,6 +6885,8 @@ local ItemNormal_Table = {
     [402] = ItemNormal_00000402,
     [403] = ItemNormal_00000403,
     [401] = ItemNormal_00000401,
+    [438] = ItemNormal_00000438,
+    [439] = ItemNormal_00000439,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
 	[35] = ItemNormal_00000035,
@@ -6879,6 +6921,12 @@ local ItemNormal_Table = {
     [435] = ItemNormal_00000435,
     [436] = ItemNormal_00000436,
     [437] = ItemNormal_00000437,
+    [442] = ItemNormal_shusanLoveCard,
+    [443] = ItemNormal_shusanLoveCard,
+    [444] = ItemNormal_shusanLoveCard,
+    [445] = ItemNormal_shusanLoveCard,
+    [446] = ItemNormal_shusanLoveCard,
+    [447] = ItemNormal_shusanLoveCard,
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,
@@ -7165,10 +7213,53 @@ local ItemNormal_Table = {
     [25] = ItemNormal_athletics_25
 };
 
+function ItemNormalOther_00000441(iid, num, bind, other)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    player:AddPExp(num*99)
+    SendMsg(player, 0x1, "你对[p:"..other:getCountry()..":"..other:getPName().."]表达了爱慕之意");
+    other:AddPExpBy(player, num*99)
+    SendMsg(other, 0x1, "[p:"..player:getCountry()..":"..player:getPName().."]对你表达了爱慕之意");
+
+
+    if num >= 36 then
+        local msgs = {
+            "[p:"..player:getCountry()..":"..player:getPName().."]送给了[p:"..other:getCountry()..":"..other:getPName().."]999个自己亲手折叠的千纸鹤。",
+            "[p:"..player:getCountry()..":"..player:getPName().."]给了[p:"..other:getCountry()..":"..other:getPName().."]一个深情的拥抱。",
+            "[p:"..player:getCountry()..":"..player:getPName().."]一把搂住了[p:"..other:getCountry()..":"..other:getPName().."]狠狠亲了一口。",
+            "[p:"..player:getCountry()..":"..player:getPName().."]含情脉脉的注视[p:"..other:getCountry()..":"..other:getPName().."]的双眼，空气中充满了浪漫的味道。",
+            "[p:"..player:getCountry()..":"..player:getPName().."]将[p:"..other:getCountry()..":"..other:getPName().."]的手搭在自己胸口，让对方感受自己的心跳。",
+            "[p:"..player:getCountry()..":"..player:getPName().."]轻吻了[p:"..other:getCountry()..":"..other:getPName().."]的手背，唇齿间充满了无限的爱意。"
+        }
+
+        local p = math.random(1, #msgs)
+        Broadcast(0x27, msgs[p])
+    end
+
+    player:AddVar(48, num)
+
+    package:DelItemSendMsg(441, player);
+    return num
+end
+
+local ItemNormalOther_Table = {
+  [441] = ItemNormalOther_00000441,
+}
+
 function RunItemNormalUse(itemId, num, bind, param)
 	local trigger = ItemNormal_Table[itemId];
 	if trigger == nil then
 		return false;
 	end
-	return trigger(itemId, num, bind, param);	
+	return trigger(itemId, num, bind, param);
 end
+
+function RunItemNormalUseOther(itemId, num, bind, other)
+	local trigger = ItemNormalOther_Table[itemId];
+	if trigger == nil then
+		return false;
+	end
+	return trigger(itemId, num, bind, other);
+end
+

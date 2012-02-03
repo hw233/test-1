@@ -90,6 +90,7 @@ private:
     void OnAddPExp(GObject::Player * player, std::vector<std::string>&);
     void OnSetAcu(GObject::Player * player, std::vector<std::string>&);
     void OnUseItem(GObject::Player * player, std::vector<std::string>&);
+    void OnUseItemOther(GObject::Player * player, std::vector<std::string>&);
 	void OnOcupyPlace(GObject::Player *, std::vector<std::string>&);
 	void OnEnterCopy(GObject::Player *, std::vector<std::string>&);
     void OnWorldAnnounce(GObject::Player *, std::vector<std::string>&);

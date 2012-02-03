@@ -24,6 +24,8 @@ namespace GObject
 #define FIGHTER_BUFF_ATTR3		0x03
 #define FIGHTER_BUFF_XTHTYT     0x04
 #define FIGHTER_BUFF_CRMASGIRL  0x05
+#define FIGHTER_BUFF_DRESS      0x07
+#define FIGHTER_BUFF_WEDDING    0x08
 
 #define FIGHTER_BUFF_COUNT 0x10 
 
@@ -535,7 +537,7 @@ protected:
         if (!values || !size)
             return true; // XXX: will be set to ''
 
-        char buf[256] = {0};
+        char buf[1024] = {0};
         char* pbuf = buf;
         char* pend = &buf[sizeof(buf)-1];
         for (int i = 0; i < size; ++i)

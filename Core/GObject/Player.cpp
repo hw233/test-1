@@ -829,6 +829,8 @@ namespace GObject
             GameAction()->onChristmas(this);
         if (World::getNewYear())
             GameAction()->onNewYear(this);
+        if (World::getValentineDay())
+            GameAction()->onValentineDay(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -3862,6 +3864,20 @@ namespace GObject
 			if(fgt != NULL)
 				fgt->addPExp(pexp);
 		}
+    }
+
+    void Player::AddPExpBy(Player* player, UInt32 pexp)
+    {
+        if (!player || !pexp)
+            return;
+
+        if (isOnline())
+        {
+            GameMsgHdr hdr2(0x238, this->getThreadId(), this, sizeof(UInt32));
+            GLOBAL().PushMsg(hdr2, &pexp);
+        }
+        else
+            AddPExp(pexp);
     }
 
 	void Player::AddExp(UInt64 exp, UInt8 mlvl)
@@ -7010,9 +7026,10 @@ namespace GObject
 	{
 		if(!_pwdInfo.secondPWD.empty() && _pwdInfo.isLocked != 0)
 		{
-			if(getBuffLeft(PLAYER_BUFF_PWDLOCK, TimeUtil::Now()) != 0)
+            UInt32 left = getBuffLeft(PLAYER_BUFF_PWDLOCK, TimeUtil::Now());
+			if(left != 0)
 			{
-				sendMsgCode(0, 2003);
+				sendMsgCode(0, 1009, left);
 				return false;
 			}
 			Stream st(REP::PWD_DAILOG);
@@ -8165,6 +8182,18 @@ namespace GObject
         {
             GameAction()->onBlueactiveday(this);
         }
+    }
+
+    void Player::sendShusanLoveTitleCard(int pos)
+    {
+        if (!pos || pos > 3)
+            return;
+        MailPackage::MailItem item[2][3] =
+        {
+            {{442, 1}, {444, 1}, {446, 1},},
+            {{443, 1}, {445, 1}, {447, 1},},
+        };
+        sendMailItem(2331, 2332, &item[IsMale()?0:1][pos - 1], 1, false);
     }
 
 } // namespace GObject

@@ -2602,6 +2602,12 @@ bool Fighter::addNewCitta( UInt16 citta, bool writedb, bool init )
 {
     if (!citta)
         return false;
+    if (_cittas.size() >= 40)
+    {
+        if (_owner)
+            _owner->sendMsgCode(0, 1704);
+        return false;
+    }
     const GData::CittaBase* cb = GData::cittaManager[citta];
     if (!cb)
         return false;

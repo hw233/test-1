@@ -1233,5 +1233,17 @@ void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
     if (prestige)
         player->getPrestige(prestige);
 }
+void OnSendLoverRingTitleCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendShusanLoveTitleCard(pos);
+}
+void OnAddPExpBy( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 pexp = *(UInt32*)(data);
+    player->AddPExp(pexp);
+}
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

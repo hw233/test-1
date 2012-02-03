@@ -71,6 +71,7 @@ bool World::_christmas = false;
 bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
+bool World::_valentineday = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -104,13 +105,14 @@ void World::World_Multi_Check( World * world )
 	clanManager.process(now, world->_today);
 }
 
-
-
-
 typedef std::multimap<UInt32, Player*> ChopStickSortMap;
 ChopStickSortMap chopStickSortMap;
 
+typedef std::multimap<UInt32, Player*> ShusanLoveSortMap;
+ShusanLoveSortMap shusanLoveSortMap;
+
 bool bSingleDayEnd = false;
+bool bValentineDayEnd = false;
 
 bool enum_midnight(void * ptr, void *)
 {
@@ -129,12 +131,6 @@ bool enum_midnight(void * ptr, void *)
         if (World::_thanksgiving)
             pl->resetThanksgiving();
     }
-#if 0
-	if(pl->getGold() > 0)
-	{
-		DBLOG1().PushUpdateData("insert into `gold_accounts`(`server_id`, `player_id`, `gold`, `time`) values(%u, %"I64_FMT"u, %u, %u)", cfg.serverLogId, pl->getId(), pl->getGold(), TimeUtil::SharpDay(1));
-	}
-#endif
 
     if(bSingleDayEnd)
     {
@@ -143,6 +139,13 @@ bool enum_midnight(void * ptr, void *)
         {
             chopStickSortMap.insert(std::make_pair(num, pl));
         }
+    }
+
+    if (bValentineDayEnd)
+    {
+        UInt32 num = pl->GetVar(VAR_SHUSAN_LOVE);
+        if(num > 0)
+            shusanLoveSortMap.insert(std::make_pair(num, pl));
     }
 
     if (World::_halloween && pl->isOnline())
@@ -241,11 +244,45 @@ bool enum_dungeon_midnight(void * ptr, void * data)
 
 	return true;
 }
+
+void SendLoverRingTitleCard()
+{
+    if(bValentineDayEnd)
+    {
+        int pos = 0;
+        UInt32 shunsanLoveNum = 0xFFFFFFFF;
+        for(ShusanLoveSortMap::reverse_iterator iter = shusanLoveSortMap.rbegin();
+                iter != shusanLoveSortMap.rend(); ++iter)
+        {
+            if(iter->first != shunsanLoveNum)
+            {
+                ++pos;
+                shunsanLoveNum = iter->first;
+            }
+            if(pos > 3) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x237, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendShusanLoveTitleCard(pos);
+            }
+        }
+    }
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
 
     bool bSingleDay = getSingleDay();
+    bool bValentineDay = getValentineDay();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
@@ -254,11 +291,16 @@ void World::World_Midnight_Check( World * world )
 	luckyDraw.checkCleanup();
 
     chopStickSortMap.clear();
+    shusanLoveSortMap.clear();
+
     //判断是不是光棍节结束
     bSingleDayEnd = bSingleDay && !getSingleDay();
+    //判断是不是情人节结束
+    bValentineDayEnd = bValentineDay && !getValentineDay();
+
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
 
-    //给筷子
+    //给筷子使用称号
     if(bSingleDayEnd)
     {
         int pos = 0;
@@ -280,6 +322,9 @@ void World::World_Midnight_Check( World * world )
             SYSMSG_BROADCASTV(2142, player->getCountry(), player->getPName(), titles[pos]); 
         }
     }
+
+    //给巧克力使用称号卡
+    SendLoverRingTitleCard();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -306,27 +351,6 @@ void World::World_CreateNewDB_Check()
 }
 void CreateNewDB(UInt32 mon , UInt32 year)
 {
-   //TO DO 配置
-   //if(0 == mon)
-   //{
-   //    UInt32 day = 1;
-   //    TimeUtil::GetDMY(&day, &mon, &year);
-   //
-#if 0
-   DBLOG1().PushUpdateData("CREATE TABLE IF NOT EXISTS `consume_tael_%u_%u`\
-           ( `server_id` int(10) unsigned NOT NULL,\
-             `player_id` bigint(20) unsigned NOT NULL,\
-             `item_id` int(10) unsigned NOT NULL,\
-             `consume_type` int(10) unsigned NOT NULL,\
-             `item_num` int(10) unsigned NOT NULL,\
-             `expenditure` int(10) unsigned NOT NULL,\
-             `consume_time` int(10) unsigned NOT NULL,\
-             INDEX server_player (`server_id`, `player_id`),\
-             INDEX server_player_item (`server_id`, `player_id`, `item_id`),\
-             INDEX server_player_type (`server_id`, `player_id`, `consume_type`)\
-           ) ENGINE=MyISAM DEFAULT CHARSET=utf8;",year, mon);
-#endif
-
     DBLOG1().PushUpdateData(cfg.sql_consume_tael.c_str(), year, mon);
     DBLOG1().PushUpdateData(cfg.sql_item_courses.c_str(), year, mon);
     DBLOG1().PushUpdateData(cfg.sql_item_histories.c_str(), year, mon);

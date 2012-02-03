@@ -45,6 +45,8 @@ namespace REQ
     const UInt8 FIRE_HERO           = 0xD4;// 0x27
     /**接收散仙*/                             
     const UInt8 ACCEPT_FIGHTER      = 0xD5;// 0x28
+    /**对某人使用物品*/                             
+    const UInt8 PACK_USE_OTHER      = 0xD7;//
     /**加血*/
     const UInt8 ADD_HP              = 0xDE;// 0x29
     /**潜力洗炼*/
@@ -362,6 +364,7 @@ namespace REP
     const UInt8 HOTEL_PUB_LIST      = 0xD3;// 0x26
     const UInt8 FIGHTER_DISMISS     = 0xD4;// 0x27
     const UInt8 FIGHTER_ACCEPT      = 0xD5;// 0x28
+    const UInt8 PACK_USE_OTHER      = 0xD7;//
     const UInt8 PUB_LIST            = 0x2A;
     const UInt8 POTENCIAL           = 0xDF;// 0x2C
 

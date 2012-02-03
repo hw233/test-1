@@ -81,6 +81,10 @@ public:
     { _rechargeactive = v; }
     inline static bool getRechargeActive()
     { return _rechargeactive; }
+    inline static void setValentineDay(bool v)
+    { _valentineday = v; }
+    inline static bool getValentineDay()
+    { return _valentineday; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -111,6 +115,7 @@ public:
     static bool _newyear;
     static bool _blueactiveday;
     static bool _rechargeactive;
+    static bool _valentineday;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

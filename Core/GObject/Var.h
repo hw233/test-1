@@ -77,6 +77,9 @@ namespace GObject
         VAR_BLUE_ACTIVE_GET = 45, //蓝钻登陆1小时在线奖励
         VAR_RECHARGE_TOTAL = 46, //新年充值活动
 
+        VAR_LOVER_RING = 47, //情人之戒
+        VAR_SHUSAN_LOVE = 48, //蜀山之恋
+
         VAR_MAX,
     };
 
@@ -151,6 +154,9 @@ namespace GObject
 
             REGISTER_VAR(VAR_BLUE_ACTIVE_GET, CYCLE_DAY);
             REGISTER_VAR(VAR_RECHARGE_TOTAL, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_LOVER_RING, CYCLE_YEAR);
+            REGISTER_VAR(VAR_SHUSAN_LOVE, CYCLE_YEAR);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

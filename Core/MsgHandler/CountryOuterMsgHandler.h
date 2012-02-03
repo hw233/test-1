@@ -471,6 +471,15 @@ struct UseItemReq
 	MESSAGE_DEF4(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param);
 };
 
+struct UseItemOtherReq
+{
+	UInt32 m_ItemId;
+	UInt8  m_ItemBindType;
+	UInt16 m_ItemNum;
+    std::string m_OtherName;
+	MESSAGE_DEF4(REQ::PACK_USE_OTHER, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, std::string, m_OtherName);
+};
+
 struct BugInfoReq
 {
   std::string _title;
@@ -507,6 +516,14 @@ void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 	{
 		pl->GetPackage()->UseItem(req.m_ItemId, req.m_ItemNum, req.m_Param, req.m_ItemBindType);
 	}
+}
+
+void OnUseItemOtherReq( GameMsgHdr& hdr, UseItemOtherReq& req )
+{
+	MSG_QUERY_PLAYER(pl);
+    if (!pl->hasChecked())
+        return;
+    pl->GetPackage()->UseItemOther(req.m_ItemId, req.m_ItemNum, req.m_OtherName, req.m_ItemBindType);
 }
 
 struct ExtendPackageReq
@@ -2762,6 +2779,7 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 }
 
 #define ITEM_SPEAKER 16
+#define ITEM_FLOWER 440
 
 void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 {
@@ -2794,6 +2812,9 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 		break;
 	case 3:
 		if(!player->GetPackage()->DelItemAny(ITEM_SPEAKER, 1))
+			break;
+    case 8:
+		if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
 			break;
 	default:
 		NETWORK()->Broadcast(st);
