@@ -1069,8 +1069,8 @@ namespace GObject
     private:
         bool _isJumpingMap;
     public:
-        bool isJumpingMap() { return _isJumpingMap; }
-        void setJumpingMap(bool v) { _isJumpingMap = v; }
+        inline bool isJumpingMap() { return _isJumpingMap; }
+        inline void setJumpingMap(bool v) { _isJumpingMap = v; }
 
 	private:
 		Mutex _mutex;
