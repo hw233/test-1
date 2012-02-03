@@ -819,11 +819,6 @@ function ItemNormal_00000418(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 5 then
-		player:sendMsgCode(2, 1011, 0);
-		return false;
-	end
-
     local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     start = os.time(date)
     doubleend = start + 86400
@@ -833,6 +828,11 @@ function ItemNormal_00000418(iid, num, bind, param)
     if now >= start then
         if now < doubleend then
             factor = 2
+        end
+
+        if package:GetRestPackageSize() < (3+(6*factor)) then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
         end
 
         package:AddItem(56, 6*factor, true, 0, 2);
@@ -853,11 +853,6 @@ function ItemNormal_00000419(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-	if package:GetRestPackageSize() < 5 then
-		player:sendMsgCode(2, 1011, 0);
-		return false;
-	end
-
     local date = { ['year'] = 2012, ['month'] = 1, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }
     start = os.time(date)
     doubleend = start + 86400
@@ -867,6 +862,11 @@ function ItemNormal_00000419(iid, num, bind, param)
     if now >= start then
         if now < doubleend then
             factor = 2
+        end
+
+        if package:GetRestPackageSize() < (3+(6*factor)) then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
         end
 
         package:AddItem(56, 6*factor, true, 0, 2);
