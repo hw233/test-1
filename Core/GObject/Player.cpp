@@ -3873,7 +3873,7 @@ namespace GObject
 
         if (isOnline())
         {
-            GameMsgHdr hdr2(0x238, this->getThreadId(), this, sizeof(UInt32));
+            GameMsgHdr hdr2(0x238, this->getThreadId(), this, sizeof(pexp));
             GLOBAL().PushMsg(hdr2, &pexp);
         }
         else

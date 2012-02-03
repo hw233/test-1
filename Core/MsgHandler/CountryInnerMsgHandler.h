@@ -1233,7 +1233,7 @@ void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
     if (prestige)
         player->getPrestige(prestige);
 }
-void OnSendLoverRingTitleCard( GameMsgHdr& hdr, const void* data )
+void OnSendShusanLoveTitleCard( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     int pos = *(int*)(data);
