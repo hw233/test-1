@@ -1431,10 +1431,11 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                         pd->skills[1].lastcd = now + pd->skills[1].last;
                     else
                         pd->skills[1].lastcd += pd->skills[1].last;
+
+                    pd->skills[1].attr = &_skillattr[1];
                     pd->player->addHIAttr(*pd->skills[1].attr);
                 }
                 pd->skills[1].bufid = PLAYER_BUFF_HIPG;
-                pd->skills[1].attr = &_skillattr[1];
                 pd->player->setBuffData(pd->skills[1].bufid, pd->skills[1].lastcd, false);
                 SYSMSG_SEND(2130, pd->player);
                 st << cd;
@@ -1467,11 +1468,12 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                         pd->skills[2].lastcd = now + pd->skills[2].last;
                     else
                         pd->skills[2].lastcd += pd->skills[2].last;
+
+                    pd->skills[2].attr = &_skillattr[2];
                     pd->player->addHIAttr(*pd->skills[2].attr);
                 }
 
                 pd->skills[2].bufid = PLAYER_BUFF_HIBT;
-                pd->skills[2].attr = &_skillattr[2];
                 pd->player->setBuffData(pd->skills[2].bufid, pd->skills[2].lastcd, false);
                 SYSMSG_SEND(2131, pd->player);
                 st << cd;
@@ -1504,11 +1506,12 @@ bool HeroIsland::useSkill(Player* player, UInt8 skillid, UInt8 type)
                         pd->skills[3].lastcd = now + pd->skills[3].last;
                     else
                         pd->skills[3].lastcd += pd->skills[3].last;
+
+                    pd->skills[3].attr = &_skillattr[3];
                     pd->player->addHIAttr(*pd->skills[3].attr);
                 }
 
                 pd->skills[3].bufid = PLAYER_BUFF_HILN;
-                pd->skills[3].attr = &_skillattr[3];
                 pd->player->setBuffData(pd->skills[3].bufid, pd->skills[3].lastcd, false);
                 SYSMSG_SEND(2132, pd->player);
                 st << cd;
