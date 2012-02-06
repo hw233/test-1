@@ -817,13 +817,18 @@ namespace GObject
 
     void ClanRankBattle::OnPlayerLeave(Player* player)
     {
-        if(m_State == STATE_PREPARE) return;
-
-        for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
+        player->clearHIAttr();
+        player->ClearClanBattleSkillFlag();
+        
+        if(m_State == STATE_BATTLE)
         {
-            if(m_Fields[i].OnPlayerLeave(player))
+
+            for(UInt32 i = 0; i < RANK_BATTLE_FIELD_NUM; ++i)
             {
-                break;
+                if(m_Fields[i].OnPlayerLeave(player))
+                {
+                    break;
+                }
             }
         }
     }
