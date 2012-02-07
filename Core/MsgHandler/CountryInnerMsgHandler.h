@@ -14,6 +14,7 @@
 #include "GObject/EventBase.h"
 #include "GObject/Sale.h"
 #include "GObject/Mail.h"
+#include "GObject/PracticePlace.h"
 #include "GData/NpcGroup.h"
 #include "Battle/BattleSimulator.h"
 #include "GObject/Athletics.h"
@@ -1244,6 +1245,11 @@ void OnAddPExpBy( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     UInt32 pexp = *(UInt32*)(data);
     player->AddPExp(pexp);
+}
+void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::practicePlace.doAttack(player, data);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

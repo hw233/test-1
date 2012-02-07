@@ -82,7 +82,6 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
         UInt32 slotprice = 0;
         UInt32 protprice = 0;
-        ConsumeInfo ci(Practice,0,0);
         if(!clanflag)
         {
             if (place != PPLACE_MAX) {
@@ -107,11 +106,12 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                         return false;
                     }
 
+                    // XXX: 返还部分费用
                     UInt16 money =  ((float)pd->checktime / pd->traintime) * pd->slotprice;
                     UInt16 money2 =  ((float)pd->checktime / pd->traintime) * pd->protprice;
                     def->getTael(money + money2);
-                    data.slotincoming += pd->slotprice - money;
-                    data.protincoming += pd->protprice - money2;
+                    data.slotincoming += (pd->slotprice - money);
+                    data.protincoming += (pd->protprice - money2);
                     DB1().PushUpdateData("UPDATE `practice_place` SET `protincoming` = %u, `slotincoming` = %u WHERE `id` = %u", data.protincoming, data.slotincoming, place);
 
                     pd->winnerid = 0;
@@ -140,15 +140,15 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                     }
 
                     pd = 0;
-                    // DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", def->getId());
                     DB1().PushUpdateData("UPDATE `practice_data` SET place = %u where `id`= %"I64_FMT"u", PPLACE_MAX, def->getId());
-                    SYSMSG(title, 1000);
-                    SYSMSGV(content, 1001, pl->getName().c_str());
+
+                    SYSMSG(title, 2333);
+                    SYSMSGV(content, 2334, pl->getCountry(), pl->getName().c_str());
                     def->GetMailBox()->newMail(NULL, 1, title, content);
-                    //PopTimerEvent(def, EVENT_PLAYERPRACTICING, def->getId());
                 }
             }
 
+            ConsumeInfo ci(Practice,0,0);
 #if 0
             if (place == PPLACE_MAX || !data.slotmoney)
             {
@@ -205,7 +205,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             switch(prot)
             {
             case 1:
-                if(pl->GetPackage()->DelItemAny(ITEM_PRACTICE_PROT, 1) == false)
+                if(!pl->GetPackage()->DelItemAny(ITEM_PRACTICE_PROT, 1))
                 {
                     pl->sendMsgCode(0, 1055);
                     st << static_cast<UInt8>(1) << Stream::eos;
@@ -376,7 +376,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             return false;
         }
 
-        //data->lock.lock();
+        bool modified = false;
         for (size_t i = 0; i < size && i < nCount; ++i)
         {
             if (!isSitdownYet(data, fgtid[i]))
@@ -384,11 +384,13 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
                 if (pl->findFighter(fgtid[i]))
                 {
                     data->fighters.push_back(fgtid[i]);
-                    updateFighters(data->fighters, pl->getId());
+                    modified = true;
                 }
             }
         }
-        //data->lock.unlock();
+
+        if (modified)
+            updateFighters(data->fighters, pl->getId());
 
         st << static_cast<UInt8>(0) << Stream::eos;
 
@@ -416,16 +418,18 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             return false;
         }
 
-        //data->lock.lock();
+        bool modified = false;
         for (size_t i = 0; i < size; ++i)
         {
             if (isSitdownYet(data, fgtid[i]))
             {
                 data->fighters.remove(fgtid[i]);
-                updateFighters(data->fighters, pl->getId());
+                modified = true;
             }
         }
-        //data->lock.unlock();
+
+        if (modified)
+            updateFighters(data->fighters, pl->getId());
 
         // TODO: notify client
         return true;
@@ -707,6 +711,14 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         return true;
     }
 
+    struct PracticeAttackInfo
+    {
+        Player* player;
+        UInt8 place;
+        UInt16 idx;
+        bool sumfalg;
+    };
+
     bool PracticePlace::doChallenge(Player* pl, UInt8 place, UInt16 idx, const std::string& name)
     {
         if (!pl || !place)
@@ -774,15 +786,41 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             st << static_cast<UInt8>(idx);
             st << Stream::eos;
             pl->send(st);
-
-           return true;
+            return true;
         }
+
+        PracticeAttackInfo msg;
+        msg.player = pl;
+        msg.place = place;
+        msg.idx = idx;
+        msg.sumfalg = sumfalg;
+        GameMsgHdr hdr(0x239, def->getThreadId(), def, sizeof(PracticeAttackInfo));
+        GLOBAL().PushMsg(hdr, &msg);
+
+        return true;
+    }
+
+    bool PracticePlace::doAttack(Player* def, const void* data)
+    {
+        if (!data || !def)
+            return false;
+
+        PracticeAttackInfo* info = (PracticeAttackInfo*)(data);
+        Player* pl = info->player;
+        UInt16 idx = info->idx;
+        UInt8 place = info->place;
+        bool sumfalg = info->sumfalg;
+
+        PracticeData* pd = m_places[place-1].data[idx];
+        if (!pd)
+            return false;
 
         Battle::BattleSimulator bsim(pl->getLocation(), pl, def, false);
         pl->PutFighters(bsim, 0, true);
         def->PutFighters(bsim, 1, true);
         bsim.start();
         
+        Stream st(REP::PRACTICE_ROB);
         Stream& packet = bsim.getPacket();
         if(packet.size() <= 8) {
             st << static_cast<UInt8>(1);
@@ -847,7 +885,6 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
 
         st << Stream::eos;
         pl->send(st);
- 
         return true;
     }
 
@@ -1221,7 +1258,7 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
         PlaceData& oldpd = m_places[idx];
         if(idx != PPLACE_MAX)
         {
-            oldpd.place.maxslot -= oldpd.place.openslot + oldpd.place.techslot;
+            oldpd.place.maxslot -= (oldpd.place.openslot + oldpd.place.techslot);
             oldpd.place.openslot = 0;
             oldpd.place.techslot = 0;
             oldpd.data.resize(oldpd.place.maxslot);

@@ -1184,11 +1184,12 @@ namespace GObject
 		void setSecondPWDDB(std::string pwd, std::string question, std::string answer);
 		UInt8 activeSecondPWD(std::string pwd, std::string question, std::string answer);
 		UInt8 forgetSecondPWD(std::string pwd, std::string answer);
-		UInt8 deactiveSecondPWD(std::string answer);
+		UInt8 deactiveSecondPWD(std::string answer, bool = false);
 		UInt8 changeSecondPWD(std::string oldPWD, std::string newPWD);
 		std::string& getQuestionForPWD(){ return _pwdInfo.questionForPWD; }
 		void makeSenconPWDInfo(Stream& st);
 		bool hasChecked();
+        inline const SecondPWDInfo& getPWDInfo() const { return _pwdInfo; }
 
     private:
         UInt32 _worldBossHp;
@@ -1240,8 +1241,9 @@ namespace GObject
         std::string m_openid;
         std::string m_openkey;
         std::string m_source;
+        bool m_isOffical;
     public:
-        inline void setDomain(const std::string& domain) { m_domain = domain; }
+        inline void setDomain(const std::string& domain) { m_domain = domain; if (atoi(domain.c_str()) == 0) m_isOffical = true; }
         inline void setOpenId(const std::string& openid) { m_openid = openid; }
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
@@ -1249,6 +1251,7 @@ namespace GObject
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
+        inline const bool isOffical() const { return m_isOffical; }
 
     public:
         void sendTripodInfo();

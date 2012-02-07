@@ -296,9 +296,9 @@ void BattleSimulator::start(UInt8 prevWin)
                     UInt16 portrait = 0;
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;
-                    if(bf->getBuffData(FIGHTER_BUFF_DRESS, now))
+                    else if(bf->getBuffData(FIGHTER_BUFF_DRESS, now))
                         portrait = 1063;
-                    if(bf->getBuffData(FIGHTER_BUFF_WEDDING, now))
+                    else if(bf->getBuffData(FIGHTER_BUFF_WEDDING, now))
                         portrait = 1064;
                     else
                         portrait = bf->getPortrait();

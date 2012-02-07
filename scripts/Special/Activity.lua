@@ -126,6 +126,9 @@ function onLevelup(player, olev, nlev)
     if getNewYear() then
         onNewYear(player)
     end
+    if getValentineDay() then
+        onValentineDay(player)
+    end
 end
 
 function onDungeonWin(player, id, level)
@@ -920,7 +923,7 @@ function onValentineDay(player)
     end
 
     if lvl >= 30 and player:GetVar(47) == 0 then
-        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【情人之戒】；\n2012/2/10-2/16登陆游戏，并且级达到30级以上（包含30级）所有用户，都将获得【情人之戒】", {1754,1,1});
+        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且级达到30级以上（包含30级）所有用户，都将获得【情人之戒】", {1754,1,1});
         player:SetVar(47, 1)
     end
 end

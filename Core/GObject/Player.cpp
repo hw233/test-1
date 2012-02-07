@@ -576,7 +576,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_hasTripod(false)
+        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_isOffical(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -6974,9 +6974,9 @@ namespace GObject
 		return 0;
 	}
 
-	UInt8 Player::deactiveSecondPWD(std::string answer)
+	UInt8 Player::deactiveSecondPWD(std::string answer, bool force)
 	{
-		if(answer != _pwdInfo.answerForPWD)
+		if(!force && answer != _pwdInfo.answerForPWD)
 			return 1;
 		_pwdInfo.errCount = 0;
 		_pwdInfo.secondPWD.clear();
@@ -8188,12 +8188,13 @@ namespace GObject
     {
         if (!pos || pos > 3)
             return;
-        MailPackage::MailItem item[2][3] =
+        MailPackage::MailItem item[3][2] =
         {
-            {{442, 1}, {444, 1}, {446, 1},},
-            {{443, 1}, {445, 1}, {447, 1},},
+            {{442, 1}, {443, 1},},
+            {{444, 1}, {445, 1},},
+            {{446, 1}, {447, 1},},
         };
-        sendMailItem(2331, 2332, &item[IsMale()?0:1][pos - 1], 1, false);
+        sendMailItem(2331, 2332, &item[pos-1][0], 2, false);
     }
 
 } // namespace GObject

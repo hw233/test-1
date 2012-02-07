@@ -25,53 +25,53 @@
 
 enum ItemClass
 {
-    // [00~19] ×°±¸ [1500~4990]   1ÎäÆ÷£¬2Í·£¬3ÐØ£¬4¼ç£¬5Ñü£¬6ÍÈ£¬7ÏîÁ´£¬8½äÖ¸£¬10·¨±¦£¬11×øÆï
-    // [20~29] ÆÕÍ¨ [0~499]
-    // [30~39] Õó·¨ [1000~1199]
-    // [40~49] ÐÄ·¨ [1200~1499]
-    // [50~59] Ç¿»¯ [500~799]
-    // [60~79] ±¦Ê¯ [5001~5200]  60Á¦Á¿£¬61Ãô½Ý£¬62ÖÇÁ¦£¬63ÌåÆÇ£¬64ÉúÃü£¬65¹¥»÷£¬66·ÀÓù£¬67ÃüÖÐ£¬68·´»÷£¬69ÉÁ±Ü£¬70±©»÷£¬71ÆÆ»÷£¬72Éí·¨
-    // [80~89] ÈÎÎñ [800~999]
+    // [00~19] è£…å¤‡ [1500~4990]   1æ­¦å™¨ï¼Œ2å¤´ï¼Œ3èƒ¸ï¼Œ4è‚©ï¼Œ5è…°ï¼Œ6è…¿ï¼Œ7é¡¹é“¾ï¼Œ8æˆ’æŒ‡ï¼Œ10æ³•å®ï¼Œ11åéª‘
+    // [20~29] æ™®é€š [0~499]
+    // [30~39] é˜µæ³• [1000~1199]
+    // [40~49] å¿ƒæ³• [1200~1499]
+    // [50~59] å¼ºåŒ– [500~799]
+    // [60~79] å®çŸ³ [5001~5200]  60åŠ›é‡ï¼Œ61æ•æ·ï¼Œ62æ™ºåŠ›ï¼Œ63ä½“é­„ï¼Œ64ç”Ÿå‘½ï¼Œ65æ”»å‡»ï¼Œ66é˜²å¾¡ï¼Œ67å‘½ä¸­ï¼Œ68åå‡»ï¼Œ69é—ªé¿ï¼Œ70æš´å‡»ï¼Œ71ç ´å‡»ï¼Œ72èº«æ³•
+    // [80~89] ä»»åŠ¡ [800~999]
 	Item_None = 0,
-	Item_Weapon = 1,	//ÎäÆ÷  ÎäÆ÷ 1
-	Item_Armor1,		//·À¾ß1 Í·¿ø 2
-	Item_Armor2,		//·À¾ß2 ÐØ¼× 3
-	Item_Armor3,		//·À¾ß3 ¼ç¼× 4
-	Item_Armor4,		//·À¾ß4 Ñü´ø 5
-	Item_Armor5,		//·À¾ß5 ÍÈ¼× 6
-	Item_Amulet,		//ÏîÁ´ 7
-	Item_Ring,			//½äÖ¸ 8
-	Item_Reserved,		//±£Áô 9
-	Item_Trump,			//·¨±¦ 10
-	Item_Mounts,		//×øÆï 11
-	Item_Normal = 20,	//ÆÕÍ¨ÎïÆ· 20~29
+	Item_Weapon = 1,	//æ­¦å™¨  æ­¦å™¨ 1
+	Item_Armor1,		//é˜²å…·1 å¤´ç›” 2
+	Item_Armor2,		//é˜²å…·2 èƒ¸ç”² 3
+	Item_Armor3,		//é˜²å…·3 è‚©ç”² 4
+	Item_Armor4,		//é˜²å…·4 è…°å¸¦ 5
+	Item_Armor5,		//é˜²å…·5 è…¿ç”² 6
+	Item_Amulet,		//é¡¹é“¾ 7
+	Item_Ring,			//æˆ’æŒ‡ 8
+	Item_Reserved,		//ä¿ç•™ 9
+	Item_Trump,			//æ³•å® 10
+	Item_Mounts,		//åéª‘ 11
+	Item_Normal = 20,	//æ™®é€šç‰©å“ 20~29
     Item_Normal28 = 28,
     Item_Normal29 = 29,
-	Item_Formula = 30,	//Õó·¨ 30~39
+	Item_Formula = 30,	//é˜µæ³• 30~39
 	Item_Formula1, Item_Formula2, Item_Formula3,
 	Item_Formula4, Item_Formula5, Item_Formula6,
 	Item_Formula7, Item_Formula8, Item_Formula9,
-	Item_Citta = 40,	//ÐÄ·¨ 40~49
+	Item_Citta = 40,	//å¿ƒæ³• 40~49
 	Item_Citta1, Item_Citta2, Item_Citta3,
 	Item_Citta4, Item_Citta5, Item_Citta6,
 	Item_Citta7, Item_Citta8, Item_Citta9,
-	Item_Enhance = 50,	//Ç¿»¯ 50~59
+	Item_Enhance = 50,	//å¼ºåŒ– 50~59
 	Item_Enhance1, Item_Enhance2, Item_Enhance3,
 	Item_Enhance4, Item_Enhance5, Item_Enhance6,
 	Item_Enhance7, Item_Enhance8, Item_Enhance9,
-	Item_Gem = 60,		//±¦Ê¯ 60~79                       Á¦Á¿±¦Ê¯
-    Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4,         // Ãô½Ý±¦Ê¯£¬ ÖÇÁ¦±¦Ê¯£¬ ÄÍÁ¦±¦Ê¯£¬ ÒâÖ¾±¦Ê¯
-    Item_Gem5, Item_Gem6, Item_Gem8, Item_Gem9,         // ÉúÃü±¦Ê¯£¬ ¹¥»÷±¦Ê¯£¬ ·ÀÓù±¦Ê¯£¬ ÃüÖÐ±¦Ê¯
-    Item_Gem10, Item_Gem11, Item_Gem12, Item_Gem13,     // ·´»÷±¦Ê¯£¬ ÉÁ±Ü±¦Ê¯£¬ ±©»÷±¦Ê¯£¬ ÆÆ»÷±¦Ê¯
-    Item_Gem14, Item_Gem15, Item_Gem16, Item_Gem17,     // Éí·¨±¦Ê¯£¬ ¼áÈÍ±¦Ê¯£¬ ·¨¿¹±¦Ê¯
+	Item_Gem = 60,		//å®çŸ³ 60~79                       åŠ›é‡å®çŸ³
+    Item_Gem1, Item_Gem2, Item_Gem3, Item_Gem4,         // æ•æ·å®çŸ³ï¼Œ æ™ºåŠ›å®çŸ³ï¼Œ è€åŠ›å®çŸ³ï¼Œ æ„å¿—å®çŸ³
+    Item_Gem5, Item_Gem6, Item_Gem8, Item_Gem9,         // ç”Ÿå‘½å®çŸ³ï¼Œ æ”»å‡»å®çŸ³ï¼Œ é˜²å¾¡å®çŸ³ï¼Œ å‘½ä¸­å®çŸ³
+    Item_Gem10, Item_Gem11, Item_Gem12, Item_Gem13,     // åå‡»å®çŸ³ï¼Œ é—ªé¿å®çŸ³ï¼Œ æš´å‡»å®çŸ³ï¼Œ ç ´å‡»å®çŸ³
+    Item_Gem14, Item_Gem15, Item_Gem16, Item_Gem17,     // èº«æ³•å®çŸ³ï¼Œ åšéŸ§å®çŸ³ï¼Œ æ³•æŠ—å®çŸ³
     Item_Gem18, Item_Gem19,
-	Item_Task = 80,		//ÈÎÎñ 80~89
-	Item_Other = 90,	//ÆäËû 90~
+	Item_Task = 80,		//ä»»åŠ¡ 80~89
+	Item_Other = 90,	//å…¶ä»– 90~
 };
 
-inline bool IsEquipId(UInt32 id) // XXX: Õâ¸öÊÇÁ÷Ë®ºÅ
+inline bool IsEquipId(UInt32 id) // XXX: è¿™ä¸ªæ˜¯æµæ°´å·
 {
-    return id > 25000; // XXX: Ö»ÓÐÎäÆ÷ÐèÒªÁ÷Ë®ºÅ
+    return id > 25000; // XXX: åªæœ‰æ­¦å™¨éœ€è¦æµæ°´å·
 	// return id >= LARM_ID && id <= RARM_ID;
 }
 
@@ -152,17 +152,17 @@ namespace GData
 		bool operator==(const ItemBaseType& other) const { return getId() == other.getId(); }
 	};
 
-	//ÆÕÍ¨ÎïÆ·
+	//æ™®é€šç‰©å“
 	struct ItemNormalType : public ItemBaseType
 	{
 		ItemNormalType(UInt32 id = 0, const std::string& name = "") : ItemBaseType(id, name) { }
 		virtual ~ItemNormalType() { }
 	};
 
-	//±¦Ê¯
+	//å®çŸ³
 	struct ItemGemType : public ItemBaseType
 	{
-		const AttrExtra* attrExtra;	//¸½¼ÓÊôÐÔ
+		const AttrExtra* attrExtra;	//é™„åŠ å±žæ€§
 		ItemGemType(UInt32 id = 0, const std::string& name = "", UInt32 attrId = 0) : ItemBaseType(id, name)
 		{
 			const AttrExtraItem * attr = attrExtraManager[attrId];
@@ -174,7 +174,7 @@ namespace GData
 		virtual ~ItemGemType() { }
 	};
 
-	//×°±¸
+	//è£…å¤‡
 	struct ItemEquipType : public ItemBaseType
 	{
 		const AttrExtra*	attrExtra;

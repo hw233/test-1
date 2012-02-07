@@ -1344,6 +1344,9 @@ namespace GObject
 
 		Stream st(REP::PACK_USE_OTHER);
         Player* other = globalNamedPlayers[m_Owner->fixName(name)];
+        if (other == m_Owner)
+            return ret;
+
         if (other)
         {
             if (bind != 0xFF)

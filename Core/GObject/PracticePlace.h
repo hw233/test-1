@@ -131,6 +131,7 @@ public:
 
     // 挑战
     bool doChallenge(Player* pl, UInt8 place, UInt16 idx, const std::string& name);
+    bool doAttack(Player* def, const void* data);
 
     // 使用金币增加修练空间
     bool addSlot(Player* pl, UInt8 place);
@@ -166,7 +167,6 @@ public:
     static UInt8 _extraCount[11];
     static UInt8 _picCnt[11];
 private:
-    Mutex m_lock[PPLACE_MAX];
     PlaceData m_places[PPLACE_MAX];
     std::map<UInt64, PracticeData*> m_pradata;
     static UInt8 _maxCount;

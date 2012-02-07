@@ -12,15 +12,15 @@ namespace GObject
 	{
 
 		MOT_None			= 0x0000,
-		MOT_Task			= 0x0001,	//ÈÎÎñ»á»°Ïà¹Ø
-		MOT_Collect			= 0x0002,	//²É¼¯Ïà¹Ø
-		MOT_LoopTask		= 0x0004,	//Ñ­»·ÈÎÎñ
-		MOT_EquipStrength	= 0x0008,	//×°±¸Ç¿»¯
-		MOT_EquipForge		= 0x0010,	//×°±¸¶ÍÔì
-		MOT_GemMaster		= 0x0020,	//±¦Ê¯´óÊ¦
-		MOT_EquipReplace	= 0x0040,	//×°±¸ÖÃ»»
-		MOT_Professor		= 0x0800,	//Ç±Á¦Ï´Á¶
-		MOT_GreatFighter	= 0x1000,	//Ãû½«
+		MOT_Task			= 0x0001,	//ä»»åŠ¡ä¼šè¯ç›¸å…³
+		MOT_Collect			= 0x0002,	//é‡‡é›†ç›¸å…³
+		MOT_LoopTask		= 0x0004,	//å¾ªç¯ä»»åŠ¡
+		MOT_EquipStrength	= 0x0008,	//è£…å¤‡å¼ºåŒ–
+		MOT_EquipForge		= 0x0010,	//è£…å¤‡é”»é€ 
+		MOT_GemMaster		= 0x0020,	//å®çŸ³å¤§å¸ˆ
+		MOT_EquipReplace	= 0x0040,	//è£…å¤‡ç½®æ¢
+		MOT_Professor		= 0x0800,	//æ½œåŠ›æ´—ç‚¼
+		MOT_GreatFighter	= 0x1000,	//åå°†
 
 	};
 

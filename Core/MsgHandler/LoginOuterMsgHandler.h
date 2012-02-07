@@ -1755,5 +1755,57 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+void SysDailog(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    std::string content;
+    br >> content;
+
+    Stream st(REP::SYSDAILOG);
+    st << content << Stream::eos;
+	NETWORK()->Broadcast(st);
+}
+
+void PwdInfo(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt64 playerId = 0;
+    br >> playerId;
+
+	GObject::Player * pl= GObject::globalPlayers[playerId];
+    if (!pl)
+        return;
+
+    const GObject::SecondPWDInfo& info = pl->getPWDInfo();
+    Stream st(SPEP::PWDINFO);
+    UInt8 onoff = info.secondPWD.empty() ? 0 : 1;
+    st << onoff;
+    if (onoff)
+    {
+        st << info.secondPWD << info.isLocked << info.errCount << info.questionForPWD << info.answerForPWD;
+    }
+    st << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void PwdReset(LoginMsgHdr &hdr, const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    UInt64 playerId = 0;
+    br >> playerId;
+
+	GObject::Player * pl= GObject::globalPlayers[playerId];
+    if (!pl)
+        return;
+
+    Stream st(SPEP::PWDRESET);
+    st << pl->deactiveSecondPWD("", true) << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 

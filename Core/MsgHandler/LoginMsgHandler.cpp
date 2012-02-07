@@ -37,6 +37,9 @@ MSG_REG_2(LoginMsgHdr,SPEQ::ONLINEPF,ServerOnlinePFNum);
 MSG_REG_2(LoginMsgHdr,SPEQ::ADDITEMFROMBSBYID,  AddItemFromBsById);
 MSG_REG_2(LoginMsgHdr,SPEQ::ADDFIGHTER,  AddFighterFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::GETMONEY, GetMoneyFromBs);
+MSG_REG_2(LoginMsgHdr,SPEQ::SYSDAILOG, SysDailog);
+MSG_REG_2(LoginMsgHdr,SPEQ::PWDINFO, PwdInfo);
+MSG_REG_2(LoginMsgHdr,SPEQ::PWDRESET, PwdReset);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 

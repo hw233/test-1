@@ -245,7 +245,7 @@ bool enum_dungeon_midnight(void * ptr, void * data)
 	return true;
 }
 
-void SendLoverRingTitleCard()
+void SendShusanLoveTitleCard()
 {
     if(bValentineDayEnd)
     {
@@ -324,7 +324,7 @@ void World::World_Midnight_Check( World * world )
     }
 
     //给巧克力使用称号卡
-    SendLoverRingTitleCard();
+    SendShusanLoveTitleCard();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);

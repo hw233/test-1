@@ -537,6 +537,8 @@ namespace REP
 
     /** 战报数据*/
     const UInt8 FIGHT_REPORT2       = 0x0F;
+    /** 系统弹窗公告 */
+    const UInt8 SYSDAILOG           = 0x0E;
 }
 
 namespace SPEQ
@@ -569,6 +571,9 @@ namespace SPEQ
     const UInt16 ADDITEMFROMBSBYID  = 0x116;
     const UInt16 ADDFIGHTER         = 0x117;
     const UInt16 GETMONEY           = 0x118;
+    const UInt16 SYSDAILOG          = 0x119;
+    const UInt16 PWDINFO            = 0x120;
+    const UInt16 PWDRESET           = 0x121;
 }
 
 namespace SPEP
@@ -597,6 +602,8 @@ namespace SPEP
     const UInt8 ADDITEMFROMBSBYID   = 0x16;
     const UInt8 ADDFIGHTER          = 0x17;
     const UInt8 GETMONEY            = 0x18;
+    const UInt8 PWDINFO             = 0x20;
+    const UInt8 PWDRESET            = 0x21;
 }
 
 #endif // _MSGID_H_
