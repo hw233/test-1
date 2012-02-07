@@ -1291,7 +1291,7 @@ function ItemNormal_00000432(iid, num, bind, param)
         if i <= v then
             package:AddItem(items[n][1], items[n][2], 0, 0, 2);
             if items[n][1] == 47 or items[n][1] == 515 then
-                Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:"..items[n][1].."]")
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:"..items[n][1].."]")
             end
             break
         end
@@ -1300,10 +1300,10 @@ function ItemNormal_00000432(iid, num, bind, param)
     if t <= 20 then
         if r <= 50 then
             package:AddItem(6007, 1, 0, 0, 2);
-            Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6007]")
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6007]")
         else
             package:AddItem(6008, 1, 0, 0, 2);
-            Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6008]")
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6008]")
         end
     end
 
