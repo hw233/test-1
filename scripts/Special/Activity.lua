@@ -117,6 +117,7 @@ end
 function onLogin(player)
 	local stage = getActivityStage();
 	checkExpire2(player, stage);
+    onLoginPF(player)
 end
 
 function onLevelup(player, olev, nlev)
@@ -923,8 +924,15 @@ function onValentineDay(player)
     end
 
     if lvl >= 30 and player:GetVar(47) == 0 then
-        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且级达到30级以上（包含30级）所有用户，都将获得【情人之戒】", {1754,1,1});
+        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且等级达到30级以上（包含30级）所有用户，都将获得【恋人之戒】", {1754,1,1});
         player:SetVar(47, 1)
+    end
+end
+
+function onLoginPF(player)
+    if player:GetVar(49) == 0 then
+        sendItemPackageMail(player, "平台登录奖励", "恭喜您获得对应平台登录奖励，请点击\"接受物品\"按钮领取。", {448,1,1});
+        player:SetVar(49, 1)
     end
 end
 

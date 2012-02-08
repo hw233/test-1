@@ -965,7 +965,7 @@ float BattleFighter::getTough(BattleFighter* defgt)
     if(tough < 0)
         return 0;
 
-    return tough;
+    return tough/100.0f;
 }
 
 

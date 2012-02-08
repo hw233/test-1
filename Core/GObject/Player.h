@@ -515,6 +515,27 @@ namespace GObject
 		Player(UInt64);
 		~Player();
 
+        inline UInt8 getShiMenMax()
+        {
+            if (isOffical())
+                return SHIMEN_TASK_MAXCOUNT + Player::_shiMenActiveCount - 1;
+            return SHIMEN_TASK_MAXCOUNT + Player::_shiMenActiveCount;
+        }
+
+        inline UInt8 getYaMenMax()
+        {
+            if (isOffical())
+                return YAMEN_TASK_MAXCOUNT + Player::_yaMenActiveCount - 1;
+            return YAMEN_TASK_MAXCOUNT + Player::_yaMenActiveCount;
+        }
+
+        inline UInt8 getClanTaskMax()
+        {
+            if (isOffical())
+                return CLAN_TASK_MAXCOUNT - 1;
+            return CLAN_TASK_MAXCOUNT;
+        }
+
 	public:
 		bool Load();
 		inline void recalcVipLevel() { _vipLevel = calcVipLevel(); }
@@ -963,6 +984,7 @@ namespace GObject
         bool addAwardByTaskColor(UInt32, bool = false);
         void delColorTask(UInt32);
 
+        UInt32 getClanTask();
         bool finishClanTask(UInt32);
         void delClanTask();
         void buildClanTask(bool fReset = false);
@@ -1243,7 +1265,13 @@ namespace GObject
         std::string m_source;
         bool m_isOffical;
     public:
-        inline void setDomain(const std::string& domain) { m_domain = domain; if (atoi(domain.c_str()) == 0) m_isOffical = true; }
+        inline void setDomain(const std::string& domain)
+        {
+            m_domain = domain; 
+            m_isOffical = false;
+            if (atoi(domain.c_str()) == 12)
+                m_isOffical = true;
+        }
         inline void setOpenId(const std::string& openid) { m_openid = openid; }
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
@@ -1251,7 +1279,7 @@ namespace GObject
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
-        inline const bool isOffical() const { return m_isOffical; }
+        inline bool isOffical() const { return m_isOffical; }
 
     public:
         void sendTripodInfo();

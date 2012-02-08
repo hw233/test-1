@@ -64,7 +64,7 @@ namespace GObject
             const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(*cit);
             if(taskType.m_Class == 6)
             {
-                if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+                if(player->getClan() == NULL || *cit != pldd.clanTaskId || pldd.ctFinishCount > player->getClanTaskMax() - 1)
                     continue;
             }
 
@@ -110,7 +110,7 @@ namespace GObject
         PlayerData& pldd = player->getPlayerData();
         if(taskType.m_Class == 6)
         {
-            if(player->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+            if(player->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > player->getClanTaskMax() - 1)
                 return;
         }
 

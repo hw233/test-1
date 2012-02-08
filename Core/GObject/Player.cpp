@@ -95,16 +95,6 @@ namespace GObject
 		return maxCount;
 	}
 
-    inline UInt8 getShiMenMax()
-    {
-        return SHIMEN_TASK_MAXCOUNT + Player::_shiMenActiveCount;
-    }
-
-    inline UInt8 getYaMenMax()
-    {
-        return YAMEN_TASK_MAXCOUNT + Player::_yaMenActiveCount;
-    }
-
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
 #if 0
@@ -2400,16 +2390,21 @@ namespace GObject
 
             if (ng->getLevel() <= GetLev() || (ng->getLevel() > GetLev() && (ng->getLevel() - GetLev()) < 10))
             {
+                UInt32 exp = 0;
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
-                    pendExp(ng->getExp() * 17 / 10);
+                    exp = ng->getExp() * 17 / 10;
                 else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
-                    pendExp(ng->getExp() * 3 / 2);
+                    exp = ng->getExp() * 3 / 2;
                 else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
-                    pendExp(ng->getExp() * 3 / 2);
+                    exp = ng->getExp() * 3 / 2;
                 else if(getBuffData(PLAYER_BUFF_TRAINP1, now))
-                    pendExp(ng->getExp() * 13 / 10);
+                    exp = ng->getExp() * 13 / 10;
                 else
-                    pendExp(ng->getExp());
+                    exp  = ng->getExp();
+
+                if (isOffical())
+                    exp -= (exp/10);
+                pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
             //战胜特定NPC之后 荣誉
@@ -4400,6 +4395,20 @@ namespace GObject
         }
     }
 
+    UInt32 Player::getClanTask()
+    {
+        URandom rnd(time(NULL));
+        const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
+        UInt8 idx = rnd(task.size());
+        UInt32 taskid = task[idx];
+        if(_playerData.clanTaskId == taskid)
+            _playerData.clanTaskId = task[++idx % task.size()];
+        else
+            _playerData.clanTaskId = taskid;
+        GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        return _playerData.clanTaskId;
+    }
+
     bool Player::finishClanTask(UInt32 taskId)
     {
 		const GData::TaskType& taskType = GData::GDataManager::GetTaskTypeData(taskId);
@@ -4411,20 +4420,12 @@ namespace GObject
             return false;
         }
 
-        if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+        if(taskId != _playerData.clanTaskId || _playerData.ctFinishCount > getClanTaskMax() - 1)
             return false;
 
         ++ _playerData.ctFinishCount;
-        if(CLAN_TASK_MAXCOUNT > _playerData.ctFinishCount) {
-            URandom rnd(time(NULL));
-            const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
-            UInt8 idx = rnd(task.size());
-            UInt32 taskid = task[idx];
-            if(_playerData.clanTaskId == taskid)
-                _playerData.clanTaskId = task[++idx % task.size()];
-            else
-                _playerData.clanTaskId = taskid;
-            GetTaskMgr()->AddCanAcceptTask(_playerData.clanTaskId);
+        if(getClanTaskMax() > _playerData.ctFinishCount) {
+            getClanTask();
         } else {
             _playerData.clanTaskId = 0;
         }
@@ -4492,8 +4493,11 @@ namespace GObject
 
 	void Player::writeClanTask()
 	{
+        if (!isOffical() && getClanTaskMax() < _playerData.ctFinishCount)
+            _playerData.ctFinishCount = 0;
+
         Stream st(REP::CLAN_INFO_UPDATE);
-        st << static_cast<UInt8>(9) << ((_playerData.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT);
+        st << static_cast<UInt8>(9) << ((_playerData.ctFinishCount << 4) | getClanTaskMax());
         st << Stream::eos;
         send(st);
 
@@ -4512,7 +4516,7 @@ namespace GObject
 
     bool Player::isClanTaskFull()
     {
-        return CLAN_TASK_MAXCOUNT  - 1 < _playerData.ctFinishCount;
+        return getClanTaskMax() - 1 < _playerData.ctFinishCount;
     }
 
     void Player::AddClanBuilding(UInt32 building)
@@ -5789,27 +5793,32 @@ namespace GObject
     void Player::GetDailyTask(UInt8& shimenF, UInt8& shimenMax, UInt8& yamenF, UInt8& yamenMax, UInt8& clanF, UInt8& clanMax)
     {
         //UInt32 vipLevel = getVipLevel();
-        if (getShiMenMax() < _playerData.smFinishCount)
+        if (!isOffical() && getShiMenMax() < _playerData.smFinishCount)
         {
             _playerData.smFinishCount = 0;
             writeShiMen();
         }
-        if (getYaMenMax() < _playerData.ymFinishCount)
+        if (!isOffical() && getYaMenMax() < _playerData.ymFinishCount)
         {
             _playerData.ymFinishCount = 0;
             writeYaMen();
         }
+        if (!isOffical() && getClanTaskMax() < _playerData.ctFinishCount)
+        {
+            _playerData.ctFinishCount = 0;
+            writeClanTask();
+        }
 
-        shimenF = _playerData.smFinishCount;
+        shimenF = _playerData.smFinishCount > getShiMenMax() ? getShiMenMax() : _playerData.smFinishCount;
         shimenMax = getShiMenMax();
 
-        yamenF = _playerData.ymFinishCount;
+        yamenF = _playerData.ymFinishCount > getYaMenMax() ? getYaMenMax() : _playerData.ymFinishCount;
         yamenMax = getYaMenMax();
 
-        clanF =  _playerData.ctFinishCount;
-        clanMax = CLAN_TASK_MAXCOUNT;
-
+        clanF =  _playerData.ctFinishCount > getClanTaskMax() ? getClanTaskMax() : _playerData.ctFinishCount;
+        clanMax = getClanTaskMax();
     }
+
     void Player::GetFuben(UInt8& copy, UInt8& copyMax, UInt8& dung, UInt8& dungMax, UInt8& format, UInt8& formatMax )
     {
         UInt32 vipLevel = getVipLevel();
@@ -5837,17 +5846,27 @@ namespace GObject
 		st << static_cast<UInt8>(1);
         UInt32 curtime = TimeUtil::Now();
 		UInt32 vipLevel = getVipLevel();
-        if (getShiMenMax() < _playerData.smFinishCount)
+        if (!isOffical() && getShiMenMax() < _playerData.smFinishCount)
         {
             _playerData.smFinishCount = 0;
             writeShiMen();
         }
-        if (getYaMenMax() < _playerData.ymFinishCount)
+        if (!isOffical() && getYaMenMax() < _playerData.ymFinishCount)
         {
             _playerData.ymFinishCount = 0;
             writeYaMen();
         }
-        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() - _playerData.smFinishCount) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() - _playerData.ymFinishCount) << getYaMenMax() << static_cast<UInt8>(CLAN_TASK_MAXCOUNT - _playerData.ctFinishCount);
+        if (!isOffical() && getClanTaskMax() < _playerData.ctFinishCount)
+        {
+            _playerData.ctFinishCount = 0;
+            writeClanTask();
+        }
+        if (!_playerData.clanTaskId && !isOffical() && getClanTaskMax() > _playerData.ctFinishCount)
+        {
+            _playerData.clanTaskId = getClanTask();
+        }
+
+        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() >= _playerData.smFinishCount ? getShiMenMax() - _playerData.smFinishCount : 0) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() >= _playerData.ymFinishCount ? getYaMenMax() - _playerData.ymFinishCount : 0) << getYaMenMax() << static_cast<UInt8>(getClanTaskMax() > _playerData.ctFinishCount ? getClanTaskMax() - _playerData.ctFinishCount : 0);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
         UInt8 cnt = playerCopy.getCopySize(this);

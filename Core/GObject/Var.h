@@ -79,6 +79,7 @@ namespace GObject
 
         VAR_LOVER_RING = 47, //情人之戒
         VAR_SHUSAN_LOVE = 48, //蜀山之恋
+        VAR_LOGIN_PF = 49, //每日平台登陆宝箱
 
         VAR_MAX,
     };
@@ -157,6 +158,7 @@ namespace GObject
 
             REGISTER_VAR(VAR_LOVER_RING, CYCLE_YEAR);
             REGISTER_VAR(VAR_SHUSAN_LOVE, CYCLE_YEAR);
+            REGISTER_VAR(VAR_LOGIN_PF, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

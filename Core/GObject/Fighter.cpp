@@ -1957,6 +1957,9 @@ bool Fighter::upSkill( UInt16 skill, int idx, bool writedb )
     if (!(idx >= 0 && idx < getUpSkillsMax())) // dst
         return false;
 
+    if (hasSkill(skill) < 0)
+        return false;
+
     if (testMutual(skill))
         return false;
 

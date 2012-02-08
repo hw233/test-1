@@ -901,7 +901,7 @@ void OnClanOption( GameMsgHdr& hdr, const void* data )
         {
             player->setClan(co->clan);
 
-            if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
+            if(player->getClanTaskMax() > PLAYER_DATA(player, ctFinishCount))
                 player->buildClanTask();
         }
         break;

@@ -45,9 +45,6 @@ void DCLogger::decDomainOnlineNum(UInt8 domain)
 
 bool DCLogger::reg(Player* player)
 {
-    if (player && player->isOffical())
-        return true;
-
     std::ostringstream msg;
 
     msg << "version=";
@@ -80,9 +77,6 @@ bool DCLogger::reg(Player* player)
 
 bool DCLogger::login(Player* player)
 {
-    if (player && player->isOffical())
-        return true;
-
     std::ostringstream msg;
 
     msg << "version=";
@@ -115,9 +109,6 @@ bool DCLogger::login(Player* player)
 
 bool DCLogger::logout(Player* player)
 {
-    if (player && player->isOffical())
-        return true;
-
     std::ostringstream msg;
 
     msg << "version=";
@@ -185,9 +176,6 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
 
 bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
-    if (player && player->isOffical())
-        return true;
-
     std::ostringstream msg;
 
     msg << "version=";
@@ -229,9 +217,6 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
 
 bool DCLogger::blue(Player* player)
 {
-    if (player && player->isOffical())
-        return true;
-
     std::ostringstream msg;
 
     msg << "version=";
@@ -262,9 +247,6 @@ bool DCLogger::blue(Player* player)
 
 bool DCLogger::d3d6(Player* player)
 {
-    if (player && player->isOffical())
-        return true;
-
     std::ostringstream msg;
 
     msg << "version=";

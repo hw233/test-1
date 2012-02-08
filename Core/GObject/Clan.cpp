@@ -1252,8 +1252,15 @@ void Clan::sendInfo( Player * player )
     UInt8 place = PPLACE_MAX;
     practicePlace.getPlaceData(owner, place);
 
+    if (watchman)
+    {
+        UInt8 clanTaskMax = watchman->getClanTaskMax();
+        if (clanTaskMax < pd.ctFinishCount)
+            pd.ctFinishCount = 0;
+    }
+
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
-        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | CLAN_TASK_MAXCOUNT) << static_cast<UInt32>(getConstruction())
+        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | (watchman?watchman->getClanTaskMax():CLAN_TASK_MAXCOUNT)) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
         << _contact << _announce << _purpose;

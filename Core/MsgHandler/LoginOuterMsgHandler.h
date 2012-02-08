@@ -1760,11 +1760,8 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
-    std::string content;
-    br >> content;
-
     Stream st(REP::SYSDAILOG);
-    st << content << Stream::eos;
+    st << Stream::eos;
 	NETWORK()->Broadcast(st);
 }
 
