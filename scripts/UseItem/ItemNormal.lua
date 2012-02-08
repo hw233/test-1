@@ -1410,7 +1410,7 @@ function ItemNormal_00000448(iid, num, bind, param)
     local item = {502,510,504,55}
     local i = math.random(1,#item)
 
-    package:AddItem(item[i], 1)
+    package:AddItem(item[i], 1, true, false)
     package:DelItemSendMsg(448, player);
     return num;
 end
