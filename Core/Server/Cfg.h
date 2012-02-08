@@ -71,6 +71,8 @@ public:
     std::string sql_item_histories;
     std::string sql_mailitem_histories;
 
+    std::string stateUrl;
+
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
 	void setIfName(const char* iname);
@@ -99,6 +101,7 @@ public:
 	inline void setLoginLimit(bool limit) { enableLoginLimit = limit; }
 	inline void setLoginMax(UInt16 max) { loginLimit = max; }
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
+    inline void setStateUrl(const char* url) { stateUrl = url; }
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

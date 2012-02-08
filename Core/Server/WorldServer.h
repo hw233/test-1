@@ -8,6 +8,7 @@
 #include "DB/DBWorker.h"
 #include "Login/LoginWorker.h"
 #include "WorkerThread.h"
+#include <curl/curl.h>
 
 extern const char* s_HelpInfo;
 
@@ -71,6 +72,14 @@ private:
 public:
 	BaseThread*	m_AllWorker[MAX_THREAD_NUM];
 	Network::TcpServerWrapper* m_TcpService;
+
+public:
+    void Up();
+    void Down();
+    void State(const char* action, int serverNum);
+
+private:
+    CURL* curl;
 };
 
 #define SERVER()		WorldServer::Instance()

@@ -21,10 +21,11 @@
 
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
-WorldServer::WorldServer() : m_IsActive(false)
+WorldServer::WorldServer() : m_IsActive(false), curl(NULL)
 {
 	memset(m_AllWorker, 0x00, sizeof(m_AllWorker));
 	m_TcpService = NULL;
+    curl = curl_easy_init();
 }
 
 WorldServer::~WorldServer()
@@ -34,6 +35,7 @@ WorldServer::~WorldServer()
 		delete m_AllWorker[i];
 	}
 	//delete m_TcpService;
+    if (curl) curl_easy_cleanup(curl);
 }
 
 bool WorldServer::ParseCommandInfor(Int32 argc, char * argv[])
@@ -70,7 +72,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 		}
 	}
 	Network::Initialize();
-	//¶ÁÈ¡ÅäÖÃÎÄ¼ş
+	//è¯»å–é…ç½®æ–‡ä»¶
 	TimeUtil::Init();
     GObject::VarSystem::Init();
 	cfg.load(scriptStr);
@@ -89,7 +91,9 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
     cfg.serverLogId = cfg.serverNum;
 
-	//Êı¾İ¿âÁ¬½Ó²Ù×÷£¬ Á¬½Ó³Ø´´½¨
+    Up();
+
+	//æ•°æ®åº“è¿æ¥æ“ä½œï¼Œ è¿æ¥æ± åˆ›å»º
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();
 	DB::gDataDBConnectionMgr->Init( cfg.dbDataHost.c_str(), cfg.dbDataUser.c_str(), cfg.dbDataPassword.c_str(), cfg.dbDataSource.c_str(), 1, 32, cfg.dbDataPort );
 
@@ -145,7 +149,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	worker = WORKER_THREAD_DC;
 	m_AllWorker[worker]->Run();
 
-	//Æô¶¯Êı¾İ¿âÏß³Ì´¦Àí
+	//å¯åŠ¨æ•°æ®åº“çº¿ç¨‹å¤„ç†
 	worker = WORKER_THREAD_DB;
 	m_AllWorker[worker]->Run();
 	worker = WORKER_THREAD_DB1;
@@ -172,7 +176,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 	GData::GDataManager::LoadAllData();
 	//GObject::GObjectManager::InitGlobalObject();
-	GObject::GObjectManager::InitIDGen();	    //½«¸÷±íµÄ×î´óIDÖµ´æÈë»º´æ
+	GObject::GObjectManager::InitIDGen();	    //å°†å„è¡¨çš„æœ€å¤§IDå€¼å­˜å…¥ç¼“å­˜
 	GObject::GObjectManager::loadAllData();
 
 	return true;
@@ -180,6 +184,8 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 void WorldServer::UnInit()
 {
+    Down();
+
 	DB::gObjectDBConnectionMgr->UnInit();
 	delete DB::gObjectDBConnectionMgr;
 	DB::gObjectDBConnectionMgr = NULL;
@@ -215,20 +221,20 @@ void WorldServer::Run()
 	worker = WORKER_THREAD_WORLD;
 	m_AllWorker[worker]->Run();
 
-	//Æô¶¯¹¤×÷Ïß³Ì
+	//å¯åŠ¨å·¥ä½œçº¿ç¨‹
 	for (worker = WORKER_THREAD_COUNTRY_1; worker <= WORKER_THREAD_NEUTRAL; worker++)
 	{
 		m_AllWorker[worker]->Run();
 	}
 
-	//Æô¶¯µÇÂ¼Ïß³Ì
+	//å¯åŠ¨ç™»å½•çº¿ç¨‹
 	worker = WORKER_THREAD_LOGIN;
 	m_AllWorker[worker]->Run();
 
 	m_TcpService = new Network::TcpServerWrapper(cfg.tcpPort);
 	m_TcpService->Start();
 
-	//Ö÷Ïß³ÌµÈ´ıËùÓĞ×ÓÏß³Ì½áÊø
+	//ä¸»çº¿ç¨‹ç­‰å¾…æ‰€æœ‰å­çº¿ç¨‹ç»“æŸ
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
 		m_AllWorker[worker]->Wait();
@@ -243,12 +249,12 @@ void WorldServer::Shutdown()
 {
 	int worker;
 
-	//¹Ø±ÕÍøÂçÏß³Ì
+	//å…³é—­ç½‘ç»œçº¿ç¨‹
 	m_TcpService->UnInit();
 
 	Thread::sleep(2000);
 
-	//¹Ø±ÕËùÓĞ¹¤×÷Ïß³Ì
+	//å…³é—­æ‰€æœ‰å·¥ä½œçº¿ç¨‹
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
 	{
 		if(worker <= WORKER_THREAD_DC)
@@ -269,6 +275,48 @@ void WorldServer::Shutdown()
 	m_AllWorker[WORKER_THREAD_DB_LOG1]->Shutdown();
 }
 
+#define MAX_RET_LEN 1024
+
+static int recvret(char* data, size_t size, size_t nmemb, char* buf)
+{
+    size_t nsize = size * nmemb;
+    if (nsize > MAX_RET_LEN) {
+        bcopy(data, buf, MAX_RET_LEN);
+        return MAX_RET_LEN;
+    }   
+
+    bcopy(data, buf, nsize);
+    return nsize;
+}
+
+void WorldServer::State(const char* action, int serverNum)
+{
+    if (!curl || !action || !serverNum)
+        return;
+    char url[4096] = {0};
+    snprintf(url, sizeof(url), "%s&state=%s&server=s%d", cfg.stateUrl.c_str(), action, serverNum);
+
+    char buffer[MAX_RET_LEN] = {0};
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+
+    CURLcode res = curl_easy_perform(curl);
+    if (CURLE_OK == res)
+    {
+        // TODO:
+    }
+}
+
+void WorldServer::Up()
+{
+    State("open", cfg.serverNum);
+}
+
+void WorldServer::Down()
+{
+    State("close", cfg.serverNum);
+}
 
 GObject::Country& WorldServer::GetCountry(UInt8 worker)
 {
