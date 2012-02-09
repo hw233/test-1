@@ -804,20 +804,24 @@ bool getId(char buf[64])
 
 bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
 {
-	SHA1Engine sha1;
-	sha1.update(_hashval + 8, 4);
-	sha1.update(cfg.gmCryptKey1.c_str(), cfg.gmCryptKey1.length());
-	sha1.update(_hashval, 4);
-	sha1.update(&_userid, sizeof(UInt64));
-	sha1.update(_hashval + 12, 4);
-	sha1.update(cfg.gmCryptKey2.c_str(), cfg.gmCryptKey2.length());
-	sha1.update(_hashval + 4, 4);
+    if (cfg.GMCheck)
+    {
+        SHA1Engine sha1;
+        sha1.update(_hashval + 8, 4);
+        sha1.update(cfg.gmCryptKey1.c_str(), cfg.gmCryptKey1.length());
+        sha1.update(_hashval, 4);
+        sha1.update(&_userid, sizeof(UInt64));
+        sha1.update(_hashval + 12, 4);
+        sha1.update(cfg.gmCryptKey2.c_str(), cfg.gmCryptKey2.length());
+        sha1.update(_hashval + 4, 4);
 
-	std::vector<UInt8> buf = sha1.digest();
+        std::vector<UInt8> buf = sha1.digest();
 
-	if(memcmp(&buf.front(), _hashval + 16, 20) == 0)
-        return true;
-    return false;
+        if(memcmp(&buf.front(), _hashval + 16, 20) == 0)
+            return true;
+        return false;
+    }
+    return true;
 }
 
 #define CHKKEY() \
