@@ -914,7 +914,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			// test counter by rolling dice
 			if(counter100 || target_fighter->calcCounter(bf, !bf->canBeCounter()))
 			{
-				if(target_fighter->calcHit(bf))
+				if(counter100 || target_fighter->calcHit(bf))
 				{
                     defList[0].damType2 |= 0x80;
 					bool cs = false;
