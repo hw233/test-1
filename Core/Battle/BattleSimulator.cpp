@@ -1732,14 +1732,11 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                             factor = skill->factor[idx];
                         if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
                         {
-                            std::vector<AttackAct> atkAct2;
-                            atkAct2.clear();
                             defList[defCount].damage = 0;
                             defList[defCount].pos = pos + (activeFlag ? 0 : 25);
                             defList[defCount].leftHP = bo->getHP();
-                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                            doSkillState(bf, skill, bo, defList, defCount, NULL, NULL);
                             defCount ++;
-                            doSkillAtk2(!activeFlag, &atkAct2, defList, defCount, scList, scCount);
                         }
                         ++ i;
                     }
@@ -1792,14 +1789,11 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
 
                         if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * ap[i].factor) > _rnd(10000)))
                         {
-                            std::vector<AttackAct> atkAct2;
-                            atkAct2.clear();
                             defList[defCount].damage = 0;
                             defList[defCount].pos = ap[i].pos + (activeFlag ? 0 : 25);
                             defList[defCount].leftHP = bo->getHP();
-                            doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                            doSkillState(bf, skill, bo, defList, defCount, NULL, NULL);
                             defCount ++;
-                            doSkillAtk2(!activeFlag, &atkAct2, defList, defCount, scList, scCount);
                         }
                     }
                 }
@@ -2466,14 +2460,11 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                         factor = skill->factor[idx];
                     if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
                     {
-                        std::vector<AttackAct> atkAct2;
-                        atkAct2.clear();
                         defList[defCount].damage = 0;
                         defList[defCount].pos = pos;
                         defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                        doSkillState(bf, skill, bo, defList, defCount, NULL, NULL);
                         defCount ++;
-                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
                     ++ i;
                 }
@@ -2526,14 +2517,11 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
                     if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * ap[i].factor) > _rnd(10000)))
                     {
-                        std::vector<AttackAct> atkAct2;
-                        atkAct2.clear();
                         defList[defCount].damage = 0;
                         defList[defCount].pos = ap[i].pos;
                         defList[defCount].leftHP = bo->getHP();
-                        doSkillState(bf, skill, bo, defList, defCount, &atkAct2, atkAct);
+                        doSkillState(bf, skill, bo, defList, defCount, NULL, NULL);
                         defCount ++;
-                        doSkillAtk2(false, &atkAct2, defList, defCount, scList, scCount);
                     }
                 }
             }
