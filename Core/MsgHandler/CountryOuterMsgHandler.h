@@ -2812,15 +2812,23 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 		}
 		break;
 	case 3:
-        if (!player->hasChecked())
-            return;
-		if(!player->GetPackage()->DelItemAny(ITEM_SPEAKER, 1))
-			break;
+        {
+            if (!player->hasChecked())
+                return;
+            if(!player->GetPackage()->DelItemAny(ITEM_SPEAKER, 1))
+                break;
+            NETWORK()->Broadcast(st);
+            break;
+        }
     case 8:
-        if (!player->hasChecked())
-            return;
-		if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
-			break;
+        {
+            if (!player->hasChecked())
+                return;
+            if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
+                break;
+            NETWORK()->Broadcast(st);
+            break;
+        }
 	default:
 		NETWORK()->Broadcast(st);
 		break;
