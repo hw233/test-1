@@ -983,6 +983,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
     player->getCoupon(888);
+    player->udpLog("create", "", "", "", "", "", "guide");
     dclogger.reg(player);
 }
 
