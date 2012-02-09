@@ -81,6 +81,7 @@ namespace Script
 		lua_tinker::def(_L, "getNewYear",	GObject::World::getNewYear);
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
+		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -113,6 +114,7 @@ namespace Script
 		CLASS_DEF(Player, GetExp);
 		CLASS_DEF(Player, AddExp);
 		CLASS_DEF(Player, AddPExp);
+		CLASS_DEF(Player, AddPExpBy);
 		CLASS_DEF(Player, getGold);
 		CLASS_DEF(Player, useGold);
 		CLASS_DEF(Player, getCoupon);
@@ -189,6 +191,7 @@ namespace Script
         CLASS_DEF(Player, SetVar);
         CLASS_DEF(Player, AddVar);
 		CLASS_DEF(Player, getAttainment);
+		CLASS_DEF(Player, isOffical);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -284,6 +287,7 @@ namespace Script
 		CLASS_DEF(Package, SellItem);
 		CLASS_DEF(Package, SellEquip);
 		CLASS_DEF(Package, UseItem);
+		CLASS_DEF(Package, UseItemOther);
 		CLASS_DEF(Package, UseTaskItem);
 		CLASS_DEF(Package, GetItem);
 		CLASS_DEF(Package, GetEquip);
@@ -727,6 +731,13 @@ namespace Script
 		return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
 	}
 
+	UInt16 GameActionLua::RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind)
+	{
+		assert(player != NULL);
+		assert(other != NULL);
+		return Run<UInt32>(player, "RunItemNormalUseOther", itemId, num, bind, other);
+	}
+
 	Table GameActionLua::GetNpcRelationTask(UInt32 npcId)
 	{
 		Table task(_L);
@@ -901,6 +912,11 @@ namespace Script
 	bool GameActionLua::onNewYear(Player* player)
 	{
 		return Call<bool>("onNewYear", player);
+	}
+
+	bool GameActionLua::onValentineDay(Player* player)
+	{
+		return Call<bool>("onValentineDay", player);
 	}
 
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)

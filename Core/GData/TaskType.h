@@ -12,12 +12,12 @@ namespace GData
 	{
 		UInt32				m_TypeId;
 		std::string			m_Name;
-		UInt8				m_Class;		//1:Ö÷Ïß 2£ºÖ§Ïß 3£ºÈÕ³££¨Ñ­»·£© 4: Ê¦ÃÅ 5:ÑÃÃÅ 6£º°ïÅÉ
+		UInt8				m_Class;		//1:ä¸»çº¿ 2ï¼šæ”¯çº¿ 3ï¼šæ—¥å¸¸ï¼ˆå¾ªç¯ï¼‰ 4: å¸ˆé—¨ 5:è¡™é—¨ 6ï¼šå¸®æ´¾
 		UInt8				m_SubType;
-		UInt32				m_AcceptNpc;	//ÈÎÎñ½ÓÊÜNPC£»Èç¹ûÎª0£¬ Ôò±íÊ¾´ËÈÎÎñÊÇÍ¨¹ıÎïÆ·´¥·¢µÄ
+		UInt32				m_AcceptNpc;	//ä»»åŠ¡æ¥å—NPCï¼›å¦‚æœä¸º0ï¼Œ åˆ™è¡¨ç¤ºæ­¤ä»»åŠ¡æ˜¯é€šè¿‡ç‰©å“è§¦å‘çš„
 		UInt32				m_SubmitNpc;
 		UInt32				m_ReqTime;
-		UInt16				m_AcceptMaxNum;	//Ñ­»·ÈÎÎñ
+		UInt16				m_AcceptMaxNum;	//å¾ªç¯ä»»åŠ¡
 		std::vector<UInt16>	m_ReqStep;
 		std::set<UInt32>	m_PreTask;	
 		UInt16				m_ReqLev;
@@ -30,22 +30,22 @@ namespace GData
 	};
 	typedef std::map<UInt32, TaskType> TaskTypeList; 
 
-	//ÈÎÎñ¹ØÏµµÄÒÀÀµÁ´±í
+	//ä»»åŠ¡å…³ç³»çš„ä¾èµ–é“¾è¡¨
 	struct TaskTypeRelation
 	{
-		std::set<UInt32>	m_PreTask;	//Ç°ĞòÒÀÀµÈÎÎñ
-		std::set<UInt32>	m_PostTask;	//ºóĞò¹ØÁªÈÎÎñ
+		std::set<UInt32>	m_PreTask;	//å‰åºä¾èµ–ä»»åŠ¡
+		std::set<UInt32>	m_PostTask;	//ååºå…³è”ä»»åŠ¡
 	};
 	typedef std::map<UInt32, TaskTypeRelation> TaskTypeRelationList;
 
-	//NPC¹ØÁªÈÎÎñ±í	
+	//NPCå…³è”ä»»åŠ¡è¡¨	
 	typedef std::map<UInt32, std::set<UInt32> > TaskNpcRelationList;
 	typedef std::map<UInt32, std::set<UInt32> > DayTaskNpcRelationList;
 
-	//µÈ¼¶¹ØÁªÈÎÎñ±í
+	//ç­‰çº§å…³è”ä»»åŠ¡è¡¨
 	typedef std::map<UInt16, std::set<UInt32> > TaskLevRelationList;
 
-	//Ã¿ÈÕÈÎÎñ±í
+	//æ¯æ—¥ä»»åŠ¡è¡¨
 	typedef std::map<UInt32, std::set<UInt32> > TaskDayList;
 }
 

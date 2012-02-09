@@ -100,6 +100,7 @@ namespace GObject
 		UInt32 SellItem(UInt32 id, UInt16 num, bool bind = false);
 		UInt32 SellEquip(UInt32 id);
 		bool   UseItem(UInt32 id, UInt16 num, UInt32 param = 0, UInt8 bind = 0);
+		bool   UseItemOther(UInt32 id, UInt16 num, std::string& name, UInt8 bind = 0);
 		bool   UseTaskItem(UInt32 id, UInt8 bind = 0);
 		UInt16 Size() const  { return m_Size; }
 		ItemBase*  GetItem(UInt32 id, bool bind = false);

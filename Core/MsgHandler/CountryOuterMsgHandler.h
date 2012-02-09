@@ -471,6 +471,15 @@ struct UseItemReq
 	MESSAGE_DEF4(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param);
 };
 
+struct UseItemOtherReq
+{
+	UInt32 m_ItemId;
+	UInt8  m_ItemBindType;
+	UInt16 m_ItemNum;
+    std::string m_OtherName;
+	MESSAGE_DEF4(REQ::PACK_USE_OTHER, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, std::string, m_OtherName);
+};
+
 struct BugInfoReq
 {
   std::string _title;
@@ -499,14 +508,18 @@ struct YellowDiamondGetPacksReq
 void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 {
 	MSG_QUERY_PLAYER(pl);
-    if (!pl->hasChecked())
-        return;
 	if (GetItemSubClass(req.m_ItemId) == Item_Task)
 		pl->GetPackage()->UseTaskItem(req.m_ItemId, req.m_ItemBindType);
 	else
 	{
 		pl->GetPackage()->UseItem(req.m_ItemId, req.m_ItemNum, req.m_Param, req.m_ItemBindType);
 	}
+}
+
+void OnUseItemOtherReq( GameMsgHdr& hdr, UseItemOtherReq& req )
+{
+	MSG_QUERY_PLAYER(pl);
+    pl->GetPackage()->UseItemOther(req.m_ItemId, req.m_ItemNum, req.m_OtherName, req.m_ItemBindType);
 }
 
 struct ExtendPackageReq
@@ -976,11 +989,11 @@ void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
 void OnBookStoreListReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
-    if (!player->hasChecked())
-        return;
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt8 type = 0;
 	br >> type;
+    if (type && !player->hasChecked())
+        return;
 	player->listBookStore(type);
 }
 
@@ -1159,8 +1172,6 @@ struct FighterLeaveStruct
 void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 {
 	MSG_QUERY_PLAYER(player);
-    if(!player->hasChecked())
-        return;
 	GObject::Fighter * fgt = player->findFighter(fer._id);
 	if(fgt == NULL)
 		return;
@@ -1173,6 +1184,9 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		fgt->sendModification(11, p, e, false);
 		return;
 	}
+
+    if(!player->hasChecked())
+        return;
 
     int idx; 
     switch(fer._part)
@@ -1744,8 +1758,6 @@ void InCitySwitchReq( GameMsgHdr& hdr, InCitySwitchStruct& sms )
 void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 {
 	MSG_QUERY_PLAYER(pl);
-	if(!pl->hasChecked())
-		return;
 	UInt32 viplvl = pl->getVipLevel();
 	if(ctr.flag == 0)
 	{
@@ -1767,6 +1779,8 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 				pl->sendMsgCode(0, 1103);
 				return;
 			}
+            if (!pl->hasChecked())
+                return;
 			ConsumeInfo ci(Transport,0,0);
 			pl->useTael(GData::moneyNeed[GData::JUMP_MAP].tael,&ci);
 		}
@@ -1803,6 +1817,8 @@ void OnDungeonOpReq( GameMsgHdr& hdr, DungeonOpReq& dor )
 	default:
 		break;
 	}
+    if (result == 4)
+        return;
 	st << result << dor.type << Stream::eos;
 	pl->send(st);
 }
@@ -1879,6 +1895,8 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
 {
 	MSG_QUERY_PLAYER(pl);
+    if (!pl->hasChecked())
+        return;
 	GameMsgHdr hdr2(0x181, WORKER_THREAD_WORLD, pl, 0);
 	GLOBAL().PushMsg(hdr2, NULL);
 }
@@ -2762,6 +2780,7 @@ static bool inCountry(const Network::TcpConduit * conduit, UInt8 country)
 }
 
 #define ITEM_SPEAKER 16
+#define ITEM_FLOWER 440
 
 void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 {
@@ -2793,7 +2812,14 @@ void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
 		}
 		break;
 	case 3:
+        if (!player->hasChecked())
+            return;
 		if(!player->GetPackage()->DelItemAny(ITEM_SPEAKER, 1))
+			break;
+    case 8:
+        if (!player->hasChecked())
+            return;
+		if(!player->GetPackage()->DelItemAny(ITEM_FLOWER, 1))
 			break;
 	default:
 		NETWORK()->Broadcast(st);
@@ -3116,6 +3142,8 @@ void OnMailSendReq( GameMsgHdr& hdr, MailSendReq& msr )
 void OnMailClickReq( GameMsgHdr& hdr, MailClickReq& mcr )
 {
 	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
 	player->GetMailBox()->clickMail(mcr._mailId, mcr._action);
 }
 
@@ -3293,10 +3321,7 @@ void OnFighterTrain2Req( GameMsgHdr& hdr, FighterTrain2Req& req )
 
 void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
 {
-    //return; // TODO:
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
 	BinaryReader brd(data, hdr.msgHdr.bodyLen);
 	UInt32 fighterId = 0;
 	UInt8 type = 0;
@@ -3309,6 +3334,9 @@ void OnFighterTrainOpReq( GameMsgHdr& hdr, const void * data )
         player->send(st);
         return;
     }
+
+	if(!player->hasChecked())
+		return;
 
 	brd >> fighterId >> type;
 	if(fighterId == 0)
@@ -3678,7 +3706,6 @@ void OnTrumpLOrder( GameMsgHdr& hdr, TrumpLOrderReq& req)
 
 void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
 {
-
     MSG_QUERY_PLAYER(player);
     if(!player->hasChecked())
          return;
@@ -3686,7 +3713,6 @@ void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
     UInt32 newId = 0;
     UInt16 fid = req._fgtId;
     UInt8 res = pkg->EquipUpgrade(req._fgtId, req._itemId,  &newId , &fid);
-
 
     Stream st(REP::EQ_UPGRADE);
     if(res == 0)
@@ -3735,8 +3761,6 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
-	if(!player->hasChecked())
-		return;
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
@@ -3745,6 +3769,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     {
     case 0x0:
         {
+            if(!player->hasChecked())
+                return;
+
             bool res = 0;
             Stream st(REP::TEAM_COPY_REQ);
             st << static_cast<UInt8>(0x00);
@@ -3784,6 +3811,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 0x2:
         {
+            if(!player->hasChecked())
+                return;
+
             std::string pwd;
             UInt8 upLevel = 0;
             UInt8 dnLevel = 0;
@@ -3806,6 +3836,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 0x3:
         {
+            if(!player->hasChecked())
+                return;
+
             UInt32 teamId = 0;
             std::string pwd;
             br >> teamId;
@@ -3831,6 +3864,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 0x5:
         {
+            if(!player->hasChecked())
+                return;
+
             Stream st(REP::TEAM_COPY_REQ);
             st << static_cast<UInt8>(0x05);
             bool res = teamCopyManager->quikJoinTeam(player);
@@ -3881,6 +3917,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 0x0D:
         {
+            if(!player->hasChecked())
+                return;
+
             UInt8 type = 0;
             br >> type;
             TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
@@ -3889,6 +3928,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         break;
     case 0x0E:
         {
+            if(!player->hasChecked())
+                return;
+
             TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
             bool res = tcpInfo->getAward();
             Stream st(REP::TEAM_COPY_REQ);

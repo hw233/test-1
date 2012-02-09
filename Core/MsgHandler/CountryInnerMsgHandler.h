@@ -14,6 +14,7 @@
 #include "GObject/EventBase.h"
 #include "GObject/Sale.h"
 #include "GObject/Mail.h"
+#include "GObject/PracticePlace.h"
 #include "GData/NpcGroup.h"
 #include "Battle/BattleSimulator.h"
 #include "GObject/Athletics.h"
@@ -900,7 +901,7 @@ void OnClanOption( GameMsgHdr& hdr, const void* data )
         {
             player->setClan(co->clan);
 
-            if(CLAN_TASK_MAXCOUNT > PLAYER_DATA(player, ctFinishCount))
+            if(player->getClanTaskMax() > PLAYER_DATA(player, ctFinishCount))
                 player->buildClanTask();
         }
         break;
@@ -1232,6 +1233,23 @@ void OnAwardHIPrestige( GameMsgHdr& hdr, const void* data )
     UInt16 prestige = *(UInt16*)(data);
     if (prestige)
         player->getPrestige(prestige);
+}
+void OnSendShusanLoveTitleCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendShusanLoveTitleCard(pos);
+}
+void OnAddPExpBy( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt32 pexp = *(UInt32*)(data);
+    player->AddPExp(pexp);
+}
+void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    GObject::practicePlace.doAttack(player, data);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

@@ -10,7 +10,7 @@ using namespace DataCollector;
 
 namespace GObject
 {
-#define MAX_DOMAIN 15
+#define MAX_DOMAIN 256 
 
 class Player;
 

@@ -263,7 +263,7 @@ void ClanManager::reConfigClanBattle()
 	globalClans.enumerate(buildClanBattleTime, thisDay);
 	_clanRobBattle->configClanBattleCheck();
 	clanManager.addOnBattleClan(_clanRobBattle);
-	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `achieveCount` = 0, `thisDay` = %u", thisDay);
+	DB5().PushUpdateData("UPDATE `clan_player` SET `enterCount` = 0, `thisDay` = %u", thisDay);
 	DB5().PushUpdateData("UPDATE `clan` SET `grabAchieve` = 0");
 	DB5().PushUpdateData("UPDATE `clan` AS `update_clan` SET `battleTime` = `nextBattleTime`, `battleStatus` = 0 WHERE `update_clan`.`id` = `id`");
 }

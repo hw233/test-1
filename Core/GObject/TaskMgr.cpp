@@ -296,7 +296,7 @@ namespace GObject
         if(taskType.m_Class == 6)
         {
             PlayerData& pldd = m_PlayerOwner->getPlayerData();
-            if(m_PlayerOwner->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > CLAN_TASK_MAXCOUNT - 1)
+            if(m_PlayerOwner->getClan() == NULL || taskId != pldd.clanTaskId || pldd.ctFinishCount > m_PlayerOwner->getClanTaskMax() - 1)
                 return 0;
         }
 

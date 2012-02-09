@@ -35,6 +35,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 {
     static UInt32 sendflag = 3;
 
+    ++sendflag;
+
     if (!pl) return false;
     UInt32 now = TimeUtil::Now();
     UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
@@ -103,7 +105,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 UInt32 damage = oldHP - newHP;
                 UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
                 pl->pendExp(exp);
-                if (!(sendflag % 3))
+                if (!(sendflag % 4))
                     sendDmg(damage);
 
                 AttackInfo info(pl, damage);
@@ -133,7 +135,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     _hp[0] = 0;
                     reward(pl);
                     res = true;
-                    if (sendflag % 3)
+                    if (sendflag % 4)
                         sendHp();
                 }
                 else if (newPercent <= 5 && _percent - newPercent >= 5)
@@ -146,7 +148,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                     _percent = newPercent;
                 }
-                if (!(sendflag % 3))
+                if (!(sendflag % 4))
                     sendHp();
             }
         }

@@ -1304,7 +1304,6 @@ namespace GObject
                     UInt8 rn = n<num?n:num;
                     udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
 					DelItem2(item, rn);
-					//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
 					AddItemHistoriesLog(id, rn);
                     ret = true;
 				}				
@@ -1321,7 +1320,6 @@ namespace GObject
                         item = FindItem(id, false);
                     udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
 					DelItemAny(id, rn);
-					//DBLOG().PushUpdateData("insert into item_histories (server_id,player_id,item_id,item_num,use_time) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), id, rn, TimeUtil::Now());
                     AddItemHistoriesLog(id, rn);
                     ret = true;
 				}
@@ -1334,6 +1332,62 @@ namespace GObject
 
 		return ret;
 	}
+
+    bool Package::UseItemOther(UInt32 id, UInt16 num, std::string& name, UInt8 bind)
+    {
+		if(!m_Owner->hasChecked())
+			return false;
+		bool ret = false;
+
+        if (GetItemSubClass(id) != Item_Normal)
+            return ret;
+
+		Stream st(REP::PACK_USE_OTHER);
+        Player* other = globalNamedPlayers[m_Owner->fixName(name)];
+        if (other == m_Owner)
+            return ret;
+
+        if (other)
+        {
+            if (bind != 0xFF)
+            {
+                ItemBase* item = GetItem(id, bind > 0);
+                if (item == NULL || item->Count() < num)
+                    ret = false;
+                else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, bind > 0))
+                {
+                    UInt8 rn = n<num?n:num;
+                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+                    DelItem2(item, rn);
+                    AddItemHistoriesLog(id, rn);
+                    ret = true;
+                }				
+            }
+            else
+            {
+                if (GetItemAnyNum(id) < num)
+                    ret = false;
+                else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, false))
+                {
+                    UInt8 rn = n<num?n:num;
+                    ItemBase * item = FindItem(id, true);
+                    if (!item)
+                        item = FindItem(id, false);
+                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+                    DelItemAny(id, rn);
+                    AddItemHistoriesLog(id, rn);
+                    ret = true;
+                }
+            }
+            st << id << static_cast<UInt8>(ret ? 1 : 0) << Stream::eos;
+        }
+        else
+            st << id << static_cast<UInt8>(2) << Stream::eos;
+
+		m_Owner->send(st);
+        return ret;
+    }
+
 	void Package::DelItemSendMsg(UInt32 itemid, Player *player)
 	{
 		SYSMSG_SENDV(104, player, itemid);

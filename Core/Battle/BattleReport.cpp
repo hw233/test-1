@@ -30,7 +30,8 @@ void BattleReport::init()
 					{
 						if(id > maxid)
 							maxid = id;
-						_reports[id].clear();
+						//_reports[id].clear();
+                        _reports.insert(std::make_pair(id, std::vector<UInt8>()));
 					}
 					++dirit3;
 				}

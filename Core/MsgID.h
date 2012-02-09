@@ -45,6 +45,8 @@ namespace REQ
     const UInt8 FIRE_HERO           = 0xD4;// 0x27
     /**接收散仙*/                             
     const UInt8 ACCEPT_FIGHTER      = 0xD5;// 0x28
+    /**对某人使用物品*/                             
+    const UInt8 PACK_USE_OTHER      = 0xD7;//
     /**加血*/
     const UInt8 ADD_HP              = 0xDE;// 0x29
     /**潜力洗炼*/
@@ -362,6 +364,7 @@ namespace REP
     const UInt8 HOTEL_PUB_LIST      = 0xD3;// 0x26
     const UInt8 FIGHTER_DISMISS     = 0xD4;// 0x27
     const UInt8 FIGHTER_ACCEPT      = 0xD5;// 0x28
+    const UInt8 PACK_USE_OTHER      = 0xD7;//
     const UInt8 PUB_LIST            = 0x2A;
     const UInt8 POTENCIAL           = 0xDF;// 0x2C
 
@@ -534,6 +537,8 @@ namespace REP
 
     /** 战报数据*/
     const UInt8 FIGHT_REPORT2       = 0x0F;
+    /** 系统弹窗公告 */
+    const UInt8 SYSDAILOG           = 0x0E;
 }
 
 namespace SPEQ
@@ -566,6 +571,9 @@ namespace SPEQ
     const UInt16 ADDITEMFROMBSBYID  = 0x116;
     const UInt16 ADDFIGHTER         = 0x117;
     const UInt16 GETMONEY           = 0x118;
+    const UInt16 SYSDAILOG          = 0x119;
+    const UInt16 PWDINFO            = 0x120;
+    const UInt16 PWDRESET           = 0x121;
 }
 
 namespace SPEP
@@ -594,6 +602,8 @@ namespace SPEP
     const UInt8 ADDITEMFROMBSBYID   = 0x16;
     const UInt8 ADDFIGHTER          = 0x17;
     const UInt8 GETMONEY            = 0x18;
+    const UInt8 PWDINFO             = 0x20;
+    const UInt8 PWDRESET            = 0x21;
 }
 
 #endif // _MSGID_H_

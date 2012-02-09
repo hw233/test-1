@@ -178,6 +178,7 @@ namespace Script
 		bool RunTaskItemUse(Player* player, UInt32 itemId);	
 		bool RunItemTaskUse(Player* player, UInt32 itemId);	
 		UInt16 RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind);
+		UInt16 RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind);
 
 		void RunAutoRegen(Player* player, Fighter* fighter);
 
@@ -194,6 +195,7 @@ namespace Script
         bool onBlueactiveday(Player* player);
         bool onChristmas(Player* player);
         bool onNewYear(Player* player);
+        bool onValentineDay(Player* player);
 		void onAttackBoss(Player* player);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);

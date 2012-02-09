@@ -6,7 +6,7 @@
 
 namespace GObject
 {
-	//TODO: Ìí¼ÓÒ»×Ö¶Î£¬ ÓÃÓÚ±êÊ¾´ËÈÎÎñÊ±¾ßÌåÊ²Ã´ÈÎÎñ£¬ ÓÃÓÚÌá½»ÈÎÎñÊ±Ê¹ÓÃ
+	//TODO: æ·»åŠ ä¸€å­—æ®µï¼Œ ç”¨äºæ ‡ç¤ºæ­¤ä»»åŠ¡æ—¶å…·ä½“ä»€ä¹ˆä»»åŠ¡ï¼Œ ç”¨äºæäº¤ä»»åŠ¡æ—¶ä½¿ç”¨
 	struct TaskData
 	{
 		UInt32				m_TaskId;
@@ -19,11 +19,11 @@ namespace GObject
 
 		UInt64				m_OwnerId;
 		UInt32				m_AcceptTime;
-		std::vector<UInt16>	m_Step;				//µ±Ç°ÈÎÎñ½ø¶ÈĞÅÏ¢0000,0000,0000,0000,...
-		UInt32				m_TimeBegin;		//ÈÎÎñµÄÓĞĞ§¿ªÆôÊ±¼ä
-		UInt32				m_TimeEnd;			//ÈÎÎñµÄÓĞĞ§½áÊøÊ±¼ä
-		UInt8				m_Completed;		//ÈÎÎñÊÇ·ñÒÑÍê³É
-		UInt8				m_Submit;			//ÈÎÎñÊÇ·ñÒÑÌá½»
+		std::vector<UInt16>	m_Step;				//å½“å‰ä»»åŠ¡è¿›åº¦ä¿¡æ¯0000,0000,0000,0000,...
+		UInt32				m_TimeBegin;		//ä»»åŠ¡çš„æœ‰æ•ˆå¼€å¯æ—¶é—´
+		UInt32				m_TimeEnd;			//ä»»åŠ¡çš„æœ‰æ•ˆç»“æŸæ—¶é—´
+		UInt8				m_Completed;		//ä»»åŠ¡æ˜¯å¦å·²å®Œæˆ
+		UInt8				m_Submit;			//ä»»åŠ¡æ˜¯å¦å·²æäº¤
 
 		std::string			m_StepStr;			//Only for DB
 

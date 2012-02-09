@@ -95,18 +95,28 @@ local newYearReward = {
     { { 433,1}},
     { { 433,1}},
 }
+local valentineReward = 
+{
+    { {502,1}},
+    { {55,1}},
+    { {29,20}},
+    { {504, 1}},
+    { {438,1}},
+    { {439,1}},
+    { {510,1}},
+}
 --获取上线奖励
 function GetOnlineReward()
-    local isNewYear = getNewYear();
-    if isNewYear then
+    if getNewYear() then
         return newYearReward;
     end
-    local isChristmas = getChristmas();
-    if isChristmas == false then
-        return onlineReward;
-    else 
+    if getChristmas() then
         return christmasReward;
     end
+    if getValentineDay() then
+        return valentineReward;
+    end
+    return onlineReward;
 end
 
 --某一项的最大值

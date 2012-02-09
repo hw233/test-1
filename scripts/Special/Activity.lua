@@ -117,6 +117,9 @@ end
 function onLogin(player)
 	local stage = getActivityStage();
 	checkExpire2(player, stage);
+    if not player:isOffical() then
+        onLoginPF(player)
+    end
 end
 
 function onLevelup(player, olev, nlev)
@@ -125,6 +128,9 @@ function onLevelup(player, olev, nlev)
     end
     if getNewYear() then
         onNewYear(player)
+    end
+    if getValentineDay() then
+        onValentineDay(player)
     end
 end
 
@@ -723,9 +729,28 @@ function Christmas(player, lootlvl, where)
     end
 end
 
+function ValentineDay(player, lootlvl, where)
+    if getValentineDay() then
+        if lootlvl > 3 then
+            return;
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+        local package = player:GetPackage();
+        package:AddItem(441, itemNum[lootlvl], false);
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
+    ValentineDay(player, lootlvl)
 end
 
 
@@ -735,6 +760,7 @@ end
 function onFrontMapWin(player, id, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 1);
+    ValentineDay(player, lootlvl)
 end
 
 local vippack = {
@@ -887,5 +913,28 @@ function onBlueactiveday(player)
 
     sendItemPackageMail(player, "在线1小时奖励", "恭喜您在线达一小时，获得以下奖励：自动回血符*1，太乙真金*1，初级打孔石*1，初级挂机加速符*1，初级道法金丹*1，混元离土*2。 \n1月16日-2月6日，每日登陆《蜀山传奇》在线达到一小时都可以获得此奖励。", {9,1,1, 502,1,1, 510,1,1, 55,1,1, 29,1,1, 51,2,1});
     player:SetVar(45, 1);
+end
+
+function onValentineDay(player)
+    if not getValentineDay() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 30 then
+        return
+    end
+
+    if lvl >= 30 and player:GetVar(47) == 0 then
+        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且等级达到30级以上（包含30级）所有用户，都将获得【恋人之戒】", {1754,1,1});
+        player:SetVar(47, 1)
+    end
+end
+
+function onLoginPF(player)
+    if player:GetVar(49) == 0 then
+        sendItemPackageMail(player, "平台登录奖励", "恭喜您获得对应平台登录奖励，请点击\"接受物品\"按钮领取。", {448,1,1});
+        player:SetVar(49, 1)
+    end
 end
 

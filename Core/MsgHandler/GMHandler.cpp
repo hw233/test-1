@@ -620,6 +620,10 @@ void GMHandler::OnSetVip( GObject::Player * player, std::vector<std::string>& ar
 	if(level > 10)
 		return;
 	const static UInt32 gold[] = {88,888,1888,5888,18888,58888,88888,188888,288888,588888};
+    if (args.size() > 1)
+        player = globalPlayers[atoll(args[1].c_str())];
+    if (!player)
+        return;
 	player->setTotalRecharge(gold[level]);
 }
 
@@ -2159,6 +2163,17 @@ void GMHandler::OnUseItem( GObject::Player * player, std::vector<std::string>& a
     if (args.size() >= 3)
         fgtid = atoi(args[2].c_str());
     player->GetPackage()->UseItem(itemid, num, fgtid);
+}
+
+void GMHandler::OnUseItemOther( GObject::Player * player, std::vector<std::string>& args)
+{
+    if (!player || args.size() < 2)
+        return;
+    UInt32 itemid = atoi(args[0].c_str());
+    UInt8 num = 1;
+    if (args.size() >= 3)
+        num = atoi(args[1].c_str());
+    player->GetPackage()->UseItemOther(itemid, num, args[1]);
 }
 
 void GMHandler::OnOcupyPlace(GObject::Player * player, std::vector<std::string>& args)
