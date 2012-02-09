@@ -229,10 +229,10 @@ void WorldServer::Run()
 	worker = WORKER_THREAD_LOGIN;
 	m_AllWorker[worker]->Run();
 
-    Up();
-
 	m_TcpService = new Network::TcpServerWrapper(cfg.tcpPort);
 	m_TcpService->Start();
+
+    Up();
 
 	//主线程等待所有子线程结束
 	for (worker = 0; worker < MAX_THREAD_NUM; worker++)
@@ -248,6 +248,8 @@ void WorldServer::Run()
 void WorldServer::Shutdown()
 {
 	int worker;
+
+    Down();
 
 	//关闭网络线程
 	m_TcpService->UnInit();
@@ -301,13 +303,13 @@ void WorldServer::State(const char* action, int serverNum)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
-    TRACE_LOG("URL: %s", url);
+    fprintf(stderr, "URL: %s", url);
 
     CURLcode res = curl_easy_perform(curl);
     if (CURLE_OK == res)
     {
         // TODO:
-        TRACE_LOG("URL: %s [OK]", url);
+        fprintf(stderr, "URL: %s [OK]", url);
     }
 }
 
