@@ -91,8 +91,6 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
     cfg.serverLogId = cfg.serverNum;
 
-    Up();
-
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();
 	DB::gDataDBConnectionMgr->Init( cfg.dbDataHost.c_str(), cfg.dbDataUser.c_str(), cfg.dbDataPassword.c_str(), cfg.dbDataSource.c_str(), 1, 32, cfg.dbDataPort );
@@ -231,6 +229,8 @@ void WorldServer::Run()
 	worker = WORKER_THREAD_LOGIN;
 	m_AllWorker[worker]->Run();
 
+    Up();
+
 	m_TcpService = new Network::TcpServerWrapper(cfg.tcpPort);
 	m_TcpService->Start();
 
@@ -301,10 +301,13 @@ void WorldServer::State(const char* action, int serverNum)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
+    TRACE_LOG("URL: %s", url);
+
     CURLcode res = curl_easy_perform(curl);
     if (CURLE_OK == res)
     {
         // TODO:
+        TRACE_LOG("URL: %s [OK]", url);
     }
 }
 
