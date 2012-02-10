@@ -4397,6 +4397,8 @@ namespace GObject
 
     UInt32 Player::getClanTask()
     {
+        if (!getClan())
+            return 0;
         URandom rnd(time(NULL));
         const std::vector<UInt32>& task = GData::GDataManager::GetClanTask();
         UInt8 idx = rnd(task.size());

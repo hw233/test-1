@@ -572,8 +572,8 @@ namespace SPEQ
     const UInt16 ADDFIGHTER         = 0x117;
     const UInt16 GETMONEY           = 0x118;
     const UInt16 SYSDAILOG          = 0x119;
-    const UInt16 PWDINFO            = 0x120;
-    const UInt16 PWDRESET           = 0x121;
+    const UInt16 PWDINFO            = 0x11A;
+    const UInt16 PWDRESET           = 0x11B;
 }
 
 namespace SPEP
@@ -602,8 +602,8 @@ namespace SPEP
     const UInt8 ADDITEMFROMBSBYID   = 0x16;
     const UInt8 ADDFIGHTER          = 0x17;
     const UInt8 GETMONEY            = 0x18;
-    const UInt8 PWDINFO             = 0x20;
-    const UInt8 PWDRESET            = 0x21;
+    const UInt8 PWDINFO             = 0x1A;
+    const UInt8 PWDRESET            = 0x1B;
 }
 
 #endif // _MSGID_H_
