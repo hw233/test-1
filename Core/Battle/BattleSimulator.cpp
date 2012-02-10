@@ -811,7 +811,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 //			printf("%u:%u %s %u:%u, made %u damage, hp left: %u\n", 1-side, from_pos, cs ? "CRITICALs" : "hits", side, pos, dmg, area_target->getHP());
 			// killed the target fighter
 
-            if(counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
+            if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
             {
                 setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
                 setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
