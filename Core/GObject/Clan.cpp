@@ -1482,7 +1482,7 @@ void Clan::initBuildClan()
 
 void Clan::disband(Player * player)
 {
-	Mutex::ScopedLock lk(_mutex);
+//	Mutex::ScopedLock lk(_mutex);
 	//1):????ͬ??????
 	if (_allyClan != NULL)
 		_allyClan->delAllyClan(this);
