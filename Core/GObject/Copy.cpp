@@ -491,8 +491,11 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                     if (!World::getNewYear())
                     {
+                        // XXX: 取消VIP限制
+#if 0
                         if (pl->getVipLevel() < 4)
                             return;
+#endif
 
                         if (mtype == 1)
                         {
