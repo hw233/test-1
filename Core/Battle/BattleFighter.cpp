@@ -25,7 +25,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _criticalAdd_last(0), _criticalDmgAdd_last(0), _pierceAdd_last(0), _counterAdd_last(0), _magResAdd_last(0), _toughAdd_last(0),
     _maxhpAdd_last(0), _maxActionAdd_last(0), _atkreduce_last(0), _magatkreduce_last(0), _formEffect(NULL), _formula(bf),
     _forgetLevel(0), _forgetRound(0), _flag(0), _poisonRound(0), _poisonLevel(0), _stunRound(0), _stunLevel(0),
-     _confuseRound(0), _confuseLevel(0), _weakRound(0), _weakLevel(0), _immuneLevel(0), _immune(0), _immuneRound(0),
+     _confuseRound(0), _confuseLevel(0), _weakRound(0), _weakLevel(0), _immune(0),
     _evade100(0), _evade100_cd(0), _evade100_last(0), _evade100_base_cd(0), _evade100_base_last(0),
     _defend100(0), _defend100_cd(0), _defend100_last(0), _defend100_base_cd(0), _defend100_base_last(0),
 	_attackAdd2(0), _magAtkAdd2(0), _defAdd2(0), _magDefAdd2(0), _hitrateAdd2(0), _evadeAdd2(0),
@@ -33,6 +33,8 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
     _atkreduce2(0), _magatkreduce2(0),
 	_maxhpAdd2(0), _maxActionAdd2(0)
 {
+    memset(_immuneLevel, 0, sizeof(_immuneLevel));
+    memset(_immuneRound, 0, sizeof(_immuneRound));
 	setFighter(f);
 }
 
@@ -951,6 +953,15 @@ float BattleFighter::getMagRes(BattleFighter* defgt)
     return magres;
 }
 
+float BattleFighter::calcCriticalDmg(BattleFighter* defender)
+{
+    float factor = getCriticalDmg() - defender->getTough(this);
+    if(factor < 1)
+        factor = 1;
+
+    return factor;
+}
+
 float BattleFighter::getTough(BattleFighter* defgt)
 {
     float tough = 0;
@@ -968,5 +979,72 @@ float BattleFighter::getTough(BattleFighter* defgt)
     return tough/100.0f;
 }
 
+void BattleFighter::setImmuneLevel(UInt8 state, UInt8 f)
+{
+    if(state == 0)
+        return;
+
+    for(Int8 idx = 0; idx < 8;++idx)
+    {
+        if(state & (1 << idx))
+        {
+            _immuneLevel[idx] = f;
+        }
+    }
+}
+
+UInt8 BattleFighter::getImmuneLevel(UInt8 state)
+{
+    if(state == 0)
+        return 0;
+
+    Int8 idx = 0;
+    for(;;++idx)
+    {
+        if(state & (1 << idx))
+        {
+            break;
+        }
+    }
+
+    if(idx > 7)
+        return 0;
+
+    return _immuneLevel[idx];
+}
+
+void BattleFighter::setImmuneRound(UInt8 state, UInt8 f)
+{
+    if(state == 0)
+        return;
+
+    for(Int8 idx = 0; idx < 8; ++idx)
+    {
+        if(state & (1 << idx))
+        {
+            _immuneRound[idx] = f;
+        }
+    }
+}
+
+UInt8 BattleFighter::getImmuneRound(UInt8 state)
+{
+    if(state == 0)
+        return 0;
+
+    Int8 idx = 0;
+    for(;;++idx)
+    {
+        if(state & (1 << idx))
+        {
+            break;
+        }
+    }
+
+    if(idx > 7)
+        return 0;
+
+    return _immuneRound[idx];
+}
 
 }

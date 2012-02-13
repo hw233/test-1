@@ -51,7 +51,7 @@ public:
 	inline UInt16 getExtraSoul() { return _attrExtra.soul; }
 	inline UInt16 getExtraAura() { return _attrExtra.aura; }
 	inline UInt16 getExtraAuraMax() { return _attrExtra.auraMax; }
-	inline UInt16 getExtraTough() { return _attrExtra.tough; }
+	inline float getExtraTough() { return _attrExtra.tough; }
 	inline float getExtraStrengthP() { return _attrExtra.strengthP; }
 	inline float getExtraPhysiqueP() { return _attrExtra.physiqueP; }
 	inline float getExtraAgilityP() { return _attrExtra.agilityP; }
@@ -133,6 +133,7 @@ public:
 	float getEvade(BattleFighter* defgt);
 	float getCritical(BattleFighter* defgt);
 	inline float getCriticalDmg() {float ret = _criticaldmg + _criticalDmgAdd + _criticalDmgAdd2; return (ret > 0 ? ret : 0);}
+    float calcCriticalDmg(BattleFighter* defender);
 	float getPierce(BattleFighter* defgt);
 	float getCounter(BattleFighter* defgt);
 	float getMagRes(BattleFighter* defgt);
@@ -221,12 +222,12 @@ public:
 	inline void delFlag(UInt32 f) { _flag &= ~f; }
 	inline bool hasFlag(UInt32 f) { return (_flag & f) > 0;}
 	void setAttrExtra(UInt8, UInt8, UInt8);
-    inline void setImmuneLevel(UInt8 f) { _immuneLevel = f; }
-    inline void setImmune(UInt8 f) { _immune |= f; }
-    inline void setImmuneRound(UInt8 f) { _immuneRound = f; }
-    inline UInt8 getImmuneLevel() { return _immuneLevel; }
+    void setImmuneLevel(UInt8 state, UInt8 f);
+    void setImmune(UInt8 f) { _immune |= f; }
+    void setImmuneRound(UInt8 state, UInt8 f);
+    UInt8 getImmuneLevel(UInt8 state);
     inline UInt8 getImmune() { return _immune; }
-    inline UInt8 getImmuneRound() { return _immuneRound; }
+    UInt8 getImmuneRound(UInt8 state);
     inline void setForgetLevel(UInt8 f) { _forgetLevel = f; }
     inline void setForgetRound(UInt8 f) { _forgetRound = f; }
     inline UInt8 getForgetLevel() { return _forgetLevel; }
@@ -429,9 +430,9 @@ private:
     bool _revival;
     UInt8 _activeSkillIdx;
     // 入场时技能效果
-    UInt8 _immuneLevel;
+    UInt8 _immuneLevel[8];
     UInt8 _immune;
-    UInt8 _immuneRound;
+    UInt8 _immuneRound[8];
     bool _evade100;
     UInt8 _evade100_cd;
     UInt8 _evade100_last;
