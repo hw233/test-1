@@ -1415,6 +1415,48 @@ function ItemNormal_00000448(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_VIP(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local needsize = {5, 1, 1, 2, 3, 4, 4, 4, 4, 5, 6, 8, 20, 20, 30, 40}
+    local vipitems = {
+        {56,2,503,10,514,10,507,2,509,2,0,0},
+        {56,2,0,0,0,0,0,0,0,0,0,0},
+        {56,10,0,0,0,0,0,0,0,0,0,0},
+        {56,10,503,5,0,0,0,0,0,0,0,0},
+        {56,10,503,10,514,10,0,0,0,0,0,0},
+        {503,20,515,5,507,2,509,2,0,0,0,0},
+        {503,30,515,15,507,10,509,10,0,0,0,0},
+        {503,30,515,20,507,10,509,10,0,0,0,0},
+        {503,50,515,30,507,30,509,30,0,0,0,0},
+        {503,100,515,30,507,30,509,30,0,0,0,0},
+        {503,200,515,50,507,50,509,50,0,0,0,0},
+        {503,300,515,80,507,50,509,50,0,0,0,0},
+        {503,800,515,240,507,150,509,150,0,0,0,0},
+        {503,800,515,280,507,150,509,150,0,0,0,0},
+        {503,1000,515,500,507,600,509,600,0,0,0,0},
+        {503,1500,515,500,507,700,509,700,0,0,0,0},
+    }
+
+    local lvl = iid - 449 + 1;
+
+    if package:GetRestPackageSize() < needsize[lvl] then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    for n = 1,#vipitems[lvl],2 do
+        if vipitems[lvl][n] == 0 then
+            break
+        end
+        package:AddItem(vipitems[lvl][n], vipitems[lvl][n+1], true, false)
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -6954,6 +6996,24 @@ local ItemNormal_Table = {
     [446] = ItemNormal_shusanLoveCard,
     [447] = ItemNormal_shusanLoveCard,
     [448] = ItemNormal_00000448,
+
+    [449] = ItemNormal_VIP,
+    [450] = ItemNormal_VIP,
+    [451] = ItemNormal_VIP,
+    [452] = ItemNormal_VIP,
+    [453] = ItemNormal_VIP,
+    [454] = ItemNormal_VIP,
+    [455] = ItemNormal_VIP,
+    [456] = ItemNormal_VIP,
+    [457] = ItemNormal_VIP,
+    [458] = ItemNormal_VIP,
+    [459] = ItemNormal_VIP,
+    [460] = ItemNormal_VIP,
+    [461] = ItemNormal_VIP,
+    [462] = ItemNormal_VIP,
+    [463] = ItemNormal_VIP,
+    [464] = ItemNormal_VIP,
+
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,
