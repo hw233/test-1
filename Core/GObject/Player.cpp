@@ -49,6 +49,7 @@
 #include "GData/ClanTechTable.h"
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
+#include "Common/StringTokenizer.h"
 
 #include <cmath>
 
@@ -897,7 +898,16 @@ namespace GObject
             }
         }
 
-        udpLog("", "", "", "", "", "", "login");
+        if (!m_via.empty())
+        {
+            StringTokenizer via(m_via, "_");
+            if (via.count() > 1)
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
+            else
+                udpLog(m_via.c_str(), "", "", "", "", "", "login");
+        }
+        else
+            udpLog("", "", "", "", "", "", "login");
         dclogger.login(this);
 	}
 

@@ -108,8 +108,9 @@ struct UserLoginStruct
     std::string _platform;
     std::string _openid;
     std::string _openkey;
-	MESSAGE_DEF10(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
-            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey);
+    std::string _via;
+	MESSAGE_DEF11(REQ::LOGIN, UInt64, _userid, UInt8, _level, UInt8, _level1, UInt8, _isYear, UInt32, _lang,
+            HashValType, _hashval, std::string, _server, std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via);
 };
 
 struct NewUserStruct
@@ -122,8 +123,9 @@ struct NewUserStruct
     std::string _platform;
     std::string _openid;
     std::string _openkey;
-	MESSAGE_DEF8(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
-            std::string, _platform, std::string, _openid, std::string, _openkey);
+    std::string _via;
+	MESSAGE_DEF9(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via);
 
 };
 
@@ -296,6 +298,7 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setDomain(ul._platform);
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
+            player->setVia(ul._via);
         }
 
 		UInt8 flag = 0;
@@ -524,6 +527,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setDomain(nu._platform);
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
+            pl->setVia(nu._via);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
