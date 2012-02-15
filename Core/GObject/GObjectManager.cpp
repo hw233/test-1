@@ -53,6 +53,7 @@
 #include "ActivityMgr.h"
 #include <fcntl.h>
 #include "HoneyFall.h"
+#include "TownDeamon.h"
 
 namespace GObject
 {
@@ -183,6 +184,7 @@ namespace GObject
 		LoadArena();
         LoadPracticePlace();
         LoadWorldBoss();
+        LoadTownDeamon();
         InitMoneyLog();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -3865,4 +3867,58 @@ namespace GObject
 		}
 		return static_cast<ItemArmor *>(equip);
 	}
+
+    bool GObjectManager::LoadTownDeamon() // 
+    {
+        if(!townDeamonManager)
+            return false;
+
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+		lc.prepare("Loading TownDeamon Monsters:");
+		GData::DBTownDeamonMonster dbtdm;
+		if(execu->Prepare("SELECT `level`, `npcId` FROM `towndeamon_monster` order by level asc", dbtdm) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            townDeamonManager->loadDeamonMonstersFromDB(dbtdm.level, dbtdm.npcId);
+        }
+		lc.finalize();
+
+		std::unique_ptr<DB::DBExecutor> execu2(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu2.get() == NULL || !execu2->isConnected()) return false;
+		lc.prepare("Loading TownDeamon Player:");
+		DBTownDeamonPlayer dbtdp;
+        Player* pl = NULL;
+		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `awards`, `vitalityTime`, `vitality` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		while(execu2->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            pl = globalPlayers[hfData.playerId];
+            if(pl == NULL)
+                continue;
+            DeamonPlayerData* dpData = pl->getDeamonPlayerData();
+            if(!dpData)
+                continue;
+            dpData->startTime = dbtdp.startTime;
+            dpData->deamonLevel = dbtdp.deamonLevel;
+            dpData->curLevel = dbtdp.curLevel;
+            dpData->maxLevel = dbtdp.maxLevel;
+            dpData->accTime = dbtdp.accTime;
+            dpData->awards = dbtdp.awards;
+            dpData->validityTime = dbtdp.validityTime;
+            dpData->validity = dbtdp.validity;
+
+            if(deamonLevel != 0)
+                townDeamonManager->loadDeamonPlayersFromDB(dbtdm.deamonLevel, pl);
+        }
+		lc.finalize();
+
+    }
+
 }

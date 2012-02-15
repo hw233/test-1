@@ -3951,4 +3951,89 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
+void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            townDeamonManager->showTown(player);
+        }
+        break;
+    case 0x01:
+        {
+            UInt16 level = 0;
+            br >> level;
+            townDeamonManager->showLevelTown(player, level);
+        }
+        break;
+    case 0x02:
+        {
+            UInt16 start = 0;
+            UInt16 count = 0;
+            br >> start >> level;
+            townDeamonManager->listDeamons(player, start, count);
+        }
+        break;
+    case 0x03:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt8 count = 0;
+            br >> count;
+            townDeamonManager->useAccItem(player, count);
+        }
+        break;
+    case 0x04:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt8 count = 0;
+            br >> count;
+            townDeamonManager->useVitalityItem(player, count);
+        }
+        break;
+    case 0x05:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt16 level = 0;
+            UInt8 type = 0;
+            br >> level >> type;
+            townDeamonManager->challenge(player, level, type);
+        }
+        break;
+    case 0x06:
+        {
+            if(!player->hasChecked())
+                return;
+
+            townDeamonManager->cancelDeamon(player);
+        }
+        break;
+    case 0x07:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt16 levels = 0;
+            br >> levels;
+            townDeamonManager->autoCompleteQuite(player, levels);
+        }
+        break;
+    default:
+        return;
+    }
+}
+
+
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_

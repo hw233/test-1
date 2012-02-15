@@ -1325,6 +1325,7 @@ namespace GObject
         void buildClanTechSkill();
         UInt8 getClanSkillFlag() { return m_csFlag; }
         void setClanSkillFlag(UInt8 csFlag) { m_csFlag = csFlag; }
+        DeamonPlayerData* getDeamonPlayerData() { return m_dpData; }
 
     private:
         bool m_hasTripod;
@@ -1333,6 +1334,7 @@ namespace GObject
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
         HoneyFall* m_hf;
+        DeamonPlayerData* m_dpData;
         std::map<UInt8, ClanSkill> m_clanSkill;
         UInt8 m_csFlag;
 

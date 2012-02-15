@@ -12,6 +12,12 @@
 namespace GData
 {
 
+struct DBTownDeamonMonster
+{
+	UInt16 level;
+    UInt32 npcId;
+};
+
 struct DBNpcGroup
 {
 	UInt32 id;
@@ -66,6 +72,19 @@ struct DBClanAssistant
 
 namespace GObject
 {
+
+struct DBTownDeamonPlayer
+{
+    UInt16 deamonLevel;
+    UInt16 curLevel;
+    UInt16 maxLevel;
+    UInt64 playerId;
+    UInt32 startTime;
+    UInt32 accTime;
+    UInt32 awards;
+    UInt32 vitalityTime;
+    UInt16 vitality;
+};
 
 struct DBMapSpot
 {

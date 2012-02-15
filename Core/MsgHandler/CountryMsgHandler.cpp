@@ -143,6 +143,9 @@ MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 
+MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
+
+
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReLoadLuaReq);

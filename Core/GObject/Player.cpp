@@ -588,6 +588,7 @@ namespace GObject
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
+        m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
 	}
 
@@ -597,6 +598,10 @@ namespace GObject
 		UnInit();
         delete m_tcpInfo;
         m_tcpInfo = NULL;
+        delete m_hf;
+        m_hf = NULL;
+        delete m_dpData;
+        m_dpData = NULL:
 	}
 
 	bool Player::Load()

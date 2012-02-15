@@ -81,6 +81,7 @@ namespace GObject
         static bool LoadTripodData();
         static bool LoadWorldBoss();
         static bool loadTeamCopy();
+        static bool LoadTownDeamon();
         static bool InitMoneyLog();
 
         static bool addGM(UInt64 id, UInt8 lvl);
