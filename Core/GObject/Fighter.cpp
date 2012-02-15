@@ -1223,6 +1223,8 @@ void Fighter::rebuildEquipAttr()
 		if(equip->getQuality() >= 4)
 			testEquipInSet(setId, setNum, equip->GetItemType().getId());
 		addAttr(equip);
+
+        _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
 
 	equip = getAmulet();
@@ -1231,6 +1233,7 @@ void Fighter::rebuildEquipAttr()
 		if(equip->getQuality() >= 4)
 			testEquipInSet(setId, setNum, equip->GetItemType().getId());
 		addAttr(equip);
+        _attrExtraEquip.hp += GObjectManager::getRingHpFromEnchant(equip->getValueLev(), equip->GetCareer(), equip->getItemEquipData().enchant);
 	}
 
 	for(int i = 0; i < 8; ++ i)

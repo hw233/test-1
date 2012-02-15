@@ -43,6 +43,12 @@ namespace GObject
         float attrMax[3][4][9];
     };
 
+    struct stRingHpBase
+    {
+        stRingHpBase() { memset(hpBase, 0, sizeof(hpBase)); }
+        float hpBase[4];
+    };
+
     struct stHftChance
     {
         stHftChance() { times = 0; chance = 0; }
@@ -323,6 +329,33 @@ namespace GObject
             return 0;
         }
 
+        static float getRingHpFromEnchant(UInt8 lvl, UInt8 crr, UInt8 enchant)
+        {
+            if(enchant == 0)
+                return 0;
+
+            if(crr > 3)
+                crr = 0;
+            if(enchant > 12)
+                enchant = 0;
+            -- enchant;
+
+            std::map<UInt8, stRingHpBase*>::iterator it = _ringHpBase.find(lvl);
+            if(it == _ringHpBase.end())
+            {
+                UInt8 lvl2 = lvl - lvl%10;
+                it = _ringHpBase.find(lvl2);
+            }
+            
+            stRingHpBase* ringHp = NULL;
+            if(it == _ringHpBase.end())
+                ringHp = _ringHpBase[10];
+            else
+                ringHp = it->second;
+
+            return ringHp->hpBase[crr] * _ringHpFactor[enchant];
+        }
+
        	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -363,6 +396,10 @@ namespace GObject
         static float _tough_max;
         static float _counter_max;
         static float _mres_max;
+
+        // 项链戒指强化
+        static std::map<UInt8, stRingHpBase*> _ringHpBase;
+        static float _ringHpFactor[12];
 
         // 天赋洗炼
         static std::vector<UInt32> _FFTypeChance;

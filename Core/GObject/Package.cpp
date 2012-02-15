@@ -1704,7 +1704,7 @@ namespace GObject
 		UInt8 pos = 0;
         UInt32 failThisTime = 0; 
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
-		if(equip == NULL || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet)
+		if(equip == NULL/* || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet*/)
 			return 2;
 
         const GData::ItemBaseType& itemType =  equip-> GetItemType();
