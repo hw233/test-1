@@ -12,7 +12,8 @@
 #include "Mail.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
-#include "GObject/TeamCopy.h"
+#include "TeamCopy.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -247,6 +248,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
 
     std::vector<UInt16> loot;
     if (pl->attackCopyNpc(fgtid, 1, id, World::_wday==6?2:1, tcd.lootlvl, ato, &loot)) {
+        pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 0);
         if (ato)
             pl->checkLastBattled();
         bool nextfloor = false;
@@ -295,6 +297,11 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             }
 
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
+
+            if (id == 1)
+                pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 1);
+            if (id == 2)
+                pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)
@@ -491,8 +498,10 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                     if (!World::getNewYear())
                     {
-                        if (pl->getVipLevel() < 4)
-                            return;
+                        // XXX: moneyNeed must greater than 1000
+                        UInt32 pref = 0;
+                        if (pl->getVipLevel() >= 4)
+                            pref = 1000;
 
                         if (mtype == 1)
                         {
@@ -506,12 +515,12 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                         }
                         else
                         {
-                            if (GData::moneyNeed[GData::COPY_AUTO1+id-1].tael > pl->getTael()) {
+                            if (GData::moneyNeed[GData::COPY_AUTO1+id-1].tael - pref > pl->getTael()) {
                                 pl->sendMsgCode(0, 1100);
                                 return;
                             } else {
                                 ConsumeInfo ci(EnterAutoCopy,0,0);
-                                pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael, &ci);
+                                pl->useTael(GData::moneyNeed[GData::COPY_AUTO1+id-1].tael - pref, &ci);
                             }
                         }
                     }

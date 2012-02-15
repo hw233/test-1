@@ -8,6 +8,7 @@
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
 #include "GObject/GObjectManager.h"
+#include "GObject/HeroMemo.h"
 
 namespace Battle
 {
@@ -632,6 +633,8 @@ const GData::SkillBase* BattleFighter::getActiveSkill(bool need_therapy)
         if(_aura >= 100 && _peerlessSkill.base->effect != NULL)
         {
             // peerless skill first
+            if (_fighter->getOwner())
+                _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_ADVANCED, 0, 2);
             return _peerlessSkill.base;
         }
     }
@@ -702,6 +705,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkill100(std::vector<GData::Ski
             if(passiveSkill100[idx].base->effect == NULL)
                 continue;
             passiveSkill100[idx].cd = passiveSkill100[idx].base->cd + 1;
+            if (_fighter->getOwner())
+                _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_MASTER, 0, 1);
             return passiveSkill100[idx++].base;
         }
     }
@@ -768,6 +773,8 @@ const GData::SkillBase* BattleFighter::getPassiveSkill(std::vector<GData::SkillI
                 continue;
             passiveSkill[idx].cd = passiveSkill[idx].base->cd + 1;
             resSkillBase = passiveSkill[idx].base;
+            if (_fighter->getOwner())
+                _fighter->getOwner()->OnHeroMemo(GObject::MC_SKILL, GObject::MD_MASTER, 0, 1);
             break;
         }
     }

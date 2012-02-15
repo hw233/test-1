@@ -52,6 +52,7 @@
 #include "LoginMsgHandler.h"
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/HeroMemo.h"
 
 struct NullReq
 {
@@ -956,6 +957,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         tcpInfo->sendAwardInfo();
     }
 
+    pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
 }
 
@@ -1137,6 +1139,13 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 	Stream st;
 	player->makeFormationInfo(st);
 	player->send(st);
+
+    if (c == 5)
+        player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 0);
+    if (f == 1001)
+        player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 1);
+    if (f == 1202)
+        player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 2);
 }
 
 void OnFighterInfoReq( GameMsgHdr& hdr, const void * data )

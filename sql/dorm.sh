@@ -11,6 +11,7 @@ fi
 function dorm()
 {
     mysql -h$H -u$U -p$P -P$PT $DBO -e "\
+        delete from attainment where ownerId = $1;\
         delete from activityData where playerId = $1;\
         delete from auto_battle where playerId = $1;\
         delete from equipment where id in (select id from item where ownerId = $1 and id >= 30000);\
@@ -25,7 +26,7 @@ function dorm()
         delete from var where playerId = $1;\
         delete from player_buff where id = $1;\
         delete from practice_data where id = $1;\
-        delete from practice_place where ownerid = $1;\
+        update practice_place set ownerid = 0 where ownerid = $1;\
         delete from player_copy where playerId = $1;\
         delete from player_frontmap where playerId = $1;\
         delete from athletics_rank where ranker = $1;\

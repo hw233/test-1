@@ -128,6 +128,7 @@ namespace GObject
     struct TeamData;
     struct TeamCopyPlayerInfo;
     class ActivityMgr;
+    class HeroMemo;
     class HoneyFall;
 
     struct TripodData
@@ -545,6 +546,7 @@ namespace GObject
 		UInt8 GetCountryThread();
 
 		void Login();
+        void sendCreateMail();
 
 		void Reconnect();
 
@@ -920,6 +922,7 @@ namespace GObject
 		inline ClanBattle * getClanBattle() { return _clanBattle; }
 
         void OnDoAttainment(UInt32 attId,   UInt32  param);
+        void OnHeroMemo(UInt8,UInt8,UInt8,UInt8);
 		//////////////////////////////////////////////////////////////////////////
 		//????ϵͳ
 		inline bool IsInTeam() const { return false; }	//TODO
@@ -933,6 +936,7 @@ namespace GObject
 		MailBox* GetMailBox() { return m_MailBox; }
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
         ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
+        HeroMemo* GetHeroMemo(){return m_HeroMemo;}
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -968,6 +972,7 @@ namespace GObject
 		bool addFoe(Player *);
 		bool delFoe(Player *);
 		inline bool isFriendFull() { return _friends[0].size() >= 20; }
+        inline UInt32 getFrendsNum() const { return _friends[0].size(); }
 		bool testCanAddFriend(Player *);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
@@ -1116,6 +1121,7 @@ namespace GObject
 
 		AttainMgr* m_AttainMgr;
         ActivityMgr*  m_ActivityMgr;
+        HeroMemo* m_HeroMemo;
 		MailBox* m_MailBox;
 
 		bool _isOnline;
@@ -1263,6 +1269,7 @@ namespace GObject
         std::string m_openid;
         std::string m_openkey;
         std::string m_source;
+        std::string m_via;
         bool m_isOffical;
     public:
         inline void setDomain(const std::string& domain)
@@ -1275,10 +1282,12 @@ namespace GObject
         inline void setOpenId(const std::string& openid) { m_openid = openid; }
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
+        inline void setVia(const std::string& via) { m_via = via; }
         inline const std::string& getDomain() const { return m_domain; }
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
+        inline const std::string& getVia() const { return m_via; }
         inline bool isOffical() const { return m_isOffical; }
 
     public:

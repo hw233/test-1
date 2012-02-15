@@ -8,6 +8,18 @@
 
 using namespace DataCollector;
 
+#if 0
+    1   qzone
+    2   pengyou
+    2   xiaoyou
+    3   qqweibo
+    4   qplus
+    5   caifutong
+    10  qqgame
+    11  q3366
+    12  kingxin
+#endif
+
 namespace GObject
 {
 #define MAX_DOMAIN 256 

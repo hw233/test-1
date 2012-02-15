@@ -984,6 +984,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     player->GetPackage()->AddItem(18, 1, true);
     player->getCoupon(888);
     player->udpLog("create", "", "", "", "", "", "guide");
+    player->sendCreateMail();
     dclogger.reg(player);
 }
 
@@ -1251,6 +1252,12 @@ void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
     GObject::practicePlace.doAttack(player, data);
+}
+void OnHeroMemo( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8* msg = (UInt8*)(data);
+    player->OnHeroMemo(msg[0], msg[1], msg[2], msg[3]);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

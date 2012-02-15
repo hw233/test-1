@@ -12,6 +12,8 @@
 #include "MsgID.h"
 #include "Script/BattleFormula.h"
 #include "MsgHandler/CountryMsgStruct.h"
+#include "HeroMemo.h"
+
 namespace GObject
 {
 
@@ -207,6 +209,8 @@ void Athletics::attack(Player * defer)
 	UInt8 tid = defer->getThreadId();
 	if(tid == _owner->getThreadId())
 	{
+        _owner->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 0);
+
 		struct AthleticsResult
 		{
 			UInt32	id;
@@ -241,6 +245,8 @@ void Athletics::attack(Player * defer)
         Player* winner =  res ? _owner : defer;
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
+        if (res)
+            _owner->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 1);
 		return;
 	}
 	struct AthleticsBeData
@@ -490,6 +496,7 @@ void Athletics::attackMartial(Player* defer)
     UInt32 id = 0;
 
     GameAction()->doAty(this->_owner, AtyAthletics, 0, 0);
+    _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
     do
     {
         UInt8 idx = 0xFF;
@@ -544,14 +551,12 @@ void Athletics::attackMartial(Player* defer)
         UInt32 time = TimeUtil::Now();
 		id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
 		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
-
-        
        
         Player* winner =  res ? _owner : defer;
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
-
-       
+        if (res)
+            _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
     }while(false);
 
 	AthleticsResult ar = {id, 0, defer, res };
@@ -644,6 +649,8 @@ void Athletics::awardMartial(Player* defer, bool win)
             la.itemId = 6;
             la.itemCount = 1;
             wins = 0;
+
+            _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 2);
         }
         la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
         _owner->getPrestige(la.prestige, false);

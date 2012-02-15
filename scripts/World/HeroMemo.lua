@@ -1,0 +1,3 @@
+
+local level2HeroSoul = {}
+

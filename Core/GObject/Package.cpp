@@ -22,6 +22,7 @@
 #include "GData/EUpgradeTable.h"
 #include "AttainMgr.h"
 #include "HoneyFall.h"
+#include "HeroMemo.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -523,6 +524,12 @@ namespace GObject
                 }
                 if (fromWhere == FromNpcBuy)
                     udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
+                if (typeId == 1209)
+                    m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
+                if (typeId == 1223)
+                    m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
+                if (typeId == 1224)
+                    m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
 				return item;
 			}
 			return NULL;
@@ -540,6 +547,12 @@ namespace GObject
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
+                if (typeId == 1209)
+                    m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
+                if (typeId == 1223)
+                    m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
+                if (typeId == 1224)
+                    m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
@@ -574,6 +587,12 @@ namespace GObject
             {
                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             }
+            if (typeId == 1209)
+                m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
+            if (typeId == 1223)
+                m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
+            if (typeId == 1224)
+                m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
 			return item;
 		}
 		else
@@ -592,6 +611,12 @@ namespace GObject
             {
                  AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             }
+            if (typeId == 1209)
+                m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
+            if (typeId == 1223)
+                m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
+            if (typeId == 1224)
+                m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
 			return NULL;
 		}
 	}
@@ -1679,7 +1704,7 @@ namespace GObject
 		UInt8 pos = 0;
         UInt32 failThisTime = 0; 
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
-		if(equip == NULL || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet)
+		if(equip == NULL/* || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet*/)
 			return 2;
 
         const GData::ItemBaseType& itemType =  equip-> GetItemType();
@@ -1689,6 +1714,11 @@ namespace GObject
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
         UInt8 quality = 0;
         UInt8 maxEnchantLevel = ENCHANT_LEVEL_MAX;
+        if (m_Owner->getVipLevel() >= 11) // XXX: ==VIP11 -> 11
+            ++maxEnchantLevel;
+        if (m_Owner->getVipLevel() >= 12) // XXX: >=VIP12 -> 12
+            ++maxEnchantLevel;
+
         if(equip->getClass() == Item_Weapon)
         {
             quality = 1;
@@ -1870,6 +1900,13 @@ namespace GObject
                 {
                     GameAction()->doAttainment(this->m_Owner, 10207,itemType.quality);
                 }
+
+                 if (ied.enchant == 1)
+                     m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 0);
+                 if (ied.enchant == 2)
+                     m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 1);
+                 if (ied.enchant == 4)
+                     m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 2);
             }
             else
             {
@@ -1878,6 +1915,13 @@ namespace GObject
 
                  if(fgt)
                      fgt->CheckEquipEnchantAttainment(ied.enchant);
+
+                 if (ied.enchant == 2)
+                     m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 0);
+                 if (ied.enchant == 4)
+                     m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 1);
+                 if (ied.enchant == 6)
+                     m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 2);
             }
 
 			if(fgt != NULL)
@@ -2015,6 +2059,13 @@ namespace GObject
 			fgt->sendModification(0x21 + pos, equip, false);
 		else
 			SendSingleEquipData(equip);
+
+        if (ied.sockets >= 3)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 0, 2);
+        else if (ied.sockets >= 2)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 0, 1);
+        else if (ied.sockets >= 1)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 0, 0);
 		return 0;
 	}
 
@@ -2184,6 +2235,10 @@ namespace GObject
         UInt8 gemLev = getGemLev(gemId);
         GameAction()->doAttainment(m_Owner, 10170, gemLev);
 
+        m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 1, 0);
+        if (gemLev >= 3)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 1, 2);
+
         if((fempty  + 1)== SOCKETS_MAX)
         {
             //镶嵌满脸
@@ -2281,6 +2336,8 @@ namespace GObject
 		}
 		else
 			SendSingleEquipData(equip);
+
+        m_Owner->OnHeroMemo(MC_FORGE, MD_MASTER, 1, 1);
 		return 0;
 	}
 
@@ -2406,6 +2463,13 @@ namespace GObject
             item = NULL;
             pushBackSplitItem( splitOut, itemOutId, count );
             res = 0;
+
+            if (itemOutId == 502)
+                m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 0);
+            if (itemOutId == 518)
+                m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 1);
+            if (itemOutId == 503)
+                m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 2);
         }
 
 		if(got)
@@ -3185,6 +3249,14 @@ namespace GObject
                     *pFgtId = 0;
             }
         }
+
+        if (oldEquip->getClass() == Item_Armor2)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 0);
+        if (oldEquip->getClass() == Item_Ring)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
+        if (oldEquip->getClass() == Item_Weapon)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+
         return 0;
     }
 
@@ -3224,6 +3296,7 @@ namespace GObject
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
         GameAction()->doAty(this->m_Owner, AtyForge, 0, 0);
+        m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 0);
 		UInt8 lv = equip->getValueLev();
 		UInt8 q = equip->getQuality() - 3;
 		if(protect)
@@ -3281,6 +3354,35 @@ namespace GObject
         if ((float)values[1] > v1 && !(protect & 2))
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
+        }
+
+        {
+            float v0 = 0;
+            if(equip_t == EQUIPTYPE_EQUIP)
+                v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*40;
+            if ((float)values[0] > v0 && !(protect & 1))
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
+        }
+        {
+            float v0 = 0;
+            if(equip_t == EQUIPTYPE_EQUIP)
+                v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*40;
+            if ((float)values[0] > v0 && !(protect & 1))
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
+        }
+        {
+            float v0 = 0;
+            if(equip_t == EQUIPTYPE_EQUIP)
+                v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*70;
+            if ((float)values[0] > v0 && !(protect & 1))
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+        }
+        {
+            float v0 = 0;
+            if(equip_t == EQUIPTYPE_EQUIP)
+                v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*70;
+            if ((float)values[0] > v0 && !(protect & 1))
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
         }
 
 		ApplyAttr2(equip, types, values);
@@ -3580,6 +3682,13 @@ namespace GObject
         }
 		else
 			SendSingleEquipData(trump);
+
+        if (ied_trump.tRank >= 3)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 2);
+        else if (ied_trump.tRank >= 2)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 1);
+        else if (ied_trump.tRank >= 1)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 0);
 
         return 0;
     }

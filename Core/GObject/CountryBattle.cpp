@@ -12,6 +12,7 @@
 #include "Common/TimeUtil.h"
 #include "SpecialAward.h"
 #include "MsgID.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -198,6 +199,10 @@ void CountryBattle::process(UInt32 curtime)
 
 				if(cbd1->killStreak >= 10 && World::_actAvailable && gSpecialAward.getAwardSize(0) < 3)
 					gSpecialAward.AddSpecialAwardList(0, cbd1->player);
+
+                cbd1->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 1);
+                if (cbd1->killStreak == 2)
+                    cbd1->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
 			}
 			else
 			{
@@ -258,6 +263,9 @@ void CountryBattle::process(UInt32 curtime)
 				if(cbd2->killStreak >= 10 && World::_actAvailable && gSpecialAward.getAwardSize(0) < 3)
 					gSpecialAward.AddSpecialAwardList(0, cbd2->player);
 
+                cbd2->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 1);
+                if (cbd2->killStreak == 2)
+                    cbd2->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
 			}
 		}
 	}
@@ -549,6 +557,7 @@ bool CountryBattle::playerEnter( Player * player )
 	SYSMSG_SENDV(1041, player, player->getCountry());
 
     GameAction()->doAty( player, AtyCountryWar, 0, 0);
+    player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 0);
 	return true;
 }
 
