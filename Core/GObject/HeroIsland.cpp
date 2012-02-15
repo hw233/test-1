@@ -8,6 +8,8 @@
 #include "MsgID.h"
 #include "Country.h"
 #include "MsgHandler/CountryMsgStruct.h"
+#include "HeroMemo.h"
+
 namespace GObject
 {
 
@@ -1303,6 +1305,8 @@ bool HeroIsland::attack(Player* player, UInt8 type, UInt64 id)
                     Stream st(REP::HERO_ISLAND);
                     st << static_cast<UInt8>(5) << static_cast<UInt8>(status) << pd->straight << Stream::eos;
                     pd->player->send(st);
+
+                    pd->player->OnHeroMemo(MC_ATHLETICS, MD_MASTER, 0, 1);
                 }
             }
 
@@ -1684,6 +1688,8 @@ void HeroIsland::playerEnter(Player* player)
         st << static_cast<UInt8>(1);
     st << Stream::eos;
     player->send(st);
+
+    player->OnHeroMemo(MC_ATHLETICS, MD_MASTER, 0, 0);
 }
 
 void HeroIsland::playerLeave(Player* player)
@@ -2015,6 +2021,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
 
         if (awards[id].id && awards[id].num)
         {
+            player->OnHeroMemo(MC_ATHLETICS, MD_MASTER, 0, 2);
 
             pd->awardgot = 0xFF;
             if (awards[id].id > 5)

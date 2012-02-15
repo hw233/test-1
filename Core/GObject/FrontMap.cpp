@@ -10,6 +10,7 @@
 #include "Server/Cfg.h"
 #include "Script/GameActionLua.h"
 #include "Country.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -299,6 +300,8 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
         ret = true;
         if (ato)
             pl->checkLastBattled();
+
+        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
     }
 
     if (ret) {
@@ -342,6 +345,11 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
             if (ato)
                 autoClear(pl, complate);
+
+            if (id == 1)
+                pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
+            if (id == 2)
+                pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
             return 2;
         } else { // 打过某一点
             UInt8 nspot = spot+1;
@@ -471,11 +479,9 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                     if (!World::getNewYear())
                     {
-                        // XXX: 取消VIP限制
-#if 0
-                        if (pl->getVipLevel() < 5)
-                            return;
-#endif
+                        UInt32 pref = 0;
+                        if (pl->getVipLevel() >= 5)
+                            pref = 1000;
 
                         if (mtype == 1)
                         {
@@ -489,12 +495,12 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
                         }
                         else
                         {
-                            if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael > pl->getTael()) {
+                            if (GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael - pref > pl->getTael()) {
                                 pl->sendMsgCode(0, 1100);
                                 return;
                             } else {
                                 ConsumeInfo ci(EnterAutoFrontMap,0,0);
-                                pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael, &ci);
+                                pl->useTael(GData::moneyNeed[GData::FRONTMAP_AUTO1+id-1].tael - pref, &ci);
                             }
                         }
                     }

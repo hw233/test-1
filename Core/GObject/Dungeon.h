@@ -146,7 +146,7 @@ private:
 	std::list<DungeonLootInfo> _recentLoots;
 	std::vector<std::list<DungeonReportInfo> > _recentReports;
 	static UInt8 _maxCount;
-	static UInt8 _extraCount[11];
+	static UInt8 _extraCount[16];
 	static UInt16 _price[5];
 	static size_t _priceCount;
 };

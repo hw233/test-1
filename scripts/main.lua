@@ -19,4 +19,5 @@ require("Other/OperationTaskAction")
 require("Special/Activity")
 require("Other/ClanBattle")
 require("World/ActivityMgr")
+require("World/HeroMemo")
 

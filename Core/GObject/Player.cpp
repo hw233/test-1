@@ -6,6 +6,7 @@
 #include "TaskMgr.h"
 #include "AttainMgr.h"
 #include "ActivityMgr.h"
+#include "HeroMemo.h"
 #include "Trade.h"
 #include "Sale.h"
 #include "Country.h"
@@ -582,6 +583,7 @@ namespace GObject
 		m_Athletics = new Athletics(this);
 		m_AttainMgr = new AttainMgr(this);
         m_ActivityMgr = new ActivityMgr(this);
+        m_HeroMemo = new HeroMemo(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
@@ -628,8 +630,8 @@ namespace GObject
 
 	void Player::setVipL(UInt8 lvl)
 	{
-#define VIP_OPEN_MAX 10
-        if (!lvl || lvl > VIP_OPEN_MAX)
+#define _VIP_OPEN_MAX 15
+        if (!lvl || lvl > _VIP_OPEN_MAX)
             return;
         if (lvl == 0)
             _playerData.totalRecharge = 87;
@@ -653,6 +655,16 @@ namespace GObject
             _playerData.totalRecharge = 288888;
         else if (lvl == 10)
             _playerData.totalRecharge = 588888;
+        else if (lvl == 11)
+            _playerData.totalRecharge = 988888;
+        else if (lvl == 12)
+            _playerData.totalRecharge = 1888888;
+        else if (lvl == 13)
+            _playerData.totalRecharge = 2888888;
+        else if (lvl == 14)
+            _playerData.totalRecharge = 5888888;
+        else if (lvl == 15)
+            _playerData.totalRecharge = 8888888;
 		DB1().PushUpdateData("UPDATE `player` SET `totalRecharge` = %u WHERE `id` = %"I64_FMT"u", _playerData.totalRecharge, getId());
         recalcVipLevel();
 		sendModification(7, _playerData.totalRecharge);
@@ -660,7 +672,7 @@ namespace GObject
 
 	UInt32 Player::calcVipLevel()
 	{
-#define VIP_OPEN_MAX 10
+#define VIP_OPEN_MAX 15
 		UInt32 totalRecharge = _playerData.totalRecharge;
 		UInt32 vipl;
 		if(totalRecharge < 88)
@@ -683,8 +695,18 @@ namespace GObject
 			vipl = 8;
 		else if(totalRecharge < 588888)
 			vipl = 9;
-		else
+		else if(totalRecharge < 988888)
 			vipl = 10;
+		else if(totalRecharge < 1888888)
+			vipl = 11;
+		else if(totalRecharge < 2888888)
+			vipl = 12;
+		else if(totalRecharge < 5888888)
+			vipl = 13;
+		else if(totalRecharge < 8888888)
+			vipl = 14;
+        else
+			vipl = 15;
 		if(vipl > VIP_OPEN_MAX)
 			return VIP_OPEN_MAX;
 		return vipl;
@@ -2576,6 +2598,8 @@ namespace GObject
 		addFlag(Training);
 		event->notify();
 		event->updateDB(true);
+
+        OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 0);
 		return true;
 	}
 
@@ -2637,6 +2661,7 @@ namespace GObject
 		GameMsgHdr hdr(0x178, WORKER_THREAD_WORLD, this, 0);
 		GLOBAL().PushMsg(hdr, NULL);
         GameAction()->doAty(this, AtyTaskHook, 0,0);
+        OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 1);
 	}
 
 	void Player::sendEvents()
@@ -2792,6 +2817,13 @@ namespace GObject
 		}
 
         AddFriendAttainment(pl);
+
+        if (getFrendsNum() == 1)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
+        if (getFrendsNum() == 5)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
+        if (getFrendsNum() == 10)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 2);
 		return true;
 	}
 
@@ -5058,6 +5090,13 @@ namespace GObject
             _playerData.tavernOrangeCount = 0;
         }
 
+        if (fgt->getColor() == 0)
+            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 0);
+        else if (fgt->getColor() == 1)
+            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 1);
+        else if (fgt->getColor() == 2)
+            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 2);
+
         if(fgt->getColor() ==3)
         {
             GameAction()->onRecruitAward(this);
@@ -5396,6 +5435,7 @@ namespace GObject
 			map->OnPlayerLevUp(this);
 
 		GameAction()->onLevelup(this, oLev, nLev);
+        OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -6087,6 +6127,11 @@ namespace GObject
                     }
 
                 }
+
+                if (p >= 1.2f)
+                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
+                else if (p >= 1.1f)
+                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 2);
             }
             else
             {
@@ -6137,6 +6182,11 @@ namespace GObject
 
                     }
                 }
+
+                if (p >= 6.5f)
+                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 1);
+                else if (p >= 7.0f)
+                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 2);
             }
 		}
 		else
@@ -6164,6 +6214,11 @@ namespace GObject
 			}
 			return 1;
 		}
+
+        if(isPotential)
+            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 0);
+        else
+            OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 0);
 
         if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
             fgt->getAttrType2(true);
@@ -6449,8 +6504,8 @@ namespace GObject
 	{
 		if(l < 1)
 			l = 1;
-		if(h > 10)
-			h = 10;
+		if(h > 15)
+			h = 15;
 		for(UInt32 j = l; j <= h; ++j)
 		{
 			SYSMSG(title, 256);
@@ -6459,7 +6514,7 @@ namespace GObject
 			if(mail == NULL)
 				continue;
 
-			const UInt32 vipTable[11][12] =
+			const UInt32 vipTable[16][12] =
             {
                 {56,2,0,0,0,0,0,0,0,0,0,0},
                 {56,10,0,0,0,0,0,0,0,0,0,0},
@@ -6471,6 +6526,11 @@ namespace GObject
                 {503,50,515,30,507,30,509,30,0,0,0,0},
                 {503,100,515,30,507,30,509,30,0,0,0,0},
                 {503,200,515,50,507,50,509,50,0,0,0,0},
+                {503,300,515,80,507,50,509,50,0,0,0,0},
+                {503,800,515,240,507,150,509,150,0,0,0,0},
+                {503,800,515,280,507,150,509,150,0,0,0,0},
+                {503,1000,515,500,507,600,509,600,0,0,0,0},
+                {503,1500,515,500,507,700,509,700,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
 
@@ -6746,6 +6806,17 @@ namespace GObject
         GameAction()->doAttainment(this, attId, param);
     }
 
+    void Player::OnHeroMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item)
+    {
+        if (CURRENT_THREAD_ID() != getThreadId())
+        {
+            UInt8 msg[4] = {chapter, diff, group, item};
+            GameMsgHdr h(0x240,  getThreadId(), this, sizeof(msg));
+            GLOBAL().PushMsg(h, &msg);
+        }
+        else
+            GetHeroMemo()->setMemo(chapter, diff, group, item, 1);
+    }
 
 	void Player::setClan(Clan * c)
 	{
@@ -8045,6 +8116,9 @@ namespace GObject
             }
 
             showClanSkill(skillId);
+
+            if (skillId == CLAN_SKILL_ACTION && cs.level == 3)
+                OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 2);
         } while(false);
 
         st << res;
@@ -8216,6 +8290,13 @@ namespace GObject
             {{446, 1}, {447, 1},},
         };
         sendMailItem(2331, 2332, &item[pos-1][0], 2, false);
+    }
+
+    void Player::sendCreateMail()
+    {
+        SYSMSG(title, 2335);
+        SYSMSG(content, 2336);
+        GetMailBox()->newMail(NULL, 0x12, title, content);
     }
 
 } // namespace GObject

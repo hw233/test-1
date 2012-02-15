@@ -21,10 +21,11 @@
 #include "MsgID.h"
 #include "Script/GameActionLua.h"
 #include "MsgHandler/CountryMsgStruct.h"
+#include "ClanRankBattle.h"
+#include "HeroMemo.h"
+
 #include <mysql.h>
 #include <sstream>
-
-#include "ClanRankBattle.h"
 
 namespace GObject
 {
@@ -430,6 +431,7 @@ bool Clan::join( Player * player, UInt8 jt, UInt16 si, UInt32 ptype, UInt32 p, U
 	GameMsgHdr hdr(0x310, player->getThreadId(), player, sizeof(type));
 	GLOBAL().PushMsg(hdr, &type);
 
+    player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 0);
 	return true;
 }
 
@@ -1092,6 +1094,7 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		//count *= 2;
 	if (_techs->donate(player, techId, type, count))
 	{
+        player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
 		if (type == 1)
 		{
             // ?????ʽ?

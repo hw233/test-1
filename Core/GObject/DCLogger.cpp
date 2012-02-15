@@ -70,6 +70,7 @@ bool DCLogger::reg(Player* player)
     msg << player->getOpenKey();
     msg << "&source=";
     msg << player->getSource();
+    msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;
@@ -102,6 +103,7 @@ bool DCLogger::login(Player* player)
     msg << player->getOpenKey();
     msg << "&source=";
     msg << player->getSource();
+    msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;
@@ -136,6 +138,7 @@ bool DCLogger::logout(Player* player)
     msg << time(NULL) - player->getLastOnline(); // TODO:
     msg << "&source=";
     msg << player->getSource();
+    msg << "&touid=&toopenid=&level=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&keycheckret=&safebuf=&remark=&user_num=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;
@@ -169,6 +172,7 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     msg << num;
     msg << "&opuid=";
     msg << cfg.serverNum;
+    msg << "&userip=&svrip=&opopenid=&touid=&toopenid=&level=&source=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&key=&keycheckret=&safebuf=&remark=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;
@@ -210,6 +214,9 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
         msg << "&totalfee=";
         msg << total*10;
     }
+    else
+        msg << "&totalfee=";
+    msg << "&touid=&toopenid=&level=&source=&modifyexp=&totalexp=&modifycoin=&totalcoin=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;
@@ -240,6 +247,7 @@ bool DCLogger::blue(Player* player)
     msg << player->getOpenId();
     msg << "&key=";
     msg << player->getOpenKey();
+    msg << "&touid=&toopenid=&level=&source=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;
@@ -270,6 +278,7 @@ bool DCLogger::d3d6(Player* player)
     msg << player->getOpenId();
     msg << "&key=";
     msg << player->getOpenKey();
+    msg << "&touid=&toopenid=&level=&source=&itemid=&itemtype=&itemcnt=&modifyexp=&totalexp=&modifycoin=&totalcoin=&modifyfee=&totalfee=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
 
     DC().Push(msg.str().c_str(), msg.str().length());
     return true;

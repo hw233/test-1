@@ -51,8 +51,9 @@
 #include "GObject/WBossMgr.h"
 #include "GObject/TeamCopy.h"
 #include "ActivityMgr.h"
-#include <fcntl.h>
 #include "HoneyFall.h"
+#include "HeroMemo.h"
+#include <fcntl.h>
 
 namespace GObject
 {
@@ -184,6 +185,7 @@ namespace GObject
         LoadPracticePlace();
         LoadWorldBoss();
         InitMoneyLog();
+        LoadHeroMemo();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -3584,6 +3586,27 @@ namespace GObject
         }
         World::_moneyLogged = today[6];
 
+        return true;
+    }
+
+    bool GObjectManager::LoadHeroMemo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Hero Memo Data");
+        Player* pl = 0;
+		DBHeroMemo hm;
+		if(execu->Prepare("SELECT `playerId`, `awards`, `memos` FROM `heromemo`", hm)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			pl = globalPlayers[hm.playerId];
+            if (!pl)
+                continue;
+            pl->GetHeroMemo()->loadFromDB(hm.awards.c_str(), hm.memos.c_str());
+            pl = 0;
+        }
         return true;
     }
 

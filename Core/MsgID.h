@@ -9,6 +9,8 @@ namespace REQ
     const UInt8 KEEP_ALIVE          = 0x00;
     /**自动重连*/
     const UInt8 RECONNECT           = 0x01;
+    /**剑侠秘箓领取奖励*/
+    const UInt8 HEROMEMO            = 0x06;
     /**成就*/
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择*/
@@ -340,6 +342,7 @@ namespace REP
     const UInt8 LINEUP_CHANGE       = 0x03;
     const UInt8 NEXT_ARENA          = 0x04;
     const UInt8 CHKMARK             = 0x05;
+    const UInt8 HEROMEMO            = 0x06;
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     const UInt8 CAMP_SELECT         = 0xF1;// 0x0D
     const UInt8 BE_DISCONNECT       = 0xF2;// 0x0E

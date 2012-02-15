@@ -9,6 +9,7 @@
 #include "Server/Cfg.h"
 #include "MsgID.h"
 #include "GData/Money.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -38,7 +39,7 @@ UInt16 Dungeon::_price[5] = {0, 50, 50};
 size_t Dungeon::_priceCount = 0;
 
 GGlobalObjectManagerT<Dungeon, UInt8> dungeonManager;
-UInt8 Dungeon::_extraCount[11] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
+UInt8 Dungeon::_extraCount[16] = {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 Dungeon::Dungeon( UInt8 id, const GData::DungeonData * dd ): GObjectBaseT<Dungeon, UInt8>(id), _dungeon(dd)
 {
@@ -243,6 +244,8 @@ bool Dungeon::doAttack( Player * player, UInt8 level)
     if(!dm->fighter)
         return false;
 
+    player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 0);
+
 	Battle::BattleSimulator bsim(player->getLocation(), player, dm->fighter->getName(), dm->fighter->getLevel(), false);
 	player->PutFighters(bsim, 0);
 	bsim.setPortrait(1, dm->fighter->favor);
@@ -311,6 +314,8 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 	const GData::DungeonMonster * dm = dgl->monsterSet;
 	if(dm == NULL)
 		return false;
+
+    player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 0);
 
     player->setJusticeRoar(dpi.justice_roar);
 	Battle::BattleSimulator bsim(player->getLocation(), player, dm->fighter->getName(), dm->fighter->getLevel(), dm->formated);
@@ -501,6 +506,11 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 			DB3().PushUpdateData("UPDATE `dungeon_player` SET `level` = %u, `totalCount` = %u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", dpi.level, dpi.totalCount, _id, player->getId());
 		r = true;
 		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
+
+        if (getId() == 1)
+            player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
+        if (getId() == 2)
+            player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 2);
 	}
 
 	if(noreport)

@@ -11,6 +11,7 @@
 #include "Country.h"
 #include "Script/GameActionLua.h"
 #include "MapCollection.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -403,6 +404,14 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
     {
         mgr->disapper(TimeUtil::Now());
     }
+
+    if (m_lvl == 1)
+        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 0);
+    if (m_lvl == 2)
+        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 1);
+    if (!m_final)
+        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
+
     return res;
 }
 

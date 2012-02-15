@@ -7,6 +7,7 @@
 #include "GData/Money.h"
 #include "Country.h"
 #include "Script/GameActionLua.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -927,6 +928,12 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
 
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
     }
+
+    pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
+    if (copyId == 1 && type == 0)
+        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
+    if (copyId == 1 && type == 1)
+        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
 }
 
 void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid)

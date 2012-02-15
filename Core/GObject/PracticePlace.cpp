@@ -18,6 +18,8 @@
 #include "Country.h"
 #include "MsgHandler/CountryMsgStruct.h"
 #include "Script/GameActionLua.h"
+#include "HeroMemo.h"
+
 namespace GObject
 {
 
@@ -237,6 +239,9 @@ UInt8 PracticePlace::_picCnt[11] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6};
             pl->send(st);
             return false;
         }
+
+        if (place == PPLACE_MAX)
+            pl->OnHeroMemo(MC_CITTA, MD_STARTED, 0, 0);
 
 		UInt32 now = TimeUtil::Now();
 

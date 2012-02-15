@@ -8,6 +8,7 @@
 #include "Country.h"
 #include "PracticePlace.h"
 #include "Script/GameActionLua.h"
+#include "HeroMemo.h"
 #include <sstream>
 
 namespace GObject
@@ -284,6 +285,8 @@ namespace GObject
 
                     report.result = 1;
                     m_LastWinClan = m_Clan1;
+
+                    player1->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 1);
                 }
                 else //玩家2胜
                 {
@@ -298,6 +301,8 @@ namespace GObject
 
                     report.result = 2;
                     m_LastWinClan = m_Clan2;
+
+                    player2->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 1);
                 }
 
                 m_Reports.push_back(report);
@@ -402,6 +407,9 @@ namespace GObject
                 UInt32 proffer = player->GetClanBattleScore() * 5;
                 clan->addMemberProffer(player, proffer);
                 player->AddVar(VAR_CLANBATTLE_HONOUR, proffer);
+
+                if (GetWinner() == clan->getId())
+                    player->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 2);
             }
         }
 
@@ -416,6 +424,9 @@ namespace GObject
                 UInt32 proffer = player->GetClanBattleScore() * 5;
                 clan->addMemberProffer(player, proffer);
                 player->AddVar(VAR_CLANBATTLE_HONOUR, proffer);
+
+                if (GetWinner() == clan->getId())
+                    player->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 2);
             }
         }
     }
@@ -1401,6 +1412,8 @@ namespace GObject
         stream << UInt8(1);
         stream << Stream::eos;
         info->Broadcast(stream);
+
+        player->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
     }
 
     void ClanRankBattleMgr::PlayerLeave(Player* player)

@@ -792,6 +792,12 @@ struct DBActivityData
     UInt32 award;
     std::string flags;
 };
+struct DBHeroMemo
+{
+    UInt64 playerId;
+	std::string awards;
+	std::string memos;
+};
 
 }
 
@@ -1788,6 +1794,15 @@ SPECIALDEF(4)
     UInt8, level,
     UInt16, loc,
     UInt8, count
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBHeroMemo)
+SPECIALDEF(3)
+(
+    UInt64, playerId,
+    std::string, awards,
+    std::string, memos
 )
 SPECIALEND()
 

@@ -20,6 +20,7 @@
 #include "Athletics.h"
 #include "MsgID.h"
 #include "Common/URandom.h"
+#include "HeroMemo.h"
 
 namespace GObject
 {
@@ -2150,6 +2151,7 @@ void AthleticsRank::giveAward( Player* pl )
         pl->send(st);
     }
 
+    pl->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
 }
 
 }
