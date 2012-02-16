@@ -660,6 +660,28 @@ local Enchant_chance_adv = {
 
 }
 
+--  戒指、项链强化生命基数
+local Enchant_ring = {
+
+--  装备等级、儒、释、道
+
+    {10,40,37.5,40,42.5},
+    {20,80,75,80,85},
+    {30,120,112.5,120,127.5},
+    {40,160,150,160,170},
+    {50,200,187.5,200,212.5},
+    {60,240,225,240,255},
+    {70,280,262.5,280,297.5},
+    {80,320,300,320,340},
+    {90,360,337.5,360,382.5},
+    {100,400,375,400,425},
+    {110,440,412.5,440,467.5},
+    {120,480,450,480,510},
+
+}
+
+--  戒指、项链强化概率
+local Enchant_ring_rate = {1, 1.2, 1.6, 2.2, 3, 4, 5.2, 6.6, 8.2, 10, 12, 14.2}
 
 
 local Enchant_max = {7, 7, 7, 7, 8, 10, 10, 10, 10, 11, 12}
@@ -1245,4 +1267,12 @@ end
 
 function getOrangeTeamMatieralSplit()
     return Team_Split_orange
+end
+
+function getEnchantRing()
+    return Enchant_ring
+end
+
+function getEnchantRingRate()
+    return Enchant_ring_rate
 end

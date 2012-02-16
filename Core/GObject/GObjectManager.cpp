@@ -104,6 +104,9 @@ namespace GObject
 
     std::vector<stHftChance> GObjectManager::_hft_chance[6][12];
 
+    std::map<UInt8, stRingHpBase*> GObjectManager::_ringHpBase;
+    float GObjectManager::_ringHpFactor[12];
+
     UInt8 GObjectManager::_evade_factor;
     UInt8 GObjectManager::_hitrate_factor;
     UInt8 GObjectManager::_critcal_factor;
@@ -3237,6 +3240,40 @@ namespace GObject
                         attr->attrMax[q][crr][t-3] = table_temp2.get<float>(t+1);
                     }
                 }
+            }
+
+            {
+                lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantRing");
+                UInt32 size = table_temp.size();
+                for(UInt8 i = 0; i < size; ++i)
+                {
+                    lua_tinker::table table_temp2 = table_temp.get<lua_tinker::table>(i+1);
+                    UInt8 lvl = table_temp2.get<float>(1);
+
+                    std::map<UInt8, stRingHpBase*>::iterator it = _ringHpBase.find(lvl);
+                    stRingHpBase* ringHp = NULL;
+                    if(it != _ringHpBase.end())
+                        ringHp = it->second;
+                    else
+                    {
+                        ringHp = new stRingHpBase();
+                        _ringHpBase[lvl] = ringHp;
+                    }
+
+                    ringHp->hpBase[0] = table_temp2.get<float>(2);
+                    ringHp->hpBase[1] = table_temp2.get<float>(3);
+                    ringHp->hpBase[2] = table_temp2.get<float>(4);
+                    ringHp->hpBase[3] = table_temp2.get<float>(5);
+                }
+            }
+
+            {
+				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getEnchantRingRate");
+				UInt32 size = std::min(12, table_temp.size());
+				for(UInt32 j = 0; j < size; j ++)
+				{
+					_ringHpFactor[j] =  table_temp.get<UInt32>(j + 1);
+				}
             }
 
             {
