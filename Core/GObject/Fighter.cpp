@@ -29,7 +29,7 @@ namespace GObject
 
 GlobalFighters globalFighters;
 
-static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.00, 1.00};
+static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.25, 1.51};
 
 Fighter& getGreatFighter(UInt32 id)
 {

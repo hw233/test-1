@@ -2221,28 +2221,29 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     if(dostatus)
     {
         bool self = false;
+        bool flag = ((target_side == bf->getSide()) ? false : true);
         if(1 == skill->area)
         {
             for(UInt8 pos = 0; pos < 25; ++ pos)
             {
-                doSkillStatus(true, bf, skill, target_side, pos, 1, scList, scCount, self);
+                doSkillStatus(flag, bf, skill, target_side, pos, 1, scList, scCount, self);
             }
         }
         else if( 0 == skill->area )
         {
-            doSkillStatus(true, bf, skill, target_side, target_pos, 1, scList, scCount, self);
+            doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self);
         }
         else
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo != NULL && bo->getHP() != 0 && bo->isChar())
             {
-                doSkillStatus(true, bf, skill, target_side, target_pos, 1, scList, scCount, self);
+                doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self);
             }
 
             for(int i = 0; i < apcnt; ++ i)
             {
-                doSkillStatus(true, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self);
+                doSkillStatus(flag, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self);
             }
 
         }
