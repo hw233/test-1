@@ -50,7 +50,7 @@ void TownDeamon::listDeamons(Player* pl, UInt16 start, UInt16 count)
     Stream st(REP::TOWN_DEAMON);
     st << static_cast<UInt8>(0x02);
     st << total << start << count;
-    Int16 end = start + count;
+    UInt16 end = start + count;
     if(end > m_Monsters.size())
         end = m_Monsters.size();
 
@@ -84,7 +84,7 @@ void TownDeamon::showTown(Player* pl)
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
-    st << dpd->level << dpd->maxLevel << dpd->deamonLevel;
+    st << dpd->curLevel << dpd->maxLevel << dpd->deamonLevel;
     st << TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
     st << dpd->awards << dpd->accTime;
     UInt32 spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
@@ -117,7 +117,7 @@ void TownDeamon::showLevelTown(Player* pl, UInt16 level)
     {
         DeamonPlayerData* dpd = pl2->getDeamonPlayerData();
 
-        st << dpd->level << pl2->getName() << pl2->GetLev();
+        st << dpd->curLevel << pl2->getName() << pl2->GetLev();
         st << TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
         st << dpd->awards;
         UInt32 spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
@@ -133,7 +133,20 @@ void TownDeamon::showLevelTown(Player* pl, UInt16 level)
 void TownDeamon::useAccItem(Player*, UInt8 count)
 {
     Stream st(REP::TOWN_DEAMON);
-    st << static_cast<UInt8>(0x01);
+    st << static_cast<UInt8>(0x03);
+
+    UInt8 res = 0;
+    UInt16 leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    if(dpd->deamonLevel == 0)
+        res = 2;
+    else
+    {
+    }
+
+    st << Stream::eos;
+    pl->send(st);
 }
 
 void TownDeamon::useVitalityItem(Player*, UInt8 count)
@@ -142,7 +155,7 @@ void TownDeamon::useVitalityItem(Player*, UInt8 count)
 
 void TownDeamon::cancelDeamon(Player* pl)
 {
-    Stream st();
+    Stream st(REP::TOWN_DEAMON);
 
     pl->send(st);
 }
@@ -153,7 +166,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
 
 void TownDeamon::notifyChallengeResult(Player* pl, UInt16 level, UInt8 win)
 {
-    Stream st();
+    Stream st(REP::TOWN_DEAMON);
 
     pl->send(st);
 }

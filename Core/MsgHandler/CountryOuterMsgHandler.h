@@ -53,6 +53,7 @@
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/HeroMemo.h"
+#include "GObject/TownDeamon.h"
 
 struct NullReq
 {
@@ -3985,7 +3986,7 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
         {
             UInt16 start = 0;
             UInt16 count = 0;
-            br >> start >> level;
+            br >> start >> count;
             townDeamonManager->listDeamons(player, start, count);
         }
         break;

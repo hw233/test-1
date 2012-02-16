@@ -130,6 +130,7 @@ namespace GObject
     class ActivityMgr;
     class HeroMemo;
     class HoneyFall;
+    struct DeamonPlayerData;
 
     struct TripodData
     {

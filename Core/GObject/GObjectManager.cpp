@@ -3936,6 +3936,7 @@ namespace GObject
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 
+		LoadingCounter lc("TownDeamon");
 		lc.prepare("Loading TownDeamon Monsters:");
 		GData::DBTownDeamonMonster dbtdm;
 		if(execu->Prepare("SELECT `level`, `npcId` FROM `towndeamon_monster` order by level asc", dbtdm) != DB::DB_OK)
@@ -3959,7 +3960,7 @@ namespace GObject
 		while(execu2->Next() == DB::DB_OK)
 		{
 			lc.advance();
-            pl = globalPlayers[hfData.playerId];
+            pl = globalPlayers[dbtdp.playerId];
             if(pl == NULL)
                 continue;
             DeamonPlayerData* dpData = pl->getDeamonPlayerData();
@@ -3971,14 +3972,15 @@ namespace GObject
             dpData->maxLevel = dbtdp.maxLevel;
             dpData->accTime = dbtdp.accTime;
             dpData->awards = dbtdp.awards;
-            dpData->validityTime = dbtdp.validityTime;
-            dpData->validity = dbtdp.validity;
+            dpData->vitalityTime = dbtdp.vitalityTime;
+            dpData->vitality = dbtdp.vitality;
 
-            if(deamonLevel != 0)
-                townDeamonManager->loadDeamonPlayersFromDB(dbtdm.deamonLevel, pl);
+            if(dbtdp.deamonLevel != 0)
+                townDeamonManager->loadDeamonPlayersFromDB(dbtdp.deamonLevel, pl);
         }
 		lc.finalize();
 
+        return true;
     }
 
 }

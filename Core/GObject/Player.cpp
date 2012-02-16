@@ -50,6 +50,7 @@
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
 #include "Common/StringTokenizer.h"
+#include "TownDeamon.h"
 
 #include <cmath>
 
@@ -604,7 +605,7 @@ namespace GObject
         delete m_hf;
         m_hf = NULL;
         delete m_dpData;
-        m_dpData = NULL:
+        m_dpData = NULL;
 	}
 
 	bool Player::Load()

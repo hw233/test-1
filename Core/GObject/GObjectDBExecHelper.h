@@ -833,6 +833,23 @@ SPECIALDEF(5)
 	)
 SPECIALEND()
 
+
+SPECIALBEGIN(GObject::DBTownDeamonPlayer)
+SPECIALDEF(9)
+    (
+    UInt16, deamonLevel,
+    UInt16, curLevel,
+    UInt16, maxLevel,
+    UInt64, playerId,
+    UInt32, startTime,
+    UInt32, accTime,
+    UInt32, awards,
+    UInt32, vitalityTime,
+    UInt16, vitality
+    )
+SPECIALEND()
+
+
 SPECIALBEGIN(GObject::DBMapSpot)
 SPECIALDEF(6)
 	(
@@ -1185,6 +1202,15 @@ SPECIALDEF(31)
     UInt8, attrType3,
     UInt16, attrValue3
 	)
+SPECIALEND()
+
+
+SPECIALBEGIN(GData::DBTownDeamonMonster)
+SPECIALDEF(2)
+(
+	UInt16, level,
+    UInt32, npcId
+)
 SPECIALEND()
 
 SPECIALBEGIN(GData::DBNpcGroup)
