@@ -6842,6 +6842,7 @@ namespace GObject
 
     void Player::OnHeroMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item)
     {
+        return; // TODO: 下个版本开放
         if (CURRENT_THREAD_ID() != getThreadId())
         {
             UInt8 msg[4] = {chapter, diff, group, item};

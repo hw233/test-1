@@ -3365,7 +3365,7 @@ namespace GObject
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*40;
-            if ((float)values[0] > v0 && !(protect & 1))
+            if ((float)values[1] > v0 && !(protect & 1))
                 m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
         }
         {
@@ -3379,7 +3379,7 @@ namespace GObject
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*70;
-            if ((float)values[0] > v0 && !(protect & 1))
+            if ((float)values[1] > v0 && !(protect & 1))
                 m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
         }
 
