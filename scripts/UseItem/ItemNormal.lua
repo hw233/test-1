@@ -1441,7 +1441,7 @@ function ItemNormal_VIP(iid, num, bind, param)
 
     local lvl = iid - 449 + 1;
 
-    if package:GetRestPackageSize() < needsize[lvl] then
+    if package:GetRestPackageSize() < needsize[lvl] + 1 then
         player:sendMsgCode(2, 1011, 0);
         return false;
     end
@@ -1451,6 +1451,11 @@ function ItemNormal_VIP(iid, num, bind, param)
             break
         end
         package:AddItem(vipitems[lvl][n], vipitems[lvl][n+1], true, false)
+    end
+
+    if lvl >= 6 then
+        local equip = getRandOEquip(player:GetLev())
+        package:AddEquip(equip, 1, false);
     end
 
     package:DelItemSendMsg(iid, player);
