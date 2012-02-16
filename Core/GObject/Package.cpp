@@ -3221,6 +3221,8 @@ namespace GObject
             EquipTo(0, fgt, part, ptmp, true);
         }
 
+        UInt32 oldEquipClass = oldEquip->getClass();
+
         if( false == DelEquip2(oldEquip, ToEquipUpgrade))
             return 2;
         
@@ -3246,11 +3248,11 @@ namespace GObject
             }
         }
 
-        if (oldEquip->getClass() == Item_Armor2)
+        if (oldEquipClass == Item_Armor2)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 0);
-        if (oldEquip->getClass() == Item_Ring)
+        if (oldEquipClass == Item_Ring)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
-        if (oldEquip->getClass() == Item_Weapon)
+        if (oldEquipClass == Item_Weapon)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
 
         return 0;
