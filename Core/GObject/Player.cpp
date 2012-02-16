@@ -931,6 +931,27 @@ namespace GObject
         }
     }
 
+    void Player::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
+    {    
+        if (!op || !price)
+            return;
+        char _price[32] = {0};
+        char _type[32] = {0};
+        char _id[32] = {0};
+        snprintf(_type, 32, "%u", type);
+        snprintf(_id, 32, "%u", id); 
+        if (!id || !num)
+        {
+            snprintf(_price, 32, "%u", price);
+            udpLog(op, _type, "GN", _price, "", "", "props");
+        }
+        else
+        {
+            snprintf(_price, 32, "%u", price/num);
+            udpLog(op, _type, _id, _price, "", "", "props", num);
+        }
+    }
+
     void Player::moneyLog(int type, int gold, int coupon, int tael, int achievement, int prestige)
     {
         if (!type || type > 2) return;
@@ -3148,6 +3169,9 @@ namespace GObject
 		SYSMSG_SENDV(150, this, c);
 		SYSMSG_SENDV(1050, this, c);
 		sendModification(1, _playerData.gold);
+
+        if (ci)
+            udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
 		return _playerData.gold;
 	}
 

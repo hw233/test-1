@@ -522,8 +522,6 @@ namespace GObject
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
-                if (fromWhere == FromNpcBuy)
-                    udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -558,8 +556,6 @@ namespace GObject
 					ItemNotify(item->GetItemType().getId(), num);
 				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                      AddItemCoursesLog(typeId, num, fromWhere);
-                if (fromWhere == FromNpcBuy)
-                    udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
 				return item;
 			}
 

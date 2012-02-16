@@ -1255,6 +1255,7 @@ namespace GObject
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);
+        void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
     private:
         CUserLogger* m_ulog;
