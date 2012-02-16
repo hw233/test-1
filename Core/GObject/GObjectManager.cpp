@@ -3064,7 +3064,7 @@ namespace GObject
                         UInt8 lv = table_temp2.get<UInt8>(1) - 1;
                         if(lv > 12)
                             continue;
-                        hftc.times = table_temp2.get<UInt8>(2);
+                        hftc.times = table_temp2.get<UInt16>(2);
                         hftc.chance = table_temp2.get<UInt32>(3);
                         _hft_chance[q][lv].push_back(hftc);
                     }
@@ -3274,7 +3274,7 @@ namespace GObject
 				UInt32 size = std::min(12, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
 				{
-					_ringHpFactor[j] =  table_temp.get<UInt32>(j + 1);
+					_ringHpFactor[j] =  table_temp.get<float>(j + 1);
 				}
             }
 

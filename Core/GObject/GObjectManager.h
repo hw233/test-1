@@ -52,7 +52,7 @@ namespace GObject
     struct stHftChance
     {
         stHftChance() { times = 0; chance = 0; }
-        UInt8 times;
+        UInt16 times;
         UInt32 chance;
     };
 
@@ -313,7 +313,7 @@ namespace GObject
                 return 0;
         }
 
-        static UInt32 getChanceFromHft(UInt8 q, UInt8 lv, UInt8 v)
+        static UInt32 getChanceFromHft(UInt8 q, UInt8 lv, UInt16 v)
         {
             if(q > 5)
                 q = 0;

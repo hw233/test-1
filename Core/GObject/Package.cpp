@@ -522,8 +522,6 @@ namespace GObject
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
-                if (fromWhere == FromNpcBuy)
-                    udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
@@ -558,8 +556,6 @@ namespace GObject
 					ItemNotify(item->GetItemType().getId(), num);
 				if((fromWhere != 0  && item->getQuality() >= 3) || (fromWhere == FromMerge && item->getQuality() >= 2))
                      AddItemCoursesLog(typeId, num, fromWhere);
-                if (fromWhere == FromNpcBuy)
-                    udpLog(item->getClass(), typeId, num, GData::store.getPrice(typeId), "add");
 				return item;
 			}
 
@@ -3225,6 +3221,8 @@ namespace GObject
             EquipTo(0, fgt, part, ptmp, true);
         }
 
+        UInt32 oldEquipClass = oldEquip->getClass();
+
         if( false == DelEquip2(oldEquip, ToEquipUpgrade))
             return 2;
         
@@ -3250,11 +3248,11 @@ namespace GObject
             }
         }
 
-        if (oldEquip->getClass() == Item_Armor2)
+        if (oldEquipClass == Item_Armor2)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 0);
-        if (oldEquip->getClass() == Item_Ring)
+        if (oldEquipClass == Item_Ring)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
-        if (oldEquip->getClass() == Item_Weapon)
+        if (oldEquipClass == Item_Weapon)
             m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
 
         return 0;
@@ -3367,7 +3365,7 @@ namespace GObject
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*40;
-            if ((float)values[0] > v0 && !(protect & 1))
+            if ((float)values[1] > v0 && !(protect & 1))
                 m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
         }
         {
@@ -3381,7 +3379,7 @@ namespace GObject
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*70;
-            if ((float)values[0] > v0 && !(protect & 1))
+            if ((float)values[1] > v0 && !(protect & 1))
                 m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
         }
 
