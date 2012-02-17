@@ -130,26 +130,29 @@ void TownDeamon::showLevelTown(Player* pl, UInt16 level)
     pl->send(st);
 }
 
-void TownDeamon::useAccItem(Player*, UInt8 count)
+void TownDeamon::useAccItem(Player* pl, UInt8 count)
 {
     Stream st(REP::TOWN_DEAMON);
     st << static_cast<UInt8>(0x03);
 
     UInt8 res = 0;
-    UInt16 leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+    UInt32 accTime = 0;
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     if(dpd->deamonLevel == 0)
+    {
         res = 2;
+    }
     else
     {
+        UInt8 needs = leftTime - dpd->accTime;
     }
 
     st << Stream::eos;
     pl->send(st);
 }
 
-void TownDeamon::useVitalityItem(Player*, UInt8 count)
+void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
 {
 }
 
