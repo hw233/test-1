@@ -52,6 +52,8 @@ struct DeamonPlayerData
 };
 
 static const UInt8 TOWNDEAMON_LEVEL_UP = 40;
+static const UInt8 TD_MAXACCTIME = 86400;
+static const UInt8 TD_MAXVITALITY = 1000;
 
 class TownDeamon
 {

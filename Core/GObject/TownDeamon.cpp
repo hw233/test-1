@@ -136,17 +136,33 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
     st << static_cast<UInt8>(0x03);
 
     UInt8 res = 0;
-    UInt32 accTime = 0;
 
+    UInt32 leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
-    if(dpd->deamonLevel == 0)
+
+    if(dpd->deamonLevel == 0 || dpd->accTime >= leftTime)
     {
         res = 2;
     }
     else
     {
-        UInt8 needs = leftTime - dpd->accTime;
+        UInt32 tmpTime = TD_MAXACCTIME - dpd->accTime;
+        UInt32 need = tmpTime / 3600 + ((tmpTime % 100) == 0 ? 0 : 1);
+        if(need > count)
+            need = count;
+        if(pl->GetPackage()->GetItemAnyNum() < need)
+            need = pl->GetPackage()->GetItemAnyNum();
+        if(need == 0)
+            res = 1;
+        else
+        {
+            dpd->accTime += need * 3600;
+            if(dpd->accTime > TD_MAXACCTIME)
+                dpd->accTime = TD_MAXACCTIME;
+        }
     }
+
+    st << res << dpd->accTime;
 
     st << Stream::eos;
     pl->send(st);
@@ -154,6 +170,39 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
 
 void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
 {
+    Stream st(REP::TOWN_DEAMON);
+    st << static_cast<UInt8>(0x04);
+
+    UInt8 res = 0;
+
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+
+    if(dpd->deamonLevel == 0 || dpd->vitality >= TD_MAXVITALITY)
+    {
+        res = 2;
+    }
+    else
+    {
+        UInt32 tmpVitality = TD_MAXACCTIME - dpd->vitality;
+        UInt32 need = tmpVitality / 100 + ((tmpVitality % 100) == 0 ? 0 : 1);
+        if(need > count)
+            need = count;
+        if(pl->GetPackage()->GetItemAnyNum() < need)
+            need = pl->GetPackage()->GetItemAnyNum();
+        if(need == 0)
+            res = 1;
+        else
+        {
+            dpd->vitality += need * 100;
+            if(dpd->vitality > TD_MAXVITALITY)
+                dpd->vitality = TD_MAXVITALITY;
+        }
+    }
+
+    st << res << dpd->vitality;
+
+    st << Stream::eos;
+    pl->send(st);
 }
 
 void TownDeamon::cancelDeamon(Player* pl)
