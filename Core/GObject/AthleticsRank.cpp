@@ -728,7 +728,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	GLOBAL().PushMsg(hdr, &defer);
 //	DBLOG().PushUpdateData("insert into `athletics_challenge`(`server_id`, `row`, `attacker_rank`, `defender_rank`, `created_at`) values(%u, %u, %u, %u, %u)", cfg.serverLogId, row, atkerRankPos, deferRankPos, TimeUtil::Now());
 }
-const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20};
+const static UInt8 Maxchallengenum[] = {15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
 UInt8 AthleticsRank::GetMaxchallengenum(UInt32 vip)
 {
     return Maxchallengenum[vip];

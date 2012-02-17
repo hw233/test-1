@@ -164,8 +164,8 @@ public:
 
     bool isSitdownYet(PracticeData* pd, UInt32 id);
 
-    static UInt8 _extraCount[11];
-    static UInt8 _picCnt[11];
+    static UInt8 _extraCount[16];
+    static UInt8 _picCnt[16];
 private:
     PlaceData m_places[PPLACE_MAX];
     std::map<UInt64, PracticeData*> m_pradata;
