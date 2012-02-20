@@ -80,7 +80,7 @@ namespace GObject
 	UInt32 Player::_bookStoreInterval = 2 * 3600, Player::_bookStoreRate = 100;
     UInt8 Player::_yaMenActiveCount = 0;
     UInt8 Player::_shiMenActiveCount = 0;
-	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24};
+	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24};
 	const UInt16 MAX_EXTEND_TIME	= 10;
 	const UInt16 EACH_EXTEND_NUM	= 50;
 	GlobalPlayers globalPlayers;
@@ -93,8 +93,6 @@ namespace GObject
 	UInt8 Player::getMaxIcCount(UInt8 vipLevel)
 	{
 		UInt8 maxCount = MaxICCount[vipLevel];
-		//if(World::_wday == 6)
-	    //    maxCount += 8; 
 		return maxCount;
 	}
 
@@ -2617,7 +2615,7 @@ namespace GObject
             UInt32 viplvl = getVipLevel();
             if(viplvl >= 4 && viplvl <= 7)
                 count += 60 * 8;
-            else if (viplvl > 7 && viplvl <= 10)
+            else if (viplvl > 7 && viplvl <= 15)
                 count += 60 * 16;
         }
         else
@@ -4758,7 +4756,7 @@ namespace GObject
                                     _playerData.fshimen[n] = task[*i];
                                     _playerData.fsmcolor[n] = j+1;
                                     if (getVipLevel() >= 3) {
-                                        static UInt8 viptaskcolor[11] = {0,0,0,3,3,3,4,4,4,4,4};
+                                        static UInt8 viptaskcolor[16] = {0,0,0,3,3,3,4,4,4,4,4,4,4,4,4,4};
                                         if (_playerData.fsmcolor[n] < viptaskcolor[getVipLevel()])
                                             _playerData.fsmcolor[n] = viptaskcolor[getVipLevel()];
                                     }
@@ -4766,7 +4764,7 @@ namespace GObject
                                     _playerData.fyamen[n] = task[*i];
                                     _playerData.fymcolor[n] = j+1;
                                     if (getVipLevel() >= 2) {
-                                        static UInt8 viptaskcolor[11] = {0,0,3,3,3,4,4,4,4,4,4};
+                                        static UInt8 viptaskcolor[16] = {0,0,3,3,3,4,4,4,4,4,4,4,4,4,4,4};
                                         if (_playerData.fymcolor[n] < viptaskcolor[getVipLevel()])
                                             _playerData.fymcolor[n] = viptaskcolor[getVipLevel()];
                                     }

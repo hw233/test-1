@@ -56,7 +56,7 @@ struct AthleticsRankData
     UInt32  oldrank;
     UInt32  first4rank;
     UInt32  extrachallenge;
-    UInt16  pageNum; //???
+    UInt32  pageNum; //???
         //UInt32  first4rank;
         //// 0x1 第一次成为竞技场第一
         //// 0x2 第一次杀入竞技场二强
@@ -213,7 +213,7 @@ protected:
 	}
 
 
-	inline UInt16 getRankPos(UInt8 row, Rank rank)
+	inline UInt32 getRankPos(UInt8 row, Rank rank)
 	{
 		return std::distance(_athleticses[row].begin(), rank) + 1;	//FIXME
 	}
@@ -225,7 +225,7 @@ protected:
 	{
 		return _athleticses[row].end();
 	}
-	inline UInt16 getRankSize(UInt8 row)
+	inline UInt32 getRankSize(UInt8 row)
 	{
 		return static_cast<UInt16>(_athleticses[row].size());
 	}

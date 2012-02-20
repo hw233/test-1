@@ -617,9 +617,9 @@ void GMHandler::OnSetVip( GObject::Player * player, std::vector<std::string>& ar
 	if(args.empty())
 		return;
 	UInt32 level = atoi(args[0].c_str());
-	if(level > 10)
+	if(level > 15)
 		return;
-	const static UInt32 gold[] = {88,888,1888,5888,18888,58888,88888,188888,288888,588888};
+	const static UInt32 gold[] = {88,888,1888,5888,18888,58888,88888,188888,288888,588888,988888,1888888,2888888,5888888,8888888};
     if (args.size() > 1)
         player = globalPlayers[atoll(args[1].c_str())];
     if (!player)
