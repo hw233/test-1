@@ -307,7 +307,7 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 				UInt32 saleId;
 				Player *buyer;
 			};
-			//¸øÂô¼ÒÌí¼Ó½ğÇ®
+			//ç»™å–å®¶æ·»åŠ é‡‘é’±
 			BuyInfo buyinfo = {id, player};
 			GameMsgHdr hdr(0x303, sale->_owner->getThreadId(), sale->_owner, sizeof(buyinfo));
 			GLOBAL().PushMsg(hdr, &buyinfo);
@@ -354,7 +354,7 @@ void SaleMgr::cancelSale(Player * player, UInt32 id)
 
 void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::string& name, UInt8 req, UInt8 color, UInt8 career, UInt8 eqType)
 {
-	//ËÑË÷
+	//æœç´¢
 	if (!name.empty())
 	{
 		//if (sch == 0)
@@ -379,7 +379,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 	{
 		if (ReqCvt[req] != 0xFF)
 		{
-			//ÇëÇóµ¥¸öÁĞ±í
+			//è¯·æ±‚å•ä¸ªåˆ—è¡¨
 			if (req > 2 && req < 8)
                 req = ReqCvt[req] + eqType;
             else if(req < 3)
@@ -407,7 +407,7 @@ void SaleMgr::requestSaleList(Player * player, UInt16 start, UInt16 count, std::
 		}
 		else
 		{
-			//ÇëÇóÈ«²¿ÁĞ±í
+			//è¯·æ±‚å…¨éƒ¨åˆ—è¡¨
 			UInt16 sz = static_cast<UInt16>(saleRowStat(0, color, career));
 			UInt16 end = start + count;
 			if (end > sz)
@@ -439,7 +439,7 @@ UInt16 SaleMgr::appendSingleSaleList(Player * player, Stream& st, UInt8 type, UI
 	{
 		//if (sort == 0)
 		{
-			//ÉıĞò
+			//å‡åº
 			std::vector<SaleData *>& sales = offsetIter1->second;
 			for (UInt16 offsetIter2 = offset2; offsetIter2 < sales.size() && readCount < count; ++ offsetIter2)
 			{
@@ -503,46 +503,46 @@ bool SaleMgr::shiftSingleSaleList(UInt8 type, UInt8 quality, UInt8 career, UInt1
 			continue; 
         if (quality != 0 && career != 0)
         {
-			// Ö¸¶¨ÑÕÉ«,Ö°Òµ
+			// æŒ‡å®šé¢œè‰²,èŒä¸š
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
                 if (sales[offset2]->_item->getQuality() == quality && sales[offset2]->_item->GetCareer() == career)
 				{
 					++ count;
-					if (count >= start)
+					if (count > start)
 						return true;
 				}
 			}
         }
         else if (quality != 0)
 		{
-			// Ö¸¶¨ÑÕÉ«
+			// æŒ‡å®šé¢œè‰²
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
 				if (sales[offset2]->_item->getQuality() == quality)
 				{
 					++ count;
-					if (count >= start)
+					if (count > start)
 						return true;
 				}
 			}
 		}
         else if(career != 0)
         {
-			// Ö¸¶¨Ö°Òµ
+			// æŒ‡å®šèŒä¸š
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
                 if (sales[offset2]->_item->GetCareer() == career)
 				{
 					++ count;
-					if (count >= start)
+					if (count > start)
 						return true;
 				}
 			}
         }
 		else
 		{
-			//ÈÎºÎÑÕÉ«,Ö°Òµ
+			//ä»»ä½•é¢œè‰²,èŒä¸š
 			second += sales.size();
 			if (start >= first && start < second)
 			{
@@ -570,46 +570,46 @@ bool SaleMgr::shiftSingleSaleList2(UInt8 type, UInt8 quality, UInt8 career, UInt
 			continue; 
         if(quality != 0 && career != 0)
         {
-			//Ö¸¶¨ÑÕÉ«,Ö°Òµ
+			//æŒ‡å®šé¢œè‰²,èŒä¸š
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
                 if (sales[offset2]->_item->getQuality() == quality && sales[offset2]->_item->GetCareer() == career)
                 {
                     ++ count;
-                    if (count >= offset)
+                    if (count > offset)
                         return true;
                 }
 			}
 		}
         else if(quality != 0)
         {
-			//Ö¸¶¨ÑÕÉ«
+			//æŒ‡å®šé¢œè‰²
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
                 if (sales[offset2]->_item->getQuality() == quality)
                 {
                     ++ count;
-                    if (count >= offset)
+                    if (count > offset)
                         return true;
                 }
 			}
         }
         else if(career != 0)
         {
-			//Ö¸¶¨Ö°Òµ
+			//æŒ‡å®šèŒä¸š
 			for (offset2 = 0; offset2 < sales.size(); ++ offset2)
 			{
                 if (sales[offset2]->_item->GetCareer() == career)
                 {
                     ++ count;
-                    if (count >= offset)
+                    if (count > offset)
                         return true;
                 }
 			}
         }
 		else
 		{
-			//ÈÎºÎÑÕÉ«,Ö°Òµ
+			//ä»»ä½•é¢œè‰²,èŒä¸š
 			second += sales.size();
 			if (offset >= first && offset < second)
 			{
@@ -827,10 +827,10 @@ void SaleMgr::update(UInt32 curr)
 UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
 {
     //static UInt8 cvt[] = { 1, 1, 2, 1, 6, 7, 8, 9, 10, 11, 12, 13, 4, 1 };
-    static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 16, 1, 1, 1, 1, 1, 1, 1, 1, 1,         // ×°±¸£¬·¨±¦   [0-19]
-                           1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  // ÆÕÍ¨ÎïÆ·£¬ Õó·¨ [20-39]
-                           12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // ĞÄ·¨£¬ Ç¿»¯ [40-59]
-                           34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 33, 33, 33, 33};  // ±¦Ê¯ [60-79]
+    static UInt8 cvt[] = { 1, 4, 5, 6, 7, 8, 9, 10, 11, 1, 16, 1, 1, 1, 1, 1, 1, 1, 1, 1,         // è£…å¤‡ï¼Œæ³•å®   [0-19]
+                           1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  // æ™®é€šç‰©å“ï¼Œ é˜µæ³• [20-39]
+                           12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // å¿ƒæ³•ï¼Œ å¼ºåŒ– [40-59]
+                           34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 33, 33, 33, 33};  // å®çŸ³ [60-79]
 
     UInt8 res = cvt[type];
     if(type > sizeof(cvt) - 1)
@@ -849,40 +849,40 @@ UInt8 SaleMgr::StatIndex(UInt8 type, UInt32 typeId, UInt8& parent)
 
     switch(res)
     {
-    case 16:                                      //·¨±¦
+    case 16:                                      //æ³•å®
         parent = 16;
         if(type == 29)
             res += 3;
-        else if(typeId > 1499 && typeId < 1600)        //±»¶¯¼¼ÄÜ·¨±¦
+        else if(typeId > 1499 && typeId < 1600)        //è¢«åŠ¨æŠ€èƒ½æ³•å®
             res += 1;
-        else if(typeId > 1599 && typeId < 1700)   //Ö÷¶¯¼¼ÄÜ·¨±¦
+        else if(typeId > 1599 && typeId < 1700)   //ä¸»åŠ¨æŠ€èƒ½æ³•å®
             res += 2;
         break;
-    case 20:                                                         //Õó·¨
+    case 20:                                                         //é˜µæ³•
         parent = 20;
-        if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //Á½ÒÇÎ¢³¾Õó
+        if(typeId == 1000 || (typeId > 1011 && typeId < 1020))       //ä¸¤ä»ªå¾®å°˜é˜µ
             res += 12;
-        else if(typeId == 1001 || (typeId > 1019 && typeId < 1031))  //ĞëÃÖ¾Å¹¬Õó
+        else if(typeId == 1001 || (typeId > 1019 && typeId < 1031))  //é¡»å¼¥ä¹å®«é˜µ
             res += 11;
-        else if(typeId == 1002 || (typeId > 1030 && typeId < 1040))  //½ğ¸Õ·üÄ§Õó
+        else if(typeId == 1002 || (typeId > 1030 && typeId < 1040))  //é‡‘åˆšä¼é­”é˜µ
             res += 10;
-        else if(typeId == 1003 || (typeId > 1039 && typeId < 1052))  //×ÏŞ±Ì«¼«Õó
+        else if(typeId == 1003 || (typeId > 1039 && typeId < 1052))  //ç´«è–‡å¤ªæé˜µ
             res += 9;
-        else if(typeId == 1010 || (typeId > 1051 && typeId < 1059))  //ÎåĞĞÃğ¾øÕó
+        else if(typeId == 1010 || (typeId > 1051 && typeId < 1059))  //äº”è¡Œç­ç»é˜µ
             res += 8;
-        else if(typeId == 1004 || (typeId > 1058 && typeId < 1065))  //ËÄÏóÔªÁéÕó
+        else if(typeId == 1004 || (typeId > 1058 && typeId < 1065))  //å››è±¡å…ƒçµé˜µ
             res += 2;
-        else if(typeId == 1005 || (typeId > 1064 && typeId < 1074))  //±±¶·ÆßĞÇÕó
+        else if(typeId == 1005 || (typeId > 1064 && typeId < 1074))  //åŒ—æ–—ä¸ƒæ˜Ÿé˜µ
             res += 7;
-        else if(typeId == 1006 || (typeId > 1073 && typeId < 1084))  //µßµ¹°ËØÔÕó
+        else if(typeId == 1006 || (typeId > 1073 && typeId < 1084))  //é¢ å€’å…«å¦é˜µ
             res += 6;
-        else if(typeId == 1007 || (typeId > 1083 && typeId < 1096))  //¶¼ÌìÁÒ»ğÕó
+        else if(typeId == 1007 || (typeId > 1083 && typeId < 1096))  //éƒ½å¤©çƒˆç«é˜µ
             res += 5;
-        else if(typeId == 1008 || (typeId > 1095 && typeId < 1107))  //Ììî¸µØÉ·Õó
+        else if(typeId == 1008 || (typeId > 1095 && typeId < 1107))  //å¤©ç½¡åœ°ç…é˜µ
             res += 4;
-        else if(typeId == 1009 || (typeId > 1106 && typeId < 1116))  //ÆæÃÅ¶İ¼×Õó
+        else if(typeId == 1009 || (typeId > 1106 && typeId < 1116))  //å¥‡é—¨éç”²é˜µ
             res += 3;
-        else if(typeId == 1111 || (typeId > 1115 && typeId < 1124))  //ÆßÉ«ËøÔÆÕó
+        else if(typeId == 1111 || (typeId > 1115 && typeId < 1125))  //ä¸ƒè‰²é”äº‘é˜µ
             res += 1;
         break;
     case 12:

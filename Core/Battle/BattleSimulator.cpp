@@ -891,7 +891,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
             {
                 defList[defCount].damType = e_damOut;
                 area_target->setDefend100(false);
-                if(counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
+                if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
                 {
                     setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
                     setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
@@ -926,6 +926,11 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
         {
             doPoisonAttack(bf, cs, skill, area_target, factor, defList, defCount, scList, scCount, atkAct);
         }
+
+        std::vector<AttackAct> atkAct2;
+        atkAct2.clear();
+        doPassiveSkillBeAtk(bf, area_target, &atkAct2, atkAct, dmg + magdmg);
+        doSkillAtk2((side == bf->getSide()), &atkAct2, defList, defCount, scList, scCount);
 
 		// if this fighter can counter
 		if(can_counter && counter_deny >= 0 && _winner == 0 && !_isBody[side][pos] && area_target_obj->getHP() > 0 && bf->getHP() > 0)
@@ -993,11 +998,6 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 #endif
 			}
 		}
-
-        std::vector<AttackAct> atkAct2;
-        atkAct2.clear();
-        doPassiveSkillBeAtk(bf, area_target, &atkAct2, atkAct, dmg + magdmg);
-        doSkillAtk2((side == bf->getSide()), &atkAct2, defList, defCount, scList, scCount);
 	}
 	else // if attacked a barrier
 	{
@@ -2254,7 +2254,39 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
     {
         UInt32 rhp = bf->calcTherapy(skill);
 
-        if(bf->getSide() != target_side)
+        // 释、普渡慈航
+        if(SKILL_ID(skill->getId()) == 18)
+        {
+            BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+            if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
+                return dmg;
+
+            int cnt = 3;
+            UInt8 excepts[25] = {0};
+            size_t exceptCnt = 0;
+            do
+            {
+                if(bo != NULL && bo->getHP() != 0 && bo->isChar())
+                {
+                    UInt32 rhp2 = rhp * skill->factor[3-cnt];
+                    UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp2);
+                    if(hpr != 0)
+                    {
+                        excepts[exceptCnt] = bo->getPos();
+                        ++ exceptCnt;
+                        defList[defCount].pos = bo->getPos() + 25;
+                        defList[defCount].damType = e_damHpAdd;
+                        defList[defCount].damage = hpr;
+                        defList[defCount].leftHP = bo->getHP();
+                        ++ defCount;
+                    }
+                }
+
+                bo = getTherapyTarget2(bf, excepts, exceptCnt);
+
+            }while(--cnt);
+        }
+        else if(bf->getSide() != target_side)
         {
             UInt32 hpr = bf->regenHP(rhp);
             if(hpr != 0)
@@ -2585,7 +2617,42 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
     {
-        if(0 == skill->area)
+        //道、万剑诀
+        if(SKILL_ID(skill->getId()) == 27)
+        {
+            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
+
+            int cnt = 8;
+            for(int i = 0; i < cnt; ++ i)
+            {
+                BattleFighter* rnd_bf = getRandomFighter(target_side, NULL, 0);
+                dmg += attackOnce(bf, cs, pr, skill, rnd_bf, 1, defList, defCount, scList, scCount);
+            }
+        }
+        //儒、青莲剑歌
+        else if(SKILL_ID(skill->getId()) == 9)
+        {
+            int idx = 0;
+            for(int i = 0; i < apcnt; ++ i)
+            {
+                BattleObject * area_target_obj = _objs[target_side][ap[i].pos];
+                if(area_target_obj == NULL || area_target_obj->getHP() == 0 || bf == NULL)
+                    continue;
+                ++ idx;
+            }
+
+            int fsize = skill->factor.size();
+            float factor = 1;
+            if(fsize > idx)
+                factor = skill->factor[idx];
+
+            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], factor, defList, defCount, scList, scCount, apcnt, ap, atkAct);
+            for(int j = 0; j < apcnt; ++ j)
+            {
+                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][ap[j].pos], factor, defList, defCount, scList, scCount);
+            }
+        }
+        else if(0 == skill->area)
         {
             dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
         }
@@ -3148,6 +3215,50 @@ BattleFighter* BattleSimulator::getTherapyTarget(BattleFighter* bf)
 	}
 
     return NULL;
+}
+
+BattleFighter* BattleSimulator::getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount)
+{
+    UInt8 side = bf->getSide();
+    BattleFighter* bo = NULL;
+    UInt32 maxHpLost = 0;
+    UInt8 pos = 0;
+	for(UInt8 i = 0; i < 25; ++ i)
+	{
+		bo = static_cast<BattleFighter*>(_objs[side][i]);
+		if(bo == NULL || bo->getHP() == 0)
+			continue;
+
+		bool except = false;
+		for(size_t j = 0; j < exceptCount; ++ j)
+		{
+			if(excepts[j] == i)
+			{
+				except = true;
+				break;
+			}
+		}
+		if(except)
+			continue;
+
+        UInt32 hp = bo->getHP();
+        UInt32 maxHp = bo->getMaxHP();
+        if(hp < (maxHp >> 1))
+        {
+            return bo;
+        }
+
+        if(maxHp - hp > maxHpLost)
+        {
+            maxHpLost = maxHp - hp;
+            pos = i;
+        }
+	}
+
+    if(maxHpLost != 0)
+		bo = static_cast<BattleFighter*>(_objs[side][pos]);
+
+    return bo;
 }
 
 UInt32 BattleSimulator::FightersEnter(UInt8 prevWin)

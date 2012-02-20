@@ -227,6 +227,7 @@ private:
     UInt32 doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct = NULL);
     UInt32 doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct = NULL, UInt32 skillParam = 0);
     BattleFighter* getTherapyTarget(BattleFighter* bf);
+    BattleFighter* getTherapyTarget2(BattleFighter* bf, UInt8 * excepts, size_t exceptCount);
     void doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount, bool& self);
     void doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, StatusChange* scList, size_t& scCount);
     void doSkillState(BattleFighter* bf, const GData::SkillBase* skill, BattleObject* bo, DefStatus* defList, size_t& defCount, std::vector<AttackAct>* atkAct2, std::vector<AttackAct>* atkAct = NULL);

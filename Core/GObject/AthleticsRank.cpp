@@ -363,7 +363,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 		return ;
 	}
 	Rank rank = found->second;
-	UInt16 rankpos = getRankPos(row, rank);
+	UInt32 rankpos = getRankPos(row, rank);
 	Rank start, end;
     UInt8 rank3num = 0;
     UInt8 ranknum = 0;
@@ -391,7 +391,7 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 	else
 	{
 		start = end = getRankBegin(row);
-		UInt16 ranksize = getRankSize(row);
+		UInt32 ranksize = getRankSize(row);
 		if (ranksize > 9)
         {
 			std::advance(end, 10);
@@ -491,7 +491,7 @@ void AthleticsRank::RequestKillCD(Player* player)
     if (found == _ranks[row].end())
         return;
     Rank rank = found->second;
-    UInt16 rankpos = getRankPos(row, rank);
+    UInt32 rankpos = getRankPos(row, rank);
     if(rankpos <=500)
         return;
 
@@ -530,7 +530,7 @@ void AthleticsRank::RequestPageNum(Player* player)
         return;
     }
     Rank rank = found->second;
-    UInt16 rankpos = getRankPos(row, rank);
+    UInt32 rankpos = getRankPos(row, rank);
     if(rankpos <=500)
         return;
 
@@ -572,7 +572,7 @@ void AthleticsRank::AddPageNum(Player* player, bool bMoneyEnough)
         return;
     }
     Rank rank = found->second;
-    UInt16 rankpos = getRankPos(row, rank);
+    UInt32 rankpos = getRankPos(row, rank);
     if(rankpos <=10)
     {
         return;
@@ -654,9 +654,9 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 	RankList::iterator atkerRank = _ranks[row].find(atker);
 	if (atkerRank == _ranks[row].end())
 		return ;
-	UInt16 atkerRankPos = getRankPos(row, atkerRank->second);
-	UInt16 deferRankPos = getRankPos(row, deferRank->second);
-    UInt16 pageNum = (*atkerRank->second)->pageNum; //得到攻击者的页面
+	UInt32 atkerRankPos = getRankPos(row, atkerRank->second);
+	UInt32 deferRankPos = getRankPos(row, deferRank->second);
+    UInt32 pageNum = (*atkerRank->second)->pageNum; //得到攻击者的页面
 	if(atkerRankPos > 10 )
 	{
 		if (atkerRankPos <= deferRankPos)
@@ -827,8 +827,8 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 		return ;
 
     AthleticsRankData * data = *(atkerRank->second);
-	UInt16 atkerRankPos = getRankPos(row, atkerRank->second);
-	UInt16 deferRankPos = getRankPos(row, deferRank->second);
+	UInt32 atkerRankPos = getRankPos(row, atkerRank->second);
+	UInt32 deferRankPos = getRankPos(row, deferRank->second);
 	if(atkerRankPos >10)
 	{
 		if (atkerRankPos <= deferRankPos || (atkerRankPos - deferRankPos > 10*(data->pageNum + 1)))// && !(getAthleticsExtraChallenge(atker) & static_cast<UInt32>(0x80000000))))
