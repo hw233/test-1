@@ -239,6 +239,7 @@ private:
 	void doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAct, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount);
 
     UInt32 releaseCD(BattleFighter* bf);
+    void releaseWeak(BattleFighter* bo, DefStatus* defList, size_t& defCount);
 
     void  InitAttainRecord();
     void  CheckAttain();
