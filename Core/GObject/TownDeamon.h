@@ -29,6 +29,7 @@ struct DeamonMonster
 
 struct DeamonPlayerData
 {
+    UInt32 challengeTime;
     UInt32 startTime;
     UInt16 deamonLevel;
     UInt16 curLevel;
@@ -40,6 +41,7 @@ struct DeamonPlayerData
 
     DeamonPlayerData()
     {
+        challengeTime = 0;
         startTime = 0;
         deamonLevel = 0;
         curLevel = 0;
@@ -74,8 +76,10 @@ class TownDeamon
         void autoCompleteQuite(Player*, UInt16 levels);
         void process();
 
-    private:
-        bool checkTownDeamon(Player*, UInt16 level = 0);
+        bool checkTownDeamon(Player* pl);
+        bool attackNpc(Player* pl, UInt32 npcId);
+        bool attackPlayer(Player* pl, Player* defer);
+        bool beAttackByPlayer();
 
     private:
         std::vector<DeamonMonster> m_Monsters;

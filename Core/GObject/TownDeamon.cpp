@@ -208,12 +208,146 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
 void TownDeamon::cancelDeamon(Player* pl)
 {
     Stream st(REP::TOWN_DEAMON);
+    st << static_cast<UInt8>(0x06);
+    UInt8 res = 0;
 
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    if(dpd->deamonLevel == 0)
+        res = 1;
+    else if(m_Monsters[dpd->deamonLevel - 1].player != pl)
+        res = 1;
+    else
+    {
+        m_Monsters[dpd->deamonLevel].player = NULL;
+        dpd->deamonLevel = 0;
+        dpd->startTime = 0;
+    }
+
+    st << Stream::eos;
     pl->send(st);
+}
+
+bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
+{
+    UInt32 now = TimeUtil::Now();
+    UInt32 buffLeft = pl->getBuffData(PLAYER_BUFF_ATTACKING, now);
+    if(cfg.GMCheck && buffLeft > now)
+    {
+        pl->sendMsgCode(0, 1407, buffLeft - now);
+        return false;
+    }
+    pl->checkLastBattled();
+    UIntew npcId = m_Monsters[level].npcId;
+    GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
+    if(it == GData::npcGroups.end())
+        return false;
+
+    GData::NpcGroup * ng = it->second;
+    Battle::BattleSimulator bsim(pl->getLocation(), pl, ng->getName(), ng->getLevel(), false);
+    pl->PutFighters( bsim, 0 );
+    ng->putFighters( bsim );
+    bsim.start();
+    Stream& packet = bsim.getPacket();
+    if(packet.size() <= 8)
+        return false;
+
+    UInt16 ret = 0x0100;
+    bool res = bsim.getWinner() == 1;
+    if(res)
+    {
+        ret = 0x0101;
+        pl->_lastNg = ng;
+        pl->pendExp(ng->getExp());
+        ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+    }
+
+    Stream st(REP::ATTACK_NPC);
+    st << ret << PLAYER_DATA(pl, lastExp) << static_cast<UInt8>(0);
+    UInt8 sz = pl->_lastLoot.size();
+    st << sz;
+    for(UInt8 i = 0; i < sz; ++ i)
+    {
+        st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
+    }
+    st.append(&packet[8], packet.size() - 8);
+    st << Stream::eos;
+    pl->send(st);
+
+    bsim.applyFighterHP(0, pl);
+
+    pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
+
+    return res;
+}
+
+bool TownDeamon::attackPlayer(Player* pl, Player* defer)
+{
+	UInt8 tid = defer->getThreadId();
+	if(tid == pl->getThreadId())
+	{
+		bool res;
+
+		Battle::BattleSimulator bsim(pl->getLocation(), pl, defer);
+		pl->PutFighters( bsim, 0, true );
+		defer->PutFighters( bsim, 1, true );
+		bsim.start();
+		res = bsim.getWinner() == 1;
+
+		Stream st(REP::ATTACK_NPC);
+		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+		pl->send(st);
+		
+		return;
+	}
+	struct AthleticsBeData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	AthleticsBeData abd = { _owner, _owner->getFormation(), static_cast<UInt16>(_owner->getMainFighter() != NULL ? _owner->getMainFighter()->getId() : 0) };
+	for(int i = 0; i < 5; ++ i)
+		abd.lineup[i] = _owner->getLineup(i);
+	GameMsgHdr hdr(0x215, tid, defer, sizeof(AthleticsBeData));
+	GLOBAL().PushMsg(hdr, &abd);
+
 }
 
 void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
 {
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    switch(type)
+    {
+    case 0:
+        {
+            if(level != dpd->curLevel)
+                break;
+            else
+            {
+                UInt8 res = 0;
+                if(attackNpc(pl, m_Monsters[level].npcId))
+                    res = 0;
+                else
+                    res = 1;
+                Stream st(REP::TOWN_DEAMON);
+                st << static_cast<UInt8>(0x06);
+                st << level << type << res << Stream::eos;
+                pl->send(st);
+            }
+
+        }
+        break;
+    case 1:
+        {
+            if(level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel)
+                break;
+            else
+            {
+            }
+        }
+        break;
+    }
 }
 
 void TownDeamon::notifyChallengeResult(Player* pl, UInt16 level, UInt8 win)
@@ -229,6 +363,14 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 
 void TownDeamon::process()
 {
+}
+
+bool TownDeamon::checkTownDeamon(Player* pl)
+{
+    if(PLAYER_DATA(pl, location) != )
+        return false
+
+    return true;
 }
 
 }

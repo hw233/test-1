@@ -3964,6 +3964,10 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
+
+    if(!townDeamonManager->checkTownDeamon(player))
+        return;
+
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;

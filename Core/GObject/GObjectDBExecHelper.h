@@ -84,6 +84,7 @@ struct DBTownDeamonPlayer
     UInt32 awards;
     UInt32 vitalityTime;
     UInt16 vitality;
+    UInt32 challengeTime;
 };
 
 struct DBMapSpot

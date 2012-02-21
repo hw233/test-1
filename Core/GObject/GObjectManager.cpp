@@ -3954,7 +3954,7 @@ namespace GObject
 		lc.prepare("Loading TownDeamon Player:");
 		DBTownDeamonPlayer dbtdp;
         Player* pl = NULL;
-		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `awards`, `vitalityTime`, `vitality` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
+		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `awards`, `vitalityTime`, `vitality`, `challengeTime` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		while(execu2->Next() == DB::DB_OK)
@@ -3966,6 +3966,7 @@ namespace GObject
             DeamonPlayerData* dpData = pl->getDeamonPlayerData();
             if(!dpData)
                 continue;
+            dpData->challengeTime = dbtdp.challengeTime;
             dpData->startTime = dbtdp.startTime;
             dpData->deamonLevel = dbtdp.deamonLevel;
             dpData->curLevel = dbtdp.curLevel;
