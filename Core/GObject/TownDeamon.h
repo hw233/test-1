@@ -72,14 +72,14 @@ class TownDeamon
         void useVitalityItem(Player*, UInt8 count);
         void cancelDeamon(Player*);
         void challenge(Player*, UInt16 level, UInt8 type);
-        void notifyChallengeResult(Player*, UInt16 level, UInt8 win);
+        void notifyChallengeResult(Player*, Player* defer, UInt8 win);
         void autoCompleteQuite(Player*, UInt16 levels);
         void process();
 
         bool checkTownDeamon(Player* pl);
-        bool attackNpc(Player* pl, UInt32 npcId);
-        bool attackPlayer(Player* pl, Player* defer);
-        bool beAttackByPlayer();
+        void attackNpc(Player* pl, UInt32 npcId);
+        void attackPlayer(Player* pl, Player* defer);
+        void beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
 
     private:
         std::vector<DeamonMonster> m_Monsters;

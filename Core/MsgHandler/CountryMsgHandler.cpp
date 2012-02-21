@@ -244,6 +244,9 @@ MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
 
+MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
+MSG_REG_2(GameMsgHdr, 0x341, OnTownDeamonResNotify);
+
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);
 MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);

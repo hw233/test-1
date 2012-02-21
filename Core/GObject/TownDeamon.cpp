@@ -280,7 +280,7 @@ bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
     return res;
 }
 
-bool TownDeamon::attackPlayer(Player* pl, Player* defer)
+void TownDeamon::attackPlayer(Player* pl, Player* defer)
 {
 	UInt8 tid = defer->getThreadId();
 	if(tid == pl->getThreadId())
@@ -297,21 +297,54 @@ bool TownDeamon::attackPlayer(Player* pl, Player* defer)
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		pl->send(st);
 		
+        notifyChallengeResult(pl, defer, res);
+
 		return;
 	}
-	struct AthleticsBeData
+	struct TDBeAttackData
 	{
 		Player * attacker;
 		UInt16 formation;
 		UInt16 portrait;
 		Lineup lineup[5];
 	};
-	AthleticsBeData abd = { _owner, _owner->getFormation(), static_cast<UInt16>(_owner->getMainFighter() != NULL ? _owner->getMainFighter()->getId() : 0) };
+	TDBeAttackData tdbad = { pl, pl->getFormation(), static_cast<UInt16>(pl->getMainFighter() != NULL ? pl->getMainFighter()->getId() : 0) };
 	for(int i = 0; i < 5; ++ i)
-		abd.lineup[i] = _owner->getLineup(i);
-	GameMsgHdr hdr(0x215, tid, defer, sizeof(AthleticsBeData));
+		abd.lineup[i] = pl->getLineup(i);
+	GameMsgHdr hdr(0x340, tid, defer, sizeof(TDBeAttackData));
 	GLOBAL().PushMsg(hdr, &abd);
+}
 
+void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
+{
+	Battle::BattleSimulator bsim(atker->getLocation(), atker, defer);
+	bsim.setFormation( 0, formation );
+	bsim.setPortrait( 0, portrait );
+	for(int i = 0; i < 5; ++ i)
+	{
+		if(lineup[i].fighter != NULL)
+		{
+			Battle::BattleFighter * bf = bsim.newFighter(0, lineup[i].pos, lineup[i].fighter);
+			bf->setHP(0);
+		}
+	}
+	defer->PutFighters( bsim, 1, true );
+	bsim.start();
+	bool res = bsim.getWinner() == 1;
+
+	Stream st(REP::ATTACK_NPC);
+	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
+	atker->send(st);
+
+	struct TDResNotify
+	{
+		Player * peer;
+		bool win;
+	};
+
+	TDResNotify notify = { defer, res };
+	GameMsgHdr hdr2(0x341, atker->getThreadId(), atker, sizeof(TDResNotify));
+	GLOBAL().PushMsg(hdr2, &notify);
 }
 
 void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
@@ -342,23 +375,69 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
         {
             if(level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel)
                 break;
+            else if(m_Monsters[level].player)
+            {
+                attackPlayer(pl, m_Monsters[level].player);
+            }
             else
             {
+                m_Monsters[level].player = pl;
+                dpd->deamonLevel = level;
+                dpd->startTime = TimeUtil::Now();
+
+                UInt8 res = 0;
+                Stream st(REP::TOWN_DEAMON);
+                st << static_cast<UInt8>(0x06);
+                st << level << type << res << Stream::eos;
+                pl->send(st);
             }
         }
         break;
     }
 }
 
-void TownDeamon::notifyChallengeResult(Player* pl, UInt16 level, UInt8 win)
+void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 {
     Stream st(REP::TOWN_DEAMON);
 
+    DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    UInt16 level = deferDpd->deamonLevel;
+    UInt8 res = 0;
+
+    dpd->challengeTime = TimeUtil::Now();
+    if(win)
+    {
+        dpd->deamonLevel = level;
+        dpd->startTime = TimeUtil::Now();
+
+        deferDpd->deamonLevel = 0;
+        deferDpd->startTime = 0;
+    }
+    else
+    {
+        res = 1;
+    }
+
+    st << static_cast<UInt8>(0x06);
+    st << level << static_cast<UInt8>(1) << res << Stream::eos;
     pl->send(st);
 }
 
 void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 {
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+
+    int maxCnt = levels;
+    if(levels > dpd->maxLevel - dpd->curLevel)
+        maxCnt = dpd->maxLevel - dpd->curLevel;
+
+    if(pl->GetPackage()->GetItemAnyNum() < maxCnt)
+        maxCnt = pl->GetPackage()->GetItemAnyNum();
+
+    for(int idx = 0; idx < maxCnt ; ++idx)
+    {
+    }
 }
 
 void TownDeamon::process()
