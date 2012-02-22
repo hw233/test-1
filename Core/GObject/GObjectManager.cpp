@@ -784,6 +784,16 @@ namespace GObject
 		return true;
 	}
 
+	inline bool heromemo_loaded(Player * p, int)
+	{
+        if(p->GetLev() >= 45)
+            p->GetHeroMemo()->setMemo(MC_FIGHTER, MD_STARTED, 0, 2, 1);
+        if (p->getClan())
+            p->GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 0, 1);
+        p->initAcuHeroMemo();
+		return true;
+	}
+
     bool GObjectManager::loadQQVipAward()
     {
         lua_State* L = lua_open();
@@ -1892,7 +1902,6 @@ namespace GObject
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
 		lc.finalize();
-
 
 		/////////////////////////////////
 
@@ -3644,6 +3653,9 @@ namespace GObject
             pl->GetHeroMemo()->loadFromDB(hm.awards.c_str(), hm.memos.c_str());
             pl = 0;
         }
+
+		globalPlayers.enumerate(heromemo_loaded, 0);
+
         return true;
     }
 

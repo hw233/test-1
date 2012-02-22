@@ -209,8 +209,6 @@ void Athletics::attack(Player * defer)
 	UInt8 tid = defer->getThreadId();
 	if(tid == _owner->getThreadId())
 	{
-        _owner->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 0);
-
 		struct AthleticsResult
 		{
 			UInt32	id;
@@ -246,7 +244,7 @@ void Athletics::attack(Player * defer)
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
         if (res)
-            _owner->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 1);
+            _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
 		return;
 	}
 	struct AthleticsBeData
@@ -321,6 +319,7 @@ void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Line
         msg.param = 1;
         GameMsgHdr h(0x244,   atker->getThreadId(), atker, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
+        atker->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
     }
 
 }
@@ -496,7 +495,6 @@ void Athletics::attackMartial(Player* defer)
     UInt32 id = 0;
 
     GameAction()->doAty(this->_owner, AtyAthletics, 0, 0);
-    _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
     do
     {
         UInt8 idx = 0xFF;
@@ -556,7 +554,7 @@ void Athletics::attackMartial(Player* defer)
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
         if (res)
-            _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
+            winner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
     }while(false);
 
 	AthleticsResult ar = {id, 0, defer, res };

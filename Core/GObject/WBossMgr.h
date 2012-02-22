@@ -128,6 +128,8 @@ public:
 
     void bossAppear(UInt8 lvl, bool force = false);
 
+    inline UInt32 getAppearTime() const { return _appearTime; }
+
 private:
     UInt32 _prepareTime;
     UInt8 _prepareStep;

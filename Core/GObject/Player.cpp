@@ -937,14 +937,15 @@ namespace GObject
         char _type[32] = {0};
         char _id[32] = {0};
         snprintf(_type, 32, "%u", type);
-        snprintf(_id, 32, "%u", id); 
         if (!id || !num)
         {
+            snprintf(_id, 32, "GN_%u", type);
             snprintf(_price, 32, "%u", price);
-            udpLog(op, _type, "GN", _price, "", "", "props");
+            udpLog(op, _type, _id, _price, "", "", "props");
         }
         else
         {
+            snprintf(_id, 32, "%u", id);
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
         }
@@ -2847,12 +2848,12 @@ namespace GObject
 
         AddFriendAttainment(pl);
 
-        if (getFrendsNum() == 1)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
-        if (getFrendsNum() == 5)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
-        if (getFrendsNum() == 10)
+        if (getFrendsNum() >= 10)
             OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 2);
+        else if (getFrendsNum() >= 5)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
+        else if (getFrendsNum() >= 1)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
 		return true;
 	}
 
@@ -4496,6 +4497,7 @@ namespace GObject
             _playerData.clanTaskId = 0;
         }
 
+        OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
         return true;
     }
@@ -4899,6 +4901,7 @@ namespace GObject
 		Stream st(REP::HOTEL_PUB_LIST);
 		if(count > 0)
 		{
+            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 0);
             UInt8 hasGet = 0;
 			do
 			{
@@ -5122,11 +5125,8 @@ namespace GObject
             _playerData.tavernOrangeCount = 0;
         }
 
-        if (fgt->getColor() == 0)
-            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 0);
-        else if (fgt->getColor() == 1)
-            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 1);
-        else if (fgt->getColor() == 2)
+        OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 1);
+        if (fgt->getColor() == 1)
             OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 2);
 
         if(fgt->getColor() ==3)
@@ -5315,6 +5315,8 @@ namespace GObject
 				_playerData.lineup[fe].updateId();
 				++ c;
 			}
+            if (c == 4)
+                OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 0);
             UInt8 newPos[5] = {0};
             if(0 == _playerData.formation)
             {
@@ -5467,7 +5469,8 @@ namespace GObject
 			map->OnPlayerLevUp(this);
 
 		GameAction()->onLevelup(this, oLev, nLev);
-        OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
+        if (nLev >= 45)
+            OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -6109,6 +6112,11 @@ namespace GObject
 		if(!m_Package->DelItemAny(itemId, 1, NULL, ToTrainFighter))
 			return 2;
 
+        if(isPotential)
+            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 0);
+        else
+            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
+
 		if(uRand(1000) < rate)
 		{
             bool bMainFighter = isMainFighter( fgt->getId()) ; 
@@ -6157,13 +6165,7 @@ namespace GObject
                     {
                         SYSMSG_BROADCASTV(2200, getCountry(), getName().c_str(), fgt->getColor(), fgt->getName().c_str());
                     }
-
                 }
-
-                if (p >= 1.2f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
-                else if (p >= 1.1f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 2);
             }
             else
             {
@@ -6214,11 +6216,6 @@ namespace GObject
 
                     }
                 }
-
-                if (p >= 6.5f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 1);
-                else if (p >= 7.0f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 2);
             }
 		}
 		else
@@ -6246,11 +6243,6 @@ namespace GObject
 			}
 			return 1;
 		}
-
-        if(isPotential)
-            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 0);
-        else
-            OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 0);
 
         if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
             fgt->getAttrType2(true);
@@ -6840,7 +6832,6 @@ namespace GObject
 
     void Player::OnHeroMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item)
     {
-        return; // TODO: 下个版本开放
         if (CURRENT_THREAD_ID() != getThreadId())
         {
             UInt8 msg[4] = {chapter, diff, group, item};
@@ -8330,6 +8321,26 @@ namespace GObject
         SYSMSG(title, 2335);
         SYSMSG(content, 2336);
         GetMailBox()->newMail(NULL, 0x12, title, content);
+    }
+
+    void Player::initAcuHeroMemo()
+    {
+        for (std::map<UInt32, Fighter*>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+        {
+            Fighter * fgt = it->second;
+            if (fgt->getAcupointsBit(1) >= 1 && fgt->getAcupointsBit(1) <= 3)
+                GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 0, 1);
+            if (fgt->getAcupointsBit(2) == 3)
+                GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 1, 1);
+            if (fgt->getAcupointsBit(3) == 3)
+                GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 2, 1);
+        }
+        if (getFrendsNum() >= 10)
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 2, 1);
+        else if (getFrendsNum() >= 5)
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 1, 1);
+        else if (getFrendsNum() >= 1)
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 0, 1);
     }
 
 } // namespace GObject

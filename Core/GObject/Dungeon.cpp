@@ -507,10 +507,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		r = true;
 		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
 
-        if (getId() == 1)
-            player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
-        if (getId() == 2)
-            player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 2);
+        player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 2);
 	}
 
 	if(noreport)

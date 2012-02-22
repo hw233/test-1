@@ -32,6 +32,8 @@
 #include "GObject/HeroIsland.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/AthleticsRank.h"
+#include "GObject/HeroMemo.h"
+
 GMHandler gmHandler;
 
 GMHandler::GMHandler()
@@ -155,6 +157,7 @@ GMHandler::GMHandler()
     Reg(3, "moneyin", &GMHandler::OnMoneyIn);
     Reg(3, "newyear", &GMHandler::OnNewYear);
     Reg(3, "ff", &GMHandler::OnFgtForge);
+    Reg(3, "ghmaward", &GMHandler::OnGetHeroMemoAward);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2587,5 +2590,13 @@ void GMHandler::OnFgtForge(GObject::Player* player, std::vector<std::string>& ar
     if (!fgt)
         return;
     fgt->forge(0, lock);
+}
+
+void GMHandler::OnGetHeroMemoAward(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (!args.size())
+        return;
+    UInt8 idx = atoi(args[0].c_str());
+    player->GetHeroMemo()->getAward(idx);
 }
 
