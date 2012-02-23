@@ -56,7 +56,47 @@ struct DeamonPlayerData
         accAwards = 0;
         vitalityTime = 0;
         vitality = 0;
-        spirit = 0;
+        spirit = 100;
+    }
+
+    UInt32 calcAccLeft()
+    {
+        UInt32 accLeft = 0;
+        if(accLen > TimeUtil::Now() - accTime)
+            accLeft = accLen - TimeUtil::Now() + accTime;
+        return accLen;
+    }
+
+    UInt32 calcAwards()
+    {
+        UInt32 awards = 0;
+        UInt32 accLeft = 0;
+        if(accLen > TimeUtil::Now() - accTime)
+            accLeft = accLen - TimeUtil::Now() + accTime;
+
+        if(startTime != 0)
+            awards = (TimeUtil::Now() - startTime + accLen - accLeft)/TD_AWARD_TIMEUNIT + accAwards;
+        return awards;
+    }
+
+    UInt32 calcVitality()
+    {
+        UInt32 vitalityLeft = 0;
+        if(vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - vitalityTime)
+            vitalityLeft = vitality - (TimeUtil::Now() + vitalityTime) / TD_VITALITY_TIMEUNIT;
+
+        return vitalityLeft;
+    }
+
+    UInt32 calcSpirit()
+    {
+        UInt32 spiritLeft = 0;
+        if(vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - vitalityTime)
+            spiritLeft = spirit;
+        else if((spirit + vitality) * TD_VITALITY_TIMEUNIT > (TimeUtil::Now() + vitalityTime))
+            spiritLeft = spirit + vitality - (TimeUtil::Now() + vitalityTime) / TD_VITALITY_TIMEUNIT;
+
+        return spiritLeft;
     }
 };
 

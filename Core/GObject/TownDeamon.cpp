@@ -99,13 +99,13 @@ void TownDeamon::showTown(Player* pl)
     if(dpd->vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - dpd->vitalityTime)
         vitality = dpd->vitality - (TimeUtil::Now() + dpd->vitalityTime) / TD_VITALITY_TIMEUNIT;
 
+    if(vitality > 0)
+        spirit = dpd->spirit;
+    else if((dpd->spirit + dpd->vitality) * TD_VITALITY_TIMEUNIT > (TimeUtil::Now() + dpd->vitalityTime))
+        spirit = dpd->spirit + dpd->vitality - (TimeUtil::Now() + dpd->vitalityTime) / TD_VITALITY_TIMEUNIT;
+
     st << dpd->curLevel << dpd->maxLevel << dpd->deamonLevel << timeLeft;
     st << awards << accLeft << vitality << spirit;
-    spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
-    vitality = dpd->vitality > 0 ? dpd->vitality : 0;
-    if(spirit < 0)
-        spirit = 0;
-
     st << Stream::eos;
     pl->send(st);
 }
