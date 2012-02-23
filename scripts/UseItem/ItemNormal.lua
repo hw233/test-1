@@ -1411,7 +1411,7 @@ function ItemNormal_00000448(iid, num, bind, param)
     local i = math.random(1,#item)
 
     package:AddItem(item[i], 1, true, false)
-    package:DelItemSendMsg(448, player);
+    package:DelItemSendMsg(iid, player);
     return num;
 end
 
@@ -7001,6 +7001,9 @@ local ItemNormal_Table = {
     [446] = ItemNormal_shusanLoveCard,
     [447] = ItemNormal_shusanLoveCard,
     [448] = ItemNormal_00000448,
+    [468] = ItemNormal_00000448,
+    [469] = ItemNormal_00000448,
+    [470] = ItemNormal_00000448,
 
     [449] = ItemNormal_VIP,
     [450] = ItemNormal_VIP,

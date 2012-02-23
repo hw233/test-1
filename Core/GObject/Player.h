@@ -1293,6 +1293,8 @@ namespace GObject
         inline const std::string& getVia() const { return m_via; }
         inline bool isOffical() const { return m_isOffical; }
 
+        inline UInt8 getPlatform() const { return atoi(m_domain.c_str()); }
+
     public:
         inline void setSysDailog(bool v) { m_sysDailog = v; }
         inline bool getSysDailog() { return m_sysDailog; }

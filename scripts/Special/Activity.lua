@@ -933,7 +933,51 @@ end
 
 function onLoginPF(player)
     if player:GetVar(49) == 0 then
-        sendItemPackageMail(player, "平台登录奖励", "恭喜您获得对应平台登录奖励，请点击\"接受物品\"按钮领取。", {448,1,1});
+        local pfnames = {
+            [1] = "QQ空间",
+            [2] = "QQ校友",
+            -- [4] = "Q+",
+            [10] = "QQ游戏大厅",
+            -- [11] = "3366",
+            -- [12] = "官网",
+        }
+        local titles = {
+            [1] = pfnames[1].."登陆奖励",
+            [2] = pfnames[2].."登陆奖励",
+            --[4] = pfnames[4].."登陆奖励",
+            [10] = pfnames[10].."登陆奖励",
+            --[11] = pfnames[11].."登陆奖励",
+            -- [12] = pfnames[12].."登陆奖励",
+        }
+        local ctxs = {
+            [1] = "每日通过"..pfnames[1].."登陆《蜀山传奇》都可以获得【"..pfnames[1].."登陆礼包】 \n登陆礼包每日只能领取一次",
+            [2] = "每日通过"..pfnames[2].."登陆《蜀山传奇》都可以获得【"..pfnames[2].."登陆礼包】 \n登陆礼包每日只能领取一次",
+            --[4] = "每日通过"..pfnames[4].."登陆《蜀山传奇》都可以获得【"..pfnames[4].."登陆礼包】 登陆礼包每日只能领取一次",
+            [10] = "每日通过"..pfnames[10].."登陆《蜀山传奇》都可以获得【"..pfnames[10].."登陆礼包】 \n登陆礼包每日只能领取一次",
+            --[11] = "每日通过"..pfnames[11].."登陆《蜀山传奇》都可以获得【"..pfnames[11].."登陆礼包】 登陆礼包每日只能领取一次",
+            -- [12] = "每日通过"..pfnames[12].."登陆《蜀山传奇》都可以获得【"..pfnames[12].."登陆礼包】 登陆礼包每日只能领取一次",
+        }
+
+        local pkgs = {
+            [1] = {469,1,1},
+            [2] = {470,1,1},
+            --[4] = {448,1,1},
+            [10] = {468,1,1},
+            --[11] = {448,1,1},
+            -- [12] = {448,1,1},
+        }
+
+        local pf = player:getPlatform()
+
+        if pf == 11 or pf == 4 then
+            return
+        end
+
+        if pfnames[pf] == nil then
+            return
+        end
+
+        sendItemPackageMail(player, titles[pf], ctxs[pf], pkgs[pf]);
         player:SetVar(49, 1)
     end
 end

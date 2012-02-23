@@ -192,6 +192,7 @@ namespace Script
         CLASS_DEF(Player, AddVar);
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
+		CLASS_DEF(Player, getPlatform);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
