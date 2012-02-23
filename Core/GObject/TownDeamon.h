@@ -12,6 +12,9 @@ namespace GObject
 {
 
 static const UInt32 TOWNDEAMONENDTM = 19 * 3600;
+static const UInt32 TD_VITALITY_TIMEUNIT = 600;
+static const UInt32 TD_AWARD_TIMEUNIT = 900;
+static const UInt32 TD_CHALLENGE_TIMEUNIT = 300;
 
 class Player;
 
@@ -35,9 +38,11 @@ struct DeamonPlayerData
     UInt16 curLevel;
     UInt16 maxLevel;
     UInt32 accTime;
-    UInt32 awards;
+    UInt32 accLen;
+    UInt32 accAwards;
     UInt32 vitalityTime;
-    Int32  vitality;
+    UInt32  vitality;
+    UInt32  spirit;
 
     DeamonPlayerData()
     {
@@ -47,9 +52,11 @@ struct DeamonPlayerData
         curLevel = 0;
         maxLevel = 0;
         accTime = 0;
-        awards = 0;
+        accLen = 0;
+        accAwards = 0;
         vitalityTime = 0;
         vitality = 0;
+        spirit = 0;
     }
 };
 

@@ -84,14 +84,27 @@ void TownDeamon::showTown(Player* pl)
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
-    st << dpd->curLevel << dpd->maxLevel << dpd->deamonLevel;
-    st << TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
-    st << dpd->awards << dpd->accTime;
-    UInt32 spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
-    UInt32 vitality = dpd->vitality > 0 ? dpd->vitality : 0;
+    UInt32 awards = 0;
+    UInt32 accLeft = 0;
+    UInt32 spirit = 0;
+    UInt32 vitality = 0;
+    UInt32 timeLeft = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+
+    if(dpd->accLen > TimeUtil::Now() - dpd->accTime)
+        accLeft = dpd->accLen - TimeUtil::Now() + dpd->accTime;
+
+    if(dpd->startTime != 0)
+        awards = (TimeUtil::Now() - dpd->startTime + dpd->accLen - accLeft)/TD_AWARD_TIMEUNIT + dpd->accAwards;
+
+    if(dpd->vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - dpd->vitalityTime)
+        vitality = dpd->vitality - (TimeUtil::Now() + dpd->vitalityTime) / TD_VITALITY_TIMEUNIT;
+
+    st << dpd->curLevel << dpd->maxLevel << dpd->deamonLevel << timeLeft;
+    st << awards << accLeft << vitality << spirit;
+    spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
+    vitality = dpd->vitality > 0 ? dpd->vitality : 0;
     if(spirit < 0)
         spirit = 0;
-    st << vitality << spirit;
 
     st << Stream::eos;
     pl->send(st);
@@ -442,6 +455,15 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 
 void TownDeamon::process()
 {
+    int cnt = m_Monsters.size();
+    for(int i = 0; i < cnt;; ++ i)
+    {
+        Player* pl = m_Monsters[i].player;
+        if(!pl)
+            continue;
+
+        DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    }
 }
 
 bool TownDeamon::checkTownDeamon(Player* pl)
