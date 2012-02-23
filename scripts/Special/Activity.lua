@@ -935,7 +935,7 @@ function onLoginPF(player)
     if player:GetVar(49) == 0 then
         local pfnames = {
             [1] = "QQ空间",
-            [2] = "QQ校友",
+            [2] = "朋友网",
             -- [4] = "Q+",
             [10] = "QQ游戏大厅",
             -- [11] = "3366",
