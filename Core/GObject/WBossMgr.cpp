@@ -412,6 +412,8 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
     if (!m_final)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
 
+    if (!m_final)
+        GameAction()->doAty(pl, AtyBoss, 0, 0);
     return res;
 }
 

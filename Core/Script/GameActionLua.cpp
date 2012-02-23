@@ -919,6 +919,11 @@ namespace Script
 		return Call<bool>("onValentineDay", player);
 	}
 
+	bool GameActionLua::getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul)
+	{
+		return Call<bool>("getHeroMemoAward", player, idx, soul);
+	}
+
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)
 	{
 		return Call<bool>("getActivateAttrResult", lastActivateCount, quality);

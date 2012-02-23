@@ -2150,8 +2150,6 @@ void AthleticsRank::giveAward( Player* pl )
         st << Stream::eos;
         pl->send(st);
     }
-
-    pl->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
 }
 
 }

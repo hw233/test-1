@@ -192,6 +192,8 @@ enum MemoType
 
 };
 
+class Player;
+
 enum MemoChapter
 {
     MC_FIGHTER = 0,
@@ -268,11 +270,18 @@ public:
     void updateToDB();
     void loadFromDB(const char* awards, const char* memos);
 
+    static bool testCanGetAward(Player* player, UInt8 idx);
+    static void addMaxSoul(UInt16 soul);
+
+private:
+    static std::vector<UInt16> m_maxSoul;
+
 private:
     Player* m_owner;
     UInt16 m_heroSoul;
     Memo m_memos[MC_MAX][MD_MAX];
     std::vector<UInt8> m_awards;
+    UInt8 m_maxAwardIdx;
 };
 
 } // namespace GObject

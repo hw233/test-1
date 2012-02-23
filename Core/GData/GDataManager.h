@@ -48,6 +48,7 @@ namespace GData
         static bool LoadOnlineAwardData();
         static bool LoadMoney();
         static bool LoadEUpgradeData();
+        static bool LoadHeroMemoMaxSoul();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);
