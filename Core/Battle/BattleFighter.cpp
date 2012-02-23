@@ -559,9 +559,9 @@ void BattleFighter::initStats(bool checkEnh)
 	}
 }
 
-UInt32 BattleFighter::regenHP( UInt32 u )
+UInt32 BattleFighter::regenHP( UInt32 u, bool weak )
 {
-    if(_weakRound > 0)
+    if(_weakRound > 0 && weak)
         u /= 2;
 
 	UInt32 oldhp = _hp;
