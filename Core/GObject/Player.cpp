@@ -566,7 +566,8 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_isOffical(false), m_hasTripod(false)
+        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -5658,12 +5659,12 @@ namespace GObject
 			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[5] = {{56, 2}, {503,10}, {514,10}, {507,2}, {509,2}};
-                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 5);
-                mailPackageManager.push(mail->id, mitem, 5, true);
+                MailPackage::MailItem mitem[1] = {{449, 1}};
+                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 1);
+                mailPackageManager.push(mail->id, mitem, 1, true);
 
                 std::string strItems;
-                for (int i = 0; i < 5; ++i)
+                for (int i = 0; i < 1; ++i)
                 {
                     strItems += Itoa(mitem[i].id);
                     strItems += ",";
@@ -6540,21 +6541,21 @@ namespace GObject
 
 			const UInt32 vipTable[16][12] =
             {
-                {56,2,0,0,0,0,0,0,0,0,0,0},
-                {56,10,0,0,0,0,0,0,0,0,0,0},
-                {56,10,503,5,0,0,0,0,0,0,0,0},
-                {56,10,503,10,514,10,0,0,0,0,0,0},
-                {503,20,515,5,507,2,509,2,0,0,0,0},
-                {503,30,515,15,507,10,509,10,0,0,0,0},
-                {503,30,515,20,507,10,509,10,0,0,0,0},
-                {503,50,515,30,507,30,509,30,0,0,0,0},
-                {503,100,515,30,507,30,509,30,0,0,0,0},
-                {503,200,515,50,507,50,509,50,0,0,0,0},
-                {503,300,515,80,507,50,509,50,0,0,0,0},
-                {503,800,515,240,507,150,509,150,0,0,0,0},
-                {503,800,515,280,507,150,509,150,0,0,0,0},
-                {503,1000,515,500,507,600,509,600,0,0,0,0},
-                {503,1500,515,500,507,700,509,700,0,0,0,0},
+                {450,1,0,0,0,0,0,0,0,0,0,0},
+                {451,1,0,0,0,0,0,0,0,0,0,0},
+                {452,1,0,0,0,0,0,0,0,0,0,0},
+                {453,1,0,0,0,0,0,0,0,0,0,0},
+                {454,1,0,0,0,0,0,0,0,0,0,0},
+                {455,1,0,0,0,0,0,0,0,0,0,0},
+                {456,1,0,0,0,0,0,0,0,0,0,0},
+                {457,1,0,0,0,0,0,0,0,0,0,0},
+                {458,1,0,0,0,0,0,0,0,0,0,0},
+                {459,1,0,0,0,0,0,0,0,0,0,0},
+                {460,1,0,0,0,0,0,0,0,0,0,0},
+                {461,1,0,0,0,0,0,0,0,0,0,0},
+                {462,1,0,0,0,0,0,0,0,0,0,0},
+                {463,1,0,0,0,0,0,0,0,0,0,0},
+                {464,1,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
 
@@ -6573,6 +6574,8 @@ namespace GObject
 				strItems += "|";
 			}
 
+            // XXX: 改成发礼包，在礼包使用里给装备 yangyoufa@ 23/02/12 10:21:47 
+#if 0
             if (j >= 5) // XXX: 玩家等级橙色装备x1
             {
                 UInt16 id = getRandOEquip(GetLev());
@@ -6582,6 +6585,7 @@ namespace GObject
 				strItems += ",";
 				strItems += Itoa(1);
             }
+#endif
 
 			mailPackageManager.push(mail->id, mitem, mcount, true);
 			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
@@ -8337,9 +8341,9 @@ namespace GObject
         }
         if (getFrendsNum() >= 10)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 2, 1);
-        else if (getFrendsNum() >= 5)
+        if (getFrendsNum() >= 5)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 1, 1);
-        else if (getFrendsNum() >= 1)
+        if (getFrendsNum() >= 1)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 0, 1);
     }
 

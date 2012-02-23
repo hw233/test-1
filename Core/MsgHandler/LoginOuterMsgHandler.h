@@ -556,6 +556,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setQQVipl(nu._level);
             pl->setQQVipl1(nu._level1);
             pl->setQQVipYear(nu._isYear);
+            pl->setSysDailog(true);
             GameMsgHdr hdr(0x297, country, pl, 0);
             GLOBAL().PushMsg(hdr, NULL);
 		}
@@ -1763,6 +1764,13 @@ void GetMoneyFromBs(LoginMsgHdr &hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+inline bool player_enum(GObject::Player* p, int)
+{
+    if (!p->isOnline())
+        p->setSysDailog(true);
+    return true;
+}
+
 void SysDailog(LoginMsgHdr &hdr, const void * data)
 {
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
@@ -1771,6 +1779,8 @@ void SysDailog(LoginMsgHdr &hdr, const void * data)
     Stream st(REP::SYSDAILOG);
     st << Stream::eos;
 	NETWORK()->Broadcast(st);
+
+	GObject::globalPlayers.enumerate(player_enum, 0);
 }
 
 void PwdInfo(LoginMsgHdr &hdr, const void * data)

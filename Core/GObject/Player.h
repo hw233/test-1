@@ -1294,6 +1294,12 @@ namespace GObject
         inline bool isOffical() const { return m_isOffical; }
 
     public:
+        inline void setSysDailog(bool v) { m_sysDailog = v; }
+        inline bool getSysDailog() { return m_sysDailog; }
+    private:
+        bool m_sysDailog;
+
+    public:
         void sendTripodInfo();
         void addItem(UInt32 itemid, UInt16 num, UInt8 bind);
         void makeFire(UInt32 id1, UInt32 id2);

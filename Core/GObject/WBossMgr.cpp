@@ -399,6 +399,20 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
                 m_final = true;
             appear(id, m_id);
         }
+
+        // XXX: 打元神也参与抽奖
+        AttackInfo info(pl, 0);
+        AtkInfoType::iterator i = m_atkinfo.begin();
+        while (i != m_atkinfo.end())
+        {
+            if ((*i).player == pl)
+            {
+                m_atkinfo.erase(i);
+                break;
+            }
+            ++i;
+        }
+        m_atkinfo.insert(info);
     }
     else if (res && m_final)
     {

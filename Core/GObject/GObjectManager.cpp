@@ -3655,7 +3655,6 @@ namespace GObject
         }
 
 		globalPlayers.enumerate(heromemo_loaded, 0);
-
         return true;
     }
 

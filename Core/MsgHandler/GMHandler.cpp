@@ -158,6 +158,7 @@ GMHandler::GMHandler()
     Reg(3, "newyear", &GMHandler::OnNewYear);
     Reg(3, "ff", &GMHandler::OnFgtForge);
     Reg(3, "ghmaward", &GMHandler::OnGetHeroMemoAward);
+    Reg(3, "sysdlg", &GMHandler::OnSysDailog);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2598,5 +2599,16 @@ void GMHandler::OnGetHeroMemoAward(GObject::Player* player, std::vector<std::str
         return;
     UInt8 idx = atoi(args[0].c_str());
     player->GetHeroMemo()->getAward(idx);
+}
+
+inline bool player_enum(GObject::Player* p, int) 
+{
+    if (!p->isOnline())
+        p->setSysDailog(true);
+    return true;
+}
+void GMHandler::OnSysDailog(GObject::Player* player, std::vector<std::string>& args)
+{
+    GObject::globalPlayers.enumerate(player_enum, 0);
 }
 

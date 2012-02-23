@@ -965,6 +965,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
+
+    if (pl->getSysDailog())
+    {
+        Stream st(REP::SYSDAILOG);
+        st << Stream::eos;
+        pl->send(st);
+        pl->setSysDailog(false);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
