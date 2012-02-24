@@ -129,6 +129,7 @@ enum ItemFrom
     FromDailyActivity,
     FromEquipUpgrade,
     FromClan,
+    FromTownDeamon,
 };
 
 enum ItemTo

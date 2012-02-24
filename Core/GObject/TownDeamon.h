@@ -22,11 +22,15 @@ struct DeamonMonster
 {
     Player* player;
     UInt32 npcId;
+    UInt32 itemId;
+    UInt32 itemNum;
 
     DeamonMonster()
     {
         player = NULL;
         npcId = 0;
+        itemId = 0;
+        itemNum = 0;
     }
 };
 
@@ -41,8 +45,10 @@ struct DeamonPlayerData
     UInt32 accLen;
     UInt32 accAwards;
     UInt32 vitalityTime;
-    UInt32  vitality;
-    UInt32  spirit;
+    UInt32 vitality;
+    UInt32 spirit;
+    UInt32 itemId;
+    UInt32 itemNum;
 
     DeamonPlayerData()
     {
@@ -57,6 +63,8 @@ struct DeamonPlayerData
         vitalityTime = 0;
         vitality = 0;
         spirit = 100;
+        itemId = 0;
+        itemNum = 0;
     }
 
     UInt32 calcAccLeft()
@@ -64,7 +72,7 @@ struct DeamonPlayerData
         UInt32 accLeft = 0;
         if(accLen > TimeUtil::Now() - accTime)
             accLeft = accLen - TimeUtil::Now() + accTime;
-        return accLen;
+        return accLeft;
     }
 
     UInt32 calcAwards()
@@ -93,16 +101,16 @@ struct DeamonPlayerData
         UInt32 spiritLeft = 0;
         if(vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - vitalityTime)
             spiritLeft = spirit;
-        else if((spirit + vitality) * TD_VITALITY_TIMEUNIT > (TimeUtil::Now() + vitalityTime))
-            spiritLeft = spirit + vitality - (TimeUtil::Now() + vitalityTime) / TD_VITALITY_TIMEUNIT;
+        else if((spirit + vitality) * TD_VITALITY_TIMEUNIT > (TimeUtil::Now() - vitalityTime))
+            spiritLeft = spirit + vitality - (TimeUtil::Now() - vitalityTime) / TD_VITALITY_TIMEUNIT;
 
         return spiritLeft;
     }
 };
 
-static const UInt8 TOWNDEAMON_LEVEL_UP = 40;
-static const UInt8 TD_MAXACCTIME = 86400;
-static const UInt8 TD_MAXVITALITY = 1000;
+static const UInt32 TOWNDEAMON_LEVEL_UP = 40;
+static const UInt32 TD_MAXACCTIME = 86400;
+static const UInt32 TD_MAXVITALITY = 1000;
 
 class TownDeamon
 {
@@ -110,7 +118,7 @@ class TownDeamon
         TownDeamon();
         virtual ~TownDeamon();
 
-        void loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId);
+        void loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId, UInt32 itemId, UInt32 itemNum);
         void loadDeamonPlayersFromDB(UInt16 level, Player* pl);
         void listDeamons(Player*, UInt16 start, UInt16 count);
         void showLevelTown(Player*, UInt16 level);
@@ -127,6 +135,10 @@ class TownDeamon
         void attackNpc(Player* pl, UInt32 npcId);
         void attackPlayer(Player* pl, Player* defer);
         void beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
+
+    private:
+        void quitDeamon(Player* pl, bool fullAward = false);
+        void occupyDeamon(Player* pl);
 
     private:
         std::vector<DeamonMonster> m_Monsters;

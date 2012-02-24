@@ -3939,13 +3939,13 @@ namespace GObject
 		LoadingCounter lc("TownDeamon");
 		lc.prepare("Loading TownDeamon Monsters:");
 		GData::DBTownDeamonMonster dbtdm;
-		if(execu->Prepare("SELECT `level`, `npcId` FROM `towndeamon_monster` order by level asc", dbtdm) != DB::DB_OK)
+		if(execu->Prepare("SELECT `level`, `npcId`, `itemId`, `itemNum` FROM `towndeamon_monster` order by level asc", dbtdm) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		while(execu->Next() == DB::DB_OK)
 		{
 			lc.advance();
-            townDeamonManager->loadDeamonMonstersFromDB(dbtdm.level, dbtdm.npcId);
+            townDeamonManager->loadDeamonMonstersFromDB(dbtdm.level, dbtdm.npcId, dbtdm.itemId, dbtdm.itemNum);
         }
 		lc.finalize();
 
@@ -3954,7 +3954,7 @@ namespace GObject
 		lc.prepare("Loading TownDeamon Player:");
 		DBTownDeamonPlayer dbtdp;
         Player* pl = NULL;
-		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `awards`, `vitalityTime`, `vitality`, `challengeTime` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
+		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		while(execu2->Next() == DB::DB_OK)
@@ -3972,9 +3972,13 @@ namespace GObject
             dpData->curLevel = dbtdp.curLevel;
             dpData->maxLevel = dbtdp.maxLevel;
             dpData->accTime = dbtdp.accTime;
-            dpData->awards = dbtdp.awards;
+            dpData->accLen = dbtdp.accLen;
+            dpData->accAwards = dbtdp.accAwards;
             dpData->vitalityTime = dbtdp.vitalityTime;
             dpData->vitality = dbtdp.vitality;
+            dpData->spirit = dbtdp.spirit;
+            dpData->itemId = dbtdp.itemId;
+            dpData->itemNum = dbtdp.itemNum;
 
             if(dbtdp.deamonLevel != 0)
                 townDeamonManager->loadDeamonPlayersFromDB(dbtdp.deamonLevel, pl);

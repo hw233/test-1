@@ -13,6 +13,7 @@
 #include "Common/TimeUtil.h"
 #include "Common/Itoa.h"
 #include "ClanRankBattle.h"
+#include "TownDeamon.h"
 
 namespace GObject
 {
@@ -41,6 +42,11 @@ void Country::Hero_Island_Check(void *)
     heroIsland.process(TimeUtil::Now());
 }
 
+void Country::TownDeamonTmAward(void *)
+{
+    townDeamonManager->process();
+}
+
 void Country::ClanRankBattleCheck(void *)
 {
     ClanRankBattleMgr::Instance().Process(TimeUtil::Now());
@@ -63,6 +69,9 @@ bool Country::Init()
 		AddTimer(5000, Country_Battle_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
 		AddTimer(5000, Hero_Island_Check, static_cast<void *>(NULL), (5 - (now % 5)) * 1000);
         AddTimer(1000, ClanRankBattleCheck);
+        townDeamonManager->process();
+        UInt32 tdChkPoint = TimeUtil::SharpDayT(0, now) + TOWNDEAMONENDTM;
+        AddTimer(86400 * 1000, TownDeamonTmAward, static_cast<void *>(NULL), (tdChkPoint >= now ? tdChkPoint - now : 86400 + tdChkPoint - now) * 1000);
 	}
 
 	return true;

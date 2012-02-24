@@ -16,6 +16,8 @@ struct DBTownDeamonMonster
 {
 	UInt16 level;
     UInt32 npcId;
+    UInt32 itemId;
+    UInt32 itemNum;
 };
 
 struct DBNpcGroup
@@ -81,10 +83,14 @@ struct DBTownDeamonPlayer
     UInt64 playerId;
     UInt32 startTime;
     UInt32 accTime;
-    UInt32 awards;
+    UInt32 accLen;
+    UInt32 accAwards;
     UInt32 vitalityTime;
     UInt16 vitality;
+    UInt16 spirit;
     UInt32 challengeTime;
+    UInt32 itemId;
+    UInt32 itemNum;
 };
 
 struct DBMapSpot
@@ -836,7 +842,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBTownDeamonPlayer)
-SPECIALDEF(9)
+SPECIALDEF(14)
     (
     UInt16, deamonLevel,
     UInt16, curLevel,
@@ -844,9 +850,14 @@ SPECIALDEF(9)
     UInt64, playerId,
     UInt32, startTime,
     UInt32, accTime,
-    UInt32, awards,
+    UInt32, accLen,
+    UInt32, accAwards,
     UInt32, vitalityTime,
-    UInt16, vitality
+    UInt16, vitality,
+    UInt16, spirit,
+    UInt32, challengeTime,
+    UInt32, itemId,
+    UInt32, itemNum
     )
 SPECIALEND()
 
@@ -1207,10 +1218,12 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GData::DBTownDeamonMonster)
-SPECIALDEF(2)
+SPECIALDEF(4)
 (
 	UInt16, level,
-    UInt32, npcId
+    UInt32, npcId,
+    UInt32, itemId,
+    UInt32, itemNum
 )
 SPECIALEND()
 

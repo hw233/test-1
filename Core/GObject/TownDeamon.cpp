@@ -12,6 +12,10 @@
 namespace GObject
 {
 
+#define ACC_ITEM        465
+#define VITALITY_ITEM   466
+#define TD_AUTO_ITEM    467
+
 TownDeamon* townDeamonManager = new TownDeamon();
 
 TownDeamon::TownDeamon()
@@ -24,10 +28,12 @@ TownDeamon::~TownDeamon()
     m_Monsters.clear();
 }
 
-void TownDeamon::loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId)
+void TownDeamon::loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId, UInt32 itemId, UInt32 itemNum)
 {
     DeamonMonster dm;
     dm.npcId = npcId;
+    dm.itemId = itemId;
+    dm.itemNum = itemNum;
     m_Monsters.push_back(dm);
     if(level != m_Monsters.size())
         printf("TownDeamon: loadDeamonMonsterFromDB Error\n");
@@ -63,9 +69,7 @@ void TownDeamon::listDeamons(Player* pl, UInt16 start, UInt16 count)
         if(pl2)
         {
             DeamonPlayerData* dpd = pl2->getDeamonPlayerData();
-            UInt32 spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
-            if(spirit < 0)
-                spirit = 0;
+            UInt32 spirit = dpd->calcSpirit();
             st << idx << pl2->getName() << pl2->GetLev() << spirit;
         }
         else
@@ -84,27 +88,17 @@ void TownDeamon::showTown(Player* pl)
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
-    UInt32 awards = 0;
-    UInt32 accLeft = 0;
-    UInt32 spirit = 0;
-    UInt32 vitality = 0;
-    UInt32 timeLeft = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+    UInt32 awards = dpd->calcAwards();
+    UInt32 accLeft = dpd->calcAccLeft();
+    UInt32 spirit = dpd->calcSpirit();
+    UInt32 vitality = dpd->calcVitality();
+    UInt32 leftTime = 0;
+    if(TimeUtil::SharpDayT(TOWNDEAMONENDTM) > TimeUtil::Now())
+        leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+    else
+        leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) + TD_MAXACCTIME - TimeUtil::Now();
 
-    if(dpd->accLen > TimeUtil::Now() - dpd->accTime)
-        accLeft = dpd->accLen - TimeUtil::Now() + dpd->accTime;
-
-    if(dpd->startTime != 0)
-        awards = (TimeUtil::Now() - dpd->startTime + dpd->accLen - accLeft)/TD_AWARD_TIMEUNIT + dpd->accAwards;
-
-    if(dpd->vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - dpd->vitalityTime)
-        vitality = dpd->vitality - (TimeUtil::Now() + dpd->vitalityTime) / TD_VITALITY_TIMEUNIT;
-
-    if(vitality > 0)
-        spirit = dpd->spirit;
-    else if((dpd->spirit + dpd->vitality) * TD_VITALITY_TIMEUNIT > (TimeUtil::Now() + dpd->vitalityTime))
-        spirit = dpd->spirit + dpd->vitality - (TimeUtil::Now() + dpd->vitalityTime) / TD_VITALITY_TIMEUNIT;
-
-    st << dpd->curLevel << dpd->maxLevel << dpd->deamonLevel << timeLeft;
+    st << dpd->curLevel << dpd->maxLevel << dpd->deamonLevel << leftTime;
     st << awards << accLeft << vitality << spirit;
     st << Stream::eos;
     pl->send(st);
@@ -130,13 +124,16 @@ void TownDeamon::showLevelTown(Player* pl, UInt16 level)
     {
         DeamonPlayerData* dpd = pl2->getDeamonPlayerData();
 
+        UInt32 leftTime = 0;
+        if(TimeUtil::SharpDayT(TOWNDEAMONENDTM) > TimeUtil::Now())
+            leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+        else
+            leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) + TD_MAXACCTIME - TimeUtil::Now();
+
         st << dpd->curLevel << pl2->getName() << pl2->GetLev();
-        st << TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
-        st << dpd->awards;
-        UInt32 spirit = dpd->vitality >= 0 ? 100 : (100 + dpd->vitality);
-        if(spirit < 0)
-            spirit = 0;
-        st << spirit;
+        st << leftTime;
+        st << dpd->calcAwards();
+        st << dpd->calcSpirit();
     }
 
     st << Stream::eos;
@@ -150,7 +147,11 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
 
     UInt8 res = 0;
 
-    UInt32 leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+    UInt32 leftTime = 0;
+    if(TimeUtil::SharpDayT(TOWNDEAMONENDTM) > TimeUtil::Now())
+        leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) - TimeUtil::Now();
+    else
+        leftTime = TimeUtil::SharpDayT(TOWNDEAMONENDTM) + TD_MAXACCTIME - TimeUtil::Now();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
     if(dpd->deamonLevel == 0 || dpd->accTime >= leftTime)
@@ -159,23 +160,39 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
     }
     else
     {
-        UInt32 tmpTime = TD_MAXACCTIME - dpd->accTime;
-        UInt32 need = tmpTime / 3600 + ((tmpTime % 100) == 0 ? 0 : 1);
+        UInt32 accLeft = dpd->calcAccLeft();
+        UInt32 need = (TD_MAXACCTIME - accLeft)/3600 + ((TD_MAXACCTIME - accLeft)%3600 > 0 ? 1 : 0);
+
         if(need > count)
             need = count;
-        if(pl->GetPackage()->GetItemAnyNum() < need)
-            need = pl->GetPackage()->GetItemAnyNum();
+
+        if(pl->GetPackage()->GetItemAnyNum(ACC_ITEM) < need)
+            need = pl->GetPackage()->GetItemAnyNum(ACC_ITEM);
         if(need == 0)
             res = 1;
         else
         {
-            dpd->accTime += need * 3600;
-            if(dpd->accTime > TD_MAXACCTIME)
-                dpd->accTime = TD_MAXACCTIME;
+            pl->GetPackage()->DelItemAny(ACC_ITEM, need);
+            if(dpd->accTime != 0 && accLeft == 0)
+            {
+                dpd->accAwards += dpd->accLen/TD_AWARD_TIMEUNIT;
+                dpd->accLen = need * 3600;
+            }
+            else
+            {
+                dpd->accLen = dpd->calcAccLeft() + need * 3600;
+            }
+
+            dpd->accTime = TimeUtil::Now();
+            if(dpd->accLen > TD_MAXACCTIME)
+                dpd->accLen = TD_MAXACCTIME;
+
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `accTime`=%u,`accLen`=%u, `accAwards`=%u WHERE `playerId` = %"I64_FMT"u", dpd->accTime, dpd->accLen, dpd->accAwards, pl->getId());
         }
     }
 
-    st << res << dpd->accTime;
+    UInt32 accLeft = dpd->calcAccLeft();
+    st << res << accLeft;
 
     st << Stream::eos;
     pl->send(st);
@@ -196,24 +213,41 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
     }
     else
     {
-        UInt32 tmpVitality = TD_MAXACCTIME - dpd->vitality;
-        UInt32 need = tmpVitality / 100 + ((tmpVitality % 100) == 0 ? 0 : 1);
+        UInt32 spirit = dpd->calcSpirit();
+        UInt32 vitality = dpd->calcVitality();
+
+        UInt32 tmp = 100 - spirit + vitality;
+        UInt32 need = tmp / 100 + (tmpVtl % 100 > 0 ? 1 : 0);
         if(need > count)
             need = count;
-        if(pl->GetPackage()->GetItemAnyNum() < need)
-            need = pl->GetPackage()->GetItemAnyNum();
+
+        if(pl->GetPackage()->GetItemAnyNum(VITALITY_ITEM) < need)
+            need = pl->GetPackage()->GetItemAnyNum(VITALITY_ITEM);
         if(need == 0)
             res = 1;
         else
         {
-            dpd->vitality += need * 100;
+            UInt32 tmpVitality = need * 100;
+            if(tmpVitality >= 100 - spirit)
+            {
+                tmpVitality -= 100 - spirit;
+                dpd->vitality = vitality + tmpVitality;
+            }
+            else
+            {
+                dpd->spirit = spirit + tmpVitality;
+                dpd->vitality = 0;
+            }
+
+            dpd->vitalityTime = TimeUtil::Now();
             if(dpd->vitality > TD_MAXVITALITY)
                 dpd->vitality = TD_MAXVITALITY;
+
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `spirit`=%u,`vitality`=%u, `vitalityTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->spirit, dpd->vitality, dpd->vitalityTime, pl->getId());
         }
     }
 
     st << res << dpd->vitality;
-
     st << Stream::eos;
     pl->send(st);
 }
@@ -231,9 +265,7 @@ void TownDeamon::cancelDeamon(Player* pl)
         res = 1;
     else
     {
-        m_Monsters[dpd->deamonLevel].player = NULL;
-        dpd->deamonLevel = 0;
-        dpd->startTime = 0;
+        quitDeamon(pl);
     }
 
     st << Stream::eos;
@@ -386,7 +418,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
         break;
     case 1:
         {
-            if(level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel)
+            if(level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
                 break;
             else if(m_Monsters[level].player)
             {
@@ -394,10 +426,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
             }
             else
             {
-                m_Monsters[level].player = pl;
-                dpd->deamonLevel = level;
-                dpd->startTime = TimeUtil::Now();
-
+                occupyDeamon(pl);
                 UInt8 res = 0;
                 Stream st(REP::TOWN_DEAMON);
                 st << static_cast<UInt8>(0x06);
@@ -413,25 +442,26 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 {
     Stream st(REP::TOWN_DEAMON);
 
-    DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
     UInt16 level = deferDpd->deamonLevel;
     UInt8 res = 0;
 
     dpd->challengeTime = TimeUtil::Now();
     if(win)
     {
-        dpd->deamonLevel = level;
-        dpd->startTime = TimeUtil::Now();
+        if(TimeUtil::Now() - deferDpd->startTime >= 3600)
+            pl->GetPackage()->AddItem2(m_Monsters[level].itemId, 1, true, true, FromTownDeamon);
 
-        deferDpd->deamonLevel = 0;
-        deferDpd->startTime = 0;
+        occupyDeamon(pl);
+        quitDeamon(defer);
     }
     else
     {
         res = 1;
     }
 
+    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `challengeTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->challengeTime, pl->getId());
     st << static_cast<UInt8>(0x06);
     st << level << static_cast<UInt8>(1) << res << Stream::eos;
     pl->send(st);
@@ -445,8 +475,8 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
     if(levels > dpd->maxLevel - dpd->curLevel)
         maxCnt = dpd->maxLevel - dpd->curLevel;
 
-    if(pl->GetPackage()->GetItemAnyNum() < maxCnt)
-        maxCnt = pl->GetPackage()->GetItemAnyNum();
+    if(pl->GetPackage()->GetItemAnyNum(TD_AUTO_ITEM) < maxCnt)
+        maxCnt = pl->GetPackage()->GetItemAnyNum(TD_AUTO_ITEM);
 
     for(int idx = 0; idx < maxCnt ; ++idx)
     {
@@ -463,15 +493,67 @@ void TownDeamon::process()
             continue;
 
         DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+
+        if(TimeUtil::SharpDayT(TOWNDEAMONENDTM) < TimeUtil::Now() && dpd->startTime < TimeUtil::SharpDayT(TOWNDEAMONENDTM))
+            quitDeamon(pl, true);
     }
 }
 
 bool TownDeamon::checkTownDeamon(Player* pl)
 {
     if(PLAYER_DATA(pl, location) != )
-        return false
+        return false;
+
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    if(dpd->itemId != 0)
+        return false;
 
     return true;
+}
+
+void TownDeamon::quitDeamon(Player* pl, bool fullAward)
+{
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    if(dpd->startTime == 0)
+        return;
+
+    UInt32 awards = dpd->calcAwards();
+    if(!fullAward)
+        awards /= 2;
+
+    if(awards > 0)
+    {
+        dpd->itemId = m_Monsters[level].itemId;
+        dpd->itemNum = m_Monsters[level].itemNum * awards;
+    }
+    //pl->GetPackage()->AddItem2(, , true, true, FromTownDeamon);
+
+    m_Monsters[dpd->deamonLevel].player = NULL;
+    dpd->deamonLevel = 0;
+    dpd->startTime = 0;
+    dpd->accTime = 0;
+    dpd->vitalityTime = 0;
+    dpd->accAwards = 0;
+    dpd->vitality = dpd->calcVitality();
+    dpd->spirit = dpd->calcSpirit();
+    dpd->accLen = dpd->calcAccLeft();
+
+    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u,`startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u, `itemId`=%u, `itemNum`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, dpd->itemId, dpd->itemNum, pl->getId());
+}
+
+void TownDeamon::occupyDeamon(Player* pl)
+{
+    DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+
+    m_Monsters[level].player = pl;
+    dpd->deamonLevel = level;
+    UInt32 tmNow = TimeUtil::Now();
+    dpd->startTime = tmNow;
+
+    dpd->accTime = tmNow;
+    dpd->vitalityTime = tmNow;
+
+    DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u,`startTime`=%u, `accTime`=%u, `vitalityTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, pl->getId());
 }
 
 }
