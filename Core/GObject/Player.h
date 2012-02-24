@@ -659,7 +659,7 @@ namespace GObject
         inline void setLockExpireTime(UInt32 let)   {_playerData.lockExpireTime=let;}
 		inline UInt32   getLockExpireTime() {return _playerData.lockExpireTime;}
 
-        void initAcuHeroMemo();
+        void initHeroMemo();
 
 		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now());
 		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now());

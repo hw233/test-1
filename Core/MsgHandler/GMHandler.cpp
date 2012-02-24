@@ -159,6 +159,7 @@ GMHandler::GMHandler()
     Reg(3, "ff", &GMHandler::OnFgtForge);
     Reg(3, "ghmaward", &GMHandler::OnGetHeroMemoAward);
     Reg(3, "sysdlg", &GMHandler::OnSysDailog);
+    Reg(3, "regenall", &GMHandler::OnRegenAll);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2610,5 +2611,9 @@ inline bool player_enum(GObject::Player* p, int)
 void GMHandler::OnSysDailog(GObject::Player* player, std::vector<std::string>& args)
 {
     GObject::globalPlayers.enumerate(player_enum, 0);
+}
+void GMHandler::OnRegenAll(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->regenAll(true);
 }
 

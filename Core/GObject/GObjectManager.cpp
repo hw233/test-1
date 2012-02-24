@@ -786,11 +786,7 @@ namespace GObject
 
 	inline bool heromemo_loaded(Player * p, int)
 	{
-        if(p->GetLev() >= 45)
-            p->GetHeroMemo()->setMemo(MC_FIGHTER, MD_STARTED, 0, 2, 1);
-        if (p->getClan())
-            p->GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 0, 1);
-        p->initAcuHeroMemo();
+        p->initHeroMemo();
 		return true;
 	}
 
