@@ -884,13 +884,14 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
     return getMaxTrumps();
 }
 
-void Fighter::setCurrentHP( UInt16 hp, bool writedb )
+void Fighter::setCurrentHP( UInt32 hp, bool writedb )
 {
 	if(_hp == hp)
 		return;
 
 	if(writedb)
 	{
+#if 0
 		UInt32 maxhp = getMaxHP();
 		if(hp >= maxhp)
 		{
@@ -898,6 +899,11 @@ void Fighter::setCurrentHP( UInt16 hp, bool writedb )
 				return;
 			hp = 0;
 		}
+#else
+		UInt32 maxhp = getMaxHP();
+		if(hp > maxhp)
+			hp = maxhp;
+#endif
 		_hp = hp;
 		sendModification(1, hp);
 	}

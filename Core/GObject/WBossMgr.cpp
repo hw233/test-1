@@ -384,6 +384,30 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
     if (!_percent)
         return false;
 
+    if (m_lvl == 1)
+        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 0);
+    if (m_lvl == 2)
+        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 1);
+    if (!m_final)
+        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
+
+    if (!m_final)
+    {
+        // XXX: 打元神也参与抽奖
+        AttackInfo info(pl, 0);
+        AtkInfoType::iterator i = m_atkinfo.begin();
+        while (i != m_atkinfo.end())
+        {
+            if ((*i).player == pl)
+            {
+                m_atkinfo.erase(i);
+                break;
+            }
+            ++i;
+        }
+        m_atkinfo.insert(info);
+    }
+
     bool res = attackWorldBoss(pl, m_id, World::_wday==4?2:1, m_final);
     if (res && !m_final)
     {
@@ -399,35 +423,11 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
                 m_final = true;
             appear(id, m_id);
         }
-
-        // XXX: 打元神也参与抽奖
-        AttackInfo info(pl, 0);
-        AtkInfoType::iterator i = m_atkinfo.begin();
-        while (i != m_atkinfo.end())
-        {
-            if ((*i).player == pl)
-            {
-                m_atkinfo.erase(i);
-                break;
-            }
-            ++i;
-        }
-        m_atkinfo.insert(info);
     }
     else if (res && m_final)
     {
         mgr->disapper(TimeUtil::Now());
     }
-
-    if (m_lvl == 1)
-        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 0);
-    if (m_lvl == 2)
-        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 1);
-    if (!m_final)
-        pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
-
-    if (!m_final)
-        GameAction()->doAty(pl, AtyBoss, 0, 0);
     return res;
 }
 

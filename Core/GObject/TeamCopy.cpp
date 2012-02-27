@@ -932,9 +932,8 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
             pl->checkDeath();
 
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
     }
-
-    pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
 }
 
 void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid)

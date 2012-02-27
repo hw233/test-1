@@ -554,7 +554,7 @@ void Athletics::attackMartial(Player* defer)
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
         if (res)
-            winner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
+            _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
     }while(false);
 
 	AthleticsResult ar = {id, 0, defer, res };
@@ -621,9 +621,8 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
         msg.param = 1;
         GameMsgHdr h(0x244,   atker->getThreadId(), atker, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
+        atker->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
     }
-
-
 }
 
 void Athletics::awardMartial(Player* defer, bool win)

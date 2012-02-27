@@ -2851,9 +2851,9 @@ namespace GObject
 
         if (getFrendsNum() >= 10)
             OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 2);
-        else if (getFrendsNum() >= 5)
+        if (getFrendsNum() >= 5)
             OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
-        else if (getFrendsNum() >= 1)
+        if (getFrendsNum() >= 1)
             OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
 		return true;
 	}
@@ -8327,8 +8327,13 @@ namespace GObject
         GetMailBox()->newMail(NULL, 0x12, title, content);
     }
 
-    void Player::initAcuHeroMemo()
+    void Player::initHeroMemo()
     {
+        if(GetLev() >= 45)
+            GetHeroMemo()->setMemo(MC_FIGHTER, MD_STARTED, 0, 2, 1);
+        if (getClan())
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 0, 1);
+
         for (std::map<UInt32, Fighter*>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
         {
             Fighter * fgt = it->second;
@@ -8345,6 +8350,19 @@ namespace GObject
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 1, 1);
         if (getFrendsNum() >= 1)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 0, 1);
+        if (_fighters.size() > 9)
+        {
+            GetHeroMemo()->setMemo(MC_FIGHTER, MD_ADVANCED, 0, 1, 1);
+            GetHeroMemo()->setMemo(MC_FIGHTER, MD_ADVANCED, 0, 2, 1);
+        }
+
+        std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_ACTION);
+        if(it != m_clanSkill.end())
+        {
+            ClanSkill& cs = it->second;
+            if (cs.level == 3)
+                GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 2, 1);
+        }
     }
 
 } // namespace GObject

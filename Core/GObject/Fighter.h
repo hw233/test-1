@@ -62,7 +62,7 @@ public:
     inline void setPExpMax(UInt32 e) { _pexpMax = e; }
 	void setLevelAndExp(UInt8 l, UInt64 e);
 	void setPotential(float p, bool = true);
-	void setCurrentHP(UInt16 hp, bool = true);
+	void setCurrentHP(UInt32 hp, bool = true);
 	void addHPPercent(UInt8 p, bool = true);
 
 	const std::string& getName();
