@@ -1181,6 +1181,7 @@ namespace GObject
 
         // ͨ????????֮??
         UInt8 _justice_roar;
+        float _spirit_factor;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1200,6 +1201,8 @@ namespace GObject
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
 
+        inline void setSpiritFactor(float v) { _spirit_factor = v; }
+        inline float getSpiritFactor() { return _spirit_factor; }
 	protected:
 		inline void setBlockBossByLevel();
 	public:

@@ -277,31 +277,34 @@ void BattleFighter::setFighter( GObject::Fighter * f )
 void BattleFighter::updateAllAttr()
 {
 	updateBuffExtras();
+    float factor = 1.0f;
+    if(_fighter && _fighter->getOwner())
+        factor = _fighter->getOwner()->getSpiritFactor();
 
 	_strength = _formula->calcStrength(this);
 	_agility = _formula->calcAgility(this);
 	_physique = _formula->calcPhysique(this);
 	_intelligence = _formula->calcIntelligence(this);
-	_attack = _formula->calcAttack(this);
-	_defend = _formula->calcDefend(this);
-	_hitrate = _formula->calcHitrate(this, NULL);
-	_evade = _formula->calcEvade(this, NULL);
-	_critical = _formula->calcCritical(this, NULL);
-	_pierce = _formula->calcPierce(this, NULL);
-	_counter = _formula->calcCounter(this, NULL);
-	_maxAction = _formula->calcAction(this);
+	_attack = _formula->calcAttack(this) * factor;
+	_defend = _formula->calcDefend(this) * factor;
+	_hitrate = _formula->calcHitrate(this, NULL) + factor - 1.0f;
+	_evade = _formula->calcEvade(this, NULL) + factor - 1.0f;
+	_critical = _formula->calcCritical(this, NULL) + factor - 1.0f;
+	_pierce = _formula->calcPierce(this, NULL) + factor - 1.0f;
+	_counter = _formula->calcCounter(this, NULL) + factor - 1.0f;
+	_maxAction = _formula->calcAction(this) * factor;
 	UInt32 oldhp = getMaxHP();
-	_maxhp = _formula->calcHP(this);
+	_maxhp = _formula->calcHP(this) * factor;
     _criticaldmg = _formula->calcCriticalDmg(this);
 
     _aura = _formula->calcAura(this);
     _auraMax = _formula->calcAuraMax(this);
     _will = _formula->calcWill(this);
     _soul = _formula->calcSoul(this);
-    _tough = _formula->calcTough(this, NULL);
-    _magatk = _formula->calcMagAttack(this);
-    _magdef = _formula->calcMagDefend(this);
-    _magres = _formula->calcMagRes(this, NULL);
+    _tough = _formula->calcTough(this, NULL) + factor - 1.0f;
+    _magatk = _formula->calcMagAttack(this) * factor;
+    _magdef = _formula->calcMagDefend(this) * factor;
+    _magres = _formula->calcMagRes(this, NULL) + factor - 1.0f;
 
     if(_maxhp == 0)
         _maxhp = 1;

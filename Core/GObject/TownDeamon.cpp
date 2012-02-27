@@ -18,6 +18,48 @@ namespace GObject
 
 TownDeamon* townDeamonManager = new TownDeamon();
 
+
+UInt32 DeamonPlayerData::calcAccLeft()
+{
+    UInt32 accLeft = 0;
+    if(accLen > TimeUtil::Now() - accTime)
+        accLeft = accLen - TimeUtil::Now() + accTime;
+    return accLeft;
+}
+
+UInt32 DeamonPlayerData::calcAwards()
+{
+    UInt32 awards = 0;
+    UInt32 accLeft = 0;
+    if(accLen > TimeUtil::Now() - accTime)
+        accLeft = accLen - TimeUtil::Now() + accTime;
+
+    if(startTime != 0)
+        awards = (TimeUtil::Now() - startTime + accLen - accLeft)/TD_AWARD_TIMEUNIT + accAwards;
+    return awards;
+}
+
+UInt32 DeamonPlayerData::calcVitality()
+{
+    UInt32 vitalityLeft = 0;
+    if(vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - vitalityTime)
+        vitalityLeft = vitality - (TimeUtil::Now() + vitalityTime) / TD_VITALITY_TIMEUNIT;
+
+    return vitalityLeft;
+}
+
+UInt32 DeamonPlayerData::calcSpirit()
+{
+    UInt32 spiritLeft = 0;
+    if(vitality * TD_VITALITY_TIMEUNIT > TimeUtil::Now() - vitalityTime)
+        spiritLeft = spirit;
+    else if((spirit + vitality) * TD_VITALITY_TIMEUNIT > (TimeUtil::Now() - vitalityTime))
+        spiritLeft = spirit + vitality - (TimeUtil::Now() - vitalityTime) / TD_VITALITY_TIMEUNIT;
+
+    return spiritLeft;
+}
+
+
 TownDeamon::TownDeamon()
 {
     m_Monsters.clear();
@@ -217,7 +259,7 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
         UInt32 vitality = dpd->calcVitality();
 
         UInt32 tmp = 100 - spirit + vitality;
-        UInt32 need = tmp / 100 + (tmpVtl % 100 > 0 ? 1 : 0);
+        UInt32 need = tmp / 100 + (tmp % 100 > 0 ? 1 : 0);
         if(need > count)
             need = count;
 
@@ -282,7 +324,6 @@ bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
         return false;
     }
     pl->checkLastBattled();
-    UIntew npcId = m_Monsters[level].npcId;
     GData::NpcGroups::iterator it = GData::npcGroups.find(npcId);
     if(it == GData::npcGroups.end())
         return false;
@@ -335,8 +376,13 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 		Battle::BattleSimulator bsim(pl->getLocation(), pl, defer);
 		pl->PutFighters( bsim, 0, true );
 		defer->PutFighters( bsim, 1, true );
+        DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
+        UInt32 spirit = deferDpd->calcSpirit();
+        float factor = static_cast<float>(spirit)/100.0f;
+        defer->setSpiritFactor(factor);
 		bsim.start();
 		res = bsim.getWinner() == 1;
+        defer->setSpiritFactor(1.0f);
 
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
@@ -355,9 +401,9 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 	};
 	TDBeAttackData tdbad = { pl, pl->getFormation(), static_cast<UInt16>(pl->getMainFighter() != NULL ? pl->getMainFighter()->getId() : 0) };
 	for(int i = 0; i < 5; ++ i)
-		abd.lineup[i] = pl->getLineup(i);
+		tdbad.lineup[i] = pl->getLineup(i);
 	GameMsgHdr hdr(0x340, tid, defer, sizeof(TDBeAttackData));
-	GLOBAL().PushMsg(hdr, &abd);
+	GLOBAL().PushMsg(hdr, &tdbad);
 }
 
 void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
@@ -374,8 +420,13 @@ void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formatio
 		}
 	}
 	defer->PutFighters( bsim, 1, true );
+    DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
+    UInt32 spirit = deferDpd->calcSpirit();
+    float factor = static_cast<float>(spirit)/100.0f;
+    defer->setSpiritFactor(factor);
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
+    defer->setSpiritFactor(1.0f);
 
 	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
@@ -426,7 +477,7 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
             }
             else
             {
-                occupyDeamon(pl);
+                occupyDeamon(pl, level);
                 UInt8 res = 0;
                 Stream st(REP::TOWN_DEAMON);
                 st << static_cast<UInt8>(0x06);
@@ -453,8 +504,8 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
         if(TimeUtil::Now() - deferDpd->startTime >= 3600)
             pl->GetPackage()->AddItem2(m_Monsters[level].itemId, 1, true, true, FromTownDeamon);
 
-        occupyDeamon(pl);
         quitDeamon(defer);
+        occupyDeamon(pl, level);
     }
     else
     {
@@ -486,7 +537,7 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 void TownDeamon::process()
 {
     int cnt = m_Monsters.size();
-    for(int i = 0; i < cnt;; ++ i)
+    for(int i = 0; i < cnt; ++ i)
     {
         Player* pl = m_Monsters[i].player;
         if(!pl)
@@ -501,7 +552,7 @@ void TownDeamon::process()
 
 bool TownDeamon::checkTownDeamon(Player* pl)
 {
-    if(PLAYER_DATA(pl, location) != )
+    if(PLAYER_DATA(pl, location) != 0x1414)
         return false;
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
@@ -523,8 +574,8 @@ void TownDeamon::quitDeamon(Player* pl, bool fullAward)
 
     if(awards > 0)
     {
-        dpd->itemId = m_Monsters[level].itemId;
-        dpd->itemNum = m_Monsters[level].itemNum * awards;
+        dpd->itemId = m_Monsters[dpd->deamonLevel].itemId;
+        dpd->itemNum = m_Monsters[dpd->deamonLevel].itemNum * awards;
     }
     //pl->GetPackage()->AddItem2(, , true, true, FromTownDeamon);
 
@@ -541,7 +592,7 @@ void TownDeamon::quitDeamon(Player* pl, bool fullAward)
     DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u,`startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u, `itemId`=%u, `itemNum`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, dpd->itemId, dpd->itemNum, pl->getId());
 }
 
-void TownDeamon::occupyDeamon(Player* pl)
+void TownDeamon::occupyDeamon(Player* pl, UInt16 level)
 {
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
