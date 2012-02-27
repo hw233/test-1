@@ -1094,7 +1094,6 @@ bool Clan::donate(Player * player, UInt8 techId, UInt16 type, UInt32 count)
 		//count *= 2;
 	if (_techs->donate(player, techId, type, count))
 	{
-        player->OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
 		if (type == 1)
 		{
             // ?????ʽ?

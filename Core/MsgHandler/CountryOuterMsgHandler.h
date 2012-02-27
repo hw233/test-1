@@ -627,6 +627,12 @@ struct EquipUpgradeReq
     MESSAGE_DEF2(REQ::EQ_UPGRADE, UInt16, _fgtId, UInt32, _itemId);
 
 };
+struct GetHeroMemoAward
+{
+    UInt8 _idx;
+    MESSAGE_DEF1(REQ::HEROMEMO, UInt8, _idx);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -960,6 +966,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
+
+    if (pl->getSysDailog())
+    {
+        Stream st(REP::SYSDAILOG);
+        st << Stream::eos;
+        pl->send(st);
+        pl->setSysDailog(false);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1141,11 +1155,10 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 	player->makeFormationInfo(st);
 	player->send(st);
 
+    player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 1);
     if (c == 5)
         player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 0);
-    if (f == 1001)
-        player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 1);
-    if (f == 1202)
+    if (f % 100 > 1)
         player->OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 2);
 }
 
@@ -1900,6 +1913,7 @@ void OnDungeonAutoReq( GameMsgHdr& hdr, DungeonAutoReq& dar )
 	if(dg == NULL)
 		return;
 	dg->autoChallenge(pl, dar.mtype);
+    pl->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 1);
 }
 
 void OnDungeonCompleteAutoReq( GameMsgHdr& hdr, DungeonCompleteAutoReq& )
@@ -2445,7 +2459,6 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 		return ;
 
 	player->checkLastBattled();
-	//player->setBuffData(PLAYER_BUFF_ATTACKING, 0);
 }
 
 void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
@@ -2465,15 +2478,6 @@ void OnCopyReq( GameMsgHdr& hdr, CopyReq& req )
 		player->sendMsgCode(0, 1408);
 		return;
 	}
-    // XXX: 在这里找不到npc
-#if 0
-	GObject::MapObject * mo = map->GetObject(req._npcId);
-	if(mo == NULL || mo->GetSpot() != loc)
-	{
-		player->sendMsgCode(0, 1408);
-		return;
-	}
-#endif
     switch (req.type) {
         case 0:
             GObject::playerCopy.sendInfo(player, req.id);
@@ -4049,5 +4053,13 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 }
 
 
+
+void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->GetHeroMemo()->getAward(req._idx);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

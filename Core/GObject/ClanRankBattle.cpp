@@ -179,6 +179,7 @@ namespace GObject
             (*iter)->SetVar(VAR_WEEKLY_CLANBATTLE, 1);
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
+            (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
@@ -189,6 +190,7 @@ namespace GObject
             (*iter)->SetVar(VAR_WEEKLY_CLANBATTLE, 1);
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
+            (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
         }
 
         m_WaitPlayers.clear();
@@ -1412,8 +1414,6 @@ namespace GObject
         stream << UInt8(1);
         stream << Stream::eos;
         info->Broadcast(stream);
-
-        player->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
     }
 
     void ClanRankBattleMgr::PlayerLeave(Player* player)

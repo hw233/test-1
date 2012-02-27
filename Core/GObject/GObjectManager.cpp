@@ -786,6 +786,12 @@ namespace GObject
 		return true;
 	}
 
+	inline bool heromemo_loaded(Player * p, int)
+	{
+        p->initHeroMemo();
+		return true;
+	}
+
     bool GObjectManager::loadQQVipAward()
     {
         lua_State* L = lua_open();
@@ -1894,7 +1900,6 @@ namespace GObject
 			pl->GetMailBox()->newMail(mdata.id, mdata.sender, mdata.recvTime, mdata.flag, mdata.title, mdata.content, mdata.additionalId);
 		}
 		lc.finalize();
-
 
 		/////////////////////////////////
 
@@ -3646,6 +3651,8 @@ namespace GObject
             pl->GetHeroMemo()->loadFromDB(hm.awards.c_str(), hm.memos.c_str());
             pl = 0;
         }
+
+		globalPlayers.enumerate(heromemo_loaded, 0);
         return true;
     }
 

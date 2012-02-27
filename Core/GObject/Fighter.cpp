@@ -246,9 +246,9 @@ bool Fighter::addPExp( Int32 e, bool writedb )
         SYSMSG_SENDV(2005, _owner, _color, getName().c_str(), e);
     }
 
-    if (_pexp >= 10000 && _owner)
+    if (_pexp >= 5000 && _owner)
         _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 0, 1);
-    else if (_pexp >= 5000 && _owner)
+    if (_pexp >= 10000 && _owner)
         _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 0, 2);
 
     sendModification(6, _pexp);
@@ -831,7 +831,7 @@ ItemEquip* Fighter::setTrump( ItemEquip* trump, int idx, bool writedb )
                 const GData::AttrExtra* attr = trump->getAttrExtra();
                 if (attr)
                 {
-                    addSkillsFromCT(attr->skills, writedb);
+                    addSkillsFromCT(attr->skills, writedb, true);
                 }
             }
 
@@ -884,13 +884,14 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
     return getMaxTrumps();
 }
 
-void Fighter::setCurrentHP( UInt16 hp, bool writedb )
+void Fighter::setCurrentHP( UInt32 hp, bool writedb )
 {
 	if(_hp == hp)
 		return;
 
 	if(writedb)
 	{
+#if 0
 		UInt32 maxhp = getMaxHP();
 		if(hp >= maxhp)
 		{
@@ -898,6 +899,11 @@ void Fighter::setCurrentHP( UInt16 hp, bool writedb )
 				return;
 			hp = 0;
 		}
+#else
+		UInt32 maxhp = getMaxHP();
+		if(hp > maxhp)
+			hp = maxhp;
+#endif
 		_hp = hp;
 		sendModification(1, hp);
 	}
@@ -2343,17 +2349,8 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
             //装备上心法成就
             GameAction()->doAttainment(_owner, 10084,getUpCittasNum());
 
-        if (writedb && _owner)
-        {
+        if (_owner && writedb)
             _owner->OnHeroMemo(MC_CITTA, MD_ADVANCED, 0, 1);
-            if (getUpCittasNum() == 3)
-                _owner->OnHeroMemo(MC_CITTA, MD_MASTER, 0, 0);
-            
-            if (getClass() == 1 && getUpCittasNum() >= 3 && isCittaUp(1101) && isCittaUp(1201) && isCittaUp(1901))
-                _owner->OnHeroMemo(MC_CITTA, MD_MASTER, 0, 1);
-            if (getClass() == 3 && getUpCittasNum() >= 3 && isCittaUp(2501) && isCittaUp(2301) && isCittaUp(2901))
-                _owner->OnHeroMemo(MC_CITTA, MD_MASTER, 0, 2);
-        }
     }
 
     if (ret && !swap)
@@ -3238,10 +3235,6 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 _attrType1 = type;
                 _attrValue1 = value; // XXX: /10000
 
-                if (((((double)_attrValue1 / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.409f)
-                    _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 1);
-                if (((((double)_attrValue1 / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.709f)
-                    _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 2);
                 return 0;
             }
             break;
@@ -3264,10 +3257,6 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 _attrType2 = type;
                 _attrValue2 = value; // XXX: /10000
 
-                if (((((double)_attrValue2 / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.409f)
-                    _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 1);
-                if (((((double)_attrValue2 / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.709f)
-                    _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 2);
                 return 0;
             }
             break;
@@ -3291,10 +3280,6 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 _attrType3 = type;
                 _attrValue3 = value; // XXX: /10000
 
-                if (((((double)_attrValue3 / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.409f)
-                    _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 1);
-                if (((((double)_attrValue3 / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.709f)
-                    _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 2);
                 return 0;
             }
             break;
@@ -3307,7 +3292,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 if (!_owner->GetPackage()->DelItemAny(FF_FORGE_ITEM, 1, NULL, ToForgeFighter))
                     return 2;
                 _owner->GetPackage()->AddItemHistoriesLog(FF_FORGE_ITEM, 1);
-                _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 2, 0);
+                _owner->OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 2);
 
                 UInt8 ret = 1;
                 if (!lock)

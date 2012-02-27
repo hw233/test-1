@@ -197,7 +197,7 @@ public:
 
 	inline UInt32 getLostHP() { Int32 tmp = _maxhp + _maxhpAdd; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
-	UInt32 regenHP(UInt32 u);
+	UInt32 regenHP(UInt32 u, bool weak = false);
 
 	void updateAllAttr();
 	void initStats(bool);

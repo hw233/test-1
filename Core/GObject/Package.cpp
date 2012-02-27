@@ -1897,11 +1897,11 @@ namespace GObject
                     GameAction()->doAttainment(this->m_Owner, 10207,itemType.quality);
                 }
 
-                 if (ied.enchant == 1)
+                 if (ied.enchant >= 1)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 0);
-                 if (ied.enchant == 2)
+                 if (ied.enchant >= 2)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 1);
-                 if (ied.enchant == 4)
+                 if (ied.enchant >= 4)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 2);
             }
             else
@@ -1912,11 +1912,11 @@ namespace GObject
                  if(fgt)
                      fgt->CheckEquipEnchantAttainment(ied.enchant);
 
-                 if (ied.enchant == 2)
+                 if (ied.enchant >= 2)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 0);
-                 if (ied.enchant == 4)
+                 if (ied.enchant >= 4)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 1);
-                 if (ied.enchant == 6)
+                 if (ied.enchant >= 6)
                      m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 0, 2);
             }
 
@@ -2337,8 +2337,15 @@ namespace GObject
 		return 0;
 	}
 
-    static void pushBackSplitItem( std::vector<SplitItemOut>& splitOut, UInt16 itemId, UInt16 count )
+    static void pushBackSplitItem( Player* player, std::vector<SplitItemOut>& splitOut, UInt16 itemId, UInt16 count )
     {
+        if (itemId == 502)
+            player->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 0);
+        if (itemId == 518)
+            player->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 1);
+        if (itemId == 503)
+            player->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 2);
+
         UInt32 cnt = splitOut.size();
         bool find = false;
         for( UInt32 i = 0; i < cnt; ++i )
@@ -2457,15 +2464,8 @@ namespace GObject
             AddItem(itemOutId, count, isBound, silence, FromSplit);
 
             item = NULL;
-            pushBackSplitItem( splitOut, itemOutId, count );
+            pushBackSplitItem( m_Owner, splitOut, itemOutId, count );
             res = 0;
-
-            if (itemOutId == 502)
-                m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 0);
-            if (itemOutId == 518)
-                m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 1);
-            if (itemOutId == 503)
-                m_Owner->OnHeroMemo(MC_FORGE, MD_STARTED, 1, 2);
         }
 
 		if(got)
@@ -2478,7 +2478,7 @@ namespace GObject
             item = NULL;
 			AddItem(itemOutId, count, isBound, silence, FromSplit);
 
-            pushBackSplitItem( splitOut, itemOutId, count );
+            pushBackSplitItem( m_Owner, splitOut, itemOutId, count );
             res = 0;
 		}
 
@@ -3359,28 +3359,28 @@ namespace GObject
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*40;
             if ((float)values[0] > v0 && !(protect & 1))
-                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 1);
         }
         {
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*40;
-            if ((float)values[1] > v0 && !(protect & 1))
-                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 1);
+            if ((float)values[1] > v0 && !(protect & 2))
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 1);
         }
         {
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*70;
             if ((float)values[0] > v0 && !(protect & 1))
-                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 2);
         }
         {
             float v0 = 0;
             if(equip_t == EQUIPTYPE_EQUIP)
                 v0 = GObjectManager::getAttrMax(lv, types[1]-1, q, crr)*70;
-            if ((float)values[1] > v0 && !(protect & 1))
-                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 1, 2);
+            if ((float)values[1] > v0 && !(protect & 2))
+                m_Owner->OnHeroMemo(MC_FORGE, MD_ADVANCED, 0, 2);
         }
 
 		ApplyAttr2(equip, types, values);
@@ -3681,12 +3681,11 @@ namespace GObject
 		else
 			SendSingleEquipData(trump);
 
-        if (ied_trump.tRank >= 3)
-            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 2);
-        else if (ied_trump.tRank >= 2)
-            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 1);
+        m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 0);
+        if (ied_trump.tRank >= 2)
+            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 2);
         else if (ied_trump.tRank >= 1)
-            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 0, 0);
+            m_Owner->OnHeroMemo(MC_FORGE, MD_LEGEND, 1, 1);
 
         return 0;
     }

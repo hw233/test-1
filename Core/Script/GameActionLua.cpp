@@ -192,6 +192,7 @@ namespace Script
         CLASS_DEF(Player, AddVar);
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
+		CLASS_DEF(Player, getPlatform);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -917,6 +918,11 @@ namespace Script
 	bool GameActionLua::onValentineDay(Player* player)
 	{
 		return Call<bool>("onValentineDay", player);
+	}
+
+	bool GameActionLua::getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul)
+	{
+		return Call<bool>("getHeroMemoAward", player, idx, soul);
 	}
 
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)

@@ -1,15 +1,20 @@
 
+#include "Config.h"
+#include "Country.h"
 #include "HeroMemo.h"
 #include "Player.h"
 #include "Common/Itoa.h"
 #include "Common/StringTokenizer.h"
+#include "Script/GameActionLua.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
 
 namespace GObject
 {
 
-HeroMemo::HeroMemo(Player* player) : m_owner(player), m_heroSoul(0)
+std::vector<UInt16> HeroMemo::m_maxSoul;
+
+HeroMemo::HeroMemo(Player* player) : m_owner(player), m_heroSoul(0), m_maxAwardIdx(0)
 {}
 
 HeroMemo::~HeroMemo()
@@ -28,10 +33,17 @@ void HeroMemo::setMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item, UInt8
     m_memos[chapter][diff][group][item] = value;
 
     Stream st(REP::HEROMEMO);
-    st << chapter << diff << group << item << Stream::eos;
+    st << static_cast<UInt8>(1) << chapter << diff << group << item << Stream::eos;
     m_owner->send(st);
 
     ++m_heroSoul;
+    if (testCanGetAward(m_owner, m_maxAwardIdx+1))
+    {
+        if (!m_awards.size())
+            m_awards.resize(m_maxSoul.size());
+        m_awards[m_maxAwardIdx] = 1;
+        ++m_maxAwardIdx;
+    }
 
     updateToDB();
 }
@@ -78,16 +90,25 @@ void HeroMemo::sendHeroMemoInfo()
 
 void HeroMemo::getAward(UInt8 idx)
 {
+    if (!idx)
+        return;
     if (idx > m_awards.size())
         return;
     if (m_awards[idx-1] != 1)
         return;
 
-    // TODO:
+    if (!m_owner)
+        return;
+    if (GameAction()->getHeroMemoAward(m_owner, idx, m_heroSoul))
+    {
+        m_awards[idx-1] = 2;
 
+        Stream st(REP::HEROMEMO);
+        st << static_cast<UInt8>(2) << idx << Stream::eos;
+        m_owner->send(st);
 
-    m_awards[idx-1] = 2;
-    updateToDB();
+        updateToDB();
+    }
 }
 
 void HeroMemo::loadFromDB(const char* awards, const char* memos)
@@ -102,6 +123,11 @@ void HeroMemo::loadFromDB(const char* awards, const char* memos)
         m_awards.resize(count);
         for (UInt32 i = 0; i < count; ++i)
             m_awards[i] = atoi(award[i].c_str());
+    }
+    else
+    {
+        m_awards.resize(m_maxSoul.size());
+        count = m_maxSoul.size();
     }
 
     StringTokenizer chapter(memos, "|");
@@ -126,6 +152,21 @@ void HeroMemo::loadFromDB(const char* awards, const char* memos)
                         ++m_heroSoul;
                 }
             }
+        }
+    }
+
+
+    for (UInt32 i = 0; i < count; ++i)
+    {
+        bool ret = testCanGetAward(m_owner, i+1);
+        if (ret && !m_awards[i])
+        {
+            m_awards[i] = 1;
+            m_maxAwardIdx = i+1;
+        }
+        else if (m_awards[i] == 2)
+        {
+            m_maxAwardIdx = i+1;
         }
     }
 }
@@ -168,6 +209,28 @@ void HeroMemo::updateToDB()
 
     DB().PushUpdateData("REPLACE INTO `heromemo` (`playerId`, `awards`, `memos`) VALUES (%"I64_FMT"u, '%s', '%s')"  ,
             this->m_owner->getId(), awards.c_str(), memos.c_str());
+}
+
+void HeroMemo::addMaxSoul(UInt16 soul)
+{
+    m_maxSoul.push_back(soul);
+}
+
+bool HeroMemo::testCanGetAward(Player* player, UInt8 idx)
+{
+    if (!player || !idx)
+        return false;
+
+    UInt8 size = m_maxSoul.size();
+    if (idx >= size)
+        return false;
+
+    for (UInt8 i = 0; i < size; ++i)
+    {
+        if (i+1 == idx && player->GetHeroMemo()->getHeroSoul() >= m_maxSoul[i])
+            return true;
+    }
+    return false;
 }
 
 } // namespace GObject

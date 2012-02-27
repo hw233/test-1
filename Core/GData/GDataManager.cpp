@@ -24,6 +24,7 @@
 #include "Money.h"
 #include "Common/StringTokenizer.h"
 #include "EUpgradeTable.h"
+#include "GObject/HeroMemo.h"
 #include "Script/lua_tinker.h"
 
 namespace GData
@@ -206,7 +207,11 @@ namespace GData
 			fprintf(stderr, "Load money Error !\n");
 			return false;
 		}
-
+        if (!LoadHeroMemoMaxSoul())
+        {
+			fprintf(stderr, "Load Hero Memo Max Soul Error !\n");
+			return false;
+        }
 
 		return true;
 	}	
@@ -1476,6 +1481,23 @@ namespace GData
                     m.ticket = needmoney.get<int>(3);
                     moneyNeed[i] = m;
                 }
+            }
+            lua_close(L);
+            return true;
+    }
+
+    bool GDataManager::LoadHeroMemoMaxSoul()
+    {
+			lua_State* L = lua_open();
+			luaopen_base(L);
+			luaopen_string(L);
+			luaopen_table(L);
+			{
+				std::string path = cfg.scriptPath + "World/HeroMemo.lua";
+                lua_tinker::dofile(L, path.c_str());
+                lua_tinker::table soul = lua_tinker::call<lua_tinker::table>(L, "getHeroMemoMaxSoul");
+                for (int i = 1; i <= soul.size(); ++i)
+                    GObject::HeroMemo::addMaxSoul(soul.get<UInt16>(i));
             }
             lua_close(L);
             return true;

@@ -123,6 +123,9 @@ private:
     void OnMoneyIn(GObject::Player* player, std::vector<std::string>&);
     void OnNewYear(GObject::Player* player, std::vector<std::string>&);
     void OnFgtForge(GObject::Player* player, std::vector<std::string>&);
+    void OnGetHeroMemoAward(GObject::Player* player, std::vector<std::string>&);
+    void OnSysDailog(GObject::Player* player, std::vector<std::string>&);
+    void OnRegenAll(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

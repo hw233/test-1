@@ -1606,7 +1606,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     if(NULL == bo)
                         continue;
 
-                    UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * ap[i].factor);
+                    UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * ap[i].factor, skill->cond == GData::SKILL_ACTIVE);
                     if(hpr != 0)
                     {
                         defList[defCount].pos = bo->getPos() + (activeFlag ? 25 : 0);
@@ -2269,7 +2269,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
                     UInt32 rhp2 = rhp * skill->factor[3-cnt];
-                    UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp2);
+                    UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp2, skill->cond == GData::SKILL_ACTIVE);
                     if(hpr != 0)
                     {
                         excepts[exceptCnt] = bo->getPos();
@@ -2279,6 +2279,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                         defList[defCount].damage = hpr;
                         defList[defCount].leftHP = bo->getHP();
                         ++ defCount;
+                        if(skill->cond == GData::SKILL_ACTIVE)
+                            releaseWeak(bo, defList, defCount);
                     }
                 }
 
@@ -2288,7 +2290,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         }
         else if(bf->getSide() != target_side)
         {
-            UInt32 hpr = bf->regenHP(rhp);
+            UInt32 hpr = bf->regenHP(rhp, skill->cond == GData::SKILL_ACTIVE);
             if(hpr != 0)
             {
                 defList[defCount].pos = bf->getPos() + 25;
@@ -2296,6 +2298,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].damage = hpr;
                 defList[defCount].leftHP = bf->getHP();
                 ++ defCount;
+                if(skill->cond == GData::SKILL_ACTIVE)
+                    releaseWeak(bf, defList, defCount);
             }
         }
         else if(1 == skill->area)
@@ -2316,7 +2320,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 if(fsize > 0)
                     factor = skill->factor[idx];
 
-                UInt32 hpr = bo->regenHP(rhp * factor);
+                UInt32 hpr = bo->regenHP(rhp * factor, skill->cond == GData::SKILL_ACTIVE);
                 ++i;
                 if(hpr == 0)
                     continue;
@@ -2326,6 +2330,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].damage = hpr;
                 defList[defCount].leftHP = bo->getHP();
                 ++ defCount;
+                if(skill->cond == GData::SKILL_ACTIVE)
+                    releaseWeak(bo, defList, defCount);
             }
         }
         else if(0 == skill->area)
@@ -2334,7 +2340,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
                 return dmg;
 
-            UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp);
+            UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp, skill->cond == GData::SKILL_ACTIVE);
             if(hpr != 0)
             {
                 defList[defCount].pos = bo->getPos() + 25;
@@ -2342,6 +2348,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 defList[defCount].damage = hpr;
                 defList[defCount].leftHP = bo->getHP();
                 ++ defCount;
+                if(skill->cond == GData::SKILL_ACTIVE)
+                    releaseWeak(bo, defList, defCount);
             }
         }
         else
@@ -2353,7 +2361,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 float factor = 1;
                 if(fsize > 0)
                     factor = skill->factor[0];
-                UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * factor);
+                UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * factor, skill->cond == GData::SKILL_ACTIVE);
                 if(hpr != 0)
                 {
                     defList[defCount].pos = bo->getPos() + 25;
@@ -2361,6 +2369,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     defList[defCount].damage = hpr;
                     defList[defCount].leftHP = bo->getHP();
                     ++ defCount;
+                    if(skill->cond == GData::SKILL_ACTIVE)
+                        releaseWeak(bo, defList, defCount);
                 }
             }
 
@@ -2370,7 +2380,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 if(NULL == bo)
                     continue;
 
-                UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * ap[i].factor);
+                UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp * ap[i].factor, skill->cond == GData::SKILL_ACTIVE);
                 if(hpr != 0)
                 {
                     defList[defCount].pos = bo->getPos() + 25;
@@ -2378,6 +2388,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     defList[defCount].damage = hpr;
                     defList[defCount].leftHP = bo->getHP();
                     ++ defCount;
+                    if(skill->cond == GData::SKILL_ACTIVE)
+                        releaseWeak(bo, defList, defCount);
                 }
             }
         }
@@ -5126,24 +5138,6 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
 	    bf->setStunRound(stun);
 	}
 
-	UInt32 weak = bf->getWeakRound();
-	if(weak > 0)
-	{
-		-- weak;
-	    if(weak == 0)
-        {
-            defList[defCount].damType = e_UnWeak;
-            defList[defCount].damage = 0;
-            defList[defCount].pos = bf->getPos() + 25;
-            defList[defCount].leftHP = bf->getHP();
-            defCount++;
-        }
-
-	    bf->setWeakRound(weak);
-	}
-
-
-
     UInt8& atkAdd_last = bf->getAttackAddLast();
     if(atkAdd_last > 0)
     {
@@ -5309,6 +5303,25 @@ UInt32 BattleSimulator::releaseCD(BattleFighter* bf)
     }
 
     return rcnt;
+}
+
+void BattleSimulator::releaseWeak(BattleFighter* bo, DefStatus* defList, size_t& defCount)
+{
+	UInt32 weak = bo->getWeakRound();
+	if(weak > 0)
+	{
+		-- weak;
+	    if(weak == 0)
+        {
+            defList[defCount].damType = e_UnWeak;
+            defList[defCount].damage = 0;
+            defList[defCount].pos = bo->getPos() + 25;
+            defList[defCount].leftHP = bo->getHP();
+            defCount++;
+        }
+
+	    bo->setWeakRound(weak);
+	}
 }
 
 }

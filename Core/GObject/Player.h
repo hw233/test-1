@@ -660,6 +660,8 @@ namespace GObject
         inline void setLockExpireTime(UInt32 let)   {_playerData.lockExpireTime=let;}
 		inline UInt32   getLockExpireTime() {return _playerData.lockExpireTime;}
 
+        void initHeroMemo();
+
 		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now());
 		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now());
 		void setBuffData(UInt8, UInt32, bool = true);
@@ -1294,6 +1296,14 @@ namespace GObject
         inline const std::string& getSource() const { return m_source; }
         inline const std::string& getVia() const { return m_via; }
         inline bool isOffical() const { return m_isOffical; }
+
+        inline UInt8 getPlatform() const { return atoi(m_domain.c_str()); }
+
+    public:
+        inline void setSysDailog(bool v) { m_sysDailog = v; }
+        inline bool getSysDailog() { return m_sysDailog; }
+    private:
+        bool m_sysDailog;
 
     public:
         void sendTripodInfo();

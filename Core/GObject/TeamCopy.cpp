@@ -906,6 +906,11 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
             {
                 tcpInfo->setAwardRoll(copyId);
             }
+
+            if (t == 0)
+                pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
+            if (t == 1)
+                pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
         }
     }
 
@@ -927,13 +932,8 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
             pl->checkDeath();
 
         pl->setBuffData(PLAYER_BUFF_ATTACKING, now + turns);
+        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
     }
-
-    pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 0);
-    if (copyId == 1 && type == 0)
-        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
-    if (copyId == 1 && type == 1)
-        pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
 }
 
 void TeamCopy::sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid)

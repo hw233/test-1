@@ -567,7 +567,8 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL), m_isOffical(false), m_hasTripod(false)
+        _justice_roar(0), _spirit_factor(1.0f), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
         m_ClanBattleScore = 0;
@@ -943,14 +944,15 @@ namespace GObject
         char _type[32] = {0};
         char _id[32] = {0};
         snprintf(_type, 32, "%u", type);
-        snprintf(_id, 32, "%u", id); 
         if (!id || !num)
         {
+            snprintf(_id, 32, "GN_%u", type);
             snprintf(_price, 32, "%u", price);
-            udpLog(op, _type, "GN", _price, "", "", "props");
+            udpLog(op, _type, _id, _price, "", "", "props");
         }
         else
         {
+            snprintf(_id, 32, "%u", id);
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
         }
@@ -2853,12 +2855,12 @@ namespace GObject
 
         AddFriendAttainment(pl);
 
-        if (getFrendsNum() == 1)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
-        if (getFrendsNum() == 5)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
-        if (getFrendsNum() == 10)
+        if (getFrendsNum() >= 10)
             OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 2);
+        if (getFrendsNum() >= 5)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
+        if (getFrendsNum() >= 1)
+            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
 		return true;
 	}
 
@@ -4502,6 +4504,7 @@ namespace GObject
             _playerData.clanTaskId = 0;
         }
 
+        OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
         return true;
     }
@@ -4905,6 +4908,7 @@ namespace GObject
 		Stream st(REP::HOTEL_PUB_LIST);
 		if(count > 0)
 		{
+            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 0);
             UInt8 hasGet = 0;
 			do
 			{
@@ -5128,11 +5132,8 @@ namespace GObject
             _playerData.tavernOrangeCount = 0;
         }
 
-        if (fgt->getColor() == 0)
-            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 0);
-        else if (fgt->getColor() == 1)
-            OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 1);
-        else if (fgt->getColor() == 2)
+        OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 1);
+        if (fgt->getColor() == 1)
             OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 0, 2);
 
         if(fgt->getColor() ==3)
@@ -5321,6 +5322,8 @@ namespace GObject
 				_playerData.lineup[fe].updateId();
 				++ c;
 			}
+            if (c == 4)
+                OnHeroMemo(MC_FIGHTER, MD_ADVANCED, 1, 0);
             UInt8 newPos[5] = {0};
             if(0 == _playerData.formation)
             {
@@ -5473,7 +5476,8 @@ namespace GObject
 			map->OnPlayerLevUp(this);
 
 		GameAction()->onLevelup(this, oLev, nLev);
-        OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
+        if (nLev >= 45)
+            OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -5661,12 +5665,12 @@ namespace GObject
 			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[5] = {{56, 2}, {503,10}, {514,10}, {507,2}, {509,2}};
-                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 5);
-                mailPackageManager.push(mail->id, mitem, 5, true);
+                MailPackage::MailItem mitem[1] = {{449, 1}};
+                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 1);
+                mailPackageManager.push(mail->id, mitem, 1, true);
 
                 std::string strItems;
-                for (int i = 0; i < 5; ++i)
+                for (int i = 0; i < 1; ++i)
                 {
                     strItems += Itoa(mitem[i].id);
                     strItems += ",";
@@ -6115,6 +6119,11 @@ namespace GObject
 		if(!m_Package->DelItemAny(itemId, 1, NULL, ToTrainFighter))
 			return 2;
 
+        if(isPotential)
+            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 0);
+        else
+            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
+
 		if(uRand(1000) < rate)
 		{
             bool bMainFighter = isMainFighter( fgt->getId()) ; 
@@ -6163,13 +6172,7 @@ namespace GObject
                     {
                         SYSMSG_BROADCASTV(2200, getCountry(), getName().c_str(), fgt->getColor(), fgt->getName().c_str());
                     }
-
                 }
-
-                if (p >= 1.2f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
-                else if (p >= 1.1f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 2);
             }
             else
             {
@@ -6220,11 +6223,6 @@ namespace GObject
 
                     }
                 }
-
-                if (p >= 6.5f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 1);
-                else if (p >= 7.0f)
-                    OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 2);
             }
 		}
 		else
@@ -6252,11 +6250,6 @@ namespace GObject
 			}
 			return 1;
 		}
-
-        if(isPotential)
-            OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 0);
-        else
-            OnHeroMemo(MC_FIGHTER, MD_MASTER, 1, 0);
 
         if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
             fgt->getAttrType2(true);
@@ -6554,21 +6547,21 @@ namespace GObject
 
 			const UInt32 vipTable[16][12] =
             {
-                {56,2,0,0,0,0,0,0,0,0,0,0},
-                {56,10,0,0,0,0,0,0,0,0,0,0},
-                {56,10,503,5,0,0,0,0,0,0,0,0},
-                {56,10,503,10,514,10,0,0,0,0,0,0},
-                {503,20,515,5,507,2,509,2,0,0,0,0},
-                {503,30,515,15,507,10,509,10,0,0,0,0},
-                {503,30,515,20,507,10,509,10,0,0,0,0},
-                {503,50,515,30,507,30,509,30,0,0,0,0},
-                {503,100,515,30,507,30,509,30,0,0,0,0},
-                {503,200,515,50,507,50,509,50,0,0,0,0},
-                {503,300,515,80,507,50,509,50,0,0,0,0},
-                {503,800,515,240,507,150,509,150,0,0,0,0},
-                {503,800,515,280,507,150,509,150,0,0,0,0},
-                {503,1000,515,500,507,600,509,600,0,0,0,0},
-                {503,1500,515,500,507,700,509,700,0,0,0,0},
+                {450,1,0,0,0,0,0,0,0,0,0,0},
+                {451,1,0,0,0,0,0,0,0,0,0,0},
+                {452,1,0,0,0,0,0,0,0,0,0,0},
+                {453,1,0,0,0,0,0,0,0,0,0,0},
+                {454,1,0,0,0,0,0,0,0,0,0,0},
+                {455,1,0,0,0,0,0,0,0,0,0,0},
+                {456,1,0,0,0,0,0,0,0,0,0,0},
+                {457,1,0,0,0,0,0,0,0,0,0,0},
+                {458,1,0,0,0,0,0,0,0,0,0,0},
+                {459,1,0,0,0,0,0,0,0,0,0,0},
+                {460,1,0,0,0,0,0,0,0,0,0,0},
+                {461,1,0,0,0,0,0,0,0,0,0,0},
+                {462,1,0,0,0,0,0,0,0,0,0,0},
+                {463,1,0,0,0,0,0,0,0,0,0,0},
+                {464,1,0,0,0,0,0,0,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0},
             };
 
@@ -6587,6 +6580,8 @@ namespace GObject
 				strItems += "|";
 			}
 
+            // XXX: 改成发礼包，在礼包使用里给装备 yangyoufa@ 23/02/12 10:21:47 
+#if 0
             if (j >= 5) // XXX: 玩家等级橙色装备x1
             {
                 UInt16 id = getRandOEquip(GetLev());
@@ -6596,6 +6591,7 @@ namespace GObject
 				strItems += ",";
 				strItems += Itoa(1);
             }
+#endif
 
 			mailPackageManager.push(mail->id, mitem, mcount, true);
 			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
@@ -6846,7 +6842,6 @@ namespace GObject
 
     void Player::OnHeroMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item)
     {
-        return; // TODO: 下个版本开放
         if (CURRENT_THREAD_ID() != getThreadId())
         {
             UInt8 msg[4] = {chapter, diff, group, item};
@@ -8336,6 +8331,44 @@ namespace GObject
         SYSMSG(title, 2335);
         SYSMSG(content, 2336);
         GetMailBox()->newMail(NULL, 0x12, title, content);
+    }
+
+    void Player::initHeroMemo()
+    {
+        if(GetLev() >= 45)
+            GetHeroMemo()->setMemo(MC_FIGHTER, MD_STARTED, 0, 2, 1);
+        if (getClan())
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 0, 1);
+
+        for (std::map<UInt32, Fighter*>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
+        {
+            Fighter * fgt = it->second;
+            if (fgt->getAcupointsBit(1) >= 1 && fgt->getAcupointsBit(1) <= 3)
+                GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 0, 1);
+            if (fgt->getAcupointsBit(2) == 3)
+                GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 1, 1);
+            if (fgt->getAcupointsBit(3) == 3)
+                GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 2, 1);
+        }
+        if (getFrendsNum() >= 10)
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 2, 1);
+        if (getFrendsNum() >= 5)
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 1, 1);
+        if (getFrendsNum() >= 1)
+            GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 0, 1);
+        if (_fighters.size() > 9)
+        {
+            GetHeroMemo()->setMemo(MC_FIGHTER, MD_ADVANCED, 0, 1, 1);
+            GetHeroMemo()->setMemo(MC_FIGHTER, MD_ADVANCED, 0, 2, 1);
+        }
+
+        std::map<UInt8, ClanSkill>::iterator it = m_clanSkill.find(CLAN_SKILL_ACTION);
+        if(it != m_clanSkill.end())
+        {
+            ClanSkill& cs = it->second;
+            if (cs.level == 3)
+                GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 2, 1);
+        }
     }
 
 } // namespace GObject
