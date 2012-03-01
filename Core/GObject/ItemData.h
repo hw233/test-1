@@ -63,15 +63,15 @@ namespace GObject
 				st << static_cast<UInt8>(0);
 		}
 	};
-	//×°±¸¶îÍâÊôĞÔ
+	//è£…å¤‡é¢å¤–å±æ€§
 	struct ItemEquipData
 	{
-		UInt8	sockets;			//¿×Êı
-		UInt8	enchant;			//Ç¿»¯¼¶±ğ
-		UInt8	tRank;			    //·¨±¦µ±Ç°½×
-		UInt8	maxTRank;			//·¨±¦×î´ó½×
-		UInt32	trumpExp;			//·¨±¦¾­Ñé
-		UInt16	gems[SOCKETS_MAX];			//±¦Ê¯ÏâÇ¶Ôö¼Ó¸½¼ÓÊôĞÔ
+		UInt8	sockets;			//å­”æ•°
+		UInt8	enchant;			//å¼ºåŒ–çº§åˆ«
+		UInt8	tRank;			    //æ³•å®å½“å‰é˜¶
+		UInt8	maxTRank;			//æ³•å®æœ€å¤§é˜¶
+		UInt32	trumpExp;			//æ³•å®ç»éªŒ
+		UInt16	gems[SOCKETS_MAX];			//å®çŸ³é•¶åµŒå¢åŠ é™„åŠ å±æ€§
 		ItemEquipAttr2 extraAttr2;
 
 		ItemEquipData(): sockets(0), enchant(0), tRank(0), maxTRank(0), trumpExp(0) { memset(gems, 0, sizeof(gems)); }

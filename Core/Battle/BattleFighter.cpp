@@ -32,7 +32,7 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_attackAdd2(0), _magAtkAdd2(0), _defAdd2(0), _magDefAdd2(0), _hitrateAdd2(0), _evadeAdd2(0),
     _criticalAdd2(0), _criticalDmgAdd2(0), _pierceAdd2(0), _counterAdd2(0), _magResAdd2(0), _toughAdd2(0),
     _atkreduce2(0), _magatkreduce2(0),
-	_maxhpAdd2(0), _maxActionAdd2(0)
+	_maxhpAdd2(0), _maxActionAdd2(0), _fakeDeadTimes(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -1056,5 +1056,12 @@ UInt8 BattleFighter::getImmuneRound(UInt8 state)
 
     return _immuneRound[idx];
 }
+
+void BattleFighter::fakeDead()
+{
+    ++_fakeDeadTimes;
+    _hp = 1;
+}
+
 
 }

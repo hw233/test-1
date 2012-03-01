@@ -526,12 +526,42 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
     if(levels > dpd->maxLevel - dpd->curLevel)
         maxCnt = dpd->maxLevel - dpd->curLevel;
 
+    UInt8 res = 0;
+    if(maxCnt == 0)
+        res = 2;
     if(pl->GetPackage()->GetItemAnyNum(TD_AUTO_ITEM) < maxCnt)
         maxCnt = pl->GetPackage()->GetItemAnyNum(TD_AUTO_ITEM);
 
-    for(int idx = 0; idx < maxCnt ; ++idx)
+    if(maxCnt == 0)
+        res = 1;
+
+    Stream st(REP::TOWN_DEAMON);
+    st << static_cast<UInt8>(0x07) << res;
+    if(res == 0)
     {
+        st << static_cast<UInt16>(dpd->curLevel + maxCnt);
+        for(int idx = 0; idx < maxCnt ; ++idx)
+        {
+            GData::NpcGroups::iterator it = GData::npcGroups.find(m_Monsters[idx + dpd->curLevel].npcId);
+            if(it == GData::npcGroups.end())
+                continue;
+
+            GData::NpcGroup * ng = it->second;
+            pl->pendExp(ng->getExp());
+            ng->getLoots(pl, pl->_lastLoot, 0, NULL);
+        }
     }
+
+    st << pl->getPendExp();
+    UInt16 sz = pl->_lastLoot.size();
+    st << sz;
+    for(UInt8 i = 0; i < sz; ++ i)
+    {
+        st << pl->_lastLoot[i].id << pl->_lastLoot[i].count;
+    }
+
+    st << Stream::eos;
+    pl->send(st);
 }
 
 void TownDeamon::process()
