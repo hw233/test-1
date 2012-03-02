@@ -76,6 +76,7 @@ namespace GObject
 		static bool loadAllFriends();
 		static bool loadAllClans();
 		static bool loadEquipments();
+		static bool loadEquipmentsSpirit();
 		static bool LoadDungeon();
 		static bool unloadEquipments();				//从数据库内卸载所有的装备
 		static bool LoadSpecialAward();

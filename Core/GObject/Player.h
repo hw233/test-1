@@ -1350,6 +1350,8 @@ namespace GObject
         UInt8 getClanSkillFlag() { return m_csFlag; }
         void setClanSkillFlag(UInt8 csFlag) { m_csFlag = csFlag; }
         DeamonPlayerData* getDeamonPlayerData() { return m_dpData; }
+        void sendDeamonAwardsInfo();
+        void getDeamonAwards();
 
     private:
         bool m_hasTripod;

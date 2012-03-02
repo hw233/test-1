@@ -534,6 +534,27 @@ CREATE TABLE `equipment` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `equipment_spirit`
+--
+
+DROP TABLE IF EXISTS `equipment_spirit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `equipment_spirit` (
+  `id` int(10) unsigned NOT NULL,
+  `splev1` smallint(6) NOT NULL DEFAULT '0',
+  `splev2` smallint(6) NOT NULL DEFAULT '0',
+  `splev3` smallint(6) NOT NULL DEFAULT '0',
+  `splev4` smallint(6) NOT NULL DEFAULT '0',
+  `spform1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `spform2` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `spform3` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
 -- Table structure for table `exchange_ticket`
 --
 
@@ -1298,8 +1319,10 @@ CREATE TABLE `towndeamon_player` (
   `vitality` int(10) unsigned NOT NULL,
   `spirit` int(10) unsigned NOT NULL,
   `challengeTime` int(10) unsigned NOT NULL,
-  `itemId` int(10) unsigned NOT NULL,
-  `itemNum` int(10) unsigned NOT NULL,
+  `itemId` int(10) unsigned NOT NULL DEFAULT 0,
+  `itemNum` int(10) unsigned NOT NULL DEFAULT 0,
+  `quitLevel` smallint(3) unsigned NOT NULL DEFAULT 0,
+  `attacker` bigint(20) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

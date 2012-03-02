@@ -627,6 +627,16 @@ struct EquipUpgradeReq
     MESSAGE_DEF2(REQ::EQ_UPGRADE, UInt16, _fgtId, UInt32, _itemId);
 
 };
+
+struct EquipSpiritReq
+{
+    UInt8 _type;
+    UInt16 _fgtId;
+    UInt32 _itemId;
+    MESSAGE_DEF3(REQ::EQ_SPIRIT, UInt8, _type, UInt16, _fgtId, UInt32, _itemId);
+};
+
+
 struct GetHeroMemoAward
 {
     UInt8 _idx;
@@ -963,6 +973,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
         tcpInfo->sendAwardInfo();
     }
+    pl->sendDeamonAwardsInfo();
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
@@ -3744,6 +3755,16 @@ void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
 
     player->send(st);
 }
+
+void OnEquipSpirit( GameMsgHdr& hdr, EquipSpiritReq& req)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    Package * pkg = player->GetPackage();
+    pkg->AttachSpirit(req._type, req._fgtId, req._itemId);
+}
+
 void OnActivityList( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -3969,12 +3990,17 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
 
-    if(!townDeamonManager->checkTownDeamon(player))
-        return;
-
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
+
+    if(op !=0x08 && (PLAYER_DATA(player, location) != 0x1414 || player->GetLev() < 40))
+        return;
+
+    if(op != 0x08)
+    {
+       townDeamonManager->checkStartTime(player); 
+    }
 
     switch(op)
     {
@@ -4047,6 +4073,10 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
             townDeamonManager->autoCompleteQuite(player, levels);
         }
         break;
+    case 0x08:
+        {
+            player->getDeamonAwards();
+        }
     default:
         return;
     }

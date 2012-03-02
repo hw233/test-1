@@ -1532,6 +1532,8 @@ namespace GObject
             tcpInfo->sendAwardInfo();
         }
 
+        sendDeamonAwardsInfo();
+
 		if(update)
 		{
 			DB1().PushUpdateDataL("UPDATE `player` SET `lastExp` = 0, `lastResource` = 0 WHERE `id` = %"I64_FMT"u", _id);
@@ -8369,6 +8371,48 @@ namespace GObject
             if (cs.level == 3)
                 GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 2, 1);
         }
+    }
+
+    void Player::sendDeamonAwardsInfo()
+    {
+        if(m_dpData->itemNum != 0 || m_dpData->attacker != NULL)
+        {
+            Stream st(REP::TOWN_DEAMON);
+            st << static_cast<UInt8>(0x08);
+            string name = "";
+            if(m_dpData->attacker)
+                name = m_dpData->attacker->getName();
+
+            st << m_dpData->quitLevel << static_cast<UInt16>(m_dpData->itemId) << static_cast<UInt8>(m_dpData->itemNum) << name;
+            st << Stream::eos;
+            send(st);
+        }
+    }
+
+    void Player::getDeamonAwards()
+    {
+        if(m_dpData->itemNum == 0 && m_dpData->attacker == NULL)
+        {
+            return;
+        }
+        if(m_dpData->itemNum != 0)
+        {
+            if(NULL != GetPackage()->AddItem2(m_dpData->itemId, m_dpData->itemNum, true, true, FromTownDeamon))
+            {
+                m_dpData->itemId = 0;
+                m_dpData->itemNum = 0;
+                m_dpData->quitLevel = 0;
+                m_dpData->attacker = NULL;
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+            }
+        }
+        else
+        {
+            m_dpData->quitLevel = 0;
+            m_dpData->attacker = NULL;
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        }
+
     }
 
 } // namespace GObject

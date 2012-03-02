@@ -170,6 +170,7 @@ namespace GObject
         loadCopy();
         loadFrontMap();
 		loadEquipments();
+		loadEquipmentsSpirit();
         loadFightersPCChance();
 		loadFighters();
 		loadClanAssist();
@@ -3481,6 +3482,62 @@ namespace GObject
 		return true;
 	}
 
+	bool GObjectManager::loadEquipmentsSpirit()
+    {
+        std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+        if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading equipments spirit:");
+        DBEquipmentSpirit dbes;
+        if(execu->Prepare("SELECT `equipment`.`id`, `splev1`, `splev2`, `splev3`, `splev4`, `spform1`, `spform2`, `spform3` FROM `equipment` LEFT JOIN `equipment_spirit` ON `equipment`.`id` = `equipment_spirit`.`id`", dbes) != DB::DB_OK)
+            return false;
+
+        lc.reset(2000);
+        while(execu->Next() == DB::DB_OK)
+        {
+            lc.advance();
+            std::map<UInt32, ItemEquip *>::iterator it = equips.find(dbes.id);
+            if(it == equips.end())
+                continue;
+
+            ItemEquip * equip = it->second;
+            if(equip == NULL)
+                continue;
+            switch(equip->getClass())
+            {
+            case Item_Weapon:
+            case Item_Armor1:
+            case Item_Armor2:
+            case Item_Armor3:
+            case Item_Armor4:
+            case Item_Armor5:
+            case Item_Ring:
+            case Item_Amulet:
+                {
+                    ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+                    esa.spLev[0] = dbes.splev1;
+                    esa.spLev[1] = dbes.splev2;
+                    esa.spLev[2] = dbes.splev3;
+                    esa.spLev[3] = dbes.splev4;
+                    esa.spForm[0] = dbes.spform1;
+                    esa.spForm[1] = dbes.spform2;
+                    esa.spForm[2] = dbes.spform3;
+
+                    if(equip->getQuality() == 5 && esa.spForm[0] == 0)
+                    {
+                        Package::GenSpirit(equip);
+                    }
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		lc.finalize();
+
+		return true;
+
+    }
 
 	bool GObjectManager::LoadSpecialAward()
 	{
@@ -3961,7 +4018,7 @@ namespace GObject
 		lc.prepare("Loading TownDeamon Player:");
 		DBTownDeamonPlayer dbtdp;
         Player* pl = NULL;
-		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
+		if(execu2->Prepare("SELECT `deamonLevel`, `curLevel`, `maxLevel`, `playerId`, `startTime`, `accTime`, `accLen`, `accAwards`, `vitalityTime`, `vitality`, `spirit`, `challengeTime`, `itemId`, `itemNum`, `quitLevel`, `attacker` FROM `towndeamon_player` order by deamonLevel asc", dbtdp) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		while(execu2->Next() == DB::DB_OK)
@@ -3986,6 +4043,11 @@ namespace GObject
             dpData->spirit = dbtdp.spirit;
             dpData->itemId = dbtdp.itemId;
             dpData->itemNum = dbtdp.itemNum;
+            dpData->quitLevel = dbtdp.quitLevel;
+            if(dbtdp.attacker != 0)
+                dpData->attacker = globalPlayers[dbtdp.attacker];
+            else
+                dpData->attacker = NULL;
 
             if(dbtdp.deamonLevel != 0)
                 townDeamonManager->loadDeamonPlayersFromDB(dbtdp.deamonLevel, pl);

@@ -623,6 +623,22 @@ CREATE TABLE `towndeamon_monster` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `spirit_attr`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `spirit_attr` (
+  `level` smallint(3) unsigned NOT NULL,
+  `attack` float(5,2) unsigned NOT NULL,
+  `defend` float(5,2) unsigned NOT NULL,
+  `critical` float(5,2) unsigned NOT NULL,
+  `pierce` float(5,2) unsigned NOT NULL,
+  `action` float(5,2) unsigned NOT NULL,
+  `tough` float(5,2) unsigned NOT NULL,
+  `criticaldmg` float(5,2) unsigned NOT NULL,
+  `hp` float(5,2) unsigned NOT NULL,
+  PRIMARY KEY (`level`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 
 -- Dump completed

@@ -92,6 +92,7 @@ namespace GObject
 		inline const GData::AttrExtra * getAttrExtra() { return static_cast<const GData::ItemEquipType*>(_itemBaseType)->attrExtra; }
 
 		inline ItemEquipAttr2& getEquipAttr2() { return _itemEquipData.extraAttr2; }
+		inline ItemEquipSpiritAttr& getEquipSpiritAttr() { return _itemEquipData.spiritAttr; }
 
 		inline UInt16 getAttack()
         {

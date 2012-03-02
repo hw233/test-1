@@ -293,6 +293,19 @@ struct DBFighterProb
     Int32 gold;
 };
 
+struct DBSpiritAttr
+{
+    UInt16 level;
+    float attack;
+    float defend;
+    float critical;
+    float pierce;
+    float action;
+    float tough;
+    float criticaldmg;
+    float hp;
+};
+
 struct DBCopy
 {
     UInt8 id;
@@ -632,6 +645,21 @@ SPECIALDEF(3)
         UInt32, id,
         Int32, free,
         Int32, gold
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBSpiritAttr)
+SPECIALDEF(9)
+    (
+        UInt16, level,
+        float, attack,
+        float, defend,
+        float, critical,
+        float, pierce,
+        float, action,
+        float, tough,
+        float, criticaldmg,
+        float, hp
     )
 SPECIALEND()
 

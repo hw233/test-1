@@ -13,8 +13,9 @@ namespace GObject
 
 static const UInt32 TOWNDEAMONENDTM = 19 * 3600;
 static const UInt32 TD_VITALITY_TIMEUNIT = 600;
-static const UInt32 TD_AWARD_TIMEUNIT = 900;
+static const UInt32 TD_AWARD_TIMEUNIT = 3600;
 static const UInt32 TD_CHALLENGE_TIMEUNIT = 300;
+//static const UInt32 TD_CHALLENGE_TIMEUNIT = 20;
 
 class Player;
 struct Lineup;
@@ -50,6 +51,8 @@ struct DeamonPlayerData
     UInt32 spirit;
     UInt32 itemId;
     UInt32 itemNum;
+    UInt16 quitLevel;
+    Player* attacker;
 
     DeamonPlayerData()
     {
@@ -66,6 +69,8 @@ struct DeamonPlayerData
         spirit = 100;
         itemId = 0;
         itemNum = 0;
+        quitLevel = 0;
+        attacker = NULL;
     }
 
     UInt32 calcAccLeft();
@@ -75,7 +80,7 @@ struct DeamonPlayerData
 };
 
 static const UInt32 TOWNDEAMON_LEVEL_UP = 40;
-static const UInt32 TD_MAXACCTIME = 86400;
+static const UInt32 TD_MAXACCTIME = 172800;
 static const UInt32 TD_MAXVITALITY = 1000;
 
 class TownDeamon
@@ -97,18 +102,20 @@ class TownDeamon
         void autoCompleteQuite(Player*, UInt16 levels);
         void process();
 
+        void checkStartTime(Player* pl);
         bool checkTownDeamon(Player* pl);
         bool attackNpc(Player* pl, UInt32 npcId);
         void attackPlayer(Player* pl, Player* defer);
         void beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
 
     private:
-        void quitDeamon(Player* pl, bool fullAward = false);
+        void quitDeamon(Player* pl, Player* attacker = NULL);
         void occupyDeamon(Player* pl, UInt16 level);
 
     private:
         std::vector<DeamonMonster> m_Monsters;
         UInt16 m_location;
+        UInt16 m_maxDeamonLevel;
 };
 
 extern TownDeamon* townDeamonManager;

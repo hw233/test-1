@@ -4,6 +4,7 @@
 #include "GData/ItemType.h"
 #include "GData/TaskType.h"
 #include "Server/ServerTypes.h"
+#include "GData/SpiritAttrTable.h"
 
 namespace GObject
 {
@@ -49,6 +50,7 @@ namespace GData
         static bool LoadMoney();
         static bool LoadEUpgradeData();
         static bool LoadHeroMemoMaxSoul();
+        static bool LoadSpiritAttrTable();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);

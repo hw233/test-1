@@ -91,6 +91,8 @@ struct DBTownDeamonPlayer
     UInt32 challengeTime;
     UInt32 itemId;
     UInt32 itemNum;
+    UInt16 quitLevel;
+    UInt64 attacker;
 };
 
 struct DBMapSpot
@@ -375,6 +377,18 @@ struct DBEquipment
 	UInt32 socket5;
 	UInt32 socket6;
 	UInt8 bindType;
+};
+
+struct DBEquipmentSpirit
+{
+	UInt32 id;
+	Int16 splev1;
+	Int16 splev2;
+	Int16 splev3;
+	Int16 splev4;
+	UInt8 spform1;
+	UInt8 spform2;
+	UInt8 spform3;
 };
 
 struct DBFriend
@@ -842,7 +856,7 @@ SPECIALEND()
 
 
 SPECIALBEGIN(GObject::DBTownDeamonPlayer)
-SPECIALDEF(14)
+SPECIALDEF(16)
     (
     UInt16, deamonLevel,
     UInt16, curLevel,
@@ -857,7 +871,9 @@ SPECIALDEF(14)
     UInt16, spirit,
     UInt32, challengeTime,
     UInt32, itemId,
-    UInt32, itemNum
+    UInt32, itemNum,
+    UInt16, quitLevel,
+    UInt64, attacker
     )
 SPECIALEND()
 
@@ -1534,6 +1550,19 @@ SPECIALDEF(20)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBEquipmentSpirit)
+SPECIALDEF(8)
+(
+	UInt32, id,
+	Int16, splev1,
+	Int16, splev2,
+	Int16, splev3,
+	Int16, splev4,
+	UInt8, spform1,
+	UInt8, spform2,
+	UInt8, spform3
+)
+SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDungeonPlayer)
 SPECIALDEF(9)

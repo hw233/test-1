@@ -23,6 +23,7 @@
 #include "GObject/Mail.h"
 #include "HeroMemo.h"
 #include "AttainMgr.h"
+#include "GData/SpiritAttrTable.h"
 
 namespace GObject
 {
@@ -635,6 +636,14 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 			ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 			ea2.appendAttrToStream(st);
 
+            UInt8 itemClass = equip->getClass();
+            UInt8 q = equip->getQuality();
+            if(itemClass >= Item_Weapon && itemClass <= Item_Ring && q == 5)
+            {
+                ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+                esa.appendAttrToStream(st);
+            }
+
             if(equip->getClass() == Item_Trump)
             {
                 st << ied.maxTRank << ied.trumpExp;
@@ -1103,6 +1112,99 @@ inline void addEquipAttr2( GData::AttrExtra& ae, const ItemEquipAttr2& ext, UInt
 	}
 }
 
+inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr& esa, ItemClass	itemClass )
+{
+    UInt16 lev0 = esa.spLev[0];
+    UInt16 lev1 = esa.spLev[1];
+    UInt16 lev2 = esa.spLev[2];
+    UInt16 lev3 = esa.spLev[3];
+    switch(itemClass)
+    {
+    case Item_Weapon:
+        if(lev0 > 0)
+        {
+            ae.attack += GData::spiritAttrTable[lev0-1].attack;
+            ae.magatk += GData::spiritAttrTable[lev0-1].attack;
+        }
+        if(lev1 > 0)
+            ae.pirlvl += GData::spiritAttrTable[lev1-1].pierce_lvl;
+        if(lev2 > 0)
+            ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
+        if(lev3 > 0)
+            ae.action += GData::spiritAttrTable[lev3-1].action;
+        break;
+    case Item_Armor1:
+        if(lev0 > 0)
+        {
+            ae.defend += GData::spiritAttrTable[lev0-1].defend;
+            ae.magdef += GData::spiritAttrTable[lev0-1].defend;
+        }
+        if(lev1 > 0)
+            ae.action += GData::spiritAttrTable[lev1-1].action;
+        if(lev2 > 0)
+            ae.pirlvl += GData::spiritAttrTable[lev2-1].pierce_lvl;
+        if(lev3 > 0)
+            ae.hp += GData::spiritAttrTable[lev3-1].hp;
+        break;
+    case Item_Armor3:
+        if(lev0 > 0)
+        {
+            ae.defend += GData::spiritAttrTable[lev0-1].defend;
+            ae.magdef += GData::spiritAttrTable[lev0-1].defend;
+        }
+        if(lev1 > 0)
+            ae.action += GData::spiritAttrTable[lev1-1].action;
+        if(lev2 > 0)
+            ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
+        if(lev3 > 0)
+            ae.hp += GData::spiritAttrTable[lev3-1].hp;
+        break;
+    case Item_Armor2:
+    case Item_Armor4:
+    case Item_Armor5:
+        if(lev0 > 0)
+        {
+            ae.defend += GData::spiritAttrTable[lev0-1].defend;
+            ae.magdef += GData::spiritAttrTable[lev0-1].defend;
+        }
+        if(lev1 > 0)
+            ae.action += GData::spiritAttrTable[lev1-1].action;
+        if(lev2 > 0)
+            ae.toughlvl += GData::spiritAttrTable[lev2-1].tough_lvl;
+        if(lev3 > 0)
+            ae.hp += GData::spiritAttrTable[lev3-1].hp;
+        break;
+    case Item_Amulet:
+        if(lev0 > 0)
+        {
+            ae.attack += GData::spiritAttrTable[lev0-1].attack;
+            ae.magatk += GData::spiritAttrTable[lev0-1].attack;
+        }
+        if(lev1 > 0)
+            ae.hp += GData::spiritAttrTable[lev1-1].hp;
+        if(lev2 > 0)
+            ae.pirlvl += GData::spiritAttrTable[lev2-1].pierce_lvl;
+        if(lev3 > 0)
+            ae.criticaldmg += GData::spiritAttrTable[lev3-1].critical_dmg;
+        break;
+    case Item_Ring:
+        if(lev0 > 0)
+        {
+            ae.attack += GData::spiritAttrTable[lev0-1].attack;
+            ae.magatk += GData::spiritAttrTable[lev0-1].attack;
+        }
+        if(lev1 > 0)
+            ae.hp += GData::spiritAttrTable[lev1-1].hp;
+        if(lev2 > 0)
+            ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
+        if(lev3 > 0)
+            ae.criticaldmg += GData::spiritAttrTable[lev3-1].critical_dmg;
+        break;
+    default:
+        return;
+    }
+}
+
 inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
 {
     if(id - 1750 < 8)
@@ -1151,6 +1253,7 @@ void Fighter::addAttr( ItemEquip * equip )
         return;
 	addAttrExtra(_attrExtraEquip, equip->getAttrExtra());
 	addEquipAttr2(_attrExtraEquip, equip->getEquipAttr2(), _level);
+    addEquipSpiritAttr(_attrExtraEquip, equip->getEquipSpiritAttr(), equip->getClass());
 	ItemEquipData& ied = equip->getItemEquipData();
 	for(UInt8 i = 0; i < ied.sockets; ++ i)
 	{
