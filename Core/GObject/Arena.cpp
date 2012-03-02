@@ -136,12 +136,26 @@ void Arena::appendLineup( Stream& st, Player * player )
 		Lineup& pdata = player->getLineup(i);
 		if(pdata.available())
 		{
-			++ c;
+			++c;
 			st << pdata.pos << static_cast<UInt16>(pdata.fid);
 			Fighter * fgt = pdata.fighter;
-            // XXX: 
-			st << fgt->getLevel() << static_cast<UInt8>(fgt->getPotential() * 100 + 0.5f);
+
+            st << fgt->getLevel() << fgt->getPotential() << fgt->getCapacity();
+            st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
+            st << fgt->getAttrType1();
+            st << fgt->getAttrValue1();
+            st << fgt->getAttrType2();
+            st << fgt->getAttrValue2();
+            st << fgt->getAttrType3();
+            st << fgt->getAttrValue3();
+
             fgt->getAllUpSkillAndLevel(st);
+            fgt->getAllPSkillAndLevel4Arena(st);
+            fgt->getAllUpCittaAndLevel(st);
+
+            for (UInt8 i = 0; i < fgt->getMaxTrumps(); ++i)
+                appendEquipInfo(st, fgt->getTrump(i));
+
 			appendEquipInfo(st, fgt->getWeapon());
 			appendEquipInfo(st, fgt->getArmor(0));
 			appendEquipInfo(st, fgt->getArmor(1));
@@ -163,7 +177,7 @@ void Arena::appendEquipInfo( Stream& st, ItemEquip * equip )
 		return;
 	}
 	ItemEquipData& ied = equip->getItemEquipData();
-	st << static_cast<UInt16>(equip->GetItemType().getId()) << ied.enchant;
+	st << static_cast<UInt16>(equip->GetItemType().getId()) << ied.enchant << ied.tRank << ied.maxTRank;
 	ied.extraAttr2.appendAttrToStream(st);
 	st << ied.sockets;
 	for(UInt8 i = 0; i < ied.sockets; ++ i)

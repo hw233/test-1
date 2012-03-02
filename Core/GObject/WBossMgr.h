@@ -67,6 +67,14 @@ public:
         }
         return 0;
     }
+    inline void setHP(UInt32 hp)
+    {
+        if (!m_final)
+            return;
+        if (!hp)
+            hp = 100;
+        _hp[0] = hp;
+    }
 
     void reward(Player* player);
     void getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret);
@@ -121,6 +129,7 @@ public:
     void calcNext(UInt32 now);
     void nextDay(UInt32 now);
     void sendDaily(Player* player);
+    void setHP(UInt32 hp);
 
     inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
     inline UInt8 getLevel(){return m_maxlvl;}

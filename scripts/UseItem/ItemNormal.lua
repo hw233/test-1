@@ -1193,6 +1193,8 @@ function ItemNormal_00000428(iid, num, bind, param)
             {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
             {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
             {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
+            {111,112,113,114,115,116,117,118,119,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297},
+            {120,121,122,123,124,125,126,127,128},
         }
 
         local lvl = player:GetLev()
@@ -1217,10 +1219,12 @@ function ItemNormal_00000428(iid, num, bind, param)
             n = 7
         elseif lvl >= 75 and lvl < 80 then
             n = 8
-        elseif lvl >= 80 then
+        elseif lvl >= 80 and lvl < 85 then
             n = 9
-        else
-            n = 1
+        elseif lvl >= 85 and lvl < 90 then
+            n = 10
+        elseif lvl >= 90 then
+            n = 11
         end
 
         local m = math.random(1, #items[n])
@@ -1577,7 +1581,8 @@ function ItemNormal_00000010(iid, num, bind, param)
       {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
       {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
       {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
-      {111,112,113,114,115,116,117,118,119},
+      {111,112,113,114,115,116,117,118,119,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297},
+      {120,121,122,123,124,125,126,127,128},
   }
 
   local n = 0
@@ -1599,8 +1604,10 @@ function ItemNormal_00000010(iid, num, bind, param)
       n = 8
   elseif lvl >= 80 and lvl < 85 then
       n = 9
-  elseif lvl >= 85 then
+  elseif lvl >= 85 and lvl < 90 then
       n = 10
+  elseif lvl >= 90 then
+      n = 11
   end
 
   if n == 0 then
@@ -6497,22 +6504,8 @@ function ItemNormal_athletics_2(iid, num, bind, param)
 		return false;
 	end
 
-    local level = player:GetLev();
-    level = math.floor((math.floor((level) / 10)) * 10)
-    local tmpEquipTable = Athletics_Orange_Equip[level]
-
-    if tmpEquipTable == nil then
-        if level > 80 then
-            tmpEquipTable = Athletics_Orange_Equip[80]
-        else
-            tmpEquipTable = Athletics_Orange_Equip[50]
-        end
-    end
-
-    local equipId = 0;
-    if tmpEquipTable ~= nil then
-        local tmpSize = table.getn(tmpEquipTable);
-        equipId = tmpEquipTable[math.random(1, tmpSize)];
+    local equipId = getRandOEquip(player:GetLev())
+    if equipId ~= 0 then
         package:AddEquip(equipId, 1);
     end
 
@@ -6540,22 +6533,8 @@ function ItemNormal_athletics_3(iid, num, bind, param)
 		return false;
 	end
 
-    local level = player:GetLev();
-    level = math.floor((math.floor((level) / 10)) * 10)
-    local tmpEquipTable = Athletics_Orange_Equip[level]
-
-    if tmpEquipTable == nil then
-        if level > 80 then
-            tmpEquipTable = Athletics_Orange_Equip[80]
-        else
-            tmpEquipTable = Athletics_Orange_Equip[50]
-        end
-    end
-
-    local equipId = 0;
-    if tmpEquipTable ~= nil then
-        local tmpSize = table.getn(tmpEquipTable);
-        equipId = tmpEquipTable[math.random(1, tmpSize)];
+    local equipId = getRandOEquip(player:GetLev())
+    if equipId ~= 0 then
         package:AddEquip(equipId, 1);
     end
 
@@ -6581,22 +6560,8 @@ function ItemNormal_athletics_4(iid, num, bind, param)
 		return false;
 	end
 
-    local level = player:GetLev();
-    level = math.floor((math.floor((level) / 10)) * 10)
-    local tmpEquipTable = Athletics_Orange_Equip[level]
-
-    if tmpEquipTable == nil then
-        if level > 80 then
-            tmpEquipTable = Athletics_Orange_Equip[80]
-        else
-            tmpEquipTable = Athletics_Orange_Equip[50]
-        end
-    end
-
-    local equipId = 0;
-    if tmpEquipTable ~= nil then
-        local tmpSize = table.getn(tmpEquipTable);
-        equipId = tmpEquipTable[math.random(1, tmpSize)];
+    local equipId = getRandOEquip(player:GetLev())
+    if equipId ~= 0 then
         package:AddEquip(equipId, 1);
     end
 
@@ -6624,22 +6589,9 @@ function ItemNormal_athletics_5(iid, num, bind, param)
 		return false;
 	end
 
-    local level = player:GetLev();
-    level = math.floor((math.floor((level) / 10)) * 10)
-    local tmpEquipTable = Athletics_Purple_Equip[level]
-
-    if tmpEquipTable == nil then
-        if level > 100 then
-            tmpEquipTable = Athletics_Purple_Equip[100]
-        else
-            tmpEquipTable = Athletics_Purple_Equip[40]
-        end
-    end
-
-    local equipId = 0;
-    if tmpEquipTable ~= nil then
-        local tmpSize = table.getn(tmpEquipTable);
-        equipId = tmpEquipTable[math.random(1, tmpSize)];
+    local equipId = 0
+    equipId = getRandPEquip(player:GetLev())
+    if equipId ~= 0 then
         package:AddEquip(equipId, 1);
     end
 
@@ -6787,7 +6739,6 @@ function ItemNormal_athletics_24(iid, num, bind, param)
         equipId = tmpEquipTable[math.random(1, tmpSize)];
     end
 
-
     package:DelItemSendMsg(24, player);
     if roll < 21 then
 		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60 和[4:"..equipId.."]");
@@ -6828,23 +6779,10 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     local roll = math.random(1, 100);
     local itemId = 0;
 
-    local level = player:GetLev();
-    level = math.floor((math.floor((level) / 10)) * 10)
-    local tmpEquipTable = Athletics_Orange_Equip[level]
-
-    if tmpEquipTable == nil then
-        if level > 80 then
-            tmpEquipTable = Athletics_Orange_Equip[80]
-        else
-            tmpEquipTable = Athletics_Orange_Equip[50]
-        end
+    local equipId = getRandOEquip(player:GetLev())
+    if equipId ~= 0 then
+        package:AddEquip(equipId, 1);
     end
-
-    if tmpEquipTable ~= nil then
-        local tmpSize = table.getn(tmpEquipTable);
-        equipId = tmpEquipTable[math.random(1, tmpSize)];
-    end
-
 
     package:DelItemSendMsg(25, player);
     if roll < 21 then
@@ -6862,10 +6800,6 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     else
 		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200 和[4:"..equipId.."]");
         player:getCoupon(200);
-    end
-
-    if equipId ~= 0 then
-		package:AddEquip(equipId, 1);
     end
 
     if itemId ~= 0 then
@@ -7338,8 +7272,53 @@ function ItemNormalOther_00000441(iid, num, bind, other)
     return num
 end
 
+function ItemNormalOther_00000475(iid, num, bind, other)
+    local player = GetPlayer()
+    local package = player:GetPackage()
+
+    if other:IsMale() then
+		player:sendMsgCode(2, 1071, 0);
+        return false
+    end
+
+    if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    local items = {9, 514, 515, 500, 49, 503, 511, 517, 15}
+    local prob = {1700,3200,3300,4800,5200,5500,7100,8500,10000}
+    local broad = {0,1,1,0,0,1,0,1,0}
+    local item = 0
+
+    local k = 1
+    local rand = math.random(10000)
+    for n = 1,#prob do
+        if rand <= prob[n] then
+            item = items[n]
+            k = n
+            break;
+        end
+    end
+
+    if item == 0 then
+        return false
+    end
+
+    package:AddItem(item, 1, 1, 0, 2)
+    if broad[k] == 1 then
+        Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]祝[p:"..other:getCountry()..":"..other:getPName().."]节日快乐～并送上了[4:"..item.."]x1作为礼物～")
+    end
+    other:AddItemBy(player, item, 1, true)
+    package:DelItemSendMsg(475, player)
+
+    player:AddVar(50, 1)
+    return num
+end
+
 local ItemNormalOther_Table = {
   [441] = ItemNormalOther_00000441,
+  [475] = ItemNormalOther_00000475,
 }
 
 function RunItemNormalUse(itemId, num, bind, param)

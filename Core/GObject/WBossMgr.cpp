@@ -19,17 +19,20 @@ namespace GObject
 const UInt8 WBOSS_NUM = 7;
 const UInt8 WBOSS_ATTKMAX = 10;
 
+static unsigned int attackPre = 0; // XXX: 攻击BOSS的先后顺序因子
+
 static UInt8 getAttackMax()
 {
     return WBOSS_ATTKMAX;
 }
 
 static UInt32 worldboss[] = {
-    5466, 5467, 5468, 5469, 5509,
-    5162, 5473, 5474, 5475, 5510,
-    5103, 5470, 5471, 5472, 5511,
-    5168, 5476, 5477, 5478, 5512,
-    5127, 5479, 5480, 5481, 5513,
+    5466, 5467, 5468, 5469, 5509, // 40
+    5162, 5473, 5474, 5475, 5510, // 50
+    5103, 5470, 5471, 5472, 5511, // 60
+    5168, 5476, 5477, 5478, 5512, // 70
+    5127, 5479, 5480, 5481, 5513, // 80
+    5197, 5482, 5483, 5484, 5514, // 90
 };
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
@@ -134,6 +137,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     SYSMSG_BROADCASTV(550, nflist[0].fighter->getId());
                     _percent = 0;
                     _hp[0] = 0;
+                    attackPre = 0;
                     reward(pl);
                     res = true;
                     if (sendflag % 4)
@@ -212,7 +216,7 @@ void WBoss::flee()
 
 void WBoss::reward(Player* player)
 {
-    static UInt16 trumps[] = {226,90,225,227,270,};
+    static UInt16 trumps[] = {226,90,225,227,270,298};
     static UInt8 trumpnum[] = {3,2,1};
     static UInt16 gems[] = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142};
 
@@ -394,7 +398,7 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
     if (!m_final)
     {
         // XXX: 打元神也参与抽奖
-        AttackInfo info(pl, 0);
+        AttackInfo info(pl, attackPre);
         AtkInfoType::iterator i = m_atkinfo.begin();
         while (i != m_atkinfo.end())
         {
@@ -406,6 +410,7 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
             ++i;
         }
         m_atkinfo.insert(info);
+        ++attackPre;
     }
 
     bool res = attackWorldBoss(pl, m_id, World::_wday==4?2:1, m_final);
@@ -929,6 +934,12 @@ void WBossMgr::bossAppear(UInt8 lvl, bool force)
     {
         appear(lvl, now);
     }
+}
+
+void WBossMgr::setHP(UInt32 hp)
+{
+    if (m_boss)
+        m_boss->setHP(hp);
 }
 
 WBossMgr worldBoss;

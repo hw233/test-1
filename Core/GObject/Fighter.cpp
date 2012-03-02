@@ -740,20 +740,22 @@ bool Fighter::hasTrumpType(UInt32 trumpid)
 
 bool Fighter::canSetTrump(UInt8 idx, UInt32 trumpid)
 {
+#if 0
     if (idx == 0)
         return true;
 
-    if (_level >= 60 && idx == 2)
+    if (_level >= 60 && idx >= 1)
     {
         return !hasTrumpType(trumpid);
     }
 
-    if (_potential >= 1.5 && _capacity >= 7 && idx == 1)
+    if (_potential >= 1.5 && _capacity >= 7 && idx >= 1)
     {
         return !hasTrumpType(trumpid);
     }
+#endif
 
-    return false;
+    return !hasTrumpType(trumpid);
 }
 
 ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )
@@ -886,24 +888,18 @@ int Fighter::getAllTrumpId( UInt32* trumps, int size )
 
 void Fighter::setCurrentHP( UInt32 hp, bool writedb )
 {
-	if(_hp == hp)
+	if(_hp && _hp == hp)
 		return;
 
 	if(writedb)
 	{
-#if 0
 		UInt32 maxhp = getMaxHP();
 		if(hp >= maxhp)
 		{
-			if(_hp == 0)
-				return;
+			//if(_hp == 0)
+			//	return;
 			hp = 0;
 		}
-#else
-		UInt32 maxhp = getMaxHP();
-		if(hp > maxhp)
-			hp = maxhp;
-#endif
 		_hp = hp;
 		sendModification(1, hp);
 	}
@@ -1595,6 +1591,30 @@ void Fighter::getAllPSkillAndLevel(Stream& st)
         }
     }
 }
+
+void Fighter::getAllPSkillAndLevel4Arena(Stream& st)
+{
+    UInt8 size = 0;
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _passkl[i].size();
+        st << size;
+        for (size_t j = 0; j < _passkl[i].size(); ++j)
+        {
+            st << _passkl[i][j];
+        }
+    }
+    for (size_t i = 0; i < GData::SKILL_PASSIVES-GData::SKILL_PASSSTART; ++i)
+    {
+        size = _rpasskl[i].size();
+        st << size;
+        for (size_t j = 0; j < _rpasskl[i].size(); ++j)
+        {
+            st << _rpasskl[i][j];
+        }
+    }
+}
+
 
 UInt8 Fighter::getSkillsNum()
 {

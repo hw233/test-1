@@ -275,6 +275,11 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     if (spot > 1 && spot > tmp.size())
         return 0;
 
+    if (pl->hasFlag(Player::AutoFrontMap) && !ato) {
+        // pl->sendMsgCode(0, 1414);
+        return 0;
+    }
+
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
         tmp[spot].lootlvl = tmp[spot-1].lootlvl;
@@ -476,7 +481,8 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                     pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 1);
 
-                    if (!World::getNewYear())
+                    bool girl = (World::getGirlDay() && !pl->IsMale());
+                    if (!World::getNewYear() && !girl)
                     {
                         UInt32 pref = 0;
                         UInt8 div = 1;

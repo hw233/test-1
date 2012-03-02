@@ -40,6 +40,7 @@ void WorldScript::init()
     def("setTavernBlueCount", GObject::Player::setTavernBlueCount);
     def("setTavernPurpleCount", GObject::Player::setTavernPurpleCount);
     def("setTavernOrangeCount", GObject::Player::setTavernOrangeCount);
+	def("isFBVersion", GObject::World::isFBVersion);
 	def("setActivityStage", GObject::World::setActivityStage);
 	def("setActAvailable", GObject::World::setActAvailable);
 	def("setActAvailable1", GObject::World::setActAvailable1);
@@ -61,6 +62,8 @@ void WorldScript::init()
 	def("setRechargeActive", GObject::World::setRechargeActive);
 	def("getValentineDay", GObject::World::getValentineDay);
 	def("setValentineDay", GObject::World::setValentineDay);
+	def("getGirlDay", GObject::World::getGirlDay);
+	def("setGirlDay", GObject::World::setGirlDay);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

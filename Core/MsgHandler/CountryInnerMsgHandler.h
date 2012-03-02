@@ -794,8 +794,11 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
         player->udpLog(nno, recharge->money, gold, id, "", "", "pay");
 
+#ifdef _FB
+#else
         UInt32 mny = atoi(recharge->money);
         dclogger.fee(player, 0, mny);
+#endif
     }
     else
     {
@@ -985,7 +988,10 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     player->getCoupon(888);
     player->udpLog("create", "", "", "", "", "", "guide");
     player->sendCreateMail();
+#ifdef _FB
+#else
     dclogger.reg(player);
+#endif
 }
 
 void OnRunScriptReq( GameMsgHdr&, const void * data )
@@ -1247,6 +1253,19 @@ void OnAddPExpBy( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     UInt32 pexp = *(UInt32*)(data);
     player->AddPExp(pexp);
+}
+void OnAddItemBy( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct ItemAdd
+    {
+        UInt16 item;
+        UInt16 num;
+        bool bind;
+    };
+
+    ItemAdd* ia = (ItemAdd*)(data);
+    player->GetPackage()->AddItem(ia->item, ia->num, ia->bind);
 }
 void OnPracticeAttack( GameMsgHdr& hdr, const void* data )
 {

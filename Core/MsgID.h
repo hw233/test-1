@@ -290,8 +290,8 @@ namespace REQ
     const UInt8 SERVER_ARENA_INFO   = 0xEA;
     /**请求对阵表*/
     const UInt8 SERVER_ARENA_ELIM   = 0xEB;
-    /**???*/
-    const UInt8 SERVER_ARENA_OP     = 0xEC;
+    /**跨服战操作*/
+    const UInt8 SERVER_ARENA_OP     = 0xE8;
     /**聊天*/
     const UInt8 CHAT                = 0x20;// 0xF0
     /**私聊*/
@@ -525,7 +525,7 @@ namespace REP
     const UInt8 YD_INFO             = 0x2E;
     const UInt8 YD_AWARD_RCV        = 0x2F;
 
-    const UInt8 SERVER_ARENA_OP     = 0xEC;
+    const UInt8 SERVER_ARENA_OP     = 0xE8;
 
     const UInt8 ATHLETICS_CHALLENGE = 0xF5;// 0xD2
     const UInt8 WINSTREAK           = 0xF6;// 0xD3
@@ -577,6 +577,7 @@ namespace SPEQ
     const UInt16 SYSDAILOG          = 0x119;
     const UInt16 PWDINFO            = 0x11A;
     const UInt16 PWDRESET           = 0x11B;
+    const UInt16 MAILVIP            = 0x11C;
 }
 
 namespace SPEP
@@ -607,6 +608,7 @@ namespace SPEP
     const UInt8 GETMONEY            = 0x18;
     const UInt8 PWDINFO             = 0x1A;
     const UInt8 PWDRESET            = 0x1B;
+    const UInt8 MAILVIP             = 0x1C;
 }
 
 #endif // _MSGID_H_

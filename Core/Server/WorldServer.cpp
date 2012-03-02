@@ -71,7 +71,7 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 			cfg.slugName = cfg.channelName;
 		}
 	}
-	Network::Initialize();
+    Network::Initialize();
 	//读取配置文件
 	TimeUtil::Init();
     GObject::VarSystem::Init();
@@ -79,7 +79,10 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	globalSysMsg.load();
 	Battle::battleReport.init();
     _analyzer.Init();
+#ifdef _FB
+#else
     GObject::dclogger.init();
+#endif
 
     if (!num)
     {
@@ -90,6 +93,11 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
         cfg.serverNum = num;
 
     cfg.serverLogId = cfg.serverNum;
+
+#ifdef _FB
+    cfg.fbVersion = true;
+#else
+#endif
 
 	//数据库连接操作， 连接池创建
 	DB::gDataDBConnectionMgr = new DB::DBConnectionMgr();

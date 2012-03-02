@@ -36,6 +36,8 @@ public:
 
 	std::string	cryptKey1, cryptKey2;
 	std::string	gmCryptKey1, gmCryptKey2;
+	std::string	fbrCryptKey1, fbrCryptKey2;
+    bool fbVersion;
 
     struct TokenServer
     {
@@ -88,6 +90,7 @@ public:
 	{dbLogHost = h; dbLogPort = p; dbLogUser = u; dbLogPassword = pw; dbLogSource = s;}
 	inline void setCryptKeys(const char * k1, const char * k2) {cryptKey1 = k1; cryptKey2 = k2;}
 	inline void setGMCryptKeys(const char * k1, const char * k2) {gmCryptKey1 = k1; gmCryptKey2 = k2;}
+	inline void setFBRechargeKeys(const char * k1, const char * k2) {fbrCryptKey1 = k1; fbrCryptKey2 = k2;}
 	void setAdminAllowedIP(const char *);
 	inline void setOpening( UInt16 y, UInt8 m, UInt8 d )
 	{ openYear = y; openMonth = m; openDay = d; }

@@ -270,6 +270,7 @@ void HeroIsland::calcNext(UInt32 now)
     {
         _prepareTime = TimeUtil::SharpDayT(0,now) + 11 * 60 * 60 + 45 * 60;
 
+#if 0
         if(World::_wday == 6 || World::_wday == 7)
         {
             if (now >= TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60)
@@ -279,9 +280,12 @@ void HeroIsland::calcNext(UInt32 now)
         }
         else
         {
+#endif
             if (now >= TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60)
                 _prepareTime += 24 * 60 * 60;
+#if 0
         }
+#endif
 
         _startTime = _prepareTime + 15 * 60;
         _endTime = _startTime + 55 * 60;
@@ -325,11 +329,17 @@ void HeroIsland::rankReward()
         if (n < nsz)
         {
             prestige = _prestige[n] * factor + (*i)->tasks * 10;
+            if (World::_wday == 6 || World::_wday == 7)
+                prestige *= 2;
             if (n < 3)
             {
-                MailPackage::MailItem item[] = {{10,1},};
-                (*i)->player->sendMailItem(2310, 2311, item, 1);
-                SYSMSG_BROADCASTV(2313, n+1, (*i)->player->getCountry(), (*i)->player->getName().c_str(), prestige);
+                UInt16 count = (World::_wday == 6 || World::_wday == 7)?2:1;
+                MailPackage::MailItem item[] = {{10,count},};
+                if (count == 1)
+                    (*i)->player->sendMailItem(2310, 2311, item, 1);
+                else
+                    (*i)->player->sendMailItem(2310, 2315, item, 1);
+                SYSMSG_BROADCASTV(2313, n+1, (*i)->player->getCountry(), (*i)->player->getName().c_str(), prestige, count);
             }
 
             ++n;
@@ -339,6 +349,8 @@ void HeroIsland::rankReward()
             if (nsz)
             {
                 prestige = _prestige[nsz-1] * factor + (*i)->tasks * 10;
+                if (World::_wday == 6 || World::_wday == 7)
+                    prestige *= 2;
             }
         }
 
@@ -569,7 +581,8 @@ void HeroIsland::applayPlayers()
             {
                 if (j && pd && pd->player && pd->expcd <= now)
                 {
-                    pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]);
+                    UInt8 factor = (World::_wday == 6 || World::_wday == 7)?2:1;
+                    pd->player->AddExp(calcExp(pd->player->GetLev())*_expfactor[j-1]*factor);
                     pd->expcd = now + 60;
                 }
             }
@@ -1982,6 +1995,7 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
             UInt32 num;
         };
 
+        UInt8 factor = (World::_wday == 6 || World::_wday == 7)?2:1;
         UInt8 quality = pd->awardgot;
         if (quality)
             quality -= 1;
@@ -2000,9 +2014,9 @@ bool HeroIsland::getAward(Player* player, UInt8 id, UInt8 type)
                 {
                     awards[j].id = awds->id;
                     if (awds->id == 2)
-                        awards[j].num = awds->num * calcExp(player->GetLev());
+                        awards[j].num = awds->num * calcExp(player->GetLev()) * factor;
                     else
-                        awards[j].num = awds->num;
+                        awards[j].num = awds->num * factor;
                     break;
                 }
             }
