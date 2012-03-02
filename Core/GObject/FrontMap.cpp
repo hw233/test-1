@@ -275,6 +275,11 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
     if (spot > 1 && spot > tmp.size())
         return 0;
 
+    if (pl->hasFlag(Player::AutoFrontMap) && !ato) {
+        // pl->sendMsgCode(0, 1414);
+        return 0;
+    }
+
     if (spot >= tmp.size()) {
         tmp.resize(spot+1);
         tmp[spot].lootlvl = tmp[spot-1].lootlvl;
