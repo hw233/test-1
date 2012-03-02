@@ -212,6 +212,11 @@ namespace GData
 			fprintf(stderr, "Load Hero Memo Max Soul Error !\n");
 			return false;
         }
+        if (!LoadSpiritAttrTable())
+        {
+			fprintf(stderr, "Load Spirit Attr Type Error !\n");
+			return false;
+        }
 
 		return true;
 	}	
@@ -1663,4 +1668,27 @@ namespace GData
         return m_OnlineAwardTime.size();
     }
 
+    bool GDataManager::LoadSpiritAttrTable()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSpiritAttr dbsa;
+		if(execu->Prepare("SELECT `level`, `attack`, `defend`, `critical`, `pierce`, `action`, `tough`, `criticaldmg`, `hp` FROM `spirit_attr` order by `level` asc", dbsa) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            SpiritAttr sa;
+            sa.attack = dbsa.attack;
+            sa.defend = dbsa.defend;
+            sa.critical_lvl = dbsa.critical;
+            sa.pierce_lvl = dbsa.pierce;
+            sa.action = dbsa.action;
+            sa.tough_lvl = dbsa.tough;
+            sa.critical_dmg = dbsa.criticaldmg;
+            sa.hp = dbsa.hp;
+
+            spiritAttrTable.push_back(sa);
+        }
+        return true;
+    }
 }

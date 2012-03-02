@@ -53,6 +53,7 @@
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/HeroMemo.h"
+#include "GObject/TownDeamon.h"
 
 struct NullReq
 {
@@ -626,6 +627,16 @@ struct EquipUpgradeReq
     MESSAGE_DEF2(REQ::EQ_UPGRADE, UInt16, _fgtId, UInt32, _itemId);
 
 };
+
+struct EquipSpiritReq
+{
+    UInt8 _type;
+    UInt16 _fgtId;
+    UInt32 _itemId;
+    MESSAGE_DEF3(REQ::EQ_SPIRIT, UInt8, _type, UInt16, _fgtId, UInt32, _itemId);
+};
+
+
 struct GetHeroMemoAward
 {
     UInt8 _idx;
@@ -962,6 +973,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
         tcpInfo->sendAwardInfo();
     }
+    pl->sendDeamonAwardsInfo();
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
@@ -3743,6 +3755,16 @@ void OnEquipUpgrade( GameMsgHdr& hdr, EquipUpgradeReq& req)
 
     player->send(st);
 }
+
+void OnEquipSpirit( GameMsgHdr& hdr, EquipSpiritReq& req)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    Package * pkg = player->GetPackage();
+    pkg->AttachSpirit(req._type, req._fgtId, req._itemId);
+}
+
 void OnActivityList( GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
@@ -3963,6 +3985,104 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
         return;
     }
 }
+
+void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    if(op !=0x08 && (PLAYER_DATA(player, location) != 0x1414 || player->GetLev() < 40))
+        return;
+
+    if(op != 0x08)
+    {
+       townDeamonManager->checkStartTime(player); 
+    }
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            townDeamonManager->showTown(player);
+        }
+        break;
+    case 0x01:
+        {
+            UInt16 level = 0;
+            br >> level;
+            townDeamonManager->showLevelTown(player, level);
+        }
+        break;
+    case 0x02:
+        {
+            UInt16 start = 0;
+            UInt16 count = 0;
+            br >> start >> count;
+            townDeamonManager->listDeamons(player, start, count);
+        }
+        break;
+    case 0x03:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt8 count = 0;
+            br >> count;
+            townDeamonManager->useAccItem(player, count);
+        }
+        break;
+    case 0x04:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt8 count = 0;
+            br >> count;
+            townDeamonManager->useVitalityItem(player, count);
+        }
+        break;
+    case 0x05:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt16 level = 0;
+            UInt8 type = 0;
+            br >> level >> type;
+            townDeamonManager->challenge(player, level, type);
+        }
+        break;
+    case 0x06:
+        {
+            if(!player->hasChecked())
+                return;
+
+            townDeamonManager->cancelDeamon(player);
+        }
+        break;
+    case 0x07:
+        {
+            if(!player->hasChecked())
+                return;
+
+            UInt16 levels = 0;
+            br >> levels;
+            townDeamonManager->autoCompleteQuite(player, levels);
+        }
+        break;
+    case 0x08:
+        {
+            player->getDeamonAwards();
+        }
+    default:
+        return;
+    }
+}
+
+
 
 void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
 {

@@ -981,7 +981,10 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 
 					// killed the fighter
 					if(bf->getHP() == 0)
-						onDead(true, bf, defList, defCount);
+                    {
+						if(!onDead(true, bf, defList, defCount))
+                            defList[0].counterLeft = bf->getHP();
+                    }
 					else if(_winner == 0)
                     {
 						onDamage(bf, scList, scCount, false);
@@ -1135,8 +1138,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
 
         if(area_target->getHP() == 0)
         {
-            onDead(false, area_target, defList, defCount);
-            return dmg;
+            if(onDead(false, area_target, defList, defCount))
+                return dmg;
         }
         else if(_winner == 0)
         {
@@ -1156,8 +1159,8 @@ UInt32 BattleSimulator::doPoisonAttack(BattleFighter* bf, bool cs, const GData::
 
             if(area_target->getHP() == 0)
             {
-                onDead(false, area_target, defList, defCount);
-                return dmg;
+                if(onDead(false, area_target, defList, defCount))
+                    return dmg;
             }
             else if(_winner == 0)
             {
@@ -1310,8 +1313,8 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     ++defCount;
                     if(bo->getHP() == 0)
                     {
-                        onDead(!activeFlag, bo, defList, defCount);
-                        break;
+                        if(onDead(!activeFlag, bo, defList, defCount))
+                            break;
                     }
 
                     bo->makeDamage(dmg);
@@ -1321,8 +1324,8 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     ++defCount;
                     if(bo->getHP() == 0)
                     {
-                        onDead(!activeFlag, bo, defList, defCount);
-                        break;
+                        if(onDead(!activeFlag, bo, defList, defCount))
+                            break;
                     }
 
                     bo->makeDamage(dmg*1.5);
@@ -1459,7 +1462,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     continue;
                 }
                 ap[apcnt].pos = x + y * 5;
-                int idx = std::min(fsize, std::max(abs(ad.y), abs(ad.x)));
+                int idx = std::min(abs(fsize-1), std::max(abs(ad.y), abs(ad.x)));
                 if(fsize != 0)
                     ap[apcnt ++].factor = skill->factor[idx];
                 else
@@ -1548,7 +1551,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                         continue;
 
                     float factor = 1;
-                    int idx = std::min(fsize, i);
+                    int idx = std::min(abs(fsize-1), i);
                     if(fsize > 0)
                         factor = skill->factor[idx];
 
@@ -1633,7 +1636,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                             continue;
 
                         UInt32 dmg = abs(bf->calcPoison(skill, bo, false));
-                        int idx = std::min(fsize, i);
+                        int idx = std::min(abs(fsize-1), i);
                         if(fsize > 0)
                             dmg *= skill->factor[idx];
                         ++i;
@@ -1731,7 +1734,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                             continue;
 
                         float factor = 1;
-                        int idx = std::min(fsize, i);
+                        int idx = std::min(abs(fsize-1), i);
                         if(fsize > 0)
                             factor = skill->factor[idx];
                         if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
@@ -2183,7 +2186,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 continue;
             }
             ap[apcnt].pos = x + y * 5;
-            int idx = std::min(fsize, std::max(abs(ad.y), abs(ad.x)));
+            int idx = std::min(abs(fsize-1), std::max(abs(ad.y), abs(ad.x)));
             if(fsize != 0)
                 ap[apcnt ++].factor = skill->factor[idx];
             else
@@ -2316,7 +2319,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                     continue;
 
                 float factor = 1;
-                int idx = std::min(fsize, i);
+                int idx = std::min(abs(fsize-1), i);
                 if(fsize > 0)
                     factor = skill->factor[idx];
 
@@ -2409,7 +2412,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                         continue;
 
                     UInt32 dmg = abs(bf->calcPoison(skill, bo, false));
-                    int idx = std::min(fsize, i);
+                    int idx = std::min(abs(fsize-1), i);
                     if(fsize > 0)
                         dmg *= skill->factor[idx];
                     ++i;
@@ -2507,7 +2510,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                         continue;
 
                     float factor = 1;
-                    int idx = std::min(fsize, i);
+                    int idx = std::min(abs(fsize-1), i);
                     if(fsize > 0)
                         factor = skill->factor[idx];
                     if(((skill->cond != GData::SKILL_ACTIVE && skill->cond != GData::SKILL_PEERLESS) || (rate * factor) > _rnd(10000)))
@@ -2677,7 +2680,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 if(_objs[target_side][pos] == NULL || _objs[target_side][pos]->getHP() == 0)
                     continue;
                 float factor = 1;
-                int idx = std::min(fsize, i);
+                int idx = std::min(abs(fsize-1), i);
                 if(fsize > 0)
                     factor = skill->factor[idx];
                 dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][pos], factor, defList, defCount, scList, scCount);
@@ -4966,47 +4969,61 @@ void BattleSimulator::setStatusChange(BattleFighter * bf, UInt8 side, UInt8 pos,
 	}
 }
 
-void BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount)
+bool BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount)
 {
 	if(!bo->isChar())
-		return;
+		return true;
 
     bool fRevival = false;
-    if(false == (static_cast<BattleFighter*>(bo))->isRevival())
+    bool fFakeDead = false;
+    size_t idx = 0;
+    const GData::SkillBase* passiveSkill = NULL;
+    passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead100(idx);
+    if(passiveSkill == NULL)
+        passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead();
+
+    if(passiveSkill != NULL)
     {
-        size_t idx = 0;
-        const GData::SkillBase* passiveSkill = NULL;
-        while(NULL != (passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead100(idx)))
+        switch(SKILL_ID(passiveSkill->getId()))
         {
-            fRevival = true;
+        case 226:
+            {
+                size_t cnt = passiveSkill->factor.size();
+                UInt16 i = (static_cast<BattleFighter*>(bo))->getFakeDeadTimes();
+                if(i >= cnt)
+                    i = cnt - 1;
+
+                if(uRand(10000) < passiveSkill->prob * passiveSkill->factor[i] * 100)
+                {
+                    fFakeDead = true;
+                    (static_cast<BattleFighter*>(bo))->fakeDead();
+                }
+            }
+            break;
+        default:
+            {
+                if(!(static_cast<BattleFighter*>(bo))->isRevival())
+                {
+                    fRevival = true;
+                    (static_cast<BattleFighter*>(bo))->setRevival();
+                    //doSkillAttackAftEnter(static_cast<BattleFighter*>(bo));
+                }
+            }
             break;
         }
 
-        if(passiveSkill == NULL)
-        {
-            passiveSkill = (static_cast<BattleFighter*>(bo))->getPassiveSkillDead();
-            if( NULL != passiveSkill )
-            {
-                fRevival = true;
-            }
-        }
-
-        if(passiveSkill != NULL)
+        if(fFakeDead || fRevival)
         {
             defList[defCount].pos = bo->getPos() + (activeFlag ? 25 : 0);
             defList[defCount].damType = e_skill;
             defList[defCount].damage = passiveSkill->getId();
             defList[defCount].leftHP = bo->getHP();
             ++ defCount;
+            return false;
         }
     }
 
-    if(fRevival)
-    {
-        (static_cast<BattleFighter*>(bo))->setRevival();
-        //doSkillAttackAftEnter(static_cast<BattleFighter*>(bo));
-    }
-    else
+    if(!fFakeDead && !fRevival)
     {
         // remove from action queue
         BattleFighter* toremove = static_cast<BattleFighter *>(bo);
@@ -5015,6 +5032,8 @@ void BattleSimulator::onDead(bool activeFlag, BattleObject * bo, DefStatus* defL
         // re-test winner
         _winner = testWinner();
     }
+
+    return true;
 }
 
 void BattleSimulator::onDamage( BattleObject * bo, StatusChange * scList, size_t& scCount, bool active, std::vector<AttackAct>* atkAct)

@@ -448,6 +448,11 @@ private:
     float _atkreduce2, _magatkreduce2;
 	Int32 _maxhpAdd2, _maxActionAdd2;
 
+    UInt16 _fakeDeadTimes;
+public:
+    void fakeDead();
+    inline UInt16 getFakeDeadTimes() { return _fakeDeadTimes; }
+
 public:
 	enum StatusFlag
 	{

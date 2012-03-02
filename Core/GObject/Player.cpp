@@ -50,6 +50,7 @@
 #include "GData/ClanLvlTable.h"
 #include "GData/ClanSkillTable.h"
 #include "Common/StringTokenizer.h"
+#include "TownDeamon.h"
 
 #include <cmath>
 
@@ -566,7 +567,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        _justice_roar(0), _spirit_factor(1.0f), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
         m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
@@ -590,6 +591,7 @@ namespace GObject
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
         m_hf = new HoneyFall(this);
+        m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
 	}
 
@@ -599,6 +601,10 @@ namespace GObject
 		UnInit();
         delete m_tcpInfo;
         m_tcpInfo = NULL;
+        delete m_hf;
+        m_hf = NULL;
+        delete m_dpData;
+        m_dpData = NULL;
 	}
 
 	bool Player::Load()
@@ -1547,6 +1553,8 @@ namespace GObject
         {
             tcpInfo->sendAwardInfo();
         }
+
+        sendDeamonAwardsInfo();
 
 		if(update)
 		{
@@ -8422,6 +8430,48 @@ namespace GObject
             if (cs.level >= 3)
                 GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 2, 1);
         }
+    }
+
+    void Player::sendDeamonAwardsInfo()
+    {
+        if(m_dpData->itemNum != 0 || m_dpData->attacker != NULL)
+        {
+            Stream st(REP::TOWN_DEAMON);
+            st << static_cast<UInt8>(0x08);
+            string name = "";
+            if(m_dpData->attacker)
+                name = m_dpData->attacker->getName();
+
+            st << m_dpData->quitLevel << static_cast<UInt16>(m_dpData->itemId) << static_cast<UInt8>(m_dpData->itemNum) << name;
+            st << Stream::eos;
+            send(st);
+        }
+    }
+
+    void Player::getDeamonAwards()
+    {
+        if(m_dpData->itemNum == 0 && m_dpData->attacker == NULL)
+        {
+            return;
+        }
+        if(m_dpData->itemNum != 0)
+        {
+            if(NULL != GetPackage()->AddItem2(m_dpData->itemId, m_dpData->itemNum, true, true, FromTownDeamon))
+            {
+                m_dpData->itemId = 0;
+                m_dpData->itemNum = 0;
+                m_dpData->quitLevel = 0;
+                m_dpData->attacker = NULL;
+                DB3().PushUpdateData("UPDATE `towndeamon_player` SET `itemId`=0, `itemNum`=0, `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+            }
+        }
+        else
+        {
+            m_dpData->quitLevel = 0;
+            m_dpData->attacker = NULL;
+            DB3().PushUpdateData("UPDATE `towndeamon_player` SET `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
+        }
+
     }
 
 } // namespace GObject

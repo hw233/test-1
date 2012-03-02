@@ -213,7 +213,7 @@ private:
 	UInt32 attackOnce(BattleFighter * bf, bool& cs, bool& pr, const GData::SkillBase* skill, BattleObject * bo, float factor, DefStatus* defList, size_t& defCount, StatusChange* scList, size_t& scCount, int counter_deny = -1, AttackPoint * counter_deny_list = NULL, std::vector<AttackAct>* atkAct = NULL);
 	float testRescue(BattleFighter *& bf, int counter_deny, AttackPoint * counter_deny_list);
 	float testLink(BattleFighter *& bf, UInt16& skillId);
-    void onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount);
+    bool onDead(bool activeFlag, BattleObject * bo, DefStatus* defList, size_t& defCount);
 	int testWinner();
 	int testWinner2();
 	void appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 target_pos, UInt8 atk_type, UInt16 add_id, bool cs, bool pr, DefStatus* defList, size_t defCount, StatusChange * scList, size_t scCount);

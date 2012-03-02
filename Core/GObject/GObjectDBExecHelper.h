@@ -12,6 +12,14 @@
 namespace GData
 {
 
+struct DBTownDeamonMonster
+{
+	UInt16 level;
+    UInt32 npcId;
+    UInt32 itemId;
+    UInt32 itemNum;
+};
+
 struct DBNpcGroup
 {
 	UInt32 id;
@@ -66,6 +74,26 @@ struct DBClanAssistant
 
 namespace GObject
 {
+
+struct DBTownDeamonPlayer
+{
+    UInt16 deamonLevel;
+    UInt16 curLevel;
+    UInt16 maxLevel;
+    UInt64 playerId;
+    UInt32 startTime;
+    UInt32 accTime;
+    UInt32 accLen;
+    UInt32 accAwards;
+    UInt32 vitalityTime;
+    UInt16 vitality;
+    UInt16 spirit;
+    UInt32 challengeTime;
+    UInt32 itemId;
+    UInt32 itemNum;
+    UInt16 quitLevel;
+    UInt64 attacker;
+};
 
 struct DBMapSpot
 {
@@ -349,6 +377,18 @@ struct DBEquipment
 	UInt32 socket5;
 	UInt32 socket6;
 	UInt8 bindType;
+};
+
+struct DBEquipmentSpirit
+{
+	UInt32 id;
+	Int16 splev1;
+	Int16 splev2;
+	Int16 splev3;
+	Int16 splev4;
+	UInt8 spform1;
+	UInt8 spform2;
+	UInt8 spform3;
 };
 
 struct DBFriend
@@ -814,6 +854,30 @@ SPECIALDEF(5)
 	)
 SPECIALEND()
 
+
+SPECIALBEGIN(GObject::DBTownDeamonPlayer)
+SPECIALDEF(16)
+    (
+    UInt16, deamonLevel,
+    UInt16, curLevel,
+    UInt16, maxLevel,
+    UInt64, playerId,
+    UInt32, startTime,
+    UInt32, accTime,
+    UInt32, accLen,
+    UInt32, accAwards,
+    UInt32, vitalityTime,
+    UInt16, vitality,
+    UInt16, spirit,
+    UInt32, challengeTime,
+    UInt32, itemId,
+    UInt32, itemNum,
+    UInt16, quitLevel,
+    UInt64, attacker
+    )
+SPECIALEND()
+
+
 SPECIALBEGIN(GObject::DBMapSpot)
 SPECIALDEF(6)
 	(
@@ -1168,6 +1232,17 @@ SPECIALDEF(31)
 	)
 SPECIALEND()
 
+
+SPECIALBEGIN(GData::DBTownDeamonMonster)
+SPECIALDEF(4)
+(
+	UInt16, level,
+    UInt32, npcId,
+    UInt32, itemId,
+    UInt32, itemNum
+)
+SPECIALEND()
+
 SPECIALBEGIN(GData::DBNpcGroup)
 SPECIALDEF(9)
 (
@@ -1475,6 +1550,19 @@ SPECIALDEF(20)
 )
 SPECIALEND()
 
+SPECIALBEGIN(GObject::DBEquipmentSpirit)
+SPECIALDEF(8)
+(
+	UInt32, id,
+	Int16, splev1,
+	Int16, splev2,
+	Int16, splev3,
+	Int16, splev4,
+	UInt8, spform1,
+	UInt8, spform2,
+	UInt8, spform3
+)
+SPECIALEND()
 
 SPECIALBEGIN(GObject::DBDungeonPlayer)
 SPECIALDEF(9)

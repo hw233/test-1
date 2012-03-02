@@ -63,6 +63,20 @@ namespace GObject
 				st << static_cast<UInt8>(0);
 		}
 	};
+    // 装备注灵属性
+    struct ItemEquipSpiritAttr
+    {
+        UInt16  spLev[4];             // 注灵等级
+        UInt8   spForm[3];            // 注灵公式
+
+        ItemEquipSpiritAttr() { memset(spLev, 0, sizeof(spLev)); memset(spForm, 0, sizeof(spForm)); }
+
+		inline void appendAttrToStream(Stream& st)
+        {
+            st << spLev[0] << spLev[1] << spLev[2] << spLev[3];
+            st << spForm[0] << spForm[1] << spForm[2];
+        }
+    };
 	//装备额外属性
 	struct ItemEquipData
 	{
@@ -73,6 +87,7 @@ namespace GObject
 		UInt32	trumpExp;			//法宝经验
 		UInt16	gems[SOCKETS_MAX];			//宝石镶嵌增加附加属性
 		ItemEquipAttr2 extraAttr2;
+        ItemEquipSpiritAttr spiritAttr;
 
 		ItemEquipData(): sockets(0), enchant(0), tRank(0), maxTRank(0), trumpExp(0) { memset(gems, 0, sizeof(gems)); }
 	};

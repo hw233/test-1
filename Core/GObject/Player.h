@@ -130,6 +130,7 @@ namespace GObject
     class ActivityMgr;
     class HeroMemo;
     class HoneyFall;
+    struct DeamonPlayerData;
 
     struct TripodData
     {
@@ -1183,6 +1184,7 @@ namespace GObject
 
         // ͨ????????֮??
         UInt8 _justice_roar;
+        float _spirit_factor;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1202,6 +1204,8 @@ namespace GObject
         inline void setJusticeRoar(UInt8 v) { _justice_roar = v; }
         inline UInt8 getJusticeRoar() { return _justice_roar; }
 
+        inline void setSpiritFactor(float v) { _spirit_factor = v; }
+        inline float getSpiritFactor() { return _spirit_factor; }
 	protected:
 		inline void setBlockBossByLevel();
 	public:
@@ -1348,6 +1352,9 @@ namespace GObject
         void buildClanTechSkill();
         UInt8 getClanSkillFlag() { return m_csFlag; }
         void setClanSkillFlag(UInt8 csFlag) { m_csFlag = csFlag; }
+        DeamonPlayerData* getDeamonPlayerData() { return m_dpData; }
+        void sendDeamonAwardsInfo();
+        void getDeamonAwards();
 
     private:
         bool m_hasTripod;
@@ -1356,6 +1363,7 @@ namespace GObject
         CopyTeamPage m_ctp;
         TeamCopyPlayerInfo* m_tcpInfo;
         HoneyFall* m_hf;
+        DeamonPlayerData* m_dpData;
         std::map<UInt8, ClanSkill> m_clanSkill;
         UInt8 m_csFlag;
 

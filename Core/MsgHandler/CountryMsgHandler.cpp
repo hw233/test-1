@@ -136,6 +136,7 @@ MSG_REG_2(GameMsgHdr, REQ::EQ_TRUMP_UPGRADE, OnTrumpUpgrade);
 MSG_REG(GameMsgHdr, OnTrumpLOrder);
 
 MSG_REG(GameMsgHdr, OnEquipUpgrade);
+MSG_REG(GameMsgHdr, OnEquipSpirit);
 
 
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
@@ -143,6 +144,9 @@ MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_LIST, OnActivityList);
 MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
+
+MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
+
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -241,6 +245,9 @@ MSG_REG_2(GameMsgHdr, 0x232, OnAthleticsMartialReq);
 MSG_REG_2(GameMsgHdr, 0x233, OnAthleticsMartialAttack);
 MSG_REG_2(GameMsgHdr, 0x234, OnAthleticsMartialBeAttack);
 MSG_REG_2(GameMsgHdr, 0x235, OnAwardAthleticsMartial);
+
+MSG_REG_2(GameMsgHdr, 0x340, OnTownDeamonlBeAttack);
+MSG_REG_2(GameMsgHdr, 0x341, OnTownDeamonResNotify);
 
 MSG_REG_2(GameMsgHdr, 0x236, OnAwardHIPrestige);
 MSG_REG_2(GameMsgHdr, 0x237, OnSendShusanLoveTitleCard);

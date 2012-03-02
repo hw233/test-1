@@ -192,6 +192,8 @@ namespace GObject
 
         void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
 
+        void AttachSpirit(UInt8 type, UInt16 fighterId, UInt32 itemId);
+        static void GenSpirit(ItemEquip* equip);
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 

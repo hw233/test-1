@@ -63,6 +63,8 @@ enum PurchaseType
     PrintDemon, // 除魔印消费
     EnterAutoFrontMap,
     EnterAutoCopy,
+    TownDeamonAuto,
+    EquipAttachSpirit,
 };
 
 enum IncomingType
@@ -129,6 +131,7 @@ enum ItemFrom
     FromDailyActivity,
     FromEquipUpgrade,
     FromClan,
+    FromTownDeamon,
 };
 
 enum ItemTo

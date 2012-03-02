@@ -37,6 +37,8 @@
 #define ITEM_ACTIVATE_ATTR 9215
 #define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
 #define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
+#define SPIRIT_TRANS_ITEM   548    // 转魂符
+#define SPIRIT_LEVEL_MAX    100    // 最大注灵等级
 
 namespace GObject
 {
@@ -756,6 +758,8 @@ namespace GObject
 				e = equip;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
 				DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `maxTRank`, `trumpExp`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`) VALUES(%u, %u, %u, %u, %u, %d, %u, %d, %u, %d)", id, typeId, edata.maxTRank, edata.trumpExp, edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3);
+                GenSpirit(equip);
+
 				SendSingleEquipData(equip);
 				if(notify)
 					ItemNotify(equip->GetItemType().getId());
@@ -838,6 +842,8 @@ namespace GObject
 
         DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
         DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`,`socket3`,`socket4`, `socket5`, `socket6`) VALUES(%u, %u, %u, %u, %d, %u, %d, %u, %d, %u, %u,%u,%u,%u,%u,%u)", id, typeId, edata.enchant,edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3, edata.sockets, edata.gems[0], edata.gems[1], edata.gems[2], edata.gems[3], edata.gems[4],edata.gems[5]);
+        GenSpirit(equip);
+
         SendSingleEquipData(equip);
         if(notify)
             ItemNotify(equip->GetItemType().getId());
@@ -1656,6 +1662,14 @@ namespace GObject
 		}
 		ItemEquipAttr2& ea2 = equip->getEquipAttr2();
 		ea2.appendAttrToStream(st);
+
+        UInt8 itemClass = equip->getClass();
+        UInt8 q = equip->getQuality();
+		if(itemClass >= Item_Weapon && itemClass <= Item_Ring && q == 5)
+        {
+            ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+            esa.appendAttrToStream(st);
+        }
 
         if(equip->getClass() == Item_Trump)
         {
@@ -3731,4 +3745,131 @@ namespace GObject
         return 0;
     }
 
+    void Package::AttachSpirit(UInt8 type, UInt16 fighterId, UInt32 itemId)
+    {
+        // 注灵类型 spiritType[属性条][装备类型]
+        // 属性条:1, 2, 3, 4
+        // 装备类洗:1-武器，2-护头，3-护胸，4-护肩，5-护腰，6-护腿，7-项链，8-戒指
+        // spiritType:0-攻击，1-防御，2-暴击，3-破击，4-身法，5-坚韧，6-暴击伤害，7-生命
+        static int spiritType[4][8] = {
+            {0, 1, 1, 1, 1, 1, 0, 0},
+            {3, 4, 4, 4, 4, 4, 7, 7},
+            {2, 3, 5, 2, 5, 5, 3, 2},
+            {4, 7, 7, 7, 7, 7, 6, 6}
+        };
+        static UInt32 baseSpiritItem = 7000;
+
+		Fighter * fgt = NULL;
+		UInt8 pos = 0;
+		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
+        if(equip == NULL)
+            return;
+        UInt8 itemClass = equip->getClass();
+		if(itemClass > Item_Ring || itemClass < Item_Weapon)
+			return;
+
+        UInt8 q = equip->getQuality();
+        if(q < 5)
+            return;
+
+        bool bind = false;
+        ItemEquipData& ied_equip = equip->getItemEquipData();
+        switch(type)
+        {
+        case 0:
+            {
+                UInt32 itemId[3] = {0};
+                UInt8 form0 = ied_equip.spiritAttr.spForm[0];
+                UInt16 awardLev = 0;
+                if(m_Owner->getTael() < 10)
+                    return;
+
+                for(int j = 0; j != 3; ++ j)
+                {
+                    UInt8 form = ied_equip.spiritAttr.spForm[j];
+                    if(form == 0)
+                        return;
+                    UInt8 lev = (ied_equip.spiritAttr.spLev[form - 1] + 5)/5;
+                    if(ied_equip.spiritAttr.spLev[form - 1] == SPIRIT_LEVEL_MAX)
+                        lev = SPIRIT_LEVEL_MAX / 5;
+
+                    UInt32 tmpId = baseSpiritItem + spiritType[form - 1][itemClass - 1] * 100 + lev;
+                    if(GetItemAnyNum(tmpId) == 0)
+                        return;
+                    itemId[j] = tmpId;
+                    if(form0 == form && j != 0)
+                        ++ awardLev;
+                }
+                if(awardLev != 2)
+                    awardLev = 0;
+
+                for(int k = 0; k != 3; ++ k)
+                {
+                    bool tmp = false;
+                    DelItemAny(itemId[k], 1, &tmp);
+                    if(tmp && !bind)
+                        bind = tmp;
+                }
+
+                ConsumeInfo ci(EquipAttachSpirit,0,0);
+                m_Owner->useTael(10,&ci);
+                int idx = uRand(3);
+                UInt8 form = ied_equip.spiritAttr.spForm[idx];
+                UInt16 spLev = 1;
+                for(int i = idx - 1; i >= 0; -- i)
+                {
+                    if(ied_equip.spiritAttr.spForm[i] == form)
+                        ++ spLev;
+                }
+                ied_equip.spiritAttr.spLev[form - 1] += spLev + awardLev;
+                if(SPIRIT_LEVEL_MAX < ied_equip.spiritAttr.spLev[form - 1])
+                    ied_equip.spiritAttr.spLev[form - 1] = SPIRIT_LEVEL_MAX;
+                ied_equip.spiritAttr.spForm[0] = uRand(4) + 1;
+                ied_equip.spiritAttr.spForm[1] = uRand(4) + 1;
+                ied_equip.spiritAttr.spForm[2] = uRand(4) + 1;
+
+                DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spLev%u` = %u, `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", form, ied_equip.spiritAttr.spLev[form - 1], ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
+            }
+            break;
+        case 1:
+            {
+                if(!DelItemAny(SPIRIT_TRANS_ITEM, 1, &bind))
+                    return;
+
+                ied_equip.spiritAttr.spForm[0] = uRand(4) + 1;
+                ied_equip.spiritAttr.spForm[1] = uRand(4) + 1;
+                ied_equip.spiritAttr.spForm[2] = uRand(4) + 1;
+                DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spform1` = %u, `spform2` = %d, `spform3` = %u WHERE `id` = %u", ied_equip.spiritAttr.spForm[0], ied_equip.spiritAttr.spForm[1], ied_equip.spiritAttr.spForm[2], equip->getId());
+            }
+            break;
+        default:
+            return;
+        }
+
+        if(!equip->GetBindStatus() && bind)
+            equip->DoEquipBind();
+		if(fgt != NULL)
+        {
+            fgt->setDirty();
+			fgt->sendModification(0x21 + pos, equip, false);
+        }
+		else
+			SendSingleEquipData(equip);
+
+		Stream st(REP::EQ_SPIRIT);
+		st << type << fighterId << itemId << Stream::eos;
+		m_Owner->send(st);
+    }
+
+    void Package::GenSpirit(ItemEquip* equip)
+    {
+        ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+        if(equip->getQuality() == 5 && esa.spForm[0] == 0)
+        {
+            esa.spForm[0] = GRND(4) + 1;
+            esa.spForm[1] = GRND(4) + 1;
+            esa.spForm[2] = GRND(4) + 1;
+            DB4().PushUpdateData("INSERT INTO `equipment_spirit` (`id`, `splev1`, `splev2`, `splev3`, `splev4`, `spform1`, `spform2`, `spform3`) values (%u, 0, 0, 0, 0, %u, %u, %u)", equip->getId(), esa.spForm[0], esa.spForm[1], esa.spForm[2]);
+        }
+    }
 }

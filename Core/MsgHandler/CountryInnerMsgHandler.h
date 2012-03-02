@@ -1279,4 +1279,34 @@ void OnHeroMemo( GameMsgHdr& hdr, const void* data )
     player->OnHeroMemo(msg[0], msg[1], msg[2], msg[3]);
 }
 
+void OnTownDeamonlBeAttack( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+	struct TDBeAttackData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+
+	TDBeAttackData* tdabd = reinterpret_cast<TDBeAttackData*>(const_cast<void *>(data));
+
+    townDeamonManager->beAttackByPlayer(player, tdabd->attacker, tdabd->formation, tdabd->portrait, tdabd->lineup);
+}
+
+void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct TDResNotify
+    {
+        GObject::Player * peer;
+        bool win;
+    };
+    TDResNotify* notify = reinterpret_cast<TDResNotify*>(const_cast<void *>(data));
+
+    townDeamonManager->notifyChallengeResult(player, notify->peer, notify->win);
+}
+
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
