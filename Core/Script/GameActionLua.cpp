@@ -75,6 +75,7 @@ namespace Script
 		lua_tinker::def(_L, "Broadcast",	SysBroadcast);
 		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
+		lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
 		lua_tinker::def(_L, "getChristmas",	GObject::World::getChristmas);
@@ -82,6 +83,7 @@ namespace Script
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
+		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -115,6 +117,7 @@ namespace Script
 		CLASS_DEF(Player, AddExp);
 		CLASS_DEF(Player, AddPExp);
 		CLASS_DEF(Player, AddPExpBy);
+		CLASS_DEF(Player, AddItemBy);
 		CLASS_DEF(Player, getGold);
 		CLASS_DEF(Player, useGold);
 		CLASS_DEF(Player, getCoupon);

@@ -41,6 +41,21 @@
 
 static memcached_st* memc = NULL;
 
+bool getId(char buf[64]);
+bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
+
+#define CHKKEY() \
+{\
+    UInt8 hash[64] = {0};\
+    if (!br.read(hash, 36))\
+        return;\
+    char id[64] = {0};\
+    if (!getId(id))\
+        return;\
+    if (!checkKey(1, hash, atoll(id)))\
+        return;\
+}
+
 static bool initMemcache()
 {
     bool hasServer = false;
@@ -136,7 +151,10 @@ void UserDisconnect( GameMsgHdr& hdr, UserDisconnectStruct& )
 	player->SetSessionID(-1);
 	GameMsgHdr imh(0x200, player->getThreadId(), player, 0);
 	GLOBAL().PushMsg(imh, NULL);
+#ifdef _FB
+#else
     GObject::dclogger.decDomainOnlineNum(atoi(player->getDomain().c_str()));
+#endif
 }
 
 struct UserLogonRepStruct
@@ -268,19 +286,8 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
         return;
     }
 
-	SHA1Engine sha1;
-	sha1.update(ul._hashval + 8, 4);
-	sha1.update(cfg.cryptKey1.c_str(), cfg.cryptKey1.length());
-	sha1.update(ul._hashval, 4);
-	sha1.update(&ul._userid, sizeof(UInt64));
-	sha1.update(ul._hashval + 12, 4);
-	sha1.update(cfg.cryptKey2.c_str(), cfg.cryptKey2.length());
-	sha1.update(ul._hashval + 4, 4);
-
-	std::vector<UInt8> buf = sha1.digest();
 	UInt8 res;
-
-	if(!cfg.GMCheck || memcmp(&buf.front(), ul._hashval + 16, 20) == 0)
+	if(!cfg.GMCheck || checkKey(0, ul._hashval, ul._userid))
 	{
 		Network::GameClient * cl = static_cast<Network::GameClient *>(conn.get());
 		GObject::Player * player = NULL;
@@ -305,7 +312,10 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		if(res == 0)
 		{
             TRACE_LOG("登陆成功, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
+#ifdef _FB
+#else
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
+#endif
             player->setQQVipl(ul._level);
             player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
@@ -315,8 +325,11 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
 		else if(res == 4)
 		{
             TRACE_LOG("重复登陆, %s, %"I64_FMT"u, %"I64_FMT"u, %u, %d", ul._openid.c_str(), ul._userid, pid, hdr.sessionID, player->getThreadId());
+#ifdef _FB
+#else
             GObject::dclogger.decDomainOnlineNum(atoi(domain.c_str()));
             GObject::dclogger.incDomainOnlineNum(atoi(ul._platform.c_str()));
+#endif
             player->setQQVipl(ul._level);
             player->setQQVipl1(ul._level1);
             player->setQQVipYear(ul._isYear);
@@ -472,13 +485,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 		if(pl == NULL)
 			return;
 
-#if 0
-		// UInt16 loc = (nu._country == 1) ? 0x0005 : 0x1002;
-        // 先将_country移动置放置大地图id的高字节的高四位,然后+1初始化玩家的据点id
-#else
 		UInt16 loc = 0x0002;
-#endif
-
         UInt8 country = COUNTRY_NEUTRAL; // XXX: 低级玩家暂时规为中立
 
 		PLAYER_DATA(pl, name) = newname;
@@ -531,7 +538,10 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
+#ifdef _FB
+#else
             GObject::dclogger.incDomainOnlineNum(atoi(pl->getDomain().c_str()));
+#endif
 			CountryEnterStruct ces(false, 1, loc);
 			GameMsgHdr imh(0x1F0, country, pl, sizeof(CountryEnterStruct));
 			GLOBAL().PushMsg(imh, &ces);
@@ -574,7 +584,6 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 {
     BinaryReader br(data, hdr.msgHdr.bodyLen);
 
-    std::string token;
     std::string no;
     UInt64 player_Id;
     UInt16 id;
@@ -582,17 +591,36 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     std::string uint;
     std::string money;
 
+    UInt8 ret = 1;
+    std::string err = "";
+
+#ifdef _FB
+    UInt8 hash[64] = {0};
+    if (!br.read(hash, 36))
+        return;
+
+    br>>no;
+    br>>player_Id;
+
+    if (!checkKey(2, hash, player_Id))
+    {
+        err += "Error Key";
+        err = 2;
+    }
+#else
+    std::string token;
     br>>token;
     br>>no;
     br>>player_Id;
+#endif
+
     br>>id;
     br>>num;
     br>>uint;
     br>>money;
 
-    UInt8 ret = 1;
-    std::string err = "";
-
+#ifdef _FB
+#else
     initMemcache();
     if (memc)
     {
@@ -646,6 +674,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     }
     else
         err += "token server error.";
+#endif
 
     if (no.length())
     {
@@ -807,38 +836,48 @@ bool getId(char buf[64])
     return true;
 }
 
-bool checkKey(const UInt8* _hashval, UInt64 _userid = 20110503ll)
+bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid = 20110503ll)
 {
     if (cfg.GMCheck)
     {
         SHA1Engine sha1;
+        std::string key1, key2;
+
+        if (type == 0)
+        {
+            key1 = cfg.cryptKey1;
+            key2 = cfg.cryptKey2;
+        }
+        else if (type == 1)
+        {
+            key1 = cfg.gmCryptKey1;
+            key2 = cfg.gmCryptKey2;
+        }
+        else if (type == 2)
+        {
+            key1 = cfg.fbrCryptKey1;
+            key2 = cfg.fbrCryptKey2;
+        }
+        else
+        {
+            return false;
+        }
+
         sha1.update(_hashval + 8, 4);
-        sha1.update(cfg.gmCryptKey1.c_str(), cfg.gmCryptKey1.length());
+        sha1.update(key1.c_str(), key1.length());
         sha1.update(_hashval, 4);
         sha1.update(&_userid, sizeof(UInt64));
         sha1.update(_hashval + 12, 4);
-        sha1.update(cfg.gmCryptKey2.c_str(), cfg.gmCryptKey2.length());
+        sha1.update(key2.c_str(), key2.length());
         sha1.update(_hashval + 4, 4);
 
         std::vector<UInt8> buf = sha1.digest();
 
-        if(memcmp(&buf.front(), _hashval + 16, 20) == 0)
+        if (memcmp(&buf.front(), _hashval + 16, 20) == 0)
             return true;
         return false;
     }
     return true;
-}
-
-#define CHKKEY() \
-{\
-    UInt8 hash[64] = {0};\
-    if (!br.read(hash, 36))\
-        return;\
-    char id[64] = {0};\
-    if (!getId(id))\
-        return;\
-    if (!checkKey(hash, atoll(id)))\
-        return;\
 }
 
 void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
@@ -1259,6 +1298,8 @@ void ServerOnlineNum(LoginMsgHdr& hdr, const void * data)
 
 void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
 {
+#ifdef _FB
+#else
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
 	Stream st;
 	st.init(SPEP::ONLINEPF,0x01);
@@ -1282,6 +1323,7 @@ void ServerOnlinePFNum(LoginMsgHdr& hdr, const void * data)
     st.data<UInt8>(off) = count;
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+#endif
 }
 
 void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
@@ -1375,6 +1417,76 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	st<<Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 	
+	SAFE_DELETE(item);
+}
+
+void MailVIPFromBs(LoginMsgHdr &hdr,const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+	Stream st;
+	st.init(SPEP::MAILVIP,0x01);
+	std::string content;
+	std::string title;
+    UInt8 viplmin = 0;
+    UInt8 viplmax = 0;
+	UInt32 money[4] = {0};
+	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
+	UInt16 nums = 0;
+	UInt8 bindType = 1;
+    CHKKEY();
+	br>>title>>content>>viplmin>>viplmax>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
+	std::string result="";
+	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
+	if(item == NULL)
+		return;
+	UInt8 count = {0};
+	memset(item, 0, sizeof(GObject::MailPackage::MailItem) * (nums + 5));
+
+    INFO_LOG("GM[%s]: %u, %u, %u, %u", __PRETTY_FUNCTION__, money[0], money[1], money[2], money[3]);
+	for(UInt32 i = 0; i < nums; i ++)
+	{
+		br>>item[i].id>>count;
+		item[i].count = count;
+        INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
+	}
+	for(UInt32 i = 0; i < 4; i ++)
+	{
+		if(money[i] == 0)
+			continue;
+		item[nums].id = moneyType[i];
+		item[nums++].count = money[i];
+	}
+
+    for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
+	{
+		GObject::Player* player=it->second;
+		if(player==NULL)
+		{
+			result+="1 ";
+		}
+		else
+		{
+            if (player->getVipLevel() < viplmin || player->getVipLevel() > viplmax)
+                continue;
+
+			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			if(pmail != NULL)
+			{
+				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
+				result +="0 ";
+                player->moneyLog(2, money[2], money[1], money[0], money[3]);
+			}
+			else
+			{
+				result +="2 ";
+			}
+		}
+	}
+	result=result.substr(0,result.length()-1);
+	st<<result;
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 	SAFE_DELETE(item);
 }
 

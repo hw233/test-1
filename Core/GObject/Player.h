@@ -700,6 +700,7 @@ namespace GObject
 		void AddExp(UInt64, UInt8 = 0);
 		void AddPExp(UInt32);
 		void AddPExpBy(Player*,UInt32);
+		void AddItemBy(Player*,UInt16,UInt16,bool);
 		void pendExp(UInt32, bool = false);
 		void setLevelAndExp(UInt8, UInt64);
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
@@ -1256,6 +1257,8 @@ namespace GObject
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
+                const char* str5, const char* str6, const char* type, UInt32 count = 1);
+        void udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);
         void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);

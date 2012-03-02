@@ -495,7 +495,8 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
 
                     pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 1);
 
-                    if (!World::getNewYear())
+                    bool girl = (World::getGirlDay() && !pl->IsMale());
+                    if (!World::getNewYear() && !girl)
                     {
                         // XXX: moneyNeed must greater than 1000
                         UInt32 pref = 0;

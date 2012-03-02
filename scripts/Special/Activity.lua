@@ -747,10 +747,33 @@ function ValentineDay(player, lootlvl, where)
     end
 end
 
+function GirlDay(player, lootlvl)
+    if getGirlDay() then
+        local item = {471, 472, 473, 474}
+
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+        local package = player:GetPackage();
+        for m = 1,itemNum[lootlvl] do
+            package:AddItem(item[math.random(1, #item)], 1, false);
+        end
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
     ValentineDay(player, lootlvl)
+    GirlDay(player, lootlvl)
 end
 
 
@@ -761,6 +784,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 1);
     ValentineDay(player, lootlvl)
+    GirlDay(player, lootlvl)
 end
 
 local vippack = {
@@ -928,6 +952,12 @@ function onValentineDay(player)
     if lvl >= 30 and player:GetVar(47) == 0 then
         sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且等级达到30级以上（包含30级）所有用户，都将获得【恋人之戒】", {1754,1,1});
         player:SetVar(47, 1)
+    end
+end
+
+function onGirlDay(player)
+    if not getGirlDay() then
+        return
     end
 end
 

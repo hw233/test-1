@@ -72,6 +72,7 @@ bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_valentineday = false;
+bool World::_girlday = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -359,7 +360,10 @@ void World::World_Online_Log( void * )
 {
 	UInt32 onlineNums=NETWORK()->getOnlineNum();
 	DBLOG1().PushUpdateData("insert into online_situations (server_id,divtime,num) values(%u,%u,%u)", cfg.serverLogId, TimeUtil::Now(), onlineNums);
+#ifdef _FB
+#else
     dclogger.online();
+#endif
 }
 
 void World::World_Athletics_Check( void * )

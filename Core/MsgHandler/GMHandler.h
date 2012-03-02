@@ -126,6 +126,7 @@ private:
     void OnGetHeroMemoAward(GObject::Player* player, std::vector<std::string>&);
     void OnSysDailog(GObject::Player* player, std::vector<std::string>&);
     void OnRegenAll(GObject::Player* player, std::vector<std::string>& args);
+    void OnSetBossHp(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

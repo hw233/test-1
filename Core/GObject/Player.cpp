@@ -907,8 +907,34 @@ namespace GObject
         }
         else
             udpLog("", "", "", "", "", "", "login");
+#ifdef _FB
+#else
         dclogger.login(this);
+#endif
 	}
+
+#define WEBDOWNLOAD 255
+#define OFFICAL 12
+
+    void Player::udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
+                const char* str5, const char* str6, const char* type, UInt32 count)
+    {
+        if (m_ulog)
+        {
+            char buf[1024] = {0};
+            char* pbuf = &buf[0];
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.qqvipl, cfg.serverNum, platform);
+
+            m_ulog->SetUserMsg(buf);
+            if (platform != WEBDOWNLOAD)
+                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
+            if (platform)
+                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
+
+            TRACE_LOG("%s", buf);
+        }
+    }
 
     void Player::udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count)
@@ -916,17 +942,10 @@ namespace GObject
         if (m_ulog)
         {
             UInt8 platform = atoi(getDomain().c_str());
-            char buf[1024] = {0};
-            char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.qqvipl, cfg.serverNum, platform);
+            if (platform == OFFICAL && strstr(m_via.c_str(), "webdownload"))
+                platform = WEBDOWNLOAD;
 
-            m_ulog->SetUserMsg(buf);
-            m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, 0);
-            if (platform)
-                m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
-
-            TRACE_LOG("%s", buf);
+            udpLog(platform, str1, str2, str3, str4, str5, str6, type, count);
         }
     }
 
@@ -1409,7 +1428,10 @@ namespace GObject
             PopTimerEvent(this, EVENT_TIMETICK, getId());
 
         LogoutSaveOnlineTimeToday();
+#ifdef _FB
+#else
         dclogger.logout(this);
+#endif
         heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
 	}
@@ -2848,13 +2870,6 @@ namespace GObject
 		}
 
         AddFriendAttainment(pl);
-
-        if (getFrendsNum() >= 10)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 2);
-        if (getFrendsNum() >= 5)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
-        if (getFrendsNum() >= 1)
-            OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
 		return true;
 	}
 
@@ -2907,6 +2922,16 @@ namespace GObject
 				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 0, %"I64_FMT"u)", getId(), pl->getId());
 		}
 		_friends[0].insert(pl);
+
+        if (notify || writedb)
+        {
+            if (getFrendsNum() >= 1)
+                OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 0);
+            if (getFrendsNum() >= 5)
+                OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 1);
+            if (getFrendsNum() >= 10)
+                OnHeroMemo(MC_CONTACTS, MD_STARTED, 0, 2);
+        }
 	}
 
 	void Player::delFriend( Player * pl )
@@ -3939,6 +3964,32 @@ namespace GObject
         }
         else
             AddPExp(pexp);
+    }
+
+    void Player::AddItemBy(Player* player, UInt16 item, UInt16 num, bool bind)
+    {
+        if (!player || !item || !num)
+            return;
+
+        if (isOnline())
+        {
+            struct ItemAdd
+            {
+                UInt16 item;
+                UInt16 num;
+                bool bind;
+            };
+
+            ItemAdd ia;
+            ia.item = item;
+            ia.num = num;
+            ia.bind = bind;
+
+            GameMsgHdr hdr2(0x241, this->getThreadId(), this, sizeof(ia));
+            GLOBAL().PushMsg(hdr2, &ia);
+        }
+        else
+            m_Package->AddItem(item, num, bind, true);
     }
 
 	void Player::AddExp(UInt64 exp, UInt8 mlvl)
@@ -7532,7 +7583,10 @@ namespace GObject
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
 
+#ifdef _FB
+#else
                     dclogger.d3d6(this);
+#endif
                 }
                 else
                 {
@@ -7580,7 +7634,10 @@ namespace GObject
                         GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
                     }
 
+#ifdef _FB
+#else
                     dclogger.blue(this);
+#endif
                 }
                 else
                 {
@@ -8344,12 +8401,14 @@ namespace GObject
             if (fgt->getAcupointsBit(3) == 3)
                 GetHeroMemo()->setMemo(MC_CITTA, MD_STARTED, 1, 2, 1);
         }
+
         if (getFrendsNum() >= 10)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 2, 1);
         if (getFrendsNum() >= 5)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 1, 1);
         if (getFrendsNum() >= 1)
             GetHeroMemo()->setMemo(MC_CONTACTS, MD_STARTED, 0, 0, 1);
+
         if (_fighters.size() > 9)
         {
             GetHeroMemo()->setMemo(MC_FIGHTER, MD_ADVANCED, 0, 1, 1);
@@ -8360,7 +8419,7 @@ namespace GObject
         if(it != m_clanSkill.end())
         {
             ClanSkill& cs = it->second;
-            if (cs.level == 3)
+            if (cs.level >= 3)
                 GetHeroMemo()->setMemo(MC_CONTACTS, MD_ADVANCED, 0, 2, 1);
         }
     }

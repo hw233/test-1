@@ -143,6 +143,12 @@ function onActivityCheck(tm)
       setValentineDay(false)
   end
 
+  if tm >= actTime19 and tm < actTime20 then
+      setGirlDay(true)
+  else
+      setGirlDay(false)
+  end
+
   loadStore()
 end
 
@@ -156,6 +162,8 @@ function initActTime(y, m, d)
   local  SerStartTm7 = { ['year'] = 2012, ['month'] = 1, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm8 = { ['year'] = 2012, ['month'] = 1, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm9 = { ['year'] = 2012, ['month'] = 2, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTm10= { ['year'] = 2012, ['month'] = 3, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm10= { ['year'] = 2012, ['month'] = 2, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -183,6 +191,9 @@ function initActTime(y, m, d)
 
   actTime17 = os.time(SerStartTm9);
   actTime18 = os.time(SerStartTm9) + 7 * 86400;
+
+  actTime19 = os.time(SerStartTm10);
+  actTime20 = os.time(SerStartTm10) + 2 * 86400;
 
   onActivityCheck(os.time() + 30);
 

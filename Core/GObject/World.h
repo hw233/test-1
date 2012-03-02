@@ -4,6 +4,7 @@
 #include "MsgHandler/WorldMsgHandler.h"
 #include "Server/WorkerThread.h"
 #include "Common/Stream.h"
+#include "Server/Cfg.h"
 
 namespace Network
 {
@@ -38,6 +39,9 @@ public:
 public:
 	inline UInt32 ThisDay() { return _today; }
 	inline UInt32 Now() { return _now; }
+
+    inline static bool isFBVersion() { return cfg.fbVersion; }
+
 	inline static void setActivityStage(int stage)
 	{ _activityStage = stage; }
 	inline static int getActivityStage()
@@ -85,6 +89,10 @@ public:
     { _valentineday = v; }
     inline static bool getValentineDay()
     { return _valentineday; }
+    inline static void setGirlDay(bool v)
+    { _girlday = v; }
+    inline static bool getGirlDay()
+    { return _girlday; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -116,6 +124,7 @@ public:
     static bool _blueactiveday;
     static bool _rechargeactive;
     static bool _valentineday;
+    static bool _girlday;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

@@ -476,7 +476,8 @@ void FrontMap::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool in
 
                     pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 1);
 
-                    if (!World::getNewYear())
+                    bool girl = (World::getGirlDay() && !pl->IsMale());
+                    if (!World::getNewYear() && !girl)
                     {
                         UInt32 pref = 0;
                         UInt8 div = 1;
