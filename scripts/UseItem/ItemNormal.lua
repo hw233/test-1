@@ -7307,7 +7307,7 @@ function ItemNormalOther_00000475(iid, num, bind, other)
 
     package:AddItem(item, 1, 1, 0, 2)
     if broad[k] == 1 then
-        Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]祝[p:"..other:getCountry()..":"..other:getPName().."]节日快乐～并送上了[4:"..item.."]x1作为礼物～")
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]祝[p:"..other:getCountry()..":"..other:getPName().."]节日快乐～并送上了[4:"..item.."]x1作为礼物～")
     end
     other:AddItemBy(player, item, 1, true)
     package:DelItemSendMsg(475, player)

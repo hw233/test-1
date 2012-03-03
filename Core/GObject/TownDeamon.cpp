@@ -611,7 +611,7 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 		ConsumeInfo ci(TownDeamonAuto,0,0);
 		pl->useTael(maxCnt * TD_AUTO_TAEL,&ci);
         st << static_cast<UInt16>(dpd->curLevel + maxCnt);
-        for(int idx = 0; idx < maxCnt ; ++idx)
+        for(UInt32 idx = 0; idx < maxCnt ; ++idx)
         {
             GData::NpcGroups::iterator it = GData::npcGroups.find(m_Monsters[idx + dpd->curLevel].npcId);
             if(it == GData::npcGroups.end())
