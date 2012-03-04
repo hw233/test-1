@@ -183,6 +183,7 @@ void World::makeActivityInfo(Stream &st)
 
     UInt8 active = _newyear?1:0;
     active |= _rechargeactive?2:0;
+    active |= _girlday?4:0;
     st << active << Stream::eos;
 }
 void World::calWeekDay()
