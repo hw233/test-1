@@ -223,7 +223,8 @@ void TcpSlaveServer::_remove( int id )
 			int rrid = rid;
 			do
 			{
-				_emptySet.erase(rrid);
+                if (!_emptySet.empty())
+                    _emptySet.erase(rrid);
 				-- rrid;
 			}
 			while(rrid >= 0 && _conduits[rrid].get() == NULL);
