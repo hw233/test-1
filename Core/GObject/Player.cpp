@@ -6059,9 +6059,11 @@ namespace GObject
 			Lineup& pd = _playerData.lineup[i];
 			if(pd.fighter != NULL && (pd.fighter->getCurrentHP() != 0 || full))
 			{
+#if 0
                 if (full)
                     pd.fighter->setCurrentHP(pd.fighter->getMaxHP());
                 else
+#endif
                     pd.fighter->setCurrentHP(0);
 			}
 		}

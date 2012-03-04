@@ -1181,7 +1181,7 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
         if(lev2 > 0)
             ae.pirlvl += GData::spiritAttrTable[lev2-1].pierce_lvl;
         if(lev3 > 0)
-            ae.criticaldmg += GData::spiritAttrTable[lev3-1].critical_dmg;
+            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/10000.f);
         break;
     case Item_Ring:
         if(lev0 > 0)
@@ -1194,7 +1194,7 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
         if(lev2 > 0)
             ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
         if(lev3 > 0)
-            ae.criticaldmg += GData::spiritAttrTable[lev3-1].critical_dmg;
+            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/10000.f);
         break;
     default:
         return;
