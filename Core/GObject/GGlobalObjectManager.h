@@ -114,6 +114,40 @@ public:
 		}
 	}
 
+    void reset()
+    {
+        Mutex::ScopedLock lk(_objMutex);
+        typename std::unordered_map<_VK, _VT * >::iterator it;
+        for(it = _objs.begin(); it != _objs.end(); ++ it)
+        {
+            delete it->second;
+        }
+        _objs.clear();
+    }
+
+    inline void resetExcept(std::set<UInt64>& eset)
+    {
+        Mutex::ScopedLock lk(_objMutex);
+        typename std::unordered_map<_VK, _VT *>::iterator it = _objs.begin();
+        while(it != _objs.end())
+        {
+            if(eset.find(it->first) == eset.end())
+            {
+                delete it->second;
+                _objs.erase(it ++);
+            }
+            else
+                ++ it;
+        }
+    }
+
+    inline _VT* find(UInt64 id, int channelId, int serverId)
+    {
+        UInt64 pid = (id & 0xFFFF00FFFFFFFFFFull) | (static_cast<UInt64>(channelId) << 40);
+        if((pid >> 48) == 0)
+            pid |= static_cast<UInt64>(serverId) << 48;
+        return operator[](pid);
+    }
 
     void enumerate(Visitor<_VT>& visitor)
     {

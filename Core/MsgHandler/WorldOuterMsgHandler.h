@@ -11,7 +11,6 @@
 #include "Server/OidGenerator.h"
 #include "Server/SysMsg.h"
 #include "Server/Cfg.h"
-#include "GObject/Arena.h"
 #include "GObject/Leaderboard.h"
 #include "GObject/CountryBattle.h"
 #include "GObject/Clan.h"
@@ -27,10 +26,18 @@
 #include "GObject/Mail.h"
 #include "GObject/ClanManager.h"
 #include "GObject/PracticePlace.h"
-
 #include "Common/Stream.h"
 #include "Common/BinaryReader.h"
 #include "GData/Money.h"
+
+#ifdef _ARENA_SERVER
+#include "GObject/GameServer.h"
+#include "GObject/Stage.h"
+#include "Network/ArenaClient.h"
+#include "Battle/BattleReport.h"
+#else
+#include "GObject/Arena.h"
+#endif
 
 #include <mysql.h>
 
@@ -1468,5 +1475,424 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 	}
 }
 
+#ifdef _ARENA_SERVER
+void onServerReg(LoginMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_BR(br);
+	std::string channelName;
+	int channelId = 0;
+	int sno = 0;
+	int mno = 0;
+	br >> channelName >> channelId >> sno >> mno;
+	if(channelName.empty())
+		return;
+	if(sno == 0)
+		return;
+	std::set<int> mlist;
+	for(int i = 0; i < mno; ++ i)
+	{
+		int mid;
+		br >> mid;
+		mlist.insert(mid);
+	}
+	TcpConnection conn = NETWORK()->GetConn(hdr.sessionId);
+	Network::ArenaClient * aconn = static_cast<Network::ArenaClient *>(conn.get());
+	aconn->SetChannelId(channelId);
+	aconn->SetServerId(sno);
+	GObject::GameServer * gs = GObject::gameServers.add(channelName, channelId, sno, mlist, hdr.sessionId);
+	if(gs == NULL)
+	{
+		Stream st(0x01);
+		st << static_cast<UInt8>(1) << Stream::eos;
+		aconn->send(&st[0], st.size());
+	}
+	else
+	{
+		int type = GObject::gameServers.channelType(channelId);
+		switch(type)
+		{
+		case 1:
+			if(GObject::stageManager.isGlobal() > 1)
+				return;
+			break;
+		case 2:
+			if(GObject::stageManager.isGlobal() <= 1)
+				return;
+			break;
+		case 3:
+			return;
+		}
+		Stream st;
+		GObject::stageManager.makeInfo(st, channelId, sno, true);
+		aconn->send(&st[0], st.size());
+	}
+}
+
+template<class T, class DT>
+static T* readEquip(BinaryReader& br)
+{
+	UInt16 typeId;
+	UInt8 extraCount;
+	br >> typeId;
+	if(typeId == 0)
+		return NULL;
+	const GData::ItemBaseType * itype = GData::itemBaseTypeManager[typeId];
+	if(itype == NULL)
+		return NULL;
+	GObject::ItemEquipData edata;
+	br >> edata.enchant >> extraCount;
+	if(edata.enchant > ENCHANT_LEVEL_MAX || extraCount > 3)
+		return NULL;
+	switch(extraCount)
+	{
+	case 1:
+		br >> edata.extraAttr2.type1 >> edata.extraAttr2.value1;
+		break;
+	case 2:
+		br >> edata.extraAttr2.type1 >> edata.extraAttr2.value1;
+		br >> edata.extraAttr2.type2 >> edata.extraAttr2.value2;
+		break;
+	case 3:
+		br >> edata.extraAttr2.type1 >> edata.extraAttr2.value1;
+		br >> edata.extraAttr2.type2 >> edata.extraAttr2.value2;
+		br >> edata.extraAttr2.type3 >> edata.extraAttr2.value3;
+		break;
+	default:
+		break;
+	}
+	br >> edata.sockets;
+	if(edata.sockets > 6)
+		return NULL;
+	for(int i = 0; i < edata.sockets; ++ i)
+		br >> edata.gems[i];
+	return new(std::nothrow) T(*static_cast<const DT *>(itype), edata);
+}
+
+static UInt8 readEquips(GObject::Player * player, BinaryReader& br)
+{
+	UInt8 formation, fgtCount;
+	br >> formation >> fgtCount;
+	if(fgtCount == 0 || fgtCount > 5)
+	{
+		return 1;
+	}
+	else
+	{
+		DB().PushUpdateData("DELETE FROM `fighter` WHERE `playerId` = %"I64_FMT"u", player->getId());
+		for(UInt8 i = 0; i < fgtCount; ++ i)
+		{
+			UInt8 pos;
+			UInt16 fgtId;
+			UInt8 level;
+			UInt8 potential;
+			UInt16 skillId;
+			UInt8 flag;
+			br >> pos >> fgtId >> level >> potential >> skillId >> flag;
+			GObject::Fighter * fgt = player->findFighter(fgtId);
+			if(fgt == NULL)
+			{
+				GObject::Fighter * specfgt = GObject::globalFighters[fgtId];
+				if(specfgt == NULL)
+					continue;
+				fgt = specfgt->clone(player);
+				if(fgt == NULL)
+					continue;
+				player->addFighter(fgt, false);
+			}
+			GObject::Lineup& lu = player->getLineup(i);
+			if(lu.fid != fgtId || lu.pos != pos)
+			{
+				lu.fighter = fgt;
+				lu.pos = pos;
+				lu.updateId();
+			}
+			fgt->setLevel(level);
+			fgt->setPotential(static_cast<float>(potential) / 100.0f);
+			fgt->setSkillAndLevel(skillId);
+			UInt32 p = static_cast<UInt32>(fgt->getPotential() * 100 + 0.5);
+			DB().PushUpdateData("REPLACE INTO `fighter`(`id`, `playerId`, `potential`, `level`, `skill`) VALUES(%u, %"I64_FMT"u, %u.%02u, %u, %u)", fgtId, player->getId(), p / 100, p % 100, fgt->getLevel(), fgt->getSkillAndLevel());
+			GObject::ItemWeapon * weapon;
+			GObject::ItemArmor * armor;
+			GObject::ItemEquip * equip;
+			if(flag & 0x01)
+			{
+				weapon = readEquip<GObject::ItemWeapon, GData::ItemWeaponType>(br);
+				weapon = fgt->setWeapon(weapon);
+				if(weapon != NULL)
+					delete weapon;
+			}
+			if(flag & 0x02)
+			{
+				armor = readEquip<GObject::ItemArmor, GData::ItemEquipType>(br);
+				armor = fgt->setArmor(0, armor);
+				if(armor != NULL)
+					delete armor;
+			}
+			if(flag & 0x04)
+			{
+				armor = readEquip<GObject::ItemArmor, GData::ItemEquipType>(br);
+				armor = fgt->setArmor(1, armor);
+				if(armor != NULL)
+					delete armor;
+			}
+			if(flag & 0x08)
+			{
+				armor = readEquip<GObject::ItemArmor, GData::ItemEquipType>(br);
+				armor = fgt->setArmor(2, armor);
+				if(armor != NULL)
+					delete armor;
+			}
+			if(flag & 0x10)
+			{
+				armor = readEquip<GObject::ItemArmor, GData::ItemEquipType>(br);
+				armor = fgt->setArmor(3, armor);
+				if(armor != NULL)
+					delete armor;
+			}
+			if(flag & 0x20)
+			{
+				armor = readEquip<GObject::ItemArmor, GData::ItemEquipType>(br);
+				armor = fgt->setArmor(4, armor);
+				if(armor != NULL)
+					delete armor;
+			}
+			if(flag & 0x40)
+			{
+				equip = readEquip<GObject::ItemEquip, GData::ItemEquipType>(br);
+				equip = fgt->setAmulet(equip);
+				if(equip != NULL)
+					delete equip;
+			}
+			if(flag & 0x80)
+			{
+				equip = readEquip<GObject::ItemEquip, GData::ItemEquipType>(br);
+				equip = fgt->setRing(equip);
+				if(equip != NULL)
+					delete equip;
+			}
+		}
+		for(UInt8 i = fgtCount; i < 5; ++ i)
+		{
+			GObject::Lineup& lu = player->getLineup(i);
+			if(lu.fighter != NULL)
+			{
+				lu.fighter = NULL;
+				lu.pos = 0;
+				lu.updateId();
+			}
+		}
+		player->setFormation(formation, false);
+		player->storeFighters();
+	}
+	return 0;
+}
+
+void onPlayerEnter(GameMsgHdr& hdr, const void * data)
+{
+	if(hdr.serverId >= 4096 || hdr.channelId >= 256)
+		return;
+	int type = GObject::gameServers.channelType(hdr.channelId);
+	switch(type)
+	{
+	case 1:
+		if(GObject::stageManager.isGlobal() > 1)
+			return;
+		break;
+	case 2:
+		if(GObject::stageManager.isGlobal() <= 1)
+			return;
+		break;
+	case 3:
+		return;
+	}
+	UInt8 pg = GObject::stageManager.getProgress();
+	if(pg == 1 || pg == 4 || pg == 5 || pg == 6)
+	{
+		MSG_QUERY_BR(br);
+		UInt64 id;
+		std::string name;
+		UInt8 flag;
+		br >> id >> name >> flag;
+		if(name.empty())
+			return;
+		int pos = static_cast<int>(name.size()) - 1;
+		if(static_cast<UInt8>(name[pos]) < 32)
+		{
+			do
+			{
+				-- pos;
+			}
+			while(pos >= 0 && static_cast<UInt8>(name[pos]) < 32);
+			if(pos < 0)
+				return;
+			name.erase(name.begin() + pos + 1, name.end());
+		}
+		UInt8 r = 0;
+		UInt8 entered = 0xFF;
+		UInt8 title = flag & 0x7F;
+		bool newplayer = false;
+		UInt64 pid = id | (static_cast<UInt64>(hdr.channelId) << 40);
+		if((pid >> 48) == 0)
+			pid |= (static_cast<UInt64>(hdr.serverId) << 48);
+		GObject::Player * player = GObject::globalPlayers[pid];
+		if(player == NULL)
+		{
+			player = new(std::nothrow) GObject::Player(pid);
+			if(player == NULL)
+				r = 1;
+			else
+				newplayer = true;
+		}
+		if(r == 0)
+		{
+			PLAYER_DATA(player, name) = name;
+			PLAYER_DATA(player, title) = title;
+			DB().PushUpdateData("REPLACE INTO `player`(`id`, `name`, `title`, `entered`) VALUES (%"I64_FMT"u, '%s', %u, %u)", player->getId(), player->getName().c_str(), player->getTitle(), player->getEntered());
+			r = readEquips(player, br);
+			if(r == 0)
+			{
+				GObject::globalPlayers.add(player);
+				entered = GObject::stageManager.enter(player);
+				player->setEntered(entered);
+			}
+		}
+		if(r != 0 && newplayer)
+		{
+			DB().PushUpdateData("DELETE FROM `player` WHERE `id` = %"I64_FMT"u", player->getId());
+			delete player;
+		}
+		Stream st(0x02);
+		if(entered >= STAGE_GROUPS)
+			r = 1;
+		st << r << id << entered;
+		if(player == NULL || r != 0)
+			st << "";
+		else
+		{
+			st << player->getDisplayName();
+			st << player->getFormation();
+			for(int i = 0; i < 5; ++ i)
+			{
+				GObject::Lineup& lu = player->getLineup(i);
+				if(lu.available())
+					st << static_cast<UInt16>(lu.fighter->getId()) << lu.fighter->getLevel() << lu.fighter->getColor();
+				else
+					st << static_cast<UInt32>(0);
+			}
+		}
+		st << Stream::eos;
+		player->send(st);
+	}
+	else
+	{
+		Stream st(0x02);
+		st << static_cast<UInt8>(1) << static_cast<UInt64>(0) << static_cast<UInt8>(0) << "" << Stream::eos;
+		GObject::gameServers.send(hdr.channelId, hdr.serverId, &st[0], st.size());
+	}
+}
+
+void onLineupCommit(GameMsgHdr& hdr, const void * data)
+{
+	int type = GObject::gameServers.channelType(hdr.channelId);
+	switch(type)
+	{
+	case 1:
+		if(GObject::stageManager.isGlobal() > 1)
+			return;
+		break;
+	case 2:
+		if(GObject::stageManager.isGlobal() <= 1)
+			return;
+		break;
+	case 3:
+		return;
+	}
+	MSG_QUERY_BR(br);
+	UInt64 id;
+	br >> id;
+	UInt8 r = 0;
+	GObject::Player * player = GObject::globalPlayers.find(id, hdr.channelId, hdr.serverId);
+	if(player == NULL)
+	{
+		r = 1;
+		Stream st(0x03);
+		st << r << id << Stream::eos;
+		GObject::gameServers.send(hdr.channelId, hdr.serverId, &st[0], st.size());
+	}
+	else
+	{
+		r = readEquips(player, br);
+		Stream st(0x03);
+		st << r << id;
+		st << player->getFormation();
+		for(int i = 0; i < 5; ++ i)
+		{
+			GObject::Lineup& lu = player->getLineup(i);
+			if(lu.available())
+				st << static_cast<UInt16>(lu.fighter->getId()) << lu.fighter->getLevel() << lu.fighter->getColor();
+			else
+				st << static_cast<UInt32>(0);
+		}
+		st << Stream::eos;
+		player->send(st);
+	}
+}
+
+void onBetInfo(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_BR(br);
+	GObject::BetsInfo bi[STAGE_GROUPS];
+	for(int i = 0; i < STAGE_GROUPS; ++ i)
+	{
+		for(int j = 0; j < 32; ++ j)
+		{
+			br >> bi[i].count[j];
+		}
+	}
+	GObject::stageManager.pushBetsInfo(hdr.channelId, hdr.serverId, bi);
+}
+
+void onSingleBet(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_BR(br);
+	UInt8 group = 0, pos = 0;
+	UInt32 count = 0;
+	br >> group >> pos >> count;
+	GObject::stageManager.pushSingleBet(hdr.channelId, hdr.serverId, group, pos, count);
+}
+
+void BattleReportReq(LoginMsgHdr& hdr, const void * data)
+{
+	if(hdr.msgHdr.bodyLen < sizeof(UInt32))
+		return;
+	UInt32 battleId = *reinterpret_cast<const UInt32 *>(data);
+	std::vector<UInt8> *r = Battle::battleReport[battleId];
+	if(r == NULL)
+		return;
+	NETWORK()->SendMsgToClient(hdr.sessionId, &(*r)[0], r->size());
+}
+
+void onDisconnected(GameMsgHdr& hdr, const void * data)
+{
+	GObject::gameServers.del(hdr.channelId, hdr.serverId);
+}
+
+void GmHandlerFromBs(LoginMsgHdr &hdr,const void * data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+	Stream st;
+	st.init(0x04,0x01);
+	std::string playerNameList;
+	std::string cmd;
+	br>>playerNameList;
+	br>>cmd;
+	if(gmHandler.Handle(cmd, NULL, true))
+		st<<"0";
+	else
+		st<<"1";
+	st<<Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionId,st);
+}
+#endif
 
 #endif // _WORLDOUTERMSGHANDLER_H_

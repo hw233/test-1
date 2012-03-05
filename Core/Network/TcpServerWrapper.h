@@ -1,7 +1,11 @@
 #ifndef _TCPSERVERWRAPPER_INC_
 #define _TCPSERVERWRAPPER_INC_
 
+#ifdef _ARENA_SERVER
+#include "ArenaClient.h"
+#else
 #include "GameClient.h"
+#endif
 #include "ArenaConn.h"
 #include "TcpServer.h"
 #include "Common/Stream.h"
@@ -10,6 +14,18 @@ typedef std::shared_ptr<Network::TcpConduit> TcpConnection;
 
 namespace Network
 {
+#ifdef _ARENA_SERVER
+    class TcpSlaveWrapper:
+        public TcpSlaveServerT<ArenaClient>
+    {
+        public:
+            TcpSlaveWrapper(UInt32 idx): TcpSlaveServerT<ArenaClient>(idx) {}
+            virtual TcpConduit * newConnection(int ss, TcpSlaveServer * s, int id)
+            {
+                return NULL;
+            }
+    };
+#else
 	class TcpSlaveWrapper:
 		public TcpSlaveServerT<GameClient>
 	{
@@ -29,13 +45,18 @@ namespace Network
 			return NULL;
 		}
 	};
+#endif
 
 	class TcpServerWrapper
 	{
 	public:
 		TcpServerWrapper(UInt16 port)
 		{
+#ifdef _ARENA_SERVER
+            m_TcpService = new TcpMasterServerT<ArenaClient, TcpSlaveWrapper>(port);
+#else
 			m_TcpService = new TcpMasterServerT<GameClient, TcpSlaveWrapper>(port);
+#endif
 			assert(m_TcpService != NULL);
 			m_Active = true;
 		}
@@ -108,7 +129,11 @@ namespace Network
 	private:
 		bool m_Active;
 		Thread m_TcpThread;
+#ifdef _ARENA_SERVER
+        TcpMasterServerT<Network::ArenaClient, TcpSlaveWrapper>* m_TcpService;
+#else
 		TcpMasterServerT<Network::GameClient, TcpSlaveWrapper>* m_TcpService;
+#endif
 	};
 
 //////////////////////////////////////////////////////////////////////////

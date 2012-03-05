@@ -51,6 +51,9 @@
 #include "GData/ClanSkillTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
+#ifdef _ARENA_SERVER
+#include "GameServer.h"
+#endif
 
 #include <cmath>
 
@@ -563,7 +566,11 @@ namespace GObject
 	}
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
-		_isJumpingMap(false), _isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
+		_isJumpingMap(false),
+#ifdef _ARENA_SERVER
+        _channelId(static_cast<int>(id >> 40) & 0xFF), _serverId(static_cast<int>(id >> 48)),
+#endif
+        _isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
@@ -1779,6 +1786,19 @@ namespace GObject
 	{
 		return (!_fighters.empty()) ? _fighters.begin()->second->getLevel() : LEVEL_MAX;
 	}
+
+    UInt8 Player::GetColor() const
+    {
+        return (!_fighters.empty()) ? _fighters.begin()->second->getColor() : 0;
+    }
+
+    UInt8 Player::getPortraitAndColor() const
+    {
+        if(_fighters.empty())
+            return 0;
+        Fighter * fgt = _fighters.begin()->second;
+        return (fgt->getColor() << 3) + fgt->getId();
+    }
 
 	UInt64 Player::GetExp() const
 	{
@@ -5289,6 +5309,12 @@ namespace GObject
 		setBuffData(0, autohp);
 	}
 
+#ifdef _ARENA_SERVER
+	UInt32 Player::getClientAddress()
+	{
+        return 0;
+    }
+#else
 	UInt32 Player::getClientAddress()
 	{
         TcpConnection conn = NETWORK()->GetConn(this->GetSessionID());
@@ -5297,6 +5323,7 @@ namespace GObject
         Network::GameClient * client = static_cast<Network::GameClient *>(conn.get());
         return client->GetClientIP();
 	}
+#endif
 
 	void Player::makeWallow( Stream& st )
 	{
@@ -6930,6 +6957,23 @@ namespace GObject
 
 	void Player::rebuildBattleName()
 	{
+#ifdef _ARENA_SERVER
+        char numstr[16];
+        sprintf(numstr, "%u\n", _playerData.title);
+        GameServer * gs = gameServers(_channelId, _serverId);
+        if(gs != NULL)
+        {
+            char chstr[16];
+            sprintf(chstr, ".S%u", _serverId);
+            _battleName = gs->getChannel() + chstr + "\n" + numstr + _playerData.name;
+            _displayName = _playerData.name + "@" + gs->getChannel() + chstr;
+        }
+        else
+        {
+            _battleName = std::string("\n") + numstr + _playerData.name;
+            _displayName = _playerData.name;
+        }
+#else
 		char numstr[16];
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
@@ -6941,7 +6985,53 @@ namespace GObject
 			_battleName += numstr;
 		}
 		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+#endif
 	}
+
+#ifdef _ARENA_SERVER
+    void Player::setEntered( UInt8 e )
+    {
+        if(_playerData.entered == e)
+            return;
+        _playerData.entered = e;
+        DB().PushUpdateData("UPDATE `player` SET `entered` = %u WHERE `id` = %"I64_FMT"u", e, _id);
+    }
+
+    UInt64 Player::getOriginId(UInt64 id)
+    {
+        int channelId = static_cast<int>(id >> 40) & 0xFF, serverId = static_cast<int>(id >> 48);
+        if(gameServers.isMerged(channelId, serverId))
+            return id & 0xFFFF00FFFFFFFFFFull;
+        return id & 0xFFFFFFFFFFull;
+    }
+
+    UInt64 Player::getOriginId()
+    {
+        if(gameServers.isMerged(_channelId, _serverId))
+            return _id & 0xFFFF00FFFFFFFFFFull;
+        return _id & 0xFFFFFFFFFFull;
+    }
+
+    int Player::getRealServerId()
+    {
+        GameServer * gs = gameServers(_channelId, _serverId);
+        if(gs == NULL)
+            return 0;
+        if(gs->getMainId() < 0)
+            return _serverId;
+        return gs->getMainId();
+    }
+
+    int Player::getRealCSId()
+    {
+        GameServer * gs = gameServers(_channelId, _serverId);
+        if(gs == NULL)
+            return 0;
+        if(gs->getMainId() < 0)
+            return (_serverId << 8) + _channelId;
+        return (gs->getMainId() << 8) + _channelId;
+    }
+#endif
 
 	void Player::writeBookStoreIds()
 	{
