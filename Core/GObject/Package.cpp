@@ -47,6 +47,18 @@ namespace GObject
 
     extern URandom GRND;
 
+    // 注灵类型 spiritType[属性条][装备类型]
+    // 属性条:1, 2, 3, 4
+    // 装备类洗:1-武器，2-护头，3-护胸，4-护肩，5-护腰，6-护腿，7-项链，8-戒指
+    // spiritType:0-攻击，1-防御，2-暴击，3-破击，4-身法，5-坚韧，6-暴击伤害，7-生命
+    static int spiritType[4][8] = {
+        {0, 1, 1, 1, 1, 1, 0, 0},
+        {3, 4, 4, 4, 4, 4, 7, 7},
+        {2, 3, 5, 2, 5, 5, 3, 2},
+        {4, 7, 7, 7, 7, 7, 6, 6}
+    };
+    static UInt32 baseSpiritItem = 7000;
+
     UInt16 getRandOEquip(UInt8 lvl)
     {
         static const UInt16* equips[] = {OEquip50, OEquip60, OEquip70, OEquip80, OEquip90, OEquip100};
@@ -775,13 +787,12 @@ namespace GObject
 		return NULL;
 	}
 
-    ItemEquip* Package::AddUpgradeEquip(UInt32 typeId, bool notify, bool bind , ItemEquipData& ed, float * maxv)
+    ItemEquip* Package::AddUpgradeEquip(UInt32 typeId, UInt32 oldEquipId, bool notify, bool bind , ItemEquipData& ed, float * maxv)
     {
         const GData::ItemBaseType * itype = CheckBeforeEquipUpgrade(typeId);
         if(itype == NULL)
             return NULL;
 
-        //ItemEquipData ed = oldEquip->getItemEquipData();
         ItemEquipData edata = ed;
 
         ItemEquip * equip = NULL;
@@ -842,7 +853,7 @@ namespace GObject
 
         DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
         DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`,`socket3`,`socket4`, `socket5`, `socket6`) VALUES(%u, %u, %u, %u, %d, %u, %d, %u, %d, %u, %u,%u,%u,%u,%u,%u)", id, typeId, edata.enchant,edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3, edata.sockets, edata.gems[0], edata.gems[1], edata.gems[2], edata.gems[3], edata.gems[4],edata.gems[5]);
-        GenSpirit(equip);
+        DB4().PushUpdateData("UPDATE `equipment_spirit` SET `id` = %u WHERE `id` = %u", id, oldEquipId);
 
         SendSingleEquipData(equip);
         if(notify)
@@ -1296,11 +1307,12 @@ namespace GObject
                 return ret;
             }
         }
-        else if (GetItemSubClass(id) == Item_Normal)
+        else if (GetItemSubClass(id) == Item_Normal || GetItemSubClass(id) == Item_Soul)
         {
             ItemBase* item = GetItem(id, bind > 0);
             if (item && (item->getClass() == Item_Normal29 ||
-                         item->getClass() == Item_Normal28))
+                         item->getClass() == Item_Normal28 ||
+                         (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9)))
             {
                 ret = TrumpMerge(id, bind > 0);
                 if (ret)
@@ -1534,7 +1546,6 @@ namespace GObject
             if( GetItemAnyNum(id) < num)
                 return false;
         }
-
          
         for(UInt32 i = 0 ; i < stfs[0].m_stfs.size() ; i ++)
         {
@@ -2471,6 +2482,30 @@ namespace GObject
             }
         }
 
+        bool spirit = false;
+        {
+            ItemEquip* equip = static_cast<ItemEquip*>(item);
+            if (equip->isSpirited())
+            {
+                UInt8 itemClass = equip->getClass();
+                ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+                for (UInt8 i = 0; i < 4; ++i)
+                {
+                    if (!esa.spLev[i])
+                        continue;
+                    UInt8 lev = (esa.spLev[i]-1)/5 + 1;
+                    UInt32 tmpId = baseSpiritItem + spiritType[i][itemClass - 1] * 100 + lev;
+                    UInt32 count = (esa.spLev[i]%5)?((esa.spLev[i]%5)+1):6;
+                    if (tmpId && tmpId >= LSOUL_ID && tmpId <= RSOUL_ID)
+                    {
+                        AddItem(tmpId, count, isBound, silence, FromSplit);
+                        pushBackSplitItem( m_Owner, splitOut, tmpId, count );
+                        spirit = true;
+                    }
+                }
+            }
+        }
+
         if(itemOutId != 0 && count != 0)
         {
             if(item != NULL)
@@ -2499,6 +2534,7 @@ namespace GObject
         if(item != NULL)
             DelEquip2(static_cast<ItemEquip *>(item), ToSplit);
         
+        res &= (spirit?0:1);
 		return res;
 	}
 
@@ -3236,12 +3272,12 @@ namespace GObject
         }
 
         UInt32 oldEquipClass = oldEquip->getClass();
+        UInt32 oldEquipId = oldEquip->getId();
 
-        if( false == DelEquip2(oldEquip, ToEquipUpgrade))
+        if(false == DelEquip2(oldEquip, ToEquipUpgrade))
             return 2;
-        
 
-        ItemEquip*  pEquip = AddUpgradeEquip(newId, true, bind, ed , maxv);
+        ItemEquip*  pEquip = AddUpgradeEquip(newId, oldEquipId, true, bind, ed , maxv);
         if( pEquip == NULL)
             return 2;
 
@@ -3747,17 +3783,6 @@ namespace GObject
 
     void Package::AttachSpirit(UInt8 type, UInt16 fighterId, UInt32 itemId)
     {
-        // 注灵类型 spiritType[属性条][装备类型]
-        // 属性条:1, 2, 3, 4
-        // 装备类洗:1-武器，2-护头，3-护胸，4-护肩，5-护腰，6-护腿，7-项链，8-戒指
-        // spiritType:0-攻击，1-防御，2-暴击，3-破击，4-身法，5-坚韧，6-暴击伤害，7-生命
-        static int spiritType[4][8] = {
-            {0, 1, 1, 1, 1, 1, 0, 0},
-            {3, 4, 4, 4, 4, 4, 7, 7},
-            {2, 3, 5, 2, 5, 5, 3, 2},
-            {4, 7, 7, 7, 7, 7, 6, 6}
-        };
-        static UInt32 baseSpiritItem = 7000;
 
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
@@ -3869,7 +3894,7 @@ namespace GObject
             esa.spForm[0] = GRND(4) + 1;
             esa.spForm[1] = GRND(4) + 1;
             esa.spForm[2] = GRND(4) + 1;
-            DB4().PushUpdateData("INSERT INTO `equipment_spirit` (`id`, `splev1`, `splev2`, `splev3`, `splev4`, `spform1`, `spform2`, `spform3`) values (%u, 0, 0, 0, 0, %u, %u, %u)", equip->getId(), esa.spForm[0], esa.spForm[1], esa.spForm[2]);
+            DB4().PushUpdateData("REPLACE INTO `equipment_spirit` (`id`, `splev1`, `splev2`, `splev3`, `splev4`, `spform1`, `spform2`, `spform3`) values (%u, 0, 0, 0, 0, %u, %u, %u)", equip->getId(), esa.spForm[0], esa.spForm[1], esa.spForm[2]);
         }
     }
 }

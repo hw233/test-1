@@ -255,5 +255,8 @@ MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);
 MSG_REG_2(GameMsgHdr, 0x239, OnPracticeAttack);
 MSG_REG_2(GameMsgHdr, 0x240, OnHeroMemo);
 MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
+#ifdef _FB
+MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
+#endif
 
 MSG_HANDLER_END()

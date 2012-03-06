@@ -669,6 +669,8 @@ namespace GObject
                 return (3<<4)|(_playerData.qqvipl-20);
             return 0;
         }
+        inline bool isYD() const { return _playerData.qqvipl >= 1 && _playerData.qqvipl <= 9; }
+        inline bool isBD() const { return _playerData.qqvipl >= 10 && _playerData.qqvipl <= 29; }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
@@ -990,6 +992,7 @@ namespace GObject
 		void addFriendFromDB(Player *);
 		void addBlockFromDB(Player *);
 		void addFoeFromDB(Player *);
+		void addCFriendFromDB(Player *);
 		bool addFriend(Player *);
         void AddFriendAttainment( Player* other);
 		void delFriend(Player *);
@@ -998,9 +1001,18 @@ namespace GObject
 		inline bool hasBlock(Player *pl) { Mutex::ScopedLock lk(_mutex); return _hasBlock(pl); }
 		bool addFoe(Player *);
 		bool delFoe(Player *);
+        bool addCFriend(Player*);
+        void delCFriend(Player*);
 		inline bool isFriendFull() { return _friends[0].size() >= 20; }
+        inline bool isCFriendFull() { return _friends[3].size() >= 20; }
         inline UInt32 getFrendsNum() const { return _friends[0].size(); }
+        inline UInt32 getCFrendsNum() const { return _friends[3].size(); }
 		bool testCanAddFriend(Player *);
+		bool testCanAddCFriend(Player *);
+#ifdef _FB
+        void tellCFriendLvlUp(UInt8);
+#endif
+        void OnCFriendLvlUp(Player*, UInt8);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
 
@@ -1107,6 +1119,8 @@ namespace GObject
 		bool _hasFriend( UInt8 type, Player * pl ) const;
 		inline Player * _findFriend(std::string& name) { return _findFriend(0, name); }
 		inline bool _hasFriend(Player *pl) const { return _hasFriend(0, pl); }
+		inline Player * _findCFriend(std::string& name) { return _findFriend(3, name); }
+		inline bool _hasCFriend(Player *pl) const { return _hasFriend(3, pl); }
 		inline Player * _findBlock(std::string& name) { return _findFriend(1, name); }
 		inline bool _hasBlock(Player *pl) const { return _hasFriend(1, pl); }
 		inline Player * _findFoe(std::string& name) { return _findFriend(2, name); }
@@ -1116,6 +1130,8 @@ namespace GObject
 		void pushFriendAct(FriendActStruct * fas);
 		void addFriendInternal(Player *, bool, bool = true);
 		void delFriendInternal(Player *, bool = true);
+		void addCFriendInternal(Player *, bool, bool = true);
+		void delCFriendInternal(Player *, bool = true);
 
 		void sendVIPMails(UInt8, UInt8);
 		void sendYDVIPMails(UInt8, UInt8);
@@ -1143,7 +1159,7 @@ namespace GObject
 
 		Package* m_Package;
 
-		std::set<Player *> _friends[3];
+		std::set<Player *> _friends[4];
 		std::vector<FriendActStruct *> _friendActs;
 
 		TaskMgr* m_TaskMgr;

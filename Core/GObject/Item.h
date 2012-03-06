@@ -94,6 +94,17 @@ namespace GObject
 		inline ItemEquipAttr2& getEquipAttr2() { return _itemEquipData.extraAttr2; }
 		inline ItemEquipSpiritAttr& getEquipSpiritAttr() { return _itemEquipData.spiritAttr; }
 
+        bool isSpirited()
+        {
+            ItemEquipSpiritAttr& esa = getEquipSpiritAttr();
+            for (UInt8 i = 0; i < 4; ++i)
+            {
+                if (esa.spLev[i])
+                    return true;
+            }
+            return false;
+        }
+
 		inline UInt16 getAttack()
         {
             const GData::AttrExtra* attrExtra = getAttrExtra();

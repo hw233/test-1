@@ -90,7 +90,7 @@ class TownDeamon
         virtual ~TownDeamon();
 
         void loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId, UInt32 itemId, UInt32 itemNum);
-        void loadDeamonPlayersFromDB(UInt16 level, Player* pl);
+        void loadDeamonPlayersFromDB(UInt16 level, UInt16 maxLevel, Player* pl);
         void listDeamons(Player*, UInt16 start, UInt16 count);
         void showLevelTown(Player*, UInt16 level);
         void showTown(Player*);
@@ -116,6 +116,7 @@ class TownDeamon
         std::vector<DeamonMonster> m_Monsters;
         UInt16 m_location;
         UInt16 m_maxDeamonLevel;
+        UInt16 m_maxLevel;
 };
 
 extern TownDeamon* townDeamonManager;

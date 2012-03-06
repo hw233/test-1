@@ -1660,7 +1660,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 
 	for(UInt16 i = 0; i < count; ++ i)
 	{
-		amount += GData::moneyNeed[GData::SPLIT].tael;//GObjectManager::getSplitCost();   // split_cost[q][lv];
+		amount += GData::moneyNeed[GData::SPLIT].tael;
 
 		UInt32 itemId;
 		br >> itemId;
@@ -1793,32 +1793,36 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 {
 	MSG_QUERY_PLAYER(pl);
 	UInt32 viplvl = pl->getVipLevel();
-	if(ctr.flag == 0)
-	{
-		if(viplvl < 3)
-		{
-            // XXX: vip不收钱
-			//if(pl->getTael() < 1)
-			//		return;
-			//ConsumeInfo ci(Transport,0,0);
-			//pl->useTael(1,&ci);
-		}
-	}
-	else
-	{
-		if(viplvl == 0)
-		{
-			if(pl->getTael() < GData::moneyNeed[GData::JUMP_MAP].tael)
-			{
-				pl->sendMsgCode(0, 1103);
-				return;
-			}
-            if (!pl->hasChecked())
-                return;
-			ConsumeInfo ci(Transport,0,0);
-			pl->useTael(GData::moneyNeed[GData::JUMP_MAP].tael,&ci);
-		}
-	}
+
+    if (!pl->isYD() && !pl->isBD())
+    {
+        if(ctr.flag == 0)
+        {
+            if(viplvl < 3)
+            {
+                // XXX: vip不收钱
+                //if(pl->getTael() < 1)
+                //		return;
+                //ConsumeInfo ci(Transport,0,0);
+                //pl->useTael(1,&ci);
+            }
+        }
+        else
+        {
+            if(viplvl == 0)
+            {
+                if(pl->getTael() < GData::moneyNeed[GData::JUMP_MAP].tael)
+                {
+                    pl->sendMsgCode(0, 1103);
+                    return;
+                }
+                if (!pl->hasChecked())
+                    return;
+                ConsumeInfo ci(Transport,0,0);
+                pl->useTael(GData::moneyNeed[GData::JUMP_MAP].tael,&ci);
+            }
+        }
+    }
 
 	pl->moveTo(ctr._locid, true);
 }

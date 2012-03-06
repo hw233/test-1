@@ -20,18 +20,21 @@
 #define RGEM_ID         5200
 #define LCITTA1_ID      6000
 #define RCITTA1_ID      7000
-#define LOTHER_ID       7001
+#define LSOUL_ID        7001
+#define RSOUL_ID        7999
+#define LOTHER_ID       8000
 #define ROTHER_ID       65535
 
 enum ItemClass
 {
-    // [00~19] 装备 [1500~4990]   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11坐骑
-    // [20~29] 普通 [0~499]
-    // [30~39] 阵法 [1000~1199]
-    // [40~49] 心法 [1200~1499]
-    // [50~59] 强化 [500~799]
-    // [60~79] 宝石 [5001~5200]  60力量，61敏捷，62智力，63体魄，64生命，65攻击，66防御，67命中，68反击，69闪避，70暴击，71破击，72身法
-    // [80~89] 任务 [800~999]
+    // [00~19]  装备 [1500~4990]   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11坐骑
+    // [20~29]  普通 [0~499]
+    // [30~39]  阵法 [1000~1199]
+    // [40~49]  心法 [1200~1499]
+    // [50~59]  强化 [500~799]
+    // [60~79]  宝石 [5001~5200]  60力量，61敏捷，62智力，63体魄，64生命，65攻击，66防御，67命中，68反击，69闪避，70暴击，71破击，72身法
+    // [80~89]  任务 [800~999]
+    // [90~100] 魂   [7000~8000]
 	Item_None = 0,
 	Item_Weapon = 1,	//武器  武器 1
 	Item_Armor1,		//防具1 头盔 2
@@ -66,7 +69,10 @@ enum ItemClass
     Item_Gem14, Item_Gem15, Item_Gem16, Item_Gem17,     // 身法宝石， 坚韧宝石， 法抗宝石
     Item_Gem18, Item_Gem19,
 	Item_Task = 80,		//任务 80~89
-	Item_Other = 90,	//其他 90~
+    Item_Soul = 90, Item_Soul1, Item_Soul2, Item_Soul3,
+    Item_Soul4, Item_Soul5, Item_Soul6, Item_Soul7,
+    Item_Soul8, Item_Soul9,
+	Item_Other = 100,	//其他
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -125,6 +131,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_Citta;
     if (id >= LGEM_ID && id <= RGEM_ID)
 		return Item_Gem;
+    if (id >= LSOUL_ID && id <= RSOUL_ID)
+        return Item_Soul;
 	return Item_Other;
 }
 

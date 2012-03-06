@@ -914,7 +914,19 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
+            {
+#ifdef _FB
+                if (via[0].find("FB_") != std::string::npos || via[0].find("fb_") != std::string::npos)
+                {
+                    UInt64 playerid = atoll(via[1].c_str());
+                    Player* cfriend = globalPlayers[playerid];
+                    if (cfriend)
+                        addCFriend(cfriend);
+                }
+                else
+#endif
+                    udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
+            }
             else
                 udpLog(m_via.c_str(), "", "", "", "", "", "login");
         }
@@ -2901,6 +2913,26 @@ namespace GObject
 		return true;
 	}
 
+	bool Player::addCFriend( Player * pl )
+	{
+		if(pl == NULL || this == pl)
+			return false;
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+		if(!testCanAddCFriend(pl))
+			return false;
+		if(_id < pl->getId())
+		{
+			addCFriendInternal(pl, true, true);
+			pl->addCFriendInternal(this, true, false);
+		}
+		else
+		{
+			pl->addCFriendInternal(this, true, true);
+			addCFriendInternal(pl, true, false);
+		}
+		return true;
+	}
 	void Player::addFriendFromDB( Player * pl )
 	{
 		if(pl == NULL || this == pl)
@@ -2914,6 +2946,22 @@ namespace GObject
 		{
 			pl->addFriendInternal(this, false, false);
 			addFriendInternal(pl, false, false);
+		}
+	}
+
+	void Player::addCFriendFromDB( Player * pl )
+	{
+		if(pl == NULL || this == pl)
+			return;
+		if(_id < pl->getId())
+		{
+			addCFriendInternal(pl, false, false);
+			pl->addCFriendInternal(this, false, false);
+		}
+		else
+		{
+			pl->addCFriendInternal(this, false, false);
+			addCFriendInternal(pl, false, false);
 		}
 	}
 
@@ -2962,12 +3010,34 @@ namespace GObject
         }
 	}
 
+	void Player::addCFriendInternal( Player * pl, bool notify, bool writedb )
+	{
+		if(notify)
+		{
+			//notifyFriendAct(1, pl);
+			Stream st(REP::FRIEND_ACTION);
+			st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			send(st);
+			SYSMSG_SEND(2341, this);
+			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
+			if(writedb)
+				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 3, %"I64_FMT"u)", getId(), pl->getId());
+		}
+		_friends[3].insert(pl);
+	}
 	void Player::delFriend( Player * pl )
 	{
 		Mutex::ScopedLock lk(_mutex);
 		Mutex::ScopedLock lk2(pl->getMutex());
 		delFriendInternal(pl);
 		pl->delFriendInternal(this);
+	}
+    void Player::delCFriend(Player* pl)
+	{
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+		delCFriendInternal(pl);
+		pl->delCFriendInternal(this);
 	}
 
 	void Player::delFriendInternal( Player * pl, bool writedb )
@@ -2983,6 +3053,21 @@ namespace GObject
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
 			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 0 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+	}
+
+	void Player::delCFriendInternal( Player * pl, bool writedb )
+	{
+		std::set<Player *>::iterator it = _friends[3].find(pl);
+		if(it == _friends[3].end())
+			return;
+		_friends[3].erase(it);
+		Stream st(REP::FRIEND_ACTION);
+		st << static_cast<UInt8>(0x06) << pl->getName() << Stream::eos;
+		send(st);
+		SYSMSG_SEND(2339, this);
+		SYSMSG_SENDV(2340, this, pl->getCountry(), pl->getName().c_str());
+		if(writedb)
+			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 3 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
 	}
 
 	Player * Player::_findFriend( UInt8 type, std::string& name )
@@ -5538,6 +5623,75 @@ namespace GObject
         }
 
     }
+
+#ifdef _FB
+    void Player::tellCFriendLvlUp(UInt8 lvl)
+    {
+        struct PlayerLvlUp
+        {
+            Player* player;
+            UInt8 lvl;
+        } msg;
+        msg.player = this;
+        msg.lvl = lvl;
+        GameMsgHdr h(0x242,  getThreadId(), this, sizeof(msg));
+        GLOBAL().PushMsg(h, &msg);
+    }
+
+    void Player::OnCFriendLvlUp(Player* player, UInt8 lvl)
+    {
+        if (!player || !lvl)
+            return;
+        if (!_hasCFriend(player))
+            return;
+
+        UInt8 cnt = 0;
+        for (std::set<Player *>::iterator it = _friends[3].begin();
+                it != _friends[3].end(); ++it)
+        {
+            if ((*it)->GetLev() >= lvl)
+                ++cnt;
+        }
+
+        if (lvl == 1)
+        {
+            if (cnt >= 3)
+            {
+            }
+            else if (cnt >= 5)
+            {
+            }
+            else if (cnt >= 10)
+            {
+            }
+        }
+        else if (lvl == 45)
+        {
+            if (cnt >= 3)
+            {
+            }
+            else if (cnt >= 5)
+            {
+            }
+            else if (cnt >= 10)
+            {
+            }
+        }
+        else if (lvl == 60)
+        {
+            if (cnt >= 3)
+            {
+            }
+            else if (cnt >= 5)
+            {
+            }
+            else if (cnt >= 10)
+            {
+            }
+        }
+    }
+#endif
+
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
 		if(_clan != NULL)
@@ -5558,6 +5712,9 @@ namespace GObject
 		GameAction()->onLevelup(this, oLev, nLev);
         if (nLev >= 45)
             OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
+#ifdef _FB
+       tellCFriendLvlUp(nLev);
+#endif
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -6534,6 +6691,33 @@ namespace GObject
 			return false;
 		}
 #endif
+		return true;
+	}
+
+	bool Player::testCanAddCFriend( Player * pl )
+	{
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+		if(isCFriendFull())
+			return false;
+
+		if(_hasCFriend(pl))
+			return false;
+
+		if(_hasBlock(pl))
+		{
+			sendMsgCode(2, 1500);
+			return false;
+		}
+
+		if(pl->isCFriendFull())
+			return false;
+
+		if(pl->_hasBlock(this))
+		{
+			sendMsgCode(2, 1502);
+			return false;
+		}
 		return true;
 	}
 
