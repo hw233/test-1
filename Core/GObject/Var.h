@@ -83,6 +83,7 @@ namespace GObject
         VAR_GIRL_PACK = 50, //快乐女生礼包使用个数
         VAR_OFFLINE = 51,//下线时时间
         VAR_OFFLINE_EXP = 52,//离线经验
+        VAR_OFFLINE_PEXP = 53,//离线修为，分钟
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
         VAR_CFRIEND_45,
@@ -171,6 +172,7 @@ namespace GObject
             REGISTER_VAR(VAR_GIRL_PACK, CYCLE_YEAR);
             REGISTER_VAR(VAR_OFFLINE, CYCLE_NONE);
             REGISTER_VAR(VAR_OFFLINE_EXP, CYCLE_NONE);
+            REGISTER_VAR(VAR_OFFLINE_PEXP, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_1, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_45, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_60, CYCLE_NONE);

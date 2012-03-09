@@ -921,13 +921,17 @@ namespace GObject
             {
                 if (via[0].find("FB") != std::string::npos || via[0].find("fb") != std::string::npos)
                 {
-                    UInt64 playerid = atoll(via[1].c_str());
-                    Player* cfriend = globalPlayers[playerid];
-                    if (cfriend)
+                    if (!getInvitedBy())
                     {
-                        addCFriend(cfriend);
-                        setInvitedBy(playerid);
-                        GameAction()->onInvitedBy(this);
+                        UInt64 playerid = atoll(via[1].c_str());
+                        Player* cfriend = globalPlayers[playerid];
+                        if (cfriend)
+                        {
+                            addCFriend(cfriend);
+                            setInvitedBy(playerid);
+                            tellCFriendLvlUp(1);
+                            GameAction()->onInvitedBy(this);
+                        }
                     }
                 }
                 else
@@ -5671,7 +5675,7 @@ namespace GObject
         if (!player)
             return;
 
-        GameMsgHdr h(0x242,  player->getThreadId(), this, sizeof(msg));
+        GameMsgHdr h(0x242,  player->getThreadId(), player, sizeof(msg));
         GLOBAL().PushMsg(h, &msg);
     }
 
@@ -8827,24 +8831,43 @@ namespace GObject
     void Player::offlineExp(UInt32 now)
     {
         UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            lastOffline = _playerData.lastOnline;
         if (now < lastOffline)
             return;
         UInt32 offline = now - lastOffline;
         if (offline < 24 * 60 * 60)
             return;
+        offline -= 24 * 60 * 60;
+        if (!offline)
+            return;
 
         UInt8 lvl = GetLev();
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
+        AddVar(VAR_OFFLINE_PEXP, offline/60);
     }
 
     void Player::getOfflineExp()
     {
         UInt32 exp = GetVar(VAR_OFFLINE_EXP);
-        if (!exp)
-            return;
-        AddExp(exp);
-        SetVar(VAR_OFFLINE_EXP, 0);
+        if (exp)
+        {
+            AddExp(exp);
+            SetVar(VAR_OFFLINE_EXP, 0);
+        }
+
+        UInt32 pexp = GetVar(VAR_OFFLINE_PEXP);
+        if (pexp)
+        {
+            for(int i = 0; i < 5; ++i)
+            {
+                GObject::Fighter * fgt = getLineup(i).fighter;
+                if(fgt != NULL)
+                    fgt->addPExp(pexp*fgt->getPracticeInc()*0.8f, true);
+            }
+            SetVar(VAR_OFFLINE_PEXP, 0);
+        }
     }
 
 } // namespace GObject

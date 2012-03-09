@@ -282,7 +282,7 @@ public:
 
 	UInt32 regenHP(UInt32);
 	bool addExp(UInt64);
-	bool addPExp(Int32, bool = true);
+	bool addPExp(Int32, bool = true, bool = false);
 
 	void sendModification(UInt8 t, UInt64 v);
 	void sendMaxSoul();
@@ -599,6 +599,7 @@ protected:
     UInt16 _expMods;
     UInt32 _expEnd;
     UInt16 _pexpMods;
+    bool _forceWrite;
 	float _battlePoint;
 	GData::AttrExtra _attrExtraEquip;
 
