@@ -330,13 +330,17 @@ void TownDeamon::cancelDeamon(Player* pl)
     if(!checkTownDeamon(pl))
         return;
 
+
     Stream st(REP::TOWN_DEAMON);
     st << static_cast<UInt8>(0x06);
     UInt8 res = 0;
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     UInt16 idx = dpd->deamonLevel - 1;
+
     if(dpd->deamonLevel == 0)
+        res = 1;
+    else if(m_Monsters[idx].inChallenge)
         res = 1;
     else if(m_Monsters[idx].player != pl)
     {
@@ -455,9 +459,6 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 
 void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
-    if((PLAYER_DATA(atker, location) != 0x1414))
-        return;
-
 	Battle::BattleSimulator bsim(/*atker->getLocation()*/Battle::BS_COPY5, atker, defer);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
@@ -551,9 +552,11 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
     case 1:
         {
             Player* def = m_Monsters[idx].player;
-            if(level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
+            if(m_Monsters[idx].inChallenge || level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
                 break;
-            else if(def)
+
+            m_Monsters[idx].inChallenge = true;
+            if(def)
             {
                 if (def != pl && def->getDeamonPlayerData() && def->getDeamonPlayerData()->deamonLevel)
                     attackPlayer(pl, def);
@@ -580,9 +583,6 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
 
 void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 {
-    if((PLAYER_DATA(pl, location) != 0x1414))
-        return;
-
     Stream st(REP::TOWN_DEAMON);
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
@@ -595,6 +595,7 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
     UInt8 res = 0;
     UInt16 idx = level - 1;
 
+    m_Monsters[idx].inChallenge = false;
     dpd->challengeTime = TimeUtil::Now();
     if(win)
     {

@@ -27,6 +27,7 @@ struct DeamonMonster
     UInt32 npcId;
     UInt32 itemId;
     UInt32 itemNum;
+    bool inChallenge;
 
     DeamonMonster()
     {
@@ -34,6 +35,7 @@ struct DeamonMonster
         npcId = 0;
         itemId = 0;
         itemNum = 0;
+        inChallenge = false;
     }
 };
 
