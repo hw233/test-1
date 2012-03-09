@@ -555,9 +555,9 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
             if(m_Monsters[idx].inChallenge || level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
                 break;
 
-            m_Monsters[idx].inChallenge = true;
             if(def)
             {
+                m_Monsters[idx].inChallenge = true;
                 if (def != pl && def->getDeamonPlayerData() && def->getDeamonPlayerData()->deamonLevel)
                     attackPlayer(pl, def);
             }
