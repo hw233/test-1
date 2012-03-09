@@ -13,7 +13,8 @@ namespace GObject
 
 static const UInt32 TOWNDEAMONENDTM = 19 * 3600;
 static const UInt32 TD_VITALITY_TIMEUNIT = 600;
-static const UInt32 TD_AWARD_TIMEUNIT = 3600;
+static const UInt32 TD_AWARD_TIMEUNIT = 900;
+//static const UInt32 TD_AWARD_TIMEUNIT = 300;
 static const UInt32 TD_CHALLENGE_TIMEUNIT = 300;
 //static const UInt32 TD_CHALLENGE_TIMEUNIT = 20;
 

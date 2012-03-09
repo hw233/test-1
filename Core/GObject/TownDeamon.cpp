@@ -443,6 +443,9 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 
 void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
+    if((PLAYER_DATA(atker, location) != 0x1414))
+        return;
+
 	Battle::BattleSimulator bsim(/*atker->getLocation()*/Battle::BS_COPY5, atker, defer);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
@@ -504,7 +507,9 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
 
                     res = 0;
                     ++ dpd->curLevel;
-                    dpd->startTime = TimeUtil::Now();
+                    if(dpd->startTime == 0)
+                        dpd->startTime = TimeUtil::Now();
+
                     if(dpd->maxLevel == 0)
                     {
                         ++ dpd->maxLevel;
@@ -563,6 +568,9 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
 
 void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 {
+    if((PLAYER_DATA(pl, location) != 0x1414))
+        return;
+
     Stream st(REP::TOWN_DEAMON);
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
@@ -643,7 +651,8 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 
     if(maxCnt != 0)
     {
-        dpd->startTime = TimeUtil::Now();
+        if(dpd->startTime == 0)
+            dpd->startTime = TimeUtil::Now();
         dpd->curLevel += maxCnt;
         DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
     }
