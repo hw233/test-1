@@ -339,7 +339,19 @@ void TownDeamon::cancelDeamon(Player* pl)
     if(dpd->deamonLevel == 0)
         res = 1;
     else if(m_Monsters[idx].player != pl)
+    {
         res = 1;
+        dpd->vitality = dpd->calcVitality();
+        dpd->accLen = dpd->calcAccLeft();
+        dpd->deamonLevel = 0;
+        dpd->accTime = 0;
+        dpd->vitalityTime = 0;
+        dpd->accAwards = 0;
+        dpd->spirit = 100;
+
+        showTown(pl);
+        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u, `startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, pl->getId());
+    }
     else
     {
         quitDeamon(pl, pl);
