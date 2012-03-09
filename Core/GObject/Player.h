@@ -341,7 +341,7 @@ namespace GObject
 
 	struct PlayerData
 	{
-		static const UInt16 INIT_PACK_SIZE = 100;
+		static const UInt16 INIT_PACK_SIZE = 150;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
@@ -1219,6 +1219,7 @@ namespace GObject
         UInt8 _CFriendAwards[CF_LVLS*3];
     public:
         void setInvitedBy(UInt64 id, bool writedb = true);
+        inline UInt64 getInvitedBy() { return _invitedBy; }
         void resetCFriends();
         void loadCFriendAwards(std::string& awards);
         void getCFriendAward(UInt8 idx);

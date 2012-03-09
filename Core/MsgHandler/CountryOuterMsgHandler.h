@@ -994,7 +994,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         if (exp)
         {
             Stream st(REP::OFFLINEEXP);
-            st << pl->GetVar(VAR_OFFLINE_EXP) << Stream::eos;
+            st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f) << Stream::eos;
             pl->send(st);
         }
     }
