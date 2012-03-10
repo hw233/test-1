@@ -41,7 +41,7 @@
 
 static memcached_st* memc = NULL;
 
-bool getId(char buf[64]);
+bool getId(char buf[64], UInt8 type = 0);
 bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
 
 #define CHKKEY() \
@@ -50,7 +50,7 @@ bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
     if (!br.read(hash, 36))\
         return;\
     char id[64] = {0};\
-    if (!getId(id))\
+    if (!getId(id, 0))\
         return;\
     if (!checkKey(1, hash, atoll(id)))\
         return;\
@@ -605,7 +605,11 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>no;
     br>>player_Id;
 
-    if (!checkKey(2, hash, player_Id))
+    char pid[64] = {0};
+    if (!getId(pid, 1))
+        return;
+
+    if (!checkKey(2, hash, atoll(pid)))
     {
         err += "Error Key";
         err = 2;
@@ -793,7 +797,7 @@ void onUserReRecharge( LoginMsgHdr& hdr, const void * data )
     return;
 }
 
-bool getId(char buf[64])
+bool getId(char buf[64], UInt8 type)
 {
     if (cfg.GMCheck)
     {
@@ -809,7 +813,10 @@ bool getId(char buf[64])
 
         int retry = 3;
         memcached_return rc;
-        len = snprintf(key, sizeof(key), "sscq_gmtool_key_id");
+        if (type == 0)
+            len = snprintf(key, sizeof(key), "sscq_gmtool_key_id");
+        else if (type == 1)
+            len = snprintf(key, sizeof(key), "sscq_recharge_key_id");
         while (retry)
         {
             --retry;

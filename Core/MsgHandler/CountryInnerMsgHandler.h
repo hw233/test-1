@@ -1308,5 +1308,19 @@ void OnTownDeamonResNotify( GameMsgHdr& hdr, const void* data )
     townDeamonManager->notifyChallengeResult(player, notify->peer, notify->win);
 }
 
+#ifdef _FB
+void OnCFriendLvlUp( GameMsgHdr& hdr, const void* data )
+{
+    struct PlayerLvlUp 
+    {
+        Player* player;
+        UInt8 lvl;
+    };
+
+    MSG_QUERY_PLAYER(player);
+    PlayerLvlUp* msg = (PlayerLvlUp*)data;
+    player->OnCFriendLvlUp(msg->player, msg->lvl);
+}
+#endif
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

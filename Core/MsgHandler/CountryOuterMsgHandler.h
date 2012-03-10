@@ -636,11 +636,21 @@ struct EquipSpiritReq
     MESSAGE_DEF3(REQ::EQ_SPIRIT, UInt8, _type, UInt16, _fgtId, UInt32, _itemId);
 };
 
-
 struct GetHeroMemoAward
 {
     UInt8 _idx;
     MESSAGE_DEF1(REQ::HEROMEMO, UInt8, _idx);
+};
+
+struct GetCFriendAward
+{
+    UInt8 _idx;
+    MESSAGE_DEF1(REQ::CFRIEND, UInt8, _idx);
+};
+
+struct GetOfflineExp
+{
+    MESSAGE_DEF(REQ::OFFLINEEXP);
 };
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
@@ -977,6 +987,17 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
+    pl->sendCFriendAward();
+
+    {
+        UInt32 exp = pl->GetVar(VAR_OFFLINE_EXP);
+        if (exp)
+        {
+            Stream st(REP::OFFLINEEXP);
+            st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f) << Stream::eos;
+            pl->send(st);
+        }
+    }
 
     if (pl->getSysDailog())
     {
@@ -1660,7 +1681,7 @@ void OnBatchSplitReq( GameMsgHdr& hdr, const void * data )
 
 	for(UInt16 i = 0; i < count; ++ i)
 	{
-		amount += GData::moneyNeed[GData::SPLIT].tael;//GObjectManager::getSplitCost();   // split_cost[q][lv];
+		amount += GData::moneyNeed[GData::SPLIT].tael;
 
 		UInt32 itemId;
 		br >> itemId;
@@ -1793,32 +1814,36 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 {
 	MSG_QUERY_PLAYER(pl);
 	UInt32 viplvl = pl->getVipLevel();
-	if(ctr.flag == 0)
-	{
-		if(viplvl < 3)
-		{
-            // XXX: vip不收钱
-			//if(pl->getTael() < 1)
-			//		return;
-			//ConsumeInfo ci(Transport,0,0);
-			//pl->useTael(1,&ci);
-		}
-	}
-	else
-	{
-		if(viplvl == 0)
-		{
-			if(pl->getTael() < GData::moneyNeed[GData::JUMP_MAP].tael)
-			{
-				pl->sendMsgCode(0, 1103);
-				return;
-			}
-            if (!pl->hasChecked())
-                return;
-			ConsumeInfo ci(Transport,0,0);
-			pl->useTael(GData::moneyNeed[GData::JUMP_MAP].tael,&ci);
-		}
-	}
+
+    if (!pl->isYD() && !pl->isBD())
+    {
+        if(ctr.flag == 0)
+        {
+            if(viplvl < 3)
+            {
+                // XXX: vip不收钱
+                //if(pl->getTael() < 1)
+                //		return;
+                //ConsumeInfo ci(Transport,0,0);
+                //pl->useTael(1,&ci);
+            }
+        }
+        else
+        {
+            if(viplvl == 0)
+            {
+                if(pl->getTael() < GData::moneyNeed[GData::JUMP_MAP].tael)
+                {
+                    pl->sendMsgCode(0, 1103);
+                    return;
+                }
+                if (!pl->hasChecked())
+                    return;
+                ConsumeInfo ci(Transport,0,0);
+                pl->useTael(GData::moneyNeed[GData::JUMP_MAP].tael,&ci);
+            }
+        }
+    }
 
 	pl->moveTo(ctr._locid, true);
 }
@@ -3182,7 +3207,7 @@ void OnMailClickReq( GameMsgHdr& hdr, MailClickReq& mcr )
 
 void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 {
-	if(flr._type > 2)
+	if(flr._type > 3)
 		return;
 	MSG_QUERY_PLAYER(player);
 	player->sendFriendList(flr._type, flr._start, flr._count);
@@ -3224,6 +3249,13 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 	case 6:
 		player->delFoe(pl);
 		break;
+    case 7:
+        player->addCFriend(pl);
+        break;
+    case 8:
+        player->delCFriend(pl);
+        pl->delCFriend(player);
+        break;
 	}
 }
 
@@ -4090,6 +4122,22 @@ void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
     if(!player->hasChecked())
          return;
     player->GetHeroMemo()->getAward(req._idx);
+}
+
+void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->getCFriendAward(req._idx);
+}
+
+void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->getOfflineExp();
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

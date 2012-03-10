@@ -27,7 +27,7 @@ struct SSTATUS2CSTATUST {
 	}
 }SSTATUS2CSTATUS;
 
-//·¢Æð½»Ò×Í¨Öª
+//路垄脝冒陆禄脪脳脥篓脰陋
 struct LaunchTradeNotify
 {
 	UInt32 id;
@@ -345,7 +345,7 @@ bool Trade::replyTrade(UInt32 id, UInt32 coin, UInt32 gold, std::vector<TradeIte
 */
 	operateTradeNotify(trade->_id, trade->_tradeStatus);
 
-	//»Ø¸´Í¨Öª
+	//禄脴赂麓脥篓脰陋
 	OperateTradeNotify notify;
 	notify.id = trade->_id;
 	notify.status = static_cast<UInt8>(TRADE_CONFIRM);
@@ -366,7 +366,7 @@ void Trade::confirmTrade(UInt32 id)
 		return;
 	trade->_tradeStatus = static_cast<UInt8>(TRADE_CONFIRMED);
 
-	//½«ÎïÆ·ÍÆËÍ³öÈ¥£¬µ«²»½«ÎïÆ·´ÓÖÐÉ¾³ý£®Ö±µ½ÊÕµ½¶Ô·½µÄÏìÓ¦²ÅÉ¾³ý£®
+	//陆芦脦茂脝路脥脝脣脥鲁枚脠楼拢卢碌芦虏禄陆芦脦茂脝路麓脫脰脨脡戮鲁媒拢庐脰卤碌陆脢脮碌陆露脭路陆碌脛脧矛脫娄虏脜脡戮鲁媒拢庐
 	ConfirmTradeNotify notify;
 	notify.id = id;
 	notify.launcher = _owner;
@@ -390,7 +390,7 @@ void Trade::cancelTrade(UInt32 id)
 	TradeData* trade = found->second;
 	if (trade->_tradeStatus == static_cast<UInt8>(TRADE_LAUNCH) || trade->_tradeStatus == static_cast<UInt8>(TRADE_RECEIVE) || trade->_tradeStatus == static_cast<UInt8>(TRADE_REPLY) || trade->_tradeStatus == static_cast<UInt8>(TRADE_CONFIRM))
 	{
-		//ÍË»¹ÎïÆ·¼°Í­Ç®,Ôª±¦
+		//脥脣禄鹿脦茂脝路录掳脥颅脟庐,脭陋卤娄
 		_owner->getCoin(trade->_coin);
 		_owner->getGold(trade->_gold);
 		trade->_coin = trade->_gold = 0;
@@ -410,7 +410,7 @@ void Trade::cancelTrade(UInt32 id)
 		operateTradeNotify(trade->_id, trade->_tradeStatus);
 		delTradeTimeoutNotify(trade->_id, trade->_tradeTime);
 
-		//È¡ÏûÍ¨Öª
+		//脠隆脧没脥篓脰陋
 		OperateTradeNotify notify;
 		notify.id = trade->_id;
 		notify.status = static_cast<UInt8>(trade->_tradeSide == 0 ? TRADE_PEERCANCEL : TRADE_SELFCANCEL);
@@ -428,7 +428,7 @@ void Trade::cancel2Trade(UInt32 id)
 	if (!needCheckTrade(trade->_tradeStatus))
 		return;
 
-	//ÍË»¹ÎïÆ·¼°Í­Ç®,Ôª±¦
+	//脥脣禄鹿脦茂脝路录掳脥颅脟庐,脭陋卤娄
 	_owner->getCoin(trade->_coin);
 	_owner->getGold(trade->_gold);
 	trade->_coin = trade->_gold = 0;
@@ -537,7 +537,7 @@ bool Trade::recvConfirmTrade(UInt32 id, UInt32 coin, UInt32 gold, ItemBase** ite
 	TradeData* trade = found->second;
 	if (trade->_tradeStatus == static_cast<UInt8>(TRADE_REPLY))
 	{
-		//ÍÆËÍÎïÆ·µ½½»Ò×·½
+		//脥脝脣脥脦茂脝路碌陆陆禄脪脳路陆
 		ConfirmTradeNotify notify;
 		notify.id = id;
 		notify.launcher = trade->_tradePlayer;
@@ -550,7 +550,7 @@ bool Trade::recvConfirmTrade(UInt32 id, UInt32 coin, UInt32 gold, ItemBase** ite
 
 		_owner->getCoin(coin);
 		_owner->getGold(gold);
-		buildTradeItems(items, itemNum, trade->_strItems);	//Èç¹û±³°üÒÑÂú,ÔòÏÂ´Î¼ÓÈë±³°üÖÐ
+		buildTradeItems(items, itemNum, trade->_strItems);	//脠莽鹿没卤鲁掳眉脪脩脗煤,脭貌脧脗麓脦录脫脠毛卤鲁掳眉脰脨
 		//printf("Build items : %s\n", trade->_strItems.c_str());
 		if (!appendTradeItems(items, itemNum))
 		{
@@ -604,7 +604,7 @@ bool Trade::recvCancelTrade(UInt32 id)
 		return false;
 	TradeData* trade = found->second;
 
-	//ÍË»¹ÎïÆ·¼°Í­Ç®,Ôª±¦
+	//脥脣禄鹿脦茂脝路录掳脥颅脟庐,脭陋卤娄
 	_owner->getCoin(trade->_coin);
 	_owner->getGold(trade->_gold);
 	trade->_coin = trade->_gold = 0;

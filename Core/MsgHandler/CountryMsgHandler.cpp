@@ -77,6 +77,8 @@ MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 MSG_REG(GameMsgHdr, OnGetHeroMemoAward);
+MSG_REG(GameMsgHdr, OnGetCFriendAward);
+MSG_REG(GameMsgHdr, OnGetOfflineExp);
 
 MSG_REG_2(GameMsgHdr, REQ::FORMATION_DATA, OnFrontMapReq);
 MSG_REG_2(GameMsgHdr, REQ::AUTO_COPY, OnAutoCopy);
@@ -255,5 +257,8 @@ MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);
 MSG_REG_2(GameMsgHdr, 0x239, OnPracticeAttack);
 MSG_REG_2(GameMsgHdr, 0x240, OnHeroMemo);
 MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
+#ifdef _FB
+MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
+#endif
 
 MSG_HANDLER_END()

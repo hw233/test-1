@@ -81,6 +81,15 @@ namespace GObject
         VAR_SHUSAN_LOVE = 48, //蜀山之恋
         VAR_LOGIN_PF = 49, //每日平台登陆宝箱
         VAR_GIRL_PACK = 50, //快乐女生礼包使用个数
+        VAR_OFFLINE = 51,//下线时时间
+        VAR_OFFLINE_EXP = 52,//离线经验
+        VAR_OFFLINE_PEXP = 53,//离线修为，分钟
+
+        VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
+        VAR_CFRIEND_45,
+        VAR_CFRIEND_60,
+
+        // 以后必须预留10个
 
         VAR_MAX,
     };
@@ -161,6 +170,12 @@ namespace GObject
             REGISTER_VAR(VAR_SHUSAN_LOVE, CYCLE_YEAR);
             REGISTER_VAR(VAR_LOGIN_PF, CYCLE_DAY);
             REGISTER_VAR(VAR_GIRL_PACK, CYCLE_YEAR);
+            REGISTER_VAR(VAR_OFFLINE, CYCLE_NONE);
+            REGISTER_VAR(VAR_OFFLINE_EXP, CYCLE_NONE);
+            REGISTER_VAR(VAR_OFFLINE_PEXP, CYCLE_NONE);
+            REGISTER_VAR(VAR_CFRIEND_1, CYCLE_NONE);
+            REGISTER_VAR(VAR_CFRIEND_45, CYCLE_NONE);
+            REGISTER_VAR(VAR_CFRIEND_60, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

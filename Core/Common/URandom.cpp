@@ -49,3 +49,9 @@ extern "C" unsigned int uRandom(unsigned int modulo)
 {
 	return uRand(modulo);
 }
+
+URandom& URandom::current()
+{
+    return static_cast<BaseThread *>(Thread::current())->uRandom;
+}
+

@@ -118,4 +118,15 @@ MSG_REG_2(GameMsgHdr, 0x1F5, OnReplaceOwner);
 MSG_REG_2(GameMsgHdr, 0x1F6, OnPracticeAddExp);
 MSG_REG_2(GameMsgHdr, 0x1F7, OnPracticeStop);
 
+#ifdef _ARENA_SERVER
+MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);
+MSG_REG_2(GameMsgHdr, 0x02, onPlayerEnter);
+MSG_REG_2(GameMsgHdr, 0x03, onLineupCommit);
+MSG_REG_2(GameMsgHdr, 0x06, onBetInfo);
+MSG_REG_2(GameMsgHdr, 0x07, onSingleBet);
+MSG_REG_2(LoginMsgHdr, 0x84, GmHandlerFromBs);
+MSG_REG_2(LoginMsgHdr, 0x90, BattleReportReq);
+MSG_REG_2(GameMsgHdr, 0xFF, onDisconnected);
+#endif
+
 MSG_HANDLER_END()

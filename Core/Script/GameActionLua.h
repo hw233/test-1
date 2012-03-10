@@ -201,6 +201,8 @@ namespace Script
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
+		void onInvitedBy(Player* player);
+		bool onGetCFriendAward(Player* player, UInt8 idx);
 		void onGetVipPack(Player* player, UInt8 type);
 		bool testTakePack(Player* player, UInt8 type, UInt8 freq);
 		bool testTakePackSize(Player* player, UInt8 type);

@@ -7,7 +7,7 @@
 #include "GData/Money.h"
 #include "Country.h"
 #include "Script/GameActionLua.h"
-
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -75,6 +75,7 @@ TownDeamon::TownDeamon()
 {
     m_Monsters.clear();
     m_maxDeamonLevel = 0;
+    m_maxLevel = 0;
 }
 
 TownDeamon::~TownDeamon()
@@ -93,13 +94,15 @@ void TownDeamon::loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId, UInt32 ite
         printf("TownDeamon: loadDeamonMonsterFromDB Error\n");
 }
 
-void TownDeamon::loadDeamonPlayersFromDB(UInt16 level, Player* pl)
+void TownDeamon::loadDeamonPlayersFromDB(UInt16 level, UInt16 maxLevel, Player* pl)
 {
     if(level > m_Monsters.size() || level == 0)
         printf("TownDeamon: loadDeamonPlayerFromDB Error\n");
     UInt16 idx = level - 1;
     if(level > m_maxDeamonLevel)
         m_maxDeamonLevel = level;
+    if (maxLevel > m_maxLevel)
+        m_maxLevel = maxLevel;
 
     DeamonMonster& dm = m_Monsters[idx];
     dm.player = pl;
@@ -327,16 +330,32 @@ void TownDeamon::cancelDeamon(Player* pl)
     if(!checkTownDeamon(pl))
         return;
 
+
     Stream st(REP::TOWN_DEAMON);
     st << static_cast<UInt8>(0x06);
     UInt8 res = 0;
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     UInt16 idx = dpd->deamonLevel - 1;
+
     if(dpd->deamonLevel == 0)
         res = 1;
-    else if(m_Monsters[idx].player != pl)
+    else if(m_Monsters[idx].inChallenge)
         res = 1;
+    else if(m_Monsters[idx].player != pl)
+    {
+        res = 1;
+        dpd->vitality = dpd->calcVitality();
+        dpd->accLen = dpd->calcAccLeft();
+        dpd->deamonLevel = 0;
+        dpd->accTime = 0;
+        dpd->vitalityTime = 0;
+        dpd->accAwards = 0;
+        dpd->spirit = 100;
+
+        showTown(pl);
+        DB3().PushUpdateData("UPDATE `towndeamon_player` SET `deamonLevel`=%u, `startTime`=%u, `accTime`=%u, `vitalityTime`=%u, `accAwards`=%u, `vitality`=%u, `spirit`=%u, `accLen`=%u WHERE `playerId` = %"I64_FMT"u", dpd->deamonLevel, dpd->startTime, dpd->accTime, dpd->vitalityTime, dpd->accAwards, dpd->vitality, dpd->spirit, dpd->accLen, pl->getId());
+    }
     else
     {
         quitDeamon(pl, pl);
@@ -361,7 +380,7 @@ bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
         return false;
 
     GData::NpcGroup * ng = it->second;
-    Battle::BattleSimulator bsim(pl->getLocation(), pl, ng->getName(), ng->getLevel(), false);
+    Battle::BattleSimulator bsim(/*pl->getLocation()*/Battle::BS_COPY5, pl, ng->getName(), ng->getLevel(), false);
     pl->PutFighters( bsim, 0 );
     ng->putFighters( bsim );
     bsim.start();
@@ -405,7 +424,7 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 	{
 		bool res;
 
-		Battle::BattleSimulator bsim(pl->getLocation(), pl, defer);
+		Battle::BattleSimulator bsim(/*pl->getLocation()*/Battle::BS_COPY5, pl, defer);
 		pl->PutFighters( bsim, 0, true );
 		defer->PutFighters( bsim, 1, true );
         DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
@@ -440,7 +459,7 @@ void TownDeamon::attackPlayer(Player* pl, Player* defer)
 
 void TownDeamon::beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
-	Battle::BattleSimulator bsim(atker->getLocation(), atker, defer);
+	Battle::BattleSimulator bsim(/*atker->getLocation()*/Battle::BS_COPY5, atker, defer);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
 	for(int i = 0; i < 5; ++ i)
@@ -493,9 +512,17 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                 UInt8 res = 0;
                 if(attackNpc(pl, m_Monsters[idx].npcId))
                 {
+                    if (level > m_maxLevel)
+                    {
+                        SYSMSG_BROADCASTV(2337, pl->getCountry(), pl->getName().c_str(), level);
+                        m_maxLevel = level;
+                    }
+
                     res = 0;
                     ++ dpd->curLevel;
-                    dpd->startTime = TimeUtil::Now();
+                    if(dpd->startTime == 0)
+                        dpd->startTime = TimeUtil::Now();
+
                     if(dpd->maxLevel == 0)
                     {
                         ++ dpd->maxLevel;
@@ -524,11 +551,15 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
         break;
     case 1:
         {
-            if(level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
+            Player* def = m_Monsters[idx].player;
+            if(m_Monsters[idx].inChallenge || level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
                 break;
-            else if(m_Monsters[idx].player)
+
+            if(def)
             {
-                attackPlayer(pl, m_Monsters[idx].player);
+                m_Monsters[idx].inChallenge = true;
+                if (def != pl && def->getDeamonPlayerData() && def->getDeamonPlayerData()->deamonLevel)
+                    attackPlayer(pl, def);
             }
             else
             {
@@ -557,14 +588,22 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
     UInt16 level = deferDpd->deamonLevel;
+    if (!level) // XXX:
+        level = deferDpd->quitLevel;
+    if (!level)
+        return;
     UInt8 res = 0;
     UInt16 idx = level - 1;
 
+    m_Monsters[idx].inChallenge = false;
     dpd->challengeTime = TimeUtil::Now();
     if(win)
     {
         if(TimeUtil::Now() - deferDpd->startTime >= 3600)
-            pl->GetPackage()->AddItem2(m_Monsters[idx].itemId, 1, true, true, FromTownDeamon);
+        {
+            pl->GetPackage()->AddItem2(m_Monsters[idx].itemId, 1, true, false, FromTownDeamon);
+            SYSMSG_BROADCASTV(2338, pl->getCountry(), pl->getName().c_str(), level, defer->getCountry(), defer->getName().c_str(), m_Monsters[idx].itemId);
+        }
 
         quitDeamon(defer, pl);
         occupyDeamon(pl, level);
@@ -625,7 +664,8 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 
     if(maxCnt != 0)
     {
-        dpd->startTime = TimeUtil::Now();
+        if(dpd->startTime == 0)
+            dpd->startTime = TimeUtil::Now();
         dpd->curLevel += maxCnt;
         DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
     }

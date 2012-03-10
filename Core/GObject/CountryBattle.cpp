@@ -13,6 +13,7 @@
 #include "SpecialAward.h"
 #include "MsgID.h"
 #include "HeroMemo.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -558,6 +559,8 @@ bool CountryBattle::playerEnter( Player * player )
 
     GameAction()->doAty( player, AtyCountryWar, 0, 0);
     player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 0);
+    if (World::getWhiteLoveDay() && World::_wday == 7)
+        player->GetPackage()->AddItem2(476, 5, 1, 1);
 	return true;
 }
 

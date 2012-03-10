@@ -13,7 +13,8 @@ namespace GObject
 
 static const UInt32 TOWNDEAMONENDTM = 19 * 3600;
 static const UInt32 TD_VITALITY_TIMEUNIT = 600;
-static const UInt32 TD_AWARD_TIMEUNIT = 3600;
+static const UInt32 TD_AWARD_TIMEUNIT = 900;
+//static const UInt32 TD_AWARD_TIMEUNIT = 300;
 static const UInt32 TD_CHALLENGE_TIMEUNIT = 300;
 //static const UInt32 TD_CHALLENGE_TIMEUNIT = 20;
 
@@ -26,6 +27,7 @@ struct DeamonMonster
     UInt32 npcId;
     UInt32 itemId;
     UInt32 itemNum;
+    bool inChallenge;
 
     DeamonMonster()
     {
@@ -33,6 +35,7 @@ struct DeamonMonster
         npcId = 0;
         itemId = 0;
         itemNum = 0;
+        inChallenge = false;
     }
 };
 
@@ -90,7 +93,7 @@ class TownDeamon
         virtual ~TownDeamon();
 
         void loadDeamonMonstersFromDB(UInt16 level, UInt32 npcId, UInt32 itemId, UInt32 itemNum);
-        void loadDeamonPlayersFromDB(UInt16 level, Player* pl);
+        void loadDeamonPlayersFromDB(UInt16 level, UInt16 maxLevel, Player* pl);
         void listDeamons(Player*, UInt16 start, UInt16 count);
         void showLevelTown(Player*, UInt16 level);
         void showTown(Player*);
@@ -116,6 +119,7 @@ class TownDeamon
         std::vector<DeamonMonster> m_Monsters;
         UInt16 m_location;
         UInt16 m_maxDeamonLevel;
+        UInt16 m_maxLevel;
 };
 
 extern TownDeamon* townDeamonManager;

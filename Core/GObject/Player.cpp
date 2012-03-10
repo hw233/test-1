@@ -51,6 +51,9 @@
 #include "GData/ClanSkillTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
+#ifdef _ARENA_SERVER
+#include "GameServer.h"
+#endif
 
 #include <cmath>
 
@@ -563,7 +566,11 @@ namespace GObject
 	}
 
 	Player::Player( UInt64 id ): GObjectBaseT<Player, UInt64>(id),
-		_isJumpingMap(false), _isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
+		_isJumpingMap(false),
+#ifdef _ARENA_SERVER
+        _channelId(static_cast<int>(id >> 40) & 0xFF), _serverId(static_cast<int>(id >> 48)),
+#endif
+        _isOnline(false), _isHoding(false), _holdGold(0), _threadId(0xFF), _session(-1),
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
@@ -574,6 +581,7 @@ namespace GObject
         m_ClanBattleScore = 0;
         m_ClanBattleWinTimes = 0;
         m_ClanBattleSkillFlag = 0;
+        _invitedBy = 0;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -593,6 +601,8 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
+        memset(_CFriends, 0x00, sizeof(_CFriends));
+        memset(_CFriendAwards, 0x00, sizeof(_CFriendAwards));
 	}
 
 
@@ -888,6 +898,7 @@ namespace GObject
             onBlueactiveday();
 
         sendLevelPack(GetLev());
+        offlineExp(curtime);
 
         char buf[64] = {0};
         snprintf(buf, sizeof(buf), "%"I64_FMT"u", _id);
@@ -907,7 +918,25 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
+            {
+                if (via[0].find("FB") != std::string::npos || via[0].find("fb") != std::string::npos)
+                {
+                    if (!getInvitedBy())
+                    {
+                        UInt64 playerid = atoll(via[1].c_str());
+                        Player* cfriend = globalPlayers[playerid];
+                        if (cfriend)
+                        {
+                            addCFriend(cfriend);
+                            setInvitedBy(playerid);
+                            tellCFriendLvlUp(1);
+                            GameAction()->onInvitedBy(this);
+                        }
+                    }
+                }
+                else
+                    udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
+            }
             else
                 udpLog(m_via.c_str(), "", "", "", "", "", "login");
         }
@@ -1373,6 +1402,7 @@ namespace GObject
 		}
 
 		UInt32 curtime = TimeUtil::Now();
+        SetVar(VAR_OFFLINE, curtime);
 
         if(hasFlag(InCopyTeam))
             teamCopyManager->leaveTeamCopy(this);
@@ -1779,6 +1809,19 @@ namespace GObject
 	{
 		return (!_fighters.empty()) ? _fighters.begin()->second->getLevel() : LEVEL_MAX;
 	}
+
+    UInt8 Player::GetColor() const
+    {
+        return (!_fighters.empty()) ? _fighters.begin()->second->getColor() : 0;
+    }
+
+    UInt8 Player::getPortraitAndColor() const
+    {
+        if(_fighters.empty())
+            return 0;
+        Fighter * fgt = _fighters.begin()->second;
+        return (fgt->getColor() << 3) + fgt->getId();
+    }
 
 	UInt64 Player::GetExp() const
 	{
@@ -2881,6 +2924,26 @@ namespace GObject
 		return true;
 	}
 
+	bool Player::addCFriend( Player * pl )
+	{
+		if(pl == NULL || this == pl)
+			return false;
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+		if(!testCanAddCFriend(pl))
+			return false;
+		if(_id < pl->getId())
+		{
+			addCFriendInternal(pl, true, true);
+			pl->addCFriendInternal(this, true, false);
+		}
+		else
+		{
+			pl->addCFriendInternal(this, true, true);
+			addCFriendInternal(pl, true, false);
+		}
+		return true;
+	}
 	void Player::addFriendFromDB( Player * pl )
 	{
 		if(pl == NULL || this == pl)
@@ -2894,6 +2957,22 @@ namespace GObject
 		{
 			pl->addFriendInternal(this, false, false);
 			addFriendInternal(pl, false, false);
+		}
+	}
+
+	void Player::addCFriendFromDB( Player * pl )
+	{
+		if(pl == NULL || this == pl)
+			return;
+		if(_id < pl->getId())
+		{
+			addCFriendInternal(pl, false, true);
+			pl->addCFriendInternal(this, false, true);
+		}
+		else
+		{
+			pl->addCFriendInternal(this, false, true);
+			addCFriendInternal(pl, false, true);
 		}
 	}
 
@@ -2942,12 +3021,34 @@ namespace GObject
         }
 	}
 
+	void Player::addCFriendInternal( Player * pl, bool notify, bool writedb )
+	{
+		if(notify)
+		{
+			//notifyFriendAct(1, pl);
+			Stream st(REP::FRIEND_ACTION);
+			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			send(st);
+			SYSMSG_SEND(2341, this);
+			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
+			if(writedb)
+				DB1().PushUpdateData("REPLACE INTO `friend` (`id`, `type`, `friendId`) VALUES (%"I64_FMT"u, 3, %"I64_FMT"u)", getId(), pl->getId());
+		}
+		_friends[3].insert(pl);
+	}
 	void Player::delFriend( Player * pl )
 	{
 		Mutex::ScopedLock lk(_mutex);
 		Mutex::ScopedLock lk2(pl->getMutex());
 		delFriendInternal(pl);
 		pl->delFriendInternal(this);
+	}
+    void Player::delCFriend(Player* pl)
+	{
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+		delCFriendInternal(pl);
+		pl->delCFriendInternal(this);
 	}
 
 	void Player::delFriendInternal( Player * pl, bool writedb )
@@ -2963,6 +3064,21 @@ namespace GObject
 		SYSMSG_SENDV(1034, this, pl->getCountry(), pl->getName().c_str());
 		if(writedb)
 			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 0 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
+	}
+
+	void Player::delCFriendInternal( Player * pl, bool writedb )
+	{
+		std::set<Player *>::iterator it = _friends[3].find(pl);
+		if(it == _friends[3].end())
+			return;
+		_friends[3].erase(it);
+		Stream st(REP::FRIEND_ACTION);
+		st << static_cast<UInt8>(0x08) << pl->getName() << Stream::eos;
+		send(st);
+		SYSMSG_SEND(2339, this);
+		SYSMSG_SENDV(2340, this, pl->getCountry(), pl->getName().c_str());
+		if(writedb)
+			DB1().PushUpdateData("DELETE FROM `friend` WHERE `id` = %"I64_FMT"u AND `type` = 3 AND `friendId` = %"I64_FMT"u", getId(), pl->getId());
 	}
 
 	Player * Player::_findFriend( UInt8 type, std::string& name )
@@ -4303,6 +4419,9 @@ namespace GObject
                     smcolor.erase(smcolor.begin() + i);
                     --cnt;
 
+                    if (World::getWhiteLoveDay() && World::_wday == 1)
+                        GetPackage()->AddItem2(476, 1, 1, 1);
+
                     sendColorTask(0, 0);
                     writeShiMen();
                     return true;
@@ -4320,6 +4439,9 @@ namespace GObject
                     yamen.erase(yamen.begin() + i);
                     ymcolor.erase(ymcolor.begin() + i);
                     --cnt;
+
+                    if (World::getWhiteLoveDay() && World::_wday == 2)
+                        GetPackage()->AddItem2(476, 1, 1, 1);
 
                     sendColorTask(1, 0);
                     writeYaMen();
@@ -4359,6 +4481,9 @@ namespace GObject
                     ++_playerData.smAcceptCount;
                     _playerData.fshimen[i] = 0;
                     _playerData.fsmcolor[i] = 0;
+
+                    if (World::getWhiteLoveDay() && World::_wday == 1)
+                        GetPackage()->AddItem2(476, 1, 1, 1);
 
                     sendColorTask(0, 0);
                     writeShiMen();
@@ -4400,6 +4525,9 @@ namespace GObject
                     ++_playerData.ymAcceptCount;
                     _playerData.fyamen[i] = 0;
                     _playerData.fymcolor[i] = 0;
+
+                    if (World::getWhiteLoveDay() && World::_wday == 2)
+                        GetPackage()->AddItem2(476, 1, 1, 1);
 
                     sendColorTask(1, 0);
                     writeYaMen();
@@ -4556,6 +4684,9 @@ namespace GObject
         } else {
             _playerData.clanTaskId = 0;
         }
+
+        if (World::getWhiteLoveDay() && World::_wday == 3)
+            GetPackage()->AddItem2(476, 1, 1, 1);
 
         OnHeroMemo(MC_CONTACTS, MD_ADVANCED, 0, 1);
         writeClanTask();
@@ -5255,9 +5386,9 @@ namespace GObject
 	{
 		if(hasFlag(CountryBattle | ClanBattling | ClanRankBattle))
 			return;
-		UInt32 autohp = getBuffData(0);
-		if(autohp == 0)
-			return;
+		UInt32 autohp = 0; // getBuffData(0);
+		//if(autohp == 0)
+		//	return;
 		for(int i = 0; i < 5; ++ i)
 		{
 			Fighter * fighter = getLineup(i).fighter;
@@ -5266,29 +5397,42 @@ namespace GObject
 			UInt16 hp = fighter->getCurrentHP();
 			if(hp == 0)
 				continue;
-			UInt32 maxhp = fighter->getMaxHP();
-			if(hp < maxhp)
-			{
-				if(hp + autohp >= maxhp)
-				{
-					autohp -= maxhp - hp;
-					hp = maxhp;
-				}
-				else
-				{
-					hp += autohp;
-					fighter->setCurrentHP(hp);
-					autohp = 0;
-					break;
-				}
-			}
-			else
-				hp = 0;
+            if (!World::getAutoHeal())
+            {
+                UInt32 maxhp = fighter->getMaxHP();
+                if(hp < maxhp)
+                {
+                    if(hp + autohp >= maxhp)
+                    {
+                        autohp -= maxhp - hp;
+                        hp = maxhp;
+                    }
+                    else
+                    {
+                        hp += autohp;
+                        fighter->setCurrentHP(hp);
+                        autohp = 0;
+                        break;
+                    }
+                }
+                else
+                    hp = 0;
+            }
+            else
+            {
+                hp = 0;
+            }
 			fighter->setCurrentHP(hp);
 		}
-		setBuffData(0, autohp);
+		//setBuffData(0, autohp);
 	}
 
+#ifdef _ARENA_SERVER
+	UInt32 Player::getClientAddress()
+	{
+        return 0;
+    }
+#else
 	UInt32 Player::getClientAddress()
 	{
         TcpConnection conn = NETWORK()->GetConn(this->GetSessionID());
@@ -5297,6 +5441,7 @@ namespace GObject
         Network::GameClient * client = static_cast<Network::GameClient *>(conn.get());
         return client->GetClientIP();
 	}
+#endif
 
 	void Player::makeWallow( Stream& st )
 	{
@@ -5511,6 +5656,53 @@ namespace GObject
         }
 
     }
+
+    void Player::tellCFriendLvlUp(UInt8 lvl)
+    {
+        if (!_invitedBy)
+            return;
+
+        struct PlayerLvlUp
+        {
+            Player* player;
+            UInt8 lvl;
+        } msg;
+
+        msg.player = this;
+        msg.lvl = lvl;
+
+        Player* player = globalPlayers[_invitedBy];
+        if (!player)
+            return;
+
+        GameMsgHdr h(0x242,  player->getThreadId(), player, sizeof(msg));
+        GLOBAL().PushMsg(h, &msg);
+    }
+
+    static UInt8 cf_lvls[CF_LVLS] = {1, 45, 60};
+    void Player::resetCFriends()
+    {
+        memset(_CFriends, 0x00, sizeof(_CFriends));
+        for (std::set<Player *>::iterator it = _friends[3].begin();
+                it != _friends[3].end(); ++it)
+        {
+            for (UInt8 i = 0; i < CF_LVLS; ++i)
+            {
+                if ((*it)->GetLev() >= cf_lvls[i])
+                    ++_CFriends[i];
+            }
+        }
+    }
+
+    void Player::OnCFriendLvlUp(Player* player, UInt8 lvl)
+    {
+        if (!player || !lvl)
+            return;
+        if (!_hasCFriend(player))
+            return;
+        resetCFriends();
+    }
+
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
 		if(_clan != NULL)
@@ -5531,6 +5723,9 @@ namespace GObject
 		GameAction()->onLevelup(this, oLev, nLev);
         if (nLev >= 45)
             OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
+#ifdef _FB
+       tellCFriendLvlUp(nLev);
+#endif
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -6510,6 +6705,37 @@ namespace GObject
 		return true;
 	}
 
+	bool Player::testCanAddCFriend( Player * pl )
+	{
+		Mutex::ScopedLock lk(_mutex);
+		Mutex::ScopedLock lk2(pl->getMutex());
+		if(isCFriendFull())
+			return false;
+
+		if(_hasCFriend(pl))
+			return false;
+
+#if 0
+		if(_hasBlock(pl))
+		{
+			sendMsgCode(2, 1500);
+			return false;
+		}
+#endif
+
+		if(pl->isCFriendFull())
+			return false;
+
+#if 0
+		if(pl->_hasBlock(this))
+		{
+			sendMsgCode(2, 1502);
+			return false;
+		}
+#endif
+		return true;
+	}
+
 	std::string& Player::fixName( std::string& name )
 	{
 		if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
@@ -6930,6 +7156,23 @@ namespace GObject
 
 	void Player::rebuildBattleName()
 	{
+#ifdef _ARENA_SERVER
+        char numstr[16];
+        sprintf(numstr, "%u\n", _playerData.title);
+        GameServer * gs = gameServers(_channelId, _serverId);
+        if(gs != NULL)
+        {
+            char chstr[16];
+            sprintf(chstr, ".S%u", _serverId);
+            _battleName = gs->getChannel() + chstr + "\n" + numstr + _playerData.name;
+            _displayName = _playerData.name + "@" + gs->getChannel() + chstr;
+        }
+        else
+        {
+            _battleName = std::string("\n") + numstr + _playerData.name;
+            _displayName = _playerData.name;
+        }
+#else
 		char numstr[16];
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
@@ -6941,7 +7184,53 @@ namespace GObject
 			_battleName += numstr;
 		}
 		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+#endif
 	}
+
+#ifdef _ARENA_SERVER
+    void Player::setEntered( UInt8 e )
+    {
+        if(_playerData.entered == e)
+            return;
+        _playerData.entered = e;
+        DB().PushUpdateData("UPDATE `player` SET `entered` = %u WHERE `id` = %"I64_FMT"u", e, _id);
+    }
+
+    UInt64 Player::getOriginId(UInt64 id)
+    {
+        int channelId = static_cast<int>(id >> 40) & 0xFF, serverId = static_cast<int>(id >> 48);
+        if(gameServers.isMerged(channelId, serverId))
+            return id & 0xFFFF00FFFFFFFFFFull;
+        return id & 0xFFFFFFFFFFull;
+    }
+
+    UInt64 Player::getOriginId()
+    {
+        if(gameServers.isMerged(_channelId, _serverId))
+            return _id & 0xFFFF00FFFFFFFFFFull;
+        return _id & 0xFFFFFFFFFFull;
+    }
+
+    int Player::getRealServerId()
+    {
+        GameServer * gs = gameServers(_channelId, _serverId);
+        if(gs == NULL)
+            return 0;
+        if(gs->getMainId() < 0)
+            return _serverId;
+        return gs->getMainId();
+    }
+
+    int Player::getRealCSId()
+    {
+        GameServer * gs = gameServers(_channelId, _serverId);
+        if(gs == NULL)
+            return 0;
+        if(gs->getMainId() < 0)
+            return (_serverId << 8) + _channelId;
+        return (gs->getMainId() << 8) + _channelId;
+    }
+#endif
 
 	void Player::writeBookStoreIds()
 	{
@@ -8473,7 +8762,113 @@ namespace GObject
             m_dpData->attacker = NULL;
             DB3().PushUpdateData("UPDATE `towndeamon_player` SET `quitLevel`=0, `attacker`=0 WHERE `playerId` = %"I64_FMT"u", getId());
         }
+    }
 
+    void Player::setInvitedBy(UInt64 id, bool writedb)
+    {
+        if (!id)
+            return;
+        _invitedBy = id;
+        if (writedb)
+        {
+            DB3().PushUpdateData("REPLACE INTO `cfriend_awards` (`playerId`, `invitedId`, `awards`) VALUES (%"I64_FMT"u, %"I64_FMT"u, '')", _id, id);
+        }
+    }
+
+    void Player::loadCFriendAwards(std::string& awards)
+    {
+        StringTokenizer cfa(awards, "|");
+        UInt32 count = cfa.count();
+        if (!count)
+            return;
+        for (UInt8 i = 0; i < CF_LVLS*3 && i < count; ++i)
+            _CFriendAwards[i] = atoi(cfa[i].c_str());
+    }
+
+    static UInt8 cf_cnt[CF_LVLS] = {3, 5, 10};
+    void Player::getCFriendAward(UInt8 idx)
+    {
+        if (!idx || idx > CF_LVLS*3)
+            return;
+
+        UInt8 i = (idx-1)/3;
+        UInt8 c = (idx-1)%3;
+        if (i >= CF_LVLS)
+            return;
+
+        if (_CFriends[i] >= cf_cnt[c] && !_CFriendAwards[idx-1])
+        {
+            if (!GameAction()->onGetCFriendAward(this, idx))
+                return;
+
+            _CFriendAwards[idx-1] = 1;
+
+            std::string awards;
+            for (UInt8 j = 0; j < CF_LVLS*3; ++j)
+            {
+                awards += Itoa(_CFriendAwards[j]);
+                if (j != CF_LVLS*3 - 1)
+                    awards += "|";
+            }
+            DB3().PushUpdateData("UPDATE `cfriend_awards` SET `awards` = '%s' WHERE `playerId` = %"I64_FMT"u", awards.c_str(), _id);
+
+            sendCFriendAward();
+        }
+    }
+
+    void Player::sendCFriendAward()
+    {
+        UInt32 awds = 0;
+        for (UInt8 i = 0; i < CF_LVLS*3; ++i)
+        {
+            if (_CFriendAwards[i])
+                awds |= (1<<i);
+        }
+        Stream st(REP::CFRIEND);
+        st << awds << Stream::eos;
+        send(st);
+    }
+
+    void Player::offlineExp(UInt32 now)
+    {
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            lastOffline = _playerData.lastOnline;
+        if (now < lastOffline)
+            return;
+        UInt32 offline = now - lastOffline;
+        if (offline < 24 * 60 * 60)
+            return;
+        offline -= 24 * 60 * 60;
+        if (!offline)
+            return;
+
+        UInt8 lvl = GetLev();
+        UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
+        AddVar(VAR_OFFLINE_EXP, exp);
+        AddVar(VAR_OFFLINE_PEXP, offline/60);
+    }
+
+    void Player::getOfflineExp()
+    {
+        UInt32 exp = GetVar(VAR_OFFLINE_EXP);
+        if (exp)
+        {
+            AddExp(exp);
+            SetVar(VAR_OFFLINE_EXP, 0);
+        }
+
+        UInt32 pexp = GetVar(VAR_OFFLINE_PEXP);
+        if (pexp)
+        {
+            for(int i = 0; i < 5; ++i)
+            {
+                GObject::Fighter * fgt = getLineup(i).fighter;
+                if(fgt != NULL)
+                    fgt->addPExp(pexp*fgt->getPracticeInc()*0.8f, true);
+            }
+            SetVar(VAR_OFFLINE_PEXP, 0);
+        }
     }
 
 } // namespace GObject

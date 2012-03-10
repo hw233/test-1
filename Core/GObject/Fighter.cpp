@@ -54,7 +54,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
     _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false),
-    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _battlePoint(0.0f), _praadd(0),
+    _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _praadd(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
     favor(0), reqFriendliness(0), strength(0), physique(0),
     agility(0), intelligence(0), will(0), soulMax(0), soul(0), baseSoul(0), aura(0), tough(0),
@@ -218,7 +218,7 @@ bool Fighter::addExp( UInt64 e )
 	return r;
 }
 
-bool Fighter::addPExp( Int32 e, bool writedb )
+bool Fighter::addPExp( Int32 e, bool writedb, bool force )
 {
     if (e < 0)
     {
@@ -252,6 +252,7 @@ bool Fighter::addPExp( Int32 e, bool writedb )
     if (_pexp >= 10000 && _owner)
         _owner->OnHeroMemo(MC_CITTA, MD_STARTED, 0, 2);
 
+    _forceWrite = force;
     sendModification(6, _pexp);
     return true;
 }
@@ -371,10 +372,11 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
 	case 6:
         {
             ++_pexpMods;
-            if (_pexpMods >= 3) // XXX: 半小时一次
+            if (_pexpMods >= 3 || _forceWrite) // XXX: 半小时一次
             {
                 DB2().PushUpdateData("UPDATE `fighter` SET `practiceExp` = %"I64_FMT"u WHERE `id` = %u AND `playerId` = %"I64_FMT"u", v, _id, _owner->getId());
                 _pexpMods = 0;
+                _forceWrite = false;
             }
 
             if(_pexpAddTmp > 0)
@@ -736,10 +738,13 @@ bool Fighter::hasTrumpType(UInt32 trumpid)
     if (!ie)
         return false;
 
+    bool pass = (ie->GetItemType().getId() >= 1500 && ie->GetItemType().getId() <= 1599);
     for (UInt8 i = 0; i < TRUMP_UPMAX; ++i)
     {
         if (_trump[i])
         {
+            if (pass && _trump[i]->GetItemType().getId() >= 1500 && _trump[i]->GetItemType().getId() <= 1599)
+                return false;
             if (_trump[i]->GetItemType().getId() == ie->GetItemType().getId())
                 return true;
         }
@@ -749,22 +754,19 @@ bool Fighter::hasTrumpType(UInt32 trumpid)
 
 bool Fighter::canSetTrump(UInt8 idx, UInt32 trumpid)
 {
-#if 0
     if (idx == 0)
         return true;
 
-    if (_level >= 60 && idx >= 1)
+    if (_level >= 60 && idx == 2)
     {
         return !hasTrumpType(trumpid);
     }
 
-    if (_potential >= 1.5 && _capacity >= 7 && idx >= 1)
+    if (_potential >= 1.5 && _capacity >= 7 && idx == 1)
     {
         return !hasTrumpType(trumpid);
     }
-#endif
-
-    return !hasTrumpType(trumpid);
+    return false;
 }
 
 ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )

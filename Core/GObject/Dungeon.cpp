@@ -508,6 +508,8 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
 		DBLOG1().PushUpdateData("insert into `dungeon_statistics` (`server_id`, `player_id`, `dungeon_id`, `this_day`, `pass_time`) values(%u, %"I64_FMT"u, %u, %u, %u)", cfg.serverLogId, player->getId(), _id, TimeUtil::SharpDay(0), TimeUtil::Now());
 
         player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 2);
+        if (World::getWhiteLoveDay() && World::_wday == 6)
+            player->GetPackage()->AddItem2(476, 5, 1, 1);
 	}
 
 	if(noreport)
@@ -592,7 +594,8 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 	case 0:
 		{
             bool girl = (World::getGirlDay() && !player->IsMale());
-            if (!World::getNewYear() && !girl)
+            if (!World::getNewYear() && !girl && !player->isYD() && !player->isBD())
+            //if (!World::getNewYear() && !girl)
             {
                 UInt32 viplevel = player->getVipLevel();
                 if(viplevel < 6)

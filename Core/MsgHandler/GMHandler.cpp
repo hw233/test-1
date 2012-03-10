@@ -161,6 +161,7 @@ GMHandler::GMHandler()
     Reg(3, "sysdlg", &GMHandler::OnSysDailog);
     Reg(3, "regenall", &GMHandler::OnRegenAll);
     Reg(3, "bosshp", &GMHandler::OnSetBossHp);
+    Reg(3, "time", &GMHandler::OnTime);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2623,5 +2624,11 @@ void GMHandler::OnSetBossHp(GObject::Player* player, std::vector<std::string>& a
         return;
     GObject::worldBoss.setHP(atoi(args[0].c_str()));
 }
+void GMHandler::OnTime(GObject::Player* player, std::vector<std::string>& args)
+{
 
+    time_t curtime1 = time(NULL) + 30; 
+    struct tm *local = localtime(&curtime1);
+    SYSMSG_SENDV(2350, player, 1900+local->tm_year, 1+local->tm_mon, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec, local->tm_wday+1);
+}
 

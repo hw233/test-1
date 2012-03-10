@@ -10,7 +10,7 @@ local flushtaskfactor = {
     }
 }
 
-local lvlfactor = {5,10,15,20,25,30,35,40,45}
+local lvlfactor = {5,10,15,20,25,30,35,40,45,50}
 local base = 25
 
 local taskawardfactor = {

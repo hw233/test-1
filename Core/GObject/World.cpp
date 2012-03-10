@@ -63,6 +63,7 @@ int World::_activityStage = 0;
 bool World::_actAvailable = false;
 bool World::_actAvailable1 = false;
 bool World::_isNewServer = false;
+bool World::_autoHeal = false;
 bool World::_nationalDay = false;
 bool World::_halloween = false;
 bool World::_singleday = false;
@@ -73,6 +74,7 @@ bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 bool World::_valentineday = false;
 bool World::_girlday = false;
+bool World::_whiteloveday = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -160,7 +162,7 @@ bool enum_clan_midnight(void * ptr, void * data)
 	Clan * clan = static_cast<Clan *>(ptr);
 	if (clan == NULL)
 		return true;
-	clan->getClanDynamicMsg()->cleanClanDynamicMsg();
+	// clan->getClanDynamicMsg()->cleanClanDynamicMsg();
 	Player * leader = clan->getLeader();
 	if (leader == NULL)
 		return true;

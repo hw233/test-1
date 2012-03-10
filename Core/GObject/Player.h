@@ -341,7 +341,7 @@ namespace GObject
 
 	struct PlayerData
 	{
-		static const UInt16 INIT_PACK_SIZE = 100;
+		static const UInt16 INIT_PACK_SIZE = 150;
 		PlayerData()
 			: gold(0), coupon(0), tael(0), coin(0), prestige(0), status(0), country(0),
 			title(0), achievement(0), attainment(0) , qqvipl(0), qqvipyear(0), qqawardgot(0), qqawardEnd(0), ydGemId(0), location(0), inCity(false), lastOnline(0),
@@ -353,6 +353,9 @@ namespace GObject
             clanTaskId(0), ctFinishCount(0),
 			created(0), lockExpireTime(0), wallow(1), battlecdtm(0), dungeonCnt(0), dungeonEnd(0),
             copyFreeCnt(0), copyGoldCnt(0), copyUpdate(0), frontFreeCnt(0), frontGoldCnt(0), frontUpdate(0)
+#ifdef _ARENA_SERVER
+            , entered(0)
+#endif
 		{
             memset(tavernId, 0, sizeof(tavernId));
             memset(fshimen, 0, sizeof(fshimen));
@@ -444,6 +447,9 @@ namespace GObject
         UInt8 frontGoldCnt;         // ??ͼ?շѴ???
         UInt32 frontUpdate;         // ??ͼ????????ʱ??
         std::vector<UInt16> formations; // ??ѧ??????
+#ifdef _ARENA_SERVER
+        UInt8 entered;
+#endif
 	};
 
 	class Player:
@@ -538,6 +544,21 @@ namespace GObject
             return CLAN_TASK_MAXCOUNT;
         }
 
+#ifdef _ARENA_SERVER
+        UInt64 getOriginId();
+        static UInt64 getOriginId(UInt64 id);
+
+        inline int getChannelId() { return _channelId; }
+        inline int getServerId() { return _serverId; }
+        int getRealServerId();
+        inline int getCSId() { return (_serverId << 8) + _channelId; }
+        int getRealCSId();
+
+        void setEntered(UInt8 e);
+        inline bool isEntered() const { return _playerData.entered != 0xFF; }
+        inline UInt8 getEntered() const { return _playerData.entered; }
+#endif
+
 	public:
 		bool Load();
 		inline void recalcVipLevel() { _vipLevel = calcVipLevel(); }
@@ -580,6 +601,8 @@ namespace GObject
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
         void resetThanksgiving();
+        void offlineExp(UInt32);
+        void getOfflineExp();
 
         void sendShusanLoveTitleCard(int);
 
@@ -648,6 +671,18 @@ namespace GObject
                 return (3<<4)|(_playerData.qqvipl-20);
             return 0;
         }
+        // XXX: 1-9 黄钻等级
+        //      10-19 蓝钻等级
+        //      20-29 3366等级,另qqvipl1 为蓝钻等级
+        inline bool isYD() const { return _playerData.qqvipl >= 1 && _playerData.qqvipl <= 9; }
+        inline bool isBD() const
+        {
+            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+                return true;
+            if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 10 && _playerData.qqvipl1 <= 19)
+                    return true;
+            return false;
+        }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);
@@ -697,6 +732,8 @@ namespace GObject
 		UInt8 GetClassAndSex() const;
 		bool IsMale() const;
 		UInt8 GetLev() const;
+        UInt8 GetColor() const;
+        UInt8 getPortraitAndColor() const;
 		UInt64 GetExp() const;
 		void AddExp(UInt64, UInt8 = 0);
 		void AddPExp(UInt32);
@@ -967,6 +1004,7 @@ namespace GObject
 		void addFriendFromDB(Player *);
 		void addBlockFromDB(Player *);
 		void addFoeFromDB(Player *);
+		void addCFriendFromDB(Player *);
 		bool addFriend(Player *);
         void AddFriendAttainment( Player* other);
 		void delFriend(Player *);
@@ -975,9 +1013,16 @@ namespace GObject
 		inline bool hasBlock(Player *pl) { Mutex::ScopedLock lk(_mutex); return _hasBlock(pl); }
 		bool addFoe(Player *);
 		bool delFoe(Player *);
+        bool addCFriend(Player*);
+        void delCFriend(Player*);
 		inline bool isFriendFull() { return _friends[0].size() >= 20; }
+        inline bool isCFriendFull() { return _friends[3].size() >= 20; }
         inline UInt32 getFrendsNum() const { return _friends[0].size(); }
+        inline UInt32 getCFrendsNum() const { return _friends[3].size(); }
 		bool testCanAddFriend(Player *);
+		bool testCanAddCFriend(Player *);
+        void tellCFriendLvlUp(UInt8);
+        void OnCFriendLvlUp(Player*, UInt8);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
 
@@ -1084,6 +1129,8 @@ namespace GObject
 		bool _hasFriend( UInt8 type, Player * pl ) const;
 		inline Player * _findFriend(std::string& name) { return _findFriend(0, name); }
 		inline bool _hasFriend(Player *pl) const { return _hasFriend(0, pl); }
+		inline Player * _findCFriend(std::string& name) { return _findFriend(3, name); }
+		inline bool _hasCFriend(Player *pl) const { return _hasFriend(3, pl); }
 		inline Player * _findBlock(std::string& name) { return _findFriend(1, name); }
 		inline bool _hasBlock(Player *pl) const { return _hasFriend(1, pl); }
 		inline Player * _findFoe(std::string& name) { return _findFriend(2, name); }
@@ -1093,6 +1140,8 @@ namespace GObject
 		void pushFriendAct(FriendActStruct * fas);
 		void addFriendInternal(Player *, bool, bool = true);
 		void delFriendInternal(Player *, bool = true);
+		void addCFriendInternal(Player *, bool, bool = true);
+		void delCFriendInternal(Player *, bool = true);
 
 		void sendVIPMails(UInt8, UInt8);
 		void sendYDVIPMails(UInt8, UInt8);
@@ -1109,13 +1158,18 @@ namespace GObject
 	private:
 		Mutex _mutex;
 
+#ifdef _ARENA_SERVER
+        int _channelId;
+        int _serverId;
+#endif
+
 		std::map<UInt32, Fighter *> _fighters;
 		std::map<UInt32, TrainFighterData *> _trainFighters;
 		std::set<UInt32> _greatFighterFull;
 
 		Package* m_Package;
 
-		std::set<Player *> _friends[3];
+		std::set<Player *> _friends[4];
 		std::vector<FriendActStruct *> _friendActs;
 
 		TaskMgr* m_TaskMgr;
@@ -1162,6 +1216,24 @@ namespace GObject
         UInt32 m_ClanBattleScore;     //帮会战个人积分
         UInt32 m_ClanBattleWinTimes;  //帮会战连胜次数
         UInt32 m_ClanBattleSkillFlag; //帮派战已使用技能位
+
+#ifdef _ARENA_SERVER
+        inline const std::string& getDisplayName() { if(_displayName.empty()) rebuildBattleName(); return _displayName; }
+    private:
+        std::string _displayName;
+#endif
+
+#define CF_LVLS 3
+        UInt8 _CFriends[CF_LVLS];
+        UInt64 _invitedBy;
+        UInt8 _CFriendAwards[CF_LVLS*3];
+    public:
+        void setInvitedBy(UInt64 id, bool writedb = true);
+        inline UInt64 getInvitedBy() { return _invitedBy; }
+        void resetCFriends();
+        void loadCFriendAwards(std::string& awards);
+        void getCFriendAward(UInt8 idx);
+        void sendCFriendAward();
 
     public:
 		// Last battled monster

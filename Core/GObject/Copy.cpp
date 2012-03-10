@@ -580,7 +580,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     return;
                 }
 
-                if (!World::getNewYear())
+                if (!World::getNewYear() && !pl->isYD() && !pl->isBD())
                 {
                     if (pl->getVipLevel() < 6)
                         return;
