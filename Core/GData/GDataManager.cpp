@@ -441,6 +441,9 @@ namespace GData
 			return false;
 		while(execu->Next() == DB::DB_OK)
 		{
+            if(idt.typeId == 0)
+                continue;
+
 			ItemBaseType * wt;
 			switch(idt.subClass)
 			{
