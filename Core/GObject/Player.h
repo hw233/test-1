@@ -671,8 +671,18 @@ namespace GObject
                 return (3<<4)|(_playerData.qqvipl-20);
             return 0;
         }
+        // XXX: 1-9 黄钻等级
+        //      10-19 蓝钻等级
+        //      20-29 3366等级,另qqvipl1 为蓝钻等级
         inline bool isYD() const { return _playerData.qqvipl >= 1 && _playerData.qqvipl <= 9; }
-        inline bool isBD() const { return _playerData.qqvipl >= 10 && _playerData.qqvipl <= 29; }
+        inline bool isBD() const
+        {
+            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+                return true;
+            if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 10 && _playerData.qqvipl1 <= 19)
+                    return true;
+            return false;
+        }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
 		void addTotalRecharge(UInt32);

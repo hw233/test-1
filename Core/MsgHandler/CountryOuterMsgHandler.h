@@ -3207,7 +3207,7 @@ void OnMailClickReq( GameMsgHdr& hdr, MailClickReq& mcr )
 
 void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 {
-	if(flr._type > 2)
+	if(flr._type > 3)
 		return;
 	MSG_QUERY_PLAYER(player);
 	player->sendFriendList(flr._type, flr._start, flr._count);
@@ -3249,6 +3249,13 @@ void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 	case 6:
 		player->delFoe(pl);
 		break;
+    case 7:
+        player->addCFriend(pl);
+        break;
+    case 8:
+        player->delCFriend(pl);
+        pl->delCFriend(player);
+        break;
 	}
 }
 

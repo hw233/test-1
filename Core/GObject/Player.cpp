@@ -3027,7 +3027,7 @@ namespace GObject
 		{
 			//notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x05) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
 			send(st);
 			SYSMSG_SEND(2341, this);
 			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
@@ -3073,7 +3073,7 @@ namespace GObject
 			return;
 		_friends[3].erase(it);
 		Stream st(REP::FRIEND_ACTION);
-		st << static_cast<UInt8>(0x06) << pl->getName() << Stream::eos;
+		st << static_cast<UInt8>(0x08) << pl->getName() << Stream::eos;
 		send(st);
 		SYSMSG_SEND(2339, this);
 		SYSMSG_SENDV(2340, this, pl->getCountry(), pl->getName().c_str());
@@ -8792,10 +8792,11 @@ namespace GObject
             return;
 
         UInt8 i = (idx-1)/3;
+        UInt8 c = (idx-1)%3;
         if (i >= CF_LVLS)
             return;
 
-        if (_CFriends[i] >= cf_cnt[i] && !_CFriendAwards[idx-1])
+        if (_CFriends[i] >= cf_cnt[c] && !_CFriendAwards[idx-1])
         {
             if (!GameAction()->onGetCFriendAward(this, idx))
                 return;
@@ -8803,10 +8804,10 @@ namespace GObject
             _CFriendAwards[idx-1] = 1;
 
             std::string awards;
-            for (UInt8 i = 0; i < CF_LVLS*3; ++i)
+            for (UInt8 j = 0; j < CF_LVLS*3; ++j)
             {
-                awards += Itoa(_CFriendAwards[i]);
-                if (i != CF_LVLS*3 - 1)
+                awards += Itoa(_CFriendAwards[j]);
+                if (j != CF_LVLS*3 - 1)
                     awards += "|";
             }
             DB3().PushUpdateData("UPDATE `cfriend_awards` SET `awards` = '%s' WHERE `playerId` = %"I64_FMT"u", awards.c_str(), _id);
@@ -8821,7 +8822,7 @@ namespace GObject
         for (UInt8 i = 0; i < CF_LVLS*3; ++i)
         {
             if (_CFriendAwards[i])
-                awds |= (1<<(32-i+1));
+                awds |= (1<<i);
         }
         Stream st(REP::CFRIEND);
         st << awds << Stream::eos;
