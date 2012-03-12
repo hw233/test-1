@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
         long long rid = random();
         long long rrid = rid << 32 | (random() | 0x12345);
         size_t vlen = snprintf(id, sizeof(id), "%llu", rrid);
-        memcached_return_t rc = memcached_set(memc, key, len, id, vlen, (time_t)(60), 0);
+        memcached_return_t rc = memcached_set(memc, key, len, id, vlen, (time_t)(10*60), 0);
         int retry = 2;
         while (rc != MEMCACHED_SUCCESS && retry)
         {   
