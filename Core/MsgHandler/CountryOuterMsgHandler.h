@@ -976,7 +976,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendAutoFrontMap();
     }
+#ifdef _FB
+    // XXX: do not need
+#else
 	pl->sendWallow();
+#endif
 	pl->sendEvents();
     //pl->GetPackage()->SendPackageItemInfor();
     {

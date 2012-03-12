@@ -937,6 +937,12 @@ namespace GObject
 				}
 			}
 
+            if (dbpd.pdata.packSize < PlayerData::INIT_PACK_SIZE)
+            {
+                dbpd.pdata.packSize = PlayerData::INIT_PACK_SIZE;
+				DB1().PushUpdateData("UPDATE `player` SET `packSize` = %u WHERE `id` = %"I64_FMT"u", dbpd.pdata.packSize, id);
+            }
+
 			{
 				StringTokenizer ntk(dbpd.nextreward, "|");
 				if(ntk.count() > 3)

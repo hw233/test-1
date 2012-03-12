@@ -4,13 +4,13 @@ VERSION=`data +%y%m%d%H%M`
 all:debug
 
 debug:
-	cd tools/udplog_cpp/ && make
+	rm -rf build && cd tools/udplog_cpp/ && make
 	if [ ! -d build ]; then\
 		premake4 --os=linux --platform=x64 gmake; fi\
 		&& cd build && config=debug $(MAKE) -j8 -f Makefile
 
 release:
-	cd tools/udplog_cpp/ && make
+	rm -rf build && cd tools/udplog_cpp/ && make
 	if [ ! -d build ]; then\
 		premake4 --os=linux --platform=x64 gmake; fi\
 		&& cd build && config=release $(MAKE) -j8 -f Makefile
@@ -18,13 +18,13 @@ release:
 	@objcopy --strip-debug bin/Release/Server.ASSS
 
 debug_fb:
-	cd tools/udplog_cpp/ && make
+	rm -rf build && cd tools/udplog_cpp/ && make
 	if [ ! -d build ]; then\
 		premake4 --os=linux --platform=x64 --file=premake4fb.lua gmake; fi\
 		&& cd build && config=debug $(MAKE) -j8 -f Makefile
 
 release_fb:
-	cd tools/udplog_cpp/ && make
+	rm -rf build && cd tools/udplog_cpp/ && make
 	if [ ! -d build ]; then\
 		premake4 --os=linux --platform=x64 --file=premake4fb.lua gmake; fi\
 		&& cd build && config=release $(MAKE) -j8 -f Makefile

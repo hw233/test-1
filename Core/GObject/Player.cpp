@@ -8679,7 +8679,11 @@ namespace GObject
     void Player::sendCreateMail()
     {
         SYSMSG(title, 2335);
+#ifdef _FB
+        SYSMSG(content, 2343);
+#else
         SYSMSG(content, 2336);
+#endif
         GetMailBox()->newMail(NULL, 0x12, title, content);
     }
 
