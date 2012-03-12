@@ -32,6 +32,7 @@ release_fb:
 	@objcopy --strip-debug bin/Release/Server.ASSS
 
 clean:
+	find . -name *.o | xargs rm -rf
 	cd tools/udplog_cpp/ && make clean
 	cd build && make -f Makefile clean
 
