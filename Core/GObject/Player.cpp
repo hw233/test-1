@@ -991,15 +991,17 @@ namespace GObject
         char _price[32] = {0};
         char _type[32] = {0};
         char _id[32] = {0};
-        snprintf(_type, 32, "%u", type);
         if (!id || !num)
         {
+            snprintf(_type, 32, "1");
             snprintf(_id, 32, "GN_%u", type);
             snprintf(_price, 32, "%u", price);
             udpLog(op, _type, _id, _price, "", "", "props");
         }
         else
         {
+            UInt8 type = GetItemLogType(id);
+            snprintf(_type, 32, "%u", type);
             snprintf(_id, 32, "%u", id);
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
