@@ -35,6 +35,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setVerifyTokenServer", &Cfg::setVerifyTokenServer);
 	class_def<Cfg>("setOnlineLimit", &Cfg::setOnlineLimit);
 	class_def<Cfg>("setStateUrl", &Cfg::setStateUrl);
+	class_def<Cfg>("setWarZone", &Cfg::setWarZone);
 	set("cfg", cfg);
 }
 

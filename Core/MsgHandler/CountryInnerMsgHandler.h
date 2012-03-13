@@ -986,6 +986,10 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
     player->getCoupon(888);
+#if defined(_FB) && defined(_FB_TEST)
+    player->getGold(20000);
+    player->setVipL(6);
+#endif
     player->udpLog("create", "", "", "", "", "", "guide");
     player->sendCreateMail();
 #ifdef _FB

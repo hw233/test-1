@@ -446,12 +446,12 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 
 	trimName(nu._name);
 
-#if 1
-	bool noWallow = (nu._class & 0x80) > 0;
-	nu._class &= ~0x80;
-#else
+#ifdef _FB
 	bool noWallow = false;
+#else
+	bool noWallow = (nu._class & 0x80) > 0;
 #endif
+	nu._class &= ~0x80;
 
 	if(nu._name.empty() || nu._name.length() > 15 || (strncmp(nu._name.c_str(), "ERROR_", 6) == 0))
 	{

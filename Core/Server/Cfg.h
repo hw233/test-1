@@ -74,6 +74,7 @@ public:
     std::string sql_mailitem_histories;
 
     std::string stateUrl;
+    UInt16 warZone;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -105,6 +106,7 @@ public:
 	inline void setLoginMax(UInt16 max) { loginLimit = max; }
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
     inline void setStateUrl(const char* url) { stateUrl = url; }
+    inline void setWarZone(UInt16 zone) { warZone = zone; }
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {
