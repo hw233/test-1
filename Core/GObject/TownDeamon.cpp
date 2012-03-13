@@ -247,15 +247,16 @@ void TownDeamon::useAccItem(Player* pl, UInt8 count)
             {
                 dpd->accAwards += dpd->accLen/TD_AWARD_TIMEUNIT;
                 dpd->accLen = need * 86400;
+                dpd->accTime = TimeUtil::Now();
             }
             else
             {
-                dpd->accLen = dpd->calcAccLeft() + need * 86400;
+                dpd->accLen += /*dpd->calcAccLeft() + */need * 86400;
             }
 
-            dpd->accTime = TimeUtil::Now();
-            if(dpd->accLen > TD_MAXACCTIME)
-                dpd->accLen = TD_MAXACCTIME;
+            //dpd->accTime = TimeUtil::Now();
+            if(dpd->calcAccLeft() > TD_MAXACCTIME)
+                dpd->accLen = TD_MAXACCTIME + TimeUtil::Now() - dpd->accTime;
 
             DB3().PushUpdateData("UPDATE `towndeamon_player` SET `accTime`=%u,`accLen`=%u, `accAwards`=%u WHERE `playerId` = %"I64_FMT"u", dpd->accTime, dpd->accLen, dpd->accAwards, pl->getId());
         }
