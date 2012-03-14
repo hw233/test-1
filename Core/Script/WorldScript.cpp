@@ -48,6 +48,8 @@ void WorldScript::init()
 	def("setIsNewServer", GObject::World::setIsNewServer);
 	def("setNationalDay", GObject::World::setNationalDay);
 	def("setHalloween", GObject::World::setHalloween);
+	def("setAutoHeal", GObject::World::setAutoHeal);
+	def("getAutoHeal", GObject::World::getAutoHeal);
 	def("setSingleDay", GObject::World::setSingleDay);
 	def("getSingleDay", GObject::World::getSingleDay);
 	def("setThanksgiving", GObject::World::setThanksgiving);
@@ -64,6 +66,8 @@ void WorldScript::init()
 	def("setValentineDay", GObject::World::setValentineDay);
 	def("getGirlDay", GObject::World::getGirlDay);
 	def("setGirlDay", GObject::World::setGirlDay);
+	def("getWhiteLoveDay", GObject::World::getWhiteLoveDay);
+	def("setWhiteLoveDay", GObject::World::setWhiteLoveDay);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

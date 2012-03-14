@@ -580,7 +580,7 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
     {
         if(TimeUtil::Now() - deferDpd->startTime >= 3600)
         {
-            pl->GetPackage()->AddItem2(m_Monsters[idx].itemId, 1, true, true, FromTownDeamon);
+            pl->GetPackage()->AddItem2(m_Monsters[idx].itemId, 1, true, false, FromTownDeamon);
             SYSMSG_BROADCASTV(2338, pl->getCountry(), pl->getName().c_str(), level, defer->getCountry(), defer->getName().c_str(), m_Monsters[idx].itemId);
         }
 

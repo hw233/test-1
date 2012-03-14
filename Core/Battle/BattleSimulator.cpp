@@ -4650,7 +4650,7 @@ void BattleSimulator::appendToPacket(UInt8 from_side, UInt8 from_pos, UInt8 targ
 bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool useRegen, UInt32 sysRegen )
 {
 	bool res = false;
-	UInt32 autohp = player->getBuffData(PLAYER_BUFF_AUTOHEAL, 0);
+	UInt32 autohp = 0; // player->getBuffData(PLAYER_BUFF_AUTOHEAL, 0);
 	for(int j = 0; j < 5; ++ j)
 	{
 		GObject::Lineup& pd = player->getLineup(j);
@@ -4672,28 +4672,36 @@ bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool
 			if(useRegen)
 			{
 				if(newhp == 0)
-					newhp = 1;
-				if(autohp > 0)
-				{
-					if(newhp < oldmaxhp)
-					{
-						if(newhp + autohp >= oldmaxhp)
-						{
-							autohp -= oldmaxhp - newhp;
-							newhp = 0;
-						}
-						else
-						{
-							newhp += autohp;
-							autohp = 0;
-							res = true;
-						}
-					}
-					else
-						newhp = 0;
-				}
-				else
-					res = true;
+                    newhp = 1;
+                if (!World::getAutoHeal())
+                {
+                    if(autohp > 0)
+                    {
+                        if(newhp < oldmaxhp)
+                        {
+                            if(newhp + autohp >= oldmaxhp)
+                            {
+                                autohp -= oldmaxhp - newhp;
+                                newhp = 0;
+                            }
+                            else
+                            {
+                                newhp += autohp;
+                                autohp = 0;
+                                res = true;
+                            }
+                        }
+                        else
+                            newhp = 0;
+                    }
+                    else
+                        res = true;
+                }
+                else
+                {
+                    newhp = 0;
+                    res = true;
+                }
 			}
 			else
 			{
@@ -4708,7 +4716,7 @@ bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool
 			pd.fighter->setCurrentHP(newhp);
 		}
 	}
-	player->setBuffData(0, autohp);
+	// player->setBuffData(0, autohp);
 	return res;
 }
 

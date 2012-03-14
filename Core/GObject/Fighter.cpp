@@ -736,10 +736,13 @@ bool Fighter::hasTrumpType(UInt32 trumpid)
     if (!ie)
         return false;
 
+    bool pass = (ie->GetItemType().getId() >= 1500 && ie->GetItemType().getId() <= 1599);
     for (UInt8 i = 0; i < TRUMP_UPMAX; ++i)
     {
         if (_trump[i])
         {
+            if (pass && _trump[i]->GetItemType().getId() >= 1500 && _trump[i]->GetItemType().getId() <= 1599)
+                return false;
             if (_trump[i]->GetItemType().getId() == ie->GetItemType().getId())
                 return true;
         }
@@ -749,22 +752,19 @@ bool Fighter::hasTrumpType(UInt32 trumpid)
 
 bool Fighter::canSetTrump(UInt8 idx, UInt32 trumpid)
 {
-#if 0
     if (idx == 0)
         return true;
 
-    if (_level >= 60 && idx >= 1)
+    if (_level >= 60 && idx == 2)
     {
         return !hasTrumpType(trumpid);
     }
 
-    if (_potential >= 1.5 && _capacity >= 7 && idx >= 1)
+    if (_potential >= 1.5 && _capacity >= 7 && idx == 1)
     {
         return !hasTrumpType(trumpid);
     }
-#endif
-
-    return !hasTrumpType(trumpid);
+    return false;
 }
 
 ItemEquip ** Fighter::setTrump( std::string& trumps, bool writedb )

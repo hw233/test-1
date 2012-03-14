@@ -77,6 +77,7 @@ namespace Script
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
 		lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
+		lua_tinker::def(_L, "getAutoHeal",	GObject::World::getAutoHeal);
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
 		lua_tinker::def(_L, "getChristmas",	GObject::World::getChristmas);
 		lua_tinker::def(_L, "getNewYear",	GObject::World::getNewYear);
@@ -84,6 +85,7 @@ namespace Script
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
+		lua_tinker::def(_L, "getWhiteLoveDay", GObject::World::getWhiteLoveDay);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -851,6 +853,16 @@ namespace Script
 	{
 		Call<void>("onLevelup", player, olev, nlev);
         doAttainment(player, 10001, nlev);
+	}
+
+	void GameActionLua::onInvitedBy( Player* player )
+	{
+		Call<void>("onInvitedBy", player);
+	}
+
+	bool GameActionLua::onGetCFriendAward( Player* player, UInt8 idx )
+	{
+		return Call<bool>("onGetCFriendAward", player, idx);
 	}
 
 	bool GameActionLua::testTakePack( Player* player, UInt8 type, UInt8 freq )

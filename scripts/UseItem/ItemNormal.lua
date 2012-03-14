@@ -1419,6 +1419,37 @@ function ItemNormal_00000448(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00000476(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {506,507,508,509,514,515,500,49,503,511,517,15,}
+    local nums = {1,1,1,1,1,1,1,1,1,1,1,2,}
+    local prob = {1072,1667,2739,3334,4406,4644,5716,5954,6906,7978,9048,10000,}
+    local broad = {0,1,0,1,1,1,0,0,1,0,1,0,}
+    local item = 0
+
+    local k = 1
+    local rand = math.random(10000)
+    for n = 1,#prob do
+        if rand <= prob[n] then
+            item = items[n]
+            k = n
+            break;
+        end
+    end
+
+    if item == 0 then
+        return false
+    end
+
+    package:AddItem(item, nums[k], 1, 0, 2)
+    if broad[k] == 1 then
+        Broadcast(0x27, "恭喜，[p:"..player:getCountry()..":"..player:getPName().."]玩家使用[4:476]，获得道具[4:"..item.."]x"..nums[k])
+    end
+    return num
+end
+
 function ItemNormal_VIP(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -6938,6 +6969,7 @@ local ItemNormal_Table = {
     [468] = ItemNormal_00000448,
     [469] = ItemNormal_00000448,
     [470] = ItemNormal_00000448,
+    [476] = ItemNormal_00000476,
 
     [449] = ItemNormal_VIP,
     [450] = ItemNormal_VIP,

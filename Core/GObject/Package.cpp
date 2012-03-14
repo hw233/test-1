@@ -3819,7 +3819,13 @@ namespace GObject
                         lev = SPIRIT_LEVEL_MAX / 5;
 
                     UInt32 tmpId = baseSpiritItem + spiritType[form - 1][itemClass - 1] * 100 + lev;
-                    if(GetItemAnyNum(tmpId) == 0)
+                    UInt32 same = 1;
+                    for (UInt8 i = 0; i < 3; ++i)
+                    {
+                        if (itemId[i] == tmpId)
+                            ++same;
+                    }
+                    if(GetItemAnyNum(tmpId) < same)
                         return;
                     itemId[j] = tmpId;
                     if(form0 == form && j != 0)

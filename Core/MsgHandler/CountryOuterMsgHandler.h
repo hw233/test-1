@@ -636,11 +636,21 @@ struct EquipSpiritReq
     MESSAGE_DEF3(REQ::EQ_SPIRIT, UInt8, _type, UInt16, _fgtId, UInt32, _itemId);
 };
 
-
 struct GetHeroMemoAward
 {
     UInt8 _idx;
     MESSAGE_DEF1(REQ::HEROMEMO, UInt8, _idx);
+};
+
+struct GetCFriendAward
+{
+    UInt8 _idx;
+    MESSAGE_DEF1(REQ::CFRIEND, UInt8, _idx);
+};
+
+struct GetOfflineExp
+{
+    MESSAGE_DEF(REQ::OFFLINEEXP);
 };
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
@@ -977,6 +987,17 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
+    pl->sendCFriendAward();
+
+    {
+        UInt32 exp = pl->GetVar(VAR_OFFLINE_EXP);
+        if (exp)
+        {
+            Stream st(REP::OFFLINEEXP);
+            st << pl->GetVar(VAR_OFFLINE_EXP) << Stream::eos;
+            pl->send(st);
+        }
+    }
 
     if (pl->getSysDailog())
     {
@@ -4094,6 +4115,22 @@ void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
     if(!player->hasChecked())
          return;
     player->GetHeroMemo()->getAward(req._idx);
+}
+
+void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->getCFriendAward(req._idx);
+}
+
+void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->getOfflineExp();
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

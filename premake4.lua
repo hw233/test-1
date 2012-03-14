@@ -33,7 +33,7 @@ solution "HoHH"
     configuration "linux"
     	includedirs { "/usr/include/mysql", "/usr/local/include/mysql", "/usr/local/include", "/usr/local/mysql", "/usr/local/mysql/include", "/usr/local/mysql/include/mysql", "/usr/local/services/mysql/include/mysql", "/usr/local/services/libevent/include", "tools/udplog_cpp", "/usr/local/services/libmemcached/include", "tools/DC_CPP_SDK_V1.0/inc", "/usr/local/services/curl/include", "/opt/app/mysql", "/opt/app/mysql/include", "/opt/app/mysql/include/mysql", "/opt/app/libevent/include", "/opt/app/libmemcached/include", "/opt/app/curl/include" }
         libdirs { "/usr/local/lib/mysql", "/usr/local/lib64", "/usr/local/lib", "/usr/local/mysql/lib", "/usr/local/mysql/lib/mysql/", "/usr/local/services/mysql/lib/mysql", "/usr/local/services/libevent/lib", "tools/udplog_cpp", "/usr/local/services/libmemcached/lib", "tools/DC_CPP_SDK_V1.0/lib", "/usr/local/services/curl/lib", "/opt/app/mysql/lib", "/opt/app/mysql/lib/mysql", "/opt/app/libevent/lib", "/opt/app/libmemcached/lib", "/opt/app/curl/lib" }
-        defines { "_APPID=27036", "_VERSION="..os.date("%y%m%d%H%M", os.time()), "_NEED_OPENID", "_FB" }
+        defines { "_APPID=27036", "_VERSION="..os.date("%y%m%d%H%M", os.time()), "_NEED_OPENID",  }
 
     configuration "vs*"
 

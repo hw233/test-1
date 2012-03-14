@@ -601,6 +601,8 @@ namespace GObject
         void sendHalloweenOnlineAward(UInt32, bool = false);
         void sendLevelPack(UInt8);
         void resetThanksgiving();
+        void offlineExp(UInt32);
+        void getOfflineExp();
 
         void sendShusanLoveTitleCard(int);
 
@@ -1009,9 +1011,7 @@ namespace GObject
         inline UInt32 getCFrendsNum() const { return _friends[3].size(); }
 		bool testCanAddFriend(Player *);
 		bool testCanAddCFriend(Player *);
-#ifdef _FB
         void tellCFriendLvlUp(UInt8);
-#endif
         void OnCFriendLvlUp(Player*, UInt8);
 
 		void sendFriendList(UInt8, UInt8, UInt8);
@@ -1212,6 +1212,17 @@ namespace GObject
     private:
         std::string _displayName;
 #endif
+
+#define CF_LVLS 3
+        UInt8 _CFriends[CF_LVLS];
+        UInt64 _invitedBy;
+        UInt8 _CFriendAwards[CF_LVLS*3];
+    public:
+        void setInvitedBy(UInt64 id, bool writedb = true);
+        void resetCFriends();
+        void loadCFriendAwards(std::string& awards);
+        void getCFriendAward(UInt8 idx);
+        void sendCFriendAward();
 
     public:
 		// Last battled monster

@@ -769,11 +769,34 @@ function GirlDay(player, lootlvl)
     end
 end
 
+function WhiteLoveDay(player, lootlvl, where)
+    if getWhiteLoveDay() and ((getWeekDay() == 4 and where == 0) or (getWeekDay() == 5 and where == 1)) then
+        local item = 476
+
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 2,
+            [1] = 3,
+            [2] = 4,
+            [3] = 5,
+        };
+
+        local package = player:GetPackage();
+        for m = 1,itemNum[lootlvl] do
+            package:AddItem(item, 1, true);
+        end
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
+    WhiteLoveDay(player, lootlvl, 0)
 end
 
 
@@ -785,6 +808,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     Christmas(player, lootlvl, 1);
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
+    WhiteLoveDay(player, lootlvl, 1)
 end
 
 local vippack = {
@@ -1010,5 +1034,33 @@ function onLoginPF(player)
         sendItemPackageMail(player, titles[pf], ctxs[pf], pkgs[pf]);
         player:SetVar(49, 1)
     end
+end
+
+local cfriend_awards = {
+    {{56,6,1}, {57,6,1}},
+    {{56,12,1}, {57,12,1}},
+    {{56,24,1}, {57,24,1}},
+    {{503,5,1}, {508,3,1}, {506,3,1}, {56,6,1}, {57,6,1}},
+    {{503,10,1}, {508,6,1}, {506,6,1}, {56,12,1}, {57,12,1}},
+    {{503,20,1}, {508,12,1}, {506,12,1}, {56,24,1}, {57,24,1}},
+    {{800,2,1}, {507,2,1}, {515,2,1}, {56,6,1}, {57,6,1}},
+    {{800,4,1}, {507,4,1}, {515,4,1}, {56,12,1}, {57,12,1}},
+    {{800,8,1}, {507,8,1}, {515,8,1}, {56,24,1}, {57,24,1}},
+}
+function onGetCFriendAward(player, idx)
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #cfriend_awards[idx] then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for k, v in pairs(cfriend_awards[idx]) do
+        package:Add(v[1], v[2], v[3])
+    end
+    return true
+end
+
+function onInvitedBy(player)
+    sendItemPackageMail(player, "好友邀请奖励", "您的好友邀请您一同游玩蜀山传奇，系统赠送您一份大礼包", {503,5,1, 56,10,1, 57,10,1, 5035,1,1});
 end
 

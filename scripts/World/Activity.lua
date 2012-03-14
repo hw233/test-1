@@ -149,6 +149,15 @@ function onActivityCheck(tm)
       setGirlDay(false)
   end
 
+  if tm >= actTime21 and tm < actTime22 then
+      setWhiteLoveDay(true)
+  else
+      setWhiteLoveDay(false)
+  end
+
+  -- XXX: cancel auto heal
+  setAutoHeal(true)
+
   loadStore()
 end
 
@@ -163,6 +172,7 @@ function initActTime(y, m, d)
   local  SerStartTm8 = { ['year'] = 2012, ['month'] = 1, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm9 = { ['year'] = 2012, ['month'] = 2, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm10= { ['year'] = 2012, ['month'] = 3, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm11= { ['year'] = 2012, ['month'] = 3, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -193,6 +203,9 @@ function initActTime(y, m, d)
 
   actTime19 = os.time(SerStartTm10);
   actTime20 = os.time(SerStartTm10) + 2 * 86400;
+
+  actTime21 = os.time(SerStartTm11);
+  actTime22 = os.time(SerStartTm11) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 

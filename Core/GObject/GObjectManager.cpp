@@ -192,6 +192,7 @@ namespace GObject
         LoadTownDeamon();
         InitMoneyLog();
         LoadHeroMemo();
+        LoadCFriendAwards();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -2148,6 +2149,9 @@ namespace GObject
 			case 2:
 				pl->addFoeFromDB(toadd);
 				break;
+            case 3:
+                pl->addCFriendFromDB(toadd);
+                break;
 			}
 		}
 		lc.finalize();
@@ -3710,6 +3714,31 @@ namespace GObject
         }
 
 		globalPlayers.enumerate(heromemo_loaded, 0);
+        return true;
+    }
+
+    bool GObjectManager::LoadCFriendAwards()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading CFriend Awards Data");
+        Player* pl = 0;
+		DBCFriendAwards cfa;
+		if(execu->Prepare("SELECT `playerId`, `invitedId`, `awards` FROM `cfriend_awards`", cfa)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			pl = globalPlayers[cfa.playerId];
+            if (!pl)
+                continue;
+            if (cfa.invitedId)
+                pl->setInvitedBy(cfa.invitedId, false);
+            pl->loadCFriendAwards(cfa.awards);
+            pl->resetCFriends();
+            pl = 0;
+        }
+
         return true;
     }
 

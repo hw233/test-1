@@ -77,6 +77,8 @@ MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 MSG_REG(GameMsgHdr, OnGetHeroMemoAward);
+MSG_REG(GameMsgHdr, OnGetCFriendAward);
+MSG_REG(GameMsgHdr, OnGetOfflineExp);
 
 MSG_REG_2(GameMsgHdr, REQ::FORMATION_DATA, OnFrontMapReq);
 MSG_REG_2(GameMsgHdr, REQ::AUTO_COPY, OnAutoCopy);
