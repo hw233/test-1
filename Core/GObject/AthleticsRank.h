@@ -5,7 +5,7 @@
 
 namespace GObject
 {
-
+#define ATHLETICS_RANK_MAX_CNT   3000
 const  UInt32  OrangeEquip50[] = {1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554};
 const  UInt32  OrangeEquip70[] = {1561, 1562, 1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594};
 const  UInt32  OrangeEquip80[] = {1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634};
@@ -215,8 +215,18 @@ protected:
 
 	inline UInt32 getRankPos(UInt8 row, Rank rank)
 	{
-		return std::distance(_athleticses[row].begin(), rank) + 1;	//FIXME
-	}
+#if 0
+        return std::distance(_athleticses[row].begin(), rank) + 1;	//FIXME
+#else
+        UInt32 Pos;
+        Pos = std::distance(_athleticses[row].begin(), rank) + 1;
+        if(Pos > ATHLETICS_RANK_MAX_CNT)
+        {
+            Pos = ATHLETICS_RANK_MAX_CNT + 1;
+        }
+        return Pos;
+#endif
+    }
 	inline Rank getRankBegin(UInt8 row)
 	{
 		return _athleticses[row].begin();

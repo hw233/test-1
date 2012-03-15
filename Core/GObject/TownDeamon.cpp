@@ -716,8 +716,19 @@ void TownDeamon::quitDeamon(Player* pl, Player* attacker)
 
     UInt32 awards = dpd->calcAwards();
     if(attacker != NULL || pl == attacker)
+    {
+#if 0
         awards = (awards >> 1) + (awards & 1);
-
+#else
+        UInt32 awardsNumerator;
+        awardsNumerator = awards * dpd->calcSpirit();
+        awards = awardsNumerator / 100;
+        if(awardsNumerator % 100)
+        {
+            awards = awards + 1;
+        }
+#endif
+    }
     UInt16 idx = dpd->deamonLevel - 1;
     if(awards > 0)
     {
