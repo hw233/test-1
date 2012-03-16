@@ -23,14 +23,26 @@ struct GameMsgHdr
 		player(NULL) { }
 	GameMsgHdr(UInt32 id, UInt8 did, GObject::Player * pl, UInt32 blen):
 		msgHdr(id, did, blen), player(pl) { }
+#ifdef _ARENA_SERVER
+    GameMsgHdr(UInt32 id, UInt8 did, int cid, int sid, UInt32 blen):
+        msgHdr(id, did, blen), channelId(cid), serverId(sid) {}
+#endif
 	MsgHdr	msgHdr;
-	GObject::Player *player;
+    GObject::Player *player;
+#ifdef _ARENA_SERVER
+    int channelId;
+    int serverId;
+#endif
 };
 
 struct LoginMsgHdr
 {
 	LoginMsgHdr():
 		playerID(0), sessionID(0) { }
+#ifdef _ARENA_SERVER
+    LoginMsgHdr(UInt32 id, UInt8 did, int sess, UInt32 blen):
+        msgHdr(id, did, blen), sessionID(sess) { } 
+#endif
 	LoginMsgHdr(UInt32 id, UInt8 did, UInt64 pid, int sess, UInt32 blen):
 		msgHdr(id, did, blen), playerID(pid), sessionID(sess) { }
 	MsgHdr	msgHdr;

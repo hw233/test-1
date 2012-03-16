@@ -41,6 +41,7 @@ local addPoint = {
     [106] = 1, --AtyTaskHook,  //挂机加速
     [107] = 1, --AtyPSpeed,    //修炼加速
     [108] = 1, --AtyGroupCopy, //组队副本
+    [109] = 1, --AtyTownDeamon, //锁妖塔
 }
 
 --某个奖励需要的活跃度

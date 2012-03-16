@@ -132,6 +132,9 @@ function onLevelup(player, olev, nlev)
     if getValentineDay() then
         onValentineDay(player)
     end
+    if getFoolsDay() then
+        onFoolsDay(player)
+    end
 end
 
 function onDungeonWin(player, id, level)
@@ -982,6 +985,22 @@ end
 function onGirlDay(player)
     if not getGirlDay() then
         return
+    end
+end
+
+function onFoolsDay(player)
+    if not getFoolsDay() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(58) == 0 then
+        sendItemPackageMail(player, "", "", {0,1,1});
+        player:SetVar(58, 1)
     end
 end
 

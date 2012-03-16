@@ -15,6 +15,8 @@ namespace REQ
     const UInt8 CFRIEND             = 0x07;
     /**离线经验领取*/
     const UInt8 OFFLINEEXP          = 0x08;
+    /**代币使用*/
+    const UInt8 TOKEN               = 0x09;
     /**成就*/
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择*/
@@ -353,6 +355,7 @@ namespace REP
     const UInt8 HEROMEMO            = 0x06;
     const UInt8 CFRIEND             = 0x07;
     const UInt8 OFFLINEEXP          = 0x08;
+    const UInt8 TOKEN               = 0x09;
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     const UInt8 CAMP_SELECT         = 0xF1;// 0x0D
     const UInt8 BE_DISCONNECT       = 0xF2;// 0x0E

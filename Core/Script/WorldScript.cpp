@@ -68,6 +68,12 @@ void WorldScript::init()
 	def("setGirlDay", GObject::World::setGirlDay);
 	def("getWhiteLoveDay", GObject::World::getWhiteLoveDay);
 	def("setWhiteLoveDay", GObject::World::setWhiteLoveDay);
+	def("getTrumpEnchRet", GObject::World::getTrumpEnchRet);
+	def("setTrumpEnchRet", GObject::World::setTrumpEnchRet);
+	def("getFoolsDay", GObject::World::getFoolsDay);
+	def("setFoolsDay", GObject::World::setFoolsDay);
+	def("getChingMing", GObject::World::getChingMing);
+	def("setChingMing", GObject::World::setChingMing);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

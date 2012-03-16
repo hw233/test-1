@@ -54,6 +54,7 @@
 #include "HoneyFall.h"
 #include "TownDeamon.h"
 #include "HeroMemo.h"
+#include "ArenaBattle.h"
 #include <fcntl.h>
 
 namespace GObject
@@ -1372,6 +1373,9 @@ namespace GObject
 			pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;
+
+            if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level >= 70)
+                ArenaBattle::Instance().addLevelMan(true);
 		}
 		lc.finalize();
         worldBoss.setLevel(lvl_max);

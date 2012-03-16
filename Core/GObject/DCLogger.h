@@ -18,6 +18,7 @@ using namespace DataCollector;
     10  qqgame
     11  q3366
     12  kingxin
+    16  gamelife
 #endif
 
 namespace GObject

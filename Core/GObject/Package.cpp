@@ -1981,6 +1981,61 @@ namespace GObject
                 }
 				break;
 			}
+
+            // 强化送代币活动
+            if (World::getTrumpEnchRet())
+            {
+                if (quality == 0) // 防具
+                {
+                    if (ied.enchant == 6)
+                        m_Owner->AddVar(VAR_COIN_TOKEN, 1);
+                    if (ied.enchant == 8)
+                        m_Owner->AddVar(VAR_TAEL_TOKEN, 2);
+                    if (ied.enchant == 10)
+                        m_Owner->AddVar(VAR_GOLD_TOKEN, 3);
+                }
+                else if (quality == 1) // 武器
+                {
+                    if (ied.enchant == 6)
+                        m_Owner->AddVar(VAR_COIN_TOKEN, 1);
+                    if (ied.enchant == 8)
+                        m_Owner->AddVar(VAR_GOLD_TOKEN, 2);
+                    if (ied.enchant == 10)
+                        m_Owner->AddVar(VAR_GOLD_TOKEN, 5);
+                }
+                else // 法宝
+                {
+                    if (quality == 3)
+                    {
+                        if (ied.enchant == 4)
+                            m_Owner->AddVar(VAR_COIN_TOKEN, 1);
+                        if (ied.enchant == 6)
+                            m_Owner->AddVar(VAR_TAEL_TOKEN, 2);
+                        if (ied.enchant == 6)
+                            m_Owner->AddVar(VAR_GOLD_TOKEN, 2);
+                    }
+                    if (quality == 4)
+                    {
+                        if (ied.enchant == 4)
+                            m_Owner->AddVar(VAR_COIN_TOKEN, 1);
+                        if (ied.enchant == 6)
+                            m_Owner->AddVar(VAR_TAEL_TOKEN, 2);
+                        if (ied.enchant == 6)
+                            m_Owner->AddVar(VAR_GOLD_TOKEN, 3);
+                    }
+                    if (quality == 5)
+                    {
+                        if (ied.enchant == 4)
+                            m_Owner->AddVar(VAR_COIN_TOKEN, 1);
+                        if (ied.enchant == 6)
+                            m_Owner->AddVar(VAR_GOLD_TOKEN, 2);
+                        if (ied.enchant == 6)
+                            m_Owner->AddVar(VAR_GOLD_TOKEN, 4);
+                    }
+                }
+                m_Owner->sendTokenInfo();
+            }
+
 			return 0;
 		}
 

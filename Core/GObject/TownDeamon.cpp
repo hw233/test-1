@@ -8,6 +8,8 @@
 #include "Country.h"
 #include "Script/GameActionLua.h"
 #include "Server/SysMsg.h"
+#include "Var.h"
+#include "MsgHandler/CountryMsgStruct.h"
 
 namespace GObject
 {
@@ -415,7 +417,6 @@ bool TownDeamon::attackNpc(Player* pl, UInt32 npcId)
     bsim.applyFighterHP(0, pl);
 
     pl->setBuffData(PLAYER_BUFF_ATTACKING, now + bsim.getTurns());
-
     return res;
 }
 
@@ -581,6 +582,8 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
         }
         break;
     }
+
+    addActivity(pl);
 }
 
 void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
@@ -682,6 +685,7 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
     pl->checkLastBattled();
     st << Stream::eos;
     pl->send(st);
+    addActivity(pl);
 }
 
 void TownDeamon::process()
@@ -795,6 +799,25 @@ void TownDeamon::checkStartTime(Player* pl)
             showTown(pl);
             DB3().PushUpdateData("UPDATE `towndeamon_player` SET `startTime`=0, `curLevel`=0 WHERE `playerId` = %"I64_FMT"u", pl->getId());
         }
+    }
+}
+
+void TownDeamon::addActivity(Player* pl)
+{
+    if (!pl->GetVar(VAR_TOWNDEAMON))
+    {
+        if(pl->getThreadId() != WORKER_THREAD_NEUTRAL)
+        {
+            stActivityMsg msg;
+            msg.id = AtyTownDeamon;
+            GameMsgHdr hdr2(0x245, pl->getThreadId(), pl, sizeof(stActivityMsg));
+            GLOBAL().PushMsg(hdr2, &msg);
+        }
+        else
+        {
+            GameAction()->doAty(pl, AtyTownDeamon, 0, 0);
+        }
+        pl->SetVar(VAR_TOWNDEAMON, 1);
     }
 }
 

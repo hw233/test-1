@@ -196,6 +196,7 @@ namespace Script
         bool onChristmas(Player* player);
         bool onNewYear(Player* player);
         bool onValentineDay(Player* player);
+        bool onFoolsDay(Player* player);
 		void onAttackBoss(Player* player);
 		bool getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
