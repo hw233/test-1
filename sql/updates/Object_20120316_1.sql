@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `enchlog`;
 CREATE TABLE `enchlog` (
       `playerId` bigint(20) unsigned NOT NULL,
       `type` tinyint(3) unsigned NOT NULL,
