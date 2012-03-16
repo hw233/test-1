@@ -305,6 +305,7 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
             {
                 tmpVitality -= 100 - spirit;
                 dpd->vitality = vitality + tmpVitality;
+                dpd->spirit = 100;
             }
             else
             {
@@ -723,10 +724,6 @@ void TownDeamon::quitDeamon(Player* pl, Player* attacker)
         UInt32 awardsNumerator;
         awardsNumerator = awards * dpd->calcSpirit();
         awards = awardsNumerator / 100;
-        if(awardsNumerator % 100)
-        {
-            awards = awards + 1;
-        }
 #endif
     }
     UInt16 idx = dpd->deamonLevel - 1;

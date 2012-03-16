@@ -69,7 +69,11 @@ inline void GlobalObject::PushMsg(const MsgHdrType& hdr, void* msgBody)
 	char* buffer = (char*)AllocMsgBlock(sizeof(MsgHdrType) + hdr.msgHdr.bodyLen);
 	if(buffer == NULL)
 		return;
-	memcpy(buffer, &hdr, sizeof(MsgHdrType));
+    if(hdr.msgHdr.cmdID != 0x0 && hdr.msgHdr.cmdID != 0x289 && hdr.msgHdr.cmdID != 0x189)
+    {
+        printf("[%s:%d]cmdID:0x%x, desWorkerID:%d, bodyLen:%u\n", __func__, __LINE__, hdr.msgHdr.cmdID, hdr.msgHdr.desWorkerID, hdr.msgHdr.bodyLen);
+    }
+    memcpy(buffer, &hdr, sizeof(MsgHdrType));
 	if(msgBody != NULL && hdr.msgHdr.bodyLen > 0)
 		memcpy(buffer+sizeof(MsgHdrType), msgBody, hdr.msgHdr.bodyLen);
 

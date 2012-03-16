@@ -569,6 +569,10 @@ void AthleticsRank::RequestPageNum(Player* player)
     }
     Rank rank = found->second;
     UInt32 rankpos = getRankPos(row, rank);
+
+    if(rankpos > ATHLETICS_RANK_MAX_CNT)
+        rankpos = ATHLETICS_RANK_MAX_CNT + 1;
+
     if(rankpos <=500)
         return;
 
@@ -581,6 +585,12 @@ void AthleticsRank::RequestPageNum(Player* player)
         return;
     }
     */
+    if(rankpos - ((*rank)->pageNum  * 10 + 20) <= 500)
+    {
+        player->sendMsgCode(0, 1498); //翻页失败，不能翻入前500名！！
+            return;
+    }
+
     player->addGlobalFlag(Player::AthPayForPage);
    // (*rank)->pageNum  ++ ;
    // send msg to Country
