@@ -110,6 +110,10 @@ public:
     { _chingming = v; }
     inline static bool getChingMing()
     { return _chingming; }
+    inline static void setCarnival(bool v)
+    { _carnival = v; }
+    inline static bool getCarnival()
+    { return _carnival; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -148,6 +152,7 @@ public:
     static bool _trumpenchret;
     static bool _foolsday;
     static bool _chingming;
+    static bool _carnival;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

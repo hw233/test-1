@@ -78,7 +78,11 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 	cfg.load(scriptStr);
 	globalSysMsg.load();
 	Battle::battleReport.init();
+#ifdef _FB
+    _analyzer.Init("./conf/udplogfb.xml");
+#else
     _analyzer.Init();
+#endif
 #ifdef _FB
 #else
     GObject::dclogger.init();

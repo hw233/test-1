@@ -999,7 +999,11 @@ function onFoolsDay(player)
     end
 
     if lvl >= 40 and player:GetVar(58) == 0 then
-        sendItemPackageMail(player, "", "", {0,1,1});
+        sendItemPackageMail(player, "【愚人节礼包】奖励", "恭喜您获得【愚人节礼包】，4月1日打开有惊喜哦！\n等级≥40级所有玩家，在3/29-4/1每日登陆游戏就可以获得一个【愚人节礼包】", {0,1,1});
+        local date = os.date("%Y%m%d", os.time())
+        if date == "20120401" then
+            sendItemPackageMail(player, "【愚人节卡片】奖励", "恭喜您获得【愚人节卡片】*5，使用卡片会有惊喜哦！\n等级≥40级所有玩家，在4月1日登陆游戏就可以获得【愚人节卡片】*5", {0,5,1});
+        end
         player:SetVar(58, 1)
     end
 end

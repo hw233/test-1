@@ -102,45 +102,7 @@ namespace GObject
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
-#if 0
-		float theirbp = _npcGroup->getBattlePoints();
-		float mybp = 0.0f;
-		for(int i = 0; i < 5; ++ i)
-		{
-			Lineup& lup = m_Player->getLineup(i);
-			if(!lup.available())
-				continue;
-			int ext = 0;
-			if(m_Player->getBuffData(PLAYER_BUFF_ATTR3, now))
-				ext = 3;
-			else if(m_Player->getBuffData(PLAYER_BUFF_ATTR2, now))
-				ext = 2;
-			else if(m_Player->getBuffData(PLAYER_BUFF_ATTR1, now))
-				ext = 1;
-			if(lup.fighter->getBuffData(FIGHTER_BUFF_ATTR3, now))
-				ext += 3;
-			else if(lup.fighter->getBuffData(FIGHTER_BUFF_ATTR2, now))
-				ext += 2;
-			else if(lup.fighter->getBuffData(FIGHTER_BUFF_ATTR1, now))
-				ext += 1;
-			if(m_Player->getBuffData(PLAYER_BUFF_HOLY))
-				ext += lup.fighter->getLevel() / 4;
-			mybp += lup.fighter->getBattlePoint() * (1.0f + 0.015f * ext);
-		}
-		const float autobattle_tweak = 0.5;
-		const float autobattle_A = 2.5;
-		float exp = 3.0f * _npcGroup->getExp();
-		float clanEffect = 1.0f;
-		if(m_Player->getClan() != NULL)
-			clanEffect = m_Player->getClan()->getAutoBattleSpeed();
-		if(mybp >= theirbp)
-			exp *= autobattle_A / (theirbp / mybp + (autobattle_A - 1.0f));
-		else
-			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
-		return exp * clanEffect;
-#else
         return 8.0f * _npcGroup->getExp();
-#endif
 	}
 
 	void EventAutoBattle::Process(UInt32)
@@ -303,34 +265,8 @@ namespace GObject
 			return;
         }
 
-#if 0
-        PracticeFighterExp pfexp;
-        memset(&pfexp, 0, sizeof(pfexp));
-
-        //data->lock.lock();
-        Fighter* fgt = 0;
-        UInt8 n = 0;
-        for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
-        {
-            fgt = m_Player->findFighter(*i);
-            if (fgt)
-            {
-                //fgt->addPExp(fgt->getPracticeInc() * 10); 
-                if(n < sizeof(pfexp.fids)/sizeof(UInt32))
-                {
-                    pfexp.fids[n] = *i;
-                    pfexp.counts[n] = 10;
-                    ++ n;
-                }
-            }
-        }
-        //data->lock.unlock();
-        GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
-        GLOBAL().PushMsg(hdr1, &pfexp);
-#else
         GameMsgHdr hdr1(0x1F6, WORKER_THREAD_WORLD, m_Player, 0);
         GLOBAL().PushMsg(hdr1, NULL);
-#endif
 
 		data->checktime -= 10;
         if ((int)data->checktime < 0)
@@ -338,12 +274,8 @@ namespace GObject
 		if(leftCount == 0 || data->checktime == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
-#if 0
-            practicePlace.stop(m_Player);
-#else
             GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
             GLOBAL().PushMsg(hdr1, NULL);
-#endif
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
 			return;
 		}
@@ -363,8 +295,6 @@ namespace GObject
 			return false;
         }
 
-        //data->lock.lock();
-        //data->lock.unlock();
         if(m_Player->getPIcCount() <= 0)
             return false;
 
@@ -381,7 +311,6 @@ namespace GObject
             memset(&pfexp, 0, sizeof(pfexp));
             pfexp.goldUse = goldUse;
 
-            //data->lock.lock();
             Fighter* fgt = 0;
             UInt8 n = 0;
             for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
@@ -8930,10 +8859,13 @@ namespace GObject
             return;
         }
 
+        if (!GetVar(VAR_GOLD_TOKEN+type))
+            return;
+
         static UInt16 items[3][4] = {
-            {56,57,15,500},
-            {503,514,501,547},
             {515,509,507,47},
+            {503,514,501,547},
+            {56,57,15,500},
         };
 
         bool same = true;
@@ -8950,26 +8882,27 @@ namespace GObject
 
         if (same)
         {
-            GetPackage()->AddItem(ids[0], 6, true, true);
+            GetPackage()->AddItem(ids[0], 6, true, false);
         }
         else
         {
             for (UInt8 i = 0; i < 3; ++i)
             {
-                GetPackage()->AddItem(ids[i], 1, true, true);
+                GetPackage()->AddItem(ids[i], 1, true, false);
             }
         }
 
-        Stream st(REQ::TOKEN);
+        Stream st(REP::TOKEN);
         st << static_cast<UInt8>(1) << ids[0] << ids[1] << ids[2] << Stream::eos;
         send(st);
 
-        // sendTokenInfo();
+        SetVar(VAR_GOLD_TOKEN+type, GetVar(VAR_GOLD_TOKEN+type)-1);
+        sendTokenInfo();
     }
 
     void Player::sendTokenInfo()
     {
-        Stream st(REQ::TOKEN);
+        Stream st(REP::TOKEN);
         st << static_cast<UInt8>(0) << GetVar(VAR_GOLD_TOKEN) << GetVar(VAR_TAEL_TOKEN) << GetVar(VAR_COIN_TOKEN) << Stream::eos;
         send(st);
     }

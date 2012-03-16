@@ -1274,6 +1274,7 @@ void OnPracticeStopReq( GameMsgHdr& hdr, PracticeStopReq& req)
 {
 	MSG_QUERY_PLAYER(player);
 	GObject::practicePlace.stop(player);
+    PopTimerEvent(player, EVENT_PLAYERPRACTICING, player->getId());
 }
 
 void OnAthleticsListReq( GameMsgHdr& hdr, AthleticsListReq& req)

@@ -74,6 +74,8 @@ void WorldScript::init()
 	def("setFoolsDay", GObject::World::setFoolsDay);
 	def("getChingMing", GObject::World::getChingMing);
 	def("setChingMing", GObject::World::setChingMing);
+	def("getCarnival", GObject::World::getCarnival);
+	def("setCarnival", GObject::World::setCarnival);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
