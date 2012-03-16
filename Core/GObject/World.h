@@ -82,8 +82,8 @@ public:
     { _blueactiveday = v; }
     inline static bool getBlueactiveday()
     { return _blueactiveday; }
-    inline static void setRechargeActive(bool v)
-    { _rechargeactive = v; }
+    inline static void setRechargeActive(bool v, UInt8 no)
+    { _rechargeactive = v; if (v) _rechargeactiveno |= no; else _rechargeactiveno &= ~no; }
     inline static bool getRechargeActive()
     { return _rechargeactive; }
     inline static void setValentineDay(bool v)
@@ -98,6 +98,18 @@ public:
     { _whiteloveday = v; }
     inline static bool getWhiteLoveDay()
     { return _whiteloveday; }
+    inline static void setTrumpEnchRet(bool v)
+    { _trumpenchret = v; }
+    inline static bool getTrumpEnchRet()
+    { return _trumpenchret; }
+    inline static void setFoolsDay(bool v)
+    { _foolsday = v; }
+    inline static bool getFoolsDay()
+    { return _foolsday; }
+    inline static void setChingMing(bool v)
+    { _chingming = v; }
+    inline static bool getChingMing()
+    { return _chingming; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -129,9 +141,13 @@ public:
     static bool _newyear;
     static bool _blueactiveday;
     static bool _rechargeactive;
+    static UInt8 _rechargeactiveno;
     static bool _valentineday;
     static bool _girlday;
     static bool _whiteloveday;
+    static bool _trumpenchret;
+    static bool _foolsday;
+    static bool _chingming;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

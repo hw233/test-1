@@ -86,6 +86,9 @@ namespace Script
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
 		lua_tinker::def(_L, "getWhiteLoveDay", GObject::World::getWhiteLoveDay);
+		lua_tinker::def(_L, "getTrumpEnchRet", GObject::World::getTrumpEnchRet);
+		lua_tinker::def(_L, "getFoolsDay", GObject::World::getFoolsDay);
+		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -933,6 +936,11 @@ namespace Script
 	bool GameActionLua::onValentineDay(Player* player)
 	{
 		return Call<bool>("onValentineDay", player);
+	}
+
+	bool GameActionLua::onFoolsDay(Player* player)
+	{
+		return Call<bool>("onFoolsDay", player);
 	}
 
 	bool GameActionLua::getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul)

@@ -54,7 +54,7 @@ UInt32 ChatItem::addFighter( Player * player, UInt32 id )
 	UInt16 magatk = static_cast<UInt16>(bformula->calcMagAttack(fgt));
 	UInt16 def = static_cast<UInt16>(bformula->calcDefend(fgt));
 	UInt16 magdef = static_cast<UInt16>(bformula->calcMagDefend(fgt));
-	UInt16 hp = static_cast<UInt16>(bformula->calcHP(fgt));
+	UInt32 hp = static_cast<UInt16>(bformula->calcHP(fgt));
 
 	UInt16 hit = static_cast<float>(bformula->calcHitrate(fgt, NULL)) * 100;
 	UInt16 evd = static_cast<float>(bformula->calcEvade(fgt, NULL)) * 100;

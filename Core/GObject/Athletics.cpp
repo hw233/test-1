@@ -772,10 +772,9 @@ void Athletics:: PayForKillCD(UInt8 type)
     msg.moneyEnough = 0;
    if(_owner->getGold() < cost) 
        _owner->sendMsgCode(0, 1104);
-
    else
    {
-        ConsumeInfo ci(AthleticPaging,0,0);
+        ConsumeInfo ci(AthleticKillCD,0,0);
         _owner->useGold(cost, &ci);
         msg.moneyEnough = 1;
    }

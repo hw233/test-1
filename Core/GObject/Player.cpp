@@ -51,6 +51,7 @@
 #include "GData/ClanSkillTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
+#include "ArenaBattle.h"
 #ifdef _ARENA_SERVER
 #include "GameServer.h"
 #endif
@@ -752,7 +753,10 @@ namespace GObject
 		return vipl;
 	}
 
-    static UInt32 recharge[] = {188,288,688,888,1888,2012,2888,3888,4888,5888,6888,7888,8888,9888,9999};
+    //春节充值活动额度
+    //static UInt32 recharge[] = {188,288,688,888,1888,2012,2888,3888,4888,5888,6888,7888,8888,9888,9999};
+    //2012年3月份充值活动额度
+    static UInt32 recharge[] = {199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999,};
     UInt8 Player::calcRechargeLevel(UInt32 total)
     {
         UInt32 totalRecharge = total;
@@ -859,6 +863,8 @@ namespace GObject
             GameAction()->onNewYear(this);
         if (World::getValentineDay())
             GameAction()->onValentineDay(this);
+        if (World::getFoolsDay())
+            GameAction()->onFoolsDay(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -5728,6 +5734,8 @@ namespace GObject
 #ifdef _FB
        tellCFriendLvlUp(nLev);
 #endif
+
+#if 0
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -5739,6 +5747,7 @@ namespace GObject
 			GameMsgHdr hdr1(0x1A4, WORKER_THREAD_WORLD, this, 7);
 			GLOBAL().PushMsg(hdr1, buffer);
 		}
+#endif
 
         //TELL my frined that my Level up  so get the Attainment!
         if(nLev == 50 || nLev == 80 || nLev == 100)
@@ -5754,6 +5763,12 @@ namespace GObject
                 GLOBAL().PushMsg(hdr, &msg);
                 it ++ ;
             }
+        }
+
+        if (nLev == 70)
+        {
+            GameMsgHdr hdr(0x1A7, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr, 0);
         }
 	}
 
@@ -5934,7 +5949,7 @@ namespace GObject
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
 
-        if (World::_rechargeactive)
+        if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             UInt8 oldVipLevel = calcRechargeLevel(total);
@@ -5973,7 +5988,7 @@ namespace GObject
 
     void Player::sendRechargeInfo()
     {
-        if (!World::_rechargeactive)
+        if (!World::getRechargeActive())
             return;
 
         UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -6503,8 +6518,10 @@ namespace GObject
 			return 1;
 		}
 
-        if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
+        if (fgt->getPotential() >= 1.2f)
             fgt->getAttrType2(true);
+        if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
+            fgt->getAttrType3(true);
 		return 0;
 	}
 
@@ -6896,6 +6913,7 @@ namespace GObject
 			if(mail == NULL)
 				continue;
 
+#if 0
 			const UInt32 vipTable[16][14] =
             {
                 {430,2,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -6915,6 +6933,27 @@ namespace GObject
                 {432,10,6008,6,507,5,509,5,30,10,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
+#else // XXX: 2012年03月充值反利活动
+			const UInt32 vipTable[16][14] =
+            {
+                {514,3,0,0,0,0,0,0,0,0,0,0,0,0},
+                {503,3,0,0,0,0,0,0,0,0,0,0,0,0},
+                {516,3,0,0,0,0,0,0,0,0,0,0,0,0},
+                {514,5,503,5,516,5,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,80,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,100,0,0,0,0,0,0,0,0,0,0,0,0},
+                {507,2,509,2,30,2,MailPackage::Coupon,100,0,0,0,0,0,0},
+                {MailPackage::Coupon,120,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,140,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,160,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,180,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,200,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,220,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,240,0,0,0,0,0,0,0,0,0,0,0,0},
+                {515,10,507,10,509,10,30,10,MailPackage::Coupon,300,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+            };
+#endif
 
 			MailPackage::MailItem mitem[7];
 			UInt32 mcount = 0;
@@ -6923,6 +6962,9 @@ namespace GObject
 			const UInt32 * t = vipTable[j-1];
 			for(UInt32 i = 0; i < 14 && t[i] > 0; i += 2)
 			{
+                if (!t[i])
+                    break;
+
 				mitem[mcount].id = t[i];
 				mitem[mcount++].count = t[i+1];
 				strItems += Itoa(t[i]);
@@ -8877,5 +8919,59 @@ namespace GObject
         }
     }
 
+    void Player::useToken(UInt8 type)
+    {
+        if (type > 2)
+            return;
+
+        if (GetPackage()->GetRestPackageSize() < 3)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+
+        static UInt16 items[3][4] = {
+            {56,57,15,500},
+            {503,514,501,547},
+            {515,509,507,47},
+        };
+
+        bool same = true;
+        UInt16 ids[3] = {0,};
+        URandom rnd(time(NULL));
+
+        for (UInt8 i = 0; i < 3; ++i)
+        {
+            UInt8 idx = rnd(sizeof(items[type])/sizeof(UInt16));
+            ids[i] = items[type][idx];
+            if (i && ids[i] != ids[i-1])
+                same = false;
+        }
+
+        if (same)
+        {
+            GetPackage()->AddItem(ids[0], 6, true, true);
+        }
+        else
+        {
+            for (UInt8 i = 0; i < 3; ++i)
+            {
+                GetPackage()->AddItem(ids[i], 1, true, true);
+            }
+        }
+
+        Stream st(REQ::TOKEN);
+        st << static_cast<UInt8>(1) << ids[0] << ids[1] << ids[2] << Stream::eos;
+        send(st);
+
+        // sendTokenInfo();
+    }
+
+    void Player::sendTokenInfo()
+    {
+        Stream st(REQ::TOKEN);
+        st << static_cast<UInt8>(0) << GetVar(VAR_GOLD_TOKEN) << GetVar(VAR_TAEL_TOKEN) << GetVar(VAR_COIN_TOKEN) << Stream::eos;
+        send(st);
+    }
 } // namespace GObject
 

@@ -32,6 +32,7 @@
 #include "MsgID.h"
 #include "GObject/DCLogger.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/ArenaBattle.h"
 
 namespace GObject
 {
@@ -72,9 +73,13 @@ bool World::_christmas = false;
 bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
+UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_girlday = false;
 bool World::_whiteloveday = false;
+bool World::_trumpenchret = false;
+bool World::_foolsday = false;
+bool World::_chingming = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -184,7 +189,10 @@ void World::makeActivityInfo(Stream &st)
 	st << static_cast<UInt8>(5) << _wday;
 
     UInt8 active = _newyear?1:0;
-    active |= _rechargeactive?2:0;
+    if (_rechargeactiveno & 1)
+        active |= _rechargeactive?2:0;
+    if (_rechargeactiveno & 2)
+        active |= _rechargeactive?8:0;
     active |= _girlday?4:0;
     st << active << Stream::eos;
 }
