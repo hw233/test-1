@@ -800,6 +800,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
+    ChingMingDay(player, lootlvl, 0)
 end
 
 
@@ -812,6 +813,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
+    ChingMingDay(player, lootlvl, 1)
 end
 
 local vippack = {
@@ -1001,6 +1003,28 @@ function onFoolsDay(player)
     if lvl >= 40 and player:GetVar(58) == 0 then
         sendItemPackageMail(player, "", "", {0,1,1});
         player:SetVar(58, 1)
+    end
+end
+
+function ChingMingDay(player, lootlvl, where)
+    if not getChingMing() then
+        return
+    end
+
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+
+    local item = 481
+    local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+    local package = player:GetPackage();
+    for m = 1,itemNum[lootlvl] do
+        package:AddItem(item, 1, true);
     end
 end
 
