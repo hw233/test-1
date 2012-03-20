@@ -179,6 +179,12 @@ function onActivityCheck(tm)
       setChingMing(false)
   end
 
+  if tm >= actTime23 and tm < actTime30 then
+      setCarnival(true)
+  else
+      setCarnival(false)
+  end
+
   -- XXX: cancel auto heal
   setAutoHeal(true)
 
@@ -201,7 +207,7 @@ function initActTime(y, m, d)
   local  SerStartTm12= { ['year'] = 2012, ['month'] = 3, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 充值返利（3/23-3/31）
   local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 愚人节活动（3/29-3/31）
+  -- 愚人节活动（3/29-4/1）
   local  SerStartTm14= { ['year'] = 2012, ['month'] = 3, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -246,7 +252,7 @@ function initActTime(y, m, d)
   actTime26 = os.time(SerStartTm13) + 9 * 86400;
 
   actTime27 = os.time(SerStartTm14);
-  actTime28 = os.time(SerStartTm14) + 3 * 86400;
+  actTime28 = os.time(SerStartTm14) + 4 * 86400;
 
   actTime29 = os.time(SerStartTm15);
   actTime30 = os.time(SerStartTm15) + 8 * 86400;

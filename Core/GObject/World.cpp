@@ -80,6 +80,7 @@ bool World::_whiteloveday = false;
 bool World::_trumpenchret = false;
 bool World::_foolsday = false;
 bool World::_chingming = false;
+bool World::_carnival = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -190,9 +191,11 @@ void World::makeActivityInfo(Stream &st)
 
     UInt8 active = _newyear?1:0;
     if (_rechargeactiveno & 1)
-        active |= _rechargeactive?2:0;
-    if (_rechargeactiveno & 2)
-        active |= _rechargeactive?8:0;
+        active |= 2;
+    //if (_rechargeactiveno & 2)
+    //    active |= 8;
+    if (_carnival)
+        active |= 8;
     active |= _girlday?4:0;
     st << active << Stream::eos;
 }

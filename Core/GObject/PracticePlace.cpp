@@ -299,7 +299,6 @@ UInt8 PracticePlace::_picCnt[16] = {0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 6, 6, 6, 6, 6,
             //DB1().PushUpdateData("DELETE FROM `practice_data` WHERE `id` = %"I64_FMT"u)", pl->getId());
             DB1().PushUpdateData("UPDATE `practice_data` SET place = %u, slot = 0, checktime = 0, cdend = %u where `id`= %"I64_FMT"u",
                     PPLACE_MAX, pd->cdend, pl->getId());
-            PopTimerEvent(pl, EVENT_PLAYERPRACTICING, pl->getId());
 
             if(place == PPLACE_MAX || clan != pl->getClan())
                 --m_places[place-1].used;
