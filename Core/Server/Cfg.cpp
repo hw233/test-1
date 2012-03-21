@@ -84,8 +84,20 @@ bool Cfg::isAdminIPAllowed( UInt32 ip )
 	for(size_t i = 0; i < _adminIPAllowed.size(); ++ i)
 	{
 		if(!((_adminIPAllowed[i].addr ^ ip) >> _adminIPAllowed[i].mask))
+        {
+#ifdef _DEBUG
+            struct in_addr addr;
+            addr.s_addr = ip;
+            fprintf(stderr, "ADMIN IP ALLOWED: (%u): %s\n", ip, inet_ntoa(addr));
+#endif
 			return true;
+        }
 	}
+#ifdef _DEBUG
+    struct in_addr addr;
+    addr.s_addr = ip;
+    fprintf(stderr, "ADMIN IP IS NOT ALLOWED: (%u): %s\n", ip, inet_ntoa(addr));
+#endif
 	return false;
 }
 

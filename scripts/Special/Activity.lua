@@ -785,7 +785,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
-    ChingMingDay(player, lootlvl, 0)
+    ChingMingDay(player, lootlvl)
 end
 
 
@@ -798,7 +798,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
-    ChingMingDay(player, lootlvl, 1)
+    ChingMingDay(player, lootlvl)
 end
 
 local vippack = {
@@ -995,7 +995,7 @@ function onFoolsDay(player)
     end
 end
 
-function ChingMingDay(player, lootlvl, where)
+function ChingMingDay(player, lootlvl)
     if not getChingMing() then
         return
     end
@@ -1004,7 +1004,6 @@ function ChingMingDay(player, lootlvl, where)
         lootlvl = 0
     end
 
-    local item = 481
     local itemNum = {
             [0] = 1,
             [1] = 2,
@@ -1012,9 +1011,7 @@ function ChingMingDay(player, lootlvl, where)
             [3] = 6,
         };
     local package = player:GetPackage();
-    for m = 1,itemNum[lootlvl] do
-        package:AddItem(item, 1, true);
-    end
+    package:AddItem(481, itemNum[lootlvl], true);
 end
 
 function onLoginPF(player)

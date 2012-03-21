@@ -163,6 +163,7 @@ GMHandler::GMHandler()
     Reg(3, "bosshp", &GMHandler::OnSetBossHp);
     Reg(3, "time", &GMHandler::OnTime);
     Reg(3, "token", &GMHandler::OnToken);
+	Reg(3, "recharge", &GMHandler::OnRecharge);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2642,5 +2643,10 @@ void GMHandler::OnToken(GObject::Player* player, std::vector<std::string>& args)
         player->AddVar(VAR_COIN_TOKEN, atoi(args[2].c_str()));
     player->sendTokenInfo();
 }
-
+void GMHandler::OnRecharge(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt32 money = 0;
+	LoginMsgHdr hdr(0x105, WORKER_THREAD_LOGIN, 0, player->GetSessionID(), sizeof(money));
+	GLOBAL().PushMsg(hdr, &money);
+}
 

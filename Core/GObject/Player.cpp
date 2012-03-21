@@ -893,8 +893,8 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.qqvipl, cfg.serverNum, platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u||||||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -3258,6 +3258,10 @@ namespace GObject
 
         if (ci)
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
+#ifdef _FB
+#else
+        dclogger.consume(this, _playerData.gold, c);
+#endif
 		return _playerData.gold;
 	}
 
@@ -8898,6 +8902,11 @@ namespace GObject
 
         SetVar(VAR_GOLD_TOKEN+type, GetVar(VAR_GOLD_TOKEN+type)-1);
         sendTokenInfo();
+
+        if (type == 0 && !same)
+            SYSMSG_BROADCASTV(2351, _playerData.country, _playerData.name.c_str(), ids[0], ids[1], ids[2]);
+        if (type == 0 && same)
+            SYSMSG_BROADCASTV(2352, _playerData.country, _playerData.name.c_str(), ids[0]);
     }
 
     void Player::sendTokenInfo()

@@ -178,6 +178,43 @@ bool DCLogger::online(UInt32 num, UInt8 domain)
     return true;
 }
 
+bool DCLogger::consume(Player* player, UInt32 total, UInt32 c)
+{
+    stringstream msg;
+    msg << "version=";
+    msg << version;
+    msg << "&appid=";
+    msg << appid;
+    msg << "&userip=";
+    msg << player->getClientAddress();
+    msg << "&svrip=";
+    msg << cfg.serverIp;
+    msg << "&time=";
+    msg << time(NULL);
+    msg << "&domain=";
+    msg << player->getDomain();
+    msg << "&worldid=";
+    msg << cfg.serverNum;
+    msg << "&optype=1&actionid=5";
+    msg << "&opuid=";
+    msg << player->getId();
+    msg << "&opopenid=";
+    msg << player->getOpenId();
+    msg << "&key=";
+    msg << player->getOpenKey();
+    msg << "&itemid=29999";
+    msg << "&itemtype=29";
+    msg << "&itemcnt=1";
+    msg << "&modifyfee=";
+    msg << c*10;
+    msg << "&totalfee=";
+    msg << total*10;
+    msg << "&touid=&toopenid=&level=&source=&modifyexp=&totalexp=&modifycoin=&totalcoin=&onlinetime=&keycheckret=&safebuf=&remark=&user_num=";
+
+    DC().Push(msg.str().c_str(), msg.str().length());
+    return true;
+}
+
 bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
 {
     std::ostringstream msg;
@@ -196,7 +233,7 @@ bool DCLogger::fee(Player* player, UInt32 total, Int32 c)
     msg << player->getDomain();
     msg << "&worldid=";
     msg << cfg.serverNum;
-    msg << "&optype=1&actionid=5";
+    msg << "&optype=1&actionid=15";
     msg << "&opuid=";
     msg << player->getId();
     msg << "&opopenid=";
