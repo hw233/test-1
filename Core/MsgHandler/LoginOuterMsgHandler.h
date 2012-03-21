@@ -37,7 +37,7 @@
 #include "GObject/Copy.h"
 #include "GObject/Dungeon.h"
 #include "GObject/World.h"
-
+#include "GObject/Var.h"
 
 static memcached_st* memc = NULL;
 
@@ -206,6 +206,7 @@ inline UInt8 doLogin(Network::GameClient * cl, UInt64 pid, UInt32 hsid, GObject:
                     cl2->send(kick_pkt, 4);
                     cl2->SetPlayer(NULL);
                     cl2->pendClose();
+                    player->SetVar(GObject::VAR_OFFLINE, TimeUtil::Now());
                     res = 4;
                 }
 			}
