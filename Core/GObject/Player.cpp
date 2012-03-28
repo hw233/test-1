@@ -6447,9 +6447,9 @@ namespace GObject
 			return 1;
 		}
 
-        if (fgt->getPotential() + 0.005 >= 1.2f)
+        if (fgt->getPotential() + 0.005f >= 1.2f)
             fgt->getAttrType2(true);
-        if (fgt->getPotential() + 0.005 >= 1.5f && fgt->getCapacity() >= 7.0f)
+        if (fgt->getPotential() + 0.005f >= 1.5f && fgt->getCapacity() >= 7.0f)
             fgt->getAttrType3(true);
 		return 0;
 	}

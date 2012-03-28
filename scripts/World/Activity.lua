@@ -203,7 +203,7 @@ function initActTime(y, m, d)
   local  SerStartTm9 = { ['year'] = 2012, ['month'] = 2, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm10= { ['year'] = 2012, ['month'] = 3, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm11= { ['year'] = 2012, ['month'] = 3, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 装备法宝强化返利（3/21-3/27）
+  -- 装备法宝强化返利（3/19-3/25）
   local  SerStartTm12= { ['year'] = 2012, ['month'] = 3, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 充值返利（3/23-3/31）
   local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };

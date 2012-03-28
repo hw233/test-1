@@ -448,11 +448,6 @@ bool Dungeon::doChallenge( Player * player, DungeonPlayerInfo& dpi, bool report,
 
 bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool noreport, UInt32 * totalExp, UInt32 gold )
 {
-    // TODO:
-#if 0
-	if(World::_activityStage > 0)
-		GameAction()->onDungeonWin(player, _id, dpi.level + 1);
-#endif
 	UInt8 level = dpi.level;
 	if(level >= _levels.size())
     {
@@ -510,6 +505,8 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         player->OnHeroMemo(MC_SLAYER, MD_STARTED, 0, 2);
         if (World::getWhiteLoveDay() && World::_wday == 6)
             player->GetPackage()->AddItem2(476, 5, 1, 1);
+
+		GameAction()->onDungeonWin(player, _id, dpi.totalCount);
 	}
 
 	if(noreport)

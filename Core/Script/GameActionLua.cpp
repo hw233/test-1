@@ -219,6 +219,7 @@ namespace Script
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);
 		CLASS_DEF(Fighter, getClass);
+		CLASS_DEF(Fighter, getSex);
 		// TODO: CLASS_DEF(Fighter, getSkill);
 		// CLASS_DEF(Fighter, setSkill);
 		// CLASS_DEF(Fighter, setSkillLevel);
@@ -803,9 +804,9 @@ namespace Script
 		Call<void>("onLogin", player);
 	}
 
-	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 level )
+	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 count )
 	{
-		Call<void>("onDungeonWin", player, id, level);
+		Call<void>("onDungeonWin", player, id, count);
 	}
 
 	void GameActionLua::onClanBattleAttend( Player* player )

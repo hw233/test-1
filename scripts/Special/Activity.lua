@@ -137,18 +137,7 @@ function onLevelup(player, olev, nlev)
     end
 end
 
-function onDungeonWin(player, id, level)
-	if (id == 1 and level == 15) or (id == 2 and level == 22) or (id == 3 and level == 44) or (id == 4 and level == 20) or (id == 5 and level == 20)then
-		local stage = getActivityStage()
-		if stage == 1 then
-			checkExpire(player)
-			if player:hasStatus(0x100) then
-				return
-			end
-			player:addStatus(0x100)
-			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在副本通关后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
-		end
-	end
+function onDungeonWin(player, id, count)
 end
 
 function onClanBattleAttend(player)
@@ -774,8 +763,6 @@ end
 
 function WhiteLoveDay(player, lootlvl, where)
     if getWhiteLoveDay() and ((getWeekDay() == 4 and where == 0) or (getWeekDay() == 5 and where == 1)) then
-        local item = 476
-
         if lootlvl > 3 then
             lootlvl = 0
         end
@@ -788,9 +775,7 @@ function WhiteLoveDay(player, lootlvl, where)
         };
 
         local package = player:GetPackage();
-        for m = 1,itemNum[lootlvl] do
-            package:AddItem(item, 1, true);
-        end
+        package:AddItem(476, itemNum[lootlvl], true);
     end
 end
 
@@ -999,10 +984,10 @@ function onFoolsDay(player)
     end
 
     if lvl >= 40 and player:GetVar(58) == 0 then
-        sendItemPackageMail(player, "【愚人节礼包】奖励", "恭喜您获得【愚人节礼包】，4月1日打开有惊喜哦！\n等级≥40级所有玩家，在3/29-4/1每日登陆游戏就可以获得一个【愚人节礼包】", {0,1,1});
-        local date = os.date("%Y%m%d", os.time())
-        if date == "20120401" then
-            sendItemPackageMail(player, "【愚人节卡片】奖励", "恭喜您获得【愚人节卡片】*5，使用卡片会有惊喜哦！\n等级≥40级所有玩家，在4月1日登陆游戏就可以获得【愚人节卡片】*5", {0,5,1});
+        sendItemPackageMail(player, "【愚人节礼包】奖励", "恭喜您获得【愚人节礼包】，4月1日打开有惊喜哦！\n等级≥40级所有玩家，在3/29-4/1每日登陆游戏就可以获得一个【愚人节礼包】", {479,1,1});
+        local date = os.date("%m%d", os.time())
+        if date == "0401" then
+            sendItemPackageMail(player, "【愚人节卡片】奖励", "恭喜您获得【愚人节卡片】*5，使用卡片会有惊喜哦！\n等级≥40级所有玩家，在4月1日登陆游戏就可以获得【愚人节卡片】*5", {480,5,1});
         end
         player:SetVar(58, 1)
     end
