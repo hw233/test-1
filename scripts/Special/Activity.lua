@@ -785,6 +785,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
+    ChingMingDay(player, lootlvl, 0)
 end
 
 
@@ -797,6 +798,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     ValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
+    ChingMingDay(player, lootlvl, 1)
 end
 
 local vippack = {
@@ -990,6 +992,28 @@ function onFoolsDay(player)
             sendItemPackageMail(player, "【愚人节卡片】奖励", "恭喜您获得【愚人节卡片】*5，使用卡片会有惊喜哦！\n等级≥40级所有玩家，在4月1日登陆游戏就可以获得【愚人节卡片】*5", {480,5,1});
         end
         player:SetVar(58, 1)
+    end
+end
+
+function ChingMingDay(player, lootlvl, where)
+    if not getChingMing() then
+        return
+    end
+
+    if lootlvl > 3 then
+        lootlvl = 0
+    end
+
+    local item = 481
+    local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+    local package = player:GetPackage();
+    for m = 1,itemNum[lootlvl] do
+        package:AddItem(item, 1, true);
     end
 end
 
