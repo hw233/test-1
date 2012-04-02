@@ -3684,7 +3684,7 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId)
         return false;
     }
 
-    UInt32 itemOut = m_2ndSoul->setSoulSkill(idx, skillId);
+    UInt32 itemOut = m_2ndSoul->setSoulSkill(idx, skillId, true);
     if(0xFFFFFFFF == itemOut)
         return false;
 

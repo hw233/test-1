@@ -187,6 +187,7 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, SoulSkill ss, bool writeDB)
 
     switch(ss.id)
     {
+    case 0:
     case SOUL_SKILL_ATTRTRANS:
     case SOUL_SKILL_STRENGHT:
     case SOUL_SKILL_INTELLIGENCE:
@@ -220,10 +221,10 @@ UInt16 SecondSoul::getSkillIdOfItem(UInt32 itemId)
 {
     UInt16 skillId = 0;
     int size1 = GData::soulSkillTable.size();
-    for(int i = 1; i < size1 + 1; ++ i)
+    for(int i = 1; i < size1; ++ i)
     {
         int size2 = GData::soulSkillTable[i].size();
-        for(int j = 1; j < size2 + 1; ++ j)
+        for(int j = 1; j < size2; ++ j)
         {
             if(itemId == GData::soulSkillTable[i][j].itemId)
             {
