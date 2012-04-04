@@ -305,6 +305,7 @@ void TownDeamon::useVitalityItem(Player* pl, UInt8 count)
             {
                 tmpVitality -= 100 - spirit;
                 dpd->vitality = vitality + tmpVitality;
+                dpd->spirit = 100;
             }
             else
             {

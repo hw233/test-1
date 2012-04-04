@@ -340,6 +340,9 @@ namespace REQ
 
     /** 锁妖塔*/
     const UInt8 TOWN_DEAMON         = 0xA9;
+
+    /** 元神系统*/
+    const UInt8 SECOND_SOUL         = 0x8E;
 }
 
 namespace REP
@@ -556,6 +559,9 @@ namespace REP
 
     /** 锁妖塔*/
     const UInt8 TOWN_DEAMON         = 0xA9;
+
+    /** 元神系统*/
+    const UInt8 SECOND_SOUL         = 0x8E;
 }
 
 namespace SPEQ

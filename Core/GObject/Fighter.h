@@ -12,6 +12,7 @@
 #include "GData/SkillTable.h"
 #include "GData/CittaTable.h"
 #include "GObject/WBossMgr.h"
+#include "SecondSoul.h"
 
 namespace GObject
 {
@@ -38,6 +39,12 @@ namespace GObject
 #define ACUPOINTS_MAX 15
 
 #define PEERLESS_UPMAX 1
+
+struct SoulItemExp
+{
+    UInt16 itemId;
+    Int16 exp;
+};
 
 class Player;
 class Fighter
@@ -453,6 +460,7 @@ public:
 	inline Int16 getBaseSoul() { return baseSoul; }
     inline Int16 getSoul() { return soul; }
     Int16 getMaxSoul();
+    Int16 get2ndSounSoulMax();
 
 	inline float getBaseEvade()
     {
@@ -614,6 +622,21 @@ protected:
     UInt16 _attrValue2;
     UInt8 _attrType3;
     UInt16 _attrValue3;
+
+    SecondSoul* m_2ndSoul;
+public:
+	float getSoulPracticeAddOn();
+	float getSoulPracticeFactor();
+    bool openSecondSoul(UInt8 cls);
+    void setSecondSoul(SecondSoul* sedondSoul);
+    UInt8 getSoulExtraAura();
+    bool practiceLevelUp();
+
+    void enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOut);
+    bool equipSoulSkill(UInt8 idx, UInt32 itemId);
+
+    void send2ndSoulInfo();
+
 public:
 	UInt32 favor;
 	UInt32 reqFriendliness;

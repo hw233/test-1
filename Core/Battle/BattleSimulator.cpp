@@ -893,8 +893,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 area_target->setDefend100(false);
                 if(bf->getSide() != area_target->getSide() && counter_deny >= 0 && (!skill || skill->cond == GData::SKILL_ACTIVE))
                 {
-                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, false);
-                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25, 0, scList, scCount, true);
+                    setStatusChange(bf, bf->getSide(), bf->getPos(), 1, 0, e_stAura, 25 + bf->getSoulExtraAura(), 0, scList, scCount, false);
+                    setStatusChange(bf, area_target->getSide(), area_target->getPos(), 1, 0, e_stAura, 25 + area_target->getSoulExtraAura(), 0, scList, scCount, true);
                 }
             }
             

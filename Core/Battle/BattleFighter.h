@@ -366,6 +366,7 @@ public:
     inline void setAtkReduce2(float v) { _atkreduce2 = v; }
     inline void setMagAtkReduce2(float v) { _magatkreduce2 = v; }
 
+    inline UInt8 getSoulExtraAura() { return _fighter->getSoulExtraAura(); }
 
 private:
 	void updateBuffExtras();

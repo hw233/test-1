@@ -1449,6 +1449,7 @@ namespace GObject
 
     public:
         void onBlueactiveday();
+        void sendSecondInfo();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

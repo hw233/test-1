@@ -20,6 +20,7 @@ namespace GData
 
 	public:
 		static bool LoadExpData();
+        static bool LoadSoulExpData();
         static bool LoadAcuPraData();
 		static bool LoadAreaData();
 		static bool LoadWeaponDefData();
@@ -43,6 +44,7 @@ namespace GData
         static bool LoadClanLvlData();
 		static bool LoadClanTechTable();
 		static bool LoadClanSkillTable();
+        static bool LoadSoulSkillTable();
         static bool LoadFighterProb();
         static bool LoadCopyData();
         static bool LoadFrontMapData();
@@ -51,6 +53,7 @@ namespace GData
         static bool LoadEUpgradeData();
         static bool LoadHeroMemoMaxSoul();
         static bool LoadSpiritAttrTable();
+        static bool LoadSoulItemExp();
 
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);
@@ -105,6 +108,7 @@ namespace GData
         static std::vector<UInt32>       m_BookPrice;
         static std::vector<UInt16>       m_OnlineAwardTime;
         static std::vector<std::vector<UInt16> > m_OnlineAward[3];
+        static std::map<UInt32, UInt32>  m_soulItemExp;
 	};
 
 	

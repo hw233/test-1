@@ -3903,4 +3903,5 @@ namespace GObject
             DB4().PushUpdateData("REPLACE INTO `equipment_spirit` (`id`, `splev1`, `splev2`, `splev3`, `splev4`, `spform1`, `spform2`, `spform3`) values (%u, 0, 0, 0, 0, %u, %u, %u)", equip->getId(), esa.spForm[0], esa.spForm[1], esa.spForm[2]);
         }
     }
+
 }

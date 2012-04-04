@@ -8875,5 +8875,14 @@ namespace GObject
         }
     }
 
+    void Player::sendSecondInfo()
+    {
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            Fighter* fgt = it->second;
+            fgt->send2ndSoulInfo();
+        }
+    }
+
 } // namespace GObject
 

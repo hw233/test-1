@@ -92,6 +92,8 @@ namespace GObject
         static bool InitMoneyLog();
         static bool LoadHeroMemo();
         static bool LoadCFriendAwards();
+        static bool LoadSoulItemChance();
+        static bool loadSecondSoul();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
@@ -359,6 +361,31 @@ namespace GObject
             return ringHp->hpBase[crr] * _ringHpFactor[enchant];
         }
 
+        static UInt32 getSoulEnchantChance(UInt8 soulStateLevel, UInt8 itemColor)
+        {
+            if(soulStateLevel < 1 || itemColor < 2)
+                return 0;
+            UInt8 lvlIdx = soulStateLevel - 1;
+            UInt8 colorIdx = itemColor - 2;
+            if(lvlIdx >= _soulEnchantChance.size())
+                return 0;
+            if(colorIdx >= _soulEnchantChance[lvlIdx].size())
+                return 0;
+
+            return _soulEnchantChance[lvlIdx][colorIdx];
+        }
+
+        static UInt32 getDecSoulStateExp(UInt8 soulStateLevel)
+        {
+            if(soulStateLevel < 1)
+                return 0;
+            UInt8 lvlIdx = soulStateLevel - 1;
+            if(lvlIdx >= _decSoulStateExp.size())
+                return 0;
+
+            return _decSoulStateExp[lvlIdx];
+        }
+
        	private:
 		static std::map<UInt32, ItemEquip *> equips;
         static UInt32 _enchant_cost;
@@ -440,6 +467,9 @@ namespace GObject
         static UInt32 _team_m_item[3];
         static std::map<UInt32, UInt32> _team_om_chance[3];
         static std::map<UInt32, UInt32> _team_om_item;
+
+        static std::vector<std::vector<UInt32>> _soulEnchantChance;
+        static std::vector<UInt32> _decSoulStateExp;
 
         public:
         static  vMergeStfs  getMergeStfs( UInt32 id)

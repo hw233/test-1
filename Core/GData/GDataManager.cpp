@@ -26,6 +26,8 @@
 #include "EUpgradeTable.h"
 #include "GObject/HeroMemo.h"
 #include "Script/lua_tinker.h"
+#include "SoulExpTable.h"
+#include "SoulSkillTable.h"
 
 namespace GData
 {
@@ -58,6 +60,7 @@ namespace GData
     std::vector<UInt32>		GDataManager::m_BookPrice;
     std::vector<UInt16>     GDataManager::m_OnlineAwardTime;
     std::vector<std::vector<UInt16> > GDataManager::m_OnlineAward[3];
+    std::map<UInt32, UInt32>  GDataManager::m_soulItemExp;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -66,6 +69,11 @@ namespace GData
 			fprintf(stderr, "Load ExpData Error !\n");
 			return false;
 		}
+        if(!LoadSoulExpData())
+        {
+			fprintf(stderr, "Load SoulExpData Error !\n");
+			return false;
+        }
 		if (!LoadAcuPraData())
 		{
 			fprintf(stderr, "Load AcuPra Error !\n");
@@ -182,6 +190,11 @@ namespace GData
 			fprintf(stderr, "Load clan skill template Error !\n");
 			return false;
 		}
+        if(!LoadSoulSkillTable())
+        {
+			fprintf(stderr, "Load soul skill template Error !\n");
+			return false;
+        }
 		if (!LoadFighterProb())
 		{
 			fprintf(stderr, "Load fighter prob template Error !\n");
@@ -217,10 +230,33 @@ namespace GData
 			fprintf(stderr, "Load Spirit Attr Type Error !\n");
 			return false;
         }
+        if(!LoadSoulItemExp())
+        {
+			fprintf(stderr, "Load Soul Item Exp Table Error !\n");
+			return false;
+        }
 
 		return true;
-	}	
-	
+	}
+
+    bool GDataManager::LoadSoulExpData()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBSoulExp dbexp;
+		if(execu->Prepare("SELECT `lvl`, `exp`, `pexp` FROM `soul_lvl_exp`", dbexp) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            if(dbexp.exp != 0)
+                soulExpTable.setTable(dbexp.lvl, dbexp.exp);
+            if(dbexp.pexp != 0)
+                soulExpTable.setPracticeTable(dbexp.lvl, dbexp.pexp);
+		}
+		return true;
+	}
+
+
 	bool GDataManager::LoadExpData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -1164,6 +1200,28 @@ namespace GData
 		return true;
 	}
 
+	bool GDataManager::LoadSoulSkillTable()
+	{
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		DBSoulSkillType sst;
+		if (execu->Prepare("SELECT `id`, `name`, `level`, `itemId`, `value` FROM `soul_skill_template` ORDER BY `id` ASC, `level` ASC", sst) != DB::DB_OK)
+			return false;
+		while (execu->Next() == DB::DB_OK)
+		{
+			if (sst.id >= soulSkillTable.size())
+			{
+				soulSkillTable.resize(sst.id + 1);
+			}
+			SingleSoulSkillTable & single = soulSkillTable[sst.id];
+			if (sst.level >= single.size())
+				single.resize(sst.level + 1);
+			single[sst.level] = SoulSkillTableData(sst.id, sst.name, sst.level, sst.itemId, sst.value);
+		}
+
+		return true;
+	}
+
 	bool GDataManager::LoadClanSkillTable()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -1691,6 +1749,20 @@ namespace GData
             sa.hp = dbsa.hp;
 
             spiritAttrTable.push_back(sa);
+        }
+        return true;
+    }
+
+    bool GDataManager::LoadSoulItemExp()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSoulItemExp dbsie;
+		if(execu->Prepare("SELECT `itemId`, `exp` FROM `soul_item_exp`", dbsie) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            m_soulItemExp[dbsie.itemId] = dbsie.exp;
         }
         return true;
     }
