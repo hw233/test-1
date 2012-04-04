@@ -714,7 +714,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
                 setAthleticsExtraChallenge(atker, 0);
 			return;
         }
-        /*
+        
 		if ((atkerRankPos - deferRankPos > 10 * (pageNum + 1))  && !type)
 		{
 			//Stream st(REP::ATHLETICS_CHALLENGE);
@@ -723,7 +723,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 			atker->sendMsgCode(0, 1405);
 			return ;
 		}
-        */
+        
 	}
 	else 
     {
