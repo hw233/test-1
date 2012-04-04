@@ -86,11 +86,16 @@ namespace Script
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
 		lua_tinker::def(_L, "getWhiteLoveDay", GObject::World::getWhiteLoveDay);
+		lua_tinker::def(_L, "getTrumpEnchRet", GObject::World::getTrumpEnchRet);
+		lua_tinker::def(_L, "getFoolsDay", GObject::World::getFoolsDay);
+		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
+		lua_tinker::def(_L, "getCarnival", GObject::World::getCarnival);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
+		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -215,6 +220,7 @@ namespace Script
 		CLASS_DEF(Fighter, getBuffData);
 		CLASS_DEF(Fighter, setBuffData);
 		CLASS_DEF(Fighter, getClass);
+		CLASS_DEF(Fighter, getSex);
 		// TODO: CLASS_DEF(Fighter, getSkill);
 		// CLASS_DEF(Fighter, setSkill);
 		// CLASS_DEF(Fighter, setSkillLevel);
@@ -799,9 +805,9 @@ namespace Script
 		Call<void>("onLogin", player);
 	}
 
-	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 level )
+	void GameActionLua::onDungeonWin( Player* player, UInt8 id, UInt8 count )
 	{
-		Call<void>("onDungeonWin", player, id, level);
+		Call<void>("onDungeonWin", player, id, count);
 	}
 
 	void GameActionLua::onClanBattleAttend( Player* player )
@@ -933,6 +939,11 @@ namespace Script
 	bool GameActionLua::onValentineDay(Player* player)
 	{
 		return Call<bool>("onValentineDay", player);
+	}
+
+	bool GameActionLua::onFoolsDay(Player* player)
+	{
+		return Call<bool>("onFoolsDay", player);
 	}
 
 	bool GameActionLua::getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul)

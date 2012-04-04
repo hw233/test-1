@@ -653,6 +653,12 @@ struct GetOfflineExp
     MESSAGE_DEF(REQ::OFFLINEEXP);
 };
 
+struct UseToken
+{
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::TOKEN, UInt8, _type);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -995,6 +1001,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->sendRechargeInfo();
     pl->sendCFriendAward();
+
+    if (World::getTrumpEnchRet())
+        pl->sendTokenInfo();
 
     {
         UInt32 exp = pl->GetVar(VAR_OFFLINE_EXP);
@@ -4249,4 +4258,17 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
 }
 
 
+void OnUseToken( GameMsgHdr& hdr, UseToken& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+    if (World::getTrumpEnchRet())
+    {
+        player->useToken(req._type);
+    }
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
+

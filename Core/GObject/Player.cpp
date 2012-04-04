@@ -51,6 +51,7 @@
 #include "GData/ClanSkillTable.h"
 #include "Common/StringTokenizer.h"
 #include "TownDeamon.h"
+#include "ArenaBattle.h"
 #ifdef _ARENA_SERVER
 #include "GameServer.h"
 #endif
@@ -101,45 +102,7 @@ namespace GObject
 
 	float EventAutoBattle::calcExpEach(UInt32 now)
 	{
-#if 0
-		float theirbp = _npcGroup->getBattlePoints();
-		float mybp = 0.0f;
-		for(int i = 0; i < 5; ++ i)
-		{
-			Lineup& lup = m_Player->getLineup(i);
-			if(!lup.available())
-				continue;
-			int ext = 0;
-			if(m_Player->getBuffData(PLAYER_BUFF_ATTR3, now))
-				ext = 3;
-			else if(m_Player->getBuffData(PLAYER_BUFF_ATTR2, now))
-				ext = 2;
-			else if(m_Player->getBuffData(PLAYER_BUFF_ATTR1, now))
-				ext = 1;
-			if(lup.fighter->getBuffData(FIGHTER_BUFF_ATTR3, now))
-				ext += 3;
-			else if(lup.fighter->getBuffData(FIGHTER_BUFF_ATTR2, now))
-				ext += 2;
-			else if(lup.fighter->getBuffData(FIGHTER_BUFF_ATTR1, now))
-				ext += 1;
-			if(m_Player->getBuffData(PLAYER_BUFF_HOLY))
-				ext += lup.fighter->getLevel() / 4;
-			mybp += lup.fighter->getBattlePoint() * (1.0f + 0.015f * ext);
-		}
-		const float autobattle_tweak = 0.5;
-		const float autobattle_A = 2.5;
-		float exp = 3.0f * _npcGroup->getExp();
-		float clanEffect = 1.0f;
-		if(m_Player->getClan() != NULL)
-			clanEffect = m_Player->getClan()->getAutoBattleSpeed();
-		if(mybp >= theirbp)
-			exp *= autobattle_A / (theirbp / mybp + (autobattle_A - 1.0f));
-		else
-			exp /= 1.0f + autobattle_tweak - autobattle_tweak * mybp / theirbp;
-		return exp * clanEffect;
-#else
         return 8.0f * _npcGroup->getExp();
-#endif
 	}
 
 	void EventAutoBattle::Process(UInt32)
@@ -302,34 +265,8 @@ namespace GObject
 			return;
         }
 
-#if 0
-        PracticeFighterExp pfexp;
-        memset(&pfexp, 0, sizeof(pfexp));
-
-        //data->lock.lock();
-        Fighter* fgt = 0;
-        UInt8 n = 0;
-        for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
-        {
-            fgt = m_Player->findFighter(*i);
-            if (fgt)
-            {
-                //fgt->addPExp(fgt->getPracticeInc() * 10); 
-                if(n < sizeof(pfexp.fids)/sizeof(UInt32))
-                {
-                    pfexp.fids[n] = *i;
-                    pfexp.counts[n] = 10;
-                    ++ n;
-                }
-            }
-        }
-        //data->lock.unlock();
-        GameMsgHdr hdr1(0x320, m_Player->getThreadId(), m_Player, sizeof(PracticeFighterExp));
-        GLOBAL().PushMsg(hdr1, &pfexp);
-#else
         GameMsgHdr hdr1(0x1F6, WORKER_THREAD_WORLD, m_Player, 0);
         GLOBAL().PushMsg(hdr1, NULL);
-#endif
 
 		data->checktime -= 10;
         if ((int)data->checktime < 0)
@@ -337,12 +274,8 @@ namespace GObject
 		if(leftCount == 0 || data->checktime == 0)
 		{
             DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
-#if 0
-            practicePlace.stop(m_Player);
-#else
             GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
             GLOBAL().PushMsg(hdr1, NULL);
-#endif
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
 			return;
 		}
@@ -362,8 +295,6 @@ namespace GObject
 			return false;
         }
 
-        //data->lock.lock();
-        //data->lock.unlock();
         if(m_Player->getPIcCount() <= 0)
             return false;
 
@@ -380,7 +311,6 @@ namespace GObject
             memset(&pfexp, 0, sizeof(pfexp));
             pfexp.goldUse = goldUse;
 
-            //data->lock.lock();
             Fighter* fgt = 0;
             UInt8 n = 0;
             for (auto i = data->fighters.begin(), e = data->fighters.end(); i != e; ++i)
@@ -752,7 +682,10 @@ namespace GObject
 		return vipl;
 	}
 
-    static UInt32 recharge[] = {188,288,688,888,1888,2012,2888,3888,4888,5888,6888,7888,8888,9888,9999};
+    //春节充值活动额度
+    //static UInt32 recharge[] = {188,288,688,888,1888,2012,2888,3888,4888,5888,6888,7888,8888,9888,9999};
+    //2012年3月份充值活动额度
+    static UInt32 recharge[] = {199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999,};
     UInt8 Player::calcRechargeLevel(UInt32 total)
     {
         UInt32 totalRecharge = total;
@@ -859,6 +792,8 @@ namespace GObject
             GameAction()->onNewYear(this);
         if (World::getValentineDay())
             GameAction()->onValentineDay(this);
+        if (World::getFoolsDay())
+            GameAction()->onFoolsDay(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -958,8 +893,8 @@ namespace GObject
         {
             char buf[1024] = {0};
             char* pbuf = &buf[0];
-            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||||||||%u||%u||%u|",
-                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.qqvipl, cfg.serverNum, platform);
+            pbuf += snprintf(pbuf, sizeof(buf), "%u_%u_%"I64_FMT"u|%s|||||%u||%u||||||%u||%u||%u|",
+                    cfg.serverNum, cfg.tcpPort, getId(), getOpenId().c_str(), GetLev(), _playerData.gold, _playerData.qqvipl, cfg.serverNum, platform);
 
             m_ulog->SetUserMsg(buf);
             if (platform != WEBDOWNLOAD)
@@ -991,15 +926,17 @@ namespace GObject
         char _price[32] = {0};
         char _type[32] = {0};
         char _id[32] = {0};
-        snprintf(_type, 32, "%u", type);
         if (!id || !num)
         {
+            snprintf(_type, 32, "1");
             snprintf(_id, 32, "GN_%u", type);
             snprintf(_price, 32, "%u", price);
             udpLog(op, _type, _id, _price, "", "", "props");
         }
         else
         {
+            UInt8 type = GetItemLogType(id);
+            snprintf(_type, 32, "%u", type);
             snprintf(_id, 32, "%u", id);
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
@@ -3321,6 +3258,10 @@ namespace GObject
 
         if (ci)
             udpLog(ci->purchaseType, ci->itemId, ci->itemNum, c, "add");
+#ifdef _FB
+#else
+        dclogger.consume(this, _playerData.gold, c);
+#endif
 		return _playerData.gold;
 	}
 
@@ -5726,6 +5667,8 @@ namespace GObject
 #ifdef _FB
        tellCFriendLvlUp(nLev);
 #endif
+
+#if 0
 		if(nLev >= 30)
 		{
 			UInt8 buffer[7];
@@ -5737,6 +5680,7 @@ namespace GObject
 			GameMsgHdr hdr1(0x1A4, WORKER_THREAD_WORLD, this, 7);
 			GLOBAL().PushMsg(hdr1, buffer);
 		}
+#endif
 
         //TELL my frined that my Level up  so get the Attainment!
         if(nLev == 50 || nLev == 80 || nLev == 100)
@@ -5752,6 +5696,12 @@ namespace GObject
                 GLOBAL().PushMsg(hdr, &msg);
                 it ++ ;
             }
+        }
+
+        if (nLev == 70)
+        {
+            GameMsgHdr hdr(0x1A7, WORKER_THREAD_WORLD, this, 0);
+            GLOBAL().PushMsg(hdr, 0);
         }
 	}
 
@@ -5932,7 +5882,7 @@ namespace GObject
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
 
-        if (World::_rechargeactive)
+        if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             UInt8 oldVipLevel = calcRechargeLevel(total);
@@ -5971,7 +5921,7 @@ namespace GObject
 
     void Player::sendRechargeInfo()
     {
-        if (!World::_rechargeactive)
+        if (!World::getRechargeActive())
             return;
 
         UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
@@ -6501,8 +6451,10 @@ namespace GObject
 			return 1;
 		}
 
-        if (fgt->getPotential() >= 1.5f && fgt->getCapacity() >= 7.0f)
+        if (fgt->getPotential() + 0.005f >= 1.2f)
             fgt->getAttrType2(true);
+        if (fgt->getPotential() + 0.005f >= 1.5f && fgt->getCapacity() >= 7.0f)
+            fgt->getAttrType3(true);
 		return 0;
 	}
 
@@ -6894,6 +6846,7 @@ namespace GObject
 			if(mail == NULL)
 				continue;
 
+#if 0
 			const UInt32 vipTable[16][14] =
             {
                 {430,2,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -6913,6 +6866,27 @@ namespace GObject
                 {432,10,6008,6,507,5,509,5,30,10,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
+#else // XXX: 2012年03月充值反利活动
+			const UInt32 vipTable[16][14] =
+            {
+                {514,3,0,0,0,0,0,0,0,0,0,0,0,0},
+                {503,3,0,0,0,0,0,0,0,0,0,0,0,0},
+                {516,3,0,0,0,0,0,0,0,0,0,0,0,0},
+                {514,5,503,5,516,5,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,80,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,100,0,0,0,0,0,0,0,0,0,0,0,0},
+                {507,2,509,2,30,2,MailPackage::Coupon,100,0,0,0,0,0,0},
+                {MailPackage::Coupon,120,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,140,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,160,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,180,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,200,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,220,0,0,0,0,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,240,0,0,0,0,0,0,0,0,0,0,0,0},
+                {515,10,507,10,509,10,30,10,MailPackage::Coupon,300,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+            };
+#endif
 
 			MailPackage::MailItem mitem[7];
 			UInt32 mcount = 0;
@@ -6921,6 +6895,9 @@ namespace GObject
 			const UInt32 * t = vipTable[j-1];
 			for(UInt32 i = 0; i < 14 && t[i] > 0; i += 2)
 			{
+                if (!t[i])
+                    break;
+
 				mitem[mcount].id = t[i];
 				mitem[mcount++].count = t[i+1];
 				strItems += Itoa(t[i]);
@@ -8884,5 +8861,68 @@ namespace GObject
         }
     }
 
+    void Player::useToken(UInt8 type)
+    {
+        if (type > 2)
+            return;
+
+        if (GetPackage()->GetRestPackageSize() < 3)
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+
+        if (!GetVar(VAR_GOLD_TOKEN+type))
+            return;
+
+        static UInt16 items[3][4] = {
+            {515,509,507,47},
+            {503,514,501,547},
+            {56,57,15,500},
+        };
+
+        bool same = true;
+        UInt16 ids[3] = {0,};
+        URandom rnd(time(NULL));
+
+        for (UInt8 i = 0; i < 3; ++i)
+        {
+            UInt8 idx = rnd(sizeof(items[type])/sizeof(UInt16));
+            ids[i] = items[type][idx];
+            if (i && ids[i] != ids[i-1])
+                same = false;
+        }
+
+        if (same)
+        {
+            GetPackage()->AddItem(ids[0], 6, true, false);
+        }
+        else
+        {
+            for (UInt8 i = 0; i < 3; ++i)
+            {
+                GetPackage()->AddItem(ids[i], 1, true, false);
+            }
+        }
+
+        Stream st(REP::TOKEN);
+        st << static_cast<UInt8>(1) << ids[0] << ids[1] << ids[2] << Stream::eos;
+        send(st);
+
+        SetVar(VAR_GOLD_TOKEN+type, GetVar(VAR_GOLD_TOKEN+type)-1);
+        sendTokenInfo();
+
+        if (type == 0 && !same)
+            SYSMSG_BROADCASTV(2351, _playerData.country, _playerData.name.c_str(), ids[0], ids[1], ids[2]);
+        if (type == 0 && same)
+            SYSMSG_BROADCASTV(2352, _playerData.country, _playerData.name.c_str(), ids[0]);
+    }
+
+    void Player::sendTokenInfo()
+    {
+        Stream st(REP::TOKEN);
+        st << static_cast<UInt8>(0) << GetVar(VAR_GOLD_TOKEN) << GetVar(VAR_TAEL_TOKEN) << GetVar(VAR_COIN_TOKEN) << Stream::eos;
+        send(st);
+    }
 } // namespace GObject
 

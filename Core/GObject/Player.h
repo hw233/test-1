@@ -1234,6 +1234,8 @@ namespace GObject
         void loadCFriendAwards(std::string& awards);
         void getCFriendAward(UInt8 idx);
         void sendCFriendAward();
+        void useToken(UInt8 type);
+        void sendTokenInfo();
 
     public:
 		// Last battled monster

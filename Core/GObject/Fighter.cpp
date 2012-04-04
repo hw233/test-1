@@ -766,7 +766,7 @@ bool Fighter::canSetTrump(UInt8 idx, UInt32 trumpid)
         return !hasTrumpType(trumpid);
     }
 
-    if (_potential >= 1.5 && _capacity >= 7 && idx == 1)
+    if (_potential + 0.005f >= 1.5f && _capacity >= 7 && idx == 1)
     {
         return !hasTrumpType(trumpid);
     }
@@ -2495,7 +2495,10 @@ bool Fighter::upCitta( UInt16 citta, int idx, bool writedb )
 
     if (ret && !swap)
     {
-        addSkillsFromCT(skillFromCitta(citta), writedb);
+        bool up = _owner?(_owner->getMainFighter()?_owner->getMainFighter()->getLevel()>=10:true):false;
+        if (!writedb)
+            up = false;
+        addSkillsFromCT(skillFromCitta(citta), writedb, up);
 
         {
             soul += cb->needsoul;
@@ -3275,24 +3278,26 @@ void Fighter::setAttrValue1(UInt16 v)
 
 void Fighter::setAttrType2(UInt8 t)
 {
-    if (_potential >= 1.5 && _capacity >= 7.0)
+    if (_potential + 0.005f >= 1.2f)
         _attrType2 = t;
 }
 
 void Fighter::setAttrValue2(UInt16 v)
 {
-    if (_potential >= 1.5 && _capacity >= 7.0)
+    if (_potential + 0.005f >= 1.2f)
         _attrValue2 = v;
 }
 
 void Fighter::setAttrType3(UInt8 t)
 {
-    _attrType3 = t;
+    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0)
+        _attrType3 = t;
 }
 
 void Fighter::setAttrValue3(UInt16 v)
 {
-    _attrValue3 = v;
+    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0)
+        _attrValue3 = v;
 }
 
 UInt8 Fighter::getAttrType1(bool notify)
@@ -3318,7 +3323,7 @@ UInt16 Fighter::getAttrValue1(bool notify)
 UInt8 Fighter::getAttrType2(bool notify)
 {
     UInt8 ret = 1;
-    if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
+    if (_potential + 0.005f >= 1.2f && !_attrType2)
         ret = forge(2, 0, true);
     if (!ret)
         updateForgeAttr(notify);
@@ -3328,7 +3333,7 @@ UInt8 Fighter::getAttrType2(bool notify)
 UInt16 Fighter::getAttrValue2(bool notify)
 {
     UInt8 ret = 1;
-    if (_potential >= 1.5 && _capacity >= 7.0 && !_attrType2)
+    if (_potential + 0.005f >= 1.2f && !_attrType2)
         ret = forge(2, 0, true);
     if (!ret)
         updateForgeAttr(notify);
@@ -3337,13 +3342,21 @@ UInt16 Fighter::getAttrValue2(bool notify)
 
 UInt8 Fighter::getAttrType3(bool notify)
 {
-    // TODO:
+    UInt8 ret = 1;
+    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0 && !_attrType3)
+        ret = forge(3, 0, true);
+    if (!ret)
+        updateForgeAttr(notify);
     return _attrType3;
 }
 
 UInt16 Fighter::getAttrValue3(bool notify)
 {
-    // TODO:
+    UInt8 ret = 1;
+    if (_potential + 0.005f >= 1.5f && _capacity >= 7.0 && !_attrType3)
+        ret = forge(3, 0, true);
+    if (!ret)
+        updateForgeAttr(notify);
     return _attrValue3;
 }
 
@@ -3403,7 +3416,6 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
 
         case 3:
             {
-                return 0; // TODO:
                 UInt8 type = 0;
                 do
                 {
@@ -3440,16 +3452,18 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                     ret = forge(1);
                     if (ret)
                         return ret;
-                    if ((_potential >= 1.5f && _capacity >= 7.0f) || _attrType2)
+                    if (_potential + 0.005f >= 1.2f || _attrType2)
                     {
                         ret = forge(2);
                         if (ret)
                             return ret;
                     }
-                    // TODO
-                    ret = forge(3);
-                    if (ret)
-                        return ret;
+                    if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0f) || _attrType3)
+                    {
+                        ret = forge(3);
+                        if (ret)
+                            return ret;
+                    }
                     broadcastForge(lock);
                     return 0;
                 }
@@ -3474,7 +3488,7 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 }
                 if (!(lock & 0x2))
                 {
-                    if ((_potential >= 1.5f && _capacity >= 7.0f) || _attrType2)
+                    if (_potential + 0.005f >= 1.2f || _attrType2)
                     {
                         ret = forge(2);
                         if (ret)
@@ -3483,10 +3497,12 @@ UInt8 Fighter::forge(UInt8 which, UInt8 lock, bool initmain)
                 }
                 if (!(lock & 0x4))
                 {
-                    // TODO:
-                    ret = forge(3);
-                    if (ret)
-                        return ret;
+                    if ((_potential + 0.005f >= 1.5f && _capacity >= 7.0f) || _attrType3)
+                    {
+                        ret = forge(3);
+                        if (ret)
+                            return ret;
+                    }
                 }
 
                 broadcastForge(lock);

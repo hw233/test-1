@@ -1254,23 +1254,17 @@ void Clan::sendInfo( Player * player )
     UInt8 place = PPLACE_MAX;
     practicePlace.getPlaceData(owner, place);
 
-    if (watchman)
+    if (!player->isOffical() && player->getClanTaskMax() < pd.ctFinishCount)
     {
-        UInt8 clanTaskMax = watchman->getClanTaskMax();
-        if (clanTaskMax < pd.ctFinishCount)
-            pd.ctFinishCount = 0;
+        pd.ctFinishCount = 0;
+        player->writeClanTask();
     }
 
     st << static_cast<UInt8>(0) << member->cls << static_cast<UInt8>(getCount()) << static_cast<UInt8>(getMaxMemberCount())
-        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | (watchman?watchman->getClanTaskMax():CLAN_TASK_MAXCOUNT)) << static_cast<UInt32>(getConstruction())
+        <<  static_cast<UInt8>((pd.ctFinishCount << 4) | player->getClanTaskMax()) << static_cast<UInt32>(getConstruction())
         << getClanFunds() << member->proffer << static_cast<UInt8>(place-1)
         << _name << (owner == NULL ? "" : owner->getName()) << getFounderName() <<(watchman == NULL ? "" : watchman->getName())
         << _contact << _announce << _purpose;
-#if 0
-	st << static_cast<UInt8>(0) << _name << (owner == NULL ? "" : owner->getName())
-		<< getFounderName() << (watchman == NULL ? "" : watchman->getName()) << getLev() << _contact << _announce << _purpose
-		<< static_cast<UInt8>(getCount()) << getDonateAchievement(player) << member->cls;
-#endif
 	st << Stream::eos;
 	player->send(st);
 }

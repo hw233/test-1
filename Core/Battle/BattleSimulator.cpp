@@ -288,11 +288,8 @@ void BattleSimulator::start(UInt8 prevWin)
 					}
 					UInt32 maxhp = bf->getMaxHP();
 					_packet << static_cast<UInt8>(j + 1) << bf->getFighter()->getBattleName();
-					if(bf->getFighter()->isNpc())
-						_packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
-                    else
-						_packet << bf->getFighter()->getClassAndSex();
 
+                    UInt8 clsnsex = bf->getFighter()->getClassAndSex();
                     UInt16 portrait = 0;
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;
@@ -300,8 +297,43 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 1063;
                     else if(bf->getBuffData(FIGHTER_BUFF_WEDDING, now))
                         portrait = 1064;
+                    else if(bf->getBuffData(FIGHTER_BUFF_RMAN, now))
+                    {
+                        clsnsex = 1<<4;
+                        portrait = 1;
+                    }
+                    else if(bf->getBuffData(FIGHTER_BUFF_RWMAN, now))
+                    {
+                        clsnsex = 1<<4|1;
+                        portrait = 2;
+                    }
+                    else if(bf->getBuffData(FIGHTER_BUFF_SMAN, now))
+                    {
+                        clsnsex = 2<<4;
+                        portrait = 3;
+                    }
+                    else if(bf->getBuffData(FIGHTER_BUFF_SWMAN, now))
+                    {
+                        clsnsex = 2<<4|1;
+                        portrait = 4;
+                    }
+                    else if(bf->getBuffData(FIGHTER_BUFF_DMAN, now))
+                    {
+                        clsnsex = 3<<4;
+                        portrait = 5;
+                    }
+                    else if(bf->getBuffData(FIGHTER_BUFF_DWMAN, now))
+                    {
+                        clsnsex = 3<<4|1;
+                        portrait = 6;
+                    }
                     else
                         portrait = bf->getPortrait();
+
+					if(bf->getFighter()->isNpc())
+						_packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
+                    else
+						_packet << clsnsex;
 
 					_packet << static_cast<UInt8>(_isBody[i][j] > 0 ? (_isBody[i][j] - 1) : bf->getFighter()->getLevel()) << portrait << static_cast<UInt8>(bf->getFlag() & 0x03);
 					_packet << static_cast<UInt8>(bf->getFighter()->getColor())

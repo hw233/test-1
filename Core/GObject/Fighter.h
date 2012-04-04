@@ -28,6 +28,13 @@ namespace GObject
 #define FIGHTER_BUFF_DRESS      0x07
 #define FIGHTER_BUFF_WEDDING    0x08
 
+#define FIGHTER_BUFF_RMAN       0x09 //儒男
+#define FIGHTER_BUFF_RWMAN      0x0A //儒女
+#define FIGHTER_BUFF_SMAN       0x0B //释男
+#define FIGHTER_BUFF_SWMAN      0x0C //释女
+#define FIGHTER_BUFF_DMAN       0x0D //道男
+#define FIGHTER_BUFF_DWMAN      0x0E //道女
+
 #define FIGHTER_BUFF_COUNT 0x10 
 
 #define SKILL_UPMAX 3 // 技能最初就能装备3个

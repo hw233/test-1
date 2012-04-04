@@ -32,6 +32,7 @@
 #include "MsgID.h"
 #include "GObject/DCLogger.h"
 #include "GObject/TeamCopy.h"
+#include "GObject/ArenaBattle.h"
 
 namespace GObject
 {
@@ -72,9 +73,14 @@ bool World::_christmas = false;
 bool World::_newyear = false;
 bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
+UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
 bool World::_girlday = false;
 bool World::_whiteloveday = false;
+bool World::_trumpenchret = false;
+bool World::_foolsday = false;
+bool World::_chingming = false;
+bool World::_carnival = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -162,20 +168,12 @@ bool enum_clan_midnight(void * ptr, void * data)
 	Clan * clan = static_cast<Clan *>(ptr);
 	if (clan == NULL)
 		return true;
-	// clan->getClanDynamicMsg()->cleanClanDynamicMsg();
 	Player * leader = clan->getLeader();
 	if (leader == NULL)
 		return true;
 
     clan->ClearDueItemHistory();
     clan->SetDailyBattleScore(0);
-#if 0
-	UInt32 now = *reinterpret_cast<UInt32 *>(data);
-	UInt32 lastOnline = leader->getLastOnline();
-	if (now > lastOnline && now - lastOnline >= 10 * 86400)
-		clan->alterLeader();
-#endif
-
 	return true;
 }
 void World::makeActivityInfo(Stream &st)
@@ -183,9 +181,13 @@ void World::makeActivityInfo(Stream &st)
 	st.init(REP::DAILY_DATA);
 	st << static_cast<UInt8>(5) << _wday;
 
-    UInt8 active = _newyear?1:0;
-    active |= _rechargeactive?2:0;
+    UInt32 active = _newyear?1:0;
+    active |= _rechargeactiveno&1?2:0;
     active |= _girlday?4:0;
+    active |= _trumpenchret?8:0;
+    active |= _rechargeactiveno&2?16:0;
+    active |= _foolsday?32:0;
+    active |= _chingming?64:0;
     st << active << Stream::eos;
 }
 void World::calWeekDay()
@@ -199,15 +201,6 @@ void World::calWeekDay()
 		ClanCityBattle::setMaxEnterCount(3 * 2);
 	else
 		ClanCityBattle::setMaxEnterCount(3);
-	if(_wday == 3)
-	{
-#if 0
-		size_t sz;
-		UInt16 * prices = Dungeon::getPrice(sz);
-		for(size_t i = 0; i < sz; ++ i)
-			prices[i] /= 2;	
-#endif
-	}
     if(_wday == 1)
     {
         practicePlace.resetPracticePlaceIncoming();

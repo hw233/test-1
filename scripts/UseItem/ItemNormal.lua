@@ -348,6 +348,10 @@ function ItemNormal_00000401(iid, num, bind, param)
         return false
     end
 
+    for i=0,5 do
+        fgt:setBuffData(i+9, 0, true)
+    end
+
     fgt:setBuffData(8, 0, true)
     fgt:setBuffData(7, 0, true)
     if ItemNormal_AddBuff(fgt, 5, 3600, num, 356400) then
@@ -366,6 +370,10 @@ function ItemNormal_00000438(iid, num, bind, param)
         return false
     end
 
+    for i=0,5 do
+        fgt:setBuffData(i+9, 0, true)
+    end
+
     fgt:setBuffData(8, 0, true)
     fgt:setBuffData(5, 0, true)
     if ItemNormal_AddBuff(fgt, 7, 7200, num, 356400) then
@@ -382,6 +390,10 @@ function ItemNormal_00000439(iid, num, bind, param)
 
     if fgt == nil then
         return false
+    end
+
+    for i=0,5 do
+        fgt:setBuffData(i+9, 0, true)
     end
 
     fgt:setBuffData(7, 0, true)
@@ -1446,6 +1458,113 @@ function ItemNormal_00000476(iid, num, bind, param)
     package:AddItem(item, nums[k], 1, 0, 2)
     if broad[k] == 1 then
         Broadcast(0x27, "恭喜，[p:"..player:getCountry()..":"..player:getPName().."]玩家使用[4:476]，获得道具[4:"..item.."]x"..nums[k])
+    end
+    return num
+end
+
+function ItemNormal_00000479(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local needsize = 6;
+    local date = os.date("%m%d", os.time())
+
+    if date < "0401" then
+        SendMsg(player, 0x35, "愚人节当日打开有惊喜");
+        return false
+    end
+
+    local factor = 1
+    if date == "0401" then
+        factor = 2
+        needsize = needsize + 1
+        SendMsg(player, 0x35, "惊喜就在这里！恭喜获得双倍奖励，祝大侠节日快乐～");
+    end
+
+    if package:GetRestPackageSize() < needsize then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    package:AddItem(503, factor, 1, 0, 2);
+    package:AddItem(506, factor, 1, 0, 2);
+    package:AddItem(508, factor, 1, 0, 2);
+    package:AddItem(500, factor, 1, 0, 2);
+    package:Add(1526, factor, 1, 0, 2);
+    package:AddItem(548, 5*factor, 1, 0, 2);
+
+    return num
+end
+
+function ItemNormal_00000480(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local date = os.date("%m%d", os.time())
+    if date ~= "0401" then
+        SendMsg(player, 0x35, "只能在愚人节当天使用");
+        return false
+    end
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    fgt:setBuffData(5, 0, true)
+    fgt:setBuffData(7, 0, true)
+    fgt:setBuffData(8, 0, true)
+
+    for i=0,5 do
+        fgt:setBuffData(i+9, 0, true)
+    end
+
+    local cls = fgt:getClass()
+    if cls == 0 then
+        return false
+    end
+    local sex = fgt:getSex()
+    sex = sex % 2
+    local buf = 2*(cls-1)+sex
+
+    local b = math.random(0, 5)
+    while (b == buf) do
+        b = math.random(0, 5)
+    end
+    buf = b
+
+    fgt:setBuffData(buf+9, os.time()+24*60*60, true)
+    package:DelItemSendMsg(480, player);
+    return num;
+end
+
+function ItemNormal_00000481(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {506,507,508,509,514,515,500,49,503,511,517,15,548,}
+    local nums = {1,1,1,1,1,1,1,1,1,1,1,2,5,}
+    local prob = {1037,1140,2177,2280,3317,3627,4664,4974,5906,6943,7980,8192,10000,}
+    local broad = {0,1,0,1,1,1,0,0,1,0,1,0,0,}
+    local item = 0
+
+    local k = 1
+    local rand = math.random(10000)
+    for n = 1,#prob do
+        if rand <= prob[n] then
+            item = items[n]
+            k = n
+            break;
+        end
+    end
+
+    if item == 0 then
+        return false
+    end
+
+    package:AddItem(item, nums[k], 1, 0, 2)
+    if broad[k] == 1 then
+        Broadcast(0x27, "恭喜，[p:"..player:getCountry()..":"..player:getPName().."]玩家使用[4:481]，获得道具[4:"..item.."]x"..nums[k])
     end
     return num
 end
@@ -6970,6 +7089,9 @@ local ItemNormal_Table = {
     [469] = ItemNormal_00000448,
     [470] = ItemNormal_00000448,
     [476] = ItemNormal_00000476,
+    [479] = ItemNormal_00000479,
+    [480] = ItemNormal_00000480,
+    [481] = ItemNormal_00000481,
 
     [449] = ItemNormal_VIP,
     [450] = ItemNormal_VIP,

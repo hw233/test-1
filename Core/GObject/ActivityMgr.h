@@ -33,6 +33,7 @@ namespace GObject
         AtyTaskHook,  //挂机加速
         AtyPSpeed,    //修炼加速
         AtyGroupCopy, //组队副本
+        AtyTownDeamon, //锁妖塔
         AtyEnd,
     };
 

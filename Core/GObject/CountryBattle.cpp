@@ -559,8 +559,11 @@ bool CountryBattle::playerEnter( Player * player )
 
     GameAction()->doAty( player, AtyCountryWar, 0, 0);
     player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 0);
-    if (World::getWhiteLoveDay() && World::_wday == 7)
+    if (World::getWhiteLoveDay() && World::_wday == 7 && !player->GetVar(VAR_CBWHITEPACK))
+    {
         player->GetPackage()->AddItem2(476, 5, 1, 1);
+        player->SetVar(VAR_CBWHITEPACK, 1);
+    }
 	return true;
 }
 

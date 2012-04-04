@@ -183,7 +183,7 @@ namespace Script
 		void RunAutoRegen(Player* player, Fighter* fighter);
 
 		void onLogin(Player* player);
-		void onDungeonWin(Player* player, UInt8 id, UInt8 level);
+		void onDungeonWin(Player* player, UInt8 id, UInt8 count);
 		void onClanBattleAttend(Player* player);
 		void onCountryBattleAttend(Player* player);
 		void onCountryBattleWinStreak(Player* player, UInt32 count);
@@ -196,6 +196,7 @@ namespace Script
         bool onChristmas(Player* player);
         bool onNewYear(Player* player);
         bool onValentineDay(Player* player);
+        bool onFoolsDay(Player* player);
 		void onAttackBoss(Player* player);
 		bool getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);

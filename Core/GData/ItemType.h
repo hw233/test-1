@@ -136,6 +136,15 @@ inline ItemClass GetItemSubClass(UInt32 id)
 	return Item_Other;
 }
 
+inline UInt8 GetItemLogType(UInt16 id)
+{
+    if (id < LGEM_ID)
+        return 1;
+    if (id >= LGEM_ID && id <= RGEM_ID)
+        return 3;
+    return 1;
+}
+
 namespace GData
 {
 
@@ -236,7 +245,6 @@ namespace GData
 
 #define ITEM_BIND_CHECK(bindType, bind)	\
 	if(!bind && bindType == 1) bind = true;
-
 }
 
 #endif

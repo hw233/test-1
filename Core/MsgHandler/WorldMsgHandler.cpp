@@ -98,6 +98,7 @@ MSG_REG_2(GameMsgHdr, 0x1A3, OnSpecialAward);
 MSG_REG_2(GameMsgHdr, 0x1A4, OnUpdateBlockBossRank);
 MSG_REG_2(GameMsgHdr, 0x1A5, OnBloackBossDataReq);
 MSG_REG_2(GameMsgHdr, 0x1A6, OnFighterStandup);
+MSG_REG_2(GameMsgHdr, 0x1A7, OnArenaAddLevelMan);
 
 MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);

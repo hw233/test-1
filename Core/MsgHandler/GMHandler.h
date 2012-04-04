@@ -128,6 +128,8 @@ private:
     void OnRegenAll(GObject::Player* player, std::vector<std::string>& args);
     void OnSetBossHp(GObject::Player* player, std::vector<std::string>& args);
     void OnTime(GObject::Player* player, std::vector<std::string>& args);
+    void OnToken(GObject::Player* player, std::vector<std::string>& args);
+    void OnRecharge(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

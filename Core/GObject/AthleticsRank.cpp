@@ -22,6 +22,7 @@
 #include "Common/URandom.h"
 #include "HeroMemo.h"
 
+
 namespace GObject
 {
 
@@ -104,7 +105,8 @@ void AthleticsRank::updateBatchRanker(UInt8 row, Rank rank1, Rank rank2)
 	Rank begin, end;
 	begin = rank1;
 	end = ++rank2;
-	for (; begin != end; ++begin)
+
+	for (; begin != end && getRankPos(row, begin) <= ATHLETICS_RANK_MAX_CNT; ++begin)
 	{
 		++ (*begin)->rank;
 		DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", (*begin)->rank, (*begin)->ranker->getId());
@@ -116,7 +118,19 @@ void AthleticsRank::updatePageNum(Rank r)
 }
 void AthleticsRank::addAthleticsFromDB(UInt8 row, AthleticsRankData * data)
 {
-	_maxRank[row] = std::max(_maxRank[row], data->rank);
+    if(data->rank > ATHLETICS_RANK_MAX_CNT)
+    {
+        data->rank = ATHLETICS_RANK_MAX_CNT + 1;
+    }
+    if(data->oldrank > ATHLETICS_RANK_MAX_CNT)
+    {
+        data->oldrank = ATHLETICS_RANK_MAX_CNT + 1;
+    }
+    if(data->maxrank > ATHLETICS_RANK_MAX_CNT)
+    {
+        data->maxrank = ATHLETICS_RANK_MAX_CNT + 1;
+    }
+    _maxRank[row] = std::max(_maxRank[row], data->rank);
     if(data->oldrank == 0)
     {
         data->oldrank = data->rank;
@@ -145,10 +159,17 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 			_athleticses[0].erase(found->second);
 			_ranks[0].erase(player);
 			//DB6().PushUpdateData("DELETE FROM `athletics_rank` WHERE `ranker` = %"I64_FMT"u", data->ranker->getId());
-			_ranks[1][player] = _athleticses[1].insert(_athleticses[1].end(), data);;
-			data->rank = ++_maxRank[1];
+			_ranks[1][player] = _athleticses[1].insert(_athleticses[1].end(), data);
+            if(_maxRank[1] <= ATHLETICS_RANK_MAX_CNT)
+            {
+                data->rank = ++_maxRank[1];
+            }
+            else
+            {
+                data->rank = ATHLETICS_RANK_MAX_CNT + 1;
+            }
             data->oldrank = data->rank;
-			data->maxrank = _athleticses[1].size();
+			data->maxrank = std::min(_athleticses[1].size(), (size_t)(ATHLETICS_RANK_MAX_CNT + 1));
             DB6().PushUpdateData("UPDATE `athletics_rank` SET `row`=1, `rank`=%u, `maxRank`=%u, `oldrank`=%u where ranker=%"I64_FMT"u", data->rank, data->maxrank, data->oldrank, data->ranker->getId());
 		}
 	}
@@ -158,7 +179,14 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 		if (data == NULL)
 			return false;
 		data->row = row;
-		data->rank = ++_maxRank[row];
+        if(_maxRank[1] <= ATHLETICS_RANK_MAX_CNT)
+        {
+            data->rank = ++_maxRank[1];
+        }
+        else
+        {
+            data->rank = ATHLETICS_RANK_MAX_CNT + 1;
+        }
 		data->ranker = player;
 		data->challengenum = 0;
 		data->challengetime = 0;
@@ -174,7 +202,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
         data->pageNum = 0;
 		Rank rank = _athleticses[row].insert(_athleticses[row].end(), data);
 		_ranks[row][player] = rank;
-		data->maxrank = _athleticses[row].size();
+		data->maxrank = std::min(_athleticses[row].size(), (size_t)(ATHLETICS_RANK_MAX_CNT + 1));
 		BuildNewBox(rank);
         DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, 0, 0, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge, data->pageNum);
 		GameMsgHdr hdr(0x216, player->getThreadId(), player, 0);
@@ -373,10 +401,20 @@ void AthleticsRank::requestAthleticsList(Player * player, UInt16 type)
 
         if(top  < rankpos)
         {
-            start = rank;
-            std::advance(start ,  -1 * top);
-            end = start;
-            std::advance(end , 10);
+            if(rankpos <= ATHLETICS_RANK_MAX_CNT)
+            {
+                start = rank;
+                std::advance(start ,  -1 * top);
+                end = start;
+                std::advance(end , 10);
+            }
+            else
+            {
+                start = getRankBegin(row);
+                std::advance(start, ATHLETICS_RANK_MAX_CNT - top);
+                end = start;
+                std::advance(end, 10);
+            }
         }
         else
         {
@@ -531,17 +569,28 @@ void AthleticsRank::RequestPageNum(Player* player)
     }
     Rank rank = found->second;
     UInt32 rankpos = getRankPos(row, rank);
+
+    if(rankpos > ATHLETICS_RANK_MAX_CNT)
+        rankpos = ATHLETICS_RANK_MAX_CNT + 1;
+
     if(rankpos <=500)
         return;
 
     if(( (*rank)->pageNum *10 + 11) >= rankpos) 
         return;
-
+    /*
     if((*rank)->pageNum >= 10)
     {
         player->sendMsgCode(0, 1499); //最多翻10页
         return;
     }
+    */
+    if(rankpos - ((*rank)->pageNum  * 10 + 20) <= 500)
+    {
+        player->sendMsgCode(0, 1498); //翻页失败，不能翻入前500名！！
+            return;
+    }
+
     player->addGlobalFlag(Player::AthPayForPage);
    // (*rank)->pageNum  ++ ;
    // send msg to Country
@@ -665,6 +714,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
                 setAthleticsExtraChallenge(atker, 0);
 			return;
         }
+        /*
 		if ((atkerRankPos - deferRankPos > 10 * (pageNum + 1))  && !type)
 		{
 			//Stream st(REP::ATHLETICS_CHALLENGE);
@@ -673,6 +723,7 @@ void AthleticsRank::challenge(Player * atker, std::string& name, UInt8 type)
 			atker->sendMsgCode(0, 1405);
 			return ;
 		}
+        */
 	}
 	else 
     {

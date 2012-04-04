@@ -53,7 +53,7 @@ enum PurchaseType
     TrumpUpgrade,
     TrumpLOrder,
     AutoFrontMapComplete,
-    AthleticPaging, 
+    AthleticKillCD,
     HeroIslandSkill,
     HeroIslandAuto,
     TeamCopyAwardRoll,
@@ -65,6 +65,7 @@ enum PurchaseType
     EnterAutoCopy,
     TownDeamonAuto,
     EquipAttachSpirit,
+    AthleticPaging,
 };
 
 enum IncomingType

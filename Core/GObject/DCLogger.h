@@ -18,6 +18,7 @@ using namespace DataCollector;
     10  qqgame
     11  q3366
     12  kingxin
+    16  gamelife
 #endif
 
 namespace GObject
@@ -38,6 +39,7 @@ public:
     bool login(Player* player);
     bool logout(Player* player);
     bool online(UInt32 num, UInt8 domain);
+    bool consume(Player* player, UInt32 total, UInt32 c);
     bool fee(Player* player, UInt32 total, Int32 c);
     bool blue(Player* player);
     bool d3d6(Player* player);

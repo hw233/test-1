@@ -139,6 +139,7 @@ MSG_REG(GameMsgHdr, OnTrumpLOrder);
 
 MSG_REG(GameMsgHdr, OnEquipUpgrade);
 MSG_REG(GameMsgHdr, OnEquipSpirit);
+MSG_REG(GameMsgHdr, OnUseToken);
 
 
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);

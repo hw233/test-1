@@ -132,9 +132,9 @@ function onActivityCheck(tm)
   end
 
   if tm >= actTime15 and tm < actTime16 then
-      setRechargeActive(true)
+      setRechargeActive(true, 1)
   else
-      setRechargeActive(false)
+      setRechargeActive(false, 1)
   end
 
   if tm >= actTime17 and tm < actTime18 then
@@ -155,6 +155,36 @@ function onActivityCheck(tm)
       setWhiteLoveDay(false)
   end
 
+  if tm >= actTime23 and tm < actTime24 then
+      setTrumpEnchRet(true)
+  else
+      setTrumpEnchRet(false)
+  end
+
+  if tm >= actTime25 and tm < actTime26 then
+      setRechargeActive(true, 2)
+  else
+      setRechargeActive(false, 2)
+  end
+
+  if tm >= actTime27 and tm < actTime28 then
+      setFoolsDay(true)
+  else
+      setFoolsDay(false)
+  end
+
+  if tm >= actTime29 and tm < actTime30 then
+      setChingMing(true)
+  else
+      setChingMing(false)
+  end
+
+  if tm >= actTime23 and tm < actTime30 then
+      setCarnival(true)
+  else
+      setCarnival(false)
+  end
+
   -- XXX: cancel auto heal
   setAutoHeal(true)
 
@@ -173,6 +203,14 @@ function initActTime(y, m, d)
   local  SerStartTm9 = { ['year'] = 2012, ['month'] = 2, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm10= { ['year'] = 2012, ['month'] = 3, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm11= { ['year'] = 2012, ['month'] = 3, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 装备法宝强化返利（3/19-3/25）
+  local  SerStartTm12= { ['year'] = 2012, ['month'] = 3, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 充值返利（3/23-3/31）
+  local  SerStartTm13= { ['year'] = 2012, ['month'] = 3, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 愚人节活动（3/29-4/1）
+  local  SerStartTm14= { ['year'] = 2012, ['month'] = 3, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 清明节
+  local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;
@@ -206,6 +244,18 @@ function initActTime(y, m, d)
 
   actTime21 = os.time(SerStartTm11);
   actTime22 = os.time(SerStartTm11) + 7 * 86400;
+
+  actTime23 = os.time(SerStartTm12);
+  actTime24 = os.time(SerStartTm12) + 7 * 86400;
+
+  actTime25 = os.time(SerStartTm13);
+  actTime26 = os.time(SerStartTm13) + 9 * 86400;
+
+  actTime27 = os.time(SerStartTm14);
+  actTime28 = os.time(SerStartTm14) + 4 * 86400;
+
+  actTime29 = os.time(SerStartTm15);
+  actTime30 = os.time(SerStartTm15) + 8 * 86400;
 
   onActivityCheck(os.time() + 30);
 

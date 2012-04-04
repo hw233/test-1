@@ -69,7 +69,7 @@ inline void GlobalObject::PushMsg(const MsgHdrType& hdr, void* msgBody)
 	char* buffer = (char*)AllocMsgBlock(sizeof(MsgHdrType) + hdr.msgHdr.bodyLen);
 	if(buffer == NULL)
 		return;
-	memcpy(buffer, &hdr, sizeof(MsgHdrType));
+    memcpy(buffer, &hdr, sizeof(MsgHdrType));
 	if(msgBody != NULL && hdr.msgHdr.bodyLen > 0)
 		memcpy(buffer+sizeof(MsgHdrType), msgBody, hdr.msgHdr.bodyLen);
 

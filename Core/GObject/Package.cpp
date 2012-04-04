@@ -1718,7 +1718,220 @@ namespace GObject
 		m_Owner->send(st);
 	}
 
-	UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
+    void writeEnchLog(UInt64 playerid, UInt8 type, UInt8 enchant)
+    {
+        DB4().PushUpdateData("REPLACE INTO `enchlog` (`playerId`, `type`, `enchant`) VALUES (%"I64_FMT"u, %u, %u)", playerid, type, enchant);
+    }
+
+    void enchantToken(Player* player, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type)
+    {
+        bool writedb = false;
+        // 强化送代币活动
+        if (quality == 0) // 防具
+        {
+            if (type)
+            {
+                if (level == 6)
+                {
+                    player->AddVar(VAR_COIN_TOKEN, 1);
+                    writedb = true;
+                }
+                if (level == 8)
+                {
+                    player->AddVar(VAR_TAEL_TOKEN, 2);
+                    writedb = true;
+                }
+                if (level == 10)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 3);
+                    writedb = true;
+                }
+            }
+            else
+            {
+                if (slevel < 6 && level >= 6)
+                {
+                    player->AddVar(VAR_COIN_TOKEN, 1);
+                    writedb = true;
+                }
+                if (slevel < 8 && level >= 8)
+                {
+                    player->AddVar(VAR_TAEL_TOKEN, 2);
+                    writedb = true;
+                }
+                if (slevel < 10 && level >= 10)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 3);
+                    writedb = true;
+                }
+            }
+        }
+        else if (quality == 1) // 武器
+        {
+            if (type)
+            {
+                if (level == 6)
+                {
+                    player->AddVar(VAR_COIN_TOKEN, 1);
+                    writedb = true;
+                }
+                if (level == 8)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 2);
+                    writedb = true;
+                }
+                if (level == 10)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 5);
+                    writedb = true;
+                }
+            }
+            else
+            {
+                if (slevel < 6 && level >= 6)
+                {
+                    player->AddVar(VAR_COIN_TOKEN, 1);
+                    writedb = true;
+                }
+                if (slevel < 8 && level >= 8)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 2);
+                    writedb = true;
+                }
+                if (slevel < 10 && level >= 10)
+                {
+                    player->AddVar(VAR_GOLD_TOKEN, 5);
+                    writedb = true;
+                }
+            }
+        }
+        else // 法宝
+        {
+            if (quality == 3)
+            {
+                if (type)
+                {
+                    if (level == 4)
+                    {
+                        player->AddVar(VAR_COIN_TOKEN, 1);
+                        writedb = true;
+                    }
+                    if (level == 6)
+                    {
+                        player->AddVar(VAR_TAEL_TOKEN, 2);
+                        writedb = true;
+                    }
+                    if (level == 8)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 2);
+                        writedb = true;
+                    }
+                }
+                else
+                {
+                    if (slevel < 4 && level >= 4)
+                    {
+                        player->AddVar(VAR_COIN_TOKEN, 1);
+                        writedb = true;
+                    }
+                    if (slevel < 6 && level >= 6)
+                    {
+                        player->AddVar(VAR_TAEL_TOKEN, 2);
+                        writedb = true;
+                    }
+                    if (slevel < 8 && level >= 8)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 2);
+                        writedb = true;
+                    }
+                }
+            }
+            if (quality == 4)
+            {
+                if (type)
+                {
+                    if (level == 4)
+                    {
+                        player->AddVar(VAR_COIN_TOKEN, 1);
+                        writedb = true;
+                    }
+                    if (level == 6)
+                    {
+                        player->AddVar(VAR_TAEL_TOKEN, 2);
+                        writedb = true;
+                    }
+                    if (level == 8)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 3);
+                        writedb = true;
+                    }
+                }
+                else
+                {
+                    if (slevel < 4 && level >= 4)
+                    {
+                        player->AddVar(VAR_COIN_TOKEN, 1);
+                        writedb = true;
+                    }
+                    if (slevel < 6 && level >= 6)
+                    {
+                        player->AddVar(VAR_TAEL_TOKEN, 2);
+                        writedb = true;
+                    }
+                    if (slevel < 8 && level >= 8)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 3);
+                        writedb = true;
+                    }
+                }
+            }
+            if (quality == 5)
+            {
+                if (type)
+                {
+                    if (level == 4)
+                    {
+                        player->AddVar(VAR_COIN_TOKEN, 1);
+                        writedb  = true;
+                    }
+                    if (level == 6)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 2);
+                        writedb  = true;
+                    }
+                    if (level == 8)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 4);
+                        writedb  = true;
+                    }
+                }
+                else
+                {
+                    if (slevel < 4 && level >= 4)
+                    {
+                        player->AddVar(VAR_COIN_TOKEN, 1);
+                        writedb  = true;
+                    }
+                    if (slevel < 6 && level >= 6)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 2);
+                        writedb  = true;
+                    }
+                    if (slevel < 8 && level >= 8)
+                    {
+                        player->AddVar(VAR_GOLD_TOKEN, 4);
+                        writedb  = true;
+                    }
+                }
+            }
+        }
+
+        if (writedb)
+            writeEnchLog(player->getId(), quality, level);
+        player->sendTokenInfo();
+    }
+
+    UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
 		if (type > 1) return 2;
 		Fighter * fgt = NULL;
@@ -1796,6 +2009,7 @@ namespace GObject
 			m_Owner->sendMsgCode(0, 1100);
 			return 2;
 		}
+        bool autoEnch = false;
 		bool isBound = equip->GetBindStatus();
 		// static UInt32 enchant_chance[] = {100, 90, 80, 60, 50, 40, 20, 10, 5, 2, 2, 2};
         bool flag_suc = false;
@@ -1840,6 +2054,7 @@ namespace GObject
             {
                 if(uRand(100000) < enchant)
                 {
+                    autoEnch = true;
                     ++success;
                     flag_suc = true;
                     ++ ied.enchant;
@@ -1981,6 +2196,9 @@ namespace GObject
                 }
 				break;
 			}
+
+            if (World::getTrumpEnchRet())
+                enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 			return 0;
 		}
 

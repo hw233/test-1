@@ -84,6 +84,12 @@ namespace GObject
         VAR_OFFLINE = 51,//下线时时间
         VAR_OFFLINE_EXP = 52,//离线经验
         VAR_OFFLINE_PEXP = 53,//离线修为，分钟
+        VAR_TOWNDEAMON = 54, //锁妖塔战斗一次
+        VAR_GOLD_TOKEN = 55, //金代币 先天灵石
+        VAR_TAEL_TOKEN = 56, //银代币 盘古灵石
+        VAR_COIN_TOKEN = 57, //铜代币 轩辕灵石
+        VAR_FOOLS_DAY = 58, //愚人节礼包是否领取
+        VAR_CBWHITEPACK = 59, //阵营战白色情人节礼包
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
         VAR_CFRIEND_45,
@@ -173,6 +179,12 @@ namespace GObject
             REGISTER_VAR(VAR_OFFLINE, CYCLE_NONE);
             REGISTER_VAR(VAR_OFFLINE_EXP, CYCLE_NONE);
             REGISTER_VAR(VAR_OFFLINE_PEXP, CYCLE_NONE);
+            REGISTER_VAR(VAR_TOWNDEAMON, CYCLE_DAY);
+            REGISTER_VAR(VAR_GOLD_TOKEN, CYCLE_NONE);
+            REGISTER_VAR(VAR_TAEL_TOKEN, CYCLE_NONE);
+            REGISTER_VAR(VAR_COIN_TOKEN, CYCLE_NONE);
+            REGISTER_VAR(VAR_FOOLS_DAY, CYCLE_DAY);
+            REGISTER_VAR(VAR_CBWHITEPACK, CYCLE_DAY);
             REGISTER_VAR(VAR_CFRIEND_1, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_45, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_60, CYCLE_NONE);

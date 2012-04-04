@@ -110,6 +110,7 @@ class TownDeamon
         bool attackNpc(Player* pl, UInt32 npcId);
         void attackPlayer(Player* pl, Player* defer);
         void beAttackByPlayer(Player* defer, Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup);
+        void addActivity(Player* pl);
 
     private:
         void quitDeamon(Player* pl, Player* attacker = NULL);

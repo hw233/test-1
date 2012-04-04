@@ -310,6 +310,9 @@ void UserLoginReq(LoginMsgHdr& hdr, UserLoginStruct& ul)
             player->setOpenId(ul._openid);
             player->setOpenKey(ul._openkey);
             player->setVia(ul._via);
+#ifdef _FB
+            PLAYER_DATA(player, wallow) = 0;
+#endif
         }
 
 		UInt8 flag = 0;
@@ -447,7 +450,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
 	trimName(nu._name);
 
 #ifdef _FB
-	bool noWallow = false;
+	bool noWallow = true;
 #else
 	bool noWallow = (nu._class & 0x80) > 0;
 #endif
@@ -891,16 +894,48 @@ bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid = 20110503ll)
     return true;
 }
 
+inline bool player_enum_1(GObject::Player* p, void* msg)
+{
+    struct Msg
+    {
+        UInt8 pf;
+        Stream* msg;
+    };
+
+    Msg* _msg = (Msg*)msg;
+    if (p->isOnline() && atoi(p->getDomain().c_str()) == _msg->pf)
+        p->send(*_msg->msg);
+
+    return true;
+}
+
 void WorldAnnounce( LoginMsgHdr& hdr, const void * data )
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 pf = 0;
 	UInt8 type;
 	std::string msg;
     CHKKEY();
-	br >> type >> msg;
+	br >> pf >> type >> msg;
+
 	Stream st(REP::SYSTEM_INFO);
 	st << type << msg << Stream::eos;
-	NETWORK()->Broadcast(st);
+
+    if (!pf)
+    {
+        NETWORK()->Broadcast(st);
+    }
+    else
+    {
+        struct Msg
+        {
+            UInt8 pf;
+            Stream* msg;
+        } _msg;
+        _msg.pf = pf;
+        _msg.msg = &st;
+        GObject::globalPlayers.enumerate(player_enum_1, (void*)&_msg);
+    }
 }
 
 void OnKickUser(LoginMsgHdr& hdr,const void * data)
@@ -1372,12 +1407,13 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 	st.init(SPEP::ADDITEMTOALL,0x01);
 	std::string content;
 	std::string title;
+    UInt8 pf = 0;
 	UInt32 money[4] = {0};
 	UInt32 moneyType[4] = {GObject::MailPackage::Tael, GObject::MailPackage::Coupon, GObject::MailPackage::Gold, GObject::MailPackage::Achievement};
 	UInt16 nums = 0;
 	UInt8 bindType = 1;
     CHKKEY();
-	br>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
+	br>>pf>>title>>content>>money[0]>>money[1]>>money[2]>>money[3]>>nums>>bindType;
 	std::string result="";
 	GObject::MailPackage::MailItem *item = new(std::nothrow) GObject::MailPackage::MailItem[nums + 5];
 	if(item == NULL)
@@ -1409,18 +1445,21 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		}
 		else
 		{
-			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
-			if(pmail != NULL)
-			{
-				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
-				result +="0 ";
-                player->moneyLog(2, money[2], money[1], money[0], money[3]);
-			}
-			else
-			{
-				result +="2 ";				
-			}
+            if (!pf || (pf && player->isOnline() && atoi(player->getDomain().c_str())==pf))
+            {
+                GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
+                GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                if(pmail != NULL)
+                {
+                    GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
+                    result +="0 ";
+                    player->moneyLog(2, money[2], money[1], money[0], money[3]);
+                }
+                else
+                {
+                    result +="2 ";
+                }
+            }
 		}
 	}
 	result=result.substr(0,result.length()-1);

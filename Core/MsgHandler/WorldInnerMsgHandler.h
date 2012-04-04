@@ -24,6 +24,7 @@
 #include "Script/BattleFormula.h"
 #include "GObject/SpecialAward.h"
 #include "GObject/PracticePlace.h"
+#include "GObject/ArenaBattle.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -503,6 +504,12 @@ void OnFighterStandup( GameMsgHdr& hdr, const void * data )
     UInt32 fgtid = *(UInt32*)(data);
     UInt32 fgts[1] = {fgtid};
     GObject::practicePlace.standup(player, fgts, 1);
+}
+
+void OnArenaAddLevelMan( GameMsgHdr& hdr, const void * data )
+{
+	MSG_QUERY_PLAYER(player);
+    GObject::ArenaBattle::Instance().addLevelMan();
 }
 
 void OnRunscriptReq( GameMsgHdr&, const void * data )
