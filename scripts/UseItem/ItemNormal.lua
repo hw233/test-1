@@ -1616,6 +1616,22 @@ function ItemNormal_VIP(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00000533(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local n = iid-533+1
+    local items = {{526,2,1}, {526,1,1}, {527,12,1}, {527,6,1}, {528,34,1}, {528,17,1}, {529,60,1}, {529,30,1}, {530,88,1}, {530,44,1}, {531,116,2}, {531, 58,1},}
+    if package:GetRestPackageSize() < (items[n][3]*num) then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    package:AddItem(items[n][1], items[n][2]*num, true, false)
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
 function ItemNormal_00000038(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
@@ -7110,6 +7126,19 @@ local ItemNormal_Table = {
     [463] = ItemNormal_VIP,
     [464] = ItemNormal_VIP,
 
+    [533] = ItemNormal_00000533,
+    [534] = ItemNormal_00000533,
+    [535] = ItemNormal_00000533,
+    [536] = ItemNormal_00000533,
+    [537] = ItemNormal_00000533,
+    [538] = ItemNormal_00000533,
+    [539] = ItemNormal_00000533,
+    [540] = ItemNormal_00000533,
+    [541] = ItemNormal_00000533,
+    [542] = ItemNormal_00000533,
+    [543] = ItemNormal_00000533,
+    [544] = ItemNormal_00000533,
+
 	[8947] = ItemNormal_00008947,
 	[8949] = ItemNormal_00008949,
 	[8950] = ItemNormal_00008950,
@@ -7397,6 +7426,9 @@ local ItemNormal_Table = {
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
+    if num <= 0 then
+        return false
+    end
     local player = GetPlayer()
     local package = player:GetPackage();
 
@@ -7427,6 +7459,10 @@ function ItemNormalOther_00000441(iid, num, bind, other)
 end
 
 function ItemNormalOther_00000475(iid, num, bind, other)
+    if num <= 0 then
+        return false
+    end
+
     local player = GetPlayer()
     local package = player:GetPackage()
 
@@ -7476,6 +7512,9 @@ local ItemNormalOther_Table = {
 }
 
 function RunItemNormalUse(itemId, num, bind, param)
+    if num <= 0 then
+        return false
+    end
 	local trigger = ItemNormal_Table[itemId];
 	if trigger == nil then
 		return false;
@@ -7484,6 +7523,9 @@ function RunItemNormalUse(itemId, num, bind, param)
 end
 
 function RunItemNormalUseOther(itemId, num, bind, other)
+    if num <= 0 then
+        return false
+    end
 	local trigger = ItemNormalOther_Table[itemId];
 	if trigger == nil then
 		return false;

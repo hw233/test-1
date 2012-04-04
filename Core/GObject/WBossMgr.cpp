@@ -942,6 +942,35 @@ void WBossMgr::setHP(UInt32 hp)
         m_boss->setHP(hp);
 }
 
+void WBossMgr::sendBossInfo(Player* pl)
+{
+    return;
+    Stream st(REP::DAILY_DATA);
+    st << static_cast<UInt8>(6);
+    st << static_cast<UInt8>(6);
+    if (!m_boss)
+        st << static_cast<UInt32>(0);
+    else if (m_boss->isDisappered())
+        st << static_cast<UInt32>(2);
+    else
+        st << static_cast<UInt32>(1);
+    st << Stream::eos;
+    pl->send(st);
+
+    UInt8 idx = 0;
+    if (m_boss && m_boss->isDisappered())
+       idx = (m_level-1)*5-1;
+    else
+       idx = m_level*5-1;
+
+    Stream st1(REP::DAILY_DATA);
+    st1 << static_cast<UInt8>(6);
+    st1 << static_cast<UInt8>(7);
+    st1 << static_cast<UInt32>(worldboss[idx]);
+    st1 << Stream::eos;
+    pl->send(st1);
+}
+
 WBossMgr worldBoss;
 
 } // namespace GObject

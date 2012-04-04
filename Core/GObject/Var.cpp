@@ -70,6 +70,14 @@ namespace GObject
     {
         if(id >= VAR_MAX) return;
 
+#if 0
+        if (TimeUtil::Now() > overTime)
+        {
+            DB7().PushUpdateData("DELETE FROM `var` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", m_PlayerID, id);
+            return;
+        }
+#endif
+
         m_Vars[id] = data;
         m_OverTime[id] = overTime;
     }

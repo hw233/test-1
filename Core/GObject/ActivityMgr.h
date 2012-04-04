@@ -101,7 +101,8 @@ namespace GObject
             //func
             UInt32 GetRandomReward() ;
             //std::vector<stOnlineReward> GetOnlineReward();
-            void GetOnlineReward();
+            void GetOnlineReward(UInt8 cnt);
+            UInt8 GetOnlineRewardGetNum();
             UInt32 GetOnlineRewardNum();
             void SendOnlineReward(Stream& s);
             void SendActivityInfo(Stream& s);

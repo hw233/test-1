@@ -68,56 +68,68 @@ local maxActivity = {
 }
 
 --上线奖励
-local onlineReward = 
-{
-    { {502,1}},
-    { {55,1}},
-    { {29,20}},
-    { {504, 1}},
-    { {5001,1} ,  {5011, 1} , {5021, 1}, {5031, 1}, {5041, 1} } ,
-    { {5061,1} ,  {5071, 1} , {5081, 1}, {5091, 1}, {5101, 1}, {5111 , 1 }, {5121, 1} } , 
-    { {510,1}},
+onlineReward1 = {
+    {{55,1},},
+    {{510,1},},
+    {{504,1},},
+    {{502,1},},
+    {{5001,1},{5011,1},{5021,1},{5031,1},{5041,1},{5051,1},{5061,1},{5071,1},{5081,1},{5091,1},{5101,1},{5111,1},{5121,1},{5131,1},{5141},},
+    {{29,50},},
 }
-local christmasReward = {
-    { { 403,1} },
-    { { 403,2} },
-    { { 403,3} },
-    { { 402,1}},
-    { { 402,2}},
-    { { 402,3}},
-    { { 401,1}},
+onlineReward2 = {
+    {{56,1},},
+    {{57,1},},
+    {{510,1},},
+    {{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142},},
+    {{29,60},},
+    {{51,1},},
 }
-local newYearReward = {
-    { { 433,1}},
-    { { 434,1}},
-    { { 435,1}},
-    { { 436,1}},
-    { { 437,1}},
-    { { 433,1}},
-    { { 433,1}},
+onlineReward3 = {
+    {{56,1},},
+    {{57,1},},
+    {{511,1},},
+    {{500,1},},
+    {{514,1},},
+    {{48,1},},
 }
-local valentineReward = 
-{
-    { {502,1}},
-    { {55,1}},
-    { {29,20}},
-    { {504, 1}},
-    { {438,1}},
-    { {439,1}},
-    { {510,1}},
+onlineReward4 = {
+    {{514,1},},
+    {{506,1},},
+    {{508,1},},
+    {{49,1},},
+    {{512,1},},
+    {{503,1},},
 }
+onlineReward5 = {
+    {{515,1},},
+    {{507,1},},
+    {{509,1},},
+    {{50,1},},
+    {{512,1},},
+    {{503,1},},
+}
+
+onlineReward = {
+    [0] = onlineReward2,
+    [1] = onlineReward2,
+    [2] = onlineReward3,
+    [3] = onlineReward3,
+    [4] = onlineReward4,
+    [5] = onlineReward4,
+    [6] = onlineReward5,
+}
+
 --获取上线奖励
-function GetOnlineReward()
-    if getNewYear() then
-        return newYearReward;
+function GetOnlineReward(cnt)
+    if cnt > 6 then
+        return onlineReward1;
     end
-    if getChristmas() then
-        return christmasReward;
+
+    local wday = os.date("%w", os.time())
+    if wday == "0" then
+        return onlineReward[cnt]
     end
-    if getValentineDay() then
-        return valentineReward;
-    end
-    return onlineReward;
+    return onlineReward1
 end
 
 --某一项的最大值
