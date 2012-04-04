@@ -69,7 +69,6 @@ function calcSoulStrength( ss )
   local cls = ss:getClass()
   local stlvl = ss:getStateLevel()
   local lvl = ss:getPracticeLevel()
-  print(soul_potential[stlvl] * soul_str_factor[cls] * lvl)
   return soul_potential[stlvl] * soul_str_factor[cls] * lvl
 end
 
