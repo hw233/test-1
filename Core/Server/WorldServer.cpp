@@ -315,13 +315,17 @@ void WorldServer::State(const char* action, int serverNum)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
-    fprintf(stderr, "URL: %s", url);
+    fprintf(stderr, "URL: %s\n", url);
 
     CURLcode res = curl_easy_perform(curl);
     if (CURLE_OK == res)
     {
         // TODO:
-        fprintf(stderr, "URL: %s [OK]", url);
+        fprintf(stderr, "URL: %s [OK]\n", url);
+    }
+    else
+    {
+        fprintf(stderr, "URL: %s [ERROR]\n", url);
     }
 }
 

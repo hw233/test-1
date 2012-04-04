@@ -1019,6 +1019,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         pl->send(st);
         pl->setSysDailog(false);
     }
+
+    {
+        worldBoss.sendBossInfo(pl);
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -3830,12 +3834,12 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
         case 0:
             if (!player->hasChecked())
                 return;
-            mgr->ChangeOnlineReward();
+            //mgr->ChangeOnlineReward();
             break;
 
         case 1:
             // getDailyReward
-            mgr ->GetReward(2);
+            mgr->GetReward(2);
             break;
         case 2:
             UInt16 flag = 0;
@@ -4148,8 +4152,6 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
 {
     MSG_QUERY_PLAYER(player);
-    if(!player->hasChecked())
-         return;
     player->getOfflineExp();
 }
 

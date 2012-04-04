@@ -61,7 +61,7 @@ bool ActivityMgr::CheckTimeOver()
     UInt32 over = TimeUtil::SharpDayT(1 , now);
     _item.Reset( 0  , over);
     _onlineReward.clear() ;
-    GetOnlineReward();
+    GetOnlineReward(GetOnlineRewardGetNum());
     UpdateToDB();
     return true;
 }
@@ -114,33 +114,42 @@ void ActivityMgr::UpdateToDB()
             this->_owner->getId(), _item.overTime,    _item.awardID,    _item.point, _item.award, strFlag.c_str());
 }
 
-void ActivityMgr::GetOnlineReward()
+UInt8 ActivityMgr::GetOnlineRewardGetNum()
 {
-    lua_tinker::table t = GameAction()->GetOnlineReward();
-    
+    UInt8 cnt = 0;
+    for (UInt8 i = 0; i < 7; ++i)
+    {
+        if (_owner->GetVar(VAR_ATYITEM_1+i))
+            ++cnt;
+    }
+    return cnt;
+}
+
+void ActivityMgr::GetOnlineReward(UInt8 cnt)
+{
+    lua_tinker::table t = GameAction()->GetOnlineReward(cnt);
+
     UInt32 size = t.size();
-    for(UInt32 i = 0; i< size; i++)
+    for(UInt32 i = 0; i < size; i++)
     {
         RtyRewards v;
         lua_tinker::table t2 = t.get<lua_tinker::table>(i + 1);
         UInt32 s = t2.size();
 
-        
-       
         for(UInt32 j = 0; j < s; j++)
         {
             lua_tinker::table tt = t2.get<lua_tinker::table>(j + 1);
             if(tt.size() == 2)
-             {
-                  stRtyReward r;
-                 r.num = tt.get<UInt8>(2);
-                 r.id = tt.get<UInt32>(1);
-                 v.push_back(r);
-             }
-       }
+            {
+                stRtyReward r;
+                r.num = tt.get<UInt8>(2);
+                r.id = tt.get<UInt32>(1);
+                v.push_back(r);
+            }
+        }
 
         if(s == 1)
-             _onlineReward.push_back(v[0]);
+            _onlineReward.push_back(v[0]);
         if(s >1)
         {
             UInt32 idx = uRand(s);
@@ -155,7 +164,7 @@ UInt32  ActivityMgr::GetOnlineRewardNum()
     UInt32 s = _onlineReward.size();
     if(s == 0)
     {
-        GetOnlineReward();
+        GetOnlineReward(GetOnlineRewardGetNum());
         s = _onlineReward.size();
     }
      return s;
@@ -165,6 +174,9 @@ UInt32  ActivityMgr::GetOnlineRewardNum()
  */
 void ActivityMgr::ChangeOnlineReward()
 {
+    // XXX: 取消这个功能 yangyoufa@ 01/04/12 14:11:39
+    return;
+
     CheckTimeOver();
     //已经领取过了
     if(_item.award & AtyOnlineReward)
@@ -196,8 +208,6 @@ void ActivityMgr::ChangeOnlineReward()
      st<<static_cast<UInt8>( _item.awardID);
      st<<Stream::eos;
      _owner->send(st);
-
-
 }
 /**
  *  获取奖励 
@@ -205,32 +215,35 @@ void ActivityMgr::ChangeOnlineReward()
 void ActivityMgr::GetReward(UInt32 flag)
 {
     CheckTimeOver();
-    if(_item.award & flag)
+
+    if(flag != AtyOnlineReward && _item.award & flag)
         return;
 
-    if(flag == AtyOnlineReward )
+    if(flag == AtyOnlineReward)
     {
-        if(_item.awardID == 0)
+        if (_owner->GetPackage()->IsFull())
+        {
+            _owner->sendMsgCode(0, 1011);
+            return;
+        }
+
+        if (_owner->GetVar(VAR_ATYITEM_1+World::_wday-1))
             return;
 
         UInt32 s =  _onlineReward.size();
         if(s == 0)
             return;
 
-        UInt32 idx = _item.awardID - 1;
+        UInt32 idx = GetRandomReward() - 1;
         if(idx >= s)
             idx = 0;
 
-        //给奖励
-       if ( _owner->GetPackage()->IsFull())
-       {
-           _owner->sendMsgCode(0, 1011);
-           return;
-       }
-
+       //给奖励
         _owner->GetPackage()->Add(_onlineReward[idx].id, _onlineReward[idx].num, true, false, FromDailyActivity);
+        _owner->SetVar(VAR_ATYITEM_1+World::_wday-1, _onlineReward[idx].id<<16|_onlineReward[idx].num);
 
-        AddRewardFlag(flag);
+        // AddRewardFlag(flag);
+        ActivityList(0x01);
     }
     else
     {
@@ -252,18 +265,28 @@ void  ActivityMgr::AddRewardFlag(UInt32 flag, bool db)
 
 void ActivityMgr::SendOnlineReward(Stream& s)
 {
-    //if(_onlineReward.size() == 0)
-    //{
-        _onlineReward.clear();
-        GetOnlineReward();
-    //}
-    s<< static_cast<UInt8>(_item.awardID ) << static_cast<UInt8>(_onlineReward.size());
+    _onlineReward.clear();
+    GetOnlineReward(GetOnlineRewardGetNum());
 
-    for(UInt32 i = 0 ; i < _onlineReward.size(); i ++ )
+    for (UInt8 i = 0; i < 7; ++i)
     {
-            s<<static_cast<UInt8>(_onlineReward[i].num) << static_cast<UInt32>(_onlineReward[i].id);
+        UInt32 val = _owner->GetVar(VAR_ATYITEM_1+i);
+        s << static_cast<UInt8>(val & 0xFFFF) << static_cast<UInt16>((val>>16) & 0xFFFF);
     }
 
+    s << World::_wday;
+    if (!_owner->GetVar(VAR_ATYITEM_1+World::_wday-1))
+    {
+        s << static_cast<UInt8>(_onlineReward.size());
+        for(UInt32 i = 0 ; i < _onlineReward.size(); i ++ )
+        {
+            s << static_cast<UInt8>(_onlineReward[i].num) << static_cast<UInt32>(_onlineReward[i].id);
+        }
+    }
+    else
+    {
+        s << static_cast<UInt8>(0);
+    }
 }
 inline UInt8 GetAtyIDInClient(UInt32 item_enum)
 {
@@ -402,22 +425,23 @@ void ActivityMgr::ActivityList(UInt8 type)
     Stream st(REP::ACTIVITY_LIST);
     st<<static_cast<UInt8> (type);
 
-        if(type & 0x01)
-        {
-            SendOnlineReward(st);
-        }
-        if(type & 0x02)
-        {
-            SendActivityInfo(st);
-        }
+    if(type & 0x01)
+    {
+        SendOnlineReward(st);
+    }
+    if(type & 0x02)
+    {
+        SendActivityInfo(st);
+    }
 
-         if(type & 0x04)
-         {
-             if(time == 0)
-                    time = _owner->GetOnlineTimeToday();
-                st<< static_cast<UInt32>(time);
-         }
-        st << Stream::eos;
-        _owner->send(st);
+    if(type & 0x04)
+    {
+        if(time == 0)
+            time = _owner->GetOnlineTimeToday();
+        st<< static_cast<UInt32>(time);
+    }
+    st << Stream::eos;
+    _owner->send(st);
 }
+
 }

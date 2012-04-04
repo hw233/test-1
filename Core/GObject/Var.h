@@ -91,6 +91,16 @@ namespace GObject
         VAR_FOOLS_DAY = 58, //愚人节礼包是否领取
         VAR_CBWHITEPACK = 59, //阵营战白色情人节礼包
 
+        VAR_ATYITEM_1 = 60, //活跃度星期一奖励
+        VAR_ATYITEM_2,      //活跃度星期二奖励
+        VAR_ATYITEM_3,      //活跃度星期三奖励
+        VAR_ATYITEM_4,      //活跃度星期四奖励
+        VAR_ATYITEM_5,      //活跃度星期五奖励
+        VAR_ATYITEM_6,      //活跃度星期六奖励
+        VAR_ATYITEM_7,      //活跃度星期天奖励
+
+        VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
+
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
         VAR_CFRIEND_45,
         VAR_CFRIEND_60,
@@ -185,6 +195,14 @@ namespace GObject
             REGISTER_VAR(VAR_COIN_TOKEN, CYCLE_NONE);
             REGISTER_VAR(VAR_FOOLS_DAY, CYCLE_DAY);
             REGISTER_VAR(VAR_CBWHITEPACK, CYCLE_DAY);
+            REGISTER_VAR(VAR_ATYITEM_1, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ATYITEM_2, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ATYITEM_3, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ATYITEM_4, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ATYITEM_5, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ATYITEM_6, CYCLE_WEEK);
+            REGISTER_VAR(VAR_ATYITEM_7, CYCLE_WEEK);
+            REGISTER_VAR(VAR_CLAN_LEAVE_TIME, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_1, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_45, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_60, CYCLE_NONE);

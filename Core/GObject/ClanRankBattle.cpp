@@ -31,7 +31,7 @@ namespace GObject
 
 
     //帮会排名战报名开始时间
-    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 21 * 60 * 60;
+    const static UInt32 RANK_BATTLE_SIGNUP_BEGINTIME = 20 * 60 * 60 + 30 * 60;
     //帮会排名战报名持续时间
     const static UInt32 RANK_BATTLE_SIGNUP_TIME = 10 * 60;
 
@@ -1313,6 +1313,12 @@ namespace GObject
         Clan* clan = player->getClan();
         if(clan == NULL) return;
 
+        if (player->GetVar(VAR_CLAN_LEAVE_TIME) + 24 * 60 * 60 > TimeUtil::Now())
+        {
+            player->sendMsgCode(1, 1331);
+            return;
+        }
+       
         if(m_State == STATE_SIGNUP)
         {
             if(fieldId >= RANK_BATTLE_FIELD_NUM) return;
@@ -1403,6 +1409,12 @@ namespace GObject
         if(info == NULL) return; //帮会没参加
 
         if(!info->HasPlayer(player)) return;
+
+        if (player->GetVar(VAR_CLAN_LEAVE_TIME) + 24 * 60 * 60 > TimeUtil::Now())
+        {
+            player->sendMsgCode(1, 1331);
+            return;
+        }
        
         UInt32 field = clan->GetRankBattleField(player, m_Now);
         if(field >= RANK_BATTLE_FIELD_NUM) return;

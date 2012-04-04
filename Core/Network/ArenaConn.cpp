@@ -22,8 +22,13 @@ ArenaConn::ArenaConn( int fd, Network::TcpSlaveServer * s, int id ) :
 	addr.sin_port = htons(cfg.arenaPort);
 	if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 		throw std::bad_exception();
-	Stream st(REP::RECONNECT, 0xEF);
-	st << cfg.slugName << cfg.channelNum << cfg.serverNum << Stream::eos;
+	Stream st(0x01, 0xEF);
+	st << cfg.slugName << cfg.channelNum << cfg.serverNum;
+    if (cfg.merged)
+    {
+        // TODO:
+    }
+    st << Stream::eos;
 	send(&st[0], st.size());
 }
 

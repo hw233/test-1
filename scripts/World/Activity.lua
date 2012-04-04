@@ -1,10 +1,5 @@
 -- initializer
 
-actTime1 = 0;
-actTime2 = 0;
-actTime3 = 0;
-actTime4 = 0;
-
 serverName = nil
 serverNum = 0
 
@@ -80,6 +75,11 @@ function onActivityCheck(tm)
   setTavernPurpleCount(100);
   setTavernOrangeCount(400);
 
+  --if tm >= actTime0 and tm < actTime00 then
+  --    setIsNewServer(true);
+  --else
+  --    setIsNewServer(false);
+  --end
 
   if tm >= actTime1 and tm < actTime2 then
     setShiMenActiveCount(5);
@@ -192,6 +192,7 @@ function onActivityCheck(tm)
 end
 
 function initActTime(y, m, d)
+  local  SerStartTm = { ['year'] = y, ['month'] = m, ['day'] = d, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 }; --开服时间
   local  SerStartTm1 = { ['year'] = 2011, ['month'] = 10, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm2 = { ['year'] = 2011, ['month'] = 10, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm3 = { ['year'] = 2011, ['month'] = 11, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -211,6 +212,9 @@ function initActTime(y, m, d)
   local  SerStartTm14= { ['year'] = 2012, ['month'] = 3, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  actTime0 = os.time(SerStartTm);
+  actTime00 = os.time(SerStartTm) + 7 * 86400;
 
   actTime1 = os.time(SerStartTm1);
   actTime2 = os.time(SerStartTm1) + 7 * 86400;

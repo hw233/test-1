@@ -596,6 +596,7 @@ bool Clan::leave(Player * player)
     
     ClanRankBattleMgr::Instance().Signout(player);
     player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
+    player->SetVar(VAR_CLAN_LEAVE_TIME, now);
 
 	_members.erase(found);
 	delete member;

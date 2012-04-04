@@ -1325,8 +1325,9 @@ namespace GObject
 
         if (num == 0 || IsEquipId(id) ||
                 (GetItemSubClass(id) != Item_Normal &&
-                 (GetItemSubClass(id) != Item_Formula && 
-                GetItemSubClass(id) != Item_Citta)))
+                 GetItemSubClass(id) != Item_Formula && 
+                 GetItemSubClass(id) != Item_Enhance && 
+                GetItemSubClass(id) != Item_Citta))
 			ret = false;
 		else
 		{
@@ -1376,6 +1377,8 @@ namespace GObject
     {
 		if(!m_Owner->hasChecked())
 			return false;
+        if (!num)
+            return false;
 		bool ret = false;
 
         if (GetItemSubClass(id) != Item_Normal)
@@ -1400,7 +1403,7 @@ namespace GObject
                     DelItem2(item, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
-                }				
+                }
             }
             else
             {
@@ -3019,6 +3022,7 @@ namespace GObject
 
         while(result == 0 && unbindCount >= 3)
         {
+            bool useBind = false;
             UInt32 amount = GData::moneyNeed[GData::GEMMERGE].tael;//GObjectManager::getMergeCost();        // merge_cost[lvl];
             coinAmount += amount;
             if(coinAmount > myCoin)
@@ -3038,6 +3042,7 @@ namespace GObject
                         break;
                     }
                     ++ protectBindUsed;
+                    useBind = true;
                 }
                 else
                     ++ protectUnbindUsed;
@@ -3046,7 +3051,10 @@ namespace GObject
             {
                 unbindUsed += 3;
                 unbindCount -= 3;
-                ++ unbindGemsOut;
+                if (useBind)
+                    ++ bindGemsOut;
+                else
+                    ++ unbindGemsOut;
                 ++ succTimes;
             }
             else
