@@ -1165,6 +1165,24 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
+		UInt8 p = *(buf + pos + sizeof(UInt32));
+
+        bool find = false;
+        for(UInt8 k = 0; k < 5; ++ k)
+        {
+            if((*GData::formationManager[f])[k].pos == p)
+            {
+                find = true;
+                break;
+            }
+        }
+        if(!find)
+            return;
+    }
+
+	for(UInt8 i = 0; i < c; ++ i)
+	{
+		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
 		UInt32 fgtid = *reinterpret_cast<const UInt32 *>(buf + pos);
 		if (player->hasTrainFighter(fgtid))
 			continue;
