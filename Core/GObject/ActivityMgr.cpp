@@ -280,7 +280,7 @@ void ActivityMgr::SendOnlineReward(Stream& s)
         s << static_cast<UInt8>(_onlineReward.size());
         for(UInt32 i = 0 ; i < _onlineReward.size(); i ++ )
         {
-            s<<static_cast<UInt8>(_onlineReward[i].num) << static_cast<UInt32>(_onlineReward[i].id);
+            s << static_cast<UInt8>(_onlineReward[i].num) << static_cast<UInt32>(_onlineReward[i].id);
         }
     }
     else

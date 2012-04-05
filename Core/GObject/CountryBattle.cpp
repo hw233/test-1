@@ -892,7 +892,7 @@ void GlobalCountryBattle::prepare( UInt32 t )
 		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
 	else
 		_prepareTime = t + 30;
-	if(_prepareTime + 60 * 60 < t)
+	if(_prepareTime + 30 * 60 < t)
 		_prepareTime += 24 * 60 * 60;
 	_startTime = _prepareTime + 15 * 60;
 	if(cfg.GMCheck)
