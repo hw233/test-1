@@ -50,6 +50,7 @@ namespace GObject
 struct SoulItemExp
 {
     UInt16 itemId;
+    UInt8 res;
     Int16 exp;
 };
 

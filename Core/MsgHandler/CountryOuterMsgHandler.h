@@ -4245,7 +4245,7 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             st << fighterId << infoNum;
             for( int j = 0; j < infoNum; ++ j)
             {
-                st << soulItemExpOut[j].itemId << soulItemExpOut[j].exp;
+                st << soulItemExpOut[j].itemId << soulItemExpOut[j].res << soulItemExpOut[j].exp;
             }
             st << Stream::eos;
             player->send(st);

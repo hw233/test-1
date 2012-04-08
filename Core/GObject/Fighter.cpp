@@ -3624,6 +3624,11 @@ void Fighter::enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOu
     if(it == GData::GDataManager::m_soulItemExp.end())
         return;
 
+    if(!_owner->GetPackage()->DelItemAny(itemId, 1, NULL, ToSecondSoul))
+    {
+        return;
+    }
+
     UInt32 exp = it->second;
     const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
 
@@ -3647,17 +3652,18 @@ void Fighter::enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOu
             succ = true;
     }
 
-    _owner->GetPackage()->DelItemAny(itemId, 1, NULL);
     sie.itemId = itemId;
     if(succ)
     {
+        sie.res = 0;
         sie.exp = exp;
         m_2ndSoul->addStateExp(exp);
     }
     else
     {
         exp = GObjectManager::getDecSoulStateExp(soulStateLevel);
-        sie.exp = 0 - exp;
+        sie.res = 1;
+        sie.exp = exp;
         m_2ndSoul->decStateExp(exp);
     }
 

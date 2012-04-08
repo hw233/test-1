@@ -3458,10 +3458,10 @@ namespace GObject
 
         for(UInt32 i = 0 ;  i < it->second.stfs.size(); i++)
         {
-            bool b = false;
+            bool b = bind;
             GData::stUseItem&  itm = it->second.stfs[i];
             DelItemAny(itm.id, itm.num, &b);
-            if(b)
+            if(b && !bind)
                 bind = true;
         }
 
@@ -4015,7 +4015,7 @@ namespace GObject
         if(q < 5)
             return;
 
-        bool bind = false;
+        bool bind = equip->GetBindStatus();
         ItemEquipData& ied_equip = equip->getItemEquipData();
         switch(type)
         {
@@ -4054,7 +4054,7 @@ namespace GObject
 
                 for(int k = 0; k != 3; ++ k)
                 {
-                    bool tmp = false;
+                    bool tmp = bind;
                     DelItemAny(itemId[k], 1, &tmp);
                     if(tmp && !bind)
                         bind = tmp;

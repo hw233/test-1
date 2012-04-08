@@ -155,6 +155,7 @@ enum ItemTo
 	ToTrumpUpgrade,	
     ToEquipUpgrade,
     ToForgeFighter,
+    ToSecondSoul,
 };
 
 
