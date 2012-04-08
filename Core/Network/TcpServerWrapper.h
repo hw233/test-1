@@ -91,7 +91,9 @@ namespace Network
 
 		inline void CloseArena()
 		{
-			Close(-1);
+			if(!m_Active)
+				return;
+			m_TcpService->closeConn(-1);
 		}
 
 		inline TcpConnection GetConn(int sessionID)

@@ -129,7 +129,15 @@ void TcpSlaveServer::_accepted( int ss )
 				if(ss < 0)
 				{
 					try {
-						conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
+                        if(_connConduit == NULL)
+                        {
+                            conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
+                            _connConduit = conduit;
+                        }
+                        else
+                            conduit = _connConduit;
+                        if(conduit)
+                            conduit->initConnection();
 					} catch(...)
 					{
 						conduit = NULL;
@@ -173,7 +181,15 @@ void TcpSlaveServer::_accepted( int ss )
 		if(ss < 0)
 		{
 			try {
-				conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
+                if(_connConduit == NULL)
+                {
+                    conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
+                    _connConduit = conduit;
+                }
+                else
+                    conduit = _connConduit;
+                if(conduit)
+                    conduit->initConnection();
 			} catch(...)
 			{
 				conduit = NULL;
@@ -439,6 +455,17 @@ void TcpMasterServer::close( int id )
 	if(rid >= server->_conduits.size() || server->_conduits[rid].get() == NULL)
 		return;
 	server->_conduits[rid]->closeConn();
+}
+
+void TcpMasterServer::closeConn( int id )
+{
+	int rid = -1 - id;
+	if(rid >= TCP_CONN_IDX_MAX)
+        return;
+	if(rid < 0)
+		close(id);
+    else
+        close(_workers[0]->_connUp[rid]);
 }
 
 void TcpMasterServer::broadcast( const void * buf, int len )

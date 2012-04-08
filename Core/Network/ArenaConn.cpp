@@ -16,6 +16,15 @@ namespace Network
 ArenaConn::ArenaConn( int fd, Network::TcpSlaveServer * s, int id ) :
 	TcpConduit(fd, s, id)
 {
+}
+
+bool ArenaConn::enabled()
+{
+	return cfg.arenaPort > 0;
+}
+
+void ArenaConn::initConnection()
+{
 	struct sockaddr_in addr = {0};
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(ResolveAddress(cfg.arenaHost.c_str()));
@@ -30,11 +39,6 @@ ArenaConn::ArenaConn( int fd, Network::TcpSlaveServer * s, int id ) :
     }
     st << Stream::eos;
 	send(&st[0], st.size());
-}
-
-bool ArenaConn::enabled()
-{
-	return cfg.arenaPort > 0;
 }
 
 int ArenaConn::parsePacket( struct evbuffer * buf, int &off, int &len )
