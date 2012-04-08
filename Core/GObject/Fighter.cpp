@@ -1650,7 +1650,7 @@ bool Fighter::skillLevelUp( UInt16 skill, UInt8 lv )
 
 void Fighter::getAllUpSkillAndLevel( Stream& st )
 {
-    Int8 skills = getUpSkillsNum();
+    UInt8 skills = getUpSkillsNum();
     st << skills;
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
@@ -3536,11 +3536,11 @@ void Fighter::updateForgeAttr(bool notify)
 void Fighter::broadcastForge(UInt8 lock)
 {
     bool b = false;
-    if (!(lock & 0x1) && (((((double)_attrValue1 / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.909f))
+    if (!(lock & 0x1) && (((((double)(_attrValue1-_attrValue1%10) / 100.f) / GObjectManager::getFFMaxVal(_attrType1))) > 0.909f))
         b = true;
-    if (!(lock & 0x2) && (((((double)_attrValue2 / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.909f))
+    if (!(lock & 0x2) && (((((double)(_attrValue2-_attrValue2%10) / 100.f) / GObjectManager::getFFMaxVal(_attrType2))) > 0.909f))
         b = true;
-    if (!(lock & 0x4) && (((((double)_attrValue3 / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.909f))
+    if (!(lock & 0x4) && (((((double)(_attrValue3-_attrValue3%10) / 100.f) / GObjectManager::getFFMaxVal(_attrType3))) > 0.909f))
         b = true;
 
     if (b)

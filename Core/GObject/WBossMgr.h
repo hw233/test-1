@@ -130,6 +130,7 @@ public:
     void nextDay(UInt32 now);
     void sendDaily(Player* player);
     void setHP(UInt32 hp);
+    void sendBossInfo(Player* pl);
 
     inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
     inline UInt8 getLevel(){return m_maxlvl;}

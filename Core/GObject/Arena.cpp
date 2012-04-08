@@ -179,6 +179,7 @@ void Arena::appendEquipInfo( Stream& st, ItemEquip * equip )
 	ItemEquipData& ied = equip->getItemEquipData();
 	st << static_cast<UInt16>(equip->GetItemType().getId()) << ied.enchant << ied.tRank << ied.maxTRank;
 	ied.extraAttr2.appendAttrToStream(st);
+    ied.spiritAttr.appendAttrToStream(st);
 	st << ied.sockets;
 	for(UInt8 i = 0; i < ied.sockets; ++ i)
 		st << ied.gems[i];

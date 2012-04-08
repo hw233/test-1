@@ -498,75 +498,6 @@ namespace GObject
 					maxGF = fgt->getId();
 			}
 			globalFighters[fgt->getId()] = fgt;
-			float potential = fgt->getPotential();
-			UInt8 level = fgt->getLevel();
-			switch (id)
-			{
-			case 4478:
-				{
-					for (UInt8 inc = 1; inc <= 50; ++ inc)
-					{
-						Fighter * fgt_clone = fgt->clone(NULL);
-						fgt_clone->setWeapon(nwp, false);
-						fgt_clone->setPotential(potential + inc * 0.02f, false);
-						fgt_clone->setLevel(level + inc);
-						globalFighters[id + inc] = fgt_clone;
-					}
-				}
-				break;
-			case 4529:
-			case 4551:
-				{
-					for (UInt8 inc = 1; inc <= 10; ++ inc)
-					{
-						Fighter * fgt_clone = fgt->clone(NULL);
-						fgt_clone->setWeapon(nwp, false);
-						fgt_clone->setPotential(potential + inc * 0.05f, false);
-						fgt_clone->setLevel(level + inc * 5);
-						globalFighters[id + inc] = fgt_clone;
-					}
-				}
-				break;
-			case 4540:
-			case 4562:
-				{
-					for (UInt8 inc = 1; inc <= 10; ++ inc)
-					{
-						Fighter * fgt_clone = fgt->clone(NULL);
-						fgt_clone->setWeapon(nwp, false);
-						fgt_clone->setPotential(potential + inc * 0.1f, false);
-						fgt_clone->setLevel(level + inc * 5);
-						globalFighters[id + inc] = fgt_clone;
-					}
-				}
-				break;
-			default:
-				{
-					float pt = 0.0f;
-					if(id >= 4373 && id <= 4391)
-						pt = 0.8f;
-					else if(id >= 4392 && id <= 4413)
-						pt = 0.8f;
-					else if(id >= 4419 && id <= 4460)
-						pt = 0.8f;
-					else if(id >= 4697 && id <= 4710)
-						pt = 1.0f;
-					else if(id >= 4723 && id <= 4740)
-						pt = 1.2f;
-					if(pt != 0.0f)
-					{
-						Fighter * fgt_clone = fgt->clone(NULL);
-						fgt_clone->setWeapon(nwp, false);
-						fgt_clone->setPotential(fgt->getPotential() + pt, false);
-						globalFighters[fgt_clone->getId() + 4096] = fgt_clone;
-						fgt_clone = fgt->clone(NULL);
-						fgt_clone->setWeapon(nwp, false);
-						fgt_clone->setPotential(fgt->getPotential() + pt * 2, false);
-						globalFighters[fgt_clone->getId() + 8192] = fgt_clone;
-					}
-				}
-				break;
-			}
 		}
 		lc.finalize();
 		globalFighters.setMaxFgtId(maxGF);
@@ -3727,6 +3658,7 @@ namespace GObject
             pl->GetHeroMemo()->loadFromDB(hm.awards.c_str(), hm.memos.c_str());
             pl = 0;
         }
+		lc.finalize();
 
 		globalPlayers.enumerate(heromemo_loaded, 0);
         return true;
@@ -3753,7 +3685,7 @@ namespace GObject
             pl->resetCFriends();
             pl = 0;
         }
-
+		lc.finalize();
         return true;
     }
 

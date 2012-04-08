@@ -24,12 +24,18 @@ static bool initMemcache()
         memc = memcached_create(NULL);
         std::vector<Sp> tokenServer;
         Sp s;
+#if defined(_FB)
+        s.ip = "192.168.100.2";
+        s.port = 11211;
+        tokenServer.push_back(s);
+#else
         s.ip = "10.142.16.11";
         s.port = 9146;
         tokenServer.push_back(s);
         s.ip = "10.142.39.27";
         s.port = 9146;
         tokenServer.push_back(s);
+#endif
         size_t sz = tokenServer.size();
 
         for (size_t i = 0; i < sz; ++i) 
@@ -103,11 +109,11 @@ int main(int argc, char* argv[])
         long long rid = random();
         long long rrid = rid << 32 | (random() | 0x12345);
         size_t vlen = snprintf(id, sizeof(id), "%llu", rrid);
-        memcached_return_t rc = memcached_set(memc, key, len, id, vlen, (time_t)(10*60), 0);
+        memcached_return_t rc = memcached_set(memc, key, len, id, vlen, -1, 0);
         int retry = 2;
         while (rc != MEMCACHED_SUCCESS && retry)
-        {   
-            rc = memcached_set(memc, key, len, id, vlen, (time_t)(30), 0); 
+        {
+            rc = memcached_set(memc, key, len, id, vlen, -1, 0);
             --retry;
         }
         printf("%s\n", id);

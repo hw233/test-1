@@ -4692,7 +4692,7 @@ bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool
 		if(obj != NULL && obj->isChar())
 		{
 			BattleFighter * bf = static_cast<BattleFighter *>(obj);
-			UInt16 hp = bf->getHP();
+			UInt32 hp = bf->getHP();
 
 			UInt32 oldmaxhp = pd.fighter->getMaxHP();
 			UInt32 currhp = pd.fighter->getCurrentHP();
@@ -4762,7 +4762,7 @@ void BattleSimulator::getFighterHP( UInt8 side, GObject::Fighter ** fighters, UI
 		if(obj != NULL && obj->isChar())
 		{
 			BattleFighter * bf = static_cast<BattleFighter *>(obj);
-			UInt16 hp_ = bf->getHP();
+			UInt32 hp_ = bf->getHP();
 			UInt32 maxhp = bf->getMaxHP();
 			if(percent > 0)
 			{

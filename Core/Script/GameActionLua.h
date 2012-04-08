@@ -217,7 +217,7 @@ namespace Script
 		UInt32 onTavernFlush(UInt8 color);
 		bool onTakeMailPackage(Player* player, UInt32 pkgId);
 		lua_tinker::table onGetMailItems(UInt32 pkgId);
-        lua_tinker::table GetOnlineReward();
+        lua_tinker::table GetOnlineReward(UInt8 cnt);
         void   GetAtyReward(Player* p, UInt32 flag);
 		UInt32 onLuckyDrawItemRoll(UInt8 type);
 		UInt32 onDungeonLootItemRoll(Player * player, UInt8 id, UInt8 level, bool isBoss);

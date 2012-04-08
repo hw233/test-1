@@ -6875,7 +6875,7 @@ namespace GObject
                 {514,5,503,5,516,5,0,0,0,0,0,0,0,0},
                 {MailPackage::Coupon,80,0,0,0,0,0,0,0,0,0,0,0,0},
                 {MailPackage::Coupon,100,0,0,0,0,0,0,0,0,0,0,0,0},
-                {507,2,509,2,30,2,MailPackage::Coupon,100,0,0,0,0,0,0},
+                {507,2,509,2,30,10,MailPackage::Coupon,100,0,0,0,0,0,0},
                 {MailPackage::Coupon,120,0,0,0,0,0,0,0,0,0,0,0,0},
                 {MailPackage::Coupon,140,0,0,0,0,0,0,0,0,0,0,0,0},
                 {MailPackage::Coupon,160,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -8812,6 +8812,8 @@ namespace GObject
 
     void Player::offlineExp(UInt32 now)
     {
+        if (GetLev() <= 30)
+            return;
         UInt32 lastOffline = GetVar(VAR_OFFLINE);
         if (!lastOffline)
             lastOffline = _playerData.lastOnline;

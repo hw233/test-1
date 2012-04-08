@@ -35,13 +35,13 @@ UInt32 CountryBattleData::getReward(UInt8 lvl, UInt32 curtime, UInt32 nextReward
 		duration = curtime + 60 - nextReward;
 	UInt8 plvl = player->GetLev();
 	if(plvl <= 90)
-		player->AddExp(duration * ((plvl - 40) * 6 + 20));
+		player->AddExp(2 * (duration * ((plvl - 40) * 6 + 20)));
 	else if(plvl <= 100)
-		player->AddExp(duration * ((plvl - 90) * 22 + 320));
+		player->AddExp(2 * (duration * ((plvl - 90) * 22 + 320)));
 	else if(plvl <= 114)
-		player->AddExp(duration * ((plvl - 100) * 140 + 540));
+		player->AddExp(2 * (duration * ((plvl - 100) * 140 + 540)));
 	else
-		player->AddExp(duration * 2500);
+		player->AddExp(2 * (duration * 2500));
 	return duration;
 }
 
@@ -87,6 +87,9 @@ inline void addAchievement(UInt32& achieve, UInt8 lvl, UInt8& killStreak1, UInt8
         achieve += 10 * (lvl + 1);
 	if(World::_wday == 1)
 		achieve *= 2;
+
+    // XXX: 阵营战时间减半后处理
+    achieve *= 2;
 }
 void CountryBattle::LeaveGetAttainment(Player* p, CBPlayerData& data)
 {
@@ -131,7 +134,6 @@ void CountryBattle::process(UInt32 curtime)
 
 			int turns = 0;
 			bool res = cbd1->player->challenge(cbd2->player, NULL, &turns, false, 50);
-
            
 			GameAction()->RunOperationTaskAction1(cbd1->player, 2, res);
 			GameAction()->RunOperationTaskAction1(cbd2->player, 2, !res);
@@ -139,7 +141,7 @@ void CountryBattle::process(UInt32 curtime)
 			cbd2->player->setBuffData(PLAYER_BUFF_ATTACKING, curtime + 2 * turns);
 
 			UInt8 gotScore = 8 * (lvl + 1);
-			UInt32 achieve = 0, loserAchieve = 1 * (lvl + 1);
+			UInt32 achieve = 0, loserAchieve = 2 * (lvl + 1);
 			if(World::_wday == 1)
 				loserAchieve *= 2;
 			if(res)
@@ -165,7 +167,7 @@ void CountryBattle::process(UInt32 curtime)
 				data.setSideLevel(0, lvl);
 				data.player = cbd1->player;
 				data.streak = cbd1->killStreak;
-				data.score = gotScore;
+				data.score = achieve;
 				data.playerOther = cbd2->player;
 				data.streakOther = cbd2->killStreak;
 				_cbsdlist.push_back(data);
@@ -228,7 +230,7 @@ void CountryBattle::process(UInt32 curtime)
 				data.setSideLevel(1, lvl);
 				data.player = cbd2->player;
 				data.streak = cbd2->killStreak;
-				data.score = gotScore;
+				data.score = achieve;
 				data.playerOther = cbd1->player;
 				data.streakOther = cbd1->killStreak;
 				_cbsdlist.push_back(data);
@@ -673,7 +675,7 @@ void CountryBattle::restCount( UInt32 curtime, UInt8 lvl, UInt8 side )
 		{
 			Player * player = cbd->player;
 			UInt8 gotScore = lvl + 1;
-			UInt8 achievement = lvl + 1;
+			UInt8 achievement = 2 * (lvl + 1);
 			if(World::_wday == 1)
 				achievement *= 2;
 			cbd->restCountTime = curtime + 60;
@@ -688,7 +690,7 @@ void CountryBattle::restCount( UInt32 curtime, UInt8 lvl, UInt8 side )
 			data.type = 3;
 			data.setSideLevel(side, lvl);
 			data.player = cbd->player;
-			data.score = gotScore;
+			data.score = achievement;
 			_cbsdlist.push_back(data);
 		}
 	}
@@ -890,13 +892,13 @@ void GlobalCountryBattle::prepare( UInt32 t )
 		_prepareTime = TimeUtil::SharpDay(0) + 19 * 60 * 60 + 45 * 60;
 	else
 		_prepareTime = t + 30;
-	if(_prepareTime + 60 * 60 < t)
+	if(_prepareTime + 30 * 60 < t)
 		_prepareTime += 24 * 60 * 60;
 	_startTime = _prepareTime + 15 * 60;
 	if(cfg.GMCheck)
 	{
 		_startTime = _prepareTime + 15 * 60;
-		_endTime = _startTime + 60 * 60;
+		_endTime = _startTime + 30 * 60;
 	}
 	else
 	{

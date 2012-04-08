@@ -980,9 +980,9 @@ namespace Script
 		return Call<lua_tinker::table>("onGetMailItems", pkgId);	
 	}
 
-    lua_tinker::table GameActionLua::GetOnlineReward()
+    lua_tinker::table GameActionLua::GetOnlineReward(UInt8 cnt)
     {
-        return Call<lua_tinker::table>("GetOnlineReward");
+        return Call<lua_tinker::table>("GetOnlineReward", cnt);
     }
 
     void   GameActionLua::GetAtyReward(Player* p, UInt32 flag)
