@@ -1397,7 +1397,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                     defList[defCount].damage = 0;
                     defList[defCount].damType = e_Weak;
                     bo->setWeakLevel(SKILL_LEVEL(boSkill->getId()));
-                    bo->setWeakRound(boSkill->last + 1);
+                    bo->setWeakRound(boSkill->last);
                 }
                 break;
             }
@@ -1999,10 +1999,7 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
         {
             defList[defCount].damType = e_Weak;
             target_bo->setWeakLevel(SKILL_LEVEL(skill->getId()));
-            if(skill->cond == GData::SKILL_BEATKED)
-                target_bo->setWeakRound(skill->last + 1);
-            else
-                target_bo->setWeakRound(skill->last);
+            target_bo->setWeakRound(skill->last);
         }
         break;
     }
