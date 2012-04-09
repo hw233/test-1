@@ -697,10 +697,10 @@ void TownDeamon::process()
         if(!pl)
             continue;
 
-        DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+        //DeamonPlayerData* dpd = pl->getDeamonPlayerData();
 
-        if(TimeUtil::SharpDayT(0) + TOWNDEAMONENDTM <= TimeUtil::Now() && dpd->startTime <= TimeUtil::SharpDayT(0) + TOWNDEAMONENDTM)
-            quitDeamon(pl, NULL);
+        //if(TimeUtil::SharpDayT(0) + TOWNDEAMONENDTM <= TimeUtil::Now() && dpd->startTime <= TimeUtil::SharpDayT(0) + TOWNDEAMONENDTM)
+        quitDeamon(pl, NULL);
     }
 }
 

@@ -1976,6 +1976,9 @@ namespace GObject
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x50, equip, true);
 
+            for(UInt8 k = 0; k < 6; ++k)
+                fgt->equipSoulSkill(k, 0);
+
 			_fighters.erase(it);
 			DB2().PushUpdateData("DELETE FROM `fighter` WHERE `id` = %u AND `playerId` = %"I64_FMT"u", id, getId());
 
@@ -1995,9 +1998,9 @@ namespace GObject
 		return NULL;
 	}
 
-	UInt16 Player::addFightCurrentHp(UInt32 id, UInt16 hp, bool battle)
+	UInt32 Player::addFightCurrentHp(UInt32 id, UInt32 hp, bool battle)
 	{
-		UInt16 currHp = 0;
+		UInt32 currHp = 0;
 		if (battle)
 		{
 			for(int i = 0; i < 5; ++ i)
@@ -2053,9 +2056,9 @@ namespace GObject
         return p;
     }
 
-	void Player::addFightCurrentHpAll(UInt16 hp)
+	void Player::addFightCurrentHpAll(UInt32 hp)
 	{
-		UInt16 currHp = 0;
+		UInt32 currHp = 0;
 		for (std::map<UInt32, Fighter*>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
 		{
 			Fighter * fgt = it->second;
@@ -5335,7 +5338,7 @@ namespace GObject
 			Fighter * fighter = getLineup(i).fighter;
 			if(fighter == NULL)
 				continue;
-			UInt16 hp = fighter->getCurrentHP();
+			UInt32 hp = fighter->getCurrentHP();
 			if(hp == 0)
 				continue;
             if (!World::getAutoHeal())

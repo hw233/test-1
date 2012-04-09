@@ -7,7 +7,7 @@
 namespace GData
 {
 
-#define STATE_LEVEL_MAX 8
+#define STATE_LEVEL_MAX 10
 
 class SoulExpTable
 {

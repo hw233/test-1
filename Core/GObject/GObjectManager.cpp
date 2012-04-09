@@ -4094,7 +4094,7 @@ namespace GObject
                 int tempSize = tempTable.size();
 
                 std::vector<UInt32> tmpChance;
-                for(int j = 0; j < tempSize - 1; ++ j)
+                for(int j = 1; j < tempSize - 1; ++ j)
                 {
                     tmpChance.push_back(tempTable.get<UInt32>(j + 1));
                 }

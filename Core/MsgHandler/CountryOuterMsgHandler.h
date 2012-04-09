@@ -4237,8 +4237,9 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             for(int i = 0; i < itemNum; ++ i)
             {
                 UInt16 itemId = 0;
-                br >> itemId;
-                fgt->enchantSoul(itemId, soulItemExpOut);
+                UInt8 bind = 0;
+                br >> itemId >> bind;
+                fgt->enchantSoul(itemId, bind != 0, soulItemExpOut);
             }
 
             UInt16 infoNum = soulItemExpOut.size();
@@ -4258,14 +4259,15 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
             UInt16 fighterId = 0;
             UInt8 idx = 0;
             UInt16 itemId = 0;
+            UInt8 bind = 0;
 
-            br >> fighterId >> idx >> itemId;
+            br >> fighterId >> idx >> itemId >> bind;
             GObject::Fighter * fgt = player->findFighter(fighterId);
             if(!fgt || idx < 1 || idx > 6)
                 break;
 
             bool res = false;
-            res = fgt->equipSoulSkill(idx - 1, itemId);
+            res = fgt->equipSoulSkill(idx - 1, itemId, bind != 0);
 
             Stream st(REP::SECOND_SOUL);
             st << static_cast<UInt8>(4);

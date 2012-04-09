@@ -584,7 +584,7 @@ CREATE TABLE `fighter` (
   `relvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `experience` bigint(20) unsigned NOT NULL DEFAULT '0',
   `practiceExp` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `hp` mediumint(5) unsigned NOT NULL DEFAULT '0',
+  `hp` int(10) unsigned NOT NULL DEFAULT '0',
   `attrType1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `attrValue1` smallint(5) unsigned NOT NULL DEFAULT '0',
   `attrType2` tinyint(3) unsigned NOT NULL DEFAULT '0',

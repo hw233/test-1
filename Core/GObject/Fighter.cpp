@@ -32,7 +32,7 @@ namespace GObject
 GlobalFighters globalFighters;
 
 static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.25, 1.51};
-#define SOUL_EXP_ITEM 482
+#define SOUL_EXP_ITEM 8000
 #define SOUL_SKILL_DEFAULT_ITEM 8565
 
 Fighter& getGreatFighter(UInt32 id)
@@ -3576,6 +3576,7 @@ bool Fighter::openSecondSoul(UInt8 cls)
 
     m_2ndSoul->insertIntoDB();
     m_2ndSoul->sendInfo(_owner);
+    sendMaxSoul();
     return true;
 }
 
@@ -3616,7 +3617,7 @@ bool Fighter::practiceLevelUp()
     return true;
 }
 
-void Fighter::enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOut)
+void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
 {
     if(!m_2ndSoul)
         return;
@@ -3624,7 +3625,7 @@ void Fighter::enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOu
     if(it == GData::GDataManager::m_soulItemExp.end())
         return;
 
-    if(!_owner->GetPackage()->DelItemAny(itemId, 1, NULL, ToSecondSoul))
+    if(!_owner->GetPackage()->DelItem(itemId, 1, bind, ToSecondSoul))
     {
         return;
     }
@@ -3670,7 +3671,7 @@ void Fighter::enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOu
     soulItemExpOut.push_back(sie);
 }
 
-bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId)
+bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
 {
     if(!m_2ndSoul)
         return false;
@@ -3678,7 +3679,7 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId)
     UInt16 skillId = 0;
     if(itemId != 0)
     {
-        if (_owner->GetPackage()->GetItemAnyNum(itemId) == 0)
+        if (_owner->GetPackage()->GetItemNum(itemId, bind) == 0)
             return false;
 
         skillId = m_2ndSoul->getSkillIdOfItem(itemId);
@@ -3694,7 +3695,7 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId)
     if(0xFFFFFFFF == itemOut)
         return false;
 
-    _owner->GetPackage()->DelItemAny(itemId, 1, NULL);
+    _owner->GetPackage()->DelItem(itemId, 1, bind);
     if(0 != itemOut)
         _owner->GetPackage()->AddItem(itemOut, 1, true, true);
 

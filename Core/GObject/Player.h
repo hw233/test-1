@@ -867,8 +867,8 @@ namespace GObject
 			}
 		}
 
-		UInt16 addFightCurrentHp(UInt32 id, UInt16 hp, bool battle = false);
-		void   addFightCurrentHpAll(UInt16 hp);
+		UInt32 addFightCurrentHp(UInt32 id, UInt32 hp, bool battle = false);
+		void   addFightCurrentHpAll(UInt32 hp);
 
 		void updateBattleFighters(bool = true);
 		void storeFighters();

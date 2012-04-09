@@ -25,7 +25,7 @@ void SecondSoul::addAttr(GData::AttrExtra& ae)
     float agilityFactor = getSoulSkillValue(SOUL_SKILL_AGILITY);
     float willFactor = getSoulSkillValue(SOUL_SKILL_WILL);
     //float allFactor = getSoulSkillValue(SOUL_SKILL_ALLATTR);
-    float hpFactor = getSoulSkillValue(SOUL_SKILL_HPFACTOR);
+    //float hpFactor = getSoulSkillValue(SOUL_SKILL_HPFACTOR);
 
     if(m_strength == 0)
     {
@@ -36,7 +36,7 @@ void SecondSoul::addAttr(GData::AttrExtra& ae)
         m_will = Script::BattleFormula::getCurrent()->calcSoulWill(this);
     }
 
-    ae.hpP += hpFactor;
+    //ae.hpP += hpFactor;
     ae.strength += m_strength * (1 + strenghtFactor + attrTransFactor) ;
     ae.agility += m_agility * (1 + agilityFactor + attrTransFactor);
     ae.physique += m_physique * (1 + physiqueFactor + attrTransFactor);
@@ -152,7 +152,6 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, SoulSkill ss, bool writeDB)
             if(m_skills[i].id == ss.id && idx != i)
             {
                 return 0xFFFFFFFF;
-                break;
             }
         }
     }

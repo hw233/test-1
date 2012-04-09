@@ -94,7 +94,7 @@ public:
 	inline UInt32 getPExpMax() {return _pexpMax;}
     inline bool isPExpFull() { return _pexpMax <= _pexp; }
 	inline float getPotential() {return _potential;}
-	inline UInt16 getCurrentHP() {return _hp;}
+	inline UInt32 getCurrentHP() {return _hp;}
     bool isExpFull();
     UInt64 getExpMax();
 
@@ -585,7 +585,7 @@ protected:
 	float _potential;   // 潜力
 	float _capacity;    // 资质
 	UInt8 _color;
-	UInt16 _hp;
+	UInt32 _hp;
 
     UInt8 _acupoints[ACUPOINTS_MAX];    // 穴道
 
@@ -640,8 +640,8 @@ public:
     UInt8 getSoulExtraAura();
     bool practiceLevelUp();
 
-    void enchantSoul(UInt32 itemId, std::vector<SoulItemExp>& soulItemExpOut);
-    bool equipSoulSkill(UInt8 idx, UInt32 itemId);
+    void enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut);
+    bool equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind=true);
 
     void send2ndSoulInfo();
 
