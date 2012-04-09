@@ -1971,6 +1971,10 @@ namespace GObject
 			if(delTrainFighter(id))
 				PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
 			Fighter * fgt = it->second;
+
+            for(Int8 k = 5; k >= 0; --k)
+                fgt->equipSoulSkill(k, 0);
+
 			ItemEquip * equip;
 			for(UInt8 z = 1; z < 9; ++ z)
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
@@ -1996,9 +2000,9 @@ namespace GObject
 		return NULL;
 	}
 
-	UInt16 Player::addFightCurrentHp(UInt32 id, UInt16 hp, bool battle)
+	UInt32 Player::addFightCurrentHp(UInt32 id, UInt32 hp, bool battle)
 	{
-		UInt16 currHp = 0;
+		UInt32 currHp = 0;
 		if (battle)
 		{
 			for(int i = 0; i < 5; ++ i)
@@ -2054,9 +2058,9 @@ namespace GObject
         return p;
     }
 
-	void Player::addFightCurrentHpAll(UInt16 hp)
+	void Player::addFightCurrentHpAll(UInt32 hp)
 	{
-		UInt16 currHp = 0;
+		UInt32 currHp = 0;
 		for (std::map<UInt32, Fighter*>::iterator it = _fighters.begin(); it != _fighters.end(); ++it)
 		{
 			Fighter * fgt = it->second;
@@ -5336,7 +5340,7 @@ namespace GObject
 			Fighter * fighter = getLineup(i).fighter;
 			if(fighter == NULL)
 				continue;
-			UInt16 hp = fighter->getCurrentHP();
+			UInt32 hp = fighter->getCurrentHP();
 			if(hp == 0)
 				continue;
             if (!World::getAutoHeal())
@@ -8852,6 +8856,15 @@ namespace GObject
                     fgt->addPExp(pexp*fgt->getPracticeInc()*0.8f, true);
             }
             SetVar(VAR_OFFLINE_PEXP, 0);
+        }
+    }
+
+    void Player::sendSecondInfo()
+    {
+		for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+        {
+            Fighter* fgt = it->second;
+            fgt->send2ndSoulInfo();
         }
     }
 

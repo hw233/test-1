@@ -983,6 +983,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         pl->sendAutoFrontMap();
     }
+    {
+        pl->sendSecondInfo();
+    }
 #ifdef _FB
     // XXX: do not need
 #else
@@ -1163,6 +1166,24 @@ void OnSetFormationReq( GameMsgHdr& hdr, const void * buffer )
 
     if(!player->checkFormation(f))
         return;
+
+	for(UInt8 i = 0; i < c; ++ i)
+	{
+		UInt32 pos = 3 + (sizeof(UInt8) + sizeof(UInt32)) * i;
+		UInt8 p = *(buf + pos + sizeof(UInt32));
+
+        bool find = false;
+        for(UInt8 k = 0; k < 5; ++ k)
+        {
+            if((*GData::formationManager[f])[k].pos == p)
+            {
+                find = true;
+                break;
+            }
+        }
+        if(!find)
+            return;
+    }
 
 	for(UInt8 i = 0; i < c; ++ i)
 	{
@@ -4209,6 +4230,110 @@ void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
     MSG_QUERY_PLAYER(player);
     player->getOfflineExp();
 }
+
+void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+    case 0x00:
+        {
+            UInt16 fighterId = 0;
+            br >> fighterId;
+            GObject::Fighter * fgt = player->findFighter(fighterId);
+            if(fgt)
+                fgt->send2ndSoulInfo();
+        }
+        break;
+    case 0x01:
+        {
+            UInt16 fighterId = 0;
+            UInt8 cls = 0;
+            br >> fighterId >> cls;
+            GObject::Fighter * fgt = player->findFighter(fighterId);
+            if(fgt)
+            {
+                bool res = false;
+                res = fgt->openSecondSoul(cls);
+                Stream st(REP::SECOND_SOUL);
+                st << static_cast<UInt8>(1);
+                st << fighterId << static_cast<UInt8>(res ? 0 : 1) << Stream::eos;
+                player->send(st);
+            }
+        }
+        break;
+    case 0x02:
+        {
+            UInt16 fighterId = 0;
+            br >> fighterId;
+            GObject::Fighter * fgt = player->findFighter(fighterId);
+            if(fgt)
+            {
+                fgt->practiceLevelUp();
+            }
+        }
+        break;
+    case 0x03:
+        {
+            UInt16 fighterId = 0;
+            UInt16 itemNum = 0;
+            br >> fighterId >> itemNum;
+
+            GObject::Fighter * fgt = player->findFighter(fighterId);
+            if(!fgt)
+                break;
+
+            std::vector<SoulItemExp> soulItemExpOut;
+            for(int i = 0; i < itemNum; ++ i)
+            {
+                UInt16 itemId = 0;
+                UInt8 bind = 0;
+                br >> itemId >> bind;
+                fgt->enchantSoul(itemId, bind != 0, soulItemExpOut);
+            }
+
+            UInt16 infoNum = soulItemExpOut.size();
+            Stream st(REP::SECOND_SOUL);
+            st << static_cast<UInt8>(3);
+            st << fighterId << infoNum;
+            for( int j = 0; j < infoNum; ++ j)
+            {
+                st << soulItemExpOut[j].itemId << soulItemExpOut[j].res << soulItemExpOut[j].exp;
+            }
+            st << Stream::eos;
+            player->send(st);
+        }
+        break;
+    case 0x04:
+        {
+            UInt16 fighterId = 0;
+            UInt8 idx = 0;
+            UInt16 itemId = 0;
+            UInt8 bind = 0;
+
+            br >> fighterId >> idx >> itemId >> bind;
+            GObject::Fighter * fgt = player->findFighter(fighterId);
+            if(!fgt || idx < 1 || idx > 6)
+                break;
+
+            bool res = false;
+            res = fgt->equipSoulSkill(idx - 1, itemId, bind != 0);
+
+            Stream st(REP::SECOND_SOUL);
+            st << static_cast<UInt8>(4);
+            st << fighterId << static_cast<UInt8>(res ? 0 : 1) << Stream::eos;
+            st << Stream::eos;
+            player->send(st);
+        }
+        break;
+    }
+}
+
 
 void OnUseToken( GameMsgHdr& hdr, UseToken& req )
 {

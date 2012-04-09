@@ -211,6 +211,15 @@ struct DBClanSkillType
     float value;        // 技能效果值
 };
 
+struct DBSoulSkillType
+{
+	UInt16 id;          // 技能ID
+    std::string name;   // 技能名
+	UInt8  level;       // 技能等级
+	UInt32 itemId;      // 技能书ID
+    float value;        // 技能效果值
+};
+
 struct DBCitta
 {
     UInt16 id;          // ID及等级 id=id/100 lvl=id%100
@@ -267,6 +276,13 @@ struct DBExp
 	UInt64 exp;
 };
 
+struct DBSoulExp 
+{
+	UInt8 lvl;
+	UInt32 exp;
+	UInt32 pexp;
+};
+
 struct DBLootItem
 {
 	UInt32 id;
@@ -304,6 +320,12 @@ struct DBSpiritAttr
     float tough;
     float criticaldmg;
     float hp;
+};
+
+struct DBSoulItemExp
+{
+    UInt32 itemId;
+    UInt32 exp;
 };
 
 struct DBCopy
@@ -437,6 +459,15 @@ SPECIALDEF(2)
 	)
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBSoulExp)
+SPECIALDEF(3)
+	(
+	UInt8, lvl,
+	UInt32, exp,
+	UInt32, pexp
+	)
+SPECIALEND()
+
 SPECIALBEGIN(GData::DBLootItem)
 SPECIALDEF(3)
 	(
@@ -493,6 +524,17 @@ SPECIALDEF(5)
     std::string, name,
 	UInt8,  level,
 	UInt32, needs,
+    float, value
+	)
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBSoulSkillType)
+SPECIALDEF(5)
+	(
+	UInt16, id,
+    std::string, name,
+	UInt8,  level,
+	UInt32, itemId,
     float, value
 	)
 SPECIALEND()
@@ -662,6 +704,15 @@ SPECIALDEF(9)
         float, hp
     )
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBSoulItemExp)
+SPECIALDEF(2)
+    (
+    UInt32, itemId,
+    UInt32, exp
+    )
+SPECIALEND()
+
 
 SPECIALBEGIN(GData::DBCopy)
 SPECIALDEF(4)

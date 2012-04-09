@@ -2,6 +2,7 @@
 #include "BattleFormula.h"
 #include "Battle/BattleFighter.h"
 #include "GObject/Fighter.h"
+#include "GObject/SecondSoul.h"
 #include "GObject/Country.h"
 #include "GObject/World.h"
 #include "Server/OidGenerator.h"
@@ -106,6 +107,9 @@ void BattleFormula::init()
 	class_def<GObject::Fighter>("getExtraToughLevel", &GObject::Fighter::getExtraToughLevel);
 	class_def<GObject::Fighter>("getExtraMagResLevel", &GObject::Fighter::getExtraMagResLevel);
 
+	class_def<GObject::Fighter>("getSoulPracticeAddOn", &GObject::Fighter::getSoulPracticeAddOn);
+	class_def<GObject::Fighter>("getSoulPracticeFactor", &GObject::Fighter::getSoulPracticeFactor);
+
 	class_add<Battle::BattleFighter>("BattleFighter");
 	class_def<Battle::BattleFighter>("getId", &Battle::BattleFighter::getId);
 	class_def<Battle::BattleFighter>("getClass", &Battle::BattleFighter::getClass);
@@ -181,11 +185,41 @@ void BattleFormula::init()
 	class_def<Battle::BattleFighter>("getExtraCounterLevel", &Battle::BattleFighter::getExtraCounterLevel);
 	class_def<Battle::BattleFighter>("getExtraToughLevel", &Battle::BattleFighter::getExtraToughLevel);
 	class_def<Battle::BattleFighter>("getExtraMagResLevel", &Battle::BattleFighter::getExtraMagResLevel);
+
+	class_add<GObject::SecondSoul>("SecondSoul");
+	class_def<GObject::SecondSoul>("getClass", &GObject::SecondSoul::getClass);
+	class_def<GObject::SecondSoul>("getPracticeLevel", &GObject::SecondSoul::getPracticeLevel);
+	class_def<GObject::SecondSoul>("getStateLevel", &GObject::SecondSoul::getStateLevel);
 }
 
 void BattleFormula::postInit()
 {
 	call<void>("initSeed", IDGenerator::gSeedOidGenerator.ID());
+}
+
+float BattleFormula::calcSoulStrenght(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulStrength", ss);
+}
+
+float BattleFormula::calcSoulAgility(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulAgility", ss);
+}
+
+float BattleFormula::calcSoulPhysique(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulPhysique", ss);
+}
+
+float BattleFormula::calcSoulIntelligence(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulIntelligence", ss);
+}
+
+float BattleFormula::calcSoulWill(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulWill", ss);
 }
 
 float BattleFormula::calcStrength( GObject::Fighter * fgt )

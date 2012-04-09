@@ -150,6 +150,8 @@ MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
+MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
+
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 

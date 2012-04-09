@@ -7,6 +7,7 @@
 namespace GObject
 {
 	class Fighter;
+    class SecondSoul;
 }
 
 namespace Battle
@@ -34,6 +35,12 @@ public:
 	BattleFormula(const char * file);
 	void init();
 	void postInit();
+
+    float calcSoulStrenght(GObject::SecondSoul*);
+    float calcSoulAgility(GObject::SecondSoul*);
+    float calcSoulPhysique(GObject::SecondSoul*);
+    float calcSoulIntelligence(GObject::SecondSoul*);
+    float calcSoulWill(GObject::SecondSoul*);
 
 	float calcStrength(GObject::Fighter *);
 	float calcAgility(GObject::Fighter *);

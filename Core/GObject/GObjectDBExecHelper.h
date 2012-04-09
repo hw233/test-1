@@ -245,6 +245,17 @@ struct DBFighter
     std::string extraPos;
 };
 
+struct DBSecondSoul
+{
+	UInt32 fighterId;
+	UInt64 playerId;
+	UInt8 cls;
+	UInt8 practiceLevel;
+	UInt8 stateLevel;
+	UInt32 stateExp;
+    std::string skills;
+};
+
 struct DBPracticePlace
 {
     UInt8 id;           // 修为挂机点ID
@@ -1121,6 +1132,20 @@ SPECIALDEF(33)
 	std::string, extraPos
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSecondSoul)
+SPECIALDEF(7)
+(
+	UInt32, fighterId,
+    UInt64, playerId,
+	UInt8, cls,
+	UInt8, practiceLevel,
+	UInt8, stateLevel,
+	UInt32, stateExp,
+    std::string, skills
+)
+SPECIALEND()
+
 
 SPECIALBEGIN(GObject::DBPracticePlace)
 SPECIALDEF(12)

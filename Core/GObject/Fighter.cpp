@@ -24,6 +24,7 @@
 #include "HeroMemo.h"
 #include "AttainMgr.h"
 #include "GData/SpiritAttrTable.h"
+#include "SecondSoul.h"
 
 namespace GObject
 {
@@ -31,6 +32,8 @@ namespace GObject
 GlobalFighters globalFighters;
 
 static float enc_factor[] = {0, 0.05, 0.10, 0.16, 0.23, 0.31, 0.40, 0.51, 0.64, 0.80, 1.00, 1.25, 1.51};
+#define SOUL_EXP_ITEM 8000
+#define SOUL_SKILL_DEFAULT_ITEM 8565
 
 Fighter& getGreatFighter(UInt32 id)
 {
@@ -69,6 +72,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_armor, 0, 5 * sizeof(ItemEquip *));
 	memset(_trump, 0, sizeof(_trump));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
+    m_2ndSoul = NULL;
 }
 
 Fighter::~Fighter()
@@ -1420,6 +1424,11 @@ void Fighter::rebuildEquipAttr()
         const GData::AttrExtra* ae = _owner->getHIAttr();
         if (ae)
             addAttrExtra(_attrExtraEquip, ae);
+    }
+
+    if(m_2ndSoul)
+    {
+        m_2ndSoul->addAttr(_attrExtraEquip);
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -3232,7 +3241,7 @@ Int16 Fighter::getMaxSoul()
     if(_owner == NULL)
         return soulMax;
     else
-        return soulMax + _owner->getClanSkillMaxSoulEffect();
+        return soulMax + _owner->getClanSkillMaxSoulEffect() + get2ndSounSoulMax();
 }
 
 void GlobalFighters::setAllDirty()
@@ -3539,6 +3548,180 @@ void Fighter::broadcastForge(UInt8 lock)
         fprintf(stderr, "%u, %u, %u, %u, %u, %u\n", _attrType1, _attrValue1,  _attrType2, _attrValue2,  _attrType3, _attrValue3);
         SYSMSG_BROADCASTV(2330, _owner->getCountry(), _owner->getName().c_str(), getColor(), getName().c_str());
     }
+}
+
+float Fighter::getSoulPracticeAddOn()
+{
+    if(!m_2ndSoul)
+        return 0;
+    return m_2ndSoul->getPracticeAddOn();
+}
+
+float Fighter::getSoulPracticeFactor()
+{
+    if(!m_2ndSoul)
+        return 0;
+    return m_2ndSoul->getPracticeFactor();
+}
+
+bool Fighter::openSecondSoul(UInt8 cls)
+{
+    if(m_2ndSoul || _level < 60 || cls < 1 || cls > 3)
+        return false;
+
+    m_2ndSoul = new SecondSoul(this, cls);
+    // xx: TODO
+    UInt16 skillId = m_2ndSoul->getSkillIdOfItem(SOUL_SKILL_DEFAULT_ITEM);
+    m_2ndSoul->setSoulSkill(0, skillId, false);
+
+    m_2ndSoul->insertIntoDB();
+    m_2ndSoul->sendInfo(_owner);
+    sendMaxSoul();
+    return true;
+}
+
+void Fighter::setSecondSoul(SecondSoul* secondSoul)
+{
+    if(m_2ndSoul)
+        return;
+
+    m_2ndSoul = secondSoul;
+}
+
+UInt8 Fighter::getSoulExtraAura()
+{
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getExtraAura();
+}
+
+bool Fighter::practiceLevelUp()
+{
+    if(!m_2ndSoul)
+        return false;
+
+    Stream st(REP::SECOND_SOUL);
+    st << static_cast<UInt8>(2) << static_cast<UInt16>(getId());
+    if(m_2ndSoul->practiceLevelUp(_pexp))
+    {
+        sendModification(6, _pexp);
+        st << static_cast<UInt8>(0) << m_2ndSoul->getPracticeLevel();
+    }
+    else
+        st << static_cast<UInt8>(1);
+
+    st << Stream::eos;
+
+    _owner->send(st);
+    return true;
+}
+
+void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut)
+{
+    if(!m_2ndSoul)
+        return;
+    std::map<UInt32, UInt32>::iterator it = GData::GDataManager::m_soulItemExp.find(itemId);
+    if(it == GData::GDataManager::m_soulItemExp.end())
+        return;
+
+    if(!_owner->GetPackage()->DelItem(itemId, 1, bind, ToSecondSoul))
+    {
+        return;
+    }
+
+    UInt32 exp = it->second;
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
+
+    UInt8 itemColor = itemType->quality;
+    UInt8 soulColor = m_2ndSoul->getSoulColor();
+    UInt8 soulStateLevel = m_2ndSoul->getStateLevel();
+
+    bool succ = false;
+    SoulItemExp sie;
+
+    if(itemColor >= soulColor)
+    {
+        succ = true;
+    }
+    else
+    {
+        UInt16 rnd = uRand(10000);
+        if(itemId == SOUL_EXP_ITEM)
+            itemColor = 6;
+        if(rnd < GObjectManager::getSoulEnchantChance(soulStateLevel, itemColor))
+            succ = true;
+    }
+
+    sie.itemId = itemId;
+    if(succ)
+    {
+        sie.res = 0;
+        sie.exp = exp;
+        m_2ndSoul->addStateExp(exp);
+    }
+    else
+    {
+        exp = GObjectManager::getDecSoulStateExp(soulStateLevel);
+        sie.res = 1;
+        sie.exp = exp;
+        m_2ndSoul->decStateExp(exp);
+    }
+
+    soulItemExpOut.push_back(sie);
+}
+
+bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
+{
+    if(!m_2ndSoul)
+        return false;
+
+    UInt16 skillId = 0;
+    if(itemId != 0)
+    {
+        if (_owner->GetPackage()->GetItemNum(itemId, bind) == 0)
+            return false;
+
+        skillId = m_2ndSoul->getSkillIdOfItem(itemId);
+    }
+
+    if(_owner->GetFreePackageSize() < 1)
+    {
+        _owner->sendMsgCode(0, 1011);
+        return false;
+    }
+
+    UInt32 itemOut = m_2ndSoul->setSoulSkill(idx, skillId, true);
+    if(0xFFFFFFFF == itemOut)
+        return false;
+
+    _owner->GetPackage()->DelItem(itemId, 1, bind);
+    if(0 != itemOut)
+        _owner->GetPackage()->AddItem(itemOut, 1, true, true);
+
+    m_2ndSoul->sendSoulSkill(_owner);
+    return true;
+}
+
+void Fighter::send2ndSoulInfo()
+{
+    if(!m_2ndSoul)
+    {
+        Stream st(REP::SECOND_SOUL);
+        st << static_cast<UInt8>(0) << static_cast<UInt16>(getId()) << static_cast<UInt8>(0) << Stream::eos;
+        _owner->send(st);
+        return;
+    }
+
+    m_2ndSoul->sendInfo(_owner);
+}
+
+Int16 Fighter::get2ndSounSoulMax()
+{
+    if(!m_2ndSoul)
+        return 0;
+
+    return m_2ndSoul->getSoulMax();
 }
 
 }

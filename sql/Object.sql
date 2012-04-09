@@ -584,7 +584,7 @@ CREATE TABLE `fighter` (
   `relvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `experience` bigint(20) unsigned NOT NULL DEFAULT '0',
   `practiceExp` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `hp` mediumint(5) unsigned NOT NULL DEFAULT '0',
+  `hp` int(10) unsigned NOT NULL DEFAULT '0',
   `attrType1` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `attrValue1` smallint(5) unsigned NOT NULL DEFAULT '0',
   `attrType2` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1333,6 +1333,20 @@ CREATE TABLE `cfriend_awards` (
   `awards` varchar(256) NOT NULL DEFAULT '',
   PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `second_soul`;
+CREATE TABLE `second_soul` (
+  `fighterId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `playerId` bigint(20) unsigned NOT NULL,
+  `cls` tinyint(3) unsigned NOT NULL,
+  `practiceLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `stateLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `stateExp` int(10) unsigned NOT NULL DEFAULT 0,
+  `skills` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY(`fighterId`, `playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 DROP TABLE IF EXISTS `enchlog`;
 CREATE TABLE `enchlog` (

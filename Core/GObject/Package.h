@@ -171,6 +171,8 @@ namespace GObject
         ItemEquip* AddUpgradeEquip(UInt32 typeId, UInt32 oldEquipId, bool notify, bool bind , ItemEquipData& ed , float*);
         const GData::ItemBaseType*  CheckBeforeEquipUpgrade(UInt32 typeId);
         UInt8 EquipUpgrade( UInt16 fighterId, UInt32 itemId , UInt32* pNewID, UInt16* pFgtId);
+
+
 	private:
 		static UInt16 GetNewUsedGrids(const GData::ItemBaseType& type, UInt16 num);
 		static UInt16 GetNewUsedGrids(UInt32 id, UInt16 num = 1);

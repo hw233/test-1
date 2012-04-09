@@ -134,6 +134,9 @@ namespace GObject
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
 
+    std::vector<std::vector<UInt32>> GObjectManager::_soulEnchantChance;
+    std::vector<UInt32> GObjectManager::_decSoulStateExp;
+
     GObjectManager:: vMergeStfs    GObjectManager:: _vMergeStfs;
     std::map <UInt32,  std::vector<UInt32> >   GObjectManager:: _mMergeStfsIndex;
     //std::map <UInt32, UInt32>  GObjectManager::_EUpgradeIdMap;
@@ -179,6 +182,7 @@ namespace GObject
 		loadClanRobMonster();
         loadQQVipAward();
 		loadAllPlayers();
+        loadSecondSoul();
 		loadAllAthletics();
 		loadAllAthleticsEvent();
 		unloadEquipments();
@@ -197,6 +201,7 @@ namespace GObject
         LoadCFriendAwards();
         LoadWBoss();
         LoadDiscount();
+        LoadSoulItemChance();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4064,4 +4069,80 @@ namespace GObject
         lc.finalize();
         return true;
     }
+=======
+    bool GObjectManager::loadSecondSoul()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+
+        LoadingCounter lc("Loading Fighter Second Soul:");
+		DBSecondSoul dbss;
+        Player* pl = NULL;
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul`", dbss) != DB::DB_OK)
+			return false;
+		lc.reset(20);
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+			if(dbss.playerId != last_id)
+			{
+				last_id = dbss.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(dbss.fighterId);
+			if(fgt == NULL || fgt->getLevel() < 60)
+            {
+                continue;
+            }
+
+            SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel);
+			StringTokenizer tokenizer(dbss.skills, ",");
+            int idx = 0;
+			for(size_t j = 0; j < tokenizer.count(); ++ j)
+			{
+				UInt16 skillId = atoi(tokenizer[j].c_str());
+                secondSoul->setSoulSkill(idx, skillId);
+                ++ idx;
+			}
+            fgt->setSecondSoul(secondSoul);
+		}
+		lc.finalize();
+
+        return true;
+    }
+
+    bool GObjectManager::LoadSoulItemChance()
+    {
+        lua_State* L = lua_open();
+        luaopen_base(L);
+        luaopen_string(L);
+        {
+            std::string path = cfg.scriptPath + "items/SoulItem.lua";
+            lua_tinker::dofile(L, path.c_str());
+
+            lua_tinker::table si_table = lua_tinker::call<lua_tinker::table>(L, "getSoulItemChance");
+            size_t si_size = si_table.size();
+            for(UInt32 i = 0; i < si_size; i ++)
+            {
+                lua_tinker::table tempTable = si_table.get<lua_tinker::table>(i + 1);
+                int tempSize = tempTable.size();
+
+                std::vector<UInt32> tmpChance;
+                for(int j = 1; j < tempSize - 1; ++ j)
+                {
+                    tmpChance.push_back(tempTable.get<UInt32>(j + 1));
+                }
+
+                _soulEnchantChance.push_back(tmpChance);
+                _decSoulStateExp.push_back(tempTable.get<UInt32>(tempSize));
+            }
+        }
+        lua_close(L);
+
+        return true;
+    }
+
 }

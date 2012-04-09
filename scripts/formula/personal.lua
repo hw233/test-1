@@ -47,6 +47,77 @@ int_hit_factor = 0.02
 autobattle_tweak = 0.5
 autobattle_A = 2.5
 
+
+-- 第二元神属性成长
+--           儒     释      道
+soul_str_factor = {2,3,5}
+soul_phy_factor = {6,7,8}
+soul_agi_factor = {3,2,5}
+soul_int_factor = {6,5,2}
+soul_wil_factor = {3,6,3}
+
+-- 元神强度对应潜力表
+
+soul_potential = {1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,2}
+
+
+function calcSoulStrength( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local cls = ss:getClass()
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_str_factor[cls] * lvl
+end
+
+function calcSoulAgility( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local cls = ss:getClass()
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_agi_factor[cls] * lvl
+end
+
+function calcSoulPhysique( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local cls = ss:getClass()
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_phy_factor[cls] * lvl
+end
+
+function calcSoulIntelligence( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local cls = ss:getClass()
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_int_factor[cls] * lvl
+end
+
+function calcSoulWill( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local cls = ss:getClass()
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_wil_factor[cls] * lvl
+end
+
+
+
 -- 辅助函数
 -- 基础属性
 function calcAura( fgt )
