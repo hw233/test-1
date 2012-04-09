@@ -36,6 +36,8 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120307_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120314_1.sql # must be once
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120316_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120405_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120409_1.sql
     #. clearshiyamen.sh
 }
 

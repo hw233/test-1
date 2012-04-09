@@ -1342,3 +1342,16 @@ CREATE TABLE `enchlog` (
   PRIMARY KEY (`playerId`,`type`,`enchant`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `wboss`;
+CREATE TABLE `wboss` (
+  `idx` tinyint(3) unsigned NOT NULL,
+  `last` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`idx`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `discount`;
+CREATE TABLE `discount` (
+      `itemid` int(10) unsigned NOT NULL,
+      `discount` tinyint(3) unsigned NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

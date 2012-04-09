@@ -501,6 +501,7 @@ namespace REP
     const UInt8 STORE_LIST          = 0xDC;// 0xB0
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
     const UInt8 STORE_LIST_EXCHANGE = 0xDE;// ??
+    const UInt8 STORE_DISLIMIT      = 0x0A;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1

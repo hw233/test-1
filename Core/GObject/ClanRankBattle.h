@@ -421,6 +421,8 @@ namespace GObject
 
         const ClanVec& getClanRanking() const { return m_ClanRanking; }
 
+        void sendDaily(Player* player);
+
     private:
         void ProcessInit(UInt32 oldtime);
         void ProcessSignup();
@@ -467,6 +469,9 @@ namespace GObject
         UInt32 m_StartTime;
         //加经验次数
         UInt32 m_expTime;
+
+        bool m_singupNotified;
+        bool m_battleNotified;
         
         //参加战斗的帮会列表
         ClanMap m_Clans;

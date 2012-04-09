@@ -55,6 +55,7 @@
 #ifdef _ARENA_SERVER
 #include "GameServer.h"
 #endif
+#include "GData/Store.h"
 
 #include <cmath>
 
@@ -8915,6 +8916,16 @@ namespace GObject
     {
         Stream st(REP::TOKEN);
         st << static_cast<UInt8>(0) << GetVar(VAR_GOLD_TOKEN) << GetVar(VAR_TAEL_TOKEN) << GetVar(VAR_COIN_TOKEN) << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendDiscountLimit()
+    {
+        static UInt8 discount[] = {3,5,8,};
+        Stream st(REP::STORE_DISLIMIT);
+        for (UInt8 i = 0; i < 3; ++i)
+            st << static_cast<UInt8>(GData::store.getDiscountLimit(discount[i]) - GetVar(GObject::VAR_DISCOUNT_1+i));
+        st << Stream::eos;
         send(st);
     }
 } // namespace GObject

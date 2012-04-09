@@ -92,6 +92,8 @@ namespace GObject
         static bool InitMoneyLog();
         static bool LoadHeroMemo();
         static bool LoadCFriendAwards();
+        static bool LoadWBoss();
+        static bool LoadDiscount();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

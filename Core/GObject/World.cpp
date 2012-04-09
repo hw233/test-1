@@ -33,6 +33,7 @@
 #include "GObject/DCLogger.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/ArenaBattle.h"
+#include "GData/Store.h"
 
 namespace GObject
 {
@@ -278,6 +279,9 @@ void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
 
+    if (World::_wday == 7)
+        GData::store.resetDistcount();
+
     bool bSingleDay = getSingleDay();
     bool bValentineDay = getValentineDay();
 	world->_worldScript->onActivityCheck(curtime+30);
@@ -333,6 +337,7 @@ void World::World_Midnight_Check( World * world )
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);
     World_CreateNewDB_Check();
+    worldBoss.resetBossSt();
 }
 void World::World_CreateNewDB_Check()
 {

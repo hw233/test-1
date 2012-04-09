@@ -1090,6 +1090,8 @@ namespace GObject
         m_BattleNo = 0;
         m_Now = 0;
         m_expTime = 0;
+        m_singupNotified = false;
+        m_battleNotified = false;
 
         memset(m_Skills, 0, sizeof(m_Skills));
     }
@@ -1293,12 +1295,22 @@ namespace GObject
                 break;
             case STATE_SIGNUP:
                 {
+                    if (!m_singupNotified)
+                    {
+                        sendDaily(NULL);
+                        m_singupNotified = true;
+                    }
                     ProcessSignup();
                     CheckAddExp();
                 }
                 break;
             case STATE_BATTLE:
                 {
+                    if (m_battleNotified)
+                    {
+                        sendDaily(NULL);
+                        m_battleNotified = false;
+                    }
                     ProcessBattle();
                     CheckAddExp();
                 }
@@ -2514,6 +2526,23 @@ namespace GObject
         } 
 
         m_expTime = m_Now + 60;
+    }
+
+    void ClanRankBattleMgr::sendDaily(Player* player)
+    {
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(10);
+        if (m_State == STATE_SIGNUP)
+            st << static_cast<UInt8>(2);
+        else if (m_State == STATE_BATTLE)
+            st << static_cast<UInt8>(0);
+        else if (m_State == STATE_INIT)
+            st << static_cast<UInt8>(1);
+        st << Stream::eos;
+        if (player)
+            player->send(st);
+        else 
+            NETWORK()->Broadcast(st);
     }
 }
 

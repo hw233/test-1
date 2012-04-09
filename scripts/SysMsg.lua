@@ -453,7 +453,7 @@ sysMsg:set(551, 0x35, "世界BOSS已经消失");
 sysMsg:set(552, 0x16, "玩家[p:%u:%s]在[2:%u]打败世界BOSS第%u个元神 [1:%u]");
 sysMsg:set(553, 0x27, "世界BOSS[1:%u]说: 你们以为这么简单就可以杀死我吗？我的真身被尘封了几百年，终于得见天日，我会把你们都撕成碎片，哈哈哈！！！");
 sysMsg:set(554, 0x16, "世界BOSS[1:%u]横空出世，在[2:%u]掀起腥风血雨，大家快快行动起来，把[1:%u]消灭，会有惊喜哦！！！")
-sysMsg:set(557, 0x16, "世界BOSS奖励，第%u名[p:%u:%s]获得了: [4:%u], [4:%u]x%u, [4:%u]x%u");
+sysMsg:set(557, 0x16, "世界BOSS奖励，第%u名[p:%u:%s]获得了: [4:%u]x%u");
 sysMsg:set(558, 0x27, "世界BOSS奖励，第4名~第10名获得了: [4:%u]x%u");
 sysMsg:set(559, 0x27, "世界BOSS击杀奖励，[p:%u:%s]获得了: [4:%u]x%u, %u银币");
 sysMsg:set(560, 0x27, "世界BOSS幸运奖励，[p:%u:%s]获得了: [4:%u]x%u");
@@ -505,7 +505,8 @@ sysMsg:set(731, 0, "")
 sysMsg:set(732, 0, "")
 sysMsg:set(733, 0, "")
 sysMsg:set(734, 0, "")
-sysMsg:set(735, 0, "")
+
+sysMsg:set(735, 0, "当前世界BOSS血量：%u")
 
 sysMsg:set(780, 0, "全球")
 sysMsg:set(781, 0, "三十二强")

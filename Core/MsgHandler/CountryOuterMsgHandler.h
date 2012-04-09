@@ -958,6 +958,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 	pl->GetMailBox()->notifyNewMail();
 	UInt8 level = pl->GetLev();
 	pl->sendDailyInfo();
+    ClanRankBattleMgr::Instance().sendDaily(pl);
 	{
 		Stream st;
 		pl->makeSenconPWDInfo(st);
@@ -2618,7 +2619,11 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 		return;
     if (!lr._count)
         lr._count = 1;
-	UInt32 price = GData::store.getPrice(lr._type, lr._itemId);
+	UInt32 price = 0;
+    if (lr._type == 1)
+        price = GData::store.getPrice(2, lr._itemId); // XXX: when discount need one item id
+    else
+        price = GData::store.getPrice(lr._type, lr._itemId);
 	Stream st(REP::STORE_BUY);
 	if(price == 0 || price == 0xFFFFFFFF)
 	{
@@ -2627,10 +2632,60 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	}
 	else
 	{
-        if (lr._type < 8)
+        if (lr._type > 1 && lr._type < 8)
             price *= lr._count;
 		switch(lr._type)
 		{
+        case 1:
+            {
+                UInt8 discount = lr._count;
+                UInt8 varoff = GData::store.getDisVarOffset(discount);
+                if (player->GetVar(VAR_DISCOUNT_1+varoff) >= GData::store.getDiscountLimit(discount))
+                {
+                    player->sendMsgCode(0, 1020);
+                    return;
+                }
+
+                UInt16 items[4] = {0};
+                UInt8 c = GData::store.getItemsByDiscount(discount, items);
+                if (!c) return;
+                if (player->GetPackage()->GetRestPackageSize() < c)
+                {
+                    player->sendMsgCode(0, 1011);
+                    return;
+                }
+
+                price = 0;
+                for (UInt8 i = 0; i < c; ++i)
+                    price += GData::store.getPrice(2, items[i]);
+
+                price *= GData::store.getDiscount(discount);
+                if(PLAYER_DATA(player, gold) < price)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    for (UInt8 i = 0; i < c; ++i)
+                    {
+                        GObject::ItemBase * item;
+                        if(IsEquipTypeId(items[i]))
+                            item = player->GetPackage()->AddEquipN(items[i], 1, true, false, FromNpcBuy);
+                        else
+                            item = player->GetPackage()->AddItem(items[i], 1, true, false, FromNpcBuy);
+                    }
+
+                    ConsumeInfo ci(Item, items[0], 1); // XXX:
+                    player->useGold(price, &ci);
+                    st << static_cast<UInt8>(0);
+
+                    GameAction()->doAty(player, AtyBuy, 0, 0);
+
+                    player->AddVar(VAR_DISCOUNT_1+varoff, 1);
+                    player->sendDiscountLimit();
+                }
+            }
+            break;
 		case 4:
 			if(PLAYER_DATA(player, coupon) < price)
 			{

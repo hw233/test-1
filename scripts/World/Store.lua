@@ -1,29 +1,43 @@
+
+function resetDiscount()
+    local store = GetStore()
+
+    local discount_num = {
+        1,2,4,
+    }
+
+    local discounts = {
+        3,5,8,
+    }
+
+    local discount_items = {
+        465,466,516,547,57,56,500,15,501,503,505,506,508,511,512,513,514,515,517,
+    };
+
+    for d = 1, #discounts do
+        local nr = math.random(1, #discount_num)
+        local num = discount_num[nr]
+        print("num :" .. num)
+        for i = 1, num do
+            local n = math.random(1, #discount_items)
+            print("id: " .. discount_items[n] .. " discount: " .. discounts[d])
+            store:add(1, discount_items[n], discounts[d])
+            table.remove(discount_items, n);
+        end
+    end
+    store:storeDiscount()
+end
+
 function loadStore()
 local store = GetStore()
 store:clear()
-if getNewYear() then
-store:add(1,432,50)
-store:add(1,431,20)
-store:add(1,430,10)
-store:add(5,429,1000)
+
+if store:needResetDiscount() then
+    resetDiscount()
 end
-if getValentineDay() then
-store:add(1,438,10)
-store:add(1,439,10)
-end
-store:add(1,548,1)
-store:add(1,465,20)
-store:add(1,466,10)
-store:add(1,72,720)
-store:add(1,78,120)
-store:add(1,79,200)
-store:add(1,80,450)
-store:add(1,81,110)
-store:add(1,503,20)
-store:add(1,514,10)
-store:add(1,515,80)
-store:add(1,56,10)
-store:add(2,548,1)
+
+store:discountLimit()
+
 store:add(2,465,20)
 store:add(2,466,10)
 store:add(2,440,50)

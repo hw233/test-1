@@ -1236,6 +1236,7 @@ namespace GObject
         void sendCFriendAward();
         void useToken(UInt8 type);
         void sendTokenInfo();
+        void sendDiscountLimit();
 
     public:
 		// Last battled monster
