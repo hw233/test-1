@@ -4069,7 +4069,7 @@ namespace GObject
         lc.finalize();
         return true;
     }
-=======
+
     bool GObjectManager::loadSecondSoul()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
