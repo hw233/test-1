@@ -344,12 +344,14 @@ void WBoss::reward(Player* player)
         {
             MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
+            SYSMSG_BROADCASTV(558, trumpFrag[tlvl], 2);
         }
 
         if (j >= AWARD_AREA2 && j < AWARD_MAN)
         {
             MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
+            SYSMSG_BROADCASTV(571, trumpFrag[tlvl], 1);
         }
 
         if (j == lucky1 || j == lucky2) // 法宝碎片

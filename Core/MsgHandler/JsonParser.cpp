@@ -4,12 +4,14 @@
 #include "GObject/Player.h"
 #include "MsgID.h"
 
+extern "C" {
 #include "bits.h"
 #include "debug.h"
 #include "printbuf.h"
 #include "json_object.h"
 #include "json_tokener.h"
 #include "json_util.h"
+}
 
 #define SERVICE "OP_SSCQ"
 #define EMPTY "{head:{},body:{}}"
@@ -164,6 +166,8 @@ int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json
     json_object_object_add(retbody, "usVip", json_object_new_int(player->getVipLevel()));
     json_object_object_add(retbody, "uiRegisterTime", json_object_new_int(player->getCreated()));
     json_object_object_add(retbody, "uiLastLoginTime", json_object_new_int(player->getLastOnline()));
+
+    head->cmd = 4;
     return 0;
 }
 
