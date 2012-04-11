@@ -40,6 +40,7 @@ public:
     SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel = 1, UInt32 stateExp = 0, UInt8 stateLevel = 1 );
     void insertIntoDB();
 
+    bool setClass(UInt8 cls);
     UInt8 getClass() { return m_cls; }
     UInt8 getPracticeLevel() { return m_practiceLevel; }
     UInt32 getStateExp() { return m_stateExp; }

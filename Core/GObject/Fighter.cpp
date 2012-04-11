@@ -3724,5 +3724,13 @@ Int16 Fighter::get2ndSounSoulMax()
     return m_2ndSoul->getSoulMax();
 }
 
+bool Fighter::changeSecondSoulClass(UInt8 cls)
+{
+    if(!m_2ndSoul)
+        return false;
+
+    return m_2ndSoul->setClass(cls);
+}
+
 }
 
