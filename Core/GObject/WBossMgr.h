@@ -57,6 +57,7 @@ public:
     void disapper();
     bool attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final = false);
     void updateLastDB(UInt32 end);
+    const std::string& getName() const { return m_name; }
 
     inline void setIdx(UInt8 idx) { m_idx = idx; }
     inline UInt8 getIdx() const { return m_idx; }
@@ -108,6 +109,7 @@ private:
     std::vector<UInt32> _hp;
     bool m_final;
     AtkInfoType m_atkinfo;
+    std::string m_name;
 };
 
 class WBossMgr
@@ -137,8 +139,8 @@ public:
     void sendDaily(Player* player);
     void setHP(UInt32 hp);
     void sendBossInfo(Player* pl);
-    UInt16 fixBossId(UInt16 id);
-    void fixBossName(UInt16 id, Fighter* fighter);
+    UInt16 fixBossId(UInt16 id, UInt8 idx);
+    void fixBossName(UInt16 id, Fighter* fighter, UInt8 idx);
 
     inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
     inline UInt8 getLevel(){return m_maxlvl;}
@@ -149,6 +151,7 @@ public:
     inline UInt16 getLast(UInt8 idx) const { return m_lasts[idx]; }
 
     void setBossSt(UInt8 idx, UInt8 st);
+    void setBossName(UInt8 idx, std::string name);
     void resetBossSt();
     void bossAppear(UInt8 lvl, bool force = false);
 
@@ -167,6 +170,7 @@ private:
 
     UInt16 m_bossID[2];
     UInt8 m_bossSt[2];
+    std::string m_bossName[2];
 };
 
 extern WBossMgr worldBoss;

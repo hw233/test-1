@@ -46,11 +46,17 @@ static UInt8 getAttackMax()
 #define DEMONS_2 6236
 #define DEMONS_3 6237
 #define DEMONS_4 6238
+#define DEMONS_5 6239
+#define DEMONS_6 6240
+#define DEMONS_7 6241
 #else
 #define DEMONS_1 5197
 #define DEMONS_2 5514
 #define DEMONS_3 5514
 #define DEMONS_4 5514
+#define DEMONS_5 5514
+#define DEMONS_6 5514
+#define DEMONS_7 5514
 #endif
 
 static UInt32 worldboss[] = {
@@ -60,10 +66,10 @@ static UInt32 worldboss[] = {
     5168, 5512,
     5127, 5513,
     5197, 5514,
-    DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4
+    DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7,
 };
 
-static UInt32 demons[] = {DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4};
+static UInt32 demons[] = {DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7};
 
 static UInt8 bossidx[][2] = {
     {0,3},
@@ -78,18 +84,18 @@ static UInt8 bossidx[][2] = {
 static UInt8 getColor(UInt8 lvl)
 {
     if (lvl >= 90)
-        return 5;
-    if (lvl >= 80)
         return 4;
-    if (lvl >= 70)
+    if (lvl >= 80)
         return 3;
-    if (lvl >= 60)
+    if (lvl >= 70)
         return 2;
-    if (lvl >= 50)
+    if (lvl >= 60)
         return 1;
-    if (lvl >= 40)
+    if (lvl >= 50)
         return 0;
-    return 0;
+    if (lvl >= 40)
+        return 10;
+    return 10;
 }
 
 static UInt32 getExp(UInt8 lvl)
@@ -303,15 +309,9 @@ void WBoss::reward(Player* player)
     size_t sz = m_atkinfo.size();
     if (!sz) return;
 
-    UInt8 tlvl = _mgr->getLevel(); 
-
-    if (tlvl < 40)
-        tlvl = 40;
-    if (tlvl > LEVEL_MAX)
-        tlvl = LEVEL_MAX;
-
-    tlvl -= 40;
-    tlvl /= 10;
+    UInt8 tlvl = 0;
+    if (m_id >= 5509 && m_id <= 5514)
+        tlvl = m_id-5509;
 
     UInt32 lucky1 = uRand(sz);
     UInt32 lucky2 = uRand(sz);
@@ -407,7 +407,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
         }
     }
 
-    if (!in && World::_wday == 7 && (id == DEMONS_3 || id == DEMONS_4))
+    if (!in && World::_wday == 7 && (id == DEMONS_3 || id == DEMONS_4 || id == DEMONS_5 || id == DEMONS_6 || id == DEMONS_7))
         in = true;
 
     if (!in) return false;
@@ -474,7 +474,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
                 id = worldboss[idx];
             if (!((idx+1) % 2))
                 m_final = true;
-            id = _mgr->fixBossId(id);
+            id = _mgr->fixBossId(id, m_idx);
             appear(id, m_id);
         }
     }
@@ -498,42 +498,76 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
 
-    if (isFinal())
+    if (m_final)
     {
         setLast(_mgr->getLast(bossidx[World::_wday-1][m_idx]));
         setAppearTime(TimeUtil::Now());
-        _mgr->fixBossName(npcid, nflist[0].fighter);
+        _mgr->fixBossName(npcid, nflist[0].fighter, m_idx);
     }
+
+    _mgr->setBossName(m_idx, nflist[0].fighter->getName());
 
     _hp.clear();
     size_t sz = nflist.size();
     if (!sz) return;
     _hp.resize(sz);
 
-    if (m_final)
-    {
-        nflist[0].fighter->setColor(getColor(_mgr->getLevel()));
-        _ng->setExp(getExp(_mgr->getLevel()));
-    }
-
     UInt32 ohp = nflist[0].fighter->getMaxHP();
     _hp[0] = ohp;
 
-    if (m_final && nflist[0].fighter && !m_extra && m_last && m_last < (UInt16)WBOSS_BASE_TIME)
+    if (m_final && nflist[0].fighter && !m_extra && m_last)
     {
-        UInt32 exthp = (WBOSS_BASE_TIME/m_last - 1) * WBOSS_HP_FACTOR * ohp;
-        setHP(ohp+exthp);
+        UInt32 exthp = 0;
+        Int16 extatk = 0;
+        Int16 extmagatk = 0;
 
-        UInt16 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
-        UInt16 extatk = (WBOSS_BASE_TIME/m_last - 1) * WBOSS_ATK_FACTOR * atk;
+        Int16 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
+        Int16 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
+
+        if (m_last <= WBOSS_BASE_TIME)
+        {
+            exthp = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_HP_FACTOR * ohp;
+            exthp += ohp;
+        }
+        else
+        {
+            exthp = ((float)m_last/WBOSS_BASE_TIME - (float)1) * WBOSS_HP_FACTOR * ohp;
+            if (exthp >= ohp)
+                exthp -= ohp;
+            if (exthp < 20000000)
+                exthp = 20000000;
+        }
+
+        setHP(exthp);
+        nflist[0].fighter->setBaseHP(exthp);
+
+        extatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * atk;
         nflist[0].fighter->addExtraAttack(extatk);
-        UInt16 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();;
-        UInt16 extmagatk = (WBOSS_BASE_TIME/m_last - 1) * WBOSS_ATK_FACTOR * matk;
-        nflist[0].fighter->addExtraMagAttack(extmagatk);
-        m_extra = true;
 
-        UInt8 level = WBOSS_BASE_LVL + _hp[0]/1000000;
+        extmagatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * matk;
+        nflist[0].fighter->addExtraMagAttack(extmagatk);
+
+        TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
+                nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
+                nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
+#ifdef DEBUG
+        fprintf(stderr, "BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
+                nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
+                nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
+#endif
+        m_extra = true;
+    }
+
+    if (m_final)
+    {
+        UInt8 level = WBOSS_BASE_LVL + _hp[0]/1500000;
         nflist[0].fighter->setLevel(level);
+        nflist[0].fighter->setColor(getColor(_mgr->getLevel()));
+        _ng->setExp(getExp(_mgr->getLevel()));
+        TRACE_LOG("BOSS level: %u, color: %u, exp: %u", nflist[0].fighter->getLevel(), nflist[0].fighter->getColor(), _ng->getExp());
+#ifdef DEBUG
+        fprintf(stderr, "BOSS level: %u, color: %u, exp: %u", nflist[0].fighter->getLevel(), nflist[0].fighter->getColor(), _ng->getExp());
+#endif
     }
 
     Map * map = Map::FromSpot(m_loc);
@@ -591,6 +625,7 @@ void WBoss::disapper()
     map->Hide(m_id);
     map->DelObject(m_id);
 
+    _mgr->setBossName(m_idx, ""); // XXX: must before setBossSt
     _mgr->setBossSt(m_idx, 2);
 
     m_extra = false;
@@ -806,7 +841,6 @@ void WBossMgr::process(UInt32 now)
         disapper(now);
         if (m_boss)
             m_boss->flee();
-        sendBossInfo(NULL);
     }
 }
 
@@ -844,7 +878,6 @@ void WBossMgr::broadcastTV(UInt32 now)
                 return;
             _prepareStep = 5;
             appear(now);
-            sendBossInfo(NULL);
             break;
 
         default:
@@ -856,10 +889,11 @@ void WBossMgr::resetBossSt()
 {
     m_bossID[0] = m_bossID[1] = 0;
     m_bossSt[0] = m_bossSt[1] = 0;
+    m_bossName[0] = m_bossName[1] = "";
     sendBossInfo(NULL);
 }
 
-UInt16 WBossMgr::fixBossId(UInt16 id)
+UInt16 WBossMgr::fixBossId(UInt16 id, UInt8 idx)
 {
     if (id != DEMONS_2)
         return id;
@@ -867,25 +901,36 @@ UInt16 WBossMgr::fixBossId(UInt16 id)
     AthleticsRank::Rank end = gAthleticsRank.getRankEnd(1);
     if (it == end)
         return id;
+    if (idx == 1)
+        ++it;
+    if (it == end)
+        return id;
     Player* first = (*it)->ranker;
     if (!first)
         return id;
     UInt8 cls = first->GetClass();
-    return demons[cls];
+    UInt8 sex = first->IsMale()?0:3;
+    return demons[cls+sex];
 }
 
-void WBossMgr::fixBossName(UInt16 id, Fighter* fighter)
+void WBossMgr::fixBossName(UInt16 id, Fighter* fighter, UInt8 idx)
 {
-    if (id == DEMONS_2 || id == DEMONS_3 || id == DEMONS_4)
+    if (id == DEMONS_2 || id == DEMONS_3 || id == DEMONS_4 || id == DEMONS_5 || id == DEMONS_6 || id == DEMONS_7)
     {
         AthleticsRank::Rank it = gAthleticsRank.getRankBegin(1);
         AthleticsRank::Rank end = gAthleticsRank.getRankEnd(1);
         if (it == end)
             return;
+        if (idx == 1)
+            ++it;
+        if (it == end)
+            return;
         Player* first = (*it)->ranker;
         if (!first)
             return;
-        fighter->setName(first->getName());
+        SYSMSG(pre, 2353);
+        std::string name = first->getName() + pre;
+        fighter->setName(name);
     }
 }
 
@@ -899,7 +944,7 @@ void WBossMgr::appear(UInt32 now)
         return;
     }
     npcid = worldboss[idx];
-    npcid = fixBossId(npcid);
+    npcid = fixBossId(npcid, m_idx);
 
     std::vector<UInt16> spots;
     Map::GetAllSpot(spots);
@@ -1006,20 +1051,18 @@ void WBossMgr::setHP(UInt32 hp)
 void WBossMgr::setBossSt(UInt8 idx, UInt8 st)
 {
     m_bossSt[idx] = st;
-    if (idx == 1 && st == 2)
-    {
-        //m_bossSt[0] = m_bossSt[1] = 0;
-        //m_bossID[0] = m_bossID[1] = 0;
-    }
+    sendBossInfo(NULL);
+}
+
+void WBossMgr::setBossName(UInt8 idx, std::string name)
+{
+    m_bossName[idx] = name;
 }
 
 void WBossMgr::sendBossInfo(Player* pl)
 {
-    if (!m_bossID[0])
-    {
-        m_bossID[0] = fixBossId(worldboss[2*bossidx[World::_wday-1][0]+1]);
-        m_bossID[1] = fixBossId(worldboss[2*bossidx[World::_wday-1][1]+1]);
-    }
+    m_bossID[0] = fixBossId(worldboss[2*bossidx[World::_wday-1][0]+1], 0);
+    m_bossID[1] = fixBossId(worldboss[2*bossidx[World::_wday-1][1]+1], 1);
 
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(6);
@@ -1027,6 +1070,7 @@ void WBossMgr::sendBossInfo(Player* pl)
     st << static_cast<UInt8>(0);
     st << static_cast<UInt8>(m_bossSt[0]);
     st << static_cast<UInt16>(m_bossID[0]);
+    st << m_bossName[0];
     st << Stream::eos;
     if (pl)
         pl->send(st);
@@ -1039,6 +1083,7 @@ void WBossMgr::sendBossInfo(Player* pl)
     st1 << static_cast<UInt8>(1);
     st1 << static_cast<UInt8>(m_bossSt[1]);
     st1 << static_cast<UInt16>(m_bossID[1]);
+    st1 << m_bossName[1];
     st1 << Stream::eos;
     if (pl)
         pl->send(st1);

@@ -89,7 +89,7 @@ public:
 
     Int16 getSoulMax()
     {
-        Int16 soul[] = {0, 10, 20, 30, 40, 50, 60, 80, 100, 120, 150};
+        Int16 soul[] = {0, 10, 20, 30, 40, 60,80, 100, 120, 160, 210};
         int idx = (m_stateLevel > 10 ? 10 : m_stateLevel);
         return soul[idx];
     }

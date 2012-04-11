@@ -38,6 +38,7 @@
 #include "GObject/Dungeon.h"
 #include "GObject/World.h"
 #include "GObject/Var.h"
+#include "MsgHandler/JsonParser.h"
 
 static memcached_st* memc = NULL;
 
@@ -1982,6 +1983,16 @@ void PwdReset(LoginMsgHdr &hdr, const void * data)
     Stream st(SPEP::PWDRESET);
     st << pl->deactiveSecondPWD("", true) << Stream::eos;
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
+void JasonParse(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+
+    std::string json;
+    br >> json;
+    jsonParser(json, hdr.sessionID);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

@@ -38,6 +38,9 @@ end
 
 store:discountLimit()
 
+store:add(2,33,10)
+store:add(2,8000,15)
+store:add(2,548,1)
 store:add(2,465,20)
 store:add(2,466,10)
 store:add(2,440,50)

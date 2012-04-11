@@ -516,7 +516,8 @@ public:
     }
 
     inline float getBaseMagRes() { return magres; }
-	inline Int32 getBaseHP() { return maxhp; }
+    inline void setBaseHP(UInt32 hp) { maxhp = hp; }
+	inline UInt32 getBaseHP() { return maxhp; }
 	inline UInt32 getBaseAction() { return action; }
 
     Int32 getAcuPraAdd() { return _praadd; }

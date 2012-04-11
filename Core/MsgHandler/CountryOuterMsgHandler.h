@@ -470,7 +470,8 @@ struct UseItemReq
 	UInt8  m_ItemBindType;
 	UInt16 m_ItemNum;
 	UInt32 m_Param;
-	MESSAGE_DEF4(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param);
+    UInt8  m_Type;
+	MESSAGE_DEF5(REQ::PACK_USE, UInt32, m_ItemId, UInt8, m_ItemBindType, UInt16, m_ItemNum, UInt32, m_Param, UInt8, m_Type);
 };
 
 struct UseItemOtherReq
@@ -514,7 +515,7 @@ void OnUseItemReq( GameMsgHdr& hdr, UseItemReq& req )
 		pl->GetPackage()->UseTaskItem(req.m_ItemId, req.m_ItemBindType);
 	else
 	{
-		pl->GetPackage()->UseItem(req.m_ItemId, req.m_ItemNum, req.m_Param, req.m_ItemBindType);
+		pl->GetPackage()->UseItem(req.m_ItemId, req.m_ItemNum, req.m_Type, req.m_Param, req.m_ItemBindType);
 	}
 }
 

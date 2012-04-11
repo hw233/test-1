@@ -6199,7 +6199,8 @@ namespace GObject
         worldBoss.sendDaily(this);
         heroIsland.sendDaily(this);
         globalCountryBattle.sendDaily(this);
-        teamCopyManager->sendDaily(this);
+        teamCopyManager->sendDaily(this, 7);
+        teamCopyManager->sendDaily(this, 11);
 	}
 
 	void Player::regenAll(bool full)
@@ -6208,14 +6209,7 @@ namespace GObject
 		{
 			Lineup& pd = _playerData.lineup[i];
 			if(pd.fighter != NULL && (pd.fighter->getCurrentHP() != 0 || full))
-			{
-#if 0
-                if (full)
-                    pd.fighter->setCurrentHP(pd.fighter->getMaxHP());
-                else
-#endif
                     pd.fighter->setCurrentHP(0);
-			}
 		}
 	}
 

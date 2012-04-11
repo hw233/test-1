@@ -33,6 +33,7 @@
 #include "GObject/TeamCopy.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/HeroMemo.h"
+#include "MsgHandler/JsonParser.h"
 
 GMHandler gmHandler;
 
@@ -165,6 +166,7 @@ GMHandler::GMHandler()
     Reg(3, "token", &GMHandler::OnToken);
 	Reg(3, "recharge", &GMHandler::OnRecharge);
 	Reg(3, "boss", &GMHandler::OnBossHP);
+	Reg(3, "json", &GMHandler::OnJson);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2653,5 +2655,10 @@ void GMHandler::OnRecharge(GObject::Player* player, std::vector<std::string>& ar
 void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args)
 {
 	SYSMSG_SENDV(735, player, GObject::worldBoss.getHP());
+}
+void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
+{
+    std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
+    jsonParser(json, -1);
 }
 

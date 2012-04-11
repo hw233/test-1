@@ -155,6 +155,61 @@ CittaBookBase = 1200
 
 FormationBookBase  = 1000
 
+function getRandTrump(lvl)
+  if lvl < 40 then
+      return 0
+  end
+
+  local items = {
+      {1600,1601,1602},
+      {1604,1605,1606},
+      {1603,1608,1609},
+      {1610,1614,1615},
+      {1612,1616,1607,1611},
+      {200,201,202,203,204,205,206,207,208},
+      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
+      {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
+      {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
+      {111,112,113,114,115,116,117,118,119,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297},
+      {120,121,122,123,124,125,126,127,128},
+  }
+
+  local n = 0
+  if lvl >= 40 and lvl <= 44 then
+      n = 1
+  elseif lvl >= 45 and lvl <= 49 then
+      n = 2
+  elseif lvl >= 50 and lvl <= 54 then
+      n = 3
+  elseif lvl >= 55 and lvl <= 59 then
+      n = 4
+  elseif lvl >= 60 and lvl <= 64 then
+      n = 5
+  elseif lvl >= 65 and lvl <= 69 then
+      n = 6
+  elseif lvl >= 70 and lvl <= 74 then
+      n = 7
+  elseif lvl >= 75 and lvl < 80 then
+      n = 8
+  elseif lvl >= 80 and lvl < 85 then
+      n = 9
+  elseif lvl >= 85 and lvl < 90 then
+      n = 10
+  elseif lvl >= 90 then
+      n = 11
+  end
+
+  if n == 0 then
+      return 0
+  end
+
+  local m = math.random(1, #items[n])
+  if items[n][m] == nil then
+      return 0
+  end
+  return items[n][m]
+end
+
 function BroadCastEquip1(playercountry, playername, boxname, equipname1)
 	Broadcast(0x17, "[p:"..playercountry..":"..playername.."]幸运地从[e:5:"..boxname.."]中开出了[e:5:"..equipname1.."]");
 end
@@ -1566,6 +1621,63 @@ function ItemNormal_00000481(iid, num, bind, param)
     if broad[k] == 1 then
         Broadcast(0x27, "恭喜，[p:"..player:getCountry()..":"..player:getPName().."]玩家使用[4:481]，获得道具[4:"..item.."]x"..nums[k])
     end
+    package:DelItemSendMsg(481, player);
+    return num
+end
+
+function ItemNormal_00000482(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local items = {56,57,60000,60001,60002,503,15,507,509,}
+    local nums = {1,1,1,1,1,1,1,1,1,}
+    local prob = {1666,3332,3502,4502,5668,7168,8834,9500,10000,}
+    local trumpfrag = {
+        [482] = {226},
+        [483] = {90},
+        [484] = {225},
+        [485] = {227},
+        [486] = {270},
+        [487] = {298},
+        [488] = {226,90,225,227,270,298},
+    }
+    local item = 0
+
+    local k = 1
+    local rand = math.random(10000)
+    for n = 1,#prob do
+        if rand <= prob[n] then
+            item = items[n]
+            k = n
+            break;
+        end
+    end
+
+    if item == 0 then
+        return false
+    end
+
+    if package:GetRestPackageSize() < nums[k] then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    if item == 60000 then
+        package:AddItem(trumpfrag[iid][math.random(1,#trumpfrag[iid])], 1, 1, 0, 2)
+    elseif item == 60001 then
+          local trump = getRandTrump(player:GetLev())
+          if trump == 0 then
+              return false
+          end
+          package:Add(trump, 1, 1, 0, 2)
+    elseif item == 60002 then
+        local equip = getRandOEquip(player:GetLev())
+        package:AddEquip(equip, 1, false)
+    else 
+        package:AddItem(item, nums[k], 1, 0, 2)
+    end
+
+    package:DelItemSendMsg(iid, player)
     return num
 end
 
@@ -1731,63 +1843,15 @@ end
 function ItemNormal_00000010(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
-  local lvl = player:GetLev()
 
-  if lvl < 40 then
-      return
+  local trump = getRandTrump(player:GetLev())
+  if trump == 0 then
+      return false
   end
 
-  local items = {
-      {1600,1601,1602},
-      {1604,1605,1606},
-      {1603,1608,1609},
-      {1610,1614,1615},
-      {1612,1616,1607,1611},
-      {200,201,202,203,204,205,206,207,208},
-      {209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,103,104,105,106,107,108,109,110},
-      {228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,91,92,93,94,95,96,97,98,99,100,101,102},
-      {243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269},
-      {111,112,113,114,115,116,117,118,119,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297},
-      {120,121,122,123,124,125,126,127,128},
-  }
+  package:Add(trump, 1, 1, 0, 2);
 
-  local n = 0
-  if lvl >= 40 and lvl <= 44 then
-      n = 1
-  elseif lvl >= 45 and lvl <= 49 then
-      n = 2
-  elseif lvl >= 50 and lvl <= 54 then
-      n = 3
-  elseif lvl >= 55 and lvl <= 59 then
-      n = 4
-  elseif lvl >= 60 and lvl <= 64 then
-      n = 5
-  elseif lvl >= 65 and lvl <= 69 then
-      n = 6
-  elseif lvl >= 70 and lvl <= 74 then
-      n = 7
-  elseif lvl >= 75 and lvl < 80 then
-      n = 8
-  elseif lvl >= 80 and lvl < 85 then
-      n = 9
-  elseif lvl >= 85 and lvl < 90 then
-      n = 10
-  elseif lvl >= 90 then
-      n = 11
-  end
-
-  if n == 0 then
-      return
-  end
-
-  local m = math.random(1, #items[n])
-  if items[n][m] == nil then
-      return
-  end
-
-  package:Add(items[n][m], 1, 1, 0, 2);
-
-  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[英雄遗迹]，获得了[4:"..items[n][m].."]")
+  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[英雄遗迹]，获得了[4:"..trump.."]")
   package:DelItemSendMsg(10, player);
   return num
 end
@@ -2396,6 +2460,39 @@ function ItemNormal_00000031(iid, num, bind, param)
 
     package:DelItemSendMsg(31, player);
     return n;
+end
+
+function ItemNormal_00000033(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    local items = {8500,8505,8510,8515,8525,8530,8535,8540,8545,8565,}
+    local prob = {1100,2200,2600,3700,4800,5900,7000,8100,9200,10000,}
+
+    for i = 1, num do
+        local k = 1
+        local rand = math.random(10000)
+        for n = 1,#prob do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
+        end
+
+        if item == 0 then
+            return false
+        end
+        package:Add(item, 1, true, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
 end
 
 function ItemNormal_00000035(iid, num, bind, param)
@@ -6219,14 +6316,17 @@ end
 function ItemNormal_00007000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage()
-	if package:GetRestPackageSize() < 5 then
+
+	if package:GetRestPackageSize() < (5*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
-    if iid % 10 == 1 then
+
+    if iid % 10 == 1 and (iid / 10) % 10 == 0 then
         return false
     end
-    package:AddItem(iid - 1, 5, bind)
+
+    package:AddItem(iid - 1, 5*num, bind)
     player:GetPackage():DelItemSendMsg(iid, player)
     return num
 end
@@ -7032,6 +7132,7 @@ local ItemNormal_Table = {
     [439] = ItemNormal_00000439,
 	[30] = ItemNormal_00000030,
 	[31] = ItemNormal_00000031,
+	[33] = ItemNormal_00000033,
 	[35] = ItemNormal_00000035,
 	[36] = ItemNormal_00000036,
 	[37] = ItemNormal_00000037,
@@ -7078,6 +7179,14 @@ local ItemNormal_Table = {
     [479] = ItemNormal_00000479,
     [480] = ItemNormal_00000480,
     [481] = ItemNormal_00000481,
+
+    [482] = ItemNormal_00000482,
+    [483] = ItemNormal_00000482,
+    [484] = ItemNormal_00000482,
+    [485] = ItemNormal_00000482,
+    [486] = ItemNormal_00000482,
+    [487] = ItemNormal_00000482,
+    [488] = ItemNormal_00000482,
 
     [449] = ItemNormal_VIP,
     [450] = ItemNormal_VIP,

@@ -846,6 +846,8 @@ namespace GObject
 		void notifyAddFighter(Fighter * fgt);
 		Fighter * findFighter(UInt32);
 		Fighter * getMainFighter();
+        Int32 getMainHP() { return getMainFighter()?getMainFighter()->getCurrentHP():0; }
+        UInt32 getMainPExp() { return getMainFighter()?getMainFighter()->getPExp():0; }
 		bool hasFighter(UInt32);
         bool addFighterFromItem(UInt32, UInt32);
 		Fighter * removeFighter(UInt32);

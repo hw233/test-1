@@ -17,12 +17,12 @@
 #include "DB/DBExecHelper.h"
 #include "Server/SysMsg.h"
 #include "Common/TimeUtil.h"
-#include "GObject/TradeCheck.h"
-#include "GObject/SaleMgr.h"
-#include "GObject/AthleticsRank.h"
-#include "GObject/ClanBattle.h"
-#include "GObject/ClanManager.h"
-#include "GObject/Clan.h"
+#include "TradeCheck.h"
+#include "SaleMgr.h"
+#include "AthleticsRank.h"
+#include "ClanBattle.h"
+#include "ClanManager.h"
+#include "Clan.h"
 #include "Script/WorldScript.h"
 #include "Script/BattleFormula.h"
 #include "SpecialAward.h"
@@ -30,10 +30,12 @@
 #include "WBossMgr.h"
 #include "HeroIsland.h"
 #include "MsgID.h"
-#include "GObject/DCLogger.h"
-#include "GObject/TeamCopy.h"
-#include "GObject/ArenaBattle.h"
+#include "DCLogger.h"
+#include "TeamCopy.h"
+#include "ArenaBattle.h"
 #include "GData/Store.h"
+#include "CountryBattle.h"
+#include "ClanRankBattle.h"
 
 namespace GObject
 {
@@ -160,6 +162,9 @@ bool enum_midnight(void * ptr, void *)
 
     if (World::_halloween && pl->isOnline())
         pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
+
+    if (pl->isOnline() && World::_wday == 7)
+        GData::store.sendList(1, pl);
 
 	return true;
 }
@@ -338,6 +343,10 @@ void World::World_Midnight_Check( World * world )
 	NETWORK()->Broadcast(st);
     World_CreateNewDB_Check();
     worldBoss.resetBossSt();
+    globalCountryBattle.setStatus(0);
+    ClanRankBattleMgr::Instance().setStatus(0);
+    teamCopyManager->resetStatus();
+    heroIsland.setStatus(0);
 }
 void World::World_CreateNewDB_Check()
 {
