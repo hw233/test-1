@@ -298,7 +298,10 @@ void SecondSoul::sendSoulSkill(Player* pl)
 bool SecondSoul::setClass(UInt8 cls)
 {
     if(cls == 0 || cls == m_cls)
+    {
+        m_fgt->getOwner()->sendMsgCode(0, 1073);
         return false;
+    }
 
     m_cls = cls;
     DB2().PushUpdateData("UPDATE `second_soul` SET `cls` = %d WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_cls, m_fgt->getId(), m_fgt->getOwner()->getId());
@@ -310,6 +313,7 @@ bool SecondSoul::setClass(UInt8 cls)
     m_intelligence = Script::BattleFormula::getCurrent()->calcSoulIntelligence(this);
     m_will = Script::BattleFormula::getCurrent()->calcSoulWill(this);
     m_fgt->setDirty(true);
+    m_fgt->getOwner()->sendMsgCode(0, 1074);
 
     return true;
 }
