@@ -628,14 +628,14 @@ DROP TABLE IF EXISTS `spirit_attr`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `spirit_attr` (
   `level` smallint(3) unsigned NOT NULL,
-  `attack` float(5,2) unsigned NOT NULL,
-  `defend` float(5,2) unsigned NOT NULL,
-  `critical` float(5,2) unsigned NOT NULL,
-  `pierce` float(5,2) unsigned NOT NULL,
-  `action` float(5,2) unsigned NOT NULL,
-  `tough` float(5,2) unsigned NOT NULL,
-  `criticaldmg` float(5,2) unsigned NOT NULL,
-  `hp` float(5,2) unsigned NOT NULL,
+  `attack` float(10,2) NOT NULL,
+  `defend` float(10,2) NOT NULL,
+  `critical` float(10,2) NOT NULL,
+  `pierce` float(10,2) NOT NULL,
+  `action` float(10,2) NOT NULL,
+  `tough` float(10,2) NOT NULL,
+  `criticaldmg` float(10,2) NOT NULL,
+  `hp` float(10,2) NOT NULL,
   PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
