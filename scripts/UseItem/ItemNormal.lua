@@ -6317,16 +6317,20 @@ function ItemNormal_00007000(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage()
 
-	if package:GetRestPackageSize() < (5*num/99) then
+	if package:GetRestPackageSize() < (2+3*num/99) then
 		player:sendMsgCode(2, 1011, 0);
 		return false;
 	end
 
-    if iid % 10 == 1 and (iid / 10) % 10 == 0 then
+    if iid % 10 == 1 and math.floor(iid / 10) % 10 == 0 then
         return false
     end
 
-    package:AddItem(iid - 1, 5*num, bind)
+    package:AddItem(iid - 1, num, bind)
+
+    local nid = math.floor(iid / 100);
+    nid = nid * 100 + 1
+    package:AddItem(nid, 2*num, bind)
     player:GetPackage():DelItemSendMsg(iid, player)
     return num
 end
