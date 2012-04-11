@@ -227,6 +227,7 @@ namespace Script
 		// CLASS_DEF(Fighter, learnSkill);
 		CLASS_DEF(Fighter, skillLevelUp);
 		CLASS_DEF(Fighter, addNewCitta);
+		CLASS_DEF(Fighter, changeSecondSoulClass);
 
 		//????
 		CLASS_ADD(TaskMgr);

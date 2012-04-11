@@ -7076,6 +7076,52 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     return num;
 end
 
+-- 青龙
+function ItemNormal_SecondSoul_489(iid, num, bind, param)
+    local player = GetPlayer()
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    if not fgt:changeSecondSoulClass(1) then
+        return false;
+    end
+
+    return 1;
+end
+
+function ItemNormal_SecondSoul_490(iid, num, bind, param)
+    local player = GetPlayer()
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    if not fgt:changeSecondSoulClass(2) then
+        return false;
+    end
+
+    return 1;
+end
+
+function ItemNormal_SecondSoul_491(iid, num, bind, param)
+    local player = GetPlayer()
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    if not fgt:changeSecondSoulClass(3) then
+        return false;
+    end
+
+    return 1;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8901] = ItemNormal_00008901,
@@ -8503,6 +8549,10 @@ local ItemNormal_Table = {
     [7997] = ItemNormal_00007000,
     [7998] = ItemNormal_00007000,
     [7999] = ItemNormal_00007000,
+    -- 第二元神
+    [489] = ItemNormal_SecondSoul_489,
+    [490] = ItemNormal_SecondSoul_490,
+    [491] = ItemNormal_SecondSoul_491
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
