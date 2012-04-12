@@ -136,8 +136,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         return false;
 
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
-    pl->PutFighters( bsim, 0 ); 
-    _ng->putFighters( bsim );
+    pl->PutFighters(bsim, 0); 
+    _ng->putFighters(bsim);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
     size_t sz = nflist.size();
@@ -187,14 +187,16 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             if(oldHP > newHP)
             {
                 UInt32 damage = oldHP - newHP;
-                UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                UInt32 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                if (exp < 1000)
+                    exp = 1000;
                 pl->pendExp(exp);
                 if (!(sendflag % 4))
                     sendDmg(damage);
 
                 AttackInfo info(pl, damage);
-                AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
-                while (i != e)
+                AtkInfoType::iterator i = m_atkinfo.begin();
+                while (i != m_atkinfo.end())
                 {
                     if ((*i).player == pl)
                     {
@@ -204,9 +206,10 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     }
                     ++i;
                 }
-                m_atkinfo.insert(info);
+                bool ret = m_atkinfo.insert(info).second;
+                TRACE_LOG("WBOSS INSERT ret: %u (pid: %"I64_FMT"u, dmg: %u)", ret, pl->getId(), damage);
 
-                UInt8 newPercent = (float(newHP) / nflist[0].fighter->getMaxHP()) * 100;
+                UInt8 newPercent = ((float)newHP / nflist[0].fighter->getMaxHP()) * 100;
                 
                 if (newPercent > 100)
                     newPercent = 100;
@@ -236,6 +239,10 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 }
                 if (!(sendflag % 4))
                     sendHp();
+            }
+            else
+            {
+                TRACE_LOG("WBOSS OLDHP(%u) < NEWHP(%u)", oldHP, newHP);
             }
         }
     }
@@ -330,8 +337,10 @@ void WBoss::reward(Player* player)
     if (World::_wday == 7)
         tlvl = uRand(sizeof(trumpFrag)/sizeof(UInt16));
 
+    bool notify4_10 = false;
+    bool notify11_20 = false;
     UInt32 j = 0;
-    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend(); i != e; ++i, ++j)
+    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(); i != m_atkinfo.rend(); ++i, ++j)
     {
         if (j < AWARD_AREA1)
         {
@@ -344,21 +353,29 @@ void WBoss::reward(Player* player)
         {
             MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
-            SYSMSG_BROADCASTV(558, trumpFrag[tlvl], 2);
+            if (!notify4_10)
+            {
+                SYSMSG_BROADCASTV(558, trumpFrag[tlvl], 2);
+                notify4_10 = true;
+            }
         }
 
         if (j >= AWARD_AREA2 && j < AWARD_MAN)
         {
             MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
-            SYSMSG_BROADCASTV(571, trumpFrag[tlvl], 1);
+            if (!notify11_20)
+            {
+                SYSMSG_BROADCASTV(571, trumpFrag[tlvl], 1);
+                notify11_20 = true;
+            }
         }
 
         if (j == lucky1 || j == lucky2) // 法宝碎片
         {
-            MailPackage::MailItem item[] = {{trumpFrag[tlvl],2},};
+            MailPackage::MailItem item[] = {{trumpFrag[tlvl],1},};
             (*i).player->sendMailItem(562, 563, item, 1, false);
-            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 2);
+            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 1);
         }
 
         if (j >= AWARD_MAN)
@@ -385,7 +402,7 @@ void WBoss::reward(Player* player)
 
         MailPackage::MailItem item[] = {{55,1},{MailPackage::Tael,500}};
         (*i).player->sendMailItem(568, 569, item, 2);
-        GameAction()->doAty((*i).player, AtyBoss, 0 , 0 );
+        GameAction()->doAty((*i).player, AtyBoss, 0, 0);
     }
 
     if (player)
