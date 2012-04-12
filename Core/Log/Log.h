@@ -59,13 +59,16 @@ enum PurchaseType
     TeamCopyAwardRoll,
     DailyActivity,
     ClanRankBattleSkill,
-    ForEquipUpgrade,    
+    ForEquipUpgrade,
     PrintDemon, // 除魔印消费
     EnterAutoFrontMap,
     EnterAutoCopy,
     TownDeamonAuto,
     EquipAttachSpirit,
     AthleticPaging,
+    Discount3,
+    Discount5,
+    Discount8,
 };
 
 enum IncomingType
