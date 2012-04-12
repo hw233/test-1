@@ -55,6 +55,7 @@
 #ifdef _ARENA_SERVER
 #include "GameServer.h"
 #endif
+#include "GData/Store.h"
 
 #include <cmath>
 
@@ -6198,7 +6199,8 @@ namespace GObject
         worldBoss.sendDaily(this);
         heroIsland.sendDaily(this);
         globalCountryBattle.sendDaily(this);
-        teamCopyManager->sendDaily(this);
+        teamCopyManager->sendDaily(this, 7);
+        teamCopyManager->sendDaily(this, 11);
 	}
 
 	void Player::regenAll(bool full)
@@ -6207,14 +6209,7 @@ namespace GObject
 		{
 			Lineup& pd = _playerData.lineup[i];
 			if(pd.fighter != NULL && (pd.fighter->getCurrentHP() != 0 || full))
-			{
-#if 0
-                if (full)
-                    pd.fighter->setCurrentHP(pd.fighter->getMaxHP());
-                else
-#endif
                     pd.fighter->setCurrentHP(0);
-			}
 		}
 	}
 
@@ -8928,6 +8923,16 @@ namespace GObject
     {
         Stream st(REP::TOKEN);
         st << static_cast<UInt8>(0) << GetVar(VAR_GOLD_TOKEN) << GetVar(VAR_TAEL_TOKEN) << GetVar(VAR_COIN_TOKEN) << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendDiscountLimit()
+    {
+        static UInt8 discount[] = {3,5,8,};
+        Stream st(REP::STORE_DISLIMIT);
+        for (UInt8 i = 0; i < 3; ++i)
+            st << static_cast<UInt8>(GData::store.getDiscountLimit(discount[i]) - GetVar(GObject::VAR_DISCOUNT_1+i));
+        st << Stream::eos;
         send(st);
     }
 } // namespace GObject

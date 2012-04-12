@@ -152,7 +152,7 @@ class HeroIsland
 {
 public:
     HeroIsland() : _running(false), _notifyTime(0), _prepareStep(0),
-    _prepareTime(0), _startTime(0), _endTime(0), _count(0), _expTime(0), _disperseTime(0)
+    _prepareTime(0), _startTime(0), _endTime(0), _count(0), _expTime(0), _disperseTime(0), _status(0)
     {
         _types[0] = _types[1] = _types[2] = 0;
         _expfactor[0] = _expfactor[1] = _expfactor[2] = _expfactor[3] = 2.0;
@@ -231,6 +231,12 @@ public:
     inline void setRunning(bool r) { _running = r; }
     inline bool isRunning() { return _running; }
 
+    inline void setStatus(UInt8 status)
+    {
+        _status = status;
+        sendDaily(NULL);
+    }
+
 private:
     SortType _sorts;
     std::vector<HIPlayerData*> _players[HERO_ISLAND_SPOTS];
@@ -248,6 +254,7 @@ private:
     float _expfactor[4];
     UInt32 _expTime;
     UInt32 _disperseTime;
+    UInt8 _status;
 };
 
 extern HeroIsland heroIsland;

@@ -504,6 +504,7 @@ namespace REP
     const UInt8 STORE_LIST          = 0xDC;// 0xB0
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
     const UInt8 STORE_LIST_EXCHANGE = 0xDE;// ??
+    const UInt8 STORE_DISLIMIT      = 0x0A;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
@@ -601,6 +602,7 @@ namespace SPEQ
     const UInt16 PWDINFO            = 0x11A;
     const UInt16 PWDRESET           = 0x11B;
     const UInt16 MAILVIP            = 0x11C;
+    const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
 }
 
 namespace SPEP
@@ -632,6 +634,7 @@ namespace SPEP
     const UInt8 PWDINFO             = 0x1A;
     const UInt8 PWDRESET            = 0x1B;
     const UInt8 MAILVIP             = 0x1C;
+    const UInt8 JASON               = 0x1D;
 }
 
 #endif // _MSGID_H_

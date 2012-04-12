@@ -25,7 +25,7 @@ project "Server.ASSS"
     	buildoptions { "-pg" }
         linkoptions { "-pg" }
     configuration "not windows"
-        links { "event", "event_pthreads", "dl", "udplog", "memcached", "dcapi_cpp-64", "curl" }
+        links { "event", "event_pthreads", "dl", "udplog", "memcached", "dcapi_cpp-64", "curl", "json" }
     configuration "linux"
         defines "LUA_USE_LINUX"
     configuration "macosx"

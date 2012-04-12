@@ -12,12 +12,27 @@
 #include "Script/GameActionLua.h"
 #include "MapCollection.h"
 #include "HeroMemo.h"
+#include "AthleticsRank.h"
 
 namespace GObject
 {
 
 const UInt8 WBOSS_NUM = 7;
 const UInt8 WBOSS_ATTKMAX = 10;
+const float WBOSS_BASE_TIME = 600.f;
+const float WBOSS_HP_FACTOR = 1.f;
+const float WBOSS_ATK_FACTOR = .5f;
+const UInt8 WBOSS_BASE_LVL = 20;
+
+#if 1
+#define AWARD_AREA1 3
+#define AWARD_AREA2 10
+#define AWARD_MAN 20
+#else
+#define AWARD_AREA1 3
+#define AWARD_AREA2 10
+#define AWARD_MAN 20
+#endif
 
 static unsigned int attackPre = 0; // XXX: 攻击BOSS的先后顺序因子
 
@@ -26,14 +41,79 @@ static UInt8 getAttackMax()
     return WBOSS_ATTKMAX;
 }
 
+#if 1
+#define DEMONS_1 6235
+#define DEMONS_2 6236
+#define DEMONS_3 6237
+#define DEMONS_4 6238
+#define DEMONS_5 6239
+#define DEMONS_6 6240
+#define DEMONS_7 6241
+#else
+#define DEMONS_1 5197
+#define DEMONS_2 5514
+#define DEMONS_3 5514
+#define DEMONS_4 5514
+#define DEMONS_5 5514
+#define DEMONS_6 5514
+#define DEMONS_7 5514
+#endif
+
 static UInt32 worldboss[] = {
-    5466, 5467, 5468, 5469, 5509, // 40
-    5162, 5473, 5474, 5475, 5510, // 50
-    5103, 5470, 5471, 5472, 5511, // 60
-    5168, 5476, 5477, 5478, 5512, // 70
-    5127, 5479, 5480, 5481, 5513, // 80
-    5197, 5482, 5483, 5484, 5514, // 90
+    5466, 5509,
+    5162, 5510,
+    5103, 5511,
+    5168, 5512,
+    5127, 5513,
+    5197, 5514,
+    DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7,
 };
+
+static UInt32 demons[] = {DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7};
+
+static UInt8 bossidx[][2] = {
+    {0,3},
+    {1,4},
+    {2,5},
+    {3,0},
+    {4,1},
+    {5,2},
+    {6,6},
+};
+
+static UInt8 getColor(UInt8 lvl)
+{
+    if (lvl >= 90)
+        return 4;
+    if (lvl >= 80)
+        return 3;
+    if (lvl >= 70)
+        return 2;
+    if (lvl >= 60)
+        return 1;
+    if (lvl >= 50)
+        return 0;
+    if (lvl >= 40)
+        return 10;
+    return 10;
+}
+
+static UInt32 getExp(UInt8 lvl)
+{
+    if (lvl >= 90)
+        return 27187500;
+    if (lvl >= 80)
+        return 21187500;
+    if (lvl >= 70)
+        return 15937500;
+    if (lvl >= 60)
+        return 11437500;
+    if (lvl >= 50)
+        return 7687500;
+    if (lvl >= 40)
+        return 4687500;
+    return 4687500;
+}
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
 {
@@ -56,8 +136,8 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
         return false;
 
     Battle::BattleSimulator bsim(Battle::BS_WBOSS, pl, _ng->getName(), _ng->getLevel(), false);
-    pl->PutFighters( bsim, 0 ); 
-    _ng->putFighters( bsim );
+    pl->PutFighters(bsim, 0); 
+    _ng->putFighters(bsim);
 
     std::vector<GData::NpcFData>& nflist = _ng->getList();
     size_t sz = nflist.size();
@@ -107,14 +187,16 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
             if(oldHP > newHP)
             {
                 UInt32 damage = oldHP - newHP;
-                UInt32 exp = (float(damage) / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                UInt32 exp = ((float)damage / nflist[0].fighter->getMaxHP()) * _ng->getExp() * expfactor;
+                if (exp < 1000)
+                    exp = 1000;
                 pl->pendExp(exp);
                 if (!(sendflag % 4))
                     sendDmg(damage);
 
                 AttackInfo info(pl, damage);
-                AtkInfoType::iterator i = m_atkinfo.begin(), e = m_atkinfo.end();
-                while (i != e)
+                AtkInfoType::iterator i = m_atkinfo.begin();
+                while (i != m_atkinfo.end())
                 {
                     if ((*i).player == pl)
                     {
@@ -124,9 +206,10 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     }
                     ++i;
                 }
-                m_atkinfo.insert(info);
+                bool ret = m_atkinfo.insert(info).second;
+                TRACE_LOG("WBOSS INSERT ret: %u (pid: %"I64_FMT"u, dmg: %u)", ret, pl->getId(), damage);
 
-                UInt8 newPercent = (float(newHP) / nflist[0].fighter->getMaxHP()) * 100;
+                UInt8 newPercent = ((float)newHP / nflist[0].fighter->getMaxHP()) * 100;
                 
                 if (newPercent > 100)
                     newPercent = 100;
@@ -142,6 +225,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     res = true;
                     if (sendflag % 4)
                         sendHp();
+                    updateLastDB(TimeUtil::Now());
                 }
                 else if (newPercent <= 5 && _percent - newPercent >= 5)
                 {
@@ -155,6 +239,10 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 }
                 if (!(sendflag % 4))
                     sendHp();
+            }
+            else
+            {
+                TRACE_LOG("WBOSS OLDHP(%u) < NEWHP(%u)", oldHP, newHP);
             }
         }
     }
@@ -187,24 +275,30 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
     return res;
 }
 
+void WBoss::updateLastDB(UInt32 end)
+{
+    UInt8 idx = bossidx[World::_wday-1][m_idx];
+    if (!m_appearTime)
+        return;
+
+    if (m_appearTime > end)
+        return;
+
+    UInt32 last = end - m_appearTime;
+    _mgr->setLast(idx, last);
+    DB3().PushUpdateData("REPLACE INTO `wboss` (`idx`, `last`) VALUES (%u, %u)", idx, last);
+}
+
 void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
 {
-    if (sz >= 3)
+    if (sz > AWARD_MAN)
     {
-        if (sz <= 10)
+        UInt32 j = uRand(sz-AWARD_MAN);
+        for (UInt32 i = 0; i < num; ++i)
         {
-            for (UInt8 i = 0; i < 7; ++i)
-                ret.insert(i+3);
-        }
-        else
-        {
-            UInt32 j = uRand(sz-3);
-            for (UInt32 i = 0; i < num; ++i)
-            {
-                while (ret.find(j+3) != ret.end())
-                    j = uRand(sz-3);
-                ret.insert(j+3);
-            }
+            while (ret.find(j+AWARD_MAN) != ret.end())
+                j = uRand(sz-AWARD_MAN);
+            ret.insert(j+AWARD_MAN);
         }
     }
 }
@@ -216,111 +310,80 @@ void WBoss::flee()
 
 void WBoss::reward(Player* player)
 {
-    static UInt16 trumps[] = {226,90,225,227,270,298};
-    static UInt8 trumpnum[] = {3,2,1};
+    static UInt16 trumpFrag[] = {226,90,225,227,270,298};
     static UInt16 gems[] = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142};
 
     size_t sz = m_atkinfo.size();
     if (!sz) return;
 
-    UInt8 lvl = _ng->getLevel();
-    UInt8 tlvl = lvl;
-
-    if (tlvl < 40)
-        tlvl = 40;
-    if (tlvl > LEVEL_MAX)
-        tlvl = LEVEL_MAX;
-
-    tlvl -= 40;
-    tlvl /= 10;
+    UInt8 tlvl = 0;
+    if (m_id >= 5509 && m_id <= 5514)
+        tlvl = m_id-5509;
 
     UInt32 lucky1 = uRand(sz);
-    if (lucky1 < 10)
-        lucky1 = 10;
     UInt32 lucky2 = uRand(sz);
-    if (lucky2 < 10)
-        lucky2 = 10;
-
     if (lucky1 == lucky2)
-        lucky2 += uRand(10);
+        lucky2 = uRand(sz);
 
-    if (lucky2 >= sz)
-        lucky2 = sz-1;
-
-    if (lucky1 >= sz)
-        lucky1 = 0;
-    if (lucky2 >= sz)
-        lucky2 = 0;
-
-    std::set<UInt32> equip_lucky;
+    std::set<UInt32> comp;
     std::set<UInt32> breath;
     std::set<UInt32> gem;
 
-    UInt32 luckynum = 0;
-    if (lvl == 40)
-        luckynum = (float)10 * sz / 100;
-    else
-        luckynum = (float)5 * sz / 100;
-    getRandList(sz, luckynum, equip_lucky);
+    UInt32 luckynum = (float)10 * sz / 100;
+    getRandList(sz, luckynum, comp); // 补髓丹
+    getRandList(sz, luckynum, breath); // 凝神丹
+    getRandList(sz, luckynum, gem); // 宝石
 
-    luckynum = (float)5 * sz / 100;
-    getRandList(sz, luckynum, breath);
-    getRandList(sz, luckynum, gem);
+    if (World::_wday == 7)
+        tlvl = uRand(sizeof(trumpFrag)/sizeof(UInt16));
 
-    bool notified = false;
+    bool notify4_10 = false;
+    bool notify11_20 = false;
     UInt32 j = 0;
-    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(), e = m_atkinfo.rend(); i != e; ++i, ++j)
+    for (AtkInfoType::reverse_iterator i = m_atkinfo.rbegin(); i != m_atkinfo.rend(); ++i, ++j)
     {
-        if (j < 3)
+        if (j < AWARD_AREA1)
         {
-            UInt16 equip = 0;
-            if (lvl == 40)
-                equip = GObject::getRandPEquip(lvl);
-            else
-                equip = GObject::getRandOEquip(lvl);
-
-            if (tlvl > sizeof(trumps)/sizeof(UInt16))
-                continue;
-
-            MailPackage::MailItem item[] = {{equip,1},{514,trumpnum[j]},};
-            (*i).player->sendMailItem(564, 565, item, 2);
-            MailPackage::MailItem item1[] = {{trumps[tlvl],1},};
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],4},};
             (*i).player->sendMailItem(564, 565, item1, 1, false);
-            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), equip, 514, trumpnum[j], trumps[tlvl], 1);
+            SYSMSG_BROADCASTV(557, j+1, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 4);
         }
 
-        if ((j >= 3 && j <= 9))
+        if (j >= AWARD_AREA1 && j < AWARD_AREA2)
         {
-            MailPackage::MailItem item[] = {{trumps[tlvl],1},};
-            (*i).player->sendMailItem(564, 565, item, 1, false);
-            if (!notified)
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],2},};
+            (*i).player->sendMailItem(564, 565, item1, 1, false);
+            if (!notify4_10)
             {
-                SYSMSG_BROADCASTV(558, trumps[tlvl], 1);
-                notified = true;
+                SYSMSG_BROADCASTV(558, trumpFrag[tlvl], 2);
+                notify4_10 = true;
             }
         }
 
-        if (j == lucky1 || j == lucky2)
+        if (j >= AWARD_AREA2 && j < AWARD_MAN)
         {
-            MailPackage::MailItem item[] = {{trumps[tlvl],1},};
-            (*i).player->sendMailItem(562, 563, item, 1, false);
-            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumps[tlvl], 1);
+            MailPackage::MailItem item1[] = {{trumpFrag[tlvl],1},};
+            (*i).player->sendMailItem(564, 565, item1, 1, false);
+            if (!notify11_20)
+            {
+                SYSMSG_BROADCASTV(571, trumpFrag[tlvl], 1);
+                notify11_20 = true;
+            }
         }
 
-        if (j >= 3)
+        if (j == lucky1 || j == lucky2) // 法宝碎片
         {
-            if (equip_lucky.find(j) != equip_lucky.end())
+            MailPackage::MailItem item[] = {{trumpFrag[tlvl],1},};
+            (*i).player->sendMailItem(562, 563, item, 1, false);
+            SYSMSG_BROADCASTV(560, (*i).player->getCountry(), (*i).player->getName().c_str(), trumpFrag[tlvl], 1);
+        }
+
+        if (j >= AWARD_MAN)
+        {
+            if (comp.find(j) != comp.end())
             {
-                UInt16 equip = 0;
-                if (lvl == 40)
-                    equip = GObject::getRandPEquip(lvl);
-                else
-                    equip = GObject::getRandOEquip(lvl);
-                if (equip)
-                {
-                    MailPackage::MailItem item[] = {{equip,1},};
-                    (*i).player->sendMailItem(562, 563, item, 1);
-                }
+                MailPackage::MailItem item[] = {{506,1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
             }
 
             if (breath.find(j) != breath.end())
@@ -339,7 +402,7 @@ void WBoss::reward(Player* player)
 
         MailPackage::MailItem item[] = {{55,1},{MailPackage::Tael,500}};
         (*i).player->sendMailItem(568, 569, item, 2);
-        GameAction()->doAty((*i).player, AtyBoss, 0 , 0 );
+        GameAction()->doAty((*i).player, AtyBoss, 0, 0);
     }
 
     if (player)
@@ -351,17 +414,21 @@ void WBoss::reward(Player* player)
     m_atkinfo.clear();
 }
 
-bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
+bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
 {
     bool in = false;
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 2; ++i)
     {
-        if (worldboss[i+(m_lvl-1)*5] == id)
+        if (worldboss[2*bossidx[World::_wday-1][m_idx]+i] == id)
         {
             in = true;
             break;
         }
     }
+
+    if (!in && World::_wday == 7 && (id == DEMONS_3 || id == DEMONS_4 || id == DEMONS_5 || id == DEMONS_6 || id == DEMONS_7))
+        in = true;
+
     if (!in) return false;
 
     if (pl->getLocation() != loc)
@@ -388,9 +455,9 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
     if (!_percent)
         return false;
 
-    if (m_lvl == 1)
+    if (m_final)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 0);
-    if (m_lvl == 2)
+    if (World::_wday == 7)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 1);
     if (!m_final)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
@@ -420,18 +487,19 @@ bool WBoss::attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id)
         if (m_count <= m_maxcnt)
         {
             SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, m_count, m_id);
-            UInt8 idx = (m_lvl-1)*5 + (m_count-1)/3 + 1;
+            UInt8 idx = 2*bossidx[World::_wday-1][m_idx] + (m_count-1)/9;
             UInt32 id = 0;
             if (idx < sizeof(worldboss)/sizeof(UInt32))
                 id = worldboss[idx];
-            if (!((idx+1) % 5))
+            if (!((idx+1) % 2))
                 m_final = true;
+            id = _mgr->fixBossId(id, m_idx);
             appear(id, m_id);
         }
     }
     else if (res && m_final)
     {
-        mgr->disapper(TimeUtil::Now());
+        _mgr->disapper(TimeUtil::Now());
     }
     return res;
 }
@@ -447,13 +515,79 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     _ng = it->second;
     if (!_ng) return;
 
-    _hp.clear();
     std::vector<GData::NpcFData>& nflist = _ng->getList();
+
+    if (m_final)
+    {
+        setLast(_mgr->getLast(bossidx[World::_wday-1][m_idx]));
+        setAppearTime(TimeUtil::Now());
+        _mgr->fixBossName(npcid, nflist[0].fighter, m_idx);
+    }
+
+    _mgr->setBossName(m_idx, nflist[0].fighter->getName());
+
+    _hp.clear();
     size_t sz = nflist.size();
     if (!sz) return;
     _hp.resize(sz);
-    for(size_t i = 0; i < sz; ++ i)
-        _hp[i] = nflist[i].fighter->getMaxHP();
+
+    UInt32 ohp = nflist[0].fighter->getMaxHP();
+    _hp[0] = ohp;
+
+    if (m_final && nflist[0].fighter && !m_extra && m_last)
+    {
+        UInt32 exthp = 0;
+        Int16 extatk = 0;
+        Int16 extmagatk = 0;
+
+        Int16 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
+        Int16 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
+
+        if (m_last <= WBOSS_BASE_TIME)
+        {
+            exthp = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_HP_FACTOR * ohp;
+            exthp += ohp;
+        }
+        else
+        {
+            exthp = ((float)m_last/WBOSS_BASE_TIME - (float)1) * WBOSS_HP_FACTOR * ohp;
+            if (exthp >= ohp)
+                exthp -= ohp;
+            if (exthp < 20000000)
+                exthp = 20000000;
+        }
+
+        setHP(exthp);
+        nflist[0].fighter->setBaseHP(exthp);
+
+        extatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * atk;
+        nflist[0].fighter->addExtraAttack(extatk);
+
+        extmagatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * matk;
+        nflist[0].fighter->addExtraMagAttack(extmagatk);
+
+        TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
+                nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
+                nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
+#ifdef DEBUG
+        fprintf(stderr, "BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
+                nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
+                nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
+#endif
+        m_extra = true;
+    }
+
+    if (m_final)
+    {
+        UInt8 level = WBOSS_BASE_LVL + _hp[0]/1500000;
+        nflist[0].fighter->setLevel(level);
+        nflist[0].fighter->setColor(getColor(_mgr->getLevel()));
+        _ng->setExp(getExp(_mgr->getLevel()));
+        TRACE_LOG("BOSS level: %u, color: %u, exp: %u", nflist[0].fighter->getLevel(), nflist[0].fighter->getColor(), _ng->getExp());
+#ifdef DEBUG
+        fprintf(stderr, "BOSS level: %u, color: %u, exp: %u", nflist[0].fighter->getLevel(), nflist[0].fighter->getColor(), _ng->getExp());
+#endif
+    }
 
     Map * map = Map::FromSpot(m_loc);
     if (!map) return;
@@ -477,8 +611,8 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         m_id = npcid;
     }
 
-    TRACE_LOG("appear: %u(%u:%u), lvl: %u, loc: %u, count: %u", m_id, npcid, oldid, m_lvl, m_loc, m_count);
-    fprintf(stderr, "appear: %u, lvl: %u, loc: %u\n", m_id, m_lvl, m_loc);
+    TRACE_LOG("appear: %u(%u:%u), idx: %u, loc: %u, count: %u", m_id, npcid, oldid, m_idx, m_loc, m_count);
+    fprintf(stderr, "appear: %u, idx: %u, loc: %u\n", m_id, m_idx, m_loc);
 
     m_disappered = false;
     if (m_count == 10)
@@ -496,6 +630,8 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     sendId();
     sendLoc();
+
+    _mgr->setBossSt(m_idx, 1);
 }
 
 void WBoss::disapper()
@@ -508,6 +644,12 @@ void WBoss::disapper()
     map->Hide(m_id);
     map->DelObject(m_id);
 
+    _mgr->setBossName(m_idx, ""); // XXX: must before setBossSt
+    _mgr->setBossSt(m_idx, 2);
+
+    m_extra = false;
+    m_last = 0;
+    m_appearTime = 0;
     m_count = 0;
     m_disappered = true;
     m_final = false;
@@ -515,7 +657,7 @@ void WBoss::disapper()
     _ng = NULL;
     _hp.clear();
     
-    TRACE_LOG("disapper: %u, lvl: %u, loc: %u", m_id, m_lvl, m_loc);
+    TRACE_LOG("disapper: %u, idx: %u, loc: %u", m_id, m_idx, m_loc);
 }
 
 void WBoss::sendHpMax(Player* player)
@@ -606,6 +748,19 @@ void WBoss::sendCount(Player* player)
         NETWORK()->Broadcast(st);
 }
 
+WBossMgr::WBossMgr()
+    : _prepareTime(0), _prepareStep(0), _appearTime(0),
+    _disapperTime(0), m_idx(0), m_maxlvl(0), m_boss(NULL)
+{
+    memset(m_lasts, 0x00, sizeof(m_lasts));
+    m_bossID[0] = m_bossID[1] = 0;
+    m_bossSt[0] = m_bossSt[1] = 0;
+
+    UInt32 now = TimeUtil::Now();
+    if (now > TimeUtil::SharpDayT(0,now) + 16 * 60 * 60 + 15 * 60)
+        m_bossSt[0] = m_bossSt[1] = 2;
+}
+
 bool WBossMgr::isWorldBoss(UInt32 npcid)
 {
     for (UInt8 i = 0; i < sizeof(worldboss)/sizeof(UInt32); ++i)
@@ -626,19 +781,15 @@ bool WBossMgr::isWorldBoss(UInt32 npcid)
 
 void WBossMgr::nextDay(UInt32 now)
 {
-    m_level = 1;
-#if 1
-    _prepareTime = TimeUtil::SharpDayT(1,now) + 12 * 60 * 60 + 45 * 60;
+    _prepareTime = TimeUtil::SharpDayT(1,now) + 10 * 60 * 60 + 15 * 60;
     _appearTime = _prepareTime + 15 * 60;
     _disapperTime = _appearTime + 60 * 60 - 10;
-#else
-    _prepareTime = TimeUtil::SharpDayT(1,now) + 15 * 60 * 60 + 45 * 60;
-    _appearTime = _prepareTime + 15 * 60;
-    _disapperTime = _appearTime + 60 * 60 - 10;
-#endif
+
     if (m_boss)
     {
         m_boss->disapper();
+        m_boss->setIdx(0);
+        m_idx = 0;
         delete m_boss;
         m_boss = NULL;
     }
@@ -650,124 +801,53 @@ void WBossMgr::nextDay(UInt32 now)
 void WBossMgr::calcNext(UInt32 now)
 {
     UInt32 appears[] = {
-#if 1
-        TimeUtil::SharpDayT(0,now) + 20 * 60 * 60,
-        TimeUtil::SharpDayT(0,now) + 18 * 60 * 60 + 45 * 60, /*100*/
-        TimeUtil::SharpDayT(0,now) + 17 * 60 * 60 + 45 * 60, /*90*/
-        TimeUtil::SharpDayT(0,now) + 16 * 60 * 60 + 45 * 60, /*80*/
-        TimeUtil::SharpDayT(0,now) + 15 * 60 * 60 + 45 * 60, /*70*/
-        TimeUtil::SharpDayT(0,now) + 14 * 60 * 60 + 45 * 60, /*60*/
-        TimeUtil::SharpDayT(0,now) + 13 * 60 * 60 + 45 * 60, /*50*/
-        TimeUtil::SharpDayT(0,now) + 12 * 60 * 60 + 45 * 60, /*40*/
-        TimeUtil::SharpDayT(0,now),
-#else
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+21*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+18*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+15*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+12*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+9*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+6*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+3*60,
-        TimeUtil::SharpDayT(0,now) + 13*60*60+41*60+10,
-        TimeUtil::SharpDayT(0,now),
-#endif
+        TimeUtil::SharpDayT(0,now) + 16 * 60 * 60 + 15 * 60,
+        TimeUtil::SharpDayT(0,now) + 15 * 60 * 60 + 15 * 60,
+        TimeUtil::SharpDayT(0,now) + 10 * 60 * 60 + 15 * 60,
     };
 
-    if ((m_level+1) * 5 > (UInt8)(sizeof(worldboss)/sizeof(UInt32)))
+    if (m_idx == 1)
     {
         nextDay(now);
         return;
     }
 
-    for (UInt8 i = 0; i < WBOSS_NUM+2; ++i)
+    _prepareTime = 0;
+    for (UInt8 i = 0; i < sizeof(appears)/sizeof(UInt32); ++i)
     {
-        if (now >= appears[i] && i == 0)
+        if (now > appears[i])
         {
-            nextDay(now);
-            return;
-        }
-
-        if (i <= WBOSS_NUM && now >= appears[i])
-        {
-            if (m_boss && m_boss->isDisappered())
+            if (i == 0)
             {
-                UInt8 dstlvl = WBOSS_NUM-i+1;
-                if (i == 1 && dstlvl == m_level)
-                {
-                    nextDay(now);
-                    return;
-                }
-
-                if (dstlvl == m_level)
-                {
-                    _prepareTime = appears[i-1];
-                    m_level = dstlvl + 1;
-                }
-                else
-                {
-                    _prepareTime = appears[i];
-                    m_level = dstlvl;
-                }
-
-                if (m_maxlvl < (40+(m_level-1)*10))
-                {
-                    nextDay(now);
-                    return;
-                }
-            }
-            else
-            {
-                if (m_maxlvl < (40+(WBOSS_NUM-i)*10))
-                {
-                    nextDay(now);
-                    return;
-                }
-
-                _prepareTime = appears[i];
-                m_level = WBOSS_NUM - i + 1;
+                m_idx = 0;
+                nextDay(now);
+                return;
             }
 
-            if (cfg.GMCheck)
-            {
-                _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60 - 60;
-            }
-            else
-            {
-                _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60 - 60;
-            }
+            UInt8 idx = i;
+            if (m_boss && m_boss->isDisappered() && m_boss->getIdx() == sizeof(appears)/sizeof(UInt32)-i-1)
+                idx = idx - 1;
+
+            _prepareTime = appears[idx];
+            m_idx = sizeof(appears)/sizeof(UInt32)-idx-1;
             break;
         }
-
-        if (i == WBOSS_NUM+1 && m_maxlvl >= 40)
-        {
-            _prepareTime = appears[i-1];
-            if (cfg.GMCheck)
-            {
-                _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60 - 60;
-            }
-            else
-            {
-                _appearTime = _prepareTime + 15 * 60;
-                _disapperTime = _appearTime + 60 * 60 - 60;
-            }
-            m_level = 1;
-        }
     }
 
-    if ((m_level) * 5 > sizeof(worldboss)/sizeof(UInt32))
+    if (!_prepareTime)
     {
-        nextDay(now);
-        return;
+        m_idx = 0;
+        _prepareTime = appears[sizeof(appears)/sizeof(UInt32)-1];
     }
+
+    _appearTime = _prepareTime + 15 * 60;
+    _disapperTime = _appearTime + 60 * 60 - 60;
 
     if (!cfg.GMCheck)
     {
-        fprintf(stderr, "lvl: %u, time: %u\n", m_level, _prepareTime);
+        fprintf(stderr, "boss time: %u\n", _prepareTime);
     }
-    TRACE_LOG("lvl: %u, time: %u", m_level, _prepareTime);
+    TRACE_LOG("boss time: %u", _prepareTime);
 }
 
 void WBossMgr::process(UInt32 now)
@@ -816,7 +896,7 @@ void WBossMgr::broadcastTV(UInt32 now)
             if (now < _appearTime)
                 return;
             _prepareStep = 5;
-            appear(m_level, now);
+            appear(now);
             break;
 
         default:
@@ -824,19 +904,66 @@ void WBossMgr::broadcastTV(UInt32 now)
     }
 }
 
-void WBossMgr::appear(UInt8 level, UInt32 now)
+void WBossMgr::resetBossSt()
 {
-    if (!level)
-        return;
+    m_bossID[0] = m_bossID[1] = 0;
+    m_bossSt[0] = m_bossSt[1] = 0;
+    m_bossName[0] = m_bossName[1] = "";
+    sendBossInfo(NULL);
+}
 
+UInt16 WBossMgr::fixBossId(UInt16 id, UInt8 idx)
+{
+    if (id != DEMONS_2)
+        return id;
+    AthleticsRank::Rank it = gAthleticsRank.getRankBegin(1);
+    AthleticsRank::Rank end = gAthleticsRank.getRankEnd(1);
+    if (it == end)
+        return id;
+    if (idx == 1)
+        ++it;
+    if (it == end)
+        return id;
+    Player* first = (*it)->ranker;
+    if (!first)
+        return id;
+    UInt8 cls = first->GetClass();
+    UInt8 sex = first->IsMale()?0:3;
+    return demons[cls+sex];
+}
+
+void WBossMgr::fixBossName(UInt16 id, Fighter* fighter, UInt8 idx)
+{
+    if (id == DEMONS_2 || id == DEMONS_3 || id == DEMONS_4 || id == DEMONS_5 || id == DEMONS_6 || id == DEMONS_7)
+    {
+        AthleticsRank::Rank it = gAthleticsRank.getRankBegin(1);
+        AthleticsRank::Rank end = gAthleticsRank.getRankEnd(1);
+        if (it == end)
+            return;
+        if (idx == 1)
+            ++it;
+        if (it == end)
+            return;
+        Player* first = (*it)->ranker;
+        if (!first)
+            return;
+        SYSMSG(pre, 2353);
+        std::string name = first->getName() + pre;
+        fighter->setName(name);
+    }
+}
+
+void WBossMgr::appear(UInt32 now)
+{
     UInt32 npcid = 0;
-    UInt8 idx = (level-1)*5;
+    UInt8 idx = 2*bossidx[World::_wday-1][m_idx];
     if (idx >= sizeof(worldboss)/sizeof(UInt32))
     {
         nextDay(now);
         return;
     }
     npcid = worldboss[idx];
+    npcid = fixBossId(npcid, m_idx);
 
     std::vector<UInt16> spots;
     Map::GetAllSpot(spots);
@@ -845,20 +972,18 @@ void WBossMgr::appear(UInt8 level, UInt32 now)
     UInt16 spot = spots[uRand(spots.size())];
     if (!spot) return;
 
+    UInt32 oldnpcid = 0;
     if (!m_boss)
     {
-        m_boss = new WBoss(npcid, 0, getAttackMax(), spot, level);
-        m_boss->appear(npcid, 0);
+        m_boss = new WBoss(this, npcid, 0, getAttackMax(), spot, m_idx);
     }
     else
     {
-        if (level != m_boss->getLevel())
-        {
-            m_boss->setLevel(level);
-            m_boss->setLoc(spot);
-        }
-        m_boss->appear(npcid, m_boss->getId());
+        m_boss->setIdx(m_idx);
+        m_boss->setLoc(spot);
+        oldnpcid = m_boss->getId();
     }
+    m_boss->appear(npcid, oldnpcid);
 }
 
 void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
@@ -867,7 +992,7 @@ void WBossMgr::attack(Player* pl, UInt16 loc, UInt32 npcid)
         return;
     if (!m_boss)
         return;
-    m_boss->attack(this, pl, loc, npcid);
+    m_boss->attack(pl, loc, npcid);
 }
 
 void WBossMgr::disapper(UInt32 now)
@@ -932,7 +1057,7 @@ void WBossMgr::bossAppear(UInt8 lvl, bool force)
     }
     else
     {
-        appear(lvl, now);
+        appear(now);
     }
 }
 
@@ -942,33 +1067,47 @@ void WBossMgr::setHP(UInt32 hp)
         m_boss->setHP(hp);
 }
 
+void WBossMgr::setBossSt(UInt8 idx, UInt8 st)
+{
+    m_bossSt[idx] = st;
+    sendBossInfo(NULL);
+}
+
+void WBossMgr::setBossName(UInt8 idx, std::string name)
+{
+    m_bossName[idx] = name;
+}
+
 void WBossMgr::sendBossInfo(Player* pl)
 {
-    return;
+    m_bossID[0] = fixBossId(worldboss[2*bossidx[World::_wday-1][0]+1], 0);
+    m_bossID[1] = fixBossId(worldboss[2*bossidx[World::_wday-1][1]+1], 1);
+
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(6);
     st << static_cast<UInt8>(6);
-    if (!m_boss)
-        st << static_cast<UInt32>(0);
-    else if (m_boss->isDisappered())
-        st << static_cast<UInt32>(2);
-    else
-        st << static_cast<UInt32>(1);
+    st << static_cast<UInt8>(0);
+    st << static_cast<UInt8>(m_bossSt[0]);
+    st << static_cast<UInt16>(m_bossID[0]);
+    st << m_bossName[0];
     st << Stream::eos;
-    pl->send(st);
-
-    UInt8 idx = 0;
-    if (m_boss && m_boss->isDisappered())
-       idx = (m_level-1)*5-1;
+    if (pl)
+        pl->send(st);
     else
-       idx = m_level*5-1;
+        NETWORK()->Broadcast(st);
 
     Stream st1(REP::DAILY_DATA);
     st1 << static_cast<UInt8>(6);
-    st1 << static_cast<UInt8>(7);
-    st1 << static_cast<UInt32>(worldboss[idx]);
+    st1 << static_cast<UInt8>(6);
+    st1 << static_cast<UInt8>(1);
+    st1 << static_cast<UInt8>(m_bossSt[1]);
+    st1 << static_cast<UInt16>(m_bossID[1]);
+    st1 << m_bossName[1];
     st1 << Stream::eos;
-    pl->send(st1);
+    if (pl)
+        pl->send(st1);
+    else
+        NETWORK()->Broadcast(st1);
 }
 
 WBossMgr worldBoss;

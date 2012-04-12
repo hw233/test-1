@@ -38,9 +38,9 @@ typedef std::set<AttackInfo, lt> AtkInfoType;
 class WBoss
 {
 public:
-    WBoss(UInt32 id, UInt8 cnt, UInt8 max, UInt16 loc, UInt8 lvl)
+    WBoss(WBossMgr* mgr, UInt32 id, UInt8 cnt, UInt8 max, UInt16 loc, UInt8 idx)
         : m_id(id), m_count(cnt), m_maxcnt(max), m_loc(loc),
-        m_lvl(lvl), m_disappered(false),
+        m_idx(idx), m_disappered(false), m_extra(false), m_last(0), m_appearTime(0), _mgr(mgr),
         _percent(100), _ng(NULL), m_final(false) {}
     ~WBoss() {}
 
@@ -50,13 +50,17 @@ public:
 
     inline void setId(UInt32 id) { m_id = id; }
     inline UInt32 getId() const { return m_id; }
-    bool attack(WBossMgr* mgr, Player* pl, UInt16 loc, UInt32 id);
+    inline UInt32 getAppearTime() const { return m_appearTime; }
+    inline void setAppearTime(UInt32 t) { m_appearTime = t; }
+    bool attack(Player* pl, UInt16 loc, UInt32 id);
     void appear(UInt32 npcid, UInt32 oldid = 0);
     void disapper();
     bool attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final = false);
+    void updateLastDB(UInt32 end);
+    const std::string& getName() const { return m_name; }
 
-    inline void setLevel(UInt8 lvl) { m_lvl = lvl; }
-    inline UInt8 getLevel() const { return m_lvl; }
+    inline void setIdx(UInt8 idx) { m_idx = idx; }
+    inline UInt8 getIdx() const { return m_idx; }
     inline void setLoc(UInt16 loc) { m_loc = loc; }
     inline UInt16 getLoc() const { return m_loc; }
     inline UInt32 getHP()
@@ -75,6 +79,7 @@ public:
             hp = 100;
         _hp[0] = hp;
     }
+    inline void setLast(UInt16 last) { m_last = last; }
 
     void reward(Player* player);
     void getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret);
@@ -92,14 +97,19 @@ private:
     UInt8 m_count;
     UInt8 m_maxcnt;
     UInt16 m_loc;
-    UInt8 m_lvl;
+    UInt8 m_idx;
     bool m_disappered;
+    bool m_extra;
+    UInt16 m_last;
+    UInt32 m_appearTime;
 
+    WBossMgr* _mgr;
     UInt8 _percent;
     GData::NpcGroup* _ng;
     std::vector<UInt32> _hp;
     bool m_final;
     AtkInfoType m_atkinfo;
+    std::string m_name;
 };
 
 class WBossMgr
@@ -108,9 +118,7 @@ public:
     static bool isWorldBoss(UInt32 npcid);
 
 public:
-    WBossMgr()
-        : _prepareTime(0), _prepareStep(0), _appearTime(0),
-        _disapperTime(0), m_level(1), m_maxlvl(0), m_boss(NULL) {}
+    WBossMgr();
     ~WBossMgr()
     {
         if (m_boss)
@@ -122,7 +130,7 @@ public:
 
     void initWBoss();
     void process(UInt32 now);
-    void appear(UInt8 level, UInt32 now);
+    void appear(UInt32 now);
     void disapper(UInt32 now);
     void attack(Player* pl, UInt16 loc, UInt32 npcid);
     void broadcastTV(UInt32 now);
@@ -131,11 +139,20 @@ public:
     void sendDaily(Player* player);
     void setHP(UInt32 hp);
     void sendBossInfo(Player* pl);
+    UInt16 fixBossId(UInt16 id, UInt8 idx);
+    void fixBossName(UInt16 id, Fighter* fighter, UInt8 idx);
 
     inline void setLevel(UInt8 lvl) {   if (lvl > m_maxlvl) m_maxlvl = lvl; }
     inline UInt8 getLevel(){return m_maxlvl;}
-    inline void setBossLevel(UInt8 lvl) { m_level = lvl; }
 
+    inline UInt32 getHP() const { return m_boss?m_boss->getHP():0; }
+
+    inline void setLast(UInt8 idx, UInt16 last) { m_lasts[idx] = last; }
+    inline UInt16 getLast(UInt8 idx) const { return m_lasts[idx]; }
+
+    void setBossSt(UInt8 idx, UInt8 st);
+    void setBossName(UInt8 idx, std::string name);
+    void resetBossSt();
     void bossAppear(UInt8 lvl, bool force = false);
 
     inline UInt32 getAppearTime() const { return _appearTime; }
@@ -146,9 +163,14 @@ private:
     UInt32 _appearTime;
     UInt32 _disapperTime;
 
-    UInt8 m_level;
+    UInt8 m_idx;
     UInt8 m_maxlvl;
+    UInt16 m_lasts[7];
     WBoss* m_boss;
+
+    UInt16 m_bossID[2];
+    UInt8 m_bossSt[2];
+    std::string m_bossName[2];
 };
 
 extern WBossMgr worldBoss;

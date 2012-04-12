@@ -834,6 +834,16 @@ struct DBWorldBoss
     UInt16 loc;
     UInt8 count;
 };
+struct DBWBoss
+{
+    UInt8 idx;
+    UInt32 last;
+};
+struct DBDiscount
+{
+    UInt32 itemid;
+    UInt8 discount;
+};
 struct DBActivityData
 {
     UInt64 playerId;
@@ -1913,6 +1923,22 @@ SPECIALDEF(4)
     UInt8, level,
     UInt16, loc,
     UInt8, count
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBWBoss)
+SPECIALDEF(2)
+(
+    UInt8, idx,
+    UInt32, last
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBDiscount)
+SPECIALDEF(2)
+(
+    UInt32, itemid,
+    UInt8, discount
 )
 SPECIALEND()
 

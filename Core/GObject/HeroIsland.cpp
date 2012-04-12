@@ -388,7 +388,7 @@ void HeroIsland::end(UInt32 now)
     reset();
     _prepareStep = 0;
     SYSMSG_BROADCASTV(2116);
-    sendDaily(NULL);
+    setStatus(2);
 }
 
 void HeroIsland::reset()
@@ -433,7 +433,7 @@ void HeroIsland::process(UInt32 now)
         else
             _expTime = now + 30;
         _running = true;
-        sendDaily(NULL);
+        setStatus(1);
     }
 
     if (_running && now >= _endTime)
@@ -2142,11 +2142,9 @@ void HeroIsland::setAto(Player* player, UInt8 onoff)
 
 void HeroIsland::sendDaily(Player* player)
 {
-    if (player && !isRunning())
-        return;
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(8);
-    st << static_cast<UInt8>(isRunning()?0:1);
+    st << static_cast<UInt8>(_status);
     st << Stream::eos;
     if (player)
         player->send(st);

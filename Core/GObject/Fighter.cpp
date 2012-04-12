@@ -3571,8 +3571,8 @@ bool Fighter::openSecondSoul(UInt8 cls)
 
     m_2ndSoul = new SecondSoul(this, cls);
     // xx: TODO
-    UInt16 skillId = m_2ndSoul->getSkillIdOfItem(SOUL_SKILL_DEFAULT_ITEM);
-    m_2ndSoul->setSoulSkill(0, skillId, false);
+    //UInt16 skillId = m_2ndSoul->getSkillIdOfItem(SOUL_SKILL_DEFAULT_ITEM);
+    //m_2ndSoul->setSoulSkill(0, skillId, false);
 
     m_2ndSoul->insertIntoDB();
     m_2ndSoul->sendInfo(_owner);

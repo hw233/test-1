@@ -124,6 +124,7 @@ static const UInt32 EXTRAREWARDTM = 19 * 3600;
 class Player;
 class AthleticsRank
 {
+public:
 	typedef std::list<AthleticsRankData *> AthleticsList;
 	typedef AthleticsList::iterator Rank;
 	typedef std::map<Player *, Rank> RankList;
@@ -200,8 +201,6 @@ public:
 
 public:
 	void TmExtraAward();
-
-protected:
 
 	inline UInt8 getRankRow(UInt8 lev)
 	{

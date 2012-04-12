@@ -1275,59 +1275,69 @@ namespace GObject
 		return 0;
 	}
 
-	bool Package::UseItem(UInt32 id, UInt16 num, UInt32 param, UInt8 bind)
+	bool Package::UseItem(UInt32 id, UInt16 num, UInt8 type, UInt32 param, UInt8 bind)
 	{
 		if(!m_Owner->hasChecked())
 			return false;
 		bool ret = false;
 
-        if (GetItemSubClass(id) == Item_Formula)
+        // XXX: 0-使用 1-合成 2-分解
+        // XXX: 0,2同时走使用流程
+        if (type == 1)
         {
-            ItemBase* item = GetItem(id, bind > 0);
-            if (item && item->getClass() == Item_Formula5)
+            if (GetItemSubClass(id) == Item_Formula)
             {
-                ret = FormulaMerge(id, bind > 0);
-                if (ret)
-                    m_Owner->sendMsgCode(0, 1800);
-                else
-                    m_Owner->sendMsgCode(0, 1802);
-                return ret;
+                ItemBase* item = GetItem(id, bind > 0);
+                if (item && item->getClass() == Item_Formula5)
+                {
+                    ret = FormulaMerge(id, bind > 0);
+                    if (ret)
+                        m_Owner->sendMsgCode(0, 1800);
+                    else
+                        m_Owner->sendMsgCode(0, 1802);
+                    return ret;
+                }
             }
-        }
-        else if (GetItemSubClass(id) == Item_Citta)
-        {
-            ItemBase* item = GetItem(id, bind > 0);
-            if (item && item->getClass() == Item_Citta5)
+            else if (GetItemSubClass(id) == Item_Citta)
             {
-                ret = CittaMerge(id, bind > 0);
-                if (ret)
-                    m_Owner->sendMsgCode(0, 1800);
-                else
-                    m_Owner->sendMsgCode(0, 1802);
-                return ret;
+                ItemBase* item = GetItem(id, bind > 0);
+                if (item && item->getClass() == Item_Citta5)
+                {
+                    ret = CittaMerge(id, bind > 0);
+                    if (ret)
+                        m_Owner->sendMsgCode(0, 1800);
+                    else
+                        m_Owner->sendMsgCode(0, 1802);
+                    return ret;
+                }
             }
-        }
-        else if (GetItemSubClass(id) == Item_Normal || GetItemSubClass(id) == Item_Soul)
-        {
-            ItemBase* item = GetItem(id, bind > 0);
-            if (item && (item->getClass() == Item_Normal29 ||
-                         item->getClass() == Item_Normal28 ||
-                         (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9)))
+            else if (GetItemSubClass(id) == Item_Normal ||
+                    GetItemSubClass(id) == Item_Soul ||
+                    GetItemSubClass(id) == Item_SL)
             {
-                ret = TrumpMerge(id, bind > 0);
-                if (ret)
-                    m_Owner->sendMsgCode(0, 1800);
-                else
-                    m_Owner->sendMsgCode(0, 1802);
-                return ret;
+                ItemBase* item = GetItem(id, bind > 0);
+                if (item && (item->getClass() == Item_Normal29 ||
+                            item->getClass() == Item_Normal28 ||
+                            (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9) ||
+                            item->getClass() == Item_SL1))
+                {
+                    ret = TrumpMerge(id, bind > 0);
+                    if (ret)
+                        m_Owner->sendMsgCode(0, 1800);
+                    else
+                        m_Owner->sendMsgCode(0, 1802);
+                    return ret;
+                }
             }
+            return false;
         }
 
         if (num == 0 || IsEquipId(id) ||
                 (GetItemSubClass(id) != Item_Normal &&
                  GetItemSubClass(id) != Item_Formula && 
                  GetItemSubClass(id) != Item_Enhance && 
-                GetItemSubClass(id) != Item_Citta))
+                GetItemSubClass(id) != Item_Citta &&
+                GetItemSubClass(id) != Item_Soul))
 			ret = false;
 		else
 		{
