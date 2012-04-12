@@ -92,6 +92,7 @@ private:
 	static void appendLineup( Stream& st, Player * player);
 	static void appendEquipInfo( Stream& st, ItemEquip * equip );
 
+	static void appendLineup2( Stream& st, Player * player);
 private:
 	struct RecordInfo
 	{

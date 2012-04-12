@@ -528,6 +528,8 @@ public:
     void addAttr( const GData::CittaEffect* ce );
     void    CheckEquipEnchantAttainment(UInt8 e);
     bool  IsEquipEnchantLev(UInt8 e);
+
+    void getAttrExtraEquip(Stream& st);
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();

@@ -90,7 +90,7 @@ void Arena::enterArena( Player * player )
 {
 	Stream st(REP::ENTER_ARENA, 0xEF);
 	st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
-	appendLineup(st, player);
+	appendLineup2(st, player);
 	st << Stream::eos;
 	NETWORK()->SendToArena(st);
 }
@@ -99,7 +99,7 @@ void Arena::commitLineup( Player * player, int sid )
 {
 	Stream st(REP::LINEUP_CHANGE, 0xEF);
 	st << player->getId();
-	appendLineup(st, player);
+	appendLineup2(st, player);
 	st << Stream::eos;
 	NETWORK()->SendMsgToClient(sid, st);
 }
@@ -123,6 +123,32 @@ UInt8 Arena::bet( Player * player, UInt8 group, UInt8 pos, UInt8 tael )
 	UInt16 data = tael;
 	GLOBAL().PushMsg(hdr, &data);
 	return 0;
+}
+
+void Arena::appendLineup2( Stream& st, Player * player)
+{
+	st << player->getFormation();
+	size_t offset = st.size();
+	UInt8 c = 0;
+	st << c;
+	for(UInt8 i = 0; i < 5; ++ i)
+	{
+		Lineup& pdata = player->getLineup(i);
+		if(pdata.available())
+		{
+			++c;
+			st << pdata.pos << static_cast<UInt16>(pdata.fid);
+			Fighter * fgt = pdata.fighter;
+
+            st << fgt->getLevel() << fgt->getPotential() << fgt->getCapacity();
+            st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
+            fgt->getAllUpSkillAndLevel(st);
+            fgt->getAllPSkillAndLevel4Arena(st);
+
+            fgt->getAttrExtraEquip(st);
+		}
+	}
+	st.data<UInt8>(offset) = c;
 }
 
 void Arena::appendLineup( Stream& st, Player * player )

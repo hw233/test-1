@@ -3735,5 +3735,21 @@ bool Fighter::changeSecondSoulClass(UInt8 cls)
     return m_2ndSoul->setClass(cls);
 }
 
+
+void Fighter::getAttrExtraEquip(Stream& st)
+{
+    checkDirty();
+
+	st << strength << physique << agility << intelligence << will << soul << aura;
+	st << auraMax << attack << magatk << defend << magdef << hp << tough << action;
+	st << hitrate << evade << critical << criticaldmg << pierce << counter << magres;
+
+	st << strengthP << physiqueP << agilityP << intelligenceP << willP << soulP << auraP
+    st << auraMaxP << attackP << magatkP << defendP << magdefP << hpP << toughP << actionP;
+	st << hitrateP << evadeP << criticalP << criticaldmgP << pierceP << counterP << magresP;
+
+    st << hitrlvl << evdlvl << crilvl << pirlvl << counterlvl << mreslvl << toughlvl;
+}
+
 }
 
