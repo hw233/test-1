@@ -105,7 +105,9 @@ namespace GObject
         VAR_CFRIEND_45,
         VAR_CFRIEND_60,
 
-        // 以后必须预留10个
+        VAR_DISCOUNT_1 = 80, // 3折区购买次数
+        VAR_DISCOUNT_2, // 5折区购买次数
+        VAR_DISCOUNT_3, // 8折区购买次数
 
         VAR_MAX,
     };
@@ -206,6 +208,10 @@ namespace GObject
             REGISTER_VAR(VAR_CFRIEND_1, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_45, CYCLE_NONE);
             REGISTER_VAR(VAR_CFRIEND_60, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_DISCOUNT_1, CYCLE_WEEK);
+            REGISTER_VAR(VAR_DISCOUNT_2, CYCLE_WEEK);
+            REGISTER_VAR(VAR_DISCOUNT_3, CYCLE_WEEK);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -138,7 +138,13 @@ class TeamCopy
         void sendBattleReport(TeamData* td, GData::NpcGroup* ng, Battle::BattleSimulator& bsim, UInt32& rptid);
 
         void process(UInt32 now);
-        void sendDaily(Player* player);
+        void sendDaily(Player* player, UInt8 type = 7);
+        void resetStatus()
+        {
+            _isDoubleExp1 = _isDoubleExp2 = 0;
+            sendDaily(NULL, 7);
+            sendDaily(NULL, 11);
+        }
 
     private:
         typedef std::vector<TeamData*> CopyTeams;
@@ -167,7 +173,8 @@ class TeamCopy
         TeamCopyNpc m_tcNpcId[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         bool _notify1;
         bool _notify2;
-        bool _isDoubleExp;
+        UInt8 _isDoubleExp1;
+        UInt8 _isDoubleExp2;
 };
 
 extern TeamCopy* teamCopyManager;

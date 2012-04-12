@@ -19,7 +19,7 @@ const UInt8 TeamCopyPlayerInfo::_needRoll = 1;
 const UInt8 TeamCopyPlayerInfo::_hasRoll = 2;
 std::vector<TeamCopyAwards> TeamCopyPlayerInfo::_awards[TEAMCOPY_MAXCOPYCNT];
 
-TeamCopy::TeamCopy() : _notify1(false), _notify2(false), _isDoubleExp(false)
+TeamCopy::TeamCopy() : _notify1(false), _notify2(false), _isDoubleExp1(0), _isDoubleExp2(0)
 {
     for(int t = 0; t < TEAMCOPY_MAXTYPECNT; ++t)
     {
@@ -1006,38 +1006,39 @@ void TeamCopy::process(UInt32 now)
     if (now >= notify1 && now < notifyEnd1 && !_notify1)
     {
         _notify1 = true;
-        _isDoubleExp = true;
-        sendDaily(NULL);
+        _isDoubleExp1 = 1;
+        sendDaily(NULL, 7);
     }
 
     if (now >= notify2 && now < notifyEnd2 && !_notify2)
     {
         _notify2 = true;
-        _isDoubleExp = true;
-        sendDaily(NULL);
+        _isDoubleExp2 = 1;
+        sendDaily(NULL, 11);
     }
 
-    if (now >= notifyEnd1 && notify2)
+    if (now >= notifyEnd1 && _isDoubleExp1 == 1)
     {
-        _isDoubleExp = false;
-        sendDaily(NULL);
+        _isDoubleExp1 = 2;
+        sendDaily(NULL, 7);
     }
 
-    if (now >= notifyEnd2 && _isDoubleExp)
+    if (now >= notifyEnd2 && _isDoubleExp2 == 1)
     {
         _notify1 = _notify2 = false;
-        _isDoubleExp = false;
-        sendDaily(NULL);
+        _isDoubleExp2 = 2;
+        sendDaily(NULL, 11);
     }
 }
 
-void TeamCopy::sendDaily(Player* player)
+void TeamCopy::sendDaily(Player* player, UInt8 type)
 {
-    if (player && !_isDoubleExp)
-        return;
     Stream st(REP::DAILY_DATA);
-    st << static_cast<UInt8>(7);
-    st << static_cast<UInt8>(_isDoubleExp?0:1);
+    st << static_cast<UInt8>(type);
+    if (type == 7)
+        st << static_cast<UInt8>(_isDoubleExp1);
+    else
+        st << static_cast<UInt8>(_isDoubleExp2);
     st << Stream::eos;
     if (player)
         player->send(st);

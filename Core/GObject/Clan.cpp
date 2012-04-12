@@ -500,6 +500,7 @@ bool Clan::kick(Player * player, UInt64 pid)
 
     ClanRankBattleMgr::Instance().Signout(kicker);
     player->SetVar(VAR_CLANBATTLE_HONOUR, 0);
+    kicker->SetVar(VAR_CLAN_LEAVE_TIME, now);
 
 	getAllocBack(*member);
 

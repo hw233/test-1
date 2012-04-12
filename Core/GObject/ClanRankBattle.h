@@ -421,6 +421,14 @@ namespace GObject
 
         const ClanVec& getClanRanking() const { return m_ClanRanking; }
 
+        void sendDaily(Player* player);
+
+        void setStatus(UInt8 status)
+        {
+            m_Status = status;
+            sendDaily(NULL);
+        }
+
     private:
         void ProcessInit(UInt32 oldtime);
         void ProcessSignup();
@@ -467,6 +475,9 @@ namespace GObject
         UInt32 m_StartTime;
         //加经验次数
         UInt32 m_expTime;
+
+        bool m_singupNotified;
+        bool m_battleNotified;
         
         //参加战斗的帮会列表
         ClanMap m_Clans;
@@ -494,6 +505,8 @@ namespace GObject
         RewardsMap  m_WeeklyClanRewards;
         //每周帮会排名奖励
         RewardsMap  m_WeeklyClanSortRewards;
+        //帮派战状态
+        UInt8 m_Status;
     };
 }
 

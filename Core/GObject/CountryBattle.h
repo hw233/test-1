@@ -115,7 +115,7 @@ private:
 class GlobalCountryBattle
 {
 public:
-	GlobalCountryBattle(): _running(false), _prepareTime(0), _startTime(0), _endTime(0), _countryBattle(NULL) { }
+	GlobalCountryBattle(): _running(false), _prepareTime(0), _startTime(0), _endTime(0), _countryBattle(NULL), _status(0) { }
 	void prepare(UInt32);
 	void prepare2(UInt32);
 	bool process(UInt32);
@@ -129,12 +129,14 @@ public:
 	void addAutoCB(Player *);
 	void delAutoCB(Player *);
     void sendDaily(Player*);
+    inline void setStatus(UInt8 status) { _status = status; sendDaily(NULL); }
 
 private:
 	bool _running;
 	UInt32 _prepareTime, _startTime, _endTime;
 	CountryBattle * _countryBattle;
 	std::set<Player *> _autoList;
+    UInt8 _status;
 };
 
 extern GlobalCountryBattle globalCountryBattle;

@@ -55,6 +55,7 @@
 #include "TownDeamon.h"
 #include "HeroMemo.h"
 #include "ArenaBattle.h"
+#include "GData/Store.h"
 #include <fcntl.h>
 
 namespace GObject
@@ -198,6 +199,8 @@ namespace GObject
         InitMoneyLog();
         LoadHeroMemo();
         LoadCFriendAwards();
+        LoadWBoss();
+        LoadDiscount();
         LoadSoulItemChance();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
@@ -4033,6 +4036,40 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::LoadWBoss()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading WorldBoss Data");
+		DBWBoss t;
+		if(execu->Prepare("SELECT `idx`, `last` FROM `wboss`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+            worldBoss.setLast(t.idx, t.last);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::LoadDiscount()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Discount Data");
+		DBDiscount t;
+		if(execu->Prepare("SELECT `itemid`, `discount` FROM `discount`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+            GData::store.add(1, t.itemid, t.discount);
+        }
+        lc.finalize();
+        return true;
+    }
+
     bool GObjectManager::loadSecondSoul()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -4107,6 +4144,5 @@ namespace GObject
 
         return true;
     }
-
 
 }

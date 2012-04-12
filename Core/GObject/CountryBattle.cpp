@@ -398,27 +398,7 @@ void CountryBattle::end(UInt32 curtime)
 				GameAction()->onCountryBattleAttend(it->first);
 			UInt32 awardTime = it->second.awardTime;
 
-#if 0
-            if (rewardid[side] == PLAYER_BUFF_TRAINP1)
-            {
-                if (!it->first->getBuffData(PLAYER_BUFF_TRAINP2))
-                {
-                    it->first->addBuffData(rewardid[side], awardTime);
-                    SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
-                    it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
-                }
-            }
-            else if (rewardid[side] == PLAYER_BUFF_TRAINP2)
-            {
-                if (!it->first->getBuffData(PLAYER_BUFF_TRAINP1))
-                {
-                    it->first->addBuffData(rewardid[side], awardTime);
-                    SYSMSGV(content, mailid[side], it->second.totalAchievement, awardTime / 3600, (awardTime / 60) % 60, awardTime % 60, it->second.totalWin, it->second.totallose, it->second.maxKillStreak);
-                    it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
-                }
-            }
-#else
-            UInt16 count = awardTime / 3600 + ((awardTime % 3600) ? 1: 0);
+            UInt16 count = awardTime / 1800 + ((awardTime % 1800) ? 1: 0);
             if (rewardid[side] == PLAYER_BUFF_TRAINP1 && count)
             {
                 MailPackage::MailItem mitem[1] = {{55, count}};
@@ -439,7 +419,7 @@ void CountryBattle::end(UInt32 curtime)
                 if(pmail != NULL)
                     mailPackageManager.push(pmail->id, mitem, 1, true);
             }
-#endif
+
 			/*for back stage*/
 			UInt8 lvl = getJoinLevel(it->first->GetLev());
 			enterSize[lvl] ++;
@@ -927,7 +907,7 @@ void GlobalCountryBattle::end( )
 	_running = false;
 	UInt32 curtime = TimeUtil::Now();
 	_countryBattle->end(curtime);
-    sendDaily(NULL);
+    setStatus(2);
 
 	_prepareTime = 0;
 	_startTime = 0;
@@ -972,7 +952,7 @@ bool GlobalCountryBattle::process(UInt32 curtime)
 				_countryBattle->playerEnter(player);
 			}
 		}
-        sendDaily(NULL);
+        setStatus(1);
 		break;
 	case 3:
 		{
@@ -1022,11 +1002,9 @@ void GlobalCountryBattle::delAutoCB( Player * player )
 
 void GlobalCountryBattle::sendDaily(Player* player)
 {
-    if (player && !isRunning())
-        return;
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(9);
-    st << static_cast<UInt8>(isRunning()?0:1);
+    st << static_cast<UInt8>(_status);
     st << Stream::eos;
     if (player)
         player->send(st);

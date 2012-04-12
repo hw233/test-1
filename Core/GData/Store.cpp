@@ -75,6 +75,8 @@ void Store::sendList( UInt8 type, GObject::Player * player )
         player->send(_storePacketExchange[type - EXCHANGE]);
     else
         player->send(_storePacket[type - 1]);
+    if (type == 1)
+        player->sendDiscountLimit();
 }
 
 void Store::makePacket()
@@ -106,7 +108,7 @@ void Store::makePacket()
 
 void Store::clear()
 {
-	for(int i = 0; i < 7; ++ i)
+	for(int i = 1; i < 7; ++ i) // XXX: do not clear _items[0]
 	{
 		_storePacket[i].clear();
 		_items[i].clear();
@@ -118,6 +120,77 @@ void Store::clear()
 		_itemsExchange[i].clear();
 		_itemPricesExchange[i].clear();
     }
+    _discountLimit.clear();
+}
+
+void Store::storeDiscount()
+{
+    DB3().PushUpdateData("DELETE FROM `discount`;");
+    for (UInt8 i = 0; i < _items[0].size(); ++i)
+    {
+        DB3().PushUpdateData("INSERT INTO `discount` (`itemid`, `discount`) VALUES (%u, %u)",
+                _items[0][i]&0xFFFF, (_items[0][i]>>16)&0xFFFF);
+    }
+}
+
+void Store::discountLimit()
+{
+    static UInt8 baseLimit[] = {3,5,8};
+    for (UInt8 n = 0; n < 3; ++n)
+    {
+        UInt8 c = 0;
+        for (UInt8 i = 0; i < _items[0].size() && c < 4; ++i)
+        {
+            if (((_items[0][i]>>16)&0xFFFF) == baseLimit[n])
+                ++c;
+        }
+        _discountLimit.push_back(baseLimit[n] + 4 / c);
+    }
+}
+
+UInt16 Store::getDiscountLimit(UInt8 type)
+{
+    if (type == 3 && _discountLimit.size() >= 1)
+        return _discountLimit[0];
+    if (type == 5 && _discountLimit.size() >= 2)
+        return _discountLimit[1];
+    if (type == 8 && _discountLimit.size() >= 3)
+        return _discountLimit[2];
+    return 0;
+}
+
+float Store::getDiscount(UInt8 type)
+{
+    if (type == 3)
+        return .3f;
+    if (type == 5)
+        return .5f;
+    if (type == 8)
+        return .8f;
+    return 0.f;
+}
+
+UInt8 Store::getDisVarOffset(UInt8 type)
+{
+    if (type == 3)
+        return 0;
+    if (type == 5)
+        return 1;
+    if (type == 8)
+        return 2;
+    return 0;
+}
+
+UInt8 Store::getItemsByDiscount(UInt8 type, UInt16 items[4])
+{
+    UInt8 c = 0;
+    for (UInt8 i = 0; i < _items[0].size() && c < 4; ++i)
+    {
+        if (((_items[0][i]>>16)&0xFFFF) == type)
+            items[c++] = (_items[0][i]&0xFFFF);
+    }
+    return c;
 }
 
 }
+

@@ -2,11 +2,9 @@
 <config>
 	<udplog_server>
 		<item ip="192.168.100.2" port="8800" />
-		<item ip="192.168.100.2" port="8811" />
+		<item ip="192.168.100.2" port="8801" />
     </udplog_server>
 	<udplog_server_domain>
-		<item domain="40" ip="192.168.100.2" port="8800" />
-		<item domain="40" ip="192.168.100.2" port="8811" />
     </udplog_server_domain>
 	<log_file_type>
 		<item id="1" typeinfo="gb"/>

@@ -383,6 +383,7 @@ void ActivityMgr::SendActivityInfo(Stream& s)
         {
             m1 = AthleticsRank::GetMaxchallengenum(vipLevel);
         }
+#if 0
         else if( i == AtyBoss)
         {
             UInt8 lev =  worldBoss.getLevel();
@@ -393,6 +394,7 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             else
                 m1 = 0;
         }
+#endif
         else
             m1 = static_cast<UInt8>(GameAction()->GetAtyCheckFlag(i));
 

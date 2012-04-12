@@ -22,7 +22,9 @@
 #define RCITTA1_ID      7000
 #define LSOUL_ID        7001
 #define RSOUL_ID        7999
-#define LOTHER_ID       8000
+#define LSL_ID          8000
+#define RSL_ID          8999
+#define LOTHER_ID       9000
 #define ROTHER_ID       65535
 
 enum ItemClass
@@ -72,7 +74,9 @@ enum ItemClass
     Item_Soul = 90, Item_Soul1, Item_Soul2, Item_Soul3,
     Item_Soul4, Item_Soul5, Item_Soul6, Item_Soul7,
     Item_Soul8, Item_Soul9,
-	Item_Other = 100,	//其他
+    Item_SL = 100, // 元神技能材料
+    Item_SL1, // 元神技能
+	Item_Other = 102,	//其他
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -133,6 +137,8 @@ inline ItemClass GetItemSubClass(UInt32 id)
 		return Item_Gem;
     if (id >= LSOUL_ID && id <= RSOUL_ID)
         return Item_Soul;
+    if (id >= LSL_ID && id <= RSL_ID)
+        return Item_SL;
 	return Item_Other;
 }
 

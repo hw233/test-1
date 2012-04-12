@@ -187,8 +187,7 @@ function onActivityCheck(tm)
 
   -- XXX: cancel auto heal
   setAutoHeal(true)
-
-  loadStore()
+  loadStore();
 end
 
 function initActTime(y, m, d)
@@ -263,7 +262,6 @@ function initActTime(y, m, d)
 
   onActivityCheck(os.time() + 30);
 
-  loadStore();
   loadTitle();
   loadRareAnimals()
   loadTeamCopyAwardsCfg()

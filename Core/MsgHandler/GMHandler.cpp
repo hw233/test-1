@@ -33,6 +33,7 @@
 #include "GObject/TeamCopy.h"
 #include "GObject/AthleticsRank.h"
 #include "GObject/HeroMemo.h"
+#include "MsgHandler/JsonParser.h"
 
 GMHandler gmHandler;
 
@@ -164,6 +165,8 @@ GMHandler::GMHandler()
     Reg(3, "time", &GMHandler::OnTime);
     Reg(3, "token", &GMHandler::OnToken);
 	Reg(3, "recharge", &GMHandler::OnRecharge);
+	Reg(3, "boss", &GMHandler::OnBossHP);
+	Reg(3, "json", &GMHandler::OnJson);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2403,7 +2406,7 @@ void GMHandler::OnSetBosslevel(GObject::Player *player, std::vector<std::string>
         return;
     if (args.size() < 1)
         return;
-    GObject::worldBoss.setBossLevel(atoi(args[0].c_str()));
+    //GObject::worldBoss.setBossLevel(atoi(args[0].c_str()));
 }
 
 void GMHandler::OnQQVipKey(GObject::Player *player, std::vector<std::string>& args)
@@ -2648,5 +2651,14 @@ void GMHandler::OnRecharge(GObject::Player* player, std::vector<std::string>& ar
     UInt32 money = 0;
 	LoginMsgHdr hdr(0x105, WORKER_THREAD_LOGIN, 0, player->GetSessionID(), sizeof(money));
 	GLOBAL().PushMsg(hdr, &money);
+}
+void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args)
+{
+	SYSMSG_SENDV(735, player, GObject::worldBoss.getHP());
+}
+void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
+{
+    std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
+    jsonParser(json, -1);
 }
 
