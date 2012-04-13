@@ -2697,7 +2697,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                             item = player->GetPackage()->AddItem(items[i], 1, true, false, FromNpcBuy);
                     }
 
-                    ConsumeInfo ci(Item, items[0], 1); // XXX:
+                    ConsumeInfo ci(Discount3+varoff, 0, 0);
                     player->useGold(price, &ci);
                     st << static_cast<UInt8>(0);
 
