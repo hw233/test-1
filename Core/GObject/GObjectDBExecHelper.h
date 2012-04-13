@@ -331,6 +331,49 @@ struct DBBossDamage
 };
 
 // 将可变属性
+struct DBFighterAndSecondSoul
+{
+	UInt32 id;              // 将编号
+	UInt64 playerId;        // 玩家ID
+	float potential;        // 潜力
+    float capacity;         // 资质
+	UInt8 level;            // 等级
+    UInt8 relvl;            // 转身后等级
+	UInt64 experience;      // 经验槽
+    UInt64 practiceExp;     // 修炼经验槽
+	UInt32 hp;              // 血槽
+	UInt32 weapon;          // 武器
+	UInt32 armor1;          // 头盔
+	UInt32 armor2;          // 护甲
+	UInt32 armor3;          // 护肩
+	UInt32 armor4;          // 腰带
+	UInt32 armor5;          // 靴子
+	UInt32 ring;            // 戒指
+	UInt32 amulet;          // 项链
+    UInt16 peerless;        // 无双技能
+    UInt16 talent;          // 天赋
+    std::string trump;      // 法宝
+    std::string acupoints;  // 穴道,打通次数
+    std::string skill;      // 装备的技能
+    std::string citta;      // 装备的心法
+    std::string skills;     // 学会的技能, ID1,ID2,...
+    std::string cittas;     // 学会的心法, ID1,ID2,...
+    UInt8 attrType1;
+    UInt16 attrValue1;
+    UInt8 attrType2;
+    UInt16 attrValue2;
+    UInt8 attrType3;
+    UInt16 attrValue3;
+	UInt32 fighterId;
+	UInt8 cls;
+	UInt8 practiceLevel;
+	UInt8 stateLevel;
+	UInt32 stateExp;
+    std::string skills_2nd;
+};
+
+
+// 将可变属性
 struct DBFighterObj
 {
 	UInt32 id;              // 将编号
@@ -1235,6 +1278,50 @@ SPECIALDEF(4)
 	UInt32, exp
 	)
 SPECIALEND()
+
+SPECIALBEGIN(GObject::DBFighterAndSecondSoul)
+SPECIALDEF(37)
+	(
+	UInt32, id,
+	UInt64, playerId,
+	float, potential,
+	float, capacity,
+	UInt8, level,
+    UInt8, relvl,
+	UInt64, experience,
+	UInt64, practiceExp,
+	UInt32, hp,
+	UInt32, weapon,
+	UInt32, armor1,
+	UInt32, armor2,
+	UInt32, armor3,
+	UInt32, armor4,
+	UInt32, armor5,
+	UInt32, ring,
+	UInt32, amulet,
+    UInt16, peerless,
+    UInt16, talent,
+    std::string, trump,
+    std::string, acupoints,
+    std::string, skill,
+    std::string, citta,
+    std::string, skills,
+    std::string, cittas,
+    UInt8, attrType1,
+    UInt16, attrValue1,
+    UInt8, attrType2,
+    UInt16, attrValue2,
+    UInt8, attrType3,
+    UInt16, attrValue3,
+	UInt32, fighterId,
+	UInt8, cls,
+	UInt8, practiceLevel,
+	UInt8, stateLevel,
+	UInt32, stateExp,
+    std::string, skills_2nd
+	)
+SPECIALEND()
+
 
 SPECIALBEGIN(GObject::DBFighterObj)
 SPECIALDEF(31)

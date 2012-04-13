@@ -182,7 +182,7 @@ namespace GObject
 		loadClanRobMonster();
         loadQQVipAward();
 		loadAllPlayers();
-        loadSecondSoul();
+        //loadSecondSoul();
 		loadAllAthletics();
 		loadAllAthleticsEvent();
 		unloadEquipments();
@@ -1244,8 +1244,8 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
         UInt8 lvl_max = 0;
-		DBFighterObj specfgtobj;
-		if(execu->Prepare("SELECT `id`, `playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3` FROM `fighter` ORDER BY `playerId`", specfgtobj) != DB::DB_OK)
+		DBFighterAndSecondSoul specfgtobj;
+		if(execu->Prepare("SELECT `id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1280,6 +1280,20 @@ namespace GObject
                 }
 
                 lvPlayer->push_back(pl->getId());
+            }
+
+            if(specfgtobj.fighterId != 0 && specfgtobj.level >= 60)
+            {
+                SecondSoul* secondSoul = new SecondSoul(fgt2, specfgtobj.cls, specfgtobj.practiceLevel, specfgtobj.stateExp, specfgtobj.stateLevel);
+                StringTokenizer tokenizer(specfgtobj.skills_2nd, ",");
+                int idx = 0;
+                for(size_t j = 0; j < tokenizer.count(); ++ j)
+                {
+                    UInt16 skillId = atoi(tokenizer[j].c_str());
+                    secondSoul->setSoulSkill(idx, skillId);
+                    ++ idx;
+                }
+                fgt2->setSecondSoul(secondSoul);
             }
 
 			fgt2->setPotential(specfgtobj.potential, false);
