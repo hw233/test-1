@@ -804,11 +804,11 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			{
 				float def;
                 float magdef;
-                float toughFator = (pr ? area_target->getTough(bf) : 1.0f);
+                float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
-                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel()) * toughFator;
+                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor);
                     float magatkreduce = area_target->getMagAtkReduce();
                     if(magatkreduce && magdmg > 0)
                         magdmg -= factor * magatk * magatkreduce / 100;
@@ -821,7 +821,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(atk)
                 {
                     def = area_target->getDefend();
-                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel()) * toughFator;
+                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor);
 
                     float atkreduce = area_target->getAtkReduce();
                     if(atkreduce && dmg > 0)
@@ -988,8 +988,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					//float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
 					bool pr = target_fighter->calcPierce(bf);
-                    float toughFator = (pr ? area_target->getTough(bf) : 1.0f);
-					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel()) * toughFator;
+                    float toughFactor = pr ? bf->getTough(target_fighter) : 1.0f;
+					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor);
 
                     float atkreduce = bf->getAtkReduce();
                     if(atkreduce && dmg2 > 0)
@@ -4740,7 +4740,7 @@ bool BattleSimulator::applyFighterHP( UInt8 side, GObject::Player * player, bool
 			UInt32 currhp = pd.fighter->getCurrentHP();
 			if(currhp == 0)
 				currhp = oldmaxhp;
-			UInt32 newhp = hp * oldmaxhp / bf->getMaxHP();
+			UInt32 newhp = (float)hp / bf->getMaxHP() * oldmaxhp;
 			if(newhp > currhp)
 				newhp = currhp;
 			if(useRegen)

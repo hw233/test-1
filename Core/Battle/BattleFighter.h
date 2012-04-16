@@ -138,7 +138,7 @@ public:
 	float getCounter(BattleFighter* defgt);
 	float getMagRes(BattleFighter* defgt);
 	float getTough(BattleFighter* defgt);
-	inline UInt32 getMaxHP() {Int32 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
+	inline UInt32 getMaxHP() {Int64 ret = _maxhp + _maxhpAdd + _maxhpAdd2; return (ret > 0 ? ret : 0);}
 	inline Int32 getAction() {Int32 ret = _maxAction + _maxActionAdd + _maxActionAdd2; return (ret > 0 ? ret : 0);}
 	inline const GData::Formation::GridEffect * getFormationEffect() const {return _formEffect;}
 
@@ -195,7 +195,7 @@ public:
     inline UInt8& getAtkReduceLast() { return _atkreduce_last;}
     inline UInt8& getMagAtkReduceLast() { return _magatkreduce_last;}
 
-	inline UInt32 getLostHP() { Int32 tmp = _maxhp + _maxhpAdd; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
+	inline UInt32 getLostHP() { Int64 tmp = _maxhp + _maxhpAdd + _maxhpAdd2; UInt32 mhp = (tmp > 0 ? tmp : 0); if(mhp > _hp) return mhp - _hp; return 0; }
 
 	UInt32 regenHP(UInt32 u, bool weak = false);
 
@@ -377,7 +377,8 @@ private:
 	float _attack, _magatk, _defend, _magdef, _hitrate, _evade;
     float _critical, _criticaldmg, _pierce, _counter, _magres;
     float _atkreduce, _magatkreduce;
-	Int32 _maxhp, _maxAction;
+	UInt32 _maxhp;
+    Int32 _maxAction;
 	float _attackAdd, _magAtkAdd, _defAdd, _magDefAdd, _hitrateAdd, _evadeAdd;
     float _criticalAdd, _criticalDmgAdd, _pierceAdd, _counterAdd, _magResAdd, _toughAdd;
 	Int32 _maxhpAdd, _maxActionAdd;
