@@ -804,10 +804,11 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 			{
 				float def;
                 float magdef;
+                float toughFator = (pr ? area_target->getTough(bf) : 1.0f);
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
-                    magdmg = (pr ? static_cast<UInt32>(factor * magatk) : _formula->calcDamage(factor * magatk, magdef, bf->getLevel()));
+                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel()) * toughFator;
                     float magatkreduce = area_target->getMagAtkReduce();
                     if(magatkreduce && magdmg > 0)
                         magdmg -= factor * magatk * magatkreduce / 100;
@@ -820,7 +821,7 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(atk)
                 {
                     def = area_target->getDefend();
-                    dmg = (pr ? static_cast<UInt32>(factor * atk) : _formula->calcDamage(factor * atk, def, bf->getLevel()));
+                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel()) * toughFator;
 
                     float atkreduce = area_target->getAtkReduce();
                     if(atkreduce && dmg > 0)
@@ -987,7 +988,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					//float atk = target_fighter->getAttack();
 					float def = bf->getDefend();
 					bool pr = target_fighter->calcPierce(bf);
-					UInt32 dmg2 = (pr ? static_cast<UInt32>(atk) : _formula->calcDamage(atk, def, target_fighter->getLevel()));
+                    float toughFator = (pr ? area_target->getTough(bf) : 1.0f);
+					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel()) * toughFator;
 
                     float atkreduce = bf->getAtkReduce();
                     if(atkreduce && dmg2 > 0)
@@ -2110,8 +2112,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         return 0;
     }
 
-    // 雪球
-    if(SKILL_ID(skill->getId()) == 137)
+    // 雪球-137 小蜘蛛-434
+    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434)
     {
         static UInt8 skill_prob_137[10][3] = {
             {0, 0, 0},
@@ -2131,16 +2133,21 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         StatusChange scList[25];
 
         UInt8 cnt = 0;
-        UInt8 level = SKILL_LEVEL(skill->getId());
-        if(level > 9)
-            level = 9;
-        UInt8 roll = _rnd(100);
-        if(skill_prob_137[level][0] > roll)
+        if(SKILL_ID(skill->getId()) == 137)
+        {
+            UInt8 level = SKILL_LEVEL(skill->getId());
+            if(level > 9)
+                level = 9;
+            UInt8 roll = _rnd(100);
+            if(skill_prob_137[level][0] > roll)
+                cnt = 1;
+            else if(skill_prob_137[level][1] > roll)
+                cnt = 2;
+            else if(skill_prob_137[level][2] > roll)
+                cnt = 3;
+        }
+        else
             cnt = 1;
-        else if(skill_prob_137[level][1] > roll)
-            cnt = 2;
-        else if(skill_prob_137[level][2] > roll)
-            cnt = 3;
 
         for(UInt8 i = 0; i < cnt; ++i)
         {
@@ -2162,7 +2169,11 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 				break;
 			bf->addFlag(BattleFighter::Mirrored);
 			UInt8 pos = posList[_rnd(posCount)];
-            GObject::Fighter * fgt = globalFighters[5679];
+            GObject::Fighter * fgt = NULL;
+            if(SKILL_ID(skill->getId()) == 137)
+                fgt = globalFighters[5679];
+            else
+                fgt = globalFighters[6011];
             if(fgt == NULL)
                 break;
 			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);
@@ -2175,7 +2186,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             
             defList[i].pos = pos + 25;
             defList[i].damType = e_Summon;
-            defList[i].damage = 5679;
+            defList[i].damage = fgt->getId();
             defList[i].leftHP = newf->getHP();
             ++defCount;
 
@@ -2661,17 +2672,51 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             || skill->effect->magdam || skill->effect->magdamP || skill->effect->addmag
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
     {
-        //道、万剑诀
-        if(SKILL_ID(skill->getId()) == 27)
+        //儒、元磁神雷
+        if(SKILL_ID(skill->getId()) == 140)
         {
+            static UInt8 skill_prob_140[10][4] = {
+                {0, 0, 0},
+                {75, 100, 101, 102},
+                {65, 100, 101, 102},
+                {55, 100, 101, 102},
+                {45, 100, 101, 102},
+                {35, 85,  95,  100},
+                {25, 70,  90,  100},
+                {15, 55,  85,  100},
+                {5,  40,  80,  100},
+                {0,  25,  75,  100}
+            };
+            UInt8 cnt = 0;
+            UInt8 level = SKILL_LEVEL(skill->getId());
+            if(level > 9)
+                level = 9;
+            UInt8 roll = _rnd(100);
+            if(skill_prob_140[level][0] > roll)
+                cnt = 0;
+            else if(skill_prob_140[level][1] > roll)
+                cnt = 1;
+            else if(skill_prob_140[level][2] > roll)
+                cnt = 2;
+            else if(skill_prob_140[level][3] > roll)
+                cnt = 3;
+            for(int i = 0; i < cnt; ++ i)
+            {
+                dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount);
+            }
             dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
-
+ 
+        }
+        //道、万剑诀
+        else if(SKILL_ID(skill->getId()) == 27)
+        {
             int cnt = 8;
             for(int i = 0; i < cnt; ++ i)
             {
                 BattleFighter* rnd_bf = getRandomFighter(target_side, NULL, 0);
                 dmg += attackOnce(bf, cs, pr, skill, rnd_bf, 1, defList, defCount, scList, scCount);
             }
+            dmg += attackOnce(bf, cs, pr, skill, _objs[target_side][target_pos], 1, defList, defCount, scList, scCount, 0, NULL, atkAct);
         }
         //儒、青莲剑歌
         else if(SKILL_ID(skill->getId()) == 9)
