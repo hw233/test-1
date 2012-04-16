@@ -106,7 +106,7 @@ public:
 	float calcHP(Battle::BattleFighter *);
 	float calcAction(Battle::BattleFighter *);
 
-	float calcDamage(float, float, float);
+	float calcDamage(float, float, float, float);
     float calcPracticeInc(GObject::Fighter *);
     float calcClanTechAddon(UInt16 id, UInt8 lvl);
 	lua_tinker::table getFactor(UInt8, UInt8, UInt8);
