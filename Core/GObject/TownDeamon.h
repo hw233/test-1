@@ -27,7 +27,6 @@ struct DeamonMonster
     UInt32 npcId;
     UInt32 itemId;
     UInt32 itemNum;
-    bool inChallenge;
 
     DeamonMonster()
     {
@@ -35,7 +34,6 @@ struct DeamonMonster
         npcId = 0;
         itemId = 0;
         itemNum = 0;
-        inChallenge = false;
     }
 };
 
@@ -56,6 +54,7 @@ struct DeamonPlayerData
     UInt32 itemNum;
     UInt16 quitLevel;
     Player* attacker;
+    bool inChallenge;
 
     DeamonPlayerData()
     {
@@ -74,6 +73,7 @@ struct DeamonPlayerData
         itemNum = 0;
         quitLevel = 0;
         attacker = NULL;
+        inChallenge = false;
     }
 
     UInt32 calcAccLeft();
