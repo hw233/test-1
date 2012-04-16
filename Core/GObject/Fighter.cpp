@@ -3739,16 +3739,16 @@ bool Fighter::changeSecondSoulClass(UInt8 cls)
 void Fighter::getAttrExtraEquip(Stream& st)
 {
     checkDirty();
+    GData::AttrExtra& attr = _attrExtraEquip;
+	st << attr.strength << attr.physique << attr.agility << attr.intelligence << attr.will << attr.soul << attr.aura;
+	st << attr.auraMax << attr.attack << attr.magatk << attr.defend << attr.magdef << attr.hp << attr.tough << attr.action;
+	st << attr.hitrate << attr.evade << attr.critical << attr.criticaldmg << attr.pierce << attr.counter << attr.magres;
 
-	st << strength << physique << agility << intelligence << will << soul << aura;
-	st << auraMax << attack << magatk << defend << magdef << hp << tough << action;
-	st << hitrate << evade << critical << criticaldmg << pierce << counter << magres;
+	st << attr.strengthP << attr.physiqueP << attr.agilityP << attr.intelligenceP << attr.willP << attr.soulP << attr.auraP;
+    st << attr.auraMaxP << attr.attackP << attr.magatkP << attr.defendP << attr.magdefP << attr.hpP << attr.toughP << attr.actionP;
+	st << attr.hitrateP << attr.evadeP << attr.criticalP << attr.criticaldmgP << attr.pierceP << attr.counterP << attr.magresP;
 
-	st << strengthP << physiqueP << agilityP << intelligenceP << willP << soulP << auraP
-    st << auraMaxP << attackP << magatkP << defendP << magdefP << hpP << toughP << actionP;
-	st << hitrateP << evadeP << criticalP << criticaldmgP << pierceP << counterP << magresP;
-
-    st << hitrlvl << evdlvl << crilvl << pirlvl << counterlvl << mreslvl << toughlvl;
+    st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl;
 }
 
 }
