@@ -312,7 +312,7 @@ void WBoss::flee()
 void WBoss::reward(Player* player)
 {
     static UInt16 trumpFrag[] = {226,90,225,227,270,298};
-    static UInt16 gems[] = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142};
+    static UInt16 gems[] = {5003,5013,5023,5033,5043,5053,5063,5073,5083,5093,5103,5113,5123,5133,5143,};
 
     size_t sz = m_atkinfo.size();
     if (!sz) return;
