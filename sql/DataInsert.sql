@@ -138,10 +138,6 @@ LOCK TABLES `team_copy` WRITE;
 source teamcopy
 UNLOCK TABLES;
 
-LOCK TABLES `talent` WRITE;
-source talent
-UNLOCK TABLES;
-
 LOCK TABLES `soul_skill_template` WRITE;
 source soulskilltemplate
 UNLOCK TABLES;
