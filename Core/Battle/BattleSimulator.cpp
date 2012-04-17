@@ -2647,9 +2647,9 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
     {
         //儒、元磁神雷
-        if(SKILL_ID(skill->getId()) == 140)
+        if(SKILL_ID(skill->getId()) == 122)
         {
-            static UInt8 skill_prob_140[10][4] = {
+            static UInt8 skill_prob_122[10][4] = {
                 {0, 0, 0},
                 {75, 100, 101, 102},
                 {65, 100, 101, 102},
@@ -2666,13 +2666,13 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
             if(level > 9)
                 level = 9;
             UInt8 roll = _rnd(100);
-            if(skill_prob_140[level][0] > roll)
+            if(skill_prob_122[level][0] > roll)
                 cnt = 0;
-            else if(skill_prob_140[level][1] > roll)
+            else if(skill_prob_122[level][1] > roll)
                 cnt = 1;
-            else if(skill_prob_140[level][2] > roll)
+            else if(skill_prob_122[level][2] > roll)
                 cnt = 2;
-            else if(skill_prob_140[level][3] > roll)
+            else if(skill_prob_122[level][3] > roll)
                 cnt = 3;
             for(int i = 0; i < cnt; ++ i)
             {
