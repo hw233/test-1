@@ -1449,7 +1449,7 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
                 else if(fdmg > 0 && bf->getSide() != target_side)
                 {
                     UInt8 immune = bo->getImmune();
-                    if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(skill->effect->state))
+                    if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(0x10))
                     {
                        defList[defCount].damType = e_Immune;
                     }
@@ -1505,25 +1505,8 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
         }
 
         // 免疫降灵气
-        bool dostatus = true;
-        if(skill->effect->state == 64)
-        {
-            BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
-            if(NULL == bo)
-                continue;
-
-            UInt8 immune = bo->getImmune();
-            if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(skill->effect->state))
-            {
-                dostatus = false;
-                defList[defCount].damType = e_Immune;
-                defList[defCount].pos = target_pos + (activeFlag ? 0 : 25);
-                defList[defCount].damage = 0;
-                defList[defCount].leftHP = bo->getHP();
-                ++ defCount;
-            }
-        }
-        if(dostatus)
+        //bool dostatus = true;
+        //if(dostatus)
         {
             bool self = false;
             bool flag = ((target_side == bf->getSide()) ? activeFlag : !activeFlag);
@@ -1531,24 +1514,28 @@ void BattleSimulator::doSkillAtk2(bool activeFlag, std::vector<AttackAct>* atkAc
             {
                 for(UInt8 pos = 0; pos < 25; ++ pos)
                 {
-                    doSkillStatus(flag, bf, skill, target_side, pos, 1, scList, scCount, self);
+                    bool ifDecAura = isImmuneDecAura(skill, target_side, pos, defList, defCount);
+                    doSkillStatus(flag, bf, skill, target_side, pos, 1, scList, scCount, self, ifDecAura);
                 }
             }
             else if(0 == skill->area)
             {
-                doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self);
+                bool ifDecAura = isImmuneDecAura(skill, target_side, target_pos, defList, defCount);
+                doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self, ifDecAura);
             }
             else
             {
                 BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
                 if(bo != NULL && bo->getHP() != 0 && bo->isChar())
                 {
-                    doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self);
+                    bool ifDecAura = isImmuneDecAura(skill, target_side, target_pos, defList, defCount);
+                    doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self, ifDecAura);
                 }
 
                 for(int i = 0; i < apcnt; ++ i)
                 {
-                    doSkillStatus(flag, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self);
+                    bool ifDecAura = isImmuneDecAura(skill, target_side, ap[i].pos, defList, defCount);
+                    doSkillStatus(flag, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self, ifDecAura);
                 }
 
             }
@@ -2050,7 +2037,7 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
 
     if(1 == skill->area)
     {
-        target_pos = 0;
+        target_pos = getPossibleTarget(bf->getSide(), bf->getPos());
         cnt = 25;
     }
     else if( 0 == skill->target )
@@ -2147,7 +2134,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
                 cnt = 3;
         }
         else
-            cnt = 1;
+            cnt = 2;
 
         for(UInt8 i = 0; i < cnt; ++i)
         {
@@ -2243,25 +2230,8 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
     memset(defList, 0, sizeof(defList));
     // 免疫降灵气
-    bool dostatus = true;
-    if(skill->effect->state == 64)
-    {
-        BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
-        if(NULL == bo)
-            return 0;
-
-        UInt8 immune = bo->getImmune();
-        if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(skill->effect->state))
-        {
-            dostatus = false;
-            defList[defCount].damType = e_Immune;
-            defList[defCount].pos = target_pos;
-            defList[defCount].damage = 0;
-            defList[defCount].leftHP = bo->getHP();
-            ++ defCount;
-        }
-    }
-    if(dostatus)
+    //bool dostatus = true;
+    //if(dostatus)
     {
         bool self = false;
         bool flag = ((target_side == bf->getSide()) ? false : true);
@@ -2269,24 +2239,28 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         {
             for(UInt8 pos = 0; pos < 25; ++ pos)
             {
-                doSkillStatus(flag, bf, skill, target_side, pos, 1, scList, scCount, self);
+                bool ifDecAura = isImmuneDecAura(skill, target_side, pos, defList, defCount);
+                doSkillStatus(flag, bf, skill, target_side, pos, 1, scList, scCount, self, ifDecAura);
             }
         }
         else if( 0 == skill->area )
         {
-            doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self);
+            bool ifDecAura = isImmuneDecAura(skill, target_side, target_pos, defList, defCount);
+            doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self, ifDecAura);
         }
         else
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo != NULL && bo->getHP() != 0 && bo->isChar())
             {
-                doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self);
+                bool ifDecAura = isImmuneDecAura(skill, target_side, target_pos, defList, defCount);
+                doSkillStatus(flag, bf, skill, target_side, target_pos, 1, scList, scCount, self, ifDecAura);
             }
 
             for(int i = 0; i < apcnt; ++ i)
             {
-                doSkillStatus(flag, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self);
+                bool ifDecAura = isImmuneDecAura(skill, target_side, ap[i].pos, defList, defCount);
+                doSkillStatus(flag, bf, skill, target_side, ap[i].pos, 1, scList, scCount, self, ifDecAura);
             }
 
         }
@@ -3005,7 +2979,7 @@ void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* 
 }
 
 
-void BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt ,StatusChange* scList, size_t& scCount, bool& self)
+void BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt ,StatusChange* scList, size_t& scCount, bool& self, bool ifDecAura)
 {
     if(NULL == skill || bf == NULL)
         return;
@@ -3035,7 +3009,7 @@ void BattleSimulator::doSkillStatus(bool activeFlag, BattleFighter* bf, const GD
                     tmpself = true;
                 }
             }
-            else
+            else if(!ifDecAura)
             {
                 setStatusChange(bf, target_side, bo == NULL ? 0 : bo->getPos(), cnt, skill, e_stAura, value, skill->last, scList, scCount, activeFlag);
             }
@@ -5423,6 +5397,40 @@ void BattleSimulator::releaseWeak(BattleFighter* bo, DefStatus* defList, size_t&
 
 	    bo->setWeakRound(weak);
 	}
+}
+
+bool BattleSimulator::isImmuneDecAura(const GData::SkillBase* skill, int target_side, int target_pos, DefStatus* defList, size_t& defCount)
+{
+    if(NULL == skill)
+        return false;
+
+    if(skill->effect == NULL)
+        return false;
+
+    BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+    if(NULL == bo)
+        return false;
+
+    bool fimm = false;
+    if(skill->effect->state & 0x40)
+    {
+        BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
+        if(NULL == bo)
+            return false;
+
+        UInt8 immune = bo->getImmune();
+        if((skill->effect->state & immune) && SKILL_LEVEL(skill->getId()) <= bo->getImmuneLevel(0x40))
+        {
+            fimm = true;
+            defList[defCount].damType = e_Immune;
+            defList[defCount].pos = target_pos;
+            defList[defCount].damage = 0;
+            defList[defCount].leftHP = bo->getHP();
+            ++ defCount;
+        }
+    }
+
+    return fimm;
 }
 
 }
