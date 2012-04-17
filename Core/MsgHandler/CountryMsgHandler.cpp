@@ -77,6 +77,7 @@ MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 MSG_REG(GameMsgHdr, OnGetHeroMemoAward);
+MSG_REG(GameMsgHdr, OnGetShuoShuoAward);
 MSG_REG(GameMsgHdr, OnGetCFriendAward);
 MSG_REG(GameMsgHdr, OnGetOfflineExp);
 
@@ -263,5 +264,6 @@ MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
 #ifdef _FB
 MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
 #endif
+MSG_REG_2(GameMsgHdr, 0x243, OnShuoShuo);
 
 MSG_HANDLER_END()

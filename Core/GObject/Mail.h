@@ -41,7 +41,7 @@ public:
 		UInt32 count;
 	};
 public:
-	bool takeIt(Player *);
+	bool takeIt(Player *, bool = false);
 	UInt16 push(UInt16, UInt16);
 	void makeInfo(Stream& st);
 private:

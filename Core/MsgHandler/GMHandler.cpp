@@ -2658,7 +2658,10 @@ void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args
 }
 void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
+#ifdef _FB
+#else
     std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
     jsonParser(json, -1);
+#endif
 }
 

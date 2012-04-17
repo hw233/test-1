@@ -1,4 +1,7 @@
 
+#ifdef _FB
+#else
+
 #include "Config.h"
 #include "JsonParser.h"
 #include "GObject/Player.h"
@@ -17,7 +20,7 @@ extern "C" {
 #define EMPTY "{head:{},body:{}}"
 
 #define EUNKNOW (-100)
-#define EPLAYER_NOT_EXIST (-101)
+#define EPLAYER_NOT_EXIST (1)
 
 #define GET_STRING(obj, key, dst, maxlen) \
 { \
@@ -50,7 +53,7 @@ struct JsonHead
 
 bool parseHead(struct json_object* obj, JsonHead* head)
 {
-    if (!obj)
+    if (!obj || !head)
         return false;
 
     struct json_object* hdr = json_object_object_get(obj, "head");
@@ -181,19 +184,12 @@ void jsonParser(std::string& json, int sessionid)
     std::string err;
 
     JsonHead head = {0,};
+    struct json_object* obj = NULL;
     struct json_object* body = NULL;
 
     struct json_object* retobj = NULL;
     struct json_object* rethead = NULL;
     struct json_object* retbody = NULL;
-
-    struct json_object* obj = json_tokener_parse(json.c_str());
-    if (!parseHead(obj, &head))
-        goto _error;
-
-    body = json_object_object_get(obj, "body");
-    if (!body)
-        goto _error;
 
     retobj = json_object_new_object();
     if (!retobj)
@@ -206,6 +202,18 @@ void jsonParser(std::string& json, int sessionid)
     retbody = json_object_new_object();
     if (!retbody)
         goto _error1;
+
+    obj = json_tokener_parse(json.c_str());
+    if (!parseHead(obj, &head))
+    {
+        ++head.cmd; // XXX:
+        err += "request error.";
+        goto _error;
+    }
+
+    body = json_object_object_get(obj, "body");
+    if (!body)
+        goto _error;
 
     switch (head.cmd)
     {
@@ -256,4 +264,5 @@ _error1:
 
     return;
 }
+#endif
 

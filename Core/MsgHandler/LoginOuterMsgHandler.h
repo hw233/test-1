@@ -1230,7 +1230,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		else
 		{
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1300,7 +1300,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 		else
 		{
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1449,7 +1449,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
             if (!pf || (pf && player->isOnline() && atoi(player->getDomain().c_str())==pf))
             {
                 GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-                GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
                 if(pmail != NULL)
                 {
                     GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1521,7 +1521,7 @@ void MailVIPFromBs(LoginMsgHdr &hdr,const void * data)
                 continue;
 
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1987,12 +1987,15 @@ void PwdReset(LoginMsgHdr &hdr, const void * data)
 
 void JasonParse(LoginMsgHdr& hdr, const void* data)
 {
+#ifdef _FB
+#else
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     std::string json;
     br >> json;
     jsonParser(json, hdr.sessionID);
+#endif
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

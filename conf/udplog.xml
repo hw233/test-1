@@ -51,7 +51,7 @@
 		<item id="28" typeinfo="syslog" />
 		<item id="31" typeinfo="guide" />
 		<item id="32" typeinfo="inventory" />
-		<item id="33" typeinfo="bac2" />
+		<item id="33" typeinfo="currency" />
 		<item id="34" typeinfo="bac3" />
 		<item id="35" typeinfo="paypv" />
 		<item id="36" typeinfo="feed" />

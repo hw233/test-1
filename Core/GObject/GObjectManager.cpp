@@ -54,6 +54,7 @@
 #include "HoneyFall.h"
 #include "TownDeamon.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
 #include <fcntl.h>
@@ -198,6 +199,7 @@ namespace GObject
         LoadTownDeamon();
         InitMoneyLog();
         LoadHeroMemo();
+        LoadShuoShuo();
         LoadCFriendAwards();
         LoadWBoss();
         LoadDiscount();
@@ -3678,6 +3680,28 @@ namespace GObject
 		lc.finalize();
 
 		globalPlayers.enumerate(heromemo_loaded, 0);
+        return true;
+    }
+
+    bool GObjectManager::LoadShuoShuo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Shuo Shuo Data");
+        Player* pl = 0;
+		DBShuoShuo ss;
+		if(execu->Prepare("SELECT `playerId`, `updateTime`, `shuoshuo` FROM `shuoshuo`", ss)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			pl = globalPlayers[ss.playerId];
+            if (!pl)
+                continue;
+            pl->GetShuoShuo()->loadFromDB(ss.update, ss.ss.c_str());
+            pl = 0;
+        }
+		lc.finalize();
         return true;
     }
 

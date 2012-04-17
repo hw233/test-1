@@ -50,7 +50,9 @@ local rewardNeedPoint = {
     [8] = 80,
     [16] = 100,
     [32] = 120,
-    [64] = 160,
+    [64] = 140,
+    [128] = 160,
+    [256] = 180,
 }
 --一天活跃度的最大值
 local maxActivity = {
@@ -164,7 +166,6 @@ function GetAtyReward(player, flag)
        return;
     end
 
-
     local package = player:GetPackage();
     if package:IsFull() then
         player:sendMsgCode(2, 1011, 0);
@@ -202,7 +203,7 @@ function GetAtyReward(player, flag)
             package:AddItem(401, 2, true, false, 24 );
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x2");
         end
-
+        player:OnShuoShuo(1)
     end
 
     if flag == 32 then
@@ -216,7 +217,15 @@ function GetAtyReward(player, flag)
         end
 
     end
-    if flag == 64 then
+
+    if flag == 64 then -- 140
+        package:Add(1526, 1 , true, false , 24);
+        if rand <= 20 then
+            package:AddItem(514, 1, true, false, 24);
+        end
+    end
+
+    if flag == 128 then -- 160
         package:AddItem(30, 2 , true, false , 24);
         package:AddItem(509, 1 , true, false , 24)
         if rand <= 20 then
@@ -226,8 +235,20 @@ function GetAtyReward(player, flag)
             package:AddItem(401, 3, true, false, 24 );
             Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x3");
         end
-
     end
+
+    if flag == 256 then -- 180
+        package:AddItem(30, 2 , true, false , 24);
+        package:AddItem(509, 1 , true, false , 24)
+        if rand <= 20 then
+            package:AddItem(515, 1, true, false, 24 );
+        end
+         if  isChristmas == true then
+            package:AddItem(401, 3, true, false, 24 );
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x3");
+        end
+    end
+
     mgr:AddRewardFlag(flag,true);
 end
 

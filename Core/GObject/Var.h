@@ -108,6 +108,11 @@ namespace GObject
         VAR_DISCOUNT_1 = 80, // 3折区购买次数
         VAR_DISCOUNT_2, // 5折区购买次数
         VAR_DISCOUNT_3, // 8折区购买次数
+        VAR_CTSLANDING, // 创建角色前七天连续登陆记录
+        VAR_CTSAWARD, // 七天登陆奖励
+        VAR_CLAWARD, // 七天连续登陆奖励
+        VAR_CL3DAY, // 七天连接三天登陆奖励
+        VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
 
         VAR_MAX,
     };
@@ -212,6 +217,11 @@ namespace GObject
             REGISTER_VAR(VAR_DISCOUNT_1, CYCLE_WEEK);
             REGISTER_VAR(VAR_DISCOUNT_2, CYCLE_WEEK);
             REGISTER_VAR(VAR_DISCOUNT_3, CYCLE_WEEK);
+            REGISTER_VAR(VAR_CTSLANDING, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTSAWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAWARD, CYCLE_DAY);
+            REGISTER_VAR(VAR_CL3DAY, CYCLE_NONE);
+            REGISTER_VAR(VAR_RC7DAYRECHARGE, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

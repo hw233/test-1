@@ -24,6 +24,7 @@
 #include "Script/BattleFormula.h"
 #include "GObject/Clan.h"
 #include "GObject/DCLogger.h"
+#include "GObject/ShuoShuo.h"
 
 //Login thread -> Country thread
 void PlayerEnter( GameMsgHdr& hdr, const void * data )
@@ -611,6 +612,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
         player->resetThanksgiving();
     if (World::_blueactiveday)
         player->onBlueactiveday();
+    player->GetShuoShuo()->reset();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -792,7 +794,7 @@ void OnGoldRecharge( GameMsgHdr& hdr, const void * data )
         const char* id = "29999";
         snprintf(gold, 32, "%u", recharge->gold);
         snprintf(nno, 256, "%s#%s", recharge->uint, recharge->no);
-        player->udpLog(nno, recharge->money, gold, id, "", "", "pay");
+        player->udpLog(nno, recharge->money, gold, id, "", "pay", "pay");
 
 #ifdef _FB
 #else
@@ -1281,6 +1283,12 @@ void OnHeroMemo( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
     UInt8* msg = (UInt8*)(data);
     player->OnHeroMemo(msg[0], msg[1], msg[2], msg[3]);
+}
+void OnShuoShuo( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 idx = *(UInt8*)(data);
+    player->OnShuoShuo(idx);
 }
 
 void OnTownDeamonlBeAttack( GameMsgHdr& hdr, const void* data )

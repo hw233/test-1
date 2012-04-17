@@ -90,6 +90,7 @@ namespace Script
 		lua_tinker::def(_L, "getFoolsDay", GObject::World::getFoolsDay);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getCarnival", GObject::World::getCarnival);
+		lua_tinker::def(_L, "getRC7Day", GObject::World::getRC7Day);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -203,6 +204,7 @@ namespace Script
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
 		CLASS_DEF(Player, getPlatform);
+		CLASS_DEF(Player, OnShuoShuo);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -952,6 +954,11 @@ namespace Script
 		return Call<bool>("getHeroMemoAward", player, idx, soul);
 	}
 
+	bool GameActionLua::getShuoShuoAward(Player* player, UInt8 idx)
+	{
+		return Call<bool>("getShuoShuoAward", player, idx);
+	}
+
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)
 	{
 		return Call<bool>("getActivateAttrResult", lastActivateCount, quality);
@@ -1030,5 +1037,13 @@ namespace Script
     UInt32  GameActionLua::GetMaxActivity(UInt32 vip)
     {
         return Call<UInt32>(  "GetMaxActivity", vip);
+    }
+    void GameActionLua::onCLLoginReward(Player* pl, UInt8 cts)
+    {
+        return Call<void>(  "onClanBattleAttend", pl, cts);
+    }
+    void GameActionLua::onCL3DayReward(Player* pl)
+    {
+        return Call<void>(  "onCL3DayReward", pl);
     }
 }

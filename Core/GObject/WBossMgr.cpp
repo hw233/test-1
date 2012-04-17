@@ -12,6 +12,7 @@
 #include "Script/GameActionLua.h"
 #include "MapCollection.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 #include "AthleticsRank.h"
 
 namespace GObject
@@ -19,7 +20,7 @@ namespace GObject
 
 const UInt8 WBOSS_NUM = 7;
 const UInt8 WBOSS_ATTKMAX = 10;
-const float WBOSS_BASE_TIME = 600.f;
+const float WBOSS_BASE_TIME = 300.f;
 const float WBOSS_HP_FACTOR = 1.f;
 const float WBOSS_ATK_FACTOR = .5f;
 const UInt8 WBOSS_BASE_LVL = 20;
@@ -117,7 +118,7 @@ static UInt32 getExp(UInt8 lvl)
 
 bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool final)
 {
-    static UInt32 sendflag = 3;
+    static UInt32 sendflag = 7;
 
     ++sendflag;
 
@@ -191,7 +192,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                 if (exp < 1000)
                     exp = 1000;
                 pl->pendExp(exp);
-                if (!(sendflag % 4))
+                if (!(sendflag % 8))
                     sendDmg(damage);
 
                 AttackInfo info(pl, damage);
@@ -223,7 +224,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     attackPre = 0;
                     reward(pl);
                     res = true;
-                    if (sendflag % 4)
+                    if (sendflag % 8)
                         sendHp();
                     updateLastDB(TimeUtil::Now());
                 }
@@ -237,7 +238,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     SYSMSG_BROADCASTV(548, pl->getCountry(), pl->getName().c_str(), nflist[0].fighter->getId(), newPercent);
                     _percent = newPercent;
                 }
-                if (!(sendflag % 4))
+                if (!(sendflag % 8))
                     sendHp();
             }
             else
@@ -328,11 +329,17 @@ void WBoss::reward(Player* player)
     std::set<UInt32> comp;
     std::set<UInt32> breath;
     std::set<UInt32> gem;
+    std::set<UInt32> _503;
+    std::set<UInt32> _515;
+    std::set<UInt32> _507;
+    std::set<UInt32> _509;
 
     UInt32 luckynum = (float)10 * sz / 100;
-    getRandList(sz, luckynum, comp); // 补髓丹
-    getRandList(sz, luckynum, breath); // 凝神丹
     getRandList(sz, luckynum, gem); // 宝石
+
+    luckynum = (float)5 * sz / 100;
+    getRandList(sz, luckynum, breath); // 凝神丹
+    getRandList(sz, luckynum, comp); // 补髓丹
 
     if (World::_wday == 7)
         tlvl = uRand(sizeof(trumpFrag)/sizeof(UInt16));
@@ -398,18 +405,42 @@ void WBoss::reward(Player* player)
                 MailPackage::MailItem item[] = {{gems[idx],1},};
                 (*i).player->sendMailItem(562, 563, item, 1);
             }
+
+            if (_503.find(j) != _503.end())
+            {
+                MailPackage::MailItem item[] = {{503,1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
+            }
+
+            if (_515.find(j) != _515.end())
+            {
+                MailPackage::MailItem item[] = {{515,1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
+            }
+
+            if (_507.find(j) != _507.end())
+            {
+                MailPackage::MailItem item[] = {{507,1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
+            }
+
+            if (_509.find(j) != _509.end())
+            {
+                MailPackage::MailItem item[] = {{509,1},};
+                (*i).player->sendMailItem(562, 563, item, 1);
+            }
         }
 
-        MailPackage::MailItem item[] = {{55,1},{MailPackage::Tael,500}};
+        MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000}};
         (*i).player->sendMailItem(568, 569, item, 2);
         GameAction()->doAty((*i).player, AtyBoss, 0, 0);
     }
 
     if (player)
     {
-        MailPackage::MailItem item[] = {{56,5},{MailPackage::Tael,10000},};
+        MailPackage::MailItem item[] = {{56,5},{MailPackage::Tael,20000},};
         player->sendMailItem(566, 567, item, 2);
-        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 10000);
+        SYSMSG_BROADCASTV(559, player->getCountry(), player->getName().c_str(), 56, 5, 20000);
     }
     m_atkinfo.clear();
 }
@@ -461,6 +492,7 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 1);
     if (!m_final)
         pl->OnHeroMemo(MC_SLAYER, MD_LEGEND, 0, 2);
+    pl->OnShuoShuo(SS_WBOSS);
 
     if (!m_final)
     {
@@ -537,28 +569,31 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (m_final && nflist[0].fighter && !m_extra && m_last)
     {
         UInt32 exthp = 0;
-        Int16 extatk = 0;
-        Int16 extmagatk = 0;
+        Int32 extatk = 0;
+        Int32 extmagatk = 0;
 
-        Int16 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
-        Int16 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
+        Int32 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
+        Int32 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
 
         if (m_last <= WBOSS_BASE_TIME)
         {
             exthp = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_HP_FACTOR * ohp;
-            exthp += ohp;
+            ohp += exthp;
         }
         else
         {
             exthp = ((float)m_last/WBOSS_BASE_TIME - (float)1) * WBOSS_HP_FACTOR * ohp;
-            if (exthp >= ohp)
-                exthp -= ohp;
-            if (exthp < 20000000)
-                exthp = 20000000;
+            if (ohp >= exthp)
+                ohp -= exthp;
+            if (ohp < 20000000)
+                ohp = 20000000;
         }
 
-        setHP(exthp);
-        nflist[0].fighter->setBaseHP(exthp);
+        if (ohp > 350000000)
+            ohp = 350000000;
+
+        setHP(ohp);
+        nflist[0].fighter->setBaseHP(ohp);
 
         extatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * atk;
         nflist[0].fighter->addExtraAttack(extatk);

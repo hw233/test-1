@@ -23,6 +23,7 @@
 #include "AttainMgr.h"
 #include "HoneyFall.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -536,12 +537,16 @@ namespace GObject
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
+                if (fromWhere != FromNpcBuy && GData::store.getPrice(typeId))
+                    udpLog(item->getClass(), typeId, num, 0, "add");
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
                 if (typeId == 1224)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+                if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+                    m_Owner->OnShuoShuo(SS_CITTA);
 				return item;
 			}
 			return NULL;
@@ -557,6 +562,8 @@ namespace GObject
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+                if (fromWhere != FromNpcBuy && GData::store.getPrice(typeId))
+                    udpLog(item->getClass(), typeId, num, 0, "add");
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -565,6 +572,8 @@ namespace GObject
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
                 if (typeId == 1224)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+                if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+                    m_Owner->OnShuoShuo(SS_CITTA);
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
@@ -603,6 +612,8 @@ namespace GObject
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
             if (typeId == 1224)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+            if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+                m_Owner->OnShuoShuo(SS_CITTA);
 			return item;
 		}
 		else
@@ -627,6 +638,8 @@ namespace GObject
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
             if (typeId == 1224)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+            if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+                m_Owner->OnShuoShuo(SS_CITTA);
 			return NULL;
 		}
 	}
@@ -725,14 +738,22 @@ namespace GObject
 				switch(itype->subClass)
 				{
 				case Item_Weapon:
-					equip = new(std::nothrow) ItemWeapon(id, itype, edata);
+                    {
+                        equip = new(std::nothrow) ItemWeapon(id, itype, edata);
+                        if (itype->quality == 5 && !m_Owner->GetShuoShuo()->getShuoShuo(SS_OE))
+                            m_Owner->GetShuoShuo()->setShuoShuo(SS_OE, 1);
+                    }
 					break;
 				case Item_Armor1:
 				case Item_Armor2:
 				case Item_Armor3:
 				case Item_Armor4:
 				case Item_Armor5:
-					equip = new ItemArmor(id, itype, edata);
+                    {
+                        equip = new ItemArmor(id, itype, edata);
+                        if (itype->quality == 5 && !m_Owner->GetShuoShuo()->getShuoShuo(SS_OE))
+                            m_Owner->GetShuoShuo()->setShuoShuo(SS_OE, 1);
+                    }
 					break;
                 case Item_Trump:
                     {
@@ -753,6 +774,9 @@ namespace GObject
                         equip = new ItemTrump(id, itype, edata);
                         if (equip && equip->getItemEquipData().enchant)
                             ((ItemTrump*)equip)->fixSkills();
+
+                        if (!m_Owner->GetShuoShuo()->getShuoShuo(SS_TRUMP))
+                            m_Owner->GetShuoShuo()->setShuoShuo(SS_TRUMP, 1);
                     }
                     break;
 				default:
@@ -1352,7 +1376,9 @@ namespace GObject
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
                     UInt8 rn = n<num?n:num;
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+                    UInt32 price = GData::store.getPrice(id);
+                    if (price)
+                        udpLog(item->getClass(), id, rn, price, "sub");
 					DelItem2(item, rn);
 					AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1368,7 +1394,9 @@ namespace GObject
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+                    UInt32 price = GData::store.getPrice(id);
+                    if (price)
+                        udpLog(item->getClass(), id, rn, price, "sub");
 					DelItemAny(id, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1409,7 +1437,9 @@ namespace GObject
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, bind > 0))
                 {
                     UInt8 rn = n<num?n:num;
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+                    UInt32 price = GData::store.getPrice(id);
+                    if (price)
+                        udpLog(item->getClass(), id, rn, price, "sub");
                     DelItem2(item, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1425,7 +1455,9 @@ namespace GObject
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
+                    UInt32 price = GData::store.getPrice(id);
+                    if (price)
+                        udpLog(item->getClass(), id, rn, price, "sub");
                     DelItemAny(id, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1448,13 +1480,14 @@ namespace GObject
 
     void Package::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
     {
-        if (!op || !price)
+        if (!op)
             return;
         char _price[32] = {0};
         char _type[32] = {0};
         char _id[32] = {0};
         snprintf(_price, 32, "%u", price);
-        snprintf(_type, 32, "%u", type);
+        UInt8 t = GetItemLogType(id);
+        snprintf(_type, 32, "%u", t);
         snprintf(_id, 32, "%u", id);
         m_Owner->udpLog(op, _type, _id, _price, "", "", "props", num);
     }

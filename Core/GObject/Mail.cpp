@@ -37,7 +37,7 @@ void Mail::packetTitle( Stream& st )
 	st << id << sender << recvTime << flag << title;
 }
 
-bool MailPackage::takeIt( Player * player )
+bool MailPackage::takeIt( Player * player, bool gm )
 {
 	Package * package = player->GetPackage();
 	UInt32 required = 0;
@@ -70,7 +70,17 @@ bool MailPackage::takeIt( Player * player )
 				player->getCoupon(it->second + ((it->first & 0x0FFF) << 16));
 				break;
 			case Gold:
-				player->getGold(it->second + ((it->first & 0x0FFF) << 16));
+                {
+                    UInt32 c = it->second + ((it->first & 0x0FFF) << 16);
+                    player->getGold(c);
+
+                    if (gm)
+                    {
+                        char gold[32] = {0}; 
+                        snprintf(gold, 32, "%u", c);
+                        player->udpLog("free", gold, "", "", "", "", "currency");
+                    }
+                }
 				break;
 			case Achievement:
 				player->getAchievement(it->second + ((it->first & 0x0FFF)<< 16));
@@ -355,7 +365,7 @@ bool MailBox::delMail( UInt32 id, bool freeAdd )
 		case 0x21:
 			{
 				UInt32 count = mail->additional >> 16;
-				if(count == 0xFFFE)
+				if(count == 0xFFFE || count == 0xFFFD)
 					mailPackageManager.remove(id);
 			}
 			break;
@@ -470,7 +480,7 @@ void MailBox::readMail( UInt32 id )
 						}
 					}
 				}
-				else if(count == 0xFFFE)
+				else if(count == 0xFFFE || count == 0xFFFD)
 				{
 					MailPackage * pkg = mailPackageManager[id];
 					if(pkg == NULL)
@@ -623,6 +633,25 @@ void MailBox::clickMail( UInt32 id, UInt8 action )
 					break;
 				}
 				if(pkg->takeIt(_owner))
+				{
+					mailPackageManager.remove(id);
+				}
+				else
+				{
+					_owner->sendMsgCode(0, 1011);
+					return;
+				}
+			}
+			else if(count == 0xFFFD)
+			{
+				MailPackage * pkg = mailPackageManager[id];
+				if(pkg == NULL)
+				{
+					delIt = true;
+					DBLOG1().PushUpdateData("update `mailitem_histories` set `status`= 1, `delete_time` = %u where `server_id` = %u and `mail_id` = %u and `status` = 0", TimeUtil::Now(), cfg.serverLogId, mail->id);
+					break;
+				}
+				if(pkg->takeIt(_owner, true))
 				{
 					mailPackageManager.remove(id);
 				}

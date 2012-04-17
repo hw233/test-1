@@ -1115,6 +1115,8 @@ HIPlayerData* HeroIsland::leave(HIPlayerData* pd, UInt8 spot, UInt16 pos)
         if (_nplayers[spot])
             --_nplayers[spot];
     }
+    if (pd->player && !spot && pd->ato && pd->player->allHpP() < 100)
+        pd->player->regenAll(true);
     return pd;
 }
 

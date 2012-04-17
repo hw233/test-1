@@ -1093,3 +1093,26 @@ function onInvitedBy(player)
     sendItemPackageMail(player, "好友邀请奖励", "您的好友邀请您一同游玩蜀山传奇，系统赠送您一份大礼包", {503,5,1, 56,10,1, 57,10,1, 5035,1,1});
 end
 
+function onCLLoginReward(player, cts)
+    if cts == 0 then
+        player:getCoupon(20)
+        return
+    end
+
+    local coupon = {20,30,40,50,60,70,80,}
+    if cts > 7 then
+        return
+    end
+    player:getCoupon(coupon[cts]);
+end
+
+function onCL3DayReward(player)
+    local package = player:GetPackage()
+    if package:IsFull() then
+        player:sendMsgCode(2, 1011, 0)
+        return;
+    end
+    -- TODO:
+    package:AddItem(33, 1, 1)
+end
+

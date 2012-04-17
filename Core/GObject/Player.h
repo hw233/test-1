@@ -129,6 +129,7 @@ namespace GObject
     struct TeamCopyPlayerInfo;
     class ActivityMgr;
     class HeroMemo;
+    class ShuoShuo;
     class HoneyFall;
     struct DeamonPlayerData;
 
@@ -569,6 +570,8 @@ namespace GObject
 
 		void Login();
         void sendCreateMail();
+        void continuousLogin(UInt32 now);
+        void getContinuousReward(UInt8 type);
 
 		void Reconnect();
 
@@ -966,6 +969,7 @@ namespace GObject
 
         void OnDoAttainment(UInt32 attId,   UInt32  param);
         void OnHeroMemo(UInt8,UInt8,UInt8,UInt8);
+        void OnShuoShuo(UInt8);
 		//////////////////////////////////////////////////////////////////////////
 		//????ϵͳ
 		inline bool IsInTeam() const { return false; }	//TODO
@@ -980,6 +984,7 @@ namespace GObject
 		AttainMgr* GetAttainMgr() { return m_AttainMgr; }
         ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
         HeroMemo* GetHeroMemo(){return m_HeroMemo;}
+        ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1150,6 +1155,9 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
+        void sendRC7DayMails(UInt32 r);
+        UInt8 calcRC7DayRechargeLevel(UInt32 total);
+        void sendRC7DayRechargeMails(UInt8 l, UInt8 h);
 
     private:
         bool _isJumpingMap;
@@ -1182,6 +1190,7 @@ namespace GObject
 		AttainMgr* m_AttainMgr;
         ActivityMgr*  m_ActivityMgr;
         HeroMemo* m_HeroMemo;
+        ShuoShuo* m_ShuoShuo;
 		MailBox* m_MailBox;
 
 		bool _isOnline;

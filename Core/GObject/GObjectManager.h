@@ -91,6 +91,7 @@ namespace GObject
         static bool LoadTownDeamon();
         static bool InitMoneyLog();
         static bool LoadHeroMemo();
+        static bool LoadShuoShuo();
         static bool LoadCFriendAwards();
         static bool LoadWBoss();
         static bool LoadDiscount();

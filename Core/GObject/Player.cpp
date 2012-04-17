@@ -7,6 +7,7 @@
 #include "AttainMgr.h"
 #include "ActivityMgr.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 #include "Trade.h"
 #include "Sale.h"
 #include "Country.h"
@@ -524,6 +525,7 @@ namespace GObject
 		m_AttainMgr = new AttainMgr(this);
         m_ActivityMgr = new ActivityMgr(this);
         m_HeroMemo = new HeroMemo(this);
+        m_ShuoShuo = new ShuoShuo(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
@@ -707,6 +709,27 @@ namespace GObject
         return recharge[lvl-1];
     }
 
+    static UInt32 RC7DayRecharge[] = {10,50,100,200,300,400,500,};
+    UInt8 Player::calcRC7DayRechargeLevel(UInt32 total)
+    {
+        UInt32 totalRecharge = total;
+        for (UInt8 i = 0; i < sizeof(RC7DayRecharge)/sizeof(UInt32); ++i)
+        {
+            if (totalRecharge < RC7DayRecharge[i])
+                return i;
+        }
+        return 7;
+    }
+
+    inline UInt32 RC7DayLevelToRecharge(UInt8 lvl)
+    {
+        if (lvl < 1)
+            return 0;
+        if (lvl > sizeof(RC7DayRecharge)/sizeof(UInt32))
+            lvl = 7;
+        return RC7DayRecharge[lvl-1];
+    }
+
 	bool Player::Init()
 	{
 		if(_availInit)
@@ -736,6 +759,8 @@ namespace GObject
         SAFE_DELETE(m_pVars);
         SAFE_DELETE(m_AttainMgr);
         SAFE_DELETE(m_ActivityMgr);
+        SAFE_DELETE(m_HeroMemo);
+        SAFE_DELETE(m_ShuoShuo);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -764,6 +789,8 @@ namespace GObject
                 _offlineTime = 0;
             }
 		}
+
+        continuousLogin(curtime);
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -4370,6 +4397,8 @@ namespace GObject
 
                     sendColorTask(0, 0);
                     writeShiMen();
+                    if (!GetShuoShuo()->getShuoShuo(SS_SHIMEN))
+                        GetShuoShuo()->setShuoShuo(SS_SHIMEN, 1);
                     return true;
                 }
             }
@@ -4391,6 +4420,8 @@ namespace GObject
 
                     sendColorTask(1, 0);
                     writeYaMen();
+                    if (!GetShuoShuo()->getShuoShuo(SS_YAMEN))
+                        GetShuoShuo()->setShuoShuo(SS_YAMEN, 1);
                     return true;
                 }
             }
@@ -4433,6 +4464,8 @@ namespace GObject
 
                     sendColorTask(0, 0);
                     writeShiMen();
+                    if (!GetShuoShuo()->getShuoShuo(SS_SHIMEN))
+                        GetShuoShuo()->setShuoShuo(SS_SHIMEN, 1);
                     return true;
                 }
             }
@@ -4477,6 +4510,8 @@ namespace GObject
 
                     sendColorTask(1, 0);
                     writeYaMen();
+                    if (!GetShuoShuo()->getShuoShuo(SS_YAMEN))
+                        GetShuoShuo()->setShuoShuo(SS_YAMEN, 1);
                     return true;
                 }
             }
@@ -5708,6 +5743,9 @@ namespace GObject
             GameMsgHdr hdr(0x1A7, WORKER_THREAD_WORLD, this, 0);
             GLOBAL().PushMsg(hdr, 0);
         }
+
+        if (nLev == 40 || nLev == 50 || nLev == 60 || nLev == 70 || nLev == 80 || nLev == 90 || nLev == 100)
+            OnShuoShuo(nLev/10-4 + SS_40);
 	}
 
     void Player::sendFormationList()
@@ -5792,6 +5830,9 @@ namespace GObject
 
         st << static_cast<UInt8>(1) << Stream::eos;
         send(st);
+
+        if (!GetShuoShuo()->getShuoShuo(SS_FMTLVLUP))
+            GetShuoShuo()->setShuoShuo(SS_FMTLVLUP, 1);
         return true;
     }
 
@@ -5886,6 +5927,7 @@ namespace GObject
 		}
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
+        sendRC7DayMails(r);
 
         if (World::getRechargeActive())
         {
@@ -6910,6 +6952,55 @@ namespace GObject
 		}
 	}
 
+	void Player::sendRC7DayRechargeMails( UInt8 l, UInt8 h )
+	{
+		if(l < 1)
+			l = 1;
+		if(h > 7)
+			h = 7;
+
+		for(UInt32 j = l; j <= h; ++j)
+		{
+			SYSMSGV(title, 2322, RC7DayLevelToRecharge(j));
+			SYSMSG(content, 2323);
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+			if(mail == NULL)
+				continue;
+
+			const UInt32 itemTable[7][16] =
+            {
+                {514,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+                {503,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+                {516,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
+                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
+                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
+                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
+            };
+
+			MailPackage::MailItem mitem[8];
+			UInt32 mcount = 0;
+            std::string strItems;
+
+			const UInt32 * t = itemTable[j-1];
+			for(UInt32 i = 0; i < 16 && t[i] > 0; i += 2)
+			{
+                if (!t[i])
+                    break;
+
+				mitem[mcount].id = t[i];
+				mitem[mcount++].count = t[i+1];
+				strItems += Itoa(t[i]);
+				strItems += ",";
+				strItems += Itoa(t[i+1]);
+				strItems += "|";
+			}
+
+			mailPackageManager.push(mail->id, mitem, mcount, true);
+			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
 	void Player::sendBlockBossMail(UInt8 l, UInt8 h)
 	{
 		UInt16 coupon = 0;
@@ -7107,6 +7198,19 @@ namespace GObject
         }
         else
             GetHeroMemo()->setMemo(chapter, diff, group, item, 1);
+    }
+
+    void Player::OnShuoShuo(UInt8 idx)
+    {
+        // TODO:
+        return;
+        if (CURRENT_THREAD_ID() != getThreadId())
+        {
+            GameMsgHdr h(0x243,  getThreadId(), this, sizeof(idx));
+            GLOBAL().PushMsg(h, &idx);
+        }
+        else
+            GetShuoShuo()->setShuoShuo(idx, 1);
     }
 
 	void Player::setClan(Clan * c)
@@ -8935,5 +9039,144 @@ namespace GObject
         st << Stream::eos;
         send(st);
     }
+
+#define DAY_SECS (24*60*60)
+#define CREATE_OFFSET(c, n) (((n) - (c)) / (DAY_SECS))
+    void Player::continuousLogin(UInt32 now)
+    {
+        if (!World::getRC7Day())
+            return;
+        if (now < getCreated())
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+        if (created_sharp < now_sharp)
+            return;
+
+        if (now_sharp - created_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDING);
+        UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+        if (off >= 7)
+            return;
+        ctslanding |= (1<<off);
+
+        UInt32 cts = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++cts;
+            else
+                break;
+        }
+
+        // TODO:
+        Stream st(REP::RC7DAY);
+        st << static_cast<UInt8>(0);
+
+        UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
+        UInt8 oldLevel = calcRC7DayRechargeLevel(total);
+        if (oldLevel < 7)
+        {
+            st << static_cast<UInt16>(RC7DayRecharge[oldLevel-1] - total);
+            st << static_cast<UInt8>(0);
+        }
+        else
+            st << static_cast<UInt16>(0);
+
+        {
+            for (int i = 6; i >= 0; --i)
+            {
+                if (ctslanding & (1<<i))
+                    ++cts;
+                else
+                    cts = 0;
+            }
+        }
+
+        st << Stream::eos;
+        send(st);
+
+        SetVar(VAR_CTSLANDING, ctslanding);
+    }
+
+    void Player::getContinuousReward(UInt8 type)
+    {
+        if (!World::getRC7Day())
+            return;
+        UInt32 now = TimeUtil::Now();
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+        if (created_sharp < now_sharp)
+            return;
+
+        if (now_sharp - created_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDING);
+        UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
+        if (off > 6)
+            off = 6;
+
+        UInt32 cts = 0;
+        for (int i = 6; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++cts;
+            else
+                break;
+        }
+
+        if (type == 1 && !GetVar(VAR_CTSAWARD))
+        {
+            GameAction()->onCLLoginReward(this, 0);
+            SetVar(VAR_CTSAWARD, 1);
+        }
+        if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
+        {
+            GameAction()->onCLLoginReward(this, cts);
+            SetVar(VAR_CLAWARD, 1);
+        }
+        if (type == 3 && !GetVar(VAR_CL3DAY))
+        {
+            for (int i = 6; i >= 0; --i)
+            {
+                if (ctslanding & (1<<i))
+                    ++cts;
+                else
+                    cts = 0;
+            }
+
+            if (cts >= 3)
+            {
+                GameAction()->onCL3DayReward(this);
+                SetVar(VAR_CL3DAY, 1);
+            }
+        }
+    }
+
+    void Player::sendRC7DayMails(UInt32 r)
+    {
+        if (!World::getRC7Day())
+            return;
+        UInt32 now = TimeUtil::Now();
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
+        if (created_sharp < now_sharp)
+            return;
+
+        if (now_sharp - created_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
+        UInt8 oldLevel = calcRC7DayRechargeLevel(total);
+        total += r;
+        UInt8 level = calcRC7DayRechargeLevel(total);
+        sendRC7DayRechargeMails(oldLevel + 1, level);
+        SetVar(VAR_RC7DAYRECHARGE, total);
+    }
+
 } // namespace GObject
 

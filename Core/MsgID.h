@@ -17,6 +17,10 @@ namespace REQ
     const UInt8 OFFLINEEXP          = 0x08;
     /**代币使用*/
     const UInt8 TOKEN               = 0x09;
+    /**领取出生七天奖励*/
+    const UInt8 RC7DAY              = 0x0B;
+    /**发表说说奖励*/
+    const UInt8 SSAWARD             = 0x0C;
     /**成就*/
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择*/
@@ -505,6 +509,8 @@ namespace REP
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
     const UInt8 STORE_LIST_EXCHANGE = 0xDE;// ??
     const UInt8 STORE_DISLIMIT      = 0x0A;
+    const UInt8 RC7DAY              = 0x0B;
+    const UInt8 SSAWARD             = 0x0C;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1

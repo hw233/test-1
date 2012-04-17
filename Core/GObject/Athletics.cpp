@@ -13,6 +13,7 @@
 #include "Script/BattleFormula.h"
 #include "MsgHandler/CountryMsgStruct.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -244,7 +245,10 @@ void Athletics::attack(Player * defer)
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
         if (res)
+        {
             _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
+            _owner->OnShuoShuo(SS_ATHWIN);
+        }
 		return;
 	}
 	struct AthleticsBeData
@@ -320,6 +324,7 @@ void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Line
         GameMsgHdr h(0x244,   atker->getThreadId(), atker, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
         atker->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
+        atker->OnShuoShuo(SS_ATHWIN);
     }
 
 }
@@ -554,7 +559,10 @@ void Athletics::attackMartial(Player* defer)
 
         GameAction()->doAttainment(winner,  Script::ATHLETICS_WIN , 1);
         if (res)
+        {
             _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
+            _owner->OnShuoShuo(SS_ATHWIN);
+        }
     }while(false);
 
 	AthleticsResult ar = {id, 0, defer, res };
@@ -622,6 +630,7 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
         GameMsgHdr h(0x244,   atker->getThreadId(), atker, sizeof(msg));
         GLOBAL().PushMsg(h, & msg);
         atker->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
+        atker->OnShuoShuo(SS_ATHWIN);
     }
 }
 

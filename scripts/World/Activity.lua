@@ -185,6 +185,8 @@ function onActivityCheck(tm)
       setCarnival(false)
   end
 
+  setRC7Day(false)
+
   -- XXX: cancel auto heal
   setAutoHeal(true)
   loadStore();

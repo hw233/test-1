@@ -36,6 +36,7 @@
 #include "GData/Store.h"
 #include "CountryBattle.h"
 #include "ClanRankBattle.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -84,6 +85,7 @@ bool World::_trumpenchret = false;
 bool World::_foolsday = false;
 bool World::_chingming = false;
 bool World::_carnival = false;
+bool World::_rc7day = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -165,6 +167,9 @@ bool enum_midnight(void * ptr, void *)
 
     if (pl->isOnline() && World::_wday == 7)
         GData::store.sendList(1, pl);
+
+    if (!pl->isOnline())
+        pl->GetShuoShuo()->reset(false);
 
 	return true;
 }

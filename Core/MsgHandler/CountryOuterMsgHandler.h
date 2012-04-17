@@ -53,6 +53,7 @@
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/HeroMemo.h"
+#include "GObject/ShuoShuo.h"
 #include "GObject/TownDeamon.h"
 
 struct NullReq
@@ -643,6 +644,12 @@ struct GetHeroMemoAward
     MESSAGE_DEF1(REQ::HEROMEMO, UInt8, _idx);
 };
 
+struct GetShuoShuoAward
+{
+    UInt8 _idx;
+    MESSAGE_DEF1(REQ::SSAWARD, UInt8, _idx);
+};
+
 struct GetCFriendAward
 {
     UInt8 _idx;
@@ -1001,6 +1008,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendDeamonAwardsInfo();
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
+    pl->GetShuoShuo()->sendShuoShuo();
     pl->sendRechargeInfo();
     pl->sendCFriendAward();
 
@@ -4208,14 +4216,20 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
-
-
 void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
 {
     MSG_QUERY_PLAYER(player);
     if(!player->hasChecked())
          return;
     player->GetHeroMemo()->getAward(req._idx);
+}
+
+void OnGetShuoShuoAward( GameMsgHdr& hdr, GetShuoShuoAward& req)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->GetShuoShuo()->getAward(req._idx);
 }
 
 void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )

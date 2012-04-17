@@ -14,6 +14,7 @@
 #include "Country.h"
 #include "TeamCopy.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -299,6 +300,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
+            if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
+                pl->OnShuoShuo(id-1 + SS_COPY1);
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)

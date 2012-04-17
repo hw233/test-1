@@ -114,6 +114,10 @@ public:
     { _carnival = v; }
     inline static bool getCarnival()
     { return _carnival; }
+    inline static void setRC7Day(bool v)
+    { _rc7day = v; }
+    inline static bool getRC7Day()
+    { return _rc7day; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -153,6 +157,7 @@ public:
     static bool _foolsday;
     static bool _chingming;
     static bool _carnival;
+    static bool _rc7day;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
