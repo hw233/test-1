@@ -54,6 +54,8 @@ void CFriend::setCFriendSafe(UInt8 idx)
 
 void CFriend::setCFriend(UInt8 idx, UInt8 status)
 {
+    if (!World::getCFriend())
+        return;
     bool w = false;
     if (idx >= m_maxIdx)
     {
@@ -83,6 +85,8 @@ UInt8 CFriend::getCFriend(UInt8 idx)
 
 void CFriend::getAward(UInt8 idx)
 {
+    if (!World::getCFriend())
+        return;
     if (!idx)
         return;
     if (idx > m_cf.size())

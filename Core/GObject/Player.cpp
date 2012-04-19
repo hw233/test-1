@@ -5638,6 +5638,8 @@ namespace GObject
     static UInt8 cf_lvls[4] = {45, 50, 60, 70};
     void Player::tellCFriendLvlUp(UInt8 lvl)
     {
+        if (!World::getCFriend())
+            return;
         bool found = false;
         for (UInt8 i = 0; i < sizeof(cf_lvls)/sizeof(UInt8); ++i)
         {
@@ -7208,6 +7210,8 @@ namespace GObject
 
     void Player::OnShuoShuo(UInt8 idx)
     {
+        if (!World::getShuoShuo())
+            return;
         if (CURRENT_THREAD_ID() != getThreadId())
         {
             GameMsgHdr h(0x243,  getThreadId(), this, sizeof(idx));

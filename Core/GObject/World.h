@@ -118,6 +118,14 @@ public:
     { _rc7day = v; }
     inline static bool getRC7Day()
     { return _rc7day; }
+    inline static void setShuoShuo(bool v)
+    { _shuoshuo = v; }
+    inline static bool getShuoShuo()
+    { return _shuoshuo; }
+    inline static void setCFriend(bool v)
+    { _cfriend = v; }
+    inline static bool getCFriend()
+    { return _cfriend; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -158,6 +166,8 @@ public:
     static bool _chingming;
     static bool _carnival;
     static bool _rc7day;
+    static bool _shuoshuo;
+    static bool _cfriend;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

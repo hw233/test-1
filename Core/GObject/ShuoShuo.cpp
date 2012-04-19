@@ -71,6 +71,8 @@ void ShuoShuo::setShuoSafe(UInt8 idx, UInt8 status)
 
 void ShuoShuo::setShuoShuo(UInt8 idx, UInt8 status)
 {
+    if (!World::getShuoShuo())
+        return;
     bool w = false;
     if (m_ss.size() < MIN_ITEM)
     {
@@ -107,6 +109,8 @@ UInt8 ShuoShuo::getShuoShuo(UInt8 idx)
 
 void ShuoShuo::getAward(UInt8 idx)
 {
+    if (!World::getShuoShuo())
+        return;
     if (!idx)
         return;
     if (idx > m_ss.size())
