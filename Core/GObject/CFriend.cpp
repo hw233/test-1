@@ -42,8 +42,15 @@ void CFriend::updateToDB()
             cf += ",";
     }
 
-    DB().PushUpdateData("UPDATE `cfriend_awards` SET awards = '%s' WHERE `playerId` = %"I64_FMT"u",
-            cf.c_str(), m_owner->getId());
+    if (!m_owner->getInvitedBy())
+    {
+        DB3().PushUpdateData("REPLACE INTO `cfriend_awards` (`playerId`, `invitedId`, `awards`) VALUES (%"I64_FMT"u, 0, '%s')", m_owner->getId(), cf.c_str());
+    }
+    else
+    {
+        DB3().PushUpdateData("UPDATE `cfriend_awards` SET awards = '%s' WHERE `playerId` = %"I64_FMT"u",
+                cf.c_str(), m_owner->getId());
+    }
 }
 
 void CFriend::setCFriendSafe(UInt8 idx)

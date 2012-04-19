@@ -1013,7 +1013,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
-    pl->GetCFriend()->sendCFriend();
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
