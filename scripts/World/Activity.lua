@@ -42,6 +42,11 @@ function setServer(n, num)
   serverNum = num
 end
 
+is_4_21 = false 
+function is4_21()
+    return is_4_21
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -185,6 +190,12 @@ function onActivityCheck(tm)
       setCarnival(false)
   end
 
+  if tm >= actTime31 and tm < actTime32 then
+      is_4_21 = true
+  else
+      is_4_21 = false
+  end
+
   setRC7Day(false)
 
   -- XXX: cancel auto heal
@@ -213,6 +224,7 @@ function initActTime(y, m, d)
   local  SerStartTm14= { ['year'] = 2012, ['month'] = 3, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -261,6 +273,9 @@ function initActTime(y, m, d)
 
   actTime29 = os.time(SerStartTm15);
   actTime30 = os.time(SerStartTm15) + 8 * 86400;
+
+  actTime31 = os.time(SerStartTm16);
+  actTime32 = os.time(SerStartTm16) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 

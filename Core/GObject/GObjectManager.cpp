@@ -55,6 +55,7 @@
 #include "TownDeamon.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "CFriend.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
 #include <fcntl.h>
@@ -735,6 +736,12 @@ namespace GObject
         p->initHeroMemo();
 		return true;
 	}
+
+    inline bool shuoshuo_loaded(Player* p, int)
+    {
+        p->initShuoShuo();
+        return true;
+    }
 
     bool GObjectManager::loadQQVipAward()
     {
@@ -3702,6 +3709,8 @@ namespace GObject
             pl = 0;
         }
 		lc.finalize();
+
+		globalPlayers.enumerate(shuoshuo_loaded, 0);
         return true;
     }
 
@@ -3722,8 +3731,8 @@ namespace GObject
                 continue;
             if (cfa.invitedId)
                 pl->setInvitedBy(cfa.invitedId, false);
-            pl->loadCFriendAwards(cfa.awards);
-            pl->resetCFriends();
+            pl->GetCFriend()->loadFromDB(cfa.awards.c_str());
+            pl->setCFriends();
             pl = 0;
         }
 		lc.finalize();

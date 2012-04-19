@@ -109,6 +109,9 @@ namespace GObject
 #define MAX_TRIPOD_SOUL 100000
 #define POINT_PERMIN (60*10)
 
+#define MAX_FRIENDS 30
+#define MAX_CFRIENDS 50
+
 	class Map;
 	class Player;
 	class ItemBase;
@@ -130,6 +133,7 @@ namespace GObject
     class ActivityMgr;
     class HeroMemo;
     class ShuoShuo;
+    class CFriend;
     class HoneyFall;
     struct DeamonPlayerData;
 
@@ -699,6 +703,7 @@ namespace GObject
 		inline UInt32   getLockExpireTime() {return _playerData.lockExpireTime;}
 
         void initHeroMemo();
+        void initShuoShuo();
 
 		UInt32 getBuffData(UInt8 idx, UInt32 tm = TimeUtil::Now());
 		UInt32 getBuffLeft(UInt8 idx, UInt32 tm = TimeUtil::Now());
@@ -985,6 +990,7 @@ namespace GObject
         ActivityMgr* GetActivityMgr(){return m_ActivityMgr;}
         HeroMemo* GetHeroMemo(){return m_HeroMemo;}
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
+        CFriend* GetCFriend(){return m_CFriend;}
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1022,8 +1028,8 @@ namespace GObject
 		bool delFoe(Player *);
         bool addCFriend(Player*);
         void delCFriend(Player*);
-		inline bool isFriendFull() { return _friends[0].size() >= 20; }
-        inline bool isCFriendFull() { return _friends[3].size() >= 20; }
+		inline bool isFriendFull() { return _friends[0].size() >= MAX_FRIENDS; }
+        inline bool isCFriendFull() { return _friends[3].size() >= MAX_CFRIENDS; }
         inline UInt32 getFrendsNum() const { return _friends[0].size(); }
         inline UInt32 getCFrendsNum() const { return _friends[3].size(); }
 		bool testCanAddFriend(Player *);
@@ -1191,6 +1197,7 @@ namespace GObject
         ActivityMgr*  m_ActivityMgr;
         HeroMemo* m_HeroMemo;
         ShuoShuo* m_ShuoShuo;
+        CFriend* m_CFriend;
 		MailBox* m_MailBox;
 
 		bool _isOnline;
@@ -1234,17 +1241,11 @@ namespace GObject
         std::string _displayName;
 #endif
 
-#define CF_LVLS 3
-        UInt8 _CFriends[CF_LVLS];
         UInt64 _invitedBy;
-        UInt8 _CFriendAwards[CF_LVLS*3];
     public:
         void setInvitedBy(UInt64 id, bool writedb = true);
         inline UInt64 getInvitedBy() { return _invitedBy; }
-        void resetCFriends();
-        void loadCFriendAwards(std::string& awards);
-        void getCFriendAward(UInt8 idx);
-        void sendCFriendAward();
+        void setCFriends();
         void useToken(UInt8 type);
         void sendTokenInfo();
         void sendDiscountLimit();
@@ -1366,6 +1367,7 @@ namespace GObject
         std::string m_openkey;
         std::string m_source;
         std::string m_via;
+        std::string m_invited;
         bool m_isOffical;
     public:
         inline void setDomain(const std::string& domain)
@@ -1379,11 +1381,13 @@ namespace GObject
         inline void setOpenKey(const std::string& openkey) { m_openkey = openkey; }
         inline void setSource(const std::string& source) { m_source = source; }
         inline void setVia(const std::string& via) { m_via = via; }
+        inline void setInvited(const std::string& inv) { m_invited = inv; }
         inline const std::string& getDomain() const { return m_domain; }
         inline const std::string& getOpenId() const { return m_openid; }
         inline const std::string& getOpenKey() const { return m_openkey; }
         inline const std::string& getSource() const { return m_source; }
         inline const std::string& getVia() const { return m_via; }
+        inline const std::string& getInvited() const { return m_invited; }
         inline bool isOffical() const { return m_isOffical; }
 
         inline UInt8 getPlatform() const { return atoi(m_domain.c_str()); }

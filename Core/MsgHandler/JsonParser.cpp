@@ -157,7 +157,9 @@ int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json
 
     json_object_object_add(retbody, "szRoleName", json_object_new_string(player->getName().c_str()));
     json_object_object_add(retbody, "ucGender", json_object_new_int(player->IsMale()?1:2));
-    json_object_object_add(retbody, "szCharTitle", json_object_new_string(""));
+    char title[32] = {0};
+    snprintf(title, sizeof(title), "%u", player->getTitle());
+    json_object_object_add(retbody, "szCharTitle", json_object_new_string(title));
     json_object_object_add(retbody, "ucJob", json_object_new_int(player->GetClass()));
     json_object_object_add(retbody, "ucNation", json_object_new_int(player->getCountry()));
     json_object_object_add(retbody, "uiCurHP", json_object_new_int(player->getMainHP()));

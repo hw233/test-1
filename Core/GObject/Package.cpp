@@ -545,7 +545,7 @@ namespace GObject
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
                 if (typeId == 1224)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
-                if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+                if (item->getClass() == Item_Citta)
                     m_Owner->OnShuoShuo(SS_CITTA);
 				return item;
 			}
@@ -572,7 +572,7 @@ namespace GObject
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
                 if (typeId == 1224)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
-                if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+                if (item->getClass() == Item_Citta)
                     m_Owner->OnShuoShuo(SS_CITTA);
 				SendItemData(item);
 				if(notify)
@@ -612,7 +612,7 @@ namespace GObject
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
             if (typeId == 1224)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
-            if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+            if (item->getClass() == Item_Citta)
                 m_Owner->OnShuoShuo(SS_CITTA);
 			return item;
 		}
@@ -638,7 +638,7 @@ namespace GObject
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
             if (typeId == 1224)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
-            if (item->getClass() == Item_Citta && !m_Owner->GetShuoShuo()->getShuoShuo(SS_CITTA))
+            if (item->getClass() == Item_Citta)
                 m_Owner->OnShuoShuo(SS_CITTA);
 			return NULL;
 		}
@@ -738,22 +738,14 @@ namespace GObject
 				switch(itype->subClass)
 				{
 				case Item_Weapon:
-                    {
-                        equip = new(std::nothrow) ItemWeapon(id, itype, edata);
-                        if (itype->quality == 5 && !m_Owner->GetShuoShuo()->getShuoShuo(SS_OE))
-                            m_Owner->GetShuoShuo()->setShuoShuo(SS_OE, 1);
-                    }
+                    equip = new(std::nothrow) ItemWeapon(id, itype, edata);
 					break;
 				case Item_Armor1:
 				case Item_Armor2:
 				case Item_Armor3:
 				case Item_Armor4:
 				case Item_Armor5:
-                    {
-                        equip = new ItemArmor(id, itype, edata);
-                        if (itype->quality == 5 && !m_Owner->GetShuoShuo()->getShuoShuo(SS_OE))
-                            m_Owner->GetShuoShuo()->setShuoShuo(SS_OE, 1);
-                    }
+                    equip = new ItemArmor(id, itype, edata);
 					break;
                 case Item_Trump:
                     {
@@ -774,9 +766,6 @@ namespace GObject
                         equip = new ItemTrump(id, itype, edata);
                         if (equip && equip->getItemEquipData().enchant)
                             ((ItemTrump*)equip)->fixSkills();
-
-                        if (!m_Owner->GetShuoShuo()->getShuoShuo(SS_TRUMP))
-                            m_Owner->GetShuoShuo()->setShuoShuo(SS_TRUMP, 1);
                     }
                     break;
 				default:
@@ -787,6 +776,11 @@ namespace GObject
 					return NULL;
 				ITEM_BIND_CHECK(itype->bindType,bind);
 				equip->SetBindStatus(bind);
+
+                if (itype->subClass != Item_Trump && itype->quality == 5)
+                    m_Owner->OnShuoShuo(SS_OE);
+                if (itype->subClass == Item_Trump)
+                    m_Owner->OnShuoShuo(SS_TRUMP);
 
 				ItemBase *& e = m_Items[id];
 				if(e == NULL)
@@ -947,6 +941,12 @@ namespace GObject
 		if(e == NULL)
 			++ m_Size;
 		e = equip;
+
+        if (equip->getClass() != Item_Trump && equip->getQuality() == 5)
+            m_Owner->OnShuoShuo(SS_OE);
+        if (equip->getClass() == Item_Trump)
+            m_Owner->OnShuoShuo(SS_TRUMP);
+
 		DB4().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %"I64_FMT"u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
 		SendSingleEquipData(equip);
 		ItemNotify(equip->GetItemType().getId());

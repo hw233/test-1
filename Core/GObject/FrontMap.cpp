@@ -157,7 +157,15 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
 
 bool FrontMap::checkLevel(Player* pl, UInt8 id)
 {
-    UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
+    static UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
+    static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+
+    if (pl->getLocation() != spots[id-1])
+    {
+        SYSMSG_SENDV(2244, pl);
+        return false;
+    }
+
     if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8)) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
         return false;

@@ -54,6 +54,7 @@
 #include "GObject/TeamCopy.h"
 #include "GObject/HeroMemo.h"
 #include "GObject/ShuoShuo.h"
+#include "GObject/CFriend.h"
 #include "GObject/TownDeamon.h"
 
 struct NullReq
@@ -652,8 +653,9 @@ struct GetShuoShuoAward
 
 struct GetCFriendAward
 {
+    UInt8 _flag;
     UInt8 _idx;
-    MESSAGE_DEF1(REQ::CFRIEND, UInt8, _idx);
+    MESSAGE_DEF2(REQ::CFRIEND, UInt8, _flag, UInt8, _idx);
 };
 
 struct GetOfflineExp
@@ -1009,8 +1011,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->GetShuoShuo()->sendShuoShuo();
+    pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
-    pl->sendCFriendAward();
+    pl->GetCFriend()->sendCFriend();
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -2670,6 +2673,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
             {
                 UInt8 discount = lr._count;
                 UInt8 varoff = GData::store.getDisVarOffset(discount);
+                if (varoff == 0xff)
+                    return;
                 if (player->GetVar(VAR_DISCOUNT_1+varoff) >= GData::store.getDiscountLimit(discount))
                 {
                     player->sendMsgCode(0, 1020);
@@ -4237,7 +4242,10 @@ void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
     MSG_QUERY_PLAYER(player);
     if(!player->hasChecked())
          return;
-    player->getCFriendAward(req._idx);
+    if (req._flag == 1)
+        player->GetCFriend()->setCFriendNum(req._idx);
+    else
+        player->GetCFriend()->getAward(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )

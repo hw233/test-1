@@ -181,6 +181,7 @@ namespace GObject
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
+            (*iter)->OnShuoShuo(SS_CLANRANK);
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
@@ -192,6 +193,7 @@ namespace GObject
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
+            (*iter)->OnShuoShuo(SS_CLANRANK);
         }
 
         m_WaitPlayers.clear();
@@ -290,7 +292,6 @@ namespace GObject
                     m_LastWinClan = m_Clan1;
 
                     player1->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 1);
-                    player1->OnShuoShuo(SS_CLANRANK);
                 }
                 else //玩家2胜
                 {
@@ -307,7 +308,6 @@ namespace GObject
                     m_LastWinClan = m_Clan2;
 
                     player2->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 1);
-                    player2->OnShuoShuo(SS_CLANRANK);
                 }
 
                 m_Reports.push_back(report);

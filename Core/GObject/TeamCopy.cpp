@@ -1311,9 +1311,7 @@ bool TeamCopyPlayerInfo::getAward()
 
     DB3().PushUpdateData("DELETE FROM `teamcopy_player_award` WHERE `playerId` = %"I64_FMT"u", m_owner->getId());
 
-    if (!m_owner->GetShuoShuo()->getShuoShuo(SS_TEAMCP))
-        m_owner->GetShuoShuo()->setShuoShuo(SS_TEAMCP, 1);
-
+    m_owner->OnShuoShuo(SS_TEAMCP);
     return true;
 }
 

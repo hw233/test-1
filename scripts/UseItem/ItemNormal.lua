@@ -1536,6 +1536,114 @@ function ItemNormal_00000482(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00000492(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 2 then
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local items = {{502,1},{504,1},{0,1},{510,1},{55,2}}
+
+    local i = math.random(1, #items)
+    local t = math.random(1,100)
+
+    if i == 3 then
+        local gems = {5002,5012,5022,5032,5042,5052,5062,5072,5082,5092,5102,5112,5122,5132,5142,};
+        package:AddItem(gems[math.random(1,#gems)], 1, bind, 0, 2);
+    else
+        package:AddItem(items[i][1], items[i][2], bind, 0, 2);
+    end
+    if t <= 20 then
+        package:AddItem(6037, 1, bind, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
+function ItemNormal_00000493(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 2 then
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local items = {{56,1},{57,1},{511,2},{466,1},{500,1},{15,1}}
+
+    local i = math.random(1, #items)
+    local t = math.random(1,100)
+
+    package:AddItem(items[i][1], items[i][2], 0, 0, 2);
+    if t <= 20 then
+        package:AddItem(6034, 1, 0, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
+function ItemNormal_00000494(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 2 then
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local items = {{503,1},{514,2},{512,2},{466,2},{508,2},{506,2},{517,2}}
+
+    local i = math.random(1, #items)
+    local t = math.random(1,100)
+
+    package:AddItem(items[i][1], items[i][2], 0, 0, 2);
+    if t <= 20 then
+        package:AddItem(6038, 1, 0, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
+function ItemNormal_00000495(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 2 then
+		player:sendMsgCode(2, 1011, 0);
+		return false;
+	end
+
+    local items = {{515,1},{47,1},{501,4},{513,4},{33,5},{8000,4},{466,5}}
+    local prob = {741,1112,3334,4815,6667,8148,10000,}
+
+    local p = math.random(1, 10000)
+    local i = 1
+    for n = 1, #prob do
+        if p <= prob[n] then
+            i = n
+            break
+        end
+    end
+
+    local item = items[i]
+    package:AddItem(item[1], item[2], 0, 0, 2);
+
+    local t = math.random(1,100)
+    if t <= 20 then
+        local items = {6035,6036}
+        package:AddItem(items[math.random(1,#items)], 1, 0, 0, 2);
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
 function ItemNormal_VIP(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -1571,12 +1679,12 @@ function ItemNormal_VIP(iid, num, bind, param)
         if vipitems[lvl][n] == 0 then
             break
         end
-        package:AddItem(vipitems[lvl][n], vipitems[lvl][n+1], true, false)
+        package:AddItem(vipitems[lvl][n], vipitems[lvl][n+1], true, false, 2)
     end
 
     if lvl >= 6 then
         local equip = getRandOEquip(player:GetLev())
-        package:AddEquip(equip, 1, false);
+        package:AddEquip(equip, 1, false, 0, 2);
     end
 
     package:DelItemSendMsg(iid, player);
@@ -3333,6 +3441,11 @@ local ItemNormal_Table = {
     [486] = ItemNormal_00000482,
     [487] = ItemNormal_00000482,
     [488] = ItemNormal_00000482,
+
+    [492] = ItemNormal_00000492,
+    [493] = ItemNormal_00000493,
+    [494] = ItemNormal_00000494,
+    [495] = ItemNormal_00000495,
 
     [449] = ItemNormal_VIP,
     [450] = ItemNormal_VIP,

@@ -140,8 +140,9 @@ struct NewUserStruct
     std::string _openid;
     std::string _openkey;
     std::string _via;
-	MESSAGE_DEF9(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
-            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via);
+    std::string _invited;
+	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited);
 
 };
 
@@ -543,6 +544,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
+            pl->setInvited(nu._invited);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 

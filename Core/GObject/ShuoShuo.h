@@ -59,6 +59,7 @@ public:
     void loadFromDB(UInt32 update, const char* ss);
     void updateToDB();
 
+    void setShuoSafe(UInt8 idx, UInt8 status = 1);
     void setShuoShuo(UInt8 idx, UInt8 status);
     UInt8 getShuoShuo(UInt8 idx);
 

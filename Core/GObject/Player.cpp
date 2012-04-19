@@ -8,6 +8,7 @@
 #include "ActivityMgr.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "CFriend.h"
 #include "Trade.h"
 #include "Sale.h"
 #include "Country.h"
@@ -526,6 +527,7 @@ namespace GObject
         m_ActivityMgr = new ActivityMgr(this);
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
+        m_CFriend = new CFriend(this);
         m_pVars = new VarSystem(id);
         _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
@@ -534,8 +536,6 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
-        memset(_CFriends, 0x00, sizeof(_CFriends));
-        memset(_CFriendAwards, 0x00, sizeof(_CFriendAwards));
 	}
 
 
@@ -761,6 +761,7 @@ namespace GObject
         SAFE_DELETE(m_ActivityMgr);
         SAFE_DELETE(m_HeroMemo);
         SAFE_DELETE(m_ShuoShuo);
+        SAFE_DELETE(m_CFriend);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -881,30 +882,30 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-            {
-                if (via[0].find("FB") != std::string::npos || via[0].find("fb") != std::string::npos)
-                {
-                    if (!getInvitedBy())
-                    {
-                        UInt64 playerid = atoll(via[1].c_str());
-                        Player* cfriend = globalPlayers[playerid];
-                        if (cfriend)
-                        {
-                            addCFriend(cfriend);
-                            setInvitedBy(playerid);
-                            tellCFriendLvlUp(1);
-                            GameAction()->onInvitedBy(this);
-                        }
-                    }
-                }
-                else
-                    udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
-            }
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
             else
                 udpLog(m_via.c_str(), "", "", "", "", "", "login");
         }
         else
             udpLog("", "", "", "", "", "", "login");
+
+        if (!m_invited.empty())
+        {
+            if (!getInvitedBy())
+            {
+                UInt64 playerid = atoll(m_invited.c_str());
+                if (playerid != getId())
+                {
+                    Player* cfriend = globalPlayers[playerid];
+                    if (cfriend)
+                    {
+                        if (addCFriend(cfriend))
+                            setInvitedBy(playerid);
+                    }
+                }
+            }
+        }
+
 #ifdef _FB
 #else
         dclogger.login(this);
@@ -3074,7 +3075,7 @@ namespace GObject
 		if(pl == this)
 			return false;
 		Mutex::ScopedLock lk(_mutex);
-		if(_friends[1].size() >= 20)
+		if(_friends[1].size() >= MAX_FRIENDS)
 		{
 			sendMsgCode(2, 1505);
 			return false;
@@ -3138,7 +3139,7 @@ namespace GObject
 		//SYSMSG_SEND(157, this);
 		//SYSMSG_SENDV(1057, this, pl->getCountry(), pl->getName().c_str());
 
-		if(_friends[2].size() >= 20)
+		if(_friends[2].size() >= MAX_FRIENDS)
 		{
 			std::set<Player *>::iterator it = _friends[2].begin();
 			Stream st(REP::FRIEND_ACTION);
@@ -4397,8 +4398,7 @@ namespace GObject
 
                     sendColorTask(0, 0);
                     writeShiMen();
-                    if (!GetShuoShuo()->getShuoShuo(SS_SHIMEN))
-                        GetShuoShuo()->setShuoShuo(SS_SHIMEN, 1);
+                    OnShuoShuo(SS_SHIMEN);
                     return true;
                 }
             }
@@ -4420,8 +4420,7 @@ namespace GObject
 
                     sendColorTask(1, 0);
                     writeYaMen();
-                    if (!GetShuoShuo()->getShuoShuo(SS_YAMEN))
-                        GetShuoShuo()->setShuoShuo(SS_YAMEN, 1);
+                    OnShuoShuo(SS_YAMEN);
                     return true;
                 }
             }
@@ -4464,8 +4463,7 @@ namespace GObject
 
                     sendColorTask(0, 0);
                     writeShiMen();
-                    if (!GetShuoShuo()->getShuoShuo(SS_SHIMEN))
-                        GetShuoShuo()->setShuoShuo(SS_SHIMEN, 1);
+                    OnShuoShuo(SS_SHIMEN);
                     return true;
                 }
             }
@@ -4510,8 +4508,7 @@ namespace GObject
 
                     sendColorTask(1, 0);
                     writeYaMen();
-                    if (!GetShuoShuo()->getShuoShuo(SS_YAMEN))
-                        GetShuoShuo()->setShuoShuo(SS_YAMEN, 1);
+                    OnShuoShuo(SS_YAMEN);
                     return true;
                 }
             }
@@ -5638,8 +5635,22 @@ namespace GObject
 
     }
 
+    static UInt8 cf_lvls[4] = {45, 50, 60, 70};
     void Player::tellCFriendLvlUp(UInt8 lvl)
     {
+        bool found = false;
+        for (UInt8 i = 0; i < sizeof(cf_lvls)/sizeof(UInt8); ++i)
+        {
+            if (lvl == cf_lvls[i])
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            return;
+
         if (!_invitedBy)
             return;
 
@@ -5660,17 +5671,29 @@ namespace GObject
         GLOBAL().PushMsg(h, &msg);
     }
 
-    static UInt8 cf_lvls[CF_LVLS] = {1, 45, 60};
-    void Player::resetCFriends()
+    void Player::setCFriends()
     {
-        memset(_CFriends, 0x00, sizeof(_CFriends));
+        UInt32 cfs[4] = {0};
+        static UInt8 cf_nums[6] = {1, 3, 5, 10, 20, 30};
         for (std::set<Player *>::iterator it = _friends[3].begin();
                 it != _friends[3].end(); ++it)
         {
-            for (UInt8 i = 0; i < CF_LVLS; ++i)
+            UInt8 lvl = (*it)->GetLev();
+            for (UInt8 i = 0; i < sizeof(cf_lvls)/sizeof(UInt8); ++i)
             {
-                if ((*it)->GetLev() >= cf_lvls[i])
-                    ++_CFriends[i];
+                if (lvl < cf_lvls[i])
+                    break;
+                ++cfs[i];
+            }
+        }
+
+        for (UInt8 j = 0; j < sizeof(cf_lvls)/sizeof(UInt8); ++j)
+        {
+            for (UInt8 i = 0; i < sizeof(cf_nums)/sizeof(UInt8); ++i)
+            {
+                if (cfs[j] < cf_nums[i])
+                    break;
+                GetCFriend()->setCFriendSafe(CF_45_1+6*j+i);
             }
         }
     }
@@ -5681,7 +5704,7 @@ namespace GObject
             return;
         if (!_hasCFriend(player))
             return;
-        resetCFriends();
+        setCFriends();
     }
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
@@ -5704,23 +5727,7 @@ namespace GObject
 		GameAction()->onLevelup(this, oLev, nLev);
         if (nLev >= 45)
             OnHeroMemo(MC_FIGHTER, MD_STARTED, 0, 2);
-#ifdef _FB
        tellCFriendLvlUp(nLev);
-#endif
-
-#if 0
-		if(nLev >= 30)
-		{
-			UInt8 buffer[7];
-			*reinterpret_cast<UInt8 *>(buffer) = nLev;
-			*reinterpret_cast<UInt8 *>(buffer + 1) = _bossLevel;
-			*reinterpret_cast<UInt16 *>(buffer + 2) = 0;
-			*reinterpret_cast<UInt16 *>(buffer + 4) = 0;
-			*reinterpret_cast<UInt8 *>(buffer + 6) = static_cast<UInt8>(0);
-			GameMsgHdr hdr1(0x1A4, WORKER_THREAD_WORLD, this, 7);
-			GLOBAL().PushMsg(hdr1, buffer);
-		}
-#endif
 
         //TELL my frined that my Level up  so get the Attainment!
         if(nLev == 50 || nLev == 80 || nLev == 100)
@@ -5831,8 +5838,7 @@ namespace GObject
         st << static_cast<UInt8>(1) << Stream::eos;
         send(st);
 
-        if (!GetShuoShuo()->getShuoShuo(SS_FMTLVLUP))
-            GetShuoShuo()->setShuoShuo(SS_FMTLVLUP, 1);
+        OnShuoShuo(SS_FMTLVLUP);
         return true;
     }
 
@@ -7202,15 +7208,13 @@ namespace GObject
 
     void Player::OnShuoShuo(UInt8 idx)
     {
-        // TODO:
-        return;
         if (CURRENT_THREAD_ID() != getThreadId())
         {
             GameMsgHdr h(0x243,  getThreadId(), this, sizeof(idx));
             GLOBAL().PushMsg(h, &idx);
         }
         else
-            GetShuoShuo()->setShuoShuo(idx, 1);
+            GetShuoShuo()->setShuoSafe(idx);
     }
 
 	void Player::setClan(Clan * c)
@@ -8807,6 +8811,24 @@ namespace GObject
         }
     }
 
+    void Player::initShuoShuo()
+    {
+        if (GetLev() >= 40)
+            GetShuoShuo()->setShuoSafe(SS_40);
+        if (GetLev() >= 50)
+            GetShuoShuo()->setShuoSafe(SS_50);
+        if (GetLev() >= 60)
+            GetShuoShuo()->setShuoSafe(SS_60);
+        if (GetLev() >= 70)
+            GetShuoShuo()->setShuoSafe(SS_70);
+        if (GetLev() >= 80)
+            GetShuoShuo()->setShuoSafe(SS_80);
+        if (GetLev() >= 90)
+            GetShuoShuo()->setShuoSafe(SS_90);
+        if (GetLev() >= 100)
+            GetShuoShuo()->setShuoSafe(SS_100);
+    }
+
     void Player::sendDeamonAwardsInfo()
     {
         if(m_dpData->itemNum != 0 || m_dpData->attacker != NULL)
@@ -8852,65 +8874,14 @@ namespace GObject
     {
         if (!id)
             return;
+        if (_invitedBy)
+            return;
         _invitedBy = id;
         if (writedb)
         {
             DB3().PushUpdateData("REPLACE INTO `cfriend_awards` (`playerId`, `invitedId`, `awards`) VALUES (%"I64_FMT"u, %"I64_FMT"u, '')", _id, id);
+            GetCFriend()->setCFriendSafe(CF_INVITED);
         }
-    }
-
-    void Player::loadCFriendAwards(std::string& awards)
-    {
-        StringTokenizer cfa(awards, "|");
-        UInt32 count = cfa.count();
-        if (!count)
-            return;
-        for (UInt8 i = 0; i < CF_LVLS*3 && i < count; ++i)
-            _CFriendAwards[i] = atoi(cfa[i].c_str());
-    }
-
-    static UInt8 cf_cnt[CF_LVLS] = {3, 5, 10};
-    void Player::getCFriendAward(UInt8 idx)
-    {
-        if (!idx || idx > CF_LVLS*3)
-            return;
-
-        UInt8 i = (idx-1)/3;
-        UInt8 c = (idx-1)%3;
-        if (i >= CF_LVLS)
-            return;
-
-        if (_CFriends[i] >= cf_cnt[c] && !_CFriendAwards[idx-1])
-        {
-            if (!GameAction()->onGetCFriendAward(this, idx))
-                return;
-
-            _CFriendAwards[idx-1] = 1;
-
-            std::string awards;
-            for (UInt8 j = 0; j < CF_LVLS*3; ++j)
-            {
-                awards += Itoa(_CFriendAwards[j]);
-                if (j != CF_LVLS*3 - 1)
-                    awards += "|";
-            }
-            DB3().PushUpdateData("UPDATE `cfriend_awards` SET `awards` = '%s' WHERE `playerId` = %"I64_FMT"u", awards.c_str(), _id);
-
-            sendCFriendAward();
-        }
-    }
-
-    void Player::sendCFriendAward()
-    {
-        UInt32 awds = 0;
-        for (UInt8 i = 0; i < CF_LVLS*3; ++i)
-        {
-            if (_CFriendAwards[i])
-                awds |= (1<<i);
-        }
-        Stream st(REP::CFRIEND);
-        st << awds << Stream::eos;
-        send(st);
     }
 
     void Player::offlineExp(UInt32 now)
@@ -9035,7 +9006,16 @@ namespace GObject
         static UInt8 discount[] = {3,5,8,};
         Stream st(REP::STORE_DISLIMIT);
         for (UInt8 i = 0; i < 3; ++i)
-            st << static_cast<UInt8>(GData::store.getDiscountLimit(discount[i]) - GetVar(GObject::VAR_DISCOUNT_1+i));
+        {
+            UInt8 max = GData::store.getDiscountLimit(discount[i]);
+            UInt8 used = GetVar(GObject::VAR_DISCOUNT_1+i);
+            if (used > max)
+            {
+                used = max;
+                SetVar(GObject::VAR_DISCOUNT_1+i, used);
+            }
+            st << static_cast<UInt8>(max - used);
+        }
         st << Stream::eos;
         send(st);
     }

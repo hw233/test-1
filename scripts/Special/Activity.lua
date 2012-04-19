@@ -1065,32 +1065,8 @@ function onLoginPF(player)
     end
 end
 
-local cfriend_awards = {
-    {{56,6,1}, {57,6,1}},
-    {{56,12,1}, {57,12,1}},
-    {{56,24,1}, {57,24,1}},
-    {{503,5,1}, {508,3,1}, {506,3,1}, {56,6,1}, {57,6,1}},
-    {{503,10,1}, {508,6,1}, {506,6,1}, {56,12,1}, {57,12,1}},
-    {{503,20,1}, {508,12,1}, {506,12,1}, {56,24,1}, {57,24,1}},
-    {{509,2,1}, {507,2,1}, {515,2,1}, {56,6,1}, {57,6,1}},
-    {{509,4,1}, {507,4,1}, {515,4,1}, {56,12,1}, {57,12,1}},
-    {{509,8,1}, {507,8,1}, {515,8,1}, {56,24,1}, {57,24,1}},
-}
-function onGetCFriendAward(player, idx)
-    local package = player:GetPackage()
-    if package:GetRestPackageSize() < #cfriend_awards[idx] then
-        player:sendMsgCode(2, 1011, 0)
-        return false
-    end
-
-    for k, v in pairs(cfriend_awards[idx]) do
-        package:Add(v[1], v[2], v[3])
-    end
-    return true
-end
-
 function onInvitedBy(player)
-    sendItemPackageMail(player, "好友邀请奖励", "您的好友邀请您一同游玩蜀山传奇，系统赠送您一份大礼包", {503,5,1, 56,10,1, 57,10,1, 5035,1,1});
+    -- sendItemPackageMail(player, "好友邀请奖励", "您的好友邀请您一同游玩蜀山传奇，系统赠送您一份大礼包", {503,5,1, 56,10,1, 57,10,1, 5035,1,1});
 end
 
 function onCLLoginReward(player, cts)

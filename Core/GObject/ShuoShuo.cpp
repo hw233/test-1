@@ -63,6 +63,12 @@ void ShuoShuo::updateToDB()
             m_owner->getId(), m_updateTime, ss.c_str());
 }
 
+void ShuoShuo::setShuoSafe(UInt8 idx, UInt8 status)
+{
+    if (!getShuoShuo(idx))
+        setShuoShuo(idx, status);
+}
+
 void ShuoShuo::setShuoShuo(UInt8 idx, UInt8 status)
 {
     bool w = false;
@@ -120,7 +126,7 @@ void ShuoShuo::updateShuoShuo(UInt8 idx)
 {
     Stream st(REP::SSAWARD);
     st << static_cast<UInt8>(0);
-    st << idx;
+    st << static_cast<UInt8>(idx+1);
     st << m_ss[idx];
     st << Stream::eos;
     m_owner->send(st);

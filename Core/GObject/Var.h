@@ -114,6 +114,8 @@ namespace GObject
         VAR_CL3DAY, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
 
+        VAR_INVITES, // 邀请好友的次数
+
         VAR_MAX,
     };
 
@@ -222,6 +224,7 @@ namespace GObject
             REGISTER_VAR(VAR_CLAWARD, CYCLE_DAY);
             REGISTER_VAR(VAR_CL3DAY, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYRECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_INVITES, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
