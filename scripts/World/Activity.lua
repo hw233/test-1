@@ -197,7 +197,7 @@ function onActivityCheck(tm)
   end
 
   setRC7Day(false)
-  setShuoShuo(true);
+  setShuoShuo(false);
   setCFriend(true);
 
   -- XXX: cancel auto heal
