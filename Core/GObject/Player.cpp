@@ -9030,6 +9030,7 @@ namespace GObject
     {
         if (!World::getRC7Day())
             return;
+
         if (now < getCreated())
             return;
 
@@ -9047,6 +9048,7 @@ namespace GObject
             return;
         ctslanding |= (1<<off);
 
+        // 从今天开始的连续登陆
         UInt32 cts = 0;
         for (int i = off; i >= 0; --i)
         {
@@ -9056,20 +9058,22 @@ namespace GObject
                 break;
         }
 
-        // TODO:
         Stream st(REP::RC7DAY);
         st << static_cast<UInt8>(0);
 
         UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
         UInt8 oldLevel = calcRC7DayRechargeLevel(total);
+        st << oldLevel;
         if (oldLevel < 7)
-        {
-            st << static_cast<UInt16>(RC7DayRecharge[oldLevel-1] - total);
-            st << static_cast<UInt8>(0);
-        }
+            st << static_cast<UInt16>(RC7DayRecharge[oldLevel] - total);
         else
             st << static_cast<UInt16>(0);
 
+        st << static_cast<UInt8>(GetVar(VAR_CTSAWARD));
+        st << static_cast<UInt8>(cts);
+
+        cts = 0;
+        // 最后一次连续登陆次数，用于领取散仙
         {
             for (int i = 6; i >= 0; --i)
             {
@@ -9079,6 +9083,8 @@ namespace GObject
                     cts = 0;
             }
         }
+        st << static_cast<UInt8>(cts);
+        st << static_cast<UInt8>(GetVar(VAR_RC7DAYWILL));
 
         st << Stream::eos;
         send(st);
@@ -9086,10 +9092,11 @@ namespace GObject
         SetVar(VAR_CTSLANDING, ctslanding);
     }
 
-    void Player::getContinuousReward(UInt8 type)
+    void Player::getContinuousReward(UInt8 type, UInt8 idx)
     {
         if (!World::getRC7Day())
             return;
+
         UInt32 now = TimeUtil::Now();
         UInt32 now_sharp = TimeUtil::SharpDay(0, now);
         UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
@@ -9105,7 +9112,7 @@ namespace GObject
             off = 6;
 
         UInt32 cts = 0;
-        for (int i = 6; i >= 0; --i)
+        for (int i = off; i >= 0; --i)
         {
             if (ctslanding & (1<<i))
                 ++cts;
@@ -9117,14 +9124,27 @@ namespace GObject
         {
             GameAction()->onCLLoginReward(this, 0);
             SetVar(VAR_CTSAWARD, 1);
+
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(1);
+            st << Stream::eos;
+            send(st);
+            return;
         }
         if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
         {
             GameAction()->onCLLoginReward(this, cts);
             SetVar(VAR_CLAWARD, 1);
+
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(2);
+            st << Stream::eos;
+            send(st);
+            return;
         }
         if (type == 3 && !GetVar(VAR_CL3DAY))
         {
+            cts = 0;
             for (int i = 6; i >= 0; --i)
             {
                 if (ctslanding & (1<<i))
@@ -9137,7 +9157,25 @@ namespace GObject
             {
                 GameAction()->onCL3DayReward(this);
                 SetVar(VAR_CL3DAY, 1);
+
+                Stream st(REP::RC7DAY);
+                st << static_cast<UInt8>(3);
+                st << Stream::eos;
+                send(st);
+                return;
             }
+        }
+        if (idx && type == 4 && !GetVar(VAR_RC7DAYWILL))
+        {
+            GameAction()->onRC7DayWill(this, idx);
+            SetVar(VAR_RC7DAYWILL, idx);
+
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(4);
+            st << static_cast<UInt8>(idx);
+            st << Stream::eos;
+            send(st);
+            return;
         }
     }
 

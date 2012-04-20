@@ -1092,3 +1092,21 @@ function onCL3DayReward(player)
     package:AddItem(33, 1, 1)
 end
 
+function onRC7DayWill(player, idx)
+    if idx == 1 then
+        player:getPrestige(5000)
+    end
+
+    if idx == 2 then
+        player:getAchievement(5000)
+    end
+
+    if idx == 3 then
+        player:AddPExp(50000)
+    end
+
+    if idx == 4 then
+        player:AddExp(50000)
+    end
+end
+

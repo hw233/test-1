@@ -132,6 +132,7 @@ private:
     void OnRecharge(GObject::Player* player, std::vector<std::string>& args);
     void OnBossHP(GObject::Player* player, std::vector<std::string>& args);
     void OnJson(GObject::Player* player, std::vector<std::string>& args);
+    void OnRC7Awd(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

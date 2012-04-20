@@ -167,6 +167,7 @@ GMHandler::GMHandler()
 	Reg(3, "recharge", &GMHandler::OnRecharge);
 	Reg(3, "boss", &GMHandler::OnBossHP);
 	Reg(3, "json", &GMHandler::OnJson);
+	Reg(3, "rc7awd", &GMHandler::OnRC7Awd);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2663,5 +2664,14 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
     std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
     jsonParser(json, -1);
 #endif
+}
+void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 idx = 0;
+    if (args.size() == 2)
+        idx = atoi(args[1].c_str());
+    player->getContinuousReward(atoi(args[0].c_str()), idx);
 }
 

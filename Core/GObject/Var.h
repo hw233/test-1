@@ -113,6 +113,7 @@ namespace GObject
         VAR_CLAWARD, // 七天连续登陆奖励
         VAR_CL3DAY, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
+        VAR_RC7DAYWILL, // 所选择的愿望索引
 
         VAR_INVITES, // 邀请好友的次数
 

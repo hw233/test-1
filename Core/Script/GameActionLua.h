@@ -227,6 +227,7 @@ namespace Script
         void onRecruitAward(Player* player);
         void onCLLoginReward(Player* player, UInt8 cts);
         void onCL3DayReward(Player* player);
+        void onRC7DayWill(Player* player, UInt8 idx);
        
 	public:
 
