@@ -692,7 +692,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB8().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        DB8().PushUpdateData("REPLACE INTO `recharge` (`no`,`playerId`,`id`,`num`,`status`) VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
