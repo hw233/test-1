@@ -6373,9 +6373,9 @@ namespace GObject
         else
             OnHeroMemo(MC_FIGHTER, MD_MASTER, 0, 1);
 
+        bool bMainFighter = isMainFighter( fgt->getId()) ; 
 		if(uRand(1000) < rate)
 		{
-            bool bMainFighter = isMainFighter( fgt->getId()) ; 
             if(isPotential)
             {
                 p += 0.01f;
@@ -6504,6 +6504,36 @@ namespace GObject
             fgt->getAttrType2(true);
         if (fgt->getPotential() + 0.005f >= 1.5f && fgt->getCapacity() >= 7.0f)
             fgt->getAttrType3(true);
+
+#ifdef _FB
+        if (bMainFighter && World::getFighter1368())
+        {
+            if (fgt->getPotential() + 0.005f >= 1.3f && fgt->getCapacity() >= 6.8f && !GetVar(VAR_FIGHTER1_3_6_8))
+            {
+                SetVar(VAR_FIGHTER1_3_6_8, 1);
+
+                SYSMSG(title, 3000);
+                SYSMSG(content, 3001);
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000);
+                if(mail)
+                {
+                    MailPackage::MailItem mitem[2] = {{MailPackage::Gold,200}, {1523,1}};
+                    mailPackageManager.push(mail->id, mitem, 2, true);
+
+                    std::string strItems;
+                    for (int i = 0; i < 2; ++i)
+                    {
+                        strItems += Itoa(mitem[i].id);
+                        strItems += ",";
+                        strItems += Itoa(mitem[i].count);
+                        strItems += "|";
+                    }
+                    DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                }
+            }
+        }
+#endif
+
 		return 0;
 	}
 
@@ -8766,13 +8796,13 @@ namespace GObject
 
     void Player::sendCreateMail()
     {
-        SYSMSG(title, 2335);
 #ifdef _FB
-        SYSMSG(content, 2343);
 #else
+        SYSMSG(title, 2335);
+        //SYSMSG(content, 2343);
         SYSMSG(content, 2336);
-#endif
         GetMailBox()->newMail(NULL, 0x12, title, content);
+#endif
     }
 
     void Player::initHeroMemo()

@@ -126,6 +126,10 @@ public:
     { _cfriend = v; }
     inline static bool getCFriend()
     { return _cfriend; }
+    inline static void setFighter1368(bool v)
+    { _fighter1368 = v; }
+    inline static bool getFighter1368()
+    { return _fighter1368; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -168,6 +172,7 @@ public:
     static bool _rc7day;
     static bool _shuoshuo;
     static bool _cfriend;
+    static bool _fighter1368;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

@@ -114,8 +114,11 @@ namespace GObject
         VAR_CL3DAY, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
         VAR_RC7DAYWILL, // 所选择的愿望索引
-
         VAR_INVITES, // 邀请好友的次数
+#ifdef _FB
+        VAR_FIGHTER1_3_6_8 = 90, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
+#else
+#endif
 
         VAR_MAX,
     };
@@ -226,6 +229,7 @@ namespace GObject
             REGISTER_VAR(VAR_CL3DAY, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYRECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_INVITES, CYCLE_NONE);
+            REGISTER_VAR(VAR_FIGHTER1_3_6_8, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

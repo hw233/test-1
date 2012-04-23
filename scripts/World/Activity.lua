@@ -196,6 +196,12 @@ function onActivityCheck(tm)
       is_4_21 = false
   end
 
+  if tm >= actTime101 and tm < actTime102 then
+      setFighter1368(true)
+  else
+      setFighter1368(false)
+  end
+
   setRC7Day(false)
   setShuoShuo(false);
   setCFriend(true);
@@ -227,6 +233,8 @@ function initActTime(y, m, d)
   -- 清明节
   local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -278,6 +286,9 @@ function initActTime(y, m, d)
 
   actTime31 = os.time(SerStartTm16);
   actTime32 = os.time(SerStartTm16) + 7 * 86400;
+
+  actTime101 = os.time(SerStartTm101);
+  actTime102 = os.time(SerStartTm101) + 8 * 86400;
 
   onActivityCheck(os.time() + 30);
 
