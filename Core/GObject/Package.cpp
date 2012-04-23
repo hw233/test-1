@@ -3608,7 +3608,6 @@ namespace GObject
 			return 2;
 		}
         AddItemHistoriesLog(ITEM_FORGE_L1,  1);
-        //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
         //
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
@@ -3632,7 +3631,6 @@ namespace GObject
             }
             else
                 AddItemHistoriesLog(ITEM_FORGE_PROTECT,  c);
-                //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
 		}
 		types[0] = ied.extraAttr2.type1;
 		values[0] = ied.extraAttr2.value1;
