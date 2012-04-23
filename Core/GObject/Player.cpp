@@ -8764,6 +8764,19 @@ namespace GObject
         sendMailItem(2331, 2332, &item[pos-1][0], 2, false);
     }
 
+    void Player::sendMayDayTitleCard(int pos)
+    {
+        if (!pos || pos > 3)
+            return;
+        MailPackage::MailItem item[3] =
+        {
+            {9009, 1},
+            {9007, 1},
+            {9008, 1},
+        };
+        sendMailItem(2354, 2355, &item[pos-1], 1, false);
+    }
+
     void Player::sendCreateMail()
     {
         SYSMSG(title, 2335);
@@ -9198,6 +9211,62 @@ namespace GObject
         UInt8 level = calcRC7DayRechargeLevel(total);
         sendRC7DayRechargeMails(oldLevel + 1, level);
         SetVar(VAR_RC7DAYRECHARGE, total);
+    }
+
+    void Player::sendMDSoul(UInt32 point)
+    {
+        if (!World::getMayDay())
+            return;
+        Stream st(REP::USESOUL);
+        st << point << GetVar(VAR_MDSOUL) << Stream::eos;
+        send(st);
+    }
+
+    void Player::useMDSoul()
+    {
+        if (!World::getMayDay())
+            return;
+        UInt8 type = 0;
+        UInt32 soul = GetVar(VAR_MDSOUL);
+        if (!soul)
+            return;
+
+        UInt32 subsoul = 0;
+        if (soul >= 100)
+        {
+            type = 1;
+            subsoul = 100;
+        }
+        else if (soul >= 50)
+        {
+            type = 2;
+            subsoul = 50;
+        }
+        else if (soul >= 25)
+        {
+            type = 3;
+            subsoul = 25;
+        }
+
+        if (!type)
+            return;
+
+        soul -= subsoul;
+
+        GameAction()->onUseMDSoul(this, type);
+        SetVar(VAR_MDSOUL, soul);
+
+        sendMDSoul(subsoul);
+    }
+
+    void Player::svrSt(UInt8 type)
+    {
+        Stream st(REP::SVRST);
+        if (type == 1)
+        {
+            st << static_cast<UInt8>(type) << TimeUtil::Now() << Stream::eos;
+        }
+        send(st);
     }
 
 } // namespace GObject

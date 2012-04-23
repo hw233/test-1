@@ -525,7 +525,13 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
                     if (player2)
                         player = player2;
                 }
-				player->getGold(val);
+                player->getGold(val);
+
+                {
+                    char gold[32] = {0}; 
+                    snprintf(gold, 32, "%u", val); 
+                    player->udpLog("free", gold, "", "", "", "", "currency");
+                }
 			}
 			break;
 		case 3:
@@ -646,6 +652,11 @@ void GMHandler::OnTopup( GObject::Player * player, std::vector<std::string>& arg
 		return;
 	UInt32 val = atoi(args[0].c_str());
 	player->getGold(val);
+    {
+        char gold[32] = {0}; 
+        snprintf(gold, 32, "%u", val); 
+        player->udpLog("free", gold, "", "", "", "", "currency");
+    }
 	player->addTotalRecharge(val);
 }
 
@@ -1313,6 +1324,11 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	player->AddExp(GData::expTable.getLevelMin(100));
     player->AddPExp(100000);
     player->getGold(10000000);
+    {
+        char gold[32] = {0}; 
+        snprintf(gold, 32, "%u", 10000000); 
+        player->udpLog("free", gold, "", "", "", "", "currency");
+    }
     player->getTael(10000000);
 	makeSuper(player->getMainFighter(), player->GetLev());
 	addSuperClass(player, 10);
@@ -2244,7 +2260,14 @@ inline bool give_money(Player * p, UInt32* money)
     if (p && p->GetLev() >= lvl)
     {
         if (moneys[0])
+        {
             p->getGold(moneys[0]);
+            {
+                char gold[32] = {0}; 
+                snprintf(gold, 32, "%u", moneys[0]); 
+                p->udpLog("free", gold, "", "", "", "", "currency");
+            }
+        }
         if (moneys[1])
             p->getTael(moneys[1]);
         if (moneys[2])

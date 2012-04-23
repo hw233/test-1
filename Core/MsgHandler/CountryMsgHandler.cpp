@@ -141,7 +141,8 @@ MSG_REG(GameMsgHdr, OnTrumpLOrder);
 MSG_REG(GameMsgHdr, OnEquipUpgrade);
 MSG_REG(GameMsgHdr, OnEquipSpirit);
 MSG_REG(GameMsgHdr, OnUseToken);
-
+MSG_REG(GameMsgHdr, OnMDSoul);
+MSG_REG(GameMsgHdr, OnSvrSt);
 
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 
@@ -263,5 +264,6 @@ MSG_REG_2(GameMsgHdr, 0x240, OnHeroMemo);
 MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
 MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
 MSG_REG_2(GameMsgHdr, 0x243, OnShuoShuo);
+MSG_REG_2(GameMsgHdr, 0x246, OnSendMayDayTitleCard);
 
 MSG_HANDLER_END()

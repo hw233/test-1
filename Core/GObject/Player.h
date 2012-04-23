@@ -612,6 +612,7 @@ namespace GObject
         void getOfflineExp();
 
         void sendShusanLoveTitleCard(int);
+        void sendMayDayTitleCard(int);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -889,6 +890,7 @@ namespace GObject
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo();
+        void sendMDSoul(UInt32 point);
 
 		void autoRegenAll();
 		void regenAll(bool = false);
@@ -1249,6 +1251,9 @@ namespace GObject
         void useToken(UInt8 type);
         void sendTokenInfo();
         void sendDiscountLimit();
+
+        void useMDSoul();
+        void svrSt(UInt8);
 
     public:
 		// Last battled monster

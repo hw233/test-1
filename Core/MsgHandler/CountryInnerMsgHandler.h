@@ -1254,6 +1254,12 @@ void OnSendShusanLoveTitleCard( GameMsgHdr& hdr, const void* data )
     int pos = *(int*)(data);
     player->sendShusanLoveTitleCard(pos);
 }
+void OnSendMayDayTitleCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendMayDayTitleCard(pos);
+}
 void OnAddPExpBy( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

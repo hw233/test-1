@@ -88,6 +88,8 @@ bool World::_carnival = false;
 bool World::_rc7day = false;
 bool World::_shuoshuo = false;
 bool World::_cfriend = false;
+bool World::_mayday = false;
+bool World::_mayday1 = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -127,8 +129,14 @@ ChopStickSortMap chopStickSortMap;
 typedef std::multimap<UInt32, Player*> ShusanLoveSortMap;
 ShusanLoveSortMap shusanLoveSortMap;
 
+typedef std::multimap<UInt32, Player*> MayDaySortMap;
+MayDaySortMap mayDaySortMap1;
+MayDaySortMap mayDaySortMap2;
+MayDaySortMap mayDaySortMap3;
+
 bool bSingleDayEnd = false;
 bool bValentineDayEnd = false;
+bool bMayDayEnd = false;
 
 bool enum_midnight(void * ptr, void *)
 {
@@ -162,6 +170,21 @@ bool enum_midnight(void * ptr, void *)
         UInt32 num = pl->GetVar(VAR_SHUSAN_LOVE);
         if(num > 0)
             shusanLoveSortMap.insert(std::make_pair(num, pl));
+    }
+
+    if (bMayDayEnd)
+    {
+        UInt32 num = pl->GetVar(VAR_MDSOUL_CNT1);
+        if (num > 0)
+            mayDaySortMap1.insert(std::make_pair(num, pl));
+
+        num = pl->GetVar(VAR_MDSOUL_CNT2);
+        if (num > 0)
+            mayDaySortMap2.insert(std::make_pair(num, pl));
+
+        num = pl->GetVar(VAR_MDSOUL_CNT3);
+        if (num > 0)
+            mayDaySortMap3.insert(std::make_pair(num, pl));
     }
 
     if (World::_halloween && pl->isOnline())
@@ -287,6 +310,91 @@ void SendShusanLoveTitleCard()
     }
 }
 
+void SendMDSoulCnt()
+{
+    if(bMayDayEnd)
+    {
+        int pos = 0;
+        UInt32 mayDayNum = 0xFFFFFFFF;
+        for(MayDaySortMap::reverse_iterator iter = mayDaySortMap1.rbegin();
+                iter != mayDaySortMap1.rend(); ++iter)
+        {
+            if(iter->first != mayDayNum)
+            {
+                ++pos;
+                mayDayNum = iter->first;
+            }
+            if(pos > 1) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                int type = 1;
+                GameMsgHdr hdr(0x246, player->getThreadId(), player, sizeof(type));
+                GLOBAL().PushMsg(hdr, &type);
+            }
+            else
+            {
+                player->sendMayDayTitleCard(1);
+            }
+        }
+
+        mayDayNum = 0xFFFFFFFF;
+        for(MayDaySortMap::reverse_iterator iter = mayDaySortMap2.rbegin();
+                iter != mayDaySortMap2.rend(); ++iter)
+        {
+            if(iter->first != mayDayNum)
+            {
+                ++pos;
+                mayDayNum = iter->first;
+            }
+            if(pos > 1) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                int type = 2;
+                GameMsgHdr hdr(0x246, player->getThreadId(), player, sizeof(type));
+                GLOBAL().PushMsg(hdr, &type);
+            }
+            else
+            {
+                player->sendMayDayTitleCard(2);
+            }
+        }
+
+        mayDayNum = 0xFFFFFFFF;
+        for(MayDaySortMap::reverse_iterator iter = mayDaySortMap3.rbegin();
+                iter != mayDaySortMap3.rend(); ++iter)
+        {
+            if(iter->first != mayDayNum)
+            {
+                ++pos;
+                mayDayNum = iter->first;
+            }
+            if(pos > 1) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                int type = 3;
+                GameMsgHdr hdr(0x246, player->getThreadId(), player, sizeof(type));
+                GLOBAL().PushMsg(hdr, &type);
+            }
+            else
+            {
+                player->sendMayDayTitleCard(3);
+            }
+        }
+    }
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -296,6 +404,7 @@ void World::World_Midnight_Check( World * world )
 
     bool bSingleDay = getSingleDay();
     bool bValentineDay = getValentineDay();
+    bool bMayDay = getMayDay();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
@@ -305,11 +414,16 @@ void World::World_Midnight_Check( World * world )
 
     chopStickSortMap.clear();
     shusanLoveSortMap.clear();
+    mayDaySortMap1.clear();
+    mayDaySortMap2.clear();
+    mayDaySortMap3.clear();
 
     //判断是不是光棍节结束
     bSingleDayEnd = bSingleDay && !getSingleDay();
     //判断是不是情人节结束
     bValentineDayEnd = bValentineDay && !getValentineDay();
+    //五一使用风雷石活动是否结束
+    bMayDayEnd = bMayDay && !getMayDay();
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
 
@@ -338,6 +452,7 @@ void World::World_Midnight_Check( World * world )
 
     //给巧克力使用称号卡
     SendShusanLoveTitleCard();
+    SendMDSoulCnt();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);

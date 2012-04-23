@@ -114,8 +114,13 @@ namespace GObject
         VAR_CL3DAY, // 七天连接三天登陆奖励
         VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
         VAR_RC7DAYWILL, // 所选择的愿望索引
-
         VAR_INVITES, // 邀请好友的次数
+        VAR_MDSOUL = 90, // 五一活动灵气值
+        VAR_MDSOUL_CNT1, // 五一活动风雷宝珠使用次数 9000
+        VAR_MDSOUL_CNT2, // 雷之石 497
+        VAR_MDSOUL_CNT3, // 风之石 496
+        VAR_MDES = 94, // 五月份活动节日套装
+        VAR_MDPACKS = 95, // 五月份活动礼包是否发放
 
         VAR_MAX,
     };
@@ -226,6 +231,12 @@ namespace GObject
             REGISTER_VAR(VAR_CL3DAY, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYRECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_INVITES, CYCLE_NONE);
+            REGISTER_VAR(VAR_MDSOUL, CYCLE_NONE);
+            REGISTER_VAR(VAR_MDSOUL_CNT1, CYCLE_NONE);
+            REGISTER_VAR(VAR_MDSOUL_CNT2, CYCLE_NONE);
+            REGISTER_VAR(VAR_MDSOUL_CNT3, CYCLE_NONE);
+            REGISTER_VAR(VAR_MDES, CYCLE_NONE);
+            REGISTER_VAR(VAR_MDPACKS, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

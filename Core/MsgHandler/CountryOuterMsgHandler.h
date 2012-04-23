@@ -669,6 +669,17 @@ struct UseToken
     MESSAGE_DEF1(REQ::TOKEN, UInt8, _type);
 };
 
+struct UseMDSoul
+{
+    MESSAGE_DEF(REQ::USESOUL);
+};
+
+struct SvrSt
+{
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::SVRST, UInt8, _type);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -4356,7 +4367,6 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
-
 void OnUseToken( GameMsgHdr& hdr, UseToken& req )
 {
     MSG_QUERY_PLAYER(player);
@@ -4367,6 +4377,24 @@ void OnUseToken( GameMsgHdr& hdr, UseToken& req )
     {
         player->useToken(req._type);
     }
+}
+
+void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+    if (World::getMayDay())
+        player->useMDSoul();
+}
+
+void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->svrSt(req._type);
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

@@ -196,6 +196,18 @@ function onActivityCheck(tm)
       is_4_21 = false
   end
 
+  if tm >= actTime33 and tm < actTime34 then
+      setMayDay(true)
+  else
+      setMayDay(false)
+  end
+
+  if tm >= actTime35 and tm < actTime36 then
+      setMayDay1(true)
+  else
+      setMayDay1(false)
+  end
+
   setRC7Day(false)
   setShuoShuo(true);
   setCFriend(true);
@@ -227,6 +239,8 @@ function initActTime(y, m, d)
   -- 清明节
   local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -278,6 +292,12 @@ function initActTime(y, m, d)
 
   actTime31 = os.time(SerStartTm16);
   actTime32 = os.time(SerStartTm16) + 7 * 86400;
+
+  actTime33 = os.time(SerStartTm17);
+  actTime34 = os.time(SerStartTm17) + 7 * 86400;
+
+  actTime35 = os.time(SerStartTm17);
+  actTime36 = os.time(SerStartTm17) + 34 * 86400;
 
   onActivityCheck(os.time() + 30);
 

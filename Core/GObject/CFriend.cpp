@@ -139,7 +139,7 @@ void CFriend::setCFriendNum(UInt8 num)
     static UInt8 nums[] = {1,3,5,10,15,20};
     UInt8 sz = sizeof(nums)/sizeof(UInt8);
     UInt32 invited = m_owner->GetVar(VAR_INVITES);
-    if (invited > nums[sz-1] + 5)
+    if (invited > (UInt32)(nums[sz-1] + 5))
         return;
     invited += 1;
     for (UInt8 i = 0; i < sz; ++i)

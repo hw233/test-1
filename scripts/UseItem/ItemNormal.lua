@@ -1644,6 +1644,44 @@ function ItemNormal_00000495(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00000496(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    fgt:addPExp(num*100)
+    local p = math.random(1,20);
+    player:AddVar(90, p)
+    player:sendMDSoul(p)
+    player:AddVar(93, 1)
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
+function ItemNormal_00000497(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    fgt:addPExp(num*100)
+    local p = math.random(8,12);
+    player:AddVar(90, p)
+    player:sendMDSoul(p)
+    player:AddVar(92, 1)
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
 function ItemNormal_VIP(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
@@ -2701,6 +2739,30 @@ function ItemNormal_00007000(iid, num, bind, param)
     return num
 end
 
+function ItemNormal_00009000(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    fgt:addPExp(num*20000)
+    player:AddVar(91, 1)
+
+    package:DelItemSendMsg(iid, player);
+    return num
+end
+
+function ItemNormal_00009007(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(iid-9007+11)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_citta(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
@@ -3446,6 +3508,9 @@ local ItemNormal_Table = {
     [493] = ItemNormal_00000493,
     [494] = ItemNormal_00000494,
     [495] = ItemNormal_00000495,
+
+    [496] = ItemNormal_00000496,
+    [497] = ItemNormal_00000497,
 
     [449] = ItemNormal_VIP,
     [450] = ItemNormal_VIP,
@@ -4618,6 +4683,13 @@ local ItemNormal_Table = {
     [7997] = ItemNormal_00007000,
     [7998] = ItemNormal_00007000,
     [7999] = ItemNormal_00007000,
+
+    [9000] = ItemNormal_00009000,
+
+    [9007] = ItemNormal_00009007,
+    [9008] = ItemNormal_00009008,
+    [9009] = ItemNormal_00009009,
+
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
     [490] = ItemNormal_SecondSoul_490,

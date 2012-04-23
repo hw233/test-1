@@ -93,6 +93,8 @@ namespace Script
 		lua_tinker::def(_L, "getRC7Day", GObject::World::getRC7Day);
 		lua_tinker::def(_L, "getShuoShuo", GObject::World::getShuoShuo);
 		lua_tinker::def(_L, "getCFriend", GObject::World::getCFriend);
+		lua_tinker::def(_L, "getMayDay", GObject::World::getMayDay);
+		lua_tinker::def(_L, "getMayDay1", GObject::World::getMayDay1);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -207,6 +209,7 @@ namespace Script
 		CLASS_DEF(Player, isOffical);
 		CLASS_DEF(Player, getPlatform);
 		CLASS_DEF(Player, OnShuoShuo);
+        CLASS_DEF(Player, sendMDSoul);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -1051,5 +1054,9 @@ namespace Script
     void GameActionLua::onRC7DayWill(Player* pl, UInt8 idx)
     {
         return Call<void>(  "onRC7DayWill", pl, idx);
+    }
+    void GameActionLua::onUseMDSoul(Player* pl, UInt8 type)
+    {
+        return Call<void>(  "onUseMDSoul", pl, type);
     }
 }

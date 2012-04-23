@@ -82,6 +82,10 @@ void WorldScript::init()
 	def("setShuoShuo", GObject::World::setShuoShuo);
 	def("getCFriend", GObject::World::getCFriend);
 	def("setCFriend", GObject::World::setCFriend);
+	def("getMayDay", GObject::World::getMayDay);
+	def("setMayDay", GObject::World::setMayDay);
+	def("getMayDay1", GObject::World::getMayDay1);
+	def("setMayDay1", GObject::World::setMayDay1);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

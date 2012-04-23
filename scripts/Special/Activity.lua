@@ -135,6 +135,12 @@ function onLevelup(player, olev, nlev)
     if getFoolsDay() then
         onFoolsDay(player)
     end
+    if getMayDay() then
+        onMayDay(player)
+    end
+    if getMayDay1() then
+        onMayDay1(player)
+    end
 end
 
 function onDungeonWin(player, id, count)
@@ -779,6 +785,25 @@ function WhiteLoveDay(player, lootlvl, where)
     end
 end
 
+function MayDay(player, lootlvl)
+    if getMayDay() then
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 2,
+            [1] = 4,
+            [2] = 8,
+            [3] = 12,
+        };
+
+        local item = {496,497}
+        local package = player:GetPackage();
+        package:AddItem(item[math.random(1,#item)], itemNum[lootlvl], true);
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
@@ -786,6 +811,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
     ChingMingDay(player, lootlvl)
+    MayDay(player, lootlvl)
 end
 
 
@@ -799,6 +825,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
     ChingMingDay(player, lootlvl)
+    MayDay(player, lootlvl)
 end
 
 local vippack = {
@@ -995,6 +1022,43 @@ function onFoolsDay(player)
     end
 end
 
+function onMayDay(player)
+    if not getMayDay() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(94) == 0 then
+        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1755,1,1});
+        player:SetVar(94, 1)
+    end
+end
+
+function onMayDay1(player)
+    if not getMayDay1() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(95) == 0 then
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9001,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9002,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9003,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9004,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9005,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9006,1,1});
+        player:SetVar(95, 1)
+    end
+end
+
 function ChingMingDay(player, lootlvl)
     if not getChingMing() then
         return
@@ -1108,5 +1172,25 @@ function onRC7DayWill(player, idx)
     if idx == 4 then
         player:AddExp(50000)
     end
+end
+
+function onUseMDSoul(player, _type)
+    if _type == 0 or _type > 3 then
+        return
+    end
+
+    local items = {
+        {9000,47,509,507,515,509,507,515,},
+        {503,514,506,508,517,512,501,513,},
+        {497,496,15,56,57,511,500,518,},
+    }
+
+    local package = player:GetPackage()
+    if package:IsFull() then
+        player:sendMsgCode(2, 1011, 0)
+        return;
+    end
+
+    package:AddItem(items[_type][math.random(1,#items[_type])], 1, 1)
 end
 
