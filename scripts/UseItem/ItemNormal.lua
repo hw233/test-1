@@ -1654,9 +1654,16 @@ function ItemNormal_00000496(iid, num, bind, param)
 	end
 
     fgt:addPExp(num*100)
-    local p = math.random(1,20);
-    player:AddVar(90, p)
-    player:sendMDSoul(p)
+
+    local op = player:GetVar(90);
+    if op < 10000 then
+        local p = math.random(1,20);
+        if op + p > 10000 then
+            p = op + p - 10000
+        end
+        player:AddVar(90, p)
+        player:sendMDSoul(p)
+    end
     player:AddVar(93, 1)
 
     package:DelItemSendMsg(iid, player);
@@ -1673,9 +1680,16 @@ function ItemNormal_00000497(iid, num, bind, param)
 	end
 
     fgt:addPExp(num*100)
-    local p = math.random(8,12);
-    player:AddVar(90, p)
-    player:sendMDSoul(p)
+
+    local op = player:GetVar(90);
+    if op < 10000 then
+        local p = math.random(8,12);
+        if op + p > 10000 then
+            p = op + p - 10000
+        end
+        player:AddVar(90, p)
+        player:sendMDSoul(p)
+    end
     player:AddVar(92, 1)
 
     package:DelItemSendMsg(iid, player);
@@ -2753,6 +2767,70 @@ function ItemNormal_00009000(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player);
     return num
+end
+
+function ItemNormal_00009001(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local dates = {
+        { ['year'] = 2012, ['month'] = 5, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 5, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 5, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 5, ['day'] = 20, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 5, ['day'] = 31, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+    }
+
+    local items = {
+        {{56,6},{57,6},{503,6},{60000,100}},
+        {{56,6},{57,6},{514,6},{60000,100}},
+        {{56,6},{57,6},{1526,6},{60000,100}},
+        {{56,6},{57,6},{509,6},{60000,100}},
+        {{56,6},{57,6},{507,6},{60000,100}},
+        {{56,6},{57,6},{30000,1},{60000,100}},
+    }
+
+    local id = iid - 9000
+    local start = os.time(dates[id])
+    local doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        if package:GetRestPackageSize() < (3*factor) then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
+        end
+
+        local item = items[id]
+
+        for k,v in pairs(item) do
+            if v[1] == 30000 then
+                local gem = {5005, 5015, 5025, 5035, 5045}
+                local g = math.random(1, #gem)
+                package:AddItem(gem[g], v[2], true, 0, 2)
+                if factor == 2 then
+                    g = math.random(1, #gem)
+                    package:AddItem(gem[g], v[2], true, 0, 2)
+                end
+            elseif v[1] == 60000 then
+                player:getCoupon(v[2]*factor)
+            else
+                package:Add(v[1], v[2]*factor, true, 0, 2)
+            end
+        end
+
+        package:DelItemSendMsg(iid, player);
+        return num
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+    return false
 end
 
 function ItemNormal_00009007(iid, num, bind, param)
@@ -4685,6 +4763,13 @@ local ItemNormal_Table = {
     [7999] = ItemNormal_00007000,
 
     [9000] = ItemNormal_00009000,
+
+    [9001] = ItemNormal_00009001,
+    [9002] = ItemNormal_00009001,
+    [9003] = ItemNormal_00009001,
+    [9004] = ItemNormal_00009001,
+    [9005] = ItemNormal_00009001,
+    [9006] = ItemNormal_00009001,
 
     [9007] = ItemNormal_00009007,
     [9008] = ItemNormal_00009008,
