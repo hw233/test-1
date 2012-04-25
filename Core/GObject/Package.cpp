@@ -872,7 +872,7 @@ namespace GObject
         DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
         DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`,`socket3`,`socket4`, `socket5`, `socket6`) VALUES(%u, %u, %u, %u, %d, %u, %d, %u, %d, %u, %u,%u,%u,%u,%u,%u)", id, typeId, edata.enchant,edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3, edata.sockets, edata.gems[0], edata.gems[1], edata.gems[2], edata.gems[3], edata.gems[4],edata.gems[5]);
         DB4().PushUpdateData("UPDATE `equipment_spirit` SET `id` = %u WHERE `id` = %u", id, oldEquipId);
-
+        GenSpirit2(equip);
         SendSingleEquipData(equip);
         if(notify)
             ItemNotify(equip->GetItemType().getId());
@@ -3550,7 +3550,6 @@ namespace GObject
         if( pEquip == NULL)
             return 2;
 
-
         if(pNewId)
             *pNewId =  pEquip->getId();
         ConsumeInfo ci(ForEquipUpgrade,0,0);
@@ -4171,4 +4170,15 @@ namespace GObject
         }
     }
 
+    void Package::GenSpirit2(ItemEquip* equip)
+    {
+        ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+        if (equip->getQuality() == 5 && esa.spForm[0] == 0)
+        {
+            esa.spForm[0] = GRND(4) + 1;
+            esa.spForm[1] = GRND(4) + 1;
+            esa.spForm[2] = GRND(4) + 1;
+            DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spform1` = %u, `spform2` = %u, `spform3` = %u WHERE `id` = %u", esa.spForm[0], esa.spForm[1], esa.spForm[2], equip->getId());
+        }
+    }
 }

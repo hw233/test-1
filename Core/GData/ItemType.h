@@ -24,7 +24,9 @@
 #define RSOUL_ID        7999
 #define LSL_ID          8000
 #define RSL_ID          8999
-#define LOTHER_ID       9000
+#define LNORMAL1_ID     9000
+#define RNORMAL1_ID     9999
+#define LOTHER_ID       10000
 #define ROTHER_ID       65535
 
 enum ItemClass
@@ -123,7 +125,7 @@ inline bool IsFighterTypeId(UInt32 id)
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
-    if (id >= LNORMAL_ID && id <= RNORMAL_ID)
+    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID))
         return Item_Normal;
     if (id >= LENHANCE_ID && id <= RENHANCE_ID)
         return Item_Enhance;
