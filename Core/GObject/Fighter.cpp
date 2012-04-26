@@ -3676,12 +3676,17 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
     if(!m_2ndSoul)
         return false;
 
-    if(itemId != 0)
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
+    if( idx != MAX_SKILL_NUM && ((m_2ndSoul->getSkillNum1() > MAX_SKILL_NUM_1 && itemType->subClass == Item_SL1 )
+            || (m_2ndSoul->getSkillNum2() > MAX_SKILL_NUM_2 && itemType->subClass == Item_SL2)) )
+        itemId = 0;
+
+    if(itemId != 0 && idx == MAX_SKILL_NUM)
     {
-        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
-        if( (m_2ndSoul->getSkillNum1() >= MAX_SKILL_NUM_1 && itemType->subClass != Item_SL1)
-                || (m_2ndSoul->getSkillNum2() >= MAX_SKILL_NUM_2 && itemType->subClass != Item_SL2) )
+        if( (m_2ndSoul->getSkillNum1() == MAX_SKILL_NUM_1 && itemType->subClass == Item_SL1)
+                || (m_2ndSoul->getSkillNum2() == MAX_SKILL_NUM_2 && itemType->subClass == Item_SL2) )
             return false;
+        -- idx;
     }
 
     UInt16 skillId = 0;
@@ -3750,7 +3755,7 @@ UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
         return 0xFF;
 
     if(itemId == 0)
-        return MAX_SKILL_NUM - 1;
+        return MAX_SKILL_NUM;
 
     UInt16 skillId = m_2ndSoul->getSkillIdOfItem(itemId);
 
