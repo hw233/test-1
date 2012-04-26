@@ -232,14 +232,10 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, UInt16 skillId, bool writeDB)
             -- m_skill_num2;
     }
 
-    if(m_skill_num1 > MAX_SKILL_NUM_1)
-        m_skill_num1 = MAX_SKILL_NUM_1;
-    else if(m_skill_num1 < 0)
+    if(m_skill_num1 < 0)
         m_skill_num1 = 0;
 
-    if(m_skill_num2 > MAX_SKILL_NUM_2)
-        m_skill_num2 = MAX_SKILL_NUM_2;
-    else if(m_skill_num2 < 0)
+    if(m_skill_num2 < 0)
         m_skill_num2 = 0;
 
     return itemId;
