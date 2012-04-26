@@ -231,6 +231,7 @@ namespace Script
         void onCL3DayReward(Player* player);
         void onRC7DayWill(Player* player, UInt8 idx);
         UInt32 onUseMDSoul(Player* player, UInt8 type);
+        bool onTurnOnRC7Day(Player* player, UInt32 total, UInt32 offset);
        
 	public:
 

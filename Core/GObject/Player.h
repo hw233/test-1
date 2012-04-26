@@ -576,6 +576,8 @@ namespace GObject
         void sendCreateMail();
         void continuousLogin(UInt32 now);
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
+        void turnOnRC7Day();
+        void addRC7DayRecharge(UInt32 r);
 
 		void Reconnect();
 
@@ -1165,9 +1167,6 @@ namespace GObject
         void sendRechargeMails(UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
-        void sendRC7DayMails(UInt32 r);
-        UInt8 calcRC7DayRechargeLevel(UInt32 total);
-        void sendRC7DayRechargeMails(UInt8 l, UInt8 h);
 
     private:
         bool _isJumpingMap;

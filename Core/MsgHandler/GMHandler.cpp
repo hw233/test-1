@@ -168,6 +168,7 @@ GMHandler::GMHandler()
 	Reg(3, "boss", &GMHandler::OnBossHP);
 	Reg(3, "json", &GMHandler::OnJson);
 	Reg(3, "rc7awd", &GMHandler::OnRC7Awd);
+	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2697,4 +2698,9 @@ void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args
         idx = atoi(args[1].c_str());
     player->getContinuousReward(atoi(args[0].c_str()), idx);
 }
+void GMHandler::OnRC7TurnOn(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->turnOnRC7Day();
+}
+
 

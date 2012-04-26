@@ -710,27 +710,6 @@ namespace GObject
         return recharge[lvl-1];
     }
 
-    static UInt32 RC7DayRecharge[] = {10,50,100,200,300,400,500,};
-    UInt8 Player::calcRC7DayRechargeLevel(UInt32 total)
-    {
-        UInt32 totalRecharge = total;
-        for (UInt8 i = 0; i < sizeof(RC7DayRecharge)/sizeof(UInt32); ++i)
-        {
-            if (totalRecharge < RC7DayRecharge[i])
-                return i;
-        }
-        return 7;
-    }
-
-    inline UInt32 RC7DayLevelToRecharge(UInt8 lvl)
-    {
-        if (lvl < 1)
-            return 0;
-        if (lvl > sizeof(RC7DayRecharge)/sizeof(UInt32))
-            lvl = 7;
-        return RC7DayRecharge[lvl-1];
-    }
-
 	bool Player::Init()
 	{
 		if(_availInit)
@@ -5940,7 +5919,7 @@ namespace GObject
 		}
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
-        sendRC7DayMails(r);
+        addRC7DayRecharge(r);
 
         if (World::getRechargeActive())
         {
@@ -6965,55 +6944,6 @@ namespace GObject
 		}
 	}
 
-	void Player::sendRC7DayRechargeMails( UInt8 l, UInt8 h )
-	{
-		if(l < 1)
-			l = 1;
-		if(h > 7)
-			h = 7;
-
-		for(UInt32 j = l; j <= h; ++j)
-		{
-			SYSMSGV(title, 2322, RC7DayLevelToRecharge(j));
-			SYSMSG(content, 2323);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-			if(mail == NULL)
-				continue;
-
-			const UInt32 itemTable[7][16] =
-            {
-                {514,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {503,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {516,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
-                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
-                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
-                {514,5,503,5,516,5,0,0,0,0,0,0,0,0,0,0},
-            };
-
-			MailPackage::MailItem mitem[8];
-			UInt32 mcount = 0;
-            std::string strItems;
-
-			const UInt32 * t = itemTable[j-1];
-			for(UInt32 i = 0; i < 16 && t[i] > 0; i += 2)
-			{
-                if (!t[i])
-                    break;
-
-				mitem[mcount].id = t[i];
-				mitem[mcount++].count = t[i+1];
-				strItems += Itoa(t[i]);
-				strItems += ",";
-				strItems += Itoa(t[i+1]);
-				strItems += "|";
-			}
-
-			mailPackageManager.push(mail->id, mitem, mcount, true);
-			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
-        }
-    }
-
 	void Player::sendBlockBossMail(UInt8 l, UInt8 h)
 	{
 		UInt16 coupon = 0;
@@ -7522,6 +7452,8 @@ namespace GObject
 			return 1;
 		if(!_pwdInfo.secondPWD.empty())
 			return 1;
+        if (GetLev() < 30)
+            return 1;
 		_pwdInfo.secondPWD = pwd;
 		_pwdInfo.questionForPWD = question;
 		_pwdInfo.answerForPWD = answer;
@@ -9066,7 +8998,6 @@ namespace GObject
             return;
         ctslanding |= (1<<off);
 
-        // 从今天开始的连续登陆
         UInt32 cts = 0;
         for (int i = off; i >= 0; --i)
         {
@@ -9079,25 +9010,13 @@ namespace GObject
         Stream st(REP::RC7DAY);
         st << static_cast<UInt8>(0);
 
-        UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
-        st << total;
+        st << GetVar(VAR_RC7DAYRECHARGE);
+        st << static_cast<UInt8>(GetVar(VAR_RC7DAYTURNON));
         st << static_cast<UInt8>(GetVar(VAR_CTSAWARD));
         st << static_cast<UInt8>(cts);
-
-        cts = 0;
-        // 最后一次连续登陆次数，用于领取散仙
-        {
-            for (int i = 6; i >= 0; --i)
-            {
-                if (ctslanding & (1<<i))
-                    ++cts;
-                else
-                    cts = 0;
-            }
-        }
-        st << static_cast<UInt8>(cts);
+        st << static_cast<UInt8>(GetVar(VAR_CLAWARD));
+        st << static_cast<UInt8>(GetVar(VAR_CL3DAY));
         st << static_cast<UInt8>(GetVar(VAR_RC7DAYWILL));
-
         st << Stream::eos;
         send(st);
 
@@ -9156,15 +9075,6 @@ namespace GObject
         }
         if (type == 3 && !GetVar(VAR_CL3DAY))
         {
-            cts = 0;
-            for (int i = 6; i >= 0; --i)
-            {
-                if (ctslanding & (1<<i))
-                    ++cts;
-                else
-                    cts = 0;
-            }
-
             if (cts >= 3)
             {
                 GameAction()->onCL3DayReward(this);
@@ -9189,32 +9099,6 @@ namespace GObject
             send(st);
             return;
         }
-    }
-
-    void Player::sendRC7DayMails(UInt32 r)
-    {
-        if (!World::getRC7Day())
-            return;
-        UInt32 now = TimeUtil::Now();
-        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
-        UInt32 created_sharp = TimeUtil::SharpDay(0, getCreated());
-        if (created_sharp < now_sharp)
-            return;
-
-        if (now_sharp - created_sharp > 7 * DAY_SECS)
-            return;
-
-        UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
-        UInt8 oldLevel = calcRC7DayRechargeLevel(total);
-        total += r;
-        UInt8 level = calcRC7DayRechargeLevel(total);
-        sendRC7DayRechargeMails(oldLevel + 1, level);
-        SetVar(VAR_RC7DAYRECHARGE, total);
-
-        Stream st(REP::RC7DAY);
-        st << static_cast<UInt8>(5);
-        st << total << Stream::eos;
-        send(st);
     }
 
     void Player::sendMDSoul(UInt8 type, UInt32 id)
@@ -9326,6 +9210,38 @@ namespace GObject
         {
             st << static_cast<UInt8>(type) << TimeUtil::Now() << Stream::eos;
         }
+        send(st);
+    }
+
+    void Player::turnOnRC7Day()
+    {
+        if (!World::getRC7Day())
+            return;
+
+        UInt32 offset = GetVar(VAR_RC7DAYTURNON);
+        if (offset > 7)
+            return;
+        UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
+        if (GameAction()->onTurnOnRC7Day(this, total, offset))
+        {
+            SetVar(VAR_RC7DAYTURNON, offset+1);
+
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(6) << static_cast<UInt8>(GetVar(VAR_RC7DAYTURNON));
+            st << Stream::eos;
+            send(st);
+        }
+    }
+
+    void Player::addRC7DayRecharge(UInt32 r)
+    {
+        if (!World::getRC7Day())
+            return;
+        AddVar(VAR_RC7DAYRECHARGE, r);
+
+        Stream st(REP::RC7DAY);
+        st << static_cast<UInt8>(5) << GetVar(VAR_RC7DAYRECHARGE);
+        st << Stream::eos;
         send(st);
     }
 

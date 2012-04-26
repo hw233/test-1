@@ -1188,3 +1188,51 @@ function onUseMDSoul(player, _type)
     return items[_type][math.random(1,#items[_type])]
 end
 
+function onTurnOnRC7Day(player, total, offset)
+    local items = {
+        {{15,2},{502,1},{57,1},{56,1},{506,1},{508,1},{510,2},{503,1}},
+        {{15,2},{502,2},{57,1},{56,1},{506,1},{508,1},{510,5},{503,1}},
+        {{15,2},{502,3},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,2},{502,4},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,2},{502,5},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,2},{502,6},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,5},{502,10},{57,5},{56,5},{507,2},{509,2},{512,2},{503,2}},
+    }
+
+    if offset + 1 > #items then
+        return false
+    end
+
+    local totals = {10,50,100,200,300,400,500}
+
+    local max = 0
+    for n = 1, #totals do
+        if total >= totals[n] then
+            max = n
+        else
+            break
+        end
+    end
+
+    if max == 0 then
+        return false
+    end
+
+    if offset >= max then
+        return false
+    end
+
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < 8 then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    local item = items[offset + 1]
+    for k,v in pairs(item) do
+        package:AddItem(v[1], v[2], 1)
+    end
+
+    return true
+end
+

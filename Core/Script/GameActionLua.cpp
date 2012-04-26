@@ -1069,4 +1069,8 @@ namespace Script
     {
         return Call<UInt32>(  "onUseMDSoul", pl, type);
     }
+    bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
+    {
+        return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
+    }
 }

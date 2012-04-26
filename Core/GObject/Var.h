@@ -121,6 +121,7 @@ namespace GObject
         VAR_MDSOUL_CNT3, // 风之石 496
         VAR_MDES = 94, // 五月份活动节日套装
         VAR_MDPACKS = 95, // 五月份活动礼包是否发放
+        VAR_RC7DAYTURNON,
 
         VAR_MAX,
     };
@@ -237,6 +238,7 @@ namespace GObject
             REGISTER_VAR(VAR_MDSOUL_CNT3, CYCLE_NONE);
             REGISTER_VAR(VAR_MDES, CYCLE_NONE);
             REGISTER_VAR(VAR_MDPACKS, CYCLE_NONE);
+            REGISTER_VAR(VAR_RC7DAYTURNON, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

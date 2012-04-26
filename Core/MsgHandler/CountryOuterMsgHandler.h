@@ -4410,5 +4410,38 @@ void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )
     player->svrSt(req._type);
 }
 
+void OnRC7Day( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+        case 1:
+        case 2:
+        case 3:
+            player->getContinuousReward(op);
+            break;
+
+        case 4:
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->getContinuousReward(op, idx);
+            }
+            break;
+
+        case 5:
+            player->turnOnRC7Day();
+            break;
+
+        default:
+            break;
+    }
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 
