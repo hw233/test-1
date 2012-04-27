@@ -7855,6 +7855,11 @@ namespace GObject
             else
                 st << maxCnt;
             st << static_cast<UInt8>(0);
+
+            UInt8 factor = 1;
+            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 10 && World::getYDMDAct())
+                factor = 2;
+
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
                 if(flag && (i == 0 || i > 6))
@@ -7868,7 +7873,7 @@ namespace GObject
                     if(GetItemSubClass(itemId) == Item_Gem)
                         itemId = _playerData.ydGemId;
 
-                    st << itemId << ydItem[j].itemNum;
+                    st << itemId << static_cast<UInt8>(ydItem[j].itemNum*factor);
                 }
             }
 
@@ -7876,7 +7881,7 @@ namespace GObject
             UInt8 itemCnt = ydItem.size();
             st << itemCnt;
             for(UInt8 j = 0; j < itemCnt; ++ j)
-                st << ydItem[j].itemId << ydItem[j].itemNum;
+                st << ydItem[j].itemId << static_cast<UInt8>(ydItem[j].itemNum*factor);
             st << Stream::eos;
             send(st);
         }
@@ -7947,6 +7952,10 @@ namespace GObject
                     qqvipl = qqvipl%10 + 1;
             }
 
+            UInt8 factor = 1;
+            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 10 && World::getYDMDAct())
+                factor = 2;
+
             if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)
             {
                 std::vector<YDItem>& ydItem = GObjectManager::getYDItem(qqvipl - 1);
@@ -7961,7 +7970,7 @@ namespace GObject
                         if(GetItemSubClass(itemId) == Item_Gem)
                             itemId = _playerData.ydGemId;
 
-                        GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                        GetPackage()->AddItem2(itemId, factor*ydItem[j].itemNum, true, true);
                     }
 
 #ifdef _FB
@@ -7984,7 +7993,7 @@ namespace GObject
                     _playerData.qqawardgot |= (0x2<<flag);
 
                     for(int j = 0; j < itemCnt; ++ j)
-                        GetPackage()->AddItem2(ydItem[j].itemId, ydItem[j].itemNum, true, true);
+                        GetPackage()->AddItem2(ydItem[j].itemId, factor*ydItem[j].itemNum, true, true);
                 }
                 else
                 {

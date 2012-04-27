@@ -208,6 +208,12 @@ function onActivityCheck(tm)
       setMayDay1(false)
   end
 
+  if tm >= actTime37 and tm < actTime38 then
+      setYDMDAct(true)
+  else
+      setYDMDAct(false)
+  end
+
   setRC7Day(true)
   setShuoShuo(true);
   setCFriend(true);
@@ -298,6 +304,9 @@ function initActTime(y, m, d)
 
   actTime35 = os.time(SerStartTm17);
   actTime36 = os.time(SerStartTm17) + 34 * 86400;
+  
+  actTime37 = os.time(SerStartTm17);
+  actTime38 = os.time(SerStartTm17) + 10 * 86400;
 
   onActivityCheck(os.time() + 30);
 

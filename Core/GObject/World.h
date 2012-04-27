@@ -134,6 +134,10 @@ public:
     { _mayday1 = v; }
     inline static bool getMayDay1()
     { return _mayday1; }
+    inline static void setYDMDAct(bool v)
+    { _ydmdact = v; }
+    inline static bool getYDMDAct()
+    { return _ydmdact; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -178,6 +182,7 @@ public:
     static bool _cfriend;
     static bool _mayday;
     static bool _mayday1;
+    static bool _ydmdact;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
