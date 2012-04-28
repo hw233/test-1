@@ -9135,15 +9135,15 @@ namespace GObject
             type = 1;
             subsoul = 100;
         }
-        else if (soul >= 50)
+        else if (soul >= 20)
         {
             type = 2;
-            subsoul = 50;
+            subsoul = 20;
         }
-        else if (soul >= 25)
+        else if (soul >= 10)
         {
             type = 3;
-            subsoul = 25;
+            subsoul = 10;
         }
 
         if (!type)
@@ -9172,15 +9172,15 @@ namespace GObject
             type = 1;
             subsoul = 100;
         }
-        else if (soul >= 50)
+        else if (soul >= 20)
         {
             type = 2;
-            subsoul = 50;
+            subsoul = 20;
         }
-        else if (soul >= 25)
+        else if (soul >= 10)
         {
             type = 3;
-            subsoul = 25;
+            subsoul = 10;
         }
 
         if (!type)
