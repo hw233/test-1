@@ -609,6 +609,7 @@ namespace SPEQ
     const UInt16 PWDRESET           = 0x11B;
     const UInt16 MAILVIP            = 0x11C;
     const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
+    const UInt16 CFRIEND            = 0x11E;//设置成密友
 }
 
 namespace SPEP
@@ -641,6 +642,7 @@ namespace SPEP
     const UInt8 PWDRESET            = 0x1B;
     const UInt8 MAILVIP             = 0x1C;
     const UInt8 JASON               = 0x1D;
+    const UInt8 CFRIEND             = 0x1E;//设置成密友
 }
 
 #endif // _MSGID_H_

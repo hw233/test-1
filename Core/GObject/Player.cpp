@@ -2882,12 +2882,12 @@ namespace GObject
 		if(_id < pl->getId())
 		{
 			addFriendInternal(pl, true, true);
-			pl->addFriendInternal(this, true, false);
+			pl->addFriendInternal(this, true, true);
 		}
 		else
 		{
 			pl->addFriendInternal(this, true, true);
-			addFriendInternal(pl, true, false);
+			addFriendInternal(pl, true, true);
 		}
 
         AddFriendAttainment(pl);
@@ -2905,12 +2905,12 @@ namespace GObject
 		if(_id < pl->getId())
 		{
 			addCFriendInternal(pl, true, true);
-			pl->addCFriendInternal(this, true, false);
+			pl->addCFriendInternal(this, true, true);
 		}
 		else
 		{
 			pl->addCFriendInternal(this, true, true);
-			addCFriendInternal(pl, true, false);
+			addCFriendInternal(pl, true, true);
 		}
 		return true;
 	}
@@ -2936,13 +2936,13 @@ namespace GObject
 			return;
 		if(_id < pl->getId())
 		{
-			addCFriendInternal(pl, false, true);
-			pl->addCFriendInternal(this, false, true);
+			addCFriendInternal(pl, false, false);
+			pl->addCFriendInternal(this, false, false);
 		}
 		else
 		{
-			pl->addCFriendInternal(this, false, true);
-			addCFriendInternal(pl, false, true);
+			pl->addCFriendInternal(this, false, false);
+			addCFriendInternal(pl, false, false);
 		}
 	}
 
