@@ -215,7 +215,7 @@ function onActivityCheck(tm)
   end
 
   if tm >= actTime101 and tm < actTime102 then
-      setFighter1368(true)
+      setFighter1368(false) -- only fb
   else
       setFighter1368(false)
   end
