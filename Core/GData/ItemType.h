@@ -78,7 +78,8 @@ enum ItemClass
     Item_Soul8, Item_Soul9,
     Item_SL = 100, // 元神技能材料
     Item_SL1, // 元神技能
-	Item_Other = 102,	//其他
+    Item_SL2, // 元神技能
+	Item_Other = 103,	//其他
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号

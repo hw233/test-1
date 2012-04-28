@@ -4347,17 +4347,21 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
     case 0x04:
         {
             UInt16 fighterId = 0;
-            UInt8 idx = 0;
-            UInt16 itemId = 0;
+            UInt16 itemId1 = 0;
+            UInt16 itemId2 = 0;
             UInt8 bind = 0;
 
-            br >> fighterId >> idx >> itemId >> bind;
+            br >> fighterId >> itemId1 >> itemId2 >> bind;
             GObject::Fighter * fgt = player->findFighter(fighterId);
-            if(!fgt || idx < 1 || idx > 6)
+            if(!fgt)
+                break;
+
+            UInt8 idx = fgt->getSoulSkillIdx(itemId1);
+            if(idx == 0xFF)
                 break;
 
             bool res = false;
-            res = fgt->equipSoulSkill(idx - 1, itemId, bind != 0);
+            res = fgt->equipSoulSkill(idx, itemId2, bind != 0);
 
             Stream st(REP::SECOND_SOUL);
             st << static_cast<UInt8>(4);

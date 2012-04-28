@@ -2001,7 +2001,7 @@ namespace GObject
 				PopTimerEvent(this, EVENT_FIGHTERAUTOTRAINING, id);
 			Fighter * fgt = it->second;
 
-            for(Int8 k = 5; k >= 0; --k)
+            for(Int8 k = MAX_SKILL_NUM - 1; k >= 0; --k)
                 fgt->equipSoulSkill(k, 0);
 
 			ItemEquip * equip;
