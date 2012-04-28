@@ -197,19 +197,19 @@ function onActivityCheck(tm)
   end
 
   if tm >= actTime33 and tm < actTime34 then
-      setMayDay(false)
+      setMayDay(false) -- only qq
   else
       setMayDay(false)
   end
 
   if tm >= actTime35 and tm < actTime36 then
-      setMayDay1(false)
+      setMayDay1(false) -- only qq
   else
       setMayDay1(false)
   end
 
   if tm >= actTime37 and tm < actTime38 then
-      setYDMDAct(false)
+      setYDMDAct(false) -- only qq
   else
       setYDMDAct(false)
   end
@@ -221,7 +221,7 @@ function onActivityCheck(tm)
   end
 
   setRC7Day(true)
-  setShuoShuo(false);
+  setShuoShuo(false); -- only qq
   setCFriend(true);
 
   -- XXX: cancel auto heal
