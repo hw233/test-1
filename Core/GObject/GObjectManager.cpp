@@ -4146,14 +4146,14 @@ namespace GObject
             }
 
             SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel);
-			StringTokenizer tokenizer(dbss.skills, ",");
+            StringTokenizer tokenizer(dbss.skills, ",");
             int idx = 0;
-			for(size_t j = 0; j < tokenizer.count(); ++ j)
-			{
-				UInt16 skillId = atoi(tokenizer[j].c_str());
+            for(size_t j = 0; j < tokenizer.count(); ++ j)
+            {
+                UInt16 skillId = atoi(tokenizer[j].c_str());
                 secondSoul->setSoulSkill(idx, skillId);
                 ++ idx;
-			}
+            }
             fgt->setSecondSoul(secondSoul);
 		}
 		lc.finalize();
