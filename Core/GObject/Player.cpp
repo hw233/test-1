@@ -824,6 +824,10 @@ namespace GObject
             GameAction()->onValentineDay(this);
         if (World::getFoolsDay())
             GameAction()->onFoolsDay(this);
+        if (World::getMayDay())
+            GameAction()->onMayDay(this);
+        if (World::getMayDay1())
+            GameAction()->onMayDay1(this);
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {

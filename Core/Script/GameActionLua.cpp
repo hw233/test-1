@@ -954,6 +954,16 @@ namespace Script
 		return Call<bool>("onFoolsDay", player);
 	}
 
+	bool GameActionLua::onMayDay(Player* player)
+	{
+		return Call<bool>("onMayDay", player);
+	}
+
+	bool GameActionLua::onMayDay1(Player* player)
+	{
+		return Call<bool>("onMayDay1", player);
+	}
+
 	bool GameActionLua::getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul)
 	{
 		return Call<bool>("getHeroMemoAward", player, idx, soul);
