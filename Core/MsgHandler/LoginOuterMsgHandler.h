@@ -2000,5 +2000,27 @@ void JasonParse(LoginMsgHdr& hdr, const void* data)
 #endif
 }
 
+void SetCFriend(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    std::string name1;
+    std::string name2;
+    br >> name1;
+    br >> name2;
+	GObject::Player * pl1 = GObject::globalNamedPlayers[name1];
+	GObject::Player * pl2 = GObject::globalNamedPlayers[name2];
+    UInt8 ret = 1;
+    if (pl1 && pl2)
+    {
+        pl1->addCFriend(pl2);
+        ret = 0;
+    }
+
+    Stream st(SPEP::CFRIEND);
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
+}
+
 #endif // _LOGINOUTERMSGHANDLER_H_
 
