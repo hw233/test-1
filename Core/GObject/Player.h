@@ -890,7 +890,9 @@ namespace GObject
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo();
-        void sendMDSoul(UInt32 point);
+        void getMDItem();
+        void sendMDSoul(UInt8 type, UInt32 id = 0);
+        UInt32 _mditem;
 
 		void autoRegenAll();
 		void regenAll(bool = false);

@@ -1176,7 +1176,7 @@ end
 
 function onUseMDSoul(player, _type)
     if _type == 0 or _type > 3 then
-        return
+        return 0
     end
 
     local items = {
@@ -1185,12 +1185,6 @@ function onUseMDSoul(player, _type)
         {497,496,15,56,57,511,500,518,},
     }
 
-    local package = player:GetPackage()
-    if package:IsFull() then
-        player:sendMsgCode(2, 1011, 0)
-        return;
-    end
-
-    package:AddItem(items[_type][math.random(1,#items[_type])], 1, 1)
+    return items[_type][math.random(1,#items[_type])]
 end
 

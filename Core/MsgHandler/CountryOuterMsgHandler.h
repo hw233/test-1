@@ -671,7 +671,8 @@ struct UseToken
 
 struct UseMDSoul
 {
-    MESSAGE_DEF(REQ::USESOUL);
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::USESOUL, UInt8, _type);
 };
 
 struct SvrSt
@@ -1024,6 +1025,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
+    pl->sendMDSoul(0);
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -4386,7 +4388,14 @@ void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
          return;
 
     if (World::getMayDay())
-        player->useMDSoul();
+    {
+        if (req._type == 0)
+            player->sendMDSoul(0);
+        else if (req._type == 1)
+            player->getMDItem();
+        else if (req._type == 2)
+            player->useMDSoul();
+    }
 }
 
 void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )

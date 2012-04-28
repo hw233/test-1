@@ -536,6 +536,7 @@ namespace GObject
         m_hf = new HoneyFall(this);
         m_dpData = new DeamonPlayerData();
         m_csFlag = 0;
+        _mditem = 0;
 	}
 
 
@@ -9075,13 +9076,7 @@ namespace GObject
         st << static_cast<UInt8>(0);
 
         UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
-        UInt8 oldLevel = calcRC7DayRechargeLevel(total);
-        st << oldLevel;
-        if (oldLevel < 7)
-            st << static_cast<UInt16>(RC7DayRecharge[oldLevel] - total);
-        else
-            st << static_cast<UInt16>(0);
-
+        st << total;
         st << static_cast<UInt8>(GetVar(VAR_CTSAWARD));
         st << static_cast<UInt8>(cts);
 
@@ -9211,26 +9206,41 @@ namespace GObject
         UInt8 level = calcRC7DayRechargeLevel(total);
         sendRC7DayRechargeMails(oldLevel + 1, level);
         SetVar(VAR_RC7DAYRECHARGE, total);
+
+        Stream st(REP::RC7DAY);
+        st << static_cast<UInt8>(5);
+        st << total << Stream::eos;
+        send(st);
     }
 
-    void Player::sendMDSoul(UInt32 point)
+    void Player::sendMDSoul(UInt8 type, UInt32 id)
     {
         if (!World::getMayDay())
             return;
         Stream st(REP::USESOUL);
-        st << point << GetVar(VAR_MDSOUL) << Stream::eos;
+        if (type == 0)
+        {
+            st << static_cast<UInt8>(0);
+            st << GetVar(VAR_MDSOUL) << Stream::eos;
+        }
+        else if (type == 1)
+        {
+            st << static_cast<UInt8>(1);
+            st << id << Stream::eos;
+        }
         send(st);
     }
 
-    void Player::useMDSoul()
+    void Player::getMDItem()
     {
         if (!World::getMayDay())
             return;
-        UInt8 type = 0;
+
         UInt32 soul = GetVar(VAR_MDSOUL);
         if (!soul)
             return;
 
+        UInt8 type = 0;
         UInt32 subsoul = 0;
         if (soul >= 100)
         {
@@ -9251,12 +9261,58 @@ namespace GObject
         if (!type)
             return;
 
+        _mditem = GameAction()->onUseMDSoul(this, type);
+        if (!_mditem)
+            return;
+
+        sendMDSoul(1, _mditem);
+    }
+
+    void Player::useMDSoul()
+    {
+        if (!World::getMayDay())
+            return;
+
+        UInt32 soul = GetVar(VAR_MDSOUL);
+        if (!soul)
+            return;
+
+        UInt8 type = 0;
+        UInt32 subsoul = 0;
+        if (soul >= 100)
+        {
+            type = 1;
+            subsoul = 100;
+        }
+        else if (soul >= 50)
+        {
+            type = 2;
+            subsoul = 50;
+        }
+        else if (soul >= 25)
+        {
+            type = 3;
+            subsoul = 25;
+        }
+
+        if (!type)
+            return;
+
+        if (!_mditem)
+            return;
+
+        if (GetPackage()->IsFull())
+        {
+            sendMsgCode(0, 1011);
+            return;
+        }
+
+        GetPackage()->AddItem(_mditem, 1, true);
+
         soul -= subsoul;
-
-        GameAction()->onUseMDSoul(this, type);
         SetVar(VAR_MDSOUL, soul);
-
-        sendMDSoul(subsoul);
+        sendMDSoul(0);
+        _mditem = 0;
     }
 
     void Player::svrSt(UInt8 type)

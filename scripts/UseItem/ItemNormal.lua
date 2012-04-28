@@ -1662,7 +1662,7 @@ function ItemNormal_00000496(iid, num, bind, param)
             p = op + p - 10000
         end
         player:AddVar(90, p)
-        player:sendMDSoul(p)
+        player:sendMDSoul(0, 0)
     end
     player:AddVar(93, 1)
 
@@ -1688,7 +1688,7 @@ function ItemNormal_00000497(iid, num, bind, param)
             p = op + p - 10000
         end
         player:AddVar(90, p)
-        player:sendMDSoul(p)
+        player:sendMDSoul(0, 0)
     end
     player:AddVar(92, 1)
 
