@@ -5619,7 +5619,7 @@ namespace GObject
 
     }
 
-    static UInt8 cf_lvls[4] = {45, 50, 60, 70};
+    static UInt8 cf_lvls[5] = {45, 50, 60, 70, LEVEL_MAX};
     void Player::tellCFriendLvlUp(UInt8 lvl)
     {
         if (!World::getCFriend())
@@ -5627,9 +5627,13 @@ namespace GObject
         bool found = false;
         for (UInt8 i = 0; i < sizeof(cf_lvls)/sizeof(UInt8); ++i)
         {
-            if (lvl == cf_lvls[i])
+            if (lvl < cf_lvls[i])
             {
-                found = true;
+                if (i)
+                {
+                    found = true;
+                    lvl = cf_lvls[i-1];
+                }
                 break;
             }
         }
@@ -5667,13 +5671,13 @@ namespace GObject
             UInt8 lvl = (*it)->GetLev();
             for (UInt8 i = 0; i < sizeof(cf_lvls)/sizeof(UInt8); ++i)
             {
-                if (lvl < cf_lvls[i])
+                if (lvl < cf_lvls[i] || lvl >= LEVEL_MAX)
                     break;
                 ++cfs[i];
             }
         }
 
-        for (UInt8 j = 0; j < sizeof(cf_lvls)/sizeof(UInt8); ++j)
+        for (UInt8 j = 0; j < sizeof(cfs)/sizeof(UInt8); ++j)
         {
             for (UInt8 i = 0; i < sizeof(cf_nums)/sizeof(UInt8); ++i)
             {
