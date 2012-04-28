@@ -138,6 +138,10 @@ public:
     { _ydmdact = v; }
     inline static bool getYDMDAct()
     { return _ydmdact; }
+    inline static void setFighter1368(bool v)
+    { _fighter1368 = v; }
+    inline static bool getFighter1368()
+    { return _fighter1368; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -183,6 +187,7 @@ public:
     static bool _mayday;
     static bool _mayday1;
     static bool _ydmdact;
+    static bool _fighter1368;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

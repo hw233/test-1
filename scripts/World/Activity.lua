@@ -214,6 +214,12 @@ function onActivityCheck(tm)
       setYDMDAct(false)
   end
 
+  if tm >= actTime101 and tm < actTime102 then
+      setFighter1368(true)
+  else
+      setFighter1368(false)
+  end
+
   setRC7Day(true)
   setShuoShuo(true);
   setCFriend(true);
@@ -247,6 +253,8 @@ function initActTime(y, m, d)
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -307,6 +315,9 @@ function initActTime(y, m, d)
   
   actTime37 = os.time(SerStartTm17);
   actTime38 = os.time(SerStartTm17) + 10 * 86400;
+
+  actTime101 = os.time(SerStartTm101);
+  actTime102 = os.time(SerStartTm101) + 8 * 86400;
 
   onActivityCheck(os.time() + 30);
 
