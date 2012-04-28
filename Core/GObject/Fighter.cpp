@@ -3677,9 +3677,11 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
         return false;
 
     const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
-    if( idx != MAX_SKILL_NUM && ((m_2ndSoul->getSkillNum1() > MAX_SKILL_NUM_1 && itemType->subClass == Item_SL1 )
-            || (m_2ndSoul->getSkillNum2() > MAX_SKILL_NUM_2 && itemType->subClass == Item_SL2)) )
+    if( m_2ndSoul->getSkillNum1() > MAX_SKILL_NUM_1 || m_2ndSoul->getSkillNum2() > MAX_SKILL_NUM_2 )
+    {
         itemId = 0;
+        idx = 0;
+    }
 
     if(itemId != 0 && idx == MAX_SKILL_NUM)
     {
