@@ -1062,9 +1062,9 @@ namespace Script
     {
         return Call<void>(  "onCL3DayReward", pl);
     }
-    void GameActionLua::onRC7DayWill(Player* pl, UInt8 idx)
+    bool GameActionLua::onRC7DayWill(Player* pl, UInt8 idx)
     {
-        return Call<void>(  "onRC7DayWill", pl, idx);
+        return Call<bool>(  "onRC7DayWill", pl, idx);
     }
     UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type)
     {

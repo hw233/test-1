@@ -9153,15 +9153,17 @@ namespace GObject
         }
         if (idx && type == 4 && !GetVar(VAR_RC7DAYWILL))
         {
-            GameAction()->onRC7DayWill(this, idx);
-            SetVar(VAR_RC7DAYWILL, idx);
+            if (GameAction()->onRC7DayWill(this, idx))
+            {
+                SetVar(VAR_RC7DAYWILL, idx);
 
-            Stream st(REP::RC7DAY);
-            st << static_cast<UInt8>(4);
-            st << static_cast<UInt8>(idx);
-            st << Stream::eos;
-            send(st);
-            return;
+                Stream st(REP::RC7DAY);
+                st << static_cast<UInt8>(4);
+                st << static_cast<UInt8>(idx);
+                st << Stream::eos;
+                send(st);
+                return;
+            }
         }
     }
 

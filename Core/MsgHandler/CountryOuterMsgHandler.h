@@ -4406,14 +4406,14 @@ void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
 void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )
 {
     MSG_QUERY_PLAYER(player);
-    if(!player->hasChecked())
-         return;
     player->svrSt(req._type);
 }
 
 void OnRC7Day( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
 
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;

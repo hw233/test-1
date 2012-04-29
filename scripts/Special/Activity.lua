@@ -1158,18 +1158,22 @@ end
 function onRC7DayWill(player, idx)
     if idx == 1 then
         player:getPrestige(5000, true)
+        return true
     end
 
     if idx == 2 then
         player:getAchievement(3000)
+        return true
     end
 
     if idx == 3 then
         player:AddPExp(100000)
+        return true
     end
 
     if idx == 4 then
         player:AddExp(1000000)
+        return true
     end
 end
 
