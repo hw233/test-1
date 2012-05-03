@@ -8,6 +8,8 @@
 #include "Common/Stream.h"
 #include "MsgID.h"
 
+#define MIN_ITEM 2
+
 namespace GObject
 {
 
@@ -28,6 +30,19 @@ void CFriend::loadFromDB(const char* cf)
     m_cf.resize(count);
     for (UInt8 i = 0; i < count; ++i)
         m_cf[i] = atoi(cfriend[i].c_str());
+    if (count < MIN_ITEM)
+    {
+        m_cf.resize(MIN_ITEM, 0);
+        count = MIN_ITEM;
+        updateToDB();
+    }
+
+    if (!m_owner->GetVar(VAR_INVITES) && m_cf[1])
+    {
+        m_cf[1] = 0;
+        updateToDB();
+    }
+
     m_maxIdx = count;
 }
 
@@ -64,6 +79,13 @@ void CFriend::setCFriend(UInt8 idx, UInt8 status)
     if (!World::getCFriend())
         return;
     bool w = false;
+    if (m_cf.size() < MIN_ITEM)
+    {
+        m_cf.resize(MIN_ITEM, 0);
+        m_maxIdx = MIN_ITEM;
+        w = true;
+    }
+
     if (idx >= m_maxIdx)
     {
         m_maxIdx = idx+1;
@@ -133,22 +155,25 @@ void CFriend::sendCFriend()
 
 void CFriend::setCFriendNum(UInt8 num)
 {
-    if (!num)
-        return;
-
-    static UInt8 nums[] = {1,3,5,10,15,20};
-    UInt8 sz = sizeof(nums)/sizeof(UInt8);
     UInt32 invited = m_owner->GetVar(VAR_INVITES);
-    if (invited > (UInt32)(nums[sz-1] + 5))
+    if (invited >= 2)
         return;
-    invited += 1;
-    for (UInt8 i = 0; i < sz; ++i)
-    {
-        if (invited < nums[i])
-            break;
-        setCFriendSafe(CF_INV1+i);
-    }
+    if (invited == 1)
+        setCFriendSafe(CF_INV1);
     m_owner->AddVar(VAR_INVITES, 1);
+}
+
+void CFriend::reset(bool online)
+{
+    if (m_cf.size() < MIN_ITEM)
+        m_cf.resize(MIN_ITEM, 0); 
+    for (UInt8 i = 0; i < MIN_ITEM; ++i)
+    {
+        m_cf[i] = 0;
+        if (online)
+            updateCFriend(i);
+    }
+    updateToDB();
 }
 
 } // namespace GObject

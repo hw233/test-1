@@ -45,6 +45,12 @@ enum {
     SS_YAMEN,
     SS_TEAMCP,
     SS_FMTLVLUP,
+    SS_HM_30 = 37,
+    SS_HM_40,
+    SS_HM_50,
+    SS_HM_60,
+    SS_HM_70,
+    SS_HM_80,
     SS_MAX
 };
 

@@ -121,7 +121,7 @@ public:
     inline static void setShuoShuo(bool v)
     { _shuoshuo = v; }
     inline static bool getShuoShuo()
-    { return _shuoshuo; }
+    { return _shuoshuo || true; }
     inline static void setCFriend(bool v)
     { _cfriend = v; }
     inline static bool getCFriend()

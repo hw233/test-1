@@ -2849,6 +2849,46 @@ function ItemNormal_00009007(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009010(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+
+    local items = {60001,60000,60000,56,502,510,50000,}
+    local nums = {10,1000,500,1,1,1,1,}
+    local prob = {357,1071,3571,4285,5714,7143,10000,}
+    local item = 0
+
+    for i = 1, num do
+        local k = 1
+        local rand = math.random(10000)
+        for n = 1,#prob do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
+        end
+
+        if item == 0 then
+            return false
+        end
+
+        if item == 50000 then
+            local gems = {5001,5011,5021,5031,5041,5051,5061,5071,5081,5091,5101,5111,5121,5131,5141,}
+            package:AddItem(gems[math.random(1,#gems)], nums[k], 1, 0, 2)
+        elseif item == 60000 then
+            player:getTael(nums[k])
+        elseif item == 60001 then
+            player:getCoupon(nums[k])
+        else
+            package:AddItem(item, nums[k], 1, 0, 2)
+        end
+    end
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_citta(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
@@ -4782,6 +4822,8 @@ local ItemNormal_Table = {
     [9007] = ItemNormal_00009007,
     [9008] = ItemNormal_00009007,
     [9009] = ItemNormal_00009007,
+
+    [9010] = ItemNormal_00009010,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,

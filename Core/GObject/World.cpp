@@ -37,6 +37,7 @@
 #include "CountryBattle.h"
 #include "ClanRankBattle.h"
 #include "ShuoShuo.h"
+#include "CFriend.h"
 
 namespace GObject
 {
@@ -196,7 +197,10 @@ bool enum_midnight(void * ptr, void *)
         GData::store.sendList(1, pl);
 
     if (!pl->isOnline())
+    {
         pl->GetShuoShuo()->reset(false);
+        pl->GetCFriend()->reset(false);
+    }
 
 	return true;
 }

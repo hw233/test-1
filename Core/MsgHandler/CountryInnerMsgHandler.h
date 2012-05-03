@@ -613,6 +613,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
     if (World::_blueactiveday)
         player->onBlueactiveday();
     player->GetShuoShuo()->reset();
+    player->GetCFriend()->reset();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )

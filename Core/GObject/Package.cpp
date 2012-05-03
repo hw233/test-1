@@ -537,7 +537,7 @@ namespace GObject
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
-                if (fromWhere != FromNpcBuy && GData::store.getPrice(typeId))
+                if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
@@ -562,7 +562,7 @@ namespace GObject
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
-                if (fromWhere != FromNpcBuy && GData::store.getPrice(typeId))
+                if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
                     udpLog(item->getClass(), typeId, num, 0, "add");
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
@@ -998,6 +998,10 @@ namespace GObject
 				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
 
+            UInt32 price = GData::store.getPrice(id);
+            if (price || GData::GDataManager::isInUdpItem(id))
+                udpLog(item->getClass(), id, num, price, "sub");
+
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1026,6 +1030,10 @@ namespace GObject
 				DBLOG().GetMultiDBName(tbn); 
 				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
+
+            UInt32 price = GData::store.getPrice(item->getId());
+            if (price || GData::GDataManager::isInUdpItem(item->getId()))
+                udpLog(item->getClass(), item->getId(), num, price, "sub");
 
 			SendItemData(item);
 			UInt32 id = item->getId();
@@ -1377,9 +1385,6 @@ namespace GObject
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
                     UInt8 rn = n<num?n:num;
-                    UInt32 price = GData::store.getPrice(id);
-                    if (price)
-                        udpLog(item->getClass(), id, rn, price, "sub");
 					DelItem2(item, rn);
 					AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1395,9 +1400,6 @@ namespace GObject
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    UInt32 price = GData::store.getPrice(id);
-                    if (price)
-                        udpLog(item->getClass(), id, rn, price, "sub");
 					DelItemAny(id, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1438,9 +1440,6 @@ namespace GObject
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, bind > 0))
                 {
                     UInt8 rn = n<num?n:num;
-                    UInt32 price = GData::store.getPrice(id);
-                    if (price)
-                        udpLog(item->getClass(), id, rn, price, "sub");
                     DelItem2(item, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1456,9 +1455,6 @@ namespace GObject
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    UInt32 price = GData::store.getPrice(id);
-                    if (price)
-                        udpLog(item->getClass(), id, rn, price, "sub");
                     DelItemAny(id, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;

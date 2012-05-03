@@ -9,7 +9,7 @@ namespace GObject
 
 enum {
     CF_INVITED = 0,
-    CF_INV1,
+    CF_INV1, // 邀请了2次
     CF_INV3,
     CF_INV5,
     CF_INV10,
@@ -60,6 +60,7 @@ public:
     void getAward(UInt8 idx);
     void updateCFriend(UInt8 idx);
     void sendCFriend();
+    void reset(bool = true);
 
 private:
     Player* m_owner;

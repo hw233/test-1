@@ -105,6 +105,8 @@ void WorldScript::init()
     def("clearTeamCopyAwardCfg", GObject::TeamCopyPlayerInfo::clearTeamCopyAwardCfg);
     def("addGM", GObject::GObjectManager::addGM);
     def("delGM", GObject::GObjectManager::delGM);
+    def("clearUdpItem", GData::GDataManager::clearUdpItem);
+    def("addUdpItem", GData::GDataManager::addUdpItem);
     def("setFFTypeChance", GObject::GObjectManager::setFFTypeChance);
     def("setFFAttrChance", GObject::GObjectManager::setFFAttrChance);
     def("setFFAttrMaxValProp", GObject::GObjectManager::setFFAttrMaxValProp);
