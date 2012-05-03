@@ -165,15 +165,21 @@ void CFriend::setCFriendNum(UInt8 num)
 
 void CFriend::reset(bool online)
 {
+    bool w = false;
     if (m_cf.size() < MIN_ITEM)
-        m_cf.resize(MIN_ITEM, 0); 
-    for (UInt8 i = 0; i < MIN_ITEM; ++i)
     {
-        m_cf[i] = 0;
-        if (online)
-            updateCFriend(i);
+        m_cf.resize(MIN_ITEM, 0); 
+        w = true;
     }
-    updateToDB();
+    if (m_cf[1])
+    {
+        m_cf[1] = 0;
+        w = true;
+    }
+    if (online && w)
+        updateCFriend(1);
+    if (w)
+        updateToDB();
 }
 
 } // namespace GObject
