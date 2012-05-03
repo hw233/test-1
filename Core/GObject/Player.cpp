@@ -7830,7 +7830,8 @@ namespace GObject
         checkQQAward();
 
         bool blue = false;
-        if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20)
+        UInt8 domain = atoi(m_domain.c_str());
+        if (domain == 11 && _playerData.qqvipl >= 20)
         {
             Stream st(REP::YD_INFO);
 
@@ -7887,7 +7888,7 @@ namespace GObject
             st << static_cast<UInt8>(0);
 
             UInt8 factor = 1;
-            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 10 && World::getYDMDAct())
+            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 10 && (domain == 1 || domain == 2 || domain == 4) && World::getYDMDAct())
                 factor = 2;
 
             for(UInt8 i = 0; i < maxCnt; ++ i)
@@ -7924,7 +7925,8 @@ namespace GObject
         UInt8 nRes = 0;
         Stream st(REP::YD_AWARD_RCV);
 
-        if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 1)
+        UInt8 domain = atoi(m_domain.c_str());
+        if (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
             if (!qqvipl)
@@ -7959,11 +7961,11 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 0))
+        else if (_playerData.qqvipl < 20 || (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
-            if (atoi(m_domain.c_str()) == 11 && _playerData.qqvipl >= 20 && d3d6 == 0)
+            if (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 0)
             {
                 qqvipl = _playerData.qqvipl1;
                 flag = 8*(_playerData.qqvipl1 / 10);
@@ -7983,7 +7985,7 @@ namespace GObject
             }
 
             UInt8 factor = 1;
-            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 10 && World::getYDMDAct())
+            if (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 10 && (domain == 1 || domain == 2 || domain == 4) && World::getYDMDAct())
                 factor = 2;
 
             if(type == 1 && !(_playerData.qqawardgot & (0x1<<flag)) && qqvipl != 0)
