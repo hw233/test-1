@@ -180,7 +180,7 @@ void jsonParser(std::string& json, int sessionid)
 {
     TRACE_LOG("JSON RECV: %s\n", json.c_str());
 #ifdef _DEBUG
-    fprintf(stderr, "JSON RECV: %s\n", json.c_str());
+    //fprintf(stderr, "JSON RECV: %s\n", json.c_str());
 #endif
     int ret = EUNKNOW;
     std::string err;
@@ -244,7 +244,7 @@ _error:
         const char* retstr = json_object_to_json_string(retobj);
         TRACE_LOG("JOSN SEND: %s\n", retstr?retstr:"null");
 #ifdef _DEBUG
-        fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
+        //fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
 #endif
 
         if (sessionid >= 0)

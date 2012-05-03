@@ -2685,8 +2685,12 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
 #ifdef _FB
 #else
+    UInt64 begin = TimeUtil::GetTick();
     std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
-    jsonParser(json, -1);
+    for (UInt16 i = 0; i < 4000; ++i)
+        jsonParser(json, -1);
+    UInt64 end = TimeUtil::GetTick();
+    fprintf(stderr, "total secs: %.2f\n", (float)(end-begin)/1000000);
 #endif
 }
 void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args)
