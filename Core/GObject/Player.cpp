@@ -6411,6 +6411,14 @@ namespace GObject
                     {
                         SYSMSG_BROADCASTV(2200, getCountry(), getName().c_str(), fgt->getColor(), fgt->getName().c_str());
                     }
+
+#ifdef _FB
+                    if (World::getTrainFighter() && _trainFightersAct.find(fgt->getId()) == _trainFightersAct.end())
+                    {
+                        GameAction()->onTrainFighterAct(this, fgt);
+                        _trainFightersAct.insert(fgt->getId());
+                    }
+#endif
                 }
             }
             else

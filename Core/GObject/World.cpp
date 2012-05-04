@@ -94,6 +94,7 @@ bool World::_mayday1 = false;
 bool World::_ydmdact = false;
 bool World::_fighter1368 = false;
 bool World::_enchantact = false;
+bool World::_trainfighter = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
