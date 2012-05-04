@@ -142,6 +142,10 @@ public:
     { _fighter1368 = v; }
     inline static bool getFighter1368()
     { return _fighter1368; }
+    inline static void setEnchantAct(bool v)
+    { _enchantact = v; }
+    inline static bool getEnchantAct()
+    { return _enchantact; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -188,6 +192,7 @@ public:
     static bool _mayday1;
     static bool _ydmdact;
     static bool _fighter1368;
+    static bool _enchantact;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
