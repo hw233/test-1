@@ -272,8 +272,7 @@ function initActTime(y, m, d)
   local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  --local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
