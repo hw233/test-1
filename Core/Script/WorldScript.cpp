@@ -80,6 +80,8 @@ void WorldScript::init()
 	def("setFighter1368", GObject::World::setFighter1368);
 	def("getEnchantAct", GObject::World::getEnchantAct);
 	def("setEnchantAct", GObject::World::setEnchantAct);
+	def("getTrainFighter", GObject::World::getTrainFighter);
+	def("setTrainFighter", GObject::World::setTrainFighter);
 	def("getRC7Day", GObject::World::getRC7Day);
 	def("setRC7Day", GObject::World::setRC7Day);
 	def("getShuoShuo", GObject::World::getShuoShuo);

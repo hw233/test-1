@@ -1187,6 +1187,10 @@ namespace GObject
 		std::map<UInt32, TrainFighterData *> _trainFighters;
 		std::set<UInt32> _greatFighterFull;
 
+#ifdef _FB
+		std::set<UInt32> _trainFightersAct;
+#endif
+
 		Package* m_Package;
 
 		std::set<Player *> _friends[4];

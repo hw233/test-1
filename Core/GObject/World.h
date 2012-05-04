@@ -146,6 +146,10 @@ public:
     { _enchantact = v; }
     inline static bool getEnchantAct()
     { return _enchantact; }
+    inline static void setTrainFighter(bool v)
+    { _trainfighter = v; }
+    inline static bool getTrainFighter()
+    { return _trainfighter; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -193,6 +197,7 @@ public:
     static bool _ydmdact;
     static bool _fighter1368;
     static bool _enchantact;
+    static bool _trainfighter;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

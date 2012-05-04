@@ -92,6 +92,7 @@ namespace Script
 		lua_tinker::def(_L, "getCarnival", GObject::World::getCarnival);
 		lua_tinker::def(_L, "getFighter1368", GObject::World::getFighter1368);
 		lua_tinker::def(_L, "getEnchantAct", GObject::World::getEnchantAct);
+		lua_tinker::def(_L, "getTrainFighter", GObject::World::getTrainFighter);
 		lua_tinker::def(_L, "getRC7Day", GObject::World::getRC7Day);
 		lua_tinker::def(_L, "getShuoShuo", GObject::World::getShuoShuo);
 		lua_tinker::def(_L, "getCFriend", GObject::World::getCFriend);
@@ -906,6 +907,11 @@ namespace Script
 	void GameActionLua::onEnchantAct( Player* player, UInt8 level )
 	{
 		Call<void>("onEnchantAct", player, level);
+	}
+
+	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
+	{
+		Call<void>("onTrainFighterAct", player, fgt);
 	}
 
 	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )
