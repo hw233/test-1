@@ -1253,3 +1253,12 @@ function onTurnOnRC7Day(player, total, offset)
     return true
 end
 
+function onEnchantAct(player, level)
+    local items = {
+        [4] = {502,1,1},
+        [6] = {509,2,1},
+        [8] = {509,5,1, 1509,1,1},
+    };
+    sendItemPackageMail(player, "装备强化返利", "【活动时间】：5月5日—5月11日\n 【活动内容】：活动期间内将武器、头盔、胸甲、腰带、护腿强化至指定级别，即可立即获得对应道具奖励。\n 强化至4级可免费获赠：太乙真金*1\n 强化至6级可免费获赠：凝神易筋丹*2\n 强化至8级可免费获赠：凝神易筋丹*5、橙色法宝六阳神火鉴一个", items[level]);
+end
+

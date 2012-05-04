@@ -196,32 +196,41 @@ function onActivityCheck(tm)
       is_4_21 = false
   end
 
-  if tm >= actTime33 and tm < actTime34 then
-      setMayDay(true)
-  else
-      setMayDay(false)
-  end
+  if isFBVersion() then
+      if tm >= actTime101 and tm < actTime102 then
+          setFighter1368(true)
+      else
+          setFighter1368(false)
+      end
 
-  if tm >= actTime35 and tm < actTime36 then
-      setMayDay1(true)
+      if tm >= actTime103 and tm < actTime104 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
   else
-      setMayDay1(false)
-  end
+      if tm >= actTime33 and tm < actTime34 then
+          setMayDay(true)
+      else
+          setMayDay(false)
+      end
 
-  if tm >= actTime37 and tm < actTime38 then
-      setYDMDAct(true)
-  else
-      setYDMDAct(false)
-  end
+      if tm >= actTime35 and tm < actTime36 then
+          setMayDay1(true)
+      else
+          setMayDay1(false)
+      end
 
-  if tm >= actTime101 and tm < actTime102 then
-      setFighter1368(false) -- only fb
-  else
-      setFighter1368(false)
+      if tm >= actTime37 and tm < actTime38 then
+          setYDMDAct(true)
+      else
+          setYDMDAct(false)
+      end
+
+      setShuoShuo(true);
   end
 
   setRC7Day(true)
-  setShuoShuo(true);
   setCFriend(true);
 
   -- XXX: cancel auto heal
@@ -255,6 +264,8 @@ function initActTime(y, m, d)
   local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  --local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 4, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -318,6 +329,9 @@ function initActTime(y, m, d)
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
+
+  actTime103 = os.time(SerStartTm102);
+  actTime104 = os.time(SerStartTm102) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 

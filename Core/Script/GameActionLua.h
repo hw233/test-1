@@ -215,6 +215,7 @@ namespace Script
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
 		void onEnchant(Player* player, UInt8 level);
+		void onEnchantAct(Player* player, UInt8 level);
 		void onTopup(Player* player, UInt32 ogold, UInt32 ngold);
 		UInt32 onAttakerAddexp(Player* attacker, Player *defender, UInt32 award);
 		UInt32 onTavernFlush(UInt8 color);

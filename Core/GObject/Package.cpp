@@ -1974,6 +1974,30 @@ namespace GObject
         player->sendTokenInfo();
     }
 
+#ifdef _FB
+    void enchantAct(Player* player, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type)
+    {
+        if (type == 0)
+        {
+            if (slevel < 4 && level >= 4)
+                GameAction()->onEnchantAct(player, 4);
+            if (slevel < 6 && level >= 6)
+                GameAction()->onEnchantAct(player, 6);
+            if (slevel < 8 && level >= 8)
+                GameAction()->onEnchantAct(player, 8);
+        }
+        else
+        {
+            if (level == 4)
+                GameAction()->onEnchantAct(player, level);
+            if (level == 6)
+                GameAction()->onEnchantAct(player, level);
+            if (level == 8)
+                GameAction()->onEnchantAct(player, level);
+        }
+    }
+#endif
+
     UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
 		if (type > 1) return 2;
@@ -2242,6 +2266,10 @@ namespace GObject
 
             if (World::getTrumpEnchRet())
                 enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+#ifdef _FB
+            if (World::getEnchantAct())
+                enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+#endif
 			return 0;
 		}
 
