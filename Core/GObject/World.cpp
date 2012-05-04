@@ -341,6 +341,7 @@ void SendMDSoulCnt()
             }
         }
 
+        pos = 0;
         mayDayNum = 0xFFFFFFFF;
         for(MayDaySortMap::reverse_iterator iter = mayDaySortMap2.rbegin();
                 iter != mayDaySortMap2.rend(); ++iter)
@@ -367,6 +368,7 @@ void SendMDSoulCnt()
             }
         }
 
+        pos = 0;
         mayDayNum = 0xFFFFFFFF;
         for(MayDaySortMap::reverse_iterator iter = mayDaySortMap3.rbegin();
                 iter != mayDaySortMap3.rend(); ++iter)

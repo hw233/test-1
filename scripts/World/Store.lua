@@ -45,6 +45,11 @@ store:add(2,495,50)
 store:add(5,492,1000)
 end
 
+if getMayDay() then
+store:add(2,496,10)
+store:add(2,497,10)
+end
+
 store:add(2,33,10)
 store:add(2,8000,15)
 store:add(2,72,720)

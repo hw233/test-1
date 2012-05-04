@@ -1653,18 +1653,18 @@ function ItemNormal_00000496(iid, num, bind, param)
 		return false;
 	end
 
-    fgt:addPExp(num*100)
+    fgt:addPExp(num*888)
 
     local op = player:GetVar(90);
     if op < 10000 then
-        local p = math.random(1,20);
+        local p = num * math.random(1,20);
         if op + p > 10000 then
             p = op + p - 10000
         end
         player:AddVar(90, p)
         player:sendMDSoul(0, 0)
     end
-    player:AddVar(93, 1)
+    player:AddVar(93, num)
 
     package:DelItemSendMsg(iid, player);
     return num
@@ -1679,18 +1679,18 @@ function ItemNormal_00000497(iid, num, bind, param)
 		return false;
 	end
 
-    fgt:addPExp(num*100)
+    fgt:addPExp(num*888)
 
     local op = player:GetVar(90);
     if op < 10000 then
-        local p = math.random(8,12);
+        local p = num * math.random(8,12);
         if op + p > 10000 then
             p = op + p - 10000
         end
         player:AddVar(90, p)
         player:sendMDSoul(0, 0)
     end
-    player:AddVar(92, 1)
+    player:AddVar(92, num)
 
     package:DelItemSendMsg(iid, player);
     return num
@@ -2763,7 +2763,7 @@ function ItemNormal_00009000(iid, num, bind, param)
 	end
 
     fgt:addPExp(num*20000)
-    player:AddVar(91, 1)
+    player:AddVar(91, num)
 
     package:DelItemSendMsg(iid, player);
     return num
@@ -4772,8 +4772,8 @@ local ItemNormal_Table = {
     [9006] = ItemNormal_00009001,
 
     [9007] = ItemNormal_00009007,
-    [9008] = ItemNormal_00009008,
-    [9009] = ItemNormal_00009009,
+    [9008] = ItemNormal_00009007,
+    [9009] = ItemNormal_00009007,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
