@@ -1259,11 +1259,11 @@ function onEnchantAct(player, level)
         [6] = {509,2,1},
         [8] = {509,5,1, 1509,1,1},
     };
-    sendItemPackageMail(player, "装备强化返利", "【活动时间】：5月5日—5月11日\n 【活动内容】：活动期间内将武器、头盔、胸甲、腰带、护腿强化至指定级别，即可立即获得对应道具奖励。\n 强化至4级可免费获赠：太乙真金*1\n 强化至6级可免费获赠：凝神易筋丹*2\n 强化至8级可免费获赠：凝神易筋丹*5、橙色法宝六阳神火鉴一个", items[level]);
+    sendItemPackageMail(player, "装备强化返利活动", "装备强化返利活动", items[level]);
 end
 
 function onTrainFighterAct(player, fgt)
     local table_items = {0xA000, 1200, 1};
-    sendItemPackageMail(player, '散仙洗练返利', '活动期间，玩家将散仙（包括主将）的潜力首次洗练到1.5时，将获得1200礼券奖励', table_items)
+    sendItemPackageMail(player, '散仙洗橙返利活动', '散仙洗橙返利活动', table_items)
 end
 
