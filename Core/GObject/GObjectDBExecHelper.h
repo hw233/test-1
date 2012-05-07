@@ -881,6 +881,9 @@ struct DBWBoss
 {
     UInt8 idx;
     UInt32 last;
+    UInt32 hp;
+    UInt32 atk;
+    UInt32 matk;
 };
 struct DBDiscount
 {
@@ -2020,10 +2023,13 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBWBoss)
-SPECIALDEF(2)
+SPECIALDEF(5)
 (
     UInt8, idx,
-    UInt32, last
+    UInt32, last,
+    UInt32, hp,
+    UInt32, atk, 
+    UInt32, matk
 )
 SPECIALEND()
 

@@ -4089,12 +4089,17 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading WorldBoss Data");
 		DBWBoss t;
-		if(execu->Prepare("SELECT `idx`, `last` FROM `wboss`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `idx`, `last`, `hp`, `atk`, `matk` FROM `wboss`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
-            worldBoss.setLast(t.idx, t.last);
+            Last l;
+            l.time = t.last;
+            l.hp = t.hp;
+            l.atk = t.atk;
+            l.matk = t.matk;
+            worldBoss.setLast(t.idx, l);
         }
         lc.finalize();
         return true;
