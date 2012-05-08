@@ -1995,10 +1995,10 @@ void BattleSimulator::doSkillState(BattleFighter* bf, const GData::SkillBase* sk
 
 }
 
-UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct)
+bool BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int target_pos, std::vector<AttackAct>* atkAct)
 {
     if(bf == NULL || bf->getHP() == 0)
-        return 0;
+        return false;
 
     BattleObject* target_object = _objs[otherside][target_pos];
     if(target_object!= NULL)
@@ -2020,10 +2020,10 @@ UInt32 BattleSimulator::doNormalAttack(BattleFighter* bf, int otherside, int tar
 
         int self_side = bf->getSide() == otherside ? 25 : 0;
         appendToPacket(bf->getSide(), bf->getPos(), target_pos + self_side, static_cast<UInt8>(0), static_cast<UInt16>(0), cs, pr, defList, defCount, scList, scCount);
-        return dmg;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* skill, int& target_side, int& target_pos, int& cnt)
@@ -2087,16 +2087,16 @@ void BattleSimulator::getSkillTarget(BattleFighter* bf, const GData::SkillBase* 
     }
 }
 
-UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct, UInt32 skillParam)
+bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt, std::vector<AttackAct>* atkAct, UInt32 skillParam)
 {
     if(NULL == skill || target_pos < 0 || bf == NULL)
-        return 0;
+        return false;
     if(skill->effect == NULL)
-        return 0;
+        return false;
 
     if(bf->getHP() == 0)
     {
-        return 0;
+        return false;
     }
 
     // 雪球-137 小蜘蛛-434
@@ -2186,7 +2186,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
         appendToPacket(bf->getSide(), bf->getPos(), bf->getPos() + 25, 2, skill->getId(), false, false, defList, defCount, scList, scCount);
 
-        return 0;
+        return true;
     }
 
     UInt32 dmg = 0;
@@ -2276,7 +2276,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                return dmg;
+                return false;
 
             int cnt = 3;
             UInt8 excepts[25] = {0};
@@ -2355,7 +2355,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
         {
             BattleFighter* bo = static_cast<BattleFighter*>(_objs[target_side][target_pos]);
             if(bo == NULL || bo->getHP() == 0 || !bo->isChar())
-                return dmg;
+                return false;
 
             UInt32 hpr = static_cast<BattleFighter*>(bo)->regenHP(rhp, skill->cond == GData::SKILL_ACTIVE);
             if(hpr != 0)
@@ -2757,7 +2757,7 @@ UInt32 BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase*
 
     int self_side = bf->getSide() == target_side ? 25 : 0;
     appendToPacket( bf->getSide(), bf->getPos(), target_pos + self_side, 2, skill->getId(), cs, pr, defList, defCount, scList, scCount);
-    return dmg;
+    return true;
 }
 
 void BattleSimulator::doSkillStatus2(BattleFighter* bf, const GData::SkillBase* skill, int target_side, int target_pos, int cnt ,StatusChange* scList, size_t& scCount)
@@ -3562,7 +3562,6 @@ UInt32 BattleSimulator::doAttack( int pos )
 
         int target_pos;
         int otherside = 1 - bf->getSide();
-        UInt32 dmg = 0;
         if(confuse > 0)
         {
             BattleFighter* rnd_bf = NULL; 
@@ -3587,16 +3586,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
             std::vector<AttackAct> atkAct;
             atkAct.clear();
-            dmg += doNormalAttack(bf, otherside, target_pos, &atkAct);
-            ++ rcnt;
+            if(doNormalAttack(bf, otherside, target_pos, &atkAct))
+                ++ rcnt;
 
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
                 if(atkAct[idx].bf->getHP() == 0)
                     continue;
-                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                ++ rcnt;
+                if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                    ++ rcnt;
             }
 
             atkAct.clear();
@@ -3612,16 +3611,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
             std::vector<AttackAct> atkAct;
             atkAct.clear();
-            dmg += doNormalAttack(bf, otherside, target_pos, &atkAct);
-            ++ rcnt;
+            if(doNormalAttack(bf, otherside, target_pos, &atkAct))
+                ++ rcnt;
 
             size_t actCnt = atkAct.size();
             for(size_t idx = 0; idx < actCnt; idx++)
             {
                 if(atkAct[idx].bf->getHP() == 0)
                     continue;
-                doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                ++ rcnt;
+                if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                    ++ rcnt;
             }
             atkAct.clear();
 
@@ -3641,16 +3640,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
-                ++ rcnt;
+                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                    ++ rcnt;
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
                     if(atkAct[idx].bf->getHP() == 0)
                         continue;
-                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                    ++ rcnt;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
                 }
                 atkAct.clear();
             }
@@ -3664,16 +3663,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
-                ++ rcnt;
+                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                    ++ rcnt;
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
                     if(atkAct[idx].bf->getHP() == 0)
                         continue;
-                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                    ++ rcnt;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
                 }
                 atkAct.clear();
             }
@@ -3700,16 +3699,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                dmg += doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct);
-                ++ rcnt;
+                if(doSkillAttack(bf, skill, otherside, target_pos, cnt, &atkAct))
+                    ++ rcnt;
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
                     if(atkAct[idx].bf->getHP() == 0)
                         continue;
-                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                    ++ rcnt;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
                 }
                 atkAct.clear();
 
@@ -3733,16 +3732,16 @@ UInt32 BattleSimulator::doAttack( int pos )
 
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                dmg += doNormalAttack(bf, otherside, target_pos, &atkAct);
-                ++ rcnt;
+                if(doNormalAttack(bf, otherside, target_pos, &atkAct))
+                    ++ rcnt;
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
                     if(atkAct[idx].bf->getHP() == 0)
                         continue;
-                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                    ++ rcnt;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
                 }
                 atkAct.clear();
 
@@ -3764,16 +3763,16 @@ UInt32 BattleSimulator::doAttack( int pos )
                         getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                         std::vector<AttackAct> atkAct;
                         atkAct.clear();
-                        doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
-                        ++ rcnt;
+                        if(doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct))
+                            ++ rcnt;
 
                         size_t actCnt = atkAct.size();
                         for(size_t idx = 0; idx < actCnt; idx++)
                         {
                             if(atkAct[idx].bf->getHP() == 0)
                                 continue;
-                            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                            ++ rcnt;
+                            if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                                ++ rcnt;
                         }
                         atkAct.clear();
                     }
@@ -3785,16 +3784,16 @@ UInt32 BattleSimulator::doAttack( int pos )
                         getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                         std::vector<AttackAct> atkAct;
                         atkAct.clear();
-                        doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
-                        ++ rcnt;
+                        if(doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct))
+                            ++ rcnt;
 
                         size_t actCnt = atkAct.size();
                         for(size_t idx = 0; idx < actCnt; idx++)
                         {
                             if(atkAct[idx].bf->getHP() == 0)
                                 continue;
-                            doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                            ++ rcnt;
+                            if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                                ++ rcnt;
                         }
                         atkAct.clear();
                     }
@@ -3819,16 +3818,16 @@ UInt32 BattleSimulator::doAttack( int pos )
                 getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
-                ++ rcnt;
+                if(doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct))
+                    ++ rcnt;
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
                     if(atkAct[idx].bf->getHP() == 0)
                         continue;
-                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                    ++ rcnt;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
                 }
                 atkAct.clear();
             }
@@ -3840,16 +3839,16 @@ UInt32 BattleSimulator::doAttack( int pos )
                 getSkillTarget(bf, passiveSkill, otherside, target_pos, cnt);
                 std::vector<AttackAct> atkAct;
                 atkAct.clear();
-                doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct);
-                ++ rcnt;
+                if(doSkillAttack(bf, passiveSkill, otherside, target_pos, cnt, &atkAct))
+                    ++ rcnt;
 
                 size_t actCnt = atkAct.size();
                 for(size_t idx = 0; idx < actCnt; idx++)
                 {
                     if(atkAct[idx].bf->getHP() == 0)
                         continue;
-                    doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param);
-                    ++ rcnt;
+                    if(doSkillAttack(atkAct[idx].bf, atkAct[idx].skill, atkAct[idx].target_side, atkAct[idx].target_pos, 1, NULL, atkAct[idx].param))
+                        ++ rcnt;
                 }
                 atkAct.clear();
             }
