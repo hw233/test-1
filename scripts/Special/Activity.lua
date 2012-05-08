@@ -1152,25 +1152,24 @@ function onCL3DayReward(player)
         player:sendMsgCode(2, 1011, 0)
         return;
     end
-    -- TODO:
-    package:AddItem(33, 1, 1)
+    package:AddItem(9011, 1, 1)
 end
 
 function onRC7DayWill(player, idx)
     if idx == 1 then
-        player:getPrestige(5000)
+        player:getPrestige(5000, true)
     end
 
     if idx == 2 then
-        player:getAchievement(5000)
+        player:getAchievement(3000)
     end
 
     if idx == 3 then
-        player:AddPExp(50000)
+        player:AddPExp(100000)
     end
 
     if idx == 4 then
-        player:AddExp(50000)
+        player:AddExp(1000000)
     end
 end
 
@@ -1184,6 +1183,20 @@ function onUseMDSoul(player, _type)
         {503,514,506,508,517,512,501,513,},
         {497,496,15,56,57,511,500,518,},
     }
+
+    if _type == 3 then
+        local prob = {500,1000,2500,4000,5500,7000,8500,10000}
+        local p = math.random(1,10000)
+        local i = 1
+        for n = 1,#prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        return items[_type][i]
+    end
 
     return items[_type][math.random(1,#items[_type])]
 end

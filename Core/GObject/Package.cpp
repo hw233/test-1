@@ -1343,7 +1343,8 @@ namespace GObject
                 if (item && (item->getClass() == Item_Normal29 ||
                             item->getClass() == Item_Normal28 ||
                             (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9) ||
-                            item->getClass() == Item_SL1))
+                            item->getClass() == Item_SL1 ||
+                            item->getClass() == Item_SL2))
                 {
                     ret = TrumpMerge(id, bind > 0);
                     if (ret)

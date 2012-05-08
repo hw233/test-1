@@ -1025,6 +1025,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
+    pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
 
     if (World::getTrumpEnchRet())

@@ -1658,11 +1658,15 @@ function ItemNormal_00000496(iid, num, bind, param)
     local op = player:GetVar(90);
     if op < 10000 then
         local p = num * math.random(1,20);
-        if op + p > 10000 then
-            p = op + p - 10000
+        if (op + p) > 10000 then
+            p = 10000 - op
         end
         player:AddVar(90, p)
         player:sendMDSoul(0, 0)
+        if getMayDay() then
+            SendMsg(player, 0x35, "获得风雷罗盘灵气"..p.."点")
+            SendMsg(player, 0x1, "获得风雷罗盘灵气"..p.."点")
+        end
     end
     player:AddVar(93, num)
 
@@ -1684,11 +1688,15 @@ function ItemNormal_00000497(iid, num, bind, param)
     local op = player:GetVar(90);
     if op < 10000 then
         local p = num * math.random(8,12);
-        if op + p > 10000 then
-            p = op + p - 10000
+        if (op + p) > 10000 then
+            p = 10000 - op
         end
         player:AddVar(90, p)
         player:sendMDSoul(0, 0)
+        if getMayDay() then
+            SendMsg(player, 0x35, "获得风雷罗盘灵气"..p.."点")
+            SendMsg(player, 0x1, "获得风雷罗盘灵气"..p.."点")
+        end
     end
     player:AddVar(92, num)
 

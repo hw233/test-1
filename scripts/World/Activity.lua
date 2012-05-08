@@ -208,7 +208,7 @@ function onActivityCheck(tm)
       setMayDay1(false)
   end
 
-  setRC7Day(false)
+  setRC7Day(true)
   setShuoShuo(true);
   setCFriend(true);
 
@@ -291,7 +291,7 @@ function initActTime(y, m, d)
   actTime30 = os.time(SerStartTm15) + 8 * 86400;
 
   actTime31 = os.time(SerStartTm16);
-  actTime32 = os.time(SerStartTm16) + 7 * 86400;
+  actTime32 = os.time(SerStartTm16) + 11 * 86400;
 
   actTime33 = os.time(SerStartTm17);
   actTime34 = os.time(SerStartTm17) + 7 * 86400;

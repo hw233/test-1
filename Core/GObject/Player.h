@@ -578,6 +578,7 @@ namespace GObject
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
         void addRC7DayRecharge(UInt32 r);
+        void sendRC7DayInfo(UInt32 now);
 
 		void Reconnect();
 

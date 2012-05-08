@@ -149,6 +149,7 @@ namespace Script
 		CLASS_DEF(Player, hasStatusBit);
 		CLASS_DEF(Player, setTitle);
 		CLASS_DEF(Player, getTitle);
+		CLASS_DEF(Player, getPrestige);
 		CLASS_DEF(Player, getAchievement);
 		CLASS_DEF(Player, useAchievement);
 		CLASS_DEF(Player, getLocation);
@@ -1055,7 +1056,7 @@ namespace Script
     }
     void GameActionLua::onCLLoginReward(Player* pl, UInt8 cts)
     {
-        return Call<void>(  "onClanBattleAttend", pl, cts);
+        return Call<void>(  "onCLLoginReward", pl, cts);
     }
     void GameActionLua::onCL3DayReward(Player* pl)
     {
