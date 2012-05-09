@@ -229,11 +229,11 @@ end
 function onMergeGem(player, lev, num)
     if getGemMergeAct() then
         local items = {
-            [6] = {507,num,1, 503,num,1},
-            [7] = {30,num,1, 509,2*num,1},
-            [8] = {30,4*num,1, 1504,num,1},
-            [9] = {30,20*num,1, 1509,num,1},
-            [10] = {30,50*num,1, 1627,num,1},
+            [6] = {507,1,1, 503,1,1},
+            [7] = {30,1,1, 509,2,1},
+            [8] = {30,4,1, 1504,1,1},
+            [9] = {30,20,1, 1509,1,1},
+            [10] = {30,50,1, 1627,1,1},
         }
 
         local item = items[lev]
@@ -241,7 +241,9 @@ function onMergeGem(player, lev, num)
             return
         end
 
-        sendItemPackageMail(player, "合所宝石活动奖励", "所宝石活动奖励", item);
+        for n = 1, num do
+            sendItemPackageMail(player, "合成宝石活动奖励", "合成宝石活动奖励", item);
+        end
 	end
 end
 
