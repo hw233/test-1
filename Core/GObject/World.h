@@ -150,6 +150,10 @@ public:
     { _trainfighter = v; }
     inline static bool getTrainFighter()
     { return _trainfighter; }
+    inline static void setGemMergeAct(bool v)
+    { _gemmergeact = v; }
+    inline static bool getGemMergeAct()
+    { return _gemmergeact; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -198,6 +202,7 @@ public:
     static bool _fighter1368;
     static bool _enchantact;
     static bool _trainfighter;
+    static bool _gemmergeact;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

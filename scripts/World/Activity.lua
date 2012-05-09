@@ -215,6 +215,12 @@ function onActivityCheck(tm)
           setTrainFighter(false)
       end
 
+      if tm >= actTime107 and tm < actTime108 then
+          setGemMergeAct(true)
+      else
+          setGemMergeAct(false)
+      end
+
       setShuoShuo(false);
   else
       if tm >= actTime33 and tm < actTime34 then
@@ -273,6 +279,7 @@ function initActTime(y, m, d)
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -342,6 +349,9 @@ function initActTime(y, m, d)
 
   actTime105 = os.time(SerStartTm102);
   actTime106 = os.time(SerStartTm102) + 3 * 86400;
+
+  actTime107 = os.time(SerStartTm103);
+  actTime108 = os.time(SerStartTm103) + 8 * 86400;
 
   onActivityCheck(os.time() + 30);
 
