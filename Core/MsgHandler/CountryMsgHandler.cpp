@@ -144,6 +144,7 @@ MSG_REG(GameMsgHdr, OnMDSoul);
 MSG_REG(GameMsgHdr, OnSvrSt);
 MSG_REG(GameMsgHdr, OnYBBuf);
 MSG_REG(GameMsgHdr, OnGuideUdp);
+MSG_REG(GameMsgHdr, OnGetAward);
 
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 

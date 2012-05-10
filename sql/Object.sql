@@ -1324,7 +1324,7 @@ CREATE TABLE `cfriend_awards` (
 
 DROP TABLE IF EXISTS `second_soul`;
 CREATE TABLE `second_soul` (
-  `fighterId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `fighterId` int(10) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
   `cls` tinyint(3) unsigned NOT NULL,
   `practiceLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
@@ -1385,7 +1385,7 @@ DROP TABLE IF EXISTS `luckylog`;
 CREATE TABLE `luckylog` (
     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `name` varchar(255) NOT NULL,
-    `items` varchar(255) NOT NULL,
+    `items` varchar(512) NOT NULL,
     PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

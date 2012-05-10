@@ -661,8 +661,8 @@ namespace GObject
                 _playerData.qqvipl = 16;
             else if (lvl > 26 && lvl < 30)
                 _playerData.qqvipl = 26;
-            else if (lvl > 36)
-                _playerData.qqvipl = 36;
+            else if (lvl > 38)
+                _playerData.qqvipl = 38;
         }
         inline void setQQVipl1(UInt8 lvl)
         {
@@ -1436,6 +1436,10 @@ namespace GObject
         void genAward(Stream& st);
         bool genAward();
 
+        void getAward(UInt8 type, UInt8 opt);
+        void getSSDTAward(UInt8 opt);
+        void sendSSDTInfo();
+
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
         TripodData& runTripodData(TripodData& data, bool = false);
@@ -1498,6 +1502,7 @@ namespace GObject
         void onBlueactiveday();
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
+        void sendYBBufInfo(UInt32 ybbuf);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

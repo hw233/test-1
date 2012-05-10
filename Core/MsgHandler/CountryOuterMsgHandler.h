@@ -675,6 +675,13 @@ struct YBBuf
     MESSAGE_DEF1(REQ::YBBUF, UInt8, _type);
 };
 
+struct GetAward
+{
+    UInt8 _type;
+    UInt8 _opt;
+    MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
+};
+
 struct GuideUdp
 {
     UInt8 _type;
@@ -1029,6 +1036,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRechargeInfo();
     pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
+    pl->sendSSDTInfo();
+    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -4349,6 +4358,12 @@ void OnYBBuf( GameMsgHdr& hdr, YBBuf& req )
 {
     MSG_QUERY_PLAYER(player);
     player->recvYBBuf(req._type);
+}
+
+void OnGetAward( GameMsgHdr& hdr, GetAward& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getAward(req._type, req._opt);
 }
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )

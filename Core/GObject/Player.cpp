@@ -7947,10 +7947,34 @@ namespace GObject
 
             blue = true;
         }
-
-        if (domain == 4 && _playerData.qqvipl >= 30)
+        else if (domain == 4 && _playerData.qqvipl >= 30)
         {
             // TODO:
+            Stream st(REP::YD_INFO);
+
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_QPLUS));
+            UInt8 maxCnt = GObjectManager::getQPlusMaxCount();
+            st << maxCnt;
+            st << static_cast<UInt8>(1);
+            for(UInt8 i = 0; i < maxCnt; ++ i)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getQPlusItem(i);
+                UInt8 itemCnt = ydItem.size();
+                st << itemCnt;
+                for(int j = 0; j < itemCnt; ++ j)
+                {
+                    UInt32 itemId = ydItem[j].itemId;
+                    if(GetItemSubClass(itemId) == Item_Gem)
+                        itemId = _playerData.ydGemId;
+
+                    st << itemId << ydItem[j].itemNum;
+                }
+            }
+            st << static_cast<UInt8>(0);
+            st << Stream::eos;
+            send(st);
+
             qplus = true;
         }
 
@@ -7961,7 +7985,7 @@ namespace GObject
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue)
+            if (blue || qplus)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
@@ -8054,11 +8078,39 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 0))
+        else if (domain == 4 && _playerData.qqvipl >= 30 && d3d6/*qplus*/ == 1)
+        {
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+
+            UInt32 award = GetVar(VAR_AWARD_QPLUS);
+            if (!award)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getQPlusItem(qqvipl);
+                UInt8 itemCnt = ydItem.size();
+                if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+                {
+                    nRes = 4;
+                    SetVar(VAR_AWARD_QPLUS, 1);
+                    for(int j = 0; j < itemCnt; ++ j)
+                    {
+                        UInt32 itemId = ydItem[j].itemId;
+                        if(GetItemSubClass(itemId) == Item_Gem)
+                            itemId = _playerData.ydGemId;
+
+                        GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                    }
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
+            }
+        }
+        else if (_playerData.qqvipl < 20 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
-            if (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 0)
+            if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
                 qqvipl = _playerData.qqvipl1;
                 flag = 8*(_playerData.qqvipl1 / 10);
@@ -8130,10 +8182,6 @@ namespace GObject
             {
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
-        }
-        else if (domain == 4 && _playerData.qqvipl >= 30 && d3d6/*qplus*/ == 1)
-        {
-            // TODO:
         }
 
         st << nRes << Stream::eos;
@@ -8499,6 +8547,66 @@ namespace GObject
                 m_td.quality, getId());
         runTripodData(m_td);
         sendTripodInfo();
+    }
+
+    void Player::getAward(UInt8 type, UInt8 opt)
+    {
+        switch(type)
+        {
+        case 1:
+            // 搜搜地图
+            getSSDTAward(opt);
+            break;
+        }
+    }
+
+    void Player::getSSDTAward(UInt8 opt)
+    {
+        if(!World::getSSDTAct() || opt > 3)
+            return;
+
+        UInt8 status = GetVar(VAR_AWARD_SSDT_2);
+        // 点亮每日旗帜
+        if(opt == 0)
+        {
+            if(GetVar(VAR_AWARD_SSDT_1))
+                return;
+            if(!GameAction()->RunSSDTAward(this, opt))
+                return;
+
+            ++ status;
+            SetVar(VAR_AWARD_SSDT_1, 1);
+            SetVar(VAR_AWARD_SSDT_2, status);
+        }
+        else
+        {
+            static UInt8 flags[] = {1, 2, 4, 7};
+            if( (1 << opt) & (status >> 4) )
+                return;
+            if(flags[opt] > (status & 0x0F))
+                return;
+            if(!GameAction()->RunSSDTAward(this, opt))
+                return;
+
+            status |= (1 << (opt + 4));
+            SetVar(VAR_AWARD_SSDT_2, status);
+        }
+
+        sendSSDTInfo();
+    }
+
+    void Player::sendSSDTInfo()
+    {
+        if(!World::getSSDTAct())
+            return;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(1);
+        UInt8 status = GetVar(VAR_AWARD_SSDT_2);
+        if(GetVar(VAR_AWARD_SSDT_1))
+            status |= (1 << 4);
+        st << status << Stream::eos;
+        send(st);
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
@@ -9491,14 +9599,18 @@ namespace GObject
 
         if (r)
         {
-            ybbuf = ybbuf << 16 | bbuf;
+            ybbuf = (ybuf << 16) | bbuf;
             SetVar(VAR_YBBUF, ybbuf);
         }
 
-        // TODO:
-        //Stream st(0);
-        //st << Stream::eos;
-        //send(st);
+        sendYBBufInfo(ybbuf);
+    }
+
+    void Player::sendYBBufInfo(UInt32 ybbuf)
+    {
+        Stream st(REP::YBBUF);
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        send(st);
     }
 
     bool Player::isCopyPassed(UInt8 copyid)
