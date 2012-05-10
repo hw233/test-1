@@ -749,6 +749,24 @@ function MayDay(player, lootlvl)
     end
 end
 
+function LuckyDrawBox(player, id)
+    local items = {
+        [2] = 9012,
+        [3] = 9013,
+        [4] = 9014,
+        [5] = 9015,
+        [6] = 9016,
+    }
+
+    local item = items[id]
+    if item == nil then
+        return
+    end
+
+    local package = player:GetPackage()
+    package:Add(item, 1, true)
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
@@ -757,6 +775,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
+    LuckyDrawBox(player, id)
 end
 
 

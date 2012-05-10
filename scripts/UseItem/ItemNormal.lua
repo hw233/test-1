@@ -2912,13 +2912,19 @@ function ItemNormal_00009017(iid, num, bind, param)
         return false
     end
 
+    local maxpoint = 150
     local point = fgt:getElixirAttrByOffset(off)
-    if point > 150 then
+    if point >= maxpoint then
 		player:sendMsgCode(2, 1075, 0);
         return false 
     end
 
-    if fgt:addElixirAttrByOffset(off, 1) then
+    local rn = maxpoint - point
+    if num > rn then
+        num = rn
+    end
+
+    if fgt:addElixirAttrByOffset(off, num) then
         package:DelItemSendMsg(iid, player);
         return num;
     end

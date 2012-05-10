@@ -3253,9 +3253,9 @@ void GlobalFighters::buildSummonSet()
 Int16 Fighter::getMaxSoul()
 {
     if(_owner == NULL)
-        return soulMax;
+        return soulMax + _elixirattr.soul;
     else
-        return soulMax + _owner->getClanSkillMaxSoulEffect() + get2ndSounSoulMax();
+        return soulMax + _elixirattr.soul + _owner->getClanSkillMaxSoulEffect() + get2ndSounSoulMax();
 }
 
 void GlobalFighters::setAllDirty()
@@ -3831,6 +3831,7 @@ bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
         _elixirattr.soul += v;
         MAXVAL(_elixirattr.soul, MV);
         st << off2type[off] << static_cast<UInt32>(_elixirattr.soul);
+        sendModification(9, getMaxSoul());
         ret = true;
     }
 

@@ -41,6 +41,7 @@ public:
 	inline UInt32 Now() { return _now; }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
+    inline static bool isDebug() { return cfg.debug; }
 
 	inline static void setActivityStage(int stage)
 	{ _activityStage = stage; }
@@ -150,6 +151,19 @@ public:
     { _enchantact = v; }
     inline static bool getEnchantAct()
     { return _enchantact; }
+    inline static void setBlueDiamondAct(bool v)
+    { _bluediamondact = v; }
+    inline static bool getBlueDiamondAct()
+    { return _bluediamondact; }
+    inline static void setYellowDiamondAct(bool v)
+    { _yellowdiamondact = v; }
+    inline static bool getYellowDiamondAct()
+    { return _yellowdiamondact; }
+    inline static void setQQGameAct(bool v)
+    { _qqgameact = v; }
+    inline static bool getQQGameAct()
+    { return _qqgameact; }
+
     inline static void setTrainFighter(bool v)
     { _trainfighter = v; }
     inline static bool getTrainFighter()
@@ -208,6 +222,9 @@ public:
     static bool _enchantact;
     static bool _trainfighter;
     static bool _gemmergeact;
+    static bool _bluediamondact;
+    static bool _yellowdiamondact;
+    static bool _qqgameact;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
