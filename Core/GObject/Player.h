@@ -1312,6 +1312,7 @@ namespace GObject
         inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
+        float getPracticeIncByDiamond();
         bool accPractice();
         void AddPracticeExp(const PracticeFighterExp* pfexp);
 

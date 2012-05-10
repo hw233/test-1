@@ -2506,6 +2506,14 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
+                //if(this->isBD() || this->isYD())
+                if(this->getPlatform() == 10)
+                {
+                    UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
+                    SYSMSG_SENDV(1092, this, extraExp);
+                    SYSMSG_SENDV(1093, this, extraExp);
+                    exp += extraExp;
+                }
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
@@ -6171,8 +6179,21 @@ namespace GObject
         UInt32 vipLevel = getVipLevel();
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        copy = freeCnt + goldCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel);
+
+        UInt8 currentCnt, totalCnt;
+        if(this->isBD()) {
+            currentCnt = this->GetVar(VAR_DIAMOND_BLUE);
+            totalCnt = 1;
+        } else if (this->isYD()) {
+            currentCnt = this->GetVar(VAR_DIAMOND_YELLOW);
+            totalCnt = 1;
+        } else {
+            currentCnt = 0;
+            totalCnt = 0;
+        }
+
+        copy = freeCnt + goldCnt + currentCnt;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -6219,7 +6240,21 @@ namespace GObject
         UInt8 cnt = playerCopy.getCopySize(this);
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel));
+
+        UInt8 currentDiamondCnt;
+        UInt8 totalDiamondCnt;
+        if(this->isBD()) {
+            currentDiamondCnt = this->GetVar(VAR_DIAMOND_BLUE);
+            totalDiamondCnt = 1;
+        } else if (this->isYD()) {
+            currentDiamondCnt = this->GetVar(VAR_DIAMOND_YELLOW);
+            totalDiamondCnt = 1;
+        } else {
+            currentDiamondCnt = 0;
+            totalDiamondCnt = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -7358,14 +7393,21 @@ namespace GObject
             {
                 if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
                 {
+                    count = 1;
+                    //if(this->isBD() || this->isYD())
+                    if(this->getPlatform() == 10)
+                    {
+                        printf("diamond user\n");
+                        count *= 2;
+                    }
                     updateNextBookStoreUpdate(curtime);
                 }
                 else
                 {
+                    count = 1;
                     money = GData::moneyNeed[GData::BOOK_LIST].tael;
                 }
 
-                count = 1;
                 // updateNextBookStoreUpdate(curtime);
             }
 
@@ -7642,6 +7684,22 @@ namespace GObject
         }
 #endif
         return 0.0;
+    }
+
+    float Player::getPracticeIncByDiamond()
+    {
+        if(this->isBD())
+        {
+            return 0.1;
+        }
+        else if(this->isYD())
+        {
+            return 0.1;
+        }
+        else
+        {
+            return 0.0;
+        }
     }
 
     bool Player::accPractice()
