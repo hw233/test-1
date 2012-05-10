@@ -1501,6 +1501,7 @@ namespace GObject
         void onBlueactiveday();
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
+        void sendYBBufInfo(UInt32 ybbuf);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
