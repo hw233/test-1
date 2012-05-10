@@ -1,6 +1,9 @@
 
-function RunSSDTAward(opt)
-    local player = GetPlayer();
+function RunSSDTAward(player, opt)
+    if player == nil then
+        return false;
+    end
+
     local package = player:GetPackage();
 
 	if package:GetRestPackageSize() < 1 then		
@@ -8,8 +11,9 @@ function RunSSDTAward(opt)
 		return false;
 	end
 
-    if(opt > 3)
+    if opt > 3 then
         return false;
+    end
 
     if opt == 0 then
         local gem = {5002, 5012, 5022, 5032, 5042, 5052, 5062, 5072, 5082, 5092, 5102, 5112, 5122, 5132, 5142}
