@@ -9433,7 +9433,7 @@ namespace GObject
 
         if (r)
         {
-            ybbuf = ybbuf << 16 | bbuf;
+            ybbuf = (ybuf << 16) | bbuf;
             SetVar(VAR_YBBUF, ybbuf);
         }
 

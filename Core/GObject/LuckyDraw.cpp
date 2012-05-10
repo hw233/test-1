@@ -12,6 +12,7 @@
 #include "Server/WorldServer.h"
 #include "Common/StringTokenizer.h"
 #include "MsgID.h"
+#include "GData/ItemType.h"
 
 namespace GObject
 {
@@ -56,6 +57,19 @@ void LuckyDraw::sendInfo(Player* player)
     player->send(st);
 }
 
+bool merge(std::vector<LDItem>& its, UInt16 itemid, UInt8 num)
+{
+    for (std::vector<LDItem>::iterator it = its.begin(), end = its.end(); it != end; ++it)
+    {
+        if ((*it).itemid == itemid)
+        {
+            (*it).num += num;
+            return true;
+        }
+    }
+    return false;
+}
+
 void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
 {
     if (!player)
@@ -73,6 +87,7 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
     if (size)
     {
         std::vector<LDItem> its;
+        std::vector<LDItem> logits;
         for (int i = 1; i <= size; ++i)
         {
             lua_tinker::table item = items.get<lua_tinker::table>(i);
@@ -84,18 +99,17 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
                 LDItem i;
                 i.itemid = itemid;
                 i.num = num;
-                bool merged = false;
-                for (std::vector<LDItem>::iterator it = its.begin(), end = its.end(); it != end; ++it)
-                {
-                    if ((*it).itemid == itemid)
-                    {
-                        (*it).num += num;
-                        merged = true;
-                        break;
-                    }
-                }
+
+                bool merged = merge(its, itemid, num);
                 if (!merged)
                     its.push_back(i);
+
+                const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemid];
+                if (itemType->quality == 5)
+                {
+                    if (!merge(logits, itemid, num))
+                        logits.push_back(i);
+                }
             }
         }
 
@@ -107,7 +121,8 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
             st << its[i].num;
         }
 
-        pushLog(player->getName(), its);
+        if (logits.size())
+            pushLog(player->getName(), logits);
     }
     else
         st << static_cast<UInt8>(0);
