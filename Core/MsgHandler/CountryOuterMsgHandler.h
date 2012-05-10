@@ -3870,6 +3870,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
+    if (player->isJumpingMap())
+        return;
+
     switch(op)
     {
     case 0x0:
