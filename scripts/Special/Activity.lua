@@ -241,7 +241,7 @@ function onMergeGem(player, lev, num)
             return
         end
 
-        sendItemPackageMail(player, "合所宝石活动奖励", "所宝石活动奖励", item);
+        sendItemPackageMail(player, "合成宝石活动奖励", "合成宝石活动奖励", item);
 	end
 end
 
