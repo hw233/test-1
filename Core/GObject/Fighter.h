@@ -549,6 +549,7 @@ public:
 
     Int32 getAcuPraAdd() { return _praadd; }
     float getPracticeBufFactor();
+    float getPracticeIncByDiamond();
     float getClanTechAddon(int place);
     float getPracticeInc();
     // TODO:

@@ -91,6 +91,7 @@ bool World::_cfriend = false;
 bool World::_mayday = false;
 bool World::_mayday1 = false;
 bool World::_ydmdact = false;
+bool World::_ssdtact = false;
 bool World::_fighter1368 = false;
 bool World::_enchantact = false;
 bool World::_trainfighter = false;
@@ -232,6 +233,7 @@ void World::makeActivityInfo(Stream &st)
     active |= _rechargeactiveno&2?16:0;
     active |= _foolsday?32:0;
     active |= _chingming?64:0;
+    active |= _ssdtact?128:0;
     st << active << Stream::eos;
 }
 void World::calWeekDay()

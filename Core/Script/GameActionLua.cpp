@@ -1099,4 +1099,10 @@ namespace Script
     {
         return Call<lua_tinker::table>("luckyDraw", player, id, num, bind);
     }
+    bool GameActionLua::RunSSDTAward(Player* player, UInt8 opt)
+	{
+		assert(player != NULL);
+		return Call<bool>("RunSSDTAward", player, opt);
+	}
+
 }

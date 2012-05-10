@@ -3011,6 +3011,11 @@ float Fighter::getPracticeBufFactor()
     return _owner->getPracticeBufFactor();
 }
 
+float Fighter::getPracticeIncByDiamond()
+{
+    return _owner->getPracticeIncByDiamond();
+}
+
 float Fighter::getClanTechAddon( int place )
 {
     if (_owner)

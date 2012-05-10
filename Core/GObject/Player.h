@@ -661,8 +661,8 @@ namespace GObject
                 _playerData.qqvipl = 16;
             else if (lvl > 26 && lvl < 30)
                 _playerData.qqvipl = 26;
-            else if (lvl > 36)
-                _playerData.qqvipl = 36;
+            else if (lvl > 38)
+                _playerData.qqvipl = 38;
         }
         inline void setQQVipl1(UInt8 lvl)
         {
@@ -1312,6 +1312,7 @@ namespace GObject
         inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
+        float getPracticeIncByDiamond();
         bool accPractice();
         void AddPracticeExp(const PracticeFighterExp* pfexp);
 
@@ -1434,6 +1435,10 @@ namespace GObject
         void getAward();
         void genAward(Stream& st);
         bool genAward();
+
+        void getAward(UInt8 type, UInt8 opt);
+        void getSSDTAward(UInt8 opt);
+        void sendSSDTInfo();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();

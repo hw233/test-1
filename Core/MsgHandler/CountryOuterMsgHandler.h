@@ -675,6 +675,13 @@ struct YBBuf
     MESSAGE_DEF1(REQ::YBBUF, UInt8, _type);
 };
 
+struct GetAward
+{
+    UInt8 _type;
+    UInt8 _opt;
+    MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
+};
+
 struct GuideUdp
 {
     UInt8 _type;
@@ -1029,6 +1036,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRechargeInfo();
     pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
+    pl->sendSSDTInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
     luckyDraw.notifyDisplay(pl);
 
@@ -3863,6 +3871,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
+    if (player->isJumpingMap())
+        return;
+
     switch(op)
     {
     case 0x0:
@@ -4351,6 +4362,12 @@ void OnYBBuf( GameMsgHdr& hdr, YBBuf& req )
 {
     MSG_QUERY_PLAYER(player);
     player->recvYBBuf(req._type);
+}
+
+void OnGetAward( GameMsgHdr& hdr, GetAward& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getAward(req._type, req._opt);
 }
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
