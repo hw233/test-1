@@ -34,6 +34,7 @@
 #include "GObject/AthleticsRank.h"
 #include "GObject/HeroMemo.h"
 #include "MsgHandler/JsonParser.h"
+#include "GObject/LuckyDraw.h"
 
 GMHandler gmHandler;
 
@@ -78,7 +79,6 @@ GMHandler::GMHandler()
 	Reg(3, "setdl", &GMHandler::OnSetDL);
 	Reg(3, "setvip", &GMHandler::OnSetVip);
 	Reg(3, "super", &GMHandler::OnSuper);
-	Reg(3, "luckydraw", &GMHandler::OnLuckyDraw);
 	Reg(3, "spawn", &GMHandler::OnSpawn);
 	Reg(3, "unspawn", &GMHandler::OnUnspawn);
 
@@ -169,6 +169,8 @@ GMHandler::GMHandler()
 	Reg(3, "json", &GMHandler::OnJson);
 	Reg(3, "rc7awd", &GMHandler::OnRC7Awd);
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
+	Reg(3, "vars", &GMHandler::OnAddVarS);
+	Reg(3, "ld", &GMHandler::OnLuckyDraw);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -1420,18 +1422,6 @@ void GMHandler::OnLimitLuckyDraw( std::vector<std::string>& arglist )
 		return;
 	cfg.limitLuckyDraw = n;
 	NETWORK()->Enumerate<Network::GameClient>(enumLD, n);
-}
-
-void GMHandler::OnLuckyDraw( GObject::Player * player, std::vector<std::string>& arglist )
-{
-	bool n = true;
-	if(!arglist.empty())
-		n = atoi(arglist[0].c_str()) > 0;
-
-	if(n)
-		player->removeStatus(Player::NoLuckyDraw);
-	else
-		player->addStatus(Player::NoLuckyDraw);
 }
 
 void GMHandler::OnRunScript( std::vector<std::string>& arglist )
@@ -2706,5 +2696,26 @@ void GMHandler::OnRC7TurnOn(GObject::Player* player, std::vector<std::string>& a
 {
     player->turnOnRC7Day();
 }
+void GMHandler::OnAddVarS(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    int v = atoi(args[0].c_str());
+    player->AddVarS(VAR_LDPOINT, v);
+	SYSMSG_SENDV(9999, player, player->GetVarS(VAR_LDPOINT));
+}
+void GMHandler::OnLuckyDraw(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt8 id = 1;
+    UInt8 num = 1;
+    bool bind = false;
+    if (args.size() >= 1)
+        id = atoi(args[0].c_str());
+    if (args.size() >= 2)
+        num = atoi(args[1].c_str());
+    if (args.size() >= 3)
+        bind = atoi(args[2].c_str());
 
+    luckyDraw.draw(player, id, num, bind);
+}
 

@@ -755,20 +755,6 @@ CREATE TABLE `locked_player` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `luckydrawgold`
---
-
-DROP TABLE IF EXISTS `luckydrawgold`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `luckydrawgold` (
-  `playerId` bigint(20) unsigned NOT NULL,
-  `cost` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`playerId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `mail`
 --
 
@@ -1338,7 +1324,7 @@ CREATE TABLE `cfriend_awards` (
 
 DROP TABLE IF EXISTS `second_soul`;
 CREATE TABLE `second_soul` (
-  `fighterId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `fighterId` int(10) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
   `cls` tinyint(3) unsigned NOT NULL,
   `practiceLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
@@ -1361,6 +1347,9 @@ DROP TABLE IF EXISTS `wboss`;
 CREATE TABLE `wboss` (
   `idx` tinyint(3) unsigned NOT NULL,
   `last` int(10) unsigned NOT NULL,
+  `hp` int(10) unsigned NOT NULL,
+  `atk` int(10) NOT NULL,
+  `matk` int(10) NOT NULL,
   PRIMARY KEY (`idx`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1376,5 +1365,27 @@ CREATE TABLE `shuoshuo` (
   `updateTime` int(10) NOT NULL,
   `shuoshuo` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `elixir`;
+CREATE TABLE `elixir` (
+    `id` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `strength` int(5) NOT NULL DEFAULT '0',
+    `physique` int(5) NOT NULL DEFAULT '0',
+    `agility` int(5) NOT NULL DEFAULT '0',
+    `intelligence` int(5) NOT NULL DEFAULT '0',
+    `will` int(5) NOT NULL DEFAULT '0',
+    `soul` int(5) NOT NULL DEFAULT '0',
+    UNIQUE KEY `id_playerId` (`id`,`playerId`),
+    KEY `playerId` (`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `luckylog`;
+CREATE TABLE `luckylog` (
+    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `items` varchar(512) NOT NULL,
+    PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

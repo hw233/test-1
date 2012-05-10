@@ -105,6 +105,7 @@ namespace Script
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
+		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -208,8 +209,10 @@ namespace Script
 		CLASS_DEF(Player, sendMailPack);
 		CLASS_DEF(Player, setVipAwardFlag);
         CLASS_DEF(Player, GetVar);
+        CLASS_DEF(Player, GetVarS);
         CLASS_DEF(Player, SetVar);
         CLASS_DEF(Player, AddVar);
+        CLASS_DEF(Player, AddVarS);
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
 		CLASS_DEF(Player, getPlatform);
@@ -240,6 +243,8 @@ namespace Script
 		CLASS_DEF(Fighter, skillLevelUp);
 		CLASS_DEF(Fighter, addNewCitta);
 		CLASS_DEF(Fighter, changeSecondSoulClass);
+		CLASS_DEF(Fighter, addElixirAttrByOffset);
+		CLASS_DEF(Fighter, getElixirAttrByOffset);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -319,6 +324,7 @@ namespace Script
 		CLASS_DEF(Package, GetItemUsedGrids);
 		CLASS_DEF(Package, ExistItem);
 		CLASS_DEF(Package, GetItemNum);
+		CLASS_DEF(Package, GetItemAnyNum);
 		CLASS_DEF(Package, GetMaxPackageSize);
 		CLASS_DEF(Package, GetUsedPackageSize);
 		CLASS_DEF(Package, GetRestPackageSize);
@@ -1088,4 +1094,14 @@ namespace Script
     {
         return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
     }
+    lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind)
+    {
+        return Call<lua_tinker::table>("luckyDraw", player, id, num, bind);
+    }
+    bool GameActionLua::RunSSDTAward(Player* player, UInt8 opt)
+	{
+		assert(player != NULL);
+		return Call<bool>("RunSSDTAward", player, opt);
+	}
+
 }

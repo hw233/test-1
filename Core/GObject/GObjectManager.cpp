@@ -30,7 +30,6 @@
 #include "ClanTech.h"
 #include "ClanBattle.h"
 #include "ClanManager.h"
-#include "LuckyDraw.h"
 #include "BlockBossMgr.h"
 #include "MapCollection.h"
 #include "CountryBattle.h"
@@ -58,6 +57,7 @@
 #include "CFriend.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
+#include "LuckyDraw.h"
 #include <fcntl.h>
 
 namespace GObject
@@ -133,6 +133,7 @@ namespace GObject
 
     std::vector<std::vector<YDItem>> GObjectManager::_yellow_diamond_award;
     std::vector<std::vector<YDItem>> GObjectManager::_d3d6_diamond_award;
+    std::vector<std::vector<YDItem>> GObjectManager::_qplus_diamond_award;
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
 
@@ -193,7 +194,6 @@ namespace GObject
         loadTeamCopy();
 		loadAllClans();
 		LoadSpecialAward();
-		LoadLuckyDraw();
 		LoadArena();
         LoadPracticePlace();
         LoadWorldBoss();
@@ -205,6 +205,7 @@ namespace GObject
         LoadWBoss();
         LoadDiscount();
         LoadSoulItemChance();
+        LoadLuckyLog();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -796,6 +797,27 @@ namespace GObject
                 _d3d6_diamond_award.push_back(itemVt);
             }
 
+            lua_tinker::table qplusTable = lua_tinker::call<lua_tinker::table>(L, "getQPlusAward");
+            size_t qplus_size = qplusTable.size();
+            for(UInt32 i = 0; i < qplus_size; i ++)
+            {
+                std::vector<YDItem> itemVt;
+                itemVt.clear();
+                lua_tinker::table itemTable = qplusTable.get<lua_tinker::table>(i + 1);
+                size_t itemSize = itemTable.size();
+                for(UInt8 j = 0; j < itemSize; ++j)
+                {
+                    lua_tinker::table tempTable = itemTable.get<lua_tinker::table>(j + 1);
+                    YDItem item = {0};
+
+                    item.itemId = tempTable.get<UInt32>(1);
+                    item.itemNum = tempTable.get<UInt8>(2);
+
+                    itemVt.push_back(item);
+                }
+                _qplus_diamond_award.push_back(itemVt);
+            }
+
             lua_tinker::table yydTable = lua_tinker::call<lua_tinker::table>(L, "getYearYellowDiamondAward");
             size_t yyd_size = yydTable.size();
             for(UInt32 j = 0; j < yyd_size; j ++)
@@ -1253,8 +1275,8 @@ namespace GObject
 		last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
         UInt8 lvl_max = 0;
-		DBFighterAndSecondSoul specfgtobj;
-		if(execu->Prepare("SELECT `id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		DBFighter2 specfgtobj;
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1335,6 +1357,25 @@ namespace GObject
 			pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;
+
+#define MAXVAL(x,y) { if (x > y) x = y; }
+#define MV 150
+            ElixirAttr attr;
+            attr.strength = specfgtobj.strength;
+            MAXVAL(attr.strength, MV);
+            attr.physique = specfgtobj.physique;
+            MAXVAL(attr.physique, MV);
+            attr.agility = specfgtobj.agility;
+            MAXVAL(attr.agility, MV);
+            attr.intelligence = specfgtobj.intelligence;
+            MAXVAL(attr.intelligence, MV);
+            attr.will = specfgtobj.will;
+            MAXVAL(attr.will, MV);
+            attr.soul = specfgtobj.soul;
+            MAXVAL(attr.soul, MV);
+            fgt2->setElixirAttr(attr);
+#undef MV
+#undef MAXVAL
 
             if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level >= 70)
                 ArenaBattle::Instance().addLevelMan(true);
@@ -3538,26 +3579,6 @@ namespace GObject
 
 		return true;	
 	}
-	bool GObjectManager::LoadLuckyDraw()
-	{
-		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
-		if (execu.get() == NULL || !execu->isConnected()) return false;
-		LoadingCounter lc("Loading LuckyDrawCost");
-		DBLuckyDraw ld;
-		if(execu->Prepare("SELECT `playerId`, `cost` FROM `luckydrawgold`", ld)!= DB::DB_OK)
-			return false;	
-		lc.reset(20);
-		while(execu->Next() == DB::DB_OK)
-		{
-			lc.advance();
-			Player * player = globalPlayers[ld.playerid];
-			if(player == NULL) continue;
-			luckyDraw.pushCostFromDB(player, ld.cost);
-		}
-		lc.finalize();
-
-		return true;	
-	}
 
 	bool GObjectManager::LoadArena()
 	{
@@ -4089,12 +4110,18 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading WorldBoss Data");
 		DBWBoss t;
-		if(execu->Prepare("SELECT `idx`, `last` FROM `wboss`", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `idx`, `last`, `hp`, `atk`, `matk` FROM `wboss`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
-            worldBoss.setLast(t.idx, t.last);
+			lc.advance();
+            Last l;
+            l.time = t.last;
+            l.hp = t.hp;
+            l.atk = t.atk;
+            l.matk = t.matk;
+            worldBoss.setLast(t.idx, l);
         }
         lc.finalize();
         return true;
@@ -4111,6 +4138,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             GData::store.add(1, t.itemid, t.discount);
         }
         lc.finalize();
@@ -4189,6 +4217,24 @@ namespace GObject
         }
         lua_close(L);
 
+        return true;
+    }
+
+    bool GObjectManager::LoadLuckyLog()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Lucky Log");
+		DBLuckyLog t;
+		if(execu->Prepare("SELECT `name`, `items` FROM `luckylog` ORDER BY `id` DESC LIMIT 10", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            luckyDraw.pushLog(t.name, t.items);
+        }
+        lc.finalize();
         return true;
     }
 

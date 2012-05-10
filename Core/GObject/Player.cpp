@@ -915,7 +915,7 @@ namespace GObject
             if (platform)
                 m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
 
-            TRACE_LOG("%s", buf);
+            TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u)", buf, str1, str2, str3, str4, str5, str6, type, count);
         }
     }
 
@@ -954,6 +954,14 @@ namespace GObject
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
         }
+    }
+
+    void Player::guideUdp(UInt8 type, std::string& p1, std::string& p2)
+    {
+        if (type == 0)
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "guide");
+        else if (type == 1)
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "act");
     }
 
     void Player::moneyLog(int type, int gold, int coupon, int tael, int achievement, int prestige)
@@ -1617,6 +1625,11 @@ namespace GObject
         return m_pVars->GetVar(id);
     }
 
+    Int32 Player::GetVarS(Int32 id)
+    {
+        return (Int32)m_pVars->GetVar(id);
+    }
+
     void Player::LoadVar(UInt32 id, UInt32 val, UInt32 overTime)
     {
         m_pVars->LoadVar(id, val, overTime);
@@ -1630,6 +1643,12 @@ namespace GObject
     void Player::AddVar(UInt32 id, UInt32 val)
     {
         m_pVars->AddVar(id,val);
+    }
+
+    void Player::AddVarS(UInt32 id, Int32 val)
+    {
+        Int32 v = GetVarS(id);
+        m_pVars->SetVar(id,v+val);
     }
 
     UInt32 Player::GetVarNow(UInt32 id,  UInt32 now)
@@ -2219,6 +2238,7 @@ namespace GObject
         st << fgt->getAttrValue2();
         st << fgt->getAttrType3();
         st << fgt->getAttrValue3();
+        fgt->appendElixirAttr(st);
         st << fgt->getUpCittasMax();
 		if(withequip)
 		{
@@ -2486,6 +2506,14 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
+                //if(this->isBD() || this->isYD())
+                if(this->getPlatform() == 10)
+                {
+                    UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
+                    SYSMSG_SENDV(1092, this, extraExp);
+                    SYSMSG_SENDV(1093, this, extraExp);
+                    exp += extraExp;
+                }
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
@@ -6151,8 +6179,21 @@ namespace GObject
         UInt32 vipLevel = getVipLevel();
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        copy = freeCnt + goldCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel);
+
+        UInt8 currentCnt, totalCnt;
+        if(this->isBD()) {
+            currentCnt = this->GetVar(VAR_DIAMOND_BLUE);
+            totalCnt = 1;
+        } else if (this->isYD()) {
+            currentCnt = this->GetVar(VAR_DIAMOND_YELLOW);
+            totalCnt = 1;
+        } else {
+            currentCnt = 0;
+            totalCnt = 0;
+        }
+
+        copy = freeCnt + goldCnt + currentCnt;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -6199,7 +6240,21 @@ namespace GObject
         UInt8 cnt = playerCopy.getCopySize(this);
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel));
+
+        UInt8 currentDiamondCnt;
+        UInt8 totalDiamondCnt;
+        if(this->isBD()) {
+            currentDiamondCnt = this->GetVar(VAR_DIAMOND_BLUE);
+            totalDiamondCnt = 1;
+        } else if (this->isYD()) {
+            currentDiamondCnt = this->GetVar(VAR_DIAMOND_YELLOW);
+            totalDiamondCnt = 1;
+        } else {
+            currentDiamondCnt = 0;
+            totalDiamondCnt = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -7338,14 +7393,21 @@ namespace GObject
             {
                 if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
                 {
+                    count = 1;
+                    //if(this->isBD() || this->isYD())
+                    if(this->getPlatform() == 10)
+                    {
+                        printf("diamond user\n");
+                        count *= 2;
+                    }
                     updateNextBookStoreUpdate(curtime);
                 }
                 else
                 {
+                    count = 1;
                     money = GData::moneyNeed[GData::BOOK_LIST].tael;
                 }
 
-                count = 1;
                 // updateNextBookStoreUpdate(curtime);
             }
 
@@ -7624,6 +7686,22 @@ namespace GObject
         return 0.0;
     }
 
+    float Player::getPracticeIncByDiamond()
+    {
+        if(this->isBD())
+        {
+            return 0.1;
+        }
+        else if(this->isYD())
+        {
+            return 0.1;
+        }
+        else
+        {
+            return 0.0;
+        }
+    }
+
     bool Player::accPractice()
     {
         UInt32 goldUse = GData::moneyNeed[GData::INSTANTPRACTICE].gold;
@@ -7783,7 +7861,7 @@ namespace GObject
         UInt8 qqvipl = 0;
         UInt8 flag = 0;
 
-        if (_playerData.qqvipl >= 20)
+        if (_playerData.qqvipl >= 20) // 20-29 - 3366, 30-39 - Q+
         {
             qqvipl = _playerData.qqvipl1;
             flag = 8*(_playerData.qqvipl1 / 10);
@@ -7838,6 +7916,7 @@ namespace GObject
         checkQQAward();
 
         bool blue = false;
+        bool qplus = false;
         UInt8 domain = atoi(m_domain.c_str());
         if (domain == 11 && _playerData.qqvipl >= 20)
         {
@@ -7868,15 +7947,45 @@ namespace GObject
 
             blue = true;
         }
+        else if (domain == 4 && _playerData.qqvipl >= 30)
+        {
+            // TODO:
+            Stream st(REP::YD_INFO);
 
-        if (_playerData.qqvipl < 20 || blue)
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+            st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>(GetVar(VAR_AWARD_QPLUS));
+            UInt8 maxCnt = GObjectManager::getQPlusMaxCount();
+            st << maxCnt;
+            st << static_cast<UInt8>(1);
+            for(UInt8 i = 0; i < maxCnt; ++ i)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getQPlusItem(i);
+                UInt8 itemCnt = ydItem.size();
+                st << itemCnt;
+                for(int j = 0; j < itemCnt; ++ j)
+                {
+                    UInt32 itemId = ydItem[j].itemId;
+                    if(GetItemSubClass(itemId) == Item_Gem)
+                        itemId = _playerData.ydGemId;
+
+                    st << itemId << ydItem[j].itemNum;
+                }
+            }
+            st << static_cast<UInt8>(0);
+            st << Stream::eos;
+            send(st);
+
+            qplus = true;
+        }
+
+        if (_playerData.qqvipl < 20 || blue || qplus)
         {
             Stream st(REP::YD_INFO);
 
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue)
+            if (blue || qplus)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
@@ -7969,11 +8078,39 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 0))
+        else if (domain == 4 && _playerData.qqvipl >= 30 && d3d6/*qplus*/ == 1)
+        {
+            UInt8 qqvipl = _playerData.qqvipl % 10;
+
+            UInt32 award = GetVar(VAR_AWARD_QPLUS);
+            if (!award)
+            {
+                std::vector<YDItem>& ydItem = GObjectManager::getQPlusItem(qqvipl);
+                UInt8 itemCnt = ydItem.size();
+                if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
+                {
+                    nRes = 4;
+                    SetVar(VAR_AWARD_QPLUS, 1);
+                    for(int j = 0; j < itemCnt; ++ j)
+                    {
+                        UInt32 itemId = ydItem[j].itemId;
+                        if(GetItemSubClass(itemId) == Item_Gem)
+                            itemId = _playerData.ydGemId;
+
+                        GetPackage()->AddItem2(itemId, ydItem[j].itemNum, true, true);
+                    }
+                }
+                else
+                {
+                    sendMsgCode(2, 1011);
+                }
+            }
+        }
+        else if (_playerData.qqvipl < 20 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
-            if (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 0)
+            if ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0)
             {
                 qqvipl = _playerData.qqvipl1;
                 flag = 8*(_playerData.qqvipl1 / 10);
@@ -8410,6 +8547,66 @@ namespace GObject
                 m_td.quality, getId());
         runTripodData(m_td);
         sendTripodInfo();
+    }
+
+    void Player::getAward(UInt8 type, UInt8 opt)
+    {
+        switch(type)
+        {
+        case 1:
+            // 搜搜地图
+            getSSDTAward(opt);
+            break;
+        }
+    }
+
+    void Player::getSSDTAward(UInt8 opt)
+    {
+        if(!World::getSSDTAct() || opt > 3)
+            return;
+
+        UInt8 status = GetVar(VAR_AWARD_SSDT_2);
+        // 点亮每日旗帜
+        if(opt == 0)
+        {
+            if(GetVar(VAR_AWARD_SSDT_1))
+                return;
+            if(!GameAction()->RunSSDTAward(this, opt))
+                return;
+
+            ++ status;
+            SetVar(VAR_AWARD_SSDT_1, 1);
+            SetVar(VAR_AWARD_SSDT_2, status);
+        }
+        else
+        {
+            static UInt8 flags[] = {1, 2, 4, 7};
+            if( (1 << opt) & (status >> 4) )
+                return;
+            if(flags[opt] > (status & 0x0F))
+                return;
+            if(!GameAction()->RunSSDTAward(this, opt))
+                return;
+
+            status |= (1 << (opt + 4));
+            SetVar(VAR_AWARD_SSDT_2, status);
+        }
+
+        sendSSDTInfo();
+    }
+
+    void Player::sendSSDTInfo()
+    {
+        if(!World::getSSDTAct())
+            return;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(1);
+        UInt8 status = GetVar(VAR_AWARD_SSDT_2);
+        if(GetVar(VAR_AWARD_SSDT_1))
+            status |= (1 << 4);
+        st << status << Stream::eos;
+        send(st);
     }
 
     TripodData& Player::runTripodData(TripodData& data, bool init)
@@ -9374,6 +9571,54 @@ namespace GObject
         st << static_cast<UInt8>(5) << GetVar(VAR_RC7DAYRECHARGE);
         st << Stream::eos;
         send(st);
+    }
+
+    void Player::recvYBBuf(UInt8 type)
+    {
+        UInt32 ybbuf = GetVar(VAR_YBBUF);
+        UInt32 ybuf = (ybbuf >> 16) & 0xFFFF;
+        UInt32 bbuf = ybbuf & 0xFFFF;
+
+        // type = 0 黄钻 1 蓝钻
+
+        bool r = false;
+        UInt32 now = TimeUtil::Now();
+        if (!ybuf && type == 0)
+        {
+            setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
+            ybuf = 1;
+            r = true;
+        }
+
+        if (!bbuf && type == 1)
+        {
+            setBuffData(PLAYER_BUFF_BBUF, now + 60 * 60);
+            bbuf = 1;
+            r = true;
+        }
+
+        if (r)
+        {
+            ybbuf = (ybuf << 16) | bbuf;
+            SetVar(VAR_YBBUF, ybbuf);
+        }
+
+        sendYBBufInfo(ybbuf);
+    }
+
+    void Player::sendYBBufInfo(UInt32 ybbuf)
+    {
+        Stream st(REP::YBBUF);
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        send(st);
+    }
+
+    bool Player::isCopyPassed(UInt8 copyid)
+    {
+        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
+        if (!tcpInfo)
+            return false;
+        return tcpInfo->getPass(copyid);
     }
 
 } // namespace GObject

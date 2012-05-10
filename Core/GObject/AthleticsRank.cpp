@@ -179,9 +179,9 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 		if (data == NULL)
 			return false;
 		data->row = row;
-        if(_maxRank[1] <= ATHLETICS_RANK_MAX_CNT)
+        if(_maxRank[row] <= ATHLETICS_RANK_MAX_CNT)
         {
-            data->rank = ++_maxRank[1];
+            data->rank = ++_maxRank[row];
         }
         else
         {

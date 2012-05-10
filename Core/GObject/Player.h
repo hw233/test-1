@@ -96,6 +96,8 @@ namespace GObject
 #define PLAYER_BUFF_HIESCAPE        0x3F    // Ӣ?۵?????
 
 #define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????��ʤ??????
+#define PLAYER_BUFF_YBUF            0x41
+#define PLAYER_BUFF_BBUF            0x42
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
@@ -657,13 +659,17 @@ namespace GObject
                 _playerData.qqvipl = 8;
             else if(lvl > 16 && lvl < 20)
                 _playerData.qqvipl = 16;
-            else if (lvl > 26)
+            else if (lvl > 26 && lvl < 30)
                 _playerData.qqvipl = 26;
+            else if (lvl > 38)
+                _playerData.qqvipl = 38;
         }
         inline void setQQVipl1(UInt8 lvl)
         {
             _playerData.qqvipl1 = lvl;
-            if (lvl < 10 || lvl >= 20)
+            if (lvl > 7 && lvl < 10)
+                _playerData.qqvipl1 = 7;
+            if (lvl >= 20)
                  _playerData.qqvipl1 = 16;
         }
         inline UInt8 getQQVipl() { return _playerData.qqvipl; }
@@ -680,12 +686,18 @@ namespace GObject
                 return (1<<4)|(_playerData.qqvipl1-10);
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29)
                 return (3<<4)|(_playerData.qqvipl-20);
+            if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
+                return (4<<4)|(_playerData.qqvipl-30);
             return 0;
         }
         // XXX: 1-9 黄钻等级
         //      10-19 蓝钻等级
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
-        inline bool isYD() const { return _playerData.qqvipl >= 1 && _playerData.qqvipl <= 9; }
+        //      30-39 Q+等级,另qqvipl1 为黄钻等级
+        inline bool isYD() const
+        {
+            return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
+        }
         inline bool isBD() const
         {
             if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
@@ -716,10 +728,12 @@ namespace GObject
 		void testBattlePunish();
 
 
-        UInt32 GetVar(UInt32 id );
+        UInt32 GetVar(UInt32 id);
+        Int32 GetVarS(Int32 id);
         void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
-        void SetVar(UInt32 id, UInt32 val );
-        void AddVar(UInt32 id, UInt32 val );
+        void SetVar(UInt32 id, UInt32 val);
+        void AddVar(UInt32 id, UInt32 val);
+        void AddVarS(UInt32 id, Int32 val);
 
         UInt32 GetVarNow(UInt32 id, UInt32 now);
         void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
@@ -756,6 +770,8 @@ namespace GObject
 		inline UInt32 getPendExp() { return _playerData.lastExp & 0x7FFFFFFF; }
 		bool regenHP(UInt32);
         UInt8 allHpP();
+
+        bool isCopyPassed(UInt8 copyid);
 
     private:
         GData::AttrExtra _hiattr;
@@ -1296,6 +1312,7 @@ namespace GObject
         inline UInt32 getPracticePlace() { return _praplace>>16&0xffff; }
         inline UInt32 getPracticeSlot() { return _praplace&0xffff; }
         float getPracticeBufFactor();
+        float getPracticeIncByDiamond();
         bool accPractice();
         void AddPracticeExp(const PracticeFighterExp* pfexp);
 
@@ -1363,6 +1380,7 @@ namespace GObject
         void udpLog(UInt8 platform, const char* str1, const char* str2, const char* str3, const char* str4,
                 const char* str5, const char* str6, const char* type, UInt32 count = 1);
         void udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op);
+        void guideUdp(UInt8 type, std::string& p1, std::string& p2);
         void moneyLog(int type, int gold, int coupon = 0, int tael = 0, int achievement = 0, int prestige = 0);
     private:
         CUserLogger* m_ulog;
@@ -1417,6 +1435,10 @@ namespace GObject
         void getAward();
         void genAward(Stream& st);
         bool genAward();
+
+        void getAward(UInt8 type, UInt8 opt);
+        void getSSDTAward(UInt8 opt);
+        void sendSSDTInfo();
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1479,6 +1501,8 @@ namespace GObject
     public:
         void onBlueactiveday();
         void sendSecondInfo();
+        void recvYBBuf(UInt8 type);
+        void sendYBBufInfo(UInt32 ybbuf);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

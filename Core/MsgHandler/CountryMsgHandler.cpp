@@ -32,6 +32,7 @@ MSG_REG_2(GameMsgHdr, REQ::HERO_ISLAND, OnHeroIslandReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_REQINIT, OnClanRankBattleReqInit);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_REQ, OnClanRankBattleReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_RANKBATTLE_SORTLIST, OnClanRankBattleSortList);
+MSG_REG_2(GameMsgHdr, REQ::LUCKYDRAW, OnLuckyDrawReq);
 
 MSG_REG(GameMsgHdr, OnPracticeHookAddReq);
 MSG_REG(GameMsgHdr, OnExtendPackageReq);
@@ -73,8 +74,6 @@ MSG_REG(GameMsgHdr, OnCancelAutoBattleReq);
 MSG_REG(GameMsgHdr, OnInstantAutoBattleReq);
 MSG_REG(GameMsgHdr, OnBattleEndReq);
 MSG_REG(GameMsgHdr, OnConveyBattleReq);
-MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
-MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 MSG_REG(GameMsgHdr, OnGetHeroMemoAward);
 MSG_REG(GameMsgHdr, OnGetShuoShuoAward);
@@ -143,6 +142,9 @@ MSG_REG(GameMsgHdr, OnEquipSpirit);
 MSG_REG(GameMsgHdr, OnUseToken);
 MSG_REG(GameMsgHdr, OnMDSoul);
 MSG_REG(GameMsgHdr, OnSvrSt);
+MSG_REG(GameMsgHdr, OnYBBuf);
+MSG_REG(GameMsgHdr, OnGuideUdp);
+MSG_REG(GameMsgHdr, OnGetAward);
 
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 

@@ -9,7 +9,6 @@
 #include "Fighter.h"
 #include "TaskMgr.h"
 #include "EventBase.h"
-#include "LuckyDraw.h"
 #include "ChatItem.h"
 #include "Announce.h"
 #include "Dungeon.h"
@@ -92,9 +91,11 @@ bool World::_cfriend = false;
 bool World::_mayday = false;
 bool World::_mayday1 = false;
 bool World::_ydmdact = false;
+bool World::_ssdtact = false;
 bool World::_fighter1368 = false;
 bool World::_enchantact = false;
 bool World::_trainfighter = false;
+bool World::_gemmergeact = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -232,6 +233,7 @@ void World::makeActivityInfo(Stream &st)
     active |= _rechargeactiveno&2?16:0;
     active |= _foolsday?32:0;
     active |= _chingming?64:0;
+    active |= _ssdtact?128:0;
     st << active << Stream::eos;
 }
 void World::calWeekDay()
@@ -419,8 +421,6 @@ void World::World_Midnight_Check( World * world )
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
 	DB1().PushUpdateData("UPDATE `player` SET `icCount` = 0;");
-	luckyDraw.setLuckyDrawCost();
-	luckyDraw.checkCleanup();
 
     chopStickSortMap.clear();
     shusanLoveSortMap.clear();

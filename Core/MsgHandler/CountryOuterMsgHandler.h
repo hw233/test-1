@@ -131,18 +131,6 @@ struct TakeOnlineRewardReq
 	MESSAGE_DEF1(REQ::REWARD, UInt8, _flag);
 };
 
-struct LuckyDrawInfoReq
-{
-	MESSAGE_DEF(REQ::LUCKYDRAW_INFO);
-};
-
-struct LuckyDrawReq
-{
-	UInt8 _type;
-	UInt8 _times;
-	MESSAGE_DEF2(REQ::LUCKYDRAW, UInt8, _type, UInt8, _times);
-};
-
 struct EnchantReq
 {
 	UInt16 _fighterId;
@@ -681,6 +669,27 @@ struct SvrSt
     MESSAGE_DEF1(REQ::SVRST, UInt8, _type);
 };
 
+struct YBBuf
+{
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::YBBUF, UInt8, _type);
+};
+
+struct GetAward
+{
+    UInt8 _type;
+    UInt8 _opt;
+    MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
+};
+
+struct GuideUdp
+{
+    UInt8 _type;
+    std::string p1;
+    std::string p2;
+    MESSAGE_DEF3(REQ::GUIDEUDP, UInt8, _type, std::string, p1, std::string, p2);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -1027,6 +1036,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRechargeInfo();
     pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
+    pl->sendSSDTInfo();
+    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -1474,12 +1485,6 @@ void OnFighterTrainReq( GameMsgHdr& hdr, FighterTrainReq& ftr )
 	player->send(st);
 }
 
-void OnLuckyDrawInfoReq( GameMsgHdr& hdr, LuckyDrawInfoReq& )
-{
-	MSG_QUERY_PLAYER(player);
-	GObject::luckyDraw.sendInfo(player);
-}
-
 void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
 {
 	MSG_QUERY_PLAYER(player);
@@ -1490,124 +1495,29 @@ void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
 	player->sendOnlineReward();
 }
 
-void OnLuckyDrawReq( GameMsgHdr& hdr, LuckyDrawReq& ldr )
+void OnLuckyDrawReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
-	UInt8 type = ldr._type - 1;
-	if(type  > 3)
-		return;
-	UInt32 cost = 0;
-	bool bind = false;
-	switch(type)
-	{
-	case 0:
-		{
-			if(player->getTael() < static_cast<UInt32>(ldr._times * 9))
-				return;
-			ConsumeInfo ci(Explore,0,0);
-			player->useTael(ldr._times * 9,&ci);
-			UInt8 lev = player->GetLev();
-			if(lev >= 70)
-				type = 6;
-			else if(lev >= 50)
-				type = 5;
-			bind = true;
-			break;
-		}
-	case 1:
-		{
-			if(player->getGold() < static_cast<UInt32>(ldr._times * 5))
-				return;
-			cost = ldr._times * 5;
-			ConsumeInfo ci(Explore,0,0);
-			player->useGold(cost,&ci);
-			break;
-		}
-	case 2:
-	case 3:
-		{
-			if(player->getGold() < static_cast<UInt32>(ldr._times * 9))
-				return;
-			cost = ldr._times * 9;
-			ConsumeInfo ci(Explore,0,0);
-			player->useGold(cost,&ci);
-			UInt8 lev = player->GetLev();
-			if(type == 3)
-				type = 7;
-			else if(lev >= 80)
-				type = 4;
-			else if(lev >= 70)
-				type = 3;
-			break;
-		}
-	}
-	std::vector<UInt16> equips;
-	std::map<UInt32, UInt8> items;
-	for(UInt8 i = 0; i < ldr._times; ++ i)
-	{
-		GData::LootResult lr = GObject::luckyDraw.doLuckyDraw(type);
-		if(IsEquipTypeId(lr.id))
-		{
-			for(UInt16 j = 0; j < lr.count; ++ j)
-				equips.push_back(lr.id);
-		}
-		else
-		{
-			items[lr.id] += lr.count;
-		}
-	}
-	if(cost > 0)
-	{
-		GObject::luckyDraw.pushCost(player, cost);
-	}
-	Stream st(REP::LUCKYDRAW);
-	Stream broadcastst;
-	st << ldr._type << ldr._times << static_cast<UInt8>(equips.size() + items.size());
-	std::vector<UInt16>::iterator it1;
-	std::map<UInt32, UInt8>::iterator it2;
-	for(it1 = equips.begin(); it1 != equips.end(); ++ it1)
-	{
-		const GData::ItemBaseType * baseType = GData::itemBaseTypeManager[*it1];
-		UInt8 quality = (baseType == NULL) ? 0 : baseType->quality;
-		GObject::ItemBase * item = player->GetPackage()->AddEquip2(*it1, quality >= 5, bind, FromLuckyDraw);
-		if(item != NULL)
-		{
-			st << item->getId() << *it1;
-			if(quality >= 5)
-			{
-				Stream st(REP::LUCKYDRAW_OTH);
-				st << static_cast<UInt8>(1) << player->getName() << player->getCountry() << ldr._type << *it1 << Stream::eos;
-				broadcastst.append(&st[0], st.size());
-			}
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
 
-			GObject::luckyDraw.pushResult(player, item->getQuality(), item->GetItemType().getId(), 1, ldr._type);
-		}
-		else
-			st << static_cast<UInt32>(0) << *it1;
-	}
-	for(it2 = items.begin(); it2 != items.end(); ++ it2)
-	{
-		const GData::ItemBaseType * baseType = GData::itemBaseTypeManager[it2->first];
-		UInt8 quality = (baseType == NULL) ? 0 : baseType->quality;
-		GObject::ItemBase * item = player->GetPackage()->AddItem2(it2->first, it2->second, quality >= 5, bind, FromLuckyDraw);
-		st << it2->first << it2->second;
-		if(item != NULL)
-		{
-			if(item->getQuality() >= 5)
-			{
-				Stream st(REP::LUCKYDRAW_OTH);
-				st << static_cast<UInt8>(1) << player->getName() << player->getCountry() << ldr._type << static_cast<UInt16>(it2->first) << it2->second << Stream::eos;
-				broadcastst.append(&st[0], st.size());
-			}
-			GObject::luckyDraw.pushResult(player, item->getQuality(), static_cast<UInt16>(it2->first), it2->second, ldr._type);
-		}
-	}
-	st << Stream::eos;
-	player->send(st);
-	if(broadcastst.size() > 0)
-		NETWORK()->Broadcast(broadcastst);
+    if (type == 0)
+    {
+        UInt8 id;
+        UInt8 times;
+        UInt8 bind;
+        br >> id;
+        br >> times;
+        br >> bind;
+        luckyDraw.draw(player, id, times, bind==1?true:false);
+    }
+    else if (type == 1)
+    {
+        luckyDraw.sendInfo(player);
+    }
 }
 
 void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
@@ -3960,6 +3870,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     UInt8 op = 0;
     br >> op;
 
+    if (player->isJumpingMap())
+        return;
+
     switch(op)
     {
     case 0x0:
@@ -4442,6 +4355,24 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
         default:
             break;
     }
+}
+
+void OnYBBuf( GameMsgHdr& hdr, YBBuf& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->recvYBBuf(req._type);
+}
+
+void OnGetAward( GameMsgHdr& hdr, GetAward& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getAward(req._type, req._opt);
+}
+
+void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->guideUdp(req._type, req.p1, req.p2);
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

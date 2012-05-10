@@ -9,7 +9,6 @@
 #include "DB/DBConnectionMgr.h"
 #include "GObjectDBExecHelper.h"
 #include "GData/GDataManager.h"
-#include "GObject/LuckyDraw.h"
 #include "GObject/SpecialAward.h"
 #include "Server/SysMsg.h"
 #include "Script/GameActionLua.h"
@@ -3195,13 +3194,13 @@ namespace GObject
         if(bindGemsOut > 0)
         {
             AddItem(gemIdOut, bindGemsOut, true, false, FromMerge);
-            if(World::_activityStage > 0)
+            if(World::getGemMergeAct())
                 GameAction()->onMergeGem(m_Owner, lvl + 2, bindGemsOut);
         }
         if(unbindGemsOut > 0)
         {
             AddItem(gemIdOut, unbindGemsOut, false, false, FromMerge);
-            if(World::_activityStage > 0)
+            if(World::getGemMergeAct())
                 GameAction()->onMergeGem(m_Owner, lvl + 2, unbindGemsOut);
         }
 

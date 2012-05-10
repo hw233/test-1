@@ -73,6 +73,9 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_trump, 0, sizeof(_trump));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
     m_2ndSoul = NULL;
+    _iswboss = false;
+    _wbextatk = 0;
+    _wbextmagatk = 0;
 }
 
 Fighter::~Fighter()
@@ -1429,6 +1432,12 @@ void Fighter::rebuildEquipAttr()
     if(m_2ndSoul)
     {
         m_2ndSoul->addAttr(_attrExtraEquip);
+    }
+
+    if (isWBoss())
+    {
+        _attrExtraEquip.attack += _wbextatk;
+        _attrExtraEquip.magatk += _wbextmagatk;
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
@@ -3002,6 +3011,11 @@ float Fighter::getPracticeBufFactor()
     return _owner->getPracticeBufFactor();
 }
 
+float Fighter::getPracticeIncByDiamond()
+{
+    return _owner->getPracticeIncByDiamond();
+}
+
 float Fighter::getClanTechAddon( int place )
 {
     if (_owner)
@@ -3777,6 +3791,101 @@ UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
     UInt16 skillId = m_2ndSoul->getSkillIdOfItem(itemId);
 
     return m_2ndSoul->getSoulSkillIdx(skillId);
+}
+
+bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
+{
+    static UInt8 off2type[] = {
+        0x80, 0x84, 0x81, 0x82, 0x83, 0x85,
+    };
+
+#define MAXVAL(x,y) { if (x > y) x = y; }
+#define MV 150
+    bool ret = false;
+
+    Stream st(REP::CHANGE_EQUIPMENT);
+    st << getId() << static_cast<UInt8>(1);
+
+    if (off == 0)
+    {
+        _elixirattr.strength += v;
+        MAXVAL(_elixirattr.strength, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.strength);
+        ret = true;
+    }
+    if (off == 1)
+    {
+        _elixirattr.physique += v;
+        MAXVAL(_elixirattr.physique, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.physique);
+        ret = true;
+    }
+    if (off == 2)
+    {
+        _elixirattr.agility += v;
+        MAXVAL(_elixirattr.agility, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.agility);
+        ret = true;
+    }
+    if (off == 3)
+    {
+        _elixirattr.intelligence += v;
+        MAXVAL(_elixirattr.intelligence, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.intelligence);
+        ret = true;
+    }
+    if (off == 4)
+    {
+        _elixirattr.will += v;
+        MAXVAL(_elixirattr.will, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.will);
+        ret = true;
+    }
+    if (off == 5)
+    {
+        _elixirattr.soul += v;
+        MAXVAL(_elixirattr.soul, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.soul);
+        ret = true;
+    }
+
+    if (ret)
+    {
+        st << Stream::eos;
+        _owner->send(st);
+
+        DB1().PushUpdateData("REPLACE INTO `elixir` (`id`, `playerId`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", _id, _owner->getId(), _elixirattr.strength, _elixirattr.physique, _elixirattr.agility, _elixirattr.intelligence, _elixirattr.will, _elixirattr.soul);
+    }
+    return ret;
+#undef MV
+#undef MAXVAL
+}
+
+Int32 Fighter::getElixirAttrByOffset(UInt8 off)
+{
+    if (off == 0)
+        return _elixirattr.strength;
+    if (off == 1)
+        return _elixirattr.physique;
+    if (off == 2)
+        return _elixirattr.agility;
+    if (off == 3)
+        return _elixirattr.intelligence;
+    if (off == 4)
+        return _elixirattr.will;
+    if (off == 5)
+        return _elixirattr.soul;
+    return 0;
+}
+
+void Fighter::appendElixirAttr(Stream& st)
+{
+    st << static_cast<UInt16>(_elixirattr.strength);
+    st << static_cast<UInt16>(_elixirattr.agility);
+    st << static_cast<UInt16>(_elixirattr.intelligence);
+    st << static_cast<UInt16>(_elixirattr.will);
+    st << static_cast<UInt16>(_elixirattr.physique);
+    st << static_cast<UInt16>(_elixirattr.soul);
 }
 
 }
