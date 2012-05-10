@@ -915,7 +915,7 @@ namespace GObject
             if (platform)
                 m_ulog->LogMsg(str1, str2, str3, str4, str5, str6, type, count, platform);
 
-            TRACE_LOG("%s", buf);
+            TRACE_LOG("%s - (%s,%s,%s,%s,%s,%s,%s,%u)", buf, str1, str2, str3, str4, str5, str6, type, count);
         }
     }
 
@@ -954,6 +954,14 @@ namespace GObject
             snprintf(_price, 32, "%u", price/num);
             udpLog(op, _type, _id, _price, "", "", "props", num);
         }
+    }
+
+    void Player::guideUdp(UInt8 type, std::string& p1, std::string& p2)
+    {
+        if (type == 0)
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "guide");
+        else if (type == 1)
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "act");
     }
 
     void Player::moneyLog(int type, int gold, int coupon, int tael, int achievement, int prestige)
@@ -2230,6 +2238,7 @@ namespace GObject
         st << fgt->getAttrValue2();
         st << fgt->getAttrType3();
         st << fgt->getAttrValue3();
+        fgt->appendElixirAttr(st);
         st << fgt->getUpCittasMax();
 		if(withequip)
 		{
@@ -2497,10 +2506,12 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
-                if(_playerData.qqvipl >= 1 && _playerData.qqvipl <= 19)
+                //if(this->isBD() || this->isYD())
+                if(this->getPlatform() == 10)
                 {
                     UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
-                    printf("extraExp(%d)\n", extraExp);
+                    SYSMSG_SENDV(1092, this, extraExp);
+                    SYSMSG_SENDV(1093, this, extraExp);
                     exp += extraExp;
                 }
                 pendExp(exp);
@@ -6169,12 +6180,11 @@ namespace GObject
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
 
-        UInt8 qqVip1 = this->getQQVipl();
         UInt8 currentCnt, totalCnt;
-        if(qqVip1 >= 10 && qqVip1 <= 19) {
+        if(this->isBD()) {
             currentCnt = this->GetVar(VAR_DIAMOND_BLUE);
             totalCnt = 1;
-        } else if (qqVip1 >= 1 && qqVip1 <= 9) {
+        } else if (this->isYD()) {
             currentCnt = this->GetVar(VAR_DIAMOND_YELLOW);
             totalCnt = 1;
         } else {
@@ -6230,7 +6240,21 @@ namespace GObject
         UInt8 cnt = playerCopy.getCopySize(this);
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        st << cnt << static_cast<UInt8>(freeCnt + goldCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel));
+
+        UInt8 currentDiamondCnt;
+        UInt8 totalDiamondCnt;
+        if(this->isBD()) {
+            currentDiamondCnt = this->GetVar(VAR_DIAMOND_BLUE);
+            totalDiamondCnt = 1;
+        } else if (this->isYD()) {
+            currentDiamondCnt = this->GetVar(VAR_DIAMOND_YELLOW);
+            totalDiamondCnt = 1;
+        } else {
+            currentDiamondCnt = 0;
+            totalDiamondCnt = 0;
+        }
+
+        st << cnt << static_cast<UInt8>(freeCnt + goldCnt + currentDiamondCnt) << static_cast<UInt8>(GObject::PlayerCopy::getFreeCount()) << static_cast<UInt8>(GObject::PlayerCopy::getGoldCount(vipLevel)) << static_cast<UInt8>(totalDiamondCnt);
         if(cnt)
         {
             playerCopy.buildInfo(this, st);
@@ -7370,7 +7394,8 @@ namespace GObject
                 if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
                 {
                     count = 1;
-                    if(_playerData.qqvipl >= 1 && _playerData.qqvipl <= 19)
+                    //if(this->isBD() || this->isYD())
+                    if(this->getPlatform() == 10)
                     {
                         printf("diamond user\n");
                         count *= 2;
@@ -7663,19 +7688,16 @@ namespace GObject
 
     float Player::getPracticeIncByDiamond()
     {
-        if(_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+        if(this->isBD())
         {
-            printf("blue diamond\n");
             return 0.1;
         }
-        else if(_playerData.qqvipl >= 1 && _playerData.qqvipl <=9)
+        else if(this->isYD())
         {
-            printf("yellow diamond\n");
             return 0.1;
         }
         else
         {
-            printf("no diamond\n");
             return 0.0;
         }
     }

@@ -98,15 +98,14 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     count |= getFreeCount();
     st << count;
 
-    UInt8 qqVip1 = pl->getQQVipl();
-    if(qqVip1 >= 10 && qqVip1 <= 19) {
+    if(pl->isBD()) {
         count = pl->GetVar(VAR_DIAMOND_BLUE);
         count <<= 4;
         st << count;
         count = PRIVILEGE_COUNT;
         count <<= 4;
         st << count;
-    } else if (qqVip1 >= 1 && qqVip1 <=9) {
+    } else if (pl->isYD()) {
         count = pl->GetVar(VAR_DIAMOND_YELLOW);
         st << count;
         count = PRIVILEGE_COUNT;
@@ -146,8 +145,11 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     if (!pl)
         return false;
 
-    UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
-    id = realCopyId;
+    if(id == 0xff)
+    {
+        UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+        id = realCopyId;
+    }
     if (!id)
         return false;
 
@@ -183,18 +185,13 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     //diamond privilege
     if(id == 0xff)
     {
-        UInt8 qqVipl;
-        UInt8 currentCnt;
-        qqVipl = pl->getQQVipl();
-        if(qqVipl >= 10 && qqVipl <= 19) {
-            currentCnt = pl->GetVar(VAR_DIAMOND_BLUE);
-            if(currentCnt < PRIVILEGE_COUNT) {
+        if(pl->isBD()) {
+            if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 return 0;
             }
-        } else {
-            currentCnt = pl->GetVar(VAR_DIAMOND_YELLOW);
-            if(currentCnt < PRIVILEGE_COUNT) {
+        } else if(pl->isYD()) {
+            if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 return 0;
             }
@@ -249,14 +246,32 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
         return;
     }
 
+    if(id == 0xff)
+    {
+        if(pl->isBD()) {
+            if(pl->GetVar(VAR_DIAMOND_BLUE) >= PRIVILEGE_COUNT) {
+                pl->sendMsgCode(0, 1998);
+                return;
+            }
+        } else if(pl->isYD()){
+            if(pl->GetVar(VAR_DIAMOND_YELLOW) >= PRIVILEGE_COUNT) {
+                pl->sendMsgCode(1, 1999);
+                return;
+            }
+        }
+    }
+
     CopyData& tcd = getCopyData(pl, id, true);
     if (tcd.floor && tcd.spot)
         return;
 
     UInt8 lootlvl = 0;
     UInt8 ret = checkCopy(pl, id, lootlvl);
-    UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
-    id = realCopyId;
+    if(id == 0xff)
+    {
+        UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+        id = realCopyId;
+    }
     if (!ret) {
         if (!tcd.floor) {
             tcd.floor = 1;
@@ -529,9 +544,11 @@ CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool up
 {
     static CopyData nulldata;
     UInt8 idTmp = id;
-    UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
-
-    id = realCopyId;
+    if(id == 0xff)
+    {
+        UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+        id = realCopyId;
+    }
     CopyData& cd = m_copys[playerId][id];
     if (!cd.floor && update) {
         DB3().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)",

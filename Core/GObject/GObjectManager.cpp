@@ -57,6 +57,7 @@
 #include "CFriend.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
+#include "LuckyDraw.h"
 #include <fcntl.h>
 
 namespace GObject
@@ -203,6 +204,7 @@ namespace GObject
         LoadWBoss();
         LoadDiscount();
         LoadSoulItemChance();
+        LoadLuckyLog();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4091,6 +4093,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             Last l;
             l.time = t.last;
             l.hp = t.hp;
@@ -4113,6 +4116,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             GData::store.add(1, t.itemid, t.discount);
         }
         lc.finalize();
@@ -4191,6 +4195,24 @@ namespace GObject
         }
         lua_close(L);
 
+        return true;
+    }
+
+    bool GObjectManager::LoadLuckyLog()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Lucky Log");
+		DBLuckyLog t;
+		if(execu->Prepare("SELECT `name`, `items` FROM `luckylog` ORDER BY `id` DESC LIMIT 10", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            luckyDraw.pushLog(t.name, t.items);
+        }
+        lc.finalize();
         return true;
     }
 

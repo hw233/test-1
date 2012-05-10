@@ -685,6 +685,7 @@ public:
     inline void setElixirAttr(ElixirAttr& attr) { _elixirattr = attr; }
     bool addElixirAttrByOffset(UInt8 off, Int32 v);
     Int32 getElixirAttrByOffset(UInt8 off);
+    void appendElixirAttr(Stream& st);
 private:
     ElixirAttr _elixirattr;
 

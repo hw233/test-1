@@ -234,7 +234,7 @@ namespace Script
         bool onRC7DayWill(Player* player, UInt8 idx);
         UInt32 onUseMDSoul(Player* player, UInt8 type);
         bool onTurnOnRC7Day(Player* player, UInt32 total, UInt32 offset);
-        lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num);
+        lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind);
        
 	public:
 
