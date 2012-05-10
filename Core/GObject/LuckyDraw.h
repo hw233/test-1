@@ -32,6 +32,8 @@ public:
     void draw(Player* player, UInt8 id, UInt8 num, bool = false);
     void pushLog(const std::string& name, const std::vector<LDItem>& i);
     void pushLog(const std::string& name, const std::string& its);
+    void notifyPass(Player* player, UInt8 id);
+    void notifyDisplay(Player* player);
 
 private:
     FastMutex _lock;

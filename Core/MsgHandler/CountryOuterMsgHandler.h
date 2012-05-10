@@ -1030,6 +1030,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
+    luckyDraw.notifyDisplay(pl);
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();

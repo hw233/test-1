@@ -3248,9 +3248,9 @@ void GlobalFighters::buildSummonSet()
 Int16 Fighter::getMaxSoul()
 {
     if(_owner == NULL)
-        return soulMax;
+        return soulMax + _elixirattr.soul;
     else
-        return soulMax + _owner->getClanSkillMaxSoulEffect() + get2ndSounSoulMax();
+        return soulMax + _elixirattr.soul + _owner->getClanSkillMaxSoulEffect() + get2ndSounSoulMax();
 }
 
 void GlobalFighters::setAllDirty()
