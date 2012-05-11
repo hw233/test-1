@@ -177,6 +177,37 @@ void LuckyDraw::pushLog(const std::string& name, const std::string& its)
     _logs.push_back(l);
 }
 
+void LuckyDraw::notifyPass(Player* player, UInt8 id)
+{
+    if (!player || id <= 1)
+        return;
+    Stream st(REP::LUCKYDRAW);
+    st << static_cast<UInt8>(2);
+    st << static_cast<UInt8>(id -1);
+    st << Stream::eos;
+    player->send(st);
+}
+
+void LuckyDraw::notifyDisplay(Player* player)
+{
+    Stream st(REP::LUCKYDRAW);
+    st << static_cast<UInt8>(3);
+    bool passed = false;
+    for (UInt8 i = 2; i < 7; ++i)
+    {
+        if (player->isCopyPassed(i))
+            passed = true;
+    }
+
+    if (passed)
+        st << static_cast<UInt8>(1);
+    else
+        st << static_cast<UInt8>(0);
+
+    st << Stream::eos;
+    player->send(st);
+}
+
 LuckyDraw luckyDraw;
 
 }

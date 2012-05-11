@@ -96,6 +96,9 @@ bool World::_fighter1368 = false;
 bool World::_enchantact = false;
 bool World::_trainfighter = false;
 bool World::_gemmergeact = false;
+bool World::_bluediamondact = false;
+bool World::_yellowdiamondact = false;
+bool World::_qqgameact = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {

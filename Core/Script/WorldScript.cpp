@@ -41,6 +41,7 @@ void WorldScript::init()
     def("setTavernPurpleCount", GObject::Player::setTavernPurpleCount);
     def("setTavernOrangeCount", GObject::Player::setTavernOrangeCount);
 	def("isFBVersion", GObject::World::isFBVersion);
+	def("isDebug", GObject::World::isDebug);
 	def("setActivityStage", GObject::World::setActivityStage);
 	def("setActAvailable", GObject::World::setActAvailable);
 	def("setActAvailable1", GObject::World::setActAvailable1);
@@ -98,6 +99,12 @@ void WorldScript::init()
 	def("setSSDTAct", GObject::World::setSSDTAct);
 	def("getGemMergeAct", GObject::World::getGemMergeAct);
 	def("setGemMergeAct", GObject::World::setGemMergeAct);
+    def("setBlueDiamondAct", GObject::World::setBlueDiamondAct);
+    def("setYellowDiamondAct", GObject::World::setYellowDiamondAct);
+    def("setQQGameAct", GObject::World::setQQGameAct);
+    def("getBlueDiamondAct", GObject::World::getBlueDiamondAct);
+    def("getYellowDiamondAct", GObject::World::getYellowDiamondAct);
+    def("getQQGameAct", GObject::World::getQQGameAct);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

@@ -199,8 +199,8 @@ namespace GObject
         LoadWorldBoss();
         LoadTownDeamon();
         InitMoneyLog();
+        LoadShuoShuo(); // XXX: must before LoadHeroMemo
         LoadHeroMemo();
-        LoadShuoShuo();
         LoadCFriendAwards();
         LoadWBoss();
         LoadDiscount();
@@ -1327,6 +1327,25 @@ namespace GObject
                 fgt2->setSecondSoul(secondSoul);
             }
 
+#define MAXVAL(x,y) { if (x > y) x = y; }
+#define MV 150
+            ElixirAttr attr;
+            attr.strength = specfgtobj.strength;
+            MAXVAL(attr.strength, MV);
+            attr.physique = specfgtobj.physique;
+            MAXVAL(attr.physique, MV);
+            attr.agility = specfgtobj.agility;
+            MAXVAL(attr.agility, MV);
+            attr.intelligence = specfgtobj.intelligence;
+            MAXVAL(attr.intelligence, MV);
+            attr.will = specfgtobj.will;
+            MAXVAL(attr.will, MV);
+            attr.soul = specfgtobj.soul;
+            MAXVAL(attr.soul, MV);
+            fgt2->setElixirAttr(attr);
+#undef MV
+#undef MAXVAL
+
 			fgt2->setPotential(specfgtobj.potential, false);
             fgt2->setCapacity(specfgtobj.capacity, false);
 			fgt2->setLevel(specfgtobj.level, true);
@@ -1357,25 +1376,6 @@ namespace GObject
 			pl->addFighter(fgt2, false, true);
             if (specfgtobj.level > lvl_max)
                 lvl_max = specfgtobj.level;
-
-#define MAXVAL(x,y) { if (x > y) x = y; }
-#define MV 150
-            ElixirAttr attr;
-            attr.strength = specfgtobj.strength;
-            MAXVAL(attr.strength, MV);
-            attr.physique = specfgtobj.physique;
-            MAXVAL(attr.physique, MV);
-            attr.agility = specfgtobj.agility;
-            MAXVAL(attr.agility, MV);
-            attr.intelligence = specfgtobj.intelligence;
-            MAXVAL(attr.intelligence, MV);
-            attr.will = specfgtobj.will;
-            MAXVAL(attr.will, MV);
-            attr.soul = specfgtobj.soul;
-            MAXVAL(attr.soul, MV);
-            fgt2->setElixirAttr(attr);
-#undef MV
-#undef MAXVAL
 
             if(pl->isMainFighter(specfgtobj.id) && specfgtobj.level >= 70)
                 ArenaBattle::Instance().addLevelMan(true);
