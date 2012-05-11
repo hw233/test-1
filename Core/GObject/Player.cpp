@@ -9031,18 +9031,6 @@ namespace GObject
             GetShuoShuo()->setShuoSafe(SS_90);
         if (GetLev() >= 100)
             GetShuoShuo()->setShuoSafe(SS_100);
-        if (GetHeroMemo()->getHeroSoul() >= 30)
-            GetShuoShuo()->setShuoSafe(SS_HM_30);
-        if (GetHeroMemo()->getHeroSoul() >= 40)
-            GetShuoShuo()->setShuoSafe(SS_HM_40);
-        if (GetHeroMemo()->getHeroSoul() >= 50)
-            GetShuoShuo()->setShuoSafe(SS_HM_50);
-        if (GetHeroMemo()->getHeroSoul() >= 60)
-            GetShuoShuo()->setShuoSafe(SS_HM_60);
-        if (GetHeroMemo()->getHeroSoul() >= 70)
-            GetShuoShuo()->setShuoSafe(SS_HM_70);
-        if (GetHeroMemo()->getHeroSoul() >= 80)
-            GetShuoShuo()->setShuoSafe(SS_HM_80);
     }
 
     void Player::sendDeamonAwardsInfo()

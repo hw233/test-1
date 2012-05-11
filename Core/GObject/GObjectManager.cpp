@@ -199,8 +199,8 @@ namespace GObject
         LoadWorldBoss();
         LoadTownDeamon();
         InitMoneyLog();
+        LoadShuoShuo(); // XXX: must before LoadHeroMemo
         LoadHeroMemo();
-        LoadShuoShuo();
         LoadCFriendAwards();
         LoadWBoss();
         LoadDiscount();
