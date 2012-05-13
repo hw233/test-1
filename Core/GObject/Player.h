@@ -700,7 +700,8 @@ namespace GObject
         }
         inline bool isBD() const
         {
-            if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+            //if (_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+            if (_playerData.qqvipl >= 11 && _playerData.qqvipl <= 19) //qqvipl为10代表蓝钻0级，不是蓝钻用户
                 return true;
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 10 && _playerData.qqvipl1 <= 19)
                     return true;
