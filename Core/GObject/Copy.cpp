@@ -101,6 +101,8 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
 
     if(pl->isBD() && World::getBlueDiamondAct()) {
         count = pl->GetVar(VAR_DIAMOND_BLUE);
+        if(count > PRIVILEGE_COUNT)
+            count = 0;
         count <<= 4;
         st << count;
         count = PRIVILEGE_COUNT;
@@ -108,6 +110,8 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
         st << count;
     } else if (pl->isYD() && World::getYellowDiamondAct()) {
         count = pl->GetVar(VAR_DIAMOND_YELLOW);
+        if(count > PRIVILEGE_COUNT)
+            count = 0;
         st << count;
         count = PRIVILEGE_COUNT;
         st << count;
