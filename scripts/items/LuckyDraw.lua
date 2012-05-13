@@ -1396,15 +1396,18 @@ function luckyDraw(player, id, num, bind)
         return got 
     end 
 
-    local package = player:GetPackage();
-    local ninum = package:GetItemNum(needitem, bind)
-    if ninum < num then
-        player:sendMsgCode(2, 1076, 0);
+    local package = player:GetPackage()
+    local bnum = package:GetItemNum(needitem, true)
+    local ubnum = package:GetItemNum(needitem, false)
+    local gold = player:getGold()
+
+    if (bnum + ubnum + gold/10) < num then
+        player:sendMsgCode(2, 1076, 0)
         return got 
-    end 
+    end
 
     if package:GetRestPackageSize() < num * 1.5 then
-        player:sendMsgCode(2, 1011, 0);
+        player:sendMsgCode(2, 1011, 0)
         return got 
     end
 
@@ -1413,11 +1416,41 @@ function luckyDraw(player, id, num, bind)
         return got
     end 
 
+    print('num: ' .. num .. ' gold: ' .. gold)
     local money = 0
     local point = 0
+    local use = 1 -- 1-bind 2-unbind 3-gold
     for o = 1, num do
-        if package:DelItem(needitem, 1, bind) == false then
-            break
+        if use == 1 then
+            if bnum ~= 0 then
+                bnum = bnum - 1
+                bind = true
+            else
+                use = 2
+                bind = false
+            end
+        end
+
+        if use == 2 then
+            if ubnum ~= 0 then
+                ubnum = ubnum - 1
+            else
+                use = 3
+            end
+        end
+
+        print('use: ' .. use)
+
+        if use == 1 then
+            if package:DelItem(needitem, 1, bind) == false then
+                break
+            end
+        elseif use == 2 then
+            if package:DelItem(needitem, 1, bind) == false then
+                break
+            end
+        elseif use == 3 then
+            player:useGold4LuckDraw(item2point)
         end
 
         local x = math.random(1,1000000)
@@ -1425,6 +1458,7 @@ function luckyDraw(player, id, num, bind)
         for i = 1,sz do
             if x <= item[i][1] then
                 local it = item[i][2]
+                print(bind)
                 package:Add(it, 1, bind, 0, 14)
                 table.insert(got, {it, 1})
                 point = point + item2point

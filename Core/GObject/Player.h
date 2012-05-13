@@ -794,6 +794,7 @@ namespace GObject
 
 		UInt32 getGold(UInt32 c = 0, UInt8 incomingType = 0);
 		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
+        UInt32 useGold4LuckDraw(UInt32 c);
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
 
 		UInt32 getGoldOrCoupon();

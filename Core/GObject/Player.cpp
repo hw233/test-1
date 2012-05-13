@@ -3311,6 +3311,12 @@ namespace GObject
 		return _playerData.gold;
 	}
 
+    UInt32 Player::useGold4LuckDraw(UInt32 c)
+    {
+		ConsumeInfo ci(LuckyDraw,0,0);
+		return useGold(c, &ci);
+    }
+
 	bool Player::holdGold(UInt32 c, UInt8 action, ConsumeInfo * ci)
 	{
 		switch(action)
