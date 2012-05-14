@@ -599,7 +599,9 @@ void Dungeon::processAutoChallenge( Player * player, UInt8 type, UInt32 * totalE
 	case 0:
 		{
             bool girl = (World::getGirlDay() && !player->IsMale());
-            if (!World::getNewYear() && !girl)
+            if (!World::getNewYear() &&
+                    !girl &&
+                    !World::getNetValentineDay())
             {
                 UInt32 viplevel = player->getVipLevel();
                 if(viplevel < 6)

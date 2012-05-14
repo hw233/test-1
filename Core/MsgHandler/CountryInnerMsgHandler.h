@@ -1341,4 +1341,16 @@ void OnCFriendLvlUp( GameMsgHdr& hdr, const void* data )
     player->OnCFriendLvlUp(msg->player, msg->lvl);
 }
 
+void OnRemoveClanRank( GameMsgHdr& hdr, const void* data )
+{
+    struct ClanData
+    {
+        Clan* clan;
+    };
+
+    ClanData* clan_data = reinterpret_cast<ClanData*>(const_cast<void*>(data));
+
+    ClanRankBattleMgr::Instance().removeClanRank(clan_data->clan);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_

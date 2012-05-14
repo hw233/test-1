@@ -1280,9 +1280,9 @@ namespace GObject
 
     bool ClanRankBattleMgr::IsInBattle(Clan* clan)
     {
-        if(clan == NULL || m_State != STATE_BATTLE) return false;
+        if(clan == NULL || m_State == STATE_INIT) return false;
         
-        return GetClanInfo(clan->getId()) != NULL; 
+        return true;
     }
 
     void ClanRankBattleMgr::Process(UInt32 now)
@@ -2546,6 +2546,18 @@ namespace GObject
             player->send(st);
         else 
             NETWORK()->Broadcast(st);
+    }
+
+    void ClanRankBattleMgr::removeClanRank(Clan* clan)
+    {
+        if(!clan)
+            return;
+
+        for(ClanVec::iterator it = m_ClanRanking.begin(); it != m_ClanRanking.end(); ++ it)
+        {
+            if(*it == clan)
+                m_ClanRanking.erase(it);
+        }
     }
 }
 
