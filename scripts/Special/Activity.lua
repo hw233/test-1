@@ -120,6 +120,16 @@ function onLogin(player)
     if not player:isOffical() then
         onLoginPF(player)
     end
+    if getNetValentineDay() then
+        onNVDLogin(player)
+    end
+end
+
+function onNVDLogin(player)
+    if player:GetVar(106) == 0 then
+        sendItemPackageMail(player, "网路情人节礼包活动", "网路情人节礼包", {9027,1,1})
+        player:SetVar(106, 1)
+    end
 end
 
 function onLevelup(player, olev, nlev)
@@ -690,6 +700,27 @@ function ValentineDay(player, lootlvl, where)
     end
 end
 
+function NetValentineDay(player, lootlvl)
+    if getNetValentineDay() then
+        if lootlvl > 3 then
+            return;
+        end
+
+        local itemNum = {
+            [0] = 1,
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        };
+
+        local package = player:GetPackage();
+        local items = {9023,9024,9025,9026}
+        for n = 1, itemNum[lootlvl] do
+            package:AddItem(items[math.random(1,#items)], 1, false);
+        end
+    end
+end
+
 function GirlDay(player, lootlvl)
     if getGirlDay() then
         local item = {471, 472, 473, 474}
@@ -753,6 +784,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
     ValentineDay(player, lootlvl)
+    NetValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
     ChingMingDay(player, lootlvl)
@@ -767,6 +799,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 1);
     ValentineDay(player, lootlvl)
+    NetValentineDay(player, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
     ChingMingDay(player, lootlvl)

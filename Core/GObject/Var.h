@@ -123,6 +123,8 @@ namespace GObject
         VAR_MDES = 94, // 五月份活动节日套装
         VAR_MDPACKS = 95, // 五月份活动礼包是否发放
         VAR_RC7DAYTURNON,
+        VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
+        VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
 
         VAR_MAX,
     };
@@ -245,6 +247,8 @@ namespace GObject
             REGISTER_VAR(VAR_MDPACKS, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYTURNON, CYCLE_NONE);
 #endif
+            REGISTER_VAR(VAR_NETVDPACK, CYCLE_NONE);
+            REGISTER_VAR(VAR_LASTATHRANK, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

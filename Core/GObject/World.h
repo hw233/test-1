@@ -90,6 +90,10 @@ public:
     { _valentineday = v; }
     inline static bool getValentineDay()
     { return _valentineday; }
+    inline static void setNetValentineDay(bool v)
+    { _netvalentineday = v; }
+    inline static bool getNetValentineDay()
+    { return _netvalentineday; }
     inline static void setGirlDay(bool v)
     { _girlday = v; }
     inline static bool getGirlDay()
@@ -187,6 +191,7 @@ public:
     static bool _rechargeactive;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
+    static bool _netvalentineday;
     static bool _girlday;
     static bool _whiteloveday;
     static bool _trumpenchret;

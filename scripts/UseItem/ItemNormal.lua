@@ -2849,6 +2849,35 @@ function ItemNormal_00009007(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009027(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local rn = 0
+    for n = 1, num do
+        local items = {{514,1},{515,1},{500,1},{49,1},{503,1},{511,1},{517,1},{15,2},{60000,1},}
+        local item = items[math.random(1,#items)]
+        if item[1] == 60000 then
+            item[1] = getRandOEquip(player:GetLev())
+        end
+
+        if item[1] == 0 then
+            return false
+        end
+
+        if package:GetRestPackageSize() < item[1] then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
+        end
+
+        package:Add(item[1], item[2], bind, 0, 2)
+        rn = rn + 1
+    end
+
+    package:DelItemSendMsg(iid, player);
+    return rn;
+end
+
 function ItemNormal_citta(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
@@ -4782,6 +4811,8 @@ local ItemNormal_Table = {
     [9007] = ItemNormal_00009007,
     [9008] = ItemNormal_00009007,
     [9009] = ItemNormal_00009007,
+
+    [9027] = ItemNormal_00009027,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
