@@ -12,7 +12,7 @@ namespace GObject
 
 SecondSoul::SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel, UInt32 stateExp, UInt8 stateLevel)
     : m_fgt(fgt), m_cls(cls), m_practiceLevel(practiceLevel), m_stateExp(stateExp), m_stateLevel(stateLevel),
-        m_strength(0), m_agility(0), m_physique(0), m_intelligence(0), m_will(0)
+        m_strength(0), m_agility(0), m_physique(0), m_intelligence(0), m_will(0), m_skill_num1(0), m_skill_num2(0)
 {
 }
 
@@ -180,7 +180,7 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, SoulSkill ss, bool writeDB)
     if(writeDB)
     {
         std::string str;
-        skillData2String(str);
+        vector2string(m_skills, m_skills.size(), str);
         DB2().PushUpdateData("UPDATE `second_soul` SET `skills` = '%s' WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", str.c_str(), m_fgt->getId(), m_fgt->getOwner()->getId());
     }
 
@@ -213,6 +213,31 @@ UInt32 SecondSoul::setSoulSkill(UInt8 idx, UInt16 skillId, bool writeDB)
     ss.level = skillId & 0xFF;
 
     itemId = setSoulSkill(idx, ss, writeDB);
+
+    if(ss.id != 0 && itemId == 0)
+    {
+        UInt32 tmpItemId = GData::soulSkillTable[ss.id][ss.level].itemId;
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[tmpItemId];
+        if(itemType->subClass == Item_SL1)
+            ++ m_skill_num1;
+        else
+            ++ m_skill_num2;
+    }
+    else if( ss.id == 0 && itemId != 0)
+    {
+        const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
+        if(itemType->subClass == Item_SL1)
+            -- m_skill_num1;
+        else
+            -- m_skill_num2;
+    }
+
+    if(m_skill_num1 < 0)
+        m_skill_num1 = 0;
+
+    if(m_skill_num2 < 0)
+        m_skill_num2 = 0;
+
     return itemId;
 }
 
@@ -239,26 +264,8 @@ UInt16 SecondSoul::getSkillIdOfItem(UInt32 itemId)
 void SecondSoul::insertIntoDB()
 {
     std::string str;
-    skillData2String(str);
+    vector2string(m_skills, m_skills.size(), str);
     DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %"I64_FMT"u, %u, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, str.c_str());
-}
-
-void SecondSoul::skillData2String(std::string& str)
-{
-    int size = m_skills.size();
-    char buf[1024] = {0};
-    char* pbuf = buf;
-    char* pend = &buf[sizeof(buf)-1];
-    for (int i = 0; i < size; ++i)
-    {
-        UInt16 skillId = (static_cast<UInt16>(m_skills[i].id) << 8) + m_skills[i].level;
-        pbuf += snprintf(pbuf, pend - pbuf, "%u", skillId);
-        if (i < size - 1)
-            pbuf += snprintf(pbuf, pend - pbuf, ",");
-    }
-
-    if (pbuf != buf)
-        str = buf;
 }
 
 void SecondSoul::sendInfo(Player* pl)
@@ -316,6 +323,34 @@ bool SecondSoul::setClass(UInt8 cls)
     m_fgt->getOwner()->sendMsgCode(0, 1074);
 
     return true;
+}
+
+UInt8 SecondSoul::getSoulSkillIdx(SoulSkill ss)
+{
+    int size = m_skills.size();
+
+    if(ss.id != 0)
+    {
+        for(int i = 0; i < size; ++ i)
+        {
+            if(m_skills[i].id == ss.id && ss.level == m_skills[i].level)
+            {
+                return i;
+            }
+        }
+    }
+
+    return 0xFF;
+}
+
+UInt8 SecondSoul::getSoulSkillIdx(UInt16 skillId)
+{
+    SoulSkill ss;
+
+    ss.id = skillId >> 8;
+    ss.level = skillId & 0xFF;
+
+    return getSoulSkillIdx(ss);
 }
 
 }

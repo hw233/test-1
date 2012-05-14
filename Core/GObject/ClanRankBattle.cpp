@@ -9,6 +9,7 @@
 #include "PracticePlace.h"
 #include "Script/GameActionLua.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 #include <sstream>
 
 namespace GObject
@@ -180,6 +181,7 @@ namespace GObject
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
+            (*iter)->OnShuoShuo(SS_CLANRANK);
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
@@ -191,6 +193,7 @@ namespace GObject
 
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
+            (*iter)->OnShuoShuo(SS_CLANRANK);
         }
 
         m_WaitPlayers.clear();
@@ -2274,6 +2277,10 @@ namespace GObject
 
             if(++m_BattleNo > BATTLE_NUM_PER_DAY) //今天的比赛结束了
             {
+                setStatus(2);
+                m_singupNotified = false;
+                m_battleNotified = false;
+
                 //第二天战斗开始时间
                 m_StartTime = m_StartTime + 24 * 60 * 60;
                 //m_StartTime = m_StartTime + 2 * 60 * 60;
@@ -2410,7 +2417,6 @@ namespace GObject
         m_ClanRanking.assign(clans.begin(), clans.end());
 
         SortClans(true);
-        setStatus(2);
     }
 
     bool ClanRankBattleMgr::CreateBattle(ClanRankBattleInfo* clan1, ClanRankBattleInfo* clan2)

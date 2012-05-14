@@ -11,5 +11,5 @@ clean:
 	rm -f *.o *.a
 
 %.o : %.c
-	$(CC) -O2 -o $@ -c $^
+	$(CC) -g -O2 -o $@ -c $^
 

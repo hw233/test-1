@@ -90,6 +90,15 @@ namespace Script
 		lua_tinker::def(_L, "getFoolsDay", GObject::World::getFoolsDay);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getCarnival", GObject::World::getCarnival);
+		lua_tinker::def(_L, "getFighter1368", GObject::World::getFighter1368);
+		lua_tinker::def(_L, "getEnchantAct", GObject::World::getEnchantAct);
+		lua_tinker::def(_L, "getTrainFighter", GObject::World::getTrainFighter);
+		lua_tinker::def(_L, "getRC7Day", GObject::World::getRC7Day);
+		lua_tinker::def(_L, "getShuoShuo", GObject::World::getShuoShuo);
+		lua_tinker::def(_L, "getCFriend", GObject::World::getCFriend);
+		lua_tinker::def(_L, "getMayDay", GObject::World::getMayDay);
+		lua_tinker::def(_L, "getMayDay1", GObject::World::getMayDay1);
+		lua_tinker::def(_L, "getYDMDAct", GObject::World::getYDMDAct);
 		lua_tinker::def(_L, "getWeekDay",	GObject::World::getWeekDay);
 		lua_tinker::def(_L, "getThanksgiving",	GObject::World::getThanksgiving);
 		lua_tinker::def(_L, "getRandOEquip",	GObject::getRandOEquip);
@@ -144,6 +153,7 @@ namespace Script
 		CLASS_DEF(Player, hasStatusBit);
 		CLASS_DEF(Player, setTitle);
 		CLASS_DEF(Player, getTitle);
+		CLASS_DEF(Player, getPrestige);
 		CLASS_DEF(Player, getAchievement);
 		CLASS_DEF(Player, useAchievement);
 		CLASS_DEF(Player, getLocation);
@@ -203,6 +213,8 @@ namespace Script
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
 		CLASS_DEF(Player, getPlatform);
+		CLASS_DEF(Player, OnShuoShuo);
+        CLASS_DEF(Player, sendMDSoul);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -892,6 +904,16 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level )
+	{
+		Call<void>("onEnchantAct", player, level);
+	}
+
+	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
+	{
+		Call<void>("onTrainFighterAct", player, fgt);
+	}
+
 	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )
 	{
 		Call<void>("onCopyFloorWin", player, id, floor, spot, lootlvl);
@@ -947,9 +969,24 @@ namespace Script
 		return Call<bool>("onFoolsDay", player);
 	}
 
+	bool GameActionLua::onMayDay(Player* player)
+	{
+		return Call<bool>("onMayDay", player);
+	}
+
+	bool GameActionLua::onMayDay1(Player* player)
+	{
+		return Call<bool>("onMayDay1", player);
+	}
+
 	bool GameActionLua::getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul)
 	{
 		return Call<bool>("getHeroMemoAward", player, idx, soul);
+	}
+
+	bool GameActionLua::getShuoShuoAward(Player* player, UInt8 idx)
+	{
+		return Call<bool>("getShuoShuoAward", player, idx);
 	}
 
 	bool GameActionLua::getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality)
@@ -1030,5 +1067,25 @@ namespace Script
     UInt32  GameActionLua::GetMaxActivity(UInt32 vip)
     {
         return Call<UInt32>(  "GetMaxActivity", vip);
+    }
+    void GameActionLua::onCLLoginReward(Player* pl, UInt8 cts)
+    {
+        return Call<void>(  "onCLLoginReward", pl, cts);
+    }
+    void GameActionLua::onCL3DayReward(Player* pl)
+    {
+        return Call<void>(  "onCL3DayReward", pl);
+    }
+    bool GameActionLua::onRC7DayWill(Player* pl, UInt8 idx)
+    {
+        return Call<bool>(  "onRC7DayWill", pl, idx);
+    }
+    UInt32 GameActionLua::onUseMDSoul(Player* pl, UInt8 type)
+    {
+        return Call<UInt32>(  "onUseMDSoul", pl, type);
+    }
+    bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
+    {
+        return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
     }
 }

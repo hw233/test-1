@@ -20,4 +20,6 @@ require("Special/Activity")
 require("Other/ClanBattle")
 require("World/ActivityMgr")
 require("World/HeroMemo")
+require("World/ShuoShuo")
+require("World/CFriend")
 

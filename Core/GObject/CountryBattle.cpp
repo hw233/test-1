@@ -13,6 +13,7 @@
 #include "SpecialAward.h"
 #include "MsgID.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 #include "Package.h"
 
 namespace GObject
@@ -204,6 +205,7 @@ void CountryBattle::process(UInt32 curtime)
 					gSpecialAward.AddSpecialAwardList(0, cbd1->player);
 
                 cbd1->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 1);
+                cbd1->player->OnShuoShuo(SS_CTRYBATTLE);
                 if (cbd1->killStreak == 2)
                     cbd1->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
 			}
@@ -267,6 +269,7 @@ void CountryBattle::process(UInt32 curtime)
 					gSpecialAward.AddSpecialAwardList(0, cbd2->player);
 
                 cbd2->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 1);
+                cbd2->player->OnShuoShuo(SS_CTRYBATTLE);
                 if (cbd2->killStreak == 2)
                     cbd2->player->OnHeroMemo(MC_ATHLETICS, MD_ADVANCED, 0, 2);
 			}

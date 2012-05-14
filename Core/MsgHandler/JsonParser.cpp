@@ -1,4 +1,7 @@
 
+#ifdef _FB
+#else
+
 #include "Config.h"
 #include "JsonParser.h"
 #include "GObject/Player.h"
@@ -17,7 +20,7 @@ extern "C" {
 #define EMPTY "{head:{},body:{}}"
 
 #define EUNKNOW (-100)
-#define EPLAYER_NOT_EXIST (-101)
+#define EPLAYER_NOT_EXIST (1)
 
 #define GET_STRING(obj, key, dst, maxlen) \
 { \
@@ -50,7 +53,7 @@ struct JsonHead
 
 bool parseHead(struct json_object* obj, JsonHead* head)
 {
-    if (!obj)
+    if (!obj || !head)
         return false;
 
     struct json_object* hdr = json_object_object_get(obj, "head");
@@ -154,7 +157,9 @@ int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json
 
     json_object_object_add(retbody, "szRoleName", json_object_new_string(player->getName().c_str()));
     json_object_object_add(retbody, "ucGender", json_object_new_int(player->IsMale()?1:2));
-    json_object_object_add(retbody, "szCharTitle", json_object_new_string(""));
+    char title[32] = {0};
+    snprintf(title, sizeof(title), "%u", player->getTitle());
+    json_object_object_add(retbody, "szCharTitle", json_object_new_string(title));
     json_object_object_add(retbody, "ucJob", json_object_new_int(player->GetClass()));
     json_object_object_add(retbody, "ucNation", json_object_new_int(player->getCountry()));
     json_object_object_add(retbody, "uiCurHP", json_object_new_int(player->getMainHP()));
@@ -175,25 +180,18 @@ void jsonParser(std::string& json, int sessionid)
 {
     TRACE_LOG("JSON RECV: %s\n", json.c_str());
 #ifdef _DEBUG
-    fprintf(stderr, "JSON RECV: %s\n", json.c_str());
+    //fprintf(stderr, "JSON RECV: %s\n", json.c_str());
 #endif
     int ret = EUNKNOW;
     std::string err;
 
     JsonHead head = {0,};
+    struct json_object* obj = NULL;
     struct json_object* body = NULL;
 
     struct json_object* retobj = NULL;
     struct json_object* rethead = NULL;
     struct json_object* retbody = NULL;
-
-    struct json_object* obj = json_tokener_parse(json.c_str());
-    if (!parseHead(obj, &head))
-        goto _error;
-
-    body = json_object_object_get(obj, "body");
-    if (!body)
-        goto _error;
 
     retobj = json_object_new_object();
     if (!retobj)
@@ -206,6 +204,18 @@ void jsonParser(std::string& json, int sessionid)
     retbody = json_object_new_object();
     if (!retbody)
         goto _error1;
+
+    obj = json_tokener_parse(json.c_str());
+    if (!parseHead(obj, &head))
+    {
+        ++head.cmd; // XXX:
+        err += "request error.";
+        goto _error;
+    }
+
+    body = json_object_object_get(obj, "body");
+    if (!body)
+        goto _error;
 
     switch (head.cmd)
     {
@@ -234,7 +244,7 @@ _error:
         const char* retstr = json_object_to_json_string(retobj);
         TRACE_LOG("JOSN SEND: %s\n", retstr?retstr:"null");
 #ifdef _DEBUG
-        fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
+        //fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
 #endif
 
         if (sessionid >= 0)
@@ -256,4 +266,5 @@ _error1:
 
     return;
 }
+#endif
 

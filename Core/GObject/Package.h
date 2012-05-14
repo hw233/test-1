@@ -196,6 +196,7 @@ namespace GObject
 
         void AttachSpirit(UInt8 type, UInt16 fighterId, UInt32 itemId);
         static void GenSpirit(ItemEquip* equip);
+        static void GenSpirit2(ItemEquip* equip);
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 

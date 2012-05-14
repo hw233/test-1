@@ -120,7 +120,7 @@ struct DBSkill
 struct DBSkillEffect
 {
     UInt16 id;
-    UInt8 state;        // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱 有等级之分
+    UInt8 state;        // 状态: 0-无状态 1-中毒，2-混乱，4-晕眩(无法攻击)，8-无法使用技能, 16-反伤, 32-虚弱, 64-降灵气 有等级之分
     UInt8 immune;       // 对状态技能的免疫,只能免疫比自己技能低的技能
     UInt8 disperse;     // 驱散状态,只对友方使用,除自己外,是状态的值的和
     std::string damage; // 物理伤害 num/num% (目前物理伤害和法术伤害互斥)

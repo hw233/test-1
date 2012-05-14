@@ -61,6 +61,7 @@ namespace GData
     std::vector<UInt16>     GDataManager::m_OnlineAwardTime;
     std::vector<std::vector<UInt16> > GDataManager::m_OnlineAward[3];
     std::map<UInt32, UInt32>  GDataManager::m_soulItemExp;
+    std::vector<UInt32> GDataManager::m_udpLogItems;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -1766,4 +1767,26 @@ namespace GData
         }
         return true;
     }
+
+    void GDataManager::clearUdpItem()
+    {
+        m_udpLogItems.clear();
+    }
+
+    void GDataManager::addUdpItem(UInt32 id)
+    {
+        m_udpLogItems.push_back(id);
+    }
+
+    bool GDataManager::isInUdpItem(UInt32 id)
+    {
+        UInt32 size = m_udpLogItems.size();
+        for (UInt32 i = 0; i < size; ++i)
+        {
+            if (m_udpLogItems[i] == id)
+                return true;
+        }
+        return false;
+    }
 }
+

@@ -140,8 +140,9 @@ struct NewUserStruct
     std::string _openid;
     std::string _openkey;
     std::string _via;
-	MESSAGE_DEF9(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
-            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via);
+    std::string _invited;
+	MESSAGE_DEF10(REQ::CREATE_ROLE, std::string, _name, UInt8, _class, UInt8, _level, UInt8, _level1, UInt8, _isYear,
+            std::string, _platform, std::string, _openid, std::string, _openkey, std::string, _via, std::string, _invited);
 
 };
 
@@ -543,6 +544,7 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
+            pl->setInvited(nu._invited);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
 
@@ -690,7 +692,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
     if (no.length())
     {
-        DB8().PushUpdateData("REPLACE INTO `recharge` VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
+        DB8().PushUpdateData("REPLACE INTO `recharge` (`no`,`playerId`,`id`,`num`,`status`) VALUES ('%s', %"I64_FMT"u, %u, %u, %u)",
                 no.c_str(), player_Id, id, num, 0); // 0-准备/不成功 1-成功,2-补单成功
     }
     else
@@ -1230,7 +1232,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		else
 		{
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1300,7 +1302,7 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 		else
 		{
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1449,7 +1451,7 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
             if (!pf || (pf && player->isOnline() && atoi(player->getDomain().c_str())==pf))
             {
                 GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-                GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+                GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
                 if(pmail != NULL)
                 {
                     GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1521,7 +1523,7 @@ void MailVIPFromBs(LoginMsgHdr &hdr,const void * data)
                 continue;
 
 			GObject::MailItemsInfo itemsInfo(item, BackStage, nums);
-			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+			GObject::Mail *pmail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 			if(pmail != NULL)
 			{
 				GObject::mailPackageManager.push(pmail->id, item, nums, bindType == 1);
@@ -1987,12 +1989,37 @@ void PwdReset(LoginMsgHdr &hdr, const void * data)
 
 void JasonParse(LoginMsgHdr& hdr, const void* data)
 {
+#ifdef _FB
+#else
 	BinaryReader br(data,hdr.msgHdr.bodyLen);
     CHKKEY();
 
     std::string json;
     br >> json;
     jsonParser(json, hdr.sessionID);
+#endif
+}
+
+void SetCFriend(LoginMsgHdr& hdr, const void* data)
+{
+	BinaryReader br(data,hdr.msgHdr.bodyLen);
+    CHKKEY();
+    std::string name1;
+    std::string name2;
+    br >> name1;
+    br >> name2;
+	GObject::Player * pl1 = GObject::globalNamedPlayers[name1];
+	GObject::Player * pl2 = GObject::globalNamedPlayers[name2];
+    UInt8 ret = 1;
+    if (pl1 && pl2)
+    {
+        pl1->addCFriend(pl2);
+        ret = 0;
+    }
+
+    Stream st(SPEP::CFRIEND);
+    st << ret << Stream::eos;
+	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
 #endif // _LOGINOUTERMSGHANDLER_H_

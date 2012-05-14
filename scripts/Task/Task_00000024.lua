@@ -168,7 +168,7 @@ function Task_00000024_submit(itemId, itemNum)
 
 	local package = player:GetPackage();
 
-	local fixReqGrid = package:GetItemUsedGrids(509,1,1);
+	local fixReqGrid = package:GetItemUsedGrids(509,1,1) + package:GetItemUsedGrids(516,1,1);
 	if fixReqGrid > player:GetFreePackageSize() then
 		player:sendMsgCode(2, 1013, 0);
 		return false;
@@ -183,6 +183,13 @@ function Task_00000024_submit(itemId, itemNum)
 		end
 	else 
 		package:AddItem(509,1,1);
+	end
+	if IsEquipTypeId(516) then
+		for k = 1, 1 do
+			package:AddEquip(516, 1);
+		end
+	else 
+		package:AddItem(516,1,1);
 	end
 
 	player:AddExp(3800);

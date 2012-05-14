@@ -1221,6 +1221,7 @@ CREATE TABLE `recharge` (
   `id` smallint(4) NOT NULL DEFAULT '29999',
   `num` int(10) unsigned NOT NULL,
   `status` tinyint(3) unsigned NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`no`),
   KEY noplayer (`no`, `playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1367,5 +1368,13 @@ DROP TABLE IF EXISTS `discount`;
 CREATE TABLE `discount` (
       `itemid` int(10) unsigned NOT NULL,
       `discount` tinyint(3) unsigned NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `shuoshuo`;
+CREATE TABLE `shuoshuo` (
+  `playerId` bigint(20) unsigned NOT NULL,
+  `updateTime` int(10) NOT NULL,
+  `shuoshuo` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

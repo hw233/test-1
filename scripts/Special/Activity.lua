@@ -135,6 +135,12 @@ function onLevelup(player, olev, nlev)
     if getFoolsDay() then
         onFoolsDay(player)
     end
+    if getMayDay() then
+        onMayDay(player)
+    end
+    if getMayDay1() then
+        onMayDay1(player)
+    end
 end
 
 function onDungeonWin(player, id, count)
@@ -779,6 +785,25 @@ function WhiteLoveDay(player, lootlvl, where)
     end
 end
 
+function MayDay(player, lootlvl)
+    if getMayDay() then
+        if lootlvl > 3 then
+            lootlvl = 0
+        end
+
+        local itemNum = {
+            [0] = 2,
+            [1] = 4,
+            [2] = 8,
+            [3] = 12,
+        };
+
+        local item = {496,497}
+        local package = player:GetPackage();
+        package:AddItem(item[math.random(1,#item)], itemNum[lootlvl], true);
+    end
+end
+
 function onCopyWin(player, id, floor, spot, lootlvl)
     SingleDayReward(player, lootlvl);
     Christmas(player, lootlvl, 0);
@@ -786,6 +811,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
     ChingMingDay(player, lootlvl)
+    MayDay(player, lootlvl)
 end
 
 
@@ -799,6 +825,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     GirlDay(player, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
     ChingMingDay(player, lootlvl)
+    MayDay(player, lootlvl)
 end
 
 local vippack = {
@@ -995,6 +1022,43 @@ function onFoolsDay(player)
     end
 end
 
+function onMayDay(player)
+    if not getMayDay() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(94) == 0 then
+        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1755,1,1});
+        player:SetVar(94, 1)
+    end
+end
+
+function onMayDay1(player)
+    if not getMayDay1() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(95) == 0 then
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9001,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9002,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9003,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9004,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9005,1,1});
+        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9006,1,1});
+        player:SetVar(95, 1)
+    end
+end
+
 function ChingMingDay(player, lootlvl)
     if not getChingMing() then
         return
@@ -1065,31 +1129,141 @@ function onLoginPF(player)
     end
 end
 
-local cfriend_awards = {
-    {{56,6,1}, {57,6,1}},
-    {{56,12,1}, {57,12,1}},
-    {{56,24,1}, {57,24,1}},
-    {{503,5,1}, {508,3,1}, {506,3,1}, {56,6,1}, {57,6,1}},
-    {{503,10,1}, {508,6,1}, {506,6,1}, {56,12,1}, {57,12,1}},
-    {{503,20,1}, {508,12,1}, {506,12,1}, {56,24,1}, {57,24,1}},
-    {{509,2,1}, {507,2,1}, {515,2,1}, {56,6,1}, {57,6,1}},
-    {{509,4,1}, {507,4,1}, {515,4,1}, {56,12,1}, {57,12,1}},
-    {{509,8,1}, {507,8,1}, {515,8,1}, {56,24,1}, {57,24,1}},
-}
-function onGetCFriendAward(player, idx)
+function onInvitedBy(player)
+    -- sendItemPackageMail(player, "好友邀请奖励", "您的好友邀请您一同游玩蜀山传奇，系统赠送您一份大礼包", {503,5,1, 56,10,1, 57,10,1, 5035,1,1});
+end
+
+function onCLLoginReward(player, cts)
+    if cts == 0 then
+        player:getCoupon(20)
+        return
+    end
+
+    local coupon = {20,30,40,50,60,70,80,}
+    if cts > 7 then
+        return
+    end
+    player:getCoupon(coupon[cts]);
+end
+
+function onCL3DayReward(player)
     local package = player:GetPackage()
-    if package:GetRestPackageSize() < #cfriend_awards[idx] then
+    if package:IsFull() then
+        player:sendMsgCode(2, 1011, 0)
+        return;
+    end
+    package:AddItem(9011, 1, 1)
+end
+
+function onRC7DayWill(player, idx)
+    if idx == 1 then
+        player:getPrestige(5000, true)
+        return true
+    end
+
+    if idx == 2 then
+        player:getAchievement(3000)
+        return true
+    end
+
+    if idx == 3 then
+        player:AddPExp(100000)
+        return true
+    end
+
+    if idx == 4 then
+        player:AddExp(1000000)
+        return true
+    end
+end
+
+function onUseMDSoul(player, _type)
+    if _type == 0 or _type > 3 then
+        return 0
+    end
+
+    local items = {
+        {9000,47,509,507,515,509,507,515,},
+        {503,514,506,508,517,512,501,513,},
+        {497,496,15,56,57,511,500,518,},
+    }
+
+    if _type == 3 then
+        local prob = {500,1000,2500,4000,5500,7000,8500,10000}
+        local p = math.random(1,10000)
+        local i = 1
+        for n = 1,#prob do
+            if p <= prob[n] then
+                i = n
+                break
+            end
+        end
+
+        return items[_type][i]
+    end
+
+    return items[_type][math.random(1,#items[_type])]
+end
+
+function onTurnOnRC7Day(player, total, offset)
+    local items = {
+        {{15,2},{502,1},{57,1},{56,1},{506,1},{508,1},{510,2},{503,1}},
+        {{15,2},{502,2},{57,1},{56,1},{506,1},{508,1},{510,5},{503,1}},
+        {{15,2},{502,3},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,2},{502,4},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,2},{502,5},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,2},{502,6},{57,2},{56,2},{506,2},{508,2},{511,2},{503,2}},
+        {{15,5},{502,10},{57,5},{56,5},{507,2},{509,2},{512,2},{503,2}},
+    }
+
+    if offset + 1 > #items then
+        return false
+    end
+
+    local totals = {10,50,100,200,300,400,500}
+
+    local max = 0
+    for n = 1, #totals do
+        if total >= totals[n] then
+            max = n
+        else
+            break
+        end
+    end
+
+    if max == 0 then
+        return false
+    end
+
+    if offset >= max then
+        return false
+    end
+
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < 8 then
         player:sendMsgCode(2, 1011, 0)
         return false
     end
 
-    for k, v in pairs(cfriend_awards[idx]) do
-        package:Add(v[1], v[2], v[3])
+    local item = items[offset + 1]
+    for k,v in pairs(item) do
+        package:AddItem(v[1], v[2], 1)
     end
+
     return true
 end
 
-function onInvitedBy(player)
-    sendItemPackageMail(player, "好友邀请奖励", "您的好友邀请您一同游玩蜀山传奇，系统赠送您一份大礼包", {503,5,1, 56,10,1, 57,10,1, 5035,1,1});
+function onEnchantAct(player, level)
+    local items = {
+        [4] = {502,1,1},
+        [6] = {509,2,1},
+        [8] = {509,5,1, 1509,1,1},
+    };
+    sendItemPackageMail(player, "装备强化返利", "【活动时间】：5月5日—5月11日\n 【活动内容】：活动期间内将武器、头盔、胸甲、腰带、护腿强化至指定级别，即可立即获得对应道具奖励。\n 强化至4级可免费获赠：太乙真金*1\n 强化至6级可免费获赠：凝神易筋丹*2\n 强化至8级可免费获赠：凝神易筋丹*5、橙色法宝六阳神火鉴一个", items[level]);
+end
+
+function onTrainFighterAct(player, fgt)
+    local table_items = {0xA000, 1200, 1};
+    sendItemPackageMail(player, '散仙洗练返利', '活动期间，玩家将散仙（包括主将）的潜力首次洗练到1.5时，将获得1200礼券奖励', table_items)
 end
 

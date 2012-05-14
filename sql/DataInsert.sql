@@ -130,3 +130,32 @@ LOCK TABLES `equipment_set` WRITE;
 source equipmentset
 UNLOCK TABLES;
 
+LOCK TABLES `towndeamon_monster` WRITE;
+source towndeamonmonster
+UNLOCK TABLES;
+
+LOCK TABLES `team_copy` WRITE;
+source teamcopy
+UNLOCK TABLES;
+
+LOCK TABLES `soul_skill_template` WRITE;
+source soulskilltemplate
+UNLOCK TABLES;
+
+LOCK TABLES `soul_lvl_exp` WRITE;
+source soullvlexp
+UNLOCK TABLES;
+
+LOCK TABLES `soul_item_exp` WRITE;
+source soulitemexp
+UNLOCK TABLES;
+
+LOCK TABLES `eupgrade` WRITE;
+source eupgrade
+UNLOCK TABLES;
+
+LOCK TABLES `spirit_attr` WRITE;
+source spiritattr
+UNLOCK TABLES;
+
+

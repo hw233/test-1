@@ -54,6 +54,8 @@
 #include "HoneyFall.h"
 #include "TownDeamon.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
+#include "CFriend.h"
 #include "ArenaBattle.h"
 #include "GData/Store.h"
 #include <fcntl.h>
@@ -198,6 +200,7 @@ namespace GObject
         LoadTownDeamon();
         InitMoneyLog();
         LoadHeroMemo();
+        LoadShuoShuo();
         LoadCFriendAwards();
         LoadWBoss();
         LoadDiscount();
@@ -733,6 +736,12 @@ namespace GObject
         p->initHeroMemo();
 		return true;
 	}
+
+    inline bool shuoshuo_loaded(Player* p, int)
+    {
+        p->initShuoShuo();
+        return true;
+    }
 
     bool GObjectManager::loadQQVipAward()
     {
@@ -3681,6 +3690,30 @@ namespace GObject
         return true;
     }
 
+    bool GObjectManager::LoadShuoShuo()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Shuo Shuo Data");
+        Player* pl = 0;
+		DBShuoShuo ss;
+		if(execu->Prepare("SELECT `playerId`, `updateTime`, `shuoshuo` FROM `shuoshuo`", ss)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			pl = globalPlayers[ss.playerId];
+            if (!pl)
+                continue;
+            pl->GetShuoShuo()->loadFromDB(ss.update, ss.ss.c_str());
+            pl = 0;
+        }
+		lc.finalize();
+
+		globalPlayers.enumerate(shuoshuo_loaded, 0);
+        return true;
+    }
+
     bool GObjectManager::LoadCFriendAwards()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -3698,8 +3731,8 @@ namespace GObject
                 continue;
             if (cfa.invitedId)
                 pl->setInvitedBy(cfa.invitedId, false);
-            pl->loadCFriendAwards(cfa.awards);
-            pl->resetCFriends();
+            pl->GetCFriend()->loadFromDB(cfa.awards.c_str());
+            pl->setCFriends();
             pl = 0;
         }
 		lc.finalize();
@@ -4113,14 +4146,14 @@ namespace GObject
             }
 
             SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel);
-			StringTokenizer tokenizer(dbss.skills, ",");
+            StringTokenizer tokenizer(dbss.skills, ",");
             int idx = 0;
-			for(size_t j = 0; j < tokenizer.count(); ++ j)
-			{
-				UInt16 skillId = atoi(tokenizer[j].c_str());
+            for(size_t j = 0; j < tokenizer.count(); ++ j)
+            {
+                UInt16 skillId = atoi(tokenizer[j].c_str());
                 secondSoul->setSoulSkill(idx, skillId);
                 ++ idx;
-			}
+            }
             fgt->setSecondSoul(secondSoul);
 		}
 		lc.finalize();

@@ -55,6 +55,10 @@ namespace GData
         static bool LoadSpiritAttrTable();
         static bool LoadSoulItemExp();
 
+        static void clearUdpItem();
+        static void addUdpItem(UInt32 id);
+        static bool isInUdpItem(UInt32 id);
+
 	public:
 		static const TaskType& GetTaskTypeData(UInt32 typeId);
 		static const TaskTypeRelation& GetTaskTypeRelationData(UInt32 typeId);
@@ -109,6 +113,7 @@ namespace GData
         static std::vector<UInt16>       m_OnlineAwardTime;
         static std::vector<std::vector<UInt16> > m_OnlineAward[3];
         static std::map<UInt32, UInt32>  m_soulItemExp;
+        static std::vector<UInt32>      m_udpLogItems;
 	};
 
 	

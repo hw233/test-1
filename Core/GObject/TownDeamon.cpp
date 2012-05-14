@@ -344,7 +344,7 @@ void TownDeamon::cancelDeamon(Player* pl)
 
     if(dpd->deamonLevel == 0)
         res = 1;
-    else if(m_Monsters[idx].inChallenge)
+    else if(dpd->inChallenge)
         res = 1;
     else if(m_Monsters[idx].player != pl)
     {
@@ -555,12 +555,17 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
     case 1:
         {
             Player* def = m_Monsters[idx].player;
-            if(m_Monsters[idx].inChallenge || level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
+            if(dpd->inChallenge || level == 0 || 0 != dpd->deamonLevel || level > dpd->curLevel || TimeUtil::Now() - dpd->challengeTime < TD_CHALLENGE_TIMEUNIT)
                 break;
 
             if(def)
             {
-                m_Monsters[idx].inChallenge = true;
+                DeamonPlayerData* deferDpd = def->getDeamonPlayerData();
+                if(deferDpd->inChallenge)
+                    break;
+
+                dpd->inChallenge = true;
+                deferDpd->inChallenge = true;
                 if (def != pl && def->getDeamonPlayerData() && def->getDeamonPlayerData()->deamonLevel)
                     attackPlayer(pl, def);
             }
@@ -592,15 +597,18 @@ void TownDeamon::notifyChallengeResult(Player* pl, Player* defer, bool win)
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
     DeamonPlayerData* deferDpd = defer->getDeamonPlayerData();
+
+    dpd->inChallenge = false;
+    deferDpd->inChallenge = false;
+
     UInt16 level = deferDpd->deamonLevel;
-    if (!level) // XXX:
-        level = deferDpd->quitLevel;
+//    if (!level) // XXX:
+//        level = deferDpd->quitLevel;
     if (!level)
         return;
     UInt8 res = 0;
     UInt16 idx = level - 1;
 
-    m_Monsters[idx].inChallenge = false;
     dpd->challengeTime = TimeUtil::Now();
     if(win)
     {

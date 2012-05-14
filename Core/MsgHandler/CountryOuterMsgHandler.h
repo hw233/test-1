@@ -53,6 +53,8 @@
 #include "GObject/SaleMgr.h"
 #include "GObject/TeamCopy.h"
 #include "GObject/HeroMemo.h"
+#include "GObject/ShuoShuo.h"
+#include "GObject/CFriend.h"
 #include "GObject/TownDeamon.h"
 
 struct NullReq
@@ -643,10 +645,17 @@ struct GetHeroMemoAward
     MESSAGE_DEF1(REQ::HEROMEMO, UInt8, _idx);
 };
 
-struct GetCFriendAward
+struct GetShuoShuoAward
 {
     UInt8 _idx;
-    MESSAGE_DEF1(REQ::CFRIEND, UInt8, _idx);
+    MESSAGE_DEF1(REQ::SSAWARD, UInt8, _idx);
+};
+
+struct GetCFriendAward
+{
+    UInt8 _flag;
+    UInt8 _idx;
+    MESSAGE_DEF2(REQ::CFRIEND, UInt8, _flag, UInt8, _idx);
 };
 
 struct GetOfflineExp
@@ -658,6 +667,18 @@ struct UseToken
 {
     UInt8 _type;
     MESSAGE_DEF1(REQ::TOKEN, UInt8, _type);
+};
+
+struct UseMDSoul
+{
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::USESOUL, UInt8, _type);
+};
+
+struct SvrSt
+{
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::SVRST, UInt8, _type);
 };
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
@@ -1001,8 +1022,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendDeamonAwardsInfo();
 
     pl->GetHeroMemo()->sendHeroMemoInfo();
+    pl->GetShuoShuo()->sendShuoShuo();
+    pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
-    pl->sendCFriendAward();
+    pl->sendRC7DayInfo(TimeUtil::Now());
+    pl->sendMDSoul(0);
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -2662,6 +2686,8 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
             {
                 UInt8 discount = lr._count;
                 UInt8 varoff = GData::store.getDisVarOffset(discount);
+                if (varoff == 0xff)
+                    return;
                 if (player->GetVar(VAR_DISCOUNT_1+varoff) >= GData::store.getDiscountLimit(discount))
                 {
                     player->sendMsgCode(0, 1020);
@@ -4208,8 +4234,6 @@ void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
-
-
 void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
 {
     MSG_QUERY_PLAYER(player);
@@ -4218,12 +4242,23 @@ void OnGetHeroMemoAward( GameMsgHdr& hdr, GetHeroMemoAward& req)
     player->GetHeroMemo()->getAward(req._idx);
 }
 
+void OnGetShuoShuoAward( GameMsgHdr& hdr, GetShuoShuoAward& req)
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+    player->GetShuoShuo()->getAward(req._idx);
+}
+
 void OnGetCFriendAward( GameMsgHdr& hdr, GetCFriendAward& req )
 {
     MSG_QUERY_PLAYER(player);
     if(!player->hasChecked())
          return;
-    player->getCFriendAward(req._idx);
+    if (req._flag == 1)
+        player->GetCFriend()->setCFriendNum(req._idx);
+    else
+        player->GetCFriend()->getAward(req._idx);
 }
 
 void OnGetOfflineExp( GameMsgHdr& hdr, GetOfflineExp& req )
@@ -4313,17 +4348,21 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
     case 0x04:
         {
             UInt16 fighterId = 0;
-            UInt8 idx = 0;
-            UInt16 itemId = 0;
+            UInt16 itemId1 = 0;
+            UInt16 itemId2 = 0;
             UInt8 bind = 0;
 
-            br >> fighterId >> idx >> itemId >> bind;
+            br >> fighterId >> itemId1 >> itemId2 >> bind;
             GObject::Fighter * fgt = player->findFighter(fighterId);
-            if(!fgt || idx < 1 || idx > 6)
+            if(!fgt)
+                break;
+
+            UInt8 idx = fgt->getSoulSkillIdx(itemId1);
+            if(idx == 0xFF)
                 break;
 
             bool res = false;
-            res = fgt->equipSoulSkill(idx - 1, itemId, bind != 0);
+            res = fgt->equipSoulSkill(idx, itemId2, bind != 0);
 
             Stream st(REP::SECOND_SOUL);
             st << static_cast<UInt8>(4);
@@ -4335,7 +4374,6 @@ void OnSecondSoulReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
-
 void OnUseToken( GameMsgHdr& hdr, UseToken& req )
 {
     MSG_QUERY_PLAYER(player);
@@ -4345,6 +4383,64 @@ void OnUseToken( GameMsgHdr& hdr, UseToken& req )
     if (World::getTrumpEnchRet())
     {
         player->useToken(req._type);
+    }
+}
+
+void OnMDSoul( GameMsgHdr& hdr, UseMDSoul& req )
+{
+    MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+    if (World::getMayDay())
+    {
+        if (req._type == 0)
+            player->sendMDSoul(0);
+        else if (req._type == 1)
+            player->getMDItem();
+        else if (req._type == 2)
+            player->useMDSoul();
+    }
+}
+
+void OnSvrSt( GameMsgHdr& hdr, SvrSt& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->svrSt(req._type);
+}
+
+void OnRC7Day( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch(op)
+    {
+        case 1:
+        case 2:
+        case 3:
+            player->getContinuousReward(op);
+            break;
+
+        case 4:
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->getContinuousReward(op, idx);
+            }
+            break;
+
+        case 5:
+            player->turnOnRC7Day();
+            break;
+
+        default:
+            break;
     }
 }
 

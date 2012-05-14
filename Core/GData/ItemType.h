@@ -24,7 +24,9 @@
 #define RSOUL_ID        7999
 #define LSL_ID          8000
 #define RSL_ID          8999
-#define LOTHER_ID       9000
+#define LNORMAL1_ID     9000
+#define RNORMAL1_ID     9999
+#define LOTHER_ID       10000
 #define ROTHER_ID       65535
 
 enum ItemClass
@@ -76,7 +78,8 @@ enum ItemClass
     Item_Soul8, Item_Soul9,
     Item_SL = 100, // 元神技能材料
     Item_SL1, // 元神技能
-	Item_Other = 102,	//其他
+    Item_SL2, // 元神技能
+	Item_Other = 103,	//其他
 };
 
 inline bool IsEquipId(UInt32 id) // XXX: 这个是流水号
@@ -123,7 +126,7 @@ inline bool IsFighterTypeId(UInt32 id)
 
 inline ItemClass GetItemSubClass(UInt32 id)
 {
-    if (id >= LNORMAL_ID && id <= RNORMAL_ID)
+    if ((id >= LNORMAL_ID && id <= RNORMAL_ID) || (id >= LNORMAL1_ID && id <= RNORMAL1_ID))
         return Item_Normal;
     if (id >= LENHANCE_ID && id <= RENHANCE_ID)
         return Item_Enhance;

@@ -38,8 +38,25 @@ end
 
 store:discountLimit()
 
+if is4_21() then
+store:add(2,493,10)
+store:add(2,494,20)
+store:add(2,495,50)
+store:add(5,492,1000)
+end
+
+if getMayDay() then
+store:add(2,496,10)
+store:add(2,497,10)
+end
+
 store:add(2,33,10)
 store:add(2,8000,15)
+store:add(2,72,720)
+store:add(2,78,120)
+store:add(2,79,200)
+store:add(2,80,450)
+store:add(2,81,110)
 store:add(2,548,1)
 store:add(2,465,20)
 store:add(2,466,10)

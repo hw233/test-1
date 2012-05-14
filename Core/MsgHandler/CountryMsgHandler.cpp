@@ -77,6 +77,7 @@ MSG_REG(GameMsgHdr, OnLuckyDrawInfoReq);
 MSG_REG(GameMsgHdr, OnLuckyDrawReq);
 MSG_REG(GameMsgHdr, OnCopyReq);
 MSG_REG(GameMsgHdr, OnGetHeroMemoAward);
+MSG_REG(GameMsgHdr, OnGetShuoShuoAward);
 MSG_REG(GameMsgHdr, OnGetCFriendAward);
 MSG_REG(GameMsgHdr, OnGetOfflineExp);
 
@@ -140,7 +141,8 @@ MSG_REG(GameMsgHdr, OnTrumpLOrder);
 MSG_REG(GameMsgHdr, OnEquipUpgrade);
 MSG_REG(GameMsgHdr, OnEquipSpirit);
 MSG_REG(GameMsgHdr, OnUseToken);
-
+MSG_REG(GameMsgHdr, OnMDSoul);
+MSG_REG(GameMsgHdr, OnSvrSt);
 
 MSG_REG_2(GameMsgHdr, REQ::TEAM_COPY_REQ, OnTeamCopyReq);
 
@@ -151,7 +153,7 @@ MSG_REG_2(GameMsgHdr, REQ::ACTIVITY_REWARD,OnActivityReward);
 MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
 MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
-
+MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -260,8 +262,8 @@ MSG_REG_2(GameMsgHdr, 0x238, OnAddPExpBy);
 MSG_REG_2(GameMsgHdr, 0x239, OnPracticeAttack);
 MSG_REG_2(GameMsgHdr, 0x240, OnHeroMemo);
 MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
-#ifdef _FB
 MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
-#endif
+MSG_REG_2(GameMsgHdr, 0x243, OnShuoShuo);
+MSG_REG_2(GameMsgHdr, 0x246, OnSendMayDayTitleCard);
 
 MSG_HANDLER_END()

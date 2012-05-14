@@ -42,6 +42,7 @@ MSG_REG_2(LoginMsgHdr,SPEQ::GETMONEY, GetMoneyFromBs);
 MSG_REG_2(LoginMsgHdr,SPEQ::SYSDAILOG, SysDailog);
 MSG_REG_2(LoginMsgHdr,SPEQ::PWDINFO, PwdInfo);
 MSG_REG_2(LoginMsgHdr,SPEQ::PWDRESET, PwdReset);
+MSG_REG_2(LoginMsgHdr,SPEQ::CFRIEND,SetCFriend);
 
 MSG_REG_2(LoginMsgHdr, 0x300, OnCheckPackKey);
 

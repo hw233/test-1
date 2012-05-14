@@ -902,6 +902,12 @@ struct DBHeroMemo
 	std::string awards;
 	std::string memos;
 };
+struct DBShuoShuo
+{
+    UInt64 playerId;
+    UInt32 update;
+	std::string ss;
+};
 struct DBCFriendAwards
 {
     UInt64 playerId;
@@ -2035,6 +2041,15 @@ SPECIALDEF(3)
     UInt64, playerId,
     std::string, awards,
     std::string, memos
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBShuoShuo)
+SPECIALDEF(3)
+(
+    UInt64, playerId,
+    UInt32, update,
+    std::string, ss
 )
 SPECIALEND()
 

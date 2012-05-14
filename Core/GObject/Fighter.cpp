@@ -3676,6 +3676,21 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
     if(!m_2ndSoul)
         return false;
 
+    const GData::ItemBaseType* itemType = GData::itemBaseTypeManager[itemId];
+    if( m_2ndSoul->getSkillNum1() > MAX_SKILL_NUM_1 || m_2ndSoul->getSkillNum2() > MAX_SKILL_NUM_2 )
+    {
+        itemId = 0;
+        idx = 0;
+    }
+
+    if(itemId != 0 && idx == MAX_SKILL_NUM)
+    {
+        if( (m_2ndSoul->getSkillNum1() == MAX_SKILL_NUM_1 && itemType->subClass == Item_SL1)
+                || (m_2ndSoul->getSkillNum2() == MAX_SKILL_NUM_2 && itemType->subClass == Item_SL2) )
+            return false;
+        -- idx;
+    }
+
     UInt16 skillId = 0;
     if(itemId != 0)
     {
@@ -3691,7 +3706,8 @@ bool Fighter::equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind)
         return false;
     }
 
-    UInt32 itemOut = m_2ndSoul->setSoulSkill(idx, skillId, true);
+    UInt32 itemOut = 0xFFFFFFFF;
+    itemOut = m_2ndSoul->setSoulSkill(idx, skillId, true);
     if(0xFFFFFFFF == itemOut)
         return false;
 
@@ -3735,7 +3751,6 @@ bool Fighter::changeSecondSoulClass(UInt8 cls)
     return m_2ndSoul->setClass(cls);
 }
 
-
 void Fighter::getAttrExtraEquip(Stream& st)
 {
     checkDirty();
@@ -3749,6 +3764,19 @@ void Fighter::getAttrExtraEquip(Stream& st)
 	st << attr.hitrateP << attr.evadeP << attr.criticalP << attr.criticaldmgP << attr.pierceP << attr.counterP << attr.magresP;
 
     st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl;
+}
+
+UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
+{
+    if(!m_2ndSoul)
+        return 0xFF;
+
+    if(itemId == 0)
+        return MAX_SKILL_NUM;
+
+    UInt16 skillId = m_2ndSoul->getSkillIdOfItem(itemId);
+
+    return m_2ndSoul->getSoulSkillIdx(skillId);
 }
 
 }

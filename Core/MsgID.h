@@ -17,6 +17,14 @@ namespace REQ
     const UInt8 OFFLINEEXP          = 0x08;
     /**代币使用*/
     const UInt8 TOKEN               = 0x09;
+    /**领取出生七天奖励*/
+    const UInt8 RC7DAY              = 0x0B;
+    /**发表说说奖励*/
+    const UInt8 SSAWARD             = 0x0C;
+    /**使用灵气*/
+    const UInt8 USESOUL             = 0x0D;
+    /**服务器当前状态*/
+    const UInt8 SVRST               = 0x11;
     /**成就*/
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择*/
@@ -505,6 +513,10 @@ namespace REP
     const UInt8 STORE_BUY           = 0xDD;// 0xB1
     const UInt8 STORE_LIST_EXCHANGE = 0xDE;// ??
     const UInt8 STORE_DISLIMIT      = 0x0A;
+    const UInt8 RC7DAY              = 0x0B;
+    const UInt8 SSAWARD             = 0x0C;
+    const UInt8 USESOUL             = 0x0D;
+    const UInt8 SVRST               = 0x11;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1
@@ -603,6 +615,7 @@ namespace SPEQ
     const UInt16 PWDRESET           = 0x11B;
     const UInt16 MAILVIP            = 0x11C;
     const UInt16 JASON              = 0x11D;//PHP过来的JASON请求
+    const UInt16 CFRIEND            = 0x11E;//设置成密友
 }
 
 namespace SPEP
@@ -635,6 +648,7 @@ namespace SPEP
     const UInt8 PWDRESET            = 0x1B;
     const UInt8 MAILVIP             = 0x1C;
     const UInt8 JASON               = 0x1D;
+    const UInt8 CFRIEND             = 0x1E;//设置成密友
 }
 
 #endif // _MSGID_H_

@@ -17,7 +17,9 @@ struct SoulSkill
     UInt8 level;
 };
 
-#define MAX_SKILL_NUM 6
+#define MAX_SKILL_NUM_1 5
+#define MAX_SKILL_NUM_2 5
+#define MAX_SKILL_NUM 10
 
 #define SOUL_SKILL_ATTRTRANS     1          // 增幅术, 给角色提供元神属性x%的提升
 #define SOUL_SKILL_STRENGHT      2          // 力量, 增加元神的力量
@@ -57,11 +59,34 @@ public:
     UInt8 getExtraAura();
     bool practiceLevelUp(UInt32& pexp);
     SoulSkill* getSoulSkill(UInt8 idx);
+    UInt8 getSoulSkillIdx(SoulSkill ss);
+    UInt8 getSoulSkillIdx(UInt16 skillId);
+
     UInt32 setSoulSkill(UInt8 idx, SoulSkill ss, bool writeDB = false);
     UInt32 setSoulSkill(UInt8 idx, UInt16 skillId, bool writeDB = false);
 
     float getSoulSkillValue(UInt8 id);
-    void skillData2String(std::string& str);
+
+    bool vector2string(std::vector<SoulSkill>& skills, int size, std::string& str)
+    {
+        if (!size)
+            return true; // XXX: will be set to ''
+
+        char buf[1024] = {0};
+        char* pbuf = buf;
+        char* pend = &buf[sizeof(buf)-1];
+        for (int i = 0; i < size; ++i)
+        {
+            UInt16 skillId = (static_cast<UInt16>(skills[i].id) << 8) + skills[i].level;
+            pbuf += snprintf(pbuf, pend - pbuf, "%u", skillId);
+            if (i < size - 1)
+                pbuf += snprintf(pbuf, pend - pbuf, ",");
+        }
+
+        if (pbuf != buf)
+            str = buf;
+        return true;
+    }
 
     static UInt16 getSkillIdOfItem(UInt32 itemId);
     UInt8 getSoulColor()
@@ -97,6 +122,8 @@ public:
 
     void sendInfo(Player* pl);
     void sendSoulSkill(Player* pl);
+    Int8 getSkillNum1() { return m_skill_num1; }
+    Int8 getSkillNum2() { return m_skill_num2; }
 
 private:
     Fighter* m_fgt;
@@ -109,6 +136,8 @@ private:
     float m_physique;
     float m_intelligence;
     float m_will;
+    Int8 m_skill_num1;
+    Int8 m_skill_num2;
 
     std::vector<SoulSkill> m_skills;
 };

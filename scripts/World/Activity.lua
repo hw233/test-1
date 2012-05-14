@@ -42,6 +42,11 @@ function setServer(n, num)
   serverNum = num
 end
 
+is_4_21 = false 
+function is4_21()
+    return is_4_21
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -185,6 +190,57 @@ function onActivityCheck(tm)
       setCarnival(false)
   end
 
+  if tm >= actTime31 and tm < actTime32 then
+      is_4_21 = true
+  else
+      is_4_21 = false
+  end
+
+  if isFBVersion() then
+      if tm >= actTime101 and tm < actTime102 then
+          setFighter1368(true)
+      else
+          setFighter1368(false)
+      end
+
+      if tm >= actTime103 and tm < actTime104 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
+      if tm >= actTime105 and tm < actTime106 then
+          setTrainFighter(true)
+      else
+          setTrainFighter(false)
+      end
+
+      setShuoShuo(false);
+  else
+      if tm >= actTime33 and tm < actTime34 then
+          setMayDay(true)
+      else
+          setMayDay(false)
+      end
+
+      if tm >= actTime35 and tm < actTime36 then
+          setMayDay1(true)
+      else
+          setMayDay1(false)
+      end
+
+      if tm >= actTime37 and tm < actTime38 then
+          setYDMDAct(true)
+      else
+          setYDMDAct(false)
+      end
+
+      setShuoShuo(true);
+  end
+
+  setRC7Day(true)
+  setCFriend(true);
+
   -- XXX: cancel auto heal
   setAutoHeal(true)
   loadStore();
@@ -211,6 +267,12 @@ function initActTime(y, m, d)
   local  SerStartTm14= { ['year'] = 2012, ['month'] = 3, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 清明节
   local  SerStartTm15= { ['year'] = 2012, ['month'] = 4, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -259,6 +321,27 @@ function initActTime(y, m, d)
 
   actTime29 = os.time(SerStartTm15);
   actTime30 = os.time(SerStartTm15) + 8 * 86400;
+
+  actTime31 = os.time(SerStartTm16);
+  actTime32 = os.time(SerStartTm16) + 11 * 86400;
+
+  actTime33 = os.time(SerStartTm17);
+  actTime34 = os.time(SerStartTm17) + 7 * 86400;
+
+  actTime35 = os.time(SerStartTm17);
+  actTime36 = os.time(SerStartTm17) + 34 * 86400;
+  
+  actTime37 = os.time(SerStartTm17);
+  actTime38 = os.time(SerStartTm17) + 10 * 86400;
+
+  actTime101 = os.time(SerStartTm101);
+  actTime102 = os.time(SerStartTm101) + 8 * 86400;
+
+  actTime103 = os.time(SerStartTm102);
+  actTime104 = os.time(SerStartTm102) + 7 * 86400;
+
+  actTime105 = os.time(SerStartTm102);
+  actTime106 = os.time(SerStartTm102) + 3 * 86400;
 
   onActivityCheck(os.time() + 30);
 

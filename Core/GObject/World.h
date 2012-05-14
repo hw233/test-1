@@ -114,6 +114,42 @@ public:
     { _carnival = v; }
     inline static bool getCarnival()
     { return _carnival; }
+    inline static void setRC7Day(bool v)
+    { _rc7day = v; }
+    inline static bool getRC7Day()
+    { return _rc7day; }
+    inline static void setShuoShuo(bool v)
+    { _shuoshuo = v; }
+    inline static bool getShuoShuo()
+    { return _shuoshuo || true; }
+    inline static void setCFriend(bool v)
+    { _cfriend = v; }
+    inline static bool getCFriend()
+    { return _cfriend; }
+    inline static void setMayDay(bool v)
+    { _mayday = v; }
+    inline static bool getMayDay()
+    { return _mayday; }
+    inline static void setMayDay1(bool v)
+    { _mayday1 = v; }
+    inline static bool getMayDay1()
+    { return _mayday1; }
+    inline static void setYDMDAct(bool v)
+    { _ydmdact = v; }
+    inline static bool getYDMDAct()
+    { return _ydmdact; }
+    inline static void setFighter1368(bool v)
+    { _fighter1368 = v; }
+    inline static bool getFighter1368()
+    { return _fighter1368; }
+    inline static void setEnchantAct(bool v)
+    { _enchantact = v; }
+    inline static bool getEnchantAct()
+    { return _enchantact; }
+    inline static void setTrainFighter(bool v)
+    { _trainfighter = v; }
+    inline static bool getTrainFighter()
+    { return _trainfighter; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -153,6 +189,15 @@ public:
     static bool _foolsday;
     static bool _chingming;
     static bool _carnival;
+    static bool _rc7day;
+    static bool _shuoshuo;
+    static bool _cfriend;
+    static bool _mayday;
+    static bool _mayday1;
+    static bool _ydmdact;
+    static bool _fighter1368;
+    static bool _enchantact;
+    static bool _trainfighter;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

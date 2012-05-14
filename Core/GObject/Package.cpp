@@ -23,6 +23,7 @@
 #include "AttainMgr.h"
 #include "HoneyFall.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 #define ITEM_FORGE_L1 500      // 洗炼符
 #define ITEM_SOCKET_L1 510
@@ -536,12 +537,16 @@ namespace GObject
                 {
                     AddItemCoursesLog(typeId, num, fromWhere);
                 }
+                if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                    udpLog(item->getClass(), typeId, num, 0, "add");
                 if (typeId == 1209)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
                 if (typeId == 1223)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
                 if (typeId == 1224)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+                if (item->getClass() == Item_Citta)
+                    m_Owner->OnShuoShuo(SS_CITTA);
 				return item;
 			}
 			return NULL;
@@ -557,6 +562,8 @@ namespace GObject
 			{
 				m_Items[ItemKey(typeId, bind)] = item;
 				DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, num, m_Owner->getId(), bind ? 1 : 0);
+                if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                    udpLog(item->getClass(), typeId, num, 0, "add");
                 //增加获取物品的荣誉
                 GameAction()->doAttainment(m_Owner, Script::ON_ADD_ITEM, typeId);
                 if (typeId == 1209)
@@ -565,6 +572,8 @@ namespace GObject
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
                 if (typeId == 1224)
                     m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+                if (item->getClass() == Item_Citta)
+                    m_Owner->OnShuoShuo(SS_CITTA);
 				SendItemData(item);
 				if(notify)
 					ItemNotify(item->GetItemType().getId(), num);
@@ -603,6 +612,8 @@ namespace GObject
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
             if (typeId == 1224)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+            if (item->getClass() == Item_Citta)
+                m_Owner->OnShuoShuo(SS_CITTA);
 			return item;
 		}
 		else
@@ -627,6 +638,8 @@ namespace GObject
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 1);
             if (typeId == 1224)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 2);
+            if (item->getClass() == Item_Citta)
+                m_Owner->OnShuoShuo(SS_CITTA);
 			return NULL;
 		}
 	}
@@ -725,14 +738,14 @@ namespace GObject
 				switch(itype->subClass)
 				{
 				case Item_Weapon:
-					equip = new(std::nothrow) ItemWeapon(id, itype, edata);
+                    equip = new(std::nothrow) ItemWeapon(id, itype, edata);
 					break;
 				case Item_Armor1:
 				case Item_Armor2:
 				case Item_Armor3:
 				case Item_Armor4:
 				case Item_Armor5:
-					equip = new ItemArmor(id, itype, edata);
+                    equip = new ItemArmor(id, itype, edata);
 					break;
                 case Item_Trump:
                     {
@@ -763,6 +776,11 @@ namespace GObject
 					return NULL;
 				ITEM_BIND_CHECK(itype->bindType,bind);
 				equip->SetBindStatus(bind);
+
+                if (itype->subClass != Item_Trump && itype->quality == 5)
+                    m_Owner->OnShuoShuo(SS_OE);
+                if (itype->subClass == Item_Trump)
+                    m_Owner->OnShuoShuo(SS_TRUMP);
 
 				ItemBase *& e = m_Items[id];
 				if(e == NULL)
@@ -854,7 +872,7 @@ namespace GObject
         DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, 1, %"I64_FMT"u, %u)", id, m_Owner->getId(), bind ? 1 : 0);
         DB4().PushUpdateData("INSERT INTO `equipment`(`id`, `itemId`, `enchant`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `sockets`, `socket1`, `socket2`,`socket3`,`socket4`, `socket5`, `socket6`) VALUES(%u, %u, %u, %u, %d, %u, %d, %u, %d, %u, %u,%u,%u,%u,%u,%u)", id, typeId, edata.enchant,edata.extraAttr2.type1, edata.extraAttr2.value1, edata.extraAttr2.type2, edata.extraAttr2.value2, edata.extraAttr2.type3, edata.extraAttr2.value3, edata.sockets, edata.gems[0], edata.gems[1], edata.gems[2], edata.gems[3], edata.gems[4],edata.gems[5]);
         DB4().PushUpdateData("UPDATE `equipment_spirit` SET `id` = %u WHERE `id` = %u", id, oldEquipId);
-
+        GenSpirit2(equip);
         SendSingleEquipData(equip);
         if(notify)
             ItemNotify(equip->GetItemType().getId());
@@ -923,6 +941,12 @@ namespace GObject
 		if(e == NULL)
 			++ m_Size;
 		e = equip;
+
+        if (equip->getClass() != Item_Trump && equip->getQuality() == 5)
+            m_Owner->OnShuoShuo(SS_OE);
+        if (equip->getClass() == Item_Trump)
+            m_Owner->OnShuoShuo(SS_TRUMP);
+
 		DB4().PushUpdateData("REPLACE INTO `item` VALUES(%u, %u, %"I64_FMT"u, %d)", equip->getId(), 1, m_Owner->getId(), equip->GetBindStatus() ? 1 : 0);
 		SendSingleEquipData(equip);
 		ItemNotify(equip->GetItemType().getId());
@@ -974,6 +998,10 @@ namespace GObject
 				DBLOG().PushUpdateData("insert into  `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str(), cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
 
+            UInt32 price = GData::store.getPrice(id);
+            if (price || GData::GDataManager::isInUdpItem(id))
+                udpLog(item->getClass(), id, num, price, "sub");
+
 			SendItemData(item);
 			if (cnt == 0)
 			{
@@ -1002,6 +1030,10 @@ namespace GObject
 				DBLOG().GetMultiDBName(tbn); 
 				DBLOG().PushUpdateData("insert into `%s`(`server_id`, `player_id`, `item_id`, `item_num`, `from_to`, `happened_time`) values(%u, %"I64_FMT"u, %u, %u, %u, %u)",tbn.c_str() ,cfg.serverLogId, m_Owner->getId(), item->GetItemType().getId(), num, toWhere, TimeUtil::Now());
             }
+
+            UInt32 price = GData::store.getPrice(item->getId());
+            if (price || GData::GDataManager::isInUdpItem(item->getId()))
+                udpLog(item->getClass(), item->getId(), num, price, "sub");
 
 			SendItemData(item);
 			UInt32 id = item->getId();
@@ -1319,7 +1351,8 @@ namespace GObject
                 if (item && (item->getClass() == Item_Normal29 ||
                             item->getClass() == Item_Normal28 ||
                             (item->getClass() >= Item_Soul && item->getClass() <= Item_Soul9) ||
-                            item->getClass() == Item_SL1))
+                            item->getClass() == Item_SL1 ||
+                            item->getClass() == Item_SL2))
                 {
                     ret = TrumpMerge(id, bind > 0);
                     if (ret)
@@ -1352,7 +1385,6 @@ namespace GObject
 				else if (UInt16 n = GameAction()->RunItemNormalUse(m_Owner, id, param, num, bind > 0))
 				{
                     UInt8 rn = n<num?n:num;
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
 					DelItem2(item, rn);
 					AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1368,7 +1400,6 @@ namespace GObject
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
 					DelItemAny(id, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1409,7 +1440,6 @@ namespace GObject
                 else if (UInt16 n = GameAction()->RunItemNormalUseOther(m_Owner, id, other, num, bind > 0))
                 {
                     UInt8 rn = n<num?n:num;
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
                     DelItem2(item, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1425,7 +1455,6 @@ namespace GObject
                     ItemBase * item = FindItem(id, true);
                     if (!item)
                         item = FindItem(id, false);
-                    udpLog(item->getClass(), id, rn, GData::store.getPrice(id), "sub");
                     DelItemAny(id, rn);
                     AddItemHistoriesLog(id, rn);
                     ret = true;
@@ -1448,13 +1477,14 @@ namespace GObject
 
     void Package::udpLog(UInt32 type, UInt32 id, UInt32 num, UInt32 price, const char* op)
     {
-        if (!op || !price)
+        if (!op)
             return;
         char _price[32] = {0};
         char _type[32] = {0};
         char _id[32] = {0};
         snprintf(_price, 32, "%u", price);
-        snprintf(_type, 32, "%u", type);
+        UInt8 t = GetItemLogType(id);
+        snprintf(_type, 32, "%u", t);
         snprintf(_id, 32, "%u", id);
         m_Owner->udpLog(op, _type, _id, _price, "", "", "props", num);
     }
@@ -1944,6 +1974,30 @@ namespace GObject
         player->sendTokenInfo();
     }
 
+#ifdef _FB
+    void enchantAct(Player* player, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type)
+    {
+        if (type == 0)
+        {
+            if (slevel < 4 && level >= 4)
+                GameAction()->onEnchantAct(player, 4);
+            if (slevel < 6 && level >= 6)
+                GameAction()->onEnchantAct(player, 6);
+            if (slevel < 8 && level >= 8)
+                GameAction()->onEnchantAct(player, 8);
+        }
+        else
+        {
+            if (level == 4)
+                GameAction()->onEnchantAct(player, level);
+            if (level == 6)
+                GameAction()->onEnchantAct(player, level);
+            if (level == 8)
+                GameAction()->onEnchantAct(player, level);
+        }
+    }
+#endif
+
     UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
 		if (type > 1) return 2;
@@ -2212,6 +2266,10 @@ namespace GObject
 
             if (World::getTrumpEnchRet())
                 enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+#ifdef _FB
+            if (World::getEnchantAct())
+                enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+#endif
 			return 0;
 		}
 
@@ -3517,7 +3575,6 @@ namespace GObject
         if( pEquip == NULL)
             return 2;
 
-
         if(pNewId)
             *pNewId =  pEquip->getId();
         ConsumeInfo ci(ForEquipUpgrade,0,0);
@@ -3575,7 +3632,6 @@ namespace GObject
 			return 2;
 		}
         AddItemHistoriesLog(ITEM_FORGE_L1,  1);
-        //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_L1, 1, TimeUtil::Now());
         //
         //装备洗练成就
         GameAction()->doAttainment(this->m_Owner, 10175, 0);
@@ -3599,7 +3655,6 @@ namespace GObject
             }
             else
                 AddItemHistoriesLog(ITEM_FORGE_PROTECT,  c);
-                //DBLOG().PushUpdateData("insert into `item_histories` (`server_id`, `player_id`, `item_id`, `item_num`, `use_time`) values(%u,%"I64_FMT"u,%u,%u,%u)", cfg.serverLogId, m_Owner->getId(), ITEM_FORGE_PROTECT, c, TimeUtil::Now());
 		}
 		types[0] = ied.extraAttr2.type1;
 		values[0] = ied.extraAttr2.value1;
@@ -4140,4 +4195,15 @@ namespace GObject
         }
     }
 
+    void Package::GenSpirit2(ItemEquip* equip)
+    {
+        ItemEquipSpiritAttr& esa = equip->getEquipSpiritAttr();
+        if (equip->getQuality() == 5 && esa.spForm[0] == 0)
+        {
+            esa.spForm[0] = GRND(4) + 1;
+            esa.spForm[1] = GRND(4) + 1;
+            esa.spForm[2] = GRND(4) + 1;
+            DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spform1` = %u, `spform2` = %u, `spform3` = %u WHERE `id` = %u", esa.spForm[0], esa.spForm[1], esa.spForm[2], equip->getId());
+        }
+    }
 }

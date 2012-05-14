@@ -14,6 +14,7 @@
 #include "Country.h"
 #include "TeamCopy.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -114,8 +115,16 @@ bool copyCheckLevel(Player* pl, UInt8 id)
         return false;
 
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90};
+    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
+
     if (id > sizeof(lvls)/sizeof(UInt8))
         return false;
+
+    if (pl->getLocation() != spots[id-1])
+    {
+        SYSMSG_SENDV(2243, pl);
+        return false;
+    }
 
     if (pl->GetLev() < lvls[id-1]) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
@@ -299,6 +308,8 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);
+            if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_COPY1))
+                pl->OnShuoShuo(id-1 + SS_COPY1);
 
             TeamCopyPlayerInfo* tcpInfo = pl->getTeamCopyPlayerInfo();
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)

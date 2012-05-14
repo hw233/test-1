@@ -178,7 +178,7 @@ UInt8 Store::getDisVarOffset(UInt8 type)
         return 1;
     if (type == 8)
         return 2;
-    return 0;
+    return 0xff;
 }
 
 UInt8 Store::getItemsByDiscount(UInt8 type, UInt16 items[4])

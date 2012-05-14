@@ -167,6 +167,8 @@ GMHandler::GMHandler()
 	Reg(3, "recharge", &GMHandler::OnRecharge);
 	Reg(3, "boss", &GMHandler::OnBossHP);
 	Reg(3, "json", &GMHandler::OnJson);
+	Reg(3, "rc7awd", &GMHandler::OnRC7Awd);
+	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -524,7 +526,13 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
                     if (player2)
                         player = player2;
                 }
-				player->getGold(val);
+                player->getGold(val);
+
+                {
+                    char gold[32] = {0}; 
+                    snprintf(gold, 32, "%u", val); 
+                    player->udpLog("free", gold, "", "", "", "", "currency");
+                }
 			}
 			break;
 		case 3:
@@ -645,6 +653,11 @@ void GMHandler::OnTopup( GObject::Player * player, std::vector<std::string>& arg
 		return;
 	UInt32 val = atoi(args[0].c_str());
 	player->getGold(val);
+    {
+        char gold[32] = {0}; 
+        snprintf(gold, 32, "%u", val); 
+        player->udpLog("free", gold, "", "", "", "", "currency");
+    }
 	player->addTotalRecharge(val);
 }
 
@@ -1312,6 +1325,11 @@ void GMHandler::OnSuper( GObject::Player * player, std::vector<std::string>& arg
 	player->AddExp(GData::expTable.getLevelMin(100));
     player->AddPExp(100000);
     player->getGold(10000000);
+    {
+        char gold[32] = {0}; 
+        snprintf(gold, 32, "%u", 10000000); 
+        player->udpLog("free", gold, "", "", "", "", "currency");
+    }
     player->getTael(10000000);
 	makeSuper(player->getMainFighter(), player->GetLev());
 	addSuperClass(player, 10);
@@ -2243,7 +2261,14 @@ inline bool give_money(Player * p, UInt32* money)
     if (p && p->GetLev() >= lvl)
     {
         if (moneys[0])
+        {
             p->getGold(moneys[0]);
+            {
+                char gold[32] = {0}; 
+                snprintf(gold, 32, "%u", moneys[0]); 
+                p->udpLog("free", gold, "", "", "", "", "currency");
+            }
+        }
         if (moneys[1])
             p->getTael(moneys[1]);
         if (moneys[2])
@@ -2658,7 +2683,28 @@ void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args
 }
 void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
+#ifdef _FB
+#else
+    UInt64 begin = TimeUtil::GetTick();
     std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
-    jsonParser(json, -1);
+    for (UInt16 i = 0; i < 4000; ++i)
+        jsonParser(json, -1);
+    UInt64 end = TimeUtil::GetTick();
+    fprintf(stderr, "total secs: %.2f\n", (float)(end-begin)/1000000);
+#endif
 }
+void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 1)
+        return;
+    UInt8 idx = 0;
+    if (args.size() == 2)
+        idx = atoi(args[1].c_str());
+    player->getContinuousReward(atoi(args[0].c_str()), idx);
+}
+void GMHandler::OnRC7TurnOn(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->turnOnRC7Day();
+}
+
 

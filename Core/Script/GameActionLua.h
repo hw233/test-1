@@ -197,8 +197,11 @@ namespace Script
         bool onNewYear(Player* player);
         bool onValentineDay(Player* player);
         bool onFoolsDay(Player* player);
+        bool onMayDay(Player* player);
+        bool onMayDay1(Player* player);
 		void onAttackBoss(Player* player);
 		bool getHeroMemoAward(Player* player, UInt8 idx, UInt32 soul);
+		bool getShuoShuoAward(Player* player, UInt8 idx);
 		bool onPurchase(Player* player, UInt32 id, UInt8 count);
 		void exchangeExtraReward(Player* player, UInt32 id);
 		void onLevelup(Player* player, UInt8 olev, UInt8 nlev);
@@ -212,6 +215,8 @@ namespace Script
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
 		void onEnchant(Player* player, UInt8 level);
+		void onEnchantAct(Player* player, UInt8 level);
+		void onTrainFighterAct(Player* player, Fighter* fgt);
 		void onTopup(Player* player, UInt32 ogold, UInt32 ngold);
 		UInt32 onAttakerAddexp(Player* attacker, Player *defender, UInt32 award);
 		UInt32 onTavernFlush(UInt8 color);
@@ -224,6 +229,11 @@ namespace Script
 		void onMergeGem(Player * player, UInt8 lev, UInt8 num);
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
         void onRecruitAward(Player* player);
+        void onCLLoginReward(Player* player, UInt8 cts);
+        void onCL3DayReward(Player* player);
+        bool onRC7DayWill(Player* player, UInt8 idx);
+        UInt32 onUseMDSoul(Player* player, UInt8 type);
+        bool onTurnOnRC7Day(Player* player, UInt32 total, UInt32 offset);
        
 	public:
 

@@ -11,6 +11,7 @@
 #include "Script/GameActionLua.h"
 #include "Country.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -156,7 +157,15 @@ void FrontMap::sendFrontMap(Stream& st, Player* pl, UInt8 id, bool force)
 
 bool FrontMap::checkLevel(Player* pl, UInt8 id)
 {
-    UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
+    static UInt8 lvls[] = {35, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95};
+    static UInt16 spots[] = {1284, 2053, 4360, 4611, 5893, 5637, 8195, 6153, 9222, 9481, 10244, 5129};
+
+    if (pl->getLocation() != spots[id-1])
+    {
+        SYSMSG_SENDV(2244, pl);
+        return false;
+    }
+
     if (pl->GetLev() < lvls[id-1] || id > sizeof(lvls)/sizeof(UInt8)) {
         SYSMSG_SENDV(2109, pl, pl->GetLev(), lvls[id-1]);
         return false;
@@ -352,6 +361,8 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 autoClear(pl, complate);
 
             pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 2);
+            if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_FM1))
+                pl->OnShuoShuo(id-1 + SS_FM1);
             return 2;
         } else { // 打过某一点
             UInt8 nspot = spot+1;

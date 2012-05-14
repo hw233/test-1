@@ -8,6 +8,7 @@
 #include "Country.h"
 #include "Script/GameActionLua.h"
 #include "HeroMemo.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -1310,6 +1311,7 @@ bool TeamCopyPlayerInfo::getAward()
 
     DB3().PushUpdateData("DELETE FROM `teamcopy_player_award` WHERE `playerId` = %"I64_FMT"u", m_owner->getId());
 
+    m_owner->OnShuoShuo(SS_TEAMCP);
     return true;
 }
 

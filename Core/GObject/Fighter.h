@@ -653,6 +653,7 @@ public:
 
     void send2ndSoulInfo();
 
+    UInt8 getSoulSkillIdx(UInt16 itemId);
 public:
 	UInt32 favor;
 	UInt32 reqFriendliness;

@@ -8,6 +8,7 @@
 #include "Script/GameActionLua.h"
 #include "Common/Stream.h"
 #include "MsgID.h"
+#include "ShuoShuo.h"
 
 namespace GObject
 {
@@ -37,6 +38,20 @@ void HeroMemo::setMemo(UInt8 chapter, UInt8 diff, UInt8 group, UInt8 item, UInt8
     m_owner->send(st);
 
     ++m_heroSoul;
+
+    if (m_heroSoul >= 30)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_30);
+    if (m_heroSoul >= 40)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_40);
+    if (m_heroSoul >= 50)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_50);
+    if (m_heroSoul >= 60)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_60);
+    if (m_heroSoul >= 70)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_70);
+    if (m_heroSoul >= 80)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_80);
+
     if (testCanGetAward(m_owner, m_maxAwardIdx+1))
     {
         if (!m_awards.size())
@@ -169,6 +184,19 @@ void HeroMemo::loadFromDB(const char* awards, const char* memos)
             m_maxAwardIdx = i+1;
         }
     }
+
+    if (m_heroSoul >= 30)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_30);
+    if (m_heroSoul >= 40)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_40);
+    if (m_heroSoul >= 50)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_50);
+    if (m_heroSoul >= 60)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_60);
+    if (m_heroSoul >= 70)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_70);
+    if (m_heroSoul >= 80)
+        m_owner->GetShuoShuo()->setShuoSafe(SS_HM_80);
 }
 
 void HeroMemo::updateToDB()
