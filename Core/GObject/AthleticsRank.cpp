@@ -1184,6 +1184,46 @@ void AthleticsRank::TmExtraAward()
         UInt16 itemId = 0;
         UInt8  itemCount = 1;
 		Player *ranker = (*start)->ranker;
+
+#ifdef _FB
+        if (World::getNetValentineDay())
+        {
+            UInt32 lastrank = ranker->GetVar(VAR_LASTATHRANK);
+            UInt32 currank = (*start)->rank;
+            if (currank <= 15 || lastrank)
+            {
+                if ((currank <= 15) || ((currank <= 500) && (currank > lastrank) && ((currank - lastrank) >= 15)))
+                {
+                    SYSMSG(title, 4000);
+                    SYSMSG(content2, 4002);
+                    SYSMSGV(content3, 4003, currank - lastrank);
+                    char* content1 = NULL;
+                    if (currank <= 15)
+                        content1 = content2;
+                    else
+                        content1 = content3;
+                    SYSMSGV(content, 4001, content1);
+                    Mail* mail = ranker->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                    if(mail)
+                    {
+                        MailPackage::MailItem mitem[1] = {{9027,1}};
+                        mailPackageManager.push(mail->id, mitem, 1, true);
+                        std::string strItems;
+                        for (int i = 0; i < 1; ++i)
+                        {
+                            strItems += Itoa(mitem[i].id);
+                            strItems += ",";
+                            strItems += Itoa(mitem[i].count);
+                            strItems += "|";
+                        }
+                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, ranker->getId(), mail->id, AthliticisTimeAward, title, content, strItems.c_str(), mail->recvTime);
+                    }
+                }
+            }
+            ranker->SetVar(VAR_LASTATHRANK, currank);
+        }
+#endif
+
         if(rank == 1)
         {
             itemId = 2;
