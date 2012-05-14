@@ -882,8 +882,8 @@ struct DBWBoss
     UInt8 idx;
     UInt32 last;
     UInt32 hp;
-    UInt32 atk;
-    UInt32 matk;
+    Int32 atk;
+    Int32 matk;
 };
 struct DBDiscount
 {
@@ -2028,8 +2028,8 @@ SPECIALDEF(5)
     UInt8, idx,
     UInt32, last,
     UInt32, hp,
-    UInt32, atk, 
-    UInt32, matk
+    Int32, atk,
+    Int32, matk
 )
 SPECIALEND()
 

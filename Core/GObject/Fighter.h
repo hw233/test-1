@@ -88,6 +88,8 @@ public:
 	inline bool isBoy() {return _sex == 2;}
     inline UInt8 getSex() {return _sex;}
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
+    inline bool isWBoss() { return _iswboss; }
+    inline void setWBoss(bool v) { _iswboss = v; }
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
 	inline UInt32 getPExp() {return _pexp;}
@@ -384,18 +386,15 @@ public:
 	inline float getExtraSoulP() { checkDirty(); return _attrExtraEquip.soulP; }
 	inline float getExtraAuraP() { checkDirty(); return _attrExtraEquip.auraP; }
 	inline float getExtraAuraMaxP() { checkDirty(); return _attrExtraEquip.auraMaxP; }
-    inline void addExtraAttack(UInt16 atk) { setDirty(true); _attrExtraEquip.attack += atk; }
-	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
+	inline Int32 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
-	inline void addExtraMagAttack(UInt16 atk) { setDirty(true); _attrExtraEquip.magatk += atk; }
-	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }
+	inline Int32 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }
 	inline float getExtraMagAttackP() { checkDirty(); return _attrExtraEquip.magatkP; }
-	inline UInt16 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
+	inline Int32 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
 	inline float getExtraDefendP() { checkDirty(); return _attrExtraEquip.defendP; }
-	inline UInt16 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.magdef; }
+	inline Int32 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.magdef; }
 	inline float getExtraMagDefendP() { checkDirty(); return _attrExtraEquip.magdefP; }
-	inline void addExtraHP(UInt32 hp) { setDirty(true); _attrExtraEquip.hp += hp; }
-	inline UInt16 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
+	inline UInt32 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
 	inline float getExtraHPP() { checkDirty(); return _attrExtraEquip.hpP; }
 	inline float getExtraAction() { checkDirty(); return _attrExtraEquip.action; }
 	inline float getExtraActionP() { checkDirty(); return _attrExtraEquip.actionP; }
@@ -416,6 +415,11 @@ public:
     inline float getExtraToughLevel() { checkBPDirty(); return _attrExtraEquip.toughlvl; }
     inline float getExtraMagResLevel() { checkBPDirty(); return _attrExtraEquip.mreslvl; }
 
+public:
+    inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
+	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
+
+public:
 	inline Int16 getBaseStrength()
     {
         return strength;
@@ -652,6 +656,12 @@ public:
     void send2ndSoulInfo();
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
+
+private:
+    bool _iswboss;
+    Int32 _wbextatk;
+    Int32 _wbextmagatk;
+
 public:
 	UInt32 favor;
 	UInt32 reqFriendliness;

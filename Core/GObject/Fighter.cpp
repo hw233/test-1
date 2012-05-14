@@ -73,6 +73,9 @@ Fighter::Fighter(UInt32 id, Player * owner):
 	memset(_trump, 0, sizeof(_trump));
 	memset(_buffData, 0, FIGHTER_BUFF_COUNT * sizeof(UInt32));
     m_2ndSoul = NULL;
+    _iswboss = false;
+    _wbextatk = 0;
+    _wbextmagatk = 0;
 }
 
 Fighter::~Fighter()
@@ -1429,6 +1432,12 @@ void Fighter::rebuildEquipAttr()
     if(m_2ndSoul)
     {
         m_2ndSoul->addAttr(_attrExtraEquip);
+    }
+
+    if (isWBoss())
+    {
+        _attrExtraEquip.attack += _wbextatk;
+        _attrExtraEquip.magatk += _wbextmagatk;
     }
 
 	_maxHP = Script::BattleFormula::getCurrent()->calcHP(this);
