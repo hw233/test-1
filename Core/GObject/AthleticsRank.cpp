@@ -944,22 +944,21 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
             flag |= 0x04;
             UInt32 atkDataRank = data->rank;
 			data->rank = deferdata->rank;
-			UInt32 deferPos = static_cast<UInt32>(getRankPos(row, deferRank->second));
-			data->maxrank = std::min(data->maxrank, deferPos);
-			if (deferPos == 1)
+			data->maxrank = std::min(data->maxrank, deferRankPos);
+			if (deferRankPos == 1)
 			{
 				SYSMSG_BROADCASTV(323, data->ranker->getName().c_str(), (*(deferRank->second))->ranker->getName().c_str());
 			}
-			if (deferPos <= 10)
+			if (deferRankPos <= 10)
 			{
-				newRank = deferPos;
+				newRank = deferRankPos;
 			}
-            if(deferPos < 4)
+            if(deferRankPos < 4)
             {
                 flag |= 0x02;
             }
 			
-            if(atkDataRank < 500 )
+            if(atkerRankPos < 500 )
             {
                 deferdata->rank = atkDataRank;
                 Rank atk = atkerRank->second;
