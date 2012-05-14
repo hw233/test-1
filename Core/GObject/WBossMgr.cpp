@@ -286,8 +286,14 @@ void WBoss::updateLastDB(UInt32 end)
         return;
 
     UInt32 last = end - m_appearTime;
-    _mgr->setLast(idx, last);
-    DB3().PushUpdateData("REPLACE INTO `wboss` (`idx`, `last`) VALUES (%u, %u)", idx, last);
+    Last l;
+    l.time = last;
+    l.hp = m_lastHP;
+    l.atk = m_lastAtk;
+    l.matk = m_lastMAtk;
+    _mgr->setLast(idx, l);
+    DB3().PushUpdateData("REPLACE INTO `wboss` (`idx`, `last`, `hp`, `atk`, `matk`) VALUES (%u, %u, %u, %u, %u)",
+            idx, last, m_lastHP, m_lastAtk, m_lastMAtk);
 }
 
 void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
@@ -551,7 +557,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     if (m_final)
     {
-        setLast(_mgr->getLast(bossidx[World::_wday-1][m_idx]));
+        setLast(_mgr->getLastTime(bossidx[World::_wday-1][m_idx]));
         setAppearTime(TimeUtil::Now());
         _mgr->fixBossName(npcid, nflist[0].fighter, m_idx);
     }
@@ -563,7 +569,11 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!sz) return;
     _hp.resize(sz);
 
-    UInt32 ohp = nflist[0].fighter->getMaxHP();
+    UInt32 ohp = 0;
+    if (m_final)
+        ohp = _mgr->getLastHP(bossidx[World::_wday-1][m_idx]);
+    if (!ohp)
+        ohp = nflist[0].fighter->getMaxHP();
     _hp[0] = ohp;
 
     if (m_final && nflist[0].fighter && !m_extra && m_last)
@@ -572,8 +582,12 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         Int32 extatk = 0;
         Int32 extmagatk = 0;
 
-        Int32 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
-        Int32 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
+        Int32 atk = _mgr->getLastAtk(bossidx[World::_wday-1][m_idx]);
+        if (!atk)
+            atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
+        Int32 matk = _mgr->getLastMAtk(bossidx[World::_wday-1][m_idx]);
+        if (!matk)
+            matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
 
         if (m_last <= WBOSS_BASE_TIME)
         {
@@ -610,6 +624,10 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
                 nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
 #endif
         m_extra = true;
+
+        m_lastHP = ohp;
+        m_lastAtk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
+        m_lastMAtk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack(); 
     }
 
     if (m_final)

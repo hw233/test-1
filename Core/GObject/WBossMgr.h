@@ -41,7 +41,7 @@ public:
     WBoss(WBossMgr* mgr, UInt32 id, UInt8 cnt, UInt8 max, UInt16 loc, UInt8 idx)
         : m_id(id), m_count(cnt), m_maxcnt(max), m_loc(loc),
         m_idx(idx), m_disappered(false), m_extra(false), m_last(0), m_appearTime(0), _mgr(mgr),
-        _percent(100), _ng(NULL), m_final(false) {}
+        _percent(100), _ng(NULL), m_final(false), m_lastHP(0), m_lastAtk(0), m_lastMAtk(0) {}
     ~WBoss() {}
 
     inline void setFinal(bool f) { m_final = f; }
@@ -110,6 +110,18 @@ private:
     bool m_final;
     AtkInfoType m_atkinfo;
     std::string m_name;
+
+    UInt32 m_lastHP;
+    UInt32 m_lastAtk;
+    UInt32 m_lastMAtk;
+};
+
+struct Last
+{
+    UInt16 time;
+    UInt32 hp;
+    UInt32 atk;
+    UInt32 matk;
 };
 
 class WBossMgr
@@ -147,8 +159,11 @@ public:
 
     inline UInt32 getHP() const { return m_boss?m_boss->getHP():0; }
 
-    inline void setLast(UInt8 idx, UInt16 last) { m_lasts[idx] = last; }
-    inline UInt16 getLast(UInt8 idx) const { return m_lasts[idx]; }
+    inline void setLast(UInt8 idx, Last& l) { m_lasts[idx] = l; }
+    inline UInt16 getLastTime(UInt8 idx) const { return m_lasts[idx].time; }
+    inline UInt32 getLastHP(UInt8 idx) const { return m_lasts[idx].hp; }
+    inline UInt32 getLastAtk(UInt8 idx) const { return m_lasts[idx].atk; }
+    inline UInt32 getLastMAtk(UInt8 idx) const { return m_lasts[idx].matk; }
 
     void setBossSt(UInt8 idx, UInt8 st);
     void setBossName(UInt8 idx, std::string name);
@@ -165,7 +180,7 @@ private:
 
     UInt8 m_idx;
     UInt8 m_maxlvl;
-    UInt16 m_lasts[7];
+    Last m_lasts[7];
     WBoss* m_boss;
 
     UInt16 m_bossID[2];
