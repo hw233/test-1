@@ -6183,9 +6183,13 @@ namespace GObject
         if(this->isBD() && World::getBlueDiamondAct()) {
             currentCnt = this->GetVar(VAR_DIAMOND_BLUE);
             totalCnt = 1;
+            if(currentCnt > totalCnt)
+                currentCnt = 0;
         } else if (this->isYD() && World::getYellowDiamondAct()) {
             currentCnt = this->GetVar(VAR_DIAMOND_YELLOW);
             totalCnt = 1;
+            if(currentCnt > totalCnt)
+                currentCnt = 0;
         } else {
             currentCnt = 0;
             totalCnt = 0;
@@ -6245,9 +6249,13 @@ namespace GObject
         if(this->isBD() && World::getBlueDiamondAct()) {
             currentDiamondCnt = this->GetVar(VAR_DIAMOND_BLUE);
             totalDiamondCnt = 1;
+            if(currentDiamondCnt > totalDiamondCnt)
+                currentDiamondCnt = 0;
         } else if (this->isYD() && World::getYellowDiamondAct()) {
             currentDiamondCnt = this->GetVar(VAR_DIAMOND_YELLOW);
             totalDiamondCnt = 1;
+            if(currentDiamondCnt > totalDiamondCnt)
+                currentDiamondCnt = 0;
         } else {
             currentDiamondCnt = 0;
             totalDiamondCnt = 0;

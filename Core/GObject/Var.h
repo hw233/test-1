@@ -123,8 +123,8 @@ namespace GObject
         VAR_MDES = 94, // 五月份活动节日套装
         VAR_MDPACKS = 95, // 五月份活动礼包是否发放
         VAR_RC7DAYTURNON,
-        VAR_DIAMOND_BLUE = 96,  //蓝钻特权
-        VAR_DIAMOND_YELLOW,//黄钻特权
+        //VAR_DIAMOND_BLUE = 96,  //蓝钻特权，放在后面
+        VAR_DIAMOND_YELLOW = 97,//黄钻特权
         VAR_YBBUF = 98, // 蓝黄钻之力是否领取
         VAR_LDPOINT = 99, // 夺宝积分，整数类型，可正可负，非绑定
         VAR_LDCOUNT = 100, // 夺宝次数，触发后清空
@@ -133,6 +133,9 @@ namespace GObject
         VAR_AWARD_QPLUS = 102, // QPLUS等级奖励
         VAR_AWARD_SSDT_1 = 103, // 搜搜地图点亮旗帜每日奖励
         VAR_AWARD_SSDT_2 = 104, // 搜搜地图点亮旗帜达成奖励
+
+        VAR_DIAMOND_BLUE = 105,  //蓝钻特权
+
         VAR_MAX,
     };
 
