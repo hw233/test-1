@@ -53,7 +53,6 @@ private:
 	void OnPlayerWallow(GObject::Player * player, std::vector<std::string>&);
 	void OnWallow(std::vector<std::string>&);
 	void OnLimitLuckyDraw(std::vector<std::string>&);
-	void OnLuckyDraw(GObject::Player *, std::vector<std::string>&);
 	void OnRunScript(std::vector<std::string>&);
 	void OnSuper(GObject::Player *, std::vector<std::string>&);
 	void OnReconn(std::vector<std::string>&);
@@ -135,6 +134,7 @@ private:
     void OnRC7Awd(GObject::Player* player, std::vector<std::string>& args);
     void OnRC7TurnOn(GObject::Player* player, std::vector<std::string>& args);
     void OnAddVarS(GObject::Player* player, std::vector<std::string>& args);
+    void OnLuckyDraw(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

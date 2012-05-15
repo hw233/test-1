@@ -1639,7 +1639,7 @@ namespace GObject
 
     void Player::AddVarS(UInt32 id, Int32 val)
     {
-        Int32 v = GetVarS(id);
+        Int32 v = GetVarS(id);  
         m_pVars->SetVar(id,v+val);
     }
 
