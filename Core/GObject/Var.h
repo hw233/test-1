@@ -115,11 +115,8 @@ namespace GObject
         VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
         VAR_RC7DAYWILL, // 所选择的愿望索引
         VAR_INVITES, // 邀请好友的次数
-#ifdef _FB
         VAR_FIGHTER1_3_6_8 = 90, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
-#else
-        VAR_MDSOUL = 90, // 五一活动灵气值
-#endif
+        VAR_MDSOUL = 90, // 五一活动灵气值,与VAR_FIGHTER1_3_6_8是互斥的，这两个活动不会同时存在
         VAR_MDSOUL_CNT1, // 五一活动风雷宝珠使用次数 9000
         VAR_MDSOUL_CNT2, // 雷之石 497
         VAR_MDSOUL_CNT3, // 风之石 496
@@ -254,11 +251,8 @@ namespace GObject
             REGISTER_VAR(VAR_RC7DAYRECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYWILL, CYCLE_NONE);
             REGISTER_VAR(VAR_INVITES, CYCLE_DAY);
-#ifdef _FB
             REGISTER_VAR(VAR_FIGHTER1_3_6_8, CYCLE_NONE);
-#else
             REGISTER_VAR(VAR_MDSOUL, CYCLE_NONE);
-#endif
             REGISTER_VAR(VAR_MDSOUL_CNT1, CYCLE_NONE);
             REGISTER_VAR(VAR_MDSOUL_CNT2, CYCLE_NONE);
             REGISTER_VAR(VAR_MDSOUL_CNT3, CYCLE_NONE);
