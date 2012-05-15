@@ -461,6 +461,8 @@ public:
 		Enh1 = 0x03,
 		Enh2 = 0x0C,
 		Enh3 = 0x10,
+        Enh4 = 0x20,
+        Enh5 = 0x40,
 		Stun = 0xE0,
 		Poison = 0x700,
 		Confuse = 0x3800,

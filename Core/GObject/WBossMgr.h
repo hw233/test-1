@@ -112,16 +112,16 @@ private:
     std::string m_name;
 
     UInt32 m_lastHP;
-    UInt32 m_lastAtk;
-    UInt32 m_lastMAtk;
+    Int32 m_lastAtk;
+    Int32 m_lastMAtk;
 };
 
 struct Last
 {
     UInt16 time;
     UInt32 hp;
-    UInt32 atk;
-    UInt32 matk;
+    Int32 atk;
+    Int32 matk;
 };
 
 class WBossMgr

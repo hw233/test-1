@@ -7783,7 +7783,7 @@ namespace GObject
         UInt8 qqvipl = 0;
         UInt8 flag = 0;
 
-        if (_playerData.qqvipl >= 20)
+        if (_playerData.qqvipl >= 20) // 20-29 - 3366, 30-39 - Q+
         {
             qqvipl = _playerData.qqvipl1;
             flag = 8*(_playerData.qqvipl1 / 10);
@@ -7838,6 +7838,7 @@ namespace GObject
         checkQQAward();
 
         bool blue = false;
+        bool qplus = false;
         UInt8 domain = atoi(m_domain.c_str());
         if (domain == 11 && _playerData.qqvipl >= 20)
         {
@@ -7869,7 +7870,13 @@ namespace GObject
             blue = true;
         }
 
-        if (_playerData.qqvipl < 20 || blue)
+        if (domain == 4 && _playerData.qqvipl >= 30)
+        {
+            // TODO:
+            qplus = true;
+        }
+
+        if (_playerData.qqvipl < 20 || blue || qplus)
         {
             Stream st(REP::YD_INFO);
 
@@ -8045,6 +8052,10 @@ namespace GObject
             {
                 DB1().PushUpdateData("UPDATE `player` SET `qqawardgot` = %u WHERE `id` = %"I64_FMT"u", _playerData.qqawardgot, getId());
             }
+        }
+        else if (domain == 4 && _playerData.qqvipl >= 30 && d3d6/*qplus*/ == 1)
+        {
+            // TODO:
         }
 
         st << nRes << Stream::eos;
@@ -9374,6 +9385,50 @@ namespace GObject
         st << static_cast<UInt8>(5) << GetVar(VAR_RC7DAYRECHARGE);
         st << Stream::eos;
         send(st);
+    }
+
+    void Player::recvYBBuf(UInt8 type)
+    {
+        UInt32 ybbuf = GetVar(VAR_YBBUF);
+        UInt32 ybuf = (ybbuf >> 16) & 0xFFFF;
+        UInt32 bbuf = ybbuf & 0xFFFF;
+
+        // type = 0 黄钻 1 蓝钻
+
+        bool r = false;
+        UInt32 now = TimeUtil::Now();
+        if (!ybuf && type == 0)
+        {
+            setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
+            ybuf = 1;
+            r = true;
+        }
+
+        if (!bbuf && type == 1)
+        {
+            setBuffData(PLAYER_BUFF_BBUF, now + 60 * 60);
+            bbuf = 1;
+            r = true;
+        }
+
+        if (r)
+        {
+            ybbuf = ybbuf << 16 | bbuf;
+            SetVar(VAR_YBBUF, ybbuf);
+        }
+
+        // TODO:
+        //Stream st(0);
+        //st << Stream::eos;
+        //send(st);
+    }
+
+    bool Player::isCopyPassed(UInt8 copyid)
+    {
+        TeamCopyPlayerInfo* tcpInfo = getTeamCopyPlayerInfo();
+        if (!tcpInfo)
+            return false;
+        return tcpInfo->getPass(copyid);
     }
 
 } // namespace GObject

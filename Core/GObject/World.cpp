@@ -9,7 +9,6 @@
 #include "Fighter.h"
 #include "TaskMgr.h"
 #include "EventBase.h"
-#include "LuckyDraw.h"
 #include "ChatItem.h"
 #include "Announce.h"
 #include "Dungeon.h"
@@ -419,8 +418,6 @@ void World::World_Midnight_Check( World * world )
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
 	DB1().PushUpdateData("UPDATE `player` SET `icCount` = 0;");
-	luckyDraw.setLuckyDrawCost();
-	luckyDraw.checkCleanup();
 
     chopStickSortMap.clear();
     shusanLoveSortMap.clear();

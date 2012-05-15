@@ -123,6 +123,7 @@ namespace GObject
         VAR_MDES = 94, // 五月份活动节日套装
         VAR_MDPACKS = 95, // 五月份活动礼包是否发放
         VAR_RC7DAYTURNON,
+        VAR_YBBUF = 98, // 蓝黄钻之力是否领取
 
         VAR_MAX,
     };
@@ -244,6 +245,7 @@ namespace GObject
             REGISTER_VAR(VAR_MDES, CYCLE_NONE);
             REGISTER_VAR(VAR_MDPACKS, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYTURNON, CYCLE_NONE);
+            REGISTER_VAR(VAR_YBBUF, CYCLE_DAY);
 #endif
         }
         

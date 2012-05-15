@@ -9,7 +9,6 @@
 #include "DB/DBConnectionMgr.h"
 #include "GObjectDBExecHelper.h"
 #include "GData/GDataManager.h"
-#include "GObject/LuckyDraw.h"
 #include "GObject/SpecialAward.h"
 #include "Server/SysMsg.h"
 #include "Script/GameActionLua.h"

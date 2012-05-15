@@ -25,6 +25,8 @@ namespace REQ
     const UInt8 USESOUL             = 0x0D;
     /**服务器当前状态*/
     const UInt8 SVRST               = 0x11;
+    /**领取蓝黄钻之力*/
+    const UInt8 YBBUF               = 0x12;
     /**成就*/
     const UInt8 ACHIEVEMENT         = 0xF0;// 0x0C
     /**阵营选择*/
@@ -517,6 +519,7 @@ namespace REP
     const UInt8 SSAWARD             = 0x0C;
     const UInt8 USESOUL             = 0x0D;
     const UInt8 SVRST               = 0x11;
+    const UInt8 YBBUF               = 0x12;
 
     const UInt8 TRADE_LIST          = 0x80;// 0xC0
     const UInt8 TRADE_DATA          = 0x81;// 0xC1

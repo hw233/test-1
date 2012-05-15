@@ -2853,7 +2853,6 @@ function ItemNormal_00009010(iid, num, bind, param)
     local player = GetPlayer()
     local package = player:GetPackage();
 
-
     local items = {60001,60000,60000,56,502,510,50000,}
     local nums = {10,1000,500,1,1,1,1,}
     local prob = {357,1071,3571,4285,5714,7143,10000,}
@@ -2887,6 +2886,43 @@ function ItemNormal_00009010(iid, num, bind, param)
     end
     package:DelItemSendMsg(iid, player);
     return num;
+end
+
+function ItemNormal_00009017(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+
+    local tp = iid - 9017
+    local tp2off = { -- offset of ElixirAttr in Fighter.h
+        [0] = 0,
+        [1] = 2,
+        [2] = 3,
+        [3] = 4,
+        [4] = 1,
+        [5] = 5,
+    }
+
+    local off = tp2off[tp]
+    if off == nil then
+        return false
+    end
+
+    local point = fgt:getElixirAttrByOffset(off)
+    if point > 150 then
+		player:sendMsgCode(2, 1075, 0);
+        return false 
+    end
+
+    if fgt:addElixirAttrByOffset(off, 1) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    end
+    return false
 end
 
 function ItemNormal_citta(iid, num, bind, param)
@@ -4824,6 +4860,13 @@ local ItemNormal_Table = {
     [9009] = ItemNormal_00009007,
 
     [9010] = ItemNormal_00009010,
+
+    [9017] = ItemNormal_00009017,
+    [9018] = ItemNormal_00009017,
+    [9019] = ItemNormal_00009017,
+    [9020] = ItemNormal_00009017,
+    [9021] = ItemNormal_00009017,
+    [9022] = ItemNormal_00009017,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,

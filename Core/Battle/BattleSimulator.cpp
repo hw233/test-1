@@ -253,6 +253,10 @@ void BattleSimulator::start(UInt8 prevWin)
 			{
 				flag |= BattleFighter::Enh3;
 			}
+            if (_player[i]->getBuffData(PLAYER_BUFF_YBUF, now) > 0)
+                flag |= BattleFighter::Enh4;
+            if (_player[i]->getBuffData(PLAYER_BUFF_BBUF, now) > 0)
+                flag |= BattleFighter::Enh5;
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
