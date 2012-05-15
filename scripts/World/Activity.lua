@@ -227,6 +227,12 @@ function onActivityCheck(tm)
           setGemMergeAct(false)
       end
 
+      if tm >= actTime109 and tm < actTime110 then
+          setNetValentineDay(true)
+      else
+          setNetValentineDay(false)
+      end
+
       setShuoShuo(false);
   else
       if tm >= actTime33 and tm < actTime34 then
@@ -322,6 +328,7 @@ function initActTime(y, m, d)
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -409,6 +416,9 @@ function initActTime(y, m, d)
 
   actTime107 = os.time(SerStartTm103);
   actTime108 = os.time(SerStartTm103) + 8 * 86400;
+
+  actTime109 = os.time(SerStartTm104);
+  actTime110 = os.time(SerStartTm104) + 7 * 86400;
 
   onActivityCheck(os.time() + 30);
 

@@ -1,3 +1,4 @@
+
 #ifndef _VAR_H_
 #define _VAR_H_
 
@@ -33,13 +34,13 @@ namespace GObject
         VAR_BOOT = 8,     // ʥ??ѥ
         VAR_TODAY_ONLINE = 9,     // time -- online today
         VAR_KEYPACK1 = 10,  // KEY????
-        VAR_KEYPACK2,
-        VAR_KEYPACK3,
-        VAR_KEYPACK4,
-        VAR_KEYPACK5,
-        VAR_KEYPACK6,
-        VAR_KEYPACK7,
-        VAR_KEYPACK8,
+        VAR_KEYPACK2 = 11,
+        VAR_KEYPACK3 = 12,
+        VAR_KEYPACK4 = 13,
+        VAR_KEYPACK5 = 14,
+        VAR_KEYPACK6 = 15,
+        VAR_KEYPACK7 = 16,
+        VAR_KEYPACK8 = 17,
        
         VAR_FAIL_ENCH = 20,  // fail to enchat equip
         VAR_SPLIT_EQUIP = 21 , //split equip times
@@ -92,38 +93,37 @@ namespace GObject
         VAR_CBWHITEPACK = 59, //阵营战白色情人节礼包
 
         VAR_ATYITEM_1 = 60, //活跃度星期一奖励
-        VAR_ATYITEM_2,      //活跃度星期二奖励
-        VAR_ATYITEM_3,      //活跃度星期三奖励
-        VAR_ATYITEM_4,      //活跃度星期四奖励
-        VAR_ATYITEM_5,      //活跃度星期五奖励
-        VAR_ATYITEM_6,      //活跃度星期六奖励
-        VAR_ATYITEM_7,      //活跃度星期天奖励
+        VAR_ATYITEM_2 = 61, //活跃度星期二奖励
+        VAR_ATYITEM_3 = 62, //活跃度星期三奖励
+        VAR_ATYITEM_4 = 63, //活跃度星期四奖励
+        VAR_ATYITEM_5 = 64, //活跃度星期五奖励
+        VAR_ATYITEM_6 = 65, //活跃度星期六奖励
+        VAR_ATYITEM_7 = 66, //活跃度星期天奖励
 
         VAR_CLAN_LEAVE_TIME = 67, //退出帮派时间
+        VAR_FIGHTER1_3_6_8 = 68, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
 
         VAR_CFRIEND_1 = 70, //密友等级相应个数 1级
-        VAR_CFRIEND_45,
-        VAR_CFRIEND_60,
+        VAR_CFRIEND_45 = 71,
+        VAR_CFRIEND_60 = 72,
 
         VAR_DISCOUNT_1 = 80, // 3折区购买次数
-        VAR_DISCOUNT_2, // 5折区购买次数
-        VAR_DISCOUNT_3, // 8折区购买次数
-        VAR_CTSLANDING, // 创建角色前七天连续登陆记录
-        VAR_CTSAWARD, // 七天登陆奖励
-        VAR_CLAWARD, // 七天连续登陆奖励
-        VAR_CL3DAY, // 七天连接三天登陆奖励
-        VAR_RC7DAYRECHARGE, // 创建角色后前七天充值总额
-        VAR_RC7DAYWILL, // 所选择的愿望索引
-        VAR_INVITES, // 邀请好友的次数
-        VAR_FIGHTER1_3_6_8 = 90, // 繁体版主将潜力值达到1.3，资质达到6.8活动是否达成
+        VAR_DISCOUNT_2 = 81, // 5折区购买次数
+        VAR_DISCOUNT_3 = 82, // 8折区购买次数
+        VAR_CTSLANDING = 83, // 创建角色前七天连续登陆记录
+        VAR_CTSAWARD = 84, // 七天登陆奖励
+        VAR_CLAWARD = 85, // 七天连续登陆奖励
+        VAR_CL3DAY = 86, // 七天连接三天登陆奖励
+        VAR_RC7DAYRECHARGE = 87, // 创建角色后前七天充值总额
+        VAR_RC7DAYWILL = 88, // 所选择的愿望索引
+        VAR_INVITES = 89, // 邀请好友的次数
         VAR_MDSOUL = 90, // 五一活动灵气值
-        VAR_MDSOUL_CNT1, // 五一活动风雷宝珠使用次数 9000
-        VAR_MDSOUL_CNT2, // 雷之石 497
-        VAR_MDSOUL_CNT3, // 风之石 496
+        VAR_MDSOUL_CNT1 = 91, // 五一活动风雷宝珠使用次数 9000
+        VAR_MDSOUL_CNT2 = 92, // 雷之石 497
+        VAR_MDSOUL_CNT3 = 93, // 风之石 496
         VAR_MDES = 94, // 五月份活动节日套装
         VAR_MDPACKS = 95, // 五月份活动礼包是否发放
-        VAR_RC7DAYTURNON,
-        //VAR_DIAMOND_BLUE = 96,  //蓝钻特权，放在后面
+        VAR_RC7DAYTURNON = 96,
         VAR_DIAMOND_YELLOW = 97,//黄钻特权
         VAR_YBBUF = 98, // 蓝黄钻之力是否领取
         VAR_LDPOINT = 99, // 夺宝积分，整数类型，可正可负，非绑定
@@ -135,6 +135,8 @@ namespace GObject
         VAR_AWARD_SSDT_2 = 104, // 搜搜地图点亮旗帜达成奖励
 
         VAR_DIAMOND_BLUE = 105,  //蓝钻特权
+        VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
+        VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
 
         VAR_MAX,
     };
@@ -249,9 +251,7 @@ namespace GObject
             REGISTER_VAR(VAR_RC7DAYRECHARGE, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYWILL, CYCLE_NONE);
             REGISTER_VAR(VAR_INVITES, CYCLE_DAY);
-#ifdef _FB
             REGISTER_VAR(VAR_FIGHTER1_3_6_8, CYCLE_NONE);
-#else
             REGISTER_VAR(VAR_MDSOUL, CYCLE_NONE);
             REGISTER_VAR(VAR_MDSOUL_CNT1, CYCLE_NONE);
             REGISTER_VAR(VAR_MDSOUL_CNT2, CYCLE_NONE);
@@ -263,9 +263,10 @@ namespace GObject
             REGISTER_VAR(VAR_LDPOINT, CYCLE_NONE);
             REGISTER_VAR(VAR_LDCOUNT, CYCLE_NONE);
             REGISTER_VAR(VAR_LDPOINTB, CYCLE_NONE);
-#endif
             REGISTER_VAR(VAR_DIAMOND_BLUE, CYCLE_DAY);
             REGISTER_VAR(VAR_DIAMOND_YELLOW, CYCLE_DAY);
+            REGISTER_VAR(VAR_NETVDPACK, CYCLE_NONE);
+            REGISTER_VAR(VAR_LASTATHRANK, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
@@ -290,7 +291,7 @@ namespace GObject
     };
 }
 
-
-
-
 #endif
+
+/* vim: set ai si nu sm smd hls is ts=4 sm=4 bs=indent,eol,start */
+

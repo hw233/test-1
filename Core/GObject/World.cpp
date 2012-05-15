@@ -79,6 +79,7 @@ bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
+bool World::_netvalentineday = false;
 bool World::_girlday = false;
 bool World::_whiteloveday = false;
 bool World::_trumpenchret = false;
