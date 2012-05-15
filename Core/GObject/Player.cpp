@@ -1632,6 +1632,12 @@ namespace GObject
         m_pVars->AddVar(id,val);
     }
 
+    void Player::AddVarS(UInt32 id, Int32 val)
+    {
+        Int32 v = GetVarS(id);  
+        m_pVars->SetVar(id,v+val);
+    }
+
     UInt32 Player::GetVarNow(UInt32 id,  UInt32 now)
     {
         return m_pVars->GetVar(id , now);

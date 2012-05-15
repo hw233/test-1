@@ -166,6 +166,7 @@ local copyitem = {
 function luckyDraw(player, id, num)
     local got = {}
 
+    print('luckyDraw, id:' .. id .. 'num:' .. num)
     local needitem = copyitem[id]
     if needitem == nil then
         return got 
@@ -177,10 +178,11 @@ function luckyDraw(player, id, num)
         return got 
     end 
 
+    print('num*1.5: ' .. num*1.5)
     if package:GetRestPackageSize() < num * 1.5 then
         player:sendMsgCode(2, 1011, 0); 
         return got 
-    end 
+    end
 
     local item = items[id]
     if item == nil then
