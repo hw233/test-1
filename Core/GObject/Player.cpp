@@ -1617,6 +1617,11 @@ namespace GObject
         return m_pVars->GetVar(id);
     }
 
+    Int32 Player::GetVarS(Int32 id)
+    {
+        return (Int32)m_pVars->GetVar(id);
+    }
+
     void Player::LoadVar(UInt32 id, UInt32 val, UInt32 overTime)
     {
         m_pVars->LoadVar(id, val, overTime);
