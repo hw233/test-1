@@ -28,7 +28,7 @@ public:
     ~LuckyDraw() {}
 
     void sendInfo(Player* player);
-    void draw(Player* player);
+    void draw(Player* player, UInt8 id, UInt8 num);
 
 private:
     FastMutex _lock;

@@ -169,6 +169,7 @@ GMHandler::GMHandler()
 	Reg(3, "json", &GMHandler::OnJson);
 	Reg(3, "rc7awd", &GMHandler::OnRC7Awd);
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
+	Reg(3, "vars", &GMHandler::OnAddVarS);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2706,5 +2707,10 @@ void GMHandler::OnRC7TurnOn(GObject::Player* player, std::vector<std::string>& a
 {
     player->turnOnRC7Day();
 }
-
+void GMHandler::OnAddVarS(GObject::Player* player, std::vector<std::string>& args)
+{
+    int v = atoi(args[0].c_str());
+    player->AddVarS(VAR_LDPOINT, v);
+	SYSMSG_SENDV(9999, player, player->GetVarS(VAR_LDPOINT));
+}
 

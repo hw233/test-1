@@ -208,8 +208,10 @@ namespace Script
 		CLASS_DEF(Player, sendMailPack);
 		CLASS_DEF(Player, setVipAwardFlag);
         CLASS_DEF(Player, GetVar);
+        CLASS_DEF(Player, GetVarS);
         CLASS_DEF(Player, SetVar);
         CLASS_DEF(Player, AddVar);
+        CLASS_DEF(Player, AddVarS);
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
 		CLASS_DEF(Player, getPlatform);
@@ -321,6 +323,7 @@ namespace Script
 		CLASS_DEF(Package, GetItemUsedGrids);
 		CLASS_DEF(Package, ExistItem);
 		CLASS_DEF(Package, GetItemNum);
+		CLASS_DEF(Package, GetItemAnyNum);
 		CLASS_DEF(Package, GetMaxPackageSize);
 		CLASS_DEF(Package, GetUsedPackageSize);
 		CLASS_DEF(Package, GetRestPackageSize);
@@ -1089,5 +1092,9 @@ namespace Script
     bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
     {
         return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
+    }
+    lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num)
+    {
+        return Call<lua_tinker::table>("luckyDraw", player, id, num);
     }
 }

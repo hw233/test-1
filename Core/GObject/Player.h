@@ -728,10 +728,12 @@ namespace GObject
 		void testBattlePunish();
 
 
-        UInt32 GetVar(UInt32 id );
+        UInt32 GetVar(UInt32 id);
+        Int32 GetVarS(Int32 id);
         void LoadVar(UInt32 id, UInt32 val, UInt32 overTime);
-        void SetVar(UInt32 id, UInt32 val );
-        void AddVar(UInt32 id, UInt32 val );
+        void SetVar(UInt32 id, UInt32 val);
+        void AddVar(UInt32 id, UInt32 val);
+        void AddVarS(UInt32 id, Int32 val);
 
         UInt32 GetVarNow(UInt32 id, UInt32 now);
         void SetVarNow(UInt32 id,  UInt32 val, UInt32 now);
