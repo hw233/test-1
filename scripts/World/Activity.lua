@@ -196,6 +196,12 @@ function onActivityCheck(tm)
       is_4_21 = false
   end
 
+  if tm >= actTime47 and tm < actTime48 then
+      setRechargeActive(true, 4)
+  else
+      setRechargeActive(false, 4)
+  end
+
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -310,6 +316,9 @@ function initActTime(y, m, d)
   -- 游戏大厅特权
   local  SerStartTm21= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 充值返利（5/16-5/27）
+  local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -385,6 +394,9 @@ function initActTime(y, m, d)
 
   actTime45 = os.time(SerStartTm21);
   actTime46 = os.time(SerStartTm21) + 7 * 86400;
+
+  actTime47 = os.time(SerStartTm22);
+  actTime48 = os.time(SerStartTm22) + 11 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
