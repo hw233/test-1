@@ -60,15 +60,15 @@ public:
 	inline float getExtraSoulP() { return _attrExtra.soulP; }
 	inline float getExtraAuraP() { return _attrExtra.auraP; }
 	inline float getExtraAuraMaxP() { return _attrExtra.auraMaxP; }
-	inline UInt16 getExtraAttack() { return _attrExtra.attack; }
+	inline Int32 getExtraAttack() { return _attrExtra.attack; }
 	inline float getExtraAttackP() { return _attrExtra.attackP; }
-	inline UInt16 getExtraMagAttack() { return _attrExtra.magatk; }
+	inline Int32 getExtraMagAttack() { return _attrExtra.magatk; }
 	inline float getExtraMagAttackP() { return _attrExtra.magatkP; }
-	inline UInt16 getExtraDefend() { return _attrExtra.defend; }
+	inline Int32 getExtraDefend() { return _attrExtra.defend; }
 	inline float getExtraDefendP() { return _attrExtra.defendP; }
-	inline UInt16 getExtraMagDefend() { return _attrExtra.magdef; }
+	inline Int32 getExtraMagDefend() { return _attrExtra.magdef; }
 	inline float getExtraMagDefendP() { return _attrExtra.magdefP; }
-	inline UInt16 getExtraHP() { return _attrExtra.hp; }
+	inline Int32 getExtraHP() { return _attrExtra.hp; }
 	inline float getExtraHPP() { return _attrExtra.hpP; }
 	inline float getExtraAction() { return _attrExtra.action; }
 	inline float getExtraActionP() { return _attrExtra.actionP; }
@@ -103,10 +103,10 @@ public:
 	inline Int16 getBaseAura() { return _fighter->getBaseAura(); }
 	inline Int16 getBaseAuraMax() { return _fighter->getBaseAuraMax(); }
 	inline Int16 getBaseTough() { return _fighter->getBaseTough(); }
-	inline Int16 getBaseAttack() {return _fighter->getBaseAttack();}
-	inline Int16 getBaseMagAttack() {return _fighter->getBaseMagAttack();}
-	inline Int16 getBaseDefend() {return _fighter->getBaseDefend();}
-	inline Int16 getBaseMagDefend() {return _fighter->getBaseMagDefend();}
+	inline Int32 getBaseAttack() {return _fighter->getBaseAttack();}
+	inline Int32 getBaseMagAttack() {return _fighter->getBaseMagAttack();}
+	inline Int32 getBaseDefend() {return _fighter->getBaseDefend();}
+	inline Int32 getBaseMagDefend() {return _fighter->getBaseMagDefend();}
 	inline float getBaseHitrate() {return _fighter->getBaseHitrate();}
 	inline float getBaseEvade() {return _fighter->getBaseEvade();}
 	inline float getBaseCritical() {return _fighter->getBaseCritical();}

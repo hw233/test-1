@@ -490,10 +490,10 @@ public:
 	inline Int16 getBaseAuraMax() { return auraMax; }
 	inline Int16 getBaseTough() { return tough; }
 
-	inline Int16 getBaseAttack() { return attack; }
-	inline Int16 getBaseMagAttack() { return magatk; }
-	inline Int16 getBaseDefend() { return defend; }
-	inline Int16 getBaseMagDefend() { return magdef; }
+	inline Int32 getBaseAttack() { return attack; }
+	inline Int32 getBaseMagAttack() { return magatk; }
+	inline Int32 getBaseDefend() { return defend; }
+	inline Int32 getBaseMagDefend() { return magdef; }
 	inline float getBaseHitrate() { return hitrate; }
 
 	inline Int16 getBaseSoul() { return baseSoul; }
