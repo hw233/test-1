@@ -166,12 +166,13 @@ local copyitem = {
 function luckyDraw(player, id, num)
     local got = {}
 
-    print('luckyDraw, id:' .. id .. 'num:' .. num)
+    print('luckyDraw, id:' .. id .. ' num:' .. num)
     local needitem = copyitem[id]
     if needitem == nil then
         return got 
     end 
 
+    print('needitem: ' .. needitem)
     local package = player:GetPackage();
     local ninum = package:GetItemAnyNum(needitem)
     if ninum < num then
