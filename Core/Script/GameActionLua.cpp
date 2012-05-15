@@ -240,6 +240,8 @@ namespace Script
 		CLASS_DEF(Fighter, skillLevelUp);
 		CLASS_DEF(Fighter, addNewCitta);
 		CLASS_DEF(Fighter, changeSecondSoulClass);
+		CLASS_DEF(Fighter, addElixirAttrByOffset);
+		CLASS_DEF(Fighter, getElixirAttrByOffset);
 
 		//????
 		CLASS_ADD(TaskMgr);

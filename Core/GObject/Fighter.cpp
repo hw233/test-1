@@ -3773,5 +3773,71 @@ UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
     return m_2ndSoul->getSoulSkillIdx(skillId);
 }
 
+bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
+{
+#define MAXVAL(x,y) { if (x > y) x = y; }
+#define MV 150
+    bool ret = false;
+    if (off == 0)
+    {
+        _elixirattr.strength += v;
+        MAXVAL(_elixirattr.strength, MV);
+        ret = true;
+    }
+    if (off == 1)
+    {
+        _elixirattr.physique += v;
+        MAXVAL(_elixirattr.physique, MV);
+        ret = true;
+    }
+    if (off == 2)
+    {
+        _elixirattr.agility += v;
+        MAXVAL(_elixirattr.agility, MV);
+        ret = true;
+    }
+    if (off == 3)
+    {
+        _elixirattr.intelligence += v;
+        MAXVAL(_elixirattr.intelligence, MV);
+        ret = true;
+    }
+    if (off == 4)
+    {
+        _elixirattr.will += v;
+        MAXVAL(_elixirattr.will, MV);
+        ret = true;
+    }
+    if (off == 5)
+    {
+        _elixirattr.soul += v;
+        MAXVAL(_elixirattr.soul, MV);
+        ret = true;
+    }
+
+    if (ret)
+        DB1().PushUpdateData("REPLACE INTO `elixir` (`id`, `playerId`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", _id, _owner->getId(), _elixirattr.strength, _elixirattr.physique, _elixirattr.agility, _elixirattr.intelligence, _elixirattr.will, _elixirattr.soul);
+    return ret;
+#undef MV
+#undef MAXVAL
+}
+
+Int32 Fighter::getElixirAttrByOffset(UInt8 off)
+{
+    if (off == 0)
+        return _elixirattr.strength;
+    if (off == 1)
+        return _elixirattr.physique;
+    if (off == 2)
+        return _elixirattr.agility;
+    if (off == 3)
+        return _elixirattr.intelligence;
+    if (off == 4)
+        return _elixirattr.will;
+    if (off == 5)
+        return _elixirattr.soul;
+    return 0;
+}
+
 }
 

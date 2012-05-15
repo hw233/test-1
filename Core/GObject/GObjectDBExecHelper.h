@@ -331,7 +331,7 @@ struct DBBossDamage
 };
 
 // 将可变属性
-struct DBFighterAndSecondSoul
+struct DBFighter2
 {
 	UInt32 id;              // 将编号
 	UInt64 playerId;        // 玩家ID
@@ -370,6 +370,12 @@ struct DBFighterAndSecondSoul
 	UInt8 stateLevel;
 	UInt32 stateExp;
     std::string skills_2nd;
+    Int32 strength;
+    Int32 physique;
+    Int32 agility;
+    Int32 intelligence;
+    Int32 will;
+    Int32 soul;
 };
 
 
@@ -1288,8 +1294,8 @@ SPECIALDEF(4)
 	)
 SPECIALEND()
 
-SPECIALBEGIN(GObject::DBFighterAndSecondSoul)
-SPECIALDEF(37)
+SPECIALBEGIN(GObject::DBFighter2)
+SPECIALDEF(43)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1327,7 +1333,13 @@ SPECIALDEF(37)
 	UInt8, practiceLevel,
 	UInt8, stateLevel,
 	UInt32, stateExp,
-    std::string, skills_2nd
+    std::string, skills_2nd,
+    Int32, strength,
+    Int32, physique,
+    Int32, agility,
+    Int32, intelligence,
+    Int32, will,
+    Int32, soul
 	)
 SPECIALEND()
 

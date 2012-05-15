@@ -54,6 +54,29 @@ struct SoulItemExp
     Int16 exp;
 };
 
+struct ElixirAttr
+{
+    ElixirAttr() : strength(0), physique(0), agility(0), intelligence(0), will(0), soul(0) {}
+
+    ElixirAttr& operator+=(ElixirAttr& attr)
+    {
+        strength += attr.strength;
+        physique += attr.physique;
+        agility += attr.agility;
+        intelligence += attr.intelligence;
+        will += attr.will;
+        soul += attr.soul;
+        return *this;
+    }
+
+    Int32 strength;
+    Int32 physique;
+    Int32 agility;
+    Int32 intelligence;
+    Int32 will;
+    Int32 soul;
+};
+
 class Player;
 class Fighter
 {
@@ -422,7 +445,7 @@ public:
 public:
 	inline Int16 getBaseStrength()
     {
-        return strength;
+        return strength + _elixirattr.strength;
         // XXX: 暂时不启用
         if (_id > 9)
             return strength;
@@ -437,7 +460,7 @@ public:
 
 	inline Int16 getBasePhysique()
     {
-        return physique;
+        return physique + _elixirattr.physique;
         if (_id > 9)
             return physique;
         static const Int16 add[9][9] = {{0}, {0}, {0}, {40, 40, 15, 15, 15, 15}, {90, 90, 30, 30, 35, 35}, {140, 140, 45, 45, 55, 55}};
@@ -446,7 +469,7 @@ public:
 
 	inline Int16 getBaseAgility()
     {
-        return agility;
+        return agility + _elixirattr.agility;
         if (_id > 9)
             return agility;
         static const Int16 add[9][9] = {{0}, {0}, {0}, {15, 15, 40, 40, 15, 15}, {30, 30, 90, 90, 30, 30}, {45, 45, 140, 140, 45, 45}};
@@ -455,14 +478,14 @@ public:
 
 	inline Int16 getBaseIntelligence()
     {
-        return intelligence;
+        return intelligence + _elixirattr.intelligence;
         if (_id > 9)
             return intelligence;
         static const Int16 add[9][9] = {{0}, {0}, {0}, {10, 10, 10, 10, 10, 10}, {25, 25, 25, 25, 25, 25}, {40, 40, 40, 40, 40, 40}};
         return intelligence + add[_color][_class];
     }
 
-	inline Int16 getBaseWill() { return will; }
+	inline Int16 getBaseWill() { return will + _elixirattr.will; }
 	inline Int16 getBaseAura() { return aura; }
 	inline Int16 getBaseAuraMax() { return auraMax; }
 	inline Int16 getBaseTough() { return tough; }
@@ -474,7 +497,7 @@ public:
 	inline float getBaseHitrate() { return hitrate; }
 
 	inline Int16 getBaseSoul() { return baseSoul; }
-    inline Int16 getSoul() { return soul; }
+    inline Int16 getSoul() { return soul + _elixirattr.soul; }
     Int16 getMaxSoul();
     Int16 get2ndSounSoulMax();
 
@@ -656,6 +679,13 @@ public:
     void send2ndSoulInfo();
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
+
+public:
+    inline void setElixirAttr(ElixirAttr& attr) { _elixirattr = attr; }
+    bool addElixirAttrByOffset(UInt8 off, Int32 v);
+    Int32 getElixirAttrByOffset(UInt8 off);
+private:
+    ElixirAttr _elixirattr;
 
 private:
     bool _iswboss;

@@ -383,6 +383,13 @@ void BattleFighter::updateBuffExtras()
 		_attrExtra.intelligenceP += extAttr;
 		_attrExtra.willP += extAttr;
 	}
+    if ((_flag & Enh4) || (_flag & Enh5))
+    {
+        _attrExtra.attack += 50;
+        _attrExtra.magatk += 50;
+        _attrExtra.defend += 100;
+        _attrExtra.magdef += 100;
+    }
 }
 
 float BattleFighter::calcAttack( bool& isCritical, BattleFighter* defender, float* pCf)

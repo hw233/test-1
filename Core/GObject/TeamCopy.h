@@ -92,6 +92,7 @@ class TeamCopyPlayerInfo
         void setAwardRoll(UInt8 copyId);
 
         bool getPass(UInt8 copyId, UInt8 t);
+        bool getPass(UInt8 copyId);
         UInt8 getPassTimes(UInt8 copyId, UInt8 t);
         void setPass(UInt8 copyId, UInt8 t, bool pass, bool notify = false);
         void setPassTimes(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime);
