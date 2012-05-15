@@ -132,6 +132,7 @@ namespace GObject
 
     std::vector<std::vector<YDItem>> GObjectManager::_yellow_diamond_award;
     std::vector<std::vector<YDItem>> GObjectManager::_d3d6_diamond_award;
+    std::vector<std::vector<YDItem>> GObjectManager::_qplus_diamond_award;
     std::vector<YDItem>              GObjectManager::_year_yellow_diamond_award;
     std::vector<UInt32>              GObjectManager::_yellow_diamond_gem;
 
@@ -792,6 +793,27 @@ namespace GObject
                     itemVt.push_back(item);
                 }
                 _d3d6_diamond_award.push_back(itemVt);
+            }
+
+            lua_tinker::table qplusTable = lua_tinker::call<lua_tinker::table>(L, "getQPlusAward");
+            size_t qplus_size = qplusTable.size();
+            for(UInt32 i = 0; i < qplus_size; i ++)
+            {
+                std::vector<YDItem> itemVt;
+                itemVt.clear();
+                lua_tinker::table itemTable = qplusTable.get<lua_tinker::table>(i + 1);
+                size_t itemSize = itemTable.size();
+                for(UInt8 j = 0; j < itemSize; ++j)
+                {
+                    lua_tinker::table tempTable = itemTable.get<lua_tinker::table>(j + 1);
+                    YDItem item = {0};
+
+                    item.itemId = tempTable.get<UInt32>(1);
+                    item.itemNum = tempTable.get<UInt8>(2);
+
+                    itemVt.push_back(item);
+                }
+                _qplus_diamond_award.push_back(itemVt);
             }
 
             lua_tinker::table yydTable = lua_tinker::call<lua_tinker::table>(L, "getYearYellowDiamondAward");

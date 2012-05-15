@@ -125,6 +125,7 @@ namespace GObject
         VAR_RC7DAYTURNON,
         VAR_YBBUF = 98, // 蓝黄钻之力是否领取
 
+        VAR_AWARD_QPLUS = 101, // QPLUS等级奖励
         VAR_MAX,
     };
 
