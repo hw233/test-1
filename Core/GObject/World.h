@@ -187,7 +187,7 @@ public:
 	void setWeekDay(UInt8 wday);
 
 public:
-	static void calWeekDay();
+	static void calWeekDay( World * world );
 
 public:
     static UInt32 _moneyLogged;
@@ -230,6 +230,7 @@ public:
     static bool _bluediamondact;
     static bool _yellowdiamondact;
     static bool _qqgameact;
+    static void* _recalcwd;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -253,6 +254,7 @@ private:
     static void World_Boss_Prepare(void*);
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
+	static void ReCalcWeekDay( World * );
 
 private:
 	void testUpdate();
