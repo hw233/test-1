@@ -41,7 +41,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120406_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120409_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120416_1.sql
-    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120417_1.sql # must be once
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120417_1.sql # must be once reset world boss time
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120423_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120427_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120503_1.sql # must be once -- fb
@@ -49,6 +49,7 @@ function update_object()
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_2.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120509_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120515_1.sql # must be once
     #. clearshiyamen.sh
 }
 

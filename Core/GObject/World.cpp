@@ -79,6 +79,7 @@ bool World::_blueactiveday = false;
 bool World::_rechargeactive = false;
 UInt8 World::_rechargeactiveno = 0;
 bool World::_valentineday = false;
+bool World::_netvalentineday = false;
 bool World::_girlday = false;
 bool World::_whiteloveday = false;
 bool World::_trumpenchret = false;
@@ -99,6 +100,7 @@ bool World::_gemmergeact = false;
 bool World::_bluediamondact = false;
 bool World::_yellowdiamondact = false;
 bool World::_qqgameact = false;
+void* World::_recalcwd = NULL;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -130,6 +132,13 @@ void World::World_Multi_Check( World * world )
 	gTradeCheck.update(now);
 	gSaleMgr.update(now);
 	clanManager.process(now, world->_today);
+}
+
+void World::ReCalcWeekDay( World * world )
+{
+    if(!world)
+        return;
+    calWeekDay(world);
 }
 
 typedef std::multimap<UInt32, Player*> ChopStickSortMap;
@@ -239,13 +248,28 @@ void World::makeActivityInfo(Stream &st)
     active |= _ssdtact?128:0;
     st << active << Stream::eos;
 }
-void World::calWeekDay()
+void World::calWeekDay( World * world )
 {
 	time_t curtime1 = time(NULL) + 30;
 	struct tm *local = localtime(&curtime1);
-	_wday = static_cast<UInt8>(local->tm_wday);
-	if(_wday == 0)
-		_wday = static_cast<UInt8>(7);
+	UInt8 wday = static_cast<UInt8>(local->tm_wday);
+	if(wday == 0)
+		wday = static_cast<UInt8>(7);
+    if(_wday == wday)
+    {
+        if(!_recalcwd)
+            _recalcwd = world->AddTimer(10000, ReCalcWeekDay, world, 10000);
+        return;
+    }
+    else
+    {
+        if(_recalcwd)
+        {
+            world->RemoveTimer(_recalcwd);
+            _recalcwd = NULL;
+        }
+        _wday = wday;
+    }
 	if(_wday == 4)
 		ClanCityBattle::setMaxEnterCount(3 * 2);
 	else
@@ -472,7 +496,7 @@ void World::World_Midnight_Check( World * world )
 	clanManager.reConfigClanBattle();
 	challengeCheck.clear();
 	
-	calWeekDay();
+	calWeekDay(world);
 	Stream st(REP::DAILY_DATA);
 	makeActivityInfo(st);
 	NETWORK()->Broadcast(st);
@@ -537,7 +561,7 @@ bool World::Init()
 	path = cfg.scriptPath + "formula/main.lua";
 	_battleFormula = new Script::BattleFormula(path.c_str());
 
-	calWeekDay();
+	calWeekDay(this);
     UInt32 day = 1;
     UInt32 mon = 1;
     UInt32 year = 2011;

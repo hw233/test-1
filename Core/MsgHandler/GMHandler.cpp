@@ -86,6 +86,7 @@ GMHandler::GMHandler()
 	Reg(3, "wallow", &GMHandler::OnWallow);
 	Reg(3, "setgl", &GMHandler::OnSetGM);
 	Reg(3, "reloadLua", &GMHandler::OnReLoadLua);
+	Reg(3, "reload", &GMHandler::OnReLoadLua);
 	Reg(3, "limitluckydraw", &GMHandler::OnLimitLuckyDraw);
 	Reg(3, "run", &GMHandler::OnRunScript);
 	Reg(3, "reconn", &GMHandler::OnReconn);

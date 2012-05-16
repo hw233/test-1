@@ -91,6 +91,10 @@ public:
     { _valentineday = v; }
     inline static bool getValentineDay()
     { return _valentineday; }
+    inline static void setNetValentineDay(bool v)
+    { _netvalentineday = v; }
+    inline static bool getNetValentineDay()
+    { return _netvalentineday; }
     inline static void setGirlDay(bool v)
     { _girlday = v; }
     inline static bool getGirlDay()
@@ -183,7 +187,7 @@ public:
 	void setWeekDay(UInt8 wday);
 
 public:
-	static void calWeekDay();
+	static void calWeekDay( World * world );
 
 public:
     static UInt32 _moneyLogged;
@@ -205,6 +209,7 @@ public:
     static bool _rechargeactive;
     static UInt8 _rechargeactiveno;
     static bool _valentineday;
+    static bool _netvalentineday;
     static bool _girlday;
     static bool _whiteloveday;
     static bool _trumpenchret;
@@ -225,6 +230,7 @@ public:
     static bool _bluediamondact;
     static bool _yellowdiamondact;
     static bool _qqgameact;
+    static void* _recalcwd;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -248,6 +254,7 @@ private:
     static void World_Boss_Prepare(void*);
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
+	static void ReCalcWeekDay( World * );
 
 private:
 	void testUpdate();
