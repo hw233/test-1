@@ -1805,6 +1805,7 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
         st << player->getCountry();
         st << player->GetClass();
         st << static_cast<UInt8>(player->IsMale()?0:1);
+        st << static_cast<UInt8>(player->getVipLevel());
         st << player->getTael();
         st << player->getGold();
         st << player->getCoupon();
