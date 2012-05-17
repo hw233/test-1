@@ -15,8 +15,8 @@ local checkFlag = {
     [12] = 5, -- AtyClanWar,   //帮派战
     [13] = 24,-- AtyAthletics, //斗剑
 
-    [110] = 1, --AtyShuoShuo, //领取发表说说奖励
-    [111] = 1, --AtyInvited, //领取好友邀请奖励
+    --[110] = 1, --AtyShuoShuo, //领取发表说说奖励
+    --[111] = 1, --AtyInvited, //领取好友邀请奖励
 }
 --增加的活跃度
 local addPoint = {
