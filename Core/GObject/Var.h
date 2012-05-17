@@ -137,6 +137,8 @@ namespace GObject
         VAR_DIAMOND_BLUE = 105,  //蓝钻特权
         VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
         VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
+        VAR_SHUOSHUO = 108, // 今天领取过说说奖励次数
+        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数
 
         VAR_MAX,
     };
@@ -267,6 +269,8 @@ namespace GObject
             REGISTER_VAR(VAR_DIAMOND_YELLOW, CYCLE_DAY);
             REGISTER_VAR(VAR_NETVDPACK, CYCLE_NONE);
             REGISTER_VAR(VAR_LASTATHRANK, CYCLE_NONE);
+            REGISTER_VAR(VAR_SHUOSHUO, CYCLE_DAY);
+            REGISTER_VAR(VAR_INVITED, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

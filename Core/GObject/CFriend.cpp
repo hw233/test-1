@@ -128,6 +128,12 @@ void CFriend::getAward(UInt8 idx)
         m_cf[idx-1] = 2;
         updateToDB();
         updateCFriend(idx-1);
+
+        if (!m_owner->GetVar(VAR_INVITED))
+        {
+            GameAction()->doAty(m_owner, AtyInvited, 0, 0);
+            m_owner->SetVar(VAR_INVITED, 1);
+        }
     }
 }
 

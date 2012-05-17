@@ -69,6 +69,7 @@ enum PurchaseType
     Discount3,
     Discount5,
     Discount8,
+    LuckyDraw,
 };
 
 enum IncomingType

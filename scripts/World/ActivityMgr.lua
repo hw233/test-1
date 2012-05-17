@@ -14,6 +14,9 @@ local checkFlag = {
     [11] = 1,-- AtyCountryWar,//阵营战
     [12] = 5, -- AtyClanWar,   //帮派战
     [13] = 24,-- AtyAthletics, //斗剑
+
+    [110] = 1, --AtyShuoShuo, //领取发表说说奖励
+    [111] = 1, --AtyInvited, //领取好友邀请奖励
 }
 --增加的活跃度
 local addPoint = {
@@ -42,6 +45,8 @@ local addPoint = {
     [107] = 1, --AtyPSpeed,    //修炼加速
     [108] = 1, --AtyGroupCopy, //组队副本
     [109] = 1, --AtyTownDeamon, //锁妖塔
+    [110] = 1, --AtyShuoShuo, //领取发表说说奖励
+    [111] = 1, --AtyInvited, //领取好友邀请奖励
 }
 
 --某个奖励需要的活跃度
