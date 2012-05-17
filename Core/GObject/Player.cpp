@@ -88,7 +88,7 @@ namespace GObject
     UInt8 Player::_yaMenActiveCount = 0;
     UInt8 Player::_shiMenActiveCount = 0;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24};
-	const UInt16 MAX_EXTEND_TIME	= 10;
+	const UInt16 MAX_EXTEND_TIME	= 17;
 	const UInt16 EACH_EXTEND_NUM	= 50;
 	GlobalPlayers globalPlayers;
 	GlobalPlayers newPlayers;
