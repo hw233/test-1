@@ -2708,11 +2708,14 @@ void GMHandler::OnLuckyDraw(GObject::Player* player, std::vector<std::string>& a
 {
     UInt8 id = 1;
     UInt8 num = 1;
+    bool bind = false;
     if (args.size() == 1)
         id = atoi(args[0].c_str());
     if (args.size() == 2)
         num = atoi(args[1].c_str());
+    if (args.size() == 3)
+        bind = atoi(args[2].c_str());
 
-    luckyDraw.draw(player, id, num);
+    luckyDraw.draw(player, id, num, bind);
 }
 

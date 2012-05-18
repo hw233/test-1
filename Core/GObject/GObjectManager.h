@@ -97,6 +97,7 @@ namespace GObject
         static bool LoadDiscount();
         static bool LoadSoulItemChance();
         static bool loadSecondSoul();
+        static bool LoadLuckyLog();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);

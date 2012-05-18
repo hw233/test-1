@@ -956,6 +956,14 @@ namespace GObject
         }
     }
 
+    void Player::guideUdp(UInt8 type, std::string& p1, std::string& p2)
+    {
+        if (type == 0)
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "guide");
+        else if (type == 1)
+            udpLog(p1.c_str(), p2.c_str(), "", "", "", "", "act");
+    }
+
     void Player::moneyLog(int type, int gold, int coupon, int tael, int achievement, int prestige)
     {
         if (!type || type > 2) return;
@@ -2230,6 +2238,7 @@ namespace GObject
         st << fgt->getAttrValue2();
         st << fgt->getAttrType3();
         st << fgt->getAttrValue3();
+        fgt->appendElixirAttr(st);
         st << fgt->getUpCittasMax();
 		if(withequip)
 		{

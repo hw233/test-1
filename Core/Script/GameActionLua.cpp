@@ -1094,8 +1094,8 @@ namespace Script
     {
         return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
     }
-    lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num)
+    lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind)
     {
-        return Call<lua_tinker::table>("luckyDraw", player, id, num);
+        return Call<lua_tinker::table>("luckyDraw", player, id, num, bind);
     }
 }
