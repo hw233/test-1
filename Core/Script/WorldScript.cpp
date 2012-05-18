@@ -94,6 +94,8 @@ void WorldScript::init()
 	def("setMayDay1", GObject::World::setMayDay1);
 	def("getYDMDAct", GObject::World::getYDMDAct);
 	def("setYDMDAct", GObject::World::setYDMDAct);
+	def("getSSDTAct", GObject::World::getSSDTAct);
+	def("setSSDTAct", GObject::World::setSSDTAct);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

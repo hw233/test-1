@@ -235,6 +235,12 @@ function onActivityCheck(tm)
           setYDMDAct(false)
       end
 
+      if tm >= actTime39 and tm < actTime40 then
+          setSSDTAct(true)
+      else
+          setSSDTAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -270,6 +276,8 @@ function initActTime(y, m, d)
   local  SerStartTm16= { ['year'] = 2012, ['month'] = 4, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 搜搜地图 （5/14-5/20）
+  local  SerStartTm18= { ['year'] = 2012, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -333,6 +341,9 @@ function initActTime(y, m, d)
   
   actTime37 = os.time(SerStartTm17);
   actTime38 = os.time(SerStartTm17) + 10 * 86400;
+
+  actTime39 = os.time(SerStartTm18);
+  actTime40 = os.time(SerStartTm18) + 7 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

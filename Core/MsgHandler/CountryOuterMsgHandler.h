@@ -682,6 +682,13 @@ struct YBBuf
     MESSAGE_DEF1(REQ::YBBUF, UInt8, _type);
 };
 
+struct GetAward
+{
+    UInt8 _type;
+    UInt8 _opt;
+    MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
+};
+
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
 {
 	UInt16 bodyLen = hdr.msgHdr.bodyLen;
@@ -1028,6 +1035,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRechargeInfo();
     pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
+    pl->sendSSDTInfo();
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -4332,6 +4340,11 @@ void OnYBBuf( GameMsgHdr& hdr, YBBuf& req )
     player->recvYBBuf(req._type);
 }
 
+void OnGetAward( GameMsgHdr& hdr, GetAward& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->getAward(req._type, req._opt);
+}
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

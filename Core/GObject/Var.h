@@ -127,7 +127,9 @@ namespace GObject
         VAR_LDPOINT = 99, // 夺宝积分，整数类型，可正可负
         VAR_LDCOUNT = 100, // 夺宝次数，触发后清空
 
-        VAR_AWARD_QPLUS = 101, // QPLUS等级奖励
+        VAR_AWARD_QPLUS = 102, // QPLUS等级奖励
+        VAR_AWARD_SSDT_1 = 103, // 搜搜地图点亮旗帜每日奖励
+        VAR_AWARD_SSDT_2 = 104, // 搜搜地图点亮旗帜达成奖励
         VAR_MAX,
     };
 
@@ -143,7 +145,7 @@ namespace GObject
     {
     public:
         VarSystem(UInt64 playerid);
-        ~VarSystem();
+         ~VarSystem();
 
     public:
 
@@ -191,6 +193,9 @@ namespace GObject
             REGISTER_VAR(VAR_YELLOW_THRUMP_NUM, CYCLE_NONE);
             
             REGISTER_VAR(VAR_AWARD_3366, CYCLE_DAY);
+            REGISTER_VAR(VAR_AWARD_QPLUS, CYCLE_DAY);
+            REGISTER_VAR(VAR_AWARD_SSDT_1, CYCLE_DAY);
+            REGISTER_VAR(VAR_AWARD_SSDT_2, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CLANBATTLE_HONOUR, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAN_WEAL, CYCLE_DAY);

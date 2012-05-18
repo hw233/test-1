@@ -1434,6 +1434,10 @@ namespace GObject
         void genAward(Stream& st);
         bool genAward();
 
+        void getAward(UInt8 type, UInt8 opt);
+        void getSSDTAward(UInt8 opt);
+        void sendSSDTInfo();
+
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
         TripodData& runTripodData(TripodData& data, bool = false);

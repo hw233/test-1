@@ -138,6 +138,10 @@ public:
     { _ydmdact = v; }
     inline static bool getYDMDAct()
     { return _ydmdact; }
+    inline static void setSSDTAct(bool v)
+    { _ssdtact = v; }
+    inline static bool getSSDTAct()
+    { return _ssdtact; }
     inline static void setFighter1368(bool v)
     { _fighter1368 = v; }
     inline static bool getFighter1368()
@@ -195,6 +199,7 @@ public:
     static bool _mayday;
     static bool _mayday1;
     static bool _ydmdact;
+    static bool _ssdtact;
     static bool _fighter1368;
     static bool _enchantact;
     static bool _trainfighter;

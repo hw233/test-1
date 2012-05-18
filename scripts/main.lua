@@ -23,4 +23,5 @@ require("World/HeroMemo")
 require("World/ShuoShuo")
 require("World/CFriend")
 require("items/LuckyDraw")
+require("items/Awards")
 

@@ -136,6 +136,7 @@ enum ItemFrom
     FromEquipUpgrade,
     FromClan,
     FromTownDeamon,
+	FromSSDTAward,
 };
 
 enum ItemTo

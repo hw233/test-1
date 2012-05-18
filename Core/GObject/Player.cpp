@@ -8484,6 +8484,66 @@ namespace GObject
         sendTripodInfo();
     }
 
+    void Player::getAward(UInt8 type, UInt8 opt)
+    {
+        switch(type)
+        {
+        case 1:
+            // 搜搜地图
+            getSSDTAward(opt);
+            break;
+        }
+    }
+
+    void Player::getSSDTAward(UInt8 opt)
+    {
+        if(!World::getSSDTAct() || opt > 3)
+            return;
+
+        UInt8 status = GetVar(VAR_AWARD_SSDT_2);
+        // 点亮每日旗帜
+        if(opt == 0)
+        {
+            if(GetVar(VAR_AWARD_SSDT_1))
+                return;
+            if(!GameAction()->RunSSDTAward(this, opt))
+                return;
+
+            ++ status;
+            SetVar(VAR_AWARD_SSDT_1, 1);
+            SetVar(VAR_AWARD_SSDT_2, status);
+        }
+        else
+        {
+            static UInt8 flags[] = {1, 2, 4, 7};
+            if( (1 << opt) & (status >> 4) )
+                return;
+            if(flags[opt] > (status & 0x0F))
+                return;
+            if(!GameAction()->RunSSDTAward(this, opt))
+                return;
+
+            status |= (1 << (opt + 4));
+            SetVar(VAR_AWARD_SSDT_2, status);
+        }
+
+        sendSSDTInfo();
+    }
+
+    void Player::sendSSDTInfo()
+    {
+        if(!World::getSSDTAct())
+            return;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(1);
+        UInt8 status = GetVar(VAR_AWARD_SSDT_2);
+        if(GetVar(VAR_AWARD_SSDT_1))
+            status |= (1 << 4);
+        st << status << Stream::eos;
+        send(st);
+    }
+
     TripodData& Player::runTripodData(TripodData& data, bool init)
     {
         if (&data != &m_td)
