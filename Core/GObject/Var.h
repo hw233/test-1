@@ -124,6 +124,9 @@ namespace GObject
         VAR_MDPACKS = 95, // 五月份活动礼包是否发放
         VAR_RC7DAYTURNON,
 
+        VAR_DIAMOND_BLUE,  //蓝钻特权
+        VAR_DIAMOND_YELLOW,//黄钻特权
+
         VAR_MAX,
     };
 
@@ -245,6 +248,8 @@ namespace GObject
             REGISTER_VAR(VAR_MDPACKS, CYCLE_NONE);
             REGISTER_VAR(VAR_RC7DAYTURNON, CYCLE_NONE);
 #endif
+            REGISTER_VAR(VAR_DIAMOND_BLUE, CYCLE_DAY);
+            REGISTER_VAR(VAR_DIAMOND_YELLOW, CYCLE_DAY);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

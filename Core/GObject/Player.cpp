@@ -2486,6 +2486,12 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
+                if(_playerData.qqvipl >= 1 && _playerData.qqvipl <= 19)
+                {
+                    UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
+                    printf("extraExp(%d)\n", extraExp)
+                    exp += extraExp;
+                }
                 pendExp(exp);
                 ng->getLoots(this, _lastLoot);
             }
@@ -6151,8 +6157,22 @@ namespace GObject
         UInt32 vipLevel = getVipLevel();
         UInt8 freeCnt, goldCnt;
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
-        copy = freeCnt + goldCnt;
-        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel);
+
+        UInt8 qqVip1 = this->getQQVipl();
+        UInt8 currentCnt, totalCnt;
+        if(qqVip1 >= 10 && qqVip1 <= 19) {
+            currentCnt = this->GetVar(VAR_DIAMOND_BLUE);
+            totalCnt = 1;
+        } else if (qqVip1 >= 1 && qqVip1 <= 9) {
+            currentCnt = this->GetVar(VAR_DIAMOND_YELLOW);
+            totalCnt = 1;
+        } else {
+            currentCnt = 0;
+            totalCnt = 0;
+        }
+
+        copy = freeCnt + goldCnt + currentCnt;
+        copyMax = GObject::PlayerCopy::getFreeCount() + GObject::PlayerCopy::getGoldCount(vipLevel) + totalCnt;
 
         UInt32 now = TimeUtil::Now();
         if(now >= _playerData.dungeonEnd)
@@ -7330,14 +7350,20 @@ namespace GObject
             {
                 if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
                 {
+                    count = 1;
+                    if(_playerData.qqvipl >= 1 && _playerData.qqvipl <= 19)
+                    {
+                        printf("diamond user\n");
+                        count *= 2;
+                    }
                     updateNextBookStoreUpdate(curtime);
                 }
                 else
                 {
+                    count = 1;
                     money = GData::moneyNeed[GData::BOOK_LIST].tael;
                 }
 
-                count = 1;
                 // updateNextBookStoreUpdate(curtime);
             }
 
@@ -7614,6 +7640,25 @@ namespace GObject
         }
 #endif
         return 0.0;
+    }
+
+    float Player::getPracticeIncByDiamond()
+    {
+        if(_playerData.qqvipl >= 10 && _playerData.qqvipl <= 19)
+        {
+            printf("blue diamond\n");
+            return 0.1;
+        }
+        else if(_playerData.qqvipl >= 1 && _playerData.qqvipl <=9)
+        {
+            printf("yellow diamond\n");
+            return 0.1;
+        }
+        else
+        {
+            printf("no diamond\n");
+            return 0.0;
+        }
     }
 
     bool Player::accPractice()

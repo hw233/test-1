@@ -18,8 +18,20 @@
 
 namespace GObject
 {
-
+#define PRIVILEGE_COUNT 1
 UInt8 PlayerCopy::_activeCount = 0;
+static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
+
+static UInt8 GetCopyIdBySpots(UInt16 currentSpot)
+{
+    for(UInt8 i = 0; i < sizeof(spots)/sizeof(spots[0]); i++)
+    {
+        if(spots[i] == currentSpot)
+            return (i+1);
+    }
+    return 1;
+}
+
 
 void PlayerCopy::setCopyActiveCount(UInt8 c) { _activeCount = c; }
 
@@ -66,6 +78,7 @@ UInt8 PlayerCopy::getGoldCount(UInt8 vipl)
 
 void PlayerCopy::sendInfo(Player* pl, UInt8 id)
 {
+
     if (!pl || !id)
         return;
 
@@ -84,6 +97,28 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     count <<=4;
     count |= getFreeCount();
     st << count;
+
+    UInt8 qqVip1 = pl->getQQVipl();
+    if(qqVip1 >= 10 && qqVip1 <= 19) {
+        count = pl->GetVar(VAR_DIAMOND_BLUE);
+        count <<= 4;
+        st << count;
+        count = PRIVILEGE_COUNT;
+        count <<= 4;
+        st << count;
+    } else if (qqVip1 >= 1 && qqVip1 <=9) {
+        count = pl->GetVar(VAR_DIAMOND_YELLOW);
+        st << count;
+        count = PRIVILEGE_COUNT;
+        st << count;
+    } else {
+        count = 0;
+        st << count;
+        count = 0;
+        st << count;
+    }
+    st << count;
+
     st << Stream::eos;
     pl->send(st);
 }
@@ -111,11 +146,13 @@ bool copyCheckLevel(Player* pl, UInt8 id)
     if (!pl)
         return false;
 
+    UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+    id = realCopyId;
     if (!id)
         return false;
 
     static UInt8 lvls[] = {30, 45, 60, 70, 80, 90};
-    static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
+    //static UInt16 spots[] = {776, 2067, 5906, 8198, 12818, 10512};
 
     if (id > sizeof(lvls)/sizeof(UInt8))
         return false;
@@ -143,6 +180,28 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
 
     if (!copyCheckLevel(pl, id))
         return 1;
+    //diamond privilege
+    if(id == 0xff)
+    {
+        UInt8 qqVipl;
+        UInt8 currentCnt;
+        qqVipl = pl->getQQVipl();
+        if(qqVipl >= 10 && qqVipl <= 19) {
+            currentCnt = pl->GetVar(VAR_DIAMOND_BLUE);
+            if(currentCnt < PRIVILEGE_COUNT) {
+                pl->AddVar(VAR_DIAMOND_BLUE, 1);
+                return 0;
+            }
+        } else {
+            currentCnt = pl->GetVar(VAR_DIAMOND_YELLOW);
+            if(currentCnt < PRIVILEGE_COUNT) {
+                pl->AddVar(VAR_DIAMOND_YELLOW, 1);
+                return 0;
+            }
+        }
+        SYSMSG_SENDV(2000, pl);
+        return 1;
+    }
 
     if (PLAYER_DATA(pl, copyFreeCnt) < getFreeCount()) {
         ++PLAYER_DATA(pl, copyFreeCnt);
@@ -176,8 +235,8 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
 	FastMutex::ScopedLock lk(_mutex); // XXX: ???
 
-    if (!id)
-        id = 1;
+    //if (!id)
+    //    id = 1;
 
     if (pl->hasFlag(Player::AutoCopy)) {
         pl->sendMsgCode(0, 1414);
@@ -196,6 +255,8 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
     UInt8 lootlvl = 0;
     UInt8 ret = checkCopy(pl, id, lootlvl);
+    UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+    id = realCopyId;
     if (!ret) {
         if (!tcd.floor) {
             tcd.floor = 1;
@@ -467,13 +528,18 @@ void PlayerCopy::getCount(Player* pl, UInt8* free, UInt8* gold, bool lock)
 CopyData& PlayerCopy::getCopyData(Player* pl, UInt64 playerId, UInt8 id, bool update)
 {
     static CopyData nulldata;
+    UInt8 idTmp = id;
+    UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+
+    id = realCopyId;
     CopyData& cd = m_copys[playerId][id];
     if (!cd.floor && update) {
         DB3().PushUpdateData("REPLACE INTO `player_copy`(`playerId`, `id`, `floor`, `spot`) VALUES(%"I64_FMT"u, %u, %u, %u)",
                 playerId, id, cd.floor, cd.spot);
     }
 
-    getCount(pl, NULL, NULL);
+    if(idTmp != 0xff)
+        getCount(pl, NULL, NULL);
     return cd;
 }
 

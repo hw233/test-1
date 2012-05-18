@@ -106,7 +106,7 @@ inline bool IsEquip(UInt8 subClass)
 inline UInt8 getGemLev(UInt32 id)
 {
     UInt8 lev = id%10;
-    if(IsGemId)
+    if(IsGemId(id))
     {
         if(lev == 0)
             return 10;
