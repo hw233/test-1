@@ -3,6 +3,7 @@
 #define _LUCKYDRAW_H_
 
 #include "Common/Mutex.h"
+#include <string>
 
 namespace GObject
 {
@@ -28,7 +29,9 @@ public:
     ~LuckyDraw() {}
 
     void sendInfo(Player* player);
-    void draw(Player* player, UInt8 id, UInt8 num);
+    void draw(Player* player, UInt8 id, UInt8 num, bool = false);
+    void pushLog(const std::string& name, const std::vector<LDItem>& i);
+    void pushLog(const std::string& name, const std::string& its);
 
 private:
     FastMutex _lock;

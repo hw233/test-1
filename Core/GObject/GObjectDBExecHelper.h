@@ -896,6 +896,11 @@ struct DBDiscount
     UInt32 itemid;
     UInt8 discount;
 };
+struct DBLuckyLog
+{
+    std::string name;
+    std::string items;
+};
 struct DBActivityData
 {
     UInt64 playerId;
@@ -2050,6 +2055,14 @@ SPECIALDEF(2)
 (
     UInt32, itemid,
     UInt8, discount
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBLuckyLog)
+SPECIALDEF(2)
+(
+    std::string, name,
+    std::string, items
 )
 SPECIALEND()
 

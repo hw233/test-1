@@ -131,13 +131,6 @@ struct TakeOnlineRewardReq
 	MESSAGE_DEF1(REQ::REWARD, UInt8, _flag);
 };
 
-struct LuckyDrawReq
-{
-	UInt8 _type;
-	UInt8 _times;
-	MESSAGE_DEF2(REQ::LUCKYDRAW, UInt8, _type, UInt8, _times);
-};
-
 struct EnchantReq
 {
 	UInt16 _fighterId;
@@ -682,11 +675,20 @@ struct YBBuf
     MESSAGE_DEF1(REQ::YBBUF, UInt8, _type);
 };
 
+<<<<<<< HEAD
 struct GetAward
 {
     UInt8 _type;
     UInt8 _opt;
     MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
+=======
+struct GuideUdp
+{
+    UInt8 _type;
+    std::string p1;
+    std::string p2;
+    MESSAGE_DEF3(REQ::GUIDEUDP, UInt8, _type, std::string, p1, std::string, p2);
+>>>>>>> 2c7899156becbebcec2fc034b70a56863ff76a06
 };
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)
@@ -1493,11 +1495,29 @@ void OnTakeOnlineRewardReq( GameMsgHdr& hdr, TakeOnlineRewardReq& req)
 	player->sendOnlineReward();
 }
 
-void OnLuckyDrawReq( GameMsgHdr& hdr, LuckyDrawReq& ldr )
+void OnLuckyDrawReq( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	if(!player->hasChecked())
 		return;
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    br >> type;
+
+    if (type == 0)
+    {
+        UInt8 id;
+        UInt8 times;
+        UInt8 bind;
+        br >> id;
+        br >> times;
+        br >> bind;
+        luckyDraw.draw(player, id, times, bind==1?true:false);
+    }
+    else if (type == 1)
+    {
+        luckyDraw.sendInfo(player);
+    }
 }
 
 void OnEnchantReq( GameMsgHdr& hdr, EnchantReq& er )
@@ -4344,6 +4364,12 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
 {
     MSG_QUERY_PLAYER(player);
     player->getAward(req._type, req._opt);
+}
+
+void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->guideUdp(req._type, req.p1, req.p2);
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
