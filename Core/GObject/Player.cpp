@@ -2500,7 +2500,7 @@ namespace GObject
                 if(_playerData.qqvipl >= 1 && _playerData.qqvipl <= 19)
                 {
                     UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
-                    printf("extraExp(%d)\n", extraExp)
+                    printf("extraExp(%d)\n", extraExp);
                     exp += extraExp;
                 }
                 pendExp(exp);
