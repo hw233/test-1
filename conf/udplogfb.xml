@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
 	<udplog_server>
-		<item ip="192.168.100.2" port="8800" />
-		<item ip="192.168.100.2" port="8801" />
+        <item ip="10.211.0.108" port="8800" />
+        <item ip="10.211.0.108" port="8801" />
     </udplog_server>
 	<udplog_server_domain>
     </udplog_server_domain>

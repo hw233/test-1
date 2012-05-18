@@ -2014,6 +2014,8 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
     if (pl1 && pl2)
     {
         pl1->addCFriend(pl2);
+        pl1->tellCFriendLvlUp(pl2->GetLev());
+        pl2->tellCFriendLvlUp(pl1->GetLev());
         ret = 0;
     }
 

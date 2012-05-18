@@ -14,6 +14,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "AthleticsRank.h"
+#include "Script/BattleFormula.h"
 
 namespace GObject
 {
@@ -226,7 +227,12 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     res = true;
                     if (sendflag % 8)
                         sendHp();
+
                     updateLastDB(TimeUtil::Now());
+
+                    nflist[0].fighter->setExtraAttack(0);
+                    nflist[0].fighter->setExtraMagAttack(0);
+                    nflist[0].fighter->setWBoss(false);
                 }
                 else if (newPercent <= 5 && _percent - newPercent >= 5)
                 {
@@ -286,8 +292,14 @@ void WBoss::updateLastDB(UInt32 end)
         return;
 
     UInt32 last = end - m_appearTime;
-    _mgr->setLast(idx, last);
-    DB3().PushUpdateData("REPLACE INTO `wboss` (`idx`, `last`) VALUES (%u, %u)", idx, last);
+    Last l;
+    l.time = last;
+    l.hp = m_lastHP;
+    l.atk = m_lastAtk;
+    l.matk = m_lastMAtk;
+    _mgr->setLast(idx, l);
+    DB3().PushUpdateData("REPLACE INTO `wboss` (`idx`, `last`, `hp`, `atk`, `matk`) VALUES (%u, %u, %u, %d, %d)",
+            idx, last, m_lastHP, m_lastAtk, m_lastMAtk);
 }
 
 void WBoss::getRandList(UInt32 sz, UInt32 num, std::set<UInt32>& ret)
@@ -551,7 +563,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     if (m_final)
     {
-        setLast(_mgr->getLast(bossidx[World::_wday-1][m_idx]));
+        setLast(_mgr->getLastTime(bossidx[World::_wday-1][m_idx]));
         setAppearTime(TimeUtil::Now());
         _mgr->fixBossName(npcid, nflist[0].fighter, m_idx);
     }
@@ -563,26 +575,35 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     if (!sz) return;
     _hp.resize(sz);
 
-    UInt32 ohp = nflist[0].fighter->getMaxHP();
+    UInt32 ohp = 0;
+    if (m_final)
+        ohp = _mgr->getLastHP(bossidx[World::_wday-1][m_idx]);
+    if (!ohp)
+        ohp = nflist[0].fighter->getMaxHP();
     _hp[0] = ohp;
 
+    Int32 extatk = 0;
+    Int32 extmagatk = 0;
+    Int32 atk = 0;
+    Int32 matk = 0;
     if (m_final && nflist[0].fighter && !m_extra && m_last)
     {
         UInt32 exthp = 0;
-        Int32 extatk = 0;
-        Int32 extmagatk = 0;
 
-        Int32 atk = nflist[0].fighter->getBaseAttack() * (1 + nflist[0].fighter->getExtraAttackP()) + nflist[0].fighter->getExtraAttack();
-        Int32 matk = nflist[0].fighter->getBaseMagAttack() * (1 + nflist[0].fighter->getExtraMagAttackP()) + nflist[0].fighter->getExtraMagAttack();
+        atk = _mgr->getLastAtk(bossidx[World::_wday-1][m_idx]);
+        matk = _mgr->getLastMAtk(bossidx[World::_wday-1][m_idx]);
+
+        Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(nflist[0].fighter);
+        Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(nflist[0].fighter);
 
         if (m_last <= WBOSS_BASE_TIME)
         {
-            exthp = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_HP_FACTOR * ohp;
+            exthp = (1.f - m_last/(float)WBOSS_BASE_TIME) * WBOSS_HP_FACTOR * ohp;
             ohp += exthp;
         }
         else
         {
-            exthp = ((float)m_last/WBOSS_BASE_TIME - (float)1) * WBOSS_HP_FACTOR * ohp;
+            exthp = (m_last/(float)WBOSS_BASE_TIME - 1.f) * WBOSS_HP_FACTOR * ohp;
             if (ohp >= exthp)
                 ohp -= exthp;
             if (ohp < 20000000)
@@ -594,12 +615,13 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
         setHP(ohp);
         nflist[0].fighter->setBaseHP(ohp);
+        nflist[0].fighter->setWBoss(true);
 
-        extatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * atk;
-        nflist[0].fighter->addExtraAttack(extatk);
+        extatk = (1.f - WBOSS_BASE_TIME/(float)m_last) * WBOSS_ATK_FACTOR * (atk + baseatk);
+        nflist[0].fighter->setExtraAttack(extatk + atk);
 
-        extmagatk = (WBOSS_BASE_TIME/(float)m_last - (float)1) * WBOSS_ATK_FACTOR * matk;
-        nflist[0].fighter->addExtraMagAttack(extmagatk);
+        extmagatk = (1.f - WBOSS_BASE_TIME/(float)m_last) * WBOSS_ATK_FACTOR * (matk + basematk);
+        nflist[0].fighter->setExtraMagAttack(extmagatk + matk);
 
         TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
                 nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
@@ -614,6 +636,10 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
 
     if (m_final)
     {
+        m_lastHP = ohp;
+        m_lastAtk = extatk + atk;
+        m_lastMAtk = extmagatk + matk;
+
         UInt8 level = WBOSS_BASE_LVL + _hp[0]/1500000;
         nflist[0].fighter->setLevel(level);
         nflist[0].fighter->setColor(getColor(_mgr->getLevel()));

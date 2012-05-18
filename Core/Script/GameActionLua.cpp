@@ -91,6 +91,8 @@ namespace Script
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getCarnival", GObject::World::getCarnival);
 		lua_tinker::def(_L, "getFighter1368", GObject::World::getFighter1368);
+		lua_tinker::def(_L, "getEnchantAct", GObject::World::getEnchantAct);
+		lua_tinker::def(_L, "getTrainFighter", GObject::World::getTrainFighter);
 		lua_tinker::def(_L, "getRC7Day", GObject::World::getRC7Day);
 		lua_tinker::def(_L, "getShuoShuo", GObject::World::getShuoShuo);
 		lua_tinker::def(_L, "getCFriend", GObject::World::getCFriend);
@@ -103,6 +105,7 @@ namespace Script
 		lua_tinker::def(_L, "getRandPEquip",	GObject::getRandPEquip);
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
+		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -206,8 +209,10 @@ namespace Script
 		CLASS_DEF(Player, sendMailPack);
 		CLASS_DEF(Player, setVipAwardFlag);
         CLASS_DEF(Player, GetVar);
+        CLASS_DEF(Player, GetVarS);
         CLASS_DEF(Player, SetVar);
         CLASS_DEF(Player, AddVar);
+        CLASS_DEF(Player, AddVarS);
 		CLASS_DEF(Player, getAttainment);
 		CLASS_DEF(Player, isOffical);
 		CLASS_DEF(Player, getPlatform);
@@ -238,6 +243,8 @@ namespace Script
 		CLASS_DEF(Fighter, skillLevelUp);
 		CLASS_DEF(Fighter, addNewCitta);
 		CLASS_DEF(Fighter, changeSecondSoulClass);
+		CLASS_DEF(Fighter, addElixirAttrByOffset);
+		CLASS_DEF(Fighter, getElixirAttrByOffset);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -317,6 +324,7 @@ namespace Script
 		CLASS_DEF(Package, GetItemUsedGrids);
 		CLASS_DEF(Package, ExistItem);
 		CLASS_DEF(Package, GetItemNum);
+		CLASS_DEF(Package, GetItemAnyNum);
 		CLASS_DEF(Package, GetMaxPackageSize);
 		CLASS_DEF(Package, GetUsedPackageSize);
 		CLASS_DEF(Package, GetRestPackageSize);
@@ -902,6 +910,16 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level )
+	{
+		Call<void>("onEnchantAct", player, level);
+	}
+
+	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
+	{
+		Call<void>("onTrainFighterAct", player, fgt);
+	}
+
 	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )
 	{
 		Call<void>("onCopyFloorWin", player, id, floor, spot, lootlvl);
@@ -1075,5 +1093,9 @@ namespace Script
     bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
     {
         return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
+    }
+    lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num)
+    {
+        return Call<lua_tinker::table>("luckyDraw", player, id, num);
     }
 }

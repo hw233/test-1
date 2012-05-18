@@ -54,6 +54,29 @@ struct SoulItemExp
     Int16 exp;
 };
 
+struct ElixirAttr
+{
+    ElixirAttr() : strength(0), physique(0), agility(0), intelligence(0), will(0), soul(0) {}
+
+    ElixirAttr& operator+=(ElixirAttr& attr)
+    {
+        strength += attr.strength;
+        physique += attr.physique;
+        agility += attr.agility;
+        intelligence += attr.intelligence;
+        will += attr.will;
+        soul += attr.soul;
+        return *this;
+    }
+
+    Int32 strength;
+    Int32 physique;
+    Int32 agility;
+    Int32 intelligence;
+    Int32 will;
+    Int32 soul;
+};
+
 class Player;
 class Fighter
 {
@@ -88,6 +111,8 @@ public:
 	inline bool isBoy() {return _sex == 2;}
     inline UInt8 getSex() {return _sex;}
 	inline bool isNpc() { return _id > GREAT_FIGHTER_MAX; }
+    inline bool isWBoss() { return _iswboss; }
+    inline void setWBoss(bool v) { _iswboss = v; }
 	inline UInt8 getLevel() {return _level;}
 	inline UInt64 getExp() {return _exp;}
 	inline UInt32 getPExp() {return _pexp;}
@@ -384,18 +409,15 @@ public:
 	inline float getExtraSoulP() { checkDirty(); return _attrExtraEquip.soulP; }
 	inline float getExtraAuraP() { checkDirty(); return _attrExtraEquip.auraP; }
 	inline float getExtraAuraMaxP() { checkDirty(); return _attrExtraEquip.auraMaxP; }
-    inline void addExtraAttack(UInt16 atk) { setDirty(true); _attrExtraEquip.attack += atk; }
-	inline UInt16 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
+	inline Int32 getExtraAttack() { checkDirty(); return _attrExtraEquip.attack; }
 	inline float getExtraAttackP() { checkDirty(); return _attrExtraEquip.attackP; }
-	inline void addExtraMagAttack(UInt16 atk) { setDirty(true); _attrExtraEquip.magatk += atk; }
-	inline UInt16 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }
+	inline Int32 getExtraMagAttack() { checkDirty(); return _attrExtraEquip.magatk; }
 	inline float getExtraMagAttackP() { checkDirty(); return _attrExtraEquip.magatkP; }
-	inline UInt16 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
+	inline Int32 getExtraDefend() { checkDirty(); return _attrExtraEquip.defend; }
 	inline float getExtraDefendP() { checkDirty(); return _attrExtraEquip.defendP; }
-	inline UInt16 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.magdef; }
+	inline Int32 getExtraMagDefend() { checkDirty(); return _attrExtraEquip.magdef; }
 	inline float getExtraMagDefendP() { checkDirty(); return _attrExtraEquip.magdefP; }
-	inline void addExtraHP(UInt32 hp) { setDirty(true); _attrExtraEquip.hp += hp; }
-	inline UInt16 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
+	inline UInt32 getExtraHP() { checkDirty(); return _attrExtraEquip.hp; }
 	inline float getExtraHPP() { checkDirty(); return _attrExtraEquip.hpP; }
 	inline float getExtraAction() { checkDirty(); return _attrExtraEquip.action; }
 	inline float getExtraActionP() { checkDirty(); return _attrExtraEquip.actionP; }
@@ -416,9 +438,14 @@ public:
     inline float getExtraToughLevel() { checkBPDirty(); return _attrExtraEquip.toughlvl; }
     inline float getExtraMagResLevel() { checkBPDirty(); return _attrExtraEquip.mreslvl; }
 
+public:
+    inline void setExtraAttack(Int32 atk) { setDirty(true); _wbextatk = atk; }
+	inline void setExtraMagAttack(Int32 atk) { setDirty(true); _wbextmagatk = atk; }
+
+public:
 	inline Int16 getBaseStrength()
     {
-        return strength;
+        return strength + _elixirattr.strength;
         // XXX: 暂时不启用
         if (_id > 9)
             return strength;
@@ -433,7 +460,7 @@ public:
 
 	inline Int16 getBasePhysique()
     {
-        return physique;
+        return physique + _elixirattr.physique;
         if (_id > 9)
             return physique;
         static const Int16 add[9][9] = {{0}, {0}, {0}, {40, 40, 15, 15, 15, 15}, {90, 90, 30, 30, 35, 35}, {140, 140, 45, 45, 55, 55}};
@@ -442,7 +469,7 @@ public:
 
 	inline Int16 getBaseAgility()
     {
-        return agility;
+        return agility + _elixirattr.agility;
         if (_id > 9)
             return agility;
         static const Int16 add[9][9] = {{0}, {0}, {0}, {15, 15, 40, 40, 15, 15}, {30, 30, 90, 90, 30, 30}, {45, 45, 140, 140, 45, 45}};
@@ -451,26 +478,26 @@ public:
 
 	inline Int16 getBaseIntelligence()
     {
-        return intelligence;
+        return intelligence + _elixirattr.intelligence;
         if (_id > 9)
             return intelligence;
         static const Int16 add[9][9] = {{0}, {0}, {0}, {10, 10, 10, 10, 10, 10}, {25, 25, 25, 25, 25, 25}, {40, 40, 40, 40, 40, 40}};
         return intelligence + add[_color][_class];
     }
 
-	inline Int16 getBaseWill() { return will; }
+	inline Int16 getBaseWill() { return will + _elixirattr.will; }
 	inline Int16 getBaseAura() { return aura; }
 	inline Int16 getBaseAuraMax() { return auraMax; }
 	inline Int16 getBaseTough() { return tough; }
 
-	inline Int16 getBaseAttack() { return attack; }
-	inline Int16 getBaseMagAttack() { return magatk; }
-	inline Int16 getBaseDefend() { return defend; }
-	inline Int16 getBaseMagDefend() { return magdef; }
+	inline Int32 getBaseAttack() { return attack; }
+	inline Int32 getBaseMagAttack() { return magatk; }
+	inline Int32 getBaseDefend() { return defend; }
+	inline Int32 getBaseMagDefend() { return magdef; }
 	inline float getBaseHitrate() { return hitrate; }
 
 	inline Int16 getBaseSoul() { return baseSoul; }
-    inline Int16 getSoul() { return soul; }
+    inline Int16 getSoul() { return soul + _elixirattr.soul; }
     Int16 getMaxSoul();
     Int16 get2ndSounSoulMax();
 
@@ -653,6 +680,19 @@ public:
     void send2ndSoulInfo();
 
     UInt8 getSoulSkillIdx(UInt16 itemId);
+
+public:
+    inline void setElixirAttr(ElixirAttr& attr) { _elixirattr = attr; }
+    bool addElixirAttrByOffset(UInt8 off, Int32 v);
+    Int32 getElixirAttrByOffset(UInt8 off);
+private:
+    ElixirAttr _elixirattr;
+
+private:
+    bool _iswboss;
+    Int32 _wbextatk;
+    Int32 _wbextmagatk;
+
 public:
 	UInt32 favor;
 	UInt32 reqFriendliness;

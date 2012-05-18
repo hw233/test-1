@@ -1070,6 +1070,11 @@ bool TeamCopyPlayerInfo::getPass(UInt8 copyId, UInt8 t)
     return m_pass[t][copyIdx];
 }
 
+bool TeamCopyPlayerInfo::getPass(UInt8 copyId)
+{
+    return getPass(copyId, 0);
+}
+
 UInt8 TeamCopyPlayerInfo::getPassTimes(UInt8 copyId, UInt8 t)
 {
     UInt8 copyIdx = copyId - 1;
@@ -1199,6 +1204,10 @@ void TeamCopyPlayerInfo::checkCopyPass(UInt32 taskId)
     case 157:
         if(getPass(4, 0) == false)
             setPass(4, 0, true);
+        break;
+    case 176:
+        if(getPass(5, 0) == false)
+            setPass(5, 0, true);
         break;
     }
 }

@@ -228,10 +228,10 @@ struct DBFighter
     Int16 aura;                 // 灵气/士气
     Int16 auraMax;              // 最大灵气/士气
     Int16 tough;                // 坚韧
-    Int16 attack;               // 物理攻击
-    Int16 magatk;               // 法术攻击
-    Int16 defend;               // 物理防御
-    Int16 magdef;               // 法术防御
+    Int32 attack;               // 物理攻击
+    Int32 magatk;               // 法术攻击
+    Int32 defend;               // 物理防御
+    Int32 magdef;               // 法术防御
     Int32 hp;                   // 最大血槽*
     UInt16 action;              // 身法/行动值
     UInt16 talent;              // 天赋
@@ -331,7 +331,7 @@ struct DBBossDamage
 };
 
 // 将可变属性
-struct DBFighterAndSecondSoul
+struct DBFighter2
 {
 	UInt32 id;              // 将编号
 	UInt64 playerId;        // 玩家ID
@@ -370,6 +370,12 @@ struct DBFighterAndSecondSoul
 	UInt8 stateLevel;
 	UInt32 stateExp;
     std::string skills_2nd;
+    Int32 strength;
+    Int32 physique;
+    Int32 agility;
+    Int32 intelligence;
+    Int32 will;
+    Int32 soul;
 };
 
 
@@ -881,6 +887,9 @@ struct DBWBoss
 {
     UInt8 idx;
     UInt32 last;
+    UInt32 hp;
+    Int32 atk;
+    Int32 matk;
 };
 struct DBDiscount
 {
@@ -1164,10 +1173,10 @@ SPECIALDEF(33)
 	Int16, aura,
 	Int16, auraMax,
 	Int16, tough,
-	Int16, attack,
-	Int16, magatk,
-	Int16, defend,
-	Int16, magdef,
+	Int32, attack,
+	Int32, magatk,
+	Int32, defend,
+	Int32, magdef,
 	Int32, hp,
 	UInt16, action,
 	UInt16, talent,
@@ -1285,8 +1294,8 @@ SPECIALDEF(4)
 	)
 SPECIALEND()
 
-SPECIALBEGIN(GObject::DBFighterAndSecondSoul)
-SPECIALDEF(37)
+SPECIALBEGIN(GObject::DBFighter2)
+SPECIALDEF(43)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1324,7 +1333,13 @@ SPECIALDEF(37)
 	UInt8, practiceLevel,
 	UInt8, stateLevel,
 	UInt32, stateExp,
-    std::string, skills_2nd
+    std::string, skills_2nd,
+    Int32, strength,
+    Int32, physique,
+    Int32, agility,
+    Int32, intelligence,
+    Int32, will,
+    Int32, soul
 	)
 SPECIALEND()
 
@@ -2020,10 +2035,13 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBWBoss)
-SPECIALDEF(2)
+SPECIALDEF(5)
 (
     UInt8, idx,
-    UInt32, last
+    UInt32, last,
+    UInt32, hp,
+    Int32, atk,
+    Int32, matk
 )
 SPECIALEND()
 

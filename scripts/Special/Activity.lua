@@ -227,78 +227,23 @@ function onExchange(player)
 end
 
 function onMergeGem(player, lev, num)
-	local stage = getActivityStage();
-	local playerLev = player:GetLev();
-	local orangeFavor = {5820, 5821, 5822, 5823, 5824};
-	local dietyFavor = {5825, 5826, 5827, 5828};
-	if stage >= 1 and stage <= 3 then
-		if lev == 6 then
-			sendRewardMail(player, '合成6级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..num..'个三级洗炼符，赶紧领取吧！', 8916, 1 * num);
-		elseif lev == 7 then
-			local table_items = {8916, 1 * num, 1};			
-			if playerLev >= 85 then
-				for i = 1, num do 
-					table.insert(table_items, dietyFavor[math.random(1, 4)]);
-					table.insert(table_items, 1);
-					table.insert(table_items, 0);
-				end
-			else
-				for i = 1, num do 
-					table.insert(table_items, orangeFavor[math.random(1, 5)]);
-					table.insert(table_items, 1);
-					table.insert(table_items, 0);
-				end
-			end
-			-- sendItemPackageMail(player, '合成7级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..num..'个喜好品、'..num..'个三级洗炼符，赶紧领取吧！', table_items);
-		elseif lev == 8 then
-			local table_items = {9000, 1 * num, 1};
-			if playerLev >= 85 then
-				for i = 1, num do 
-					table.insert(table_items, dietyFavor[math.random(1, 4)]);
-					table.insert(table_items, 2);
-					table.insert(table_items, 0);
-				end
-			else
-				for i = 1, num do 
-					table.insert(table_items, orangeFavor[math.random(1, 5)]);
-					table.insert(table_items, 2);
-					table.insert(table_items, 0);
-				end
-			end
-			-- sendItemPackageMail(player, '合成8级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(2 * num)..'个喜好品、'..num..'个潜力保护符，赶紧领取吧！', table_items);
-		elseif lev == 9 then
-			local table_items = {9000, 2 * num, 1};
-			if playerLev >= 85 then
-				for i = 1, num do 
-					table.insert(table_items, dietyFavor[math.random(1, 4)]);
-					table.insert(table_items, 3);
-					table.insert(table_items, 0);
-				end
-			else
-				for i = 1, num do 
-					table.insert(table_items, orangeFavor[math.random(1, 5)]);
-					table.insert(table_items, 3);
-					table.insert(table_items, 0);
-				end
-			end
-			-- sendItemPackageMail(player, '合成9级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(3 * num)..'个喜好品、'..(2 * num)..'个潜力保护符，赶紧领取吧！', table_items);
-		elseif lev == 10 then
-			local table_items = {9000, 3 * num, 1};
-			if playerLev >= 85 then
-				for i = 1, num do 
-					table.insert(table_items, dietyFavor[math.random(1, 4)]);
-					table.insert(table_items, 4);
-					table.insert(table_items, 0);
-				end
-			else
-				for i = 1, num do 
-					table.insert(table_items, orangeFavor[math.random(1, 5)]);
-					table.insert(table_items, 4);
-					table.insert(table_items, 0);
-				end
-			end
-			-- sendItemPackageMail(player, '合成10级宝石奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你'..(4 * num)..'个喜好品、'..(3 * num)..'个潜力保护符，赶紧领取吧！', table_items);
-		end
+    if getGemMergeAct() then
+        local items = {
+            [6] = {507,1,1, 503,1,1},
+            [7] = {30,1,1, 509,2,1},
+            [8] = {30,4,1, 1504,1,1},
+            [9] = {30,20,1, 1509,1,1},
+            [10] = {30,50,1, 1627,1,1},
+        }
+
+        local item = items[lev]
+        if item == nil then
+            return
+        end
+
+        for n = 1, num do
+            sendItemPackageMail(player, "合成宝石活动奖励", "合成宝石活动奖励", item);
+        end
 	end
 end
 
@@ -1251,5 +1196,19 @@ function onTurnOnRC7Day(player, total, offset)
     end
 
     return true
+end
+
+function onEnchantAct(player, level)
+    local items = {
+        [4] = {502,1,1},
+        [6] = {509,2,1},
+        [8] = {509,5,1, 1509,1,1},
+    };
+    sendItemPackageMail(player, "装备强化返利活动", "装备强化返利活动", items[level]);
+end
+
+function onTrainFighterAct(player, fgt)
+    local table_items = {0xA000, 1200, 1};
+    sendItemPackageMail(player, '散仙洗橙返利活动', '散仙洗橙返利活动', table_items)
 end
 
