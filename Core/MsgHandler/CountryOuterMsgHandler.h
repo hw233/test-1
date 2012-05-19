@@ -1029,6 +1029,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendRechargeInfo();
     pl->sendRC7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
+    pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();

@@ -9437,10 +9437,14 @@ namespace GObject
             SetVar(VAR_YBBUF, ybbuf);
         }
 
-        // TODO:
-        //Stream st(0);
-        //st << Stream::eos;
-        //send(st);
+        sendYBBufInfo(ybbuf);
+    }
+
+    void Player::sendYBBufInfo(UInt32 ybbuf)
+    {
+        Stream st(REP::YBBUF);
+        st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        send(st);
     }
 
     bool Player::isCopyPassed(UInt8 copyid)

@@ -38,8 +38,12 @@ void LuckyDraw::sendInfo(Player* player)
     st << sz;
     for (std::list<LDLog>::iterator i = _logs.begin(), e = _logs.end(); i != e; ++i)
     {
-        st << (*i).name;
+        Player* pl = globalNamedPlayers[(*i).name]; // fixName?
+        if (!pl)
+            continue;
 
+        st << (*i).name;
+        st << pl->getCountry();
         UInt16 s = (*i).items.size();
         st << s;
         for (UInt8 j = 0; j < s; ++j)
@@ -69,7 +73,6 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
     if (size)
     {
         std::vector<LDItem> its;
-        st << static_cast<UInt8>(size);
         for (int i = 1; i <= size; ++i)
         {
             lua_tinker::table item = items.get<lua_tinker::table>(i);
@@ -77,15 +80,33 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
             {
                 UInt16 itemid = item.get<UInt16>(1);
                 UInt8 num = item.get<UInt16>(2);
-                st << itemid;
-                st << num;
 
                 LDItem i;
                 i.itemid = itemid;
                 i.num = num;
-                its.push_back(i);
+                bool merged = false;
+                for (std::vector<LDItem>::iterator it = its.begin(), end = its.end(); it != end; ++it)
+                {
+                    if ((*it).itemid == itemid)
+                    {
+                        (*it).num += num;
+                        merged = true;
+                        break;
+                    }
+                }
+                if (!merged)
+                    its.push_back(i);
             }
         }
+
+        UInt8 sz = its.size();
+        st << static_cast<UInt8>(sz);
+        for (UInt8 i = 0; i < sz; ++i)
+        {
+            st << its[i].itemid;
+            st << its[i].num;
+        }
+
         pushLog(player->getName(), its);
     }
     else
@@ -113,6 +134,8 @@ void LuckyDraw::pushLog(const std::string& name, const std::vector<LDItem>& i)
         its += Itoa(i[j].itemid);
         its += ",";
         its += Itoa(i[j].num);
+        if (j != sz - 1)
+            its += ",";
     }
 
     if (name.empty() || its.empty())
@@ -129,7 +152,7 @@ void LuckyDraw::pushLog(const std::string& name, const std::string& its)
     UInt32 sz = items.count();
     if (!sz)
         return;
-    for (UInt32 i = 0; i < sz; ++i)
+    for (UInt32 i = 0; i < sz; i+=2)
     {
         LDItem it;
         it.itemid = atoi(items[i].c_str());

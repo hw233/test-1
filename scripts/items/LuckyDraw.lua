@@ -1313,7 +1313,7 @@ function luckyDraw(player, id, num, bind)
 
     local item = items[id]
     if item == nil then
-        return got 
+        return got
     end 
 
     local money = 0
@@ -1324,7 +1324,7 @@ function luckyDraw(player, id, num, bind)
             break
         end
 
-        local x = math.random(1,10000)
+        local x = math.random(1,100000)
         local sz = #item
         for i = 1,sz do
             if x <= item[i][1] then
