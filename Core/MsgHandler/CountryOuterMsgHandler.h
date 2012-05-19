@@ -675,20 +675,19 @@ struct YBBuf
     MESSAGE_DEF1(REQ::YBBUF, UInt8, _type);
 };
 
-<<<<<<< HEAD
 struct GetAward
 {
     UInt8 _type;
     UInt8 _opt;
     MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
-=======
+};
+
 struct GuideUdp
 {
     UInt8 _type;
     std::string p1;
     std::string p2;
     MESSAGE_DEF3(REQ::GUIDEUDP, UInt8, _type, std::string, p1, std::string, p2);
->>>>>>> 2c7899156becbebcec2fc034b70a56863ff76a06
 };
 
 void OnSellItemReq( GameMsgHdr& hdr, const void * buffer)

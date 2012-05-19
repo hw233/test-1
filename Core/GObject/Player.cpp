@@ -7927,7 +7927,7 @@ namespace GObject
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
 
-            if (blue)
+            if (blue || qplus)
             {
                 flag = 8*(_playerData.qqvipl1 / 10);
                 qqvipl = _playerData.qqvipl1 % 10;
@@ -8023,13 +8023,11 @@ namespace GObject
         else if (domain == 4 && _playerData.qqvipl >= 30 && d3d6/*qplus*/ == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
-            if (!qqvipl)
-                return 0;
 
             UInt32 award = GetVar(VAR_AWARD_QPLUS);
             if (!award)
             {
-                std::vector<YDItem>& ydItem = GObjectManager::getQPlusItem(qqvipl - 1);
+                std::vector<YDItem>& ydItem = GObjectManager::getQPlusItem(qqvipl);
                 UInt8 itemCnt = ydItem.size();
                 if(GetPackage()->GetRestPackageSize() > ydItem.size() - 1)
                 {
