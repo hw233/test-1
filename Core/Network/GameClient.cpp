@@ -242,6 +242,8 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 	{
 		if(pl == NULL)
 		{
+#ifdef _FB
+#else
             if(cmd == SPEQ::JASON)
             {
                 Stream st(SPEP::JASON);
@@ -249,6 +251,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
                 send(&st[0], st.size());
             }
             else
+#endif
             {
                 LoginMsgHdr hdr( cmd, WORKER_THREAD_LOGIN, m_PlayerId, id(), len );
                 GLOBAL().PushMsg( hdr,  buf );
