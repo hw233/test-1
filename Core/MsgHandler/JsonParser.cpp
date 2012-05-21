@@ -6,6 +6,7 @@
 #include "JsonParser.h"
 #include "GObject/Player.h"
 #include "MsgID.h"
+#include "Common/BinaryReader.h"
 
 extern "C" {
 #include "bits.h"
@@ -266,5 +267,101 @@ _error1:
 
     return;
 }
+
+void jsonParser2(void * buf, int len, Stream& st)
+{
+	BinaryReader br(buf, len);
+    //CHKKEY();
+    UInt8 hash[64] = {0};
+    if (!br.read(hash, 36))
+        return;
+
+    std::string json;
+    br >> json;
+
+    //TRACE_LOG("JSON RECV: %s\n", json.c_str());
+#ifdef _DEBUG
+    //fprintf(stderr, "JSON RECV: %s\n", json.c_str());
+#endif
+    int ret = EUNKNOW;
+    std::string err;
+
+    JsonHead head = {0,};
+    struct json_object* obj = NULL;
+    struct json_object* body = NULL;
+
+    struct json_object* retobj = NULL;
+    struct json_object* rethead = NULL;
+    struct json_object* retbody = NULL;
+
+    retobj = json_object_new_object();
+    if (!retobj)
+        goto _error1;
+
+    rethead = json_object_new_object();
+    if (!rethead)
+        goto _error1;
+
+    retbody = json_object_new_object();
+    if (!retbody)
+        goto _error1;
+
+    obj = json_tokener_parse(json.c_str());
+    if (!parseHead(obj, &head))
+    {
+        ++head.cmd; // XXX:
+        err += "request error.";
+        goto _error;
+    }
+
+    body = json_object_object_get(obj, "body");
+    if (!body)
+        goto _error;
+
+    switch (head.cmd)
+    {
+        case 1:
+            ret = query_rolelist_req(&head, body, retbody, err);
+            break;
+        case 3:
+            ret = query_rolebaseinfo_req(&head, body, retbody, err);
+            break;
+        default:
+            break;
+    }
+
+_error:
+    {
+        head.retcode = ret;
+        head.sendTime = time(NULL);
+        snprintf(head.errmsg, sizeof(head.errmsg), "%s", err.c_str());
+        snprintf(head.name, sizeof(head.name), "%s", SERVICE);
+
+        fillHead(rethead, &head);
+
+        json_object_object_add(retobj, "head", rethead);
+        json_object_object_add(retobj, "body", retbody);
+
+        const char* retstr = json_object_to_json_string(retobj);
+        //TRACE_LOG("JOSN SEND: %s\n", retstr?retstr:"null");
+#ifdef _DEBUG
+        //fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
+#endif
+
+        st << std::string(retstr?retstr:EMPTY);
+        st << Stream::eos;
+    }
+
+_error1:
+    if (retobj)
+        json_object_put(retobj);
+    if (retbody)
+        json_object_put(retbody);
+    if (rethead)
+        json_object_put(rethead);
+
+    return;
+}
+
 #endif
 

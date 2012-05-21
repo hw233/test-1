@@ -7,6 +7,7 @@
 #include "Server/Cfg.h"
 #include "MsgID.h"
 #include <event2/buffer.h>
+#include "MsgHandler/JsonParser.h"
 
 namespace Network
 {
@@ -241,8 +242,17 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 	{
 		if(pl == NULL)
 		{
-			LoginMsgHdr hdr( cmd, WORKER_THREAD_LOGIN, m_PlayerId, id(), len );
-			GLOBAL().PushMsg( hdr,  buf );
+            if(cmd == SPEQ::JASON)
+            {
+                Stream st(SPEP::JASON);
+                jsonParser2(buf, len, st);
+                send(&st[0], st.size());
+            }
+            else
+            {
+                LoginMsgHdr hdr( cmd, WORKER_THREAD_LOGIN, m_PlayerId, id(), len );
+                GLOBAL().PushMsg( hdr,  buf );
+            }
 		}
 	}
 	else

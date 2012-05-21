@@ -8442,7 +8442,7 @@ namespace GObject
             }
             else
             {
-                pk->DelItem(itemid, num, bind);
+                pk->DelItem(itemid, num, bind, ToDesdroy);
             }
         }
 
