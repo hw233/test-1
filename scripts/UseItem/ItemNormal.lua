@@ -2947,12 +2947,12 @@ function ItemNormal_00009027(iid, num, bind, param)
             return false
         end
 
-        if package:GetRestPackageSize() < item[1] then
+        if package:GetRestPackageSize() < item[2] then
             player:sendMsgCode(2, 1011, 0);
-            return false;
+            return rn;
         end
 
-        package:Add(item[1], item[2], bind, 0, 2)
+        package:Add(item[1], item[2], true, 0, 2)
         rn = rn + 1
     end
 

@@ -1191,11 +1191,11 @@ void AthleticsRank::TmExtraAward()
             UInt32 currank = (*start)->rank;
             if (currank <= 15 || lastrank)
             {
-                if ((currank <= 15) || ((currank <= 500) && (currank > lastrank) && ((currank - lastrank) >= 15)))
+                if ((currank <= 15) || ((currank <= 500) && (currank < lastrank) && ((lastrank - currank) >= 15)))
                 {
                     SYSMSG(title, 4000);
                     SYSMSG(content2, 4002);
-                    SYSMSGV(content3, 4003, currank - lastrank);
+                    SYSMSGV(content3, 4003, lastrank - currank);
                     char* content1 = NULL;
                     if (currank <= 15)
                         content1 = content2;
