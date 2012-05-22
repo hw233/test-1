@@ -101,6 +101,8 @@ bool World::_bluediamondact = false;
 bool World::_yellowdiamondact = false;
 bool World::_qqgameact = false;
 void* World::_recalcwd = NULL;
+bool World::_june = false;
+bool World::_june1 = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -246,6 +248,7 @@ void World::makeActivityInfo(Stream &st)
     active |= _foolsday?32:0;
     active |= _chingming?64:0;
     active |= _ssdtact?128:0;
+    active |= _june?256:0;
     st << active << Stream::eos;
 }
 void World::calWeekDay( World * world )

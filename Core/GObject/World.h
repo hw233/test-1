@@ -177,6 +177,16 @@ public:
     inline static bool getGemMergeAct()
     { return _gemmergeact; }
 
+
+    inline static void setJune(bool v)
+    { _june = v; }
+    inline static bool getJune()
+    { return _june; }
+    inline static void setJune1(bool v)
+    { _june1 = v; }
+    inline static bool getJune1()
+    { return _june1; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
 
@@ -231,6 +241,8 @@ public:
     static bool _yellowdiamondact;
     static bool _qqgameact;
     static void* _recalcwd;
+    static bool _june;
+    static bool _june1;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

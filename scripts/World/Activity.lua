@@ -196,11 +196,18 @@ function onActivityCheck(tm)
       is_4_21 = false
   end
 
-  if tm >= actTime47 and tm < actTime48 then
-      setRechargeActive(true, 4)
+  if tm >= actTime49 and tm < actTime50 then
+      setJune(true)
   else
-      setRechargeActive(false, 4)
+      setJune(false)
   end
+
+  if tm >= actTime51 and tm < actTime52 then
+      setJune1(true)
+  else
+      setJune1(false)
+  end
+
 
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
@@ -277,6 +284,12 @@ function onActivityCheck(tm)
           setQQGameAct(false)
       end
 
+      if tm >= actTime47 and tm < actTime48 then
+          setRechargeActive(true, 4)
+      else
+          setRechargeActive(false, 4)
+      end
+
       setShuoShuo(true);
   end
 
@@ -324,6 +337,9 @@ function initActTime(y, m, d)
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  -- 儿童节 (5/28-6/3)(5/28-6/30)
+  local  SerStartTm23= { ['year'] = 2012, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -404,6 +420,12 @@ function initActTime(y, m, d)
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 11 * 86400;
+
+  actTime49 = os.time(SerStartTm23);
+  actTime50 = os.time(SerStartTm23) + 7 * 86400;
+
+  actTime51 = os.time(SerStartTm23);
+  actTime52 = os.time(SerStartTm23) + 34 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

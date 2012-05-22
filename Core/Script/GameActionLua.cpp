@@ -1110,4 +1110,9 @@ namespace Script
 		return Call<bool>("RunSSDTAward", player, opt);
 	}
 
+    UInt16 GameActionLua::RunHappyAward(Player* player, UInt8 opt)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunHappyAward", player, opt);
+    }
 }

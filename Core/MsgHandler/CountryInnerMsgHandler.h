@@ -615,6 +615,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
     player->GetShuoShuo()->reset();
     player->GetCFriend()->reset();
     player->sendSSDTInfo();
+    player->sendHappyInfo();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )

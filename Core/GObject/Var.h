@@ -140,6 +140,12 @@ namespace GObject
         VAR_SHUOSHUO = 108, // 今天领取过说说奖励次数
         VAR_INVITED = 109, // 今天领取过邀请好友奖励次数
 
+        VAR_JUNE = 110,      // 六月礼包是否发放
+        VAR_JUNE_EQUIP = 111, // 六月节日套装是否发放
+        VAR_JUNE_ITEM = 112, // 欢乐礼包是否领取
+        VAR_JUNE_RECHARGE_TOTAL = 113, //六一充值
+        VAR_JUNE_HAPPY = 114, //六一欢乐值
+
         VAR_MAX,
     };
 

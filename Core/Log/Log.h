@@ -138,6 +138,7 @@ enum ItemFrom
     FromClan,
     FromTownDeamon,
 	FromSSDTAward,
+	FromHappyAward,
 };
 
 enum ItemTo
