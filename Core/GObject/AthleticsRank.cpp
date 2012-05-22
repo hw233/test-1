@@ -1188,7 +1188,8 @@ void AthleticsRank::TmExtraAward()
         if (World::getNetValentineDay())
         {
             UInt32 lastrank = ranker->GetVar(VAR_LASTATHRANK);
-            UInt32 currank = (*start)->rank;
+            UInt32 currank = rank;
+            fprintf(stderr, "playerid: %"I64_FMT"u, currank: %u, lastrank: %u\n", (*start)->ranker->getId(), currank, lastrank);
             if (currank <= 15 || lastrank)
             {
                 if ((currank <= 15) || ((currank <= 500) && (currank < lastrank) && ((lastrank - currank) >= 15)))
