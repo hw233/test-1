@@ -208,7 +208,6 @@ function onActivityCheck(tm)
       setJune1(false)
   end
 
-
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -238,6 +237,12 @@ function onActivityCheck(tm)
           setNetValentineDay(true)
       else
           setNetValentineDay(false)
+      end
+
+      if tm >= actTime111 and tm < actTime112 then
+          setRechargeActive(true, 4)
+      else
+          setRechargeActive(false, 4)
       end
 
       setShuoShuo(false);
@@ -345,6 +350,8 @@ function initActTime(y, m, d)
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- FB充值返利（5/23-5/27）
+  local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -419,7 +426,7 @@ function initActTime(y, m, d)
   actTime46 = os.time(SerStartTm21) + 7 * 86400;
 
   actTime47 = os.time(SerStartTm22);
-  actTime48 = os.time(SerStartTm22) + 11 * 86400;
+  actTime48 = os.time(SerStartTm22) + 12 * 86400;
 
   actTime49 = os.time(SerStartTm23);
   actTime50 = os.time(SerStartTm23) + 7 * 86400;
@@ -441,6 +448,9 @@ function initActTime(y, m, d)
 
   actTime109 = os.time(SerStartTm104);
   actTime110 = os.time(SerStartTm104) + 7 * 86400;
+
+  actTime111 = os.time(SerStartTm105);
+  actTime112 = os.time(SerStartTm105) + 12 * 86400;
 
   onActivityCheck(os.time() + 30);
 
