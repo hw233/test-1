@@ -6857,6 +6857,45 @@ namespace GObject
 		}
 	}
 
+    static char nameStr[2048];
+    const char* Player::patchShowName(const char* name, const UInt64 playerId)
+    {
+        if(cfg.merged)
+        {
+            unsigned short len = 0;
+            const char *pname = name;
+            while(pname[len] && len < 2048)
+                ++len;
+            strncpy(nameStr, name, len);
+#if 0
+            char a = nameStr[len - 1];
+            char b = nameStr[len - 2];
+            char serverNo = a * 31 + b;
+            nameStr[len - 2] = '\0';
+#else
+            unsigned char a;
+            unsigned char serverNo = 0;
+            for(unsigned short i = len; i >= 1 && i >= len - 1; i--)
+            {
+                a = static_cast<unsigned char>(nameStr[i - 1]) - static_cast<unsigned char>(1);
+                if(a > static_cast<unsigned char>(31))
+                    break;
+                serverNo = serverNo * static_cast<unsigned char>(31) + a;
+                nameStr[i -1] = '\0';
+            }
+            serverNo += 1; //起点从0开始
+#endif
+            if(playerId != 0 && serverNo != static_cast<unsigned char>(playerId >> 48))
+            {
+                char tmp[32];
+                sprintf(tmp, ".S%d", serverNo);
+                strcat(nameStr, tmp);
+            }
+            return reinterpret_cast<const char*>(nameStr);
+        }
+        return name;
+    }
+
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
 	{
 		if(l < 1)

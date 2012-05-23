@@ -1140,7 +1140,7 @@ namespace GObject
 		std::string& fixName(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
-
+        const char *patchShowName(const char* name, const UInt64 playerId = 0);
 		void autoCB(bool = true);
 
 	public:
