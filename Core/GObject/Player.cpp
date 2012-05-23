@@ -9087,6 +9087,18 @@ namespace GObject
         sendMailItem(2354, 2355, &item[pos-1], 1, false);
     }
 
+    void Player::sendJuneHappyTitleCard(int pos)
+    {
+        if (!pos || pos > 2)
+            return;
+        MailPackage::MailItem item[2] =
+        {
+            {9029, 1},
+            {9030, 1},
+        };
+        sendMailItem(2356, 2357, &item[pos-1], 1, false);
+    }
+
     void Player::sendCreateMail()
     {
 #ifdef _FB

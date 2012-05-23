@@ -267,6 +267,7 @@ MSG_REG_2(GameMsgHdr, 0x241, OnAddItemBy);
 MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
 MSG_REG_2(GameMsgHdr, 0x243, OnShuoShuo);
 MSG_REG_2(GameMsgHdr, 0x246, OnSendMayDayTitleCard);
+MSG_REG_2(GameMsgHdr, 0x247, OnSendJuneHappyTitleCard);
 
 
 MSG_REG_2(GameMsgHdr, 0x250, OnRemoveClanRank);

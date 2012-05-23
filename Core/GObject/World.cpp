@@ -154,9 +154,13 @@ MayDaySortMap mayDaySortMap1;
 MayDaySortMap mayDaySortMap2;
 MayDaySortMap mayDaySortMap3;
 
+typedef std::multimap<UInt32, Player*> JuneSortMap;
+JuneSortMap juneSortMap;
+
 bool bSingleDayEnd = false;
 bool bValentineDayEnd = false;
 bool bMayDayEnd = false;
+bool bJuneEnd = false;
 
 bool enum_midnight(void * ptr, void *)
 {
@@ -205,6 +209,13 @@ bool enum_midnight(void * ptr, void *)
         num = pl->GetVar(VAR_MDSOUL_CNT3);
         if (num > 0)
             mayDaySortMap3.insert(std::make_pair(num, pl));
+    }
+
+    if(bJuneEnd)
+    {
+        UInt32 num = pl->GetVar(VAR_JUNE_HAPPY_ITEM_CNT);
+        if (num > 0)
+            juneSortMap.insert(std::make_pair(num, pl));
     }
 
     if (World::_halloween && pl->isOnline())
@@ -437,6 +448,39 @@ void SendMDSoulCnt()
     }
 }
 
+void SendHappyItemCnt()
+{
+    if(bJuneEnd)
+    {
+        int pos = 0;
+        UInt32 happyItemNum = 0xFFFFFFFF;
+        for(JuneSortMap::reverse_iterator iter = juneSortMap.rbegin();
+                iter != juneSortMap.rend(); ++iter)
+        {
+            if(iter->first != happyItemNum)
+            {
+                ++pos;
+                happyItemNum = iter->first;
+            }
+            if(pos > 2) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x247, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendJuneHappyTitleCard(pos);
+            }
+        }
+    }
+
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -447,6 +491,7 @@ void World::World_Midnight_Check( World * world )
     bool bSingleDay = getSingleDay();
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
+    bool bJune = getJune();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
@@ -464,6 +509,8 @@ void World::World_Midnight_Check( World * world )
     bValentineDayEnd = bValentineDay && !getValentineDay();
     //五一使用风雷石活动是否结束
     bMayDayEnd = bMayDay && !getMayDay();
+    // 六一活动是否结束
+    bJuneEnd = bJune && !getJune();
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
 
@@ -493,6 +540,7 @@ void World::World_Midnight_Check( World * world )
     //给巧克力使用称号卡
     SendShusanLoveTitleCard();
     SendMDSoulCnt();
+    SendHappyItemCnt();
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);

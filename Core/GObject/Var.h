@@ -145,6 +145,7 @@ namespace GObject
         VAR_JUNE_ITEM = 112, // 欢乐礼包是否领取
         VAR_JUNE_RECHARGE_TOTAL = 113, //六一充值
         VAR_JUNE_HAPPY = 114, //六一欢乐值
+        VAR_JUNE_HAPPY_ITEM_CNT = 115, // 六一使用棒棒糖数
 
         VAR_MAX,
     };
