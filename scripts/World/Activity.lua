@@ -221,6 +221,18 @@ function onActivityCheck(tm)
           setGemMergeAct(false)
       end
 
+      if tm >= actTime109 and tm < actTime110 then
+          setNetValentineDay(true)
+      else
+          setNetValentineDay(false)
+      end
+
+      if tm >= actTime111 and tm < actTime112 then
+          setRechargeActive(true, 4)
+      else
+          setRechargeActive(false, 4)
+      end
+
       setShuoShuo(false);
   else
       if tm >= actTime33 and tm < actTime34 then
@@ -263,6 +275,12 @@ function onActivityCheck(tm)
           setQQGameAct(true)
       else
           setQQGameAct(false)
+      end
+
+      if tm >= actTime47 and tm < actTime48 then
+          setRechargeActive(true, 4)
+      else
+          setRechargeActive(false, 4)
       end
 
       setShuoShuo(true);
@@ -310,9 +328,15 @@ function initActTime(y, m, d)
   -- 游戏大厅特权
   local  SerStartTm21= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 充值返利（5/16-5/27）
+  local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- FB充值返利（5/23-5/27）
+  local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -386,6 +410,9 @@ function initActTime(y, m, d)
   actTime45 = os.time(SerStartTm21);
   actTime46 = os.time(SerStartTm21) + 7 * 86400;
 
+  actTime47 = os.time(SerStartTm22);
+  actTime48 = os.time(SerStartTm22) + 12 * 86400;
+
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
 
@@ -397,6 +424,12 @@ function initActTime(y, m, d)
 
   actTime107 = os.time(SerStartTm103);
   actTime108 = os.time(SerStartTm103) + 8 * 86400;
+
+  actTime109 = os.time(SerStartTm104);
+  actTime110 = os.time(SerStartTm104) + 7 * 86400;
+
+  actTime111 = os.time(SerStartTm105);
+  actTime112 = os.time(SerStartTm105) + 12 * 86400;
 
   onActivityCheck(os.time() + 30);
 

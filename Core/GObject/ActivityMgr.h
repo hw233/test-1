@@ -34,6 +34,8 @@ namespace GObject
         AtyPSpeed,    //修炼加速
         AtyGroupCopy, //组队副本
         AtyTownDeamon, //锁妖塔
+        AtyShuoShuo, //取发表说说奖励
+        AtyInvited, //领取好友邀请奖励
         AtyEnd,
     };
 

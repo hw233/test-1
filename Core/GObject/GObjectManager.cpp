@@ -1945,24 +1945,13 @@ namespace GObject
 			data->row = dbd.row;
 			data->ranker = pl;
 
-            if(rank[dbd.row] == 0)
+            ++ rank[dbd.row];
+            if(rank[dbd.row] > ATHLETICS_RANK_MAX_CNT)
+                rank[dbd.row] = ATHLETICS_RANK_MAX_CNT + 1;
+            data->rank = rank[dbd.row];
+            if(rank[dbd.row] != dbd.rank && rank[dbd.row] <= ATHLETICS_RANK_MAX_CNT)
             {
-                rank[dbd.row] = ((dbd.rank == 0) ? 1 : dbd.rank);
-                data->rank = rank[dbd.row];
-            }
-            else
-            {
-                if(dbd.rank <= rank[dbd.row])
-                {
-                    ++ rank[dbd.row];
-                    data->rank = rank[dbd.row];
-                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, dbd.ranker);
-                }
-                else
-                {
-                    data->rank = dbd.rank;
-                    rank[dbd.row] = data->rank;
-                }
+                DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, dbd.ranker);
             }
 
 			data->maxrank = dbd.maxRank;

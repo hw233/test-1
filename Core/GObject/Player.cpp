@@ -88,7 +88,7 @@ namespace GObject
     UInt8 Player::_yaMenActiveCount = 0;
     UInt8 Player::_shiMenActiveCount = 0;
 	const UInt8 MaxICCount[] = {8, 16, 16, 16, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24};
-	const UInt16 MAX_EXTEND_TIME	= 10;
+	const UInt16 MAX_EXTEND_TIME	= 17;
 	const UInt16 EACH_EXTEND_NUM	= 50;
 	GlobalPlayers globalPlayers;
 	GlobalPlayers newPlayers;
@@ -689,7 +689,9 @@ namespace GObject
     //春节充值活动额度
     //static UInt32 recharge[] = {188,288,688,888,1888,2012,2888,3888,4888,5888,6888,7888,8888,9888,9999};
     //2012年3月份充值活动额度
-    static UInt32 recharge[] = {199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999,};
+    //static UInt32 recharge[] = {199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999,};
+    //2012年5月16充值活动额度
+    static UInt32 recharge[] = {199,399,599,799,999,1499,1999,3999,5999,7999,9999,19999,29999,39999,49999};
     UInt8 Player::calcRechargeLevel(UInt32 total)
     {
         UInt32 totalRecharge = total;
@@ -3310,6 +3312,12 @@ namespace GObject
 #endif
 		return _playerData.gold;
 	}
+
+    UInt32 Player::useGold4LuckDraw(UInt32 c)
+    {
+		ConsumeInfo ci(LuckyDraw,0,0);
+		return useGold(c, &ci);
+    }
 
 	bool Player::holdGold(UInt32 c, UInt8 action, ConsumeInfo * ci)
 	{
@@ -7025,6 +7033,7 @@ namespace GObject
 				continue;
 
 #if 0
+            //春节充值活动额度
 			const UInt32 vipTable[16][14] =
             {
                 {430,2,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -7044,7 +7053,7 @@ namespace GObject
                 {432,10,6008,6,507,5,509,5,30,10,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
-#else // XXX: 2012年03月充值反利活动
+            // XXX: 2012年03月充值反利活动
 			const UInt32 vipTable[16][14] =
             {
                 {514,3,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -7064,6 +7073,28 @@ namespace GObject
                 {515,10,507,10,509,10,30,10,MailPackage::Coupon,300,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
+#else
+            //2012年5月16充值反利活动
+			const UInt32 vipTable[16][14] =
+            {
+                {503,3,514,4,9012,5,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,50,9012,5,0,0,0,0,0,0,0,0,0,0},
+                {516,3,514,6,9012,5,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,75,9013,5,0,0,0,0,0,0,0,0,0,0},
+                {501,6,513,2,56,3,57,3,9013,5,0,0,0,0},
+                {MailPackage::Coupon,100,9013,5,0,0,0,0,0,0,0,0,0,0},
+                {515,3,505,4,9014,5,0,0,0,0,0,0,0,0},
+                {MailPackage::Coupon,200,9014,5,0,0,0,0,0,0,0,0,0,0},
+                {507,3,509,3,56,2,57,2,9014,5,0,0,0,0},
+                {MailPackage::Coupon,300,9015,5,0,0,0,0,0,0,0,0,0,0},
+                {515,10,30,10,56,5,57,5,9015,5,0,0,0,0},
+                {507,3,509,3,515,3,547,5,9015,5,0,0,0,0},
+                {507,5,509,5,515,5,547,5,9016,5,0,0,0,0},
+                {507,7,509,7,515,7,547,5,9016,5,0,0,0,0},
+                {507,10,509,10,515,10,547,5,9016,5,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+            };
+
 #endif
 
 			MailPackage::MailItem mitem[7];

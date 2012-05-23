@@ -85,6 +85,7 @@ namespace Script
 		lua_tinker::def(_L, "getBlueactiveday",	GObject::World::getBlueactiveday);
 		lua_tinker::def(_L, "getRechargeActive", GObject::World::getRechargeActive);
 		lua_tinker::def(_L, "getValentineDay", GObject::World::getValentineDay);
+		lua_tinker::def(_L, "getNetValentineDay", GObject::World::getNetValentineDay);
 		lua_tinker::def(_L, "getGirlDay", GObject::World::getGirlDay);
 		lua_tinker::def(_L, "getWhiteLoveDay", GObject::World::getWhiteLoveDay);
 		lua_tinker::def(_L, "getTrumpEnchRet", GObject::World::getTrumpEnchRet);
@@ -141,6 +142,7 @@ namespace Script
 		CLASS_DEF(Player, AddItemBy);
 		CLASS_DEF(Player, getGold);
 		CLASS_DEF(Player, useGold);
+		CLASS_DEF(Player, useGold4LuckDraw);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
 		CLASS_DEF(Player, getTael);

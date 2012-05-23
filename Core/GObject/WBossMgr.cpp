@@ -578,7 +578,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
     UInt32 ohp = 0;
     if (m_final)
         ohp = _mgr->getLastHP(bossidx[World::_wday-1][m_idx]);
-    if (!ohp)
+    if (m_final && !ohp)
         ohp = nflist[0].fighter->getMaxHP();
     _hp[0] = ohp;
 
@@ -596,20 +596,9 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(nflist[0].fighter);
         Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(nflist[0].fighter);
 
-        if (m_last <= WBOSS_BASE_TIME)
-        {
-            exthp = (1.f - m_last/(float)WBOSS_BASE_TIME) * WBOSS_HP_FACTOR * ohp;
-            ohp += exthp;
-        }
-        else
-        {
-            exthp = (m_last/(float)WBOSS_BASE_TIME - 1.f) * WBOSS_HP_FACTOR * ohp;
-            if (ohp >= exthp)
-                ohp -= exthp;
-            if (ohp < 20000000)
-                ohp = 20000000;
-        }
-
+        ohp = (ohp / (float)m_last) * (float)WBOSS_BASE_TIME;
+        if (ohp < 20000000)
+            ohp = 20000000;
         if (ohp > 350000000)
             ohp = 350000000;
 
@@ -617,17 +606,17 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         nflist[0].fighter->setBaseHP(ohp);
         nflist[0].fighter->setWBoss(true);
 
-        extatk = (1.f - WBOSS_BASE_TIME/(float)m_last) * WBOSS_ATK_FACTOR * (atk + baseatk);
+        extatk = (WBOSS_BASE_TIME/(float)m_last - 1.f) * WBOSS_ATK_FACTOR * (atk + baseatk);
         nflist[0].fighter->setExtraAttack(extatk + atk);
 
-        extmagatk = (1.f - WBOSS_BASE_TIME/(float)m_last) * WBOSS_ATK_FACTOR * (matk + basematk);
+        extmagatk = (WBOSS_BASE_TIME/(float)m_last - 1.f) * WBOSS_ATK_FACTOR * (matk + basematk);
         nflist[0].fighter->setExtraMagAttack(extmagatk + matk);
 
-        TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
+        TRACE_LOG("BOSS: hp: %u, base attack: %u, extra attack: %d, magattack: %u, extra magattack: %d",
                 nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
                 nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
-#ifdef DEBUG
-        fprintf(stderr, "BOSS: hp: %u, base attack: %u, extra attack: %u, magattack: %u, extra magattack: %u",
+#ifdef _DEBUG
+        fprintf(stderr, "BOSS: hp: %u, base attack: %u, extra attack: %d, magattack: %u, extra magattack: %d",
                 nflist[0].fighter->getBaseHP(), nflist[0].fighter->getBaseAttack(),
                 nflist[0].fighter->getExtraAttack(), nflist[0].fighter->getBaseMagAttack(), nflist[0].fighter->getExtraMagAttack());
 #endif
