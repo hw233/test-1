@@ -139,16 +139,10 @@ void Leaderboard::doUpdate()
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
-		" LIMIT 0, 100", blist);
-    count = static_cast<UInt8>(blist.size());
-    for(index = 0; index < count; ++index)
-    {
-        if(cfg.merged)
-            Player::patchMergedName(blist[index].id, blist[index].name);
-    }
-    buildPacket(_levelStream, 0, _id, blist);
-	if(!blist.empty())
-		_maxLevel = blist[0].lvl;
+		" LIMIT 0, 100", blist2);
+    buildPacket2(_levelStream, 0, _id, blist2);
+	if(!blist2.empty())
+		_maxLevel = blist2[0].lvl;
 
 	blist.clear();
 	std::list<AthleticsRankData *> *pathleticsrank = gAthleticsRank.getAthleticsRank();
