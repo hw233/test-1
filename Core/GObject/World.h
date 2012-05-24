@@ -201,7 +201,7 @@ public:
 	static void makeActivityInfo(Stream &st);
 	void setWeekDay(UInt8 wday);
 
-    void RankLuckyDraw(Player* player);
+    void RankLuckyDraw(Player* player, bool notify = true);
     void SendLuckyDrawList(Player* player);
     void SendLuckyDrawAward();
 

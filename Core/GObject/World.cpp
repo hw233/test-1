@@ -255,7 +255,7 @@ bool enum_lucky_draw_rank_list(void * ptr, void * data )
     if(player == NULL)
         return true;
 
-    WORLD().RankLuckyDraw(player);
+    WORLD().RankLuckyDraw(player, false);
     return true;
 }
 
@@ -642,8 +642,10 @@ bool World::Init()
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
 	AddTimer(5000, World_Multi_Check, this);
 
+#ifdef _FB
     if(getJune())
         globalPlayers.enumerate(enum_lucky_draw_rank_list, static_cast<void *>(NULL));
+#endif
 
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
@@ -686,7 +688,7 @@ void World::testUpdate( )
 	}
 }
 
-void World::RankLuckyDraw(Player* player)
+void World::RankLuckyDraw(Player* player, bool notify)
 {
     UInt32 luckyDrawCnt = player->GetVar(VAR_LUCKYDRAW_CNT);
     LuckyDrawRankList::iterator it = _luckyDrawRankList.find(player);
@@ -700,37 +702,43 @@ void World::RankLuckyDraw(Player* player)
 
     for(; r_rank != _luckyDrawList.rend(); ++ r_rank)
     {
-        SYSMSG(title, 2362);
         if(luckyDrawCnt <= (*r_rank)->GetVar(VAR_LUCKYDRAW_CNT))
             break;
-        UInt32 pos = std::distance(_luckyDrawList.begin(), r_rank.base()) + 1;
-        if(pos == 0)
+        if(notify)
         {
-            SYSMSGV(content, 2363, player->getName().c_str(), pos);
-            (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        }
-        else if(pos == 1)
-        {
-            SYSMSGV(content, 2363, player->getName().c_str(), pos);
-            (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        }
-        else if(pos == 2)
-        {
-            SYSMSGV(content, 2363, player->getName().c_str(), pos);
-            (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-        }
-        else if(pos == 9)
-        {
-            SYSMSGV(content, 2363, player->getName().c_str(), pos);
-            (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            SYSMSG(title, 2362);
+            UInt32 pos = std::distance(_luckyDrawList.begin(), r_rank.base()) + 1;
+            if(pos == 0)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            }
+            else if(pos == 1)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            }
+            else if(pos == 2)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            }
+            else if(pos == 9)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            }
         }
     }
 
     _luckyDrawRankList[player] = _luckyDrawList.insert(r_rank.base(), player);
-    UInt32 pos = std::distance(_luckyDrawList.begin(), _luckyDrawRankList[player]) + 1;
-    SYSMSGV(title, 2358, pos);
-    SYSMSGV(content, 2359, pos);
-    player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    if(notify)
+    {
+        UInt32 pos = std::distance(_luckyDrawList.begin(), _luckyDrawRankList[player]) + 1;
+        SYSMSGV(title, 2358, pos);
+        SYSMSGV(content, 2359, pos);
+        player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+    }
 }
 
 void World::SendLuckyDrawList(Player* player)

@@ -1281,7 +1281,7 @@ function onTrainFighterAct(player, fgt)
 end
 
 function onJune(player)
-    if not getMayDay() then
+    if not getJune() then
         return
     end
 
