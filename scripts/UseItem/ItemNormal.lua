@@ -3607,7 +3607,7 @@ function ItemNormal_00009028(iid, num, bind, param)
 
     package:DelItemSendMsg(iid, player);
     if getJune() then
-        local happy = math.random(1, num*3);
+        local happy = math.random(num, num*3);
         player:AddVar(114, happy);
         SendMsg(player, 0x35, "获得欢乐值"..happy.."点")
         player:AddVar(115, num);

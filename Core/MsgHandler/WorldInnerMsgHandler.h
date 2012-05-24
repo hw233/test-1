@@ -660,4 +660,14 @@ void OnPracticeStop( GameMsgHdr& hdr,  const void* data )
     practicePlace.stop(player);
 }
 
+void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
+{
+    using namespace GObject;
+    MSG_QUERY_PLAYER(player);
+    UInt8 times = *(UInt8*)data;
+    player->AddVar(VAR_LUCKYDRAW_CNT, times);
+
+    WORLD().RankLuckyDraw(player);
+}
+
 #endif // _WORLDINNERMSGHANDLER_H_

@@ -29,6 +29,11 @@ struct MoneyIn
     int prestige;
 };
 
+typedef std::list<Player*> LuckyDrawList;
+typedef LuckyDrawList::iterator LuckyDrawRank;
+typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
+typedef std::map<Player *, LuckyDrawRank> LuckyDrawRankList;
+
 class World:
 	public WorkerRunner<WorldMsgHandler>
 {
@@ -196,6 +201,10 @@ public:
 	static void makeActivityInfo(Stream &st);
 	void setWeekDay(UInt8 wday);
 
+    void RankLuckyDraw(Player* player);
+    void SendLuckyDrawList(Player* player);
+    void SendLuckyDrawAward();
+
 public:
 	static void calWeekDay( World * world );
 
@@ -276,6 +285,8 @@ private:
 	UInt32 _today;
 	UInt32 _announceLast;
     std::vector<UInt32> _domain_nums;
+    LuckyDrawList _luckyDrawList;
+    LuckyDrawRankList _luckyDrawRankList;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);
