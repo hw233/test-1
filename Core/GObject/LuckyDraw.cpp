@@ -115,6 +115,14 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
             }
         }
 
+#ifdef _FB
+        if(WORLD().getJune())
+        {
+            GameMsgHdr hdr2(0x1C0, WORKER_THREAD_WORLD, player, sizeof(num));
+            GLOBAL().PushMsg(hdr2, &num);
+        }
+#endif
+
         UInt8 sz = its.size();
         st << static_cast<UInt8>(sz);
         for (UInt8 i = 0; i < sz; ++i)

@@ -5973,6 +5973,16 @@ namespace GObject
             sendRechargeInfo();
         }
 
+        if(World::getJune())
+        {
+            UInt32 total = GetVar(VAR_JUNE_RECHARGE_TOTAL);
+            UInt32 value = total % 20;
+            value += r;
+            total += r;
+            SetVar(VAR_JUNE_RECHARGE_TOTAL, total);
+            sendJuneRechargeMails(value);
+        }
+
         UInt32 total = getBuffData(PLAYER_BUFF_YDOTR);
 		if(World::_nationalDay)
         {
@@ -7119,6 +7129,54 @@ namespace GObject
 			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
 		}
 	}
+
+    void Player::sendJuneRechargeMails(UInt32 value)
+    {
+        UInt32 count = value / 20;
+        if(count > 0)
+        {
+			SYSMSGV(title, 2324);
+			SYSMSG(content, 2325);
+            int cnt = count / 255;
+            int left = count % 255;
+            std::string strItems;
+            for(int i = 0; i < cnt; ++ i)
+            {
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail == NULL)
+                    return;
+
+                MailPackage::MailItem mitem;
+                mitem.id = 9028;
+                mitem.count = 255;
+                strItems += Itoa(mitem.id);
+                strItems += ",";
+                strItems += Itoa(255);
+                strItems += "|";
+
+                mailPackageManager.push(mail->id, &mitem, 1, true);
+
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+            if(left > 0)
+            {
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail == NULL)
+                    return;
+                MailPackage::MailItem mitem;
+                mitem.id = 9028;
+                mitem.count = left;
+                strItems += Itoa(mitem.id);
+                strItems += ",";
+                strItems += Itoa(left);
+                strItems += "|";
+
+                mailPackageManager.push(mail->id, &mitem, 1, true);
+
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+        }
+    }
 
 	void Player::sendBlockBossMail(UInt8 l, UInt8 h)
 	{
@@ -8481,7 +8539,7 @@ namespace GObject
             }
             else
             {
-                pk->DelItem(itemid, num, bind);
+                pk->DelItem(itemid, num, bind, ToDesdroy);
             }
         }
 
@@ -8633,6 +8691,10 @@ namespace GObject
             // 搜搜地图
             getSSDTAward(opt);
             break;
+        case 2:
+            // 欢乐大转盘
+            getHappyAward(opt);
+            break;
         }
     }
 
@@ -8682,6 +8744,63 @@ namespace GObject
         if(GetVar(VAR_AWARD_SSDT_1))
             status |= (1 << 4);
         st << status << Stream::eos;
+        send(st);
+    }
+
+    void Player::getHappyAward(UInt8 opt)
+    {
+        if(opt == 6)
+        {
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_lastLoot.clear();
+        }
+
+        if(!World::getJune() || opt > 5)
+            return;
+
+        UInt16 itemId = 0;
+        UInt8 status = GetVar(VAR_JUNE_ITEM);
+        // 转到转盘
+        if(opt == 0)
+        {
+            UInt32 happy = GetVar(VAR_JUNE_HAPPY);
+            if(happy < 20)
+                return;
+            if(0 == (itemId = GameAction()->RunHappyAward(this, opt)))
+                return;
+
+            GData::LootResult lt = {itemId, 1};
+            _lastLoot.push_back(lt);
+            SetVar(VAR_JUNE_HAPPY, happy - 20);
+        }
+        else
+        {
+            if( (1 << (opt - 1)) & status )
+                return;
+            if(0 == GameAction()->RunHappyAward(this, opt))
+                return;
+
+            status |= (1 << (opt - 1));
+            SetVar(VAR_JUNE_ITEM, status);
+        }
+
+        sendHappyInfo(itemId);
+    }
+
+    void Player::sendHappyInfo(UInt16 itemId)
+    {
+        if(!World::getJune())
+            return;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(2);
+        UInt32 happy = GetVar(VAR_JUNE_HAPPY);
+        UInt8 status = GetVar(VAR_JUNE_ITEM);
+        st << happy << static_cast<UInt8>(happy >= 20 ? 1 : 0) << itemId << status << Stream::eos;
         send(st);
     }
 
@@ -9040,6 +9159,18 @@ namespace GObject
             {9008, 1},
         };
         sendMailItem(2354, 2355, &item[pos-1], 1, false);
+    }
+
+    void Player::sendJuneHappyTitleCard(int pos)
+    {
+        if (!pos || pos > 2)
+            return;
+        MailPackage::MailItem item[2] =
+        {
+            {9029, 1},
+            {9030, 1},
+        };
+        sendMailItem(2356, 2357, &item[pos-1], 1, false);
     }
 
     void Player::sendCreateMail()

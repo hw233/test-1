@@ -146,8 +146,8 @@ void Athletics::notifyAthleticsData2(AthleticsData * data)
 void Athletics::listAthleticsReport()
 {
     UInt8 count = 15;
-	if (count > static_cast<UInt16>(_athleticses.size()))
-		count = static_cast<UInt16>(_athleticses.size());
+	if (15 > _athleticses.size())
+		count = static_cast<UInt8>(_athleticses.size());
 
 	Stream st(REP::ARENA_IFNO);
     st << static_cast<UInt16>(0x08);

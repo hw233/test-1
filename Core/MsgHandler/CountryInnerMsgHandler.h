@@ -615,6 +615,9 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
     player->GetShuoShuo()->reset();
     player->GetCFriend()->reset();
     player->sendSSDTInfo();
+    player->SetVar(VAR_JUNE_HAPPY, 0);
+    player->SetVar(VAR_JUNE_ITEM, 0);
+    player->sendHappyInfo();
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )
@@ -1262,6 +1265,14 @@ void OnSendMayDayTitleCard( GameMsgHdr& hdr, const void* data )
     int pos = *(int*)(data);
     player->sendMayDayTitleCard(pos);
 }
+
+void OnSendJuneHappyTitleCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendJuneHappyTitleCard(pos);
+}
+
 void OnAddPExpBy( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);

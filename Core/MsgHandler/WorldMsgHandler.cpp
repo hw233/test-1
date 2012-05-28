@@ -42,6 +42,7 @@ MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_PAGING,    OnAthleticsPaging);
 MSG_REG_2(GameMsgHdr, REQ::ATHLETICS_KILLCD,    OnAthleticsKillCD);
 MSG_REG(GameMsgHdr, OnGetOwnBoxReq);
 MSG_REG(GameMsgHdr, OnAthleticsGetAwardReq);
+MSG_REG(GameMsgHdr, OnLuckDrawRankListReq);
 
 MSG_REG(GameMsgHdr, OnItemHistoryReq);
 MSG_REG_2(GameMsgHdr, REQ::CLAN_PACKAGE, OnClanPackageReq);
@@ -103,6 +104,9 @@ MSG_REG_2(GameMsgHdr, 0x1A7, OnArenaAddLevelMan);
 MSG_REG_2(GameMsgHdr, 0x1B1, OnSearchSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B2, OnPutSaleNotify);
 MSG_REG_2(GameMsgHdr, 0x1B3, OnBuySaleCheckOKNotify);
+
+MSG_REG_2(GameMsgHdr, 0x1C0, OnLuckyDraw);
+
 MSG_REG_2(GameMsgHdr, 0x1EE, OnReloadLuaReq);
 MSG_REG_2(GameMsgHdr, 0x1ED, OnRunscriptReq);
 MSG_REG_2(GameMsgHdr, 0x1EF, OnRunscriptBattleReq);

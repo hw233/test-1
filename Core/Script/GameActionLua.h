@@ -237,6 +237,7 @@ namespace Script
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num);
         bool RunSSDTAward(Player* player, UInt8 opt);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind);
+        UInt16 RunHappyAward(Player* player, UInt8 opt);
        
 	public:
 

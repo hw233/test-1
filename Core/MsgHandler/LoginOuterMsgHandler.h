@@ -38,7 +38,7 @@
 #include "GObject/Dungeon.h"
 #include "GObject/World.h"
 #include "GObject/Var.h"
-#include "MsgHandler/JsonParser.h"
+//#include "MsgHandler/JsonParser.h"
 
 static memcached_st* memc = NULL;
 
@@ -2112,6 +2112,7 @@ void PwdReset(LoginMsgHdr &hdr, const void * data)
 	NETWORK()->SendMsgToClient(hdr.sessionID,st);
 }
 
+#if 0
 void JasonParse(LoginMsgHdr& hdr, const void* data)
 {
 #ifdef _FB
@@ -2124,6 +2125,7 @@ void JasonParse(LoginMsgHdr& hdr, const void* data)
     jsonParser(json, hdr.sessionID);
 #endif
 }
+#endif
 
 void SetCFriend(LoginMsgHdr& hdr, const void* data)
 {

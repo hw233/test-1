@@ -7,6 +7,7 @@
 #include "Server/Cfg.h"
 #include "MsgID.h"
 #include <event2/buffer.h>
+#include "MsgHandler/JsonParser.h"
 
 namespace Network
 {
@@ -123,7 +124,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 	{
 	/*  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  */
 		0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, // 0x00
-		2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x10
+		2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x10
 		0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x20
 		1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x30
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x40
@@ -241,8 +242,20 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 	{
 		if(pl == NULL)
 		{
-			LoginMsgHdr hdr( cmd, WORKER_THREAD_LOGIN, m_PlayerId, id(), len );
-			GLOBAL().PushMsg( hdr,  buf );
+#ifdef _FB
+#else
+            if(cmd == SPEQ::JASON)
+            {
+                Stream st(SPEP::JASON);
+                jsonParser2(buf, len, st);
+                send(&st[0], st.size());
+            }
+            else
+#endif
+            {
+                LoginMsgHdr hdr( cmd, WORKER_THREAD_LOGIN, m_PlayerId, id(), len );
+                GLOBAL().PushMsg( hdr,  buf );
+            }
 		}
 	}
 	else

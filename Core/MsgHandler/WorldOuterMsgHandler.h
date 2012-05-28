@@ -248,6 +248,11 @@ struct AthleticsGetAwardReq
     MESSAGE_DEF(REQ::ATHLETICS_GET_AWARD);
 };
 
+struct LuckyDrawRankListReq
+{
+    MESSAGE_DEF(REQ::LUCKY_RANK);
+};
+
 #if 0
 struct AthleticsChallengeReq
 {
@@ -1331,6 +1336,12 @@ void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req )
 {
     MSG_QUERY_PLAYER(player);
     GObject::gAthleticsRank.giveAward(player);
+}
+
+void OnLuckDrawRankListReq( GameMsgHdr& hdr, LuckyDrawRankListReq& req )
+{
+    MSG_QUERY_PLAYER(player);
+    WORLD().SendLuckyDrawList(player);
 }
 
 
