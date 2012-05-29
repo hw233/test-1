@@ -22,7 +22,7 @@ int connASSS(int port)
 
     if( clientSock < 0 )
     {
-        g_log->OutError("Client Socket create error!");
+        g_log->OutError("Client Socket create error!\n");
         return -1;
     }
     memset( &sa, 0, sizeof(sa) );
@@ -46,7 +46,7 @@ int jason_listen( int port )
     //建立TCP套接口
     if((sockfd = socket(AF_INET,SOCK_STREAM,0))==-1)
     {
-        g_log->OutError("create socket error");
+        g_log->OutError("create socket error\n");
         exit(1);
     }
     //初始化结构体，并绑定2323端口
@@ -57,13 +57,13 @@ int jason_listen( int port )
     //绑定套接口
     if(bind(sockfd,(struct sockaddr *)&my_addr,sizeof(struct sockaddr))==-1)
     {
-        g_log->OutError("bind socket error");
+        g_log->OutError("bind socket error\n");
         exit(1);
     }
     //创建监听套接口
     if(listen(sockfd,10)==-1)
     {
-        g_log->OutError("listen error");
+        g_log->OutError("listen error\n");
         exit(1);
     }
 
@@ -105,11 +105,11 @@ int main()
     int jason_port = cfg.tcpPort - 1000;
 
     int asss_conn = -1;
-
     int jason_sock = jason_listen(jason_port);
 
     socklen_t sin_size = sizeof(struct sockaddr_in);
     struct sockaddr_in their_addr;
+    bool flag = false;
     //等待连接
     while(1)
     {
@@ -118,21 +118,28 @@ int main()
 
         if(asss_conn == -1)
         {
+            if(flag)
+                g_log->OutTrace("failed connect to asss server.\n");
+            flag = false;
             sleep(1);
             continue;
         }
         else
-            g_log->OutTrace("server is run.\n");
+        {
+            if(!flag)
+                g_log->OutTrace("connect to asss server.\n");
+            flag = true;
+        }
 
         //如果建立连接，将产生一个全新的套接字
         int new_fd = -1;
         if((new_fd = accept(jason_sock,(struct sockaddr *)&their_addr,&sin_size))==-1)
         {
-            g_log->OutError("accept error");
+            g_log->OutError("accept error\n");
             exit(1);
         }
         else
-            g_log->OutTrace("accept new connection %s", inet_ntoa(their_addr.sin_addr));
+            g_log->OutTrace("accept new connection %s\n", inet_ntoa(their_addr.sin_addr));
 
 
         while(1)
@@ -141,7 +148,7 @@ int main()
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
             {
-                g_log->OutTrace("read_jason_req. connection close %s", inet_ntoa(their_addr.sin_addr));
+                g_log->OutTrace("read_jason_req. connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 close(new_fd);
                 break;
             }
@@ -151,7 +158,7 @@ int main()
                 close(new_fd);
                 close( asss_conn );
                 asss_conn = -1;
-                g_log->OutError("write_jason_req failed.");
+                g_log->OutError("write_jason_req failed.\n");
                 break;
             }
 
@@ -160,14 +167,14 @@ int main()
                 close(new_fd);
                 close( asss_conn );
                 asss_conn = -1;
-                g_log->OutError("read_jason_rep failed.");
+                g_log->OutError("read_jason_rep failed.\n");
                 break;
             }
 
             if( -1 == write( new_fd, buf, len ))
             {
                 close(new_fd);
-                g_log->OutError("write_jason_rep connection close %s", inet_ntoa(their_addr.sin_addr));
+                g_log->OutError("write_jason_rep connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 break;
             }
         }
