@@ -794,7 +794,11 @@ namespace Script
 	{
 		if (player == NULL) return "";
 		const std::string& name = player->getName();
-		return name.c_str();
+        if(cfg.merged)
+        {
+            return player->patchShowName(name.c_str());
+        }
+        return name.c_str();
 	}
 
 	const char* GameActionLua::GetPlayerStateName(Player* player)

@@ -653,6 +653,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>num;
     br>>uint;
     br>>money;
+    UInt64 player_Id_tmp = player_Id;
 
     if(cfg.merged)
     {
@@ -672,7 +673,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         int retry = 3;
         memcached_return rc;
-        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
+        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", /*player_Id*/player_Id_tmp, token.c_str());
         while (retry)
         {
             --retry;
