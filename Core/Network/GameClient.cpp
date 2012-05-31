@@ -248,6 +248,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             {
                 Stream st(SPEP::JASON);
                 jsonParser2(buf, len, st);
+                st << Stream::eos;
                 send(&st[0], st.size());
             }
             else

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <netinet/tcp.h>
 
 #include "Config.h"
 #include "Log/Log.h"
@@ -32,9 +33,19 @@ int connASSS(int port)
 
     if( connect( clientSock, (sockaddr*)&sa, sizeof(sockaddr) ) < 0 )
     {
-        g_log->OutError("Connect Error!\n");
         return -1;
     }
+
+#if 0
+    struct timeval timeout;
+    timeout.tv_sec=1;
+    timeout.tv_usec=0;
+    int res = setsockopt(clientSock, SOL_SOCKET, SO_RCVTIMEO | SO_SNDTIMEO, (char *)&timeout.tv_sec, sizeof(struct timeval));
+    if(res == -1)
+        g_log->OutError("asss_conn setsockopt error[%d]!\n", errno);
+#endif
+    int flag = 1;
+    setsockopt(clientSock, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
 
     return clientSock;
 }
@@ -72,11 +83,11 @@ int jason_listen( int port )
 
 int read_jason_req(int fd, char* buf)
 {
-    int read_len1 = read( fd, buf, 5);
+    int read_len1 = recv( fd, buf, 5, 0);
     if(read_len1 != 5)
         return 0;
     int len = *(short*)buf;
-    int read_len2 = read( fd, buf+5, len );
+    int read_len2 = recv( fd, buf+5, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -85,11 +96,11 @@ int read_jason_req(int fd, char* buf)
 
 int read_jason_rep(int fd, char* buf)
 {
-    int read_len1 = read( fd, buf, 4);
+    int read_len1 = recv( fd, buf, 4, 0);
     if(read_len1 != 4)
         return 0;
     int len = *(short*)buf;
-    int read_len2 = read( fd, buf+4, len );
+    int read_len2 = recv( fd, buf+4, len, 0 );
     if(read_len2 != len)
         return 0;
 
@@ -139,11 +150,22 @@ int main()
             exit(1);
         }
         else
-            g_log->OutTrace("accept new connection %s\n", inet_ntoa(their_addr.sin_addr));
-
-
-        while(1)
         {
+#if 0
+            struct timeval timeout;
+            timeout.tv_sec=3;
+            timeout.tv_usec=0;
+            int res = setsockopt(new_fd, SOL_SOCKET, SO_RCVTIMEO | SO_SNDTIMEO, (char *)&timeout.tv_sec, sizeof(struct timeval));
+            if(res == -1)
+	        g_log->OutError("new_fd setsockopt error[%d]!\n", errno);
+
+#endif
+            int flag = 1;
+            setsockopt(new_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
+            g_log->OutTrace("accept new connection %s\n", inet_ntoa(their_addr.sin_addr));
+        }
+
+        do {
             char buf[4096] = {0};
             int len = 0;
             if((len = read_jason_req(new_fd, buf)) == 0)
@@ -153,31 +175,40 @@ int main()
                 break;
             }
 
-            if( -1 == write( asss_conn, buf, len ))
+            int sd = 0;
+            if( (sd = send( asss_conn, buf, len, 0 )) < 0)
             {
                 close(new_fd);
+                new_fd = -1;
                 close( asss_conn );
                 asss_conn = -1;
                 g_log->OutError("write_jason_req failed.\n");
                 break;
             }
+            printf("sd: %d\n", sd);
 
             if((len = read_jason_rep(asss_conn, buf)) == 0)
             {
                 close(new_fd);
+                new_fd = -1;
                 close( asss_conn );
                 asss_conn = -1;
                 g_log->OutError("read_jason_rep failed.\n");
                 break;
             }
 
-            if( -1 == write( new_fd, buf, len ))
+            if( -1 == send( new_fd, buf, len, 0 ))
             {
                 close(new_fd);
+                new_fd = -1;
                 g_log->OutError("write_jason_rep connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 break;
             }
         }
+        while(false);
+
+        if(new_fd != -1)
+            close(new_fd);
     }
 
     close( asss_conn );
