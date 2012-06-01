@@ -1,6 +1,7 @@
 
 -- 消耗一个物品所得到的积分
 local item2point = 10
+local item2point2 = 6
 
 -- { 物品概率(累积值), 物品ID, 积分}，对应5个副本
 local items = {
@@ -1657,7 +1658,11 @@ function luckyDraw(player, id, num, bind)
                 print(bind)
                 package:Add(it, 1, bind, 0, 14)
                 table.insert(got, {it, 1})
-                point = point + item2point
+                if bind then
+                    point = point + item2point2
+                else
+                    point = point + item2point
+                end
                 money = money + item[i][3]
                 break
             end 
