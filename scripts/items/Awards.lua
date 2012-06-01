@@ -54,7 +54,7 @@ function RunHappyAward(player, opt)
                 itemId = item[i]
 
                 if i <=4 then
-                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在欢乐大转盘中幸运地获得了[4:"..itemId.."]x1")
+                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在歡樂大轉盤中幸運地獲得了[4:"..itemId.."]x1")
                 end
                 break
             end
@@ -70,11 +70,56 @@ function RunHappyAward(player, opt)
 
         itemId = 1;
         for i = 1, #items[opt], 2 do
-            package:AddItem(items[opt][i], items[opt][i+1], true, 0, 40);
+            if items[opt][i] == 5005 then
+                local gem = {5005, 5015, 5025, 5035, 5045, 5055, 5065, 5075, 5085, 5095, 5105, 5115, 5125, 5135, 5145}
+                local g = math.random(1, #gem)
+                package:AddItem(gem[g], 1, true, 0, 40);
+            else
+                package:AddItem(items[opt][i], items[opt][i+1], true, 0, 40);
+            end
         end
     end
 
     return itemId;
+end
+
+function RunTargetAward(player)
+    if player == nil then
+        return 0;
+    end
+
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+
+    if player:hasRealItemAward(1) then
+        player:getRealItemAward(1)
+        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了60QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+        return 7;
+    end
+    if player:hasRealItemAward(2) then
+        player:getRealItemAward(2)
+        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了100QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+        return 8;
+    end
+
+    local chance = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
+    local item = {515, 503, 507, 56, 57, 15, 60, 100}
+    local j = 0;
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            player:lastLootPush(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 41);
+            j = i;
+            break
+        end
+    end
+
+    return j;
 end
 
 

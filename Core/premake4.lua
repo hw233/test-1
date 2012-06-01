@@ -2,7 +2,7 @@ project "Server.ASSS"
     kind "ConsoleApp"
 
     files { "**.cpp", "**.c", "**.h" }
-    excludes { "lua/*", "Common/*_WIN32.*", "Common/*_UNIX.*", "Common/*_POSIX.*" }
+    excludes { "lua/*", "JsonProxy/*", "Common/*_WIN32.*", "Common/*_UNIX.*", "Common/*_POSIX.*" }
     includedirs { "." }
 
     configuration { "vs* or codeblocks" }
@@ -58,4 +58,43 @@ project "Server.lua.jit"
     configuration "macosx"
         defines "LUA_USE_MACOSX"
 end
+
+project "JsonProxy.ASSS"
+    kind "ConsoleApp"
+
+    files { "JsonProxy/*.cpp", "Common/*.cpp", "Log/*.cpp", "Server/Cfg.cpp", "Script/Script.cpp", "Script/lua_tinker.cpp", "Script/ConfigScript.cpp", "Script/DepartDBScript.cpp", "Common/*.h", "Log/*.h", "Script/ConfigScript.h", "Script/DepartDBScript.h", "Network/Network.h", "Server/Cfg.h" }
+    excludes { "lua/*", "Common/*_WIN32.*", "Common/*_UNIX.*", "Common/*_POSIX.*" }
+    includedirs { "." }
+
+    configuration { "vs* or codeblocks" }
+        pchheader "Config.h"
+	pchsource "Config.cpp"
+    configuration { "not vs* or codeblocks" }
+        excludes { "Config.cpp" }
+    configuration "windows"
+        links { "ws2_32", "mswsock", "kernel32", "user32" }
+    configuration { "Debug", "vs*" }
+        links { "eventd" }
+    configuration { "Release", "vs*" }
+        links { "event", "event_pthreads", "dl", "pthread" }
+    configuration { "windows", "not vs*" }
+        links { "event" }
+    configuration "not vs*"
+    	buildoptions { "-std=c++0x" }
+        links { "mysqlclient" }
+    configuration { "Debug", "not vs*"}
+    	buildoptions { "-pg" }
+        linkoptions { "-pg" }
+    configuration "not windows"
+        links { "event", "event_pthreads", "dl" }
+    configuration "linux"
+        defines { "LUA_USE_LINUX", "_JSON_PROXY_" }
+        defines "LUA_USE_LINUX"
+    configuration "macosx"
+        defines { "LUA_USE_MACOSX", "_JSON_PROXY_" }
+    configuration "luajit"
+        links { "luajit-5.1" }
+    configuration "luaorg"
+        links { "Server.lua" }
+
 

@@ -541,6 +541,14 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                         else
                             DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u  WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
                     }
+
+                    UInt32 thisDay = TimeUtil::SharpDay();
+                    UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
+                    if(20 == dpd->curLevel && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
+                    {
+                        pl->SetVar(VAR_CLAWARD2, 1);
+                        pl->sendRC7DayInfo(TimeUtil::Now());
+                    }
                 }
                 else
                     res = 1;
@@ -642,6 +650,7 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
         return;
 
     DeamonPlayerData* dpd = pl->getDeamonPlayerData();
+    UInt16 curLevelTmp = dpd->curLevel;
 
     UInt32 maxCnt = levels;
     if(levels > dpd->maxLevel - dpd->curLevel)
@@ -681,6 +690,14 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
             dpd->startTime = TimeUtil::Now();
         dpd->curLevel += maxCnt;
         DB3().PushUpdateData("UPDATE `towndeamon_player` SET `curLevel`=%u, `startTime`=%u WHERE `playerId` = %"I64_FMT"u", dpd->curLevel, dpd->startTime, pl->getId());
+
+        UInt32 thisDay = TimeUtil::SharpDay();
+        UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
+        if(curLevelTmp < 20 && dpd->curLevel >= 20 && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
+        {
+            pl->SetVar(VAR_CLAWARD2, 1);
+            pl->sendRC7DayInfo(TimeUtil::Now());
+        }
     }
     st << pl->getPendExp();
     UInt16 sz = pl->_lastLoot.size();
