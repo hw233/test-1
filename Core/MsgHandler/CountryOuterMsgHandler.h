@@ -232,6 +232,12 @@ struct ActivateAttrReq
 	MESSAGE_DEF3(REQ::EQ_ACTIVE, UInt16, _fighterId, UInt32, _itemId, UInt32, _itemId2);
 };
 #endif
+struct ActivateAttrReq
+{
+	UInt16 _fighterId;
+	UInt32 _itemId;
+	MESSAGE_DEF2(REQ::EQ_ACTIVATE, UInt16, _fighterId, UInt32, _itemId);
+};
 
 #if 0
 struct OutCitySwitchStruct
@@ -1771,6 +1777,15 @@ void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 	player->send(st);
 }
 #endif
+void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	Stream st(REP::EQ_ACTIVATE);
+	st << player->GetPackage()->ActivateAttr(aar._fighterId, aar._itemId) << aar._fighterId << aar._itemId << Stream::eos;
+	player->send(st);
+}
 
 #if 0
 void OutCitySwitchReq( GameMsgHdr& hdr, OutCitySwitchStruct& lms )

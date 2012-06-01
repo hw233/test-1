@@ -52,6 +52,7 @@ enum
     COPY_AUTO4,
     COPY_AUTO5,
     COPY_AUTO6,
+    COPY_AUTO7,
 // 通天塔
     DUNGEON_IM,
     DUNGEON_AUTO,
@@ -97,6 +98,8 @@ enum
     AUTOHI,
 // 组队副本通关抽奖
    TEAMCOPYAWARD_ROLL, 
+// 装备洗练属性解封
+   ATTR_ACTIVATE,
 
     MONEY_MAX,
 };

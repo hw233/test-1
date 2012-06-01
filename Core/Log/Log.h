@@ -106,6 +106,7 @@ enum MailItemType
 	SaleSell,
     AutoFrontMap,
     ClanBattleAward,
+    RealItemAwardActive,
 };
 enum ItemFrom
 {

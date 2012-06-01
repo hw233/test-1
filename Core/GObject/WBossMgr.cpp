@@ -25,6 +25,9 @@ const float WBOSS_BASE_TIME = 300.f;
 const float WBOSS_HP_FACTOR = 1.f;
 const float WBOSS_ATK_FACTOR = .5f;
 const UInt8 WBOSS_BASE_LVL = 20;
+const UInt32 WBOSS_MIN_HP = 20000000;
+const UInt32 WBOSS_MAX_HP = 350000000;
+const float WBOSS_MAX_ASC_HP_FACTOR = 1.40f;
 
 #if 1
 #define AWARD_AREA1 3
@@ -228,7 +231,7 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
                     if (sendflag % 8)
                         sendHp();
 
-                    updateLastDB(TimeUtil::Now());
+                    //updateLastDB(TimeUtil::Now());
 
                     nflist[0].fighter->setExtraAttack(0);
                     nflist[0].fighter->setExtraMagAttack(0);
@@ -596,11 +599,14 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         Int32 baseatk = Script::BattleFormula::getCurrent()->calcAttack(nflist[0].fighter);
         Int32 basematk = Script::BattleFormula::getCurrent()->calcMagAttack(nflist[0].fighter);
 
-        ohp = (ohp / (float)m_last) * (float)WBOSS_BASE_TIME;
-        if (ohp < 20000000)
-            ohp = 20000000;
-        if (ohp > 350000000)
-            ohp = 350000000;
+        float hp_factor = (float)WBOSS_BASE_TIME / (float)m_last;
+        if(hp_factor > WBOSS_MAX_ASC_HP_FACTOR)
+            hp_factor = WBOSS_MAX_ASC_HP_FACTOR;
+        UInt32 ohp = ohp * hp_factor;
+        if (ohp < WBOSS_MIN_HP)
+            ohp = WBOSS_MIN_HP;
+        if (ohp > WBOSS_MAX_HP)
+            ohp = WBOSS_MAX_HP;
 
         setHP(ohp);
         nflist[0].fighter->setBaseHP(ohp);
@@ -697,6 +703,7 @@ void WBoss::disapper()
     _mgr->setBossName(m_idx, ""); // XXX: must before setBossSt
     _mgr->setBossSt(m_idx, 2);
 
+    updateLastDB(TimeUtil::Now());
     m_extra = false;
     m_last = 0;
     m_appearTime = 0;

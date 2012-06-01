@@ -1509,6 +1509,9 @@ namespace GObject
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
         void sendYBBufInfo(UInt32 ybbuf);
+
+        bool hasRealItemAward(UInt32 id);
+        void getRealItemAward(UInt32 id);
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

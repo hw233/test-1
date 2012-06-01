@@ -15,7 +15,7 @@ namespace GObject
 
 TeamCopy* teamCopyManager = new TeamCopy();
 
-const UInt8 TeamCopy::lvls[6] = {30, 45, 60, 70, 80, 90};
+const UInt8 TeamCopy::lvls[TEAMCOPY_MAXCOPYCNT] = {30, 45, 60, 70, 80, 90, 100};
 const UInt8 TeamCopyPlayerInfo::_needRoll = 1;
 const UInt8 TeamCopyPlayerInfo::_hasRoll = 2;
 std::vector<TeamCopyAwards> TeamCopyPlayerInfo::_awards[TEAMCOPY_MAXCOPYCNT];

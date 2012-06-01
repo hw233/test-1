@@ -51,6 +51,7 @@ MSG_REG(GameMsgHdr, OnBatchMergeReq);
 //MSG_REG_2(GameMsgHdr, REQ::GEM_UPGRADE, OnBatchMergeReq);
 //MSG_REG(GameMsgHdr, OnActivateAttrReq);
 //MSG_REG(GameMsgHdr, OutCitySwitchReq);
+MSG_REG(GameMsgHdr, OnActivateAttrReq);
 MSG_REG(GameMsgHdr, InCitySwitchReq);
 MSG_REG(GameMsgHdr, OnTransportReq);
 MSG_REG(GameMsgHdr, OnDungeonOpReq);

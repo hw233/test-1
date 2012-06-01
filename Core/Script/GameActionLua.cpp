@@ -9,6 +9,7 @@
 #include "GObject/MOAction.h"
 #include "GObject/AttainMgr.h"
 #include "GObject/Country.h"
+#include "GObject/RealItemAward.h"
 #include "Log/Log.h"
 #include "MsgID.h"
 
@@ -227,6 +228,8 @@ namespace Script
 		CLASS_DEF(Player, OnShuoShuo);
         CLASS_DEF(Player, sendMDSoul);
         CLASS_DEF(Player, sendHappyInfo);
+        CLASS_DEF(Player, hasRealItemAward);
+        CLASS_DEF(Player, getRealItemAward);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

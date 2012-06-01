@@ -2651,7 +2651,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
     {
         //儒、元磁神雷
-        if(SKILL_ID(skill->getId()) == 122)
+        if(SKILL_ID(skill->getId()) == 122 || SKILL_ID(skill->getId()) == 477)
         {
             static UInt8 skill_prob_122[10][4] = {
                 {0, 0, 0},
