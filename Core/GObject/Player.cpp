@@ -276,7 +276,7 @@ namespace GObject
             data->checktime = 0;
 		if(leftCount == 0 || data->checktime == 0)
 		{
-            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %"I64_FMT"u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
             GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
             GLOBAL().PushMsg(hdr1, NULL);
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
@@ -343,7 +343,7 @@ namespace GObject
                 data->checktime = 0;
             if(data->checktime == 0)
             {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %"I64_FMT"u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
                 practicePlace.stop(m_Player);
                 PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
             }
@@ -8927,7 +8927,7 @@ namespace GObject
         cs.id = skillId;
         cs.level = 0;
 
-        DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%u, %u, 0)", getId(), skillId);
+        DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%"I64_FMT"u, %u, 0)", getId(), skillId);
     }
 
     UInt8 Player::getClanSkillLevel(UInt8 skillId)
@@ -8960,7 +8960,7 @@ namespace GObject
 
             ClanSkill& cs = it->second;
             ++ cs.level;
-            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, getId(), skillId);
+            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %"I64_FMT"u and `skillId`=%u", cs.level, getId(), skillId);
 
             if(skillId == CLAN_SKILL_MAXSOUL)
             {
