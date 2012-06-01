@@ -54,7 +54,7 @@ function RunHappyAward(player, opt)
                 itemId = item[i]
 
                 if i <=4 then
-                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在欢乐大转盘中幸运地获得了[4:"..itemId.."]x1")
+                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在歡樂大轉盤中幸運地獲得了[4:"..itemId.."]x1")
                 end
                 break
             end
@@ -70,7 +70,13 @@ function RunHappyAward(player, opt)
 
         itemId = 1;
         for i = 1, #items[opt], 2 do
-            package:AddItem(items[opt][i], items[opt][i+1], true, 0, 40);
+            if items[opt][i] == 5005 then
+                local gem = {5005, 5015, 5025, 5035, 5045, 5055, 5065, 5075, 5085, 5095, 5105, 5115, 5125, 5135, 5145}
+                local g = math.random(1, #gem)
+                package:AddItem(gem[g], 1, true, 0, 40);
+            else
+                package:AddItem(items[opt][i], items[opt][i+1], true, 0, 40);
+            end
         end
     end
 

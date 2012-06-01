@@ -58,6 +58,7 @@
 #include "GameServer.h"
 #endif
 #include "GData/Store.h"
+#include "RealItemAward.h"
 
 #include <cmath>
 
@@ -9913,6 +9914,16 @@ namespace GObject
         if (!tcpInfo)
             return false;
         return tcpInfo->getPass(copyid);
+    }
+
+    bool Player::hasRealItemAward(UInt32 id)
+    {
+        return realItemAwardMgr.hasAward(id);
+    }
+
+    void Player::getRealItemAward(UInt32 id)
+    {
+        realItemAwardMgr.getAward(this, id);
     }
 
 } // namespace GObject

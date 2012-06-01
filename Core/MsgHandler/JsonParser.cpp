@@ -349,7 +349,6 @@ _error:
 #endif
 
         st << std::string(retstr?retstr:EMPTY);
-        st << Stream::eos;
     }
 
 _error1:

@@ -901,6 +901,14 @@ struct DBLuckyLog
     std::string name;
     std::string items;
 };
+
+struct DBRealItemAward
+{
+    UInt32 id;
+    UInt32 cd;
+    std::string card_no;
+    std::string card_psw;
+};
 struct DBActivityData
 {
     UInt64 playerId;
@@ -2063,6 +2071,16 @@ SPECIALDEF(2)
 (
     std::string, name,
     std::string, items
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBRealItemAward)
+SPECIALDEF(4)
+(
+    UInt32, id,
+    UInt32, cd,
+    std::string, card_no,
+    std::string, card_psw
 )
 SPECIALEND()
 

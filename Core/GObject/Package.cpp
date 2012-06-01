@@ -34,7 +34,7 @@
 #define ITEM_ENCHANT_PROTECT 8927
 #define ITEM_DETACH_RUNE 504    // 粗制拆卸石
 #define ITEM_FORGE_PROTECT 501  // 洗炼保护符
-#define ITEM_ACTIVATE_ATTR 9215
+#define ITEM_ACTIVATE_ATTR 549
 #define TRUMP_LORDER_ITEM       517      // 玲珑冰晶
 #define MAX_TRUMP_LORDER_ITEM   9        // 最高阶
 #define SPIRIT_TRANS_ITEM   548    // 转魂符
@@ -3380,6 +3380,7 @@ namespace GObject
 	}
 #endif
 
+#if 0
 	UInt8 Package::ActivateAttr( UInt16 fighterId, UInt32 itemId, UInt32 itemId2 )
 	{
 		Fighter * fgt = NULL;
@@ -3468,6 +3469,73 @@ namespace GObject
 		++ _lastActivateCount;
 		return 1;
 	}
+#endif
+	UInt8 Package::ActivateAttr( UInt16 fighterId, UInt32 itemId )
+	{
+		Fighter * fgt = NULL;
+		UInt8 pos = 0;
+		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
+		if(equip == NULL) return 1;
+
+		UInt8 q = equip->getQuality();
+		ItemEquipData& ied = equip->getItemEquipData();
+        UInt8 c = ied.extraAttr2.getCount();
+		if(c == 0 && c > 2) return 1;
+
+		UInt8 lv = (equip->getReqLev() + 5) / 10 - 1;
+		q -= 3;
+		UInt32 amount = GData::moneyNeed[GData::ATTR_ACTIVATE].tael;
+		if(m_Owner->getTael() < amount)
+		{
+			m_Owner->sendMsgCode(0, 1100);
+			return 1;
+		}
+
+		bool isBound = equip->GetBindStatus();
+		if(!DelItemAny(ITEM_ACTIVATE_ATTR, 1, &isBound)) return 1;
+        DelItemSendMsg(ITEM_ACTIVATE_ATTR, m_Owner);
+
+		m_Owner->useTael(amount);
+		{
+			UInt8 protect = 1 | c;
+			UInt8 types[3];
+			Int16 values[3];
+			types[0] = ied.extraAttr2.type1;
+			values[0] = ied.extraAttr2.value1;
+			types[1] = ied.extraAttr2.type2;
+			values[1] = ied.extraAttr2.value2;
+			types[2] = ied.extraAttr2.type3;
+			values[2] = ied.extraAttr2.value3;
+            UInt8 crr = equip->GetCareer();
+
+            UInt8 equip_t = EQUIPTYPE_EQUIP;
+            lv = equip->getValueLev();
+            if(equip->GetItemType().subClass == Item_Trump)
+            {
+                equip_t = EQUIPTYPE_TRUMP;
+                lv = ied.tRank;
+            }
+
+            ++ c;
+			getRandomAttr2(lv, crr, q, c, protect, types, values, equip_t);
+			if(!equip->GetBindStatus() && isBound)
+				equip->DoEquipBind();
+			ApplyAttr2(equip, types, values);
+			if(fgt != NULL)
+			{
+				fgt->setDirty();
+                if(equip->getClass() == Item_Trump)
+                    fgt->sendModification(0x50 + pos, equip, false);
+                else
+                    fgt->sendModification(0x21 + pos, equip, false);
+			}
+			else
+				SendSingleEquipData(equip);
+			return 0;
+		}
+		return 1;
+	}
+
 
     const GData::ItemBaseType*  Package::CheckBeforeEquipUpgrade(UInt32 typeId)
     {
@@ -3693,6 +3761,17 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+
+        float v2 = 0;
+        if(equip_t == EQUIPTYPE_EQUIP)
+            v2 = GObjectManager::getAttrMax(lv, types[2]-1, q, crr)*90;
+        else if(equip_t == EQUIPTYPE_TRUMP)
+            v2 = GObjectManager::getAttrTrumpMax(lv, types[2]-1, q, crr)*90;
+        if ((float)values[2] > v2 && !(protect & 4))
+        {
+            SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
+        }
+
 
         {
             float v0 = 0;
