@@ -1049,7 +1049,73 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         if (exp)
         {
             Stream st(REP::OFFLINEEXP);
-            st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f) << Stream::eos;
+            st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f);
+
+            UInt32 equip = pl->GetVar(VAR_OFFLINE_EQUIP);
+            if(equip)
+            {
+                UInt8 dayCnt = static_cast<UInt8>(equip / (24 * 3600));
+                UInt8 lvl = pl->GetLev();
+                UInt16 equipId = 0;
+                UInt16 needCnt = 0;
+
+                if(dayCnt > 365)
+                    needCnt = 365;
+                if(dayCnt < 7)
+                    needCnt = 0;
+                else if(dayCnt < 14)
+                    needCnt = 1;
+                else if(dayCnt < 21)
+                    needCnt = 3;
+                else if(dayCnt < 30)
+                    needCnt = 5;
+                else
+                    needCnt = 7 + (dayCnt - 30) * 2;
+                if (pl->GetPackage()->GetRestPackageSize() < needCnt)
+                {
+                    pl->sendMsgCode(0, 1011);
+                    return;
+                }
+
+                st << needCnt;
+                if(dayCnt >= 7)
+                {
+                    equipId = getRandOEquip(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                }
+                if(dayCnt >= 14)
+                {
+                    equipId = getRandOEquip(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                    equipId = GameAction()->getRandTrump(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                }
+                if(dayCnt >= 21)
+                {
+                    equipId = getRandOEquip(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                    equipId = GameAction()->getRandTrump(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                }
+                int times = dayCnt / 30;
+                while(times--)
+                {
+                    equipId = getRandOEquip(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                    equipId = GameAction()->getRandTrump(lvl);
+                    pl->GetPackage()->AddItem(equipId, 1, true);
+                    st << equipId;
+                }
+                pl->SetVar(VAR_OFFLINE_EQUIP, 0);
+            }
+
+            st<< Stream::eos;
             pl->send(st);
         }
     }

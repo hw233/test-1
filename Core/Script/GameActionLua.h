@@ -179,6 +179,7 @@ namespace Script
 		bool RunItemTaskUse(Player* player, UInt32 itemId);	
 		UInt16 RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind);
 		UInt16 RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind);
+        UInt16 getRandTrump(UInt8 lvl);
 
 		void RunAutoRegen(Player* player, Fighter* fighter);
 
@@ -238,7 +239,7 @@ namespace Script
         bool RunSSDTAward(Player* player, UInt8 opt);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind);
         UInt16 RunHappyAward(Player* player, UInt8 opt);
-       
+        UInt16 RunTargetAward(Player* player);
 	public:
 
 		template <typename R>

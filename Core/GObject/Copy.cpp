@@ -386,6 +386,12 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->send(st);
             }
 
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 fourthDay = TimeUtil::SharpDay(3, PLAYER_DATA(pl, created));
+            std::cout << id << thisDay << fourthDay << std::endl;
+            if(id == 2 && thisDay == fourthDay && !pl->GetVar(VAR_CLAWARD2))
+                pl->SetVar(VAR_CLAWARD2, 1);
+
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);

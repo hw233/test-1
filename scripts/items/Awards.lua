@@ -77,4 +77,54 @@ function RunHappyAward(player, opt)
     return itemId;
 end
 
+function RunTargetAward(player)
+    if player == nil then
+        return 0;
+    end
+
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+
+    local itemId = 0;
+    local chance = {1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250}
+    local item = {515, 503, 507, 56, 57, 15, 60, 80}
+    local g = math.random(1, 10000)
+    local i;
+    for i = 1, #chance do
+        if g <= chance[i] then
+            if i <= 6 then
+                player:lastLootPush(item[i], 1);
+                package:AddItem(item[i], 1, true, true, 41);
+            else
+                if i == 7 then
+                    if player:hasRealItemAward(1) then
+                        player:getRealItemAward(1)
+                        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得60QB实物大奖")
+                    else
+                        i = 1;
+                        player:lastLootPush(item[i], 1);
+                        package:AddItem(item[i], 1, true, true, 41);
+                    end
+                else
+                     if player:hasRealItemAward(2) then
+                         player:getRealItemAward(2)
+                         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得100QB实物大奖")
+                     else
+                         i = 1;
+                         player:lastLootPush(item[i], 1);
+                         package:AddItem(item[i], 1, true, true, 41);
+                     end
+                end
+            end
+            break
+        end
+    end
+
+    return i;
+end
+
 

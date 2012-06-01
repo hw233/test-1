@@ -355,6 +355,12 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             }
             tmp.resize(0);
 
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 fifthDay = TimeUtil::SharpDay(4, PLAYER_DATA(pl, created));
+            std::cout << id << thisDay << fifthDay << std::endl;
+            if(id == 2 && thisDay == fifthDay && !pl->GetVar(VAR_CLAWARD2))
+                pl->SetVar(VAR_CLAWARD2, 1);
+
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
             if (ato)

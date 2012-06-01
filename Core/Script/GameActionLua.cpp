@@ -227,6 +227,7 @@ namespace Script
 		CLASS_DEF(Player, OnShuoShuo);
         CLASS_DEF(Player, sendMDSoul);
         CLASS_DEF(Player, sendHappyInfo);
+        CLASS_DEF(Player, lastLootPush);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -771,6 +772,11 @@ namespace Script
 		return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
 	}
 
+    UInt16 GameActionLua::getRandTrump(UInt8 lvl)
+    {
+        return Run<UInt32>(NULL, "getRandTrump", lvl);
+    }
+
 	UInt16 GameActionLua::RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind)
 	{
 		assert(player != NULL);
@@ -1118,4 +1124,14 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt16>("RunHappyAward", player, opt);
     }
+
+    UInt16 GameActionLua::RunTargetAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunTargetAward", player);
+    }
+
 }
+
+
+

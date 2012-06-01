@@ -1445,6 +1445,7 @@ namespace GObject
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
+        void getTargetAward(UInt8 opt);
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1484,6 +1485,7 @@ namespace GObject
         DeamonPlayerData* getDeamonPlayerData() { return m_dpData; }
         void sendDeamonAwardsInfo();
         void getDeamonAwards();
+        void lastLootPush(UInt16 itemId, UInt16 num);
 
     private:
         bool m_hasTripod;

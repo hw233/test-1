@@ -148,6 +148,9 @@ namespace GObject
         VAR_JUNE_HAPPY_ITEM_CNT = 115, // 六一使用棒棒糖数
         VAR_LUCKYDRAW_CNT = 116, // 寻宝次数
 
+        VAR_CLAWARD2 = 117, // 七天目标抽奖之今日目标
+        VAR_OFFLINE_EQUIP = 118, //离线道具
+
         VAR_MAX,
     };
 
@@ -287,6 +290,8 @@ namespace GObject
             REGISTER_VAR(VAR_JUNE_HAPPY, CYCLE_DAY);
             REGISTER_VAR(VAR_JUNE_HAPPY_ITEM_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_OFFLINE_EQUIP, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

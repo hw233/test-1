@@ -639,6 +639,16 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 	if (atkerRank == _ranks[row].end())
 		return;
 
+    AthleticsRankData * atKerData = *(atkerRank->second);
+    if(atKerData && atKerData->challengenum >= 5)
+    {
+        UInt32 thisDay = TimeUtil::SharpDay();
+        UInt32 secondDay = TimeUtil::SharpDay(1, PLAYER_DATA(atker, created));
+        std::cout << thisDay << secondDay << std::endl;
+        if(thisDay == secondDay && !atker->GetVar(VAR_CLAWARD2))
+             atker->SetVar(VAR_CLAWARD2, 1);
+    }
+
     UInt32 extrachallenge = (*atkerRank->second)->extrachallenge;
     if((0 == extrachallenge) || (extrachallenge & static_cast<UInt32>(0x80000000)))
         return;
