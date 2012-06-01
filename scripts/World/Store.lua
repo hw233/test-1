@@ -51,6 +51,7 @@ store:add(2,497,10)
 end
 
 
+store:add(2,549,80)
 store:add(2,33,10)
 store:add(2,8000,15)
 store:add(2,72,720)
