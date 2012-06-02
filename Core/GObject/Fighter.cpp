@@ -212,7 +212,7 @@ bool Fighter::addExp( UInt64 e )
 		{
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
-		}
+        }
         worldBoss.setLevel(_level);
         _owner->sendLevelPack(_level);
         _expFlush = true;
@@ -287,6 +287,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
+            /*
             if(_level >= 40)
             {
                 UInt32 thisDay = TimeUtil::SharpDay();
@@ -297,6 +298,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
                      _owner->sendRC7DayInfo(TimeUtil::Now());
                 }
             }
+            */
 		}
         worldBoss.setLevel(l);
 	}
