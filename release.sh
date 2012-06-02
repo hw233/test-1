@@ -23,6 +23,6 @@ if [ $# -ge 2 -a "$2" == "fb" ]; then
     fi
 else
     make release
-    tar cvfz $R$file --exclude=sql/conf.sh bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol conf/udplog.xml scripts/ sql/
+    tar cvfz $R$file --exclude=sql/conf.sh  bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol conf/udplog.xml scripts/ sql/
 fi
 

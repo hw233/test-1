@@ -58,6 +58,7 @@
 #include "GameServer.h"
 #endif
 #include "GData/Store.h"
+#include "RealItemAward.h"
 
 #include <cmath>
 
@@ -8656,6 +8657,9 @@ namespace GObject
             // 欢乐大转盘
             getHappyAward(opt);
             break;
+        case 3:
+            // 今日目标
+            getTargetAward(opt);
         }
     }
 
@@ -8752,8 +8756,42 @@ namespace GObject
         sendHappyInfo(itemId);
     }
 
+    void Player::getTargetAward(UInt8 opt)
+    {
+        UInt8 idx = 1;
+        UInt8 status = GetVar(VAR_JUNE_ITEM);
+        // 转到转盘
+        if(opt == 0 && 1 == GetVar(VAR_CLAWARD2))
+        {
+            idx = GameAction()->RunTargetAward(this);
+            SetVar(VAR_CLAWARD2, 2);
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(3);
+            st << idx;
+            st << Stream::eos;
+            send(st);
+        }
+        else if(opt == 1)
+        {
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_lastLoot.clear();
+        }
+    }
+
+
+    void Player::lastLootPush(UInt16 itemId, UInt16 num)
+    {
+        GData::LootResult lt = {itemId, num};
+        _lastLoot.push_back(lt);
+    }
+
     void Player::sendHappyInfo(UInt16 itemId)
     {
+
         if(!World::getJune())
             return;
 
@@ -9278,10 +9316,79 @@ namespace GObject
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
+#if 0
+        AddVar(VAR_OFFLINE_EQUIP, offline);
+#endif
     }
 
     void Player::getOfflineExp()
     {
+#if 0
+        UInt32 equip = GetVar(VAR_OFFLINE_EQUIP);
+        if(equip)
+        {
+            UInt32 dayCnt = equip / (24 * 3600);
+            UInt8 lvl = GetLev();
+            UInt16 equipId;
+            UInt16 needCnt = 0;
+
+            if(dayCnt > 365)
+                needCnt = 365;
+            if(dayCnt < 7)
+                needCnt = 1;
+            else if(dayCnt < 14)
+                needCnt = 3;
+            else if(dayCnt < 21)
+                needCnt = 5;
+            else if(dayCnt < 30)
+                needCnt = 7;
+            else
+                needCnt = 9 + (dayCnt - 30) * 2;
+            if (GetPackage()->GetRestPackageSize() < needCnt)
+            {
+                sendMsgCode(0, 1011);
+                return;
+            }
+
+            if(dayCnt >= 7)
+            {
+                equipId = getRandOEquip(lvl);
+                m_Package->AddItem(equipId, 1, true);
+                equipId = GameAction()->getRandTrump(lvl);
+                m_Package->AddItem(equipId, 1, true);
+            }
+            if(dayCnt >= 14)
+            {
+                equipId = getRandOEquip(lvl);
+                m_Package->AddItem(equipId, 1, true);
+                equipId = GameAction()->getRandTrump(lvl);
+                m_Package->AddItem(equipId, 1, true);
+            }
+            if(dayCnt >= 21)
+            {
+                equipId = getRandOEquip(lvl);
+                m_Package->AddItem(equipId, 1, true);
+                equipId = GameAction()->getRandTrump(lvl);
+                m_Package->AddItem(equipId, 1, true);
+            }
+            if(dayCnt >= 30)
+            {
+                equipId = getRandOEquip(lvl);
+                m_Package->AddItem(equipId, 1, true);
+                equipId = GameAction()->getRandTrump(lvl);
+                m_Package->AddItem(equipId, 1, true);
+            }
+            int times = (dayCnt - 30) / 30;
+            while(times--)
+            {
+                equipId = getRandOEquip(lvl);
+                m_Package->AddItem(equipId, 1, true);
+                equipId = GameAction()->getRandTrump(lvl);
+                m_Package->AddItem(equipId, 1, true);
+            }
+            SetVar(VAR_OFFLINE_EQUIP, 0);
+        }
+#endif
         UInt32 exp = GetVar(VAR_OFFLINE_EXP);
         if (exp)
         {
@@ -9476,6 +9583,8 @@ namespace GObject
         st << static_cast<UInt8>(cts3);
         st << static_cast<UInt8>(GetVar(VAR_CL3DAY));
         st << static_cast<UInt8>(GetVar(VAR_RC7DAYWILL));
+        st << static_cast<UInt8>(off + 1);
+        st << static_cast<UInt8>(GetVar(VAR_CLAWARD2));
         st << Stream::eos;
         send(st);
     }
@@ -9493,7 +9602,25 @@ namespace GObject
 
         if (now_sharp - created_sharp > 7 * DAY_SECS)
             return;
-
+#if 0
+        // 简体今日目标
+        if (type == 9 && 1 == GetVar(VAR_CLAWARD2))
+        {
+            if(this->GetFreePackageSize() < 1)
+            {
+                this->sendMsgCode(0, 1011);
+                return;
+            }
+            SetVar(VAR_CLAWARD2, 2);
+            Stream st(REP::RC7DAY);
+            UInt8 idx;
+            idx = GameAction()->RunTargetAward(this);
+            st << static_cast<UInt8>(2) << idx;
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+#endif
         UInt32 ctslanding = GetVar(VAR_CTSLANDING);
         UInt32 off = CREATE_OFFSET(created_sharp, now_sharp);
         if (off >= 7)
@@ -9507,19 +9634,29 @@ namespace GObject
             else
                 break;
         }
-
+#ifdef _FB
         if (type == 1 && !GetVar(VAR_CTSAWARD))
         {
             GameAction()->onCLLoginReward(this, 0);
             SetVar(VAR_CTSAWARD, 1);
-
             Stream st(REP::RC7DAY);
             st << static_cast<UInt8>(1);
             st << Stream::eos;
             send(st);
             return;
         }
-
+#else
+        if (type == 1 && !GetVar(VAR_CTSAWARD))
+        {
+            GameAction()->onCLLoginReward(this, cts);
+            SetVar(VAR_CTSAWARD, 1);
+            Stream st(REP::RC7DAY);
+            st << static_cast<UInt8>(1);
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+#endif
         if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -9565,6 +9702,7 @@ namespace GObject
                 }
             }
         }
+
         if (idx && type == 4 && !GetVar(VAR_RC7DAYWILL))
         {
             if (GameAction()->onRC7DayWill(this, idx))
@@ -9778,6 +9916,16 @@ namespace GObject
         if (!tcpInfo)
             return false;
         return tcpInfo->getPass(copyid);
+    }
+
+    bool Player::hasRealItemAward(UInt32 id)
+    {
+        return realItemAwardMgr.hasAward(id);
+    }
+
+    void Player::getRealItemAward(UInt32 id)
+    {
+        realItemAwardMgr.getAward(this, id);
     }
 
 } // namespace GObject

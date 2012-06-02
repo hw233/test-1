@@ -14,7 +14,7 @@ namespace GObject
     static const UInt16 OEquip70[] = {2592,2593,2594,2595,2596,2597,2598,2599,2600,2601,2602,2603,2604,2605,2606,2607,2608,2609,2610,2611,2612,2613,2614,2615};
     static const UInt16 OEquip80[] = {2616,2617,2618,2619,2620,2621,2622,2623,2624,2625,2626,2627,2628,2629,2630,2631,2632,2633,2634,2635,2636,2637,2638,2639};
     static const UInt16 OEquip90[] = {2640,2641,2642,2643,2644,2645,2646,2647,2648,2649,2650,2651,2652,2653,2654,2655,2656,2657,2658,2659,2660,2661,2662,2663};
-    static const UInt16 OEquip100[]= {2640,2641,2642,2643,2644,2645,2646,2647,2648,2649,2650,2651,2652,2653,2654,2655,2656,2657,2658,2659,2660,2661,2662,2663};
+    static const UInt16 OEquip100[]= {2664,2665,2666,2667,2668,2669,2670,2671,2672,2673,2674,2675,2676,2677,2678,2679,2680,2681,2682,2683,2684,2685,2686,2687};
 
     UInt16 getRandOEquip(UInt8 lvl);
     UInt16 getRandPEquip(UInt8 lvl);
@@ -153,7 +153,8 @@ namespace GObject
 		UInt8 ExchangeSet(UInt32 * itemId, UInt8 type, UInt32& resultId);
 		// UInt8 BatchMergeGem(std::map<UInt16, UInt32, _GemCompare >& gems, std::vector<UInt32>& gemsOut);
 		UInt8 BatchMergeGem(UInt16 gemId, UInt16 unbindCount, UInt16 bindCount, UInt8 protect, UInt16& gemIdOut, UInt16& unbindGemsOut, UInt16& bindGemsOut, UInt16& succTimes, UInt16& failedTimes);
-		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);
+		//UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId, UInt32 itemId2);
+		UInt8 ActivateAttr(UInt16 fighterId, UInt32 itemId);
 		UInt8 TrumpUpgrade(UInt16 fighterId, UInt32 trumpId, UInt32 itemId);
 		UInt8 TrumpLOrder(UInt16 fighterId, UInt32 trumpId);
 

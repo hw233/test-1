@@ -59,6 +59,7 @@
 #include "GData/Store.h"
 #include "LuckyDraw.h"
 #include <fcntl.h>
+#include "RealItemAward.h"
 
 namespace GObject
 {
@@ -172,6 +173,7 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
+        loadRealItemAward();
         loadEquipForge();
 		loadMapData();
         loadAttrFactor();
@@ -4222,6 +4224,25 @@ namespace GObject
 		{
 			lc.advance();
             luckyDraw.pushLog(t.name, t.items);
+        }
+        lc.finalize();
+        return true;
+    }
+
+
+    bool GObjectManager::loadRealItemAward()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Real Item Award");
+		DBRealItemAward t;
+		if(execu->Prepare("SELECT `id`, `cd`, `card_no`, `card_psw` FROM `real_item_award` ORDER BY `id`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            realItemAwardMgr.load(t.id, t.cd, t.card_no, t.card_psw);
         }
         lc.finalize();
         return true;

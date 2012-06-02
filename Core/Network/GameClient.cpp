@@ -134,7 +134,7 @@ UInt8 GameClient::threadFromCmd(GObject::Player * player, int cmd)
 		0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, // 0x80
 		0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, // 0x90
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0xA0
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, // 0xB0
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, // 0xB0
 		0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, // 0xC0
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, // 0xD0
 		2, 2, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, // 0xE0
@@ -248,6 +248,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
             {
                 Stream st(SPEP::JASON);
                 jsonParser2(buf, len, st);
+                st << Stream::eos;
                 send(&st[0], st.size());
             }
             else
