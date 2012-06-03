@@ -700,39 +700,40 @@ void World::RankLuckyDraw(Player* player, bool notify)
     {
         RLuckyDrawRank r_rank2(it->second);
         r_rank = r_rank2;
-        ++ r_rank;
     }
+    else
+        change = true;
 
     for(; r_rank != _luckyDrawList.rend(); ++ r_rank)
     {
         if(luckyDrawCnt <= (*r_rank)->GetVar(VAR_LUCKYDRAW_CNT))
             break;
+
         if(!change)
         {
             change = true;
-            _luckyDrawList.erase(it->second);
         }
 
         if(notify)
         {
             SYSMSG(title, 2362);
             UInt32 pos = std::distance(_luckyDrawList.begin(), r_rank.base()) + 1;
-            if(pos == 0)
+            if(pos == 2)
             {
                 SYSMSGV(content, 2363, player->getName().c_str(), pos);
                 (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
             }
-            else if(pos == 1)
+            else if(pos == 3)
             {
                 SYSMSGV(content, 2363, player->getName().c_str(), pos);
                 (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
             }
-            else if(pos == 2)
+            else if(pos == 4)
             {
                 SYSMSGV(content, 2363, player->getName().c_str(), pos);
                 (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
             }
-            else if(pos == 9)
+            else if(pos == 11)
             {
                 SYSMSGV(content, 2363, player->getName().c_str(), pos);
                 (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
@@ -742,6 +743,8 @@ void World::RankLuckyDraw(Player* player, bool notify)
 
     if(change)
     {
+        if(it != _luckyDrawRankList.end())
+            _luckyDrawList.erase(it->second);
         _luckyDrawRankList[player] = _luckyDrawList.insert(r_rank.base(), player);
         if(notify)
         {
@@ -792,7 +795,7 @@ void World::SendLuckyDrawAward()
             Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[3] = {{9019,5}, {30,6}, {9034, 1}};
+                MailPackage::MailItem mitem[3] = {{9022,5}, {30,6}, {9034, 1}};
                 mailPackageManager.push(mail->id, mitem, 3, true);
 
                 std::string strItems;
@@ -811,7 +814,7 @@ void World::SendLuckyDrawAward()
             Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{9017,4}, {30,4}};
+                MailPackage::MailItem mitem[2] = {{9019,4}, {30,4}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
 
                 std::string strItems;
@@ -830,7 +833,7 @@ void World::SendLuckyDrawAward()
             Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{9021,3}, {30,2}};
+                MailPackage::MailItem mitem[2] = {{9017,3}, {30,2}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
 
                 std::string strItems;
@@ -849,7 +852,7 @@ void World::SendLuckyDrawAward()
             Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
             if(mail)
             {
-                MailPackage::MailItem mitem[2] = {{9018,2}, {30,1}};
+                MailPackage::MailItem mitem[2] = {{9021,2}, {30,1}};
                 mailPackageManager.push(mail->id, mitem, 2, true);
 
                 std::string strItems;

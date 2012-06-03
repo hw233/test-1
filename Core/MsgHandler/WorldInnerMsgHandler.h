@@ -665,7 +665,7 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
 {
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
-    UInt8 times = *(UInt8*)data;
+    UInt8 times = *(UInt32*)data;
     UInt32 oldCnt = player->GetVar(VAR_LUCKYDRAW_CNT);
     player->AddVar(VAR_LUCKYDRAW_CNT, times);
     SYSMSG(title, 2364);
