@@ -3675,6 +3675,14 @@ function ItemNormal_00009031(iid, num, bind, param)
     return false
 end
 
+function ItemNormal_00009034(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(16)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 
 
 local ItemNormal_Table = {
@@ -4993,6 +5001,9 @@ local ItemNormal_Table = {
     [9031] = ItemNormal_00009031,
     [9032] = ItemNormal_00009031,
     [9033] = ItemNormal_00009031,
+
+    -- 多宝仙君
+    [9034] = ItemNormal_00009034,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
