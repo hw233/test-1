@@ -615,6 +615,8 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
     player->GetShuoShuo()->reset();
     player->GetCFriend()->reset();
     player->sendSSDTInfo();
+    player->SetVar(VAR_JUNE_HAPPY, 0);
+    player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
 }
 

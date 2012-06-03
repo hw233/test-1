@@ -25,6 +25,7 @@
 #include "GObject/SpecialAward.h"
 #include "GObject/PracticePlace.h"
 #include "GObject/ArenaBattle.h"
+#include "Common/Itoa.h"
 
 void OnPushTimerEvent( GameMsgHdr& hdr, const void * data )
 {
@@ -665,7 +666,86 @@ void OnLuckyDraw( GameMsgHdr& hdr,  const void* data )
     using namespace GObject;
     MSG_QUERY_PLAYER(player);
     UInt8 times = *(UInt8*)data;
+    UInt32 oldCnt = player->GetVar(VAR_LUCKYDRAW_CNT);
     player->AddVar(VAR_LUCKYDRAW_CNT, times);
+    SYSMSG(title, 2364);
+    SYSMSG(content, 2365);
+    if((oldCnt < 20) && ((oldCnt + times) >=20)) 
+    {
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{9013,5}, {9018,1}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+
+            std::string strItems;
+            for(int i = 0; i < 2; ++ i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+    if((oldCnt < 40) && ((oldCnt + times) >=40)) 
+    {
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{9013,5}, {9020,1}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+
+            std::string strItems;
+            for(int i = 0; i < 2; ++ i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+    if((oldCnt < 60) && ((oldCnt + times) >=60)) 
+    {
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{9013,5}, {9018,2}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+
+            std::string strItems;
+            for(int i = 0; i < 2; ++ i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+    if((oldCnt < 80) && ((oldCnt + times) >=80)) 
+    {
+        Mail * mail = player->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[2] = {{9013,5}, {9020,2}};
+            mailPackageManager.push(mail->id, mitem, 2, true);
+
+            std::string strItems;
+            for(int i = 0; i < 2; ++ i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, player->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
 
     WORLD().RankLuckyDraw(player);
 }

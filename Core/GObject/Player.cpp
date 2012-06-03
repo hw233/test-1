@@ -5976,7 +5976,7 @@ namespace GObject
         if(World::getJune())
         {
             UInt32 total = GetVar(VAR_JUNE_RECHARGE_TOTAL);
-            UInt32 value = total % 10;
+            UInt32 value = total % 20;
             value += r;
             total += r;
             SetVar(VAR_JUNE_RECHARGE_TOTAL, total);
@@ -7093,26 +7093,49 @@ namespace GObject
 
     void Player::sendJuneRechargeMails(UInt32 value)
     {
-        UInt32 count = value / 10;
+        UInt32 count = value / 20;
         if(count > 0)
         {
 			SYSMSGV(title, 2324);
 			SYSMSG(content, 2325);
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-			if(mail == NULL)
-				return;
-
-			MailPackage::MailItem mitem;
+            int cnt = count / 255;
+            int left = count % 255;
             std::string strItems;
-            mitem.id = 9028;
-            mitem.count = count;
-            strItems += Itoa(mitem.id);
-            strItems += ",";
-            strItems += Itoa(count);
-            strItems += "|";
+            for(int i = 0; i < cnt; ++ i)
+            {
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail == NULL)
+                    return;
 
-			mailPackageManager.push(mail->id, &mitem, 1, true);
-			DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+                MailPackage::MailItem mitem;
+                mitem.id = 9028;
+                mitem.count = 255;
+                strItems += Itoa(mitem.id);
+                strItems += ",";
+                strItems += Itoa(255);
+                strItems += "|";
+
+                mailPackageManager.push(mail->id, &mitem, 1, true);
+
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+            if(left > 0)
+            {
+                Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                if(mail == NULL)
+                    return;
+                MailPackage::MailItem mitem;
+                mitem.id = 9028;
+                mitem.count = left;
+                strItems += Itoa(mitem.id);
+                strItems += ",";
+                strItems += Itoa(left);
+                strItems += "|";
+
+                mailPackageManager.push(mail->id, &mitem, 1, true);
+
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
         }
     }
 
@@ -8687,6 +8710,16 @@ namespace GObject
 
     void Player::getHappyAward(UInt8 opt)
     {
+        if(opt == 6)
+        {
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_lastLoot.clear();
+        }
+
         if(!World::getJune() || opt > 5)
             return;
 
@@ -8701,16 +8734,18 @@ namespace GObject
             if(0 == (itemId = GameAction()->RunHappyAward(this, opt)))
                 return;
 
+            GData::LootResult lt = {itemId, 1};
+            _lastLoot.push_back(lt);
             SetVar(VAR_JUNE_HAPPY, happy - 20);
         }
         else
         {
-            if( (1 << opt) & status )
+            if( (1 << (opt - 1)) & status )
                 return;
             if(0 == GameAction()->RunHappyAward(this, opt))
                 return;
 
-            status |= (1 << opt);
+            status |= (1 << (opt - 1));
             SetVar(VAR_JUNE_ITEM, status);
         }
 

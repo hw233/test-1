@@ -226,6 +226,7 @@ namespace Script
 		CLASS_DEF(Player, getPlatform);
 		CLASS_DEF(Player, OnShuoShuo);
         CLASS_DEF(Player, sendMDSoul);
+        CLASS_DEF(Player, sendHappyInfo);
 
 		CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

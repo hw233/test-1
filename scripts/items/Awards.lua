@@ -45,13 +45,17 @@ function RunHappyAward(player, opt)
 
     local itemId = 0;
     if opt == 0 then
-        local chance = {51, 116, 189, 246, 1273, 3326, 5893, 10000}
+        local chance = {100, 212, 338, 456, 1461, 3470, 5981, 10000}
         local item = {9022, 509, 507, 515, 503, 514, 56, 15}
         local g = math.random(1, 10000)
         for i = 1, #chance do 
             if g <= chance[i] then
-                package:AddItem(item[i], 1, true, 0, 40);
+                package:AddItem(item[i], 1, true, true, 40);
                 itemId = item[i]
+
+                if i <=4 then
+                    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]在欢乐大转盘中幸运地获得了[4:"..itemId.."]x1")
+                end
                 break
             end
         end
@@ -64,6 +68,7 @@ function RunHappyAward(player, opt)
             { 507, 1, 509, 1, 9021, 1 },
         }
 
+        itemId = 1;
         for i = 1, #items[opt], 2 do
             package:AddItem(items[opt][i], items[opt][i+1], true, 0, 40);
         end

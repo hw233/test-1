@@ -1297,7 +1297,7 @@ function onJune(player)
 end
 
 function onJune1(player)
-    if not getMayDay1() then
+    if not getJune1() then
         return
     end
 
@@ -1307,9 +1307,9 @@ function onJune1(player)
     end
 
     if lvl >= 40 and player:GetVar(110) == 0 then
-        sendItemPackageMail(player, "儿童节礼包", "恭喜您获得儿童节礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9031,1,1});
-        sendItemPackageMail(player, "父亲节礼包", "恭喜您获得父亲节礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9032,1,1});
-        sendItemPackageMail(player, "端午节礼包", "恭喜您获得端午节礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9033,1,1});
+        sendItemPackageMail(player, "儿童节礼包", "恭喜您获得儿童节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9031,1,1});
+        sendItemPackageMail(player, "父亲节礼包", "恭喜您获得父亲节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9032,1,1});
+        sendItemPackageMail(player, "端午节礼包", "恭喜您获得端午节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9033,1,1});
         player:SetVar(110, 1)
     end
 end

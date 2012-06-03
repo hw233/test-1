@@ -1516,9 +1516,9 @@ void OnLuckyDrawReq( GameMsgHdr& hdr, const void * data )
         br >> bind;
         luckyDraw.draw(player, id, times, bind==1?true:false);
 #ifdef _FB
-        if(getJune())
+        if(WORLD().getJune())
         {
-            GameMsgHdr hdr2(0x1C0, WORKER_THREAD_WORLD, pl, sizeof(times));
+            GameMsgHdr hdr2(0x1C0, WORKER_THREAD_WORLD, player, sizeof(times));
             GLOBAL().PushMsg(hdr2, &times);
         }
 #endif
