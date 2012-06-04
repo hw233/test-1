@@ -5737,7 +5737,18 @@ namespace GObject
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
-		if(_clan != NULL)
+        if(nLev >= 40)
+        {
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(this, created));
+            if(thisDay == firstDay && !this->GetVar(VAR_CLAWARD2))
+            {
+                 this->SetVar(VAR_CLAWARD2, 1);
+                 this->sendRC7DayInfo(TimeUtil::Now());
+            }
+        }
+
+        if(_clan != NULL)
 		{
 			_clan->broadcastMemberInfo(this);
 		}
