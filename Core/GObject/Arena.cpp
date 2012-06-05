@@ -854,7 +854,24 @@ void Arena::readPlayers(BinaryReader& brd)
     brd >> cnt;
     for(int i = 0; i < cnt; ++ i)
     {
+        Mutex::ScopedLock lk(globalPlayers.getMutex());
+        std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
+        for(UInt32 z = 0; z < count; ++ z)
+        {
+            UInt64 pid = 0;
+            brd >> pid;
+            Player * pl = pm[pid];
+            if(pl == NULL)
+                continue;
+            ArenaPlayer& ap = _players[pl];
+            brd >> ap.realName;
+        }
     }
 }
+
+void Arena::readHistories(BinaryReader& brd)
+{
+}
+
 
 }
