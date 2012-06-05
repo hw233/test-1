@@ -211,6 +211,7 @@ void Arena::appendEquipInfo( Stream& st, ItemEquip * equip )
 		st << ied.gems[i];
 }
 
+#if 0
 void Arena::readFrom( BinaryReader& brd )
 {
 	brd >> _session;
@@ -557,6 +558,41 @@ void Arena::readFrom( BinaryReader& brd )
 	if(!_loaded)
 		_loaded = true;
 }
+#endif
+void Arena::readFrom( BinaryReader& brd )
+{
+	brd >> _session;
+	UInt8 progress;
+	brd >> progress;
+	if(progress != _progress)
+	{
+		_progress = progress;
+		_notified = 0;
+	}
+	switch(_progress)
+	{
+	case 0:
+		if(!_players.empty())
+			_players.clear();
+		brd >> _nextTime;
+        readPlayers(brd);
+		break;
+	case 1:
+	case 2:
+	case 8:
+		brd >> _nextTime;
+        readHistories(brd);
+		break;
+	case 3:
+	case 4:
+    case 5:
+    case 6:
+        readElimination(brd);
+        break;
+	}
+	if(!_loaded)
+		_loaded = true;
+}
 
 void Arena::sendInfo( Player * player )
 {
@@ -810,6 +846,15 @@ void Arena::check()
 		}
 		break;
 	}
+}
+
+void Arena::readPlayers(BinaryReader& brd)
+{
+    UInt32 cnt = 0;
+    brd >> cnt;
+    for(int i = 0; i < cnt; ++ i)
+    {
+    }
 }
 
 }

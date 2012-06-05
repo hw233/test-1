@@ -115,9 +115,9 @@ private:
 	UInt32 _playerCount[3];
 	std::map<UInt64, RecordInfo> _records;
 	std::map<Player *, ArenaPlayer> _players;
-	EliminationPlayer _finals[3][32];
-	UInt8 _finalIdx[3][6][32];
-	EliminationBattle _finalBattles[3][31];
+	EliminationPlayer _finals[2][32];
+	UInt8 _finalIdx[2][6][32];
+	EliminationBattle _finalBattles[2][31];
 };
 
 extern Arena arena;

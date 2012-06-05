@@ -32,7 +32,7 @@ void ArenaConn::initConnection()
 	if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 		throw std::bad_exception();
 	Stream st(0x01, 0xEF);
-	st << cfg.slugName << cfg.channelNum << cfg.serverNum;
+	st << cfg.slugName << cfg.channelNum << cfg.serverNum << cfg.merged;
     if (cfg.merged)
     {
         // TODO:
