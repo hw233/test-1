@@ -6595,11 +6595,11 @@ namespace GObject
                 Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000);
                 if(mail)
                 {
-                    MailPackage::MailItem mitem[2] = {{MailPackage::Coupon,200}, {1523,1}};
-                    mailPackageManager.push(mail->id, mitem, 2, true);
+                    MailPackage::MailItem mitem[1] = {{30,6}};
+                    mailPackageManager.push(mail->id, mitem, 1, true);
 
                     std::string strItems;
-                    for (int i = 0; i < 2; ++i)
+                    for (int i = 0; i < 1; ++i)
                     {
                         strItems += Itoa(mitem[i].id);
                         strItems += ",";

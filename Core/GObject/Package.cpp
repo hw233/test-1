@@ -1984,6 +1984,8 @@ namespace GObject
                 GameAction()->onEnchantAct(player, 6);
             if (slevel < 8 && level >= 8)
                 GameAction()->onEnchantAct(player, 8);
+            if (slevel < 10 && level >= 10)
+                GameAction()->onEnchantAct(player, 10);
         }
         else
         {
@@ -1992,6 +1994,8 @@ namespace GObject
             if (level == 6)
                 GameAction()->onEnchantAct(player, level);
             if (level == 8)
+                GameAction()->onEnchantAct(player, level);
+            if (level == 10)
                 GameAction()->onEnchantAct(player, level);
         }
     }
@@ -2266,7 +2270,7 @@ namespace GObject
             if (World::getTrumpEnchRet())
                 enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #ifdef _FB
-            if (World::getEnchantAct())
+            if (World::getEnchantAct() && (equip->getClass() == Item_Weapon || equip->getClass() == Item_Armor1 || equip->getClass() == Item_Armor2 || equip->getClass() == Item_Armor4 || equip->getClass() == Item_Armor5))
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #endif
 			return 0;
