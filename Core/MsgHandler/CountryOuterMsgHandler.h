@@ -4440,6 +4440,16 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
     }
 }
 
+void OnRF7Day( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+}
+
 void OnYBBuf( GameMsgHdr& hdr, YBBuf& req )
 {
     MSG_QUERY_PLAYER(player);

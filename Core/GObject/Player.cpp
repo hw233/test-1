@@ -825,6 +825,7 @@ namespace GObject
 		}
 
         continuousLogin(curtime);
+        continuousLoginRF(curtime);
 
         if (World::_halloween)
             sendHalloweenOnlineAward(curtime);
@@ -9651,6 +9652,41 @@ namespace GObject
         SetVar(VAR_CTSLANDING, ctslanding);
     }
 
+    void Player::continuousLoginRF(UInt32 now)
+    {
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+
+        UInt32 rf = GetVar(VAR_INRF7DAY);
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
+
+        if (now < rf)
+            return;
+
+        bool inact = false;
+        if (now_sharp - last_sharp > 14 * DAY_SECS)
+        {
+            SetVar(VAR_INRF7DAY, now);
+            if (GetVar(VAR_CTSLANDINGRF))
+                SetVar(VAR_CTSLANDINGRF, 0);
+            inact = true;
+        }
+        else if (now_sharp - rf_sharp <= 7 * DAY_SECS)
+            inact = true;
+
+        if (!inact)
+            return;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDINGRF);
+        UInt32 off = CREATE_OFFSET(rf_sharp, now_sharp);
+        if (off >= 7)
+            return;
+        ctslanding |= (1<<off);
+        SetVar(VAR_CTSLANDINGRF, ctslanding);
+    }
+
     void Player::sendRC7DayInfo(UInt32 now)
     {
         if (!World::getRC7Day())
@@ -9698,6 +9734,74 @@ namespace GObject
             cts3 = t;
 
         Stream st(REP::RC7DAY);
+        st << static_cast<UInt8>(0);
+        st << GetVar(VAR_RC7DAYRECHARGE);
+        st << static_cast<UInt8>(GetVar(VAR_RC7DAYTURNON));
+        st << static_cast<UInt8>(GetVar(VAR_CTSAWARD));
+        st << static_cast<UInt8>(cts);
+        st << static_cast<UInt8>(GetVar(VAR_CLAWARD));
+        st << static_cast<UInt8>(cts3);
+        st << static_cast<UInt8>(GetVar(VAR_CL3DAY));
+        st << static_cast<UInt8>(GetVar(VAR_RC7DAYWILL));
+        st << static_cast<UInt8>(off + 1);
+        st << static_cast<UInt8>(GetVar(VAR_CLAWARD2));
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendRF7DayInfo(UInt32 now)
+    {
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+
+        UInt32 rf = GetVar(VAR_INRF7DAY);
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
+
+        if (now < rf)
+            return;
+
+        bool inact = false;
+        if (now_sharp - last_sharp > 14 * DAY_SECS)
+            inact = true;
+        else if (now_sharp - rf_sharp <= 7 * DAY_SECS)
+            inact = true;
+
+        if (!inact)
+            return;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDINGRF);
+        UInt32 off = CREATE_OFFSET(rf_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 cts = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++cts;
+            else
+                break;
+        }
+
+        UInt32 t = 0;
+        UInt32 cts3 = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++t;
+            else
+            {
+                if (cts3 < t)
+                    cts3 = t;
+                t = 0;
+            }
+        }
+        if (cts3 < t)
+            cts3 = t;
+
+        Stream st(REP::RF7DAY);
         st << static_cast<UInt8>(0);
         st << GetVar(VAR_RC7DAYRECHARGE);
         st << static_cast<UInt8>(GetVar(VAR_RC7DAYTURNON));

@@ -1498,6 +1498,7 @@ void Clan::disband(Player * player)
 	globalOwnedClans[cny].remove(player->getName());
 	clanCache.push(this, false);
 	
+#if 0
     struct ClanData
     {
         Clan* clan;
@@ -1507,6 +1508,7 @@ void Clan::disband(Player * player)
 
     GameMsgHdr h(0x250,  WORKER_THREAD_NEUTRAL, NULL, sizeof(ClanData*));
     GLOBAL().PushMsg(h, &clan_data);
+#endif
 
 	DB5().PushUpdateData("DELETE FROM `clan` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
