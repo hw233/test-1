@@ -1508,10 +1508,16 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		item[nums++].count = money[i];
 	}
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+    {
+        br>>serverNo;
+    }
+
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
 	{
 		GObject::Player *player=it->second;
-		if(player==NULL)
+		if(player==NULL || (serverNo != 0 && serverNo != (static_cast<UInt16>(player->getId()>>48))))
 		{
 			result+="1 ";
 		}
