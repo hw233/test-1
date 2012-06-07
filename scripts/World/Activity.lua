@@ -208,12 +208,6 @@ function onActivityCheck(tm)
       setJune1(false)
   end
 
-  if tm >= actTime53 and tm < actTime54 then
-      setEnchantGt11(true)
-  else
-      setEnchantGt11(false)
-  end
-
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -299,6 +293,18 @@ function onActivityCheck(tm)
           setRechargeActive(true, 4)
       else
           setRechargeActive(false, 4)
+      end
+
+      if tm >= actTime53 and tm < actTime54 then
+          setEnchantGt11(true)
+      else
+          setEnchantGt11(false)
+      end
+
+      if tm >= actTime55 and tm < actTime56 then
+          setRechargeActive(true, 8)
+      else
+          setRechargeActive(false, 8)
       end
 
       setShuoShuo(true);
@@ -444,6 +450,9 @@ function initActTime(y, m, d)
 
   actTime53 = os.time(SerStartTm24);
   actTime54 = os.time(SerStartTm24) + 12 * 86400;
+
+  actTime55 = os.time(SerStartTm24);
+  actTime56 = os.time(SerStartTm24) + 12 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
