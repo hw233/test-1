@@ -361,7 +361,7 @@ function initActTime(y, m, d)
   local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
@@ -458,10 +458,10 @@ function initActTime(y, m, d)
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
 
   actTime103 = os.time(SerStartTm102);
-  actTime104 = os.time(SerStartTm102) + 7 * 86400;
+  actTime104 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime105 = os.time(SerStartTm102);
-  actTime106 = os.time(SerStartTm102) + 3 * 86400;
+  actTime106 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime107 = os.time(SerStartTm103);
   actTime108 = os.time(SerStartTm103) + 8 * 86400;

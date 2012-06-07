@@ -1276,12 +1276,17 @@ function onTurnOnRC7Day(player, total, offset)
 end
 
 function onEnchantAct(player, level)
+    local pic = {1416, 1417, 1418, 1419, 1420};
+    local rand = math.random(1, #pic);
+    local rand2 = math.random(1, #pic);
+    local rand3 = math.random(1, #pic);
     local items = {
         [4] = {502,1,1},
         [6] = {509,2,1},
-        [8] = {509,5,1, 1509,1,1},
+        [8] = {509,5,1, pic[rand],1,1, 30,1,1},
+        [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
     };
-    sendItemPackageMail(player, "装备强化返利活动", "装备强化返利活动", items[level]);
+    sendItemPackageMail(player, "装备强化返利第二期活动", "装备强化返利第二期活动", items[level]);
 end
 
 function onEnchantGt11(player, id, level, _type)
@@ -1299,8 +1304,8 @@ function onEnchantGt11(player, id, level, _type)
 end
 
 function onTrainFighterAct(player, fgt)
-    local table_items = {0xA000, 1200, 1};
-    sendItemPackageMail(player, '散仙洗橙返利活动', '散仙洗橙返利活动', table_items)
+    local table_items = {30, 6, 1};
+    sendItemPackageMail(player, '散仙洗练返修为活动', '散仙洗练返修为活动', table_items)
 end
 
 function onJune(player)
