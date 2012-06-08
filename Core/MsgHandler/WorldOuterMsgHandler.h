@@ -1480,7 +1480,8 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 			UInt8 pos1 = 0, pos2 = 0;
 			brd >> group >> pos1 >> pos2;
 			Stream st(REP::SERVER_ARENA_OP);
-			st << type << group << pos1 << pos2 << GObject::arena.getBetCount(group - 1, pos1) << GObject::arena.getBetCount(group - 1, pos2) << Stream::eos;
+			st << type << group << pos1 << pos2 << Stream::eos;
+//GObject::arena.getBetCount(group - 1, pos1) << GObject::arena.getBetCount(group - 1, pos2) << 
 			player->send(st);
 		}
 		break;

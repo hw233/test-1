@@ -16,7 +16,7 @@ namespace GObject
 
 void EliminationPlayer::calcBet(bool won, const char * t)
 {
-	bool isWinner = lastRank == 6;
+	bool isWinner = false;
 	for(std::map<Player *, UInt8>::iterator it = betMap.begin(); it != betMap.end(); ++ it)
 	{
 		if(won)
@@ -54,23 +54,25 @@ void EliminationPlayer::resetBet()
 	betMap.clear();
 }
 
-UInt8 EliminationBattle::winner()
+UInt8 EliminationBattle::winner(UInt8 idx)
 {
 	UInt8 w = 0;
-	const UInt8 oflag[3] = {1, 2, 4};
-	for(int i = 0; i < 3; ++ i)
+    const UInt8 round[5] = { 3, 3, 5, 5, 7 };
+	const UInt8 oflag[7] = {1, 2, 4, 8, 16, 32, 64};
+	for(int i = 0; i < round[idx]; ++ i)
 		if(wonFlag & oflag[i])
 			++ w;
-	if(w > 1)
+	if((w << 1) > round[idx])
 		return 1;
 	return 0;
 }
 
-UInt8 EliminationBattle::winCount()
+UInt8 EliminationBattle::winCount(UInt8 idx)
 {
 	UInt8 w = 0;
-	const UInt8 oflag[3] = {1, 2, 4};
-	for(int i = 0; i < 3; ++ i)
+    const UInt8 round[5] = { 3, 3, 5, 5, 7 };
+	const UInt8 oflag[7] = {1, 2, 4, 8, 16, 32, 64};
+	for(int i = 0; i < round[idx]; ++ i)
 		if((wonFlag & oflag[i]) == 0)
 			++ w;
 	return w;
@@ -104,23 +106,35 @@ void Arena::commitLineup( Player * player, int sid )
 	NETWORK()->SendMsgToClient(sid, st);
 }
 
-UInt8 Arena::bet( Player * player, UInt8 group, UInt8 pos, UInt8 tael )
+UInt8 Arena::bet( Player * player, UInt8 group, UInt16 pos, UInt8 type )
 {
-	if(group > 2 || _progress != 4 || _status > 0 || _round > 4 || pos > 31)
+	if(group > 1 || _progress != 8 || _progress != 9 || _progress != 10 || (_status > 0  && _progress > 3 && _progress < 8))
 		return 1;
-	UInt8 fidx = pos >> _round;
-	if(_finalIdx[group][_round][fidx] != pos || _finals[group][pos].name.empty() || _finals[group][pos].betMap.find(player) != _finals[group][pos].betMap.end())
-		return 1;
-	_finals[group][pos].betMap[player] = tael;
+    if(_progress == 8 || _progress == 9)
+    {
+        std::map<UInt64, PreliminaryPlayer>::iterator it = _preliminaryPlayers.begin();
+        std::advance(it, pos);
+        PreliminaryPlayer& pp = it->second;
+        if(pos > _preliminaryPlayers.size() || pp.name.empty() || pp.betMap.find(player) != pp.betMap.end() || _players[player].betList.size() >= 5)
+            return 1;
+        pp.betMap[player] = type;
+    }
+    else
+    {
+        UInt8 fidx = pos >> _round;
+        if(_finalIdx[group][_round][fidx] != pos || _finals[group][pos].name.empty() || _finals[group][pos].betMap.find(player) != _finals[group][pos].betMap.end() || _players[player].betList.size() >= 1)
+            return 1;
+        _finals[group][pos].betMap[player] = type;
+    }
 	BetInfo binfo;
 	binfo.round = _round;
 	binfo.group = group;
 	binfo.pos = pos;
-	binfo.tael = tael;
+	binfo.type = type;
 	_players[player].betList.push_back(binfo);
-	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `group`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.group, binfo.pos, binfo.tael);
+	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `group`, `pos`, `type`) VALUES(%"I64_FMT"u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.group, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
-	UInt16 data = tael;
+	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
 	return 0;
 }
@@ -563,7 +577,7 @@ void Arena::readFrom( BinaryReader& brd )
 {
 	brd >> _session;
 	UInt8 progress;
-	brd >> progress;
+	brd >> progress >> _nextTime;
 	if(progress != _progress)
 	{
 		_progress = progress;
@@ -572,21 +586,28 @@ void Arena::readFrom( BinaryReader& brd )
 	switch(_progress)
 	{
 	case 0:
+        brd >> _playerCount[0];
+        break;
+    case 8:
+	case 9:
 		if(!_players.empty())
 			_players.clear();
-		brd >> _nextTime;
+        if(!_preliminaryPlayers.empty())
+            _preliminaryPlayers.clear();
         readPlayers(brd);
 		break;
-	case 1:
 	case 2:
-	case 8:
-		brd >> _nextTime;
+        readHistories(brd);
+	case 1:
         readHistories(brd);
 		break;
 	case 3:
 	case 4:
     case 5:
     case 6:
+    case 7:
+    case 10:
+    case 11:
         readElimination(brd);
         break;
 	}
@@ -597,6 +618,7 @@ void Arena::readFrom( BinaryReader& brd )
 void Arena::sendInfo( Player * player )
 {
 	Stream st(REP::SERVER_ARENA_INFO);
+#if 0
 	std::map<Player *, ArenaPlayer>::iterator it = _players.find(player);
 	if(it == _players.end())
 	{
@@ -611,8 +633,7 @@ void Arena::sendInfo( Player * player )
 		st << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0);
 	else
 		st << static_cast<UInt8>(iter->second.lastRank) << static_cast<UInt8>(iter->second.rank) << static_cast<UInt16>(iter->second.session);
-	st << _session << _winnerColor[0] << _winner[0] << _winnerColor[1] << _winner[1] << _winnerColor[2] << _winner[2];
-	st << _progress;
+#endif
 	UInt32 leftTime;
 	UInt32 now = TimeUtil::Now();
 	if(_nextTime > now)
@@ -622,29 +643,77 @@ void Arena::sendInfo( Player * player )
 	switch(_progress)
 	{
 	case 0:
-		st << leftTime;
+        {
+            st << static_cast<UInt8>(1);
+            UInt8 find = 0;
+            std::map<Player *, ArenaPlayer>::iterator it = _players.find(player);
+            if(it != _players.end())
+                find = 1;
+            st << find << leftTime << _playerCount[0];
+        }
 		break;
 	case 1:
 	case 2:
-		st << leftTime << _playerCount[0] << _playerCount[1] << _playerCount[2];
+        {
+            st << static_cast<UInt8>(_progress + 1);
+            UInt8 flag = 0;
+            std::map<UInt64, PreliminaryPlayer>::iterator it = _preliminaryPlayers.find(player->getId());
+            if(it == _preliminaryPlayers.end())
+                flag = 1;
+            st << flag;
+            if(flag == 0)
+            {
+                st << leftTime;
+                ArenaPlayer& ap = _players[player];
+                UInt8 cnt = static_cast<UInt8>(ap.battles.size());
+                st << cnt;
+                int ttimes = 0;
+                int dtimes = 0;
+                for(int i = 0; i < cnt; ++ i)
+                {
+                    UInt8 flag = ap.group << 4 | ap.battles[i].won;
+                    st << flag;
+                    if(ap.group == 0)
+                    {
+                        ++ ttimes;
+                        st << ttimes;
+                    }
+                    else
+                    {
+                        ++ dtimes;
+                        st << ttimes;
+                    }
+                    st << ap.battles[i].battleId << ap.battles[i].otherName;
+                }
+            }
+            std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
+            if(ait == _players.end())
+            {
+                st << static_cast<UInt8>(5);
+            }
+            else
+            {
+                ArenaPlayer& ap = ait->second;
+                st << static_cast<UInt8>(5 - ap.betList.size());
+            }
+            UInt16 premNum = static_cast<UInt16>(_preliminaryPlayers.size());
+            st << premNum;
+            for(std::map<UInt64, PreliminaryPlayer>::iterator pit = _preliminaryPlayers.begin(); pit != _preliminaryPlayers.end(); ++ pit)
+            {
+                PreliminaryPlayer& pp = pit->second;
+                UInt8 fSupport = 0;
+                std::map<Player *, UInt8>::iterator it = pp.betMap.find(player);
+                if(it != pp.betMap.end())
+                    fSupport = 1;
+                st << pp.battlePoint << pp.support << fSupport << pp.level << pp.name;
+            }
+        }
 		break;
-	case 3:
-		{
-			st << leftTime;
-			if(it != _players.end())
-			{
-				st << static_cast<UInt16>(it->second.battles.size());
-				for(std::vector<PriliminaryBattle>::iterator iter = it->second.battles.begin(); iter != it->second.battles.end(); ++ iter)
-				{
-					st << iter->won << iter->otherColor << iter->otherName << iter->battleTime << iter->battleId;
-				}
-			}
-			else
-				st << static_cast<UInt16>(0);
-		}
-		break;
-	case 4:
-		st << _status << leftTime;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
 		break;
 	}
 	st << Stream::eos;
@@ -673,11 +742,7 @@ void Arena::sendElimination( Player * player, UInt8 group )
 		{
 			EliminationPlayer& pl = _finals[it->group][it->pos];
 			st << static_cast<UInt8>(((it->group + 1) << 3) + it->round);
-			if(pl.lastRank == 6)
-				st << static_cast<UInt8>(0x40 | pl.color);
-			else
-				st << pl.color;
-			st << pl.level << pl.name << it->tael;
+			st << pl.level << pl.name << it->type;
 			UInt8 rpos = it->pos >> it->round;
 			EliminationBattle& eb = _finalBattles[it->group][aIndex[it->round] + (rpos >> 1)];
 			if((rpos & 1) == 0)
@@ -691,7 +756,7 @@ void Arena::sendElimination( Player * player, UInt8 group )
 	{
 		for(int i = 0; i < 32; ++ i)
 		{
-			st << _finals[g][i].color << _finals[g][i].level << _finals[g][i].lastRank << _finals[g][i].name;
+			st << _finals[g][i].level << _finals[g][i].name;
 		}
 	}
 	st << _round;
@@ -706,8 +771,8 @@ void Arena::sendElimination( Player * player, UInt8 group )
 void Arena::push( Player * player, UInt8 group, const std::string& rname )
 {
 	ArenaPlayer& ap = _players[player];
-	if(ap.group == 0xFF && group < 3)
-		++ _playerCount[group];
+	if(ap.group == 0xFF && group <= 3)
+		++ _playerCount[0];
 	ap.group = group;
 	ap.realName = rname;
 }
@@ -807,13 +872,13 @@ void Arena::pushPriliminary( Player * player, UInt8 won, UInt8 color, const std:
 	}
 }
 
-void Arena::pushBetFromDB( Player * player, UInt8 round, UInt8 group, UInt8 pos, UInt8 tael )
+void Arena::pushBetFromDB( Player * player, UInt8 round, UInt8 group, UInt16 pos, UInt8 type )
 {
 	BetInfo binfo;
 	binfo.round = round;
 	binfo.group = group;
 	binfo.pos = pos;
-	binfo.tael = tael;
+	binfo.type = type;
 	_players[player].betList.push_back(binfo);
 }
 
@@ -850,28 +915,438 @@ void Arena::check()
 
 void Arena::readPlayers(BinaryReader& brd)
 {
-    UInt32 cnt = 0;
-    brd >> cnt;
-    for(int i = 0; i < cnt; ++ i)
+    Mutex::ScopedLock lk(globalPlayers.getMutex());
+    std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
+    UInt32 count;
+    brd >> count;
+    for(UInt32 z = 0; z < count; ++ z)
     {
-        Mutex::ScopedLock lk(globalPlayers.getMutex());
-        std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
-        for(UInt32 z = 0; z < count; ++ z)
+        UInt64 pid = 0;
+        int cid, sid;
+        UInt8 level = 0;
+        float battlePoint = 0;
+        UInt32 support = 0;
+        std::string name;
+        brd >> cid >> sid >> pid >> level >> battlePoint >> support >> name;
+        UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
+        if(cid == cfg.channelNum && sid == cfg.serverNum)
+            ppid = pid;
+        PreliminaryPlayer& pp = _preliminaryPlayers[ppid];
+        pp.id = ppid;
+        pp.support = support;
+        pp.level = level;
+        pp.battlePoint = battlePoint;
+        pp.name = name;
+        if(cid == cfg.channelNum && sid == cfg.serverNum)
         {
-            UInt64 pid = 0;
-            brd >> pid;
             Player * pl = pm[pid];
             if(pl == NULL)
                 continue;
             ArenaPlayer& ap = _players[pl];
-            brd >> ap.realName;
+            ap.group = z;
+            ap.realName = name;
         }
     }
 }
 
 void Arena::readHistories(BinaryReader& brd)
 {
+    UInt32 cnt = 0;
+    brd >> cnt;
+
+    Mutex::ScopedLock lk(globalPlayers.getMutex());
+    std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
+    for(int i = 0; i < cnt; ++ i)
+    {
+        UInt64 pid = 0;
+        UInt8 level = 0;
+        std::string name;
+        brd >> pid >> level >> name;
+
+        Player * pl = pm[pid];
+        UInt16 bCount = 0;
+        brd >> bCount;
+        for(UInt16 p = 0; p < bCount; ++ p)
+        {
+            PriliminaryBattle pb;
+            brd >> pb.won >> pb.otherColor >> pb.otherName >> pb.battleTime >> pb.battleId;
+            if(pl == NULL)
+                continue;
+            ArenaPlayer& ap = _players[pl];
+            ap.battles.push_back(pb);
+        }
+    }
 }
 
+void Arena::readElimination(BinaryReader& brd)
+{
+    UInt8 cnt = 0;
+    brd >> cnt;
+    for(int i = 0; i < cnt; ++ i)
+    {
+        UInt32 count = 0;
+        brd >> count;
+        Mutex::ScopedLock lk(globalPlayers.getMutex());
+        std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
+        for(UInt32 z = 0; z < count; ++ z)
+        {
+            UInt64 pid = 0;
+            int cid, sid;
+            UInt8 level = 0;
+            float battlePoint = 0;
+            UInt32 support = 0;
+            std::string name;
+            brd >> cid >> sid >> pid >> level >> battlePoint >> support >> name;
+            if(cid == cfg.channelNum && sid == cfg.serverNum)
+            {
+                Player * pl = pm[pid];
+                if(pl == NULL)
+                    continue;
+                ArenaPlayer& ap = _players[pl];
+                ap.realName = name;
+            }
+        }
+
+        for(int j = 0; j < 32; ++ j)
+        {
+            int cid, sid;
+            float battlePoint = 0;
+            UInt32 support = 0;
+            brd >> cid >> sid >> _finals[i][j].id >> _finals[i][j].level>> battlePoint >> support >> _finals[i][j].name;
+            UInt64 ppid = _finals[i][j].id | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
+            if(cfg.channelNum != cid || cfg.serverNum != sid)
+                _finals[i][j].id = ppid;
+            _finalIdx[i][0][j] = j;
+            _finals[i][j].battlePoint = battlePoint;
+            _finals[i][j].support = support;
+        }
+        _round = 0;
+        UInt8 status;
+        brd >> status >> _round;
+        if(_notified && status != _status)
+        {
+            _status = status;
+            _notified = 0;
+        }
+
+        int idx = 0;
+        const int aIndex[6] = {0, 16, 24, 28, 30, 31};
+        for(int j = 0; j < aIndex[idx]; ++ j)
+        {
+            UInt8 cnt = 0;
+            brd >> cnt;
+            brd >> _finalBattles[i][j].wonFlag;
+            for(int k = 0; k < cnt; ++ k)
+            {
+                UInt32 battleId;
+                brd >> battleId;
+                _finalBattles[i][j].battleId.push_back(battleId);;
+            }
+        }
+
+        calcFinalBet(i);
+    }
+}
+
+void Arena::calcFinalBet(int i)
+{
+    const int aIndex[6] = {0, 16, 24, 28, 30, 31};
+    UInt32 r = _round;
+    if(_status == 0)
+        ++ r;
+    if(r > 1)
+    {
+        GET_PROGRESS_NAME(p, _round - 1);
+        for(UInt32 j = 1; j < r; ++ j)
+        {
+            int starti = aIndex[j - 1], endi = aIndex[j];
+            for(int k = starti; k < endi; ++ k)
+            {
+                if(_finalBattles[i][k].winner(_round) == 0)
+                {
+                    UInt8 nidx = _finalIdx[i][j-1][(k - starti) * 2];
+                    _finalIdx[i][j][k - starti] = nidx;
+                    if(_status == 0 && j == r - 1)
+                    {
+                        _finals[i][nidx].calcBet(true, p);
+                        _finals[i][_finalIdx[i][j-1][(k - starti) * 2 + 1]].calcBet(false, p);
+                    }
+                }
+                else
+                {
+                    UInt8 nidx = _finalIdx[i][j-1][(k - starti) * 2 + 1];
+                    _finalIdx[i][j][k - starti] = nidx;
+                    if(_status == 0 && j == r - 1)
+                    {
+                        _finals[i][nidx].calcBet(true, p);
+                        _finals[i][_finalIdx[i][j-1][(k - starti) * 2]].calcBet(false, p);
+                    }
+                }
+            }
+        }
+    }
+    if(_loaded)
+    {
+        if(!_notified)
+        {
+            const int start_hour[3] = {12, 16, 19};
+            const int start_min[3] = {15, 0, 0};
+            _notified = 1;
+            if(_status == 0 && _round > 0)
+            {
+                GET_ARENA_NAME(n);
+                GET_PROGRESS_NAME(p, _round - 1);
+                SYSMSG_BROADCASTV(704, n, p, 3);
+                GET_PROGRESS_NAME(p2, _round);
+                SYSMSGV(title, 720, _session & 0x7FFF, n, p2);
+                SYSMSGV(title2, 722, _session & 0x7FFF, n, p2);
+                if(_round < 5)
+                {
+                    char pn[2048] = {0};
+                    int m = 32 >> _round;
+                    for(int i = 0; i < 2; ++ i)
+                    {
+                        for(int j = 0; j < m; ++ j)
+                        {
+                            EliminationPlayer& ep = _finals[i][_finalIdx[i][_round][j]];
+                            if(ep.id != 0)
+                            {
+                                Player * pl = globalPlayers[ep.id];
+                                if(pl == NULL)
+                                    continue;
+                                SYSMSGV(sn, 10000, pl->getCountry(), pl->getName().c_str());
+                                strcat(pn, sn);
+                            }
+                        }
+
+                        const int aIndex[6] = {0, 16, 24, 28, 30, 31};
+                        int starti = aIndex[_round - 1];
+                        int endi = aIndex[_round];
+                        for(int idx = starti; idx < endi; ++ idx)
+                        {
+                            EliminationPlayer& ep1 = _finals[i][_finalIdx[i][_round - 1][(idx - starti) * 2]];
+                            EliminationPlayer& ep2 = _finals[i][_finalIdx[i][_round - 1][(idx - starti) * 2 + 1]];
+                            if(ep1.name.empty() || ep2.name.empty())
+                                continue;
+                            Player * pl;
+                            UInt8 winCount = _finalBattles[i][idx].winCount(_round);
+                            if(winCount > 1)
+                            {
+                                if(ep1.id != 0 && (pl = globalPlayers[ep1.id]) != NULL)
+                                {
+                                    SYSMSGV(content, 721, _session & 0x7FFF, n, p, 3, ep2.name.c_str(), winCount, 3 - winCount, static_cast<UInt32>(ep1.betMap.size()));
+                                    pl->GetMailBox()->newMail(NULL, 0x01, title, content);
+                                }
+                                if(ep2.id != 0 && (pl = globalPlayers[ep2.id]) != NULL)
+                                {
+                                    SYSMSGV(content, 723, _session & 0x7FFF, n, p, ep1.name.c_str(), 3 - winCount, winCount, static_cast<UInt32>(ep2.betMap.size()));
+                                    pl->GetMailBox()->newMail(NULL, 0x01, title2, content);
+                                }
+                            }
+                            else
+                            {
+                                if(ep2.id != 0 && (pl = globalPlayers[ep2.id]) != NULL)
+                                {
+                                    SYSMSGV(content, 721, _session & 0x7FFF, n, p, 3, ep1.name.c_str(), 3 - winCount, winCount, static_cast<UInt32>(ep2.betMap.size()));
+                                    pl->GetMailBox()->newMail(NULL, 0x01, title, content);
+                                }
+                                if(ep1.id != 0 && (pl = globalPlayers[ep1.id]) != NULL)
+                                {
+                                    SYSMSGV(content, 723, _session & 0x7FFF, n, p, ep2.name.c_str(), winCount, 3 - winCount, static_cast<UInt32>(ep1.betMap.size()));
+                                    pl->GetMailBox()->newMail(NULL, 0x01, title2, content);
+                                }
+                            }
+                        }
+                    }
+                    GET_ARENA_NAME(n);
+                    GET_PROGRESS_NAME(p, _round);
+                    SYSMSG_BROADCASTV(702, pn, _session & 0x7FFF, n, p);
+                }
+            }
+        }
+        if(_status == 0)
+        {
+            for(int i = 0; i < 3; ++ i)
+            {
+                for(int j = 0; j < 32; ++ j)
+                {
+                    _finals[i][j].resetBet();
+                }
+            }
+        }
+    }
+    else
+    {
+        UInt8 r = _round;
+        if(_status > 0 && r > 0)
+        {
+            -- r;
+        }
+        for(std::map<Player *, ArenaPlayer>::iterator it = _players.begin(); it != _players.end(); ++ it)
+        {
+            std::vector<BetInfo>& blist = it->second.betList;
+            if(blist.empty())
+                continue;
+            BetInfo& bi = blist.back();
+            if(bi.round == r)
+            {
+                _finals[bi.group][bi.pos].betMap[it->first] = bi.type;
+            }
+        }
+    }
+}
+
+void Arena::sendStatus(Player* pl)
+{
+	Stream st(REP::SERVER_ARENA_INFO);
+    st << static_cast<UInt8>(0);
+    UInt8 find = 0;
+    std::map<Player *, ArenaPlayer>::iterator it = _players.find(pl);
+    if(it != _players.end())
+        find = 1;
+    st << _session << _progress << find << Stream::eos;
+    pl->send(st);
+}
+
+void Arena::sendEnter(Player* pl)
+{
+	UInt32 leftTime;
+	UInt32 now = TimeUtil::Now();
+	if(_nextTime > now)
+		leftTime = _nextTime - now;
+	else
+		leftTime = 0;
+
+	Stream st(REP::SERVER_ARENA_INFO);
+    st << static_cast<UInt8>(1);
+    UInt8 find = 0;
+    std::map<Player *, ArenaPlayer>::iterator it = _players.find(pl);
+    if(it != _players.end())
+        find = 1;
+    st << find << leftTime << _playerCount[0] << Stream::eos;
+
+    pl->send(st);
+}
+
+void Arena::sendPreliminary(Player* player, UInt8 flag)
+{
+	UInt32 leftTime;
+	UInt32 now = TimeUtil::Now();
+	if(_nextTime > now)
+		leftTime = _nextTime - now;
+	else
+		leftTime = 0;
+
+	Stream st(REP::SERVER_ARENA_INFO);
+    st << static_cast<UInt8>(_progress + 1);
+    if(flag == 0)
+    {
+        std::map<UInt64, PreliminaryPlayer>::iterator it = _preliminaryPlayers.find(player->getId());
+        if(it == _preliminaryPlayers.end())
+            return;
+    }
+
+    st << flag;
+    if(flag == 0)
+    {
+        st << leftTime;
+        ArenaPlayer& ap = _players[player];
+        UInt8 cnt = static_cast<UInt8>(ap.battles.size());
+        st << cnt;
+        int ttimes = 0;
+        int dtimes = 0;
+        for(int i = 0; i < cnt; ++ i)
+        {
+            UInt8 flag = ap.group << 4 | ap.battles[i].won;
+            st << flag;
+            if(ap.group == 0)
+            {
+                ++ ttimes;
+                st << ttimes;
+            }
+            else
+            {
+                ++ dtimes;
+                st << ttimes;
+            }
+            st << ap.battles[i].battleId << ap.battles[i].otherName;
+        }
+    }
+    else
+    {
+        std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
+        if(ait == _players.end())
+        {
+            st << static_cast<UInt8>(5);
+        }
+        else
+        {
+            ArenaPlayer& ap = ait->second;
+            st << static_cast<UInt8>(5 - ap.betList.size());
+        }
+        UInt16 premNum = static_cast<UInt16>(_preliminaryPlayers.size());
+        st << premNum;
+        for(std::map<UInt64, PreliminaryPlayer>::iterator pit = _preliminaryPlayers.begin(); pit != _preliminaryPlayers.end(); ++ pit)
+        {
+            PreliminaryPlayer& pp = pit->second;
+            UInt8 fSupport = 0;
+            std::map<Player *, UInt8>::iterator it = pp.betMap.find(player);
+            if(it != pp.betMap.end())
+                fSupport = 1;
+            st << pp.battlePoint << pp.support << fSupport << pp.level << pp.name;
+        }
+    }
+
+    st << Stream::eos;
+    player->send(st);
+}
+
+void Arena::sendElimination( Player * player, UInt8 group )
+{
+	bool resultOnly = (group & 0x80) > 0;
+	UInt8 g = (group & 0x7F) - 1;
+	if(g >= 3)
+		return;
+	if(_progress < 4)
+		return;
+	Stream st(REP::SERVER_ARENA_ELIM);
+	st << group;
+	std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
+	const int aIndex[6] = {0, 16, 24, 28, 30, 31};
+	if(iter == _players.end())
+		st << static_cast<UInt8>(0);
+	else
+	{
+		std::vector<BetInfo>& blist = iter->second.betList;
+		st << static_cast<UInt8>(blist.size());
+		for(std::vector<BetInfo>::iterator it = blist.begin(); it != blist.end(); ++ it)
+		{
+			EliminationPlayer& pl = _finals[it->group][it->pos];
+			st << static_cast<UInt8>(((it->group + 1) << 3) + it->round);
+			st << pl.level << pl.name << it->type;
+			UInt8 rpos = it->pos >> it->round;
+			EliminationBattle& eb = _finalBattles[it->group][aIndex[it->round] + (rpos >> 1)];
+			if((rpos & 1) == 0)
+				st << eb.wonFlag;
+			else
+				st << static_cast<UInt8>((~eb.wonFlag) & 0x07);
+			st << eb.battleId[0] << eb.battleId[1] << eb.battleId[2];
+		}
+	}
+	if(!resultOnly)
+	{
+		for(int i = 0; i < 32; ++ i)
+		{
+			st << _finals[g][i].level << _finals[g][i].name;
+		}
+	}
+	st << _round;
+	for(int j = 0; j < aIndex[_round]; ++ j)
+	{
+		st << _finalBattles[g][j].wonFlag << _finalBattles[g][j].battleId[0] << _finalBattles[g][j].battleId[1] << _finalBattles[g][j].battleId[2];
+	}
+	st << Stream::eos;
+	player->send(st);
+}
 
 }
