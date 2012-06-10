@@ -82,20 +82,20 @@ function Task_00000043(npcId)
 		action.m_ActionID = 43
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "知客了一";
+		action.m_ActionMsg = task_msg_309;
 	elseif task:GetTaskSubmitNpc(43) == npcId then
 		if Task_Submit_00000043() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 43
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "知客了一";
+			action.m_ActionMsg = task_msg_310;
 		elseif task:HasAcceptedTask(43) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 43
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "知客了一";
+			action.m_ActionMsg = task_msg_311;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000043_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "阿弥陀佛，少侠怕是来晚了，那帮书生当晚就遭了毒手，不过还剩一个叫周云从的被关在地牢内。不过慈云寺近日来看管甚严，广场内常有僧兵巡逻，若想偷入地牢，还得先除掉这些耳目才行。";
-	action.m_ActionMsg = "我一定做的神不知鬼不觉。";
+	action.m_NpcMsg = task_msg_312;
+	action.m_ActionMsg = task_msg_313;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000043_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是好身手。";
+	action.m_NpcMsg = task_msg_314;
 	action.m_ActionMsg = "";
 	return action;
 end

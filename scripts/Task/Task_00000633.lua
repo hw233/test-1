@@ -50,20 +50,20 @@ function Task_00000633(npcId)
 		action.m_ActionID = 633
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "巨大鳄鱼";
+		action.m_ActionMsg = task_msg_1318;
 	elseif task:GetTaskSubmitNpc(633) == npcId then
 		if Task_Submit_00000633() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 633
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "巨大鳄鱼";
+			action.m_ActionMsg = task_msg_1319;
 		elseif task:HasAcceptedTask(633) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 633
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "巨大鳄鱼";
+			action.m_ActionMsg = task_msg_1320;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000633_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都不远处的桂花山是一处美景，不过山中有五色云雾，寻常人轻易不得入内，听说有个室外高人隐居在山中，布下了五色云雾。在桂花山里有一处福仙潭，潭附近有一些巨大的鳄鱼出没，伤害了无数过往行人商旅，还拜托少侠你除掉这一害。";
-	action.m_ActionMsg = "对付这些四脚蜥蜴，那还不简单，我去去就回。";
+	action.m_NpcMsg = task_msg_1321;
+	action.m_ActionMsg = task_msg_1322;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000633_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些毒鳄凶猛无比，伤害了无数过往行人商旅。 ";
+	action.m_NpcMsg = task_msg_1323;
 	action.m_ActionMsg = "";
 	return action;
 end

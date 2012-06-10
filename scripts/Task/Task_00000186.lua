@@ -82,20 +82,20 @@ function Task_00000186(npcId)
 		action.m_ActionID = 186
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "异兽陆吾";
+		action.m_ActionMsg = task_msg_2066;
 	elseif task:GetTaskSubmitNpc(186) == npcId then
 		if Task_Submit_00000186() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 186
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "异兽陆吾";
+			action.m_ActionMsg = task_msg_2067;
 		elseif task:HasAcceptedTask(186) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 186
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "异兽陆吾";
+			action.m_ActionMsg = task_msg_2068;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000186_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "昆仑乃是上古神人之地，有不少异兽残存，他们修炼多年，道行高深，少侠可以去拿他们练练手。麒麟岩那里就有一只陆吾，少侠去试试吧。";
-	action.m_ActionMsg = "我去会会这些上古异兽。";
+	action.m_NpcMsg = task_msg_2069;
+	action.m_ActionMsg = task_msg_2070;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000186_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2071;
 	action.m_ActionMsg = "";
 	return action;
 end

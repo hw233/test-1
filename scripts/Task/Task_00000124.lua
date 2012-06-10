@@ -82,20 +82,20 @@ function Task_00000124(npcId)
 		action.m_ActionID = 124
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "自动挂机";
+		action.m_ActionMsg = task_msg_1090;
 	elseif task:GetTaskSubmitNpc(124) == npcId then
 		if Task_Submit_00000124() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 124
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "自动挂机";
+			action.m_ActionMsg = task_msg_1091;
 		elseif task:HasAcceptedTask(124) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 124
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "自动挂机";
+			action.m_ActionMsg = task_msg_1092;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000124_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠，修道之路漫长，你也不急一时，闲来可以挂机练级，当然了挂机怪物的等级不能超过您自身的等级，挂机还可以使用加速功能，获得大量的经验，当然了每天的加速次数是有限的，并且每加速一次要消耗10礼券，所以"..GetPlayerName(GetPlayer()).."你可要合理的安排自己的时间。";
-	action.m_ActionMsg = "还有这种事，我一定要去试试。";
+	action.m_NpcMsg = task_msg_1093..GetPlayerName(GetPlayer())..task_msg_1094;
+	action.m_ActionMsg = task_msg_1095;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000124_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."若你闲来无事，就可以挂机练级，也方便你在挂机的时候做点其它的事情。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1096;
 	action.m_ActionMsg = "";
 	return action;
 end

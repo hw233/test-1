@@ -82,20 +82,20 @@ function Task_00000111(npcId)
 		action.m_ActionID = 111
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "金蚕蛊母";
+		action.m_ActionMsg = task_msg_537;
 	elseif task:GetTaskSubmitNpc(111) == npcId then
 		if Task_Submit_00000111() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 111
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "金蚕蛊母";
+			action.m_ActionMsg = task_msg_538;
 		elseif task:HasAcceptedTask(111) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 111
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "金蚕蛊母";
+			action.m_ActionMsg = task_msg_539;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000111_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."有你帮忙，清剿了绿袍的手下，我们布置两仪微尘阵至今未被绿袍发现，看来除魔大计成功有望。是时候引绿袍出洞了！在那阴风后洞有一只金蚕蛊母，是绿袍炼制百毒金蚕蛊的根本，"..GetPlayerName(GetPlayer()).."你去将蛊母消灭，一定会引的它大怒，乱了方寸，到时候我们就可以发动大阵将此獠消灭。";
-	action.m_ActionMsg = "好的，弟子这就去。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_540..GetPlayerName(GetPlayer())..task_msg_541;
+	action.m_ActionMsg = task_msg_542;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000111_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "呵呵，两仪微尘阵即日就可以布置成功了。";
+	action.m_NpcMsg = task_msg_543;
 	action.m_ActionMsg = "";
 	return action;
 end

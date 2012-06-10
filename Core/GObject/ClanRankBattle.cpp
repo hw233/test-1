@@ -182,6 +182,7 @@ namespace GObject
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
+            (*iter)->setContinuousRFAward(2);
         }
         for(PlayerVec::const_iterator iter = team2.begin();
                 iter != team2.end(); ++iter){
@@ -194,6 +195,7 @@ namespace GObject
             GameAction()->doAty((*iter), AtyClanWar, 1, 0);
             (*iter)->OnHeroMemo(MC_ATHLETICS, MD_LEGEND, 0, 0);
             (*iter)->OnShuoShuo(SS_CLANRANK);
+            (*iter)->setContinuousRFAward(2);
         }
 
         m_WaitPlayers.clear();

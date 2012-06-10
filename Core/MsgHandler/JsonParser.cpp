@@ -177,6 +177,55 @@ int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json
     return 0;
 }
 
+int add_playeritem_req(JsonHead* head, struct json_object* body, struct json_object* retbody, std::string& err)
+{
+    if (!head || !body || !retbody)
+        return EUNKNOW;
+
+    char openid[36] = {0};
+    char playerId[32] = {0};
+    UInt32 areaid = 0;
+    UInt64 playerid = 0;
+    UInt32 itemid = 0;
+    Int32 inum = 0;
+
+    GET_STRING(body, "szOpenId", openid, 36);
+    GET_STRING(body, "playerId", playerId, 32);
+    struct json_object* val = json_object_object_get(body, "uiAreaId");
+    if (val)
+        areaid = json_object_get_int(val);
+
+    val = json_object_object_get(body, "iNum");
+    if (val)
+        inum = json_object_get_int(val);
+
+    val = json_object_object_get(body, "uiItemId");
+    if (val)
+        itemid = json_object_get_int(val);
+
+    playerid = atoll(playerId);
+    GObject::Player* player = GObject::globalPlayers[playerid];
+    if (!player)
+    {
+        err += "player not exist!";
+        return EPLAYER_NOT_EXIST;
+    }
+
+    struct AddItem
+    {
+        UInt16 itemid;
+        UInt16 itemnum;
+    } ai;
+
+    ai.itemid = itemid;
+    ai.itemnum = inum;
+    GameMsgHdr hdr(0x248, player->getThreadId(), player, sizeof(ai));
+    GLOBAL().PushMsg(hdr, &ai);
+
+    head->cmd = 6;
+    return 0;
+}
+
 void jsonParser(std::string& json, int sessionid)
 {
     TRACE_LOG("JSON RECV: %s\n", json.c_str());
@@ -225,6 +274,9 @@ void jsonParser(std::string& json, int sessionid)
             break;
         case 3:
             ret = query_rolebaseinfo_req(&head, body, retbody, err);
+            break;
+        case 5:
+            ret = add_playeritem_req(&head, body, retbody, err);
             break;
         default:
             break;
@@ -325,6 +377,9 @@ void jsonParser2(void * buf, int len, Stream& st)
             break;
         case 3:
             ret = query_rolebaseinfo_req(&head, body, retbody, err);
+            break;
+        case 5:
+            ret = add_playeritem_req(&head, body, retbody, err);
             break;
         default:
             break;

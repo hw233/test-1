@@ -122,4 +122,33 @@ function RunTargetAward(player)
     return j;
 end
 
+function RunTargetAwardRF(player)
+    if player == nil then
+        return 0;
+    end
+
+    local package = player:GetPackage();
+
+	if package:GetRestPackageSize() < 1 then
+		player:sendMsgCode(2, 1011, 0);
+		return 0;
+	end
+
+    local chance = {379,1895,2400,5768,9558,10000}
+    local item = {515,503,507,56,57,509}
+    local j = 0;
+    local g = math.random(1, 10000)
+    for i = 1, #chance do
+        if g <= chance[i] then
+            player:lastLootPush(item[i], 1);
+            package:AddItem(item[i], 1, true, true, 41);
+            j = i;
+            break
+        end
+    end
+
+    return j;
+end
+
+
 

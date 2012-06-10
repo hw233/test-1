@@ -82,20 +82,20 @@ function Task_00000028(npcId)
 		action.m_ActionID = 28
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "摩伽仙子";
+		action.m_ActionMsg = task_msg_214;
 	elseif task:GetTaskSubmitNpc(28) == npcId then
 		if Task_Submit_00000028() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 28
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "摩伽仙子";
+			action.m_ActionMsg = task_msg_215;
 		elseif task:HasAcceptedTask(28) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 28
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "摩伽仙子";
+			action.m_ActionMsg = task_msg_216;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000028_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我这两个童子性格顽劣，少侠请不要见怪。在这里不远游个辟邪村，村中有位隐居的高人摩珈仙子玉清大师，她原是邪道滇西毒龙尊者的同门，后来被神尼优昙点化，便洗净尘缘，一心归善。玉清大师道法高深，如果能得到她的帮助一定会更增胜算。";
-	action.m_ActionMsg = "我这就去辟邪村找玉清大师";
+	action.m_NpcMsg = task_msg_217;
+	action.m_ActionMsg = task_msg_218;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000028_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我虽然隐居在此，不过也听说了少侠你的一些事迹。";
+	action.m_NpcMsg = task_msg_219;
 	action.m_ActionMsg = "";
 	return action;
 end

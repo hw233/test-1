@@ -82,20 +82,20 @@ function Task_00000015(npcId)
 		action.m_ActionID = 15
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "白云寺";
+		action.m_ActionMsg = task_msg_153;
 	elseif task:GetTaskSubmitNpc(15) == npcId then
 		if Task_Submit_00000015() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 15
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "白云寺";
+			action.m_ActionMsg = task_msg_154;
 		elseif task:HasAcceptedTask(15) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 15
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "白云寺";
+			action.m_ActionMsg = task_msg_155;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000015_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "说起毛太，其实他一人实不足为虑，只是慈云寺众多妖人中的一员，那里妖人聚集，真是乌烟瘴气，不过里面确实有一些厉害的角色，连我也很是头疼。 ";
-	action.m_ActionMsg = "那该如何是好？";
+	action.m_NpcMsg = task_msg_156;
+	action.m_ActionMsg = task_msg_157;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000015_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺里虽然邪派人物众多，不过我们正道中人也在聚集准备出手剿灭慈云寺妖孽。成都郊外有一座白云寺，主持白云大师道法高深，你先去大师那里等候我的佳音。";
-	action.m_ActionMsg = "好的，前辈你也要小心。";
+	action.m_NpcMsg = task_msg_158;
+	action.m_ActionMsg = task_msg_159;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000015_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠根骨资质俱佳，未来成就不可限量。";
+	action.m_NpcMsg = task_msg_160;
 	action.m_ActionMsg = "";
 	return action;
 end

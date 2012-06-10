@@ -82,20 +82,20 @@ function Task_00000091(npcId)
 		action.m_ActionID = 91
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "魔泉幡禁制";
+		action.m_ActionMsg = task_msg_406;
 	elseif task:GetTaskSubmitNpc(91) == npcId then
 		if Task_Submit_00000091() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 91
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "魔泉幡禁制";
+			action.m_ActionMsg = task_msg_407;
 		elseif task:HasAcceptedTask(91) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 91
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "魔泉幡禁制";
+			action.m_ActionMsg = task_msg_408;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000091_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "乖徒儿你是不是在找这根母针啊，莫急，莫急，母针在我手里用来破除魔泉幡之禁制，待会为师我做法，你就出手打破这个鸟幡，禁制一除，我即刻离开此处，带你回百蛮山阴风洞，师傅传你百毒金蚕蛊大法，纵横天下，无人可敌……桀桀桀！";
-	action.m_ActionMsg = "谨尊师傅法旨，徒儿这就出手破掉魔泉幡。";
+	action.m_NpcMsg = task_msg_409;
+	action.m_ActionMsg = task_msg_410;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000091_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "好徒儿，我是越来越喜欢你了，还真不舍得……桀桀桀。";
+	action.m_NpcMsg = task_msg_411;
 	action.m_ActionMsg = "";
 	return action;
 end

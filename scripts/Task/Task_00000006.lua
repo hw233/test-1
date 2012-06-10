@@ -82,20 +82,20 @@ function Task_00000006(npcId)
 		action.m_ActionID = 6
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "回报周淳";
+		action.m_ActionMsg = task_msg_85;
 	elseif task:GetTaskSubmitNpc(6) == npcId then
 		if Task_Submit_00000006() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 6
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "回报周淳";
+			action.m_ActionMsg = task_msg_86;
 		elseif task:HasAcceptedTask(6) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 6
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "回报周淳";
+			action.m_ActionMsg = task_msg_87;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000006_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "看来这些古籍在我这里还真是明珠蒙尘了，周大哥的意思我已知晓，我一定好好教导这些幼童，你们就放心吧，只是剑侠之事我了解不多，关于这个剑侠心法我觉得你应该去请教一下周大哥才好。";
-	action.m_ActionMsg = "好，我这就去找周前辈。";
+	action.m_NpcMsg = task_msg_88;
+	action.m_ActionMsg = task_msg_89;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000006_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎呀，这可是传说中修仙之人练习的功法啊，少侠你真是有福缘，想不到马湘这个秀才竟然还收藏着这个。";
+	action.m_NpcMsg = task_msg_90;
 	action.m_ActionMsg = "";
 	return action;
 end

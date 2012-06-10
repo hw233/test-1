@@ -82,20 +82,20 @@ function Task_00000192(npcId)
 		action.m_ActionID = 192
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "异兽鬼车";
+		action.m_ActionMsg = task_msg_2165;
 	elseif task:GetTaskSubmitNpc(192) == npcId then
 		if Task_Submit_00000192() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 192
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "异兽鬼车";
+			action.m_ActionMsg = task_msg_2166;
 		elseif task:HasAcceptedTask(192) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 192
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "异兽鬼车";
+			action.m_ActionMsg = task_msg_2167;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000192_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "珠峰乃是世界之巅，倒是有不少神奇的生物，你看那雪山那一侧的绝壁处，有一些上古的异兽后裔，是名鬼车，颇为不凡，少侠你不去去见识见识，当然打一仗是难免的，哈哈。";
-	action.m_ActionMsg = "我这就去见识见识鬼车的奇妙之处。";
+	action.m_NpcMsg = task_msg_2168;
+	action.m_ActionMsg = task_msg_2169;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000192_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2170;
 	action.m_ActionMsg = "";
 	return action;
 end

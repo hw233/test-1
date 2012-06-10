@@ -82,20 +82,20 @@ function Task_00000047(npcId)
 		action.m_ActionID = 47
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "突围慈云寺";
+		action.m_ActionMsg = task_msg_339;
 	elseif task:GetTaskSubmitNpc(47) == npcId then
 		if Task_Submit_00000047() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 47
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "突围慈云寺";
+			action.m_ActionMsg = task_msg_340;
 		elseif task:HasAcceptedTask(47) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 47
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "突围慈云寺";
+			action.m_ActionMsg = task_msg_341;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000047_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才我发现寺内有很多恶人鼓噪，估计是发现少侠你进入了慈云寺，现在大门恐怕已经被封锁，那边墙角有一颗大树，墙外是一个菜园，不如我们顺着大树翻出墙外，去种菜的张老实家避一避。";
-	action.m_ActionMsg = "这样也好，你要随时跟着我。";
+	action.m_NpcMsg = task_msg_342;
+	action.m_ActionMsg = task_msg_343;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000047_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你们这是……快进来，让老汉给这个书生包扎一下。";
+	action.m_NpcMsg = task_msg_344;
 	action.m_ActionMsg = "";
 	return action;
 end

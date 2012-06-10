@@ -82,20 +82,20 @@ function Task_00000089(npcId)
 		action.m_ActionID = 89
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "追杀野魔";
+		action.m_ActionMsg = task_msg_388;
 	elseif task:GetTaskSubmitNpc(89) == npcId then
 		if Task_Submit_00000089() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 89
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "追杀野魔";
+			action.m_ActionMsg = task_msg_389;
 		elseif task:HasAcceptedTask(89) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 89
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "追杀野魔";
+			action.m_ActionMsg = task_msg_390;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000089_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "这个雅各达绰号西方野魔，颇有几件厉害的法宝，尤其是他的黄沙魔火歹毒无比，因为地窍中的雪魂珠是他魔火的克星，所以他也觊觎雪魂珠许久，常常来玄冰谷骚扰我。";
-	action.m_ActionMsg = "这个雅各达确实非常可恶。";
+	action.m_NpcMsg = task_msg_391;
+	action.m_ActionMsg = task_msg_392;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000089_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "他一般在鬼风谷炼制魔火，这次被你击败一定是跑回了鬼风谷，所谓除恶务尽，这个雅各达一定不要放过，否则后患无穷。"..GetPlayerName(GetPlayer()).."你应该立刻去鬼风谷将他消灭。";
-	action.m_ActionMsg = "前辈说的有理，我这就赶去鬼风谷。";
+	action.m_NpcMsg = task_msg_393..GetPlayerName(GetPlayer())..task_msg_394;
+	action.m_ActionMsg = task_msg_395;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000089_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢"..GetPlayerName(GetPlayer()).."你的帮助，日后我枯禅参悟完毕，一定将雪魂珠送你。";
+	action.m_NpcMsg = task_msg_396..GetPlayerName(GetPlayer())..task_msg_397;
 	action.m_ActionMsg = "";
 	return action;
 end

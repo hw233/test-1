@@ -50,20 +50,20 @@ function Task_00000164(npcId)
 		action.m_ActionID = 164
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "九首神鳖";
+		action.m_ActionMsg = task_msg_1898;
 	elseif task:GetTaskSubmitNpc(164) == npcId then
 		if Task_Submit_00000164() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 164
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "九首神鳖";
+			action.m_ActionMsg = task_msg_1899;
 		elseif task:HasAcceptedTask(164) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 164
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "九首神鳖";
+			action.m_ActionMsg = task_msg_1900;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000164_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我昔年曾云游四方，在那极北之处有一座奇怪的岛屿，名曰陷空岛。你如亲自去了就可以见识到其中玄妙之处，在陷空岛周遭有一座鳖极岛，其中住着一位修炼千年的九首神鳖，你不如去见见它。要知道它修炼多年见识非凡，可以在修道之路上指点你一二，就受用不尽了。";
-	action.m_ActionMsg = "是吗，我这就去陷空岛转转。";
+	action.m_NpcMsg = task_msg_1901;
+	action.m_ActionMsg = task_msg_1902;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000164_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老朽修炼多年，终于可以化身成人了。";
+	action.m_NpcMsg = task_msg_1903;
 	action.m_ActionMsg = "";
 	return action;
 end

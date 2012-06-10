@@ -82,20 +82,20 @@ function Task_00000003(npcId)
 		action.m_ActionID = 3
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "周淳蒙馆";
+		action.m_ActionMsg = task_msg_66;
 	elseif task:GetTaskSubmitNpc(3) == npcId then
 		if Task_Submit_00000003() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 3
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "周淳蒙馆";
+			action.m_ActionMsg = task_msg_67;
 		elseif task:HasAcceptedTask(3) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 3
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "周淳蒙馆";
+			action.m_ActionMsg = task_msg_68;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000003_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我先前在乌鸦嘴偶遇二弟周淳，约好在他教授学生的蒙馆相见，谁知刚分手就遇到昔年的仇家，还好少侠及时赶到。只是现在我和小女都有伤在身，需调养疗伤，望少侠先去告知周淳，我们歇息片刻即来。";
-	action.m_ActionMsg = "好的，我会告知周前辈的。";
+	action.m_NpcMsg = task_msg_69;
+	action.m_ActionMsg = task_msg_70;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000003_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "李宁受伤了？！多谢少侠相救。";
+	action.m_NpcMsg = task_msg_71;
 	action.m_ActionMsg = "";
 	return action;
 end

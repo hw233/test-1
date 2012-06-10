@@ -140,6 +140,7 @@ enum ItemFrom
     FromTownDeamon,
 	FromSSDTAward,
 	FromHappyAward,
+    FromIDIP,
 };
 
 enum ItemTo

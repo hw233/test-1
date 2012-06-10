@@ -56,20 +56,20 @@ function Task_00000551(npcId)
 		action.m_ActionID = 551
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "教诲";
+		action.m_ActionMsg = task_msg_768;
 	elseif task:GetTaskSubmitNpc(551) == npcId then
 		if Task_Submit_00000551() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 551
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "教诲";
+			action.m_ActionMsg = task_msg_769;
 		elseif task:HasAcceptedTask(551) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 551
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "教诲";
+			action.m_ActionMsg = task_msg_770;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000551_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."我们昆仑派源远流长，也是天下正道气运所在，作为昆仑弟子一定要时刻自省其身。你师叔韦少少入昆仑已久，受训颇严，今日你就去师叔处聆听教诲吧。";
-	action.m_ActionMsg = "谨遵掌教之令。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_771;
+	action.m_ActionMsg = task_msg_772;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000551_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我看你心存正气，将来必然会将我派发扬光大。";
+	action.m_NpcMsg = task_msg_773;
 	action.m_ActionMsg = "";
 	return action;
 end

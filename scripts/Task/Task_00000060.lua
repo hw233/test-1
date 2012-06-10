@@ -82,20 +82,20 @@ function Task_00000060(npcId)
 		action.m_ActionID = 60
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "解救姥姥";
+		action.m_ActionMsg = task_msg_1695;
 	elseif task:GetTaskSubmitNpc(60) == npcId then
 		if Task_Submit_00000060() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 60
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "解救姥姥";
+			action.m_ActionMsg = task_msg_1696;
 		elseif task:HasAcceptedTask(60) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 60
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "解救姥姥";
+			action.m_ActionMsg = task_msg_1697;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000060_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才我去五色云雾外祭拜师傅，见那金驼三人的师傅飞龙师太飞剑毁了师父法体，又飞出剑光攻击师父已出窍的元婴。如今师父危在旦夕，我一人不是那贼婆的对手，"..GetPlayerName(GetPlayer()).."还请你帮忙一起救我师父，赶走飞龙师太。";
-	action.m_ActionMsg = "若兰师妹莫急，我这就去救令师。";
+	action.m_NpcMsg = task_msg_1698..GetPlayerName(GetPlayer())..task_msg_1699;
+	action.m_ActionMsg = task_msg_1700;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000060_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."多谢你出手赶走了飞龙师太，如今吾师飞升应已无忧。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1701;
 	action.m_ActionMsg = "";
 	return action;
 end

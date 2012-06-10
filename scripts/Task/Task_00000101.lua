@@ -50,20 +50,20 @@ function Task_00000101(npcId)
 		action.m_ActionID = 101
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "武当借剑";
+		action.m_ActionMsg = task_msg_467;
 	elseif task:GetTaskSubmitNpc(101) == npcId then
 		if Task_Submit_00000101() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 101
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "武当借剑";
+			action.m_ActionMsg = task_msg_468;
 		elseif task:HasAcceptedTask(101) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 101
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "武当借剑";
+			action.m_ActionMsg = task_msg_469;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000101_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "当年我炼制这九九八十一根玄女针，虽是犀利无比，可也有伤天和，如今劫难降至，只有兵解来免去大劫。可是这次兵解需要的飞剑只有武当半边大师的七口青牛剑才合适，不知道少侠可否帮我去武当山找半边借来这七口青牛剑？";
-	action.m_ActionMsg = "武当半边大师性格怪异，我尽力而为吧。";
+	action.m_NpcMsg = task_msg_470;
+	action.m_ActionMsg = task_msg_471;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000101_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "贫尼已经知晓你的来意。";
+	action.m_NpcMsg = task_msg_472;
 	action.m_ActionMsg = "";
 	return action;
 end

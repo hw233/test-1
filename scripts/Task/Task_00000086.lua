@@ -82,20 +82,20 @@ function Task_00000086(npcId)
 		action.m_ActionID = 86
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "绝顶妖禽";
+		action.m_ActionMsg = task_msg_366;
 	elseif task:GetTaskSubmitNpc(86) == npcId then
 		if Task_Submit_00000086() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 86
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "绝顶妖禽";
+			action.m_ActionMsg = task_msg_367;
 		elseif task:HasAcceptedTask(86) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 86
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "绝顶妖禽";
+			action.m_ActionMsg = task_msg_368;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000086_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "哎，我虽早年改邪归正，可是旁门之法毕竟不是正道，修炼过程中不慎走火入魔，如今半身不遂所以在此参枯禅。这里地窍中有一个雪魂珠乃万年冰雪精英所化，可以助我成道。";
-	action.m_ActionMsg = "这个雪魂珠看来很神奇啊。";
+	action.m_NpcMsg = task_msg_369;
+	action.m_ActionMsg = task_msg_370;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000086_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个珠子生在地窍之中，须得打通此山主峰玉京潭绝顶，直下七千三百丈才可取得。可是玉京潭绝顶上有只妖禽总是妨碍我做法，老身如今半身不遂，奈何不得这只扁毛畜生，还希望小友你帮我赶走它。";
-	action.m_ActionMsg = "前辈，我这就去教训这只大鸟。";
+	action.m_NpcMsg = task_msg_371;
+	action.m_ActionMsg = task_msg_372;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000086_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老身行动不便，多谢小友仗义出手。";
+	action.m_NpcMsg = task_msg_373;
 	action.m_ActionMsg = "";
 	return action;
 end

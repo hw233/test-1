@@ -56,20 +56,20 @@ function Task_00000530(npcId)
 		action.m_ActionID = 530
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "采花大盗";
+		action.m_ActionMsg = task_msg_1396;
 	elseif task:GetTaskSubmitNpc(530) == npcId then
 		if Task_Submit_00000530() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 530
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "采花大盗";
+			action.m_ActionMsg = task_msg_1397;
 		elseif task:HasAcceptedTask(530) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 530
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "采花大盗";
+			action.m_ActionMsg = task_msg_1398;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000530_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "最近颇有些妖人在成都作乱，成都治安真得很成问题，听说有几个大户人家的小姐都被那采花大盗糟蹋，成都的官府对此束手无策，听说是剑侠一流在作案，"..GetPlayerName(GetPlayer()).."你去将这个淫贼捉拿归案。";
-	action.m_ActionMsg = "我绝不会放过这些采花贼！";
+	action.m_NpcMsg = task_msg_1399..GetPlayerName(GetPlayer())..task_msg_1400;
+	action.m_ActionMsg = task_msg_1401;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000530_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1402;
 	action.m_ActionMsg = "";
 	return action;
 end

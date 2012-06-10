@@ -82,20 +82,20 @@ function Task_00000142(npcId)
 		action.m_ActionID = 142
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "青狼妖道";
+		action.m_ActionMsg = task_msg_1637;
 	elseif task:GetTaskSubmitNpc(142) == npcId then
 		if Task_Submit_00000142() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 142
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "青狼妖道";
+			action.m_ActionMsg = task_msg_1638;
 		elseif task:HasAcceptedTask(142) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 142
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "青狼妖道";
+			action.m_ActionMsg = task_msg_1639;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000142_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "那三尸墓的妖孽固然可恶，可是那些居心莫测的邪道妖人更是不可饶恕，有个妖道叫做叶培与他的帮凶张秀一起，想趁我们对付妖尸的时候谋取轩辕至宝，必须要先消灭他们。";
-	action.m_ActionMsg = "师太莫愁，我这就去消灭他们。";
+	action.m_NpcMsg = task_msg_1640;
+	action.m_ActionMsg = task_msg_1641;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000142_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，少侠真是剑术高强，一身正气啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1642;
 	action.m_ActionMsg = "";
 	return action;
 end

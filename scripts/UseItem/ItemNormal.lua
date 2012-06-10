@@ -3683,7 +3683,22 @@ function ItemNormal_00009034(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009036(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
 
+    if package:GetRestPackageSize() < (2+(2*num)/99) then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:AddItem(507, 2*num, 1, 0, 2);
+    package:AddItem(509, 2*num, 1, 0, 2);
+    player:getCoupon(50*num)
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
@@ -5004,6 +5019,8 @@ local ItemNormal_Table = {
 
     -- 多宝仙君
     [9034] = ItemNormal_00009034,
+
+    [9036] = ItemNormal_00009036,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

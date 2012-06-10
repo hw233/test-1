@@ -50,20 +50,20 @@ function Task_00000651(npcId)
 		action.m_ActionID = 651
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "蜀中遗祸";
+		action.m_ActionMsg = task_msg_2097;
 	elseif task:GetTaskSubmitNpc(651) == npcId then
 		if Task_Submit_00000651() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 651
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "蜀中遗祸";
+			action.m_ActionMsg = task_msg_2098;
 		elseif task:HasAcceptedTask(651) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 651
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "蜀中遗祸";
+			action.m_ActionMsg = task_msg_2099;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000651_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "昔年张献忠荼毒蜀中，给四川百姓带来无穷的灾祸，虽然现在贼首已殁，但是仍有不少贼兵四处流窜，前端时间一小股贼兵跑到了白堰村附近，还希望少侠可以帮忙除掉他们。";
-	action.m_ActionMsg = "我这就去。";
+	action.m_NpcMsg = task_msg_2100;
+	action.m_ActionMsg = task_msg_2101;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000651_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_2102;
 	action.m_ActionMsg = "";
 	return action;
 end

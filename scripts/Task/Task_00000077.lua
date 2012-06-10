@@ -82,20 +82,20 @@ function Task_00000077(npcId)
 		action.m_ActionID = 77
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "义救湘英";
+		action.m_ActionMsg = task_msg_1751;
 	elseif task:GetTaskSubmitNpc(77) == npcId then
 		if Task_Submit_00000077() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 77
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "义救湘英";
+			action.m_ActionMsg = task_msg_1752;
 		elseif task:HasAcceptedTask(77) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 77
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "义救湘英";
+			action.m_ActionMsg = task_msg_1753;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000077_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "莫非你就是戴家那帮小子请来的什么剑仙？看你这副乳臭味干的样子如何是咱们庄主请来的神仙郭道长的对手。";
-	action.m_ActionMsg = "郭老道很厉害吗？";
+	action.m_NpcMsg = task_msg_1754;
+	action.m_ActionMsg = task_msg_1755;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000077_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "什么郭老道，要称郭仙长，方才你们戴家的小女娃来捣乱，就被仙长他老人家出手擒下关在螺丝湾里。劝你还是不要来趟戴家的这潭浑水比较好。";
-	action.m_ActionMsg = "有这种事……";
+	action.m_NpcMsg = task_msg_1756;
+	action.m_ActionMsg = task_msg_1757;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000077_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我被那妖道困在这里多时，正束手无策，却没料到"..GetPlayerName(GetPlayer()).."你这么快就来救我。";
+	action.m_NpcMsg = task_msg_1758..GetPlayerName(GetPlayer())..task_msg_1759;
 	action.m_ActionMsg = "";
 	return action;
 end

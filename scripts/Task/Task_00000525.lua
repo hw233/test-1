@@ -56,20 +56,20 @@ function Task_00000525(npcId)
 		action.m_ActionID = 525
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "正道弃徒";
+		action.m_ActionMsg = task_msg_1163;
 	elseif task:GetTaskSubmitNpc(525) == npcId then
 		if Task_Submit_00000525() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 525
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "正道弃徒";
+			action.m_ActionMsg = task_msg_1164;
 		elseif task:HasAcceptedTask(525) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 525
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "正道弃徒";
+			action.m_ActionMsg = task_msg_1165;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000525_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "长沙郊外有一个恶人，之前是万里飞虹冬元奇的弟子，因为心术不正被逐出师门，如今在长沙郊外为恶，"..GetPlayerName(GetPlayer()).."你这就去将这个恶人除掉。";
-	action.m_ActionMsg = "好吧，我去去就回。";
+	action.m_NpcMsg = task_msg_1166..GetPlayerName(GetPlayer())..task_msg_1167;
+	action.m_ActionMsg = task_msg_1168;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000525_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是身手不凡。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1169;
 	action.m_ActionMsg = "";
 	return action;
 end

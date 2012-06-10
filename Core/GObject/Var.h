@@ -154,7 +154,13 @@ namespace GObject
 #endif
         VAR_ENCHANTGT11 = 119, // 限时强化一次性返还是否返过
         VAR_INRF7DAY = 120, // 回流7日活动开始时间
-        VAR_CTSLANDINGRF = 120, // 回流7日连续登陆7天记录
+        VAR_CTSLANDINGRF = 121, // 回流7日连续登陆7天记录
+        VAR_RF7DAYRECHARGE = 122, // 回流后前七天充值总额
+        VAR_RF7DAYWILL = 123, // 回流后所选择的愿望索引
+        VAR_RF7DAYTURNON = 124, // 回流充值刻度点亮
+        VAR_CTSAWARDRF = 125, // 回流后七天登陆抽奖
+        VAR_CLAWARDRF = 126, // 回流后七天连续登陆奖励
+        VAR_CL3DAYRF = 127, // 回流后七天连接三天登陆奖励
         VAR_MAX,
     };
 
@@ -296,12 +302,18 @@ namespace GObject
             REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CLAWARD2, CYCLE_DAY);
-            REGISTER_VAR(VAR_ENCHANTGT11, CYCLE_NONE);
-            REGISTER_VAR(VAR_INRF7DAY, CYCLE_NONE);
-            REGISTER_VAR(VAR_CTSLANDINGRF, CYCLE_NONE);
 #if 0
             REGISTER_VAR(VAR_OFFLINE_EQUIP, CYCLE_NONE);
 #endif
+            REGISTER_VAR(VAR_ENCHANTGT11, CYCLE_NONE);
+            REGISTER_VAR(VAR_INRF7DAY, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTSLANDINGRF, CYCLE_NONE);
+            REGISTER_VAR(VAR_RF7DAYRECHARGE, CYCLE_NONE);
+            REGISTER_VAR(VAR_RF7DAYWILL, CYCLE_NONE);
+            REGISTER_VAR(VAR_RF7DAYTURNON, CYCLE_NONE);
+            REGISTER_VAR(VAR_CTSAWARDRF, CYCLE_DAY);
+            REGISTER_VAR(VAR_CLAWARDRF, CYCLE_DAY);
+            REGISTER_VAR(VAR_CL3DAYRF, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

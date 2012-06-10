@@ -50,20 +50,20 @@ function Task_00000082(npcId)
 		action.m_ActionID = 82
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "长沙送信";
+		action.m_ActionMsg = task_msg_1076;
 	elseif task:GetTaskSubmitNpc(82) == npcId then
 		if Task_Submit_00000082() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 82
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "长沙送信";
+			action.m_ActionMsg = task_msg_1077;
 		elseif task:HasAcceptedTask(82) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 82
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "长沙送信";
+			action.m_ActionMsg = task_msg_1078;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000082_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "戴家场这边的风波也算顺利解决了，不过我这次本来是要去青螺山和其他剑仙会和的。那里有一处青螺魔宫，八个魔头聚在那里为祸，现在时间紧迫，我不能再做耽搁了。";
-	action.m_ActionMsg = "前辈那就赶快上路吧。";
+	action.m_NpcMsg = task_msg_1079;
+	action.m_ActionMsg = task_msg_1080;
 	return action;
 end
 
@@ -87,8 +87,8 @@ function Task_00000082_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我这里有书信一封，原本是要交给长沙白龙庵的素因大师，邀她同去青螺山的，现在只有麻烦你帮我送去了。";
-	action.m_ActionMsg = "没问题，就交给我吧。";
+	action.m_NpcMsg = task_msg_1081;
+	action.m_ActionMsg = task_msg_1082;
 	return action;
 end
 
@@ -97,7 +97,7 @@ function Task_00000082_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠千里送信来此。";
+	action.m_NpcMsg = task_msg_1083;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000179(npcId)
 		action.m_ActionID = 179
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "祖师灵位";
+		action.m_ActionMsg = task_msg_2024;
 	elseif task:GetTaskSubmitNpc(179) == npcId then
 		if Task_Submit_00000179() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 179
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "祖师灵位";
+			action.m_ActionMsg = task_msg_2025;
 		elseif task:HasAcceptedTask(179) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 179
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "祖师灵位";
+			action.m_ActionMsg = task_msg_2026;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000179_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，多谢少侠帮忙，武当新遭大变，还须借助少侠之力，虽然是武当内部之事，只要少侠通过一些考验，也不算外人，你去祭拜一下祖师灵位，祭拜铜人阵吧。";
-	action.m_ActionMsg = "是吗，我这就去看看。";
+	action.m_NpcMsg = task_msg_2027;
+	action.m_ActionMsg = task_msg_2028;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000179_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2029;
 	action.m_ActionMsg = "";
 	return action;
 end

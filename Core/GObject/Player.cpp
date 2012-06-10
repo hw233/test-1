@@ -922,12 +922,12 @@ namespace GObject
         {
             StringTokenizer via(m_via, "_");
             if (via.count() > 1)
-                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "", "login");
+                udpLog(via[0].c_str(), via[1].c_str(), "", "", "", "1", "login");
             else
-                udpLog(m_via.c_str(), "", "", "", "", "", "login");
+                udpLog(m_via.c_str(), "", "", "", "", "1", "login");
         }
         else
-            udpLog("", "", "", "", "", "", "login");
+            udpLog("", "", "", "", "", "1", "login");
 
         if (!m_invited.empty())
         {
@@ -940,7 +940,9 @@ namespace GObject
                     if (cfriend)
                     {
                         if (addCFriend(cfriend))
+                        {
                             setInvitedBy(playerid);
+                        }
                     }
                 }
             }
@@ -1406,6 +1408,7 @@ namespace GObject
 
 		removeStatus(SGPunish);
         LogoutSaveOnlineTimeToday();
+        udpLog("", "", "", "", "", "2", "login");
 	}
 
 	void Player::Logout(bool nobroadcast)
@@ -1484,6 +1487,7 @@ namespace GObject
 #endif
         heroIsland.playerOffline(this);
 		removeStatus(SGPunish);
+        udpLog("", "", "", "", "", "2", "login");
 	}
 
 	void Player::checkLastBattled()
@@ -6026,6 +6030,7 @@ namespace GObject
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
         addRC7DayRecharge(r);
+        addRF7DayRecharge(r);
 
         if (World::getRechargeActive())
         {
@@ -8785,6 +8790,11 @@ namespace GObject
         case 3:
             // 今日目标
             getTargetAward(opt);
+            break;
+            // 回流今日目标
+        case 4:
+            getTargetAwardRF(opt);
+            break;
         }
     }
 
@@ -8907,6 +8917,30 @@ namespace GObject
         }
     }
 
+    void Player::getTargetAwardRF(UInt8 opt)
+    {
+        UInt8 idx = 1;
+        // 转到转盘
+        if(opt == 0 && 1 == GetVar(VAR_CTSAWARDRF))
+        {
+            idx = GameAction()->RunTargetAwardRF(this);
+            SetVar(VAR_CTSAWARDRF, 2);
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(4);
+            st << idx;
+            st << Stream::eos;
+            send(st);
+        }
+        else if(opt == 1)
+        {
+			std::vector<GData::LootResult>::iterator it;
+			for(it = _lastLoot.begin(); it != _lastLoot.end(); ++ it)
+			{
+				m_Package->ItemNotify(it->id, it->count);
+			}
+			_lastLoot.clear();
+        }
+    }
 
     void Player::lastLootPush(UInt16 itemId, UInt16 num)
     {
@@ -9654,23 +9688,41 @@ namespace GObject
 
     void Player::continuousLoginRF(UInt32 now)
     {
-        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
-
         UInt32 rf = GetVar(VAR_INRF7DAY);
-        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
-
-        UInt32 lastOffline = GetVar(VAR_OFFLINE);
-        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
-
         if (now < rf)
             return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 rf_sharp = 0;
+        if (rf)
+            rf_sharp = TimeUtil::SharpDay(0, rf);
+
+        UInt32 lastOffline = GetVar(VAR_OFFLINE);
+        if (!lastOffline)
+            return;
+        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
 
         bool inact = false;
         if (now_sharp - last_sharp > 14 * DAY_SECS)
         {
+            rf = now;
+            rf_sharp = TimeUtil::SharpDay(0, rf);
             SetVar(VAR_INRF7DAY, now);
+
             if (GetVar(VAR_CTSLANDINGRF))
                 SetVar(VAR_CTSLANDINGRF, 0);
+            if (GetVar(VAR_RF7DAYRECHARGE))
+                SetVar(VAR_RF7DAYRECHARGE, 0);
+            if (GetVar(VAR_RF7DAYWILL))
+                SetVar(VAR_RF7DAYWILL, 0);
+            if (GetVar(VAR_RF7DAYTURNON))
+                SetVar(VAR_RF7DAYTURNON, 0);
+            if (GetVar(VAR_CTSAWARDRF))
+                SetVar(VAR_CTSAWARDRF, 0);
+            if (GetVar(VAR_CLAWARDRF))
+                SetVar(VAR_CLAWARDRF, 0);
+            if (GetVar(VAR_CL3DAYRF))
+                SetVar(VAR_CL3DAYRF, 0);
             inact = true;
         }
         else if (now_sharp - rf_sharp <= 7 * DAY_SECS)
@@ -9751,24 +9803,13 @@ namespace GObject
 
     void Player::sendRF7DayInfo(UInt32 now)
     {
-        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
-
         UInt32 rf = GetVar(VAR_INRF7DAY);
-        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
-
-        UInt32 lastOffline = GetVar(VAR_OFFLINE);
-        UInt32 last_sharp = TimeUtil::SharpDay(0, lastOffline);
-
-        if (now < rf)
+        if (!rf || now < rf)
             return;
 
-        bool inact = false;
-        if (now_sharp - last_sharp > 14 * DAY_SECS)
-            inact = true;
-        else if (now_sharp - rf_sharp <= 7 * DAY_SECS)
-            inact = true;
-
-        if (!inact)
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+        if (now_sharp - rf_sharp > 7 * DAY_SECS)
             return;
 
         UInt32 ctslanding = GetVar(VAR_CTSLANDINGRF);
@@ -9803,16 +9844,15 @@ namespace GObject
 
         Stream st(REP::RF7DAY);
         st << static_cast<UInt8>(0);
-        st << GetVar(VAR_RC7DAYRECHARGE);
-        st << static_cast<UInt8>(GetVar(VAR_RC7DAYTURNON));
-        st << static_cast<UInt8>(GetVar(VAR_CTSAWARD));
+        st << GetVar(VAR_RF7DAYRECHARGE);
+        st << static_cast<UInt8>(GetVar(VAR_RF7DAYTURNON));
         st << static_cast<UInt8>(cts);
-        st << static_cast<UInt8>(GetVar(VAR_CLAWARD));
+        st << static_cast<UInt8>(GetVar(VAR_CLAWARDRF));
         st << static_cast<UInt8>(cts3);
-        st << static_cast<UInt8>(GetVar(VAR_CL3DAY));
-        st << static_cast<UInt8>(GetVar(VAR_RC7DAYWILL));
+        st << static_cast<UInt8>(GetVar(VAR_CL3DAYRF));
+        st << static_cast<UInt8>(GetVar(VAR_RF7DAYWILL));
         st << static_cast<UInt8>(off + 1);
-        st << static_cast<UInt8>(GetVar(VAR_CLAWARD2));
+        st << static_cast<UInt8>(GetVar(VAR_CTSAWARDRF)); // 抽奖
         st << Stream::eos;
         send(st);
     }
@@ -9947,6 +9987,143 @@ namespace GObject
         }
     }
 
+    void Player::setContinuousRFAward(UInt32 no)
+    {
+        if (GetVar(VAR_CTSAWARDRF))
+            return;
+
+        UInt32 now = TimeUtil::Now();
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 rf = GetVar(VAR_INRF7DAY);
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+        if (!rf || now < rf)
+            return;
+        if (now_sharp - rf_sharp > 7 * DAY_SECS)
+            return;
+        UInt32 off = CREATE_OFFSET(rf_sharp, now_sharp) + 1;
+
+        if (off == no)
+        {
+            SetVar(VAR_CTSAWARDRF, 1);
+            sendRF7DayInfo(now);
+        }
+    }
+
+    void Player::getContinuousRewardRF(UInt8 type, UInt8 idx)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 rf = GetVar(VAR_INRF7DAY);
+        if (!rf || now < rf)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+
+        if (now_sharp - rf_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 ctslanding = GetVar(VAR_CTSLANDINGRF);
+        UInt32 off = CREATE_OFFSET(rf_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 cts = 0;
+        for (int i = off; i >= 0; --i)
+        {
+            if (ctslanding & (1<<i))
+                ++cts;
+            else
+                break;
+        }
+#if 0 // XXX: 走 0x13
+#ifdef _FB
+        if (type == 1 && !GetVar(VAR_CTSAWARDRF))
+        {
+            GameAction()->onCLLoginRewardRF(this, 0, type);
+            SetVar(VAR_CTSAWARDRF, 1);
+            Stream st(REP::RF7DAY);
+            st << static_cast<UInt8>(1);
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+#else
+        if (type == 1 && GetVar(VAR_CTSAWARDRF) == 1)
+        {
+            UInt16 id = GameAction()->onCLLoginRewardRF(this, cts, type);
+            if (!id)
+                return;
+            SetVar(VAR_CTSAWARDRF, 2);
+            Stream st(REP::RF7DAY);
+            st << static_cast<UInt8>(1);
+            st << id;
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+#endif
+#endif
+        if (type == 2 && !GetVar(VAR_CLAWARDRF) && cts)
+        {
+            GameAction()->onCLLoginRewardRF(this, cts, type);
+            SetVar(VAR_CLAWARDRF, 1);
+
+            Stream st(REP::RF7DAY);
+            st << static_cast<UInt8>(2);
+            st << Stream::eos;
+            send(st);
+            return;
+        }
+
+        if (type == 3 && !GetVar(VAR_CL3DAYRF))
+        {
+            UInt32 t = 0;
+            UInt32 cts3 = 0;
+            for (int i = off; i >= 0; --i)
+            {
+                if (ctslanding & (1<<i))
+                    ++t;
+                else
+                {
+                    if (cts3 < t)
+                        cts3 = t;
+                    t = 0;
+                }
+            }
+            if (cts3 < t)
+                cts3 = t;
+
+            if (cts3 >= 3)
+            {
+                if (GameAction()->onCLLoginRewardRF(this, cts3, type))
+                {
+                    SetVar(VAR_CL3DAYRF, 1);
+
+                    Stream st(REP::RF7DAY);
+                    st << static_cast<UInt8>(3);
+                    st << Stream::eos;
+                    send(st);
+                    return;
+                }
+            }
+        }
+
+        if (idx && type == 4 && !GetVar(VAR_RF7DAYWILL))
+        {
+            if (GameAction()->onRC7DayWill(this, idx))
+            {
+                SetVar(VAR_RF7DAYWILL, idx);
+
+                Stream st(REP::RF7DAY);
+                st << static_cast<UInt8>(4);
+                st << static_cast<UInt8>(idx);
+                st << Stream::eos;
+                send(st);
+                return;
+            }
+        }
+    }
+
     void Player::sendMDSoul(UInt8 type, UInt32 id)
     {
         if (!World::getMayDay())
@@ -10052,13 +10229,18 @@ namespace GObject
     void Player::svrSt(UInt8 type)
     {
         Stream st(REP::SVRST);
+        st << type;
         if (type == 1)
         {
-            st << static_cast<UInt8>(type) << TimeUtil::Now() << Stream::eos;
+            st << TimeUtil::Now() << Stream::eos;
         }
         else if (type == 2)
         {
-            st << static_cast<UInt8>(type) << getCreated() << Stream::eos;
+            st << getCreated() << Stream::eos;
+        }
+        else if (type == 3)
+        {
+            st << GetVar(VAR_INRF7DAY) << Stream::eos;
         }
         send(st);
     }
@@ -10069,7 +10251,7 @@ namespace GObject
             return;
 
         UInt32 offset = GetVar(VAR_RC7DAYTURNON);
-        if (offset > 7)
+        if (offset >= 7)
             return;
         UInt32 total = GetVar(VAR_RC7DAYRECHARGE);
         if (GameAction()->onTurnOnRC7Day(this, total, offset))
@@ -10083,6 +10265,34 @@ namespace GObject
         }
     }
 
+    void Player::turnOnRF7Day()
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 rf = GetVar(VAR_INRF7DAY);
+        if (!rf || now < rf)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+
+        if (now_sharp - rf_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 offset = GetVar(VAR_RF7DAYTURNON);
+        if (offset >= 7)
+            return;
+        UInt32 total = GetVar(VAR_RF7DAYRECHARGE);
+        if (GameAction()->onTurnOnRF7Day(this, total, offset))
+        {
+            SetVar(VAR_RF7DAYTURNON, offset+1);
+
+            Stream st(REP::RF7DAY);
+            st << static_cast<UInt8>(6) << static_cast<UInt8>(GetVar(VAR_RF7DAYTURNON));
+            st << Stream::eos;
+            send(st);
+        }
+    }
+
     void Player::addRC7DayRecharge(UInt32 r)
     {
         if (!World::getRC7Day())
@@ -10091,6 +10301,27 @@ namespace GObject
 
         Stream st(REP::RC7DAY);
         st << static_cast<UInt8>(5) << GetVar(VAR_RC7DAYRECHARGE);
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::addRF7DayRecharge(UInt32 r)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 rf = GetVar(VAR_INRF7DAY);
+        if (!rf || now < rf)
+            return;
+
+        UInt32 rf_sharp = TimeUtil::SharpDay(0, rf);
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+
+        if (now_sharp - rf_sharp > 7 * DAY_SECS)
+            return;
+
+        AddVar(VAR_RF7DAYRECHARGE, r);
+
+        Stream st(REP::RF7DAY);
+        st << static_cast<UInt8>(5) << GetVar(VAR_RF7DAYRECHARGE);
         st << Stream::eos;
         send(st);
     }
@@ -10154,6 +10385,27 @@ namespace GObject
     void Player::getRealItemAward(UInt32 id)
     {
         realItemAwardMgr.getAward(this, id);
+    }
+
+    void Player::IDIPAddItem(UInt16 itemId, UInt16 num, bool bind)
+    {
+        SYSMSG(title, 4004);
+        SYSMSG(content, 4005);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[1] = {{itemId,num}};
+            mailPackageManager.push(mail->id, mitem, 1, bind);
+            std::string strItems;
+            for (int i = 0; i < 1; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
     }
 
 } // namespace GObject

@@ -82,20 +82,20 @@ function Task_00000001(npcId)
 		action.m_ActionID = 1
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "应劫之人";
+		action.m_ActionMsg = task_msg_31;
 	elseif task:GetTaskSubmitNpc(1) == npcId then
 		if Task_Submit_00000001() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 1
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "应劫之人";
+			action.m_ActionMsg = task_msg_32;
 		elseif task:HasAcceptedTask(1) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 1
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "应劫之人";
+			action.m_ActionMsg = task_msg_33;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000001_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "目前蜀中之地正是正邪之战的关键之地。我已推算出数个应劫之人，其中有一位就在不远的乌鸦嘴渡口，你现在速速去湘江边消灭那些追杀李宁父女的水贼，保护好他们父女。";
-	action.m_ActionMsg = "好，我这就去。";
+	action.m_NpcMsg = task_msg_34;
+	action.m_ActionMsg = task_msg_35;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000001_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠你帮我们击退这些恶人，这柄剑是老夫昔年行走江湖的随身兵刃就赠与少侠吧。";
+	action.m_NpcMsg = task_msg_36;
 	action.m_ActionMsg = "";
 	return action;
 end

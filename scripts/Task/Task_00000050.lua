@@ -82,20 +82,20 @@ function Task_00000050(npcId)
 		action.m_ActionID = 50
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "决战之地";
+		action.m_ActionMsg = task_msg_1103;
 	elseif task:GetTaskSubmitNpc(50) == npcId then
 		if Task_Submit_00000050() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 50
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "决战之地";
+			action.m_ActionMsg = task_msg_1104;
 		elseif task:HasAcceptedTask(50) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 50
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "决战之地";
+			action.m_ActionMsg = task_msg_1105;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000050_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才醉道人前辈去了慈云寺，与众妖人约定在魏家场展开决战，届时成都周遭的正道剑仙都回去魏家场，少侠你正好可以去助大家一臂之力，多诛杀几个邪派的妖人。";
-	action.m_ActionMsg = "除恶扬善，我自然是义不容辞。";
+	action.m_NpcMsg = task_msg_1106;
+	action.m_ActionMsg = task_msg_1107;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000050_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "魏家场一战，邪派妖人被打得是丢盔弃甲啊，哈哈。";
+	action.m_NpcMsg = task_msg_1108;
 	action.m_ActionMsg = "";
 	return action;
 end

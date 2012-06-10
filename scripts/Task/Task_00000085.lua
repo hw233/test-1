@@ -82,20 +82,20 @@ function Task_00000085(npcId)
 		action.m_ActionID = 85
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "隐居高人";
+		action.m_ActionMsg = task_msg_360;
 	elseif task:GetTaskSubmitNpc(85) == npcId then
 		if Task_Submit_00000085() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 85
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "隐居高人";
+			action.m_ActionMsg = task_msg_361;
 		elseif task:HasAcceptedTask(85) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 85
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "隐居高人";
+			action.m_ActionMsg = task_msg_362;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000085_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "青螺魔宫里妖人众多，仅我这天魔大法是远远不够的。离此不远处有一个玄冰谷，谷内隐居这一个叫女殃神的剑仙，听说昔年是邪道中人，如今已改邪归正，说不定可以助我等破这青螺魔宫。";
-	action.m_ActionMsg = "是吗，那我这就去见见这位隐居高人。";
+	action.m_NpcMsg = task_msg_363;
+	action.m_ActionMsg = task_msg_364;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000085_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老身在此参枯禅已有很多时日了。";
+	action.m_NpcMsg = task_msg_365;
 	action.m_ActionMsg = "";
 	return action;
 end

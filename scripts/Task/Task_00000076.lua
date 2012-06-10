@@ -82,20 +82,20 @@ function Task_00000076(npcId)
 		action.m_ActionID = 76
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "约战吕村";
+		action.m_ActionMsg = task_msg_1062;
 	elseif task:GetTaskSubmitNpc(76) == npcId then
 		if Task_Submit_00000076() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 76
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "约战吕村";
+			action.m_ActionMsg = task_msg_1063;
 		elseif task:HasAcceptedTask(76) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 76
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "约战吕村";
+			action.m_ActionMsg = task_msg_1064;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000076_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "陈圩的恶徒欲借吕村的道打通鱼神洞，确实防不胜防，我看与少侠同来的人里有不少是剑仙一流，不如和他们约定光明正大的打一次擂台以了解恩怨。";
-	action.m_ActionMsg = "这个办法不错。";
+	action.m_NpcMsg = task_msg_1065;
+	action.m_ActionMsg = task_msg_1066;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000076_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我这里有书信两封，这封信请少侠交给吕村的吕宪明，约定他们三日后来戴家场擂台一绝胜负。";
-	action.m_ActionMsg = "我定会把信带到。";
+	action.m_NpcMsg = task_msg_1067;
+	action.m_ActionMsg = task_msg_1068;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000076_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "打擂台吗，难道我还怕了你们不成！";
+	action.m_NpcMsg = task_msg_1069;
 	action.m_ActionMsg = "";
 	return action;
 end

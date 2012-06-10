@@ -50,20 +50,20 @@ function Task_00000603(npcId)
 		action.m_ActionID = 603
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "慈云寺恶僧";
+		action.m_ActionMsg = task_msg_906;
 	elseif task:GetTaskSubmitNpc(603) == npcId then
 		if Task_Submit_00000603() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 603
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "慈云寺恶僧";
+			action.m_ActionMsg = task_msg_907;
 		elseif task:HasAcceptedTask(603) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 603
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "慈云寺恶僧";
+			action.m_ActionMsg = task_msg_908;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000603_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都附近有座慈云禅师，寺内主持智通本官还见过，一直都安分守已，可是最近寺内来了不少五湖四海的强人，在成都一带为恶，甚至连寺内的僧人都开始作奸犯科，"..GetPlayerName(GetPlayer()).."你这去将这些个妖僧剿灭。";
-	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
+	action.m_NpcMsg = task_msg_909..GetPlayerName(GetPlayer())..task_msg_910;
+	action.m_ActionMsg = task_msg_911;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000603_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_912;
 	action.m_ActionMsg = "";
 	return action;
 end

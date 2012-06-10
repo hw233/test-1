@@ -82,20 +82,20 @@ function Task_00000022(npcId)
 		action.m_ActionID = 22
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "怒惩毛太";
+		action.m_ActionMsg = task_msg_183;
 	elseif task:GetTaskSubmitNpc(22) == npcId then
 		if Task_Submit_00000022() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 22
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "怒惩毛太";
+			action.m_ActionMsg = task_msg_184;
 		elseif task:HasAcceptedTask(22) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 22
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "怒惩毛太";
+			action.m_ActionMsg = task_msg_185;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000022_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠救命，这个恶人跟踪我到家里，见周围无人便想非礼于我，我看少侠一身正气，肯定是正道的剑仙，希望可以帮我赶走他。";
-	action.m_ActionMsg = "好的，看我帮你赶跑这个恶人。";
+	action.m_NpcMsg = task_msg_186;
+	action.m_ActionMsg = task_msg_187;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000022_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠出手相助，小女子感激不尽。";
+	action.m_NpcMsg = task_msg_188;
 	action.m_ActionMsg = "";
 	return action;
 end

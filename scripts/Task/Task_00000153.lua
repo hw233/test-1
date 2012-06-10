@@ -82,20 +82,20 @@ function Task_00000153(npcId)
 		action.m_ActionID = 153
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "仙人虞";
+		action.m_ActionMsg = task_msg_1687;
 	elseif task:GetTaskSubmitNpc(153) == npcId then
 		if Task_Submit_00000153() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 153
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "仙人虞";
+			action.m_ActionMsg = task_msg_1688;
 		elseif task:HasAcceptedTask(153) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 153
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "仙人虞";
+			action.m_ActionMsg = task_msg_1689;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000153_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "雁荡山一带风景秀丽，不过深山之中多毒蛇猛兽出没，据老一辈的传下来说，雁荡山有一株奇异的毒草叫仙人虞，此草可化形千万但是剧毒无比，寻常人稍微吸入一丝立刻七窍流血而亡。这段时间进山采药的村民们不少命丧于此毒草手下，还希望少侠帮助移除这株毒草。";
-	action.m_ActionMsg = "还有这种事情？这个毒草在哪里，什么样子？";
+	action.m_NpcMsg = task_msg_1690;
+	action.m_ActionMsg = task_msg_1691;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000153_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，听我的祖父说起，这毒草一般化为蛇形在山中出没，此蛇人面蛇身应该很好辨认。";
-	action.m_ActionMsg = "好，我这就去雁荡山中找出这个仙人虞。";
+	action.m_NpcMsg = task_msg_1692;
+	action.m_ActionMsg = task_msg_1693;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000153_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是谢天谢地，有少侠你来帮助我们。";
+	action.m_NpcMsg = task_msg_1694;
 	action.m_ActionMsg = "";
 	return action;
 end

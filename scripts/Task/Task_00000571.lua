@@ -56,20 +56,20 @@ function Task_00000571(npcId)
 		action.m_ActionID = 571
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "吕村打手";
+		action.m_ActionMsg = task_msg_1170;
 	elseif task:GetTaskSubmitNpc(571) == npcId then
 		if Task_Submit_00000571() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 571
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "吕村打手";
+			action.m_ActionMsg = task_msg_1171;
 		elseif task:HasAcceptedTask(571) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 571
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "吕村打手";
+			action.m_ActionMsg = task_msg_1172;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000571_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "长沙郊外有一些恶人，受了魔教中人的蛊惑，在长沙为恶，"..GetPlayerName(GetPlayer()).."你这就去长沙郊外看看，如果遇到就顺手铲除了这些恶人。";
-	action.m_ActionMsg = "弟子遵命，我去去就回。";
+	action.m_NpcMsg = task_msg_1173..GetPlayerName(GetPlayer())..task_msg_1174;
+	action.m_ActionMsg = task_msg_1175;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000571_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1176;
 	action.m_ActionMsg = "";
 	return action;
 end

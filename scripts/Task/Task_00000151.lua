@@ -82,20 +82,20 @@ function Task_00000151(npcId)
 		action.m_ActionID = 151
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "落湖镇";
+		action.m_ActionMsg = task_msg_1675;
 	elseif task:GetTaskSubmitNpc(151) == npcId then
 		if Task_Submit_00000151() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 151
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "落湖镇";
+			action.m_ActionMsg = task_msg_1676;
 		elseif task:HasAcceptedTask(151) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 151
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "落湖镇";
+			action.m_ActionMsg = task_msg_1677;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000151_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在我除妖鲧的这段时间，雁荡山脚落湖镇的村民对我礼遇有加，只是恩师有命，要我除妖后即刻回百花山。这雁荡靠近东海，也滋生了不少妖孽，我暂时分身乏术，还希望你可以去帮助万村长解决周遭的祸害。";
-	action.m_ActionMsg = "没问题……";
+	action.m_NpcMsg = task_msg_1678;
+	action.m_ActionMsg = task_msg_1679;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000151_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是谢天谢地，有少侠你来帮助我们。";
+	action.m_NpcMsg = task_msg_1680;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -56,20 +56,20 @@ function Task_00000511(npcId)
 		action.m_ActionID = 511
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "成都知府";
+		action.m_ActionMsg = task_msg_699;
 	elseif task:GetTaskSubmitNpc(511) == npcId then
 		if Task_Submit_00000511() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 511
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "成都知府";
+			action.m_ActionMsg = task_msg_700;
 		elseif task:HasAcceptedTask(511) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 511
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "成都知府";
+			action.m_ActionMsg = task_msg_701;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000511_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "明末党争剧烈，又赶上陕北大旱，闯王起义覆灭了明朝大好江山，真个时天灾人祸啊，如今满清入关，颠覆了我汉室江山，在这兵荒马乱的时节，象成都知府这样爱民如子的好官真是不多见，我见他任期将满，有意度他入我门派，"..GetPlayerName(GetPlayer()).."你去问问他意下如何？";
-	action.m_ActionMsg = "好的，弟子这就去。";
+	action.m_NpcMsg = task_msg_702..GetPlayerName(GetPlayer())..task_msg_703;
+	action.m_ActionMsg = task_msg_704;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000511_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "蒙仙长如此夸奖，真是愧不敢当，所谓当官应为民做主，这只是我为官的本分而已。";
+	action.m_NpcMsg = task_msg_705;
 	action.m_ActionMsg = "";
 	return action;
 end

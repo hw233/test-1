@@ -82,20 +82,20 @@ function Task_00000035(npcId)
 		action.m_ActionID = 35
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "惩治恶徒";
+		action.m_ActionMsg = task_msg_263;
 	elseif task:GetTaskSubmitNpc(35) == npcId then
 		if Task_Submit_00000035() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 35
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "惩治恶徒";
+			action.m_ActionMsg = task_msg_264;
 		elseif task:HasAcceptedTask(35) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 35
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "惩治恶徒";
+			action.m_ActionMsg = task_msg_265;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000035_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你来得正好，小女正被那妖人侮辱，眼看名节不保，还请少侠速速施以援手。";
-	action.m_ActionMsg = "老丈放心，我这就去除掉这个";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_266;
+	action.m_ActionMsg = task_msg_267;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000035_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，大恩不言谢，老朽也没什么拿得出手的东西，而且少侠是世外高人，一般黄白之物恐怕也入不了少侠的法眼。这里有一个我年青时在峨眉山找到的奇异之物，送给少侠，希望可以对你有点帮助。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_268;
 	action.m_ActionMsg = "";
 	return action;
 end

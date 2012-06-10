@@ -62,20 +62,20 @@ function Task_00000051(npcId)
 		action.m_ActionID = 51
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "掌教真人";
+		action.m_ActionMsg = task_msg_1122;
 	elseif task:GetTaskSubmitNpc(51) == npcId then
 		if Task_Submit_00000051() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 51
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "掌教真人";
+			action.m_ActionMsg = task_msg_1123;
 		elseif task:HasAcceptedTask(51) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 51
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "掌教真人";
+			action.m_ActionMsg = task_msg_1124;
 		end
 	end
 	return action;
@@ -89,8 +89,8 @@ function Task_00000051_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺一战已经终了，正道中人都齐聚蜀山，"..GetPlayerName(GetPlayer()).."你也一起去吧。峨眉掌教乾坤正气妙一真人齐前辈正在峨眉派的玉清殿等着见见你这个正道的后起之秀呢。";
-	action.m_ActionMsg = "嗯，我这就赶去。";
+	action.m_NpcMsg = task_msg_1125..GetPlayerName(GetPlayer())..task_msg_1126;
+	action.m_ActionMsg = task_msg_1127;
 	return action;
 end
 
@@ -99,7 +99,7 @@ function Task_00000051_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."正道中兴的重担就在你们这小一辈的肩上了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1128;
 	action.m_ActionMsg = "";
 	return action;
 end

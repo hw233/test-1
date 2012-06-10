@@ -50,20 +50,20 @@ function Task_00000611(npcId)
 		action.m_ActionID = 611
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "寒泉恶人";
+		action.m_ActionMsg = task_msg_962;
 	elseif task:GetTaskSubmitNpc(611) == npcId then
 		if Task_Submit_00000611() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 611
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "寒泉恶人";
+			action.m_ActionMsg = task_msg_963;
 		elseif task:HasAcceptedTask(611) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 611
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "寒泉恶人";
+			action.m_ActionMsg = task_msg_964;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000611_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都不远处的桂花山是一处美景，不过山中有五色云雾，寻常人轻易不得入内，我手下捕快捉拿一个恶徒金驼到桂花山，见那厮驾飞剑进入寒泉就再也不见踪迹，听说那里是个世外高人的隐居之所，所以只有拜托少侠你去跑一趟了。";
-	action.m_ActionMsg = "为民除害是我辈本色，我去去就回。";
+	action.m_NpcMsg = task_msg_965;
+	action.m_ActionMsg = task_msg_966;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000611_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_967;
 	action.m_ActionMsg = "";
 	return action;
 end

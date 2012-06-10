@@ -696,4 +696,8 @@ sysMsg:set(4001, 0, "%s")
 sysMsg:set(4002, 0, "君子争上游奖励，恭喜你在15名之内了")
 sysMsg:set(4003, 0, "君子争上游奖励，恭喜你较昨日前进了%u名")
 
+sysMsg:set(4004, 0, "神秘礼物(来自IDIP)")
+sysMsg:set(4005, 0, "神秘礼物(来自IDIP)")
+
 sysMsg:set(9999, 0, "var: %d")
+
