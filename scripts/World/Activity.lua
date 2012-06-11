@@ -247,6 +247,24 @@ function onActivityCheck(tm)
           setSSDTAct(false)
       end
 
+      if tm >= actTime41 and tm < actTime42 then
+          setBlueDiamondAct(true)
+      else
+          setBlueDiamondAct(false)
+      end
+
+      if tm >= actTime43 and tm < actTime44 then
+          setYellowDiamondAct(true)
+      else
+          setYellowDiamondAct(false)
+      end
+
+      if tm >= actTime45 and tm < actTime46 then
+          setQQGameAct(true)
+      else
+          setQQGameAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -284,6 +302,13 @@ function initActTime(y, m, d)
   local  SerStartTm17= { ['year'] = 2012, ['month'] = 4, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 搜搜地图 （5/14-5/20）
   local  SerStartTm18= { ['year'] = 2012, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+  -- 黄钻特权
+  local  SerStartTm19= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 黄钻特权
+  local  SerStartTm20= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 游戏大厅特权
+  local  SerStartTm21= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -351,6 +376,15 @@ function initActTime(y, m, d)
 
   actTime39 = os.time(SerStartTm18);
   actTime40 = os.time(SerStartTm18) + 7 * 86400;
+
+  actTime41 = os.time(SerStartTm19);
+  actTime42 = os.time(SerStartTm19) + 31 * 86400;
+
+  actTime43 = os.time(SerStartTm20);
+  actTime44 = os.time(SerStartTm20) + 31 * 86400;
+
+  actTime45 = os.time(SerStartTm21);
+  actTime46 = os.time(SerStartTm21) + 7 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

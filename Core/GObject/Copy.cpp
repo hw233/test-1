@@ -99,14 +99,14 @@ void PlayerCopy::sendInfo(Player* pl, UInt8 id)
     count |= getFreeCount();
     st << count;
 
-    if(pl->isBD()) {
+    if(pl->isBD() && World::getBlueDiamondAct()) {
         count = pl->GetVar(VAR_DIAMOND_BLUE);
         count <<= 4;
         st << count;
         count = PRIVILEGE_COUNT;
         count <<= 4;
         st << count;
-    } else if (pl->isYD()) {
+    } else if (pl->isYD() && World::getYellowDiamondAct()) {
         count = pl->GetVar(VAR_DIAMOND_YELLOW);
         st << count;
         count = PRIVILEGE_COUNT;
@@ -186,12 +186,12 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     //diamond privilege
     if(id == 0xff)
     {
-        if(pl->isBD()) {
+        if(pl->isBD() && World::getBlueDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_BLUE) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_BLUE, 1);
                 return 0;
             }
-        } else if(pl->isYD()) {
+        } else if(pl->isYD() && World::getYellowDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_YELLOW) < PRIVILEGE_COUNT) {
                 pl->AddVar(VAR_DIAMOND_YELLOW, 1);
                 return 0;
@@ -249,12 +249,12 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
 
     if(id == 0xff)
     {
-        if(pl->isBD()) {
+        if(pl->isBD() && World::getBlueDiamondAct()) {
             if(pl->GetVar(VAR_DIAMOND_BLUE) >= PRIVILEGE_COUNT) {
                 pl->sendMsgCode(0, 1998);
                 return;
             }
-        } else if(pl->isYD()){
+        } else if(pl->isYD() && World::getYellowDiamondAct()){
             if(pl->GetVar(VAR_DIAMOND_YELLOW) >= PRIVILEGE_COUNT) {
                 pl->sendMsgCode(1, 1999);
                 return;
