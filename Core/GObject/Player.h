@@ -1523,6 +1523,23 @@ namespace GObject
 
         bool hasRealItemAward(UInt32 id);
         void getRealItemAward(UInt32 id);
+
+    public:
+        struct RNR
+        {
+            RNR() : date(0), recharge(0) {}
+
+            UInt32 date;
+            UInt32 recharge;
+        };
+
+        void addRechargeNextRet(UInt32);
+        void updateRNR2DB();
+        void loadRNRFromDB(const std::string& str);
+        void sendRNR(UInt32 now);
+        void sendRechargeNextRetInfo(UInt32 now);
+    private:
+        std::vector<RNR> rechargs;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

@@ -208,6 +208,7 @@ namespace GObject
         LoadDiscount();
         LoadSoulItemChance();
         LoadLuckyLog();
+        loadRNR();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4230,7 +4231,6 @@ namespace GObject
         return true;
     }
 
-
     bool GObjectManager::loadRealItemAward()
     {
 		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
@@ -4244,6 +4244,27 @@ namespace GObject
 		{
 			lc.advance();
             realItemAwardMgr.load(t.id, t.cd, t.card_no, t.card_psw);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadRNR()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading RNR");
+		DBRNR t;
+		if(execu->Prepare("SELECT `id`, `record` FROM `rechargenextret` ORDER BY `id`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            Player* pl = globalPlayers[t.id];
+            if (!pl)
+                continue;
+            pl->loadRNRFromDB(t.record);
         }
         lc.finalize();
         return true;

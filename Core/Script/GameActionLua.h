@@ -244,6 +244,7 @@ namespace Script
         UInt16 RunHappyAward(Player* player, UInt8 opt);
         UInt16 RunTargetAward(Player* player);
         UInt16 RunTargetAwardRF(Player* player);
+        void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
 	public:
 
 		template <typename R>

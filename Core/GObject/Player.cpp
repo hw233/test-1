@@ -78,6 +78,9 @@
 #define CLAN_SKILL_HITRATE  7
 #define CLAN_SKILL_MAXSOUL  8
 
+#define DAY_SECS (24*60*60)
+#define CREATE_OFFSET(c, n) (((n) - (c)) / (DAY_SECS))
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -6031,6 +6034,7 @@ namespace GObject
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
         addRC7DayRecharge(r);
         addRF7DayRecharge(r);
+        addRechargeNextRet(r);
 
         if (World::getRechargeActive())
         {
@@ -6079,6 +6083,115 @@ namespace GObject
 
         sendTripodInfo();
 	}
+
+    void Player::addRechargeNextRet(UInt32 r)
+    {
+        if (!World::getRechargeNextRet())
+            return;
+        if (World::_rechargenextretstart > World::_rechargenextretend)
+            return;
+        UInt32 now = TimeUtil::Now();
+        if (now < World::_rechargenextretstart || now >= World::_rechargenextretend)
+            return;
+        UInt32 off = (now - World::_rechargenextretstart) / DAY_SECS;
+        if (off > 60)
+            return;
+        UInt32 size = rechargs.size();
+        if (off >= size)
+            rechargs.resize(off+1, RNR());
+
+        rechargs[off].date = TimeUtil::SharpDay(0, now);
+        rechargs[off].recharge += r;
+
+        Stream st(REP::DAILY_DATA);
+        st << static_cast<UInt8>(14) << static_cast<UInt8>(off+1) << rechargs[off].recharge << Stream::eos;
+        send(st);
+
+        updateRNR2DB();
+    }
+
+    void Player::updateRNR2DB()
+    {
+        std::string str;
+        UInt32 size = rechargs.size();
+        for (UInt32 i = 0; i < size; ++i)
+        {
+            str += Itoa(rechargs[i].date);
+            str += ",";
+            str += Itoa(rechargs[i].recharge);
+            if(i != size - 1)
+                str += "|";
+        }
+		DB1().PushUpdateData("REPLACE INTO `rechargenextret` VALUES (%"I64_FMT"u, '%s')", getId(), str.c_str());
+    }
+
+    void Player::loadRNRFromDB(const std::string& str)
+    {
+        // XXX: 如果超出活动时间处理
+        if (str.empty())
+            return;
+        StringTokenizer rs(str, "|");
+        UInt32 count = rs.count();
+        if (count)
+        {
+            rechargs.resize(count, RNR());
+            for (UInt32 i = 0; i < count; ++i)
+            {
+                StringTokenizer t(rs[i], ",");
+                if (t.count() == 2)
+                {
+                    rechargs[i].date = atoi(t[0].c_str());
+                    rechargs[i].recharge = atoi(t[1].c_str());
+                }
+            }
+        }
+    }
+
+    void Player::sendRNR(UInt32 now)
+    {
+        UInt32 size = rechargs.size();
+        for (UInt32 i = 0; i < size; ++i)
+        {
+            UInt32 date = rechargs[i].date;
+            UInt32 recharge = rechargs[i].recharge;
+
+            if (date && recharge && (date >= TimeUtil::SharpDay(0, World::_rechargenextretstart)) &&
+                    (date < TimeUtil::SharpDay(0, World::_rechargenextretend)) &&
+                    (now >= (TimeUtil::SharpDay(0, date) + 13 * DAY_SECS)) &&
+                    (now < (TimeUtil::SharpDay(0, date) + 13 * DAY_SECS + 3 * DAY_SECS)))
+            {
+                struct SendRNR
+                {
+                    Player* player;
+                    UInt32 off;
+                    UInt32 date;
+                    UInt32 total;
+                } rnr;
+
+                rnr.player = this;
+                rnr.off = (now - date) / (24 * 60 * 60) - 13;
+                rnr.date = date;
+                rnr.total = recharge;
+                GameMsgHdr hdr(0x249, getThreadId(), this, sizeof(rnr));
+                GLOBAL().PushMsg(hdr, &rnr);
+            }
+        }
+    }
+
+    void Player::sendRechargeNextRetInfo(UInt32 now)
+    {
+        if (now >= World::_rechargenextretstart &&
+                now < (TimeUtil::SharpDay(0, World::_rechargenextretend) + 13 * DAY_SECS + 2 * DAY_SECS))
+        {
+            Stream st(REP::DAILY_DATA);
+            UInt8 sz = rechargs.size();
+            st << static_cast<UInt8>(13) << static_cast<UInt8>(sz);
+            for (UInt8 i = 0; i < sz; ++i)
+                st << rechargs[i].recharge;
+            st << Stream::eos;
+            send((st));
+        }
+    }
 
     void Player::sendRechargeInfo()
     {
@@ -9663,8 +9776,6 @@ namespace GObject
         send(st);
     }
 
-#define DAY_SECS (24*60*60)
-#define CREATE_OFFSET(c, n) (((n) - (c)) / (DAY_SECS))
     void Player::continuousLogin(UInt32 now)
     {
         if (!World::getRC7Day())

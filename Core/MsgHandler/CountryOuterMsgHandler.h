@@ -1036,12 +1036,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendDeamonAwardsInfo();
 
+    UInt32 now = TimeUtil::Now();
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
-    pl->sendRC7DayInfo(TimeUtil::Now());
-    pl->sendRF7DayInfo(TimeUtil::Now());
+    pl->sendRechargeNextRetInfo(now);
+    pl->sendRC7DayInfo(now);
+    pl->sendRF7DayInfo(now);
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendHappyInfo();

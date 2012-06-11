@@ -1408,3 +1408,52 @@ function June(player, lootlvl)
     end
 end
 
+function sendRNR(player, off, date, total)
+    local rm = os.date("%m", date)
+    local rd = os.date("%d", date)
+    local title = string.format(msg_91, rm, rd, off+1)
+
+    local rorate = {[0]=50,[1]=30,[2]=20,}
+    local ror = rorate[off]
+    print('rorate: ' .. ror)
+    if ror == nil then
+        return
+    end
+
+    local cal = {99,199,399,699,1099,1599,2199,2899,3699,4599,5599,6799,8199,9799,11599,13599,15899,18499,21399,24599,28199,32199,36699,41699,47299,53499,60399,67999,76399,85899,99999,}
+    local rate = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,}
+
+    local i = 0
+    local sz = #cal
+    for n=1,sz do
+        if total >= cal[n] then
+            i = n
+        end
+    end
+
+    print('i: ' .. i)
+    if i == 0 then
+        return
+    end
+
+    local r = rate[i]
+    print('r: ' .. r)
+    if r == nil then
+        return
+    end
+
+    local f = math.floor(total * (r/100) * (rorate[0]/100))
+    local s = math.floor(total * (r/100) * (rorate[1]/100))
+    local t = total * (r/100) - (f + s)
+    local ms = {f, s, t}
+
+    local m = ms[off+1]
+    print('m: ' .. m)
+    if m == nil then
+        return
+    end
+    local ctx = string.format(msg_92, rm, rd, total, off+1, m)
+
+    sendItemPackageMail(player, title, ctx, {0xB000,m,1});
+end
+

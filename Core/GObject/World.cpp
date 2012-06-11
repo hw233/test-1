@@ -106,6 +106,9 @@ void* World::_recalcwd = NULL;
 bool World::_june = false;
 bool World::_june1 = false;
 bool World::_enchant_gt11 = false;
+bool World::_rechargenextret;
+UInt32 World::_rechargenextretstart;
+UInt32 World::_rechargenextretend;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -165,8 +168,9 @@ bool bValentineDayEnd = false;
 bool bMayDayEnd = false;
 bool bJuneEnd = false;
 
-bool enum_midnight(void * ptr, void *)
+bool enum_midnight(void * ptr, void* next)
 {
+    UInt32 nextday = *static_cast<UInt32*>(next);
 	Player * pl = static_cast<Player *>(ptr);
 	if(pl == NULL)
 		return true;
@@ -232,6 +236,10 @@ bool enum_midnight(void * ptr, void *)
         pl->GetShuoShuo()->reset(false);
         pl->GetCFriend()->reset(false);
     }
+
+    if (TimeUtil::SharpDay(0, nextday) >= TimeUtil::SharpDay(0, World::_rechargenextretstart)+13*24*60*60 &&
+            TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)
+        pl->sendRNR(nextday);
 
 	return true;
 }
@@ -526,7 +534,8 @@ void World::World_Midnight_Check( World * world )
     // 六一活动是否结束
     bJuneEnd = bJune && !getJune();
 
-	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
+    UInt32 nextday = curtime + 30;
+	globalPlayers.enumerate(enum_midnight, static_cast<void *>(&nextday));
 
     //给筷子使用称号
     if(bSingleDayEnd)
