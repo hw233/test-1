@@ -15,6 +15,7 @@
 #include "TeamCopy.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "LuckyDraw.h"
 
 namespace GObject
 {
@@ -391,6 +392,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             if(tcpInfo && tcpInfo->getPass(id, 0) == false)
             {
                 tcpInfo->setPass(id, 0, true, true);
+                luckyDraw.notifyPass(pl, id);
             }
 
             tcd.floor = 0;

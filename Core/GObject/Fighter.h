@@ -74,7 +74,7 @@ struct ElixirAttr
     Int32 agility;
     Int32 intelligence;
     Int32 will;
-    Int32 soul;
+    Int32 soul; // max soul
 };
 
 class Player;
@@ -497,7 +497,7 @@ public:
 	inline float getBaseHitrate() { return hitrate; }
 
 	inline Int16 getBaseSoul() { return baseSoul; }
-    inline Int16 getSoul() { return soul + _elixirattr.soul; }
+    inline Int16 getSoul() { return soul; }
     Int16 getMaxSoul();
     Int16 get2ndSounSoulMax();
 

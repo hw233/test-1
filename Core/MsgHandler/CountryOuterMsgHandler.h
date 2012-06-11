@@ -1038,6 +1038,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
+    luckyDraw.notifyDisplay(pl);
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
@@ -3869,6 +3870,9 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
     UInt8 op = 0;
     br >> op;
+
+    if (player->isJumpingMap())
+        return;
 
     switch(op)
     {

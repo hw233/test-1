@@ -76,6 +76,7 @@ namespace Script
 		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
 		lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
+		lua_tinker::def(_L, "isDebug", GObject::World::isDebug);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
 		lua_tinker::def(_L, "getAutoHeal",	GObject::World::getAutoHeal);
 		lua_tinker::def(_L, "getSingleDay",	GObject::World::getSingleDay);
