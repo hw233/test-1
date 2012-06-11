@@ -7648,7 +7648,6 @@ namespace GObject
 		}
         */
 		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
-        std::cout << _battleName << std::endl;
 #endif
 	}
 
@@ -9591,75 +9590,28 @@ namespace GObject
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
-#if 0
+#ifndef _FB
         AddVar(VAR_OFFLINE_EQUIP, offline);
 #endif
     }
 
     void Player::getOfflineExp()
     {
-#if 0
+#ifndef _FB
         UInt32 equip = GetVar(VAR_OFFLINE_EQUIP);
         if(equip)
         {
-            UInt32 dayCnt = equip / (24 * 3600);
-            UInt8 lvl = GetLev();
-            UInt16 equipId;
-            UInt16 needCnt = 0;
-
-            if(dayCnt > 365)
-                needCnt = 365;
-            if(dayCnt < 7)
-                needCnt = 1;
-            else if(dayCnt < 14)
-                needCnt = 3;
-            else if(dayCnt < 21)
-                needCnt = 5;
-            else if(dayCnt < 30)
-                needCnt = 7;
-            else
-                needCnt = 9 + (dayCnt - 30) * 2;
-            if (GetPackage()->GetRestPackageSize() < needCnt)
+            if(GetPackage()->GetRestPackageSize() < this->_equipAward.size())
             {
                 sendMsgCode(0, 1011);
                 return;
             }
-
-            if(dayCnt >= 7)
+            for(UInt16 i = 0; i < this->_equipAward.size(); i++)
             {
-                equipId = getRandOEquip(lvl);
-                m_Package->AddItem(equipId, 1, true);
-                equipId = GameAction()->getRandTrump(lvl);
-                m_Package->AddItem(equipId, 1, true);
-            }
-            if(dayCnt >= 14)
-            {
-                equipId = getRandOEquip(lvl);
-                m_Package->AddItem(equipId, 1, true);
-                equipId = GameAction()->getRandTrump(lvl);
-                m_Package->AddItem(equipId, 1, true);
-            }
-            if(dayCnt >= 21)
-            {
-                equipId = getRandOEquip(lvl);
-                m_Package->AddItem(equipId, 1, true);
-                equipId = GameAction()->getRandTrump(lvl);
-                m_Package->AddItem(equipId, 1, true);
-            }
-            if(dayCnt >= 30)
-            {
-                equipId = getRandOEquip(lvl);
-                m_Package->AddItem(equipId, 1, true);
-                equipId = GameAction()->getRandTrump(lvl);
-                m_Package->AddItem(equipId, 1, true);
-            }
-            int times = (dayCnt - 30) / 30;
-            while(times--)
-            {
-                equipId = getRandOEquip(lvl);
-                m_Package->AddItem(equipId, 1, true);
-                equipId = GameAction()->getRandTrump(lvl);
-                m_Package->AddItem(equipId, 1, true);
+                if(IsEquipTypeId(this->_equipAward[i].id))
+                    m_Package->AddEquip(this->_equipAward[i].id, true, false, FromPExp);
+                else
+                    m_Package->AddItem(this->_equipAward[i].id, this->_equipAward[i].count, true, false, FromPExp);
             }
             SetVar(VAR_OFFLINE_EQUIP, 0);
         }

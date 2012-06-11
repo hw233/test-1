@@ -1292,6 +1292,7 @@ namespace GObject
 		GData::NpcGroup * _lastNg;
 		std::vector<GData::LootResult> _lastLoot;
         std::vector<LastAthAward> _lastAthAward;
+        std::vector<GData::LootResult> _equipAward;
 
     private:
 		UInt16 _lastDungeon;
