@@ -106,6 +106,9 @@ namespace Script
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
+        lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
+        lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
+        lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);

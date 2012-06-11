@@ -2506,8 +2506,7 @@ namespace GObject
 
                 if (isOffical())
                     exp -= (exp/10);
-                //if(this->isBD() || this->isYD())
-                if(this->getPlatform() == 10)
+                if(this->getPlatform() == 10 && World::getQQGameAct())
                 {
                     UInt32 extraExp = exp / 2;//蓝黄钻野外手动打怪经验+50%
                     SYSMSG_SENDV(1092, this, extraExp);
@@ -6181,10 +6180,10 @@ namespace GObject
         playerCopy.getCount(this, &freeCnt, &goldCnt, true);
 
         UInt8 currentCnt, totalCnt;
-        if(this->isBD()) {
+        if(this->isBD() && World::getBlueDiamondAct()) {
             currentCnt = this->GetVar(VAR_DIAMOND_BLUE);
             totalCnt = 1;
-        } else if (this->isYD()) {
+        } else if (this->isYD() && World::getYellowDiamondAct()) {
             currentCnt = this->GetVar(VAR_DIAMOND_YELLOW);
             totalCnt = 1;
         } else {
@@ -6243,10 +6242,10 @@ namespace GObject
 
         UInt8 currentDiamondCnt;
         UInt8 totalDiamondCnt;
-        if(this->isBD()) {
+        if(this->isBD() && World::getBlueDiamondAct()) {
             currentDiamondCnt = this->GetVar(VAR_DIAMOND_BLUE);
             totalDiamondCnt = 1;
-        } else if (this->isYD()) {
+        } else if (this->isYD() && World::getYellowDiamondAct()) {
             currentDiamondCnt = this->GetVar(VAR_DIAMOND_YELLOW);
             totalDiamondCnt = 1;
         } else {
@@ -7394,12 +7393,6 @@ namespace GObject
                 if(_nextBookStoreUpdate == 0 || curtime >= _nextBookStoreUpdate)
                 {
                     count = 1;
-                    //if(this->isBD() || this->isYD())
-                    if(this->getPlatform() == 10)
-                    {
-                        printf("diamond user\n");
-                        count *= 2;
-                    }
                     updateNextBookStoreUpdate(curtime);
                 }
                 else
@@ -7509,7 +7502,12 @@ namespace GObject
 
 	void Player::updateNextBookStoreUpdate(UInt32 curtime)
 	{
-		_nextBookStoreUpdate = (curtime + _bookStoreInterval) / _bookStoreInterval * _bookStoreInterval;
+        UInt32 tmp = _bookStoreInterval;
+        if(this->getPlatform() == 10 && World::getQQGameAct())
+            tmp /= 2;
+        if(tmp == 0)
+            tmp = 1;
+        _nextBookStoreUpdate = (curtime + tmp) / tmp * tmp;
 	}
 
 	UInt8 Player::unLockSecondPWD(std::string pwd)
@@ -7688,11 +7686,11 @@ namespace GObject
 
     float Player::getPracticeIncByDiamond()
     {
-        if(this->isBD())
+        if(this->isBD() && World::getBlueDiamondAct())
         {
             return 0.1;
         }
-        else if(this->isYD())
+        else if(this->isYD() && World::getYellowDiamondAct())
         {
             return 0.1;
         }
@@ -9575,35 +9573,38 @@ namespace GObject
 
     void Player::recvYBBuf(UInt8 type)
     {
-        UInt32 ybbuf = GetVar(VAR_YBBUF);
-        UInt32 ybuf = (ybbuf >> 16) & 0xFFFF;
-        UInt32 bbuf = ybbuf & 0xFFFF;
-
-        // type = 0 黄钻 1 蓝钻
-
-        bool r = false;
-        UInt32 now = TimeUtil::Now();
-        if (!ybuf && type == 0)
+        if((this->isBD() && World::getBlueDiamondAct()) || (this->isYD() && World::getYellowDiamondAct()))
         {
-            setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
-            ybuf = 1;
-            r = true;
-        }
+            UInt32 ybbuf = GetVar(VAR_YBBUF);
+            UInt32 ybuf = (ybbuf >> 16) & 0xFFFF;
+            UInt32 bbuf = ybbuf & 0xFFFF;
 
-        if (!bbuf && type == 1)
-        {
-            setBuffData(PLAYER_BUFF_BBUF, now + 60 * 60);
-            bbuf = 1;
-            r = true;
-        }
+            // type = 0 黄钻 1 蓝钻
 
-        if (r)
-        {
-            ybbuf = (ybuf << 16) | bbuf;
-            SetVar(VAR_YBBUF, ybbuf);
-        }
+            bool r = false;
+            UInt32 now = TimeUtil::Now();
+            if (!ybuf && type == 0)
+            {
+                setBuffData(PLAYER_BUFF_YBUF, now + 60 * 60);
+                ybuf = 1;
+                r = true;
+            }
 
-        sendYBBufInfo(ybbuf);
+            if (!bbuf && type == 1)
+            {
+                setBuffData(PLAYER_BUFF_BBUF, now + 60 * 60);
+                bbuf = 1;
+                r = true;
+            }
+
+            if (r)
+            {
+                ybbuf = (ybuf << 16) | bbuf;
+                SetVar(VAR_YBBUF, ybbuf);
+            }
+
+            sendYBBufInfo(ybbuf);
+        }
     }
 
     void Player::sendYBBufInfo(UInt32 ybbuf)
