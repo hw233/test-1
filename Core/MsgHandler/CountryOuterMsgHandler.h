@@ -1110,6 +1110,8 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
                 {
                     st << pl->_equipAward[i].id;
                 }
+#else
+                st << static_cast<UInt8>(0);
 #endif
             }
 
