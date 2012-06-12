@@ -345,12 +345,11 @@ function initActTime(y, m, d)
   -- 搜搜地图 （5/14-5/20）
   local  SerStartTm18= { ['year'] = 2011, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 蓝钻特权
+  local  SerStartTm19= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 黄钻特权
-  local  SerStartTm19= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 黄钻特权
-  local  SerStartTm20= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm20= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  --local  SerStartTm21= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm21= { ['year'] = 2012, ['month'] = 6, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
@@ -432,10 +431,10 @@ function initActTime(y, m, d)
   actTime40 = os.time(SerStartTm18) + 7 * 86400;
 
   actTime41 = os.time(SerStartTm19);
-  actTime42 = os.time(SerStartTm19) + 31 * 86400;
+  actTime42 = os.time(SerStartTm19) + 19 * 86400;
 
   actTime43 = os.time(SerStartTm20);
-  actTime44 = os.time(SerStartTm20) + 31 * 86400;
+  actTime44 = os.time(SerStartTm20) + 19 * 86400;
 
   actTime45 = os.time(SerStartTm21);
   actTime46 = os.time(SerStartTm21) + 14 * 86400;
