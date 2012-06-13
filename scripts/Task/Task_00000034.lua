@@ -82,20 +82,20 @@ function Task_00000034(npcId)
 		action.m_ActionID = 34
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "道人留信";
+		action.m_ActionMsg = task_msg_257;
 	elseif task:GetTaskSubmitNpc(34) == npcId then
 		if Task_Submit_00000034() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 34
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "道人留信";
+			action.m_ActionMsg = task_msg_258;
 		elseif task:HasAcceptedTask(34) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 34
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "道人留信";
+			action.m_ActionMsg = task_msg_259;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000034_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你来了呀，刚不巧那位道人已经离去，不过临走时留了一张纸条让我交付给少侠，听他说这附近的施家巷有个妖人作恶，要少侠你去除掉这个妖人。";
-	action.m_ActionMsg = "知道了，我这就去。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_260;
+	action.m_ActionMsg = task_msg_261;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000034_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠快帮帮忙，小女被那妖人抓住，恐怕名节不保。";
+	action.m_NpcMsg = task_msg_262;
 	action.m_ActionMsg = "";
 	return action;
 end

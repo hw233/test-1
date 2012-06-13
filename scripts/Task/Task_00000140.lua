@@ -50,20 +50,20 @@ function Task_00000140(npcId)
 		action.m_ActionID = 140
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "庐山之乱";
+		action.m_ActionMsg = task_msg_1643;
 	elseif task:GetTaskSubmitNpc(140) == npcId then
 		if Task_Submit_00000140() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 140
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "庐山之乱";
+			action.m_ActionMsg = task_msg_1644;
 		elseif task:HasAcceptedTask(140) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 140
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "庐山之乱";
+			action.m_ActionMsg = task_msg_1645;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000140_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "前日我接到庐山因空师太的飞剑传书，庐山三尸墓里的几个上古僵尸作乱，她一人势单力孤，请求我们峨眉的支援，这次就派你去庐山帮助因空师太吧，不过你得小心这几个上古的僵尸。";
-	action.m_ActionMsg = "是吗，这几个僵尸这么厉害？";
+	action.m_NpcMsg = task_msg_1646;
+	action.m_ActionMsg = task_msg_1647;
 	return action;
 end
 
@@ -87,8 +87,8 @@ function Task_00000140_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，三尸墓里的僵尸其中一对原是父子，父亲叫做无华氏。前端时间他们去轩辕之墓盗取了昊天镜和九嶷鼎，想借此为恶，必须尽早消灭他们，";
-	action.m_ActionMsg = "弟子这就去庐山。";
+	action.m_NpcMsg = task_msg_1648;
+	action.m_ActionMsg = task_msg_1649;
 	return action;
 end
 
@@ -97,7 +97,7 @@ function Task_00000140_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，白眉大师派你来帮助我真是太好了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1650;
 	action.m_ActionMsg = "";
 	return action;
 end

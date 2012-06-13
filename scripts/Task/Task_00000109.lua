@@ -82,20 +82,20 @@ function Task_00000109(npcId)
 		action.m_ActionID = 109
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "金蛊花";
+		action.m_ActionMsg = task_msg_523;
 	elseif task:GetTaskSubmitNpc(109) == npcId then
 		if Task_Submit_00000109() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 109
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "金蛊花";
+			action.m_ActionMsg = task_msg_524;
 		elseif task:HasAcceptedTask(109) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 109
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "金蛊花";
+			action.m_ActionMsg = task_msg_525;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000109_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "虽然将金蚕除去，不过绿袍用来饲养金蚕的金蛊花也是绝毒之物，其中有不少被绿袍用邪法炼制成傀儡，凶恶异常，"..GetPlayerName(GetPlayer()).."你去将这些金蛊花傀儡消灭。";
-	action.m_ActionMsg = "谨遵掌教真人法旨。";
+	action.m_NpcMsg = task_msg_526..GetPlayerName(GetPlayer())..task_msg_527;
+	action.m_ActionMsg = task_msg_528;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000109_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "金蚕和金蛊花被尽数灭除，绿袍想再炼金蚕蛊恐怕是没那么容易了。";
+	action.m_NpcMsg = task_msg_529;
 	action.m_ActionMsg = "";
 	return action;
 end

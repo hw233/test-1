@@ -56,20 +56,20 @@ function Task_00000522(npcId)
 		action.m_ActionID = 522
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "邪恶道人";
+		action.m_ActionMsg = task_msg_1136;
 	elseif task:GetTaskSubmitNpc(522) == npcId then
 		if Task_Submit_00000522() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 522
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "邪恶道人";
+			action.m_ActionMsg = task_msg_1137;
 		elseif task:HasAcceptedTask(522) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 522
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "邪恶道人";
+			action.m_ActionMsg = task_msg_1138;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000522_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "桂花山有一座极阴洞，听乡民们说那里不知什么时候来了一个邪恶的道人，四处掳掠年青的少男男女回去修炼邪功，你速速去将他除掉。";
-	action.m_ActionMsg = "好的，除恶扬善乃是我们正道本色。";
+	action.m_NpcMsg = task_msg_1139;
+	action.m_ActionMsg = task_msg_1140;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000522_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是身手不凡。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1141;
 	action.m_ActionMsg = "";
 	return action;
 end

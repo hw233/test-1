@@ -82,20 +82,20 @@ function Task_00000068(npcId)
 		action.m_ActionID = 68
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "误会";
+		action.m_ActionMsg = task_msg_1737;
 	elseif task:GetTaskSubmitNpc(68) == npcId then
 		if Task_Submit_00000068() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 68
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "误会";
+			action.m_ActionMsg = task_msg_1738;
 		elseif task:HasAcceptedTask(68) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 68
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "误会";
+			action.m_ActionMsg = task_msg_1739;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000068_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才在长沙黄鹤楼饮酒，见到一群恶人在临座商量去城外一个叫戴家场的地方滋事，少侠不如去看一看，若见到这些恶人，出手惩戒一下，方显侠义本色。";
-	action.m_ActionMsg = "我这就赶去戴家场看一看发生了什么事。";
+	action.m_NpcMsg = task_msg_1740;
+	action.m_ActionMsg = task_msg_1741;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000068_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是误会，适才听人误报，以为是罗九派人来寻仇，所以我们大张旗鼓在此等候，真是大水冲了龙王庙，自己人不识自己人了，让嘉客见笑了。";
+	action.m_NpcMsg = task_msg_1742;
 	action.m_ActionMsg = "";
 	return action;
 end

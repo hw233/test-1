@@ -2472,10 +2472,11 @@ namespace GObject
 				clan->addAllyClanFromDB(cl.allyClan);
 				clan->addEnemyClanFromDB(cl.enemyClan1);
 				clan->addEnemyClanFromDB(cl.enemyClan2);
-				clan->patchMergedName();
+				//clan->patchMergedName();
                 clan->setClanFunds(cl.funds);
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
+                clan->patchMergedName();
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
                 clan->LoadBattleScore(cl.battleScore);

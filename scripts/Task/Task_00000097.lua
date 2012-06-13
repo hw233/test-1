@@ -82,20 +82,20 @@ function Task_00000097(npcId)
 		action.m_ActionID = 97
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "消灭妖人";
+		action.m_ActionMsg = task_msg_440;
 	elseif task:GetTaskSubmitNpc(97) == npcId then
 		if Task_Submit_00000097() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 97
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "消灭妖人";
+			action.m_ActionMsg = task_msg_441;
 		elseif task:HasAcceptedTask(97) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 97
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "消灭妖人";
+			action.m_ActionMsg = task_msg_442;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000097_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "姑婆岭正邪人士混杂，我在此潜修多年未与他们有过冲突。不过近些时日来，那赤发寨主纵容手下为恶，"..GetPlayerName(GetPlayer()).."希望你可以消灭这些邪道妖人，也还这周遭山岭的清静。";
-	action.m_ActionMsg = "大师，我就去消灭这些妖人。";
+	action.m_NpcMsg = task_msg_443..GetPlayerName(GetPlayer())..task_msg_444;
+	action.m_ActionMsg = task_msg_445;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000097_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多日不见，"..GetPlayerName(GetPlayer()).."你修为日深，剑术大有长进啊。";
+	action.m_NpcMsg = task_msg_446..GetPlayerName(GetPlayer())..task_msg_447;
 	action.m_ActionMsg = "";
 	return action;
 end

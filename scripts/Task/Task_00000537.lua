@@ -56,20 +56,20 @@ function Task_00000537(npcId)
 		action.m_ActionID = 537
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "隐居剑侠";
+		action.m_ActionMsg = task_msg_1445;
 	elseif task:GetTaskSubmitNpc(537) == npcId then
 		if Task_Submit_00000537() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 537
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "隐居剑侠";
+			action.m_ActionMsg = task_msg_1446;
 		elseif task:HasAcceptedTask(537) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 537
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "隐居剑侠";
+			action.m_ActionMsg = task_msg_1447;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000537_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在成都有位隐居多年的剑侠，叫沈浪，昔年为师曾和他一起出门历练，降魔除妖无数，只是汉室颠覆，又恪于修道之人的戒律，不能对凡人出手，所以他心灰意冷隐居成都，你去拜访一下他吧。";
-	action.m_ActionMsg = "弟子这就去。";
+	action.m_NpcMsg = task_msg_1448;
+	action.m_ActionMsg = task_msg_1449;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000537_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "数十年没见了，想不到齐掌教还记得我。";
+	action.m_NpcMsg = task_msg_1450;
 	action.m_ActionMsg = "";
 	return action;
 end

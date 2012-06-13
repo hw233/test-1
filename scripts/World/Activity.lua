@@ -345,12 +345,12 @@ function initActTime(y, m, d)
   -- 搜搜地图 （5/14-5/20）
   local  SerStartTm18= { ['year'] = 2011, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 蓝钻特权
+  local  SerStartTm19= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 黄钻特权
-  local  SerStartTm19= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 黄钻特权
-  local  SerStartTm20= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm20= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  local  SerStartTm21= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm21= { ['year'] = 2012, ['month'] = 6, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -361,7 +361,7 @@ function initActTime(y, m, d)
   local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
@@ -431,13 +431,13 @@ function initActTime(y, m, d)
   actTime40 = os.time(SerStartTm18) + 7 * 86400;
 
   actTime41 = os.time(SerStartTm19);
-  actTime42 = os.time(SerStartTm19) + 31 * 86400;
+  actTime42 = os.time(SerStartTm19) + 19 * 86400;
 
   actTime43 = os.time(SerStartTm20);
-  actTime44 = os.time(SerStartTm20) + 31 * 86400;
+  actTime44 = os.time(SerStartTm20) + 19 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 7 * 86400;
+  actTime46 = os.time(SerStartTm21) + 14 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
@@ -458,10 +458,10 @@ function initActTime(y, m, d)
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
 
   actTime103 = os.time(SerStartTm102);
-  actTime104 = os.time(SerStartTm102) + 7 * 86400;
+  actTime104 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime105 = os.time(SerStartTm102);
-  actTime106 = os.time(SerStartTm102) + 3 * 86400;
+  actTime106 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime107 = os.time(SerStartTm103);
   actTime108 = os.time(SerStartTm103) + 8 * 86400;

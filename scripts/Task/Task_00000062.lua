@@ -82,20 +82,20 @@ function Task_00000062(npcId)
 		action.m_ActionID = 62
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "阴魔大法";
+		action.m_ActionMsg = task_msg_1823;
 	elseif task:GetTaskSubmitNpc(62) == npcId then
 		if Task_Submit_00000062() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 62
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "阴魔大法";
+			action.m_ActionMsg = task_msg_1824;
 		elseif task:HasAcceptedTask(62) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 62
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "阴魔大法";
+			action.m_ActionMsg = task_msg_1825;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000062_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "啊……啊！这位少侠快帮忙救我出来，我和主人见这妖道恶毒，与他争斗，却被他这个什么九天都篆阴魔妖法所困，昏昏欲睡，若破不了这个妖术，恐怕我们要遭了妖道的毒手！少侠救命。";
-	action.m_ActionMsg = "大猩猩，真是有趣。";
+	action.m_NpcMsg = task_msg_1826;
+	action.m_ActionMsg = task_msg_1827;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000062_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠再不出手，会说话的大猩猩就变成死猩猩了。";
-	action.m_ActionMsg = "大猩猩莫慌，看我神功无敌，救你出来。";
+	action.m_NpcMsg = task_msg_1828;
+	action.m_ActionMsg = task_msg_1829;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000062_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你才是大猩猩，你全家都是大猩猩！";
+	action.m_NpcMsg = task_msg_1830;
 	action.m_ActionMsg = "";
 	return action;
 end

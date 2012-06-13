@@ -82,20 +82,20 @@ function Task_00000112(npcId)
 		action.m_ActionID = 112
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "再战绿袍";
+		action.m_ActionMsg = task_msg_1032;
 	elseif task:GetTaskSubmitNpc(112) == npcId then
 		if Task_Submit_00000112() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 112
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "再战绿袍";
+			action.m_ActionMsg = task_msg_1033;
 		elseif task:HasAcceptedTask(112) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 112
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "再战绿袍";
+			action.m_ActionMsg = task_msg_1034;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000112_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我们已经布下两仪微尘大阵将绿袍的巢穴阴风洞团团围住，别说他有玄牝珠，这回就算他插翅也难逃一死，"..GetPlayerName(GetPlayer()).."你就和我们一道去灭此妖孽，也让你见识一下两仪微尘阵的玄奥之处。";
-	action.m_ActionMsg = "是吗，那太好了。";
+	action.m_NpcMsg = task_msg_1035..GetPlayerName(GetPlayer())..task_msg_1036;
+	action.m_ActionMsg = task_msg_1037;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000112_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "如今绿袍得诛，算是功行圆满了。";
+	action.m_NpcMsg = task_msg_1038;
 	action.m_ActionMsg = "";
 	return action;
 end

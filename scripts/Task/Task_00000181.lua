@@ -82,20 +82,20 @@ function Task_00000181(npcId)
 		action.m_ActionID = 181
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "灵灵子";
+		action.m_ActionMsg = task_msg_2036;
 	elseif task:GetTaskSubmitNpc(181) == npcId then
 		if Task_Submit_00000181() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 181
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "灵灵子";
+			action.m_ActionMsg = task_msg_2037;
 		elseif task:HasAcceptedTask(181) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 181
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "灵灵子";
+			action.m_ActionMsg = task_msg_2038;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000181_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我本是昆仑派的剑侠，与同门有些干戈，后来介绍武当长老的邀请这才入了武当，如今执掌武当。这些内部事务还得请教师兄灵灵子。";
-	action.m_ActionMsg = "是吗，我这就去看看。";
+	action.m_NpcMsg = task_msg_2039;
+	action.m_ActionMsg = task_msg_2040;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000181_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2041;
 	action.m_ActionMsg = "";
 	return action;
 end

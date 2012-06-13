@@ -82,20 +82,20 @@ function Task_00000007(npcId)
 		action.m_ActionID = 7
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "剑侠心法";
+		action.m_ActionMsg = task_msg_91;
 	elseif task:GetTaskSubmitNpc(7) == npcId then
 		if Task_Submit_00000007() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 7
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "剑侠心法";
+			action.m_ActionMsg = task_msg_92;
 		elseif task:HasAcceptedTask(7) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 7
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "剑侠心法";
+			action.m_ActionMsg = task_msg_93;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000007_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠果然仙缘深厚，这本书籍乃是仙道中人修炼的功法，少侠机缘巧合获得此物，想必也是天意如此，待我告诉你如何使用这功法，日后必能斩妖除魔，造福苍生。";
-	action.m_ActionMsg = "多谢周前辈指点。";
+	action.m_NpcMsg = task_msg_94;
+	action.m_ActionMsg = task_msg_95;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000007_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "希望少侠将来可以除魔卫道拯救众生。";
+	action.m_NpcMsg = task_msg_96;
 	action.m_ActionMsg = "";
 	return action;
 end

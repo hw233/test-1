@@ -56,20 +56,20 @@ function Task_00000593(npcId)
 		action.m_ActionID = 593
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "化外妖道";
+		action.m_ActionMsg = task_msg_1610;
 	elseif task:GetTaskSubmitNpc(593) == npcId then
 		if Task_Submit_00000593() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 593
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "化外妖道";
+			action.m_ActionMsg = task_msg_1611;
 		elseif task:HasAcceptedTask(593) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 593
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "化外妖道";
+			action.m_ActionMsg = task_msg_1612;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000593_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "长沙郊外有一些恶人，受了魔教中人的蛊惑，在长沙为恶，他们还请来了化外的妖道使用邪法，"..GetPlayerName(GetPlayer()).."我看就派你去一程，铲除了这些恶人。";
-	action.m_ActionMsg = "弟子遵命，我去去就回。";
+	action.m_NpcMsg = task_msg_1613..GetPlayerName(GetPlayer())..task_msg_1614;
+	action.m_ActionMsg = task_msg_1615;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000593_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1616;
 	action.m_ActionMsg = "";
 	return action;
 end

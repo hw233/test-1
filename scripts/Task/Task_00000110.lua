@@ -82,20 +82,20 @@ function Task_00000110(npcId)
 		action.m_ActionID = 110
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "祭风台";
+		action.m_ActionMsg = task_msg_530;
 	elseif task:GetTaskSubmitNpc(110) == npcId then
 		if Task_Submit_00000110() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 110
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "祭风台";
+			action.m_ActionMsg = task_msg_531;
 		elseif task:HasAcceptedTask(110) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 110
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "祭风台";
+			action.m_ActionMsg = task_msg_532;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000110_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "为师和你的师叔师伯不方便出面，唯恐打草惊蛇惊动了绿袍妖孽。如今绿袍手下基本已经清剿干净，只剩下祭风台一带妖孽的亲传弟子了。他们能被绿袍收为亲传弟子，基本都是十恶不赦之辈，将他们一并消灭吧"..GetPlayerName(GetPlayer()).."。";
-	action.m_ActionMsg = "除魔卫道正是我辈本色。";
+	action.m_NpcMsg = task_msg_533..GetPlayerName(GetPlayer())..task_msg_534;
+	action.m_ActionMsg = task_msg_535;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000110_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "如今绿袍老祖的爪牙尽去，我们布置两仪微尘阵的进度可以加快不少。";
+	action.m_NpcMsg = task_msg_536;
 	action.m_ActionMsg = "";
 	return action;
 end

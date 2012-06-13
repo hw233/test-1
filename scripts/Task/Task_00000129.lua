@@ -82,20 +82,20 @@ function Task_00000129(npcId)
 		action.m_ActionID = 129
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "多次加速";
+		action.m_ActionMsg = task_msg_1838;
 	elseif task:GetTaskSubmitNpc(129) == npcId then
 		if Task_Submit_00000129() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 129
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "多次加速";
+			action.m_ActionMsg = task_msg_1839;
 		elseif task:HasAcceptedTask(129) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 129
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "多次加速";
+			action.m_ActionMsg = task_msg_1840;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000129_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你现在就可以去尝试一下，以你现在的水平去福仙潭底毒石的地方挂机比较不错，没有危险又比较省力，正常消灭200个怪可是很艰巨的任务，不过你试着去挂机的话，就很轻松省力了。";
-	action.m_ActionMsg = "好的，我这就去。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1841;
+	action.m_ActionMsg = task_msg_1842;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000129_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是好身手。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1843;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -50,20 +50,20 @@ function Task_00000095(npcId)
 		action.m_ActionID = 95
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "白云大师";
+		action.m_ActionMsg = task_msg_428;
 	elseif task:GetTaskSubmitNpc(95) == npcId then
 		if Task_Submit_00000095() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 95
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "白云大师";
+			action.m_ActionMsg = task_msg_429;
 		elseif task:HasAcceptedTask(95) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 95
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "白云大师";
+			action.m_ActionMsg = task_msg_430;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000095_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你还记得在成都郊外白云寺遇见的白云大师吗？她一般都在姑婆岭附近的正修庵隐居，我与她有多年未见，不知道你可否代我去问候她一下？";
-	action.m_ActionMsg = "好的，我这就去姑婆岭。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_431;
+	action.m_ActionMsg = task_msg_432;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000095_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."成都郊外与你一别，想不到我们又见面了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_433;
 	action.m_ActionMsg = "";
 	return action;
 end

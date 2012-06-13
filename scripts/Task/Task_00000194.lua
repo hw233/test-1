@@ -82,20 +82,20 @@ function Task_00000194(npcId)
 		action.m_ActionID = 194
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "红鬼谷";
+		action.m_ActionMsg = task_msg_2177;
 	elseif task:GetTaskSubmitNpc(194) == npcId then
 		if Task_Submit_00000194() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 194
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "红鬼谷";
+			action.m_ActionMsg = task_msg_2178;
 		elseif task:HasAcceptedTask(194) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 194
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "红鬼谷";
+			action.m_ActionMsg = task_msg_2179;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000194_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "贫尼在此隐居已久，也于那红鬼谷的毒龙尊者井水不犯河水，不过最近毒龙外出，他手下不少弟子在喜马拉雅山为所欲为很是不堪，少侠你出去巡视一下，铲除那些为非作歹的毒龙弟子。";
-	action.m_ActionMsg = "我这就去周遭巡逻一下。";
+	action.m_NpcMsg = task_msg_2180;
+	action.m_ActionMsg = task_msg_2181;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000194_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2182;
 	action.m_ActionMsg = "";
 	return action;
 end

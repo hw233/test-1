@@ -82,20 +82,20 @@ function Task_00000044(npcId)
 		action.m_ActionID = 44
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "厢房密室";
+		action.m_ActionMsg = task_msg_315;
 	elseif task:GetTaskSubmitNpc(44) == npcId then
 		if Task_Submit_00000044() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 44
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "厢房密室";
+			action.m_ActionMsg = task_msg_316;
 		elseif task:HasAcceptedTask(44) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 44
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "厢房密室";
+			action.m_ActionMsg = task_msg_317;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000044_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "想不到少侠武艺如此高强，这样我就放心很多了，那周云从被关押的地牢在密室内，你要先去厢房开启密室的机关，才能进入地牢救人。";
-	action.m_ActionMsg = "是什么样的机关？";
+	action.m_NpcMsg = task_msg_318;
+	action.m_ActionMsg = task_msg_319;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000044_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠进入厢房可以看到中堂挂着一副八仙过海图，在画的下面有一个磬锤，只要一敲，密室暗门就打开了。少侠千万注意不要惊动密室里看守的妖人。";
-	action.m_ActionMsg = "好的，我这就去打开机关。";
+	action.m_NpcMsg = task_msg_320;
+	action.m_ActionMsg = task_msg_321;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000044_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是惊险，还好少侠你快刀斩乱麻，要是惊动了其他妖人那就糟糕了。";
+	action.m_NpcMsg = task_msg_322;
 	action.m_ActionMsg = "";
 	return action;
 end

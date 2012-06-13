@@ -82,20 +82,20 @@ function Task_00000117(npcId)
 		action.m_ActionID = 117
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "青囊仙子";
+		action.m_ActionMsg = task_msg_574;
 	elseif task:GetTaskSubmitNpc(117) == npcId then
 		if Task_Submit_00000117() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 117
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "青囊仙子";
+			action.m_ActionMsg = task_msg_575;
 		elseif task:HasAcceptedTask(117) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 117
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "青囊仙子";
+			action.m_ActionMsg = task_msg_576;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000117_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才我见到峨眉来人，好像是个道姑，去了那边的一处奥区仙府，少侠你去见见她吧。";
-	action.m_ActionMsg = "好的，我这就去见前辈。";
+	action.m_NpcMsg = task_msg_577;
+	action.m_ActionMsg = task_msg_578;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000117_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "久闻少侠之名，今日得见果然名不虚传。";
+	action.m_NpcMsg = task_msg_579;
 	action.m_ActionMsg = "";
 	return action;
 end

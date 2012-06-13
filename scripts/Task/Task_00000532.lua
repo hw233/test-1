@@ -56,20 +56,20 @@ function Task_00000532(npcId)
 		action.m_ActionID = 532
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "水贼喽啰";
+		action.m_ActionMsg = task_msg_1410;
 	elseif task:GetTaskSubmitNpc(532) == npcId then
 		if Task_Submit_00000532() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 532
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "水贼喽啰";
+			action.m_ActionMsg = task_msg_1411;
 		elseif task:HasAcceptedTask(532) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 532
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "水贼喽啰";
+			action.m_ActionMsg = task_msg_1412;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000532_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都前段时间治安真得很成问题，有一股水贼在附近为恶，祸害百姓，残暴异常，还希望"..GetPlayerName(GetPlayer()).."去将这些恶人除掉。";
-	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
+	action.m_NpcMsg = task_msg_1413..GetPlayerName(GetPlayer())..task_msg_1414;
+	action.m_ActionMsg = task_msg_1415;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000532_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1416;
 	action.m_ActionMsg = "";
 	return action;
 end

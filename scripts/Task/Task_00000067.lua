@@ -82,20 +82,20 @@ function Task_00000067(npcId)
 		action.m_ActionID = 67
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "剑下留人";
+		action.m_ActionMsg = task_msg_1730;
 	elseif task:GetTaskSubmitNpc(67) == npcId then
 		if Task_Submit_00000067() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 67
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "剑下留人";
+			action.m_ActionMsg = task_msg_1731;
 		elseif task:HasAcceptedTask(67) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 67
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "剑下留人";
+			action.m_ActionMsg = task_msg_1732;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000067_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "若论世俗武艺，我其实也不输给余莹姑，只是她跟随剑仙学习了那飞剑之术，我一介凡人可不是对手……哎呀，她竟然放飞剑来打我，我命休矣！！";
-	action.m_ActionMsg = "莫慌……其实我也会飞剑。";
+	action.m_NpcMsg = task_msg_1733;
+	action.m_ActionMsg = task_msg_1734;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000067_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢救命之恩，不知道"..GetPlayerName(GetPlayer()).."你能不能教我飞剑之术？";
+	action.m_NpcMsg = task_msg_1735..GetPlayerName(GetPlayer())..task_msg_1736;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000125(npcId)
 		action.m_ActionID = 125
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "棘手案件";
+		action.m_ActionMsg = task_msg_1097;
 	elseif task:GetTaskSubmitNpc(125) == npcId then
 		if Task_Submit_00000125() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 125
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "棘手案件";
+			action.m_ActionMsg = task_msg_1098;
 		elseif task:HasAcceptedTask(125) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 125
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "棘手案件";
+			action.m_ActionMsg = task_msg_1099;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000125_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，如今中华大地兵患才息，邪道之人纷乱又起，我等正道人士正应消灭妖邪，维护正义。听说成都府衙赵捕头遇到了几件棘手的案子，你去帮帮他吧。 ";
-	action.m_ActionMsg = "好的，我这就去找捕头大哥。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1100;
+	action.m_ActionMsg = task_msg_1101;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000125_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，你能来帮我真是太好了，我们凡俗之人解决不了那些神异之事啊！";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1102;
 	action.m_ActionMsg = "";
 	return action;
 end

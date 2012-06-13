@@ -82,20 +82,20 @@ function Task_00000104(npcId)
 		action.m_ActionID = 104
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "兵解";
+		action.m_ActionMsg = task_msg_487;
 	elseif task:GetTaskSubmitNpc(104) == npcId then
 		if Task_Submit_00000104() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 104
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "兵解";
+			action.m_ActionMsg = task_msg_488;
 		elseif task:HasAcceptedTask(104) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 104
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "兵解";
+			action.m_ActionMsg = task_msg_489;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000104_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "算算天劫将至，"..GetPlayerName(GetPlayer()).."你看天边那朵红云即是我将遭逢的劫云。届时天劫一至，少侠你就用这青牛剑刺我肉身助我兵解，这样我元婴也可以重新转世再修功德。";
-	action.m_ActionMsg = "好的，那恕晚辈冒犯了。";
+	action.m_NpcMsg = task_msg_490..GetPlayerName(GetPlayer())..task_msg_491;
+	action.m_ActionMsg = task_msg_492;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000104_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠为我脱劫之事奔波。";
+	action.m_NpcMsg = task_msg_493;
 	action.m_ActionMsg = "";
 	return action;
 end

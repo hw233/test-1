@@ -577,10 +577,16 @@ namespace GObject
 		void Login();
         void sendCreateMail();
         void continuousLogin(UInt32 now);
+        void continuousLoginRF(UInt32 now);
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
+        void getContinuousRewardRF(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
+        void turnOnRF7Day();
         void addRC7DayRecharge(UInt32 r);
-        void sendRC7DayInfo(UInt32 now);
+        void addRF7DayRecharge(UInt32 r);
+        void sendRC7DayInfo(UInt32 now = TimeUtil::Now());
+        void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
+        void setContinuousRFAward(UInt32 no);
 
 		void Reconnect();
 
@@ -1447,6 +1453,7 @@ namespace GObject
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
         void getTargetAward(UInt8 opt);
+        void getTargetAwardRF(UInt8 opt);
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1487,6 +1494,7 @@ namespace GObject
         void sendDeamonAwardsInfo();
         void getDeamonAwards();
         void lastLootPush(UInt16 itemId, UInt16 num);
+        void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
 
     private:
         bool m_hasTripod;

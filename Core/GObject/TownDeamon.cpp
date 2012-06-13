@@ -549,6 +549,8 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
                         pl->SetVar(VAR_CLAWARD2, 1);
                         pl->sendRC7DayInfo(TimeUtil::Now());
                     }
+                    if (20 == dpd->curLevel)
+                        pl->setContinuousRFAward(7);
                 }
                 else
                     res = 1;
@@ -698,6 +700,8 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
             pl->SetVar(VAR_CLAWARD2, 1);
             pl->sendRC7DayInfo(TimeUtil::Now());
         }
+        if (curLevelTmp < 20 && dpd->curLevel >= 20)
+            pl->setContinuousRFAward(7);
     }
     st << pl->getPendExp();
     UInt16 sz = pl->_lastLoot.size();

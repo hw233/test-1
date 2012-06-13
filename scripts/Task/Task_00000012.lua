@@ -82,20 +82,20 @@ function Task_00000012(npcId)
 		action.m_ActionID = 12
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "女儿红";
+		action.m_ActionMsg = task_msg_129;
 	elseif task:GetTaskSubmitNpc(12) == npcId then
 		if Task_Submit_00000012() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 12
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "女儿红";
+			action.m_ActionMsg = task_msg_130;
 		elseif task:HasAcceptedTask(12) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 12
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "女儿红";
+			action.m_ActionMsg = task_msg_131;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000012_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "这位客官来得真不巧啊，本店原本有上好的女儿红，开坛十里香，是远近闻名，只是现在本店的女儿红酒是一滴都不剩了。";
-	action.m_ActionMsg = "奇怪，酒楼怎会没有酒卖呢？掌柜的可否在说笑。";
+	action.m_NpcMsg = task_msg_132;
+	action.m_ActionMsg = task_msg_133;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000012_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "客官不知，上个月来了一伙贼兵，他们是为祸四川多年那张献忠的残部，四处流窜，无恶不作，小号的酒全被他们免费征去了。客官想找酒……只有去那伙贼兵的营地了。";
-	action.m_ActionMsg = "岂有此理，待我去铲除这些恶人。";
+	action.m_NpcMsg = task_msg_134;
+	action.m_ActionMsg = task_msg_135;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000012_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这酒不错，"..GetPlayerName(GetPlayer()).."看你眼光清明，也是正道中人，我这就教你我们剑仙之流的修炼方法……哈哈，好酒！ ";
+	action.m_NpcMsg = task_msg_136..GetPlayerName(GetPlayer())..task_msg_137;
 	action.m_ActionMsg = "";
 	return action;
 end

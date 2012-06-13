@@ -82,20 +82,20 @@ function Task_00000185(npcId)
 		action.m_ActionID = 185
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "异兽毕方";
+		action.m_ActionMsg = task_msg_2060;
 	elseif task:GetTaskSubmitNpc(185) == npcId then
 		if Task_Submit_00000185() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 185
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "异兽毕方";
+			action.m_ActionMsg = task_msg_2061;
 		elseif task:HasAcceptedTask(185) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 185
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "异兽毕方";
+			action.m_ActionMsg = task_msg_2062;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000185_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "昆仑乃是上古神人之地，有不少异兽残存，他们修炼多年，道行高深，少侠可以去拿他们练练手。瑶池那里就有一些毕方聚集，少侠去试试吧。";
-	action.m_ActionMsg = "我去会会这些上古异兽。";
+	action.m_NpcMsg = task_msg_2063;
+	action.m_ActionMsg = task_msg_2064;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000185_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2065;
 	action.m_ActionMsg = "";
 	return action;
 end

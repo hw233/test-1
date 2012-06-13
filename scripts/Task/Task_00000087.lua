@@ -82,20 +82,20 @@ function Task_00000087(npcId)
 		action.m_ActionID = 87
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "雪魂珠";
+		action.m_ActionMsg = task_msg_374;
 	elseif task:GetTaskSubmitNpc(87) == npcId then
 		if Task_Submit_00000087() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 87
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "雪魂珠";
+			action.m_ActionMsg = task_msg_375;
 		elseif task:HasAcceptedTask(87) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 87
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "雪魂珠";
+			action.m_ActionMsg = task_msg_376;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000087_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才我已经用彻地神针打通玉京潭绝顶，只下七千三百丈到了地窍，小友只需去地窍中击败万年冰雪精英，我即可做法将它所化得雪魂珠取来。";
-	action.m_ActionMsg = "听起来真玄。";
+	action.m_NpcMsg = task_msg_377;
+	action.m_ActionMsg = task_msg_378;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000087_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有了这个雪魂珠，我郑八姑参枯禅终于可以成功了。";
+	action.m_NpcMsg = task_msg_379;
 	action.m_ActionMsg = "";
 	return action;
 end

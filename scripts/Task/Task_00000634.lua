@@ -50,20 +50,20 @@ function Task_00000634(npcId)
 		action.m_ActionID = 634
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "福仙潭毒石";
+		action.m_ActionMsg = task_msg_1324;
 	elseif task:GetTaskSubmitNpc(634) == npcId then
 		if Task_Submit_00000634() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 634
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "福仙潭毒石";
+			action.m_ActionMsg = task_msg_1325;
 		elseif task:HasAcceptedTask(634) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 634
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "福仙潭毒石";
+			action.m_ActionMsg = task_msg_1326;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000634_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都不远处的桂花山是一处美景，不过山中有五色云雾，寻常人轻易不得入内，听说有个室外高人隐居在山中，布下了五色云雾。在桂花山里有一处福仙潭，福仙潭里水产丰富，可是福仙潭底有一个巨大毒石，毒雾缭绕，有不少渔民被毒雾害死，还拜托少侠你除掉这一害。";
-	action.m_ActionMsg = "这种事情我还是第一次听说，我去看看顺手将它除掉。";
+	action.m_NpcMsg = task_msg_1327;
+	action.m_ActionMsg = task_msg_1328;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000634_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个毒石剧毒无比，毒害了很多在福仙潭的渔夫旅。 ";
+	action.m_NpcMsg = task_msg_1329;
 	action.m_ActionMsg = "";
 	return action;
 end

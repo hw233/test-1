@@ -82,20 +82,20 @@ function Task_00000155(npcId)
 		action.m_ActionID = 155
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "紫云之乱";
+		action.m_ActionMsg = task_msg_1850;
 	elseif task:GetTaskSubmitNpc(155) == npcId then
 		if Task_Submit_00000155() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 155
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "紫云之乱";
+			action.m_ActionMsg = task_msg_1851;
 		elseif task:HasAcceptedTask(155) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 155
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "紫云之乱";
+			action.m_ActionMsg = task_msg_1852;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000155_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "紫云宫原是连山大师别府，天一金母的旧居，这紫云三女前世乃天一金母的侍女，此番转世重来，却误入歧途，勾结邪魔外道。这回令你去东海，就是要将这些邪派人士铲除。";
-	action.m_ActionMsg = "嗯，我这就去。";
+	action.m_NpcMsg = task_msg_1853;
+	action.m_ActionMsg = task_msg_1854;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000155_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "紫云宫原是仙人府邸，但是现在却被这群妖人占据。";
+	action.m_NpcMsg = task_msg_1855;
 	action.m_ActionMsg = "";
 	return action;
 end

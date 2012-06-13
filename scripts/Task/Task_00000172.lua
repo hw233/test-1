@@ -50,20 +50,20 @@ function Task_00000172(npcId)
 		action.m_ActionID = 172
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "守灵侍卫";
+		action.m_ActionMsg = task_msg_1988;
 	elseif task:GetTaskSubmitNpc(172) == npcId then
 		if Task_Submit_00000172() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 172
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "守灵侍卫";
+			action.m_ActionMsg = task_msg_1989;
 		elseif task:HasAcceptedTask(172) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 172
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "守灵侍卫";
+			action.m_ActionMsg = task_msg_1990;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000172_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在这片海域附近，有一处奇异的火山叫做月儿岛，乃是昔年连山大师坐化之所，听说有不少奇珍遗留，你不如去探寻一下，说不定有所收获。不过月儿岛的守卫仍在，你要小心应付才对。";
-	action.m_ActionMsg = "是吗，我这就去看看。";
+	action.m_NpcMsg = task_msg_1991;
+	action.m_ActionMsg = task_msg_1992;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000172_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠在月儿岛有何收获？";
+	action.m_NpcMsg = task_msg_1993;
 	action.m_ActionMsg = "";
 	return action;
 end

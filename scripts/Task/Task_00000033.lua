@@ -82,20 +82,20 @@ function Task_00000033(npcId)
 		action.m_ActionID = 33
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "嗜酒如命";
+		action.m_ActionMsg = task_msg_251;
 	elseif task:GetTaskSubmitNpc(33) == npcId then
 		if Task_Submit_00000033() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 33
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "嗜酒如命";
+			action.m_ActionMsg = task_msg_252;
 		elseif task:HasAcceptedTask(33) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 33
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "嗜酒如命";
+			action.m_ActionMsg = task_msg_253;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000033_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "小子，你的飞剑也强化了，我这里就不留你了……我还开张做着生意呢，你啊就快走吧。醉道人他嗜酒如命，一喝就来精神，回望江楼怕是找不着他了，不过你还是去看看吧。";
-	action.m_ActionMsg = "沈前辈，那我就告辞了。";
+	action.m_NpcMsg = task_msg_254;
+	action.m_ActionMsg = task_msg_255;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000033_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "客官，您这是要住店呢，还是饮酒？";
+	action.m_NpcMsg = task_msg_256;
 	action.m_ActionMsg = "";
 	return action;
 end

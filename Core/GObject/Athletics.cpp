@@ -248,6 +248,7 @@ void Athletics::attack(Player * defer)
         {
             _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
             _owner->OnShuoShuo(SS_ATHWIN);
+            _owner->setContinuousRFAward(1);
         }
 		return;
 	}
@@ -325,6 +326,7 @@ void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Line
         GLOBAL().PushMsg(h, & msg);
         atker->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 0);
         atker->OnShuoShuo(SS_ATHWIN);
+        atker->setContinuousRFAward(1);
     }
 
 }
@@ -562,6 +564,7 @@ void Athletics::attackMartial(Player* defer)
         {
             _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
             _owner->OnShuoShuo(SS_ATHWIN);
+            _owner->setContinuousRFAward(1);
         }
     }while(false);
 
@@ -631,6 +634,7 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
         GLOBAL().PushMsg(h, & msg);
         atker->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 1);
         atker->OnShuoShuo(SS_ATHWIN);
+        atker->setContinuousRFAward(1);
     }
 }
 

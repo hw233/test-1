@@ -82,20 +82,20 @@ function Task_00000182(npcId)
 		action.m_ActionID = 182
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "武当叛徒";
+		action.m_ActionMsg = task_msg_2042;
 	elseif task:GetTaskSubmitNpc(182) == npcId then
 		if Task_Submit_00000182() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 182
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "武当叛徒";
+			action.m_ActionMsg = task_msg_2043;
 		elseif task:HasAcceptedTask(182) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 182
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "武当叛徒";
+			action.m_ActionMsg = task_msg_2044;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000182_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这李琴生也是我的同门师兄弟，他目前就在落花洞处，是我们武当的耻辱，少侠去解决他吧。";
-	action.m_ActionMsg = "是吗，我这就去除掉这个败类。";
+	action.m_NpcMsg = task_msg_2045;
+	action.m_ActionMsg = task_msg_2046;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000182_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2047;
 	action.m_ActionMsg = "";
 	return action;
 end

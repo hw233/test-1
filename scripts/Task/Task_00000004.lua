@@ -82,20 +82,20 @@ function Task_00000004(npcId)
 		action.m_ActionID = 4
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "文昌阁";
+		action.m_ActionMsg = task_msg_72;
 	elseif task:GetTaskSubmitNpc(4) == npcId then
 		if Task_Submit_00000004() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 4
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "文昌阁";
+			action.m_ActionMsg = task_msg_73;
 		elseif task:HasAcceptedTask(4) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 4
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "文昌阁";
+			action.m_ActionMsg = task_msg_74;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000004_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "唉，大好河山落入异族之手，令我心如死灰，现在只想与李宁大哥一起隐居峨嵋，不问世事。只是我先前教授的一群小童，略有天资，不想耽误了他们的前程，希望少侠去文昌阁找一下马湘，让他代我教导这些学生。";
-	action.m_ActionMsg = "没问题，我这就去。";
+	action.m_NpcMsg = task_msg_75;
+	action.m_ActionMsg = task_msg_76;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000004_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，我也挺喜欢这些乖巧聪明的童子，这件事就包在我身上了。";
+	action.m_NpcMsg = task_msg_77;
 	action.m_ActionMsg = "";
 	return action;
 end

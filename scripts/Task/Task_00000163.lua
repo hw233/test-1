@@ -82,20 +82,20 @@ function Task_00000163(npcId)
 		action.m_ActionID = 163
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "天痴上人";
+		action.m_ActionMsg = task_msg_1892;
 	elseif task:GetTaskSubmitNpc(163) == npcId then
 		if Task_Submit_00000163() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 163
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "天痴上人";
+			action.m_ActionMsg = task_msg_1893;
 		elseif task:HasAcceptedTask(163) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 163
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "天痴上人";
+			action.m_ActionMsg = task_msg_1894;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000163_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这铜椰岛的地磁真气忒过厉害，牢牢吸住爷爷的辟魔神梭，让我们无处可遁，所幸少侠方才出手教训铜椰岛弟子，出手不重，没什么伤亡。如今之计只能去天痴老儿处乖乖认错，希望他能看在爷爷的面子上放过我俩……";
-	action.m_ActionMsg = "知道认错就好。";
+	action.m_NpcMsg = task_msg_1895;
+	action.m_ActionMsg = task_msg_1896;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000163_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "罢了罢了，看在易周的面子上我就不计较此事了。";
+	action.m_NpcMsg = task_msg_1897;
 	action.m_ActionMsg = "";
 	return action;
 end

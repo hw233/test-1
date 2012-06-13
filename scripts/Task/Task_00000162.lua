@@ -82,20 +82,20 @@ function Task_00000162(npcId)
 		action.m_ActionID = 162
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "铜椰岛";
+		action.m_ActionMsg = task_msg_1880;
 	elseif task:GetTaskSubmitNpc(162) == npcId then
 		if Task_Submit_00000162() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 162
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "铜椰岛";
+			action.m_ActionMsg = task_msg_1881;
 		elseif task:HasAcceptedTask(162) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 162
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "铜椰岛";
+			action.m_ActionMsg = task_msg_1882;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000162_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我那一对孙儿甚是顽劣，此去紫云宫除妖我特地送他们辟魔神梭防身。谁料到紫云宫事毕，他们竟然跑到天痴上人的铜椰岛生事。那老儿在岛上发现的地磁元气，专克各类金属物品，如今神梭被困在岛上，我又碍于面子，不便前往，还有劳小友跑一趟救出我那顽劣的孙儿。";
-	action.m_ActionMsg = "这地磁元气听起来很犀利啊。";
+	action.m_NpcMsg = task_msg_1883;
+	action.m_ActionMsg = task_msg_1884;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000162_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎，爷爷的这个辟魔神梭确是神妙，可是这铜椰岛甚是古怪，神梭在这里完全发挥不了作用。";
+	action.m_NpcMsg = task_msg_1885;
 	action.m_ActionMsg = "";
 	return action;
 end

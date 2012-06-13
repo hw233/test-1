@@ -371,6 +371,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 2);
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_FM1))
                 pl->OnShuoShuo(id-1 + SS_FM1);
+            pl->setContinuousRFAward(5);
             return 2;
         } else { // 打过某一点
             UInt8 nspot = spot+1;

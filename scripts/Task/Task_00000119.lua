@@ -82,20 +82,20 @@ function Task_00000119(npcId)
 		action.m_ActionID = 119
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "冰蚕";
+		action.m_ActionMsg = task_msg_580;
 	elseif task:GetTaskSubmitNpc(119) == npcId then
 		if Task_Submit_00000119() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 119
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "冰蚕";
+			action.m_ActionMsg = task_msg_581;
 		elseif task:HasAcceptedTask(119) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 119
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "冰蚕";
+			action.m_ActionMsg = task_msg_582;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000119_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "莽苍山这处冰穴真是世所罕见，在冰穴深处孕育着一只数百年道行的冰蚕，阴寒无比，若被那些邪道人士获得，练成邪功就是一场灾难了，"..GetPlayerName(GetPlayer()).."不如你去冰穴内将它降服。";
-	action.m_ActionMsg = "嗯，我这就去会会这只冰蚕。";
+	action.m_NpcMsg = task_msg_583..GetPlayerName(GetPlayer())..task_msg_584;
+	action.m_ActionMsg = task_msg_585;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000119_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个冰蚕真是天地奇珍。";
+	action.m_NpcMsg = task_msg_586;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000070(npcId)
 		action.m_ActionID = 70
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "阵营选择";
+		action.m_ActionMsg = task_msg_1017;
 	elseif task:GetTaskSubmitNpc(70) == npcId then
 		if Task_Submit_00000070() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 70
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "阵营选择";
+			action.m_ActionMsg = task_msg_1018;
 		elseif task:HasAcceptedTask(70) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 70
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "阵营选择";
+			action.m_ActionMsg = task_msg_1019;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000070_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "醉道人师叔已经观察你许久，觉得少侠你侠肝义胆，也是我们正道之人，所以已经向昆仑和峨眉的掌教真人推荐了少侠， 不知道少侠你愿意加入昆仑派还是峨眉派呢？";
-	action.m_ActionMsg = "嗯，让我思考一下。";
+	action.m_NpcMsg = task_msg_1020;
+	action.m_ActionMsg = task_msg_1021;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000070_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这把剑是醉道人师叔送给"..GetPlayerName(GetPlayer()).."少侠的，听说是师叔当年在海外仙山找到的神兵，我这就期待着少侠可以用此剑在正邪之战中大方异彩了。";
-	action.m_ActionMsg = "多谢醉道人师叔也多谢邱大哥。";
+	action.m_NpcMsg = task_msg_1022..GetPlayerName(GetPlayer())..task_msg_1023;
+	action.m_ActionMsg = task_msg_1024;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000070_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."正道中兴的重担就在你们的肩上了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1025;
 	action.m_ActionMsg = "";
 	return action;
 end
