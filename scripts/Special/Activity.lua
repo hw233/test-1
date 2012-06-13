@@ -252,20 +252,22 @@ end
 
 function onMergeGem(player, lev, num)
     if getGemMergeAct() then
-        local items = {
-            [6] = {507,1,1, 503,1,1},
-            [7] = {30,1,1, 509,2,1},
-            [8] = {30,4,1, 1504,1,1},
-            [9] = {30,20,1, 1509,1,1},
-            [10] = {30,50,1, 1627,1,1},
-        }
-
-        local item = items[lev]
-        if item == nil then
-            return
-        end
-
         for n = 1, num do
+            local r1 = {1416,1417,1418,1419,1420,}
+            local r2 = {1421,1422,1423,1424,1425,1426,}
+            local items = {
+                [6] = {507,1,1, 503,1,1},
+                [7] = {30,1,1, r1[math.random(1,#r1)],1,1, r2[math.random(1,#r2)],1,1},
+                [8] = {30,4,1, r1[math.random(1,#r1)],1,1, r1[math.random(1,#r1)],1,1, r1[math.random(1,#r1)],1,1, r2[math.random(1,#r2)],1,1, r2[math.random(1,#r2)],1,1, r2[math.random(1,#r2)],1,1, getRandOEquip(player:GetLev()),1,1},
+                [9] = {30,20,1, 1239,1,1, 1232,1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1},
+                [10] = {30,50,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1,},
+            }
+
+            local item = items[lev]
+            if item == nil then
+                return
+            end
+
             sendItemPackageMail(player, "合成宝石活动奖励", "合成宝石活动奖励", item);
         end
 	end
@@ -1328,5 +1330,14 @@ function June(player, lootlvl)
 end
 
 function onRechargeAct(player, total)
+    local title = "开服7日返仙石奖励"
+    local content = "恭喜您在储值返仙石活动中获得返还奖励，再次充值还可以继续领取哦！单笔充值在4000仙石及以上可获得最高达20%的返还！"
+    if total >= 1000 and total <= 1999 then
+        sendItemPackageMail(player, title, content, {0xB000,100,0});
+    elseif total >= 2000 and total <= 3999 then
+        sendItemPackageMail(player, title, content, {0xB000,300,0});
+    elseif total >= 4000 then
+        sendItemPackageMail(player, title, content, {0xB000,0.2*total,0});
+    end
 end
 

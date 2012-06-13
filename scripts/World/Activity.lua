@@ -80,11 +80,11 @@ function onActivityCheck(tm)
   setTavernPurpleCount(100);
   setTavernOrangeCount(400);
 
-  --if tm >= actTime0 and tm < actTime00 then
-  --    setIsNewServer(true);
-  --else
-  --    setIsNewServer(false);
-  --end
+  if tm >= actTime0 and tm < actTime00 then
+      setIsNewServer(true);
+  else
+      setIsNewServer(false);
+  end
 
   if tm >= actTime1 and tm < actTime2 then
     setShiMenActiveCount(5);
@@ -348,7 +348,7 @@ function initActTime(y, m, d)
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm103 = { ['year'] = 2012, ['month'] = 6, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
   local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -444,7 +444,7 @@ function initActTime(y, m, d)
   actTime106 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime107 = os.time(SerStartTm103);
-  actTime108 = os.time(SerStartTm103) + 8 * 86400;
+  actTime108 = os.time(SerStartTm103) + 7 * 86400;
 
   actTime109 = os.time(SerStartTm104);
   actTime110 = os.time(SerStartTm104) + 7 * 86400;

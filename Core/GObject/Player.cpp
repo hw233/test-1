@@ -6006,7 +6006,7 @@ namespace GObject
                 setBuffData(PLAYER_BUFF_YDOTR, 0, true);
         }
 
-#ifdef _FB
+#ifdef _FB // XXX: 单笔反利
         if (World::IsNewServer())
             GameAction()->onRechargeAct(this, r);
 #endif
@@ -9144,8 +9144,16 @@ namespace GObject
 #ifdef _FB
 #else
         SYSMSG(title, 2335);
-        //SYSMSG(content, 2343);
         SYSMSG(content, 2336);
+        GetMailBox()->newMail(NULL, 0x12, title, content);
+#endif
+    }
+
+    void Player::sendOpenAct(UInt32 day)
+    {
+#ifdef _FB
+        SYSMSGV(title, 4004, day);
+        SYSMSGV(content, 4005, day);
         GetMailBox()->newMail(NULL, 0x12, title, content);
 #endif
     }

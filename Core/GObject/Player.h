@@ -576,6 +576,7 @@ namespace GObject
 
 		void Login();
         void sendCreateMail();
+        void sendOpenAct(UInt32);
         void continuousLogin(UInt32 now);
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
