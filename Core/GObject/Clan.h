@@ -248,8 +248,13 @@ private:
 public:
 	Clan( UInt32 id, const std::string& name, UInt32 ft = 0, UInt8 lvl = 1 );
 	~Clan();
-	inline void patchMergedName() { patchMergedName(_id, _name); }
+#if 0
+    inline void patchMergedName() { patchMergedName(_id, _name); }
 	static void patchMergedName(UInt32 id, std::string& name);
+#else
+    inline void patchMergedName() { patchMergedName(_founder, _name); }
+	static void patchMergedName(UInt64 id, std::string& name);
+#endif
 public:
 	UInt16 getFavorItemId(UInt8 skilId);
 	inline UInt32 getTechIdIndex(UInt8 skillId){return skillId - 7;}// ????7???׻?8????ȸ9??????10 fix??????

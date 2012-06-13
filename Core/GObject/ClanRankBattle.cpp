@@ -713,9 +713,23 @@ namespace GObject
             SysMsgItem* msg = globalSysMsg[2212];
             if(msg != NULL)
             {
-                msg->getvap(&stream1, m_Clan2->clan->getName().c_str());
+                if(cfg.merged)
+                {
+                    Player* founderMan = globalPlayers[m_Clan2->clan->getFounder()];
+                    if(founderMan)
+                        msg->getvap(&stream1, founderMan->patchShowName(m_Clan2->clan->getName().c_str()));
+                }
+                else
+                    msg->getvap(&stream1, m_Clan2->clan->getName().c_str());
                 m_Clan1->clan->broadcast(stream1);
-                msg->getvap(&stream2, m_Clan1->clan->getName().c_str());
+                if(cfg.merged)
+                {
+                    Player* founderMan = globalPlayers[m_Clan1->clan->getFounder()];
+                    if(founderMan)
+                        msg->getvap(&stream2, founderMan->patchShowName(m_Clan1->clan->getName().c_str()));
+                }
+                else
+                    msg->getvap(&stream2, m_Clan1->clan->getName().c_str());
                 m_Clan2->clan->broadcast(stream2);
             }
             m_Clan1->battle = this;
@@ -2309,16 +2323,36 @@ namespace GObject
                     std::string rankStr;
                     UInt32 first = 2223;
                     SysMsgItem* msg = globalSysMsg[first];
-                    if(msg != NULL) msg->getva(rankStr, (*iter)->getName().c_str());
-                    for(++iter; iter != m_ClanRanking.end() && first < 2228; ++iter)
+                    if(cfg.merged)
                     {
-                        msg = globalSysMsg[++first];
-                        if(msg != NULL) msg->getva(rankStr, (*iter)->getName().c_str());
+                        Player* founderMan = globalPlayers[(*iter)->getFounder()];
+                        if(founderMan)
+                        {
+                            if(msg != NULL) msg->getva(rankStr, founderMan->patchShowName((*iter)->getName().c_str()));
+                            for(++iter; iter != m_ClanRanking.end() && first < 2228; ++iter)
+                            {
+                                msg = globalSysMsg[++first];
+                                if(msg != NULL) msg->getva(rankStr, founderMan->patchShowName((*iter)->getName().c_str()));
+                            }
+                            SYSMSG(end,2229);
+                            rankStr.append(end);
+                           
+                            SYSMSG_BROADCASTV(2222,founderMan->patchShowName(rankStr.c_str()));
+                        }
                     }
-                    SYSMSG(end,2229);
-                    rankStr.append(end);
-                   
-                    SYSMSG_BROADCASTV(2222,rankStr.c_str());
+                    else
+                    {
+                        if(msg != NULL) msg->getva(rankStr, (*iter)->getName().c_str());
+                        for(++iter; iter != m_ClanRanking.end() && first < 2228; ++iter)
+                        {
+                            msg = globalSysMsg[++first];
+                            if(msg != NULL) msg->getva(rankStr, (*iter)->getName().c_str());
+                        }
+                        SYSMSG(end,2229);
+                        rankStr.append(end);
+                       
+                        SYSMSG_BROADCASTV(2222,rankStr.c_str());
+                    }
                 }
                 
                 m_Clans.clear();
