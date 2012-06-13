@@ -82,20 +82,20 @@ function Task_00000106(npcId)
 		action.m_ActionID = 106
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "魔教妖孽";
+		action.m_ActionMsg = task_msg_501;
 	elseif task:GetTaskSubmitNpc(106) == npcId then
 		if Task_Submit_00000106() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 106
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "魔教妖孽";
+			action.m_ActionMsg = task_msg_502;
 		elseif task:HasAcceptedTask(106) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 106
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "魔教妖孽";
+			action.m_ActionMsg = task_msg_503;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000106_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "绿袍老祖魔功高强，乃是南方魔教的始祖之一，而这个魔头身怀玄牝珠，几乎是不死之身，所以我们特地在百蛮山布下长眉真人亲传的两仪微尘阵来杀灭此獠。"..GetPlayerName(GetPlayer()).."如今你来助我们是再好也不过，先去将绿袍布在恶鬼峡附近的魔教前哨消灭吧，此时我们还不宜出面。";
-	action.m_ActionMsg = "弟子遵命。";
+	action.m_NpcMsg = task_msg_504..GetPlayerName(GetPlayer())..task_msg_505;
+	action.m_ActionMsg = task_msg_506;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000106_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."今日我们东海三仙齐聚百蛮山布两仪微尘阵也将是一段佳话啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_507;
 	action.m_ActionMsg = "";
 	return action;
 end

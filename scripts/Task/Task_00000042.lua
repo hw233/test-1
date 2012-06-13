@@ -82,20 +82,20 @@ function Task_00000042(npcId)
 		action.m_ActionID = 42
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "书生之祸";
+		action.m_ActionMsg = task_msg_301;
 	elseif task:GetTaskSubmitNpc(42) == npcId then
 		if Task_Submit_00000042() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 42
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "书生之祸";
+			action.m_ActionMsg = task_msg_302;
 		elseif task:HasAcceptedTask(42) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 42
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "书生之祸";
+			action.m_ActionMsg = task_msg_303;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000042_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "几天前我曾在望江楼遇见一个仙根和资质都非常好的书生叫周云从，但看他们随行的书生印堂晦暗，面带死气，几乎都有杀身之祸。我因为有事耽搁迟了些天回来，回来发现他们一行去了慈云寺被那些邪派妖人抓住，恐怕有杀身之祸，你得赶快去慈云寺救周云从。";
-	action.m_ActionMsg = "我这就去救出这些书生。";
+	action.m_NpcMsg = task_msg_304;
+	action.m_ActionMsg = task_msg_305;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000042_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慢着，慈云寺妖人众多，你一个人去势孤力单肯定不是他们对手，不过据我这几天暗中观察所见，寺内的知客僧了一有向善之心，你可以去找他帮忙救出这些书生。";
-	action.m_ActionMsg = "好的，我一定小心从事。";
+	action.m_NpcMsg = task_msg_306;
+	action.m_ActionMsg = task_msg_307;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000042_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我看少侠一脸正气，一定是正道中人。";
+	action.m_NpcMsg = task_msg_308;
 	action.m_ActionMsg = "";
 	return action;
 end

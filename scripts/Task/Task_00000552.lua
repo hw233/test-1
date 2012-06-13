@@ -56,20 +56,20 @@ function Task_00000552(npcId)
 		action.m_ActionID = 552
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "蛇妖之祸";
+		action.m_ActionMsg = task_msg_774;
 	elseif task:GetTaskSubmitNpc(552) == npcId then
 		if Task_Submit_00000552() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 552
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "蛇妖之祸";
+			action.m_ActionMsg = task_msg_775;
 		elseif task:HasAcceptedTask(552) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 552
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "蛇妖之祸";
+			action.m_ActionMsg = task_msg_776;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000552_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都郊外的云灵山有一只蛇妖盘踞，经常祸害过往行人。这只蛇妖惯于喷涂剧毒，成都知府及其手下的衙役捕快拿它毫无办法，所以上我们昆仑求助，"..GetPlayerName(GetPlayer()).."你去将这只妖物消灭吧。";
-	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
+	action.m_NpcMsg = task_msg_777..GetPlayerName(GetPlayer())..task_msg_778;
+	action.m_ActionMsg = task_msg_779;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000552_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "除了此蛇妖，也可以保成都附近百姓的安宁。";
+	action.m_NpcMsg = task_msg_780;
 	action.m_ActionMsg = "";
 	return action;
 end

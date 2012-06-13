@@ -82,20 +82,20 @@ function Task_00000120(npcId)
 		action.m_ActionID = 120
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "女贼杨花";
+		action.m_ActionMsg = task_msg_615;
 	elseif task:GetTaskSubmitNpc(120) == npcId then
 		if Task_Submit_00000120() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 120
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "女贼杨花";
+			action.m_ActionMsg = task_msg_616;
 		elseif task:HasAcceptedTask(120) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 120
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "女贼杨花";
+			action.m_ActionMsg = task_msg_617;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000120_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，其实醉道人前辈怕你出意外，一直跟着你去了慈云寺，方才寺内的恶人躁动也是前辈故意做的，方便少侠你去救人。";
-	action.m_ActionMsg = "原来如此，我说怎么救人这么顺利。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_618;
+	action.m_ActionMsg = task_msg_619;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000120_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "如今慈云寺大批的妖人已经被前辈引走了，临走时前辈让我转告你，慈云寺藏污纳垢，密室内有不少邪恶之徒，其中有个叫杨花的女贼作恶多端让少侠你去将她铲除。";
-	action.m_ActionMsg = "我这就去再探慈云寺。";
+	action.m_NpcMsg = task_msg_620;
+	action.m_ActionMsg = task_msg_621;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000120_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺里的这些妖人真是可恶！";
+	action.m_NpcMsg = task_msg_622;
 	action.m_ActionMsg = "";
 	return action;
 end

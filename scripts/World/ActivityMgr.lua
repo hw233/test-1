@@ -185,7 +185,7 @@ function GetAtyReward(player, flag)
         package:AddItem(gemid, 1, true, false, 24 ); 
         if  isChristmas == true then
             package:AddItem(401, 1, true, false, 24 );
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x1");
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_90.."[4:".. 401 .."]x1");
         end
     end
 
@@ -206,7 +206,7 @@ function GetAtyReward(player, flag)
 
         if  isChristmas == true then
             package:AddItem(401, 2, true, false, 24 );
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x2");
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_90.."[4:".. 401 .."]x2");
         end
         player:OnShuoShuo(1)
     end
@@ -238,7 +238,7 @@ function GetAtyReward(player, flag)
         end
          if  isChristmas == true then
             package:AddItem(401, 3, true, false, 24 );
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x3");
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_90.."[4:".. 401 .."]x3");
         end
     end
 
@@ -250,7 +250,7 @@ function GetAtyReward(player, flag)
         end
          if  isChristmas == true then
             package:AddItem(401, 3, true, false, 24 );
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]通过活跃奖励，获得了[4:".. 401 .."]x3");
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_90.."[4:".. 401 .."]x3");
         end
     end
 

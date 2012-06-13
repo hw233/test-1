@@ -140,6 +140,14 @@ void Leaderboard::doUpdate()
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
 		" LIMIT 0, 100", blist2);
+    for(UInt8 c = 0; c < blist2.size(); c++)
+    {
+        Player* curPlayer = globalPlayers[blist2[c].id];
+        if(curPlayer && curPlayer->getClan())
+        {
+            curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist2[c].clan);
+        }
+    }
     buildPacket2(_levelStream, 0, _id, blist2);
 	if(!blist2.empty())
 		_maxLevel = blist2[0].lvl;
@@ -176,7 +184,15 @@ void Leaderboard::doUpdate()
         if(cfg.merged)
             Player::patchMergedName(blist[index].id, blist[index].name);
     }
-	buildPacket(_achievementStream, 2, _id, blist);
+    for(UInt8 c = 0; c < blist.size(); c++)
+    {
+        Player* curPlayer = globalPlayers[blist[c].id];
+        if(curPlayer && curPlayer->getClan())
+        {
+            curPlayer->patchMergedName(curPlayer->getClan()->getFounder(), blist[c].clan);
+        }
+    }
+    buildPacket(_achievementStream, 2, _id, blist);
 
 	blist.clear();
 #if 0

@@ -82,20 +82,20 @@ function Task_00000019(npcId)
 		action.m_ActionID = 19
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "云灵山除妖";
+		action.m_ActionMsg = task_msg_161;
 	elseif task:GetTaskSubmitNpc(19) == npcId then
 		if Task_Submit_00000019() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 19
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "云灵山除妖";
+			action.m_ActionMsg = task_msg_162;
 		elseif task:HasAcceptedTask(19) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 19
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "云灵山除妖";
+			action.m_ActionMsg = task_msg_163;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000019_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "蛇妖确实比较厉害，不过我早已准备了应付之法，特地从黄山的餐霞大师那里借来金鳞蜈蚣，它可是蛇妖的克星。消灭这只蛇妖不在话下，"..GetPlayerName(GetPlayer()).."你这就和我们一起去吧。";
-	action.m_ActionMsg = "晚辈正好也想去见识一下蛇妖的厉害。";
+	action.m_NpcMsg = task_msg_164..GetPlayerName(GetPlayer())..task_msg_165;
+	action.m_ActionMsg = task_msg_166;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000019_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "只是可惜这只金鳞蜈蚣了，竟然和蛇妖同归于尽。";
+	action.m_NpcMsg = task_msg_167;
 	action.m_ActionMsg = "";
 	return action;
 end

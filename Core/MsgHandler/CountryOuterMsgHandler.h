@@ -1042,6 +1042,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
     pl->sendRC7DayInfo(TimeUtil::Now());
+    pl->sendRF7DayInfo(TimeUtil::Now());
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
@@ -4438,6 +4439,41 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
         case 5:
             player->turnOnRC7Day();
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OnRF7Day( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch (op)
+    {
+        case 1:
+        case 2:
+        case 3:
+            player->getContinuousRewardRF(op);
+            break;
+
+        case 4:
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->getContinuousRewardRF(op, idx);
+            }
+            break;
+
+        case 5:
+            player->turnOnRF7Day();
             break;
 
         default:

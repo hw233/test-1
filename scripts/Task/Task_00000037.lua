@@ -82,20 +82,20 @@ function Task_00000037(npcId)
 		action.m_ActionID = 37
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "青螺八魔";
+		action.m_ActionMsg = task_msg_999;
 	elseif task:GetTaskSubmitNpc(37) == npcId then
 		if Task_Submit_00000037() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 37
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "青螺八魔";
+			action.m_ActionMsg = task_msg_1000;
 		elseif task:HasAcceptedTask(37) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 37
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "青螺八魔";
+			action.m_ActionMsg = task_msg_1001;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000037_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "方才我以元神之法去青螺魔宫进行了探查，发现正道群英已经齐聚青螺山，准备进攻青螺魔宫，剿灭这处邪道的据点，"..GetPlayerName(GetPlayer()).."你也应该去助一臂之力。";
-	action.m_ActionMsg = "嗯，我知道了。";
+	action.m_NpcMsg = task_msg_1002..GetPlayerName(GetPlayer())..task_msg_1003;
+	action.m_ActionMsg = task_msg_1004;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000037_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "青螺魔宫是八魔的师傅神手比丘魏枫娘所建，这个妖妇非常狡猾，他的弟子七魔许人龙昔日与我有点恩怨，正好趁此机会报昔年之仇。";
-	action.m_ActionMsg = "你放心，我一定手刃此獠。";
+	action.m_NpcMsg = task_msg_1005;
+	action.m_ActionMsg = task_msg_1006;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000037_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是正道的后起之秀，未来前途不可限量啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1007;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -50,20 +50,20 @@ function Task_00000123(npcId)
 		action.m_ActionID = 123
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "天蒙禅师";
+		action.m_ActionMsg = task_msg_23;
 	elseif task:GetTaskSubmitNpc(123) == npcId then
 		if Task_Submit_00000123() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 123
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "天蒙禅师";
+			action.m_ActionMsg = task_msg_24;
 		elseif task:HasAcceptedTask(123) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 123
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "天蒙禅师";
+			action.m_ActionMsg = task_msg_25;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000123_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "老衲早已在东汉得道，虽说大道无情，可是仍有一丝尘心未泯，这一日老衲静坐枯禅，心中忽有所得，推算出1700年后中华大地将遭遇兵劫，邪道会乘势而起……";
-	action.m_ActionMsg = "那我该怎么办？";
+	action.m_NpcMsg = task_msg_26;
+	action.m_ActionMsg = task_msg_27;
 	return action;
 end
 
@@ -87,8 +87,8 @@ function Task_00000123_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我以佛门无上神通推动元神之力，穿越千年来寻你，须知你是这正邪之战的应劫之人，待我传你神通以应付此劫。";
-	action.m_ActionMsg = "那多谢神僧了。";
+	action.m_NpcMsg = task_msg_28;
+	action.m_ActionMsg = task_msg_29;
 	return action;
 end
 
@@ -97,7 +97,7 @@ function Task_00000123_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎，劫难将至，中华大地将陷入沉沦。";
+	action.m_NpcMsg = task_msg_30;
 	action.m_ActionMsg = "";
 	return action;
 end

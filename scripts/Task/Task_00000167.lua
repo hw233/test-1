@@ -82,20 +82,20 @@ function Task_00000167(npcId)
 		action.m_ActionID = 167
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "陷空老祖";
+		action.m_ActionMsg = task_msg_1910;
 	elseif task:GetTaskSubmitNpc(167) == npcId then
 		if Task_Submit_00000167() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 167
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "陷空老祖";
+			action.m_ActionMsg = task_msg_1911;
 		elseif task:HasAcceptedTask(167) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 167
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "陷空老祖";
+			action.m_ActionMsg = task_msg_1912;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000167_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "此处陷空岛隐居着一个异人，叫陷空老祖，陷空岛也是因他而得名。小友你既来此也应该去拜见一下他老人家。";
-	action.m_ActionMsg = "是吗，我这就去。";
+	action.m_NpcMsg = task_msg_1913;
+	action.m_ActionMsg = task_msg_1914;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000167_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哈哈，早就听说小友你在正邪之战中大放异彩。";
+	action.m_NpcMsg = task_msg_1915;
 	action.m_ActionMsg = "";
 	return action;
 end

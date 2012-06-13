@@ -82,20 +82,20 @@ function Task_00000049(npcId)
 		action.m_ActionID = 49
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "铁掌僧";
+		action.m_ActionMsg = task_msg_597;
 	elseif task:GetTaskSubmitNpc(49) == npcId then
 		if Task_Submit_00000049() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 49
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "铁掌僧";
+			action.m_ActionMsg = task_msg_598;
 		elseif task:HasAcceptedTask(49) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 49
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "铁掌僧";
+			action.m_ActionMsg = task_msg_599;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000049_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺里众妖人一直孽迹不显，不过经过这段时间的明擦暗访，我已经清楚他们一般不在周边地区作案，所以周围百姓一直被他们蒙蔽，慈云寺方丈智通手下有四大弟子号称金刚，领头的叫铁掌僧慧明，此人对智通忠心耿耿，又诡计多端，若要铲除慈云寺魔窟，智通的爪牙一定要尽早除掉。";
-	action.m_ActionMsg = "邱大哥放心，管他铁掌僧还是铜掌僧，见了我都要变成软脚虾。";
+	action.m_NpcMsg = task_msg_600;
+	action.m_ActionMsg = task_msg_601;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000049_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "铁掌僧见到你，变成软脚虾了吧。";
+	action.m_NpcMsg = task_msg_602;
 	action.m_ActionMsg = "";
 	return action;
 end

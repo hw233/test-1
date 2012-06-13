@@ -82,20 +82,20 @@ function Task_00000039(npcId)
 		action.m_ActionID = 39
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "武侯祠";
+		action.m_ActionMsg = task_msg_281;
 	elseif task:GetTaskSubmitNpc(39) == npcId then
 		if Task_Submit_00000039() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 39
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "武侯祠";
+			action.m_ActionMsg = task_msg_282;
 		elseif task:HasAcceptedTask(39) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 39
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "武侯祠";
+			action.m_ActionMsg = task_msg_283;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000039_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."方才那位醉道人来找过你，让我转告说他会在成都武侯祠等你，让你尽快赶去。";
-	action.m_ActionMsg = "我知道了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_284;
+	action.m_ActionMsg = task_msg_285;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000039_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然侠心义胆，是我正道中人啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_286;
 	action.m_ActionMsg = "";
 	return action;
 end

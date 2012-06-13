@@ -50,20 +50,20 @@ function Task_00000090(npcId)
 		action.m_ActionID = 90
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "绿袍之难";
+		action.m_ActionMsg = task_msg_398;
 	elseif task:GetTaskSubmitNpc(90) == npcId then
 		if Task_Submit_00000090() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 90
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "绿袍之难";
+			action.m_ActionMsg = task_msg_399;
 		elseif task:HasAcceptedTask(90) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 90
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "绿袍之难";
+			action.m_ActionMsg = task_msg_400;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000090_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "桀……桀……桀，小辈你不要东张西望了，此处被我那恶徒辛辰子用魔泉幡设下了禁制，就算你道行再高也离不开此峰，原本我可破此法术，只是我的元神被劣徒用九子母元阳针禁锢无法施展魔功，也出不得此峰。";
-	action.m_ActionMsg = "那该如何是好。";
+	action.m_NpcMsg = task_msg_401;
+	action.m_ActionMsg = task_msg_402;
 	return action;
 end
 
@@ -87,8 +87,8 @@ function Task_00000090_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我看你资质不错，仙根福厚，不若拜我为师，我便传你破这九子母元阳针之法，届时我自可施展魔功破了这幡。到时候天下美女财物任你掠夺，天下生灵任你宰割，岂不快哉。";
-	action.m_ActionMsg = "（这个绿袍一看就是邪道妖人……不如我假装答应，等脱困之后再做打算）老祖你魔功盖世，能做你的徒弟真是莫大的福分。";
+	action.m_NpcMsg = task_msg_403;
+	action.m_ActionMsg = task_msg_404;
 	return action;
 end
 
@@ -97,7 +97,7 @@ function Task_00000090_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "徒儿，你还真是乖巧啊……桀桀……桀！";
+	action.m_NpcMsg = task_msg_405;
 	action.m_ActionMsg = "";
 	return action;
 end

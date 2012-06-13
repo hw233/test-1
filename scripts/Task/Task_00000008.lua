@@ -82,20 +82,20 @@ function Task_00000008(npcId)
 		action.m_ActionID = 8
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "启程";
+		action.m_ActionMsg = task_msg_97;
 	elseif task:GetTaskSubmitNpc(8) == npcId then
 		if Task_Submit_00000008() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 8
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "启程";
+			action.m_ActionMsg = task_msg_98;
 		elseif task:HasAcceptedTask(8) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 8
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "启程";
+			action.m_ActionMsg = task_msg_99;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000008_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "方才李宁父女已经准备好自己的行李包裹，打算与我即刻启程前往峨嵋山隐居，他们已经在舍身崖处等候你我，少侠不如和我们一起去峨眉山？";
-	action.m_ActionMsg = "能与前辈同行，我深感荣幸。";
+	action.m_NpcMsg = task_msg_100;
+	action.m_ActionMsg = task_msg_101;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000008_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，我看你神采奕奕，莫非得了什么奇遇？";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_102;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000121(npcId)
 		action.m_ActionID = 121
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "方丈智通";
+		action.m_ActionMsg = task_msg_587;
 	elseif task:GetTaskSubmitNpc(121) == npcId then
 		if Task_Submit_00000121() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 121
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "方丈智通";
+			action.m_ActionMsg = task_msg_588;
 		elseif task:HasAcceptedTask(121) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 121
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "方丈智通";
+			action.m_ActionMsg = task_msg_589;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000121_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "慈云寺的方丈叫做智通，乃是当年五台派太乙混元祖师的弟子，一手飞剑使得出神入化。自从混元祖师在第二次峨眉斗剑中陨落，他手下的弟子各奔东西，而智通跑到成都建了这慈云寺，聚集了不少妖人，暗中图谋反攻正道。";
-	action.m_ActionMsg = "原来还有这么一段故事啊。";
+	action.m_NpcMsg = task_msg_590;
+	action.m_ActionMsg = task_msg_591;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000121_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，魏家场一役，智通的师兄金身罗汉法元战败，其他妖人死的死伤的伤，现在智通一人独木难支，已经不成气候，"..GetPlayerName(GetPlayer()).."这智通就交给你对付了。";
-	action.m_ActionMsg = "好，我这就去慈云寺铲除首恶。";
+	action.m_NpcMsg = task_msg_592..GetPlayerName(GetPlayer())..task_msg_593;
+	action.m_ActionMsg = task_msg_594;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000121_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺的首恶已除，其他助拳妖人在魏家场也溃不成军，"..GetPlayerName(GetPlayer()).."你居功居首位啊！";
+	action.m_NpcMsg = task_msg_595..GetPlayerName(GetPlayer())..task_msg_596;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000030(npcId)
 		action.m_ActionID = 30
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "再会醉道人";
+		action.m_ActionMsg = task_msg_230;
 	elseif task:GetTaskSubmitNpc(30) == npcId then
 		if Task_Submit_00000030() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 30
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "再会醉道人";
+			action.m_ActionMsg = task_msg_231;
 		elseif task:HasAcceptedTask(30) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 30
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "再会醉道人";
+			action.m_ActionMsg = task_msg_232;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000030_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "虽然慈云寺大战在即，不过正邪双方都在邀请帮手，所以暂时是风平浪静的，你先去成都望江楼吧，醉道人师兄他一般都在那里饮酒。";
-	action.m_ActionMsg = "多谢大师赠送的法宝，我这就去了。";
+	action.m_NpcMsg = task_msg_233;
+	action.m_ActionMsg = task_msg_234;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000030_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你小子运气不错嘛，白云那小姑娘竟然把她的随身至宝都送你了。";
+	action.m_NpcMsg = task_msg_235;
 	action.m_ActionMsg = "";
 	return action;
 end

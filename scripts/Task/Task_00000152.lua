@@ -82,20 +82,20 @@ function Task_00000152(npcId)
 		action.m_ActionID = 152
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "雁荡水贼";
+		action.m_ActionMsg = task_msg_1681;
 	elseif task:GetTaskSubmitNpc(152) == npcId then
 		if Task_Submit_00000152() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 152
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "雁荡水贼";
+			action.m_ActionMsg = task_msg_1682;
 		elseif task:HasAcceptedTask(152) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 152
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "雁荡水贼";
+			action.m_ActionMsg = task_msg_1683;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000152_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠想必与之前在此除妖的仙子是同门吧，看来都是侠义之辈啊。老朽在雁荡湖畔生活了七十多年，这个村子也一直平安，可是前段时间不知哪里来了一伙水贼，打家劫舍，无恶不作，还希望少侠可以将他们驱逐出雁荡湖。";
-	action.m_ActionMsg = "那么麻烦干什么，都送他们去投胎好了，嘿嘿。";
+	action.m_NpcMsg = task_msg_1684;
+	action.m_ActionMsg = task_msg_1685;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000152_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是谢天谢地，有少侠你来帮助我们。";
+	action.m_NpcMsg = task_msg_1686;
 	action.m_ActionMsg = "";
 	return action;
 end

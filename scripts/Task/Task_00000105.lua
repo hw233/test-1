@@ -50,20 +50,20 @@ function Task_00000105(npcId)
 		action.m_ActionID = 105
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "魔教始祖";
+		action.m_ActionMsg = task_msg_494;
 	elseif task:GetTaskSubmitNpc(105) == npcId then
 		if Task_Submit_00000105() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 105
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "魔教始祖";
+			action.m_ActionMsg = task_msg_495;
 		elseif task:HasAcceptedTask(105) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 105
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "魔教始祖";
+			action.m_ActionMsg = task_msg_496;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000105_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "峨眉派掌教妙一真人齐漱溟和老友东海三仙准备除掉南方魔教的始祖绿袍老祖，已经在百蛮山着手布置长眉真人遗留的两仪微尘大阵，"..GetPlayerName(GetPlayer()).."我知道你和绿袍也有些小小的过节，不如趁此机会前去做一个了断如何？";
-	action.m_ActionMsg = "多谢大师指点，晚辈这就赶往百蛮山。";
+	action.m_NpcMsg = task_msg_497..GetPlayerName(GetPlayer())..task_msg_498;
+	action.m_ActionMsg = task_msg_499;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000105_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."今日我们东海三仙齐聚百蛮山布两仪微尘阵也将是一段佳话啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_500;
 	action.m_ActionMsg = "";
 	return action;
 end

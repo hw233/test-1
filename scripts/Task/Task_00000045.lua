@@ -82,20 +82,20 @@ function Task_00000045(npcId)
 		action.m_ActionID = 45
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "无间道之殇";
+		action.m_ActionMsg = task_msg_323;
 	elseif task:GetTaskSubmitNpc(45) == npcId then
 		if Task_Submit_00000045() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 45
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "无间道之殇";
+			action.m_ActionMsg = task_msg_324;
 		elseif task:HasAcceptedTask(45) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 45
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "无间道之殇";
+			action.m_ActionMsg = task_msg_325;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000045_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "刚刚我已经将密室的暗门开启，这里是地牢的钥匙，少侠赶快去救人吧，不过那书生笨手笨脚的，希望不会出了什么差错。";
-	action.m_ActionMsg = "嗯，我这就去救人，不过你也得小心。";
+	action.m_NpcMsg = task_msg_326;
+	action.m_ActionMsg = task_msg_327;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000045_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 3;
-	action.m_NpcMsg = "哎呀，少侠慢走，现在寺内死了几个妖人，又走失了书生，方丈责怪下来，我也不好交代……不如这样，少侠你插我一剑，这样的话我也好蒙混过关。";
-	action.m_ActionMsg = "这……很疼的，你要忍住哦……";
+	action.m_NpcMsg = task_msg_328;
+	action.m_ActionMsg = task_msg_329;
 	return action;
 end
 
@@ -129,8 +129,8 @@ function Task_00000045_step_03()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "啊……啊啊啊！好痛！你……你怎么插我这里！";
-	action.m_ActionMsg = "对不起，我手滑了……要不我在你说的地方再插一下？";
+	action.m_NpcMsg = task_msg_330;
+	action.m_ActionMsg = task_msg_331;
 	return action;
 end
 
@@ -139,7 +139,7 @@ function Task_00000045_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这位侠士你是来救我的吗？";
+	action.m_NpcMsg = task_msg_332;
 	action.m_ActionMsg = "";
 	return action;
 end

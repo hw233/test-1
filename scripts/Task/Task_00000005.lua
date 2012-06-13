@@ -82,20 +82,20 @@ function Task_00000005(npcId)
 		action.m_ActionID = 5
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "购买古籍";
+		action.m_ActionMsg = task_msg_78;
 	elseif task:GetTaskSubmitNpc(5) == npcId then
 		if Task_Submit_00000005() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 5
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "购买古籍";
+			action.m_ActionMsg = task_msg_79;
 		elseif task:HasAcceptedTask(5) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 5
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "购买古籍";
+			action.m_ActionMsg = task_msg_80;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000005_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些银两我不能收，不过教书办学也确实需要钱财……嗯，君子爱财取之有道，我这边有不少收集来的古籍，都是我的老仆保管。少侠不妨去挑选几本古籍吧，这些银两权当作"..GetPlayerName(GetPlayer()).."你的书资可好？";
-	action.m_ActionMsg = "小声嘀咕（这些破书能值几个钱）。";
+	action.m_NpcMsg = task_msg_81..GetPlayerName(GetPlayer())..task_msg_82;
+	action.m_ActionMsg = task_msg_83;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000005_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些古籍可是我花了数十年的时间才搜集到的，少侠你可要好生保护才好。";
+	action.m_NpcMsg = task_msg_84;
 	action.m_ActionMsg = "";
 	return action;
 end

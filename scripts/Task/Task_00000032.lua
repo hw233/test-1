@@ -82,20 +82,20 @@ function Task_00000032(npcId)
 		action.m_ActionID = 32
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "强化装备";
+		action.m_ActionMsg = task_msg_243;
 	elseif task:GetTaskSubmitNpc(32) == npcId then
 		if Task_Submit_00000032() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 32
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "强化装备";
+			action.m_ActionMsg = task_msg_244;
 		elseif task:HasAcceptedTask(32) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 32
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "强化装备";
+			action.m_ActionMsg = task_msg_245;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000032_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "这个穷酒鬼竟然还藏着这么个好玩意，来来来，让我教教你怎么把这块太乙真金熔炼到你的飞剑中去，这次就不收你钱了，全记在那个酒鬼头上。";
-	action.m_ActionMsg = "这怎么好意思呢？";
+	action.m_NpcMsg = task_msg_246;
+	action.m_ActionMsg = task_msg_247;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000032_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "没事，没事……你看这么大块的太乙真金一次强化也用不了这许多，剩下的就权且当做手工费了，嘿嘿。";
-	action.m_ActionMsg = "前辈真是打的好算盘……";
+	action.m_NpcMsg = task_msg_248;
+	action.m_ActionMsg = task_msg_249;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000032_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嘿嘿，小子你以后找我的机会多着呢，这点小钱小意思了。";
+	action.m_NpcMsg = task_msg_250;
 	action.m_ActionMsg = "";
 	return action;
 end

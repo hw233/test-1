@@ -82,20 +82,20 @@ function Task_00000159(npcId)
 		action.m_ActionID = 159
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "宝相夫人";
+		action.m_ActionMsg = task_msg_1862;
 	elseif task:GetTaskSubmitNpc(159) == npcId then
 		if Task_Submit_00000159() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 159
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "宝相夫人";
+			action.m_ActionMsg = task_msg_1863;
 		elseif task:HasAcceptedTask(159) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 159
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "宝相夫人";
+			action.m_ActionMsg = task_msg_1864;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000159_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我昔年炼制的白眉针杀戮太重，命中注定会有这么一劫，虽然百年来我静心修道，不再造杀孽，不过这天劫仍然如期而至。如今我专心渡劫，不能分心，还望少侠帮助除掉那鄢什，此人修炼的诡异魔宫，操纵僵尸，你要小心对付才是。";
-	action.m_ActionMsg = "嗯，我知道了。";
+	action.m_NpcMsg = task_msg_1865;
+	action.m_ActionMsg = task_msg_1866;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000159_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢诸位道友相助。";
+	action.m_NpcMsg = task_msg_1867;
 	action.m_ActionMsg = "";
 	return action;
 end

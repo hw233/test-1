@@ -82,20 +82,20 @@ function Task_00000168(npcId)
 		action.m_ActionID = 168
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "冰雪结晶";
+		action.m_ActionMsg = task_msg_1922;
 	elseif task:GetTaskSubmitNpc(168) == npcId then
 		if Task_Submit_00000168() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 168
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "冰雪结晶";
+			action.m_ActionMsg = task_msg_1923;
 		elseif task:HasAcceptedTask(168) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 168
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "冰雪结晶";
+			action.m_ActionMsg = task_msg_1924;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000168_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这里天寒地冻本是一片安静的所在，只是百年前易周为那只老鳖搞出一块元磁禁制，引得周围很多生灵变异，尤其是周边冰原上凝结出一些冰雪结晶，经常伤我手下弟子，而我清心潜修已不问这些琐事，如果小友有暇去帮帮我这些不成器的弟子也好。";
-	action.m_ActionMsg = "不敢不敢，弟子我这就去清除这些冰雪异类。";
+	action.m_NpcMsg = task_msg_1925;
+	action.m_ActionMsg = task_msg_1926;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000168_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哈哈，早就听说小友你在正邪之战中大放异彩。";
+	action.m_NpcMsg = task_msg_1927;
 	action.m_ActionMsg = "";
 	return action;
 end

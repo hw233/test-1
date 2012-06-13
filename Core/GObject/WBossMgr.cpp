@@ -457,6 +457,7 @@ void WBoss::reward(Player* player)
         MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000}};
         (*i).player->sendMailItem(568, 569, item, 2);
         GameAction()->doAty((*i).player, AtyBoss, 0, 0);
+        (*i).player->setContinuousRFAward(6);
     }
 
     if (player)

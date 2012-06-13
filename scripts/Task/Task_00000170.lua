@@ -82,20 +82,20 @@ function Task_00000170(npcId)
 		action.m_ActionID = 170
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "乌神叟";
+		action.m_ActionMsg = task_msg_1934;
 	elseif task:GetTaskSubmitNpc(170) == npcId then
 		if Task_Submit_00000170() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 170
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "乌神叟";
+			action.m_ActionMsg = task_msg_1935;
 		elseif task:HasAcceptedTask(170) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 170
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "乌神叟";
+			action.m_ActionMsg = task_msg_1936;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000170_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在我诸多弟子里，只有乌神叟和郑元规资质悟性皆是不凡，只是郑元规这个孽徒不走正路被我逐出师门。大弟子乌神叟就是心性太多柔和，为孽徒求情，被我处罚去宫外除妖已有不少时日，你去见见他，告诉他为师怒气已消，让他回来见我吧。";
-	action.m_ActionMsg = "老祖吩咐，弟子这就去办。";
+	action.m_NpcMsg = task_msg_1937;
+	action.m_ActionMsg = task_msg_1938;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000170_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠帮助。";
+	action.m_NpcMsg = task_msg_1939;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -56,20 +56,20 @@ function Task_00000585(npcId)
 		action.m_ActionID = 585
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "玉清大师";
+		action.m_ActionMsg = task_msg_1560;
 	elseif task:GetTaskSubmitNpc(585) == npcId then
 		if Task_Submit_00000585() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 585
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "玉清大师";
+			action.m_ActionMsg = task_msg_1561;
 		elseif task:HasAcceptedTask(585) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 585
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "玉清大师";
+			action.m_ActionMsg = task_msg_1562;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000585_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "玉清大师本是邪道毒龙尊者的同门，后来遇见神尼优昙点化弃暗投明，拜入神尼门下，如今正在成都郊外辟邪村隐居，你去拜访一下她，象她请教一下剑术上的疑问，对你大有好处啊。";
-	action.m_ActionMsg = "弟子正有些疑问呢。";
+	action.m_NpcMsg = task_msg_1563;
+	action.m_ActionMsg = task_msg_1564;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000585_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有劳小友带来齐掌教的问候。";
+	action.m_NpcMsg = task_msg_1565;
 	action.m_ActionMsg = "";
 	return action;
 end

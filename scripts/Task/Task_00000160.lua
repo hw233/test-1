@@ -82,20 +82,20 @@ function Task_00000160(npcId)
 		action.m_ActionID = 160
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "崇明岛恶人";
+		action.m_ActionMsg = task_msg_1868;
 	elseif task:GetTaskSubmitNpc(160) == npcId then
 		if Task_Submit_00000160() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 160
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "崇明岛恶人";
+			action.m_ActionMsg = task_msg_1869;
 		elseif task:HasAcceptedTask(160) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 160
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "崇明岛恶人";
+			action.m_ActionMsg = task_msg_1870;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000160_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "峨眉派的几位少侠方才助我渡劫，如今天劫已渡，他们也纷纷离去，不过方才见李英琼神色焦急，似乎是她的爱宠佛奴遇敌，往崇明岛方向去了。那座岛上有一个妖妇唤作蒲妙妙，不如你赶去与英琼联手除掉此恶。";
-	action.m_ActionMsg = "嗯，我知道了。";
+	action.m_NpcMsg = task_msg_1871;
+	action.m_ActionMsg = task_msg_1872;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000160_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这等邪派人物定要早早消灭。";
+	action.m_NpcMsg = task_msg_1873;
 	action.m_ActionMsg = "";
 	return action;
 end

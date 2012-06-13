@@ -1498,6 +1498,7 @@ void Clan::disband(Player * player)
 	globalOwnedClans[cny].remove(player->getName());
 	clanCache.push(this, false);
 	
+#if 0
     struct ClanData
     {
         Clan* clan;
@@ -1507,6 +1508,7 @@ void Clan::disband(Player * player)
 
     GameMsgHdr h(0x250,  WORKER_THREAD_NEUTRAL, NULL, sizeof(ClanData*));
     GLOBAL().PushMsg(h, &clan_data);
+#endif
 
 	DB5().PushUpdateData("DELETE FROM `clan` WHERE `id` = %u", _id);
 	DB5().PushUpdateData("DELETE FROM `clan_pending_player` WHERE `id` = %u", _id);
@@ -2481,9 +2483,10 @@ void Clan::broadcastMemberInfo( Player * player )
 	broadcastMemberInfo(*((*found)), 1);
 }
 
+#if 0
 void Clan::patchMergedName( UInt32 id, std::string& name )
 {
-	if(cfg.merged && id >= 0x1000000)
+    if(cfg.merged && id >= 0x1000000)
 	{
 		UInt32 sid = (id >> 24) - 1;
 		do
@@ -2495,6 +2498,13 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 	}
 }
 
+#else
+void Clan::patchMergedName( UInt64 id, std::string& name )
+{
+    if(cfg.merged)
+        Player::patchMergedName(id, name);
+}
+#endif
 float Clan::getClanTechAddon()
 {
     // TODO:

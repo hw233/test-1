@@ -50,20 +50,20 @@ function Task_00000635(npcId)
 		action.m_ActionID = 635
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "邪派道姑";
+		action.m_ActionMsg = task_msg_1330;
 	elseif task:GetTaskSubmitNpc(635) == npcId then
 		if Task_Submit_00000635() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 635
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "邪派道姑";
+			action.m_ActionMsg = task_msg_1331;
 		elseif task:HasAcceptedTask(635) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 635
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "邪派道姑";
+			action.m_ActionMsg = task_msg_1332;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000635_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都不远处的桂花山是一处美景，不过山中有五色云雾，寻常人轻易不得入内，听说有个室外高人隐居在山中，布下了五色云雾。前不久有个奇怪的道姑来成都，似乎要去福仙潭找什么乌风草，与本地居民发生争吵，辣手屠灭了一个村子，希望少侠可以去桂花山将这个邪恶道姑消灭。";
-	action.m_ActionMsg = "竟然有这种凶恶之人！";
+	action.m_NpcMsg = task_msg_1333;
+	action.m_ActionMsg = task_msg_1334;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000635_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "想不到传说中的剑仙一流，也有如此恶人。";
+	action.m_NpcMsg = task_msg_1335;
 	action.m_ActionMsg = "";
 	return action;
 end

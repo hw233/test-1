@@ -1107,6 +1107,10 @@ namespace Script
     {
         return Call<void>(  "onCLLoginReward", pl, cts);
     }
+    UInt16 GameActionLua::onCLLoginRewardRF(Player* pl, UInt8 cts, UInt8 type)
+    {
+        return Call<UInt16>(  "onCLLoginRewardRF", pl, cts, type);
+    }
     void GameActionLua::onCL3DayReward(Player* pl)
     {
         return Call<void>(  "onCL3DayReward", pl);
@@ -1122,6 +1126,10 @@ namespace Script
     bool GameActionLua::onTurnOnRC7Day(Player* pl, UInt32 total, UInt32 offset)
     {
         return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
+    }
+    bool GameActionLua::onTurnOnRF7Day(Player* pl, UInt32 total, UInt32 offset)
+    {
+        return Call<bool>(  "onTurnOnRF7Day", pl, total, offset);
     }
     lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind)
     {
@@ -1144,7 +1152,11 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt16>("RunTargetAward", player);
     }
-
+    UInt16 GameActionLua::RunTargetAwardRF(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunTargetAwardRF", player);
+    }
 }
 
 

@@ -56,20 +56,20 @@ function Task_00000508(npcId)
 		action.m_ActionID = 508
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "作恶多端";
+		action.m_ActionMsg = task_msg_678;
 	elseif task:GetTaskSubmitNpc(508) == npcId then
 		if Task_Submit_00000508() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 508
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "作恶多端";
+			action.m_ActionMsg = task_msg_679;
 		elseif task:HasAcceptedTask(508) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 508
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "作恶多端";
+			action.m_ActionMsg = task_msg_680;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000508_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "慈云寺最近聚集了不少邪派人士，有一些妖人在附近为恶，祸害百姓，实在是我们剑侠里的败类，"..GetPlayerName(GetPlayer()).."你速速去将这些恶人除掉。";
-	action.m_ActionMsg = "为民除害是我辈本色，弟子去去就回。";
+	action.m_NpcMsg = task_msg_681..GetPlayerName(GetPlayer())..task_msg_682;
+	action.m_ActionMsg = task_msg_683;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000508_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_684;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -77,11 +77,9 @@ end
 function onTakeMailPackage(player, pkgId)
   if pkgId == 10000 then
     player:getCoupon(888)
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 888 礼券!")
     return true
   elseif pkgId == 10001 then
     player:getCoupon(88)
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 88 礼券!")
     return true
   end
   local pkgFunc = MailPackage_Table[pkgId]
@@ -99,9 +97,7 @@ function onTakeMailPackage(player, pkgId)
     end
   end
   if pkgId == 10002 then
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 [4:8923] x2!")
   elseif pkgId == 10003 then
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 领取了立冬礼包，幸运地获得了 [4:8922] x2!")
   elseif pkgId == 1001 then
     player:getCoupon(100)
   elseif pkgId == 1002 then
@@ -134,7 +130,7 @@ end
 
 function onNVDLogin(player)
     if player:GetVar(106) == 0 then
-        sendItemPackageMail(player, "网路情人节礼包活动", "网路情人节礼包", {9027,1,1})
+        sendItemPackageMail(player, msg_1, msg_2, {9027,1,1})
         player:SetVar(106, 1)
     end
 end
@@ -178,14 +174,12 @@ function onClanBattleAttend(player)
 			return
 		end
 		player:addStatus(0x400)
-		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在帮派战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
 	end
 end
 
 function onCountryBattleAttend(player)
 	local stage = getActivityStage();
 	if stage == 1 then	
-		sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你在阵营战后获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2);
 	end
 end
 
@@ -196,7 +190,6 @@ function onAttakerAward(attacker, defender, award)
 	local isMale1 = attacker:IsMale();
 	local isMale2 = defender:IsMale();
 	if (isMale1 and not isMale2) or (not isMale1 and isMale2) then
-		SendMsg(attacker, 0x35, "恭喜您通过情人节乱世佳人活动获得50%额外奖励");
 		return (award * 3 / 2);		
 	else
 		return award;
@@ -222,7 +215,6 @@ function onAthleticWin(player)
 		cnt = cnt + 1;
 		player:setStatusBit(20, 3, cnt);
 		if cnt == 5 then
-			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你今日斗剑场胜利5次，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
 		end
 	end
 end
@@ -241,7 +233,6 @@ function onDayTaskComplete(player, count)
 			cnt2 = cnt2 - 10
 			cnt = cnt + 1
 			player:setStatusBit(24, 2, cnt)
-			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，您今日成功完成 10 次日常循环任务，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
 		end
 		player:setStatusBit(26, 4, cnt2)
 	end
@@ -266,7 +257,7 @@ function onMergeGem(player, lev, num)
         end
 
         for n = 1, num do
-            sendItemPackageMail(player, "合成宝石活动奖励", "合成宝石活动奖励", item);
+            sendItemPackageMail(player, msg_3, msg_3, item);
         end
 	end
 end
@@ -279,7 +270,7 @@ function onOnlineAward(player, itemId, count)
 			if package:Add(itemId, count * 2, true, false, 12) == nil then
 				return false
 			end
-		SendMsg(player, 0x35, "恭喜您非常幸运地获得了春节期间在线双倍奖励！");
+		SendMsg(player, 0x35, msg_4);
 		else
 			if package:Add(itemId, count, true, false, 12) == nil then
 				return false
@@ -292,16 +283,12 @@ function onEnchant(player, level)
   local stage = getActivityStage();
   if stage == 2 then
 	if level == 7 then
-		sendRewardMail(player, '装备强化7级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你一个银票，赶紧领取吧！', 8996, 1);		
 	elseif level == 8 then
-		sendRewardMail(player, '装备强化8级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你一个潜力保护符，赶紧领取吧！', 9000, 1);		
 	elseif level == 9 then
-		sendRewardMail(player, '装备强化9级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你一个潜力保护符，赶紧领取吧！', 9000, 1);		
 	elseif level == 10 then
 		local favor = {5820, 5821, 5822, 5823, 5824};
 		local rand_favor = math.random(1, #favor);
 		local table_items = {favor[rand_favor], 10, 0};
-		-- sendItemPackageMail(player, '装备强化10级奖励', '恭喜您！您的不懈努力终于感动了铁匠铺老板，他送了你10个橙色喜好品，赶紧领取吧！', table_items);
 	end
   end
 end
@@ -317,7 +304,6 @@ function onAttackBoss(player)
 		cnt = cnt + 1
 		player:setStatusBit(30, 2, cnt)
 		if cnt == 3 then
-			sendRewardMail(player, '愚人节鱼宴邀请函', '通过勤奋努力，你今日攻击Boss 3次，获得了2个鱼宴邀请函，请再接再厉，多多努力，食霸非你莫属！', 9224, 2)
 		end
 	end
 end
@@ -333,12 +319,10 @@ function onTopup(player, oldGold, newGold)
 		return;
 	end
 	player:addStatus(0x200)
-	sendRewardMail(player, '充值有礼', '您在活动期间充值获得“蜀山传奇银币嘉奖礼包”一个，内含银票2张。请在背包中留出足够空间后点击接收。蜀山传奇感谢您一路支持和关爱。', 8996, 2)
   end
   if stage == 5 then
 	local rand = math.random(1, 16);
 	local gold = newGold - oldGold;
-	player:sendTopupMail('恭喜您获得了春节字符奖券', "恭喜，您在活动期间充值了"..gold.."仙石，获得了一张相应的春节字符奖券，奖券号码为："..rand.."。\n如果您的奖券号码和2月6日公布的幸运字符一致，您将额外获得"..gold.."仙石的奖励。\n详见官网公告。", gold, rand);
   end
 end
 
@@ -362,7 +346,6 @@ function onLuckyDrawItemRoll(t)
 end
 
 extra_dungeon_loot_item = {9032, 9032, 9032, 9033, 9033, 9033, 9034, 9034, 9034, 9035}
-dname = {'焚骨窟', '天人福邸', '困仙阵', '无间炼狱', '海底幻境'}
 function onDungeonLootItemRoll(player, id, l, b)
 	local stage = getActivityStage();
 	if stage ~= 3 then
@@ -381,7 +364,6 @@ function onDungeonLootItemRoll(player, id, l, b)
 		local pic = {9218, 9219, 9220, 9221, 9222};
 		local rand = math.random(1, #pic);
 		local table_items = {pic[rand], 1, 0};
-		sendItemPackageMail(player, '清明节拼接清明上河图', '你在副本'..dname[id]..l..'层边打怪边看风景，无意中看到地上一张纸片，捡起一看，哇！清明上河图碎片！赶紧集齐一套去活动侍女处兑换奖励吧！', table_items);
 	end
   return 0;
 end
@@ -396,7 +378,6 @@ function exchangeRoll(player, itemId)
       c = 100;
     end
     player:getCoupon(c);
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用 [4:"..itemId.."] 兑换获得礼券" .. c);
     return;
   end
   local itemId = 8996;
@@ -420,7 +401,6 @@ function exchangeRoll(player, itemId)
    itemCount = 3;
   end
   player:GetPackage():AddItem(itemId, itemCount, true);
-  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用 [4:"..itemId.."] 兑换获得[4:" .. itemId .. "]x" .. itemCount);
 end
 
 function exchangeExtraReward(player, id)
@@ -459,7 +439,6 @@ function exchangeExtraReward(player, id)
 		package:DelItem(9221, 1, false);
 		package:DelItem(9222, 1, false);
 		package:AddItem(9223, 1, true);  
-		Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 凑齐了清明上河图,兑换获得了[4:9223]");
 	else 
 		return;  
 	end
@@ -497,7 +476,6 @@ function exchangeExtraReward(player, id)
       return
     end
     package:AddItem(9039, 1, true);
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用生肖兔兑换获得[4:9039]");
   elseif id == 4 then
     checkExpire(player)
     local cnt = player:getStatusBit(12, 2)
@@ -520,7 +498,6 @@ function exchangeExtraReward(player, id)
     package:DelItem(9033, 3, false);
     package:DelItem(9034, 3, false);
     package:AddItem(9036, 1, true);
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用福星画像+禄星画像+寿星画像兑换获得[4:9036]");
   elseif id == 5 then
     checkExpire(player)
     local cnt = player:getStatusBit(14, 2)
@@ -544,7 +521,6 @@ function exchangeExtraReward(player, id)
     package:DelItem(9034, 3, false);
     package:DelItem(9035, 2, false);
     package:AddItem(9037, 1, true);
-    Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用福星画像+禄星画像+寿星画像+三星高照兑换获得[4:9037]");
   elseif id == 6 then
     checkExpire(player)
     local cnt = player:getStatusBit(24, 2)
@@ -575,7 +551,6 @@ function exchangeExtraReward(player, id)
 	local table_count = {5, 10, 50, 100, 200, 500, 1000};
 	for i, v in ipairs(table_count) do
 		if exchangeCount == v then
-			Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."]惊为天人，义无反顾的兑换了"..exchangeCount.."个[4:9210]，获得了大量奇珍异宝，称霸天下指日可待！");
 		end
 	end
 	package:DelItem(9208, 3, false);
@@ -596,7 +571,7 @@ function PrepareTask(player)
             action.m_ActionToken = 1;
             action.m_ActionID = 1; -- 领取月饼
             action.m_ActionStep = 0;
-            action.m_ActionMsg = "中秋月饼";
+            action.m_ActionMsg = msg_5;
             table.insert(ActiveTask, action);
         else
             local action = ActionTable:Instance();
@@ -604,7 +579,7 @@ function PrepareTask(player)
             action.m_ActionToken = 1;
             action.m_ActionID = 0;
             action.m_ActionStep = 0;
-            action.m_ActionMsg = "今日已领取中秋月饼";
+            action.m_ActionMsg = msg_6;
             table.insert(ActiveTask, action);
         end
     end
@@ -625,7 +600,7 @@ function onRecruitAward(player)
     local date = os.date("%Y%m%d", os.time())
     if date >=  "20110915" then
 		local table_items = {0xA000, 1000, 1};
-        sendItemPackageMail(player, '散仙召集令', '您在【散仙召集令】活动中，成功招募传奇散仙一名，恭喜您获得奖励1000礼券，感谢您对我们游戏的支持。', table_items)
+        sendItemPackageMail(player, msg_7, msg_8, table_items)
     end
 end
 
@@ -637,8 +612,8 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
             if shengyi == 0 then
                 package:AddItem(70, 1, true)
                 player:SetVar(2, 70)
-                SendMsg(player, 0x35, "你获得了杨花珍藏的：智通的僧衣");
-                SendMsg(player, 1, "你获得了杨花珍藏的：智通的僧衣");
+                SendMsg(player, 0x35, msg_9);
+                SendMsg(player, 1, msg_9);
             end
         end
 
@@ -648,8 +623,8 @@ function onCopyFloorWin(player, id, floor, spot, lootlvl)
             if apron == 0 then
                 package:AddItem(71, 1, true)
                 player:SetVar(3, 71)
-                SendMsg(player, 0x35, "获得了智通珍藏的：杨花的肚兜");
-                SendMsg(player, 1, "获得了智通珍藏的：杨花的肚兜");
+                SendMsg(player, 0x35, msg_10);
+                SendMsg(player, 1, msg_10);
             end
         end
     end
@@ -688,11 +663,6 @@ function Christmas(player, lootlvl, where)
 
         local package = player:GetPackage();
         package:AddItem(401, itemNum[lootlvl], false);
-        --if where == 0 then
-        --    Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 副本通关，获得【圣诞萌萌变身卡】x" .. itemNum[lootlvl])
-        --else
-        --    Broadcast(0x17, "恭喜[p:"..player:getCountry()..":"..player:getPName().."] 阵图通关，获得【圣诞萌萌变身卡】x" .. itemNum[lootlvl])
-        --end
     end
 end
 
@@ -920,14 +890,14 @@ function onThanksgivingDay(player)
         return
     end
 
-    sendItemPackageMail(player, "感恩节在线奖励", "恭喜您获得感恩节在线奖励【感恩节大餐】*3\n 11月23日-11月29日活动期间，每日在线达到3小时就可以获得感恩节在线奖励【感恩节大餐】*3\n 11月23日-11月29日活动期间，连续七天，每天在线都达到3小时还可以获得法宝【火鸡】*5\n 【火鸡】可在法宝熔炼时使用，提升法宝熔炼值。", {8,3,1});
+    sendItemPackageMail(player, msg_11, msg_12, {8,3,1});
 
     player:SetVar(4, -1)
     local cnt = player:GetVar(5)
     player:SetVar(5, cnt+1);
 
     if cnt == 6 then
-        sendItemPackageMail(player, "感恩节连续在线奖励", "恭喜您获得感恩节连续七天在线奖励【火鸡】*5\n 11月23日-11月29日活动期间，每日在线达到3小时就可以获得感恩节在线奖励【感恩节大餐】*3\n 11月23日-11月29日活动期间，连续七天，每天在线都达到3小时还可以获得法宝【火鸡】*5\n 【火鸡】可在法宝熔炼时使用，提升法宝熔炼值。", {1525,5,1});
+        sendItemPackageMail(player, msg_13, msg_14, {1525,5,1});
     end
 end
 
@@ -942,12 +912,12 @@ function onChristmas(player)
     end
 
     if lvl >= 30 and player:GetVar(7) == 0 then
-        sendItemPackageMail(player, "圣诞节活动奖励", "恭喜您获得法宝【雪人】\n 2011年12月23日-2012年1月3日登陆并且等级达到30级玩家，即可获得法宝【雪人】 ", {1637,1,1});
+        sendItemPackageMail(player, msg_15, msg_16, {1637,1,1});
         player:SetVar(7,1)
     end
 
     if lvl >= 40 and player:GetVar(8) == 0 then
-        sendItemPackageMail(player, "圣诞节活动奖励（二）", "恭喜您获得节日套装奖励【圣诞萌萌靴】\n 2011年12月23日-2012年1月3日登陆并且等级达到40级玩家，即可获得节日套装奖励【圣诞萌萌靴】 ", {1752,1,1});
+        sendItemPackageMail(player, msg_17, msg_18, {1752,1,1});
         player:SetVar(8,1)
     end
 end
@@ -963,20 +933,19 @@ function onNewYear(player)
     end
 
     if lvl >= 30 and player:GetVar(42) == 0 then
-        local msg = "恭喜您获得龙年迎新礼包，礼包的封印将会在对应日期解除， 届时可打开获得丰厚道具，若是在解除封印当天打开的话可获得双倍奖励哦。（如果觉得占包包可以先不接受的说）"
-        sendItemPackageMail(player, "龙年迎新礼包-小年夜礼包", msg, {417,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-大年夜礼包", msg, {418,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初一礼包", msg, {419,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初二礼包", msg, {420,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初三礼包", msg, {421,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初四礼包", msg, {422,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初五礼包", msg, {423,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初六礼包", msg, {424,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初七礼包", msg, {425,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-初八礼包", msg, {426,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-立春礼包", msg, {427,1,1});
-        sendItemPackageMail(player, "龙年迎新礼包-元宵礼包", msg, {428,1,1});
-        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装【中国结】。\n 1月12日-2月6日 登陆游戏，并且等级达到30的玩家可以获得节日套装【中国结】 ", {1753,1,1});
+        sendItemPackageMail(player, msg_20, msg_19, {417,1,1});
+        sendItemPackageMail(player, msg_21, msg_19, {418,1,1});
+        sendItemPackageMail(player, msg_22, msg_19, {419,1,1});
+        sendItemPackageMail(player, msg_23, msg_19, {420,1,1});
+        sendItemPackageMail(player, msg_24, msg_19, {421,1,1});
+        sendItemPackageMail(player, msg_25, msg_19, {422,1,1});
+        sendItemPackageMail(player, msg_26, msg_19, {423,1,1});
+        sendItemPackageMail(player, msg_27, msg_19, {424,1,1});
+        sendItemPackageMail(player, msg_28, msg_19, {425,1,1});
+        sendItemPackageMail(player, msg_29, msg_19, {426,1,1});
+        sendItemPackageMail(player, msg_30, msg_19, {427,1,1});
+        sendItemPackageMail(player, msg_31, msg_19, {428,1,1});
+        sendItemPackageMail(player, msg_32, msg_33, {1753,1,1});
         player:SetVar(42,1)
     end
 end
@@ -990,7 +959,7 @@ function onBlueactiveday(player)
         return
     end
 
-    sendItemPackageMail(player, "在线1小时奖励", "恭喜您在线达一小时，获得以下奖励：自动回血符*1，太乙真金*1，初级打孔石*1，初级挂机加速符*1，初级道法金丹*1，混元离土*2。 \n1月16日-2月6日，每日登陆《蜀山传奇》在线达到一小时都可以获得此奖励。", {9,1,1, 502,1,1, 510,1,1, 55,1,1, 29,1,1, 51,2,1});
+    sendItemPackageMail(player, msg_34, msg_35, {9,1,1, 502,1,1, 510,1,1, 55,1,1, 29,1,1, 51,2,1});
     player:SetVar(45, 1);
 end
 
@@ -1005,7 +974,7 @@ function onValentineDay(player)
     end
 
     if lvl >= 30 and player:GetVar(47) == 0 then
-        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且等级达到30级以上（包含30级）所有用户，都将获得【恋人之戒】", {1754,1,1});
+        sendItemPackageMail(player, msg_36, msg_37, {1754,1,1});
         player:SetVar(47, 1)
     end
 end
@@ -1027,10 +996,10 @@ function onFoolsDay(player)
     end
 
     if lvl >= 40 and player:GetVar(58) == 0 then
-        sendItemPackageMail(player, "【愚人节礼包】奖励", "恭喜您获得【愚人节礼包】，4月1日打开有惊喜哦！\n等级≥40级所有玩家，在3/29-4/1每日登陆游戏就可以获得一个【愚人节礼包】", {479,1,1});
+        sendItemPackageMail(player, msg_38, msg_39, {479,1,1});
         local date = os.date("%m%d", os.time())
         if date == "0401" then
-            sendItemPackageMail(player, "【愚人节卡片】奖励", "恭喜您获得【愚人节卡片】*5，使用卡片会有惊喜哦！\n等级≥40级所有玩家，在4月1日登陆游戏就可以获得【愚人节卡片】*5", {480,5,1});
+            sendItemPackageMail(player, msg_40, msg_41, {480,5,1});
         end
         player:SetVar(58, 1)
     end
@@ -1047,7 +1016,7 @@ function onMayDay(player)
     end
 
     if lvl >= 40 and player:GetVar(94) == 0 then
-        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1755,1,1});
+        sendItemPackageMail(player, msg_42, msg_43, {1755,1,1});
         player:SetVar(94, 1)
     end
 end
@@ -1063,12 +1032,12 @@ function onMayDay1(player)
     end
 
     if lvl >= 40 and player:GetVar(95) == 0 then
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9001,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9002,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9003,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9004,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9005,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9006,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9001,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9002,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9003,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9004,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9005,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9006,1,1});
         player:SetVar(95, 1)
     end
 end
@@ -1166,6 +1135,47 @@ function onCLLoginReward(player, cts)
         end
         player:getCoupon(coupon[cts]);
     end
+end
+
+function onCLLoginRewardRF(player, cts, _type)
+    if isFBVersion() then
+        if cts == 0 then
+            player:getCoupon(10)
+            return 0
+        end
+    else
+        if _type == 1 then -- XXX: 走0x13了
+            local items = {515,503,507,56,57,509}
+            local prob = {379,1895,2400,5768,9558,10000}
+            local p = math.random(1,10000)
+            local i = 1
+            for n = 1,#prob do
+                if p <= prob[n] then
+                    i = n
+                    break
+                end
+            end
+            return items[i]
+        elseif _type == 2 then
+            local coupon = {10,10,10,10,10,10,10}
+            if cts > 7 then
+                return 0
+            end
+            player:getCoupon(coupon[cts]);
+        elseif _type == 3 then
+            if cts >= 3 then
+                local package = player:GetPackage()
+                if package:IsFull() then
+                    return 0
+                end
+
+                package:Add(9036, 1, 1)
+                return 1
+            end
+        elseif _type == 4 then
+        end
+    end
+    return 0
 end
 
 function onCL3DayReward(player)
@@ -1275,13 +1285,66 @@ function onTurnOnRC7Day(player, total, offset)
     return true
 end
 
+function onTurnOnRF7Day(player, total, offset)
+    local items = {
+        {{56,1},{57,1}},
+        {{56,2},{57,2},{15,1}},
+        {{56,3},{57,3},{15,2}},
+        {{56,4},{57,4},{15,3},{503,1}},
+        {{56,5},{57,5},{15,4},{503,2}},
+        {{56,6},{57,6},{15,5},{503,3},{516,1}},
+        {{56,7},{57,7},{15,6},{503,4},{516,2}},
+    }
+
+    if offset + 1 > #items then
+        return false
+    end
+
+    local totals = {10,50,100,300,500,700,1000}
+
+    local max = 0
+    for n = 1, #totals do
+        if total >= totals[n] then
+            max = n
+        else
+            break
+        end
+    end
+
+    if max == 0 then
+        return false
+    end
+
+    if offset >= max then
+        return false
+    end
+
+    local item = items[offset + 1]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #item then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for k,v in pairs(item) do
+        package:Add(v[1], v[2], 1)
+    end
+
+    return true
+end
+
 function onEnchantAct(player, level)
+    local pic = {1416, 1417, 1418, 1419, 1420};
+    local rand = math.random(1, #pic);
+    local rand2 = math.random(1, #pic);
+    local rand3 = math.random(1, #pic);
     local items = {
         [4] = {502,1,1},
         [6] = {509,2,1},
-        [8] = {509,5,1, 1509,1,1},
+        [8] = {509,5,1, pic[rand],1,1, 30,1,1},
+        [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
     };
-    sendItemPackageMail(player, "装备强化返利活动", "装备强化返利活动", items[level]);
+    sendItemPackageMail(player, msg_46, msg_46, items[level]);
 end
 
 function onEnchantGt11(player, id, level, _type)
@@ -1295,12 +1358,12 @@ function onEnchantGt11(player, id, level, _type)
             [12] = {9022,1,1, 9021,2,1},
         },
     };
-    sendItemPackageMail(player, "限时强化返礼", "恭喜您获得了限时强化返礼。[4:"..id.."] "..level.."级", items[_type][level]);
+    sendItemPackageMail(player, msg_47, msg_48 .. "[4:"..id.."] "..level..msg_49, items[_type][level]);
 end
 
 function onTrainFighterAct(player, fgt)
-    local table_items = {0xA000, 1200, 1};
-    sendItemPackageMail(player, '散仙洗橙返利活动', '散仙洗橙返利活动', table_items)
+    local table_items = {30, 6, 1};
+    sendItemPackageMail(player, msg_50, msg_50, table_items)
 end
 
 function onJune(player)
@@ -1314,7 +1377,7 @@ function onJune(player)
     end
 
     if lvl >= 40 and player:GetVar(111) == 0 then
-        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1756,1,1});
+        sendItemPackageMail(player, msg_51, msg_52, {1756,1,1});
         player:SetVar(111, 1)
     end
 end
@@ -1330,9 +1393,9 @@ function onJune1(player)
     end
 
     if lvl >= 40 and player:GetVar(110) == 0 then
-        sendItemPackageMail(player, "儿童节礼包", "恭喜您获得儿童节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9031,1,1});
-        sendItemPackageMail(player, "父亲节礼包", "恭喜您获得父亲节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9032,1,1});
-        sendItemPackageMail(player, "端午节礼包", "恭喜您获得端午节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9033,1,1});
+        sendItemPackageMail(player, msg_53, msg_56, {9031,1,1});
+        sendItemPackageMail(player, msg_54, msg_57, {9032,1,1});
+        sendItemPackageMail(player, msg_55, msg_58, {9033,1,1});
         player:SetVar(110, 1)
     end
 end

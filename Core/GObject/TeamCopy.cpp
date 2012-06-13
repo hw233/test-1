@@ -921,6 +921,7 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
             if (t == 1)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
+            pl->setContinuousRFAward(4);
         }
     }
 

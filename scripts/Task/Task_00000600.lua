@@ -50,20 +50,20 @@ function Task_00000600(npcId)
 		action.m_ActionID = 600
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "僵尸作乱";
+		action.m_ActionMsg = task_msg_1115;
 	elseif task:GetTaskSubmitNpc(600) == npcId then
 		if Task_Submit_00000600() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 600
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "僵尸作乱";
+			action.m_ActionMsg = task_msg_1116;
 		elseif task:HasAcceptedTask(600) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 600
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "僵尸作乱";
+			action.m_ActionMsg = task_msg_1117;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000600_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "自从中原遭遇兵劫，民不聊生，不但有恶人作乱，甚至有些在兵劫中惨遭横死的人执念深重，化为僵尸为恶，近日在成都郊外乱葬岗处有村民发现了一些可怕的僵尸，还希望"..GetPlayerName(GetPlayer()).."去将这些怪物消灭。";
-	action.m_ActionMsg = "几个僵尸不在话下，我去去就回。";
+	action.m_NpcMsg = task_msg_1118..GetPlayerName(GetPlayer())..task_msg_1119;
+	action.m_ActionMsg = task_msg_1120;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000600_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是身手不凡。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1121;
 	action.m_ActionMsg = "";
 	return action;
 end

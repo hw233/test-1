@@ -82,20 +82,20 @@ function Task_00000079(npcId)
 		action.m_ActionID = 79
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "妖化村民";
+		action.m_ActionMsg = task_msg_1760;
 	elseif task:GetTaskSubmitNpc(79) == npcId then
 		if Task_Submit_00000079() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 79
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "妖化村民";
+			action.m_ActionMsg = task_msg_1761;
 		elseif task:HasAcceptedTask(79) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 79
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "妖化村民";
+			action.m_ActionMsg = task_msg_1762;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000079_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "那陈圩请来的妖人姚开江用妖术控制部分村民要打通鱼神洞旧道，这些被妖法控制的人变得力大无穷，全没人性，戴家场的村民肯定不是他们的对手。";
-	action.m_ActionMsg = "这种妖术听起来似乎很厉害。";
+	action.m_NpcMsg = task_msg_1763;
+	action.m_ActionMsg = task_msg_1764;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000079_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "那处旧道就在离鱼神洞不远的一处山坳，你速速赶去将这些妖化的村民们消灭，迟恐有变。";
-	action.m_ActionMsg = "我这就去将他们消灭。";
+	action.m_NpcMsg = task_msg_1765;
+	action.m_ActionMsg = task_msg_1766;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000079_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "那姚开江的妖法厉害，要想个办法对付才好。";
+	action.m_NpcMsg = task_msg_1767;
 	action.m_ActionMsg = "";
 	return action;
 end

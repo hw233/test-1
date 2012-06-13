@@ -50,20 +50,20 @@ function Task_00000639(npcId)
 		action.m_ActionID = 639
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "妖化村民";
+		action.m_ActionMsg = task_msg_1355;
 	elseif task:GetTaskSubmitNpc(639) == npcId then
 		if Task_Submit_00000639() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 639
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "妖化村民";
+			action.m_ActionMsg = task_msg_1356;
 		elseif task:HasAcceptedTask(639) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 639
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "妖化村民";
+			action.m_ActionMsg = task_msg_1357;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000639_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "长沙郊外有一些恶人，受了魔教中人的蛊惑，在长沙为恶，他们请来了一个妖道使用邪法将当地善良的村民转化为凶兽，为恶一方，"..GetPlayerName(GetPlayer()).."你速速去除掉这些妖化村民。";
-	action.m_ActionMsg = "几个邪物不在话下，我去去就回。";
+	action.m_NpcMsg = task_msg_1358..GetPlayerName(GetPlayer())..task_msg_1359;
+	action.m_ActionMsg = task_msg_1360;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000639_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然是身手不凡。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1361;
 	action.m_ActionMsg = "";
 	return action;
 end

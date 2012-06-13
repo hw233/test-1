@@ -82,20 +82,20 @@ function Task_00000103(npcId)
 		action.m_ActionID = 103
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "青牛剑";
+		action.m_ActionMsg = task_msg_480;
 	elseif task:GetTaskSubmitNpc(103) == npcId then
 		if Task_Submit_00000103() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 103
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "青牛剑";
+			action.m_ActionMsg = task_msg_481;
 		elseif task:HasAcceptedTask(103) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 103
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "青牛剑";
+			action.m_ActionMsg = task_msg_482;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000103_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这青牛剑我一共炼制了七把，尚未见血，"..GetPlayerName(GetPlayer()).."这柄青牛剑我就赠送与你，拿去助那金针圣母兵解吧，虽然她当年玄女针毒辣异常，但也罪不当绝。";
-	action.m_ActionMsg = "多谢前辈赐剑。";
+	action.m_NpcMsg = task_msg_483..GetPlayerName(GetPlayer())..task_msg_484;
+	action.m_ActionMsg = task_msg_485;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000103_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠，有青牛剑助我兵解，我总算可以避开此次劫难了。";
+	action.m_NpcMsg = task_msg_486;
 	action.m_ActionMsg = "";
 	return action;
 end

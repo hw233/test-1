@@ -82,20 +82,20 @@ function Task_00000017(npcId)
 		action.m_ActionID = 17
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "救命灵药";
+		action.m_ActionMsg = task_msg_7;
 	elseif task:GetTaskSubmitNpc(17) == npcId then
 		if Task_Submit_00000017() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 17
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "救命灵药";
+			action.m_ActionMsg = task_msg_8;
 		elseif task:HasAcceptedTask(17) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 17
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "救命灵药";
+			action.m_ActionMsg = task_msg_9;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000017_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这附近有一座云灵山，山中有一只蛇妖为祸，我和大师正着手准备除掉蛇咬，脱不开身。我那徒儿施林方才探查蛇妖洞穴误中毒雾，正好少侠你可以为我送解毒药给他，就在郊外的农家茅屋处。";
-	action.m_ActionMsg = "李前辈，我这就赶去。";
+	action.m_NpcMsg = task_msg_10;
+	action.m_ActionMsg = task_msg_11;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000017_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."真是太感谢你了，这蛇妖的毒雾好生厉害。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_12;
 	action.m_ActionMsg = "";
 	return action;
 end

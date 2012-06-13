@@ -82,20 +82,20 @@ function Task_00000083(npcId)
 		action.m_ActionID = 83
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "书生的难题";
+		action.m_ActionMsg = task_msg_345;
 	elseif task:GetTaskSubmitNpc(83) == npcId then
 		if Task_Submit_00000083() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 83
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "书生的难题";
+			action.m_ActionMsg = task_msg_346;
 		elseif task:HasAcceptedTask(83) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 83
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "书生的难题";
+			action.m_ActionMsg = task_msg_347;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000083_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎……看你们剑仙一流高来高去，我心里好是羡慕。昨天凌浑前辈欲收我为徒，可是却给我出了个难题，让我给他带来青螺，魔宫里六魔厉吼的首级，这叫我怎么办是好，少侠不如你帮帮我吧。";
-	action.m_ActionMsg = "俞公子，你就放心吧，我一定给你带来他的首级。";
+	action.m_NpcMsg = task_msg_348;
+	action.m_ActionMsg = task_msg_349;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000083_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎，这些邪派的妖人，我一个凡俗之人怎么能对付的了，真亏"..GetPlayerName(GetPlayer()).."你帮忙了。";
+	action.m_NpcMsg = task_msg_350..GetPlayerName(GetPlayer())..task_msg_351;
 	action.m_ActionMsg = "";
 	return action;
 end

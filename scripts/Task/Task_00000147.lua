@@ -82,20 +82,20 @@ function Task_00000147(npcId)
 		action.m_ActionID = 147
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "极恶穷奇";
+		action.m_ActionMsg = task_msg_1964;
 	elseif task:GetTaskSubmitNpc(147) == npcId then
 		if Task_Submit_00000147() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 147
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "极恶穷奇";
+			action.m_ActionMsg = task_msg_1965;
 		elseif task:HasAcceptedTask(147) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 147
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "极恶穷奇";
+			action.m_ActionMsg = task_msg_1966;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000147_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这穷奇原是四凶之一，与无华氏父子争斗，由此相识狼狈为奸，又破了昔年白阳真人禁制三尸墓的禁法，从此更是嚣张，不过这穷奇乃是四凶之一，颇有些本领，少侠你须得小心应付才是。";
-	action.m_ActionMsg = "管他什么妖魔鬼怪，我只凭手中飞剑，自叫他有来无回。";
+	action.m_NpcMsg = task_msg_1967;
+	action.m_ActionMsg = task_msg_1968;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000147_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，少侠真是剑术高强，一身正气啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1969;
 	action.m_ActionMsg = "";
 	return action;
 end
