@@ -280,7 +280,7 @@ void SecondSoul::insertIntoDB()
 {
     std::string str;
     vector2string(m_skills, m_skills.size(), str);
-    DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %"I64_FMT"u, %u, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, m_xinxiu, str.c_str());
+    DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %"I64_FMT"u, %u, 0, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, str.c_str());
 }
 
 void SecondSoul::sendInfo(Player* pl)
@@ -319,8 +319,7 @@ void SecondSoul::sendSoulSkill(Player* pl)
 
 bool SecondSoul::setClass(UInt8 cls)
 {
-    const UInt8 cls_mod[13] = {0, 1, 2, 3, 1, 1, 1, 2, 2, 2, 3, 3, 3};
-    if(cls == 0 || cls == m_cls || cls > 12 || cls_mod[cls] != cls_mod[m_cls])
+    if(cls == 0 || cls == m_cls || cls > 12)
     {
         m_fgt->getOwner()->sendMsgCode(0, 1073);
         return false;
@@ -373,7 +372,7 @@ bool SecondSoul::setXinxiu(UInt8 xinxiu)
 {
     if(xinxiu == 0 || xinxiu == m_xinxiu || xinxiu > 4)
     {
-        m_fgt->getOwner()->sendMsgCode(0, 1073);
+        m_fgt->getOwner()->sendMsgCode(0, 1079);
         return false;
     }
 
@@ -386,7 +385,7 @@ bool SecondSoul::setXinxiu(UInt8 xinxiu)
     m_xinxiu_defend = Script::BattleFormula::getCurrent()->calcSoulXinxiuDefend(this);
     m_xinxiu_hp = Script::BattleFormula::getCurrent()->calcSoulXinxiuHp(this);
     m_fgt->setDirty(true);
-    m_fgt->getOwner()->sendMsgCode(0, 1074);
+    m_fgt->getOwner()->sendMsgCode(0, 1078);
 }
 
 }

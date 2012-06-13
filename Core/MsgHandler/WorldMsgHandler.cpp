@@ -60,6 +60,8 @@ MSG_REG_2(ArenaMsgHdr, 0x102, OnPlayerEntered);
 MSG_REG_2(ArenaMsgHdr, 0x103, OnLineupCommited);
 MSG_REG_2(ArenaMsgHdr, 0x104, OnArenaPriliminary);
 MSG_REG_2(ArenaMsgHdr, 0x105, OnPriliminaryInfo);
+MSG_REG_2(ArenaMsgHdr, 0x106, OnArenaBattleReport);
+MSG_REG_2(ArenaMsgHdr, 0x107, OnArenaSupport);
 
 MSG_REG_2(GameMsgHdr, 0x160, OnClanChatReq);
 

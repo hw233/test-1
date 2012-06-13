@@ -43,7 +43,7 @@ namespace Network
 	{
 		friend class TcpMasterServer;
 	public:
-		TcpSlaveServer(UInt32 idx): TcpServer(), _slave_idx(idx), _connConduit(NULL), _count(0), _evOp(NULL), _evTick(NULL) { for(int i = 0; i < TCP_CONN_IDX_MAX; ++ i) _connUp[i] = -1; }
+		TcpSlaveServer(UInt32 idx): TcpServer(), _slave_idx(idx), _count(0), _evOp(NULL), _evTick(NULL) { for(int i = 0; i < TCP_CONN_IDX_MAX; ++ i) _connUp[i] = -1; }
 		void initConnection(int = 1);
 		void lostConnection(int = 1);
 		void accepted(int);
@@ -76,7 +76,7 @@ namespace Network
 	protected:
 		UInt32 _slave_idx;
 
-        TcpConduit* _connConduit;
+        //TcpConduit* _connConduit;
 		_ConduitList _conduits;
 		std::set<size_t> _emptySet;
 

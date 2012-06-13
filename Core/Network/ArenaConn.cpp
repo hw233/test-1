@@ -29,9 +29,11 @@ void ArenaConn::initConnection()
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(ResolveAddress(cfg.arenaHost.c_str()));
 	addr.sin_port = htons(cfg.arenaPort);
-	if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    int n = bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr));
+	//if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+	if(n < 0)
 		throw std::bad_exception();
-	Stream st(0x01, 0xEF);
+	Stream st(ARENAREQ::REG, 0xEF);
 	st << cfg.slugName << cfg.channelNum << cfg.serverNum << cfg.merged;
     if (cfg.merged)
     {

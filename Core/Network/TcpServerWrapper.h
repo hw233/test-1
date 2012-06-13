@@ -33,12 +33,16 @@ namespace Network
 		TcpSlaveWrapper(UInt32 idx): TcpSlaveServerT<GameClient>(idx) {}
 		virtual TcpConduit * newConnection(int ss, TcpSlaveServer * s, int id)
 		{
+            int sock = -1;
 			switch(ss)
 			{
 			case -1:
 				if(!ArenaConn::enabled())
 					return NULL;
-				return new(std::nothrow) ArenaConn(-1, s, id);
+                sock = socket( AF_INET, SOCK_STREAM, 0 );
+                if(sock < 0)
+                    return NULL;
+				return new(std::nothrow) ArenaConn(sock, s, id);
 			default:
 				return NULL;
 			}

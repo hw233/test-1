@@ -116,7 +116,7 @@ void TcpSlaveServer::remove( int id )
 
 void TcpSlaveServer::_accepted( int ss )
 {
-	TcpConduit * conduit;
+	TcpConduit * conduit = NULL;
 	_mutex.lock();
 	while(!_emptySet.empty())
 	{
@@ -129,17 +129,14 @@ void TcpSlaveServer::_accepted( int ss )
 				if(ss < 0)
 				{
 					try {
-                        if(_connConduit == NULL)
-                        {
-                            conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
-                            _connConduit = conduit;
-                        }
-                        else
-                            conduit = _connConduit;
+                        conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
+
                         if(conduit)
                             conduit->initConnection();
 					} catch(...)
 					{
+                        if(conduit)
+                            delete conduit;
 						conduit = NULL;
 					}
 				}
@@ -181,17 +178,13 @@ void TcpSlaveServer::_accepted( int ss )
 		if(ss < 0)
 		{
 			try {
-                if(_connConduit == NULL)
-                {
-                    conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
-                    _connConduit = conduit;
-                }
-                else
-                    conduit = _connConduit;
+                conduit = newConnection(ss, this, id * WORKERS + _slave_idx);
                 if(conduit)
                     conduit->initConnection();
 			} catch(...)
 			{
+                if(conduit)
+                    delete conduit;
 				conduit = NULL;
 			}
 		}

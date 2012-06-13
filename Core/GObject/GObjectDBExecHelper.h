@@ -367,6 +367,7 @@ struct DBFighter2
     UInt16 attrValue3;
 	UInt32 fighterId;
 	UInt8 cls;
+	UInt8 xinxiu;
 	UInt8 practiceLevel;
 	UInt8 stateLevel;
 	UInt32 stateExp;
@@ -1309,7 +1310,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(43)
+SPECIALDEF(44)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1344,6 +1345,7 @@ SPECIALDEF(43)
     UInt16, attrValue3,
 	UInt32, fighterId,
 	UInt8, cls,
+	UInt8, xinxiu,
 	UInt8, practiceLevel,
 	UInt8, stateLevel,
 	UInt32, stateExp,

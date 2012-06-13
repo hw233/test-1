@@ -1278,7 +1278,7 @@ namespace GObject
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1317,7 +1317,7 @@ namespace GObject
 
             if(specfgtobj.fighterId != 0 && specfgtobj.level >= 60)
             {
-                SecondSoul* secondSoul = new SecondSoul(fgt2, specfgtobj.cls, specfgtobj.practiceLevel, specfgtobj.stateExp, specfgtobj.stateLevel);
+                SecondSoul* secondSoul = new SecondSoul(fgt2, specfgtobj.cls, specfgtobj.practiceLevel, specfgtobj.stateExp, specfgtobj.stateLevel, specfgtobj.xinxiu);
                 StringTokenizer tokenizer(specfgtobj.skills_2nd, ",");
                 int idx = 0;
                 for(size_t j = 0; j < tokenizer.count(); ++ j)
@@ -4164,7 +4164,7 @@ namespace GObject
                 continue;
             }
 
-            SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.xinxiu, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel);
+            SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel, dbss.xinxiu);
             StringTokenizer tokenizer(dbss.skills, ",");
             int idx = 0;
             for(size_t j = 0; j < tokenizer.count(); ++ j)

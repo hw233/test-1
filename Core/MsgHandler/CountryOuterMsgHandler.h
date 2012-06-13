@@ -56,6 +56,7 @@
 #include "GObject/ShuoShuo.h"
 #include "GObject/CFriend.h"
 #include "GObject/TownDeamon.h"
+#include "GObject/Arena.h"
 
 struct NullReq
 {
@@ -1136,6 +1137,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     {
         worldBoss.sendBossInfo(pl);
+    }
+
+    {
+        GObject::arena.sendActive(pl);
     }
 }
 

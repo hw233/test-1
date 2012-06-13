@@ -265,7 +265,7 @@ struct ArenaInfoReq
 {
 	UInt8 type;
 	UInt8 flag;
-	MESSAGE_DEF(REQ::SERVER_ARENA_INFO);
+	MESSAGE_DEF2(REQ::SERVER_ARENA_INFO, UInt8, type, UInt8, flag);
 };
 
 struct ArenaEliminationReq
@@ -1399,20 +1399,18 @@ void OnArenaPriliminary( ArenaMsgHdr& hdr, const void * data )
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
 	UInt64 playerId = 0;
 	UInt8 won = 0;
-	UInt8 color;
+	UInt8 type = 0;
+	UInt8 heroId = 0;
 	std::string name;
 	UInt32 btime;
 	UInt32 bid;
-	br >> playerId >> won >> color >> name >> btime >> bid;
-	float rate = 0.0f;
-	if(won == 2)
-		br >> rate;
+	br >> playerId >> won >> type >> heroId >> name >> btime >> bid;
 	GObject::Player * player = GObject::globalPlayers[playerId];
 	if(player == NULL)
 		return;
-	GObject::arena.pushPriliminary(player, won, color, name, btime, bid, rate);
+	GObject::arena.pushPriliminary(player, won, type, heroId, name, btime, bid);
 	Stream st(REP::ARENAPRILIMINARY);
-	st << static_cast<UInt8>(1) << won << color << name << btime << bid << Stream::eos;
+	st << static_cast<UInt8>(1) << won << type << heroId << name << btime << bid << Stream::eos;
 	player->send(st);
 }
 
@@ -1422,6 +1420,34 @@ void OnPriliminaryInfo( ArenaMsgHdr& hdr, const void * data )
 	UInt32 r[3] = {0};
 	br >> r[0] >> r[1] >> r[2];
 	GObject::arena.pushPriliminaryCount(r);
+}
+
+void OnArenaBattleReport( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt64 pid = 0;
+    br >> pid;
+    Stream st;
+    std::vector<UInt8> buf;
+    buf.resize(br.size()-8);
+    br >> buf;
+    st << buf;
+    st << Stream::eos;
+
+	GObject::Player * player = GObject::globalPlayers[pid];
+    if(player == NULL)
+        return;
+	player->send(&(st[0]), st.size());
+}
+
+void OnArenaSupport( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 flag = 0;
+    UInt16 pos = 0;
+    br >> type >> flag >> pos;
+    GObject::arena.updateSuport(type, flag, pos);
 }
 
 void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
@@ -1437,7 +1463,7 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
         break;
     case 2:
     case 3:
-        GObject::arena.sendPreliminary(player, air.flag);
+        GObject::arena.sendPreliminary(player, air.type-2, air.flag);
         break;
     case 4:
     case 5:
@@ -1465,9 +1491,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 	{
 	case 0:
 		{
-			Stream st(REP::SERVER_ARENA_OP);
-			st << type << static_cast<UInt8>(GObject::arena.active() ? 1 : 0) << Stream::eos;
-			player->send(st);
+            GObject::arena.sendActive(player);
 		}
 		break;
 	case 1:
@@ -1488,22 +1512,11 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 		break;
 	case 3:
 		{
-			Stream st(REP::SERVER_ARENA_OP);
-			UInt32 pc[3];
-			GObject::arena.getPlayerCount(pc);
-			st << type << pc[0] << pc[1] << pc[2] << Stream::eos;
-			player->send(st);
-		}
-		break;
-	case 4:
-		{
-			UInt8 group = 0;
-			UInt8 pos1 = 0, pos2 = 0;
-			brd >> group >> pos1 >> pos2;
-			Stream st(REP::SERVER_ARENA_OP);
-			st << type << group << pos1 << pos2 << Stream::eos;
-//GObject::arena.getBetCount(group - 1, pos1) << GObject::arena.getBetCount(group - 1, pos2) << 
-			player->send(st);
+            UInt32 battleId = 0;
+            brd >> battleId;
+            Stream st(ARENAREQ::BATTLE_REPORT, 0xEF);
+            st << player->getId() << battleId << Stream::eos;
+            NETWORK()->SendToArena(st);
 		}
 		break;
 	}

@@ -13,7 +13,8 @@ class ItemEquip;
 struct PriliminaryBattle
 {
 	UInt8 won;
-	UInt8 otherColor;
+	UInt8 type;
+	UInt8 otherHeroId;
 	std::string otherName;
 	UInt32 battleTime;
 	UInt32 battleId;
@@ -40,6 +41,7 @@ struct PreliminaryPlayer
 {
 	UInt64 id;
     UInt8 level;
+    UInt8 heroId;
     UInt32 battlePoint;
     UInt32 support;
     std::string name;
@@ -54,6 +56,7 @@ struct EliminationPlayer
 {
 	UInt64 id;
 	UInt8 level;
+	UInt8 heroId;
     UInt32 battlePoint;
     UInt32 support;
 	std::string name;
@@ -92,19 +95,24 @@ public:
 	void sendInfo(Player * player);
 	void sendElimination(Player * player, UInt8);
 	void push(Player * player, UInt8, const std::string&);
-	void pushPriliminary(Player * player, UInt8, UInt8, const std::string&, UInt32, UInt32, float);
+	void pushPriliminary(Player * player, UInt8, UInt8, UInt8, const std::string&, UInt32, UInt32);
 	void pushBetFromDB(Player * player, UInt8, UInt8, UInt16, UInt8);
 	void pushPriliminaryCount(UInt32 *);
 	void check();
 
     void readPlayers(BinaryReader& brd);
+    void readPrePlayers(BinaryReader& brd);
     void readHistories(BinaryReader& brd);
     void readElimination(BinaryReader& brd);
     void calcFinalBet(int i);
 
+    void sendActive(Player* pl);
     void sendStatus(Player* pl);
     void sendEnter(Player* pl);
-    void sendPreliminary(Player* pl, UInt8 flag);
+    void sendPreliminary(Player* pl, UInt8 type, UInt8 flag);
+
+    void updateSuport(UInt8 type, UInt8 flag, UInt16 pos);
+
 private:
 	static void appendLineup( Stream& st, Player * player);
 	static void appendEquipInfo( Stream& st, ItemEquip * equip );
@@ -135,7 +143,7 @@ private:
     EliminationPlayer _finals[2][32];
 	UInt64 _finalIdx[2][6][32];
 	EliminationBattle _finalBattles[2][31];
-    std::map<UInt64, PreliminaryPlayer> _preliminaryPlayers;
+    std::map<UInt64, PreliminaryPlayer> _preliminaryPlayers[2];
 };
 
 extern Arena arena;
