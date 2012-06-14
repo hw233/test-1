@@ -1415,7 +1415,6 @@ function sendRNR(player, off, date, total)
 
     local rorate = {[0]=50,[1]=30,[2]=20,}
     local ror = rorate[off]
-    print('rorate: ' .. ror)
     if ror == nil then
         return
     end
@@ -1431,24 +1430,21 @@ function sendRNR(player, off, date, total)
         end
     end
 
-    print('i: ' .. i)
     if i == 0 then
         return
     end
 
     local r = rate[i]
-    print('r: ' .. r)
     if r == nil then
         return
     end
 
     local f = math.floor(total * (r/100) * (rorate[0]/100))
     local s = math.floor(total * (r/100) * (rorate[1]/100))
-    local t = total * (r/100) - (f + s)
+    local t = math.ceil(total * (r/100)) - (f + s)
     local ms = {f, s, t}
 
     local m = ms[off+1]
-    print('m: ' .. m)
     if m == nil then
         return
     end
