@@ -712,7 +712,7 @@ namespace GObject
         if (lvl < 1)
             return 0;
         if (lvl > sizeof(recharge)/sizeof(UInt32))
-            lvl = 15;
+            lvl = sizeof(recharge)/sizeof(UInt32);
         return recharge[lvl-1];
     }
 
@@ -7102,7 +7102,7 @@ namespace GObject
 		for(UInt32 j = l; j <= h; ++j)
 		{
 			SYSMSGV(title, 2320, levelToRecharge(j));
-			SYSMSG(content, 2321);
+			SYSMSGV(content, 2321, levelToRecharge(j));
 			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 			if(mail == NULL)
 				continue;
@@ -7179,9 +7179,9 @@ namespace GObject
                 {516,3,512,2,509,1,0,0,0,0,0,0,0,0},
                 {5065,1,56,5,509,1,0,0,0,0,0,0,0,0},
                 {503,5,56,6,57,2,509,1,0,0,0,0,0,0},
-                {514,2,56,6,57,2,509,2,0,0,0,0,0,0},
-                {514,2,56,6,57,5,509,2,0,0,0,0,0,0},
-                {514,2,56,6,57,6,509,2,0,0,0,0,0,0},
+                {515,2,56,6,57,2,509,2,0,0,0,0,0,0},
+                {515,2,56,6,57,5,509,2,0,0,0,0,0,0},
+                {515,2,56,6,57,6,509,2,0,0,0,0,0,0},
                 {549,2,56,6,57,6,509,2,0,0,0,0,0,0},
                 {515,5,30,10,56,5,57,5,509,3,0,0,0,0},
                 {507,5,509,5,515,5,547,5,0,0,0,0,0,0},
