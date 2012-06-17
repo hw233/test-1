@@ -1327,3 +1327,6 @@ function June(player, lootlvl)
     end
 end
 
+function onRechargeAct(player, total)
+end
+

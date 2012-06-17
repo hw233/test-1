@@ -6006,6 +6006,11 @@ namespace GObject
                 setBuffData(PLAYER_BUFF_YDOTR, 0, true);
         }
 
+#ifdef _FB
+        if (World::IsNewServer())
+            GameAction()->onRechargeAct(this, r);
+#endif
+
         sendTripodInfo();
 	}
 

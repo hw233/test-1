@@ -929,6 +929,11 @@ namespace Script
 		Call<void>("onTrainFighterAct", player, fgt);
 	}
 
+	void GameActionLua::onRechargeAct( Player* player, UInt32 total )
+	{
+		Call<void>("onRechargeAct", player, total);
+	}
+
 	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )
 	{
 		Call<void>("onCopyFloorWin", player, id, floor, spot, lootlvl);
