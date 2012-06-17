@@ -2483,9 +2483,10 @@ void Clan::broadcastMemberInfo( Player * player )
 	broadcastMemberInfo(*((*found)), 1);
 }
 
+#if 0
 void Clan::patchMergedName( UInt32 id, std::string& name )
 {
-	if(cfg.merged && id >= 0x1000000)
+    if(cfg.merged && id >= 0x1000000)
 	{
 		UInt32 sid = (id >> 24) - 1;
 		do
@@ -2497,6 +2498,13 @@ void Clan::patchMergedName( UInt32 id, std::string& name )
 	}
 }
 
+#else
+void Clan::patchMergedName( UInt64 id, std::string& name )
+{
+    if(cfg.merged)
+        Player::patchMergedName(id, name);
+}
+#endif
 float Clan::getClanTechAddon()
 {
     // TODO:
