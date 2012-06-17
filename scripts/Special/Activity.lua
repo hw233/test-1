@@ -959,7 +959,7 @@ function onBlueactiveday(player)
         return
     end
 
-    sendItemPackageMail(player, "在线1小时奖励", "恭喜您在线达一小时，获得以下奖励：自动回血符*1，太乙真金*1，初级打孔石*1，初级挂机加速符*1，初级道法金丹*1，混元离土*2。 \n1月16日-2月6日，每日登陆《蜀山传奇》在线达到一小时都可以获得此奖励。", {9,1,1, 502,1,1, 510,1,1, 55,1,1, 29,1,1, 51,2,1});
+    sendItemPackageMail(player, msg_34, msg_35, {9,1,1, 502,1,1, 510,1,1, 55,1,1, 29,1,1, 51,2,1});
     player:SetVar(45, 1);
 end
 
@@ -974,7 +974,7 @@ function onValentineDay(player)
     end
 
     if lvl >= 30 and player:GetVar(47) == 0 then
-        sendItemPackageMail(player, "情人节套装奖励", "恭喜您，获得情人节活动奖励【恋人之戒】；\n2012/2/11-2/17登陆游戏，并且等级达到30级以上（包含30级）所有用户，都将获得【恋人之戒】", {1754,1,1});
+        sendItemPackageMail(player, msg_36, msg_37, {1754,1,1});
         player:SetVar(47, 1)
     end
 end
@@ -996,10 +996,10 @@ function onFoolsDay(player)
     end
 
     if lvl >= 40 and player:GetVar(58) == 0 then
-        sendItemPackageMail(player, "【愚人节礼包】奖励", "恭喜您获得【愚人节礼包】，4月1日打开有惊喜哦！\n等级≥40级所有玩家，在3/29-4/1每日登陆游戏就可以获得一个【愚人节礼包】", {479,1,1});
+        sendItemPackageMail(player, msg_38, msg_39, {479,1,1});
         local date = os.date("%m%d", os.time())
         if date == "0401" then
-            sendItemPackageMail(player, "【愚人节卡片】奖励", "恭喜您获得【愚人节卡片】*5，使用卡片会有惊喜哦！\n等级≥40级所有玩家，在4月1日登陆游戏就可以获得【愚人节卡片】*5", {480,5,1});
+            sendItemPackageMail(player, msg_40, msg_41, {480,5,1});
         end
         player:SetVar(58, 1)
     end
@@ -1016,7 +1016,7 @@ function onMayDay(player)
     end
 
     if lvl >= 40 and player:GetVar(94) == 0 then
-        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1755,1,1});
+        sendItemPackageMail(player, msg_42, msg_43, {1755,1,1});
         player:SetVar(94, 1)
     end
 end
@@ -1032,12 +1032,12 @@ function onMayDay1(player)
     end
 
     if lvl >= 40 and player:GetVar(95) == 0 then
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9001,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9002,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9003,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9004,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9005,1,1});
-        sendItemPackageMail(player, "五月节日惊喜礼包", "恭喜您获得五月节日惊喜礼包，礼包在相应的日期时间可以获得双倍奖励哦！", {9006,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9001,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9002,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9003,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9004,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9005,1,1});
+        sendItemPackageMail(player, msg_44, msg_45, {9006,1,1});
         player:SetVar(95, 1)
     end
 end
@@ -1135,6 +1135,47 @@ function onCLLoginReward(player, cts)
         end
         player:getCoupon(coupon[cts]);
     end
+end
+
+function onCLLoginRewardRF(player, cts, _type)
+    if isFBVersion() then
+        if cts == 0 then
+            player:getCoupon(10)
+            return 0
+        end
+    else
+        if _type == 1 then -- XXX: 走0x13了
+            local items = {515,503,507,56,57,509}
+            local prob = {379,1895,2400,5768,9558,10000}
+            local p = math.random(1,10000)
+            local i = 1
+            for n = 1,#prob do
+                if p <= prob[n] then
+                    i = n
+                    break
+                end
+            end
+            return items[i]
+        elseif _type == 2 then
+            local coupon = {10,10,10,10,10,10,10}
+            if cts > 7 then
+                return 0
+            end
+            player:getCoupon(coupon[cts]);
+        elseif _type == 3 then
+            if cts >= 3 then
+                local package = player:GetPackage()
+                if package:IsFull() then
+                    return 0
+                end
+
+                package:Add(9036, 1, 1)
+                return 1
+            end
+        elseif _type == 4 then
+        end
+    end
+    return 0
 end
 
 function onCL3DayReward(player)
@@ -1244,6 +1285,54 @@ function onTurnOnRC7Day(player, total, offset)
     return true
 end
 
+function onTurnOnRF7Day(player, total, offset)
+    local items = {
+        {{56,1},{57,1}},
+        {{56,2},{57,2},{15,1}},
+        {{56,3},{57,3},{15,2}},
+        {{56,4},{57,4},{15,3},{503,1}},
+        {{56,5},{57,5},{15,4},{503,2}},
+        {{56,6},{57,6},{15,5},{503,3},{516,1}},
+        {{56,7},{57,7},{15,6},{503,4},{516,2}},
+    }
+
+    if offset + 1 > #items then
+        return false
+    end
+
+    local totals = {10,50,100,300,500,700,1000}
+
+    local max = 0
+    for n = 1, #totals do
+        if total >= totals[n] then
+            max = n
+        else
+            break
+        end
+    end
+
+    if max == 0 then
+        return false
+    end
+
+    if offset >= max then
+        return false
+    end
+
+    local item = items[offset + 1]
+    local package = player:GetPackage()
+    if package:GetRestPackageSize() < #item then
+        player:sendMsgCode(2, 1011, 0)
+        return false
+    end
+
+    for k,v in pairs(item) do
+        package:Add(v[1], v[2], 1)
+    end
+
+    return true
+end
+
 function onEnchantAct(player, level)
     local pic = {1416, 1417, 1418, 1419, 1420};
     local rand = math.random(1, #pic);
@@ -1255,7 +1344,7 @@ function onEnchantAct(player, level)
         [8] = {509,5,1, pic[rand],1,1, 30,1,1},
         [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
     };
-    sendItemPackageMail(player, "装备强化返利第二期活动", "装备强化返利第二期活动", items[level]);
+    sendItemPackageMail(player, msg_46, msg_46, items[level]);
 end
 
 function onEnchantGt11(player, id, level, _type)
@@ -1269,12 +1358,12 @@ function onEnchantGt11(player, id, level, _type)
             [12] = {9022,1,1, 9021,2,1},
         },
     };
-    sendItemPackageMail(player, "限时强化返礼", "恭喜您获得了限时强化返礼。[4:"..id.."] "..level.."级", items[_type][level]);
+    sendItemPackageMail(player, msg_47, msg_48 .. "[4:"..id.."] "..level..msg_49, items[_type][level]);
 end
 
 function onTrainFighterAct(player, fgt)
     local table_items = {30, 6, 1};
-    sendItemPackageMail(player, '散仙洗练返修为活动', '散仙洗练返修为活动', table_items)
+    sendItemPackageMail(player, msg_50, msg_50, table_items)
 end
 
 function onJune(player)
@@ -1288,7 +1377,7 @@ function onJune(player)
     end
 
     if lvl >= 40 and player:GetVar(111) == 0 then
-        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1756,1,1});
+        sendItemPackageMail(player, msg_51, msg_52, {1756,1,1});
         player:SetVar(111, 1)
     end
 end
@@ -1304,9 +1393,9 @@ function onJune1(player)
     end
 
     if lvl >= 40 and player:GetVar(110) == 0 then
-        sendItemPackageMail(player, "儿童节礼包", "恭喜您获得儿童节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9031,1,1});
-        sendItemPackageMail(player, "父亲节礼包", "恭喜您获得父亲节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9032,1,1});
-        sendItemPackageMail(player, "端午节礼包", "恭喜您获得端午节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9033,1,1});
+        sendItemPackageMail(player, msg_53, msg_56, {9031,1,1});
+        sendItemPackageMail(player, msg_54, msg_57, {9032,1,1});
+        sendItemPackageMail(player, msg_55, msg_58, {9033,1,1});
         player:SetVar(110, 1)
     end
 end
