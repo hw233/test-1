@@ -3,6 +3,7 @@
 
 #include "Item.h"
 #include "GData/GDataManager.h"
+#include "GObject/GGlobalObjectManager.h"
 #include "Common/URandom.h"
 
 namespace GObject
@@ -198,6 +199,8 @@ namespace GObject
         void AttachSpirit(UInt8 type, UInt16 fighterId, UInt32 itemId);
         static void GenSpirit(ItemEquip* equip);
         static void GenSpirit2(ItemEquip* equip);
+
+        void enumerate(Visitor<ItemBase>& visitor);
 	private:
 		enum {ItemClassSize = Item_Weapon + 1};
 

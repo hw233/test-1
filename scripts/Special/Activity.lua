@@ -1284,6 +1284,20 @@ function onEnchantAct(player, level)
     sendItemPackageMail(player, "装备强化返利活动", "装备强化返利活动", items[level]);
 end
 
+function onEnchantGt11(player, id, level, _type)
+    local items = {
+        [1] = {
+            [11] = {9022,2,1, 9021,2,1},
+            [12] = {9022,3,1, 9021,3,1},
+        },
+        [2] = {
+            [11] = {9022,1,1, 9021,1,1},
+            [12] = {9022,1,1, 9021,2,1},
+        },
+    };
+    sendItemPackageMail(player, "限时强化返礼", "恭喜您获得了限时强化返礼。[4:"..id.."] "..level.."级", items[_type][level]);
+end
+
 function onTrainFighterAct(player, fgt)
     local table_items = {0xA000, 1200, 1};
     sendItemPackageMail(player, '散仙洗橙返利活动', '散仙洗橙返利活动', table_items)

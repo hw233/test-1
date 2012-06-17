@@ -692,16 +692,19 @@ namespace GObject
     //2012年3月份充值活动额度
     //static UInt32 recharge[] = {199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999,};
     //2012年5月16充值活动额度
-    static UInt32 recharge[] = {199,399,599,799,999,1499,1999,3999,5999,7999,9999,19999,29999,39999,49999};
-    UInt8 Player::calcRechargeLevel(UInt32 total)
+    //static UInt32 recharge[] = {199,399,599,799,999,1499,1999,3999,5999,7999,9999,19999,29999,39999,49999};
+    static UInt32 recharge[] = {99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,99999,};
+
+    UInt8 Player::calcRechargeLevel(UInt32 total, UInt8& maxlevel)
     {
         UInt32 totalRecharge = total;
+        maxlevel = sizeof(recharge)/sizeof(UInt32);
         for (UInt8 i = 0; i < sizeof(recharge)/sizeof(UInt32); ++i)
         {
             if (totalRecharge < recharge[i])
                 return i;
         }
-        return 15;
+        return maxlevel;
     }
 
     inline UInt32 levelToRecharge(UInt8 lvl)
@@ -760,6 +763,53 @@ namespace GObject
 		return _clan->getName();
 	}
 
+    void Player::enchantGt11()
+    {
+        struct EnchantGt11 : public Visitor<ItemBase>
+        {
+            EnchantGt11(Player* player) : player(player) {}
+
+            bool operator()(ItemBase* ptr)
+            {
+                if (IsWeapon(ptr->getClass()) || IsArmor(ptr->getClass()))
+                {
+                    ItemEquip* ie = (ItemEquip*)(ptr);
+                    if (ie->getItemEquipData().enchant == 11 || ie->getItemEquipData().enchant == 12)
+                    {
+                        UInt8 type = IsWeapon(ptr->getClass())?1:2;
+                        for (UInt8 l = ie->getItemEquipData().enchant; l >= 11; --l)
+                            GameAction()->onEnchantGt11(player, ie->GetItemType().getId(), l, type);
+                    }
+                }
+                return true;
+            }
+
+            Player* player;
+        } eg(this);
+        GetPackage()->enumerate(eg);
+
+        std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+        for (; it != _fighters.end(); ++it)
+        {
+            Fighter* fgt = it->second;
+            ItemEquip* e[11] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+                fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
+                fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
+
+            for (int i = 0; i < 11; ++i)
+            {
+                if (e[i] && (e[i]->getItemEquipData().enchant == 11 || e[i]->getItemEquipData().enchant == 12))
+                {
+                    UInt8 type = IsWeapon(e[i]->getClass())?1:2;
+                    for (UInt8 l = e[i]->getItemEquipData().enchant; l >= 11; --l)
+                        GameAction()->onEnchantGt11(this, e[i]->GetItemType().getId(), l, type);
+                }
+            }
+        }
+
+        SetVar(VAR_ENCHANTGT11, 1);
+    }
+
 	void Player::Login()
 	{
 		UInt32 curtime = TimeUtil::Now();
@@ -810,6 +860,8 @@ namespace GObject
             GameAction()->onMayDay(this);
         if (World::getMayDay1())
             GameAction()->onMayDay1(this);
+        if (World::getEnchantGt11() && !GetVar(VAR_ENCHANTGT11))
+            enchantGt11();
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -5977,10 +6029,11 @@ namespace GObject
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
-            UInt8 oldVipLevel = calcRechargeLevel(total);
+            UInt8 maxlevel = 0;
+            UInt8 oldVipLevel = calcRechargeLevel(total, maxlevel);
             total += r;
-            UInt8 vipLevel = calcRechargeLevel(total);
-            sendRechargeMails(oldVipLevel + 1, vipLevel);
+            UInt8 vipLevel = calcRechargeLevel(total, maxlevel);
+            sendRechargeMails(oldVipLevel + 1, vipLevel, maxlevel);
             SetVar(VAR_RECHARGE_TOTAL, total);
             sendRechargeInfo();
         }
@@ -7039,12 +7092,12 @@ namespace GObject
 		}
 	}
 
-	void Player::sendRechargeMails( UInt8 l, UInt8 h )
+	void Player::sendRechargeMails( UInt8 l, UInt8 h, UInt8 m )
 	{
 		if(l < 1)
 			l = 1;
-		if(h > 15)
-			h = 15;
+		if(h > m)
+			h = m;
 
 		for(UInt32 j = l; j <= h; ++j)
 		{
@@ -7116,7 +7169,6 @@ namespace GObject
                 {507,10,509,10,515,10,547,5,9016,5,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
-
 #endif
 
 			MailPackage::MailItem mitem[7];

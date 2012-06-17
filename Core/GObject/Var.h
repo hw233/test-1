@@ -152,6 +152,7 @@ namespace GObject
 #if 0
         VAR_OFFLINE_EQUIP = 118, //离线道具
 #endif
+        VAR_ENCHANTGT11 = 119, // 限时强化一次性返还是否返过
         VAR_MAX,
     };
 
@@ -293,6 +294,7 @@ namespace GObject
             REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CLAWARD2, CYCLE_DAY);
+            REGISTER_VAR(VAR_ENCHANTGT11, CYCLE_NONE);
 #if 0
             REGISTER_VAR(VAR_OFFLINE_EQUIP, CYCLE_NONE);
 #endif

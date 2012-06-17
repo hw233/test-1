@@ -208,6 +208,12 @@ function onActivityCheck(tm)
       setJune1(false)
   end
 
+  if tm >= actTime53 and tm < actTime54 then
+      setEnchantGt11(true)
+  else
+      setEnchantGt11(false)
+  end
+
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -345,6 +351,8 @@ function initActTime(y, m, d)
 
   -- 儿童节 (5/28-6/3)(5/28-6/30)
   local  SerStartTm23= { ['year'] = 2012, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 限时强化
+  local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -433,6 +441,9 @@ function initActTime(y, m, d)
 
   actTime51 = os.time(SerStartTm23);
   actTime52 = os.time(SerStartTm23) + 34 * 86400;
+
+  actTime53 = os.time(SerStartTm24);
+  actTime54 = os.time(SerStartTm24) + 12 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
