@@ -9,12 +9,13 @@
 #include "Common/BinaryReader.h"
 
 extern "C" {
-#include "bits.h"
-#include "debug.h"
-#include "printbuf.h"
-#include "json_object.h"
-#include "json_tokener.h"
-#include "json_util.h"
+//#include "bits.h"
+//#include "debug.h"
+//#include "printbuf.h"
+//#include "json_t.h"
+//#include "json_tokener.h"
+//#include "json_util.h"
+#include "../../tools/json-1.4/json.h"
 }
 
 #define SERVICE "OP_SSCQ"
@@ -25,17 +26,13 @@ extern "C" {
 
 #define GET_STRING(obj, key, dst, maxlen) \
 { \
-    struct json_object* val = json_object_object_get(obj, key); \
-    if (val) \
+    json_t* val = json_find_first_label(obj, key); \
+    if (val && val->child && val->child->text) \
     { \
-        const char* str = json_object_get_string(val); \
-        if (str) \
-        { \
-            int len = strlen(str); \
-            if (len > maxlen) \
-                len = maxlen; \
-            memcpy(dst, str, len); \
-        } \
+        int len = strlen(val->child->text); \
+        if (len > maxlen) \
+        len = maxlen; \
+        memcpy(dst, val->child->text, len); \
     } \
 }
 
@@ -52,56 +49,66 @@ struct JsonHead
     char   errmsg[100+1];
 };
 
-bool parseHead(struct json_object* obj, JsonHead* head)
+json_t* my_json_new_number(int number)
+{
+    char buf[1024] = {0};
+    snprintf(buf, sizeof(buf), "%d", number);
+    return json_new_number(buf);
+}
+
+bool parseHead(json_t* obj, JsonHead* head)
 {
     if (!obj || !head)
         return false;
 
-    struct json_object* hdr = json_object_object_get(obj, "head");
+    json_t* hdr = json_find_first_label(obj, "head");
     if (!hdr)
         return false;
+    if (!hdr->child)
+        return false;
 
-    struct json_object* val = json_object_object_get(hdr, "uiPacketLen");
-    if (val)
-        head->length = json_object_get_int(val);
+    hdr = hdr->child;
+    json_t* val = json_find_first_label(hdr, "uiPacketLen");
+    if (val && val->child && val->child->text)
+        head->length = atoi(val->child->text);
 
-    val = json_object_object_get(hdr, "uiCmdid");
-    if (val)
-        head->cmd = json_object_get_int(val);
+    val = json_find_first_label(hdr, "uiCmdid");
+    if (val && val->child && val->child->text)
+        head->cmd = atoi(val->child->text);
 
-    val = json_object_object_get(hdr, "uiSeqid");
-    if (val)
-        head->seqid = json_object_get_int(val);
+    val = json_find_first_label(hdr, "uiSeqid");
+    if (val && val->child && val->child->text)
+        head->seqid = atoi(val->child->text);
 
     GET_STRING(hdr, "szServiceName", head->name, 16);
 
-    val = json_object_object_get(hdr, "uiSendTime");
-    if (val)
-        head->sendTime = json_object_get_int(val);
+    val = json_find_first_label(hdr, "uiSendTime");
+    if (val && val->child && val->child->text)
+        head->sendTime = atoi(val->child->text);
 
-    val = json_object_object_get(hdr, "uiVersion");
-    if (val)
-        head->version = json_object_get_int(val);
+    val = json_find_first_label(hdr, "uiVersion");
+    if (val && val->child && val->child->text)
+        head->version = atoi(val->child->text);
 
     GET_STRING(hdr, "ucAuthenticate", head->auth, 32);
 
     return true;
 }
 
-void fillHead(struct json_object* head, JsonHead* hdr)
+void fillHead(json_t* head, JsonHead* hdr)
 {
-    json_object_object_add(head, "uiPacketLen", json_object_new_int(hdr->length));
-    json_object_object_add(head, "uiCmdid", json_object_new_int(hdr->cmd));
-    json_object_object_add(head, "uiSeqid", json_object_new_int(hdr->seqid));
-    json_object_object_add(head, "szServiceName", json_object_new_string(hdr->name));
-    json_object_object_add(head, "uiSendTime", json_object_new_int(hdr->sendTime));
-    json_object_object_add(head, "uiVersion", json_object_new_int(hdr->version));
-    json_object_object_add(head, "ucAuthenticate", json_object_new_string(hdr->auth));
-    json_object_object_add(head, "iResult", json_object_new_int(hdr->retcode));
-    json_object_object_add(head, "szRetErrMsg", json_object_new_string(hdr->errmsg));
+    json_insert_pair_into_object(head, "uiPacketLen", my_json_new_number(hdr->length));
+    json_insert_pair_into_object(head, "uiCmdid", my_json_new_number(hdr->cmd));
+    json_insert_pair_into_object(head, "uiSeqid", my_json_new_number(hdr->seqid));
+    json_insert_pair_into_object(head, "szServiceName", json_new_string(hdr->name));
+    json_insert_pair_into_object(head, "uiSendTime", my_json_new_number(hdr->sendTime));
+    json_insert_pair_into_object(head, "uiVersion", my_json_new_number(hdr->version));
+    json_insert_pair_into_object(head, "ucAuthenticate", json_new_string(hdr->auth));
+    json_insert_pair_into_object(head, "iResult", my_json_new_number(hdr->retcode));
+    json_insert_pair_into_object(head, "szRetErrMsg", json_new_string(hdr->errmsg));
 }
 
-int query_rolelist_req(JsonHead* head, struct json_object* body, struct json_object* retbody, std::string& err)
+int query_rolelist_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
         return EUNKNOW;
@@ -111,11 +118,15 @@ int query_rolelist_req(JsonHead* head, struct json_object* body, struct json_obj
     UInt32 areaid = 0;
     UInt64 playerid = 0;
 
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
     GET_STRING(body, "szOpenId", openid, 36);
     GET_STRING(body, "playerId", playerId, 32);
-    struct json_object* val = json_object_object_get(body, "uiAreaId");
-    if (val)
-        areaid = json_object_get_int(val);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
 
     playerid = atoll(playerId);
     GObject::Player* player = GObject::globalPlayers[playerid];
@@ -125,14 +136,14 @@ int query_rolelist_req(JsonHead* head, struct json_object* body, struct json_obj
         return EPLAYER_NOT_EXIST;
     }
 
-    json_object_object_add(retbody, "ullRoleId", json_object_new_string(playerId));
-    json_object_object_add(retbody, "szRoleName", json_object_new_string(player->getName().c_str()));
+    json_insert_pair_into_object(retbody, "ullRoleId", json_new_string(playerId));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(player->getName().c_str()));
 
     head->cmd = 2;
     return 0;
 }
 
-int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json_object* retbody, std::string& err)
+int query_rolebaseinfo_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
         return EUNKNOW;
@@ -142,11 +153,15 @@ int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json
     UInt32 areaid = 0;
     UInt64 playerid = 0;
 
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
     GET_STRING(body, "szOpenId", openid, 36);
     GET_STRING(body, "playerId", playerId, 32);
-    struct json_object* val = json_object_object_get(body, "uiAreaId");
-    if (val)
-        areaid = json_object_get_int(val);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
 
     playerid = atoll(playerId);
     GObject::Player* player = GObject::globalPlayers[playerid];
@@ -156,28 +171,28 @@ int query_rolebaseinfo_req(JsonHead* head, struct json_object* body, struct json
         return EPLAYER_NOT_EXIST;
     }
 
-    json_object_object_add(retbody, "szRoleName", json_object_new_string(player->getName().c_str()));
-    json_object_object_add(retbody, "ucGender", json_object_new_int(player->IsMale()?1:2));
+    json_insert_pair_into_object(retbody, "szRoleName", json_new_string(player->getName().c_str()));
+    json_insert_pair_into_object(retbody, "ucGender", my_json_new_number(player->IsMale()?1:2));
     char title[32] = {0};
     snprintf(title, sizeof(title), "%u", player->getTitle());
-    json_object_object_add(retbody, "szCharTitle", json_object_new_string(title));
-    json_object_object_add(retbody, "ucJob", json_object_new_int(player->GetClass()));
-    json_object_object_add(retbody, "ucNation", json_object_new_int(player->getCountry()));
-    json_object_object_add(retbody, "uiCurHP", json_object_new_int(player->getMainHP()));
-    json_object_object_add(retbody, "uiQuality", json_object_new_int(player->getMainPExp()));
-    json_object_object_add(retbody, "uiReputation", json_object_new_int(0));
-    json_object_object_add(retbody, "uiMoney", json_object_new_int(player->getGold()));
-    json_object_object_add(retbody, "uiGold", json_object_new_int(player->getTael()));
-    json_object_object_add(retbody, "usLevel", json_object_new_int(player->GetLev()));
-    json_object_object_add(retbody, "usVip", json_object_new_int(player->getVipLevel()));
-    json_object_object_add(retbody, "uiRegisterTime", json_object_new_int(player->getCreated()));
-    json_object_object_add(retbody, "uiLastLoginTime", json_object_new_int(player->getLastOnline()));
+    json_insert_pair_into_object(retbody, "szCharTitle", json_new_string(title));
+    json_insert_pair_into_object(retbody, "ucJob", my_json_new_number(player->GetClass()));
+    json_insert_pair_into_object(retbody, "ucNation", my_json_new_number(player->getCountry()));
+    json_insert_pair_into_object(retbody, "uiCurHP", my_json_new_number(player->getMainHP()));
+    json_insert_pair_into_object(retbody, "uiQuality", my_json_new_number(player->getMainPExp()));
+    json_insert_pair_into_object(retbody, "uiReputation", my_json_new_number(0));
+    json_insert_pair_into_object(retbody, "uiMoney", my_json_new_number(player->getGold()));
+    json_insert_pair_into_object(retbody, "uiGold", my_json_new_number(player->getTael()));
+    json_insert_pair_into_object(retbody, "usLevel", my_json_new_number(player->GetLev()));
+    json_insert_pair_into_object(retbody, "usVip", my_json_new_number(player->getVipLevel()));
+    json_insert_pair_into_object(retbody, "uiRegisterTime", my_json_new_number(player->getCreated()));
+    json_insert_pair_into_object(retbody, "uiLastLoginTime", my_json_new_number(player->getLastOnline()));
 
     head->cmd = 4;
     return 0;
 }
 
-int add_playeritem_req(JsonHead* head, struct json_object* body, struct json_object* retbody, std::string& err)
+int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::string& err)
 {
     if (!head || !body || !retbody)
         return EUNKNOW;
@@ -189,19 +204,23 @@ int add_playeritem_req(JsonHead* head, struct json_object* body, struct json_obj
     UInt32 itemid = 0;
     Int32 inum = 0;
 
+    body = body->child;
+    if (!body)
+        return EUNKNOW;
+
     GET_STRING(body, "szOpenId", openid, 36);
     GET_STRING(body, "playerId", playerId, 32);
-    struct json_object* val = json_object_object_get(body, "uiAreaId");
-    if (val)
-        areaid = json_object_get_int(val);
+    json_t* val = json_find_first_label(body, "uiAreaId");
+    if (val && val->child && val->child->text)
+        areaid = atoi(val->child->text);
 
-    val = json_object_object_get(body, "iNum");
-    if (val)
-        inum = json_object_get_int(val);
+    val = json_find_first_label(body, "iNum");
+    if (val && val->child && val->child->text)
+        inum = atoi(val->child->text);
 
-    val = json_object_object_get(body, "uiItemId");
-    if (val)
-        itemid = json_object_get_int(val);
+    val = json_find_first_label(body, "uiItemId");
+    if (val && val->child && val->child->text)
+        itemid = atoi(val->child->text);
 
     playerid = atoll(playerId);
     GObject::Player* player = GObject::globalPlayers[playerid];
@@ -226,100 +245,6 @@ int add_playeritem_req(JsonHead* head, struct json_object* body, struct json_obj
     return 0;
 }
 
-void jsonParser(std::string& json, int sessionid)
-{
-    TRACE_LOG("JSON RECV: %s\n", json.c_str());
-#ifdef _DEBUG
-    //fprintf(stderr, "JSON RECV: %s\n", json.c_str());
-#endif
-    int ret = EUNKNOW;
-    std::string err;
-
-    JsonHead head = {0,};
-    struct json_object* obj = NULL;
-    struct json_object* body = NULL;
-
-    struct json_object* retobj = NULL;
-    struct json_object* rethead = NULL;
-    struct json_object* retbody = NULL;
-
-    retobj = json_object_new_object();
-    if (!retobj)
-        goto _error1;
-
-    rethead = json_object_new_object();
-    if (!rethead)
-        goto _error1;
-
-    retbody = json_object_new_object();
-    if (!retbody)
-        goto _error1;
-
-    obj = json_tokener_parse(json.c_str());
-    if (!parseHead(obj, &head))
-    {
-        ++head.cmd; // XXX:
-        err += "request error.";
-        goto _error;
-    }
-
-    body = json_object_object_get(obj, "body");
-    if (!body)
-        goto _error;
-
-    switch (head.cmd)
-    {
-        case 1:
-            ret = query_rolelist_req(&head, body, retbody, err);
-            break;
-        case 3:
-            ret = query_rolebaseinfo_req(&head, body, retbody, err);
-            break;
-        case 5:
-            ret = add_playeritem_req(&head, body, retbody, err);
-            break;
-        default:
-            break;
-    }
-
-_error:
-    {
-        head.retcode = ret;
-        head.sendTime = time(NULL);
-        snprintf(head.errmsg, sizeof(head.errmsg), "%s", err.c_str());
-        snprintf(head.name, sizeof(head.name), "%s", SERVICE);
-
-        fillHead(rethead, &head);
-
-        json_object_object_add(retobj, "head", rethead);
-        json_object_object_add(retobj, "body", retbody);
-
-        const char* retstr = json_object_to_json_string(retobj);
-        TRACE_LOG("JOSN SEND: %s\n", retstr?retstr:"null");
-#ifdef _DEBUG
-        //fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
-#endif
-
-        if (sessionid >= 0)
-        {
-            Stream st(SPEP::JASON);
-            st << std::string(retstr?retstr:EMPTY);
-            st << Stream::eos;
-            NETWORK()->SendMsgToClient(sessionid, st);
-        }
-    }
-
-_error1:
-    if (retobj)
-        json_object_put(retobj);
-    if (retbody)
-        json_object_put(retbody);
-    if (rethead)
-        json_object_put(rethead);
-
-    return;
-}
-
 void jsonParser2(void * buf, int len, Stream& st)
 {
 	BinaryReader br(buf, len);
@@ -339,34 +264,34 @@ void jsonParser2(void * buf, int len, Stream& st)
     std::string err;
 
     JsonHead head = {0,};
-    struct json_object* obj = NULL;
-    struct json_object* body = NULL;
+    json_t* obj = NULL;
+    json_t* body = NULL;
 
-    struct json_object* retobj = NULL;
-    struct json_object* rethead = NULL;
-    struct json_object* retbody = NULL;
+    json_t* retobj = NULL;
+    json_t* rethead = NULL;
+    json_t* retbody = NULL;
 
-    retobj = json_object_new_object();
+    retobj = json_new_object();
     if (!retobj)
         goto _error1;
 
-    rethead = json_object_new_object();
+    rethead = json_new_object();
     if (!rethead)
         goto _error1;
 
-    retbody = json_object_new_object();
+    retbody = json_new_object();
     if (!retbody)
         goto _error1;
 
-    obj = json_tokener_parse(json.c_str());
-    if (!parseHead(obj, &head))
+    enum json_error jerr;
+    if ((jerr = json_parse_document(&obj, (char*)json.c_str())) != JSON_OK || !parseHead(obj, &head))
     {
         ++head.cmd; // XXX:
         err += "request error.";
         goto _error;
     }
 
-    body = json_object_object_get(obj, "body");
+    body = json_find_first_label(obj, "body");
     if (!body)
         goto _error;
 
@@ -394,25 +319,30 @@ _error:
 
         fillHead(rethead, &head);
 
-        json_object_object_add(retobj, "head", rethead);
-        json_object_object_add(retobj, "body", retbody);
+        json_insert_pair_into_object(retobj, "head", rethead);
+        json_insert_pair_into_object(retobj, "body", retbody);
 
-        const char* retstr = json_object_to_json_string(retobj);
+        char* retstr = 0;
+        json_tree_to_string(retobj, &retstr);
         //TRACE_LOG("JOSN SEND: %s\n", retstr?retstr:"null");
 #ifdef _DEBUG
         //fprintf(stderr, "JOSN SEND: %s\n", retstr?retstr:"null");
 #endif
 
         st << std::string(retstr?retstr:EMPTY);
+        if (retstr)
+            free(retstr);
     }
 
 _error1:
     if (retobj)
-        json_object_put(retobj);
+        json_free_value(&retobj);
+#if 0
     if (retbody)
-        json_object_put(retbody);
+        json_free_value(&retbody);
     if (rethead)
-        json_object_put(rethead);
+        json_free_value(&rethead);
+#endif
 
     return;
 }

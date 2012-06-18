@@ -172,6 +172,7 @@ int main()
             {
                 g_log->OutTrace("read_jason_req. connection close %s\n", inet_ntoa(their_addr.sin_addr));
                 close(new_fd);
+                new_fd = -1;
                 break;
             }
 
@@ -185,7 +186,6 @@ int main()
                 g_log->OutError("write_jason_req failed.\n");
                 break;
             }
-            printf("sd: %d\n", sd);
 
             if((len = read_jason_rep(asss_conn, buf)) == 0)
             {
@@ -207,11 +207,12 @@ int main()
         }
         while(false);
 
-        if(new_fd != -1)
+        if(new_fd > 0)
             close(new_fd);
     }
 
-    close( asss_conn );
+    if (asss_conn > 0)
+        close( asss_conn );
 
     return 0;
 }

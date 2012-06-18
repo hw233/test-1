@@ -66,7 +66,7 @@ inline void GlobalObject::PushMsg(const MsgHdrType& hdr, void* msgBody)
 	UInt8 workerId = hdr.msgHdr.desWorkerID;
 	if( workerId >= (UInt8)MAX_THREAD_NUM )
 		return;
-	char* buffer = (char*)AllocMsgBlock(sizeof(MsgHdrType) + hdr.msgHdr.bodyLen);
+    char* buffer = new(std::nothrow) char[sizeof(MsgHdrType) + hdr.msgHdr.bodyLen];
 	if(buffer == NULL)
 		return;
     memcpy(buffer, &hdr, sizeof(MsgHdrType));

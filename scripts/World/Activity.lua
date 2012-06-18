@@ -324,6 +324,12 @@ function onActivityCheck(tm)
           is_6_25 = false
       end
 
+      if tm >= actTime61 and tm < actTime62 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -481,6 +487,9 @@ function initActTime(y, m, d)
 
   actTime59 = os.time(SerStartTm26);
   actTime60 = os.time(SerStartTm26) + 7 * 86400;
+
+  actTime61 = os.time(SerStartTm26);
+  actTime62 = os.time(SerStartTm26) + 6 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

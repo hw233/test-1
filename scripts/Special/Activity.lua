@@ -1333,18 +1333,32 @@ function onTurnOnRF7Day(player, total, offset)
     return true
 end
 
-function onEnchantAct(player, level)
-    local pic = {1416, 1417, 1418, 1419, 1420};
-    local rand = math.random(1, #pic);
-    local rand2 = math.random(1, #pic);
-    local rand3 = math.random(1, #pic);
-    local items = {
-        [4] = {502,1,1},
-        [6] = {509,2,1},
-        [8] = {509,5,1, pic[rand],1,1, 30,1,1},
-        [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
-    };
-    sendItemPackageMail(player, msg_46, msg_46, items[level]);
+function onEnchantAct(player, level, _type)
+    if isFBVersion() then
+        local pic = {1416, 1417, 1418, 1419, 1420};
+        local rand = math.random(1, #pic);
+        local rand2 = math.random(1, #pic);
+        local rand3 = math.random(1, #pic);
+        local items = {
+            [4] = {502,1,1},
+            [6] = {509,2,1},
+            [8] = {509,5,1, pic[rand],1,1, 30,1,1},
+            [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
+        };
+        sendItemPackageMail(player, msg_46, msg_46, items[level]);
+    else
+        local items = {
+            [0] = {
+                [8] = {509,3,1, 503,3,1, 500,3,1},
+                [10] = {509,6,1, 503,6,1, 500,6,1},
+            },
+            [1] = {
+                [8] = {509,1,1, 503,1,1, 500,1,1},
+                [10] = {509,3,1, 503,3,1, 500,3,1},
+            },
+        };
+        sendItemPackageMail(player, msg_93, msg_94, items[_type][level]);
+    end
 end
 
 function onEnchantGt11(player, id, level, _type)
