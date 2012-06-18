@@ -16,6 +16,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "LuckyDraw.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -231,6 +232,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     return 1;
 }
 
+static bool diamondPrivilege = false;
 void PlayerCopy::enter(Player* pl, UInt8 id)
 {
     if (!pl || !id)
@@ -276,6 +278,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
     if(id == 0xff)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+        diamondPrivilege = true;
         id = realCopyId;
     }
     if (!ret) {
@@ -395,6 +398,27 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->sendRC7DayInfo(TimeUtil::Now());
             }
 
+            if(World::getFourCopAct())
+            {
+                UInt32 randNum = uRand(3);
+                if(diamondPrivilege)
+                {
+                    diamondPrivilege = false;
+                    randNum = randNum + 1;
+                }
+                else if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)
+                {
+                    if(3 <= PLAYER_DATA(pl, copyGoldCnt))
+                        randNum = randNum + 4;
+                    else if(2 == PLAYER_DATA(pl, copyGoldCnt))
+                        randNum = randNum + 3;
+                    else
+                        randNum = randNum + 2;
+                }
+                else
+                    randNum = randNum + 1;
+                pl->GetPackage()->AddItem2(9057, randNum, true, true);
+            }
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
             pl->OnHeroMemo(MC_SLAYER, MD_ADVANCED, 0, 2);

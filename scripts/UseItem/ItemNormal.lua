@@ -2960,6 +2960,35 @@ function ItemNormal_00009027(iid, num, bind, param)
     return rn;
 end
 
+function ItemNormal_00009067(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local _40 = {2400,2401,2402,2403,2404,2405,2406,2407,2408,2409,2410,2411,2412,2413,2414,2415,2416,2417,2418,2419,2420,2421,2422,2423,}
+    local _50 = {2545,2546,2547,2548,2549,2550,2553,2554,2555,2556,2557,2558,2561,2562,2563,2564,2565,2566,}
+
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    local r = math.random(100)
+
+    local item = 0
+    if r >= 67 then
+        item = _50[math.random(1,#_50)]
+        package:Add(item, 1, true, 0, 2)
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9067]，"..msg_61.."[4:"..item.."]")
+    else
+        item = _40[math.random(1,#_40)]
+        package:Add(item, 1, true, 0, 2)
+    end
+
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_citta(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
@@ -3698,6 +3727,120 @@ function ItemNormal_00009036(iid, num, bind, param)
     player:getCoupon(50*num)
 
     package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009053(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < 2 then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+    package:DelItemSendMsg(iid, player);
+
+    local items = {506, 507, 508, 509, 514, 515, 500, 49, 503, 511, 517, 15}
+    local prob = {1176,1294,2459,2518,3671,4024,5200,5553,6612,7800,8941,10000}
+    local broad = {0,1,0,1,0,1,0,0,0,0,0,0}
+    local item = 0
+
+    local k = 1
+    local rand = math.random(1,10000)
+    for n = 1,#prob do
+        if rand <= prob[n] then
+            item = items[n]
+            k = n
+            break;
+        end
+    end
+
+    if item == 0 then
+        return false
+    end
+
+    if item == 15 then
+        package:AddItem(item, 2, 1, 0, 2)
+        if broad[k] == 1 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:"..iid.."]"..msg_99.."[4:"..item.."]x2");
+        end
+    else
+        package:AddItem(item, 1, 1, 0, 2)
+        if broad[k] == 1 then
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:"..iid.."]"..msg_99.."[4:"..item.."]x1");
+        end
+    end
+
+    item = 0
+    if iid == 9053 then
+        rand = math.random(1,100)
+        if rand <= 30 then
+            item = 2856
+        end
+    elseif iid == 9054 then
+        rand = math.random(1,100)
+        if rand <= 25 then
+            item = 2857
+        end
+    elseif iid == 9055 then
+        rand = math.random(1,100)
+        if rand <= 10 then
+            item = 2858
+        end
+    elseif iid == 9056 then
+        rand = math.random(1,100)
+        if rand <= 20 then
+            item = 2859
+        end
+    else
+    end
+
+    if item > 0 then
+        package:Add(item, 1, 1, 0, 2)
+        --Broadcast(0x1, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_98.."[4:8]"..msg_99.."[4:"..item.."]x1");
+    end
+
+    return num;
+end
+
+function ItemNormal_00009058(iid, num, bind, param)
+    local player = GetPlayer();
+    local package = player:GetPackage();
+
+    local all_items = { 
+        { {509, 30}, {503, 30}, {515, 10}, {9017, 10} },
+        { {509, 25}, {503, 25}, {515, 8}, {9017, 8} },
+        { {509, 20}, {503, 20}, {515, 6}, {9017, 6} },
+        { {509, 15}, {503, 15}, {515, 5}, {9017, 4} },
+        { {509, 10}, {503, 10}, {515, 3}, {9017, 2} },
+        { {509, 8}, {503, 8}, {515, 1}, {9017, 1} },
+        { {509, 5}, {503, 5} },
+        { {509, 3}, {503, 3} },
+        { {509, 1}, {503, 1} }
+    };
+
+    local idx = iid - 9057;
+    local packageSize = {13, 11, 9, 7, 5, 4, 2, 2, 2};
+    if package:GetRestPackageSize() < packageSize[idx] then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:DelItemSendMsg(iid, player);
+
+    local items = all_items[idx];
+    for i = 1, #items do
+        if items[i][1] == 9017 then
+            for j = 1, items[i][2] do
+                local elixir = {9017, 9018, 9019, 9020, 9021, 9022}
+                p = math.random(1, #elixir)
+                package:AddItem(elixir[p], 1, 1, 0, 2)
+            end
+        else
+            package:AddItem(items[i][1], items[i][2], 1, 0, 2)
+        end
+    end
+
     return num;
 end
 
@@ -5005,6 +5148,8 @@ local ItemNormal_Table = {
     [9022] = ItemNormal_00009017,
     [9027] = ItemNormal_00009027,
 
+    [9067] = ItemNormal_00009067,
+
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
     [490] = ItemNormal_SecondSoul_489,
@@ -5036,6 +5181,35 @@ local ItemNormal_Table = {
     [9034] = ItemNormal_00009034,
 
     [9036] = ItemNormal_00009036,
+
+    -- 铁手宝箱
+    [9053] = ItemNormal_00009053,
+    -- 无情宝箱
+    [9054] = ItemNormal_00009053,
+    -- 冷血宝箱
+    [9055] = ItemNormal_00009053,
+    -- 追命宝箱
+    [9056] = ItemNormal_00009053,
+
+    -- 仙界第一宝箱
+    [9058] = ItemNormal_00009058,
+    -- 仙界王者宝箱
+    [9059] = ItemNormal_00009058,
+    -- 仙界霸主宝箱
+    [9060] = ItemNormal_00009058,
+    -- 仙界英雄宝箱
+    [9061] = ItemNormal_00009058,
+    -- 仙界剑侠宝箱
+    [9062] = ItemNormal_00009058,
+    -- 仙界橙色宝箱
+    [9063] = ItemNormal_00009058,
+    -- 仙界紫色宝箱
+    [9064] = ItemNormal_00009058,
+    -- 仙界蓝色宝箱
+    [9065] = ItemNormal_00009058,
+    -- 仙界绿色宝箱
+    [9066] = ItemNormal_00009058,
+
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

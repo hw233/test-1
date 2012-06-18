@@ -1305,7 +1305,8 @@ void Fighter::addAttr( ItemEquip * equip )
 	{
 		if(ied.gems[i] != 0)
 		{
-			GData::ItemGemType * igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
+            GData::ItemGemType * igt = NULL;
+			igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
 			addAttrExtra(_attrExtraEquip, igt->attrExtra);
 		}
 	}

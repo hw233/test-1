@@ -219,6 +219,7 @@ namespace Script
 		void onEnchantAct(Player* player, UInt8 level, UInt8 type = 0);
 		void onEnchantGt11(Player* player, UInt16 id, UInt8 level, UInt8 type);
 		void onTrainFighterAct(Player* player, Fighter* fgt);
+        void onRechargeAct(Player* player, UInt32 total);
 		void onTopup(Player* player, UInt32 ogold, UInt32 ngold);
 		UInt32 onAttakerAddexp(Player* attacker, Player *defender, UInt32 award);
 		UInt32 onTavernFlush(UInt8 color);

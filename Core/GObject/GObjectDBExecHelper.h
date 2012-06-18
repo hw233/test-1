@@ -343,6 +343,7 @@ struct DBFighter2
 	UInt64 experience;      // 经验槽
     UInt64 practiceExp;     // 修炼经验槽
 	UInt32 hp;              // 血槽
+	UInt32 fashion;         // 时装
 	UInt32 weapon;          // 武器
 	UInt32 armor1;          // 头盔
 	UInt32 armor2;          // 护甲
@@ -1319,7 +1320,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(44)
+SPECIALDEF(45)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1330,6 +1331,7 @@ SPECIALDEF(44)
 	UInt64, experience,
 	UInt64, practiceExp,
 	UInt32, hp,
+	UInt32, fashion,
 	UInt32, weapon,
 	UInt32, armor1,
 	UInt32, armor2,

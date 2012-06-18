@@ -533,7 +533,6 @@ namespace GObject
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
         m_pVars = new VarSystem(id);
-        _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
@@ -2253,6 +2252,7 @@ namespace GObject
 		{
 			st << buffid[i] << buffleft[i];
 		}
+        st << GetVar(VAR_MONEY_ARENA);
 		st << Stream::eos;
 	}
 
@@ -3560,7 +3560,51 @@ namespace GObject
 		sendModification(3, _playerData.tael);
 	}
 
-	UInt32 Player::getCoin( UInt32 c )
+	UInt32 Player::getMoneyArena( UInt32 c )
+	{
+        UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
+		if(c == 0)
+			return moneyArena;
+		moneyArena += c;
+		SYSMSG_SENDV(164, this, c);
+		SYSMSG_SENDV(1064, this, c);
+        SetVar(VAR_MONEY_ARENA, moneyArena);
+
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        send(st);
+
+        return moneyArena;
+	}
+
+	UInt32 Player::useMoneyArena( UInt32 a,ConsumeInfo * ci )
+	{
+        UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
+        if(a == 0 || moneyArena == 0)
+            return moneyArena;
+        if(moneyArena < a)
+            moneyArena = 0;
+        else
+        {
+            moneyArena -= a;
+            if(ci!=NULL)
+            {
+                DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
+            }
+        }
+        SYSMSG_SENDV(163, this, a);
+        SYSMSG_SENDV(1063, this, a);
+        SetVar(VAR_MONEY_ARENA, moneyArena);
+
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        send(st);
+
+        return moneyArena;
+    }
+
+    UInt32 Player::getCoin( UInt32 c )
 	{
         return 0; // XXX: no useful
 		if(c == 0)
@@ -6080,6 +6124,11 @@ namespace GObject
             if (total)
                 setBuffData(PLAYER_BUFF_YDOTR, 0, true);
         }
+
+#ifdef _FB // XXX: 单笔反利
+        if (World::IsNewServer())
+            GameAction()->onRechargeAct(this, r);
+#endif
 
         sendTripodInfo();
 	}
@@ -9451,8 +9500,16 @@ namespace GObject
 #ifdef _FB
 #else
         SYSMSG(title, 2335);
-        //SYSMSG(content, 2343);
         SYSMSG(content, 2336);
+        GetMailBox()->newMail(NULL, 0x12, title, content);
+#endif
+    }
+
+    void Player::sendOpenAct(UInt32 day)
+    {
+#ifdef _FB
+        SYSMSGV(title, 4006, day);
+        SYSMSGV(content, 4007, day);
         GetMailBox()->newMail(NULL, 0x12, title, content);
 #endif
     }
@@ -9590,14 +9647,11 @@ namespace GObject
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
-#ifndef _FB
         AddVar(VAR_OFFLINE_EQUIP, offline);
-#endif
     }
 
     void Player::getOfflineExp()
     {
-#ifndef _FB
         UInt32 equip = GetVar(VAR_OFFLINE_EQUIP);
         if(equip)
         {
@@ -9615,7 +9669,6 @@ namespace GObject
             }
             SetVar(VAR_OFFLINE_EQUIP, 0);
         }
-#endif
         UInt32 exp = GetVar(VAR_OFFLINE_EXP);
         if (exp)
         {
@@ -10474,5 +10527,21 @@ namespace GObject
         }
     }
 
+    void Player::sendFourCopAct()
+    {
+        UInt16 lengxueCnt;
+        UInt16 wuqingCnt;
+        UInt16 tieshouCnt;
+        UInt16 zhuimingCnt;
+
+        lengxueCnt = static_cast<UInt16>(GetVar(VAR_LX_CNT));
+        wuqingCnt = static_cast<UInt16>(GetVar(VAR_WQ_CNT));
+        tieshouCnt = static_cast<UInt16>(GetVar(VAR_TS_CNT));
+        zhuimingCnt = static_cast<UInt16>(GetVar(VAR_ZM_CNT));
+
+        Stream st(REP::FOURCOP);
+        st << static_cast<UInt8>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
+        send(st);
+    }
 } // namespace GObject
 

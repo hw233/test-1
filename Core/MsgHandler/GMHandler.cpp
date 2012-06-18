@@ -581,6 +581,16 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 				player->getPrestige(val);
             }
             break;
+
+        case 11:
+			{
+				UInt32 val = atoi(args[1].c_str());
+				if(val == 0)
+					return;
+				player->getMoneyArena(val);
+            }
+            break;
+
 		}
 	}
 }

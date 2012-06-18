@@ -1054,13 +1054,15 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
 
+    if(World::getFourCopAct())
+        pl->sendFourCopAct();
+
     {
         UInt32 exp = pl->GetVar(VAR_OFFLINE_EXP);
         if (exp)
         {
             Stream st(REP::OFFLINEEXP);
             st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f);
-#ifndef _FB
             UInt32 equip = pl->GetVar(VAR_OFFLINE_EQUIP);
             if(equip)
             {
@@ -1113,9 +1115,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
                 {
                     st << pl->_equipAward[i].id;
                 }
-#else
-                st << static_cast<UInt8>(0);
-#endif
             }
 
             st<< Stream::eos;
@@ -2674,7 +2673,9 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	{
         if (lr._type > 1 && lr._type < 8)
             price *= lr._count;
-		switch(lr._type)
+        else if(lr._type >= PURCHASE3 && lr._type <= PURCHASE4)
+            price *= lr._count;
+        switch(lr._type)
 		{
         case 1:
             {
@@ -2890,6 +2891,36 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         player->GetPackage()->DelItemAny(priceID, priceNum, &bind);
                         player->useDemonLog(priceID, priceNum, &ci);
                         st << static_cast<UInt8>(0);
+                    }
+                }
+            }
+            break;
+        case PURCHASE3:
+        case PURCHASE3+1:
+        case PURCHASE3+2:
+        case PURCHASE4:
+            {
+                UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
+                if (arena < price)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    GObject::ItemBase * item;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL)
+                        st << static_cast<UInt8>(2);
+                    else
+                    {
+                        //player->SetVar(VAR_MONEY_ARENA, arena - price);
+				        ConsumeInfo ci(Item,lr._itemId,lr._count);
+					    player->useMoneyArena(price,&ci);
+                        st << static_cast<UInt8>(0);
+                        GameAction()->doAty( player,AtyBuy, 0,0);
                     }
                 }
             }
@@ -3944,6 +3975,111 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
             mgr->GetReward(flag);
             break;
 
+    }
+}
+
+void OnFourCopReq( GameMsgHdr& hdr, const void* data)
+{
+    if(!World::getFourCopAct())
+        return;
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 opt = 0;
+    br >> type;
+    br >> opt;
+
+    /** 赠送神捕令 **/
+    if(0 == type)
+    {
+        UInt16 count = 0;
+        UInt16 tmpCnt = 0;
+        br >> count;
+
+        if(count > pl->GetPackage()->GetItemAnyNum(9057))
+        {
+            //sendMsgCode(0, 1011);
+            return;
+        }
+        pl->GetPackage()->DelItemAny(9057, count);
+        switch(opt)
+        {
+            case 1:
+                pl->AddVar(VAR_LX_CNT, count);
+                tmpCnt = pl->GetVar(VAR_LX_CNT);
+            break;
+            case 2:
+                pl->AddVar(VAR_WQ_CNT, count);
+                tmpCnt = pl->GetVar(VAR_WQ_CNT);
+            break;
+            case 3:
+                pl->AddVar(VAR_TS_CNT, count);
+                tmpCnt = pl->GetVar(VAR_TS_CNT);
+            break;
+            case 4:
+                pl->AddVar(VAR_ZM_CNT, count);
+                tmpCnt = pl->GetVar(VAR_ZM_CNT);
+            break;
+            default:
+            break;
+        }
+        Stream st(REP::FOURCOP);
+        st << opt << tmpCnt << Stream::eos;
+        pl->send(st);
+    }
+    /** 点击宝箱领取奖励 **/
+    else
+    {
+        if(pl->GetPackage()->GetRestPackageSize() < 1)
+        {
+            pl->sendMsgCode(0, 1011);
+            return;
+        }
+        UInt16 tmpCnt;
+        switch(opt)
+        {
+            case 1:
+                tmpCnt = pl->GetVar(VAR_LX_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_LX_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9055, 1, true);
+                }
+            break;
+            case 2:
+                tmpCnt = pl->GetVar(VAR_WQ_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_WQ_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9054, 1, true);
+                }
+            break;
+            case 3:
+                tmpCnt = pl->GetVar(VAR_TS_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_TS_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9053, 1, true);
+                }
+            break;
+            case 4:
+                tmpCnt = pl->GetVar(VAR_ZM_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_ZM_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9056, 1, true);
+                }
+            break;
+            default:
+            break;
+        }
+        Stream st(REP::FOURCOP);
+        st << opt << tmpCnt << Stream::eos;
+        pl->send(st);
     }
 }
 

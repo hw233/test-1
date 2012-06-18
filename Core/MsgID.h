@@ -366,6 +366,8 @@ namespace REQ
     const UInt8 SECOND_SOUL         = 0x8E;
     /** 新手引导的UDPLOG请求 */
     const UInt8 GUIDEUDP            = 0xF4;
+
+    const UInt8 FOURCOP             = 0x1F;
 }
 
 namespace REP
@@ -596,6 +598,9 @@ namespace REP
 
     /** 元神系统*/
     const UInt8 SECOND_SOUL         = 0x8E;
+
+    const UInt8 FOURCOP             = 0x1F;
+
 }
 
 namespace SPEQ

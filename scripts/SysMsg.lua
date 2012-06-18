@@ -59,6 +59,8 @@ sysMsg:set(157, 0x35, "")
 sysMsg:set(158, 0x35, "")
 sysMsg:set(159, 0x35, "")
 sysMsg:set(162, 0x35, "学会[7:%u%u]")
+sysMsg:set(163, 0x35, "消费龙魂%u")
+sysMsg:set(164, 0x35, "获得龙魂%u")
 
 sysMsg:set(181, 0x35, "未通过防沉迷认证，获得经验值减半")
 sysMsg:set(182, 0x35, "未通过防沉迷认证，获得银币减半%u")
@@ -130,6 +132,9 @@ sysMsg:set(1058, 1, "")
 sysMsg:set(1060, 1, "")
 sysMsg:set(1061, 1, "")
 sysMsg:set(1062, 1, "[f:%u:%s]学会了[7:%u%u]")
+sysMsg:set(1063, 1, "您消费%u龙魂")
+sysMsg:set(1064, 1, "您获得%u龙魂")
+
 sysMsg:set(1081, 1, "您未通过防沉迷认证，获得经验值减半")
 sysMsg:set(1082, 1, "您未通过防沉迷认证，获得银币减半%u")
 sysMsg:set(1083, 1, "您未通过防沉迷认证，获得减半铜钱%u")
@@ -701,6 +706,8 @@ sysMsg:set(4003, 0, "君子争上游奖励，恭喜你较昨日前进了%u名")
 
 sysMsg:set(4004, 0, "神秘礼物(来自IDIP)")
 sysMsg:set(4005, 0, "神秘礼物(来自IDIP)")
+sysMsg:set(4006, 0, "储值返仙石还剩%u天！")
+sysMsg:set(4007, 0, "储值返仙石还剩最后%u天！！！此活动仅在开服举办，机会难得，错过即不在！")
 
 sysMsg:set(9999, 0, "var: %d")
 

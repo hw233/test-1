@@ -203,6 +203,19 @@ public:
     inline static void setRechargeNextRetStart(UInt32 start, UInt32 end)
     { _rechargenextretstart = start; _rechargenextretend = end; }
 
+    inline static void setMergeAthAct(bool v)
+    { _mergeathact = v; }
+    inline static bool getMergeAthAct()
+    { return _mergeathact; }
+    inline static void setFourCopAct(bool v)
+    { _fourcopact = v; printf("----------------------------: %d\n", _fourcopact);}
+    inline static bool getFourCopAct()
+    { return _fourcopact; }
+    inline static void setDuanWu(bool v)
+    { _duanwu = v; }
+    inline static bool getDuanWu()
+    { return _duanwu; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
 
@@ -267,6 +280,9 @@ public:
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
     static UInt32 _rechargenextretend;
+    static bool _mergeathact;
+    static bool _fourcopact;
+    static bool _duanwu;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -291,6 +307,7 @@ private:
     static void Hero_Island_Process(void*);
     static void Team_Copy_Process(void*);
 	static void ReCalcWeekDay( World * );
+	static void World_One_Min( World * );
 
 private:
 	void testUpdate();
