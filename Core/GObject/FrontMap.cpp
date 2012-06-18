@@ -12,6 +12,7 @@
 #include "Country.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -361,6 +362,23 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             {
                 pl->SetVar(VAR_CLAWARD2, 1);
                 pl->sendRC7DayInfo(TimeUtil::Now());
+            }
+
+            if(World::getFourCopAct())
+            {
+                UInt32 randNum = uRand(3);
+                if(PLAYER_DATA(pl, frontFreeCnt) == getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > 0)
+                {
+                    if(3 <= PLAYER_DATA(pl, frontGoldCnt))
+                        randNum = randNum + 4;
+                    else if(2 == PLAYER_DATA(pl, frontGoldCnt))
+                        randNum = randNum + 3;
+                    else
+                        randNum = randNum + 2;
+                }
+                else
+                    randNum = randNum + 1;
+                pl->GetPackage()->AddItem2(9057, randNum, true, true);
             }
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);

@@ -17,7 +17,7 @@
 #define LARM_ID         1500
 #define RARM_ID         4999
 #define LGEM_ID         5000
-#define RGEM_ID         5200
+#define RGEM_ID         5999
 #define LCITTA1_ID      6000
 #define RCITTA1_ID      7000
 #define LSOUL_ID        7001
@@ -36,7 +36,7 @@ enum ItemClass
     // [30~39]  阵法 [1000~1199]
     // [40~49]  心法 [1200~1499]
     // [50~59]  强化 [500~799]
-    // [60~79]  宝石 [5001~5200]  60力量，61敏捷，62智力，63体魄，64生命，65攻击，66防御，67命中，68反击，69闪避，70暴击，71破击，72身法
+    // [60~79]  宝石 [5001~5999]  60力量，61敏捷，62智力，63体魄，64生命，65攻击，66防御，67命中，68反击，69闪避，70暴击，71破击，72身法
     // [80~89]  任务 [800~999]
     // [90~100] 魂   [7000~8000]
 	Item_None = 0,
@@ -93,9 +93,34 @@ inline bool IsEquipTypeId(UInt32 id)
 	return id >= LARM_ID && id <= RARM_ID;
 }
 
+/** 新增11,12级宝石 **/
+inline bool IsGemId2(UInt32 id)
+{
+    if(id >= 5501 && id <= 5502)
+        return true;
+    else if(id >= 5511 && id <= 5512)
+        return true;
+    else if(id >= 5521 && id <= 5522)
+        return true;
+    else if(id >= 5531 && id <= 5532)
+        return true;
+    else if(id >= 5541 && id <= 5542)
+        return true;
+    else if(id >= 5551 && id <= 5552)
+        return true;
+    else if(id >= 5561 && id <= 5562)
+        return true;
+    else if(id >= 5571 && id <= 5572)
+        return true;
+    else if(id >= 5631 && id <= 5632)
+        return true;
+    else
+        return false;
+}
+
 inline bool IsGemId(UInt32 id)
 {
-	return id > LGEM_ID && id <= RGEM_ID;
+	return (id > LGEM_ID && id <= RGEM_ID);
 }
 
 inline bool IsEquip(UInt8 subClass)

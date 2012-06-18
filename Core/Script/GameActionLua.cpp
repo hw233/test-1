@@ -77,6 +77,7 @@ namespace Script
 		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
 		lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
+		lua_tinker::def(_L, "isNewServer", GObject::World::IsNewServer);
 		lua_tinker::def(_L, "isDebug", GObject::World::isDebug);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
 		lua_tinker::def(_L, "getAutoHeal",	GObject::World::getAutoHeal);
@@ -117,6 +118,12 @@ namespace Script
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
         lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
         lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
+        lua_tinker::def(_L, "setMergeAthAct", GObject::World::setMergeAthAct);
+        lua_tinker::def(_L, "getMergeAthAct", GObject::World::getMergeAthAct);
+        lua_tinker::def(_L, "setFourCopAct", GObject::World::setFourCopAct);
+        lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
+
+        CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
@@ -949,6 +956,11 @@ namespace Script
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
 	{
 		Call<void>("onTrainFighterAct", player, fgt);
+	}
+
+	void GameActionLua::onRechargeAct( Player* player, UInt32 total )
+	{
+		Call<void>("onRechargeAct", player, total);
 	}
 
 	void GameActionLua::onCopyFloorWin( Player* player, UInt8 id, UInt8 floor, UInt8 spot, UInt8 lootlvl )

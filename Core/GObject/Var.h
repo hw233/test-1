@@ -161,7 +161,15 @@ namespace GObject
         VAR_CTSAWARDRF = 125, // 回流后七天登陆抽奖
         VAR_CLAWARDRF = 126, // 回流后七天连续登陆奖励
         VAR_CL3DAYRF = 127, // 回流后七天连接三天登陆奖励
-        VAR_DUANWU = 134, // 端午上线邮件
+
+        VAR_MONEY_ARENA = 128, // 剑魂数
+        VAR_LX_CNT = 131, //冷血
+        VAR_WQ_CNT = 132, //无情
+        VAR_TS_CNT = 133, //铁手
+        VAR_ZM_CNT = 134, //追命
+
+        VAR_DUANWU = 135, // 端午上线邮件
+
         VAR_MAX,
     };
 
@@ -315,6 +323,13 @@ namespace GObject
             REGISTER_VAR(VAR_CTSAWARDRF, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAWARDRF, CYCLE_DAY);
             REGISTER_VAR(VAR_CL3DAYRF, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_MONEY_ARENA, CYCLE_NONE);
+            REGISTER_VAR(VAR_LX_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_WQ_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_TS_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_ZM_CNT, CYCLE_NONE);
+
             REGISTER_VAR(VAR_DUANWU, CYCLE_NONE);
         }
         

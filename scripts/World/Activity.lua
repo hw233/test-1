@@ -85,11 +85,11 @@ function onActivityCheck(tm)
   setTavernPurpleCount(100);
   setTavernOrangeCount(400);
 
-  --if tm >= actTime0 and tm < actTime00 then
-  --    setIsNewServer(true);
-  --else
-  --    setIsNewServer(false);
-  --end
+  if tm >= actTime0 and tm < actTime00 then
+      setIsNewServer(true);
+  else
+      setIsNewServer(false);
+  end
 
   if tm >= actTime1 and tm < actTime2 then
     setShiMenActiveCount(5);
@@ -213,6 +213,14 @@ function onActivityCheck(tm)
       setJune1(false)
   end
 
+  if tm >= actTime59 and tm < actTime60 then
+      is_6_22 = true
+      setDuanWu(true)
+  else
+      is_6_22 = false
+      setDuanWu(false)
+  end
+
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -318,18 +326,22 @@ function onActivityCheck(tm)
           setRechargeNextRet(false)
       end
 
-      if tm >= actTime59 and tm < actTime60 then
-          is_6_22 = true
-          setDuanWu(true)
-      else
-          is_6_22 = false
-          setDuanWu(false)
-      end
-
       if tm >= actTime61 and tm < actTime62 then
           setEnchantAct(true)
       else
           setEnchantAct(false)
+      end
+
+      if tm >= actTime113 and tm < actTime114 then
+          setMergeAthAct(true)
+      else
+          setMergeAthAct(false)
+      end
+
+      if tm >= actTime115 and tm < actTime116 then
+          setFourCopAct(true)
+      else
+          setFourCopAct(false)
       end
 
       setShuoShuo(true);
@@ -386,16 +398,20 @@ function initActTime(y, m, d)
   local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 充值后期返利(过段时间反利)
   local  SerStartTm25= { ['year'] = 2012, ['month'] = 6, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 6.25限时购买
+  -- 6.22限时购买
   local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm103 = { ['year'] = 2012, ['month'] = 6, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
   local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 合服斗剑排名奖励增加至30名活动(6/25-7/1)
+  local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 四大名捕（6/22-7/21）
+  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -504,13 +520,18 @@ function initActTime(y, m, d)
   actTime106 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime107 = os.time(SerStartTm103);
-  actTime108 = os.time(SerStartTm103) + 8 * 86400;
+  actTime108 = os.time(SerStartTm103) + 7 * 86400;
 
   actTime109 = os.time(SerStartTm104);
   actTime110 = os.time(SerStartTm104) + 7 * 86400;
 
   actTime111 = os.time(SerStartTm105);
   actTime112 = os.time(SerStartTm105) + 12 * 86400;
+
+  actTime113 = os.time(SerStartTm106);
+  actTime114 = os.time(SerStartTm106) + 7 * 86400;
+  actTime115 = os.time(SerStartTm107);
+  actTime116 = os.time(SerStartTm107) + 30 * 86400;
 
   onActivityCheck(os.time() + 30);
 

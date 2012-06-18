@@ -2954,7 +2954,7 @@ namespace GObject
 
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getMergeChance");
-				UInt32 size = std::min(9, table_temp.size());
+				UInt32 size = std::min(11, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
 				{
 					_merge_chance[j] =  table_temp.get<UInt32>(j + 1);
@@ -3463,9 +3463,16 @@ namespace GObject
                         break;
                     case Item_Fashion:
                     case Item_Trump:
-                        equip = new ItemTrump(dbe.id, itype, ied);
-                        if (equip && ied.enchant)
-                            ((ItemTrump*)equip)->fixSkills();
+                        if (itype->subClass == Item_Fashion)
+                        {
+                            equip = new ItemFashion(dbe.id, itype, ied);
+                        }
+                        else
+                        {
+                            equip = new ItemTrump(dbe.id, itype, ied);
+                            if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
+                        }
                         break;
                     default:
                         equip = new ItemEquip(dbe.id, itype, ied);

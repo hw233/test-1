@@ -246,20 +246,22 @@ end
 
 function onMergeGem(player, lev, num)
     if getGemMergeAct() then
-        local items = {
-            [6] = {507,1,1, 503,1,1},
-            [7] = {30,1,1, 509,2,1},
-            [8] = {30,4,1, 1504,1,1},
-            [9] = {30,20,1, 1509,1,1},
-            [10] = {30,50,1, 1627,1,1},
-        }
-
-        local item = items[lev]
-        if item == nil then
-            return
-        end
-
         for n = 1, num do
+            local r1 = {1416,1417,1418,1419,1420,}
+            local r2 = {1421,1422,1423,1424,1425,1426,}
+            local items = {
+                [6] = {507,1,1, 503,1,1},
+                [7] = {30,1,1, r1[math.random(1,#r1)],1,1, r2[math.random(1,#r2)],1,1},
+                [8] = {30,4,1, r1[math.random(1,#r1)],1,1, r1[math.random(1,#r1)],1,1, r1[math.random(1,#r1)],1,1, r2[math.random(1,#r2)],1,1, r2[math.random(1,#r2)],1,1, r2[math.random(1,#r2)],1,1, getRandOEquip(player:GetLev()),1,1},
+                [9] = {30,20,1, 1239,1,1, 1232,1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1},
+                [10] = {30,50,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1, getRandOEquip(player:GetLev()),1,1,},
+            }
+
+            local item = items[lev]
+            if item == nil then
+                return
+            end
+
             sendItemPackageMail(player, msg_3, msg_3, item);
         end
 	end
@@ -1431,6 +1433,18 @@ function June(player, lootlvl)
     end
 end
 
+function onRechargeAct(player, total)
+    local title = msg_96
+    local content = msg_97
+    if total >= 1000 and total <= 1999 then
+        sendItemPackageMail(player, title, content, {0xB000,100,0});
+    elseif total >= 2000 and total <= 3999 then
+        sendItemPackageMail(player, title, content, {0xB000,300,0});
+    elseif total >= 4000 then
+        sendItemPackageMail(player, title, content, {0xB000,0.2*total,0});
+    end
+end
+
 function sendRNR(player, off, date, total)
     local rm = os.date("%m", date)
     local rd = os.date("%d", date)
@@ -1487,7 +1501,7 @@ function onDuanWu(player)
     end
 
     if lvl >= 40 and player:GetVar(134) == 0 then
-        sendItemPackageMail(player, msg_95, msg_95, {1527,1,1});
+        sendItemPackageMail(player, msg_95, msg_95, {1527,2,1});
         player:SetVar(134, 1)
     end
 end

@@ -47,6 +47,7 @@ void WorldScript::init()
 	def("setActAvailable1", GObject::World::setActAvailable1);
 	def("getActivityStage", GObject::World::getActivityStage);
 	def("setIsNewServer", GObject::World::setIsNewServer);
+	def("isNewServer", GObject::World::IsNewServer);
 	def("setNationalDay", GObject::World::setNationalDay);
 	def("setHalloween", GObject::World::setHalloween);
 	def("setAutoHeal", GObject::World::setAutoHeal);
@@ -139,6 +140,11 @@ void WorldScript::init()
     def("setFFAttrChance", GObject::GObjectManager::setFFAttrChance);
     def("setFFAttrMaxValProp", GObject::GObjectManager::setFFAttrMaxValProp);
     def("setFFAttrMaxVal", GObject::GObjectManager::setFFAttrMaxVal);
+
+    def("setMergeAthAct", GObject::World::setMergeAthAct);
+    def("getMergeAthAct", GObject::World::getMergeAthAct);
+    def("setFourCopAct", GObject::World::setFourCopAct);
+    def("getFourCopAct", GObject::World::getFourCopAct);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
