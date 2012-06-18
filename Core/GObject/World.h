@@ -208,7 +208,7 @@ public:
     inline static bool getMergeAthAct()
     { return _mergeathact; }
     inline static void setFourCopAct(bool v)
-    { _fourcopact = v; printf("----------------------------: %d\n", _fourcopact);}
+    { _fourcopact = v; }
     inline static bool getFourCopAct()
     { return _fourcopact; }
     inline static void setDuanWu(bool v)
