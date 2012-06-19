@@ -38,6 +38,23 @@ end
 
 store:discountLimit()
 
+if isNewServer() then
+store:add(2,9067,80)
+end
+
+if is6_22() then
+store:add(2,1700,500)
+store:add(2,1701,500)
+store:add(2,1527,25)
+end
+
+if is6_22() then
+store:add(2,493,10)
+store:add(2,494,20)
+store:add(2,495,50)
+store:add(5,492,1000)
+end
+
 store:add(2,33,10)
 store:add(2,8000,15)
 store:add(2,72,720)

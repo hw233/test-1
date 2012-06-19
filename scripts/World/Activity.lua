@@ -213,6 +213,14 @@ function onActivityCheck(tm)
       setJune1(false)
   end
 
+  if tm >= actTime59 and tm < actTime60 then
+      is_6_22 = true
+      setDuanWu(true)
+  else
+      is_6_22 = false
+      setDuanWu(false)
+  end
+
   if isFBVersion() then
       if tm >= actTime101 and tm < actTime102 then
           setFighter1368(true)
@@ -318,14 +326,6 @@ function onActivityCheck(tm)
           setRechargeNextRet(false)
       end
 
-      if tm >= actTime59 and tm < actTime60 then
-          is_6_22 = true
-          setDuanWu(true)
-      else
-          is_6_22 = false
-          setDuanWu(false)
-      end
-
       if tm >= actTime61 and tm < actTime62 then
           setEnchantAct(true)
       else
@@ -386,7 +386,7 @@ function initActTime(y, m, d)
   local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 充值后期返利(过段时间反利)
   local  SerStartTm25= { ['year'] = 2012, ['month'] = 6, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 6.25限时购买
+  -- 6.22限时购买
   local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 

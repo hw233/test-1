@@ -2960,6 +2960,35 @@ function ItemNormal_00009027(iid, num, bind, param)
     return rn;
 end
 
+function ItemNormal_00009067(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local _40 = {2400,2401,2402,2403,2404,2405,2406,2407,2408,2409,2410,2411,2412,2413,2414,2415,2416,2417,2418,2419,2420,2421,2422,2423,}
+    local _50 = {2545,2546,2547,2548,2549,2550,2553,2554,2555,2556,2557,2558,2560,2561,2562,2563,2564,2565,2566,}
+
+    if package:GetRestPackageSize() < 1 then
+        player:sendMsgCode(2, 1011, 0);
+        return false;
+    end
+
+    local r = math.random(100)
+
+    local item = 0
+    if r >= 67 then
+        item = _50[math.random(1,#_50)]
+        package:Add(item, 1, true, 0, 2)
+    else
+        item = _40[math.random(1,#_40)]
+        package:Add(item, 1, true, 0, 2)
+    end
+
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:9067]，"..msg_61.."[4:"..item.."]")
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 function ItemNormal_citta(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
@@ -5002,6 +5031,8 @@ local ItemNormal_Table = {
     [9021] = ItemNormal_00009017,
     [9022] = ItemNormal_00009017,
     [9027] = ItemNormal_00009027,
+
+    [9067] = ItemNormal_00009067,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
