@@ -4527,7 +4527,7 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
     player->getAward(req._type, req._opt);
 }
 
-void OnDonateCopOrder( GameMsgHdr& hdr, FourCop& req )
+void OnFourCopAct( GameMsgHdr& hdr, FourCop& req )
 {
     MSG_QUERY_PLAYER(player);
     player->onFourCopReq(req._type, req._opt, req._count);

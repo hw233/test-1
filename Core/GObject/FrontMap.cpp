@@ -12,6 +12,7 @@
 #include "Country.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -378,7 +379,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             else
                 randNum = randNum + 1;
             std::cout << "randNum: " << randNum << std::endl;
-            pl->AddVar(VAR_COP_ORDER_CNT, randNum);
+            pl->GetPackage()->AddItem2(9057, randNum, true, true);
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);

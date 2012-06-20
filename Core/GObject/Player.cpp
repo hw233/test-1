@@ -3570,7 +3570,12 @@ namespace GObject
 		SYSMSG_SENDV(164, this, c);
 		SYSMSG_SENDV(1064, this, c);
         SetVar(VAR_MONEY_ARENA, moneyArena);
-		return _playerData.coupon;
+
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        send(st);
+
+        return moneyArena;
 	}
 
 	UInt32 Player::useMoneyArena( UInt32 a,ConsumeInfo * ci )
@@ -3591,8 +3596,12 @@ namespace GObject
         }
         SYSMSG_SENDV(163, this, a);
         SYSMSG_SENDV(1063, this, a);
-        //sendModification(8, _playerData.achievement);
         SetVar(VAR_MONEY_ARENA, moneyArena);
+
+        Stream st(REP::USER_INFO_CHANGE);
+        st << static_cast<UInt8>(0x56) << moneyArena << Stream::eos;
+        send(st);
+
         return moneyArena;
     }
 
@@ -10512,85 +10521,47 @@ namespace GObject
 
     void Player::sendFourCopAct()
     {
-        UInt32 tmpCnt;
-        UInt16 copCnt;
         UInt16 lengxueCnt;
         UInt16 wuqingCnt;
         UInt16 tieshouCnt;
         UInt16 zhuimingCnt;
 
-        copCnt = static_cast<UInt16>(GetVar(VAR_COP_ORDER_CNT));
-
-        tmpCnt = GetVar(VAR_LX_WQ_CNT);
-        lengxueCnt = static_cast<UInt16>(tmpCnt >> 16);
-        wuqingCnt = static_cast<UInt16>(tmpCnt & 0xffff);
-
-        tmpCnt = GetVar(VAR_TS_ZM_CNT);
-        tieshouCnt = static_cast<UInt16>(tmpCnt >> 16);
-        zhuimingCnt = static_cast<UInt16>(tmpCnt & 0xffff);
+        lengxueCnt = static_cast<UInt16>(GetVar(VAR_LX_CNT));
+        wuqingCnt = static_cast<UInt16>(GetVar(VAR_WQ_CNT));
+        tieshouCnt = static_cast<UInt16>(GetVar(VAR_TS_CNT));
+        zhuimingCnt = static_cast<UInt16>(GetVar(VAR_ZM_CNT));
 
         Stream st(REP::FOURCOP);
-        st << copCnt << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
+        st << static_cast<UInt16>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
         send(st);
     }
 
     void Player::onFourCopReq(UInt8 type, UInt8 opt, UInt8 count)
     {
-        if(!World::getFourCopAct() || type >= 2)
+        if(!World::getFourCopAct())
             return;
 
-        UInt32 tmpCnt;
-        UInt16 copCnt;
-        UInt16 lengxueCnt;
-        UInt16 wuqingCnt;
-        UInt16 tieshouCnt;
-        UInt16 zhuimingCnt;
-
-        copCnt = static_cast<UInt16>(GetVar(VAR_COP_ORDER_CNT));
-
-        tmpCnt = GetVar(VAR_LX_WQ_CNT);
-        lengxueCnt = static_cast<UInt16>(tmpCnt >> 16);
-        wuqingCnt = static_cast<UInt16>(tmpCnt & 0xffff);
-
-        tmpCnt = GetVar(VAR_TS_ZM_CNT);
-        tieshouCnt = static_cast<UInt16>(tmpCnt >> 16);
-        zhuimingCnt = static_cast<UInt16>(tmpCnt & 0xffff);
-
         /** 赠送神捕令 **/
-        if(0 == opt)
+        if(0 == type)
         {
-            if(copCnt < count)
-                return;
+            UInt16 tmpCnt;
 
+            if(count > m_Package->GetItemAnyNum(9057))
+                return;
+            m_Package->DelItem(9057, count, true);
             switch(type)
             {
-                case 0:
-                    lengxueCnt += count;
-                    tmpCnt = (static_cast<UInt32>(lengxueCnt) << 16) + static_cast<UInt32>(wuqingCnt);
-                    SetVar(VAR_LX_WQ_CNT, tmpCnt);
-                    copCnt -= count;
-                    SetVar(VAR_COP_ORDER_CNT, copCnt);
-                break;
                 case 1:
-                    wuqingCnt += count;
-                    tmpCnt = (static_cast<UInt32>(lengxueCnt) << 16) + static_cast<UInt32>(wuqingCnt);
-                    SetVar(VAR_LX_WQ_CNT, tmpCnt);
-                    copCnt -= count;
-                    SetVar(VAR_COP_ORDER_CNT, copCnt);
+                    AddVar(VAR_LX_CNT, count);
                 break;
                 case 2:
-                    tieshouCnt += count;
-                    tmpCnt = (static_cast<UInt32>(tieshouCnt) << 16) + static_cast<UInt32>(zhuimingCnt);
-                    SetVar(VAR_TS_ZM_CNT, tmpCnt);
-                    copCnt -= count;
-                    SetVar(VAR_COP_ORDER_CNT, copCnt);
+                    AddVar(VAR_WQ_CNT, count);
                 break;
                 case 3:
-                    zhuimingCnt += count;
-                    tmpCnt = (static_cast<UInt32>(tieshouCnt) << 16) + static_cast<UInt32>(zhuimingCnt);
-                    SetVar(VAR_TS_ZM_CNT, tmpCnt);
-                    copCnt -= count;
-                    SetVar(VAR_COP_ORDER_CNT, copCnt);
+                    AddVar(VAR_TS_CNT, count);
+                break;
+                case 4:
+                    AddVar(VAR_ZM_CNT, count);
                 break;
                 default:
                 break;
@@ -10603,46 +10574,49 @@ namespace GObject
             {
                 sendMsgCode(0, 1011);
             }
+            UInt16 tmpCnt;
             switch(type)
             {
-                case 0:
-                    if(lengxueCnt < 10)
-                        return;
-                    lengxueCnt -= 10;
-                    tmpCnt = (static_cast<UInt32>(lengxueCnt) << 16) + static_cast<UInt32>(wuqingCnt);
-                    SetVar(VAR_LX_WQ_CNT, tmpCnt);
-                    GetPackage()->AddItem2(9053, 1, true, true);
-                break;
                 case 1:
-                    if(wuqingCnt < 10)
-                        return;
-                    wuqingCnt -= 10;
-                    tmpCnt = (static_cast<UInt32>(lengxueCnt) << 16) + static_cast<UInt32>(wuqingCnt);
-                    SetVar(VAR_LX_WQ_CNT, tmpCnt);
-                    GetPackage()->AddItem2(9054, 1, true, true);
+                    tmpCnt = GetVar(VAR_LX_CNT);
+                    if(tmpCnt >= 10)
+                    {
+                        tmpCnt -= 10;
+                        SetVar(VAR_LX_CNT, tmpCnt);
+                        m_Package->AddItem2(9055, 1, true, true);
+                    }
                 break;
                 case 2:
-                    if(tieshouCnt < 10)
-                        return;
-                    tieshouCnt -= 10;
-                    tmpCnt = (static_cast<UInt32>(tieshouCnt) << 16) + static_cast<UInt32>(zhuimingCnt);
-                    SetVar(VAR_TS_ZM_CNT, tmpCnt);
-                    GetPackage()->AddItem2(9055, 1, true, true);
+                    tmpCnt = GetVar(VAR_WQ_CNT);
+                    if(tmpCnt >= 10)
+                    {
+                        tmpCnt -= 10;
+                        SetVar(VAR_WQ_CNT, tmpCnt);
+                        m_Package->AddItem2(9054, 1, true, true);
+                    }
                 break;
                 case 3:
-                    if(zhuimingCnt < 10)
-                        return;
-                    zhuimingCnt -= 10;
-                    tmpCnt = (static_cast<UInt32>(tieshouCnt) << 16) + static_cast<UInt32>(zhuimingCnt);
-                    SetVar(VAR_TS_ZM_CNT, tmpCnt);
-                    GetPackage()->AddItem2(9056, 1, true, true);
+                    tmpCnt = GetVar(VAR_TS_CNT);
+                    if(tmpCnt >= 10)
+                    {
+                        tmpCnt -= 10;
+                        SetVar(VAR_TS_CNT, tmpCnt);
+                        m_Package->AddItem2(9053, 1, true, true);
+                    }
+                break;
+                case 4:
+                    tmpCnt = GetVar(VAR_ZM_CNT);
+                    if(tmpCnt >= 10)
+                    {
+                        tmpCnt -= 10;
+                        SetVar(VAR_ZM_CNT, tmpCnt);
+                        m_Package->AddItem2(9056, 1, true, true);
+                    }
                 break;
                 default:
                 break;
             }
-
         }
-
     }
 
 } // namespace GObject

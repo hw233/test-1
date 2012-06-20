@@ -16,6 +16,7 @@
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
 #include "LuckyDraw.h"
+#include "Package.h"
 
 namespace GObject
 {
@@ -420,7 +421,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             else
                 randNum = randNum + 1;
             std::cout << "randNum: " << randNum << std::endl;
-            pl->AddVar(VAR_COP_ORDER_CNT, randNum);
+            pl->GetPackage()->AddItem2(9057, randNum, true, true);
 
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 

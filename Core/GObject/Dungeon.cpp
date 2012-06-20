@@ -524,7 +524,7 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
         else
             randNum = randNum + 1;
         std::cout << "randNum: " << randNum << std::endl;
-        player->AddVar(VAR_COP_ORDER_CNT, randNum);
+        player->GetPackage()->AddItem2(9057, randNum, true, true);
 
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount);
 
