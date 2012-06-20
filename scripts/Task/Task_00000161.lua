@@ -82,20 +82,20 @@ function Task_00000161(npcId)
 		action.m_ActionID = 161
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "玄龟殿";
+		action.m_ActionMsg = task_msg_1874;
 	elseif task:GetTaskSubmitNpc(161) == npcId then
 		if Task_Submit_00000161() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 161
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "玄龟殿";
+			action.m_ActionMsg = task_msg_1875;
 		elseif task:HasAcceptedTask(161) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 161
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "玄龟殿";
+			action.m_ActionMsg = task_msg_1876;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000161_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "紫云宫一役，诸位少侠联手大破邪派妖人，其中易氏兄弟的九天十地辟魔神梭神出鬼没，也立了莫大的功劳，这辟魔神梭乃是玄龟殿易周前辈所制，端的是一件异宝。那玄龟殿离此处不远，不如少侠去玄龟殿见见前辈。";
-	action.m_ActionMsg = "嗯，我这就去见易周前辈。";
+	action.m_NpcMsg = task_msg_1877;
+	action.m_ActionMsg = task_msg_1878;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000161_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "久闻少侠之名，如今一见确是名不虚传。";
+	action.m_NpcMsg = task_msg_1879;
 	action.m_ActionMsg = "";
 	return action;
 end

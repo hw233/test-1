@@ -1819,19 +1819,20 @@ static void makeExtraAttr( GObject::Fighter * fgt, UInt8 pos, GObject::ItemEquip
 	ea2.value3 = v3;
 	DB3().PushUpdateData("UPDATE `equipment` SET `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u",
 		ea2.type1, ea2.value1, ea2.type2, ea2.value2, ea2.type3, ea2.value3, equip->getId());
-	fgt->sendModification(0x21 + pos, equip, false);
+	fgt->sendModification(0x20 + pos, equip, false);
 }
 
 static void makeFighterExtraAttr( GObject::Fighter * fgt, UInt8 t1, Int16 v1, UInt8 t2, Int16 v2, UInt8 t3, Int16 v3 )
 {
-	makeExtraAttr(fgt, 0, fgt->getWeapon(), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 1, fgt->getArmor(0), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 2, fgt->getArmor(1), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 3, fgt->getArmor(2), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 4, fgt->getArmor(3), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 5, fgt->getArmor(4), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 6, fgt->getAmulet(), t1, v1, t2, v2, t3, v3);
-	makeExtraAttr(fgt, 7, fgt->getRing(), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 0, fgt->getFashion(), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 1, fgt->getWeapon(), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 2, fgt->getArmor(0), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 3, fgt->getArmor(1), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 4, fgt->getArmor(2), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 5, fgt->getArmor(3), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 6, fgt->getArmor(4), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 7, fgt->getAmulet(), t1, v1, t2, v2, t3, v3);
+	makeExtraAttr(fgt, 8, fgt->getRing(), t1, v1, t2, v2, t3, v3);
 }
 
 void GMHandler::OnForge( GObject::Player * player, std::vector<std::string>& args )
@@ -1849,6 +1850,9 @@ void GMHandler::OnForge( GObject::Player * player, std::vector<std::string>& arg
 		GObject::ItemEquip * equip = NULL;
 		switch(pos)
 		{
+		case 0:
+			equip = fgt->getFashion();
+            break;
 		case 1:
 			equip = fgt->getWeapon();
 			break;
@@ -1884,7 +1888,7 @@ void GMHandler::OnForge( GObject::Player * player, std::vector<std::string>& arg
 			t[i] = atoi(args[2 + i * 2].c_str());
 			v[i] = atoi(args[3 + i * 2].c_str());
 		}
-		makeExtraAttr(fgt, pos - 1, equip, t[0], v[0], t[1], v[1], t[2], v[2]);
+		makeExtraAttr(fgt, pos, equip, t[0], v[0], t[1], v[1], t[2], v[2]);
 	}
 	else if(sz == 3 || sz == 5 || sz == 7)
 	{
@@ -1968,18 +1972,18 @@ static void makeEnchant( GObject::Fighter * fgt, UInt8 pos, GObject::ItemEquip *
 	ied.enchant = level;
 	DB3().PushUpdateData("UPDATE `equipment` SET `enchant` = %u WHERE `id` = %u", ied.enchant, equip->getId());
 	fgt->setDirty();
-	fgt->sendModification(0x21 + pos, equip, false);
+	fgt->sendModification(0x20 + pos, equip, false);
 }
 
 static void makeFighterEnchant( const std::pair<UInt32, GObject::Fighter *>& p, UInt8 level )
 {
 	GObject::Fighter * fgt = p.second;
-	makeEnchant(fgt, 0, fgt->getWeapon(), level);
-	makeEnchant(fgt, 1, fgt->getArmor(0), level);
-	makeEnchant(fgt, 2, fgt->getArmor(1), level);
-	makeEnchant(fgt, 3, fgt->getArmor(2), level);
-	makeEnchant(fgt, 4, fgt->getArmor(3), level);
-	makeEnchant(fgt, 5, fgt->getArmor(4), level);
+	makeEnchant(fgt, 1, fgt->getWeapon(), level);
+	makeEnchant(fgt, 2, fgt->getArmor(0), level);
+	makeEnchant(fgt, 3, fgt->getArmor(1), level);
+	makeEnchant(fgt, 4, fgt->getArmor(2), level);
+	makeEnchant(fgt, 5, fgt->getArmor(3), level);
+	makeEnchant(fgt, 6, fgt->getArmor(4), level);
 }
 
 void GMHandler::OnEnchant( GObject::Player * player, std::vector<std::string>& args )
@@ -2018,7 +2022,7 @@ void GMHandler::OnEnchant( GObject::Player * player, std::vector<std::string>& a
 			equip = fgt->getArmor(4);
 			break;
 		}
-		makeEnchant(fgt, pos - 1, equip, enc);
+		makeEnchant(fgt, pos, equip, enc);
 	}
 	else if(args.size() > 1)
 	{
@@ -2029,12 +2033,12 @@ void GMHandler::OnEnchant( GObject::Player * player, std::vector<std::string>& a
 		GObject::Fighter * fgt = player->findFighter(fgtId);
 		if(fgt == NULL)
 			return;
-		makeEnchant(fgt, 0, fgt->getWeapon(), enc);
-		makeEnchant(fgt, 1, fgt->getArmor(0), enc);
-		makeEnchant(fgt, 2, fgt->getArmor(1), enc);
-		makeEnchant(fgt, 3, fgt->getArmor(2), enc);
-		makeEnchant(fgt, 4, fgt->getArmor(3), enc);
-		makeEnchant(fgt, 5, fgt->getArmor(4), enc);
+		makeEnchant(fgt, 1, fgt->getWeapon(), enc);
+		makeEnchant(fgt, 2, fgt->getArmor(0), enc);
+		makeEnchant(fgt, 3, fgt->getArmor(1), enc);
+		makeEnchant(fgt, 4, fgt->getArmor(2), enc);
+		makeEnchant(fgt, 5, fgt->getArmor(3), enc);
+		makeEnchant(fgt, 6, fgt->getArmor(4), enc);
 	}
 	else
 	{
@@ -2674,11 +2678,11 @@ void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args
 }
 void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
-#ifdef _FB
-#else
+#if 0
     UInt64 begin = TimeUtil::GetTick();
-    std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
-    for (UInt16 i = 0; i < 4000; ++i)
+    //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
+    std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
+    for (UInt16 i = 0; i < 1; ++i)
         jsonParser(json, -1);
     UInt64 end = TimeUtil::GetTick();
     fprintf(stderr, "total secs: %.2f\n", (float)(end-begin)/1000000);

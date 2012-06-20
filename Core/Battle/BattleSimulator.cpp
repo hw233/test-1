@@ -295,6 +295,12 @@ void BattleSimulator::start(UInt8 prevWin)
 
                     UInt8 clsnsex = bf->getFighter()->getClassAndSex();
                     UInt16 portrait = 0;
+
+                    if (bf->getFighter()->getFashionTypeId() == 1700)
+                        portrait = 1072;
+                    else if (bf->getFighter()->getFashionTypeId() == 1701)
+                        portrait = 1074;
+
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;
                     else if(bf->getBuffData(FIGHTER_BUFF_DRESS, now))
@@ -332,7 +338,10 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 6;
                     }
                     else
-                        portrait = bf->getPortrait();
+                    {
+                        if (!portrait)
+                            portrait = bf->getPortrait();
+                    }
 
 					if(bf->getFighter()->isNpc())
 						_packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
@@ -2651,7 +2660,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             || skill->effect->crrdam || skill->effect->crrdamP || skill->effect->addcrr)
     {
         //儒、元磁神雷
-        if(SKILL_ID(skill->getId()) == 122)
+        if(SKILL_ID(skill->getId()) == 122 || SKILL_ID(skill->getId()) == 477)
         {
             static UInt8 skill_prob_122[10][4] = {
                 {0, 0, 0},

@@ -82,20 +82,20 @@ function Task_00000018(npcId)
 		action.m_ActionID = 18
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "蛇妖之害";
+		action.m_ActionMsg = task_msg_13;
 	elseif task:GetTaskSubmitNpc(18) == npcId then
 		if Task_Submit_00000018() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 18
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "蛇妖之害";
+			action.m_ActionMsg = task_msg_14;
 		elseif task:HasAcceptedTask(18) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 18
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "蛇妖之害";
+			action.m_ActionMsg = task_msg_15;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000018_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "多谢少侠送药之恩，那蛇妖修炼多年已经快成气候，它喷吐的毒雾厉害无比，所以啊剑术再高也怕菜刀，出门在外不随身带些救命的灵药说不定哪天就阴沟里翻船了，"..GetPlayerName(GetPlayer()).."你可要切记，买点自动回血符随身带着以备不时之需！ ";
-	action.m_ActionMsg = "施大哥我知道了。";
+	action.m_NpcMsg = task_msg_16..GetPlayerName(GetPlayer())..task_msg_17;
+	action.m_ActionMsg = task_msg_18;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000018_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，服了"..GetPlayerName(GetPlayer()).."你带来的灵药，我现在感觉好多了。这蛇妖不除始终是个麻烦，你这就快去白云寺吧，找白云大师和我师父商量怎么除掉这个妖孽。";
-	action.m_ActionMsg = "好，我这就去！";
+	action.m_NpcMsg = task_msg_19..GetPlayerName(GetPlayer())..task_msg_20;
+	action.m_ActionMsg = task_msg_21;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000018_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠古道热肠，真是多谢了。";
+	action.m_NpcMsg = task_msg_22;
 	action.m_ActionMsg = "";
 	return action;
 end

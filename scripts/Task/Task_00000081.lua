@@ -82,20 +82,20 @@ function Task_00000081(npcId)
 		action.m_ActionID = 81
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "代惩劣徒";
+		action.m_ActionMsg = task_msg_1776;
 	elseif task:GetTaskSubmitNpc(81) == npcId then
 		if Task_Submit_00000081() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 81
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "代惩劣徒";
+			action.m_ActionMsg = task_msg_1777;
 		elseif task:HasAcceptedTask(81) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 81
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "代惩劣徒";
+			action.m_ActionMsg = task_msg_1778;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000081_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "那恶人罗九数年前曾在我门下学剑，也怪我一时不查，竟没看出他品行不端。后来我见他心性歹毒就将他逐出师门，并且警告他不要仗着所学的剑法为恶。";
-	action.m_ActionMsg = "真是人面兽心的家伙。";
+	action.m_NpcMsg = task_msg_1779;
+	action.m_ActionMsg = task_msg_1780;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000081_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "谁知他竟然违背我立下的训条，在这长沙城外作恶，可是毕竟我和他啊师徒一场，这除恶之事就交给你去做吧。";
-	action.m_ActionMsg = "好吧，不过前辈你也不要自责了。";
+	action.m_NpcMsg = task_msg_1781;
+	action.m_ActionMsg = task_msg_1782;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000081_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "想不到我昔年一时失查，竟然酿成今日之大祸……哎！";
+	action.m_NpcMsg = task_msg_1783;
 	action.m_ActionMsg = "";
 	return action;
 end

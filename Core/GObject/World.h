@@ -181,6 +181,10 @@ public:
     { _gemmergeact = v; }
     inline static bool getGemMergeAct()
     { return _gemmergeact; }
+    inline static void setEnchantGt11(bool v)
+    { _enchant_gt11 = v; }
+    inline static bool getEnchantGt11()
+    { return _enchant_gt11; }
 
 
     inline static void setJune(bool v)
@@ -191,6 +195,18 @@ public:
     { _june1 = v; }
     inline static bool getJune1()
     { return _june1; }
+
+    inline static void setRechargeNextRet(bool v)
+    { _rechargenextret = v; }
+    inline static bool getRechargeNextRet()
+    { return _rechargenextret; }
+    inline static void setRechargeNextRetStart(UInt32 start, UInt32 end)
+    { _rechargenextretstart = start; _rechargenextretend = end; }
+
+    inline static void setDuanWu(bool v)
+    { _duanwu = v; }
+    inline static bool getDuanWu()
+    { return _duanwu; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -252,6 +268,11 @@ public:
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
+    static bool _enchant_gt11;
+    static bool _rechargenextret;
+    static UInt32 _rechargenextretstart;
+    static UInt32 _rechargenextretend;
+    static bool _duanwu;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

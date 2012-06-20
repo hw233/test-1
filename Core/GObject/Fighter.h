@@ -306,6 +306,7 @@ public:
     void addSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true, bool = false);
     void delSkillsFromCT(const std::vector<const GData::SkillBase*>& skills, bool = true);
 
+	inline ItemFashion* getFashion() { return _fashion; }
 	inline ItemWeapon * getWeapon() { return _weapon; }
 	inline ItemArmor * getArmor(int idx) { return (idx >= 0 && idx < 5) ? _armor[idx] : NULL; }
 	inline ItemEquip * getAmulet() { return _amulet; }
@@ -346,10 +347,13 @@ public:
 	UInt32 getBuffData(UInt8 idx, UInt32 now = TimeUtil::Now());
 	void setBuffData(UInt8, UInt32, bool = true);
 
+	UInt32 getFashionId();
 	UInt32 getWeaponId();
 	UInt32 getArmorId(int idx);
 	UInt32 getAmuletId();
 	UInt32 getRingId();
+
+	UInt32 getFashionTypeId();
 
 	UInt16 getWeaponAttack();
 	void getArmorDefendAndHP(UInt16& def, UInt16& hp);
@@ -357,6 +361,7 @@ public:
 	inline UInt8 getColor() { return _color; }
 	static UInt8 getColor2(float);
 
+	ItemEquip * setFashion(ItemFashion* r, bool = true);
 	ItemWeapon * setWeapon(ItemWeapon * w, bool = true);
 	ItemArmor * setArmor(int idx, ItemArmor * a, bool = true);
 	ItemEquip * setAmulet(ItemEquip * a, bool = true);
@@ -557,7 +562,7 @@ public:
     bool isGoldPractice() { return false; }
 
 	void addAttr( ItemEquip * );
-	void addTrumpAttr( ItemTrump * );
+	void addTrumpAttr( ItemEquip* );
     void addAttr( const GData::CittaEffect* ce );
     void    CheckEquipEnchantAttainment(UInt8 e);
     bool  IsEquipEnchantLev(UInt8 e);
@@ -635,6 +640,7 @@ protected:
     std::vector<UInt16> _rpasskl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART];
     std::vector<UInt16> _passkl[GData::SKILL_PASSIVES-GData::SKILL_PASSSTART]; // 100%触发技能
 
+	ItemFashion* _fashion;
 	ItemWeapon * _weapon;
 	ItemArmor * _armor[5];
 	ItemEquip * _ring;

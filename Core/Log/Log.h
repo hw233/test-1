@@ -106,6 +106,7 @@ enum MailItemType
 	SaleSell,
     AutoFrontMap,
     ClanBattleAward,
+    RealItemAwardActive,
 };
 enum ItemFrom
 {
@@ -139,6 +140,7 @@ enum ItemFrom
     FromTownDeamon,
 	FromSSDTAward,
 	FromHappyAward,
+    FromIDIP,
 };
 
 enum ItemTo
@@ -208,6 +210,7 @@ private:
 };
 
 
+#ifndef _JSON_PROXY_
 //////////////////////////////////////////////////////////////////////////
 
 #define ERROR_LOG(fmt, ...) \
@@ -240,6 +243,15 @@ private:
 
 #include "Server/WorkerThread.h"
 #define LOG()			WorkerThread<WorkerRunner<> >::LocalWorker().GetLog()
+#else
+
+#define ERROR_LOG(fmt, ...) 
+#define WARN_LOG(fmt, ...)	
+#define DEBUG_LOG(fmt, ...)	
+#define INFO_LOG(fmt, ...)	
+#define TRACE_LOG(fmt, ...)	
+
+#endif
 
 extern Log gLog;                            \
 

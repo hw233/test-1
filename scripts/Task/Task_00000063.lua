@@ -82,20 +82,20 @@ function Task_00000063(npcId)
 		action.m_ActionID = 63
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "修炼邪功";
+		action.m_ActionMsg = task_msg_1702;
 	elseif task:GetTaskSubmitNpc(63) == npcId then
 		if Task_Submit_00000063() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 63
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "修炼邪功";
+			action.m_ActionMsg = task_msg_1703;
 		elseif task:HasAcceptedTask(63) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 63
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "修炼邪功";
+			action.m_ActionMsg = task_msg_1704;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000063_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个鬼道人奸猾得很，见我来了帮手就逃进了后洞丹室，他劫掠了不少的少年男女在极阴洞里修炼邪功，少侠可一定不要放过他。";
-	action.m_ActionMsg = "真是聪明的大猩猩。";
+	action.m_NpcMsg = task_msg_1705;
+	action.m_ActionMsg = task_msg_1706;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000063_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "小样，看你得瑟的，会玩飞剑了不起啊……等你拿到紫青双剑再来显摆吧。";
+	action.m_NpcMsg = task_msg_1707;
 	action.m_ActionMsg = "";
 	return action;
 end

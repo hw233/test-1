@@ -56,20 +56,20 @@ function Task_00000539(npcId)
 		action.m_ActionID = 539
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "嵩山二老";
+		action.m_ActionMsg = task_msg_1457;
 	elseif task:GetTaskSubmitNpc(539) == npcId then
 		if Task_Submit_00000539() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 539
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "嵩山二老";
+			action.m_ActionMsg = task_msg_1458;
 		elseif task:HasAcceptedTask(539) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 539
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "嵩山二老";
+			action.m_ActionMsg = task_msg_1459;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000539_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嵩山二老乃是知名的剑侠，神龙见首不见尾啊，不过既然你在成都郊外遇见追云叟前辈，也是一种缘分，应该多多去拜访他。";
-	action.m_ActionMsg = "弟子这就去。";
+	action.m_NpcMsg = task_msg_1460;
+	action.m_ActionMsg = task_msg_1461;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000539_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "呵呵，小朋友，我们又见面了。";
+	action.m_NpcMsg = task_msg_1462;
 	action.m_ActionMsg = "";
 	return action;
 end

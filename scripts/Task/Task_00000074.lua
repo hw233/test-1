@@ -82,20 +82,20 @@ function Task_00000074(npcId)
 		action.m_ActionID = 74
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "探路先锋";
+		action.m_ActionMsg = task_msg_1743;
 	elseif task:GetTaskSubmitNpc(74) == npcId then
 		if Task_Submit_00000074() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 74
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "探路先锋";
+			action.m_ActionMsg = task_msg_1744;
 		elseif task:HasAcceptedTask(74) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 74
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "探路先锋";
+			action.m_ActionMsg = task_msg_1745;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000074_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "少侠愿意帮助戴家场对付妖人，真是太好了，可是方才和少侠一起来得小伙子许超不见了。下人们告诉我说他要去探查一下吕村的动静，一个人跑去了鱼神洞，这可就不妙了。";
-	action.m_ActionMsg = "怎么回事？";
+	action.m_NpcMsg = task_msg_1746;
+	action.m_ActionMsg = task_msg_1747;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000074_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "鱼神洞有不少吕村的妖人驻扎，他们想打通这条山洞好真奔我们戴家场而来，我怕徐超出什么意外，少侠还得尽快去找他。";
-	action.m_ActionMsg = "好，我这就去。";
+	action.m_NpcMsg = task_msg_1748;
+	action.m_ActionMsg = task_msg_1749;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000074_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "想不到鱼神洞里如此险恶，我刚来就被这些恶人困在此处。";
+	action.m_NpcMsg = task_msg_1750;
 	action.m_ActionMsg = "";
 	return action;
 end

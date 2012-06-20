@@ -82,20 +82,20 @@ function Task_00000066(npcId)
 		action.m_ActionID = 66
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "仗义援手";
+		action.m_ActionMsg = task_msg_1708;
 	elseif task:GetTaskSubmitNpc(66) == npcId then
 		if Task_Submit_00000066() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 66
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "仗义援手";
+			action.m_ActionMsg = task_msg_1709;
 		elseif task:HasAcceptedTask(66) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 66
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "仗义援手";
+			action.m_ActionMsg = task_msg_1710;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000066_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我的一位好友许钺早年因为一些误会与元元大师的女弟子余莹姑有一些矛盾，现在约在鹦鹉洲比试。可是那余莹姑是学了飞剑的人物，我的朋友许钺如何能使对手，还希望"..GetPlayerName(GetPlayer()).."你去帮助我朋友，万一遇到危险，你可以出手救他。";
-	action.m_ActionMsg = "没问题，我这就赶去。";
+	action.m_NpcMsg = task_msg_1711..GetPlayerName(GetPlayer())..task_msg_1712;
+	action.m_ActionMsg = task_msg_1713;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000066_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哎，当年我也是无心之错，现在可怎么办是好。";
+	action.m_NpcMsg = task_msg_1714;
 	action.m_ActionMsg = "";
 	return action;
 end

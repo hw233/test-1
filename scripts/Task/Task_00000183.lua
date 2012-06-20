@@ -82,20 +82,20 @@ function Task_00000183(npcId)
 		action.m_ActionID = 183
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "武当败类";
+		action.m_ActionMsg = task_msg_2048;
 	elseif task:GetTaskSubmitNpc(183) == npcId then
 		if Task_Submit_00000183() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 183
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "武当败类";
+			action.m_ActionMsg = task_msg_2049;
 		elseif task:HasAcceptedTask(183) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 183
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "武当败类";
+			action.m_ActionMsg = task_msg_2050;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000183_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "林莽是我的同门师兄弟，他目前就在丹江口处，是我们武当的耻辱，少侠去解决他吧。";
-	action.m_ActionMsg = "是吗，我这就去除掉这个败类。";
+	action.m_NpcMsg = task_msg_2051;
+	action.m_ActionMsg = task_msg_2052;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000183_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2053;
 	action.m_ActionMsg = "";
 	return action;
 end

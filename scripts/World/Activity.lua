@@ -47,6 +47,11 @@ function is4_21()
     return is_4_21
 end
 
+is_6_22 = false 
+function is6_22()
+    return is_6_22
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -295,6 +300,38 @@ function onActivityCheck(tm)
           setRechargeActive(false, 4)
       end
 
+      if tm >= actTime53 and tm < actTime54 then
+          setEnchantGt11(true)
+      else
+          setEnchantGt11(false)
+      end
+
+      if tm >= actTime55 and tm < actTime56 then
+          setRechargeActive(true, 8)
+      else
+          setRechargeActive(false, 8)
+      end
+
+      if tm >= actTime57 and tm < actTime58 then
+          setRechargeNextRet(true)
+      else
+          setRechargeNextRet(false)
+      end
+
+      if tm >= actTime59 and tm < actTime60 then
+          is_6_22 = true
+          setDuanWu(true)
+      else
+          is_6_22 = false
+          setDuanWu(false)
+      end
+
+      if tm >= actTime61 and tm < actTime62 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -333,21 +370,28 @@ function initActTime(y, m, d)
   -- 搜搜地图 （5/14-5/20）
   local  SerStartTm18= { ['year'] = 2011, ['month'] = 5, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
+  -- 蓝钻特权
+  local  SerStartTm19= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 黄钻特权
-  local  SerStartTm19= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 黄钻特权
-  local  SerStartTm20= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm20= { ['year'] = 2012, ['month'] = 6, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 游戏大厅特权
-  local  SerStartTm21= { ['year'] = 2012, ['month'] = 5, ['day'] = 12, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm21= { ['year'] = 2012, ['month'] = 6, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 充值返利（5/16-5/27）
   local  SerStartTm22= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   -- 儿童节 (5/28-6/3)(5/28-6/30)
   local  SerStartTm23= { ['year'] = 2012, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 限时强化
+  local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 充值后期返利(过段时间反利)
+  local  SerStartTm25= { ['year'] = 2012, ['month'] = 6, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 6.25限时购买
+  local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 5, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm103 = { ['year'] = 2012, ['month'] = 5, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
@@ -417,13 +461,13 @@ function initActTime(y, m, d)
   actTime40 = os.time(SerStartTm18) + 7 * 86400;
 
   actTime41 = os.time(SerStartTm19);
-  actTime42 = os.time(SerStartTm19) + 31 * 86400;
+  actTime42 = os.time(SerStartTm19) + 19 * 86400;
 
   actTime43 = os.time(SerStartTm20);
-  actTime44 = os.time(SerStartTm20) + 31 * 86400;
+  actTime44 = os.time(SerStartTm20) + 19 * 86400;
 
   actTime45 = os.time(SerStartTm21);
-  actTime46 = os.time(SerStartTm21) + 7 * 86400;
+  actTime46 = os.time(SerStartTm21) + 14 * 86400;
 
   actTime47 = os.time(SerStartTm22);
   actTime48 = os.time(SerStartTm22) + 12 * 86400;
@@ -434,14 +478,30 @@ function initActTime(y, m, d)
   actTime51 = os.time(SerStartTm23);
   actTime52 = os.time(SerStartTm23) + 34 * 86400;
 
+  actTime53 = os.time(SerStartTm24);
+  actTime54 = os.time(SerStartTm24) + 12 * 86400;
+
+  actTime55 = os.time(SerStartTm24);
+  actTime56 = os.time(SerStartTm24) + 12 * 86400;
+
+  actTime57 = os.time(SerStartTm25);
+  actTime58 = os.time(SerStartTm25) + 13 * 86400;
+  setRechargeNextRetStart(actTime57, actTime58)
+
+  actTime59 = os.time(SerStartTm26);
+  actTime60 = os.time(SerStartTm26) + 9 * 86400;
+
+  actTime61 = os.time(SerStartTm27);
+  actTime62 = os.time(SerStartTm27) + 6 * 86400;
+
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
 
   actTime103 = os.time(SerStartTm102);
-  actTime104 = os.time(SerStartTm102) + 7 * 86400;
+  actTime104 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime105 = os.time(SerStartTm102);
-  actTime106 = os.time(SerStartTm102) + 3 * 86400;
+  actTime106 = os.time(SerStartTm102) + 8 * 86400;
 
   actTime107 = os.time(SerStartTm103);
   actTime108 = os.time(SerStartTm103) + 8 * 86400;

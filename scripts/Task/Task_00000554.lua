@@ -56,20 +56,20 @@ function Task_00000554(npcId)
 		action.m_ActionID = 554
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "为恶剑侠";
+		action.m_ActionMsg = task_msg_788;
 	elseif task:GetTaskSubmitNpc(554) == npcId then
 		if Task_Submit_00000554() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 554
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "为恶剑侠";
+			action.m_ActionMsg = task_msg_789;
 		elseif task:HasAcceptedTask(554) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 554
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "为恶剑侠";
+			action.m_ActionMsg = task_msg_790;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000554_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我之前听说慈云寺来了不少恶人，今日下山巡游见不少百姓去成都府衙来告状才发觉竟是真事，有一个叫毛太的家伙时常来郊外骚扰良家妇女，"..GetPlayerName(GetPlayer()).."你速速去将这个毛太除掉。";
-	action.m_ActionMsg = "为民除害是我辈本色，我去去就回。";
+	action.m_NpcMsg = task_msg_791..GetPlayerName(GetPlayer())..task_msg_792;
+	action.m_ActionMsg = task_msg_793;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000554_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊。 ";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_794;
 	action.m_ActionMsg = "";
 	return action;
 end

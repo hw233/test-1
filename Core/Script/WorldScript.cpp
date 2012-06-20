@@ -101,6 +101,8 @@ void WorldScript::init()
 	def("setSSDTAct", GObject::World::setSSDTAct);
 	def("getGemMergeAct", GObject::World::getGemMergeAct);
 	def("setGemMergeAct", GObject::World::setGemMergeAct);
+	def("getEnchantGt11", GObject::World::getEnchantGt11);
+	def("setEnchantGt11", GObject::World::setEnchantGt11);
     def("setBlueDiamondAct", GObject::World::setBlueDiamondAct);
     def("setYellowDiamondAct", GObject::World::setYellowDiamondAct);
     def("setQQGameAct", GObject::World::setQQGameAct);
@@ -111,6 +113,11 @@ void WorldScript::init()
 	def("getJune", GObject::World::getJune);
 	def("setJune1", GObject::World::setJune1);
 	def("getJune1", GObject::World::getJune1);
+	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
+	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
+	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
+	def("setDuanWu", GObject::World::setDuanWu);
+	def("getDuanWu", GObject::World::getDuanWu);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

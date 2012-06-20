@@ -179,6 +179,7 @@ namespace Script
 		bool RunItemTaskUse(Player* player, UInt32 itemId);	
 		UInt16 RunItemNormalUse(Player* player, UInt32 itemId, UInt32 param, UInt16 num, bool bind);
 		UInt16 RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind);
+        UInt16 getRandTrump(UInt8 lvl);
 
 		void RunAutoRegen(Player* player, Fighter* fighter);
 
@@ -215,7 +216,8 @@ namespace Script
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
 		void onEnchant(Player* player, UInt8 level);
-		void onEnchantAct(Player* player, UInt8 level);
+		void onEnchantAct(Player* player, UInt8 level, UInt8 type = 0);
+		void onEnchantGt11(Player* player, UInt16 id, UInt8 level, UInt8 type);
 		void onTrainFighterAct(Player* player, Fighter* fgt);
 		void onTopup(Player* player, UInt32 ogold, UInt32 ngold);
 		UInt32 onAttakerAddexp(Player* attacker, Player *defender, UInt32 award);
@@ -230,15 +232,19 @@ namespace Script
 		bool getActivateAttrResult(UInt8 lastActivateCount, UInt8 quality);
         void onRecruitAward(Player* player);
         void onCLLoginReward(Player* player, UInt8 cts);
+        UInt16 onCLLoginRewardRF(Player* player, UInt8 cts, UInt8 type);
         void onCL3DayReward(Player* player);
         bool onRC7DayWill(Player* player, UInt8 idx);
         UInt32 onUseMDSoul(Player* player, UInt8 type);
         bool onTurnOnRC7Day(Player* player, UInt32 total, UInt32 offset);
+        bool onTurnOnRF7Day(Player* player, UInt32 total, UInt32 offset);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num);
         bool RunSSDTAward(Player* player, UInt8 opt);
         lua_tinker::table luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind);
         UInt16 RunHappyAward(Player* player, UInt8 opt);
-       
+        UInt16 RunTargetAward(Player* player);
+        UInt16 RunTargetAwardRF(Player* player);
+        void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
 	public:
 
 		template <typename R>

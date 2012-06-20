@@ -82,20 +82,20 @@ function Task_00000078(npcId)
 		action.m_ActionID = 78
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "峨眉访客";
+		action.m_ActionMsg = task_msg_1070;
 	elseif task:GetTaskSubmitNpc(78) == npcId then
 		if Task_Submit_00000078() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 78
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "峨眉访客";
+			action.m_ActionMsg = task_msg_1071;
 		elseif task:HasAcceptedTask(78) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 78
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "峨眉访客";
+			action.m_ActionMsg = task_msg_1072;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000078_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有劳少侠了为我们戴家场如此奔波了，方才有一位峨眉的前辈高人来访，说有事找你，现下他正在戴家的大院里等候，少侠还是快快去吧。";
-	action.m_ActionMsg = "是吗，我这就去。";
+	action.m_NpcMsg = task_msg_1073;
+	action.m_ActionMsg = task_msg_1074;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000078_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "想不到我昔日教授的恶徒现在竟然在此为恶。";
+	action.m_NpcMsg = task_msg_1075;
 	action.m_ActionMsg = "";
 	return action;
 end

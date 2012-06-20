@@ -82,20 +82,20 @@ function Task_00000189(npcId)
 		action.m_ActionID = 189
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "白泽";
+		action.m_ActionMsg = task_msg_2084;
 	elseif task:GetTaskSubmitNpc(189) == npcId then
 		if Task_Submit_00000189() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 189
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "白泽";
+			action.m_ActionMsg = task_msg_2085;
 		elseif task:HasAcceptedTask(189) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 189
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "白泽";
+			action.m_ActionMsg = task_msg_2086;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000189_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老夫久居摩云岭，附近有一处美景叫星宿海，可是不日前来了一只异兽白泽，破坏植被，杀死其他生灵无数。远远见到老夫的气息就逃遁的无影无踪，所以特地麻烦少侠来帮我解决这个异兽了。";
-	action.m_ActionMsg = "我这就去将这只白泽抓来。";
+	action.m_NpcMsg = task_msg_2087;
+	action.m_ActionMsg = task_msg_2088;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000189_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2089;
 	action.m_ActionMsg = "";
 	return action;
 end

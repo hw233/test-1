@@ -82,20 +82,20 @@ function Task_00000187(npcId)
 		action.m_ActionID = 187
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "异兽玄武";
+		action.m_ActionMsg = task_msg_2072;
 	elseif task:GetTaskSubmitNpc(187) == npcId then
 		if Task_Submit_00000187() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 187
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "异兽玄武";
+			action.m_ActionMsg = task_msg_2073;
 		elseif task:HasAcceptedTask(187) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 187
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "异兽玄武";
+			action.m_ActionMsg = task_msg_2074;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000187_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "昆仑乃是上古神人之地，有不少异兽残存，他们修炼多年，道行高深，少侠可以去拿他们练练手。昆仑泉处有一只玄武，少侠去试试吧。";
-	action.m_ActionMsg = "我去会会这些上古异兽。";
+	action.m_NpcMsg = task_msg_2075;
+	action.m_ActionMsg = task_msg_2076;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000187_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2077;
 	action.m_ActionMsg = "";
 	return action;
 end

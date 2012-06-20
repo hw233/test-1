@@ -82,20 +82,20 @@ function Task_00000169(npcId)
 		action.m_ActionID = 169
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "冰熊";
+		action.m_ActionMsg = task_msg_1928;
 	elseif task:GetTaskSubmitNpc(169) == npcId then
 		if Task_Submit_00000169() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 169
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "冰熊";
+			action.m_ActionMsg = task_msg_1929;
 		elseif task:HasAcceptedTask(169) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 169
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "冰熊";
+			action.m_ActionMsg = task_msg_1930;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000169_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这陷空岛地处北极，倒也有一些奇异的生物，你看那秀琼原上有一些冰熊，毛皮雪白，力大无穷，用来做运输的畜力很是不错，小友你去帮我抓一些来。";
-	action.m_ActionMsg = "老祖吩咐，弟子这就去办。";
+	action.m_NpcMsg = task_msg_1931;
+	action.m_ActionMsg = task_msg_1932;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000169_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "哈哈，早就听说小友你在正邪之战中大放异彩。";
+	action.m_NpcMsg = task_msg_1933;
 	action.m_ActionMsg = "";
 	return action;
 end

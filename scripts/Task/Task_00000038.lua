@@ -82,20 +82,20 @@ function Task_00000038(npcId)
 		action.m_ActionID = 38
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "现场罪证";
+		action.m_ActionMsg = task_msg_275;
 	elseif task:GetTaskSubmitNpc(38) == npcId then
 		if Task_Submit_00000038() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 38
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "现场罪证";
+			action.m_ActionMsg = task_msg_276;
 		elseif task:HasAcceptedTask(38) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 38
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "现场罪证";
+			action.m_ActionMsg = task_msg_277;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000038_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "张亮这个恶人得已伏法，本官还得多谢少侠帮助，不过本官公务繁忙，抽不开身，还请少侠带着我手下几个捕快去王老丈家搜集这个恶徒的犯罪证据，以供来日审讯之用。";
-	action.m_ActionMsg = "举手之劳，知府大人您太客气了。";
+	action.m_NpcMsg = task_msg_278;
+	action.m_ActionMsg = task_msg_279;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000038_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠您辛苦了。";
+	action.m_NpcMsg = task_msg_280;
 	action.m_ActionMsg = "";
 	return action;
 end

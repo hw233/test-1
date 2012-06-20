@@ -82,20 +82,20 @@ function Task_00000099(npcId)
 		action.m_ActionID = 99
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "韩仙子";
+		action.m_ActionMsg = task_msg_454;
 	elseif task:GetTaskSubmitNpc(99) == npcId then
 		if Task_Submit_00000099() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 99
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "韩仙子";
+			action.m_ActionMsg = task_msg_455;
 		elseif task:HasAcceptedTask(99) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 99
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "韩仙子";
+			action.m_ActionMsg = task_msg_456;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000099_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "虽然赤发寨主已灭，但是他修炼魔功所遗留的瘴气仍然残留在姑婆岭周围，后患无穷。离此不远有个白犀潭，相传有座地仙宫阙，如今是乙休真人的妻子韩仙子居住。"..GetPlayerName(GetPlayer()).."你可以去找韩仙子取些玉露符来给我，我会做法净化姑婆岭的瘴气。";
-	action.m_ActionMsg = "这些瘴气果然污秽难当。";
+	action.m_NpcMsg = task_msg_457..GetPlayerName(GetPlayer())..task_msg_458;
+	action.m_ActionMsg = task_msg_459;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000099_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你就是元敬常常跟我提起的那位后起之秀吧？";
+	action.m_NpcMsg = task_msg_460;
 	action.m_ActionMsg = "";
 	return action;
 end

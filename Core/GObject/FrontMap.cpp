@@ -355,6 +355,14 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             }
             tmp.resize(0);
 
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 fifthDay = TimeUtil::SharpDay(4, PLAYER_DATA(pl, created));
+            if(id == 2 && thisDay == fifthDay && !pl->GetVar(VAR_CLAWARD2))
+            {
+                pl->SetVar(VAR_CLAWARD2, 1);
+                pl->sendRC7DayInfo(TimeUtil::Now());
+            }
+
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);
             if (ato)
@@ -363,6 +371,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 1, 2);
             if (!pl->GetShuoShuo()->getShuoShuo(id-1 + SS_FM1))
                 pl->OnShuoShuo(id-1 + SS_FM1);
+            pl->setContinuousRFAward(5);
             return 2;
         } else { // 打过某一点
             UInt8 nspot = spot+1;

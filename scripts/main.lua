@@ -1,5 +1,6 @@
 --??????????
 require("global")
+require("actmsg")
 require("World/Attain")
 require("Task/Task_All")
 require("Explore/Explore_All")

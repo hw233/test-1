@@ -82,20 +82,20 @@ function Task_00000058(npcId)
 		action.m_ActionID = 58
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "只欠东风";
+		action.m_ActionMsg = task_msg_1790;
 	elseif task:GetTaskSubmitNpc(58) == npcId then
 		if Task_Submit_00000058() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 58
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "只欠东风";
+			action.m_ActionMsg = task_msg_1791;
 		elseif task:HasAcceptedTask(58) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 58
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "只欠东风";
+			action.m_ActionMsg = task_msg_1792;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000058_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "现在万事具备，只欠东风了，现在是最后一步，这里是小徒申若兰在餐霞大师处借来的紫烟锄，可以在毒石上刨出乌风草来。不过这块毒石散发的毒雾很是凶毒，所以采集时千万要小心。";
-	action.m_ActionMsg = "我会注意的，姥姥您放心吧。";
+	action.m_NpcMsg = task_msg_1793;
+	action.m_ActionMsg = task_msg_1794;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000058_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这乌风草可治各种邪派蛊毒，你要小心使用。";
+	action.m_NpcMsg = task_msg_1795;
 	action.m_ActionMsg = "";
 	return action;
 end

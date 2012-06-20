@@ -56,20 +56,20 @@ function Task_00000518(npcId)
 		action.m_ActionID = 518
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "巨大鳄鱼";
+		action.m_ActionMsg = task_msg_742;
 	elseif task:GetTaskSubmitNpc(518) == npcId then
 		if Task_Submit_00000518() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 518
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "巨大鳄鱼";
+			action.m_ActionMsg = task_msg_743;
 		elseif task:HasAcceptedTask(518) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 518
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "巨大鳄鱼";
+			action.m_ActionMsg = task_msg_744;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000518_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都不远处的桂花山是一处美景，不过山中有五色云雾，寻常人轻易不得入内，听说有个室外高人隐居在山中，布下了五色云雾。在桂花山里有一处福仙潭，潭附近有一些巨大的鳄鱼出没，伤害了无数过往行人商旅，"..GetPlayerName(GetPlayer()).."你速速去除掉这一害。";
-	action.m_ActionMsg = "对付这些四脚蜥蜴，那还不简单，我去去就回。";
+	action.m_NpcMsg = task_msg_745..GetPlayerName(GetPlayer())..task_msg_746;
+	action.m_ActionMsg = task_msg_747;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000518_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些毒鳄凶猛无比，伤害了无数过往行人商旅。 ";
+	action.m_NpcMsg = task_msg_748;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000148(npcId)
 		action.m_ActionID = 148
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "无华氏";
+		action.m_ActionMsg = task_msg_1970;
 	elseif task:GetTaskSubmitNpc(148) == npcId then
 		if Task_Submit_00000148() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 148
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "无华氏";
+			action.m_ActionMsg = task_msg_1971;
 		elseif task:HasAcceptedTask(148) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 148
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "无华氏";
+			action.m_ActionMsg = task_msg_1972;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000148_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这无华氏乃是上古山民之君，后来其子被轩辕黄帝囚禁困死，因为伤心爱子身死，不就也即逝去。后来他手下权臣北车在这庐山无华袕内，为他父子筑了一座巨大的墓穴，谁知他们竟然在墓内得了灵域地气成为妖孽，如今这些妖孽得了轩辕异宝，蠢蠢欲动，得早些铲除他们。";
-	action.m_ActionMsg = "师太，我这就去三尸墓将他们消灭。";
+	action.m_NpcMsg = task_msg_1973;
+	action.m_ActionMsg = task_msg_1974;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000148_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，这只妖尸想来已经修炼千年之久，今日终于死于你手。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1975;
 	action.m_ActionMsg = "";
 	return action;
 end

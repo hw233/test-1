@@ -45,11 +45,14 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120423_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120427_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120503_1.sql # must be once -- fb
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120504_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_1.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_2.sql
-    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120509_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120504_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_1.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120508_2.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120509_1.sql
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120515_1.sql # must be once
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/towndeamon_player_fix.sql
+    #mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120613_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120619_1.sql
     #. clearshiyamen.sh
 }
 

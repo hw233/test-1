@@ -27,8 +27,8 @@ void LuckyDraw::sendInfo(Player* player)
     Stream st(REP::LUCKYDRAW);
 
     st << static_cast<UInt8>(1);
-    st << static_cast<UInt8>(5);
-    for (UInt8 i = 2; i < 7; ++i)
+    st << static_cast<UInt8>(6);
+    for (UInt8 i = 2; i < 8; ++i)
     {
         if (player->isCopyPassed(i))
             st << static_cast<UInt8>(1);
@@ -203,10 +203,13 @@ void LuckyDraw::notifyDisplay(Player* player)
     Stream st(REP::LUCKYDRAW);
     st << static_cast<UInt8>(3);
     bool passed = false;
-    for (UInt8 i = 2; i < 7; ++i)
+    for (UInt8 i = 2; i < 8; ++i)
     {
         if (player->isCopyPassed(i))
+        {
             passed = true;
+            break;
+        }
     }
 
     if (passed)

@@ -82,20 +82,20 @@ function Task_00000041(npcId)
 		action.m_ActionID = 41
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "强化法宝";
+		action.m_ActionMsg = task_msg_295;
 	elseif task:GetTaskSubmitNpc(41) == npcId then
 		if Task_Submit_00000041() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 41
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "强化法宝";
+			action.m_ActionMsg = task_msg_296;
 		elseif task:HasAcceptedTask(41) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 41
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "强化法宝";
+			action.m_ActionMsg = task_msg_297;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000041_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "想不到醉道人这个整天泡在酒葫芦里的家伙，竟然老眼不花，找到象你资质这么高的年青人……你的来意我已知晓，今天吗就免费教你强化法宝，要知道我收费可是很贵的哦。";
-	action.m_ActionMsg = "多谢廖前辈了。";
+	action.m_NpcMsg = task_msg_298;
+	action.m_ActionMsg = task_msg_299;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000041_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我就知道这家伙最喜爱那些仙根福厚，资质不凡的年青人了，省下这点银子又够我喝几天酒了。";
+	action.m_NpcMsg = task_msg_300;
 	action.m_ActionMsg = "";
 	return action;
 end

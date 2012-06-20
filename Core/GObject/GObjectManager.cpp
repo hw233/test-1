@@ -59,6 +59,7 @@
 #include "GData/Store.h"
 #include "LuckyDraw.h"
 #include <fcntl.h>
+#include "RealItemAward.h"
 
 namespace GObject
 {
@@ -172,6 +173,7 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
+        loadRealItemAward();
         loadEquipForge();
 		loadMapData();
         loadAttrFactor();
@@ -206,6 +208,7 @@ namespace GObject
         LoadDiscount();
         LoadSoulItemChance();
         LoadLuckyLog();
+        loadRNR();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -1276,7 +1279,7 @@ namespace GObject
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1353,6 +1356,7 @@ namespace GObject
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
             fgt2->setAcupoints(specfgtobj.acupoints, false);
+			fgt2->setFashion(fetchFashion(specfgtobj.fashion), false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
 			fgt2->setArmor(1, fetchArmor(specfgtobj.armor2), false);
@@ -2470,10 +2474,11 @@ namespace GObject
 				clan->addAllyClanFromDB(cl.allyClan);
 				clan->addEnemyClanFromDB(cl.enemyClan1);
 				clan->addEnemyClanFromDB(cl.enemyClan2);
-				clan->patchMergedName();
+				//clan->patchMergedName();
                 clan->setClanFunds(cl.funds);
 				clan->setFounder(cl.founder);
 				clan->setLeaderId(cl.leader, false);
+                clan->patchMergedName();
 				clan->setWatchmanId(cl.watchman, false);
 				clan->setConstruction(cl.construction, false);
                 clan->LoadBattleScore(cl.battleScore);
@@ -3427,6 +3432,7 @@ namespace GObject
                 case Item_Armor5:
                 case Item_Ring:
                 case Item_Amulet:
+                case Item_Fashion:
                 case Item_Trump:
                 {
                     ItemEquipData ied;
@@ -3455,6 +3461,7 @@ namespace GObject
 					case Item_Armor5:
 						equip = new ItemArmor(dbe.id, itype, ied);
                         break;
+                    case Item_Fashion:
                     case Item_Trump:
                         equip = new ItemTrump(dbe.id, itype, ied);
                         if (equip && ied.enchant)
@@ -4002,6 +4009,19 @@ namespace GObject
 		return base;
 	}
 
+	ItemFashion * GObjectManager::fetchFashion( UInt32 id )
+	{
+		ItemEquip * equip = fetchEquipment(id);
+		if(equip == NULL)
+			return NULL;
+		if(equip->GetItemType().subClass != static_cast<UInt8>(Item_Fashion))
+		{
+			delete equip;
+			return NULL;
+		}
+		return static_cast<ItemFashion*>(equip);
+	}
+
 	ItemWeapon * GObjectManager::fetchWeapon( UInt32 id )
 	{
 		ItemEquip * equip = fetchEquipment(id);
@@ -4222,6 +4242,45 @@ namespace GObject
 		{
 			lc.advance();
             luckyDraw.pushLog(t.name, t.items);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadRealItemAward()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading Real Item Award");
+		DBRealItemAward t;
+		if(execu->Prepare("SELECT `id`, `cd`, `card_no`, `card_psw` FROM `real_item_award` ORDER BY `id`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            realItemAwardMgr.load(t.id, t.cd, t.card_no, t.card_psw);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadRNR()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading RNR");
+		DBRNR t;
+		if(execu->Prepare("SELECT `id`, `record` FROM `rechargenextret` ORDER BY `id`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            Player* pl = globalPlayers[t.id];
+            if (!pl)
+                continue;
+            pl->loadRNRFromDB(t.record);
         }
         lc.finalize();
         return true;

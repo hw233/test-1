@@ -59,8 +59,9 @@ bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
 
 static void serverNameToGlobalName(string& name, UInt16 sid)
 {
-    if(cfg.merged)
+    if(cfg.merged && sid > 0)
     {
+        sid = sid - 1;
         do
         {
             name.push_back(static_cast<char>((sid % 31) + 1));
@@ -1162,6 +1163,12 @@ void MailFromBs(LoginMsgHdr &hdr,const void * data)
     br>>playerName;
     br>>title;
     br>>content;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        serverNameToGlobalName(playerName, serverNo);
+    }
     GObject::Player *pl= GObject::globalNamedPlayers[playerName];
     Stream st;
     st.init(SPEP::MAILFROMBS, 0x01);
@@ -1508,10 +1515,16 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		item[nums++].count = money[i];
 	}
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+    {
+        br>>serverNo;
+    }
+
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
 	{
 		GObject::Player *player=it->second;
-		if(player==NULL)
+		if(player==NULL || (serverNo != 0 && serverNo != (static_cast<UInt16>(player->getId()>>48))))
 		{
 			result+="1 ";
 		}

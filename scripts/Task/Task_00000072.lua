@@ -82,20 +82,20 @@ function Task_00000072(npcId)
 		action.m_ActionID = 72
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "约战陈圩";
+		action.m_ActionMsg = task_msg_1048;
 	elseif task:GetTaskSubmitNpc(72) == npcId then
 		if Task_Submit_00000072() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 72
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "约战陈圩";
+			action.m_ActionMsg = task_msg_1049;
 		elseif task:HasAcceptedTask(72) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 72
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "约战陈圩";
+			action.m_ActionMsg = task_msg_1050;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000072_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这另一封信是交给陈圩的陈长泰，到时候恩怨一并了解，还请少侠务必将这两封信送到。";
-	action.m_ActionMsg = "戴场主，这你就放心吧。";
+	action.m_NpcMsg = task_msg_1051;
+	action.m_ActionMsg = task_msg_1052;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000072_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "打擂台吗，这正合吾意。";
+	action.m_NpcMsg = task_msg_1053;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000145(npcId)
 		action.m_ActionID = 145
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "妖道神鸟";
+		action.m_ActionMsg = task_msg_1976;
 	elseif task:GetTaskSubmitNpc(145) == npcId then
 		if Task_Submit_00000145() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 145
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "妖道神鸟";
+			action.m_ActionMsg = task_msg_1977;
 		elseif task:HasAcceptedTask(145) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 145
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "妖道神鸟";
+			action.m_ActionMsg = task_msg_1978;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000145_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这三尸墓早在黄帝时代就已存在，墓中的两个僵尸妖术非常厉害，后来他们偷盗了轩辕神墓中的法宝，并勾结了一个妖道叫钟敢在庐山为恶，那妖道钟敢手下一直神鸟天生凶禽，少侠你要小心对付才是。";
-	action.m_ActionMsg = "一只扁毛畜生而已，待我去消灭它。";
+	action.m_NpcMsg = task_msg_1979;
+	action.m_ActionMsg = task_msg_1980;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000145_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，少侠真是剑术高强，一身正气啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1981;
 	action.m_ActionMsg = "";
 	return action;
 end

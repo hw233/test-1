@@ -82,20 +82,20 @@ function Task_00000171(npcId)
 		action.m_ActionID = 171
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "天涔海";
+		action.m_ActionMsg = task_msg_1940;
 	elseif task:GetTaskSubmitNpc(171) == npcId then
 		if Task_Submit_00000171() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 171
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "天涔海";
+			action.m_ActionMsg = task_msg_1941;
 		elseif task:HasAcceptedTask(171) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 171
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "天涔海";
+			action.m_ActionMsg = task_msg_1942;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000171_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠通知，我这就收拾一下回去面见师傅，不过这天涔海里仍然有一些夜叉未除，请少侠帮助剿灭这些余孽吧。";
-	action.m_ActionMsg = "嗯，我懂的。";
+	action.m_NpcMsg = task_msg_1943;
+	action.m_ActionMsg = task_msg_1944;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000171_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢少侠帮助。";
+	action.m_NpcMsg = task_msg_1945;
 	action.m_ActionMsg = "";
 	return action;
 end

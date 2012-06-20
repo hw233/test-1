@@ -82,20 +82,20 @@ function Task_00000009(npcId)
 		action.m_ActionID = 9
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "事发突然";
+		action.m_ActionMsg = task_msg_103;
 	elseif task:GetTaskSubmitNpc(9) == npcId then
 		if Task_Submit_00000009() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 9
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "事发突然";
+			action.m_ActionMsg = task_msg_104;
 		elseif task:HasAcceptedTask(9) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 9
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "事发突然";
+			action.m_ActionMsg = task_msg_105;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000009_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我和父亲在舍身崖才稍息了片刻，就看到赵燕儿跑来，十分焦急，似乎找他师傅有急事，少侠不妨去问问他，到底是何事如此惊慌？";
-	action.m_ActionMsg = "嗯，我去问问。";
+	action.m_NpcMsg = task_msg_106;
+	action.m_ActionMsg = task_msg_107;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000009_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "可看见我师傅在哪？";
+	action.m_NpcMsg = task_msg_108;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000059(npcId)
 		action.m_ActionID = 59
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "乌风酒";
+		action.m_ActionMsg = task_msg_1784;
 	elseif task:GetTaskSubmitNpc(59) == npcId then
 		if Task_Submit_00000059() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 59
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "乌风酒";
+			action.m_ActionMsg = task_msg_1785;
 		elseif task:HasAcceptedTask(59) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 59
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "乌风酒";
+			action.m_ActionMsg = task_msg_1786;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000059_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "福仙潭底的毒石生长于地火之上，你们方才采集草药之时已经沾染了火毒，恐怕很快就会发作。小徒那里有我多年前秘制的乌风酒可解此火毒，你们赶快去吧，我不久就将圆寂飞升，小徒也拜托你们照顾了。";
-	action.m_ActionMsg = "姥姥保重，我们这就走了。";
+	action.m_NpcMsg = task_msg_1787;
+	action.m_ActionMsg = task_msg_1788;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000059_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "师傅从小把我抚养长大，如今离去，若兰感到不胜悲伤。";
+	action.m_NpcMsg = task_msg_1789;
 	action.m_ActionMsg = "";
 	return action;
 end

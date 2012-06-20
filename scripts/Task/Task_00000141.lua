@@ -82,20 +82,20 @@ function Task_00000141(npcId)
 		action.m_ActionID = 141
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "食人猿妖";
+		action.m_ActionMsg = task_msg_1631;
 	elseif task:GetTaskSubmitNpc(141) == npcId then
 		if Task_Submit_00000141() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 141
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "食人猿妖";
+			action.m_ActionMsg = task_msg_1632;
 		elseif task:HasAcceptedTask(141) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 141
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "食人猿妖";
+			action.m_ActionMsg = task_msg_1633;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000141_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "对付三尸墓里的僵尸到是不急，我还约了其他的正道朋友来助拳，少侠你不如先帮老身解决庐山百姓的一大难题。你看那鬼见愁悬崖危壁，居住着一群食人猿妖，经常三五成群出来袭击当地百姓，我乃出家人，不宜沾染血腥，还得少侠你出出力了。";
-	action.m_ActionMsg = "师太莫愁，我这就去消灭它们。";
+	action.m_NpcMsg = task_msg_1634;
+	action.m_ActionMsg = task_msg_1635;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000141_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，白眉大师派你来帮助我真是太好了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1636;
 	action.m_ActionMsg = "";
 	return action;
 end

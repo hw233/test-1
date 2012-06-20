@@ -50,20 +50,20 @@ function Task_00000158(npcId)
 		action.m_ActionID = 158
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "天狐渡劫";
+		action.m_ActionMsg = task_msg_1856;
 	elseif task:GetTaskSubmitNpc(158) == npcId then
 		if Task_Submit_00000158() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 158
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "天狐渡劫";
+			action.m_ActionMsg = task_msg_1857;
 		elseif task:HasAcceptedTask(158) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 158
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "天狐渡劫";
+			action.m_ActionMsg = task_msg_1858;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000158_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "如今在东海有一位道友正要渡劫，她原本乃是一天狐，是秦氏姐妹的母亲，已经有数位我们正道中人前去助她渡劫，小友你不如也去东海见识一下。";
-	action.m_ActionMsg = "嗯，我这就去。";
+	action.m_NpcMsg = task_msg_1859;
+	action.m_ActionMsg = task_msg_1860;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000158_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "多谢诸位道友相助。";
+	action.m_NpcMsg = task_msg_1861;
 	action.m_ActionMsg = "";
 	return action;
 end

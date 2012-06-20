@@ -51,6 +51,7 @@ MSG_REG(GameMsgHdr, OnBatchMergeReq);
 //MSG_REG_2(GameMsgHdr, REQ::GEM_UPGRADE, OnBatchMergeReq);
 //MSG_REG(GameMsgHdr, OnActivateAttrReq);
 //MSG_REG(GameMsgHdr, OutCitySwitchReq);
+MSG_REG(GameMsgHdr, OnActivateAttrReq);
 MSG_REG(GameMsgHdr, InCitySwitchReq);
 MSG_REG(GameMsgHdr, OnTransportReq);
 MSG_REG(GameMsgHdr, OnDungeonOpReq);
@@ -156,6 +157,7 @@ MSG_REG_2(GameMsgHdr, REQ::TOWN_DEAMON, OnTownDeamonReq);
 
 MSG_REG_2(GameMsgHdr, REQ::SECOND_SOUL, OnSecondSoulReq);
 MSG_REG_2(GameMsgHdr, REQ::RC7DAY, OnRC7Day);
+MSG_REG_2(GameMsgHdr, REQ::RF7DAY, OnRF7Day);
 
 MSG_REG_2(GameMsgHdr, 0x1D0, OnDailyReq2);
 
@@ -268,6 +270,8 @@ MSG_REG_2(GameMsgHdr, 0x242, OnCFriendLvlUp);
 MSG_REG_2(GameMsgHdr, 0x243, OnShuoShuo);
 MSG_REG_2(GameMsgHdr, 0x246, OnSendMayDayTitleCard);
 MSG_REG_2(GameMsgHdr, 0x247, OnSendJuneHappyTitleCard);
+MSG_REG_2(GameMsgHdr, 0x248, OnAddItemByIDIP);
+MSG_REG_2(GameMsgHdr, 0x249, OnSendRNR);
 
 
 MSG_REG_2(GameMsgHdr, 0x250, OnRemoveClanRank);

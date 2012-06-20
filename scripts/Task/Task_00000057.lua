@@ -82,20 +82,20 @@ function Task_00000057(npcId)
 		action.m_ActionID = 57
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "诛杀神鳄";
+		action.m_ActionMsg = task_msg_1796;
 	elseif task:GetTaskSubmitNpc(57) == npcId then
 		if Task_Submit_00000057() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 57
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "诛杀神鳄";
+			action.m_ActionMsg = task_msg_1797;
 		elseif task:HasAcceptedTask(57) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 57
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "诛杀神鳄";
+			action.m_ActionMsg = task_msg_1798;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000057_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在这福仙潭里有一只成道多年的神鳄，与那毒石相伴，凶恶异常，必须先将其杀灭，不然在你们专心采药时窜出来喷吐毒雾，就非常棘手了。";
-	action.m_ActionMsg = "姥姥放心，我对付一只小小爬虫不在话下。";
+	action.m_NpcMsg = task_msg_1799;
+	action.m_ActionMsg = task_msg_1800;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000057_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠看来剑术不错啊。";
+	action.m_NpcMsg = task_msg_1801;
 	action.m_ActionMsg = "";
 	return action;
 end

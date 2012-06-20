@@ -55,7 +55,7 @@ bool existGreatFighter(UInt32 id)
 
 Fighter::Fighter(UInt32 id, Player * owner):
 	_id(id), _owner(owner), _class(0), _level(1), _exp(0), _pexp(0),  _pexpAddTmp(0) , _pexpMax(0), _potential(1.0f),
-    _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _weapon(NULL),
+    _capacity(1.0f), _color(2), _hp(0), _cittaslot(CITTA_INIT), _fashion(NULL), _weapon(NULL),
     _ring(NULL), _amulet(NULL), _attrDirty(false), _maxHP(0), _bPDirty(false),
     _expFlush(false), _expMods(0), _expEnd(0), _pexpMods(0), _forceWrite(false), _battlePoint(0.0f), _praadd(0),
     _attrType1(0), _attrValue1(0), _attrType2(0), _attrValue2(0), _attrType3(0), _attrValue3(0),
@@ -80,6 +80,7 @@ Fighter::Fighter(UInt32 id, Player * owner):
 
 Fighter::~Fighter()
 {
+	SAFE_DELETE(_fashion);
 	SAFE_DELETE(_weapon);
 	SAFE_DELETE(_ring);
 	SAFE_DELETE(_amulet);
@@ -144,6 +145,16 @@ UInt8 Fighter::getColor2( float pot )
 	if(pot < 2.099f)
 		return 4;
 	return 10;
+}
+
+UInt32 Fighter::getFashionId()
+{
+	return _fashion ? _fashion->getId() : 0;
+}
+
+UInt32 Fighter::getFashionTypeId()
+{
+	return _fashion ? _fashion->GetTypeId() : 0;
 }
 
 UInt32 Fighter::getWeaponId()
@@ -212,7 +223,7 @@ bool Fighter::addExp( UInt64 e )
 		{
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
-		}
+        }
         worldBoss.setLevel(_level);
         _owner->sendLevelPack(_level);
         _expFlush = true;
@@ -287,6 +298,18 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
+            /*
+            if(_level >= 40)
+            {
+                UInt32 thisDay = TimeUtil::SharpDay();
+                UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(_owner, created));
+                if(thisDay == firstDay && !_owner->GetVar(VAR_CLAWARD2))
+                {
+                     _owner->SetVar(VAR_CLAWARD2, 1);
+                     _owner->sendRC7DayInfo(TimeUtil::Now());
+                }
+            }
+            */
 		}
         worldBoss.setLevel(l);
 	}
@@ -462,6 +485,7 @@ void Fighter::updateToDB( UInt8 t, UInt64 v )
     case 0x64: // passive
         break;
 
+	case 0x20: field = "fashion"; break;
 	case 0x21: field = "weapon"; break;
 	case 0x22: field = "armor1"; break;
 	case 0x23: field = "armor2"; break;
@@ -653,7 +677,7 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
                 esa.appendAttrToStream(st);
             }
 
-            if(equip->getClass() == Item_Trump)
+            if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion)
             {
                 st << ied.maxTRank << ied.trumpExp;
             }
@@ -663,6 +687,23 @@ void Fighter::sendModification( UInt8 n, UInt8 * t, ItemEquip ** v, bool writedb
 	}
 	st << Stream::eos;
 	_owner->send(st);
+}
+
+ItemEquip * Fighter::setFashion( ItemFashion* r, bool writedb )
+{
+	ItemEquip * rr = _fashion;
+	_fashion = r;
+	if(writedb)
+	{
+		_attrDirty = true;
+		_bPDirty = true;
+		if(r != NULL)
+		{
+			r->DoEquipBind(true);
+		}
+		sendModification(0x20, r);
+	}
+	return rr;
 }
 
 ItemWeapon * Fighter::setWeapon( ItemWeapon * w, bool writedb )
@@ -1270,7 +1311,7 @@ void Fighter::addAttr( ItemEquip * equip )
 	}
 }
 
-void Fighter::addTrumpAttr( ItemTrump * trump )
+void Fighter::addTrumpAttr( ItemEquip* trump )
 {
     if (!trump)
         return;
@@ -1303,7 +1344,13 @@ void Fighter::rebuildEquipAttr()
 	UInt32 setId[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	UInt32 setNum[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-	ItemEquip * equip = getWeapon();
+	ItemEquip * equip = getFashion();
+    if (equip != NULL)
+    { // XXX: like trump
+        addTrumpAttr(equip);
+    }
+
+	equip = getWeapon();
 	if(equip != NULL)
 	{
 		if(equip->getQuality() >= 4)
@@ -1457,6 +1504,7 @@ Fighter * Fighter::clone(Player * player)
 		fgt->_exp = 0;
 	}
 	fgt->_owner = player;
+	fgt->_fashion = NULL;
 	fgt->_weapon = NULL;
 	fgt->_ring = NULL;
 	fgt->_amulet = NULL;
@@ -1470,27 +1518,32 @@ Fighter * Fighter::clone(Player * player)
 
 ItemEquip * Fighter::findEquip( UInt32 id, UInt8& pos )
 {
-	pos = 0;
+    if(_fashion != NULL && _fashion->getId() == id)
+    {
+        pos = 0;
+        return _fashion;
+    }
 	if(_weapon != NULL && _weapon->getId() == id)
 	{
+        pos = 1;
 		return _weapon;
 	}
 	for(int i = 0; i < 5; ++ i)
 	{
 		if(_armor[i] != NULL && _armor[i]->getId() == id)
 		{
-			pos = i + 1;
+			pos = i + 2;
 			return _armor[i];
 		}
 	}
 	if(_amulet != NULL && _amulet->getId() == id)
 	{
-		pos = 6;
+		pos = 7;
 		return _amulet;
 	}
 	if(_ring != NULL && _ring->getId() == id)
 	{
-		pos = 7;
+		pos = 8;
 		return _ring;
 	}
     for(int idx = 0; idx < TRUMP_UPMAX; ++ idx)
@@ -1509,7 +1562,15 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 	bool found = false;
 	switch(pos)
 	{
-	case 0:
+    case 0:
+        if (_fashion == equip)
+        {
+            _fashion = NULL;
+			sendModification(0x20, NULL, true);
+			found = true;
+        }
+        break;
+	case 1:
 		if(_weapon == equip)
 		{
 			_weapon = NULL;
@@ -1517,13 +1578,13 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 			found = true;
 		}
 		break;
-	case 1:
 	case 2:
 	case 3:
 	case 4:
 	case 5:
+	case 6:
 		{
-			UInt8 i = pos - 1;
+			UInt8 i = pos - 2;
 			if(_armor[i] == equip)
 			{
 				_armor[i] = NULL;
@@ -1532,19 +1593,19 @@ void Fighter::removeEquip( UInt8 pos, ItemEquip * equip, UInt8 toWhere )
 			}
 		}
 		break;
-	case 6:
+	case 7:
 		if(_amulet == equip)
 		{
 			_amulet = NULL;
-			sendModification(0x28, NULL, true);
+			sendModification(0x27, NULL, true);
 			found = true;
 		}
 		break;
-	case 7:
+	case 8:
 		if(_ring == equip)
 		{
 			_ring = NULL;
-			sendModification(0x27, NULL, true);
+			sendModification(0x28, NULL, true);
 			found = true;
 		}
 		break;
@@ -1567,6 +1628,10 @@ Fighter * Fighter::cloneWithEquip(Player * player)
 {
 	Fighter * fgt = new Fighter(*this);
 	fgt->_owner = player;
+    if (_fashion != NULL)
+        fgt->_fashion = new ItemFashion(*_fashion);
+    else
+        fgt->_fashion = NULL;
 	if(_weapon != NULL)
 		fgt->_weapon = new ItemWeapon(*_weapon);
 	else

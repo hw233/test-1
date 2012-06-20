@@ -82,20 +82,20 @@ function Task_00000069(npcId)
 		action.m_ActionID = 69
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "戴家场之难";
+		action.m_ActionMsg = task_msg_1039;
 	elseif task:GetTaskSubmitNpc(69) == npcId then
 		if Task_Submit_00000069() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 69
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "戴家场之难";
+			action.m_ActionMsg = task_msg_1040;
 		elseif task:HasAcceptedTask(69) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 69
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "戴家场之难";
+			action.m_ActionMsg = task_msg_1041;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000069_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "我们这里叫葵花裕，那恶徒罗九和陈圩及吕村的妖人勾结为害我们戴家场，虽然他们人多势众，其实我们也不惧。只是最近他们请了一些妖人来助阵确让我们很是头痛。";
-	action.m_ActionMsg = "我们是学剑之人，自然会帮助你们对付那些邪道妖人。";
+	action.m_NpcMsg = task_msg_1042;
+	action.m_ActionMsg = task_msg_1043;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000069_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这就太好了，戴大哥是我们戴家场的场主，有什么事你去和他商量吧。";
-	action.m_ActionMsg = "好的。";
+	action.m_NpcMsg = task_msg_1044;
+	action.m_ActionMsg = task_msg_1045;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000069_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有"..GetPlayerName(GetPlayer()).."你的帮助，对付这些恶人我们就大有把握了。";
+	action.m_NpcMsg = task_msg_1046..GetPlayerName(GetPlayer())..task_msg_1047;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -50,20 +50,20 @@ function Task_00000184(npcId)
 		action.m_ActionID = 184
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "芬陀神尼";
+		action.m_ActionMsg = task_msg_2054;
 	elseif task:GetTaskSubmitNpc(184) == npcId then
 		if Task_Submit_00000184() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 184
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "芬陀神尼";
+			action.m_ActionMsg = task_msg_2055;
 		elseif task:HasAcceptedTask(184) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 184
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "芬陀神尼";
+			action.m_ActionMsg = task_msg_2056;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000184_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠去昆仑见见芬陀神尼吧，她可是前辈高人。";
-	action.m_ActionMsg = "是吗，我这就去昆仑山。";
+	action.m_NpcMsg = task_msg_2057;
+	action.m_ActionMsg = task_msg_2058;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000184_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2059;
 	action.m_ActionMsg = "";
 	return action;
 end

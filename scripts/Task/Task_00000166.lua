@@ -82,20 +82,20 @@ function Task_00000166(npcId)
 		action.m_ActionID = 166
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "玄冥界";
+		action.m_ActionMsg = task_msg_1916;
 	elseif task:GetTaskSubmitNpc(166) == npcId then
 		if Task_Submit_00000166() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 166
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "玄冥界";
+			action.m_ActionMsg = task_msg_1917;
 		elseif task:HasAcceptedTask(166) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 166
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "玄冥界";
+			action.m_ActionMsg = task_msg_1918;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000166_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这元磁真力玄妙异常，不过因为地处北极，元磁真力结合阴寒之力竟然沟通到玄冥异界，引得不少玄冥异民降临，此类异界生灵是我等之大敌，只是我首菁英骚扰在先，还无法完全化为人形，希望小友你可以出手除掉此害。";
-	action.m_ActionMsg = "是吗，我这就去除掉玄冥异民。";
+	action.m_NpcMsg = task_msg_1919;
+	action.m_ActionMsg = task_msg_1920;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000166_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老朽修炼多年，终于可以化身成人了。";
+	action.m_NpcMsg = task_msg_1921;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000026(npcId)
 		action.m_ActionID = 26
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "异人收徒";
+		action.m_ActionMsg = task_msg_201;
 	elseif task:GetTaskSubmitNpc(26) == npcId then
 		if Task_Submit_00000026() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 26
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "异人收徒";
+			action.m_ActionMsg = task_msg_202;
 		elseif task:HasAcceptedTask(26) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 26
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "异人收徒";
+			action.m_ActionMsg = task_msg_203;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000026_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "接下来就让你帮我跑跑腿了，和你一起的不是有个叫周淳的吗，虽然年过四十又不是童身，但别人说不好的自己偏偏就觉得好，我就是要收周淳做弟子，这是另外一枚补髓益元丹你去碧均庵送给他。";
-	action.m_ActionMsg = "前辈真乃是风尘异人啊。";
+	action.m_NpcMsg = task_msg_204;
+	action.m_ActionMsg = task_msg_205;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000026_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是感谢"..GetPlayerName(GetPlayer()).."你来告诉我这个喜讯。";
+	action.m_NpcMsg = task_msg_206..GetPlayerName(GetPlayer())..task_msg_207;
 	action.m_ActionMsg = "";
 	return action;
 end

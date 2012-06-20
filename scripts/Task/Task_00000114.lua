@@ -82,20 +82,20 @@ function Task_00000114(npcId)
 		action.m_ActionID = 114
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "山魈之祸";
+		action.m_ActionMsg = task_msg_551;
 	elseif task:GetTaskSubmitNpc(114) == npcId then
 		if Task_Submit_00000114() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 114
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "山魈之祸";
+			action.m_ActionMsg = task_msg_552;
 		elseif task:HasAcceptedTask(114) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 114
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "山魈之祸";
+			action.m_ActionMsg = task_msg_553;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000114_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "我们一干兄弟被附近山魈祸害的好惨，这两只山魈专喜生啖动物脑髓，被他们害死的兄弟不知其数，"..GetPlayerName(GetPlayer()).."我看你也学过一些三脚猫的剑术，对付这两只山魈应该不成问题吧。";
-	action.m_ActionMsg = "三脚猫的剑术恐怕对付不了这两只凶兽吧。";
+	action.m_NpcMsg = task_msg_554..GetPlayerName(GetPlayer())..task_msg_555;
+	action.m_ActionMsg = task_msg_556;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000114_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嘿嘿，"..GetPlayerName(GetPlayer()).."你大人有大量，别跟我一般见识。";
-	action.m_ActionMsg = "大猩猩，你虽然是个废材，不过嘴皮的能耐还是不差得。";
+	action.m_NpcMsg = task_msg_557..GetPlayerName(GetPlayer())..task_msg_558;
+	action.m_ActionMsg = task_msg_559;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000114_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."看不出你还有两把刷子吗。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_560;
 	action.m_ActionMsg = "";
 	return action;
 end

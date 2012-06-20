@@ -82,20 +82,20 @@ function Task_00000188(npcId)
 		action.m_ActionID = 188
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "天池上人";
+		action.m_ActionMsg = task_msg_2078;
 	elseif task:GetTaskSubmitNpc(188) == npcId then
 		if Task_Submit_00000188() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 188
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "天池上人";
+			action.m_ActionMsg = task_msg_2079;
 		elseif task:HasAcceptedTask(188) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 188
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "天池上人";
+			action.m_ActionMsg = task_msg_2080;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000188_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我久居昆仑，有一近邻，号天池上人，最近有些烦恼，你去看看吧。";
-	action.m_ActionMsg = "好吧，我去帮助上人解决这些烦恼。";
+	action.m_NpcMsg = task_msg_2081;
+	action.m_ActionMsg = task_msg_2082;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000188_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠光临，真是蓬荜生辉啊。";
+	action.m_NpcMsg = task_msg_2083;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -698,7 +698,7 @@ function ItemNormal_00000417(iid, num, bind, param)
         package:DelItemSendMsg(417, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -732,7 +732,7 @@ function ItemNormal_00000418(iid, num, bind, param)
         package:DelItemSendMsg(418, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -766,7 +766,7 @@ function ItemNormal_00000419(iid, num, bind, param)
         package:DelItemSendMsg(419, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -798,7 +798,7 @@ function ItemNormal_00000420(iid, num, bind, param)
         package:DelItemSendMsg(420, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -830,7 +830,7 @@ function ItemNormal_00000421(iid, num, bind, param)
         package:DelItemSendMsg(421, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -862,7 +862,7 @@ function ItemNormal_00000422(iid, num, bind, param)
         package:DelItemSendMsg(422, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -894,7 +894,7 @@ function ItemNormal_00000423(iid, num, bind, param)
         package:DelItemSendMsg(423, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -926,7 +926,7 @@ function ItemNormal_00000424(iid, num, bind, param)
         package:DelItemSendMsg(424, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -959,7 +959,7 @@ function ItemNormal_00000425(iid, num, bind, param)
         package:DelItemSendMsg(425, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -997,7 +997,7 @@ function ItemNormal_00000426(iid, num, bind, param)
         package:DelItemSendMsg(426, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -1037,7 +1037,7 @@ function ItemNormal_00000427(iid, num, bind, param)
         package:DelItemSendMsg(427, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false 
 end
@@ -1119,7 +1119,7 @@ function ItemNormal_00000428(iid, num, bind, param)
         package:DelItemSendMsg(428, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -1215,7 +1215,7 @@ function ItemNormal_00000432(iid, num, bind, param)
         if i <= v then
             package:AddItem(items[n][1], items[n][2], 0, 0, 2);
             if items[n][1] == 47 or items[n][1] == 515 then
-                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:"..items[n][1].."]")
+                Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:432]，"..msg_61.."[4:"..items[n][1].."]")
             end
             break
         end
@@ -1224,10 +1224,10 @@ function ItemNormal_00000432(iid, num, bind, param)
     if t <= 20 then
         if r <= 50 then
             package:AddItem(6007, 1, 0, 0, 2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6007]")
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:432]，"..msg_61.."[4:6007]")
         else
             package:AddItem(6008, 1, 0, 0, 2);
-            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[4:432]，获得了[4:6008]")
+            Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:432]，"..msg_61.."[4:6008]")
         end
     end
 
@@ -1327,7 +1327,7 @@ function ItemNormal_00000476(iid, num, bind, param)
 
     package:AddItem(item, nums[k], 1, 0, 2)
     if broad[k] == 1 then
-        Broadcast(0x27, "恭喜，[p:"..player:getCountry()..":"..player:getPName().."]玩家使用[4:476]，获得道具[4:"..item.."]x"..nums[k])
+        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:476]，"..msg_61.."[4:"..item.."]x"..nums[k])
     end
     return num
 end
@@ -1380,7 +1380,7 @@ function ItemNormal_00000479(iid, num, bind, param)
     local date = os.date("%m%d", os.time())
 
     if date < "0401" then
-        SendMsg(player, 0x35, "愚人节当日打开有惊喜");
+        SendMsg(player, 0x35, msg_62);
         return false
     end
 
@@ -1388,7 +1388,7 @@ function ItemNormal_00000479(iid, num, bind, param)
     if date == "0401" then
         factor = 2
         needsize = needsize + 1
-        SendMsg(player, 0x35, "惊喜就在这里！恭喜获得双倍奖励，祝大侠节日快乐～");
+        SendMsg(player, 0x35, msg_63);
     end
 
     if package:GetRestPackageSize() < needsize then
@@ -1412,7 +1412,7 @@ function ItemNormal_00000480(iid, num, bind, param)
 
     local date = os.date("%m%d", os.time())
     if date ~= "0401" then
-        SendMsg(player, 0x35, "只能在愚人节当天使用");
+        SendMsg(player, 0x35, msg_64);
         return false
     end
 
@@ -1474,7 +1474,7 @@ function ItemNormal_00000481(iid, num, bind, param)
 
     package:AddItem(item, nums[k], 1, 0, 2)
     if broad[k] == 1 then
-        Broadcast(0x27, "恭喜，[p:"..player:getCountry()..":"..player:getPName().."]玩家使用[4:481]，获得道具[4:"..item.."]x"..nums[k])
+        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:481]，"..msg_61.."[4:"..item.."]x"..nums[k])
     end
     package:DelItemSendMsg(481, player);
     return num
@@ -1664,8 +1664,8 @@ function ItemNormal_00000496(iid, num, bind, param)
         player:AddVar(90, p)
         player:sendMDSoul(0, 0)
         if getMayDay() then
-            SendMsg(player, 0x35, "获得风雷罗盘灵气"..p.."点")
-            SendMsg(player, 0x1, "获得风雷罗盘灵气"..p.."点")
+            SendMsg(player, 0x35, msg_65..p..msg_66)
+            SendMsg(player, 0x1, msg_65..p..msg_66)
         end
     end
     player:AddVar(93, num)
@@ -1694,8 +1694,8 @@ function ItemNormal_00000497(iid, num, bind, param)
         player:AddVar(90, p)
         player:sendMDSoul(0, 0)
         if getMayDay() then
-            SendMsg(player, 0x35, "获得风雷罗盘灵气"..p.."点")
-            SendMsg(player, 0x1, "获得风雷罗盘灵气"..p.."点")
+            SendMsg(player, 0x35, msg_65..p..msg_66)
+            SendMsg(player, 0x1, msg_65..p..msg_66)
         end
     end
     player:AddVar(92, num)
@@ -1830,12 +1830,12 @@ function ItemNormal_00000008(iid, num, bind, param)
         local equip = getRandOEquip(player:GetLev())
 		package:AddEquip(equip, 1, false);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..equip.."]");
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:8]"..msg_61.."[4:"..equip.."]");
         end
     else
         package:AddItem(item[1], item[2], true, false, 2);
         if i == 2 or i == 3 or i == 6 or i == 8 or i == 10 then
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用【感恩节大餐】，获得[4:"..item[1].."]x"..item[2]);
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:8]"..msg_61.."[4:"..item[1].."]x"..item[2]);
         end
     end
     package:DelItemSendMsg(8, player);
@@ -1874,7 +1874,7 @@ function ItemNormal_00000010(iid, num, bind, param)
 
   package:Add(trump, 1, 1, 0, 2);
 
-  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] 使用了[英雄遗迹]，获得了[4:"..trump.."]")
+  Broadcast(0x17, "[p:"..player:getCountry()..":"..player:getPName().."] "..msg_60.."[4:10]，"..msg_61.."[4:"..trump.."]")
   package:DelItemSendMsg(10, player);
   return num
 end
@@ -2348,11 +2348,11 @@ function ItemNormal_00000402(iid, num, bind, param)
     if item[1] == 0 then        
         local equip = getRandOEquip(player:GetLev())
         package:AddEquip(equip, 1, false);      
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..equip.."]");
+        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:402]，"..msg_61.."[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
         if item[1] == 515 then
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞绿袜子，获得[4:"..item[1].."]x"..item[2]);
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:402]，"..msg_61.."[4:"..item[1].."]x"..item[2]);
         end
     end
     package:DelItemSendMsg(402, player);
@@ -2381,11 +2381,11 @@ function ItemNormal_00000403(iid, num, bind, param)
     if item[1] == 0 then
         local equip = getRandOEquip(player:GetLev());
         package:AddEquip(equip, 1, false);      
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..equip.."]");
+        Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:403]，"..msg_61.."[4:"..equip.."]");
     else
         package:AddItem(item[1], item[2], true, false, 2);
         if item[1] == 509 or item[1] == 507 then
-            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]使用圣诞红袜子，获得[4:"..item[1].."]x"..item[2]);
+            Broadcast(0x27, msg_68.."[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:403]，"..msg_61.."[4:"..item[1].."]x"..item[2]);
         end
     end
     package:DelItemSendMsg(403, player);
@@ -2836,7 +2836,7 @@ function ItemNormal_00009001(iid, num, bind, param)
         package:DelItemSendMsg(iid, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -3264,7 +3264,7 @@ function ItemNormal_athletics_2(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:2]，获得[4:507]x3、 [4:509]x3、 [4:515]x1、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:2]，"..msg_61.."[4:507]x3、 [4:509]x3、 [4:515]x1、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(2, player);
 
@@ -3291,7 +3291,7 @@ function ItemNormal_athletics_3(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:3]，获得[4:507]x2、 [4:509]x2、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:3]，"..msg_61.."[4:507]x2、 [4:509]x2、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(3, player);
 
@@ -3318,7 +3318,7 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:4]，获得[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:4]，"..msg_61.."[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(4, player);
 
@@ -3348,7 +3348,7 @@ function ItemNormal_athletics_5(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]打开[4:5]，获得[4:50]、[4:49]、[4:503]x3、[4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:5]，"..msg_61.."[4:50]、[4:49]、[4:503]x3、[4:"..equipId.."]");
 
     package:DelItemSendMsg(5, player);
 
@@ -3487,19 +3487,19 @@ function ItemNormal_athletics_24(iid, num, bind, param)
 
     package:DelItemSendMsg(24, player);
     if roll < 21 then
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券60 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:24]，"..msg_70.."60 "..msg_73.."[4:"..equipId.."]");
         player:getCoupon(60);
     elseif roll < 41 then
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币4000 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:24]，"..msg_71.."4000 "..msg_73.."[4:"..equipId.."]");
         player:getTael(4000);
     elseif roll < 61 then
 		itemId = 48;
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了[4:48] 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:24]，"..msg_72.."[4:48] "..msg_73.."[4:"..equipId.."]");
     elseif roll < 95 then
         player:getTael(2000);
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了银币2000 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:24]，"..msg_71.."2000 "..msg_73.."[4:"..equipId.."]");
     else
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:24]，一道金光扑面而来，获得了礼券90 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:24]，"..msg_70.."90 "..msg_73.."[4:"..equipId.."]");
         player:getCoupon(90);
     end
 
@@ -3532,19 +3532,19 @@ function ItemNormal_athletics_25(iid, num, bind, param)
 
     package:DelItemSendMsg(25, player);
     if roll < 21 then
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券100 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:25]，"..msg_70.."100 "..msg_73.."[4:"..equipId.."]");
         player:getCoupon(100);
     elseif roll < 41 then
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币10000 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:25]，"..msg_71.."10000 "..msg_73.."[4:"..equipId.."]");
         player:getTael(10000);
     elseif roll < 61 then
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了[4:49] 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:25]，"..msg_72.."[4:49] "..msg_73.."[4:"..equipId.."]");
 		itemId = 49;
     elseif roll < 95 then
         player:getTael(10000);
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了银币6000 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:25]，"..msg_71.."6000 "..msg_73.."[4:"..equipId.."]");
     else
-		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]轻轻地打开了[4:25]，一道金光扑面而来，获得了礼券200 和[4:"..equipId.."]");
+		Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_69.."[4:25]，"..msg_70.."200 "..msg_73.."[4:"..equipId.."]");
         player:getCoupon(200);
     end
 
@@ -3610,7 +3610,7 @@ function ItemNormal_00009028(iid, num, bind, param)
         local happy = math.random(num, num*5);
         player:AddVar(114, happy);
         player:sendHappyInfo();
-        SendMsg(player, 0x35, "获得欢乐值"..happy.."点")
+        SendMsg(player, 0x35, msg_74..happy..msg_66)
         player:AddVar(115, num);
     end
 
@@ -3670,7 +3670,7 @@ function ItemNormal_00009031(iid, num, bind, param)
         package:DelItemSendMsg(iid, player);
         return num
     else
-        SendMsg(player, 0x35, "不在使用时间范围内");
+        SendMsg(player, 0x35, msg_59);
     end
     return false
 end
@@ -3683,7 +3683,22 @@ function ItemNormal_00009034(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009036(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
 
+    if package:GetRestPackageSize() < (2+(2*num)/99) then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:AddItem(507, 2*num, 1, 0, 2);
+    package:AddItem(509, 2*num, 1, 0, 2);
+    player:getCoupon(50*num)
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
 
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
@@ -5004,6 +5019,8 @@ local ItemNormal_Table = {
 
     -- 多宝仙君
     [9034] = ItemNormal_00009034,
+
+    [9036] = ItemNormal_00009036,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)
@@ -5014,19 +5031,19 @@ function ItemNormalOther_00000441(iid, num, bind, other)
     local package = player:GetPackage();
 
     player:AddPExp(num*99)
-    SendMsg(player, 0x1, "你对[p:"..other:getCountry()..":"..other:getPName().."]表达了爱慕之意");
+    SendMsg(player, 0x1, msg_75.."[p:"..other:getCountry()..":"..other:getPName().."]"..msg_76);
     other:AddPExpBy(player, num*99)
-    SendMsg(other, 0x1, "[p:"..player:getCountry()..":"..player:getPName().."]对你表达了爱慕之意");
+    SendMsg(other, 0x1, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_77);
 
 
     if num >= 36 then
         local msgs = {
-            "[p:"..player:getCountry()..":"..player:getPName().."]送给了[p:"..other:getCountry()..":"..other:getPName().."]999个自己亲手折叠的千纸鹤。",
-            "[p:"..player:getCountry()..":"..player:getPName().."]给了[p:"..other:getCountry()..":"..other:getPName().."]一个深情的拥抱。",
-            "[p:"..player:getCountry()..":"..player:getPName().."]一把搂住了[p:"..other:getCountry()..":"..other:getPName().."]狠狠亲了一口。",
-            "[p:"..player:getCountry()..":"..player:getPName().."]含情脉脉的注视[p:"..other:getCountry()..":"..other:getPName().."]的双眼，空气中充满了浪漫的味道。",
-            "[p:"..player:getCountry()..":"..player:getPName().."]将[p:"..other:getCountry()..":"..other:getPName().."]的手搭在自己胸口，让对方感受自己的心跳。",
-            "[p:"..player:getCountry()..":"..player:getPName().."]轻吻了[p:"..other:getCountry()..":"..other:getPName().."]的手背，唇齿间充满了无限的爱意。"
+            "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_78.."[p:"..other:getCountry()..":"..other:getPName().."]999"..msg_79,
+            "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_80.."[p:"..other:getCountry()..":"..other:getPName().."]"..msg_81,
+            "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_82.."[p:"..other:getCountry()..":"..other:getPName().."]"..msg_83,
+            "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_84.."[p:"..other:getCountry()..":"..other:getPName().."]"..msg_85,
+            "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_86.."[p:"..other:getCountry()..":"..other:getPName().."]"..msg_87,
+            "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_88.."[p:"..other:getCountry()..":"..other:getPName().."]"..msg_89
         }
 
         local p = math.random(1, #msgs)

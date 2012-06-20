@@ -291,8 +291,6 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	{
 		if(awd->side > 1)
 			player->notifyFriendAct(8, awd->side - 1);
-		//if(World::_newYearStage == 9)
-		//	awd->count = GameAction()->onAttakerAddexp(player, awd->other, awd->count);
 		player->GetAthletics()->attackergainsource(awd->athleticsid, awd->type, awd->count);
 		if(World::_activityStage > 0 && awd->win)
 			GameAction()->onAthleticWin(player);
@@ -1364,4 +1362,37 @@ void OnRemoveClanRank( GameMsgHdr& hdr, const void* data )
     ClanRankBattleMgr::Instance().removeClanRank(clan_data->clan);
 }
 
+void OnAddItemByIDIP( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct AddItem
+    {
+        UInt16 itemid;
+        UInt16 itemnum;
+    };
+
+    AddItem* ai = (AddItem*)data;
+#if 0
+    player->GetPackage()->Add(ai->itemid, ai->itemnum, true, false, FromIDIP);
+#else
+    player->IDIPAddItem(ai->itemid, ai->itemnum, true);
+#endif
+
+}
+
+void OnSendRNR( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SendRNR
+    {     
+        Player* player;
+        UInt32 off;
+        UInt32 date;
+        UInt32 total;
+    };
+    SendRNR* rnr = (SendRNR*)data;
+    GameAction()->sendRNR(rnr->player, rnr->off, rnr->date, rnr->total);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
+

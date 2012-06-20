@@ -82,20 +82,20 @@ function Task_00000036(npcId)
 		action.m_ActionID = 36
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "成都府衙";
+		action.m_ActionMsg = task_msg_269;
 	elseif task:GetTaskSubmitNpc(36) == npcId then
 		if Task_Submit_00000036() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 36
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "成都府衙";
+			action.m_ActionMsg = task_msg_270;
 		elseif task:HasAcceptedTask(36) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 36
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "成都府衙";
+			action.m_ActionMsg = task_msg_271;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000036_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个恶徒百死不得赎其罪，不过少侠还是将他送到衙门里吧，让官府来定他的罪。";
-	action.m_ActionMsg = "好吧。";
+	action.m_NpcMsg = task_msg_272;
+	action.m_ActionMsg = task_msg_273;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000036_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你真是身手不凡啊，张亮这个恶徒官府早已通缉在案，只是这厮轻功高强，一直不见他踪迹，却不料被少侠你给抓住了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_274;
 	action.m_ActionMsg = "";
 	return action;
 end

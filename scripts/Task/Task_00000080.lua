@@ -82,20 +82,20 @@ function Task_00000080(npcId)
 		action.m_ActionID = 80
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "破解妖法";
+		action.m_ActionMsg = task_msg_1768;
 	elseif task:GetTaskSubmitNpc(80) == npcId then
 		if Task_Submit_00000080() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 80
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "破解妖法";
+			action.m_ActionMsg = task_msg_1769;
 		elseif task:HasAcceptedTask(80) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 80
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "破解妖法";
+			action.m_ActionMsg = task_msg_1770;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000080_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "姚开江的妖术颇为棘手，不过方才怪叫花凌浑前辈来过，他告诉我说姚开江的妖术全在他用元神练成的一条巨蛇，只要将这条巨蛇杀死，他的妖术自然可以破掉。";
-	action.m_ActionMsg = "想不到他的妖术竟然有这样的弱点。";
+	action.m_NpcMsg = task_msg_1771;
+	action.m_ActionMsg = task_msg_1772;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000080_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，凌浑前辈告诉我说姚开江常常在鱼神洞旧道那里练他的元神，你这就去守在那里，若见那毒蛇出来，迅速出手将它消灭。";
-	action.m_ActionMsg = "我这就去。";
+	action.m_NpcMsg = task_msg_1773;
+	action.m_ActionMsg = task_msg_1774;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000080_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "山人姚开江的妖术一破，余者就不足为虑了。";
+	action.m_NpcMsg = task_msg_1775;
 	action.m_ActionMsg = "";
 	return action;
 end
