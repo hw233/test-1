@@ -1360,6 +1360,9 @@ function onEnchantAct(player, level, _type)
                 [10] = {509,3,1, 503,3,1, 500,3,1},
             },
         };
+        if items[_type][level] == nil then
+            return
+        end
         sendItemPackageMail(player, msg_93, msg_94, items[_type][level]);
     end
 end
@@ -1375,6 +1378,9 @@ function onEnchantGt11(player, id, level, _type)
             [12] = {9022,1,1, 9021,2,1},
         },
     };
+    if items[_type][level] == nil then
+        return
+    end
     sendItemPackageMail(player, msg_47, msg_48 .. "[4:"..id.."] "..level..msg_49, items[_type][level]);
 end
 
