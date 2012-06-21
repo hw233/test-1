@@ -80,7 +80,7 @@ function onActivityCheck(tm)
   setTavernInterval(1 * 3600)
   setTavernRate(100)
   
-  setRecruitCost(12);
+  setRecruitCost(20);
   setTavernBlueCount(25);
   setTavernPurpleCount(100);
   setTavernOrangeCount(400);
