@@ -181,9 +181,9 @@ namespace GObject
 
         void fixSkills()
         {
-            const GData::ItemEquipType* ibt = static_cast<const GData::ItemEquipType*>(_itemBaseType);
+            const GData::ItemTrumpType* ibt = static_cast<const GData::ItemTrumpType*>(_itemBaseType);
             if (ibt) {
-                GData::ItemEquipType* nibt = new GData::ItemEquipType(ibt->getId(), ibt->getName(), 0);
+                GData::ItemTrumpType* nibt = new GData::ItemTrumpType(ibt->getId(), ibt->getName(), 0);
                 if (!nibt)
                     return;
                 nibt->subClass = ibt->subClass;

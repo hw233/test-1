@@ -161,7 +161,7 @@ namespace GObject
         VAR_CTSAWARDRF = 125, // 回流后七天登陆抽奖
         VAR_CLAWARDRF = 126, // 回流后七天连续登陆奖励
         VAR_CL3DAYRF = 127, // 回流后七天连接三天登陆奖励
-        VAR_DUANWU = 134, // 端午上线邮件
+        VAR_DUANWU = 135, // 端午上线邮件
         VAR_MAX,
     };
 

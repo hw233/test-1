@@ -3463,9 +3463,16 @@ namespace GObject
                         break;
                     case Item_Fashion:
                     case Item_Trump:
-                        equip = new ItemTrump(dbe.id, itype, ied);
-                        if (equip && ied.enchant)
-                            ((ItemTrump*)equip)->fixSkills();
+                        if (itype->subClass == Item_Fashion)
+                        {
+                            equip = new ItemFashion(dbe.id, itype, ied);
+                        }
+                        else
+                        {
+                            equip = new ItemTrump(dbe.id, itype, ied);
+                            if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
+                        }
                         break;
                     default:
                         equip = new ItemEquip(dbe.id, itype, ied);

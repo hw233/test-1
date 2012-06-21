@@ -1059,7 +1059,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         {
             Stream st(REP::OFFLINEEXP);
             st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f);
-#ifndef _FB
             UInt32 equip = pl->GetVar(VAR_OFFLINE_EQUIP);
             if(equip)
             {
@@ -1112,9 +1111,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
                 {
                     st << pl->_equipAward[i].id;
                 }
-#else
-                st << static_cast<UInt8>(0);
-#endif
             }
 
             st<< Stream::eos;

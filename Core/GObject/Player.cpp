@@ -9602,14 +9602,11 @@ namespace GObject
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
-#ifndef _FB
         AddVar(VAR_OFFLINE_EQUIP, offline);
-#endif
     }
 
     void Player::getOfflineExp()
     {
-#ifndef _FB
         UInt32 equip = GetVar(VAR_OFFLINE_EQUIP);
         if(equip)
         {
@@ -9627,7 +9624,6 @@ namespace GObject
             }
             SetVar(VAR_OFFLINE_EQUIP, 0);
         }
-#endif
         UInt32 exp = GetVar(VAR_OFFLINE_EXP);
         if (exp)
         {

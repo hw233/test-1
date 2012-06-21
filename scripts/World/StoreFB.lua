@@ -17,10 +17,8 @@ function resetDiscount()
     for d = 1, #discounts do
         local nr = math.random(1, #discount_num)
         local num = discount_num[nr]
-        print("num :" .. num)
         for i = 1, num do
             local n = math.random(1, #discount_items)
-            print("id: " .. discount_items[n] .. " discount: " .. discounts[d])
             store:add(1, discount_items[n], discounts[d])
             table.remove(discount_items, n);
         end
