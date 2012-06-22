@@ -83,7 +83,7 @@
 
 namespace GObject
 {
-    UInt32 Player::_recruit_cost = 20;
+    UInt32 Player::_recruit_cost = GData::moneyNeed[GData::RECRUIT].gold; // 20
     UInt32 Player::_tavernBlueCount = 24;
     UInt32 Player::_tavernPurpleCount = 89;
     UInt32 Player::_tavernOrangeCount = 200;
@@ -533,7 +533,6 @@ namespace GObject
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
         m_pVars = new VarSystem(id);
-        _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
