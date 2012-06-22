@@ -3708,6 +3708,7 @@ function ItemNormal_00009053(iid, num, bind, param)
 		player:sendMsgCode(2, 1011, 0);
         return false
     end
+    package:DelItemSendMsg(iid, player);
 
     local items = {506, 507, 508, 509, 514, 515, 500, 49, 503, 511, 517, 15}
     local prob = {1176,1294,2459,2518,3671,4024,5200,5553,6612,7800,8941,10000}
@@ -3730,11 +3731,10 @@ function ItemNormal_00009053(iid, num, bind, param)
 
     package:AddItem(item, 1, 1, 0, 2)
     if broad[k] == 1 then
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_95.."[4:8]"..msg_96.."[4:"..item.."]x1");
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_96.."[4:8]"..msg_97.."[4:"..item.."]x1");
     end
 
     rand = math.random(1,100)
-    print(rand)
     if rand <= 30 then
         if iid == 9053 then
             item = 1758
@@ -3753,7 +3753,6 @@ function ItemNormal_00009053(iid, num, bind, param)
         end
     end
 
-    package:DelItemSendMsg(iid, player);
     return num;
 end
 
@@ -3761,8 +3760,6 @@ function ItemNormal_00009058(id, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 
-    print(id)
-    print(num)
     local cnt509;
     local cnt503;
     local cnt515;
@@ -3837,6 +3834,7 @@ function ItemNormal_00009058(id, num, bind, param)
 		player:sendMsgCode(2, 1011, 0);
         return false
     end
+    package:DelItemSendMsg(id, player);
 
     if cnt509 > 0 then
         package:AddItem(509, cnt509, 1, 0, 2)
@@ -3852,22 +3850,16 @@ function ItemNormal_00009058(id, num, bind, param)
     local items = {{9017,1}, {9018,1}, {9019,1}, {9020,1}, {9021,1}, {9022,1}}
     local p
 
-    print("************************")
     for i = 1,cntelixir do
-        printf("$$$$$$$$$$$$$$$")
         p = math.random(1, 6)
         for n = 1, #prob do
             if p <= prob[n] then
-                print(n)
-                print(": ")
-                print(item[n])
                 package:AddItem(item[n], 1, 1, 0, 2)
                 break
             end
         end
     end
 
-    package:DelItemSendMsg(id, player);
     return num;
 end
 

@@ -116,6 +116,8 @@ void WorldScript::init()
 	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
 	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
 	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
+	def("setDuanWu", GObject::World::setDuanWu);
+	def("getDuanWu", GObject::World::getDuanWu);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

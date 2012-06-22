@@ -401,7 +401,7 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             std::cout << static_cast<UInt32>(PLAYER_DATA(pl, copyFreeCnt)) << std::endl;
             std::cout << static_cast<UInt32>(PLAYER_DATA(pl, copyGoldCnt)) << std::endl;
             std::cout << static_cast<UInt32>(tcd.lootlvl) << std::endl;
-            UInt32 randNum = uRand(2);
+            UInt32 randNum = uRand(3);
             std::cout << "randNum,org: " << randNum << std::endl;
             if(diamondPrivilege)
             {

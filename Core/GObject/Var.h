@@ -168,6 +168,8 @@ namespace GObject
         VAR_TS_CNT = 133, //铁手
         VAR_ZM_CNT = 134, //追命
 
+        VAR_DUANWU = 135, // 端午上线邮件
+
         VAR_MAX,
     };
 
@@ -327,6 +329,8 @@ namespace GObject
             REGISTER_VAR(VAR_WQ_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TS_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ZM_CNT, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_DUANWU, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

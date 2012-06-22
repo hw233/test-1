@@ -111,6 +111,7 @@ UInt32 World::_rechargenextretstart;
 UInt32 World::_rechargenextretend;
 bool World::_mergeathact = false;
 bool World::_fourcopact = false;
+bool World::_duanwu;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {

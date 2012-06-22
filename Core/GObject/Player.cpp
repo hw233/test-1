@@ -10544,12 +10544,15 @@ namespace GObject
         /** 赠送神捕令 **/
         if(0 == type)
         {
-            UInt16 tmpCnt;
+            //UInt16 tmpCnt;
 
             if(count > m_Package->GetItemAnyNum(9057))
+            {
+                //sendMsgCode(0, 1011);
                 return;
+            }
             m_Package->DelItem(9057, count, true);
-            switch(type)
+            switch(opt)
             {
                 case 1:
                     AddVar(VAR_LX_CNT, count);
@@ -10566,6 +10569,9 @@ namespace GObject
                 default:
                 break;
             }
+            Stream st(REP::FOURCOP);
+            st << opt << Stream::eos;
+            send(st);
         }
         /** 点击宝箱领取奖励 **/
         else

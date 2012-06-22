@@ -211,6 +211,10 @@ public:
     { _fourcopact = v; printf("----------------------------: %d\n", _fourcopact);}
     inline static bool getFourCopAct()
     { return _fourcopact; }
+    inline static void setDuanWu(bool v)
+    { _duanwu = v; }
+    inline static bool getDuanWu()
+    { return _duanwu; }
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
@@ -278,6 +282,8 @@ public:
     static UInt32 _rechargenextretend;
     static bool _mergeathact;
     static bool _fourcopact;
+    static bool _duanwu;
+
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
 	void OnTimer();

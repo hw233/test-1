@@ -123,6 +123,8 @@ namespace Script
         lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
 
         CLASS_DEF(GameActionLua, Print);
+        lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
+		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
 		CLASS_DEF(GameActionLua, GetNpcRelationTask);

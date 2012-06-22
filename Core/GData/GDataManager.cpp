@@ -533,10 +533,7 @@ namespace GData
 				{
 					ItemGemType * igt = new ItemGemType(idt.typeId, idt.name, idt.attrExtra);
 					wt = igt;
-                    if(IsGemId2(wt->getId()))
-                        gemTypes[getMapGemId2(wt->getId()) - LGEM_ID] = igt;
-                    else
-					    gemTypes[wt->getId() - LGEM_ID] = igt;
+					gemTypes[wt->getId() - LGEM_ID] = igt;
 				}
 				break;
 			default:

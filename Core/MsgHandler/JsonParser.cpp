@@ -281,7 +281,10 @@ void jsonParser2(void * buf, int len, Stream& st)
 
     retbody = json_new_object();
     if (!retbody)
+    {
+        json_free_value(&rethead);
         goto _error1;
+    }
 
     enum json_error jerr;
     if ((jerr = json_parse_document(&obj, (char*)json.c_str())) != JSON_OK || !parseHead(obj, &head))
@@ -337,12 +340,6 @@ _error:
 _error1:
     if (retobj)
         json_free_value(&retobj);
-#if 0
-    if (retbody)
-        json_free_value(&retbody);
-    if (rethead)
-        json_free_value(&rethead);
-#endif
 
     return;
 }

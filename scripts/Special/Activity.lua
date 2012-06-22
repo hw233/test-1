@@ -126,6 +126,9 @@ function onLogin(player)
     if getJune1() then
         onJune1(player)
     end
+    if getDuanWu() then
+        onDuanWu(player)
+    end
 end
 
 function onNVDLogin(player)
@@ -1357,6 +1360,9 @@ function onEnchantAct(player, level, _type)
                 [10] = {509,3,1, 503,3,1, 500,3,1},
             },
         };
+        if items[_type][level] == nil then
+            return
+        end
         sendItemPackageMail(player, msg_93, msg_94, items[_type][level]);
     end
 end
@@ -1372,6 +1378,9 @@ function onEnchantGt11(player, id, level, _type)
             [12] = {9022,1,1, 9021,2,1},
         },
     };
+    if items[_type][level] == nil then
+        return
+    end
     sendItemPackageMail(player, msg_47, msg_48 .. "[4:"..id.."] "..level..msg_49, items[_type][level]);
 end
 
@@ -1465,5 +1474,21 @@ function sendRNR(player, off, date, total)
     local ctx = string.format(msg_92, rm, rd, total, off+1, m)
 
     sendItemPackageMail(player, title, ctx, {0xB000,m,1});
+end
+
+function onDuanWu(player)
+    if not getDuanWu() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(134) == 0 then
+        sendItemPackageMail(player, msg_95, msg_95, {1527,1,1});
+        player:SetVar(134, 1)
+    end
 end
 

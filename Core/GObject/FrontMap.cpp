@@ -365,7 +365,7 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
             }
             std::cout << static_cast<UInt32>(PLAYER_DATA(pl, frontFreeCnt)) << std::endl;
             std::cout << static_cast<UInt32>(PLAYER_DATA(pl, frontGoldCnt)) << std::endl;
-            UInt32 randNum = uRand(2);
+            UInt32 randNum = uRand(3);
             std::cout << "randNum,org: " << randNum << std::endl;
             if(PLAYER_DATA(pl, frontFreeCnt) == getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > 0)
             {

@@ -1257,6 +1257,10 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
     {
         id = 1;
     }
+    else if(id >= 1758 && id <= 1761)
+    {
+        id -= 1758;
+    }
     else
     {
         if (id < 2000)
@@ -1306,10 +1310,7 @@ void Fighter::addAttr( ItemEquip * equip )
 		if(ied.gems[i] != 0)
 		{
             GData::ItemGemType * igt = NULL;
-            if(IsGemId2(ied.gems[i]))
-                igt = GData::gemTypes[getMapGemId2(ied.gems[i]) - LGEM_ID];
-            else
-			    igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
+			igt = GData::gemTypes[ied.gems[i] - LGEM_ID];
 			addAttrExtra(_attrExtraEquip, igt->attrExtra);
 		}
 	}
