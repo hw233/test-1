@@ -1434,8 +1434,8 @@ function June(player, lootlvl)
 end
 
 function onRechargeAct(player, total)
-    local title = "开服7日返仙石奖励"
-    local content = "恭喜您在储值返仙石活动中获得返还奖励，再次充值还可以继续领取哦！单笔充值在4000仙石及以上可获得最高达20%的返还！"
+    local title = msg_96
+    local content = msg_97
     if total >= 1000 and total <= 1999 then
         sendItemPackageMail(player, title, content, {0xB000,100,0});
     elseif total >= 2000 and total <= 3999 then
