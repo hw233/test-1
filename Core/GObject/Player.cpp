@@ -83,7 +83,7 @@
 
 namespace GObject
 {
-    UInt32 Player::_recruit_cost = GData::moneyNeed[GData::RECRUIT].gold; // 20
+    UInt32 Player::_recruit_cost = 20;
     UInt32 Player::_tavernBlueCount = 24;
     UInt32 Player::_tavernPurpleCount = 89;
     UInt32 Player::_tavernOrangeCount = 200;
