@@ -514,17 +514,17 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
                 player->GetPackage()->AddItem2(481, 1, 1, 1);
         }
 
-        std::cout << "dungeonCnt: " << static_cast<UInt32>(PLAYER_DATA(player, dungeonCnt)) << std::endl;
-        UInt32 randNum = uRand(3);
-        std::cout << "randNum,org: " << randNum << std::endl;
-        if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+        if(World::getFourCopAct())
         {
-            randNum = randNum + 2;
+            UInt32 randNum = uRand(3);
+            if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+            {
+                randNum = randNum + 2;
+            }
+            else
+                randNum = randNum + 1;
+            player->GetPackage()->AddItem2(9057, randNum, true, true);
         }
-        else
-            randNum = randNum + 1;
-        std::cout << "randNum: " << randNum << std::endl;
-        player->GetPackage()->AddItem2(9057, randNum, true, true);
 
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount);
 

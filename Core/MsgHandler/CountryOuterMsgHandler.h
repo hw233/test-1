@@ -688,13 +688,6 @@ struct GetAward
     MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
 };
 
-struct FourCop
-{
-    UInt8 _type;
-    UInt8 _opt;
-    UInt8 _count;
-    MESSAGE_DEF3(REQ::FOURCOP, UInt8, _type, UInt8, _opt, UInt8, _count);
-};
 struct GuideUdp
 {
     UInt8 _type;
@@ -1069,7 +1062,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         {
             Stream st(REP::OFFLINEEXP);
             st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f);
-#ifndef _FB
             UInt32 equip = pl->GetVar(VAR_OFFLINE_EQUIP);
             if(equip)
             {
@@ -1122,9 +1114,6 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
                 {
                     st << pl->_equipAward[i].id;
                 }
-#else
-                st << static_cast<UInt8>(0);
-#endif
             }
 
             st<< Stream::eos;
@@ -2907,8 +2896,6 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
         case PURCHASE4:
             {
                 UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
-                std::cout << arena << std::endl;
-                std::cout << price << std::endl;
                 if (arena < price)
                 {
                     st << static_cast<UInt8>(1);
@@ -3986,6 +3973,111 @@ void OnActivityReward(  GameMsgHdr& hdr, const void * data)
     }
 }
 
+void OnFourCopReq( GameMsgHdr& hdr, const void* data)
+{
+    if(!World::getFourCopAct())
+        return;
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 opt = 0;
+    br >> type;
+    br >> opt;
+
+    /** 赠送神捕令 **/
+    if(0 == type)
+    {
+        UInt16 count = 0;
+        UInt16 tmpCnt = 0;
+        br >> count;
+
+        if(count > pl->GetPackage()->GetItemAnyNum(9057))
+        {
+            //sendMsgCode(0, 1011);
+            return;
+        }
+        pl->GetPackage()->DelItemAny(9057, count);
+        switch(opt)
+        {
+            case 1:
+                pl->AddVar(VAR_LX_CNT, count);
+                tmpCnt = pl->GetVar(VAR_LX_CNT);
+            break;
+            case 2:
+                pl->AddVar(VAR_WQ_CNT, count);
+                tmpCnt = pl->GetVar(VAR_WQ_CNT);
+            break;
+            case 3:
+                pl->AddVar(VAR_TS_CNT, count);
+                tmpCnt = pl->GetVar(VAR_TS_CNT);
+            break;
+            case 4:
+                pl->AddVar(VAR_ZM_CNT, count);
+                tmpCnt = pl->GetVar(VAR_ZM_CNT);
+            break;
+            default:
+            break;
+        }
+        Stream st(REP::FOURCOP);
+        st << opt << tmpCnt << Stream::eos;
+        pl->send(st);
+    }
+    /** 点击宝箱领取奖励 **/
+    else
+    {
+        if(pl->GetPackage()->GetRestPackageSize() < 1)
+        {
+            pl->sendMsgCode(0, 1011);
+            return;
+        }
+        UInt16 tmpCnt;
+        switch(opt)
+        {
+            case 1:
+                tmpCnt = pl->GetVar(VAR_LX_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_LX_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9055, 1, true);
+                }
+            break;
+            case 2:
+                tmpCnt = pl->GetVar(VAR_WQ_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_WQ_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9054, 1, true);
+                }
+            break;
+            case 3:
+                tmpCnt = pl->GetVar(VAR_TS_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_TS_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9053, 1, true);
+                }
+            break;
+            case 4:
+                tmpCnt = pl->GetVar(VAR_ZM_CNT);
+                if(tmpCnt >= 10)
+                {
+                    tmpCnt -= 10;
+                    pl->SetVar(VAR_ZM_CNT, tmpCnt);
+                    pl->GetPackage()->AddItem(9056, 1, true);
+                }
+            break;
+            default:
+            break;
+        }
+        Stream st(REP::FOURCOP);
+        st << opt << tmpCnt << Stream::eos;
+        pl->send(st);
+    }
+}
+
 void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -4525,12 +4617,6 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
 {
     MSG_QUERY_PLAYER(player);
     player->getAward(req._type, req._opt);
-}
-
-void OnFourCopAct( GameMsgHdr& hdr, FourCop& req )
-{
-    MSG_QUERY_PLAYER(player);
-    player->onFourCopReq(req._type, req._opt, req._count);
 }
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )

@@ -1257,10 +1257,6 @@ inline void testEquipInSet(UInt32 * setId, UInt32 * setNum, UInt32 id)
     {
         id = 1;
     }
-    else if(id >= 1758 && id <= 1761)
-    {
-        id -= 1758;
-    }
     else
     {
         if (id < 2000)

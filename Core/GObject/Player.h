@@ -576,6 +576,7 @@ namespace GObject
 
 		void Login();
         void sendCreateMail();
+        void sendOpenAct(UInt32);
         void continuousLogin(UInt32 now);
         void continuousLoginRF(UInt32 now);
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
@@ -588,7 +589,6 @@ namespace GObject
         void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
         void setContinuousRFAward(UInt32 no);
         void sendFourCopAct();
-        void onFourCopReq(UInt8 type, UInt8 opt, UInt8 count);
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???

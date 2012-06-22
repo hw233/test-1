@@ -363,23 +363,23 @@ UInt8 FrontMap::fight(Player* pl, UInt8 id, UInt8 spot, bool ato, bool complate)
                 pl->SetVar(VAR_CLAWARD2, 1);
                 pl->sendRC7DayInfo(TimeUtil::Now());
             }
-            std::cout << static_cast<UInt32>(PLAYER_DATA(pl, frontFreeCnt)) << std::endl;
-            std::cout << static_cast<UInt32>(PLAYER_DATA(pl, frontGoldCnt)) << std::endl;
-            UInt32 randNum = uRand(3);
-            std::cout << "randNum,org: " << randNum << std::endl;
-            if(PLAYER_DATA(pl, frontFreeCnt) == getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > 0)
+
+            if(World::getFourCopAct())
             {
-                if(3 <= PLAYER_DATA(pl, frontGoldCnt))
-                    randNum = randNum + 4;
-                else if(2 == PLAYER_DATA(pl, frontGoldCnt))
-                    randNum = randNum + 3;
+                UInt32 randNum = uRand(3);
+                if(PLAYER_DATA(pl, frontFreeCnt) == getFreeCount() && PLAYER_DATA(pl, frontGoldCnt) > 0)
+                {
+                    if(3 <= PLAYER_DATA(pl, frontGoldCnt))
+                        randNum = randNum + 4;
+                    else if(2 == PLAYER_DATA(pl, frontGoldCnt))
+                        randNum = randNum + 3;
+                    else
+                        randNum = randNum + 2;
+                }
                 else
-                    randNum = randNum + 2;
+                    randNum = randNum + 1;
+                pl->GetPackage()->AddItem2(9057, randNum, true, true);
             }
-            else
-                randNum = randNum + 1;
-            std::cout << "randNum: " << randNum << std::endl;
-            pl->GetPackage()->AddItem2(9057, randNum, true, true);
 
             GameAction()->onFrontMapWin(pl, id, spot, tmp[spot].lootlvl);
             DB3().PushUpdateData("DELETE FROM `player_frontmap` WHERE `playerId` = %"I64_FMT"u AND `id` = %u", pl->getId(), id);

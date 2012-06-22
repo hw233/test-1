@@ -533,7 +533,6 @@ namespace GObject
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
         m_pVars = new VarSystem(id);
-        _recruit_cost = GData::moneyNeed[GData::RECRUIT].gold;
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
         m_tcpInfo = new TeamCopyPlayerInfo(this);
@@ -6126,6 +6125,11 @@ namespace GObject
                 setBuffData(PLAYER_BUFF_YDOTR, 0, true);
         }
 
+#ifdef _FB // XXX: 单笔反利
+        if (World::IsNewServer())
+            GameAction()->onRechargeAct(this, r);
+#endif
+
         sendTripodInfo();
 	}
 
@@ -9496,8 +9500,16 @@ namespace GObject
 #ifdef _FB
 #else
         SYSMSG(title, 2335);
-        //SYSMSG(content, 2343);
         SYSMSG(content, 2336);
+        GetMailBox()->newMail(NULL, 0x12, title, content);
+#endif
+    }
+
+    void Player::sendOpenAct(UInt32 day)
+    {
+#ifdef _FB
+        SYSMSGV(title, 4006, day);
+        SYSMSGV(content, 4007, day);
         GetMailBox()->newMail(NULL, 0x12, title, content);
 #endif
     }
@@ -9635,14 +9647,11 @@ namespace GObject
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
-#ifndef _FB
         AddVar(VAR_OFFLINE_EQUIP, offline);
-#endif
     }
 
     void Player::getOfflineExp()
     {
-#ifndef _FB
         UInt32 equip = GetVar(VAR_OFFLINE_EQUIP);
         if(equip)
         {
@@ -9660,7 +9669,6 @@ namespace GObject
             }
             SetVar(VAR_OFFLINE_EQUIP, 0);
         }
-#endif
         UInt32 exp = GetVar(VAR_OFFLINE_EXP);
         if (exp)
         {
@@ -10532,98 +10540,8 @@ namespace GObject
         zhuimingCnt = static_cast<UInt16>(GetVar(VAR_ZM_CNT));
 
         Stream st(REP::FOURCOP);
-        st << static_cast<UInt16>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
+        st << static_cast<UInt8>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
         send(st);
     }
-
-    void Player::onFourCopReq(UInt8 type, UInt8 opt, UInt8 count)
-    {
-        if(!World::getFourCopAct())
-            return;
-
-        /** 赠送神捕令 **/
-        if(0 == type)
-        {
-            //UInt16 tmpCnt;
-
-            if(count > m_Package->GetItemAnyNum(9057))
-            {
-                //sendMsgCode(0, 1011);
-                return;
-            }
-            m_Package->DelItem(9057, count, true);
-            switch(opt)
-            {
-                case 1:
-                    AddVar(VAR_LX_CNT, count);
-                break;
-                case 2:
-                    AddVar(VAR_WQ_CNT, count);
-                break;
-                case 3:
-                    AddVar(VAR_TS_CNT, count);
-                break;
-                case 4:
-                    AddVar(VAR_ZM_CNT, count);
-                break;
-                default:
-                break;
-            }
-            Stream st(REP::FOURCOP);
-            st << opt << Stream::eos;
-            send(st);
-        }
-        /** 点击宝箱领取奖励 **/
-        else
-        {
-            if(GetPackage()->GetRestPackageSize() < 1)
-            {
-                sendMsgCode(0, 1011);
-            }
-            UInt16 tmpCnt;
-            switch(type)
-            {
-                case 1:
-                    tmpCnt = GetVar(VAR_LX_CNT);
-                    if(tmpCnt >= 10)
-                    {
-                        tmpCnt -= 10;
-                        SetVar(VAR_LX_CNT, tmpCnt);
-                        m_Package->AddItem2(9055, 1, true, true);
-                    }
-                break;
-                case 2:
-                    tmpCnt = GetVar(VAR_WQ_CNT);
-                    if(tmpCnt >= 10)
-                    {
-                        tmpCnt -= 10;
-                        SetVar(VAR_WQ_CNT, tmpCnt);
-                        m_Package->AddItem2(9054, 1, true, true);
-                    }
-                break;
-                case 3:
-                    tmpCnt = GetVar(VAR_TS_CNT);
-                    if(tmpCnt >= 10)
-                    {
-                        tmpCnt -= 10;
-                        SetVar(VAR_TS_CNT, tmpCnt);
-                        m_Package->AddItem2(9053, 1, true, true);
-                    }
-                break;
-                case 4:
-                    tmpCnt = GetVar(VAR_ZM_CNT);
-                    if(tmpCnt >= 10)
-                    {
-                        tmpCnt -= 10;
-                        SetVar(VAR_ZM_CNT, tmpCnt);
-                        m_Package->AddItem2(9056, 1, true, true);
-                    }
-                break;
-                default:
-                break;
-            }
-        }
-    }
-
 } // namespace GObject
 
