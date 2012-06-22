@@ -2023,37 +2023,13 @@ namespace GObject
     {
         if (quality == 0) // 防具
         {
-            if (type)
-            {
-                if (level == 8)
-                    GameAction()->onEnchantAct(player, level, 1);
-                if (level == 10)
-                    GameAction()->onEnchantAct(player, level, 1);
-            }
-            else
-            {
-                if (slevel < 8 && level >= 8)
-                    GameAction()->onEnchantAct(player, level, 1);
-                if (slevel < 10 && level >= 10)
-                    GameAction()->onEnchantAct(player, level, 1);
-            }
+            for (UInt8 l = level; l >= 8 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, 1);
         }
         else if (quality == 1) // 武器
         {
-            if (type)
-            {
-                if (level == 8)
-                    GameAction()->onEnchantAct(player, level, 0);
-                if (level == 10)
-                    GameAction()->onEnchantAct(player, level, 0);
-            }
-            else
-            {
-                if (slevel < 8 && level >= 8)
-                    GameAction()->onEnchantAct(player, level, 0);
-                if (slevel < 10 && level >= 10)
-                    GameAction()->onEnchantAct(player, level, 0);
-            }
+            for (UInt8 l = level; l >= 8 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, 0);
         }
     }
 #endif
@@ -2468,8 +2444,13 @@ namespace GObject
 	UInt8 Package::MergeGem( UInt32 gemId, UInt8 bindCount, bool protect, UInt32& ogid )
 	{
 		if (GetItemSubClass(gemId) != Item_Gem) return 2;
-		UInt32 lvl = (gemId - 1) % 10;
-		if(lvl >= 9) return 2;
+		UInt32 lvl;
+        
+        if(IsGemId2(gemId))
+            lvl = (gemId - 1) % 10 + 10;
+        else
+            lvl = (gemId - 1) % 10;
+		if(lvl >= 11) return 2;
 
 		UInt8 unbindCount = 3 - bindCount;
 		UInt32 amount = GData::moneyNeed[GData::GEMMERGE].tael;//GObjectManager::getMergeCost(); // merge_cost[lvl];
@@ -2511,7 +2492,10 @@ namespace GObject
 				DelItem(gemId, bindCount, true);
 			if(unbindCount > 0)
 				DelItem(gemId, unbindCount, false);
-			ogid = gemId + 1;
+			if(9 == lvl)
+                ogid = gemId + 491;
+            else
+                ogid = gemId + 1;
 			AddItem(ogid, 1, bindCount > 0 || isBound, false, FromMerge);
 			if(World::_activityStage > 0)
 				GameAction()->onMergeGem(m_Owner, lvl + 2, 1);
@@ -2596,7 +2580,8 @@ namespace GObject
             {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0}
         };
 
-        GData::ItemGemType * igt = GData::gemTypes[gemId - LGEM_ID];
+        GData::ItemGemType * igt = NULL;
+        igt = GData::gemTypes[gemId - LGEM_ID];
         if(!igt)
             return 1;
 
@@ -3114,8 +3099,12 @@ namespace GObject
 
         if (GetItemSubClass(gemId) != Item_Gem)
             return 3;
-        UInt32 lvl = (gemId - 1) % 10;
-        if(lvl == 9)
+        UInt32 lvl;
+        if(IsGemId2(gemId))
+            lvl = (gemId - 1) % 10 + 10;
+        else
+            lvl = (gemId - 1) % 10;
+        if(lvl >= 11)
             return 3;
 
         if(bindCount > 0 && GetItemNum(gemId, true) < bindCount)
@@ -3126,7 +3115,10 @@ namespace GObject
         UInt32 bindUsed = 0, unbindUsed = 0;
         unbindGemsOut = 0;
         bindGemsOut = 0;
-        gemIdOut = gemId + 1;
+        if(9 == lvl)
+            gemIdOut = gemId + 491;
+        else
+            gemIdOut = gemId + 1;
         succTimes = 0;
         failedTimes = 0;
 
@@ -4183,7 +4175,10 @@ namespace GObject
         {
             if(l != ied_trump.tRank)
                 fgt->setDirty();
-			fgt->sendModification(0x50 + pos, trump, false);
+            if (trump->getClass() == Item_Fashion)
+                fgt->sendModification(0x20, trump, false);
+            else
+                fgt->sendModification(0x50 + pos, trump, false);
         }
 		else
 			SendSingleEquipData(trump);
@@ -4231,7 +4226,12 @@ namespace GObject
 		if(!trump->GetBindStatus() && isBound)
 			trump->DoEquipBind();
 		if(fgt != NULL)
-			fgt->sendModification(0x50 + pos, trump, false);
+        {
+            if (trump->getClass() == Item_Fashion)
+                fgt->sendModification(0x20, trump, false);
+            else
+                fgt->sendModification(0x50 + pos, trump, false);
+        }
 		else
 			SendSingleEquipData(trump);
 

@@ -34,7 +34,7 @@ namespace GData
 	ItemBaseTypeManager		itemBaseTypeManager;
 	ItemBaseTypeNameManager itemBaseTypeNameManager;
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
-	std::vector<ItemGemType *> gemTypes(200);
+	std::vector<ItemGemType *> gemTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
 
 	TaskTypeList			GDataManager::m_TaskTypeList;

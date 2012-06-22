@@ -1279,7 +1279,7 @@ namespace GObject
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1356,6 +1356,7 @@ namespace GObject
 			fgt2->setPExp(specfgtobj.practiceExp);
 			fgt2->setCurrentHP(specfgtobj.hp, false);
             fgt2->setAcupoints(specfgtobj.acupoints, false);
+			fgt2->setFashion(fetchFashion(specfgtobj.fashion), false);
 			fgt2->setWeapon(fetchWeapon(specfgtobj.weapon), false);
 			fgt2->setArmor(0, fetchArmor(specfgtobj.armor1), false);
 			fgt2->setArmor(1, fetchArmor(specfgtobj.armor2), false);
@@ -2953,7 +2954,7 @@ namespace GObject
 
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getMergeChance");
-				UInt32 size = std::min(9, table_temp.size());
+				UInt32 size = std::min(11, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
 				{
 					_merge_chance[j] =  table_temp.get<UInt32>(j + 1);
@@ -3462,9 +3463,16 @@ namespace GObject
                         break;
                     case Item_Fashion:
                     case Item_Trump:
-                        equip = new ItemTrump(dbe.id, itype, ied);
-                        if (equip && ied.enchant)
-                            ((ItemTrump*)equip)->fixSkills();
+                        if (itype->subClass == Item_Fashion)
+                        {
+                            equip = new ItemFashion(dbe.id, itype, ied);
+                        }
+                        else
+                        {
+                            equip = new ItemTrump(dbe.id, itype, ied);
+                            if (equip && ied.enchant)
+                                ((ItemTrump*)equip)->fixSkills();
+                        }
                         break;
                     default:
                         equip = new ItemEquip(dbe.id, itype, ied);
@@ -4006,6 +4014,19 @@ namespace GObject
 		ItemEquip * base = it->second;
 		equips.erase(it);
 		return base;
+	}
+
+	ItemFashion * GObjectManager::fetchFashion( UInt32 id )
+	{
+		ItemEquip * equip = fetchEquipment(id);
+		if(equip == NULL)
+			return NULL;
+		if(equip->GetItemType().subClass != static_cast<UInt8>(Item_Fashion))
+		{
+			delete equip;
+			return NULL;
+		}
+		return static_cast<ItemFashion*>(equip);
 	}
 
 	ItemWeapon * GObjectManager::fetchWeapon( UInt32 id )

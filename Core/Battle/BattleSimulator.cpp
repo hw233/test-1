@@ -296,13 +296,10 @@ void BattleSimulator::start(UInt8 prevWin)
                     UInt8 clsnsex = bf->getFighter()->getClassAndSex();
                     UInt16 portrait = 0;
 
-                    if (bf->getFighter()->getFashionTypeId() == 1700 || bf->getFighter()->getFashionTypeId() == 1701)
-                    {
-                        if (bf->getFighter()->isMale())
-                            portrait = 1072;
-                        else
-                            portrait = 1072;
-                    }
+                    if (bf->getFighter()->getFashionTypeId() == 1700)
+                        portrait = 1072;
+                    else if (bf->getFighter()->getFashionTypeId() == 1701)
+                        portrait = 1074;
 
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;

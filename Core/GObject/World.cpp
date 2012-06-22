@@ -109,6 +109,9 @@ bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
 UInt32 World::_rechargenextretend;
+bool World::_mergeathact = false;
+bool World::_fourcopact = false;
+bool World::_duanwu;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -651,6 +654,7 @@ bool World::Init()
 	//AddTimer(3600 * 1000, World_Leaderboard_Update);
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
 	AddTimer(5000, World_Multi_Check, this);
+	AddTimer(60 * 1000, World_One_Min, this);
 
 #ifdef _FB
     if(getJune())
@@ -877,6 +881,50 @@ void World::SendLuckyDrawAward()
             }
         }
     }
+}
+
+bool enum_openact(void * ptr, void * v)
+{
+	Player * pl = static_cast<Player *>(ptr);
+	if(pl == NULL)
+		return true;
+    UInt32 day = *(UInt32*)v;
+    pl->sendOpenAct(day);
+    return true;
+}
+
+void World::World_One_Min( World * world )
+{
+#ifdef _FB
+	UInt32 now = world->_now;
+    struct tm t;
+    time_t tt = now;
+    localtime_r(&tt, &t);
+
+    UInt32 day = 0;
+
+    if (t.tm_year + 1900 == cfg.openYear &&
+            t.tm_mon == cfg.openMonth - 1 &&
+            t.tm_mday == cfg.openDay + 6 - 1 &&
+            t.tm_hour == 19 &&
+            t.tm_min == 10)
+        day = 2;
+    if (t.tm_year + 1900 == cfg.openYear &&
+            t.tm_mon == cfg.openMonth - 1 &&
+            t.tm_mday == cfg.openDay + 7 - 1 &&
+            t.tm_hour == 15 &&
+            t.tm_min == 0 )
+        day = 1;
+    if (t.tm_year + 1900 == cfg.openYear &&
+            t.tm_mon == cfg.openMonth - 1 &&
+            t.tm_mday == cfg.openDay + 7 - 1 &&
+            t.tm_hour == 19 &&
+            t.tm_min == 10)
+        day = 1;
+
+    if (day)
+        globalPlayers.enumerate(enum_openact, (void*)&day);
+#endif
 }
 
 }
