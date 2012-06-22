@@ -639,16 +639,6 @@ void AthleticsRank::challenge(Player* atker, UInt8 type)
 	if (atkerRank == _ranks[row].end())
 		return;
 
-    AthleticsRankData * atKerData = *(atkerRank->second);
-    if(atKerData && atKerData->challengenum >= 5)
-    {
-        UInt32 thisDay = TimeUtil::SharpDay();
-        UInt32 secondDay = TimeUtil::SharpDay(1, PLAYER_DATA(atker, created));
-        std::cout << thisDay << secondDay << std::endl;
-        if(thisDay == secondDay && !atker->GetVar(VAR_CLAWARD2))
-             atker->SetVar(VAR_CLAWARD2, 1);
-    }
-
     UInt32 extrachallenge = (*atkerRank->second)->extrachallenge;
     if((0 == extrachallenge) || (extrachallenge & static_cast<UInt32>(0x80000000)))
         return;
@@ -822,6 +812,18 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type)
     data->challengenum ++;
     data->challengetime = TimeUtil::Now();
 
+    if(data->challengenum >= 5)
+    {
+        UInt32 thisDay = TimeUtil::SharpDay();
+        UInt32 secondDay = TimeUtil::SharpDay(1, PLAYER_DATA(atker, created));
+        if(thisDay == secondDay && !atker->GetVar(VAR_CLAWARD2))
+        {
+             atker->SetVar(VAR_CLAWARD2, 1);
+             atker->sendRC7DayInfo(TimeUtil::Now());
+        }
+    }
+
+
     UInt32 challengeBuff=data->challengetime+ (cfg.GMCheck ? ATHLETICS_BUFF_TIME : 10);
     if (!World::getNewYear())
     {
@@ -908,6 +910,7 @@ void AthleticsRank::notifyAthletcisOver(Player * atker, Player * defer, UInt32 i
 	UInt8 newRank = 0;
     UInt16 flag = 0x09;    // 战报和基本信息
     //UInt32 prestige = 0;
+
 
 	if (!win)
 	{

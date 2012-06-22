@@ -291,9 +291,11 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
             {
                 UInt32 thisDay = TimeUtil::SharpDay();
                 UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(_owner, created));
-                std::cout << thisDay << firstDay << std::endl;
                 if(thisDay == firstDay && !_owner->GetVar(VAR_CLAWARD2))
+                {
                      _owner->SetVar(VAR_CLAWARD2, 1);
+                     _owner->sendRC7DayInfo(TimeUtil::Now());
+                }
             }
 		}
         worldBoss.setLevel(l);

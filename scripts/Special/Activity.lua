@@ -1148,17 +1148,24 @@ function onInvitedBy(player)
 end
 
 function onCLLoginReward(player, cts)
-#    if cts == 0 then
-#        player:getCoupon(20)
-#        return
-#    end
+    if isFBVersion() then
+        if cts == 0 then
+            player:getCoupon(20)
+            return
+        end
 
-#    local coupon = {20,30,40,50,60,70,80,}
-    local coupon = {10,15,20,25,30,35,40,}
-    if cts > 7 then
-        return
+        local coupon = {20,30,40,50,60,70,80,}
+        if cts > 7 then
+            return
+        end
+        player:getCoupon(coupon[cts]);
+    else
+        local coupon = {10,15,20,25,30,35,40,}
+        if cts > 7 then
+            return
+        end
+        player:getCoupon(coupon[cts]);
     end
-    player:getCoupon(coupon[cts]);
 end
 
 function onCL3DayReward(player)

@@ -4236,7 +4236,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Real Item Award");
 		DBRealItemAward t;
-		if(execu->Prepare("SELECT `id`, `cd`, `card_no`, `card_psw` FROM `real_item_award` ORDER BY `id` ", t)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `cd`, `card_no`, `card_psw` FROM `real_item_award` ORDER BY `id`", t)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)

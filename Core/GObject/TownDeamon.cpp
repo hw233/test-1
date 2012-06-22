@@ -544,9 +544,11 @@ void TownDeamon::challenge(Player* pl, UInt16 level, UInt8 type)
 
                     UInt32 thisDay = TimeUtil::SharpDay();
                     UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
-                    std::cout << thisDay << seventhDay << std::endl;
                     if(20 == dpd->curLevel && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
+                    {
                         pl->SetVar(VAR_CLAWARD2, 1);
+                        pl->sendRC7DayInfo(TimeUtil::Now());
+                    }
                 }
                 else
                     res = 1;
@@ -691,9 +693,11 @@ void TownDeamon::autoCompleteQuite(Player* pl, UInt16 levels)
 
         UInt32 thisDay = TimeUtil::SharpDay();
         UInt32 seventhDay = TimeUtil::SharpDay(6, PLAYER_DATA(pl, created));
-        std::cout << thisDay << seventhDay << std::endl;
         if(curLevelTmp < 20 && dpd->curLevel >= 20 && thisDay == seventhDay && !pl->GetVar(VAR_CLAWARD2))
+        {
             pl->SetVar(VAR_CLAWARD2, 1);
+            pl->sendRC7DayInfo(TimeUtil::Now());
+        }
     }
     st << pl->getPendExp();
     UInt16 sz = pl->_lastLoot.size();

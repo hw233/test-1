@@ -908,6 +908,15 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 tcpInfo->setAwardRoll(copyId);
             }
 
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 thirdDay = TimeUtil::SharpDay(2, PLAYER_DATA(pl, created));
+            if(thisDay == thirdDay && !pl->GetVar(VAR_CLAWARD2))
+            {
+                pl->SetVar(VAR_CLAWARD2, 1);
+                pl->sendRC7DayInfo(TimeUtil::Now());
+            }
+
+
             if (t == 0)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
             if (t == 1)
@@ -1117,17 +1126,6 @@ void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass, bool notify)
         sendUpdateTeamCopyInfo(copyId);
 
     DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
-
-    UInt32 thisDay = TimeUtil::SharpDay();
-    UInt32 thirdDay = TimeUtil::SharpDay(2, PLAYER_DATA(m_owner, created));
-    std::cout << thisDay << thirdDay << std::endl;
-    if(thisDay == thirdDay && !m_owner->GetVar(VAR_CLAWARD2))
-        m_owner->SetVar(VAR_CLAWARD2, 1);
-
-    UInt32 fourthDay = TimeUtil::SharpDay(3, PLAYER_DATA(m_owner, created));
-    std::cout << copyId << thisDay << fourthDay << std::endl;
-    if(copyId == 2 && thisDay == fourthDay && !m_owner->GetVar(VAR_CLAWARD2))
-        m_owner->SetVar(VAR_CLAWARD2, 1);
 }
 
 void TeamCopyPlayerInfo::setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)

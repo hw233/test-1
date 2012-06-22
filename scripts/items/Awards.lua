@@ -96,10 +96,10 @@ function RunTargetAward(player)
 	end
 
     local itemId = 0;
-    local chance = {1250, 1250, 1250, 1250, 1250, 1250, 1250, 1250}
-    local item = {515, 503, 507, 56, 57, 15, 60, 80}
+    local chance = {379, 1895, 2400, 5768, 9558, 9991, 9997, 10000}
+    local item = {515, 503, 507, 56, 57, 15, 60, 100}
     local g = math.random(1, 10000)
-    local i;
+    local j = 0;
     for i = 1, #chance do
         if g <= chance[i] then
             if i <= 6 then
@@ -109,7 +109,7 @@ function RunTargetAward(player)
                 if i == 7 then
                     if player:hasRealItemAward(1) then
                         player:getRealItemAward(1)
-                        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得60QB实物大奖")
+                        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了60QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
                     else
                         i = 1;
                         player:lastLootPush(item[i], 1);
@@ -118,7 +118,7 @@ function RunTargetAward(player)
                 else
                      if player:hasRealItemAward(2) then
                          player:getRealItemAward(2)
-                         Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]获得100QB实物大奖")
+                         Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了100QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
                      else
                          i = 1;
                          player:lastLootPush(item[i], 1);
@@ -126,11 +126,12 @@ function RunTargetAward(player)
                      end
                 end
             end
+            j = i;
             break
         end
     end
 
-    return i;
+    return j;
 end
 
 

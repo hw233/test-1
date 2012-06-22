@@ -8765,6 +8765,11 @@ namespace GObject
         {
             idx = GameAction()->RunTargetAward(this);
             SetVar(VAR_CLAWARD2, 2);
+            Stream st(REP::GETAWARD);
+            st << static_cast<UInt8>(3);
+            st << idx;
+            st << Stream::eos;
+            send(st);
         }
         else if(opt == 1)
         {
@@ -8775,11 +8780,6 @@ namespace GObject
 			}
 			_lastLoot.clear();
         }
-        Stream st(REP::GETAWARD);
-        st << static_cast<UInt8>(3);
-        st << idx;
-        st << Stream::eos;
-        send(st);
     }
 
 
@@ -9316,7 +9316,9 @@ namespace GObject
         UInt64 exp = (offline/60)*((lvl-10)*(lvl/10)*5+25)*0.8f;
         AddVar(VAR_OFFLINE_EXP, exp);
         AddVar(VAR_OFFLINE_PEXP, offline/60);
+#if 0
         AddVar(VAR_OFFLINE_EQUIP, offline);
+#endif
     }
 
     void Player::getOfflineExp()

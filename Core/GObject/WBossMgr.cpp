@@ -166,9 +166,11 @@ bool WBoss::attackWorldBoss(Player* pl, UInt32 npcId, UInt8 expfactor, bool fina
 
     UInt32 thisDay = TimeUtil::SharpDay();
     UInt32 sixthDay = TimeUtil::SharpDay(5, PLAYER_DATA(pl, created));
-    std::cout << thisDay << sixthDay << std::endl;
     if(thisDay == sixthDay && !pl->GetVar(VAR_CLAWARD2))
+    {
         pl->SetVar(VAR_CLAWARD2, 1);
+        pl->sendRC7DayInfo(TimeUtil::Now());
+    }
 
     UInt16 ret = 0x0100;
     bool res = bsim.getWinner() == 1;
