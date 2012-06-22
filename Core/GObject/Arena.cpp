@@ -7,6 +7,7 @@
 #include "Server/Cfg.h"
 #include "Server/SysMsg.h"
 #include "MsgID.h"
+#include "Common/Itoa.h"
 
 namespace GObject
 {
@@ -23,6 +24,17 @@ bool enum_send_status(void * ptr, void * data )
     GObject::arena.sendStatus(player);
     return true;
 }
+
+bool enum_send_active(void * ptr, void * data )
+{
+    Player* player = static_cast<Player*>(ptr);
+    if(player == NULL)
+        return true;
+
+    GObject::arena.sendActive(player);
+    return true;
+}
+
 
 void EliminationPlayer::calcBet(bool won, const char * t)
 {
@@ -96,13 +108,14 @@ void Arena::enterArena( Player * player )
 	NETWORK()->SendToArena(st);
 }
 
-void Arena::commitLineup( Player * player, int sid )
+void Arena::commitLineup( Player * player )
 {
 	Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
 	st << player->getId();
 	appendLineup2(st, player);
 	st << Stream::eos;
-	NETWORK()->SendMsgToClient(sid, st);
+	//NETWORK()->SendMsgToClient(sid, st);
+	NETWORK()->SendToArena(st);
 }
 
 UInt8 Arena::bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type )
@@ -117,7 +130,7 @@ UInt8 Arena::bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 t
         PreliminaryPlayer& pp = *it;
 
         std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
-        if(ait != _players.end() && ait->second.betList[state].size() >= 1)
+        if(ait != _players.end() && ait->second.betList[state][0].size() >= 1)
             return 0xFF;
         if(group != 0 || pos > _preliminaryPlayers_list[state].size() || pp.name.empty())
             return 0xFF;
@@ -166,7 +179,10 @@ UInt8 Arena::bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 t
 	binfo.recieved = 0;
 	binfo.pos = pos;
 	binfo.type = type;
-	_players[player].betList[state].push_back(binfo);
+    int i = 0;
+    if(group > 0)
+        i = group - 1;
+	_players[player].betList[state][i].push_back(binfo);
 	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
@@ -679,7 +695,10 @@ void Arena::readFrom( BinaryReader& brd )
     }
 
 	if(!_loaded)
+    {
 		_loaded = true;
+        globalPlayers.enumerate(enum_send_active, static_cast<void *>(NULL));
+    }
 }
 
 #if 0
@@ -953,6 +972,7 @@ void Arena::pushPriliminary(BinaryReader& br)
 {
     UInt8 won = 0;
     UInt8 type = 0;
+    UInt8 old_type = 0;
     UInt8 heroId = 0;
     std::string name;
     UInt32 btime = 0;
@@ -964,36 +984,48 @@ void Arena::pushPriliminary(BinaryReader& br)
 	br >> cid >> sid >> pid >> won >> type >> heroId >> name >> btime >> bid;
     if(type < 1)
         return;
+    old_type = type;
     if(type > 2)
+    {
         type = 2;
+    }
 
     UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
     if(cid == cfg.channelNum && sid == cfg.serverNum)
         ppid = pid;
 
 	GObject::Player * player = GObject::globalPlayers[ppid];
+
+    GET_PROGRESS_NAME(p, type-1);
+
+    if(won == 3 || won == 4 || won == 2)
+    {
+        bool flag[5] = {false, false, false, true, true};
+        PreliminaryPlayerListMap::iterator pit = _preliminaryPlayers[type-1].find(ppid);
+        if(pit != _preliminaryPlayers[type-1].end())
+        {
+            PreliminaryPlayerListIterator ppit = pit->second;
+            PreliminaryPlayer& pp = *ppit;
+            UInt16 pos = std::distance(_preliminaryPlayers_list[type-1].begin(), ppit);
+            calcBet(pp, pos, type-1, 0, flag[won], p);
+        }
+    }
+
 	if(player != NULL)
     {
-        Stream st(REP::ARENAPRILIMINARY);
+        if(bid != 0)
+        {
+            Stream st(REP::ARENAPRILIMINARY);
 
-        const UInt8 won_mod[] = {1, 0, 1, 0, 1};
-        UInt8 won2 = won_mod[won];
-        st << static_cast<UInt8>(type) << won2 << heroId << bid << name << Stream::eos;
-        player->send(st);
+            const UInt8 won_mod[] = {1, 0, 1, 0, 1};
+            UInt8 won2 = won_mod[won];
+            st << static_cast<UInt8>(type) << won2 << heroId << bid << name << Stream::eos;
+            player->send(st);
+        }
 
         ArenaPlayer& ap = _players[player];
-        if(won == 3)
+        if(won == 3 || won == 4)
         {
-            PreliminaryPlayerListMap::iterator pit = _preliminaryPlayers[type-1].find(ppid);
-            if(pit != _preliminaryPlayers[type-1].end())
-            {
-                GET_PROGRESS_NAME(p, type-1);
-                PreliminaryPlayerListIterator ppit = pit->second;
-                PreliminaryPlayer& pp = *ppit;
-                UInt16 pos = std::distance(_preliminaryPlayers_list[type-1].begin(), ppit);
-                calcBet(pp, pos, type-1, true, p);
-            }
-
             UInt32 twon = 0, tloss = 0;
             for(std::vector<PriliminaryBattle>::iterator it = ap.battles[type-1].begin(); it != ap.battles[type-1].end(); ++ it)
             {
@@ -1008,8 +1040,21 @@ void Arena::pushPriliminary(BinaryReader& br)
                     ++ tloss;
                 }
             }
-            SYSMSG(title, 710);
-            SYSMSGV(content, 712, _session & 0x7FFF, twon, tloss);
+
+            const UInt32 score[2][2] = {
+                {40, 80},
+                {50, 100}
+            };
+            UInt32 award = 0;
+            award = score[type-1][0]*tloss + score[type-1][1]*twon;
+            int g_type = 709;
+            if(old_type == 2)
+                g_type = 710;
+            else if(old_type == 3)
+                g_type = 711;
+            SYSMSGV(g, g_type);
+            SYSMSGV(title, 712, p, g);
+            SYSMSGV(content, 713, _session, p, twon, tloss, award, g);
             player->GetMailBox()->newMail(NULL, 0x01, title, content);
         }
         else
@@ -1023,11 +1068,12 @@ void Arena::pushPriliminary(BinaryReader& br)
             pb.battleId = bid;
             ap.battles[type-1].push_back(pb);
 
-            UInt32 score[2][3] = {
+            const UInt32 score[2][3] = {
                 {40, 80, 40},
                 {50, 100, 50}
             };
-            player->AddVar(VAR_MONEY_ARENA3, score[type-1][won]);
+            player->AddVar(VAR_MONEY_ARENA, score[type-1][won]);
+            player->AddVar(VAR_MONEY_ARENA2 + type - 1, score[type-1][won]);
 
             if(won == 2)
             {
@@ -1043,8 +1089,10 @@ void Arena::pushPriliminary(BinaryReader& br)
                         ++ tloss;
                     }
                 }
-                SYSMSG(title, 713);
-                SYSMSGV(content, 715, _session & 0x7FFF, twon, tloss);
+                SYSMSGV(title, 714, p);
+                UInt32 award = 0;
+                award = player->GetVar(VAR_MONEY_ARENA2 + type - 1);
+                SYSMSGV(content, 715, _session, p, twon, tloss, award);
                 player->GetMailBox()->newMail(NULL, 0x01, title, content);
             }
         }
@@ -1060,7 +1108,10 @@ void Arena::pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 grou
 	binfo.recieved = recieved;
 	binfo.pos = pos;
 	binfo.type = type;
-	_players[player].betList[state].push_back(binfo);
+    int i = 0;
+    if(group > 0)
+        i = group - 1;
+	_players[player].betList[state][i].push_back(binfo);
 }
 
 void Arena::pushPriliminaryCount( UInt32 * c )
@@ -1146,14 +1197,14 @@ void Arena::readPrePlayers(BinaryReader& brd)
     {
         for(int i = 0; i < 2; ++ i)
         {
-            std::vector<BetInfo>& blist = it->second.betList[i];
+            std::vector<BetInfo>& blist = it->second.betList[i][0];
             if(blist.empty())
                 continue;
 
             for(std::vector<BetInfo>::iterator bit = blist.begin(); bit != blist.end(); ++ bit)
             {
                 BetInfo& bi = *bit;
-                if(bi.round == 0 && bi.group == 0 && bi.state == i && bi.recieved == 0)
+                if(bi.round == 1 && bi.group == 0 && bi.state == i)
                 {
                     PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[i].begin();
                     std::advance(pit, bi.pos);
@@ -1323,6 +1374,8 @@ void Arena::readElimination(BinaryReader& brd)
 
         calcFinalBet(i);
     }
+    if(!_notified)
+        _notified = 1;
 }
 
 void Arena::calcFinalBet(int i)
@@ -1333,7 +1386,7 @@ void Arena::calcFinalBet(int i)
         ++ r;
     if(r > 1)
     {
-        GET_PROGRESS_NAME(p, _round - 1);
+        GET_PROGRESS_NAME(p, _round+1);
         for(UInt32 j = 1; j < r; ++ j)
         {
             int starti = aIndex[j - 1], endi = aIndex[j];
@@ -1345,8 +1398,15 @@ void Arena::calcFinalBet(int i)
                     _finalIdx[i][j][k - starti] = nidx;
                     if(_status == 0 && j == r - 1)
                     {
-                        calcBet(_finals[i][nidx], nidx, j, true, p);
-                        //calcBet( _finals[i][_finalIdx[i][j-1][(k - starti) * 2 + 1]], _finalIdx[i][j][k - starti], j, false, p);
+                        int pos1 = nidx;
+                        int pos2 = _finalIdx[i][j-1][(k - starti) * 2 + 1];
+                        if(j > 2)
+                        {
+                            pos1 = pos1 >> 2;
+                            pos2 = pos2 >> 2;
+                        }
+                        calcBet(_finals[i][nidx], pos1, j+1, i, true, p);
+                        calcBet( _finals[i][_finalIdx[i][j-1][(k - starti) * 2 + 1]], pos2, j+1, i, false, p);
                         //_finals[i][nidx].calcBet(true, p);
                         //_finals[i][_finalIdx[i][j-1][(k - starti) * 2 + 1]].calcBet(false, p);
                     }
@@ -1357,8 +1417,15 @@ void Arena::calcFinalBet(int i)
                     _finalIdx[i][j][k - starti] = nidx;
                     if(_status == 0 && j == r - 1)
                     {
-                        calcBet(_finals[i][nidx], nidx, j, true, p);
-                        //calcBet( _finals[i][_finalIdx[i][j-1][(k - starti) * 2 + 1]], _finalIdx[i][j][k - starti], j, false, p);
+                        int pos1 = nidx;
+                        int pos2 = _finalIdx[i][j-1][(k - starti) * 2];
+                        if(j > 2)
+                        {
+                            pos1 = pos1 >> 2;
+                            pos2 = pos2 >> 2;
+                        }
+                        calcBet(_finals[i][nidx], pos1, j+1, i, true, p);
+                        calcBet( _finals[i][_finalIdx[i][j-1][(k - starti) * 2]], pos2, j+1, i, false, p);
                         //_finals[i][nidx].calcBet(true, p);
                         //_finals[i][_finalIdx[i][j-1][(k - starti) * 2]].calcBet(false, p);
                     }
@@ -1369,40 +1436,21 @@ void Arena::calcFinalBet(int i)
     if(_loaded)
     {
         Stream st(REP::ARENAPRILIMINARY);
-        st << static_cast<UInt8>(2) << Stream::eos;
+        st << static_cast<UInt8>(3) << Stream::eos;
         NETWORK()->Broadcast(st);
         if(!_notified)
         {
-            const int start_hour[3] = {12, 16, 19};
-            const int start_min[3] = {15, 0, 0};
-            _notified = 1;
             if(_status == 0 && _round > 0)
             {
                 GET_ARENA_NAME(n);
-                GET_PROGRESS_NAME(p, _round - 1);
-                SYSMSG_BROADCASTV(704, n, p, 3);
-                GET_PROGRESS_NAME(p2, _round);
-                SYSMSGV(title, 720, _session & 0x7FFF, n, p2);
-                SYSMSGV(title2, 722, _session & 0x7FFF, n, p2);
+                GET_PROGRESS_NAME(p, _round + 1);
+                SYSMSGV(g, 710 + i);
+                SYSMSGV(title, 720, p, g);
+                SYSMSGV(title2, 722, p, g);
                 if(_round < 5)
                 {
-                    char pn[2048] = {0};
-                    int m = 32 >> _round;
-                    for(int i = 0; i < 2; ++ i)
+                    //for(int i = 0; i < 2; ++ i)
                     {
-                        for(int j = 0; j < m; ++ j)
-                        {
-                            EliminationPlayer& ep = _finals[i][_finalIdx[i][_round][j]];
-                            if(ep.id != 0)
-                            {
-                                Player * pl = globalPlayers[ep.id];
-                                if(pl == NULL)
-                                    continue;
-                                SYSMSGV(sn, 10000, pl->getCountry(), pl->getName().c_str());
-                                strcat(pn, sn);
-                            }
-                        }
-
                         const int aIndex[6] = {0, 16, 24, 28, 30, 31};
                         int starti = aIndex[_round - 1];
                         int endi = aIndex[_round];
@@ -1413,17 +1461,19 @@ void Arena::calcFinalBet(int i)
                             if(ep1.name.empty() || ep2.name.empty())
                                 continue;
                             Player * pl;
-                            UInt8 winCount = _finalBattles[i][idx].winCount(_round);
-                            if(winCount > 1)
+                            UInt8 winCount = _finalBattles[i][idx].winCount(_round-1);
+                            const UInt8 totalCount[5] = { 3, 3, 5, 5, 7 };
+                            const UInt8 winCount_mod[5] = {1, 1, 2, 2, 3};
+                            if(winCount > winCount_mod[_round-1])
                             {
                                 if(ep1.id != 0 && (pl = globalPlayers[ep1.id]) != NULL)
                                 {
-                                    SYSMSGV(content, 721, _session & 0x7FFF, n, p, 3, ep2.name.c_str(), winCount, 3 - winCount, static_cast<UInt32>(ep1.betMap.size()));
+                                    SYSMSGV(content, 721, _session, p, winCount, totalCount[_round-1] - winCount);
                                     pl->GetMailBox()->newMail(NULL, 0x01, title, content);
                                 }
                                 if(ep2.id != 0 && (pl = globalPlayers[ep2.id]) != NULL)
                                 {
-                                    SYSMSGV(content, 723, _session & 0x7FFF, n, p, ep1.name.c_str(), 3 - winCount, winCount, static_cast<UInt32>(ep2.betMap.size()));
+                                    SYSMSGV(content, 723, _session, p, totalCount[_round-1] - winCount, winCount);
                                     pl->GetMailBox()->newMail(NULL, 0x01, title2, content);
                                 }
                             }
@@ -1431,35 +1481,148 @@ void Arena::calcFinalBet(int i)
                             {
                                 if(ep2.id != 0 && (pl = globalPlayers[ep2.id]) != NULL)
                                 {
-                                    SYSMSGV(content, 721, _session & 0x7FFF, n, p, 3, ep1.name.c_str(), 3 - winCount, winCount, static_cast<UInt32>(ep2.betMap.size()));
+                                    SYSMSGV(content, 721, _session, p, totalCount[_round-1] - winCount, winCount);
                                     pl->GetMailBox()->newMail(NULL, 0x01, title, content);
                                 }
                                 if(ep1.id != 0 && (pl = globalPlayers[ep1.id]) != NULL)
                                 {
-                                    SYSMSGV(content, 723, _session & 0x7FFF, n, p, ep2.name.c_str(), winCount, 3 - winCount, static_cast<UInt32>(ep1.betMap.size()));
+                                    SYSMSGV(content, 723, _session, p, winCount, totalCount[_round-1] - winCount);
                                     pl->GetMailBox()->newMail(NULL, 0x01, title2, content);
                                 }
                             }
                         }
                     }
-                    GET_ARENA_NAME(n);
-                    GET_PROGRESS_NAME(p, _round);
-                    SYSMSG_BROADCASTV(702, pn, _session & 0x7FFF, n, p);
+                }
+                else
+                {
+                    const int award[2][6][2] = {
+                    {
+                        {9063, 6000},
+                        {9062, 7000},
+                        {9061, 8000},
+                        {9060, 10000},
+                        {9059, 12000},
+                        {9058, 15000}
+                    },
+                    {
+                        {9066, 1000},
+                        {9066, 1500},
+                        {9065, 2000},
+                        {9065, 3000},
+                        {9064, 4000},
+                        {9063, 5000}
+                    }
+                    };
+                    //for(int i = 0; i < 2; ++ i)
+                    {
+                        int idx = 0;
+                        const int aIndex[6] = {0, 16, 24, 28, 30, 31};
+                        UInt8 nidx = 0;
+                        UInt8 nidx2 = 0;
+                        for(int j = 1; j < 6; ++ j)
+                        {
+                            SYSMSGV(g, 710 + i);
+                            SYSMSGV(title, 724, g);
+                            int starti = aIndex[j - 1];
+                            int endi = aIndex[j];
+                            for(idx = starti; idx < endi; ++ idx)
+                            {
+                                if(_finalBattles[i][idx].winner(j-1) == 0)
+                                {
+                                    nidx = _finalIdx[i][j-1][(idx - starti) * 2 + 1];
+                                    if(j == 5)
+                                        nidx2 = _finalIdx[i][j-1][(idx - starti) * 2];
+                                }
+                                else
+                                {
+                                    nidx = _finalIdx[i][j-1][(idx - starti) * 2];
+                                    if(j == 5)
+                                        nidx2 = _finalIdx[i][j-1][(idx - starti) * 2 + 1];
+                                }
+                                EliminationPlayer& ep = _finals[i][nidx];
+                                Player * pl = globalPlayers[ep.id];
+                                if(pl != NULL)
+                                {
+                                    pl->AddVar(VAR_MONEY_ARENA, award[i][j-1][1]);
+                                    SYSMSGV(content, 725, _session, award[i][j-1][1]);
+                                    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                                    if(mail != NULL)
+                                    {
+                                        std::string strItems;
+                                        strItems += Itoa(award[i][j-1][0]);
+                                        strItems += ",";
+                                        strItems += Itoa(1);
+                                        strItems += "|";
+                                        mailPackageManager.push(mail->id, award[i][j-1][0], 1, true);
+                                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                                    }
+                                }
+                                if(nidx2 != 0)
+                                {
+                                    EliminationPlayer& ep = _finals[i][nidx2];
+                                    Player * pl = globalPlayers[ep.id];
+                                    if(pl == NULL)
+                                        continue;
+
+                                    GET_PROGRESS_NAME(p, j+1);
+                                    SYSMSGV(title, 724, p);
+                                    pl->AddVar(VAR_MONEY_ARENA, award[i][j][1]);
+                                    SYSMSGV(content, 725, _session, award[i][j][1]);
+                                    Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+                                    if(mail != NULL)
+                                    {
+                                        std::string strItems;
+                                        strItems += Itoa(award[i][j][0]);
+                                        strItems += ",";
+                                        strItems += Itoa(1);
+                                        strItems += "|";
+                                        mailPackageManager.push(mail->id, award[i][j][0], 1, true);
+                                        DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, pl->getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
-#if 0
-        if(_status == 0)
+        if(_status == 0 && _progress != 3)
         {
-            for(int i = 0; i < 3; ++ i)
             {
                 for(int j = 0; j < 32; ++ j)
                 {
                     _finals[i][j].resetBet();
                 }
             }
+            for(std::map<Player *, ArenaPlayer>::iterator it = _players.begin(); it != _players.end(); ++ it)
+            {
+                for(int sidx = 2; sidx < 7; ++ sidx)
+                {
+                    std::vector<BetInfo>& blist = it->second.betList[sidx][i];
+                    if(blist.empty())
+                        continue;
+                    int cnt = blist.size();
+                    for(int j = 0; j < cnt; ++ j)
+                    {
+                        BetInfo& bi = blist[j];
+                        if(bi.group == i + 1 && bi.recieved == 0)
+                        {
+                            UInt8 pos2 = bi.pos;
+                            switch(bi.state)
+                            {
+                            case 4:
+                            case 5:
+                            case 6:
+                                pos2 = _finalIdx[i][2][bi.pos];
+                                break;
+                            }
+
+                            _finals[i][pos2].betMap[it->first] = bi.type;
+                        }
+                    }
+                }
+            }
         }
-#endif
     }
     else
     {
@@ -1470,30 +1633,28 @@ void Arena::calcFinalBet(int i)
         }
         for(std::map<Player *, ArenaPlayer>::iterator it = _players.begin(); it != _players.end(); ++ it)
         {
-            for(int i = 2; i < 7; ++ i)
+            for(int sidx = 2; sidx < 7; ++ sidx)
             {
-                std::vector<BetInfo>& blist = it->second.betList[i];
+                std::vector<BetInfo>& blist = it->second.betList[sidx][i];
                 if(blist.empty())
                     continue;
                 int cnt = blist.size();
                 for(int j = 0; j < cnt; ++ j)
                 {
                     BetInfo& bi = blist[j];
-                    if(bi.recieved == 0 && bi.group >= 1 && bi.group <= 2)
+                    if(bi.group == i + 1 && bi.recieved == 0)
                     {
-                        int gIdx = bi.group - 1;
-                        UInt8 fidx = 0;
                         UInt8 pos2 = bi.pos;
                         switch(bi.state)
                         {
                         case 4:
                         case 5:
                         case 6:
-                            pos2 = _finalIdx[gIdx][2][bi.pos];
+                            pos2 = _finalIdx[i][2][bi.pos];
                             break;
                         }
 
-                        _finals[gIdx][pos2].betMap[it->first] = bi.type;
+                        _finals[i][pos2].betMap[it->first] = bi.type;
                     }
                 }
             }
@@ -1594,15 +1755,21 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag)
         st << leftTime;
         ArenaPlayer& ap = _players[player];
         UInt8 cnt = static_cast<UInt8>(ap.battles[type].size());
+        size_t offset = st.size();
         st << cnt;
+        UInt8 cnt2 = 0;
         for(int i = 0; i < cnt; ++ i)
         {
+            if(ap.battles[type][i].battleId == 0)
+                continue;
+            ++ cnt2;
             const UInt8 won_mod[] = {1, 0, 1, 0, 1};
             UInt8 won = won_mod[ap.battles[type][i].won];
             UInt8 flag =  won;
             st << flag;
             st << ap.battles[type][i].otherHeroId << ap.battles[type][i].battleId << ap.battles[type][i].otherName;
         }
+        st.data<UInt8>(offset) = static_cast<UInt8>(cnt2);
     }
     else
     {
@@ -1614,7 +1781,7 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag)
         else
         {
             ArenaPlayer& ap = ait->second;
-            std::vector<BetInfo>& blist = ap.betList[type];
+            std::vector<BetInfo>& blist = ap.betList[type][0];
             UInt8 cnt = blist.size();
             if(cnt > 1)
                 cnt = 1;
@@ -1696,7 +1863,7 @@ void Arena::sendElimination( Player * player, UInt8 type, UInt8 group )
         st << cnt;
         for(int i = 0; i < states; ++ i)
         {
-            std::vector<BetInfo>& blist = iter->second.betList[state+i];
+            std::vector<BetInfo>& blist = iter->second.betList[state+i][gIdx];
             for(std::vector<BetInfo>::iterator it = blist.begin(); it != blist.end(); ++ it)
             {
                 if(it->group != group)
@@ -1784,13 +1951,13 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
     }
 }
 
-void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, bool won, const char * t)
+void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group, bool won, const char * t)
 {
 	for(std::map<Player *, UInt8>::iterator it = pp.betMap.begin(); it != pp.betMap.end(); ++ it)
 	{
         Player* player = it->first;
         std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
-		std::vector<BetInfo>& blist = iter->second.betList[state];
+		std::vector<BetInfo>& blist = iter->second.betList[state][group];
 
         bool recieved = true;
 		for(std::vector<BetInfo>::iterator bit = blist.begin(); bit != blist.end(); ++ bit)
@@ -1811,21 +1978,21 @@ void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, bool won, co
 
 		if(won)
 		{
-            SYSMSGV(title, 730, t);
+            SYSMSGV(title, 730, t, pp.name.c_str());
 
             UInt8 rew = it->second == 0 ? 100 : 50;
-            it->first->AddVar(VAR_MONEY_ARENA, rew);
+            player->AddVar(VAR_MONEY_ARENA, rew);
             if(state == 0)
-                it->first->AddVar(VAR_MONEY_ARENA2, rew);
+                player->AddVar(VAR_MONEY_ARENA2, rew);
             if(state == 1)
                 it->first->AddVar(VAR_MONEY_ARENA3, rew);
-            SYSMSGV(content, 731, t, pp.name.c_str(), it->second, rew);
-            Mail * pMail = it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
+            SYSMSGV(content, 731, _session, t, pp.name.c_str(), rew);
+            it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
 		}
 		else
 		{
-			SYSMSGV(title, 734, t);
-			SYSMSGV(content, 735, t, pp.name.c_str(), it->second);
+            SYSMSGV(title, 732, t, pp.name.c_str());
+			SYSMSGV(content, 733, _session, t, pp.name.c_str());
 			it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
 		}
 	}

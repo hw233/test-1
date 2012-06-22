@@ -36,7 +36,7 @@ struct ArenaPlayer
 	UInt8 group;
 	std::string realName;
 	std::vector<PriliminaryBattle> battles[2];
-	std::vector<BetInfo> betList[7];
+	std::vector<BetInfo> betList[7][2];
 };
 
 struct EliminationPlayer
@@ -50,6 +50,10 @@ struct EliminationPlayer
 	std::map<Player *, UInt8> betMap;
 	EliminationPlayer(): id(0), level(0), battlePoint(0), support(0)
 	{}
+    ~EliminationPlayer()
+    {
+        betMap.clear();
+    }
 	void calcBet(bool, const char *);
 	void resetBet();
 };
@@ -82,7 +86,7 @@ public:
 	inline void getPlayerCount(UInt32 * pc) { pc[0] = _playerCount[0]; pc[1] = _playerCount[1]; pc[2] = _playerCount[2]; }
 
 	static void enterArena(Player * player);
-	static void commitLineup(Player * player, int);
+	static void commitLineup(Player * player);
     UInt8 bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
 	void readFrom(BinaryReader&);
 	void sendInfo(Player * player);
@@ -98,7 +102,7 @@ public:
     void readHistories(BinaryReader& brd);
     void readElimination(BinaryReader& brd);
     void calcFinalBet(int i);
-    void calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, bool won, const char * t);
+    void calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group, bool won, const char * t);
 
     void sendActive(Player* pl);
     void sendStatus(Player* pl);
