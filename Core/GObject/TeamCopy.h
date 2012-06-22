@@ -18,7 +18,7 @@ namespace GObject
 class Player;
 
 #define TEAMCOPY_MAXTYPECNT 2 
-#define TEAMCOPY_MAXCOPYCNT 6 
+#define TEAMCOPY_MAXCOPYCNT 7 
 #define TEAMCOPY_MAXMEMCNT  3 
 #define TEAMCOPY_MAXPAGECNT 6 
 #define TEAMCOPY_MAXPWDCNT  6 

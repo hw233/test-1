@@ -578,10 +578,16 @@ namespace GObject
         void sendCreateMail();
         void sendOpenAct(UInt32);
         void continuousLogin(UInt32 now);
+        void continuousLoginRF(UInt32 now);
         void getContinuousReward(UInt8 type, UInt8 idx = 0);
+        void getContinuousRewardRF(UInt8 type, UInt8 idx = 0);
         void turnOnRC7Day();
+        void turnOnRF7Day();
         void addRC7DayRecharge(UInt32 r);
-        void sendRC7DayInfo(UInt32 now);
+        void addRF7DayRecharge(UInt32 r);
+        void sendRC7DayInfo(UInt32 now = TimeUtil::Now());
+        void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
+        void setContinuousRFAward(UInt32 no);
 
 		void Reconnect();
 
@@ -1144,7 +1150,7 @@ namespace GObject
 		std::string& fixName(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
-
+        const char *patchShowName(const char* name, const UInt64 playerId = 0);
 		void autoCB(bool = true);
 
 	public:
@@ -1165,7 +1171,7 @@ namespace GObject
 	private:
 		UInt32 calcVipLevel();
 		UInt32 calcYDVipLevel(UInt32);
-        UInt8 calcRechargeLevel(UInt32);
+        UInt8 calcRechargeLevel(UInt32, UInt8&);
 		Player * _findFriend( UInt8 type, std::string& name );
 		bool _hasFriend( UInt8 type, Player * pl ) const;
 		inline Player * _findFriend(std::string& name) { return _findFriend(0, name); }
@@ -1186,7 +1192,7 @@ namespace GObject
 
 		void sendVIPMails(UInt8, UInt8);
 		void sendYDVIPMails(UInt8, UInt8);
-        void sendRechargeMails(UInt8, UInt8);
+        void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
 
@@ -1287,6 +1293,7 @@ namespace GObject
 		GData::NpcGroup * _lastNg;
 		std::vector<GData::LootResult> _lastLoot;
         std::vector<LastAthAward> _lastAthAward;
+        std::vector<GData::LootResult> _equipAward;
 
     private:
 		UInt16 _lastDungeon;
@@ -1378,6 +1385,7 @@ namespace GObject
     public:
         bool enchanted8(UInt32);
         void sendEnchanted8Box();
+        void enchantGt11();
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,
@@ -1446,6 +1454,8 @@ namespace GObject
         void sendSSDTInfo();
         void getHappyAward(UInt8 opt);
         void sendHappyInfo(UInt16 itemId = 0);
+        void getTargetAward(UInt8 opt);
+        void getTargetAwardRF(UInt8 opt);
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();
@@ -1485,6 +1495,8 @@ namespace GObject
         DeamonPlayerData* getDeamonPlayerData() { return m_dpData; }
         void sendDeamonAwardsInfo();
         void getDeamonAwards();
+        void lastLootPush(UInt16 itemId, UInt16 num);
+        void IDIPAddItem(UInt16 itemId, UInt16 num, bool bind = true);
 
     private:
         bool m_hasTripod;
@@ -1510,6 +1522,26 @@ namespace GObject
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
         void sendYBBufInfo(UInt32 ybbuf);
+
+        bool hasRealItemAward(UInt32 id);
+        void getRealItemAward(UInt32 id);
+
+    public:
+        struct RNR
+        {
+            RNR() : date(0), recharge(0) {}
+
+            UInt32 date;
+            UInt32 recharge;
+        };
+
+        void addRechargeNextRet(UInt32);
+        void updateRNR2DB();
+        void loadRNRFromDB(const std::string& str);
+        void sendRNR(UInt32 now);
+        void sendRechargeNextRetInfo(UInt32 now);
+    private:
+        std::vector<RNR> rechargs;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

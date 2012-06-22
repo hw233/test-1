@@ -82,20 +82,20 @@ function Task_00000165(npcId)
 		action.m_ActionID = 165
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "元磁菁英";
+		action.m_ActionMsg = task_msg_1904;
 	elseif task:GetTaskSubmitNpc(165) == npcId then
 		if Task_Submit_00000165() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 165
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "元磁菁英";
+			action.m_ActionMsg = task_msg_1905;
 		elseif task:HasAcceptedTask(165) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 165
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "元磁菁英";
+			action.m_ActionMsg = task_msg_1906;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000165_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这里地处极北，天寒地冻终年难见人迹，小友来此真是稀客呀，那易周昔年见我修行不易，特地引北极的元磁真力来助我修炼，化我横骨以便我早日修成人形。只是如今横骨已化的七七八八，但却在禁制里凝成元磁菁英，借那元磁真力对我有莫大的伤害，还希望小友能帮忙消灭掉这些菁英。";
-	action.m_ActionMsg = "是吗，我这就去除掉元磁菁英。";
+	action.m_NpcMsg = task_msg_1907;
+	action.m_ActionMsg = task_msg_1908;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000165_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老朽修炼多年，终于可以化身成人了。";
+	action.m_NpcMsg = task_msg_1909;
 	action.m_ActionMsg = "";
 	return action;
 end

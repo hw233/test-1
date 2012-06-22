@@ -50,20 +50,20 @@ function Task_00000157(npcId)
 		action.m_ActionID = 157
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "紫云之乱";
+		action.m_ActionMsg = task_msg_1946;
 	elseif task:GetTaskSubmitNpc(157) == npcId then
 		if Task_Submit_00000157() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 157
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "紫云之乱";
+			action.m_ActionMsg = task_msg_1947;
 		elseif task:HasAcceptedTask(157) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 157
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "紫云之乱";
+			action.m_ActionMsg = task_msg_1948;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000157_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "紫云宫的金须奴原是天地乾明离火所化，虽然与紫云三女一起，但仍一心向善，只是因为需要天一贞水来融会坎离，所以敢为奴仆随初凤修行，不过他没甚恶迹，所以你可手下留情，将他击败即可。";
-	action.m_ActionMsg = "嗯，我这就去。";
+	action.m_NpcMsg = task_msg_1949;
+	action.m_ActionMsg = task_msg_1950;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000157_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "紫云宫原是仙人府邸，但是现在却被这群妖人占据。";
+	action.m_NpcMsg = task_msg_1951;
 	action.m_ActionMsg = "";
 	return action;
 end

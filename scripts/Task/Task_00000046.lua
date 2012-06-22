@@ -82,20 +82,20 @@ function Task_00000046(npcId)
 		action.m_ActionID = 46
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "地牢僧兵";
+		action.m_ActionMsg = task_msg_333;
 	elseif task:GetTaskSubmitNpc(46) == npcId then
 		if Task_Submit_00000046() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 46
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "地牢僧兵";
+			action.m_ActionMsg = task_msg_334;
 		elseif task:HasAcceptedTask(46) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 46
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "地牢僧兵";
+			action.m_ActionMsg = task_msg_335;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000046_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是谢天谢地，我被关了数日，没想到还可以重见天日。不过这个地牢守卫森严，时常有僧兵守卫来巡逻，若是发现我失踪，恐怕会鸣钟报警，必须先除掉这些僧兵守卫。";
-	action.m_ActionMsg = "好的，你千万小心，我很快就回来。";
+	action.m_NpcMsg = task_msg_336;
+	action.m_ActionMsg = task_msg_337;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000046_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠救命之恩，我周云从没齿难忘。";
+	action.m_NpcMsg = task_msg_338;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000029(npcId)
 		action.m_ActionID = 29
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "炼制材料";
+		action.m_ActionMsg = task_msg_220;
 	elseif task:GetTaskSubmitNpc(29) == npcId then
 		if Task_Submit_00000029() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 29
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "炼制材料";
+			action.m_ActionMsg = task_msg_221;
 		elseif task:HasAcceptedTask(29) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 29
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "炼制材料";
+			action.m_ActionMsg = task_msg_222;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000029_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "慈云寺妖人众多，其中颇有些厉害的角色，无论剑术还是妖法都非常犀利，我现在正在炼制一件克制敌人妖法的法宝，正在紧要关头却发现有些材料数量不足，不知道"..GetPlayerName(GetPlayer()).."你可否帮我寻一些来？";
-	action.m_ActionMsg = "需要哪些材料呢？";
+	action.m_NpcMsg = task_msg_223..GetPlayerName(GetPlayer())..task_msg_224;
+	action.m_ActionMsg = task_msg_225;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000029_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些材料却也不难取，此处往北30里有一个乱葬岗，因为战乱连连，怨气聚集所以生出了不少的僵尸作怪，他们身上的玄阴之魄就是缺少的材料，"..GetPlayerName(GetPlayer()).."请速去速回，很快我就用着这些材料了。";
-	action.m_ActionMsg = "我这就去乱葬岗。";
+	action.m_NpcMsg = task_msg_226..GetPlayerName(GetPlayer())..task_msg_227;
+	action.m_ActionMsg = task_msg_228;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000029_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠你赶回来的真是及时，玉清多谢少侠援手。";
+	action.m_NpcMsg = task_msg_229;
 	action.m_ActionMsg = "";
 	return action;
 end

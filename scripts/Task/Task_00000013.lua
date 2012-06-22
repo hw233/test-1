@@ -82,20 +82,20 @@ function Task_00000013(npcId)
 		action.m_ActionID = 13
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "寻觅帮手";
+		action.m_ActionMsg = task_msg_138;
 	elseif task:GetTaskSubmitNpc(13) == npcId then
 		if Task_Submit_00000013() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 13
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "寻觅帮手";
+			action.m_ActionMsg = task_msg_139;
 		elseif task:HasAcceptedTask(13) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 13
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "寻觅帮手";
+			action.m_ActionMsg = task_msg_140;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000013_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).." , 你可知现在正值第三次峨眉斗剑，正邪都在为此做准备。各派人士四处寻觅根骨资质俱佳的弟子，你一人恐怕势单力薄，不如多结交一些同道中人。";
-	action.m_ActionMsg = "我初来乍到，人地不熟，去哪里找是好呢？";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_141;
+	action.m_ActionMsg = task_msg_142;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000013_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "呵呵，远在天边，近在眼前呀，"..GetPlayerName(GetPlayer()).."你刚刚打过交道的知味楼掌柜识人丰富，他一定能帮你介绍几个同道人士。";
-	action.m_ActionMsg = "多谢前辈指教，我这就去看看。";
+	action.m_NpcMsg = task_msg_143..GetPlayerName(GetPlayer())..task_msg_144;
+	action.m_ActionMsg = task_msg_145;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000013_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠找我就对了，谁不知道方圆百里就属我的人脉最广了。";
+	action.m_NpcMsg = task_msg_146;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000150(npcId)
 		action.m_ActionID = 150
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "雁荡斩蛟";
+		action.m_ActionMsg = task_msg_1669;
 	elseif task:GetTaskSubmitNpc(150) == npcId then
 		if Task_Submit_00000150() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 150
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "雁荡斩蛟";
+			action.m_ActionMsg = task_msg_1670;
 		elseif task:HasAcceptedTask(150) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 150
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "雁荡斩蛟";
+			action.m_ActionMsg = task_msg_1671;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000150_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这只妖鲧狡诈异常，我在此守候了数日，它只是躲在江底深处不敢路面。眼看它劫期将至，这孽畜估计按捺不住，就要出来兴风作浪……它手下不少水族妖孽，需要你助我将它们尽数铲除。";
-	action.m_ActionMsg = "没问题……其实我最喜欢帮助妹子了。";
+	action.m_NpcMsg = task_msg_1672;
+	action.m_ActionMsg = task_msg_1673;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000150_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，此间事了，对你对我都是莫大的功德啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1674;
 	action.m_ActionMsg = "";
 	return action;
 end

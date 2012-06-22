@@ -82,20 +82,20 @@ function Task_00000010(npcId)
 		action.m_ActionID = 10
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "昔日仇家";
+		action.m_ActionMsg = task_msg_109;
 	elseif task:GetTaskSubmitNpc(10) == npcId then
 		if Task_Submit_00000010() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 10
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "昔日仇家";
+			action.m_ActionMsg = task_msg_110;
 		elseif task:HasAcceptedTask(10) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 10
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "昔日仇家";
+			action.m_ActionMsg = task_msg_111;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000010_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."大哥，你行侠仗义的事情我已经听李叔叔说了，不知你现在能不能帮忙寻找我师傅？";
-	action.m_ActionMsg = "当然可以，但不知你为何如此焦急，究竟发生了？";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_112;
+	action.m_ActionMsg = task_msg_113;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000010_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠不知，村里来了一个形状吓人的恶人，唤做毛太，此人看起来似乎和我师傅有仇，看起来好象传说中的剑仙一流，师傅肯定不是对手，我要赶紧找到师傅，好有所准备。";
-	action.m_ActionMsg = "好，我这就同你一起去找他。";
+	action.m_NpcMsg = task_msg_114;
+	action.m_ActionMsg = task_msg_115;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000010_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "毛太是我早年的一个仇人，后来听说他在五台山学了飞剑，厉害无比，我们普通江湖人如何是他的对手？";
+	action.m_NpcMsg = task_msg_116;
 	action.m_ActionMsg = "";
 	return action;
 end

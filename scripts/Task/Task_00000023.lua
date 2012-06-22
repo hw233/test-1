@@ -82,20 +82,20 @@ function Task_00000023(npcId)
 		action.m_ActionID = 23
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "风尘异人";
+		action.m_ActionMsg = task_msg_189;
 	elseif task:GetTaskSubmitNpc(23) == npcId then
 		if Task_Submit_00000023() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 23
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "风尘异人";
+			action.m_ActionMsg = task_msg_190;
 		elseif task:HasAcceptedTask(23) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 23
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "风尘异人";
+			action.m_ActionMsg = task_msg_191;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000023_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "谢谢少侠出手相救，方才你与那恶僧打斗时，有一个怪老头经过，让我转告说，待会让你去绿竹林找他，接着就不见了。我想他一定是个风尘异人，少侠赶快去找他吧。";
-	action.m_ActionMsg = "有这种事情，那我走了，请多保重。";
+	action.m_NpcMsg = task_msg_192;
+	action.m_ActionMsg = task_msg_193;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000023_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "小朋友快过来，让我来逗他们玩玩。";
+	action.m_NpcMsg = task_msg_194;
 	action.m_ActionMsg = "";
 	return action;
 end

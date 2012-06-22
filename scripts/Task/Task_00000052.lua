@@ -82,20 +82,20 @@ function Task_00000052(npcId)
 		action.m_ActionID = 52
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "返回戴家场";
+		action.m_ActionMsg = task_msg_1084;
 	elseif task:GetTaskSubmitNpc(52) == npcId then
 		if Task_Submit_00000052() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 52
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "返回戴家场";
+			action.m_ActionMsg = task_msg_1085;
 		elseif task:HasAcceptedTask(52) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 52
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "返回戴家场";
+			action.m_ActionMsg = task_msg_1086;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000052_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我本来只是想帮助大哥，所以来吕村探探虚实，谁知却被那个妖道撞见，可怜我一身武艺没有施展之处，被他的妖术擒住，若不是少侠搭救，恐怕我凶多吉少。少侠为了救我不知道有没耽搁为大哥送信之事？还是请少侠回戴家场和大家商量对付吕村恶徒之事吧，我休息片刻就好。";
-	action.m_ActionMsg = "那姑娘保重，我就先走了。";
+	action.m_NpcMsg = task_msg_1087;
+	action.m_ActionMsg = task_msg_1088;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000052_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "听到湘英安全无恙，我就放心了。";
+	action.m_NpcMsg = task_msg_1089;
 	action.m_ActionMsg = "";
 	return action;
 end

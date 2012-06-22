@@ -82,20 +82,20 @@ function Task_00000180(npcId)
 		action.m_ActionID = 180
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "武当剑灵";
+		action.m_ActionMsg = task_msg_2030;
 	elseif task:GetTaskSubmitNpc(180) == npcId then
 		if Task_Submit_00000180() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 180
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "武当剑灵";
+			action.m_ActionMsg = task_msg_2031;
 		elseif task:HasAcceptedTask(180) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 180
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "武当剑灵";
+			action.m_ActionMsg = task_msg_2032;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000180_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠再去武当剑灵处介绍它的考验吧。";
-	action.m_ActionMsg = "是吗，我这就去看看。";
+	action.m_NpcMsg = task_msg_2033;
+	action.m_ActionMsg = task_msg_2034;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000180_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2035;
 	action.m_ActionMsg = "";
 	return action;
 end

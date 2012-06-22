@@ -82,20 +82,20 @@ function Task_00000024(npcId)
 		action.m_ActionID = 24
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "教训恶人";
+		action.m_ActionMsg = task_msg_2145;
 	elseif task:GetTaskSubmitNpc(24) == npcId then
 		if Task_Submit_00000024() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 24
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "教训恶人";
+			action.m_ActionMsg = task_msg_2146;
 		elseif task:HasAcceptedTask(24) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 24
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "教训恶人";
+			action.m_ActionMsg = task_msg_2147;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000024_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."不错，不错，我老人家就喜欢象你这样侠肝义胆的年青人，你看这边两个就和你完全不一样，没几分本事却在那里胡乱吹牛，说不得要好好教训他们一下。";
-	action.m_ActionMsg = "老前辈，你过奖了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_2148;
+	action.m_ActionMsg = task_msg_2149;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000024_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "年青人太谦虚了，来，来，来，让我来给你掠阵，你尽管放手施为，教训一下这两个妖人。";
-	action.m_ActionMsg = "晚辈遵命。";
+	action.m_NpcMsg = task_msg_2150;
+	action.m_ActionMsg = task_msg_2151;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000024_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "打的两个妖人屁滚尿流，哈哈！";
+	action.m_NpcMsg = task_msg_2152;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000146(npcId)
 		action.m_ActionID = 146
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "妖尸戎敦";
+		action.m_ActionMsg = task_msg_1958;
 	elseif task:GetTaskSubmitNpc(146) == npcId then
 		if Task_Submit_00000146() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 146
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "妖尸戎敦";
+			action.m_ActionMsg = task_msg_1959;
 		elseif task:HasAcceptedTask(146) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 146
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "妖尸戎敦";
+			action.m_ActionMsg = task_msg_1960;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000146_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "妖尸戎敦乃是无华氏之子，他禀天地乖戾之气而生，自幼即具神力，能手搏飞龙，生裂犀象。上古的时候因为和蚩尤氏勾结，被轩辕黄帝囚禁，后来他与其父在这三尸墓中得灵域地气成了气候，从此为恶庐山。";
-	action.m_ActionMsg = "师太，我这就去三尸墓将他们消灭。";
+	action.m_NpcMsg = task_msg_1961;
+	action.m_ActionMsg = task_msg_1962;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000146_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，这只妖尸想来已经修炼千年之久，今日终于死于你手。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1963;
 	action.m_ActionMsg = "";
 	return action;
 end

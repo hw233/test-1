@@ -82,20 +82,20 @@ function Task_00000127(npcId)
 		action.m_ActionID = 127
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "日常活动";
+		action.m_ActionMsg = task_msg_45;
 	elseif task:GetTaskSubmitNpc(127) == npcId then
 		if Task_Submit_00000127() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 127
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "日常活动";
+			action.m_ActionMsg = task_msg_46;
 		elseif task:HasAcceptedTask(127) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 127
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "日常活动";
+			action.m_ActionMsg = task_msg_47;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000127_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，我整日处理公文，繁忙异常后来叫师爷先将公文备案，让我批阅起来一目了然。这些日来我见少侠你奔波忙碌，是在过意不去，特地为你整理了一份日常活动案表，你可以仔细研究一番，我想一定可以为你节省不少时间和精力。";
-	action.m_ActionMsg = "是吗，那多谢知府大人了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_48;
+	action.m_ActionMsg = task_msg_49;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000127_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，每天的活动都可以在日常里方便的查询，副本、阵图等等关卡也可以通过日常里的传送按钮方便快捷的到达。酒馆、书商的刷新时间也可以在日常里查看并且随时传送到地点。";
-	action.m_ActionMsg = "好的，没事我会经常查看日常的。";
+	action.m_NpcMsg = task_msg_50;
+	action.m_ActionMsg = task_msg_51;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000127_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，正是少年英杰啊，想当年我在你这么大的时候，还什么都不懂呢。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_52;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000093(npcId)
 		action.m_ActionID = 93
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "凶相毕露";
+		action.m_ActionMsg = task_msg_418;
 	elseif task:GetTaskSubmitNpc(93) == npcId then
 		if Task_Submit_00000093() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 93
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "凶相毕露";
+			action.m_ActionMsg = task_msg_419;
 		elseif task:HasAcceptedTask(93) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 93
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "凶相毕露";
+			action.m_ActionMsg = task_msg_420;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000093_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "桀桀桀，你这个小辈，拜师是假，暗中谋算我是真吧，刚刚拔了九根子针我看你眼睛骨碌乱转是在找这根母针？老祖我若不是在慈云寺被极乐老贼暗算，如今只剩半截身躯，岂能让你们这些小辈得意！";
-	action.m_ActionMsg = "没了下半身的老贼，你就乖乖认命吧……";
+	action.m_NpcMsg = task_msg_421;
+	action.m_ActionMsg = task_msg_422;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000093_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 3;
-	action.m_NpcMsg = "桀桀桀，小辈你这口气还真大，老祖虽躯体残缺对付你还不是手到擒来，待我强占了你躯体，与老祖我合而为一，这么好的躯壳在你身上实在太浪费了，乖乖纳命来吧……桀桀桀。";
-	action.m_ActionMsg = "上半截这么老，下半截这么年青，明显不匹配吧！";
+	action.m_NpcMsg = task_msg_423;
+	action.m_ActionMsg = task_msg_424;
 	return action;
 end
 
@@ -129,8 +129,8 @@ function Task_00000093_step_03()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你……你你……你个牙尖嘴滑的小辈……气煞我也！";
-	action.m_ActionMsg = "可惜我最厉害的不是嘴，是我的飞剑啊！";
+	action.m_NpcMsg = task_msg_425;
+	action.m_ActionMsg = task_msg_426;
 	return action;
 end
 
@@ -139,7 +139,7 @@ function Task_00000093_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "小辈休要得意，老祖我有玄牝珠在手，元神分化，待我回到百蛮山重新找来新的躯体……到时候小辈再让我见到，定将你剥皮抽骨，碎尸万段。";
+	action.m_NpcMsg = task_msg_427;
 	action.m_ActionMsg = "";
 	return action;
 end

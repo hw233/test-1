@@ -45,6 +45,8 @@ namespace REQ
     const UInt8 USER_INFO           = 0xE4;// 0x14
     /**BUFFER信息改变*/                        
     const UInt8 STATE               = 0xE5;// 0x15
+    /**回流用户7日活动指令*/
+    const UInt8 RF7DAY              = 0x15;
     /** ??? */                                  
     const UInt8 STATE_CHANGE        = 0x16;
     /**查询书商*/                               
@@ -344,6 +346,9 @@ namespace REQ
     /***装备升级*/
     const UInt8 EQ_UPGRADE          = 0xB9;
     const UInt8 EQ_SPIRIT           = 0xBA;
+
+    /**装备洗练属性解封*/
+    const UInt8 EQ_ACTIVATE         = 0xBB;
     
     // const UInt8 GETBOX              = 0xD4;
     // const UInt8 BLOCKBOSS           = 0xD5;
@@ -387,6 +392,7 @@ namespace REP
     const UInt8 USER_INFO           = 0xE4;// 0x14
     const UInt8 USER_INFO_CHANGE    = 0xE5;// 0x15
     const UInt8 STATE_CHANGE        = 0x16;
+    const UInt8 RF7DAY              = 0x15;
     const UInt8 BOOK_SHOP_LIST      = 0xEC;// 0x1A
     const UInt8 ARENAPRILIMINARY    = 0xE9;// 0xED
     const UInt8 BOOK_SHOP_BUY       = 0xED;// 0x1B
@@ -429,6 +435,7 @@ namespace REP
     const UInt8 EQ_TRUMP_L_ORDER    = 0xB8;
     const UInt8 EQ_UPGRADE          = 0xB9;
     const UInt8 EQ_SPIRIT           = 0xBA;
+    const UInt8 EQ_ACTIVATE         = 0xBB;
 
     const UInt8 CITY_INSIDE_MOVE    = 0xA0;// 0x51
     const UInt8 MAP_TRANSPORT       = 0xA1;// 0x52

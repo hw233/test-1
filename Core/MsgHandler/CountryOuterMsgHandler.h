@@ -232,6 +232,12 @@ struct ActivateAttrReq
 	MESSAGE_DEF3(REQ::EQ_ACTIVE, UInt16, _fighterId, UInt32, _itemId, UInt32, _itemId2);
 };
 #endif
+struct ActivateAttrReq
+{
+	UInt16 _fighterId;
+	UInt32 _itemId;
+	MESSAGE_DEF2(REQ::EQ_ACTIVATE, UInt16, _fighterId, UInt32, _itemId);
+};
 
 #if 0
 struct OutCitySwitchStruct
@@ -1030,11 +1036,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendDeamonAwardsInfo();
 
+    UInt32 now = TimeUtil::Now();
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
-    pl->sendRC7DayInfo(TimeUtil::Now());
+    pl->sendRechargeNextRetInfo(now);
+    pl->sendRC7DayInfo(now);
+    pl->sendRF7DayInfo(now);
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
@@ -1049,7 +1058,66 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         if (exp)
         {
             Stream st(REP::OFFLINEEXP);
-            st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f) << Stream::eos;
+            st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f);
+#ifndef _FB
+            UInt32 equip = pl->GetVar(VAR_OFFLINE_EQUIP);
+            if(equip)
+            {
+                UInt32 dayCnt = equip / (24 * 3600);
+                UInt8 lvl = pl->GetLev();
+                GData::LootResult lr;
+
+                pl->_equipAward.clear();
+                if(dayCnt > 365)
+                    dayCnt = 365;
+                if(dayCnt >= 7)
+                {
+                    lr.id = getRandOEquip(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                }
+                if(dayCnt >= 14)
+                {
+                    lr.id = getRandOEquip(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                    lr.id = GameAction()->getRandTrump(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                }
+                if(dayCnt >= 21)
+                {
+                    lr.id = getRandOEquip(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                    lr.id = GameAction()->getRandTrump(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                }
+                if(dayCnt >= 30)
+                {
+                    int times = dayCnt / 30;
+                    while(times--)
+                    {
+                        lr.id = getRandOEquip(lvl);
+                        lr.count = 1;
+                        pl->_equipAward.push_back(lr);
+                        lr.id = GameAction()->getRandTrump(lvl);
+                        lr.count = 1;
+                        pl->_equipAward.push_back(lr);
+                    }
+                }
+                st << static_cast<UInt8>(pl->_equipAward.size());
+                for(UInt16 i = 0; i < pl->_equipAward.size(); i++)
+                {
+                    st << pl->_equipAward[i].id;
+                }
+#else
+                st << static_cast<UInt8>(0);
+#endif
+            }
+
+            st<< Stream::eos;
             pl->send(st);
         }
     }
@@ -1309,11 +1377,11 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[11] = {0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
-		ItemEquip * e[11] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[12] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
+		ItemEquip * e[12] = {fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
-		fgt->sendModification(11, p, e, false);
+		fgt->sendModification(12, p, e, false);
 		return;
 	}
 
@@ -1771,6 +1839,15 @@ void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
 	player->send(st);
 }
 #endif
+void OnActivateAttrReq( GameMsgHdr& hdr, ActivateAttrReq& aar )
+{
+	MSG_QUERY_PLAYER(player);
+	if(!player->hasChecked())
+		return;
+	Stream st(REP::EQ_ACTIVATE);
+	st << player->GetPackage()->ActivateAttr(aar._fighterId, aar._itemId) << aar._fighterId << aar._itemId << Stream::eos;
+	player->send(st);
+}
 
 #if 0
 void OutCitySwitchReq( GameMsgHdr& hdr, OutCitySwitchStruct& lms )
@@ -4352,6 +4429,41 @@ void OnRC7Day( GameMsgHdr& hdr, const void* data )
 
         case 5:
             player->turnOnRC7Day();
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OnRF7Day( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    if(!player->hasChecked())
+         return;
+
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 op = 0;
+    br >> op;
+
+    switch (op)
+    {
+        case 1:
+        case 2:
+        case 3:
+            player->getContinuousRewardRF(op);
+            break;
+
+        case 4:
+            {
+                UInt8 idx = 0;
+                br >> idx;
+                player->getContinuousRewardRF(op, idx);
+            }
+            break;
+
+        case 5:
+            player->turnOnRF7Day();
             break;
 
         default:

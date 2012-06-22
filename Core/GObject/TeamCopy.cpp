@@ -15,7 +15,7 @@ namespace GObject
 
 TeamCopy* teamCopyManager = new TeamCopy();
 
-const UInt8 TeamCopy::lvls[6] = {30, 45, 60, 70, 80, 90};
+const UInt8 TeamCopy::lvls[TEAMCOPY_MAXCOPYCNT] = {30, 45, 60, 70, 80, 90, 100};
 const UInt8 TeamCopyPlayerInfo::_needRoll = 1;
 const UInt8 TeamCopyPlayerInfo::_hasRoll = 2;
 std::vector<TeamCopyAwards> TeamCopyPlayerInfo::_awards[TEAMCOPY_MAXCOPYCNT];
@@ -908,10 +908,20 @@ void TeamCopy::teamBattleStart(Player* pl, UInt8 type)
                 tcpInfo->setAwardRoll(copyId);
             }
 
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 thirdDay = TimeUtil::SharpDay(2, PLAYER_DATA(pl, created));
+            if(thisDay == thirdDay && !pl->GetVar(VAR_CLAWARD2))
+            {
+                pl->SetVar(VAR_CLAWARD2, 1);
+                pl->sendRC7DayInfo(TimeUtil::Now());
+            }
+
+
             if (t == 0)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 1);
             if (t == 1)
                 pl->OnHeroMemo(MC_SLAYER, MD_MASTER, 0, 2);
+            pl->setContinuousRFAward(4);
         }
     }
 
@@ -1117,7 +1127,6 @@ void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass, bool notify)
         sendUpdateTeamCopyInfo(copyId);
 
     DB3().PushUpdateData("REPLACE INTO `teamcopy_player`(`playerId`, `copyId`, `type`, `pass`, `passTimes`, `vTime`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u)", m_owner->getId(), copyId, t, m_pass[t][copyIdx] ? 1 : 0, m_passTimes[t][copyIdx], m_vTime[t][copyIdx]);
-
 }
 
 void TeamCopyPlayerInfo::setPassTimesFromDB(UInt8 copyId, UInt8 t, UInt8 passTimes, UInt32 vTime)

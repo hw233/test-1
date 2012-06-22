@@ -82,20 +82,20 @@ function Task_00000056(npcId)
 		action.m_ActionID = 56
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "辟毒药草";
+		action.m_ActionMsg = task_msg_1802;
 	elseif task:GetTaskSubmitNpc(56) == npcId then
 		if Task_Submit_00000056() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 56
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "辟毒药草";
+			action.m_ActionMsg = task_msg_1803;
 		elseif task:HasAcceptedTask(56) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 56
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "辟毒药草";
+			action.m_ActionMsg = task_msg_1804;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000056_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "乌风草生长在福仙潭底得一块毒石之上，那毒石周围十丈以内，发出一种黑氛毒雾，非常厉害。需要瘴疠石边的茎素草才可辟毒，你们去采一点回来，不过千万要小心石畔的毒蛙。";
-	action.m_ActionMsg = "姥姥放心，我会小心的。";
+	action.m_NpcMsg = task_msg_1805;
+	action.m_ActionMsg = task_msg_1806;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000056_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有了这些草辟毒，取乌风草就多几分把握了。";
+	action.m_NpcMsg = task_msg_1807;
 	action.m_ActionMsg = "";
 	return action;
 end

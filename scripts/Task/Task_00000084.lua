@@ -82,20 +82,20 @@ function Task_00000084(npcId)
 		action.m_ActionID = 84
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "魔阵对策";
+		action.m_ActionMsg = task_msg_352;
 	elseif task:GetTaskSubmitNpc(84) == npcId then
 		if Task_Submit_00000084() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 84
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "魔阵对策";
+			action.m_ActionMsg = task_msg_353;
 		elseif task:HasAcceptedTask(84) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 84
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "魔阵对策";
+			action.m_ActionMsg = task_msg_354;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000084_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "青螺魔宫里的八魔本领很是平常，只是他们这次邀来得帮手颇有几个厉害角色，尤其是滇西得毒龙尊者，他最近参悟了一个水火风雷魔阵毒辣无比。";
-	action.m_ActionMsg = "那该怎么办是好？";
+	action.m_NpcMsg = task_msg_355;
+	action.m_ActionMsg = task_msg_356;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000084_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "嗯，在去魔宫的路上有一个清远寺，寺里的两个异域僧人虽然被妖人奴役，但是怀恨在心，他们修炼的天魔解体大法正是毒阵的克星，你这就去找他们商量下对策吧。";
-	action.m_ActionMsg = "好的。我这就赶去。";
+	action.m_NpcMsg = task_msg_357;
+	action.m_ActionMsg = task_msg_358;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000084_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有你相助，想来我们解除被奴役的命运就不远了。";
+	action.m_NpcMsg = task_msg_359;
 	action.m_ActionMsg = "";
 	return action;
 end

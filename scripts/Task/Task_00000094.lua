@@ -50,20 +50,20 @@ function Task_00000094(npcId)
 		action.m_ActionID = 94
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "枯禅";
+		action.m_ActionMsg = task_msg_1008;
 	elseif task:GetTaskSubmitNpc(94) == npcId then
 		if Task_Submit_00000094() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 94
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "枯禅";
+			action.m_ActionMsg = task_msg_1009;
 		elseif task:HasAcceptedTask(94) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 94
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "枯禅";
+			action.m_ActionMsg = task_msg_1010;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000094_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "老身参这枯禅已经有数年之久，如今得了雪魂珠却还差几件物品才能得以圆满。一是九天元阳尺，二是需要两枚聚魄化形丹，这几样东西据说都被魏枫娘藏在魔宫之中，若你有机会找到，八姑将不胜感激。";
-	action.m_ActionMsg = "救人于危难是我辈侠义本色。";
+	action.m_NpcMsg = task_msg_1011;
+	action.m_ActionMsg = task_msg_1012;
 	return action;
 end
 
@@ -87,8 +87,8 @@ function Task_00000094_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "那"..GetPlayerName(GetPlayer()).."你是不是可以不要这个雪魂珠了，这件法宝晶莹剔透，我甚是喜爱，真是不舍得割爱啊。";
-	action.m_ActionMsg = "咳……咳……咳……咳…………";
+	action.m_NpcMsg = task_msg_1013..GetPlayerName(GetPlayer())..task_msg_1014;
+	action.m_ActionMsg = task_msg_1015;
 	return action;
 end
 
@@ -97,7 +97,7 @@ function Task_00000094_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."这个雪魂珠我八姑就送给你了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1016;
 	action.m_ActionMsg = "";
 	return action;
 end

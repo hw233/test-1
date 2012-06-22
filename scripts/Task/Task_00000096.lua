@@ -82,20 +82,20 @@ function Task_00000096(npcId)
 		action.m_ActionID = 96
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "白象崖";
+		action.m_ActionMsg = task_msg_434;
 	elseif task:GetTaskSubmitNpc(96) == npcId then
 		if Task_Submit_00000096() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 96
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "白象崖";
+			action.m_ActionMsg = task_msg_435;
 		elseif task:HasAcceptedTask(96) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 96
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "白象崖";
+			action.m_ActionMsg = task_msg_436;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000096_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你上次出手救了魏青娘子一次，元敬还未感谢少侠，没想到这次又要麻烦你了，魏青娘子随我来正修庵，却不料昨日去山里被白象崖的一只白猿给劫走了。那只白猿避在深山中从不在我面前露头，恐怕唯有你这个生人入山方可将这只孽畜找出。";
-	action.m_ActionMsg = "大师，我这就去将这只孽畜找出。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_437;
+	action.m_ActionMsg = task_msg_438;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000096_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "真是又辛苦少侠你了。";
+	action.m_NpcMsg = task_msg_439;
 	action.m_ActionMsg = "";
 	return action;
 end

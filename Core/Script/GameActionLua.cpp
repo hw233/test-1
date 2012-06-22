@@ -9,6 +9,7 @@
 #include "GObject/MOAction.h"
 #include "GObject/AttainMgr.h"
 #include "GObject/Country.h"
+#include "GObject/RealItemAward.h"
 #include "Log/Log.h"
 #include "MsgID.h"
 
@@ -110,9 +111,13 @@ namespace Script
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
+		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
         lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
+        lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
+        lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
+        lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -227,8 +232,11 @@ namespace Script
 		CLASS_DEF(Player, OnShuoShuo);
         CLASS_DEF(Player, sendMDSoul);
         CLASS_DEF(Player, sendHappyInfo);
+        CLASS_DEF(Player, lastLootPush);
+        CLASS_DEF(Player, hasRealItemAward);
+        CLASS_DEF(Player, getRealItemAward);
 
-		CLASS_ADD(Fighter);
+        CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
 		CLASS_DEF(Fighter, getCurrentHP);
 		CLASS_DEF(Fighter, getMaxHP);
@@ -771,6 +779,11 @@ namespace Script
 		return Run<UInt32>(player, "RunItemNormalUse", itemId, num, bind, param);
 	}
 
+    UInt16 GameActionLua::getRandTrump(UInt8 lvl)
+    {
+        return Run<UInt32>(NULL, "getRandTrump", lvl);
+    }
+
 	UInt16 GameActionLua::RunItemNormalUseOther(Player* player, UInt32 itemId, Player* other, UInt16 num, bool bind)
 	{
 		assert(player != NULL);
@@ -794,7 +807,11 @@ namespace Script
 	{
 		if (player == NULL) return "";
 		const std::string& name = player->getName();
-		return name.c_str();
+        if(cfg.merged)
+        {
+            return player->patchShowName(name.c_str());
+        }
+        return name.c_str();
 	}
 
 	const char* GameActionLua::GetPlayerStateName(Player* player)
@@ -919,9 +936,14 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
-	void GameActionLua::onEnchantAct( Player* player, UInt8 level )
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 type )
 	{
-		Call<void>("onEnchantAct", player, level);
+		Call<void>("onEnchantAct", player, level, type);
+	}
+
+	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)
+	{
+		Call<void>("onEnchantGt11", player, id, level, type);
 	}
 
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
@@ -1092,6 +1114,10 @@ namespace Script
     {
         return Call<void>(  "onCLLoginReward", pl, cts);
     }
+    UInt16 GameActionLua::onCLLoginRewardRF(Player* pl, UInt8 cts, UInt8 type)
+    {
+        return Call<UInt16>(  "onCLLoginRewardRF", pl, cts, type);
+    }
     void GameActionLua::onCL3DayReward(Player* pl)
     {
         return Call<void>(  "onCL3DayReward", pl);
@@ -1108,6 +1134,10 @@ namespace Script
     {
         return Call<bool>(  "onTurnOnRC7Day", pl, total, offset);
     }
+    bool GameActionLua::onTurnOnRF7Day(Player* pl, UInt32 total, UInt32 offset)
+    {
+        return Call<bool>(  "onTurnOnRF7Day", pl, total, offset);
+    }
     lua_tinker::table GameActionLua::luckyDraw(Player* player, UInt8 id, UInt8 num, bool bind)
     {
         return Call<lua_tinker::table>("luckyDraw", player, id, num, bind);
@@ -1123,4 +1153,21 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt16>("RunHappyAward", player, opt);
     }
+
+    UInt16 GameActionLua::RunTargetAward(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunTargetAward", player);
+    }
+    UInt16 GameActionLua::RunTargetAwardRF(Player* player)
+    {
+		assert(player != NULL);
+		return Call<UInt16>("RunTargetAwardRF", player);
+    }
+
+    void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
+    {
+		return Call<void>("sendRNR", player, now, date, total);
+    }
 }
+

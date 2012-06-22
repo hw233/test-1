@@ -50,20 +50,20 @@ function Task_00000190(npcId)
 		action.m_ActionID = 190
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "神驼乙休";
+		action.m_ActionMsg = task_msg_2153;
 	elseif task:GetTaskSubmitNpc(190) == npcId then
 		if Task_Submit_00000190() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 190
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "神驼乙休";
+			action.m_ActionMsg = task_msg_2154;
 		elseif task:HasAcceptedTask(190) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 190
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "神驼乙休";
+			action.m_ActionMsg = task_msg_2155;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000190_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老夫居珠峰绝顶已久，这里本是人迹罕至之处，也落得清静，不过自从多年前那毒龙尊者来此开宗立派，就变得不甚太平，特别是他还招募了大批门人，豢养了很多妖兽，老夫也不屑对那些跳梁小丑出手，所以请你出手帮老夫灭掉这些妖兽。";
-	action.m_ActionMsg = "我这就去将这些异兽除去。";
+	action.m_NpcMsg = task_msg_2156;
+	action.m_ActionMsg = task_msg_2157;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000190_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠真是修为深厚，天赋异禀啊。";
+	action.m_NpcMsg = task_msg_2158;
 	action.m_ActionMsg = "";
 	return action;
 end

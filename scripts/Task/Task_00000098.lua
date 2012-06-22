@@ -82,20 +82,20 @@ function Task_00000098(npcId)
 		action.m_ActionID = 98
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "赤发寨主";
+		action.m_ActionMsg = task_msg_448;
 	elseif task:GetTaskSubmitNpc(98) == npcId then
 		if Task_Submit_00000098() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 98
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "赤发寨主";
+			action.m_ActionMsg = task_msg_449;
 		elseif task:HasAcceptedTask(98) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 98
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "赤发寨主";
+			action.m_ActionMsg = task_msg_450;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000098_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这赤发寨主虽是左派中人，但之前也未作恶太多，我听说他不知从哪里学会一种魔功，修炼的心性大变，行事也越发邪恶。如今之计只有将他尽早铲除，若待他魔功有成，那就大大的不妙了。";
-	action.m_ActionMsg = "师你说的有理。";
+	action.m_NpcMsg = task_msg_451;
+	action.m_ActionMsg = task_msg_452;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000098_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "拔除了姑婆岭的这个毒瘤，我也可以安心潜修了。";
+	action.m_NpcMsg = task_msg_453;
 	action.m_ActionMsg = "";
 	return action;
 end

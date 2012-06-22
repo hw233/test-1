@@ -82,20 +82,20 @@ function Task_00000088(npcId)
 		action.m_ActionID = 88
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "西方野魔";
+		action.m_ActionMsg = task_msg_380;
 	elseif task:GetTaskSubmitNpc(88) == npcId then
 		if Task_Submit_00000088() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 88
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "西方野魔";
+			action.m_ActionMsg = task_msg_381;
 		elseif task:HasAcceptedTask(88) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 88
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "西方野魔";
+			action.m_ActionMsg = task_msg_382;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000088_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "什么人鬼鬼祟祟躲在一边，以为我半身不遂就真变瞎变聋了吗！";
-	action.m_ActionMsg = "发生了什么事？";
+	action.m_NpcMsg = task_msg_383;
+	action.m_ActionMsg = task_msg_384;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000088_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "老身一人在此参枯禅已久，些许风吹草动都逃不过我的耳朵，我发现有个贼人在一边偷窥，想来是觊觎这个雪魂珠，这种天材地宝可不能落进妖人手里。老身行动不便就麻烦小友你出手将他除去了。";
-	action.m_ActionMsg = "除魔卫道是我等义不容辞的责任。";
+	action.m_NpcMsg = task_msg_385;
+	action.m_ActionMsg = task_msg_386;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000088_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这个贼人竟然是西方野魔雅各达，亏得小友将他赶跑。";
+	action.m_NpcMsg = task_msg_387;
 	action.m_ActionMsg = "";
 	return action;
 end

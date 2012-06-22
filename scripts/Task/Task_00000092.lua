@@ -82,20 +82,20 @@ function Task_00000092(npcId)
 		action.m_ActionID = 92
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "暗算失手";
+		action.m_ActionMsg = task_msg_412;
 	elseif task:GetTaskSubmitNpc(92) == npcId then
 		if Task_Submit_00000092() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 92
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "暗算失手";
+			action.m_ActionMsg = task_msg_413;
 		elseif task:HasAcceptedTask(92) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 92
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "暗算失手";
+			action.m_ActionMsg = task_msg_414;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000092_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "桀桀桀，徒儿你过来……来来来，再靠近一点，怕什么呀，为师我还要传你魔功，又不会害你。";
-	action.m_ActionMsg = "师傅我怕……你笑得这么狰狞，目露凶光，一看就知道是不怀好意。";
+	action.m_NpcMsg = task_msg_415;
+	action.m_ActionMsg = task_msg_416;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000092_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "好你个小辈，你以为我绿袍那么简单就被你给骗了！";
+	action.m_NpcMsg = task_msg_417;
 	action.m_ActionMsg = "";
 	return action;
 end

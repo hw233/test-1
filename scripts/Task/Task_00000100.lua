@@ -82,20 +82,20 @@ function Task_00000100(npcId)
 		action.m_ActionID = 100
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "玉露符";
+		action.m_ActionMsg = task_msg_461;
 	elseif task:GetTaskSubmitNpc(100) == npcId then
 		if Task_Submit_00000100() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 100
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "玉露符";
+			action.m_ActionMsg = task_msg_462;
 		elseif task:HasAcceptedTask(100) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 100
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "玉露符";
+			action.m_ActionMsg = task_msg_463;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000100_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我昔年与乙休为一件事情反目，将躯壳萎化，隐居在这白犀潭已有数年，不问世事已久。白云大师元敬与我是近邻，倒也有点往来，这玉露符乃是聚宫阙之下地根泉眼的灵气而化的灵符，却不是什么稀罕之物，你这就带去给大师吧。";
-	action.m_ActionMsg = "好的，韩前辈我这就去。";
+	action.m_NpcMsg = task_msg_464;
+	action.m_ActionMsg = task_msg_465;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000100_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "有了这玉露符，净化姑婆岭的瘴气要轻松许多了。";
+	action.m_NpcMsg = task_msg_466;
 	action.m_ActionMsg = "";
 	return action;
 end

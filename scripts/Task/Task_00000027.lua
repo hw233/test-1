@@ -82,20 +82,20 @@ function Task_00000027(npcId)
 		action.m_ActionID = 27
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "切磋武艺";
+		action.m_ActionMsg = task_msg_208;
 	elseif task:GetTaskSubmitNpc(27) == npcId then
 		if Task_Submit_00000027() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 27
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "切磋武艺";
+			action.m_ActionMsg = task_msg_209;
 		elseif task:HasAcceptedTask(27) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 27
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "切磋武艺";
+			action.m_ActionMsg = task_msg_210;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000027_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你看起来不怎么样嘛，又不高又不壮，可是师父说你成就不凡，武功也不错，我们可不服气哦，要不要来跟我们比试一下。";
-	action.m_ActionMsg = "那就恭敬不如从命了哦。";
+	action.m_NpcMsg = task_msg_211;
+	action.m_ActionMsg = task_msg_212;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000027_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."你果然高明，我们算是彻底的服气了。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_213;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000126(npcId)
 		action.m_ActionID = 126
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "众志成城";
+		action.m_ActionMsg = task_msg_37;
 	elseif task:GetTaskSubmitNpc(126) == npcId then
 		if Task_Submit_00000126() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 126
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "众志成城";
+			action.m_ActionMsg = task_msg_38;
 		elseif task:HasAcceptedTask(126) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 126
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "众志成城";
+			action.m_ActionMsg = task_msg_39;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000126_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "修道指路漫长，稍有不慎就可能陷入万劫不复之地，一个人的力量毕竟有限，若可以召集一群志同道合的修道者相互扶持，将会好很多， 所以"..GetPlayerName(GetPlayer()).."你可以加入一个帮派或者自己召集散仙建立一个帮派。";
-	action.m_ActionMsg = "让我考虑考虑！";
+	action.m_NpcMsg = task_msg_40..GetPlayerName(GetPlayer())..task_msg_41;
+	action.m_ActionMsg = task_msg_42;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000126_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "孺子可教，"..GetPlayerName(GetPlayer()).."你不但侠肝义胆，而且虚怀若谷啊。";
+	action.m_NpcMsg = task_msg_43..GetPlayerName(GetPlayer())..task_msg_44;
 	action.m_ActionMsg = "";
 	return action;
 end

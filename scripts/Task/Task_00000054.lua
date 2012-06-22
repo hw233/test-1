@@ -50,20 +50,20 @@ function Task_00000054(npcId)
 		action.m_ActionID = 54
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "惩治恶徒";
+		action.m_ActionMsg = task_msg_1026;
 	elseif task:GetTaskSubmitNpc(54) == npcId then
 		if Task_Submit_00000054() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 54
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "惩治恶徒";
+			action.m_ActionMsg = task_msg_1027;
 		elseif task:HasAcceptedTask(54) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 54
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "惩治恶徒";
+			action.m_ActionMsg = task_msg_1028;
 		end
 	end
 	return action;
@@ -77,8 +77,8 @@ function Task_00000054_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "小妹已在桂花山等候你多时了，这段时间一直被那飞龙师太的弟子金驼骚扰，想要我嫁给他，目前金驼和他两个师妹正在寒泉，希望少侠可以去帮我教训他们一下。";
-	action.m_ActionMsg = "小事一件，就包在我身上了。";
+	action.m_NpcMsg = task_msg_1029;
+	action.m_ActionMsg = task_msg_1030;
 	return action;
 end
 
@@ -87,7 +87,7 @@ function Task_00000054_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这金驼的师傅叫飞龙师太，也想染指我们桂花山的乌风草。";
+	action.m_NpcMsg = task_msg_1031;
 	action.m_ActionMsg = "";
 	return action;
 end

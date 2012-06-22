@@ -9,6 +9,7 @@
 namespace GObject
 {
 	class ItemEquip;
+    class ItemFashion;
 	class ItemWeapon;
 	class ItemArmor;
 #ifndef CHANCECOND
@@ -98,6 +99,8 @@ namespace GObject
         static bool LoadSoulItemChance();
         static bool loadSecondSoul();
         static bool LoadLuckyLog();
+        static bool loadRealItemAward();
+        static bool loadRNR();
 
         static bool addGM(UInt64 id, UInt8 lvl);
         static bool delGM(UInt64 id);
@@ -105,6 +108,7 @@ namespace GObject
         static UInt8 reRecharge(const std::string& no, UInt16 id, UInt32 num, std::string& err);
 
 		static ItemEquip * fetchEquipment(UInt32, bool = true);  //获取装备
+		static ItemFashion * fetchFashion(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemWeapon * fetchWeapon(UInt32);    //获取武器，基于fetchEquipment函数实现
 		static ItemArmor * fetchArmor(UInt32);      //获取盔甲,基于fetchEquipment函数实现
 

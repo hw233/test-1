@@ -82,20 +82,20 @@ function Task_00000002(npcId)
 		action.m_ActionID = 2
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "贼首李刚";
+		action.m_ActionMsg = task_msg_59;
 	elseif task:GetTaskSubmitNpc(2) == npcId then
 		if Task_Submit_00000002() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 2
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "贼首李刚";
+			action.m_ActionMsg = task_msg_60;
 		elseif task:HasAcceptedTask(2) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 2
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "贼首李刚";
+			action.m_ActionMsg = task_msg_61;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000002_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "我乃是齐鲁三英的李宁，昔年在湖北除掉一个为祸乡里的恶徒陆地飞腾李启明，这帮水贼的首领正是其父浪里飞腾李刚。我寡不敌众，且战且退已是身负重伤，这李刚凶狠异常，"..GetPlayerName(GetPlayer()).."你可千万要小心才是。";
-	action.m_ActionMsg = "老丈放心，我一定不会放过这个恶人。";
+	action.m_NpcMsg = task_msg_62..GetPlayerName(GetPlayer())..task_msg_63;
+	action.m_ActionMsg = task_msg_64;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000002_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "少侠身手真是高明，老朽我是白练半辈子武艺了。";
+	action.m_NpcMsg = task_msg_65;
 	action.m_ActionMsg = "";
 	return action;
 end

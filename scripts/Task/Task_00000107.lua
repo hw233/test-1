@@ -82,20 +82,20 @@ function Task_00000107(npcId)
 		action.m_ActionID = 107
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "留人寨";
+		action.m_ActionMsg = task_msg_508;
 	elseif task:GetTaskSubmitNpc(107) == npcId then
 		if Task_Submit_00000107() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 107
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "留人寨";
+			action.m_ActionMsg = task_msg_509;
 		elseif task:HasAcceptedTask(107) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 107
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "留人寨";
+			action.m_ActionMsg = task_msg_510;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000107_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "在不远处有一处留人寨，乃是五毒天王列霸多手下的据点之一，他们与绿袍勾结已久，专门劫掠过往行人，我听说绿袍和列霸多都喜欢生啖活人，实在是令人发指，这些为虎作伥的妖人一个都不能留，"..GetPlayerName(GetPlayer()).."你这就去除掉他们吧。";
-	action.m_ActionMsg = "这些禽兽不如的妖人，我一定不放过他们。";
+	action.m_NpcMsg = task_msg_511..GetPlayerName(GetPlayer())..task_msg_512;
+	action.m_ActionMsg = task_msg_513;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000107_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些邪派魔头勾结在一起，到是要小心点应付才好。";
+	action.m_NpcMsg = task_msg_514;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000065(npcId)
 		action.m_ActionID = 65
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "炼药之错";
+		action.m_ActionMsg = task_msg_1715;
 	elseif task:GetTaskSubmitNpc(65) == npcId then
 		if Task_Submit_00000065() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 65
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "炼药之错";
+			action.m_ActionMsg = task_msg_1716;
 		elseif task:HasAcceptedTask(65) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 65
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "炼药之错";
+			action.m_ActionMsg = task_msg_1717;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000065_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "我在长沙有个小友叫黄玄极，昔年因为道根不净，走火入魔崩倒了玄真子的两座丹炉而被逐出门墙。这几年里他一意苦修，走遍各处名山，想将药材采办齐全，再造一炉丹药，如今就差一味乌风草。现在草药还有点剩余，不如你就把这剩下的乌风草送给他吧。";
-	action.m_ActionMsg = "这位黄大哥现在哪里呢？";
+	action.m_NpcMsg = task_msg_1718;
+	action.m_ActionMsg = task_msg_1719;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000065_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "黄小友目前在岳麓山一带逗留，你过去找找他。";
-	action.m_ActionMsg = "好的，晚辈这就去寻他。";
+	action.m_NpcMsg = task_msg_1720;
+	action.m_ActionMsg = task_msg_1721;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000065_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "啊，这就是我遍寻名山找不到的乌风草！真是太感谢你了。";
+	action.m_NpcMsg = task_msg_1722;
 	action.m_ActionMsg = "";
 	return action;
 end

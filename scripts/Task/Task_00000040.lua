@@ -82,20 +82,20 @@ function Task_00000040(npcId)
 		action.m_ActionID = 40
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "炼制法宝";
+		action.m_ActionMsg = task_msg_287;
 	elseif task:GetTaskSubmitNpc(40) == npcId then
 		if Task_Submit_00000040() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 40
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "炼制法宝";
+			action.m_ActionMsg = task_msg_288;
 		elseif task:HasAcceptedTask(40) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 40
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "炼制法宝";
+			action.m_ActionMsg = task_msg_289;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000040_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "我们蜀山剑侠之人，虽说是以剑入道，不过有些犀利的法宝在手还是很给力的……哈哈！我早已得知，你在白云大师那里得到一件丙灵梭，不过恐怕你还无法发挥它的全部威力。";
-	action.m_ActionMsg = "那我要怎么做呢？";
+	action.m_NpcMsg = task_msg_290;
+	action.m_ActionMsg = task_msg_291;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000040_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "你不是从王老丈那里得到一个五行菁英吗，那可是一件异物啊，可以用来重新整合法宝蕴含的灵气，大大提升法宝的威力，不过用之不当，说不定会损坏法宝。我有位老友廖臣明隐居在成都的珍宝斋，你现在可以去找他，让他教你如何使用。";
-	action.m_ActionMsg = "嗯，我这就去。";
+	action.m_NpcMsg = task_msg_292;
+	action.m_ActionMsg = task_msg_293;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000040_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "醉道人这个酒鬼，老是给我找些麻烦。";
+	action.m_NpcMsg = task_msg_294;
 	action.m_ActionMsg = "";
 	return action;
 end

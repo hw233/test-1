@@ -56,20 +56,20 @@ function Task_00000519(npcId)
 		action.m_ActionID = 519
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "剧毒蛙怪";
+		action.m_ActionMsg = task_msg_749;
 	elseif task:GetTaskSubmitNpc(519) == npcId then
 		if Task_Submit_00000519() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 519
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "剧毒蛙怪";
+			action.m_ActionMsg = task_msg_750;
 		elseif task:HasAcceptedTask(519) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 519
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "剧毒蛙怪";
+			action.m_ActionMsg = task_msg_751;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000519_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "成都不远处的桂花山是一处美景，不过山中有五色云雾，寻常人轻易不得入内，听说有个室外高人隐居在山中，布下了五色云雾。在桂花山里有一处福仙潭，潭附近偶有毒蛙出没，终年喷涂毒雾，伤害了无数过往行人商旅，还拜托少侠你除掉这一害。";
-	action.m_ActionMsg = "对付这些四脚青蛙，那还不简单，我去去就回。";
+	action.m_NpcMsg = task_msg_752;
+	action.m_ActionMsg = task_msg_753;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000519_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "这些毒蛙终年喷涂毒雾，伤害了无数过往行人商旅。 ";
+	action.m_NpcMsg = task_msg_754;
 	action.m_ActionMsg = "";
 	return action;
 end

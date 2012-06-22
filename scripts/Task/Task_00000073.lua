@@ -62,20 +62,20 @@ function Task_00000073(npcId)
 		action.m_ActionID = 73
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "桂花山";
+		action.m_ActionMsg = task_msg_609;
 	elseif task:GetTaskSubmitNpc(73) == npcId then
 		if Task_Submit_00000073() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 73
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "桂花山";
+			action.m_ActionMsg = task_msg_610;
 		elseif task:HasAcceptedTask(73) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 73
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "桂花山";
+			action.m_ActionMsg = task_msg_611;
 		end
 	end
 	return action;
@@ -89,8 +89,8 @@ function Task_00000073_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "魏家场一战，顽石大师不幸被那七手夜叉龙飞的子母阴魂剑所伤，必须要桂花山金花姥姥那里的乌风草才能救治，你赶快去桂花山找金花姥姥的徒弟申若兰商量一下如何采集乌风草。";
-	action.m_ActionMsg = "弟子这就去桂花山。";
+	action.m_NpcMsg = task_msg_612;
+	action.m_ActionMsg = task_msg_613;
 	return action;
 end
 
@@ -99,7 +99,7 @@ function Task_00000073_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "顽石大师被妖人所伤，真是不幸。";
+	action.m_NpcMsg = task_msg_614;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000108(npcId)
 		action.m_ActionID = 108
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "百毒金蚕";
+		action.m_ActionMsg = task_msg_515;
 	elseif task:GetTaskSubmitNpc(108) == npcId then
 		if Task_Submit_00000108() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 108
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "百毒金蚕";
+			action.m_ActionMsg = task_msg_516;
 		elseif task:HasAcceptedTask(108) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 108
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "百毒金蚕";
+			action.m_ActionMsg = task_msg_517;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000108_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 2;
-	action.m_NpcMsg = "绿袍老祖魔焰滔天，邪功高强，不过他最厉害的法宝确实用阴风洞特产的金蚕炼制的百毒金蚕蛊，无论何等剑侠人物，被那金蚕一咬，都难免命丧黄泉。";
-	action.m_ActionMsg = "这法宝听起来似乎很厉害啊……";
+	action.m_NpcMsg = task_msg_518;
+	action.m_ActionMsg = task_msg_519;
 	return action;
 end
 
@@ -119,8 +119,8 @@ function Task_00000108_step_02()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "百毒金蚕蛊固然威力绝伦，可是太过凶毒，有干天和，之前慈云寺一战，绿袍被极乐童子前辈破了邪功，金蚕也死伤大半。如今绿袍又在金峰崖训练金蚕，须得尽早将这些金蚕除掉，不然等绿袍炼制成功，除魔之计恐怕又增变数。";
-	action.m_ActionMsg = "掌教放心，弟子这就去金峰崖将这些金蚕消灭。";
+	action.m_NpcMsg = task_msg_520;
+	action.m_ActionMsg = task_msg_521;
 	return action;
 end
 
@@ -129,7 +129,7 @@ function Task_00000108_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "没了这些金蚕，绿袍就等于没牙的老虎。";
+	action.m_NpcMsg = task_msg_522;
 	action.m_ActionMsg = "";
 	return action;
 end

@@ -82,20 +82,20 @@ function Task_00000144(npcId)
 		action.m_ActionID = 144
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = "白骨神君";
+		action.m_ActionMsg = task_msg_1651;
 	elseif task:GetTaskSubmitNpc(144) == npcId then
 		if Task_Submit_00000144() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 144
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = "白骨神君";
+			action.m_ActionMsg = task_msg_1652;
 		elseif task:HasAcceptedTask(144) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 144
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = "白骨神君";
+			action.m_ActionMsg = task_msg_1653;
 		end
 	end
 	return action;
@@ -109,8 +109,8 @@ function Task_00000144_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = "庐山有一处神魔洞，里面藏这个白骨神君，一身邪道异术非常了得。如今三尸墓妖孽作乱，必须趁早除掉庐山周围的隐患，以免将来我们对付妖尸的时候出现意外，我见少侠剑术高强，想来那白骨神君定然不是你的对手。";
-	action.m_ActionMsg = "师太莫愁，我这就去消灭他们。";
+	action.m_NpcMsg = task_msg_1654;
+	action.m_ActionMsg = task_msg_1655;
 	return action;
 end
 
@@ -119,7 +119,7 @@ function Task_00000144_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = GetPlayerName(GetPlayer()).."，少侠真是剑术高强，一身正气啊。";
+	action.m_NpcMsg = GetPlayerName(GetPlayer())..task_msg_1656;
 	action.m_ActionMsg = "";
 	return action;
 end
