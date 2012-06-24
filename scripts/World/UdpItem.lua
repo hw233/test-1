@@ -75,6 +75,7 @@ local items =
     5143,
     5145,
     8000,
+    9076,
 }
 
 function loadUdpItem()

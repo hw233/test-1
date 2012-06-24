@@ -379,6 +379,14 @@ struct DBFighter2
     Int32 intelligence;
     Int32 will;
     Int32 soul;
+    Int32 attack;
+    Int32 defend;
+    Int32 critical;
+    Int32 pierce;
+    Int32 evade;
+    Int32 counter;
+    Int32 tough;
+    Int32 action;
 };
 
 
@@ -917,7 +925,7 @@ struct DBRealItemAward
 
 struct DBRNR
 {
-    UInt32 id;
+    UInt64 id;
     std::string record;
 };
 
@@ -1320,7 +1328,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(45)
+SPECIALDEF(53)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1366,7 +1374,15 @@ SPECIALDEF(45)
     Int32, agility,
     Int32, intelligence,
     Int32, will,
-    Int32, soul
+    Int32, soul,
+    Int32, attack,
+    Int32, defend,
+    Int32, critical,
+    Int32, pierce,
+    Int32, evade,
+    Int32, counter,
+    Int32, tough,
+    Int32, action
 	)
 SPECIALEND()
 
@@ -2103,7 +2119,7 @@ SPECIALEND()
 SPECIALBEGIN(GObject::DBRNR)
 SPECIALDEF(2)
 (
-    UInt32, id,
+    UInt64, id,
     std::string, record 
 )
 SPECIALEND()
