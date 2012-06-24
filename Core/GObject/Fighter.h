@@ -56,7 +56,8 @@ struct SoulItemExp
 
 struct ElixirAttr
 {
-    ElixirAttr() : strength(0), physique(0), agility(0), intelligence(0), will(0), soul(0) {}
+    ElixirAttr() : strength(0), physique(0), agility(0), intelligence(0), will(0), soul(0),
+    attack(0), defend(0), critical(0), pierce(0), evade(0), counter(0), tough(0), action(0) {}
 
     ElixirAttr& operator+=(ElixirAttr& attr)
     {
@@ -66,6 +67,14 @@ struct ElixirAttr
         intelligence += attr.intelligence;
         will += attr.will;
         soul += attr.soul;
+        attack += attr.attack;
+        defend += attr.defend;
+        critical += attr.critical;
+        pierce += attr.pierce;
+        evade += attr.evade;
+        counter += attr.counter;
+        tough += attr.tough;
+        action += attr.action;
         return *this;
     }
 
@@ -75,6 +84,14 @@ struct ElixirAttr
     Int32 intelligence;
     Int32 will;
     Int32 soul; // max soul
+    Int32 attack; // atk,magatk
+    Int32 defend; // def,magdef
+    Int32 critical;
+    Int32 pierce;
+    Int32 evade;
+    Int32 counter;
+    Int32 tough;
+    Int32 action;
 };
 
 class Player;
@@ -493,12 +510,12 @@ public:
 	inline Int16 getBaseWill() { return will + _elixirattr.will; }
 	inline Int16 getBaseAura() { return aura; }
 	inline Int16 getBaseAuraMax() { return auraMax; }
-	inline Int16 getBaseTough() { return tough; }
+	inline float getBaseTough() { return tough + _elixirattr.tough * 0.001f * 100; }
 
-	inline Int32 getBaseAttack() { return attack; }
-	inline Int32 getBaseMagAttack() { return magatk; }
-	inline Int32 getBaseDefend() { return defend; }
-	inline Int32 getBaseMagDefend() { return magdef; }
+	inline Int32 getBaseAttack() { return attack + _elixirattr.attack; }
+	inline Int32 getBaseMagAttack() { return magatk + _elixirattr.attack; }
+	inline Int32 getBaseDefend() { return defend + _elixirattr.defend * 10; }
+	inline Int32 getBaseMagDefend() { return magdef + _elixirattr.defend * 10; }
 	inline float getBaseHitrate() { return hitrate; }
 
 	inline Int16 getBaseSoul() { return baseSoul; }
@@ -508,20 +525,12 @@ public:
 
 	inline float getBaseEvade()
     {
-        return evade;
-        if(_id > 9)
-            return evade;
-        static const float add[9][9] = {{0}, {0}, {0}, {0, 0, 2, 2, 0, 0}, {0, 0, 4, 4, 0, 0}, {0, 0, 4, 4, 0, 0}};
-        return evade + add[_color][_class];
+        return evade + _elixirattr.evade * 0.001f * 100;
     }
 
 	inline float getBaseCritical()
     {
-        return critical;
-        if(_id > 9)
-            return critical;
-        const float add[9][9] = {{0}, {0}, {0}, {4, 4, 0, 0, 0, 0}, {8, 8, 0, 0, 0, 0}, {8, 8, 8, 8, 0, 0}};
-        return critical + add[_color][_class];
+        return critical + _elixirattr.critical * 0.001f * 100;
     }
 
     inline float getBaseCriticalDmg()
@@ -531,26 +540,18 @@ public:
 
 	inline float getBasePierce()
     {
-        return pierce;
-        if (_id > 9)
-            return pierce;
-        static const float add[9][9] = {{0}, {0}, {0}, {0, 0, 0, 0, 3, 3}, {0, 0, 0, 0, 6, 6}, {0, 0, 0, 0, 10, 10}};
-        return pierce + add[_color][_class];
+        return pierce + _elixirattr.pierce * 0.001f * 100;
     }
 
 	inline float getBaseCounter()
     {
-        return counter;
-        if (_id > 9)
-            return counter;
-        static const float add[9][9] = {{0}, {0}, {0}, {0}, {0}, {4, 4, 0, 0, 0, 0}};
-        return counter + add[_color][_class];
+        return counter + _elixirattr.counter * 0.001f * 100;
     }
 
     inline float getBaseMagRes() { return magres; }
     inline void setBaseHP(UInt32 hp) { maxhp = hp; }
 	inline UInt32 getBaseHP() { return maxhp; }
-	inline UInt32 getBaseAction() { return action; }
+	inline UInt32 getBaseAction() { return action + _elixirattr.action; }
 
     Int32 getAcuPraAdd() { return _praadd; }
     float getPracticeBufFactor();
@@ -714,7 +715,7 @@ public:
     Int32 baseSoul; // 初始元神力
     Int32 aura;     // 当前灵气
     Int32 auraMax;  // 最大灵气
-    Int32 tough;
+    float tough;
 	Int32 attack;
 	Int32 magatk;
 	Int32 defend;
