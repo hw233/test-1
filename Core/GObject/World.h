@@ -203,6 +203,11 @@ public:
     inline static void setRechargeNextRetStart(UInt32 start, UInt32 end)
     { _rechargenextretstart = start; _rechargenextretend = end; }
 
+    inline static void setDuanWu(bool v)
+    { _duanwu = v; }
+    inline static bool getDuanWu()
+    { return _duanwu; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
 
@@ -267,6 +272,7 @@ public:
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;
     static UInt32 _rechargenextretend;
+    static bool _duanwu;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

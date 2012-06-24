@@ -320,8 +320,10 @@ function onActivityCheck(tm)
 
       if tm >= actTime59 and tm < actTime60 then
           is_6_22 = true
+          setDuanWu(true)
       else
           is_6_22 = false
+          setDuanWu(false)
       end
 
       if tm >= actTime61 and tm < actTime62 then
