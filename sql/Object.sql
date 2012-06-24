@@ -1378,6 +1378,14 @@ CREATE TABLE `elixir` (
     `intelligence` int(5) NOT NULL DEFAULT '0',
     `will` int(5) NOT NULL DEFAULT '0',
     `soul` int(5) NOT NULL DEFAULT '0',
+    `attack` int(5) NOT NULL DEFAULT '0',
+    `defend` int(5) NOT NULL DEFAULT '0',
+    `critical` int(5) NOT NULL DEFAULT '0',
+    `pierce` int(5) NOT NULL DEFAULT '0',
+    `evade` int(5) NOT NULL DEFAULT '0',
+    `counter` int(5) NOT NULL DEFAULT '0',
+    `tough` int(5) NOT NULL DEFAULT '0',
+    `action` int(5) NOT NULL DEFAULT '0',
     UNIQUE KEY `id_playerId` (`id`,`playerId`),
     KEY `playerId` (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1279,7 +1279,7 @@ namespace GObject
 		pl = NULL;
         UInt8 lvl_max = 0;
 		DBFighter2 specfgtobj;
-		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighter`.`id`, `fighter`.`playerId`, `potential`, `capacity`, `level`, `relvl`, `experience`, `practiceExp`, `hp`, `fashion`, `weapon`, `armor1`, `armor2`, `armor3`, `armor4`, `armor5`, `ring`, `amulet`, `peerless`, `talent`, `trump`, `acupoints`, `skill`, `citta`, `fighter`.`skills`, `cittas`, `attrType1`, `attrValue1`, `attrType2`, `attrValue2`, `attrType3`, `attrValue3`, `fighterId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `second_soul`.`skills`, `elixir`.`strength`, `elixir`.`physique`, `elixir`.`agility`, `elixir`.`intelligence`, `elixir`.`will`, `elixir`.`soul`, `elixir`.`attack`,`elixir`.`defend`, `elixir`.`critical`, `elixir`.`pierce`, `elixir`.`evade`, `elixir`.`counter`, `elixir`.`tough`, `elixir`.`action` FROM `fighter` LEFT JOIN `second_soul` ON `fighter`.`id`=`second_soul`.`fighterId` AND `fighter`.`playerId`=`second_soul`.`playerId` LEFT JOIN `elixir` ON `fighter`.`id`=`elixir`.`id` AND `fighter`.`playerId`=`elixir`.`playerId` ORDER BY `fighter`.`playerId`", specfgtobj) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
@@ -1331,7 +1331,8 @@ namespace GObject
             }
 
 #define MAXVAL(x,y) { if (x > y) x = y; }
-#define MV 150
+#define MV 200
+#define MV1 10
             ElixirAttr attr;
             attr.strength = specfgtobj.strength;
             MAXVAL(attr.strength, MV);
@@ -1345,8 +1346,25 @@ namespace GObject
             MAXVAL(attr.will, MV);
             attr.soul = specfgtobj.soul;
             MAXVAL(attr.soul, MV);
+            attr.attack = specfgtobj.attack;
+            MAXVAL(attr.attack, MV);
+            attr.defend = specfgtobj.defend;
+            MAXVAL(attr.defend, MV);
+            attr.critical = specfgtobj.critical;
+            MAXVAL(attr.critical, MV1);
+            attr.pierce = specfgtobj.pierce;
+            MAXVAL(attr.pierce, MV1);
+            attr.evade = specfgtobj.evade;
+            MAXVAL(attr.evade, MV1);
+            attr.counter = specfgtobj.counter;
+            MAXVAL(attr.counter, MV1);
+            attr.tough = specfgtobj.tough;
+            MAXVAL(attr.tough, MV1);
+            attr.action = specfgtobj.action;
+            MAXVAL(attr.action, MV);
             fgt2->setElixirAttr(attr);
 #undef MV
+#undef MV1
 #undef MAXVAL
 
 			fgt2->setPotential(specfgtobj.potential, false);

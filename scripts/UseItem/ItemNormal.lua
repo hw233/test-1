@@ -2897,14 +2897,22 @@ function ItemNormal_00009017(iid, num, bind, param)
 		return false;
 	end
 
-    local tp = iid - 9017
+    local tp = iid
     local tp2off = { -- offset of ElixirAttr in Fighter.h
-        [0] = 0,
-        [1] = 2,
-        [2] = 3,
-        [3] = 4,
-        [4] = 1,
-        [5] = 5,
+        [9017] = 0,
+        [9018] = 2,
+        [9019] = 3,
+        [9020] = 4,
+        [9021] = 1,
+        [9022] = 5,
+        [9068] = 6,
+        [9069] = 7,
+        [9070] = 8,
+        [9071] = 9,
+        [9072] = 10,
+        [9073] = 11,
+        [9074] = 12,
+        [9075] = 13,
     }
 
     local off = tp2off[tp]
@@ -2912,7 +2920,12 @@ function ItemNormal_00009017(iid, num, bind, param)
         return false
     end
 
-    local maxpoint = 150
+    local maxpoint = 0
+    if tp >= 9070 and tp <= 9074 then
+        maxpoint = 10
+    else
+        maxpoint = 200
+    end
     local point = fgt:getElixirAttrByOffset(off)
     if point >= maxpoint then
 		player:sendMsgCode(2, 1075, 0);
@@ -2984,6 +2997,42 @@ function ItemNormal_00009067(iid, num, bind, param)
         package:Add(item, 1, true, 0, 2)
     end
 
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009076(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    local items = {9017,9018,9019,9020,9021,9022,9068,9069,9070,9071,9072,9073,9074,9075,}
+    local prob = {1401,2930,4331,5860,7134,7389,8281,9427,9491,9555,9619,9683,9810,10000,}
+    local item = 0
+
+    for kk = 1, num do
+        local sz = #prob
+        local k = 1
+        local rand = math.random(10000)
+        for n = 1,sz do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
+        end
+
+        if item == 0 then
+            return false
+        end
+
+        package:AddItem(item, 1, bind, 0, 2)
+    end
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -5030,9 +5079,19 @@ local ItemNormal_Table = {
     [9020] = ItemNormal_00009017,
     [9021] = ItemNormal_00009017,
     [9022] = ItemNormal_00009017,
+    [9068] = ItemNormal_00009017,
+    [9069] = ItemNormal_00009017,
+    [9070] = ItemNormal_00009017,
+    [9071] = ItemNormal_00009017,
+    [9072] = ItemNormal_00009017,
+    [9073] = ItemNormal_00009017,
+    [9074] = ItemNormal_00009017,
+    [9075] = ItemNormal_00009017,
+
     [9027] = ItemNormal_00009027,
 
     [9067] = ItemNormal_00009067,
+    [9076] = ItemNormal_00009076,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,

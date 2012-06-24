@@ -53,6 +53,7 @@ function update_object()
     #mysql -h$H -u$U -p$P -P$PT $DBO < updates/towndeamon_player_fix.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120613_1.sql
     mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120619_1.sql
+    mysql -h$H -u$U -p$P -P$PT $DBO < updates/Object_20120622_1.sql
     #. clearshiyamen.sh
 }
 
