@@ -1398,5 +1398,12 @@ void OnSendRNR( GameMsgHdr& hdr, const void* data )
     GameAction()->sendRNR(rnr->player, rnr->off, rnr->date, rnr->total);
 }
 
+void OnGetArenaMoney( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 arenaMoney = *reinterpret_cast<const UInt32 *>(data);
+    player->getMoneyArena(arenaMoney);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

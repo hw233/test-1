@@ -276,4 +276,6 @@ MSG_REG_2(GameMsgHdr, 0x249, OnSendRNR);
 
 MSG_REG_2(GameMsgHdr, 0x250, OnRemoveClanRank);
 
+MSG_REG_2(GameMsgHdr, 0x251, OnGetArenaMoney);
+
 MSG_HANDLER_END()

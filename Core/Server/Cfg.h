@@ -108,6 +108,7 @@ public:
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
     inline void setStateUrl(const char* url) { stateUrl = url; }
     inline void setWarZone(UInt16 zone) { warZone = zone; }
+    inline void setServerNum(UInt32 no) { serverNum = no; }
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {

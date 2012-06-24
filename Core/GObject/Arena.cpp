@@ -1140,7 +1140,12 @@ void Arena::pushPriliminary(BinaryReader& br)
                 {40, 80, 40},
                 {50, 100, 50}
             };
-            player->AddVar(VAR_MONEY_ARENA, score[type-1][won]);
+            //player->AddVar(VAR_MONEY_ARENA, score[type-1][won]);
+
+            GameMsgHdr hdr(0x251, player->getThreadId(), player, 4);
+            UInt32 data = score[type-1][won];
+            GLOBAL().PushMsg(hdr, &data);
+
             player->AddVar(VAR_MONEY_ARENA2 + type - 1, score[type-1][won]);
 
             if(won == 2)
@@ -1611,7 +1616,12 @@ void Arena::calcFinalBet(int i)
                                 Player * pl = globalPlayers[ep.id];
                                 if(pl != NULL)
                                 {
-                                    pl->AddVar(VAR_MONEY_ARENA, award[i][j-1][1]);
+                                    //pl->AddVar(VAR_MONEY_ARENA, award[i][j-1][1]);
+
+                                    GameMsgHdr hdr(0x251, pl->getThreadId(), pl, 4);
+                                    UInt32 data = award[i][j-1][1];
+                                    GLOBAL().PushMsg(hdr, &data);
+
                                     SYSMSGV(content, 725, _session, award[i][j-1][1]);
                                     Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                                     if(mail != NULL)
@@ -1632,7 +1642,12 @@ void Arena::calcFinalBet(int i)
                                     if(pl == NULL)
                                         continue;
 
-                                    pl->AddVar(VAR_MONEY_ARENA, award[i][j][1]);
+                                    //pl->AddVar(VAR_MONEY_ARENA, award[i][j][1]);
+
+                                    GameMsgHdr hdr(0x251, pl->getThreadId(), pl, 4);
+                                    UInt32 data = award[i][j][1];
+                                    GLOBAL().PushMsg(hdr, &data);
+
                                     SYSMSGV(content, 725, _session, award[i][j][1]);
                                     Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
                                     if(mail != NULL)
@@ -2047,7 +2062,12 @@ void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group,
             SYSMSGV(title, 730, t, pp.name.c_str());
 
             UInt8 rew = it->second == 0 ? 100 : 50;
-            player->AddVar(VAR_MONEY_ARENA, rew);
+            //player->AddVar(VAR_MONEY_ARENA, rew);
+
+            GameMsgHdr hdr(0x251, player->getThreadId(), player, 4);
+            UInt32 data = rew;
+            GLOBAL().PushMsg(hdr, &data);
+
             if(state == 0)
                 player->AddVar(VAR_MONEY_ARENA2, rew);
             if(state == 1)

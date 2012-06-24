@@ -88,13 +88,16 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
     GObject::dclogger.init();
 #endif
 
-    if (!num)
+    if(!cfg.serverNum)
     {
-        srand(time(NULL));
-        cfg.serverNum = cfg.tcpPort+rand()%1000;
+        if (!num)
+        {
+            srand(time(NULL));
+            cfg.serverNum = cfg.tcpPort+rand()%1000;
+        }
+        else
+            cfg.serverNum = num;
     }
-    else
-        cfg.serverNum = num;
 
     cfg.serverLogId = cfg.serverNum;
 
