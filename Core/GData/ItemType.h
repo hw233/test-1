@@ -93,9 +93,34 @@ inline bool IsEquipTypeId(UInt32 id)
 	return id >= LARM_ID && id <= RARM_ID;
 }
 
+/** 新增11,12级宝石 **/
+inline bool IsGemId2(UInt32 id)
+{
+    if(id >= 5501 && id <= 5502)
+        return true;
+    else if(id >= 5511 && id <= 5512)
+        return true;
+    else if(id >= 5521 && id <= 5522)
+        return true;
+    else if(id >= 5531 && id <= 5532)
+        return true;
+    else if(id >= 5541 && id <= 5542)
+        return true;
+    else if(id >= 5551 && id <= 5552)
+        return true;
+    else if(id >= 5561 && id <= 5562)
+        return true;
+    else if(id >= 5571 && id <= 5572)
+        return true;
+    else if(id >= 5631 && id <= 5632)
+        return true;
+    else
+        return false;
+}
+
 inline bool IsGemId(UInt32 id)
 {
-	return id > LGEM_ID && id <= RGEM_ID;
+	return (id > LGEM_ID && id <= RGEM_ID);
 }
 
 inline bool IsEquip(UInt8 subClass)

@@ -588,7 +588,7 @@ namespace GObject
         void sendRC7DayInfo(UInt32 now = TimeUtil::Now());
         void sendRF7DayInfo(UInt32 now = TimeUtil::Now());
         void setContinuousRFAward(UInt32 no);
-
+        void sendFourCopAct();
 		void Reconnect();
 
 		void Logout(bool = false);	//???????߲???
@@ -815,6 +815,8 @@ namespace GObject
 		UInt32 getTael(UInt32 c = 0);
 		UInt32 useTael(UInt32 c,ConsumeInfo * ci=NULL);
 		void useTael2(UInt32 c, Player *attacker, ConsumeInfo * ci = NULL);
+        UInt32 useMoneyArena( UInt32 a,ConsumeInfo * ci = NULL);
+        UInt32 getMoneyArena( UInt32 c );
 
 		UInt32 getCoin(UInt32 c = 0);
 		UInt32 useCoin(UInt32 c, ConsumeInfo * ci=NULL, bool notify = true);

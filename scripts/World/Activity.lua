@@ -350,6 +350,18 @@ function onActivityCheck(tm)
           is_6_23 = false
       end
 
+      if tm >= actTime113 and tm < actTime114 then
+          setMergeAthAct(true)
+      else
+          setMergeAthAct(false)
+      end
+
+      if tm >= actTime115 and tm < actTime116 then
+          setFourCopAct(true)
+      else
+          setFourCopAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -415,6 +427,10 @@ function initActTime(y, m, d)
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
   local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 合服斗剑排名奖励增加至30名活动(6/25-7/1)
+  local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 四大名捕（6/25-7/31）
+  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -533,6 +549,11 @@ function initActTime(y, m, d)
 
   actTime111 = os.time(SerStartTm105);
   actTime112 = os.time(SerStartTm105) + 12 * 86400;
+
+  actTime113 = os.time(SerStartTm106);
+  actTime114 = os.time(SerStartTm106) + 7 * 86400;
+  actTime115 = os.time(SerStartTm107);
+  actTime116 = os.time(SerStartTm107) + 37 * 86400;
 
   onActivityCheck(os.time() + 30);
 

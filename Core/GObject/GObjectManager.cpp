@@ -2972,7 +2972,7 @@ namespace GObject
 
             {
 				lua_tinker::table table_temp = lua_tinker::call<lua_tinker::table>(L, "getMergeChance");
-				UInt32 size = std::min(9, table_temp.size());
+				UInt32 size = std::min(11, table_temp.size());
 				for(UInt32 j = 0; j < size; j ++)
 				{
 					_merge_chance[j] =  table_temp.get<UInt32>(j + 1);
