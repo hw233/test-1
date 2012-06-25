@@ -705,7 +705,7 @@ namespace GObject
 		case Item_Armor5:
 		case Item_Ring:
 		case Item_Amulet:
-        case Item_Mounts:
+        case Item_Fashion:
         case Item_Trump:
 			{
 				ItemEquip * equip;
@@ -713,7 +713,7 @@ namespace GObject
 
 				UInt8 lv = itype->vLev;
                 UInt8 crr = itype->career;
-				if(itype->quality > 2 && itype->subClass != Item_Trump)
+				if(itype->quality > 2 && itype->subClass != Item_Trump && itype->subClass != Item_Fashion)
 				{
 					UInt8 q = itype->quality - 3;
 					UInt8 t[3] = {0, 0, 0};
@@ -746,6 +746,7 @@ namespace GObject
 				case Item_Armor5:
                     equip = new ItemArmor(id, itype, edata);
 					break;
+                case Item_Fashion:
                 case Item_Trump:
                     {
                         UInt16 roll = uRand(1000);
@@ -776,7 +777,7 @@ namespace GObject
 				ITEM_BIND_CHECK(itype->bindType,bind);
 				equip->SetBindStatus(bind);
 
-                if (itype->subClass != Item_Trump && itype->quality == 5)
+                if (itype->subClass != Item_Trump && itype->subClass != Item_Fashion && itype->quality == 5)
                     m_Owner->OnShuoShuo(SS_OE);
                 if (itype->subClass == Item_Trump)
                     m_Owner->OnShuoShuo(SS_TRUMP);
@@ -941,7 +942,7 @@ namespace GObject
 			++ m_Size;
 		e = equip;
 
-        if (equip->getClass() != Item_Trump && equip->getQuality() == 5)
+        if (equip->getClass() != Item_Trump && equip->getClass() != Item_Fashion && equip->getQuality() == 5)
             m_Owner->OnShuoShuo(SS_OE);
         if (equip->getClass() == Item_Trump)
             m_Owner->OnShuoShuo(SS_TRUMP);
@@ -1110,6 +1111,9 @@ namespace GObject
         
         switch (c)
         {
+            case Item_Fashion:
+                return 0x20;
+
             case Item_Weapon:
                 return  0x21;
                 
@@ -1171,6 +1175,11 @@ namespace GObject
             }
 			switch(part)
 			{
+            case 0x20:
+				if(item->getClass() != Item_Fashion)
+					return false;
+				old = fgt->setFashion(static_cast<GObject::ItemFashion*>(item));
+                break;
 			case 0x21:
 				{
 					if(item->getClass() != Item_Weapon)
@@ -1237,6 +1246,9 @@ namespace GObject
 		{
 			switch(part)
 			{
+            case 0x20:
+				old = fgt->setFashion(NULL);
+                break;
 			case 0x21:
 				old = fgt->setWeapon(NULL);
 				break;
@@ -1724,7 +1736,7 @@ namespace GObject
             esa.appendAttrToStream(st);
         }
 
-        if(equip->getClass() == Item_Trump)
+        if(equip->getClass() == Item_Trump || equip->getClass() == Item_Fashion)
         {
             st << ied.maxTRank << ied.trumpExp;
         }
@@ -2024,6 +2036,9 @@ namespace GObject
 		if(equip == NULL/* || equip->getClass() == Item_Ring || equip->getClass() == Item_Amulet*/)
 			return 2;
 
+        if(equip->getClass() == Item_Fashion)
+            return 2;
+
         const GData::ItemBaseType& itemType =  equip-> GetItemType();
         if(itemType.getId() == 1525 || itemType.getId() == 1526)
             return 2;
@@ -2250,7 +2265,7 @@ namespace GObject
                 if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x50 + pos, equip, false);
                 else
-                    fgt->sendModification(0x21 + pos, equip, false);
+                    fgt->sendModification(0x20 + pos, equip, false);
 			}
 			else
 				SendSingleEquipData(equip);
@@ -2320,7 +2335,7 @@ namespace GObject
                 if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x50 + pos, equip, false);
                 else
-                    fgt->sendModification(0x21 + pos, equip, false);
+                    fgt->sendModification(0x20 + pos, equip, false);
 			}
 			else
 				SendSingleEquipData(equip);
@@ -2388,7 +2403,7 @@ namespace GObject
 		if(!equip->GetBindStatus() && isBound)
 			equip->DoEquipBind();
 		if(fgt != NULL)
-			fgt->sendModification(0x21 + pos, equip, false);
+			fgt->sendModification(0x20 + pos, equip, false);
 		else
 			SendSingleEquipData(equip);
 
@@ -2592,7 +2607,7 @@ namespace GObject
 		if(fgt != NULL)
 		{
 			fgt->setDirty();
-			fgt->sendModification(0x21 + pos, equip, false);
+			fgt->sendModification(0x20 + pos, equip, false);
 		}
 		else
 			SendSingleEquipData(equip);
@@ -2668,7 +2683,7 @@ namespace GObject
 		if(fgt != NULL)
 		{
 			fgt->setDirty();
-			fgt->sendModification(0x21 + pos2, equip, false);
+			fgt->sendModification(0x20 + pos2, equip, false);
 		}
 		else
 			SendSingleEquipData(equip);
@@ -3490,7 +3505,7 @@ namespace GObject
 			if(fgt != NULL)
 			{
 				fgt->setDirty();
-				fgt->sendModification(0x21 + pos, equip, false);
+				fgt->sendModification(0x20 + pos, equip, false);
 			}
 			else
 				SendSingleEquipData(equip);
@@ -3540,7 +3555,7 @@ namespace GObject
 
             UInt8 equip_t = EQUIPTYPE_EQUIP;
             lv = equip->getValueLev();
-            if(equip->GetItemType().subClass == Item_Trump)
+            if(equip->GetItemType().subClass == Item_Trump || equip->GetItemType().subClass == Item_Fashion)
             {
                 equip_t = EQUIPTYPE_TRUMP;
                 lv = ied.tRank;
@@ -3557,7 +3572,7 @@ namespace GObject
                 if(equip->getClass() == Item_Trump)
                     fgt->sendModification(0x50 + pos, equip, false);
                 else
-                    fgt->sendModification(0x21 + pos, equip, false);
+                    fgt->sendModification(0x20 + pos, equip, false);
 			}
 			else
 				SendSingleEquipData(equip);
@@ -3841,7 +3856,7 @@ namespace GObject
             if(equip->GetItemType().subClass == Item_Trump)
                 fgt->sendModification(0x50 + pos, equip, false);
             else
-                fgt->sendModification(0x21 + pos, equip, false);
+                fgt->sendModification(0x20 + pos, equip, false);
 		}
 		else
 			SendSingleEquipData(equip);
@@ -4281,7 +4296,7 @@ namespace GObject
 		if(fgt != NULL)
         {
             fgt->setDirty();
-			fgt->sendModification(0x21 + pos, equip, false);
+			fgt->sendModification(0x20 + pos, equip, false);
         }
 		else
 			SendSingleEquipData(equip);

@@ -156,6 +156,14 @@ namespace GObject
 		{ }
 	};
 
+    class ItemFashion : public ItemEquip
+    {
+	public:
+		ItemFashion(UInt32 id, const GData::ItemBaseType* itemEquipType, ItemEquipData& itemEquipData)
+		    : ItemEquip(id, itemEquipType, itemEquipData) 
+		{ }
+    };
+
 	class ItemTrump : public ItemEquip
 	{
 	public:

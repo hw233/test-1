@@ -3431,6 +3431,7 @@ namespace GObject
                 case Item_Armor5:
                 case Item_Ring:
                 case Item_Amulet:
+                case Item_Fashion:
                 case Item_Trump:
                 {
                     ItemEquipData ied;
@@ -3459,6 +3460,7 @@ namespace GObject
 					case Item_Armor5:
 						equip = new ItemArmor(dbe.id, itype, ied);
                         break;
+                    case Item_Fashion:
                     case Item_Trump:
                         equip = new ItemTrump(dbe.id, itype, ied);
                         if (equip && ied.enchant)
