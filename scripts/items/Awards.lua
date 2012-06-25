@@ -95,15 +95,17 @@ function RunTargetAward(player)
 		return 0;
 	end
 
-    if player:hasRealItemAward(1) then
-        player:getRealItemAward(1)
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了60QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
-        return 7;
-    end
-    if player:hasRealItemAward(2) then
-        player:getRealItemAward(2)
-        Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了100QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
-        return 8;
+    if not isFBVersion() then
+        if player:hasRealItemAward(1) then
+            player:getRealItemAward(1)
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了60QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+            return 7;
+        end
+        if player:hasRealItemAward(2) then
+            player:getRealItemAward(2)
+            Broadcast(0x27, "恭喜[p:"..player:getCountry()..":"..player:getPName().."]在七日目标实物抽奖中获得了100QB大奖，让我们一起来祝贺他。玩蜀山传奇，下一个幸运儿就是你！！！！！！！")
+            return 8;
+        end
     end
 
     local chance = {379, 1895, 2400, 5768, 9558, 10000, 10000, 10000}
