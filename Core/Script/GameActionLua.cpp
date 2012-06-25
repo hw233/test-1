@@ -117,7 +117,10 @@ namespace Script
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
         lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
         lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
-		CLASS_DEF(GameActionLua, Print);
+        lua_tinker::def(_L, "getMergeAthAct", GObject::World::getMergeAthAct);
+        lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
+
+        CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
 		CLASS_DEF(GameActionLua, GetNpcRelationTask);

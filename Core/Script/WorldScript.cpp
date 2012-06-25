@@ -138,6 +138,11 @@ void WorldScript::init()
     def("setFFAttrMaxValProp", GObject::GObjectManager::setFFAttrMaxValProp);
     def("setFFAttrMaxVal", GObject::GObjectManager::setFFAttrMaxVal);
 
+    def("setMergeAthAct", GObject::World::setMergeAthAct);
+    def("getMergeAthAct", GObject::World::getMergeAthAct);
+    def("setMergeAthAct", GObject::World::setFourCopAct);
+    def("getMergeAthAct", GObject::World::getFourCopAct);
+
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
 	class_def<GData::Store>("add", &GData::Store::add);

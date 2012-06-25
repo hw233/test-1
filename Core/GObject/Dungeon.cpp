@@ -514,7 +514,20 @@ bool Dungeon::advanceLevel( Player * player, DungeonPlayerInfo& dpi, bool norepo
                 player->GetPackage()->AddItem2(481, 1, 1, 1);
         }
 
+        std::cout << "dungeonCnt: " << static_cast<UInt32>(PLAYER_DATA(player, dungeonCnt)) << std::endl;
+        UInt32 randNum = uRand(2);
+        std::cout << "randNum,org: " << randNum << std::endl;
+        if(PLAYER_DATA(player, dungeonCnt) > getMaxCount())
+        {
+            randNum = randNum + 2;
+        }
+        else
+            randNum = randNum + 1;
+        std::cout << "randNum: " << randNum << std::endl;
+        player->AddVar(VAR_COP_ORDER_CNT, randNum);
+
 		GameAction()->onDungeonWin(player, _id, dpi.totalCount);
+
 	}
 
 	if(noreport)

@@ -2532,7 +2532,11 @@ namespace GObject
             {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0}
         };
 
-        GData::ItemGemType * igt = GData::gemTypes[gemId - LGEM_ID];
+        GData::ItemGemType * igt = NULL;
+        if(IsGemId2(gemId))
+            igt = GData::gemTypes[getMapGemId2(gemId) - LGEM_ID];
+        else
+            igt = GData::gemTypes[gemId - LGEM_ID];
         if(!igt)
             return 1;
 
@@ -3051,7 +3055,7 @@ namespace GObject
         if (GetItemSubClass(gemId) != Item_Gem)
             return 3;
         UInt32 lvl = (gemId - 1) % 10;
-        if(lvl == 9)
+        if(lvl == 11)
             return 3;
 
         if(bindCount > 0 && GetItemNum(gemId, true) < bindCount)
@@ -3062,7 +3066,10 @@ namespace GObject
         UInt32 bindUsed = 0, unbindUsed = 0;
         unbindGemsOut = 0;
         bindGemsOut = 0;
-        gemIdOut = gemId + 1;
+        if(9 == lvl)
+            gemIdOut = gemId + 491;
+        else
+            gemIdOut = gemId + 1;
         succTimes = 0;
         failedTimes = 0;
 

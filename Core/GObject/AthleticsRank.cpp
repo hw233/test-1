@@ -1185,9 +1185,14 @@ void AthleticsRank::TmExtraAward()
 {
 	AthleticsList::iterator start = _athleticses[1].begin();
 	AthleticsList::iterator end = start;
+    size_t awardCnt = 10;
 
-	if (_athleticses[1].size() >= 10)
-		std::advance(end, 10);
+    if(World::getMergeAthAct())
+    {
+        awardCnt = 30;
+    }
+    if (_athleticses[1].size() >= awardCnt)
+		std::advance(end, awardCnt);
 	else
 		end = _athleticses[1].end();
 

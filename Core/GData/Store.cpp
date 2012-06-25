@@ -12,47 +12,57 @@ Store store;
 
 void Store::add( UInt8 type, UInt32 itemId, UInt32 price )
 {
-	if(type < 1 || type > 7)
-		return;
-	_items[type - 1].push_back(itemId + (price << 16));
-	_itemPrices[type - 1][itemId] = price;
+    if(type >= PURCHASE1 && type <= PURCHASE2)
+    {
+        _items[type - PURCHASE1].push_back(itemId + (price << 16));
+        _itemPrices[type - PURCHASE1][itemId] = price;
+    }
+    else if(type >= PURCHASE3 && type <= PURCHASE4)
+    {
+        _items2[type - PURCHASE3].push_back(itemId + (price << 16));
+        _itemPrices2[type - PURCHASE3][itemId] = price;
+    }
+    return;
 }
 
 void Store::addExchange(UInt8 type, UInt32 itemId, UInt32 priceID, UInt32 priceNum)
 {
-	if(type < EXCHANGE || type > EXCHANGEEND)
-		return;
-    Exchange exchange;
-    exchange.itemID = static_cast<UInt16>(itemId);
-    exchange.priceID = static_cast<UInt16>(priceID);
-    exchange.priceNum = static_cast<UInt16>(priceNum);
-	_itemsExchange[type - EXCHANGE].push_back(exchange);
-	_itemPricesExchange[type - EXCHANGE][itemId] = priceID + (priceNum << 16);
+    if(type >= EXCHANGE && type <= EXCHANGEEND)
+    {
+        Exchange exchange;
+        exchange.itemID = static_cast<UInt16>(itemId);
+        exchange.priceID = static_cast<UInt16>(priceID);
+        exchange.priceNum = static_cast<UInt16>(priceNum);
+        _itemsExchange[type - EXCHANGE].push_back(exchange);
+        _itemPricesExchange[type - EXCHANGE][itemId] = priceID + (priceNum << 16);
+    }
+    return;
 }
 
 UInt32 Store::getPrice( UInt8 type, UInt16 itemId )
 {
-	if(type < 1 || type > EXCHANGEEND)
-		return 0xFFFFFFFF;
-
-    if (type >= EXCHANGE)
+    if(type >= PURCHASE1 && type <= PURCHASE2)
     {
-        if (type <= EXCHANGEEND)
-        {
-            std::map<UInt32, UInt32>::iterator it = _itemPricesExchange[type - EXCHANGE].find(itemId);
-            if(it == _itemPrices[type - EXCHANGE].end())
-                return 0xFFFFFFFF;
-            return it->second;
-        }
-    }
-    else
-    {
-        std::map<UInt32, UInt32>::iterator it = _itemPrices[type - 1].find(itemId);
-        if(it == _itemPrices[type - 1].end())
+        std::map<UInt32, UInt32>::iterator it = _itemPrices[type - PURCHASE1].find(itemId);
+        if(it == _itemPrices[type - PURCHASE1].end())
             return 0xFFFFFFFF;
         return it->second;
     }
-    return 0;
+    else if(type >= PURCHASE3 && type <= PURCHASE4)
+    {
+        std::map<UInt32, UInt32>::iterator it = _itemPrices2[type - PURCHASE3].find(itemId);
+        if(it == _itemPrices2[type - PURCHASE3].end())
+            return 0xFFFFFFFF;
+        return it->second;
+    }
+    else if(type >= EXCHANGE && type <= EXCHANGEEND)
+    {
+        std::map<UInt32, UInt32>::iterator it = _itemPricesExchange[type - EXCHANGE].find(itemId);
+        if(it == _itemPrices[type - EXCHANGE].end())
+            return 0xFFFFFFFF;
+        return it->second;
+    }
+    return 0xFFFFFFFF;
 }
 
 UInt32 Store::getPrice( UInt16 itemId )
@@ -69,23 +79,24 @@ UInt32 Store::getPrice( UInt16 itemId )
 
 void Store::sendList( UInt8 type, GObject::Player * player )
 {
-	if(type < 1 || type > EXCHANGEEND)
-		return;
-    if (type >= EXCHANGE)
+    if(type >= PURCHASE1 && type <= PURCHASE2)
+        player->send(_storePacket[type - PURCHASE1]);
+    else if(type >= PURCHASE3 && type <= PURCHASE4)
+        player->send(_storePacket2[type - PURCHASE3]);
+    else if(type >= EXCHANGE && type <= EXCHANGEEND)
         player->send(_storePacketExchange[type - EXCHANGE]);
-    else
-        player->send(_storePacket[type - 1]);
+
     if (type == 1)
         player->sendDiscountLimit();
 }
 
 void Store::makePacket()
 {
-	for(int i = 0; i < 7; ++ i)
+	for(int i = 0; i <= PURCHASE2 - PURCHASE1; ++ i)
 	{
 		std::vector<UInt32>& items = _items[i];
 		_storePacket[i].init(REP::STORE_LIST);
-		_storePacket[i] << static_cast<UInt8>(i + 1) << static_cast<UInt8>(items.size());
+		_storePacket[i] << static_cast<UInt8>(PURCHASE1 + i) << static_cast<UInt8>(items.size());
 		for(std::vector<UInt32>::iterator it = items.begin(); it != items.end(); ++ it)
 		{
 			_storePacket[i] << *it;
@@ -93,7 +104,19 @@ void Store::makePacket()
 		_storePacket[i] << Stream::eos;
 	}
 
-    for (int i = 0; i < 1; ++i)
+    for(int i = 0; i <= PURCHASE4 - PURCHASE3; ++ i)
+	{
+		std::vector<UInt32>& items = _items2[i];
+		_storePacket2[i].init(REP::STORE_LIST);
+		_storePacket2[i] << static_cast<UInt8>(PURCHASE3 + i) << static_cast<UInt8>(items.size());
+		for(std::vector<UInt32>::iterator it = items.begin(); it != items.end(); ++ it)
+		{
+			_storePacket2[i] << *it;
+        }
+		_storePacket2[i] << Stream::eos;
+	}
+
+    for (int i = 0; i <= EXCHANGEEND - EXCHANGE; ++i)
     {
 		std::vector<Exchange>& items = _itemsExchange[i];
 		_storePacketExchange[i].init(REP::STORE_LIST_EXCHANGE);
@@ -108,13 +131,19 @@ void Store::makePacket()
 
 void Store::clear()
 {
-	for(int i = 1; i < 7; ++ i) // XXX: do not clear _items[0]
+	for(int i = 0; i <= PURCHASE2 - PURCHASE1; ++i) // XXX: do not clear _items[0]
 	{
 		_storePacket[i].clear();
 		_items[i].clear();
 		_itemPrices[i].clear();
 	}
-    for (int i = EXCHANGE-8; i < EXCHANGEEND-7; ++i)
+	for(int i = 0; i <= PURCHASE4 - PURCHASE3; ++i)
+	{
+		_storePacket2[i].clear();
+		_items2[i].clear();
+		_itemPrices2[i].clear();
+	}
+    for (int i = 0; i < EXCHANGEEND - EXCHANGE; ++i)
     {
 		_storePacketExchange[i].clear();
 		_itemsExchange[i].clear();

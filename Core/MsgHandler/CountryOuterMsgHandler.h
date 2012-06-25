@@ -688,6 +688,13 @@ struct GetAward
     MESSAGE_DEF2(REQ::GETAWARD, UInt8, _type, UInt8, _opt);
 };
 
+struct FourCop
+{
+    UInt8 _type;
+    UInt8 _opt;
+    UInt8 _count;
+    MESSAGE_DEF3(REQ::FOURCOP, UInt8, _type, UInt8, _opt, UInt8, _count);
+};
 struct GuideUdp
 {
     UInt8 _type;
@@ -1052,6 +1059,9 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     if (World::getTrumpEnchRet())
         pl->sendTokenInfo();
+
+    if(World::getFourCopAct())
+        pl->sendFourCopAct();
 
     {
         UInt32 exp = pl->GetVar(VAR_OFFLINE_EXP);
@@ -2669,7 +2679,9 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 	{
         if (lr._type > 1 && lr._type < 8)
             price *= lr._count;
-		switch(lr._type)
+        else if(lr._type >= PURCHASE3 && lr._type <= PURCHASE4)
+            price *= lr._count;
+        switch(lr._type)
 		{
         case 1:
             {
@@ -2885,6 +2897,38 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
                         player->GetPackage()->DelItemAny(priceID, priceNum, &bind);
                         player->useDemonLog(priceID, priceNum, &ci);
                         st << static_cast<UInt8>(0);
+                    }
+                }
+            }
+            break;
+        case PURCHASE3:
+        case PURCHASE3+1:
+        case PURCHASE3+2:
+        case PURCHASE4:
+            {
+                UInt32 arena = player->GetVar(VAR_MONEY_ARENA);
+                std::cout << arena << std::endl;
+                std::cout << price << std::endl;
+                if (arena < price)
+                {
+                    st << static_cast<UInt8>(1);
+                }
+                else
+                {
+                    GObject::ItemBase * item;
+                    if(IsEquipTypeId(lr._itemId))
+                        item = player->GetPackage()->AddEquipN(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    else
+                        item = player->GetPackage()->AddItem(lr._itemId, lr._count, true, false, FromNpcBuy);
+                    if(item == NULL)
+                        st << static_cast<UInt8>(2);
+                    else
+                    {
+                        //player->SetVar(VAR_MONEY_ARENA, arena - price);
+				        ConsumeInfo ci(Item,lr._itemId,lr._count);
+					    player->useMoneyArena(price,&ci);
+                        st << static_cast<UInt8>(0);
+                        GameAction()->doAty( player,AtyBuy, 0,0);
                     }
                 }
             }
@@ -4481,6 +4525,12 @@ void OnGetAward( GameMsgHdr& hdr, GetAward& req )
 {
     MSG_QUERY_PLAYER(player);
     player->getAward(req._type, req._opt);
+}
+
+void OnDonateCopOrder( GameMsgHdr& hdr, FourCop& req )
+{
+    MSG_QUERY_PLAYER(player);
+    player->onFourCopReq(req._type, req._opt, req._count);
 }
 
 void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )

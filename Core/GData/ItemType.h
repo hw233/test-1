@@ -93,9 +93,43 @@ inline bool IsEquipTypeId(UInt32 id)
 	return id >= LARM_ID && id <= RARM_ID;
 }
 
+/** 11，12级宝石的ID映射到原来宝石的ID后面 **/
+inline UInt32 getMapGemId2(UInt32 id)
+{
+    if(id >= 5501 && id <= 5502)
+        return (id - 5501 + 5161);
+    if(id >= 5511 && id <= 5512)
+        return (id - 5511 + 5163);
+    if(id >= 5521 && id <= 5522)
+        return (id - 5521 + 5165);
+    if(id >= 5531 && id <= 5532)
+        return (id - 5531 + 5167);
+    if(id >= 5541 && id <= 5542)
+        return (id - 5541 + 5569);
+    if(id >= 5551 && id <= 5552)
+        return (id - 5551 + 5571);
+    if(id >= 5561 && id <= 5562)
+        return (id - 5561 + 5573);
+    if(id >= 5571 && id <= 5572)
+        return (id - 5571 + 5575);
+    if(id >= 5631 && id <= 5532)
+        return (id - 5631 + 5577);
+
+    return 0;
+}
+
+/** 新增11,12级宝石 **/
+inline bool IsGemId2(UInt32 id)
+{
+    if(getMapGemId2(id) > 0)
+        return true;
+    else
+        return false;
+}
+
 inline bool IsGemId(UInt32 id)
 {
-	return id > LGEM_ID && id <= RGEM_ID;
+	return ((id > LGEM_ID && id <= RGEM_ID) || IsGemId2(id));
 }
 
 inline bool IsEquip(UInt8 subClass)
@@ -146,7 +180,7 @@ inline ItemClass GetItemSubClass(UInt32 id)
         return Item_Formula;
     if ((id >= LCITTA_ID && id <= RCITTA_ID) || (id >= LCITTA1_ID && id <= RCITTA1_ID))
         return Item_Citta;
-    if (id >= LGEM_ID && id <= RGEM_ID)
+    if ((id >= LGEM_ID && id <= RGEM_ID) || IsGemId2(id))
 		return Item_Gem;
     if (id >= LSOUL_ID && id <= RSOUL_ID)
         return Item_Soul;
@@ -159,7 +193,7 @@ inline UInt8 GetItemLogType(UInt16 id)
 {
     if (id < LGEM_ID)
         return 1;
-    if (id >= LGEM_ID && id <= RGEM_ID)
+    if ((id >= LGEM_ID && id <= RGEM_ID) || IsGemId2(id))
         return 3;
     return 1;
 }

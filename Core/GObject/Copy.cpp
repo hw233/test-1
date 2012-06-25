@@ -231,6 +231,7 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     return 1;
 }
 
+static bool diamondPrivilege = false;
 void PlayerCopy::enter(Player* pl, UInt8 id)
 {
     if (!pl || !id)
@@ -276,6 +277,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
     if(id == 0xff)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
+        diamondPrivilege = true;
         id = realCopyId;
     }
     if (!ret) {
@@ -394,6 +396,31 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
                 pl->SetVar(VAR_CLAWARD2, 1);
                 pl->sendRC7DayInfo(TimeUtil::Now());
             }
+
+            std::cout << static_cast<UInt32>(PLAYER_DATA(pl, copyFreeCnt)) << std::endl;
+            std::cout << static_cast<UInt32>(PLAYER_DATA(pl, copyGoldCnt)) << std::endl;
+            std::cout << static_cast<UInt32>(tcd.lootlvl) << std::endl;
+            UInt32 randNum = uRand(2);
+            std::cout << "randNum,org: " << randNum << std::endl;
+            if(diamondPrivilege)
+            {
+                diamondPrivilege = false;
+                randNum = randNum + 1;
+                std::cout << "-----privilege-----" << std::endl;
+            }
+            else if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)
+            {
+                if(3 <= PLAYER_DATA(pl, copyGoldCnt))
+                    randNum = randNum + 4;
+                else if(2 == PLAYER_DATA(pl, copyGoldCnt))
+                    randNum = randNum + 3;
+                else
+                    randNum = randNum + 2;
+            }
+            else
+                randNum = randNum + 1;
+            std::cout << "randNum: " << randNum << std::endl;
+            pl->AddVar(VAR_COP_ORDER_CNT, randNum);
 
             GameAction()->onCopyWin(pl, id, tcd.floor, tcd.spot, tcd.lootlvl);
 
