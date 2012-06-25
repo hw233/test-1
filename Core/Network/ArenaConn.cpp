@@ -34,7 +34,7 @@ void ArenaConn::initConnection()
 	if(n < 0)
 		throw std::bad_exception();
 	Stream st(ARENAREQ::REG, 0xEF);
-	st << cfg.slugName << cfg.channelNum << cfg.serverNum << cfg.merged;
+	st << cfg.slugName << cfg.channelNum << cfg.serverNo << cfg.merged;
     if (cfg.merged)
     {
         // TODO:

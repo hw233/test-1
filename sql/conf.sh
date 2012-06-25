@@ -6,7 +6,7 @@ P=kingxin
 PT=3306
 
 DBD=data_6666
-DBO=asss_6666
+DBO=asss_test0607
 
 OPTIONS="Yes/No/Exit"
 IFS=/
