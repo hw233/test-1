@@ -1313,6 +1313,7 @@ namespace GObject
         // ͨ????????֮??
         UInt8 _justice_roar;
         float _spirit_factor;
+        bool diamondPrivilege;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1335,7 +1336,11 @@ namespace GObject
 
         inline void setSpiritFactor(float v) { _spirit_factor = v; }
         inline float getSpiritFactor() { return _spirit_factor; }
-	protected:
+
+        inline void setDiamondPrivilege(UInt8 v) { diamondPrivilege = v; }
+        inline UInt8 getDiamondPrivilege() { return diamondPrivilege; }
+
+    protected:
 		inline void setBlockBossByLevel();
 	public:
 		bool attackBlockBoss();
