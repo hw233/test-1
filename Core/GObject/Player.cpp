@@ -7526,13 +7526,16 @@ namespace GObject
 		sprintf(numstr, "%u", _playerData.title);
 		_battleName.clear();
 		_battleName = getClanName();
-		if(cfg.merged && !_battleName.empty() && static_cast<UInt8>(*(_battleName.end() - 1)) < 32)
+        /*
+        if(cfg.merged && !_battleName.empty() && static_cast<UInt8>(*(_battleName.end() - 1)) < 32)
 		{
 			sprintf(numstr, ".S%u", static_cast<UInt8>(*(_battleName.end() - 1)));
 			_battleName.erase(_battleName.end() - 1);
 			_battleName += numstr;
 		}
+        */
 		_battleName = _battleName + "\n" + numstr + "\n" + _playerData.name;
+        std::cout << _battleName << std::endl;
 #endif
 	}
 
