@@ -1500,9 +1500,9 @@ function onDuanWu(player)
         return
     end
 
-    if lvl >= 40 and player:GetVar(134) == 0 then
+    if lvl >= 40 and player:GetVar(135) == 0 then
         sendItemPackageMail(player, msg_95, msg_95, {1527,2,1});
-        player:SetVar(134, 1)
+        player:SetVar(135, 1)
     end
 end
 
