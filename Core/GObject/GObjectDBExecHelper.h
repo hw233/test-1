@@ -913,6 +913,13 @@ struct DBRealItemAward
     std::string card_no;
     std::string card_psw;
 };
+
+struct DBRNR
+{
+    UInt32 id;
+    std::string record;
+};
+
 struct DBActivityData
 {
     UInt64 playerId;
@@ -2088,6 +2095,14 @@ SPECIALDEF(4)
     UInt32, cd,
     std::string, card_no,
     std::string, card_psw
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBRNR)
+SPECIALDEF(2)
+(
+    UInt32, id,
+    std::string, record 
 )
 SPECIALEND()
 

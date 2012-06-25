@@ -149,9 +149,9 @@ namespace GObject
         VAR_LUCKYDRAW_CNT = 116, // 寻宝次数
 
         VAR_CLAWARD2 = 117, // 七天目标抽奖之今日目标
-#if 0
+
         VAR_OFFLINE_EQUIP = 118, //离线道具
-#endif
+
         VAR_ENCHANTGT11 = 119, // 限时强化一次性返还是否返过
         VAR_INRF7DAY = 120, // 回流7日活动开始时间
         VAR_CTSLANDINGRF = 121, // 回流7日连续登陆7天记录
@@ -306,9 +306,9 @@ namespace GObject
             REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_CLAWARD2, CYCLE_DAY);
-#if 0
+
             REGISTER_VAR(VAR_OFFLINE_EQUIP, CYCLE_NONE);
-#endif
+
             REGISTER_VAR(VAR_ENCHANTGT11, CYCLE_NONE);
             REGISTER_VAR(VAR_INRF7DAY, CYCLE_NONE);
             REGISTER_VAR(VAR_CTSLANDINGRF, CYCLE_NONE);

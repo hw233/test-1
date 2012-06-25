@@ -31,7 +31,7 @@
 
 enum ItemClass
 {
-    // [00~19]  装备 [1500~4990]   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11坐骑
+    // [00~19]  装备 [1500~4990]   1武器，2头，3胸，4肩，5腰，6腿，7项链，8戒指，10法宝，11时装
     // [20~29]  普通 [0~499]
     // [30~39]  阵法 [1000~1199]
     // [40~49]  心法 [1200~1499]
@@ -50,7 +50,7 @@ enum ItemClass
 	Item_Ring,			//戒指 8
 	Item_Reserved,		//保留 9
 	Item_Trump,			//法宝 10
-	Item_Mounts,		//坐骑 11
+	Item_Fashion,		//时装 11
 	Item_Normal = 20,	//普通物品 20~29
     Item_Normal28 = 28,
     Item_Normal29 = 29,
@@ -100,7 +100,7 @@ inline bool IsGemId(UInt32 id)
 
 inline bool IsEquip(UInt8 subClass)
 {
-	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Trump);
+	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Fashion);
 }
 
 inline bool IsWeapon(UInt8 subClass)

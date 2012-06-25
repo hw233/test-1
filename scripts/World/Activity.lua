@@ -47,6 +47,11 @@ function is4_21()
     return is_4_21
 end
 
+is_6_25 = false 
+function is6_25()
+    return is_6_25
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -307,6 +312,24 @@ function onActivityCheck(tm)
           setRechargeActive(false, 8)
       end
 
+      if tm >= actTime57 and tm < actTime58 then
+          setRechargeNextRet(true)
+      else
+          setRechargeNextRet(false)
+      end
+
+      if tm >= actTime59 and tm < actTime60 then
+          is_6_25 = true
+      else
+          is_6_25 = false
+      end
+
+      if tm >= actTime61 and tm < actTime62 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -359,6 +382,10 @@ function initActTime(y, m, d)
   local  SerStartTm23= { ['year'] = 2012, ['month'] = 5, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 限时强化
   local  SerStartTm24= { ['year'] = 2012, ['month'] = 6, ['day'] = 6, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 充值后期返利(过段时间反利)
+  local  SerStartTm25= { ['year'] = 2012, ['month'] = 6, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 6.25限时购买
+  local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -453,6 +480,16 @@ function initActTime(y, m, d)
 
   actTime55 = os.time(SerStartTm24);
   actTime56 = os.time(SerStartTm24) + 12 * 86400;
+
+  actTime57 = os.time(SerStartTm25);
+  actTime58 = os.time(SerStartTm25) + 13 * 86400;
+  setRechargeNextRetStart(actTime57, actTime58)
+
+  actTime59 = os.time(SerStartTm26);
+  actTime60 = os.time(SerStartTm26) + 7 * 86400;
+
+  actTime61 = os.time(SerStartTm26);
+  actTime62 = os.time(SerStartTm26) + 6 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

@@ -115,6 +115,8 @@ namespace Script
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
         lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
+        lua_tinker::def(_L, "getRechargeNextRet", GObject::World::getRechargeNextRet);
+        lua_tinker::def(_L, "setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -934,9 +936,9 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
-	void GameActionLua::onEnchantAct( Player* player, UInt8 level )
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 type )
 	{
-		Call<void>("onEnchantAct", player, level);
+		Call<void>("onEnchantAct", player, level, type);
 	}
 
 	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)
@@ -1157,7 +1159,10 @@ namespace Script
 		assert(player != NULL);
 		return Call<UInt16>("RunTargetAwardRF", player);
     }
+
+    void GameActionLua::sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total)
+    {
+		return Call<void>("sendRNR", player, now, date, total);
+    }
 }
-
-
 

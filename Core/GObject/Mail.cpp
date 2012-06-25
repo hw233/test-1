@@ -294,7 +294,9 @@ Mail * MailBox::newItemPackageMail(const char * title, const char * content, lua
 		++ cnt;
 	}
 	MailItemsInfo itemsInfo(mitem, Activity, cnt);
-	Mail *pmail = newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+    //XXX: all gold from mail will be free
+	//Mail *pmail = newMail(NULL, 0x21, title, content, 0xFFFE0000, true, &itemsInfo);
+	Mail *pmail = newMail(NULL, 0x21, title, content, 0xFFFD0000, true, &itemsInfo);
 	if(pmail != NULL)
 	{
 		UInt16 itemId;
