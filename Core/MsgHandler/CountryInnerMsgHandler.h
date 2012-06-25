@@ -1380,4 +1380,19 @@ void OnAddItemByIDIP( GameMsgHdr& hdr, const void* data )
 
 }
 
+void OnSendRNR( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    struct SendRNR
+    {     
+        Player* player;
+        UInt32 off;
+        UInt32 date;
+        UInt32 total;
+    };
+    SendRNR* rnr = (SendRNR*)data;
+    GameAction()->sendRNR(rnr->player, rnr->off, rnr->date, rnr->total);
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
+

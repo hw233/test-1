@@ -1333,18 +1333,32 @@ function onTurnOnRF7Day(player, total, offset)
     return true
 end
 
-function onEnchantAct(player, level)
-    local pic = {1416, 1417, 1418, 1419, 1420};
-    local rand = math.random(1, #pic);
-    local rand2 = math.random(1, #pic);
-    local rand3 = math.random(1, #pic);
-    local items = {
-        [4] = {502,1,1},
-        [6] = {509,2,1},
-        [8] = {509,5,1, pic[rand],1,1, 30,1,1},
-        [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
-    };
-    sendItemPackageMail(player, msg_46, msg_46, items[level]);
+function onEnchantAct(player, level, _type)
+    if isFBVersion() then
+        local pic = {1416, 1417, 1418, 1419, 1420};
+        local rand = math.random(1, #pic);
+        local rand2 = math.random(1, #pic);
+        local rand3 = math.random(1, #pic);
+        local items = {
+            [4] = {502,1,1},
+            [6] = {509,2,1},
+            [8] = {509,5,1, pic[rand],1,1, 30,1,1},
+            [10] = {509,15,1, pic[rand],1,1, pic[rand2],1,1, pic[rand3],1,1, 30,3,1},
+        };
+        sendItemPackageMail(player, msg_46, msg_46, items[level]);
+    else
+        local items = {
+            [0] = {
+                [8] = {509,3,1, 503,3,1, 500,3,1},
+                [10] = {509,6,1, 503,6,1, 500,6,1},
+            },
+            [1] = {
+                [8] = {509,1,1, 503,1,1, 500,1,1},
+                [10] = {509,3,1, 503,3,1, 500,3,1},
+            },
+        };
+        sendItemPackageMail(player, msg_93, msg_94, items[_type][level]);
+    end
 end
 
 function onEnchantGt11(player, id, level, _type)
@@ -1406,5 +1420,50 @@ function June(player, lootlvl)
         local package = player:GetPackage();
         package:AddItem(9028, 1, true, 0, 40);
     end
+end
+
+function sendRNR(player, off, date, total)
+    local rm = os.date("%m", date)
+    local rd = os.date("%d", date)
+    local title = string.format(msg_91, rm, rd, off+1)
+
+    local rorate = {[0]=50,[1]=30,[2]=20,}
+    local ror = rorate[off]
+    if ror == nil then
+        return
+    end
+
+    local cal = {99,199,399,699,1099,1599,2199,2899,3699,4599,5599,6799,8199,9799,11599,13599,15899,18499,21399,24599,28199,32199,36699,41699,47299,53499,60399,67999,76399,85899,99999,}
+    local rate = {5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,}
+
+    local i = 0
+    local sz = #cal
+    for n=1,sz do
+        if total >= cal[n] then
+            i = n
+        end
+    end
+
+    if i == 0 then
+        return
+    end
+
+    local r = rate[i]
+    if r == nil then
+        return
+    end
+
+    local f = math.floor(total * (r/100) * (rorate[0]/100))
+    local s = math.floor(total * (r/100) * (rorate[1]/100))
+    local t = math.ceil(total * (r/100)) - (f + s)
+    local ms = {f, s, t}
+
+    local m = ms[off+1]
+    if m == nil then
+        return
+    end
+    local ctx = string.format(msg_92, rm, rd, total, off+1, m)
+
+    sendItemPackageMail(player, title, ctx, {0xB000,m,1});
 end
 

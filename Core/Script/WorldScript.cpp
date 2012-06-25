@@ -113,6 +113,9 @@ void WorldScript::init()
 	def("getJune", GObject::World::getJune);
 	def("setJune1", GObject::World::setJune1);
 	def("getJune1", GObject::World::getJune1);
+	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
+	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
+	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

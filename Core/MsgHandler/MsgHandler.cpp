@@ -35,7 +35,7 @@ bool MsgHandler::ProcessMsg()
 				{
 					ihdr->msgHdr.desWorkerID = tid;
 					GLOBAL().PushMsg(*ihdr, ihdr + 1);
-					GLOBAL().FreeMsgBlock((char *)hdr);
+                    delete[] (char *)hdr;
 					continue;
 				}
 			}
@@ -52,7 +52,7 @@ bool MsgHandler::ProcessMsg()
 		{
 			//Error
 		}
-        GLOBAL().FreeMsgBlock((char *)hdr);
+        delete[] (char *)hdr;
 	}
 	while (!msgQueue.Empty());
 	return true;

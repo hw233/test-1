@@ -591,6 +591,7 @@ CREATE TABLE `fighter` (
   `attrValue2` smallint(5) unsigned NOT NULL DEFAULT '0',
   `attrType3` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `attrValue3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `fashion` int(10) unsigned NOT NULL DEFAULT '0',
   `weapon` int(10) unsigned NOT NULL DEFAULT '0',
   `armor1` int(10) unsigned NOT NULL DEFAULT '0',
   `armor2` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1395,6 +1396,12 @@ CREATE TABLE IF NOT EXISTS `real_item_award` (
     `cd` int(10) unsigned NOT NULL DEFAULT '0',
     `card_no` varchar(255) NOT NULL,
     `card_psw` varchar(255) NOT NULL,
+    PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `rechargenextret` (
+    `id` bigint(20) unsigned NOT NULL,
+    `record` varchar(1024) NOT NULL,
     PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

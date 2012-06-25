@@ -501,11 +501,11 @@ namespace GData
 			case Item_Armor5:
 			case Item_Ring:
 			case Item_Amulet:
-			// case Item_Mounts: // XXX:
 				{
 					wt = new ItemEquipType(idt.typeId, idt.name, idt.attrExtra);
 				}
 				break;
+			case Item_Fashion: // XXX:
 			case Item_Trump:
 				{
 					wt = new ItemTrumpType(idt.typeId, idt.name, idt.attrExtra);

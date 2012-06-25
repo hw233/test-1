@@ -1036,12 +1036,14 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     }
     pl->sendDeamonAwardsInfo();
 
+    UInt32 now = TimeUtil::Now();
     pl->GetHeroMemo()->sendHeroMemoInfo();
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
-    pl->sendRC7DayInfo(TimeUtil::Now());
-    pl->sendRF7DayInfo(TimeUtil::Now());
+    pl->sendRechargeNextRetInfo(now);
+    pl->sendRC7DayInfo(now);
+    pl->sendRF7DayInfo(now);
     pl->sendMDSoul(0);
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
@@ -1057,71 +1059,64 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
         {
             Stream st(REP::OFFLINEEXP);
             st << pl->GetVar(VAR_OFFLINE_EXP) << static_cast<UInt32>(pl->GetVar(VAR_OFFLINE_PEXP)*pl->getMainFighter()->getPracticeInc()*0.8f);
-#if 0
+#ifndef _FB
             UInt32 equip = pl->GetVar(VAR_OFFLINE_EQUIP);
             if(equip)
             {
-                UInt8 dayCnt = static_cast<UInt8>(equip / (24 * 3600));
+                UInt32 dayCnt = equip / (24 * 3600);
                 UInt8 lvl = pl->GetLev();
-                UInt16 equipId = 0;
-                UInt16 needCnt = 0;
+                GData::LootResult lr;
 
+                pl->_equipAward.clear();
                 if(dayCnt > 365)
-                    needCnt = 365;
-                if(dayCnt < 7)
-                    needCnt = 0;
-                else if(dayCnt < 14)
-                    needCnt = 1;
-                else if(dayCnt < 21)
-                    needCnt = 3;
-                else if(dayCnt < 30)
-                    needCnt = 5;
-                else
-                    needCnt = 7 + (dayCnt - 30) * 2;
-                if (pl->GetPackage()->GetRestPackageSize() < needCnt)
-                {
-                    pl->sendMsgCode(0, 1011);
-                    return;
-                }
-
-                st << needCnt;
+                    dayCnt = 365;
                 if(dayCnt >= 7)
                 {
-                    equipId = getRandOEquip(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
+                    lr.id = getRandOEquip(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
                 }
                 if(dayCnt >= 14)
                 {
-                    equipId = getRandOEquip(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
-                    equipId = GameAction()->getRandTrump(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
+                    lr.id = getRandOEquip(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                    lr.id = GameAction()->getRandTrump(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
                 }
                 if(dayCnt >= 21)
                 {
-                    equipId = getRandOEquip(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
-                    equipId = GameAction()->getRandTrump(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
+                    lr.id = getRandOEquip(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
+                    lr.id = GameAction()->getRandTrump(lvl);
+                    lr.count = 1;
+                    pl->_equipAward.push_back(lr);
                 }
-                int times = dayCnt / 30;
-                while(times--)
+                if(dayCnt >= 30)
                 {
-                    equipId = getRandOEquip(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
-                    equipId = GameAction()->getRandTrump(lvl);
-                    pl->GetPackage()->AddItem(equipId, 1, true);
-                    st << equipId;
+                    int times = dayCnt / 30;
+                    while(times--)
+                    {
+                        lr.id = getRandOEquip(lvl);
+                        lr.count = 1;
+                        pl->_equipAward.push_back(lr);
+                        lr.id = GameAction()->getRandTrump(lvl);
+                        lr.count = 1;
+                        pl->_equipAward.push_back(lr);
+                    }
                 }
-                pl->SetVar(VAR_OFFLINE_EQUIP, 0);
-            }
+                st << static_cast<UInt8>(pl->_equipAward.size());
+                for(UInt16 i = 0; i < pl->_equipAward.size(); i++)
+                {
+                    st << pl->_equipAward[i].id;
+                }
+#else
+                st << static_cast<UInt8>(0);
 #endif
+            }
+
             st<< Stream::eos;
             pl->send(st);
         }
@@ -1382,11 +1377,11 @@ void OnFighterEquipReq( GameMsgHdr& hdr, FighterEquipReq& fer )
 		return;
 	if(fer._part == 0)
 	{
-		static UInt8 p[11] = {0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
-		ItemEquip * e[11] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+		static UInt8 p[12] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x50, 0x51, 0x52};
+		ItemEquip * e[12] = {fgt->getFashion(), fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
             fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
             fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
-		fgt->sendModification(11, p, e, false);
+		fgt->sendModification(12, p, e, false);
 		return;
 	}
 

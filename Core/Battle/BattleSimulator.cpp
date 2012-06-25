@@ -295,6 +295,15 @@ void BattleSimulator::start(UInt8 prevWin)
 
                     UInt8 clsnsex = bf->getFighter()->getClassAndSex();
                     UInt16 portrait = 0;
+
+                    if (bf->getFighter()->getFashionTypeId() == 1700 || bf->getFighter()->getFashionTypeId() == 1701)
+                    {
+                        if (bf->getFighter()->isMale())
+                            portrait = 1072;
+                        else
+                            portrait = 1072;
+                    }
+
                     if(bf->getBuffData(FIGHTER_BUFF_CRMASGIRL, now))
                         portrait = 1058;
                     else if(bf->getBuffData(FIGHTER_BUFF_DRESS, now))
@@ -332,7 +341,10 @@ void BattleSimulator::start(UInt8 prevWin)
                         portrait = 6;
                     }
                     else
-                        portrait = bf->getPortrait();
+                    {
+                        if (!portrait)
+                            portrait = bf->getPortrait();
+                    }
 
 					if(bf->getFighter()->isNpc())
 						_packet << static_cast<UInt8>(bf->getFighter()->reqFriendliness);
