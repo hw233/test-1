@@ -763,9 +763,16 @@ namespace GObject
                                 break;
                             }
                         }
-                        equip = new ItemTrump(id, itype, edata);
-                        if (equip && equip->getItemEquipData().enchant)
-                            ((ItemTrump*)equip)->fixSkills();
+                        if (itype->subClass == Item_Fashion)
+                        {
+                            equip = new ItemFashion(id, itype, edata);
+                        }
+                        else
+                        {
+                            equip = new ItemTrump(id, itype, edata);
+                            if (equip && equip->getItemEquipData().enchant)
+                                ((ItemTrump*)equip)->fixSkills();
+                        }
                     }
                     break;
 				default:
@@ -2011,6 +2018,44 @@ namespace GObject
                 GameAction()->onEnchantAct(player, level);
         }
     }
+#else
+    void enchantAct(Player* player, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type)
+    {
+        if (quality == 0) // 防具
+        {
+            if (type)
+            {
+                if (level == 8)
+                    GameAction()->onEnchantAct(player, level, 1);
+                if (level == 10)
+                    GameAction()->onEnchantAct(player, level, 1);
+            }
+            else
+            {
+                if (slevel < 8 && level >= 8)
+                    GameAction()->onEnchantAct(player, level, 1);
+                if (slevel < 10 && level >= 10)
+                    GameAction()->onEnchantAct(player, level, 1);
+            }
+        }
+        else if (quality == 1) // 武器
+        {
+            if (type)
+            {
+                if (level == 8)
+                    GameAction()->onEnchantAct(player, level, 0);
+                if (level == 10)
+                    GameAction()->onEnchantAct(player, level, 0);
+            }
+            else
+            {
+                if (slevel < 8 && level >= 8)
+                    GameAction()->onEnchantAct(player, level, 0);
+                if (slevel < 10 && level >= 10)
+                    GameAction()->onEnchantAct(player, level, 0);
+            }
+        }
+    }
 #endif
     void enchantGt11(Player* player, UInt16 id, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type, UInt8 _class)
     {
@@ -2299,6 +2344,10 @@ namespace GObject
                 enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #ifdef _FB
             if (World::getEnchantAct() && (equip->getClass() == Item_Weapon || equip->getClass() == Item_Armor1 || equip->getClass() == Item_Armor2 || equip->getClass() == Item_Armor4 || equip->getClass() == Item_Armor5))
+                enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+#else
+            UInt8 platform = atoi(m_Owner->getDomain().c_str());
+            if (World::getEnchantAct() && platform == 10)
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #endif
 
@@ -2791,7 +2840,7 @@ namespace GObject
 
         if(IsEquip(t.subClass))
         {
-            if(t.subClass == Item_Trump)
+            if(t.subClass == Item_Trump || t.subClass == Item_Fashion)
             {
                 UInt32 n = m_Owner->GetVar(VAR_SPLIT_THRUMP);
                 n ++ ;
@@ -3729,7 +3778,7 @@ namespace GObject
 		ItemEquip * equip = FindEquip(fgt, pos, fighterId, itemId);
 		if (equip == NULL) return 2;
 		ItemEquipData& ied = equip->getItemEquipData();
-        if(equip->GetItemType().subClass == Item_Trump && ied.tRank < 1)
+        if((equip->GetItemType().subClass == Item_Trump || equip->GetItemType().subClass == Item_Fashion) && ied.tRank < 1)
             return 2;
 		bool isBound = equip->GetBindStatus();
 		switch(equip->getQuality())
@@ -3779,7 +3828,7 @@ namespace GObject
         UInt8 crr = equip->GetCareer();
 
         UInt8 equip_t = EQUIPTYPE_EQUIP;
-        if(equip->GetItemType().subClass == Item_Trump)
+        if(equip->GetItemType().subClass == Item_Trump || equip->GetItemType().subClass == Item_Fashion)
         {
             equip_t = EQUIPTYPE_TRUMP;
             lv = ied.tRank;
@@ -4010,7 +4059,8 @@ namespace GObject
             return 2;
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
 		ItemEquip * item = FindEquip(fgt, pos, 0, itemId);
-		if(trump == NULL || trump->getClass() != Item_Trump || item == NULL || item->getClass() != Item_Trump)
+		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion)
+                || item == NULL || (item->getClass() != Item_Trump && item->getClass() != Item_Fashion))
 			return 2;
 
 		bool isBound = item->GetBindStatus();
@@ -4159,7 +4209,7 @@ namespace GObject
 		Fighter * fgt = NULL;
 		UInt8 pos = 0;
 		ItemEquip * trump = FindEquip(fgt, pos, fighterId, trumpId);
-		if(trump == NULL || trump->getClass() != Item_Trump)
+		if(trump == NULL || (trump->getClass() != Item_Trump && trump->getClass() != Item_Fashion))
 			return 2;
 
         UInt8 q = trump->getQuality();

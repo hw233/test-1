@@ -3730,7 +3730,7 @@ function ItemNormal_00009053(iid, num, bind, param)
 
     package:AddItem(item, 1, 1, 0, 2)
     if broad[k] == 1 then
-        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_93.."[4:8]"..msg_94.."[4:"..item.."]x1");
+        Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_95.."[4:8]"..msg_96.."[4:"..item.."]x1");
     end
 
     rand = math.random(1,100)

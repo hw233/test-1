@@ -353,6 +353,8 @@ public:
 	UInt32 getAmuletId();
 	UInt32 getRingId();
 
+	UInt32 getFashionTypeId();
+
 	UInt16 getWeaponAttack();
 	void getArmorDefendAndHP(UInt16& def, UInt16& hp);
     inline void setColor(UInt8 color) { _color = color; }

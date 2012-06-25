@@ -152,6 +152,11 @@ UInt32 Fighter::getFashionId()
 	return _fashion ? _fashion->getId() : 0;
 }
 
+UInt32 Fighter::getFashionTypeId()
+{
+	return _fashion ? _fashion->GetTypeId() : 0;
+}
+
 UInt32 Fighter::getWeaponId()
 {
 	return _weapon ? _weapon->getId() : 0;

@@ -24,6 +24,7 @@ namespace GObject
 		const GData::ItemBaseType& GetItemType() const { return *_itemBaseType; }
 
 		inline ItemClass	getClass() const { return _itemBaseType->subClass; }
+		inline UInt16 GetTypeId() const { return _itemBaseType->getId(); }
 		inline const std::string& getName() const   { return _itemBaseType->getName();	 }
 		inline UInt8		getQuality() const { return _itemBaseType->quality; }
 		inline UInt16		getReqLev() const { return _itemBaseType->reqLev; }

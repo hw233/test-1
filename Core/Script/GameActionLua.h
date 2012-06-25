@@ -216,7 +216,7 @@ namespace Script
         void onFrontMapFloorWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
         void onFrontMapWin( Player* player, UInt8 id, UInt8 spot, UInt8 lootlvl);
 		void onEnchant(Player* player, UInt8 level);
-		void onEnchantAct(Player* player, UInt8 level);
+		void onEnchantAct(Player* player, UInt8 level, UInt8 type = 0);
 		void onEnchantGt11(Player* player, UInt16 id, UInt8 level, UInt8 type);
 		void onTrainFighterAct(Player* player, Fighter* fgt);
 		void onTopup(Player* player, UInt32 ogold, UInt32 ngold);
