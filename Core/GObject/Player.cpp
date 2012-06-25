@@ -2072,7 +2072,7 @@ namespace GObject
                 fgt->equipSoulSkill(k, 0);
 
 			ItemEquip * equip;
-			for(UInt8 z = 1; z < 9; ++ z)
+			for(UInt8 z = 0; z < 9; ++ z)
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x50, equip, true);
