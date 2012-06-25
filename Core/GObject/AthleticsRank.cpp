@@ -1187,7 +1187,7 @@ void AthleticsRank::TmExtraAward()
 	AthleticsList::iterator end = start;
     size_t awardCnt = 10;
 
-    if(World::getMergeAthAct())
+    if(cfg.merged && World::getMergeAthAct())
     {
         awardCnt = 30;
     }

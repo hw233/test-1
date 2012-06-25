@@ -81,7 +81,6 @@ GMHandler::GMHandler()
 	Reg(3, "super", &GMHandler::OnSuper);
 	Reg(3, "spawn", &GMHandler::OnSpawn);
 	Reg(3, "unspawn", &GMHandler::OnUnspawn);
-    Reg(3, "moneyarena", &GMHandler::OnAddMoneyArena);
 
 	Reg(3, "playerwallow", &GMHandler::OnPlayerWallow);
 	Reg(3, "wallow", &GMHandler::OnWallow);
@@ -582,21 +581,17 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 				player->getPrestige(val);
             }
             break;
-		}
-	}
-}
 
-void GMHandler::OnAddMoneyArena( GObject::Player * player, std::vector<std::string>& args )
-{
-	if(args.size() < 1)
-		return;
-	if(args.size() == 1)
-	{
-		UInt32 val = atoi(args[0].c_str());
-		if(val == 0)
-			return;
-		player->AddVar(VAR_MONEY_ARENA, val);
-        std::cout << "moneyarena: " << val << std::endl;
+        case 11:
+			{
+				UInt32 val = atoi(args[1].c_str());
+				if(val == 0)
+					return;
+				player->getMoneyArena(val);
+            }
+            break;
+
+		}
 	}
 }
 

@@ -3561,6 +3561,18 @@ namespace GObject
 		sendModification(3, _playerData.tael);
 	}
 
+	UInt32 Player::getMoneyArena( UInt32 c )
+	{
+        UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);
+		if(c == 0)
+			return moneyArena;
+		moneyArena += c;
+		SYSMSG_SENDV(164, this, c);
+		SYSMSG_SENDV(1064, this, c);
+        SetVar(VAR_MONEY_ARENA, moneyArena);
+		return _playerData.coupon;
+	}
+
 	UInt32 Player::useMoneyArena( UInt32 a,ConsumeInfo * ci )
 	{
         UInt32 moneyArena = GetVar(VAR_MONEY_ARENA);

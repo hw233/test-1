@@ -250,18 +250,6 @@ function onActivityCheck(tm)
           setRechargeActive(false, 4)
       end
 
-      if tm >= actTime113 and tm < actTime114 then
-          setMergeAthAct(true)
-      else
-          setMergeAthAct(false)
-      end
-
-      if tm >= actTime115 and tm < actTime116 then
-          setFourCopAct(true)
-      else
-          setFourCopAct(false)
-      end
-
       setShuoShuo(false);
   else
       if tm >= actTime33 and tm < actTime34 then
@@ -334,6 +322,18 @@ function onActivityCheck(tm)
           is_6_25 = true
       else
           is_6_25 = false
+      end
+
+      if tm >= actTime113 and tm < actTime114 then
+          setMergeAthAct(true)
+      else
+          setMergeAthAct(false)
+      end
+
+      if tm >= actTime115 and tm < actTime116 then
+          setFourCopAct(true)
+      else
+          setFourCopAct(false)
       end
 
       setShuoShuo(true);
