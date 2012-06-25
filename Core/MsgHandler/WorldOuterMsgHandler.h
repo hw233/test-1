@@ -1397,21 +1397,7 @@ void OnLineupCommited( ArenaMsgHdr& hdr, const void * data )
 void OnArenaPriliminary( ArenaMsgHdr& hdr, const void * data )
 {
 	BinaryReader br(data, hdr.msgHdr.bodyLen);
-	UInt64 playerId = 0;
-	UInt8 won = 0;
-	UInt8 type = 0;
-	UInt8 heroId = 0;
-	std::string name;
-	UInt32 btime;
-	UInt32 bid;
-	br >> playerId >> won >> type >> heroId >> name >> btime >> bid;
-	GObject::Player * player = GObject::globalPlayers[playerId];
-	if(player == NULL)
-		return;
-	GObject::arena.pushPriliminary(player, won, type, heroId, name, btime, bid);
-	Stream st(REP::ARENAPRILIMINARY);
-	st << static_cast<UInt8>(1) << won << type << heroId << name << btime << bid << Stream::eos;
-	player->send(st);
+    GObject::arena.pushPriliminary(br);
 }
 
 void OnPriliminaryInfo( ArenaMsgHdr& hdr, const void * data )
@@ -1469,7 +1455,7 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
     case 5:
     case 6:
     case 7:
-        GObject::arena.sendElimination(player, air.flag);
+        GObject::arena.sendElimination(player, air.type-4, air.flag);
         break;
     }
 	//GObject::arena.sendInfo(player);
@@ -1478,7 +1464,7 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
 void OnArenaEliminationReq( GameMsgHdr&hdr, ArenaEliminationReq& aer )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::arena.sendElimination(player, aer.group);
+	//GObject::arena.sendElimination(player, aer.group);
 }
 
 void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
@@ -1499,13 +1485,24 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 		break;
 	case 2:
 		{
-			UInt8 pos = 0, tael = 0;
-			brd >> pos >> tael;
-			if(tael > 0)
+            UInt8 state = 0, group = 0, tael = 0;
+            UInt16 pos = 0;
+			brd >> state >> tael >> pos >> group;
+			//if(tael > 0)
 			{
-				UInt8 r = GObject::arena.bet(player, (pos >> 5) - 1, pos & 0x1F, tael);
+                UInt8 r = 0;
+                if(player->getTael() < 500 && tael == 1)
+                    r = 3;
+                else if(player->getGold() < 5 && tael == 0)
+                    r = 4;
+                else
+                {
+                    r = GObject::arena.bet(player, state, group, pos, tael);
+                    if(r == 0xFF)
+                        break;
+                }
 				Stream st(REP::SERVER_ARENA_OP);
-				st << type << r << pos << tael << Stream::eos;
+				st << type << r << state << pos << group << Stream::eos;
 				player->send(st);
 			}
 		}

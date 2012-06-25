@@ -826,7 +826,9 @@ struct DBArenaBet
 {
 	UInt64 id;
 	UInt8 round;
+	UInt8 state;
 	UInt8 group;
+	UInt8 recieved;
 	UInt8 pos;
 	UInt8 tael;
 };
@@ -1959,11 +1961,13 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBArenaBet)
-SPECIALDEF(5)
+SPECIALDEF(7)
 (
 	UInt64, id,
 	UInt8, round,
+	UInt8, state,
 	UInt8, group,
+	UInt8, recieved,
 	UInt8, pos,
 	UInt8, tael
 )

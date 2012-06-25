@@ -70,6 +70,7 @@ enum PurchaseType
     Discount5,
     Discount8,
     LuckyDraw,
+    ArenaBet,
 };
 
 enum IncomingType

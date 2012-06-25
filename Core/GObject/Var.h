@@ -161,6 +161,10 @@ namespace GObject
         VAR_CTSAWARDRF = 125, // 回流后七天登陆抽奖
         VAR_CLAWARDRF = 126, // 回流后七天连续登陆奖励
         VAR_CL3DAYRF = 127, // 回流后七天连接三天登陆奖励
+
+        VAR_MONEY_ARENA = 128, // 剑魂
+        VAR_MONEY_ARENA2 = 129, // 入围赛获得剑魂
+        VAR_MONEY_ARENA3 = 130, // 32强赛获得剑魂
         VAR_MAX,
     };
 
@@ -314,6 +318,10 @@ namespace GObject
             REGISTER_VAR(VAR_CTSAWARDRF, CYCLE_DAY);
             REGISTER_VAR(VAR_CLAWARDRF, CYCLE_DAY);
             REGISTER_VAR(VAR_CL3DAYRF, CYCLE_NONE);
+
+            REGISTER_VAR(VAR_MONEY_ARENA, CYCLE_NONE);
+            REGISTER_VAR(VAR_MONEY_ARENA2, CYCLE_WEEK);
+            REGISTER_VAR(VAR_MONEY_ARENA3, CYCLE_WEEK);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

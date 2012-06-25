@@ -675,7 +675,7 @@ namespace ARENAREQ
     const UInt8 ENTER               = 0x02;
     const UInt8 COMMIT_LINEUP       = 0x03;
     const UInt8 BET                 = 0x07;
-    const UInt8 BATTLE_REPORT       = 0x90;
+    const UInt8 BATTLE_REPORT       = 0x08;
 }
 
 #endif // _MSGID_H_

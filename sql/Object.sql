@@ -61,10 +61,12 @@ DROP TABLE IF EXISTS `arena_bet`;
 CREATE TABLE `arena_bet` (
   `id` bigint(20) unsigned NOT NULL,
   `round` tinyint(3) unsigned NOT NULL,
+  `state` tinyint(3) unsigned NOT NULL,
   `group` tinyint(3) unsigned NOT NULL,
+  `recieved` tinyint(3) unsigned NOT NULL,
   `pos` tinyint(3) unsigned NOT NULL,
   `tael` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`id`,`round`)
+  PRIMARY KEY (`id`,`state`,`round`,`group`,`pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -22,8 +22,10 @@ struct PriliminaryBattle
 
 struct BetInfo
 {
+	UInt8 state;
 	UInt8 round;
 	UInt8 group;
+	UInt8 recieved;
 	UInt16 pos;
 	UInt8 type;
 };
@@ -33,23 +35,8 @@ struct ArenaPlayer
 	ArenaPlayer(): group(0xFF) {}
 	UInt8 group;
 	std::string realName;
-	std::vector<PriliminaryBattle> battles;
-	std::vector<BetInfo> betList;
-};
-
-struct PreliminaryPlayer
-{
-	UInt64 id;
-    UInt8 level;
-    UInt8 heroId;
-    UInt32 battlePoint;
-    UInt32 support;
-    std::string name;
-	std::map<Player *, UInt8> betMap;
-	PreliminaryPlayer(): id(0), level(0), battlePoint(0), support(0)
-	{}
-	void calcBet(bool, const char *);
-	void resetBet();
+	std::vector<PriliminaryBattle> battles[2];
+	std::vector<BetInfo> betList[7];
 };
 
 struct EliminationPlayer
@@ -67,6 +54,8 @@ struct EliminationPlayer
 	void resetBet();
 };
 
+typedef EliminationPlayer PreliminaryPlayer;
+
 struct EliminationBattle
 {
     UInt8 wonFlag;
@@ -80,23 +69,27 @@ struct EliminationBattle
 	}
 };
 
+typedef std::list<PreliminaryPlayer> PreliminaryPlayerList;
+typedef PreliminaryPlayerList::iterator PreliminaryPlayerListIterator;
+typedef std::map<UInt64, PreliminaryPlayerListIterator> PreliminaryPlayerListMap;
+
 class Arena
 {
 public:
 	Arena();
 
-	inline bool active() { return _loaded && (_session != 0x8001 || _progress != 0); }
+	inline bool active() { return _loaded && (_session != 0x8001 || (_progress != 0)); }
 	inline void getPlayerCount(UInt32 * pc) { pc[0] = _playerCount[0]; pc[1] = _playerCount[1]; pc[2] = _playerCount[2]; }
 
 	static void enterArena(Player * player);
 	static void commitLineup(Player * player, int);
-	UInt8 bet(Player * player, UInt8, UInt16, UInt8);
+    UInt8 bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
 	void readFrom(BinaryReader&);
 	void sendInfo(Player * player);
-	void sendElimination(Player * player, UInt8);
+	void sendElimination(Player * player, UInt8, UInt8);
 	void push(Player * player, UInt8, const std::string&);
-	void pushPriliminary(Player * player, UInt8, UInt8, UInt8, const std::string&, UInt32, UInt32);
-	void pushBetFromDB(Player * player, UInt8, UInt8, UInt16, UInt8);
+	void pushPriliminary(BinaryReader& br);
+    void pushBetFromDB( Player * player, UInt8 round, UInt8 state, UInt8 group, UInt8 recieved, UInt16 pos, UInt8 type );
 	void pushPriliminaryCount(UInt32 *);
 	void check();
 
@@ -105,6 +98,7 @@ public:
     void readHistories(BinaryReader& brd);
     void readElimination(BinaryReader& brd);
     void calcFinalBet(int i);
+    void calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, bool won, const char * t);
 
     void sendActive(Player* pl);
     void sendStatus(Player* pl);
@@ -143,7 +137,8 @@ private:
     EliminationPlayer _finals[2][32];
 	UInt64 _finalIdx[2][6][32];
 	EliminationBattle _finalBattles[2][31];
-    std::map<UInt64, PreliminaryPlayer> _preliminaryPlayers[2];
+    PreliminaryPlayerListMap _preliminaryPlayers[2];
+    PreliminaryPlayerList _preliminaryPlayers_list[2];
 };
 
 extern Arena arena;

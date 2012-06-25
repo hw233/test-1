@@ -3578,7 +3578,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading Arena Bets");
 		DBArenaBet ab;
-		if(execu->Prepare("SELECT `id`, `round`, `group`, `pos`, `tael` FROM `arena_bet` ORDER BY `id`", ab)!= DB::DB_OK)
+		if(execu->Prepare("SELECT `id`, `round`, `state`, `group`, `recieved`, `pos`, `tael` FROM `arena_bet` ORDER BY `id`", ab)!= DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -3593,7 +3593,7 @@ namespace GObject
 			}
 			if (pl == NULL)
 				continue;
-			arena.pushBetFromDB(pl, ab.round, ab.group, ab.pos, ab.tael);
+			arena.pushBetFromDB(pl, ab.round, ab.state, ab.group, ab.recieved, ab.pos, ab.tael);
 		}
 		lc.finalize();
 
