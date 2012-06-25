@@ -21,7 +21,7 @@ int main()
 {
     int clientSock, nRecvBytes = -1;
     sockaddr_in  sa;
-    char jason[] = "123456789123456789123456789123456789{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"3\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\"szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\"uiAreaId\":1,\"playerId\":5}}";
+    char jason[] = "123456789123456789123456789123456789{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"3\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\"szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\"uiAreaId\":1,\"playerId\":1111}}";
     unsigned char buffer[1024] = {0, 0, 0xCC, 1, 0x1D};
     *(short*)(buffer) = strlen(jason) + 2;
     *(short*)(buffer + 5) = strlen(jason);

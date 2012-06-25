@@ -47,9 +47,9 @@ function is4_21()
     return is_4_21
 end
 
-is_6_25 = false 
-function is6_25()
-    return is_6_25
+is_6_22 = false 
+function is6_22()
+    return is_6_22
 end
 
 function onActivityCheck(tm)
@@ -319,9 +319,9 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime59 and tm < actTime60 then
-          is_6_25 = true
+          is_6_22 = true
       else
-          is_6_25 = false
+          is_6_22 = false
       end
 
       if tm >= actTime61 and tm < actTime62 then
@@ -385,7 +385,8 @@ function initActTime(y, m, d)
   -- 充值后期返利(过段时间反利)
   local  SerStartTm25= { ['year'] = 2012, ['month'] = 6, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 6.25限时购买
-  local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -486,10 +487,10 @@ function initActTime(y, m, d)
   setRechargeNextRetStart(actTime57, actTime58)
 
   actTime59 = os.time(SerStartTm26);
-  actTime60 = os.time(SerStartTm26) + 7 * 86400;
+  actTime60 = os.time(SerStartTm26) + 9 * 86400;
 
-  actTime61 = os.time(SerStartTm26);
-  actTime62 = os.time(SerStartTm26) + 6 * 86400;
+  actTime61 = os.time(SerStartTm27);
+  actTime62 = os.time(SerStartTm27) + 6 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
