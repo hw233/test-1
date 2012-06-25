@@ -1163,8 +1163,7 @@ void Arena::pushPriliminary(BinaryReader& br)
                     }
                 }
                 SYSMSGV(title, 714, p);
-                UInt32 award = 0;
-                award = player->GetVar(VAR_MONEY_ARENA2 + type - 1);
+                UInt32 award = score[type-1][0]*tloss + score[type-1][1]*twon;
                 SYSMSGV(content, 715, _session, p, twon, tloss, award);
                 player->GetMailBox()->newMail(NULL, 0x01, title, content);
             }
