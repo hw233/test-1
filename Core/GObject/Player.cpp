@@ -9976,18 +9976,7 @@ namespace GObject
             else
                 break;
         }
-#ifdef _FB
-        if (type == 1 && !GetVar(VAR_CTSAWARD))
-        {
-            GameAction()->onCLLoginReward(this, 0);
-            SetVar(VAR_CTSAWARD, 1);
-            Stream st(REP::RC7DAY);
-            st << static_cast<UInt8>(1);
-            st << Stream::eos;
-            send(st);
-            return;
-        }
-#else
+
         if (type == 1 && !GetVar(VAR_CTSAWARD))
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -9998,7 +9987,6 @@ namespace GObject
             send(st);
             return;
         }
-#endif
         if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
         {
             GameAction()->onCLLoginReward(this, cts);
