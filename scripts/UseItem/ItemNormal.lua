@@ -341,19 +341,7 @@ function ItemNormal_00000406(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(29, 10, 1);
 
-    local prob = {50, 100}
-    local items = {{9,1}, {15,1}}
-
-    local p = math.random(1, 100)
-    local i = 1
-    for n = 1, #prob do
-        if p <= prob[n] then
-            i = n
-            break
-        end
-    end
-
-    local item = items[i];
+    local item = {15, 1}
     reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
@@ -1133,7 +1121,7 @@ function ItemNormal_00000429(iid, num, bind, param)
 		return false;
 	end
 
-    local items = {{502,1},{504,1},{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},{9,1},{510,1},{55,2}}
+    local items = {{502,1},{504,1},{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},{15,1},{510,1},{55,2}}
 
     local i = math.random(1, #items)
     local t = math.random(1,100)
@@ -1814,7 +1802,7 @@ function ItemNormal_00000008(iid, num, bind, param)
         return false;
     end
     local prob = {15, 29, 32, 45, 53, 58, 73, 86, 98, 100,}
-    local items = {{9,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
+    local items = {{15,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
 
     local p = math.random(1, 100)
     local i = 1
@@ -2126,7 +2114,7 @@ function ItemNormal_00000019(iid, num, bind, param)
 		   package:AddEquip(2205, 1);
 		   package:AddEquip(2206, 1);
 		   package:AddEquip(2207, 1);
-		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(15, 1, 1, 0, 2);
 		   package:AddItem(1211, 1, 1, 0, 2);
 		   package:AddItem(20, 1, 1, 0, 2);
 		   player:getCoupon(40);
@@ -2187,7 +2175,7 @@ function ItemNormal_00000020(iid, num, bind, param)
                package:AddItem(1208, 1, 1, 0, 2);
            end
 
-		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(15, 1, 1, 0, 2);
 		   package:AddItem(55, 1, 1, 0, 2);
 		   package:AddItem(57, 1, 1, 0, 2);
 		   package:AddItem(21, 1, 1, 0, 2);
@@ -2243,7 +2231,7 @@ function ItemNormal_00000021(iid, num, bind, param)
                package:AddEquip(2238, 1);
                package:AddEquip(2239, 1);
            end
-		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(15, 1, 1, 0, 2);
 		   package:AddItem(507, 1, 1, 0, 2);
 		   package:AddItem(509, 1, 1, 0, 2);
 		   package:AddItem(510, 1, 1, 0, 2);
@@ -2334,7 +2322,7 @@ function ItemNormal_00000402(iid, num, bind, param)
         return false;
     end
     local prob = {10, 20, 22, 32, 47, 57, 77, 99, 100,}
-    local items = {{503,1}, {514,1}, {515,1}, {511,1}, {15,2}, {500,1}, {502,1}, {9,1}, {0,0},}
+    local items = {{503,1}, {514,1}, {515,1}, {511,1}, {15,2}, {500,1}, {502,1}, {15,1}, {0,0},}
 
     local p = math.random(1, 100)
     local i = 1
@@ -2367,7 +2355,7 @@ function ItemNormal_00000403(iid, num, bind, param)
         return false;
     end
     local prob = {10, 20, 22, 25, 40, 52, 72, 99, 100,}
-    local items = {{506,1}, {508,1}, {509,1}, {507,1}, {15,2}, {30,1}, {502,1}, {9,1}, {0,0},}
+    local items = {{506,1}, {508,1}, {509,1}, {507,1}, {15,2}, {30,1}, {502,1}, {15,1}, {0,0},}
 
     local p = math.random(1, 100)
     local i = 1
@@ -3146,8 +3134,8 @@ function ItemNormal_00000007(iid, num, bind, param)
     package:AddItem(509, 2, true, 0, 2);
     -- 补髓益元丹
     package:AddItem(507, 2, true, 0, 2);
-    -- 自动回血符
-    package:AddItem(9, 5, true, 0, 2);
+    -- 银票
+    package:AddItem(15, 5, true, 0, 2);
     -- 洗练符
     package:AddItem(500, 5, true, 0, 2);
     -- 洗练符保护符
@@ -3209,8 +3197,8 @@ function ItemNormal_00000067(iid, num, bind, param)
     package:AddItem(509, 2, true, 0, 2);
     -- 补髓益元丹
     package:AddItem(507, 2, true, 0, 2);
-    -- 自动回血符
-    package:AddItem(9, 5, true, 0, 2);
+    -- 银票
+    package:AddItem(15, 5, true, 0, 2);
     -- 洗练符
     package:AddItem(500, 5, true, 0, 2);
     -- 洗练符保护符
@@ -5322,7 +5310,7 @@ function ItemNormalOther_00000475(iid, num, bind, other)
         return false
     end
 
-    local items = {9, 514, 515, 500, 49, 503, 511, 517, 15}
+    local items = {15, 514, 515, 500, 49, 503, 511, 517, 15}
     local prob = {1700,3200,3300,4800,5200,5500,7100,8500,10000}
     local broad = {0,1,1,0,0,1,0,1,0}
     local item = 0
