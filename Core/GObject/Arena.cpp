@@ -466,7 +466,7 @@ void Arena::readFrom( BinaryReader& brd )
 			{
 				int cid, sid;
 				brd >> cid >> sid >> _finals[i][j].id >> _finals[i][j].color >> _finals[i][j].level >> _finals[i][j].lastRank >> _finals[i][j].name;
-				if(cfg.channelNum != cid || cfg.serverNum != sid)
+				if(cfg.channelNum != cid || cfg.serverNo != sid)
 					_finals[i][j].id = 0;
 				_finalIdx[i][0][j] = j;
 			}
@@ -1059,7 +1059,7 @@ void Arena::pushPriliminary(BinaryReader& br)
     }
 
     UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-    if(cid == cfg.channelNum && sid == cfg.serverNum)
+    if(cid == cfg.channelNum && sid == cfg.serverNo)
         ppid = pid;
 
 	GObject::Player * player = GObject::globalPlayers[ppid];
@@ -1163,8 +1163,7 @@ void Arena::pushPriliminary(BinaryReader& br)
                     }
                 }
                 SYSMSGV(title, 714, p);
-                UInt32 award = 0;
-                award = player->GetVar(VAR_MONEY_ARENA2 + type - 1);
+                UInt32 award = score[type-1][0]*tloss + score[type-1][1]*twon;
                 SYSMSGV(content, 715, _session, p, twon, tloss, award);
                 player->GetMailBox()->newMail(NULL, 0x01, title, content);
             }
@@ -1243,7 +1242,7 @@ void Arena::readPrePlayers(BinaryReader& brd)
             std::string name;
             brd >> cid >> sid >> pid >> heroId >> level >> battlePoint >> support >> name;
             UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-            if(cid == cfg.channelNum && sid == cfg.serverNum)
+            if(cid == cfg.channelNum && sid == cfg.serverNo)
                 ppid = pid;
             PreliminaryPlayer pp;
             pp.id = ppid;
@@ -1253,7 +1252,7 @@ void Arena::readPrePlayers(BinaryReader& brd)
             pp.battlePoint = battlePoint;
             pp.name = name;
             _preliminaryPlayers[i][ppid] = _preliminaryPlayers_list[i].insert(_preliminaryPlayers_list[i].end(), pp);
-            if(cid == cfg.channelNum && sid == cfg.serverNum)
+            if(cid == cfg.channelNum && sid == cfg.serverNo)
             {
                 std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
                 if(it == pm.end())
@@ -1310,7 +1309,7 @@ void Arena::readPlayers(BinaryReader& brd)
         std::string name;
         brd >> cid >> sid >> pid >> heroId >> level >> battlePoint >> support >> name;
         UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-        if(cid == cfg.channelNum && sid == cfg.serverNum)
+        if(cid == cfg.channelNum && sid == cfg.serverNo)
             ppid = pid;
         PreliminaryPlayer pp;
         pp.id = ppid;
@@ -1321,7 +1320,7 @@ void Arena::readPlayers(BinaryReader& brd)
         pp.name = name;
         _preliminaryPlayers[0][ppid] = _preliminaryPlayers_list[0].insert(_preliminaryPlayers_list[0].end(), pp);
 
-        if(cid == cfg.channelNum && sid == cfg.serverNum)
+        if(cid == cfg.channelNum && sid == cfg.serverNo)
         {
             std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
             if(it == pm.end())
@@ -1391,7 +1390,7 @@ void Arena::readElimination(BinaryReader& brd)
             UInt32 support = 0;
             std::string name;
             brd >> cid >> sid >> pid >> heroId >> level >> battlePoint >> support >> name;
-            if(cid == cfg.channelNum && sid == cfg.serverNum)
+            if(cid == cfg.channelNum && sid == cfg.serverNo)
             {
                 std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
                 if(it == pm.end())
@@ -1412,7 +1411,7 @@ void Arena::readElimination(BinaryReader& brd)
             UInt32 support = 0;
             brd >> cid >> sid >> _finals[i][j].id >> _finals[i][j].level>> _finals[i][j].heroId >> battlePoint >> support >> _finals[i][j].name;
             UInt64 ppid = _finals[i][j].id | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-            if(cfg.channelNum != cid || cfg.serverNum != sid)
+            if(cfg.channelNum != cid || cfg.serverNo != sid)
                 _finals[i][j].id = ppid;
             _finalIdx[i][0][j] = j;
             _finals[i][j].battlePoint = battlePoint;
@@ -2092,7 +2091,7 @@ void Arena::updateBattlePoint(BinaryReader& brd)
     UInt32 battlePoint = 0;
     brd >> cid >> sid >> pid >> battlePoint;
     UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
-    if(cid == cfg.channelNum && sid == cfg.serverNum)
+    if(cid == cfg.channelNum && sid == cfg.serverNo)
         ppid = pid;
 
     PreliminaryPlayerListMap::iterator pit0 = _preliminaryPlayers[0].find(ppid);

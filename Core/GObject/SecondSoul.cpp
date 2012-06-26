@@ -386,6 +386,7 @@ bool SecondSoul::setXinxiu(UInt8 xinxiu)
     m_xinxiu_hp = Script::BattleFormula::getCurrent()->calcSoulXinxiuHp(this);
     m_fgt->setDirty(true);
     m_fgt->getOwner()->sendMsgCode(0, 1078);
+    return true;
 }
 
 }

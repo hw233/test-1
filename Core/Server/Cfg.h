@@ -61,6 +61,7 @@ public:
 	std::string slugName;
 	int channelNum;
 	int serverNum;
+    int serverNo;
 
 	std::string arenaHost;
 	UInt16      arenaPort;
@@ -109,6 +110,7 @@ public:
     inline void setStateUrl(const char* url) { stateUrl = url; }
     inline void setWarZone(UInt16 zone) { warZone = zone; }
     inline void setServerNum(UInt32 no) { serverNum = no; }
+    inline void setServerNo(UInt32 no) { serverNo = no; }
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {
