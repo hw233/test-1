@@ -13,6 +13,7 @@
 #include "Common/StringTokenizer.h"
 #include "MsgID.h"
 #include "GData/ItemType.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -109,9 +110,18 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
                 {
                     if (!merge(logits, itemid, num))
                         logits.push_back(i);
+                    SYSMSG_BROADCASTV(2204, player->getCountry(), player->getName().c_str(), id, itemid);
                 }
             }
         }
+
+#ifdef _FB
+        if(WORLD().getJune())
+        {
+            GameMsgHdr hdr2(0x1C0, WORKER_THREAD_WORLD, player, sizeof(num));
+            GLOBAL().PushMsg(hdr2, &num);
+        }
+#endif
 
         UInt8 sz = its.size();
         st << static_cast<UInt8>(sz);

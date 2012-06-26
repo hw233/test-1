@@ -29,6 +29,11 @@ struct MoneyIn
     int prestige;
 };
 
+typedef std::list<Player*> LuckyDrawList;
+typedef LuckyDrawList::iterator LuckyDrawRank;
+typedef LuckyDrawList::reverse_iterator RLuckyDrawRank;
+typedef std::map<Player *, LuckyDrawRank> LuckyDrawRankList;
+
 class World:
 	public WorkerRunner<WorldMsgHandler>
 {
@@ -177,6 +182,16 @@ public:
     inline static bool getGemMergeAct()
     { return _gemmergeact; }
 
+
+    inline static void setJune(bool v)
+    { _june = v; }
+    inline static bool getJune()
+    { return _june; }
+    inline static void setJune1(bool v)
+    { _june1 = v; }
+    inline static bool getJune1()
+    { return _june1; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
 
@@ -185,6 +200,10 @@ public:
 	{ return _wday; }
 	static void makeActivityInfo(Stream &st);
 	void setWeekDay(UInt8 wday);
+
+    void RankLuckyDraw(Player* player, bool notify = true);
+    void SendLuckyDrawList(Player* player);
+    void SendLuckyDrawAward();
 
 public:
 	static void calWeekDay( World * world );
@@ -231,6 +250,8 @@ public:
     static bool _yellowdiamondact;
     static bool _qqgameact;
     static void* _recalcwd;
+    static bool _june;
+    static bool _june1;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
@@ -264,6 +285,8 @@ private:
 	UInt32 _today;
 	UInt32 _announceLast;
     std::vector<UInt32> _domain_nums;
+    LuckyDrawList _luckyDrawList;
+    LuckyDrawRankList _luckyDrawRankList;
 };
 
     void CreateNewDB(UInt32 mon = 0, UInt32 year = 2011);

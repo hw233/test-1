@@ -123,6 +123,13 @@ function onLogin(player)
     if getNetValentineDay() then
         onNVDLogin(player)
     end
+
+    if getJune() then
+        onJune(player)
+    end
+    if getJune1() then
+        onJune1(player)
+    end
 end
 
 function onNVDLogin(player)
@@ -151,9 +158,16 @@ function onLevelup(player, olev, nlev)
     if getMayDay1() then
         onMayDay1(player)
     end
+    if getJune() then
+        onJune(player)
+    end
+    if getJune1() then
+        onJune1(player)
+    end
 end
 
 function onDungeonWin(player, id, count)
+    June(player, 0);
 end
 
 function onClanBattleAttend(player)
@@ -807,6 +821,7 @@ function onCopyWin(player, id, floor, spot, lootlvl)
     WhiteLoveDay(player, lootlvl, 0)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
+    June(player, lootlvl);
     LuckyDrawBox(player, id)
 end
 
@@ -823,6 +838,7 @@ function onFrontMapWin(player, id, spot, lootlvl)
     WhiteLoveDay(player, lootlvl, 1)
     ChingMingDay(player, lootlvl)
     MayDay(player, lootlvl)
+    June(player, lootlvl);
 end
 
 local vippack = {
@@ -1262,5 +1278,47 @@ end
 function onTrainFighterAct(player, fgt)
     local table_items = {0xA000, 1200, 1};
     sendItemPackageMail(player, '散仙洗橙返利活动', '散仙洗橙返利活动', table_items)
+end
+
+function onJune(player)
+    if not getJune() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(111) == 0 then
+        sendItemPackageMail(player, "节日套装奖励", "恭喜您获得节日套装", {1756,1,1});
+        player:SetVar(111, 1)
+    end
+end
+
+function onJune1(player)
+    if not getJune1() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(110) == 0 then
+        sendItemPackageMail(player, "儿童节礼包", "恭喜您获得儿童节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9031,1,1});
+        sendItemPackageMail(player, "父亲节礼包", "恭喜您获得父亲节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9032,1,1});
+        sendItemPackageMail(player, "端午节礼包", "恭喜您获得端午节礼包，礼包在相应的日期打开可以获得双倍奖励哦！", {9033,1,1});
+        player:SetVar(110, 1)
+    end
+end
+
+function June(player, lootlvl)
+    if getJune() then
+        -- 棒棒糖
+        local package = player:GetPackage();
+        package:AddItem(9028, 1, true, 0, 40);
+    end
 end
 

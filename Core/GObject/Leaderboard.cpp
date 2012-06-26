@@ -26,6 +26,19 @@ struct LeaderboardItem
 	std::string clan;
 };
 
+struct LeaderboardItem2
+{
+	UInt64 id;
+	std::string name;
+    UInt8 pf;
+	UInt8 lvl;
+	UInt8 country;
+	UInt64 value;
+	std::string clan;
+};
+
+
+
 }
 
 namespace DB {
@@ -41,6 +54,19 @@ SPECIALDEF(6)
 	std::string, clan
 )
 SPECIALEND()
+
+SPECIALBEGIN(GObject::LeaderboardItem2)
+SPECIALDEF(6)
+(
+	UInt64, id,
+	std::string, name,
+	UInt8, lvl,
+	UInt8, country,
+	UInt64, value,
+	std::string, clan
+)
+SPECIALEND()
+
 
 }
 
@@ -68,6 +94,26 @@ void buildPacket(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem>& l
 	st << Stream::eos;
 }
 
+void buildPacket2(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem2>& list, bool merge = true)
+{
+	UInt8 c = static_cast<UInt8>(list.size());
+	st.init(REP::SORT_LIST);
+	st << t << id << c;
+	for(UInt8 i = 0; i < c; ++ i)
+	{
+		LeaderboardItem2& item = list[i];
+		if(merge)
+			Player::patchMergedName(item.id, item.name);
+        Player* pl = globalPlayers[item.id];
+        if (pl)
+            st << item.name << pl->getPF() << item.lvl << item.country << item.value << item.clan;
+        else
+            st << item.name << item.pf << item.lvl << item.country << item.value << item.clan;
+	}
+	st << Stream::eos;
+}
+
+
 void Leaderboard::update()
 {
 	doUpdate();
@@ -83,15 +129,16 @@ void Leaderboard::doUpdate()
 
 	std::vector<LeaderboardItem> blist;
 
-	blist.clear();
+	std::vector<LeaderboardItem2> blist2;
+	blist2.clear();
 	execu->ExtractData("SELECT `player`.`id`, `player`.`name`, `fighter`.`level`, `player`.`country`, `fighter`.`experience`, `clan`.`name` FROM"
 		" (`player` CROSS JOIN `fighter`"
 		" ON `player`.`id` = `fighter`.`playerId` AND `fighter`.`id` < 10)"
 		" LEFT JOIN (`clan_player`, `clan`)"
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
-		" LIMIT 0, 100", blist);
-	buildPacket(_levelStream, 0, _id, blist);
+		" LIMIT 0, 100", blist2);
+	buildPacket2(_levelStream, 0, _id, blist2);
 	if(!blist.empty())
 		_maxLevel = blist[0].lvl;
 

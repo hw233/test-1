@@ -37,6 +37,8 @@
 #include "ClanRankBattle.h"
 #include "ShuoShuo.h"
 #include "CFriend.h"
+#include "Common/Itoa.h"
+#include "Server/SysMsg.h"
 
 namespace GObject
 {
@@ -101,6 +103,8 @@ bool World::_bluediamondact = false;
 bool World::_yellowdiamondact = false;
 bool World::_qqgameact = false;
 void* World::_recalcwd = NULL;
+bool World::_june = false;
+bool World::_june1 = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -152,9 +156,13 @@ MayDaySortMap mayDaySortMap1;
 MayDaySortMap mayDaySortMap2;
 MayDaySortMap mayDaySortMap3;
 
+typedef std::multimap<UInt32, Player*> JuneSortMap;
+JuneSortMap juneSortMap;
+
 bool bSingleDayEnd = false;
 bool bValentineDayEnd = false;
 bool bMayDayEnd = false;
+bool bJuneEnd = false;
 
 bool enum_midnight(void * ptr, void *)
 {
@@ -205,6 +213,13 @@ bool enum_midnight(void * ptr, void *)
             mayDaySortMap3.insert(std::make_pair(num, pl));
     }
 
+    if(bJuneEnd)
+    {
+        UInt32 num = pl->GetVar(VAR_JUNE_HAPPY_ITEM_CNT);
+        if (num > 0)
+            juneSortMap.insert(std::make_pair(num, pl));
+    }
+
     if (World::_halloween && pl->isOnline())
         pl->sendHalloweenOnlineAward(TimeUtil::Now(), true);
 
@@ -233,6 +248,17 @@ bool enum_clan_midnight(void * ptr, void * data)
     clan->SetDailyBattleScore(0);
 	return true;
 }
+
+bool enum_lucky_draw_rank_list(void * ptr, void * data )
+{
+    Player* player = static_cast<Player*>(ptr);
+    if(player == NULL)
+        return true;
+
+    WORLD().RankLuckyDraw(player, false);
+    return true;
+}
+
 void World::makeActivityInfo(Stream &st)
 {
 	st.init(REP::DAILY_DATA);
@@ -246,6 +272,7 @@ void World::makeActivityInfo(Stream &st)
     active |= _foolsday?32:0;
     active |= _chingming?64:0;
     active |= _ssdtact?128:0;
+    active |= _june?256:0;
     st << active << Stream::eos;
 }
 void World::calWeekDay( World * world )
@@ -434,6 +461,39 @@ void SendMDSoulCnt()
     }
 }
 
+void SendHappyItemCnt()
+{
+    if(bJuneEnd)
+    {
+        int pos = 0;
+        UInt32 happyItemNum = 0xFFFFFFFF;
+        for(JuneSortMap::reverse_iterator iter = juneSortMap.rbegin();
+                iter != juneSortMap.rend(); ++iter)
+        {
+            if(iter->first != happyItemNum)
+            {
+                ++pos;
+                happyItemNum = iter->first;
+            }
+            if(pos > 2) break;
+
+            Player* player = iter->second;
+            if (!player)
+                continue;
+            if (player->isOnline())
+            {
+                GameMsgHdr hdr(0x247, player->getThreadId(), player, sizeof(pos));
+                GLOBAL().PushMsg(hdr, &pos);
+            }
+            else
+            {
+                player->sendJuneHappyTitleCard(pos);
+            }
+        }
+    }
+
+}
+
 void World::World_Midnight_Check( World * world )
 {
 	UInt32 curtime = TimeUtil::Now();
@@ -444,6 +504,7 @@ void World::World_Midnight_Check( World * world )
     bool bSingleDay = getSingleDay();
     bool bValentineDay = getValentineDay();
     bool bMayDay = getMayDay();
+    bool bJune = getJune();
 	world->_worldScript->onActivityCheck(curtime+30);
 
 	world->_today = TimeUtil::SharpDay(0, curtime+30);	
@@ -461,6 +522,8 @@ void World::World_Midnight_Check( World * world )
     bValentineDayEnd = bValentineDay && !getValentineDay();
     //五一使用风雷石活动是否结束
     bMayDayEnd = bMayDay && !getMayDay();
+    // 六一活动是否结束
+    bJuneEnd = bJune && !getJune();
 
 	globalPlayers.enumerate(enum_midnight, static_cast<void *>(NULL));
 
@@ -490,6 +553,11 @@ void World::World_Midnight_Check( World * world )
     //给巧克力使用称号卡
     SendShusanLoveTitleCard();
     SendMDSoulCnt();
+    SendHappyItemCnt();
+#ifdef _FB
+    if(bJuneEnd)
+        world->SendLuckyDrawAward();
+#endif
 	
 	dungeonManager.enumerate(enum_dungeon_midnight, &curtime);
 	globalClans.enumerate(enum_clan_midnight, &curtime);
@@ -574,6 +642,11 @@ bool World::Init()
 	AddTimer(3600 * 4 * 1000, World_ChatItem_Purge);
 	AddTimer(5000, World_Multi_Check, this);
 
+#ifdef _FB
+    if(getJune())
+        globalPlayers.enumerate(enum_lucky_draw_rank_list, static_cast<void *>(NULL));
+#endif
+
 	UInt32 now = TimeUtil::Now(), sday = TimeUtil::SharpDay(1) - 10;
 	if(sday < now) sday += 86400;
 	AddTimer(86400 * 1000, World_Midnight_Check, this, (sday - now) * 1000);
@@ -613,6 +686,187 @@ void World::testUpdate( )
 		announce.reload();
 		_announceLast = latestlist.announce;
 	}
+}
+
+void World::RankLuckyDraw(Player* player, bool notify)
+{
+    UInt32 luckyDrawCnt = player->GetVar(VAR_LUCKYDRAW_CNT);
+    if(luckyDrawCnt == 0)
+        return;
+    LuckyDrawRankList::iterator it = _luckyDrawRankList.find(player);
+    RLuckyDrawRank r_rank = _luckyDrawList.rbegin();
+    bool change = false;
+    if(it != _luckyDrawRankList.end())
+    {
+        RLuckyDrawRank r_rank2(it->second);
+        r_rank = r_rank2;
+    }
+    else
+        change = true;
+
+    for(; r_rank != _luckyDrawList.rend(); ++ r_rank)
+    {
+        if(luckyDrawCnt <= (*r_rank)->GetVar(VAR_LUCKYDRAW_CNT))
+            break;
+
+        if(!change)
+        {
+            change = true;
+        }
+
+        if(notify)
+        {
+            SYSMSG(title, 2362);
+            UInt32 pos = std::distance(_luckyDrawList.begin(), r_rank.base()) + 1;
+            if(pos == 2)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
+            }
+            else if(pos == 3)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
+            }
+            else if(pos == 4)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
+            }
+            else if(pos == 11)
+            {
+                SYSMSGV(content, 2363, player->getName().c_str(), pos);
+                (*r_rank)->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
+            }
+        }
+    }
+
+    if(change)
+    {
+        if(it != _luckyDrawRankList.end())
+            _luckyDrawList.erase(it->second);
+        _luckyDrawRankList[player] = _luckyDrawList.insert(r_rank.base(), player);
+        if(notify)
+        {
+            UInt32 pos = std::distance(_luckyDrawList.begin(), _luckyDrawRankList[player]) + 1;
+            if(pos <= 10)
+            {
+                SYSMSGV(title, 2358, pos);
+                SYSMSGV(content, 2359, pos);
+                player->GetMailBox()->newMail(NULL, 0x12, title, content, 0xFFFE0000);
+            }
+        }
+    }
+}
+
+void World::SendLuckyDrawList(Player* player)
+{
+    Stream st(REP::LUCKY_RANK);
+    LuckyDrawRankList::iterator it = _luckyDrawRankList.find(player);
+    UInt32 pos = 0;
+    if(it != _luckyDrawRankList.end())
+        pos = std::distance(_luckyDrawList.begin(), it->second) + 1;
+
+    st << player->GetVar(VAR_LUCKYDRAW_CNT) << pos;
+    UInt8 cnt = 10;
+    if(10 > _luckyDrawList.size())
+        cnt = static_cast<UInt8>(_luckyDrawList.size());
+    st << cnt;
+    LuckyDrawRank rank = _luckyDrawList.begin();
+    for(int i = 0; rank != _luckyDrawList.end() && i < cnt; ++i, ++rank)
+    {
+        st << (*rank)->getName() << (*rank)->getCountry() << (*rank)->GetLev() << (*rank)->GetVar(VAR_LUCKYDRAW_CNT);
+    }
+
+    st << Stream::eos;
+    player->send(st);
+}
+
+void World::SendLuckyDrawAward()
+{
+    int pos = 0;
+ 
+    SYSMSG(title, 2360);
+    for(LuckyDrawRank rank = _luckyDrawList.begin(); rank != _luckyDrawList.end() && pos < 10; ++ rank, ++ pos)
+    {
+        SYSMSGV(content, 2361, (*rank)->getName().c_str(), pos+1);
+        if(pos == 0)
+        {
+            Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[3] = {{9022,5}, {30,6}, {9034, 1}};
+                mailPackageManager.push(mail->id, mitem, 3, true);
+
+                std::string strItems;
+                for(int i = 0; i < 3; ++ i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+        }
+        else if(pos == 1)
+        {
+            Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[2] = {{9019,4}, {30,4}};
+                mailPackageManager.push(mail->id, mitem, 2, true);
+
+                std::string strItems;
+                for(int i = 0; i < 2; ++ i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+        }
+        else if(pos == 2)
+        {
+            Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[2] = {{9017,3}, {30,2}};
+                mailPackageManager.push(mail->id, mitem, 2, true);
+
+                std::string strItems;
+                for(int i = 0; i < 2; ++ i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+        }
+        else
+        {
+            Mail * mail = (*rank)->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[2] = {{9021,2}, {30,1}};
+                mailPackageManager.push(mail->id, mitem, 2, true);
+
+                std::string strItems;
+                for(int i = 0; i < 2; ++ i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, (*rank)->getId(), mail->id, Activity, title, content, strItems.c_str(), mail->recvTime);
+            }
+        }
+    }
 }
 
 }

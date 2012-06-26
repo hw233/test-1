@@ -3601,6 +3601,90 @@ function ItemNormal_SecondSoul_491(iid, num, bind, param)
     return 1;
 end
 
+function ItemNormal_00009028(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    package:DelItemSendMsg(iid, player);
+    if getJune() then
+        local happy = math.random(num, num*5);
+        player:AddVar(114, happy);
+        player:sendHappyInfo();
+        SendMsg(player, 0x35, "获得欢乐值"..happy.."点")
+        player:AddVar(115, num);
+    end
+
+    return num;
+end
+
+function ItemNormal_00009029(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(iid-9029+14)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009031(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local dates = {
+        { ['year'] = 2012, ['month'] = 6, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 6, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 6, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+    }
+
+    local items = {
+        {{503,2},{514,2},{507,2},{9028,5},{60000,50}},
+        {{500,2},{501,2},{509,2},{60000,50}},
+        {{511,2},{512,2},{515,2},{60000,50}},
+    }
+
+    local id = iid - 9030
+    local start = os.time(dates[id])
+    local doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        if package:GetRestPackageSize() < 3 then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
+        end
+
+        local item = items[id]
+
+        for k,v in pairs(item) do
+            if v[1] == 60000 then
+                player:getCoupon(v[2]*factor)
+            else
+                package:Add(v[1], v[2]*factor, true, 0, 2)
+            end
+        end
+
+        package:DelItemSendMsg(iid, player);
+        return num
+    else
+        SendMsg(player, 0x35, "不在使用时间范围内");
+    end
+    return false
+end
+
+function ItemNormal_00009034(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(16)
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -4907,7 +4991,19 @@ local ItemNormal_Table = {
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
     [490] = ItemNormal_SecondSoul_490,
-    [491] = ItemNormal_SecondSoul_491
+    [491] = ItemNormal_SecondSoul_491,
+
+
+    -- 棒棒糖
+    [9028] = ItemNormal_00009028,
+    [9029] = ItemNormal_00009029,
+    [9030] = ItemNormal_00009029,
+    [9031] = ItemNormal_00009031,
+    [9032] = ItemNormal_00009031,
+    [9033] = ItemNormal_00009031,
+
+    -- 多宝仙君
+    [9034] = ItemNormal_00009034,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

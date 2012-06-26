@@ -374,7 +374,9 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     }
     s<< GetAtyIDInClient( AtyGroupCopy) << c1 << m1;
     //printf("副本组队  %u  %u\n" , c1 ,m1);
-    s<< GetAtyIDInClient( AtyTownDeamon) << static_cast<UInt8>(_owner->GetVar(VAR_TOWNDEAMON)) << static_cast<UInt8>(1);
+    s << GetAtyIDInClient(AtyTownDeamon) << static_cast<UInt8>(_owner->GetVar(VAR_TOWNDEAMON)) << static_cast<UInt8>(1);
+    s << GetAtyIDInClient(AtyShuoShuo) << static_cast<UInt8>(_owner->GetVar(VAR_SHUOSHUO)) << static_cast<UInt8>(1);
+    s << GetAtyIDInClient(AtyInvited) << static_cast<UInt8>(_owner->GetVar(VAR_INVITED)) << static_cast<UInt8>(1);
     
     for(UInt32 i = 0 ; i <  AtyMaxFlag; i ++  )
     {

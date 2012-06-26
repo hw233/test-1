@@ -618,6 +618,7 @@ namespace GObject
 
         void sendShusanLoveTitleCard(int);
         void sendMayDayTitleCard(int);
+        void sendJuneHappyTitleCard(int pos);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -795,6 +796,7 @@ namespace GObject
 
 		UInt32 getGold(UInt32 c = 0, UInt8 incomingType = 0);
 		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
+        UInt32 useGold4LuckDraw(UInt32 c);
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
 
 		UInt32 getGoldOrCoupon();
@@ -912,6 +914,7 @@ namespace GObject
         void sendRechargeInfo();
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
+        void sendJuneRechargeMails(UInt32 value);
         UInt32 _mditem;
 
 		void autoRegenAll();
@@ -1440,6 +1443,8 @@ namespace GObject
         void getAward(UInt8 type, UInt8 opt);
         void getSSDTAward(UInt8 opt);
         void sendSSDTInfo();
+        void getHappyAward(UInt8 opt);
+        void sendHappyInfo(UInt16 itemId = 0);
 
         inline TripodData& getTripodData() { return m_td; }
         TripodData& newTripodData();

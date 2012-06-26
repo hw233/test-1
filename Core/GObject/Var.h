@@ -137,6 +137,16 @@ namespace GObject
         VAR_DIAMOND_BLUE = 105,  //蓝钻特权
         VAR_NETVDPACK = 106, // 网络情人节礼包是否发放
         VAR_LASTATHRANK = 107, // 昨天结算前的斗剑排名
+        VAR_SHUOSHUO = 108, // 今天领取过说说奖励次数
+        VAR_INVITED = 109, // 今天领取过邀请好友奖励次数
+
+        VAR_JUNE = 110,      // 六月礼包是否发放
+        VAR_JUNE_EQUIP = 111, // 六月节日套装是否发放
+        VAR_JUNE_ITEM = 112, // 欢乐礼包是否领取
+        VAR_JUNE_RECHARGE_TOTAL = 113, //六一充值
+        VAR_JUNE_HAPPY = 114, //六一欢乐值
+        VAR_JUNE_HAPPY_ITEM_CNT = 115, // 六一使用棒棒糖数
+        VAR_LUCKYDRAW_CNT = 116, // 寻宝次数
 
         VAR_MAX,
     };
@@ -267,6 +277,16 @@ namespace GObject
             REGISTER_VAR(VAR_DIAMOND_YELLOW, CYCLE_DAY);
             REGISTER_VAR(VAR_NETVDPACK, CYCLE_NONE);
             REGISTER_VAR(VAR_LASTATHRANK, CYCLE_NONE);
+            REGISTER_VAR(VAR_SHUOSHUO, CYCLE_DAY);
+            REGISTER_VAR(VAR_INVITED, CYCLE_DAY);
+
+            REGISTER_VAR(VAR_JUNE, CYCLE_NONE);
+            REGISTER_VAR(VAR_JUNE_EQUIP, CYCLE_NONE);
+            REGISTER_VAR(VAR_JUNE_ITEM, CYCLE_DAY);
+            REGISTER_VAR(VAR_JUNE_RECHARGE_TOTAL, CYCLE_NONE);
+            REGISTER_VAR(VAR_JUNE_HAPPY, CYCLE_DAY);
+            REGISTER_VAR(VAR_JUNE_HAPPY_ITEM_CNT, CYCLE_NONE);
+            REGISTER_VAR(VAR_LUCKYDRAW_CNT, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
