@@ -228,7 +228,7 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
     {
         err += "player not exist!";
         json_insert_pair_into_object(retbody, "iResult", my_json_new_number(1));
-        json_insert_pair_into_object(retbody, "szRetErrMsg", json_new_string(err.c_str()));
+        json_insert_pair_into_object(retbody, "szRetMsg", json_new_string(err.c_str()));
         return EPLAYER_NOT_EXIST;
     }
 
@@ -245,7 +245,7 @@ int add_playeritem_req(JsonHead* head, json_t* body, json_t* retbody, std::strin
 
     head->cmd = 6;
     json_insert_pair_into_object(retbody, "iResult", my_json_new_number(0));
-    json_insert_pair_into_object(retbody, "szRetErrMsg", json_new_string(""));
+    json_insert_pair_into_object(retbody, "szRetMsg", json_new_string("success"));
     return 0;
 }
 
