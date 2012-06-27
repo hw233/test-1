@@ -163,7 +163,8 @@ GMHandler::GMHandler()
     Reg(3, "sysdlg", &GMHandler::OnSysDailog);
     Reg(3, "regenall", &GMHandler::OnRegenAll);
     Reg(3, "bosshp", &GMHandler::OnSetBossHp);
-    Reg(3, "time", &GMHandler::OnTime);
+    Reg(3, "systm", &GMHandler::OnTime);
+    Reg(3, "tm", &GMHandler::OnTime);
     Reg(3, "token", &GMHandler::OnToken);
 	Reg(3, "recharge", &GMHandler::OnRecharge);
 	Reg(3, "boss", &GMHandler::OnBossHP);
@@ -2661,10 +2662,9 @@ void GMHandler::OnSetBossHp(GObject::Player* player, std::vector<std::string>& a
 }
 void GMHandler::OnTime(GObject::Player* player, std::vector<std::string>& args)
 {
-
     time_t curtime1 = time(NULL) + 30; 
     struct tm *local = localtime(&curtime1);
-    SYSMSG_SENDV(2350, player, 1900+local->tm_year, 1+local->tm_mon, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec, local->tm_wday+1);
+    SYSMSG_SENDV(2350, player, 1900+local->tm_year, 1+local->tm_mon, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec, World::_wday);
 }
 void GMHandler::OnToken(GObject::Player* player, std::vector<std::string>& args)
 {

@@ -168,6 +168,13 @@ void OnCompleteDungeonAutoNotifyReq(GameMsgHdr& hdr, const void * data)
 	ev->release();
 }
 
+void OnResetRecharge(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    player->SetVar(VAR_RECHARGE_TOTAL, 0);
+    player->sendRechargeInfo();
+}
+
 void OnTimerEventCompletedNotify( GameMsgHdr& hdr, const void * data )
 {
 	struct EventMsg

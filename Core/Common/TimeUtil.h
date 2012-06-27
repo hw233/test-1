@@ -10,6 +10,39 @@ class TimeUtil
 {
 public:
 	static inline void Init() { tzset(); }
+
+    static inline UInt32 MkTime(UInt32 y, UInt32 m, UInt32 d, UInt32 hh = 0, UInt32 mm = 0, UInt32 ss = 0)
+    {
+        struct tm t_tm;
+        if (y < 1900)
+            t_tm.tm_year = 0;
+        else
+            t_tm.tm_year = y - 1900;
+        if (m % 13)
+            t_tm.tm_mon = m % 13 - 1;
+        else
+            t_tm.tm_mon = 0;
+        if (d % 32)
+            t_tm.tm_mday = d % 32;
+        else
+            t_tm.tm_mday = 1;
+        if (hh % 25)
+            t_tm.tm_hour = hh % 24 - 1;
+        else
+            t_tm.tm_hour = 0;
+        if (mm % 61)
+            t_tm.tm_min = mm % 61 - 1;
+        else
+            t_tm.tm_min = 0;
+        if (ss % 61)
+            t_tm.tm_sec = ss % 61 - 1;
+        else
+            t_tm.tm_sec = 0;
+
+        time_t t2 = mktime(&t_tm);
+        return t2;
+    }
+
 	static inline UInt32 Now() { return static_cast<UInt32>(time(NULL)); }
 	static inline UInt8 Day(UInt32 now = Now())
 	{

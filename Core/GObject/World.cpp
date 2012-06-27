@@ -105,6 +105,7 @@ bool World::_qqgameact = false;
 void* World::_recalcwd = NULL;
 bool World::_june = false;
 bool World::_june1 = false;
+bool World::_july = false;
 bool World::_enchant_gt11 = false;
 bool World::_rechargenextret;
 UInt32 World::_rechargenextretstart;
@@ -243,6 +244,22 @@ bool enum_midnight(void * ptr, void* next)
     if (TimeUtil::SharpDay(0, nextday) >= TimeUtil::SharpDay(0, World::_rechargenextretstart)+13*24*60*60 &&
             TimeUtil::SharpDay(0, nextday) < TimeUtil::SharpDay(0, World::_rechargenextretend)+13*24*60*60+2*24*60*60)
         pl->sendRNR(nextday);
+
+    if (pl->GetVar(VAR_RECHARGE_TOTAL) &&
+            (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 1) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 4) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 7)))
+    {
+        if (pl->isOnline())
+        {
+            GameMsgHdr hdr(0x282, pl->getThreadId(), pl, 0);
+            GLOBAL().PushMsg(hdr, NULL);
+        }
+        else
+        {
+            pl->SetVar(VAR_RECHARGE_TOTAL, 0);
+        }
+    }
 
 	return true;
 }
