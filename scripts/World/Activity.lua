@@ -62,6 +62,11 @@ function is6_25()
     return is_6_25
 end
 
+is_6_29 = false 
+function is6_29()
+    return is_6_29
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -263,8 +268,10 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime200 and tm < actTime201 then
+          is_6_29 = true
           setICAct(true)
       else
+          is_6_29 = false 
           setICAct(false)
       end
 

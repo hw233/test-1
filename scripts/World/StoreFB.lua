@@ -36,6 +36,10 @@ end
 
 store:discountLimit()
 
+if is6_29() then
+store:add(2,9076,100)
+end
+
 if isNewServer() then
 store:add(2,9067,80)
 end
