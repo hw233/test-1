@@ -10553,7 +10553,7 @@ namespace GObject
         UInt32 t = 0;
         if (GetLev() < 65)
             t = 500;
-        if (GetLev() >= 65 && GetLev() < 70)
+        else if (GetLev() >= 65 && GetLev() < 70)
             t = 1000;
         else
             t = 2000;
