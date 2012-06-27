@@ -18,6 +18,7 @@
 #include "GObject/DCWorker.h"
 #include "GObject/DCLogger.h"
 #include "GObject/SortWorker.h"
+#include "Common/StringTokenizer.h"
 
 const char* s_HelpInfo = "";
 //////////////////////////////////////////////////////////////////////////
@@ -318,6 +319,7 @@ void WorldServer::State(const char* action, int serverNum)
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, recvret);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
     fprintf(stderr, "URL: %s\n", url);
 
@@ -336,6 +338,15 @@ void WorldServer::State(const char* action, int serverNum)
 void WorldServer::Up()
 {
     State("open", cfg.serverNum);
+    if (!cfg.mergeList.empty())
+    {
+        StringTokenizer st(cfg.mergeList, " ");
+        if (st.count())
+        {
+            for (UInt32 i = 0; i < st.count(); ++i)
+                State("open", atoi(st[i].c_str()));
+        }
+    }
 }
 
 void WorldServer::Down()

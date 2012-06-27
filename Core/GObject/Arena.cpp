@@ -214,7 +214,7 @@ UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 
 
     UInt16 pos = std::distance(_preliminaryPlayers_list[state].begin(), it);
     std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
-    if(ait != _players.end() && ait->second.betList[state][0].size() >= 1 || pp.name.empty())
+    if((ait != _players.end() && ait->second.betList[state][0].size() >= 1) || pp.name.empty())
         return 0xFF;
     if(pp.betMap.find(player) != pp.betMap.end())
         return 2;
