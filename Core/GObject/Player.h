@@ -1542,6 +1542,9 @@ namespace GObject
         void sendRechargeNextRetInfo(UInt32 now);
     private:
         std::vector<RNR> rechargs;
+
+    public:
+        void sendLevelAward();
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

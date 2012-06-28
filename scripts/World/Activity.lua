@@ -207,12 +207,6 @@ function onActivityCheck(tm)
       setJune(false)
   end
 
-  if tm >= actTime51 and tm < actTime52 then
-      setJune1(true)
-  else
-      setJune1(false)
-  end
-
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
       setDuanWu(true)
@@ -256,6 +250,12 @@ function onActivityCheck(tm)
           setRechargeActive(true, 4)
       else
           setRechargeActive(false, 4)
+      end
+
+      if tm >= actTime200 and tm < actTime201 then
+          setICAct(true)
+      else
+          setICAct(false)
       end
 
       setShuoShuo(false);
@@ -306,6 +306,12 @@ function onActivityCheck(tm)
           setRechargeActive(true, 4)
       else
           setRechargeActive(false, 4)
+      end
+
+      if tm >= actTime51 and tm < actTime52 then
+          setJune1(true)
+      else
+          setJune1(false)
       end
 
       if tm >= actTime53 and tm < actTime54 then
@@ -396,6 +402,8 @@ function initActTime(y, m, d)
   local  SerStartTm104 = { ['year'] = 2012, ['month'] = 5, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- FB充值返利（5/23-5/27）
   local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm200= { ['year'] = 2012, ['month'] = 6, ['day'] = 28, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -511,6 +519,12 @@ function initActTime(y, m, d)
 
   actTime111 = os.time(SerStartTm105);
   actTime112 = os.time(SerStartTm105) + 12 * 86400;
+
+  actTime200= os.time(SerStartTm200);
+  actTime201= os.time(SerStartTm200) + 7 * 86400;
+
+  actTime202= os.time(SerStartTm201);
+  setLevelAwardEnd(actTime202)
 
   onActivityCheck(os.time() + 30);
 
