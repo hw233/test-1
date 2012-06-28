@@ -103,6 +103,8 @@ namespace GObject
 
 	UInt8 Player::getMaxIcCount(UInt8 vipLevel)
 	{
+        if (World::getICAct())
+            return MaxICCount[5];
 		UInt8 maxCount = MaxICCount[vipLevel];
 		return maxCount;
 	}
@@ -10021,18 +10023,7 @@ namespace GObject
             else
                 break;
         }
-#ifdef _FB
-        if (type == 1 && !GetVar(VAR_CTSAWARD))
-        {
-            GameAction()->onCLLoginReward(this, 0);
-            SetVar(VAR_CTSAWARD, 1);
-            Stream st(REP::RC7DAY);
-            st << static_cast<UInt8>(1);
-            st << Stream::eos;
-            send(st);
-            return;
-        }
-#else
+
         if (type == 1 && !GetVar(VAR_CTSAWARD))
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -10043,7 +10034,6 @@ namespace GObject
             send(st);
             return;
         }
-#endif
         if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -10543,5 +10533,37 @@ namespace GObject
         st << static_cast<UInt8>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
         send(st);
     }
+
+    void Player::sendLevelAward()
+    {
+        if (GetLev() < 60)
+            return;
+
+        UInt32 t = 0;
+        if (GetLev() < 65)
+            t = 500;
+        if (GetLev() >= 65 && GetLev() < 70)
+            t = 1000;
+        else
+            t = 2000;
+        SYSMSG(title, 4008);
+        SYSMSGV(content, 4009, GetLev(), t);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[1] = {{0xA000,t},};
+            mailPackageManager.push(mail->id, mitem, 1);
+            std::string strItems;
+            for (int i = 0; i < 1; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+
 } // namespace GObject
 

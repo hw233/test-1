@@ -125,6 +125,8 @@ namespace Script
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
+        lua_tinker::def(_L, "getICAct", GObject::World::getICAct);
+        lua_tinker::def(_L, "setLevelAwardEnd", GObject::World::setLevelAwardEnd);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);

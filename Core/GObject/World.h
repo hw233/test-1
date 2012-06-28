@@ -216,6 +216,14 @@ public:
     inline static bool getDuanWu()
     { return _duanwu; }
 
+    inline static void setICAct(bool v)
+    { _icact = v; }
+    inline static bool getICAct()
+    { return _icact; }
+
+    inline static void setLevelAwardEnd(UInt32 end)
+    { _levelawardend = end; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
 
@@ -283,6 +291,8 @@ public:
     static bool _mergeathact;
     static bool _fourcopact;
     static bool _duanwu;
+    static bool _icact;
+    static UInt32 _levelawardend;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
