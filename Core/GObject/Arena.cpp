@@ -234,7 +234,7 @@ UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 
     if(group > 0)
         i = group - 1;
 	_players[player].betList[state][i].push_back(binfo);
-	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
@@ -292,7 +292,7 @@ UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 
     if(group > 0)
         i = group - 1;
 	_players[player].betList[state][i].push_back(binfo);
-	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
@@ -757,7 +757,7 @@ void Arena::readFrom( BinaryReader& brd )
 	case 0:
 		if(!_players.empty() && sIdx == 0)
         {
-            DB().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
+            DB1().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
             _playerCount[0] = 0;
 			_players.clear();
         }
@@ -2092,7 +2092,7 @@ void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group,
                 {
                     recieved = false;
                     bit->recieved = 1;
-                    DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), bit->round, bit->state, bit->group, bit->recieved, bit->pos, bit->type);
+                    DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), bit->round, bit->state, bit->group, bit->recieved, bit->pos, bit->type);
                 }
                 break;
             }
