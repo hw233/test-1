@@ -1471,10 +1471,11 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.magdef += _owner->getClanSkillMagDefentEffect();
         _attrExtraEquip.action += _owner->getClanSkillActionEffect();
         _attrExtraEquip.hitrlvl += _owner->getClanSkillHitrLvlEffect();
-
+#if 0
         const GData::AttrExtra* ae = _owner->getHIAttr();
         if (ae)
             addAttrExtra(_attrExtraEquip, ae);
+#endif
     }
 
     if(m_2ndSoul)
@@ -3004,10 +3005,14 @@ bool Fighter::delCitta( UInt16 citta, bool writedb )
     if (idx < 0)
         return false;
 
-    offCitta(citta, true, true, writedb);
-
     std::vector<UInt16>::iterator it = _cittas.begin();
     std::advance(it, idx);
+
+    if (*it != citta)
+        return false;
+
+    offCitta(citta, true, true, writedb);
+
     *it = 0;
     _cittas.erase(it);
 
@@ -3831,6 +3836,32 @@ bool Fighter::changeSecondSoulClass(UInt8 cls)
     return m_2ndSoul->setClass(cls);
 }
 
+void Fighter::getAttrExtraEquip(Stream& st)
+{
+    checkDirty();
+    GData::AttrExtra& attr = _attrExtraEquip;
+	st << attr.strength << attr.physique << attr.agility << attr.intelligence << attr.will << attr.soul << attr.aura;
+	st << attr.auraMax << attr.attack << attr.magatk << attr.defend << attr.magdef << attr.hp << attr.tough << attr.action;
+	st << attr.hitrate << attr.evade << attr.critical << attr.criticaldmg << attr.pierce << attr.counter << attr.magres;
+
+	st << attr.strengthP << attr.physiqueP << attr.agilityP << attr.intelligenceP << attr.willP << attr.soulP << attr.auraP;
+    st << attr.auraMaxP << attr.attackP << attr.magatkP << attr.defendP << attr.magdefP << attr.hpP << attr.toughP << attr.actionP;
+	st << attr.hitrateP << attr.evadeP << attr.criticalP << attr.criticaldmgP << attr.pierceP << attr.counterP << attr.magresP;
+
+    st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl;
+}
+
+bool Fighter::changeSecondSoulXinxiu(UInt8 xinxiu)
+{
+    if(!m_2ndSoul)
+    {
+        _owner->sendMsgCode(0, 1072);
+        return false;
+    }
+
+    return m_2ndSoul->setXinxiu(xinxiu);
+}
+
 UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
 {
     if(!m_2ndSoul)
@@ -3847,11 +3878,12 @@ UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
 bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
 {
     static UInt8 off2type[] = {
-        0x80, 0x84, 0x81, 0x82, 0x83, 0x85,
+        0x80, 0x84, 0x81, 0x82, 0x83, 0x85, 0x86, 0x87, 0x88, 0x89, 0x90, 0x91, 0x92, 0x93,
     };
 
 #define MAXVAL(x,y) { if (x > y) x = y; }
-#define MV 150
+#define MV 200
+#define MV1 10
     bool ret = false;
 
     Stream st(REP::CHANGE_EQUIPMENT);
@@ -3900,13 +3932,69 @@ bool Fighter::addElixirAttrByOffset(UInt8 off, Int32 v)
         sendModification(9, getMaxSoul());
         ret = true;
     }
+    if (off == 6)
+    {
+        _elixirattr.attack += v;
+        MAXVAL(_elixirattr.attack, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.attack);
+        ret = true;
+    }
+    if (off == 7)
+    {
+        _elixirattr.defend += v;
+        MAXVAL(_elixirattr.defend, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.defend);
+        ret = true;
+    }
+    if (off == 8)
+    {
+        _elixirattr.critical += v;
+        MAXVAL(_elixirattr.critical, MV1);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.critical);
+        ret = true;
+    }
+    if (off == 9)
+    {
+        _elixirattr.pierce += v;
+        MAXVAL(_elixirattr.pierce, MV1);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.pierce);
+        ret = true;
+    }
+    if (off == 10)
+    {
+        _elixirattr.evade += v;
+        MAXVAL(_elixirattr.evade, MV1);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.evade);
+        ret = true;
+    }
+    if (off == 11)
+    {
+        _elixirattr.counter += v;
+        MAXVAL(_elixirattr.counter, MV1);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.counter);
+        ret = true;
+    }
+    if (off == 12)
+    {
+        _elixirattr.tough += v;
+        MAXVAL(_elixirattr.tough, MV1);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.tough);
+        ret = true;
+    }
+    if (off == 13)
+    {
+        _elixirattr.action += v;
+        MAXVAL(_elixirattr.action, MV);
+        st << off2type[off] << static_cast<UInt32>(_elixirattr.action);
+        ret = true;
+    }
 
     if (ret)
     {
         st << Stream::eos;
         _owner->send(st);
 
-        DB1().PushUpdateData("REPLACE INTO `elixir` (`id`, `playerId`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", _id, _owner->getId(), _elixirattr.strength, _elixirattr.physique, _elixirattr.agility, _elixirattr.intelligence, _elixirattr.will, _elixirattr.soul);
+        DB1().PushUpdateData("REPLACE INTO `elixir` (`id`, `playerId`, `strength`, `physique`, `agility`, `intelligence`, `will`, `soul`, `attack`, `defend`, `critical`, `pierce`, `evade`, `counter`, `tough`, `action`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", _id, _owner->getId(), _elixirattr.strength, _elixirattr.physique, _elixirattr.agility, _elixirattr.intelligence, _elixirattr.will, _elixirattr.soul, _elixirattr.attack, _elixirattr.defend, _elixirattr.critical, _elixirattr.pierce, _elixirattr.evade, _elixirattr.counter, _elixirattr.tough, _elixirattr.action);
     }
     return ret;
 #undef MV
@@ -3927,6 +4015,22 @@ Int32 Fighter::getElixirAttrByOffset(UInt8 off)
         return _elixirattr.will;
     if (off == 5)
         return _elixirattr.soul;
+    if (off == 6)
+        return _elixirattr.attack;
+    if (off == 7)
+        return _elixirattr.defend;
+    if (off == 8)
+        return _elixirattr.critical;
+    if (off == 9)
+        return _elixirattr.pierce;
+    if (off == 10)
+        return _elixirattr.evade;
+    if (off == 11)
+        return _elixirattr.counter;
+    if (off == 12)
+        return _elixirattr.tough;
+    if (off == 13)
+        return _elixirattr.action;
     return 0;
 }
 
@@ -3938,6 +4042,14 @@ void Fighter::appendElixirAttr(Stream& st)
     st << static_cast<UInt16>(_elixirattr.will);
     st << static_cast<UInt16>(_elixirattr.physique);
     st << static_cast<UInt16>(_elixirattr.soul);
+    st << static_cast<UInt16>(_elixirattr.attack);
+    st << static_cast<UInt16>(_elixirattr.defend);
+    st << static_cast<UInt16>(_elixirattr.critical);
+    st << static_cast<UInt16>(_elixirattr.pierce);
+    st << static_cast<UInt16>(_elixirattr.evade);
+    st << static_cast<UInt16>(_elixirattr.counter);
+    st << static_cast<UInt16>(_elixirattr.tough);
+    st << static_cast<UInt16>(_elixirattr.action);
 }
 
 }

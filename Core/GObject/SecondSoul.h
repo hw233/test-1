@@ -39,7 +39,7 @@ class SecondSoul
 {
     friend class Fighter;
 public:
-    SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel = 1, UInt32 stateExp = 0, UInt8 stateLevel = 1 );
+    SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel = 1, UInt32 stateExp = 0, UInt8 stateLevel = 1, UInt8 xinxiu = 0 );
     void insertIntoDB();
 
     bool setClass(UInt8 cls);
@@ -49,6 +49,8 @@ public:
     UInt8 getStateLevel() { return m_stateLevel; }
     void addStateExp(UInt32 exp);
     void decStateExp(UInt32 exp);
+    bool setXinxiu(UInt8 xinxiu);
+    UInt8 getXinxiu() { return m_xinxiu; }
 
     void addAttr(GData::AttrExtra& ae);
 
@@ -131,11 +133,16 @@ private:
     UInt8 m_practiceLevel;   // 元神修为等级
     UInt32 m_stateExp;       // 元神强度
     UInt8 m_stateLevel;      // 元神境界
+    UInt8 m_xinxiu;          // 星宿
     float m_strength;
     float m_agility;
     float m_physique;
     float m_intelligence;
     float m_will;
+    float m_xinxiu_attack;
+    float m_xinxiu_action;
+    float m_xinxiu_defend;
+    float m_xinxiu_hp;
     Int8 m_skill_num1;
     Int8 m_skill_num2;
 

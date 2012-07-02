@@ -25,6 +25,7 @@ namespace Network
 
 		virtual bool active() { return true; }
         virtual void OnTick(UInt32 now){}
+        virtual void initConnection() {};
 
 	protected:
 		/* len - input the length of buffer, output the length of packet that parsed out

@@ -76,6 +76,7 @@ namespace Network
 	protected:
 		UInt32 _slave_idx;
 
+        //TcpConduit* _connConduit;
 		_ConduitList _conduits;
 		std::set<size_t> _emptySet;
 
@@ -107,6 +108,7 @@ namespace Network
 		const std::shared_ptr<TcpConduit> findConn(int id);
 		void remove(int id);
 		void close(int id);
+		void closeConn(int id);
 		template <typename PredType>
 		void broadcast(const void *, int, PredType pred);
 		void broadcast(const void *, int);

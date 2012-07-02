@@ -12,6 +12,7 @@ class ArenaConn:
 public:
 	ArenaConn(int fd, Network::TcpSlaveServer * s, int id);
 	static bool enabled();
+    virtual void initConnection();
 
 protected:
 	virtual int	parsePacket(struct evbuffer * buf, int &off, int &len);

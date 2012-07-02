@@ -195,6 +195,10 @@ public:
     { _june1 = v; }
     inline static bool getJune1()
     { return _june1; }
+    inline static void setJuly(bool v)
+    { _july = v; }
+    inline static bool getJuly()
+    { return _july; }
 
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
@@ -208,7 +212,7 @@ public:
     inline static bool getMergeAthAct()
     { return _mergeathact; }
     inline static void setFourCopAct(bool v)
-    { _fourcopact = v; printf("----------------------------: %d\n", _fourcopact);}
+    { _fourcopact = v; }
     inline static bool getFourCopAct()
     { return _fourcopact; }
     inline static void setDuanWu(bool v)
@@ -218,6 +222,7 @@ public:
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
+    static void commitArenaForceOnce();
 
 public:
 	inline static UInt8 getWeekDay()
@@ -276,6 +281,7 @@ public:
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
+    static bool _july;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;

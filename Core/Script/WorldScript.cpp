@@ -114,6 +114,8 @@ void WorldScript::init()
 	def("getJune", GObject::World::getJune);
 	def("setJune1", GObject::World::setJune1);
 	def("getJune1", GObject::World::getJune1);
+	def("setJuly", GObject::World::setJuly);
+	def("getJuly", GObject::World::getJuly);
 	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
 	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
 	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
@@ -145,6 +147,7 @@ void WorldScript::init()
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
+    def("commitArenaForceOnce", GObject::World::commitArenaForceOnce);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
@@ -178,6 +181,11 @@ GData::Store * WorldScript::GetStore()
 GData::TitleList * WorldScript::GetTitleList()
 {
 	return &GData::titleList;
+}
+
+void WorldScript::forceCommitArena()
+{
+	call<void>("forceCommitArena");
 }
 
 }

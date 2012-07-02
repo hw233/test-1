@@ -52,6 +52,21 @@ function is6_22()
     return is_6_22
 end
 
+is_6_23 = false 
+function is6_23()
+    return is_6_23
+end
+
+is_6_25 = false 
+function is6_25()
+    return is_6_25
+end
+
+is_7_1 = false 
+function is7_1()
+    return is_7_1
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -327,9 +342,17 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime61 and tm < actTime62 then
+          is_6_25 = true
           setEnchantAct(true)
       else
+          is_6_25 = false
           setEnchantAct(false)
+      end
+
+      if tm >= actTime63 and tm < actTime64 then
+          is_6_23 = true
+      else
+          is_6_23 = false
       end
 
       if tm >= actTime113 and tm < actTime114 then
@@ -342,6 +365,24 @@ function onActivityCheck(tm)
           setFourCopAct(true)
       else
           setFourCopAct(false)
+      end
+
+      if tm >= actTime65 and tm < actTime66 then
+          setRechargeActive(true, 8)
+      else
+          setRechargeActive(false, 8)
+      end
+
+      if tm >= actTime67 and tm < actTime68 then
+          setJuly(true)
+      else
+          setJuly(false)
+      end
+
+      if tm >= actTime69 and tm < actTime70 then
+          is_7_1 = true
+      else
+          is_7_1 = false 
       end
 
       setShuoShuo(true);
@@ -400,7 +441,9 @@ function initActTime(y, m, d)
   local  SerStartTm25= { ['year'] = 2012, ['month'] = 6, ['day'] = 18, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 6.22限时购买
   local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm28= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm29= { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -410,8 +453,8 @@ function initActTime(y, m, d)
   local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 合服斗剑排名奖励增加至30名活动(6/25-7/1)
   local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 四大名捕（6/22-7/21）
-  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 四大名捕（6/25-7/31）
+  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -507,8 +550,20 @@ function initActTime(y, m, d)
   actTime59 = os.time(SerStartTm26);
   actTime60 = os.time(SerStartTm26) + 9 * 86400;
 
-  actTime61 = os.time(SerStartTm27);
-  actTime62 = os.time(SerStartTm27) + 6 * 86400;
+  actTime61 = os.time(SerStartTm28);
+  actTime62 = os.time(SerStartTm28) + 6 * 86400;
+
+  actTime63 = os.time(SerStartTm27);
+  actTime64 = os.time(SerStartTm27) + 8 * 86400;
+
+  actTime65 = os.time(SerStartTm29);
+  actTime66 = os.time(SerStartTm29) + 9 * 86400;
+
+  actTime67 = os.time(SerStartTm29);
+  actTime68 = os.time(SerStartTm29) + 31 * 86400;
+
+  actTime69 = os.time(SerStartTm29);
+  actTime70 = os.time(SerStartTm29) + 15 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -531,7 +586,7 @@ function initActTime(y, m, d)
   actTime113 = os.time(SerStartTm106);
   actTime114 = os.time(SerStartTm106) + 7 * 86400;
   actTime115 = os.time(SerStartTm107);
-  actTime116 = os.time(SerStartTm107) + 30 * 86400;
+  actTime116 = os.time(SerStartTm107) + 37 * 86400;
 
   onActivityCheck(os.time() + 30);
 

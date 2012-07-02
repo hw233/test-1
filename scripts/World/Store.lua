@@ -38,6 +38,20 @@ end
 
 store:discountLimit()
 
+if is7_1() then
+store:add(2,1702,500)
+store:add(2,1703,500)
+end
+
+if is6_25() then
+store:add(2,9076,100)
+end
+
+if is6_23() then
+store:add(2,509,80)
+store:add(2,507,80)
+end
+
 if is6_22() then
 store:add(2,1700,500)
 store:add(2,1701,500)
@@ -55,7 +69,6 @@ if getMayDay() then
 store:add(2,496,10)
 store:add(2,497,10)
 end
-
 
 store:add(2,549,80)
 store:add(2,33,10)

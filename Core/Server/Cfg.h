@@ -61,6 +61,7 @@ public:
 	std::string slugName;
 	int channelNum;
 	int serverNum;
+    int serverNo;
 
 	std::string arenaHost;
 	UInt16      arenaPort;
@@ -76,6 +77,8 @@ public:
 
     std::string stateUrl;
     UInt16 warZone;
+
+    std::string mergeList;
 
 public:
 	inline void setTcpPort(UInt16 p) {tcpPort = p;}
@@ -108,6 +111,9 @@ public:
 	inline void setOnlineLimit(UInt16 limit) { onlineLimit = limit; }
     inline void setStateUrl(const char* url) { stateUrl = url; }
     inline void setWarZone(UInt16 zone) { warZone = zone; }
+    inline void setServerNum(UInt32 no) { serverNum = no; }
+    inline void setServerNo(UInt32 no) { serverNo = no; }
+    inline void setMergeList(const char* list) { mergeList = list?list:"";}
 
 	inline void setVerifyTokenServer(const char* server, UInt16 port)
     {
@@ -134,6 +140,7 @@ private:
 
 	std::string _filename;
 	std::vector<IPMask> _adminIPAllowed;
+
 };
 
 extern Cfg cfg;

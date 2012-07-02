@@ -131,10 +131,11 @@ void Store::makePacket()
 
 void Store::clear()
 {
-	for(int i = 0; i <= PURCHASE2 - PURCHASE1; ++i) // XXX: do not clear _items[0]
+	for(int i = 0; i <= PURCHASE2 - PURCHASE1; ++i)
 	{
 		_storePacket[i].clear();
-		_items[i].clear();
+        if (i) // XXX: do not clear _items[0]
+            _items[i].clear();
 		_itemPrices[i].clear();
 	}
 	for(int i = 0; i <= PURCHASE4 - PURCHASE3; ++i)
@@ -143,7 +144,7 @@ void Store::clear()
 		_items2[i].clear();
 		_itemPrices2[i].clear();
 	}
-    for (int i = 0; i < EXCHANGEEND - EXCHANGE; ++i)
+    for (int i = 0; i <= EXCHANGEEND - EXCHANGE; ++i)
     {
 		_storePacketExchange[i].clear();
 		_itemsExchange[i].clear();

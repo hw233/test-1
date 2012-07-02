@@ -374,6 +374,14 @@ void BattleFighter::updateBuffExtras()
 	{
 		addAttrExtra(_attrExtra, &_attrbylevel);
 	}
+
+    if(_fighter && _fighter->getOwner())
+    {
+        const GData::AttrExtra* ae = _fighter->getOwner()->getHIAttr();
+        if (ae)
+            addAttrExtra(_attrExtra, ae);
+    }
+
 	if(ext > 0)
 	{
 		float extAttr = 0.05f * ext;

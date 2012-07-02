@@ -76,7 +76,7 @@ namespace GObject
         VAR_WEEKLY_CLANBATTLE = 44, //每周帮派战
 
         VAR_BLUE_ACTIVE_GET = 45, //蓝钻登陆1小时在线奖励
-        VAR_RECHARGE_TOTAL = 46, //新年充值活动
+        VAR_RECHARGE_TOTAL = 46, //充值活动
 
         VAR_LOVER_RING = 47, //情人之戒
         VAR_SHUSAN_LOVE = 48, //蜀山之恋
@@ -162,13 +162,16 @@ namespace GObject
         VAR_CLAWARDRF = 126, // 回流后七天连续登陆奖励
         VAR_CL3DAYRF = 127, // 回流后七天连接三天登陆奖励
 
-        VAR_MONEY_ARENA = 128, // 剑魂数
+        VAR_MONEY_ARENA = 128, // 剑魂
+        VAR_MONEY_ARENA2 = 129, // 入围赛获得剑魂
+        VAR_MONEY_ARENA3 = 130, // 32强赛获得剑魂
         VAR_LX_CNT = 131, //冷血
         VAR_WQ_CNT = 132, //无情
         VAR_TS_CNT = 133, //铁手
         VAR_ZM_CNT = 134, //追命
 
         VAR_DUANWU = 135, // 端午上线邮件
+        VAR_JULY = 136, // 七月礼包
 
         VAR_MAX,
     };
@@ -325,12 +328,15 @@ namespace GObject
             REGISTER_VAR(VAR_CL3DAYRF, CYCLE_NONE);
 
             REGISTER_VAR(VAR_MONEY_ARENA, CYCLE_NONE);
+            REGISTER_VAR(VAR_MONEY_ARENA2, CYCLE_WEEK);
+            REGISTER_VAR(VAR_MONEY_ARENA3, CYCLE_WEEK);
             REGISTER_VAR(VAR_LX_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_WQ_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_TS_CNT, CYCLE_NONE);
             REGISTER_VAR(VAR_ZM_CNT, CYCLE_NONE);
 
             REGISTER_VAR(VAR_DUANWU, CYCLE_NONE);
+            REGISTER_VAR(VAR_JULY, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

@@ -1313,6 +1313,7 @@ namespace GObject
         // ͨ????????֮??
         UInt8 _justice_roar;
         float _spirit_factor;
+        bool _diamond_privilege;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1335,7 +1336,11 @@ namespace GObject
 
         inline void setSpiritFactor(float v) { _spirit_factor = v; }
         inline float getSpiritFactor() { return _spirit_factor; }
-	protected:
+
+        inline void setDiamondPrivilege(UInt8 v) { _diamond_privilege = v; }
+        inline UInt8 getDiamondPrivilege() { return _diamond_privilege; }
+
+    protected:
 		inline void setBlockBossByLevel();
 	public:
 		bool attackBlockBoss();
@@ -1542,8 +1547,11 @@ namespace GObject
         void loadRNRFromDB(const std::string& str);
         void sendRNR(UInt32 now);
         void sendRechargeNextRetInfo(UInt32 now);
+        bool inArenaCommitCD();
+        void appendLineup2( Stream& st);
     private:
         std::vector<RNR> rechargs;
+        UInt32 m_arenaCommitCD;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

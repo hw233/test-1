@@ -207,6 +207,7 @@ MSG_REG_2(GameMsgHdr, 0x279, OnCancelAutoBattleNotifyReq);
 
 MSG_REG_2(GameMsgHdr, 0x280, OnCancelDungeonAutoNotifyReq);
 MSG_REG_2(GameMsgHdr, 0x281, OnCompleteDungeonAutoNotifyReq);
+MSG_REG_2(GameMsgHdr, 0x282, OnResetRecharge);
 MSG_REG_2(GameMsgHdr, 0x289, OnTimerEventCompletedNotify);
 MSG_REG_2(GameMsgHdr, 0x28C, OnSearchAutoBattleResult);
 MSG_REG_2(GameMsgHdr, 0x28D, OnSearchAutoDungeonResult);
@@ -275,5 +276,8 @@ MSG_REG_2(GameMsgHdr, 0x249, OnSendRNR);
 
 
 MSG_REG_2(GameMsgHdr, 0x250, OnRemoveClanRank);
+
+MSG_REG_2(GameMsgHdr, 0x251, OnGetArenaMoney);
+MSG_REG_2(GameMsgHdr, 0x252, OnArenaEnterCommit);
 
 MSG_HANDLER_END()

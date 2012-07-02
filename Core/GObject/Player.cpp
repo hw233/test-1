@@ -511,7 +511,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
         m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
@@ -519,6 +519,7 @@ namespace GObject
         m_ClanBattleWinTimes = 0;
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
+        m_arenaCommitCD = 0;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -2071,7 +2072,7 @@ namespace GObject
                 fgt->equipSoulSkill(k, 0);
 
 			ItemEquip * equip;
-			for(UInt8 z = 1; z < 9; ++ z)
+			for(UInt8 z = 0; z < 9; ++ z)
 				m_Package->EquipTo(0, fgt, z+0x20, equip, true);
             for(UInt8 t = 0; t < 3; ++ t)
 				m_Package->EquipTo(0, fgt, t+0x50, equip, true);
@@ -6082,6 +6083,7 @@ namespace GObject
 
         if (World::getRechargeActive())
         {
+#if 0
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             UInt8 maxlevel = 0;
             UInt8 oldVipLevel = calcRechargeLevel(total, maxlevel);
@@ -6090,6 +6092,12 @@ namespace GObject
             sendRechargeMails(oldVipLevel + 1, vipLevel, maxlevel);
             SetVar(VAR_RECHARGE_TOTAL, total);
             sendRechargeInfo();
+#else
+            UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
+            GameAction()->sendRechargeMails(this, total, total+r);
+            SetVar(VAR_RECHARGE_TOTAL, total+r);
+            sendRechargeInfo();
+#endif
         }
 
         if(World::getJune())
@@ -10543,5 +10551,42 @@ namespace GObject
         st << static_cast<UInt8>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
         send(st);
     }
+
+    bool Player::inArenaCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_arenaCommitCD)
+            return true;
+
+        m_arenaCommitCD = now + 60;
+        return false;
+    }
+
+    void Player::appendLineup2( Stream& st)
+    {
+        st << getFormation();
+        size_t offset = st.size();
+        UInt8 c = 0;
+        st << c;
+        for(UInt8 i = 0; i < 5; ++ i)
+        {
+            Lineup& pdata = getLineup(i);
+            if(pdata.available())
+            {
+                ++c;
+                st << pdata.pos << static_cast<UInt16>(pdata.fid);
+                Fighter * fgt = pdata.fighter;
+
+                st << fgt->getLevel() << fgt->getPotential() << fgt->getCapacity();
+                st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
+                fgt->getAllUpSkillAndLevel(st);
+                fgt->getAllPSkillAndLevel4Arena(st);
+
+                fgt->getAttrExtraEquip(st);
+            }
+        }
+        st.data<UInt8>(offset) = c;
+    }
+
 } // namespace GObject
 

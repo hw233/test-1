@@ -170,7 +170,7 @@ class TeamCopy
         TeamCopyPlayer m_playerIdle[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         CopyTeams* m_copysTeam[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         LevelTeamCnt m_clvTeamCnt[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
-        AllCopyTeams m_allCopyTeams;
+        AllCopyTeams m_allCopyTeams[TEAMCOPY_MAXCOPYCNT];
         TeamCopyNpc m_tcNpcId[TEAMCOPY_MAXTYPECNT][TEAMCOPY_MAXCOPYCNT];
         bool _notify1;
         bool _notify2;

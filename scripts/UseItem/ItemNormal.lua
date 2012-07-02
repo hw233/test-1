@@ -341,19 +341,7 @@ function ItemNormal_00000406(id, num, bind, param)
     local package = player:GetPackage();
     local reqgrids = package:GetItemUsedGrids(29, 10, 1);
 
-    local prob = {50, 100}
-    local items = {{9,1}, {15,1}}
-
-    local p = math.random(1, 100)
-    local i = 1
-    for n = 1, #prob do
-        if p <= prob[n] then
-            i = n
-            break
-        end
-    end
-
-    local item = items[i];
+    local item = {15, 1}
     reqgrids = reqgrids + package:GetItemUsedGrids(item[1], item[2], 1); 
 
     if reqgrids <= package:GetRestPackageSize() then 
@@ -1133,7 +1121,7 @@ function ItemNormal_00000429(iid, num, bind, param)
 		return false;
 	end
 
-    local items = {{502,1},{504,1},{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},{9,1},{510,1},{55,2}}
+    local items = {{502,1},{504,1},{5002,1},{5012,1},{5022,1},{5032,1},{5042,1},{5052,1},{5062,1},{5072,1},{5082,1},{5092,1},{5102,1},{5112,1},{5122,1},{5132,1},{5142,1},{15,1},{510,1},{55,2}}
 
     local i = math.random(1, #items)
     local t = math.random(1,100)
@@ -1814,7 +1802,7 @@ function ItemNormal_00000008(iid, num, bind, param)
         return false;
     end
     local prob = {15, 29, 32, 45, 53, 58, 73, 86, 98, 100,}
-    local items = {{9,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
+    local items = {{15,1}, {514,1}, {515,1}, {500,1}, {49,1}, {503,1}, {511,1}, {517,1}, {15,2}, {0,0},}
 
     local p = math.random(1, 100)
     local i = 1
@@ -2126,7 +2114,7 @@ function ItemNormal_00000019(iid, num, bind, param)
 		   package:AddEquip(2205, 1);
 		   package:AddEquip(2206, 1);
 		   package:AddEquip(2207, 1);
-		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(15, 1, 1, 0, 2);
 		   package:AddItem(1211, 1, 1, 0, 2);
 		   package:AddItem(20, 1, 1, 0, 2);
 		   player:getCoupon(40);
@@ -2187,7 +2175,7 @@ function ItemNormal_00000020(iid, num, bind, param)
                package:AddItem(1208, 1, 1, 0, 2);
            end
 
-		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(15, 1, 1, 0, 2);
 		   package:AddItem(55, 1, 1, 0, 2);
 		   package:AddItem(57, 1, 1, 0, 2);
 		   package:AddItem(21, 1, 1, 0, 2);
@@ -2243,7 +2231,7 @@ function ItemNormal_00000021(iid, num, bind, param)
                package:AddEquip(2238, 1);
                package:AddEquip(2239, 1);
            end
-		   package:AddItem(9, 1, 1, 0, 2);
+		   package:AddItem(15, 1, 1, 0, 2);
 		   package:AddItem(507, 1, 1, 0, 2);
 		   package:AddItem(509, 1, 1, 0, 2);
 		   package:AddItem(510, 1, 1, 0, 2);
@@ -2334,7 +2322,7 @@ function ItemNormal_00000402(iid, num, bind, param)
         return false;
     end
     local prob = {10, 20, 22, 32, 47, 57, 77, 99, 100,}
-    local items = {{503,1}, {514,1}, {515,1}, {511,1}, {15,2}, {500,1}, {502,1}, {9,1}, {0,0},}
+    local items = {{503,1}, {514,1}, {515,1}, {511,1}, {15,2}, {500,1}, {502,1}, {15,1}, {0,0},}
 
     local p = math.random(1, 100)
     local i = 1
@@ -2367,7 +2355,7 @@ function ItemNormal_00000403(iid, num, bind, param)
         return false;
     end
     local prob = {10, 20, 22, 25, 40, 52, 72, 99, 100,}
-    local items = {{506,1}, {508,1}, {509,1}, {507,1}, {15,2}, {30,1}, {502,1}, {9,1}, {0,0},}
+    local items = {{506,1}, {508,1}, {509,1}, {507,1}, {15,2}, {30,1}, {502,1}, {15,1}, {0,0},}
 
     local p = math.random(1, 100)
     local i = 1
@@ -2897,14 +2885,22 @@ function ItemNormal_00009017(iid, num, bind, param)
 		return false;
 	end
 
-    local tp = iid - 9017
+    local tp = iid
     local tp2off = { -- offset of ElixirAttr in Fighter.h
-        [0] = 0,
-        [1] = 2,
-        [2] = 3,
-        [3] = 4,
-        [4] = 1,
-        [5] = 5,
+        [9017] = 0,
+        [9018] = 2,
+        [9019] = 3,
+        [9020] = 4,
+        [9021] = 1,
+        [9022] = 5,
+        [9068] = 6,
+        [9069] = 7,
+        [9070] = 8,
+        [9071] = 9,
+        [9072] = 10,
+        [9073] = 11,
+        [9074] = 12,
+        [9075] = 13,
     }
 
     local off = tp2off[tp]
@@ -2912,7 +2908,12 @@ function ItemNormal_00009017(iid, num, bind, param)
         return false
     end
 
-    local maxpoint = 150
+    local maxpoint = 0
+    if tp >= 9070 and tp <= 9074 then
+        maxpoint = 10
+    else
+        maxpoint = 200
+    end
     local point = fgt:getElixirAttrByOffset(off)
     if point >= maxpoint then
 		player:sendMsgCode(2, 1075, 0);
@@ -2984,6 +2985,42 @@ function ItemNormal_00009067(iid, num, bind, param)
         package:Add(item, 1, true, 0, 2)
     end
 
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009076(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < num then
+		player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    local items = {9017,9018,9019,9020,9021,9022,9068,9069,9070,9071,9072,9073,9074,9075,}
+    local prob = {1401,2930,4331,5860,7134,7389,8281,9427,9491,9555,9619,9683,9810,10000,}
+    local item = 0
+
+    for kk = 1, num do
+        local sz = #prob
+        local k = 1
+        local rand = math.random(10000)
+        for n = 1,sz do
+            if rand <= prob[n] then
+                item = items[n]
+                k = n
+                break;
+            end
+        end
+
+        if item == 0 then
+            return false
+        end
+
+        package:AddItem(item, 1, bind, 0, 2)
+    end
 
     package:DelItemSendMsg(iid, player);
     return num;
@@ -3097,8 +3134,8 @@ function ItemNormal_00000007(iid, num, bind, param)
     package:AddItem(509, 2, true, 0, 2);
     -- 补髓益元丹
     package:AddItem(507, 2, true, 0, 2);
-    -- 自动回血符
-    package:AddItem(9, 5, true, 0, 2);
+    -- 银票
+    package:AddItem(15, 5, true, 0, 2);
     -- 洗练符
     package:AddItem(500, 5, true, 0, 2);
     -- 洗练符保护符
@@ -3160,8 +3197,8 @@ function ItemNormal_00000067(iid, num, bind, param)
     package:AddItem(509, 2, true, 0, 2);
     -- 补髓益元丹
     package:AddItem(507, 2, true, 0, 2);
-    -- 自动回血符
-    package:AddItem(9, 5, true, 0, 2);
+    -- 银票
+    package:AddItem(15, 5, true, 0, 2);
     -- 洗练符
     package:AddItem(500, 5, true, 0, 2);
     -- 洗练符保护符
@@ -3584,7 +3621,7 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     return num;
 end
 
--- 青龙
+-- 元神
 function ItemNormal_SecondSoul_489(iid, num, bind, param)
     local player = GetPlayer()
 
@@ -3593,14 +3630,14 @@ function ItemNormal_SecondSoul_489(iid, num, bind, param)
 		return false;
 	end
 
-    if not fgt:changeSecondSoulClass(1) then
+    if not fgt:changeSecondSoulClass(iid-488) then
         return false;
     end
 
     return 1;
 end
 
-function ItemNormal_SecondSoul_490(iid, num, bind, param)
+function ItemNormal_SecondSoul_9037(iid, num, bind, param)
     local player = GetPlayer()
 
 	local fgt = player:findFighter(param);
@@ -3608,14 +3645,14 @@ function ItemNormal_SecondSoul_490(iid, num, bind, param)
 		return false;
 	end
 
-    if not fgt:changeSecondSoulClass(2) then
+    if not fgt:changeSecondSoulClass(iid-9033) then
         return false;
     end
 
     return 1;
 end
 
-function ItemNormal_SecondSoul_491(iid, num, bind, param)
+function ItemNormal_SecondSoul_9046(iid, num, bind, param)
     local player = GetPlayer()
 
 	local fgt = player:findFighter(param);
@@ -3623,12 +3660,13 @@ function ItemNormal_SecondSoul_491(iid, num, bind, param)
 		return false;
 	end
 
-    if not fgt:changeSecondSoulClass(3) then
+    if not fgt:changeSecondSoulXinxiu(iid-9045) then
         return false;
     end
 
     return 1;
 end
+
 
 function ItemNormal_00009028(iid, num, bind, param)
     local player = GetPlayer()
@@ -3802,111 +3840,95 @@ function ItemNormal_00009053(iid, num, bind, param)
     return num;
 end
 
-function ItemNormal_00009058(id, num, bind, param)
+function ItemNormal_00009058(iid, num, bind, param)
     local player = GetPlayer();
     local package = player:GetPackage();
 
-    local cnt509;
-    local cnt503;
-    local cnt515;
-    local cntelixir;
-    if 9058 == id then
-        cnt509 = 30
-        cnt503 = 30
-        cnt515 = 10
-        cntelixir = 10
-    elseif 9059 == id then
-        cnt509 = 25
-        cnt503 = 25
-        cnt515 = 8
-        cntelixir = 8
-    elseif 9060 == id then
-        cnt509 = 20
-        cnt503 = 20
-        cnt515 = 6
-        cntelixir = 6
-    elseif 9061 == id then
-        cnt509 = 15
-        cnt503 = 15
-        cnt515 = 5
-        cntelixir = 4
-    elseif 9062 == id then
-        cnt509 = 10
-        cnt503 = 10
-        cnt515 = 3
-        cntelixir = 2
-    elseif 9063 == id then
-        cnt509 = 8
-        cnt503 = 8
-        cnt515 = 1
-        cntelixir = 1
-    elseif 9064 == id then
-        cnt509 = 5
-        cnt503 = 5
-        cnt515 = 0
-        cntelixir = 0;
-    elseif 9065 == id then
-        cnt509 = 3
-        cnt503 = 3
-        cnt515 = 0
-        cntelixir = 0;
-    elseif 9066 == id then
-        cnt509 = 1
-        cnt503 = 1
-        cnt515 = 0
-        cntelixir = 0
-    else
-        cnt509 = 0
-        cnt503 = 0
-        cnt515 = 0
-        cntelixir = 0
-    end
+    local all_items = { 
+        { {509, 30}, {503, 30}, {515, 10}, {9017, 10} },
+        { {509, 25}, {503, 25}, {515, 8}, {9017, 8} },
+        { {509, 20}, {503, 20}, {515, 6}, {9017, 6} },
+        { {509, 15}, {503, 15}, {515, 5}, {9017, 4} },
+        { {509, 10}, {503, 10}, {515, 3}, {9017, 2} },
+        { {509, 8}, {503, 8}, {515, 1}, {9017, 1} },
+        { {509, 5}, {503, 5} },
+        { {509, 3}, {503, 3} },
+        { {509, 1}, {503, 1} }
+    };
 
-    local packageSize = 0;
-    if cnt509 > 0 then
-        packageSize = packageSize + 1
-    end
-    if cnt503 > 0 then
-        packageSize = packageSize + 1
-    end
-    if cnt515 > 0 then
-        packageSize = packageSize + 1
-    end
-    if cntelixir > 0 then
-        packageSize = packageSize + cntelixir
-    end
-
-    if package:GetRestPackageSize() < packageSize then
+    local idx = iid - 9057;
+    local packageSize = {13, 11, 9, 7, 5, 4, 2, 2, 2};
+    if package:GetRestPackageSize() < packageSize[idx] then
 		player:sendMsgCode(2, 1011, 0);
         return false
     end
-    package:DelItemSendMsg(id, player);
 
-    if cnt509 > 0 then
-        package:AddItem(509, cnt509, 1, 0, 2)
-    end
-    if cnt503 > 0 then
-        package:AddItem(503, cnt503, 1, 0, 2)
-    end
-    if cnt515 > 0 then
-        package:AddItem(515, cnt515, 1, 0, 2)
-    end
+    package:DelItemSendMsg(iid, player);
 
-    local prob = {1, 2, 3, 4, 5, 6}
-    local items = {{9017,1}, {9018,1}, {9019,1}, {9020,1}, {9021,1}, {9022,1}}
-    local p
-
-    for i = 1,cntelixir do
-        p = math.random(1, 6)
-        for n = 1, #prob do
-            if p <= prob[n] then
-                package:AddItem(item[n], 1, 1, 0, 2)
-                break
+    local items = all_items[idx];
+    for i = 1, #items do
+        if items[i][1] == 9017 then
+            for j = 1, items[i][2] do
+                local elixir = {9017, 9018, 9019, 9020, 9021, 9022}
+                p = math.random(1, #elixir)
+                package:AddItem(elixir[p], 1, 1, 0, 2)
             end
+        else
+            package:AddItem(items[i][1], items[i][2], 1, 0, 2)
         end
     end
 
     return num;
+end
+
+function ItemNormal_00009077(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local dates = {
+        { ['year'] = 2012, ['month'] = 7, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 7, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+    }
+
+    local items = {
+        {{503,3},{514,1},{507,2},{60000,50}},
+        {{500,2},{57,3},{509,2},{60000,30}},
+        {{511,2},{548,5},{56,3},{60000,30}},
+    }
+
+    local id = iid - 9076
+    local start = os.time(dates[id])
+    local doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        if package:GetRestPackageSize() < 3*num then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
+        end
+
+        local item = items[id]
+
+        for k,v in pairs(item) do
+            if v[1] == 60000 then
+                player:getCoupon(v[2]*factor*num)
+            else
+                package:Add(v[1], v[2]*factor*num, true, 0, 2)
+            end
+        end
+
+        package:DelItemSendMsg(iid, player);
+        return num
+    else
+        SendMsg(player, 0x35, msg_59);
+    end
+    return false
 end
 
 local ItemNormal_Table = {
@@ -4151,6 +4173,7 @@ local ItemNormal_Table = {
     [1301] = ItemNormal_citta,
     [1302] = ItemNormal_citta,
     [1303] = ItemNormal_citta,
+    [1304] = ItemNormal_citta,
 
     [1000] = ItemNormal_formation,
     [1001] = ItemNormal_formation,
@@ -5210,15 +5233,38 @@ local ItemNormal_Table = {
     [9020] = ItemNormal_00009017,
     [9021] = ItemNormal_00009017,
     [9022] = ItemNormal_00009017,
+    [9068] = ItemNormal_00009017,
+    [9069] = ItemNormal_00009017,
+    [9070] = ItemNormal_00009017,
+    [9071] = ItemNormal_00009017,
+    [9072] = ItemNormal_00009017,
+    [9073] = ItemNormal_00009017,
+    [9074] = ItemNormal_00009017,
+    [9075] = ItemNormal_00009017,
+
     [9027] = ItemNormal_00009027,
 
     [9067] = ItemNormal_00009067,
+    [9076] = ItemNormal_00009076,
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
-    [490] = ItemNormal_SecondSoul_490,
-    [491] = ItemNormal_SecondSoul_491,
+    [490] = ItemNormal_SecondSoul_489,
+    [491] = ItemNormal_SecondSoul_489,
+    [9037] = ItemNormal_SecondSoul_9037,
+    [9038] = ItemNormal_SecondSoul_9037,
+    [9039] = ItemNormal_SecondSoul_9037,
+    [9040] = ItemNormal_SecondSoul_9037,
+    [9041] = ItemNormal_SecondSoul_9037,
+    [9042] = ItemNormal_SecondSoul_9037,
+    [9043] = ItemNormal_SecondSoul_9037,
+    [9044] = ItemNormal_SecondSoul_9037,
+    [9045] = ItemNormal_SecondSoul_9037,
 
+    [9046] = ItemNormal_SecondSoul_9046,
+    [9047] = ItemNormal_SecondSoul_9046,
+    [9048] = ItemNormal_SecondSoul_9046,
+    [9049] = ItemNormal_SecondSoul_9046,
 
     -- 棒棒糖
     [9028] = ItemNormal_00009028,
@@ -5260,6 +5306,10 @@ local ItemNormal_Table = {
     [9065] = ItemNormal_00009058,
     -- 仙界绿色宝箱
     [9066] = ItemNormal_00009058,
+
+    [9077] = ItemNormal_00009077,
+    [9078] = ItemNormal_00009077,
+    [9079] = ItemNormal_00009077,
 
 };
 
@@ -5314,7 +5364,7 @@ function ItemNormalOther_00000475(iid, num, bind, other)
         return false
     end
 
-    local items = {9, 514, 515, 500, 49, 503, 511, 517, 15}
+    local items = {15, 514, 515, 500, 49, 503, 511, 517, 15}
     local prob = {1700,3200,3300,4800,5200,5500,7100,8500,10000}
     local broad = {0,1,1,0,0,1,0,1,0}
     local item = 0

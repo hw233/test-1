@@ -10,9 +10,10 @@
 namespace GObject
 {
 
-SecondSoul::SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel, UInt32 stateExp, UInt8 stateLevel)
-    : m_fgt(fgt), m_cls(cls), m_practiceLevel(practiceLevel), m_stateExp(stateExp), m_stateLevel(stateLevel),
-        m_strength(0), m_agility(0), m_physique(0), m_intelligence(0), m_will(0), m_skill_num1(0), m_skill_num2(0)
+SecondSoul::SecondSoul(Fighter* fgt, UInt8 cls, UInt8 practiceLevel, UInt32 stateExp, UInt8 stateLevel, UInt8 xinxiu)
+    : m_fgt(fgt), m_cls(cls), m_practiceLevel(practiceLevel), m_stateExp(stateExp), m_stateLevel(stateLevel), m_xinxiu(xinxiu),
+        m_strength(0), m_agility(0), m_physique(0), m_intelligence(0), m_will(0),
+        m_xinxiu_attack(0), m_xinxiu_action(0), m_xinxiu_defend(0), m_xinxiu_hp(0), m_skill_num1(0), m_skill_num2(0)
 {
 }
 
@@ -34,6 +35,10 @@ void SecondSoul::addAttr(GData::AttrExtra& ae)
         m_physique = Script::BattleFormula::getCurrent()->calcSoulPhysique(this);
         m_intelligence = Script::BattleFormula::getCurrent()->calcSoulIntelligence(this);
         m_will = Script::BattleFormula::getCurrent()->calcSoulWill(this);
+        m_xinxiu_attack = Script::BattleFormula::getCurrent()->calcSoulXinxiuAttack(this);
+        m_xinxiu_action = Script::BattleFormula::getCurrent()->calcSoulXinxiuAction(this);
+        m_xinxiu_defend = Script::BattleFormula::getCurrent()->calcSoulXinxiuDefend(this);
+        m_xinxiu_hp = Script::BattleFormula::getCurrent()->calcSoulXinxiuHp(this);
     }
 
     //ae.hpP += hpFactor;
@@ -42,6 +47,12 @@ void SecondSoul::addAttr(GData::AttrExtra& ae)
     ae.physique += m_physique * (1 + physiqueFactor + attrTransFactor);
     ae.intelligence += m_intelligence * (1 + intelligenceFactor + attrTransFactor);
     ae.will += m_will * (1 + willFactor + attrTransFactor);
+    ae.attack += m_xinxiu_attack;
+    ae.magatk += m_xinxiu_attack;
+    ae.action += m_xinxiu_action;
+    ae.defend += m_xinxiu_defend;
+    ae.magdef += m_xinxiu_defend;
+    ae.hp += m_xinxiu_hp;
     ae.auraMax += getSoulSkillValue(SOUL_SKILL_AURAMAX);
 }
 
@@ -94,6 +105,10 @@ bool SecondSoul::practiceLevelUp(UInt32& pexp)
         m_physique = Script::BattleFormula::getCurrent()->calcSoulPhysique(this);
         m_intelligence = Script::BattleFormula::getCurrent()->calcSoulIntelligence(this);
         m_will = Script::BattleFormula::getCurrent()->calcSoulWill(this);
+        m_xinxiu_attack = Script::BattleFormula::getCurrent()->calcSoulXinxiuAttack(this);
+        m_xinxiu_action = Script::BattleFormula::getCurrent()->calcSoulXinxiuAction(this);
+        m_xinxiu_defend = Script::BattleFormula::getCurrent()->calcSoulXinxiuDefend(this);
+        m_xinxiu_hp = Script::BattleFormula::getCurrent()->calcSoulXinxiuHp(this);
         m_fgt->setDirty(true);
         DB2().PushUpdateData("UPDATE `second_soul` SET `practiceLevel` = %u WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_practiceLevel, m_fgt->getId(), m_fgt->getOwner()->getId());
         return true;
@@ -265,14 +280,14 @@ void SecondSoul::insertIntoDB()
 {
     std::string str;
     vector2string(m_skills, m_skills.size(), str);
-    DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %"I64_FMT"u, %u, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, str.c_str());
+    DB2().PushUpdateData("INSERT INTO `second_soul` (`fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills`) VALUES (%u, %"I64_FMT"u, %u, 0, 1, 1, 0, '%s')", m_fgt->getId(), m_fgt->getOwner()->getId(), m_cls, str.c_str());
 }
 
 void SecondSoul::sendInfo(Player* pl)
 {
     Stream st(REP::SECOND_SOUL);
     st << static_cast<UInt8>(0);
-    st << static_cast<UInt16>(m_fgt->getId()) << m_cls << m_practiceLevel << m_stateExp;
+    st << static_cast<UInt16>(m_fgt->getId()) << m_cls << m_xinxiu << m_practiceLevel << m_stateExp;
 
     UInt8 cnt = m_skills.size();
     st << cnt;
@@ -304,7 +319,7 @@ void SecondSoul::sendSoulSkill(Player* pl)
 
 bool SecondSoul::setClass(UInt8 cls)
 {
-    if(cls == 0 || cls == m_cls)
+    if(cls == 0 || cls == m_cls || cls > 12)
     {
         m_fgt->getOwner()->sendMsgCode(0, 1073);
         return false;
@@ -351,6 +366,27 @@ UInt8 SecondSoul::getSoulSkillIdx(UInt16 skillId)
     ss.level = skillId & 0xFF;
 
     return getSoulSkillIdx(ss);
+}
+
+bool SecondSoul::setXinxiu(UInt8 xinxiu)
+{
+    if(xinxiu == 0 || xinxiu == m_xinxiu || xinxiu > 4)
+    {
+        m_fgt->getOwner()->sendMsgCode(0, 1079);
+        return false;
+    }
+
+    m_xinxiu = xinxiu;
+    DB2().PushUpdateData("UPDATE `second_soul` SET `xinxiu` = %d WHERE `fighterId` = %u AND `playerId` = %"I64_FMT"u", m_xinxiu, m_fgt->getId(), m_fgt->getOwner()->getId());
+
+    sendInfo(m_fgt->getOwner());
+    m_xinxiu_attack = Script::BattleFormula::getCurrent()->calcSoulXinxiuAttack(this);
+    m_xinxiu_action = Script::BattleFormula::getCurrent()->calcSoulXinxiuAction(this);
+    m_xinxiu_defend = Script::BattleFormula::getCurrent()->calcSoulXinxiuDefend(this);
+    m_xinxiu_hp = Script::BattleFormula::getCurrent()->calcSoulXinxiuHp(this);
+    m_fgt->setDirty(true);
+    m_fgt->getOwner()->sendMsgCode(0, 1078);
+    return true;
 }
 
 }

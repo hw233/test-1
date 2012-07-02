@@ -232,7 +232,6 @@ UInt8 PlayerCopy::checkCopy(Player* pl, UInt8 id, UInt8& lootlvl)
     return 1;
 }
 
-static bool diamondPrivilege = false;
 void PlayerCopy::enter(Player* pl, UInt8 id)
 {
     if (!pl || !id)
@@ -278,7 +277,7 @@ void PlayerCopy::enter(Player* pl, UInt8 id)
     if(id == 0xff)
     {
         UInt8 realCopyId = GetCopyIdBySpots(PLAYER_DATA(pl, location));
-        diamondPrivilege = true;
+        pl->setDiamondPrivilege(true);
         id = realCopyId;
     }
     if (!ret) {
@@ -401,9 +400,9 @@ UInt8 PlayerCopy::fight(Player* pl, UInt8 id, bool ato, bool complete)
             if(World::getFourCopAct())
             {
                 UInt32 randNum = uRand(3);
-                if(diamondPrivilege)
+                if(pl->getDiamondPrivilege())
                 {
-                    diamondPrivilege = false;
+                    pl->setDiamondPrivilege(false);
                     randNum = randNum + 1;
                 }
                 else if(PLAYER_DATA(pl, copyFreeCnt) == getFreeCount() && PLAYER_DATA(pl, copyGoldCnt) > 0)

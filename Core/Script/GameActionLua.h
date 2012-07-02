@@ -246,6 +246,7 @@ namespace Script
         UInt16 RunTargetAward(Player* player);
         UInt16 RunTargetAwardRF(Player* player);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
+        void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
 	public:
 
 		template <typename R>

@@ -61,10 +61,12 @@ DROP TABLE IF EXISTS `arena_bet`;
 CREATE TABLE `arena_bet` (
   `id` bigint(20) unsigned NOT NULL,
   `round` tinyint(3) unsigned NOT NULL,
+  `state` tinyint(3) unsigned NOT NULL,
   `group` tinyint(3) unsigned NOT NULL,
+  `recieved` tinyint(3) unsigned NOT NULL,
   `pos` tinyint(3) unsigned NOT NULL,
   `tael` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`id`,`round`)
+  PRIMARY KEY (`id`,`state`,`round`,`group`,`pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1328,6 +1330,7 @@ CREATE TABLE `second_soul` (
   `fighterId` int(10) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
   `cls` tinyint(3) unsigned NOT NULL,
+  `xinxiu` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `practiceLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `stateLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `stateExp` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1378,6 +1381,14 @@ CREATE TABLE `elixir` (
     `intelligence` int(5) NOT NULL DEFAULT '0',
     `will` int(5) NOT NULL DEFAULT '0',
     `soul` int(5) NOT NULL DEFAULT '0',
+    `attack` int(5) NOT NULL DEFAULT '0',
+    `defend` int(5) NOT NULL DEFAULT '0',
+    `critical` int(5) NOT NULL DEFAULT '0',
+    `pierce` int(5) NOT NULL DEFAULT '0',
+    `evade` int(5) NOT NULL DEFAULT '0',
+    `counter` int(5) NOT NULL DEFAULT '0',
+    `tough` int(5) NOT NULL DEFAULT '0',
+    `action` int(5) NOT NULL DEFAULT '0',
     UNIQUE KEY `id_playerId` (`id`,`playerId`),
     KEY `playerId` (`playerId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

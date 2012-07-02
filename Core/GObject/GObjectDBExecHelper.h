@@ -250,6 +250,7 @@ struct DBSecondSoul
 	UInt32 fighterId;
 	UInt64 playerId;
 	UInt8 cls;
+	UInt8 xinxiu;
 	UInt8 practiceLevel;
 	UInt8 stateLevel;
 	UInt32 stateExp;
@@ -367,6 +368,7 @@ struct DBFighter2
     UInt16 attrValue3;
 	UInt32 fighterId;
 	UInt8 cls;
+	UInt8 xinxiu;
 	UInt8 practiceLevel;
 	UInt8 stateLevel;
 	UInt32 stateExp;
@@ -377,6 +379,14 @@ struct DBFighter2
     Int32 intelligence;
     Int32 will;
     Int32 soul;
+    Int32 attack;
+    Int32 defend;
+    Int32 critical;
+    Int32 pierce;
+    Int32 evade;
+    Int32 counter;
+    Int32 tough;
+    Int32 action;
 };
 
 
@@ -825,7 +835,9 @@ struct DBArenaBet
 {
 	UInt64 id;
 	UInt8 round;
+	UInt8 state;
 	UInt8 group;
+	UInt8 recieved;
 	UInt8 pos;
 	UInt8 tael;
 };
@@ -913,7 +925,7 @@ struct DBRealItemAward
 
 struct DBRNR
 {
-    UInt32 id;
+    UInt64 id;
     std::string record;
 };
 
@@ -1316,7 +1328,7 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBFighter2)
-SPECIALDEF(44)
+SPECIALDEF(53)
 	(
 	UInt32, id,
 	UInt64, playerId,
@@ -1352,6 +1364,7 @@ SPECIALDEF(44)
     UInt16, attrValue3,
 	UInt32, fighterId,
 	UInt8, cls,
+	UInt8, xinxiu,
 	UInt8, practiceLevel,
 	UInt8, stateLevel,
 	UInt32, stateExp,
@@ -1361,7 +1374,15 @@ SPECIALDEF(44)
     Int32, agility,
     Int32, intelligence,
     Int32, will,
-    Int32, soul
+    Int32, soul,
+    Int32, attack,
+    Int32, defend,
+    Int32, critical,
+    Int32, pierce,
+    Int32, evade,
+    Int32, counter,
+    Int32, tough,
+    Int32, action
 	)
 SPECIALEND()
 
@@ -1965,11 +1986,13 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBArenaBet)
-SPECIALDEF(5)
+SPECIALDEF(7)
 (
 	UInt64, id,
 	UInt8, round,
+	UInt8, state,
 	UInt8, group,
+	UInt8, recieved,
 	UInt8, pos,
 	UInt8, tael
 )
@@ -2096,7 +2119,7 @@ SPECIALEND()
 SPECIALBEGIN(GObject::DBRNR)
 SPECIALDEF(2)
 (
-    UInt32, id,
+    UInt64, id,
     std::string, record 
 )
 SPECIALEND()

@@ -168,6 +168,13 @@ void OnCompleteDungeonAutoNotifyReq(GameMsgHdr& hdr, const void * data)
 	ev->release();
 }
 
+void OnResetRecharge(GameMsgHdr& hdr, const void * data)
+{
+	MSG_QUERY_PLAYER(player);
+    player->SetVar(VAR_RECHARGE_TOTAL, 0);
+    player->sendRechargeInfo();
+}
+
 void OnTimerEventCompletedNotify( GameMsgHdr& hdr, const void * data )
 {
 	struct EventMsg
@@ -1026,7 +1033,11 @@ void OnArenaBet( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt16 tael = *reinterpret_cast<const UInt16 *>(data);
-	player->useTael(tael);
+	ConsumeInfo ci(ArenaBet, 0, 0);
+    if(tael == 0)
+        player->useGold(5, &ci);
+    else
+        player->useTael(500, &ci);
 }
 
 void OnArenaBetResult( GameMsgHdr& hdr, const void * data )
@@ -1392,6 +1403,38 @@ void OnSendRNR( GameMsgHdr& hdr, const void* data )
     };
     SendRNR* rnr = (SendRNR*)data;
     GameAction()->sendRNR(rnr->player, rnr->off, rnr->date, rnr->total);
+}
+
+void OnGetArenaMoney( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt32 arenaMoney = *reinterpret_cast<const UInt32 *>(data);
+    player->getMoneyArena(arenaMoney);
+}
+
+void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+
+    if(player->GetLev() < 70)
+        return;
+    if(type == 0)
+    {
+        Stream st(ARENAREQ::ENTER, 0xEF);
+        st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
+        player->appendLineup2(st);
+        st << Stream::eos;
+        NETWORK()->SendToArena(st);
+    }
+    else if(type == 1)
+    {
+        Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
+        st << player->getId();
+        player->appendLineup2(st);
+        st << Stream::eos;
+        NETWORK()->SendToArena(st);
+    }
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

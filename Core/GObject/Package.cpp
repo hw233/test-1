@@ -605,6 +605,8 @@ namespace GObject
             {
                 AddItemCoursesLog(typeId, static_cast<UInt32>(count), fromWhere);
             }
+            if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                udpLog(item->getClass(), typeId, count, 0, "add");
             if (typeId == 1209)
                 m_Owner->OnHeroMemo(MC_CITTA, MD_LEGEND, 0, 0);
             if (typeId == 1223)
@@ -623,6 +625,8 @@ namespace GObject
 			m_Size = newSize;
 			m_Items[ItemKey(typeId, bind)] = item;
 			DB4().PushUpdateData("INSERT INTO `item`(`id`, `itemNum`, `ownerId`, `bindType`) VALUES(%u, %u, %"I64_FMT"u, %u)", typeId, count, m_Owner->getId(), bind ? 1 : 0);
+            if (fromWhere != FromNpcBuy && (GData::store.getPrice(typeId) || GData::GDataManager::isInUdpItem(typeId)))
+                udpLog(item->getClass(), typeId, count, 0, "add");
 			SendItemData(item);
 			ItemNotify(item->GetItemType().getId(), count);
             //获得物品

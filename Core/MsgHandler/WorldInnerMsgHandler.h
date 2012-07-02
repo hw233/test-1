@@ -471,6 +471,7 @@ void OnReloadLuaReq( GameMsgHdr& hdr, const void * data )
 		GameMsgHdr hdr3(0x1EE, WORKER_THREAD_NEUTRAL, NULL, sizeof(UInt16));
 		GLOBAL().PushMsg(hdr3, &flag);
 	}
+    WORLD().getWorldScript()->forceCommitArena();
 }
 
 void OnSpecialAward( GameMsgHdr& hdr, const void * data )

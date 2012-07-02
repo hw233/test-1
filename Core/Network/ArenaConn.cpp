@@ -16,25 +16,31 @@ namespace Network
 ArenaConn::ArenaConn( int fd, Network::TcpSlaveServer * s, int id ) :
 	TcpConduit(fd, s, id)
 {
+}
+
+bool ArenaConn::enabled()
+{
+	return cfg.arenaPort > 0;
+}
+
+void ArenaConn::initConnection()
+{
 	struct sockaddr_in addr = {0};
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(ResolveAddress(cfg.arenaHost.c_str()));
 	addr.sin_port = htons(cfg.arenaPort);
-	if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    int n = bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr));
+	//if(bufferevent_socket_connect(_bev, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+	if(n < 0)
 		throw std::bad_exception();
-	Stream st(0x01, 0xEF);
-	st << cfg.slugName << cfg.channelNum << cfg.serverNum;
+	Stream st(ARENAREQ::REG, 0xEF);
+	st << cfg.slugName << cfg.channelNum << cfg.serverNo << cfg.merged;
     if (cfg.merged)
     {
         // TODO:
     }
     st << Stream::eos;
 	send(&st[0], st.size());
-}
-
-bool ArenaConn::enabled()
-{
-	return cfg.arenaPort > 0;
 }
 
 int ArenaConn::parsePacket( struct evbuffer * buf, int &off, int &len )
