@@ -1471,10 +1471,11 @@ void Fighter::rebuildEquipAttr()
         _attrExtraEquip.magdef += _owner->getClanSkillMagDefentEffect();
         _attrExtraEquip.action += _owner->getClanSkillActionEffect();
         _attrExtraEquip.hitrlvl += _owner->getClanSkillHitrLvlEffect();
-
+#if 0
         const GData::AttrExtra* ae = _owner->getHIAttr();
         if (ae)
             addAttrExtra(_attrExtraEquip, ae);
+#endif
     }
 
     if(m_2ndSoul)

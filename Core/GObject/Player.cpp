@@ -10561,5 +10561,32 @@ namespace GObject
         m_arenaCommitCD = now + 60;
         return false;
     }
+
+    void Player::appendLineup2( Stream& st)
+    {
+        st << getFormation();
+        size_t offset = st.size();
+        UInt8 c = 0;
+        st << c;
+        for(UInt8 i = 0; i < 5; ++ i)
+        {
+            Lineup& pdata = getLineup(i);
+            if(pdata.available())
+            {
+                ++c;
+                st << pdata.pos << static_cast<UInt16>(pdata.fid);
+                Fighter * fgt = pdata.fighter;
+
+                st << fgt->getLevel() << fgt->getPotential() << fgt->getCapacity();
+                st << fgt->getMaxSoul() << fgt->getPeerlessAndLevel();
+                fgt->getAllUpSkillAndLevel(st);
+                fgt->getAllPSkillAndLevel4Arena(st);
+
+                fgt->getAttrExtraEquip(st);
+            }
+        }
+        st.data<UInt8>(offset) = c;
+    }
+
 } // namespace GObject
 

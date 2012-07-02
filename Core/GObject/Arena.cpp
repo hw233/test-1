@@ -111,13 +111,14 @@ Arena::Arena():
 
 void Arena::enterArena( Player * player )
 {
-    if(player->GetLev() < 70)
+    if(_progress != 0)
         return;
-	Stream st(ARENAREQ::ENTER, 0xEF);
-	st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
-	appendLineup2(st, player);
-	st << Stream::eos;
-	NETWORK()->SendToArena(st);
+    std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
+    if( iter != _players.end() )
+        return;
+	GameMsgHdr hdr(0x252, player->getThreadId(), player, 1);
+	UInt8 data = 0;
+	GLOBAL().PushMsg(hdr, &data);
 }
 
 void Arena::commitLineup( Player * player )
@@ -190,12 +191,27 @@ void Arena::commitLineup( Player * player )
             return;
     }
 
-	Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
-	st << player->getId();
-	appendLineup2(st, player);
-	st << Stream::eos;
-	//NETWORK()->SendMsgToClient(sid, st);
-	NETWORK()->SendToArena(st);
+	GameMsgHdr hdr(0x252, player->getThreadId(), player, 1);
+	UInt8 data = 1;
+	GLOBAL().PushMsg(hdr, &data);
+}
+
+void Arena::commitArenaForceOnce()
+{
+    PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
+    Mutex::ScopedLock lk(globalPlayers.getMutex());
+    std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
+    for(; it != _preliminaryPlayers_list[0].end(); ++ it)
+    {
+        PreliminaryPlayer& pp = *it;
+        std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pp.id);
+        if(it == pm.end())
+            continue;
+        Player * pl = it->second;
+        if(pl == NULL)
+            continue;
+        commitLineup(pl);
+    }
 }
 
 UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 type )

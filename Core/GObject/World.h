@@ -222,6 +222,7 @@ public:
 
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
+    static void commitArenaForceOnce();
 
 public:
 	inline static UInt8 getWeekDay()

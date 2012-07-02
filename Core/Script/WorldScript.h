@@ -21,6 +21,7 @@ public:
 	void postInit();
 	void onActivityCheck(UInt32);
 	UInt32 onAthleticsNewBox(UInt8, UInt32);
+    void forceCommitArena();
 
 	static GData::Store * GetStore();
 	static GData::TitleList * GetTitleList();

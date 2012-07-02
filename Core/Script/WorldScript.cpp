@@ -147,6 +147,7 @@ void WorldScript::init()
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
+    def("commitArenaForceOnce", GObject::World::commitArenaForceOnce);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
@@ -180,6 +181,11 @@ GData::Store * WorldScript::GetStore()
 GData::TitleList * WorldScript::GetTitleList()
 {
 	return &GData::titleList;
+}
+
+void WorldScript::forceCommitArena()
+{
+	call<void>("forceCommitArena");
 }
 
 }

@@ -1548,6 +1548,7 @@ namespace GObject
         void sendRNR(UInt32 now);
         void sendRechargeNextRetInfo(UInt32 now);
         bool inArenaCommitCD();
+        void appendLineup2( Stream& st);
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;

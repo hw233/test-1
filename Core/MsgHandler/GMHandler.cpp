@@ -2090,7 +2090,7 @@ void GMHandler::OnAutoFB( GObject::Player * player, std::vector<std::string>& ar
 
 void GMHandler::OnEnterArena( GObject::Player * player, std::vector<std::string>& )
 {
-	GObject::Arena::enterArena(player);
+	GObject::arena.enterArena(player);
 }
 
 void GMHandler::OnNextArena( GObject::Player * player, std::vector<std::string>& )

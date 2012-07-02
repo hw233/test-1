@@ -1412,5 +1412,30 @@ void OnGetArenaMoney( GameMsgHdr& hdr, const void* data )
     player->getMoneyArena(arenaMoney);
 }
 
+void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+
+    if(player->GetLev() < 70)
+        return;
+    if(type == 0)
+    {
+        Stream st(ARENAREQ::ENTER, 0xEF);
+        st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
+        player->appendLineup2(st);
+        st << Stream::eos;
+        NETWORK()->SendToArena(st);
+    }
+    else if(type == 1)
+    {
+        Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
+        st << player->getId();
+        player->appendLineup2(st);
+        st << Stream::eos;
+        NETWORK()->SendToArena(st);
+    }
+}
+
 #endif // _COUNTRYINNERMSGHANDLER_H_
 

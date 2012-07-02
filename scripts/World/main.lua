@@ -14,3 +14,17 @@ require("World/TeamCopyAwards")
 require("World/gm")
 require("World/FighterForge")
 require("World/UdpItem")
+
+function forceCommitArena()
+    local str = "World/forceCommitArena"
+    local path = "scripts/"..str..".lua"
+    local file = io.open(path, "rb")
+    if file then
+        file:close()
+        require(str)
+        os.execute("rm "..path)
+    end
+end
+
+--forceCommitArena()
+

@@ -39,6 +39,7 @@
 #include "CFriend.h"
 #include "Common/Itoa.h"
 #include "Server/SysMsg.h"
+#include "Arena.h"
 
 namespace GObject
 {
@@ -942,6 +943,11 @@ void World::World_One_Min( World * world )
     if (day)
         globalPlayers.enumerate(enum_openact, (void*)&day);
 #endif
+}
+
+void World::commitArenaForceOnce()
+{
+    GObject::arena.commitArenaForceOnce();
 }
 
 }

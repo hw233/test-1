@@ -1498,7 +1498,7 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 		}
 		break;
 	case 1:
-		GObject::Arena::enterArena(player);
+		GObject::arena.enterArena(player);
 		break;
 	case 2:
 		{
