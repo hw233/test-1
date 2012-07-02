@@ -794,7 +794,7 @@ namespace GObject
         std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
         for (; it != _fighters.end(); ++it)
         {
-            Fighter* fgt = it->second;
+            Fighter* fgt = it->second; // XXX: Fashion can not be enchanted
             ItemEquip* e[11] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
                 fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
                 fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
@@ -2305,7 +2305,7 @@ namespace GObject
         st << fgt->getUpCittasMax();
 		if(withequip)
 		{
-			st << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)
+			st << fgt->getFashionId() << fgt->getWeaponId() << fgt->getArmorId(0) << fgt->getArmorId(1)
                 << fgt->getArmorId(2) << fgt->getArmorId(3) << fgt->getArmorId(4)
 				<< fgt->getAmuletId() << fgt->getRingId();
             fgt->getAllTrumps(st);

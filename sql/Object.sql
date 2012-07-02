@@ -591,6 +591,7 @@ CREATE TABLE `fighter` (
   `attrValue2` smallint(5) unsigned NOT NULL DEFAULT '0',
   `attrType3` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `attrValue3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `fashion` int(10) unsigned NOT NULL DEFAULT '0',
   `weapon` int(10) unsigned NOT NULL DEFAULT '0',
   `armor1` int(10) unsigned NOT NULL DEFAULT '0',
   `armor2` int(10) unsigned NOT NULL DEFAULT '0',
