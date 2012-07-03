@@ -62,6 +62,11 @@ function is6_25()
     return is_6_25
 end
 
+is_7_1 = false 
+function is7_1()
+    return is_7_1
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -374,6 +379,12 @@ function onActivityCheck(tm)
           setJuly(false)
       end
 
+      if tm >= actTime69 and tm < actTime70 then
+          is_7_1 = true
+      else
+          is_7_1 = false 
+      end
+
       setShuoShuo(true);
   end
 
@@ -550,6 +561,9 @@ function initActTime(y, m, d)
 
   actTime67 = os.time(SerStartTm29);
   actTime68 = os.time(SerStartTm29) + 31 * 86400;
+
+  actTime69 = os.time(SerStartTm29);
+  actTime70 = os.time(SerStartTm29) + 15 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

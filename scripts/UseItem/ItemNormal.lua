@@ -3897,7 +3897,7 @@ function ItemNormal_00009077(iid, num, bind, param)
         {{511,2},{548,5},{56,3},{60000,30}},
     }
 
-    local id = iid - 9077
+    local id = iid - 9076
     local start = os.time(dates[id])
     local doubleend = start + 86400
 
@@ -3908,7 +3908,7 @@ function ItemNormal_00009077(iid, num, bind, param)
             factor = 2
         end
 
-        if package:GetRestPackageSize() < 3 then
+        if package:GetRestPackageSize() < 3*num then
             player:sendMsgCode(2, 1011, 0);
             return false;
         end
@@ -3917,9 +3917,9 @@ function ItemNormal_00009077(iid, num, bind, param)
 
         for k,v in pairs(item) do
             if v[1] == 60000 then
-                player:getCoupon(v[2]*factor)
+                player:getCoupon(v[2]*factor*num)
             else
-                package:Add(v[1], v[2]*factor, true, 0, 2)
+                package:Add(v[1], v[2]*factor*num, true, 0, 2)
             end
         end
 
