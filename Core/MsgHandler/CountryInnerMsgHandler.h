@@ -1401,7 +1401,7 @@ void OnSendRNR( GameMsgHdr& hdr, const void* data )
 void OnGetArenaMoney( GameMsgHdr& hdr, const void* data )
 {
     MSG_QUERY_PLAYER(player);
-	const UInt8 arenaMoney = *reinterpret_cast<const UInt32 *>(data);
+	const UInt32 arenaMoney = *reinterpret_cast<const UInt32 *>(data);
     player->getMoneyArena(arenaMoney);
 }
 

@@ -15,6 +15,18 @@ namespace GObject
 #define GET_ARENA_NAME(n) char n[1024]; if(_session & 0x8000) { SysMsgItem * mi = globalSysMsg[780]; if(mi != NULL) mi->get(n); else n[0] = 0; } else { strcpy(n, cfg.slugName.c_str()); }
 #define GET_PROGRESS_NAME(n, p) char n[1024]; { SysMsgItem * mi = globalSysMsg[781 + p]; if(mi != NULL) mi->get(n); else n[0] = 0; }
 
+const static UInt8 progress_accept[7][13] = {
+  // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12 
+    {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},   // 0
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},   // 1
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},   // 2
+    {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},   // 3
+    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},   // 4
+    {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},   // 5
+    {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}    // 6
+};
+
+
 bool enum_send_status(void * ptr, void * data )
 {
     Player* player = static_cast<Player*>(ptr);
@@ -186,62 +198,85 @@ void Arena::commitLineup( Player * player )
 	NETWORK()->SendToArena(st);
 }
 
-UInt8 Arena::bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type )
+UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 type )
 {
-	if(group > 2 || state > 6 || _progress < 3 || (_progress == 10 && state != 2) || (_status > 0  && _progress > 3 && _progress < 8) || (_progress == 8 && state != 0) || (_progress == 9 && state!= 1))
+	if(group != 0 || state > 1)
 		return 0xFF;
+    if(progress_accept[state][_progress] == 0)
+        return 0xFF;
+
+    PreliminaryPlayerListMap::iterator pit = _preliminaryPlayers[state].find(pid); 
+    if(pit == _preliminaryPlayers[state].end())
+        return 0xFF;
+
+    PreliminaryPlayerListIterator it = pit->second;
+    PreliminaryPlayer& pp = *it;
+
+    UInt16 pos = std::distance(_preliminaryPlayers_list[state].begin(), it);
+    std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
+    if(ait != _players.end() && ait->second.betList[state][0].size() >= 1 || pp.name.empty())
+        return 0xFF;
+    if(pp.betMap.find(player) != pp.betMap.end())
+        return 2;
+    pp.betMap[player] = type;
+
+	Stream st(ARENAREQ::BET, 0xEF);
+	st << group << pos << Stream::eos;
+	NETWORK()->SendToArena(st);
+	BetInfo binfo;
+	binfo.state = state;
+	binfo.round = 1;
+	binfo.group = group;
+	binfo.recieved = 0;
+	binfo.pos = pos;
+	binfo.type = type;
+    int i = 0;
+    if(group > 0)
+        i = group - 1;
+	_players[player].betList[state][i].push_back(binfo);
+	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
+	UInt16 data = type;
+	GLOBAL().PushMsg(hdr, &data);
+
+	return type;
+}
+
+UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type )
+{
+	if(group < 1 || group > 2 || state > 6 || state < 2 || _status > 0)
+		return 0xFF;
+    if(progress_accept[state][_progress] == 0)
+        return 0xFF;
+
     UInt16 pos2 = pos;
-    if(_progress == 8 || _progress == 9)
+    int gIdx = group - 1;
+    UInt8 fidx = 0;
+    switch(state)
     {
-        if(group != 0 || pos > _preliminaryPlayers_list_set[state].size())
-            return 0xFF;
-        PreliminaryPlayersSet::iterator setIt = _preliminaryPlayers_list_set[state].begin();
-        std::advance(setIt, pos);
-        if(setIt == _preliminaryPlayers_list_set[state].end())
-            return 0xFF;
-
-        PreliminaryPlayerListIterator it = *setIt;
-        PreliminaryPlayer& pp = *it;
-
-        pos = std::distance(_preliminaryPlayers_list[state].begin(), it);
-        pos2 = pos;
-        std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
-        if(ait != _players.end() && ait->second.betList[state][0].size() >= 1 || pp.name.empty())
-            return 0xFF;
-        if(pp.betMap.find(player) != pp.betMap.end())
-            return 2;
-        pp.betMap[player] = type;
+    case 2:
+    case 3:
+        fidx = pos >> _round;
+        break;
+    case 4:
+    case 5:
+    case 6:
+        pos2 = _finalIdx[gIdx][2][pos];
+        fidx = pos2 >> _round;
+        break;
     }
+    if(_finalIdx[gIdx][_round][fidx] != pos2 || pos > 31 || _finals[gIdx][pos2].name.empty())
+        return 0xFF;
+
+    if( (fidx % 2) == 1)
+        fidx -= 1;
     else
-    {
-        int gIdx = group - 1;
-        UInt8 fidx = 0;
-        switch(state)
-        {
-        case 2:
-        case 3:
-            fidx = pos >> _round;
-            break;
-        case 4:
-        case 5:
-        case 6:
-            pos2 = _finalIdx[gIdx][2][pos];
-            fidx = pos2 >> _round;
-            break;
-        }
-        if(_finalIdx[gIdx][_round][fidx] != pos2 || pos > 31 || _finals[gIdx][pos2].name.empty())
-            return 0xFF;
+        fidx += 1;
 
-        if( (fidx % 2) == 1)
-            fidx -= 1;
-        else
-            fidx += 1;
-
-        UInt8 pos3 = _finalIdx[gIdx][_round][fidx];
-        if(_finals[gIdx][pos2].betMap.find(player) != _finals[gIdx][pos2].betMap.end() || _finals[gIdx][pos3].betMap.find(player) != _finals[gIdx][pos3].betMap.end())
-            return 2;
-        _finals[gIdx][pos2].betMap[player] = type;
-    }
+    UInt8 pos3 = _finalIdx[gIdx][_round][fidx];
+    if(_finals[gIdx][pos2].betMap.find(player) != _finals[gIdx][pos2].betMap.end() || _finals[gIdx][pos3].betMap.find(player) != _finals[gIdx][pos3].betMap.end())
+        return 2;
+    _finals[gIdx][pos2].betMap[player] = type;
 
 	Stream st(ARENAREQ::BET, 0xEF);
 	st << group << pos2 << Stream::eos;
@@ -723,6 +758,7 @@ void Arena::readFrom( BinaryReader& brd )
 		if(!_players.empty() && sIdx == 0)
         {
             DB().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
+            _playerCount[0] = 0;
 			_players.clear();
         }
         if(!_preliminaryPlayers[0].empty() && sIdx == 0)
@@ -1308,13 +1344,16 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
 void Arena::readPlayers(BinaryReader& brd, UInt8 sIdx)
 {
     if(!_players.empty() && sIdx == 0)
+    {
+        _playerCount[0] = 0;
         _players.clear();
+    }
 
     Mutex::ScopedLock lk(globalPlayers.getMutex());
     std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
     UInt32 count;
     brd >> count;
-    _playerCount[0] = count;
+    _playerCount[0] += count;
     for(UInt32 z = 0; z < count; ++ z)
     {
         UInt64 pid = 0;
@@ -1879,7 +1918,7 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag, UInt16 start
             std::map<Player *, UInt8>::iterator it = pp.betMap.find(player);
             if(it != pp.betMap.end())
                 fSupport = it->second + 1;
-            st << pp.battlePoint << static_cast<UInt16>(pp.support) << fSupport << pp.heroId << pp.level << pp.name;
+            st << pp.id << pp.battlePoint << static_cast<UInt16>(pp.support) << fSupport << pp.heroId << pp.level << pp.name;
         }
         st.data<UInt8>(offset) = static_cast<UInt8>(premNum);
     }
@@ -2008,25 +2047,21 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         if(type == 1)
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
+            std::advance(it, pos);
             if(it != _preliminaryPlayers_list[0].end())
             {
-                std::advance(it, pos);
                 PreliminaryPlayer& pp = *it;
-                _preliminaryPlayers_list_set[0].erase(it);
                 ++ pp.support;
-                _preliminaryPlayers_list_set[0].insert(it);
             }
         }
         else
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[1].begin();
+            std::advance(it, pos);
             if(it != _preliminaryPlayers_list[1].end())
             {
-                std::advance(it, pos);
                 PreliminaryPlayer& pp = *it;
-                _preliminaryPlayers_list_set[1].erase(it);
                 ++ pp.support;
-                _preliminaryPlayers_list_set[1].insert(it);
             }
         }
     }
@@ -2108,14 +2143,18 @@ void Arena::updateBattlePoint(BinaryReader& brd)
     {
         PreliminaryPlayerListIterator ppit = pit0->second;
         PreliminaryPlayer& pp = *ppit;
+        _preliminaryPlayers_list_set[0].erase(ppit);
         pp.battlePoint = battlePoint;
+        _preliminaryPlayers_list_set[0].insert(ppit);
     }
     PreliminaryPlayerListMap::iterator pit1 = _preliminaryPlayers[1].find(ppid);
     if(pit1 != _preliminaryPlayers[1].end())
     {
         PreliminaryPlayerListIterator ppit = pit1->second;
         PreliminaryPlayer& pp = *ppit;
+        _preliminaryPlayers_list_set[1].erase(ppit);
         pp.battlePoint = battlePoint;
+        _preliminaryPlayers_list_set[1].insert(ppit);
     }
     for(int i = 0; i < 2; ++ i)
     {

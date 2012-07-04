@@ -1504,7 +1504,17 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 		{
             UInt8 state = 0, group = 0, tael = 0;
             UInt16 pos = 0;
-			brd >> state >> tael >> pos >> group;
+            UInt64 pid = 0;
+			brd >> state >> tael;
+            if(state > 6)
+                break;
+            if(state < 2)
+                brd >> pid;
+            else
+                brd >> pos;
+            brd >> group;
+            if(tael > 1)
+                break;
 			//if(tael > 0)
 			{
                 UInt8 r = 0;
@@ -1512,14 +1522,19 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
                     r = 3;
                 else if(player->getGold() < 5 && tael == 0)
                     r = 4;
+                else if(state < 2)
+                    r = GObject::arena.bet1(player, state, group, pid, tael);
                 else
-                {
-                    r = GObject::arena.bet(player, state, group, pos, tael);
-                    if(r == 0xFF)
-                        break;
-                }
+                    r = GObject::arena.bet2(player, state, group, pos, tael);
+                if(r == 0xFF)
+                    break;
 				Stream st(REP::SERVER_ARENA_OP);
-				st << type << r << state << pos << group << Stream::eos;
+				st << type << r << state;
+                if(state < 2)
+                    st << pid;
+                else
+                    st << pos;
+                st << group << Stream::eos;
 				player->send(st);
 			}
 		}

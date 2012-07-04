@@ -96,7 +96,9 @@ public:
 
 	static void enterArena(Player * player);
 	void commitLineup(Player * player);
-    UInt8 bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
+    //UInt8 bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
+    UInt8 bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 type );
+    UInt8 bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
 	void readFrom(BinaryReader&);
 	void sendInfo(Player * player);
 	void sendElimination(Player * player, UInt8, UInt8);
