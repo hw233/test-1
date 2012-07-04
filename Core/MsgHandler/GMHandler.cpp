@@ -163,7 +163,8 @@ GMHandler::GMHandler()
     Reg(3, "sysdlg", &GMHandler::OnSysDailog);
     Reg(3, "regenall", &GMHandler::OnRegenAll);
     Reg(3, "bosshp", &GMHandler::OnSetBossHp);
-    Reg(3, "time", &GMHandler::OnTime);
+    Reg(3, "systm", &GMHandler::OnTime);
+    Reg(3, "tm", &GMHandler::OnTime);
     Reg(3, "token", &GMHandler::OnToken);
 	Reg(3, "recharge", &GMHandler::OnRecharge);
 	Reg(3, "boss", &GMHandler::OnBossHP);
@@ -2661,10 +2662,9 @@ void GMHandler::OnSetBossHp(GObject::Player* player, std::vector<std::string>& a
 }
 void GMHandler::OnTime(GObject::Player* player, std::vector<std::string>& args)
 {
-
     time_t curtime1 = time(NULL) + 30; 
     struct tm *local = localtime(&curtime1);
-    SYSMSG_SENDV(2350, player, 1900+local->tm_year, 1+local->tm_mon, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec, local->tm_wday+1);
+    SYSMSG_SENDV(2350, player, 1900+local->tm_year, 1+local->tm_mon, local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec, World::_wday);
 }
 void GMHandler::OnToken(GObject::Player* player, std::vector<std::string>& args)
 {
@@ -2688,15 +2688,14 @@ void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args
 }
 void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
-#if 0
     UInt64 begin = TimeUtil::GetTick();
     //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
-    std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
+    const char* json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
+    Stream st(0);
     for (UInt16 i = 0; i < 1; ++i)
-        jsonParser(json, -1);
+        jsonParser2((void*)json, strlen(json), st);
     UInt64 end = TimeUtil::GetTick();
     fprintf(stderr, "total secs: %.2f\n", (float)(end-begin)/1000000);
-#endif
 }
 void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args)
 {

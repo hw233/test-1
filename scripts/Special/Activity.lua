@@ -129,6 +129,9 @@ function onLogin(player)
     if getDuanWu() then
         onDuanWu(player)
     end
+    if getJuly() then
+        onJuly(player)
+    end
 end
 
 function onNVDLogin(player)
@@ -162,6 +165,9 @@ function onLevelup(player, olev, nlev)
     end
     if getJune1() then
         onJune1(player)
+    end
+    if getJuly() then
+        onJuly(player)
     end
 end
 
@@ -1425,6 +1431,24 @@ function onJune1(player)
     end
 end
 
+function onJuly(player)
+    if not getJuly() then
+        return
+    end
+
+    local lvl = player:GetLev()
+    if lvl < 40 then
+        return
+    end
+
+    if lvl >= 40 and player:GetVar(136) == 0 then
+        sendItemPackageMail(player, msg_102, msg_102, {9077,1,1});
+        sendItemPackageMail(player, msg_102, msg_102, {9078,1,1});
+        sendItemPackageMail(player, msg_102, msg_102, {9079,1,1});
+        player:SetVar(136, 1)
+    end
+end
+
 function June(player, lootlvl)
     if getJune() then
         -- 棒棒糖
@@ -1504,5 +1528,109 @@ function onDuanWu(player)
         sendItemPackageMail(player, msg_95, msg_95, {1527,2,1});
         player:SetVar(135, 1)
     end
+end
+
+function calcRechargeLevel(lvls, total)
+    if lvls == nil then
+        return 0
+    end
+
+    local sz = #lvls
+    if sz == 0 then
+        return 0
+    end
+
+    for j = 1,sz do
+        if total < lvls[j] then
+            return (j-1)
+        end
+    end
+    return sz
+end
+
+function sendRechargeMails1(player, ototal, ntotal)
+    local lvls = {
+        {99,199,399,699,1099,1599,2299,3699,5799,9999,},
+        {99,199,399,699,1099,1599,2299,3699,5799,9999,},
+        {99,199,399,699,1099,1599,2299,3699,5799,9999,},
+    }
+    local items = {
+        {
+            {56,3,1,},
+            {57,4,1,},
+            {508,6,1,},
+            {506,6,1},
+            {515,5,1},
+            {9021,1,1},
+            {516,5,1, 47,3,1},
+            {503,8,1},
+            {509,5,1, 507,1,1},
+            {509,7,1, 507,3,1, 9022,1,1},
+        },
+        {
+            {500,3,1},
+            {503,2,1},
+            {56,3,1, 57,3,1},
+            {516,2,1},
+            {509,3,1, 507,2,1},
+            {5035,1,1},
+            {515,5,1, 47,3,1},
+            {503,4,1, 0xA000,200,1},
+            {509,5,1, 507,1,1},
+            {509,7,1, 507,3,1, 9022,1,1},
+        },
+        {
+            {56,3,1},
+            {57,4,1},
+            {56,3,1, 57,3,1},
+            {516,2,1},
+            {515,5,1},
+            {9021,1,1},
+            {515,5,1, 47,3,1},
+            {503,4,1, 0xA000,100,1},
+            {509,5,1, 507,1,1},
+            {509,7,1, 507,3,1, 9022,1,1},
+        },
+    }
+
+    local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(start);
+    local n = os.time();
+
+    local i = 0
+    if n >= s and n < s + 3 * 86400 then
+        i = 1
+    elseif n >= s + 3 * 86400 and n < s + 6 * 86400 then
+        i = 2
+    elseif n >= s + 6 * 86400 and n < s + 9 * 86400 then
+        i = 3
+    end
+
+    if i == 0 then
+        return
+    end
+
+    local lvl = lvls[i]
+    if lvl == nil then
+        return
+    end
+    local olvl = calcRechargeLevel(lvl, ototal)
+    local nlvl = calcRechargeLevel(lvl, ntotal)
+
+    print("ototal: " .. ototal .. " ntotal: " .. ntotal .. " olvl:" .. olvl .. " nlvl: " .. nlvl)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[i][k])
+        local ctx = string.format(msg_101, lvls[i][k])
+        sendItemPackageMail(player, title, ctx, items[i][k]);
+    end
+end
+
+function sendRechargeMails(player, ototal, ntotal)
+    sendRechargeMails1(player, ototal, ntotal)
 end
 

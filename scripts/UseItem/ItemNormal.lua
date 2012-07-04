@@ -3881,6 +3881,56 @@ function ItemNormal_00009058(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009077(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    local dates = {
+        { ['year'] = 2012, ['month'] = 7, ['day'] = 2, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+        { ['year'] = 2012, ['month'] = 7, ['day'] = 27, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 },
+    }
+
+    local items = {
+        {{503,3},{514,1},{507,2},{60000,50}},
+        {{500,2},{57,3},{509,2},{60000,30}},
+        {{511,2},{548,5},{56,3},{60000,30}},
+    }
+
+    local id = iid - 9076
+    local start = os.time(dates[id])
+    local doubleend = start + 86400
+
+    local factor = 1
+    now = os.time()
+    if now >= start then
+        if now < doubleend then
+            factor = 2
+        end
+
+        if package:GetRestPackageSize() < 3*num then
+            player:sendMsgCode(2, 1011, 0);
+            return false;
+        end
+
+        local item = items[id]
+
+        for k,v in pairs(item) do
+            if v[1] == 60000 then
+                player:getCoupon(v[2]*factor*num)
+            else
+                package:Add(v[1], v[2]*factor*num, true, 0, 2)
+            end
+        end
+
+        package:DelItemSendMsg(iid, player);
+        return num
+    else
+        SendMsg(player, 0x35, msg_59);
+    end
+    return false
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -5256,6 +5306,10 @@ local ItemNormal_Table = {
     [9065] = ItemNormal_00009058,
     -- 仙界绿色宝箱
     [9066] = ItemNormal_00009058,
+
+    [9077] = ItemNormal_00009077,
+    [9078] = ItemNormal_00009077,
+    [9079] = ItemNormal_00009077,
 
 };
 

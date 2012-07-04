@@ -195,6 +195,10 @@ public:
     { _june1 = v; }
     inline static bool getJune1()
     { return _june1; }
+    inline static void setJuly(bool v)
+    { _july = v; }
+    inline static bool getJuly()
+    { return _july; }
 
     inline static void setRechargeNextRet(bool v)
     { _rechargenextret = v; }
@@ -276,6 +280,7 @@ public:
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
+    static bool _july;
     static bool _enchant_gt11;
     static bool _rechargenextret;
     static UInt32 _rechargenextretstart;

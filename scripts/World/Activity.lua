@@ -62,6 +62,11 @@ function is6_25()
     return is_6_25
 end
 
+is_7_1 = false 
+function is7_1()
+    return is_7_1
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -362,6 +367,24 @@ function onActivityCheck(tm)
           setFourCopAct(false)
       end
 
+      if tm >= actTime65 and tm < actTime66 then
+          setRechargeActive(true, 8)
+      else
+          setRechargeActive(false, 8)
+      end
+
+      if tm >= actTime67 and tm < actTime68 then
+          setJuly(true)
+      else
+          setJuly(false)
+      end
+
+      if tm >= actTime69 and tm < actTime70 then
+          is_7_1 = true
+      else
+          is_7_1 = false 
+      end
+
       setShuoShuo(true);
   end
 
@@ -420,6 +443,7 @@ function initActTime(y, m, d)
   local  SerStartTm26= { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm28= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm29= { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -531,6 +555,15 @@ function initActTime(y, m, d)
 
   actTime63 = os.time(SerStartTm27);
   actTime64 = os.time(SerStartTm27) + 8 * 86400;
+
+  actTime65 = os.time(SerStartTm29);
+  actTime66 = os.time(SerStartTm29) + 9 * 86400;
+
+  actTime67 = os.time(SerStartTm29);
+  actTime68 = os.time(SerStartTm29) + 31 * 86400;
+
+  actTime69 = os.time(SerStartTm29);
+  actTime70 = os.time(SerStartTm29) + 15 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

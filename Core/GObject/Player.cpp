@@ -6083,6 +6083,7 @@ namespace GObject
 
         if (World::getRechargeActive())
         {
+#if 0
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
             UInt8 maxlevel = 0;
             UInt8 oldVipLevel = calcRechargeLevel(total, maxlevel);
@@ -6091,6 +6092,12 @@ namespace GObject
             sendRechargeMails(oldVipLevel + 1, vipLevel, maxlevel);
             SetVar(VAR_RECHARGE_TOTAL, total);
             sendRechargeInfo();
+#else
+            UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
+            GameAction()->sendRechargeMails(this, total, total+r);
+            SetVar(VAR_RECHARGE_TOTAL, total+r);
+            sendRechargeInfo();
+#endif
         }
 
         if(World::getJune())
