@@ -1345,6 +1345,9 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
                 if(bi.round == 1 && bi.group == 0 && bi.state == i)
                 {
                     PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[i].begin();
+                    int pos = bi.pos;
+                    if(pos > _preliminaryPlayers_list[i].size())
+                        pos = _preliminaryPlayers_list[i].size();
                     std::advance(pit, bi.pos);
                     if(pit != _preliminaryPlayers_list[i].end())
                     {
@@ -1923,7 +1926,10 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag, UInt16 start
         size_t offset = st.size();
         st << premNum;
         PreliminaryPlayersSet::iterator setIt = _preliminaryPlayers_list_set[type].begin();
-        std::advance(setIt, start);
+        int pos = start;
+        if(pos > _preliminaryPlayers_list_set[type].size())
+            pos = _preliminaryPlayers_list_set[type].size();
+        std::advance(setIt, pos);
         for(int i = 0; setIt != _preliminaryPlayers_list_set[type].end() && i < len; ++ setIt)
         {
             ++ premNum;
@@ -2063,7 +2069,10 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         if(type == 1)
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
-            std::advance(it, pos);
+            int pos2 = pos;
+            if(pos2 > _preliminaryPlayers_list[0].size())
+                pos2 = _preliminaryPlayers_list[0].size();
+            std::advance(it, pos2);
             if(it != _preliminaryPlayers_list[0].end())
             {
                 PreliminaryPlayer& pp = *it;
@@ -2073,7 +2082,10 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         else
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[1].begin();
-            std::advance(it, pos);
+            int pos2 = pos;
+            if(pos2 > _preliminaryPlayers_list[1].size())
+                pos2 = _preliminaryPlayers_list[1].size();
+            std::advance(it, pos2);
             if(it != _preliminaryPlayers_list[1].end())
             {
                 PreliminaryPlayer& pp = *it;
