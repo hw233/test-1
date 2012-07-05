@@ -1231,7 +1231,7 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
         if(lev2 > 0)
             ae.pirlvl += GData::spiritAttrTable[lev2-1].pierce_lvl;
         if(lev3 > 0)
-            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/10000.f);
+            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/100.f);
         break;
     case Item_Ring:
         if(lev0 > 0)
@@ -1244,7 +1244,7 @@ inline void addEquipSpiritAttr( GData::AttrExtra& ae, const ItemEquipSpiritAttr&
         if(lev2 > 0)
             ae.crilvl += GData::spiritAttrTable[lev2-1].critical_lvl;
         if(lev3 > 0)
-            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/10000.f);
+            ae.criticaldmg += ((double)GData::spiritAttrTable[lev3-1].critical_dmg/100.f);
         break;
     default:
         return;
@@ -4056,6 +4056,49 @@ void Fighter::appendElixirAttr(Stream& st)
     st << static_cast<UInt16>(_elixirattr.counter);
     st << static_cast<UInt16>(_elixirattr.tough);
     st << static_cast<UInt16>(_elixirattr.action);
+}
+
+void Fighter::appendElixirAttr2(Stream& st)
+{
+    st << _elixirattr.strength;
+    st << _elixirattr.agility;
+    st << _elixirattr.intelligence;
+    st << _elixirattr.will;
+    st << _elixirattr.physique;
+    st << _elixirattr.soul;
+    st << _elixirattr.attack;
+    st << _elixirattr.defend;
+    st << _elixirattr.critical;
+    st << _elixirattr.pierce;
+    st << _elixirattr.evade;
+    st << _elixirattr.counter;
+    st << _elixirattr.tough;
+    st << _elixirattr.action;
+}
+
+
+UInt16 Fighter::getBattlePortrait()
+{
+    UInt16 portrait = 0;
+    UInt32 fashion = getFashionTypeId();
+
+    switch(fashion)
+    {
+    case 1700:
+        portrait = 1072;
+        break;
+    case 1701:
+        portrait = 1074;
+        break;
+    case 1702:
+        portrait = 1063;
+        break;
+    case 1703:
+        portrait = 1064;
+        break;
+    }
+
+    return portrait;
 }
 
 }

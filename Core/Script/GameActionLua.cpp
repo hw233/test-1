@@ -243,6 +243,7 @@ namespace Script
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
+        CLASS_DEF(Player, getMoneyArena);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);

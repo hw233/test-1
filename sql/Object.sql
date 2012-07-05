@@ -64,7 +64,7 @@ CREATE TABLE `arena_bet` (
   `state` tinyint(3) unsigned NOT NULL,
   `group` tinyint(3) unsigned NOT NULL,
   `recieved` tinyint(3) unsigned NOT NULL,
-  `pos` tinyint(3) unsigned NOT NULL,
+  `pos` smallint(4) unsigned NOT NULL,
   `tael` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`,`state`,`round`,`group`,`pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
