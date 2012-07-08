@@ -3931,6 +3931,14 @@ function ItemNormal_00009077(iid, num, bind, param)
     return false
 end
 
+function ItemNormal_00009080(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    player:getMoneyArena(100*num);
+    return num;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -5311,6 +5319,7 @@ local ItemNormal_Table = {
     [9078] = ItemNormal_00009077,
     [9079] = ItemNormal_00009077,
 
+    [9080] = ItemNormal_00009080,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

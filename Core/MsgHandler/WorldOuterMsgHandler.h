@@ -1518,9 +1518,9 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 			//if(tael > 0)
 			{
                 UInt8 r = 0;
-                if(player->getTael() < 500 && tael == 1)
+                if(player->GetPackage()->GetItemAnyNum(ARENA_BET_ITEM1) < 1 && tael == 1)
                     r = 3;
-                else if(player->getGold() < 5 && tael == 0)
+                else if(player->GetPackage()->GetItemAnyNum(ARENA_BET_ITEM2) < 1 && tael == 0)
                     r = 4;
                 else if(state < 2)
                     r = GObject::arena.bet1(player, state, group, pid, tael);

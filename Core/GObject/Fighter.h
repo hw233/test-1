@@ -569,6 +569,7 @@ public:
     bool  IsEquipEnchantLev(UInt8 e);
 
     void getAttrExtraEquip(Stream& st);
+    UInt16 getBattlePortrait();
 protected:
 	void rebuildEquipAttr();
 	void rebuildBattlePoint();
@@ -696,6 +697,7 @@ public:
     bool addElixirAttrByOffset(UInt8 off, Int32 v);
     Int32 getElixirAttrByOffset(UInt8 off);
     void appendElixirAttr(Stream& st);
+    void appendElixirAttr2(Stream& st);
 private:
     ElixirAttr _elixirattr;
 

@@ -1033,11 +1033,10 @@ void OnArenaBet( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt16 tael = *reinterpret_cast<const UInt16 *>(data);
-	ConsumeInfo ci(ArenaBet, 0, 0);
     if(tael == 0)
-        player->useGold(5, &ci);
+        player->GetPackage()->DelItemAny(ARENA_BET_ITEM2, 1, NULL, ToArenaBet);
     else
-        player->useTael(500, &ci);
+        player->GetPackage()->DelItemAny(ARENA_BET_ITEM1, 1, NULL, ToArenaBet);
 }
 
 void OnArenaBetResult( GameMsgHdr& hdr, const void * data )

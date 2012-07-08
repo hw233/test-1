@@ -277,6 +277,8 @@ UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 
     case 4:
     case 5:
     case 6:
+        if(pos > 7)
+            return 0xFF;
         pos2 = _finalIdx[gIdx][2][pos];
         fidx = pos2 >> _round;
         break;
@@ -773,7 +775,7 @@ void Arena::readFrom( BinaryReader& brd )
 	case 0:
 		if(!_players.empty() && sIdx == 0)
         {
-            DB1().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
+            DB1().PushUpdateData("DELETE FROM `arena_bet`");
             _playerCount[0] = 0;
 			_players.clear();
         }

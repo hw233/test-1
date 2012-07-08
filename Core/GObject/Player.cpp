@@ -10583,6 +10583,10 @@ namespace GObject
                 fgt->getAllPSkillAndLevel4Arena(st);
 
                 fgt->getAttrExtraEquip(st);
+
+                st << fgt->getSoulExtraAura();
+                st << fgt->getBattlePortrait();
+                fgt->appendElixirAttr2(st);
             }
         }
         st.data<UInt8>(offset) = c;
