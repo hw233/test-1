@@ -410,8 +410,8 @@ function initActTime(y, m, d)
   local  SerStartTm105= { ['year'] = 2012, ['month'] = 5, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 合服斗剑排名奖励增加至30名活动(6/25-7/1)
   local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  -- 四大名捕（6/22-7/21）
-  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 22, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  -- 四大名捕（6/25-7/31）
+  local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -531,7 +531,7 @@ function initActTime(y, m, d)
   actTime113 = os.time(SerStartTm106);
   actTime114 = os.time(SerStartTm106) + 7 * 86400;
   actTime115 = os.time(SerStartTm107);
-  actTime116 = os.time(SerStartTm107) + 30 * 86400;
+  actTime116 = os.time(SerStartTm107) + 37 * 86400;
 
   onActivityCheck(os.time() + 30);
 
