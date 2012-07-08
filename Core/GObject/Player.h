@@ -1542,8 +1542,10 @@ namespace GObject
         void loadRNRFromDB(const std::string& str);
         void sendRNR(UInt32 now);
         void sendRechargeNextRetInfo(UInt32 now);
+        bool inArenaCommitCD();
     private:
         std::vector<RNR> rechargs;
+        UInt32 m_arenaCommitCD;
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

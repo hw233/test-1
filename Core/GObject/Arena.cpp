@@ -110,6 +110,74 @@ void Arena::enterArena( Player * player )
 
 void Arena::commitLineup( Player * player )
 {
+    bool final = false;
+    bool preliminary = false;
+    int endi = 0;
+    int round = 0;
+    int idx = 0;
+    switch(_progress)
+    {
+    case 0:
+        {
+            std::map<Player*, ArenaPlayer>::iterator it = _players.find(player);
+            if(it == _players.end())
+                return;
+        }
+        break;
+    case 1:
+    case 8:
+        preliminary = true; idx = 0;
+        break;
+    case 2:
+    case 9:
+        preliminary = true; idx = 1;
+        break;
+    case 10:
+    case 3:
+        final = true; endi = 32; round = 0;
+        break;
+    case 4:
+        final = true; endi = 16; round = 1;
+        break;
+    case 5:
+        final = true; endi = 8; round = 2;
+        break;
+    case 6:
+        final = true; endi = 4; round = 3;
+        break;
+    case 7:
+        final = true; endi = 2; round = 4;
+        break;
+    default:
+        return;
+    }
+    if(final)
+    {
+        bool find = false;
+        for(int i = 0; i < 2; ++ i)
+        {
+            for(int j = 0; j < endi; ++ j)
+            {
+                UInt8 nidx = _finalIdx[i][round][j];
+                if(_finals[i][nidx].id == player->getId())
+                {
+                    find = true;
+                    break;
+                }
+            }
+            if(find)
+                break;
+        }
+        if(!find)
+            return;
+    }
+    else if(preliminary)
+    {
+        PreliminaryPlayerListMap::iterator it = _preliminaryPlayers[idx].find(player->getId());
+        if(it == _preliminaryPlayers[idx].end())
+            return;
+    }
+
 	Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
 	st << player->getId();
 	appendLineup2(st, player);
@@ -1564,8 +1632,6 @@ void Arena::calcFinalBet(int i)
                                     if(pl == NULL)
                                         continue;
 
-                                    GET_PROGRESS_NAME(p, j+1);
-                                    SYSMSGV(title, 724, p);
                                     pl->AddVar(VAR_MONEY_ARENA, award[i][j][1]);
                                     SYSMSGV(content, 725, _session, award[i][j][1]);
                                     Mail * mail = pl->GetMailBox()->newMail(NULL, 0x21, title, content, 0xFFFE0000);
@@ -1890,7 +1956,7 @@ void Arena::sendElimination( Player * player, UInt8 type, UInt8 group )
             for(int i = 0; i < 8; ++ i)
             {
                 UInt8 pos = _finalIdx[gIdx][2][i];
-                st << _finals[gIdx][pos].heroId << _finals[gIdx][pos].level << _finals[gIdx][i].battlePoint << static_cast<UInt16>(_finals[gIdx][i].support) << _finals[gIdx][pos].name;
+                st << _finals[gIdx][pos].heroId << _finals[gIdx][pos].level << _finals[gIdx][pos].battlePoint << static_cast<UInt16>(_finals[gIdx][pos].support) << _finals[gIdx][pos].name;
             }
         }
 	}
@@ -1996,6 +2062,43 @@ void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group,
 			it->first->GetMailBox()->newMail(NULL, 0x01, title, content);
 		}
 	}
+}
+
+void Arena::updateBattlePoint(BinaryReader& brd)
+{
+    UInt32 cid = 0;
+    UInt32 sid = 0;
+    UInt64 pid = 0;
+    UInt32 battlePoint = 0;
+    brd >> cid >> sid >> pid >> battlePoint;
+    UInt64 ppid = pid | (static_cast<UInt64>(sid) << 48) | (static_cast<UInt64>(cid) << 40);
+    if(cid == cfg.channelNum && sid == cfg.serverNum)
+        ppid = pid;
+
+    PreliminaryPlayerListMap::iterator pit0 = _preliminaryPlayers[0].find(ppid);
+    if(pit0 != _preliminaryPlayers[0].end())
+    {
+        PreliminaryPlayerListIterator ppit = pit0->second;
+        PreliminaryPlayer& pp = *ppit;
+        pp.battlePoint = battlePoint;
+    }
+    PreliminaryPlayerListMap::iterator pit1 = _preliminaryPlayers[1].find(ppid);
+    if(pit1 != _preliminaryPlayers[1].end())
+    {
+        PreliminaryPlayerListIterator ppit = pit1->second;
+        PreliminaryPlayer& pp = *ppit;
+        pp.battlePoint = battlePoint;
+    }
+    for(int i = 0; i < 2; ++ i)
+    {
+        for(int j = 0; j < 32; ++ j)
+        {
+            if(_finals[i][j].id == ppid)
+            {
+                _finals[i][j].battlePoint = battlePoint;
+            }
+        }
+    }
 }
 
 }

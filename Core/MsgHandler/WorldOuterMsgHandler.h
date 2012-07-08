@@ -1391,7 +1391,16 @@ void OnPlayerEntered( ArenaMsgHdr& hdr, const void * data )
 
 void OnLineupCommited( ArenaMsgHdr& hdr, const void * data )
 {
-
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 r;
+	UInt64 playerId;
+    br >> r >> playerId;
+	GObject::Player * player = GObject::globalPlayers[playerId];
+	if(player == NULL)
+		return;
+    Stream st(REP::SERVER_ARENA_OP);
+    st << static_cast<UInt8>(4) << r << Stream::eos;
+    player->send(st);
 }
 
 void OnArenaPriliminary( ArenaMsgHdr& hdr, const void * data )
@@ -1434,6 +1443,12 @@ void OnArenaSupport( ArenaMsgHdr& hdr, const void * data )
     UInt16 pos = 0;
     br >> type >> flag >> pos;
     GObject::arena.updateSuport(type, flag, pos);
+}
+
+void OnArenaBattlePoint( ArenaMsgHdr& hdr, const void * data )
+{
+	BinaryReader br(data, hdr.msgHdr.bodyLen);
+    GObject::arena.updateBattlePoint(br);
 }
 
 void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
@@ -1516,6 +1531,18 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
             NETWORK()->SendToArena(st);
 		}
 		break;
+    case 4:
+        {
+            if(player->inArenaCommitCD())
+            {
+                Stream st(REP::SERVER_ARENA_OP);
+                st << static_cast<UInt8>(4) << static_cast<UInt8>(2) << Stream::eos;
+                player->send(st);
+            }
+            else
+                GObject::arena.commitLineup(player);
+        }
+        break;
 	}
 }
 

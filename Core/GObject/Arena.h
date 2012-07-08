@@ -86,7 +86,7 @@ public:
 	inline void getPlayerCount(UInt32 * pc) { pc[0] = _playerCount[0]; pc[1] = _playerCount[1]; pc[2] = _playerCount[2]; }
 
 	static void enterArena(Player * player);
-	static void commitLineup(Player * player);
+	void commitLineup(Player * player);
     UInt8 bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
 	void readFrom(BinaryReader&);
 	void sendInfo(Player * player);
@@ -110,6 +110,7 @@ public:
     void sendPreliminary(Player* pl, UInt8 type, UInt8 flag);
 
     void updateSuport(UInt8 type, UInt8 flag, UInt16 pos);
+    void updateBattlePoint(BinaryReader& brd);
 
 private:
 	static void appendLineup( Stream& st, Player * player);

@@ -519,6 +519,7 @@ namespace GObject
         m_ClanBattleWinTimes = 0;
         m_ClanBattleSkillFlag = 0;
         _invitedBy = 0;
+        m_arenaCommitCD = 0;
 
 		memset(_buffData, 0, sizeof(UInt32) * PLAYER_BUFF_COUNT);
 		m_Package = new Package(this);
@@ -10542,6 +10543,16 @@ namespace GObject
         Stream st(REP::FOURCOP);
         st << static_cast<UInt8>(0) << lengxueCnt << wuqingCnt << tieshouCnt << zhuimingCnt << Stream::eos;
         send(st);
+    }
+
+    bool Player::inArenaCommitCD()
+    {
+        UInt32 now = TimeUtil::Now();
+        if(now < m_arenaCommitCD)
+            return true;
+
+        m_arenaCommitCD = now + 60;
+        return false;
     }
 } // namespace GObject
 
