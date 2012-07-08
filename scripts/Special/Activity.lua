@@ -1360,12 +1360,14 @@ function onEnchantAct(player, level, _type)
     else
         local items = {
             [0] = {
-                [8] = {509,3,1, 503,3,1, 500,3,1},
-                [10] = {509,6,1, 503,6,1, 500,6,1},
+                [8] = {509,1,1, 9075,1,1, 9074,1,1},
+                [9] = {509,1,1, 507,1,1, 9017,1,1, 9019,1,1},
+                [10] = {509,2,1, 507,2,1, 9022,1,1},
             },
             [1] = {
-                [8] = {509,1,1, 503,1,1, 500,1,1},
-                [10] = {509,3,1, 503,3,1, 500,3,1},
+                [8] = {9021,1,1},
+                [9] = {507,1,1, 9075,1,1},
+                [10] = {507,1,1, 9068,1,1, 9021,1,1},
             },
         };
         if items[_type][level] == nil then
@@ -1390,6 +1392,44 @@ function onEnchantGt11(player, id, level, _type)
         return
     end
     sendItemPackageMail(player, msg_47, msg_48 .. "[4:"..id.."] "..level..msg_49, items[_type][level]);
+end
+
+function onSoulEnchantMaxSoul(player, oms, yams)
+    local items = {
+        {9069,2,1, 9017,2,1, 9072,1,1},
+        {9021,2,1, 9075,2,1, 9019,2,1},
+        {9022,1,1, 9073,1,1, 9070,1,1, 9071,1,1},
+        {9022,2,1, 9074,2,1, 9068,3,1},
+    }
+
+    if oms >= yams then
+        return
+    end
+
+    local ms = {100,120,160,210}
+
+    if yams < ms[1] then
+        return
+    end
+
+    local s = 0
+    local e = 0
+    for n=1,#ms do
+        if oms >= ms[n] then
+            s = n
+        end
+        if yams >= ms[n] then
+            e = n
+        end
+    end
+
+    if s >= e then
+        return
+    end
+
+    for j=s+1,e do
+        sendItemPackageMail(player, msg_104, msg_104, items[j])
+    end
 end
 
 function onTrainFighterAct(player, fgt)

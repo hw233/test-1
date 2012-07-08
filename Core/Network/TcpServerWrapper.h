@@ -40,6 +40,7 @@ namespace Network
 				if(!ArenaConn::enabled())
 					return NULL;
                 sock = socket( AF_INET, SOCK_STREAM, 0 );
+                printf("FD %s: %u\n", __PRETTY_FUNCTION__, sock);
                 if(sock < 0)
                     return NULL;
 				return new(std::nothrow) ArenaConn(sock, s, id);

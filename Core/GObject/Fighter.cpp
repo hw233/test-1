@@ -3743,7 +3743,13 @@ void Fighter::enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& so
     {
         sie.res = 0;
         sie.exp = exp;
+
+        UInt32 msoul = get2ndSounSoulMax();
         m_2ndSoul->addStateExp(exp);
+        UInt32 yamsoul = get2ndSounSoulMax();
+
+        if (msoul != yamsoul && World::getEnchantAct())
+            GameAction()->onSoulEnchantMaxSoul(_owner, msoul, yamsoul);
     }
     else
     {

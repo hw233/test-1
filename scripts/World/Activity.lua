@@ -385,6 +385,12 @@ function onActivityCheck(tm)
           is_7_1 = false 
       end
 
+      if tm >= actTime71 and tm < actTime72 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -444,6 +450,7 @@ function initActTime(y, m, d)
   local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm28= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm29= { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm30= { ['year'] = 2012, ['month'] = 7, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -564,6 +571,9 @@ function initActTime(y, m, d)
 
   actTime69 = os.time(SerStartTm29);
   actTime70 = os.time(SerStartTm29) + 15 * 86400;
+
+  actTime71 = os.time(SerStartTm30);
+  actTime72 = os.time(SerStartTm30) + 2 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
