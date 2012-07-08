@@ -3894,7 +3894,7 @@ function ItemNormal_00009058(id, num, bind, param)
     end
 
     local prob = {1, 2, 3, 4, 5, 6}
-    local items = {{9017,1}, {9018,1}, {9019,1}, {9020,1}, {9021,1}, {9022,1}}
+    local item = {9017, 9018, 9019, 9020, 9021, 9022}
     local p
 
     for i = 1,cntelixir do
