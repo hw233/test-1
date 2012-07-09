@@ -3214,7 +3214,7 @@ function ItemNormal_00000067(iid, num, bind, param)
     package:AddEquip(Equip50[cls], 1);
 
 
-    package:DelItemSendMsg(67, player);
+    package:DelItemSendMsg(iid, player);
     return num;
 end
 
@@ -4240,6 +4240,7 @@ local ItemNormal_Table = {
     [79] = ItemNormal_00000079,
     [80] = ItemNormal_00000080,
     [81] = ItemNormal_00000081,
+    [9084] = ItemNormal_00000067,
 
     --竞技场宝箱
     [2] = ItemNormal_athletics_2,

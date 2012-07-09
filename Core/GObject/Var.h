@@ -173,6 +173,7 @@ namespace GObject
         VAR_DUANWU = 135, // 端午上线邮件
         VAR_JULY = 136, // 七月礼包
         VAR_2NDSOUL = 137, // 元神吞噬奖励是否发放
+        VAR_QQVIP = 138, //QQ会员
 
         VAR_MAX,
     };
@@ -339,6 +340,7 @@ namespace GObject
             REGISTER_VAR(VAR_DUANWU, CYCLE_NONE);
             REGISTER_VAR(VAR_JULY, CYCLE_NONE);
             REGISTER_VAR(VAR_2NDSOUL, CYCLE_NONE);
+            REGISTER_VAR(VAR_QQVIP, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

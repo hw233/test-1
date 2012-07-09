@@ -8320,7 +8320,15 @@ namespace GObject
             RollYDGem();
         }
 
-        if( !(_playerData.qqawardgot & (0x80<<flag)) && qqvipl )
+        if(isQQVIP())
+        {
+            if(GetFreePackageSize() >= 1 && GetVar(VAR_QQVIP) == 0)
+            {
+                SetVar(VAR_QQVIP, 1);
+                GetPackage()->AddItem2(9084, 1, true, true);
+            }
+        }
+        else if( !(_playerData.qqawardgot & (0x80<<flag)) && qqvipl )
         {
             if(GetFreePackageSize() < 1)
             {
