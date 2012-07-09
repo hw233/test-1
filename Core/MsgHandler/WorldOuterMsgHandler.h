@@ -265,7 +265,9 @@ struct ArenaInfoReq
 {
 	UInt8 type;
 	UInt8 flag;
-	MESSAGE_DEF2(REQ::SERVER_ARENA_INFO, UInt8, type, UInt8, flag);
+    UInt16 start;
+    UInt8 len;
+	MESSAGE_DEF4(REQ::SERVER_ARENA_INFO, UInt8, type, UInt8, flag, UInt16, start, UInt8, len);
 };
 
 struct ArenaEliminationReq
@@ -1464,7 +1466,7 @@ void OnArenaInfoReq( GameMsgHdr& hdr, ArenaInfoReq& air )
         break;
     case 2:
     case 3:
-        GObject::arena.sendPreliminary(player, air.type-2, air.flag);
+        GObject::arena.sendPreliminary(player, air.type-2, air.flag, air.start, air.len);
         break;
     case 4:
     case 5:

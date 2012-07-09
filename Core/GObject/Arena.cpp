@@ -193,14 +193,20 @@ UInt8 Arena::bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 t
     UInt16 pos2 = pos;
     if(_progress == 8 || _progress == 9)
     {
-        PreliminaryPlayerListIterator it = _preliminaryPlayers_list[state].begin();
-        std::advance(it, pos);
+        if(group != 0 || pos > _preliminaryPlayers_list_set[state].size())
+            return 0xFF;
+        PreliminaryPlayersSet::iterator setIt = _preliminaryPlayers_list_set[state].begin();
+        std::advance(setIt, pos);
+        if(setIt == _preliminaryPlayers_list_set[state].end())
+            return 0xFF;
+
+        PreliminaryPlayerListIterator it = *setIt;
         PreliminaryPlayer& pp = *it;
 
+        pos = std::distance(_preliminaryPlayers_list[state].begin(), it);
+        pos2 = pos;
         std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
-        if(ait != _players.end() && ait->second.betList[state][0].size() >= 1)
-            return 0xFF;
-        if(group != 0 || pos > _preliminaryPlayers_list[state].size() || pp.name.empty())
+        if(ait != _players.end() && ait->second.betList[state][0].size() >= 1 || pp.name.empty())
             return 0xFF;
         if(pp.betMap.find(player) != pp.betMap.end())
             return 2;
@@ -698,7 +704,8 @@ void Arena::readFrom( BinaryReader& brd )
 #endif
 void Arena::readFrom( BinaryReader& brd )
 {
-	brd >> _session;
+    UInt8 sIdx = 0;
+	brd >> sIdx >> _session;
 	UInt8 progress;
 	UInt8 reg;
 	brd >> reg >> progress >> _nextTime;
@@ -709,36 +716,39 @@ void Arena::readFrom( BinaryReader& brd )
 		_notified = 0;
         fStatus = true;
 	}
+
 	switch(_progress)
 	{
 	case 0:
-		if(!_players.empty())
+		if(!_players.empty() && sIdx == 0)
         {
             DB().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
 			_players.clear();
         }
-        if(!_preliminaryPlayers[0].empty())
+        if(!_preliminaryPlayers[0].empty() && sIdx == 0)
         {
             _preliminaryPlayers[0].clear();
             _preliminaryPlayers_list[0].clear();
+            _preliminaryPlayers_list_set[0].clear();
         }
-        if(!_preliminaryPlayers[1].empty())
+        if(!_preliminaryPlayers[1].empty() && sIdx == 0)
         {
             _preliminaryPlayers[1].clear();
             _preliminaryPlayers_list[1].clear();
+            _preliminaryPlayers_list_set[1].clear();
         }
-        readPlayers(brd);
+        readPlayers(brd, sIdx);
         break;
     case 8:
 	case 9:
-        readPrePlayers(brd);
+        readPrePlayers(brd, sIdx);
         if(reg == 1)
             readHistories(brd);
 		break;
 	case 2:
 	case 1:
         if(reg == 1)
-            readPrePlayers(brd);
+            readPrePlayers(brd, sIdx);
         readHistories(brd);
 		break;
     case 10:
@@ -750,11 +760,12 @@ void Arena::readFrom( BinaryReader& brd )
     case 11:
         if(reg == 1)
         {
-            readPrePlayers(brd);
+            readPrePlayers(brd, sIdx);
             readHistories(brd);
         }
 
-        readElimination(brd);
+        if(sIdx == 0)
+            readElimination(brd);
         break;
 	}
     if(fStatus)
@@ -1217,16 +1228,17 @@ void Arena::check()
 	}
 }
 
-void Arena::readPrePlayers(BinaryReader& brd)
+void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
 {
     Mutex::ScopedLock lk(globalPlayers.getMutex());
     std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
     for(int i = 0; i < 2; ++ i)
     {
-        if(!_preliminaryPlayers[i].empty())
+        if(!_preliminaryPlayers[i].empty() && sIdx == 0)
         {
             _preliminaryPlayers[i].clear();
             _preliminaryPlayers_list[i].clear();
+            _preliminaryPlayers_list_set[i].clear();
         }
 
         UInt32 count;
@@ -1251,7 +1263,9 @@ void Arena::readPrePlayers(BinaryReader& brd)
             pp.heroId = heroId;
             pp.battlePoint = battlePoint;
             pp.name = name;
-            _preliminaryPlayers[i][ppid] = _preliminaryPlayers_list[i].insert(_preliminaryPlayers_list[i].end(), pp);
+            PreliminaryPlayerListIterator it = _preliminaryPlayers_list[i].insert(_preliminaryPlayers_list[i].end(), pp);
+            _preliminaryPlayers[i][ppid] = it;
+            _preliminaryPlayers_list_set[i].insert(it);
             if(cid == cfg.channelNum && sid == cfg.serverNo)
             {
                 std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
@@ -1280,17 +1294,20 @@ void Arena::readPrePlayers(BinaryReader& brd)
                 {
                     PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[i].begin();
                     std::advance(pit, bi.pos);
-                    PreliminaryPlayer& pp = *pit;
-                    pp.betMap[it->first] = bi.type;
+                    if(pit != _preliminaryPlayers_list[i].end())
+                    {
+                        PreliminaryPlayer& pp = *pit;
+                        pp.betMap[it->first] = bi.type;
+                    }
                 }
             }
         }
     }
 }
 
-void Arena::readPlayers(BinaryReader& brd)
+void Arena::readPlayers(BinaryReader& brd, UInt8 sIdx)
 {
-    if(!_players.empty())
+    if(!_players.empty() && sIdx == 0)
         _players.clear();
 
     Mutex::ScopedLock lk(globalPlayers.getMutex());
@@ -1318,8 +1335,9 @@ void Arena::readPlayers(BinaryReader& brd)
         pp.heroId = heroId;
         pp.battlePoint = battlePoint;
         pp.name = name;
-        _preliminaryPlayers[0][ppid] = _preliminaryPlayers_list[0].insert(_preliminaryPlayers_list[0].end(), pp);
-
+        PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].insert(_preliminaryPlayers_list[0].end(), pp);
+        _preliminaryPlayers[0][ppid] = it;
+        _preliminaryPlayers_list_set[0].insert(it);
         if(cid == cfg.channelNum && sid == cfg.serverNo)
         {
             std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
@@ -1376,34 +1394,6 @@ void Arena::readElimination(BinaryReader& brd)
     brd >> cnt;
     for(int i = 0; i < cnt; ++ i)
     {
-        UInt32 count = 0;
-        brd >> count;
-        Mutex::ScopedLock lk(globalPlayers.getMutex());
-        std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
-        for(UInt32 z = 0; z < count; ++ z)
-        {
-            UInt64 pid = 0;
-            int cid, sid;
-            UInt8 heroId = 0;
-            UInt8 level = 0;
-            UInt32 battlePoint = 0;
-            UInt32 support = 0;
-            std::string name;
-            brd >> cid >> sid >> pid >> heroId >> level >> battlePoint >> support >> name;
-            if(cid == cfg.channelNum && sid == cfg.serverNo)
-            {
-                std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pid);
-                if(it == pm.end())
-                    continue;
-                Player * pl = it->second;
-                if(pl == NULL)
-                    continue;
-                ArenaPlayer& ap = _players[pl];
-                ap.group = i;
-                ap.realName = name;
-            }
-        }
-
         for(int j = 0; j < 32; ++ j)
         {
             int cid, sid;
@@ -1809,7 +1799,7 @@ void Arena::sendEnter(Player* pl)
     pl->send(st);
 }
 
-void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag)
+void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag, UInt16 start, UInt8 len)
 {
 	UInt32 leftTime;
 	UInt32 now = TimeUtil::Now();
@@ -1872,10 +1862,18 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag)
             winNum = player->GetVar(VAR_MONEY_ARENA2);
         else
             winNum = player->GetVar(VAR_MONEY_ARENA3);
-        UInt16 premNum = static_cast<UInt16>(_preliminaryPlayers_list[type].size());
-        st << winNum << premNum;
-        for(PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[type].begin(); pit != _preliminaryPlayers_list[type].end(); ++ pit)
+        UInt8 premNum = 0;
+        UInt16 totalPreNum = _preliminaryPlayers_list_set[type].size();
+        st << winNum << totalPreNum << start;
+        size_t offset = st.size();
+        st << premNum;
+        PreliminaryPlayersSet::iterator setIt = _preliminaryPlayers_list_set[type].begin();
+        std::advance(setIt, start);
+        for(int i = 0; setIt != _preliminaryPlayers_list_set[type].end() && i < len; ++ setIt)
         {
+            ++ premNum;
+            ++ i;
+            PreliminaryPlayerListIterator pit = *setIt;
             PreliminaryPlayer& pp = *pit;
             UInt8 fSupport = 0;
             std::map<Player *, UInt8>::iterator it = pp.betMap.find(player);
@@ -1883,6 +1881,7 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag)
                 fSupport = it->second + 1;
             st << pp.battlePoint << static_cast<UInt16>(pp.support) << fSupport << pp.heroId << pp.level << pp.name;
         }
+        st.data<UInt8>(offset) = static_cast<UInt8>(premNum);
     }
 
     st << Stream::eos;
@@ -2009,16 +2008,26 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         if(type == 1)
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
-            std::advance(it, pos);
-            PreliminaryPlayer& pp = *it;
-            ++ pp.support;
+            if(it != _preliminaryPlayers_list[0].end())
+            {
+                std::advance(it, pos);
+                PreliminaryPlayer& pp = *it;
+                _preliminaryPlayers_list_set[0].erase(it);
+                ++ pp.support;
+                _preliminaryPlayers_list_set[0].insert(it);
+            }
         }
         else
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[1].begin();
-            std::advance(it, pos);
-            PreliminaryPlayer& pp = *it;
-            ++ pp.support;
+            if(it != _preliminaryPlayers_list[1].end())
+            {
+                std::advance(it, pos);
+                PreliminaryPlayer& pp = *it;
+                _preliminaryPlayers_list_set[1].erase(it);
+                ++ pp.support;
+                _preliminaryPlayers_list_set[1].insert(it);
+            }
         }
     }
     else if(flag == 2)

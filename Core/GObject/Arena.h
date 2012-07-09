@@ -77,6 +77,15 @@ typedef std::list<PreliminaryPlayer> PreliminaryPlayerList;
 typedef PreliminaryPlayerList::iterator PreliminaryPlayerListIterator;
 typedef std::map<UInt64, PreliminaryPlayerListIterator> PreliminaryPlayerListMap;
 
+struct PlayerLess
+{
+     bool operator()(const PreliminaryPlayerListIterator p1, const PreliminaryPlayerListIterator p2) const
+     {       
+         return p1->battlePoint > p2->battlePoint;
+     }
+};
+typedef std::multiset<PreliminaryPlayerListIterator, PlayerLess> PreliminaryPlayersSet;
+
 class Arena
 {
 public:
@@ -97,8 +106,8 @@ public:
 	void pushPriliminaryCount(UInt32 *);
 	void check();
 
-    void readPlayers(BinaryReader& brd);
-    void readPrePlayers(BinaryReader& brd);
+    void readPlayers(BinaryReader& brd, UInt8 sIdx);
+    void readPrePlayers(BinaryReader& brd, UInt8 sIdx);
     void readHistories(BinaryReader& brd);
     void readElimination(BinaryReader& brd);
     void calcFinalBet(int i);
@@ -107,7 +116,7 @@ public:
     void sendActive(Player* pl);
     void sendStatus(Player* pl);
     void sendEnter(Player* pl);
-    void sendPreliminary(Player* pl, UInt8 type, UInt8 flag);
+    void sendPreliminary(Player* player, UInt8 type, UInt8 flag, UInt16 start, UInt8 len);
 
     void updateSuport(UInt8 type, UInt8 flag, UInt16 pos);
     void updateBattlePoint(BinaryReader& brd);
@@ -144,6 +153,7 @@ private:
 	EliminationBattle _finalBattles[2][31];
     PreliminaryPlayerListMap _preliminaryPlayers[2];
     PreliminaryPlayerList _preliminaryPlayers_list[2];
+    PreliminaryPlayersSet _preliminaryPlayers_list_set[2];
 };
 
 extern Arena arena;
