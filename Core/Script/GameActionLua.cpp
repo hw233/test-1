@@ -160,6 +160,7 @@ namespace Script
 		CLASS_DEF(Player, getGold);
 		CLASS_DEF(Player, useGold);
 		CLASS_DEF(Player, useGold4LuckDraw);
+		CLASS_DEF(Player, getGold4LuckDraw);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
 		CLASS_DEF(Player, getTael);
