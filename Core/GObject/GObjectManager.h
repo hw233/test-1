@@ -100,6 +100,7 @@ namespace GObject
         static bool loadSecondSoul();
         static bool LoadLuckyLog();
         static bool loadRealItemAward();
+        static bool loadNewRelation();
         static bool loadRNR();
 
         static bool addGM(UInt64 id, UInt8 lvl);

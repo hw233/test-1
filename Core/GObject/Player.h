@@ -17,6 +17,7 @@
 #include "kingnet_analyzer.h"
 #include "Script/lua_tinker.h"
 #include "Mail.h"
+#include "GObject/NewRelation.h"
 
 namespace Battle
 {
@@ -1027,6 +1028,7 @@ namespace GObject
         HeroMemo* GetHeroMemo(){return m_HeroMemo;}
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
+        NewRelation* GetNewRelation() { return m_relation; }
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1235,6 +1237,7 @@ namespace GObject
         HeroMemo* m_HeroMemo;
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;
+        NewRelation* m_relation;
 		MailBox* m_MailBox;
 
 		bool _isOnline;

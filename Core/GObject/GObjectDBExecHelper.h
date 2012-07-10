@@ -923,6 +923,13 @@ struct DBRealItemAward
     std::string card_psw;
 };
 
+struct DBNewRelation
+{
+    UInt64 playerId;
+    UInt8 mood;
+    std::string sign;
+};
+
 struct DBRNR
 {
     UInt64 id;
@@ -2113,6 +2120,15 @@ SPECIALDEF(4)
     UInt32, cd,
     std::string, card_no,
     std::string, card_psw
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBNewRelation)
+SPECIALDEF(3)
+(
+    UInt64, playerId,
+    UInt8, mood,
+    std::string, sign
 )
 SPECIALEND()
 

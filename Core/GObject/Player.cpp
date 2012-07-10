@@ -533,6 +533,7 @@ namespace GObject
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
+        m_relation = new NewRelation();
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -751,6 +752,7 @@ namespace GObject
         SAFE_DELETE(m_HeroMemo);
         SAFE_DELETE(m_ShuoShuo);
         SAFE_DELETE(m_CFriend);
+        SAFE_DELETE(m_relation);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -3048,7 +3050,7 @@ namespace GObject
 		{
 			notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) << Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
 			SYSMSG_SENDV(1032, this, pl->getCountry(), pl->getName().c_str());
@@ -3074,7 +3076,7 @@ namespace GObject
 		{
 			//notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) << Stream::eos;
 			send(st);
 			SYSMSG_SEND(2341, this);
 			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
@@ -3269,13 +3271,15 @@ namespace GObject
             {
                 Player * pl = *it;
                 st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
-                    << pl->GetLev() << pl->GetClass() << pl->getClanName();
+                    << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
+                st << static_cast<UInt8>(pl->isOnline());
                 ++it;
             }
         }
 		st << Stream::eos;
 		send(st);
 	}
+
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{
