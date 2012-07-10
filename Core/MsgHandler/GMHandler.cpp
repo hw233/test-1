@@ -173,6 +173,7 @@ GMHandler::GMHandler()
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
+    Reg(3, "newr", &GMHandler::OnNewRelation);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2734,4 +2735,27 @@ void GMHandler::OnLuckyDraw(GObject::Player* player, std::vector<std::string>& a
 
     luckyDraw.draw(player, id, num, bind);
 }
+void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt8 type = 0;
+    UInt8 start = 0;
+    UInt8 cnt = 1;
+    if(args.size() >= 1)
+        type = atoi(args[0].c_str());
+    if (args.size() >= 2)
+        start = atoi(args[1].c_str());
+    if (args.size() >= 3)
+        cnt = atoi(args[2].c_str());
+    if(type > 4)
+        return;
+    if(type == 4)
+    {
+        GObject::Clan *clan = player->getClan();
+        if(clan != NULL)
+            clan->sendClanList(player, type, start, cnt);
+    }
+    else
+        player->sendFriendList(type, start, cnt);
+}
+
 

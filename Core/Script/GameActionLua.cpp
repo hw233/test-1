@@ -152,6 +152,7 @@ namespace Script
 		CLASS_DEF(Player, getPName);
 		CLASS_DEF(Player, IsMale);
 		CLASS_DEF(Player, GetLev);
+		CLASS_DEF(Player, getTotalRecharge);
 		CLASS_DEF(Player, GetExp);
 		CLASS_DEF(Player, AddExp);
 		CLASS_DEF(Player, AddPExp);

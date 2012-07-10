@@ -538,6 +538,7 @@ namespace GObject
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
+        m_relation = new NewRelation();
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -756,6 +757,7 @@ namespace GObject
         SAFE_DELETE(m_HeroMemo);
         SAFE_DELETE(m_ShuoShuo);
         SAFE_DELETE(m_CFriend);
+        SAFE_DELETE(m_relation);
 	}
 
 	UInt8 Player::GetCountryThread()
@@ -964,6 +966,33 @@ namespace GObject
                 }
             }
         }
+
+		if(!_playerData.totalRecharge && !GetVar(VAR_VIPFIRST))
+		{
+            SetVar(VAR_VIPFIRST, 1);
+
+			SYSMSG(title, 254);
+			SYSMSG(content, 255);
+
+			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
+            if(mail)
+            {
+                MailPackage::MailItem mitem[1] = {{449, 1}};
+                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 1);
+                mailPackageManager.push(mail->id, mitem, 1, true);
+
+                std::string strItems;
+                for (int i = 0; i < 1; ++i)
+                {
+                    strItems += Itoa(mitem[i].id);
+                    strItems += ",";
+                    strItems += Itoa(mitem[i].count);
+                    strItems += "|";
+                }
+
+                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+            }
+		}
 
 #ifdef _FB
 #else
@@ -3067,7 +3096,7 @@ namespace GObject
 		{
 			notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			st << static_cast<UInt8>(0x01) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) << Stream::eos;
 			send(st);
 			SYSMSG_SEND(132, this);
 			SYSMSG_SENDV(1032, this, pl->getCountry(), pl->getName().c_str());
@@ -3093,7 +3122,7 @@ namespace GObject
 		{
 			//notifyFriendAct(1, pl);
 			Stream st(REP::FRIEND_ACTION);
-			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << Stream::eos;
+			st << static_cast<UInt8>(0x07) << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry() << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl) << static_cast<UInt8>(pl->isOnline()) << Stream::eos;
 			send(st);
 			SYSMSG_SEND(2341, this);
 			SYSMSG_SENDV(2342, this, pl->getCountry(), pl->getName().c_str());
@@ -3288,13 +3317,15 @@ namespace GObject
             {
                 Player * pl = *it;
                 st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
-                    << pl->GetLev() << pl->GetClass() << pl->getClanName();
+                    << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << GObject::gAthleticsRank.getAthleticsRank(pl);
+                st << static_cast<UInt8>(pl->isOnline());
                 ++it;
             }
         }
 		st << Stream::eos;
 		send(st);
 	}
+
 
 	void Player::sendModification( UInt8 t, UInt32 v, bool updateToDB )
 	{
@@ -6064,7 +6095,6 @@ namespace GObject
 	{
 		if(r == 0)
 			return;
-		UInt32 oldRecharge = _playerData.totalRecharge;
 		UInt32 oldVipLevel = _vipLevel;
 		_playerData.totalRecharge += r;
 		recalcVipLevel();
@@ -6077,31 +6107,6 @@ namespace GObject
 		{
 			oldVipLevel = 0;
 			addStatus(TopupRewarded);
-		}
-
-		if(oldRecharge == 0)
-		{
-			SYSMSG(title, 254);
-			SYSMSG(content, 255);
-
-			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
-            if(mail)
-            {
-                MailPackage::MailItem mitem[1] = {{449, 1}};
-                MailItemsInfo itemsInfo(mitem, FirstReChargeAward, 1);
-                mailPackageManager.push(mail->id, mitem, 1, true);
-
-                std::string strItems;
-                for (int i = 0; i < 1; ++i)
-                {
-                    strItems += Itoa(mitem[i].id);
-                    strItems += ",";
-                    strItems += Itoa(mitem[i].count);
-                    strItems += "|";
-                }
-
-                DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
-            }
 		}
 
 		sendVIPMails(oldVipLevel + 1, _vipLevel);
@@ -9137,7 +9142,6 @@ namespace GObject
     void Player::getTargetAward(UInt8 opt)
     {
         UInt8 idx = 1;
-        UInt8 status = GetVar(VAR_JUNE_ITEM);
         // 转到转盘
         if(opt == 0 && 1 == GetVar(VAR_CLAWARD2))
         {

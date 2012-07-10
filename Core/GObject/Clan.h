@@ -449,6 +449,7 @@ public:
 
 public:
 	void sendClanDynamicMsg(Player *, UInt8, UInt16, UInt16);
+    void sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt);
 
 private:
 	void addAllyClan(Clan *, bool = true);

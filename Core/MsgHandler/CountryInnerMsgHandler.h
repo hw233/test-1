@@ -999,6 +999,7 @@ void OnCreateAward(GameMsgHdr& hdr, const void * data)
 {
     MSG_QUERY_PLAYER(player);
     player->GetPackage()->AddItem(18, 1, true);
+    player->GetPackage()->AddItem(449, 1, true); // XXX: 首充礼包
     player->getCoupon(888);
 #if defined(_FB) && defined(_FB_TEST)
     player->getGold(20000);

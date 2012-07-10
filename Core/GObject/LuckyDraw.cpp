@@ -14,6 +14,7 @@
 #include "MsgID.h"
 #include "GData/ItemType.h"
 #include "Server/SysMsg.h"
+#include "GVar.h"
 
 namespace GObject
 {
@@ -30,7 +31,7 @@ void LuckyDraw::sendInfo(Player* player)
     st << static_cast<UInt8>(6);
     for (UInt8 i = 2; i < 8; ++i)
     {
-        if (player->isCopyPassed(i))
+        if (GVAR.GetVar(GVAR_TCPASS) >= i)
             st << static_cast<UInt8>(1);
         else
             st << static_cast<UInt8>(0);
@@ -77,7 +78,7 @@ void LuckyDraw::draw(Player* player, UInt8 id, UInt8 num, bool bind)
         return;
     FastMutex::ScopedLock lock(_lock);
 
-    if (!player->isCopyPassed(id+1))
+    if (GVAR.GetVar(GVAR_TCPASS) < id)
         return;
 
     Stream st(REP::LUCKYDRAW);
@@ -187,15 +188,27 @@ void LuckyDraw::pushLog(const std::string& name, const std::string& its)
     _logs.push_back(l);
 }
 
-void LuckyDraw::notifyPass(Player* player, UInt8 id)
+void LuckyDraw::notifyPass(UInt8 id)
 {
-    if (!player || id <= 1)
+    if (id <= 1)
         return;
-    Stream st(REP::LUCKYDRAW);
-    st << static_cast<UInt8>(2);
-    st << static_cast<UInt8>(id -1);
-    st << Stream::eos;
-    player->send(st);
+    UInt8 maxid = GVAR.GetVar(GVAR_TCPASS);
+    if (id > maxid)
+    {
+        Stream st(REP::LUCKYDRAW);
+        st << static_cast<UInt8>(2);
+        st << static_cast<UInt8>(id -1);
+        st << Stream::eos;
+        NETWORK()->Broadcast(st);
+        GVAR.SetVar(GVAR_TCPASS, id);
+    }
+}
+
+void LuckyDraw::setPass(UInt8 id)
+{
+    UInt8 maxid = GVAR.GetVar(GVAR_TCPASS);
+    if (id > maxid)
+        GVAR.SetVar(GVAR_TCPASS, id);
 }
 
 void LuckyDraw::notifyDisplay(Player* player)
@@ -203,6 +216,9 @@ void LuckyDraw::notifyDisplay(Player* player)
     Stream st(REP::LUCKYDRAW);
     st << static_cast<UInt8>(3);
     bool passed = false;
+    if (GVAR.GetVar(GVAR_TCPASS))
+        passed = true;
+#if 0
     for (UInt8 i = 2; i < 8; ++i)
     {
         if (player->isCopyPassed(i))
@@ -211,6 +227,7 @@ void LuckyDraw::notifyDisplay(Player* player)
             break;
         }
     }
+#endif
 
     if (passed)
         st << static_cast<UInt8>(1);

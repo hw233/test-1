@@ -3352,10 +3352,17 @@ void OnMailClickReq( GameMsgHdr& hdr, MailClickReq& mcr )
 
 void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 {
-	if(flr._type > 3)
+	if(flr._type > 4)
 		return;
 	MSG_QUERY_PLAYER(player);
-	player->sendFriendList(flr._type, flr._start, flr._count);
+    if(flr._type == 4)
+    {
+        GObject::Clan *clan = player->getClan();
+        if(clan != NULL)
+            clan->sendClanList(player, flr._type, flr._start, flr._count);
+    }
+    else
+	    player->sendFriendList(flr._type, flr._start, flr._count);
 }
 
 void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
@@ -4269,6 +4276,47 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     default:
         return;
     }
+}
+
+void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 mood = 0;
+    std::string status;
+    br >> type;
+
+    if(type > 4)
+        return;
+
+    Stream st(REP::NEWRELATION);
+    st << type;
+    /** 关系 **/
+    switch(type)
+    {
+        case 0:
+            st << pl->GetNewRelation()->getMood();
+            break;
+        case 1:
+            br >> mood;
+            st << mood;
+            pl->GetNewRelation()->setMood(mood);
+            break;
+        case 2:
+            st << pl->GetNewRelation()->getSign();
+            break;
+        case 3:
+            br >> status;
+            st << status;
+            pl->GetNewRelation()->setSign(status);
+            break;
+        default:
+            break;
+    }
+
+    st << Stream::eos;
+    pl->send(st);
 }
 
 void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)

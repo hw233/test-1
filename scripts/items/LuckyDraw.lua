@@ -2,6 +2,7 @@
 -- 消耗一个物品所得到的积分
 local item2point = 10
 local item2point2 = 6
+local copylvl = {45,60,70,80,90}
 
 -- { 物品概率(累积值), 物品ID, 积分}，对应5个副本
 local items = {
@@ -1634,12 +1635,22 @@ local copyitem = {
 }
 
 function luckyDraw(player, id, num, bind)
+    print(id)
     local got = {}
 
     local needitem = copyitem[id]
     if needitem == nil then
         return got 
     end 
+
+    local lvl = player:GetLev()
+    if lvl >= copylvl[id] then
+        item2point = 10
+        item2point2 = 6
+    else
+        item2point = copylvl[id] - lvl + 10
+        item2point2 = copylvl[id] - lvl + 6
+    end
 
     local package = player:GetPackage()
     local bnum = package:GetItemNum(needitem, true)

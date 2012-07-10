@@ -24,6 +24,7 @@
 #include "ClanRankBattle.h"
 #include "HeroMemo.h"
 
+#include "GObject/AthleticsRank.h"
 #include <mysql.h>
 #include <sstream>
 
@@ -3484,6 +3485,35 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
     }
 
     return res;
+}
+
+void Clan::sendClanList(Player *player, UInt8 type, UInt8 start, UInt8 cnt)
+{
+    UInt8 sz = static_cast<UInt8>(_members.size());
+    UInt8 end = start + cnt;
+    if(end > sz)
+        end = sz;
+    if(end < start)
+        cnt = 0;
+    else
+        cnt = end - start;
+    Stream st(REP::FRIEND_LIST);
+    st << static_cast<UInt8>(type) << start << cnt << sz;
+    if (sz && cnt)
+    {
+        Members::iterator it = _members.begin();
+        std::advance(it, start);
+        for(UInt8 i = 0; i < cnt; ++ i)
+        {
+            Player * pl = (*it)->player;
+            st << pl->getId() << pl->getName() << pl->getPF() << static_cast<UInt8>(pl->IsMale() ? 0 : 1) << pl->getCountry()
+                << pl->GetLev() << pl->GetClass() << pl->getClanName() << pl->GetNewRelation()->getMood() << pl->GetNewRelation()->getSign() << gAthleticsRank.getAthleticsRank(pl);
+            st << static_cast<UInt8>(pl->isOnline());
+            ++it;
+        }
+    }
+    st << Stream::eos;
+    player->send(st);
 }
 
 }

@@ -1718,6 +1718,11 @@ function ItemNormal_VIP(iid, num, bind, param)
 
     local lvl = iid - 449 + 1;
 
+    if iid == 449 and player:getTotalRecharge() == 0 then
+        player:sendMsgCode(2, 1019, 0)
+        return false
+    end
+
     if package:GetRestPackageSize() < needsize[lvl] + 1 then
         player:sendMsgCode(2, 1011, 0);
         return false;
