@@ -563,7 +563,7 @@ function initActTime(y, m, d)
   actTime115 = os.time(SerStartTm107);
   actTime116 = os.time(SerStartTm107) + 37 * 86400;
   actTime200= os.time(SerStartTm200);
-  actTime201= os.time(SerStartTm200) + 7 * 86400;
+  actTime201= os.time(SerStartTm200) + 6 * 86400;
 
   actTime202= os.time(SerStartTm201);
   setLevelAwardEnd(actTime202)
