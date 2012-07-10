@@ -60,6 +60,7 @@
 #include "LuckyDraw.h"
 #include <fcntl.h>
 #include "RealItemAward.h"
+#include "NewRelation.h"
 #include "GVar.h"
 
 namespace GObject
@@ -211,6 +212,7 @@ namespace GObject
         LoadSoulItemChance();
         LoadLuckyLog();
         loadRNR();
+        loadNewRelation();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4287,6 +4289,27 @@ namespace GObject
 		{
 			lc.advance();
             realItemAwardMgr.load(t.id, t.cd, t.card_no, t.card_psw);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadNewRelation()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading New Relation");
+		DBNewRelation t;
+		if(execu->Prepare("SELECT `playerId`, `mood`, `sign` FROM `new_relation` ORDER BY `playerId`", t)!= DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+		{
+			lc.advance();
+            Player* pl = globalPlayers[t.playerId];
+            if(!pl)
+                continue;
+            pl->GetNewRelation()->LoadFromDB(t.playerId, t.mood, t.sign);
         }
         lc.finalize();
         return true;
