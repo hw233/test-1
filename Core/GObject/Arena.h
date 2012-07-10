@@ -94,7 +94,7 @@ public:
 	inline bool active() { return _loaded && (_session != 0x8001 || (_progress != 0)); }
 	inline void getPlayerCount(UInt32 * pc) { pc[0] = _playerCount[0]; pc[1] = _playerCount[1]; pc[2] = _playerCount[2]; }
 
-	static void enterArena(Player * player);
+	void enterArena(Player * player);
 	void commitLineup(Player * player);
     //UInt8 bet( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 type );
     UInt8 bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 type );
@@ -122,6 +122,7 @@ public:
 
     void updateSuport(UInt8 type, UInt8 flag, UInt16 pos);
     void updateBattlePoint(BinaryReader& brd);
+    void commitArenaForceOnce();
 
 private:
 	static void appendLineup( Stream& st, Player * player);

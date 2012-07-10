@@ -25,6 +25,9 @@ namespace GObject
 #define TRUMP_ENCHANT_L1 514   //五行精英
 #define TRUMP_ENCHANT_L2 515  //五行精华
 
+#define ARENA_BET_ITEM1    9081
+#define ARENA_BET_ITEM2    9082
+
 	class Fighter;
 	class Player;
 

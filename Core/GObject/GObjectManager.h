@@ -64,6 +64,7 @@ namespace GObject
 
 	public:
 		static bool InitIDGen();
+        static bool loadGVar();
 		static bool loadMapData();
 		static bool loadFighters();
 		static bool loadCopy();

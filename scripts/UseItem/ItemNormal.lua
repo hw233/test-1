@@ -3214,7 +3214,7 @@ function ItemNormal_00000067(iid, num, bind, param)
     package:AddEquip(Equip50[cls], 1);
 
 
-    package:DelItemSendMsg(67, player);
+    package:DelItemSendMsg(iid, player);
     return num;
 end
 
@@ -3931,6 +3931,49 @@ function ItemNormal_00009077(iid, num, bind, param)
     return false
 end
 
+function ItemNormal_00009080(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    package:DelItemSendMsg(iid, player);
+    player:getMoneyArena(100*num);
+    return num;
+end
+
+function ItemNormal_00009085(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*10)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(548, num*100, true, 0, 2);
+    package:Add(465, num*1, true, 0, 2);
+    package:Add(466, num*1, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009086(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (4+(4*num*10)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(50, num*10, true, 0, 2);
+    package:Add(49, num*10, true, 0, 2);
+    package:Add(48, num*10, true, 0, 2);
+    package:Add(51, num*10, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -3951,6 +3994,7 @@ local ItemNormal_Table = {
 	[20] = ItemNormal_00000020,
 	[21] = ItemNormal_00000021,
     [26] = ItemNormal_00000026,
+    [9083] = ItemNormal_00000026,
     [27] = ItemNormal_00000027,
     [28] = ItemNormal_00000028,
 	[29] = ItemNormal_00000029,
@@ -4196,6 +4240,7 @@ local ItemNormal_Table = {
     [79] = ItemNormal_00000079,
     [80] = ItemNormal_00000080,
     [81] = ItemNormal_00000081,
+    [9084] = ItemNormal_00000067,
 
     --竞技场宝箱
     [2] = ItemNormal_athletics_2,
@@ -5311,6 +5356,10 @@ local ItemNormal_Table = {
     [9078] = ItemNormal_00009077,
     [9079] = ItemNormal_00009077,
 
+    [9080] = ItemNormal_00009080,
+
+    [9085] = ItemNormal_00009085,
+    [9086] = ItemNormal_00009086,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

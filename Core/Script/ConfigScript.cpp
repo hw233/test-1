@@ -23,6 +23,7 @@ ConfigScript::ConfigScript( Cfg * cfg )
 	class_def<Cfg>("setFBRechargeKeys", &Cfg::setFBRechargeKeys);
 	class_def<Cfg>("setAdminAllowedIP", &Cfg::setAdminAllowedIP);
 	class_def<Cfg>("setOpening", &Cfg::setOpening);
+	class_def<Cfg>("setMergeList", &Cfg::setMergeList);
 	class_def<Cfg>("setWallow", &Cfg::setWallow);
 	class_def<Cfg>("setLimitLuckyDraw", &Cfg::setLimitLuckyDraw);
 	class_def<Cfg>("setMerged", &Cfg::setMerged);

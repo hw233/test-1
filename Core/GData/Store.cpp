@@ -4,6 +4,8 @@
 #include "Server/WorldServer.h"
 #include "GObject/Player.h"
 #include "MsgID.h"
+#include "Server/Cfg.h"
+#include "GObject/Package.h"
 
 namespace GData
 {
@@ -12,6 +14,9 @@ Store store;
 
 void Store::add( UInt8 type, UInt32 itemId, UInt32 price )
 {
+    if(cfg.arenaPort == 0 && (itemId == ARENA_BET_ITEM1 || itemId == ARENA_BET_ITEM2))
+        return;
+
     if(type >= PURCHASE1 && type <= PURCHASE2)
     {
         _items[type - PURCHASE1].push_back(itemId + (price << 16));

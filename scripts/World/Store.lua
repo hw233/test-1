@@ -38,24 +38,9 @@ end
 
 store:discountLimit()
 
-if is7_1() then
-store:add(2,1702,500)
-store:add(2,1703,500)
-end
-
-if is6_25() then
-store:add(2,9076,100)
-end
-
-if is6_23() then
-store:add(2,509,80)
-store:add(2,507,80)
-end
-
-if is6_22() then
-store:add(2,1700,500)
-store:add(2,1701,500)
-store:add(2,1527,25)
+if is7_10_15() then
+store:add(2,9085,100)
+store:add(2,9086,200)
 end
 
 if is4_21() then
@@ -70,6 +55,12 @@ store:add(2,496,10)
 store:add(2,497,10)
 end
 
+if is7_1() then
+store:add(2,1702,500)
+store:add(2,1703,500)
+end
+
+store:add(2,9082,5)
 store:add(2,549,80)
 store:add(2,33,10)
 store:add(2,8000,15)
@@ -154,6 +145,7 @@ store:add(4,5113,20)
 store:add(4,5123,20)
 store:add(4,5133,15)
 store:add(4,5143,20)
+store:add(5,9081,500)
 store:add(5,489,2000)
 store:add(5,490,2000)
 store:add(5,491,2000)

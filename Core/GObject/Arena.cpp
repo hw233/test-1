@@ -111,13 +111,14 @@ Arena::Arena():
 
 void Arena::enterArena( Player * player )
 {
-    if(player->GetLev() < 70)
+    if(_progress != 0)
         return;
-	Stream st(ARENAREQ::ENTER, 0xEF);
-	st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
-	appendLineup2(st, player);
-	st << Stream::eos;
-	NETWORK()->SendToArena(st);
+    std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
+    if( iter != _players.end() )
+        return;
+	GameMsgHdr hdr(0x252, player->getThreadId(), player, 1);
+	UInt8 data = 0;
+	GLOBAL().PushMsg(hdr, &data);
 }
 
 void Arena::commitLineup( Player * player )
@@ -190,12 +191,27 @@ void Arena::commitLineup( Player * player )
             return;
     }
 
-	Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
-	st << player->getId();
-	appendLineup2(st, player);
-	st << Stream::eos;
-	//NETWORK()->SendMsgToClient(sid, st);
-	NETWORK()->SendToArena(st);
+	GameMsgHdr hdr(0x252, player->getThreadId(), player, 1);
+	UInt8 data = 1;
+	GLOBAL().PushMsg(hdr, &data);
+}
+
+void Arena::commitArenaForceOnce()
+{
+    PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
+    Mutex::ScopedLock lk(globalPlayers.getMutex());
+    std::unordered_map<UInt64, Player *>& pm = globalPlayers.getMap();
+    for(; it != _preliminaryPlayers_list[0].end(); ++ it)
+    {
+        PreliminaryPlayer& pp = *it;
+        std::unordered_map<UInt64, Player *>::const_iterator it = pm.find(pp.id);
+        if(it == pm.end())
+            continue;
+        Player * pl = it->second;
+        if(pl == NULL)
+            continue;
+        commitLineup(pl);
+    }
 }
 
 UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 type )
@@ -214,7 +230,7 @@ UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 
 
     UInt16 pos = std::distance(_preliminaryPlayers_list[state].begin(), it);
     std::map<Player*, ArenaPlayer>::iterator ait = _players.find(player);
-    if(ait != _players.end() && ait->second.betList[state][0].size() >= 1 || pp.name.empty())
+    if((ait != _players.end() && ait->second.betList[state][0].size() >= 1) || pp.name.empty())
         return 0xFF;
     if(pp.betMap.find(player) != pp.betMap.end())
         return 2;
@@ -234,7 +250,7 @@ UInt8 Arena::bet1( Player * player, UInt8 state, UInt8 group, UInt64 pid, UInt8 
     if(group > 0)
         i = group - 1;
 	_players[player].betList[state][i].push_back(binfo);
-	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
@@ -261,6 +277,8 @@ UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 
     case 4:
     case 5:
     case 6:
+        if(pos > 7)
+            return 0xFF;
         pos2 = _finalIdx[gIdx][2][pos];
         fidx = pos2 >> _round;
         break;
@@ -292,7 +310,7 @@ UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 
     if(group > 0)
         i = group - 1;
 	_players[player].betList[state][i].push_back(binfo);
-	DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
+	DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), binfo.round, binfo.state, binfo.group, binfo.recieved, binfo.pos, binfo.type);
 	GameMsgHdr hdr(0x230, player->getThreadId(), player, 2);
 	UInt16 data = type;
 	GLOBAL().PushMsg(hdr, &data);
@@ -757,7 +775,7 @@ void Arena::readFrom( BinaryReader& brd )
 	case 0:
 		if(!_players.empty() && sIdx == 0)
         {
-            DB().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
+            DB1().PushUpdateData("DELETE FROM `arena_bet`");
             _playerCount[0] = 0;
 			_players.clear();
         }
@@ -1329,6 +1347,9 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
                 if(bi.round == 1 && bi.group == 0 && bi.state == i)
                 {
                     PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[i].begin();
+                    int pos = bi.pos;
+                    if(pos > _preliminaryPlayers_list[i].size())
+                        pos = _preliminaryPlayers_list[i].size();
                     std::advance(pit, bi.pos);
                     if(pit != _preliminaryPlayers_list[i].end())
                     {
@@ -1907,7 +1928,10 @@ void Arena::sendPreliminary(Player* player, UInt8 type, UInt8 flag, UInt16 start
         size_t offset = st.size();
         st << premNum;
         PreliminaryPlayersSet::iterator setIt = _preliminaryPlayers_list_set[type].begin();
-        std::advance(setIt, start);
+        int pos = start;
+        if(pos > _preliminaryPlayers_list_set[type].size())
+            pos = _preliminaryPlayers_list_set[type].size();
+        std::advance(setIt, pos);
         for(int i = 0; setIt != _preliminaryPlayers_list_set[type].end() && i < len; ++ setIt)
         {
             ++ premNum;
@@ -2047,7 +2071,10 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         if(type == 1)
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[0].begin();
-            std::advance(it, pos);
+            int pos2 = pos;
+            if(pos2 > _preliminaryPlayers_list[0].size())
+                pos2 = _preliminaryPlayers_list[0].size();
+            std::advance(it, pos2);
             if(it != _preliminaryPlayers_list[0].end())
             {
                 PreliminaryPlayer& pp = *it;
@@ -2057,7 +2084,10 @@ void Arena::updateSuport(UInt8 type, UInt8 flag, UInt16 pos)
         else
         {
             PreliminaryPlayerListIterator it = _preliminaryPlayers_list[1].begin();
-            std::advance(it, pos);
+            int pos2 = pos;
+            if(pos2 > _preliminaryPlayers_list[1].size())
+                pos2 = _preliminaryPlayers_list[1].size();
+            std::advance(it, pos2);
             if(it != _preliminaryPlayers_list[1].end())
             {
                 PreliminaryPlayer& pp = *it;
@@ -2092,7 +2122,7 @@ void Arena::calcBet(PreliminaryPlayer& pp, UInt16 pos, UInt8 state, UInt8 group,
                 {
                     recieved = false;
                     bit->recieved = 1;
-                    DB().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), bit->round, bit->state, bit->group, bit->recieved, bit->pos, bit->type);
+                    DB1().PushUpdateData("REPLACE INTO `arena_bet`(`id`, `round`, `state`, `group`, `recieved`, `pos`, `tael`) VALUES(%"I64_FMT"u, %u, %u, %u, %u, %u, %u)", player->getId(), bit->round, bit->state, bit->group, bit->recieved, bit->pos, bit->type);
                 }
                 break;
             }

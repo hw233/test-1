@@ -218,6 +218,7 @@ namespace Script
 		void onEnchant(Player* player, UInt8 level);
 		void onEnchantAct(Player* player, UInt8 level, UInt8 type = 0);
 		void onEnchantGt11(Player* player, UInt16 id, UInt8 level, UInt8 type);
+        void onSoulEnchantMaxSoul(Player* player, UInt32 oms, UInt32 yams);
 		void onTrainFighterAct(Player* player, Fighter* fgt);
         void onRechargeAct(Player* player, UInt32 total);
 		void onTopup(Player* player, UInt32 ogold, UInt32 ngold);
@@ -247,6 +248,7 @@ namespace Script
         UInt16 RunTargetAwardRF(Player* player);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
         void sendRechargeMails(Player* player, UInt32 ototal, UInt32 ntotal);
+        void onEquipForge( Player* player, UInt32 itemId, UInt32 onums);
 	public:
 
 		template <typename R>

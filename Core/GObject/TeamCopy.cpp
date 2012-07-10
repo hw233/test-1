@@ -296,7 +296,7 @@ UInt32 TeamCopy::createTeam(Player* pl, std::string pwd, UInt8 upLevel, UInt8 dn
     ct.push_back(td);
     pl->setTeamData(td);
 
-    m_allCopyTeams[td->id] = td;
+    m_allCopyTeams[copyIdx][td->id] = td;
 
     incLevelTeamCnt(copyId, t, upLevel, dnLevel);
 
@@ -388,6 +388,7 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
 {
     CopyTeamPage& ctp = pl->getCopyTeamPage();
     UInt8 copyId = ctp.copyId;
+    UInt8 copyIdx = ctp.copyId - 1;
     UInt8 t = ctp.t;
 
     UInt32 now = TimeUtil::Now();
@@ -410,8 +411,8 @@ UInt32 TeamCopy::joinTeam(Player* pl, UInt32 teamId, std::string pwd)
     if(copyId != teamCopyId || t != teamCopyType)
         return 0;
     
-    AllCopyTeamsIterator it = m_allCopyTeams.find(teamId);
-    if(it == m_allCopyTeams.end() || it->second == NULL)
+    AllCopyTeamsIterator it = m_allCopyTeams[copyIdx].find(teamId);
+    if(it == m_allCopyTeams[copyIdx].end() || it->second == NULL)
     {
 		pl->sendMsgCode(1, 2102);
         return 0;
@@ -499,7 +500,7 @@ void TeamCopy::leaveTeam(Player* pl)
     bool find = false;
     if(td->count == 0)
     {
-        m_allCopyTeams.erase(td->id);
+        m_allCopyTeams[copyIdx].erase(td->id);
 
         CopyTeams& ct = *(m_copysTeam[t][copyIdx]);
         for(UInt32 i = 0; i < ct.size(); ++i)

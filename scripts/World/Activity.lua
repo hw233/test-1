@@ -67,6 +67,26 @@ function is7_1()
     return is_7_1
 end
 
+is_7_10_15 = false
+function is7_10_15()
+    return is_7_10_15
+end
+
+is_7_11_12 = false
+function is7_11_12()
+    return is_7_11_12
+end
+
+is_7_13 = false
+function is7_13()
+    return is_7_13
+end
+
+is_6_29 = false 
+function is6_29()
+    return is_6_29
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -222,12 +242,6 @@ function onActivityCheck(tm)
       setJune(false)
   end
 
-  if tm >= actTime51 and tm < actTime52 then
-      setJune1(true)
-  else
-      setJune1(false)
-  end
-
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
       setDuanWu(true)
@@ -271,6 +285,14 @@ function onActivityCheck(tm)
           setRechargeActive(true, 4)
       else
           setRechargeActive(false, 4)
+      end
+
+      if tm >= actTime200 and tm < actTime201 then
+          is_6_29 = true
+          setICAct(true)
+      else
+          is_6_29 = false 
+          setICAct(false)
       end
 
       setShuoShuo(false);
@@ -323,6 +345,12 @@ function onActivityCheck(tm)
           setRechargeActive(false, 4)
       end
 
+      if tm >= actTime51 and tm < actTime52 then
+          setJune1(true)
+      else
+          setJune1(false)
+      end
+
       if tm >= actTime53 and tm < actTime54 then
           setEnchantGt11(true)
       else
@@ -368,9 +396,11 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime65 and tm < actTime66 then
-          setRechargeActive(true, 8)
+          setRechargeActive(true, 16)
+      elseif tm >= actTime73 and tm < actTime74 then
+          setRechargeActive(true, 16)
       else
-          setRechargeActive(false, 8)
+          setRechargeActive(false, 16)
       end
 
       if tm >= actTime67 and tm < actTime68 then
@@ -383,6 +413,18 @@ function onActivityCheck(tm)
           is_7_1 = true
       else
           is_7_1 = false 
+      end
+
+      if tm >= actTime71 and tm < actTime72 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
+      if tm >= actTime75 and tm < actTime76 then
+          is_7_10_15 = true
+      else
+          is_7_10_15 = false 
       end
 
       setShuoShuo(true);
@@ -444,6 +486,9 @@ function initActTime(y, m, d)
   local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm28= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm29= { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm30= { ['year'] = 2012, ['month'] = 7, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm31= { ['year'] = 2012, ['month'] = 7, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm32= { ['year'] = 2012, ['month'] = 7, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -455,6 +500,8 @@ function initActTime(y, m, d)
   local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 四大名捕（6/25-7/31）
   local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm200= { ['year'] = 2012, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -557,13 +604,22 @@ function initActTime(y, m, d)
   actTime64 = os.time(SerStartTm27) + 8 * 86400;
 
   actTime65 = os.time(SerStartTm29);
-  actTime66 = os.time(SerStartTm29) + 9 * 86400;
+  actTime66 = os.time(SerStartTm29) + 6 * 86400;
 
   actTime67 = os.time(SerStartTm29);
   actTime68 = os.time(SerStartTm29) + 31 * 86400;
 
   actTime69 = os.time(SerStartTm29);
   actTime70 = os.time(SerStartTm29) + 15 * 86400;
+
+  actTime71 = os.time(SerStartTm30);
+  actTime72 = os.time(SerStartTm30) + 2 * 86400;
+
+  actTime73 = os.time(SerStartTm31);
+  actTime74 = os.time(SerStartTm31) + 5 * 86400;
+
+  actTime75 = os.time(SerStartTm32);
+  actTime76 = os.time(SerStartTm32) + 6 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;
@@ -587,6 +643,11 @@ function initActTime(y, m, d)
   actTime114 = os.time(SerStartTm106) + 7 * 86400;
   actTime115 = os.time(SerStartTm107);
   actTime116 = os.time(SerStartTm107) + 37 * 86400;
+  actTime200= os.time(SerStartTm200);
+  actTime201= os.time(SerStartTm200) + 6 * 86400;
+
+  actTime202= os.time(SerStartTm201);
+  setLevelAwardEnd(actTime202)
 
   onActivityCheck(os.time() + 30);
 

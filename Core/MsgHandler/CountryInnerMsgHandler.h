@@ -585,9 +585,11 @@ void OnSaleSellRespNotify( GameMsgHdr& hdr, const void * data )
 	{
 		UInt32 saleId;
 		Player *buyer;
+        UInt32 id;
+        UInt16 num;
 	};
 	BuyInfo binfo = *reinterpret_cast<BuyInfo *>(const_cast<void *>(data));
-	player->GetSale()->sellSaleResp(binfo.saleId, binfo.buyer);
+	player->GetSale()->sellSaleResp(binfo.saleId, binfo.buyer, binfo.id, binfo.num);
 }
 
 void OnSaleItemCancel( GameMsgHdr& hdr, const void * data )
@@ -1033,11 +1035,10 @@ void OnArenaBet( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt16 tael = *reinterpret_cast<const UInt16 *>(data);
-	ConsumeInfo ci(ArenaBet, 0, 0);
     if(tael == 0)
-        player->useGold(5, &ci);
+        player->GetPackage()->DelItemAny(ARENA_BET_ITEM2, 1, NULL, ToArenaBet);
     else
-        player->useTael(500, &ci);
+        player->GetPackage()->DelItemAny(ARENA_BET_ITEM1, 1, NULL, ToArenaBet);
 }
 
 void OnArenaBetResult( GameMsgHdr& hdr, const void * data )
@@ -1410,6 +1411,31 @@ void OnGetArenaMoney( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
 	const UInt32 arenaMoney = *reinterpret_cast<const UInt32 *>(data);
     player->getMoneyArena(arenaMoney);
+}
+
+void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
+
+    if(player->GetLev() < 70)
+        return;
+    if(type == 0)
+    {
+        Stream st(ARENAREQ::ENTER, 0xEF);
+        st << player->getId() << player->getName() << static_cast<UInt8>(player->getTitle());
+        player->appendLineup2(st);
+        st << Stream::eos;
+        NETWORK()->SendToArena(st);
+    }
+    else if(type == 1)
+    {
+        Stream st(ARENAREQ::COMMIT_LINEUP, 0xEF);
+        st << player->getId();
+        player->appendLineup2(st);
+        st << Stream::eos;
+        NETWORK()->SendToArena(st);
+    }
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

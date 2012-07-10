@@ -119,8 +119,11 @@ void WorldScript::init()
 	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
 	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
 	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
+	def("setLevelAwardEnd", GObject::World::setLevelAwardEnd);
 	def("setDuanWu", GObject::World::setDuanWu);
 	def("getDuanWu", GObject::World::getDuanWu);
+	def("setICAct", GObject::World::setICAct);
+	def("getICAct", GObject::World::getICAct);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);
@@ -147,6 +150,7 @@ void WorldScript::init()
     def("getMergeAthAct", GObject::World::getMergeAthAct);
     def("setFourCopAct", GObject::World::setFourCopAct);
     def("getFourCopAct", GObject::World::getFourCopAct);
+    def("commitArenaForceOnce", GObject::World::commitArenaForceOnce);
 
 	class_add<GData::Store>("Store");
 	class_def<GData::Store>("clear", &GData::Store::clear);
@@ -180,6 +184,11 @@ GData::Store * WorldScript::GetStore()
 GData::TitleList * WorldScript::GetTitleList()
 {
 	return &GData::titleList;
+}
+
+void WorldScript::forceCommitArena()
+{
+	call<void>("forceCommitArena");
 }
 
 }

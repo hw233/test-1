@@ -1644,7 +1644,7 @@ function luckyDraw(player, id, num, bind)
     local package = player:GetPackage()
     local bnum = package:GetItemNum(needitem, true)
     local ubnum = package:GetItemNum(needitem, false)
-    local gold = player:getGold()
+    local gold = player:getGold4LuckDraw()
 
     if (bnum + ubnum + gold/10) < num then
         player:sendMsgCode(2, 1076, 0)
