@@ -249,7 +249,7 @@ bool enum_midnight(void * ptr, void* next)
     if (pl->GetVar(VAR_RECHARGE_TOTAL) &&
             (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 1) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 4) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 7)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9)))
     {
         if (pl->isOnline())
         {

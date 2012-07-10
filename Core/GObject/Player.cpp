@@ -866,6 +866,15 @@ namespace GObject
             GameAction()->onMayDay1(this);
         if (World::getEnchantGt11() && !GetVar(VAR_ENCHANTGT11))
             enchantGt11();
+        if (World::getEnchantAct() && !GetVar(VAR_2NDSOUL))
+        {
+            for(std::map<UInt32, Fighter *>::iterator it = _fighters.begin(); it != _fighters.end(); ++ it)
+            {
+                Fighter* fgt = it->second;
+                GameAction()->onSoulEnchantMaxSoul(this, 0, fgt->get2ndSounSoulMax());
+            }
+            SetVar(VAR_2NDSOUL, 1);
+        }
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -10583,6 +10592,10 @@ namespace GObject
                 fgt->getAllPSkillAndLevel4Arena(st);
 
                 fgt->getAttrExtraEquip(st);
+
+                st << fgt->getSoulExtraAura();
+                st << fgt->getBattlePortrait();
+                fgt->appendElixirAttr2(st);
             }
         }
         st.data<UInt8>(offset) = c;

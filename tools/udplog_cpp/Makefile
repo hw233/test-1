@@ -13,5 +13,6 @@ clean:
 	rm -f *.o *.a
 
 %.o : %.cpp
-	$(CPP) -O2 -o $@ -c $^
+	#$(CPP) -O2 -o $@ -c $^
+	$(CPP) -g -o $@ -c $^
 

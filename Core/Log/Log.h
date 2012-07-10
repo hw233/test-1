@@ -165,6 +165,7 @@ enum ItemTo
     ToEquipUpgrade,
     ToForgeFighter,
     ToSecondSoul,
+    ToArenaBet,
 };
 
 

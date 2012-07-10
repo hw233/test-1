@@ -67,6 +67,21 @@ function is7_1()
     return is_7_1
 end
 
+is_7_9_10 = false
+function is7_9_10()
+    return is_7_9_10
+end
+
+is_7_11_12 = false
+function is7_11_12()
+    return is_7_11_12
+end
+
+is_7_13 = false
+function is7_13()
+    return is_7_13
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -368,9 +383,11 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime65 and tm < actTime66 then
-          setRechargeActive(true, 8)
+          setRechargeActive(true, 16)
+      elseif tm >= actTime73 and tm < actTime74 then
+          setRechargeActive(true, 16)
       else
-          setRechargeActive(false, 8)
+          setRechargeActive(false, 16)
       end
 
       if tm >= actTime67 and tm < actTime68 then
@@ -383,6 +400,30 @@ function onActivityCheck(tm)
           is_7_1 = true
       else
           is_7_1 = false 
+      end
+
+      if tm >= actTime71 and tm < actTime72 then
+          setEnchantAct(true)
+      else
+          setEnchantAct(false)
+      end
+
+      if tm >= actTime75 and tm < actTime76 then
+          is_7_9_10 = true
+      else
+          is_7_9_10 = false 
+      end
+
+      if tm >= actTime77 and tm < actTime78 then
+          is_7_11_12 = true
+      else
+          is_7_11_12 = false
+      end
+
+      if tm >= actTime79 and tm < actTime80 then
+          is_7_13 = true
+      else
+          is_7_13 = false
       end
 
       setShuoShuo(true);
@@ -444,6 +485,10 @@ function initActTime(y, m, d)
   local  SerStartTm27= { ['year'] = 2012, ['month'] = 6, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm28= { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm29= { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm30= { ['year'] = 2012, ['month'] = 7, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm31= { ['year'] = 2012, ['month'] = 7, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm32= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm33= { ['year'] = 2012, ['month'] = 7, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -557,13 +602,28 @@ function initActTime(y, m, d)
   actTime64 = os.time(SerStartTm27) + 8 * 86400;
 
   actTime65 = os.time(SerStartTm29);
-  actTime66 = os.time(SerStartTm29) + 9 * 86400;
+  actTime66 = os.time(SerStartTm29) + 6 * 86400;
 
   actTime67 = os.time(SerStartTm29);
   actTime68 = os.time(SerStartTm29) + 31 * 86400;
 
   actTime69 = os.time(SerStartTm29);
   actTime70 = os.time(SerStartTm29) + 15 * 86400;
+
+  actTime71 = os.time(SerStartTm30);
+  actTime72 = os.time(SerStartTm30) + 2 * 86400;
+
+  actTime73 = os.time(SerStartTm31);
+  actTime74 = os.time(SerStartTm31) + 5 * 86400;
+
+  actTime75 = os.time(SerStartTm31);
+  actTime76 = os.time(SerStartTm31) + 2 * 86400;
+
+  actTime77 = os.time(SerStartTm32);
+  actTime78 = os.time(SerStartTm32) + 2 * 86400;
+
+  actTime79 = os.time(SerStartTm33);
+  actTime80 = os.time(SerStartTm33) + 1 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

@@ -243,6 +243,7 @@ namespace Script
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
+        CLASS_DEF(Player, getMoneyArena);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -271,6 +272,7 @@ namespace Script
 		CLASS_DEF(Fighter, addElixirAttrByOffset);
 		CLASS_DEF(Fighter, getElixirAttrByOffset);
 		CLASS_DEF(Fighter, changeSecondSoulXinxiu);
+		CLASS_DEF(Fighter, get2ndSounSoulMax);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -953,6 +955,11 @@ namespace Script
 	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)
 	{
 		Call<void>("onEnchantGt11", player, id, level, type);
+	}
+
+	void GameActionLua::onSoulEnchantMaxSoul( Player* player, UInt32 oms, UInt32 yams )
+	{
+		Call<void>("onSoulEnchantMaxSoul", player, oms, yams);
 	}
 
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
