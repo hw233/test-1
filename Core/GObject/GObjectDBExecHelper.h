@@ -845,7 +845,7 @@ struct DBArenaBet
 	UInt8 state;
 	UInt8 group;
 	UInt8 recieved;
-	UInt8 pos;
+	UInt16 pos;
 	UInt8 tael;
 };
 
@@ -2009,7 +2009,7 @@ SPECIALDEF(7)
 	UInt8, state,
 	UInt8, group,
 	UInt8, recieved,
-	UInt8, pos,
+	UInt16, pos,
 	UInt8, tael
 )
 SPECIALEND()
