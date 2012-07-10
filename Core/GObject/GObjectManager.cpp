@@ -174,6 +174,7 @@ namespace GObject
 
 	void GObjectManager::loadAllData()
 	{
+        loadGVar();
         loadRealItemAward();
         loadEquipForge();
 		loadMapData();
@@ -210,7 +211,6 @@ namespace GObject
         LoadSoulItemChance();
         LoadLuckyLog();
         loadRNR();
-        loadGVar();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 

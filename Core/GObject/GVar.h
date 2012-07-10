@@ -23,7 +23,8 @@ namespace GObject
 
     enum GVarID
     {
-        GVAR_INVALID = 0,    //??Ч??��
+        GVAR_INVALID = 0,
+        GVAR_TCPASS = 1, // 组队副本最高通过等级
         GVAR_MAX,
     };
 
@@ -45,7 +46,7 @@ namespace GObject
         static void Init()
         {
             //注册变量
-            //GREGISTER_VAR(VAR_2NDSOUL, CYCLE_NONE);
+            GREGISTER_VAR(GVAR_TCPASS, GCYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);
@@ -67,6 +68,8 @@ namespace GObject
 
         static UInt32 m_VarTypes[GVAR_MAX];
     };
+
+#define GVAR GVarSystem::Instance()
 }
 
 #endif
