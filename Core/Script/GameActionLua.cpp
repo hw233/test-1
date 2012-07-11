@@ -76,7 +76,8 @@ namespace Script
 		lua_tinker::def(_L, "Broadcast",	SysBroadcast);
 		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
-		lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
+        lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
+		lua_tinker::def(_L, "isVTVersion", GObject::World::isVTVersion);
 		lua_tinker::def(_L, "isNewServer", GObject::World::IsNewServer);
 		lua_tinker::def(_L, "isDebug", GObject::World::isDebug);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);

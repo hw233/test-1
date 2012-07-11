@@ -9,11 +9,11 @@
 namespace GObject
 {
 
-template<typename _VT >
+template<typename _V >
 class GLocalObjectManagerT
 {
 public:
-	bool add(_VT* val)
+	bool add(_V* val)
 	{
 		UInt32 slot = val->getSlot();
 		if(slot != static_cast<UInt32>(-1))
@@ -34,7 +34,7 @@ public:
 		}
 		return true;
 	}
-	void remove(_VT* val)
+	void remove(_V* val)
 	{
 		UInt32 slot = val->getSlot();
 		if(_objs.size() > slot && _objs[slot] != NULL && _objs[slot] == val)
@@ -47,7 +47,7 @@ public:
 	void remove(UInt32 slot)
 	{
 	}
-	_VT * operator[] (const UInt32 slot)
+	_V * operator[] (const UInt32 slot)
 	{
 		if(_objs.size() > slot)
 		{
@@ -59,7 +59,7 @@ public:
 	}
 
 protected:
-	std::vector<_VT *> _objs;
+	std::vector<_V *> _objs;
 	std::list<size_t> _empty;
 };
 

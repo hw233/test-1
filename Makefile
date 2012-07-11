@@ -34,6 +34,20 @@ release_fb:
 	@objcopy --only-keep-debug bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol
 	@objcopy --strip-debug bin/Release/Server.ASSS
 
+debug_vt:
+	rm -rf build && cd tools/udplog_cpp/ && make
+	if [ ! -d build ]; then\
+		premake4 --os=linux --platform=x64 --file=premake4vt.lua gmake; fi\
+		&& cd build && config=debug $(MAKE) -j8 -f Makefile
+
+release_vt:
+	rm -rf build && cd tools/udplog_cpp/ && make
+	if [ ! -d build ]; then\
+		premake4 --os=linux --platform=x64 --file=premake4vt.lua gmake; fi\
+		&& cd build && config=release $(MAKE) -j8 -f Makefile
+	@objcopy --only-keep-debug bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol
+	@objcopy --strip-debug bin/Release/Server.ASSS
+
 clean:
 	find . -name *.o | xargs rm -rf
 	cd tools/$(JSON) && make distclean
