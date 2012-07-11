@@ -10,74 +10,74 @@
 namespace GObject
 {
 
-template<typename _VT>
+template<typename _V>
 class Visitor
 {
 public:
     virtual ~Visitor(){}
 
-    virtual bool operator()(_VT* ptr) = 0;
+    virtual bool operator()(_V* ptr) = 0;
 };
 
-template<typename _VT, typename _VK >
+template<typename _V, typename _VK >
 class GGlobalObjectManagerT
 {
 public:
-    typedef typename std::unordered_map<_VK, _VT * >::iterator iterator;
+    typedef typename std::unordered_map<_VK, _V * >::iterator iterator;
 public:
-	_VT * newObject(const _VK key)
+	_V * newObject(const _VK key)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		_VT * v = _VT::create(key);
+		_V * v = _V::create(key);
 		_objs[v->getId()] = v;
 		return v;
 	}
 	template<typename T1>
-	_VT * newObject(const _VK key, T1& v1)
+	_V * newObject(const _VK key, T1& v1)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		_VT * v = _VT::create(key, v1);
+		_V * v = _V::create(key, v1);
 		_objs[v->getId()] = v;
 		return v;
 	}
 	template<typename T1, typename T2>
-	_VT * newObject(const _VK key, T1& v1, T2& v2)
+	_V * newObject(const _VK key, T1& v1, T2& v2)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		_VT * v = _VT::create(key, v1, v2);
+		_V * v = _V::create(key, v1, v2);
 		_objs[v->getId()] = v;
 		return v;
 	}
 	template<typename T1, typename T2, typename T3>
-	_VT * newObject(const _VK key, T1& v1, T2& v2, T3& v3)
+	_V * newObject(const _VK key, T1& v1, T2& v2, T3& v3)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		_VT * v = _VT::create(key, v1, v2, v3);
+		_V * v = _V::create(key, v1, v2, v3);
 		_objs[v->getId()] = v;
 		return v;
 	}
 	template<typename T1, typename T2, typename T3, typename T4>
-	_VT * newObject(const _VK key, T1& v1, T2& v2, T3& v3, T4& v4)
+	_V * newObject(const _VK key, T1& v1, T2& v2, T3& v3, T4& v4)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		_VT * v = _VT::create(key, v1, v2, v3, v4);
+		_V * v = _V::create(key, v1, v2, v3, v4);
 		_objs[v->getId()] = v;
 		return v;
 	}
 	template<typename T1, typename T2, typename T3, typename T4, typename T5>
-	_VT * newObject(const _VK key, T1& v1, T2& v2, T3& v3, T4& v4, T5& v5)
+	_V * newObject(const _VK key, T1& v1, T2& v2, T3& v3, T4& v4, T5& v5)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		_VT * v = _VT::create(key, v1, v2, v3, v4, v5);
+		_V * v = _V::create(key, v1, v2, v3, v4, v5);
 		_objs[v->getId()] = v;
 		return v;
 	}
-	void add(_VT* val)
+	void add(_V* val)
 	{
 		Mutex::ScopedLock lk(_objMutex);
 		_objs[val->getId()] = val;
 	}
-	void add(const _VK& key, _VT* val)
+	void add(const _VK& key, _V* val)
 	{
 		Mutex::ScopedLock lk(_objMutex);
 		_objs[key] = val;
@@ -87,10 +87,10 @@ public:
 		Mutex::ScopedLock lk(_objMutex);
 		_objs.erase(key);
 	}
-	_VT * operator[] (const _VK& key)
+	_V * operator[] (const _VK& key)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		typename std::unordered_map<_VK, _VT * >::const_iterator it = _objs.find(key);
+		typename std::unordered_map<_VK, _V * >::const_iterator it = _objs.find(key);
 		if(it == _objs.end())
 		{
 			return NULL;
@@ -106,7 +106,7 @@ public:
 	void enumerate(_CBT cb, _PT param)
 	{
 		Mutex::ScopedLock lk(_objMutex);
-		typename std::unordered_map<_VK, _VT * >::iterator it;
+		typename std::unordered_map<_VK, _V * >::iterator it;
 		for(it = _objs.begin(); it != _objs.end(); ++ it)
 		{
 			if(!cb(it->second, param))
@@ -117,7 +117,7 @@ public:
     void reset()
     {
         Mutex::ScopedLock lk(_objMutex);
-        typename std::unordered_map<_VK, _VT * >::iterator it;
+        typename std::unordered_map<_VK, _V * >::iterator it;
         for(it = _objs.begin(); it != _objs.end(); ++ it)
         {
             delete it->second;
@@ -128,7 +128,7 @@ public:
     inline void resetExcept(std::set<UInt64>& eset)
     {
         Mutex::ScopedLock lk(_objMutex);
-        typename std::unordered_map<_VK, _VT *>::iterator it = _objs.begin();
+        typename std::unordered_map<_VK, _V *>::iterator it = _objs.begin();
         while(it != _objs.end())
         {
             if(eset.find(it->first) == eset.end())
@@ -141,7 +141,7 @@ public:
         }
     }
 
-    inline _VT* find(UInt64 id, int channelId, int serverId)
+    inline _V* find(UInt64 id, int channelId, int serverId)
     {
         UInt64 pid = (id & 0xFFFF00FFFFFFFFFFull) | (static_cast<UInt64>(channelId) << 40);
         if((pid >> 48) == 0)
@@ -149,10 +149,10 @@ public:
         return operator[](pid);
     }
 
-    void enumerate(Visitor<_VT>& visitor)
+    void enumerate(Visitor<_V>& visitor)
     {
         Mutex::ScopedLock lk(_objMutex);
-        typename std::unordered_map<_VK, _VT * >::iterator it;
+        typename std::unordered_map<_VK, _V * >::iterator it;
 		for(it = _objs.begin(); it != _objs.end(); ++ it)
 		{
 			if(!visitor(it->second))
@@ -161,13 +161,13 @@ public:
     }
 
 	inline Mutex& getMutex() { return _objMutex; }
-	std::unordered_map<_VK, _VT * >& getMap() { return _objs; }
+	std::unordered_map<_VK, _V * >& getMap() { return _objs; }
 
     inline iterator begin() { return _objs.begin(); }
     inline iterator end() { return _objs.end(); }
 
 protected:
-	std::unordered_map<_VK, _VT * > _objs;
+	std::unordered_map<_VK, _V * > _objs;
 	Mutex _objMutex;
 };
 

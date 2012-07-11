@@ -38,6 +38,7 @@ public:
 	std::string	gmCryptKey1, gmCryptKey2;
 	std::string	fbrCryptKey1, fbrCryptKey2;
     bool fbVersion;
+    bool vtVersion;
     bool debug;
 
     struct TokenServer

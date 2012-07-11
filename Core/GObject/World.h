@@ -46,6 +46,7 @@ public:
 	inline UInt32 Now() { return _now; }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
+    inline static bool isVTVersion() { return cfg.vtVersion; }
     inline static bool isDebug() { return cfg.debug; }
 
 	inline static void setActivityStage(int stage)

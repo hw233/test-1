@@ -1,6 +1,10 @@
 --??????????
 require("global")
+if isVTVersion() then
+require("actmsg_vt")
+else
 require("actmsg")
+end
 require("World/Attain")
 require("Task/Task_All")
 require("Explore/Explore_All")

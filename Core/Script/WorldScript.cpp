@@ -41,6 +41,7 @@ void WorldScript::init()
     def("setTavernPurpleCount", GObject::Player::setTavernPurpleCount);
     def("setTavernOrangeCount", GObject::Player::setTavernOrangeCount);
 	def("isFBVersion", GObject::World::isFBVersion);
+	def("isVTVersion", GObject::World::isVTVersion);
 	def("isDebug", GObject::World::isDebug);
 	def("setActivityStage", GObject::World::setActivityStage);
 	def("setActAvailable", GObject::World::setActAvailable);
