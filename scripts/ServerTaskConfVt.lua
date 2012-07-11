@@ -1,4 +1,4 @@
-require("scripts/taskmsg")
+require("scripts/taskmsg_vt")
 ------------------------------------------------------------------------
 --TypeId, Name, Class, SubType, AcceptNpc, SubmitNpc, ReqTime, AcceptMaxNum, ReqStep, PreTask, ReqLev, Country(State)
 ------------------------------------------------------------------------

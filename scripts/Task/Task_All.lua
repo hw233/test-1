@@ -1,7 +1,7 @@
 if isVTVersion() then
-require("scripts/taskmsg_vt")
+require("taskmsg_vt")
 else
-require("scripts/taskmsg")
+require("taskmsg")
 end
 require("scripts/global")
 require("scripts/Task/Task_00000016")
