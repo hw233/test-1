@@ -469,6 +469,22 @@ namespace GData
 		return true;
 	}
 
+    void makeSkill2Item(const std::vector<const SkillBase*>& sks, UInt16 itemid)
+    {
+        if (!sks.size())
+            return;
+
+        UInt16 skillid = 0;
+        for (UInt32 i = 0; i < sks.size(); ++i)
+        {
+            if (sks[i])
+            {
+                skillid = sks[i]->getId();
+                skill2item[skillid] = itemid;
+            }
+        }
+    }
+
 	bool GDataManager::LoadItemTypeData()
 	{
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
@@ -509,6 +525,8 @@ namespace GData
 			case Item_Trump:
 				{
 					wt = new ItemTrumpType(idt.typeId, idt.name, idt.attrExtra);
+                    if (((ItemTrumpType*)wt)->attrExtra)
+                        makeSkill2Item(((ItemTrumpType*)wt)->attrExtra->skills, idt.typeId);
 				}
                 break;
             case Item_Gem:
@@ -1177,6 +1195,8 @@ namespace GData
             citta->needsoul = ct.needsoul;
             citta->effect = cittaEffectManager[ct.effectid];
             cittaManager.add(citta);
+            if (citta->effect)
+                makeSkill2Item(citta->effect->skill, ct.id/100+1200-1);
         }
         return true;
     }
@@ -1792,6 +1812,11 @@ namespace GData
                 return true;
         }
         return false;
+    }
+
+    UInt32 GDataManager::getMaxStrengthenVal(UInt16 id, UInt8 clvl)
+    {
+        return 0;
     }
 }
 

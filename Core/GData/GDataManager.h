@@ -87,6 +87,7 @@ namespace GData
         static const std::vector<UInt16>& GetOnlineAward(UInt8 cls, UInt8 i);
         static UInt16 GetOnlineAwardTime(UInt8 i);
         static UInt8 GetOnlineAwardCount();
+        static UInt32 getMaxStrengthenVal(UInt16 id, UInt8 clvl);
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -116,7 +117,7 @@ namespace GData
         static std::vector<UInt32>      m_udpLogItems;
 	};
 
-	
+    static std::map<UInt16, UInt16> skill2item;
 }
 
 #endif // _GDATAMANAGER_H_

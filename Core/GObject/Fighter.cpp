@@ -4101,5 +4101,118 @@ UInt16 Fighter::getBattlePortrait()
     return portrait;
 }
 
+UInt8 Fighter::SSGetLvl(UInt16 skillid)
+{
+    if (!_owner)
+        return 0;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(skillid);
+    if (i == m_ss.end())
+        return 0;
+    return m_ss[skillid].lvl;
+}
+
+void Fighter::SSOpen(UInt16 id, UInt32 itemId, bool bind)
+{
+    if (!_owner)
+        return;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
+    if (i != m_ss.end())
+        return;
+
+    if (isSkillUp(id) < 0)
+        return;
+
+    if (GData::skill2item.find(id) == GData::skill2item.end())
+        return;
+    if (GData::skill2item[id] != itemId)
+        return;
+
+    Package* pkg = _owner->GetPackage();
+    ItemBase* item = pkg->FindItem(itemId, bind);
+    if (!item)
+        return;
+    if(!pkg->DelEquip(itemId, ToSkillStrengthenOpen))
+        return;
+
+    SStrengthen ss;
+    ss.father = itemId;
+    ss.maxVal = GData::GDataManager::getMaxStrengthenVal(id, 0); //
+    if (!ss.maxVal)
+        return;
+    m_ss[id] = ss;
+
+    SSUpdate2DB(id, ss);
+}
+
+UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
+{
+    if (!_owner)
+        return 0;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
+    if (i == m_ss.end())
+        return 0;
+
+    if (isSkillUp(id) < 0)
+        return 0;
+
+    if (GData::skill2item.find(id) == GData::skill2item.end())
+        return 0;
+    if (GData::skill2item[id] != itemId)
+        return 0;
+
+    SStrengthen& ss = m_ss[id];
+    if (!ss.maxVal) // full
+        return 0;
+    Package* pkg = _owner->GetPackage();
+
+    ItemBase* item = pkg->FindItem(itemId, bind);
+    if (!item)
+        return 0;
+
+    const GData::ItemBaseType& ibt = item->GetItemType();
+    UInt32 exp = ibt.trumpExp;
+    if (!exp)
+        return 0;
+
+    if(!pkg->DelEquip(itemId, ToSkillStrengthenUpgrade))
+        return 0;
+
+    ss.curVal += exp;
+    while (ss.curVal >= ss.maxVal)
+    {
+        ss.curVal -= ss.maxVal;
+        ++ss.lvl;
+        if (ss.lvl >= 9)
+        {
+            ss.maxVal = 0;
+            ss.curVal = 0;
+            break;
+        }
+        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(id, ss.lvl);
+    }
+
+    SSUpdate2DB(id, ss);
+    return 0;
+}
+
+void Fighter::SSErase(UInt16 id)
+{
+    if (!_owner)
+        return;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
+    if (i == m_ss.end())
+        return;
+    m_ss.erase(id);
+    SSDeleteDB(id);
+}
+
+void Fighter::SSUpdate2DB(UInt16 id, SStrengthen& ss)
+{
+}
+
+void Fighter::SSDeleteDB(UInt16 id)
+{
+}
+
 }
 
