@@ -1353,9 +1353,8 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
                 if(bi.round == 1 && bi.group == 0 && bi.state == i)
                 {
                     PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[i].begin();
-                    int pos = bi.pos;
-                    if(pos > _preliminaryPlayers_list[i].size())
-                        pos = _preliminaryPlayers_list[i].size();
+                    if(bi.pos > _preliminaryPlayers_list[i].size())
+                        continue;
                     std::advance(pit, bi.pos);
                     if(pit != _preliminaryPlayers_list[i].end())
                     {
