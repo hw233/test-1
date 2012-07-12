@@ -4020,8 +4020,8 @@ function ItemNormal_00009087(iid, num, bind, param)
         return false
     end
 
-    package:Add(5055, num, 0, 2);
-    package:Add(511, num, 0, 2);
+    package:Add(5055, num, true, 0, 2);
+    package:Add(511, num, true, 0, 2);
 
     package:DelItemSendMsg(iid, player);
     return num;
