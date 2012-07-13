@@ -246,6 +246,7 @@ namespace Script
         UInt16 RunTargetAward(Player* player);
         UInt16 RunTargetAwardRF(Player* player);
         void sendRNR(Player* player, UInt32 now, UInt32 date, UInt32 total);
+        void onEquipForge( Player* player, UInt32 itemId, UInt32 onums);
 	public:
 
 		template <typename R>

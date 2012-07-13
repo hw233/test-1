@@ -1506,3 +1506,27 @@ function onDuanWu(player)
     end
 end
 
+function onEquipForge(player, id, onums)
+    local start = { ['year'] = 2012, ['month'] = 7, ['day'] = 5, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local s = os.time(start)
+    local e = s + 7 * 86400
+    local n = os.time()
+
+    if n < s or n >= e then
+        return
+    end
+
+    local items = {
+        {500,3,1},
+        {501,3,1, 549,1,1, 30,1,1, 9076,1,1},
+        {30,3,1, 9076,2,1, getRandOEquip(player:GetLev()),1,1},
+    }
+
+    local item = items[onums]
+    if item == nil then
+        return
+    end
+
+    sendItemPackageMail(player, msg_103, msg_103, item);
+end
+

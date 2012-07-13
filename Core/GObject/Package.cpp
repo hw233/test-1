@@ -3821,6 +3821,7 @@ namespace GObject
 
 		getRandomAttr2(lv, crr, q, ied.extraAttr2.getCount(), protect, types, values, equip_t);
 
+        UInt8 num = 0;
         float v0 = 0;
         if(equip_t == EQUIPTYPE_EQUIP)
             v0 = GObjectManager::getAttrMax(lv, types[0]-1, q, crr)*90;
@@ -3830,6 +3831,8 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+        if ((float)values[0] > v0)
+            ++num;
 
         float v1 = 0;
         if(equip_t == EQUIPTYPE_EQUIP)
@@ -3840,6 +3843,9 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+        if ((float)values[1] > v1)
+            ++num;
+
 
         float v2 = 0;
         if(equip_t == EQUIPTYPE_EQUIP)
@@ -3850,6 +3856,15 @@ namespace GObject
         {
             SYSMSG_BROADCASTV(2203, m_Owner->getCountry(), m_Owner->getName().c_str(), equip->GetItemType().getId());
         }
+        if ((float)values[2] > v2)
+            ++num;
+
+#ifdef _FB
+        if (num)
+        {
+            m_Owner->equipForge(fighterId, itemId, num);
+        }
+#endif
 
 
         {

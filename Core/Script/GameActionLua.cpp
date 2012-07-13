@@ -955,6 +955,11 @@ namespace Script
 		Call<void>("onEnchantGt11", player, id, level, type);
 	}
 
+	void GameActionLua::onEquipForge( Player* player, UInt32 itemId, UInt32 onums)
+	{
+		Call<void>("onEquipForge", player, itemId, onums);
+	}
+
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
 	{
 		Call<void>("onTrainFighterAct", player, fgt);

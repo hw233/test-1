@@ -10576,5 +10576,18 @@ namespace GObject
         }
     }
 
+#ifdef _FB
+    void Player::equipForge(UInt32 fighterId, UInt32 itemId, UInt32 num)
+    {
+        UInt32 fi = fighterId << 16 | itemId;
+        UInt32& on = _forges[fi];
+        if (on < num)
+        {
+            on = num;
+            GameAction()->onEquipForge(this, itemId, num);
+        }
+    }
+#endif
+
 } // namespace GObject
 

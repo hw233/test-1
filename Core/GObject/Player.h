@@ -1547,6 +1547,13 @@ namespace GObject
 
     public:
         void sendLevelAward();
+
+#ifdef _FB
+    public:
+        void equipForge(UInt32 fighterId, UInt32 itemId, UInt32 num);
+    private:
+        std::map<UInt32, UInt32> _forges;
+#endif
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n
