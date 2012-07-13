@@ -4169,6 +4169,8 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     SStrengthen& ss = m_ss[id];
     if (!ss.maxVal) // full
         return 0;
+    if (ss.father != itemId)
+        return 0;
     Package* pkg = _owner->GetPackage();
 
     ItemBase* item = pkg->FindItem(itemId, bind);
@@ -4208,6 +4210,8 @@ void Fighter::SSErase(UInt16 id)
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
     if (i == m_ss.end())
         return;
+    if (isSkillUp(id) < 0)
+        return;
     m_ss.erase(id);
     SSDeleteDB(id);
 }
@@ -4217,6 +4221,10 @@ void Fighter::SSUpdate2DB(UInt16 id, SStrengthen& ss)
 }
 
 void Fighter::SSDeleteDB(UInt16 id)
+{
+}
+
+void Fighter::SSFromDB(SStrengthen& ss)
 {
 }
 

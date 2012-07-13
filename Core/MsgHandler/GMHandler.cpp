@@ -174,6 +174,9 @@ GMHandler::GMHandler()
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
     Reg(3, "newr", &GMHandler::OnNewRelation);
+    Reg(3, "ssopen", &GMHandler::OnSSOpen);
+    Reg(3, "ssup", &GMHandler::OnSSUp);
+    Reg(3, "sserase", &GMHandler::OnSSErase);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2758,4 +2761,55 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
         player->sendFriendList(type, start, cnt);
 }
 
+void GMHandler::OnSSOpen(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+        return;
+
+    UInt32 fgtid = atoi(args[0].c_str());
+    UInt32 skillid = atoi(args[1].c_str());
+    UInt32 itemid = atoi(args[2].c_str());
+
+    bool bind = false;
+    if (args.size() >= 4)
+        bind = atoi(args[3].c_str());
+
+    Fighter* fgt = player->findFighter(fgtid);
+    if (!fgt)
+        return;
+    fgt->SSOpen(skillid, itemid, bind);
+}
+
+void GMHandler::OnSSUp(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+        return;
+
+    UInt32 fgtid = atoi(args[0].c_str());
+    UInt32 skillid = atoi(args[1].c_str());
+    UInt32 itemid = atoi(args[2].c_str());
+
+    bool bind = false;
+    if (args.size() >= 4)
+        bind = atoi(args[3].c_str());
+
+    Fighter* fgt = player->findFighter(fgtid);
+    if (!fgt)
+        return;
+    fgt->SSUpgrade(skillid, itemid, bind);
+}
+
+void GMHandler::OnSSErase(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+
+    UInt32 fgtid = atoi(args[0].c_str());
+    UInt32 skillid = atoi(args[1].c_str());
+
+    Fighter* fgt = player->findFighter(fgtid);
+    if (!fgt)
+        return;
+    fgt->SSErase(skillid);
+}
 
