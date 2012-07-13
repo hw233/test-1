@@ -1643,12 +1643,11 @@ function luckyDraw(player, id, num, bind)
     end 
 
     local lvl = player:GetLev()
+    local item2gold = 0;
     if lvl >= copylvl[id] then
-        item2point = 10
-        item2point2 = 6
+        item2gold = 10;
     else
-        item2point = copylvl[id] - lvl + 10
-        item2point2 = copylvl[id] - lvl + 6
+        item2gold = copylvl[id] - lvl + 10
     end
 
     local package = player:GetPackage()
@@ -1656,7 +1655,7 @@ function luckyDraw(player, id, num, bind)
     local ubnum = package:GetItemNum(needitem, false)
     local gold = player:getGold4LuckDraw()
 
-    if (bnum + ubnum + gold/10) < num then
+    if (bnum + ubnum + gold/item2gold) < num then
         player:sendMsgCode(2, 1076, 0)
         return got 
     end
@@ -1705,7 +1704,7 @@ function luckyDraw(player, id, num, bind)
                 break
             end
         elseif use == 3 then
-            player:useGold4LuckDraw(item2point)
+            player:useGold4LuckDraw(item2gold)
         end
 
         local x = math.random(1,1000000)

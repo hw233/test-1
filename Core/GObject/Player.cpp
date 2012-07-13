@@ -9578,6 +9578,17 @@ namespace GObject
         sendMailItem(2356, 2357, &item[pos-1], 1, false);
     }
 
+    void Player::sendPExpCard(int pos)
+    {
+        if (!pos || pos > 1)
+            return;
+        MailPackage::MailItem item[1] =
+        {
+            {9089, 1},
+        };
+        sendMailItem(3002, 3002, &item[pos-1], 1, false);
+    }
+
     void Player::sendCreateMail()
     {
 #ifdef _FB

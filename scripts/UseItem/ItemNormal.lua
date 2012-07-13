@@ -2289,6 +2289,38 @@ function ItemNormal_00000029(iid, num, bind, param)
     return n;
 end
 
+function ItemNormal_00009088(iid, num, bind, param)
+	local player = GetPlayer();
+    local package = player:GetPackage();
+	local fgt = player:findFighter(param);
+	if fgt == nil then
+		return false;
+	end
+    if fgt:isPExpFull() then
+        player:sendMsgCode(2, 1069, 0);
+        return false
+    end
+
+    local pexp = fgt:getPExp()
+    local n = 0;
+    for i = 1, num do
+        n = n + 1
+        pexp = pexp + 2000
+        if pexp >= fgt:getPExpMax() then
+            break
+        end
+    end
+
+    if n ~= 0 then
+        fgt:addPExp(n * 2000);
+    end
+
+    player:AddVar(140, n)
+
+    package:DelItemSendMsg(iid, player);
+    return n;
+end
+
 function ItemNormal_00000400(iid, num, bind, param)
 	local player = GetPlayer();
     local package = player:GetPackage();
@@ -3389,7 +3421,7 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:4]，"..msg_61.."[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:4]，"..msg_61.."[4:507]、 [4:509]、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(4, player);
 
@@ -3975,6 +4007,30 @@ function ItemNormal_00009086(iid, num, bind, param)
     package:Add(48, num*10, true, 0, 2);
     package:Add(51, num*10, true, 0, 2);
 
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009087(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (2+(2*num)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(5055, num, true, 0, 2);
+    package:Add(511, num, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00009089(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setTitle(17)
     package:DelItemSendMsg(iid, player);
     return num;
 end
@@ -5365,6 +5421,10 @@ local ItemNormal_Table = {
 
     [9085] = ItemNormal_00009085,
     [9086] = ItemNormal_00009086,
+
+    [9087] = ItemNormal_00009087,
+    [9088] = ItemNormal_00009088,
+    [9089] = ItemNormal_00009089,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

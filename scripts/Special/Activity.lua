@@ -1344,7 +1344,7 @@ function onTurnOnRF7Day(player, total, offset)
     return true
 end
 
-function onEnchantAct(player, level, _type)
+function onEnchantAct(player, level, quality, _type)
     if isFBVersion() then
         local pic = {1416, 1417, 1418, 1419, 1420};
         local rand = math.random(1, #pic);
@@ -1359,21 +1359,33 @@ function onEnchantAct(player, level, _type)
         sendItemPackageMail(player, msg_46, msg_46, items[level]);
     else
         local items = {
-            [0] = {
-                [8] = {509,1,1, 9075,1,1, 9074,1,1},
-                [9] = {509,1,1, 507,1,1, 9017,1,1, 9019,1,1},
-                [10] = {509,2,1, 507,2,1, 9022,1,1},
+            [2] = {
+                [8] = {509,1,1, 507,1,1, },
             },
-            [1] = {
-                [8] = {9021,1,1},
-                [9] = {507,1,1, 9075,1,1},
-                [10] = {507,1,1, 9068,1,1, 9021,1,1},
+            [3] = {
+                [7] = {509,1,1, 507,1,1, },
+                [8] = {509,2,1, 507,2,1, },
+            },
+            [4] = {
+                [6] = {515,1,1, 509,1,1, 507,1,1, },
+                [7] = {515,2,1, 514,3,1, },
+                [8] = {515,3,1, },
+            },
+            [5] = {
+                [6] = {515,2,1, 514,5,1, },
+                [7] = {515,2,1, 509,1,1, 507,1,1, },
+                [8] = {515,5,1, 509,1,1, 507,1,1, },
             },
         };
-        if items[_type][level] == nil then
+        print('level: ' .. level .. ' quality: ' .. quality .. ' _type: ' .. _type)
+        if items[quality] == nil then
             return
         end
-        sendItemPackageMail(player, msg_93, msg_94, items[_type][level]);
+        if items[quality][level] == nil then
+            return
+        end
+
+        sendItemPackageMail(player, msg_93, msg_94, items[quality][level]);
     end
 end
 

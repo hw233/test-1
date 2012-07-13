@@ -128,6 +128,7 @@ namespace GObject
     float GObjectManager::_tough_max;
     float GObjectManager::_counter_max;
     float GObjectManager::_mres_max;
+    float GObjectManager::_cridmg_max;
 
     std::vector<std::vector<UInt32>> GObjectManager::_color_chance_gold;
     std::vector<std::vector<UInt32>> GObjectManager::_color_chance_free;
@@ -401,6 +402,7 @@ namespace GObject
             _tough_max = lua_tinker::call<float>(L, "getToughMax");
             _counter_max = lua_tinker::call<float>(L, "getCounterMax");
             _mres_max = lua_tinker::call<float>(L, "getMagResMax");
+            _cridmg_max = lua_tinker::call<float>(L, "getCriticalDmgMax");
         }
         lua_close(L);
 

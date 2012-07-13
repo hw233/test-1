@@ -187,6 +187,7 @@ namespace GObject
         static float getToughMax() { return _tough_max; }
         static float getCounterMax() { return _counter_max; }
         static float getMagResMax() { return _mres_max; }
+        static float getCriticalDmgMax() { return _cridmg_max; }
 
 
         static UInt16 getAttrTypeChance(UInt8 q, UInt8 idx) { return _attrTypeChances[q][idx]; }
@@ -449,6 +450,7 @@ namespace GObject
         static float _tough_max;
         static float _counter_max;
         static float _mres_max;
+        static float _cridmg_max;
 
         // 项链戒指强化
         static std::map<UInt8, stRingHpBase*> _ringHpBase;

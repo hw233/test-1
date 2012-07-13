@@ -2027,13 +2027,18 @@ namespace GObject
     {
         if (quality == 0) // 防具
         {
-            for (UInt8 l = level; l >= 8 && l > slevel; --l)
-                GameAction()->onEnchantAct(player, l, 1);
+            for (UInt8 l = level; l >= 6 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, quality, 1);
         }
         else if (quality == 1) // 武器
         {
-            for (UInt8 l = level; l >= 8 && l > slevel; --l)
-                GameAction()->onEnchantAct(player, l, 0);
+            for (UInt8 l = level; l >= 6 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, quality, 0);
+        }
+        else
+        {
+            for (UInt8 l = level; l >= 6 && l > slevel; --l)
+                GameAction()->onEnchantAct(player, l, quality);
         }
     }
 #endif
@@ -2321,7 +2326,10 @@ namespace GObject
 			}
 
             if (World::getTrumpEnchRet())
-                enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+            {
+                enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+                // enchantToken(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
+            }
 #ifdef _FB
             if (World::getEnchantAct() && (equip->getClass() == Item_Weapon || equip->getClass() == Item_Armor1 || equip->getClass() == Item_Armor2 || equip->getClass() == Item_Armor4 || equip->getClass() == Item_Armor5))
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);

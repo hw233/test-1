@@ -38,6 +38,22 @@ end
 
 store:discountLimit()
 
+if is7_16_8_15() then
+store:add(2,1704,999)
+store:add(2,1705,999)
+end
+
+if is7_13_16() then
+store:add(2,9088,10)
+end
+
+if is7_14_15() then
+store:add(2,5007,950)
+store:add(2,5037,950)
+store:add(2,5027,950)
+store:add(2,9087,100)
+end
+
 if is7_10_15() then
 store:add(2,9085,100)
 store:add(2,9086,200)
@@ -60,6 +76,7 @@ store:add(2,1702,500)
 store:add(2,1703,500)
 end
 
+store:add(2,1528,50)
 store:add(2,9082,5)
 store:add(2,549,80)
 store:add(2,33,10)
