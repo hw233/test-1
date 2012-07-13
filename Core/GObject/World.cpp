@@ -316,7 +316,7 @@ void World::makeActivityInfo(Stream &st)
     UInt32 active = _newyear?1:0;
     active |= _rechargeactiveno&1?2:0;
     active |= _girlday?4:0;
-    active |= _trumpenchret?8:0;
+    //active |= _trumpenchret?8:0;
     active |= _rechargeactiveno&2?16:0;
     active |= _foolsday?32:0;
     active |= _chingming?64:0;
