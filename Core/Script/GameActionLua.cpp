@@ -126,6 +126,8 @@ namespace Script
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
+        lua_tinker::def(_L, "getICAct", GObject::World::getICAct);
+        lua_tinker::def(_L, "setLevelAwardEnd", GObject::World::setLevelAwardEnd);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -960,6 +962,11 @@ namespace Script
 	void GameActionLua::onSoulEnchantMaxSoul( Player* player, UInt32 oms, UInt32 yams )
 	{
 		Call<void>("onSoulEnchantMaxSoul", player, oms, yams);
+    }
+
+	void GameActionLua::onEquipForge( Player* player, UInt32 itemId, UInt32 onums)
+	{
+		Call<void>("onEquipForge", player, itemId, onums);
 	}
 
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )

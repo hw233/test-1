@@ -103,6 +103,8 @@ namespace GObject
 
 	UInt8 Player::getMaxIcCount(UInt8 vipLevel)
 	{
+        if (World::getICAct())
+            return MaxICCount[5];
 		UInt8 maxCount = MaxICCount[vipLevel];
 		return maxCount;
 	}
@@ -142,17 +144,20 @@ namespace GObject
 		UInt16 cnt = static_cast<UInt16>(m_Timer.GetLeftTimes());
 
 		UInt32 vipLevel = m_Player->getVipLevel();
+        UInt8 iccnt = Player::getMaxIcCount(vipLevel) - m_Player->getIcCount();
+        if (Player::getMaxIcCount(vipLevel) < m_Player->getIcCount())
+            iccnt = Player::getMaxIcCount(vipLevel);
 		if(cnt > 0)
 		{
 			if(_npcGroup == NULL)
 				return;
 			UInt32 t = TimeUtil::Now();
 			if(t > _finalEnd) t = 0; else t = _finalEnd - t;
-			st << _npcGroup->getId() << static_cast<UInt8>(1) << cnt << t << (Player::getMaxIcCount(vipLevel) - m_Player->getIcCount()) << Stream::eos;
+			st << _npcGroup->getId() << static_cast<UInt8>(1) << cnt << t << iccnt << Stream::eos;
 		}
 		else
 		{
-			st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (Player::getMaxIcCount(vipLevel) - m_Player->getIcCount()) << Stream::eos;
+			st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << iccnt << Stream::eos;
 			m_Player->delFlag(Player::Training);
 		}
 		m_Player->send(st);
@@ -2797,7 +2802,10 @@ namespace GObject
 	void Player::cancelAutoBattleNotify()
 	{
 		Stream st(REP::TASK_RESPONSE_HOOK);
-		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << (getMaxIcCount(_vipLevel) - getIcCount()) << Stream::eos;
+        UInt8 cnt = Player::getMaxIcCount(getVipLevel()) - getIcCount();
+        if (Player::getMaxIcCount(getVipLevel()) < getIcCount())
+            cnt = Player::getMaxIcCount(getVipLevel());
+		st << static_cast<UInt32>(0) << static_cast<UInt8>(0) << static_cast<UInt16>(0) << static_cast<UInt32>(0) << cnt << Stream::eos;
 		send(st);
 		DB3().PushUpdateData("DELETE FROM `auto_battle` WHERE `playerId` = %"I64_FMT"u", _id);
 		delFlag(Training);
@@ -2812,6 +2820,8 @@ namespace GObject
 
 	void Player::instantAutoBattle()
 	{
+		if(_playerData.icCount > getMaxIcCount(_vipLevel))
+            _playerData.icCount = 0;
 		if(_playerData.icCount >= getMaxIcCount(_vipLevel) || !hasFlag(Training) || getGoldOrCoupon() < 10)
 			return;
 
@@ -6505,7 +6515,10 @@ namespace GObject
             _playerData.clanTaskId = getClanTask();
         }
 
-        st << static_cast<UInt8>(getMaxIcCount(vipLevel) - getIcCount()) << static_cast<UInt8>(getShiMenMax() >= _playerData.smFinishCount ? getShiMenMax() - _playerData.smFinishCount : 0) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() >= _playerData.ymFinishCount ? getYaMenMax() - _playerData.ymFinishCount : 0) << getYaMenMax() << static_cast<UInt8>(getClanTaskMax() > _playerData.ctFinishCount ? getClanTaskMax() - _playerData.ctFinishCount : 0);
+        UInt8 iccnt = Player::getMaxIcCount(vipLevel) - getIcCount();
+        if (Player::getMaxIcCount(vipLevel) < getIcCount())
+            iccnt = Player::getMaxIcCount(vipLevel);
+        st << iccnt << static_cast<UInt8>(getShiMenMax() >= _playerData.smFinishCount ? getShiMenMax() - _playerData.smFinishCount : 0) << getShiMenMax() << static_cast<UInt8>(getYaMenMax() >= _playerData.ymFinishCount ? getYaMenMax() - _playerData.ymFinishCount : 0) << getYaMenMax() << static_cast<UInt8>(getClanTaskMax() > _playerData.ctFinishCount ? getClanTaskMax() - _playerData.ctFinishCount : 0);
         st << calcNextBookStoreUpdate(curtime) << calcNextTavernUpdate(curtime);
 		//bossManager.buildInfo(st);
         UInt8 cnt = playerCopy.getCopySize(this);
@@ -10070,18 +10083,7 @@ namespace GObject
             else
                 break;
         }
-#ifdef _FB
-        if (type == 1 && !GetVar(VAR_CTSAWARD))
-        {
-            GameAction()->onCLLoginReward(this, 0);
-            SetVar(VAR_CTSAWARD, 1);
-            Stream st(REP::RC7DAY);
-            st << static_cast<UInt8>(1);
-            st << Stream::eos;
-            send(st);
-            return;
-        }
-#else
+
         if (type == 1 && !GetVar(VAR_CTSAWARD))
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -10092,7 +10094,6 @@ namespace GObject
             send(st);
             return;
         }
-#endif
         if (type == 2 && !GetVar(VAR_CLAWARD) && cts)
         {
             GameAction()->onCLLoginReward(this, cts);
@@ -10632,6 +10633,52 @@ namespace GObject
         }
         st.data<UInt8>(offset) = c;
     }
+
+#ifdef _FB
+    void Player::sendLevelAward()
+    {
+        if (GetLev() < 60)
+            return;
+
+        UInt32 t = 0;
+        if (GetLev() < 65)
+            t = 500;
+        else if (GetLev() >= 65 && GetLev() < 70)
+            t = 1000;
+        else
+            t = 2000;
+        SYSMSG(title, 4008);
+        SYSMSGV(content, 4009, GetLev(), t);
+        Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFD0000/*free*/);
+        if(mail)
+        {
+            MailPackage::MailItem mitem[1] = {{0xA000,t},};
+            mailPackageManager.push(mail->id, mitem, 1);
+            std::string strItems;
+            for (int i = 0; i < 1; ++i)
+            {
+                strItems += Itoa(mitem[i].id);
+                strItems += ",";
+                strItems += Itoa(mitem[i].count);
+                strItems += "|";
+            }
+            DBLOG1().PushUpdateData("insert into mailitem_histories(server_id, player_id, mail_id, mail_type, title, content_text, content_item, receive_time) values(%u, %"I64_FMT"u, %u, %u, '%s', '%s', '%s', %u)", cfg.serverLogId, getId(), mail->id, VipAward, title, content, strItems.c_str(), mail->recvTime);
+        }
+    }
+#endif
+
+#ifdef _FB
+    void Player::equipForge(UInt32 fighterId, UInt32 itemId, UInt32 num)
+    {
+        UInt32 fi = fighterId << 16 | itemId;
+        UInt32& on = _forges[fi];
+        if (on < num)
+        {
+            on = num;
+            GameAction()->onEquipForge(this, itemId, num);
+        }
+    }
+#endif
 
 } // namespace GObject
 

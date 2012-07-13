@@ -2688,6 +2688,7 @@ void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args
 }
 void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
+#ifndef _FB
     UInt64 begin = TimeUtil::GetTick();
     //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
     const char* json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
@@ -2696,6 +2697,7 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
         jsonParser2((void*)json, strlen(json), st);
     UInt64 end = TimeUtil::GetTick();
     fprintf(stderr, "total secs: %.2f\n", (float)(end-begin)/1000000);
+#endif
 }
 void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args)
 {

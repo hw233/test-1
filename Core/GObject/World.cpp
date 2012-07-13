@@ -114,6 +114,8 @@ UInt32 World::_rechargenextretend;
 bool World::_mergeathact = false;
 bool World::_fourcopact = false;
 bool World::_duanwu;
+bool World::_icact;
+UInt32 World::_levelawardend;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -261,6 +263,10 @@ bool enum_midnight(void * ptr, void* next)
             pl->SetVar(VAR_RECHARGE_TOTAL, 0);
         }
     }
+#ifdef _FB
+    if (TimeUtil::SharpDay(0, nextday) == TimeUtil::SharpDay(0, World::_levelawardend))
+        pl->sendLevelAward();
+#endif
 
 	return true;
 }

@@ -82,6 +82,11 @@ function is7_13()
     return is_7_13
 end
 
+is_6_29 = false 
+function is6_29()
+    return is_6_29
+end
+
 function onActivityCheck(tm)
   local osmax = oldServersMax[serverName]
   if osmax ~= nil and serverNum <= osmax then
@@ -237,12 +242,6 @@ function onActivityCheck(tm)
       setJune(false)
   end
 
-  if tm >= actTime51 and tm < actTime52 then
-      setJune1(true)
-  else
-      setJune1(false)
-  end
-
   if tm >= actTime59 and tm < actTime60 then
       is_6_22 = true
       setDuanWu(true)
@@ -286,6 +285,14 @@ function onActivityCheck(tm)
           setRechargeActive(true, 4)
       else
           setRechargeActive(false, 4)
+      end
+
+      if tm >= actTime200 and tm < actTime201 then
+          is_6_29 = true
+          setICAct(true)
+      else
+          is_6_29 = false 
+          setICAct(false)
       end
 
       setShuoShuo(false);
@@ -336,6 +343,12 @@ function onActivityCheck(tm)
           setRechargeActive(true, 4)
       else
           setRechargeActive(false, 4)
+      end
+
+      if tm >= actTime51 and tm < actTime52 then
+          setJune1(true)
+      else
+          setJune1(false)
       end
 
       if tm >= actTime53 and tm < actTime54 then
@@ -500,6 +513,8 @@ function initActTime(y, m, d)
   local  SerStartTm106 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   -- 四大名捕（6/25-7/31）
   local  SerStartTm107 = { ['year'] = 2012, ['month'] = 6, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm200= { ['year'] = 2012, ['month'] = 6, ['day'] = 29, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm201= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   actTime0 = os.time(SerStartTm);
   actTime00 = os.time(SerStartTm) + 7 * 86400;
@@ -647,6 +662,11 @@ function initActTime(y, m, d)
   actTime114 = os.time(SerStartTm106) + 7 * 86400;
   actTime115 = os.time(SerStartTm107);
   actTime116 = os.time(SerStartTm107) + 37 * 86400;
+  actTime200= os.time(SerStartTm200);
+  actTime201= os.time(SerStartTm200) + 6 * 86400;
+
+  actTime202= os.time(SerStartTm201);
+  setLevelAwardEnd(actTime202)
 
   onActivityCheck(os.time() + 30);
 
