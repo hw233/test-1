@@ -8268,15 +8268,23 @@ namespace GObject
         UInt8 qqvipl = 0;
         UInt8 flag = 0;
 
-        if (_playerData.qqvipl >= 20) // 20-29 - 3366, 30-39 - Q+
+        if (_playerData.qqvipl >= 20 && _playerData.qqvipl < 40) // 20-29 - 3366, 30-39 - Q+ 40-49 - qqvip
         {
             qqvipl = _playerData.qqvipl1;
             flag = 8*(_playerData.qqvipl1 / 10);
         }
         else
         {
-            qqvipl = _playerData.qqvipl;
-            flag = 8*(_playerData.qqvipl / 10);
+            if (_playerData.qqvipl >= 40)
+            {
+                qqvipl = _playerData.qqvipl;
+                flag = 8*((_playerData.qqvipl-20) / 10);
+            }
+            else
+            {
+                qqvipl = _playerData.qqvipl;
+                flag = 8*(_playerData.qqvipl / 10);
+            }
         }
 
         if(flag)
@@ -8325,7 +8333,7 @@ namespace GObject
         bool blue = false;
         bool qplus = false;
         UInt8 domain = atoi(m_domain.c_str());
-        if (domain == 11 && _playerData.qqvipl >= 20)
+        if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40)
         {
             Stream st(REP::YD_INFO);
 
@@ -8354,7 +8362,7 @@ namespace GObject
 
             blue = true;
         }
-        else if (domain == 4 && _playerData.qqvipl >= 30)
+        else if (domain == 4 && _playerData.qqvipl >= 30 && _playerData.qqvipl < 40)
         {
             // TODO:
             Stream st(REP::YD_INFO);
@@ -8385,7 +8393,7 @@ namespace GObject
             qplus = true;
         }
 
-        if (_playerData.qqvipl < 20 || blue || qplus)
+        if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || blue || qplus)
         {
             Stream st(REP::YD_INFO);
 
@@ -8399,14 +8407,24 @@ namespace GObject
             }
             else
             {
-                flag = 8*(_playerData.qqvipl / 10);
-                qqvipl = _playerData.qqvipl % 10;
+                if (_playerData.qqvipl >= 40)
+                {
+                    flag = 8*((_playerData.qqvipl-20) / 10);
+                    qqvipl = _playerData.qqvipl % 10;
+                }
+                else
+                {
+                    flag = 8*(_playerData.qqvipl / 10);
+                    qqvipl = _playerData.qqvipl % 10;
+                }
             }
 
             st << qqvipl << _playerData.qqvipyear << static_cast<UInt8>((_playerData.qqawardgot>>flag) & 0x03);
             UInt8 maxCnt = GObjectManager::getYDMaxCount();
-            if(flag)
+            if(flag == 8)
                 st << static_cast<UInt8>(maxCnt - 2);
+            else if (flag == 16)
+                st << static_cast<UInt8>(maxCnt - 1);
             else
                 st << maxCnt;
             st << static_cast<UInt8>(0);
@@ -8417,7 +8435,9 @@ namespace GObject
 
             for(UInt8 i = 0; i < maxCnt; ++ i)
             {
-                if(flag && (i == 0 || i > 6))
+                if(flag == 8 && (i == 0 || i > 6))
+                    continue;
+                if (flag == 16 && i > 6)
                     continue;
                 std::vector<YDItem>& ydItem = GObjectManager::getYDItem(i);
                 UInt8 itemCnt = ydItem.size();
@@ -8450,7 +8470,7 @@ namespace GObject
         Stream st(REP::YD_AWARD_RCV);
 
         UInt8 domain = atoi(m_domain.c_str());
-        if (domain == 11 && _playerData.qqvipl >= 20 && d3d6 == 1)
+        if (domain == 11 && _playerData.qqvipl >= 20 && _playerData.qqvipl < 40 && d3d6 == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
             if (!qqvipl)
@@ -8485,7 +8505,7 @@ namespace GObject
                 }
             }
         }
-        else if (domain == 4 && _playerData.qqvipl >= 30 && d3d6/*qplus*/ == 1)
+        else if (domain == 4 && _playerData.qqvipl >= 30 && _playerData.qqvipl < 40 && d3d6/*qplus*/ == 1)
         {
             UInt8 qqvipl = _playerData.qqvipl % 10;
 
@@ -8513,7 +8533,7 @@ namespace GObject
                 }
             }
         }
-        else if (_playerData.qqvipl < 20 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
+        else if (_playerData.qqvipl < 20 || _playerData.qqvipl >= 40 || ((domain == 11 || domain == 4) && d3d6 == 0 && _playerData.qqvipl1 > 0))
         {
             UInt8 qqvipl = 0;
             UInt8 flag = 0;
@@ -8524,16 +8544,28 @@ namespace GObject
             }
             else
             {
-                qqvipl = _playerData.qqvipl;
-                flag = 8*(_playerData.qqvipl / 10);
+                if (_playerData.qqvipl >= 40)
+                {
+                    qqvipl = _playerData.qqvipl;
+                    flag = 8*((_playerData.qqvipl-20) / 10);
+                }
+                else
+                {
+                    qqvipl = _playerData.qqvipl;
+                    flag = 8*(_playerData.qqvipl / 10);
+                }
             }
 
-            if(flag)
+            if(flag == 8)
             {
                 if(qqvipl % 10 == 0)
                     qqvipl = 0;
                 else
                     qqvipl = qqvipl%10 + 1;
+            }
+            else if (flag == 16)
+            {
+                qqvipl %= 10;
             }
 
             UInt8 factor = 1;

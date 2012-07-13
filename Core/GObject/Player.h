@@ -669,8 +669,10 @@ namespace GObject
                 _playerData.qqvipl = 16;
             else if (lvl > 26 && lvl < 30)
                 _playerData.qqvipl = 26;
-            else if (lvl > 38)
+            else if (lvl > 38 && lvl < 40)
                 _playerData.qqvipl = 38;
+            else if (lvl > 47)
+                _playerData.qqvipl = 47;
         }
         inline void setQQVipl1(UInt8 lvl)
         {
@@ -696,12 +698,15 @@ namespace GObject
                 return (3<<4)|(_playerData.qqvipl-20);
             if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
                 return (4<<4)|(_playerData.qqvipl-30);
+            if (_playerData.qqvipl >= 40 && _playerData.qqvipl <= 49)
+                return (4<<4)|(_playerData.qqvipl-40);
             return 0;
         }
         // XXX: 1-9 黄钻等级
         //      10-19 蓝钻等级
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
         //      30-39 Q+等级,另qqvipl1 为黄钻等级
+        //      40-49 QQ会员等级
         inline bool isYD() const
         {
             return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
@@ -714,6 +719,10 @@ namespace GObject
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19) //qqvipli1为10代表蓝钻0级，不是蓝钻用户
                     return true;
             return false;
+        }
+        inline bool isQQVIP() const 
+        {
+            return (_playerData.qqvipl >= 40 && _playerData.qqvipl <= 49);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }

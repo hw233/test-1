@@ -50,6 +50,10 @@ store:add(2,496,10)
 store:add(2,497,10)
 end
 
+if is7_1() then
+store:add(2,1702,500)
+store:add(2,1703,500)
+end
 
 store:add(2,9082,5)
 store:add(2,549,80)
