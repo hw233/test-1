@@ -3421,7 +3421,7 @@ function ItemNormal_athletics_4(iid, num, bind, param)
     -- 太乙精金
     package:AddItem(503, 3, true, 0, 2);
 
-    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:4]，"..msg_61.."[4:507]、 [4:508]、 [4:503]x3 [4:"..equipId.."]");
+    Broadcast(0x27, "[p:"..player:getCountry()..":"..player:getPName().."]"..msg_60.."[4:4]，"..msg_61.."[4:507]、 [4:509]、 [4:503]x3 [4:"..equipId.."]");
 
     package:DelItemSendMsg(4, player);
 
