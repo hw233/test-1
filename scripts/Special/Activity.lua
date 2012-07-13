@@ -1592,7 +1592,7 @@ function sendRechargeMails1(player, ototal, ntotal)
     local lvls = {
         {99,199,399,699,1099,1599,2299,3699,5799,9999,},
         {99,199,399,699,1099,1599,2299,3699,5799,9999,},
-        {99,199,399,699,1099,1599,2299,3699,5799,9999,},
+        {99,199,399,699,1099,1599,2299},
     }
     local items = {
         {
@@ -1620,16 +1620,13 @@ function sendRechargeMails1(player, ototal, ntotal)
             {509,7,1, 507,3,1, 9022,1,1},
         },
         {
-            {56,3,1},
-            {57,4,1},
-            {56,3,1, 57,3,1},
+            {500,2,1},
+            {514,2,1},
+            {503,2,1},
             {516,2,1},
-            {515,5,1},
-            {9021,1,1},
-            {515,5,1, 47,3,1},
-            {503,4,1, 0xA000,100,1},
-            {509,5,1, 507,1,1},
-            {509,7,1, 507,3,1, 9022,1,1},
+            {515,1,1},
+            {515,2,1},
+            {515,3,1},
         },
     }
 
@@ -1642,7 +1639,11 @@ function sendRechargeMails1(player, ototal, ntotal)
         i = 1
     elseif n >= s + 3 * 86400 and n < s + 6 * 86400 then
         i = 2
-    elseif n >= s + 6 * 86400 and n < s + 9 * 86400 then
+    end
+
+    start = { ['year'] = 2012, ['month'] = 7, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    s = os.time(start)
+    if n >= s and n < s + 5 * 86400 then
         i = 3
     end
 
@@ -1656,8 +1657,6 @@ function sendRechargeMails1(player, ototal, ntotal)
     end
     local olvl = calcRechargeLevel(lvl, ototal)
     local nlvl = calcRechargeLevel(lvl, ntotal)
-
-    print("ototal: " .. ototal .. " ntotal: " .. ntotal .. " olvl:" .. olvl .. " nlvl: " .. nlvl)
 
     if nlvl == 0 or olvl == nlvl then
         return
