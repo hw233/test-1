@@ -60,6 +60,7 @@
 #include "LuckyDraw.h"
 #include <fcntl.h>
 #include "RealItemAward.h"
+#include "GVar.h"
 
 namespace GObject
 {
@@ -209,6 +210,7 @@ namespace GObject
         LoadSoulItemChance();
         LoadLuckyLog();
         loadRNR();
+        loadGVar();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4306,6 +4308,24 @@ namespace GObject
             if (!pl)
                 continue;
             pl->loadRNRFromDB(t.record);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadGVar()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading RNR");
+        DBGVar gvar;
+        if(execu->Prepare("SELECT `id`, `data`, `over` FROM `gvar` ORDER BY `id`", gvar) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+            GVarSystem::Instance().LoadVar(gvar.id, gvar.data, gvar.overTime);
         }
         lc.finalize();
         return true;
