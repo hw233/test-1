@@ -82,5 +82,3 @@ void GlobalObject::FreeMsgBlock(void* ptr)
 }
 
 
-
-

@@ -2742,6 +2742,25 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
     UInt8 cnt = 1;
     if(args.size() >= 1)
         type = atoi(args[0].c_str());
+
+    if(type == 5)
+    {
+        std::string responderName("70603");
+        if(args.size() >= 2)
+            responderName = args[1];
+        player->GetNewRelation()->challengeRequest(player, responderName);
+    }
+    else if(type == 6)
+    {
+        std::string senderName("70603");
+        if(args.size() >= 2)
+            senderName = args[1];
+        UInt8 accept = 1;
+        if(args.size() >= 3)
+            accept = atoi(args[2].c_str());
+        player->GetNewRelation()->challengeRespond(player, senderName, accept);
+    }
+
     if (args.size() >= 2)
         start = atoi(args[1].c_str());
     if (args.size() >= 3)

@@ -100,6 +100,8 @@ namespace GObject
 #define PLAYER_BUFF_YBUF            0x41
 #define PLAYER_BUFF_BBUF            0x42
 
+#define PLAYER_BUFF_N_ATHLETICS     0x44    //历练冷却
+
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
 
@@ -1162,6 +1164,7 @@ namespace GObject
 		void sendFriendActList();
 
 		std::string& fixName(std::string& name);
+        void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
         const char *patchShowName(const char* name, const UInt64 playerId = 0);

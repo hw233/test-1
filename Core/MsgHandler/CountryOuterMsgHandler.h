@@ -3368,8 +3368,9 @@ void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
-	if(pl == NULL || pl == player)
+    player->patchDeleteDotS(fr._name);
+    GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
+    if(pl == NULL || pl == player)
 	{
 		player->sendMsgCode(0, 1506);
 		return;
@@ -4287,7 +4288,7 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
     std::string status;
     br >> type;
 
-    if(type > 4)
+    if(type > 5)
         return;
 
     Stream st(REP::NEWRELATION);
@@ -4311,6 +4312,15 @@ void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
             st << status;
             pl->GetNewRelation()->setSign(status);
             break;
+        case 4:
+            br >> status;
+            pl->GetNewRelation()->challengeRequest(pl, status);
+            return;//isn't break
+        case 5:
+            br >> status;
+            br >> mood;
+            pl->GetNewRelation()->challengeRespond(pl, status, mood);
+            return;//isn't break
         default:
             break;
     }

@@ -245,6 +245,32 @@ void OnAthleticsBeReq( GameMsgHdr& hdr, const void * data )
 	player->GetAthletics()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup);
 }
 
+void OnNewRelationAttack(GameMsgHdr& hdr, const void *data)
+{
+	MSG_QUERY_PLAYER(player);
+	struct NewRelationBeData
+	{
+		Player * attacker;
+		UInt16 formation;
+		UInt16 portrait;
+		Lineup lineup[5];
+	};
+	NewRelationBeData *abd = reinterpret_cast<NewRelationBeData *>(const_cast<void *>(data));
+    player->GetNewRelation()->beAttack(abd->attacker, abd->formation, abd->portrait, abd->lineup, player);
+}
+
+void OnNewRelationCountryReq(GameMsgHdr& hdr, const void *data)
+{
+    MSG_QUERY_PLAYER(player);
+    struct stNewRelationReq
+    {
+        UInt8 type;
+        std::string atkName;
+    };
+    stNewRelationReq *nrw = reinterpret_cast<stNewRelationReq *>(const_cast<void *>(data));
+    player->GetNewRelation()->countrySend(player, nrw->type, nrw->atkName);
+}
+
 void OnAthleticsEnterResp( GameMsgHdr& hdr, const void * )
 {
 	MSG_QUERY_PLAYER(player);
