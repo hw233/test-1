@@ -67,9 +67,9 @@ function is7_1()
     return is_7_1
 end
 
-is_7_9_10 = false
-function is7_9_10()
-    return is_7_9_10
+is_7_10_15 = false
+function is7_10_15()
+    return is_7_10_15
 end
 
 is_7_11_12 = false
@@ -422,21 +422,9 @@ function onActivityCheck(tm)
       end
 
       if tm >= actTime75 and tm < actTime76 then
-          is_7_9_10 = true
+          is_7_10_15 = true
       else
-          is_7_9_10 = false 
-      end
-
-      if tm >= actTime77 and tm < actTime78 then
-          is_7_11_12 = true
-      else
-          is_7_11_12 = false
-      end
-
-      if tm >= actTime79 and tm < actTime80 then
-          is_7_13 = true
-      else
-          is_7_13 = false
+          is_7_10_15 = false 
       end
 
       setShuoShuo(true);
@@ -500,8 +488,7 @@ function initActTime(y, m, d)
   local  SerStartTm29= { ['year'] = 2012, ['month'] = 7, ['day'] = 1, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm30= { ['year'] = 2012, ['month'] = 7, ['day'] = 7, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm31= { ['year'] = 2012, ['month'] = 7, ['day'] = 9, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm32= { ['year'] = 2012, ['month'] = 7, ['day'] = 11, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
-  local  SerStartTm33= { ['year'] = 2012, ['month'] = 7, ['day'] = 13, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm32= { ['year'] = 2012, ['month'] = 7, ['day'] = 10, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -631,14 +618,8 @@ function initActTime(y, m, d)
   actTime73 = os.time(SerStartTm31);
   actTime74 = os.time(SerStartTm31) + 5 * 86400;
 
-  actTime75 = os.time(SerStartTm31);
-  actTime76 = os.time(SerStartTm31) + 2 * 86400;
-
-  actTime77 = os.time(SerStartTm32);
-  actTime78 = os.time(SerStartTm32) + 2 * 86400;
-
-  actTime79 = os.time(SerStartTm33);
-  actTime80 = os.time(SerStartTm33) + 1 * 86400;
+  actTime75 = os.time(SerStartTm32);
+  actTime76 = os.time(SerStartTm32) + 6 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

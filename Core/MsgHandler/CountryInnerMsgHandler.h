@@ -585,9 +585,11 @@ void OnSaleSellRespNotify( GameMsgHdr& hdr, const void * data )
 	{
 		UInt32 saleId;
 		Player *buyer;
+        UInt32 id;
+        UInt16 num;
 	};
 	BuyInfo binfo = *reinterpret_cast<BuyInfo *>(const_cast<void *>(data));
-	player->GetSale()->sellSaleResp(binfo.saleId, binfo.buyer);
+	player->GetSale()->sellSaleResp(binfo.saleId, binfo.buyer, binfo.id, binfo.num);
 }
 
 void OnSaleItemCancel( GameMsgHdr& hdr, const void * data )

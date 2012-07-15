@@ -138,7 +138,7 @@ public:
 	void checkSaleBuyPrice(SalePriceCheck&);
 	void buySellResp(SaleItemBuy&);
 	void cancelSellResp(SaleItemCancel&);
-	void sellSaleResp(UInt32, Player *);
+	void sellSaleResp(UInt32, Player *, UInt32, UInt16);
 
 	bool addSaleMailItems(UInt32);
 	void delSaleMailItems(UInt32);

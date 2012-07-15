@@ -38,6 +38,11 @@ end
 
 store:discountLimit()
 
+if is7_10_15() then
+store:add(2,9085,100)
+store:add(2,9086,200)
+end
+
 if is4_21() then
 store:add(2,493,10)
 store:add(2,494,20)
