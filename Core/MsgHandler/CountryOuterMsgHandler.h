@@ -4678,5 +4678,11 @@ void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
     player->guideUdp(req._type, req.p1, req.p2);
 }
 
+void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+}
+
 #endif // _COUNTRYOUTERMSGHANDLER_H_
 

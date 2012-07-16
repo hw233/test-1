@@ -117,7 +117,7 @@ namespace GData
         static std::vector<UInt32>      m_udpLogItems;
 	};
 
-    static std::map<UInt16, UInt16> skill2item;
+    extern std::map<UInt16, UInt16> skill2item;
 }
 
 #endif // _GDATAMANAGER_H_

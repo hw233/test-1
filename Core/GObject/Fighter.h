@@ -724,7 +724,7 @@ public:
     void SSErase(UInt16 id);
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);
-    void SSFromDB(SStrengthen& ss);
+    void SSFromDB(UInt16 id, SStrengthen& ss);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

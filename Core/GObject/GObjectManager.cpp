@@ -214,6 +214,7 @@ namespace GObject
         LoadLuckyLog();
         loadRNR();
         loadNewRelation();
+        loadSkillStrengthen();
 		DB::gDataDBConnectionMgr->UnInit();
 	}
 
@@ -4351,6 +4352,42 @@ namespace GObject
         {
 			lc.advance();
             GVarSystem::Instance().LoadVar(gvar.id, gvar.data, gvar.overTime);
+        }
+        lc.finalize();
+        return true;
+    }
+
+    bool GObjectManager::loadSkillStrengthen()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gObjectDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+		LoadingCounter lc("Loading skill strengthen");
+        DBSS ss;
+        if(execu->Prepare("SELECT `id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl` FROM `skill_strengthen` ORDER BY `playerId`", ss) != DB::DB_OK)
+			return false;
+		lc.reset(1000);
+        Player* pl = NULL;
+		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
+		while(execu->Next() == DB::DB_OK)
+        {
+			lc.advance();
+			if(ss.playerId != last_id)
+			{
+				last_id = ss.playerId;
+				pl = globalPlayers[last_id];
+			}
+			if(pl == NULL)
+				continue;
+			Fighter * fgt = pl->findFighter(ss.id);
+			if(fgt == NULL)
+				continue;
+
+            SStrengthen s;
+            s.father = ss.father;
+            s.maxVal = ss.maxVal;
+            s.curVal = ss.curVal;
+            s.lvl = ss.lvl;
+            fgt->SSFromDB(ss.skillid, s);
         }
         lc.finalize();
         return true;

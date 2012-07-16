@@ -370,6 +370,8 @@ namespace REQ
     const UInt8 FOURCOP             = 0x1F;
     /** 新关系 **/
     const UInt8 NEWRELATION         = 0x17;
+    /** 符文 (内丹) **/
+    const UInt8 SKILLSTRENGTHEN     = 0x18;
 }
 
 namespace REP
@@ -604,7 +606,8 @@ namespace REP
     const UInt8 FOURCOP             = 0x1F;
     /** 新关系 **/
     const UInt8 NEWRELATION         = 0x17;
-
+    /** 符文 (内丹) **/
+    const UInt8 SKILLSTRENGTHEN     = 0x18;
 }
 
 namespace SPEQ

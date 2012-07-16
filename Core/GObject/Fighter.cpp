@@ -2139,6 +2139,8 @@ int Fighter::hasSkill( UInt16 skill )
 
 int Fighter::isSkillUp(UInt16 skill)
 {
+    if (!SKILL_ID(skill))
+        return -1;
     for (int i = 0; i < getUpSkillsMax(); ++i)
     {
         if (SKILL_ID(skill) == SKILL_ID(_skill[i]))
@@ -4111,66 +4113,81 @@ UInt8 Fighter::SSGetLvl(UInt16 skillid)
 {
     if (!_owner)
         return 0;
-    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(skillid);
+    UInt32 _id = skillid/100;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(_id);
     if (i == m_ss.end())
         return 0;
-    return m_ss[skillid].lvl;
+    return m_ss[_id].lvl;
 }
 
 void Fighter::SSOpen(UInt16 id, UInt32 itemId, bool bind)
 {
     if (!_owner)
         return;
-    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
+    UInt32 _id = id/100;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(_id);
     if (i != m_ss.end())
         return;
 
     if (isSkillUp(id) < 0)
         return;
 
-    if (GData::skill2item.find(id) == GData::skill2item.end())
+    if (GData::skill2item.find(_id) == GData::skill2item.end())
         return;
-    if (GData::skill2item[id] != itemId)
+    if (GData::skill2item[_id] != itemId)
         return;
 
     Package* pkg = _owner->GetPackage();
     ItemBase* item = pkg->FindItem(itemId, bind);
     if (!item)
         return;
-    if(!pkg->DelEquip(itemId, ToSkillStrengthenOpen))
-        return;
+    // 
+    if (item->getClass() != Item_Trump)
+    {
+        if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
+            return;
+    }
+    else
+    {
+        if(!pkg->DelEquip(itemId, ToSkillStrengthenOpen))
+            return;
+    }
 
     SStrengthen ss;
     ss.father = itemId;
-    ss.maxVal = GData::GDataManager::getMaxStrengthenVal(id, 0); //
+    ss.maxVal = GData::GDataManager::getMaxStrengthenVal(_id, 0); //
     if (!ss.maxVal)
         return;
-    m_ss[id] = ss;
+    m_ss[_id] = ss;
 
-    SSUpdate2DB(id, ss);
+    SSUpdate2DB(_id, ss);
 }
 
 UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 {
     if (!_owner)
         return 0;
-    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
+
+    UInt32 _id = id/100;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(_id);
     if (i == m_ss.end())
         return 0;
 
-    if (isSkillUp(id) < 0)
-        return 0;
-
-    if (GData::skill2item.find(id) == GData::skill2item.end())
-        return 0;
-    if (GData::skill2item[id] != itemId)
-        return 0;
-
-    SStrengthen& ss = m_ss[id];
+    SStrengthen& ss = m_ss[_id];
     if (!ss.maxVal) // full
         return 0;
     if (ss.father != itemId)
         return 0;
+
+    int idx = isSkillUp(id);
+    if (idx < 0)
+        return 0;
+
+    if (GData::skill2item.find(_id) == GData::skill2item.end())
+        return 0;
+    if (GData::skill2item[_id] != itemId)
+        return 0;
+
     Package* pkg = _owner->GetPackage();
 
     ItemBase* item = pkg->FindItem(itemId, bind);
@@ -4182,24 +4199,36 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (!exp)
         return 0;
 
-    if(!pkg->DelEquip(itemId, ToSkillStrengthenUpgrade))
-        return 0;
+    if (item->getClass() != Item_Trump)
+    {
+        if(!pkg->DelItem2(item, 1, ToSkillStrengthenOpen))
+            return 0;
+    }
+    else
+    {
+        if(!pkg->DelEquip(itemId, ToSkillStrengthenOpen))
+            return 0;
+    }
 
     ss.curVal += exp;
+
+    UInt8 mlvl = getUpSkillLevel(idx);
     while (ss.curVal >= ss.maxVal)
     {
         ss.curVal -= ss.maxVal;
         ++ss.lvl;
-        if (ss.lvl >= 9)
+        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(_id, ss.lvl);
+
+        if (ss.lvl >= mlvl)
         {
-            ss.maxVal = 0;
             ss.curVal = 0;
+            if (mlvl == 9) // XXX: max level
+                ss.maxVal = 0;
             break;
         }
-        ss.maxVal = GData::GDataManager::getMaxStrengthenVal(id, ss.lvl);
     }
 
-    SSUpdate2DB(id, ss);
+    SSUpdate2DB(_id, ss);
     return 0;
 }
 
@@ -4207,25 +4236,34 @@ void Fighter::SSErase(UInt16 id)
 {
     if (!_owner)
         return;
-    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(id);
+    UInt32 _id = id/100;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(_id);
     if (i == m_ss.end())
         return;
     if (isSkillUp(id) < 0)
         return;
-    m_ss.erase(id);
-    SSDeleteDB(id);
+    m_ss.erase(_id);
+    SSDeleteDB(_id);
 }
 
 void Fighter::SSUpdate2DB(UInt16 id, SStrengthen& ss)
 {
+    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), id, ss.father, ss.maxVal, ss.curVal, ss.lvl);
 }
 
 void Fighter::SSDeleteDB(UInt16 id)
 {
+    DB1().PushUpdateData("DELETE FROM `skill_strengthen` WHERE `id` = %u AND `playerId` = %"I64_FMT"u AND `skillid` = %u", getId(), _owner->getId(), id);
 }
 
-void Fighter::SSFromDB(SStrengthen& ss)
+void Fighter::SSFromDB(UInt16 id, SStrengthen& ss)
 {
+    if (!_owner)
+        return;
+    if (isSkillUp(id*100) < 0)
+        return;
+    // XXX: DO Delete
+    m_ss[id] = ss;
 }
 
 }

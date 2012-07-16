@@ -36,6 +36,7 @@ namespace GData
 	ObjectMapT<GObject::ItemWeapon> npcWeapons;
 	std::vector<ItemGemType *> gemTypes(1000);
 	ItemEquipSetTypeManager	itemEquipSetTypeManager;
+    std::map<UInt16, UInt16> skill2item;
 
 	TaskTypeList			GDataManager::m_TaskTypeList;
 	TaskTypeRelationList	GDataManager::m_TaskTypeRelationList;
@@ -480,7 +481,7 @@ namespace GData
             if (sks[i])
             {
                 skillid = sks[i]->getId();
-                skill2item[skillid] = itemid;
+                skill2item[skillid/100] = itemid;
             }
         }
     }
@@ -1816,6 +1817,8 @@ namespace GData
 
     UInt32 GDataManager::getMaxStrengthenVal(UInt16 id, UInt8 clvl)
     {
+        // TODO:
+        return 1000000;
         return 0;
     }
 }
