@@ -4311,7 +4311,7 @@ namespace GObject
             Player* pl = globalPlayers[t.playerId];
             if(!pl)
                 continue;
-            pl->GetNewRelation()->LoadFromDB(t.playerId, t.mood, t.sign);
+            pl->GetNewRelation()->LoadFromDB(t.mood, t.sign);
         }
         lc.finalize();
         return true;
@@ -4357,3 +4357,4 @@ namespace GObject
     }
 
 }
+

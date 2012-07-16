@@ -538,7 +538,7 @@ namespace GObject
         m_HeroMemo = new HeroMemo(this);
         m_ShuoShuo = new ShuoShuo(this);
         m_CFriend = new CFriend(this);
-        m_relation = new NewRelation();
+        m_relation = new NewRelation(this);
         m_pVars = new VarSystem(id);
         memset(&m_ctp, 0, sizeof(m_ctp));
         m_teamData = NULL;
@@ -3645,7 +3645,7 @@ namespace GObject
             moneyArena -= a;
             if(ci!=NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -7124,7 +7124,7 @@ namespace GObject
 
 	std::string& Player::fixName( std::string& name )
 	{
-		if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
+        if(cfg.merged && !name.empty())if(static_cast<UInt8>(*(name.end() - 1)) >= 32 && !_playerData.name.empty())
 		{
 			const std::string& pn = _playerData.name;
 			size_t idx = pn.size() - 1;
@@ -7135,10 +7135,33 @@ namespace GObject
 			}
 			name.insert(name.end(), pn.begin() + idx + 1, pn.end());
 		}
-		return name;
+        return name;
 	}
 
-	void Player::patchMergedName( UInt64 id, std::string& name )
+    void Player::patchDeleteDotS(std::string& name)
+    {
+        if(cfg.merged && !name.empty())
+        {
+            UInt16 serverNo;
+            std::string nameTmp = name;
+            size_t pos = nameTmp.find(".S");
+            if(pos == std::string::npos)
+                pos = nameTmp.find(".s");
+            if(pos == std::string::npos)
+                return;
+            if(pos + 2 >= nameTmp.size())
+                return;
+            std::string tmp(nameTmp.begin()+pos+2, nameTmp.end());
+            serverNo = atoi(tmp.c_str());
+            if(serverNo == (this->getId() >> 48))
+            {
+                nameTmp.erase(nameTmp.begin()+pos, nameTmp.end());
+                name = nameTmp;
+            }
+        }
+    }
+
+    void Player::patchMergedName( UInt64 id, std::string& name )
 	{
 		if(cfg.merged && id >= 0x1000000000000ull)
 		{
