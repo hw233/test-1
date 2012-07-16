@@ -100,7 +100,7 @@ namespace GObject
 #define PLAYER_BUFF_YBUF            0x41
 #define PLAYER_BUFF_BBUF            0x42
 
-#define PLAYER_BUFF_N_ATHLETICS     0x44    //历练冷却
+#define PLAYER_BUFF_N_ATHLETICS     0x44    //邀请斗剑冷却
 
 #define PLAYER_BUFF_DISPLAY_MAX		0x50
 #define PLAYER_BUFF_COUNT			0x50
