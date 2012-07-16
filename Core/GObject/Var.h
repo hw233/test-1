@@ -176,6 +176,7 @@ namespace GObject
         VAR_QQVIP = 138, //QQ会员
         VAR_VIPFIRST  = 139, // 是否领取VIP首充礼包
         VAR_PEXPITEMS = 140, // 丹使用量
+        VAR_SOSOMAPAWARD = 141, // SOSO地图登陆奖励记录
 
         VAR_MAX,
     };
@@ -345,6 +346,7 @@ namespace GObject
             REGISTER_VAR(VAR_QQVIP, CYCLE_NONE);
             REGISTER_VAR(VAR_VIPFIRST, CYCLE_NONE);
             REGISTER_VAR(VAR_PEXPITEMS, CYCLE_NONE);
+            REGISTER_VAR(VAR_SOSOMAPAWARD, CYCLE_NONE);
         }
         
         UInt32 GetVar(UInt32 id, UInt32 now = 0);

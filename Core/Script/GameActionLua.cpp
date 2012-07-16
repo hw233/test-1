@@ -1200,5 +1200,10 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
+
+	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
+	{
+		Call<bool>("onSoSoMapAward", player, off);
+	}
 }
 

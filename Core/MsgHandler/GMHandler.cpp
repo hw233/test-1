@@ -174,6 +174,7 @@ GMHandler::GMHandler()
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
     Reg(3, "newr", &GMHandler::OnNewRelation);
+    Reg(3, "sosog", &GMHandler::OnSoSoGet);
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2756,6 +2757,11 @@ void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>&
     }
     else
         player->sendFriendList(type, start, cnt);
+}
+
+void GMHandler::OnSoSoGet(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->getSoSoMapAward();
 }
 
 

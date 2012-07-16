@@ -117,6 +117,7 @@ bool World::_duanwu;
 bool World::_icact;
 UInt32 World::_levelawardend;
 bool World::_pexpitems;
+UInt32 World::_sosomapbegin = 0;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {
@@ -264,7 +265,8 @@ bool enum_midnight(void * ptr, void* next)
     if (pl->GetVar(VAR_RECHARGE_TOTAL) &&
             (TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 1) ||
             TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 4) ||
-            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9)))
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 9) ||
+            TimeUtil::SharpDay(0, nextday) == TimeUtil::MkTime(2012, 7, 17)))
     {
         if (pl->isOnline())
         {

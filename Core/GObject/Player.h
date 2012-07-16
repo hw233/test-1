@@ -1567,6 +1567,10 @@ namespace GObject
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
 
+    public:
+        void getSoSoMapAward();
+        void sendSoSoMapInfo();
+
 #ifdef _FB
     public:
         void sendLevelAward();

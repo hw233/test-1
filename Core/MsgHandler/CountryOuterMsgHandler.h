@@ -1137,6 +1137,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     {
         GObject::arena.sendActive(pl);
     }
+
+    {
+        pl->sendSoSoMapInfo();
+    }
 }
 
 void OnPlayerInfoChangeReq( GameMsgHdr& hdr, const void * data )
@@ -1872,7 +1876,7 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 	MSG_QUERY_PLAYER(pl);
 	UInt32 viplvl = pl->getVipLevel();
 
-    if (!pl->isYD() && !pl->isBD())
+    if (!pl->isYD() && !pl->isBD() && !pl->isQQVIP())
     {
         if(ctr.flag == 0)
         {

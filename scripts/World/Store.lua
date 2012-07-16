@@ -28,6 +28,49 @@ function resetDiscount()
     store:storeDiscount()
 end
 
+function discount(store)
+    local tm1 = { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm2 = { ['year'] = 2012, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm3 = { ['year'] = 2012, ['month'] = 7, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm4 = { ['year'] = 2012, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm5 = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+    local now = os.time() + 30
+    local t1 = os.time(tm1)
+    local t2 = os.time(tm2)
+    local t3 = os.time(tm3)
+    local t4 = os.time(tm4)
+    local t5 = os.time(tm5)
+
+    local day = 86400
+
+    if now >= t1 and now < t1 + 2*day then
+        store:add(2,5017,950)
+        store:add(2,5047,950)
+    end
+
+    if now >= t2 and now < t2 + 2*day then
+        store:add(2,5067,1850)
+        store:add(2,5077,1400)
+    end
+
+    if now >= t3 and now < t3 + 2*day then
+        store:add(2,5127,1850)
+        store:add(2,5137,1850)
+        store:add(2,5147,1850)
+    end
+    
+    if now >= t4 and now < t4 + 2*day then
+        store:add(2,5087,1850)
+        store:add(2,5097,1850)
+    end
+
+    if now >= t5 and now < t5 + 2*day then
+        store:add(2,5107,1850)
+        store:add(2,5117,1850)
+    end
+end
+
 function loadStore()
 local store = GetStore()
 store:clear()
@@ -37,6 +80,8 @@ if store:needResetDiscount() then
 end
 
 store:discountLimit()
+
+discount(store)
 
 if is7_16_8_15() then
 store:add(2,1704,999)

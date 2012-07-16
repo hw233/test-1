@@ -9043,6 +9043,10 @@ namespace GObject
         case 4:
             getTargetAwardRF(opt);
             break;
+
+        case 5:
+            getSoSoMapAward();
+            break;
         }
     }
 
@@ -10711,6 +10715,62 @@ namespace GObject
         }
     }
 #endif
+
+    void Player::getSoSoMapAward()
+    {
+        UInt32 now = TimeUtil::Now();
+        if (!World::_sosomapbegin || now < World::_sosomapbegin)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 soso_sharp = TimeUtil::SharpDay(0, World::_sosomapbegin);
+
+        if (now_sharp - soso_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 off = CREATE_OFFSET(soso_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 soso = GetVar(VAR_SOSOMAPAWARD);
+        bool got = (soso>>off)&0x1;
+        if (got)
+            return;
+
+        GameAction()->onSoSoMapAward(this, off);
+
+        soso |= (1<<off);
+        SetVar(VAR_SOSOMAPAWARD, soso);
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(5) << static_cast<UInt8>(0) << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendSoSoMapInfo()
+    {
+        UInt32 now = TimeUtil::Now();
+
+        if (!World::_sosomapbegin || now < World::_sosomapbegin)
+            return;
+
+        UInt32 now_sharp = TimeUtil::SharpDay(0, now);
+        UInt32 soso_sharp = TimeUtil::SharpDay(0, World::_sosomapbegin);
+
+        if (now_sharp - soso_sharp > 7 * DAY_SECS)
+            return;
+
+        UInt32 off = CREATE_OFFSET(soso_sharp, now_sharp);
+        if (off >= 7)
+            return;
+
+        UInt32 soso = GetVar(VAR_SOSOMAPAWARD);
+        bool got = (soso>>off)&0x1;
+
+        Stream st(REP::GETAWARD);
+        st << static_cast<UInt8>(5) << static_cast<UInt8>(got?0:1) << Stream::eos;
+        send(st);
+    }
 
 } // namespace GObject
 

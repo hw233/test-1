@@ -1681,8 +1681,43 @@ function sendRechargeMails1(player, ototal, ntotal)
     end
 end
 
+function sendRechargeMails2(player, ototal, ntotal)
+    local lvls = {
+        99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,
+    }
+    local items = {
+        {503,2,1, 514,1,1},
+        {500,3,1, 56,6,1, 57,2,1},
+        {508,2,1, 56,6,1, 57,5,1},
+        {511,6,1, 466,6,1},
+        {516,3,1, 512,2,1},
+        {5065,1,1, 56,5,1},
+        {503,5,1, 56,6,1, 57,2,1},
+        {515,2,1, 56,6,1, 57,2,1},
+        {515,2,1, 56,6,1, 57,5,1},
+        {515,2,1, 56,6,1, 57,6,1},
+        {549,2,1, 56,6,1, 57,6,1},
+        {515,5,1, 30,10,1, 56,5,1, 57,5,1},
+        {507,5,1, 509,5,1, 515,5,1, 547,5,1},
+    }
+
+    local olvl = calcRechargeLevel(lvls, ototal)
+    local nlvl = calcRechargeLevel(lvls, ntotal)
+
+    if nlvl == 0 or olvl == nlvl then
+        return
+    end
+
+    for k = olvl+1, nlvl do
+        local title = string.format(msg_100, lvls[k])
+        local ctx = string.format(msg_101, lvls[k])
+        sendItemPackageMail(player, title, ctx, items[k]);
+    end
+end
+
 function sendRechargeMails(player, ototal, ntotal)
-    sendRechargeMails1(player, ototal, ntotal)
+    --sendRechargeMails1(player, ototal, ntotal)
+    sendRechargeMails2(player, ototal, ntotal)
 end
 
 function onEquipForge(player, id, onums)
@@ -1707,5 +1742,31 @@ function onEquipForge(player, id, onums)
     end
 
     sendItemPackageMail(player, msg_103, msg_103, item);
+end
+
+function onSoSoMapAward(player, off)
+    if off >= 7 then
+        return 0
+    end
+
+    local items = {
+        {503, 1},
+        {514, 1},
+        {56, 1},
+        {57, 1},
+        {11, 2},
+        {518, 5},
+        {509, 1},
+    }
+
+    local item = items[off+1]
+    if item == nil then
+        return 0 
+    end
+
+    print("item[1]" .. item[1])
+    local package = player:GetPackage()
+    package:Add(item[1], item[2], true)
+    return 1
 end
 

@@ -715,7 +715,7 @@ void PlayerCopy::autoBattle(Player* pl, UInt8 id, UInt8 type, UInt8 mtype, bool 
                     return;
                 }
 
-                if (!World::getNewYear() && !pl->isYD() && !pl->isBD())
+                if (!World::getNewYear() && !pl->isYD() && !pl->isBD() && !pl->isQQVIP())
                 {
                     if (pl->getVipLevel() < 6)
                         return;

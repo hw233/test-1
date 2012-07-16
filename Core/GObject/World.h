@@ -234,6 +234,9 @@ public:
     inline static bool getPExpItems()
     { return _pexpitems; }
 
+    inline static void setSoSoMapBegin(UInt32 v)
+    { _sosomapbegin = v; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
     static void commitArenaForceOnce();
@@ -306,6 +309,7 @@ public:
     static bool _icact;
     static UInt32 _levelawardend;
     static bool _pexpitems;
+    static UInt32 _sosomapbegin;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
