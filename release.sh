@@ -21,8 +21,10 @@ if [ $# -ge 2 -a "$2" == "fb" ]; then
         mv sql.bak sql
         mv scripts.bak scripts
     fi
+elif [ $# -ge 2 -a "$2" == "vt" ]; then
+    make release_vt
+    tar cvfz $R"VT."$file --exclude=sql/conf.sh  bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol conf/udplog.xml scripts/ sql/
 else
     make release
     tar cvfz $R$file --exclude=sql/conf.sh  bin/Release/JsonProxy.ASSS bin/Release/Server.ASSS bin/Release/Server.ASSS.symbol conf/udplog.xml scripts/ sql/
 fi
-

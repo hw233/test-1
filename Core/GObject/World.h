@@ -46,6 +46,7 @@ public:
 	inline UInt32 Now() { return _now; }
 
     inline static bool isFBVersion() { return cfg.fbVersion; }
+    inline static bool isVTVersion() { return cfg.vtVersion; }
     inline static bool isDebug() { return cfg.debug; }
 
 	inline static void setActivityStage(int stage)
@@ -228,6 +229,11 @@ public:
     inline static void setLevelAwardEnd(UInt32 end)
     { _levelawardend = end; }
 
+    inline static void setPExpItems(bool v)
+    { _pexpitems = v; }
+    inline static bool getPExpItems()
+    { return _pexpitems; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
     static void commitArenaForceOnce();
@@ -299,6 +305,7 @@ public:
     static bool _duanwu;
     static bool _icact;
     static UInt32 _levelawardend;
+    static bool _pexpitems;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

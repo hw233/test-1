@@ -616,11 +616,16 @@ namespace GData
 		}
 		{
 			lua_State* L = lua_open();
-			luaopen_base(L);
-			luaopen_string(L);
-			luaopen_table(L);
+            luaL_openlibs(L);
+			//luaopen_base(L);
+			//luaopen_string(L);
+			//luaopen_table(L);
 			{
+#ifdef _VT
+				std::string path = cfg.scriptPath + "ServerTaskConfVt.lua";
+#else
 				std::string path = cfg.scriptPath + "ServerTaskConf.lua";
+#endif
 				lua_tinker::dofile(L, path.c_str());
 				lua_tinker::table conf = lua_tinker::call<lua_tinker::table>(L, "GetTaskConfTable");
 				UInt32 size = conf.size();

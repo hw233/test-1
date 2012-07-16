@@ -1445,7 +1445,14 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
     MSG_QUERY_PLAYER(player);
 	const UInt8 type = *reinterpret_cast<const UInt8 *>(data);
 
-    if(player->GetLev() < 70)
+#ifdef _FB
+#define LIMIT_LEVEL  60
+#else
+#define LIMIT_LEVEL  70
+#endif
+
+
+    if(player->GetLev() < LIMIT_LEVEL)
         return;
     if(type == 0)
     {
@@ -1463,6 +1470,12 @@ void OnArenaEnterCommit( GameMsgHdr& hdr, const void* data )
         st << Stream::eos;
         NETWORK()->SendToArena(st);
     }
+}
+void OnSendPExpCard( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    int pos = *(int*)(data);
+    player->sendPExpCard(pos);
 }
 
 #endif // _COUNTRYINNERMSGHANDLER_H_

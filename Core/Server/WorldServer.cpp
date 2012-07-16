@@ -101,7 +101,9 @@ bool WorldServer::Init(const char * scriptStr, const char * serverName, int num)
 
 #ifdef _FB
     cfg.fbVersion = true;
-#else
+#endif
+#ifdef _VT
+    cfg.vtVersion = true;
 #endif
 
 #ifdef _DEBUG

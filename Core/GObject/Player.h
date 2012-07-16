@@ -629,6 +629,7 @@ namespace GObject
         void sendShusanLoveTitleCard(int);
         void sendMayDayTitleCard(int);
         void sendJuneHappyTitleCard(int pos);
+        void sendPExpCard(int pos);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);

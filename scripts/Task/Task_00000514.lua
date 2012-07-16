@@ -56,20 +56,20 @@ function Task_00000514(npcId)
 		action.m_ActionID = 514
 		action.m_ActionToken = 1;
 		action.m_ActionStep = 01;
-		action.m_ActionMsg = task_msg_718;
+		action.m_ActionMsg = task_msg_000718;
 	elseif task:GetTaskSubmitNpc(514) == npcId then
 		if Task_Submit_00000514() then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 514
 			action.m_ActionToken = 2;
 			action.m_ActionStep = 10;
-			action.m_ActionMsg = task_msg_719;
+			action.m_ActionMsg = task_msg_000719;
 		elseif task:HasAcceptedTask(514) then
 			action.m_ActionType = 0x0001;
 			action.m_ActionID = 514
 			action.m_ActionToken = 0;
 			action.m_ActionStep = 0;
-			action.m_ActionMsg = task_msg_720;
+			action.m_ActionMsg = task_msg_000720;
 		end
 	end
 	return action;
@@ -83,8 +83,8 @@ function Task_00000514_step_01()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_721;
-	action.m_ActionMsg = task_msg_722;
+	action.m_NpcMsg = task_msg_000721;
+	action.m_ActionMsg = task_msg_000722;
 	return action;
 end
 
@@ -93,7 +93,7 @@ function Task_00000514_step_10()
 	action.m_ActionType = 0x0001;
 	action.m_ActionToken = 3;
 	action.m_ActionStep = 0;
-	action.m_NpcMsg = task_msg_723;
+	action.m_NpcMsg = task_msg_000723;
 	action.m_ActionMsg = "";
 	return action;
 end

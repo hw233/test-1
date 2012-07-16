@@ -3645,7 +3645,7 @@ namespace GObject
             moneyArena -= a;
             if(ci!=NULL)
             {
-                DBLOG1().PushUpdateData("insert into consume_achievement (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
+                DBLOG1().PushUpdateData("insert into consume_arena (server_id,player_id,consume_type,item_id,item_num,expenditure,consume_time) values(%u,%"I64_FMT"u,%u,%u,%u,%u,%u)",
                 cfg.serverLogId, getId(), ci->purchaseType, ci->itemId, ci->itemNum, a, TimeUtil::Now());
             }
         }
@@ -9599,6 +9599,17 @@ namespace GObject
             {9030, 1},
         };
         sendMailItem(2356, 2357, &item[pos-1], 1, false);
+    }
+
+    void Player::sendPExpCard(int pos)
+    {
+        if (!pos || pos > 1)
+            return;
+        MailPackage::MailItem item[1] =
+        {
+            {9089, 1},
+        };
+        sendMailItem(3002, 3002, &item[pos-1], 1, false);
     }
 
     void Player::sendCreateMail()
