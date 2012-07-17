@@ -4124,11 +4124,6 @@ void Fighter::SSOpen(UInt16 id, UInt32 itemId, bool bind)
 {
     if (!_owner)
         return;
-    UInt32 _id = id/100;
-    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(_id);
-    if (i != m_ss.end())
-        return;
-
     if (isSkillUp(id) < 0)
         return;
 
@@ -4153,14 +4148,37 @@ void Fighter::SSOpen(UInt16 id, UInt32 itemId, bool bind)
             return;
     }
 
-    SStrengthen ss;
-    ss.father = itemId;
-    ss.maxVal = GData::GDataManager::getMaxStrengthenVal(_id, 0); //
-    if (!ss.maxVal)
-        return;
-    m_ss[_id] = ss;
+    std::map<UInt16, SStrengthen>::iterator i = m_ss.find(_id);
+    if (i != m_ss.end())
+    {
+        if (i->second.maxLvl >= 9)
+            return;
+    }
 
-    SSUpdate2DB(_id, ss);
+    UInt8 prob = 100; // TODO:
+    if (uRand(100) <= prob)
+    {
+        UInt32 _id = id/100;
+        if (i == m_ss.end())
+        {
+            SStrengthen ss;
+            ss.father = itemId;
+            ss.maxVal = GData::GDataManager::getMaxStrengthenVal(_id, 0); //
+            if (!ss.maxVal)
+                return;
+            ss.maxLvl = 1;
+            m_ss[_id] = ss;
+            SSUpdate2DB(_id, ss);
+        }
+        else
+        {
+            ++i->second.maxLvl;
+            SSUpdate2DB(_id, i->second);
+        }
+    }
+    else
+    {
+    }
 }
 
 UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
@@ -4213,6 +4231,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     ss.curVal += exp;
 
     UInt8 mlvl = getUpSkillLevel(idx);
+    mlvl = mlvl>ss.maxLvl?ss.maxLvl:mlvl;
     while (ss.curVal >= ss.maxVal)
     {
         ss.curVal -= ss.maxVal;
@@ -4248,7 +4267,7 @@ void Fighter::SSErase(UInt16 id)
 
 void Fighter::SSUpdate2DB(UInt16 id, SStrengthen& ss)
 {
-    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), id, ss.father, ss.maxVal, ss.curVal, ss.lvl);
+    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), id, ss.father, ss.maxVal, ss.curVal, ss.lvl, ss.maxLvl);
 }
 
 void Fighter::SSDeleteDB(UInt16 id)

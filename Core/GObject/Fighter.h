@@ -55,6 +55,7 @@ struct SStrengthen
     UInt32 maxVal; // 熔炼最大值
     UInt32 curVal; // 熔炼当前值
     UInt8 lvl; // 熔炼等级
+    UInt8 maxLvl; // 解封等级
 };
 
 struct SoulItemExp

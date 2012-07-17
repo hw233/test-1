@@ -215,6 +215,7 @@ struct DBSS
     UInt32 maxVal;
     UInt32 curVal;
     UInt8 lvl;
+    UInt8 maxLvl;
 };
 
 struct DBFighterBuffData
@@ -1162,7 +1163,7 @@ SPECIALDEF(3)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBSS)
-SPECIALDEF(7)
+SPECIALDEF(8)
     (
     UInt32, id,
     UInt64, playerId,
@@ -1170,7 +1171,8 @@ SPECIALDEF(7)
     UInt16, father,
     UInt32, maxVal,
     UInt32, curVal,
-    UInt8, lvl
+    UInt8, lvl,
+    UInt8, maxLvl
     )
 SPECIALEND()
 

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `skill_strengthen` (
     `maxVal` int(10) unsigned NOT NULL,
     `curVal` int(10) unsigned NOT NULL,
     `lvl` tinyint(1) unsigned NOT NULL,
+    `maxLvl` tinyint(1) unsigned NOT NULL,
     UNIQUE KEY `id_playerId_skill` (`id`,`playerId`, `skillid`),
     KEY `playerId` (`playerId`),
     KEY `id` (`id`)

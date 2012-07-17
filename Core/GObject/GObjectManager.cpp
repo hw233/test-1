@@ -4363,7 +4363,7 @@ namespace GObject
 		if (execu.get() == NULL || !execu->isConnected()) return false;
 		LoadingCounter lc("Loading skill strengthen");
         DBSS ss;
-        if(execu->Prepare("SELECT `id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl` FROM `skill_strengthen` ORDER BY `playerId`", ss) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl` FROM `skill_strengthen` ORDER BY `playerId`", ss) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
         Player* pl = NULL;
@@ -4387,6 +4387,7 @@ namespace GObject
             s.maxVal = ss.maxVal;
             s.curVal = ss.curVal;
             s.lvl = ss.lvl;
+            s.maxLvl = ss.maxLvl;
             fgt->SSFromDB(ss.skillid, s);
         }
         lc.finalize();
