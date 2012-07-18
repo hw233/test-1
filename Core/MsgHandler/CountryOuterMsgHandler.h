@@ -2552,6 +2552,14 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt32 now = TimeUtil::Now();
+
+    TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+    if(tcpInfo)
+    {
+        tcpInfo->sendAwardInfo();
+    }
+
+
 	if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
 
