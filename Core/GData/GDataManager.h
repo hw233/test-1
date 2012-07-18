@@ -54,6 +54,8 @@ namespace GData
         static bool LoadHeroMemoMaxSoul();
         static bool LoadSpiritAttrTable();
         static bool LoadSoulItemExp();
+        static bool LoadSkillStrengthenExp();
+        static bool LoadSkillStrengthenProb();
 
         static void clearUdpItem();
         static void addUdpItem(UInt32 id);
@@ -88,6 +90,7 @@ namespace GData
         static UInt16 GetOnlineAwardTime(UInt8 i);
         static UInt8 GetOnlineAwardCount();
         static UInt32 getMaxStrengthenVal(UInt16 id, UInt8 clvl);
+        static UInt32 getSkillStrengthenProb(UInt16 id, UInt8 clvl);
 
 	public:
 		static TaskTypeList				 m_TaskTypeList;
@@ -115,6 +118,8 @@ namespace GData
         static std::vector<std::vector<UInt16> > m_OnlineAward[3];
         static std::map<UInt32, UInt32>  m_soulItemExp;
         static std::vector<UInt32>      m_udpLogItems;
+        static std::map<UInt16, std::vector<UInt32> > m_skillstrengthexp;
+        static std::map<UInt16, std::vector<UInt32> > m_skillstrengthprob;
 	};
 
     extern std::map<UInt16, UInt16> skill2item;

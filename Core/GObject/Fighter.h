@@ -720,12 +720,16 @@ private:
     // 内丹系统
 public:
     UInt8 SSGetLvl(UInt16 skillid);
+    SStrengthen* SSGetInfo(UInt16 skillid);
     void SSOpen(UInt16 id, UInt32 itemId, bool bind = false);
     UInt8 SSUpgrade(UInt16 id, UInt32 itemId, bool bind = false);
     void SSErase(UInt16 id);
     void SSUpdate2DB(UInt16 id, SStrengthen& ss);
     void SSDeleteDB(UInt16 id);
     void SSFromDB(UInt16 id, SStrengthen& ss);
+    void makeFighterSSInfo(Stream& st);
+    void appendFighterSSInfo(Stream& st, UInt16 skillid);
+    void appendFighterSSInfo(Stream& st, UInt16 skillid, SStrengthen* ss);
 private:
     std::map<UInt16, SStrengthen> m_ss;
 

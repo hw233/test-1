@@ -929,6 +929,7 @@ namespace GObject
 		bool setFormation(UInt16);
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
+        void makeFighterSSList(Stream& st);
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);

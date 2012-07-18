@@ -3727,6 +3727,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[hm.playerId];
             if (!pl)
                 continue;
@@ -3751,6 +3752,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[ss.playerId];
             if (!pl)
                 continue;
@@ -3775,6 +3777,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
 			pl = globalPlayers[cfa.playerId];
             if (!pl)
                 continue;
@@ -3892,6 +3895,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             TripodData td;
             td.soul = t.soul;
             td.fire = t.fire;
@@ -3937,6 +3941,7 @@ namespace GObject
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             GObject::PracticeData* ppd = new (std::nothrow) GObject::PracticeData(pd.id);
             if (!ppd)
                 return false;
@@ -3993,6 +3998,7 @@ namespace GObject
         bool found = false;
 		while(execu->Next() == DB::DB_OK)
 		{
+			lc.advance();
             if (rrdb.id == id && rrdb.num == num)
             {
                 found = true;

@@ -63,6 +63,8 @@ namespace GData
     std::vector<std::vector<UInt16> > GDataManager::m_OnlineAward[3];
     std::map<UInt32, UInt32>  GDataManager::m_soulItemExp;
     std::vector<UInt32> GDataManager::m_udpLogItems;
+    std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthexp;
+    std::map<UInt16, std::vector<UInt32> > GDataManager::m_skillstrengthprob;
 
 	bool GDataManager::LoadAllData()
 	{
@@ -235,6 +237,16 @@ namespace GData
         if(!LoadSoulItemExp())
         {
 			fprintf(stderr, "Load Soul Item Exp Table Error !\n");
+			return false;
+        }
+        if(!LoadSkillStrengthenExp())
+        {
+			fprintf(stderr, "Load Skill Strengthen Exp Table Error !\n");
+			return false;
+        }
+        if(!LoadSkillStrengthenProb())
+        {
+			fprintf(stderr, "Load Skill Strengthen Prob Table Error !\n");
 			return false;
         }
 
@@ -1815,10 +1827,56 @@ namespace GData
         return false;
     }
 
+    bool GDataManager::LoadSkillStrengthenExp()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSSExp ssexp;
+		if(execu->Prepare("SELECT `id`, `exp1`, `exp2`, `exp3`, `exp4`, `exp5`, `exp6`, `exp7`, `exp8`, `exp9` FROM `skillstrengthen`", ssexp) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            m_skillstrengthexp[ssexp.id].resize(9);
+            UInt32* pv = &ssexp.exp1;
+            for (UInt8 i = 0; i < 9; ++i)
+                m_skillstrengthexp[ssexp.id][i] = *pv++;;
+        }
+        return true;
+    }
+    bool GDataManager::LoadSkillStrengthenProb()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSSProb ssprob;
+		if(execu->Prepare("SELECT `id`, `prob1`, `prob2`, `prob3`, `prob4`, `prob5`, `prob6`, `prob7`, `prob8`, `prob9` FROM `skillstrengthenprob`", ssprob) != DB::DB_OK)
+			return false;
+		while(execu->Next() == DB::DB_OK)
+		{
+            m_skillstrengthprob[ssprob.id].resize(9);
+            UInt32* pv = &ssprob.prob1;
+            for (UInt8 i = 0; i < 9; ++i)
+                m_skillstrengthprob[ssprob.id][i] = *pv++;;
+        }
+        return true;
+    }
     UInt32 GDataManager::getMaxStrengthenVal(UInt16 id, UInt8 clvl)
     {
-        // TODO:
-        return 1000000;
+        std::map<UInt16, std::vector<UInt32> >::iterator i = m_skillstrengthexp.find(id);
+        if (i != m_skillstrengthexp.end())
+        {
+            if (i->second.size() > clvl)
+                return i->second[clvl];
+        }
+        return 0;
+    }
+    UInt32 GDataManager::getSkillStrengthenProb(UInt16 id, UInt8 clvl)
+    {
+        std::map<UInt16, std::vector<UInt32> >::iterator i = m_skillstrengthprob.find(id);
+        if (i != m_skillstrengthprob.end())
+        {
+            if (i->second.size() > clvl)
+                return i->second[clvl];
+        }
         return 0;
     }
 }
