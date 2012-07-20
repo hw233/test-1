@@ -166,8 +166,19 @@ enum ItemTo
     ToForgeFighter,
     ToSecondSoul,
     ToArenaBet,
+    ToSkillStrengthenOpen,
+	ToSkillStrengthenUpgrade,
 };
 
+struct IncommingInfo
+{
+    IncommingInfo():incommingType(0),itemId(0),itemNum(0){}
+    IncommingInfo(UInt32 incommingType_,UInt32 itemId_,UInt32 itemNum_):incommingType(incommingType_),itemId(itemId_),itemNum(itemNum_){}
+
+    UInt32 incommingType;
+    UInt32 itemId;
+    UInt32 itemNum;
+};
 
 struct ConsumeInfo
 {

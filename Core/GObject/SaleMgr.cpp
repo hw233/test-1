@@ -307,9 +307,11 @@ void SaleMgr::addSaleItem(Player * player, UInt32 id, UInt32 pos)
 			{
 				UInt32 saleId;
 				Player *buyer;
+                UInt32 id;
+                UInt16 num;
 			};
 			//给卖家添加金钱
-			BuyInfo buyinfo = {id, player};
+			BuyInfo buyinfo = {id, player, sale->_item->getId(), sale->_item->Count()};
 			GameMsgHdr hdr(0x303, sale->_owner->getThreadId(), sale->_owner, sizeof(buyinfo));
 			GLOBAL().PushMsg(hdr, &buyinfo);
 

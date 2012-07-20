@@ -348,6 +348,34 @@ struct DBSoulItemExp
     UInt32 exp;
 };
 
+struct DBSSExp
+{
+    UInt16 id;
+    UInt32 exp1;
+    UInt32 exp2;
+    UInt32 exp3;
+    UInt32 exp4;
+    UInt32 exp5;
+    UInt32 exp6;
+    UInt32 exp7;
+    UInt32 exp8;
+    UInt32 exp9;
+};
+
+struct DBSSProb
+{
+    UInt16 id;
+    UInt32 prob1;
+    UInt32 prob2;
+    UInt32 prob3;
+    UInt32 prob4;
+    UInt32 prob5;
+    UInt32 prob6;
+    UInt32 prob7;
+    UInt32 prob8;
+    UInt32 prob9;
+};
+
 struct DBCopy
 {
     UInt8 id;
@@ -759,6 +787,37 @@ SPECIALDEF(2)
     )
 SPECIALEND()
 
+SPECIALBEGIN(GData::DBSSExp)
+SPECIALDEF(10)
+    (
+    UInt16,id,
+    UInt32,exp1,
+    UInt32,exp2,
+    UInt32,exp3,
+    UInt32,exp4,
+    UInt32,exp5,
+    UInt32,exp6,
+    UInt32,exp7,
+    UInt32,exp8,
+    UInt32,exp9
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GData::DBSSProb)
+SPECIALDEF(10)
+    (
+    UInt16,id,
+    UInt32,prob1,
+    UInt32,prob2,
+    UInt32,prob3,
+    UInt32,prob4,
+    UInt32,prob5,
+    UInt32,prob6,
+    UInt32,prob7,
+    UInt32,prob8,
+    UInt32,prob9
+    )
+SPECIALEND()
 
 SPECIALBEGIN(GData::DBCopy)
 SPECIALDEF(4)

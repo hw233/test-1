@@ -199,6 +199,25 @@ struct DBPlayerVar
     UInt32 overTime;
 };
 
+struct DBGVar
+{
+    UInt32 id;
+    UInt32 data;
+    UInt32 overTime;
+};
+
+struct DBSS
+{
+    UInt32 id;
+    UInt64 playerId;
+    UInt16 skillid;
+    UInt16 father;
+    UInt32 maxVal;
+    UInt32 curVal;
+    UInt8 lvl;
+    UInt8 maxLvl;
+};
+
 struct DBFighterBuffData
 {
 	UInt64 playerId;
@@ -838,7 +857,7 @@ struct DBArenaBet
 	UInt8 state;
 	UInt8 group;
 	UInt8 recieved;
-	UInt8 pos;
+	UInt16 pos;
 	UInt8 tael;
 };
 
@@ -921,6 +940,13 @@ struct DBRealItemAward
     UInt32 cd;
     std::string card_no;
     std::string card_psw;
+};
+
+struct DBNewRelation
+{
+    UInt64 playerId;
+    UInt8 mood;
+    std::string sign;
 };
 
 struct DBRNR
@@ -1124,6 +1150,29 @@ SPECIALDEF(4)
     UInt16, id,
     UInt32, data,
     UInt32, overTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBGVar)
+SPECIALDEF(3)
+    (
+    UInt32, id,
+    UInt32, data,
+    UInt32, overTime
+    )
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBSS)
+SPECIALDEF(8)
+    (
+    UInt32, id,
+    UInt64, playerId,
+    UInt16, skillid,
+    UInt16, father,
+    UInt32, maxVal,
+    UInt32, curVal,
+    UInt8, lvl,
+    UInt8, maxLvl
     )
 SPECIALEND()
 
@@ -1993,7 +2042,7 @@ SPECIALDEF(7)
 	UInt8, state,
 	UInt8, group,
 	UInt8, recieved,
-	UInt8, pos,
+	UInt16, pos,
 	UInt8, tael
 )
 SPECIALEND()
@@ -2113,6 +2162,15 @@ SPECIALDEF(4)
     UInt32, cd,
     std::string, card_no,
     std::string, card_psw
+)
+SPECIALEND()
+
+SPECIALBEGIN(GObject::DBNewRelation)
+SPECIALDEF(3)
+(
+    UInt64, playerId,
+    UInt8, mood,
+    std::string, sign
 )
 SPECIALEND()
 
