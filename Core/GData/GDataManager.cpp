@@ -28,6 +28,7 @@
 #include "Script/lua_tinker.h"
 #include "SoulExpTable.h"
 #include "SoulSkillTable.h"
+#include "SkillStrengthen.h"
 
 namespace GData
 {
@@ -1024,6 +1025,67 @@ namespace GData
         return true;
     }
 
+
+    bool GDataManager::LoadSkillStrengthenEffect()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSkillStrengthenEffect dbne;
+        if(execu->Prepare("SELECT `id`, `cond`, `target`, `prob`, `area`, `factor`, `last`, `type`, `value` FROM  `skillstrengthen_effect`", dbne) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            SkillStrengthenEffect* ef = new SkillStrengthenEffect(dbne.id);
+            if(!ef)
+                return false;
+            ef->cond = dbne.cond;
+            ef->target = dbne.target;
+            ef->prob = dbne.prob;
+            ef->area = dbne.area;
+            ef->last = dbne.last;
+            ef->type = dbne.type;
+            ef->value = dbne.value;
+
+            StringTokenizer tk(dbne.factor, ",");
+            if (tk.count())
+            {
+                for (size_t i = 0; i < tk.count(); ++i)
+                    ef->factor.push_back(::atof(tk[i].c_str()));
+            }
+
+            skillStrengthenEffectManager.add(ef);
+        }
+
+        return true;
+    }
+
+    bool GDataManager::LoadSkillStrengthens()
+    {
+		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
+		if (execu.get() == NULL || !execu->isConnected()) return false;
+        DBSkillStrengthen dbnd;
+        if(execu->Prepare("SELECT `id`, `name`, `effect` FROM  `skillstrengthen`", dbnd) != DB::DB_OK)
+            return false;
+        while(execu->Next() == DB::DB_OK)
+        {
+            SkillStrengthenBase* skillstrengthen = new SkillStrengthenBase(dbnd.id, dbnd.name);
+            if(!skillstrengthen)
+                return false;
+
+            StringTokenizer tk(dbnd.effect, ",");
+            if (tk.count())
+            {
+                for (size_t i = 0; i < tk.count(); ++i)
+                {
+                    skillstrengthen->effect.push_back(skillStrengthenEffectManager[::atoi(tk[i].c_str())]);
+                }
+            }
+
+            skillStrengthenManager.add(skillstrengthen);
+        }
+
+        return true;
+    }
 
     bool GDataManager::LoadSkillEffect()
     {

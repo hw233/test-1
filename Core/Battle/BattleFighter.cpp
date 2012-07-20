@@ -32,7 +32,14 @@ BattleFighter::BattleFighter(Script::BattleFormula * bf, GObject::Fighter * f, U
 	_attackAdd2(0), _magAtkAdd2(0), _defAdd2(0), _magDefAdd2(0), _hitrateAdd2(0), _evadeAdd2(0),
     _criticalAdd2(0), _criticalDmgAdd2(0), _pierceAdd2(0), _counterAdd2(0), _magResAdd2(0), _toughAdd2(0),
     _atkreduce2(0), _magatkreduce2(0),
-	_maxhpAdd2(0), _maxActionAdd2(0), _fakeDeadTimes(0)
+	_maxhpAdd2(0), _maxActionAdd2(0), _fakeDeadTimes(0),
+    _atkreduce3(0), _magatkreduce3(0), _pudu_debuf(0),
+    _atkreduce3_last(0), _magatkreduce3_last(0), _pudu_debuf_last(0),
+    _deep_forget_dmg_extra(0), _deep_stun_dmg_extra(0),
+    _therapy_dec(0), _therapy_dec_last(0),
+    _bleed1(0), _bleed2(0), _bleed3(0),
+    _bleed1_last(0), _bleed2_last(0), _bleed3_last(0),
+    _immune2(0), _def_dec(0), _def_dec_last(0)
 {
     memset(_immuneLevel, 0, sizeof(_immuneLevel));
     memset(_immuneRound, 0, sizeof(_immuneRound));
@@ -488,6 +495,16 @@ float BattleFighter::calcTherapy(const GData::SkillBase* skill)
     {
         aura_factor = _aura / 100;
         _aura = 0;
+    }
+
+    GData::SkillStrengthenBase* ss = getSkillStrengthen(SKILL_ID(skill->getId()));
+    const GData::SkillStrengthenEffect* ef = NULL;
+    if(ss)
+        ef = ss->getEffect(GData::ON_THERAPY, GData::TYPE_CRITICAL);
+    if(ef)
+    {
+        if(uRand(10000) < getCritical(NULL)*ef->value*100)
+            aura_factor *= 2;
     }
 
     return aura_factor * ((_magatk + _magAtkAdd + _magAtkAdd2) * skill->effect->hpP + skill->effect->addhp + skill->effect->hp);
@@ -1091,5 +1108,13 @@ void BattleFighter::fakeDead()
     _hp = 1;
 }
 
+GData::SkillStrengthenBase* BattleFighter::getSkillStrengthen(UInt16 skillId)
+{
+    std::map<UInt16, GData::SkillStrengthenBase*>::iterator it = _skillStrengthen.find(skillId);
+    if(it != _skillStrengthen.end())
+        return it->second;
+
+    return NULL;
+}
 
 }

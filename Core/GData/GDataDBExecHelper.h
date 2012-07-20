@@ -94,6 +94,26 @@ struct DBFormation
 	std::string levelup_item;
 };
 
+struct DBSkillStrengthen
+{
+    UInt16 id;
+    std::string name;
+    std::string effect;
+};
+
+struct DBSkillStrengthenEffect
+{
+    UInt16 id;
+    UInt16 cond;
+    UInt8 target;
+    float prob;
+    UInt8 area;
+    std::string factor;
+    Int16 last;
+    Int16 type;
+    float value;
+};
+
 struct DBSkill
 {
     UInt16 id;
@@ -538,6 +558,32 @@ SPECIALDEF(5)
     float, value
 	)
 SPECIALEND()
+
+SPECIALBEGIN(GData::DBSkillStrengthen)
+SPECIALDEF(3)
+    (
+    UInt16, id,
+    std::string, name,
+    std::string, effect
+    )
+SPECIALEND()
+
+
+SPECIALBEGIN(GData::DBSkillStrengthenEffect)
+SPECIALDEF(9)
+    (
+    UInt16, id,
+    UInt16, cond,
+    UInt8, target,
+    float, prob,
+    UInt8, area,
+    std::string, factor,
+    Int16, last,
+    Int16, type,
+    float, value
+    )
+SPECIALEND()
+
 
 SPECIALBEGIN(GData::DBSkill)
 SPECIALDEF(10)

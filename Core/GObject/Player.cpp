@@ -3848,6 +3848,8 @@ namespace GObject
 		if (priceType == 0)
 		{
 			const std::vector<UInt32>& golds = GData::GDataManager::GetGoldTrainList();
+            if(fgt->getLevel() >= golds.size())
+                return false;
 			price = time * golds[fgt->getLevel()]; 
 			if (getGold() < price)
 			{
@@ -3859,6 +3861,8 @@ namespace GObject
 		else
 		{
 			const std::vector<UInt32>& taels = GData::GDataManager::GetTaelTrainList();
+            if(fgt->getLevel() >= taels.size())
+                return false;
 			price = time * taels[fgt->getLevel()];
 			if (getTael() < price)
 			{
