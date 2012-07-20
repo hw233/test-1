@@ -1100,7 +1100,7 @@ namespace GData
 		std::unique_ptr<DB::DBExecutor> execu(DB::gDataDBConnectionMgr->GetExecutor());
 		if (execu.get() == NULL || !execu->isConnected()) return false;
         DBSkillStrengthen dbnd;
-        if(execu->Prepare("SELECT `id`, `name`, `effect` FROM  `skillstrengthen`", dbnd) != DB::DB_OK)
+        if(execu->Prepare("SELECT `id`, `name`, `effect` FROM  `skillstrengthen_skill`", dbnd) != DB::DB_OK)
             return false;
         while(execu->Next() == DB::DB_OK)
         {

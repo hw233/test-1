@@ -283,6 +283,7 @@ public:
     const GData::SkillBase* getPassiveSkill100(std::vector<GData::SkillItem>& passiveSkill100, size_t& idx);
 
     GData::SkillStrengthenBase* getSkillStrengthen(UInt16 skillId);
+    void updateSkillStrengthen(UInt16 skillId);
 
     inline bool isRevival() { return _revival; }
     inline void setRevival()

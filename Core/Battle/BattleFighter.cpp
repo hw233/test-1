@@ -67,6 +67,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.base = GData::skillManager[activeSkill[idx]];
         skillItem.cd = 0;
         _activeSkill.insert(_activeSkill.end(), skillItem);
+
+        updateSkillStrengthen(activeSkill[idx]);
     }
 
     std::vector<UInt16>& passiveSkillPrvAtk100Id = _fighter->getPassiveSkillPreAtk100();
@@ -97,6 +99,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillPrvAtk100.insert(_passiveSkillPrvAtk100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillPrvAtk100Id[idx]);
     }
 
     cnt = passiveSkillAftAtk100Id.size();
@@ -108,6 +112,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillAftAtk100.insert(_passiveSkillAftAtk100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillPrvAtk100Id[idx]);
     }
 
     cnt = passiveSkillBeAtk100Id.size();
@@ -119,6 +125,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillBeAtk100.insert(_passiveSkillBeAtk100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillBeAtk100Id[idx]);
     }
 
     cnt = passiveSkillAftEvd100Id.size();
@@ -130,6 +138,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillAftEvd100.insert(_passiveSkillAftEvd100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftEvd100Id[idx]);
     }
 
     cnt = passiveSkillAftRes100Id.size();
@@ -141,6 +151,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillAftRes100.insert(_passiveSkillAftRes100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftRes100Id[idx]);
     }
 
     cnt = passiveSkillEnter100Id.size();
@@ -152,6 +164,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillEnter100.insert(_passiveSkillEnter100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillEnter100Id[idx]);
     }
 
     cnt = passiveSkillDead100Id.size();
@@ -163,6 +177,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillDead100.insert(_passiveSkillDead100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillDead100Id[idx]);
     }
 
     cnt = passiveSkillAftNAtk100Id.size();
@@ -174,6 +190,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         skillItem.cd = 0;
         skillItem.rateExtent = 0;
         _passiveSkillAftNAtk100.insert(_passiveSkillAftNAtk100.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftNAtk100Id[idx]);
     }
 
     cnt = passiveSkillPreAtkId.size();
@@ -187,6 +205,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillPreAtk.insert(_passiveSkillPreAtk.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillPreAtkId[idx]);
     }
 
     cnt = passiveSkillAftAtkId.size();
@@ -200,6 +220,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftAtk.insert(_passiveSkillAftAtk.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftAtkId[idx]);
     }
 
     cnt = passiveSkillBeAtkId.size();
@@ -213,6 +235,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillBeAtk.insert(_passiveSkillBeAtk.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillBeAtkId[idx]);
     }
 
     cnt = passiveSkillAftEvdId.size();
@@ -226,6 +250,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftEvd.insert(_passiveSkillAftEvd.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftEvdId[idx]);
     }
 
     cnt = passiveSkillAftResId.size();
@@ -239,6 +265,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftRes.insert(_passiveSkillAftRes.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftResId[idx]);
     }
 
     cnt = passiveSkillEnterId.size();
@@ -252,6 +280,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillEnter.insert(_passiveSkillEnter.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillEnterId[idx]);
     }
 
     cnt = passiveSkillDeadId.size();
@@ -265,6 +295,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillDead.insert(_passiveSkillDead.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillDeadId[idx]);
     }
 
     cnt = passiveSkillAftNAtk.size();
@@ -278,6 +310,8 @@ void BattleFighter::setFighter( GObject::Fighter * f )
         rateExtent += skillItem.base->prob * 100;
         skillItem.rateExtent = rateExtent;
         _passiveSkillAftNAtk.insert(_passiveSkillAftNAtk.end(), skillItem);
+
+        updateSkillStrengthen(passiveSkillAftNAtk[idx]);
     }
 }
 
@@ -1127,6 +1161,17 @@ GData::SkillStrengthenBase* BattleFighter::getSkillStrengthen(UInt16 skillId)
         return it->second;
 
     return NULL;
+}
+
+void BattleFighter::updateSkillStrengthen(UInt16 skillId)
+{
+    UInt8 lvl = _fighter->SSGetLvl(skillId);
+    if(lvl)
+    {
+        UInt16 skill_id = SKILL_ID(skillId);
+        UInt16 ssId = SKILLANDLEVEL(skill_id, lvl);
+        _skillStrengthen[skill_id] = (GData::SkillStrengthenBase*)(GData::skillStrengthenManager[ssId]);
+    }
 }
 
 }
