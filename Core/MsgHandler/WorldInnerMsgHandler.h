@@ -586,6 +586,13 @@ void OnAthleticsMartialFlush( GameMsgHdr& hdr, const void* data )
     GObject::gAthleticsRank.updateAthleticsMartial(player);
 }
 
+void OnAthleticsFlush( GameMsgHdr& hdr, const void* data )
+{
+	MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8 *)data;
+    GObject::gAthleticsRank.updateAthleticsP(player, type);
+}
+
 void OnAthleticsPayRet( GameMsgHdr& hdr,  const void* data)
 {
     MSG_QUERY_PLAYER(player);

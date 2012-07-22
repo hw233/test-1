@@ -1213,6 +1213,13 @@ void OnMartialUpdate( GameMsgHdr& hdr, const void* data )
     player->GetAthletics()->updateMartial(md);
 }
 
+void OnMartialUpdate2( GameMsgHdr& hdr, const void* data )
+{
+    MSG_QUERY_PLAYER(player);
+    UInt8 type = *(UInt8*)(data);
+    player->GetAthletics()->listAthleticsMartial2(type);
+}
+
 void OnAthleticsMartialAttack( GameMsgHdr& hdr, const void* data )
 {
 	MSG_QUERY_PLAYER(player);

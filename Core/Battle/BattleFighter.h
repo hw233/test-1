@@ -221,6 +221,10 @@ public:
 	inline void addFlag(UInt32 f) { _flag |= f; }
 	inline void delFlag(UInt32 f) { _flag &= ~f; }
 	inline bool hasFlag(UInt32 f) { return (_flag & f) > 0;}
+	inline UInt32 getFlag2() { return _flag2; }
+	inline void addFlag2(UInt32 f) { _flag2 |= f; }
+	inline void delFlag2(UInt32 f) { _flag2 &= ~f; }
+	inline bool hasFlag2(UInt32 f) { return (_flag2 & f) > 0;}
 	void setAttrExtra(UInt8, UInt8, UInt8);
     void setImmuneLevel(UInt8 state, UInt8 f);
     void setImmune(UInt8 f) { _immune |= f; }
@@ -394,6 +398,7 @@ private:
 	   b4:ÓúÕ½ÓúÓÂ
 	   28-31bit: holy level */
 	UInt32 _flag;
+	UInt32 _flag2;
 
     UInt8 _poisonRound;
     UInt8 _poisonLevel;
@@ -473,7 +478,19 @@ public:
         PoisonRound = 0x1C00000,
         StunRound = 0xE000000,
         ConfuseRound = 0x70000000,
-	};
+    };
+	enum StatusFlag2
+	{
+		AthlEnh1 = 0x01,
+		AthlEnh2 = 0x02,
+		AthlEnh3 = 0x04,
+        AthlEnh4 = 0x08,
+        AthlEnh5 = 0x10,
+		AthlEnh6 = 0x20,
+		AthlEnh7 = 0x40,
+		AthlEnh8 = 0x80,
+		AthlEnh9 = 0x100,
+    };
 };
 
 }

@@ -4113,7 +4113,7 @@ UInt8 Fighter::SSGetLvl(UInt16 skillid)
 {
     if (!_owner)
         return 0;
-    UInt32 sid = skillid/100;
+    UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
         return 0;
@@ -4124,7 +4124,7 @@ SStrengthen* Fighter::SSGetInfo(UInt16 skillid)
 {
     if (!_owner)
         return 0;
-    UInt32 sid = skillid/100;
+    UInt32 sid = SKILL_ID(skillid);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
         return NULL;
@@ -4167,17 +4167,18 @@ void Fighter::makeFighterSSInfo(Stream& st)
 }
 
 #define SS_MAXLVL 9
-void Fighter::SSOpen(UInt16 id, UInt32 itemId, bool bind)
+void Fighter::SSOpen(UInt16 id)
 {
     if (!_owner)
         return;
     if (isSkillUp(id) < 0)
         return;
 
-    UInt16 sid = id/100;
+    UInt16 sid = SKILL_ID(id);
     if (GData::skill2item.find(sid) == GData::skill2item.end())
         return;
-    if (GData::skill2item[sid] != itemId)
+    UInt16 itemId = GData::skill2item[sid];
+    if (!itemId)
         return;
 
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
@@ -4188,7 +4189,9 @@ void Fighter::SSOpen(UInt16 id, UInt32 itemId, bool bind)
     }
 
     Package* pkg = _owner->GetPackage();
-    ItemBase* item = pkg->FindItem(itemId, bind);
+    ItemBase* item = pkg->FindItem(itemId, true);
+    if (!item)
+        item = pkg->FindItem(itemId, false);
     if (!item)
         return;
     // 
@@ -4234,7 +4237,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     if (!_owner)
         return 0;
 
-    UInt32 sid = id/100;
+    UInt32 sid = SKILL_ID(id);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
         return 0;
@@ -4306,7 +4309,7 @@ void Fighter::SSErase(UInt16 id)
 {
     if (!_owner)
         return;
-    UInt32 sid = id/100;
+    UInt32 sid = SKILL_ID(id);
     std::map<UInt16, SStrengthen>::iterator i = m_ss.find(sid);
     if (i == m_ss.end())
         return;

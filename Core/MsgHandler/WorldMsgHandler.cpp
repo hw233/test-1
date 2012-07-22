@@ -126,6 +126,8 @@ MSG_REG_2(GameMsgHdr, 0x1F5, OnReplaceOwner);
 MSG_REG_2(GameMsgHdr, 0x1F6, OnPracticeAddExp);
 MSG_REG_2(GameMsgHdr, 0x1F7, OnPracticeStop);
 
+MSG_REG_2(GameMsgHdr, 0x1F8, OnAthleticsFlush);
+
 #ifdef _ARENA_SERVER
 MSG_REG_2(LoginMsgHdr, 0x01, onServerReg);
 MSG_REG_2(GameMsgHdr, 0x02, onPlayerEnter);

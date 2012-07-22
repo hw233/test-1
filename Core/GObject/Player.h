@@ -99,11 +99,21 @@ namespace GObject
 #define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????��ʤ??????
 #define PLAYER_BUFF_YBUF            0x41
 #define PLAYER_BUFF_BBUF            0x42
-
 #define PLAYER_BUFF_N_ATHLETICS     0x44    //邀请斗剑冷却
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x50
-#define PLAYER_BUFF_COUNT			0x50
+#define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
+#define PLAYER_BUFF_ATHL1           0x51
+#define PLAYER_BUFF_ATHL2           0x52
+#define PLAYER_BUFF_ATHL3           0x53
+#define PLAYER_BUFF_ATHL4           0x54
+#define PLAYER_BUFF_ATHL5           0x55
+#define PLAYER_BUFF_ATHL6           0x56
+#define PLAYER_BUFF_ATHL7           0x57
+#define PLAYER_BUFF_ATHL8           0x58
+#define PLAYER_BUFF_ATHL9           0x59
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x5F
+#define PLAYER_BUFF_COUNT			0x5F
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
 #define SHIMEN_TASK_MAXCOUNT        5       // ʦ??ÿ????????????
@@ -492,6 +502,7 @@ namespace GObject
             AutoFrontMap    = 0x00000080,
             InCopyTeam      = 0x00000100,
             ClanRankBattle  = 0x00000200,
+            AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -1389,6 +1400,8 @@ namespace GObject
         inline UInt32 getWorldBossHp() const { return _worldBossHp; }
 
     public:
+
+    public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
         void addPracticeFighter(UInt32* fighters, size_t size);
 
@@ -1550,6 +1563,8 @@ namespace GObject
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
         void sendYBBufInfo(UInt32 ybbuf);
+        void adjustAthlBuffData(UInt32 type);
+        void sendAthlBufInfo();
 
         bool hasRealItemAward(UInt32 id);
         void getRealItemAward(UInt32 id);
