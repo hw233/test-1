@@ -66,6 +66,11 @@ function discount(store)
     end
 
     if now >= t4 and now < t4 + 9*day then
+        store:add(2,509,80)
+        store:add(2,507,80)
+    end
+
+    if now >= t5 and now < t5 + 7*day then
         store:add(2,9076,100)
         store:add(2,9092,30)
         store:add(2,9093,20)
