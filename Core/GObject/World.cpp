@@ -709,6 +709,11 @@ void World::Team_Copy_Process(void*)
     teamCopyManager->process(TimeUtil::Now());
 }
 
+void World::AthleticsPhysicalCheck(void *)
+{
+    gAthleticsRank.process();
+}
+
 bool World::Init()
 {
 	GObjectManager::delayLoad();
@@ -749,6 +754,7 @@ bool World::Init()
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
+    AddTimer(3600 * 1000, AthleticsPhysicalCheck);
 	return true;
 }
 

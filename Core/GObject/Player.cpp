@@ -81,6 +81,9 @@
 #define DAY_SECS (24*60*60)
 #define CREATE_OFFSET(c, n) (((n) - (c)) / (DAY_SECS))
 
+#define ATHL_BUFF_SECS        (10*60)
+#define ATHL_BUFF_SECS_MAX    (30*60)
+
 namespace GObject
 {
     UInt32 Player::_recruit_cost = 20;
@@ -1251,7 +1254,7 @@ namespace GObject
                     for (UInt8 j = 0; j < 6; ++j)
                     {
                         ied.gems[j] = gemId[cls-1][i][j];
-                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
+                        DB4().PushUpdateData("UPDATE `equipment` SET `enchant` = %u, `sockets` = %u, `socket1` = %u, `socket2` = %u, `socket3` = %u, `socket4` = %u, `socket5` = %u, `socket6` = %u, `attrType1` = %u, `attrValue1` = %d, `attrType2` = %u, `attrValue2` = %d, `attrType3` = %u, `attrValue3` = %d WHERE `id` = %"I64_FMT"u", ied.enchant, ied.sockets, ied.gems[0], ied.gems[1], ied.gems[2], ied.gems[3], ied.gems[4], ied.gems[5], ied.extraAttr2.type1, ied.extraAttr2.value1, ied.extraAttr2.type2, ied.extraAttr2.value2, ied.extraAttr2.type3, ied.extraAttr2.value3, ie->getId());
                     }
                     GetPackage()->SendSingleEquipData(ie);
                 }
@@ -2247,7 +2250,7 @@ namespace GObject
 		if(_playerData.formation == f)
 			return true;
 		_playerData.formation = f;
-		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %" I64_FMT "u", f, _id);
+		DB1().PushUpdateData("UPDATE `player` SET `formation` = %u WHERE id = %"I64_FMT"u", f, _id);
 
         return true;
 	}
@@ -10615,6 +10618,163 @@ namespace GObject
     {
         Stream st(REP::YBBUF);
         st << static_cast<UInt8>((ybbuf >> 16) & 0xFFFF) << static_cast<UInt8>(ybbuf & 0xFFFF) << Stream::eos;
+        send(st);
+    }
+
+    void Player::adjustAthlBuffData(UInt32 type)
+    {
+        UInt32 now = TimeUtil::Now();
+        UInt32 leftTime;
+        UInt32 flag = 0;
+        UInt8 count = 0;
+        UInt8 index;
+        if(type & Battle::BattleFighter::AthlEnh1)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL1))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL1) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL1, now + leftTime);
+            flag = PLAYER_BUFF_ATHL1;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh2)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL2))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL2) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL2, now + leftTime);
+            flag = PLAYER_BUFF_ATHL2;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh3)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL3))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL3) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL3, now + leftTime);
+            flag = PLAYER_BUFF_ATHL3;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh4)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL4))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL4) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL4, now + leftTime);
+            flag = PLAYER_BUFF_ATHL4;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh5)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL5))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL5) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL5, now + leftTime);
+            flag = PLAYER_BUFF_ATHL5;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh6)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL6))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL6) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL6, now + leftTime);
+            flag = PLAYER_BUFF_ATHL6;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh7)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL7))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL7) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL7, now + leftTime);
+            flag = PLAYER_BUFF_ATHL7;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh8)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL8))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL8) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL8, now + leftTime);
+            flag = PLAYER_BUFF_ATHL8;
+        }
+        else if(type & Battle::BattleFighter::AthlEnh9)
+        {
+            leftTime = ATHL_BUFF_SECS;
+            if(getBuffData(PLAYER_BUFF_ATHL9))
+            {
+                leftTime = getBuffData(PLAYER_BUFF_ATHL9) - now + ATHL_BUFF_SECS;
+                if(leftTime > ATHL_BUFF_SECS_MAX)
+                    leftTime = ATHL_BUFF_SECS_MAX;
+            }
+            setBuffData(PLAYER_BUFF_ATHL9, now + leftTime);
+            flag = PLAYER_BUFF_ATHL9;
+        }
+
+        //sendAthlBufInfo();
+        if(flag == 0)
+            return;
+        count = 1;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        st << count;
+        index = flag - PLAYER_BUFF_ATHL1;
+        st << index;
+        leftTime = getBuffData(flag) - now;
+        st << leftTime;
+        st << Stream::eos;
+        send(st);
+    }
+
+    void Player::sendAthlBufInfo()
+    {
+        UInt32 leftTime;
+        Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+        st << static_cast<UInt8>(5);
+        UInt8 count = 0;
+        UInt8 index;
+        for(index = PLAYER_BUFF_ATHL1; index <= PLAYER_BUFF_ATHL9; index++)
+        {
+            if(getBuffData(index) > 0)
+                count++;
+        }
+        st << count;
+        for(index = PLAYER_BUFF_ATHL1; index <= PLAYER_BUFF_ATHL9; index++)
+        {
+            if(getBuffData(index) > 0)
+            {
+                st << static_cast<UInt8>(index - PLAYER_BUFF_ATHL1);
+                leftTime = getBuffData(index) - TimeUtil::Now();
+                st << leftTime;
+            }
+        }
+        st << Stream::eos;
         send(st);
     }
 

@@ -245,7 +245,8 @@ struct AthleticsListReq
 
 struct AthleticsGetAwardReq
 {
-    MESSAGE_DEF(REQ::ATHLETICS_GET_AWARD);
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::ATHLETICS_GET_AWARD, UInt8, _type);
 };
 
 struct LuckyDrawRankListReq
@@ -1317,8 +1318,10 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
     case 2:
         {
             std::string name;
+            UInt8 rivalDifficulty = 0;
             brd >> name;
-            GObject::gAthleticsRank.challenge2(player, name, 3);
+            brd >> rivalDifficulty;
+            GObject::gAthleticsRank.challenge2(player, name, 3, rivalDifficulty);
         }
         break;
     }
@@ -1326,7 +1329,19 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
 void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
 {
      MSG_QUERY_PLAYER(player);
-     GObject::gAthleticsRank.RequestPageNum(player);
+     BinaryReader brd(data, hdr.msgHdr.bodyLen);
+     UInt8 opt = 0;
+     brd >> opt;
+     if(opt == 1)
+     {
+         UInt8 athlDiffculty = 0;
+         UInt8 athlCategory = 0;
+         brd >> athlDiffculty;
+         brd >> athlCategory;
+         GObject::gAthleticsRank.RequestSubDir(player, athlDiffculty, athlCategory);
+     }
+     else
+         GObject::gAthleticsRank.RequestPageNum(player);
 }
 
 void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
@@ -1339,7 +1354,7 @@ void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
 void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
 {
     MSG_QUERY_PLAYER(player);
-    GObject::gAthleticsRank.giveAward(player);
+    GObject::gAthleticsRank.giveAward(player, req._type);
 }
 
 void OnLuckDrawRankListReq( GameMsgHdr& hdr, LuckyDrawRankListReq& req )

@@ -347,6 +347,7 @@ private:
     static void Team_Copy_Process(void*);
 	static void ReCalcWeekDay( World * );
 	static void World_One_Min( World * );
+    static void AthleticsPhysicalCheck(void *);
 
 private:
 	void testUpdate();

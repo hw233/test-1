@@ -480,8 +480,8 @@ function calcPierce( fgt, defgt )
   return prc + fgt:getExtraPierce() + prclvl/(prclvl + pirlvl_factor*deflev + pirlvl_addon_factor)*100
 end
 
-function calcDamage( atk, def, atklvl, toughFactor )
-    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor)
+function calcDamage( atk, def, atklvl, toughFactor, dmgreduce )
+    local dmgP = (1 - def/(def + deflvl_factor*atklvl + deflvl_addon_factor) * toughFactor - dmgreduce/100)
     if dmgP < 0.25 then
         dmgP = 0.25
     end
