@@ -857,10 +857,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
-                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor);
                     float magatkreduce = area_target->getMagAtkReduce();
-                    if(magatkreduce && magdmg > 0)
-                        magdmg -= factor * magatk * magatkreduce / 100;
+                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor, magatkreduce);
 
                     magdmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -870,11 +868,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(atk)
                 {
                     def = area_target->getDefend();
-                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor);
-
                     float atkreduce = area_target->getAtkReduce();
-                    if(atkreduce && dmg > 0)
-                        dmg -= factor * atk * atkreduce / 100;
+                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor, atkreduce);
 
                     dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -1038,11 +1033,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					float def = bf->getDefend();
 					bool pr = target_fighter->calcPierce(bf);
                     float toughFactor = pr ? bf->getTough(target_fighter) : 1.0f;
-					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor);
-
                     float atkreduce = bf->getAtkReduce();
-                    if(atkreduce && dmg2 > 0)
-                        dmg2 -= factor * atk * atkreduce / 100;
+					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor, atkreduce);
 
                     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
 

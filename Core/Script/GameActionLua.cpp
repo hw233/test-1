@@ -1209,7 +1209,7 @@ namespace Script
 
 	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
 	{
-		Call<bool>("onSoSoMapAward", player, off);
+		return Call<bool>("onSoSoMapAward", player, off);
 	}
 }
 
