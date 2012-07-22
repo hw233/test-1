@@ -545,9 +545,9 @@ float BattleFormula::calcAction(Battle::BattleFighter * fgt)
 	return call<UInt32>("calcAction", fgt);
 }
 
-float BattleFormula::calcDamage( float atk, float def, float atklvl, float toughFactor )
+float BattleFormula::calcDamage( float atk, float def, float atklvl, float toughFactor, float dmgreduce )
 {
-	return call<float>("calcDamage", atk, def, atklvl, toughFactor);
+	return call<float>("calcDamage", atk, def, atklvl, toughFactor, dmgreduce);
 }
 
 float BattleFormula::calcAutoBattle( float mybp, float theirbp )
