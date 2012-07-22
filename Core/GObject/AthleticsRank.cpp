@@ -2830,7 +2830,7 @@ void AthleticsRank::process()
             needSave = false;
             //考虑5分钟误差
             Viplvl = data->ranker->getVipLevel();
-            if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl == 6))
+            if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl >= 6))
             {
                 needSave = true;
                 data->ePhysical += 6;

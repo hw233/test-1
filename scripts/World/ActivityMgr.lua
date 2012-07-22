@@ -274,6 +274,18 @@ function doAty(player, id, param1 ,  param2)
     --print("checkTimeOver");
     --print(needflag);
     mgr:CheckTimeOver();
+    if id == 13 then
+        local VipLvl = player:getVipLevel()
+        local count
+        if VipLvl < 6 then
+            count = 15
+        else
+            count = 20
+        end
+        if mgr:GetFlag(id) >= count then
+            return
+        end
+    end
     --判断标志位
     if needflag ~= nil then
         local curflag = mgr:GetFlag(id);
