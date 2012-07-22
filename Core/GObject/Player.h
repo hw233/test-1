@@ -502,6 +502,7 @@ namespace GObject
             AutoFrontMap    = 0x00000080,
             InCopyTeam      = 0x00000100,
             ClanRankBattle  = 0x00000200,
+            AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
 

@@ -339,7 +339,7 @@ bool AthleticsRank::enterAthleticsReq(Player * player ,UInt8 lev)
 		_ranks[row][player] = rank;
 		data->maxrank = std::min(_athleticses[row].size(), (size_t)(ATHLETICS_RANK_MAX_CNT + 1));
 		BuildNewBox(rank);
-        DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, 0, 0, %u, %u, %u, %u, %u, %u, %u, %u)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge, data->pageNum);
+        DB6().PushUpdateData("INSERT INTO `athletics_rank` VALUES(%u, %u, %"I64_FMT"u, %u, %u, %u, 0, 0, %u, %u, %u, %u, %u, %u, %u, %u, 0, %u, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", row, data->rank, data->ranker->getId(), data->maxrank, data->challengenum, data->challengetime, data->winstreak, data->bewinstreak, data->failstreak, data->befailstreak, data->oldrank, data->first4rank, data->extrachallenge, data->pageNum, data->ePhysical);
 		GameMsgHdr hdr(0x216, player->getThreadId(), player, 0);
 		GLOBAL().PushMsg(hdr, NULL);
 	}
@@ -2248,21 +2248,22 @@ void AthleticsRank::updateAthleticsRank(AthleticsRankData* data)
 
 UInt8 getRivalRandomDiffculty()
 {
-    UInt8 rate, rivalDiffculty;
-    rate = uRand(100);
-    if(rate >= 98)
+    UInt16 rate;
+    UInt8 rivalDiffculty;
+    rate = uRand(1000);
+    if(rate >= 995)
         rivalDiffculty = 7;
-    else if(rate >= 96)
+    else if(rate >= 990)
         rivalDiffculty = 6;
-    else if(rate >= 94)
+    else if(rate >= 985)
         rivalDiffculty = 5;
-     else if(rate >= 92)
+     else if(rate >= 980)
         rivalDiffculty = 4;
-     else if(rate >= 90)
+     else if(rate >= 975)
         rivalDiffculty = 3;
-     else if(rate >= 88)
+     else if(rate >= 970)
         rivalDiffculty = 2;
-     else if(rate >= 86)
+     else if(rate >= 965)
         rivalDiffculty = 1;
      else
         rivalDiffculty = 0;
@@ -2276,11 +2277,11 @@ typedef struct _stAward
 }stAward;
 const stAward awardPool[] =
 {
-    {29, 1}, {29, 2}, {29, 3},
-    {56, 1}, {57, 1}, {29, 4}, {29, 4},
-    {511, 1}, {500, 1}, {29, 6}, {29, 8},
-    {503, 1}, {514, 1}, {499, 20}, {29, 15},
-    {503, 1}, {509, 1}, {507, 1}
+    {29, 1}, {29, 2}, {29, 3}, {55, 1}, {502, 1}, {510, 1},
+    {56, 1}, {57, 1},
+    {511, 1}, {500, 1}, {499, 10},
+    {503, 1}, {514, 1},
+    {515, 1}, {509, 1}, {507, 1}
 };
 
 UInt32 AthleticsRank::getAthlRandomAward(UInt8 diffculty, UInt8 opt)
@@ -2298,12 +2299,12 @@ UInt32 AthleticsRank::getAthlRandomAward(UInt8 diffculty, UInt8 opt)
             break;
         case 2:
             {
-                award = awardPool[3 + opt];
+                award = awardPool[6 + opt];
             }
             break;
         case 3:
             {
-                award = awardPool[7 + opt];
+                award = awardPool[8 + opt];
             }
             break;
         case 4:
@@ -2313,13 +2314,41 @@ UInt32 AthleticsRank::getAthlRandomAward(UInt8 diffculty, UInt8 opt)
             break;
         case 5:
             {
-                award = awardPool[15 + opt];
+                award = awardPool[13 + opt];
             }
             break;
         default:
             break;
     }
     tmp = (award.itemId << 16) + award.count;
+    return tmp;
+}
+
+UInt8 AthleticsRank::getAthlRandomMaxValue(UInt8 diffculty)
+{
+    UInt8 tmp = 0;
+    if(diffculty == 0 || diffculty > 5)
+        return tmp;
+    switch(diffculty)
+    {
+        case 1:
+            tmp = 6;
+            break;
+        case 2:
+            tmp = 2;
+            break;
+        case 3:
+            tmp = 3;
+            break;
+        case 4:
+            tmp = 2;
+            break;
+        case 5:
+            tmp = 3;
+            break;
+        default:
+            break;
+    }
     return tmp;
 }
 
@@ -2356,6 +2385,16 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         ;
 
     GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
+    if(it == GObject::globalLevelsPlayers.end())
+        it = GObject::globalLevelsPlayers.find(level - 1);
+    if(it == GObject::globalLevelsPlayers.end())
+        it = GObject::globalLevelsPlayers.find(level - 2);
+    if(it == GObject::globalLevelsPlayers.end())
+        it = GObject::globalLevelsPlayers.find(level - 3);
+    if(it == GObject::globalLevelsPlayers.end())
+        it = GObject::globalLevelsPlayers.find(level - 4);
+    if(it == GObject::globalLevelsPlayers.end())
+        it = GObject::globalLevelsPlayers.find(level - 5);
     if(it == GObject::globalLevelsPlayers.end())
         return;
 

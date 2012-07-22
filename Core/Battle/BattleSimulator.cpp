@@ -263,6 +263,7 @@ void BattleSimulator::start(UInt8 prevWin)
              || _player[i]->hasFlag(GObject::Player::InCopyTeam)
              || _player[i]->hasFlag(GObject::Player::AutoDungeon)
              || _player[i]->hasFlag(GObject::Player::AutoFrontMap))*/
+            if(_player[i]->hasFlag(GObject::Player::AthleticsBuff))
             {
                 if (_player[i]->getBuffData(PLAYER_BUFF_ATHL1, now) > 0)
                     flag2 |= BattleFighter::AthlEnh1;
