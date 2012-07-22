@@ -2788,16 +2788,11 @@ void GMHandler::OnSSOpen(GObject::Player* player, std::vector<std::string>& args
 
     UInt32 fgtid = atoi(args[0].c_str());
     UInt32 skillid = atoi(args[1].c_str());
-    UInt32 itemid = atoi(args[2].c_str());
-
-    bool bind = false;
-    if (args.size() >= 4)
-        bind = atoi(args[3].c_str());
 
     Fighter* fgt = player->findFighter(fgtid);
     if (!fgt)
         return;
-    fgt->SSOpen(skillid, itemid, bind);
+    fgt->SSOpen(skillid);
 }
 
 void GMHandler::OnSSUp(GObject::Player* player, std::vector<std::string>& args)

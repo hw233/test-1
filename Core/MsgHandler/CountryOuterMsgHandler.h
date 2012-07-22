@@ -1047,6 +1047,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
+    pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);
     pl->sendRC7DayInfo(now);
     pl->sendRF7DayInfo(now);
@@ -4721,12 +4722,8 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
     if (type == 1)
     {
         UInt16 skillid = 0;
-        UInt32 itemid = 0;
-        UInt8 bind = 0;
         br >> skillid;
-        br >> itemid;
-        br >> bind;
-        fgt->SSOpen(skillid, itemid, bind);
+        fgt->SSOpen(skillid);
     }
     else if (type == 2)
     {
