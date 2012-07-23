@@ -41,6 +41,7 @@ void WorldScript::init()
     def("setTavernPurpleCount", GObject::Player::setTavernPurpleCount);
     def("setTavernOrangeCount", GObject::Player::setTavernOrangeCount);
 	def("isFBVersion", GObject::World::isFBVersion);
+	def("isVTVersion", GObject::World::isVTVersion);
 	def("isDebug", GObject::World::isDebug);
 	def("setActivityStage", GObject::World::setActivityStage);
 	def("setActAvailable", GObject::World::setActAvailable);
@@ -119,8 +120,18 @@ void WorldScript::init()
 	def("setRechargeNextRet", GObject::World::setRechargeNextRet);
 	def("getRechargeNextRet", GObject::World::getRechargeNextRet);
 	def("setRechargeNextRetStart", GObject::World::setRechargeNextRetStart);
+	def("setLevelAwardEnd", GObject::World::setLevelAwardEnd);
 	def("setDuanWu", GObject::World::setDuanWu);
 	def("getDuanWu", GObject::World::getDuanWu);
+	def("setICAct", GObject::World::setICAct);
+	def("getICAct", GObject::World::getICAct);
+	def("setPExpItems", GObject::World::setPExpItems);
+	def("getPExpItems", GObject::World::getPExpItems);
+	def("setSoSoMapBegin", GObject::World::setSoSoMapBegin);
+	def("setOpenTest", GObject::World::setOpenTest);
+	def("getOpenTest", GObject::World::getOpenTest);
+	def("setConsumeActive", GObject::World::setConsumeActive);
+	def("getConsumeActive", GObject::World::getConsumeActive);
 	def("Broadcast", SysBroadcast);
 	def("GetStore", GetStore);
 	def("GetTitleList", GetTitleList);

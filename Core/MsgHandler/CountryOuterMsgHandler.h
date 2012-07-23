@@ -609,7 +609,8 @@ struct PracticeHookAddReq
 
 struct AthleticsRefreshMartialReq
 {
-	MESSAGE_DEF(REQ::ATHLETICS_REFRESH_MARTIAL);
+    UInt8 _type;
+	MESSAGE_DEF1(REQ::ATHLETICS_REFRESH_MARTIAL, UInt8, _type);
 };
 
 struct TrumpLOrderReq
@@ -984,6 +985,11 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 		pl->makeFighterList(st);
 		conn->send(&st[0], st.size());
 	}
+    {
+        Stream st;
+        pl->makeFighterSSList(st);
+		conn->send(&st[0], st.size());
+    }
 	{
 		Stream st;
 		pl->makeFormationInfo(st);
@@ -1043,6 +1049,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->GetShuoShuo()->sendShuoShuo();
     pl->GetCFriend()->sendCFriend();
     pl->sendRechargeInfo();
+    pl->sendConsumeInfo();
     pl->sendRechargeNextRetInfo(now);
     pl->sendRC7DayInfo(now);
     pl->sendRF7DayInfo(now);
@@ -1050,6 +1057,7 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
     pl->sendSSDTInfo();
     pl->sendHappyInfo();
     pl->sendYBBufInfo(pl->GetVar(VAR_YBBUF));
+    pl->sendAthlBufInfo();
     luckyDraw.notifyDisplay(pl);
 
     if (World::getTrumpEnchRet())
@@ -1137,6 +1145,10 @@ void OnPlayerInfoReq( GameMsgHdr& hdr, PlayerInfoReq& )
 
     {
         GObject::arena.sendActive(pl);
+    }
+
+    {
+        pl->sendSoSoMapInfo();
     }
 }
 
@@ -1873,7 +1885,7 @@ void OnTransportReq( GameMsgHdr& hdr, CityTransportReq& ctr )
 	MSG_QUERY_PLAYER(pl);
 	UInt32 viplvl = pl->getVipLevel();
 
-    if (!pl->isYD() && !pl->isBD())
+    if (!pl->isYD() && !pl->isBD() && !pl->isQQVIP())
     {
         if(ctr.flag == 0)
         {
@@ -2549,6 +2561,14 @@ void OnBattleEndReq( GameMsgHdr& hdr, BattleEndReq& req )
 {
 	MSG_QUERY_PLAYER(player);
 	UInt32 now = TimeUtil::Now();
+
+    TeamCopyPlayerInfo* tcpInfo = player->getTeamCopyPlayerInfo();
+    if(tcpInfo)
+    {
+        tcpInfo->sendAwardInfo();
+    }
+
+
 	if(now <= PLAYER_DATA(player, battlecdtm))
 		return ;
 
@@ -2944,6 +2964,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				{
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
                     player->useGold(price,&ci);
+                    player->consumeGold(price);
 					st << static_cast<UInt8>(0);
 
                     GameAction()->doAty(player, AtyBuy ,0,0);
@@ -3353,17 +3374,25 @@ void OnMailClickReq( GameMsgHdr& hdr, MailClickReq& mcr )
 
 void OnFriendListReq( GameMsgHdr& hdr, FriendListReq& flr )
 {
-	if(flr._type > 3)
+	if(flr._type > 4)
 		return;
 	MSG_QUERY_PLAYER(player);
-	player->sendFriendList(flr._type, flr._start, flr._count);
+    if(flr._type == 4)
+    {
+        GObject::Clan *clan = player->getClan();
+        if(clan != NULL)
+            clan->sendClanList(player, flr._type, flr._start, flr._count);
+    }
+    else
+	    player->sendFriendList(flr._type, flr._start, flr._count);
 }
 
 void OnFriendOpReq( GameMsgHdr& hdr, FriendOpReq& fr )
 {
 	MSG_QUERY_PLAYER(player);
-	GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
-	if(pl == NULL || pl == player)
+    player->patchDeleteDotS(fr._name);
+    GObject::Player * pl = GObject::globalNamedPlayers[player->fixName(fr._name)];
+    if(pl == NULL || pl == player)
 	{
 		player->sendMsgCode(0, 1506);
 		return;
@@ -3830,6 +3859,7 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
     MSG_QUERY_PLAYER(player);
     if (!player->hasChecked())
         return;
+#if 0
     if(player->getTael() < 100)
         return;
 
@@ -3838,6 +3868,9 @@ void OnRefreshMartialReq( GameMsgHdr& hdr, AthleticsRefreshMartialReq& req )
 
     GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, player, 0);
     GLOBAL().PushMsg(hdr2, NULL);
+#endif
+    GameMsgHdr hdr2(0x1F8, WORKER_THREAD_WORLD, player, 1);
+    GLOBAL().PushMsg(hdr2, &(req._type));
 }
 
 void OnTrumpUpgrade( GameMsgHdr& hdr, const void* data)
@@ -4272,6 +4305,56 @@ void OnTeamCopyReq( GameMsgHdr& hdr, const void* data)
     }
 }
 
+void OnNewRelationReq( GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt8 mood = 0;
+    std::string status;
+    br >> type;
+
+    if(type > 5)
+        return;
+
+    Stream st(REP::NEWRELATION);
+    st << type;
+    /** 关系 **/
+    switch(type)
+    {
+        case 0:
+            st << pl->GetNewRelation()->getMood();
+            break;
+        case 1:
+            br >> mood;
+            st << mood;
+            pl->GetNewRelation()->setMood(mood);
+            break;
+        case 2:
+            st << pl->GetNewRelation()->getSign();
+            break;
+        case 3:
+            br >> status;
+            st << status;
+            pl->GetNewRelation()->setSign(status);
+            break;
+        case 4:
+            br >> status;
+            pl->GetNewRelation()->challengeRequest(pl, status);
+            return;//isn't break
+        case 5:
+            br >> status;
+            br >> mood;
+            pl->GetNewRelation()->challengeRespond(pl, status, mood);
+            return;//isn't break
+        default:
+            break;
+    }
+
+    st << Stream::eos;
+    pl->send(st);
+}
+
 void OnTownDeamonReq( GameMsgHdr& hdr, const void* data)
 {
 	MSG_QUERY_PLAYER(player);
@@ -4631,6 +4714,7 @@ void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
     player->guideUdp(req._type, req.p1, req.p2);
 }
 
+<<<<<<< HEAD
 void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -4697,6 +4781,56 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
   
     }
     player->send(st);
+=======
+void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
+{
+    MSG_QUERY_PLAYER(pl);
+    BinaryReader br(data, hdr.msgHdr.bodyLen);
+    UInt8 type = 0;
+    UInt32 fighterid = 0;
+    br >> type;
+    br >> fighterid;
+
+    Fighter* fgt = pl->findFighter(fighterid);
+    if (!fgt)
+        return;
+    if (type == 1)
+    {
+        UInt16 skillid = 0;
+        br >> skillid;
+        fgt->SSOpen(skillid);
+    }
+    else if (type == 2)
+    {
+        UInt16 skillid = 0;
+        UInt16 num = 0;
+        br >> skillid;
+        br >> num;
+
+        bool brk = false;
+        for (UInt16 i = 0; i < num; ++i)
+        {
+            UInt32 itemid = 0;
+            UInt16 itemnum = 0;
+            UInt8 bind = 0;
+            br >> itemid;
+            br >> itemnum;
+            br >> bind;
+
+            for (UInt16 j = 0; j < itemnum; ++j)
+            {
+                if (!fgt->SSUpgrade(skillid, itemid, bind))
+                {
+                    brk = true;
+                    break;
+                }
+            }
+
+            if (brk)
+                break;
+        }
+    }
+>>>>>>> d2ab1f1841964889069487955e22c7256c1ae556
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_

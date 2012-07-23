@@ -15,6 +15,12 @@ namespace GObject
 #define GET_ARENA_NAME(n) char n[1024]; if(_session & 0x8000) { SysMsgItem * mi = globalSysMsg[780]; if(mi != NULL) mi->get(n); else n[0] = 0; } else { strcpy(n, cfg.slugName.c_str()); }
 #define GET_PROGRESS_NAME(n, p) char n[1024]; { SysMsgItem * mi = globalSysMsg[781 + p]; if(mi != NULL) mi->get(n); else n[0] = 0; }
 
+#ifdef _FB
+#define LIMIT_LEVEL  60
+#else
+#define LIMIT_LEVEL  70
+#endif
+
 const static UInt8 progress_accept[7][13] = {
   // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12 
     {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0},   // 0
@@ -111,7 +117,7 @@ Arena::Arena():
 
 void Arena::enterArena( Player * player )
 {
-    if(_progress != 0)
+    if(_progress != 0 || player->GetLev() < LIMIT_LEVEL)
         return;
     std::map<Player *, ArenaPlayer>::iterator iter = _players.find(player);
     if( iter != _players.end() )
@@ -277,6 +283,8 @@ UInt8 Arena::bet2( Player * player, UInt8 state, UInt8 group, UInt16 pos, UInt8 
     case 4:
     case 5:
     case 6:
+        if(pos > 7)
+            return 0xFF;
         pos2 = _finalIdx[gIdx][2][pos];
         fidx = pos2 >> _round;
         break;
@@ -773,7 +781,7 @@ void Arena::readFrom( BinaryReader& brd )
 	case 0:
 		if(!_players.empty() && sIdx == 0)
         {
-            DB1().PushUpdateData("DELETE FROM `arena_bet` WHERE `recieved` = 1");
+            DB1().PushUpdateData("DELETE FROM `arena_bet`");
             _playerCount[0] = 0;
 			_players.clear();
         }
@@ -1345,9 +1353,8 @@ void Arena::readPrePlayers(BinaryReader& brd, UInt8 sIdx)
                 if(bi.round == 1 && bi.group == 0 && bi.state == i)
                 {
                     PreliminaryPlayerListIterator pit = _preliminaryPlayers_list[i].begin();
-                    int pos = bi.pos;
-                    if(pos > _preliminaryPlayers_list[i].size())
-                        pos = _preliminaryPlayers_list[i].size();
+                    if(bi.pos > _preliminaryPlayers_list[i].size())
+                        continue;
                     std::advance(pit, bi.pos);
                     if(pit != _preliminaryPlayers_list[i].end())
                     {

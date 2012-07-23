@@ -76,7 +76,8 @@ namespace Script
 		lua_tinker::def(_L, "Broadcast",	SysBroadcast);
 		lua_tinker::def(_L, "SendMsg",		SysSendMsg);
 		lua_tinker::def(_L, "TaskAction",	&MOAction::TaskAction);
-		lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
+        lua_tinker::def(_L, "isFBVersion", GObject::World::isFBVersion);
+		lua_tinker::def(_L, "isVTVersion", GObject::World::isVTVersion);
 		lua_tinker::def(_L, "isNewServer", GObject::World::IsNewServer);
 		lua_tinker::def(_L, "isDebug", GObject::World::isDebug);
 		lua_tinker::def(_L, "getActivityStage",	GObject::World::getActivityStage);
@@ -123,9 +124,14 @@ namespace Script
         lua_tinker::def(_L, "getMergeAthAct", GObject::World::getMergeAthAct);
         lua_tinker::def(_L, "setFourCopAct", GObject::World::setFourCopAct);
         lua_tinker::def(_L, "getFourCopAct", GObject::World::getFourCopAct);
+        lua_tinker::def(_L, "getPExpItems", GObject::World::getPExpItems);
+        lua_tinker::def(_L, "getOpenTest", GObject::World::getOpenTest);
+        lua_tinker::def(_L, "getConsumeActive", GObject::World::getConsumeActive);
 
         CLASS_DEF(GameActionLua, Print);
         lua_tinker::def(_L, "getDuanWu", GObject::World::getDuanWu);
+        lua_tinker::def(_L, "getICAct", GObject::World::getICAct);
+        lua_tinker::def(_L, "setLevelAwardEnd", GObject::World::setLevelAwardEnd);
 		CLASS_DEF(GameActionLua, Print);
 		CLASS_DEF(GameActionLua, GetPlayer1);
 		CLASS_DEF(GameActionLua, GetPlayer2);
@@ -150,6 +156,7 @@ namespace Script
 		CLASS_DEF(Player, getPName);
 		CLASS_DEF(Player, IsMale);
 		CLASS_DEF(Player, GetLev);
+		CLASS_DEF(Player, getTotalRecharge);
 		CLASS_DEF(Player, GetExp);
 		CLASS_DEF(Player, AddExp);
 		CLASS_DEF(Player, AddPExp);
@@ -158,6 +165,7 @@ namespace Script
 		CLASS_DEF(Player, getGold);
 		CLASS_DEF(Player, useGold);
 		CLASS_DEF(Player, useGold4LuckDraw);
+		CLASS_DEF(Player, getGold4LuckDraw);
 		CLASS_DEF(Player, getCoupon);
 		CLASS_DEF(Player, useCoupon);
 		CLASS_DEF(Player, getTael);
@@ -243,6 +251,7 @@ namespace Script
         CLASS_DEF(Player, lastLootPush);
         CLASS_DEF(Player, hasRealItemAward);
         CLASS_DEF(Player, getRealItemAward);
+        CLASS_DEF(Player, getMoneyArena);
 
         CLASS_ADD(Fighter);
 		CLASS_DEF(Fighter, regenHP);
@@ -271,6 +280,7 @@ namespace Script
 		CLASS_DEF(Fighter, addElixirAttrByOffset);
 		CLASS_DEF(Fighter, getElixirAttrByOffset);
 		CLASS_DEF(Fighter, changeSecondSoulXinxiu);
+		CLASS_DEF(Fighter, get2ndSounSoulMax);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -946,14 +956,24 @@ namespace Script
 		Call<void>("onEnchant", player, level);
 	}
 
-	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 type )
+	void GameActionLua::onEnchantAct( Player* player, UInt8 level, UInt8 quality, UInt8 type )
 	{
-		Call<void>("onEnchantAct", player, level, type);
+		Call<void>("onEnchantAct", player, level, quality, type);
 	}
 
 	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)
 	{
 		Call<void>("onEnchantGt11", player, id, level, type);
+	}
+
+	void GameActionLua::onSoulEnchantMaxSoul( Player* player, UInt32 oms, UInt32 yams )
+	{
+		Call<void>("onSoulEnchantMaxSoul", player, oms, yams);
+    }
+
+	void GameActionLua::onEquipForge( Player* player, UInt32 itemId, UInt32 onums)
+	{
+		Call<void>("onEquipForge", player, itemId, onums);
 	}
 
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )
@@ -1183,6 +1203,7 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
+<<<<<<< HEAD
     
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
     {
@@ -1199,5 +1220,16 @@ namespace Script
         return Call<UInt32>("GetExchangePropsID");
     }
 
+=======
+    void GameActionLua::sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal)
+    {
+		return Call<void>("sendConsumeMails", player, ototal, ntotal);
+    }
+
+	bool GameActionLua::onSoSoMapAward( Player* player, UInt8 off)
+	{
+		return Call<bool>("onSoSoMapAward", player, off);
+	}
+>>>>>>> d2ab1f1841964889069487955e22c7256c1ae556
 }
 

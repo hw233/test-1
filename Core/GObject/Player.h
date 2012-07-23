@@ -17,6 +17,7 @@
 #include "kingnet_analyzer.h"
 #include "Script/lua_tinker.h"
 #include "Mail.h"
+#include "GObject/NewRelation.h"
 
 namespace Battle
 {
@@ -98,9 +99,21 @@ namespace GObject
 #define PLAYER_BUFF_AMARTIAL_WIN    0x40    // ??????��ʤ??????
 #define PLAYER_BUFF_YBUF            0x41
 #define PLAYER_BUFF_BBUF            0x42
+#define PLAYER_BUFF_N_ATHLETICS     0x44    //邀请斗剑冷却
 
-#define PLAYER_BUFF_DISPLAY_MAX		0x50
-#define PLAYER_BUFF_COUNT			0x50
+#define PLAYER_BUFF_ATHLETICS_P     0x45    //历练冷却时间
+#define PLAYER_BUFF_ATHL1           0x51
+#define PLAYER_BUFF_ATHL2           0x52
+#define PLAYER_BUFF_ATHL3           0x53
+#define PLAYER_BUFF_ATHL4           0x54
+#define PLAYER_BUFF_ATHL5           0x55
+#define PLAYER_BUFF_ATHL6           0x56
+#define PLAYER_BUFF_ATHL7           0x57
+#define PLAYER_BUFF_ATHL8           0x58
+#define PLAYER_BUFF_ATHL9           0x59
+
+#define PLAYER_BUFF_DISPLAY_MAX		0x5F
+#define PLAYER_BUFF_COUNT			0x5F
 
 #define CLAN_TASK_MAXCOUNT          5       // ????ÿ????????????
 #define SHIMEN_TASK_MAXCOUNT        5       // ʦ??ÿ????????????
@@ -489,6 +502,7 @@ namespace GObject
             AutoFrontMap    = 0x00000080,
             InCopyTeam      = 0x00000100,
             ClanRankBattle  = 0x00000200,
+            AthleticsBuff   = 0x80000000,
 			AllFlags		= 0xFFFFFFFF
 		};
 
@@ -630,6 +644,7 @@ namespace GObject
         void sendShusanLoveTitleCard(int);
         void sendMayDayTitleCard(int);
         void sendJuneHappyTitleCard(int pos);
+        void sendPExpCard(int pos);
 
 	public:
 		void sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num);
@@ -673,8 +688,10 @@ namespace GObject
                 _playerData.qqvipl = 16;
             else if (lvl > 26 && lvl < 30)
                 _playerData.qqvipl = 26;
-            else if (lvl > 38)
+            else if (lvl > 38 && lvl < 40)
                 _playerData.qqvipl = 38;
+            else if (lvl > 47)
+                _playerData.qqvipl = 47;
         }
         inline void setQQVipl1(UInt8 lvl)
         {
@@ -700,12 +717,15 @@ namespace GObject
                 return (3<<4)|(_playerData.qqvipl-20);
             if (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39)
                 return (4<<4)|(_playerData.qqvipl-30);
+            if (_playerData.qqvipl >= 40 && _playerData.qqvipl <= 49)
+                return (4<<4)|(_playerData.qqvipl-40);
             return 0;
         }
         // XXX: 1-9 黄钻等级
         //      10-19 蓝钻等级
         //      20-29 3366等级,另qqvipl1 为蓝钻等级
         //      30-39 Q+等级,另qqvipl1 为黄钻等级
+        //      40-49 QQ会员等级
         inline bool isYD() const
         {
             return (_playerData.qqvipl >= 1 && _playerData.qqvipl <= 9) || (_playerData.qqvipl >= 30 && _playerData.qqvipl <= 39);
@@ -718,6 +738,10 @@ namespace GObject
             if (_playerData.qqvipl >= 20 && _playerData.qqvipl <= 29 && _playerData.qqvipl1 >= 11 && _playerData.qqvipl1 <= 19) //qqvipli1为10代表蓝钻0级，不是蓝钻用户
                     return true;
             return false;
+        }
+        inline bool isQQVIP() const 
+        {
+            return (_playerData.qqvipl > 40 && _playerData.qqvipl <= 49);
         }
 
 		UInt32 getTotalRecharge()			{ return _playerData.totalRecharge; }
@@ -805,9 +829,10 @@ namespace GObject
 		void sendModification(UInt8, UInt32, bool = true);
 		void updateDB(UInt8, UInt32);
 
-		UInt32 getGold(UInt32 c = 0, UInt8 incomingType = 0);
+		UInt32 getGold(UInt32 c = 0, IncommingInfo* ii = NULL);
 		UInt32 useGold(UInt32 c,ConsumeInfo * ci=NULL);
         UInt32 useGold4LuckDraw(UInt32 c);
+        UInt32 getGold4LuckDraw();
 		bool holdGold(UInt32 c, UInt8, ConsumeInfo * ci = NULL);
 
 		UInt32 getGoldOrCoupon();
@@ -921,10 +946,12 @@ namespace GObject
 		bool setFormation(UInt16);
 		void makePlayerInfo(Stream&);
 		void makeFormationInfo(Stream&);
+        void makeFighterSSList(Stream& st);
 		void makeFighterList(Stream&);
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo();
+        void sendConsumeInfo();
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
         void sendJuneRechargeMails(UInt32 value);
@@ -946,6 +973,8 @@ namespace GObject
         void checkQQAward();
         void RollYDGem();
         void openLevelBox(UInt8 lvl, UInt8 cls);
+
+        void consumeGold(UInt32 c);
 
 	public:
 		Map* GetMap();
@@ -1031,6 +1060,7 @@ namespace GObject
         HeroMemo* GetHeroMemo(){return m_HeroMemo;}
         ShuoShuo* GetShuoShuo(){return m_ShuoShuo;}
         CFriend* GetCFriend(){return m_CFriend;}
+        NewRelation* GetNewRelation() { return m_relation; }
 		Trade* GetTrade()			{ return m_Trade; }
 		Sale* GetSale()				{ return m_Sale; }
 		Athletics* GetAthletics()	{ return m_Athletics; }
@@ -1154,6 +1184,7 @@ namespace GObject
 		void sendFriendActList();
 
 		std::string& fixName(std::string& name);
+        void patchDeleteDotS(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
         const char *patchShowName(const char* name, const UInt64 playerId = 0);
@@ -1239,6 +1270,7 @@ namespace GObject
         HeroMemo* m_HeroMemo;
         ShuoShuo* m_ShuoShuo;
         CFriend* m_CFriend;
+        NewRelation* m_relation;
 		MailBox* m_MailBox;
 
 		bool _isOnline;
@@ -1370,6 +1402,8 @@ namespace GObject
         inline void pendWorldBossHp(UInt32 hp) { _worldBossHp += hp; }
         inline void resetWorldBossHp() { _worldBossHp = 0; }
         inline UInt32 getWorldBossHp() const { return _worldBossHp; }
+
+    public:
 
     public:
         void payPractice(UInt8 place, UInt16 slot, UInt8 type, UInt8 priceType, UInt8 time, UInt8 prot);
@@ -1533,6 +1567,8 @@ namespace GObject
         void sendSecondInfo();
         void recvYBBuf(UInt8 type);
         void sendYBBufInfo(UInt32 ybbuf);
+        void adjustAthlBuffData(UInt32 type);
+        void sendAthlBufInfo();
 
         bool hasRealItemAward(UInt32 id);
         void getRealItemAward(UInt32 id);
@@ -1556,6 +1592,22 @@ namespace GObject
     private:
         std::vector<RNR> rechargs;
         UInt32 m_arenaCommitCD;
+
+    public:
+        void getSoSoMapAward();
+        void sendSoSoMapInfo();
+
+#ifdef _FB
+    public:
+        void sendLevelAward();
+#endif
+
+#ifdef _FB
+    public:
+        void equipForge(UInt32 fighterId, UInt32 itemId, UInt32 num);
+    private:
+        std::map<UInt32, UInt32> _forges;
+#endif
 	};
 
 #define PLAYER_DATA(p, n) p->getPlayerData().n

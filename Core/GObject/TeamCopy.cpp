@@ -9,6 +9,7 @@
 #include "Script/GameActionLua.h"
 #include "HeroMemo.h"
 #include "ShuoShuo.h"
+#include "LuckyDraw.h"
 
 namespace GObject
 {
@@ -1114,6 +1115,7 @@ void TeamCopyPlayerInfo::setPassFromDB(UInt8 copyId, UInt8 t, bool pass)
         return;
 
     m_pass[t][copyIdx] = pass;
+    luckyDraw.setPass(copyId); // XXX: fix old server
 }
 
 void TeamCopyPlayerInfo::setPass(UInt8 copyId, UInt8 t, bool pass, bool notify)

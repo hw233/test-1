@@ -173,9 +173,17 @@ GMHandler::GMHandler()
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
+<<<<<<< HEAD
 	
     Reg(3, "sign", &GMHandler::OnHandleSignIn);
 	
+=======
+    Reg(3, "newr", &GMHandler::OnNewRelation);
+    Reg(3, "ssopen", &GMHandler::OnSSOpen);
+    Reg(3, "ssup", &GMHandler::OnSSUp);
+    Reg(3, "sserase", &GMHandler::OnSSErase);
+    Reg(3, "sosog", &GMHandler::OnSoSoGet);
+>>>>>>> d2ab1f1841964889069487955e22c7256c1ae556
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -2691,6 +2699,7 @@ void GMHandler::OnBossHP(GObject::Player* player, std::vector<std::string>& args
 }
 void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
 {
+#if !defined(_FB) && !defined(_VT)
     UInt64 begin = TimeUtil::GetTick();
     //std::string json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"1\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111}}";
     const char* json = "{\"head\": {\"uiPacketLen\":100,\"uiCmdid\":\"5\",\"uiSeqid\":1,\"szServiceName\":\"IDIP\",\"uiSendTime\": 20110820,\"uiVersion\":1001,\"ucAuthenticate\":\"\",\"iResult\":0,\" szRetErrMsg\":\"\"},\"body\":{\"szOpenId\":\"100001\",\" uiAreaId\":0,\"playerId\":1111,\"iNum\":1,\"uiItemId\":507}}";
@@ -2699,6 +2708,7 @@ void GMHandler::OnJson(GObject::Player* player, std::vector<std::string>& args)
         jsonParser2((void*)json, strlen(json), st);
     UInt64 end = TimeUtil::GetTick();
     fprintf(stderr, "total secs: %.2f\n", (float)(end-begin)/1000000);
+#endif
 }
 void GMHandler::OnRC7Awd(GObject::Player* player, std::vector<std::string>& args)
 {
@@ -2735,6 +2745,99 @@ void GMHandler::OnLuckyDraw(GObject::Player* player, std::vector<std::string>& a
 
     luckyDraw.draw(player, id, num, bind);
 }
+void GMHandler::OnNewRelation(GObject::Player* player, std::vector<std::string>& args)
+{
+    UInt8 type = 0;
+    UInt8 start = 0;
+    UInt8 cnt = 1;
+    if(args.size() >= 1)
+        type = atoi(args[0].c_str());
+
+    if(type == 5)
+    {
+        std::string responderName("70603");
+        if(args.size() >= 2)
+            responderName = args[1];
+        player->GetNewRelation()->challengeRequest(player, responderName);
+    }
+    else if(type == 6)
+    {
+        std::string senderName("70603");
+        if(args.size() >= 2)
+            senderName = args[1];
+        UInt8 accept = 1;
+        if(args.size() >= 3)
+            accept = atoi(args[2].c_str());
+        player->GetNewRelation()->challengeRespond(player, senderName, accept);
+    }
+
+    if (args.size() >= 2)
+        start = atoi(args[1].c_str());
+    if (args.size() >= 3)
+        cnt = atoi(args[2].c_str());
+    if(type > 4)
+        return;
+    if(type == 4)
+    {
+        GObject::Clan *clan = player->getClan();
+        if(clan != NULL)
+            clan->sendClanList(player, type, start, cnt);
+    }
+    else
+        player->sendFriendList(type, start, cnt);
+}
+
+void GMHandler::OnSSOpen(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+        return;
+
+    UInt32 fgtid = atoi(args[0].c_str());
+    UInt32 skillid = atoi(args[1].c_str());
+
+    Fighter* fgt = player->findFighter(fgtid);
+    if (!fgt)
+        return;
+    fgt->SSOpen(skillid);
+}
+
+void GMHandler::OnSSUp(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 3)
+        return;
+
+    UInt32 fgtid = atoi(args[0].c_str());
+    UInt32 skillid = atoi(args[1].c_str());
+    UInt32 itemid = atoi(args[2].c_str());
+
+    bool bind = false;
+    if (args.size() >= 4)
+        bind = atoi(args[3].c_str());
+
+    Fighter* fgt = player->findFighter(fgtid);
+    if (!fgt)
+        return;
+    fgt->SSUpgrade(skillid, itemid, bind);
+}
+
+void GMHandler::OnSSErase(GObject::Player* player, std::vector<std::string>& args)
+{
+    if (args.size() < 2)
+        return;
+
+    UInt32 fgtid = atoi(args[0].c_str());
+    UInt32 skillid = atoi(args[1].c_str());
+
+    Fighter* fgt = player->findFighter(fgtid);
+    if (!fgt)
+        return;
+    fgt->SSErase(skillid);
+}
+void GMHandler::OnSoSoGet(GObject::Player* player, std::vector<std::string>& args)
+{
+    player->getSoSoMapAward();
+}
+
 
 void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>& args)
 {

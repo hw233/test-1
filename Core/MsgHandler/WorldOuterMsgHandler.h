@@ -245,7 +245,8 @@ struct AthleticsListReq
 
 struct AthleticsGetAwardReq
 {
-    MESSAGE_DEF(REQ::ATHLETICS_GET_AWARD);
+    UInt8 _type;
+    MESSAGE_DEF1(REQ::ATHLETICS_GET_AWARD, UInt8, _type);
 };
 
 struct LuckyDrawRankListReq
@@ -1317,8 +1318,10 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
     case 2:
         {
             std::string name;
+            UInt8 rivalDifficulty = 0;
             brd >> name;
-            GObject::gAthleticsRank.challenge2(player, name, 3);
+            brd >> rivalDifficulty;
+            GObject::gAthleticsRank.challenge2(player, name, 3, rivalDifficulty);
         }
         break;
     }
@@ -1326,7 +1329,19 @@ void OnAthleticsChallengeReq( GameMsgHdr& hdr, const void * data)
 void OnAthleticsPaging( GameMsgHdr& hdr, const void * data)
 {
      MSG_QUERY_PLAYER(player);
-     GObject::gAthleticsRank.RequestPageNum(player);
+     BinaryReader brd(data, hdr.msgHdr.bodyLen);
+     UInt8 opt = 0;
+     brd >> opt;
+     if(opt == 1)
+     {
+         UInt8 athlDiffculty = 0;
+         UInt8 athlCategory = 0;
+         brd >> athlDiffculty;
+         brd >> athlCategory;
+         GObject::gAthleticsRank.RequestSubDir(player, athlDiffculty, athlCategory);
+     }
+     else
+         GObject::gAthleticsRank.RequestPageNum(player);
 }
 
 void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
@@ -1339,7 +1354,7 @@ void OnAthleticsKillCD( GameMsgHdr& hdr, const void * data)
 void OnAthleticsGetAwardReq( GameMsgHdr& hdr, AthleticsGetAwardReq& req ) 
 {
     MSG_QUERY_PLAYER(player);
-    GObject::gAthleticsRank.giveAward(player);
+    GObject::gAthleticsRank.giveAward(player, req._type);
 }
 
 void OnLuckDrawRankListReq( GameMsgHdr& hdr, LuckyDrawRankListReq& req )
@@ -1518,9 +1533,9 @@ void OnArenaOpReq( GameMsgHdr& hdr, const void * data )
 			//if(tael > 0)
 			{
                 UInt8 r = 0;
-                if(player->getTael() < 500 && tael == 1)
+                if(player->GetPackage()->GetItemAnyNum(ARENA_BET_ITEM1) < 1 && tael == 1)
                     r = 3;
-                else if(player->getGold() < 5 && tael == 0)
+                else if(player->GetPackage()->GetItemAnyNum(ARENA_BET_ITEM2) < 1 && tael == 0)
                     r = 4;
                 else if(state < 2)
                     r = GObject::arena.bet1(player, state, group, pid, tael);

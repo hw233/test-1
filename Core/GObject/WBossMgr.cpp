@@ -74,6 +74,16 @@ static UInt32 worldboss[] = {
     DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7,
 };
 
+static UInt32 worldboss1[] = {
+    5466, 7000,
+    5162, 7001,
+    5103, 7002,
+    5168, 7003,
+    5127, 7004,
+    5197, 7005,
+    DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7,
+};
+
 static UInt32 demons[] = {DEMONS_1, DEMONS_2, DEMONS_3, DEMONS_4, DEMONS_5, DEMONS_6, DEMONS_7};
 
 static UInt8 bossidx[][2] = {
@@ -454,8 +464,17 @@ void WBoss::reward(Player* player)
             }
         }
 
-        MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000}};
-        (*i).player->sendMailItem(568, 569, item, 2);
+        if (World::getOpenTest())
+        {
+            MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000},{9091,1}};
+            (*i).player->sendMailItem(568, 569, item, 3);
+        }
+        else
+        {
+            MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000}};
+            (*i).player->sendMailItem(568, 569, item, 2);
+        }
+
         GameAction()->doAty((*i).player, AtyBoss, 0, 0);
         (*i).player->setContinuousRFAward(6);
     }
@@ -474,10 +493,21 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
     bool in = false;
     for (int i = 0; i < 2; ++i)
     {
-        if (worldboss[2*bossidx[World::_wday-1][m_idx]+i] == id)
+        if (World::getOpenTest())
         {
-            in = true;
-            break;
+            if (worldboss1[2*bossidx[World::_wday-1][m_idx]+i] == id)
+            {
+                in = true;
+                break;
+            }
+        }
+        else
+        {
+            if (worldboss[2*bossidx[World::_wday-1][m_idx]+i] == id)
+            {
+                in = true;
+                break;
+            }
         }
     }
 
@@ -545,8 +575,16 @@ bool WBoss::attack(Player* pl, UInt16 loc, UInt32 id)
             SYSMSG_BROADCASTV(552, pl->getCountry(), pl->getName().c_str(), loc, m_count, m_id);
             UInt8 idx = 2*bossidx[World::_wday-1][m_idx] + (m_count-1)/9;
             UInt32 id = 0;
-            if (idx < sizeof(worldboss)/sizeof(UInt32))
-                id = worldboss[idx];
+            if (World::getOpenTest())
+            {
+                if (idx < sizeof(worldboss1)/sizeof(UInt32))
+                    id = worldboss1[idx];
+            }
+            else
+            {
+                if (idx < sizeof(worldboss)/sizeof(UInt32))
+                    id = worldboss[idx];
+            }
             if (!((idx+1) % 2))
                 m_final = true;
             id = _mgr->fixBossId(id, m_idx);
@@ -830,17 +868,36 @@ WBossMgr::WBossMgr()
 
 bool WBossMgr::isWorldBoss(UInt32 npcid)
 {
-    for (UInt8 i = 0; i < sizeof(worldboss)/sizeof(UInt32); ++i)
+    if (World::getOpenTest())
     {
-        if (cfg.GMCheck || true)
+        for (UInt8 i = 0; i < sizeof(worldboss1)/sizeof(UInt32); ++i)
         {
-            if (worldboss[i] == npcid)
-                return true;
+            if (cfg.GMCheck || true)
+            {
+                if (worldboss1[i] == npcid)
+                    return true;
+            }
+            else
+            {
+                if (worldboss1[i] == npcid)
+                    return true;
+            }
         }
-        else
+    }
+    else
+    {
+        for (UInt8 i = 0; i < sizeof(worldboss)/sizeof(UInt32); ++i)
         {
-            if (worldboss[i] == npcid)
-                return true;
+            if (cfg.GMCheck || true)
+            {
+                if (worldboss[i] == npcid)
+                    return true;
+            }
+            else
+            {
+                if (worldboss[i] == npcid)
+                    return true;
+            }
         }
     }
     return false;
@@ -1024,12 +1081,24 @@ void WBossMgr::appear(UInt32 now)
 {
     UInt32 npcid = 0;
     UInt8 idx = 2*bossidx[World::_wday-1][m_idx];
-    if (idx >= sizeof(worldboss)/sizeof(UInt32))
+    if (World::getOpenTest())
     {
-        nextDay(now);
-        return;
+        if (idx >= sizeof(worldboss1)/sizeof(UInt32))
+        {
+            nextDay(now);
+            return;
+        }
+        npcid = worldboss1[idx];
     }
-    npcid = worldboss[idx];
+    else
+    {
+        if (idx >= sizeof(worldboss)/sizeof(UInt32))
+        {
+            nextDay(now);
+            return;
+        }
+        npcid = worldboss[idx];
+    }
     npcid = fixBossId(npcid, m_idx);
 
     std::vector<UInt16> spots;
@@ -1147,8 +1216,16 @@ void WBossMgr::setBossName(UInt8 idx, std::string name)
 
 void WBossMgr::sendBossInfo(Player* pl)
 {
-    m_bossID[0] = fixBossId(worldboss[2*bossidx[World::_wday-1][0]+1], 0);
-    m_bossID[1] = fixBossId(worldboss[2*bossidx[World::_wday-1][1]+1], 1);
+    if (World::getOpenTest())
+    {
+        m_bossID[0] = fixBossId(worldboss1[2*bossidx[World::_wday-1][0]+1], 0);
+        m_bossID[1] = fixBossId(worldboss1[2*bossidx[World::_wday-1][1]+1], 1);
+    }
+    else
+    {
+        m_bossID[0] = fixBossId(worldboss[2*bossidx[World::_wday-1][0]+1], 0);
+        m_bossID[1] = fixBossId(worldboss[2*bossidx[World::_wday-1][1]+1], 1);
+    }
 
     Stream st(REP::DAILY_DATA);
     st << static_cast<UInt8>(6);

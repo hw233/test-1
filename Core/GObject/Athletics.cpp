@@ -20,8 +20,12 @@ namespace GObject
 
 Athletics::Athletics(Player * player) : _owner(player), _hasEnterAthletics(false)
 {
-    memset(_martial, 0, sizeof(_martial));
-    memset(_canAttack, 0, sizeof(_canAttack));
+    UInt8 i;
+    for(i = 0; i < 5; i++)
+    {
+        gAthleticsRank.setOrginal_martial(_owner, 0, NULL);
+        gAthleticsRank.setOrginal_canAttack(_owner, 0, 0);
+    }
 }
 
 Athletics::~Athletics()
@@ -220,16 +224,16 @@ void Athletics::attack(Player * defer)
 		bool res;
 		UInt32 reptid, time;
 		time = TimeUtil::Now();
-
+        _owner->addFlag(GObject::Player::AthleticsBuff);
 		Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, _owner, defer);
 		_owner->PutFighters( bsim, 0, true );
 		defer->PutFighters( bsim, 1, true );
 		bsim.start();
 		res = bsim.getWinner() == 1;
+        _owner->delFlag(GObject::Player::AthleticsBuff);
 		reptid = bsim.getId();
         if (res)
            GameAction()->RunOperationTaskAction0(_owner, 4);
-
 		Stream st(REP::ATTACK_NPC);
 		st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
 		_owner->send(st);
@@ -268,6 +272,7 @@ void Athletics::attack(Player * defer)
 
 void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
+    _owner->addFlag(GObject::Player::AthleticsBuff);
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
@@ -282,6 +287,7 @@ void Athletics::beAttack(Player * atker, UInt16 formation, UInt16 portrait, Line
 	_owner->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
+    _owner->delFlag(GObject::Player::AthleticsBuff);
 
 	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
@@ -480,12 +486,12 @@ void Athletics::updateMartial(const MartialData* md)
     if(!md)
         return;
 
-    if(md->idx > 2)
+    if(md->idx > 4)
         return;
 
-    _martial[md->idx] = md->defer;
-    _canAttack[md->idx] = md->canAttack;
-    listAthleticsMartial();
+    gAthleticsRank.setOrginal_martial(_owner, md->idx, md->defer);
+    gAthleticsRank.setOrginal_canAttack(_owner, md->idx, md->canAttack);
+    //listAthleticsMartial();
 }
 
 void Athletics::attackMartial(Player* defer)
@@ -505,19 +511,19 @@ void Athletics::attackMartial(Player* defer)
     do
     {
         UInt8 idx = 0xFF;
-        for(UInt8 i = 0; i < 3; ++i)
+        for(UInt8 i = 0; i < 5; ++i)
         {
-            if(_martial[i] == defer)
+            if(gAthleticsRank.getOrginal_martial(_owner, i) == defer)
             {
                 idx = i;
                 break;
             }
         }
 
-        if(idx > 2)
+        if(idx > 4)
             break;
 
-        if(0 == _canAttack[idx])
+        if(0 == gAthleticsRank.getOrginal_canAttack(_owner, idx))
             break;
 
         UInt8 tid = defer->getThreadId();
@@ -540,11 +546,13 @@ void Athletics::attackMartial(Player* defer)
         }
 
         UInt32 reptid;
+        _owner->addFlag(GObject::Player::AthleticsBuff);
         Battle::BattleSimulator bsim = Battle::BattleSimulator(Battle::BS_ATHLETICS1, _owner, defer);
         defer->PutFighters( bsim, 1, true );
         _owner->PutFighters( bsim, 0, true );
         bsim.start();
         res = bsim.getWinner() == 1;
+        _owner->delFlag(GObject::Player::AthleticsBuff);
         reptid = bsim.getId();
 
         Stream st(REP::ATTACK_NPC);
@@ -553,9 +561,9 @@ void Athletics::attackMartial(Player* defer)
 
         awardMartial(defer, res);
 
-        UInt32 time = TimeUtil::Now();
-		id = addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
-		notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
+        //UInt32 time = TimeUtil::Now();
+		id = 0;//addAthleticsData(0, defer, res ? 0 : 1, reptid, time);
+		//notifyAthleticsDeferData(0, defer, id, res ? 0 : 1, reptid, time);
        
         Player* winner =  res ? _owner : defer;
 
@@ -576,6 +584,7 @@ void Athletics::attackMartial(Player* defer)
 
 void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
+    _owner->addFlag(GObject::Player::AthleticsBuff);
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
@@ -590,6 +599,7 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
 	_owner->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
+    _owner->delFlag(GObject::Player::AthleticsBuff);
 
 	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
@@ -602,9 +612,9 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
 		Player * atker;
 		bool result;
 	};
-	UInt32 time = TimeUtil::Now();
-	UInt32 id = addAthleticsData(1, atker, res ? 0 : 1, bsim.getId(), time);
-	notifyAthleticsDeferData(1, atker, id, res ? 0 : 1, bsim.getId(), time);
+	//UInt32 time = TimeUtil::Now();
+	UInt32 id = 0;//addAthleticsData(1, atker, res ? 0 : 1, bsim.getId(), time);
+	//notifyAthleticsDeferData(1, atker, id, res ? 0 : 1, bsim.getId(), time);
 	AthleticsResult ar = {id, 1, atker, res };
 
 	GameMsgHdr hdr(0x1F2, WORKER_THREAD_WORLD, _owner, sizeof(AthleticsResult));
@@ -643,16 +653,19 @@ void Athletics::awardMartial(Player* defer, bool win)
     GObject::LastAthAward la = {0};
     if(win)
     {
-        for(UInt8 i = 0; i < 3; ++i)
+        UInt8 i;
+        for(i = 0; i < 5; ++i)
         {
-            if(_martial[i] == defer)
+            if(gAthleticsRank.getOrginal_martial(_owner, i) == defer)
             {
-                _canAttack[i] = 0;
+                gAthleticsRank.setOrginal_canAttack(_owner, i, 0);
                 break;
             }
         }
-
+        if(i >= 5)
+            return;
         UInt8 wins = _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN) + 1;
+        /*
         if(wins >= 5)
         {
             _owner->GetPackage()->AddItem(6, 1, 1, true, FromAthletAward);
@@ -662,6 +675,27 @@ void Athletics::awardMartial(Player* defer, bool win)
 
             _owner->OnHeroMemo(MC_ATHLETICS, MD_STARTED, 0, 2);
         }
+        */
+
+        AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(_owner);
+        if(curData)
+        {
+            UInt8 index;
+            UInt8 category;
+            UInt32 bufFlag;
+            index = curData->eSelectIndex;
+            if(index== 0 || index > 5)
+                index = 1;
+            if(curData->eRivalType[i] != 0)
+            {
+                category = (curData->eCombine[index - 1] >> 16) & 0xFF;
+                if(category > 8)
+                    category = 0;
+                bufFlag = 1 << category;
+                _owner->adjustAthlBuffData(bufFlag);
+            }
+        }
+
         la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
         _owner->getPrestige(la.prestige, false);
         _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
@@ -718,43 +752,253 @@ void Athletics::updateMartialHdr(const MartialHeader* mh)
 #endif
 }
 
+UInt8 getAthlRandomDiffculty()
+{
+    UInt16 rate;
+    UInt8 athlDiffculty;
+    rate = uRand(10000);
+    if(rate >= 9980)
+        athlDiffculty = 5;
+    else if(rate >= 9910)
+        athlDiffculty = 4;
+    else if(rate >= 9800)
+        athlDiffculty = 3;
+     else if(rate >= 8600)
+        athlDiffculty = 2;
+     else
+        athlDiffculty = 1;
+    return athlDiffculty;
+}
+#define COUNT_PER        5
+#define COUNT_MAX        9
+void getAthlRandomCategory(UInt8 *arr, UInt8 count)
+{
+    UInt8 diffculty;
+    UInt8 i, j;
+
+    if(!arr)
+        return;
+
+    for(i = 0; i < count;)
+    {
+        diffculty = uRand(COUNT_MAX);
+        for(j = 0; j < i; j++)
+        {
+           if(arr[j] == diffculty)
+               break;
+        }
+        if(j == i)
+            arr[i++] = diffculty;
+        else
+            continue;
+    }
+}
+
 void Athletics::listAthleticsMartial()
 {
 	Stream st(REP::ARENA_IFNO);
-    st << static_cast<UInt16>(0x10);
+    st << static_cast<UInt16>(0x20);
+    AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(_owner);
+    if(!curData)
+        return;
+    st << curData->ePhysical;
+    st << gAthleticsRank.GetMaxPhysical(_owner->getVipLevel());
 
-    UInt8 needRefresh = true;
     UInt8 wins =  5 - _owner->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
-	st << wins << static_cast<UInt8>(3);
-	for (UInt8 i = 0; i < 3; ++i)
-	{
-        if(_martial[i] != 0)
+    st << wins;
+    /** 选择过 **/
+    if(curData->eSelectIndex != 0)
+    {
+        st << static_cast<UInt8>(1);
+        UInt8 index = curData->eSelectIndex;
+        if(index == 0 || index > 5)
+            index = 1;
+        UInt32 dbValue = curData->eCombine[index - 1];
+        UInt8 athlDiffculty = dbValue >> 24;
+        UInt8 athlCategory = (dbValue >> 16) & 0xFF;
+        st << athlDiffculty;
+        st << athlCategory;
+        UInt8 tmp4 = dbValue & 0xFF;
+        UInt32 tmp;
+        char a[64];
+        std::string curAward;
+        tmp = gAthleticsRank.getAthlRandomAward(athlDiffculty, tmp4);
+        sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
+        curAward.assign(a);
+        st << curAward;
+        UInt8 count = 0;
+        UInt8 i;
+        for(i = 0; i < 5; i++)
         {
-            Player* pl = _martial[i];
-            if( pl != NULL && _canAttack[i] != 0)
-                needRefresh = false;
+            if(gAthleticsRank.getOrginal_martial(_owner, i) != NULL)
+                count++;
+        }
+        st << count;
+        for(i = 0; i < count; i++)
+        {
+            Player* pl = gAthleticsRank.getOrginal_martial(_owner, i);
+            if(pl)
+                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+        }
+        st << Stream::eos;
+        _owner->send(st);
 
-            if(pl == NULL)
-                st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
-            else
-                st << pl->getName() << pl->getCountry() << pl->GetClass() << static_cast<UInt8>(pl->GetClassAndSex() & 0x0F) << pl->GetLev() << _canAttack[i];
+        //if(needRefresh)
+        //{
+        //    GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, _owner, 0);
+        //    GLOBAL().PushMsg(hdr2, NULL);
+        //}
+    }
+    else
+    {
+        st << static_cast<UInt8>(0);
+        if(curData->eCombine[0] == 0 && curData->eCombine[1] == 0 && curData->eCombine[2] == 0 && curData->eCombine[3] == 0 && curData->eCombine[4] == 0)
+        {
+            st << static_cast<UInt8>(COUNT_PER);
+            UInt8 a[COUNT_PER];
+            getAthlRandomCategory(a, COUNT_PER);
+            for(UInt8 i = 0; i < COUNT_PER; i++)
+            {
+                UInt8 tmp1, tmp2, tmp3, tmp4;
+                UInt32 dbValue;
+                tmp1 = getAthlRandomDiffculty();
+                st << tmp1;
+                tmp2 = a[i];
+                st << tmp2;
+                tmp3 = 0;
+                st << tmp3;
+                UInt8 totalChoice = gAthleticsRank.getAthlRandomMaxValue(tmp1);
+                tmp4 = uRand(totalChoice);
+                UInt32 tmp;
+                char a[64];
+                std::string curAward;
+                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
+                curAward.assign(a);
+                st << curAward;
+                dbValue = (tmp1 << 24) + (tmp2 << 16) + (tmp3 << 8) + tmp4;
+                gAthleticsRank.setOrginal_eCategory(_owner, i, dbValue);
+            }
+            st << Stream::eos;
+            _owner->send(st);
         }
         else
         {
-            st << "" << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0) << static_cast<UInt8>(0);
+            st << static_cast<UInt8>(COUNT_PER);
+            UInt32 dbValue;
+            UInt8 tmp1, tmp2, tmp3, tmp4;
+            for(UInt8 i = 0; i < COUNT_PER; i++)
+            {
+                dbValue = curData->eCombine[i];
+                tmp1 = dbValue >> 24;
+                st << tmp1;
+                tmp2 = (dbValue >> 16) & 0xFF;
+                st << tmp2;
+                tmp3 = (dbValue >> 8) & 0xFF;
+                st << tmp3;
+                tmp4 = dbValue & 0xFF;
+                UInt32 tmp;
+                char a[64];
+                std::string curAward;
+                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
+                curAward.assign(a);
+                st << curAward;
+            }
+            st << Stream::eos;
+            _owner->send(st);
         }
-	}
-
-    st << Stream::eos;
-
-    _owner->send(st);
-
-    if(needRefresh)
-    {
-        GameMsgHdr hdr2(0x1F1, WORKER_THREAD_WORLD, _owner, 0);
-        GLOBAL().PushMsg(hdr2, NULL);
     }
+
 }
+
+void Athletics::listAthleticsMartial2(UInt8 type, bool update)
+{
+    AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(_owner);
+    if(!curData)
+        return;
+    if(type == 0)
+        update = true;
+    if(type == 3)
+        type = 0;
+    Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
+    st << type;
+    if(curData->eSelectIndex != 0)
+    {
+        UInt8 count = 0;
+        UInt8 i;
+        for(i = 0; i < 5; i++)
+        {
+            if(gAthleticsRank.getOrginal_martial(_owner, i) != NULL)
+                count++;
+        }
+        st << count;
+        for(i = 0; i < count; i++)
+        {
+            Player* player = gAthleticsRank.getOrginal_martial(_owner, i);
+            if(player)
+                st << player->getName() << player->getCountry() << player->GetClass() << static_cast<UInt8>(player->GetClassAndSex() & 0x0F) << player->GetLev() << gAthleticsRank.getOrginal_canAttack(_owner, i) << curData->eRivalType[i];
+        }
+    }
+    else
+    {
+        if(update || (curData->eCombine[0] == 0 && curData->eCombine[1] == 0 && curData->eCombine[2] == 0 && curData->eCombine[3] == 0 && curData->eCombine[4] == 0))
+        {
+            st << static_cast<UInt8>(COUNT_PER);
+            UInt8 a[COUNT_PER];
+            getAthlRandomCategory(a, COUNT_PER);
+            for(UInt8 i = 0; i < COUNT_PER; i++)
+            {
+                UInt8 tmp1, tmp2, tmp3, tmp4;
+                UInt32 dbValue;
+                tmp1 = getAthlRandomDiffculty();
+                st << tmp1;
+                tmp2 = a[i];
+                st << tmp2;
+                tmp3 = 0;
+                st << tmp3;
+                UInt8 totalChoice = gAthleticsRank.getAthlRandomMaxValue(tmp1);
+                tmp4 = uRand(totalChoice);
+                UInt32 tmp;
+                char a[64];
+                std::string curAward;
+                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
+                curAward.assign(a);
+                st << curAward;
+                dbValue = (tmp1 << 24) + (tmp2 << 16) + (tmp3 << 8) + tmp4;
+                gAthleticsRank.setOrginal_eCategory(_owner, i, dbValue);
+            }
+        }
+        else
+        {
+            st << static_cast<UInt8>(COUNT_PER);
+            UInt32 dbValue;
+            UInt8 tmp1, tmp2, tmp3, tmp4;
+            for(UInt8 i = 0; i < COUNT_PER; i++)
+            {
+                dbValue = curData->eCombine[i];
+                tmp1 = dbValue >> 24;
+                st << tmp1;
+                tmp2 = (dbValue >> 16) & 0xFF;
+                st << tmp2;
+                tmp3 = (dbValue >> 8) & 0xFF;
+                st << tmp3;
+                tmp4 = dbValue & 0xFF;
+                UInt32 tmp;
+                char a[64];
+                std::string curAward;
+                tmp = gAthleticsRank.getAthlRandomAward(tmp1, tmp4);
+                sprintf(a, "%u:%u", (tmp >> 16), (tmp & 0xFFFF));
+                curAward.assign(a);
+                st << curAward;
+            }
+        }
+    }
+    st << Stream::eos;
+    _owner->send(st);
+}
+
 void  Athletics:: PayForPaging(UInt8 type)
 {
     UInt8   MoneyEnough = 0 ;

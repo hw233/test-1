@@ -299,7 +299,7 @@ void Sale::cancelSellResp(SaleItemCancel& saleItemCancel)
 	}
 }
 
-void Sale::sellSaleResp(UInt32 id, Player *buyer)
+void Sale::sellSaleResp(UInt32 id, Player *buyer, UInt32 itemId, UInt16 itemNum)
 {
 	std::map<UInt32, SaleSellRespData *>::iterator found = _sellItems.find(id);
 	if (found != _sellItems.end())
@@ -314,7 +314,8 @@ void Sale::sellSaleResp(UInt32 id, Player *buyer)
 		}
 		else
 		{
-			_owner->getGold(saleSellRespData->price, InFromSale);
+            IncommingInfo ii(InFromSale, itemId, itemNum);
+			_owner->getGold(saleSellRespData->price, &ii);
 			SYSMSGV(content, 314, saleSellRespData->itemName, buyer->patchShowName(buyer->getName().c_str(), _owner->getId()), saleSellRespData->price);
             MailItemsInfo itemsInfo(NULL, SaleSell, 0);
 			_owner->GetMailBox()->newMail(_owner, 0x07, title, content, 0, true, &itemsInfo);

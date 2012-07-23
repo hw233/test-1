@@ -370,6 +370,10 @@ namespace REQ
     const UInt8 GUIDEUDP            = 0xF4;
 
     const UInt8 FOURCOP             = 0x1F;
+    /** 新关系 **/
+    const UInt8 NEWRELATION         = 0x17;
+    /** 符文 (内丹) **/
+    const UInt8 SKILLSTRENGTHEN     = 0x18;
 }
 
 namespace REP
@@ -418,6 +422,8 @@ namespace REP
     const UInt8 PACK_INFO           = 0xC0;// 0x30
     const UInt8 PACK_USE            = 0xC3;// 0x33
     const UInt8 PACK_EXTEND         = 0xC4;// 0x34
+    /**刷新历练*/
+    const UInt8 ATHLETICS_REFRESH_MARTIAL = 0xC7;
     const UInt8 REWARD_DRAW         = 0xCF;// 0x38
     const UInt8 TRIPOD_INFO         = 0xCE;// 0x39
     const UInt8 LUCKYDRAW_INFO      = 0x3D;
@@ -603,7 +609,10 @@ namespace REP
     const UInt8 SECOND_SOUL         = 0x8E;
 
     const UInt8 FOURCOP             = 0x1F;
-
+    /** 新关系 **/
+    const UInt8 NEWRELATION         = 0x17;
+    /** 符文 (内丹) **/
+    const UInt8 SKILLSTRENGTHEN     = 0x18;
 }
 
 namespace SPEQ

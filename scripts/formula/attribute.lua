@@ -23,6 +23,7 @@ pierce_max = 70
 tough_max = 75
 counter_max = 55
 magres_max = 70
+critical_damage_max = 300
 
 
 function getEvadeFactor()
@@ -73,3 +74,6 @@ function getMagResMax()
     return magres_max
 end
 
+function getCriticalDmgMax()
+    return critical_damage_max
+end

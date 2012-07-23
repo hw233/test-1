@@ -28,6 +28,49 @@ function resetDiscount()
     store:storeDiscount()
 end
 
+function discount(store)
+    local tm1 = { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm2 = { ['year'] = 2012, ['month'] = 7, ['day'] = 19, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm3 = { ['year'] = 2012, ['month'] = 7, ['day'] = 21, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm4 = { ['year'] = 2012, ['month'] = 7, ['day'] = 23, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+    local tm5 = { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+
+    local now = os.time() + 30
+    local t1 = os.time(tm1)
+    local t2 = os.time(tm2)
+    local t3 = os.time(tm3)
+    local t4 = os.time(tm4)
+    local t5 = os.time(tm5)
+
+    local day = 86400
+
+    if now >= t1 and now < t1 + 2*day then
+        store:add(2,5017,950)
+        store:add(2,5047,950)
+    end
+
+    if now >= t2 and now < t2 + 2*day then
+        store:add(2,5067,1850)
+        store:add(2,5077,1400)
+    end
+
+    if now >= t3 and now < t3 + 2*day then
+        store:add(2,5127,1850)
+        store:add(2,5137,1850)
+        store:add(2,5147,1850)
+    end
+    
+    if now >= t4 and now < t4 + 2*day then
+        store:add(2,5087,1850)
+        store:add(2,5097,1850)
+    end
+
+    if now >= t5 and now < t5 + 2*day then
+        store:add(2,5107,1850)
+        store:add(2,5117,1850)
+    end
+end
+
 function loadStore()
 local store = GetStore()
 store:clear()
@@ -38,24 +81,27 @@ end
 
 store:discountLimit()
 
-if is7_1() then
-store:add(2,1702,500)
-store:add(2,1703,500)
+discount(store)
+
+if is7_16_8_15() then
+store:add(2,1704,999)
+store:add(2,1705,999)
 end
 
-if is6_25() then
-store:add(2,9076,100)
+if is7_13_16() then
+store:add(2,9088,10)
 end
 
-if is6_23() then
-store:add(2,509,80)
-store:add(2,507,80)
+if is7_14_15() then
+store:add(2,5007,950)
+store:add(2,5037,950)
+store:add(2,5027,950)
+store:add(2,9087,100)
 end
 
-if is6_22() then
-store:add(2,1700,500)
-store:add(2,1701,500)
-store:add(2,1527,25)
+if is7_10_15() then
+store:add(2,9085,100)
+store:add(2,9086,200)
 end
 
 if is4_21() then
@@ -70,6 +116,13 @@ store:add(2,496,10)
 store:add(2,497,10)
 end
 
+if is7_1() then
+store:add(2,1702,500)
+store:add(2,1703,500)
+end
+
+store:add(2,1528,50)
+store:add(2,9082,5)
 store:add(2,549,80)
 store:add(2,33,10)
 store:add(2,8000,15)
@@ -154,6 +207,7 @@ store:add(4,5113,20)
 store:add(4,5123,20)
 store:add(4,5133,15)
 store:add(4,5143,20)
+store:add(5,9081,500)
 store:add(5,489,2000)
 store:add(5,490,2000)
 store:add(5,491,2000)

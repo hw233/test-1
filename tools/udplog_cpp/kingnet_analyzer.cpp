@@ -104,10 +104,12 @@ int32_t CUserLogger::SendUDPLog(int32_t uid, int32_t type, const char* msg, int 
 	addr.sin_port   = htons(host.nPort);
 	if(inet_aton(host.szIP, &addr.sin_addr) < 0)
 	{
+        close(sockfd);
 		return E_FAIL;
 	}
 	if(sendto(sockfd, sendbuf, (size_t)(head.m_nPackageLength+1), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) < 0)
 	{
+        close(sockfd);
 		return E_FAIL;
 	}
 	close(sockfd);

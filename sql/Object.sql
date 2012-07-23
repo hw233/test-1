@@ -64,7 +64,7 @@ CREATE TABLE `arena_bet` (
   `state` tinyint(3) unsigned NOT NULL,
   `group` tinyint(3) unsigned NOT NULL,
   `recieved` tinyint(3) unsigned NOT NULL,
-  `pos` tinyint(3) unsigned NOT NULL,
+  `pos` smallint(4) unsigned NOT NULL,
   `tael` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`,`state`,`round`,`group`,`pos`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1415,5 +1415,36 @@ CREATE TABLE IF NOT EXISTS `rechargenextret` (
     `id` bigint(20) unsigned NOT NULL,
     `record` varchar(1024) NOT NULL,
     PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `gvar`;
+CREATE TABLE `gvar` (
+  `id` int(10) unsigned NOT NULL,
+  `data` int(10) unsigned NOT NULL,
+  `over` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `new_relation`;
+CREATE TABLE IF NOT EXISTS `new_relation` (
+    `playerId` bigint(20) unsigned NOT NULL,
+    `mood` smallint(3) unsigned NOT NULL DEFAULT 0,
+    `sign` varchar(255) NOT NULL,
+    PRIMARY KEY(`playerId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `skill_strengthen`;
+CREATE TABLE IF NOT EXISTS `skill_strengthen` (
+    `id` int(10) unsigned NOT NULL,
+    `playerId` bigint(20) unsigned NOT NULL,
+    `skillid` smallint(5) unsigned NOT NULL,
+    `father` smallint(5) unsigned NOT NULL,
+    `maxVal` int(10) unsigned NOT NULL,
+    `curVal` int(10) unsigned NOT NULL,
+    `lvl` tinyint(1) unsigned NOT NULL,
+    `maxLvl` tinyint(1) unsigned NOT NULL,
+    UNIQUE KEY `id_playerId_skill` (`id`,`playerId`, `skillid`),
+    KEY `playerId` (`playerId`),
+    KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -243,6 +243,7 @@ void GameClient::onRecv( int cmd, int len, void * buf )
 		if(pl == NULL)
 		{
 #ifdef _FB
+#elif defined(_VT)
 #else
             if(cmd == SPEQ::JASON)
             {
