@@ -42,6 +42,11 @@ public:
     float calcSoulIntelligence(GObject::SecondSoul*);
     float calcSoulWill(GObject::SecondSoul*);
 
+    float calcSoulXinxiuAttack(GObject::SecondSoul*);
+    float calcSoulXinxiuAction(GObject::SecondSoul*);
+    float calcSoulXinxiuDefend(GObject::SecondSoul*);
+    float calcSoulXinxiuHp(GObject::SecondSoul*);
+
 	float calcStrength(GObject::Fighter *);
 	float calcAgility(GObject::Fighter *);
 	float calcIntelligence(GObject::Fighter *);

@@ -3555,7 +3555,7 @@ function ItemNormal_athletics_25(iid, num, bind, param)
     return num;
 end
 
--- 青龙
+-- 元神
 function ItemNormal_SecondSoul_489(iid, num, bind, param)
     local player = GetPlayer()
 
@@ -3564,14 +3564,14 @@ function ItemNormal_SecondSoul_489(iid, num, bind, param)
 		return false;
 	end
 
-    if not fgt:changeSecondSoulClass(1) then
+    if not fgt:changeSecondSoulClass(iid-488) then
         return false;
     end
 
     return 1;
 end
 
-function ItemNormal_SecondSoul_490(iid, num, bind, param)
+function ItemNormal_SecondSoul_9037(iid, num, bind, param)
     local player = GetPlayer()
 
 	local fgt = player:findFighter(param);
@@ -3579,14 +3579,14 @@ function ItemNormal_SecondSoul_490(iid, num, bind, param)
 		return false;
 	end
 
-    if not fgt:changeSecondSoulClass(2) then
+    if not fgt:changeSecondSoulClass(iid-9033) then
         return false;
     end
 
     return 1;
 end
 
-function ItemNormal_SecondSoul_491(iid, num, bind, param)
+function ItemNormal_SecondSoul_9046(iid, num, bind, param)
     local player = GetPlayer()
 
 	local fgt = player:findFighter(param);
@@ -3594,12 +3594,13 @@ function ItemNormal_SecondSoul_491(iid, num, bind, param)
 		return false;
 	end
 
-    if not fgt:changeSecondSoulClass(3) then
+    if not fgt:changeSecondSoulXinxiu(iid-9045) then
         return false;
     end
 
     return 1;
 end
+
 
 function ItemNormal_00009028(iid, num, bind, param)
     local player = GetPlayer()
@@ -4990,9 +4991,22 @@ local ItemNormal_Table = {
 
     -- 第二元神
     [489] = ItemNormal_SecondSoul_489,
-    [490] = ItemNormal_SecondSoul_490,
-    [491] = ItemNormal_SecondSoul_491,
+    [490] = ItemNormal_SecondSoul_489,
+    [491] = ItemNormal_SecondSoul_489,
+    [9037] = ItemNormal_SecondSoul_9037,
+    [9038] = ItemNormal_SecondSoul_9037,
+    [9039] = ItemNormal_SecondSoul_9037,
+    [9040] = ItemNormal_SecondSoul_9037,
+    [9041] = ItemNormal_SecondSoul_9037,
+    [9042] = ItemNormal_SecondSoul_9037,
+    [9043] = ItemNormal_SecondSoul_9037,
+    [9044] = ItemNormal_SecondSoul_9037,
+    [9045] = ItemNormal_SecondSoul_9037,
 
+    [9046] = ItemNormal_SecondSoul_9046,
+    [9047] = ItemNormal_SecondSoul_9046,
+    [9048] = ItemNormal_SecondSoul_9046,
+    [9049] = ItemNormal_SecondSoul_9046,
 
     -- 棒棒糖
     [9028] = ItemNormal_00009028,

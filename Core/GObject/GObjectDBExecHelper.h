@@ -250,6 +250,7 @@ struct DBSecondSoul
 	UInt32 fighterId;
 	UInt64 playerId;
 	UInt8 cls;
+	UInt8 xinxiu;
 	UInt8 practiceLevel;
 	UInt8 stateLevel;
 	UInt32 stateExp;

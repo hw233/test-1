@@ -3777,6 +3777,17 @@ bool Fighter::changeSecondSoulClass(UInt8 cls)
     return m_2ndSoul->setClass(cls);
 }
 
+bool Fighter::changeSecondSoulXinxiu(UInt8 xinxiu)
+{
+    if(!m_2ndSoul)
+    {
+        _owner->sendMsgCode(0, 1072);
+        return false;
+    }
+
+    return m_2ndSoul->setXinxiu(xinxiu);
+}
+
 UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)
 {
     if(!m_2ndSoul)

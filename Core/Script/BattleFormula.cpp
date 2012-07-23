@@ -191,6 +191,7 @@ void BattleFormula::init()
 	class_def<GObject::SecondSoul>("getClass", &GObject::SecondSoul::getClass);
 	class_def<GObject::SecondSoul>("getPracticeLevel", &GObject::SecondSoul::getPracticeLevel);
 	class_def<GObject::SecondSoul>("getStateLevel", &GObject::SecondSoul::getStateLevel);
+	class_def<GObject::SecondSoul>("getXinxiu", &GObject::SecondSoul::getXinxiu);
 }
 
 void BattleFormula::postInit()
@@ -221,6 +222,26 @@ float BattleFormula::calcSoulIntelligence(GObject::SecondSoul* ss)
 float BattleFormula::calcSoulWill(GObject::SecondSoul* ss)
 {
 	return call<float>("calcSoulWill", ss);
+}
+
+float BattleFormula::calcSoulXinxiuAttack(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulXinxiuAttack", ss);
+}
+
+float BattleFormula::calcSoulXinxiuAction(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulXinxiuAction", ss);
+}
+
+float BattleFormula::calcSoulXinxiuDefend(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulXinxiuDefend", ss);
+}
+
+float BattleFormula::calcSoulXinxiuHp(GObject::SecondSoul* ss)
+{
+	return call<float>("calcSoulXinxiuHp", ss);
 }
 
 float BattleFormula::calcStrength( GObject::Fighter * fgt )
