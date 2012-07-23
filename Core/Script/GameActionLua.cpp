@@ -1203,7 +1203,6 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
-<<<<<<< HEAD
     
     void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
     {
@@ -1220,7 +1219,6 @@ namespace Script
         return Call<UInt32>("GetExchangePropsID");
     }
 
-=======
     void GameActionLua::sendConsumeMails(Player* player, UInt32 ototal, UInt32 ntotal)
     {
 		return Call<void>("sendConsumeMails", player, ototal, ntotal);
@@ -1230,6 +1228,5 @@ namespace Script
 	{
 		return Call<bool>("onSoSoMapAward", player, off);
 	}
->>>>>>> d2ab1f1841964889069487955e22c7256c1ae556
 }
 

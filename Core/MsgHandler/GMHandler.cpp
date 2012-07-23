@@ -173,17 +173,14 @@ GMHandler::GMHandler()
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
-<<<<<<< HEAD
 	
     Reg(3, "sign", &GMHandler::OnHandleSignIn);
 	
-=======
     Reg(3, "newr", &GMHandler::OnNewRelation);
     Reg(3, "ssopen", &GMHandler::OnSSOpen);
     Reg(3, "ssup", &GMHandler::OnSSUp);
     Reg(3, "sserase", &GMHandler::OnSSErase);
     Reg(3, "sosog", &GMHandler::OnSoSoGet);
->>>>>>> d2ab1f1841964889069487955e22c7256c1ae556
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )

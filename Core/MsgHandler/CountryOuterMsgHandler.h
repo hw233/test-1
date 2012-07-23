@@ -4714,7 +4714,6 @@ void OnGuideUdp( GameMsgHdr& hdr, GuideUdp& req )
     player->guideUdp(req._type, req.p1, req.p2);
 }
 
-<<<<<<< HEAD
 void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
@@ -4781,7 +4780,8 @@ void OnActivitySignIn( GameMsgHdr& hdr, const void * data )
   
     }
     player->send(st);
-=======
+}
+
 void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
 {
     MSG_QUERY_PLAYER(pl);
@@ -4830,7 +4830,6 @@ void OnSkillStrengthen( GameMsgHdr& hdr, const void* data)
                 break;
         }
     }
->>>>>>> d2ab1f1841964889069487955e22c7256c1ae556
 }
 
 #endif // _COUNTRYOUTERMSGHANDLER_H_
