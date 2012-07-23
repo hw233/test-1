@@ -122,7 +122,7 @@ namespace GObject
 		UInt32 now = TimeUtil::Now();
 		float exp = calcExpEach(now);
 		if(m_Player->getBuffData(PLAYER_BUFF_TRAINP3, now))
-			exp *= 1.7f;
+			exp *= 1.8f;
 		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP4, now))
 			exp *= 1.5f;
 		else if(m_Player->getBuffData(PLAYER_BUFF_TRAINP2, now))
@@ -2612,7 +2612,7 @@ namespace GObject
             {
                 UInt32 exp = 0;
                 if(getBuffData(PLAYER_BUFF_TRAINP3, now))
-                    exp = ng->getExp() * 17 / 10;
+                    exp = ng->getExp() * 18 / 10;
                 else if(getBuffData(PLAYER_BUFF_TRAINP4, now))
                     exp = ng->getExp() * 3 / 2;
                 else if(getBuffData(PLAYER_BUFF_TRAINP2, now))
@@ -2719,7 +2719,12 @@ namespace GObject
 		{
 			ret = 0x0101;
 			_lastNg = ng;
-            pendExp(ng->getExp()*expfactor);
+
+            UInt32 exp = 0;
+            if(getBuffData(PLAYER_BUFF_TRAINP3, now))
+                exp = expfactor * ng->getExp() * 18 / 10;
+            pendExp(exp);
+
 			ng->getLoots(this, _lastLoot, lootlvl, &atoCnt);
             //战胜NPC 成就
             GameAction()->doAttainment(this, 10351, npcId);
@@ -8147,11 +8152,11 @@ namespace GObject
 
     float Player::getPracticeBufFactor()
     {
-#if 0
         if(getBuffData(PLAYER_BUFF_PRACTICE1, TimeUtil::Now()))
         {
-            return 0.2;
+            return 0.5;
         }
+#if 0
         if(getBuffData(PLAYER_BUFF_PRACTICE2, TimeUtil::Now()))
         {
             return 0.5;
@@ -8299,7 +8304,13 @@ namespace GObject
 
             UInt32 now = TimeUtil::Now();
             UInt32 duration = 60*60;
+            UInt8 type = 0;
             UInt32 p = getBuffData(PLAYER_BUFF_PROTECT, now);
+            if (!p)
+            {
+                p = getBuffData(PLAYER_BUFF_PRACTICE1, now);
+                type = 1;
+            }
             UInt32 left = 0;
             if (p > 0)
                 left = p - now;
@@ -8307,11 +8318,17 @@ namespace GObject
             if (left >= duration)
             {
                 left -= duration;
-                setBuffData(PLAYER_BUFF_PROTECT, left+now);
+                if (type == 0)
+                    setBuffData(PLAYER_BUFF_PROTECT, left+now);
+                else
+                    setBuffData(PLAYER_BUFF_PRACTICE1, left+now);
             }
             else if (left)
             {
-                setBuffData(PLAYER_BUFF_PROTECT, 0);
+                if (type == 0)
+                    setBuffData(PLAYER_BUFF_PROTECT, 0);
+                else
+                    setBuffData(PLAYER_BUFF_PRACTICE1, 0);
             }
         }
         else
