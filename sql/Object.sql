@@ -98,6 +98,29 @@ CREATE TABLE `athletics_rank` (
   `first4rank` int(10) unsigned NOT NULL DEFAULT '0',
   `extrachallenge` int(10) unsigned NOT NULL DEFAULT '0',
   `pageNum` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `eChallengeTime` int(10) NOT NULL DEFAULT '0',
+  `ePhysical` tinyint(3) NOT NULL DEFAULT '20',
+  `eSelectIndex` tinyint(3) NOT NULL DEFAULT '0',
+  `eCombine1` int(10) NOT NULL DEFAULT '0',
+  `eCombine2` int(10) NOT NULL DEFAULT '0',
+  `eCombine3` int(10) NOT NULL DEFAULT '0',
+  `eCombine4` int(10) NOT NULL DEFAULT '0',
+  `eCombine5` int(10) NOT NULL DEFAULT '0',
+  `eRival1` bigint(20) NOT NULL DEFAULT '0',
+  `eRival2` bigint(20) NOT NULL DEFAULT '0',
+  `eRival3` bigint(20) NOT NULL DEFAULT '0',
+  `eRival4` bigint(20) NOT NULL DEFAULT '0',
+  `eRival5` bigint(20) NOT NULL DEFAULT '0',
+  `eCanAttack1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eCanAttack2` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eCanAttack3` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eCanAttack4` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eCanAttack5` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eRivalType1` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eRivalType2` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eRivalType3` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eRivalType4` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `eRivalType5` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ranker`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1176,6 +1199,8 @@ CREATE TABLE `activityData` (
     `point`   int(10) unsigned NOT NULL,
     `award`   int(10) unsigned NOT NULL,
    `flags`    varchar(255) NOT NULL DEFAULT '',
+    `scores`  int(10) unsigned NOT NULL,
+    `propsID` int(10) unsigned NOT NULL,
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

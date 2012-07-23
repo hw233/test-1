@@ -2427,7 +2427,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             UInt32 size1 = lvPlayer2->size();
             for(UInt32 j = 0; j < size1; ++j)
             {
-                if(i == 0 && pl->getId() == (*lvPlayer2)[j])
+                if(/*i == 0 && */pl->getId() == (*lvPlayer2)[j])
                     continue;
                 idIdx[k] = (*lvPlayer2)[j];
                 ++k;

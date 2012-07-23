@@ -28,9 +28,11 @@ ActivityMgr::~ActivityMgr()
 void ActivityMgr::LoadFromDB(DBActivityData& data)
 {
     _item.overTime = data.overTime;
-    _item.awardID = data.awardID;
-    _item.point = data.point;
-    _item.award = data.award;
+    _item.awardID  = data.awardID;
+    _item.point    = data.point;
+    _item.award    = data.award;
+    _item.scores   = data.scores;
+    _item.propsID  = data.propsID;
 
     //解析flag
     StringTokenizer ntk(data.flags, "|");
@@ -59,7 +61,7 @@ bool ActivityMgr::CheckTimeOver()
     if(now < _item.overTime)
         return false;
     UInt32 over = TimeUtil::SharpDayT(1 , now);
-    _item.Reset( 0  , over);
+    _item.Reset( 0  , over, _item.scores, _item.propsID);
     _onlineReward.clear() ;
     GetOnlineReward(GetOnlineRewardGetNum());
     UpdateToDB();
@@ -97,6 +99,33 @@ void ActivityMgr::AddPoint(UInt32 v)
 }
 
 /**
+ * 添加每日签到积分
+ *
+*/
+void ActivityMgr::AddScores(UInt32 v)
+{
+    if(v <= 0) return;
+    _item.scores += v;
+}
+
+void ActivityMgr::SetPropsID(UInt32 id)
+{
+    if(id <= 0) return;
+    _item.propsID = id;
+}
+
+/*
+ *  兑换道具减少签到积分
+ */
+void ActivityMgr::SubScores(UInt32 v)
+{
+    if(v <= 0) return;
+    _item.scores -= v;
+    if(_item.scores < 0) 
+        _item.scores = 0;
+}
+
+/**
  * 更新数据库
  */
 void ActivityMgr::UpdateToDB()
@@ -110,8 +139,8 @@ void ActivityMgr::UpdateToDB()
              strFlag += "|";
     }
 
-    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s')"  ,
-            this->_owner->getId(), _item.overTime,    _item.awardID,    _item.point, _item.award, strFlag.c_str());
+    DB().PushUpdateData("REPLACE INTO `activityData` (`playerId`, `overTime`, `awardId`,`point`,`award`, `flags`, `scores`, `propsID`) VALUES (%"I64_FMT"u, %u, %u, %u, %u, '%s', '%u', '%u')"  ,
+            this->_owner->getId(), _item.overTime,    _item.awardID,    _item.point, _item.award, strFlag.c_str(), _item.scores, _item.propsID);
 }
 
 UInt8 ActivityMgr::GetOnlineRewardGetNum()
@@ -128,14 +157,13 @@ UInt8 ActivityMgr::GetOnlineRewardGetNum()
 void ActivityMgr::GetOnlineReward(UInt8 cnt)
 {
     lua_tinker::table t = GameAction()->GetOnlineReward(cnt);
-
+    
     UInt32 size = t.size();
     for(UInt32 i = 0; i < size; i++)
     {
         RtyRewards v;
         lua_tinker::table t2 = t.get<lua_tinker::table>(i + 1);
         UInt32 s = t2.size();
-
         for(UInt32 j = 0; j < s; j++)
         {
             lua_tinker::table tt = t2.get<lua_tinker::table>(j + 1);
@@ -215,7 +243,7 @@ void ActivityMgr::ChangeOnlineReward()
 void ActivityMgr::GetReward(UInt32 flag)
 {
     CheckTimeOver();
-
+    
     if(flag != AtyOnlineReward && _item.award & flag)
         return;
 
@@ -237,7 +265,6 @@ void ActivityMgr::GetReward(UInt32 flag)
         UInt32 idx = GetRandomReward() - 1;
         if(idx >= s)
             idx = 0;
-
        //给奖励
         _owner->GetPackage()->Add(_onlineReward[idx].id, _onlineReward[idx].num, true, false, FromDailyActivity);
         _owner->SetVar(VAR_ATYITEM_1+World::_wday-1, _onlineReward[idx].id<<16|_onlineReward[idx].num);
@@ -293,8 +320,7 @@ inline UInt8 GetAtyIDInClient(UInt32 item_enum)
     return  static_cast<UInt8>(item_enum + 1);
 }
 void ActivityMgr::SendActivityInfo(Stream& s)
-{
-
+{ 
     UInt8 c1, m1 = 0;
     UInt8 c2,  m2 = 0;
     UInt8 c3,  m3 = 0;
@@ -303,28 +329,30 @@ void ActivityMgr::SendActivityInfo(Stream& s)
     //刷新活跃度
     c1 =static_cast<UInt8>( GameAction()->GetMaxActivity(vipLevel));
     s<< static_cast<UInt8>(_item.point) << c1;
-
-    //printf("活跃度 : %u  %u\n",  static_cast<UInt8>(_item.point) , c1);
+    //刷新活跃度签到积分、待兑换道具id 
+    s<< static_cast<UInt32>(_item.scores) << static_cast<UInt8>(_item.flag[AtySignIn]);
+    lua_tinker::table props = GameAction()->GetExchangeProps(_item.propsID);
+    s<< static_cast<UInt16>(_item.propsID) << props.get<UInt8>(3) << props.get<UInt16>(2);
     //个数
-    c1 = static_cast<UInt8>(AtyEnd - AtyBegin - 1 + AtyMaxFlag);
+    c1 = static_cast<UInt8>(AtyEnd - AtyBegin - 1 + AtyMaxFlag - 1); //跳过签到
     s<< c1;
-
-   // printf("个数 %u  \n" ,c1);
+   //printf("个数 %u  \n" ,c1);
 
     //各个各个项
     _owner->GetDailyTask(c1,m1,c2,m2,c3,m3);
+    //printf("日常：%u,%u,||%u,%u,||%u,%u\n",c1,m1,c2,m2,c3,m3);
+    s<< GetAtyIDInClient( AtyShimenTask) << c1 << m1;
+    //printf("师门任务, %u  %u\n",c1 ,m1);
 
-   s<< GetAtyIDInClient( AtyShimenTask) << c1 << m1;
-   //printf("师门任务, %u  %u\n",c1 ,m1);
+    s<< GetAtyIDInClient( AtyYamenTask) << c2 << m2;
+    //printf("衙门, %u  %u\n",c1 ,m1);
 
-   s<< GetAtyIDInClient( AtyYamenTask) << c2 << m2;
-  // printf("衙门, %u  %u\n",c1 ,m1);
-
-   s<< GetAtyIDInClient( AtyClanTask) << c3 << m3;
-   //printf("帮拍  %u  %u\n" , c3 ,m3);
+    s<< GetAtyIDInClient( AtyClanTask) << c3 << m3;
+    //printf("帮拍  %u  %u\n" , c3 ,m3);
 
 
-   _owner-> GetFuben(c1,m1,c2,m2,c3,m3);
+    _owner-> GetFuben(c1,m1,c2,m2,c3,m3);
+    //printf("副本：%u,%u,||%u,%u,||%u,%u\n",c1,m1,c2,m2,c3,m3);
     s<< GetAtyIDInClient( AtyCopy ) << c1 << m1;
     //printf("副本  %u  %u\n" , c1 ,m1);
 
@@ -373,7 +401,6 @@ void ActivityMgr::SendActivityInfo(Stream& s)
             m1 =12;
     }
     s<< GetAtyIDInClient( AtyGroupCopy) << c1 << m1;
-    //printf("副本组队  %u  %u\n" , c1 ,m1);
     s << GetAtyIDInClient(AtyTownDeamon) << static_cast<UInt8>(_owner->GetVar(VAR_TOWNDEAMON)) << static_cast<UInt8>(1);
     s << GetAtyIDInClient(AtyShuoShuo) << static_cast<UInt8>(_owner->GetVar(VAR_SHUOSHUO)) << static_cast<UInt8>(1);
     s << GetAtyIDInClient(AtyInvited) << static_cast<UInt8>(_owner->GetVar(VAR_INVITED)) << static_cast<UInt8>(1);
@@ -399,9 +426,10 @@ void ActivityMgr::SendActivityInfo(Stream& s)
 #endif
         else
             m1 = static_cast<UInt8>(GameAction()->GetAtyCheckFlag(i));
-
+        if( i == AtySignIn)  //跳过签到不发送
+            continue;
         s<< GetAtyIDInClient(i ) << c1 << m1;
-       // printf("项目%d : %u  %u\n" , i, c1 ,m1);
+        //printf("项目%d : %u  %u\n" , i, c1 ,m1);
     }
     //奖励
     s<<static_cast<UInt16>(_item.award);
@@ -415,7 +443,7 @@ void ActivityMgr::ActivityList(UInt8 type)
 {
     //自我刷新一下
     CheckTimeOver();
-
+    
     UInt32 time = 0;
     //上线时间检查
     if(_item.flag[AtyLongTime]  == 0)
@@ -428,7 +456,6 @@ void ActivityMgr::ActivityList(UInt8 type)
     }
     Stream st(REP::ACTIVITY_LIST);
     st<<static_cast<UInt8> (type);
-
     if(type & 0x01)
     {
         SendOnlineReward(st);
