@@ -886,11 +886,8 @@ UInt32 BattleSimulator::doXinmoAttack(BattleFighter * bf, BattleObject* bo, DefS
         float def;
         float toughFactor = pr ? area_target->getTough(bf) : 1.0f;
         def = area_target->getDefend();
-        dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor);
-
         float atkreduce = area_target->getAtkReduce();
-        if(atkreduce && dmg > 0)
-            dmg -= atk * atkreduce / 100;
+        dmg = _formula->calcDamage(atk, def, bf->getLevel(), toughFactor, atkreduce);
 
         dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
