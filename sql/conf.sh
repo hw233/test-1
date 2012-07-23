@@ -1,12 +1,12 @@
 #!/bin/bash
 
-H=localhost
+H=192.168.88.250
 U=kingxin
 P=kingxin
 PT=3306
 
-DBD=data_8888
-DBO=asss_8888
+DBD=suntao_Data
+DBO=suntao_Object
 
 OPTIONS="Yes/No/Exit"
 IFS=/

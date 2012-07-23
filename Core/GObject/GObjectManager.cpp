@@ -1887,7 +1887,7 @@ namespace GObject
     	last_id = 0xFFFFFFFFFFFFFFFFull;
 		pl = NULL;
 		DBActivityData atydata;
-		if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
+		if(execu->Prepare("SELECT `playerId`, `overTime`, `awardId`, `point`, `award`, `flags`, `scores`, `propsID` FROM `activityData` ORDER BY  `playerId`", atydata) != DB::DB_OK)
 			return false;
 		lc.reset(1000);
 		while(execu->Next() == DB::DB_OK)

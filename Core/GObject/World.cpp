@@ -191,8 +191,8 @@ bool enum_midnight(void * ptr, void* next)
 		return true;
 	if (pl->isOnline())
 	{
-		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, 0);
-		GLOBAL().PushMsg(hdr, NULL);
+		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, sizeof(nextday));
+		GLOBAL().PushMsg(hdr, &nextday);
 	}
     else
     {

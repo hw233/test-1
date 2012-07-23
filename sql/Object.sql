@@ -1199,6 +1199,8 @@ CREATE TABLE `activityData` (
     `point`   int(10) unsigned NOT NULL,
     `award`   int(10) unsigned NOT NULL,
    `flags`    varchar(255) NOT NULL DEFAULT '',
+    `scores`  int(10) unsigned NOT NULL,
+    `propsID` int(10) unsigned NOT NULL,
     PRIMARY KEY (`playerId`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

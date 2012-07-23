@@ -112,7 +112,7 @@ end
 
 function onLogin(player)
 	local stage = getActivityStage();
-	checkExpire2(player, stage);
+    checkExpire2(player, stage);
     if not player:isOffical() then
         onLoginPF(player)
     end
