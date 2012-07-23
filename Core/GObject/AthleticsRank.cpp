@@ -2251,19 +2251,19 @@ UInt8 getRivalRandomDiffculty()
     UInt16 rate;
     UInt8 rivalDiffculty;
     rate = uRand(1000);
-    if(rate >= 995)
+    if(rate >= 996)
         rivalDiffculty = 7;
-    else if(rate >= 990)
+    else if(rate >= 992)
         rivalDiffculty = 6;
-    else if(rate >= 985)
+    else if(rate >= 988)
         rivalDiffculty = 5;
-     else if(rate >= 980)
+     else if(rate >= 984)
         rivalDiffculty = 4;
-     else if(rate >= 975)
+     else if(rate >= 980)
         rivalDiffculty = 3;
-     else if(rate >= 970)
+     else if(rate >= 976)
         rivalDiffculty = 2;
-     else if(rate >= 965)
+     else if(rate >= 972)
         rivalDiffculty = 1;
      else
         rivalDiffculty = 0;
@@ -2278,7 +2278,7 @@ typedef struct _stAward
 const stAward awardPool[] =
 {
     {29, 1}, {29, 2}, {29, 3}, {55, 1}, {502, 1}, {510, 1},
-    {56, 1}, {57, 1},
+    {56, 1}, {57, 1}, {499, 5},
     {511, 1}, {500, 1}, {499, 10},
     {503, 1}, {514, 1},
     {515, 1}, {509, 1}, {507, 1}
@@ -2304,17 +2304,17 @@ UInt32 AthleticsRank::getAthlRandomAward(UInt8 diffculty, UInt8 opt)
             break;
         case 3:
             {
-                award = awardPool[8 + opt];
+                award = awardPool[9 + opt];
             }
             break;
         case 4:
             {
-                award = awardPool[11 + opt];
+                award = awardPool[12 + opt];
             }
             break;
         case 5:
             {
-                award = awardPool[13 + opt];
+                award = awardPool[14 + opt];
             }
             break;
         default:
@@ -2335,7 +2335,7 @@ UInt8 AthleticsRank::getAthlRandomMaxValue(UInt8 diffculty)
             tmp = 6;
             break;
         case 2:
-            tmp = 2;
+            tmp = 3;
             break;
         case 3:
             tmp = 3;
@@ -2818,6 +2818,7 @@ void AthleticsRank::process()
     UInt8 row;
     AthleticsRankData *data;
     UInt32 Viplvl;
+    bool needSave;
 
     for(row = 0; row <= 1; ++row)
     {
@@ -2826,10 +2827,21 @@ void AthleticsRank::process()
             data = *(it->second);
             if(!data->ranker)
                 continue;
+            needSave = false;
+            //考虑5分钟误差
             Viplvl = data->ranker->getVipLevel();
+            if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl == 6))
+            {
+                needSave = true;
+                data->ePhysical += 6;
+            }
             if(data->ePhysical == MaxPhysical[Viplvl])
+            {
+                if(needSave)
+                    DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", data->ePhysical, data->ranker->getId());
                 continue;
-            if(data->ePhysical > MaxPhysical[Viplvl])
+            }
+            else if(data->ePhysical > MaxPhysical[Viplvl])
                 data->ePhysical = MaxPhysical[Viplvl];
             else
                 data->ePhysical += 1;
