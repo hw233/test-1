@@ -4166,6 +4166,27 @@ void Fighter::makeFighterSSInfo(Stream& st)
     st.data<UInt8>(offset) = c;
 }
 
+void Fighter::getAllSSAndLevel(Stream& st)
+{
+    size_t offset = st.size();
+    st << static_cast<UInt8>(0);
+    UInt8 c = 0;
+    for (int i = 0; i < getUpSkillsMax(); ++i)
+    {
+        if (_skill[i])
+        {
+            SStrengthen* ss = SSGetInfo(_skill[i]);
+            if (!ss)
+            {
+                ++c;
+                UInt16 skill_id = SKILL_ID(_skill[i]);
+                st << static_cast<UInt16>(SKILLANDLEVEL(skill_id, ss->lvl));
+            }
+        }
+    }
+    st.data<UInt8>(offset) = c;
+}
+
 #define SS_MAXLVL 9
 void Fighter::SSOpen(UInt16 id)
 {

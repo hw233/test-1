@@ -489,6 +489,7 @@ void BattleSimulator::start(UInt8 prevWin)
                     _packet << bf->getFighter()->getPeerlessAndLevel();
                     bf->getFighter()->getAllUpSkillAndLevel(_packet);
                     bf->getFighter()->getAllPSkillAndLevel(_packet);
+                    bf->getFighter()->getAllSSAndLevel(_packet);
                     
 					if(ismain && (prevWin-1) != i)
 					{

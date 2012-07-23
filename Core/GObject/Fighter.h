@@ -423,6 +423,8 @@ public:
     static inline bool isMainFighter(UInt32 id) { return id > 0 && id < 10; }
     inline bool isMainFighter() { return isMainFighter(_id); }
 
+    void getAllSSAndLevel(Stream& st);
+
 public:
 	inline const GData::AttrExtra * getAttrExtraEquip() { checkDirty(); return &_attrExtraEquip; }
 	inline UInt16 getExtraStrength() { checkDirty(); return _attrExtraEquip.strength; }
