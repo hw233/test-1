@@ -604,7 +604,7 @@ void OnSaleItemSearchReq( GameMsgHdr& hdr, const void * data )
 	player->GetSale()->searchMySale(*saleSearchReq);
 }
 
-void OnDailyCheck( GameMsgHdr& hdr, const void * )
+void OnDailyCheck( GameMsgHdr& hdr, const void * data )
 {
 	MSG_QUERY_PLAYER(player);
 
@@ -623,6 +623,7 @@ void OnDailyCheck( GameMsgHdr& hdr, const void * )
     player->SetVar(VAR_JUNE_HAPPY, 0);
     player->SetVar(VAR_JUNE_ITEM, 0);
     player->sendHappyInfo();
+    player->SendNextdayTime( *(UInt32*)data );
 }
 
 void OnExpGainByInstantCompleteReq( GameMsgHdr& hdr, const void * data )

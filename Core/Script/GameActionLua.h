@@ -290,8 +290,12 @@ namespace Script
 
     public:
         void doAty( Player* pl, UInt32 id,  UInt32 param1, UInt32 param2);
-        UInt32  GetAtyCheckFlag(UInt32 idx);
-        UInt32  GetMaxActivity(UInt32 vip);
+        void doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day);
+        UInt32 GetAtyCheckFlag(UInt32 idx);
+        UInt32 GetMaxActivity(UInt32 vip);
+        lua_tinker::table GetExchangeProps(UInt32 id);
+        UInt32 GetExchangePropsID();
+
 	private:
 		Player* _player1;	//?ű???????Ϊ????1
 		Player* _player2;	//?ű???????Ϊ????2

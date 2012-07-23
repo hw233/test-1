@@ -328,7 +328,8 @@ namespace Script
         CLASS_DEF(ActivityMgr, UpdateToDB);
         CLASS_DEF(ActivityMgr, GetPoint);
         CLASS_DEF(ActivityMgr, AddRewardFlag);
-		
+        CLASS_DEF(ActivityMgr, AddScores);
+	    	
         //????
 		CLASS_ADD(Package);
 		CLASS_DEF(Package, Add);
@@ -1182,5 +1183,21 @@ namespace Script
     {
 		return Call<void>("sendRechargeMails", player, ototal, ntotal);
     }
+    
+    void GameActionLua::doAtySignIn(Player* pl, UInt32 id, UInt32 month, UInt32 day)
+    {
+        return Call<void>("doAtySignIn", pl, id, month, day);
+    }
+    
+    lua_tinker::table GameActionLua::GetExchangeProps(UInt32 id)
+    {
+        return Call<lua_tinker::table>("GetExchangeProps", id);
+    }
+
+    UInt32 GameActionLua::GetExchangePropsID()
+    {
+        return Call<UInt32>("GetExchangePropsID");
+    }
+
 }
 

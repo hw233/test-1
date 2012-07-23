@@ -173,6 +173,9 @@ GMHandler::GMHandler()
 	Reg(3, "rc7ton", &GMHandler::OnRC7TurnOn);
 	Reg(3, "vars", &GMHandler::OnAddVarS);
 	Reg(3, "ld", &GMHandler::OnLuckyDraw);
+	
+    Reg(3, "sign", &GMHandler::OnHandleSignIn);
+	
 }
 
 void GMHandler::Reg( int gmlevel, const std::string& code, GMHandler::GMHPROC proc )
@@ -497,7 +500,7 @@ void GMHandler::OnAddMoney( GObject::Player * player, std::vector<std::string>& 
 	if(args.size() == 1)
 	{
 		UInt32 val = atoi(args[0].c_str());
-		if(val == 0)
+        if(val == 0)
 			return;
 		player->getCoin(val);
 	}
@@ -2733,3 +2736,35 @@ void GMHandler::OnLuckyDraw(GObject::Player* player, std::vector<std::string>& a
     luckyDraw.draw(player, id, num, bind);
 }
 
+void GMHandler::OnHandleSignIn(GObject::Player* player, std::vector<std::string>& args)
+{
+	if(args.size() < 1)
+		return;
+	if(args.size() == 1)
+        return;
+	else
+	{
+		ActivityMgr* mgr = player->GetActivityMgr();
+        switch(atoi(args[0].c_str()))
+		{
+		case 1:
+			{
+				UInt32 val = atoi(args[1].c_str());
+                if(val == 0)
+                    return;
+                mgr->AddScores(val);
+                mgr->UpdateToDB();
+            }
+            break;
+        case 2:
+            {
+				UInt32 val = atoi(args[1].c_str());
+                if(val < 0 || val > 1)
+                    return;
+                mgr->UpdateFlag(AtySignIn, val);
+                mgr->UpdateToDB();
+            }
+            break;
+        }
+    }
+}

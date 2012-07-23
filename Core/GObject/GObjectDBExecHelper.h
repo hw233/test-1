@@ -937,6 +937,8 @@ struct DBActivityData
     UInt32 point;
     UInt32 award;
     std::string flags;
+    UInt32 scores;
+    UInt32 propsID;
 };
 struct DBHeroMemo
 {
@@ -2058,14 +2060,16 @@ SPECIALDEF(4)
 SPECIALEND()
 
 SPECIALBEGIN(GObject::DBActivityData)
-SPECIALDEF(6)
+SPECIALDEF(8)
 (
-    UInt64,playerId,
+    UInt64, playerId,
     UInt32, overTime,
     UInt32, awardID,
     UInt32, point,
     UInt32, award,
-    std::string, flags    
+    std::string, flags,   
+    UInt32, scores,
+    UInt32, propsID
 )
 SPECIALEND()
 

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-H=localhost
+H=192.168.88.250
 U=kingxin
 P=kingxin
 PT=3306
-DBL=log_8888
+DBL=suntao_Log
 OPTIONS="Yes/No/Exit"
 IFS=/
 

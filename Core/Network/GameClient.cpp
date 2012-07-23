@@ -284,7 +284,7 @@ void GameClient::onDisconnected()
 bool GameClient::active()
 {
 	GObject::Player * player = m_Player.value();
-	return player != NULL && player->isOnline();
+    return player != NULL && player->isOnline();
 }
 
 void GameClient::OnTick(UInt32 now)

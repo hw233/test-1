@@ -135,6 +135,8 @@ private:
     void OnRC7TurnOn(GObject::Player* player, std::vector<std::string>& args);
     void OnAddVarS(GObject::Player* player, std::vector<std::string>& args);
     void OnLuckyDraw(GObject::Player* player, std::vector<std::string>& args);
+    
+    void OnHandleSignIn(GObject::Player* player, std::vector<std::string>& args);
 };
 
 extern GMHandler gmHandler;

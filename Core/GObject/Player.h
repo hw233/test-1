@@ -574,6 +574,10 @@ namespace GObject
 
 		UInt8 GetCountryThread();
 
+        //玩家每日签到接口
+        void ActivitySignIn();
+        void SendNextdayTime(UInt32 nextDay); 
+
 		void Login();
         void sendCreateMail();
         void sendOpenAct(UInt32);
@@ -643,7 +647,7 @@ namespace GObject
 		inline void setThreadId(UInt8 cny)	 { _threadId = cny; }
 
 		inline UInt8 getCountry() const		{ return _playerData.country; }
-		void setCountry(UInt8 cny);
+        void setCountry(UInt8 cny);
 
         void OnSelectCountry();
 		inline UInt16 getLocation()			{ return _playerData.location; }
