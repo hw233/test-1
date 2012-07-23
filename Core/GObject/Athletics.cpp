@@ -584,7 +584,7 @@ void Athletics::attackMartial(Player* defer)
 
 void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
-    _owner->addFlag(GObject::Player::AthleticsBuff);
+    atker->addFlag(GObject::Player::AthleticsBuff);
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);
 	bsim.setFormation( 0, formation );
 	bsim.setPortrait( 0, portrait );
@@ -599,7 +599,7 @@ void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrai
 	_owner->PutFighters( bsim, 1, true );
 	bsim.start();
 	bool res = bsim.getWinner() == 1;
-    _owner->delFlag(GObject::Player::AthleticsBuff);
+    atker->delFlag(GObject::Player::AthleticsBuff);
 
 	Stream st(REP::ATTACK_NPC);
 	st << static_cast<UInt8>(res ? 1 : 0) << static_cast<UInt8>(0) << bsim.getId() << Stream::eos;
