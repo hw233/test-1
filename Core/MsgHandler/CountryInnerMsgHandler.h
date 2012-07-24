@@ -307,7 +307,10 @@ void OnAthleticsAwardReq(GameMsgHdr& hdr, const void * data)
 	struct GObject::AthleticsAward *awd = reinterpret_cast<struct GObject::AthleticsAward *>(const_cast<void *>(data));
     if(awd->itemId && awd->itemCount)
     {
-        player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
+        if(awd->itemId == 499)
+            player->getCoupon(awd->itemCount);
+        else
+            player->GetPackage()->AddItem(awd->itemId, awd->itemCount, 1, false, FromAthletAward);
     }
     if(awd->prestige)
     {
