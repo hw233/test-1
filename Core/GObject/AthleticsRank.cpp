@@ -949,8 +949,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
         return ;
     }
     data->challengenum = updateChallengeNum(data->challengenum, data->eChallengeTime);
-    if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
-        return ;
+    //if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
+    //    return ;
     data->challengenum ++;
     data->eChallengeTime = TimeUtil::Now();
 
