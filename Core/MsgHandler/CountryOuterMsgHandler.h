@@ -3039,6 +3039,8 @@ int ToMsgCenter(Stream st)
 		close(sockfd);
 		return E_FAIL;
 	}
+
+    close(sockfd);
     return 0;
 }
 void OnChatReq( GameMsgHdr& hdr, ChatReq& cr )
