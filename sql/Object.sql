@@ -1327,7 +1327,7 @@ CREATE TABLE `second_soul` (
   `fighterId` int(10) unsigned NOT NULL,
   `playerId` bigint(20) unsigned NOT NULL,
   `cls` tinyint(3) unsigned NOT NULL,
-  `xinxiu` tinyint(3) unsigned NOT NULL,
+  `xinxiu` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `practiceLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `stateLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `stateExp` int(10) unsigned NOT NULL DEFAULT 0,
