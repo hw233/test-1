@@ -949,8 +949,8 @@ void AthleticsRank::challenge2(Player * atker, std::string& name, UInt8 type, UI
         return ;
     }
     data->challengenum = updateChallengeNum(data->challengenum, data->eChallengeTime);
-    if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
-        return ;
+    //if (data->challengenum >= Maxchallengenum[Viplvl] && cfg.GMCheck)
+    //    return ;
     data->challengenum ++;
     data->eChallengeTime = TimeUtil::Now();
 
@@ -1793,7 +1793,7 @@ UInt32 AthleticsRank::addAthleticsEventData(UInt8 row, Player* player1, Player* 
 		_athleticsesEvent[row].pop_front();
 	}
 	_athleticsesEvent[row].push_back(data);
-	DB6().PushUpdateData("INSERT INTO `athletics_event` (`id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time`) VALUES(%u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u, %u)", data->id, row, player1 ? player1->getId() : 0, player2 ? player2->getId() : 0, data->cond, data->color, data->value, data->itemCount, data->itemId, data->time);
+	DB6().PushUpdateData("INSERT INTO `athletics_event` (`id`, `row`, `player1`, `player2`, `cond`, `color`, `value`, `itemcount`, `itemid`, `time`) VALUES(%u, %u, %"I64_FMT"u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", data->id, row, player1 ? player1->getId() : 0, player2 ? player2->getId() : 0, data->cond, data->color, data->value, data->itemCount, data->itemId, data->time);
 
     broadcastAthleticsEvent(15);
 
@@ -2374,15 +2374,15 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         index = 1;
     UInt8 diffculty = (data->eCombine[index - 1] >> 24) & 0xFF;
     if(diffculty == 2)
-        level += 1;
-    else if(diffculty == 3)
-        level += 2;
-    else if(diffculty == 4)
-        level += 3;
-    else if(diffculty == 5)
-        level += 5;
-    else
         ;
+    else if(diffculty == 3)
+        level += 1;
+    else if(diffculty == 4)
+        level += 2;
+    else if(diffculty == 5)
+        level += 3;
+    else
+        level -= 1;
 
     GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
     if(it == GObject::globalLevelsPlayers.end())
@@ -2392,9 +2392,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     if(it == GObject::globalLevelsPlayers.end())
         it = GObject::globalLevelsPlayers.find(level - 3);
     if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 4);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 5);
+        it = GObject::globalLevelsPlayers.find(level + 1);
     if(it == GObject::globalLevelsPlayers.end())
         return;
 
@@ -2448,22 +2446,22 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
             roll0 = (roll0 + 1) % size;
         }
         UInt32 roll1 = rnd(size);
-        while((size2 > roll1 && pl->getId() == (*lvPlayer)[roll1]) || roll1 == roll0)
+        while(size2 > roll1 && (pl->getId() == (*lvPlayer)[roll1] || roll1 == roll0))
         {
             roll1 = (roll1 + 1) % size;
         }
         UInt32 roll2 = rnd(size);
-        while((size2 > roll2 && pl->getId() == (*lvPlayer)[roll2]) || roll2 == roll0 || roll2 == roll1)
+        while(size2 > roll2 && (pl->getId() == (*lvPlayer)[roll2] || roll2 == roll0 || roll2 == roll1))
         {
             roll2 = (roll2 + 1) % size;
         }
         UInt32 roll3 = rnd(size);
-        while((size2 > roll3 && pl->getId() == (*lvPlayer)[roll3]) || roll3 == roll0 || roll3 == roll1 || roll3 == roll2)
+        while(size2 > roll3 && (pl->getId() == (*lvPlayer)[roll3] || roll3 == roll0 || roll3 == roll1 || roll3 == roll2))
         {
             roll3 = (roll3 + 1) % size;
         }
         UInt32 roll4 = rnd(size);
-        while((size2 > roll4 && pl->getId() == (*lvPlayer)[roll4]) || roll4 == roll0 || roll4 == roll1 || roll4 == roll2 || roll4 == roll3)
+        while(size2 > roll4 && (pl->getId() == (*lvPlayer)[roll4] || roll4 == roll0 || roll4 == roll1 || roll4 == roll2 || roll4 == roll3))
         {
             roll4 = (roll4 + 1) % size;
         }
@@ -2711,6 +2709,7 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
             count = awardId & 0xFFFF;
             //_owner->GetPackage()->AddItem(itemId, count, 1, true, FromAthletAward);
             AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, 0, itemId, count};
+            atkerAthleticsAward.prestige = 50 * (World::_wday == 3 ? 2 : 1);
             GameMsgHdr hdr2(0x217, pl->getThreadId(), pl, sizeof(AthleticsAward));
             GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
             wins = 0;
@@ -2830,7 +2829,7 @@ void AthleticsRank::process()
             needSave = false;
             //考虑5分钟误差
             Viplvl = data->ranker->getVipLevel();
-            if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl == 6))
+            if(((TimeUtil::Now() % 86400 < 300) || (TimeUtil::Now() % 86400 > 86100)) && (Viplvl >= 6))
             {
                 needSave = true;
                 data->ePhysical += 6;
