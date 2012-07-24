@@ -610,7 +610,7 @@ void WBoss::appear(UInt32 npcid, UInt32 oldid)
         float hp_factor = (float)WBOSS_BASE_TIME / (float)m_last;
         if(hp_factor > WBOSS_MAX_ASC_HP_FACTOR)
             hp_factor = WBOSS_MAX_ASC_HP_FACTOR;
-        UInt32 ohp = ohp * hp_factor;
+        ohp = ohp * hp_factor;
         if (ohp < WBOSS_MIN_HP)
             ohp = WBOSS_MIN_HP;
         if (ohp > WBOSS_MAX_HP)
@@ -711,7 +711,8 @@ void WBoss::disapper()
     _mgr->setBossName(m_idx, ""); // XXX: must before setBossSt
     _mgr->setBossSt(m_idx, 2);
 
-    updateLastDB(TimeUtil::Now());
+    if(m_final)
+        updateLastDB(TimeUtil::Now());
     m_extra = false;
     m_last = 0;
     m_appearTime = 0;

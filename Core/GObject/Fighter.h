@@ -675,6 +675,7 @@ public:
     UInt8 getSoulExtraAura();
     bool practiceLevelUp();
     bool changeSecondSoulClass(UInt8 cls);
+    bool changeSecondSoulXinxiu(UInt8 xinxiu);
 
     void enchantSoul(UInt32 itemId, bool bind, std::vector<SoulItemExp>& soulItemExpOut);
     bool equipSoulSkill(UInt8 idx, UInt32 itemId, bool bind=true);

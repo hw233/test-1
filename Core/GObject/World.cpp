@@ -105,6 +105,7 @@ bool World::_qqgameact = false;
 void* World::_recalcwd = NULL;
 bool World::_june = false;
 bool World::_june1 = false;
+bool World::_enchant_gt11 = false;
 
 World::World(): WorkerRunner<WorldMsgHandler>(1000), _worldScript(NULL), _battleFormula(NULL), _now(TimeUtil::Now()), _today(TimeUtil::SharpDay(0, _now + 30)), _announceLast(0)
 {

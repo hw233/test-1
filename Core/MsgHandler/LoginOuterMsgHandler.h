@@ -57,6 +57,19 @@ bool checkKey(UInt8 type, const UInt8* _hashval, UInt64 _userid);
         return;\
 }
 
+static void serverNameToGlobalName(string& name, UInt16 sid)
+{
+    if(cfg.merged)
+    {
+        do
+        {
+            name.push_back(static_cast<char>((sid % 31) + 1));
+            sid /= 31;
+        }
+        while(sid > 0);
+    }
+}
+
 static bool initMemcache()
 {
     bool hasServer = false;
@@ -544,6 +557,14 @@ void NewUserReq( LoginMsgHdr& hdr, NewUserStruct& nu )
             pl->setOpenId(nu._openid);
             pl->setOpenKey(nu._openkey);
             pl->setVia(nu._via);
+            if(cfg.merged)
+            {
+                UInt64 inviterId = (pl->getId() & 0xffff000000000000) + atoll(nu._invited.c_str());
+                char szTmp[128];
+                sprintf(szTmp, "%ld", inviterId);
+                string strTmp(szTmp);
+                nu._invited  = strTmp;
+            }
             pl->setInvited(nu._invited);
 
 			DBLOG1().PushUpdateData("insert into register_states(server_id,player_id,player_name,platform,reg_time) values(%u,%"I64_FMT"u, '%s', %u, %u)", cfg.serverLogId, pl->getId(), pl->getName().c_str(), atoi(nu._platform.c_str()), TimeUtil::Now());
@@ -632,7 +653,14 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
     br>>num;
     br>>uint;
     br>>money;
+    UInt64 player_Id_tmp = player_Id;
 
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        player_Id += (static_cast<UInt64>(serverNo) << 48);
+    }
 #ifdef _FB
 #else
     initMemcache();
@@ -645,7 +673,7 @@ void onUserRecharge( LoginMsgHdr& hdr, const void * data )
 
         int retry = 3;
         memcached_return rc;
-        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", player_Id, token.c_str());
+        len = snprintf(key, sizeof(key), "token_27036_%"I64_FMT"u_%s", /*player_Id*/player_Id_tmp, token.c_str());
         while (retry)
         {
             --retry;
@@ -980,13 +1008,21 @@ void LockUser(LoginMsgHdr& hdr,const void * data)
     st.init(SPEP::LOCKUSER,0x01);
     BinaryReader br(data,hdr.msgHdr.bodyLen);
     UInt64 playerId;
-    UInt64 expireTime;
+    //UInt64 expireTime;
+    UInt32 expireTime;
     CHKKEY();
     br>>playerId;
     br>>expireTime;
     INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, playerId, expireTime);
     st<<playerId;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        playerId += (static_cast<UInt64>(serverNo) << 48);
+    }
     GObject::Player * pl= GObject::globalPlayers[playerId];
+
     if(pl==NULL)
     {
         st<<static_cast<UInt32>(1);
@@ -1025,6 +1061,12 @@ void UnlockUser(LoginMsgHdr& hdr,const void * data)
     br>>playerId;
     INFO_LOG("GM[%s]: %"I64_FMT"u", __PRETTY_FUNCTION__, playerId);
     st<<playerId;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        playerId += (static_cast<UInt64>(serverNo) << 48);
+    }
     GObject::Player * pl= GObject::globalPlayers[playerId];
     if(pl==NULL)
         st<<static_cast<UInt32>(1);
@@ -1147,12 +1189,18 @@ void BanChatFromBs(LoginMsgHdr &hdr,const void * data)
     CHKKEY();
     br>>playerNameList;
     br>>time;
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+    {
+        br>>serverNo;
+    }
     StringTokenizer stk(playerNameList,"%");
     st<<playerNameList;
 	std::string result="";
     for(StringTokenizer::Iterator it=stk.begin();it!=stk.end();it++)
     {
         std::string playerName =*it;
+        serverNameToGlobalName(playerName, serverNo);
         GObject::Player *player=GObject::globalNamedPlayers[playerName];
         if(player==NULL)
         {
@@ -1214,6 +1262,11 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 		item[i].count = count;
         INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+    {
+        br>>serverNo;
+    }
 	for(UInt32 i = 0; i < 4; i ++)
 	{
 		if(money[i] == 0)
@@ -1224,6 +1277,7 @@ void AddItemFromBs(LoginMsgHdr &hdr,const void * data)
 	for(StringTokenizer::Iterator it=stk.begin();it!=stk.end();it++)
 	{
 		std::string playerName =*it;
+        serverNameToGlobalName(playerName, serverNo);
 		GObject::Player *player=GObject::globalNamedPlayers[playerName];
 		if(player==NULL)
 		{
@@ -1284,7 +1338,12 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 		item[i].count = count;
         INFO_LOG("GM[%s]: %u, %u", __PRETTY_FUNCTION__, item[i].id, count);
 	}
-	for(UInt32 i = 0; i < 4; i ++)
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+    {
+        br>>serverNo;        
+    }
+    for(UInt32 i = 0; i < 4; i ++)
 	{
 		if(money[i] == 0)
 			continue;
@@ -1294,6 +1353,10 @@ void AddItemFromBsById(LoginMsgHdr &hdr,const void * data)
 	for(StringTokenizer::Iterator it=stk.begin();it!=stk.end();it++)
 	{
 		UInt64 playerID = strtoll((*it).c_str(),NULL, 10);
+        if(cfg.merged)
+        {
+            playerID += (static_cast<UInt64>(serverNo) << 48);
+        }
 		GObject::Player *player=GObject::globalPlayers[playerID];
 		if(player==NULL)
 		{
@@ -1385,6 +1448,12 @@ void SetLevelFromBs(LoginMsgHdr& hdr, const void * data)
     CHKKEY();
     br>>id;
     br>>level;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        id += (static_cast<UInt64>(serverNo) <<  48);
+    }
 
     INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, level);
 
@@ -1439,10 +1508,16 @@ void AddItemToAllFromBs(LoginMsgHdr &hdr,const void * data)
 		item[nums++].count = money[i];
 	}
 
+    UInt16 serverNo = 0;
+    if(cfg.merged)
+    {
+        br>>serverNo;
+    }
+
     for (GObject::GlobalPlayers::iterator it = GObject::globalPlayers.begin(), end = GObject::globalPlayers.end(); it != end; ++it)
 	{
 		GObject::Player *player=it->second;
-		if(player==NULL)
+		if(player==NULL || (serverNo != 0 && serverNo != (static_cast<UInt16>(player->getId()>>48))))
 		{
 			result+="1 ";
 		}
@@ -1557,6 +1632,12 @@ void SetPropsFromBs(LoginMsgHdr &hdr,const void * data)
     br>>pexp;
     br>>prestige; // 声望
     br>>honor; // 荣誉
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        id += (static_cast<UInt64>(serverNo) << 48);
+    }
 
     INFO_LOG("GM[%s]: %"I64_FMT"u, %u, %u, %u", __PRETTY_FUNCTION__, id, pexp, prestige, honor);
 
@@ -1605,11 +1686,18 @@ void SetMoneyFromBs(LoginMsgHdr &hdr,const void * data)
     br>>tael;
     br>>coupon;
     br>>achievement;
-
     INFO_LOG("GM[%s]: %"I64_FMT"u, %s, %u, %u, %u, %u, %u",
             __PRETTY_FUNCTION__, id, token.c_str(), type, gold, tael, coupon, achievement);
 
     st<<id;
+
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        id += (static_cast<UInt64>(serverNo) << 48);
+    }
+
     st<<type;
 
     UInt8 ret = 0;
@@ -1712,6 +1800,12 @@ void SetVIPLFromBs(LoginMsgHdr &hdr, const void * data)
     br>>lv;
     st<<id;
     st<<lv;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        id += (static_cast<UInt64>(serverNo) << 48);
+    }
 
     INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, lv);
 
@@ -1742,6 +1836,12 @@ void ClearTaskFromBs(LoginMsgHdr &hdr, const void * data)
     INFO_LOG("GM[%s]: %"I64_FMT"u, %u", __PRETTY_FUNCTION__, id, type);
 
     UInt8 ret = 1;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        id += (static_cast<UInt64>(serverNo) << 48);
+    }
     GObject::Player * pl = GObject::globalPlayers[id];
     if (pl)
     {
@@ -1780,18 +1880,29 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
     UInt8 type;
     CHKKEY();
     br >> type;
+    UInt16 serverNo = 0;
 
     GObject::Player* player = NULL;
     if (type == 1)
     {
         UInt64 pid;
         br >> pid;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            pid += (static_cast<UInt64>(serverNo) << 48);
+        }
         player = GObject::globalPlayers[pid];
     }
     else if (type == 2)
     {
         std::string playerName;
         br >> playerName;
+        if(cfg.merged)
+        {
+            br>>serverNo;
+            serverNameToGlobalName(playerName, serverNo);
+        }
         player = GObject::globalNamedPlayers[playerName];
     }
     else
@@ -1799,8 +1910,17 @@ void PlayerInfoFromBs(LoginMsgHdr &hdr, const void * data)
 
     if (player)
     {
-        st << player->getId();
-        st << player->getName();
+        if(cfg.merged)
+        {
+            UInt64 playerId = player->getId();
+            playerId = (playerId & 0x0000ffffffffffff);
+            st << playerId;
+        }
+        else
+        {
+            st << player->getId();
+        }
+        st << player->patchShowName(player->getName().c_str());
         st << player->GetLev();
         st << player->getCountry();
         st << player->GetClass();
@@ -1956,6 +2076,12 @@ void PwdInfo(LoginMsgHdr &hdr, const void * data)
     UInt64 playerId = 0;
     br >> playerId;
 
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        playerId += (static_cast<UInt64>(serverNo) << 48);
+    }
 	GObject::Player * pl= GObject::globalPlayers[playerId];
     if (!pl)
         return;
@@ -1978,7 +2104,12 @@ void PwdReset(LoginMsgHdr &hdr, const void * data)
     CHKKEY();
     UInt64 playerId = 0;
     br >> playerId;
-
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        playerId += (static_cast<UInt64>(serverNo) << 48);
+    }
 	GObject::Player * pl= GObject::globalPlayers[playerId];
     if (!pl)
         return;
@@ -2011,6 +2142,13 @@ void SetCFriend(LoginMsgHdr& hdr, const void* data)
     std::string name2;
     br >> name1;
     br >> name2;
+    if(cfg.merged)
+    {
+        UInt16 serverNo = 0;
+        br>>serverNo;
+        serverNameToGlobalName(name1, serverNo);
+        serverNameToGlobalName(name2, serverNo);
+    }
 	GObject::Player * pl1 = GObject::globalNamedPlayers[name1];
 	GObject::Player * pl2 = GObject::globalNamedPlayers[name2];
     UInt8 ret = 1;

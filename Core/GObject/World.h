@@ -181,6 +181,10 @@ public:
     { _gemmergeact = v; }
     inline static bool getGemMergeAct()
     { return _gemmergeact; }
+    inline static void setEnchantGt11(bool v)
+    { _enchant_gt11 = v; }
+    inline static bool getEnchantGt11()
+    { return _enchant_gt11; }
 
 
     inline static void setJune(bool v)
@@ -252,6 +256,7 @@ public:
     static void* _recalcwd;
     static bool _june;
     static bool _june1;
+    static bool _enchant_gt11;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }

@@ -1951,7 +1951,7 @@ namespace GObject
             if(rank[dbd.row] > ATHLETICS_RANK_MAX_CNT)
                 rank[dbd.row] = ATHLETICS_RANK_MAX_CNT + 1;
             data->rank = rank[dbd.row];
-            if(rank[dbd.row] != dbd.rank && rank[dbd.row] <= ATHLETICS_RANK_MAX_CNT)
+            if(rank[dbd.row] != dbd.rank/* && rank[dbd.row] <= ATHLETICS_RANK_MAX_CNT*/)
             {
                 DB6().PushUpdateData("UPDATE `athletics_rank` SET `rank` = %u WHERE `ranker` = %"I64_FMT"u", data->rank, dbd.ranker);
             }
@@ -4144,7 +4144,7 @@ namespace GObject
         LoadingCounter lc("Loading Fighter Second Soul:");
 		DBSecondSoul dbss;
         Player* pl = NULL;
-		if(execu->Prepare("SELECT `fighterId`, `playerId`, `cls`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul`", dbss) != DB::DB_OK)
+		if(execu->Prepare("SELECT `fighterId`, `playerId`, `cls`, `xinxiu`, `practiceLevel`, `stateLevel`, `stateExp`, `skills` FROM `second_soul`", dbss) != DB::DB_OK)
 			return false;
 		lc.reset(20);
 		UInt64 last_id = 0xFFFFFFFFFFFFFFFFull;
@@ -4164,7 +4164,7 @@ namespace GObject
                 continue;
             }
 
-            SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel);
+            SecondSoul* secondSoul = new SecondSoul(fgt, dbss.cls, dbss.xinxiu, dbss.practiceLevel, dbss.stateExp, dbss.stateLevel);
             StringTokenizer tokenizer(dbss.skills, ",");
             int idx = 0;
             for(size_t j = 0; j < tokenizer.count(); ++ j)

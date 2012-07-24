@@ -104,7 +104,7 @@ public:
 
     void sendStatus(Player* pl);
     void sendEnter(Player* pl);
-    void sendPreliminary(Player* pl);
+    void sendPreliminary(Player* pl, UInt8 flag);
 private:
 	static void appendLineup( Stream& st, Player * player);
 	static void appendEquipInfo( Stream& st, ItemEquip * equip );

@@ -1143,7 +1143,7 @@ namespace GObject
 		std::string& fixName(std::string& name);
 		inline void patchMergedName() { patchMergedName(_id, _playerData.name); }
 		static void patchMergedName(UInt64 id, std::string& name);
-
+        const char *patchShowName(const char* name, const UInt64 playerId = 0);
 		void autoCB(bool = true);
 
 	public:
@@ -1164,7 +1164,7 @@ namespace GObject
 	private:
 		UInt32 calcVipLevel();
 		UInt32 calcYDVipLevel(UInt32);
-        UInt8 calcRechargeLevel(UInt32);
+        UInt8 calcRechargeLevel(UInt32, UInt8&);
 		Player * _findFriend( UInt8 type, std::string& name );
 		bool _hasFriend( UInt8 type, Player * pl ) const;
 		inline Player * _findFriend(std::string& name) { return _findFriend(0, name); }
@@ -1185,7 +1185,7 @@ namespace GObject
 
 		void sendVIPMails(UInt8, UInt8);
 		void sendYDVIPMails(UInt8, UInt8);
-        void sendRechargeMails(UInt8, UInt8);
+        void sendRechargeMails(UInt8, UInt8, UInt8);
 		void checkIcExpire(bool = true);
 		void sendBlockBossMail(UInt8, UInt8);
 
@@ -1377,6 +1377,7 @@ namespace GObject
     public:
         bool enchanted8(UInt32);
         void sendEnchanted8Box();
+        void enchantGt11();
 
     public:
         void udpLog(const char* str1, const char* str2, const char* str3, const char* str4,

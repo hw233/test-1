@@ -3453,7 +3453,7 @@ UInt8 Clan::skillLevelUp(Player* pl, UInt8 skillId)
             Stream st(REP::CLAN_INFO_UPDATE);
             st << static_cast<UInt8>(5) << cm->proffer << Stream::eos;
             pl->send(st);
-            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %u", cm->proffer, cm->player->getId());
+            DB5().PushUpdateData("UPDATE `clan_player` SET `proffer` = %u WHERE `playerId` = %"I64_FMT"u", cm->proffer, cm->player->getId());
         }
 
         GameMsgHdr hdr1(0x312, pl->getThreadId(), pl, sizeof(skillId));

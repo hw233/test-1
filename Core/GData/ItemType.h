@@ -103,6 +103,16 @@ inline bool IsEquip(UInt8 subClass)
 	return subClass >= static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Trump);
 }
 
+inline bool IsWeapon(UInt8 subClass)
+{
+    return subClass == static_cast<UInt8>(Item_Weapon);
+}
+
+inline bool IsArmor(UInt8 subClass)
+{
+    return subClass > static_cast<UInt8>(Item_Weapon) && subClass <= static_cast<UInt8>(Item_Ring);
+}
+
 inline UInt8 getGemLev(UInt32 id)
 {
     UInt8 lev = id%10;

@@ -101,6 +101,8 @@ void WorldScript::init()
 	def("setSSDTAct", GObject::World::setSSDTAct);
 	def("getGemMergeAct", GObject::World::getGemMergeAct);
 	def("setGemMergeAct", GObject::World::setGemMergeAct);
+	def("getEnchantGt11", GObject::World::getEnchantGt11);
+	def("setEnchantGt11", GObject::World::setEnchantGt11);
     def("setBlueDiamondAct", GObject::World::setBlueDiamondAct);
     def("setYellowDiamondAct", GObject::World::setYellowDiamondAct);
     def("setQQGameAct", GObject::World::setQQGameAct);

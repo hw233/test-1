@@ -111,6 +111,7 @@ namespace Script
         lua_tinker::def(_L, "getRandGem" ,      GObject::getRandGem);
 		lua_tinker::def(_L, "getChingMing", GObject::World::getChingMing);
 		lua_tinker::def(_L, "getGemMergeAct", GObject::World::getGemMergeAct);
+		lua_tinker::def(_L, "getEnchantGt11", GObject::World::getEnchantGt11);
         lua_tinker::def(_L, "getBlueDiamondAct", GObject::World::getBlueDiamondAct);
         lua_tinker::def(_L, "getYellowDiamondAct", GObject::World::getYellowDiamondAct);
         lua_tinker::def(_L, "getQQGameAct", GObject::World::getQQGameAct);
@@ -258,6 +259,7 @@ namespace Script
 		CLASS_DEF(Fighter, changeSecondSoulClass);
 		CLASS_DEF(Fighter, addElixirAttrByOffset);
 		CLASS_DEF(Fighter, getElixirAttrByOffset);
+		CLASS_DEF(Fighter, changeSecondSoulXinxiu);
 
 		//????
 		CLASS_ADD(TaskMgr);
@@ -803,7 +805,11 @@ namespace Script
 	{
 		if (player == NULL) return "";
 		const std::string& name = player->getName();
-		return name.c_str();
+        if(cfg.merged)
+        {
+            return player->patchShowName(name.c_str());
+        }
+        return name.c_str();
 	}
 
 	const char* GameActionLua::GetPlayerStateName(Player* player)
@@ -931,6 +937,11 @@ namespace Script
 	void GameActionLua::onEnchantAct( Player* player, UInt8 level )
 	{
 		Call<void>("onEnchantAct", player, level);
+	}
+
+	void GameActionLua::onEnchantGt11( Player* player, UInt16 id, UInt8 level, UInt8 type)
+	{
+		Call<void>("onEnchantGt11", player, id, level, type);
 	}
 
 	void GameActionLua::onTrainFighterAct( Player* player, Fighter* fgt )

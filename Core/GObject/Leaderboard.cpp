@@ -83,8 +83,8 @@ void buildPacket(Stream& st, UInt8 t, UInt32 id, std::vector<LeaderboardItem>& l
 	for(UInt8 i = 0; i < c; ++ i)
 	{
 		LeaderboardItem& item = list[i];
-		if(merge)
-			Player::patchMergedName(item.id, item.name);
+		//if(merge)
+		//	Player::patchMergedName(item.id, item.name);
         Player* pl = globalPlayers[item.id];
         if (pl)
             st << item.name << pl->getPF() << item.lvl << item.country << item.value << item.clan;
@@ -121,6 +121,8 @@ void Leaderboard::update()
 
 void Leaderboard::doUpdate()
 {
+    UInt8 count;
+    UInt8 index;
 	std::unique_ptr<DB::DBExecutor> execu;
 	execu.reset(DB::gObjectDBConnectionMgr->GetExecutor());
 	if (execu.get() == NULL || !execu->isConnected()) return;
@@ -138,9 +140,9 @@ void Leaderboard::doUpdate()
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `fighter`.`experience` DESC"
 		" LIMIT 0, 100", blist2);
-	buildPacket2(_levelStream, 0, _id, blist2);
-	if(!blist.empty())
-		_maxLevel = blist[0].lvl;
+    buildPacket2(_levelStream, 0, _id, blist2);
+	if(!blist2.empty())
+		_maxLevel = blist2[0].lvl;
 
 	blist.clear();
 	std::list<AthleticsRankData *> *pathleticsrank = gAthleticsRank.getAthleticsRank();
@@ -168,7 +170,13 @@ void Leaderboard::doUpdate()
 		" ON `player`.`id` = `clan_player`.`playerId` AND `clan_player`.`id` = `clan`.`id`"
 		" ORDER BY `player`.`archievement` DESC"
 		" LIMIT 0, 100", blist);
-	buildPacket(_achievementStream, 2, _id, blist, false);
+    count = static_cast<UInt8>(blist.size());
+    for(index = 0; index < count; ++index)
+    {
+        if(cfg.merged)
+            Player::patchMergedName(blist[index].id, blist[index].name);
+    }
+	buildPacket(_achievementStream, 2, _id, blist);
 
 	blist.clear();
 #if 0
@@ -185,16 +193,18 @@ void Leaderboard::doUpdate()
 	blist.resize(size);
     for (std::vector<Clan*>::const_iterator it = clanRanking.begin(), e = clanRanking.end(); it != e; ++i, ++it)
     {
-		blist[i].id = (*it)->getId();
+		//blist[i].id = (*it)->getId();
         Player* owner = (*it)->getOwner();
         if (owner)
         {
+            blist[i].id = owner->getId();
             blist[i].name = owner->getName();
             blist[i].pf = owner->getPF();
             blist[i].country = owner->getCountry();
         }
         else
         {
+            blist[i].id = 0;
             blist[i].name = "";
             blist[i].pf = 0;
             blist[i].country = 2;

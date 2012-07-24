@@ -49,12 +49,18 @@ autobattle_A = 2.5
 
 
 -- 第二元神属性成长
---           儒     释      道
-soul_str_factor = {2,3,5}
-soul_phy_factor = {6,7,8}
-soul_agi_factor = {3,2,5}
-soul_int_factor = {6,5,2}
-soul_wil_factor = {3,6,3}
+--           1青龙 2朱雀 3玄武 4狂雷•青龙 5烈阳•青龙 6雨泽•青龙 7炽炎•朱雀 8羽焰•朱雀 9浴火•朱雀 10冰锋•玄武 11凛风•玄武 12水盾•玄武 
+soul_str_factor = {2, 3, 5, 3, 5, 3, 4, 4, 4, 8, 6, 6}
+soul_phy_factor = {6, 7, 8, 7, 7, 9, 8, 8, 10,9, 9, 11}
+soul_agi_factor = {3, 2, 5, 4, 4, 4, 3, 3, 3, 6, 8, 6}
+soul_int_factor = {6, 5, 2, 9, 7, 7, 8, 6, 6, 3, 3, 3}
+soul_wil_factor = {3, 6, 3, 4, 4, 4, 7, 9, 7, 4, 4, 4}
+
+-- 1角宿：攻击 2翼宿：身法 3斗宿：防御 4奎宿：生命
+soul_xinxiu_attack = {3, 0, 0, 0}
+soul_xinxiu_action = {0, 3, 0, 0}
+soul_xinxiu_defend = {0, 0, 10,0}
+soul_xinxiu_hp =     {0, 0, 0, 10}
 
 -- 元神强度对应潜力表
 
@@ -115,6 +121,63 @@ function calcSoulWill( ss )
   local lvl = ss:getPracticeLevel()
   return soul_potential[stlvl] * soul_wil_factor[cls] * lvl
 end
+
+function calcSoulXinxiuAttack( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local xinxiu = ss:getXinxiu()
+  if xinxiu == 0 then
+      return 0
+  end
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_xinxiu_attack[xinxiu] * lvl
+end
+
+function calcSoulXinxiuAction( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local xinxiu = ss:getXinxiu()
+  if xinxiu == 0 then
+      return 0
+  end
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_xinxiu_action[xinxiu] * lvl
+end
+
+function calcSoulXinxiuDefend( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local xinxiu = ss:getXinxiu()
+  if xinxiu == 0 then
+      return 0
+  end
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_xinxiu_defend[xinxiu] * lvl
+end
+
+function calcSoulXinxiuHp( ss )
+  if ss == nil then
+    return 0
+  end
+
+  local xinxiu = ss:getXinxiu()
+  if xinxiu == 0 then
+      return 0
+  end
+  local stlvl = ss:getStateLevel()
+  local lvl = ss:getPracticeLevel()
+  return soul_potential[stlvl] * soul_xinxiu_hp[xinxiu] * lvl
+end
+
 
 
 

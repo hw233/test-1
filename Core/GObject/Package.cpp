@@ -1996,6 +1996,19 @@ namespace GObject
         }
     }
 #endif
+    void enchantGt11(Player* player, UInt16 id, UInt8 quality, UInt8 slevel, UInt8 level, UInt8 type, UInt8 _class)
+    {
+        if (type == 0)
+        {
+            for (UInt8 l = level; l >= 11 && l > slevel; --l)
+                GameAction()->onEnchantGt11(player, id, l, _class);
+        }
+        else
+        {
+            if ((slevel < 11 && level >= 11) || (slevel < 12 && level >= 12))
+                GameAction()->onEnchantGt11(player, id, level, _class);
+        }
+    }
 
     UInt8 Package::Enchant( UInt16 fighterId, UInt32 itemId, UInt8 type, UInt16 count, UInt8 level, UInt16& success, UInt16& failed/*, bool protect*/ )
 	{
@@ -2014,9 +2027,9 @@ namespace GObject
         UInt32 item_enchant_l = ITEM_ENCHANT_L1;
         UInt8 quality = 0;
         UInt8 maxEnchantLevel = ENCHANT_LEVEL_MAX;
-        if (m_Owner->getVipLevel() >= 11) // XXX: ==VIP11 -> 11
+        if (m_Owner->getVipLevel() >= 11 || World::getEnchantGt11()) // XXX: ==VIP11 -> 11
             ++maxEnchantLevel;
-        if (m_Owner->getVipLevel() >= 12) // XXX: >=VIP12 -> 12
+        if (m_Owner->getVipLevel() >= 12 || World::getEnchantGt11()) // XXX: >=VIP12 -> 12
             ++maxEnchantLevel;
 
         if(equip->getClass() == Item_Weapon)
@@ -2269,6 +2282,12 @@ namespace GObject
             if (World::getEnchantAct())
                 enchantAct(m_Owner, quality, oldEnchant, ied.enchant, autoEnch?0:1);
 #endif
+
+            if (ied.enchant >= 11 && World::getEnchantGt11() && (IsWeapon(equip->getClass()) || IsArmor(equip->getClass())))
+            {
+                UInt8 type = IsWeapon(equip->getClass())?1:2;
+                enchantGt11(m_Owner, equip->GetItemType().getId(), quality, oldEnchant, ied.enchant, autoEnch?0:1, type);
+            }
 			return 0;
 		}
 
@@ -4282,6 +4301,16 @@ namespace GObject
             esa.spForm[1] = GRND(4) + 1;
             esa.spForm[2] = GRND(4) + 1;
             DB4().PushUpdateData("UPDATE `equipment_spirit` SET `spform1` = %u, `spform2` = %u, `spform3` = %u WHERE `id` = %u", esa.spForm[0], esa.spForm[1], esa.spForm[2], equip->getId());
+        }
+    }
+    
+    void Package::enumerate(Visitor<ItemBase>& visitor)
+    {
+		item_elem_iter iter = m_Items.begin();
+		for (; iter != m_Items.end(); ++iter)
+        {
+            if(!visitor(iter->second))
+                return;
         }
     }
 }

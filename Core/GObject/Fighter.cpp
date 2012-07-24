@@ -212,7 +212,7 @@ bool Fighter::addExp( UInt64 e )
 		{
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
-		}
+        }
         worldBoss.setLevel(_level);
         _owner->sendLevelPack(_level);
         _expFlush = true;
@@ -287,6 +287,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
 
 			SYSMSG_SENDV(101, _owner, _level);
 			_owner->checkLevUp(oldLevel, _level);
+            /*
             if(_level >= 40)
             {
                 UInt32 thisDay = TimeUtil::SharpDay();
@@ -297,6 +298,7 @@ void Fighter::setLevelAndExp( UInt8 l, UInt64 e )
                      _owner->sendRC7DayInfo(TimeUtil::Now());
                 }
             }
+            */
 		}
         worldBoss.setLevel(l);
 	}
@@ -3788,6 +3790,17 @@ void Fighter::getAttrExtraEquip(Stream& st)
 	st << attr.hitrateP << attr.evadeP << attr.criticalP << attr.criticaldmgP << attr.pierceP << attr.counterP << attr.magresP;
 
     st << attr.hitrlvl << attr.evdlvl << attr.crilvl << attr.pirlvl << attr.counterlvl << attr.mreslvl << attr.toughlvl;
+}
+
+bool Fighter::changeSecondSoulXinxiu(UInt8 xinxiu)
+{
+    if(!m_2ndSoul)
+    {
+        _owner->sendMsgCode(0, 1072);
+        return false;
+    }
+
+    return m_2ndSoul->setXinxiu(xinxiu);
 }
 
 UInt8 Fighter::getSoulSkillIdx(UInt16 itemId)

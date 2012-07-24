@@ -277,7 +277,7 @@ namespace GObject
             data->checktime = 0;
 		if(leftCount == 0 || data->checktime == 0)
 		{
-            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+            DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %"I64_FMT"u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
             GameMsgHdr hdr1(0x1F7, WORKER_THREAD_WORLD, m_Player, 0);
             GLOBAL().PushMsg(hdr1, NULL);
 			PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
@@ -344,7 +344,7 @@ namespace GObject
                 data->checktime = 0;
             if(data->checktime == 0)
             {
-                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
+                DB().PushUpdateData("UPDATE `practice_data` SET `checktime` = %u, `place` = %u, `slot` = %u, winnerid = %"I64_FMT"u, fighters = '' WHERE `id` = %"I64_FMT"u", data->checktime, PPLACE_MAX, 0, 0, m_Player->getId());
                 practicePlace.stop(m_Player);
                 PopTimerEvent(m_Player, EVENT_PLAYERPRACTICING, m_Player->getId());
             }
@@ -692,16 +692,19 @@ namespace GObject
     //2012年3月份充值活动额度
     //static UInt32 recharge[] = {199,399,599,999,1299,1599,1999,2999,3999,4999,5999,6999,7999,8999,9999,};
     //2012年5月16充值活动额度
-    static UInt32 recharge[] = {199,399,599,799,999,1499,1999,3999,5999,7999,9999,19999,29999,39999,49999};
-    UInt8 Player::calcRechargeLevel(UInt32 total)
+    //static UInt32 recharge[] = {199,399,599,799,999,1499,1999,3999,5999,7999,9999,19999,29999,39999,49999};
+    static UInt32 recharge[] = {99,199,399,699,1099,1599,2199,2899,3699,4599,5599,8999,15999,26999,42999,64999,99999,};
+
+    UInt8 Player::calcRechargeLevel(UInt32 total, UInt8& maxlevel)
     {
         UInt32 totalRecharge = total;
+        maxlevel = sizeof(recharge)/sizeof(UInt32);
         for (UInt8 i = 0; i < sizeof(recharge)/sizeof(UInt32); ++i)
         {
             if (totalRecharge < recharge[i])
                 return i;
         }
-        return 15;
+        return maxlevel;
     }
 
     inline UInt32 levelToRecharge(UInt8 lvl)
@@ -709,7 +712,7 @@ namespace GObject
         if (lvl < 1)
             return 0;
         if (lvl > sizeof(recharge)/sizeof(UInt32))
-            lvl = 15;
+            lvl = sizeof(recharge)/sizeof(UInt32);
         return recharge[lvl-1];
     }
 
@@ -759,6 +762,53 @@ namespace GObject
 			return empty;
 		return _clan->getName();
 	}
+
+    void Player::enchantGt11()
+    {
+        struct EnchantGt11 : public Visitor<ItemBase>
+        {
+            EnchantGt11(Player* player) : player(player) {}
+
+            bool operator()(ItemBase* ptr)
+            {
+                if (IsWeapon(ptr->getClass()) || IsArmor(ptr->getClass()))
+                {
+                    ItemEquip* ie = (ItemEquip*)(ptr);
+                    if (ie->getItemEquipData().enchant == 11 || ie->getItemEquipData().enchant == 12)
+                    {
+                        UInt8 type = IsWeapon(ptr->getClass())?1:2;
+                        for (UInt8 l = ie->getItemEquipData().enchant; l >= 11; --l)
+                            GameAction()->onEnchantGt11(player, ie->GetItemType().getId(), l, type);
+                    }
+                }
+                return true;
+            }
+
+            Player* player;
+        } eg(this);
+        GetPackage()->enumerate(eg);
+
+        std::map<UInt32, Fighter *>::iterator it = _fighters.begin();
+        for (; it != _fighters.end(); ++it)
+        {
+            Fighter* fgt = it->second;
+            ItemEquip* e[11] = {fgt->getWeapon(), fgt->getArmor(0), fgt->getArmor(1),
+                fgt->getArmor(2), fgt->getArmor(3), fgt->getArmor(4), fgt->getAmulet(),
+                fgt->getRing(), fgt->getTrump(0), fgt->getTrump(1), fgt->getTrump(2)};
+
+            for (int i = 0; i < 11; ++i)
+            {
+                if (e[i] && (e[i]->getItemEquipData().enchant == 11 || e[i]->getItemEquipData().enchant == 12))
+                {
+                    UInt8 type = IsWeapon(e[i]->getClass())?1:2;
+                    for (UInt8 l = e[i]->getItemEquipData().enchant; l >= 11; --l)
+                        GameAction()->onEnchantGt11(this, e[i]->GetItemType().getId(), l, type);
+                }
+            }
+        }
+
+        SetVar(VAR_ENCHANTGT11, 1);
+    }
 
 	void Player::Login()
 	{
@@ -810,6 +860,8 @@ namespace GObject
             GameAction()->onMayDay(this);
         if (World::getMayDay1())
             GameAction()->onMayDay1(this);
+        if (World::getEnchantGt11() && !GetVar(VAR_ENCHANTGT11))
+            enchantGt11();
 
         if (World::_nationalDay) // XXX: 国庆节活动
         {
@@ -5737,7 +5789,18 @@ namespace GObject
 
 	void Player::checkLevUp(UInt8 oLev, UInt8 nLev)
 	{
-		if(_clan != NULL)
+        if(nLev >= 40)
+        {
+            UInt32 thisDay = TimeUtil::SharpDay();
+            UInt32 firstDay = TimeUtil::SharpDay(0, PLAYER_DATA(this, created));
+            if(thisDay == firstDay && !this->GetVar(VAR_CLAWARD2))
+            {
+                 this->SetVar(VAR_CLAWARD2, 1);
+                 this->sendRC7DayInfo(TimeUtil::Now());
+            }
+        }
+
+        if(_clan != NULL)
 		{
 			_clan->broadcastMemberInfo(this);
 		}
@@ -5966,10 +6029,11 @@ namespace GObject
         if (World::getRechargeActive())
         {
             UInt32 total = GetVar(VAR_RECHARGE_TOTAL);
-            UInt8 oldVipLevel = calcRechargeLevel(total);
+            UInt8 maxlevel = 0;
+            UInt8 oldVipLevel = calcRechargeLevel(total, maxlevel);
             total += r;
-            UInt8 vipLevel = calcRechargeLevel(total);
-            sendRechargeMails(oldVipLevel + 1, vipLevel);
+            UInt8 vipLevel = calcRechargeLevel(total, maxlevel);
+            sendRechargeMails(oldVipLevel + 1, vipLevel, maxlevel);
             SetVar(VAR_RECHARGE_TOTAL, total);
             sendRechargeInfo();
         }
@@ -6876,6 +6940,45 @@ namespace GObject
 		}
 	}
 
+    static char nameStr[2048];
+    const char* Player::patchShowName(const char* name, const UInt64 playerId)
+    {
+        if(cfg.merged)
+        {
+            unsigned short len = 0;
+            const char *pname = name;
+            while(pname[len] && len < 2048)
+                ++len;
+            strncpy(nameStr, name, len);
+#if 0
+            char a = nameStr[len - 1];
+            char b = nameStr[len - 2];
+            char serverNo = a * 31 + b;
+            nameStr[len - 2] = '\0';
+#else
+            unsigned char a;
+            unsigned char serverNo = 0;
+            for(unsigned short i = len; i >= 1 && i >= len - 1; i--)
+            {
+                a = static_cast<unsigned char>(nameStr[i - 1]) - static_cast<unsigned char>(1);
+                if(a > static_cast<unsigned char>(31))
+                    break;
+                serverNo = serverNo * static_cast<unsigned char>(31) + a;
+                nameStr[i -1] = '\0';
+            }
+            serverNo += 1; //起点从0开始
+#endif
+            if(playerId != 0 && serverNo != static_cast<unsigned char>(playerId >> 48))
+            {
+                char tmp[32];
+                sprintf(tmp, ".S%d", serverNo);
+                strcat(nameStr, tmp);
+            }
+            return reinterpret_cast<const char*>(nameStr);
+        }
+        return name;
+    }
+
 	void Player::sendYDVIPMails( UInt8 l, UInt8 h )
 	{
 		if(l < 1)
@@ -6989,17 +7092,17 @@ namespace GObject
 		}
 	}
 
-	void Player::sendRechargeMails( UInt8 l, UInt8 h )
+	void Player::sendRechargeMails( UInt8 l, UInt8 h, UInt8 m )
 	{
 		if(l < 1)
 			l = 1;
-		if(h > 15)
-			h = 15;
+		if(h > m)
+			h = m;
 
 		for(UInt32 j = l; j <= h; ++j)
 		{
 			SYSMSGV(title, 2320, levelToRecharge(j));
-			SYSMSG(content, 2321);
+			SYSMSGV(content, 2321, levelToRecharge(j));
 			Mail * mail = m_MailBox->newMail(NULL, 0x21, title, content, 0xFFFE0000);
 			if(mail == NULL)
 				continue;
@@ -7045,7 +7148,6 @@ namespace GObject
                 {515,10,507,10,509,10,30,10,MailPackage::Coupon,300,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
-#else
             //2012年5月16充值反利活动
 			const UInt32 vipTable[16][14] =
             {
@@ -7066,7 +7168,29 @@ namespace GObject
                 {507,10,509,10,515,10,547,5,9016,5,0,0,0,0},
                 {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
             };
-
+#else
+            //2012年6月6日充值反利活动
+			const UInt32 vipTable[18][14] =
+            {
+                {503,2,514,1,509,1,0,0,0,0,0,0,0,0},
+                {500,3,56,6,57,2,509,1,0,0,0,0,0,0},
+                {508,2,56,6,57,5,509,1,0,0,0,0,0,0},
+                {511,6,466,6,509,1,0,0,0,0,0,0,0,0},
+                {516,3,512,2,509,1,0,0,0,0,0,0,0,0},
+                {5065,1,56,5,509,1,0,0,0,0,0,0,0,0},
+                {503,5,56,6,57,2,509,1,0,0,0,0,0,0},
+                {515,2,56,6,57,2,509,2,0,0,0,0,0,0},
+                {515,2,56,6,57,5,509,2,0,0,0,0,0,0},
+                {515,2,56,6,57,6,509,2,0,0,0,0,0,0},
+                {549,2,56,6,57,6,509,2,0,0,0,0,0,0},
+                {515,5,30,10,56,5,57,5,509,3,0,0,0,0},
+                {507,5,509,5,515,5,547,5,0,0,0,0,0,0},
+                {507,10,509,10,515,5,547,5,0,0,0,0,0,0},
+                {507,10,509,10,515,10,547,5,0,0,0,0,0,0},
+                {507,15,509,15,515,15,547,5,0,0,0,0,0,0},
+                {507,20,509,20,515,20,547,10,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+            };
 #endif
 
 			MailPackage::MailItem mitem[7];
@@ -8926,7 +9050,7 @@ namespace GObject
         cs.id = skillId;
         cs.level = 0;
 
-        DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%u, %u, 0)", getId(), skillId);
+        DB5().PushUpdateData("REPLACE INTO `clan_skill`(`playerId`, `skillId`, `level`) VALUES(%"I64_FMT"u, %u, 0)", getId(), skillId);
     }
 
     UInt8 Player::getClanSkillLevel(UInt8 skillId)
@@ -8959,7 +9083,7 @@ namespace GObject
 
             ClanSkill& cs = it->second;
             ++ cs.level;
-            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %u and `skillId`=%u", cs.level, getId(), skillId);
+            DB5().PushUpdateData("UPDATE `clan_skill` SET `level` = %u WHERE `playerId` = %"I64_FMT"u and `skillId`=%u", cs.level, getId(), skillId);
 
             if(skillId == CLAN_SKILL_MAXSOUL)
             {

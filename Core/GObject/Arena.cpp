@@ -720,6 +720,7 @@ void Arena::sendInfo( Player * player )
 	player->send(st);
 }
 
+#if 0
 void Arena::sendElimination( Player * player, UInt8 group )
 {
 	bool resultOnly = (group & 0x80) > 0;
@@ -767,6 +768,7 @@ void Arena::sendElimination( Player * player, UInt8 group )
 	st << Stream::eos;
 	player->send(st);
 }
+#endif
 
 void Arena::push( Player * player, UInt8 group, const std::string& rname )
 {
