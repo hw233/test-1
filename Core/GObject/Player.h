@@ -45,7 +45,7 @@ namespace GObject
 #define PLAYER_BUFF_CLANMOVE		0x07	//??????ս????BUFF
 #define PLAYER_BUFF_BANCHAT			0x08
 #define PLAYER_BUFF_BOSSWEAK		0x09
-#define PLAYER_BUFF_TRAINP3			0x0A	//??Բ????????+70%
+#define PLAYER_BUFF_TRAINP3			0x0A	//??Բ????????+80%
 #define PLAYER_BUFF_TRAINP4			0x0B	//??Բ????????+50%
 #define PLAYER_BUFF_ATHLETICS		0x0C	//???ھ???buffer, ?��??̴߳???
 #define PLAYER_BUFF_PKLOCK			0x0D
@@ -57,8 +57,8 @@ namespace GObject
 #define PLAYER_BUFF_REENTERCLAN		0x13
 #define PLAYER_BUFF_CLANRCENHANCE	0x14    
 #define PLAYER_BUFF_PWDLOCK			0x15	//5?????????? ????10????
-#define PLAYER_BUFF_PRACTICE1       0x16	//??��?ӳ?20% XXX: ??ʱ????
-#define PLAYER_BUFF_PRACTICE2       0x17	//??��?ӳ?50% XXX: ??ʱ????
+#define PLAYER_BUFF_PRACTICE1       0x17	//修为加速: 50%
+//#define PLAYER_BUFF_PRACTICE2       0x17	//??��?ӳ?50% XXX: ??ʱ????
 #define PLAYER_BUFF_XTHTYT          0x18	//??ʹ????????????Ԫ̥
 #define PLAYER_BUFF_WBOSS           0x19	//?Ѷ??????��?BOSS????
 #define PLAYER_BUFF_YDOTR           0x20    //??????????ֵ?ܶ?
@@ -1350,6 +1350,7 @@ namespace GObject
         UInt8 _justice_roar;
         float _spirit_factor;
         bool _diamond_privilege;
+        UInt32 _athlRivalBuf;
     public:
         static UInt8 _yaMenActiveCount;
         static UInt8 _shiMenActiveCount;
@@ -1375,6 +1376,9 @@ namespace GObject
 
         inline void setDiamondPrivilege(UInt8 v) { _diamond_privilege = v; }
         inline UInt8 getDiamondPrivilege() { return _diamond_privilege; }
+
+        inline void setAthlRivalBuff(UInt32 v) { _athlRivalBuf = v; }
+        inline UInt32 getAthlRivalBuff() { return _athlRivalBuf; }
 
     protected:
 		inline void setBlockBossByLevel();

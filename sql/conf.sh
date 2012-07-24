@@ -5,13 +5,8 @@ U=kingxin
 P=kingxin
 PT=3306
 
-<<<<<<< HEAD
-DBD=data_8833
-DBO=asss_8833
-=======
-DBD=data_6666
-DBO=asss_6666
->>>>>>> a752912150781a2c1034dae2979eefe163ae5678
+DBD=data_8888
+DBO=asss_8888
 
 OPTIONS="Yes/No/Exit"
 IFS=/

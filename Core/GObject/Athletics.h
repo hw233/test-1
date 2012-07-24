@@ -69,6 +69,7 @@ public:
 	void notifyAthleticsData2(UInt32);
 	void notifyAthleticsDeferData(UInt8, Player *, UInt32, UInt8, UInt32, UInt32);
 	void notifyDropAthleticsData(UInt32);
+    void adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset);
 	void updateAthleticsAwardData(UInt32, UInt8, UInt32);
 
     void listAthleticsReport();

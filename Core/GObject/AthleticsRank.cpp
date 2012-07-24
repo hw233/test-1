@@ -2689,8 +2689,13 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
     if(type == 1)
     {
         UInt8 wins = pl->getBuffData(PLAYER_BUFF_AMARTIAL_WIN);
-        if(wins >= 5 && pl->GetPackage()->GetRestPackageSize() >= 1)
+        if(wins >= 5)
         {
+            if(pl->GetPackage()->GetRestPackageSize() < 1)
+            {
+                pl->sendMsgCode(0, 1011);
+                return;
+            }
             AthleticsRankData* rankData = *found->second;
             UInt8 index;
             UInt8 diffculty;
