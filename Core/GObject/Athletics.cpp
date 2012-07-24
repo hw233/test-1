@@ -696,8 +696,8 @@ void Athletics::awardMartial(Player* defer, bool win)
             }
         }
 
-        la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
-        _owner->getPrestige(la.prestige, false);
+        //la.prestige = 10 * (World::_wday == 3 ? 2 : 1);
+        //_owner->getPrestige(la.prestige, false);
         _owner->setBuffData(PLAYER_BUFF_AMARTIAL_WIN, wins, true);
 
         listAthleticsMartial();

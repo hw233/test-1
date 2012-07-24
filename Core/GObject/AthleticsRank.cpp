@@ -2374,15 +2374,15 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
         index = 1;
     UInt8 diffculty = (data->eCombine[index - 1] >> 24) & 0xFF;
     if(diffculty == 2)
-        level += 1;
-    else if(diffculty == 3)
-        level += 2;
-    else if(diffculty == 4)
-        level += 3;
-    else if(diffculty == 5)
-        level += 5;
-    else
         ;
+    else if(diffculty == 3)
+        level += 1;
+    else if(diffculty == 4)
+        level += 2;
+    else if(diffculty == 5)
+        level += 3;
+    else
+        level -= 1;
 
     GObject::GlobalLevelsPlayersIterator it = GObject::globalLevelsPlayers.find(level);
     if(it == GObject::globalLevelsPlayers.end())
@@ -2392,9 +2392,7 @@ void AthleticsRank::updateAthleticsMartial(Player* pl)
     if(it == GObject::globalLevelsPlayers.end())
         it = GObject::globalLevelsPlayers.find(level - 3);
     if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 4);
-    if(it == GObject::globalLevelsPlayers.end())
-        it = GObject::globalLevelsPlayers.find(level - 5);
+        it = GObject::globalLevelsPlayers.find(level + 1);
     if(it == GObject::globalLevelsPlayers.end())
         return;
 
@@ -2711,6 +2709,7 @@ void AthleticsRank::giveAward( Player* pl, UInt8 type)
             count = awardId & 0xFFFF;
             //_owner->GetPackage()->AddItem(itemId, count, 1, true, FromAthletAward);
             AthleticsAward atkerAthleticsAward = { 0, 0, 0, 0, 0, 0, 0, 0, itemId, count};
+            atkerAthleticsAward.prestige = 50 * (World::_wday == 3 ? 2 : 1);
             GameMsgHdr hdr2(0x217, pl->getThreadId(), pl, sizeof(AthleticsAward));
             GLOBAL().PushMsg(hdr2, &atkerAthleticsAward);
             wins = 0;
