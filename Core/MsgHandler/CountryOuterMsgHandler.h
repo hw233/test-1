@@ -2947,6 +2947,7 @@ void OnStoreBuyReq( GameMsgHdr& hdr, StoreBuyReq& lr )
 				{
 					ConsumeInfo ci(Item,lr._itemId,lr._count);
                     player->useGold(price,&ci);
+                    player->consumeGold(price);
 					st << static_cast<UInt8>(0);
 
                     GameAction()->doAty(player, AtyBuy ,0,0);

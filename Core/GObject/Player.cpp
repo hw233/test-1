@@ -6294,6 +6294,17 @@ namespace GObject
 		send((st));
     }
 
+    void Player::sendConsumeInfo()
+    {
+        if (!World::getConsumeActive())
+            return;
+
+        UInt32 total = GetVar(VAR_CONSUME);
+		Stream st(REP::DAILY_DATA);
+		st << static_cast<UInt8>(15) << total << Stream::eos;
+		send((st));
+    }
+
 	void Player::sendTopupMail(const char* title, const char* content, UInt32 gold, UInt8 num)
 	{
 		m_MailBox->newMail(NULL, 0x01, title, content);
@@ -10793,6 +10804,17 @@ namespace GObject
         Stream st(REP::GETAWARD);
         st << static_cast<UInt8>(5) << static_cast<UInt8>(got?0:1) << Stream::eos;
         send(st);
+    }
+
+    void Player::consumeGold(UInt32 c)
+    {
+        if (World::getConsumeActive())
+        {
+            UInt32 total = GetVar(VAR_CONSUME);
+            GameAction()->sendConsumeMails(this, total, total+c);
+            SetVar(VAR_CONSUME, total+c);
+            sendConsumeInfo();
+        }
     }
 
 } // namespace GObject

@@ -935,6 +935,7 @@ namespace GObject
 		void makeFighterInfo(Stream&, Fighter *, bool = true);
 		bool makeFighterInfo(Stream&, UInt32);
         void sendRechargeInfo();
+        void sendConsumeInfo();
         void getMDItem();
         void sendMDSoul(UInt8 type, UInt32 id = 0);
         void sendJuneRechargeMails(UInt32 value);
@@ -956,6 +957,8 @@ namespace GObject
         void checkQQAward();
         void RollYDGem();
         void openLevelBox(UInt8 lvl, UInt8 cls);
+
+        void consumeGold(UInt32 c);
 
 	public:
 		Map* GetMap();

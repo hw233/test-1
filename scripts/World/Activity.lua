@@ -465,6 +465,16 @@ function onActivityCheck(tm)
           setSoSoMapBegin(actTime83)
       end
 
+      if tm >= actTime85 and tm < actTime86 then
+          setOpenTest(true)
+          setRechargeActive(true, 16)
+          setConsumeActive(true)
+      else
+          setOpenTest(false)
+          setRechargeActive(false, 16)
+          setConsumeActive(false)
+      end
+
       setShuoShuo(true);
   end
 
@@ -531,6 +541,7 @@ function initActTime(y, m, d)
   local  SerStartTm34= { ['year'] = 2012, ['month'] = 7, ['day'] = 14, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm35= { ['year'] = 2012, ['month'] = 7, ['day'] = 16, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm36= { ['year'] = 2012, ['month'] = 7, ['day'] = 17, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
+  local  SerStartTm37= { ['year'] = 2012, ['month'] = 7, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
 
   local  SerStartTm101 = { ['year'] = 2012, ['month'] = 4, ['day'] = 25, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
   local  SerStartTm102 = { ['year'] = 2012, ['month'] = 6, ['day'] = 8, ['hour'] = 0, ['min'] = 0, ['sec'] = 0 };
@@ -674,6 +685,9 @@ function initActTime(y, m, d)
 
   actTime83 = os.time(SerStartTm36);
   actTime84 = os.time(SerStartTm36) + 7 * 86400;
+
+  actTime85 = os.time(SerStartTm37);
+  actTime86 = os.time(SerStartTm37) + 7 * 86400;
 
   actTime101 = os.time(SerStartTm101);
   actTime102 = os.time(SerStartTm101) + 8 * 86400;

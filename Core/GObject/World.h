@@ -237,6 +237,16 @@ public:
     inline static void setSoSoMapBegin(UInt32 v)
     { _sosomapbegin = v; }
 
+    inline static void setOpenTest(bool v)
+    { _opentest = v; }
+    inline static bool getOpenTest()
+    { return _opentest; }
+
+    inline static void setConsumeActive(bool v)
+    { _consumeactive = v; }
+    inline static bool getConsumeActive()
+    { return _consumeactive; }
+
 	inline Script::WorldScript * getWorldScript() { return _worldScript; }
 	inline Script::BattleFormula * getBattleFormula() { return _battleFormula; }
     static void commitArenaForceOnce();
@@ -310,6 +320,8 @@ public:
     static UInt32 _levelawardend;
     static bool _pexpitems;
     static UInt32 _sosomapbegin;
+    static bool _opentest;
+    static bool _consumeactive;
 
 protected:
 	inline UInt8 TID() const { return WORKER_THREAD_WORLD; }
