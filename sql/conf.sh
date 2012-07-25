@@ -5,8 +5,8 @@ U=kingxin
 P=kingxin
 PT=3306
 
-DBD=suntao_Data
-DBO=suntao_Object
+DBD=data_6666
+DBO=asss_6666
 
 OPTIONS="Yes/No/Exit"
 IFS=/
