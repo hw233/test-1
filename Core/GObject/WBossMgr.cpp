@@ -464,7 +464,7 @@ void WBoss::reward(Player* player)
             }
         }
 
-        if (World::getOpenTest())
+        if (World::getOpenTest() && World::_wday != 7)
         {
             MailPackage::MailItem item[] = {{1526,1},{MailPackage::Tael,1000},{9091,1}};
             (*i).player->sendMailItem(568, 569, item, 3);

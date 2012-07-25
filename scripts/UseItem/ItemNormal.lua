@@ -1903,7 +1903,7 @@ end
 function ItemNormal_000000111(iid, num, bind, param)
 	local player = GetPlayer();
 	local package = player:GetPackage();
-	local num2 = player:getBuffData(0x04, os.time());
+	local num2 = player:getBuffData(4, os.time());
 	if num2 ~= 0 then
 		num2 = num2 - os.time();
 	end
@@ -1912,7 +1912,7 @@ function ItemNormal_000000111(iid, num, bind, param)
 		num2 = 18000;
 	end
 	package:DelItemSendMsg(11, player);
-	player:setBuffData(0x04, os.time() + num2, true);
+	player:setBuffData(4, os.time() + num2, true);
 	return num;
 end
 
@@ -1947,6 +1947,7 @@ end
 function ItemNormal_00000057(iid, num, bind, param)
   local player = GetPlayer()
   local package = player:GetPackage();
+  player:setBuffData(0x17, 0, true)
   if ItemNormal_AddBuff(player, 4, 3600, num, 356400) then
   	package:DelItemSendMsg(57, player);
 	return num;
@@ -4035,6 +4036,89 @@ function ItemNormal_00009089(iid, num, bind, param)
     return num;
 end
 
+function ItemNormal_00009092(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setBuffData(5, 0, true)
+    player:setBuffData(6, 0, true)
+    player:setBuffData(11, 0, true)
+    if ItemNormal_AddBuff(player, 10, 3600, num, 356400) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    else
+        return false;
+    end
+end
+
+function ItemNormal_00009093(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+    player:setBuffData(4, 0, true)
+    if ItemNormal_AddBuff(player, 0x17, 3600, num, 356400) then
+        package:DelItemSendMsg(iid, player);
+        return num;
+    else
+        return false;
+    end
+end
+
+function ItemNormal_00010000(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (13+(13*num*5)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*5, true, 0, 2);
+    package:Add(57, num*5, true, 0, 2);
+    package:Add(508, num*5, true, 0, 2);
+    package:Add(506, num*5, true, 0, 2);
+    package:Add(15, num*5, true, 0, 2);
+    package:Add(51, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+    package:Add(49, num*5, true, 0, 2);
+    package:Add(509, num*5, true, 0, 2);
+    package:Add(515, num*5, true, 0, 2);
+    package:Add(438, num*5, true, 0, 2);
+    package:Add(439, num*5, true, 0, 2);
+    package:Add(440, num*10, true, 0, 2);
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
+function ItemNormal_00010001(iid, num, bind, param)
+    local player = GetPlayer()
+    local package = player:GetPackage();
+
+    if package:GetRestPackageSize() < (15+(15*num*8)/99) then
+        player:sendMsgCode(2, 1011, 0);
+        return false
+    end
+
+    package:Add(56, num*10, true, 0, 2);
+    package:Add(57, num*10, true, 0, 2);
+    package:Add(508, num*10, true, 0, 2);
+    package:Add(506, num*10, true, 0, 2);
+    package:Add(15, num*10, true, 0, 2);
+    package:Add(51, num*5, true, 0, 2);
+    package:Add(48, num*5, true, 0, 2);
+    package:Add(49, num*5, true, 0, 2);
+    package:Add(50, num*5, true, 0, 2);
+    package:Add(509, num*5, true, 0, 2);
+    package:Add(507, num*5, true, 0, 2);
+    package:Add(515, num*2, true, 0, 2);
+    package:Add(438, num*5, true, 0, 2);
+    package:Add(439, num*5, true, 0, 2);
+    package:Add(440, num*10, true, 0, 2);
+
+
+    package:DelItemSendMsg(iid, player);
+    return num;
+end
+
 local ItemNormal_Table = {
   [1] = ItemNormal_00000001,
 	[8] = ItemNormal_00000008,
@@ -5426,6 +5510,11 @@ local ItemNormal_Table = {
     [9087] = ItemNormal_00009087,
     [9088] = ItemNormal_00009088,
     [9089] = ItemNormal_00009089,
+    [9092] = ItemNormal_00009092,
+    [9093] = ItemNormal_00009093,
+
+    [10000] = ItemNormal_00010000,
+    [10001] = ItemNormal_00010001,
 };
 
 function ItemNormalOther_00000441(iid, num, bind, other)

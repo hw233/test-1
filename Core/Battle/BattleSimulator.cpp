@@ -374,6 +374,7 @@ void BattleSimulator::start(UInt8 prevWin)
                 if (_player[i]->getBuffData(PLAYER_BUFF_ATHL9, now) > 0)
                     flag2 |= BattleFighter::AthlEnh9;
             }
+            flag2 |= _player[i]->getAthlRivalBuff();
 		}
 		for(int j = 0; j < 25; ++ j)
 		{

@@ -4239,7 +4239,7 @@ void Fighter::SSOpen(UInt16 id)
                 return;
             ss.maxLvl = 1;
             m_ss[sid] = ss;
-            SSUpdate2DB(sid, ss);
+            SSUpdate2DB(id, ss);
         }
     }
     else
@@ -4248,7 +4248,8 @@ void Fighter::SSOpen(UInt16 id)
         if (uRand(10000) <= prob)
         {
             ++i->second.maxLvl;
-            SSUpdate2DB(sid, i->second);
+            i->second.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, i->second.lvl);
+            SSUpdate2DB(id, i->second);
         }
     }
 }
@@ -4266,8 +4267,10 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
     SStrengthen& ss = m_ss[sid];
     if (!ss.maxVal) // full
         return 0;
-    if (ss.father != itemId)
+    if (GetItemSubClass(itemId) != Item_Citta)
         return 0;
+    //if (ss.father != itemId)
+    //    return 0;
 
     int idx = isSkillUp(id);
     if (idx < 0)
@@ -4275,8 +4278,8 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     if (GData::skill2item.find(sid) == GData::skill2item.end())
         return 0;
-    if (GData::skill2item[sid] != itemId)
-        return 0;
+    //if (GData::skill2item[sid] != itemId)
+    //    return 0;
 
     Package* pkg = _owner->GetPackage();
 
@@ -4304,7 +4307,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
 
     UInt8 ret = 1;
     UInt8 mlvl = getUpSkillLevel(idx);
-    mlvl = mlvl>ss.maxLvl?ss.maxLvl:mlvl;
+    mlvl = mlvl>ss.maxLvl?mlvl:ss.maxLvl;
     while (ss.curVal >= ss.maxVal)
     {
         ss.curVal -= ss.maxVal;
@@ -4313,7 +4316,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         if (ss.lvl >= mlvl)
         {
             ss.curVal = 0;
-            if (mlvl == SS_MAXLVL) // XXX: max level
+            if (ss.lvl == mlvl) // XXX: max level
                 ss.maxVal = 0;
             ret = 0;
             break;
@@ -4322,7 +4325,7 @@ UInt8 Fighter::SSUpgrade(UInt16 id, UInt32 itemId, bool bind)
         ss.maxVal = GData::GDataManager::getMaxStrengthenVal(sid, ss.lvl);
     }
 
-    SSUpdate2DB(sid, ss);
+    SSUpdate2DB(id, ss);
     return ret;
 }
 
@@ -4342,9 +4345,9 @@ void Fighter::SSErase(UInt16 id)
 
 void Fighter::SSUpdate2DB(UInt16 id, SStrengthen& ss)
 {
-    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), id, ss.father, ss.maxVal, ss.curVal, ss.lvl, ss.maxLvl);
+    DB1().PushUpdateData("REPLACE INTO `skill_strengthen` (`id`, `playerId`, `skillid`, `father`, `maxVal`, `curVal`, `lvl`, `maxLvl`) VALUES(%u, %"I64_FMT"u, %u, %u, %u, %u, %u, %u)", getId(), _owner->getId(), SKILL_ID(id), ss.father, ss.maxVal, ss.curVal, ss.lvl, ss.maxLvl);
     Stream st(REP::SKILLSTRENGTHEN);
-    st << static_cast<UInt8>(1);
+    st << static_cast<UInt8>(1) << getId();
     appendFighterSSInfo(st, id, &ss);
     st << Stream::eos;
     _owner->send(st);

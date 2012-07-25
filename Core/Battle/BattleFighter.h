@@ -546,6 +546,13 @@ public:
 		AthlEnh7 = 0x40,
 		AthlEnh8 = 0x80,
 		AthlEnh9 = 0x100,
+		AthlEnh31 = 0x10000,
+		AthlEnh32 = 0x20000,
+		AthlEnh33 = 0x40000,
+        AthlEnh34 = 0x80000,
+        AthlEnh35 = 0x100000,
+		AthlEnh36 = 0x200000,
+		AthlEnh37 = 0x400000,
     };
 };
 
