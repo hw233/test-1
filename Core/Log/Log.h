@@ -71,6 +71,8 @@ enum PurchaseType
     Discount8,
     LuckyDraw,
     ArenaBet,
+    AthleticKillCD2,
+    AthleticPhysical,
 };
 
 enum IncomingType

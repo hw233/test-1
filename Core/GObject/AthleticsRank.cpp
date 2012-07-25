@@ -2558,7 +2558,8 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                     pl->sendMsgCode(0, 1104);
                     return;
                 }
-                pl->useGold(1);
+                ConsumeInfo ci(AthleticKillCD2,0,0);
+                pl->useGold(1, &ci);
                 pl->setBuffData(PLAYER_BUFF_ATHLETICS_P, 0);
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
                 st << type << Stream::eos;
@@ -2587,7 +2588,8 @@ void AthleticsRank::updateAthleticsP(Player* pl, UInt8 type)
                     pl->sendMsgCode(0, 1104);
                     return;
                 }
-                pl->useGold(1);
+                ConsumeInfo ci(AthleticPhysical,0,0);
+                pl->useGold(1, &ci);
                 rankData->ePhysical += 1;
                 DB6().PushUpdateData("UPDATE `athletics_rank` SET `ePhysical` = %u WHERE `ranker` = %"I64_FMT"u", rankData->ePhysical, pl->getId());
                 Stream st(REP::ATHLETICS_REFRESH_MARTIAL);
