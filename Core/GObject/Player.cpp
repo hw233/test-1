@@ -519,7 +519,7 @@ namespace GObject
 		_availInit(false), _vipLevel(0), _clan(NULL), _clanBattle(NULL), _flag(0), _gflag(0), _onlineDuration(0), _offlineTime(0),
 		_nextTavernUpdate(0), _nextBookStoreUpdate(0), _bossLevel(21), _ng(NULL), _lastNg(NULL),
 		_lastDungeon(0), _exchangeTicketCount(0), _praplace(0), m_autoCopyFailed(false),
-        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
+        _justice_roar(0), _spirit_factor(1.0f), _diamond_privilege(false), _athlRivalBuf(0), _worldBossHp(0), m_autoCopyComplete(0), hispot(0xFF), hitype(0), m_ulog(NULL),
         m_isOffical(false), m_sysDailog(false), m_hasTripod(false)
 	{
         m_ClanBattleStatus = 1;
@@ -3367,7 +3367,7 @@ namespace GObject
 				return;
 			if(v > 0)
 				DB7().PushUpdateData("REPLACE INTO `player_buff`(`id`, `buffId`, `data`) VALUES(%"I64_FMT"u, %u, %u)", _id, t - 0x40, v);
-			else
+            else
 				DB7().PushUpdateData("DELETE FROM `player_buff` WHERE `id` = %"I64_FMT"u AND `buffId` = %u", _id, t - 0x40);
 			return;
 		}
@@ -3388,7 +3388,7 @@ namespace GObject
 		}
 		if(field != NULL)
 			DB1().PushUpdateData("UPDATE `player` SET `%s` = %u WHERE `id` = %"I64_FMT"u", field, v, _id);
-	}
+    }
 
 	UInt32 Player::getGold( UInt32 c, IncommingInfo* ii)
 	{
@@ -10872,6 +10872,30 @@ namespace GObject
             }
         }
         st.data<UInt8>(offset) = c;
+    }
+    
+    //玩家每日签到接口
+    void Player::ActivitySignIn()
+    {
+        UInt32 day = 1;
+        UInt32 mon = 1;
+        UInt32 year = 2012;
+        TimeUtil::GetDMY(&day, &mon, &year);
+        GameAction()->doAtySignIn(this, AtySignIn, mon, day);
+    }
+
+    void Player::SendNextdayTime(UInt32 nextDay)
+    {
+        Stream st(REP::SVRST);
+        st << static_cast<UInt8>(1);
+        st << nextDay << Stream::eos;
+        send(st);
+        Stream st1(REP::ACTIVITY_SIGNIN);
+        ActivityMgr* mgr = this->GetActivityMgr();
+        mgr->CheckTimeOver();
+        st1 << static_cast<UInt8> (0);
+        st1 << static_cast<UInt32>(mgr->GetScores()) << static_cast<UInt8>(mgr->GetFlag(AtySignIn)) << Stream::eos;
+        send(st1);
     }
 
 #ifdef _FB

@@ -241,6 +241,8 @@ namespace REQ
     const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
+    /**活跃度签到积分*/
+    const UInt8 ACTIVITY_SIGNIN     = 0x4C;
     /**关系列表请求*/
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     /**关系列表操作*/
@@ -528,6 +530,7 @@ namespace REP
     const UInt8 ACTIVITY_LIST       = 0x4A; 
     /**活跃度领取奖励*/
     const UInt8 ACTIVITY_REWARD     = 0x4B;
+    const UInt8 ACTIVITY_SIGNIN     = 0x4C;
  
     const UInt8 FRIEND_LIST         = 0xD8;// 0xA8
     const UInt8 FRIEND_ACTION       = 0xD9;// 0xA9

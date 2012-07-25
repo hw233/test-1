@@ -14,6 +14,7 @@ local checkFlag = {
     [11] = 1,-- AtyCountryWar,//阵营战
     [12] = 5, -- AtyClanWar,   //帮派战
     [13] = 24,-- AtyAthletics, //斗剑
+    [14]=  1, --AtySign_in,   //每日签到,做标记是否签到,不加活跃度点数
 
     --[110] = 1, --AtyShuoShuo, //领取发表说说奖励
     --[111] = 1, --AtyInvited, //领取好友邀请奖励
@@ -288,3 +289,123 @@ function doAty(player, id, param1 ,  param2)
     mgr:UpdateToDB();
 
 end
+
+
+local dayScore = {
+    [1] = {         --1月份
+        1,2,3,4,5,6,7,8,9,10,
+        11,12,13,14,15,16,17,18,19,20,
+        21,22,23,24,25,26,27,28,29,30,31 
+    },
+    [2] = {         --2月份
+    },
+    [3] = {
+    },
+    [4] = {
+    },
+    [5] = {
+    },
+    [6] = {
+    },
+    [7] = {         --7月份
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+        1,  1,  1,  1,  1,  1,  1,  1,  1,  10, 
+        50, 50, 70, 10,100, 10, 10, 50, 50, 70, 10
+    },
+    [8] = {
+        100, 10,  10, 50, 50,  70, 10, 100, 10,  10,
+        50,  50,  70, 10, 100, 10, 10, 50,  50,  70, 
+        10,  100, 10, 10, 50,  50, 70, 10,  100, 10, 10
+    },
+    [9] = {
+    },
+    [10] = {
+    },
+    [11] = {
+    },
+    [12] = {
+    },
+}
+
+--处理玩家每日签到积分累加
+function doAtySignIn(player, id, month, day)
+    if nil == player or nil == id or nil == month or nil == day
+    then
+        return
+    end
+    local mgr = player:GetActivityMgr()
+    local mon_tbl = dayScore[tonumber(month)]
+    if nil == mon_tbl
+    then
+        return
+    end
+    local score = mon_tbl[tonumber(day)]
+    if nil == score
+    then 
+        return
+    end
+    --判断标志位
+    local needflag = checkFlag[id]
+    if nil == needflag
+    then
+        return
+    end
+    local curflag = mgr:GetFlag(id)
+    if curflag >= 1 or curflag >= needflag
+    then
+         return
+    else
+        mgr:UpdateFlag(id, curflag + 1)
+    end 
+    mgr:AddScores(score)
+    mgr:UpdateToDB()
+end
+
+local exchangeProps = {
+            --id,所需积分,数量,概率下限,概率上限(1~10000)
+    [29]  = { 29,  10,  10,  1,    819   },
+    [400] = { 400, 30,  3,   819,  1599  },
+    [55]  = { 55,  30,  1,   1599, 2389  },
+    [510] = { 51,  30,  1,   2389, 3179  },
+    [504] = { 504, 40,  1,   3179, 3919  },
+    [503] = { 503, 30,  1,   3919, 4709  },
+    [56]  = { 56,  120, 1,   4709, 5252  },
+    [57]  = { 57,  130, 1,   5252, 5844  },
+    [51]  = { 51,  40,  1,   5844, 6584  },
+    [500] = { 500, 180, 1,   6584, 7078  },
+    [514] = { 514, 160, 1,   7078, 7522  },
+    [48]  = { 48,  80,  1,   7522, 8164  },
+    [506] = { 506, 120, 1,   8164, 8707  },
+    [508] = { 508, 180, 1,   8707, 9201  },
+    [503] = { 503, 160, 1,   9201, 9645  },
+    [507] = { 507, 330, 1,   9645, 9793  },
+    [515] = { 515, 320, 1,   9793, 9842  },
+    [509] = { 509, 300, 1,   9842, 10000 },
+}
+
+function GetExchangeProps(id) 
+    if nil == id
+    then
+        return exchangeProps[29]
+    end
+    local props = exchangeProps[tonumber(id)]
+    if nil == props 
+    then
+        return exchangeProps[29] 
+    else
+        return props
+    end
+end
+
+function GetExchangePropsID()
+    local ratio = math.random(10000)
+    for _, val in pairs(exchangeProps) do
+       if val[4] <= ratio and ratio < val[5]
+        then
+            return val[1]
+        end
+    end
+    return 29 
+end
+
+

@@ -21,6 +21,7 @@ namespace GObject
         AtyCountryWar,//阵营战
         AtyClanWar,   //帮派战
         AtyAthletics, //斗剑
+        AtySignIn,    //每日签到 
         AtyMaxFlag,      //标志记录的个数
 
         AtyBegin      = 99,
@@ -44,8 +45,10 @@ namespace GObject
     {
         UInt32  overTime;//结束时间
         UInt32  awardID; //上线领取奖励物品ID
-        UInt32  point;  //活跃点数
-        UInt32  award;  //领取的奖励
+        UInt32  point;   //活跃点数
+        UInt32  award;   //领取的奖励
+        UInt32  scores;  //玩家签到总积分
+        UInt32  propsID; //刷新出来的道具ID，待兑换 
         /*
         UInt8   practice;//修炼次数
         UInt8   tripodFire;//点火次数
@@ -61,14 +64,19 @@ namespace GObject
         {
             Reset();
         }
-        void Reset(UInt32 aid = 0, UInt32 ot = 0)
+        void Reset(UInt32 aid = 0, UInt32 ot = 0, UInt32 s = 0, UInt32 pid = 0)
         {
             memset(this, 0, sizeof(ActivityItem));
             if(aid)
                 awardID = aid;
             if(ot)
                 overTime = ot;
+            if(s) 
+                scores = s;
             point = 10;
+            propsID = 29;
+            if(pid) 
+                propsID = pid;
         }
     };
     struct stRtyReward
@@ -147,6 +155,15 @@ namespace GObject
             * @brief s->c  刷新列表
             */
            void ActivityList(UInt8 type);
+            
+           /**
+            * @brief 增加签到积分 
+            */
+            void AddScores(UInt32 v);
+            void SubScores(UInt32 v);
+            UInt32 GetScores() { return _item.scores;}
+            UInt32 GetPropsID() { return _item.propsID;}
+            void SetPropsID(UInt32 id = 0); 
     };
 
 }

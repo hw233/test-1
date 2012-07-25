@@ -51,7 +51,7 @@ void DBConnectionMgr::AddBack( DBConn * conn )
 
 bool DBConnectionMgr::Init(const std::string& host, const std::string& user, const std::string& pwd, const std::string& dbname, UInt16 minConn, UInt16 maxConn, UInt16 port, UInt16 idleTime)
 {
-	FastMutex::ScopedLock lk(_mutex);
+    FastMutex::ScopedLock lk(_mutex);
 	closeAll();
 	_host = host;
 	_port = port;
@@ -67,7 +67,7 @@ bool DBConnectionMgr::Init(const std::string& host, const std::string& user, con
 
 void DBConnectionMgr::UnInit()
 {
-	FastMutex::ScopedLock lk(_mutex);
+    FastMutex::ScopedLock lk(_mutex);
 	closeAll();
 }
 

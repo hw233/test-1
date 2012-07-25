@@ -445,6 +445,7 @@ void BattleFighter::updateBuffExtras()
         _attrExtra.hitrate *= 1.05f;
     }
 
+    printf("_flag2 = 0x%x\n", _flag2);
     if (_flag2 & AthlEnh31)
     {
         _attrExtra.pierce *= 1.1f;

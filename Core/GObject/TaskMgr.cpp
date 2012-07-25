@@ -55,7 +55,7 @@ namespace GObject
 	void TaskMgr::LoadTask(TaskData * task)
 	{
 		SetTaskStep(task, task->m_StepStr);
-		if (task->m_Completed == 0)
+        if (task->m_Completed == 0)
 			m_TaskAcceptedList[task->m_TaskId] = task;
 		else
 			m_TaskCompletedList[task->m_TaskId] = task;

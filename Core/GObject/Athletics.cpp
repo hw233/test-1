@@ -211,7 +211,6 @@ void Athletics::notifyDropAthleticsData(UInt32 id)
 
 void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset)
 {
-    return;
     if(!atker || !defer)
         return;
     AthleticsRankData* curData = gAthleticsRank.getAthleticsRankData(atker);
@@ -221,9 +220,13 @@ void Athletics::adjustAthlDeferBuffData(Player *atker, Player *defer, bool reset
     UInt8 index;
     UInt8 rivalType;
     UInt32 bufFlag = Battle::BattleFighter::AthlEnh31;
-    index = curData->eSelectIndex;
-    if(index== 0 || index > 5)
-        index = 1;
+    for(index = 0; index < 5; index++)
+    {
+        if(curData->eRival[index] == defer->getId())
+            break;
+    }
+    if(index >= 5)
+        return;
     rivalType = curData->eRivalType[index];
     if(rivalType == 0 || rivalType > 7)
         return;
@@ -556,8 +559,10 @@ void Athletics::attackMartial(Player* defer)
             break;
 
         UInt8 tid = defer->getThreadId();
+        printf("atk(%"I64_FMT"u), defer(%"I64_FMT"u), (%u, %u)\n", _owner->getId(), defer->getId(), _owner->getThreadId(), defer->getThreadId());
         if(_owner->getThreadId() != tid)
         {
+            printf("It is different thread\n");
             struct AthleticsBeData
             {
                 Player * attacker;
@@ -615,6 +620,7 @@ void Athletics::attackMartial(Player* defer)
 
 void Athletics::beAttackMartial(Player * atker, UInt16 formation, UInt16 portrait, Lineup * lineup)
 {
+    printf("be: atk(%"I64_FMT"u), defer(%"I64_FMT"u), (%u, %u)\n", atker->getId(), _owner->getId(), atker->getThreadId(), _owner->getThreadId());
     atker->addFlag(GObject::Player::AthleticsBuff);
     adjustAthlDeferBuffData(atker, _owner, false);
 	Battle::BattleSimulator bsim(Battle::BS_ATHLETICS1, atker, _owner);

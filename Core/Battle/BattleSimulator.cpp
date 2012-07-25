@@ -285,6 +285,7 @@ void BattleSimulator::start(UInt8 prevWin)
                     flag2 |= BattleFighter::AthlEnh9;
             }
             flag2 |= _player[i]->getAthlRivalBuff();
+            printf("flag2 = 0x%x\n", flag2);
 		}
 		for(int j = 0; j < 25; ++ j)
 		{
@@ -858,10 +859,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(magatk)
                 {
                     magdef = area_target->getMagDefend();
-                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor);
                     float magatkreduce = area_target->getMagAtkReduce();
-                    if(magatkreduce && magdmg > 0)
-                        magdmg -= factor * magatk * magatkreduce / 100;
+                    magdmg = _formula->calcDamage(factor * magatk, magdef, bf->getLevel(), toughFactor, magatkreduce);
 
                     magdmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -871,11 +870,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
                 if(atk)
                 {
                     def = area_target->getDefend();
-                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor);
-
                     float atkreduce = area_target->getAtkReduce();
-                    if(atkreduce && dmg > 0)
-                        dmg -= factor * atk * atkreduce / 100;
+                    dmg = _formula->calcDamage(factor * atk, def, bf->getLevel(), toughFactor, atkreduce);
 
                     dmg *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -1039,11 +1035,8 @@ UInt32 BattleSimulator::attackOnce(BattleFighter * bf, bool& cs, bool& pr, const
 					float def = bf->getDefend();
 					bool pr = target_fighter->calcPierce(bf);
                     float toughFactor = pr ? bf->getTough(target_fighter) : 1.0f;
-					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor);
-
                     float atkreduce = bf->getAtkReduce();
-                    if(atkreduce && dmg2 > 0)
-                        dmg2 -= factor * atk * atkreduce / 100;
+					UInt32 dmg2 = _formula->calcDamage(atk, def, target_fighter->getLevel(), toughFactor, atkreduce);
 
                     dmg2 *= static_cast<float>(950 + _rnd(100)) / 1000;
 
@@ -2150,7 +2143,7 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
     }
 
     // 雪球-137 小蜘蛛-434
-    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434)
+    if(SKILL_ID(skill->getId()) == 137 || SKILL_ID(skill->getId()) == 434 || SKILL_ID(skill->getId()) == 479)
     {
         static UInt8 skill_prob_137[10][3] = {
             {0, 0, 0},
@@ -2209,8 +2202,10 @@ bool BattleSimulator::doSkillAttack(BattleFighter* bf, const GData::SkillBase* s
             GObject::Fighter * fgt = NULL;
             if(SKILL_ID(skill->getId()) == 137)
                 fgt = globalFighters[5679];
-            else
+            else if(SKILL_ID(skill->getId()) == 434)
                 fgt = globalFighters[6011];
+            else
+                fgt = globalFighters[7006];
             if(fgt == NULL)
                 break;
 			BattleFighter * newf = new(std::nothrow) Battle::BattleFighter(_formula, fgt, side, pos);

@@ -191,8 +191,8 @@ bool enum_midnight(void * ptr, void* next)
 		return true;
 	if (pl->isOnline())
 	{
-		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, 0);
-		GLOBAL().PushMsg(hdr, NULL);
+		GameMsgHdr hdr(0x269, pl->getThreadId(), pl, sizeof(nextday));
+		GLOBAL().PushMsg(hdr, &nextday);
 	}
     else
     {
@@ -754,7 +754,7 @@ bool World::Init()
     AddTimer(86400 * 1000, World_Athletics_Check, static_cast<void *>(NULL), (athChkPoint >= now ? athChkPoint - now : 86400 + athChkPoint - now) * 1000);
 
     AddTimer(5 * 1000, Team_Copy_Process, static_cast<void*>(NULL));
-    AddTimer(3600 * 1000, AthleticsPhysicalCheck);
+    AddTimer(3600 * 1000, AthleticsPhysicalCheck, static_cast<void *>(NULL), (3600 - now % 3600) * 1000);
 	return true;
 }
 
